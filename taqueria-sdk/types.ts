@@ -238,9 +238,9 @@ export interface TaskView {
 export interface Schema {
     readonly schema: string,
     readonly version: string,
-    readonly tasks: [Task|undefined],
-    readonly scaffolds?: [Scaffold|undefined],
-    readonly hooks?: [Hook|undefined]
+    readonly tasks: (Task|undefined)[],
+    readonly scaffolds?: (Scaffold|undefined)[],
+    readonly hooks?: (Hook|undefined)[]
     checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>,
     installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>,
     proxy?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>,

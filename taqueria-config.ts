@@ -132,12 +132,10 @@ const NPMPlugin = {
                 })
         
                 const output = await process.output()
-        
                 const decoder = new TextDecoder()
-        
                 const raw = decoder.decode(output)
-
-                return JSON.parse(raw) // TODO validate schema
+                const decoded = JSON.parse(raw) // TODO validate schema
+                return decoded
             }
             catch (err) {
                 return Promise.reject({kind: 'E_INVALID_JSON', msg: 'TODO i18n message', previous: err})

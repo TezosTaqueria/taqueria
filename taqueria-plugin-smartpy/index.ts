@@ -19,7 +19,7 @@ Plugin.create(i18n => ({
             description: "Have a cup of tea",
             options: [
                 Option.create({
-                    shortflag: "g",
+                    shortFlag: "g",
                     flag: "green",
                     description: "Make green tea instead"
                 })

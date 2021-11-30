@@ -13,24 +13,25 @@ $2OpfP$taqueriasdk.Plugin.create((i18n)=>({
                     "compile-smartpy"
                 ],
                 description: "Compile a smart contract written in a SmartPy syntax to Michelson code",
+                options: [],
+                handler: $2OpfP$taqueriasdk.binary("SmartPy.sh %entry-point% %syntax% %infer% %sourceFile% %contractsDir%")
+            }),
+            $2OpfP$taqueriasdk.Task.create({
+                task: "teapot",
+                command: "teapot",
+                aliases: [
+                    "t",
+                    "tea"
+                ],
+                description: "Have a cup of tea",
                 options: [
                     $2OpfP$taqueriasdk.Option.create({
-                        shortFlag: "e",
-                        flag: "entry-point",
-                        description: "The entry point that will be compiled"
-                    }),
-                    $2OpfP$taqueriasdk.Option.create({
-                        shortFlag: "s",
-                        flag: "syntax",
-                        description: "The syntax used in the contract"
-                    }),
-                    $2OpfP$taqueriasdk.Option.create({
-                        shortFlag: "i",
-                        flag: "infer",
-                        description: "Enable type inference"
+                        shortFlag: "g",
+                        flag: "green",
+                        description: "Make green tea instead"
                     })
                 ],
-                handler: $2OpfP$taqueriasdk.binary("ligo %entry-point% %syntax% %infer% %sourceFile% %contractsDir%")
+                handler: "proxy"
             })
         ],
         checkRuntimeDependencies: ()=>Promise.resolve({
