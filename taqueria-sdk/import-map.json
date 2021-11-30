@@ -1,0 +1,6 @@
+{
+    "imports": {
+        "./types": "./types.ts",
+        "./yargs": "https://deno.land/x/yargs@v17.2.1-deno/deno.ts"
+    }
+}

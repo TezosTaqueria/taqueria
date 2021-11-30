@@ -1,0 +1,5 @@
+node_modules
+/deno
+.vscode
+.parcel-cache
+/taqueria
