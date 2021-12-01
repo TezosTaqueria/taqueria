@@ -1,0 +1,36 @@
+{
+  "name": "@taqueria/test",
+  "version": "1.0.0",
+  "description": "This is Taqueria testing project includes unit, integration and e2e tests",
+  "main": "index.js",
+  "scripts": {
+    "test:unit": "jest --config jest.config.unit.ts --coverage --no-cache",
+    "test:integration": "jest --config jest.config.integration.ts --no-cache",
+    "test:e2e": "jest --config jest.config.e2e.ts --no-cache"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ecadlabs/taqueria.git"
+  },
+  "keywords": [
+    "taqueria",
+    "tests",
+    "e2e",
+    "integration",
+    "unit"
+  ],
+  "author": "Jev Bjorsell",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ecadlabs/taqueria/issues"
+  },
+  "homepage": "https://github.com/ecadlabs/taqueria#readme",
+  "devDependencies": {
+    "@taquito/taquito": "^11.0.2",
+    "@types/jest": "^27.0.3",
+    "jest": "^27.4.3",
+    "ts-jest": "^27.0.7",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  }
+}
