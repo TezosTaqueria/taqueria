@@ -3,6 +3,9 @@ abstract class StringLike {
     protected constructor(value: string){
         this.value = value
     }
+    static make (value: string) {
+        return this.constructor.call(this, value)
+    }
 }
 
 declare const verbType: unique symbol;
@@ -25,23 +28,16 @@ export class Noun extends StringLike {
     }
 }
 
-declare const nounWithVerbType: unique symbol
-export class NounWithOneOrMoreVerbs extends StringLike {
-    [nounWithVerbType]: void
-    static create(value: string) : NounWithOneOrMoreVerbs | undefined {
-        const result = value.match(/^([A-Za-z-]+) (\[[A-Za-z-]+\] ?){1,}/)
-        if (result) {
-            const noun = Noun.create(result[0])
-            if (noun) {
-                // TODO need to extract pattern matches for verbs
-                return new NounWithOneOrMoreVerbs(noun.value)
-            }
+declare const commandType: unique symbol
+export class Command extends StringLike {
+    [commandType]: void
+    static create(value: string) : Command | undefined {
+        if (value.match(/^([A-Za-z-_]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/)) {
+            return new Command(value)
         }
-        return undefined
+        return undefined   
     }
 }
-
-type Command = Noun | NounWithOneOrMoreVerbs
 
 declare const singleChar: unique symbol
 export class SingleChar extends StringLike {
@@ -132,7 +128,7 @@ export class Task {
     }
     static create(task: UnvalidatedTask): Task | undefined {
         const name = Verb.create(task.task)
-        const command = Noun.create(task.command) || NounWithOneOrMoreVerbs.create(task.command)
+        const command = Command.create(task.command)
         const aliases = task.aliases ? task.aliases.map(createAlias).filter(alias => alias!= undefined) : []
         const options = !task.options ? [] : task.options.reduce(
             (retval: Option[], option: Option | undefined) => option ? [...retval, option] : retval,
