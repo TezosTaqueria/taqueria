@@ -7,8 +7,12 @@ import {match, __} from 'https://cdn.skypack.dev/ts-pattern'
 import {getConfig, loadPlugins, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import type {SanitizedPath} from './taqueria-utils/sanitized-path.ts'
 import Path from './taqueria-utils/sanitized-path.ts'
+import {isTaqError} from './taqueria-utils/taqueria-utils.ts'
+import {TaqError} from './taqueria-utils/types.ts'
 
-type CLIConfig = ReturnType<typeof yargs>
+type CLIConfig = ReturnType<typeof yargs> & {
+    completion: () => CLIConfig
+}
 
 
 /**
@@ -67,6 +71,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
                 fork (console.error) (console.log)
             )
     )
+    .help(false)
 
 
 const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n) => pipe(
@@ -75,9 +80,9 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n) => pipe(
 
 const postInitCLI = (env: EnvVars, args: DenoArgs, parsedArgs: SanitizedInitArgs, i18n: i18n) => pipe(
     commonCLI(env, args, i18n)
-    .help()
+    .demandCommand()
     .completion()
-    .demandCommand(),
+    .help(),
     extendCLI(env, parsedArgs, i18n)
 )
 
@@ -173,7 +178,7 @@ const updateTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, provider: strin
 const createTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, provider: string) => resolve(
     cliConfig
         .command({
-            command: task.name,
+            command: task.command,
             aliases: task.aliases,
             description: task.description,
             builder: {
@@ -188,21 +193,36 @@ const createTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, provider: strin
             }
         })
 )
-    
-        
+            
 export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
     // Parse the args required for core built-in tasks
+    const cli = initCLI(env, inputArgs, i18n)
     const initArgs = pipe(
-        initCLI(env, inputArgs, i18n).parse(),
+        cli.parse(),
         sanitizeArgs
     )
 
+    // No need to load plugins when initializing a project
     if (initArgs._.includes('init')) return;
 
     // Create the CLI extended with plugins and the help option enabled
-    fork (console.error) (identity) (postInitCLI(env, inputArgs, initArgs, i18n))
+    fork (displayError(cli)) (identity) (postInitCLI(env, inputArgs, initArgs, i18n))
 }
 
+export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
+    cli.getInternalMethods().getCommandInstance().usage.showHelp()
+    console.error("") // empty line
+    if (isTaqError(err)) {
+        switch (err.kind) {
+            case 'E_INVALID_CONFIG':
+                console.error(err.msg)
+                break;
+            default:
+                console.error(err)
+        }
+    }
+    else console.error(err)
+}
 
 const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     _: parsedArgs._,
