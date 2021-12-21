@@ -1,5 +1,6 @@
-import {Task as aTask, Option as aOption, Binary, SchemaView, TaskView, OptionView, i18n, Args, ParsedArgs, RuntimeDependency, ActionResponse, pluginDefiner, LikeAPromise, Failure, UnvalidatedTask, UnvalidatedOption} from "./types"
-import yargs from 'yargs'
+import {Alias, Option as anOption, UnvalidatedOption as OptionView, Task as TaskLike} from 'taqueria-protocol/taqueria-protocol-types'
+import {SchemaView, Task as aTask, TaskView, Binary, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure} from "./types"
+const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 
 const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefined>> => {
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
@@ -15,40 +16,45 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefin
     })
 }
 
-const viewOption = ({shortFlag, flag, description}: aOption): OptionView => ({
+const viewOption = ({shortFlag, flag, description}: anOption): OptionView => ({
     shortFlag: shortFlag.value,
     flag: flag.value,
     description
 })
 
-const viewTask = ({name, command, aliases, description, options, handler}: aTask): TaskView => ({
-    name: name.value,
+const viewTask = ({name, command, aliases, description, options}: aTask|TaskLike): TaskView => ({
+    task: name.value,
     command: command.value,
     aliases: !aliases ? [] : aliases.reduce(
-        (retval: string[], alias) => alias ? [...retval, alias.value] : retval,
+        (retval: string[], alias: Alias|undefined) => alias ? [...retval, alias.value] : retval,
         []
     ),
     description,
     options: !options ? [] : options.reduce(
-        (retval: OptionView[], option: aOption | undefined) => option ? [...retval, viewOption(option)] : retval,
+        (retval: OptionView[], option: anOption | undefined) => option ? [...retval, viewOption(option)] : retval,
         []
-    ),
-    handler
+    )
 })
+
+
 
 const parseSchema = (i18n: i18n, definer: pluginDefiner): SchemaView | undefined => {
     try {
-        const {schema, version, tasks, scaffolds, hooks, ...functions} = definer(i18n)
+        const {schema, version, tasks, scaffolds, hooks, networks, sandboxes, ...functions} = definer(i18n)
 
         return {
             schema,
             version,
-            tasks: tasks.reduce(
-                (retval: TaskView[], task: aTask|undefined) => task ? [...retval, viewTask(task)] : retval,
-                []
-            ),
+            tasks: tasks
+                ? tasks.reduce(
+                    (retval: TaskView[], task) => task ? [...retval, viewTask(task)] : retval,
+                    []
+                )
+                : [],
             hooks: [],
             scaffolds: [],
+            networks: [],
+            sandboxes: [],
             ...functions
         }
     }
@@ -95,13 +101,9 @@ export const Plugin = {
         .catch(sendError)
 }
 
-export const Task = {
-    create: (input: UnvalidatedTask) => aTask.create(input)
-}
+export const Task = aTask
 
-export const Option = {
-    create: (input: UnvalidatedOption) => aOption.create(input)
-}
+export const Option = anOption
 
 export default {
     Plugin,

@@ -1,4 +1,4 @@
-import type {Future, reject, resolve, TaqError} from './types.ts'
+import type {Future, reject, resolve, TaqError} from './taqueria-utils-types.ts'
 import Url from './url.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
@@ -22,9 +22,9 @@ export const log = <T>(message: string) => (input: T) : T => {
     return input
 }
 
-const mkdirP = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
+const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
 
-export const mkdir = (path: string) : Future<TaqError, void> => pipe(path, mkdirP, map (() => path))
+export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map (() => path))
 
 export const readFile = (path: string) => Fluture(
     (rej: reject, res: resolve) => {

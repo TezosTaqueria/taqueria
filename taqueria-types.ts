@@ -1,24 +1,6 @@
-import type {SanitizedPath} from './taqueria-utils/sanitized-path.ts'
-
-
-export interface InstalledPlugin {
-    name: string
-
-    type: 'npm' | 'binary' | "deno"
-}
-
-export interface Config {
-    language?: 'en' | 'fr'
-    plugins: InstalledPlugin[]
-    contractsDir: string
-    testsDir: string
-}
-
-export interface TaskOption {
-    shortFlag: string,
-    flag: string,
-    description: string
-}
+import type {SanitizedPath} from './taqueria-utils/taqueria-utils-types.ts'
+import {mkdir as mkDir, joinPaths} from './taqueria-utils/taqueria-utils.ts'
+import {resolve, map} from 'https://cdn.skypack.dev/fluture';
 
 export interface CommandArgs extends SanitizedInitArgs {
     plugin: string
@@ -44,43 +26,22 @@ export interface Command {
     optional: string[]
 }
 
-export interface Task {
-    name: string
-    command: string
-    aliases: string[]
-    description: string
-    options: TaskOption[]
-}
-
-export interface Scaffold {
-    [key: string]: {
-        description: string
-        options: TaskOption[]
-    }
-}
-
-export interface PluginInfo {
-
-    tasks: Task[],
-    scaffolds: Scaffold[]
-}
-
-export type taskName = "taqify"
-
 export type DenoArgs = typeof Deno.args
 
 export interface RawInitArgs {
     _: ['init' | 'install' | 'uninstall']
     projectDir: string // path to the project
     configDir: string,
-    maxConcurrency: number
+    maxConcurrency: number,
+    debug: boolean
 }
 
 export interface SanitizedInitArgs {
     _: ['init' | 'install' | 'uninstall']
     projectDir: SanitizedPath
     configDir: SanitizedPath,
-    maxConcurrency: number
+    maxConcurrency: number,
+    debug: boolean
 }
 
 export interface i18n {
@@ -93,4 +54,18 @@ export interface EnvVars {
     get: (key: EnvKey) => undefined | string
 }
 
-export type AddTaskCallback = (task: Task, provider: string) => unknown
+const configDirType: unique symbol = Symbol()
+export class ConfigDir {
+    [configDirType]: void
+    readonly value: string
+    private constructor(value: string) {
+        this.value = value
+    }
+    static create(projectDir: SanitizedPath, configDir: SanitizedPath, mkdir=false) {
+        const path = joinPaths(projectDir.value, configDir.value)
+        return mkdir
+            ? map ((path:string) => new ConfigDir(path)) (mkDir(path))
+            : resolve(new ConfigDir(path))
+
+    }
+}

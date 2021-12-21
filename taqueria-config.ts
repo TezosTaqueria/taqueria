@@ -1,13 +1,14 @@
-import type {InstalledPlugin, Config, PluginInfo, EnvVars, SanitizedInitArgs, i18n, Task, AddTaskCallback} from './types.ts'
-import ConfigDir from './config-dir.ts'
-import type {Future, TaqError} from './taqueria-utils/types.ts'
+import type {Config, PluginInfo, Task, InstalledPlugin} from './taqueria-protocol/taqueria-protocol-types.ts'
+import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
+import {EnvVars, ConfigDir, SanitizedInitArgs, i18n} from './taqueria-types.ts'
+import {SanitizedPath} from './taqueria-utils/taqueria-utils-types.ts'
 import {readFile, writeTextFile, decodeJson, log, joinPaths} from './taqueria-utils/taqueria-utils.ts'
-import type {SanitizedPath} from './taqueria-utils/sanitized-path.ts'
-import Path from './taqueria-utils/sanitized-path.ts'
 import {match} from 'https://cdn.skypack.dev/ts-pattern'
 import {join} from "https://deno.land/std@0.114.0/path/mod.ts";
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {resolve, reject, map, chain, mapRej, chainRej, parallel, attemptP} from 'https://cdn.skypack.dev/fluture'
+
+export type AddTaskCallback = (task: Task, provider: string) => unknown
 
 const defaultConfig : Config = {
     language: 'en',
@@ -38,8 +39,8 @@ export const make = (data: object) : Future<TaqError, Config> => {
 }
 
 export const getConfigPath = (projectDir: SanitizedPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
-    ConfigDir.make(projectDir, configDir, create),
-    map ((configDir:string) => join(configDir, "config.json"))
+    ConfigDir.create(projectDir, configDir, create),
+    map ((configDir: ConfigDir) => join(configDir.value, "config.json"))
 )
 
 export const getRawConfig = (projectDir: SanitizedPath, configDir: SanitizedPath,  create=false) : Future<TaqError, object> => pipe(
@@ -107,7 +108,10 @@ const NPMPlugin = {
         return pipe(
             this.retrievePluginInfo(i18n, plugin, parsedArgs),
             chain ((info: PluginInfo) => pipe(
-                info.tasks.map((task: Task) => addTask(task, plugin.name)),
+                info.tasks.map((task: Task) => {
+                    debugger
+                    return addTask(task, plugin.name)
+                }),
                 parallel (parsedArgs.maxConcurrency)
             )),
             mapRej ((previous:unknown) => ({kind: "E_INVALID_NPM_PLUGIN", msg: "TODO, should this use i18n?", previous})),
@@ -118,8 +122,9 @@ const NPMPlugin = {
     retrievePluginInfo(i18n: i18n, plugin: InstalledPlugin, {projectDir}: SanitizedInitArgs) {
         return attemptP(async () => {
             try {
+                debugger
                 const pluginPath = joinPaths(
-                    Path.view(projectDir),
+                    projectDir.value,
                     "node_modules",
                     plugin.name,
                     'index.js'

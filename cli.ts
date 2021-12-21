@@ -1,14 +1,13 @@
-import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, Task, Command, CommandArgs} from './types.ts'
+import type {Task} from './taqueria-protocol/taqueria-protocol-types.ts'
+import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, Command, CommandArgs} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs/deno.ts'
-import {map, coalesce, resolve, reject, fork} from 'https://cdn.skypack.dev/fluture';
+import {map, coalesce, resolve, reject, fork, debugMode} from 'https://cdn.skypack.dev/fluture';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {match, __} from 'https://cdn.skypack.dev/ts-pattern'
 import {getConfig, loadPlugins, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import type {SanitizedPath} from './taqueria-utils/sanitized-path.ts'
-import Path from './taqueria-utils/sanitized-path.ts'
 import {isTaqError} from './taqueria-utils/taqueria-utils.ts'
-import {TaqError} from './taqueria-utils/types.ts'
+import {SanitizedPath, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
 
 type CLIConfig = ReturnType<typeof yargs> & {
     completion: () => CLIConfig
@@ -42,6 +41,12 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         default: getFromEnv('TAQ_MAX_CONCURRENCY', getDefaultMaxConcurrency(), env),
     })
     .hide('maxConcurrency')
+    .option('debug', {
+        describe: i18n.__('Enable internal debugging'),
+        default: false
+    })
+    .boolean('debug')
+    .hide('debug')
     .option('p', {
         alias: 'projectDir',
         default: './',
@@ -105,9 +110,9 @@ const getTask = (cliConfig: CLIConfig, task: Task) => {
             .reduce(
                 (retval: unknown, handler: unknown[]) => {
                     if (retval) return retval
-                    if (handler[0] === task.name) return handler
-                    const commandName = instance.aliasMap[task.name]
-                    const existingCmd = instance.handlers[instance.aliasMap[task.name]]
+                    if (handler[0] === task.task) return handler
+                    const commandName = instance.aliasMap[task.task.value]
+                    const existingCmd = instance.handlers[instance.aliasMap[task.task.value]]
                     return commandName && existingCmd ? [commandName, existingCmd] : retval
                 },
                 false
@@ -152,8 +157,8 @@ const updateTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, provider: strin
             commandArr[1] = i18n.__("Provided by more than one plugin. To learn more try: taqueria compile --help")
             commandArr[3] = task.aliases.reduce(
                 (retval, alias) => {
-                    if (!retval.includes(alias)) {
-                        retval.push(alias)
+                    if (!retval.includes(alias.value)) {
+                        retval.push(alias.value)
                         return retval
                     }
                     return retval
@@ -166,7 +171,7 @@ const updateTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, provider: strin
     instance.usage.getCommands = () => commands
     instance.aliasMap = task.aliases.reduce(
         (retval, alias) => {
-            retval[alias] = commandName
+            retval[alias.value] = commandName
             return retval
         },
         instance.aliasMap
@@ -202,6 +207,9 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
         sanitizeArgs
     )
 
+    // Add internal debugging
+    if (initArgs.debug) debugMode(true)
+
     // No need to load plugins when initializing a project
     if (initArgs._.includes('init')) return;
 
@@ -226,9 +234,10 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
 
 const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     _: parsedArgs._,
-    configDir: Path.make(parsedArgs.configDir),
-    projectDir: Path.make(parsedArgs.projectDir),
-    maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency
+    configDir: SanitizedPath.create(parsedArgs.configDir),
+    projectDir: SanitizedPath.create(parsedArgs.projectDir),
+    maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency,
+    debug: parsedArgs.debug
 })
 
 export default {

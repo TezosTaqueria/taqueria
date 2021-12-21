@@ -1,89 +1,6 @@
-abstract class StringLike {
-    readonly value: string
-    protected constructor(value: string){
-        this.value = value
-    }
-    static make (value: string) {
-        return this.constructor.call(this, value)
-    }
-}
+import {PluginInfo, Scaffold, Hook, Sandbox, Network, Verb, Command, Option, Alias, RuntimeDependency, UnvalidatedTask as anUnvalidatedTask, Task as aTask, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedPluginInfo, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork} from 'taqueria-protocol/taqueria-protocol-types'
 
-declare const verbType: unique symbol;
-export class Verb extends StringLike {
-    [verbType]: void
-    static create(value: string): Verb | undefined {
-        const result = value.match(/^[A-Za-z-]+/)
-        // TODO - should we do more validation whether its a verb?
-        return result ? new Verb(result[0]) : undefined
-    }
-}
-
-declare const nounType: unique symbol;
-export class Noun extends StringLike {
-    [nounType]: void
-    static create(value: string): Noun | undefined {
-        const result = value.match(/^[A-Za-z-]+/)
-        // TODO - should we do more validation whether its a verb?
-        return result ? new Noun(result[0]) : undefined
-    }
-}
-
-declare const commandType: unique symbol
-export class Command extends StringLike {
-    [commandType]: void
-    static create(value: string) : Command | undefined {
-        if (value.match(/^([A-Za-z-_]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/)) {
-            return new Command(value)
-        }
-        return undefined   
-    }
-}
-
-declare const singleChar: unique symbol
-export class SingleChar extends StringLike {
-    [singleChar]: void
-    static create(value: string): SingleChar | undefined {
-        return value && value.toString().match(/^[A-Za-z]/)
-            ? new SingleChar(value[0])
-            : undefined
-    }
-}
-
-type Alias = Noun | SingleChar
-
-export const createAlias = (value: string): Alias | undefined => {
-    return Noun.create(value) || SingleChar.create(value)
-}
-
-export interface UnvalidatedOption {
-    readonly shortFlag: string
-    readonly flag: string
-    readonly description: string
-}
-
-declare const optionType: unique symbol
-export class Option {
-    [optionType]: void
-    readonly shortFlag: SingleChar
-    readonly flag: Verb
-    readonly description: string
-    private constructor(shortFlag: SingleChar, flag: Verb, description: string) {
-        this.shortFlag = shortFlag
-        this.flag = flag
-        this.description = description
-    }
-    static create(option: UnvalidatedOption): Option | undefined {
-        const shortFlag = SingleChar.create(option.shortFlag)
-        const flag = Verb.create(option.flag)
-
-        if (shortFlag && flag)
-            return new Option(shortFlag, flag, option.description)
-        
-            return undefined
-    }
-}
-
-declare const binaryType: unique symbol
+const binaryType: unique symbol = Symbol()
 export class Binary {
     [binaryType]: void
     readonly value: string
@@ -97,39 +14,23 @@ export class Binary {
 
 export type TaskHandler = "proxy" | Binary
 
-type UnvalidatedTaskOption = Option | undefined
-
-export interface UnvalidatedTask {
-    readonly task: string,
-    readonly command: string,
-    readonly description: string,
-    readonly handler: TaskHandler
-    readonly aliases?: string[]
-    readonly options?: UnvalidatedTaskOption[]
+export interface UnvalidatedTask extends anUnvalidatedTask {
+    handler: TaskHandler
 }
 
-
-declare const taskType: unique symbol
-export class Task {
+const taskType: unique symbol = Symbol()
+export class Task extends aTask{
     [taskType]: void
-    readonly name: Verb
-    readonly command: Command
-    readonly aliases?: Alias[]
-    readonly description: string
-    readonly options?: Option[]
     readonly handler: TaskHandler
     protected constructor(name: Verb, command: Command, description: string, handler: TaskHandler, options: Option[]=[], aliases: Alias[]=[]) {
-        this.name = name
-        this.command = command
-        this.description = description
+        super(name, command, description, options, aliases)
         this.handler = handler
-        this.options = options
-        this.aliases = aliases
     }
+
     static create(task: UnvalidatedTask): Task | undefined {
         const name = Verb.create(task.task)
         const command = Command.create(task.command)
-        const aliases = task.aliases ? task.aliases.map(createAlias).filter(alias => alias!= undefined) : []
+        const aliases = task.aliases ? task.aliases.map(this.createAlias).filter(alias => alias!= undefined) : []
         const options = !task.options ? [] : task.options.reduce(
             (retval: Option[], option: Option | undefined) => option ? [...retval, option] : retval,
             []
@@ -140,11 +41,12 @@ export class Task {
     }
 }
 
-export interface Scaffold {
-}
-
-export interface Hook {
-
+export interface TaskView {
+    readonly task: string
+    readonly command: string
+    readonly description: string
+    readonly aliases: string[]
+    readonly options: UnvalidatedOption[]
 }
 
 export interface Failure<Params> {
@@ -166,13 +68,6 @@ export interface i18n {
 }
 
 export type Action = "checkRuntimeDependencies" | "installRuntimeDependencies" | "proxy" | "pluginInfo"
-
-export interface RuntimeDependency {
-    readonly name: string,
-    readonly path: string,
-    readonly version: string,
-    readonly kind: "required" | "optional"
-}
 
 export interface RuntimeDependencyReport extends RuntimeDependency {
     readonly met: boolean
@@ -208,48 +103,30 @@ export interface ActionPluginInfo extends SchemaView {
 
 export type ActionResponse = ProxyAction | CheckRuntimeDependenciesAction | InstallRuntimeDependenciesAction | ActionPluginInfo | ActionNotSupported
 
-export interface ScaffoldView {
-
-}
-
-export interface HookView {
-
-}
-
-export interface OptionView {
-    readonly shortFlag: string
-    readonly flag: string
-    readonly description: string
-}
-
-export interface TaskView {
-    readonly name: string
-    readonly command: string
-    readonly aliases: string[]
-    readonly description: string
-    readonly options?: OptionView[]
-    readonly handler: TaskHandler
-}
-
 export interface Schema {
-    readonly schema: string,
-    readonly version: string,
-    readonly tasks: (Task|undefined)[],
-    readonly scaffolds?: (Scaffold|undefined)[],
-    readonly hooks?: (Hook|undefined)[]
-    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>,
-    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>,
-    proxy?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>,
+    // This should match the PluginInfo, but tasks, scaffolds, hooks, networks, and sandboxes are optional
+    readonly schema: string
+    readonly version: string
+    readonly tasks?: (Task | undefined)[]
+    readonly scaffolds?: (Scaffold | undefined)[]
+    readonly hooks?: (Hook | undefined)[]
+    readonly networks?: (Network | undefined)[]
+    readonly sandboxes?: (Sandbox | undefined)[]
+    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
+    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
+    proxy?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
 }
 
 export interface SchemaView {
-    readonly schema: string,
-    readonly version: string,
-    readonly tasks: TaskView[],
-    readonly scaffolds: ScaffoldView[],
-    readonly hooks: HookView[],
-    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>,
-    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>,
+    readonly schema: string
+    readonly version: string
+    readonly tasks: TaskView[]
+    readonly scaffolds: UnvalidatedScaffold[]
+    readonly hooks: UnvalidatedHook[]
+    readonly networks: UnvalidatedNetwork[]
+    readonly sandboxes: UnvalidatedSandbox[],
+    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
+    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
     proxy?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
 }
 

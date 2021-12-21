@@ -1,4 +1,3 @@
-import type {i18n as Internationalization} from './types.ts'
 import i18next from 'https://deno.land/x/i18next/index.js'
 
 // TODO: i18next is feature-rich, but rather large. Determine whether you need all of the functionality
@@ -30,7 +29,7 @@ await i18next.init({
 })
 
 
-export const i18n : Internationalization = {
+export const i18n = {
     __: i18next.t
 }
 
