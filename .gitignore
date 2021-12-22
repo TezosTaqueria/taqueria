@@ -102,3 +102,14 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Project specific
+node_modules
+/deno
+.vscode
+.parcel-cache
+/taqueria
+/taqueria-sdk/index.js
+/taqueria-sdk/index.js.map
+/taqueria-plugin-smartpy/index.js
+/taqueria-plugin-smartpy/index.js.map

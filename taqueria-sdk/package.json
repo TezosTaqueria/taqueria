@@ -1,0 +1,27 @@
+{
+  "name": "taqueria-sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./index.js",
+  "source": "./index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx esbuild --bundle index.ts --outfile=index.js --minify --platform=node --sourcemap",
+    "gen-schema": "npx ts-node schema-generator.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "yargs": "^17.2.1",
+    "taqueria-protocol": "file:../taqueria-protocol"
+  },
+  "devDependencies": {
+    "@bevry/jsonfile": "^1.3.0",
+    "@types/json-schema-generator": "^2.0.0",
+    "@types/yargs": "^17.0.7",
+    "esbuild": "^0.14.7",
+    "json-schema-generator": "^2.0.6",
+    "typescript": "^4.5.2"
+  }
+}
