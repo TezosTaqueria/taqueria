@@ -16,6 +16,7 @@ export type ErrorType =
     "E_INVALID_PATH"
   | "E_INVALID_CONFIG"
   | "E_INVALID_JSON"
+  | "E_FORK"
 
 export interface TaqError {
     readonly kind: ErrorType,

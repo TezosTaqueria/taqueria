@@ -25,7 +25,7 @@ Plugin.create(i18n => ({
                     description: "Enable type inference"
                 })
             ],
-            handler: binary("ligo %entry-point% %syntax% %infer% %sourceFile% %contractsDir%")
+            handler: binary("docker run --rm -v \"$PWD\":\"$PWD\" -w \"$PWD\" ligolang/ligo:next compile contract %sourceFile%")
         })
     ],
     checkRuntimeDependencies: () => Promise.resolve({

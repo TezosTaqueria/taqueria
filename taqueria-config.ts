@@ -6,9 +6,9 @@ import {readFile, writeTextFile, decodeJson, log, joinPaths} from './taqueria-ut
 import {match} from 'https://cdn.skypack.dev/ts-pattern'
 import {join} from "https://deno.land/std@0.114.0/path/mod.ts";
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {resolve, reject, map, chain, mapRej, chainRej, parallel, attemptP} from 'https://cdn.skypack.dev/fluture'
+import {resolve, reject, map, chain, mapRej, chainRej, parallel, attemptP, promise} from 'https://cdn.skypack.dev/fluture'
 
-export type AddTaskCallback = (task: Task, plugin: InstalledPlugin) => unknown
+export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<number>) => unknown
 
 const defaultConfig : Config = {
     language: 'en',
@@ -85,6 +85,26 @@ export const loadPlugins = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i
     }),
 )
 
+export const exec = (cmd: string, inputArgs: Record<string, unknown>) => attemptP(async () => {
+    try {
+        const command = Object.entries(inputArgs).reduce(
+            (retval, [key, val]) => retval.replace(`%${key}%`, val as string),
+            cmd
+        )
+
+        const process = Deno.run({cmd: ["sh", "-c", command]})
+        const status = await process.status()
+        return status.code
+    }
+    catch (previous) {
+        throw {
+            kind: "E_FORK",
+            msg: `Could not fork ${cmd}`,
+            previous
+        }
+    }
+})
+
 // export const installPlugin = (env: EnvVars, parsedArgs: Args, i18n: i18n) => pipe(
 //     getConfig(env, parsedArgs, i18n),
 //     chain ((config:Config) => 
@@ -110,7 +130,20 @@ const NPMPlugin = {
             this.retrievePluginInfo(config, env, i18n, plugin, parsedArgs),
             chain ((info: PluginInfo) => pipe(
                 info.tasks.map((task: Task) => {
-                    return addTask(task, plugin)
+                    return addTask(task, plugin, async (taskArgs: Record<string, unknown>) => {
+                        let statusCode = 0
+                        try {
+                            const f = task.handler === "proxy"
+                                ? this.request("proxy", {taskName: task.task}, config, env, i18n, plugin, parsedArgs)
+                                : exec(task.handler.value, taskArgs)
+                        
+                            statusCode = await promise (f)
+                        }
+                        catch (err) {
+                            return -1
+                        }
+                        return statusCode
+                    })
                 }),
                 parallel (parsedArgs.maxConcurrency)
             )),

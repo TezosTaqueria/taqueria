@@ -9,6 +9,8 @@ import {getConfig, loadPlugins, getDefaultMaxConcurrency} from './taqueria-confi
 import {isTaqError} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedPath, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
 
+export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<void>) => unknown
+
 type CLIConfig = ReturnType<typeof yargs> & {
     completion: () => CLIConfig
 }
@@ -129,9 +131,9 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
     ))
 )
 
-const addTask = (cliConfig: CLIConfig, i18n: i18n) => (task: Task, plugin: InstalledPlugin) =>
+const addTask = (cliConfig: CLIConfig, i18n: i18n) => (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<number>) =>
     coalesce 
-        (()                                             => createTask(cliConfig, i18n, task, plugin))
+        (()                                             => createTask(cliConfig, i18n, task, plugin, handler))
         (([commandName, existing] : [string, Command])  => updateTask(cliConfig, i18n, task, plugin, commandName, existing))
         (getTask(cliConfig, task))
 
@@ -180,7 +182,7 @@ const updateTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, plugin: Install
     return cliConfig
 }
 
-const createTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, plugin: InstalledPlugin) => resolve(
+const createTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<number>) => resolve(
     cliConfig
         .command({
             command: task.command,
@@ -194,8 +196,7 @@ const createTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, plugin: Install
                 }
             },
             handler: (yargs: Record<string, unknown>) => {
-                debugger
-                console.log(`Handler for ${plugin.name}`)
+                handler(yargs)
             }
         })
 )
