@@ -1,5 +1,5 @@
-import {Alias, Option as anOption, UnvalidatedOption as OptionView, Task as TaskLike} from 'taqueria-protocol/taqueria-protocol-types'
-import {SchemaView, Task as aTask, TaskView, Binary, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure} from "./types"
+import {Task as aTask, Binary, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike} from 'taqueria-protocol/taqueria-protocol-types'
+import {SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure} from "./types"
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 
 const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefined>> => {
@@ -22,8 +22,8 @@ const viewOption = ({shortFlag, flag, description}: anOption): OptionView => ({
     description
 })
 
-const viewTask = ({name, command, aliases, description, options}: aTask|TaskLike): TaskView => ({
-    task: name.value,
+const viewTask = ({task, command, aliases, description, options, handler}: aTask|TaskLike): TaskView => ({
+    task: task.value,
     command: command.value,
     aliases: !aliases ? [] : aliases.reduce(
         (retval: string[], alias: Alias|undefined) => alias ? [...retval, alias.value] : retval,
@@ -33,7 +33,8 @@ const viewTask = ({name, command, aliases, description, options}: aTask|TaskLike
     options: !options ? [] : options.reduce(
         (retval: OptionView[], option: anOption | undefined) => option ? [...retval, viewOption(option)] : retval,
         []
-    )
+    ),
+    handler: handler === "proxy" ? "proxy" : handler.value
 })
 
 
@@ -75,7 +76,7 @@ const getResponse = (definer: pluginDefiner) => (parsedArgs: ParsedArgs): LikeAP
             return schema ? Promise.resolve({...schema, status: "success"}) : Promise.reject({err: "E_INVALID_SCHEMA", msg: "The schema of the plugin is invalid."})
         case "proxy":
             return schema && schema.proxy
-                    ? schema.proxy(i18n, args as Record<string, unknown>)
+                    ? schema.proxy(args as Record<string, unknown>)
                     : Promise.resolve({status: "notSupported", stdout: "", stderr: i18n.proxyNotSupported, artifacts: []})
         case "checkRuntimeDependencies":
             return schema && schema.checkRuntimeDependencies
@@ -102,9 +103,8 @@ export const Plugin = {
 }
 
 export const Task = aTask
-
 export const Option = anOption
-
+export const Network = aNetwork
 export default {
     Plugin,
     Task,

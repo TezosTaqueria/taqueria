@@ -29,7 +29,7 @@ export interface Command {
 export type DenoArgs = typeof Deno.args
 
 export interface RawInitArgs {
-    _: ['init' | 'install' | 'uninstall']
+    _: ['init' | 'install' | 'uninstall', 'refresh-teztnets']
     projectDir: string // path to the project
     configDir: string,
     maxConcurrency: number,
@@ -37,7 +37,7 @@ export interface RawInitArgs {
 }
 
 export interface SanitizedInitArgs {
-    _: ['init' | 'install' | 'uninstall']
+    _: ['init' | 'install' | 'uninstall', 'refresh-teztnets']
     projectDir: SanitizedPath
     configDir: SanitizedPath,
     maxConcurrency: number,
