@@ -1,4 +1,4 @@
-import type {Config, PluginInfo, Task, InstalledPlugin} from './taqueria-protocol/taqueria-protocol-types.ts'
+import type {Config, PluginInfo, Task, InstalledPlugin, Action} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
 import {EnvVars, ConfigDir, SanitizedInitArgs, i18n} from './taqueria-types.ts'
 import {SanitizedPath} from './taqueria-utils/taqueria-utils-types.ts'
@@ -8,7 +8,7 @@ import {join} from "https://deno.land/std@0.114.0/path/mod.ts";
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {resolve, reject, map, chain, mapRej, chainRej, parallel, attemptP} from 'https://cdn.skypack.dev/fluture'
 
-export type AddTaskCallback = (task: Task, provider: string) => unknown
+export type AddTaskCallback = (task: Task, plugin: InstalledPlugin) => unknown
 
 const defaultConfig : Config = {
     language: 'en',
@@ -58,13 +58,14 @@ export const getRawConfig = (projectDir: SanitizedPath, configDir: SanitizedPath
                 )
             }
         }),
+        chain (decodeJson),
+        map ((config: Config) => ({...config, configFile: path, configDir, projectDir})),
         mapRej ((previous:unknown) => ({kind: "E_INVALID_CONFIG", msg: "TODO, should this use i18n?", previous})),
     ))
 )
 
 export const getConfig = (projectDir: SanitizedPath, configDir: SanitizedPath, _i18n: i18n, create=false) : Future<TaqError, Config> => pipe(
         getRawConfig(projectDir, configDir, create),
-        chain (decodeJson),
         chain (make)
     )
 
@@ -75,7 +76,7 @@ const loadPlugin = (config:Config, env: EnvVars, parsedArgs: SanitizedInitArgs, 
         .with("binary", () => BinaryPlugin.load(config, env, parsedArgs, i18n, plugin))
         .exhaustive()
 
-export const loadPlugins = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, addTask: (task:Task, provider: string)=> unknown) => pipe(
+export const loadPlugins = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, addTask: AddTaskCallback) => pipe(
     getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false),
     chain ((config:Config) => {
         const jobs = config.plugins.map(loadPlugin(config, env, parsedArgs, i18n, addTask))
@@ -106,11 +107,10 @@ const NPMPlugin = {
 
     load(config: Config, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, plugin: InstalledPlugin, addTask: AddTaskCallback) {
         return pipe(
-            this.retrievePluginInfo(i18n, plugin, parsedArgs),
+            this.retrievePluginInfo(config, env, i18n, plugin, parsedArgs),
             chain ((info: PluginInfo) => pipe(
                 info.tasks.map((task: Task) => {
-                    debugger
-                    return addTask(task, plugin.name)
+                    return addTask(task, plugin)
                 }),
                 parallel (parsedArgs.maxConcurrency)
             )),
@@ -118,11 +118,9 @@ const NPMPlugin = {
         )
     },
 
-    // TODO: This should be memoized
-    retrievePluginInfo(i18n: i18n, plugin: InstalledPlugin, {projectDir}: SanitizedInitArgs) {
+    request(action: Action, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, {projectDir}: SanitizedInitArgs) {
         return attemptP(async () => {
             try {
-                debugger
                 const pluginPath = joinPaths(
                     projectDir.value,
                     "node_modules",
@@ -130,8 +128,20 @@ const NPMPlugin = {
                     'index.js'
                 )
 
+                const formattedArgs = Object.entries(requestArgs).reduce(
+                    (retval: string[], [key, val]) => [...retval, '--'+key, (val as string)],
+                    []
+                )
+
                 const process = Deno.run({
-                    cmd: ["node", pluginPath, '--taqRun', 'pluginInfo', '--i18n', JSON.stringify(i18n)],
+                    cmd: [
+                        "node", pluginPath,
+                        '--taqRun', action,
+                        '--i18n', JSON.stringify(i18n),
+                        '--config', JSON.stringify(config),
+                        '--env', JSON.stringify(env),
+                        ...formattedArgs,
+                    ],
                     stdout: "piped",
                     stderr: "piped",
                 })
@@ -146,6 +156,11 @@ const NPMPlugin = {
                 return Promise.reject({kind: 'E_INVALID_JSON', msg: 'TODO i18n message', previous: err})
             }
         })
+    },
+
+    // TODO: This should be memoized
+    retrievePluginInfo(config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) {
+        return this.request("pluginInfo", {}, config, env, i18n, plugin, parsedArgs)
     }
 }
 

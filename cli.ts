@@ -1,4 +1,4 @@
-import type {Task} from './taqueria-protocol/taqueria-protocol-types.ts'
+import type {Task, InstalledPlugin} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, Command, CommandArgs} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs/deno.ts'
@@ -62,19 +62,19 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
     .epilogue(i18n.__('betaWarning'))
     .command(
         'init [projectDir]',
-            i18n.__('initDesc'),
-            (yargs: Arguments) => {
-                yargs.positional('projectDir', {
-                    describe: i18n.__('initPathDesc'),
-                    type: 'string',
-                    default: getFromEnv("TAQ_PROJECT_DIR", ".", env),
-                })
-            },
-            (args: RawInitArgs) => pipe(
-                sanitizeArgs(args), 
-                ({projectDir, configDir}) => initProject(projectDir, configDir, i18n),
-                fork (console.error) (console.log)
-            )
+        i18n.__('initDesc'),
+        (yargs: Arguments) => {
+            yargs.positional('projectDir', {
+                describe: i18n.__('initPathDesc'),
+                type: 'string',
+                default: getFromEnv("TAQ_PROJECT_DIR", ".", env),
+            })
+        },
+        (args: RawInitArgs) => pipe(
+            sanitizeArgs(args), 
+            ({projectDir, configDir}) => initProject(projectDir, configDir, i18n),
+            fork (console.error) (console.log)
+        )
     )
     .help(false)
 
@@ -129,26 +129,26 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
     ))
 )
 
-const addTask = (cliConfig: CLIConfig, i18n: i18n) => (task: Task, provider: string) =>
+const addTask = (cliConfig: CLIConfig, i18n: i18n) => (task: Task, plugin: InstalledPlugin) =>
     coalesce 
-        (()                                             => createTask(cliConfig, i18n, task, provider))
-        (([commandName, existing] : [string, Command])  => updateTask(cliConfig, i18n, task, provider, commandName, existing))
+        (()                                             => createTask(cliConfig, i18n, task, plugin))
+        (([commandName, existing] : [string, Command])  => updateTask(cliConfig, i18n, task, plugin, commandName, existing))
         (getTask(cliConfig, task))
 
 // TODO: Split this function into smaller parts        
-const updateTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, provider: string, commandName: string, existing: Command) => {
+const updateTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, plugin: InstalledPlugin, commandName: string, existing: Command) => {
     const existingHandler = existing.handler
 
     existing.handler = (args: CommandArgs) => {
-        if (args.plugin === provider) {
-            return console.log(`Handler for ${provider}`)
+        if (args.plugin === plugin.name) {
+            return console.log(`Handler for ${plugin.name}`)
         }
         return existingHandler(args)
     }
 
     existing.description = "Need to show better documentation when a task is provided by more than one plugin."
 
-    existing.builder.plugin.choices.push(provider)
+    existing.builder.plugin.choices.push(plugin.name)
 
     // Update usage information
     const instance = cliConfig.getInternalMethods().getCommandInstance()
@@ -180,7 +180,7 @@ const updateTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, provider: strin
     return cliConfig
 }
 
-const createTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, provider: string) => resolve(
+const createTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, plugin: InstalledPlugin) => resolve(
     cliConfig
         .command({
             command: task.command,
@@ -189,15 +189,19 @@ const createTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, provider: strin
             builder: {
                 plugin: {
                     description: i18n.__('pluginDesc'),
-                    default: provider,
-                    choices: [provider]
+                    default: plugin.name,
+                    choices: [plugin.name]
                 }
             },
             handler: (yargs: Record<string, unknown>) => {
-                console.log(`Handler for ${provider}`)  
+                debugger
+                console.log(`Handler for ${plugin.name}`)
             }
         })
 )
+
+// const runTask = (cliConfig: CLIConfig, parsedArgs: Record<string, unknown>)
+
             
 export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
     // Parse the args required for core built-in tasks
@@ -237,7 +241,7 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     configDir: SanitizedPath.create(parsedArgs.configDir),
     projectDir: SanitizedPath.create(parsedArgs.projectDir),
     maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency,
-    debug: parsedArgs.debug
+    debug: parsedArgs.debug,
 })
 
 export default {
