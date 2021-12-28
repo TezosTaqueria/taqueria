@@ -12,7 +12,7 @@ name: Taqueria
 
 on:
   push:
-    branches: [main]
+    branches: [main, alex-github-action-init]
   pull_request:
     branches: [main]
 
