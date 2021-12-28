@@ -8,7 +8,7 @@
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
 
-name: Taquieria
+name: Taqueria
 
 on:
   push:
@@ -26,9 +26,10 @@ jobs:
 
       - name: Setup Deno
         # uses: denoland/setup-deno@v1
-        uses: denoland/setup-deno@004814556e37c54a2f6e31384c9e18e9833173669
+        uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.x
+        004814556e37c54a2f6e31384c9e18e9833173669
+          deno-version: "^1.0.0"
 
       # Uncomment this step to verify the use of 'deno fmt' on each commit.
       # - name: Verify formatting
