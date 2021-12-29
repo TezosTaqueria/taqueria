@@ -65,10 +65,10 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Go to SDK directory
+    - name: Go to protocol directory
       run: cd taqueria-protocol 
 
-    - name: Build SDK
+    - name: Build protocol
       run: npm install
 
     # - run: npm ci
