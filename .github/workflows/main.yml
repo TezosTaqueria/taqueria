@@ -59,14 +59,14 @@ jobs:
     - name: Setup repo
       uses: actions/checkout@v2
 
-    - name: Go to SDK directory
-      run: cd taqueria-sdk 
-
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+
+    - name: Go to SDK directory
+      run: cd taqueria-sdk 
 
     - name: Build SDK
       run: npm run build
