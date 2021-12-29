@@ -40,8 +40,10 @@ jobs:
       # - name: Run tests
       #   run: deno test -A --unstable
       
-      - name: build taqueria
+      - name: Build taqueria
         run: ./bin/build.sh
+      
+      - name: Check taqueria version
         run: ./taqueria --version
         
   build:
