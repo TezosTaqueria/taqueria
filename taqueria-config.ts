@@ -151,39 +151,49 @@ const NPMPlugin = {
         )
     },
 
-    request(action: Action, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, {projectDir}: SanitizedInitArgs) {
+    request(action: Action, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) {
         return attemptP(async () => {
             try {
                 const pluginPath = joinPaths(
-                    projectDir.value,
+                    parsedArgs.projectDir.value,
                     "node_modules",
                     plugin.name,
                     'index.js'
                 )
 
-                const formattedArgs = Object.entries(requestArgs).reduce(
-                    (retval: string[], [key, val]) => [...retval, '--'+key, (val as string)],
+
+                const formattedArgs = Object.entries({...parsedArgs, ...requestArgs}).reduce(
+                    (retval: string[], [key, val]) => [...retval, '--'+key, val.toString()],
                     []
                 )
 
-                const process = Deno.run({
-                    cmd: [
-                        "node", pluginPath,
-                        '--taqRun', action,
-                        '--i18n', JSON.stringify(i18n),
-                        '--config', JSON.stringify(config),
-                        '--env', JSON.stringify(env),
-                        ...formattedArgs,
-                    ],
-                    stdout: "piped",
-                    stderr: "piped",
-                })
-        
+                const cmd = [
+                    "node", pluginPath,
+                    '--taqRun', action,
+                    '--i18n', JSON.stringify(i18n),
+                    '--config', JSON.stringify(config),
+                    '--env', JSON.stringify(env),
+                    ...formattedArgs,
+                ]
+                const process = Deno.run({cmd, stdout: "piped", stderr: "piped"})
                 const output = await process.output()
+                const error = await process.stderrOutput()
                 const decoder = new TextDecoder()
-                const raw = decoder.decode(output)
-                const decoded = JSON.parse(raw) // TODO validate schema
-                console.log(decoded)
+                const stdout = decoder.decode(output)
+                const stderr = decoder.decode(error)
+
+                if (!stdout && stderr) {
+                    return Promise.reject({
+                        kind: 'E_INVALID_JSON',
+                        msg: 'TODO i18n message',
+                        context: {
+                            stderr,
+                            stdout
+                        }
+                    })
+                }
+
+                const decoded = JSON.parse(stdout) // TODO validate schema
                 return decoded
             }
             catch (err) {

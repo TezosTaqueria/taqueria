@@ -45,7 +45,6 @@ const sanitizeArgs = (parsedArgs: ParsedArgs) : Promise<SanitizedArgs> =>
 
 
 const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefined>> => {
-    debugger
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
         const argv = yargs(unparsedArgs.slice(2)).argv as unknown as ParsedArgs
         if (argv.i18n && argv.taqRun && argv.projectDir && argv.configDir) {
