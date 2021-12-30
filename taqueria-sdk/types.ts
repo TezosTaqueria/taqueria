@@ -51,8 +51,7 @@ export type ActionNotSupported = {
 export interface ProxyAction {
     readonly status: ActionResponseCode,
     readonly stdout: string,
-    readonly stderr: string,
-    readonly artifacts: string[]
+    readonly stderr: string
 }
 
 export interface ActionPluginInfo extends SchemaView {
@@ -70,10 +69,10 @@ export interface Schema {
     readonly hooks?: (Hook | undefined)[]
     readonly networks?: (Network | undefined)[]
     readonly sandboxes?: (Sandbox | undefined)[]
-    init?: <T>(parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
-    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
-    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
-    proxy?: <T>(parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
+    init?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
 }
 
 export interface SchemaView {
@@ -84,16 +83,32 @@ export interface SchemaView {
     readonly hooks: UnvalidatedHook[]
     readonly networks: UnvalidatedNetwork[]
     readonly sandboxes: UnvalidatedSandbox[],
-    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
-    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
-    proxy?: <T>(parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
+    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
 }
 
 export type Args = string[]
 
-export type ParsedArgs = {
-    i18n: i18n,
+export interface ParsedArgs {
+    i18n: i18n
     taqRun: Action
+    config: string
+    projectDir: string
+    configDir: string
+}
+
+export interface Config extends Record<string, unknown>{
+    testsDir: string
+    contractsDir: string
+}
+
+export interface SanitizedArgs {
+    i18n: i18n
+    taqRun: Action
+    config: Config
+    contractsDir: string
+    testsDir: string
 }
 
 export type pluginDefiner = (i18n: i18n) => Schema

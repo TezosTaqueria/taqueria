@@ -134,7 +134,7 @@ const NPMPlugin = {
                         let statusCode = 0
                         try {
                             const f = task.handler === "proxy"
-                                ? this.request("proxy", {taskName: task.task}, config, env, i18n, plugin, parsedArgs)
+                                ? this.request("proxy", {task: task.task, ...taskArgs}, config, env, i18n, plugin, parsedArgs)
                                 : exec(task.handler.value, taskArgs)
                         
                             statusCode = await promise (f)
@@ -183,6 +183,7 @@ const NPMPlugin = {
                 const decoder = new TextDecoder()
                 const raw = decoder.decode(output)
                 const decoded = JSON.parse(raw) // TODO validate schema
+                console.log(decoded)
                 return decoded
             }
             catch (err) {

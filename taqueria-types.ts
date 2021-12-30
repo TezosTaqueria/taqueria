@@ -1,5 +1,5 @@
 import type {SanitizedPath} from './taqueria-utils/taqueria-utils-types.ts'
-import {mkdir as mkDir, joinPaths} from './taqueria-utils/taqueria-utils.ts'
+import {mkdir, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {resolve, map} from 'https://cdn.skypack.dev/fluture';
 
 export interface CommandArgs extends SanitizedInitArgs {
@@ -61,10 +61,10 @@ export class ConfigDir {
     private constructor(value: string) {
         this.value = value
     }
-    static create(projectDir: SanitizedPath, configDir: SanitizedPath, mkdir=false) {
+    static create(projectDir: SanitizedPath, configDir: SanitizedPath, createDir=false) {
         const path = joinPaths(projectDir.value, configDir.value)
-        return mkdir
-            ? map ((path:string) => new ConfigDir(path)) (mkDir(path))
+        return createDir
+            ? map ((path:string) => new ConfigDir(path)) (mkdir(path))
             : resolve(new ConfigDir(path))
 
     }

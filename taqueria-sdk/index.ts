@@ -1,16 +1,59 @@
 import {Task as aTask, Binary, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike} from 'taqueria-protocol/taqueria-protocol-types'
-import {SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure} from "./types"
+import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs} from "./types"
+import {join} from 'path'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 
+const parseJSON = (input: string) : Promise<Config> => new Promise((resolve, reject) => {
+    try {
+        const json = JSON.parse(input)
+        resolve(json)
+    }
+    catch (err) {
+        return Promise.reject({
+            errCode: "E_INVALID_JSON",
+            errMsg: `Invalid JSON: ${input}`,
+            previous: err,
+            context: input
+        })
+    }
+})
+
+const parseConfig = (config:string|Record<string, unknown>) : Promise<Record<string, unknown>> => typeof config === 'string'
+    ? parseJSON(config)
+    : Promise.resolve(config)
+
+
+const sanitizeConfig = (config: Record<string, unknown>) : Promise<Config> =>
+    typeof config.contractsDir === 'string' && typeof config.testsDir === 'string'
+        ? Promise.resolve(config as Config)
+        : Promise.reject({
+            errCode: "E_INVALID_ARGS",
+            errMsg: `Invalid config: ${JSON.stringify(config)}`,
+            context: config
+        })
+
+const sanitizeArgs = (parsedArgs: ParsedArgs) : Promise<SanitizedArgs> =>
+    parseConfig(parsedArgs.config)
+    .then(sanitizeConfig)
+    .then(config => ({
+        ...parsedArgs,
+        config,
+        contractsDir: join(parsedArgs.projectDir, parsedArgs.configDir, config.contractsDir),
+        testsDir: join(parsedArgs.projectDir, parsedArgs.configDir, config.testsDir)
+    }))
+
+
+
 const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefined>> => {
+    debugger
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
         const argv = yargs(unparsedArgs.slice(2)).argv as unknown as ParsedArgs
-        if (argv.i18n && argv.taqRun) {
+        if (argv.i18n && argv.taqRun && argv.projectDir && argv.configDir) {
             return Promise.resolve(argv)
         }
     }
     return Promise.reject({
-        errCode: "E_NO_ARGS",
+        errCode: "E_INVALID_ARGS",
         errMsg: "Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?",
         context: undefined
     })
@@ -68,23 +111,23 @@ const sendResponse = (response: unknown) => console.log(JSON.stringify(response)
 
 const sendError = (err: Failure<unknown>) => console.error(JSON.stringify(err))
 
-const getResponse = (definer: pluginDefiner) => (parsedArgs: ParsedArgs): LikeAPromise<ActionResponse, Failure<[]>> => {
-    const {i18n, taqRun, ...args} = parsedArgs
+const getResponse = (definer: pluginDefiner) => (sanitzedArgs: SanitizedArgs): LikeAPromise<ActionResponse, Failure<[]>> => {
+    const {i18n, taqRun} = sanitzedArgs
     const schema = parseSchema(i18n, definer)
     switch (taqRun) {
         case "pluginInfo":
             return schema ? Promise.resolve({...schema, status: "success"}) : Promise.reject({err: "E_INVALID_SCHEMA", msg: "The schema of the plugin is invalid."})
         case "proxy":
             return schema && schema.proxy
-                    ? schema.proxy(args as Record<string, unknown>)
+                    ? schema.proxy(sanitzedArgs)
                     : Promise.resolve({status: "notSupported", stdout: "", stderr: i18n.proxyNotSupported, artifacts: []})
         case "checkRuntimeDependencies":
             return schema && schema.checkRuntimeDependencies
-                    ? schema.checkRuntimeDependencies(i18n, args as Record<string, unknown>)
+                    ? schema.checkRuntimeDependencies(i18n, sanitzedArgs)
                     : Promise.resolve({status: "notSupported", report: []})
         case "installRuntimeDependencies":
             return schema && schema.installRuntimeDependencies
-                    ? schema.installRuntimeDependencies(i18n, args  as Record<string, unknown>)
+                    ? schema.installRuntimeDependencies(i18n, sanitzedArgs)
                     : Promise.resolve({status: "notSupported", report: []})
         default:
             return Promise.resolve({status: "notSupported", msg: i18n.actionNotSupported})
@@ -97,6 +140,7 @@ export const binary = Binary.create
 export const Plugin = {
     create: (definer: pluginDefiner, unparsedArgs: Args) =>
         parseArgs(unparsedArgs)
+        .then(sanitizeArgs)
         .then(getResponse(definer))
         .then(sendResponse)
         .catch(sendError)
