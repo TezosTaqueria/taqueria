@@ -10,6 +10,9 @@ export abstract class StringLike {
     static create (value: string) {
         return this.constructor.call(this, value)
     }
+    public toString() {
+        return this.value
+    }
 }
 
 const stringMax30Type: unique symbol = Symbol()
