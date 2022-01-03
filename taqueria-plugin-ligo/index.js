@@ -1,7 +1,9 @@
 const {Plugin, Task, Option, binary} = require('taqueria-sdk')
+const compile = require('./compile')
 Plugin.create(i18n => ({
     schema: "1.0",
     version: "0.1",
+    name: "ligo",
     tasks: [
         Task.create({
             task: "compile",
@@ -25,23 +27,18 @@ Plugin.create(i18n => ({
                     description: "Enable type inference"
                 })
             ],
-            handler: binary("docker run --rm -v \"$PWD\":\"$PWD\" -w \"$PWD\" ligolang/ligo:next compile contract %sourceFile%")
+            handler: 'proxy'
         })
     ],
-    checkRuntimeDependencies: () => Promise.resolve({
+    checkRuntimeDependencies: (_) => Promise.resolve({
         status: "success",
         report: [
             {name: "LIGO", path: "ligo", version: ">=0.27.0", kind: "required", met: true}
         ]
     }),
-    installRunTimeDependencies: () => Promise.resolve({
+    installRunTimeDependencies: (_) => Promise.resolve({
         status: "success",
         output: "LIGO was found in /usr/bin/ligo" // TODO this should use i18n
     }),
-    proxy: parsedArgs => Promise.resolve({
-        status: "success",
-        stdout: "Proxied successfully",
-        stderr: "",
-        artifacts: []
-    })
+    proxy: compile
 }), process.argv)
