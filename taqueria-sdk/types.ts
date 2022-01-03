@@ -96,19 +96,24 @@ export interface ParsedArgs {
     config: string
     projectDir: string
     configDir: string
+    artifactsDir: string
 }
 
 export interface Config extends Record<string, unknown>{
     testsDir: string
     contractsDir: string
+    artifactsDir: string
 }
 
 export interface SanitizedArgs {
     i18n: i18n
     taqRun: Action
     config: Config
+    projectDir: string
+    configDir: string
     contractsDir: string
     testsDir: string
+    artifactsDir: string
 }
 
 export type pluginDefiner = (i18n: i18n) => Schema

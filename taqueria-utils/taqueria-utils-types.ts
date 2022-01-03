@@ -1,3 +1,4 @@
+import {resolve as resolvePath} from 'https://deno.land/std@0.119.0/path/mod.ts'
 import {StringLike} from '../taqueria-protocol/taqueria-protocol-types.ts'
 
 type Callback = () => void
@@ -30,6 +31,17 @@ export class SanitizedPath extends StringLike{
     static create(value: string) {
         const result = value.match(/^(\.\.|\.\/|\/)/)
         return result ? new SanitizedPath(value) : new SanitizedPath(`./${value}`)
+    }
+}
+
+const sanitizedAbsPath: unique symbol = Symbol()
+export class SanitizedAbsPath extends SanitizedPath {
+    [sanitizedAbsPath]: void
+    protected constructor(value: string) {
+        super(resolvePath(value))
+    }
+    static create(value: string) {
+        return new SanitizedAbsPath(super.create(value).value)
     }
 }
 

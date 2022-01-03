@@ -7,7 +7,7 @@ import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {match, __} from 'https://cdn.skypack.dev/ts-pattern'
 import {getConfig, loadPlugins, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import {isTaqError} from './taqueria-utils/taqueria-utils.ts'
-import {SanitizedPath, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
+import {SanitizedAbsPath, SanitizedPath, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
 
 export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<void>) => unknown
 
@@ -74,7 +74,9 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         },
         (args: RawInitArgs) => pipe(
             sanitizeArgs(args), 
-            ({projectDir, configDir}) => initProject(projectDir, configDir, i18n),
+            ({projectDir, configDir}) => {
+                return initProject(projectDir, configDir, i18n)
+            },
             fork (console.error) (console.log)
         )
     )
@@ -93,7 +95,7 @@ const postInitCLI = (env: EnvVars, args: DenoArgs, parsedArgs: SanitizedInitArgs
     extendCLI(env, parsedArgs, i18n)
 )
 
-const initProject = (projectDir: SanitizedPath, configDir: SanitizedPath, i18n: i18n) => pipe(
+const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n) => pipe(
     getConfig(projectDir, configDir, i18n, true),
     map (() => i18n.__("bootstrapMsg"))
 )
@@ -240,7 +242,7 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
 const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     _: parsedArgs._,
     configDir: SanitizedPath.create(parsedArgs.configDir),
-    projectDir: SanitizedPath.create(parsedArgs.projectDir),
+    projectDir: SanitizedAbsPath.create(parsedArgs.projectDir),
     maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency,
     debug: parsedArgs.debug,
 })

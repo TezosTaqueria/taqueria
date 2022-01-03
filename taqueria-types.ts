@@ -1,4 +1,4 @@
-import type {SanitizedPath} from './taqueria-utils/taqueria-utils-types.ts'
+import type {SanitizedPath, SanitizedAbsPath} from './taqueria-utils/taqueria-utils-types.ts'
 import {mkdir, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {resolve, map} from 'https://cdn.skypack.dev/fluture';
 
@@ -38,7 +38,7 @@ export interface RawInitArgs {
 
 export interface SanitizedInitArgs {
     _: ['init' | 'install' | 'uninstall', 'refresh-teztnets']
-    projectDir: SanitizedPath
+    projectDir: SanitizedAbsPath
     configDir: SanitizedPath,
     maxConcurrency: number,
     debug: boolean
@@ -61,7 +61,7 @@ export class ConfigDir {
     private constructor(value: string) {
         this.value = value
     }
-    static create(projectDir: SanitizedPath, configDir: SanitizedPath, createDir=false) {
+    static create(projectDir: SanitizedAbsPath, configDir: SanitizedPath, createDir=false) {
         const path = joinPaths(projectDir.value, configDir.value)
         return createDir
             ? map ((path:string) => new ConfigDir(path)) (mkdir(path))

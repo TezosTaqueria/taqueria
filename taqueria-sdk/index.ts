@@ -38,8 +38,9 @@ const sanitizeArgs = (parsedArgs: ParsedArgs) : Promise<SanitizedArgs> =>
     .then(config => ({
         ...parsedArgs,
         config,
-        contractsDir: join(parsedArgs.projectDir, parsedArgs.configDir, config.contractsDir),
-        testsDir: join(parsedArgs.projectDir, parsedArgs.configDir, config.testsDir)
+        contractsDir: join(parsedArgs.projectDir, config.contractsDir),
+        testsDir: join(parsedArgs.projectDir, config.testsDir),
+        artifactsDir: join(parsedArgs.projectDir, config.artifactsDir)
     }))
 
 

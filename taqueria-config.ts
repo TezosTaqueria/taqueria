@@ -1,7 +1,7 @@
 import type {Config, PluginInfo, Task, InstalledPlugin, Action} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
 import {EnvVars, ConfigDir, SanitizedInitArgs, i18n} from './taqueria-types.ts'
-import {SanitizedPath} from './taqueria-utils/taqueria-utils-types.ts'
+import {SanitizedPath, SanitizedAbsPath} from './taqueria-utils/taqueria-utils-types.ts'
 import {readFile, writeTextFile, decodeJson, log, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {match} from 'https://cdn.skypack.dev/ts-pattern'
 import {join} from "https://deno.land/std@0.114.0/path/mod.ts";
@@ -14,7 +14,8 @@ const defaultConfig : Config = {
     language: 'en',
     plugins: [],
     contractsDir: "contracts",
-    testsDir: "tests"
+    testsDir: "tests",
+    artifactsDir: "artifacts"
     // defaultTasks: {
     //     compile: {
     //         plugin: "taqueria-plugin-ligo",
@@ -38,12 +39,12 @@ export const make = (data: object) : Future<TaqError, Config> => {
         : reject({kind: "E_INVALID_CONFIG", msg: "TODO, should this use i18n?"})
 }
 
-export const getConfigPath = (projectDir: SanitizedPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
+export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
     ConfigDir.create(projectDir, configDir, create),
     map ((configDir: ConfigDir) => join(configDir.value, "config.json"))
 )
 
-export const getRawConfig = (projectDir: SanitizedPath, configDir: SanitizedPath,  create=false) : Future<TaqError, object> => pipe(
+export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedPath,  create=false) : Future<TaqError, object> => pipe(
     getConfigPath(projectDir, configDir, create),
     chain ( (path:string) => pipe(
         readFile(path),
@@ -64,7 +65,7 @@ export const getRawConfig = (projectDir: SanitizedPath, configDir: SanitizedPath
     ))
 )
 
-export const getConfig = (projectDir: SanitizedPath, configDir: SanitizedPath, _i18n: i18n, create=false) : Future<TaqError, Config> => pipe(
+export const getConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, _i18n: i18n, create=false) : Future<TaqError, Config> => pipe(
         getRawConfig(projectDir, configDir, create),
         chain (make)
     )

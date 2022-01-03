@@ -123,6 +123,7 @@ export interface Config {
     readonly plugins: InstalledPlugin[]
     readonly contractsDir: string
     readonly testsDir: string
+    readonly artifactsDir: string
 }
 
 /**
