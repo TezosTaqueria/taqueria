@@ -65,6 +65,12 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
+    - name: Setup Deno
+      # uses: denoland/setup-deno@v1
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: "^1.0.0"
+
     - name: Run build script
       run: ./bin/build.sh 
 
