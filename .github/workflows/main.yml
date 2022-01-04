@@ -63,7 +63,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+        # cache: 'npm'
 
     # - name: Go to protocol directory
     #   run: cd taqueria-protocol 
