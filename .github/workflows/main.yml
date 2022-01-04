@@ -63,7 +63,13 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-        # cache: 'npm'
+        cache: 'npm'
+
+    - name: Setup Deno
+        # uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: "^1.0.0"
 
     # - name: Go to protocol directory
     #   run: cd taqueria-protocol 
