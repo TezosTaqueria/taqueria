@@ -71,6 +71,12 @@ jobs:
     # - name: Build protocol
     #   run: npm install
 
+    - name: node version
+      run: node --version
+
+    - name: npm version
+      run: npm --version
+
     - name: Go to SDK directory
       run: cd taqueria-sdk 
 
