@@ -74,8 +74,11 @@ jobs:
     - name: Go to SDK directory
       run: cd taqueria-sdk 
 
-    - name: Build SDK
+    - name: Install Dependencies for SDK
       run: npm install
+
+    - name: Build SDK
+      run: npm run build
 
     # - run: npm ci
     # - run: npm run build --if-present
