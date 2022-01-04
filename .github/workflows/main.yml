@@ -65,20 +65,11 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
 
-    - name: Setup Deno
-      # uses: denoland/setup-deno@v1
-      uses: denoland/setup-deno@v1
-      with:
-        deno-version: "^1.0.0"
-
-    # - name: Go to protocol directory
-    #   run: cd taqueria-protocol 
+    - name: Run build script
+      run: ./bin/build.sh 
 
     # - name: Build protocol
     #   run: npm install
-
-    - name: deno version
-      run: deno --version
 
     - name: Go to SDK directory
       run: cd taqueria-sdk 
