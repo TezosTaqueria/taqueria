@@ -73,6 +73,15 @@ html[data-theme="dark"] .docusaurus-highlight-code-line {
 	background-color: rgba(0, 0, 0, 0.3);
 }
 
+@media screen and (max-width: 996px) {
+	.navbar__items {
+		flex-direction: row-reverse;
+		justify-content: space-between;
+	}
+	.navbar-sidebar__brand {
+		height: 120px;
+	}
+}
 .navbar {
 	background-color: var(--ifm-color-primary-lightest);
 	height: 120px;
@@ -111,8 +120,4 @@ html[data-theme="dark"] .docusaurus-highlight-code-line {
 	font-weight: 600;
 	font-size: 15px;
 	line-height: 22px;
-}
-
-.githubb :hover {
-	fill: #a066aa;
 }
