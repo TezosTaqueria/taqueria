@@ -18,14 +18,13 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
 
       - name: Setup Deno
-        # uses: denoland/setup-deno@v1
         uses: denoland/setup-deno@v1
         with:
           deno-version: "^1.0.0"
@@ -48,7 +47,7 @@ jobs:
         
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     strategy:
       matrix:
@@ -66,13 +65,12 @@ jobs:
         cache: 'npm'
 
     - name: Setup Deno
-      # uses: denoland/setup-deno@v1
       uses: denoland/setup-deno@v1
       with:
         deno-version: "^1.0.0"
 
-    - name: Run build script
-      run: ./bin/build.sh 
+    # - name: Run build script
+    #   run: ./bin/build.sh 
 
     # - name: Build protocol
     #   run: npm install
