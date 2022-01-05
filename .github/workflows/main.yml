@@ -76,7 +76,9 @@ jobs:
     #   run: npm install
 
     - name: Go to SDK directory, install and build
-      run: cd taqueria-sdk && npm install && npm run build
+    - run: cd taqueria-sdk
+    - run: npm install
+    - run: npm run build
 
     # - name: Install Dependencies for SDK
     #   run: npm install
