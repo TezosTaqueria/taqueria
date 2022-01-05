@@ -10,6 +10,9 @@ export abstract class StringLike {
     static create (value: string) {
         return this.constructor.call(this, value)
     }
+    public toString() {
+        return this.value
+    }
 }
 
 const stringMax30Type: unique symbol = Symbol()
@@ -59,7 +62,7 @@ const verbType: unique symbol = Symbol()
 export class Verb extends StringLike {
     [verbType]: void
     static create(value: string): Verb | undefined {
-        const result = value.match(/^[A-Za-z-]+/)
+        const result = value.match(/^[A-Za-z\-\ ]+/)
         // TODO - should we do more validation whether its a verb?
         return result ? new Verb(result[0]) : undefined
     }
@@ -69,7 +72,7 @@ const commandType: unique symbol = Symbol()
 export class Command extends StringLike {
     [commandType]: void
     static create(value: string) : Command | undefined {
-        if (value.match(/^([A-Za-z-_]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/)) {
+        if (value.match(/^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/)) {
             return new Command(value)
         }
         return undefined   
@@ -120,6 +123,7 @@ export interface Config {
     readonly plugins: InstalledPlugin[]
     readonly contractsDir: string
     readonly testsDir: string
+    readonly artifactsDir: string
 }
 
 /**
@@ -170,13 +174,28 @@ export class Scaffold {
     }
 }
 
+const binaryType: unique symbol = Symbol()
+export class Binary {
+    [binaryType]: void
+    readonly value: string
+    private constructor(path: string) {
+        this.value = path
+    }
+    static create(path: string): Binary {
+        return new Binary(path)
+    }
+}
+
+export type TaskHandler = "proxy" | Binary
+
 
 export interface UnvalidatedTask {
     readonly task: string
     readonly command: string
     readonly description: string
     readonly aliases?: string[]
-    readonly options?: UnvalidatedTaskOption[]
+    readonly options?: UnvalidatedTaskOption[],
+    readonly handler: "proxy" | string
 }
 
 export interface UnvalidatedPluginInfo {
@@ -276,12 +295,14 @@ export class Option {
      readonly aliases: Alias[]
      readonly description: string
      readonly options?: Option[]
-     protected constructor(name: Verb, command: Command, description: string, options: Option[]=[], aliases: Alias[]=[]) {
+     readonly handler: TaskHandler
+     protected constructor(name: Verb, command: Command, description: string, handler: TaskHandler, options: Option[]=[], aliases: Alias[]=[]) {
          this.task = name
          this.command = command
          this.description = description
          this.options = options
          this.aliases = aliases
+         this.handler = handler
      }
      static createAlias(value: string): Alias | undefined {
         return Verb.create(value) || SingleChar.create(value)
@@ -290,13 +311,14 @@ export class Option {
      static create(task: UnvalidatedTask): Task | undefined {
          const name = Verb.create(task.task)
          const command = Command.create(task.command)
+         const handler = task.handler === "proxy" ? "proxy" : Binary.create(task.handler)
          const aliases = task.aliases ? task.aliases.map(this.createAlias).filter(alias => alias!= undefined) : []
          const options = !task.options ? [] : task.options.reduce(
              (retval: Option[], option: Option | undefined) => option ? [...retval, option] : retval,
              []
          )
-         return name && command && aliases && options
-             ? new Task(name, command, task.description, options, aliases as Alias[])
+         return name && command
+             ? new Task(name, command, task.description, handler, options, aliases as Alias[])
              : undefined
     }
  }
@@ -382,3 +404,5 @@ export interface Environment {
     readonly name: string
     readonly use: Sandbox | Network
 }
+
+export type Action = "checkRuntimeDependencies" | "installRuntimeDependencies" | "proxy" | "pluginInfo" | string

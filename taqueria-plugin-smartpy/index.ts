@@ -1,6 +1,6 @@
 import {Plugin, Task, Option, binary} from 'taqueria-sdk'
 
-Plugin.create(i18n => ({
+Plugin.create(_i18n => ({
     schema: "1.0",
     version: "0.1",
     tasks: [

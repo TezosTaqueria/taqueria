@@ -1,3 +1,4 @@
+import {resolve as resolvePath} from 'https://deno.land/std@0.119.0/path/mod.ts'
 import {StringLike} from '../taqueria-protocol/taqueria-protocol-types.ts'
 
 type Callback = () => void
@@ -16,6 +17,7 @@ export type ErrorType =
     "E_INVALID_PATH"
   | "E_INVALID_CONFIG"
   | "E_INVALID_JSON"
+  | "E_FORK"
 
 export interface TaqError {
     readonly kind: ErrorType,
@@ -29,6 +31,17 @@ export class SanitizedPath extends StringLike{
     static create(value: string) {
         const result = value.match(/^(\.\.|\.\/|\/)/)
         return result ? new SanitizedPath(value) : new SanitizedPath(`./${value}`)
+    }
+}
+
+const sanitizedAbsPath: unique symbol = Symbol()
+export class SanitizedAbsPath extends SanitizedPath {
+    [sanitizedAbsPath]: void
+    protected constructor(value: string) {
+        super(resolvePath(value))
+    }
+    static create(value: string) {
+        return new SanitizedAbsPath(super.create(value).value)
     }
 }
 

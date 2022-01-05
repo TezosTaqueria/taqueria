@@ -1,52 +1,12 @@
-import {PluginInfo, Scaffold, Hook, Sandbox, Network, Verb, Command, Option, Alias, RuntimeDependency, UnvalidatedTask as anUnvalidatedTask, Task as aTask, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedPluginInfo, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork} from 'taqueria-protocol/taqueria-protocol-types'
-
-const binaryType: unique symbol = Symbol()
-export class Binary {
-    [binaryType]: void
-    readonly value: string
-    private constructor(path: string) {
-        this.value = path
-    }
-    static create(path: string): Binary {
-        return new Binary(path)
-    }
-}
-
-export type TaskHandler = "proxy" | Binary
-
-export interface UnvalidatedTask extends anUnvalidatedTask {
-    handler: TaskHandler
-}
-
-const taskType: unique symbol = Symbol()
-export class Task extends aTask{
-    [taskType]: void
-    readonly handler: TaskHandler
-    protected constructor(name: Verb, command: Command, description: string, handler: TaskHandler, options: Option[]=[], aliases: Alias[]=[]) {
-        super(name, command, description, options, aliases)
-        this.handler = handler
-    }
-
-    static create(task: UnvalidatedTask): Task | undefined {
-        const name = Verb.create(task.task)
-        const command = Command.create(task.command)
-        const aliases = task.aliases ? task.aliases.map(this.createAlias).filter(alias => alias!= undefined) : []
-        const options = !task.options ? [] : task.options.reduce(
-            (retval: Option[], option: Option | undefined) => option ? [...retval, option] : retval,
-            []
-        )
-        return name && command && aliases && options
-            ? new Task(name, command, task.description, task.handler, options, aliases as Alias[])
-            : undefined
-    }
-}
+import {TaskHandler, Action, Scaffold, Hook, Sandbox, Network, Verb, Command, Option, Alias, RuntimeDependency, UnvalidatedTask, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedPluginInfo, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork} from 'taqueria-protocol/taqueria-protocol-types'
 
 export interface TaskView {
     readonly task: string
     readonly command: string
     readonly description: string
     readonly aliases: string[]
-    readonly options: UnvalidatedOption[]
+    readonly options: UnvalidatedOption[],
+    readonly handler: "proxy" | string
 }
 
 export interface Failure<Params> {
@@ -66,8 +26,6 @@ export interface i18n {
     readonly actionNotSupported: string,
     readonly proxyNotSupported: string
 }
-
-export type Action = "checkRuntimeDependencies" | "installRuntimeDependencies" | "proxy" | "pluginInfo"
 
 export interface RuntimeDependencyReport extends RuntimeDependency {
     readonly met: boolean
@@ -93,8 +51,7 @@ export type ActionNotSupported = {
 export interface ProxyAction {
     readonly status: ActionResponseCode,
     readonly stdout: string,
-    readonly stderr: string,
-    readonly artifacts: string[]
+    readonly stderr: string
 }
 
 export interface ActionPluginInfo extends SchemaView {
@@ -112,9 +69,10 @@ export interface Schema {
     readonly hooks?: (Hook | undefined)[]
     readonly networks?: (Network | undefined)[]
     readonly sandboxes?: (Sandbox | undefined)[]
-    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
-    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
-    proxy?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
+    init?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
 }
 
 export interface SchemaView {
@@ -125,16 +83,37 @@ export interface SchemaView {
     readonly hooks: UnvalidatedHook[]
     readonly networks: UnvalidatedNetwork[]
     readonly sandboxes: UnvalidatedSandbox[],
-    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
-    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
-    proxy?: <T>(i18n: i18n, parsedArgs: Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
+    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
 }
 
 export type Args = string[]
 
-export type ParsedArgs = {
-    i18n: i18n,
+export interface ParsedArgs {
+    i18n: i18n
     taqRun: Action
+    config: string
+    projectDir: string
+    configDir: string
+    artifactsDir: string
+}
+
+export interface Config extends Record<string, unknown>{
+    testsDir: string
+    contractsDir: string
+    artifactsDir: string
+}
+
+export interface SanitizedArgs {
+    i18n: i18n
+    taqRun: Action
+    config: Config
+    projectDir: string
+    configDir: string
+    contractsDir: string
+    testsDir: string
+    artifactsDir: string
 }
 
 export type pluginDefiner = (i18n: i18n) => Schema
