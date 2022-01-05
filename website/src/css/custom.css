@@ -5,6 +5,7 @@
  */
 @import url("https://fonts.googleapis.com/css2?family=Montserrat&family=Roboto&display=swap");
 /* You can override the default Infima variables here. */
+
 :root {
 	--ifm-color-primary: #fcaf17;
 	--ifm-color-primary-dark: rgb(33, 175, 144);
@@ -61,13 +62,8 @@ h4 {
 	letter-spacing: 0.2px;
 }
 
-div[class^="announcementBarContent"] a:hover {
-	color: var(--ifm-link-color);
-	text-decoration: underline;
-}
-
 .docusaurus-highlight-code-line {
-	background-color: rgba(0, 0, 0, 0.1);
+	background-color: rgba(14, 9, 9, 0.1);
 	display: block;
 	margin: 0 calc(-1 * var(--ifm-pre-padding));
 	padding: 0 var(--ifm-pre-padding);
@@ -75,4 +71,48 @@ div[class^="announcementBarContent"] a:hover {
 
 html[data-theme="dark"] .docusaurus-highlight-code-line {
 	background-color: rgba(0, 0, 0, 0.3);
+}
+
+.navbar {
+	background-color: var(--ifm-color-primary-lightest);
+	height: 120px;
+	padding-left: 7%;
+	padding-right: 7%;
+}
+.navbar__logo {
+	height: 69px;
+	width: 213px;
+}
+.header-discord-link:before {
+	background: url("../../static/img/discordSVG.svg") no-repeat;
+	content: "";
+	display: flex;
+	height: 24px;
+	width: 24px;
+}
+
+.header-twitter-link:before {
+	background: url("../../static/img/twitterSVG.svg") no-repeat;
+	content: "";
+	display: flex;
+	height: 24px;
+	width: 24px;
+}
+.header-github-link:before {
+	background: url("../../static/img/githubSVG.svg") no-repeat;
+	content: "";
+	display: flex;
+	height: 24px;
+	width: 24px;
+}
+
+.header-link {
+	font-style: normal;
+	font-weight: 600;
+	font-size: 15px;
+	line-height: 22px;
+}
+
+.githubb :hover {
+	fill: #a066aa;
 }
