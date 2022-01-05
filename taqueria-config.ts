@@ -32,7 +32,10 @@ export const getDefaultMaxConcurrency = () => 10
 export const make = (data: object) : Future<TaqError, Config> => {
     // TODO: Change decoding/validation library
     const err = undefined
-    const validData = data
+    const validData = {
+        ...defaultConfig,
+        ...data
+    }
     // const [err, validData] = validate(data, ConfigDecoder)
     return err === undefined
         ? resolve(validData)
@@ -162,18 +165,30 @@ const NPMPlugin = {
                     'index.js'
                 )
 
-
+                // For each argument passed in via the CLI, send it as an argument to the
+                // plugin call as well. Plugins can use this information for additional context
+                // about invocation
                 const formattedArgs = Object.entries({...parsedArgs, ...requestArgs}).reduce(
-                    (retval: string[], [key, val]) => [...retval, '--'+key, val.toString()],
+                    (retval: string[], [key, val]) => {
+                        // Some parameters we don't need to send, so we omit those
+                        if (['$0'].includes(key) || key.indexOf('-') >= 0)
+                            return retval
+                        // Others need renamed
+                        else if (key === '_')
+                            return [...retval, '--command', val.toString()]
+                        // Everything else is good
+                        else
+                            return [...retval, '--'+key, val.toString()]
+                    },
                     []
                 )
 
                 const cmd = [
                     "node", pluginPath,
                     '--taqRun', action,
-                    '--i18n', JSON.stringify(i18n),
-                    '--config', JSON.stringify(config),
-                    '--env', JSON.stringify(env),
+                    '--i18n', "'" + JSON.stringify(i18n) + "'",
+                    '--config', "'"+ JSON.stringify(config) + "'",
+                    '--env', "'" + JSON.stringify(env) + "'",
                     ...formattedArgs,
                 ]
                 const process = Deno.run({cmd, stdout: "piped", stderr: "piped"})
@@ -182,6 +197,10 @@ const NPMPlugin = {
                 const decoder = new TextDecoder()
                 const stdout = decoder.decode(output)
                 const stderr = decoder.decode(error)
+
+                // console.log(cmd.join(' '))
+                // console.log(stdout)
+                // console.log(stderr)
 
                 if (!stdout && stderr) {
                     return Promise.reject({
@@ -194,7 +213,7 @@ const NPMPlugin = {
                     })
                 }
 
-                const decoded = JSON.parse(stdout) // TODO validate schema
+                const decoded = JSON.parse(stdout) // TODO validate
                 return decoded
             }
             catch (err) {

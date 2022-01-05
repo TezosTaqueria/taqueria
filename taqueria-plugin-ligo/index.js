@@ -1,5 +1,6 @@
-const {Plugin, Task, Option, binary} = require('taqueria-sdk')
+const {Plugin, Task, Option} = require('taqueria-sdk')
 const compile = require('./compile')
+
 Plugin.create(i18n => ({
     schema: "1.0",
     version: "0.1",

@@ -1,6 +1,6 @@
 import {Task as aTask, Binary, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike} from 'taqueria-protocol/taqueria-protocol-types'
 import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs} from "./types"
-import {join} from 'path'
+import {join, resolve} from 'path'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 
 const parseJSON = (input: string) : Promise<Config> => new Promise((resolve, reject) => {
@@ -9,7 +9,7 @@ const parseJSON = (input: string) : Promise<Config> => new Promise((resolve, rej
         resolve(json)
     }
     catch (err) {
-        return Promise.reject({
+        return reject({
             errCode: "E_INVALID_JSON",
             errMsg: `Invalid JSON: ${input}`,
             previous: err,
@@ -35,13 +35,20 @@ const sanitizeConfig = (config: Record<string, unknown>) : Promise<Config> =>
 const sanitizeArgs = (parsedArgs: ParsedArgs) : Promise<SanitizedArgs> =>
     parseConfig(parsedArgs.config)
     .then(sanitizeConfig)
-    .then(config => ({
-        ...parsedArgs,
-        config,
-        contractsDir: join(parsedArgs.projectDir, config.contractsDir),
-        testsDir: join(parsedArgs.projectDir, config.testsDir),
-        artifactsDir: join(parsedArgs.projectDir, config.artifactsDir)
-    }))
+    .then(config => {
+        const projectDir = resolve(parsedArgs.projectDir)
+        return ({
+            ...parsedArgs,
+            projectDir,
+            config,
+            contractsDir: join(projectDir, config.contractsDir),
+            testsDir: join(projectDir, config.testsDir),
+            artifactsDir: join(projectDir, config.artifactsDir)
+        })
+    })
+    
+
+    
 
 
 
@@ -109,7 +116,9 @@ const parseSchema = (i18n: i18n, definer: pluginDefiner): SchemaView | undefined
 
 const sendResponse = (response: unknown) => console.log(JSON.stringify(response))
 
-const sendError = (err: Failure<unknown>) => console.error(JSON.stringify(err))
+const sendError = (err: Failure<unknown>) => {
+    console.error(JSON.stringify(err))
+}
 
 const getResponse = (definer: pluginDefiner) => (sanitzedArgs: SanitizedArgs): LikeAPromise<ActionResponse, Failure<[]>> => {
     const {i18n, taqRun} = sanitzedArgs
