@@ -50,7 +50,7 @@ const config = {
 				},
 				items: [
 					{
-						to: "/start",
+						to: "/blog",
 						label: " Get Started",
 						position: "right",
 						className: "header-link",
@@ -63,7 +63,7 @@ const config = {
 						className: "header-link",
 					},
 					{
-						to: "/plugins",
+						to: "/blog",
 						label: "Plugins",
 						position: "right",
 						className: "header-link",
