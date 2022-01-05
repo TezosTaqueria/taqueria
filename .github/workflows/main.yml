@@ -17,7 +17,7 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  build_taqueria:
     runs-on: ubuntu-latest
 
     steps:
@@ -44,8 +44,16 @@ jobs:
       
       - name: Check taqueria version
         run: ./taqueria --version
-        
-  build:
+      
+      - name: checking path/pwd
+        run: pwd && cd ~/ && pwd
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: taqueria
+          path: /home/runner/work/taqueria/taqueria/taqueria
+
+  build_others:
 
     runs-on: ubuntu-latest
 
