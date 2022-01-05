@@ -80,6 +80,7 @@ html[data-theme="dark"] .docusaurus-highlight-code-line {
 	}
 	.navbar-sidebar__brand {
 		height: 120px;
+		background-color: var(--ifm-color-primary-lightest);
 	}
 }
 .navbar {
