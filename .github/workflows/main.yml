@@ -51,7 +51,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: taqueria
-          path: $(pwd)/taqueria
+          path: /home/runner/work/taqueria/taqueria/taqueria
 
   build_others:
 
