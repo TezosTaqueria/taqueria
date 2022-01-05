@@ -3,7 +3,7 @@
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
  */
-
+@import url("https://fonts.googleapis.com/css2?family=Montserrat&family=Roboto&display=swap");
 /* You can override the default Infima variables here. */
 :root {
 	--ifm-color-primary: #fcaf17;
@@ -14,12 +14,56 @@
 	--ifm-color-primary-lighter: rgb(102, 212, 189);
 	--ifm-color-primary-lightest: #fff9ed;
 	--ifm-color-bg-red: #f04e6e;
+	--ifm-color-bg-yellow: #ccb909;
 	--ifm-color-red-text: #f72a58;
 	--ifm-color-bg-purple: #a066aa;
 	--ifm-color-bg-purple-light: rgba(160, 102, 170, 0.8);
 	--ifm-color-bg-white: #ffffff;
 	--ifm-color-black-text: #000000;
+	--ifm-font-size-base: 16px;
+	--ifm-font-family-base: "Montserrat";
 	--ifm-code-font-size: 95%;
+	--ifm-font-color-base: "#000000";
+}
+h1 {
+	font-style: normal;
+	font-weight: 600;
+	font-size: 40px;
+	line-height: 56px;
+	letter-spacing: 0.2px;
+}
+h2 {
+	font-style: normal;
+	font-weight: 600;
+	font-size: 32px;
+	line-height: 32px;
+	letter-spacing: 0.01em;
+}
+h3 {
+	font-style: normal;
+	font-weight: 600;
+	font-size: 18px;
+	line-height: 28px;
+	letter-spacing: 0.2px;
+}
+h4 {
+	font-style: normal;
+	font-weight: 600;
+	font-size: 20px;
+	line-height: 56px;
+	letter-spacing: 0.2px;
+}
+h4 {
+	font-style: normal;
+	font-weight: 600;
+	font-size: 15px;
+	line-height: 22px;
+	letter-spacing: 0.2px;
+}
+
+div[class^="announcementBarContent"] a:hover {
+	color: var(--ifm-link-color);
+	text-decoration: underline;
 }
 
 .docusaurus-highlight-code-line {
