@@ -36,8 +36,9 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             console.log(context)
-            console.log(context.repository.owner)
-            console.log(context.repository.name)
+            console.log(context.repo.owner)
+            console.log(context.repo.name)
+            console.log(context.runNumber)
 
 
 
