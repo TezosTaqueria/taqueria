@@ -3,6 +3,64 @@
 	align-items: center;
 	padding: 2rem 0;
 	width: 100%;
+	height: 100vh;
+	position: relative;
+}
+
+.container {
+	display: flex;
+	align-items: center;
+	padding: 2rem 0;
+	width: 100%;
+	-webkit-clip-path: polygon(0 0, 100% 0%, 100% 91%, 0% 100%);
+	clip-path: polygon(0 0, 100% 0%, 100% 90%, 0% 100%);
+	height: 100vh;
+	background-color: var(--ifm-color-primary-lightest);
+	position: relative;
+}
+.features:before {
+	content: "";
+	position: absolute;
+	bottom: -2.5%;
+	left: 0;
+	width: 20%;
+	height: 5%;
+	background-color: var(--ifm-color-primary);
+	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
+	z-index: 1;
+}
+.features:after {
+	content: "";
+	position: absolute;
+	top: 87.5%;
+	right: 0;
+	width: 20%;
+	height: 5%;
+	background-color: var(--ifm-color-primary);
+	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
+	z-index: 1;
+}
+.leftPurpleLine {
+	content: "";
+	position: absolute;
+	top: 93.5%;
+	left: 12.5%;
+	width: 10%;
+	height: 5%;
+	background-color: rgba(160, 102, 170, 0.8);
+	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
+	z-index: 2;
+}
+.rightPurpleLine {
+	content: "";
+	position: absolute;
+	top: 91.5%;
+	right: 12.5%;
+	width: 10%;
+	height: 5%;
+	background-color: rgba(160, 102, 170, 0.8);
+	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
+	z-index: 2;
 }
 
 .featureSvg {

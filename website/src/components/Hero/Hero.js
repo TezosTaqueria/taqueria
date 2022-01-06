@@ -53,17 +53,10 @@ function Feature({ Svg, title, description }) {
 
 export default function Hero() {
 	return (
-		<div>
-			<h3>Hero module</h3>
-			<section className={styles.features}>
-				<div className="container">
-					<div className="row">
-						{FeatureList.map((props, idx) => (
-							<Feature key={idx} {...props} />
-						))}
-					</div>
-				</div>
-			</section>
-		</div>
+		<section className={styles.features}>
+			<div className={styles.container}></div>
+			<div className={styles.leftPurpleLine}></div>
+			<div className={styles.rightPurpleLine}></div>
+		</section>
 	);
 }
