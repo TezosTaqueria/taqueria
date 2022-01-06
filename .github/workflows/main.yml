@@ -53,6 +53,11 @@ jobs:
           name: taqueria
           path: /home/runner/work/taqueria/taqueria/taqueria
 
+      - name: view github context
+        uses: actions/github-script@v4
+        with:
+          script: console.log(context)
+
   build_others:
 
     runs-on: ubuntu-latest
