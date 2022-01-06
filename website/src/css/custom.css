@@ -146,3 +146,17 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 .footer__bottom {
 	width: 30%;
 }
+.footerButton {
+	height: fit-content;
+	white-space: nowrap;
+	padding: 12px 18px;
+	background-color: #fcaf17;
+	color: #373f41;
+	font-size: 15px;
+	line-height: 22px;
+	font-weight: 600;
+	letter-spacing: 0.3px;
+	font-family: Montserrat;
+	border-radius: 3px;
+	margin-top: 50px;
+}

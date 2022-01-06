@@ -108,7 +108,7 @@ const config = {
 							},
 							{
 								html: `
-								<a className={styles.headlineButton} href='https://github.com'>
+								<a class=footerButton href='https://github.com'>
 								GITHUB
 							  </a>
 								  `,
@@ -123,6 +123,10 @@ const config = {
 									</fieldset>
 								</form>
 								  `,
+							},
+							{
+								label: `Copyright © ${new Date().getFullYear()}, ECAD Labs Inc.`,
+								to: "/",
 							},
 						],
 					},
