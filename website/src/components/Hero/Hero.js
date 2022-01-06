@@ -4,49 +4,35 @@ import styles from "./Hero.module.css";
 
 const FeatureList = [
 	{
-		title: "Easy to Use",
-		Svg: require("../../../static/img/taq_pink.svg").default,
+		title: "Insert awesome intro title here.",
+		Svg: require("../../../static/img/heroSVG.svg").default,
 		description: (
 			<>
-				Taqueria is designed with Tezos developer productivity in mind. Scaffold
-				a brand new Tezos app complete with Smart Contracts, Wallet Integration,
-				Integration Tests, and deployment actions.
+				Et has minim elitr intellegat. Mea aeterno eleifend antiopam ad, nam no
+				suscipit quaerendum. At nam minimum ponderum.
 			</>
 		),
-	},
-	{
-		title: "Focus on What Matters",
-		Svg: require("../../../static/img/taq_orange.svg").default,
-		description: (
-			<>
-				Taqueria pulls together the best tools from the Tezos Blockchain
-				development ecosystem so you can focus on building your vision.
-			</>
-		),
-	},
-	{
-		title: "Open to extension",
-		Svg: require("../../../static/img/taq_purple.svg").default,
-		description: (
-			<>
-				Taqueria is open to extension. Devlope your own Taqueria plugin or bring
-				Taqueria into your development environment of choice. Taqueria ships
-				with a robust CLI and a VSCode Plugin.
-			</>
-		),
+		link: {
+			title: "Quick Start",
+			url: "/blog",
+		},
 	},
 ];
 
-function Feature({ Svg, title, description }) {
+function Feature({ Svg, title, description, link }) {
 	return (
-		<div className={clsx("col col--4")}>
-			<div className="text--center">
-				<Svg className={styles.featureSvg} alt={title} />
+		<div className={styles.heroCard}>
+			<h1 className={styles.heroTitle}>{title}</h1>
+			<div className={styles.heroCardContent}>
+				<p className={styles.heroCardDescription}>{description}</p>
+				<div className={styles.heroButtonContainer}>
+					<a className={styles.heroButton} href={link.url}>
+						{link.title}
+					</a>
+				</div>
+				{link.tilte}
 			</div>
-			<div className="text--center padding-horiz--md">
-				<h3>{title}</h3>
-				<p>{description}</p>
-			</div>
+			<Svg className={styles.featureSvg} alt={title} />
 		</div>
 	);
 }
@@ -54,7 +40,14 @@ function Feature({ Svg, title, description }) {
 export default function Hero() {
 	return (
 		<section className={styles.features}>
-			<div className={styles.container}></div>
+			<div className={styles.container}>
+				<div className={styles.content}>
+					<div className={styles.heroCardContainer}>
+						<Feature {...FeatureList[0]} />
+					</div>
+					<div className={styles.carousel}></div>
+				</div>
+			</div>
 			<div className={styles.leftPurpleLine}></div>
 			<div className={styles.rightPurpleLine}></div>
 		</section>
