@@ -62,18 +62,6 @@ jobs:
           name: taqueria
           path: /home/runner/work/taqueria/taqueria/taqueria
 
-      - name: Get artifact from previous step
-        uses: actions/github-script@v5
-        id: getArtifact
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.rest.actions.listWorkflowRunArtifacts({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runNumber
-            }) 2>&1
-
       - name: Get artifact for Repo
         uses: actions/github-script@v5
         id: getArtifactFromRepo
@@ -85,6 +73,20 @@ jobs:
               repo: context.repo.repo,
             })
       
+      - run: echo ${{steps.getArtifactFromRepo.outputs.result}}
+
+      - name: Get artifact from previous step
+        uses: actions/github-script@v5
+        id: getArtifact
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runNumber
+            })
+
       - run: echo ${{steps.getArtifact.outputs.result}}
 
       - name: Comment Artifact to PR
