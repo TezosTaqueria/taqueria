@@ -11,8 +11,8 @@
 name: Taqueria
 
 on:
-  push:
-    branches: [main, alex-github-action-init]
+  # push:
+  #   branches: [main]
   pull_request:
     branches: [main]
 
@@ -41,22 +41,26 @@ jobs:
       
       - name: Build taqueria
         run: ./bin/build.sh
-      
-      - name: Check taqueria version
-        run: ./taqueria --version
-      
-      - name: checking path/pwd
-        run: pwd && cd ~/ && pwd
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload Taqueria Binary 
+        uses: actions/upload-artifact@v2
+        if: success()
         with:
           name: taqueria
           path: /home/runner/work/taqueria/taqueria/taqueria
 
-      - name: view github context
-        uses: actions/github-script@v4
+      - name: Comment Artifact tp PR
+        uses: actions/github-script@v5
         with:
-          script: console.log(context)
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Alex's first comment'
+            })
+
 
   build_others:
 
