@@ -1,6 +1,7 @@
 .features {
 	display: flex;
-	align-items: center;
+	align-items: start;
+	/* justify-content: space-around; */
 	padding: 2rem 0;
 	width: 100%;
 	background-color: var(--ifm-color-primary);
@@ -9,4 +10,33 @@
 .featureSvg {
 	height: 200px;
 	width: 200px;
+}
+
+.featureSvgs {
+	height: 32px;
+	width: 32px;
+}
+
+.left {
+	width: 45%;
+	margin: 0 20px;
+}
+
+.right {
+	width: 48%;
+	margin: 0 20px;
+}
+
+.right h1 {
+	margin-bottom: 50px;
+}
+
+.feature {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.featureText {
+	width: 40%;
+	margin: 0 50px 50px 0;
 }
