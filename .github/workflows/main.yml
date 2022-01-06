@@ -49,12 +49,20 @@ jobs:
           name: taqueria
           path: /home/runner/work/taqueria/taqueria/taqueria
 
-      - name: Comment Artifact to PR
-        uses: actions/github-script@v5
+      # - name: Comment Artifact to PR
+      - uses: actions/github-script@v5
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             console.log(context)
+            console.log(context.repo.owner)
+            console.log(context.repo.repo)
+            await github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Alex's first comment'
+            })
 
   build_others:
 
