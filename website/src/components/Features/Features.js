@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import styles from "./Features.module.css";
 
 const FeatureList = [
@@ -93,25 +92,18 @@ function Feature({ title, description, features, button }) {
         {features.map((feature, index) => {
           return (
             isVisible === feature.title && (
-              <AnimatePresence key={index}>
-                <div className={styles.featuresContentMobile}>
-                  <div className={styles.featureTabs}>
-                    <img className={styles.briefCase} src={feature.icon} />
-                    <h4 className={styles.featureTitle} id={feature.title}>
-                      {feature.title}
-                    </h4>
-                  </div>
-
-                  <motion.p
-                    className={styles.featureDescription}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    {feature.description}
-                  </motion.p>
+              <div key={index} className={styles.featuresContentMobile}>
+                <div className={styles.featureTabs}>
+                  <img className={styles.briefCase} src={feature.icon} />
+                  <h4 className={styles.featureTitle} id={feature.title}>
+                    {feature.title}
+                  </h4>
                 </div>
-              </AnimatePresence>
+
+                <p className={styles.featureDescription}>
+                  {feature.description}
+                </p>
+              </div>
             )
           );
         })}
