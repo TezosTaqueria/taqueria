@@ -84,7 +84,7 @@ jobs:
       #     repo: taqueria,
       #     run_id: ${{ steps.gatherInfo.output.runNumber }}
       
-      - run: "echo artifacts: ${{ steps.gatherInfo.outputs.result }}"
+      - run: "echo artifacts: ${{ steps.gatherInfo.outputs.result.runNumber }}"
 
   build_others:
 
