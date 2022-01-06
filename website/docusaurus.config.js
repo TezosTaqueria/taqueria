@@ -100,8 +100,29 @@ const config = {
 								  `,
 							},
 							{
-								label: "Stack Overflow",
-								href: "https://stackoverflow.com/questions/tagged/taqueria",
+								html: `
+									<p>
+									Faplaren krorar whataboutism. Krorat kroligen. 
+									</p>
+								  `,
+							},
+							{
+								html: `
+								<a className={styles.headlineButton} href='https://github.com'>
+								GITHUB
+							  </a>
+								  `,
+							},
+							{
+								html: `
+								<form >
+									<fieldset>
+									<h5>Register for updates</h5>
+									<input type="email" id="email" name="email" placeholder='Your email address'>
+									<input type="submit" value="Sign Up">
+									</fieldset>
+								</form>
+								  `,
 							},
 						],
 					},
