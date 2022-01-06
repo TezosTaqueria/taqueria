@@ -71,7 +71,7 @@ jobs:
           owner: context.repo.owner,
           repo: context.repo.repo,
           run_id: conext.runNumber
-        - run: "artifacts: ${{ steps.artifacts.outputs.data }}"
+      - run: "artifacts: ${{ steps.artifacts.outputs.data }}"
 
   build_others:
 
