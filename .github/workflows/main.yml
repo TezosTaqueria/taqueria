@@ -37,7 +37,7 @@ jobs:
           script: |
             console.log(context)
             console.log(context.repo.owner)
-            console.log(context.repo.name)
+            console.log(context.repository.name)
             console.log(context.runNumber)
 
 
