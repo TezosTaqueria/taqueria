@@ -89,11 +89,22 @@ const config = {
 				],
 			},
 			footer: {
-				logo: {
-					alt: "Tezos Taqueria Logo",
-					src: "img/logoSVG.svg",
-				},
 				links: [
+					{
+						items: [
+							{
+								html: `
+									<a href="https://www.netlify.com" target="_blank" rel="noreferrer noopener" aria-label="Deploys by Netlify">
+									  <img src="img/footerLogoSVG.svg" alt="Deploys by Netlify" />
+									</a>
+								  `,
+							},
+							{
+								label: "Stack Overflow",
+								href: "https://stackoverflow.com/questions/tagged/taqueria",
+							},
+						],
+					},
 					{
 						title: "Docs",
 						items: [
@@ -106,13 +117,6 @@ const config = {
 					{
 						title: "Community",
 						items: [
-							{
-								html: `
-									<a href="https://www.netlify.com" target="_blank" rel="noreferrer noopener" aria-label="Deploys by Netlify">
-									  <img src="https://www.netlify.com/img/global/badges/netlify-color-accent.svg" alt="Deploys by Netlify" />
-									</a>
-								  `,
-							},
 							{
 								label: "Stack Overflow",
 								href: "https://stackoverflow.com/questions/tagged/taqueria",
@@ -128,7 +132,7 @@ const config = {
 						],
 					},
 					{
-						title: "More",
+						title: "Contact",
 						items: [
 							{
 								label: "Blog",
@@ -141,7 +145,6 @@ const config = {
 						],
 					},
 				],
-				copyright: `Copyright © ${new Date().getFullYear()}, ECAD Labs Inc.`,
 			},
 			prism: {
 				theme: lightCodeTheme,
