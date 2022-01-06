@@ -72,6 +72,11 @@ h4 {
 html[data-theme="dark"] .docusaurus-highlight-code-line {
 	background-color: rgba(0, 0, 0, 0.3);
 }
+html[data-theme="light"] .docusaurus-highlight-code-line {
+	background-color: var(--ifm-color-primary-lightest);
+}
+
+/* Header Styles */
 
 @media screen and (max-width: 996px) {
 	.navbar__items {
@@ -121,4 +126,23 @@ html[data-theme="dark"] .docusaurus-highlight-code-line {
 	font-weight: 600;
 	font-size: 15px;
 	line-height: 22px;
+}
+
+/* Footer styles */
+
+.footer {
+	background-color: var(--ifm-color-primary-lightest);
+}
+
+.footer .container {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+	width: 100%;
+}
+.footer__links {
+	width: 70%;
+}
+.footer__bottom {
+	width: 30%;
 }
