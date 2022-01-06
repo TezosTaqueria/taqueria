@@ -29,6 +29,17 @@ jobs:
         with:
           deno-version: "^1.0.0"
 
+      - name: Get Workflow Info
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            console.log(context)
+            console.log(context.repo.owner)
+            console.log(context.repo.repo)
+            console.log(context.runNumber)
+
+
       # Uncomment this step to verify the use of 'deno fmt' on each commit.
       # - name: Verify formatting
       #   run: deno fmt --check
@@ -63,16 +74,16 @@ jobs:
 
 
       # - name: Try to get Artifact Info
-      - uses: octokit/request-action@v2.1.0
-        id: artifacts
-        with:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          route: GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts
-          owner: context.repo.owner,
-          repo: context.repo.repo,
-          run_id: context.runNumber
+      # - uses: octokit/request-action@v2.1.0
+      #   id: artifacts
+      #   with:
+      #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      #     route: GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts
+      #     owner: context.repo.owner,
+      #     repo: context.repo.repo,
+      #     run_id: context.runNumber
       
-      - run: "echo artifacts: ${{ steps.artifacts.outputs.data }}"
+      # - run: "echo artifacts: ${{ steps.artifacts.outputs.data }}"
 
   build_others:
 
