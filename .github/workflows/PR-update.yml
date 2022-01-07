@@ -42,7 +42,6 @@ name: Update PR
 on:
   workflow_run:
     workflows: ["Taqueria"]
-    branches: [main]
     types: [completed]
 
 jobs:  
