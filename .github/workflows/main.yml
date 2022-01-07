@@ -65,61 +65,6 @@ jobs:
 
       # - run: sleep 60
 
-  update_PR:
-    needs: build_taqueria_and_upload
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Get Workflow Info
-        uses: actions/github-script@v5
-        id: gatherInfo
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            console.log(context)
-            console.log(context.repo.owner)
-            console.log(context.repo.repo)
-            console.log(context.runId)
-
-      - name: Get artifact from previous step
-        uses: actions/github-script@v5
-        id: getArtifact
-        with:
-          github-token: ${{secrets.TEST_TOKEN}}
-          script: |
-            github.rest.actions.listWorkflowRunArtifacts({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId
-            })
-
-      - run: echo "${{ steps.getArtifact.outputs.result }}"
-
-      - name: Comment Artifact to PR
-        uses: actions/github-script@v5
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "Alex's comments"
-            })
-
-
-      # - name: Try to get Artifact Info
-      # - uses: octokit/request-action@v2.1.0
-      #   id: artifacts
-      #   with:
-      #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      #     route: GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts
-      #     owner: ecadlabs,
-      #     repo: taqueria,
-      #     run_id: ${{ steps.gatherInfo.output.runNumber }}
-      
-      # - run: "echo artifacts: ${{ steps.gatherInfo.outputs.result.runNumber }}"
-
   build_others:
 
     runs-on: ubuntu-latest
