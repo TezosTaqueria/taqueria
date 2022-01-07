@@ -91,46 +91,6 @@ const config = {
 			footer: {
 				links: [
 					{
-						items: [
-							{
-								html: `
-									<a href="https://www.netlify.com" target="_blank" rel="noreferrer noopener" aria-label="Deploys by Netlify">
-									  <img src="img/footerLogoSVG.svg" alt="Deploys by Netlify" />
-									</a>
-								  `,
-							},
-							{
-								html: `
-									<p>
-									Faplaren krorar whataboutism. Krorat kroligen. 
-									</p>
-								  `,
-							},
-							{
-								html: `
-								<a class=footerButton href='https://github.com'>
-								GITHUB
-							  </a>
-								  `,
-							},
-							{
-								html: `
-								<form >
-									<fieldset>
-									<h5>Register for updates</h5>
-									<input type="email" id="email" name="email" placeholder='Your email address'>
-									<input type="submit" value="Sign Up">
-									</fieldset>
-								</form>
-								  `,
-							},
-							{
-								label: `Copyright © ${new Date().getFullYear()}, ECAD Labs Inc.`,
-								to: "/",
-							},
-						],
-					},
-					{
 						title: "Docs",
 						items: [
 							{
@@ -166,6 +126,47 @@ const config = {
 							{
 								label: "GitHub",
 								href: "https://github.com/ecadlabs/taqueria",
+							},
+						],
+					},
+					{
+						items: [
+							{
+								html: `
+									<a href="https://www.netlify.com" target="_blank" rel="noreferrer noopener" aria-label="Deploys by Netlify">
+									  <img src="img/footerLogoSVG.svg" alt="Deploys by Netlify" />
+									</a>
+								  `,
+							},
+							{
+								html: `
+									<p>
+									Faplaren krorar whataboutism. Krorat kroligen. 
+									</p>
+								  `,
+							},
+							{
+								html: `
+								<a class='footerButton' href='https://github.com'>
+								GITHUB
+							  	</a>
+								  `,
+							},
+							{
+								html: `
+								<form class='footerForm'>
+									<h5>Register for updates</h5>
+									<div class='footerInputContainer'>
+									<input class='footerImail' type="email" id="email" name="email" placeholder='Your email address'>
+									<input class='signupButton' type="submit" value="Sign Up">
+									</div>
+								</form>
+								  `,
+							},
+							{
+								label: `Copyright © 2021 ECAD Labs - This project is licensed under Apache License, Version 2.0`,
+								to: "/",
+								className: "copyright",
 							},
 						],
 					},
