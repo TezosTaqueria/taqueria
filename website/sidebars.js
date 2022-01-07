@@ -16,113 +16,142 @@ const sidebars = {
   // By default, Docusaurus generates a sidebar from the docs folder structure
 
   docs: [
-    "intro",
-
     {
       type: "category",
-      label: "QuickStart",
-      items: ["Quickstart/Start1", "Quickstart/Start2", "Quickstart/Start3"],
+      label: "Getting Started",
+      className: "sidebarHeader",
+      collapsed: true,
+      collapsible: false,
+      items: [
+        "intro",
+        {
+          type: "category",
+          label: "QuickStart",
+          items: [
+            "Quickstart/Start1",
+            "Quickstart/Start2",
+            "Quickstart/Start3",
+          ],
+        },
+        {
+          type: "category",
+          label: "Resources",
+
+          items: ["Resources/Changelog"],
+        },
+      ],
     },
     {
       type: "category",
-      label: "Resources",
-
-      items: ["Resources/Changelog"],
-    },
-
-    "Selections",
-    "Dynamicproperties",
-    "Transformation",
-    "Animations",
-    {
-      type: "category",
-      label: "Arrays",
-
-      items: ["Arrays/arrays"],
+      label: "Main Concepts",
+      className: "sidebarHeader",
+      collapsed: true,
+      collapsible: false,
+      items: [
+        "Selections",
+        "Dynamicproperties",
+        "Transformation",
+        "Animations",
+      ],
     },
     {
       type: "category",
-      label: "Axes",
+      label: "Api Reference V 5.12.0",
+      className: "sidebarHeader",
+      collapsed: true,
+      collapsible: false,
+      items: [
+        {
+          type: "category",
+          label: "Arrays",
 
-      items: ["Axes/axes"],
-    },
-    {
-      type: "category",
-      label: "Brushes",
+          items: ["Arrays/arrays"],
+        },
+        {
+          type: "category",
+          label: "Axes",
 
-      items: ["Brushes/brushes"],
-    },
-    {
-      type: "category",
-      label: "Chords",
+          items: ["Axes/axes"],
+        },
+        {
+          type: "category",
+          label: "Brushes",
 
-      items: ["Chords/chords"],
-    },
-    {
-      type: "category",
-      label: "Collections",
+          items: ["Brushes/brushes"],
+        },
+        {
+          type: "category",
+          label: "Chords",
 
-      items: ["Collections/collections"],
-    },
-    {
-      type: "category",
-      label: "Colors",
+          items: ["Chords/chords"],
+        },
+        {
+          type: "category",
+          label: "Collections",
 
-      items: ["Colors/colors"],
-    },
-    {
-      type: "category",
-      label: "ColorSchemes",
+          items: ["Collections/collections"],
+        },
+        {
+          type: "category",
+          label: "Colors",
 
-      items: ["ColorSchemes/colorschemes"],
-    },
-    {
-      type: "category",
-      label: "Contours",
+          items: ["Colors/colors"],
+        },
+        {
+          type: "category",
+          label: "ColorSchemes",
 
-      items: ["Contours/contours"],
-    },
-    {
-      type: "category",
-      label: "Delimiter-Seperated Values",
+          items: ["ColorSchemes/colorschemes"],
+        },
+        {
+          type: "category",
+          label: "Contours",
 
-      items: ["Delimiter/delimiter"],
-    },
-    {
-      type: "category",
-      label: "Easings",
+          items: ["Contours/contours"],
+        },
+        {
+          type: "category",
+          label: "Delimiter-Seperated Values",
 
-      items: ["Easings/easings"],
-    },
-    {
-      type: "category",
-      label: "Fetches",
+          items: ["Delimiter/delimiter"],
+        },
+        {
+          type: "category",
+          label: "Easings",
 
-      items: ["Fetches/fetches"],
-    },
-    {
-      type: "category",
-      label: "Forces",
+          items: ["Easings/easings"],
+        },
+        {
+          type: "category",
+          label: "Fetches",
 
-      items: ["Forces/forces"],
-    },
-    {
-      type: "category",
-      label: "Number Formats",
+          items: ["Fetches/fetches"],
+        },
+        {
+          type: "category",
+          label: "Forces",
 
-      items: ["NumberFormats/numberformats"],
-    },
-    {
-      type: "category",
-      label: "Geographies",
+          items: ["Forces/forces"],
+        },
+        {
+          type: "category",
+          label: "Number Formats",
 
-      items: ["Geographies/geographies"],
-    },
-    {
-      type: "category",
-      label: "Hierarchies",
+          items: ["NumberFormats/numberformats"],
+        },
+        {
+          type: "category",
+          label: "Geographies",
 
-      items: ["Hierarchies/hierarchies"],
+          items: ["Geographies/geographies"],
+        },
+        {
+          type: "category",
+          label: "Hierarchies",
+
+          items: ["Hierarchies/hierarchies"],
+        },
+      ],
     },
   ],
 };
