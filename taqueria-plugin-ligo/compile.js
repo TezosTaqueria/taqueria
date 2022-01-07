@@ -25,17 +25,17 @@ const getCompileCommand = (opts) => (sourceFile) => {
 const execCmd = cmd => new Promise((resolve, _) => {
     exec(cmd, (err, stdout, stderr) => {
         if (err) resolve({
-            success: false,
+            status: 'failed',
             stdout: "",
             stderr: err
         })
         else if (stderr) resolve({
-            success: false,
+            status: 'failed',
             stdout,
             stderr
         })
         else resolve({
-            success: true,
+            status: 'success',
             stdout,
             stderr
         })
@@ -44,10 +44,6 @@ const execCmd = cmd => new Promise((resolve, _) => {
 
 const compileContract = (opts) => (sourceFile) =>
     execCmd(getCompileCommand(opts) (sourceFile))
-    .then(result => ({
-        status: result.success ? 'success' : 'failure',
-        output: result.success ? result.stdout : result.stderr
-    }))
 
 const compileAll = parsedArgs => {
     // TODO: Fetch list of files from SDK
@@ -59,7 +55,8 @@ const compileAll = parsedArgs => {
     .then(promises => Promise.all(promises))
     .then(results => ({
         status: 'success',
-        output: results ? "Done.\n" : "No LIGO contracts found.\n"
+        stdout: results ? "Done.\n" : "No LIGO contracts found.\n",
+        stderr: ""
     }))
 }
 

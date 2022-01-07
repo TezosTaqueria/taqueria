@@ -72,7 +72,7 @@ export interface Schema {
     init?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
     checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
     installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
-    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    proxy?: <T>(parsedArgs: SanitizedArgs & Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
 }
 
 export interface SchemaView {
@@ -114,6 +114,7 @@ export interface SanitizedArgs {
     contractsDir: string
     testsDir: string
     artifactsDir: string
+    task?: string
 }
 
 export type pluginDefiner = (i18n: i18n) => Schema

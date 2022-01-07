@@ -2,7 +2,7 @@ import type {Config, PluginInfo, Task, InstalledPlugin, Action} from './taqueria
 import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
 import {EnvVars, ConfigDir, SanitizedInitArgs, i18n} from './taqueria-types.ts'
 import {SanitizedPath, SanitizedAbsPath} from './taqueria-utils/taqueria-utils-types.ts'
-import {readFile, writeTextFile, decodeJson, log, joinPaths} from './taqueria-utils/taqueria-utils.ts'
+import {readFile, writeTextFile, decodeJson, log, joinPaths, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
 import {match} from 'https://cdn.skypack.dev/ts-pattern'
 import {join} from "https://deno.land/std@0.114.0/path/mod.ts";
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
@@ -89,21 +89,39 @@ export const loadPlugins = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i
     }),
 )
 
-export const exec = (cmd: string, inputArgs: Record<string, unknown>) => attemptP(async () => {
+export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>) => attemptP(async () => {
+    let command = cmdTemplate
     try {
-        const command = Object.entries(inputArgs).reduce(
-            (retval, [key, val]) => retval.replace(`%${key}%`, val as string),
-            cmd
-        )
-
-        const process = Deno.run({cmd: ["sh", "-c", command]})
+        // NOTE, uses eta templates under the hood. Very performant! https://ghcdn.rawgit.org/eta-dev/eta/master/browser-tests/benchmark.html
+        /**
+         * Template Variables:
+         * - configDir
+         * - projectDir
+         * - maxConcurrency
+         * - plugin
+         * - config.language
+         * - config.plugins
+         * - config.contractsDir
+         * - config.artifactsDir
+         * - config.testsDir
+         * - config.configFile
+         * - config.configDir
+         * - config.projectDir
+         * - env.get()
+         * - i18n.__()
+         */
+        const cmd = renderTemplate(cmdTemplate, {join, ...inputArgs})
+        command = cmd
+        const process = Deno.run({cmd: ["sh", "-c", cmd]})
         const status = await process.status()
+
         return status.code
     }
     catch (previous) {
+        console.log(previous)
         throw {
             kind: "E_FORK",
-            msg: `Could not fork ${cmd}`,
+            msg: `Could not fork ${command}`,
             previous
         }
     }
@@ -139,7 +157,7 @@ const NPMPlugin = {
                         try {
                             const f = task.handler === "proxy"
                                 ? this.request("proxy", {task: task.task, ...taskArgs}, config, env, i18n, plugin, parsedArgs)
-                                : exec(task.handler.value, taskArgs)
+                                : exec(task.handler, {...parsedArgs, ...taskArgs, config, env, i18n})
                         
                             statusCode = await promise (f)
                         }
@@ -214,9 +232,18 @@ const NPMPlugin = {
                 }
 
                 const decoded = JSON.parse(stdout) // TODO validate
+
+                // TODO: Side-effect. This shouldn't be here
+                if (action === 'proxy') console.log(
+                    decoded.status === 'success'
+                        ? decoded.stdout
+                        : decoded.stderr
+                )
+
                 return decoded
             }
             catch (err) {
+                console.log(err)
                 return Promise.reject({kind: 'E_INVALID_JSON', msg: 'TODO i18n message', previous: err})
             }
         })

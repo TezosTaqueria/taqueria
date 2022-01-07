@@ -5,6 +5,7 @@ import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {fork, attemptP, map, Future as Fluture} from 'https://cdn.skypack.dev/fluture';
 import JSON from "https://deno.land/x/json5/mod.ts";
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
+import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
 
 export const decodeJson = (encoded: string) => Fluture((rej: reject, res:resolve) => {
     try {
@@ -57,3 +58,5 @@ export const isUrl = (input:string) => fork (() => false) (() => true) (Url.make
 export const memoize = memoizy({})
 
 export const joinPaths = _joinPaths
+
+export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string

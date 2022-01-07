@@ -8,6 +8,7 @@ import {match, __} from 'https://cdn.skypack.dev/ts-pattern'
 import {getConfig, loadPlugins, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import {isTaqError} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
+import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 
 export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<void>) => unknown
 
@@ -89,6 +90,21 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n) => pipe(
 
 const postInitCLI = (env: EnvVars, args: DenoArgs, parsedArgs: SanitizedInitArgs, i18n: i18n) => pipe(
     commonCLI(env, args, i18n)
+    .command(
+        'list networks',
+        i18n.__('listNetworks'),
+        () => {},
+        (yargs: RawInitArgs) => {
+            // TODO - completely temporary
+            // Networks will be both cached in state, and too...
+            // Retrieved lazily in real time from plugins
+            new Table()
+            .header(["Name", "Label"])
+            .body([["ithacanet", "Ithaca Testnet"]])
+            .border(true)
+            .render()
+        }
+    )
     .demandCommand()
     .completion()
     .help(),
@@ -136,16 +152,16 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
 const addTask = (cliConfig: CLIConfig, i18n: i18n) => (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<number>) =>
     coalesce 
         (()                                             => createTask(cliConfig, i18n, task, plugin, handler))
-        (([commandName, existing] : [string, Command])  => updateTask(cliConfig, i18n, task, plugin, commandName, existing))
+        (([commandName, existing] : [string, Command])  => updateTask(cliConfig, i18n, task, plugin, handler, commandName, existing))
         (getTask(cliConfig, task))
 
 // TODO: Split this function into smaller parts        
-const updateTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, plugin: InstalledPlugin, commandName: string, existing: Command) => {
+const updateTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<number>, commandName: string, existing: Command) => {
     const existingHandler = existing.handler
 
     existing.handler = (args: CommandArgs) => {
         if (args.plugin === plugin.name) {
-            return console.log(`Handler for ${plugin.name}`)
+            return handler(args as unknown as Record<string, unknown>)
         }
         return existingHandler(args)
     }
@@ -202,9 +218,6 @@ const createTask = (cliConfig: CLIConfig, i18n: i18n, task:Task, plugin: Install
             }
         })
 )
-
-// const runTask = (cliConfig: CLIConfig, parsedArgs: Record<string, unknown>)
-
             
 export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
     // Parse the args required for core built-in tasks

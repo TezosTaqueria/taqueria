@@ -1,5 +1,5 @@
 {
-  "name": "taqueria-plugin-smartpy",
+  "name": "taqueria-plugin-taquito",
   "version": "1.0.0",
   "description": "",
   "targets": {
@@ -12,18 +12,19 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
     "build": "npx parcel build",
-    "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
+    "debugPluginInfo": "node --inspect-brk index.js --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "fast-glob": "^3.2.7",
-    "taqueria-sdk": "file:../taqueria-sdk"
-  },
   "devDependencies": {
     "parcel": "^2.0.1",
     "typescript": "^4.5.2"
+  },
+  "dependencies": {
+    "@taquito/taquito": "^11.0.2",
+    "taqueria-sdk": "file:../taqueria-sdk"
   }
 }
