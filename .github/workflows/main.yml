@@ -63,11 +63,13 @@ jobs:
           path: /home/runner/work/taqueria/taqueria/taqueria
           retention-days: 1
 
+      - run: sleep 60
+
       - name: Get artifact for Repo
         uses: actions/github-script@v5
         id: getArtifactFromRepo
         with:
-          github-token: ghp_CepZoYOYhirxPJJHaqg7219OJHx1923uToq8
+          github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             github.rest.actions.listArtifactsForRepo({
               owner: context.repo.owner,
