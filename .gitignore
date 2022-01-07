@@ -104,6 +104,7 @@ dist
 .tern-port
 
 # Project specific
+.DS_Store
 node_modules
 /deno
 .vscode
