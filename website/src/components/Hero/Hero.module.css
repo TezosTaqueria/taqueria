@@ -273,6 +273,7 @@ video {
 		display: flex;
 		justify-content: center;
 		background-color: var(--ifm-color-bg-purple);
+		border-radius: 8px;
 	}
 	.carousel {
 		width: 100%;
