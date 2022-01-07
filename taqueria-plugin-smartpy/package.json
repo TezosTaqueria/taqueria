@@ -19,6 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "fast-glob": "^3.2.7",
     "taqueria-sdk": "file:../taqueria-sdk"
   },
   "devDependencies": {
