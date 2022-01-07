@@ -25,6 +25,7 @@
 	--ifm-font-family-base: "Montserrat";
 	--ifm-code-font-size: 95%;
 	--ifm-font-color-base: "#000000";
+	--ifm-footer-link-color: #000000;
 }
 h1 {
 	font-style: normal;
@@ -133,6 +134,7 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 .footer {
 	background-color: var(--ifm-color-primary-lightest);
 	padding-top: 80px;
+	padding-bottom: 15px;
 }
 
 .footer .container {
@@ -148,6 +150,7 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 	flex-wrap: wrap;
 	width: 100%;
 	flex: 0 0 0 0;
+	color: #000000 !important;
 }
 .footer__links .footer__col {
 	flex: unset;
@@ -180,6 +183,9 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 }
 .footerButtonContainer {
 	margin-bottom: 20px;
+}
+.footerDescription {
+	max-width: 250px;
 }
 .footerButton {
 	height: fit-content;
@@ -216,7 +222,7 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 .signupButton {
 	height: fit-content;
 	white-space: nowrap;
-	padding: 8px 14px;
+	padding: 5px 18px;
 	background-color: var(--ifm-color-primary);
 	color: #373f41;
 	font-size: 12px;
@@ -267,5 +273,6 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 	}
 	.signupButton {
 		margin-top: 20px;
+		margin-left: 0px;
 	}
 }

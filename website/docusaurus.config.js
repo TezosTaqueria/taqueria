@@ -157,7 +157,7 @@ const config = {
 							},
 							{
 								html: `
-									<p>
+									<p class='footerDescription'>
 									Faplaren krorar whataboutism. Krorat kroligen. 
 									</p>
 								  `,
