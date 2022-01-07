@@ -7,10 +7,10 @@
 .features:before {
 	content: "";
 	position: absolute;
-	top: 10%;
+	top: 15%;
 	left: 0;
 	width: 20%;
-	height: 10%;
+	height: calc(100vh / (100 / 5));
 	background-color: var(--ifm-color-primary);
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
 	z-index: 1;
@@ -21,7 +21,7 @@
 	bottom: 90%;
 	right: 0;
 	width: 20%;
-	height: 10%;
+	height: calc(100vh / (100 / 5));
 	background-color: var(--ifm-color-primary);
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
 	z-index: 1;
@@ -38,10 +38,10 @@
 .leftPurpleLine {
 	content: "";
 	position: absolute;
-	bottom: 90%;
+	bottom: 81%;
 	left: 12.5%;
 	width: 10%;
-	height: 7%;
+	height: calc(100vh / (100 / 5));
 	background-color: rgba(160, 102, 170, 0.8);
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
 	z-index: 2;
@@ -56,4 +56,11 @@
 	background-color: rgba(70, 41, 75, 0.8);
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
 	z-index: 2;
+}
+
+.Contentcontainer {
+	position: absolute;
+	right: 0;
+	width: 100%;
+	bottom: 0;
 }

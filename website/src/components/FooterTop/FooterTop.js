@@ -12,9 +12,9 @@ const FeatureList = [
 
 function Feature({ Svg, title, description }) {
 	return (
-		<div className={styles.container}>
+		<div className={styles.Contentcontainer}>
 			<h5 className={styles.headline}>{title}</h5>
-			<div className="styles.svgContainer">
+			<div className={styles.svgContainer}>
 				<Svg className={styles.featureSvg} alt={title} />
 			</div>
 		</div>
@@ -25,12 +25,7 @@ export default function FooterTop() {
 	return (
 		<section className={styles.features}>
 			<div className={styles.container}>
-				<div className={styles.content}>
-					<div className={styles.heroCardContainer}>
-						<Feature {...FeatureList[0]} />
-					</div>
-					<div className={styles.carousel}></div>
-				</div>
+				<Feature {...FeatureList[0]} />
 			</div>
 			<div className={styles.leftPurpleLine}></div>
 			<div className={styles.rightPurpleLine}></div>
