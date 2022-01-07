@@ -17,7 +17,7 @@ on:
     branches: [main]
 
 jobs:
-  build_taqueria:
+  build_taqueria_and_upload:
     runs-on: ubuntu-latest
 
     steps:
@@ -63,21 +63,12 @@ jobs:
           path: /home/runner/work/taqueria/taqueria/taqueria
           retention-days: 1
 
-      - run: sleep 60
+      # - run: sleep 60
 
-      # - name: Get artifact for Repo
-      #   uses: actions/github-script@v5
-      #   id: getArtifactFromRepo
-      #   with:
-      #     github-token: ${{secrets.GITHUB_TOKEN}}
-      #     script: |
-      #       github.rest.actions.listArtifactsForRepo({
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #       })
-      
-      # - run: echo "${{ steps.getArtifactFromRepo.outputs.result }}"
+  update_PR:
+    runs-on: ubuntu-latest
 
+    steps:
       - name: Get artifact from previous step
         uses: actions/github-script@v5
         id: getArtifact
