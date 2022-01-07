@@ -97,6 +97,7 @@
 	background-repeat: no-repeat;
 	background-size: contain;
 	width: 654px;
+	padding-bottom: 30px;
 	margin-bottom: 30px;
 	position: relative;
 }
@@ -231,8 +232,7 @@ video {
 
 .featureSvg {
 	height: 54px;
-	width: 157px;
-	margin-top: 20px;
+	width: 150px;
 }
 @media screen and (max-width: 1300px) {
 	.featureSvg {
@@ -334,5 +334,6 @@ video {
 	}
 	.content {
 		padding-bottom: 100px;
+		padding-top: 100px;
 	}
 }
