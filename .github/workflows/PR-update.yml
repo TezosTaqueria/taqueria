@@ -5,6 +5,7 @@ name: PR Update
 on:
   workflow_run:
     workflows: ["Taqueria"]
+    branches: [main]
     type:
       - completed
 jobs:  
