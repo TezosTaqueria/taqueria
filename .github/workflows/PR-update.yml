@@ -5,8 +5,8 @@ name: PR Update
 on:
   workflow_run:
     workflows: ["Taqueria"]
-    branches: [main, alex-github-action-init]
-
+    type:
+      - completed
 jobs:  
   update_PR:
     runs-on: ubuntu-latest
