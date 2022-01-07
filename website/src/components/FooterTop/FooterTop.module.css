@@ -1,16 +1,16 @@
 .features {
 	padding: 2rem 0;
 	width: 100%;
-	height: 155px;
+	height: 350px;
 	position: relative;
 }
 .features:before {
 	content: "";
 	position: absolute;
-	bottom: -2.5%;
+	top: 10%;
 	left: 0;
 	width: 20%;
-	height: 5%;
+	height: 10%;
 	background-color: var(--ifm-color-primary);
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
 	z-index: 1;
@@ -18,19 +18,19 @@
 .features:after {
 	content: "";
 	position: absolute;
-	top: 87.5%;
+	bottom: 90%;
 	right: 0;
 	width: 20%;
-	height: 5%;
+	height: 10%;
 	background-color: var(--ifm-color-primary);
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
 	z-index: 1;
 }
 .container {
 	width: 100%;
-	-webkit-clip-path: polygon(0 0, 100% 0%, 100% 91%, 0% 100%);
-	clip-path: polygon(0 0, 100% 0%, 100% 90%, 0% 100%);
-	height: 100vh;
+	-webkit-clip-path: polygon(0 10%, 100% 0%, 100% 100%, 0% 100%);
+	clip-path: polygon(0 10%, 100% 0%, 100% 100%, 0% 100%);
+	height: 350px;
 	background-color: var(--ifm-color-primary-lightest);
 	position: relative;
 }
@@ -38,10 +38,10 @@
 .leftPurpleLine {
 	content: "";
 	position: absolute;
-	top: 93.5%;
+	bottom: 90%;
 	left: 12.5%;
 	width: 10%;
-	height: 5%;
+	height: 7%;
 	background-color: rgba(160, 102, 170, 0.8);
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
 	z-index: 2;
@@ -49,11 +49,11 @@
 .rightPurpleLine {
 	content: "";
 	position: absolute;
-	top: 91.5%;
+	bottom: 91.5%;
 	right: 12.5%;
 	width: 10%;
-	height: 5%;
-	background-color: rgba(160, 102, 170, 0.8);
+	height: calc(100vh / (100 / 5));
+	background-color: rgba(70, 41, 75, 0.8);
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
 	z-index: 2;
 }
