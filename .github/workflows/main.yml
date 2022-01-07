@@ -66,6 +66,7 @@ jobs:
       # - run: sleep 60
 
   update_PR:
+    needs: build_taqueria_and_upload
     runs-on: ubuntu-latest
 
     steps:
