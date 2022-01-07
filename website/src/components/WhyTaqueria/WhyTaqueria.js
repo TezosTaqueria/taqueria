@@ -6,6 +6,7 @@ const FeatureList = [
 	{
 		title: "Why Taqueria?",
 		Svg: require("../../../static/img/taq_purple.svg").default,
+		gif: require("../../../static/gif/mp4gifcode.mp4").default,
 		Briefcase: require("../../../static/img/briefcase.svg").default,
 		Key: require("../../../static/img/key.svg").default,
 		Box: require("../../../static/img/box.svg").default,
@@ -14,13 +15,13 @@ const FeatureList = [
 	},
 ];
 
-function Feature({ Svg, Briefcase, Key, Box, Credit_Card, title, description }) {
+function Feature({ Svg, gif, Briefcase, Key, Box, Credit_Card, title, description }) {
 	return (
 		<div>
 			<Svg className={styles.featureSvg} alt={title} />
 			<div className={styles.features}>
 				<div className={styles.left}>
-					<img src="http://localhost:3000/img/undraw_docusaurus_react.svg" />
+	                <video autoplay="true" muted src={gif} />
 				</div>
 				<div className={styles.right}>
 					<h1>{title}</h1>
@@ -50,7 +51,7 @@ function Feature({ Svg, Briefcase, Key, Box, Credit_Card, title, description }) 
 
 export default function WhyTaqueria() {
 	return (
-		<section className={styles.features}>
+		<section className={styles.wrapper}>
 			<div className="container">
 				<div className="row">
 					<Feature {...FeatureList[0]} />
