@@ -136,6 +136,7 @@ video {
 	width: 100%;
 	max-width: fit-content;
 	border-radius: 8px;
+	max-width: 558px;
 }
 
 .videoHeader {
