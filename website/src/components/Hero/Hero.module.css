@@ -27,6 +27,46 @@
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
 	z-index: 1;
 }
+.dotMenu {
+	margin: auto;
+	display: flex;
+	flex-direction: row;
+	margin-top: 10px;
+}
+.dots {
+	height: 8px;
+	width: 8px;
+	background-color: var(--ifm-color-primary);
+	border-radius: 50%;
+	display: inline-block;
+	cursor: pointer;
+	margin-left: 5px;
+	margin-right: 5px;
+	margin-bottom: 15px;
+}
+.videoBlock {
+	background-color: #111013;
+	max-height: 379px;
+	border-radius: 13px;
+	display: flex;
+	align-items: "center";
+	border-radius: 8px;
+}
+.videoBlock {
+	height: 379px;
+}
+.inactivedots {
+	height: 8px;
+	width: 8px;
+	background-color: var(--ifm-color-primary);
+	opacity: 0.2;
+	border-radius: 50%;
+	display: inline-block;
+	cursor: pointer;
+	margin-left: 5px;
+	margin-right: 5px;
+	margin-bottom: 15px;
+}
 .container {
 	width: 100%;
 	-webkit-clip-path: polygon(0 0, 100% 0%, 100% 91%, 0% 100%);
@@ -79,12 +119,12 @@
 .featureSvgTraiangle4 {
 	position: absolute;
 	top: -60px;
-	right: 50px;
+	right: 60px;
 }
 .featureSvgTraiangle5 {
 	position: absolute;
 	top: -40px;
-	right: -10px;
+	right: 10px;
 }
 .heroTitle {
 	max-width: 445px;
