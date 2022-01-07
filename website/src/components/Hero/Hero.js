@@ -1,51 +1,72 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "./Hero.module.css";
-
+import Slider from "react-slick";
 const FeatureList = [
 	{
-		title: "Easy to Use",
-		Svg: require("../../../static/img/taq_pink.svg").default,
+		title: "Insert awesome intro title here.",
+		Svg: require("../../../static/img/heroSVG.svg").default,
+		SvgTraiangle1: require("../../../static/img/triangle1.svg").default,
+		SvgTraiangle2: require("../../../static/img/triangle2.svg").default,
+		SvgTraiangle3: require("../../../static/img/triangle3.svg").default,
+		SvgTraiangle4: require("../../../static/img/triangle4.svg").default,
+		SvgTraiangle5: require("../../../static/img/triangle5.svg").default,
 		description: (
 			<>
-				Taqueria is designed with Tezos developer productivity in mind. Scaffold
-				a brand new Tezos app complete with Smart Contracts, Wallet Integration,
-				Integration Tests, and deployment actions.
+				Et has minim elitr intellegat. Mea aeterno eleifend antiopam ad, nam no
+				suscipit quaerendum. At nam minimum ponderum.
 			</>
 		),
-	},
-	{
-		title: "Focus on What Matters",
-		Svg: require("../../../static/img/taq_orange.svg").default,
-		description: (
-			<>
-				Taqueria pulls together the best tools from the Tezos Blockchain
-				development ecosystem so you can focus on building your vision.
-			</>
-		),
-	},
-	{
-		title: "Open to extension",
-		Svg: require("../../../static/img/taq_purple.svg").default,
-		description: (
-			<>
-				Taqueria is open to extension. Devlope your own Taqueria plugin or bring
-				Taqueria into your development environment of choice. Taqueria ships
-				with a robust CLI and a VSCode Plugin.
-			</>
-		),
+		link: {
+			title: "Quick Start",
+			url: "/blog",
+		},
+
+		gif: require("../../../static/gif/mp4gifcode.mp4").default,
 	},
 ];
 
-function Feature({ Svg, title, description }) {
+function Feature({
+	Svg,
+	title,
+	description,
+	link,
+	gif,
+	SvgTraiangle1,
+	SvgTraiangle2,
+	SvgTraiangle3,
+	SvgTraiangle4,
+	SvgTraiangle5,
+}) {
 	return (
-		<div className={clsx("col col--4")}>
-			<div className="text--center">
-				<Svg className={styles.featureSvg} alt={title} />
+		<div className={styles.content}>
+			<div className={styles.heroCardContainer}>
+				<div className={styles.heroCard}>
+					<h1 className={styles.heroTitle}>{title}</h1>
+					<div className={styles.heroCardContent}>
+						<p className={styles.heroCardDescription}>{description}</p>
+						<div className={styles.heroButtonContainer}>
+							<a className={styles.heroButton} href={link.url}>
+								{link.title}
+							</a>
+						</div>
+						{link.tilte}
+					</div>
+					<Svg className={styles.featureSvg} alt={title} />
+					<SvgTraiangle1 className={styles.featureSvgTraiangle1} alt={title} />
+					<SvgTraiangle2 className={styles.featureSvgTraiangle2} alt={title} />
+					<SvgTraiangle3 className={styles.featureSvgTraiangle3} alt={title} />
+					<SvgTraiangle4 className={styles.featureSvgTraiangle4} alt={title} />
+					<SvgTraiangle5 className={styles.featureSvgTraiangle5} alt={title} />
+				</div>
 			</div>
-			<div className="text--center padding-horiz--md">
-				<h3>{title}</h3>
-				<p>{description}</p>
+			<div className={styles.carousel}>
+				<div className={styles.videoHeader}>
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+				<video autoplay="true" muted src={gif} />
 			</div>
 		</div>
 	);
@@ -53,17 +74,12 @@ function Feature({ Svg, title, description }) {
 
 export default function Hero() {
 	return (
-		<div>
-			<h3>Hero module</h3>
-			<section className={styles.features}>
-				<div className="container">
-					<div className="row">
-						{FeatureList.map((props, idx) => (
-							<Feature key={idx} {...props} />
-						))}
-					</div>
-				</div>
-			</section>
-		</div>
+		<section className={styles.features}>
+			<div className={styles.container}>
+				<Feature {...FeatureList[0]} />
+			</div>
+			<div className={styles.leftPurpleLine}></div>
+			<div className={styles.rightPurpleLine}></div>
+		</section>
 	);
 }
