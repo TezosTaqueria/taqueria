@@ -67,3 +67,17 @@
 	align-items: center;
 	height: 100%;
 }
+
+@media screen and (max-width: 640px) {
+	.heroCardContainer,
+	.container {
+		-webkit-clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+		clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+	}
+	.features:before,
+	.features:after,
+	.leftPurpleLine,
+	.rightPurpleLine {
+		display: none;
+	}
+}
