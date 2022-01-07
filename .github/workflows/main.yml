@@ -67,7 +67,7 @@ jobs:
         uses: actions/github-script@v5
         id: getArtifactFromRepo
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          github-token: ghp_CepZoYOYhirxPJJHaqg7219OJHx1923uToq8
           script: |
             github.rest.actions.listArtifactsForRepo({
               owner: context.repo.owner,
