@@ -38,7 +38,7 @@ jobs:
             console.log(context)
             console.log(context.repo.owner)
             console.log(context.repo.repo)
-            console.log(context.runNumber)
+            console.log(context.runId)
 
 
 
@@ -84,7 +84,7 @@ jobs:
             github.rest.actions.listWorkflowRunArtifacts({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              run_id: context.runNumber
+              run_id: context.runId
             })
 
       - run: echo ${{steps.getArtifact.outputs.result}}
