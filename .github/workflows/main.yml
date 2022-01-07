@@ -70,6 +70,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Get Workflow Info
+        uses: actions/github-script@v5
+        id: gatherInfo
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            console.log(context)
+            console.log(context.repo.owner)
+            console.log(context.repo.repo)
+            console.log(context.runId)
+
       - name: Get artifact from previous step
         uses: actions/github-script@v5
         id: getArtifact
