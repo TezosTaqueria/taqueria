@@ -5,8 +5,10 @@ name: CI
 on:
   workflow_run:
     workflows: ["Taqueria"]
+    branches: [main, alex-github-action-init]
     types: 
       - completed
+      - requested
 
 jobs:  
   update_PR:
