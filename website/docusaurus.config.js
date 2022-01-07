@@ -90,51 +90,107 @@ const config = {
           },
         ],
       },
-
       footer: {
-        style: "dark",
         links: [
+          {
+            title: "Contact",
+            items: [
+              {
+                label: "Report Issues",
+                to: "/blog",
+              },
+              {
+                label: "Contribute",
+                to: "/blog",
+              },
+            ],
+          },
+
+          {
+            title: "Community",
+            items: [
+              {
+                label: "Stack Exchange",
+                to: "https://stackoverflow.com",
+              },
+              {
+                label: "Discord",
+                to: "https://discord.com",
+              },
+              {
+                label: "Twitter",
+                to: "https://twitter.com",
+              },
+              {
+                label: "Code of Conduct",
+                to: "/docs/intro",
+              },
+              {
+                label: "GitHub",
+                to: "https://github.com",
+              },
+            ],
+          },
           {
             title: "Docs",
             items: [
               {
-                label: "Tutorial",
+                label: "Quick Start",
+                to: "/docs/intro",
+              },
+              {
+                label: "TypeDoc Reference",
+                to: "/docs/intro",
+              },
+              {
+                label: "Roadmap",
                 to: "/docs/intro",
               },
             ],
           },
           {
-            title: "Community",
             items: [
               {
-                label: "Stack Overflow",
-                href: "https://stackoverflow.com/questions/tagged/taqueria",
+                html: `
+									<a href="/" target="_blank" rel="noreferrer noopener" aria-label="">
+									  <img src="img/footerLogoSVG.svg" alt="" />
+									</a>
+								  `,
               },
               {
-                label: "Discord",
-                href: "https://discordapp.com/invite/tezostaqueria",
+                html: `
+									<p class='footerDescription'>
+									Faplaren krorar whataboutism. Krorat kroligen. 
+									</p>
+								  `,
               },
               {
-                label: "Twitter",
-                href: "https://twitter.com/tezostaqueria",
-              },
-            ],
-          },
-          {
-            title: "More",
-            items: [
-              {
-                label: "Blog",
-                to: "/blog",
+                html: `
+								<a class='footerButton' href='https://github.com'>
+								<img class='footerGihubLogoButton' src="img/githubSVG.svg" alt="" />
+								GITHUB
+							  	</a>
+								  `,
               },
               {
-                label: "GitHub",
-                href: "https://github.com/ecadlabs/taqueria",
+                html: `
+								<form class='footerForm'>
+									<h5>Register for updates</h5>
+									<div class='footerInputContainer'>
+									<input class='footerImail' type="email" id="email" name="email" placeholder='Your email address'>
+									<input class='signupButton' type="submit" value="Sign Up">
+									</div>
+								</form>
+								  `,
+              },
+              {
+                label: `Copyright © 2021 ECAD Labs - This project is licensed under Apache License, Version 2.0`,
+                to: "/",
+                className: "copyright",
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()}, ECAD Labs Inc.`,
       },
       prism: {
         theme: lightCodeTheme,
