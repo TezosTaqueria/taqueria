@@ -61,6 +61,7 @@ jobs:
         with:
           name: taqueria
           path: /home/runner/work/taqueria/taqueria/taqueria
+          retention-days: 1
 
       - name: Get artifact for Repo
         uses: actions/github-script@v5
@@ -73,7 +74,7 @@ jobs:
               repo: context.repo.repo,
             })
       
-      - run: echo ${{ steps.getArtifactFromRepo.outputs.result }}
+      - run: echo ${{ steps.getArtifactFromRepo.outputs }}
 
       - name: Get artifact from previous step
         uses: actions/github-script@v5
@@ -87,7 +88,7 @@ jobs:
               run_id: context.runId
             })
 
-      - run: echo ${{ steps.getArtifact.outputs.result }}
+      - run: echo ${{ steps.getArtifact.outputs }}
 
       - name: Comment Artifact to PR
         uses: actions/github-script@v5
