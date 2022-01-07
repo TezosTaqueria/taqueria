@@ -91,41 +91,58 @@ const config = {
 			footer: {
 				links: [
 					{
-						title: "Docs",
+						title: "Contact",
 						items: [
 							{
-								label: "Tutorial",
-								to: "/docs/intro",
+								label: "Report Issues",
+								to: "/blog",
+							},
+							{
+								label: "Contribute",
+								to: "/blog",
 							},
 						],
 					},
+
 					{
 						title: "Community",
 						items: [
 							{
-								label: "Stack Overflow",
-								href: "https://stackoverflow.com/questions/tagged/taqueria",
+								label: "Stack Exchange",
+								to: "https://stackoverflow.com",
 							},
 							{
 								label: "Discord",
-								href: "https://discordapp.com/invite/tezostaqueria",
+								to: "https://discord.com",
 							},
 							{
 								label: "Twitter",
-								href: "https://twitter.com/tezostaqueria",
+								to: "https://twitter.com",
+							},
+							{
+								label: "Code of Conduct",
+								to: "/docs/intro",
+							},
+							{
+								label: "GitHub",
+								to: "https://github.com",
 							},
 						],
 					},
 					{
-						title: "Contact",
+						title: "Docs",
 						items: [
 							{
-								label: "Blog",
-								to: "/blog",
+								label: "Quick Start",
+								to: "/docs/intro",
 							},
 							{
-								label: "GitHub",
-								href: "https://github.com/ecadlabs/taqueria",
+								label: "TypeDoc Reference",
+								to: "/docs/intro",
+							},
+							{
+								label: "Roadmap",
+								to: "/docs/intro",
 							},
 						],
 					},
@@ -133,8 +150,8 @@ const config = {
 						items: [
 							{
 								html: `
-									<a href="https://www.netlify.com" target="_blank" rel="noreferrer noopener" aria-label="Deploys by Netlify">
-									  <img src="img/footerLogoSVG.svg" alt="Deploys by Netlify" />
+									<a href="/" target="_blank" rel="noreferrer noopener" aria-label="">
+									  <img src="img/footerLogoSVG.svg" alt="" />
 									</a>
 								  `,
 							},
@@ -148,6 +165,7 @@ const config = {
 							{
 								html: `
 								<a class='footerButton' href='https://github.com'>
+								<img class='footerGihubLogoButton' src="img/githubSVG.svg" alt="" />
 								GITHUB
 							  	</a>
 								  `,

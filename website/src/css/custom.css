@@ -155,13 +155,21 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 	width: 20%;
 }
 .footer__item {
-	margin: 20px 0;
+	margin: 15px 0;
+	font-family: Montserrat;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 14px;
+	line-height: 22px;
+	letter-spacing: 0.3px;
+	color: #000000;
 }
 .footer__links > div:nth-of-type(2) {
 	width: 20%;
 }
 .footer__links > div:nth-of-type(3) {
 	width: 20%;
+	margin-right: auto;
 }
 .footer__links > div:nth-of-type(4) {
 	width: 40%;
@@ -225,6 +233,10 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 	color: #000000;
 }
 
+.footerGihubLogoButton {
+	transform: translateY(5px);
+	padding-right: 5px;
+}
 @media only screen and (max-width: 996px) {
 	.copyright {
 		white-space: unset;
@@ -251,5 +263,8 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 	}
 	.footer__links > div:nth-of-type(1) {
 		width: 50%;
+	}
+	.signupButton {
+		margin-top: 20px;
 	}
 }
