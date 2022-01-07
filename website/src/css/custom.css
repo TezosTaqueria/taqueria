@@ -132,6 +132,7 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 
 .footer {
 	background-color: var(--ifm-color-primary-lightest);
+	padding-top: 80px;
 }
 
 .footer .container {

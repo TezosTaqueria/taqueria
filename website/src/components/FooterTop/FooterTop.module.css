@@ -33,6 +33,7 @@
 	height: 350px;
 	background-color: var(--ifm-color-primary-lightest);
 	position: relative;
+	border-bottom: 2px solid rgba(252, 175, 23, 0.1);
 }
 
 .leftPurpleLine {
@@ -53,7 +54,7 @@
 	right: 12.5%;
 	width: 10%;
 	height: calc(100vh / (100 / 5));
-	background-color: rgba(70, 41, 75, 0.8);
+	background-color: rgba(160, 102, 170, 0.8);
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
 	z-index: 2;
 }
@@ -64,4 +65,5 @@
 	width: 100%;
 	margin-right: 30px;
 	align-items: center;
+	height: 100%;
 }
