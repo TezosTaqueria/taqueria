@@ -74,7 +74,7 @@ jobs:
               repo: context.repo.repo,
             })
       
-      - run: echo ${{ steps.getArtifactFromRepo.outputs }}
+      - run: echo "${{ steps.getArtifactFromRepo.outputs.result }}"
 
       - name: Get artifact from previous step
         uses: actions/github-script@v5
@@ -88,7 +88,7 @@ jobs:
               run_id: context.runId
             })
 
-      - run: echo ${{ steps.getArtifact.outputs }}
+      - run: echo "${{ steps.getArtifact.outputs.result }}"
 
       - name: Comment Artifact to PR
         uses: actions/github-script@v5
