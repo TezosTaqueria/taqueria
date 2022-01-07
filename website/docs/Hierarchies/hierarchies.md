@@ -1,5 +1,5 @@
 ---
-title: Introduction
+title: Hierarchies
 ---
 
 **Placeholder text**
