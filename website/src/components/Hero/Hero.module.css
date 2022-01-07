@@ -1,7 +1,6 @@
 .features {
 	display: flex;
 	align-items: center;
-	padding: 2rem 0;
 	width: 100%;
 	height: 100%;
 	position: relative;
@@ -57,7 +56,7 @@
 	background-image: url("../../../static/img/purpleBG.png");
 	background-repeat: no-repeat;
 	background-size: contain;
-	width: 100%;
+	width: 654px;
 	margin-bottom: 30px;
 	position: relative;
 }
@@ -194,6 +193,45 @@ video {
 	.featureSvgTraiangle5 {
 		display: none;
 	}
+	.heroCardContainer {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		background-color: var(--ifm-color-bg-purple);
+	}
+	.carousel {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+	}
+	.heroCardContainer {
+		/* background-color: var(--ifm-color-bg-purple); */
+		/* -webkit-clip-path: polygon(0 15%, 100% 0%, 100% 85%, 15% 100%);
+		clip-path: polygon(0 15%, 100% 0%, 100% 85%, 15% 100%);
+		border-radius: 10px;
+		box-sizing: border-box; */
+		background-color: var(--ifm-color-bg-purple);
+		width: 70%;
+	}
+	.heroCard {
+		padding-top: 20px;
+		padding-left: 20px;
+		padding-right: 20px;
+		color: var(--ifm-color-bg-white);
+	}
+	.heroCardContent {
+		justify-content: center;
+		align-items: flex-start;
+		flex-direction: column;
+		width: 100%;
+	}
+	.heroCardDescription {
+		width: 100%;
+	}
+	.heroButtonContainer {
+		width: 100%;
+		padding: 15px 0px;
+	}
 }
 
 @media screen and (max-width: 640px) {
@@ -216,24 +254,5 @@ video {
 		box-sizing: border-box; */
 		background-color: var(--ifm-color-bg-purple);
 		width: 100%;
-	}
-	.heroCard {
-		padding-top: 20px;
-		padding-left: 20px;
-		padding-right: 20px;
-		color: var(--ifm-color-bg-white);
-	}
-	.heroCardContent {
-		justify-content: center;
-		align-items: center;
-		flex-direction: column;
-		width: 100%;
-	}
-	.heroCardDescription {
-		width: 100%;
-	}
-	.heroButtonContainer {
-		width: 100%;
-		padding: 15px 0px;
 	}
 }
