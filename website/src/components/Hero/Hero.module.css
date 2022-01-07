@@ -127,11 +127,14 @@
 	width: 558px;
 	/* display: flex;
 	justify-content: flex-end; */
+	position: relative;
+	display: flex;
+	flex-direction: column;
 }
 
 video {
 	width: 100%;
-	max-width: 560px;
+	max-width: fit-content;
 	border-radius: 8px;
 }
 
@@ -214,6 +217,7 @@ video {
 	}
 	.carousel {
 		width: 100%;
+		width: 558px;
 	}
 
 	.featureSvgTraiangle1,
@@ -233,6 +237,8 @@ video {
 		width: 100%;
 		display: flex;
 		justify-content: center;
+		width: 558px;
+		max-width: fit-content;
 	}
 	.heroCardContainer {
 		/* background-color: var(--ifm-color-bg-purple); */
