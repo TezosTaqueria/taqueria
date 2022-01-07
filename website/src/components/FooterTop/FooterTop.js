@@ -6,15 +6,18 @@ const FeatureList = [
 	{
 		title: "Built By",
 		Svg: require("../../../static/img/ECAD_logo.svg").default,
+		url: "/",
 	},
 	,
 ];
 
-function Feature({ Svg, title, description }) {
+function Feature({ Svg, title, url }) {
 	return (
 		<div className={styles.Contentcontainer}>
 			<h5 className={styles.headline}>{title}</h5>
-			<Svg className={styles.featureSvg} alt={title} />
+			<a href={url}>
+				<Svg className={styles.featureSvg} alt={title} />
+			</a>
 		</div>
 	);
 }
