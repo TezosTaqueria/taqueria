@@ -1,5 +1,5 @@
 ---
-title: Introduction
+title: Arrays
 ---
 
 **Placeholder text**

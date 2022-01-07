@@ -7,118 +7,158 @@
 /* You can override the default Infima variables here. */
 
 :root {
-	--ifm-color-primary: #fcaf17;
-	--ifm-color-primary-dark: rgb(33, 175, 144);
-	--ifm-color-primary-darker: rgb(31, 165, 136);
-	--ifm-color-primary-darkest: rgb(26, 136, 112);
-	--ifm-color-primary-light: #ffdfa0;
-	--ifm-color-primary-lighter: rgb(102, 212, 189);
-	--ifm-color-primary-lightest: #fff9ed;
-	--ifm-color-bg-red: #f04e6e;
-	--ifm-color-bg-yellow: #ccb909;
-	--ifm-color-red-text: #f72a58;
-	--ifm-color-bg-purple: #a066aa;
-	--ifm-color-bg-purple-light: rgba(160, 102, 170, 0.8);
-	--ifm-color-bg-white: #ffffff;
-	--ifm-color-black-text: #000000;
-	--ifm-font-size-base: 16px;
-	--ifm-font-family-base: "Montserrat";
-	--ifm-code-font-size: 95%;
-	--ifm-font-color-base: "#000000";
+  --ifm-color-primary: #fcaf17;
+  --ifm-color-primary-dark: rgb(33, 175, 144);
+  --ifm-color-primary-darker: rgb(31, 165, 136);
+  --ifm-color-primary-darkest: rgb(26, 136, 112);
+  --ifm-color-primary-light: #ffdfa0;
+  --ifm-color-primary-lighter: rgb(102, 212, 189);
+  --ifm-color-primary-lightest: #fff9ed;
+  --ifm-color-bg-red: #f04e6e;
+  --ifm-color-bg-yellow: #ccb909;
+  --ifm-color-red-text: #f72a58;
+  --ifm-color-bg-purple: #a066aa;
+  --ifm-color-bg-purple-light: rgba(160, 102, 170, 0.8);
+  --ifm-color-bg-white: #ffffff;
+  --ifm-color-black-text: #000000;
+  --ifm-font-size-base: 16px;
+  --ifm-font-family-base: "Montserrat";
+  --ifm-code-font-size: 95%;
+  --ifm-font-color-base: "#000000";
 }
 h1 {
-	font-style: normal;
-	font-weight: 600;
-	font-size: 40px;
-	line-height: 56px;
-	letter-spacing: 0.2px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 40px;
+  line-height: 56px;
+  letter-spacing: 0.2px;
 }
 h2 {
-	font-style: normal;
-	font-weight: 600;
-	font-size: 32px;
-	line-height: 32px;
-	letter-spacing: 0.01em;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 32px;
+  line-height: 32px;
+  letter-spacing: 0.01em;
 }
 h3 {
-	font-style: normal;
-	font-weight: 600;
-	font-size: 18px;
-	line-height: 28px;
-	letter-spacing: 0.2px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 28px;
+  letter-spacing: 0.2px;
 }
 h4 {
-	font-style: normal;
-	font-weight: 600;
-	font-size: 20px;
-	line-height: 56px;
-	letter-spacing: 0.2px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 56px;
+  letter-spacing: 0.2px;
 }
 h4 {
-	font-style: normal;
-	font-weight: 600;
-	font-size: 15px;
-	line-height: 22px;
-	letter-spacing: 0.2px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 22px;
+  letter-spacing: 0.2px;
 }
 
 .docusaurus-highlight-code-line {
-	background-color: rgba(14, 9, 9, 0.1);
-	display: block;
-	margin: 0 calc(-1 * var(--ifm-pre-padding));
-	padding: 0 var(--ifm-pre-padding);
+  background-color: rgba(14, 9, 9, 0.1);
+  display: block;
+  margin: 0 calc(-1 * var(--ifm-pre-padding));
+  padding: 0 var(--ifm-pre-padding);
 }
 
 html[data-theme="dark"] .docusaurus-highlight-code-line {
-	background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 @media screen and (max-width: 996px) {
-	.navbar__items {
-		flex-direction: row-reverse;
-		justify-content: space-between;
-	}
-	.navbar-sidebar__brand {
-		height: 120px;
-		background-color: var(--ifm-color-primary-lightest);
-	}
+  .navbar__items {
+    flex-direction: row-reverse;
+    justify-content: space-between;
+  }
+  .navbar-sidebar__brand {
+    height: 120px;
+    background-color: var(--ifm-color-primary-lightest);
+  }
 }
 .navbar {
-	background-color: var(--ifm-color-primary-lightest);
-	height: 120px;
-	padding-left: 7%;
-	padding-right: 7%;
+  background-color: var(--ifm-color-primary-lightest);
+  height: 120px;
+  padding-left: 7%;
+  padding-right: 7%;
 }
 .navbar__logo {
-	height: 69px;
-	width: 213px;
+  height: 69px;
+  width: 213px;
 }
 .header-discord-link:before {
-	background: url("../../static/img/discordSVG.svg") no-repeat;
-	content: "";
-	display: flex;
-	height: 24px;
-	width: 24px;
+  background: url("../../static/img/discordSVG.svg") no-repeat;
+  content: "";
+  display: flex;
+  height: 24px;
+  width: 24px;
 }
 
 .header-twitter-link:before {
-	background: url("../../static/img/twitterSVG.svg") no-repeat;
-	content: "";
-	display: flex;
-	height: 24px;
-	width: 24px;
+  background: url("../../static/img/twitterSVG.svg") no-repeat;
+  content: "";
+  display: flex;
+  height: 24px;
+  width: 24px;
 }
 .header-github-link:before {
-	background: url("../../static/img/githubSVG.svg") no-repeat;
-	content: "";
-	display: flex;
-	height: 24px;
-	width: 24px;
+  background: url("../../static/img/githubSVG.svg") no-repeat;
+  content: "";
+  display: flex;
+  height: 24px;
+  width: 24px;
 }
 
 .header-link {
-	font-style: normal;
-	font-weight: 600;
-	font-size: 15px;
-	line-height: 22px;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 22px;
+}
+
+a.menu__link--active {
+  color: var(--ifm-color-red-text);
+  font-weight: 700;
+  font-size: 14px;
+}
+li.theme-doc-sidebar-item-link {
+  position: flex;
+}
+a.menu__link:focus {
+  color: var(--ifm-color-red-text);
+}
+a.menu__link:hover {
+  color: var(--ifm-color-red-text);
+}
+a.menu__link {
+  font-weight: 500;
+  font-size: 14px;
+  order: 2;
+}
+a.menu__link::after {
+  min-width: 8px;
+}
+.menu__link {
+  color: black;
+}
+a.menu__link .menu__link--active {
+  color: var(--ifm-color-red-text);
+}
+
+a.menu__link--sublist {
+  font-weight: 500;
+  font-size: 14px;
+}
+a.menu__link--sublist:active {
+  color: var(--ifm-color-red-text);
+}
+a.menu {
+  background-color: var(--ifm-color-primary-lightest);
 }
