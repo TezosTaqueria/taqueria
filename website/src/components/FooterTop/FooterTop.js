@@ -24,7 +24,16 @@ function Feature({ Svg, title, description }) {
 export default function FooterTop() {
 	return (
 		<section className={styles.features}>
-			<Feature {...FeatureList[0]} />
+			<div className={styles.container}>
+				<div className={styles.content}>
+					<div className={styles.heroCardContainer}>
+						<Feature {...FeatureList[0]} />
+					</div>
+					<div className={styles.carousel}></div>
+				</div>
+			</div>
+			<div className={styles.leftPurpleLine}></div>
+			<div className={styles.rightPurpleLine}></div>
 		</section>
 	);
 }
