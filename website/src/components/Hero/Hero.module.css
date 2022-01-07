@@ -256,3 +256,7 @@ video {
 		width: 100%;
 	}
 }
+
+.gravityForm-3 .field-object fieldset {
+	border: none;
+}
