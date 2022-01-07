@@ -186,7 +186,7 @@ export class Binary {
     }
 }
 
-export type TaskHandler = "proxy" | Binary
+export type TaskHandler = "proxy" | string
 
 
 export interface UnvalidatedTask {
@@ -311,14 +311,13 @@ export class Option {
      static create(task: UnvalidatedTask): Task | undefined {
          const name = Verb.create(task.task)
          const command = Command.create(task.command)
-         const handler = task.handler === "proxy" ? "proxy" : Binary.create(task.handler)
          const aliases = task.aliases ? task.aliases.map(this.createAlias).filter(alias => alias!= undefined) : []
          const options = !task.options ? [] : task.options.reduce(
              (retval: Option[], option: Option | undefined) => option ? [...retval, option] : retval,
              []
          )
          return name && command
-             ? new Task(name, command, task.description, handler, options, aliases as Alias[])
+             ? new Task(name, command, task.description, task.handler, options, aliases as Alias[])
              : undefined
     }
  }

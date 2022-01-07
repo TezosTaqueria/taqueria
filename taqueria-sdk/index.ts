@@ -46,11 +46,6 @@ const sanitizeArgs = (parsedArgs: ParsedArgs) : Promise<SanitizedArgs> =>
             artifactsDir: join(projectDir, config.artifactsDir)
         })
     })
-    
-
-    
-
-
 
 const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefined>> => {
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
