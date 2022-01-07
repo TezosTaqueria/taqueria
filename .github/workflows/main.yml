@@ -65,18 +65,18 @@ jobs:
 
       - run: sleep 60
 
-      - name: Get artifact for Repo
-        uses: actions/github-script@v5
-        id: getArtifactFromRepo
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            github.rest.actions.listArtifactsForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-            })
+      # - name: Get artifact for Repo
+      #   uses: actions/github-script@v5
+      #   id: getArtifactFromRepo
+      #   with:
+      #     github-token: ${{secrets.GITHUB_TOKEN}}
+      #     script: |
+      #       github.rest.actions.listArtifactsForRepo({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #       })
       
-      - run: echo "${{ steps.getArtifactFromRepo.outputs.result }}"
+      # - run: echo "${{ steps.getArtifactFromRepo.outputs.result }}"
 
       - name: Get artifact from previous step
         uses: actions/github-script@v5
