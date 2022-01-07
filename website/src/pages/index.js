@@ -8,6 +8,7 @@ import Hero from "../components/Hero/Hero";
 import Features from "../components/Features/Features";
 import WhyTaqueria from "../components/WhyTaqueria/WhyTaqueria";
 import LogoGrid from "../components/LogoGrid/LogoGrid";
+import FooterTop from "../components/FooterTop/FooterTop";
 
 export default function Home() {
 	const { siteConfig } = useDocusaurusContext();
@@ -21,6 +22,7 @@ export default function Home() {
 				<Features />
 				<WhyTaqueria />
 				<LogoGrid />
+				<FooterTop />
 			</main>
 		</Layout>
 	);
