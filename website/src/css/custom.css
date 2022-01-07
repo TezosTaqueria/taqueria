@@ -25,6 +25,7 @@
 	--ifm-font-family-base: "Montserrat";
 	--ifm-code-font-size: 95%;
 	--ifm-font-color-base: "#000000";
+	--ifm-footer-link-color: #000000;
 }
 h1 {
 	font-style: normal;
@@ -72,6 +73,11 @@ h4 {
 html[data-theme="dark"] .docusaurus-highlight-code-line {
 	background-color: rgba(0, 0, 0, 0.3);
 }
+html[data-theme="light"] .docusaurus-highlight-code-line {
+	background-color: var(--ifm-color-primary-lightest);
+}
+
+/* Header Styles */
 
 @media screen and (max-width: 996px) {
 	.navbar__items {
@@ -121,4 +127,152 @@ html[data-theme="dark"] .docusaurus-highlight-code-line {
 	font-weight: 600;
 	font-size: 15px;
 	line-height: 22px;
+}
+
+/* Footer styles */
+
+.footer {
+	background-color: var(--ifm-color-primary-lightest);
+	padding-top: 80px;
+	padding-bottom: 15px;
+}
+
+.footer .container {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+	width: 100%;
+}
+.footer__links {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	width: 100%;
+	flex: 0 0 0 0;
+	color: #000000 !important;
+}
+.footer__links .footer__col {
+	flex: unset;
+}
+.footer__links > div:nth-of-type(1) {
+	width: 20%;
+}
+.footer__item {
+	margin: 15px 0;
+	font-family: Montserrat;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 14px;
+	line-height: 22px;
+	letter-spacing: 0.3px;
+	color: #000000;
+}
+.footer__links > div:nth-of-type(2) {
+	width: 20%;
+}
+.footer__links > div:nth-of-type(3) {
+	width: 20%;
+	margin-right: auto;
+}
+.footer__links > div:nth-of-type(4) {
+	width: 40%;
+}
+.footer__bottom {
+	display: none;
+}
+.footerButtonContainer {
+	margin-bottom: 20px;
+}
+.footerDescription {
+	max-width: 250px;
+}
+.footerButton {
+	height: fit-content;
+	white-space: nowrap;
+	padding: 12px 18px;
+	background-color: var(--ifm-color-primary);
+	color: #373f41;
+	font-size: 15px;
+	line-height: 22px;
+	font-weight: 600;
+	letter-spacing: 0.3px;
+	font-family: Montserrat;
+	border-radius: 3px;
+	margin-bottom: 50px !important;
+}
+
+.footerForm {
+	width: 100%;
+	margin-top: 50px;
+}
+
+.footerInputContainer {
+	width: 100%;
+}
+
+.footerImail {
+	border: none;
+	background: transparent;
+	border-bottom: 1px solid #565656;
+	padding-right: 100px;
+	padding-bottom: 8px;
+}
+
+.signupButton {
+	height: fit-content;
+	white-space: nowrap;
+	padding: 5px 18px;
+	background-color: var(--ifm-color-primary);
+	color: #373f41;
+	font-size: 12px;
+	line-height: 22px;
+	font-weight: 600;
+	letter-spacing: 0.3px;
+	font-family: Montserrat;
+	border-radius: 3px;
+	margin-bottom: 50px !important;
+	border: none;
+}
+
+.copyright {
+	white-space: nowrap;
+	color: #000000;
+}
+
+.footerGihubLogoButton {
+	transform: translateY(5px);
+	padding-right: 5px;
+}
+@media only screen and (max-width: 996px) {
+	.copyright {
+		white-space: unset;
+	}
+	.row .col.col.col {
+		--ifm-col-width: 50%;
+		flex-basis: unset;
+		margin-left: 0;
+	}
+	.footer .container {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		width: 100%;
+	}
+	.footer__links > div:nth-of-type(4) {
+		width: 100%;
+	}
+	.footer__links > div:nth-of-type(3) {
+		width: 50%;
+	}
+	.footer__links > div:nth-of-type(2) {
+		width: 50%;
+	}
+	.footer__links > div:nth-of-type(1) {
+		width: 50%;
+	}
+	.signupButton {
+		margin-top: 20px;
+		margin-left: 0px;
+	}
 }
