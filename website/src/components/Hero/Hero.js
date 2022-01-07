@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "./Hero.module.css";
-
+import Slider from "react-slick";
 const FeatureList = [
 	{
 		title: "Insert awesome intro title here.",
@@ -21,6 +21,7 @@ const FeatureList = [
 			title: "Quick Start",
 			url: "/blog",
 		},
+
 		gif: require("../../../static/gif/mp4gifcode.mp4").default,
 	},
 ];
@@ -37,6 +38,15 @@ function Feature({
 	SvgTraiangle4,
 	SvgTraiangle5,
 }) {
+	const settings = {
+		arrows: true,
+		dots: true,
+		infinite: true,
+		autoplay: true,
+		autoplaySpeed: 8000,
+		slidesToShow: 1,
+		slidesToScroll: 1,
+	};
 	return (
 		<div className={styles.content}>
 			<div className={styles.heroCardContainer}>
@@ -60,7 +70,18 @@ function Feature({
 				</div>
 			</div>
 			<div className={styles.carousel}>
-				<video autoplay="true" muted src={gif} />
+				<Slider {...settings} className={styles.mainSlider}>
+					<div className={styles.carouselCards}>
+						<div>
+							<div className={styles.videoHeader}>
+								<span></span>
+								<span></span>
+								<span></span>
+							</div>
+							<video autoplay="true" muted src={gif} />
+						</div>
+					</div>
+				</Slider>
 			</div>
 		</div>
 	);

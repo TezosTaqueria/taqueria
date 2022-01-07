@@ -128,9 +128,39 @@
 	/* display: flex;
 	justify-content: flex-end; */
 }
+
 video {
 	width: 100%;
 	max-width: 560px;
+	border-radius: 8px;
+}
+
+.videoHeader {
+	-webkit-align-items: center;
+	-moz-box-align: center;
+	align-items: center;
+	background: #0e1016;
+	border-radius: 8px 8px 0 0;
+	display: -webkit-flex;
+	display: -moz-box;
+	display: flex;
+	height: 28px;
+	padding: 0 12px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+.videoHeader span {
+	background: #252937;
+	border-radius: 50%;
+	display: block;
+	height: 9px;
+	margin-right: 7px;
+	width: 9px;
+}
+.slick-slider {
+	width: 100%;
 }
 .leftPurpleLine {
 	content: "";
@@ -255,8 +285,7 @@ video {
 		background-color: var(--ifm-color-bg-purple);
 		width: 100%;
 	}
-}
-
-.gravityForm-3 .field-object fieldset {
-	border: none;
+	.content {
+		padding-bottom: 100px;
+	}
 }
