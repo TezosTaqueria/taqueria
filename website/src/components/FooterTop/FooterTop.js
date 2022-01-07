@@ -14,9 +14,7 @@ function Feature({ Svg, title, description }) {
 	return (
 		<div className={styles.Contentcontainer}>
 			<h5 className={styles.headline}>{title}</h5>
-			<div className={styles.svgContainer}>
-				<Svg className={styles.featureSvg} alt={title} />
-			</div>
+			<Svg className={styles.featureSvg} alt={title} />
 		</div>
 	);
 }
