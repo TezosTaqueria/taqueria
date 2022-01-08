@@ -10,10 +10,23 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:taqueria.helloWorld"
+    "onCommand:taqueria.init"
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Taqueria",
+      "properties": {
+        "taqueria.path": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": null,
+          "description": "Specifies taqueria binary path"
+        }
+      }
+    },
     "commands": [
       {
         "command": "taqueria.init",
