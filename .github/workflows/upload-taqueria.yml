@@ -10,12 +10,13 @@ on:
     outputs:
       runID:
         # value: "123456789"
-        value: ${{ jobs.build_taqueria_and_upload.getRunID.outputs.result }}
+        value: ${{ jobs.build_taqueria_and_upload.outputs.runID }}
 
 jobs:
   build_taqueria_and_upload:
     runs-on: ubuntu-latest
-
+    outputs:
+      runID: ${{ steps.getRunID.outputs.result }}
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
