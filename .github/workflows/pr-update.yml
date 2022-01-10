@@ -57,6 +57,7 @@ jobs:
             console.log(context.runId)
 
   job1:
+    needs: get_stuff
     uses: ecadlabs/taqueria/.github/workflows/upload-taqueria.yml@e9c9cd579c30ad535b3abc60d7596453b6d710d2
 
   update_PR:
