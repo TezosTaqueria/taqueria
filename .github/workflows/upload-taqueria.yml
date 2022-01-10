@@ -9,7 +9,8 @@ on:
   workflow_call:
     outputs:
       runID:
-        value: ${{ jobs.build_taqueria_and_upload.getRunId.outputs.result }}
+        value: "123456789"
+        # value: ${{ jobs.build_taqueria_and_upload.getRunID.outputs.result }}
 
 jobs:
   build_taqueria_and_upload:
