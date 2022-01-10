@@ -41,7 +41,7 @@ name: Update PR
 
 on:
   workflow_run:
-    workflows: ["Taqueria"]
+    workflows: ["upload-taqueria"]
     branches: [alex-github-action-pr-update]
     types: [completed]
 jobs:  
