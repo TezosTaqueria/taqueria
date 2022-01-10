@@ -12,7 +12,7 @@ on:
 
 
 jobs:
-  call-build-taqueria:
+  job1:
     uses: ecadlabs/taqueria/.github/workflows/upload-taqueria.yml@90432e6848153c835cbae825d65ba7a943e1f0d0
 
   update_PR:
@@ -20,7 +20,7 @@ jobs:
     needs: call-build-taqueria
     steps:
       - name: flow through of run ID
-        run: echo ${{ needs.call-build-taqueria.outputs.runID }}
+        run: echo ${{ needs.job1.outputs.runID }}
 
       # - name: Get artifact from previous step
       #   uses: actions/github-script@v5
