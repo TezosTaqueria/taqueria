@@ -1,5 +1,5 @@
 ---
-title: Introduction
+title: Gallery
 ---
 
 **Placeholder text**
