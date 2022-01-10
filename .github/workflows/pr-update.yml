@@ -2,11 +2,13 @@
 
 name: pr-update
 
-# on:
-#   workflow_run:
-#     workflows: ["upload-taqueria"]
-#     branches: [alex-github-action-pr-update]
-#     types: [completed]
+on:
+  pull_request:
+    branches: [mainz]
+  # workflow_run:
+  #   workflows: ["upload-taqueria"]
+  #   branches: [alex-github-action-pr-update]
+  #   types: [completed]
 
 
 jobs:  

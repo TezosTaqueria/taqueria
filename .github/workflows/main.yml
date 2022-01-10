@@ -10,11 +10,11 @@
 
 # name: Taqueria
 
-# on:
-#   # push:
-#   #   branches: [main]
-#   pull_request:
-#     branches: [main]
+on:
+  # push:
+  #   branches: [main]
+  pull_request:
+    branches: [mainz]
 
 # jobs:
 #   build_taqueria_and_upload:
