@@ -10,12 +10,17 @@
 	width: 100%;
 }
 
+.headine {
+	margin: 0px 5%;
+}
 .featureSvg {
 	position: absolute;
 	z-index: -1;
 	bottom: 60%;
-	height: 200px;
-	width: 200px;
+	height: 185px;
+	width: 185px;
+	left: 0;
+	top: -20px;
 }
 
 .images {
@@ -34,9 +39,15 @@
 
 @media screen and (max-width: 1115px) {
 	.images {
-		display: flex;
-		flex-wrap: wrap;
-		margin: 0 150px;
 		justify-content: space-between;
+	}
+}
+
+@media screen and (max-width: 700px) {
+	.images {
+		justify-content: center;
+	}
+	.featureSvg {
+		display: none;
 	}
 }

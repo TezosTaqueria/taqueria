@@ -46,7 +46,7 @@ function Feature({ Svg, images, title }) {
 		<div className={styles.wrapper}>
 			<Svg className={styles.featureSvg} />
 			<div className={styles.logos}>
-				<h1>{title}</h1>
+				<h1 className={styles.headine}>{title}</h1>
 				<div className={styles.images}>
 					{images.map((image, i) => (
 						<span key={i} className={styles.image}>
