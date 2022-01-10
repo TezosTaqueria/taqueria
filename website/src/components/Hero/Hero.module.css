@@ -163,6 +163,10 @@
 	font-size: 15px;
 	line-height: 22px;
 	white-space: nowrap;
+	border-radius: 3px;
+}
+.heroButton:hover {
+	color: var(--ifm-color-black-text);
 }
 .carousel {
 	width: 558px;
