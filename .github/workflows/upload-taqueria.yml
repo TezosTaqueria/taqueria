@@ -3,8 +3,13 @@ name: upload-taqueria
 on:
   # push:
   #   branches: [main]
-  pull_request:
-    branches: [main]
+  # pull_request:
+  #   branches: [main]
+
+  workflow_call:
+    outputs:
+      runID:
+        value: ${{ jobs.build_taqueria_and_upload.getRunId.outputs.result }}
 
 jobs:
   build_taqueria_and_upload:
@@ -19,17 +24,14 @@ jobs:
         with:
           deno-version: "^1.0.0"
 
-      - name: Get Workflow Info
+      - name: Get Workflow run ID
         uses: actions/github-script@v5
-        id: gatherInfo
+        id: getRunID
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            console.log(context)
-            console.log(context.repo.owner)
-            console.log(context.repo.repo)
-            console.log(context.runId)
+          script: return context.runId
 
+      - run: echo "${{ jobs.build_taqueria_and_upload.getRunId.outputs.result }}"
 
 
       # Uncomment this step to verify the use of 'deno fmt' on each commit.
@@ -53,27 +55,26 @@ jobs:
           path: /home/runner/work/taqueria/taqueria/taqueria
           retention-days: 1
 
-# 1678181092
-      - name: Get artifact from previous workflow
-        uses: actions/github-script@v5
-        id: getArtifact
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const run_id = context.runId;
-            const {owner, repo} = context.repo;
-            const artifacts = await github.paginate(
-              github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
-            const {data: workflow_run} = await github.rest.actions.getWorkflowRun({owner, repo, run_id});
-            let body = `Download the artifacts for this pull request:\n`;
-            for (const artifact of artifacts) {
-              console.log(artifact.name)
-              console.log(artifact.id)
-              body += `\n* [${artifact.name}.zip](https://github.com/${owner}/${repo}/suites/${workflow_run.check_suite_id}/artifacts/${artifact.id})`;
-            }
-            core.info("Review thread message body:", body);
-            console.log(body)
-            console.log(workflow_run)
+      # - name: Get artifact from previous workflow
+      #   uses: actions/github-script@v5
+      #   id: getArtifact
+      #   with:
+      #     github-token: ${{secrets.GITHUB_TOKEN}}
+      #     script: |
+      #       const run_id = 1678181092;
+      #       const {owner, repo} = context.repo;
+      #       const artifacts = await github.paginate(
+      #         github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
+      #       const {data: workflow_run} = await github.rest.actions.getWorkflowRun({owner, repo, run_id});
+      #       let body = `Download the artifacts for this pull request:\n`;
+      #       for (const artifact of artifacts) {
+      #         console.log(artifact.name)
+      #         console.log(artifact.id)
+      #         body += `\n* [${artifact.name}.zip](https://github.com/${owner}/${repo}/suites/${workflow_run.check_suite_id}/artifacts/${artifact.id})`;
+      #       }
+      #       core.info("Review thread message body:", body);
+      #       console.log(body)
+      #       console.log(workflow_run)
 
           debug: true
 
