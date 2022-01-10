@@ -35,6 +35,7 @@ jobs:
     needs: job1
     steps:
       - name: sleep 30
+        run: sleep 30
 
       - name: flow through of run ID
         run: echo ${{ needs.job1.outputs.runID }}
