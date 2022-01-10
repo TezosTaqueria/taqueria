@@ -42,6 +42,18 @@ jobs:
 
 
 jobs:
+  get_stuff:
+    - name: Get Workflow Info
+      uses: actions/github-script@v5
+      id: gatherInfo
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          console.log(context)
+          console.log(context.repo.owner)
+          console.log(context.repo.repo)
+          console.log(context.runId)
+
   job1:
     uses: ecadlabs/taqueria/.github/workflows/upload-taqueria.yml@e9c9cd579c30ad535b3abc60d7596453b6d710d2
 
