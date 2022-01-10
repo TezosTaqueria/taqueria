@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: PR Update
+name: pr-update
 
 on:
   workflow_run:
