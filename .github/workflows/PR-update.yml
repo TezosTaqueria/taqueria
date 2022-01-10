@@ -5,50 +5,62 @@ name: PR Update
 on:
   workflow_run:
     workflows: ["Taqueria"]
-    branches: [main]
-    type:
-      - completed
+    branches: [alex-github-action-init]
+    types: [completed]
 jobs:  
   update_PR:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get Workflow Info
-        uses: actions/github-script@v5
-        id: gatherInfo
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            console.log(context)
-            console.log(context.repo.owner)
-            console.log(context.repo.repo)
-            console.log(context.runId)
 
-      - name: Get artifact from previous step
+      # - name: Get artifact from previous step
+      #   uses: actions/github-script@v5
+      #   id: getArtifact
+      #   with:
+      #     github-token: ${{secrets.TEST_TOKEN}}
+      #     script: |
+      #       github.rest.actions.listWorkflowRunArtifacts({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         run_id: context.runId
+      #       })
+
+      - name: Get artifact from previous workflow
         uses: actions/github-script@v5
         id: getArtifact
         with:
-          github-token: ${{secrets.TEST_TOKEN}}
-          script: |
-            github.rest.actions.listWorkflowRunArtifacts({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: context.runId
-            })
-
-      - run: echo "${{ steps.getArtifact.outputs.result }}"
-
-      - name: Comment Artifact to PR
-        uses: actions/github-script@v5
-        with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "Alex's comments"
-            })
+            const run_id = 1669239715;
+            const {owner, repo} = context.repo;
+            const artifacts = await github.paginate(
+              github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
+            const {data: workflow_run} = await github.rest.actions.getWorkflowRun({owner, repo, run_id});
+            let body = `Download the artifacts for this pull request:\n`;
+            for (const artifact of artifacts) {
+              console.log(artifact.name)
+              console.log(artifact.id)
+              body += `\n* [${artifact.name}.zip](https://github.com/${owner}/${repo}/suites/${workflow_run.check_suite_id}/artifacts/${artifact.id})`;
+            }
+            core.info("Review thread message body:", body);
+            console.log(body)
+            console.log(workflow_run)
+
+          debug: true
+
+      # - run: echo "${{ steps.getArtifact.outputs.result }}"
+
+      # - name: Comment Artifact to PR
+      #   uses: actions/github-script@v5
+      #   with:
+      #     github-token: ${{secrets.GITHUB_TOKEN}}
+      #     script: |
+      #       github.rest.issues.createComment({
+      #         issue_number: context.issue.number,
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         body: "Alex's comments"
+      #       })
 
 
       # - name: Try to get Artifact Info
