@@ -81,6 +81,12 @@
 }
 
 @media screen and (max-width: 996px) {
+	.wrapper {
+		-webkit-clip-path: none;
+		clip-path: none;
+		background-color: var(--ifm-color-primary-lightest);
+	}
+
 	.featureSvg {
 		display: none;
 	}
@@ -98,5 +104,9 @@
 
 	.left {
 		padding-bottom: 200px;
+	}
+
+	.left video {
+		width: 100%;
 	}
 }
