@@ -1,112 +1,112 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
+# # This workflow uses actions that are not certified by GitHub.
+# # They are provided by a third-party and are governed by
+# # separate terms of service, privacy policy, and support
+# # documentation.
 
-# This workflow will build project using Deno and then run tests using Node:
-# For more information aboud Deno see: https://github.com/denoland/setup-deno
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-
-name: Taqueria
-
-on:
-  # push:
-  #   branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  build_taqueria_and_upload:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Setup repo
-        uses: actions/checkout@v2
-
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: "^1.0.0"
-
-      - name: Get Workflow Info
-        uses: actions/github-script@v5
-        id: gatherInfo
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            console.log(context)
-            console.log(context.repo.owner)
-            console.log(context.repo.repo)
-            console.log(context.runId)
+# # This workflow will build project using Deno and then run tests using Node:
+# # For more information aboud Deno see: https://github.com/denoland/setup-deno
+# # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
 
+# name: Taqueria
 
-      # Uncomment this step to verify the use of 'deno fmt' on each commit.
-      # - name: Verify formatting
-      #   run: deno fmt --check
+# on:
+#   # push:
+#   #   branches: [main]
+#   pull_request:
+#     branches: [main]
 
-      # - name: Run linter
-      #   run: deno lint
+# jobs:
+#   build_taqueria_and_upload:
+#     runs-on: ubuntu-latest
 
-      # - name: Run tests
-      #   run: deno test -A --unstable
+#     steps:
+#       - name: Setup repo
+#         uses: actions/checkout@v2
+
+#       - name: Setup Deno
+#         uses: denoland/setup-deno@v1
+#         with:
+#           deno-version: "^1.0.0"
+
+#       - name: Get Workflow Info
+#         uses: actions/github-script@v5
+#         id: gatherInfo
+#         with:
+#           github-token: ${{secrets.GITHUB_TOKEN}}
+#           script: |
+#             console.log(context)
+#             console.log(context.repo.owner)
+#             console.log(context.repo.repo)
+#             console.log(context.runId)
+
+
+
+#       # Uncomment this step to verify the use of 'deno fmt' on each commit.
+#       # - name: Verify formatting
+#       #   run: deno fmt --check
+
+#       # - name: Run linter
+#       #   run: deno lint
+
+#       # - name: Run tests
+#       #   run: deno test -A --unstable
       
-      - name: Build taqueria
-        run: ./bin/build.sh
+#       - name: Build taqueria
+#         run: ./bin/build.sh
 
-      - name: Upload Taqueria Binary 
-        uses: actions/upload-artifact@v2
-        if: success()
-        with:
-          name: taqueria
-          path: /home/runner/work/taqueria/taqueria/taqueria
-          retention-days: 1
+#       - name: Upload Taqueria Binary 
+#         uses: actions/upload-artifact@v2
+#         if: success()
+#         with:
+#           name: taqueria
+#           path: /home/runner/work/taqueria/taqueria/taqueria
+#           retention-days: 1
 
-      # - run: sleep 60
+#       # - run: sleep 60
 
-  # build_others:
+#   # build_others:
 
-  #   runs-on: ubuntu-latest
+#   #   runs-on: ubuntu-latest
 
-  #   strategy:
-  #     matrix:
-  #       node-version: [12.x, 14.x, 16.x]
-  #       # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+#   #   strategy:
+#   #     matrix:
+#   #       node-version: [12.x, 14.x, 16.x]
+#   #       # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
-  #   steps:
-  #   - name: Setup repo
-  #     uses: actions/checkout@v2
+#   #   steps:
+#   #   - name: Setup repo
+#   #     uses: actions/checkout@v2
 
-  #   - name: Use Node.js ${{ matrix.node-version }}
-  #     uses: actions/setup-node@v2
-  #     with:
-  #       node-version: ${{ matrix.node-version }}
-  #       cache: 'npm'
+#   #   - name: Use Node.js ${{ matrix.node-version }}
+#   #     uses: actions/setup-node@v2
+#   #     with:
+#   #       node-version: ${{ matrix.node-version }}
+#   #       cache: 'npm'
 
-  #   - name: Setup Deno
-  #     uses: denoland/setup-deno@v1
-  #     with:
-  #       deno-version: "^1.0.0"
+#   #   - name: Setup Deno
+#   #     uses: denoland/setup-deno@v1
+#   #     with:
+#   #       deno-version: "^1.0.0"
 
-  #   # - name: Run build script
-  #   #   run: ./bin/build.sh 
+#   #   # - name: Run build script
+#   #   #   run: ./bin/build.sh 
 
-  #   # - name: Build protocol
-  #   #   run: npm install
+#   #   # - name: Build protocol
+#   #   #   run: npm install
 
-  #   - name: Go to SDK directory, install and build
-  #     run: |
-  #       cd taqueria-sdk
-  #       npm install
-  #       npm run build
+#   #   - name: Go to SDK directory, install and build
+#   #     run: |
+#   #       cd taqueria-sdk
+#   #       npm install
+#   #       npm run build
 
-  #   # - name: Install Dependencies for SDK
-  #   #   run: npm install
+#   #   # - name: Install Dependencies for SDK
+#   #   #   run: npm install
 
-  #   # - name: Build SDK
-  #   #   run: npm run build
+#   #   # - name: Build SDK
+#   #   #   run: npm run build
 
-  #   # - run: npm ci
-  #   # - run: npm run build --if-present
-  #   # - run: npm test
+#   #   # - run: npm ci
+#   #   # - run: npm run build --if-present
+#   #   # - run: npm test
