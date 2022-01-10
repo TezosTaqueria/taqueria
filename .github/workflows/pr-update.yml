@@ -4,18 +4,23 @@ name: pr-update
 
 on:
   pull_request:
-    branches: [mainz]
+    branches: [main, alex-github-action-pr-update]
   # workflow_run:
   #   workflows: ["upload-taqueria"]
   #   branches: [alex-github-action-pr-update]
   #   types: [completed]
 
 
-jobs:  
+jobs:
+  call-build-taqueria:
+    uses: ecadlabs/taqueria/.github/workflows/upload-taqueria.yml@v1
+
   update_PR:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: call-build-taqueria
     steps:
+      - name: flow through of run ID
+        run: echo ${{ needs.call-build-taqueria.outputs.runID }}
 
       # - name: Get artifact from previous step
       #   uses: actions/github-script@v5
@@ -29,28 +34,28 @@ jobs:
       #         run_id: context.runId
       #       })
 
-      - name: Get artifact from previous workflow
-        uses: actions/github-script@v5
-        id: getArtifact
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const run_id = 1678181092;
-            const {owner, repo} = context.repo;
-            const artifacts = await github.paginate(
-              github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
-            const {data: workflow_run} = await github.rest.actions.getWorkflowRun({owner, repo, run_id});
-            let body = `Download the artifacts for this pull request:\n`;
-            for (const artifact of artifacts) {
-              console.log(artifact.name)
-              console.log(artifact.id)
-              body += `\n* [${artifact.name}.zip](https://github.com/${owner}/${repo}/suites/${workflow_run.check_suite_id}/artifacts/${artifact.id})`;
-            }
-            core.info("Review thread message body:", body);
-            console.log(body)
-            console.log(workflow_run)
+      # - name: Get artifact from previous workflow
+      #   uses: actions/github-script@v5
+      #   id: getArtifact
+      #   with:
+      #     github-token: ${{secrets.GITHUB_TOKEN}}
+      #     script: |
+      #       const run_id = 1678181092;
+      #       const {owner, repo} = context.repo;
+      #       const artifacts = await github.paginate(
+      #         github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
+      #       const {data: workflow_run} = await github.rest.actions.getWorkflowRun({owner, repo, run_id});
+      #       let body = `Download the artifacts for this pull request:\n`;
+      #       for (const artifact of artifacts) {
+      #         console.log(artifact.name)
+      #         console.log(artifact.id)
+      #         body += `\n* [${artifact.name}.zip](https://github.com/${owner}/${repo}/suites/${workflow_run.check_suite_id}/artifacts/${artifact.id})`;
+      #       }
+      #       core.info("Review thread message body:", body);
+      #       console.log(body)
+      #       console.log(workflow_run)
 
-          debug: true
+      #     debug: true
 
       # - run: echo "${{ steps.getArtifact.outputs.result }}"
 
@@ -65,16 +70,3 @@ jobs:
       #         repo: context.repo.repo,
       #         body: "Alex's comments"
       #       })
-
-
-      # - name: Try to get Artifact Info
-      # - uses: octokit/request-action@v2.1.0
-      #   id: artifacts
-      #   with:
-      #     GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      #     route: GET /repos/{owner}/{repo}/actions/runs/{run_id}/artifacts
-      #     owner: ecadlabs,
-      #     repo: taqueria,
-      #     run_id: ${{ steps.gatherInfo.output.runNumber }}
-      
-      # - run: "echo artifacts: ${{ steps.gatherInfo.outputs.result.runNumber }}"
