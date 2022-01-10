@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_taqueria_and_upload
     steps:
-      - run: echo ${{ needs.build_taqueria_and_upload.getRunID.outputs.result }}
+      - run: echo ${{ needs.build_taqueria_and_upload.outputs.runID }}
 
       # - name: Get artifact from previous workflow
       #   uses: actions/github-script@v5
