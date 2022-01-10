@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "./LogoGrid.module.css";
- 
+
 const FeatureList = [
 	{
 		title: "Teams building with Taqueria",

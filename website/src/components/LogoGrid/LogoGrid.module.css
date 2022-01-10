@@ -31,3 +31,12 @@
 .image img {
 	width: 100%;
 }
+
+@media screen and (max-width: 1115px) {
+	.images {
+		display: flex;
+		flex-wrap: wrap;
+		margin: 0 150px;
+		justify-content: space-between;
+	}
+}
