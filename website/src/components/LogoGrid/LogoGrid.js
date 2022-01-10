@@ -1,20 +1,57 @@
 import React from "react";
 import clsx from "clsx";
 import styles from "./LogoGrid.module.css";
-
+ 
 const FeatureList = [
 	{
-		title: "LogoGrid Module",
+		title: "Teams building with Taqueria",
 		Svg: require("../../../static/img/taq_pink.svg").default,
-		description: <>This is LogoGrid component</>,
+		images: [
+			{
+				Image: require("../../../static/img/image.png").default,
+			},
+			{
+				Image: require("../../../static/img/image.png").default,
+			},
+			{
+				Image: require("../../../static/img/image.png").default,
+			},
+			{
+				Image: require("../../../static/img/image.png").default,
+			},
+			{
+				Image: require("../../../static/img/image.png").default,
+			},
+			{
+				Image: require("../../../static/img/image.png").default,
+			},
+			{
+				Image: require("../../../static/img/image.png").default,
+			},
+			{
+				Image: require("../../../static/img/image.png").default,
+			},
+			{
+				Image: require("../../../static/img/image.png").default,
+			},
+			{
+				Image: require("../../../static/img/image.png").default,
+			},
+		],
 	},
 ];
 
-function Feature({ Svg, title, description }) {
+function Feature({ Svg, images, title }) {
 	return (
 		<div>
-			<h3>{title}</h3>
-			<p>{description}</p>
+			<h1>{title}</h1>
+			<div className={styles.images}>
+				{images.map((image, i) => (
+					<span key={i} className={styles.image}>
+						<img src={image.Image} alt="" />
+					</span>
+				))}
+			</div>
 		</div>
 	);
 }
