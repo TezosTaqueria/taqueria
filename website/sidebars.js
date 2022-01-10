@@ -37,7 +37,12 @@ const sidebars = {
           type: "category",
           label: "Resources",
 
-          items: ["Resources/Changelog"],
+          items: [
+            "Resources/Changelog",
+            "Resources/Gallery",
+            "Resources/Plugins",
+            "Resources/Tools",
+          ],
         },
       ],
     },
