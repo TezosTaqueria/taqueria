@@ -46,6 +46,7 @@
 @media screen and (max-width: 700px) {
 	.images {
 		justify-content: center;
+		margin: 0;
 	}
 	.featureSvg {
 		display: none;
