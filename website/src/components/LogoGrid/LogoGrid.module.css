@@ -38,6 +38,9 @@
 }
 
 @media screen and (max-width: 1115px) {
+	.wrapper {
+		padding-top: 50px;
+	}
 	.images {
 		justify-content: space-between;
 	}
@@ -46,6 +49,7 @@
 @media screen and (max-width: 700px) {
 	.images {
 		justify-content: center;
+		margin: 0;
 	}
 	.featureSvg {
 		display: none;
