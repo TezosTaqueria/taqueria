@@ -45,6 +45,3 @@ jobs:
               repo: context.repo.repo,
               body: ${{ steps.createArtifact.outputs.result }}
             })
-
-
-

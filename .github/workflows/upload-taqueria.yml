@@ -6,10 +6,10 @@ on:
   pull_request:
     branches: [main]
 
-  workflow_call:
-    outputs:
-      runID:
-        value: ${{ jobs.build_taqueria_and_upload.getRunId.outputs.result }}
+  # workflow_call:
+  #   outputs:
+  #     runID:
+  #       value: ${{ jobs.build_taqueria_and_upload.getRunId.outputs.result }}
 
 jobs:
   build_taqueria_and_upload:
@@ -31,7 +31,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: return context.runId
 
-      - run: echo "${{ jobs.build_taqueria_and_upload.getRunId.outputs.result }}"
+      - run: echo "${{ steps.getRunId.outputs.result }}"
 
 
       # Uncomment this step to verify the use of 'deno fmt' on each commit.
