@@ -53,6 +53,29 @@ jobs:
           path: /home/runner/work/taqueria/taqueria/taqueria
           retention-days: 1
 
+      - name: Get artifact from previous workflow
+        uses: actions/github-script@v5
+        id: getArtifact
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const run_id = 1678181092;
+            const {owner, repo} = context.repo;
+            const artifacts = await github.paginate(
+              github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
+            const {data: workflow_run} = await github.rest.actions.getWorkflowRun({owner, repo, run_id});
+            let body = `Download the artifacts for this pull request:\n`;
+            for (const artifact of artifacts) {
+              console.log(artifact.name)
+              console.log(artifact.id)
+              body += `\n* [${artifact.name}.zip](https://github.com/${owner}/${repo}/suites/${workflow_run.check_suite_id}/artifacts/${artifact.id})`;
+            }
+            core.info("Review thread message body:", body);
+            console.log(body)
+            console.log(workflow_run)
+
+          debug: true
+
       # - run: sleep 60
 
   # build_others:
