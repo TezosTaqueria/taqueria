@@ -53,13 +53,14 @@ jobs:
           path: /home/runner/work/taqueria/taqueria/taqueria
           retention-days: 1
 
+# 1678181092
       - name: Get artifact from previous workflow
         uses: actions/github-script@v5
         id: getArtifact
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const run_id = 1678181092;
+            const run_id = context.runId;
             const {owner, repo} = context.repo;
             const artifacts = await github.paginate(
               github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
