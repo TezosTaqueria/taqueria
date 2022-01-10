@@ -1,3 +1,8 @@
+.wrapper {
+	position: relative;
+	padding-top: 100px;
+}
+
 .features {
 	display: flex;
 	align-items: center;
@@ -6,6 +11,9 @@
 }
 
 .featureSvg {
+	position: absolute;
+	z-index: -1;
+	bottom: 60%;
 	height: 200px;
 	width: 200px;
 }
