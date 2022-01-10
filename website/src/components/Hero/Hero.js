@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import clsx from "clsx";
 import styles from "./Hero.module.css";
 import Slider from "react-slick";
+
 const FeatureList = [
 	{
 		title: "Insert awesome intro title here.",
@@ -11,6 +12,7 @@ const FeatureList = [
 		SvgTraiangle3: require("../../../static/img/triangle3.svg").default,
 		SvgTraiangle4: require("../../../static/img/triangle4.svg").default,
 		SvgTraiangle5: require("../../../static/img/triangle5.svg").default,
+
 		description: (
 			<>
 				Et has minim elitr intellegat. Mea aeterno eleifend antiopam ad, nam no
@@ -121,6 +123,8 @@ function Feature({
 }
 
 export default function Hero() {
+	const LogoRedSvg = require("../../../static/img/logoRedSVG.svg").default;
+
 	return (
 		<section className={styles.features}>
 			<div className={styles.container}>
@@ -128,6 +132,7 @@ export default function Hero() {
 			</div>
 			<div className={styles.leftPurpleLine}></div>
 			<div className={styles.rightPurpleLine}></div>
+			<LogoRedSvg className={styles.logoRedSvg} alt={"logo"} />
 		</section>
 	);
 }

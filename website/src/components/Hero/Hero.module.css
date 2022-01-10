@@ -208,7 +208,6 @@ video {
 	width: 100%;
 }
 .leftPurpleLine {
-	content: "";
 	position: absolute;
 	top: 93.5%;
 	left: 12.5%;
@@ -219,7 +218,6 @@ video {
 	z-index: 2;
 }
 .rightPurpleLine {
-	content: "";
 	position: absolute;
 	top: 91.5%;
 	right: 12.5%;
@@ -227,6 +225,13 @@ video {
 	height: 5%;
 	background-color: rgba(160, 102, 170, 0.8);
 	transform: matrix(1, -0.1, 0, 0.99, 0, 0);
+	z-index: 2;
+}
+.logoRedSvg {
+	position: absolute;
+	bottom: 0;
+	right: 50%;
+	transform: translateX(50%);
 	z-index: 2;
 }
 
@@ -321,7 +326,8 @@ video {
 	.features:before,
 	.features:after,
 	.leftPurpleLine,
-	.rightPurpleLine {
+	.rightPurpleLine,
+	.logoRedSvg {
 		display: none;
 	}
 	.heroCardContainer {
