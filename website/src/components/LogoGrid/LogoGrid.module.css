@@ -1,12 +1,53 @@
+.wrapper {
+	position: relative;
+	padding-top: 100px;
+}
+
 .features {
 	display: flex;
 	align-items: center;
 	padding: 2rem 0;
 	width: 100%;
-	background-color: var(--ifm-color-bg-purple);
 }
 
+.headine {
+	margin: 0px 5%;
+}
 .featureSvg {
-	height: 200px;
-	width: 200px;
+	position: absolute;
+	z-index: -1;
+	bottom: 60%;
+	height: 185px;
+	width: 185px;
+	left: 0;
+	top: -20px;
+}
+
+.images {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 0 150px;
+}
+
+.image {
+	margin: 20px;
+}
+
+.image img {
+	width: 100%;
+}
+
+@media screen and (max-width: 1115px) {
+	.images {
+		justify-content: space-between;
+	}
+}
+
+@media screen and (max-width: 700px) {
+	.images {
+		justify-content: center;
+	}
+	.featureSvg {
+		display: none;
+	}
 }
