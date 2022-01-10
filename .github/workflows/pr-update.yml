@@ -58,12 +58,14 @@ jobs:
 
   job1:
     needs: get_stuff
-    uses: ecadlabs/taqueria/.github/workflows/upload-taqueria.yml@e9c9cd579c30ad535b3abc60d7596453b6d710d2
+    uses: ecadlabs/taqueria/.github/workflows/upload-taqueria.yml@alex-github-action-pr-update
 
   update_PR:
     runs-on: ubuntu-latest
     needs: job1
     steps:
+      - name: sleep 30
+
       - name: flow through of run ID
         run: echo ${{ needs.job1.outputs.runID }}
 
