@@ -5,7 +5,7 @@ name: PR Update
 on:
   workflow_run:
     workflows: ["Taqueria"]
-    branches: [alex-github-action-init]
+    branches: [alex-github-action-pr-update]
     types: [completed]
 jobs:  
   update_PR:
@@ -31,7 +31,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const run_id = 1669239715;
+            const run_id = 1678181092;
             const {owner, repo} = context.repo;
             const artifacts = await github.paginate(
               github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
