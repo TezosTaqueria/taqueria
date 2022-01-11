@@ -277,6 +277,10 @@ a.menu__link--sublist {
 	border-radius: 3px;
 	margin-bottom: 50px !important;
 }
+.footerButton:hover {
+	color: #373f41;
+	text-decoration: none;
+}
 
 .footerForm {
 	width: 100%;
@@ -319,6 +323,10 @@ a.menu__link--sublist {
 .footerGihubLogoButton {
 	transform: translateY(5px);
 	padding-right: 5px;
+}
+.row .col.col.col {
+	padding-left: 5%;
+	padding-right: 5%;
 }
 .row .col--3 {
 	position: fixed;
