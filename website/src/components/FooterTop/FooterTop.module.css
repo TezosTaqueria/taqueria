@@ -67,6 +67,12 @@
 	align-items: center;
 	height: 100%;
 }
+.Contentcontainer h5 {
+	height: max-content;
+	margin-bottom: 60px;
+	white-space: nowrap;
+	min-width: fit-content;
+}
 
 @media screen and (max-width: 640px) {
 	.heroCardContainer,
