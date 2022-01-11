@@ -1,0 +1,33 @@
+.container {
+    padding: 100px;
+}
+
+.footerForm {
+    width: 100%;
+    background: #FFF9ED;
+}
+
+.footerForm button {
+    height: fit-content;
+	white-space: nowrap;
+	padding: 5px 18px;
+	background-color: var(--ifm-color-primary);
+	color: #373f41;
+	font-size: 12px;
+	line-height: 22px;
+	font-weight: 600;
+	letter-spacing: 0.3px;
+	font-family: Montserrat;
+	border-radius: 3px;
+	margin-bottom: 50px !important;
+	border: none;
+}
+
+.footerForm input {
+	border: none;
+	background: transparent;
+	border-bottom: 1px solid #565656;
+	padding-right: 100px;
+	padding-bottom: 8px;
+    margin-right: 5px;
+}
