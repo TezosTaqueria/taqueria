@@ -1,7 +1,6 @@
 name: pr-update
 
 on:
-<<<<<<< HEAD
 # WARNING: When working with workflow_run workflows they will only ever execute 
 # what is present on the default branch in the repo. Make all the changes you 
 # want here and they will not change how your PR job will run. If you want to 
@@ -32,82 +31,9 @@ jobs:
             for (const artifact of artifacts) {
               body += `\n* [${artifact.name}.zip](https://github.com/${owner}/${repo}/suites/${check_suite_id}/artifacts/${artifact.id})`
             }
-=======
-  pull_request:
-    branches: [main, alex-github-action-pr-update]
-  # workflow_run:
-  #   workflows: ["upload-taqueria"]
-  #   branches: [alex-github-action-pr-update]
-  #   types: [completed]
-
-
-jobs:
-  get_stuff:
-    runs-on: ubuntu-latest
-    steps: 
-      - name: Get Workflow Info
-        uses: actions/github-script@v5
-        id: gatherInfo
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            console.log(context)
-            console.log(context.repo.owner)
-            console.log(context.repo.repo)
-            console.log(context.runId)
-
-  job1:
-    needs: get_stuff
-    uses: ecadlabs/taqueria/.github/workflows/upload-taqueria.yml@alex-github-action-pr-update
-
-  update_PR:
-    runs-on: ubuntu-latest
-    needs: job1
-    steps:
-      - name: flow through of run ID
-        run: echo ${{ needs.job1.outputs.runID }}
-
-      - name: Get artifact from previous step
-        uses: actions/github-script@v5
-        id: getArtifact
-        with:
-          github-token: ${{secrets.TEST_TOKEN}}
-          script: |
-            github.rest.actions.listWorkflowRunArtifacts({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              run_id: ${{ needs.job1.outputs.runID }}
-            })
-      
-      - run: echo ${{ steps.getArtifact.outputs.result }}
-
-      # - name: Get artifact from previous workflow
-      #   uses: actions/github-script@v5
-      #   id: getArtifact
-      #   with:
-      #     github-token: ${{secrets.GITHUB_TOKEN}}
-      #     script: |
-      #       const run_id = 1678181092;
-      #       const {owner, repo} = context.repo;
-      #       const artifacts = await github.paginate(
-      #         github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
-      #       const {data: workflow_run} = await github.rest.actions.getWorkflowRun({owner, repo, run_id});
-      #       let body = `Download the artifacts for this pull request:\n`;
-      #       for (const artifact of artifacts) {
-      #         console.log(artifact.name)
-      #         console.log(artifact.id)
-      #         body += `\n* [${artifact.name}.zip](https://github.com/${owner}/${repo}/suites/${workflow_run.check_suite_id}/artifacts/${artifact.id})`;
-      #       }
-      #       core.info("Review thread message body:", body);
-      #       console.log(body)
-      #       console.log(workflow_run)
-
-      #     debug: true
->>>>>>> 90432e6... updated PR update job to use run ID from upload job
 
             return body
 
-<<<<<<< HEAD
       - name: Comment Artifact to PR
         uses: actions/github-script@v5
         with:
@@ -119,16 +45,3 @@ jobs:
               repo: context.repo.repo,
               body: ${{ steps.createArtifact.outputs.result }}
             })
-=======
-      # - name: Comment Artifact to PR
-      #   uses: actions/github-script@v5
-      #   with:
-      #     github-token: ${{secrets.GITHUB_TOKEN}}
-      #     script: |
-      #       github.rest.issues.createComment({
-      #         issue_number: context.issue.number,
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         body: "Alex's comments"
-      #       })
->>>>>>> 90432e6... updated PR update job to use run ID from upload job

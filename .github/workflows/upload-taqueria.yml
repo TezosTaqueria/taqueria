@@ -1,22 +1,10 @@
 name: upload-taqueria
 
-on:
-  # push:
-  #   branches: [main]
-  # pull_request:
-  #   branches: [main]
-
-  workflow_call:
-    outputs:
-      runID:
-        # value: "123456789"
-        value: ${{ jobs.build_taqueria_and_upload.outputs.runID }}
+on: pull_request
 
 jobs:
   build_taqueria_and_upload:
     runs-on: ubuntu-latest
-    outputs:
-      runID: ${{ steps.getRunID.outputs.result }}
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
@@ -25,26 +13,6 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: "^1.0.0"
-
-      - name: Get Workflow run ID
-        uses: actions/github-script@v5
-        id: getRunID
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: return context.runId
-
-      - run: echo "${{ steps.getRunID.outputs.result }}"
-
-
-      # Uncomment this step to verify the use of 'deno fmt' on each commit.
-      # - name: Verify formatting
-      #   run: deno fmt --check
-
-      # - name: Run linter
-      #   run: deno lint
-
-      # - name: Run tests
-      #   run: deno test -A --unstable
       
       - name: Build taqueria
         run: ./bin/build.sh
@@ -56,80 +24,3 @@ jobs:
           name: taqueria
           path: /home/runner/work/taqueria/taqueria/taqueria
           retention-days: 1
-
-  check_job:
-    runs-on: ubuntu-latest
-    needs: build_taqueria_and_upload
-    steps:
-      - run: echo ${{ needs.build_taqueria_and_upload.outputs.runID }}
-
-      # - name: Get artifact from previous workflow
-      #   uses: actions/github-script@v5
-      #   id: getArtifact
-      #   with:
-      #     github-token: ${{secrets.GITHUB_TOKEN}}
-      #     script: |
-      #       const run_id = 1678181092;
-      #       const {owner, repo} = context.repo;
-      #       const artifacts = await github.paginate(
-      #         github.rest.actions.listWorkflowRunArtifacts, {owner, repo, run_id});
-      #       const {data: workflow_run} = await github.rest.actions.getWorkflowRun({owner, repo, run_id});
-      #       let body = `Download the artifacts for this pull request:\n`;
-      #       for (const artifact of artifacts) {
-      #         console.log(artifact.name)
-      #         console.log(artifact.id)
-      #         body += `\n* [${artifact.name}.zip](https://github.com/${owner}/${repo}/suites/${workflow_run.check_suite_id}/artifacts/${artifact.id})`;
-      #       }
-      #       core.info("Review thread message body:", body);
-      #       console.log(body)
-      #       console.log(workflow_run)
-
-          # debug: true
-
-      # - run: sleep 60
-
-  # build_others:
-
-  #   runs-on: ubuntu-latest
-
-  #   strategy:
-  #     matrix:
-  #       node-version: [12.x, 14.x, 16.x]
-  #       # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
-  #   steps:
-  #   - name: Setup repo
-  #     uses: actions/checkout@v2
-
-  #   - name: Use Node.js ${{ matrix.node-version }}
-  #     uses: actions/setup-node@v2
-  #     with:
-  #       node-version: ${{ matrix.node-version }}
-  #       cache: 'npm'
-
-  #   - name: Setup Deno
-  #     uses: denoland/setup-deno@v1
-  #     with:
-  #       deno-version: "^1.0.0"
-
-  #   # - name: Run build script
-  #   #   run: ./bin/build.sh 
-
-  #   # - name: Build protocol
-  #   #   run: npm install
-
-  #   - name: Go to SDK directory, install and build
-  #     run: |
-  #       cd taqueria-sdk
-  #       npm install
-  #       npm run build
-
-  #   # - name: Install Dependencies for SDK
-  #   #   run: npm install
-
-  #   # - name: Build SDK
-  #   #   run: npm run build
-
-  #   # - run: npm ci
-  #   # - run: npm run build --if-present
-  #   # - run: npm test
