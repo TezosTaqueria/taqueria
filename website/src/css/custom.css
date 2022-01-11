@@ -279,6 +279,7 @@ a.menu__link--sublist {
 }
 .footerButton:hover {
 	color: #373f41;
+	text-decoration: none;
 }
 
 .footerForm {
