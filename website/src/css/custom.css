@@ -320,6 +320,10 @@ a.menu__link--sublist {
 	transform: translateY(5px);
 	padding-right: 5px;
 }
+.row .col.col.col {
+	padding-left: 5%;
+	padding-right: 5%;
+}
 .row .col--3 {
 	position: fixed;
 	right: -7%;
