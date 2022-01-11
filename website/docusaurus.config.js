@@ -63,6 +63,7 @@ const config = {
 				},
 			},
 			navbar: {
+				hideOnScroll: true,
 				logo: {
 					alt: "Tezos Taqueria Logo",
 					src: "img/logoSVG.svg",
