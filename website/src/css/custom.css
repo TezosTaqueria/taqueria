@@ -277,6 +277,9 @@ a.menu__link--sublist {
 	border-radius: 3px;
 	margin-bottom: 50px !important;
 }
+.footerButton:hover {
+	color: #373f41;
+}
 
 .footerForm {
 	width: 100%;
