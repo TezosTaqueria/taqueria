@@ -1,3 +1,7 @@
+// TODO - using .ts is necessary for Deno. Explore how to make this
+// consumable by Deno or the TypeScript compiler without any warnings
+// or errors emited
+// @ts-ignore
 import {SanitizedAbsPath, SHA256} from '../taqueria-utils/taqueria-utils-types.ts'
 
 /**
@@ -298,12 +302,12 @@ export class Option {
         const flag = Verb.create(option.flag)
 
         if (!option.shortFlag && flag)
-            return new Option(undefined, flag, option.description, option.defaultValue, option.choices || [], option.required || false, option.boolean || false)
+            return new Option(undefined, flag, option.description, option.defaultValue, option.choices || [], option.required || false, option.boolean ? true : false)
 
         if (option.shortFlag && flag) {
             const shortFlag = SingleChar.create(option.shortFlag)
             return shortFlag
-                ? new Option(shortFlag, flag, option.description, option.defaultValue, option.choices || [], option.required || false, option.boolean || false)
+                ? new Option(shortFlag, flag, option.description, option.defaultValue, option.choices || [], option.required || false, option.boolean ? true : false)
                 : undefined
         }
 
