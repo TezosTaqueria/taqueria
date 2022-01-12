@@ -285,18 +285,24 @@ a.menu__link--sublist {
 .footerForm {
 	width: 100%;
 	margin-top: 50px;
+	background: #fff9ed;
 }
 
 .footerInputContainer {
 	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	flex-wrap: wrap;
 }
 
-.footerImail {
+.footerEmail {
 	border: none;
 	background: transparent;
 	border-bottom: 1px solid #565656;
 	padding-right: 100px;
 	padding-bottom: 8px;
+	margin-bottom: 8px;
 }
 
 .signupButton {
