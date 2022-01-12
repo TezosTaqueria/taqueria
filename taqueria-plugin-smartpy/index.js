@@ -58,7 +58,7 @@ var $9ee2660feae247c1$export$2e2bcd8739ae039 = $9ee2660feae247c1$export$ef7acd71
 
 
 $2OpfP$taqueriasdk.Plugin.create((i18n)=>({
-        name: "taqueria-plugin-smartpy",
+        name: "smartpy",
         schema: "1.0",
         version: "0.1",
         tasks: [
@@ -85,7 +85,8 @@ $2OpfP$taqueriasdk.Plugin.create((i18n)=>({
                     $2OpfP$taqueriasdk.Option.create({
                         shortFlag: "g",
                         flag: "green",
-                        description: "Make green tea instead"
+                        description: "Make green tea instead",
+                        boolean: true
                     })
                 ],
                 handler: `echo "I'm a little teapot <%= it.green ? "full of green tea!" : "!" %>"`

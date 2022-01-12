@@ -23,7 +23,8 @@ Plugin.create(i18n => ({
                 Option.create({
                     shortFlag: "g",
                     flag: "green",
-                    description: "Make green tea instead"
+                    description: "Make green tea instead",
+                    boolean: true // TODO: Why isn't this working?
                 })
             ],
             handler: `echo "I'm a little teapot <%= it.green ? "full of green tea!" : "!" %>"`
