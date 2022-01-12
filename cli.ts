@@ -61,6 +61,10 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         default: getFromEnv("TAQ_CONFIG_DIR", "./.taq", env),
         describe: i18n.__('configDirDesc')
     })
+    .option('e', {
+        alias: 'env',
+        describe: i18n.__('envDesc')
+    })
     .wrap(75)
     .epilogue(i18n.__('betaWarning'))
     .command(
@@ -171,7 +175,6 @@ export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>) =>
         return status.code
     }
     catch (previous) {
-        console.log(previous)
         throw {
             kind: "E_FORK",
             msg: `Could not fork ${command}`,
@@ -219,22 +222,18 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
                 '--taqRun', action,
                 '--i18n', "'" + JSON.stringify(i18n) + "'",
                 '--config', "'"+ JSON.stringify(config) + "'",
-                '--env', "'" + JSON.stringify(env) + "'",
+                '--envVars', "'" + JSON.stringify(env) + "'",
                 ...formattedArgs,
             ]
 
+            // console.log(cmd.join(' '))
 
-            console.log(cmd.join(' '))
             const process = Deno.run({cmd, stdout: "piped", stderr: "piped"})
             const output = await process.output()
             const error = await process.stderrOutput()
             const decoder = new TextDecoder()
             const stdout = decoder.decode(output)
             const stderr = decoder.decode(error)
-
-            // console.log(cmd.join(' '))
-            // console.log(stdout)
-            // console.log(stderr)
 
             if (!stdout && stderr) {
                 return Promise.reject({
@@ -274,12 +273,11 @@ const getCanonicalTask = (pluginName: string, taskName: string, state: State) =>
     undefined
 )
 
-
+// TODO -the way we're checking for plugins via 'smartpy' or 'taqueria-plugin-smartpy` is ugly
 const loadState = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, state: State): CLIConfig => {
     return Object.entries(state.tasks).reduce(
         (retval: CLIConfig, pair: [string, InstalledPlugin|Task]) => {
             const [taskName, implementation] = pair
-            debugger
 
             // Composite task...
             if ('task' in implementation) {
@@ -304,7 +302,9 @@ const loadState = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parse
             }
 
             // Canonical task...
-            const foundTask = getCanonicalTask(implementation.name, taskName, state)
+            const foundTask =
+                getCanonicalTask(implementation.name, taskName, state)
+                || getCanonicalTask(implementation.name.replace(/taqueria-plugin-/, ''), taskName, state)
             return foundTask ? addTask(retval, config, env, parsedArgs, i18n, foundTask, implementation) : retval
         },
         cliConfig
@@ -323,11 +323,12 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                     const optionSettings: Record<string, unknown> = {
                         alias: option.shortFlag ? option.shortFlag.value : undefined,
                         default: option.defaultValue,
-                        demandOption: option.required
+                        demandOption: option.required,
+                        describe: option.description
                     }
 
                     if (option.choices && option.choices.length) optionSettings.choices = option.choices
-                    if (option.boolean) optionSettings.boolean = true
+                    if (option.boolean) optionSettings['boolean'] = true
                     return cli.option(option.flag.value, optionSettings)
                 },
                 cliConfig
@@ -453,7 +454,8 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     projectDir: SanitizedAbsPath.create(parsedArgs.projectDir),
     maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency,
     debug: parsedArgs.debug,
-    plugin: parsedArgs.plugin
+    plugin: parsedArgs.plugin,
+    env: parsedArgs.env
 })
 
 export default {

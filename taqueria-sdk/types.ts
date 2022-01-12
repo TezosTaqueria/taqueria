@@ -104,6 +104,25 @@ export interface Config extends Record<string, unknown>{
     testsDir: string
     contractsDir: string
     artifactsDir: string
+    environment?: {
+        [key: string]: Environment
+    } & {
+        default: string
+    }
+}
+
+// TODO: This environment type is temporary.
+export interface Environment {
+    storage?: Record<string, any>
+    rpcUrl: string,
+    faucet: {
+        mnemonic: string[],
+        activation_code: string,
+        amount: number,
+        pkh: string,
+        password: string,
+        email: string
+    }
 }
 
 export interface SanitizedArgs {

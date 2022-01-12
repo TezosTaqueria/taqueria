@@ -44,6 +44,7 @@ export interface RawInitArgs {
     maxConcurrency: number
     debug: boolean
     plugin?: string
+    env: 'production' | 'development' | 'testing' | string
 }
 
 export interface SanitizedInitArgs {
@@ -53,13 +54,14 @@ export interface SanitizedInitArgs {
     maxConcurrency: number,
     debug: boolean,
     plugin?: string
+    env: 'production' | 'development' | 'testing' | string
 }
 
 export interface i18n {
     __(msg: string, ...params: string[]): string
 }
 
-export type EnvKey = "TAQ_CONFIG_DIR" | "TAQ_MAX_CONCURRENCY" | "TAQ_PROJECT_DIR"
+export type EnvKey = "TAQ_CONFIG_DIR" | "TAQ_MAX_CONCURRENCY" | "TAQ_PROJECT_DIR" | "TAQ_ENV"
 
 export interface EnvVars {
     get: (key: EnvKey) => undefined | string
@@ -163,7 +165,10 @@ export class State {
 
                     // This task is only provided by a single plugin
                     else {
-                        const installedPlugin = config.plugins.find((plugin: InstalledPlugin) => plugin.name === pluginInfo.name)
+                        debugger
+                        const installedPlugin = config.plugins.find(
+                            (plugin: InstalledPlugin) => [`taqueria-plugin-${pluginInfo.name}`, pluginInfo.name].includes(plugin.name)
+                        )
                         if (!installedPlugin) return retval // we should log that a problem occured here
                         retval[taskName] = installedPlugin
                         return retval
