@@ -1,6 +1,9 @@
 name: upload-taqueria
 
-on: pull_request
+on: 
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build_taqueria_and_upload:
@@ -22,5 +25,5 @@ jobs:
         if: success()
         with:
           name: taqueria
-          path: /home/runner/work/taqueria/taqueria/taqueria
+          path: ${GITHUB_WORKSPACE}/taqueria
           retention-days: 1
