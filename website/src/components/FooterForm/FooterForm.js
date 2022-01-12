@@ -34,7 +34,6 @@ function Feature() {
 			<div className={styles.footerForm}>
 				{error && <h6>Please enter your email</h6>}
 				{loading && <p>...Loading</p>}
-				{status && <p>{status}</p>}
 				{message && <p>{message && parse(message)}</p>}
 
 				<h5>Register for updates</h5>
