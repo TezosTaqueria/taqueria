@@ -51,8 +51,9 @@
 	background: transparent;
 	border-bottom: 1px solid #565656;
 	padding-right: 100px;
-	padding-bottom: 8px;
-	margin-bottom: 8px;
+	margin-bottom: 10px;
+	padding-top: 10px;
+	padding-bottom: 10px;
 }
 
 .signupButton {
@@ -69,4 +70,5 @@
 	border-radius: 3px;
 	margin-bottom: 50px !important;
 	border: none;
+	transform: translateY(5px);
 }
