@@ -1,27 +1,8 @@
 ---
-title: Introduction
+title: Plugins
 ---
 
-export const Chart = () => (
-    <div style={{display: "flex", flexDirection: "row", overflowX: "auto", boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.15)", borderRadius: "8px"}}>
-      <div style={{display: "flex", flexDirection: "column"}}>
-        <div style={{background: "#FFDFA0", color: "black", padding:"26px 16px 13px 16px", fontFamily: "Montserrat", fontStyle: "normal", fontWeight: "bold",fontSize: "14px", lineHeight: "17px", textTransform: "uppercase"}}>Name</div>
-        <div style={{color: "black", padding: "20px 16px", fontFamily: "Montserrat", fontStyle: "normal", fontWeight: "500", fontSize: "12px", lineHeight: "16px", borderBottom: "solid 2px #FFDFA0" }}>ligo</div>
-        <div style={{background: "#FFF9ED", color: "black", padding: "20px 16px", fontFamily: "Montserrat", fontStyle: "normal", fontWeight: "500", fontSize: "12px", lineHeight: "16px", borderBottom: "solid 2px #FFDFA0"}}>smartpy</div>
-        <div style={{color: "black", padding: "20px 16px", fontFamily: "Montserrat", fontStyle: "normal", fontWeight: "500", fontSize: "12px", lineHeight: "16px", borderBottom: "solid 2px #FFDFA0"}}>taqueria-sdk</div>
-      <div style={{background: "#FFF9ED", color: "black", padding: "20px 16px", fontFamily: "Montserrat", fontStyle: "normal", fontWeight: "500", fontSize: "12px", lineHeight: "16px"}}>DoinBadlyCorp(DBC)</div>
-      </div>
-      <div style={{display: "flex", flexDirection: "column", width:"100%"}}>
-        <div style={{background: "#FFDFA0", color: "black", padding:"26px 16px 13px 16px", fontFamily: "Montserrat", fontStyle: "normal", fontWeight: "bold",fontSize: "14px", lineHeight: "17px", textTransform: "uppercase"}}>Purpose</div>
-        <div style={{color: "black", padding: "20px 16px", whiteSpace: "nowrap", fontFamily: "Montserrat", fontStyle: "normal", fontWeight: "500", fontSize: "12px", lineHeight: "16px", borderLeft: "solid 2px #FFDFA0", borderBottom: "solid 2px #FFDFA0"  }}>Complies Ligo smart contracts to Michelson</div>
-        <div style={{background: "#FFF9ED", color: "black", padding: "20px 16px", whiteSpace: "nowrap", fontFamily: "Montserrat", fontStyle: "normal", fontWeight: "500", fontSize: "12px", lineHeight: "16px", borderLeft: "solid 2px #FFDFA0", borderBottom: "solid 2px #FFDFA0" }}>Complies SmartPy smart contracts to Michelson</div>
-        <div style={{color: "black", padding: "20px 16px", whiteSpace: "nowrap", fontFamily: "Montserrat", fontStyle: "normal", fontWeight: "500", fontSize: "12px", lineHeight: "16px", borderLeft: "solid 2px #FFDFA0", borderBottom: "solid 2px #FFDFA0" }}>The core of the Taqueria framework, relevant only to Taqueria plugin developers</div>
-        <div style={{background: "#FFF9ED", color: "black", padding: "20px 16px", whiteSpace: "nowrap", fontFamily: "Montserrat", fontStyle: "normal", fontWeight: "500", fontSize: "12px", lineHeight: "16px", borderLeft: "solid 2px #FFDFA0", }}>The core of the Taqueria framework, relevant only to Taqueria plugin developers</div>
-    </div>
- </div>
-);
-
-export const Caution = () => (
+export const Caution = ({ children, color }) => (
   <span
     style={{
       borderRadius: "2px",
@@ -57,7 +38,7 @@ export const Caution = () => (
             marginBottom: "11px",
           }}
         >
-          <img src={require("../static/img/CautionIcon.png").default} />
+          <img src={require("../../static/img/CautionIcon.png").default} />
           <div style={{ marginLeft: "14px" }}>CAUTION</div>
         </div>
       </div>
@@ -79,7 +60,7 @@ export const Caution = () => (
   </span>
 );
 
-export const Info = () => (
+export const Info = ({ children, color }) => (
   <span
     style={{
       borderRadius: "2px",
@@ -115,7 +96,7 @@ export const Info = () => (
             marginBottom: "11px",
           }}
         >
-          <img src={require("../static/img/InfoIcon.png").default} />
+          <img src={require("../../static/img/InfoIcon.png").default} />
           <div style={{ marginLeft: "14px" }}>INFO</div>
         </div>
       </div>
@@ -137,7 +118,7 @@ export const Info = () => (
   </span>
 );
 
-export const Tip = () => (
+export const Tip = ({ children, color }) => (
   <span
     style={{
       borderRadius: "2px",
@@ -173,7 +154,7 @@ export const Tip = () => (
             marginBottom: "11px",
           }}
         >
-          <img src={require("../static/img/TipIcon.png").default} />
+          <img src={require("../../static/img/TipIcon.png").default} />
           <div style={{ marginLeft: "14px" }}>TIP</div>
         </div>
       </div>
@@ -195,7 +176,6 @@ export const Tip = () => (
   </span>
 );
 
-<Chart/>
 <Caution />
 <Info />
 <Tip />
