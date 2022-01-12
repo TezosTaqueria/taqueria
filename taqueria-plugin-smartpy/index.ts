@@ -2,6 +2,7 @@ import {Plugin, Task, Option} from 'taqueria-sdk'
 import compile from './compile'
 
 Plugin.create(i18n => ({
+    name: "smartpy",
     schema: "1.0",
     version: "0.1",
     tasks: [
@@ -25,7 +26,7 @@ Plugin.create(i18n => ({
                     description: "Make green tea instead"
                 })
             ],
-            handler: `echo "I'm a little teapot<%= it.green ? "full of green tea!" : "!" %>"`
+            handler: `echo "I'm a little teapot <%= it.green ? "full of green tea!" : "!" %>"`
         })
     ],
     checkRuntimeDependencies: () => Promise.resolve({

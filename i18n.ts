@@ -21,7 +21,7 @@ await i18next.init({
                 "pluginOptionDesc": "Use the task from this plugin",
                 "bootstrapMsg": "Project taq'ified!",
                 "maxConcurrencyDesc": "Set the maximum concurrency limit used internally",
-                "providedByMany": "** This task is provided by more than one plugin. Use --help for more information or distingish which plugin you would like to use for this task with --plugin **",
+                "providedByMany": "Provided by more than one plugin. The option --plugin is required.",
                 "pluginDesc": "Specify what plugin should execute this command. Use this when more than one plugin provide a task of the same name.",
                 "listNetworks": "List known networks"
             }

@@ -6,7 +6,7 @@ export interface TaskView {
     readonly description: string
     readonly aliases: string[]
     readonly options: UnvalidatedOption[],
-    readonly handler: "proxy" | string
+    readonly handler: "proxy" | string | string[]
 }
 
 export interface Failure<Params> {
@@ -62,6 +62,7 @@ export type ActionResponse = ProxyAction | CheckRuntimeDependenciesAction | Inst
 
 export interface Schema {
     // This should match the PluginInfo, but tasks, scaffolds, hooks, networks, and sandboxes are optional
+    readonly name: string
     readonly schema: string
     readonly version: string
     readonly tasks?: (Task | undefined)[]
@@ -69,13 +70,13 @@ export interface Schema {
     readonly hooks?: (Hook | undefined)[]
     readonly networks?: (Network | undefined)[]
     readonly sandboxes?: (Sandbox | undefined)[]
-    init?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
     checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
     installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
-    proxy?: <T>(parsedArgs: SanitizedArgs & Record<string, unknown>) => LikeAPromise<ActionResponse, Failure<T>>
+    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
 }
 
 export interface SchemaView {
+    readonly name: string
     readonly schema: string
     readonly version: string
     readonly tasks: TaskView[]
@@ -106,6 +107,7 @@ export interface Config extends Record<string, unknown>{
 }
 
 export interface SanitizedArgs {
+    [key: string]: unknown
     i18n: i18n
     taqRun: Action
     config: Config

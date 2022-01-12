@@ -1,4 +1,4 @@
-import {Task as aTask, Binary, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike} from 'taqueria-protocol/taqueria-protocol-types'
+import {Task as aTask, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike} from 'taqueria-protocol/taqueria-protocol-types'
 import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs} from "./types"
 import {join, resolve} from 'path'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
@@ -62,7 +62,7 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefin
 }
 
 const viewOption = ({shortFlag, flag, description}: anOption): OptionView => ({
-    shortFlag: shortFlag.value,
+    shortFlag: shortFlag ? shortFlag.value : undefined,
     flag: flag.value,
     description
 })
@@ -79,16 +79,17 @@ const viewTask = ({task, command, aliases, description, options, handler}: aTask
         (retval: OptionView[], option: anOption | undefined) => option ? [...retval, viewOption(option)] : retval,
         []
     ),
-    handler: handler === "proxy" ? "proxy" : handler.value
+    handler: handler === "proxy" ? "proxy" : handler
 })
 
 
 
 const parseSchema = (i18n: i18n, definer: pluginDefiner): SchemaView | undefined => {
     try {
-        const {schema, version, tasks, scaffolds, hooks, networks, sandboxes, ...functions} = definer(i18n)
+        const {name, schema, version, tasks, scaffolds, hooks, networks, sandboxes, ...functions} = definer(i18n)
 
         return {
+            name,
             schema,
             version,
             tasks: tasks
@@ -138,8 +139,6 @@ const getResponse = (definer: pluginDefiner) => (sanitzedArgs: SanitizedArgs): L
 
     }
 }
-
-export const binary = Binary.create
 
 export const Plugin = {
     create: (definer: pluginDefiner, unparsedArgs: Args) =>
