@@ -1,0 +1,32 @@
+{
+  "name": "taqueria-plugin-taquito",
+  "version": "1.0.0",
+  "description": "",
+  "targets": {
+    "default": {
+      "source": "./index.ts",
+      "distDir": "./",
+      "context": "node",
+      "isLibrary": true
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
+    "build": "npx parcel build",
+    "debugPluginInfo": "node --inspect-brk index.js --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "parcel": "^2.0.1",
+    "typescript": "^4.5.2"
+  },
+  "dependencies": {
+    "@taquito/signer": "^11.1.0",
+    "@taquito/taquito": "^11.0.2",
+    "fast-glob": "^3.2.10",
+    "taqueria-sdk": "file:../taqueria-sdk"
+  }
+}
