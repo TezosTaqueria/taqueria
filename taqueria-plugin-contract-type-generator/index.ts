@@ -1,6 +1,6 @@
 import {Plugin, Task} from 'taqueria-sdk'
 import type { i18n} from 'taqueria-sdk/types'
-import generateTypes from './src/generate-types'
+import {tasks} from './src/tasks'
 
 Plugin.create((i18n: i18n) => ({
     name: "taquito",
@@ -17,5 +17,5 @@ Plugin.create((i18n: i18n) => ({
             handler: "proxy"
         }),
     ],
-    proxy: generateTypes
+    proxy: tasks.generateTypes,
 }), process.argv)

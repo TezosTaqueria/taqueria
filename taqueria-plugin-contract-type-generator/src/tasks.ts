@@ -80,4 +80,6 @@ export const generateTypes = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse,
     }))
 }
 
-export default generateTypes
+export const tasks = {
+    generateTypes,
+} 
