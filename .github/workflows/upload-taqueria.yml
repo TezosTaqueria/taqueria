@@ -41,10 +41,7 @@ jobs:
         shell: bash
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
-          mkdir ./test_project
-          project_init=$(./"$TAQ_BIN" init -p ./test_project)
-          echo "$project_init"
-          [[ "$project_init" == "Project taq'ified" ]]
+          [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
 
       # - name: Upload Taqueria Binary 
       #   uses: actions/upload-artifact@v2
