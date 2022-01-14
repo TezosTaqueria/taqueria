@@ -47,5 +47,5 @@ jobs:
         if: success()
         with:
           name: taqueria.${{matrix.deno_target}}
-          path: ${GITHUB_WORKSPACE}/${{ matrix.taqueria_bin }}
+          path: ${{ matrix.taqueria_bin }}
           retention-days: 1
