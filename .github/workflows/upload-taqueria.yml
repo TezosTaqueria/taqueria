@@ -40,7 +40,7 @@ jobs:
         id: build-bin
         shell: bash
         run: |
-          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
+          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env --quiet index.ts
           [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
 
       # - name: Upload Taqueria Binary 
