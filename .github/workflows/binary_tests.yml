@@ -27,5 +27,7 @@ jobs:
         run: |
           deno compile --output taqueria --allow-run --allow-write --allow-read --allow-env index.ts 
           mkdir ./test_project
+          ./taqueria -v
           ./taqueria init -p ./test_project
+          ls -l ./tests_project
 
