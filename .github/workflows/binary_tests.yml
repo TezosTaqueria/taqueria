@@ -5,6 +5,7 @@ on:
 
 env:
   DENO_DIR: ./deno
+  DENO_TARGET: ${{ matrix.deno_target }}
 
 jobs:
   build_taqueria_and_test:
@@ -15,13 +16,10 @@ jobs:
        include:
          - os: ubuntu-latest
            deno_target: "x86_64-unknown-linux-gnu"
-           extension: ""
          - os: windows-latest
            deno_target: "x86_64-pc-windows-msvc"
-           extension: ".exe"
          - os: macOS-latest
            deno_target: "x86_64-apple-darwin"
-           extension: ""
 
     steps:
       - name: Setup repo
@@ -33,13 +31,22 @@ jobs:
           deno-version: "^1.0.0"
 
       - name: Build the binary for ${{ matrix.os }}
-        env:
-          DENO_TARGET: ${{ matrix.deno_target }}
-          TAQ_COMMAND: taqueria${{ matrix.extension }}
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
           mkdir ./test_project
-          ./$TAQ_COMMAND --version
-          ./$TAQ_COMMAND init -p ./test_project
+          if
+          ./taqueria --version
+          ./taqueria init -p ./test_project
           ls ./test_project
+        if: ${{ matrix.os != "windows-latest" }}
+
+      - name: Build the binary for ${{ matrix.os }}
+        run: |
+          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
+          mkdir ./test_project
+          if
+          ./taqueria.exe --version
+          ./taqueria.exe init -p ./test_project
+          ls ./test_project
+        if: ${{ matrix.os == "windows-latest" }}
 
