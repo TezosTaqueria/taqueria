@@ -5,9 +5,13 @@ on:
 # what is present on the default branch in the repo. Make all the changes you 
 # want here and they will not change how your PR job will run. If you want to 
 # make changes to this it is best to update on the main branch itself.
-  workflow_run:
-    workflows: ["upload-taqueria"]
-    types: [completed]
+
+# TODO: Change back after testing
+  # workflow_run:
+  #   workflows: ["upload-taqueria"]
+  #   types: [completed]
+  push:
+    branches: [main]
 
 jobs:
   update_PR:
