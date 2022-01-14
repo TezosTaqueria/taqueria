@@ -34,7 +34,6 @@ jobs:
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
           mkdir ./test_project
-          if
           ./taqueria --version
           ./taqueria init -p ./test_project
           ls ./test_project
@@ -44,7 +43,6 @@ jobs:
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
           mkdir ./test_project
-          if
           ./taqueria.exe --version
           ./taqueria.exe init -p ./test_project
           ls ./test_project
