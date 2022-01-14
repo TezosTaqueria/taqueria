@@ -36,14 +36,14 @@ jobs:
         with:
           deno-version: "^1.0.0"
 
-      - name: Build the binary file ${{ matrix.os }}
+      - name: Build the binary for ${{ matrix.os }}
         id: build-bin
         shell: bash
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
           [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
 
-      - name: Upload Taqueria Binary 
+      - name: Upload the binary for ${{ matrix.os }} 
         uses: actions/upload-artifact@v2
         if: success()
         with:
