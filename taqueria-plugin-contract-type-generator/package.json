@@ -15,12 +15,12 @@
     "build": "npx parcel build",
     "debugPluginInfo": "node --inspect-brk index.js --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
     "examples": "npm run example && npm run example-json && npm run example-simple && npm run example-file && npm run example-local",
-    "example": "npx ts-node src/run.ts --g ./example/contracts ./example/types",
-    "example-json": "npx ts-node src/run.ts --json --g ./example/contracts ./example/types",
-    "example-simple": "npx ts-node src/run.ts --types simple --g ./example/contracts ./example/types-simple",
-    "example-file": "npx ts-node src/run.ts --types file --g ./example/contracts ./example/types-file",
-    "example-local": "npx ts-node src/run.ts --types local --g ./example/contracts ./example/types-local",
-    "test-generate": "npx ts-node src/run.ts --g ../taquito-michel-codec/test/ ./test/michel-codec-test-contract-types/",
+    "example": "npx ts-node run.ts --g ./example/contracts ./example/types",
+    "example-json": "npx ts-node run.ts --json --g ./example/contracts ./example/types",
+    "example-simple": "npx ts-node run.ts --types simple --g ./example/contracts ./example/types-simple",
+    "example-file": "npx ts-node run.ts --types file --g ./example/contracts ./example/types-file",
+    "example-local": "npx ts-node run.ts --types local --g ./example/contracts ./example/types-local",
+    "test-generate": "npx ts-node run.ts --g ../taquito-michel-codec/test/ ./test/michel-codec-test-contract-types/",
     "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts'",
     "precommit": "lint-staged",
     "prebuild": "rimraf dist",
@@ -38,6 +38,7 @@
     "rimraf": "^3.0.2",
     "rollup": "^2.42.0",
     "ts-node": "^9.1.1",
+    "ts-jest": "^27.1.2",
     "tsconfig-paths": "^3.9.0",
     "tslint": "^6.1.3",
     "typescript": "^4.5.2"
@@ -49,5 +50,11 @@
     "bignumber.js": "^9.0.2",
     "fast-glob": "^3.2.10",
     "taqueria-sdk": "file:../taqueria-sdk"
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx)": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$"
   }
 }
