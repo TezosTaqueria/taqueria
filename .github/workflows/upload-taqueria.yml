@@ -40,13 +40,13 @@ jobs:
         id: build-bin
         shell: bash
         run: |
-          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env --quiet index.ts
+          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
           [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
 
-      # - name: Upload Taqueria Binary 
-      #   uses: actions/upload-artifact@v2
-      #   if: success()
-      #   with:
-      #     name: taqueria.${{matrix.deno_target}}
-      #     path: ${{ matrix.taqueria_bin }}
-      #     retention-days: 1
+      - name: Upload Taqueria Binary 
+        uses: actions/upload-artifact@v2
+        if: success()
+        with:
+          name: taqueria.${{matrix.deno_target}}
+          path: ${{ matrix.taqueria_bin }}
+          retention-days: 1

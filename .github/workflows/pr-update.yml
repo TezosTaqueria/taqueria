@@ -6,12 +6,9 @@ on:
 # want here and they will not change how your PR job will run. If you want to 
 # make changes to this it is best to update on the main branch itself.
 
-# TODO: Change back after testing
-  # workflow_run:
-  #   workflows: ["upload-taqueria"]
-  #   types: [completed]
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["upload-taqueria"]
+    types: [completed]
 
 jobs:
   update_PR:
