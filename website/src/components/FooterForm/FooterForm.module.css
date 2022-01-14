@@ -73,3 +73,7 @@
 	border: none;
 	transform: translateY(5px);
 }
+
+.signupButton:hover {
+	cursor: pointer;
+}
