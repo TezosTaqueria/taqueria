@@ -35,8 +35,7 @@ jobs:
       - name: Build the binary for ${{ matrix.os }}
         env:
           DENO_TARGET: ${{ matrix.deno_target }}
-          EXTENSION: ${{ matrix.deno_target }}
-          TAQ_COMMAND: taqueria$EXTENSION
+          TAQ_COMMAND: taqueria${{ matrix.extension }}
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
           mkdir ./test_project
