@@ -3,6 +3,11 @@ name: binary tests
 on:
   push:
 
+env:
+  DENO_DIR: ./deno
+  DENO_TARGET: ${{ matrix.deno_target }}
+  TAQ_COMMAND: taqueria${{ matrix.extension }}
+
 jobs:
   build_taqueria_and_test:
     runs-on: ${{ matrix.os }}
@@ -14,12 +19,14 @@ jobs:
            deno_target: "x86_64-unknown-linux-gnu"
          - os: windows-latest
            deno_target: "x86_64-pc-windows-msvc"
+           extension: ".exe"
          - os: macOS-latest
            deno_target: "x86_64-apple-darwin"
 
     env:
       DENO_DIR: ./deno
       DENO_TARGET: ${{ matrix.deno_target }}
+      TAQ_COMMAND: taqueria${{ matrix.extension }}
 
     steps:
       - name: Setup repo
@@ -31,20 +38,24 @@ jobs:
           deno-version: "^1.0.0"
 
       - name: Build the binary file ${{ matrix.os }}
+        id: build-bin
+        shell: bash
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
           mkdir ./test_project
-          ./taqueria --version
-          ./taqueria init -p ./test_project
+          ./$TAQ_COMMAND --version
+          ./$TAQ_COMMAND -p ./test_project
           ls ./test_project
-        if: ${{ matrix.os != 'windows-latest' }}
+      #   if: ${{ matrix.os != 'windows-latest' }}
 
-      - name: Build the binary for ${{ matrix.os }}
-        run: |
-          deno compile --output taqueria --target x86_64-pc-windows-msvc --allow-run --allow-write --allow-read --allow-env index.ts 
-          mkdir ./test_project
-          ./taqueria.exe --version
-          ./taqueria.exe init -p ./test_project
-          ls ./test_project
-        if: ${{ matrix.os == 'windows-latest' }}
+      # - name: Build the binary for ${{ matrix.os }}
+      #   id: build-bin
+      #   run: |
+      #     deno compile --output taqueria --target x86_64-pc-windows-msvc --allow-run --allow-write --allow-read --allow-env index.ts 
+      #     mkdir ./test_project
+      #     ./taqueria.exe --version
+      #     ./taqueria.exe init -p ./test_project
+      #     ls ./test_project
+      #     echo ""
+      #   if: ${{ matrix.os == 'windows-latest' }}
 
