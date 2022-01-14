@@ -39,8 +39,8 @@ jobs:
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
           mkdir ./test_project
           ./$TAQ_COMMAND --version
-          ./$TAQ_COMMAND -p ./test_project
-          ls
+          ./$TAQ_COMMAND -p './test_project'
+          ls './test_project'
       #   if: ${{ matrix.os != 'windows-latest' }}
 
       # - name: Build the binary for ${{ matrix.os }}
