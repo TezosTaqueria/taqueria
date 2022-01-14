@@ -1,3 +1,9 @@
+// TODO - using .ts is necessary for Deno. Explore how to make this
+// consumable by Deno or the TypeScript compiler without any warnings
+// or errors emited
+// @ts-ignore
+import {SanitizedAbsPath, SHA256} from '../taqueria-utils/taqueria-utils-types.ts'
+
 /**
  * String-like types
  */
@@ -9,6 +15,9 @@ export abstract class StringLike {
     }
     static create (value: string) {
         return this.constructor.call(this, value)
+    }
+    public toString() {
+        return this.value
     }
 }
 
@@ -59,7 +68,7 @@ const verbType: unique symbol = Symbol()
 export class Verb extends StringLike {
     [verbType]: void
     static create(value: string): Verb | undefined {
-        const result = value.match(/^[A-Za-z-]+/)
+        const result = value.match(/^[A-Za-z\-\ ]+/)
         // TODO - should we do more validation whether its a verb?
         return result ? new Verb(result[0]) : undefined
     }
@@ -69,7 +78,7 @@ const commandType: unique symbol = Symbol()
 export class Command extends StringLike {
     [commandType]: void
     static create(value: string) : Command | undefined {
-        if (value.match(/^([A-Za-z-_]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/)) {
+        if (value.match(/^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/)) {
             return new Command(value)
         }
         return undefined   
@@ -120,6 +129,14 @@ export interface Config {
     readonly plugins: InstalledPlugin[]
     readonly contractsDir: string
     readonly testsDir: string
+    readonly artifactsDir: string
+}
+
+export interface ConfigArgs extends Config {
+    projectDir: SanitizedAbsPath,
+    configFile: SanitizedAbsPath,
+    
+    hash: SHA256
 }
 
 /**
@@ -127,12 +144,14 @@ export interface Config {
  */
 
 export interface UnvalidatedOption {
-    readonly shortFlag: string
+    readonly shortFlag?: string
     readonly flag: string
     readonly description: string
+    readonly defaultValue?: unknown
+    readonly choices?: string[]
+    readonly required?: boolean
+    readonly boolean?: boolean
 }
-
-export type UnvalidatedTaskOption = Option | undefined
 
 export interface UnvalidatedHook {
     // TODO
@@ -170,17 +189,23 @@ export class Scaffold {
     }
 }
 
+export type TaskHandler = "proxy" | string | string[]
+
 
 export interface UnvalidatedTask {
     readonly task: string
     readonly command: string
     readonly description: string
     readonly aliases?: string[]
-    readonly options?: UnvalidatedTaskOption[]
+    readonly options?: (UnvalidatedOption|Option|undefined)[],
+    readonly handler: "proxy" | string | string[]
+    readonly hidden?: boolean
+    readonly example?: string
 }
 
 export interface UnvalidatedPluginInfo {
     readonly schema: string
+    readonly name: string
     readonly version: string
     readonly tasks?: (UnvalidatedTask|undefined)[]
     readonly scaffolds?: (UnvalidatedScaffold|undefined)[]
@@ -191,14 +216,16 @@ export interface UnvalidatedPluginInfo {
 
 export class PluginInfo {
     readonly schema: string
+    readonly name: string
     readonly version: string
     readonly tasks: Task[]
     readonly scaffolds: Scaffold[]
     readonly hooks: Hook[]
     readonly networks: Network[]
     readonly sandboxes: Sandbox[]
-    constructor(schema: string, version: string, tasks: Task[], scaffolds: Scaffold[], hooks: Hook[], networks: Network[], sandboxes: Sandbox[]) {
+    constructor(schema: string, name: string, version: string, tasks: Task[], scaffolds: Scaffold[], hooks: Hook[], networks: Network[], sandboxes: Sandbox[]) {
         this.schema = schema
+        this.name = name
         this.version = version
         this.tasks = tasks
         this.scaffolds = scaffolds
@@ -213,7 +240,7 @@ export class PluginInfo {
                 if (unvalidatedItem) {
                     try {
                         const item = factory(unvalidatedItem)
-                        return item ? {...retval, item} : retval
+                        return item ? [...retval, item]: retval
                     }
                     catch (_) {
                         return retval
@@ -228,10 +255,15 @@ export class PluginInfo {
     static create(obj: UnvalidatedPluginInfo) : PluginInfo | undefined {
         if (obj.version && obj.schema) {
             try {
+                const createTask = Task.create.bind(Task)
+                const createScaffold = Scaffold.create.bind(Scaffold)
+                //TODO: Finish doing the above for each factory/constructor
+
                 const pluginInfo : PluginInfo = {
+                    name: obj.name,
                     schema: obj.schema,
                     version: obj.version,
-                    tasks: this.convert(Task.create) (obj, "tasks"),
+                    tasks: this.convert(createTask) (obj, "tasks"),
                     hooks: this.convert(Hook.create) (obj, "hooks"),
                     scaffolds: this.convert(Scaffold.create) (obj, "scaffolds"),
                     networks: this.convert(Network.create) (obj, "networks"),
@@ -250,21 +282,36 @@ export class PluginInfo {
 const optionType: unique symbol = Symbol()
 export class Option {
     [optionType]: void
-    readonly shortFlag: SingleChar
+    readonly shortFlag?: SingleChar
     readonly flag: Verb
     readonly description: string
-    private constructor(shortFlag: SingleChar, flag: Verb, description: string) {
+    readonly defaultValue?: unknown
+    readonly choices?: string[]
+    readonly required?: boolean
+    readonly boolean?: boolean
+    private constructor(shortFlag: SingleChar | undefined, flag: Verb, description: string, defaultValue: unknown, choices: string[], required: boolean, boolean: boolean) {
         this.shortFlag = shortFlag
         this.flag = flag
         this.description = description
+        this.defaultValue = defaultValue
+        this.required = required
+        this.choices = choices
+        this.boolean = boolean
     }
     static create(option: UnvalidatedOption): Option | undefined {
-        const shortFlag = SingleChar.create(option.shortFlag)
         const flag = Verb.create(option.flag)
 
-        return (shortFlag && flag)
-            ? new Option(shortFlag, flag, option.description)
-            : undefined
+        if (!option.shortFlag && flag)
+            return new Option(undefined, flag, option.description, option.defaultValue, option.choices || [], option.required || false, option.boolean ? true : false)
+
+        if (option.shortFlag && flag) {
+            const shortFlag = SingleChar.create(option.shortFlag)
+            return shortFlag
+                ? new Option(shortFlag, flag, option.description, option.defaultValue, option.choices || [], option.required || false, option.boolean ? true : false)
+                : undefined
+        }
+
+        return undefined
     }
 }
 
@@ -275,31 +322,58 @@ export class Option {
      readonly command: Command
      readonly aliases: Alias[]
      readonly description: string
+     readonly example?: string
      readonly options?: Option[]
-     protected constructor(name: Verb, command: Command, description: string, options: Option[]=[], aliases: Alias[]=[]) {
+     readonly handler: TaskHandler
+     readonly hidden: boolean
+     protected constructor(name: Verb, command: Command, description: string, handler: TaskHandler, options: Option[]=[], aliases: Alias[]=[], hidden=false, example?: string) {
          this.task = name
          this.command = command
          this.description = description
          this.options = options
          this.aliases = aliases
+         this.handler = handler
+         this.hidden = hidden
+         this.example = example
      }
      static createAlias(value: string): Alias | undefined {
         return Verb.create(value) || SingleChar.create(value)
     }
 
-     static create(task: UnvalidatedTask): Task | undefined {
-         const name = Verb.create(task.task)
-         const command = Command.create(task.command)
-         const aliases = task.aliases ? task.aliases.map(this.createAlias).filter(alias => alias!= undefined) : []
-         const options = !task.options ? [] : task.options.reduce(
-             (retval: Option[], option: Option | undefined) => option ? [...retval, option] : retval,
-             []
-         )
-         return name && command && aliases && options
-             ? new Task(name, command, task.description, options, aliases as Alias[])
-             : undefined
-    }
- }
+     static create (task: UnvalidatedTask): Task | undefined {
+        const name = Verb.create(task.task)
+        const command = Command.create(task.command)
+        const aliases = task.aliases
+            ? task.aliases.reduce(
+                (retval: Alias[], unvalidatedAlias) => {
+                    const alias  = this.createAlias(unvalidatedAlias)
+                    return alias ? [...retval, alias] : retval
+                },
+                []
+            )
+            : []
+
+        const options = !task.options ? [] : task.options.reduce(
+            (retval: Option[], option) => {
+                if (option instanceof Option) {
+                    return [...retval, option]
+                }
+                else if (option === undefined) {
+                    return retval
+                }
+                else {
+                    const validOption = Option.create(option as UnvalidatedOption)
+                    return validOption ? [...retval, validOption] : retval
+                }
+            },
+            []
+        )
+
+        return name && command
+            ? new Task(name, command, task.description, task.handler, options, aliases, task.hidden ? true : false, task.example)
+            : undefined
+        }
+}
 
 export interface RuntimeDependency {
     readonly name: string,
@@ -382,3 +456,5 @@ export interface Environment {
     readonly name: string
     readonly use: Sandbox | Network
 }
+
+export type Action = "checkRuntimeDependencies" | "installRuntimeDependencies" | "proxy" | "pluginInfo" | string

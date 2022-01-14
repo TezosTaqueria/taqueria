@@ -1,6 +1,8 @@
-import {Plugin, Task, Option, binary} from 'taqueria-sdk'
+import {Plugin, Task, Option} from 'taqueria-sdk'
+import compile from './compile'
 
 Plugin.create(i18n => ({
+    name: "smartpy",
     schema: "1.0",
     version: "0.1",
     tasks: [
@@ -10,7 +12,7 @@ Plugin.create(i18n => ({
             aliases: ["c", "compile-smartpy"],
             description: "Compile a smart contract written in a SmartPy syntax to Michelson code",
             options: [],
-            handler: binary("SmartPy.sh %entry-point% %syntax% %infer% %sourceFile% %contractsDir%")
+            handler: "proxy"
         }),
         Task.create({
             task: "teapot",
@@ -21,10 +23,11 @@ Plugin.create(i18n => ({
                 Option.create({
                     shortFlag: "g",
                     flag: "green",
-                    description: "Make green tea instead"
+                    description: "Make green tea instead",
+                    boolean: true // TODO: Why isn't this working?
                 })
             ],
-            handler: "proxy"
+            handler: `echo "I'm a little teapot <%= it.green ? "full of green tea!" : "!" %>"`
         })
     ],
     checkRuntimeDependencies: () => Promise.resolve({
@@ -37,10 +40,5 @@ Plugin.create(i18n => ({
         status: "success",
         output: "Ligo was found in /usr/bin/ligo" // TODO this should use i18n
     }),
-    proxy: parsedArgs => Promise.resolve({
-        status: "success",
-        stdout: "Proxied successfully",
-        stderr: "",
-        artifacts: []
-    })
+    proxy: compile
 }), process.argv)

@@ -104,11 +104,14 @@ dist
 .tern-port
 
 # Project specific
+.DS_Store
 node_modules
 /deno
 .vscode
+.idea
 .parcel-cache
 /taqueria
+tests/coverage
 /taqueria-sdk/index.js
 /taqueria-sdk/index.js.map
 /taqueria-plugin-smartpy/index.js
