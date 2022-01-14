@@ -3,10 +3,6 @@ name: binary tests
 on:
   push:
 
-env:
-  DENO_DIR: ./deno
-  DENO_TARGET: ${{ matrix.deno_target }}
-
 jobs:
   build_taqueria_and_test:
     runs-on: ${{ matrix.os }}
@@ -20,6 +16,10 @@ jobs:
            deno_target: "x86_64-pc-windows-msvc"
          - os: macOS-latest
            deno_target: "x86_64-apple-darwin"
+
+    env:
+      DENO_DIR: ./deno
+      DENO_TARGET: ${{ matrix.deno_target }}
 
     steps:
       - name: Setup repo
