@@ -334,7 +334,15 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
         };
     }
 
+    // chest
+    if(node.prim === 'chest'){
+        throw new Error('Not Implemented: chest');
+    }
+    if(node.prim === 'chest_key'){
+        throw new Error('Not Implemented: chest_key');
+    }
 
+    // never
     if (node.prim === `never`
     ) {
         return {
@@ -342,6 +350,7 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
             raw: node,
         };
     }
+
 
     // Unknown
     assertExhaustive(node, `Unknown type`);

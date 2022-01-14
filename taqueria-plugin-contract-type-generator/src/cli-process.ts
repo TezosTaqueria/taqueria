@@ -44,11 +44,13 @@ const getAllFiles = async (rootPath: string, filter: (fullPath: string) => boole
 
 export const generateContractTypesProcessContractFiles = async ({
     inputTzContractDirectory,
+    inputFiles,
     outputTypescriptDirectory,
     format,
     typeAliasMode,
 }: {
     inputTzContractDirectory: string;
+    inputFiles?: string[];
     outputTypescriptDirectory: string;
     format: 'tz' | 'json',
     typeAliasMode: 'local' | 'file' | 'library' | 'simple',
@@ -57,7 +59,9 @@ export const generateContractTypesProcessContractFiles = async ({
     console.log(`Generating Types: ${path.resolve(inputTzContractDirectory)} => ${path.resolve(outputTypescriptDirectory)}`);
 
     const ext = '.' + format;
-    const files = await getAllFiles(inputTzContractDirectory, x => x.endsWith(ext));
+    const filesAll = await getAllFiles(inputTzContractDirectory, x => x.endsWith(ext));
+    const files = inputFiles ? filesAll.filter(f => inputFiles.some(inputFile => f.endsWith(inputFile))) : filesAll;
+
     console.log(`Contracts Found: ${[``, ...files].join(`\n\t- `)}`);
 
     const typeAliasImportPath = `@taquito/contract-type-generator`;

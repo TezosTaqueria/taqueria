@@ -1,23 +1,35 @@
 import { SanitizedArgs, ActionResponse, Failure, LikeAPromise, ProxyAction } from "taqueria-sdk/types";
 import glob from 'fast-glob'
-import {join} from 'path'
-import { TezosToolkit } from '@taquito/taquito';
-import { InMemorySigner, importKey } from '@taquito/signer';
-import {readFile} from 'fs/promises'
+import { join } from 'path'
+import { generateContractTypesProcessContractFiles } from "./src/cli-process";
 
-type Opts = SanitizedArgs & Record<string, unknown>
+type PluginOpts = {
+    // TODO: Document these
+    typescriptDir: string,
+    typeAliasMode?: 'local' | 'file' | 'library' | 'simple',
+};
+type Opts = SanitizedArgs & Record<string, unknown>;
 
 const getContractAbspath = (contractFilename: string, parsedArgs: Opts) => 
     join(parsedArgs.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`)
 
 
-const generateContractTypes = (parsedArgs: Opts) => async (contractFilename: string) : Promise<string> => {
-    const contractAbspath = getContractAbspath(contractFilename, parsedArgs)
+const generateContractTypes = (parsedArgs: Opts & PluginOpts) => async (contractFilename: string) : Promise<string> => {
+    const contractAbspath = getContractAbspath(contractFilename, parsedArgs);
+    await generateContractTypesProcessContractFiles({
+        inputTzContractDirectory: parsedArgs.artifactsDir,
+        inputFiles: [contractAbspath],
+        outputTypescriptDirectory: parsedArgs.typescriptDir,
+        format: 'tz',
+        typeAliasMode: parsedArgs.typeAliasMode ?? 'simple',
+    });
+
+    return `${contractFilename}: Types generated`;
 
     // TODO: Generate contract michelson
     // TODO: Generate types from michelson
     
-    throw new Error('Not Implemented');
+    // throw new Error('Not Implemented');
 
     // // TODO: Should getting the default environment be provided by the SDK or the framework?
     // const currentEnv = parsedArgs.env
@@ -64,14 +76,23 @@ const generateContractTypes = (parsedArgs: Opts) => async (contractFilename: str
     // })
 }
 
-const generateContractTypesAll = (parsedArgs: Opts) : Promise<string[]> =>
+const generateContractTypesAll = (parsedArgs: Opts & PluginOpts) : Promise<string[]> =>
     glob("**/*.tz", {cwd: parsedArgs.artifactsDir})
     .then(files => Promise.all(files.map(generateContractTypes(parsedArgs))))
 
 export const generateTypes = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse, Failure<T>> => {
-    const p = parsedArgs.contract
-        ? generateContractTypes(parsedArgs) (parsedArgs.contract as string)
-        : generateContractTypesAll(parsedArgs)
+    if(!parsedArgs.typescriptDir){
+        return Promise.reject({
+            status: 'failed',
+            stderr: `No typescriptDir configured`,
+            stdout: ""
+        });
+    }
+    const argsTyped = parsedArgs as Opts & PluginOpts;
+
+    const p = argsTyped.contract
+        ? generateContractTypes(argsTyped) (argsTyped.contract as string)
+        : generateContractTypesAll(argsTyped)
 
     return p.then(data => ({
         status: 'success',
