@@ -30,7 +30,7 @@ jobs:
         with:
           deno-version: "^1.0.0"
 
-      - name: Build the binary for ${{ matrix.os }}
+      - name: Build the binary file ${{ matrix.os }}
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
           mkdir ./test_project
@@ -41,7 +41,7 @@ jobs:
 
       - name: Build the binary for ${{ matrix.os }}
         run: |
-          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
+          deno compile --output taqueria --target %DENO_TARGET% --allow-run --allow-write --allow-read --allow-env index.ts 
           mkdir ./test_project
           ./taqueria.exe --version
           ./taqueria.exe init -p ./test_project
