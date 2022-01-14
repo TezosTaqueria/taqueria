@@ -75,5 +75,5 @@
 }
 
 .signupButton:hover {
-	cursor: pointer;
+	cursor: pointer !important;
 }
