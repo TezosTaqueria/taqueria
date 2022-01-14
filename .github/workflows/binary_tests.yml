@@ -41,7 +41,7 @@ jobs:
 
       - name: Build the binary for ${{ matrix.os }}
         run: |
-          deno compile --output taqueria --target %DENO_TARGET% --allow-run --allow-write --allow-read --allow-env index.ts 
+          deno compile --output taqueria --target x86_64-pc-windows-msvc --allow-run --allow-write --allow-read --allow-env index.ts 
           mkdir ./test_project
           ./taqueria.exe --version
           ./taqueria.exe init -p ./test_project
