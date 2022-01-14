@@ -42,7 +42,7 @@ jobs:
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
           mkdir ./test_project
-          project_init=$(./"$TAQ_BIN" -p ./test_project)
+          project_init=$(./"$TAQ_BIN" init -p ./test_project)
           echo "$project_init"
           [[ "$project_init" == "Project taq'ified" ]]
 
