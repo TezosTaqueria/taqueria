@@ -38,7 +38,7 @@ jobs:
           ./taqueria --version
           ./taqueria init -p ./test_project
           ls ./test_project
-        if: ${{ matrix.os != "windows-latest" }}
+        if: ${{ matrix.os != 'windows-latest' }}
 
       - name: Build the binary for ${{ matrix.os }}
         run: |
