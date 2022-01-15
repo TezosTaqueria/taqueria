@@ -6,8 +6,27 @@ on:
       - main
 
 jobs:
-  build_taqueria_and_upload:
-    runs-on: ubuntu-latest
+  build_taqueria_and_test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+       include:
+         - os: ubuntu-latest
+           deno_target: "x86_64-unknown-linux-gnu"
+           taqueria_bin: "taqueria"
+         - os: windows-latest
+           deno_target: "x86_64-pc-windows-msvc"
+           taqueria_bin: "taqueria.exe"
+         - os: macOS-latest
+           deno_target: "x86_64-apple-darwin"
+           taqueria_bin: "taqueria"
+
+    env:
+      DENO_DIR: ./deno
+      DENO_TARGET: ${{ matrix.deno_target }}
+      TAQ_BIN: ${{ matrix.taqueria_bin }}
+
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
@@ -16,14 +35,18 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: "^1.0.0"
-      
-      - name: Build taqueria
-        run: ./bin/build.sh
 
-      - name: Upload Taqueria Binary 
+      - name: Build the binary for ${{ matrix.os }}
+        id: build-bin
+        shell: bash
+        run: |
+          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
+          [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
+
+      - name: Upload the binary for ${{ matrix.os }} 
         uses: actions/upload-artifact@v2
         if: success()
         with:
-          name: taqueria
-          path: ${GITHUB_WORKSPACE}/taqueria
+          name: taqueria.${{matrix.deno_target}}
+          path: ${{ matrix.taqueria_bin }}
           retention-days: 1
