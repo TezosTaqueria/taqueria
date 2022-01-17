@@ -65,7 +65,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           registry-url: 'https://npm.pkg.github.com'
-      - run: $(pwd)
       - run: npm install
       - run: npm publish
         env: 
