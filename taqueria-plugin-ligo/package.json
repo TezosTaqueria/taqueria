@@ -11,8 +11,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "private": true,
-  "repository": "git://https://github.com/ecadlabs/taqueria.git",
 
   "dependencies": {
     "fast-glob": "^3.2.7",
