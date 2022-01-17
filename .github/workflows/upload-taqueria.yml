@@ -53,7 +53,7 @@ jobs:
   
   publish_packages:
     needs: build_taqueria_and_test
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-latest
     permissions:
       packages: write
       contents: read
