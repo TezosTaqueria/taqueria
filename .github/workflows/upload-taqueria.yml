@@ -57,15 +57,17 @@ jobs:
     defaults:
       run:
         working-directory: taqueria-plugin-ligo
-    # permissions:
-    #   packages: write
-    #   contents: read
+    permissions:
+      packages: write
+      contents: read
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
+          scope: '@taqueria'
+      - run: npm --version
       - run: npm install
       - run: npm publish
         env: 
