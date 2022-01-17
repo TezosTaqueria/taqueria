@@ -12,6 +12,10 @@
   "author": "",
   "license": "ISC",
 
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/ecadlabs"
+  },
+
   "dependencies": {
     "fast-glob": "^3.2.7",
     "taqueria-sdk": "file:../taqueria-sdk"
