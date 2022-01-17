@@ -1,5 +1,5 @@
 {
-  "name": "taqueria-plugin-ligo",
+  "name": "@taqueria/taqueria-plugin-ligo",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -11,6 +11,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "private": true,
+  "repository": "git://https://github.com/ecadlabs/taqueria.git",
+
   "dependencies": {
     "fast-glob": "^3.2.7",
     "taqueria-sdk": "file:../taqueria-sdk"

@@ -50,3 +50,23 @@ jobs:
           name: taqueria.${{matrix.deno_target}}
           path: ${{ matrix.taqueria_bin }}
           retention-days: 1
+  
+  publish_packages:
+    runs_on: ubuntu-latest
+      needs: build_taqueria_and_test
+      permissions:
+        packages: write
+        contents: read
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions/setup-node@v2
+          with:
+            registry-url: 'https://npm.pkg.github.com'
+        - run: cd taqueria-plugin-ligo
+        - run: npm install
+        - run: npm publish
+          env: 
+            NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
