@@ -56,17 +56,16 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        shell: bash
         working-directory: taqueria-plugin-ligo
-    permissions:
-      packages: write
-      contents: read
+    # permissions:
+    #   packages: write
+    #   contents: read
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           registry-url: 'https://npm.pkg.github.com'
-      - run: pwd
+      - run: $(pwd)
       - run: npm install
       - run: npm publish
         env: 
