@@ -76,7 +76,7 @@ jobs:
           echo "PUBLIC_URL=https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
           echo "::set-output name=${{ matrix.artifact }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
   
-  update_PR:
+  pr_comment:
     runs-on: ubuntu-latest
     needs:
       - build-and-test
@@ -87,8 +87,16 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
+            const artifacts = ${{ needs.build-and-test.outputs }}
             
-            console.log(${{ toJSON(needs.build-and-test.outputs) }})
+            let body = `Download the latest artifact(s) for this pull request here:\n`
+            
+            for (const artifact of artifacts) {
+              body += `\n* ${artifact} `
+            }
+
+            console.log($body)
+            
   test-urls:
     runs-on: ubuntu-latest
     needs:
