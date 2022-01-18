@@ -63,10 +63,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
-        with:
+        with: 
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@ecadlabs'
+          # scope: '@ecadlabs'
       - run: ls -al
       - run: npm install
       - run: cat /home/runner/work/_temp/.npmrc
