@@ -31,22 +31,22 @@ jobs:
       - name: Setup repo
         uses: actions/checkout@v2
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: "^1.0.0"
+      # - name: Setup Deno
+      #   uses: denoland/setup-deno@v1
+      #   with:
+      #     deno-version: "^1.0.0"
 
-      - name: Build the binary for ${{ matrix.os }}
-        id: build-bin
-        shell: bash
-        run: |
-          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
-          [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
+      # - name: Build the binary for ${{ matrix.os }}
+      #   id: build-bin
+      #   shell: bash
+      #   run: |
+      #     deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
+      #     [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
 
-      - name: Upload the binary for ${{ matrix.os }} 
-        uses: actions/upload-artifact@v2
-        if: success()
-        with:
-          name: taqueria.${{matrix.deno_target}}
-          path: ${{ matrix.taqueria_bin }}
-          retention-days: 1
+      # - name: Upload the binary for ${{ matrix.os }} 
+      #   uses: actions/upload-artifact@v2
+      #   if: success()
+      #   with:
+      #     name: taqueria.${{matrix.deno_target}}
+      #     path: ${{ matrix.taqueria_bin }}
+      #     retention-days: 1
