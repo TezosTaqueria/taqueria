@@ -53,8 +53,6 @@ jobs:
   publish_packages:
     needs: build_taqueria_and_test
     runs-on: ubuntu-latest
-    env:
-      SCOPE: '@ecadlabs'
     defaults:
       run:
         working-directory: taqueria-plugin-ligo
@@ -67,9 +65,9 @@ jobs:
         with: 
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
-          scope: $SCOPE
+          scope: '@ecadlabs'
       - run: | 
-          contents=$(jq '.name |= $SCOPE + .' package.json) && 
+          contents=$(jq '.name |= @ecadlabs + .' package.json) && 
           echo ${contents} > package.json
       - run: cat package.json
       - run: npm install
