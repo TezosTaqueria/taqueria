@@ -11,11 +11,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  
   "repository": {
     "type": "git",
     "url": "https://github.com/ecadlabs/taqueria.git",
     "directory": "taqueria-plugin-ligo"
   },
+
   "dependencies": {
     "fast-glob": "^3.2.7",
     "taqueria-sdk": "file:../taqueria-sdk"
