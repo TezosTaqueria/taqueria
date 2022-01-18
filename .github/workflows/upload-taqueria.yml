@@ -75,7 +75,7 @@ jobs:
         id: public-url
         run: |
           echo "PUBLIC_URL=https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
-          echo '::set-output name=${{ matrix.artifact }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}
+          echo "::set-output name=${{ matrix.artifact }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
   test-urls:
     runs-on: ubuntu-latest
