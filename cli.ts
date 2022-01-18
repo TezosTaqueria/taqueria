@@ -228,7 +228,8 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
 
             // console.log(cmd.join(' '))
 
-            const process = Deno.run({cmd, stdout: "piped", stderr: "piped"})
+            const altCmd = ['sh', '-c', cmd.join(' ')]
+            const process = Deno.run({cmd: altCmd, stdout: "piped", stderr: "piped"})
             const output = await process.output()
             const error = await process.stderrOutput()
             const decoder = new TextDecoder()
