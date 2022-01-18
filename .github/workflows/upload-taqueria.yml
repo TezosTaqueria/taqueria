@@ -67,8 +67,9 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@ecadlabs'
-      - run: cat .npmrc
+      - run: ls -al
       - run: npm install
+      - run: cat /home/runner/work/_temp/.npmrc
       - run: npm publish
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
