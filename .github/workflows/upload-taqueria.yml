@@ -29,12 +29,13 @@ jobs:
            artifact: "c"
 
     outputs:
-      public-url-a: ${{ steps.public-url.outputs.a }}
-      public-url-b: ${{ steps.public-url.outputs.b }}
-      public-url-c: ${{ steps.public-url.outputs.c }}
+      public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
+      public-url-windows: ${{ steps.public-url.outputs.windows }}
+      public-url-macOS: ${{ steps.public-url.outputs.macOS }}
 
     env:
       DENO_DIR: ./deno
+      OS: ${{ matrix.os }}
       DENO_TARGET: ${{ matrix.deno_target }}
       TAQ_BIN: ${{ matrix.taqueria_bin }}
 
@@ -73,8 +74,8 @@ jobs:
       - name: Set public url
         id: public-url
         run: |
-          echo "PUBLIC_URL=https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
-          echo "::set-output name=${{ matrix.artifact }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
+          OS="${OS%-*}"
+          echo "::set-output name=$OS::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
   
   pr_comment:
     runs-on: ubuntu-latest
@@ -87,7 +88,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const artifacts = await github.paginate(${{ needs.build-and-test.outputs }})
+            const artifacts = Object.entries(${{ needs.build-and-test.outputs }})
             
             let body = `Download the latest artifact(s) for this pull request here:\n`
             
