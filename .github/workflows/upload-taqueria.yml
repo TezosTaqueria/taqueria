@@ -87,7 +87,7 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const artifacts = ${{ needs.build-and-test.outputs }}
+            const artifacts = await github.paginate(${{ needs.build-and-test.outputs }})
             
             let body = `Download the latest artifact(s) for this pull request here:\n`
             
