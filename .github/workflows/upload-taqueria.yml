@@ -1,13 +1,12 @@
 name: upload-taqueria
 
 on: 
-  push:
-  # pull_request:
-  #   branches:
-  #     - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build_taqueria_and_test:
+  build-and-test:
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -76,7 +75,20 @@ jobs:
         run: |
           echo "PUBLIC_URL=https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
           echo "::set-output name=${{ matrix.artifact }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
-
+  
+  update_PR:
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-test
+    steps:
+      - name: create comment
+        uses: actions/github-script@v5
+        id: create-comment
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            
+            console.log(${{ toJSON(needs.build-and-test.outputs) }})
   test-urls:
     runs-on: ubuntu-latest
     needs:
