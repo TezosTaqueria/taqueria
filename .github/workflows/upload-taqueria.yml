@@ -19,15 +19,15 @@ jobs:
          - os: ubuntu-latest
            deno_target: "x86_64-unknown-linux-gnu"
            taqueria_bin: "taqueria"
-           artifact: 1
+           artifact: "1"
          - os: windows-latest
            deno_target: "x86_64-pc-windows-msvc"
            taqueria_bin: "taqueria.exe"
-           artifact: 2
+           artifact: "2"
          - os: macOS-latest
            deno_target: "x86_64-apple-darwin"
            taqueria_bin: "taqueria"
-           artifact: 3
+           artifact: "3"
 
     outputs:
       public-url-1: ${{ steps.public-url.outputs.1 }}
