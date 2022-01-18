@@ -65,13 +65,10 @@ jobs:
         with: 
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@ecadlabs'
       - run: | 
           contents=$(jq '.name |= "@ecadlabs/" + .' package.json) && \
           echo ${contents} > package.json
-      - run: cat package.json
       - run: npm install
-      - run: cat /home/runner/work/_temp/.npmrc
       - run: npm publish
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
