@@ -62,6 +62,9 @@ jobs:
         with:
           path: "taqueria.${{matrix.deno_target}}"
           destination: "taqueria-artifacts/${{github.ref}}/${{github.sha}}"
+
+      - name: Get public URL
+        run: echo "PUBLIC_URL=https://storage.googleapis.com/${{ steps.upload-file.outputs.uploaded }}"
       #
 
       # - name: Upload the binary for ${{ matrix.os }} 
