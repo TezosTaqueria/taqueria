@@ -60,7 +60,7 @@ jobs:
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
           path: "${{ matrix.taqueria_bin }}"
-          destination: 'bucket-name/${GITHUB_REF}/${GITHUB_SHA}/taqueria.${{matrix.deno_target}}'
+          destination: 'taqueria-artifacts/$GITHUB_REF/$GITHUB_SHA/taqueria.${{matrix.deno_target}}'
       #
 
       # - name: Upload the binary for ${{ matrix.os }} 
