@@ -8,6 +8,9 @@ on:
 
 jobs:
   build_taqueria_and_test:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
