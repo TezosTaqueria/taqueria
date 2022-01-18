@@ -46,7 +46,7 @@ jobs:
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
           [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
-          mv "${{ matrix.taqueria_bin }}" "taqueria.${{matrix.deno_target}}"
+          mv "${TAQ_BIN}" "taqueria.${{matrix.deno_target}}.${TAQ_BIN##*.}"
 
       - name: Authenticate with GCP
         id: gcp_auth
