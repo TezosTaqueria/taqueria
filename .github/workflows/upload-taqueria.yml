@@ -1,9 +1,10 @@
 name: upload-taqueria
 
 on: 
-  pull_request:
-    branches:
-      - main
+  push:
+  # pull_request:
+  #   branches:
+  #     - main
 
 jobs:
   build_taqueria_and_test:
