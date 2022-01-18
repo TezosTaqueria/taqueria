@@ -67,7 +67,6 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
           scope: '@taqueria'
-      - run: npm --version
       - run: npm install
       - run: npm publish
         env: 
