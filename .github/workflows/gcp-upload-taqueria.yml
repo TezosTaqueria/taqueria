@@ -17,6 +17,5 @@ jobs:
         service_account: github-storage-service-account@tez-ie.iam.gserviceaccount.com
     - id: gcloud_list_test
       name: gcloud_list_test
-      run: |-
-        gcloud auth login --brief --cred-file="${{ steps.gcp_auth.outputs.credentials_file_path }}"
+      run: |
         gcloud services list
