@@ -16,26 +16,25 @@ jobs:
       matrix:
        include:
          - os: ubuntu-latest
+           os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
            taqueria_bin: "taqueria"
-           artifact: "a"
          - os: windows-latest
+           os_short: windows
            deno_target: "x86_64-pc-windows-msvc"
            taqueria_bin: "taqueria.exe"
-           artifact: "b"
          - os: macOS-latest
+           os_short: macos
            deno_target: "x86_64-apple-darwin"
            taqueria_bin: "taqueria"
-           artifact: "c"
 
     outputs:
       public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
       public-url-windows: ${{ steps.public-url.outputs.windows }}
-      public-url-macOS: ${{ steps.public-url.outputs.macOS }}
+      public-url-macos: ${{ steps.public-url.outputs.macos }}
 
     env:
       DENO_DIR: ./deno
-      OS: ${{ matrix.os }}
       DENO_TARGET: ${{ matrix.deno_target }}
       TAQ_BIN: ${{ matrix.taqueria_bin }}
 
@@ -74,7 +73,7 @@ jobs:
       - name: Set public url
         id: public-url
         run: |
-          echo "::set-output name=${OS%-*}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
+          echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
   
   pr_comment:
     runs-on: ubuntu-latest
