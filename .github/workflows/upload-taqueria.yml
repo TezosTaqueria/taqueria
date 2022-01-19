@@ -75,16 +75,21 @@ jobs:
         id: get-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          stuff=$(npm show @ecadlabs/taqueria-plugin-ligo --json | jq .version)
-          echo "::set-output name=version::${stuff}"
+        run: echo "::set-output name=version::$(npm show @ecadlabs/taqueria-plugin-ligo --json | jq .version)"
 
       - run: echo ${{ steps.get-package-version.outputs.version }}
 
-      # - run: npm install
-      # - run: npm publish
-      #   env: 
-      #     NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: npm install
+ 
+      - run: |
+        echo "${{ steps.get-package-version.outputs.version }}"
+        echo "${{ $(jq .version package.json) }}"
+        echo "${{ ${{ steps.get-package-version.outputs.version }} > $(jq .version package.json) }}"
+
+      - run: npm publish
+        if: steps.get-package-version.outputs.version > $(jq .version package.json)
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
 
