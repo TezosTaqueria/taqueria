@@ -53,7 +53,7 @@ jobs:
         run: |
           deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
           [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
-          mv "${TAQ_BIN}" "taqueria.${{matrix.deno_target}}"
+          mv "${TAQ_BIN}" "taqueria.${{ matrix.deno_target }}"
 
       - name: Authenticate with GCP
         id: gcp-auth
@@ -66,8 +66,8 @@ jobs:
         id: upload-file
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
-          path: "taqueria.${{matrix.deno_target}}"
-          destination: "taqueria-artifacts/${{github.ref}}/${{github.sha}}"
+          path: "taqueria.${{ matrix.deno_target }}"
+          destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}"
 
       - name: Set public url
         id: public-url
@@ -83,9 +83,8 @@ jobs:
         uses: actions/github-script@v5
         id: pr-comment
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const artifacts = Object.entries(${{ needs.build-and-test.outputs }})
             
             let body = `
               | Artifacts |
