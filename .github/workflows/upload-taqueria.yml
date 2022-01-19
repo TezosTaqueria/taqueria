@@ -6,52 +6,52 @@ on:
       - main
 
 jobs:
-  build_taqueria_and_test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-       include:
-         - os: ubuntu-latest
-           deno_target: "x86_64-unknown-linux-gnu"
-           taqueria_bin: "taqueria"
-         - os: windows-latest
-           deno_target: "x86_64-pc-windows-msvc"
-           taqueria_bin: "taqueria.exe"
-         - os: macOS-latest
-           deno_target: "x86_64-apple-darwin"
-           taqueria_bin: "taqueria"
+  # build_taqueria_and_test:
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #      include:
+  #        - os: ubuntu-latest
+  #          deno_target: "x86_64-unknown-linux-gnu"
+  #          taqueria_bin: "taqueria"
+  #        - os: windows-latest
+  #          deno_target: "x86_64-pc-windows-msvc"
+  #          taqueria_bin: "taqueria.exe"
+  #        - os: macOS-latest
+  #          deno_target: "x86_64-apple-darwin"
+  #          taqueria_bin: "taqueria"
 
-    env:
-      DENO_TARGET: ${{ matrix.deno_target }}
-      TAQ_BIN: ${{ matrix.taqueria_bin }}
+  #   env:
+  #     DENO_TARGET: ${{ matrix.deno_target }}
+  #     TAQ_BIN: ${{ matrix.taqueria_bin }}
 
-    steps:
-      - name: Setup repo
-        uses: actions/checkout@v2
+  #   steps:
+  #     - name: Setup repo
+  #       uses: actions/checkout@v2
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: "^1.0.0"
+  #     - name: Setup Deno
+  #       uses: denoland/setup-deno@v1
+  #       with:
+  #         deno-version: "^1.0.0"
 
-      - name: Build the binary for ${{ matrix.os }}
-        id: build-bin
-        shell: bash
-        run: |
-          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
-          [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
+  #     - name: Build the binary for ${{ matrix.os }}
+  #       id: build-bin
+  #       shell: bash
+  #       run: |
+  #         deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
+  #         [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
 
-      - name: Upload the binary for ${{ matrix.os }} 
-        uses: actions/upload-artifact@v2
-        if: success()
-        with:
-          name: taqueria.${{matrix.deno_target}}
-          path: ${{ matrix.taqueria_bin }}
-          retention-days: 1
+  #     - name: Upload the binary for ${{ matrix.os }} 
+  #       uses: actions/upload-artifact@v2
+  #       if: success()
+  #       with:
+  #         name: taqueria.${{matrix.deno_target}}
+  #         path: ${{ matrix.taqueria_bin }}
+  #         retention-days: 1
   
   publish_packages:
-    needs: build_taqueria_and_test
+    # needs: build_taqueria_and_test
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -66,16 +66,20 @@ jobs:
         with: 
           node-version: '16.x'
           registry-url: 'https://npm.pkg.github.com'
+      
       - run: | 
           contents=$(jq '.name |= "@ecadlabs/" + .' package.json) && \
           echo ${contents} > package.json
 
-      - run: npm show @ecadlabs/taqueria-plugin-ligo
+      - name: get npm registry version
+        id: get-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: cat .npmrc
+        run: echo "::set-output name=version::$(npm show @ecadlabs/taqueria-plugin-ligo --json)"
 
-      - run: npm install
+      - run: echo ${{ steps.get-package-version.outputs.version }} | jq .
+
+      # - run: npm install
       # - run: npm publish
       #   env: 
       #     NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
