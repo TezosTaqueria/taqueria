@@ -59,9 +59,8 @@ jobs:
         id: gcp-auth
         uses: google-github-actions/auth@v0
         with:
-          # TODO: Use secrets
-          workload_identity_provider: projects/108868714658/locations/global/workloadIdentityPools/github-actions-storage-pool/providers/github-actions-oidc-provider
-          service_account: github-storage-service-account@tez-ie.iam.gserviceaccount.com
+          workload_identity_provider: "projects/${{ secrets.GCP_PROJECT }}/locations/global/workloadIdentityPools/github-actions-storage-pool/providers/github-actions-oidc-provider"
+          service_account: "${{ secrets.GCP_SERVICE_ACCOUNT }}@tez-ie.iam.gserviceaccount.com"
 
       - name: Upload binary to GCP
         id: upload-file
@@ -75,14 +74,14 @@ jobs:
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
   
-  pr_comment:
+  pr-comment:
     runs-on: ubuntu-latest
     needs:
       - build-and-test
     steps:
       - name: create comment
         uses: actions/github-script@v5
-        id: create-comment
+        id: pr-comment
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
