@@ -1,4 +1,4 @@
-import {Plugin, Task} from 'taqueria-sdk'
+import {Plugin, Task, EconomicalProtocol} from 'taqueria-sdk'
 import type { i18n} from 'taqueria-sdk/types'
 import originate from './originate'
 
