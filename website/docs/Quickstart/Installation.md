@@ -1,5 +1,5 @@
 ---
-title: Start 3
+title: Installation
 ---
 
 **Placeholder text**

@@ -28,20 +28,18 @@ const sidebars = {
           type: "category",
           label: "QuickStart",
           items: [
-            "Quickstart/Start1",
-            "Quickstart/Start2",
-            "Quickstart/Start3",
+            "Quickstart/Overview",
+            "Quickstart/Installation",
+            "Quickstart/Tasks",
+            "Quickstart/Plugin Basics"
           ],
         },
         {
           type: "category",
-          label: "Resources",
+          label: "Plugins",
 
           items: [
-            "Resources/Changelog",
-            "Resources/Gallery",
-            "Resources/Plugins",
-            "Resources/Tools",
+
           ],
         },
       ],
@@ -53,7 +51,8 @@ const sidebars = {
       collapsed: true,
       collapsible: false,
       items: [
-        "Selections"
+        
+        
       ],
     }
   ]

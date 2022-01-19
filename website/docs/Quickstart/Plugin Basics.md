@@ -1,5 +1,5 @@
 ---
-title: Start 1
+title: Plugin Basics
 ---
 
 **Placeholder text**
