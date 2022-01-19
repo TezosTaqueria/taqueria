@@ -82,7 +82,6 @@ jobs:
       - run: echo "${{ steps.get-package-version.outputs.version > $(jq .version package.json) }}"
 
       - run: npm install
-
       - run: npm publish
         if: steps.get-package-version.outputs.version > $(jq .version package.json)
         env: 
