@@ -62,6 +62,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: actions/setup-node@v2
+        with: 
+          node-version: '16.x'
+          registry-url: 'https://npm.pkg.github.com'
+      - run: | 
+          contents=$(jq '.name |= "@ecadlabs/" + .' package.json) && \
+          echo ${contents} > package.json
+
       - name: Check package version
         id: cpv
         uses: PostHog/check-package-version@v2
@@ -72,13 +80,6 @@ jobs:
           echo "Published version: ${{ steps.cpv.outputs.published-version }}"
           echo "Is new version: ${{ steps.cpv.outputs.is-new-version }}"
 
-      - uses: actions/setup-node@v2
-        with: 
-          node-version: '16.x'
-          registry-url: 'https://npm.pkg.github.com'
-      - run: | 
-          contents=$(jq '.name |= "@ecadlabs/" + .' package.json) && \
-          echo ${contents} > package.json
       - run: npm install
       # - run: npm publish
       #   env: 
