@@ -37,9 +37,10 @@ I like adding my project directory to the PATH environment variable which allows
 
 ### Create a plugin (inside repo)
 
-These are temporary instuctions until the taq cli `taqueria init plugin` is ready
+The following instructions will create a typescript project with simple configuration.
+Note: These are temporary instuctions until the taq cli `taqueria init plugin` is ready.
 
-- clone `taqueria-plugin-mock`
+- clone `taqueria-plugin-boilerplate-typescript`
 - setup plugin name:
     - `index.ts` > `Plugin.create` > `name`
     - `package.json` > `name`

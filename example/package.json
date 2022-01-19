@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "taqueria-plugin-boilerplate-typescript": "file:../taqueria-plugin-boilerplate-typescript",
     "taqueria-plugin-contract-type-generator": "file:../taqueria-plugin-contract-type-generator",
     "taqueria-plugin-smartpy": "file:../taqueria-plugin-smartpy"
   }

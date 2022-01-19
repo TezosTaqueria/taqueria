@@ -3,6 +3,10 @@
     "plugins": [
         {
             "type": "npm",
+            "name": "taqueria-plugin-boilerplate-typescript"
+        },
+        {
+            "type": "npm",
             "name": "taqueria-plugin-contract-type-generator"
         }
     ],
