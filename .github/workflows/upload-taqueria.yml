@@ -94,7 +94,7 @@ jobs:
               body += `\n* ${artifact} `
             }
 
-            console.log($body)
+            console.log(body)
             
   test-urls:
     runs-on: ubuntu-latest
