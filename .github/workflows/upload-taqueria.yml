@@ -97,7 +97,7 @@ jobs:
             `;
             
             github.rest.issues.createComment({
-              issue_number: context.payload.workflow_run.pull_requests[0].number,
+              issue_number: ccontext.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: body
