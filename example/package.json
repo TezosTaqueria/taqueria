@@ -1,0 +1,18 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "taqueria-plugin-contract-type-generator": "file:../taqueria-plugin-contract-type-generator",
+    "taqueria-plugin-smartpy": "file:../taqueria-plugin-smartpy"
+  }
+}

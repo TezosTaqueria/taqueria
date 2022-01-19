@@ -1,0 +1,12 @@
+{
+    "language": "en",
+    "plugins": [
+        {
+            "type": "npm",
+            "name": "taqueria-plugin-contract-type-generator"
+        }
+    ],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts"
+}

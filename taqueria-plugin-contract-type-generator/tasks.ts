@@ -21,7 +21,7 @@ const generateContractTypes = (parsedArgs: Opts & PluginOpts) => async (contract
         inputFiles: [contractAbspath],
         outputTypescriptDirectory: parsedArgs.typescriptDir,
         format: 'tz',
-        typeAliasMode: parsedArgs.typeAliasMode ?? 'simple',
+        typeAliasMode: parsedArgs.typeAliasMode ?? 'file',
     });
 
     return `${contractFilename}: Types generated`;
@@ -88,17 +88,38 @@ export const generateTypes = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse,
             stdout: ""
         });
     }
+
+    // WORKAROUND: Redirect console.log
+    const strOutLog = [] as string[];
+    const consoleLogOrig = console.log;
+    console.log = (message:string, data?:unknown) => {
+        strOutLog.push(`${message}${data?`\n${JSON.stringify(data,null,2)}`:''}`);
+    }
+    console.log('generateTypes', { 
+        typescriptDir: parsedArgs.typescriptDir
+    });
+
+    // console.log = consoleLogOrig;
+    // return Promise.resolve({
+    //     status: 'success',
+    //     stdout: `${strOutLog.join('\n')}`,
+    //     stderr: ""
+    // });
+
     const argsTyped = parsedArgs as Opts & PluginOpts;
 
     const p = argsTyped.contract
         ? generateContractTypes(argsTyped) (argsTyped.contract as string)
         : generateContractTypesAll(argsTyped)
 
-    return p.then(data => ({
-        status: 'success',
-        stdout: Array.isArray(data) ? data.join("\n") : data,
-        stderr: ""
-    }))
+    return p.then(data => {
+        console.log = consoleLogOrig;
+        return ({
+            status: 'success',
+            stdout: `${strOutLog.join('\n')}${Array.isArray(data) ? data.join("\n") : data}`,
+            stderr: ""
+        });
+    })
 }
 
 export const tasks = {

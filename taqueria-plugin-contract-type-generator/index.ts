@@ -3,7 +3,7 @@ import type { i18n} from 'taqueria-sdk/types'
 import {tasks} from './tasks'
 
 Plugin.create((i18n: i18n) => ({
-    name: "taquito",
+    name: "contract-type-generator",
     schema: "1.0",
     version: "0.1",
     tasks: [
@@ -20,7 +20,7 @@ Plugin.create((i18n: i18n) => ({
                 Option.create({
                     shortFlag: "t",
                     flag: "typeAliasMode",
-                    choices: ['local', 'file', 'library', 'simple'],
+                    choices: ['file', 'simple'],
                     description: "The type aliases used in the generated types"
                 }),
             ],
