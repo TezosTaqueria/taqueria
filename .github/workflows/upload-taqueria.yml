@@ -71,6 +71,8 @@ jobs:
           echo ${contents} > package.json
 
       - run: npm show @ecadlabs/taqueria-plugin-ligo
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: cat .npmrc
 
       - run: npm install
