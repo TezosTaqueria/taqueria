@@ -75,7 +75,9 @@ jobs:
         id: get-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "::set-output name=version::toJSON($(npm show @ecadlabs/taqueria-plugin-ligo --json))"
+        run: |
+          stuff=$(npm show @ecadlabs/taqueria-plugin-ligo --json) | jq .
+          echo "::set-output name=version::${stuff}"
 
       - run: echo ${{ steps.get-package-version.outputs.version }}
 
