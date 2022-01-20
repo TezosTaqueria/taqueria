@@ -99,7 +99,7 @@ jobs:
   #             body: body
   #           })
 
-  publish_npm:
+  publish_npm_packages:
     # needs: build-and-test
     runs-on: ubuntu-latest
     
