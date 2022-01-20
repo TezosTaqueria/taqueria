@@ -132,10 +132,8 @@ jobs:
       - name: Update package.json to specify scope
         run: | 
           export scope="$SCOPE/"
-          echo $scope
           contents=$(jq '.name |= env.scope + .' package.json) && \
-          echo ${contents} > package.json && \
-          cat package.json
+          echo ${contents} > package.json
 
       - name: Get current npm registry version
         id: get-npm-package-version
@@ -143,18 +141,18 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: echo "::set-output name=version::$(npm show $SCOPE/${{ matrix.dir }} --json | jq .version)"
 
-      # - name: Get current local package version
-      #   id: get-local-package-version
-      #   run: echo "::set-output name=version::$(jq .version package.json)"
+      - name: Get current local package version
+        id: get-local-package-version
+        run: echo "::set-output name=version::$(jq .version package.json)"
 
-      # - name: Install dependencies
-      #   run: npm install
+      - name: Install dependencies
+        run: npm install
 
-      # - name: Build package
-      #   run: npm run build
+      - name: Build package
+        run: npm run build
       
-      # - name: Publish if new version of package 
-      #   if: steps.get-npm-package-version.outputs.version < steps.get-local-package-version.outputs.version
-      #   run: npm publish
-      #   env: 
-      #     NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish if new version of package 
+        if: steps.get-npm-package-version.outputs.version < steps.get-local-package-version.outputs.version
+        run: npm publish
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
