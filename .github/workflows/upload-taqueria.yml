@@ -124,10 +124,14 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: echo "::set-output name=version::$(npm show @ecadlabs/taqueria-plugin-ligo --json | jq .version)"
 
+      - name: get current local package version
+        id: get-local-version
+        run: echo "::set-output name=version::$(jq .version package.json)"
+
       - run: echo ${{ steps.get-package-version.outputs.version }}
       - run: echo $(jq .version package.json)
       - run: echo $(jq . package.json)
-        if: steps.get-package-version.outputs.version > $(jq .version package.json)
+        if: steps.get-package-version.outputs.version > steps.get-local-version.outputs.version
           # version="${{ steps.get-package-version.outputs.version }}"
           # package=$(jq .version package.json)
           # echo "${version}>${package}"
