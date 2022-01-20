@@ -131,7 +131,7 @@ jobs:
       
       - name: Update package.json to specify scope
         run: | 
-          contents=$(jq '.name |= "$SCOPE/" + .' package.json) && \
+          contents=$(jq '.name |= "${SCOPE}/" + .' package.json) && \
           echo ${contents} > package.json
 
       - name: Get current npm registry version
