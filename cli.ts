@@ -264,7 +264,7 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
             const { success } = await process.status();
             const { stdout, stderr } = outputAfterResponstStart;
 
-            if (!success) {
+            if (!success || !stdout && stderr) {
                 return Promise.reject({
                     kind: 'E_INVALID_JSON',
                     msg: 'TODO i18n message',

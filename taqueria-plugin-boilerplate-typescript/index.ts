@@ -10,7 +10,14 @@ Plugin.create((i18n: i18n) => ({
         Task.create({
             task: "rickroll",
             command: "rickroll",
-            description: "This is great!",
+            description: "Get your friends!",
+            options: [
+                Option.create({
+                    shortFlag: "t",
+                    flag: "target",
+                    description: "Who is the target?"
+                }),
+            ],
             aliases: ["rr"],
             handler: "proxy"
         }),

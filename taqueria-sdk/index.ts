@@ -121,6 +121,7 @@ const getResponse = (definer: pluginDefiner) => (sanitizedArgs: SanitizedArgs): 
             return schema ? Promise.resolve({...schema, status: "success"}) : Promise.reject({err: "E_INVALID_SCHEMA", msg: "The schema of the plugin is invalid."})
         case "proxy":
             const callProxy = async (proxy: NonNullable<NonNullable<typeof schema>['proxy']>): LikeAPromise<ActionResponse, Failure<[]>> => {
+                try {
                 const result = await proxy(sanitizedArgs);
                 if(result && typeof result === 'object'){
                     return result;
@@ -130,6 +131,21 @@ const getResponse = (definer: pluginDefiner) => (sanitizedArgs: SanitizedArgs): 
                     stderr: '',
                     stdout: ''
                 };
+                } catch(err) {
+                    const errTyped = err as null | string | { message?:string };
+                    const stderr = !errTyped ? 'Unknown error' 
+                        : typeof errTyped === 'string' ? errTyped 
+                        : errTyped.message ? errTyped.message
+                        : `${JSON.stringify(err, null, 2)}`;
+
+                    console.error(stderr);
+                        
+                    return Promise.reject({
+                        status: 'failed',
+                        stderr,
+                        stdout: ''
+                    });
+                }
             };
 
             return schema && schema.proxy

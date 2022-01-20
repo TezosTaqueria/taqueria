@@ -1,8 +1,14 @@
 import { SanitizedArgs } from "taqueria-sdk/types";
 
-type Opts = SanitizedArgs & Record<string, unknown>;
+type Opts = SanitizedArgs & {
+    target?: string,
+};
 
 export const rickroll = async (parsedArgs: Opts) => {
-    console.log('Please visit: https://youtu.be/dQw4w9WgXcQ');
+    if(!parsedArgs.target){
+        throw new Error('You must specify a target');
+    }
+
+    console.log(`${parsedArgs.target} - Please visit: https://youtu.be/dQw4w9WgXcQ`);
 }
 
