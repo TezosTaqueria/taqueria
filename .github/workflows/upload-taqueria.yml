@@ -89,11 +89,11 @@ jobs:
           script: |
             
             let body = `
-              | Artifacts |
-              | --------- |
-              | [Linux](${{ needs.build-and-test.outputs.public-url-ubuntu }}) |
-              | [Windows](${{ needs.build-and-test.outputs.public-url-windows }}) |
-              | [MacOS](${{ needs.build-and-test.outputs.public-url-macos }}) |
+              | Git Commit          | Artifacts |
+              | ----------          | --------- |
+              | "${{ github.sha }}" | [Linux](${{ needs.build-and-test.outputs.public-url-ubuntu }}) |
+              |                     | [Windows](${{ needs.build-and-test.outputs.public-url-windows }}) |
+              |                     | [MacOS](${{ needs.build-and-test.outputs.public-url-macos }}) |
             `;
             
             github.rest.issues.createComment({
