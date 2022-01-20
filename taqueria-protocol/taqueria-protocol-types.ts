@@ -191,6 +191,8 @@ export class Scaffold {
 
 export type TaskHandler = "proxy" | string | string[]
 
+// Includes a uuid to prevent possible conflict with normal console messages
+export const TaskResponseStart = '>>> RESPONSE-START 06574a6dead348958605d1f0ec19ba04 <<<'
 
 export interface UnvalidatedTask {
     readonly task: string

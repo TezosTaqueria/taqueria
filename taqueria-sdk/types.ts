@@ -72,7 +72,7 @@ export interface Schema {
     readonly sandboxes?: (Sandbox | undefined)[]
     checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
     installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
-    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    proxy?: <T>(parsedArgs: SanitizedArgs) => Promise<void> | LikeAPromise<ActionResponse, Failure<T>>
 }
 
 export interface SchemaView {
@@ -86,7 +86,7 @@ export interface SchemaView {
     readonly sandboxes: UnvalidatedSandbox[],
     checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
     installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
-    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    proxy?: <T>(parsedArgs: SanitizedArgs) => Promise<void> | LikeAPromise<ActionResponse, Failure<T>>
 }
 
 export type Args = string[]

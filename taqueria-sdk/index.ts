@@ -1,4 +1,4 @@
-import {Task as aTask, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike} from 'taqueria-protocol/taqueria-protocol-types'
+import {Task as aTask, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, TaskResponseStart} from 'taqueria-protocol/taqueria-protocol-types'
 import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs} from "./types"
 import {join, resolve} from 'path'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
@@ -110,29 +110,38 @@ const parseSchema = (i18n: i18n, definer: pluginDefiner): SchemaView | undefined
     }
 }
 
-const sendResponse = (response: unknown) => console.log(JSON.stringify(response))
+const sendResponse = (response: unknown) => console.log(`${TaskResponseStart}\n${JSON.stringify(response)}`)
+const sendError = (err: Failure<unknown>) => console.error(`${TaskResponseStart}\n${JSON.stringify(err)}`)
 
-const sendError = (err: Failure<unknown>) => {
-    console.error(JSON.stringify(err))
-}
-
-const getResponse = (definer: pluginDefiner) => (sanitzedArgs: SanitizedArgs): LikeAPromise<ActionResponse, Failure<[]>> => {
-    const {i18n, taqRun} = sanitzedArgs
+const getResponse = (definer: pluginDefiner) => (sanitizedArgs: SanitizedArgs): LikeAPromise<ActionResponse, Failure<[]>> => {
+    const {i18n, taqRun} = sanitizedArgs
     const schema = parseSchema(i18n, definer)
     switch (taqRun) {
         case "pluginInfo":
             return schema ? Promise.resolve({...schema, status: "success"}) : Promise.reject({err: "E_INVALID_SCHEMA", msg: "The schema of the plugin is invalid."})
         case "proxy":
+            const callProxy = async (proxy: NonNullable<NonNullable<typeof schema>['proxy']>): LikeAPromise<ActionResponse, Failure<[]>> => {
+                const result = await proxy(sanitizedArgs);
+                if(result && typeof result === 'object'){
+                    return result;
+                }
+                return {
+                    status: 'success',
+                    stderr: '',
+                    stdout: ''
+                };
+            };
+
             return schema && schema.proxy
-                    ? schema.proxy(sanitzedArgs)
+                    ? callProxy(schema.proxy)
                     : Promise.resolve({status: "notSupported", stdout: "", stderr: i18n.proxyNotSupported, artifacts: []})
         case "checkRuntimeDependencies":
             return schema && schema.checkRuntimeDependencies
-                    ? schema.checkRuntimeDependencies(i18n, sanitzedArgs)
+                    ? schema.checkRuntimeDependencies(i18n, sanitizedArgs)
                     : Promise.resolve({status: "notSupported", report: []})
         case "installRuntimeDependencies":
             return schema && schema.installRuntimeDependencies
-                    ? schema.installRuntimeDependencies(i18n, sanitzedArgs)
+                    ? schema.installRuntimeDependencies(i18n, sanitizedArgs)
                     : Promise.resolve({status: "notSupported", report: []})
         default:
             return Promise.resolve({status: "notSupported", msg: i18n.actionNotSupported})

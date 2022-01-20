@@ -1,11 +1,12 @@
 import type {UnvalidatedPluginInfo, InstalledPlugin, Config, ConfigArgs, Action, Alias, Verb, Option} from './taqueria-protocol/taqueria-protocol-types.ts'
-import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
+import {Task, PluginInfo, TaskResponseStart} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, CLICommand, CommandArgs, UnvalidatedState} from './taqueria-types.ts'
 import {State} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, chainRej, resolve, fork, forkCatch, parallel, debugMode} from 'https://cdn.skypack.dev/fluture';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
+import {readLines} from "https://deno.land/std@0.104.0/io/mod.ts";
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import {isTaqError, log, joinPaths, mkdir, readFile, writeTextFile, decodeJson, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
@@ -230,13 +231,40 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
 
             const altCmd = ['sh', '-c', cmd.join(' ')]
             const process = Deno.run({cmd: altCmd, stdout: "piped", stderr: "piped"})
-            const output = await process.output()
-            const error = await process.stderrOutput()
-            const decoder = new TextDecoder()
-            const stdout = decoder.decode(output)
-            const stderr = decoder.decode(error)
 
-            if (!stdout && stderr) {
+            // Immediately pipe console.log, console.error to console, until the `TaskResponseStart` marker
+            const outputAfterResponstStart = {
+                stdout: '',
+                stderr: '',
+            };
+            async function pipeThroughUntilResposeStart(
+                source: 'stdout' | 'stderr',
+                reader: Deno.Reader,
+                writer: Deno.Writer,
+              ) {
+                const encoder = new TextEncoder();
+                let mode = 'pipe' as 'pipe' | 'response';
+                for await (const line of readLines(reader)) {
+                    if( line === TaskResponseStart ){
+                        mode = 'response'
+                        continue;
+                    }
+
+                    if( mode === 'pipe' ){
+                        writer.write(encoder.encode(`${line??''}\n`));
+                        continue;
+                    }
+
+                    outputAfterResponstStart[source] += `${line??''}\n`;
+                }
+              }
+
+            pipeThroughUntilResposeStart('stdout', process.stdout, Deno.stdout);
+            pipeThroughUntilResposeStart('stderr', process.stderr, Deno.stderr);
+            const { success } = await process.status();
+            const { stdout, stderr } = outputAfterResponstStart;
+
+            if (!success) {
                 return Promise.reject({
                     kind: 'E_INVALID_JSON',
                     msg: 'TODO i18n message',
