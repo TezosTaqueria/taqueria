@@ -131,7 +131,8 @@ jobs:
       
       - name: Update package.json to specify scope
         run: | 
-          scope="$SCOPE/"
+          export scope="$SCOPE/"
+          echo $scope
           contents=$(jq '.name |= env.scope + .' package.json) && \
           echo ${contents} > package.json && \
           cat package.json
