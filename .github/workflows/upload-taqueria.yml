@@ -111,10 +111,15 @@ jobs:
       matrix:
         include:
           - dir: taqueria-plugin-ligo
+            build_command: echo "doesn't need to build"
           - dir: taqueria-plugin-smartpy
-          # - dir: taqueria-plugin-taquito
+            build_command: npm run build
+          - dir: taqueria-plugin-taquito
+            build_command: npm run build
           # - dir: taqueria-plugin-teztnets
+          #   build_command: npm run build
           # - dir: taqueria-sdk
+          #   build_command: npm run build
     
     defaults:
       run:
@@ -149,7 +154,7 @@ jobs:
         run: npm install
 
       - name: Build package
-        run: npm run build
+        run: ${{ matrix.build_command }}
       
       - name: Publish if new version of package 
         if: steps.get-npm-package-version.outputs.version < steps.get-local-package-version.outputs.version
