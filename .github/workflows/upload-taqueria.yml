@@ -100,7 +100,7 @@ jobs:
             })
 
   publish_npm:
-    needs: build_and_test
+    needs: build-and-test
     runs-on: ubuntu-latest
     defaults:
       run:
