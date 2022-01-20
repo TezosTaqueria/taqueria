@@ -28,10 +28,10 @@ const sidebars = {
           type: "category",
           label: "QuickStart",
           items: [
-            "Quickstart/Overview",
-            "Quickstart/Installation",
-            "Quickstart/Tasks",
-            "Quickstart/Plugin Basics"
+            "quick-start/overview",
+            "quick-start/installation",
+            "quick-start/tasks",
+            "quick-start/plugin-basics"
           ],
         },
         {
