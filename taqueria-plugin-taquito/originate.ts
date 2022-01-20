@@ -28,7 +28,7 @@ const originateContractToSandbox = async (contractFilename: string, parsedArgs: 
                     storage: storage
                 })
                 .then(operation => ({
-                    contract: contractAbspath,
+                    contract: contractFilename,
                     address: operation.contractAddress,
                     destination: sandboxName
                 }))
