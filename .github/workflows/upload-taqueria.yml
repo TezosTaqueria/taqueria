@@ -6,104 +6,104 @@ on:
       - main
 
 jobs:
-  # build-and-test:
-  #   permissions:
-  #     contents: 'read'
-  #     id-token: 'write'
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     fail-fast: true
-  #     matrix:
-  #      include:
-  #        - os: ubuntu-latest
-  #          os_short: ubuntu
-  #          deno_target: "x86_64-unknown-linux-gnu"
-  #          taqueria_bin: "taqueria"
-  #        - os: windows-latest
-  #          os_short: windows
-  #          deno_target: "x86_64-pc-windows-msvc"
-  #          taqueria_bin: "taqueria.exe"
-  #        - os: macOS-latest
-  #          os_short: macos
-  #          deno_target: "x86_64-apple-darwin"
-  #          taqueria_bin: "taqueria"
+  build-and-test:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+       include:
+         - os: ubuntu-latest
+           os_short: ubuntu
+           deno_target: "x86_64-unknown-linux-gnu"
+           taqueria_bin: "taqueria"
+         - os: windows-latest
+           os_short: windows
+           deno_target: "x86_64-pc-windows-msvc"
+           taqueria_bin: "taqueria.exe"
+         - os: macOS-latest
+           os_short: macos
+           deno_target: "x86_64-apple-darwin"
+           taqueria_bin: "taqueria"
 
-  #   outputs:
-  #     public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
-  #     public-url-windows: ${{ steps.public-url.outputs.windows }}
-  #     public-url-macos: ${{ steps.public-url.outputs.macos }}
+    outputs:
+      public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
+      public-url-windows: ${{ steps.public-url.outputs.windows }}
+      public-url-macos: ${{ steps.public-url.outputs.macos }}
 
-    # env:
-    #   DENO_DIR: ./deno
-    #   DENO_TARGET: ${{ matrix.deno_target }}
-    #   TAQ_BIN: 
+    env:
+      DENO_DIR: ./deno
+      DENO_TARGET: ${{ matrix.deno_target }}
+      TAQ_BIN: 
 
-    # steps:
-    #   - name: Setup repo
-    #     uses: actions/checkout@v2
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v2
 
-  #     - name: Setup Deno
-  #       uses: denoland/setup-deno@v1
-  #       with:
-  #         deno-version: "^1.0.0"
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: "^1.0.0"
 
-      # ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
-      # ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
-      # - name: Build the binary for ${{ matrix.os }}
-      #   id: build-bin
-      #   shell: bash
-      #   run: |
-      #     deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
-      #     [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
-      #     mv "${{ matrix.taqueria_bin }}" "taqueria.${{ matrix.deno_target }}"
+      ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
+      ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
+      - name: Build the binary for ${{ matrix.os }}
+        id: build-bin
+        shell: bash
+        run: |
+          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
+          [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
+          mv "${{ matrix.taqueria_bin }}" "taqueria.${{ matrix.deno_target }}"
 
-      # - name: Authenticate with GCP
-      #   id: gcp-auth
-      #   uses: google-github-actions/auth@v0
-      #   with:
-      #     workload_identity_provider: "projects/${{ secrets.GCP_PROJECT }}/locations/global/workloadIdentityPools/github-actions-storage-pool/providers/github-actions-oidc-provider"
-      #     service_account: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
+      - name: Authenticate with GCP
+        id: gcp-auth
+        uses: google-github-actions/auth@v0
+        with:
+          workload_identity_provider: "projects/${{ secrets.GCP_PROJECT }}/locations/global/workloadIdentityPools/github-actions-storage-pool/providers/github-actions-oidc-provider"
+          service_account: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
 
-  #     - name: Upload binary to GCP
-  #       id: upload-file
-  #       uses: 'google-github-actions/upload-cloud-storage@v0'
-  #       with:
-  #         path: "taqueria.${{ matrix.deno_target }}"
-  #         destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}"
+      - name: Upload binary to GCP
+        id: upload-file
+        uses: 'google-github-actions/upload-cloud-storage@v0'
+        with:
+          path: "taqueria.${{ matrix.deno_target }}"
+          destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}"
 
-  #     - name: Set public url
-  #       id: public-url
-  #       run: |
-  #         echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
+      - name: Set public url
+        id: public-url
+        run: |
+          echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
   
-  # pr-comment:
-  #   runs-on: ubuntu-latest
-  #   needs: build-and-test
-  #   steps:
-  #     - name: create comment
-  #       uses: actions/github-script@v5
-  #       id: pr-comment
-  #       with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         script: |
+  pr-comment:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+      - name: create comment
+        uses: actions/github-script@v5
+        id: pr-comment
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
             
-  #           let body = `
-  #             | Artifacts |
-  #             | --------- |
-  #             | [Linux](${{ needs.build-and-test.outputs.public-url-ubuntu }}) |
-  #             | [Windows](${{ needs.build-and-test.outputs.public-url-windows }}) |
-  #             | [MacOS](${{ needs.build-and-test.outputs.public-url-macos }}) |
-  #           `;
+            let body = `
+              | Artifacts |
+              | --------- |
+              | [Linux](${{ needs.build-and-test.outputs.public-url-ubuntu }}) |
+              | [Windows](${{ needs.build-and-test.outputs.public-url-windows }}) |
+              | [MacOS](${{ needs.build-and-test.outputs.public-url-macos }}) |
+            `;
             
-  #           github.rest.issues.createComment({
-  #             issue_number: context.issue.number,
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             body: body
-  #           })
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
 
   publish_npm_packages:
-    # needs: build-and-test
+    needs: build-and-test
     runs-on: ubuntu-latest
     
     permissions:
@@ -119,10 +119,10 @@ jobs:
             build_command: npm run build
           - dir: taqueria-plugin-taquito
             build_command: npm run build
-          # - dir: taqueria-plugin-teztnets
-          #   build_command: npm run build
-          # - dir: taqueria-sdk
-          #   build_command: npm run build
+          - dir: taqueria-plugin-teztnets
+            build_command: npm run build
+          - dir: taqueria-sdk
+            build_command: npm run build
     
     defaults:
       run:
