@@ -125,8 +125,8 @@ jobs:
         run: echo "::set-output name=version::$(npm show @ecadlabs/taqueria-plugin-ligo --json | jq .version)"
 
       - run: echo ${{ steps.get-package-version.outputs.version }}
-      - run: echo "${{ $(jq .version package.json) }}"
-      - run: echo "${{ steps.get-package-version.outputs.version > $(jq .version package.json) }}"
+      - run: echo $(jq .version package.json)
+      - run: echo ${{ steps.get-package-version.outputs.version }} > $(jq .version package.json)
 
       - run: npm install
       # - run: npm publish
