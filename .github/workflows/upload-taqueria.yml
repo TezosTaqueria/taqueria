@@ -114,22 +114,26 @@ jobs:
         with: 
           registry-url: 'https://npm.pkg.github.com'
       
-      - run: | 
+      - name: Update package.json to specify scope
+        run: | 
           contents=$(jq '.name |= "@ecadlabs/" + .' package.json) && \
           echo ${contents} > package.json
 
-      - name: get current npm registry version
+      - name: Get current npm registry version
         id: get-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: echo "::set-output name=version::$(npm show @ecadlabs/taqueria-plugin-ligo --json | jq .version)"
 
-      - name: get current local package version
+      - name: Get current local package version
         id: get-local-version
         run: echo "::set-output name=version::$(jq .version package.json)"
 
-      - run: npm install
-      - run: npm publish
+      - name: Install dependencies
+        run: npm install
+      
+      - name: Publish if new version of package 
         if: steps.get-package-version.outputs.version > steps.get-local-version.outputs.version
+        run: npm publish
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
