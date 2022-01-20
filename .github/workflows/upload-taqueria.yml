@@ -102,12 +102,27 @@ jobs:
   publish_npm:
     # needs: build-and-test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: taqueria-plugin-ligo
+    
     permissions:
       packages: write
       contents: read
+    
+    strategy:
+      matrix:
+        include:
+          - dir: taqueria-plugin-ligo
+          # - dir: taqueria-plugin-smartpy
+          # - dir: taqueria-plugin-taquito
+          # - dir: taqueria-plugin-teztnets
+          # - dir: taqueria-sdk
+    
+    defaults:
+      run:
+        working-directory: ${{ matrix.dir }}
+    
+    env:
+      SCOPE: '@ecadlabs' 
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -116,14 +131,14 @@ jobs:
       
       - name: Update package.json to specify scope
         run: | 
-          contents=$(jq '.name |= "@ecadlabs/" + .' package.json) && \
+          contents=$(jq '.name |= "$SCOPE/" + .' package.json) && \
           echo ${contents} > package.json
 
       - name: Get current npm registry version
         id: get-npm-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "::set-output name=version::$(npm show @ecadlabs/taqueria-plugin-ligo --json | jq .version)"
+        run: echo "::set-output name=version::$(npm show $SCOPE/taqueria-plugin-ligo --json | jq .version)"
 
       - name: Get current local package version
         id: get-local-package-version
@@ -131,6 +146,9 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Build package
+        run: npm run build
       
       - name: Publish if new version of package 
         if: steps.get-npm-package-version.outputs.version < steps.get-local-package-version.outputs.version
