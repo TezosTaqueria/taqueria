@@ -109,7 +109,7 @@ node_modules
 /deno
 .vscode
 .idea
-.parcel-cache
+**/.parcel-cache/*
 /taqueria
 tests/coverage
 /taqueria-sdk/index.js
