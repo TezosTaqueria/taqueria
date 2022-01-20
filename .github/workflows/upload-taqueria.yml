@@ -128,17 +128,8 @@ jobs:
         id: get-local-version
         run: echo "::set-output name=version::$(jq .version package.json)"
 
-      - run: echo ${{ steps.get-package-version.outputs.version }}
-      - run: echo $(jq .version package.json)
-      - run: echo $(jq . package.json)
+      - run: npm install
+      - run: npm publish
         if: steps.get-package-version.outputs.version > steps.get-local-version.outputs.version
-          # version="${{ steps.get-package-version.outputs.version }}"
-          # package=$(jq .version package.json)
-          # echo "${version}>${package}"
-          
-
-      # - run: npm install
-      # - run: npm publish
-      #   if: steps.get-package-version.outputs.version > $(jq .version package.json)
-      #   env: 
-      #     NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
