@@ -133,7 +133,7 @@ jobs:
         run: npm install
       
       - name: Publish if new version of package 
-        if: steps.get-package-version.outputs.version > steps.get-local-version.outputs.version
+        if: steps.get-package-version.outputs.version < steps.get-local-version.outputs.version
         run: npm publish
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
