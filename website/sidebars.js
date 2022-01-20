@@ -18,51 +18,43 @@ const sidebars = {
   docs: [
     {
       type: "category",
-      label: "Overview",
+      label: "Getting Started",
       className: "sidebarHeader",
-      collapsed: false,
+      collapsed: true,
       collapsible: false,
       items: [
         "intro",
-        "glossary"
+        {
+          type: "category",
+          label: "QuickStart",
+          items: [
+            "quick-start/overview",
+            "quick-start/installation",
+            "quick-start/tasks",
+            "quick-start/plugin-basics"
+          ],
+        },
+        {
+          type: "category",
+          label: "Plugins",
+
+          items: [
+
+          ],
+        },
       ],
     },
     {
       type: "category",
-      label: "Getting Started",
+      label: "Main Concepts",
       className: "sidebarHeader",
-      collapsed: false,
+      collapsed: true,
       collapsible: false,
       items: [
-        "getting-started/overview",
-        "getting-started/installation",
-        "getting-started/quick-start"
+        
+        
       ],
-    },
-    {
-      type: "category",
-      label: "Using Taqueria",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "guides/build-from-source",
-        "guides/install-plugins"
-      ],
-    },
-    {
-      type: "category",
-      label: "Resources",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "resources/plugins",
-        "resources/faq",
-        "resources/troubleshooting",
-        "resources/changelog"
-      ],
-    },
+    }
   ]
 };
 
