@@ -112,9 +112,9 @@ jobs:
         include:
           - dir: taqueria-plugin-ligo
           - dir: taqueria-plugin-smartpy
-          - dir: taqueria-plugin-taquito
-          - dir: taqueria-plugin-teztnets
-          - dir: taqueria-sdk
+          # - dir: taqueria-plugin-taquito
+          # - dir: taqueria-plugin-teztnets
+          # - dir: taqueria-sdk
     
     defaults:
       run:
@@ -138,7 +138,7 @@ jobs:
         id: get-npm-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "::set-output name=version::$(npm show $SCOPE/taqueria-plugin-ligo --json | jq .version)"
+        run: echo "::set-output name=version::$(npm show $SCOPE/${{ matrix.dir }} --json | jq .version)"
 
       - name: Get current local package version
         id: get-local-package-version
