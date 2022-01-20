@@ -127,8 +127,8 @@ jobs:
       - run: echo ${{ steps.get-package-version.outputs.version }}
       - run: echo $(jq .version package.json)
       - run: |
-        version=${{ steps.get-package-version.outputs.version }}
-        package=$(jq .version package.json)
+        version=${{ steps.get-package-version.outputs.version }} &&
+        package=$(jq .version package.json) &&
         echo "${version}>${package}"
 
       - run: npm install
