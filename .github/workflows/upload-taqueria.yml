@@ -150,7 +150,7 @@ jobs:
         id: get-local-package-version
         run: echo "::set-output name=version::$(jq .version package.json)"
 
-      - name: Install dependencies
+      - name: Install any dependencies
         run: npm install
 
       - name: Build package
