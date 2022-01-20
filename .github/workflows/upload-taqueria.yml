@@ -34,9 +34,7 @@ jobs:
       public-url-macos: ${{ steps.public-url.outputs.macos }}
 
     env:
-      DENO_DIR: ./deno
       DENO_TARGET: ${{ matrix.deno_target }}
-      TAQ_BIN: 
 
     steps:
       - name: Setup repo
