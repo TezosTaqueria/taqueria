@@ -3135,6 +3135,317 @@ var require_partial_lenses_cjs = __commonJS({
   }
 });
 
+// node_modules/err-code/index.js
+var require_err_code = __commonJS({
+  "node_modules/err-code/index.js"(exports2, module2) {
+    "use strict";
+    function assign(obj, props) {
+      for (const key in props) {
+        Object.defineProperty(obj, key, {
+          value: props[key],
+          enumerable: true,
+          configurable: true
+        });
+      }
+      return obj;
+    }
+    function createError(err, code, props) {
+      if (!err || typeof err === "string") {
+        throw new TypeError("Please pass an Error to err-code");
+      }
+      if (!props) {
+        props = {};
+      }
+      if (typeof code === "object") {
+        props = code;
+        code = void 0;
+      }
+      if (code != null) {
+        props.code = code;
+      }
+      try {
+        return assign(err, props);
+      } catch (_) {
+        props.message = err.message;
+        props.stack = err.stack;
+        const ErrClass = function() {
+        };
+        ErrClass.prototype = Object.create(Object.getPrototypeOf(err));
+        return assign(new ErrClass(), props);
+      }
+    }
+    module2.exports = createError;
+  }
+});
+
+// node_modules/retry/lib/retry_operation.js
+var require_retry_operation = __commonJS({
+  "node_modules/retry/lib/retry_operation.js"(exports2, module2) {
+    function RetryOperation(timeouts, options) {
+      if (typeof options === "boolean") {
+        options = { forever: options };
+      }
+      this._originalTimeouts = JSON.parse(JSON.stringify(timeouts));
+      this._timeouts = timeouts;
+      this._options = options || {};
+      this._maxRetryTime = options && options.maxRetryTime || Infinity;
+      this._fn = null;
+      this._errors = [];
+      this._attempts = 1;
+      this._operationTimeout = null;
+      this._operationTimeoutCb = null;
+      this._timeout = null;
+      this._operationStart = null;
+      if (this._options.forever) {
+        this._cachedTimeouts = this._timeouts.slice(0);
+      }
+    }
+    module2.exports = RetryOperation;
+    RetryOperation.prototype.reset = function() {
+      this._attempts = 1;
+      this._timeouts = this._originalTimeouts;
+    };
+    RetryOperation.prototype.stop = function() {
+      if (this._timeout) {
+        clearTimeout(this._timeout);
+      }
+      this._timeouts = [];
+      this._cachedTimeouts = null;
+    };
+    RetryOperation.prototype.retry = function(err) {
+      if (this._timeout) {
+        clearTimeout(this._timeout);
+      }
+      if (!err) {
+        return false;
+      }
+      var currentTime = new Date().getTime();
+      if (err && currentTime - this._operationStart >= this._maxRetryTime) {
+        this._errors.unshift(new Error("RetryOperation timeout occurred"));
+        return false;
+      }
+      this._errors.push(err);
+      var timeout = this._timeouts.shift();
+      if (timeout === void 0) {
+        if (this._cachedTimeouts) {
+          this._errors.splice(this._errors.length - 1, this._errors.length);
+          this._timeouts = this._cachedTimeouts.slice(0);
+          timeout = this._timeouts.shift();
+        } else {
+          return false;
+        }
+      }
+      var self = this;
+      var timer = setTimeout(function() {
+        self._attempts++;
+        if (self._operationTimeoutCb) {
+          self._timeout = setTimeout(function() {
+            self._operationTimeoutCb(self._attempts);
+          }, self._operationTimeout);
+          if (self._options.unref) {
+            self._timeout.unref();
+          }
+        }
+        self._fn(self._attempts);
+      }, timeout);
+      if (this._options.unref) {
+        timer.unref();
+      }
+      return true;
+    };
+    RetryOperation.prototype.attempt = function(fn, timeoutOps) {
+      this._fn = fn;
+      if (timeoutOps) {
+        if (timeoutOps.timeout) {
+          this._operationTimeout = timeoutOps.timeout;
+        }
+        if (timeoutOps.cb) {
+          this._operationTimeoutCb = timeoutOps.cb;
+        }
+      }
+      var self = this;
+      if (this._operationTimeoutCb) {
+        this._timeout = setTimeout(function() {
+          self._operationTimeoutCb();
+        }, self._operationTimeout);
+      }
+      this._operationStart = new Date().getTime();
+      this._fn(this._attempts);
+    };
+    RetryOperation.prototype.try = function(fn) {
+      console.log("Using RetryOperation.try() is deprecated");
+      this.attempt(fn);
+    };
+    RetryOperation.prototype.start = function(fn) {
+      console.log("Using RetryOperation.start() is deprecated");
+      this.attempt(fn);
+    };
+    RetryOperation.prototype.start = RetryOperation.prototype.try;
+    RetryOperation.prototype.errors = function() {
+      return this._errors;
+    };
+    RetryOperation.prototype.attempts = function() {
+      return this._attempts;
+    };
+    RetryOperation.prototype.mainError = function() {
+      if (this._errors.length === 0) {
+        return null;
+      }
+      var counts = {};
+      var mainError = null;
+      var mainErrorCount = 0;
+      for (var i = 0; i < this._errors.length; i++) {
+        var error = this._errors[i];
+        var message = error.message;
+        var count = (counts[message] || 0) + 1;
+        counts[message] = count;
+        if (count >= mainErrorCount) {
+          mainError = error;
+          mainErrorCount = count;
+        }
+      }
+      return mainError;
+    };
+  }
+});
+
+// node_modules/retry/lib/retry.js
+var require_retry = __commonJS({
+  "node_modules/retry/lib/retry.js"(exports2) {
+    var RetryOperation = require_retry_operation();
+    exports2.operation = function(options) {
+      var timeouts = exports2.timeouts(options);
+      return new RetryOperation(timeouts, {
+        forever: options && options.forever,
+        unref: options && options.unref,
+        maxRetryTime: options && options.maxRetryTime
+      });
+    };
+    exports2.timeouts = function(options) {
+      if (options instanceof Array) {
+        return [].concat(options);
+      }
+      var opts = {
+        retries: 10,
+        factor: 2,
+        minTimeout: 1 * 1e3,
+        maxTimeout: Infinity,
+        randomize: false
+      };
+      for (var key in options) {
+        opts[key] = options[key];
+      }
+      if (opts.minTimeout > opts.maxTimeout) {
+        throw new Error("minTimeout is greater than maxTimeout");
+      }
+      var timeouts = [];
+      for (var i = 0; i < opts.retries; i++) {
+        timeouts.push(this.createTimeout(i, opts));
+      }
+      if (options && options.forever && !timeouts.length) {
+        timeouts.push(this.createTimeout(i, opts));
+      }
+      timeouts.sort(function(a, b) {
+        return a - b;
+      });
+      return timeouts;
+    };
+    exports2.createTimeout = function(attempt, opts) {
+      var random = opts.randomize ? Math.random() + 1 : 1;
+      var timeout = Math.round(random * opts.minTimeout * Math.pow(opts.factor, attempt));
+      timeout = Math.min(timeout, opts.maxTimeout);
+      return timeout;
+    };
+    exports2.wrap = function(obj, options, methods) {
+      if (options instanceof Array) {
+        methods = options;
+        options = null;
+      }
+      if (!methods) {
+        methods = [];
+        for (var key in obj) {
+          if (typeof obj[key] === "function") {
+            methods.push(key);
+          }
+        }
+      }
+      for (var i = 0; i < methods.length; i++) {
+        var method = methods[i];
+        var original = obj[method];
+        obj[method] = function retryWrapper(original2) {
+          var op = exports2.operation(options);
+          var args = Array.prototype.slice.call(arguments, 1);
+          var callback = args.pop();
+          args.push(function(err) {
+            if (op.retry(err)) {
+              return;
+            }
+            if (err) {
+              arguments[0] = op.mainError();
+            }
+            callback.apply(this, arguments);
+          });
+          op.attempt(function() {
+            original2.apply(obj, args);
+          });
+        }.bind(obj, original);
+        obj[method].options = options;
+      }
+    };
+  }
+});
+
+// node_modules/retry/index.js
+var require_retry2 = __commonJS({
+  "node_modules/retry/index.js"(exports2, module2) {
+    module2.exports = require_retry();
+  }
+});
+
+// node_modules/promise-retry/index.js
+var require_promise_retry = __commonJS({
+  "node_modules/promise-retry/index.js"(exports2, module2) {
+    "use strict";
+    var errcode = require_err_code();
+    var retry2 = require_retry2();
+    var hasOwn = Object.prototype.hasOwnProperty;
+    function isRetryError(err) {
+      return err && err.code === "EPROMISERETRY" && hasOwn.call(err, "retried");
+    }
+    function promiseRetry(fn, options) {
+      var temp;
+      var operation;
+      if (typeof fn === "object" && typeof options === "function") {
+        temp = options;
+        options = fn;
+        fn = temp;
+      }
+      operation = retry2.operation(options);
+      return new Promise(function(resolve5, reject) {
+        operation.attempt(function(number) {
+          Promise.resolve().then(function() {
+            return fn(function(err) {
+              if (isRetryError(err)) {
+                err = err.retried;
+              }
+              throw errcode(new Error("Retrying"), "EPROMISERETRY", { retried: err });
+            }, number);
+          }).then(resolve5, function(err) {
+            if (isRetryError(err)) {
+              err = err.retried;
+              if (operation.retry(err || new Error())) {
+                return;
+              }
+            }
+            reject(err);
+          });
+        });
+      });
+    }
+    module2.exports = promiseRetry;
+  }
+});
+
 // node_modules/yargs/lib/platform-shims/esm.mjs
 var import_assert = require("assert");
 
@@ -7890,6 +8201,7 @@ var yargs_default = Yargs;
 var L = __toESM(require_partial_lenses_cjs());
 var import_promises = require("fs/promises");
 var import_child_process = require("child_process");
+var import_promise_retry = __toESM(require_promise_retry());
 var readTextFile = (filename) => (0, import_promises.readFile)(filename, { encoding: "utf8" });
 var writeTextFile = (filename) => (data) => (0, import_promises.writeFile)(filename, data, { encoding: "utf8" });
 var writeConfigFile = (filename) => (config) => Promise.resolve(config).then(JSON.stringify).then(writeTextFile(filename)).then(() => config).catch((err) => Promise.reject({ code: "E_WRITE_CONFIG", context: config, previous: err }));
@@ -8005,15 +8317,18 @@ var runMininet = (sandboxName) => (config) => {
     getBootstrapFlags(sandboxName, config),
     `--protocol-kind "${getSandboxProtocol(sandboxName, config)}"`
   ];
-  console.log(cmdArgs.join(" "));
   return run(cmdArgs.join(" "));
 };
-var configureTezosClient = (sandboxName) => (config) => {
-  const lens = L.compose("sandbox", sandboxName, "accounts", L.values, "keys");
-  return run(`tezos-client --endpoint http://localhost:20000 config update`).then(() => L.collect(lens, config).reduce((retval, keys2) => {
-    return [...retval, run(`tezos-client --protocol ${config.sandbox[sandboxName].protocol} import secret key ${keys2.alias} ${keys2.secretKey} --force`)];
-  }, [])).then((processes) => Promise.all(processes)).then(() => config);
+var configureTezosClient = (config) => run(`tezos-client --endpoint http://localhost:20000 config update`).then(() => config);
+var importAccounts = (sandboxName, config) => {
+  const accountLens = L.compose("sandbox", sandboxName, "accounts", L.values, "keys");
+  const processes = L.collect(accountLens, config).reduce((retval, keys2) => [
+    ...retval,
+    (0, import_promise_retry.default)(() => isAccountImported(keys2.alias).then((hasAccount) => hasAccount ? Promise.resolve("success") : run(`tezos-client --protocol ${config.sandbox[sandboxName].protocol} import secret key ${keys2.alias} ${keys2.secretKey} --force | tee /tmp/import-key.log`)))
+  ], []);
+  return Promise.all(processes).then(() => config);
 };
+var isAccountImported = (accountName) => run(`tezos-client list known accounts`).then((output) => output.indexOf(accountName) >= 0).catch(() => false);
 var inputArgs = yargs_default(process.argv).option("config", {
   default: "/project/.taq/config.json"
 }).option("sandbox", {
@@ -8030,7 +8345,12 @@ readTextFile(inputArgs.config).then(decodeJsonConfig).then(parseConfig).then((co
   const lens = L.compose("sandbox", inputArgs.sandbox, "accounts", L.entries);
   return L.modifyAsync(lens, addAccountKeys, config);
 }).then(writeConfigFile(inputArgs.config)).then((config) => {
-  return inputArgs.configure ? configureTezosClient(inputArgs.sandbox)(config) : runMininet(inputArgs.sandbox)(config).then(() => config);
+  if (inputArgs.configure)
+    return configureTezosClient(config);
+  else if (inputArgs.importAccounts)
+    return importAccounts(inputArgs.sandbox, config);
+  else
+    return runMininet(inputArgs.sandbox)(config).then(() => config);
 }).then(() => process.exit(0)).catch((err) => {
   console.error(err);
   process.exit(-1);

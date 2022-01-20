@@ -2,6 +2,7 @@ import yargs from 'yargs'
 import * as L from 'partial.lenses'
 import {readFile, writeFile} from 'fs/promises'
 import {exec} from 'child_process'
+import retry from 'promise-retry'
 
 type Args = ReturnType<typeof yargs> & {config: string, configure: string, sandbox: string}
 
@@ -242,13 +243,16 @@ const runMininet = (sandboxName: string) => (config: Config) => {
         // '--until-level 200_000_000',
         `--protocol-kind "${getSandboxProtocol(sandboxName, config)}"`
     ]
-    console.log(cmdArgs.join(' '))
     return run(cmdArgs.join(' '))
 }
 
 
-const configureTezosClient = (sandboxName: string) => (config: Config) => {
-    const lens = L.compose(
+const configureTezosClient = (config: Config) => 
+    run(`tezos-client --endpoint http://localhost:20000 config update`)
+    .then(() => config)
+
+const importAccounts = (sandboxName: string, config: Config) => {
+    const accountLens = L.compose(
         'sandbox',
         sandboxName,
         'accounts',
@@ -256,19 +260,31 @@ const configureTezosClient = (sandboxName: string) => (config: Config) => {
         'keys'
     )
 
-    return run(`tezos-client --endpoint http://localhost:20000 config update`)
-    .then(() =>
-        L.collect(lens, config)
-        .reduce(
-            (retval: Promise<string>[], keys: AccountKeys) => {
-                return [...retval, run(`tezos-client --protocol ${config.sandbox[sandboxName].protocol} import secret key ${keys.alias} ${keys.secretKey} --force`)]
-            },
-            []
-        )
+    const processes = L.collect(accountLens, config)
+    .reduce(
+        (retval: Promise<string>[], keys: AccountKeys) => 
+            [
+                ...retval,
+                retry(() =>
+                    isAccountImported(keys.alias)
+                    .then(hasAccount => hasAccount
+                        ? Promise.resolve('success')
+                        : run(`tezos-client --protocol ${config.sandbox[sandboxName].protocol} import secret key ${keys.alias} ${keys.secretKey} --force | tee /tmp/import-key.log`)
+                    )
+                )
+            ],
+        []
     )
-    .then(processes => Promise.all(processes))
+
+    return Promise.all(processes)
     .then(() => config)
 }
+
+
+const isAccountImported = (accountName: string) =>
+    run(`tezos-client list known accounts`)
+    .then(output => output.indexOf(accountName) >= 0)
+    .catch(() => false)
     
 
 /**** Program Execution Starts Here */
@@ -304,10 +320,13 @@ readTextFile(inputArgs.config)
     return L.modifyAsync(lens, addAccountKeys, config)
 })
 .then(writeConfigFile(inputArgs.config))
-.then(config => {
-    return inputArgs.configure 
-        ? configureTezosClient(inputArgs.sandbox) (config)
-        : runMininet(inputArgs.sandbox) (config).then(() => config)
+.then(config => { 
+    if (inputArgs.configure)
+        return configureTezosClient(config)
+    else if (inputArgs.importAccounts)
+        return importAccounts(inputArgs.sandbox, config)
+    else
+        return runMininet(inputArgs.sandbox) (config).then(() => config)
 })
 .then(() => process.exit(0))
 .catch(err => {
