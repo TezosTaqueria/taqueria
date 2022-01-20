@@ -1,5 +1,5 @@
 ---
-title: Plugin Basics
+title: Quick Start Guide
 ---
 
 **Placeholder text**
