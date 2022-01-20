@@ -11,8 +11,7 @@ const FeatureList = [
 				icon: require("../../../static/img/briefcase.svg").default,
 				description: (
 					<>
-						ET has minim elitr intellegat. Mea aeterno eleifend antiopam ad, nam no
-						suscipit quaerendum.
+						<strong>Built-in processes for quality applications</strong><br></br>When we build better applications, the entire Tezos ecosystem wins. Taqueria improves the quality of your applications through easy scaffolding and an improved development workflow.
 					</>
 				)
 			},
@@ -20,8 +19,7 @@ const FeatureList = [
 				icon: require("../../../static/img/key.svg").default,
 				description: (
 					<>
-						TE has minim elitr intellegat. Mea aeterno eleifend antiopam ad, nam no
-						suscipit quaerendum.
+						<strong>Efficient end-to-end development cycle</strong><br></br>Development doesn't stop when you launch your application. Taqueria supports the entire blockchain application development life cycle, from initial testing to deployment, maintenance of applications and smart contracts.
 					</>
 				)
 			},
@@ -29,8 +27,8 @@ const FeatureList = [
 				icon: require("../../../static/img/box.svg").default,
 				description: (
 					<>
-						Et has minim elitr intellegat. Mea aeterno eleifend antiopam ad, nam no
-						suscipit quaerendum.
+						<strong>Getting started is easier</strong><br></br>
+						Taqueria makes getting started with a Tezos project easier than ever by removing the complexity of setting up a development environment so you can get to building sooner.
 					</>
 				)
 			},
@@ -38,8 +36,8 @@ const FeatureList = [
 				icon: require("../../../static/img/credit_card.svg").default,
 				description: (
 					<>
-						Te has minim elitr intellegat. Mea aeterno eleifend antiopam ad, nam no
-						suscipit quaerendum.
+						<strong>From the creators of Taquito</strong><br></br>
+						Taqueria is built by ECAD Labs, the team behind the popular Taquito Typescript library. ECAD Labs has been working in the Tezos ecosystem since 2019 and brings extensive experience building and supporting developer tools.
 					</>
 				)
 			},

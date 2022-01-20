@@ -5,7 +5,7 @@ import Slider from "react-slick";
 
 const FeatureList = [
 	{
-		title: "Insert awesome intro title here.",
+		title: "A New Way to Build on Tezos",
 		Svg: require("../../../static/img/heroSVG.svg").default,
 		SvgTraiangle1: require("../../../static/img/triangle1.svg").default,
 		SvgTraiangle2: require("../../../static/img/triangle2.svg").default,
@@ -15,8 +15,7 @@ const FeatureList = [
 
 		description: (
 			<>
-				Et has minim elitr intellegat. Mea aeterno eleifend antiopam ad, nam no
-				suscipit quaerendum. At nam minimum ponderum.
+				Taqueria provides a seamless development workflow to easily build, test and deploy your Tezos applications.
 			</>
 		),
 		link: {
@@ -26,17 +25,17 @@ const FeatureList = [
 
 		features: [
 			{
-				title: "Feature 1",
+				title: "Installing the Taqueri CLI",
 				icon: require("../../../static/img/briefcase.png").default,
 				description:
-					"Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+					"Installing the Taqueria is easy",
 				gif: require("../../../static/gif/mp4gifcode.mp4").default,
 			},
 			{
-				title: "Feature 2",
+				title: "Installing the Taqueria VS Code Extension",
 				icon: require("../../../static/img/briefcase.png").default,
 				description:
-					"Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+					"Taqueria has a VS Code extension available in the marketplace",
 				gif: require("../../../static/gif/mp4gifcode.mp4").default,
 			},
 		],
