@@ -8231,12 +8231,13 @@ var parseConfig = (input) => {
     return null;
   };
   const parseAccounts = (input2) => Object.entries(input2).reduce((retval, [accountName, accountDetailsInput]) => {
-    if (accountName !== "default") {
+    if (typeof accountDetailsInput !== "string") {
       const temp = {};
       temp[accountName] = parseAccountDetails(accountDetailsInput);
       return temp[accountName] ? __spreadValues(__spreadValues({}, retval), temp) : retval;
+    } else {
+      return __spreadProps(__spreadValues({}, retval), { default: accountDetailsInput });
     }
-    return retval;
   }, {});
   const parseUrl = (input2) => {
     try {
@@ -8276,15 +8277,23 @@ var getAccountKeys = (accountName) => run(`flextesa key ${accountName}`).then((r
   return { alias, encryptedKey, publicKey, secretKey };
 });
 var addAccountKeys = (_0) => __async(exports, [_0], function* ([accountName, accountDetails]) {
-  const keys2 = yield getAccountKeys(accountName);
   return [
     accountName,
-    __spreadProps(__spreadValues({}, accountDetails), { keys: keys2 })
+    accountName === "default" ? accountDetails : __spreadProps(__spreadValues({}, accountDetails), { keys: yield getAccountKeys(accountName) })
   ];
 });
 var getBootstrapFlags = (sandboxName, config) => {
   const lens = L.compose("sandbox", sandboxName, "accounts", L.values);
-  return L.collect(lens, config).map(({ keys: keys2, initialBalance }) => `--add-bootstrap-account="${keys2.alias},${keys2.encryptedKey},${keys2.publicKey},${keys2.secretKey}@${initialBalance}"`).join(" ");
+  return L.collect(lens, config).reduce((retval, accountDetails) => {
+    if (typeof accountDetails === "string") {
+      return retval;
+    }
+    const { keys: keys2, initialBalance } = accountDetails;
+    return [
+      ...retval,
+      `--add-bootstrap-account="${keys2.alias},${keys2.encryptedKey},${keys2.publicKey},${keys2.secretKey}@${initialBalance}"`
+    ];
+  }, []).join(" ");
 };
 var getNoDaemonFlags = (sandboxName, config) => {
   const lens = L.compose("sandbox", sandboxName, "accounts", L.keys);

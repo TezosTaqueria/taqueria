@@ -33,7 +33,7 @@ interface AccountDetailsWithKey extends AccountDetails{
 
 type Accounts  = Record<string, AccountDetails>
 
-type AccountsInput = Record<string, AccountDetailsInput>
+type AccountsInput = Record<string, AccountDetailsInput|string>
 
 interface SandboxSettingsInput {
     readonly label?: string
@@ -101,14 +101,16 @@ const parseConfig = (input: ConfigInput) => {
 
     const parseAccounts = (input: AccountsInput): Accounts | null => Object.entries(input).reduce(
         (retval, [accountName, accountDetailsInput]) => {
-            if (accountName !== 'default') {
+            if (typeof(accountDetailsInput) !== 'string') {
                 const temp: Record<string, (null|AccountDetails)> = {}
                 temp[accountName] = parseAccountDetails(accountDetailsInput)
                 return temp[accountName]
                     ? {...retval, ...temp}
                     : retval
             }
-            return retval
+            else {
+                return {...retval, default: accountDetailsInput}
+            }
         },
         {}
     )
@@ -172,10 +174,11 @@ const getAccountKeys = (accountName: string): Promise<AccountKeys> =>
     })
 
 const addAccountKeys = async ([accountName, accountDetails]: [string, AccountDetails]) => {
-    const keys = await getAccountKeys(accountName)
     return [
         accountName,
-        {...accountDetails, keys}
+        accountName === 'default'
+            ? accountDetails
+            : {...accountDetails, keys: await getAccountKeys(accountName)}
     ]
 }
 
@@ -188,7 +191,19 @@ const getBootstrapFlags = (sandboxName: string, config:Config) => {
     )
 
     return L.collect(lens, config)
-        .map(({keys, initialBalance}: AccountDetailsWithKey) => `--add-bootstrap-account="${keys.alias},${keys.encryptedKey},${keys.publicKey},${keys.secretKey}@${initialBalance}"`)
+        .reduce(
+            (retval: string[], accountDetails: AccountDetailsWithKey | string) => {
+                if (typeof accountDetails === 'string') {
+                    return retval
+                }
+                const {keys, initialBalance} = accountDetails
+                return [
+                    ...retval,
+                    `--add-bootstrap-account="${keys.alias},${keys.encryptedKey},${keys.publicKey},${keys.secretKey}@${initialBalance}"`
+                ]
+            },
+            []
+        )
         .join(' ')
 }
 

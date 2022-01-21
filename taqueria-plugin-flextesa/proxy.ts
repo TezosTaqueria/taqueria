@@ -82,6 +82,11 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<ProxyAction> 
                 : execCmd(getStartCommand(sandbox, getDockerImage(), opts))
                 .then(() => configureTezosClient(sandbox, opts))
                 .then(() => importAccounts(sandbox, opts))
+                .then(() => ({
+                    status: 'success',
+                    stdout: `Started ${sandbox.name.value}.`,
+                    stderr: ''
+                }))
         )
 }
 
@@ -189,6 +194,8 @@ const isSandboxRunning = (sandboxName: string) =>
 const getAccountBalances =(sandbox: Sandbox): Promise<ProxyAction> => {
     const processes = Object.entries(sandbox.accounts).reduce(
         (retval: Promise<unknown>[], [accountName, _accountDetails]) => {
+            if (accountName === 'default') return retval
+
             const getBalanceProcess = 
                 execCmd(`docker exec ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
                 .then(result => result.status === 'success'
@@ -250,7 +257,8 @@ const stopSandboxTask = async <T>(parsedArgs: Opts) : LikeAPromise<ActionRespons
             if (doesUseFlextesa(sandbox)) {
                 return await isSandboxRunning(sandbox.name.value)
                 ? execCmd(`docker kill ${sandbox.name}`)
-                  .then(() => execCmd(`docker rm ${sandbox.name}`))
+                .then(result => ({...result, stdout: `Stopped ${sandbox.name.value}.`}))
+                //   .then(() => execCmd(`docker rm ${sandbox.name}`))
                 : Promise.resolve({
                     status: 'success',
                     stdout: `The ${sandbox.name} sandbox was not running.`,
