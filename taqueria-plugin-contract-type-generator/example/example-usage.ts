@@ -1,19 +1,20 @@
 import { Context, ContractAbstraction, ContractMethod, ContractProvider, TezosToolkit, Wallet } from '@taquito/taquito';
-import { contractAbstractionComposer, walletAbstractionComposer, ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './example-usage-type-utilities';
+import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './example-usage-type-utilities';
 import { ExampleContract1ContractType as TestContractType } from './types-file/example-contract-1.types';
 import { ExampleContract2ContractType as TestContractType2 } from './types-file/example-contract-2.types';
 import { nat, tas } from './types-file/type-aliases';
 
+// TODO: Move to generated code
 type TestContract = ContractAbstractionFromContractType<TestContractType>;
 type TestWalletContract = WalletContractAbstractionFromContractType<TestContractType>;
 type TestContract2 = ContractAbstractionFromContractType<TestContractType2>;
+
 
 export const exampleContractMethods1 = async () => {
 
     const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
 
     const contract = await Tezos.contract.at<TestContract>(`tz123`);
-    const contract2 = await Tezos.contract.at(`tz123`, contractAbstractionComposer<TestContractType>());
 
     contract.methods.bid(tas.nat(0));
     contract.methods.configure(
@@ -112,7 +113,7 @@ export const exampleContractMethods2 = async () => {
         code: ``,
         storage: {},
     });
-    const contract = await originationResult.contract(5) as TestContract2;
+    const contract = await originationResult.contract<TestContract2>(5);
     contract.methods.set_admin(tas.address(`tz123`));
 
     contract.methods.create_token(
@@ -153,7 +154,7 @@ export const exampleContractStorage1 = async () => {
 
     const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
 
-    const contract = await Tezos.contract.at<TestContract>(``);
+    const contract = await Tezos.contract.at<TestContract>(`tz123`);
 
     const getAuctionInfo = async (id: nat) => {
         const storage = await contract.storage();
