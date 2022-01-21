@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import clsx from "clsx";
+import React, { useState, useEffect } from "react";
+// import clsx from "clsx";
 import styles from "./Hero.module.css";
-import Slider from "react-slick";
+// import Slider from "react-slick";
 
 const FeatureList = [
   {
@@ -56,12 +56,30 @@ function Feature({
   SvgTraiangle5,
 }) {
   const checkTitle = (e) => {
+    setUserAction(true);
     isVisible === e.target.id
       ? toggleIsVisible(`${features[0].title}`)
       : toggleIsVisible(e.target.id);
   };
 
   const [isVisible, toggleIsVisible] = useState(`${features[0].title}`);
+  const [userAction, setUserAction] = useState(false);
+
+  const featuresIndex = features.findIndex((object) => {
+    return object.title === isVisible;
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const checkEnd = (index) => {
+        return features.length - 1 === index ? index * 0 : index + 1;
+      };
+
+      !userAction &&
+        toggleIsVisible(`${features[checkEnd(featuresIndex)].title}`);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isVisible, userAction]);
 
   return (
     <div className={styles.content}>
