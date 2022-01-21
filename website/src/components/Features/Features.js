@@ -52,25 +52,30 @@ const FeatureList = [
 
 function Feature({ title, description, features, button }) {
   const checkTitle = (e) => {
+    setUserAction(true);
     isVisible === e.target.id
       ? toggleIsVisible(`${features[0].title}`)
       : toggleIsVisible(e.target.id);
   };
 
   const [isVisible, toggleIsVisible] = useState(`${features[0].title}`);
+  const [userAction, setUserAction] = useState(false);
+
+  const featuresIndex = features.findIndex((object) => {
+    return object.title === isVisible;
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const index = features.findIndex((object) => {
-        return object.title === isVisible;
-      });
       const checkEnd = (index) => {
         return features.length - 1 === index ? index * 0 : index + 1;
       };
-      toggleIsVisible(`${features[checkEnd(index)].title}`);
+
+      !userAction &&
+        toggleIsVisible(`${features[checkEnd(featuresIndex)].title}`);
     }, 5000);
     return () => clearInterval(interval);
-  }, [isVisible]);
+  }, [isVisible, userAction]);
 
   return (
     <div>
