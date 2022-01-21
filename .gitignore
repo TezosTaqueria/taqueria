@@ -120,3 +120,5 @@ tests/coverage
 /taqueria-plugin-taquito/index.js.map
 /taqueria-plugin-mock/index.js
 /taqueria-plugin-mock/index.js.map
+/taqueria-plugin-flextesa/index.js
+/taqueria-plugin-flextesa/index.js.map

@@ -6,6 +6,7 @@ import {readFile} from 'fs/promises'
 
 type Opts = SanitizedArgs & Record<string, unknown>
 
+// TODO: Move to SDK
 const execCmd = (cmd:string): Promise<ProxyAction> => new Promise((resolve, reject) => {
     exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
         if (err) reject({

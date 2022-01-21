@@ -1,12 +1,30 @@
-import {TaskHandler, Action, Scaffold, Hook, Sandbox, Network, Verb, Command, Option, Alias, RuntimeDependency, UnvalidatedTask, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedPluginInfo, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork} from 'taqueria-protocol/taqueria-protocol-types'
+import {TaskHandler, Action, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, RuntimeDependency, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig} from 'taqueria-protocol/taqueria-protocol-types'
+
+export type Sandbox = theSandbox
+
+export type Attributes = theAttributes
+
+export type EconomicalProtocol = theProtocol
+
+export type NetworkConfig = theNetworkConfig
+
+export type SandboxConfig = theSandboxConfig
 
 export interface TaskView {
     readonly task: string
     readonly command: string
     readonly description: string
     readonly aliases: string[]
-    readonly options: UnvalidatedOption[],
+    readonly options: UnvalidatedOption[]
+    readonly positionals: UnvalidatedPositionalArg[]
     readonly handler: "proxy" | string | string[]
+}
+
+export interface PositionalArgView {
+    readonly placeholder: string
+    readonly description: string
+    readonly type?: OptionType
+    readonly defaultValue?: number | boolean | string
 }
 
 export interface Failure<Params> {
@@ -105,25 +123,9 @@ export interface Config extends Record<string, unknown>{
     testsDir: string
     contractsDir: string
     artifactsDir: string
-    environment?: {
-        [key: string]: Environment
-    } & {
-        default: string
-    }
-}
-
-// TODO: This environment type is temporary.
-export interface Environment {
-    storage?: Record<string, any>
-    rpcUrl: string,
-    faucet: {
-        mnemonic: string[],
-        activation_code: string,
-        amount: number,
-        pkh: string,
-        password: string,
-        email: string
-    }
+    sandbox: Record<string, SandboxConfig>
+    network: Record<string, NetworkConfig>
+    environment: Record<string, EnvironmentConfig> & {default: string}
 }
 
 export interface SanitizedArgs {
