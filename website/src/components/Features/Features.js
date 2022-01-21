@@ -61,10 +61,16 @@ function Feature({ title, description, features, button }) {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      console.log("+1");
+      const index = features.findIndex((object) => {
+        return object.title === isVisible;
+      });
+      const checkEnd = (index) => {
+        return features.length - 1 === index ? index * 0 : index + 1;
+      };
+      toggleIsVisible(`${features[checkEnd(index)].title}`);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isVisible]);
 
   return (
     <div>
