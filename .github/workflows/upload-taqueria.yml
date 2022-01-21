@@ -138,10 +138,10 @@ jobs:
       matrix:
         include:
           - dir: taqueria-plugin-ligo
-          - dir: taqueria-plugin-smartpy
-          - dir: taqueria-plugin-taquito
-          - dir: taqueria-plugin-teztnets
-          - dir: taqueria-sdk
+          # - dir: taqueria-plugin-smartpy
+          # - dir: taqueria-plugin-taquito
+          # - dir: taqueria-plugin-teztnets
+          # - dir: taqueria-sdk
     
     defaults:
       run:
