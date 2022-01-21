@@ -34,23 +34,24 @@ export const exampleContractMethods1 = async () => {
         /*end_time:*/ tas.timestamp(`2020-01-01`),
     );
 
-    // TODO: methodsObject
-    // contract.methodsObject.configure({
-    //     asset: [{
-    //         fa2_address: tas.address(`tz123`),
-    //         fa2_batch: [{
-    //             amount: tas.nat(100),
-    //             token_id: tas.nat(`100000000000000`),
-    //         }],
-    //     }],
-    //     start_time: tas.timestamp(new Date()),
-    //     end_time: tas.timestamp(`2020-01-01`),
-    //     extend_time: tas.nat(10),
-    //     min_raise: tas.mutez(10),
-    //     min_raise_percent: tas.nat(10),
-    //     opening_price: tas.mutez(10),
-    //     round_time: tas.nat(10),
-    // });
+    // methodsObject
+    contract.methodsObject.bid(tas.nat(0));
+    contract.methodsObject.configure({
+        asset: [{
+            fa2_address: tas.address(`tz123`),
+            fa2_batch: [{
+                amount: tas.nat(100),
+                token_id: tas.nat(`100000000000000`),
+            }],
+        }],
+        start_time: tas.timestamp(new Date()),
+        end_time: tas.timestamp(`2020-01-01`),
+        extend_time: tas.nat(10),
+        min_raise: tas.mutez(10),
+        min_raise_percent: tas.nat(10),
+        opening_price: tas.mutez(10),
+        round_time: tas.nat(10),
+    });
 
 };
 
@@ -85,23 +86,23 @@ export const exampleWalletContractMethods1 = async () => {
         /*end_time:*/ tas.timestamp(`2020-01-01`),
     );
 
-    // TODO: methodsObject
-    // contract.methodsObject.configure({
-    //     asset: [{
-    //         fa2_address: tas.address(`tz123`),
-    //         fa2_batch: [{
-    //             amount: tas.nat(100),
-    //             token_id: tas.nat(`100000000000000`),
-    //         }],
-    //     }],
-    //     start_time: tas.timestamp(new Date()),
-    //     end_time: tas.timestamp(`2020-01-01`),
-    //     extend_time: tas.nat(10),
-    //     min_raise: tas.mutez(10),
-    //     min_raise_percent: tas.nat(10),
-    //     opening_price: tas.mutez(10),
-    //     round_time: tas.nat(10),
-    // });
+    // methodsObject
+    contract.methodsObject.configure({
+        asset: [{
+            fa2_address: tas.address(`tz123`),
+            fa2_batch: [{
+                amount: tas.nat(100),
+                token_id: tas.nat(`100000000000000`),
+            }],
+        }],
+        start_time: tas.timestamp(new Date()),
+        end_time: tas.timestamp(`2020-01-01`),
+        extend_time: tas.nat(10),
+        min_raise: tas.mutez(10),
+        min_raise_percent: tas.nat(10),
+        opening_price: tas.mutez(10),
+        round_time: tas.nat(10),
+    });
 
 };
 
@@ -131,21 +132,22 @@ export const exampleContractMethods2 = async () => {
         }),
     );
 
-    // TODO: methodsObject
-    // contract.methodsObject.create_token({
-    //     token_id: tas.nat(`100000000000000`),
-    //     token_info: tas.map([
-    //         { key: `0`, value: tas.bytes(`abc`) },
-    //         { key: `1`, value: tas.bytes(`def`) },
-    //     ]),
-    // });
-    // contract.methodsObject.create_token({
-    //     token_id: tas.nat(`100000000000000`),
-    //     token_info: tas.map({
-    //         0: tas.bytes(`abc`),
-    //         1: tas.bytes(`def`),
-    //     }),
-    // });
+    // methodsObject
+    contract.methodsObject.set_admin(tas.address(`tz123`));
+    contract.methodsObject.create_token({
+        token_id: tas.nat(`100000000000000`),
+        token_info: tas.map([
+            { key: `0`, value: tas.bytes(`abc`) },
+            { key: `1`, value: tas.bytes(`def`) },
+        ]),
+    });
+    contract.methodsObject.create_token({
+        token_id: tas.nat(`100000000000000`),
+        token_info: tas.map({
+            0: tas.bytes(`abc`),
+            1: tas.bytes(`def`),
+        }),
+    });
 
 };
 
