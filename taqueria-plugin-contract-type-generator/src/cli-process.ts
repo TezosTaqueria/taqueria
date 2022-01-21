@@ -3,8 +3,9 @@ import path from 'path';
 import { promisify } from 'util';
 import { normalizeContractName } from './generator/contract-name';
 import { generateContractTypesFromMichelsonCode } from './generator/process';
-import { TypeAliasData } from './generator/typescript-output';
+import { TypeAliasData, TypeUtilsData } from './generator/typescript-output';
 import { typeAliasesFileContent } from './type-aliases-file-content';
+import { typeUtilsFileContent } from './type-utils-file-content';
 
 const fs = {
     mkdir: promisify(fsRaw.mkdir),
@@ -77,6 +78,11 @@ export const generateContractTypesProcessContractFiles = async ({
         await fs.writeFile(path.join(outputTypescriptDirectory, './type-aliases.ts'), typeAliasesFileContent);
     }
 
+     // Copy the type utils file
+     const typeUtilsData: TypeUtilsData = { importPath: `./type-utils` };
+     await fs.mkdir(outputTypescriptDirectory, { recursive: true });
+     await fs.writeFile(path.join(outputTypescriptDirectory, './type-utils.ts'), typeUtilsFileContent);
+
     for (const fullPath of files) {
         const fileRelativePath = fullPath.replace(path.resolve(inputTzContractDirectory), '');
         const fileName = fileRelativePath.replace(ext, '');
@@ -92,7 +98,7 @@ export const generateContractTypesProcessContractFiles = async ({
 
             const {
                 typescriptCodeOutput: { typesFileContent, contractCodeFileContent }
-            } = generateContractTypesFromMichelsonCode(michelsonCode, contractTypeName, format, typeAliasData);
+            } = generateContractTypesFromMichelsonCode(michelsonCode, contractTypeName, format, typeAliasData, typeUtilsData);
 
             // Write output (ensure dir exists)
             await fs.mkdir(path.dirname(typesOutputFilePath), { recursive: true });

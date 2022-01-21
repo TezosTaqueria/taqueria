@@ -18,8 +18,11 @@ export type TypeAliasData = {
 } | {
     mode: 'simple',
 };
+export type TypeUtilsData = {
+    importPath: string,
+};
 
-export const toTypescriptCode = (storage: TypedStorage, methods: TypedMethod[], contractName: string, parsedContract: unknown, protocol: { name: string, key: string }, typeAliasData: TypeAliasData): TypescriptCodeOutput => {
+export const toTypescriptCode = (storage: TypedStorage, methods: TypedMethod[], contractName: string, parsedContract: unknown, protocol: { name: string, key: string }, typeAliasData: TypeAliasData, typeUtilsData: TypeUtilsData): TypescriptCodeOutput => {
     type TypeAlias = { aliasType: string, simpleTypeDefinition: string, simpleTypeImports?: { name: string, isDefault?: boolean, from: string }[] };
     const usedStrictTypes = [] as TypeAlias[];
     const addTypeAlias = (strictType: TypeAlias) => {
@@ -189,15 +192,20 @@ ${tabs(indent)}`;
         .sort((a, b) => a.aliasType.localeCompare(b.aliasType))
         .map(x => x.simpleTypeDefinition).join(`\n`);
 
+    const typeUtilsDefinitions =
+            `import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from '${typeUtilsData.importPath}';`;
+
     const typeAliasesDefinitions =
         typeAliasData.mode === 'simple' ? `${simpleTypeMappingImportsText}${simpleTypeMapping}`
             : typeAliasData.mode === 'local' ? typeAliasData.fileContent
                 : `import { ${usedStrictTypes.map(x => x.aliasType).join(`, `)} } from '${typeAliasData.importPath}';`;
 
     const contractTypeName = `${contractName}ContractType`;
+    const walletTypeName = `${contractName}WalletType`;
     const codeName = `${contractName}Code`;
 
     const typesFileContent = `
+${typeUtilsDefinitions}
 ${typeAliasesDefinitions}
 
 ${storageCode}
@@ -206,7 +214,9 @@ ${methodsCode}
 
 ${methodsObjectCode}
 
-export type ${contractTypeName} = { methods: Methods, methodsObject: MethodsObject, storage: Storage, code: { __type: '${codeName}', protocol: string, code: object[] } };
+type contractTypes = { methods: Methods, methodsObject: MethodsObject, storage: Storage, code: { __type: '${codeName}', protocol: string, code: object[] } };
+export type ${contractTypeName} = ContractAbstractionFromContractType<contractTypes>;
+export type ${walletTypeName} = WalletContractAbstractionFromContractType<contractTypes>;
 `;
 
     const contractCodeFileContent = `

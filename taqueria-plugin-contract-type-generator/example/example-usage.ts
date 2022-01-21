@@ -1,14 +1,7 @@
-import { Context, ContractAbstraction, ContractMethod, ContractProvider, TezosToolkit, Wallet } from '@taquito/taquito';
-import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './example-usage-type-utilities';
-import { ExampleContract1ContractType as TestContractType } from './types-file/example-contract-1.types';
-import { ExampleContract2ContractType as TestContractType2 } from './types-file/example-contract-2.types';
+import { TezosToolkit } from '@taquito/taquito';
+import { ExampleContract1ContractType as TestContract, ExampleContract1WalletType as TestWalletContract } from './types-file/example-contract-1.types';
+import { ExampleContract2ContractType as TestContract2 } from './types-file/example-contract-2.types';
 import { nat, tas } from './types-file/type-aliases';
-
-// TODO: Move to generated code
-type TestContract = ContractAbstractionFromContractType<TestContractType>;
-type TestWalletContract = WalletContractAbstractionFromContractType<TestContractType>;
-type TestContract2 = ContractAbstractionFromContractType<TestContractType2>;
-
 
 export const exampleContractMethods1 = async () => {
 
