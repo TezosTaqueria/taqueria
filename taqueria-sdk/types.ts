@@ -50,8 +50,9 @@ export type ActionNotSupported = {
 
 export interface ProxyAction {
     readonly status: ActionResponseCode,
-    readonly stdout: string,
-    readonly stderr: string
+    readonly stdout: string | unknown,
+    readonly stderr: string,
+    readonly render?: 'none' | 'string' | 'table'
 }
 
 export interface ActionPluginInfo extends SchemaView {

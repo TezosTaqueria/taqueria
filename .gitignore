@@ -116,3 +116,7 @@ tests/coverage
 /taqueria-sdk/index.js.map
 /taqueria-plugin-smartpy/index.js
 /taqueria-plugin-smartpy/index.js.map
+/taqueria-plugin-taquito/index.js
+/taqueria-plugin-taquito/index.js.map
+/taqueria-plugin-mock/index.js
+/taqueria-plugin-mock/index.js.map

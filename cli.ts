@@ -50,6 +50,10 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
     })
     .boolean('debug')
     .hide('debug')
+    .option('quickstart', {
+        default: ''
+    })
+    .hide('quickstart')
     .option('p', {
         alias: 'projectDir',
         default: './',
@@ -79,8 +83,8 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         },
         (args: RawInitArgs) => pipe(
             sanitizeArgs(args), 
-            ({projectDir, configDir, maxConcurrency}: SanitizedInitArgs) => {
-                return initProject(projectDir, configDir, i18n, maxConcurrency)
+            ({projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
+                return initProject(projectDir, configDir, i18n, maxConcurrency, quickstart)
             },
             fork (console.error) (console.log)
         )
@@ -117,7 +121,7 @@ const postInitCLI = (env: EnvVars, args: DenoArgs, parsedArgs: SanitizedInitArgs
 
 const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync())
 
-const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number) => pipe(
+const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
     getConfig(projectDir, configDir, i18n, true),
     chain (({artifactsDir, contractsDir, testsDir, projectDir}: ConfigArgs) => {
         const
@@ -127,6 +131,10 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
         
         return parallel (maxConcurrency) ([mkdir(artifactsAbspath), mkdir(contractsAbspath), mkdir(testsAbspath)])        
     }),
+    chain ((results: string[]) => quickstart.length > 0
+        ? writeTextFile(joinPaths(projectDir.value, "quickstart.md"), quickstart)
+        : resolve (results)
+    ),
     map (() => i18n.__("bootstrapMsg"))
 )
 
@@ -205,7 +213,7 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
             const formattedArgs = Object.entries({...parsedArgs, ...requestArgs}).reduce(
                 (retval: string[], [key, val]) => {
                     // Some parameters we don't need to send, so we omit those
-                    if (['$0'].includes(key) || key.indexOf('-') >= 0 || val === undefined)
+                    if (['$0', 'quickstart'].includes(key) || key.indexOf('-') >= 0 || val === undefined)
                         return retval
                     // Others need renamed
                     else if (key === '_')
@@ -456,7 +464,8 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency,
     debug: parsedArgs.debug,
     plugin: parsedArgs.plugin,
-    env: parsedArgs.env
+    env: parsedArgs.env,
+    quickstart: parsedArgs.quickstart
 })
 
 export default {
