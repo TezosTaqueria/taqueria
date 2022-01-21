@@ -1,14 +1,19 @@
 import { Context, ContractAbstraction, ContractMethod, ContractProvider, TezosToolkit, Wallet } from '@taquito/taquito';
-import { contractAbstractionComposer, walletAbstractionComposer, ContractAbstractionFromContractType, StorageFromContractType } from './example-usage-type-utilities';
+import { contractAbstractionComposer, walletAbstractionComposer, ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './example-usage-type-utilities';
 import { ExampleContract1ContractType as TestContractType } from './types-file/example-contract-1.types';
 import { ExampleContract2ContractType as TestContractType2 } from './types-file/example-contract-2.types';
 import { nat, tas } from './types-file/type-aliases';
+
+type TestContract = ContractAbstractionFromContractType<TestContractType>;
+type TestWalletContract = WalletContractAbstractionFromContractType<TestContractType>;
+type TestContract2 = ContractAbstractionFromContractType<TestContractType2>;
 
 export const exampleContractMethods1 = async () => {
 
     const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
 
-    const contract = await Tezos.contract.at(`tz123`, contractAbstractionComposer<TestContractType>());
+    const contract = await Tezos.contract.at<TestContract>(`tz123`);
+    const contract2 = await Tezos.contract.at(`tz123`, contractAbstractionComposer<TestContractType>());
 
     contract.methods.bid(tas.nat(0));
     contract.methods.configure(
@@ -52,7 +57,7 @@ export const exampleWalletContractMethods1 = async () => {
 
     const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
 
-    const contract = await Tezos.wallet.at(`tz123`, walletAbstractionComposer<TestContractType>());
+    const contract = await Tezos.wallet.at<TestWalletContract>(`tz123`);
 
     // SendParams are not stictly typed yet
     // const bidSendResult = await contract.methods.bid(tas.nat(0)).send({ amount: tas.mutez(1000000) });
@@ -107,7 +112,7 @@ export const exampleContractMethods2 = async () => {
         code: ``,
         storage: {},
     });
-    const contract = await originationResult.contract(5) as ContractAbstractionFromContractType<TestContractType2>;
+    const contract = await originationResult.contract(5) as TestContract2;
     contract.methods.set_admin(tas.address(`tz123`));
 
     contract.methods.create_token(
@@ -148,10 +153,10 @@ export const exampleContractStorage1 = async () => {
 
     const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
 
-    const contract = await Tezos.contract.at(``) as ContractAbstractionFromContractType<TestContractType>;
+    const contract = await Tezos.contract.at<TestContract>(``);
 
     const getAuctionInfo = async (id: nat) => {
-        const storage = await contract.storage<StorageFromContractType<TestContractType>>();
+        const storage = await contract.storage();
 
         const auctions = storage.auctions;
         const auction = await auctions.get(id);
