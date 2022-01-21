@@ -130,6 +130,12 @@ export interface Config {
     readonly contractsDir: string
     readonly testsDir: string
     readonly artifactsDir: string
+
+    readonly environment: Record<'default'|string, string|EnvironmentConfig>
+
+    readonly sandbox: Record<string, SandboxConfig>
+
+    readonly network: Record<string, NetworkConfig>
 }
 
 export interface ConfigArgs extends Config {
@@ -446,7 +452,7 @@ export interface SandboxConfig {
     readonly rpcUrl?: string
     readonly protocol?: string
     readonly attributes?: Attributes
-    readonly accounts: Record<string, AccountDetails> & {default: string}
+    readonly accounts: Record<string|'default', AccountDetails|string>
 }
 
 export interface NetworkConfig {

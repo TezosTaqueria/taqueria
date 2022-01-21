@@ -13,7 +13,41 @@ export const defaultConfig : Config = {
     plugins: [],
     contractsDir: "contracts",
     testsDir: "tests",
-    artifactsDir: "artifacts"
+    artifactsDir: "artifacts",
+    environment: {
+        default: "development",
+        development: {
+            networks: [],
+            sandboxes: ["local"],
+            storage: {
+           }
+        }
+    },
+    sandbox: {
+        local: {
+            accounts: {
+                default: "bob",
+                bob: {
+                    initialBalance: "3000000000"
+                },
+                alice: {
+                    initialBalance: "2000000000"
+                },
+                john: {
+                    initialBalance: "4000000000"
+                },
+                jane: {
+                    initialBalance: "5000000000"
+                },
+                joe: {
+                    initialBalance: "1000000000"
+                }
+            }
+        }
+    },
+    network: {
+        
+    }
     // defaultTasks: {
     //     compile: {
     //         plugin: "taqueria-plugin-ligo",
