@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Features.module.css";
 
 const FeatureList = [
@@ -59,6 +59,13 @@ function Feature({ title, description, features, button }) {
 
   const [isVisible, toggleIsVisible] = useState(`${features[0].title}`);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("+1");
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div>
       <div className={styles.headlineBlock}>
@@ -113,7 +120,7 @@ function Feature({ title, description, features, button }) {
           {features.map((feature, index) => {
             return (
               isVisible === feature.title && (
-                <video key={index} autoplay="true" muted src={feature.gif} />
+                <video key={index} autoPlay={true} muted src={feature.gif} />
               )
             );
           })}
