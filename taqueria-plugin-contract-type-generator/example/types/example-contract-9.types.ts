@@ -19,4 +19,8 @@ type Methods = {
     
 };
 
-export type ExampleContract9ContractType = { methods: Methods, storage: Storage, code: { __type: 'ExampleContract9Code', protocol: string, code: object[] } };
+type MethodsObject = {
+    
+};
+
+export type ExampleContract9ContractType = { methods: Methods, methodsObject: MethodsObject, storage: Storage, code: { __type: 'ExampleContract9Code', protocol: string, code: object[] } };

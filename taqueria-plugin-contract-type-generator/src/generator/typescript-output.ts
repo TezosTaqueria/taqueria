@@ -6,6 +6,7 @@ export type TypescriptCodeOutput = {
     contractCodeFileContent: string;
     storage: string;
     methods: string;
+    methodsObject: string;
 };
 
 export type TypeAliasData = {
@@ -118,24 +119,39 @@ ${tabs(indent)}`;
         return `${t.name ?? i}${t.type.optional ? `?` : ``}: ${typeToCode(t.type, indent)}`;
     };
 
-    const argsToCode = (args: TypedVar[], indent: number): string => {
+    const argsToCode = (args: TypedVar[], indent: number, asObject: boolean): string => {
         if (args.length === 1) {
             if (args[0].type.kind === `unit`) { return ``; }
             return `${args[0].name ?? `param`}: ${typeToCode(args[0].type, indent + 1)}`;
         }
 
-        return `${toIndentedItems(indent, {},
+        const result = `${toIndentedItems(indent, {},
             args.filter(x => x.name || x.type.kind !== `unit`).map((a, i) => varToCode(a, i, indent + 1) + `,`),
         )}`;
+
+        if(asObject){
+            return `params: {${result}}`;
+        }
+
+        return result;
     };
 
     const methodsToCode = (indent: number) => {
         const methodFields = methods.map(x => {
-            const methodCode = `${x.name}: (${argsToCode(x.args, indent + 1)}) => Promise<void>;`;
+            const methodCode = `${x.name}: (${argsToCode(x.args, indent + 1, false)}) => Promise<void>;`;
             return methodCode;
         });
 
         const methodsTypeCode = `type Methods = {${toIndentedItems(indent, {}, methodFields)}};`;
+        return methodsTypeCode;
+    };
+    const methodsObjectToCode = (indent: number) => {
+        const methodFields = methods.map(x => {
+            const methodCode = `${x.name}: (${argsToCode(x.args, indent + 1, true)}) => Promise<void>;`;
+            return methodCode;
+        });
+
+        const methodsTypeCode = `type MethodsObject = {${toIndentedItems(indent, {}, methodFields)}};`;
         return methodsTypeCode;
     };
 
@@ -145,6 +161,7 @@ ${tabs(indent)}`;
     };
 
     const methodsCode = methodsToCode(0);
+    const methodsObjectCode = methodsObjectToCode(0);
     const storageCode = storageToCode(0);
 
     // Simple type aliases
@@ -187,7 +204,9 @@ ${storageCode}
 
 ${methodsCode}
 
-export type ${contractTypeName} = { methods: Methods, storage: Storage, code: { __type: '${codeName}', protocol: string, code: object[] } };
+${methodsObjectCode}
+
+export type ${contractTypeName} = { methods: Methods, methodsObject: MethodsObject, storage: Storage, code: { __type: '${codeName}', protocol: string, code: object[] } };
 `;
 
     const contractCodeFileContent = `
@@ -202,6 +221,7 @@ export const ${codeName}: { __type: '${codeName}', protocol: string, code: objec
         contractCodeFileContent,
         storage: storageCode,
         methods: methodsCode,
+        methodsObject: methodsObjectCode,
     };
 
 };

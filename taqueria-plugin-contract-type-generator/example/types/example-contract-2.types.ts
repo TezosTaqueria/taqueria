@@ -71,4 +71,49 @@ type Methods = {
         }>) => Promise<void>;
 };
 
-export type ExampleContract2ContractType = { methods: Methods, storage: Storage, code: { __type: 'ExampleContract2Code', protocol: string, code: object[] } };
+type MethodsObject = {
+    confirm_admin: () => Promise<void>;
+    pause: (param: boolean) => Promise<void>;
+    set_admin: (param: address) => Promise<void>;
+    balance_of: (params: {
+        requests: Array<{
+            owner: address;
+            token_id: nat;
+        }>,
+        callback: contract,
+    }) => Promise<void>;
+    transfer: (param: Array<{
+            from_: address;
+            txs: Array<{
+                to_: address;
+                token_id: nat;
+                amount: nat;
+            }>;
+        }>) => Promise<void>;
+    add_operator: (params: {
+        owner: address,
+        operator: address,
+        token_id: nat,
+    }) => Promise<void>;
+    remove_operator: (params: {
+        owner: address,
+        operator: address,
+        token_id: nat,
+    }) => Promise<void>;
+    burn_tokens: (param: Array<{
+            owner: address;
+            token_id: nat;
+            amount: nat;
+        }>) => Promise<void>;
+    create_token: (params: {
+        token_id: nat,
+        token_info: MMap<string, bytes>,
+    }) => Promise<void>;
+    mint_tokens: (param: Array<{
+            owner: address;
+            token_id: nat;
+            amount: nat;
+        }>) => Promise<void>;
+};
+
+export type ExampleContract2ContractType = { methods: Methods, methodsObject: MethodsObject, storage: Storage, code: { __type: 'ExampleContract2Code', protocol: string, code: object[] } };

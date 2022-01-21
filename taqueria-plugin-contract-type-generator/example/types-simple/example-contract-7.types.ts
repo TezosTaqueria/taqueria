@@ -51,4 +51,31 @@ type Methods = {
     ) => Promise<void>;
 };
 
-export type ExampleContract7ContractType = { methods: Methods, storage: Storage, code: { __type: 'ExampleContract7Code', protocol: string, code: object[] } };
+type MethodsObject = {
+    confirm_admin: () => Promise<void>;
+    pause: (param: boolean) => Promise<void>;
+    set_admin: (param: address) => Promise<void>;
+    buy: (params: {
+        sale_seller: address,
+        token_for_sale_address: address,
+        token_for_sale_token_id: nat,
+        money_token_address: address,
+        money_token_token_id: nat,
+    }) => Promise<void>;
+    mint: (param: Array<{
+            token_metadata: {
+                token_id: nat;
+                token_info: MMap<string, bytes>;
+            };
+            owner: address;
+        }>) => Promise<void>;
+    sell: (params: {
+        sale_price: nat,
+        token_for_sale_address: address,
+        token_for_sale_token_id: nat,
+        money_token_address: address,
+        money_token_token_id: nat,
+    }) => Promise<void>;
+};
+
+export type ExampleContract7ContractType = { methods: Methods, methodsObject: MethodsObject, storage: Storage, code: { __type: 'ExampleContract7Code', protocol: string, code: object[] } };
