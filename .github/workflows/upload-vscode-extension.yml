@@ -1,7 +1,7 @@
 on:
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -24,6 +24,6 @@ jobs:
 
     - run: xvfb-run -a npm test
       if: runner.os == 'Linux'
-      
+
     - run: npm test
       if: runner.os != 'Linux'
