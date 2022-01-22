@@ -65,7 +65,7 @@ const config = {
 			navbar: {
 				logo: {
 					alt: "Tezos Taqueria Logo",
-					src: "img/logoSVG.svg",
+					src: "img/Taqueria_magenta_beta.svg",
 				},
 				items: [
 					{
@@ -170,7 +170,7 @@ const config = {
 							{
 								html: `
 									<a href="/" target="_blank" rel="noreferrer noopener" aria-label="">
-									  <img src="img/footerLogoSVG.svg" alt="" />
+									  <img class='footerLogo' src="img/Taqueria_purple_beta.svg" alt="" />
 									</a>
 								  `,
 							},
