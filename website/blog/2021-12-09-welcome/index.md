@@ -61,7 +61,7 @@ export const Caution = () => (
             marginBottom: "11px",
           }}
         >
-          <img src={require("../static/img/CautionIcon.png").default} />
+          <img src={require("../../static/img/CautionIcon.png").default} />
           <div style={{ marginLeft: "14px" }}>CAUTION</div>
         </div>
       </div>
