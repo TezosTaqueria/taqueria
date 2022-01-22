@@ -120,7 +120,7 @@ const config = {
 							},
 							{
 								label: "Contribute",
-								to: "https://github.com/ecadlabs/taquito/blob/master/code-of-conduct.md",
+								to: "https://github.com/ecadlabs/taquito/blob/master/CONTRIBUTING.md",
 							},
 						],
 					},
@@ -159,7 +159,7 @@ const config = {
 							},
 							{
 								label: "Roadmap",
-								to: "https://github.com/ecadlabs/taqueria/milestones",
+								to: "https://github.com/ecadlabs/taqueria/milestones?direction=asc&sort=due_date&state=open",
 							},
 						],
 					},
