@@ -47,6 +47,17 @@ const sidebars = {
         "hello_tacos"
       ],
     },
+    {
+      type: "category",
+      label: "Taqueria Internals",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "architecture",
+        "making_plugins"
+      ],
+    },
   ]
 };
 
