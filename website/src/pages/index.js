@@ -15,7 +15,7 @@ export default function Home() {
 	return (
 		<Layout
 			title={`Hello from ${siteConfig.title}`}
-			description="Description will go into a meta tag in <head />"
+			description="A New Way to Build on Tezos"
 		>
 			<main>
 				<Hero />

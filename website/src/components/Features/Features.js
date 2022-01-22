@@ -3,47 +3,47 @@ import styles from "./Features.module.css";
 
 const FeatureList = [
   {
-    title: "Features",
+    title: "Finally all of your tools in one place",
     description:
-      "Get has minim elitr intellegat. Mea aeterno eleifend antiopam ad, nam no suscipit quaerendum. At nam minimum ponderum. Et has minim elitr intellegat. Mea aeterno eleifend antiopam minimum ponderum. Et has minim elitr intellegat. Mea aeterno eleifend antiopam",
+      "Stitching all of the development tools needed to build great applications into a cohesive, consistent and safe workflow can be incredibly frustrating and time-consuming. Taqueria is designed to help solve this problem while keeping control in your handss. Less barriers, more time creating!",
     button: {
       label: "Quick Start",
       link: "#",
     },
     features: [
       {
-        title: "Feature 1",
+        title: "Everything in one place",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+          "The Taqueria CLI and VS Code plugin bring your development tools to you. Stop moving your code jumping between IDEs. With Taqueria’s plugin infrastructure you can use the tools you need all in one place.",
         gif: require("../../../static/gif/mp4gifcode.mp4").default,
       },
       {
-        title: "Feature 2",
+        title: "Deploy with ease",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+          "Remove the complexity of deploying to different networks using Taqueria. Deploy smart contracts directly to a sandbox, testnet or the Tezos network.",
         gif: require("../../../static/gif/mp4gifcode.mp4").default,
       },
       {
-        title: "Feature 3",
+        title: "Effortlessly compile",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+          "Taqueria compiles smart contracts written in Ligo.  SmartPy and Michelson compilation is coming soon.",
         gif: require("../../../static/gif/mp4gifcode.mp4").default,
       },
       {
-        title: "Feature 4",
+        title: "Simplify testing",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+          "Taqueria supports local sandboxes and testing out of the box. Build better and safer applications with less effort.",
         gif: require("../../../static/gif/mp4gifcode.mp4").default,
       },
       {
-        title: "Feature 5",
+        title: "Fully customizable",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+          "Use Taqueria the way you want to. Taqueria has the flexibility to fit into your workflow the way you need it.",
         gif: require("../../../static/gif/mp4gifcode.mp4").default,
       },
     ],

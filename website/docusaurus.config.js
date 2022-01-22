@@ -175,7 +175,7 @@ const config = {
 							{
 								html: `
 									<p class='footerDescription'>
-									Faplaren krorar whataboutism. Krorat kroligen. 
+										A New Way to Build on Tezos
 									</p>
 								  `,
 							},
