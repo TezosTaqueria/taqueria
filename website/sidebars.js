@@ -24,17 +24,9 @@ const sidebars = {
       collapsible: false,
       items: [
         "intro",
-        {
-          type: "category",
-          label: "QuickStart",
-          items: [
-  
-          ],
-        },
-
+        "getting-started/installation"
       ],
     },
-    
   ]
 };
 
