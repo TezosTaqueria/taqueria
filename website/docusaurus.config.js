@@ -69,7 +69,8 @@ const config = {
 				},
 				items: [
 					{
-						to: "/blog",
+						type: "doc",
+						docId: "getting-started/installation",
 						label: " Get Started",
 						position: "right",
 						className: "header-link",
@@ -82,7 +83,8 @@ const config = {
 						className: "header-link",
 					},
 					{
-						to: "/blog",
+						type: "doc",
+						docId: "plugins",
 						label: "Plugins",
 						position: "right",
 						className: "header-link",
@@ -156,12 +158,8 @@ const config = {
 								to: "/docs/intro",
 							},
 							{
-								label: "TypeDoc Reference",
-								to: "/docs/intro",
-							},
-							{
 								label: "Roadmap",
-								to: "/docs/intro",
+								to: "https://github.com/ecadlabs/taqueria/milestones",
 							},
 						],
 					},
