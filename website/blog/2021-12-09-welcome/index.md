@@ -5,7 +5,6 @@ authors: [jev]
 tags: [tezos]
 ---
 
-
 export const Chart = () => (
     <div style={{display: "flex", flexDirection: "row", overflowX: "auto", boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.15)", borderRadius: "8px"}}>
       <div style={{display: "flex", flexDirection: "column"}}>
