@@ -36,7 +36,7 @@ jobs:
     env:
       DENO_DIR: ./deno
       DENO_TARGET: ${{ matrix.deno_target }}
-      TAQ_BIN: ${{ matrix.taqueria_bin }}
+      TAQ_BIN: 
 
     steps:
       - name: Setup repo
@@ -47,20 +47,22 @@ jobs:
         with:
           deno-version: "^1.0.0"
 
+      ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
+      ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
       - name: Build the binary for ${{ matrix.os }}
         id: build-bin
         shell: bash
         run: |
-          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts
-          [[ $(./"$TAQ_BIN" init -p ./test_project) == "Project taq'ified!" ]]
-          mv "${TAQ_BIN}" "taqueria.${{ matrix.deno_target }}"
+          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
+          [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
+          mv "${{ matrix.taqueria_bin }}" "taqueria.${{ matrix.deno_target }}"
 
       - name: Authenticate with GCP
         id: gcp-auth
         uses: google-github-actions/auth@v0
         with:
           workload_identity_provider: "projects/${{ secrets.GCP_PROJECT }}/locations/global/workloadIdentityPools/github-actions-storage-pool/providers/github-actions-oidc-provider"
-          service_account: "${{ secrets.GCP_SERVICE_ACCOUNT }}@tez-ie.iam.gserviceaccount.com"
+          service_account: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
 
       - name: Upload binary to GCP
         id: upload-file
