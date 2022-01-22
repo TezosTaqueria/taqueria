@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Features.module.css";
 
 const FeatureList = [
@@ -52,12 +52,30 @@ const FeatureList = [
 
 function Feature({ title, description, features, button }) {
   const checkTitle = (e) => {
+    setUserAction(true);
     isVisible === e.target.id
       ? toggleIsVisible(`${features[0].title}`)
       : toggleIsVisible(e.target.id);
   };
 
   const [isVisible, toggleIsVisible] = useState(`${features[0].title}`);
+  const [userAction, setUserAction] = useState(false);
+
+  const featuresIndex = features.findIndex((object) => {
+    return object.title === isVisible;
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const checkEnd = (index) => {
+        return features.length - 1 === index ? index * 0 : index + 1;
+      };
+
+      !userAction &&
+        toggleIsVisible(`${features[checkEnd(featuresIndex)].title}`);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isVisible, userAction]);
 
   return (
     <div>
@@ -113,7 +131,7 @@ function Feature({ title, description, features, button }) {
           {features.map((feature, index) => {
             return (
               isVisible === feature.title && (
-                <video key={index} autoplay="true" muted src={feature.gif} />
+                <video key={index} autoPlay={true} muted src={feature.gif} />
               )
             );
           })}
