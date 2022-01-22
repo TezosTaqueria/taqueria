@@ -27,6 +27,26 @@ const sidebars = {
         "getting-started/installation"
       ],
     },
+    {
+      type: "category",
+      label: "Plugins",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "plugins"
+      ],
+    },
+    {
+      type: "category",
+      label: "Example App",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "hello_tacos"
+      ],
+    },
   ]
 };
 
