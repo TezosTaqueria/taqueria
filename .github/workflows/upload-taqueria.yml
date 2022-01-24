@@ -7,7 +7,8 @@ on:
 
 env:
   SCOPE: "@ecadlabs"
-  NPM_REGISTRY: 'https://npm.pkg.github.com'
+  NPM_REGISTRY: 'https://registry.npmjs.org/'
+  GH_REGISTRY: 'https://npm.pkg.github.com'
 
 jobs:
   # build-and-test:
@@ -151,7 +152,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with: 
-          registry-url: $NPM_REGISTRY
+          registry-url: ${NPM_REGISTRY}
       
       - name: Update package.json to specify scope
         run: | 
@@ -170,6 +171,8 @@ jobs:
         run: echo "::set-output name=version::$(jq .version package.json)"
 
       - name: Install any dependencies
+        with:
+          registry-url: ${GH_REGISTRY}
         run: npm install
 
       - name: Build package
