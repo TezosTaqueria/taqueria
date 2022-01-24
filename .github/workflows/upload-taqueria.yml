@@ -125,19 +125,7 @@ jobs:
             }
 
             readFile('./taqueria-plugin-ligo/package.json');
-
-            let body = `
-              | npm package installation instructions |
-              | --------- |
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@$(jq .version ./taqueria-plugin-ligo/package.json) --registry=${{ env.NPM_REGISTRY }}|
-            `;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            })
+            console.log(readFile('./taqueria-plugin-ligo/package.json'))
 
   publish_npm_packages:
     # needs: build-and-test
