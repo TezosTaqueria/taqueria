@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+env:
+  SCOPE: "@ecadlabs"
+  NPM_REGISTRY: 'https://registry.npmjs.org/'
+  GH_REGISTRY: 'https://npm.pkg.github.com/'
+
 jobs:
   # build-and-test:
   #   permissions:
@@ -142,11 +147,6 @@ jobs:
     defaults:
       run:
         working-directory: ${{ matrix.dir }}
-
-    env:
-      SCOPE: "@ecadlabs"
-      NPM_REGISTRY: 'https://registry.npmjs.org/'
-      GH_REGISTRY: 'https://npm.pkg.github.com/'
 
     steps:
       - uses: actions/checkout@v2
