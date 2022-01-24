@@ -1,4 +1,4 @@
-import {Plugin, Task, Option} from 'taqueria-sdk'
+import {Plugin, Task, Option} from '@taqueria/node-sdk'
 import compile from './compile'
 
 Plugin.create(i18n => ({

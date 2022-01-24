@@ -1,4 +1,4 @@
-import { SanitizedArgs, ActionResponse, Failure, LikeAPromise, ProxyAction } from "taqueria-sdk/types";
+import { SanitizedArgs, ActionResponse, Failure, LikeAPromise, ProxyAction } from "@taqueria/node-sdk/types";
 import {exec} from 'child_process'
 import glob from 'fast-glob'
 import {join} from 'path'
