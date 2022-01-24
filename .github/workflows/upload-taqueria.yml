@@ -131,9 +131,9 @@ jobs:
     # needs: build-and-test
     runs-on: ubuntu-latest
     
-    permissions:
-      packages: write
-      contents: read
+    permissions: write-all
+      # packages: write
+      # contents: read
     
     strategy:
       matrix:
