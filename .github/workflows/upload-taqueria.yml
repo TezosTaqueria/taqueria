@@ -7,7 +7,7 @@ on:
 
 env:
   SCOPE: "@ecadlabs"
-  REGISTRY: 'https://npm.pkg.github.com'
+  NPM_REGISTRY: 'https://npm.pkg.github.com'
 
 jobs:
   # build-and-test:
@@ -116,7 +116,7 @@ jobs:
             let body = `
               | npm package installation instructions |
               | --------- |
-              | npm install ${SCOPE}/taqueria-plugin-ligo@$(jq .version ./taqueria-plugin-ligo/package.json) --registry=${REGISTRY}|
+              | npm install ${SCOPE}/taqueria-plugin-ligo@$(jq .version ./taqueria-plugin-ligo/package.json) --registry=${NPM_REGISTRY}|
             `;
             
             github.rest.issues.createComment({
@@ -151,7 +151,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with: 
-          registry-url: $REGISTRY
+          registry-url: $NPM_REGISTRY
       
       - name: Update package.json to specify scope
         run: | 
