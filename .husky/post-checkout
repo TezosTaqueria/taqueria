@@ -1,0 +1,10 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+for dir in `ls -1d *plugin*`; do
+    echo "Building $dir"
+    cd $dir
+    npm install
+    npm run build
+    cd ../
+done
