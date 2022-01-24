@@ -119,7 +119,6 @@ jobs:
             async function readFile(filePath) {
               try {
                 const data = await fs.readFile(filePath);
-                console.log(JSON.parse(data.toString()));
                 const JSONdata = JSON.parse(data.toString());
                 console.log(JSONdata.version)
                 return JSONdata.version
@@ -133,7 +132,7 @@ jobs:
             let body = `
               | npm package installation instructions |
               | --------- |
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@readFile("./taqueria-plugin-ligo/package.json") --registry=${{ env.NPM_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@${readFile("./taqueria-plugin-ligo/package.json")} --registry=${{ env.NPM_REGISTRY }}|
             `;
             
             github.rest.issues.createComment({
