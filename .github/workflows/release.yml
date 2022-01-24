@@ -1,12 +1,11 @@
 name: release-taqueria
 
-on: 
+on:
   create:
     tags:
       - v*
 
 jobs:
-
   create-release:
     name: Release
     runs-on: ubuntu-latest
@@ -27,31 +26,31 @@ jobs:
 
   build-and-upload:
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
     runs-on: ${{ matrix.os }}
     needs: [create-release]
     strategy:
       fail-fast: true
       matrix:
-      include:
-        - os: ubuntu-latest
-          os_short: ubuntu
-          deno_target: "x86_64-unknown-linux-gnu"
-          taqueria_bin: "taqueria"
-        - os: windows-latest
-          os_short: windows
-          deno_target: "x86_64-pc-windows-msvc"
-          taqueria_bin: "taqueria.exe"
-        - os: macOS-latest
-          os_short: macos
-          deno_target: "x86_64-apple-darwin"
-          taqueria_bin: "taqueria"
+        include:
+          - os: ubuntu-latest
+            os_short: ubuntu
+            deno_target: "x86_64-unknown-linux-gnu"
+            taqueria_bin: "taqueria"
+          - os: windows-latest
+            os_short: windows
+            deno_target: "x86_64-pc-windows-msvc"
+            taqueria_bin: "taqueria.exe"
+          - os: macOS-latest
+            os_short: macos
+            deno_target: "x86_64-apple-darwin"
+            taqueria_bin: "taqueria"
 
     env:
       DENO_DIR: ./deno
       DENO_TARGET: ${{ matrix.deno_target }}
-      TAQ_BIN: 
+      TAQ_BIN:
 
     steps:
       - name: Setup repo
