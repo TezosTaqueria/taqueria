@@ -129,7 +129,7 @@ jobs:
             # let body = `
             #   | npm package installation instructions |
             #   | --------- |
-            #   | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@${{ readFile() }} --registry=${{ env.NPM_REGISTRY }}|
+            #   | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@readFile() --registry=${{ env.NPM_REGISTRY }}|
             # `;
             
             # github.rest.issues.createComment({
