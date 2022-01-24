@@ -117,7 +117,7 @@ jobs:
             let body = `
               | npm package installation instructions |
               | --------- |
-              | npm install ${SCOPE}/taqueria-plugin-ligo@$(jq .version ./taqueria-plugin-ligo/package.json) --registry=${NPM_REGISTRY}|
+              | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@$(jq .version ./taqueria-plugin-ligo/package.json) --registry=${NPM_REGISTRY}|
             `;
             
             github.rest.issues.createComment({
