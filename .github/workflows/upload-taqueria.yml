@@ -160,13 +160,13 @@ jobs:
           contents=$(jq '.name |= env.scope + .' package.json) && \
           echo ${contents} > package.json
       
-      - name: Change Registry to NPM for Installing
-        run: |
-          npm config delete registry
-          npm config ls -al
+      # - name: Change Registry to NPM for Installing
+      #   run: |
+      #     npm config delete registry
+      #     npm config ls -al
 
       - name: Install any dependencies
-        run: npm install
+        run: npm install --registry=${NPM_REGISTRY}
 
       - name: Build package
         run: npm run build
@@ -175,17 +175,15 @@ jobs:
         id: get-local-package-version
         run: echo "::set-output name=version::$(jq .version package.json)"
 
-      - name: Change Registry to GH for publishing
-        env: 
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          npm config set registry ${GH_REGISTRY} && \
-          npm config ls -al
+      # - name: Change Registry to GH for publishing
+      #   env: 
+      #     NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     npm config set registry ${GH_REGISTRY} && \
+      #     npm config ls -al
 
       - name: Get current npm registry version
         id: get-npm-package-version
-        env: 
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm config ls -al
           echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)"
