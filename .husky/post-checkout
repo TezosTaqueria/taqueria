@@ -8,3 +8,5 @@ for dir in `ls -1d *plugin*`; do
     npm run build
     cd ../
 done
+
+npm run build
