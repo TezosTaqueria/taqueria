@@ -13,7 +13,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
-    "build": "npx parcel build",
+    "build": "npx parcel build --no-cache",
     "debugPluginInfo": "node --inspect-brk index.js --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
   },
   "keywords": [],

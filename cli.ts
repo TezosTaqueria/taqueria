@@ -1,4 +1,4 @@
-import type {UnvalidatedPluginInfo, InstalledPlugin, Config, ConfigArgs, Action, Alias, Verb, Option} from './taqueria-protocol/taqueria-protocol-types.ts'
+import type {UnvalidatedPluginInfo, InstalledPlugin, Config, ConfigArgs, Action, Alias, Verb, Option, PositionalArg} from './taqueria-protocol/taqueria-protocol-types.ts'
 import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, CLICommand, CommandArgs, UnvalidatedState} from './taqueria-types.ts'
 import {State} from './taqueria-types.ts'
@@ -10,6 +10,8 @@ import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import {isTaqError, log, joinPaths, mkdir, readFile, writeTextFile, decodeJson, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
+import { titleCase } from "https://deno.land/x/case/mod.ts";
+import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
 
 export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<void>) => unknown
 
@@ -50,6 +52,10 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
     })
     .boolean('debug')
     .hide('debug')
+    .option('quickstart', {
+        default: ''
+    })
+    .hide('quickstart')
     .option('p', {
         alias: 'projectDir',
         default: './',
@@ -79,8 +85,8 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         },
         (args: RawInitArgs) => pipe(
             sanitizeArgs(args), 
-            ({projectDir, configDir, maxConcurrency}: SanitizedInitArgs) => {
-                return initProject(projectDir, configDir, i18n, maxConcurrency)
+            ({projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
+                return initProject(projectDir, configDir, i18n, maxConcurrency, quickstart)
             },
             fork (console.error) (console.log)
         )
@@ -117,7 +123,7 @@ const postInitCLI = (env: EnvVars, args: DenoArgs, parsedArgs: SanitizedInitArgs
 
 const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync())
 
-const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number) => pipe(
+const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
     getConfig(projectDir, configDir, i18n, true),
     chain (({artifactsDir, contractsDir, testsDir, projectDir}: ConfigArgs) => {
         const
@@ -127,6 +133,10 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
         
         return parallel (maxConcurrency) ([mkdir(artifactsAbspath), mkdir(contractsAbspath), mkdir(testsAbspath)])        
     }),
+    chain ((results: string[]) => quickstart.length > 0
+        ? writeTextFile(joinPaths(projectDir.value, "quickstart.md"), quickstart)
+        : resolve (results)
+    ),
     map (() => i18n.__("bootstrapMsg"))
 )
 
@@ -205,14 +215,14 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
             const formattedArgs = Object.entries({...parsedArgs, ...requestArgs}).reduce(
                 (retval: string[], [key, val]) => {
                     // Some parameters we don't need to send, so we omit those
-                    if (['$0'].includes(key) || key.indexOf('-') >= 0 || val === undefined)
+                    if (['$0', 'quickstart'].includes(key) || key.indexOf('-') >= 0 || val === undefined)
                         return retval
                     // Others need renamed
                     else if (key === '_')
                         return [...retval, '--command', String(val)]
                     // Everything else is good
                     else
-                        return [...retval, '--'+key, String(val)]
+                        return [...retval, '--'+key, `'${val}'`]
                 },
                 []
             )
@@ -248,13 +258,6 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
             }
 
             const decoded = JSON.parse(stdout)
-
-            // TODO: Side-effect. This shouldn't be here
-            if (action === 'proxy') console.log(
-                decoded.status === 'success'
-                    ? decoded.stdout
-                    : decoded.stderr
-            )
 
             return decoded
         }
@@ -314,7 +317,7 @@ const loadState = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parse
 
 const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, task: Task, plugin?: InstalledPlugin) => pipe(
     cliConfig.command({
-        command: task.task.value,
+        command: task.command.value,
         aliases: task.aliases.map((alias: Alias) => alias.value),
         description: task.description,
         example: task.example,
@@ -334,6 +337,19 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                 },
                 cliConfig
             )
+
+            if (task.positionals) task.positionals.reduce(
+                (cli: CLIConfig, positional: PositionalArg) => {
+                    const positionalSettings = {
+                        describe: positional.description,
+                        type: positional.type,
+                        default: positional.defaultValue,
+                    }
+
+                    return cli.positional(positional.placeholder.value, positionalSettings)
+                },
+                cliConfig
+            )
         },
         handler: (inputArgs: Record<string, unknown>) => {
             if (Array.isArray(task.handler)) {
@@ -347,14 +363,24 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
             }
             
             const handler = task.handler === 'proxy' && plugin
-                ? sendPluginQuery(
-                    "proxy",
-                    {task: task.task.value},
-                    config,
-                    env,
-                    i18n,
-                    plugin,
-                    args
+                ? pipe(
+                    sendPluginQuery(
+                        "proxy",
+                        {task: task.task.value},
+                        config,
+                        env,
+                        i18n,
+                        plugin,
+                        args
+                    ),
+                    map ((decoded: {status: 'failed'|'success', stderr: string, stdout: unknown, render?: string}) => {
+                        if (decoded.render == 'table') {
+                            renderTable(decoded.stdout as Record<string, string>[])
+                        }
+                        else if (decoded.render !== 'none') {
+                            console.log(decoded.status === 'success' ? decoded.stdout: decoded.stderr)
+                        }
+                    })
                 )
                 : exec(task.handler, args)
 
@@ -362,6 +388,37 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
         }
     })
 )
+
+const renderTable = (data: Record<string, string>[]) => {
+    const keys: string[] = pipe(
+        data.reduce(
+            (retval: string[], record) =>[...retval, ...Object.keys(record)],
+            []
+        ),
+        uniq
+    )
+
+    const rows = data.reduce(
+        (retval: (string[])[], record) => {
+            const row = keys.reduce(
+                (row: string[], key: string) => {
+                    const value: string = record[key] ? record[key] : ''
+                    return [...row, value]
+                },
+                []
+            )
+            return [...retval, row]
+        },
+        []
+    )
+
+    new Table()
+        .header(keys.map(val => titleCase(val)))
+        .body(rows)
+        .border(true)
+        .render()
+}
+
 const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (cliConfig: CLIConfig) => pipe(
     getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false),
     chain ((config: ConfigArgs) => pipe(
@@ -456,7 +513,8 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency,
     debug: parsedArgs.debug,
     plugin: parsedArgs.plugin,
-    env: parsedArgs.env
+    env: parsedArgs.env,
+    quickstart: parsedArgs.quickstart
 })
 
 export default {

@@ -22,14 +22,14 @@ const getCompileCommand = (opts) => (sourceFile) => {
     return cmd
 }
 
-const execCmd = cmd => new Promise((resolve, _) => {
+const execCmd = cmd => new Promise((resolve, reject) => {
     exec(cmd, (err, stdout, stderr) => {
-        if (err) resolve({
+        if (err) reject({
             status: 'failed',
             stdout: "",
             stderr: err
         })
-        else if (stderr) resolve({
+        else if (stderr) reject({
             status: 'failed',
             stdout,
             stderr
@@ -44,6 +44,7 @@ const execCmd = cmd => new Promise((resolve, _) => {
 
 const compileContract = (opts) => (sourceFile) =>
     execCmd(getCompileCommand(opts) (sourceFile))
+    .then(() => ({contract: sourceFile, artifact: getContractArtifactFilename(opts) (sourceFile)}))
 
 const compileAll = parsedArgs => {
     // TODO: Fetch list of files from SDK
@@ -53,17 +54,19 @@ const compileAll = parsedArgs => {
     )
     .then(entries => entries.map(compileContract(parsedArgs)))
     .then(promises => Promise.all(promises))
-    .then(results => ({
-        status: 'success',
-        stdout: results ? "Done.\n" : "No LIGO contracts found.\n",
-        stderr: ""
-    }))
 }
 
 const compile = parsedArgs => {
-    return parsedArgs.sourceFile
+    const p = parsedArgs.sourceFile
         ? compileContract(parsedArgs) (parsedArgs.sourceFile)
         : compileAll(parsedArgs)
+    
+    return p.then(results => ({
+        status: 'success',
+        stdout: results,
+        stderr: "",
+        render: 'table'
+    }))
 }
 
 module.exports = compile

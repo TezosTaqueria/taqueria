@@ -45,6 +45,7 @@ export interface RawInitArgs {
     debug: boolean
     plugin?: string
     env: 'production' | 'development' | 'testing' | string
+    quickstart: string
 }
 
 export interface SanitizedInitArgs {
@@ -55,6 +56,7 @@ export interface SanitizedInitArgs {
     debug: boolean,
     plugin?: string
     env: 'production' | 'development' | 'testing' | string
+    quickstart: string
 }
 
 export interface i18n {
@@ -165,7 +167,6 @@ export class State {
 
                     // This task is only provided by a single plugin
                     else {
-                        debugger
                         const installedPlugin = config.plugins.find(
                             (plugin: InstalledPlugin) => [`taqueria-plugin-${pluginInfo.name}`, pluginInfo.name].includes(plugin.name)
                         )
