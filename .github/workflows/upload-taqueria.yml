@@ -86,7 +86,6 @@ jobs:
       - publish_npm_packages
     steps:
       - uses: actions/checkout@v2
-
       # - name: create binary comment
       #   uses: actions/github-script@v5
       #   id: pr-comment
@@ -119,17 +118,26 @@ jobs:
 
             async function readFile(filePath) {
               try {
-                const data = await fs.readFile(filePath)
-                const JSONdata = JSON.parse(data.toString())
-                console.log(data.toString())
-                console.log(JSONdata)
-                console.log(JSONdata.version)
+                const data = await fs.readFile(filePath);
+                console.log(JSON.parse(data.toString()));
+                return JSON.parse(data.toString()).version
               } catch (error) {
                 console.error(`Got an error trying to read the file: ${error.message}`);
               }
             }
 
-            readFile('./taqueria-plugin-ligo/package.json')
+            # let body = `
+            #   | npm package installation instructions |
+            #   | --------- |
+            #   | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@${{ readFile() }} --registry=${{ env.NPM_REGISTRY }}|
+            # `;
+            
+            # github.rest.issues.createComment({
+            #   issue_number: context.issue.number,
+            #   owner: context.repo.owner,
+            #   repo: context.repo.repo,
+            #   body: body
+            # })
 
   publish_npm_packages:
     # needs: build-and-test
