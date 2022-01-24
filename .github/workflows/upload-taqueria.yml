@@ -120,18 +120,19 @@ jobs:
               try {
                 const data = await fs.readFile(filePath);
                 console.log(JSON.parse(data.toString()));
-                return JSON.parse(data.toString()).version
+                const JSONdata = JSON.parse(data.toString())
+                console.log(JSONdata)
               } catch (error) {
                 console.error(`Got an error trying to read the file: ${error.message}`);
               }
             }
 
-            readFile("./taqueria-plugin-ligo/package.json")
+            readFile(./taqueria-plugin-ligo/package.json)
 
             # let body = `
             #   | npm package installation instructions |
             #   | --------- |
-            #   | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@readFile("./taqueria-plugin-ligo/package.json") --registry=${{ env.NPM_REGISTRY }}|
+            #   | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@ --registry=${{ env.NPM_REGISTRY }}|
             # `;
             
             # github.rest.issues.createComment({
