@@ -159,24 +159,25 @@ jobs:
           export scope="$SCOPE/"
           contents=$(jq '.name |= env.scope + .' package.json) && \
           echo ${contents} > package.json
+      
+      - name: Install any dependencies
+        run: npm install
+
+      - name: Build package
+        run: npm run build
+
+      - name: Get current local package version
+        id: get-local-package-version
+        run: echo "::set-output name=version::$(jq .version package.json)"
+
+      - name: Change Registry for ecad purposes
+        run: npm config set registry=${GH_REGISTRY}
 
       - name: Get current npm registry version
         id: get-npm-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: echo "::set-output name=version::$(npm show $SCOPE/${{ matrix.dir }} --json | jq .version)"
-
-      - name: Get current local package version
-        id: get-local-package-version
-        run: echo "::set-output name=version::$(jq .version package.json)"
-
-      - name: Install any dependencies
-        with:
-          registry-url: ${GH_REGISTRY}
-        run: npm install
-
-      - name: Build package
-        run: npm run build
       
       - name: Publish if new version of package 
         env: 
