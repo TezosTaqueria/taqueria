@@ -172,10 +172,8 @@ jobs:
 
       - name: Change Registry for ecad purposes
         run: |
-          cat .npmrc
           npm config set registry=${GH_REGISTRY}
           npm config ls -al
-          cat .npmrc
 
       - name: Get current npm registry version
         id: get-npm-package-version
