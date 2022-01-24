@@ -1,5 +1,4 @@
-import {Plugin, Task, Network} from 'taqueria-sdk'
-import { EconomicalProtocol } from '../taqueria-sdk/node_modules/taqueria-protocol/taqueria-protocol-types'
+import {Plugin, Task, Network} from '@taqueria/sdk'
 
 Plugin.create(i18n => ({
     schema: "1.0",

@@ -26,13 +26,13 @@
   "keywords": [
     "taqueria",
     "tezos",
-    "build",
+    "originate",
+    "deploy",
     "ecad",
     "ecadlabs",
     "plugin",
-    "smartpy",
-    "smart contract",
-    "compile"
+    "taquito",
+    "smart contract"
   ],
   "author": "ECAD Labs",
   "license": "Apache-2.0",
