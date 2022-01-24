@@ -120,14 +120,13 @@ jobs:
             async function readFile(filePath) {
               try {
                 const data = await fs.readFile(filePath);
-                console.log(JSON.Parse(data.toString()));
+                console.log(data.toString());
               } catch (error) {
                 console.error(`Got an error trying to read the file: ${error.message}`);
               }
             }
 
             readFile('./taqueria-plugin-ligo/package.json');
-            console.log(readFile('./taqueria-plugin-ligo/package.json'))
 
   publish_npm_packages:
     # needs: build-and-test
