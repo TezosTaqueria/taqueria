@@ -85,6 +85,8 @@ jobs:
       # - build-and-test
       - publish_npm_packages
     steps:
+      - uses: actions/checkout@v2
+
       # - name: create binary comment
       #   uses: actions/github-script@v5
       #   id: pr-comment
