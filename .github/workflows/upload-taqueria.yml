@@ -162,8 +162,8 @@ jobs:
       
       - name: Get current npm registry version
         id: get-npm-package-version
-        # env: 
-        #   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "$(npm show ${SCOPE}/${{ matrix.dir }} --registry=${GH_REGISTRY} --json | jq .version)"
           echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)"
