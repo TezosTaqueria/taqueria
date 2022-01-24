@@ -130,3 +130,4 @@ jobs:
         with:
           files: |
             ./release/*
+          draft: true
