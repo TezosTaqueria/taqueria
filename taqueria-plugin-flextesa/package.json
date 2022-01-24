@@ -1,5 +1,5 @@
 {
-  "name": "taqueria-plugin-smartpy",
+  "name": "taqueria-plugin-flextesa",
   "version": "1.0.0",
   "description": "",
   "targets": {
@@ -20,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "fast-glob": "^3.2.7",
+    "promise-retry": "^2.0.1",
     "taqueria-sdk": "file:../taqueria-sdk"
   },
   "devDependencies": {

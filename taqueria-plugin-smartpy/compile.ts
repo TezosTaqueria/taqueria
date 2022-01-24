@@ -5,6 +5,7 @@ import {join} from 'path'
 
 type Opts = SanitizedArgs & Record<string, unknown>
 
+// TODO: Move to SDK
 const execCmd = (cmd:string): Promise<ProxyAction> => new Promise((resolve, _) => {
     exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
         if (err) resolve({
