@@ -9,7 +9,7 @@
     "build": "npx esbuild --bundle index.ts --outfile=index.js --minify --platform=node --sourcemap",
     "gen-schema": "npx ts-node schema-generator.ts",
     "backup-config": "cp package.json package.json.orig && cp package-lock.json package-lock.json.orig",
-    "restore-config": "cp package.json.orig package.json && cp package-lock.json.orig package-lock.json",
+    "restore-config": "mv package.json.orig package.json && mv package-lock.json.orig package-lock.json",
     "get-protocol-version": "cd ../taqueria-protocol && node -e 'console.log(require(\"./package.json\").version)'",
     "set-protocol-version": "sed -I -e \"s/file:\\.\\.\\/taqueria-protocol/`npm run get-protocol-version | tail -1`/\" package.json",
     "set-protocol-version-lock": "sed -I -e \"s/file:\\.\\.\\/taqueria-protocol/`npm run get-protocol-version | tail -1`/\" package-lock.json",
