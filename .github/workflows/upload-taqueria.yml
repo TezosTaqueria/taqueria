@@ -152,7 +152,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with: 
-          registry-url: $GH_REGISTRY
+          registry-url: 'https://npm.pkg.github.com/'
           scope: "@ecadlabs"
       
       - name: Update package.json to specify scope
