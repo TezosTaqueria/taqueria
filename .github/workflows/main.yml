@@ -123,9 +123,9 @@ jobs:
         id: download-binaries 
         run: |
           mkdir release && cd release
-          curl ${{ needs.build-and-test.outputs.public-url-ubuntu }} --output taqueria.${GITHUB_REF/refs\/tags\//}-linux
-          curl ${{ needs.build-and-test.outputs.public-url-windows }} --output taqueria.${GITHUB_REF/refs\/tags\//}-windows.exe
-          curl ${{ needs.build-and-test.outputs.public-url-macos }} --output taqueria.${GITHUB_REF/refs\/tags\//}-macos
+          wget ${{ needs.build-and-test.outputs.public-url-ubuntu }} -O taqueria.${GITHUB_REF/refs\/tags\//}-linux
+          wget ${{ needs.build-and-test.outputs.public-url-windows }} -O taqueria.${GITHUB_REF/refs\/tags\//}-windows.exe
+          wget ${{ needs.build-and-test.outputs.public-url-macos }} -O taqueria.${GITHUB_REF/refs\/tags\//}-macos
 
       - name: Release
         id: release
