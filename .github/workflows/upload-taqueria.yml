@@ -185,7 +185,8 @@ jobs:
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm config set registry=${GH_REGISTRY} && \
+#           npm config set registry "${GH_REGISTRY}"
+          npm config delete registry
           npm config ls -al
           sleep 10
           registry_version=$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)
