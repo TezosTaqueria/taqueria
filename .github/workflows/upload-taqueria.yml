@@ -175,17 +175,16 @@ jobs:
         id: get-local-package-version
         run: echo "::set-output name=version::$(jq .version package.json)"
 
-      - name: Change Registry to GH for publishing
-        run: |
-          npm config set registry=${GH_REGISTRY}
-          npm config ls -al
+      # - name: Change Registry to GH for publishing
+      #   run: |
+      #     npm config set registry=${GH_REGISTRY}
+      #     npm config ls -al
 
       - name: Get current npm registry version
         id: get-npm-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-#           npm config set registry "${GH_REGISTRY}"
           npm config delete registry
           npm config ls -al
           sleep 10
