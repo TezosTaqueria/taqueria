@@ -1,4 +1,4 @@
-import {Plugin, Task, Network} from '@taqueria/sdk'
+import {Plugin, Task, Network} from '@taqueria/node-sdk'
 
 Plugin.create(i18n => ({
     schema: "1.0",

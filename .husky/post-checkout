@@ -1,11 +1,18 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
+echo '**********************************************'
+echo '******* BUILDING ALL TAQUERIA PACKAGES *******'
+echo '**********************************************'
+
 for dir in `ls -1d *plugin*`; do
     echo "Building $dir"
     cd $dir
     npm install
-    npm run build
+    HASBUILD=`node -e "console.log(require('./package.json').scripts.build ? 'true': 'false')"`
+    if [ $HASBUILD = "true" ]; then
+        npm run build
+    fi
     cd ../
 done
 
