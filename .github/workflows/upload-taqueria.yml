@@ -113,8 +113,18 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            version=$(jq .version ./taqueria-plugin-ligo/package.json)
-            console.log(${version})
+            const fs = require('fs').promises;
+
+            async function readFile(filePath) {
+              try {
+                const data = await fs.readFile(filePath);
+                console.log(JSON.Parse(data.toString()));
+              } catch (error) {
+                console.error(`Got an error trying to read the file: ${error.message}`);
+              }
+            }
+
+            readFile('./taqueria-plugin-ligo/package.json');
 
             let body = `
               | npm package installation instructions |
