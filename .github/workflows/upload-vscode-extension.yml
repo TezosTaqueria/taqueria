@@ -3,8 +3,12 @@ on:
     branches:
       - main
 
+concurrency:
+  group: build-vscode-extension-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  build-vscode-extension:
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
