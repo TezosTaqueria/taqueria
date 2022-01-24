@@ -126,12 +126,12 @@ jobs:
               }
             }
 
-            readFile(./taqueria-plugin-ligo/package.json)
+            readFile("./taqueria-plugin-ligo/package.json")
 
             # let body = `
             #   | npm package installation instructions |
             #   | --------- |
-            #   | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@readFile(./taqueria-plugin-ligo/package.json) --registry=${{ env.NPM_REGISTRY }}|
+            #   | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@readFile("./taqueria-plugin-ligo/package.json") --registry=${{ env.NPM_REGISTRY }}|
             # `;
             
             # github.rest.issues.createComment({
