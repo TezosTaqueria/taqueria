@@ -153,8 +153,8 @@ jobs:
       - uses: actions/setup-node@v2
         with: 
           node-version: 14.x
-          registry-url: ${GH_REGISTRY}
-          scope: ${SCOPE}
+          registry-url: $GH_REGISTRY
+          scope: $SCOPE
       
       - name: Update package.json to specify scope
         run: | 
