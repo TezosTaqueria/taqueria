@@ -2,40 +2,58 @@
 title: Installation
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
+## Download
 
-## Download 
+    ```json
+      This code block should recognize the PRISM language directives and turn this 
+      and the next block into a multi-language tab group 
+    ```
 
-Some intro context...
-
+    ```shell
+      The backticks should also not be showing...
+    ```
 
 <Tabs groupId="operating-systems">
   <TabItem value="mac" label="MacOS">
-    I am macOS.
+
+    ```shell
+        curl https://github.com/ecadlabs/taqueria/releases/download/v0.0.1-test.9/taqueria.x86_64-unknown-linux-gnu --output taq
+    ```
+
   </TabItem>
+
   <TabItem value="win" label="Windows">
-    I am Windows.
+
+    ```shell
+
+        curl https://github.com/ecadlabs/taqueria/releases/download/v0.0.1-test.9/taqueria.x86_64-unknown-linux-gnu --output taq
+    ```
+
   </TabItem>
   <TabItem value="linux" label="Linux">
-    I am Linux.
+    For those who don't need instructions
   </TabItem>
 </Tabs>
 
 More instructions...
 
-<Tabs groupId="operating-systems">
-  <TabItem value="mac" label="MacOS">
-    I am macOS.
-  </TabItem>
-  <TabItem value="win" label="Windows">
-    I am Windows.
-  </TabItem>
-  <TabItem value="linux" label="Linux">
-    I am Linux.
-  </TabItem>
-</Tabs>
-
 ## Building From Source
 
+export const SourceChart = () => (
+  <Tabs groupId="operating-systems">
+    <TabItem value="mac" label="MacOS">
+      I am macOS.
+    </TabItem>
+    <TabItem value="win" label="Windows">
+      I am Windows.
+    </TabItem>
+    <TabItem value="linux" label="Linux">
+      I am Linux.
+    </TabItem>
+  </Tabs>
+);
+
+<SourceChart />
