@@ -122,13 +122,26 @@ jobs:
                 console.log(JSON.parse(data.toString()));
                 const JSONdata = JSON.parse(data.toString());
                 console.log(JSONdata.version)
-                console.log(JSONdata);
+                return JSONdata.version
               } catch (error) {
                 console.error(`Got an error trying to read the file: ${error.message}`);
               }
             }
 
             readFile("./taqueria-plugin-ligo/package.json")
+
+            let body = `
+              | npm package installation instructions |
+              | --------- |
+              | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@readFile("./taqueria-plugin-ligo/package.json") --registry=${{ env.NPM_REGISTRY }}|
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
 
   # publish_npm_packages:
   #   # needs: build-and-test
