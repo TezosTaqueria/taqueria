@@ -113,8 +113,9 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            console.log($(jq .version ./taqueria-plugin-ligo/package.json))
-            
+            version=$(jq .version ./taqueria-plugin-ligo/package.json)
+            console.log(${version})
+
             let body = `
               | npm package installation instructions |
               | --------- |
