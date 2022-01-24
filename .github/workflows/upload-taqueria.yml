@@ -81,7 +81,7 @@ jobs:
   
   pr-comment:
     runs-on: ubuntu-latest
-    needs: 
+    # needs: 
       # - build-and-test
       # - publish_npm_packages
     steps:
@@ -131,7 +131,7 @@ jobs:
             # let body = `
             #   | npm package installation instructions |
             #   | --------- |
-            #   | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@${readFile(./taqueria-plugin-ligo/package.json)} --registry=${{ env.NPM_REGISTRY }}|
+            #   | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@readFile(./taqueria-plugin-ligo/package.json) --registry=${{ env.NPM_REGISTRY }}|
             # `;
             
             # github.rest.issues.createComment({
