@@ -65,11 +65,12 @@ const config = {
 			navbar: {
 				logo: {
 					alt: "Tezos Taqueria Logo",
-					src: "img/logoSVG.svg",
+					src: "img/Taqueria_magenta_beta.svg",
 				},
 				items: [
 					{
-						to: "/blog",
+						type: "doc",
+						docId: "getting-started/installation",
 						label: " Get Started",
 						position: "right",
 						className: "header-link",
@@ -82,25 +83,26 @@ const config = {
 						className: "header-link",
 					},
 					{
-						to: "/blog",
+						type: "doc",
+						docId: "plugins",
 						label: "Plugins",
 						position: "right",
 						className: "header-link",
 					},
 					{
-						href: "https://discord.com/",
+						href: "https://discord.gg/bujt7syVVT",
 						position: "right",
 						className: "header-discord-link",
 						"aria-label": "Discord",
 					},
 					{
-						href: "https://twitter.com/",
+						href: "https://twitter.com/tezostaqueria",
 						position: "right",
 						className: "header-twitter-link",
 						"aria-label": "Twitter",
 					},
 					{
-						href: "https://github.com/facebook/docusaurus",
+						href: "https://github.com/ecadlabs/taqueria",
 						position: "right",
 						className: "header-github-link",
 						"aria-label": "GitHub repository",
@@ -114,11 +116,11 @@ const config = {
 						items: [
 							{
 								label: "Report Issues",
-								to: "/blog",
+								to: "https://github.com/ecadlabs/taqueria/issues/new/choose",
 							},
 							{
 								label: "Contribute",
-								to: "/blog",
+								to: "https://github.com/ecadlabs/taquito/blob/master/CONTRIBUTING.md",
 							},
 						],
 					},
@@ -127,24 +129,24 @@ const config = {
 						title: "Community",
 						items: [
 							{
-								label: "Stack Exchange",
-								to: "https://stackoverflow.com",
+								label: "Tezos Stack Exchange",
+								to: "https://tezos.stackexchange.com/questions/tagged/taqueria",
 							},
 							{
 								label: "Discord",
-								to: "https://discord.com",
+								to: "https://discord.gg/bujt7syVVT",
 							},
 							{
 								label: "Twitter",
-								to: "https://twitter.com",
+								to: "https://twitter.com/tezostaqueria",
 							},
 							{
 								label: "Code of Conduct",
-								to: "/docs/intro",
+								to: "https://github.com/ecadlabs/taquito/blob/master/code-of-conduct.md",
 							},
 							{
 								label: "GitHub",
-								to: "https://github.com",
+								to: "https://github.com/ecadlabs/taqueria",
 							},
 						],
 					},
@@ -156,12 +158,8 @@ const config = {
 								to: "/docs/intro",
 							},
 							{
-								label: "TypeDoc Reference",
-								to: "/docs/intro",
-							},
-							{
 								label: "Roadmap",
-								to: "/docs/intro",
+								to: "https://github.com/ecadlabs/taqueria/milestones?direction=asc&sort=due_date&state=open",
 							},
 						],
 					},
@@ -170,23 +168,23 @@ const config = {
 							{
 								html: `
 									<a href="/" target="_blank" rel="noreferrer noopener" aria-label="">
-									  <img src="img/footerLogoSVG.svg" alt="" />
+									  <img class='footerLogo' src="/img/Taqueria_purple_beta.svg" alt="" />
 									</a>
 								  `,
 							},
 							{
 								html: `
 									<p class='footerDescription'>
-									Faplaren krorar whataboutism. Krorat kroligen. 
+										A New Way to Build on Tezos
 									</p>
 								  `,
 							},
 							{
 								html: `
-								<a class='footerButton' href='https://github.com'>
-								<img class='footerGihubLogoButton' src="img/githubSVG.svg" alt="" />
-								GITHUB
-							  	</a>
+									<a class='footerButton' href='https://github.com/ecadlabs/taqueria'>
+										<img class='footerGihubLogoButton' src="img/githubSVG.svg" alt="" />
+										GITHUB
+									</a>
 								  `,
 							},
 							{

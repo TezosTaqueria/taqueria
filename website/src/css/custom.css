@@ -326,6 +326,11 @@ a.menu__link--sublist {
 	color: #000000;
 }
 
+.footerLogo {
+	width: 145px;
+	height: 50px;
+}
+
 .footerGihubLogoButton {
 	transform: translateY(5px);
 	padding-right: 5px;
