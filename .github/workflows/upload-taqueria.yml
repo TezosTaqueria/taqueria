@@ -113,7 +113,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            echo "$(jq .version ./taqueria-plugin-ligo/package.json)""
+            echo "$(jq .version ./taqueria-plugin-ligo/package.json)"
             
             let body = `
               | npm package installation instructions |
@@ -161,7 +161,6 @@ jobs:
           export scope="${{ env.SCOPE }}/"
           contents=$(jq '.name |= env.scope + .' package.json) && \
           echo ${contents} > package.json
-          cat package.json
 
       - name: Install any dependencies
         run: npm install
