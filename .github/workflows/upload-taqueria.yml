@@ -186,6 +186,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "${SCOPE}/${{ matrix.dir }}"
+          npm config set registry=${GH_REGISTRY}
+          npm config ls -al
           registry_version=$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)
           echo "${registry_version}"
           echo "::set-output name=version::${registry_version}"
