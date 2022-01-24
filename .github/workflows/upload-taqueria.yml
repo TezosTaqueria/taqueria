@@ -161,10 +161,10 @@ jobs:
           echo ${contents} > package.json
       
       - name: Get current npm registry version
-      id: get-npm-package-version
-      run: |
-        npm config ls -al
-        echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)"
+        id: get-npm-package-version
+        run: |
+          npm config ls -al
+          echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)"
 
       # - name: Change Registry to NPM for Installing
       #   run: |
