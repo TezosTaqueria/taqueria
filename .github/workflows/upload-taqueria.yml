@@ -153,7 +153,7 @@ jobs:
       - uses: actions/setup-node@v2
         with: 
           registry-url: ${{ env.GH_REGISTRY }}
-          scope: "@ecadlabs"
+          scope: ${{ env.SCOPE }}
       
       - name: Update package.json to specify scope
         run: | 
@@ -175,7 +175,7 @@ jobs:
         id: get-npm-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --registry=${GH_REGISTRY} --json | jq .version)"
+        run: echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)"
       
       - name: Publish if new version of package 
         env: 
