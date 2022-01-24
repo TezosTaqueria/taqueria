@@ -146,7 +146,7 @@ jobs:
     env:
       SCOPE: "@ecadlabs"
       NPM_REGISTRY: 'https://registry.npmjs.org/'
-      GH_REGISTRY: 'https://npm.pkg.github.com'
+      GH_REGISTRY: 'https://npm.pkg.github.com/'
 
     steps:
       - uses: actions/checkout@v2
