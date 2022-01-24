@@ -77,7 +77,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.upload-url }}
-          asset_path: ${{ github.workspace }}/taqueria.${{ matrix.deno_target }}
-          asset_name: taqueria.${{ matrix.deno_target }}
+          upload_url: "${{ needs.create-release.outputs.upload-url }}"
+          asset_path: "${{ github.workspace }}/taqueria.${{ matrix.deno_target }}"
+          asset_name: "taqueria.${{ matrix.deno_target }}"
           asset_content_type: application/octet-stream
