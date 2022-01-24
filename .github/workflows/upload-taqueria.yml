@@ -178,7 +178,7 @@ jobs:
       
       - name: Get current npm registry version
         id: get-npm-package-version
-        run: echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)"
+        run: echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --registry=${GH_REGISTRY} --json | jq .version)"
 
       # - name: Change Registry to GH for publishing
       #   env: 
