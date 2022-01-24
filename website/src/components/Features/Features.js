@@ -5,7 +5,7 @@ const FeatureList = [
   {
     title: "Finally all of your tools in one place",
     description:
-      "Stitching all of the development tools needed to build great applications into a cohesive, consistent and safe workflow can be incredibly frustrating and time-consuming. Taqueria is designed to help solve this problem while keeping control in your handss. Less barriers, more time creating!",
+      "Stitching all of the development tools needed to build great applications into a cohesive, consistent and safe workflow can be incredibly frustrating and time-consuming. Taqueria is designed to help solve this problem while keeping control in your hands. Less barriers, more time creating!",
     button: {
       label: "Quick Start",
       link: "#",
