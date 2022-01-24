@@ -165,7 +165,7 @@ jobs:
         # env: 
         #   NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "$(npm show ${SCOPE}/${{ matrix.dir }} --registry={GH_REGISTRY} --json"
+          echo "$(npm show ${SCOPE}/${{ matrix.dir }} --registry={GH_REGISTRY} --json | jq .version"
           echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)"
 
       # - name: Change Registry to NPM for Installing
