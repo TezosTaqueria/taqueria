@@ -162,7 +162,7 @@ jobs:
       
       - name: Change Registry to NPM for Installing
         run: |
-          npm config set registry=${NPM_REGISTRY}
+          npm config delete registry
           npm config ls -al
 
       - name: Install any dependencies
@@ -177,7 +177,7 @@ jobs:
 
       - name: Change Registry to GH for publishing
         run: |
-          npm config delete registry
+          npm config set registry ${GH_REGISTRY} && \
           npm config ls -al
 
       - name: Get current npm registry version
@@ -185,12 +185,8 @@ jobs:
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm config set registry=${GH_REGISTRY}
-          sleep 10
           npm config ls -al
-          registry_version=$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)
-          echo "${registry_version}"
-          echo "::set-output name=version::${registry_version}"
+          echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)"
       
       - name: Publish if new version of package 
         env: 
