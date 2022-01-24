@@ -93,7 +93,7 @@ jobs:
           - dir: taqueria-plugin-ligo
           - dir: taqueria-plugin-smartpy
           - dir: taqueria-plugin-taquito
-          - dir: taqueria-plugin-teztnets
+          # - dir: taqueria-plugin-teztnets
           - dir: taqueria-sdk
     
     defaults:
@@ -189,7 +189,6 @@ jobs:
               | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@${readFile("./taqueria-plugin-ligo/package.json")} --registry=${{ env.NPM_REGISTRY }}|
               | npm install ${{ env.SCOPE }}/taqueria-plugin-smartpy@${readFile("./taqueria-plugin-smartpy/package.json")} --registry=${{ env.NPM_REGISTRY }}|
               | npm install ${{ env.SCOPE }}/taqueria-plugin-taquito@${readFile("./taqueria-plugin-taquito/package.json")} --registry=${{ env.NPM_REGISTRY }}|
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-teztnets@${readFile("./taqueria-plugin-teztnets/package.json")} --registry=${{ env.NPM_REGISTRY }}|
               | npm install ${{ env.SCOPE }}/taqueria-sdk@${readFile("./taqueria-sdk/package.json")} --registry=${{ env.NPM_REGISTRY }}|
             `;
             
