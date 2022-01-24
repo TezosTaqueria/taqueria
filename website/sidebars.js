@@ -34,7 +34,12 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "plugins"
+        "plugins",
+        "plugin_ligo",
+        "plugin_smartpy",
+        "plugin_contract_type_generator",
+        "plugin_teztnets",
+        "plugin_boilerplate_typescript",
       ],
     },
     {
