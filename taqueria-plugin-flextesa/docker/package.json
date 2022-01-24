@@ -1,17 +1,16 @@
 {
-  "name": "ecad-flextesa",
+  "name": "@taqueria/flextesa-docker",
   "version": "1.0.0",
-  "description": "",
+  "description": "Extends the oxheadalpha/flextesa image for use with Taqueria",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build-package": "npx esbuild --platform=node --bundle startFlextesa.ts --outdir=.",
-    "build-docker": "docker build . -t ecad-flextesa",
+    "build-docker": "docker build . -t taqueria/flextesa",
     "build": "npm run build-package && npm run build-docker"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["taqueria", "docker", "flextesa", "sandbox", "local", "ecad", "ecadlabs", "tezos"],
+  "author": "ECAD Labs",
+  "license": "Apache-2.0",
   "devDependencies": {
     "esbuild": "^0.14.11",
     "typescript": "^4.5.4"

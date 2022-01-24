@@ -1,4 +1,4 @@
-import {Plugin, Task, PositionalArg} from 'taqueria-sdk'
+import {Plugin, Task, PositionalArg} from '@taqueria/node-sdk'
 import proxy from './proxy'
 
 Plugin.create(_i18n => ({

@@ -1,5 +1,5 @@
-import {Sandbox as theSandbox} from 'taqueria-sdk/'
-import type { SanitizedArgs, ProxyAction, Attributes, SandboxConfig, EconomicalProtocol, ActionResponse, Failure, LikeAPromise, Sandbox } from "taqueria-sdk/types"
+import {Sandbox as theSandbox} from '@taqueria/node-sdk'
+import type { SanitizedArgs, ProxyAction, Attributes, SandboxConfig, EconomicalProtocol, ActionResponse, Failure, LikeAPromise, Sandbox } from "@taqueria/node-sdk/types"
 import {exec} from 'child_process'
 import retry from 'promise-retry'
 
@@ -40,7 +40,7 @@ const attributesToParams = (attributes: Attributes): Record<string, string> => [
     {}
 )
 
-const getDockerImage = () => 'ecad-flextesa:latest'
+const getDockerImage = () => 'taqueria/flextesa:latest'
 
 const getStartCommand = (sandbox: Sandbox, image: string, config: Opts): string => {
     const _envVars = Object.entries(attributesToParams(sandbox.attributes)).reduce(
