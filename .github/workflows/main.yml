@@ -1,4 +1,4 @@
-name: upload-taqueria
+name: main
 
 on: 
   pull_request:
@@ -121,7 +121,7 @@ jobs:
           mkdir release && cd release
           wget ${{ needs.build-and-test.outputs.public-url-ubuntu }}
           wget ${{ needs.build-and-test.outputs.public-url-windows }}
-          wget ${{ needs.build-and-test.outputs.public-url-windows }}
+          wget ${{ needs.build-and-test.outputs.public-url-macos }}
 
       - name: Release
         id: release
