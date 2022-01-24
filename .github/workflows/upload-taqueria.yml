@@ -184,7 +184,10 @@ jobs:
         id: get-npm-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "::set-output name=version::$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)"
+        run: |
+          registry_version=$(npm show ${SCOPE}/${{ matrix.dir }} --json | jq .version)
+          echo "${registry_version}"
+          echo "::set-output name=version::${registry_version}"
       
       - name: Publish if new version of package 
         env: 
