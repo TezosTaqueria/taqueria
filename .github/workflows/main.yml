@@ -19,138 +19,138 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
-  # build-and-test:
-  #   permissions:
-  #     contents: 'read'
-  #     id-token: 'write'
-  #   runs-on: ${{ matrix.os }}
-  #   strategy:
-  #     fail-fast: true
-  #     matrix:
-  #      include:
-  #        - os: ubuntu-latest
-  #          os_short: ubuntu
-  #          deno_target: "x86_64-unknown-linux-gnu"
-  #          taqueria_bin: "taqueria"
-  #        - os: windows-latest
-  #          os_short: windows
-  #          deno_target: "x86_64-pc-windows-msvc"
-  #          taqueria_bin: "taqueria.exe"
-  #        - os: macOS-latest
-  #          os_short: macos
-  #          deno_target: "x86_64-apple-darwin"
-  #          taqueria_bin: "taqueria"
+  build-and-test:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+       include:
+         - os: ubuntu-latest
+           os_short: ubuntu
+           deno_target: "x86_64-unknown-linux-gnu"
+           taqueria_bin: "taqueria"
+         - os: windows-latest
+           os_short: windows
+           deno_target: "x86_64-pc-windows-msvc"
+           taqueria_bin: "taqueria.exe"
+         - os: macOS-latest
+           os_short: macos
+           deno_target: "x86_64-apple-darwin"
+           taqueria_bin: "taqueria"
 
-  #   outputs:
-  #     public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
-  #     public-url-windows: ${{ steps.public-url.outputs.windows }}
-  #     public-url-macos: ${{ steps.public-url.outputs.macos }}
+    outputs:
+      public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
+      public-url-windows: ${{ steps.public-url.outputs.windows }}
+      public-url-macos: ${{ steps.public-url.outputs.macos }}
 
-  #   env:
-  #     DENO_TARGET: ${{ matrix.deno_target }}
+    env:
+      DENO_TARGET: ${{ matrix.deno_target }}
 
-  #   steps:
-  #     - name: Setup repo
-  #       uses: actions/checkout@v2
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v2
 
-  #     - name: Setup Deno
-  #       uses: denoland/setup-deno@v1
-  #       with:
-  #         deno-version: "^1.0.0"
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: "^1.0.0"
 
-  #     ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
-  #     ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
-  #     - name: Build the binary for ${{ matrix.os }}
-  #       id: build-bin
-  #       shell: bash
-  #       run: |
-  #         deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
-  #         [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
-  #         mv "${{ matrix.taqueria_bin }}" "taqueria.${{ matrix.deno_target }}"
+      ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
+      ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
+      - name: Build the binary for ${{ matrix.os }}
+        id: build-bin
+        shell: bash
+        run: |
+          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
+          [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
+          mv "${{ matrix.taqueria_bin }}" "taqueria.${{ matrix.deno_target }}"
 
-  #     - name: Authenticate with GCP
-  #       id: gcp-auth
-  #       uses: google-github-actions/auth@v0
-  #       with:
-  #         workload_identity_provider: "projects/${{ secrets.GCP_PROJECT }}/locations/global/workloadIdentityPools/github-actions-storage-pool/providers/github-actions-oidc-provider"
-  #         service_account: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
+      - name: Authenticate with GCP
+        id: gcp-auth
+        uses: google-github-actions/auth@v0
+        with:
+          workload_identity_provider: "projects/${{ secrets.GCP_PROJECT }}/locations/global/workloadIdentityPools/github-actions-storage-pool/providers/github-actions-oidc-provider"
+          service_account: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
 
-  #     - name: Upload binary to GCP
-  #       id: upload-file
-  #       uses: 'google-github-actions/upload-cloud-storage@v0'
-  #       with:
-  #         path: "taqueria.${{ matrix.deno_target }}"
-  #         destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}"
+      - name: Upload binary to GCP
+        id: upload-file
+        uses: 'google-github-actions/upload-cloud-storage@v0'
+        with:
+          path: "taqueria.${{ matrix.deno_target }}"
+          destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}"
 
-  #     - name: Set public url
-  #       id: public-url
-  #       run: |
-  #         echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
+      - name: Set public url
+        id: public-url
+        run: |
+          echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  # publish-npm-packages:
-  #   # needs: build-and-test
-  #   runs-on: ubuntu-latest
+  publish-npm-packages:
+    needs: build-and-test
+    runs-on: ubuntu-latest
     
-  #   permissions:
-  #     packages: write
-  #     contents: read
+    permissions:
+      packages: write
+      contents: read
     
-  #   strategy:
-  #     matrix:
-  #       include:
-  #         - dir: taqueria-plugin-ligo
-  #         - dir: taqueria-plugin-smartpy
-  #         - dir: taqueria-plugin-taquito
-  #         # - dir: taqueria-plugin-teztnets
-  #         - dir: taqueria-sdk
+    strategy:
+      matrix:
+        include:
+          - dir: taqueria-plugin-ligo
+          - dir: taqueria-plugin-smartpy
+          - dir: taqueria-plugin-taquito
+          # - dir: taqueria-plugin-teztnets
+          - dir: taqueria-sdk
     
-  #   defaults:
-  #     run:
-  #       working-directory: ${{ matrix.dir }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.dir }}
 
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with: 
-  #         registry-url: ${{ env.GH_REGISTRY }}
-  #         scope: ${{ env.SCOPE }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with: 
+          registry-url: ${{ env.GH_REGISTRY }}
+          scope: ${{ env.SCOPE }}
       
-  #     - name: Update package.json to specify scope for ECAD
-  #       run: | 
-  #         export scope="${{ env.SCOPE }}/"
-  #         export name="$(jq -r .name package.json | awk '{split($0,a,"/"); print a[2]}')"
-  #         contents=$(jq '.name |= env.scope + env.name' package.json) && \
-  #         echo ${contents} > package.json
+      - name: Update package.json to specify scope for ECAD
+        run: | 
+          export scope="${{ env.SCOPE }}/"
+          export name="$(jq -r .name package.json | awk '{split($0,a,"/"); print a[2]}')"
+          contents=$(jq '.name |= env.scope + env.name' package.json) && \
+          echo ${contents} > package.json
 
-  #     - name: Install any dependencies
-  #       run: npm install
+      - name: Install any dependencies
+        run: npm install
 
-  #     - name: Build package
-  #       run: npm run build
+      - name: Build package
+        run: npm run build
 
-  #     - name: Get current local package version
-  #       id: get-local-package-version
-  #       run: echo "::set-output name=version::$(jq .version package.json)"
+      - name: Get current local package version
+        id: get-local-package-version
+        run: echo "::set-output name=version::$(jq .version package.json)"
       
-  #     - name: Get current npm registry version
-  #       id: get-npm-package-version
-  #       env: 
-  #         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       run: |
-  #         echo "$(jq -r .name package.json)"
-  #         echo "::set-output name=version::$(npm show $(jq -r .name package.json) --json | jq .version)"
+      - name: Get current npm registry version
+        id: get-npm-package-version
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "$(jq -r .name package.json)"
+          echo "::set-output name=version::$(npm show $(jq -r .name package.json) --json | jq .version)"
       
-  #     - name: Publish if new version of package 
-  #       env: 
-  #         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       if: steps.get-npm-package-version.outputs.version < steps.get-local-package-version.outputs.version
-  #       run: npm publish 
+      - name: Publish if new version of package 
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.get-npm-package-version.outputs.version < steps.get-local-package-version.outputs.version
+        run: npm publish 
 
   pr-comment:
     runs-on: ubuntu-latest
-    # needs: 
-      # - build-and-test
-      # - publish-npm-packages
+    needs: 
+      - build-and-test
+      - publish-npm-packages
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
@@ -217,25 +217,25 @@ jobs:
               repo: context.repo.repo,
               body: body
             })
-  # release:
-  #   name: Release
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - build-and-test
-  #   if: startsWith(github.ref, 'refs/tags/v')
-  #   steps:
-  #     - name: Download binaries 
-  #       id: download-binaries 
-  #       run: |
-  #         mkdir release && cd release
-  #         wget ${{ needs.build-and-test.outputs.public-url-ubuntu }} -O taqueria.${GITHUB_REF/refs\/tags\//}-linux
-  #         wget ${{ needs.build-and-test.outputs.public-url-windows }} -O taqueria.${GITHUB_REF/refs\/tags\//}-windows.exe
-  #         wget ${{ needs.build-and-test.outputs.public-url-macos }} -O taqueria.${GITHUB_REF/refs\/tags\//}-macos
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Download binaries 
+        id: download-binaries 
+        run: |
+          mkdir release && cd release
+          wget ${{ needs.build-and-test.outputs.public-url-ubuntu }} -O taqueria.${GITHUB_REF/refs\/tags\//}-linux
+          wget ${{ needs.build-and-test.outputs.public-url-windows }} -O taqueria.${GITHUB_REF/refs\/tags\//}-windows.exe
+          wget ${{ needs.build-and-test.outputs.public-url-macos }} -O taqueria.${GITHUB_REF/refs\/tags\//}-macos
 
-  #     - name: Release
-  #       id: release
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         files: |
-  #           ./release/*
-  #         draft: true
+      - name: Release
+        id: release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./release/*
+          draft: true
