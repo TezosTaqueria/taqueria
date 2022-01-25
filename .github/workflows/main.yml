@@ -106,22 +106,30 @@ jobs:
           registry-url: ${{ env.GH_REGISTRY }}
           scope: ${{ env.SCOPE }}
 
+      - name: Plugin list
+        id: plugin-list
+        run: echo "::set-output name=list::$(find ./ -type d -name "taqueria-plugin-*" -not -path "*-util")"
+
       - name: Update package.json to specify scope
         run: | 
           export scope="${{ env.SCOPE }}/"
-          npm run update-all
-        # for d in ./taqueria-*/;
-        # do 
-        #   cd $d
-        #   contents=$(jq '.name |= env.scope + .' package.json)
-        #   echo ${contents} > package.json
-        #   cd ..
-        # done
+          export plugins=${{ steps.plugin-list.outputs.list }}
+          for d in ./taqueria-*/;
+          do 
+            cd $d
+            contents=$(jq '.name |= env.scope + .' package.json)
+            echo ${contents} > package.json
+            cd ..
+          done
       - name: Install any dependencies
-        run: npm run clean-install-all
+        run: |
+          export plugins=${{ steps.plugin-list.outputs.list }}
+          npm run clean-install-all
 
       - name: Build package
-        run: npm run build-packages
+        run: |
+          export plugins=${{ steps.plugin-list.outputs.list }}
+          npm run build-packages
 
   pr-comment:
     runs-on: ubuntu-latest
