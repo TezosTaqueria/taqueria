@@ -114,7 +114,7 @@ jobs:
         run: | 
           export scope="${{ env.SCOPE }}/"
           export plugins=${{ steps.plugin-list.outputs.list }}
-          for d in ./taqueria-*/;
+          for d in $plugins;
           do 
             cd $d
             contents=$(jq '.name |= env.scope + .' package.json)
