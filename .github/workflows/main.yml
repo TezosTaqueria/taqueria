@@ -185,11 +185,23 @@ jobs:
           script: |
             const fs = require('fs');
 
-            function readFileVersion(filePath) {
+            function readInfo(filepath) {
               try {
                 const data = fs.readFileSync(filePath)
                 const JSONdata = JSON.parse(data.toString())
-                return JSONdata.version
+                let name = JSONdata.name.split("/")[1]
+                let version = JSONdata.version
+              } catch (error) {
+                console.error(`Got an error trying to read the file: ${error.message}`)
+              }
+
+              return {name, version}
+            }
+
+            function readFileVersion(filePath) {
+              try {
+                const data = fs.readFileSync(filePath)
+                return JSON.parse(data.toString()).version
               } catch (error) {
                 console.error(`Got an error trying to read the file: ${error.message}`)
               }
@@ -199,18 +211,18 @@ jobs:
               try {
                 const data = fs.readFileSync(filePath)
                 const JSONdata = JSON.parse(data.toString())
-                console.log(JSONdata.name)
-                const name = JSONdata.name.split("/")[1]
-                return name
+                return JSONdata.name.split("/")[1]
               } catch (error) {
                 console.error(`Got an error trying to read the file: ${error.message}`)
               }
             }
 
+            const ligo = readInfo("./taqueria-plugin-ligo/package.json")
+
             let body = `
               | npm package installation instructions |
               | --------- |
-              | npm install ${{ env.SCOPE }}/${readFileNameNoScope("./taqueria-plugin-ligo/package.json")}@${readFileVersion("./taqueria-plugin-ligo/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/${ligo.name}@${ligo.version} --registry=${{ env.GH_REGISTRY }}|
               | npm install ${{ env.SCOPE }}/${readFileNameNoScope("./taqueria-plugin-smartpy/package.json")}@${readFileVersion("./taqueria-plugin-smartpy/package.json")} --registry=${{ env.GH_REGISTRY }}|
               | npm install ${{ env.SCOPE }}/${readFileNameNoScope("./taqueria-plugin-taquito/package.json")}@${readFileVersion("./taqueria-plugin-taquito/package.json")} --registry=${{ env.GH_REGISTRY }}|
               | npm install ${{ env.SCOPE }}/${readFileNameNoScope("./taqueria-sdk/package.json")}@${readFileVersion("./taqueria-sdk/package.json")} --registry=${{ env.GH_REGISTRY }}|
