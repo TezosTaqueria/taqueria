@@ -79,7 +79,7 @@ jobs:
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  publish_npm_packages:
+  publish-npm-packages:
     needs: build-and-test
     runs-on: ubuntu-latest
     
@@ -186,10 +186,10 @@ jobs:
             let body = `
               | npm package installation instructions |
               | --------- |
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@${readFile("./taqueria-plugin-ligo/package.json")} --registry=${{ env.NPM_REGISTRY }}|
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-smartpy@${readFile("./taqueria-plugin-smartpy/package.json")} --registry=${{ env.NPM_REGISTRY }}|
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-taquito@${readFile("./taqueria-plugin-taquito/package.json")} --registry=${{ env.NPM_REGISTRY }}|
-              | npm install ${{ env.SCOPE }}/taqueria-sdk@${readFile("./taqueria-sdk/package.json")} --registry=${{ env.NPM_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@${readFile("./taqueria-plugin-ligo/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/taqueria-plugin-smartpy@${readFile("./taqueria-plugin-smartpy/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/taqueria-plugin-taquito@${readFile("./taqueria-plugin-taquito/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/taqueria-sdk@${readFile("./taqueria-sdk/package.json")} --registry=${{ env.GH_REGISTRY }}|
             `;
             
             github.rest.issues.createComment({
