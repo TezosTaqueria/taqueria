@@ -32,14 +32,14 @@
   },
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "dependencies": {
-    "yargs": "^17.2.1",
-    "@taqueria/protocol": "file:../taqueria-protocol"
+    "@taqueria/protocol": "file:../taqueria-protocol",
+    "yargs": "^17.2.1"
   },
   "devDependencies": {
     "@bevry/jsonfile": "^1.3.0",
     "@types/json-schema-generator": "^2.0.0",
     "@types/yargs": "^17.0.7",
-    "esbuild": "^0.14.7",
+    "esbuild": "^0.14.13",
     "json-schema-generator": "^2.0.6",
     "typescript": "^4.5.2"
   }
