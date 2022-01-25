@@ -146,7 +146,7 @@ jobs:
           - dir: taqueria-plugin-ligo
           - dir: taqueria-plugin-smartpy
           - dir: taqueria-plugin-taquito
-          - dir: taqueria-plugin-teztnets
+          # - dir: taqueria-plugin-teztnets
           - dir: taqueria-sdk
 
     defaults:
