@@ -102,7 +102,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
-        with: 
+        with:
+          node-version: 16
           registry-url: ${{ env.GH_REGISTRY }}
           scope: ${{ env.SCOPE }}
 
@@ -194,8 +195,10 @@ jobs:
             ./release/*
           draft: true
 
+      - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
-        with: 
+        with:
+          node-version: 16
           registry-url: ${{ env.GH_REGISTRY }}
           scope: ${{ env.SCOPE }}
 
