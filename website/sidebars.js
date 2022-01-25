@@ -50,7 +50,9 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "hello-tacos-tutorial"
+        "hello_tacos",
+        "EXAMPLE_FOR_STYLING"
+
       ],
     },
     {
