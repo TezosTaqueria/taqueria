@@ -185,7 +185,7 @@ jobs:
           script: |
             const fs = require('fs');
 
-            function readFile(filePath) {
+            function readFileVersion(filePath) {
               try {
                 const data = fs.readFileSync(filePath)
                 const JSONdata = JSON.parse(data.toString())
@@ -195,13 +195,23 @@ jobs:
               }
             }
 
+            function readFileName(filePath) {
+              try {
+                const data = fs.readFileSync(filePath)
+                const JSONdata = JSON.parse(data.toString())
+                return JSONdata.name
+              } catch (error) {
+                console.error(`Got an error trying to read the file: ${error.message}`)
+              }
+            }
+
             let body = `
               | npm package installation instructions |
               | --------- |
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@${readFile("./taqueria-plugin-ligo/package.json")} --registry=${{ env.GH_REGISTRY }}|
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-smartpy@${readFile("./taqueria-plugin-smartpy/package.json")} --registry=${{ env.GH_REGISTRY }}|
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-taquito@${readFile("./taqueria-plugin-taquito/package.json")} --registry=${{ env.GH_REGISTRY }}|
-              | npm install ${{ env.SCOPE }}/taqueria-sdk@${readFile("./taqueria-sdk/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${readFileName("./taqueria-plugin-ligo/package.json")}@${readFileVersion("./taqueria-plugin-ligo/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${readFileName("./taqueria-plugin-smartpy/package.json")}@${readFileVersion("./taqueria-plugin-smartpy/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${readFileName("./taqueria-plugin-taquito/package.json")}@${readFileVersion("./taqueria-plugin-taquito/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${readFileName("./taqueria-sdk/package.json")}@${readFileVersion("./taqueria-sdk/package.json")} --registry=${{ env.GH_REGISTRY }}|
             `;
             
             github.rest.issues.createComment({
