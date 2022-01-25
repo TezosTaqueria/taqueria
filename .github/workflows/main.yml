@@ -144,7 +144,7 @@ jobs:
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: steps.get-npm-package-version.outputs.version < steps.get-local-package-version.outputs.version
-        run: npm publish
+        run: npm publish 
 
   pr-comment:
     runs-on: ubuntu-latest
@@ -191,7 +191,10 @@ jobs:
                 const JSONdata = JSON.parse(data.toString())
                 let name = JSONdata.name.split("/")[1]
                 let version = JSONdata.version
-                return {name, version}
+                console.log(name)
+                console.log(version)
+                console.log({ name, version })
+                return { name, version }
               } catch (error) {
                 console.error(`Got an error trying to read the file: ${error.message}`)
               }
