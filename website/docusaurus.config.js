@@ -23,10 +23,6 @@ const config = {
 			/** @type {import('@docusaurus/preset-classic').Options} */
 			
 			({
-				gtag: {
-					trackingID: 'G-R7WYMVNDR1',
-					anonymizeIP: true,
-				},
 				docs: {
 					path: "docs",
 					sidebarPath: require.resolve("./sidebars.js"),
@@ -50,6 +46,10 @@ const config = {
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
+			gtag: {
+				trackingID: 'UA-141789564-1',
+				anonymizeIP: true,
+			},
 			colorMode: {
 				defaultMode: "light",
 				disableSwitch: true,
