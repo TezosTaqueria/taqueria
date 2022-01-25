@@ -210,10 +210,10 @@ jobs:
             let body = `
               | npm package installation instructions |
               | --------- |
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-ligo@${readFileVersion("./taqueria-plugin-ligo/package.json")} --registry=${{ env.GH_REGISTRY }}|
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-smartpy@${readFileVersion("./taqueria-plugin-smartpy/package.json")} --registry=${{ env.GH_REGISTRY }}|
-              | npm install ${{ env.SCOPE }}/taqueria-plugin-taquito@${readFileVersion("./taqueria-plugin-taquito/package.json")} --registry=${{ env.GH_REGISTRY }}|
-              | npm install ${{ env.SCOPE }}/taqueria-sdk@${readFileVersion("./taqueria-sdk/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/${readFileNameNoScope("./taqueria-plugin-ligo/package.json")}@${readFileVersion("./taqueria-plugin-ligo/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/${readFileNameNoScope("./taqueria-plugin-smartpy/package.json")}@${readFileVersion("./taqueria-plugin-smartpy/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/${readFileNameNoScope("./taqueria-plugin-taquito/package.json")}@${readFileVersion("./taqueria-plugin-taquito/package.json")} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/${readFileNameNoScope("./taqueria-sdk/package.json")}@${readFileVersion("./taqueria-sdk/package.json")} --registry=${{ env.GH_REGISTRY }}|
             `;
             
             github.rest.issues.createComment({
