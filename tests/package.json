@@ -4,7 +4,7 @@
   "description": "This is Taqueria testing project includes unit, integration and e2e tests",
   "main": "index.js",
   "scripts": {
-    "test:unit": "deno test unit/ --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
+    "test:unit": "deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
     "test:integration": "jest --config jest.config.integration.ts --no-cache",
     "test:e2e": "jest --config jest.config.e2e.ts --no-cache"
   },
