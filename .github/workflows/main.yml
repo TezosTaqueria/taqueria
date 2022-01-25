@@ -191,11 +191,10 @@ jobs:
                 const JSONdata = JSON.parse(data.toString())
                 let name = JSONdata.name.split("/")[1]
                 let version = JSONdata.version
+                return {name, version}
               } catch (error) {
                 console.error(`Got an error trying to read the file: ${error.message}`)
               }
-
-              return {name, version}
             }
 
             function readFileVersion(filePath) {
@@ -218,6 +217,7 @@ jobs:
             }
 
             const ligo = readInfo("./taqueria-plugin-ligo/package.json")
+            console.log(ligo)
 
             let body = `
               | npm package installation instructions |
