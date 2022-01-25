@@ -32,14 +32,14 @@ jobs:
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
            taqueria_bin: "taqueria"
-         - os: windows-latest
-           os_short: windows
-           deno_target: "x86_64-pc-windows-msvc"
-           taqueria_bin: "taqueria.exe"
-         - os: macOS-latest
-           os_short: macos
-           deno_target: "x86_64-apple-darwin"
-           taqueria_bin: "taqueria"
+        #  - os: windows-latest
+        #    os_short: windows
+        #    deno_target: "x86_64-pc-windows-msvc"
+        #    taqueria_bin: "taqueria.exe"
+        #  - os: macOS-latest
+        #    os_short: macos
+        #    deno_target: "x86_64-apple-darwin"
+        #    taqueria_bin: "taqueria"
 
     outputs:
       public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
@@ -142,7 +142,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - dir: taqueria-plugin-flextesa
+          # - dir: taqueria-plugin-flextesa
           - dir: taqueria-plugin-ligo
           - dir: taqueria-plugin-smartpy
           - dir: taqueria-plugin-taquito
