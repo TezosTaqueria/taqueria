@@ -89,49 +89,6 @@ jobs:
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  build-npm-packages:
-    runs-on: ubuntu-latest
-
-    permissions:
-      packages: write
-      contents: read
-
-    strategy:
-      fail-fast: true
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          registry-url: ${{ env.GH_REGISTRY }}
-          scope: ${{ env.SCOPE }}
-
-      - name: Plugin list
-        id: plugin-list
-        run: echo "::set-output name=list::$(find ./ -type d -name "taqueria-plugin-*" -not -path "*-util")"
-
-      - name: Update package.json to specify scope
-        run: | 
-          export scope="${{ env.SCOPE }}/"
-          export plugins=${{ steps.plugin-list.outputs.list }}
-          for d in $plugins;
-          do 
-            cd $d
-            contents=$(jq '.name |= env.scope + .' package.json)
-            echo ${contents} > package.json
-            cd ..
-          done
-      - name: Install any dependencies
-        run: |
-          export plugins=${{ steps.plugin-list.outputs.list }}
-          npm run clean-install-all
-
-      - name: Build package
-        run: |
-          export plugins=${{ steps.plugin-list.outputs.list }}
-          npm run build-packages
-
   build-and-publish-npm-packages:
     runs-on: ubuntu-latest
 
