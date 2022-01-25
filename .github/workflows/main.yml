@@ -184,7 +184,7 @@ jobs:
         # Below we check if the tag ends with a version number.
         # If there is nothing after the version number the 'is-latest' output is set to true
         run: |
-          if [[ $GITHUB_REF =~ v[0-9]\.[0-9]\.[0-9]- ]] ; then echo "::set-output name=is-latest::true"; fi
+          if [[ $GITHUB_REF =~ v[0-9]\.[0-9]\.[0-9]- ]] ; then echo "::set-output name=npm-tag::next"; fi
 
       - name: Download binaries 
         id: download-binaries 
@@ -204,16 +204,16 @@ jobs:
 
       - name: Publish npm next packages
         id: publish-npm-next
+        if: ${{ steps.check-tag-suffix.outputs.npm-tag }} == 'next'
         run: |
           export plugins=${{ steps.plugin-list.outputs.list }}
           export NPM_TAG="next"
           npm run publish-all
-        if: ${{ steps.check-tag-suffix.outputs.is-latest }} != true
 
       - name: Publish npm latest packages
         id: publish-npm-latest
+        if: ${{ steps.check-tag-suffix.outputs.npm-tag }} != 'next'
         run: |
           export plugins=${{ steps.plugin-list.outputs.list }}
           export NPM_TAG="latest"
           npm run publish-all
-        if: ${{ steps.check-tag-suffix.outputs.is-latest }} == true
