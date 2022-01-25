@@ -7,21 +7,21 @@
       "build": "echo 'Nothing to build.'"
     },
     "keywords": [
-        "taqueria",
-        "tezos",
-        "build",
-        "ecad",
-        "ecadlabs",
-        "smart contract",
-        "compile"
+      "taqueria",
+      "tezos",
+      "build",
+      "ecad",
+      "ecadlabs",
+      "smart contract",
+      "compile"
     ],
     "author": "ECAD Labs",
     "license": "Apache-2.0",
     "bugs": {
-        "url": "https://github.com/ecadlabs/taqueria/issues"
+      "url": "https://github.com/ecadlabs/taqueria/issues"
     },
     "homepage": "https://github.com/ecadlabs/taqueria#readme",
     "dependencies": {
-        "@taqueria/node-sdk": "file:../taqueria-sdk"
+      "@taqueria/node-sdk": "file:../taqueria-sdk"
     }
 }
