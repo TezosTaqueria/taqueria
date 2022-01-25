@@ -10,6 +10,7 @@
     "test": "yarn",
     "build": "./bin/build.sh",
     "build-packages": "for d in ./taqueria-*/; do cd $d; npm build; cd ..; done",
+    "update-all": "for d in ./taqueria-*/; do cd $d; contents=$(jq '.name |= env.scope + .' package.json); echo ${contents} > package.json; cd ..; done",
     "install-all": "npm install; for d in ./taqueria-*/; do cd $d; npm install; cd ..; done",
     "clean-install-all": "npm ci; for d in ./taqueria-*/; do cd $d; npm ci; cd ..; done",
     "publish-all": "for d in ./taqueria-*/; do cd $d; npm publish --tag $NPM_TAG; cd ..; done",

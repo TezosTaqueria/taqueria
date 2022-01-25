@@ -96,6 +96,9 @@ jobs:
       packages: write
       contents: read
 
+    strategy:
+      fail-fast: true
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -106,13 +109,14 @@ jobs:
       - name: Update package.json to specify scope
         run: | 
           export scope="${{ env.SCOPE }}/"
-          for d in ./taqueria-*/;
-          do 
-            cd $d
-            contents=$(jq '.name |= env.scope + .' package.json)
-            echo ${contents} > package.json
-            cd ..
-          done
+          npm run update-all
+        # for d in ./taqueria-*/;
+        # do 
+        #   cd $d
+        #   contents=$(jq '.name |= env.scope + .' package.json)
+        #   echo ${contents} > package.json
+        #   cd ..
+        # done
       - name: Install any dependencies
         run: npm run clean-install-all
 
