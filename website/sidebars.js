@@ -49,7 +49,9 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "hello_tacos"
+        "hello_tacos",
+        "EXAMPLE_FOR_STYLING"
+
       ],
     },
     {
