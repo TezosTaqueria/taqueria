@@ -16,6 +16,7 @@
     "prod-config": "npm run backup-config && npm run update-sdk-version && npm run update-sdk-version-lock",
     "build-prod": "npm run backup-config && npm run prod-config && npm run build && npm run restore-config"
   },
+
   "keywords": [
     "taqueria",
     "tezos",
@@ -30,6 +31,13 @@
   ],
   "author": "ECAD Labs",
   "license": "Apache-2.0",
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecadlabs/taqueria.git",
+    "directory": "taqueria-plugin-ligo"
+  },
+
   "bugs": {
     "url": "https://github.com/ecadlabs/taqueria/issues"
   },

@@ -47,9 +47,7 @@ jobs:
       public-url-macos: ${{ steps.public-url.outputs.macos }}
 
     env:
-      DENO_DIR: ./deno
       DENO_TARGET: ${{ matrix.deno_target }}
-      TAQ_BIN: 
 
     steps:
       - name: Setup repo
@@ -89,13 +87,14 @@ jobs:
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  build-and-publish-npm-packages:
+  publish-npm-packages:
+    needs: build-and-test
     runs-on: ubuntu-latest
-
+    
     permissions:
       packages: write
       contents: read
-
+    
     strategy:
       matrix:
         include:
@@ -105,7 +104,7 @@ jobs:
           - dir: taqueria-plugin-taquito
           # - dir: taqueria-plugin-teztnets
           - dir: taqueria-sdk
-
+    
     defaults:
       run:
         working-directory: ${{ matrix.dir }}
@@ -114,45 +113,50 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with: 
-          registry-url: ${{ env.NPM_REGISTRY }}
+          registry-url: ${{ env.GH_REGISTRY }}
           scope: ${{ env.SCOPE }}
-
-      - name: Check tag suffix
-        id: check-tag-suffix
-        # Below we check if the tag ends with a version number.
-        # If there is nothing after the version number the 'is-latest' output is set to true
-        run: |
-          if [[ $GITHUB_REF =~ v[0-9]\.[0-9]\.[0-9]- ]] ; then echo "::set-output name=npm-tag::next"; fi
+      
+      - name: Update package.json to specify scope for ECAD
+        run: | 
+          export scope="${{ env.SCOPE }}/"
+          export name="$(jq -r .name package.json | awk '{split($0,a,"/"); print a[2]}')"
+          contents=$(jq '.name |= env.scope + env.name' package.json) && \
+          echo ${contents} > package.json
 
       - name: Install any dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build package
         run: npm run build
+
+      - name: Get current local package version
+        id: get-local-package-version
+        run: echo "::set-output name=version::$(jq .version package.json)"
       
-      - name: Publish for prerelease
+      - name: Get current npm registry version
+        id: get-npm-package-version
         env: 
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
-        if: startsWith(github.ref, 'refs/tags/v') && steps.check-tag-suffix.outputs.npm-tag == 'next'
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
-          npm publish --tag 'next' --access public
+          echo "$(jq -r .name package.json)"
+          echo "::set-output name=version::$(npm show $(jq -r .name package.json) --json | jq .version)"
       
-      - name: Publish for official release
+      - name: Publish if new version of package 
         env: 
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
-        if: startsWith(github.ref, 'refs/tags/v') && steps.check-tag-suffix.outputs.npm-tag != 'next'
-        run: |
-          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
-          npm publish --tag 'latest' --access public
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.get-npm-package-version.outputs.version < steps.get-local-package-version.outputs.version
+        run: npm publish 
 
   pr-comment:
     runs-on: ubuntu-latest
-    needs:
-      - build-binaries
+    needs: 
+      - build-and-test
+      - publish-npm-packages
     if: github.event_name == 'pull_request'
     steps:
-      - name: create comment
+      - uses: actions/checkout@v2
+
+      - name: create binary comment
         uses: actions/github-script@v5
         id: pr-comment
         with:
@@ -174,6 +178,46 @@ jobs:
               body: body
             })
 
+      - name: create npm comment
+        uses: actions/github-script@v5
+        id: npm-comment
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+
+            function readInfo(filePath) {
+              try {
+                const data = fs.readFileSync(filePath)
+                const JSONdata = JSON.parse(data.toString())
+                const name = JSONdata.name.split("/")[1]
+                const version = JSONdata.version
+                return { name, version }
+              } catch (error) {
+                console.error(`Got an error trying to read the file: ${error.message}`)
+              }
+            }
+
+            const ligo = readInfo("./taqueria-plugin-ligo/package.json")
+            const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
+            const taquito = readInfo("./taqueria-plugin-taquito/package.json")
+            const sdk = readInfo("./taqueria-sdk/package.json")
+
+            let body = `
+              | npm package installation instructions |
+              | --------- |
+              | npm install ${{ env.SCOPE }}/${ligo.name}@${ligo.version} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/${smartpy.name}@${smartpy.version} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/${taquito.name}@${taquito.version} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/${sdk.name}@${sdk.version} --registry=${{ env.GH_REGISTRY }}|
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
   release:
     name: Release
     runs-on: ubuntu-latest
