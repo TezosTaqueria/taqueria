@@ -17,8 +17,14 @@
     "url": "https://github.com/ecadlabs/taqueria/issues"
   },
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
-  "categories": [
-    "Other"
+  "keywords": [
+    "taqueria",
+    "tezos",
+    "build",
+    "test",
+    "deploy",
+    "ecad",
+    "ecadlabs"
   ],
   "activationEvents": [
     "onCommand:taqueria.helloWorld"
