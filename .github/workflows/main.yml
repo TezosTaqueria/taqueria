@@ -140,7 +140,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           npm --no-git-tag-version version "${{ env.PACKAGE_VERSION }}-${{ github.event.number }}-${{ env.SHORT_SHA }}"
-          npm publish --access public
+          npm publish --tag "${{ github.event.number }}" --access public
       
       - name: Publish for prerelease
         env: 
