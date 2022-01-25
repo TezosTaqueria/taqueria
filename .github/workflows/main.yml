@@ -182,13 +182,13 @@ jobs:
       - name: Publish for prerelease
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/v') && steps.check-tag-suffix.outputs.npm-tag == next
+        if: startsWith(github.ref, 'refs/tags/v') && steps.check-tag-suffix.outputs.npm-tag == 'next'
         run: npm publish --tag 'next'
       
       - name: Publish for official release
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/v') && steps.check-tag-suffix.outputs.npm-tag != next
+        if: startsWith(github.ref, 'refs/tags/v') && steps.check-tag-suffix.outputs.npm-tag != 'next'
         run: npm publish --tag 'latest'
 
   pr-comment:
