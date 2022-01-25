@@ -1,6 +1,6 @@
 # taqueria README
 
-This is the README for your extension "taqueria". After writing up a brief description, we recommend including the following sections.
+A vscode plugin to make Tezos development easier with Taqueria!
 
 ## Features
 
