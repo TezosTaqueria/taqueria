@@ -1,0 +1,7 @@
+{"language":"en","plugins":[{
+    "name": "taqueria-plugin-ligo",
+    "type": "npm"
+},{
+    "name": "taqueria-plugin-mock",
+    "type": "npm"
+}],"contractsDir":"contracts","testsDir":"tests","artifactsDir":"artifacts"}
