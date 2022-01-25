@@ -107,6 +107,7 @@ dist
 node_modules
 /deno
 .vscode
+.idea
 .parcel-cache
 /taqueria
 /taqueria-sdk/index.js
