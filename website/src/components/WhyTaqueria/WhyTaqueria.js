@@ -11,7 +11,7 @@ const FeatureList = [
         icon: require("../../../static/img/briefcase.svg").default,
         description: (
           <>
-						<strong>Built-in processes for quality applications</strong><br></br>When we build better applications, the entire Tezos ecosystem wins. Taqueria improves the quality of your applications through easy scaffolding and an improved development workflow.
+						<strong>Getting started is easier</strong><br></br>Taqueria makes getting started with a Tezos project easier than ever by removing the complexity of setting up a development environment so you can get to building sooner.
           </>
         ),
       },
@@ -27,9 +27,7 @@ const FeatureList = [
         icon: require("../../../static/img/box.svg").default,
         description: (
           <>
-						<strong>Getting started is easier</strong><br></br>
-						Taqueria makes getting started with a Tezos project easier than ever by removing the complexity of setting up a development environment so you can get to building sooner.
-          </>
+<strong>Built-in processes for quality applications</strong><br></br>When we build better applications, the entire Tezos ecosystem wins. Taqueria improves the quality of your applications through easy scaffolding and an improved development workflow.          </>
         ),
       },
       {
