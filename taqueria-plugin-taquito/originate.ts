@@ -1,4 +1,4 @@
-import { SanitizedArgs, ActionResponse, Failure, LikeAPromise, Config, NetworkConfig, SandboxConfig, ProxyAction} from "taqueria-sdk/types";
+import { SanitizedArgs, ActionResponse, Failure, LikeAPromise, Config, NetworkConfig, SandboxConfig, ProxyAction} from "@taqueria/node-sdk/types";
 import glob from 'fast-glob'
 import {join} from 'path'
 import { TezosToolkit } from '@taquito/taquito';
