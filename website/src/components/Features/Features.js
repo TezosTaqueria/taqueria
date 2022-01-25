@@ -3,12 +3,12 @@ import styles from "./Features.module.css";
 
 const FeatureList = [
   {
-    title: "Finally all of your tools in one place",
+    title: "Want a better Tezos development experience?",
     description:
-      "Stitching all of the development tools needed to build great applications into a cohesive, consistent and safe workflow can be incredibly frustrating and time-consuming. Taqueria is designed to help solve this problem while keeping control in your hands. Less barriers, more time creating!",
+      "Don’t know where to start building on Tezos? Want a smarter way to integrate your tools? If so, Taqueria is for you. This flexible framework will help you to start faster and build better applications.",
     button: {
-      label: "Quick Start",
-      link: "#",
+      label: "Try the Taqueria Beta",
+      link: "/docs/intro",
     },
     features: [
       {

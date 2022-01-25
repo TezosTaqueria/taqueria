@@ -19,7 +19,7 @@ const FeatureList = [
 			</>
 		),
 		link: {
-			title: "Quick Start",
+			title: "Try the Beta",
 			url: "/docs/intro",
 		},
 
