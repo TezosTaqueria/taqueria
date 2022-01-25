@@ -117,14 +117,6 @@ jobs:
           registry-url: ${{ env.NPM_REGISTRY }}
           scope: ${{ env.SCOPE }}
 
-      - name: Set environment variables
-        id: set-env
-        run: |
-          echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
-          echo "PACKAGE_VERSION=`node -p "require('./package.json').version"`" >> $GITHUB_ENV
-          echo "BRANCH_NAME=`echo $GITHUB_REF | cut -d'/' -f 3`" >> $GITHUB_ENV
-          echo "TARGET_VERSION=${PACKAGE_VERSION}-${SHORT_SHA}--${BRANCH_NAME}" >> $GITHUB_ENV
-
       - name: Check tag suffix
         id: check-tag-suffix
         # Below we check if the tag ends with a version number.
@@ -132,12 +124,6 @@ jobs:
         run: |
           if [[ $GITHUB_REF =~ v[0-9]\.[0-9]\.[0-9]- ]] ; then echo "::set-output name=npm-tag::next"; fi
 
-      - name: Update package.json to specify scope for ECAD
-        run: | 
-          export scope="${{ env.SCOPE }}/"
-          export name="$(jq -r .name package.json | awk '{split($0,a,"/"); print a[2]}')"
-          contents=$(jq '.name |= env.scope + env.name' package.json) && \
-          echo ${contents} > package.json
       - name: Install any dependencies
         run: npm ci
 
@@ -150,7 +136,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') && steps.check-tag-suffix.outputs.npm-tag == 'next'
         run: |
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
-          npm publish --tag 'next'
+          npm publish --tag 'next' --access public
       
       - name: Publish for official release
         env: 
@@ -158,7 +144,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') && steps.check-tag-suffix.outputs.npm-tag != 'next'
         run: |
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
-          npm publish --tag 'latest'
+          npm publish --tag 'latest' --access public
 
   pr-comment:
     runs-on: ubuntu-latest
