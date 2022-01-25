@@ -167,6 +167,8 @@ jobs:
       - build-binaries
       - build-npm-packages
     if: startsWith(github.ref, 'refs/tags/v')
+    env: 
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
