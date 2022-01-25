@@ -40,7 +40,7 @@ const getFromEnv = <T>(key: EnvKey, defaultValue:T, env: EnvVars) =>
 
 const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) => 
     yargs(args)
-    .scriptName(i18n.__('appName').toLowerCase())
+    .scriptName('taq')
     .option('maxConcurrency', {
         describe: i18n.__('maxConcurrencyDesc'),
         default: getFromEnv('TAQ_MAX_CONCURRENCY', getDefaultMaxConcurrency(), env),

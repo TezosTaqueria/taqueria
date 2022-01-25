@@ -111,6 +111,7 @@ node_modules
 .idea
 .parcel-cache
 /taqueria
+/taq
 tests/coverage
 /taqueria-sdk/index.js
 /taqueria-sdk/index.js.map
