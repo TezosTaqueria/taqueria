@@ -167,6 +167,10 @@ jobs:
       - build-npm-packages
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
+      - name: Plugin list
+        id: plugin-list
+        run: echo "::set-output name=list::$(find ./ -type d -name "taqueria-plugin-*" -not -path "*-util")"
+
       - name: Check tag suffix
         id: check-tag-suffix
         # Below we check if the tag ends with a version number.
@@ -190,9 +194,15 @@ jobs:
             ./release/*
           draft: true
 
+      - uses: actions/setup-node@v2
+        with: 
+          registry-url: ${{ env.GH_REGISTRY }}
+          scope: ${{ env.SCOPE }}
+
       - name: Publish npm next packages
         id: publish-npm-next
         run: |
+          export plugins=${{ steps.plugin-list.outputs.list }}
           export NPM_TAG="next"
           npm run publish-all
         if: ${{ steps.check-tag-suffix.outputs.is-latest }} != 'true'
@@ -200,6 +210,7 @@ jobs:
       - name: Publish npm latest packages
         id: publish-npm-latest
         run: |
+          export plugins=${{ steps.plugin-list.outputs.list }}
           export NPM_TAG="latest"
           npm run publish-all
         if: ${{ steps.check-tag-suffix.outputs.is-latest }} == 'true'
