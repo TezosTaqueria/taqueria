@@ -200,7 +200,7 @@ jobs:
                 const data = fs.readFileSync(filePath)
                 const JSONdata = JSON.parse(data.toString())
                 console.log(JSONdata.name)
-                const name = JSONdata.name.split("/"))[1]
+                const name = JSONdata.name.split("/")[1]
                 return name
               } catch (error) {
                 console.error(`Got an error trying to read the file: ${error.message}`)
