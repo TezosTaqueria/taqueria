@@ -1,4 +1,4 @@
-const {Plugin, Task, Option} = require('taqueria-sdk')
+const {Plugin, Task, Option} = require('@taqueria/node-sdk')
 
 Plugin.create(i18n => ({
     schema: "1.0",
