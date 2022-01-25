@@ -1,5 +1,5 @@
 {
-  "name": "plugin-ligo",
+  "name": "@taqueria/plugin-ligo",
   "version": "0.0.1",
   "description": "A taqueria plugin for compiling LIGO smart contracts",
   "scripts": {

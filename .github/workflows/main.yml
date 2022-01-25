@@ -115,10 +115,11 @@ jobs:
           registry-url: ${{ env.GH_REGISTRY }}
           scope: ${{ env.SCOPE }}
       
-      - name: Update package.json to specify scope
+      - name: Update package.json to specify scope for ECAD
         run: | 
           export scope="${{ env.SCOPE }}/"
-          contents=$(jq '.name |= env.scope + .' package.json) && \
+          export name="$(jq -r .name package.json | awk '{split($0,a,"/"); print a[2]}')"
+          contents=$(jq '.name |= env.scope + env.name' package.json) && \
           echo ${contents} > package.json
 
       - name: Install any dependencies
@@ -135,7 +136,9 @@ jobs:
         id: get-npm-package-version
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: echo "::set-output name=version::$(npm show ${SCOPE}/$(jq .name package.json) --json | jq .version)"
+        run: |
+          echo "$(jq .name package.json)"
+          echo "::set-output name=version::$(npm show $(jq .name package.json) --json | jq .version)"
       
       - name: Publish if new version of package 
         env: 

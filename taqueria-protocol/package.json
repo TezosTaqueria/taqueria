@@ -1,5 +1,5 @@
 {
-  "name": "protocol",
+  "name": "@taqueria/protocol",
   "version": "0.0.1",
   "description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
   "main": "index.js",

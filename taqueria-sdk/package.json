@@ -1,5 +1,5 @@
 {
-  "name": "node-sdk",
+  "name": "@taqueria/node-sdk",
   "version": "0.0.1",
   "description": "A TypeScript SDK for NodeJS used for Taqueria plugin development.",
   "main": "./index.js",

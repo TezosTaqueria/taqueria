@@ -1,5 +1,5 @@
 {
-  "name": "plugin-teztnets",
+  "name": "@taqueria/plugin-teztnets",
   "version": "0.0.1",
   "description": "A taqueria plugin for adding all testnets from teztnets.xyz",
   "main": "index.js",
