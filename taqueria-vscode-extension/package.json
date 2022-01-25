@@ -2,7 +2,7 @@
   "name": "taqueria",
   "displayName": "taqueria",
   "description": "A vscode plugin to make Tezos development easier with Taqueria!",
-  "publisher": "taqueria",
+  "publisher": "ecadlabs",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.63.0"
