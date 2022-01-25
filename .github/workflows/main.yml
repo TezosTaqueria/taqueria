@@ -186,7 +186,7 @@ jobs:
         if: ${{ steps.check-tag-suffix.outputs.is-latest }} != 'true'
 
       - name: Publish npm latest packages
-        id: publish-npm-next
+        id: publish-npm-latest
         run: |
           export NPM_TAG="latest"
           npm run publish-all
