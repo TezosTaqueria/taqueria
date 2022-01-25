@@ -1,5 +1,5 @@
-import {Task as aTask, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike} from 'taqueria-protocol/taqueria-protocol-types'
-import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs} from "./types"
+import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol} from '@taqueria/protocol/taqueria-protocol-types'
+import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView} from "./types"
 import {join, resolve} from 'path'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 
@@ -61,13 +61,24 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefin
     })
 }
 
-const viewOption = ({shortFlag, flag, description}: anOption): OptionView => ({
+const viewOption = ({shortFlag, flag, description, boolean, choices, defaultValue, required}: anOption): OptionView => ({
     shortFlag: shortFlag ? shortFlag.value : undefined,
     flag: flag.value,
-    description
+    description,
+    boolean: boolean,
+    choices: choices,
+    defaultValue: defaultValue,
+    required: required
 })
 
-const viewTask = ({task, command, aliases, description, options, handler}: aTask|TaskLike): TaskView => ({
+const viewPositionalArg = ({placeholder, description, type, defaultValue}: aPositionalArg) : PositionalArgView => ({
+    placeholder: placeholder.value,
+    description,
+    type,
+    defaultValue
+})
+
+const viewTask = ({task, command, aliases, description, options, positionals, handler}: aTask|TaskLike): TaskView => ({
     task: task.value,
     command: command.value,
     aliases: !aliases ? [] : aliases.reduce(
@@ -77,6 +88,10 @@ const viewTask = ({task, command, aliases, description, options, handler}: aTask
     description,
     options: !options ? [] : options.reduce(
         (retval: OptionView[], option: anOption | undefined) => option ? [...retval, viewOption(option)] : retval,
+        []
+    ),
+    positionals: !positionals ? [] : positionals.reduce(
+        (retval: PositionalArgView[], arg: aPositionalArg | undefined) => arg ? [...retval, viewPositionalArg(arg)] : retval,
         []
     ),
     handler: handler === "proxy" ? "proxy" : handler
@@ -152,8 +167,14 @@ export const Plugin = {
 export const Task = aTask
 export const Option = anOption
 export const Network = aNetwork
+export const Sandbox = theSandbox
+export const EconomicalProtocol = anEconomicalProtocol
+export const PositionalArg = aPositionalArg
 export default {
     Plugin,
     Task,
-    Option
+    Option,
+    Sandbox,
+    EconomicalProtocol,
+    PositionalArg,
 }

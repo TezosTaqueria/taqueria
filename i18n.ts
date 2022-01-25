@@ -10,7 +10,7 @@ await i18next.init({
             translation: {
                 "appName": "Taqueria",
                 "appDesc": "Taqueria is an integrated environment for compiling, testing, and deploying Tezos software.",
-                "betaWarning": "Taqueria is current in BETA. You've been warned. :)",
+                "betaWarning": "Taqueria is currently in BETA. You've been warned. :)",
                 "configDirDesc": "Config directory (default ./.taq)",
                 "initDesc": "Initialize a new project",
                 "initPathDesc": "Path to your project directory",
