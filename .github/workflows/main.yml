@@ -13,6 +13,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
+env:
+  SCOPE: "@ecadlabs"
+  NPM_REGISTRY: 'https://registry.npmjs.org/'
+  GH_REGISTRY: 'https://npm.pkg.github.com/'
+
 jobs:
   build-binaries:
     permissions:
