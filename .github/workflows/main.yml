@@ -201,6 +201,7 @@ jobs:
             const ligo = readInfo("./taqueria-plugin-ligo/package.json")
             const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
             const taquito = readInfo("./taqueria-plugin-taquito/package.json")
+            const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
             const sdk = readInfo("./taqueria-sdk/package.json")
 
             let body = `
@@ -209,6 +210,7 @@ jobs:
               | npm install ${{ env.SCOPE }}/${ligo.name}@${ligo.version} --registry=${{ env.GH_REGISTRY }}|
               | npm install ${{ env.SCOPE }}/${smartpy.name}@${smartpy.version} --registry=${{ env.GH_REGISTRY }}|
               | npm install ${{ env.SCOPE }}/${taquito.name}@${taquito.version} --registry=${{ env.GH_REGISTRY }}|
+              | npm install ${{ env.SCOPE }}/${flextesa.name}@${flextesa.version} --registry=${{ env.GH_REGISTRY }}|
               | npm install ${{ env.SCOPE }}/${sdk.name}@${sdk.version} --registry=${{ env.GH_REGISTRY }}|
             `;
             
