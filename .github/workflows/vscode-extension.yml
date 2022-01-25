@@ -1,0 +1,104 @@
+name: VSCode Extension
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    tags:
+      - v*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+env:
+  VSCODE_DIR: taqueria-vscode-extension
+
+jobs:
+  lint-test-build:
+    name: Test and Package on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+          # TODO: Uncomment once we make repo public
+          ## private repos have usage limits for github hosted runners
+          # - macos-latest
+          # - windows-latest
+    defaults:
+      run:
+        working-directory: ${{ env.VSCODE_DIR }}
+    outputs:
+      artifactFilename: ${{ steps.setArtifactFilename.outputs.filename }}
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v2
+      - name: Setup GIT for Windows
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+        if: runner.os == 'Windows'
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Install Dependencies
+        run: npm ci
+      - name: Linter
+        run: npm run lint
+      - name: Compile TS
+        run: npm run compile
+      - name: Run Unit Tests on Windows or macOS
+        run: npm run test
+        if: runner.os != 'Linux'
+      - name: Run Unit Tests on Linux
+        run: xvfb-run -a npm test
+        if: runner.os == 'Linux'
+      - name: Package VSCode Extension
+        id: packageExtension
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          pat: stub
+          dryRun: true
+          packagePath: ${{ env.VSCODE_DIR }}
+      - id: setArtifactFilename
+        run: echo "::set-output name=filename::taqueria-vscode-${{ github.ref_name }}-${{ runner.os }}"
+      - name: Upload Extension Package as Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.setArtifactFilename.outputs.filename }}
+          path: ${{ steps.packageExtension.outputs.vsixPath }}
+          retention-days: 7
+
+  publish-marketplace:
+    name: Publish VSCode Extension
+    if: github.ref_type == 'tag'
+    needs:
+      - lint-test-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v2
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Install Dependencies
+        run: npm ci
+        working-directory: ${{ env.VSCODE_DIR }}
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ needs.setArtifactFilename.outputs.filename }}
+      - name: Publish to Visual Studio Marketplace
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          pat: ${{ secrets.VSCE_PAT }}
+          extensionFile: ${{ needs.setArtifactFilename.outputs.filename }}
+          registryUrl: https://marketplace.visualstudio.com
+          preRelease: true
