@@ -168,6 +168,13 @@ jobs:
       - build-npm-packages
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          registry-url: ${{ env.GH_REGISTRY }}
+          scope: ${{ env.SCOPE }}
+
       - name: Plugin list
         id: plugin-list
         run: echo "::set-output name=list::$(find ./ -type d -name "taqueria-plugin-*" -not -path "*-util")"
@@ -195,20 +202,13 @@ jobs:
             ./release/*
           draft: true
 
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16
-          registry-url: ${{ env.GH_REGISTRY }}
-          scope: ${{ env.SCOPE }}
-
       - name: Publish npm next packages
         id: publish-npm-next
         run: |
           export plugins=${{ steps.plugin-list.outputs.list }}
           export NPM_TAG="next"
           npm run publish-all
-        if: ${{ steps.check-tag-suffix.outputs.is-latest }} != 'true'
+        if: ${{ steps.check-tag-suffix.outputs.is-latest }} != true
 
       - name: Publish npm latest packages
         id: publish-npm-latest
@@ -216,4 +216,4 @@ jobs:
           export plugins=${{ steps.plugin-list.outputs.list }}
           export NPM_TAG="latest"
           npm run publish-all
-        if: ${{ steps.check-tag-suffix.outputs.is-latest }} == 'true'
+        if: ${{ steps.check-tag-suffix.outputs.is-latest }} == true
