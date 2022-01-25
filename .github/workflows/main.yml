@@ -87,70 +87,70 @@ jobs:
   #       run: |
   #         echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  publish-npm-packages:
-    # needs: build-and-test
-    runs-on: ubuntu-latest
+  # publish-npm-packages:
+  #   # needs: build-and-test
+  #   runs-on: ubuntu-latest
     
-    permissions:
-      packages: write
-      contents: read
+  #   permissions:
+  #     packages: write
+  #     contents: read
     
-    strategy:
-      matrix:
-        include:
-          - dir: taqueria-plugin-ligo
-          - dir: taqueria-plugin-smartpy
-          - dir: taqueria-plugin-taquito
-          # - dir: taqueria-plugin-teztnets
-          - dir: taqueria-sdk
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - dir: taqueria-plugin-ligo
+  #         - dir: taqueria-plugin-smartpy
+  #         - dir: taqueria-plugin-taquito
+  #         # - dir: taqueria-plugin-teztnets
+  #         - dir: taqueria-sdk
     
-    defaults:
-      run:
-        working-directory: ${{ matrix.dir }}
+  #   defaults:
+  #     run:
+  #       working-directory: ${{ matrix.dir }}
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with: 
-          registry-url: ${{ env.GH_REGISTRY }}
-          scope: ${{ env.SCOPE }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #       with: 
+  #         registry-url: ${{ env.GH_REGISTRY }}
+  #         scope: ${{ env.SCOPE }}
       
-      - name: Update package.json to specify scope for ECAD
-        run: | 
-          export scope="${{ env.SCOPE }}/"
-          export name="$(jq -r .name package.json | awk '{split($0,a,"/"); print a[2]}')"
-          contents=$(jq '.name |= env.scope + env.name' package.json) && \
-          echo ${contents} > package.json
+  #     - name: Update package.json to specify scope for ECAD
+  #       run: | 
+  #         export scope="${{ env.SCOPE }}/"
+  #         export name="$(jq -r .name package.json | awk '{split($0,a,"/"); print a[2]}')"
+  #         contents=$(jq '.name |= env.scope + env.name' package.json) && \
+  #         echo ${contents} > package.json
 
-      - name: Install any dependencies
-        run: npm install
+  #     - name: Install any dependencies
+  #       run: npm install
 
-      - name: Build package
-        run: npm run build
+  #     - name: Build package
+  #       run: npm run build
 
-      - name: Get current local package version
-        id: get-local-package-version
-        run: echo "::set-output name=version::$(jq .version package.json)"
+  #     - name: Get current local package version
+  #       id: get-local-package-version
+  #       run: echo "::set-output name=version::$(jq .version package.json)"
       
-      - name: Get current npm registry version
-        id: get-npm-package-version
-        env: 
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "$(jq -r .name package.json)"
-          echo "::set-output name=version::$(npm show $(jq -r .name package.json) --json | jq .version)"
+  #     - name: Get current npm registry version
+  #       id: get-npm-package-version
+  #       env: 
+  #         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       run: |
+  #         echo "$(jq -r .name package.json)"
+  #         echo "::set-output name=version::$(npm show $(jq -r .name package.json) --json | jq .version)"
       
-      - name: Publish if new version of package 
-        env: 
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: steps.get-npm-package-version.outputs.version < steps.get-local-package-version.outputs.version
-        run: npm publish 
+  #     - name: Publish if new version of package 
+  #       env: 
+  #         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       if: steps.get-npm-package-version.outputs.version < steps.get-local-package-version.outputs.version
+  #       run: npm publish 
 
   pr-comment:
     runs-on: ubuntu-latest
     needs: 
       # - build-and-test
-      - publish-npm-packages
+      # - publish-npm-packages
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
@@ -185,7 +185,7 @@ jobs:
           script: |
             const fs = require('fs');
 
-            function readInfo(filepath) {
+            function readInfo(filePath) {
               try {
                 const data = fs.readFileSync(filePath)
                 const JSONdata = JSON.parse(data.toString())
