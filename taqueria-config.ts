@@ -1,20 +1,53 @@
-import type {Config, PluginInfo, Task, InstalledPlugin} from './taqueria-protocol/taqueria-protocol-types.ts'
+import type {Config, Task, InstalledPlugin, Action, ConfigArgs} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
-import {EnvVars, ConfigDir, SanitizedInitArgs, i18n} from './taqueria-types.ts'
-import {SanitizedPath} from './taqueria-utils/taqueria-utils-types.ts'
-import {readFile, writeTextFile, decodeJson, log, joinPaths} from './taqueria-utils/taqueria-utils.ts'
-import {match} from 'https://cdn.skypack.dev/ts-pattern'
-import {join} from "https://deno.land/std@0.114.0/path/mod.ts";
+import {ConfigDir, i18n} from './taqueria-types.ts'
+import {SanitizedPath, SanitizedAbsPath, SHA256} from './taqueria-utils/taqueria-utils-types.ts'
+import {readFile, writeTextFile, decodeJson, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {resolve, reject, map, chain, mapRej, chainRej, parallel, attemptP} from 'https://cdn.skypack.dev/fluture'
+import {resolve, reject, map, chain, mapRej, chainRej} from 'https://cdn.skypack.dev/fluture'
 
-export type AddTaskCallback = (task: Task, provider: string) => unknown
+export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<number>) => unknown
 
-const defaultConfig : Config = {
+export const defaultConfig : Config = {
     language: 'en',
     plugins: [],
     contractsDir: "contracts",
-    testsDir: "tests"
+    testsDir: "tests",
+    artifactsDir: "artifacts",
+    environment: {
+        default: "development",
+        development: {
+            networks: [],
+            sandboxes: ["local"],
+            storage: {
+           }
+        }
+    },
+    sandbox: {
+        local: {
+            accounts: {
+                default: "bob",
+                bob: {
+                    initialBalance: "3000000000"
+                },
+                alice: {
+                    initialBalance: "2000000000"
+                },
+                john: {
+                    initialBalance: "4000000000"
+                },
+                jane: {
+                    initialBalance: "5000000000"
+                },
+                joe: {
+                    initialBalance: "1000000000"
+                }
+            }
+        }
+    },
+    network: {
+        
+    }
     // defaultTasks: {
     //     compile: {
     //         plugin: "taqueria-plugin-ligo",
@@ -31,19 +64,22 @@ export const getDefaultMaxConcurrency = () => 10
 export const make = (data: object) : Future<TaqError, Config> => {
     // TODO: Change decoding/validation library
     const err = undefined
-    const validData = data
+    const validData = {
+        ...defaultConfig,
+        ...data
+    }
     // const [err, validData] = validate(data, ConfigDecoder)
     return err === undefined
         ? resolve(validData)
         : reject({kind: "E_INVALID_CONFIG", msg: "TODO, should this use i18n?"})
 }
 
-export const getConfigPath = (projectDir: SanitizedPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
+export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
     ConfigDir.create(projectDir, configDir, create),
-    map ((configDir: ConfigDir) => join(configDir.value, "config.json"))
+    map ((configDir: ConfigDir) => joinPaths(configDir.value, "config.json"))
 )
 
-export const getRawConfig = (projectDir: SanitizedPath, configDir: SanitizedPath,  create=false) : Future<TaqError, object> => pipe(
+export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedPath,  create=false) : Future<TaqError, ConfigArgs> => pipe(
     getConfigPath(projectDir, configDir, create),
     chain ( (path:string) => pipe(
         readFile(path),
@@ -58,113 +94,22 @@ export const getRawConfig = (projectDir: SanitizedPath, configDir: SanitizedPath
                 )
             }
         }),
+        chain (decodeJson),
+
+        chain ((config: Config) => pipe(
+            SHA256.futureOf(JSON.stringify(config)),
+            map ((hash: string) => ({
+                ...config,
+                configFile: path,
+                configDir, projectDir,
+                hash
+            }))
+        )),
         mapRej ((previous:unknown) => ({kind: "E_INVALID_CONFIG", msg: "TODO, should this use i18n?", previous})),
     ))
 )
 
-export const getConfig = (projectDir: SanitizedPath, configDir: SanitizedPath, _i18n: i18n, create=false) : Future<TaqError, Config> => pipe(
+export const getConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, _i18n: i18n, create=false) : Future<TaqError, ConfigArgs> => pipe(
         getRawConfig(projectDir, configDir, create),
-        chain (decodeJson),
         chain (make)
     )
-
-const loadPlugin = (config:Config, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, addTask: AddTaskCallback) => (plugin: InstalledPlugin) => 
-    match(plugin.type)
-        .with("npm", () => NPMPlugin.load(config, env, parsedArgs, i18n, plugin, addTask))
-        .with("deno", () => DenoPlugin.load(config, env, parsedArgs, i18n, plugin))
-        .with("binary", () => BinaryPlugin.load(config, env, parsedArgs, i18n, plugin))
-        .exhaustive()
-
-export const loadPlugins = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, addTask: (task:Task, provider: string)=> unknown) => pipe(
-    getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false),
-    chain ((config:Config) => {
-        const jobs = config.plugins.map(loadPlugin(config, env, parsedArgs, i18n, addTask))
-        const parallelJob = parallel (parsedArgs.maxConcurrency) (jobs)
-        return map (() => parsedArgs) (parallelJob)
-    }),
-)
-
-// export const installPlugin = (env: EnvVars, parsedArgs: Args, i18n: i18n) => pipe(
-//     getConfig(env, parsedArgs, i18n),
-//     chain ((config:Config) => 
-//         config.plugins.filter((plugin:InstalledPlugin) => plugin.name == parsedArgs.plugin)
-//             ? reject({kind: "E_ALREADY_INSTALLED", msg: "TODO, should this use i18n?"})
-//             : (
-//                 match(parsedArgs.kind)
-//                     .with('npm', () => NPMPlugin.install(config, parsedArgs, parsedArgs.plugin))
-//                     .with('binary', () => BinaryPlugin.install(config, parsedArgs, parsedArgs.plugin))
-//                     .with('deno', () => DenoPlugin.install(config, parsedArgs, i18n, parsedArgs.plugin))
-//                     .exhaustive()
-//             )
-//     ),
-// )
-
-const NPMPlugin = {
-    install(_config: Config, env: EnvVars, parsedArgs: SanitizedInitArgs, _plugin: InstalledPlugin) {
-
-    },
-
-    load(config: Config, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, plugin: InstalledPlugin, addTask: AddTaskCallback) {
-        return pipe(
-            this.retrievePluginInfo(i18n, plugin, parsedArgs),
-            chain ((info: PluginInfo) => pipe(
-                info.tasks.map((task: Task) => {
-                    debugger
-                    return addTask(task, plugin.name)
-                }),
-                parallel (parsedArgs.maxConcurrency)
-            )),
-            mapRej ((previous:unknown) => ({kind: "E_INVALID_NPM_PLUGIN", msg: "TODO, should this use i18n?", previous})),
-        )
-    },
-
-    // TODO: This should be memoized
-    retrievePluginInfo(i18n: i18n, plugin: InstalledPlugin, {projectDir}: SanitizedInitArgs) {
-        return attemptP(async () => {
-            try {
-                debugger
-                const pluginPath = joinPaths(
-                    projectDir.value,
-                    "node_modules",
-                    plugin.name,
-                    'index.js'
-                )
-
-                const process = Deno.run({
-                    cmd: ["node", pluginPath, '--taqRun', 'pluginInfo', '--i18n', JSON.stringify(i18n)],
-                    stdout: "piped",
-                    stderr: "piped",
-                })
-        
-                const output = await process.output()
-                const decoder = new TextDecoder()
-                const raw = decoder.decode(output)
-                const decoded = JSON.parse(raw) // TODO validate schema
-                return decoded
-            }
-            catch (err) {
-                return Promise.reject({kind: 'E_INVALID_JSON', msg: 'TODO i18n message', previous: err})
-            }
-        })
-    }
-}
-
-export const DenoPlugin = {
-    install(_config: Config, env: EnvVars, parsedArgs: SanitizedInitArgs, _plugin: InstalledPlugin) {
-
-    },
-
-    load(config: Config, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, plugin: InstalledPlugin) {
-        return resolve(parsedArgs)
-    }
-}
-
-const BinaryPlugin = {
-    install(_config: Config, env: EnvVars, parsedArgs: SanitizedInitArgs, _plugin: InstalledPlugin) {
-
-    },
-
-    load(config: Config, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, plugin: InstalledPlugin) {
-        return resolve(parsedArgs)
-    }
-}

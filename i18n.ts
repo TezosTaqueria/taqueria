@@ -10,7 +10,7 @@ await i18next.init({
             translation: {
                 "appName": "Taqueria",
                 "appDesc": "Taqueria is an integrated environment for compiling, testing, and deploying Tezos software.",
-                "betaWarning": "Taqueria is current in BETA. You've been warned. :)",
+                "betaWarning": "Taqueria is currently in BETA. You've been warned. :)",
                 "configDirDesc": "Config directory (default ./.taq)",
                 "initDesc": "Initialize a new project",
                 "initPathDesc": "Path to your project directory",
@@ -21,8 +21,10 @@ await i18next.init({
                 "pluginOptionDesc": "Use the task from this plugin",
                 "bootstrapMsg": "Project taq'ified!",
                 "maxConcurrencyDesc": "Set the maximum concurrency limit used internally",
-                "providedByMany": "** This task is provided by more than one plugin. Use --help for more information or distingish which plugin you would like to use for this task with --plugin **",
-                "pluginDesc": "Specify what plugin should execute this command. Use this when more than one plugin provide a task of the same name."
+                "providedByMany": "Provided by more than one plugin. The option --plugin is required.",
+                "pluginDesc": "Specify what plugin should execute this command. Use this when more than one plugin provide a task of the same name.",
+                "listNetworks": "List known networks",
+                "envDesc": "Specify an environment configuration"
             }
         }
     }

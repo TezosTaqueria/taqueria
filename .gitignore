@@ -104,6 +104,7 @@ dist
 .tern-port
 
 # Project specific
+.DS_Store
 node_modules
 /deno
 .vscode
@@ -111,9 +112,23 @@ node_modules
 .parcel-cache
 
 /taqueria
+/taq
+tests/coverage
 /taqueria-sdk/index.js
 /taqueria-sdk/index.js.map
 /taqueria-plugin-smartpy/index.js
 /taqueria-plugin-smartpy/index.js.map
-
 /tests/coverage_report
+/taqueria-plugin-smartpy/.parcel-cache
+/taqueria-plugin-taquito/index.js
+/taqueria-plugin-taquito/index.js.map
+/taqueria-plugin-mock/index.js
+/taqueria-plugin-mock/index.js.map
+/taqueria-plugin-taquito/.parcel-cache
+/taqueria-plugin-flextesa/index.js
+/taqueria-plugin-flextesa/index.js.map
+/taqueria-plugin-flextesa/.parcel-cache
+/taqueria-plugin-flextesa/docker/startFlextesa.js
+/taqueria-plugin-teztnets/index.js
+/taqueria-plugin-teztnets/index.js.map
+/taqueria-plugin-teztnets/.parcel-cache
