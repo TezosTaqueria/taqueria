@@ -1,17 +1,27 @@
 {
-    "name": "taqueria-plugin-mock",
-    "version": "1.0.0",
-    "description": "",
+    "name": "@taqueria/plugin-mock",
+    "version": "0.0.1",
+    "description": "A plugin used to test Taqueria",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "pluginInfo": "node index.js --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
-        "compile": "node index.js --taqRun proxy --task compile --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
-        "debugPluginInfo": "node --inspect index.js --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\"}' --projectDir ../test-project --configDir ./.taq"
+        "build": "echo 'Nothing to build.'"
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "keywords": [
+        "taqueria",
+        "tezos",
+        "build",
+        "ecad",
+        "ecadlabs",
+        "smart contract",
+        "compile"
+    ],
+    "author": "ECAD Labs",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/ecadlabs/taqueria/issues"
+    },
+    "homepage": "https://github.com/ecadlabs/taqueria#readme",
     "dependencies": {
-        "taqueria-sdk": "file:../taqueria-sdk"
+        "@taqueria/node-sdk": "file:../taqueria-sdk"
     }
 }
