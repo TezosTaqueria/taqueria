@@ -81,6 +81,9 @@ jobs:
       - lint-test-build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: ${{ env.VSCODE_DIR }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
@@ -90,7 +93,6 @@ jobs:
           node-version: 16
       - name: Install Dependencies
         run: npm ci
-        working-directory: ${{ env.VSCODE_DIR }}
       - name: Download Build Artifact
         uses: actions/download-artifact@v2
         with:
@@ -100,6 +102,6 @@ jobs:
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCE_PAT }}
-          extensionFile: "${{ env.VSCODE_DIR }}/${{ needs.setArtifactFilename.outputs.filename }}"
+          extensionFile: ${{ needs.setArtifactFilename.outputs.filename }}
           registryUrl: https://marketplace.visualstudio.com
           preRelease: true
