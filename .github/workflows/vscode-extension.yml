@@ -66,7 +66,7 @@ jobs:
           dryRun: true
           packagePath: ${{ env.VSCODE_DIR }}
       - id: setArtifactFilename
-        run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}"
+        run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}.vsix"
       - name: Upload Extension Package as Artifact
         uses: actions/upload-artifact@v2
         with:
