@@ -76,7 +76,8 @@ jobs:
 
   publish-marketplace:
     name: Publish VSCode Extension
-    if: github.ref_type == 'tag'
+    # TODO: uncomment before merging to master
+    # if: github.ref_type == 'tag'
     needs:
       - lint-test-build
     runs-on: ubuntu-latest
@@ -96,12 +97,12 @@ jobs:
       - name: Download Build Artifact
         uses: actions/download-artifact@v2
         with:
-          name: ${{ needs.setArtifactFilename.outputs.filename }}
+          name: ${{ needs.lint-test-build.outputs.artifactFilename }}
           path: ${{ env.VSCODE_DIR }}
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCE_PAT }}
-          extensionFile: ${{ needs.setArtifactFilename.outputs.filename }}
+          extensionFile: ${{ needs.lint-test-build.outputs.artifactFilename }}
           registryUrl: https://marketplace.visualstudio.com
           preRelease: true
