@@ -4,6 +4,7 @@
   "description": "Extends the oxheadalpha/flextesa image for use with Taqueria",
   "main": "index.js",
   "scripts": {
+    "prebuild-package": "npm install",
     "build-package": "npx esbuild --platform=node --bundle startFlextesa.ts --outdir=.",
     "build-docker": "docker build . -t taqueria/flextesa",
     "build": "npm run build-package && npm run build-docker"
