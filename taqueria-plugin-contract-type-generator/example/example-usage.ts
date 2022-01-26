@@ -1,4 +1,4 @@
-import { TezosToolkit } from '@taquito/taquito';
+import { ContractStorageType, DefaultContractType, OpKind, OriginateParams, ParamsWithKind, TezosToolkit } from '@taquito/taquito';
 import { ExampleContract1ContractType as TestContract, ExampleContract1WalletType as TestWalletContract } from './types-file/example-contract-1.types';
 import { ExampleContract2ContractType as TestContract2 } from './types-file/example-contract-2.types';
 import { nat, tas } from './types-file/type-aliases';
@@ -103,11 +103,32 @@ export const exampleContractMethods2 = async () => {
 
     const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
 
-    const originationResult = await Tezos.contract.originate({
+    // TODO: Remove this comment (leaving for debugging purposes for now)
+    // const contractObj = null as unknown as TestContract2;
+    // const storageResult = await contractObj.storage();
+    // const storageMethod = contractObj.storage;
+    // const storageReturnType = null as unknown as ReturnType<typeof contractObj['storage']>;
+    // type PromiseReturnType<T extends (...args: any) => any> = T extends (...args: any) => PromiseLike<infer R> ? R : any;
+    // const s0 = null as unknown as PromiseReturnType<TestContract2['storage']>;
+    // const s = null as unknown as ContractStorageType<TestContract2>;
+    
+    const originationResult = await Tezos.contract.originate<TestContract2>({
         code: ``,
-        storage: {},
+        // Require typed initial storage
+        storage: {
+            assets: {
+                ledger: tas.bigMap([
+                    { key: { 0: tas.address('tz123'), 1: tas.nat(42) }, value:tas.nat(42) }
+                ]),
+                operators: tas.bigMap([]),
+                token_metadata: tas.bigMap([]),
+                token_total_supply: tas.bigMap([]),
+            },
+            metadata: tas.bigMap([]),
+        },
     });
-    const contract = await originationResult.contract<TestContract2>(5);
+    // Originated contract is also typed
+    const contract = await originationResult.contract(5);
     contract.methods.set_admin(tas.address(`tz123`));
 
     contract.methods.create_token(
@@ -184,4 +205,60 @@ export const exampleContractStorage1 = async () => {
         console.log(`You are the highest bidder!`);
     }
 
+};
+
+
+// TODO: Add this utility method somewhere
+const createOriginationOperation = <TContract extends DefaultContractType = DefaultContractType>(
+    params: OriginateParams<ContractStorageType<TContract>>
+) : ParamsWithKind => {
+    return {
+        ...params,
+        kind: OpKind.ORIGINATION,
+    };
+}
+
+export const exampleBatchOrigination_Contract = async () => {
+
+    const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
+
+    const batchOperation = Tezos.contract.batch([
+        // batch cannot be typed: 
+        // There is no way to provide a specific type to a specific item in the array of batch params
+        { 
+            kind: OpKind.ORIGINATION,
+            code: ``,
+            // storage: any <-- NOT TYPED
+            storage: {
+                assets: {
+                    not_valid: 42, // <-- no type error
+                    ledger: tas.bigMap([
+                        { key: { 0: tas.address('tz123'), 1: tas.nat(42) }, value:tas.nat(42) },
+                    ]),
+                    operators: tas.bigMap([]),
+                    token_metadata: tas.bigMap([]),
+                    token_total_supply: tas.bigMap([]),
+                },
+                metadata: tas.bigMap([]),
+            },
+        },
+        // But a utility method could be provided that would require 
+        createOriginationOperation<TestContract2>({
+            code: ``,
+            // storage <-- TYPED
+            storage: {
+                assets: {
+                    // not_valid: 42, // <-- type error (uncomment to see)
+                    ledger: tas.bigMap([
+                        { key: { 0: tas.address('tz123'), 1: tas.nat(42) }, value:tas.nat(42) },
+                    ]),
+                    operators: tas.bigMap([]),
+                    token_metadata: tas.bigMap([]),
+                    token_total_supply: tas.bigMap([]),
+                },
+                metadata: tas.bigMap([]),
+            },
+        }),
+    ]);
+    await batchOperation.send();
 };

@@ -46,7 +46,7 @@
   "dependencies": {
     "@taquito/michel-codec": "^11.1.0",
     "@taquito/signer": "^11.1.0",
-    "@taquito/taquito": "^11.1.0-6bfb6c08--1343",
+    "@taquito/taquito": "^11.1.0-dc2b4138--1343",
     "bignumber.js": "^9.0.2",
     "fast-glob": "^3.2.10",
     "taqueria-sdk": "file:../taqueria-sdk"
