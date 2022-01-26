@@ -24,5 +24,4 @@
     "dependencies": {
       "@taqueria/node-sdk": "file:../taqueria-sdk"
     }
-  }
-  
+}
