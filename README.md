@@ -6,9 +6,8 @@
 <h1 align="center">
   Taqueria - A New Way to Build on Tezos
 </h1>
-# Taqueria
 
-> WARNING: This project is alpha quality. CLIs and APIs are unstable and likely to change.
+> WARNING: This project has not officially been made public. Congratulations on finding it. Have a look around, but be aware, it's not yet ready for public consumption.! CLIs and APIs are unstable and likely to change.
 ## Build instructions
 
 - Install [deno](https://deno.land/#installation)
