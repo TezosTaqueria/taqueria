@@ -260,8 +260,8 @@ jobs:
         run: |
           mkdir release && cd release
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq.${GITHUB_REF/refs\/tags\//}-linux
-          wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq.${GITHUB_REF/refs\/tags\//}-windows.exe
-          wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq.${GITHUB_REF/refs\/tags\//}-macos
+      # wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq.${GITHUB_REF/refs\/tags\//}-windows.exe
+      # wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq.${GITHUB_REF/refs\/tags\//}-macos
 
       - name: Release
         id: release
