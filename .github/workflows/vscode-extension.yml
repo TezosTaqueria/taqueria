@@ -66,7 +66,7 @@ jobs:
           dryRun: true
           packagePath: ${{ env.VSCODE_DIR }}
       - id: setArtifactFilename
-        run: echo "::set-output name=filename::taqueria-vscode-${{ github.ref_name }}-${{ runner.os }}"
+        run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}"
       - name: Upload Extension Package as Artifact
         uses: actions/upload-artifact@v2
         with:
@@ -95,10 +95,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ needs.setArtifactFilename.outputs.filename }}
+          path: ${{ env.VSCODE_DIR }}
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCE_PAT }}
-          extensionFile: ${{ needs.setArtifactFilename.outputs.filename }}
+          extensionFile: "${{ env.VSCODE_DIR }}/${{ needs.setArtifactFilename.outputs.filename }}"
           registryUrl: https://marketplace.visualstudio.com
           preRelease: true
