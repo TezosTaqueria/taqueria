@@ -185,6 +185,8 @@ jobs:
             const taquito = readInfo("./taqueria-plugin-taquito/package.json")
             const sdk = readInfo("./taqueria-sdk/package.json")
 
+            const git_short_sha = "${{ env.GITHUB_SHA }}".substring(1, 8)
+
             let body = `
               | Artifacts |
               | --------- |
@@ -195,10 +197,10 @@ jobs:
 
               | npm package installation instructions |
               | ------------------------------------- |
-              | npm install @taqueria/${ligo.name}@${ligo.version}-${{ github.event.number }}-${{ env.GITHUB_SHA::8 }}|
-              | npm install @taqueria/${smartpy.name}@${smartpy.version}-${{ github.event.number }}-${{ env.GITHUB_SHA::8 }}|
-              | npm install @taqueria/${taquito.name}@${taquito.version}-${{ github.event.number }}-${{ env.GITHUB_SHA::8 }}|
-              | npm install @taqueria/${sdk.name}@${sdk.version}-${{ github.event.number }}-${{ env.GITHUB_SHA::8 }}|
+              | npm install @taqueria/${ligo.name}@${ligo.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install @taqueria/${smartpy.name}@${smartpy.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install @taqueria/${taquito.name}@${taquito.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install @taqueria/${sdk.name}@${sdk.version}-${{ github.event.number }}-${git_short_sha}|
             `;
             
             github.rest.issues.createComment({
