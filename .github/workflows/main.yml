@@ -17,6 +17,7 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 env:
+  SCOPE: '@ecadlabs'
   NPM_REGISTRY: 'https://registry.npmjs.org/'
   GH_REGISTRY: 'https://npm.pkg.github.com/'
 
@@ -93,11 +94,9 @@ jobs:
 
   build-and-publish-npm-packages:
     runs-on: ubuntu-latest
-
     permissions:
       packages: write
       contents: read
-
     strategy:
       matrix:
         include:
@@ -107,17 +106,17 @@ jobs:
           - dir: taqueria-plugin-taquito
           # - dir: taqueria-plugin-teztnets
           - dir: taqueria-sdk
-
     defaults:
       run:
         working-directory: ${{ matrix.dir }}
-
+    env: 
+      NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with: 
           registry-url: ${{ env.NPM_REGISTRY }}
-          scope: "@taqueria"
+          scope: "${{ env.SCOPE }}"
 
       - name: Check tag suffix
         id: check-tag-suffix
@@ -132,24 +131,18 @@ jobs:
         run: npm run build
       
       - name: Publish for PR
-        env: 
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"
           npm publish --tag "pr-${{ github.event.number }}" --access public
       
       - name: Publish for prerelease
-        env: 
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
         if:  ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag == 'next'}} 
         run: |
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
           npm publish --tag 'next' --access public
       
       - name: Publish for official release
-        env: 
-          NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
         if: ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag != 'next'}} 
         run: |
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
@@ -202,10 +195,10 @@ jobs:
 
               | npm package installation instructions |
               | ------------------------------------- |
-              | npm install @taqueria/${ligo.name}@${ligo.version}-${{ github.event.number }}-${git_short_sha}|
-              | npm install @taqueria/${smartpy.name}@${smartpy.version}-${{ github.event.number }}-${git_short_sha}|
-              | npm install @taqueria/${taquito.name}@${taquito.version}-${{ github.event.number }}-${git_short_sha}|
-              | npm install @taqueria/${sdk.name}@${sdk.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${ligo.name}@${ligo.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${smartpy.name}@${smartpy.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${taquito.name}@${taquito.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${sdk.name}@${sdk.version}-${{ github.event.number }}-${git_short_sha}|
             `;
             
             github.rest.issues.createComment({
