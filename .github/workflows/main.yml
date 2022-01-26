@@ -167,36 +167,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: create binary comment
-        uses: actions/github-script@v5
-        id: pr-comment
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            
-            let body = `
-              | Artifacts |
-              | --------- |
-              | [Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }}) |
-              | [Windows](${{ needs.build-binaries.outputs.public-url-windows }}) |
-              | [MacOS](${{ needs.build-binaries.outputs.public-url-macos }}) |
-            `;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            })
-
       - name: Set environment variables 
         id: set-env-variables
         run: |
           echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
 
-      - name: create npm comment
+      - name: create pr comment
         uses: actions/github-script@v5
-        id: npm-comment
+        id: pr-comment
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -220,6 +198,11 @@ jobs:
             const sdk = readInfo("./taqueria-sdk/package.json")
 
             let body = `
+              | Binaries |
+              | -------- |
+              | [taq.${GITHUB_REF/refs\/tags\//}-linux](${{ needs.build-binaries.outputs.public-url-ubuntu }}) |
+              | [taq.${GITHUB_REF/refs\/tags\//}-windows.exe](${{ needs.build-binaries.outputs.public-url-windows }}) |
+              | [taq.${GITHUB_REF/refs\/tags\//}-macos](${{ needs.build-binaries.outputs.public-url-macos }}) |
               | npm package installation instructions |
               | --------- |
               | npm install ${{ env.SCOPE }}/${ligo.name}@${ligo.version}-${{ github.event.number }}-${{ env.SHORT_SHA }}|
@@ -234,6 +217,7 @@ jobs:
               repo: context.repo.repo,
               body: body
             })
+
   release:
     name: Release
     runs-on: ubuntu-latest
