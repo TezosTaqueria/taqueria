@@ -57,3 +57,39 @@ Some **content** with _markdown_ `syntax`. Check [this `api`](#).
 
 :::
 
+## Code Block
+
+```shell
+#!/bin/bash
+for arg in "$@"
+do
+index=$(echo $arg | cut -f1 -d=)
+val=$(echo $arg | cut -f2 -d=)
+case $index in
+X) x=$val;;
+
+Y) y=$val;;
+
+*)
+esac
+done
+((result=x+y))
+echo "X+Y=$result"
+```
+
+```js
+const compileContract = (opts) => (sourceFile) =>
+    execCmd(getCompileCommand(opts) (sourceFile))
+    .then(() => ({contract: sourceFile, artifact: getContractArtifactFilename(opts) (sourceFile)}))
+
+const compileAll = parsedArgs => {
+    // TODO: Fetch list of files from SDK
+    return glob(
+        ['**/*.ligo', '**/*.religo', '**/*.mligo', '**/*.jsligo'],
+        {cwd: parsedArgs.contractsDir, absolute: false}
+    )
+    .then(entries => entries.map(compileContract(parsedArgs)))
+    .then(promises => Promise.all(promises))
+}
+```
+
