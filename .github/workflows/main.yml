@@ -32,19 +32,19 @@ jobs:
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
            taqueria_bin: "taqueria"
-         - os: windows-latest
-           os_short: windows
-           deno_target: "x86_64-pc-windows-msvc"
-           taqueria_bin: "taqueria.exe"
-         - os: macOS-latest
-           os_short: macos
-           deno_target: "x86_64-apple-darwin"
-           taqueria_bin: "taqueria"
+        #  - os: windows-latest
+        #    os_short: windows
+        #    deno_target: "x86_64-pc-windows-msvc"
+        #    taqueria_bin: "taqueria.exe"
+        #  - os: macOS-latest
+        #    os_short: macos
+        #    deno_target: "x86_64-apple-darwin"
+        #    taqueria_bin: "taqueria"
 
     outputs:
       public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
-      public-url-windows: ${{ steps.public-url.outputs.windows }}
-      public-url-macos: ${{ steps.public-url.outputs.macos }}
+      # public-url-windows: ${{ steps.public-url.outputs.windows }}
+      # public-url-macos: ${{ steps.public-url.outputs.macos }}
 
     env:
       DENO_TARGET: ${{ matrix.deno_target }}
@@ -167,8 +167,6 @@ jobs:
               | Artifacts |
               | --------- |
               | [Linux](${{ needs.build-and-test.outputs.public-url-ubuntu }}) |
-              | [Windows](${{ needs.build-and-test.outputs.public-url-windows }}) |
-              | [MacOS](${{ needs.build-and-test.outputs.public-url-macos }}) |
             `;
             
             github.rest.issues.createComment({
@@ -230,8 +228,6 @@ jobs:
         run: |
           mkdir release && cd release
           wget ${{ needs.build-and-test.outputs.public-url-ubuntu }} -O taqueria.${GITHUB_REF/refs\/tags\//}-linux
-          wget ${{ needs.build-and-test.outputs.public-url-windows }} -O taqueria.${GITHUB_REF/refs\/tags\//}-windows.exe
-          wget ${{ needs.build-and-test.outputs.public-url-macos }} -O taqueria.${GITHUB_REF/refs\/tags\//}-macos
 
       - name: Release
         id: release
