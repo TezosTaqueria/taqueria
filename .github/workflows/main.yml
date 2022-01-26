@@ -190,11 +190,13 @@ jobs:
 
             let body = `
 
-              | Artifacts |
-              | --------- |
-              | Linux [taq.${git_tag}](${{ needs.build-binaries.outputs.public-url-ubuntu }}) |
-              | Windows [taq.${git_tag}.exe]](${{ needs.build-binaries.outputs.public-url-windows }}) |
-              | MacOS [taq.${git_tag}](${{ needs.build-binaries.outputs.public-url-macos }}) |
+
+              | Git Commit | Artifacts |
+              | ---------- | --------- |
+              | ${git_short_sha} | 
+                [Linux](https://github.com/ecadlabs/taqueria/pull/94/files#) <br /> 
+                [MacOS](https://github.com/ecadlabs/taqueria/pull/94/files#) <br /> 
+                [Windows](https://github.com/ecadlabs/taqueria/pull/94/files#) |
 
 
               | npm package installation instructions |
