@@ -31,15 +31,15 @@ jobs:
          - os: ubuntu-latest
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
-           taqueria_bin: "taqueria"
+           taqueria_bin: "taq"
         #  - os: windows-latest
         #    os_short: windows
         #    deno_target: "x86_64-pc-windows-msvc"
-        #    taqueria_bin: "taqueria.exe"
+        #    taqueria_bin: "taq.exe"
         #  - os: macOS-latest
         #    os_short: macos
         #    deno_target: "x86_64-apple-darwin"
-        #    taqueria_bin: "taqueria"
+        #    taqueria_bin: "taq"
 
     outputs:
       public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
@@ -64,9 +64,9 @@ jobs:
         id: build-bin
         shell: bash
         run: |
-          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
+          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
-          mv "${{ matrix.taqueria_bin }}" "taqueria.${{ matrix.deno_target }}"
+          mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
       - name: Authenticate with GCP
         id: gcp-auth
@@ -79,7 +79,7 @@ jobs:
         id: upload-file
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
-          path: "taqueria.${{ matrix.deno_target }}"
+          path: "taq.${{ matrix.deno_target }}"
           destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}"
 
       - name: Set public url
@@ -259,9 +259,9 @@ jobs:
         id: download-binaries 
         run: |
           mkdir release && cd release
-          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taqueria.${GITHUB_REF/refs\/tags\//}-linux
-          wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taqueria.${GITHUB_REF/refs\/tags\//}-windows.exe
-          wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taqueria.${GITHUB_REF/refs\/tags\//}-macos
+          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq.${GITHUB_REF/refs\/tags\//}-linux
+          wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq.${GITHUB_REF/refs\/tags\//}-windows.exe
+          wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq.${GITHUB_REF/refs\/tags\//}-macos
 
       - name: Release
         id: release
