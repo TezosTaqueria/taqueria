@@ -134,3 +134,4 @@ tests/coverage
 # VS Code Extension
 /taqueria-vscode-extension/out
 *.vsix
+.vscode-test
