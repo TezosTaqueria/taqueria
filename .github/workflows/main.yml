@@ -185,7 +185,7 @@ jobs:
             const taquito = readInfo("./taqueria-plugin-taquito/package.json")
             const sdk = readInfo("./taqueria-sdk/package.json")
 
-            const git_short_sha = "${{ env.GITHUB_SHA }}".substring(1, 8)
+            const git_short_sha = "${{ github.sha }}".substring(1, 8)
 
             let body = `
               | Artifacts |
