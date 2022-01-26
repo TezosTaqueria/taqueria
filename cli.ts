@@ -91,6 +91,31 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
             fork (console.error) (console.log)
         )
     )
+    .command(
+        'scaffold [scaffoldUrl] [projectDir]',
+        i18n.__('scaffoldDesc'),
+        (yargs: Arguments) => {
+            yargs
+                .positional('scaffoldUrl', {
+                    describe: i18n.__('scaffoldUrlDesc'),
+                    type: 'string',
+                    default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git',
+                })
+                // TODO: Make this a named arg
+                .positional('projectDir', {
+                    describe: i18n.__('scaffoldProjectDirDesc'),
+                    type: 'string',
+                    default: './taqueria-quickstart',
+                })
+        },
+        (args: RawInitArgs) => pipe(
+            sanitizeArgs(args), 
+            ({scaffoldUrl, projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
+                return scaffoldProject(scaffoldUrl, projectDir, configDir, i18n, maxConcurrency, quickstart)
+            },
+            fork (console.error) (console.log)
+        )
+    )
     .help(false)
 
 
@@ -138,6 +163,36 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
         : resolve (results)
     ),
     map (() => i18n.__("bootstrapMsg"))
+)
+
+const scaffoldProject = (scaffoldUrl: string, projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
+    // Clone git into destination folder (Initial version assumes git is installed)
+    chain (() => {
+        throw new Error('Not Implemented');
+
+        // Verify projectDir does not exist
+
+        // git clone
+    }),
+    // Run init found in .taq/scaffold.json
+    chain (() => {
+        throw new Error('Not Implemented');
+
+        // Load .taq/scaffold.json (if it exists)
+
+        // Run init command
+    }),
+    // Cleanup:
+    // - Remove ./.taq/scaffold.json
+    // - Remove ./.git/
+    chain (() => {
+        throw new Error('Not Implemented');
+
+        // Delete .taq/scaffold.json
+        // Delete .git/
+    }),
+    // Done
+    map (() => i18n.__("scaffoldDoneMsg"))
 )
 
 const getPluginExe = (parsedArgs: SanitizedInitArgs, plugin: InstalledPlugin) => {
@@ -510,6 +565,8 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     _: parsedArgs._,
     configDir: SanitizedPath.create(parsedArgs.configDir),
     projectDir: SanitizedAbsPath.create(parsedArgs.projectDir),
+    // TODO: SanatizedUrl
+    scaffoldUrl: parsedArgs.scaffoldUrl,
     maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency,
     debug: parsedArgs.debug,
     plugin: parsedArgs.plugin,
