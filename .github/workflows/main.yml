@@ -186,13 +186,15 @@ jobs:
             const sdk = readInfo("./taqueria-sdk/package.json")
 
             const git_short_sha = "${{ github.sha }}".substring(1, 8)
+            const git_tag = "${{ github.ref }}".split('tags/')[1];
 
             let body = `
+
               | Artifacts |
               | --------- |
-              | [Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }}) |
-              | [Windows](${{ needs.build-binaries.outputs.public-url-windows }}) |
-              | [MacOS](${{ needs.build-binaries.outputs.public-url-macos }}) |
+              | Linux [taq.${git_tag}](${{ needs.build-binaries.outputs.public-url-ubuntu }}) |
+              | Windows [taq.${git_tag}.exe]](${{ needs.build-binaries.outputs.public-url-windows }}) |
+              | MacOS [taq.${git_tag}](${{ needs.build-binaries.outputs.public-url-macos }}) |
 
 
               | npm package installation instructions |
