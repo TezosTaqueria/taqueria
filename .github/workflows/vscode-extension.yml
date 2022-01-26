@@ -82,9 +82,6 @@ jobs:
       - lint-test-build
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: ${{ env.VSCODE_DIR }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
@@ -94,11 +91,11 @@ jobs:
           node-version: 16
       - name: Install Dependencies
         run: npm ci
+        working-directory: ${{ env.VSCODE_DIR }}
       - name: Download Build Artifact
         uses: actions/download-artifact@v2
         with:
           name: ${{ needs.lint-test-build.outputs.artifactFilename }}
-          path: ${{ env.VSCODE_DIR }}
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
