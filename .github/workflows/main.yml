@@ -9,6 +9,9 @@ on:
     tags:
       - v*
 
+  release:
+    types: [published]
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
@@ -24,6 +27,7 @@ jobs:
       contents: 'read'
       id-token: 'write'
     runs-on: ${{ matrix.os }}
+    if: github.event_name != 'release'
     strategy:
       fail-fast: true
       matrix:
@@ -32,14 +36,14 @@ jobs:
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
            taqueria_bin: "taq"
-        #  - os: windows-latest
-        #    os_short: windows
-        #    deno_target: "x86_64-pc-windows-msvc"
-        #    taqueria_bin: "taq.exe"
-        #  - os: macOS-latest
-        #    os_short: macos
-        #    deno_target: "x86_64-apple-darwin"
-        #    taqueria_bin: "taq"
+         - os: windows-latest
+           os_short: windows
+           deno_target: "x86_64-pc-windows-msvc"
+           taqueria_bin: "taq.exe"
+         - os: macOS-latest
+           os_short: macos
+           deno_target: "x86_64-apple-darwin"
+           taqueria_bin: "taq"
 
     outputs:
       public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
@@ -138,7 +142,7 @@ jobs:
       - name: Publish for prerelease
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
-        if: startsWith(github.ref, 'refs/tags/v') && steps.check-tag-suffix.outputs.npm-tag == 'next'
+        if:  ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag != 'next'}} 
         run: |
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
           npm publish --tag 'next' --access public
@@ -146,7 +150,7 @@ jobs:
       - name: Publish for official release
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
-        if: startsWith(github.ref, 'refs/tags/v') && steps.check-tag-suffix.outputs.npm-tag != 'next'
+        if: ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag != 'next'}} 
         run: |
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
           npm publish --tag 'latest' --access public
@@ -220,24 +224,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Plugin list
-        id: plugin-list
-        run: echo "::set-output name=list::$(find ./ -type d -name "taqueria-plugin-*" -not -path "*-util")"
-
-      - name: Check tag suffix
-        id: check-tag-suffix
-        # Below we check if the tag ends with a version number.
-        # If there is nothing after the version number the 'is-latest' output is set to true
-        run: |
-          if [[ $GITHUB_REF =~ v[0-9]\.[0-9]\.[0-9]- ]] ; then echo "::set-output name=npm-tag::next"; fi
-
       - name: Download binaries 
         id: download-binaries 
         run: |
           mkdir release && cd release
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq.${GITHUB_REF/refs\/tags\//}-linux
-        # wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq.${GITHUB_REF/refs\/tags\//}-windows.exe
-        # wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq.${GITHUB_REF/refs\/tags\//}-macos
+          wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq.${GITHUB_REF/refs\/tags\//}-windows.exe
+          wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq.${GITHUB_REF/refs\/tags\//}-macos
 
       - name: Release
         id: release
