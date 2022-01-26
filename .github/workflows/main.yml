@@ -14,11 +14,11 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 env:
-  SCOPE: "@taqueria"
   NPM_REGISTRY: 'https://registry.npmjs.org/'
   GH_REGISTRY: 'https://npm.pkg.github.com/'
 
 jobs:
+
   build-binaries:
     permissions:
       contents: 'read'
@@ -113,20 +113,13 @@ jobs:
       - uses: actions/setup-node@v2
         with: 
           registry-url: ${{ env.NPM_REGISTRY }}
-          scope: ${{ env.SCOPE }}
-
-      - name: Set environment variables 
-        id: set-env-variables
-        run: |
-          echo "PACKAGE_VERSION=`node -p "require('./package.json').version"`" >> $GITHUB_ENV
-          echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+          scope: "@taqueria"
 
       - name: Check tag suffix
         id: check-tag-suffix
-        # Below we check if the tag ends with a version number.
-        # If there is nothing after the version number the 'is-latest' output is set to true
+        if: startsWith(github.ref, 'refs/tags/v') && (contains(github.ref, '-rc') || contains(github.ref, '-beta') || contains(github.ref, '-test'))
         run: |
-          if [[ $GITHUB_REF =~ v[0-9]\.[0-9]\.[0-9]- ]] ; then echo "::set-output name=npm-tag::next"; fi
+          echo "::set-output name=npm-tag::next"
 
       - name: Install any dependencies
         run: npm ci
@@ -139,7 +132,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          npm --no-git-tag-version version "${{ env.PACKAGE_VERSION }}-${{ github.event.number }}-${{ env.SHORT_SHA }}"
+          npm --no-git-tag-version version "pr-${{ github.event.number }}-${GITHUB_SHA::8}"
           npm publish --tag "pr-${{ github.event.number }}" --access public
       
       - name: Publish for prerelease
@@ -167,36 +160,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: create binary comment
+      - name: create pr comment
         uses: actions/github-script@v5
         id: pr-comment
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            
-            let body = `
-              | Artifacts |
-              | --------- |
-              | [Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }}) |
-              | [Windows](${{ needs.build-binaries.outputs.public-url-windows }}) |
-              | [MacOS](${{ needs.build-binaries.outputs.public-url-macos }}) |
-            `;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: body
-            })
-
-      - name: Set environment variables 
-        id: set-env-variables
-        run: |
-          echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
-
-      - name: create npm comment
-        uses: actions/github-script@v5
-        id: npm-comment
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -225,12 +191,14 @@ jobs:
               | [Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }}) |
               | [Windows](${{ needs.build-binaries.outputs.public-url-windows }}) |
               | [MacOS](${{ needs.build-binaries.outputs.public-url-macos }}) |
+
+
               | npm package installation instructions |
-              | --------- |
-              | npm install ${{ env.SCOPE }}/${ligo.name}@${ligo.version}-${{ github.event.number }}-${{ env.SHORT_SHA }}|
-              | npm install ${{ env.SCOPE }}/${smartpy.name}@${smartpy.version}-${{ github.event.number }}-${{ env.SHORT_SHA }}|
-              | npm install ${{ env.SCOPE }}/${taquito.name}@${taquito.version}-${{ github.event.number }}-${{ env.SHORT_SHA }}|
-              | npm install ${{ env.SCOPE }}/${sdk.name}@${sdk.version}-${{ github.event.number }}-${{ env.SHORT_SHA }}|
+              | ------------------------------------- |
+              | npm install @taqueria/${ligo.name}@${ligo.version}-${{ github.event.number }}-${GITHUB_SHA::8}|
+              | npm install @taqueria/${smartpy.name}@${smartpy.version}-${{ github.event.number }}-${GITHUB_SHA::8}|
+              | npm install @taqueria/${taquito.name}@${taquito.version}-${{ github.event.number }}-${GITHUB_SHA::8}|
+              | npm install @taqueria/${sdk.name}@${sdk.version}-${{ github.event.number }}-${GITHUB_SHA::8}|
             `;
             
             github.rest.issues.createComment({
