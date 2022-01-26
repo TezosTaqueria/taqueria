@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+
   push:
     tags:
       - v*
@@ -25,15 +26,14 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          # TODO: Uncomment once we make repo public
-          ## private repos have usage limits for github hosted runners
-          # - macos-latest
-          # - windows-latest
+          - macos-latest
+          - windows-latest
     defaults:
       run:
         working-directory: ${{ env.VSCODE_DIR }}
     outputs:
       artifactFilename: ${{ steps.setArtifactFilename.outputs.filename }}
+      vsixPath: ${{ steps.packageExtension.outputs.vsixPath }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
@@ -59,6 +59,7 @@ jobs:
         run: xvfb-run -a npm test
         if: runner.os == 'Linux'
       - name: Package VSCode Extension
+        if: runner.os == 'Linux'
         id: packageExtension
         uses: HaaLeo/publish-vscode-extension@v1
         with:
@@ -66,8 +67,9 @@ jobs:
           dryRun: true
           packagePath: ${{ env.VSCODE_DIR }}
       - id: setArtifactFilename
-        run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}.vsix"
+        run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}"
       - name: Upload Extension Package as Artifact
+        if: runner.os == 'Linux'
         uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.setArtifactFilename.outputs.filename }}
@@ -76,12 +78,14 @@ jobs:
 
   publish-marketplace:
     name: Publish VSCode Extension
-    # TODO: uncomment before merging to master
-    # if: github.ref_type == 'tag'
+    if: github.ref_type == 'tag'
     needs:
       - lint-test-build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: ${{ env.VSCODE_DIR }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
@@ -91,15 +95,15 @@ jobs:
           node-version: 16
       - name: Install Dependencies
         run: npm ci
-        working-directory: ${{ env.VSCODE_DIR }}
       - name: Download Build Artifact
         uses: actions/download-artifact@v2
         with:
           name: ${{ needs.lint-test-build.outputs.artifactFilename }}
+          path: ${{ env.VSCODE_DIR }}
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCE_PAT }}
-          extensionFile: ${{ needs.lint-test-build.outputs.artifactFilename }}
+          extensionFile: ${{ needs.lint-test-build.outputs.vsixPath }}
           registryUrl: https://marketplace.visualstudio.com
           preRelease: true

@@ -9,6 +9,7 @@
   },
   "author": "ECAD Labs",
   "license": "Apache-2.0",
+  "icon": "images/taqueria-icon.png",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ecadlabs/taqueria.git"
