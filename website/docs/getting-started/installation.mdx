@@ -1,0 +1,133 @@
+---
+title: Installing Taqueria
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<!-- -----
+Content Type: How-to Guide
+
+Purpose: To guide a developer through process of installing the Taqueria CLI, basic plugins, and the VS Code Extension 
+
+Audience: Novice to intermediate developers with a very basic understanding of Taqueria and CLI usage
+
+Goal: To provide a simple, easy, and reliable installation process for developers to follow so there is minimal churn due to frustration or inability to use the product due to installation or configuration issues
+
+Questions:
+- What do you need to understand about Taqueria to understand the installion process?
+- What options are there for installing Taqueria?
+- What are the exact steps a user will need to follow for each OS?
+- What are the most frequent friction points new users will have?
+
+----- -->
+
+## Taqueria Installation Basics
+
+Installing Taqueria is a quick and easy process if you understand a few basic concepts and follow the steps outlined in this guide
+
+Taqueria is a software suite that includies a CLI interface, a library of Node.js plugins, and a VS Code extension. Each of these are installed separatley. A Taqueria installation can be as simple as just the Taqueria CLI, or a more standard installation which may include the VS Code extension and other common plugins.
+
+To be explicit, the components available for installation are:
+- The Taqueria CLI, an executable binary file named `taq` installed globally in your `$PATH` that implements the Taqueria CLI, SDK and protocol
+- Any number of optional Taqueria plugins which are Node.js packages installed via NPM on a per-project basis
+- An optional VS Code plugin 'Taqueria' installed directly through the VS Code Extension Marketplace
+
+## Requirements
+
+### Taqueria CLI
+
+The requirements for the Taqueria CLI are minimal:
+- A unix shell or compatable operating system:
+    - Windows (10 or later)
+    - MacOS (Catalina or later)
+    - Linux (Ubuntu???, Other distro???)
+- Administrator privileges on your machine to allow unsigned software to run
+
+### Taqueria Plugins
+
+Taqueria plugins are Node.js packages installed via NPM. You will need to have a recent version of [Node.js](https://nodejs.org/) installed if you want to use any of the currently available plugins
+
+Some plugins have their own dependencies which also need to be installed for the plugin to work correctly. Dependencies for popular plugins include: 
+- **'taqueria-plugin-ligo'**
+    - [LIGO](https://ligolang.org) which can be installed [here](https://ligolang.org/docs/intro/installation/)
+- **'taqueria-plugin-smartpy'**
+    - [Python](https://www.python.org/) availble for download [here](https://www.python.org/downloads/)
+    - [SmartPY](https://smartpy.io/) which is installed as detailed in [this guide](https://smartpy.io/docs/cli/#direct-installation)
+- **'taqueria-plugin-flextesa'**
+    - Requires a recent version of [Docker](https://www.docker.com/)
+
+### VS Code Extension
+
+The VS Code Extension requires a recent version of Microsoft Visual Studio Code which can be installed [here](https://code.visualstudio.com/) 
+
+## Installing the Taqueria CLI
+
+### Overview
+
+Installing the Taqueria CLI involves the following steps:
+
+1. Download the correct build of Taqueria for your operating system to an installation directory of your choice
+2. Make the Taqueria binary ('taq') executable
+3. Update your shell's $PATH to include the Taqueria installation directory
+4. Configure your OS security settings to allow the Taqueria CLI/SDK (taq) to run
+
+:::note
+The Taqueria executable is not currently code signed for Mac or Windows operating systems and at this time you will recieve warnings about 'insert actual error message' from your OS.
+
+You must explicitly allow the taq executable to run using the reccomended solutions detailed in the OS specific installation instructions
+:::
+
+Once these steps are complete, you will be able to run Taqueria from your terminal using the 'taq' command
+
+Step by step instructions for installing the Taqueria CLI on a Windows, MacOS, or Linux machine are detailed in the following section. If you are comfortable with downloading the unsigned Taqueria binary and configuring it to run in your terminal on your own, you can find the correct build for your local machine [here](https://github.com/ecadlabs/taqueria/releases), and then skip to the [Installing Taqueria Plugins Section](#installing-taqueria-pluginsz) 
+
+### OS Specific Installation Instructions
+
+To make installation as fast as possible, you can follow the steps detalled below for your particular operating system. Note that these steps are simply one method for installation. You can adjust the particular directories and shell configuration if you feel comfortable doing so
+
+The following steps assume the following terminals on each operating system:
+- MacOS: zsh
+- Windows: console???
+- Linux: bash
+
+
+<Tabs groupId="operating-systems">
+<TabItem value="mac" label="MacOS">
+  
+1. Create a directory to install the Taqueria binary and change into that directory
+
+2. Download the latest MacOS build of Taqueria from the [releases page](https://github.com/ecadlabs/taqueria/releases/) and name the binary file 'taq'
+```shell
+curl https://github.com/ecadlabs/taqueria/releases/download/untagged-d7ba60ff3f2af73f46c7/taqueria.v0.0.1-test.18-macos --output taq
+```
+
+3. Make the binary file executable
+```shell
+chmod -x taq
+```
+
+4. Add the installation directory to your $PATH
+
+5. Disable MacOS Gatekeeper to allow Taqueria to run
+```shell
+sudo spctl --master-disable
+```
+</TabItem>
+<TabItem value="win" label="Windows">Coming soon...</TabItem>
+<TabItem value="lnx" label="Linux">Coming soon...</TabItem>
+</Tabs>
+::: note
+    MacOS will give you a security warning and you need to approve the changes in order for Taqueria to run
+    :::
+
+## Installing Taqueria Plugins
+
+Taqueria plugins each implement a specific function such as a smart contract language, testnet, sandbox, or test framework. Taqueria plugins often rely on 3rd party software libraries such as LIGO or Docker which need to be installed on your machine for the plugin to work correctly
+
+Taqueria is designed to be flexible, streamlined, and customizable so plugins are installed on a per-project basis depending on the particular smart contract language, test framework, sandbox environment, and testnet used in the project
+
+Once installed, plugins provide their functionality by exposing tasks in the Taqueria CLI. The tasks available to run on a particular project can be viewed by running the ```shell taq --help ``` command in a project directory that's using Taqueria 
+
+
+
