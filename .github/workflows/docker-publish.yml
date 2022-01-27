@@ -4,20 +4,19 @@ on:
   push:
     branches:
       - 'main'
+    tags:
+      - 'v*'
   pull_request:
     branches:
       - 'main'
     paths:
       - 'taqueria-plugin-*/docker/*'
-  create:
-    tags:
-      - 'v*'
 env:
   REGISTRY: ghcr.io
 
 jobs:
 
-  build-and-push-docker:
+  build-and-push:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
