@@ -19,15 +19,15 @@ Questions:
 
 ----- -->
 
-## Installation Basics
+## Taqueria Installation Basics
 
 Installing Taqueria is a quick and easy process if you understand a few basic concepts and follow the steps outlined in this guide
 
-Taqueria is a software suite that includies a CLI interface, a library of Node.js plugins, and a VS Code extension. Each of these are installed separatley. A Taqueria installation can be as simple as just the Taqueria CLI, or a more standard installation which would also include: the VS Code extension, and several plugins including: 
+Taqueria is a software suite that includies a CLI interface, a library of Node.js plugins, and a VS Code extension. Each of these are installed separatley. A Taqueria installation can be as simple as just the Taqueria CLI, or a more standard installation which would include the VS Code extension and other common plugins: 
 - A sandbox plugin such as taqueria-plugin-flextesa
 - A complier plugin such as taqueria-plugin-ligo
 
-To be explicit, the components you need to install are:
+To be explicit, the components you can install are:
 - 'taq', an executable binary file installed globally in your $PATH that implements the Taqueria CLI, SDK and protocol
 - Any number of optional Taqueria plugins which are Node.js packages installed via NPM on a per-project basis
 - An optional VS Code plugin 'Taqueria' installed directly through the VS Code Extension Marketplace
@@ -54,7 +54,7 @@ Some plugins have their own dependencies which also need to be installed for the
     - A recent version of [python](https://www.python.org/)
     - [SmartPY](https://smartpy.io/) which is installed as detailed in [this guide](https://smartpy.io/docs/cli/#direct-installation)
 - 'taqueria-plugin-flextesa'
-    - Requires a recent version of Docker which is available [here]()
+    - Requires a recent version of [Docker](https://www.docker.com/)
 
 ### VS Code Extension
 
@@ -78,17 +78,18 @@ The Taqueria executable is not currently code signed for Mac or Windows operatin
 
 Once these steps are complete, you will be able to run Taqueria from your terminal using the 'taq' command
 
-Step by step instructions for installing Taqueria with the LIGO, Flextesa, and VS Code plugins installed on a Windows, MacOS, or Linux machine are detailed in the following section. If you are comfortable with downloading the unsigned Taqueria binary and configuring it to run in your terminal on your own, you can find the correct build for your local machine [here](https://github.com/ecadlabs/taqueria/releases) and then skip to the [quick-start guide](#getting-started/quickstart) 
+Step by step instructions for installing the Taqueria CLI on a Windows, MacOS, or Linux machine are detailed in the following section. If you are comfortable with downloading the unsigned Taqueria binary and configuring it to run in your terminal on your own, you can find the correct build for your local machine [here](https://github.com/ecadlabs/taqueria/releases) and then skip to the [quick-start guide](#getting-started/quickstart) 
 
 ### OS Specific Installation Instructions
 
-
+To make installation as fast as possible, you can follow the steps detalled below for your particular operating system. Note that these steps are simply one method and location for installation. You can adjust the particular directories and shell configuration if you feel comfortable doing so
 
 ## Installing Taqueria Plugins
+
 
 Taqueria plugins each implement a specific function such as a smart contract language, testnet, sandbox, or test framework. Taqueria plugins are simple in nature and usualy rely on 3rd party softwore libraries like LIGO and SmartPY which need to be installed on your machine for the plugin to work correctly
 
 Taqueria is designed to be flexible, streamlined, and customizable so plugins are installed on a per-project basis based on the particular smart contract language, test framework, sandbox environment, and testnet required for the project
 
-Once installed, plugins provide their functionality through tasks in the Taqueria CLI. The Taqueria plugins currently installed on the project add tasks toavailable tasks show up when you run the 'taq --help' command in that particular project
+Once installed, plugins provide their functionality through tasks in the Taqueria CLI. The tasks available to run on a particular project can be viewed by running the ```shell taq --help ``` command in a project directory that's using Taqueria 
 
