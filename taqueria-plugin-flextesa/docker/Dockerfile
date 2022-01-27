@@ -1,7 +1,7 @@
 FROM oxheadalpha/flextesa:latest
 RUN mkdir /app
 WORKDIR /app
-COPY startFlextesa.js /app/
+COPY startFlextesa.ts /app/
 RUN apk add net-tools && apk add nodejs && apk add npm
-CMD node /app/startFlextesa.js
+CMD node /app/startFlextesa.ts
 # TODO: Remove after all PR testing
