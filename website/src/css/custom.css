@@ -224,6 +224,8 @@ a.menu__link--sublist {
 	flex-direction: row-reverse;
 	justify-content: space-between;
 	width: 100%;
+	margin-left: 0px !important;
+	margin-right: 0px !important;
 }
 .footer__links {
 	display: flex;
@@ -236,6 +238,8 @@ a.menu__link--sublist {
 }
 .footer__links .footer__col {
 	flex: unset;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
 }
 .footer__links > div:nth-of-type(1) {
 	width: 20%;
@@ -354,6 +358,11 @@ a.menu__link--sublist {
 		--ifm-col-width: 50%;
 		flex-basis: unset;
 		margin-left: 0;
+	}
+	.footer__links .footer__col {
+		flex: unset;
+		padding-left: 40px !important;
+		padding-right: 40px !important;
 	}
 
 	.footer .container {
