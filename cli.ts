@@ -4,7 +4,7 @@ import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, CL
 import {State} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs/deno.ts'
-import {map, chain, attemptP, chainRej, resolve, fork, forkCatch, parallel, debugMode} from 'https://cdn.skypack.dev/fluture';
+import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.skypack.dev/fluture';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import {isTaqError, log, joinPaths, mkdir, readFile, writeTextFile, decodeJson, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
@@ -500,7 +500,7 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
                 console.error(err.msg)
                 break;
             default:
-                console.error(err)
+                console.error(Deno.inspect(err, {depth: Number.MAX_SAFE_INTEGER, compact: false, showHidden: true}))
         }
     }
     else console.error(err)
