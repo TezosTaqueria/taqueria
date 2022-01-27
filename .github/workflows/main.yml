@@ -101,12 +101,15 @@ jobs:
       - uses: actions/setup-node@v2
 
       - name: get binary from build and upload step for running e2e tests
+        run: wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O ./taqueria
+
+      - name: install test dependencies
         run: |
-          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O ./tests/taqueria
+          pwd
+          ls -al
           cd tests
           npm install
           npm run test:e2e
-
 
   # build-and-publish-npm-packages:
   #   runs-on: ubuntu-latest
