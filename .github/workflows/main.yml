@@ -107,15 +107,16 @@ jobs:
 
       - name: install test dependencies
         run: |
-          pwd
-          ls -al
+          curl -fsSL https://deno.land/x/install/install.sh | sh
+
           cd tests
           npm install
       
       - name: Run unit tests
         run: |
           cd tests
-          curl -fsSL https://deno.land/x/install/install.sh | sh 
+          export DENO_INSTALL="/home/runner/.deno"
+          export PATH="$DENO_INSTALL/bin:$PATH"
           npm run test:unit
 
       - name: Run integration tests
