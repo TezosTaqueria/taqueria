@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - 'main'
+    paths:
+      - 'taqueria-plugin-flextesa/docker/*'
     tags:
       - 'v*'
   pull_request:
