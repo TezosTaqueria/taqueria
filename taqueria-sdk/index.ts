@@ -1,6 +1,8 @@
 import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol} from '@taqueria/protocol/taqueria-protocol-types'
 import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView} from "./types"
-import {join, resolve} from 'path'
+import {join, resolve, dirname} from 'path'
+import {get} from 'stack-trace'
+import generateName from 'project-name-generator'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 
 const parseJSON = (input: string) : Promise<Config> => new Promise((resolve, reject) => {
@@ -95,20 +97,14 @@ const viewTask = ({task, command, aliases, description, options, positionals, ha
         []
     ),
     handler: handler === "proxy" ? "proxy" : handler
-})
+})   
 
-const resolvePluginName = (givenName?: string): string =>
-    givenName && givenName.length > 2
-        ? givenName
-        : require('./package.json').name
-
-
-const parseSchema = (i18n: i18n, definer: pluginDefiner): SchemaView | undefined => {
+const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): SchemaView | undefined => {
     try {
         const {name, alias, schema, version, tasks, scaffolds, hooks, networks, sandboxes, ...functions} = definer(i18n)
 
         return {
-            name: resolvePluginName(name),
+            name: name ? name : inferPluginName(),
             alias,
             schema,
             version,
@@ -136,9 +132,9 @@ const sendError = (err: Failure<unknown>) => {
     console.error(JSON.stringify(err))
 }
 
-const getResponse = (definer: pluginDefiner) => (sanitzedArgs: SanitizedArgs): LikeAPromise<ActionResponse, Failure<[]>> => {
+const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => (sanitzedArgs: SanitizedArgs): LikeAPromise<ActionResponse, Failure<[]>> => {
     const {i18n, taqRun} = sanitzedArgs
-    const schema = parseSchema(i18n, definer)
+    const schema = parseSchema(i18n, definer, inferPluginName)
     switch (taqRun) {
         case "pluginInfo":
             return schema ? Promise.resolve({...schema, status: "success"}) : Promise.reject({err: "E_INVALID_SCHEMA", msg: "The schema of the plugin is invalid."})
@@ -160,13 +156,45 @@ const getResponse = (definer: pluginDefiner) => (sanitzedArgs: SanitizedArgs): L
     }
 }
 
+const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
+    try {
+        return `${require(packageJsonAbspath).name}`
+    }
+    catch (_) {
+        return generateName().dashed
+    }
+}
+
+const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
+    // The definer function can provide a name for the plugin in its schema, or it
+    // can omit it and we infer it from the package.json file.
+    // To do so, we need to get the directory for the plugin from the call stack
+    const pluginManifest = stack.reduce(
+        (retval: null|string, callsite) => {
+            const callerFile = callsite.getFileName()
+            return retval || (callerFile.includes('taqueria-sdk') || callerFile.includes('taqueria-node-sdk'))
+                ? retval
+                : join(dirname(callerFile), 'package.json')
+        },
+        null
+    )
+
+    return () =>
+        !pluginManifest
+            ? generateName().dashed
+            : getNameFromPluginManifest(pluginManifest)
+}
+
 export const Plugin = {
-    create: (definer: pluginDefiner, unparsedArgs: Args) =>
-        parseArgs(unparsedArgs)
+    create: (definer: pluginDefiner, unparsedArgs: Args) => {
+        const stack = get()
+        return parseArgs(unparsedArgs)
         .then(sanitizeArgs)
-        .then(getResponse(definer))
+        .then(getResponse(definer, inferPluginName(stack)))
         .then(sendResponse)
         .catch(sendError)
+    }
+        
 }
 
 export const Task = aTask
