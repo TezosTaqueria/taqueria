@@ -17,7 +17,7 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 env:
-  SCOPE: '@ecadlabs'
+  SCOPE: '@taqueria'
   NPM_REGISTRY: 'https://registry.npmjs.org/'
   GH_REGISTRY: 'https://npm.pkg.github.com/'
 
