@@ -1,12 +1,12 @@
 import {generateTestProject} from "./utils/utils";
 
 
-const configFilePath = 'e2e/auto-test-plugins';
+const testProjectPath = 'e2e/auto-test-plugins';
 
 describe("E2E Testing for taqueria ligo plugin",  () => {
 
     beforeAll(async () => {
-        await generateTestProject(configFilePath);
+        await generateTestProject(testProjectPath);
     })
 
     test('Verify that taqueria ligo plugin can compile the contract', async () => {
