@@ -40,7 +40,7 @@ jobs:
         id: image-metadata
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.REGISTRY }}/${{ matrix.plugin }}
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.plugin }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr,suffix=-{{sha}}
