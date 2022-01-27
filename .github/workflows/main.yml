@@ -224,6 +224,7 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq.${GITHUB_REF/refs\/tags\//}-linux
           wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq.${GITHUB_REF/refs\/tags\//}-windows.exe
           wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq.${GITHUB_REF/refs\/tags\//}-macos
+          chmod +x *
 
       - name: Release
         id: release
