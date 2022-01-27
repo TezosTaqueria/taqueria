@@ -11,11 +11,15 @@ on:
       - 'main'
     paths:
       - 'taqueria-plugin-*/docker/*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
 env:
   REGISTRY: ghcr.io
 
 jobs:
-
   build-and-push:
     runs-on: ubuntu-latest
     strategy:
