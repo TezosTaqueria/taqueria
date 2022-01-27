@@ -113,13 +113,20 @@ jobs:
           npm install
       
       - name: Run unit tests
-        run: cd tests && npm run test:unit
+        run: |
+          cd tests
+          curl -fsSL https://deno.land/x/install/install.sh | sh 
+          npm run test:unit
 
       - name: Run integration tests
-        run: cd tests && npm run test:int
+        run: |
+          cd tests
+          npm run test:int
 
       - name: Run e2e tests
-        run: cd tests && npm run test:e2e
+        run: |
+          cd tests
+          npm run test:e2e
 
   # build-and-publish-npm-packages:
   #   runs-on: ubuntu-latest
