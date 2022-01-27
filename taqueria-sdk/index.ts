@@ -97,14 +97,19 @@ const viewTask = ({task, command, aliases, description, options, positionals, ha
     handler: handler === "proxy" ? "proxy" : handler
 })
 
+const resolvePluginName = (givenName?: string): string =>
+    givenName && givenName.length > 2
+        ? givenName
+        : require('./package.json').name
 
 
 const parseSchema = (i18n: i18n, definer: pluginDefiner): SchemaView | undefined => {
     try {
-        const {name, schema, version, tasks, scaffolds, hooks, networks, sandboxes, ...functions} = definer(i18n)
+        const {name, alias, schema, version, tasks, scaffolds, hooks, networks, sandboxes, ...functions} = definer(i18n)
 
         return {
-            name,
+            name: resolvePluginName(name),
+            alias,
             schema,
             version,
             tasks: tasks
