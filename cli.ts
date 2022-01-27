@@ -228,7 +228,6 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
 )
 
 const getPluginExe = (parsedArgs: SanitizedInitArgs, plugin: InstalledPlugin) => {
-    debugger
     switch(plugin.type) {
         case 'npm':
             const pluginPath = joinPaths(
@@ -311,6 +310,9 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
                     // Others need renamed
                     else if (key === '_')
                         return [...retval, '--command', String(val)]
+                    // String types need their values
+                    else if (val instanceof SanitizedAbsPath) 
+                        return [...retval, '--'+key, `'${val.value}'`]
                     // Everything else is good
                     else
                         return [...retval, '--'+key, `'${val}'`]
@@ -549,7 +551,7 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
     parsedArgs,
     getStateAbspath,
     (stateAbspath: SanitizedAbsPath) => pipe(
-        debug(!parsedArgs.disableState)
+        !parsedArgs.disableState
             ? resolve(stateAbspath.value)
             : reject("State disabled!"),
         chain (readFile),
