@@ -24,7 +24,7 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          plugin: taqueria-plugin-flextesa 
+          - plugin: taqueria-plugin-flextesa 
     defaults:
       run:
         working-directory: ${{ matrix.plugin }}
