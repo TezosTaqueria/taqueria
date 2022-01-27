@@ -25,9 +25,6 @@ jobs:
       matrix:
         include:
           - plugin: taqueria-plugin-flextesa 
-    defaults:
-      run:
-        working-directory: ${{ matrix.plugin }}/docker
 
     steps:
       - uses: actions/checkout@v2
@@ -52,6 +49,7 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v2
+        working-directory: ${{ matrix.plugin }}/docker
         with:
           context: .
           push: true
