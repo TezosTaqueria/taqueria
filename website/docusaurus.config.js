@@ -21,7 +21,7 @@ const config = {
 		[
 			"@docusaurus/preset-classic",
 			/** @type {import('@docusaurus/preset-classic').Options} */
-			
+
 			({
 				docs: {
 					path: "docs",
@@ -47,7 +47,7 @@ const config = {
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
 			gtag: {
-				trackingID: 'G-R7WYMVNDR1',
+				trackingID: "G-R7WYMVNDR1",
 				anonymizeIP: true,
 			},
 			colorMode: {
