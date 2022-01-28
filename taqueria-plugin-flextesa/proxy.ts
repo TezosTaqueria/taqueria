@@ -1,30 +1,8 @@
-import {Sandbox as theSandbox} from '@taqueria/node-sdk'
+import {Sandbox as theSandbox, execCmd, getArch} from '@taqueria/node-sdk'
 import type { SanitizedArgs, ProxyAction, Attributes, SandboxConfig, EconomicalProtocol, ActionResponse, Failure, LikeAPromise, Sandbox } from "@taqueria/node-sdk/types"
-import {exec} from 'child_process'
 import retry from 'promise-retry'
 
 type Opts = SanitizedArgs & {sandboxName?: string}
-
-const execCmd = (cmd:string): Promise<ProxyAction> => new Promise((resolve, _) => {
-    exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
-        if (err) resolve({
-            status: 'failed',
-            stdout: stdout,
-            stderr: err.message
-        })
-        else if (stderr) resolve({
-            status: 'failed',
-            stdout,
-            stderr
-        })
-        else resolve({
-            status: 'success',
-            stdout,
-            stderr
-        })
-    })
-})
-
 
 const sleep = (milliseconds: number) => new Promise((resolve, _reject) => {
     setTimeout(resolve, milliseconds)
@@ -42,21 +20,21 @@ const attributesToParams = (attributes: Attributes): Record<string, string> => [
 
 const getDockerImage = () => 'taqueria/flextesa:latest'
 
-const getStartCommand = (sandbox: Sandbox, image: string, config: Opts): string => {
+const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
     const _envVars = Object.entries(attributesToParams(sandbox.attributes)).reduce(
         (retval, [key, val]) => `${retval} -e ${key} ${val} `,
         ""
     )
 
-    return `docker run --name ${sandbox.name} --rm --detach -p ${sandbox.rpcUrl.url.port}:20000 -v ${config.projectDir}:/project -w /app ${image} node startFlextesa.js --sandbox ${sandbox.name}`
+    return `docker run --name ${sandbox.name} --rm --detach --platform ${arch} -p ${sandbox.rpcUrl.url.port}:20000 -v ${config.projectDir}:/project -w /app ${image} node startFlextesa.js --sandbox ${sandbox.name}`
 }
 
-const getConfigureCommand = (sandbox: Sandbox, image: string, config: Opts): string => {
-    return `docker exec ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --configure`
+const getConfigureCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
+    return `docker exec --platform ${arch} ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --configure`
 }
 
-const getImportAccountsCommand = (sandbox: Sandbox, image: string, config: Opts): string => {
-    return `docker exec ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --importAccounts`
+const getImportAccountsCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
+    return `docker exec --platform ${arch} ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --importAccounts`
 }
 
 const doesUseFlextesa = (sandbox: Sandbox) => !sandbox.plugin || sandbox.plugin === 'flextesa'
@@ -79,7 +57,9 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<ProxyAction> 
                     stdout: "Already running.",
                     stderr: ''
                 })
-                : execCmd(getStartCommand(sandbox, getDockerImage(), opts))
+                : getArch()
+                    .then(arch => getStartCommand(sandbox, getDockerImage(), opts, arch)) 
+                    .then(execCmd)
                 .then(() => configureTezosClient(sandbox, opts))
                 .then(() => importAccounts(sandbox, opts))
                 .then(() => ({
@@ -92,13 +72,17 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<ProxyAction> 
 
 const configureTezosClient = (sandbox: Sandbox, opts: Opts) =>
     retry(
-        () => execCmd(getConfigureCommand(sandbox, getDockerImage(), opts))
+        () => getArch()
+                .then(arch => getConfigureCommand(sandbox, getDockerImage(), opts, arch))
+                .then(execCmd)
     )
 
 
 const importAccounts = (sandbox: Sandbox, opts: Opts) =>
     retry(
-        () => execCmd(getImportAccountsCommand(sandbox, getDockerImage(), opts))
+        () => getArch()
+                .then(arch => getImportAccountsCommand(sandbox, getDockerImage(), opts, arch))
+                .then(execCmd)
     )
 
 const startAll = (sandboxes: Sandbox[], opts: Opts): Promise<ProxyAction> => {
@@ -196,8 +180,10 @@ const getAccountBalances =(sandbox: Sandbox): Promise<ProxyAction> => {
         (retval: Promise<unknown>[], [accountName, _accountDetails]) => {
             if (accountName === 'default') return retval
 
-            const getBalanceProcess = 
-                execCmd(`docker exec ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
+            const getBalanceProcess =
+                getArch()
+                .then(arch => `docker exec --platform ${arch} ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
+                .then(execCmd)
                 .then(result => result.status === 'success'
                     ? ({account: accountName, balance: result.stdout})
                     : Promise.reject({code: 'E_BALANCE', context: [accountName, result]})
