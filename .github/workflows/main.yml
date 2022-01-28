@@ -105,7 +105,7 @@ jobs:
     #       - dir: taqueria-plugin-taquito
     #       # - dir: taqueria-plugin-teztnets
     #       # - dir: taqueria-sdk
-    uses: ./.github/workflows/npm-publish.yml
+    uses: ./npm-publish.yml
     with:
       dir: "taqueria-plugin-ligo"
     secrets:
