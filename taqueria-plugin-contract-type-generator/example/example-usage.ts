@@ -1,6 +1,6 @@
 import { ContractStorageType, DefaultContractType, OpKind, OriginateParams, ParamsWithKind, TezosToolkit } from '@taquito/taquito';
-import { ExampleContract1ContractType as TestContract, ExampleContract1WalletType as TestWalletContract } from './types-file/example-contract-1.types';
-import { ExampleContract2ContractType as TestContract2 } from './types-file/example-contract-2.types';
+import { ExampleContract1ContractType as TestContract, ExampleContract1WalletType as TestWallet } from './types-file/example-contract-1.types';
+import { ExampleContract2ContractType as TestContract2, ExampleContract2WalletType as TestWallet2  } from './types-file/example-contract-2.types';
 import { nat, tas } from './types-file/type-aliases';
 
 export const exampleContractMethods1 = async () => {
@@ -52,7 +52,7 @@ export const exampleWalletContractMethods1 = async () => {
 
     const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
 
-    const contract = await Tezos.wallet.at<TestWalletContract>(`tz123`);
+    const contract = await Tezos.wallet.at<TestWallet>(`tz123`);
 
     // SendParams are not stictly typed yet
     // const bidSendResult = await contract.methods.bid(tas.nat(0)).send({ amount: tas.mutez(1000000) });
@@ -208,25 +208,14 @@ export const exampleContractStorage1 = async () => {
 };
 
 
-// TODO: Add this utility method somewhere
-const createOriginationOperation = <TContract extends DefaultContractType = DefaultContractType>(
-    params: OriginateParams<ContractStorageType<TContract>>
-) : ParamsWithKind => {
-    return {
-        ...params,
-        kind: OpKind.ORIGINATION,
-    };
-}
-
 export const exampleBatchOrigination_Contract = async () => {
 
     const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
 
-    const batchOperation = Tezos.contract.batch([
-        // batch cannot be typed: 
-        // There is no way to provide a specific type to a specific item in the array of batch params
+    const batchOperation = Tezos.contract.batch()
+        // Untyped
+        .withOrigination(
         { 
-            kind: OpKind.ORIGINATION,
             code: ``,
             // storage: any <-- NOT TYPED
             storage: {
@@ -241,9 +230,10 @@ export const exampleBatchOrigination_Contract = async () => {
                 },
                 metadata: tas.bigMap([]),
             },
-        },
-        // But a utility method could be provided that would require 
-        createOriginationOperation<TestContract2>({
+        })
+        // Typed
+        .withOrigination<TestContract2>(
+        {
             code: ``,
             // storage <-- TYPED
             storage: {
@@ -258,7 +248,55 @@ export const exampleBatchOrigination_Contract = async () => {
                 },
                 metadata: tas.bigMap([]),
             },
-        }),
-    ]);
+        })
+    ;
+
+    await batchOperation.send();
+};
+
+
+export const exampleBatchOrigination_Wallet = async () => {
+
+    const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
+
+    const batchOperation = Tezos.wallet.batch()
+        // Untyped
+        .withOrigination(
+        { 
+            code: ``,
+            // storage: any <-- NOT TYPED
+            storage: {
+                assets: {
+                    not_valid: 42, // <-- no type error
+                    ledger: tas.bigMap([
+                        { key: { 0: tas.address('tz123'), 1: tas.nat(42) }, value:tas.nat(42) },
+                    ]),
+                    operators: tas.bigMap([]),
+                    token_metadata: tas.bigMap([]),
+                    token_total_supply: tas.bigMap([]),
+                },
+                metadata: tas.bigMap([]),
+            },
+        })
+        // Typed
+        .withOrigination<TestWallet2>(
+        {
+            code: ``,
+            // storage <-- TYPED
+            storage: {
+                assets: {
+                    // not_valid: 42, // <-- type error (uncomment to see)
+                    ledger: tas.bigMap([
+                        { key: { 0: tas.address('tz123'), 1: tas.nat(42) }, value:tas.nat(42) },
+                    ]),
+                    operators: tas.bigMap([]),
+                    token_metadata: tas.bigMap([]),
+                    token_total_supply: tas.bigMap([]),
+                },
+                metadata: tas.bigMap([]),
+            },
+        })
+    ;
+
     await batchOperation.send();
 };
