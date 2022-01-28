@@ -108,6 +108,12 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
             fork (console.error) (console.log)
         )
     )
+    .command(
+        'testFromVsCode',
+        i18n.__('testFromVsCodeDesc'),
+        () => {},
+        () => console.log("OK")
+    )
     .help(false)
 
 
@@ -600,7 +606,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                 map (sanitizeArgs),
                 chain ((initArgs: SanitizedInitArgs) => {
                     if (initArgs.debug) debugMode(true)
-                    return initArgs._.includes('init')
+                    return initArgs._.includes('init') || initArgs._.includes('testFromVsCode')
                         ? resolve(initArgs)
                         : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
                 }),

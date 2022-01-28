@@ -1,42 +1,55 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import type { I18N } from './lib/pure'
+import { exposeTaskAsCommand, addCommand } from './lib/helpers'
+import * as vscode from 'vscode'
+
+enum Commands {
+	init = 'taqueria.init'
+}
+
+
+const exposeInitTask = (context: vscode.ExtensionContext, output: vscode.OutputChannel, i18n: I18N, folders: readonly vscode.WorkspaceFolder[]) => {
+	// As the developer has no folder open, we must prompt
+	// them for a path they would like to taqify
+	if (folders.length === 0) {
+		addCommand (context) (Commands.init, () => {
+			return vscode.window.showOpenDialog({
+				canSelectFolders: true,
+				canSelectFiles: false,
+				openLabel: "Select project folder",
+				title: "Select a project folder to taq'ify",
+				canSelectMany: false
+			})
+			.then(console.log) as Promise<void>
+		})
+	}
+
+	// The developer has one folder open. We can assume that
+	// is the folder they wish to taqify
+	else if (folders.length === 1) {
+		const exposeTask = exposeTaskAsCommand (context, output, i18n)
+		return exposeTask('taqueria.init', `init ${folders[0].uri.path}`, 'notify')
+	}
+
+	// The developer has multiple folders in the their workspace.
+	// As can't really know which one to taqify without prompting them
+	else {
+		console.log("Coming soon!")
+	}
+}
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	const i18n: I18N = {} // temporary
+	const output = vscode.window.createOutputChannel("Taqueria")
+	const exposeTask = exposeTaskAsCommand (context, output, i18n)
+	const folders = vscode.workspace.workspaceFolders
+		? vscode.workspace.workspaceFolders
+		: []
 
-	const path = vscode.workspace.getConfiguration('taqueria').get("path")
-	let wf = vscode.workspace.workspaceFolders?.[0].uri.path;
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Taqueria extension initiated successfully taqueria.init');
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('taqueria.init', async () => {
-		const projectPath = await vscode.window.showInputBox({
-			title: 'Project path',
-			value: wf
-		})
-		const cp = require('child_process')
-		cp.exec(`${path}taqueria init ${projectPath ?? wf}`, (err: any, stdout: Buffer, stderr: Buffer) => {
-			console.log('stdout: ' + stdout);
-			console.log('stderr: ' + stderr);
-			if (err) {
-				console.log('error: ' + err);
-			}
-
-			if (stderr) {
-				vscode.window.showErrorMessage(stderr.toString('utf-8'));
-			} else if (stdout) {
-				vscode.window.showInformationMessage(stdout.toString('utf-8'));
-			}
-		});
-	});
-
-	context.subscriptions.push(disposable);
+	// Add built-in tasks for Taqueria
+	return exposeInitTask (context, output, i18n, folders)
 }
 
 // this method is called when your extension is deactivated
