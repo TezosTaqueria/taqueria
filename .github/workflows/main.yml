@@ -179,6 +179,7 @@ jobs:
             const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
             const taquito = readInfo("./taqueria-plugin-taquito/package.json")
             const sdk = readInfo("./taqueria-sdk/package.json")
+            const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
 
             const git_short_sha = "${{ github.sha }}".substring(1, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
@@ -197,6 +198,7 @@ jobs:
               | npm install ${{ env.SCOPE }}/${smartpy.name}@${smartpy.version}-${{ github.event.number }}-${git_short_sha}|
               | npm install ${{ env.SCOPE }}/${taquito.name}@${taquito.version}-${{ github.event.number }}-${git_short_sha}|
               | npm install ${{ env.SCOPE }}/${sdk.name}@${sdk.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${flextesa.name}@${flextesa.version}-${{ github.event.number }}-${git_short_sha}|
             `;
             
             github.rest.issues.createComment({
