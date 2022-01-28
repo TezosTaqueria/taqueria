@@ -10,9 +10,9 @@ on:
       NPM_TOKEN:
         required: true
 
-concurrency:
-  group: npm-${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
-  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+# concurrency:
+#   group: npm-${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
+#   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 env:
   SCOPE: '@taqueria'
