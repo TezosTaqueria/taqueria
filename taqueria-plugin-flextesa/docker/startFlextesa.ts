@@ -7,7 +7,7 @@ import retry from 'promise-retry'
 type Args = ReturnType<typeof yargs> & {config: string, configure: string, sandbox: string}
 
 interface Failure {
-    code: 'E_INVALID_CONFIG' | 'E_ACCOUNT_KEY' | 'E_EXEC',
+    kind: 'E_INVALID_CONFIG' | 'E_ACCOUNT_KEY' | 'E_EXEC',
     context: unknown
 }
 
@@ -70,11 +70,11 @@ const writeConfigFile = (filename: string) => (config: Config) =>
     .then(JSON.stringify)
     .then(writeTextFile(filename))
     .then(() => config)
-    .catch(err => Promise.reject({code: 'E_WRITE_CONFIG', context: config, previous: err}))
+    .catch(err => Promise.reject({kind: 'E_WRITE_CONFIG', context: config, previous: err}))
 
 const run = (cmd: string): Promise<string> => new Promise((resolve, reject) => exec(cmd, (err, stdout, stderr) => {
-    if (err) reject({code: 'E_EXEC', context: cmd, previous: err})
-    else if (stderr.length) reject({code: 'E_EXEC', context: {cmd, stderr}})
+    if (err) reject({kind: 'E_EXEC', context: cmd, previous: err})
+    else if (stderr.length) reject({kind: 'E_EXEC', context: {cmd, stderr}})
     else resolve(stdout)
 }))
 
@@ -84,7 +84,7 @@ const decodeJsonConfig = (input: string): Promise<ConfigInput> => {
         return Promise.resolve(data)
     }
     catch (err) {
-        throw {code: 'E_INVALID_JSOLN', context: input}
+        throw {kind: 'E_INVALID_JSOLN', context: input}
     }
 }
 
@@ -162,7 +162,7 @@ const parseConfig = (input: ConfigInput) => {
         if (sandboxes) return Promise.resolve({...input, sandbox: sandboxes})
             
     }
-    return Promise.reject({code: 'E_INVALID_CONFIG', context: input})
+    return Promise.reject({kind: 'E_INVALID_CONFIG', context: input})
 }
 
 
@@ -317,7 +317,7 @@ const inputArgs: Args = yargs(process.argv)
 .parse()
 
 if (!inputArgs.sandbox.length) {
-    console.log({code: 'E_INVALID_USAGE', context: inputArgs})
+    console.log({kind: 'E_INVALID_USAGE', context: inputArgs})
     process.exit(-1)
 }
 
