@@ -1,4 +1,4 @@
-import {execCmd, getArch} from '@taqueria/node-sdk'
+const {execCmd, getArch} = require('@taqueria/node-sdk')
 const {extname, basename, join} = require('path')
 const glob = require('fast-glob')
 
