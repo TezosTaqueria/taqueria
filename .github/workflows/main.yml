@@ -108,7 +108,7 @@ jobs:
     #       # - dir: taqueria-sdk
     uses: ./.github/workflows/npm-publish.yml
     with:
-      dir: taqueria-plugin-ligo
+      dir: "taqueria-plugin-ligo"
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
