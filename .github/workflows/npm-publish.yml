@@ -1,14 +1,14 @@
 name: npm-publish
 
 on:
-  workflow_call:
-    inputs:
-      dir:
-        type: string
-        required: true
-    secrets:
-      NPM_TOKEN:
-        required: true
+  workflow_call
+    # inputs:
+    #   dir:
+    #     type: string
+    #     required: true
+    # secrets:
+    #   NPM_TOKEN:
+    #     required: true
 
 # concurrency:
 #   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}

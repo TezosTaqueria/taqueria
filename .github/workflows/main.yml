@@ -106,10 +106,10 @@ jobs:
     #       # - dir: taqueria-plugin-teztnets
     #       # - dir: taqueria-sdk
     uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
-    with:
-      dir: "taqueria-plugin-ligo"
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+    # with:
+    #   dir: "taqueria-plugin-ligo"
+    # secrets:
+    #   NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   # build-and-publish-npm-packages:
   #   runs-on: ubuntu-latest
