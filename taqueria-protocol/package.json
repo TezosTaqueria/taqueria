@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "echo \"just passing through for CI, no need to build\" && exit 0",
-    "prod-config": "echo \"just passing through for CI, no need to update SDK dependency\" && exit 0"
+    "build-ci": "echo \"just passing through for CI, no need to build\" && exit 0",
+    "prod-config-ci": "echo \"just passing through for CI, no need to update SDK dependency\" && exit 0"
   },
   "keywords": [
     "taqueria",
