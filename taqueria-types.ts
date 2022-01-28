@@ -49,6 +49,7 @@ export interface RawInitArgs {
     disableState: boolean
     logPluginCalls: boolean
     build: string
+    fromVsCode: boolean
 }
 
 export interface SanitizedInitArgs {
@@ -63,6 +64,7 @@ export interface SanitizedInitArgs {
     disableState: boolean
     logPluginCalls: boolean
     build: string
+    fromVsCode: boolean
 }
 
 export interface i18n {

@@ -75,7 +75,7 @@ export const make = (data: Record<string, unknown>) : Future<TaqError, ConfigArg
     // const [err, validData] = validate(data, ConfigDecoder)
     return err === undefined
         ? resolve(validData)
-        : reject({kind: "E_INVALID_CONFIG", msg: "TODO, should this use i18n?"})
+        : reject({kind: "E_INVALID_CONFIG", msg: "The config.json file does not adhere to the required schema."})
 }
 
 export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
@@ -110,7 +110,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedP
                 hash
             }))
         )),
-        mapRej ((previous:unknown) => ({kind: "E_INVALID_CONFIG", msg: "TODO, should this use i18n?", previous})),
+        mapRej ((previous:unknown) => ({kind: "E_INVALID_CONFIG", msg: "Your config.json file looks invalid.", previous})),
     ))
 )
 
