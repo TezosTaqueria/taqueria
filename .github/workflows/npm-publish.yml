@@ -1,14 +1,14 @@
-# name: npm-publish
+name: npm-publish
 
 on: 
-  workflow_call
-    # inputs:
-    #   dir:
-    #     type: string
-    #     required: true
-    # secrets:
-    #   NPM_TOKEN:
-    #     required: true
+  workflow_call:
+    inputs:
+      dir:
+        type: string
+        required: true
+    secrets:
+      NPM_TOKEN:
+        required: true
 
 # concurrency:
 #   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
@@ -32,12 +32,12 @@ jobs:
     #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      # - uses: actions/setup-node@v2
         # with: 
         #   registry-url: ${{ env.NPM_REGISTRY }}
         #   scope: "${{ env.SCOPE }}"
 
-      - run: cd $HOME
+      # - run: cd $HOME
 
       # - name: Check tag suffix
       #   id: check-tag-suffix

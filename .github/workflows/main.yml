@@ -5,12 +5,12 @@ on:
     branches:
       - main
 
-  push:
-    tags:
-      - v*
+  # push:
+  #   tags:
+  #     - v*
 
-  release:
-    types: [published]
+  # release:
+  #   types: [published]
 
 # concurrency:
 #   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
@@ -22,7 +22,6 @@ on:
 #   GH_REGISTRY: 'https://npm.pkg.github.com/'
 
 jobs:
-
   # build-binaries:
   #   permissions:
   #     contents: 'read'
@@ -92,7 +91,7 @@ jobs:
   #       run: |
   #         echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  build-and-publish-npm-packages:
+  publish-npm:
     # runs-on: ubuntu-latest
     # permissions:
     #   packages: write
@@ -107,10 +106,10 @@ jobs:
     #       # - dir: taqueria-plugin-teztnets
     #       # - dir: taqueria-sdk
     uses: ./.github/workflows/npm-publish.yml
-    # with:
-    #   dir: "taqueria-plugin-ligo"
-    # secrets:
-    #   NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+    with:
+      dir: "taqueria-plugin-ligo"
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   # build-and-publish-npm-packages:
   #   runs-on: ubuntu-latest
