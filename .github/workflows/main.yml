@@ -93,10 +93,10 @@ jobs:
   #         echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
   build-and-publish-npm-packages:
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
+    # runs-on: ubuntu-latest
+    # permissions:
+    #   packages: write
+    #   contents: read
     # strategy:
     #   matrix:
     #     include:
