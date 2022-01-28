@@ -17,7 +17,6 @@ The structure of the package name and version is as follows
 
 `{package_scope}/{package_name}@0.0.0-pr-{github_pr_number}-{github_commit_short_sha}`. 
 
-The 0.0.0 version number is used because npm packages require a `semver` versioning scheme. 
+All information regarding the pull request and the commit that triggered the build is available in the package version name. The 0.0.0 version number is used because npm packages require a `semver` versioning scheme.
 
-Each plugin is published to npmjs.com with a tag that represents the current pull request number e.g. tag `pr-155` will be applied to all packages published in [PR #155](https://github.com/ecadlabs/taqueria/pull/155). This way, one can install the latest version of the packages for the pull request you are working on using a command like 
-`npm install @taqueria/node-sdk@pr-155`
+Each plugin is published to npmjs.com with the `preview` tag and one can install the latest version using `npm install @taqueria/node-sdk@preview`
