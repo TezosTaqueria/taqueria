@@ -97,18 +97,18 @@ jobs:
     permissions:
       packages: write
       contents: read
-    strategy:
-      matrix:
-        include:
-          # - dir: taqueria-plugin-flextesa
-          - dir: taqueria-plugin-ligo
-          - dir: taqueria-plugin-smartpy
-          - dir: taqueria-plugin-taquito
-          # - dir: taqueria-plugin-teztnets
-          # - dir: taqueria-sdk
+    # strategy:
+    #   matrix:
+    #     include:
+    #       # - dir: taqueria-plugin-flextesa
+    #       - dir: taqueria-plugin-ligo
+    #       - dir: taqueria-plugin-smartpy
+    #       - dir: taqueria-plugin-taquito
+    #       # - dir: taqueria-plugin-teztnets
+    #       # - dir: taqueria-sdk
     uses: ./.github/workflows/npm-publish.yml
     with:
-      dir: ${{ matrix.dir }}
+      dir: taqueria-plugin-ligo
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
