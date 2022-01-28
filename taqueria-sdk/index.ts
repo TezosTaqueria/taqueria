@@ -1,9 +1,45 @@
 import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol} from '@taqueria/protocol/taqueria-protocol-types'
-import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView} from "./types"
+import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView, ProxyAction} from "./types"
 import {join, resolve, dirname} from 'path'
 import {get} from 'stack-trace'
+import {exec} from 'child_process'
 import generateName from 'project-name-generator'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
+
+export const execCmd = (cmd:string): Promise<ProxyAction> => new Promise((resolve, _) => {
+    exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
+        if (err) resolve({
+            status: 'failed',
+            stdout: stdout,
+            stderr: err.message
+        })
+        else if (stderr) resolve({
+            status: 'failed',
+            stdout,
+            stderr
+        })
+        else resolve({
+            status: 'success',
+            stdout,
+            stderr
+        })
+    })
+})
+
+export const getArch = () => 
+    execCmd("uname -m")
+    .then(result => (result.stdout as string).trim().toLowerCase())
+    .then(arch => {
+        switch(arch) {
+            case 'x86_64':
+                return 'linux/amd64'
+            case 'arm64':
+                return 'linux/arm64/v8'
+            default:
+                return 'linux/amd64'
+        }
+    })
+
 
 const parseJSON = (input: string) : Promise<Config> => new Promise((resolve, reject) => {
     try {
