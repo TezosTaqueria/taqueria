@@ -42,8 +42,6 @@ jobs:
       - name: Prepare package.json for publishing
         run: npm run prod-config-ci
 
-      - run: cat package.json
-
       - name: Install any dependencies
         run: npm ci
 
