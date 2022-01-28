@@ -105,7 +105,7 @@ jobs:
     #       - dir: taqueria-plugin-taquito
     #       # - dir: taqueria-plugin-teztnets
     #       # - dir: taqueria-sdk
-    uses: ./npm-publish.yml
+    uses: ecadlab/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
     with:
       dir: "taqueria-plugin-ligo"
     secrets:
