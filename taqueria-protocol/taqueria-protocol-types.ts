@@ -222,6 +222,7 @@ export interface UnvalidatedTask {
 export interface UnvalidatedPluginInfo {
     readonly schema: string
     readonly name: string
+    readonly alias?: string
     readonly version: string
     readonly tasks?: (UnvalidatedTask|undefined)[]
     readonly scaffolds?: (UnvalidatedScaffold|undefined)[]
@@ -233,14 +234,16 @@ export interface UnvalidatedPluginInfo {
 export class PluginInfo {
     readonly schema: string
     readonly name: string
+    readonly alias?: string
     readonly version: string
     readonly tasks: Task[]
     readonly scaffolds: Scaffold[]
     readonly hooks: Hook[]
     readonly networks: Network[]
     readonly sandboxes: Sandbox[]
-    constructor(schema: string, name: string, version: string, tasks: Task[], scaffolds: Scaffold[], hooks: Hook[], networks: Network[], sandboxes: Sandbox[]) {
+    constructor(schema: string, name: string, version: string, tasks: Task[], scaffolds: Scaffold[], hooks: Hook[], networks: Network[], sandboxes: Sandbox[], alias?: string) {
         this.schema = schema
+        this.alias = alias
         this.name = name
         this.version = version
         this.tasks = tasks
@@ -274,7 +277,12 @@ export class PluginInfo {
                 const createTask = Task.create.bind(Task)
                 //TODO: Finish doing the above for each factory/constructor
 
+                const temp: Record<string, string> = obj.alias
+                    ? {alias: obj.alias}
+                    : {}
+
                 const pluginInfo : PluginInfo = {
+                    ...temp,
                     name: obj.name,
                     schema: obj.schema,
                     version: obj.version,
