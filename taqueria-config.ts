@@ -42,7 +42,10 @@ export const defaultConfig : Config = {
                 joe: {
                     initialBalance: "1000000000"
                 }
-            }
+            },
+            label: "Local Tezos Sandbox",
+            protocol: "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            rpcUrl: "http://localhost:20000"
         }
     },
     network: {
