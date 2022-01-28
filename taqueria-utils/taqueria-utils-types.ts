@@ -19,11 +19,13 @@ export type ErrorType =
   | "E_INVALID_CONFIG"
   | "E_INVALID_JSON"
   | "E_FORK"
+  | "E_INVALID_TASK"
 
 export interface TaqError {
     readonly kind: ErrorType,
     msg: string,
     previous?: TaqError | Error
+    context?: unknown
 }
 
 const sanitizedPathType: unique symbol = Symbol()
