@@ -24,7 +24,15 @@ const sidebars = {
       collapsible: false,
       items: [
         "intro",
-        "getting-started/installation",
+        "getting-started/installation"
+      ],
+    },
+      type: "category",
+      label: "Contributing",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
         "pull_request_packages"
       ],
     },

@@ -148,65 +148,65 @@ jobs:
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
           npm publish --tag 'latest' --access public
 
-  # pr-comment:
-  #   runs-on: ubuntu-latest
-  #   needs: 
-  #     - build-binaries
-  #     - build-and-publish-npm-packages
-  #   if: github.event_name == 'pull_request'
-  #   steps:
-  #     - uses: actions/checkout@v2
+  pr-comment:
+    runs-on: ubuntu-latest
+    needs: 
+      - build-binaries
+      - build-and-publish-npm-packages
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: create pr comment
-  #       uses: actions/github-script@v5
-  #       id: pr-comment
-  #       with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         script: |
-  #           const fs = require('fs');
+      - name: create pr comment
+        uses: actions/github-script@v5
+        id: pr-comment
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
 
-  #           function readInfo(filePath) {
-  #             try {
-  #               const data = fs.readFileSync(filePath)
-  #               const JSONdata = JSON.parse(data.toString())
-  #               const name = JSONdata.name.split("/")[1]
-  #               const version = JSONdata.version
-  #               return { name, version }
-  #             } catch (error) {
-  #               console.error(`Got an error trying to read the file: ${error.message}`)
-  #             }
-  #           }
+            function readInfo(filePath) {
+              try {
+                const data = fs.readFileSync(filePath)
+                const JSONdata = JSON.parse(data.toString())
+                const name = JSONdata.name.split("/")[1]
+                const version = JSONdata.version
+                return { name, version }
+              } catch (error) {
+                console.error(`Got an error trying to read the file: ${error.message}`)
+              }
+            }
 
-  #           const ligo = readInfo("./taqueria-plugin-ligo/package.json")
-  #           const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
-  #           const taquito = readInfo("./taqueria-plugin-taquito/package.json")
-  #           const sdk = readInfo("./taqueria-sdk/package.json")
+            const ligo = readInfo("./taqueria-plugin-ligo/package.json")
+            const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
+            const taquito = readInfo("./taqueria-plugin-taquito/package.json")
+            const sdk = readInfo("./taqueria-sdk/package.json")
 
-  #           const git_short_sha = "${{ github.sha }}".substring(1, 8)
-  #           const git_tag = "${{ github.ref }}".split('tags/')[1];
+            const git_short_sha = "${{ github.sha }}".substring(1, 8)
+            const git_tag = "${{ github.ref }}".split('tags/')[1];
 
-  #           let body = `
-
-
-  #             | Git Commit | Artifacts |
-  #             | ---------- | --------- |
-  #             | ${git_short_sha} | [Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }}) <br /> [MacOS](${{ needs.build-binaries.outputs.public-url-macos }}) <br /> [Windows](${{ needs.build-binaries.outputs.public-url-windows }}) |
+            let body = `
 
 
-  #             | npm package installation instructions |
-  #             | ------------------------------------- |
-  #             | npm install ${{ env.SCOPE }}/${ligo.name}@${ligo.version}-${{ github.event.number }}-${git_short_sha}|
-  #             | npm install ${{ env.SCOPE }}/${smartpy.name}@${smartpy.version}-${{ github.event.number }}-${git_short_sha}|
-  #             | npm install ${{ env.SCOPE }}/${taquito.name}@${taquito.version}-${{ github.event.number }}-${git_short_sha}|
-  #             | npm install ${{ env.SCOPE }}/${sdk.name}@${sdk.version}-${{ github.event.number }}-${git_short_sha}|
-  #           `;
+              | Git Commit | Artifacts |
+              | ---------- | --------- |
+              | ${git_short_sha} | [Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }}) <br /> [MacOS](${{ needs.build-binaries.outputs.public-url-macos }}) <br /> [Windows](${{ needs.build-binaries.outputs.public-url-windows }}) |
+
+
+              | npm package installation instructions |
+              | ------------------------------------- |
+              | npm install ${{ env.SCOPE }}/${ligo.name}@${ligo.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${smartpy.name}@${smartpy.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${taquito.name}@${taquito.version}-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${sdk.name}@${sdk.version}-${{ github.event.number }}-${git_short_sha}|
+            `;
             
-  #           github.rest.issues.createComment({
-  #             issue_number: context.issue.number,
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             body: body
-  #           })
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
   release:
     name: Release
     runs-on: ubuntu-latest

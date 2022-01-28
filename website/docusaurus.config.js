@@ -89,6 +89,13 @@ const config = {
 					},
 					{
 						type: "doc",
+						docId: "contributing",
+						position: "right",
+						label: "Contributing",
+						className: "header-link",
+					},
+					{
+						type: "doc",
 						docId: "plugins",
 						label: "Plugins",
 						position: "right",
