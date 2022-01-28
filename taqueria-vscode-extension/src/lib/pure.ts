@@ -1,6 +1,9 @@
 import {exec} from 'child_process'
 import {stat, readFile} from 'fs/promises'
-import {join, resolve} from 'path'
+import {join} from 'path'
+import {Config} from '@taqueria/protocol/taqueria-protocol-types'
+import {parse} from 'jsonc-parser'
+
 
 /***********************************************************************/
 // This module provides pure helper functions that do not use the VS Code API
@@ -14,7 +17,7 @@ export interface E_BASE {
 
 export interface E_PROXY extends E_BASE {
     code: 'E_PROXY'
-    
+    cmd?: string
 }
 
 export interface E_TAQ_NOT_FOUND extends E_BASE {
@@ -47,6 +50,11 @@ export interface E_STATE_MISSING extends E_BASE {
     taqifiedDir: PathToDir
 }
 
+export interface E_NO_TAQUERIA_PROJECTS extends E_BASE {
+    code: 'E_NO_TAQUERIA_PROJECTS'
+    msg: string
+}
+
 export interface E_EXEC extends E_BASE {
     code: 'E_EXEC',
     cmd: string
@@ -60,10 +68,15 @@ export type TaqErr =
     E_NOT_TAQIFIED |
     E_INVALID_JSON |
     E_STATE_MISSING |
-    E_EXEC
+    E_EXEC |
+    E_NO_TAQUERIA_PROJECTS
 
 export interface I18N {
     temp?: true
+}
+
+export interface ConfigHash {
+    value: string
 }
 
 export type PromiseLike<L, R> = Promise<R>
@@ -76,9 +89,14 @@ export type PathToFile = string & {__kind__: 'PathToFile'}
 
 export type Json<T> = T
 
-export type Config = Record<string, unknown>
+export interface InstalledPlugin {
+    name: string
+    type: 'npm'
+}
 
-export type State = Record<string, unknown>
+export interface State {
+    [taskName: string]: null|string[]
+}
 
 export const taqifiedDirType: unique symbol = Symbol("taqifiedDirType")
 
@@ -100,11 +118,12 @@ export class TaqifiedDir {
      * @param {I18N} i18n 
      * @returns {PromiseLike<E_NOT_TAQIFIED|E_STATE_MISSING, TaqifiedDir>}
      */
-    create(dir: PathToDir, i18n: I18N): PromiseLike<E_NOT_TAQIFIED|E_STATE_MISSING, TaqifiedDir> {
+    static create(dir: PathToDir, i18n: I18N): PromiseLike<E_NOT_TAQIFIED|E_STATE_MISSING, TaqifiedDir> {
         return makeDir(join(dir, '.taq'), i18n)
         .then(dotTaqDir =>
             makeFile(join(dotTaqDir, 'config.json'), i18n)
-            .then(pathToConfig => readJsonFile<Config>(pathToConfig, i18n, data => (data as Config)))
+            // TODO - validate config!
+            .then(pathToConfig => readJsonFile<Config>(i18n, data => (data as unknown as Config)) (pathToConfig))
             .catch(previous => Promise.reject({
                 code: 'E_NOT_TAQIFIED',
                 pathProvided: dir,
@@ -113,7 +132,8 @@ export class TaqifiedDir {
             }))
             .then(config => 
                 makeFile(join(dotTaqDir, 'state.json'), i18n)
-                .then(pathToState => readJsonFile<State>(pathToState, i18n, data => (data as State)))
+                // TODO - validate state!
+                .then(pathToState => readJsonFile<State>(i18n, data => (data as State)) (pathToState))
                 .then(state => new TaqifiedDir(dir, config, state))
                 .catch(previous => Promise.reject({
                     code: 'E_STATE_MISSING',
@@ -138,7 +158,7 @@ export class TaqifiedDir {
      * @param {I18N} i18n 
      * @returns {PromiseLike<E_NOT_TAQIFIED|E_STATE_MISSING, TaqifiedDir>}
      */
-    createFromString(inputDir: string, i18n: I18N) : PromiseLike<E_NOT_TAQIFIED|E_STATE_MISSING, TaqifiedDir> {
+    static createFromString(inputDir: string, i18n: I18N) : PromiseLike<E_NOT_TAQIFIED|E_STATE_MISSING, TaqifiedDir> {
         return makeDir(inputDir, i18n)
         .then(dir => this.create(dir, i18n))
         .catch(previous => Promise.reject({
@@ -210,6 +230,7 @@ export const makePathToTaq = (i18n: I18N) => (inputPath: string) : PromiseLike<E
  */        
 export const execCmd = (cmd: string): PromiseLike<E_EXEC, string> => new Promise((resolve, reject) => {
     exec(`sh -c '${cmd}'`, (previous, stdout, msg) => {
+        log ("Executing command:") (cmd)
         if (previous) reject({code: 'E_EXEC', msg: `An unexpected error occurred when trying to execute the command`, previous, cmd})
         else if (msg.length) reject({code: 'E_EXEC', msg, cmd})
         else resolve(stdout)
@@ -226,16 +247,34 @@ export const execCmd = (cmd: string): PromiseLike<E_EXEC, string> => new Promise
 export const proxyToTaq = (pathToTaq: PathToTaq, i18n: I18N, projectDir?: PathToDir) => (taskWithArgs: string): PromiseLike<E_PROXY, string> =>
     (
         projectDir
-            ? execCmd(`${pathToTaq} -p ${projectDir} ${taskWithArgs}`)
-            : execCmd(`${pathToTaq} ${taskWithArgs}`)
+            ? execCmd(`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`)
+            : execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`)
     )
-    .catch(previous => Promise.reject({code: 'E_PROXY', msg: "There was a problem running taq.", previous}))
+    .catch(previous => {
+        if ("code" in previous) {
+            if (previous.code === 'E_EXEC') {
+                const {cmd, msg} = previous as E_EXEC
 
-export const readJsonFile = <T>(pathToFile: PathToFile, _i18n: I18N, make: (data: Record<string, unknown>) => T) =>
+                // The error message from the CLI might be JSON
+                // Try to parse it and if so, return its error information
+                return decodeJson (msg)
+                .catch(_ => false)
+                .then(err => {
+                    if (typeof err === 'object') {
+                        return Promise.reject(err)
+                    }
+                    else return Promise.reject({code: 'E_PROXY', msg: "There was a problem running taq.", previous, cmd})
+                })
+            }
+        }
+        return Promise.reject({code: 'E_PROXY', msg: "There was a problem running taq.", previous})
+    })
+
+export const readJsonFile = <T>(_i18n: I18N, make: (data: Record<string, unknown>) => T) => (pathToFile: PathToFile) =>
     readFile(pathToFile, {encoding: 'utf-8'})
     .then(data => {
         try {
-            const json = JSON.parse(data)
+            const json = parse(data)
             return make(json) as Json<T>
         }
         catch (previous) {
@@ -243,8 +282,30 @@ export const readJsonFile = <T>(pathToFile: PathToFile, _i18n: I18N, make: (data
         }
     })
 
+export const decodeJson = <T>(data: string): PromiseLike<E_INVALID_JSON, Json<T>> => {
+    try {
+        const json : Json<T> = parse(data)
+        return Promise.resolve(json)
+    }
+    catch (previous) {
+        return Promise.reject({code: 'E_INVALID_JSON', data, msg: "The provided data is invalid JSON", previous})
+    }
+}
+
 export const findTaqBinary = (i18n: I18N) : PromiseLike<E_TAQ_NOT_FOUND, string> =>
     execCmd('which taq')
     .then(path => path.trim())
     .catch(previous => Promise.reject({code: 'E_TAQ_NOT_FOUND', msg: "Could not find taq in your path.", previous}))
     .then(makePathToTaq(i18n))
+
+
+export const makeState = (_i18n: I18N) => (input: Record<string, unknown>) => {
+    // TODO: Validate input
+    return input as unknown as State
+}
+
+export const log = <T>(heading: string) => (input: T): T => {
+    console.log('**'+heading+'**')
+    console.log(input)
+    return input
+}

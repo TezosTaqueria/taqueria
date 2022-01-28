@@ -28,7 +28,14 @@
     "ecadlabs"
   ],
   "activationEvents": [
-    "onCommand:taqueria.init"
+    "onCommand:taqueria.init",
+    "onCommand:taqueria.install",
+    "onCommand:taqueria.compile_smartpy",
+    "onCommand:taqueria.compile_ligo",
+    "onCommand:taqueria.start_sandbox",
+    "onCommand:taqueria.stop_sandbox",
+    "onCommand:taqueria.list_accounts",
+    "onCommand:taqueria.deploy"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -48,7 +55,51 @@
     "commands": [
       {
         "command": "taqueria.init",
-        "title": "Taqueria: Init"
+        "category": "Taqueria",
+        "title": "Initialize Project",
+        "shortTitle": "init"
+      },
+      {
+        "command": "taqueria.install",
+        "category": "Taqueria",
+        "title": "Install Plugin",
+        "shortTitle": "install"
+      },
+      {
+        "command": "taqueria.compile_smartpy",
+        "category": "Taqueria",
+        "title": "Compile (SmartPy)",
+        "shortTitle": "compile --plugin smartpy"
+      },
+      {
+        "command": "taqueria.compile_ligo",
+        "category": "Taqueria",
+        "title": "Compile (LIGO)",
+        "shortTitle": "compile --plugin ligo"
+      },
+      {
+        "command": "taqueria.start_sandbox",
+        "category": "Taqueria",
+        "title": "Start Sandbox",
+        "shortTitle": "start sandbox <name>"
+      },
+      {
+        "command": "taqueria.stop_sandbox",
+        "category": "Taqueria",
+        "title": "Stop Sandbox",
+        "shortTitle": "stop sandbox <name>"
+      },
+      {
+        "command": "taqueria.list_accounts",
+        "category": "Taqueria",
+        "title": "List Sandbox Accounts",
+        "shortTitle": "list accounts <name>"
+      },
+      {
+        "command": "taqueria.deploy",
+        "category": "Taqueria",
+        "title": "Deploy contracts",
+        "shortTitle": "deploy"
       }
     ]
   },
@@ -76,6 +127,8 @@
     "vsce": "^2.6.4"
   },
   "dependencies": {
+    "@taqueria/protocol": "file:../taqueria-protocol",
+    "jsonc-parser": "^3.0.0",
     "promise-memoize": "^1.2.1",
     "rambda": "^7.0.1"
   }
