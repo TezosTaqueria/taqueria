@@ -116,7 +116,7 @@ jobs:
     needs: publish-sdk-to-npm
     uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
     with:
-      dir: taqueria-sdk
+      dir: taqueria-plugin-ligo
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
   
@@ -124,7 +124,7 @@ jobs:
     needs: publish-sdk-to-npm
     uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
     with:
-      dir: taqueria-sdk
+      dir: taqueria-plugin-smartpy
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
@@ -132,7 +132,7 @@ jobs:
     needs: publish-sdk-to-npm
     uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
     with:
-      dir: taqueria-sdk
+      dir: taqueria-plugin-taquito
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
