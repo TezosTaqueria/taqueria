@@ -23,26 +23,6 @@ const getCompileCommand = (opts, arch) => (sourceFile) => {
     return cmd
 }
 
-const execCmd = cmd => new Promise((resolve, reject) => {
-    exec(cmd, (err, stdout, stderr) => {
-        if (err) reject({
-            status: 'failed',
-            stdout: "",
-            stderr: err
-        })
-        else if (stderr) reject({
-            status: 'failed',
-            stdout,
-            stderr
-        })
-        else resolve({
-            status: 'success',
-            stdout,
-            stderr
-        })
-    })
-})
-
 const compileContract = (opts) => (sourceFile) =>
     getArch()
     .then(arch => getCompileCommand(opts, arch) (sourceFile))
