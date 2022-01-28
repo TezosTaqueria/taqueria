@@ -24,7 +24,8 @@ const sidebars = {
       collapsible: false,
       items: [
         "intro",
-        "getting-started/installation"
+        "getting-started/installation",
+        "pull_request_packages"
       ],
     },
     {
