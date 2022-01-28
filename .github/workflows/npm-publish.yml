@@ -10,8 +10,8 @@ on:
       NPM_TOKEN:
         required: true
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
 #   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 env:
