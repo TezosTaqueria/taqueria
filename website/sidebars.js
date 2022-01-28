@@ -27,15 +27,6 @@ const sidebars = {
         "getting-started/installation"
       ],
     },
-      type: "category",
-      label: "Contributing",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "pull_request_packages"
-      ],
-    },
     {
       type: "category",
       label: "Plugins",
