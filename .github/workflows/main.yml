@@ -97,7 +97,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-sdk-to-npm:
-    needs: publish-npm-protocol
+    needs: publish-protocol-to-npm
     uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
     with:
       dir: taqueria-sdk
