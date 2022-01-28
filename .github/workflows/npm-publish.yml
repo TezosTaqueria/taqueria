@@ -10,9 +10,9 @@ on:
       NPM_TOKEN:
         required: true
 
-# concurrency:
-#   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
-#   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 env:
   SCOPE: '@taqueria'
@@ -42,6 +42,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/v') && (contains(github.ref, '-rc') || contains(github.ref, '-beta') || contains(github.ref, '-test'))
         run: |
           echo "::set-output name=npm-tag::next"
+
+      - name: Prepare package.json for publishing
+        run: npm run prod-config
 
       - name: Install any dependencies
         run: npm ci
