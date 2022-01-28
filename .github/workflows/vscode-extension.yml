@@ -64,6 +64,7 @@ jobs:
         with:
           pat: stub
           dryRun: true
+          yarn: true
           packagePath: ${{ env.VSCODE_DIR }}
       - id: setArtifactFilename
         run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}"
