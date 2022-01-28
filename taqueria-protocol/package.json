@@ -4,7 +4,14 @@
   "description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "get-sdk-version": "cd ../taqueria-sdk && node -e 'console.log(require(\"./package.json\").version)'",
+    "backup-config": "cp package.json package.json.orig && cp package-lock.json package-lock.json.orig",
+    "restore-config": "mv package.json.orig package.json && mv package-lock.json.orig package-lock.json",
+    "update-sdk-version": "sed -I -e \"s/file:\\.\\.\\/taqueria-sdk/`npm run get-sdk-version | tail -1`/\" package.json",
+    "update-sdk-version-lock": "sed -I -e \"s/file:\\.\\.\\/taqueria-sdk/`npm run get-sdk-version | tail -1`/\" package-lock.json",
+    "prod-config": "npm run backup-config && npm run update-sdk-version && npm run update-sdk-version-lock",
+    "build-prod": "npm run backup-config && npm run prod-config && npm run build && npm run restore-config"
   },
   "keywords": [
     "taqueria",
