@@ -14,10 +14,10 @@ on:
 #   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
 #   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
-# env:
-#   SCOPE: '@taqueria'
-#   NPM_REGISTRY: 'https://registry.npmjs.org/'
-#   GH_REGISTRY: 'https://npm.pkg.github.com/'
+env:
+  SCOPE: '@taqueria'
+  NPM_REGISTRY: 'https://registry.npmjs.org/'
+  GH_REGISTRY: 'https://npm.pkg.github.com/'
 
 jobs:
   build-and-publish-npm-packages:
@@ -32,10 +32,10 @@ jobs:
     #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v2
-      # - uses: actions/setup-node@v2
-        # with: 
-        #   registry-url: ${{ env.NPM_REGISTRY }}
-        #   scope: "${{ env.SCOPE }}"
+      - uses: actions/setup-node@v2
+        with: 
+          registry-url: ${{ env.NPM_REGISTRY }}
+          scope: "${{ env.SCOPE }}"
 
       # - run: cd $HOME
 
