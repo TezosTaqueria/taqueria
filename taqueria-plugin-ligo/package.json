@@ -14,6 +14,7 @@
     "update-sdk-version": "sed -i -e \"s/file:\\.\\.\\/taqueria-sdk/`npm run get-sdk-version | tail -1`/\" package.json",
     "update-sdk-version-lock": "sed -i -e \"s/file:\\.\\.\\/taqueria-sdk/`npm run get-sdk-version | tail -1`/\" package-lock.json",
     "prod-config": "npm run backup-config && npm run update-sdk-version && npm run update-sdk-version-lock",
+    "prod-config-ci": "npm run prod-config",
     "build-prod": "npm run backup-config && npm run prod-config && npm run build && npm run restore-config"
   },
 
