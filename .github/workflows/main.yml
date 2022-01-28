@@ -129,6 +129,17 @@ jobs:
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
+  publish-flextesa-plugin-to-npm:
+    needs:
+      - publish-ligo-plugin-to-npm
+      - publish-smartpy-plugin-to-npm
+      - publish-taquito-plugin-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
+    with:
+      dir: taqueria-plugin-flextesa
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
 
   pr-comment:
     runs-on: ubuntu-latest
@@ -139,6 +150,7 @@ jobs:
       - publish-ligo-plugin-to-npm
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
+      - publish-flextesa-plugin-to-npm
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
@@ -203,6 +215,7 @@ jobs:
       - publish-ligo-plugin-to-npm
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
+      - publish-flextesa-plugin-to-npm
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v2
