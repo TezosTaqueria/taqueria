@@ -23,6 +23,12 @@ export const log = <T>(message: string) => (input: T) : T => {
     return input
 }
 
+
+export const debug = <T>(input: T) => {
+    debugger
+    return input
+}
+
 const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
 
 export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map (() => path))
