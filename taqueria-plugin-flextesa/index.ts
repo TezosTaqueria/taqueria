@@ -2,7 +2,7 @@ import {Plugin, Task, PositionalArg} from '@taqueria/node-sdk'
 import proxy from './proxy'
 
 Plugin.create(_i18n => ({
-    name: "flextesa",
+    alias: "flextesa",
     schema: "1.0",
     version: "0.1",
     tasks: [

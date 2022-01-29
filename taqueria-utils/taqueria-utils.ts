@@ -11,7 +11,7 @@ export const decodeJson = (encoded: string) => Fluture((rej: reject, res:resolve
         const data = JSON.parse(encoded)
         res(data)
     } catch (err) {
-        rej({kind: "E_INVALID_JSON", msg: "TODO, should this use i18n?", previous: err})
+        rej({kind: "E_INVALID_JSON", msg: "The provided JSON could not be decoded.", previous: err, context: encoded})
     }
     return () => {}
 })
@@ -19,6 +19,12 @@ export const decodeJson = (encoded: string) => Fluture((rej: reject, res:resolve
 export const log = <T>(message: string) => (input: T) : T => {
     console.log(message)
     console.log(input)
+    return input
+}
+
+
+export const debug = <T>(input: T) => {
+    debugger
     return input
 }
 

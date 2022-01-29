@@ -1,6 +1,6 @@
 name: main
 
-on: 
+on:
   pull_request:
     branches:
       - main
@@ -9,16 +9,19 @@ on:
     tags:
       - v*
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
-  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+  release:
+    types: [published]
+
+env:
+  SCOPE: '@taqueria'
 
 jobs:
-  build-and-test:
+  build-binaries:
     permissions:
       contents: 'read'
       id-token: 'write'
     runs-on: ${{ matrix.os }}
+    if: github.event_name != 'release'
     strategy:
       fail-fast: true
       matrix:
@@ -26,15 +29,15 @@ jobs:
          - os: ubuntu-latest
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
-           taqueria_bin: "taqueria"
+           taqueria_bin: "taq"
          - os: windows-latest
            os_short: windows
            deno_target: "x86_64-pc-windows-msvc"
-           taqueria_bin: "taqueria.exe"
+           taqueria_bin: "taq.exe"
          - os: macOS-latest
            os_short: macos
            deno_target: "x86_64-apple-darwin"
-           taqueria_bin: "taqueria"
+           taqueria_bin: "taq"
 
     outputs:
       public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
@@ -42,9 +45,7 @@ jobs:
       public-url-macos: ${{ steps.public-url.outputs.macos }}
 
     env:
-      DENO_DIR: ./deno
       DENO_TARGET: ${{ matrix.deno_target }}
-      TAQ_BIN: 
 
     steps:
       - name: Setup repo
@@ -61,9 +62,9 @@ jobs:
         id: build-bin
         shell: bash
         run: |
-          deno compile --output taqueria --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
+          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
-          mv "${{ matrix.taqueria_bin }}" "taqueria.${{ matrix.deno_target }}"
+          mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
       - name: Authenticate with GCP
         id: gcp-auth
@@ -76,33 +77,123 @@ jobs:
         id: upload-file
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
-          path: "taqueria.${{ matrix.deno_target }}"
+          path: "taq.${{ matrix.deno_target }}"
           destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}"
 
       - name: Set public url
         id: public-url
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
+
+  publish-protocol-to-npm:
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-protocol
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
+  publish-sdk-to-npm:
+    needs: publish-protocol-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-sdk
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
+  publish-ligo-plugin-to-npm:
+    needs: publish-sdk-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-plugin-ligo
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
   
+  publish-smartpy-plugin-to-npm:
+    needs: publish-sdk-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-plugin-smartpy
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
+  publish-taquito-plugin-to-npm:
+    needs: publish-sdk-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-plugin-taquito
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
+  publish-flextesa-plugin-to-npm:
+    needs:
+      - publish-ligo-plugin-to-npm
+      - publish-smartpy-plugin-to-npm
+      - publish-taquito-plugin-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
+    with:
+      dir: taqueria-plugin-flextesa
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
+
   pr-comment:
     runs-on: ubuntu-latest
-    needs:
-      - build-and-test
+    needs: 
+      - build-binaries
+      - publish-protocol-to-npm
+      - publish-sdk-to-npm
+      - publish-ligo-plugin-to-npm
+      - publish-smartpy-plugin-to-npm
+      - publish-taquito-plugin-to-npm
+      - publish-flextesa-plugin-to-npm
     if: github.event_name == 'pull_request'
     steps:
-      - name: create comment
+      - uses: actions/checkout@v2
+
+      - name: create pr comment
         uses: actions/github-script@v5
         id: pr-comment
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            
+            const fs = require('fs');
+
+            function readInfo(filePath) {
+              try {
+                const data = fs.readFileSync(filePath)
+                const JSONdata = JSON.parse(data.toString())
+                const name = JSONdata.name.split("/")[1]
+                const version = JSONdata.version
+                return { name, version }
+              } catch (error) {
+                console.error(`Got an error trying to read the file: ${error.message}`)
+              }
+            }
+
+            const ligo = readInfo("./taqueria-plugin-ligo/package.json")
+            const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
+            const taquito = readInfo("./taqueria-plugin-taquito/package.json")
+            const sdk = readInfo("./taqueria-sdk/package.json")
+            const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
+
+            const git_short_sha = "${{ github.sha }}".substring(1, 8)
+            const git_tag = "${{ github.ref }}".split('tags/')[1];
+
             let body = `
-              | Artifacts |
-              | --------- |
-              | [Linux](${{ needs.build-and-test.outputs.public-url-ubuntu }}) |
-              | [Windows](${{ needs.build-and-test.outputs.public-url-windows }}) |
-              | [MacOS](${{ needs.build-and-test.outputs.public-url-macos }}) |
+
+
+              | Git Commit | Artifacts |
+              | ---------- | --------- |
+              | ${git_short_sha} | [Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }}) <br /> [MacOS](${{ needs.build-binaries.outputs.public-url-macos }}) <br /> [Windows](${{ needs.build-binaries.outputs.public-url-windows }}) |
+
+
+              | npm package installation instructions |
+              | ------------------------------------- |
+              | npm install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${flextesa.name}@$0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
             `;
             
             github.rest.issues.createComment({
@@ -111,21 +202,28 @@ jobs:
               repo: context.repo.repo,
               body: body
             })
-
   release:
     name: Release
     runs-on: ubuntu-latest
     needs:
-      - build-and-test
+      - build-binaries
+      - publish-protocol-to-npm
+      - publish-sdk-to-npm
+      - publish-ligo-plugin-to-npm
+      - publish-smartpy-plugin-to-npm
+      - publish-taquito-plugin-to-npm
+      - publish-flextesa-plugin-to-npm
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
+      - uses: actions/checkout@v2
+
       - name: Download binaries 
         id: download-binaries 
         run: |
           mkdir release && cd release
-          wget ${{ needs.build-and-test.outputs.public-url-ubuntu }} -O taqueria.${GITHUB_REF/refs\/tags\//}-linux
-          wget ${{ needs.build-and-test.outputs.public-url-windows }} -O taqueria.${GITHUB_REF/refs\/tags\//}-windows.exe
-          wget ${{ needs.build-and-test.outputs.public-url-macos }} -O taqueria.${GITHUB_REF/refs\/tags\//}-macos
+          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
+          wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
+          wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
 
       - name: Release
         id: release

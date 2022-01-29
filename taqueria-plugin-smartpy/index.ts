@@ -2,7 +2,7 @@ import {Plugin, Task, Option} from '@taqueria/node-sdk'
 import compile from './compile'
 
 Plugin.create(i18n => ({
-    name: "smartpy",
+    alias: "smartpy",
     schema: "1.0",
     version: "0.1",
     tasks: [

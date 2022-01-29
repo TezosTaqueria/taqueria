@@ -109,8 +109,7 @@ node_modules
 /deno
 .vscode
 .idea
-.parcel-cache
-
+**/.parcel-cache/*
 /taqueria
 /taq
 tests/coverage
@@ -132,3 +131,10 @@ tests/coverage
 /taqueria-plugin-teztnets/index.js
 /taqueria-plugin-teztnets/index.js.map
 /taqueria-plugin-teztnets/.parcel-cache
+
+# VS Code Extension
+/taqueria-vscode-extension/out
+*.vsix
+.vscode-test
+/taqueria-vscode-extension/state.json
+/taqueria-vscode-extension/config.json
