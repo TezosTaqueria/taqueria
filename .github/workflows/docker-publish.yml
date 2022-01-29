@@ -50,7 +50,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Install npm dependencies
-        run: echo $PWD && npm ci
+        run: npm ci
 
       - name: Build package
         run: npm run build-package
