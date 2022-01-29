@@ -52,7 +52,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"
-          npm publish --tag "pr-${{ github.event.number }}" --access public
+          npm publish --tag "preview" --access public
       
       - name: Publish for prerelease
         if:  ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag == 'next'}} 
