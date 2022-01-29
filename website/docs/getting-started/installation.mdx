@@ -101,10 +101,13 @@ The following steps assume the following terminals on each operating system:
   
 1. Create a directory to install the Taqueria binary and change into that directory
 
+```shell
+mkdir ~/Downloads/taqueria && cd ~/Downloads/taqueria
+
 2. Download the latest MacOS build of Taqueria from the [releases page](https://github.com/ecadlabs/taqueria/releases/) and name the binary file 'taq'
 
 ```shell
-curl https://github.com/ecadlabs/taqueria/releases/download/untagged-d7ba60ff3f2af73f46c7/taqueria.v0.0.1-test.18-macos --output taq
+curl -LO https://taqueria.io/get/macos/taq
 ```
 
 3. Make the binary file executable
@@ -113,24 +116,32 @@ curl https://github.com/ecadlabs/taqueria/releases/download/untagged-d7ba60ff3f2
 chmod -x taq
 ```
 
-4. Add the installation directory to your $PATH
+4. Move the binary to a directory in your shell's `$PATH`
+
+```shell
+sudo mv taq /usr/local/bin
+````
 
 5. Disable MacOS Gatekeeper to allow Taqueria to run
 
 ```shell
 sudo spctl --master-disable
 ```
+::: caution
+
+Currently the taq binary is not signed for Mac OS, so in-order to run Taqueria, users must disable MacOS Gatekeeper (This is not ideal). This is a temporary workaround until we can sign the binaries (see [#129](https://github.com/ecadlabs/taqueria/issues/129)). 
+
+If you want to re-enable the MacOS Gatekeeper later on, run the command `sudo spctl --master-enable`
+
+:::
 
 </TabItem>
 <TabItem value="win" label="Windows">
-
      https://taqueria.io/get/windows/taq.exe
 </TabItem>
 <TabItem value="lnx" label="Linux">Coming soon...</TabItem>
 </Tabs>
-::: note
-    MacOS will give you a security warning and you need to approve the changes in order for Taqueria to run
-    :::
+
 
 ## Installing Taqueria Plugins
 
