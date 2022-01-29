@@ -42,7 +42,10 @@ export const defaultConfig : Config = {
                 joe: {
                     initialBalance: "1000000000"
                 }
-            }
+            },
+            label: "Local Tezos Sandbox",
+            protocol: "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            rpcUrl: "http://localhost:20000"
         }
     },
     network: {
@@ -61,17 +64,18 @@ export const defaultConfig : Config = {
 
 export const getDefaultMaxConcurrency = () => 10
 
-export const make = (data: object) : Future<TaqError, Config> => {
+export const make = (data: Record<string, unknown>) : Future<TaqError, ConfigArgs> => {
     // TODO: Change decoding/validation library
     const err = undefined
     const validData = {
         ...defaultConfig,
         ...data
     }
+
     // const [err, validData] = validate(data, ConfigDecoder)
     return err === undefined
         ? resolve(validData)
-        : reject({kind: "E_INVALID_CONFIG", msg: "TODO, should this use i18n?"})
+        : reject({kind: "E_INVALID_CONFIG", msg: "The config.json file does not adhere to the required schema."})
 }
 
 export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
@@ -100,12 +104,13 @@ export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedP
             SHA256.futureOf(JSON.stringify(config)),
             map ((hash: string) => ({
                 ...config,
-                configFile: path,
-                configDir, projectDir,
+                configFile: SanitizedAbsPath.create(path),
+                configDir,
+                projectDir,
                 hash
             }))
         )),
-        mapRej ((previous:unknown) => ({kind: "E_INVALID_CONFIG", msg: "TODO, should this use i18n?", previous})),
+        mapRej ((previous:unknown) => ({kind: "E_INVALID_CONFIG", msg: "Your config.json file looks invalid.", previous})),
     ))
 )
 

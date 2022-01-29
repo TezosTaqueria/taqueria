@@ -13,7 +13,7 @@ const config = {
 
 	onBrokenLinks: "throw",
 	onBrokenMarkdownLinks: "warn",
-	favicon: "img/favicon.ico",
+	favicon: "/img/favicon.ico",
 	organizationName: "ecadlabs", // Usually your GitHub org/user name.
 	projectName: "taqueria", // Usually your repo name.
 
@@ -21,7 +21,7 @@ const config = {
 		[
 			"@docusaurus/preset-classic",
 			/** @type {import('@docusaurus/preset-classic').Options} */
-			
+
 			({
 				docs: {
 					path: "docs",
@@ -47,7 +47,7 @@ const config = {
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
 			gtag: {
-				trackingID: 'G-R7WYMVNDR1',
+				trackingID: "G-R7WYMVNDR1",
 				anonymizeIP: true,
 			},
 			colorMode: {
@@ -70,7 +70,7 @@ const config = {
 			navbar: {
 				logo: {
 					alt: "Tezos Taqueria Logo",
-					src: "img/Taqueria_magenta_beta.svg",
+					src: "/img/Taqueria_magenta_beta.svg",
 				},
 				items: [
 					{
@@ -187,7 +187,7 @@ const config = {
 							{
 								html: `
 									<a class='footerButton' href='https://github.com/ecadlabs/taqueria'>
-										<img class='footerGihubLogoButton' src="img/githubSVG.svg" alt="" />
+										<img class='footerGihubLogoButton' src="/img/githubSVG.svg" alt="" />
 										GITHUB
 									</a>
 								  `,

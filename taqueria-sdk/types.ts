@@ -1,4 +1,4 @@
-import {TaskHandler, Action, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, RuntimeDependency, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig} from 'taqueria-protocol/taqueria-protocol-types'
+import {Action, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, RuntimeDependency, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig} from '@taqueria/protocol/taqueria-protocol-types'
 
 export type Sandbox = theSandbox
 
@@ -79,9 +79,16 @@ export interface ActionPluginInfo extends SchemaView {
 
 export type ActionResponse = ProxyAction | CheckRuntimeDependenciesAction | InstallRuntimeDependenciesAction | ActionPluginInfo | ActionNotSupported
 
+/**
+ * A Schema for a plugin should have the same properties as the PluginInfo type, but
+ * many of the properties are optional rather than required as in the PluginInfo type:
+ * - name (optional, as this can be inferred from the package.json file)
+ * - tasks, scaffolds, hooks, networks, and sandboxes - a plugin can provide 0 or more of these constructs
+ */
 export interface Schema {
     // This should match the PluginInfo, but tasks, scaffolds, hooks, networks, and sandboxes are optional
-    readonly name: string
+    readonly name?: string
+    readonly alias?: string
     readonly schema: string
     readonly version: string
     readonly tasks?: (Task | undefined)[]
@@ -96,6 +103,7 @@ export interface Schema {
 
 export interface SchemaView {
     readonly name: string
+    readonly alias?: string
     readonly schema: string
     readonly version: string
     readonly tasks: TaskView[]

@@ -1,6 +1,7 @@
-const {exec} = require('child_process')
+const {execCmd, getArch} = require('@taqueria/node-sdk')
 const {extname, basename, join} = require('path')
 const glob = require('fast-glob')
+
 
 const getContractArtifactFilename = (opts) => (sourceFile) => {
     const outFile = basename(sourceFile, extname(sourceFile))
@@ -11,10 +12,10 @@ const getInputFilename = (opts) => sourceFile => {
     return join(opts.config.contractsDir, sourceFile)
 }
 
-const getCompileCommand = (opts) => (sourceFile) => {
+const getCompileCommand = (opts, arch) => (sourceFile) => {
     const {projectDir} = opts
     const inputFile = getInputFilename (opts) (sourceFile)
-    const baseCommand = `docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:next compile contract ${inputFile}`
+    const baseCommand = `docker run --platform ${arch} --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:next compile contract ${inputFile}`
     const entryPoint = opts.e ? `-e ${opts.e}` : ""
     const syntax = opts["-s"] ? `s ${opts['s']} : ""` : ""
     const outFile = `-o ${getContractArtifactFilename(opts)(sourceFile)}`
@@ -22,28 +23,10 @@ const getCompileCommand = (opts) => (sourceFile) => {
     return cmd
 }
 
-const execCmd = cmd => new Promise((resolve, reject) => {
-    exec(cmd, (err, stdout, stderr) => {
-        if (err) reject({
-            status: 'failed',
-            stdout: "",
-            stderr: err
-        })
-        else if (stderr) reject({
-            status: 'failed',
-            stdout,
-            stderr
-        })
-        else resolve({
-            status: 'success',
-            stdout,
-            stderr
-        })
-    })
-})
-
 const compileContract = (opts) => (sourceFile) =>
-    execCmd(getCompileCommand(opts) (sourceFile))
+    getArch()
+    .then(arch => getCompileCommand(opts, arch) (sourceFile))
+    .then(execCmd)
     .then(() => ({contract: sourceFile, artifact: getContractArtifactFilename(opts) (sourceFile)}))
 
 const compileAll = parsedArgs => {

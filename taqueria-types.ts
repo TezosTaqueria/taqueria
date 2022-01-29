@@ -46,6 +46,10 @@ export interface RawInitArgs {
     plugin?: string
     env: 'production' | 'development' | 'testing' | string
     quickstart: string
+    disableState: boolean
+    logPluginCalls: boolean
+    build: string
+    fromVsCode: boolean
 }
 
 export interface SanitizedInitArgs {
@@ -57,13 +61,17 @@ export interface SanitizedInitArgs {
     plugin?: string
     env: 'production' | 'development' | 'testing' | string
     quickstart: string
+    disableState: boolean
+    logPluginCalls: boolean
+    build: string
+    fromVsCode: boolean
 }
 
 export interface i18n {
     __(msg: string, ...params: string[]): string
 }
 
-export type EnvKey = "TAQ_CONFIG_DIR" | "TAQ_MAX_CONCURRENCY" | "TAQ_PROJECT_DIR" | "TAQ_ENV"
+export type EnvKey = "TAQ_CONFIG_DIR" | "TAQ_MAX_CONCURRENCY" | "TAQ_PROJECT_DIR" | "TAQ_ENV" | "TAQ_DISABLE_STATE"
 
 export interface EnvVars {
     get: (key: EnvKey) => undefined | string
@@ -119,16 +127,18 @@ type TaskCounts = Record<string, string[]>
 
 export class State {
     [stateType]: void
+    build: string
     configHash: SHA256
     tasks: PluginTaskMap
     networks: Network[]
     plugins: PluginInfo[]
 
-    protected constructor(configHash: SHA256, tasks: PluginTaskMap, networks: Network[], plugins: PluginInfo[]) {
+    protected constructor(build: string, configHash: SHA256, tasks: PluginTaskMap, networks: Network[], plugins: PluginInfo[]) {
         this.configHash = configHash
         this.tasks = tasks
         this.networks = networks
         this.plugins = plugins
+        this.build = build
     }
 
     protected static mapTasksToPlugins = (config: Config, pluginInfo: PluginInfo[], i18n: i18n) => {
@@ -204,8 +214,8 @@ export class State {
         []
     )
 
-    static create(config: ConfigArgs, pluginInfo: PluginInfo[], i18n: i18n) {
+    static create(build: string, config: ConfigArgs, pluginInfo: PluginInfo[], i18n: i18n) {
         const taskMap = this.mapTasksToPlugins(config, pluginInfo, i18n)
-        return new State(config.hash, taskMap, [], pluginInfo)
+        return new State(build, config.hash, taskMap, [], pluginInfo)
     }
 }

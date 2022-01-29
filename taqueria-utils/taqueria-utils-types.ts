@@ -19,11 +19,13 @@ export type ErrorType =
   | "E_INVALID_CONFIG"
   | "E_INVALID_JSON"
   | "E_FORK"
+  | "E_INVALID_TASK"
 
 export interface TaqError {
     readonly kind: ErrorType,
     msg: string,
     previous?: TaqError | Error
+    context?: unknown
 }
 
 const sanitizedPathType: unique symbol = Symbol()
@@ -36,17 +38,20 @@ export class SanitizedPath extends StringLike{
 }
 
 const sanitizedAbsPath: unique symbol = Symbol()
-export class SanitizedAbsPath extends SanitizedPath {
+export class SanitizedAbsPath {
     [sanitizedAbsPath]: void
-    protected constructor(value: string) {
-        super(resolvePath(value))
+    readonly value: string
+    protected constructor(value: string, cwd?: SanitizedAbsPath) {
+        this.value = cwd
+            ? resolvePath(cwd.join(value).value)
+            : resolvePath(value)
     }
     public join(...paths: string[]): SanitizedAbsPath {
         return new SanitizedAbsPath(join(this.value, ...paths))
     }
     
-    static create(value: string) {
-        return new SanitizedAbsPath(super.create(value).value)
+    static create(value: string, cwd?: SanitizedAbsPath) {
+        return new SanitizedAbsPath(value, cwd)
     }
 }
 
