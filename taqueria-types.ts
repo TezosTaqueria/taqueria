@@ -41,6 +41,7 @@ export interface RawInitArgs {
     _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
     projectDir: string // path to the project
     configDir: string
+    scaffoldUrl?: string;
     maxConcurrency: number
     debug: boolean
     plugin?: string
@@ -56,6 +57,7 @@ export interface SanitizedInitArgs {
     _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
     projectDir: SanitizedAbsPath
     configDir: SanitizedPath,
+    scaffoldUrl?: string;
     maxConcurrency: number,
     debug: boolean,
     plugin?: string

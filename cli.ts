@@ -110,7 +110,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         )
     )
     .command(
-        'scaffold [scaffoldUrl] [projectDir]',
+        'scaffold [scaffoldUrl]',
         i18n.__('scaffoldDesc'),
         (yargs: Arguments) => {
             yargs
@@ -119,17 +119,17 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
                     type: 'string',
                     default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git',
                 })
-                // TODO: Make this a named arg
-                .positional('projectDir', {
-                    describe: i18n.__('scaffoldProjectDirDesc'),
+                .option('p', {
+                    alias: 'projectDir',
                     type: 'string',
+                    describe: i18n.__('scaffoldProjectDirDesc'),
                     default: './taqueria-quickstart',
                 })
         },
         (args: RawInitArgs) => pipe(
             sanitizeArgs(args), 
             ({scaffoldUrl, projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
-                return scaffoldProject(scaffoldUrl, projectDir, configDir, i18n, maxConcurrency, quickstart)
+                return scaffoldProject(scaffoldUrl ?? '', projectDir, configDir, i18n, maxConcurrency, quickstart)
             },
             fork (console.error) (console.log)
         )
@@ -304,29 +304,59 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
 
 const scaffoldProject = (scaffoldUrl: string, projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
     // Clone git into destination folder (Initial version assumes git is installed)
-    chain (() => {
-        throw new Error('Not Implemented');
+    attemptP(async () => {
+        // TODO: Convert to fluture
+        // TODO: i18n of messages
+
+        console.log(`scaffolding\n into: ${projectDir.value}\n from: ${scaffoldUrl}\n...`)
 
         // Verify projectDir does not exist
+        try {
+            await Deno.stat(projectDir.value);
+            return Promise.reject({kind: 'E_SCAFFOLD_PROJECT_DIR_ALREADY_EXISTS', msg: 'TODO i18n message'})
+        } catch(_e) {
+            // Expect exception when trying to stat a new directory
+        }
 
         // git clone
-    }),
-    // Run init found in .taq/scaffold.json
-    chain (() => {
-        throw new Error('Not Implemented');
+        console.log(`git clone...`)
 
+        const cloneProcess = Deno.run({
+            cmd: ["git", "clone", scaffoldUrl, projectDir.value],
+        });
+        const cloneResult = await cloneProcess.status();
+        
+        if (!cloneResult.success) {
+            return Promise.reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'TODO i18n message'})
+        }
+
+
+        // Run init found in .taq/scaffold.json
+        console.log(`initializing...`)
+        // TODO: Run initialization script
         // Load .taq/scaffold.json (if it exists)
-
         // Run init command
-    }),
-    // Cleanup:
-    // - Remove ./.taq/scaffold.json
-    // - Remove ./.git/
-    chain (() => {
-        throw new Error('Not Implemented');
 
-        // Delete .taq/scaffold.json
-        // Delete .git/
+
+        // Cleanup:
+        console.log(`cleanup...`)
+
+        try {
+            console.log(`removing ${joinPaths(projectDir.value, `.taq/scaffold.json`)}`)
+            await Deno.remove(joinPaths(projectDir.value, `.taq/scaffold.json`));
+        } catch {
+            // Ignore if doesn't exist
+        }
+        try {
+            console.log(`removing ${joinPaths(projectDir.value, `.git`)}`)
+            await Deno.remove(joinPaths(projectDir.value, `.git`), { recursive: true });
+        } catch {
+            // Ignore if doesn't exist
+        }
+
+
+        // Done!
+        console.log(`scaffolding complete!`)
     }),
     // Done
     map (() => i18n.__("scaffoldDoneMsg"))
