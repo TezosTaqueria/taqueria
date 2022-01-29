@@ -87,7 +87,7 @@ jobs:
 
   publish-protocol-to-npm:
     needs: build-binaries
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@${{github.sha}}
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-protocol
     secrets:
@@ -95,7 +95,7 @@ jobs:
 
   publish-sdk-to-npm:
     needs: publish-protocol-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@${{github.sha}}
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
     with:
       dir: taqueria-sdk
     secrets:
@@ -103,7 +103,7 @@ jobs:
 
   publish-ligo-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
     with:
       dir: taqueria-plugin-ligo
     secrets:
@@ -111,7 +111,7 @@ jobs:
   
   publish-smartpy-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
     with:
       dir: taqueria-plugin-smartpy
     secrets:
@@ -119,7 +119,7 @@ jobs:
 
   publish-taquito-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
     with:
       dir: taqueria-plugin-taquito
     secrets:
