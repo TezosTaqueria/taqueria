@@ -1,0 +1,67 @@
+name: npm-publish
+
+on:
+  workflow_call:
+    inputs:
+      dir:
+        type: string
+        required: true
+    secrets:
+      NPM_TOKEN:
+        required: true
+
+env:
+  SCOPE: '@taqueria'
+  NPM_REGISTRY: 'https://registry.npmjs.org/'
+  GH_REGISTRY: 'https://npm.pkg.github.com/'
+
+jobs:
+  build-and-publish-npm-packages:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.dir }}
+    env: 
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with: 
+          registry-url: ${{ env.NPM_REGISTRY }}
+          scope: "${{ env.SCOPE }}"
+
+      - name: Check tag suffix
+        id: check-tag-suffix
+        if: startsWith(github.ref, 'refs/tags/v') && (contains(github.ref, '-rc') || contains(github.ref, '-beta') || contains(github.ref, '-test'))
+        run: |
+          echo "::set-output name=npm-tag::next"
+
+      - name: Prepare package.json for publishing
+        run: npm run prod-config-ci
+
+      - name: Install any dependencies
+        run: npm ci
+
+      - name: Build package
+        run: npm run build-ci
+      
+      - name: Publish for PR
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"
+          npm publish --tag "preview" --access public
+      
+      - name: Publish for prerelease
+        if:  ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag == 'next'}} 
+        run: |
+          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
+          npm publish --tag 'next' --access public
+      
+      - name: Publish for official release
+        if: ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag != 'next'}} 
+        run: |
+          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
+          npm publish --tag 'latest' --access public

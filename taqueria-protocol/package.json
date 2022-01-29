@@ -4,7 +4,9 @@
   "description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-ci": "echo \"just passing through for CI, no need to build\" && exit 0",
+    "prod-config-ci": "echo \"just passing through for CI, no need to update SDK dependency\" && exit 0"
   },
   "keywords": [
     "taqueria",
@@ -18,6 +20,13 @@
   ],
   "author": "ECAD Labs",
   "license": "Apache-2.0",
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecadlabs/taqueria.git",
+    "directory": "taqueria-protocol"
+  },
+
   "bugs": {
     "url": "https://github.com/ecadlabs/taqueria/issues"
   },
