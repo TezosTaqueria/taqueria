@@ -187,9 +187,14 @@ export interface UnvalidatedNetwork {
     readonly attributes?: Attributes
 }
 
+// NOTE: This is a workaround as TypeScript doesn't support
+// recursive / cyclical types yet. :(
+type Accounts_Base = Record<string, AccountDetails>
+export type Accounts = Record<string, (keyof Accounts_Base)|AccountDetails>
+
 export interface UnvalidatedSandbox extends UnvalidatedNetwork {
     readonly plugin?: string
-    readonly accounts?: Record<string, AccountDetails>
+    readonly accounts?: Accounts 
 }
 
 const hookType: unique symbol = Symbol()
@@ -464,7 +469,7 @@ export interface SandboxConfig {
     readonly rpcUrl?: string
     readonly protocol?: string
     readonly attributes?: Attributes
-    readonly accounts: Record<string|'default', AccountDetails|string>
+    readonly accounts: Accounts
 }
 
 export interface NetworkConfig {
@@ -510,6 +515,7 @@ export class EconomicalProtocolHash extends StringLike {
 
 const economicProtocalType: unique symbol = Symbol()
 export class EconomicalProtocol {
+    [economicProtocalType]: void
     readonly hash: EconomicalProtocolHash
     readonly label: HumanReadableIdentifier | undefined
     constructor(hash: EconomicalProtocolHash, label: (HumanReadableIdentifier|undefined)=undefined) {
@@ -555,11 +561,11 @@ export class Network {
 
 const sandboxType: unique symbol = Symbol()
 export class Sandbox extends Network {
-    readonly accounts: Record<string, AccountDetails>
+    readonly accounts: Accounts
     [sandboxType]: void
     readonly plugin?: string
 
-    protected constructor(name: HumanReadableIdentifier, label: StringMax30, rpcUrl: Url, protocol: EconomicalProtocol, attributes: Attributes, plugin?: string, accounts?: Record<string, AccountDetails>) {
+    protected constructor(name: HumanReadableIdentifier, label: StringMax30, rpcUrl: Url, protocol: EconomicalProtocol, attributes: Attributes, plugin?: string, accounts?: Accounts) {
         super(name, label, rpcUrl, protocol, attributes)
         this.plugin = plugin
         this.accounts = accounts ? accounts: {}
