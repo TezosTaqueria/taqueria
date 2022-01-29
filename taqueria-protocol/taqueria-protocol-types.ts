@@ -3,6 +3,10 @@
 // or errors emited
 // @ts-ignore
 import {SanitizedAbsPath, SHA256} from '../taqueria-utils/taqueria-utils-types.ts'
+// @ts-ignore
+import {urlParse} from './url-parse.ts'
+
+type URL = ReturnType<typeof urlParse>
 
 /**
  * String-like types
@@ -104,7 +108,7 @@ export class Url {
     }
     static create(value: string): Url | undefined {
         try {
-            const url = new URL(value)
+            const url = urlParse(value)
             return new Url(url)
         }
         catch (_) {

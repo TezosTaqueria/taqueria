@@ -30,11 +30,11 @@ const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: st
 }
 
 const getConfigureCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
-    return `docker exec --platform ${arch} ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --configure`
+    return `docker exec ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --configure`
 }
 
 const getImportAccountsCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
-    return `docker exec --platform ${arch} ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --importAccounts`
+    return `docker exec ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --importAccounts`
 }
 
 const doesUseFlextesa = (sandbox: Sandbox) => !sandbox.plugin || sandbox.plugin === 'flextesa'
@@ -182,7 +182,7 @@ const getAccountBalances =(sandbox: Sandbox): Promise<ProxyAction> => {
 
             const getBalanceProcess =
                 getArch()
-                .then(arch => `docker exec --platform ${arch} ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
+                .then(arch => `docker exec ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
                 .then(execCmd)
                 .then(result => result.status === 'success'
                     ? ({account: accountName, balance: result.stdout})

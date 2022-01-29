@@ -17,6 +17,7 @@ export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (ta
 
 type CLIConfig = ReturnType<typeof yargs> & {
     completion: () => CLIConfig
+    handled?: boolean
 }
 
 /**
@@ -108,6 +109,18 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
             fork (console.error) (console.log)
         )
     )
+    .option('fromVsCode', {
+        describe: i18n.__('fromVsCodeDesc'),
+        default: false,
+        boolean: true
+    })
+    .hide('fromVsCode')
+    .command(
+        'testFromVsCode',
+        false,
+        () => {},
+        () => console.log("OK")
+    )
     .help(false)
 
 
@@ -192,6 +205,43 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             fork (displayError(cliConfig)) (console.log)
         )
     )
+    .command(
+        'list-known-tasks',
+        false, // hide
+        () => {},
+        (inputArgs: RawInitArgs) => pipe(
+            parsedArgs.projectDir.join('.taq', 'state.json').value,
+            readFile,
+            chain (decodeJson),
+            map ((state: State) => Object.entries(debug(state.tasks)).reduce(
+                (retval: Record<string, string[] | null>, [taskName, implementation]) => {
+                    if ('task' in implementation) {
+                        const task = implementation as Task
+                        const plugins = 
+                            task.options
+                                ? task.options.reduce(
+                                    (retval: string[], option) => 
+                                        option.choices
+                                            ? [...retval, ...option.choices]
+                                            : retval,
+                                    []
+                                )
+                                : []
+                        const obj: Record<string, string[]> = {}
+                        obj[taskName] = plugins
+                        return {...retval, ...obj}
+                    }
+                    else {
+                        const obj: Record<string, null> = {}
+                        obj[taskName] = null
+                        return {...retval, ...obj}
+                    }
+                },
+                {}
+            )),
+            fork (displayError(cliConfig)) (console.log)
+        )
+    )
     .demandCommand()
     .completion()
     .help(),
@@ -202,11 +252,11 @@ const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync(
 
 const initNPM = (projectDir: SanitizedAbsPath, i18n: i18n) => pipe(
     readFile(projectDir.join("package.json").value),
-    chainRej (() => reject({code: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir}))
+    chainRej (() => reject({kind: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir}))
 )
 
 const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath) => pipe(
-    readFile(debug(SanitizedAbsPath.create(pluginNameOrPath, projectDir)).join('package.json').value),
+    readFile(SanitizedAbsPath.create(pluginNameOrPath, projectDir).join('package.json').value),
     chainRej (() => readFile(projectDir.join("node_modules", pluginNameOrPath, "package.json").value))
 )
 
@@ -341,11 +391,13 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
 
             if (!stdout && stderr) {
                 return Promise.reject({
-                    kind: 'E_INVALID_JSON',
-                    msg: 'TODO i18n message',
+                    kind: 'E_INVALID_PLUGIN_RESPONSE',
+                    msg: `The ${plugin.name} plugin experienced an error when executing the ${action}.`,
                     context: {
                         stderr,
-                        stdout
+                        stdout,
+                        parsedArgs,
+                        requestArgs
                     }
                 })
             }
@@ -451,6 +503,8 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
             )
         },
         handler: (inputArgs: Record<string, unknown>) => {
+            // @ts-ignore
+            cliConfig.handled = true
             if (Array.isArray(task.handler)) {
                 console.log("This is a composite task!")
                 return;
@@ -541,7 +595,8 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
             (parsedArgs: SanitizedInitArgs) => loadState(cliConfig, config, env, parsedArgs, i18n, state)
         ))
     )),
-    chain (parseArgs)
+    chain (parseArgs),
+    map (showInvalidTask(cliConfig))
 )
 
 const getStateAbspath = (parsedArgs: SanitizedInitArgs): SanitizedAbsPath => 
@@ -588,6 +643,20 @@ const computeState = (stateAbspath: SanitizedAbsPath, config: ConfigArgs, env: E
         chain ((state:State) => writeState(stateAbspath, state))
     )
 }
+
+const executingBuiltInTask = (inputArgs: SanitizedInitArgs | RawInitArgs) =>
+    [
+        'init',
+        'install',
+        'uninstall',
+        'testFromVsCode',
+        'list-known-tasks',
+        'listKnownTasks',
+
+    ].reduce(
+        (retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
+        false
+    )
             
 export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
     try {
@@ -600,7 +669,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                 map (sanitizeArgs),
                 chain ((initArgs: SanitizedInitArgs) => {
                     if (initArgs.debug) debugMode(true)
-                    return initArgs._.includes('init')
+                    return initArgs._.includes('init') || initArgs._.includes('testFromVsCode')
                         ? resolve(initArgs)
                         : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
                 }),
@@ -613,9 +682,22 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
     }
 }
 
+export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedInitArgs) => {
+    if (executingBuiltInTask(parsedArgs) || cli.handled) {
+        return parsedArgs
+    }
+    const err: TaqError = {kind: 'E_INVALID_TASK', msg: `Taqueria isn't aware of this task. Perhaps you need to install a plugin first?`, context: parsedArgs}
+    return displayError (cli) (err)
+}
+
 export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
-    cli.getInternalMethods().getCommandInstance().usage.showHelp()
-    console.error("") // empty line
+    const inputArgs = (cli.parsed as unknown as {argv: RawInitArgs}).argv
+    
+    if (!inputArgs.fromVsCode) {
+        cli.getInternalMethods().getCommandInstance().usage.showHelp()
+        console.error("") // empty line
+    }
+
     if (isTaqError(err)) {
         switch (err.kind) {
             case 'E_INVALID_CONFIG':
@@ -623,8 +705,11 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
                 break;
             default: {
                 const encoder = new TextEncoder()
-                const output = encoder.encode(JSON.stringify(err, undefined, 4))
-                Deno.stdout.writeSync(output)
+                const json = inputArgs.fromVsCode
+                    ? JSON.stringify(err, undefined, 0)
+                    : JSON.stringify(err, undefined, 4)
+                const output = encoder.encode(json)
+                Deno.stderr.writeSync(output)
             }
         }
     }
@@ -642,7 +727,8 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     quickstart: parsedArgs.quickstart,
     disableState: parsedArgs.disableState,
     build: parsedArgs.build,
-    logPluginCalls: parsedArgs.logPluginCalls
+    logPluginCalls: parsedArgs.logPluginCalls,
+    fromVsCode: parsedArgs.fromVsCode
 })
 
 export default {

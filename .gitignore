@@ -135,3 +135,5 @@ tests/coverage
 /taqueria-vscode-extension/out
 *.vsix
 .vscode-test
+/taqueria-vscode-extension/state.json
+/taqueria-vscode-extension/config.json
