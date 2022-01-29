@@ -1,26 +1,26 @@
 import {execSync} from "child_process";
 import fs from "fs";
 
-const taqueriaProject = './e2e/auto-test';
+const taqueriaProjectPath = './e2e/auto-test';
 
 describe("E2E Testing for taqueria general functionality", () => {
     test('Verify that taq init creates test folder', () => {
 
         try {
-            execSync("taqueria init e2e/auto-test")
-        } catch(error){
+            const stdout = execSync("taq init e2e/auto-test").toString();
+            expect(stdout.trim()).toEqual("Project taq'ified!")
+        } catch(error) {
             throw new Error (`error: ${error}`);
         }
 
-        setTimeout(() => {}, 2000);
-        const isTaquified = fs.existsSync(taqueriaProject);
+        const isTaquified = fs.existsSync(taqueriaProjectPath);
         expect(isTaquified).toBeTruthy();
-        expect(isTaquified).toEqual("Project taq'ified!")
     });
+
 
     afterAll(() => {
         try {
-            fs.rmdirSync(taqueriaProject, { recursive: true })
+            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }
