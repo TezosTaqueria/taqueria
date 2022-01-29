@@ -1,13 +1,11 @@
-import { assertEquals, assertThrows, unreachable } from "https://deno.land/std@0.121.0/testing/asserts.ts";
-import {fork} from 'https://cdn.skypack.dev/fluture';
+import { assertEquals, assertRejects, unreachable } from "https://deno.land/std@0.121.0/testing/asserts.ts";
+import {fork, promise} from 'https://cdn.skypack.dev/fluture';
 import {
-    commonElements,
     decodeJson,
     isTaqError,
-    isUrl,
     log,
     mkdir,
-    readFile, renderTemplate, uncommonElements,
+    readFile, renderTemplate,
     writeTextFile
 } from "../../../taqueria-utils/taqueria-utils.ts";
 import chai from "https://cdn.skypack.dev/chai@4.3.4?dts";
@@ -29,7 +27,7 @@ Deno.test("Positive scenario test for {decodeJson} function", () => {
 // TODO: Ask Michael if it is possible
 // This test was built to try to test return () => {} (line 16)
 // But it does not work, need to ask Michael about is there any way to test it
-Deno.test("Positive scenario test for {decodeJson} function with empty {}", () => {
+Deno.test("Positive scenario test for {decodeJson} function to return () => {}", () => {
     const result = decodeJson("{}");
     // @ts-ignore
     const assertSuccess = (testJsonOutput: any) => assertEquals(testJsonOutput, {});
@@ -64,11 +62,9 @@ Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t) =>
         // @ts-ignore
         await t.step("run test for {mkdir} function", async () => {
             const assert = chai.assert;
-            const result = mkdir("./unit/taqueria-utils/data/test");
+            const result = await promise(mkdir("./unit/taqueria-utils/data/test"));
             // @ts-ignore
-            const assertSuccess = (result) => exists(result).then((result) => assert.equal(result, true));
-            const assertUnreachable = () => unreachable();
-            fork(assertUnreachable)(assertSuccess)(result);
+            exists(result).then((result) => assert.equal(result, true));
         });
         // @ts-ignore
         await t.step("clean up", async () => {
@@ -83,32 +79,28 @@ Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t) =>
     sanitizeOps: false
 },);
 
-// TODO: Ask Michael if there is a way to test
-//   34 |             .then(data => {
-//   35 |                 const decoded = decoder.decode(data)
-//   36 |                 return decoded
-//   37 |             })
-// And
-//   40 |         return () => {}
+// TODO: Add test to this line return () => {} same for decodeJson()
 Deno.test({name: "Positive scenario test for {readFile} function",  fn: async () => {
-        const result = readFile("./unit/taqueria-utils/data/testRead.txt");
-        // @ts-ignore
-        const assertSuccess = (result) => assert.equal(result, 'testRead');
-        const assertUnreachable = () => unreachable();
-        fork(assertUnreachable)(assertSuccess)(result);
+        let result
+        try {
+            const result = await promise (readFile("./unit/taqueria-utils/data/testRead.txt"));
+            assertEquals(result, 'testRead');
+        }
+        catch {
+            unreachable()
+        }
     },
     sanitizeResources: false,
     sanitizeOps: false
 });
 
 // @ts-ignore
+// TODO: Re-write it same as negative
 Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: async (t) => {
         await t.step("run test for {writeTextFile} function", async () => {
-            const result = await writeTextFile("./unit/taqueria-utils/data/testWrite.txt", "testWrite");
+            const result = await promise (writeTextFile("./unit/taqueria-utils/data/testWrite.txt", "testWrite"));
             // @ts-ignore
-            const assertSuccess = (result) => assert.equal(result, 'testWrite');
-            const assertUnreachable = () => unreachable();
-            fork(assertUnreachable)(assertSuccess)(result);
+            // assert.equal(result, 'testWrite');
         });
         // @ts-ignore
         await t.step("clean up", async () => {
@@ -123,16 +115,14 @@ Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: asy
     sanitizeOps: false
 });
 
-// TODO: Ask Michael if it is correct
-Deno.test({name: "Negative scenario test for {writeTextFile} function",  fn: async () => {
-        const result = await writeTextFile(".\.\/", "");
-        const assertFailed = () => assertThrows( ()=> {
-            throw new Error("Is a directory (os error 21), open '../'\n")
+
+Deno.test({name: "Negative scenario test for {writeTextFile} function to catch error",  fn: async () => {
+        assertRejects( ()=> {
+                promise (writeTextFile("./unit/taqueria-utils/data/temp", "test"));
+                throw new Error("Is a directory (os error 21), open './unit/taqueria-utils/data/temp'\n")
             },
-            Error, "Is a directory (os error 21), open '../'\n"
+            Error, "Is a directory (os error 21), open './unit/taqueria-utils/data/temp'\n"
         );
-        const assertUnreachable = () => unreachable();
-        fork (assertFailed) (assertUnreachable) (result);
     },
     sanitizeResources: false,
     sanitizeOps: false
@@ -162,62 +152,11 @@ Deno.test({name: "Negative scenario test for {isTaqError} function",  fn: async 
     sanitizeOps: false
 });
 
-// TODO: It does not work properly, need to ask Michael how to resolve fork()
-// Because currently it returns noop function if to use same way as for reject, resolve
-Deno.test({name: "Positive scenario test for {isUrl} function",  fn: async () => {
-        const assert = chai.assert;
-        const urlTest = "http://path";
-        const result = isUrl(urlTest);
-        // @ts-ignore
-        // const assertResult = (result) => assert.equal(result, 'http://path');
-        // const assertUnreachable = () => unreachable();
-        // fork(assertUnreachable)(assertResult)(result);
-
-    },
-    sanitizeResources: false,
-    sanitizeOps: false
-});
-
 Deno.test({name: "Positive scenario test for {renderTemplate} function",  fn: async () => {
         const assert = chai.assert;
         const testTemplate = "<p>My favorite kind of cake is: <%= it.favoriteCake %></p>";
         const result = renderTemplate(testTemplate, { favoriteCake: "Chocolate!" });
         assert.equal(result, "<p>My favorite kind of cake is: Chocolate!</p>")
-    },
-    sanitizeResources: false,
-    sanitizeOps: false
-});
-
-Deno.test({name: "Positive scenario test for {commonElements} function one level",  fn: async () => {
-        const result = commonElements([["a", "b"], ["c", "a"]]);
-        console.log(result)
-    },
-    sanitizeResources: false,
-    sanitizeOps: false
-});
-
-// TODO: Need ask Michael how to call it recursively
-// To be able to verify
-//   65 |     const process = (arr1: unknown[], arr2: unknown[]) => arr1.reduce(
-//   66 |         (retval: unknown[], current) => arr2.includes(current) ? [...retval, current] : retval,
-//   67 |         []
-//   68 |     )
-// And
-//   73 |         const result = process(a, b)
-//   74 |         return recursiveProcess([result, ...remainingArrs])
-//   75 |     }
-Deno.test({name: "Positive scenario test for {commonElements} function multiple levels",  fn: async () => {
-        const result = commonElements([["a", "b"], ["c", "a"]]);
-        console.log(result)
-    },
-    sanitizeResources: false,
-    sanitizeOps: false
-});
-
-Deno.test({name: "Positive scenario test for {uncommonElements} function",  fn: async () => {
-        const assert = chai.assert;
-        const result = uncommonElements(["a","b"], ["a","d"]);
-        assert.equal(isArray(result), true)
     },
     sanitizeResources: false,
     sanitizeOps: false

@@ -1,8 +1,7 @@
 import type {Future, reject, resolve, TaqError} from './taqueria-utils-types.ts'
-import Url from './url.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {fork, attemptP, map, Future as Fluture} from 'https://cdn.skypack.dev/fluture';
+import { attemptP, map, Future as Fluture} from 'https://cdn.skypack.dev/fluture';
 import JSON from "https://deno.land/x/json5/mod.ts";
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
@@ -53,32 +52,8 @@ export const isTaqError = (err: unknown) : err is TaqError => {
     return (err as TaqError).kind !== undefined
 }
 
-export const isUrl = (input:string) => fork (() => false) (() => true) (Url.make(input))
-
 export const memoize = memoizy({})
 
 export const joinPaths = _joinPaths
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string
-
-export const commonElements = (...arrs: (unknown[])[]): unknown[] => {
-    const process = (arr1: unknown[], arr2: unknown[]) => arr1.reduce(
-        (retval: unknown[], current) => arr2.includes(current) ? [...retval, current] : retval,
-        []
-    )
-
-    const recursiveProcess = (arrs: (unknown[])[]): unknown[] => {
-        const [a, b, ...remainingArrs] = arrs
-        if (!b) return a
-        const result = process(a, b)
-        return recursiveProcess([result, ...remainingArrs])
-    }
-    
-    return recursiveProcess(arrs)
-}
-
-
-export const uncommonElements = (a: unknown[], b: unknown[]) => a.reduce(
-    (retval: unknown[], current) => b.includes(current) ? retval : [...retval, current],
-    []
-)

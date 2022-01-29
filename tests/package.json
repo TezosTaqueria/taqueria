@@ -1,12 +1,13 @@
 {
   "name": "@taqueria/test",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "This is Taqueria testing project includes unit, integration and e2e tests",
   "main": "index.js",
   "scripts": {
     "test:unit": "deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
+    "test:unit:selected": "deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",
     "test:integration": "jest --config jest.config.integration.ts --no-cache",
-    "test:e2e": "jest --detectOpenHandles -i 'plugin-init.spec.ts' --config jest.config.e2e.ts --no-cache"
+    "test:e2e": "jest --detectOpenHandles -i 'taqueria-plugin-ligo.spec.ts' --config jest.config.e2e.ts --no-cache"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,6 @@
   },
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "devDependencies": {
-    "@taqueria/plugin-ligo": "file:../taqueria-plugin-ligo",
     "@taquito/taquito": "^11.0.2",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.8",
