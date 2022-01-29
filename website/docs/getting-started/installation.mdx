@@ -26,21 +26,17 @@ Questions:
 
 Installing Taqueria is a quick and easy process if you understand a few basic concepts and follow the steps outlined in this guide
 
-Taqueria is a software suite that includies the core CLI, a VS Code extension, and a set of plugins
-
-The Taqueria components available for installation are:
+Taqueria is a software suite that includies:
 
 - The Taqueria CLI, an executable binary file named `taq` installed globally in your `$PATH` that implements the Taqueria CLI, SDK and protocol
-- An optional VS Code plugin 'Taqueria' installed directly through the VS Code Extension Marketplace
-- Any number of Taqueria plugins installed n a ***per-project*** basis via the CLI or VS Code Extension
+- A VS Code plugin installed directly through the VS Code Extension Marketplace
+- A set of plugins which get installed on a ***per-project*** basis through Taqueria CLI or VS Code Extension
 
 ## Requirements
 
 ### Taqueria CLI
 
-The requirements for the Taqueria CLI are minimal:
-
-- A unix shell in a compatable operating system:
+- A compatable operating system:
   - MacOS
   - Linux
   - Windows (via [WSL](https://docs.microsoft.com/en-us/windows/wsl/))
@@ -48,7 +44,7 @@ The requirements for the Taqueria CLI are minimal:
 
 ### Taqueria Plugins
 
-Taqueria plugins may have their own dependencies such as:
+Taqueria plugins may each have their own dependencies such as:
 
   - [Node.js](https://nodejs.org/) 
   - [LIGO](https://ligolang.org)
@@ -65,91 +61,80 @@ The VS Code Extension requires a recent version of Microsoft Visual Studio Code 
 
 Installing the Taqueria CLI involves the following steps:
 
-1. Download the correct build of Taqueria for your operating system to an installation directory of your choice
+1. Download the correct build of Taqueria for your operating system
 2. Make the Taqueria binary `taq` executable
-3. Ensure your shell's `$PATH` includes the Taqueria installation directory
+3. Add `taq` to your shell's `$PATH`
 
-Once these steps are complete, you will be able to run Taqueria from your terminal using the 'taq' command
+Once these steps are complete, you will be able to run Taqueria from your terminal using the `taq` command
 
-Step by step instructions for installing the Taqueria CLI on a Windows, MacOS, or Linux machine are detailed in the following section. If you are comfortable with downloading the unsigned Taqueria binary and configuring it to run in your terminal on your own, you can find the correct build for your local machine [here](https://github.com/ecadlabs/taqueria/releases), and then skip to the [Installing Taqueria Plugins Section](#installing-taqueria-pluginsz)
 
-### OS Specific Installation Instructions
+### OS Specific Instructions
 
-To make installation as fast as possible, you can follow the steps detalled below for your particular operating system. Note that these steps are simply one method for installation. You can adjust the particular directories and shell configuration if you feel comfortable doing so
+
+
+To make installation as fast as possible, you can follow the steps detalled below for your particular operating system
 
 The following steps assume the following terminals on each operating system:
 
-- MacOS: zsh
-- Linux: bash
-- Windows: bash (via [WSL](https://docs.microsoft.com/en-us/windows/wsl/install))
+
 
 <Tabs groupId="operating-systems">
 <TabItem value="mac" label="MacOS">
   
-1. Create a directory to install the Taqueria binary and change into that directory
+1. Download the latest MacOS build of Taqueria
 
-```shell
-mkdir ~/Downloads/taqueria && cd ~/Downloads/taqueria
-
-2. Download the latest MacOS build of Taqueria from the [releases page](https://github.com/ecadlabs/taqueria/releases/) and name the binary file 'taq'
-
-```shell
-curl -LO https://taqueria.io/get/macos/taq
+```zsh
+cd ~/Downloads && curl -LO https://taqueria.io/get/macos/taq
 ```
 
 3. Make the binary file executable
 
-```shell
+```zsh
 chmod -x taq
 ```
 
 4. Move the binary to a directory in your shell's `$PATH`
 
-```shell
+```zsh
 sudo mv taq /usr/local/bin
 ````
 
 5. Disable MacOS Gatekeeper to allow Taqueria to run
 
-```shell
+```zsh
 sudo spctl --master-disable
 ```
-::: caution
 
-Currently the taq binary is not signed for Mac OS, so in-order to run Taqueria, users must disable MacOS Gatekeeper (This is not ideal). This is a temporary workaround until we can sign the binaries (see [#129](https://github.com/ecadlabs/taqueria/issues/129)). 
+Currently the taq binary is not signed for Mac OS, so in-order to run Taqueria, users must disable MacOS Gatekeeper (This is not ideal). This is a temporary workaround until we can sign the binaries (see [#129](https://github.com/ecadlabs/taqueria/issues/129))
 
 If you want to re-enable the MacOS Gatekeeper later on, run the command `sudo spctl --master-enable`
 
-:::
 
 </TabItem>
-<TabItem value="lnx" label="Linux">Coming soon...</TabItem>
+<TabItem value="lnx" label="Linux">
 
-1. Create a directory to install the Taqueria binary and change into that directory
+1. Download the latest Linux build of Taqueria
 
-```shell
-mkdir ~/Downloads/taqueria && cd ~/Downloads/taqueria
-
-2. Download the latest MacOS build of Taqueria from the [releases page](https://github.com/ecadlabs/taqueria/releases/) and name the binary file 'taq'
-
-```shell
-curl -LO https://taqueria.io/get/linux/taq
+```bash
+cd ~/Downloads && curl -LO https://taqueria.io/get/linux/taq
 ```
 
-3. Make the binary file executable
+2. Make the binary file executable
 
-```shell
+```bash
 chmod -x taq
 ```
 
-4. Move the binary to a directory in your shell's `$PATH`
+3. Move the binary to a directory in your shell's `$PATH`
 
-```shell
+```bash
 sudo mv taq /usr/local/bin
-</Tabs>
+```
+
+</TabItem>
 <TabItem value="win" label="Windows">
 
-We reccomend Windows users run [WSL](https://docs.microsoft.com/en-us/windows/wsl/install) and follow the instructions for Linux users
+We reccomend Windows users run [WSL](https://docs.microsoft.com/en-us/windows/wsl/install) and follow the instructions detailed for Linux users
 
 A Windows x86_64 binary is available for those who are interested, however this is entirley unsupported and not reccomended
 
@@ -158,6 +143,10 @@ curl -LO https://taqueria.io/get/windows/taq.exe
 ```
 
 </TabItem>
+</Tabs>
+
+## Installing the VS Code Extension
+
 
 ## Installing Taqueria Plugins
 
