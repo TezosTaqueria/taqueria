@@ -5,7 +5,7 @@ import styles from "./WhyTaqueria.module.css";
 const FeatureList = [
   {
     title: "Why Taqueria?",
-    gif: require("../../../static/gif/mp4gifcode.mp4").default,
+    gif: require("../../../static/gif/taqueria_init.mp4").default,
     features: [
       {
         icon: require("../../../static/img/briefcase.svg").default,
