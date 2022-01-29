@@ -18,7 +18,7 @@ const attributesToParams = (attributes: Attributes): Record<string, string> => [
     {}
 )
 
-const getDockerImage = () => 'taqueria/flextesa:latest'
+const getDockerImage = () => 'ghcr.io/ecadlabs/taqueria-flextesa:latest'
 
 const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
     const _envVars = Object.entries(attributesToParams(sandbox.attributes)).reduce(
