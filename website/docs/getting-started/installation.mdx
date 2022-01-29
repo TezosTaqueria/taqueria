@@ -1,9 +1,10 @@
 ---
-title: Installing Taqueria
+title: Installation
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 <!-- -----
 Content Type: How-to Guide
@@ -26,11 +27,10 @@ Questions:
 
 Installing Taqueria is a quick and easy process if you understand a few basic concepts and follow the steps outlined in this guide
 
-Taqueria is a software suite that includies:
+There are two main components to install:
 
-- The Taqueria CLI, an executable binary file named `taq` installed globally in your `$PATH` that implements the Taqueria CLI, SDK and protocol
+- The Taqueria CLI, an executable binary named `taq` installed globally in your shell's `$PATH`
 - A VS Code plugin installed directly through the VS Code Extension Marketplace
-- A set of plugins which get installed on a ***per-project*** basis through Taqueria CLI or VS Code Extension
 
 ## Requirements
 
@@ -42,14 +42,6 @@ Taqueria is a software suite that includies:
   - Windows (via [WSL](https://docs.microsoft.com/en-us/windows/wsl/))
 - [Docker](https://www.docker.com/) 
 
-### Taqueria Plugins
-
-Taqueria plugins may each have their own dependencies such as:
-
-  - [Node.js](https://nodejs.org/) 
-  - [LIGO](https://ligolang.org)
-  - [Python](https://www.python.org/)
-  - [SmartPY](https://smartpy.io/)
 
 ### VS Code Extension
 
@@ -69,14 +61,6 @@ Once these steps are complete, you will be able to run Taqueria from your termin
 
 
 ### OS Specific Instructions
-
-
-
-To make installation as fast as possible, you can follow the steps detalled below for your particular operating system
-
-The following steps assume the following terminals on each operating system:
-
-
 
 <Tabs groupId="operating-systems">
 <TabItem value="mac" label="MacOS">
@@ -134,7 +118,7 @@ sudo mv taq /usr/local/bin
 </TabItem>
 <TabItem value="win" label="Windows">
 
-We reccomend Windows users run [WSL](https://docs.microsoft.com/en-us/windows/wsl/install) and follow the instructions detailed for Linux users
+We recomend Windows users run [WSL](https://docs.microsoft.com/en-us/windows/wsl/install) and follow the instructions detailed for Linux users
 
 A Windows x86_64 binary is available for those who are interested, however this is entirley unsupported and not reccomended
 
@@ -147,11 +131,11 @@ curl -LO https://taqueria.io/get/windows/taq.exe
 
 ## Installing the VS Code Extension
 
+The Taqueria VS Code Extension is installed from the Extensions pane within VS Code. The steps to install are:
 
-## Installing Taqueria Plugins
+1. Open the Extensions pane
+2. Type `Taqueria` in the search bar
+3. Click install
 
-Taqueria plugins each implement a specific function such as a smart contract language, testnet, sandbox, or test framework. Taqueria plugins often rely on 3rd party software libraries such as LIGO or Docker which need to be installed on your machine for the plugin to work correctly
+<img src={useBaseUrl('/img/taqueria-plugin-vscode-install.png')} />;
 
-Taqueria is designed to be flexible, streamlined, and customizable so plugins are installed on a per-project basis depending on the particular smart contract language, test framework, sandbox environment, and testnet used in the project
-
-Once installed, plugins provide their functionality by exposing tasks in the Taqueria CLI. The tasks available to run on a particular project can be viewed by running the `shell taq --help ` command in a project directory that's using Taqueria
