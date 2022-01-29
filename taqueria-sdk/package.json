@@ -13,13 +13,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx esbuild --bundle index.ts --outfile=index.js --minify --platform=node --sourcemap",
+    "build-ci": "npm run build",
     "gen-schema": "npx ts-node schema-generator.ts",
     "backup-config": "cp package.json package.json.orig && cp package-lock.json package-lock.json.orig",
     "restore-config": "mv package.json.orig package.json && mv package-lock.json.orig package-lock.json",
     "get-protocol-version": "cd ../taqueria-protocol && node -e 'console.log(require(\"./package.json\").version)'",
-    "set-protocol-version": "sed -I -e \"s/file:\\.\\.\\/taqueria-protocol/`npm run get-protocol-version | tail -1`/\" package.json",
-    "set-protocol-version-lock": "sed -I -e \"s/file:\\.\\.\\/taqueria-protocol/`npm run get-protocol-version | tail -1`/\" package-lock.json",
+    "set-protocol-version": "sed -i -e \"s/file:\\.\\.\\/taqueria-protocol/`npm run get-protocol-version | tail -1`/\" package.json",
+    "set-protocol-version-lock": "sed -i -e \"s/file:\\.\\.\\/taqueria-protocol/`npm run get-protocol-version | tail -1`/\" package-lock.json",
     "prod-config": "npm run backup-config && npm run set-protocol-version && npm run set-protocol-version-lock",
+    "prod-config-ci": "npm run prod-config",
     "build-prod": "npm run backup-config && npm run prod-config && npm run build && npm run restore-config"
   },
   "keywords": [

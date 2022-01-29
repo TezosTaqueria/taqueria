@@ -1,0 +1,3 @@
+/get/macos/taq https://github.com/ecadlabs/taqueria/releases/latest/download/taq-macos 307
+/get/linux/taq https://github.com/ecadlabs/taqueria/releases/latest/download/taq-linux 307
+/get/windows/taq.exe https://github.com/ecadlabs/taqueria/releases/latest/download/taq-windows.exe 307

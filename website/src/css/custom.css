@@ -135,6 +135,8 @@ a.menu__link--active {
 	font-size: 14px !important;
 	background-color: rgba(231, 144, 87, 0.2) !important;
 	border-radius: 24px;
+	padding-bottom: 20px;
+	padding-top: 20px;
 }
 
 li.theme-doc-sidebar-item-link {
@@ -213,11 +215,17 @@ a.menu__link--sublist {
 	padding-bottom: 15px;
 }
 
+.footer__title {
+	white-space: nowrap;
+}
+
 .footer .container {
 	display: flex;
 	flex-direction: row-reverse;
 	justify-content: space-between;
 	width: 100%;
+	margin-left: 0px !important;
+	margin-right: 0px !important;
 }
 .footer__links {
 	display: flex;
@@ -230,6 +238,8 @@ a.menu__link--sublist {
 }
 .footer__links .footer__col {
 	flex: unset;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
 }
 .footer__links > div:nth-of-type(1) {
 	width: 20%;
@@ -269,7 +279,7 @@ a.menu__link--sublist {
 	padding: 12px 18px;
 	background-color: var(--ifm-color-primary);
 	color: #373f41;
-	font-size: 15px;
+	font-size: 12px;
 	line-height: 22px;
 	font-weight: 600;
 	letter-spacing: 0.3px;
@@ -305,22 +315,6 @@ a.menu__link--sublist {
 	margin-bottom: 8px;
 }
 
-.signupButton {
-	height: fit-content;
-	white-space: nowrap;
-	padding: 5px 18px;
-	background-color: var(--ifm-color-primary);
-	color: #373f41;
-	font-size: 12px;
-	line-height: 22px;
-	font-weight: 600;
-	letter-spacing: 0.3px;
-	font-family: Montserrat;
-	border-radius: 3px;
-	margin-bottom: 50px !important;
-	border: none;
-}
-
 .copyright {
 	white-space: nowrap;
 	color: #000000;
@@ -332,8 +326,10 @@ a.menu__link--sublist {
 }
 
 .footerGihubLogoButton {
-	transform: translateY(5px);
+	transform: translateY(7px);
 	padding-right: 5px;
+	width: 22px;
+	height: 22px;
 }
 .row .col.col.col {
 	padding-left: 5%;
@@ -362,6 +358,11 @@ a.menu__link--sublist {
 		--ifm-col-width: 50%;
 		flex-basis: unset;
 		margin-left: 0;
+	}
+	.footer__links .footer__col {
+		flex: unset;
+		padding-left: 40px !important;
+		padding-right: 40px !important;
 	}
 
 	.footer .container {
