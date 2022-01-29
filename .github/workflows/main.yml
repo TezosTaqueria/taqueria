@@ -87,7 +87,7 @@ jobs:
 
   publish-protocol-to-npm:
     needs: build-binaries
-    uses: ./.github/workflows/npm-publish.yml
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
     with:
       dir: taqueria-protocol
     secrets:
