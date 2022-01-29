@@ -81,7 +81,7 @@ The following steps assume the following terminals on each operating system:
 
 - MacOS: zsh
 - Linux: bash
-- Windows: bash (via WSL)
+- Windows: bash (via [WSL](https://docs.microsoft.com/en-us/windows/wsl/install))
 
 <Tabs groupId="operating-systems">
 <TabItem value="mac" label="MacOS">
@@ -123,12 +123,41 @@ If you want to re-enable the MacOS Gatekeeper later on, run the command `sudo sp
 :::
 
 </TabItem>
-<TabItem value="win" label="Windows">
-     https://taqueria.io/get/windows/taq.exe
-</TabItem>
 <TabItem value="lnx" label="Linux">Coming soon...</TabItem>
-</Tabs>
 
+1. Create a directory to install the Taqueria binary and change into that directory
+
+```shell
+mkdir ~/Downloads/taqueria && cd ~/Downloads/taqueria
+
+2. Download the latest MacOS build of Taqueria from the [releases page](https://github.com/ecadlabs/taqueria/releases/) and name the binary file 'taq'
+
+```shell
+curl -LO https://taqueria.io/get/linux/taq
+```
+
+3. Make the binary file executable
+
+```shell
+chmod -x taq
+```
+
+4. Move the binary to a directory in your shell's `$PATH`
+
+```shell
+sudo mv taq /usr/local/bin
+</Tabs>
+<TabItem value="win" label="Windows">
+
+We reccomend Windows users run [WSL](https://docs.microsoft.com/en-us/windows/wsl/install) and follow the instructions for Linux users
+
+A Windows x86_64 binary is available for those who are interested, however this is entirley unsupported and not reccomended
+
+```shell
+curl -LO https://taqueria.io/get/windows/taq.exe
+```
+
+</TabItem>
 
 ## Installing Taqueria Plugins
 
