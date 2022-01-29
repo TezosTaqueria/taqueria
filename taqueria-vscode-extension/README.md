@@ -6,20 +6,20 @@ The Taqueria extension provides a seamless development workflow to easily build,
 
 ## A Better Development Experience
 The Taqueria extension brings all of the power of the Taqueria right into Visual Studio code so you can:
-1. Keep everything in one place
-1. Deploy with ease
-1. Effortlessly compile
-1. Simplify testing
+1. All the power of Taqueria right in the command palette 
+1. Complie your smart contracts with a single command
+1. Simplfy your testing workflow
+1. Deploy to a sandbox, testnet, or main-net with ease
 
 All while being fully customizable to fit into your Tezos development workflow.
 
 ## Features:
 1. All of the Taqueria power inside of Visual Studio Code
-1. Initialize new projects
-1. Add the plugins you need
-1. Compile smart contracts in in Ligo or SmartPy
-1. Deploy smart contracts to any network
-1. Start and stop a local sandbox
+2. Initialize new projects
+3. Add the plugins you need
+4. Compile smart contracts in in Ligo or SmartPy
+5. Deploy smart contracts to any network
+6. Start and stop a local sandbox
 
 ## Quick Start
 
