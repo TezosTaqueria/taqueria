@@ -32,7 +32,7 @@ jobs:
       vsixPath: ${{ steps.packageExtension.outputs.vsixPath }}
     steps:
       env:
-        WORKSPACE: ${{ env.VSCODE_DIR }}
+        GIT_WORKSPACE: "${{ env.VSCODE_DIR }}"
       - name: Checkout Source
         uses: actions/checkout@v2
       - name: Setup GIT for Windows
@@ -47,14 +47,14 @@ jobs:
       - name: Install Dependencies
         run: npm ci
       - name: Linter
-        run: npm run lint --workspace $WORKSPACE 
+        run: npm run lint --workspace $GIT_WORKSPACE 
       - name: Compile TS
-        run: npm run compile --workspace $WORKSPACE
+        run: npm run compile --workspace $GIT_WORKSPACE
       - name: Run Unit Tests on Windows or macOS
-        run: npm run test --workspace $WORKSPACE
+        run: npm run test --workspace $GIT_WORKSPACE
         if: runner.os != 'Linux'
       - name: Run Unit Tests on Linux
-        run: xvfb-run -a npm test --workspace $WORKSPACE
+        run: xvfb-run -a npm test --workspace $GIT_WORKSPACE
         if: runner.os == 'Linux'
       - name: Package VSCode Extension
         if: runner.os == 'Linux'
