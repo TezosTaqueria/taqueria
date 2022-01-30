@@ -503,7 +503,6 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
             )
         },
         handler: (inputArgs: Record<string, unknown>) => {
-            // @ts-ignore
             cliConfig.handled = true
             if (Array.isArray(task.handler)) {
                 console.log("This is a composite task!")
