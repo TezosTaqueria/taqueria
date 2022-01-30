@@ -38,12 +38,18 @@ jobs:
           echo "::set-output name=npm-tag::next"
 
       - name: Install any dependencies
+        env:
+          GIT_WORKSPACE: "${{ inputs.dir }}"
         run: npm ci
 
       - name: Build package
+        env:
+          GIT_WORKSPACE: "${{ inputs.dir }}"
         run: npm run --workspace $GIT_WORKSPACE build-ci
       
       - name: Publish for PR
+        env:
+          GIT_WORKSPACE: "${{ inputs.dir }}"
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"
@@ -51,12 +57,16 @@ jobs:
       
       - name: Publish for prerelease
         if:  ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag == 'next'}} 
+        env:
+          GIT_WORKSPACE: "${{ inputs.dir }}"
         run: |
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
           npm publish --workspace=$GIT_WORKSPACE --tag 'next' --access public
       
       - name: Publish for official release
         if: ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag != 'next'}} 
+        env:
+          GIT_WORKSPACE: "${{ inputs.dir }}"
         run: |
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
           npm publish --workspace=$GIT_WORKSPACE --tag 'latest' --access public
