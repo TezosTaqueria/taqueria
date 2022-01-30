@@ -23,7 +23,7 @@ I like adding my project directory to the PATH environment variable which allows
 > E.g. On my computer, this would be: `echo 'export PATH=$PATH:/Users/mweichert/Projects/taqueria' >> ~/.bashrc`
 
 ## Create a project
-1. Initialize a new project: `taqueria init test-project`
+1. Initialize a new project: `taq init test-project`
 2. Change directories: `cd test-project`
 3. Initialize the project as an NPM project: `npm init -y`
 4. Install the LIGO plugin: `taq install ../taqueria-plugin-ligo` if installing from a clone of this repo, otherwise use `taq install @taqueria/plugin-ligo`
