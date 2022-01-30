@@ -7,7 +7,7 @@ import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.skypack.dev/fluture';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {make, getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {isTaqError, debug, joinPaths, mkdir, readTextFile, writeTextFile, decodeJson, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
+import {isTaqError, log, debug, joinPaths, mkdir, readTextFile, writeTextFile, decodeJson, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
@@ -39,9 +39,24 @@ const getFromEnv = <T>(key: EnvKey, defaultValue:T, env: EnvVars) =>
     env.get(key) || defaultValue
 
 
-const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) => 
+const getVersion = (inputArgs: DenoArgs, i18n: i18n) => {
+    const i = inputArgs.findIndex(str => str === '--setVersion')
+    return i > -1
+        ? inputArgs[i+1]
+        : "not-provided"
+}
+    
+const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
     yargs(args)
     .scriptName('taq')
+    .option('setVersion', {
+        describe: i18n.__('setVersionDesc'),
+        demandOption: true,
+        requiresArg: true,
+        type: "string"
+    })
+    .hide('setVersion')
+    .version(getVersion(args, i18n))
     .option('disableState', {
         describe: i18n.__('disableStateDesc'),
         default: getFromEnv('TAQ_DISABLE_STATE', false, env),
@@ -54,11 +69,13 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         boolean: true
     })
     .hide('logPluginCalls')
-    .option('build', {
+    .option('setBuild', {
         describe: i18n.__('buildDesc'),
-        default: Date.now().toString()
+        demandOption: true,
+        requiresArg: true,
+        type: "string"
     })
-    .hide('build')
+    .hide('setBuild')
     .option('maxConcurrency', {
         describe: i18n.__('maxConcurrencyDesc'),
         default: getFromEnv('TAQ_MAX_CONCURRENCY', getDefaultMaxConcurrency(), env),
@@ -611,7 +628,7 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
         chain (readTextFile),
         chain (decodeJson),
         chain ((data: {build: string}) =>
-            typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.build
+            typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.setBuild
                 ? resolve(data as State)
                 : reject("state.json was generated with a different build of taqueria")
         ),
@@ -633,7 +650,7 @@ const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqErr
 
 const getComputedState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => pipe(
     retrieveAllPluginInfo(config, env, i18n, parsedArgs),
-    map ((pluginInfo: PluginInfo[]) => State.create(parsedArgs.build, config, pluginInfo, i18n))
+    map ((pluginInfo: PluginInfo[]) => State.create(parsedArgs.setBuild, config, pluginInfo, i18n))
 )
 
 const computeState = (stateAbspath: SanitizedAbsPath, config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => {
@@ -668,6 +685,10 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                 map (sanitizeArgs),
                 chain ((initArgs: SanitizedInitArgs) => {
                     if (initArgs.debug) debugMode(true)
+                    if (initArgs.version) {
+                        console.log(initArgs.setVersion)
+                        return Promise.resolve(initArgs)
+                    }
                     return initArgs._.includes('init') || initArgs._.includes('testFromVsCode')
                         ? resolve(initArgs)
                         : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
@@ -725,9 +746,11 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     env: parsedArgs.env,
     quickstart: parsedArgs.quickstart,
     disableState: parsedArgs.disableState,
-    build: parsedArgs.build,
     logPluginCalls: parsedArgs.logPluginCalls,
-    fromVsCode: parsedArgs.fromVsCode
+    fromVsCode: parsedArgs.fromVsCode,
+    setBuild: parsedArgs.setBuild,
+    setVersion: parsedArgs.setVersion,
+    version: parsedArgs.version
 })
 
 export default {
