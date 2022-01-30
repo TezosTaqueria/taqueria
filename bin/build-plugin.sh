@@ -1,6 +1,9 @@
 #!/bin/bash
-npm install
-HASBUILD=`node -e "console.log(require('./package.json').scripts.build ? 'true': 'false')"`
-if [ $HASBUILD = "true" ]; then
-    npm run build
+WORKSPACE=$1
+INSTALL="$2"
+
+if [ -n $INSTALL ]; then
+    npm install
 fi
+
+npm run build --workspace=$WORKSPACE

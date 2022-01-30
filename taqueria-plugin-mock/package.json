@@ -22,7 +22,7 @@
     },
     "homepage": "https://github.com/ecadlabs/taqueria#readme",
     "dependencies": {
-      "@taqueria/node-sdk": "file:../taqueria-sdk"
+      "@taqueria/node-sdk": "^0.0.1"
     }
   }
   

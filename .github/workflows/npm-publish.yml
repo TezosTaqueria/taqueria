@@ -21,9 +21,6 @@ jobs:
     permissions:
       packages: write
       contents: read
-    defaults:
-      run:
-        working-directory: ${{ inputs.dir }}
     env: 
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
@@ -32,6 +29,8 @@ jobs:
         with: 
           registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
+        env:
+          WORKSPACE: ${{ inputs.dir }}
 
       - name: Check tag suffix
         id: check-tag-suffix
@@ -39,29 +38,26 @@ jobs:
         run: |
           echo "::set-output name=npm-tag::next"
 
-      - name: Prepare package.json for publishing
-        run: npm run prod-config-ci
-
       - name: Install any dependencies
         run: npm ci
 
       - name: Build package
-        run: npm run build-ci
+        run: npm run --workspace $WORKSPACE build-ci
       
       - name: Publish for PR
         if: ${{ github.event_name == 'pull_request' }}
         run: |
           npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"
-          npm publish --tag "preview" --access public
+          npm publish --workspace $WORKSPACE--tag "preview" --access public
       
       - name: Publish for prerelease
         if:  ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag == 'next'}} 
         run: |
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
-          npm publish --tag 'next' --access public
+          npm publish --workspace=$WORKSPACE --tag 'next' --access public
       
       - name: Publish for official release
         if: ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag != 'next'}} 
         run: |
           npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
-          npm publish --tag 'latest' --access public
+          npm publish --workspace=$WORKSPACE --tag 'latest' --access public

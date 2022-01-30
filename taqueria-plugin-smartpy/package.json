@@ -14,15 +14,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx parcel build --no-cache",
     "build-ci": "npm run build",
-    "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
-    "get-sdk-version": "cd ../taqueria-sdk && node -e 'console.log(require(\"./package.json\").version)'",
-    "backup-config": "cp package.json package.json.orig && cp package-lock.json package-lock.json.orig",
-    "restore-config": "mv package.json.orig package.json && mv package-lock.json.orig package-lock.json",
-    "update-sdk-version": "sed -i -e \"s/file:\\.\\.\\/taqueria-sdk/`npm run get-sdk-version | tail -1`/\" package.json",
-    "update-sdk-version-lock": "sed -i -e \"s/file:\\.\\.\\/taqueria-sdk/`npm run get-sdk-version | tail -1`/\" package-lock.json",
-    "prod-config": "npm run backup-config && npm run update-sdk-version && npm run update-sdk-version-lock",
-    "prod-config-ci": "npm run prod-config",
-    "build-prod": "npm run backup-config && npm run prod-config && npm run build && npm run restore-config"
+    "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
   },
 
   "keywords": [
@@ -51,7 +43,7 @@
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "dependencies": {
     "fast-glob": "^3.2.7",
-    "@taqueria/node-sdk": "file:../taqueria-sdk"
+    "@taqueria/node-sdk": "^0.0.1"
   },
   "devDependencies": {
     "parcel": "^2.0.1",
