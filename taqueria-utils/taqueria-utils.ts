@@ -33,7 +33,7 @@ const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Den
 
 export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map (() => path))
 
-export const readFile = (path: string) => Fluture(
+export const readTextFile = (path: string) => Fluture(
     (rej: reject, res: resolve) => {
         const decoder = new TextDecoder("utf-8")
         Deno.readFile(path)
@@ -59,32 +59,9 @@ export const isTaqError = (err: unknown) : err is TaqError => {
     return (err as TaqError).kind !== undefined
 }
 
-export const isUrl = (input:string) => fork (() => false) (() => true) (Url.make(input))
-
 export const memoize = memoizy({})
 
 export const joinPaths = _joinPaths
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string
 
-export const commonElements = (...arrs: (unknown[])[]): unknown[] => {
-    const process = (arr1: unknown[], arr2: unknown[]) => arr1.reduce(
-        (retval: unknown[], current) => arr2.includes(current) ? [...retval, current] : retval,
-        []
-    )
-
-    const recursiveProcess = (arrs: (unknown[])[]): unknown[] => {
-        const [a, b, ...remainingArrs] = arrs
-        if (!b) return a
-        const result = process(a, b)
-        return recursiveProcess([result, ...remainingArrs])
-    }
-    
-    return recursiveProcess(arrs)
-}
-
-
-export const uncommonElements = (a: unknown[], b: unknown[]) => a.reduce(
-    (retval: unknown[], current) => b.includes(current) ? retval : [...retval, current],
-    []
-)
