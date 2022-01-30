@@ -30,7 +30,7 @@ jobs:
           registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
         env:
-          WORKSPACE: ${{ inputs.dir }}
+          WORKSPACE: "${{ inputs.dir }}"
 
       - name: Check tag suffix
         id: check-tag-suffix
