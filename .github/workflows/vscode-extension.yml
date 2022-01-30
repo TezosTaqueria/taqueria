@@ -89,8 +89,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      env:
-        WORKSPACE: ${{ env.VSCODE_DIR }}
       - name: Checkout Source
         uses: actions/checkout@v2
       - name: Install Node
