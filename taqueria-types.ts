@@ -1,7 +1,7 @@
 import type {SanitizedPath, SanitizedAbsPath} from './taqueria-utils/taqueria-utils-types.ts'
 import {SHA256} from './taqueria-utils/taqueria-utils-types.ts'
 import {Option, Config, ConfigArgs, PluginInfo, InstalledPlugin, Verb, UnvalidatedTask, Task, UnvalidatedNetwork, Network, } from './taqueria-protocol/taqueria-protocol-types.ts'
-import {mkdir, joinPaths, commonElements, uncommonElements} from './taqueria-utils/taqueria-utils.ts'
+import {mkdir, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {resolve, map} from 'https://cdn.skypack.dev/fluture';
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 
