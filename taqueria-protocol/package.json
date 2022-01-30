@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/protocol",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
   "main": "index.js",
   "scripts": {
@@ -21,13 +21,11 @@
   ],
   "author": "ECAD Labs",
   "license": "Apache-2.0",
-
   "repository": {
     "type": "git",
     "url": "https://github.com/ecadlabs/taqueria.git",
     "directory": "taqueria-protocol"
   },
-
   "bugs": {
     "url": "https://github.com/ecadlabs/taqueria/issues"
   },

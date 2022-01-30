@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/plugin-smartpy",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A taqueria plugin for compiling SmartPy smart contracts",
   "targets": {
     "default": {
@@ -16,7 +16,6 @@
     "build-ci": "npm run build",
     "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
   },
-
   "keywords": [
     "taqueria",
     "tezos",
@@ -30,13 +29,11 @@
   ],
   "author": "ECAD Labs",
   "license": "Apache-2.0",
-
   "repository": {
     "type": "git",
     "url": "https://github.com/ecadlabs/taqueria.git",
     "directory": "taqueria-plugin-smartpy"
   },
-
   "bugs": {
     "url": "https://github.com/ecadlabs/taqueria/issues"
   },
