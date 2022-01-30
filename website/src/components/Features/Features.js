@@ -16,21 +16,21 @@ const FeatureList = [
         icon: require("../../../static/img/briefcase.png").default,
         description:
           "The Taqueria CLI and VS Code plugin bring your development tools to you. Stop moving your code jumping between IDEs. With Taqueria’s plugin infrastructure you can use the tools you need all in one place.",
-        img: require("../../../static/img/everything_in_one_place.png").default,
-      },
-      {
-        title: "Deploy with ease",
-        icon: require("../../../static/img/briefcase.png").default,
-        description:
-          "Remove the complexity of deploying to different networks using Taqueria. Deploy smart contracts directly to a sandbox, testnet or the Tezos network.",
-        img: require("../../../static/img/deploy_with_ease.png").default,
+        gif: require("../../../static/gif/taq_init.mp4").default,
       },
       {
         title: "Effortlessly compile",
         icon: require("../../../static/img/briefcase.png").default,
         description:
           "Taqueria compiles smart contracts written in Ligo.  SmartPy and Michelson compilation is coming soon.",
-        img: require("../../../static/img/effortlessly_compile.png").default,
+        gif: require("../../../static/gif/taq_compile.mp4").default,
+      },
+      {
+        title: "Deploy with ease",
+        icon: require("../../../static/img/briefcase.png").default,
+        description:
+          "Remove the complexity of deploying to different networks using Taqueria. Deploy smart contracts directly to a sandbox, testnet or the Tezos network.",
+          gif: require("../../../static/gif/taq_originate.mp4").default,
       },
       // {
         
@@ -45,7 +45,7 @@ const FeatureList = [
         icon: require("../../../static/img/briefcase.png").default,
         description:
           "Use Taqueria the way you want to. Taqueria has the flexibility to fit into your workflow the way you need it.",
-        img: require("../../../static/img/fully_customizable.png").default,
+        gif: require("../../../static/gif/taq_plugins.mp4").default,
       },
     ],
   },

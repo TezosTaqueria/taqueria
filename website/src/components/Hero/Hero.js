@@ -29,14 +29,14 @@ const FeatureList = [
 				icon: require("../../../static/img/briefcase.png").default,
 				description:
 					"Installing the Taqueria is easy",
-				gif: require("../../../static/gif/taqueria_hero.mp4").default,
+				gif: require("../../../static/gif/taq_hero.mp4").default,
 			},
 			{
 				title: "Installing the Taqueria VS Code Extension",
 				icon: require("../../../static/img/briefcase.png").default,
 				description:
 					"Taqueria has a VS Code extension available in the marketplace",
-				gif: require("../../../static/gif/taqueria_hero.mp4").default,
+				gif: require("../../../static/gif/taq_hero.mp4").default,
 			},
 		],
 	},
