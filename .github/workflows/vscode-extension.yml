@@ -27,13 +27,12 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - windows-latest
-    defaults:
-      run:
-        working-directory: ${{ env.VSCODE_DIR }}
     outputs:
       artifactFilename: ${{ steps.setArtifactFilename.outputs.filename }}
       vsixPath: ${{ steps.packageExtension.outputs.vsixPath }}
     steps:
+      env:
+        WORKSPACE: ${{ env.VSCODE_DIR }}
       - name: Checkout Source
         uses: actions/checkout@v2
       - name: Setup GIT for Windows
@@ -48,14 +47,14 @@ jobs:
       - name: Install Dependencies
         run: npm ci
       - name: Linter
-        run: npm run lint
+        run: npm run lint --workspace $WORKSPACE 
       - name: Compile TS
-        run: npm run compile
+        run: npm run compile --workspace $WORKSPACE
       - name: Run Unit Tests on Windows or macOS
-        run: npm run test
+        run: npm run test --workspace $WORKSPACE
         if: runner.os != 'Linux'
       - name: Run Unit Tests on Linux
-        run: xvfb-run -a npm test
+        run: xvfb-run -a npm test --workspace $WORKSPACE
         if: runner.os == 'Linux'
       - name: Package VSCode Extension
         if: runner.os == 'Linux'
@@ -83,10 +82,9 @@ jobs:
       - lint-test-build
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    defaults:
-      run:
-        working-directory: ${{ env.VSCODE_DIR }}
     steps:
+      env:
+        WORKSPACE: ${{ env.VSCODE_DIR }}
       - name: Checkout Source
         uses: actions/checkout@v2
       - name: Install Node
