@@ -31,7 +31,6 @@ jobs:
           scope: "${{ env.SCOPE }}"
         env:
           GIT_WORKSPACE: "${{ inputs.dir }}"
-
       - name: Check tag suffix
         id: check-tag-suffix
         if: startsWith(github.ref, 'refs/tags/v') && (contains(github.ref, '-rc') || contains(github.ref, '-beta') || contains(github.ref, '-test'))
