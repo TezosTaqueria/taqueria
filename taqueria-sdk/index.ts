@@ -208,7 +208,11 @@ const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
     const pluginManifest = stack.reduce(
         (retval: null|string, callsite) => {
             const callerFile = callsite.getFileName()
-            return retval || (callerFile.includes('taqueria-sdk') || callerFile.includes('taqueria-node-sdk'))
+            return retval || (
+                callerFile.includes('taqueria-sdk') || 
+                callerFile.includes('taqueria-node-sdk') ||
+                callerFile.includes('@taqueria/node-sdk')
+            )
                 ? retval
                 : join(dirname(callerFile), 'package.json')
         },
