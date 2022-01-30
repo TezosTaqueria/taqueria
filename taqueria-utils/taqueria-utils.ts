@@ -33,7 +33,7 @@ const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Den
 
 export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map (() => path))
 
-export const readFile = (path: string) => Fluture(
+export const readTextFile = (path: string) => Fluture(
     (rej: reject, res: resolve) => {
         const decoder = new TextDecoder("utf-8")
         Deno.readFile(path)
@@ -64,3 +64,4 @@ export const memoize = memoizy({})
 export const joinPaths = _joinPaths
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string
+

@@ -7,7 +7,7 @@ import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.skypack.dev/fluture';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {make, getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {isTaqError, debug, joinPaths, mkdir, readFile, writeTextFile, decodeJson, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
+import {isTaqError, debug, joinPaths, mkdir, readTextFile, writeTextFile, decodeJson, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
@@ -211,7 +211,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         () => {},
         (inputArgs: RawInitArgs) => pipe(
             parsedArgs.projectDir.join('.taq', 'state.json').value,
-            readFile,
+            readTextFile,
             chain (decodeJson),
             map ((state: State) => Object.entries(debug(state.tasks)).reduce(
                 (retval: Record<string, string[] | null>, [taskName, implementation]) => {
@@ -251,13 +251,13 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync())
 
 const initNPM = (projectDir: SanitizedAbsPath, i18n: i18n) => pipe(
-    readFile(projectDir.join("package.json").value),
+    readTextFile(projectDir.join("package.json").value),
     chainRej (() => reject({kind: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir}))
 )
 
 const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath) => pipe(
-    readFile(SanitizedAbsPath.create(pluginNameOrPath, projectDir).join('package.json').value),
-    chainRej (() => readFile(projectDir.join("node_modules", pluginNameOrPath, "package.json").value))
+    readTextFile(SanitizedAbsPath.create(pluginNameOrPath, projectDir).join('package.json').value),
+    chainRej (() => readTextFile(projectDir.join("node_modules", pluginNameOrPath, "package.json").value))
 )
 
 const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
@@ -609,7 +609,7 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
         !parsedArgs.disableState
             ? resolve(stateAbspath.value)
             : reject("State disabled!"),
-        chain (readFile),
+        chain (readTextFile),
         chain (decodeJson),
         chain ((data: {build: string}) =>
             typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.build
