@@ -3,7 +3,7 @@ const {Plugin, Task, Option} = require('@taqueria/node-sdk')
 Plugin.create(i18n => ({
     schema: "1.0",
     version: "0.1",
-    name: "mock",
+    alias: "mock",
     tasks: [
         Task.create({
             task: "ping",

@@ -734,3 +734,8 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
 export default {
     run
 }
+
+export const __TEST__ = {
+    sanitizeArgs,
+    computeState
+}

@@ -2,58 +2,49 @@ import {execSync} from "child_process";
 import path from "path";
 import fs from "fs";
 
-export const generateTestProject = async (configFilePath: string, localPackages = true) =>{
+export const generateTestProject = async (projectPath: string, packageNames: string[], localPackages = true) =>{
     try{
-        execSync(`taq init ${configFilePath}`)
+        execSync(`taq init ${projectPath}`)
     } catch(error){
         throw new Error (`error: ${error}`);
     }
 
-    await checkFolderExistsWithTimeout(`./${configFilePath}/`, 25000);
-
-    // There is an error to write to hidden folder using NodeJS
-    // https://github.com/libuv/libuv/pull/3380
-    // The work around to use shell command for now till the PR to libuv is merged
-    // try{
-    //     execSync(`cp ./e2e/data/config.json ./${configFilePath}/.taq/`)
-    // } catch(error){
-    //     throw new Error (`error: ${error}`);
-    // }
+    await checkFolderExistsWithTimeout(`./${projectPath}/`, 25000);
 
     try{
-        fs.chmodSync(`./${configFilePath}/`, 0o777)
+        fs.chmodSync(`./${projectPath}/`, 0o777)
     } catch(error){
         throw new Error (`error: ${error}`);
     }
 
     try{
-        execSync(`cd ./${configFilePath} && npm init -y`)
+        execSync(`cd ./${projectPath} && npm init -y`)
     } catch(error){
         throw new Error (`error: ${error}`);
     }
 
-    await checkFolderExistsWithTimeout(`./${configFilePath}/package.json`, 25000);
+    await checkFolderExistsWithTimeout(`./${projectPath}/package.json`, 25000);
 
-    try{
-        if(localPackages) {
-            execSync(`cd ./${configFilePath} && taq install ../../../taqueria-plugin-ligo`)
+    packageNames.forEach(packageName => {
+        try {
+            if (localPackages) {
+                execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`)
+            } else {
+                execSync(`cd ./${projectPath} && taq install @taqueria/plugin-${packageName}`)
+            }
+        } catch (error) {
+            throw new Error(`error: ${error}`);
         }
-        else{
-            execSync(`cd ./${configFilePath} && taq install @taqueria/plugin-ligo`)
-        }
-    } catch(error){
-        throw new Error (`error: ${error}`);
-    }
+    });
 
-    await checkFolderExistsWithTimeout(`./${configFilePath}/node_modules/`, 25000);
+    await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`, 25000);
 }
 
 // The solution was taken from this source:
 // https://stackoverflow.com/questions/26165725/nodejs-check-file-exists-if-not-wait-till-it-exist
-// It is pull&wait mechanism and it is async by nature.
-// TODO: Ask Michael what he think about it
-// If we use sync code do we really need it?
-function checkFolderExistsWithTimeout(filePath:string, timeout:number) {
+// It is pull&wait mechanism and it is async by nature, because
+// there is no fs.watch sync solution
+export function checkFolderExistsWithTimeout(filePath:string, timeout:number) {
     return new Promise(function (resolve, reject) {
 
         const dir = path.dirname(filePath);

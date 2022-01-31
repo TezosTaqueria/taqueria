@@ -11,7 +11,6 @@ import {
 import chai from "https://cdn.skypack.dev/chai@4.3.4?dts";
 import { exists} from "https://deno.land/std/fs/mod.ts";
 import {TaqError} from "../../../taqueria-utils/taqueria-utils-types.ts";
-import { isArray } from "https://deno.land/x/unknownutil/mod.ts";
 
 const testValidJson = '{"test": "testPayload"}';
 const testInvalidJson = '{"test": testPayload}';
