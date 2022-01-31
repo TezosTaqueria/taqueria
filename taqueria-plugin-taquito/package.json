@@ -47,6 +47,6 @@
     "@taquito/signer": "^11.1.0",
     "@taquito/taquito": "^11.0.2",
     "fast-glob": "^3.2.10",
-    "@taqueria/node-sdk": "^0.0.1"
+    "@taqueria/node-sdk": "^0.0.4"
   }
 }
