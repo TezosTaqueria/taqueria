@@ -1,5 +1,5 @@
-import {Plugin, Task, Option} from 'taqueria-sdk'
-import type { i18n} from 'taqueria-sdk/types'
+import {Plugin, Task, Option} from '@taqueria/node-sdk'
+import type { i18n} from '@taqueria/node-sdk/types'
 import {tasks} from './tasks'
 
 Plugin.create((i18n: i18n) => ({
