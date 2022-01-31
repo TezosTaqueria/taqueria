@@ -24,8 +24,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build-plugin": "npx parcel build --no-cache",
     "build-docker": "cd docker && npm run build",
-    "build": "npm run build-docker && npm run build-plugin",
-    "build-ci": "npm run build-plugin",
+    "build-dev": "npm run build-docker && npm run build-plugin",
+    "build": "npm run build-plugin",
     "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
   },
   "author": "ECAD Labs",
