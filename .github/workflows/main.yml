@@ -120,7 +120,7 @@ jobs:
 
   publish-taquito-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-taquito
     secrets:
