@@ -1,7 +1,45 @@
-import {Task as aTask, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike} from 'taqueria-protocol/taqueria-protocol-types'
-import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs} from "./types"
-import {join, resolve} from 'path'
+import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol} from '@taqueria/protocol/taqueria-protocol-types'
+import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView, ProxyAction} from "./types"
+import {join, resolve, dirname} from 'path'
+import {get} from 'stack-trace'
+import {exec} from 'child_process'
+import generateName from 'project-name-generator'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
+
+export const execCmd = (cmd:string): Promise<ProxyAction> => new Promise((resolve, _) => {
+    exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
+        if (err) resolve({
+            status: 'failed',
+            stdout: stdout,
+            stderr: err.message
+        })
+        else if (stderr) resolve({
+            status: 'failed',
+            stdout,
+            stderr
+        })
+        else resolve({
+            status: 'success',
+            stdout,
+            stderr
+        })
+    })
+})
+
+export const getArch = () => 
+    execCmd("uname -m")
+    .then(result => (result.stdout as string).trim().toLowerCase())
+    .then(arch => {
+        switch(arch) {
+            case 'x86_64':
+                return 'linux/amd64'
+            case 'arm64':
+                return 'linux/arm64/v8'
+            default:
+                return 'linux/amd64'
+        }
+    })
+
 
 const parseJSON = (input: string) : Promise<Config> => new Promise((resolve, reject) => {
     try {
@@ -61,13 +99,24 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefin
     })
 }
 
-const viewOption = ({shortFlag, flag, description}: anOption): OptionView => ({
+const viewOption = ({shortFlag, flag, description, boolean, choices, defaultValue, required}: anOption): OptionView => ({
     shortFlag: shortFlag ? shortFlag.value : undefined,
     flag: flag.value,
-    description
+    description,
+    boolean: boolean,
+    choices: choices,
+    defaultValue: defaultValue,
+    required: required
 })
 
-const viewTask = ({task, command, aliases, description, options, handler}: aTask|TaskLike): TaskView => ({
+const viewPositionalArg = ({placeholder, description, type, defaultValue}: aPositionalArg) : PositionalArgView => ({
+    placeholder: placeholder.value,
+    description,
+    type,
+    defaultValue
+})
+
+const viewTask = ({task, command, aliases, description, options, positionals, handler}: aTask|TaskLike): TaskView => ({
     task: task.value,
     command: command.value,
     aliases: !aliases ? [] : aliases.reduce(
@@ -79,17 +128,20 @@ const viewTask = ({task, command, aliases, description, options, handler}: aTask
         (retval: OptionView[], option: anOption | undefined) => option ? [...retval, viewOption(option)] : retval,
         []
     ),
+    positionals: !positionals ? [] : positionals.reduce(
+        (retval: PositionalArgView[], arg: aPositionalArg | undefined) => arg ? [...retval, viewPositionalArg(arg)] : retval,
+        []
+    ),
     handler: handler === "proxy" ? "proxy" : handler
-})
+})   
 
-
-
-const parseSchema = (i18n: i18n, definer: pluginDefiner): SchemaView | undefined => {
+const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): SchemaView | undefined => {
     try {
-        const {name, schema, version, tasks, scaffolds, hooks, networks, sandboxes, ...functions} = definer(i18n)
+        const {name, alias, schema, version, tasks, scaffolds, hooks, networks, sandboxes, ...functions} = definer(i18n)
 
         return {
-            name,
+            name: name ? name : inferPluginName(),
+            alias,
             schema,
             version,
             tasks: tasks
@@ -116,9 +168,9 @@ const sendError = (err: Failure<unknown>) => {
     console.error(JSON.stringify(err))
 }
 
-const getResponse = (definer: pluginDefiner) => (sanitzedArgs: SanitizedArgs): LikeAPromise<ActionResponse, Failure<[]>> => {
+const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => (sanitzedArgs: SanitizedArgs): LikeAPromise<ActionResponse, Failure<[]>> => {
     const {i18n, taqRun} = sanitzedArgs
-    const schema = parseSchema(i18n, definer)
+    const schema = parseSchema(i18n, definer, inferPluginName)
     switch (taqRun) {
         case "pluginInfo":
             return schema ? Promise.resolve({...schema, status: "success"}) : Promise.reject({err: "E_INVALID_SCHEMA", msg: "The schema of the plugin is invalid."})
@@ -140,20 +192,62 @@ const getResponse = (definer: pluginDefiner) => (sanitzedArgs: SanitizedArgs): L
     }
 }
 
+const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
+    try {
+        return `${require(packageJsonAbspath).name}`
+    }
+    catch (_) {
+        return generateName().dashed
+    }
+}
+
+const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
+    // The definer function can provide a name for the plugin in its schema, or it
+    // can omit it and we infer it from the package.json file.
+    // To do so, we need to get the directory for the plugin from the call stack
+    const pluginManifest = stack.reduce(
+        (retval: null|string, callsite) => {
+            const callerFile = callsite.getFileName()
+            return retval || (
+                callerFile.includes('taqueria-sdk') || 
+                callerFile.includes('taqueria-node-sdk') ||
+                callerFile.includes('@taqueria/node-sdk')
+            )
+                ? retval
+                : join(dirname(callerFile), 'package.json')
+        },
+        null
+    )
+
+    return () =>
+        !pluginManifest
+            ? generateName().dashed
+            : getNameFromPluginManifest(pluginManifest)
+}
+
 export const Plugin = {
-    create: (definer: pluginDefiner, unparsedArgs: Args) =>
-        parseArgs(unparsedArgs)
+    create: (definer: pluginDefiner, unparsedArgs: Args) => {
+        const stack = get()
+        return parseArgs(unparsedArgs)
         .then(sanitizeArgs)
-        .then(getResponse(definer))
+        .then(getResponse(definer, inferPluginName(stack)))
         .then(sendResponse)
         .catch(sendError)
+    }
+        
 }
 
 export const Task = aTask
 export const Option = anOption
 export const Network = aNetwork
+export const Sandbox = theSandbox
+export const EconomicalProtocol = anEconomicalProtocol
+export const PositionalArg = aPositionalArg
 export default {
     Plugin,
     Task,
-    Option
+    Option,
+    Sandbox,
+    EconomicalProtocol,
+    PositionalArg,
 }

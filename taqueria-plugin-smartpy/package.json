@@ -1,7 +1,7 @@
 {
-  "name": "taqueria-plugin-smartpy",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@taqueria/plugin-smartpy",
+  "version": "0.0.4",
+  "description": "A taqueria plugin for compiling SmartPy smart contracts",
   "targets": {
     "default": {
       "source": "./index.ts",
@@ -12,15 +12,35 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx parcel build",
+    "build": "npx parcel build --no-cache",
+    "build-ci": "npm run build",
     "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "taqueria",
+    "tezos",
+    "build",
+    "ecad",
+    "ecadlabs",
+    "plugin",
+    "smartpy",
+    "smart contract",
+    "compile"
+  ],
+  "author": "ECAD Labs",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecadlabs/taqueria.git",
+    "directory": "taqueria-plugin-smartpy"
+  },
+  "bugs": {
+    "url": "https://github.com/ecadlabs/taqueria/issues"
+  },
+  "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "dependencies": {
     "fast-glob": "^3.2.7",
-    "taqueria-sdk": "file:../taqueria-sdk"
+    "@taqueria/node-sdk": "^0.0.1"
   },
   "devDependencies": {
     "parcel": "^2.0.1",

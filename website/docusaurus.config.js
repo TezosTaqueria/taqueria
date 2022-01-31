@@ -13,7 +13,7 @@ const config = {
 
 	onBrokenLinks: "throw",
 	onBrokenMarkdownLinks: "warn",
-	favicon: "img/favicon.ico",
+	favicon: "/img/favicon.ico",
 	organizationName: "ecadlabs", // Usually your GitHub org/user name.
 	projectName: "taqueria", // Usually your repo name.
 
@@ -21,6 +21,7 @@ const config = {
 		[
 			"@docusaurus/preset-classic",
 			/** @type {import('@docusaurus/preset-classic').Options} */
+
 			({
 				docs: {
 					path: "docs",
@@ -45,6 +46,10 @@ const config = {
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
+			gtag: {
+				trackingID: "G-R7WYMVNDR1",
+				anonymizeIP: true,
+			},
 			colorMode: {
 				defaultMode: "light",
 				disableSwitch: true,
@@ -65,11 +70,12 @@ const config = {
 			navbar: {
 				logo: {
 					alt: "Tezos Taqueria Logo",
-					src: "img/logoSVG.svg",
+					src: "/img/Taqueria_magenta_beta.svg",
 				},
 				items: [
 					{
-						to: "/blog",
+						type: "doc",
+						docId: "getting-started/installation",
 						label: " Get Started",
 						position: "right",
 						className: "header-link",
@@ -82,25 +88,26 @@ const config = {
 						className: "header-link",
 					},
 					{
-						to: "/blog",
+						type: "doc",
+						docId: "plugins",
 						label: "Plugins",
 						position: "right",
 						className: "header-link",
 					},
 					{
-						href: "https://discord.com/",
+						href: "https://discord.gg/bujt7syVVT",
 						position: "right",
 						className: "header-discord-link",
 						"aria-label": "Discord",
 					},
 					{
-						href: "https://twitter.com/",
+						href: "https://twitter.com/tezostaqueria",
 						position: "right",
 						className: "header-twitter-link",
 						"aria-label": "Twitter",
 					},
 					{
-						href: "https://github.com/facebook/docusaurus",
+						href: "https://github.com/ecadlabs/taqueria",
 						position: "right",
 						className: "header-github-link",
 						"aria-label": "GitHub repository",
@@ -114,11 +121,11 @@ const config = {
 						items: [
 							{
 								label: "Report Issues",
-								to: "/blog",
+								to: "https://github.com/ecadlabs/taqueria/issues/new/choose",
 							},
 							{
 								label: "Contribute",
-								to: "/blog",
+								to: "https://github.com/ecadlabs/taquito/blob/master/CONTRIBUTING.md",
 							},
 						],
 					},
@@ -127,24 +134,24 @@ const config = {
 						title: "Community",
 						items: [
 							{
-								label: "Stack Exchange",
-								to: "https://stackoverflow.com",
+								label: "Tezos Stack Exchange",
+								to: "https://tezos.stackexchange.com/questions/tagged/taqueria",
 							},
 							{
 								label: "Discord",
-								to: "https://discord.com",
+								to: "https://discord.gg/bujt7syVVT",
 							},
 							{
 								label: "Twitter",
-								to: "https://twitter.com",
+								to: "https://twitter.com/tezostaqueria",
 							},
 							{
 								label: "Code of Conduct",
-								to: "/docs/intro",
+								to: "https://github.com/ecadlabs/taquito/blob/master/code-of-conduct.md",
 							},
 							{
 								label: "GitHub",
-								to: "https://github.com",
+								to: "https://github.com/ecadlabs/taqueria",
 							},
 						],
 					},
@@ -156,12 +163,8 @@ const config = {
 								to: "/docs/intro",
 							},
 							{
-								label: "TypeDoc Reference",
-								to: "/docs/intro",
-							},
-							{
 								label: "Roadmap",
-								to: "/docs/intro",
+								to: "https://github.com/ecadlabs/taqueria/milestones?direction=asc&sort=due_date&state=open",
 							},
 						],
 					},
@@ -170,48 +173,27 @@ const config = {
 							{
 								html: `
 									<a href="/" target="_blank" rel="noreferrer noopener" aria-label="">
-									  <img src="img/footerLogoSVG.svg" alt="" />
+									  <img class='footerLogo' src="/img/Taqueria_purple_beta.svg" alt="" />
 									</a>
 								  `,
 							},
 							{
 								html: `
 									<p class='footerDescription'>
-									Faplaren krorar whataboutism. Krorat kroligen. 
+										A New Way to Build on Tezos
 									</p>
 								  `,
 							},
 							{
 								html: `
-								<a class='footerButton' href='https://github.com'>
-								<img class='footerGihubLogoButton' src="img/githubSVG.svg" alt="" />
-								GITHUB
-							  	</a>
+									<a class='footerButton' href='https://github.com/ecadlabs/taqueria'>
+										<img class='footerGihubLogoButton' src="/img/githubSVG.svg" alt="" />
+										GITHUB
+									</a>
 								  `,
 							},
 							{
-								html: `
-								<!-- Begin Mailchimp Signup Form -->
-								<div id="mc_embed_signup">
-								<form class='footerForm' action="https://ecadlabs.us20.list-manage.com/subscribe/post?u=8fdd00e1ab81d5f5550fadb32&amp;id=de1bfb4af9" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-									<h5>Register for updates</h5>
-									<div class="footerInputContainer" id="mc_embed_signup_scroll">
-										<div>
-											<input type="email" value="" name="EMAIL" class="required email footerEmail" id="mce-EMAIL" placeholder='Your email address'>
-										</div>
-										<div id="mce-responses" class="clear">
-											<div class="response" id="mce-error-response" style="display:none"></div>
-											<div class="response" id="mce-success-response" style="display:none"></div>
-										</div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-										<div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_8fdd00e1ab81d5f5550fadb32_de1bfb4af9" tabindex="-1" value=""></div>
-
-										<div class="clear"><input type="submit" value="Sign Up" name="subscribe" id="mc-embedded-subscribe" class="button signupButton"></div>
-									</div>
-								</form>
-								</div>
-
-								<!--End mc_embed_signup-->
-								  `,
+								html: `form`,
 							},
 							{
 								label: `Copyright © 2021 ECAD Labs - This project is licensed under Apache License, Version 2.0`,

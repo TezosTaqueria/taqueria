@@ -10,11 +10,16 @@ await i18next.init({
             translation: {
                 "appName": "Taqueria",
                 "appDesc": "Taqueria is an integrated environment for compiling, testing, and deploying Tezos software.",
-                "betaWarning": "Taqueria is current in BETA. You've been warned. :)",
+                "versionDesc": "Display the verison number of the Taqueria program",
+                "betaWarning": "Taqueria is currently in BETA. You've been warned. :)",
                 "configDirDesc": "Config directory (default ./.taq)",
                 "initDesc": "Initialize a new project",
                 "initPathDesc": "Path to your project directory",
                 "installDesc": "Install a plugin",
+                "pluginInstalled": "Plugin installed successfully",
+                "pluginUninstalled": "Plugin uninstalled successfully",
+                "uninstallDesc": "Uninstall a plugin",
+                "pluginNameDesc": "The name of the plugin",
                 "promptForTask": "Please specify which task you would like to execute. If you're starting a new project, please run 'init'.\n",
                 "pluginKindDesc": "Kind of plugin (NPM, Binary)",
                 "pluginAlreadyInstalled": "That plugin is already installed.",
@@ -24,7 +29,12 @@ await i18next.init({
                 "providedByMany": "Provided by more than one plugin. The option --plugin is required.",
                 "pluginDesc": "Specify what plugin should execute this command. Use this when more than one plugin provide a task of the same name.",
                 "listNetworks": "List known networks",
-                "envDesc": "Specify an environment configuration"
+                "envDesc": "Specify an environment configuration",
+                "disableStateDesc": "Does not use the saved state.json file. State is computed for each execution.",
+                "logPluginCallsDesc": "Logs any execution calls to a plugin to the console",
+                "npmInitRequired": "This project isn't a valid NPM project. Please run: npm init",
+                "testFromVsCode": "An internal command used by VS Code to test for the taq binary",
+                "fromVsCode": "An internal flag used to indicate that taq is executed via vscode"
             }
         }
     }

@@ -1,12 +1,30 @@
-import {TaskHandler, Action, Scaffold, Hook, Sandbox, Network, Verb, Command, Option, Alias, RuntimeDependency, UnvalidatedTask, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedPluginInfo, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork} from 'taqueria-protocol/taqueria-protocol-types'
+import {Action, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, RuntimeDependency, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig} from '@taqueria/protocol/taqueria-protocol-types'
+
+export type Sandbox = theSandbox
+
+export type Attributes = theAttributes
+
+export type EconomicalProtocol = theProtocol
+
+export type NetworkConfig = theNetworkConfig
+
+export type SandboxConfig = theSandboxConfig
 
 export interface TaskView {
     readonly task: string
     readonly command: string
     readonly description: string
     readonly aliases: string[]
-    readonly options: UnvalidatedOption[],
+    readonly options: UnvalidatedOption[]
+    readonly positionals: UnvalidatedPositionalArg[]
     readonly handler: "proxy" | string | string[]
+}
+
+export interface PositionalArgView {
+    readonly placeholder: string
+    readonly description: string
+    readonly type?: OptionType
+    readonly defaultValue?: number | boolean | string
 }
 
 export interface Failure<Params> {
@@ -50,8 +68,9 @@ export type ActionNotSupported = {
 
 export interface ProxyAction {
     readonly status: ActionResponseCode,
-    readonly stdout: string,
-    readonly stderr: string
+    readonly stdout: string | unknown,
+    readonly stderr: string,
+    readonly render?: 'none' | 'string' | 'table'
 }
 
 export interface ActionPluginInfo extends SchemaView {
@@ -60,9 +79,16 @@ export interface ActionPluginInfo extends SchemaView {
 
 export type ActionResponse = ProxyAction | CheckRuntimeDependenciesAction | InstallRuntimeDependenciesAction | ActionPluginInfo | ActionNotSupported
 
+/**
+ * A Schema for a plugin should have the same properties as the PluginInfo type, but
+ * many of the properties are optional rather than required as in the PluginInfo type:
+ * - name (optional, as this can be inferred from the package.json file)
+ * - tasks, scaffolds, hooks, networks, and sandboxes - a plugin can provide 0 or more of these constructs
+ */
 export interface Schema {
     // This should match the PluginInfo, but tasks, scaffolds, hooks, networks, and sandboxes are optional
-    readonly name: string
+    readonly name?: string
+    readonly alias?: string
     readonly schema: string
     readonly version: string
     readonly tasks?: (Task | undefined)[]
@@ -77,6 +103,7 @@ export interface Schema {
 
 export interface SchemaView {
     readonly name: string
+    readonly alias?: string
     readonly schema: string
     readonly version: string
     readonly tasks: TaskView[]
@@ -104,25 +131,9 @@ export interface Config extends Record<string, unknown>{
     testsDir: string
     contractsDir: string
     artifactsDir: string
-    environment?: {
-        [key: string]: Environment
-    } & {
-        default: string
-    }
-}
-
-// TODO: This environment type is temporary.
-export interface Environment {
-    storage?: Record<string, any>
-    rpcUrl: string,
-    faucet: {
-        mnemonic: string[],
-        activation_code: string,
-        amount: number,
-        pkh: string,
-        password: string,
-        email: string
-    }
+    sandbox: Record<string, SandboxConfig>
+    network: Record<string, NetworkConfig>
+    environment: Record<string, EnvironmentConfig> & {default: string}
 }
 
 export interface SanitizedArgs {

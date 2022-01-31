@@ -3,6 +3,10 @@
 // or errors emited
 // @ts-ignore
 import {SanitizedAbsPath, SHA256} from '../taqueria-utils/taqueria-utils-types.ts'
+// @ts-ignore
+import {urlParse} from './url-parse.ts'
+
+type URL = ReturnType<typeof urlParse>
 
 /**
  * String-like types
@@ -104,7 +108,7 @@ export class Url {
     }
     static create(value: string): Url | undefined {
         try {
-            const url = new URL(value)
+            const url = urlParse(value)
             return new Url(url)
         }
         catch (_) {
@@ -130,6 +134,12 @@ export interface Config {
     readonly contractsDir: string
     readonly testsDir: string
     readonly artifactsDir: string
+
+    readonly environment: Record<'default'|string, string|EnvironmentConfig>
+
+    readonly sandbox: Record<string, SandboxConfig>
+
+    readonly network: Record<string, NetworkConfig>
 }
 
 export interface ConfigArgs extends Config {
@@ -143,11 +153,19 @@ export interface ConfigArgs extends Config {
  * Protocol Models
  */
 
+export interface UnvalidatedPositionalArg {
+    readonly placeholder: string
+    readonly type?: OptionType
+    readonly defaultValue?: string | number | boolean
+    readonly description: string
+}
+
+
 export interface UnvalidatedOption {
     readonly shortFlag?: string
     readonly flag: string
     readonly description: string
-    readonly defaultValue?: unknown
+    readonly defaultValue?: string | number | boolean
     readonly choices?: string[]
     readonly required?: boolean
     readonly boolean?: boolean
@@ -169,8 +187,14 @@ export interface UnvalidatedNetwork {
     readonly attributes?: Attributes
 }
 
+// NOTE: This is a workaround as TypeScript doesn't support
+// recursive / cyclical types yet. :(
+type Accounts_Base = Record<string, AccountDetails>
+export type Accounts = Record<string, (keyof Accounts_Base)|AccountDetails>
+
 export interface UnvalidatedSandbox extends UnvalidatedNetwork {
-    readonly kind: string
+    readonly plugin?: string
+    readonly accounts?: Accounts 
 }
 
 const hookType: unique symbol = Symbol()
@@ -198,6 +222,7 @@ export interface UnvalidatedTask {
     readonly description: string
     readonly aliases?: string[]
     readonly options?: (UnvalidatedOption|Option|undefined)[],
+    readonly positionals?: (UnvalidatedPositionalArg|undefined|PositionalArg)[]
     readonly handler: "proxy" | string | string[]
     readonly hidden?: boolean
     readonly example?: string
@@ -206,6 +231,7 @@ export interface UnvalidatedTask {
 export interface UnvalidatedPluginInfo {
     readonly schema: string
     readonly name: string
+    readonly alias?: string
     readonly version: string
     readonly tasks?: (UnvalidatedTask|undefined)[]
     readonly scaffolds?: (UnvalidatedScaffold|undefined)[]
@@ -217,14 +243,16 @@ export interface UnvalidatedPluginInfo {
 export class PluginInfo {
     readonly schema: string
     readonly name: string
+    readonly alias?: string
     readonly version: string
     readonly tasks: Task[]
     readonly scaffolds: Scaffold[]
     readonly hooks: Hook[]
     readonly networks: Network[]
     readonly sandboxes: Sandbox[]
-    constructor(schema: string, name: string, version: string, tasks: Task[], scaffolds: Scaffold[], hooks: Hook[], networks: Network[], sandboxes: Sandbox[]) {
+    constructor(schema: string, name: string, version: string, tasks: Task[], scaffolds: Scaffold[], hooks: Hook[], networks: Network[], sandboxes: Sandbox[], alias?: string) {
         this.schema = schema
+        this.alias = alias
         this.name = name
         this.version = version
         this.tasks = tasks
@@ -256,14 +284,18 @@ export class PluginInfo {
         if (obj.version && obj.schema) {
             try {
                 const createTask = Task.create.bind(Task)
-                const createScaffold = Scaffold.create.bind(Scaffold)
                 //TODO: Finish doing the above for each factory/constructor
 
+                const temp: Record<string, string> = obj.alias
+                    ? {alias: obj.alias}
+                    : {}
+
                 const pluginInfo : PluginInfo = {
+                    ...temp,
                     name: obj.name,
                     schema: obj.schema,
                     version: obj.version,
-                    tasks: this.convert(createTask) (obj, "tasks"),
+                    tasks: this.convert<UnvalidatedTask, Task>(createTask) (obj, "tasks"),
                     hooks: this.convert(Hook.create) (obj, "hooks"),
                     scaffolds: this.convert(Scaffold.create) (obj, "scaffolds"),
                     networks: this.convert(Network.create) (obj, "networks"),
@@ -279,17 +311,42 @@ export class PluginInfo {
     }
 }
 
+export type OptionType = 'string' | 'number' | 'boolean'
+
+const positionalArgType: unique symbol = Symbol()
+export class PositionalArg {
+    [positionalArgType]: void
+    readonly placeholder: HumanReadableIdentifier
+    readonly description: string
+    readonly defaultValue?: string | number | boolean
+    readonly type?: OptionType
+
+    protected constructor(placeholder: HumanReadableIdentifier, description: string, type?: OptionType, defaultValue?: string | number | boolean) {
+        this.placeholder = placeholder
+        this.defaultValue = defaultValue
+        this.description = description
+        this.type = type
+    }
+
+    static create(arg: UnvalidatedPositionalArg) {
+        const placeholder = HumanReadableIdentifier.create(arg.placeholder)
+        return placeholder
+            ? new PositionalArg(placeholder, arg.description, arg.type, arg.defaultValue)
+            : undefined
+    }
+}
+
 const optionType: unique symbol = Symbol()
 export class Option {
     [optionType]: void
     readonly shortFlag?: SingleChar
     readonly flag: Verb
     readonly description: string
-    readonly defaultValue?: unknown
+    readonly defaultValue?: string | number | boolean
     readonly choices?: string[]
     readonly required?: boolean
     readonly boolean?: boolean
-    private constructor(shortFlag: SingleChar | undefined, flag: Verb, description: string, defaultValue: unknown, choices: string[], required: boolean, boolean: boolean) {
+    private constructor(shortFlag: SingleChar | undefined, flag: Verb, description: string, choices: string[], required: boolean, boolean: boolean, defaultValue?: string | number | boolean) {
         this.shortFlag = shortFlag
         this.flag = flag
         this.description = description
@@ -302,12 +359,12 @@ export class Option {
         const flag = Verb.create(option.flag)
 
         if (!option.shortFlag && flag)
-            return new Option(undefined, flag, option.description, option.defaultValue, option.choices || [], option.required || false, option.boolean ? true : false)
+            return new Option(undefined, flag, option.description, option.choices || [], option.required || false, option.boolean ? true : false, option.defaultValue)
 
         if (option.shortFlag && flag) {
             const shortFlag = SingleChar.create(option.shortFlag)
             return shortFlag
-                ? new Option(shortFlag, flag, option.description, option.defaultValue, option.choices || [], option.required || false, option.boolean ? true : false)
+                ? new Option(shortFlag, flag, option.description, option.choices || [], option.required || false, option.boolean ? true : false, option.defaultValue)
                 : undefined
         }
 
@@ -326,7 +383,8 @@ export class Option {
      readonly options?: Option[]
      readonly handler: TaskHandler
      readonly hidden: boolean
-     protected constructor(name: Verb, command: Command, description: string, handler: TaskHandler, options: Option[]=[], aliases: Alias[]=[], hidden=false, example?: string) {
+     readonly positionals: PositionalArg[]
+     protected constructor(name: Verb, command: Command, description: string, handler: TaskHandler, options: Option[]=[], positionals: PositionalArg[]=[], aliases: Alias[]=[], hidden=false, example?: string) {
          this.task = name
          this.command = command
          this.description = description
@@ -335,6 +393,7 @@ export class Option {
          this.handler = handler
          this.hidden = hidden
          this.example = example
+         this.positionals = positionals
      }
      static createAlias(value: string): Alias | undefined {
         return Verb.create(value) || SingleChar.create(value)
@@ -369,10 +428,68 @@ export class Option {
             []
         )
 
+        const positionals = !task.positionals ? [] : task.positionals.reduce(
+            (retval: PositionalArg[], item) => {
+                if (item instanceof PositionalArg) {
+                    return [...retval, item]
+                }
+                else if (item === undefined) {
+                    return retval
+                }
+
+                const positional = PositionalArg.create(item as UnvalidatedPositionalArg)
+                return positional
+                    ? [...retval, positional]:
+                    retval
+            },
+            []
+        )
+
         return name && command
-            ? new Task(name, command, task.description, task.handler, options, aliases, task.hidden ? true : false, task.example)
+            ? new Task(name, command, task.description, task.handler, options, positionals, aliases, task.hidden ? true : false, task.example)
             : undefined
         }
+}
+
+export interface AccountKeys {
+    alias: string
+    encryptedKey: string
+    publicKey: string
+    secretKey: string
+}
+
+export interface AccountDetails {
+    readonly initialBalance?: string,
+    keys?: AccountKeys
+}
+
+export interface SandboxConfig {
+    readonly label?: string,
+    readonly plugin?: string,
+    readonly rpcUrl?: string
+    readonly protocol?: string
+    readonly attributes?: Attributes
+    readonly accounts: Accounts
+}
+
+export interface NetworkConfig {
+    readonly label?: string,
+    readonly rpcUrl?: string 
+    readonly protocol?: string
+    readonly faucet: {
+        readonly pkh: string
+        readonly mnemonic: string[]   
+        readonly email: string
+        readonly password: string
+        readonly amount: string
+        readonly activation_code: string
+    }
+}
+
+export interface EnvironmentConfig {
+    readonly networks?: string[]
+    readonly sandboxes: string[]
+    readonly storage: Record<string, unknown>
 }
 
 export interface RuntimeDependency {
@@ -398,6 +515,7 @@ export class EconomicalProtocolHash extends StringLike {
 
 const economicProtocalType: unique symbol = Symbol()
 export class EconomicalProtocol {
+    [economicProtocalType]: void
     readonly hash: EconomicalProtocolHash
     readonly label: HumanReadableIdentifier | undefined
     constructor(hash: EconomicalProtocolHash, label: (HumanReadableIdentifier|undefined)=undefined) {
@@ -443,18 +561,29 @@ export class Network {
 
 const sandboxType: unique symbol = Symbol()
 export class Sandbox extends Network {
+    readonly accounts: Accounts
     [sandboxType]: void
+    readonly plugin?: string
+
+    protected constructor(name: HumanReadableIdentifier, label: StringMax30, rpcUrl: Url, protocol: EconomicalProtocol, attributes: Attributes, plugin?: string, accounts?: Accounts) {
+        super(name, label, rpcUrl, protocol, attributes)
+        this.plugin = plugin
+        this.accounts = accounts ? accounts: {}
+    }
+
     static create(sandbox: UnvalidatedSandbox) {
         const network = super.create(sandbox)
         return network
-            ? new Sandbox(network.name, network.label, network.rpcUrl, network.protocol, network.attributes)
+            ? new Sandbox(network.name, network.label, network.rpcUrl, network.protocol, network.attributes, sandbox.plugin, sandbox.accounts)
             : undefined
     }
 }
 
 export interface Environment {
     readonly name: string
-    readonly use: Sandbox | Network
+    readonly networks?: Network[]
+    readonly sandboxes?: Sandbox[]
+    readonly storage: Record<string, unknown>
 }
 
 export type Action = "checkRuntimeDependencies" | "installRuntimeDependencies" | "proxy" | "pluginInfo" | string

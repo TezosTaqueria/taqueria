@@ -1,18 +1,40 @@
 {
-  "name": "taqueria-plugin-ligo",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@taqueria/plugin-ligo",
+  "version": "0.0.4",
+  "description": "A taqueria plugin for compiling LIGO smart contracts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo 'Nothing to build.' && exit 0",
+    "build-ci": "npm run build",
     "pluginInfo": "node index.js --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
     "compile": "node index.js --taqRun proxy --task compile --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
     "debugPluginInfo": "node --inspect index.js --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\"}' --projectDir ../test-project --configDir ./.taq"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "taqueria",
+    "tezos",
+    "build",
+    "ecad",
+    "ecadlabs",
+    "plugin",
+    "ligo",
+    "ligolang",
+    "smart contract",
+    "compile"
+  ],
+  "author": "ECAD Labs",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecadlabs/taqueria.git",
+    "directory": "taqueria-plugin-ligo"
+  },
+  "bugs": {
+    "url": "https://github.com/ecadlabs/taqueria/issues"
+  },
+  "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "dependencies": {
     "fast-glob": "^3.2.7",
-    "taqueria-sdk": "file:../taqueria-sdk"
+    "@taqueria/node-sdk": "^0.0.1"
   }
 }

@@ -1,49 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Features.module.css";
 
 const FeatureList = [
   {
-    title: "Features",
+    title: "Want a better Tezos development experience?",
     description:
-      "Get has minim elitr intellegat. Mea aeterno eleifend antiopam ad, nam no suscipit quaerendum. At nam minimum ponderum. Et has minim elitr intellegat. Mea aeterno eleifend antiopam minimum ponderum. Et has minim elitr intellegat. Mea aeterno eleifend antiopam",
+      "Don’t know where to start building on Tezos? Want a smarter way to integrate your tools? If so, Taqueria is for you. This flexible framework will help you to start faster and build better applications.",
     button: {
-      label: "Quick Start",
-      link: "#",
+      label: "Try the Taqueria Beta",
+      link: "/docs/intro",
     },
     features: [
       {
-        title: "Feature 1",
+        title: "Everything in one place",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+          "The Taqueria CLI and VS Code plugin bring your development tools to you. Stop moving your code jumping between IDEs. With Taqueria’s plugin infrastructure you can use the tools you need all in one place.",
         gif: require("../../../static/gif/mp4gifcode.mp4").default,
       },
       {
-        title: "Feature 2",
+        title: "Deploy with ease",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+          "Remove the complexity of deploying to different networks using Taqueria. Deploy smart contracts directly to a sandbox, testnet or the Tezos network.",
         gif: require("../../../static/gif/mp4gifcode.mp4").default,
       },
       {
-        title: "Feature 3",
+        title: "Effortlessly compile",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+          "Taqueria compiles smart contracts written in Ligo.  SmartPy and Michelson compilation is coming soon.",
         gif: require("../../../static/gif/mp4gifcode.mp4").default,
       },
       {
-        title: "Feature 4",
+        title: "Simplify testing",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+          "Taqueria supports local sandboxes and testing out of the box. Build better and safer applications with less effort.",
         gif: require("../../../static/gif/mp4gifcode.mp4").default,
       },
       {
-        title: "Feature 5",
+        title: "Fully customizable",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Decism heminas. Örybusa dilar av nysamma. Polig ysade äss. Plangen ungen som lasm. Tiligen antidest klimatdiktatur. Epin lorade, därför att otreng. Gensa.",
+          "Use Taqueria the way you want to. Taqueria has the flexibility to fit into your workflow the way you need it.",
         gif: require("../../../static/gif/mp4gifcode.mp4").default,
       },
     ],
@@ -52,12 +52,30 @@ const FeatureList = [
 
 function Feature({ title, description, features, button }) {
   const checkTitle = (e) => {
+    setUserAction(true);
     isVisible === e.target.id
       ? toggleIsVisible(`${features[0].title}`)
       : toggleIsVisible(e.target.id);
   };
 
   const [isVisible, toggleIsVisible] = useState(`${features[0].title}`);
+  const [userAction, setUserAction] = useState(false);
+
+  const featuresIndex = features.findIndex((object) => {
+    return object.title === isVisible;
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const checkEnd = (index) => {
+        return features.length - 1 === index ? index * 0 : index + 1;
+      };
+
+      !userAction &&
+        toggleIsVisible(`${features[checkEnd(featuresIndex)].title}`);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isVisible, userAction]);
 
   return (
     <div>
@@ -113,7 +131,7 @@ function Feature({ title, description, features, button }) {
           {features.map((feature, index) => {
             return (
               isVisible === feature.title && (
-                <video key={index} autoplay="true" muted src={feature.gif} />
+                <video key={index} autoPlay={true} muted src={feature.gif} />
               )
             );
           })}

@@ -20,145 +20,50 @@ const sidebars = {
       type: "category",
       label: "Getting Started",
       className: "sidebarHeader",
-      collapsed: true,
+      collapsed: false,
       collapsible: false,
       items: [
         "intro",
-        {
-          type: "category",
-          label: "QuickStart",
-          items: [
-            "Quickstart/Start1",
-            "Quickstart/Start2",
-            "Quickstart/Start3",
-          ],
-        },
-        {
-          type: "category",
-          label: "Resources",
-
-          items: [
-            "Resources/Changelog",
-            "Resources/Gallery",
-            "Resources/Plugins",
-            "Resources/Tools",
-          ],
-        },
+        "getting-started/installation"
       ],
     },
     {
       type: "category",
-      label: "Main Concepts",
+      label: "Plugins",
       className: "sidebarHeader",
-      collapsed: true,
+      collapsed: false,
       collapsible: false,
       items: [
-        "Selections",
-        "Dynamicproperties",
-        "Transformation",
-        "Animations",
+        "plugins",
+        "plugin_ligo",
+        "plugin_smartpy",
+        "plugin_contract_type_generator",
+        "plugin_teztnets",
+        "plugin_boilerplate_typescript",
       ],
     },
     {
       type: "category",
-      label: "Api Reference V 5.12.0",
+      label: "Example App",
       className: "sidebarHeader",
-      collapsed: true,
+      collapsed: false,
       collapsible: false,
       items: [
-        {
-          type: "category",
-          label: "Arrays",
-
-          items: ["Arrays/arrays"],
-        },
-        {
-          type: "category",
-          label: "Axes",
-
-          items: ["Axes/axes"],
-        },
-        {
-          type: "category",
-          label: "Brushes",
-
-          items: ["Brushes/brushes"],
-        },
-        {
-          type: "category",
-          label: "Chords",
-
-          items: ["Chords/chords"],
-        },
-        {
-          type: "category",
-          label: "Collections",
-
-          items: ["Collections/collections"],
-        },
-        {
-          type: "category",
-          label: "Colors",
-
-          items: ["Colors/colors"],
-        },
-        {
-          type: "category",
-          label: "ColorSchemes",
-
-          items: ["ColorSchemes/colorschemes"],
-        },
-        {
-          type: "category",
-          label: "Contours",
-
-          items: ["Contours/contours"],
-        },
-        {
-          type: "category",
-          label: "Delimiter-Seperated Values",
-
-          items: ["Delimiter/delimiter"],
-        },
-        {
-          type: "category",
-          label: "Easings",
-
-          items: ["Easings/easings"],
-        },
-        {
-          type: "category",
-          label: "Fetches",
-
-          items: ["Fetches/fetches"],
-        },
-        {
-          type: "category",
-          label: "Forces",
-
-          items: ["Forces/forces"],
-        },
-        {
-          type: "category",
-          label: "Number Formats",
-
-          items: ["NumberFormats/numberformats"],
-        },
-        {
-          type: "category",
-          label: "Geographies",
-
-          items: ["Geographies/geographies"],
-        },
-        {
-          type: "category",
-          label: "Hierarchies",
-
-          items: ["Hierarchies/hierarchies"],
-        },
+        "hello_tacos"
       ],
     },
-  ],
+    {
+      type: "category",
+      label: "Taqueria Internals",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "architecture",
+        "making_plugins"
+      ],
+    },
+  ]
 };
 
 module.exports = sidebars;
