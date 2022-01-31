@@ -188,8 +188,9 @@ jobs:
             const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
             const contractTypes = readInfo("./taqueria-plugin-contract-types/package.json")
 
-            const git_short_sha = "${{ github.sha }}".substring(1, 8)
+            const git_short_sha = "${{ github.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
+            const packageVersion = "0.0.0-pr-${{ github.event.number }}-${git_short_sha}";
 
             let body = `
 
@@ -201,12 +202,12 @@ jobs:
 
               | npm package installation instructions |
               | ------------------------------------- |
-              | npm install ${{ env.SCOPE }}/${ligo.name}@${ligo.version}|
-              | npm install ${{ env.SCOPE }}/${smartpy.name}@${smartpy.version}|
-              | npm install ${{ env.SCOPE }}/${taquito.name}@${taquito.version}|
-              | npm install ${{ env.SCOPE }}/${sdk.name}@${sdk.version}|
-              | npm install ${{ env.SCOPE }}/${flextesa.name}@${flextesa.version}|
-              | npm install ${{ env.SCOPE }}/${contractTypes.name}@${contractTypes.version}|
+              | npm install ${{ env.SCOPE }}/${ligo.name}@${packageVersion}|
+              | npm install ${{ env.SCOPE }}/${smartpy.name}@${packageVersion}|
+              | npm install ${{ env.SCOPE }}/${taquito.name}@${packageVersion}|
+              | npm install ${{ env.SCOPE }}/${sdk.name}@${packageVersion}|
+              | npm install ${{ env.SCOPE }}/${flextesa.name}@${packageVersion}|
+              | npm install ${{ env.SCOPE }}/${contractTypes.name}@${packageVersion}|
             `;
             
             github.rest.issues.createComment({
