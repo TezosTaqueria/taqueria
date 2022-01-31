@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/plugin-taquito",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A taqueria plugin for originating smart contracts using Taquito",
   "targets": {
     "default": {
@@ -46,6 +46,6 @@
     "@taquito/signer": "^11.1.0",
     "@taquito/taquito": "^11.0.2",
     "fast-glob": "^3.2.10",
-    "@taqueria/node-sdk": "^0.0.4"
+    "@taqueria/node-sdk": "^0.0.5"
   }
 }
