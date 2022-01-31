@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
     echo '**********************************************'
@@ -25,6 +25,6 @@ if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
     echo "Builds complete!"
 
 else
-    echo "Usage: ./bin/build.sh"
+    echo "Usage: ./bin/build-all.sh"
     echo "(please run from within project root)"
 fi
