@@ -24,7 +24,7 @@ const getCompileCommand = (opts, arch) => (sourceFile) => {
 
 const getLigoCompilationError = (stderr) => {
     const err = stderr.split("\n").slice(1).join("\n")
-    return `There was a compilation error.\n$\n{err}`
+    return `There was a compilation error.\n\n${err}`
 }
 
 const compileContract = (opts) => (sourceFile) =>
@@ -45,6 +45,10 @@ const compileAll = parsedArgs => {
         {cwd: parsedArgs.contractsDir, absolute: false}
     )
     .then(entries => entries.map(compileContract(parsedArgs)))
+    .then(processes => processes.length > 0
+        ? processes
+        : [{contract: "None found", artifact: "N/A"}]
+    )
     .then(promises => Promise.all(promises))
 }
 
