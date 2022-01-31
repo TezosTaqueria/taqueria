@@ -4,7 +4,7 @@ sidebar_position: 2
 ---
 
 
-Taqueria is a developer tool that helps Tezso application and smart-contract developers be more productive. Taqueria is a specialized task runner specific to the Tezos software development domain at its core.
+Taqueria is a developer tool that helps Tezos application and smart-contract developers be more productive. Taqueria is a specialized task runner specific to the Tezos software development domain at its core.
 
 Taqueria consists of:
 

@@ -1,0 +1,144 @@
+---
+title: Installation
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+<!-- -----
+Content Type: How-to Guide
+
+Purpose: To guide a developer through the process of installing the Taqueria CLI, basic plugins, and the VS Code Extension 
+
+Audience: Novice to intermediate developers with a basic understanding of Taqueria and CLI usage
+
+Goal: To provide a simple, easy, and reliable installation process for developers to follow so there is minimal churn due to frustration or an inability to use the product due to installation or configuration issues
+
+Questions:
+- What do you need to understand about Taqueria to understand the installion process?
+- What options are there for installing Taqueria?
+- What are the exact steps a user will need to follow for each OS?
+- What are the most frequent friction points new users will have?
+
+----- -->
+
+## Taqueria Installation Basics
+
+Installing Taqueria is a quick and easy process if you understand a few basic concepts and follow the steps outlined in this guide
+
+There are two main components to install:
+
+- The Taqueria CLI, an executable binary named `taq` installed globally in your shell's `$PATH`
+- A VS Code plugin installed directly through the VS Code Extension Marketplace
+
+## Requirements
+
+### Taqueria CLI
+
+- A compatable operating system:
+  - MacOS
+  - Linux
+  - Windows (via [WSL](https://docs.microsoft.com/en-us/windows/wsl/))
+- [Docker](https://www.docker.com/) 
+
+
+### VS Code Extension
+
+The VS Code Extension requires a recent version of Microsoft Visual Studio Code which can be installed [here](https://code.visualstudio.com/)
+
+## Installing the Taqueria CLI
+
+### Overview
+
+Installing the Taqueria CLI involves the following steps:
+
+1. Download the correct build of Taqueria for your operating system
+2. Make the Taqueria binary `taq` executable
+3. Add `taq` to your shell's `$PATH`
+
+Once these steps are complete, you will be able to run Taqueria from your terminal using the `taq` command
+
+
+### OS Specific Instructions
+
+<Tabs groupId="operating-systems">
+<TabItem value="mac" label="MacOS">
+
+1. Download the latest MacOS build of Taqueria
+
+```shell
+curl -LO https://taqueria.io/get/macos/taq
+```
+
+2. Make the binary file executable
+
+```shell
+chmod +x taq
+```
+
+3. Move the binary to a directory in your shell's `$PATH`
+
+```shell
+sudo mv taq /usr/local/bin
+````
+
+4. Disable MacOS Gatekeeper to allow Taqueria to run
+
+```shell
+sudo spctl --master-disable
+```
+
+:::caution
+Currently the `taq` binary is not signed for Mac OS. In order to run Taqueria, users must disable MacOS Gatekeeper (*This is not ideal*)  
+This is a temporary workaround until we can sign the binaries (see [#129](https://github.com/ecadlabs/taqueria/issues/129))
+
+If you want to re-enable the MacOS Gatekeeper later on, run the command  
+`sudo spctl --master-enable`
+:::
+
+</TabItem>
+<TabItem value="lnx" label="Linux">
+
+1. Download the latest Linux build of Taqueria
+
+```shell
+curl -LO https://taqueria.io/get/linux/taq
+```
+
+2. Make the binary file executable
+
+```shell
+chmod +x taq
+```
+
+3. Move the binary to a directory in your shell's `$PATH`
+
+```shell
+sudo mv taq /usr/local/bin
+```
+
+</TabItem>
+<TabItem value="win" label="Windows">
+
+We recomend Windows users run [WSL](https://docs.microsoft.com/en-us/windows/wsl/install) and follow the instructions detailed for Linux users
+
+A Windows x86_64 binary is available for those who are interested, however this is entirley unsupported and not reccomended
+
+```shell
+curl -LO https://taqueria.io/get/windows/taq.exe
+```
+
+</TabItem>
+</Tabs>
+
+## Installing the VS Code Extension
+
+The Taqueria VS Code Extension is installed from the Extensions pane within VS Code. The steps to install are:
+
+1. Open the Extensions pane
+2. Type `Taqueria` in the search bar
+3. Click install
+
+<img src={useBaseUrl('/img/taqueria-plugin-vscode-install.png')} />;
+
