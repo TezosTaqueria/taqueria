@@ -58,5 +58,4 @@ jobs:
       - name: Publish for official release
         if: ${{ github.event_name == 'release' && github.event.action == 'published' && steps.check-tag-suffix.outputs.npm-tag != 'next'}}
         run: |
-          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}" --workspace $GIT_WORKSPACE
           npm publish --workspace=$GIT_WORKSPACE --tag 'latest' --access public
