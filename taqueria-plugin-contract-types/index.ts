@@ -3,12 +3,12 @@ import type { i18n} from 'taqueria-sdk/types'
 import {tasks} from './tasks'
 
 Plugin.create((i18n: i18n) => ({
-    name: "contract-type-generator",
+    name: "contract-types",
     schema: "1.0",
     version: "0.1",
     tasks: [
         Task.create({
-            task: "typegen",
+            task: "types",
             command: "typegen [contract]",
             description: "Generate types for a contract to be used with taquito",
             options: [
@@ -24,7 +24,7 @@ Plugin.create((i18n: i18n) => ({
                     description: "The type aliases used in the generated types"
                 }),
             ],
-            aliases: ["typegen"],
+            aliases: ["types"],
             handler: "proxy"
         }),
     ],
