@@ -9,7 +9,16 @@
     "build-docker": "docker build . -t ghcr.io/ecadlabs/taqueria-flextesa:latest",
     "build": "npm run build-package && npm run build-docker"
   },
-  "keywords": ["taqueria", "docker", "flextesa", "sandbox", "local", "ecad", "ecadlabs", "tezos"],
+  "keywords": [
+    "taqueria",
+    "docker",
+    "flextesa",
+    "sandbox",
+    "local",
+    "ecad",
+    "ecadlabs",
+    "tezos"
+  ],
   "author": "ECAD Labs",
   "license": "Apache-2.0",
   "devDependencies": {
@@ -17,6 +26,7 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
+    "@taqueria/node-sdk": "^0.0.1",
     "partial.lenses": "^14.17.0",
     "promise-retry": "^2.0.1",
     "yargs": "^17.3.1"

@@ -1,10 +1,20 @@
 import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol} from '@taqueria/protocol/taqueria-protocol-types'
 import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView, ProxyAction} from "./types"
 import {join, resolve, dirname} from 'path'
+import {readFile, writeFile} from 'fs/promises'
 import {get} from 'stack-trace'
 import {exec} from 'child_process'
 import generateName from 'project-name-generator'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
+
+export const writeJsonFile = <T>(filename: string) => (data: T): Promise<string> =>
+    writeFile(filename, JSON.stringify(data, undefined, 4), {encoding: "utf8"})
+    .then(_ => filename)
+
+export const readJsonFile = <T>(filename: string): Promise<T> =>
+    readFile(filename, {encoding: "utf-8"})
+    .then(JSON.parse)
+    .then(result => (result as T))
 
 export const execCmd = (cmd:string): Promise<ProxyAction> => new Promise((resolve, _) => {
     exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {

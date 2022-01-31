@@ -127,7 +127,7 @@
     "vsce": "^2.6.4"
   },
   "dependencies": {
-    "@taqueria/protocol": "^0.0.1",
+    "@taqueria/protocol": "^0.0.4",
     "jsonc-parser": "^3.0.0",
     "promise-memoize": "^1.2.1",
     "rambda": "^7.0.1"
