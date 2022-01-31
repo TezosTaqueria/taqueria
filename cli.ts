@@ -187,7 +187,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
                         )
                         return updatedConfig
                     }),
-                    chain (writeTextFile(config.configFile.value))                    
+                    chain (writeJsonFile(config.configFile.value))                    
                 )
             }),
             map (() => i18n.__('pluginInstalled')),

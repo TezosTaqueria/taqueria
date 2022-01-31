@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/plugin-flextesa",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A plugin for Taqueria providing local sandbox capabilities built on Flextesa",
   "keywords": [
     "taqueria",
@@ -38,7 +38,7 @@
   "dependencies": {
     "fast-glob": "^3.2.7",
     "promise-retry": "^2.0.1",
-    "@taqueria/node-sdk": "^0.0.1"
+    "@taqueria/node-sdk": "^0.0.5"
   },
   "devDependencies": {
     "@types/promise-retry": "^1.1.3",
