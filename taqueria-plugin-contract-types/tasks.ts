@@ -81,13 +81,14 @@ const generateContractTypesAll = (parsedArgs: Opts & PluginOpts) : Promise<strin
     .then(files => Promise.all(files.map(generateContractTypes(parsedArgs))))
 
 export const generateTypes = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse, Failure<T>> => {
-    if(!parsedArgs.typescriptDir){
-        return Promise.reject({
-            status: 'failed',
-            stderr: `No typescriptDir configured`,
-            stdout: ""
-        });
-    }
+    parsedArgs.typescriptDir = parsedArgs.typescriptDir || 'types';
+    // if(!parsedArgs.typescriptDir){
+    //     return Promise.reject({
+    //         status: 'failed',
+    //         stderr: `No typescriptDir configured`,
+    //         stdout: ""
+    //     });
+    // }
 
     // WORKAROUND: Redirect console.log
     const strOutLog = [] as string[];

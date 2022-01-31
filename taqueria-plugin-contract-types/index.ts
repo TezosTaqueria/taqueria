@@ -15,7 +15,8 @@ Plugin.create((i18n: i18n) => ({
                 Option.create({
                     shortFlag: "o",
                     flag: "typescriptDir",
-                    description: "The entry point that will be compiled"
+                    description: "The entry point that will be compiled",
+                    default: 'types',
                 }),
                 Option.create({
                     shortFlag: "t",
