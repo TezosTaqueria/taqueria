@@ -1,6 +1,6 @@
 {
-  "name": "taqueria-plugin-boilerplate-typescript",
-  "version": "1.0.0",
+  "name": "@taqueria/plugin-boilerplate-typescript",
+  "version": "0.0.5",
   "description": "",
   "targets": {
     "default": {
