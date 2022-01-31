@@ -1,5 +1,5 @@
 {
-  "name": "taqueria-plugin-contract-type-generator",
+  "name": "@taqueria/plugin-contract-types",
   "version": "1.0.0",
   "description": "",
   "targets": {
