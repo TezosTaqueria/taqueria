@@ -20,12 +20,6 @@
     "example-simple": "npx ts-node run.ts --types simple --g ./example/contracts ./example/types-simple",
     "example-file": "npx ts-node run.ts --types file --g ./example/contracts ./example/types-file",
     "example-local": "npx ts-node run.ts --types local --g ./example/contracts ./example/types-local",
-    "test-generate": "npx ts-node run.ts --g ../taquito-michel-codec/test/ ./test/michel-codec-test-contract-types/",
-    "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts'",
-    "precommit": "lint-staged",
-    "prebuild": "rimraf dist",
-    "//build": "tsc --project ./tsconfig.prod.json --module commonjs && rollup -c rollup.config.ts",
-    "start": "rollup -c rollup.config.ts -w",
     "test": "npm run examples && npx jest"
   },
   "keywords": [],
