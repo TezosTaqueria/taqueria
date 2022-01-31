@@ -1,9 +1,9 @@
-var $2OpfP$taqueriasdk = require("taqueria-sdk");
-var $2OpfP$fastglob = require("fast-glob");
-var $2OpfP$path = require("path");
-var $2OpfP$fs = require("fs");
-var $2OpfP$util = require("util");
-var $2OpfP$taquitomichelcodec = require("@taquito/michel-codec");
+var $dmB1f$taqueriasdk = require("taqueria-sdk");
+var $dmB1f$fastglob = require("fast-glob");
+var $dmB1f$path = require("path");
+var $dmB1f$fs = require("fs");
+var $dmB1f$util = require("util");
+var $dmB1f$taquitomichelcodec = require("@taquito/michel-codec");
 
 function $parcel$interopDefault(a) {
   return a && a.__esModule ? a.default : a;
@@ -14,14 +14,14 @@ function $parcel$interopDefault(a) {
 
 
 
-const $86a63c409e46a674$export$bd8d1d28710832a7 = (text)=>text.replace(/[^A-Za-z0-9]/g, '_').split("_").filter((x)=>x
+const $ed59e75e81f61a11$export$bd8d1d28710832a7 = (text)=>text.replace(/[^A-Za-z0-9]/g, '_').split("_").filter((x)=>x
     ).map((x)=>x[0].toUpperCase() + x.substring(1)
     ).join('')
 ;
 
 
 
-class $832c2c280611fcb3$export$d214d56e7a53a664 {
+class $8f5f1f3bf39a3a15$export$d214d56e7a53a664 {
     constructor(message1, data){
         this.message = message1;
         this.data = data;
@@ -29,12 +29,12 @@ class $832c2c280611fcb3$export$d214d56e7a53a664 {
         console.error(`❌ GenerateApiError: ${message1}`, data);
     }
 }
-const $832c2c280611fcb3$export$16bf6fe03653420f = (value, message)=>{
+const $8f5f1f3bf39a3a15$export$16bf6fe03653420f = (value, message)=>{
     console.error(message, {
         value: value
     });
 };
-const $832c2c280611fcb3$export$37679993c4e6bc41 = (out, x)=>{
+const $8f5f1f3bf39a3a15$export$37679993c4e6bc41 = (out, x)=>{
     out.push(...x);
     return out;
 } // const reduceFlatMapTest = () => {
@@ -45,12 +45,12 @@ const $832c2c280611fcb3$export$37679993c4e6bc41 = (out, x)=>{
 
 
 
-const $1d117ae52bf607e8$var$toDebugSource = (node)=>{
+const $8d9beb01354271e1$var$toDebugSource = (node)=>{
     return JSON.stringify(node);
 };
-const $1d117ae52bf607e8$export$cc65da7b09dcddd7 = (storage)=>{
-    const fields = storage.args.map((x)=>$1d117ae52bf607e8$var$visitVar(x)
-    ).reduce($832c2c280611fcb3$export$37679993c4e6bc41, []);
+const $8d9beb01354271e1$export$cc65da7b09dcddd7 = (storage)=>{
+    const fields = storage.args.map((x)=>$8d9beb01354271e1$var$visitVar(x)
+    ).reduce($8f5f1f3bf39a3a15$export$37679993c4e6bc41, []);
     const fieldsSimple = fields.length === 1 && !fields[0].name && fields[0].type.kind === 'object' ? fields[0].type.fields : fields;
     return {
         storage: {
@@ -60,20 +60,20 @@ const $1d117ae52bf607e8$export$cc65da7b09dcddd7 = (storage)=>{
         }
     };
 };
-const $1d117ae52bf607e8$export$5c00959a6ba200c1 = (parameter)=>{
+const $8d9beb01354271e1$export$5c00959a6ba200c1 = (parameter)=>{
     return {
-        methods: parameter.args.map((x)=>$1d117ae52bf607e8$var$visitContractParameterEndpoint(x)
-        ).reduce($832c2c280611fcb3$export$37679993c4e6bc41, [])
+        methods: parameter.args.map((x)=>$8d9beb01354271e1$var$visitContractParameterEndpoint(x)
+        ).reduce($8f5f1f3bf39a3a15$export$37679993c4e6bc41, [])
     };
 };
-const $1d117ae52bf607e8$var$visitContractParameterEndpoint = (node)=>{
+const $8d9beb01354271e1$var$visitContractParameterEndpoint = (node)=>{
     // console.log('visitContractParameterEndpoint', { node });
     // Sub endpoints (i.e. admin endpoints that are imported)
-    if (node.prim === `or`) return node.args.map((x)=>$1d117ae52bf607e8$var$visitContractParameterEndpoint(x)
-    ).reduce($832c2c280611fcb3$export$37679993c4e6bc41, []);
+    if (node.prim === `or`) return node.args.map((x)=>$8d9beb01354271e1$var$visitContractParameterEndpoint(x)
+    ).reduce($8f5f1f3bf39a3a15$export$37679993c4e6bc41, []);
     // Sub endpoints as a list with a single or (i.e. admin endpoints that are imported)
-    if (node.prim === `list` && node.args.length === 1 && node.args[0]?.prim === `or`) return node.args.map((x)=>$1d117ae52bf607e8$var$visitContractParameterEndpoint(x)
-    ).reduce($832c2c280611fcb3$export$37679993c4e6bc41, []);
+    if (node.prim === `list` && node.args.length === 1 && node.args[0]?.prim === `or`) return node.args.map((x)=>$8d9beb01354271e1$var$visitContractParameterEndpoint(x)
+    ).reduce($8f5f1f3bf39a3a15$export$37679993c4e6bc41, []);
     const nameRaw = node.annots?.[0];
     const name = nameRaw?.startsWith('%') ? nameRaw.substr(1) : null;
     if (!name) {
@@ -83,7 +83,7 @@ const $1d117ae52bf607e8$var$visitContractParameterEndpoint = (node)=>{
         });
         return [];
     }
-    const nodeType = $1d117ae52bf607e8$var$visitType(node, {
+    const nodeType = $8d9beb01354271e1$var$visitType(node, {
         ignorePairName: node.prim === 'pair'
     });
     // Method args are usually objects
@@ -105,9 +105,9 @@ const $1d117ae52bf607e8$var$visitContractParameterEndpoint = (node)=>{
         }
     ];
 };
-const $1d117ae52bf607e8$var$visitVar = (node)=>{
+const $8d9beb01354271e1$var$visitVar = (node)=>{
     const name = `annots` in node && node.annots?.length === 1 ? node.annots[0].substr(1) : undefined;
-    const type = $1d117ae52bf607e8$var$visitType(node);
+    const type = $8d9beb01354271e1$var$visitType(node);
     return [
         {
             name: name,
@@ -115,7 +115,7 @@ const $1d117ae52bf607e8$var$visitVar = (node)=>{
         }
     ];
 };
-const $1d117ae52bf607e8$var$visitType = (node, options)=>{
+const $8d9beb01354271e1$var$visitType = (node, options)=>{
     // console.log('visitType', { node });
     // const debug_source = toDebugSource(node);
     // if (typeof node === `string`) {
@@ -133,14 +133,14 @@ const $1d117ae52bf607e8$var$visitType = (node, options)=>{
     }
     // Union
     if (node.prim === `or`) {
-        const unionVars = node.args.map((x)=>$1d117ae52bf607e8$var$visitVar(x)
-        ).reduce($832c2c280611fcb3$export$37679993c4e6bc41, []).map((x)=>x
+        const unionVars = node.args.map((x)=>$8d9beb01354271e1$var$visitVar(x)
+        ).reduce($8f5f1f3bf39a3a15$export$37679993c4e6bc41, []).map((x)=>x
         );
         // Flatten with child unions
         const union = unionVars.map((x)=>!x.name && x.type.kind === 'union' ? x.type.union : [
                 x
             ]
-        ).reduce($832c2c280611fcb3$export$37679993c4e6bc41, []);
+        ).reduce($8f5f1f3bf39a3a15$export$37679993c4e6bc41, []);
         // const union = unionVars.map(x=>x.type);
         // const union = unionVars.map(x => x.type);
         // Flatten with child unions
@@ -150,7 +150,7 @@ const $1d117ae52bf607e8$var$visitType = (node, options)=>{
         //     union.push(...rightSide.union);
         // }
         if (union.some((x)=>!x
-        )) throw new $832c2c280611fcb3$export$d214d56e7a53a664(`or: Some fields are null`, {
+        )) throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`or: Some fields are null`, {
             node: node
         });
         return {
@@ -161,15 +161,15 @@ const $1d117ae52bf607e8$var$visitType = (node, options)=>{
     }
     // Intersect
     if (node.prim === `pair`) {
-        const fields = node.args.map((x)=>$1d117ae52bf607e8$var$visitVar(x)
-        ).reduce($832c2c280611fcb3$export$37679993c4e6bc41, []);
+        const fields = node.args.map((x)=>$8d9beb01354271e1$var$visitVar(x)
+        ).reduce($8f5f1f3bf39a3a15$export$37679993c4e6bc41, []);
         if (fields.some((x)=>!x
-        )) throw new $832c2c280611fcb3$export$d214d56e7a53a664(`pair: Some fields are null`, {
+        )) throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`pair: Some fields are null`, {
             node: node,
             args: node.args,
             fields: fields
         });
-        if (fields.length !== 2) throw new $832c2c280611fcb3$export$d214d56e7a53a664(`pair: Expected 2 items`, {
+        if (fields.length !== 2) throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`pair: Expected 2 items`, {
             node: node,
             length: fields.length,
             fields: fields
@@ -178,7 +178,7 @@ const $1d117ae52bf607e8$var$visitType = (node, options)=>{
         const fieldsFlat = fields.map((x)=>(!x.name || options?.ignorePairName) && x.type.kind === 'object' ? x.type.fields : [
                 x
             ]
-        ).reduce($832c2c280611fcb3$export$37679993c4e6bc41, []);
+        ).reduce($8f5f1f3bf39a3a15$export$37679993c4e6bc41, []);
         return {
             kind: `object`,
             raw: node,
@@ -187,12 +187,12 @@ const $1d117ae52bf607e8$var$visitType = (node, options)=>{
     }
     // list
     if (node.prim === `list` || node.prim === `set`) {
-        if (node.args.length !== 1) throw new $832c2c280611fcb3$export$d214d56e7a53a664(`list does not have 1 arg`, {
+        if (node.args.length !== 1) throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`list does not have 1 arg`, {
             node: node,
             args: node.args
         });
-        const arrayItem = $1d117ae52bf607e8$var$visitType(node.args[0]);
-        if (!arrayItem) throw new $832c2c280611fcb3$export$d214d56e7a53a664(`arrayItem are null`, {
+        const arrayItem = $8d9beb01354271e1$var$visitType(node.args[0]);
+        if (!arrayItem) throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`arrayItem are null`, {
             node: node,
             args: node.args,
             arrayItem: arrayItem
@@ -207,13 +207,13 @@ const $1d117ae52bf607e8$var$visitType = (node, options)=>{
     }
     // map
     if (node.prim === `map` || node.prim === `big_map`) {
-        if (node.args.length !== 2) throw new $832c2c280611fcb3$export$d214d56e7a53a664(`map does not have 2 args`, {
+        if (node.args.length !== 2) throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`map does not have 2 args`, {
             node: node,
             args: node.args
         });
-        const mapKey = $1d117ae52bf607e8$var$visitType(node.args[0]);
-        const mapValue = $1d117ae52bf607e8$var$visitType(node.args[1]);
-        if (!mapKey || !mapValue) throw new $832c2c280611fcb3$export$d214d56e7a53a664(`map is missing key or value`, {
+        const mapKey = $8d9beb01354271e1$var$visitType(node.args[0]);
+        const mapValue = $8d9beb01354271e1$var$visitType(node.args[1]);
+        if (!mapKey || !mapValue) throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`map is missing key or value`, {
             node: node,
             args: node.args,
             mapKey: mapKey,
@@ -231,7 +231,7 @@ const $1d117ae52bf607e8$var$visitType = (node, options)=>{
     }
     // option
     if (node.prim === `option`) return {
-        ...$1d117ae52bf607e8$var$visitType(node.args[0]),
+        ...$8d9beb01354271e1$var$visitType(node.args[0]),
         optional: true
     };
     // boolean
@@ -290,19 +290,19 @@ const $1d117ae52bf607e8$var$visitType = (node, options)=>{
         raw: node
     };
     // Unknown
-    $832c2c280611fcb3$export$16bf6fe03653420f(node, `Unknown type`);
-    throw new $832c2c280611fcb3$export$d214d56e7a53a664(`Unknown type`, {
+    $8f5f1f3bf39a3a15$export$16bf6fe03653420f(node, `Unknown type`);
+    throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`Unknown type`, {
         node: node
     });
 };
 
 
 
-const $00d1ab297b93ca91$export$eb0413f5ee90780 = (methods)=>{
+const $faedb04f69c26ca4$export$eb0413f5ee90780 = (methods)=>{
     const getSchemaObjectType = (vars)=>{
         // console.log('getSchemaObjectType', { vars });
         if (vars.some((x)=>!x
-        )) throw new $832c2c280611fcb3$export$d214d56e7a53a664(`getSchemaObjectType has null vars`, {
+        )) throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`getSchemaObjectType has null vars`, {
             vars: vars
         });
         return vars.reduce((out, x, i)=>{
@@ -336,7 +336,7 @@ const $00d1ab297b93ca91$export$eb0413f5ee90780 = (methods)=>{
 
 
 
-const $17ce70d2368a9ed4$export$d355209543d39bc0 = (storage, methods, contractName, parsedContract, protocol, typeAliasData)=>{
+const $4a2449fc09330f4b$export$d355209543d39bc0 = (storage, methods, contractName, parsedContract, protocol, typeAliasData, typeUtilsData)=>{
     const usedStrictTypes = [];
     const addTypeAlias = (strictType)=>{
         if (!usedStrictTypes.some((x)=>x.aliasType === strictType.aliasType
@@ -433,30 +433,41 @@ ${tabs(indent)}`;
         }
         if (t.kind === `never`) return `never`;
         if (t.kind === `unknown`) return `unknown`;
-        $832c2c280611fcb3$export$16bf6fe03653420f(t, `Unknown type`);
-        throw new $832c2c280611fcb3$export$d214d56e7a53a664(`Unknown type node`, {
+        $8f5f1f3bf39a3a15$export$16bf6fe03653420f(t, `Unknown type`);
+        throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`Unknown type node`, {
             t: t
         });
     };
     const varToCode = (t, i, indent)=>{
         return `${t.name ?? i}${t.type.optional ? `?` : ``}: ${typeToCode(t.type, indent)}`;
     };
-    const argsToCode = (args, indent)=>{
+    const argsToCode = (args, indent, asObject)=>{
         if (args.length === 1) {
             if (args[0].type.kind === `unit`) return ``;
             return `${args[0].name ?? `param`}: ${typeToCode(args[0].type, indent + 1)}`;
         }
-        return `${toIndentedItems(indent, {
+        const result = `${toIndentedItems(indent, {
         }, args.filter((x)=>x.name || x.type.kind !== `unit`
         ).map((a, i)=>varToCode(a, i, indent + 1) + `,`
         ))}`;
+        if (asObject) return `params: {${result}}`;
+        return result;
     };
     const methodsToCode = (indent)=>{
         const methodFields = methods.map((x)=>{
-            const methodCode = `${x.name}: (${argsToCode(x.args, indent + 1)}) => Promise<void>;`;
+            const methodCode = `${x.name}: (${argsToCode(x.args, indent + 1, false)}) => Promise<void>;`;
             return methodCode;
         });
         const methodsTypeCode = `type Methods = {${toIndentedItems(indent, {
+        }, methodFields)}};`;
+        return methodsTypeCode;
+    };
+    const methodsObjectToCode = (indent)=>{
+        const methodFields = methods.map((x)=>{
+            const methodCode = `${x.name}: (${argsToCode(x.args, indent + 1, true)}) => Promise<void>;`;
+            return methodCode;
+        });
+        const methodsTypeCode = `type MethodsObject = {${toIndentedItems(indent, {
         }, methodFields)}};`;
         return methodsTypeCode;
     };
@@ -465,10 +476,11 @@ ${tabs(indent)}`;
         return storageTypeCode;
     };
     const methodsCode = methodsToCode(0);
+    const methodsObjectCode = methodsObjectToCode(0);
     const storageCode = storageToCode(0);
     // Simple type aliases
     const simpleTypeMappingImportsAll = new Map(usedStrictTypes.map((x)=>x.simpleTypeImports ?? []
-    ).reduce($832c2c280611fcb3$export$37679993c4e6bc41, []).map((x)=>[
+    ).reduce($8f5f1f3bf39a3a15$export$37679993c4e6bc41, []).map((x)=>[
             `${x?.from}:${x?.name}:${x?.isDefault}`,
             x
         ]
@@ -498,18 +510,25 @@ ${tabs(indent)}`;
     const simpleTypeMapping = usedStrictTypes.sort((a, b)=>a.aliasType.localeCompare(b.aliasType)
     ).map((x)=>x.simpleTypeDefinition
     ).join(`\n`);
+    const typeUtilsDefinitions = `import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from '${typeUtilsData.importPath}';`;
     const typeAliasesDefinitions = typeAliasData.mode === 'simple' ? `${simpleTypeMappingImportsText}${simpleTypeMapping}` : typeAliasData.mode === 'local' ? typeAliasData.fileContent : `import { ${usedStrictTypes.map((x)=>x.aliasType
     ).join(`, `)} } from '${typeAliasData.importPath}';`;
     const contractTypeName = `${contractName}ContractType`;
+    const walletTypeName = `${contractName}WalletType`;
     const codeName = `${contractName}Code`;
     const typesFileContent = `
+${typeUtilsDefinitions}
 ${typeAliasesDefinitions}
 
 ${storageCode}
 
 ${methodsCode}
 
-export type ${contractTypeName} = { methods: Methods, storage: Storage, code: { __type: '${codeName}', protocol: string, code: object[] } };
+${methodsObjectCode}
+
+type contractTypes = { methods: Methods, methodsObject: MethodsObject, storage: Storage, code: { __type: '${codeName}', protocol: string, code: object[] } };
+export type ${contractTypeName} = ContractAbstractionFromContractType<contractTypes>;
+export type ${walletTypeName} = WalletContractAbstractionFromContractType<contractTypes>;
 `;
     const contractCodeFileContent = `
 export const ${codeName}: { __type: '${codeName}', protocol: string, code: object[] } = {
@@ -522,29 +541,30 @@ export const ${codeName}: { __type: '${codeName}', protocol: string, code: objec
         typesFileContent: typesFileContent,
         contractCodeFileContent: contractCodeFileContent,
         storage: storageCode,
-        methods: methodsCode
+        methods: methodsCode,
+        methodsObject: methodsObjectCode
     };
 };
 
 
-const $1daed9670aa8a178$var$parseContractWithMinimalProtocolLevel = (contractScript, format, contractLevelIndex)=>{
+const $f4193c486fbdae37$var$parseContractWithMinimalProtocolLevel = (contractScript, format, contractLevelIndex)=>{
     const contractLevels = [
         {
             name: 'PsDELPH1',
-            key: $2OpfP$taquitomichelcodec.Protocol.PsDELPH1
+            key: $dmB1f$taquitomichelcodec.Protocol.PsDELPH1
         },
         {
             name: 'PtEdo2Zk',
-            key: $2OpfP$taquitomichelcodec.Protocol.PtEdo2Zk
+            key: $dmB1f$taquitomichelcodec.Protocol.PtEdo2Zk
         },
         {
             name: 'PsFLorena',
-            key: $2OpfP$taquitomichelcodec.Protocol.PsFLorena
+            key: $dmB1f$taquitomichelcodec.Protocol.PsFLorena
         }, 
     ];
     const protocol = contractLevels[contractLevelIndex];
-    if (!protocol) throw new $832c2c280611fcb3$export$d214d56e7a53a664(`Could not parse contract script`, contractScript);
-    const p = new $2OpfP$taquitomichelcodec.Parser({
+    if (!protocol) throw new $8f5f1f3bf39a3a15$export$d214d56e7a53a664(`Could not parse contract script`, contractScript);
+    const p = new $dmB1f$taquitomichelcodec.Parser({
         protocol: protocol.key
     });
     try {
@@ -557,18 +577,18 @@ const $1daed9670aa8a178$var$parseContractWithMinimalProtocolLevel = (contractScr
     // Ignore parse errors
     }
     // Try again with next level
-    return $1daed9670aa8a178$var$parseContractWithMinimalProtocolLevel(contractScript, format, contractLevelIndex + 1);
+    return $f4193c486fbdae37$var$parseContractWithMinimalProtocolLevel(contractScript, format, contractLevelIndex + 1);
 };
-const $1daed9670aa8a178$export$adc4e820bbd3332 = (contractScript, contractName, format, typeAliasData)=>{
-    const p = new $2OpfP$taquitomichelcodec.Parser({
-        protocol: $2OpfP$taquitomichelcodec.Protocol.PsFLorena
+const $f4193c486fbdae37$export$adc4e820bbd3332 = (contractScript, contractName, format, typeAliasData, typeUtilsData)=>{
+    const p = new $dmB1f$taquitomichelcodec.Parser({
+        protocol: $dmB1f$taquitomichelcodec.Protocol.PsFLorena
     });
-    const { contract: contract , protocol: protocol  } = $1daed9670aa8a178$var$parseContractWithMinimalProtocolLevel(contractScript, format, 0);
+    const { contract: contract , protocol: protocol  } = $f4193c486fbdae37$var$parseContractWithMinimalProtocolLevel(contractScript, format, 0);
     const contractStorage = contract.find((x)=>x.prim === `storage`
     );
     const contractParameter = contract.find((x)=>x.prim === `parameter`
     );
-    const storageResult = contractStorage && $1d117ae52bf607e8$export$cc65da7b09dcddd7(contractStorage);
+    const storageResult = contractStorage && $8d9beb01354271e1$export$cc65da7b09dcddd7(contractStorage);
     const storage = storageResult ?? {
         storage: {
             kind: `object`,
@@ -578,10 +598,10 @@ const $1daed9670aa8a178$export$adc4e820bbd3332 = (contractScript, contractName, 
             fields: []
         }
     };
-    const parameterResult = contractParameter && $1d117ae52bf607e8$export$5c00959a6ba200c1(contractParameter);
+    const parameterResult = contractParameter && $8d9beb01354271e1$export$5c00959a6ba200c1(contractParameter);
     const methods = parameterResult?.methods ?? [];
-    const schemaOutput = $00d1ab297b93ca91$export$eb0413f5ee90780(methods);
-    const typescriptCode = $17ce70d2368a9ed4$export$d355209543d39bc0(storage, methods, contractName, contract, protocol, typeAliasData);
+    const schemaOutput = $faedb04f69c26ca4$export$eb0413f5ee90780(methods);
+    const typescriptCode = $4a2449fc09330f4b$export$d355209543d39bc0(storage, methods, contractName, contract, protocol, typeAliasData, typeUtilsData);
     return {
         schema: schemaOutput,
         typescriptCodeOutput: typescriptCode,
@@ -591,7 +611,7 @@ const $1daed9670aa8a178$export$adc4e820bbd3332 = (contractScript, contractName, 
 };
 
 
-const $80b07c9b35f59610$export$4bf5db15180664ad = `
+const $d0fc9b208811a1ce$export$4bf5db15180664ad = `
 import { BigNumber } from 'bignumber.js';
 import { MichelsonMap } from '@taquito/taquito';
 
@@ -675,23 +695,62 @@ export const tas = {
 `;
 
 
-const $16461891ca13f9bb$var$fs = {
-    mkdir: $2OpfP$util.promisify(($parcel$interopDefault($2OpfP$fs)).mkdir),
-    copyFile: $2OpfP$util.promisify(($parcel$interopDefault($2OpfP$fs)).copyFile),
-    readdir: $2OpfP$util.promisify(($parcel$interopDefault($2OpfP$fs)).readdir),
-    readFile: $2OpfP$util.promisify(($parcel$interopDefault($2OpfP$fs)).readFile),
-    writeFile: $2OpfP$util.promisify(($parcel$interopDefault($2OpfP$fs)).writeFile),
-    stat: $2OpfP$util.promisify(($parcel$interopDefault($2OpfP$fs)).stat),
-    exists: ($parcel$interopDefault($2OpfP$fs)).existsSync
+const $623bd4d726978ad0$export$e9cf70f604100ab7 = `
+import { ContractAbstraction, ContractMethod, ContractMethodObject, ContractProvider, Wallet } from '@taquito/taquito';
+
+type BaseContractType = { methods: unknown, methodsObject: unknown, storage: unknown };
+
+type ContractMethodsOf<T extends ContractProvider | Wallet, TContract extends BaseContractType> = {
+[M in keyof TContract['methods']]:
+TContract['methods'][M] extends (...args: infer A) => unknown
+? (...args: A) => ContractMethod<T>
+: never
 };
-const $16461891ca13f9bb$var$getAllFiles = async (rootPath, filter)=>{
+type ContractMethodsObjectsOf<T extends ContractProvider | Wallet, TContract extends BaseContractType> = {
+[M in keyof TContract['methodsObject']]:
+TContract['methodsObject'][M] extends (...args: infer A) => unknown
+? (...args: A) => ContractMethodObject<T>
+: never
+};
+type ContractStorageOf<TContract extends BaseContractType> = TContract['storage'];
+
+export type ContractAbstractionFromContractType<TContract extends BaseContractType> = 
+    ContractAbstraction<ContractProvider, 
+        ContractMethodsOf<ContractProvider, TContract>,
+        ContractMethodsObjectsOf<ContractProvider, TContract>,
+        {},
+        {},
+        ContractStorageOf<TContract>
+    >;
+
+export type WalletContractAbstractionFromContractType<TContract extends BaseContractType> = 
+    ContractAbstraction<Wallet, 
+        ContractMethodsOf<Wallet, TContract>,
+        ContractMethodsObjectsOf<Wallet, TContract>,
+        {},
+        {},
+        ContractStorageOf<TContract>
+    >;
+`;
+
+
+const $2568776a79215f9e$var$fs = {
+    mkdir: $dmB1f$util.promisify(($parcel$interopDefault($dmB1f$fs)).mkdir),
+    copyFile: $dmB1f$util.promisify(($parcel$interopDefault($dmB1f$fs)).copyFile),
+    readdir: $dmB1f$util.promisify(($parcel$interopDefault($dmB1f$fs)).readdir),
+    readFile: $dmB1f$util.promisify(($parcel$interopDefault($dmB1f$fs)).readFile),
+    writeFile: $dmB1f$util.promisify(($parcel$interopDefault($dmB1f$fs)).writeFile),
+    stat: $dmB1f$util.promisify(($parcel$interopDefault($dmB1f$fs)).stat),
+    exists: ($parcel$interopDefault($dmB1f$fs)).existsSync
+};
+const $2568776a79215f9e$var$getAllFiles = async (rootPath, filter)=>{
     const allFiles = [];
     const getAllFilesRecursive = async (dirPath)=>{
-        let files = await $16461891ca13f9bb$var$fs.readdir(dirPath, {
+        let files = await $2568776a79215f9e$var$fs.readdir(dirPath, {
             withFileTypes: true
         });
         for (const f of files){
-            const subPath = ($parcel$interopDefault($2OpfP$path)).resolve(dirPath, f.name);
+            const subPath = ($parcel$interopDefault($dmB1f$path)).resolve(dirPath, f.name);
             if (f.isDirectory()) {
                 await getAllFilesRecursive(subPath);
                 continue;
@@ -703,10 +762,10 @@ const $16461891ca13f9bb$var$getAllFiles = async (rootPath, filter)=>{
     await getAllFilesRecursive(rootPath);
     return allFiles;
 };
-const $16461891ca13f9bb$export$2ab4539ae1119673 = async ({ inputTzContractDirectory: inputTzContractDirectory , inputFiles: inputFiles , outputTypescriptDirectory: outputTypescriptDirectory , format: format , typeAliasMode: typeAliasMode ,  })=>{
-    console.log(`Generating Types: ${($parcel$interopDefault($2OpfP$path)).resolve(inputTzContractDirectory)} => ${($parcel$interopDefault($2OpfP$path)).resolve(outputTypescriptDirectory)}`);
+const $2568776a79215f9e$export$2ab4539ae1119673 = async ({ inputTzContractDirectory: inputTzContractDirectory , inputFiles: inputFiles , outputTypescriptDirectory: outputTypescriptDirectory , format: format , typeAliasMode: typeAliasMode ,  })=>{
+    console.log(`Generating Types: ${($parcel$interopDefault($dmB1f$path)).resolve(inputTzContractDirectory)} => ${($parcel$interopDefault($dmB1f$path)).resolve(outputTypescriptDirectory)}`);
     const ext = '.' + format;
-    const filesAll = await $16461891ca13f9bb$var$getAllFiles(inputTzContractDirectory, (x)=>x.endsWith(ext)
+    const filesAll = await $2568776a79215f9e$var$getAllFiles(inputTzContractDirectory, (x)=>x.endsWith(ext)
     );
     const files = inputFiles ? filesAll.filter((f)=>inputFiles.some((inputFile)=>f.endsWith(inputFile)
         )
@@ -718,7 +777,7 @@ const $16461891ca13f9bb$export$2ab4539ae1119673 = async ({ inputTzContractDirect
     const typeAliasImportPath = `@taquito/contract-type-generator`;
     const typeAliasData = typeAliasMode === 'local' ? {
         mode: typeAliasMode,
-        fileContent: $80b07c9b35f59610$export$4bf5db15180664ad
+        fileContent: $d0fc9b208811a1ce$export$4bf5db15180664ad
     } : typeAliasMode === 'file' ? {
         mode: typeAliasMode,
         importPath: `./type-aliases`
@@ -730,30 +789,38 @@ const $16461891ca13f9bb$export$2ab4539ae1119673 = async ({ inputTzContractDirect
     };
     if (typeAliasMode === 'file') {
         // Copy the type alias file
-        await $16461891ca13f9bb$var$fs.mkdir(outputTypescriptDirectory, {
+        await $2568776a79215f9e$var$fs.mkdir(outputTypescriptDirectory, {
             recursive: true
         });
-        await $16461891ca13f9bb$var$fs.writeFile(($parcel$interopDefault($2OpfP$path)).join(outputTypescriptDirectory, './type-aliases.ts'), $80b07c9b35f59610$export$4bf5db15180664ad);
+        await $2568776a79215f9e$var$fs.writeFile(($parcel$interopDefault($dmB1f$path)).join(outputTypescriptDirectory, './type-aliases.ts'), $d0fc9b208811a1ce$export$4bf5db15180664ad);
     }
+    // Copy the type utils file
+    const typeUtilsData = {
+        importPath: `./type-utils`
+    };
+    await $2568776a79215f9e$var$fs.mkdir(outputTypescriptDirectory, {
+        recursive: true
+    });
+    await $2568776a79215f9e$var$fs.writeFile(($parcel$interopDefault($dmB1f$path)).join(outputTypescriptDirectory, './type-utils.ts'), $623bd4d726978ad0$export$e9cf70f604100ab7);
     for (const fullPath of files){
-        const fileRelativePath = fullPath.replace(($parcel$interopDefault($2OpfP$path)).resolve(inputTzContractDirectory), '');
+        const fileRelativePath = fullPath.replace(($parcel$interopDefault($dmB1f$path)).resolve(inputTzContractDirectory), '');
         const fileName = fileRelativePath.replace(ext, '');
-        const inputFilePath = ($parcel$interopDefault($2OpfP$path)).join(inputTzContractDirectory, fileRelativePath);
-        const typesOutputFilePath = ($parcel$interopDefault($2OpfP$path)).join(outputTypescriptDirectory, fileRelativePath.replace(ext, `.types.ts`));
-        const codeContentOutputFilePath = ($parcel$interopDefault($2OpfP$path)).join(outputTypescriptDirectory, fileRelativePath.replace(ext, `.code.ts`));
+        const inputFilePath = ($parcel$interopDefault($dmB1f$path)).join(inputTzContractDirectory, fileRelativePath);
+        const typesOutputFilePath = ($parcel$interopDefault($dmB1f$path)).join(outputTypescriptDirectory, fileRelativePath.replace(ext, `.types.ts`));
+        const codeContentOutputFilePath = ($parcel$interopDefault($dmB1f$path)).join(outputTypescriptDirectory, fileRelativePath.replace(ext, `.code.ts`));
         console.log(`Processing ${fileRelativePath}...`);
         try {
-            const contractTypeName = $86a63c409e46a674$export$bd8d1d28710832a7(fileName);
-            const michelsonCode = await $16461891ca13f9bb$var$fs.readFile(inputFilePath, {
+            const contractTypeName = $ed59e75e81f61a11$export$bd8d1d28710832a7(fileName);
+            const michelsonCode = await $2568776a79215f9e$var$fs.readFile(inputFilePath, {
                 encoding: `utf8`
             });
-            const { typescriptCodeOutput: { typesFileContent: typesFileContent , contractCodeFileContent: contractCodeFileContent  }  } = $1daed9670aa8a178$export$adc4e820bbd3332(michelsonCode, contractTypeName, format, typeAliasData);
+            const { typescriptCodeOutput: { typesFileContent: typesFileContent , contractCodeFileContent: contractCodeFileContent  }  } = $f4193c486fbdae37$export$adc4e820bbd3332(michelsonCode, contractTypeName, format, typeAliasData, typeUtilsData);
             // Write output (ensure dir exists)
-            await $16461891ca13f9bb$var$fs.mkdir(($parcel$interopDefault($2OpfP$path)).dirname(typesOutputFilePath), {
+            await $2568776a79215f9e$var$fs.mkdir(($parcel$interopDefault($dmB1f$path)).dirname(typesOutputFilePath), {
                 recursive: true
             });
-            await $16461891ca13f9bb$var$fs.writeFile(typesOutputFilePath, typesFileContent);
-            await $16461891ca13f9bb$var$fs.writeFile(codeContentOutputFilePath, contractCodeFileContent);
+            await $2568776a79215f9e$var$fs.writeFile(typesOutputFilePath, typesFileContent);
+            await $2568776a79215f9e$var$fs.writeFile(codeContentOutputFilePath, contractCodeFileContent);
         } catch (err) {
             console.error(`❌ Could not process ${fileRelativePath}`, {
                 err: err
@@ -763,11 +830,11 @@ const $16461891ca13f9bb$export$2ab4539ae1119673 = async ({ inputTzContractDirect
 };
 
 
-const $f2698429a4aa14ba$var$getContractAbspath = (contractFilename, parsedArgs)=>$2OpfP$path.join(parsedArgs.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`)
+const $9fbf4c0f86dc9893$var$getContractAbspath = (contractFilename, parsedArgs)=>$dmB1f$path.join(parsedArgs.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`)
 ;
-const $f2698429a4aa14ba$var$generateContractTypes = (parsedArgs)=>async (contractFilename)=>{
-        const contractAbspath = $f2698429a4aa14ba$var$getContractAbspath(contractFilename, parsedArgs);
-        await $16461891ca13f9bb$export$2ab4539ae1119673({
+const $9fbf4c0f86dc9893$var$generateContractTypes = (parsedArgs)=>async (contractFilename)=>{
+        const contractAbspath = $9fbf4c0f86dc9893$var$getContractAbspath(contractFilename, parsedArgs);
+        await $2568776a79215f9e$export$2ab4539ae1119673({
             inputTzContractDirectory: parsedArgs.artifactsDir,
             inputFiles: [
                 contractAbspath
@@ -821,12 +888,12 @@ const $f2698429a4aa14ba$var$generateContractTypes = (parsedArgs)=>async (contrac
     // })
     }
 ;
-const $f2698429a4aa14ba$var$generateContractTypesAll = (parsedArgs)=>($parcel$interopDefault($2OpfP$fastglob))("**/*.tz", {
+const $9fbf4c0f86dc9893$var$generateContractTypesAll = (parsedArgs)=>($parcel$interopDefault($dmB1f$fastglob))("**/*.tz", {
         cwd: parsedArgs.artifactsDir
-    }).then((files)=>Promise.all(files.map($f2698429a4aa14ba$var$generateContractTypes(parsedArgs)))
+    }).then((files)=>Promise.all(files.map($9fbf4c0f86dc9893$var$generateContractTypes(parsedArgs)))
     )
 ;
-const $f2698429a4aa14ba$export$3350b7b754d5c00c = (parsedArgs)=>{
+const $9fbf4c0f86dc9893$export$3350b7b754d5c00c = (parsedArgs)=>{
     if (!parsedArgs.typescriptDir) return Promise.reject({
         status: 'failed',
         stderr: `No typescriptDir configured`,
@@ -848,7 +915,7 @@ const $f2698429a4aa14ba$export$3350b7b754d5c00c = (parsedArgs)=>{
     //     stderr: ""
     // });
     const argsTyped = parsedArgs;
-    const p = argsTyped.contract ? $f2698429a4aa14ba$var$generateContractTypes(argsTyped)(argsTyped.contract) : $f2698429a4aa14ba$var$generateContractTypesAll(argsTyped);
+    const p = argsTyped.contract ? $9fbf4c0f86dc9893$var$generateContractTypes(argsTyped)(argsTyped.contract) : $9fbf4c0f86dc9893$var$generateContractTypesAll(argsTyped);
     return p.then((data)=>{
         console.log = consoleLogOrig;
         return {
@@ -858,27 +925,27 @@ const $f2698429a4aa14ba$export$3350b7b754d5c00c = (parsedArgs)=>{
         };
     });
 };
-const $f2698429a4aa14ba$export$7191f9b9098a3ea4 = {
-    generateTypes: $f2698429a4aa14ba$export$3350b7b754d5c00c
+const $9fbf4c0f86dc9893$export$7191f9b9098a3ea4 = {
+    generateTypes: $9fbf4c0f86dc9893$export$3350b7b754d5c00c
 };
 
 
-$2OpfP$taqueriasdk.Plugin.create((i18n)=>({
-        name: "contract-type-generator",
+$dmB1f$taqueriasdk.Plugin.create((i18n)=>({
+        name: "contract-types",
         schema: "1.0",
         version: "0.1",
         tasks: [
-            $2OpfP$taqueriasdk.Task.create({
-                task: "typegen",
+            $dmB1f$taqueriasdk.Task.create({
+                task: "types",
                 command: "typegen [contract]",
                 description: "Generate types for a contract to be used with taquito",
                 options: [
-                    $2OpfP$taqueriasdk.Option.create({
+                    $dmB1f$taqueriasdk.Option.create({
                         shortFlag: "o",
                         flag: "typescriptDir",
                         description: "The entry point that will be compiled"
                     }),
-                    $2OpfP$taqueriasdk.Option.create({
+                    $dmB1f$taqueriasdk.Option.create({
                         shortFlag: "t",
                         flag: "typeAliasMode",
                         choices: [
@@ -889,12 +956,12 @@ $2OpfP$taqueriasdk.Plugin.create((i18n)=>({
                     }), 
                 ],
                 aliases: [
-                    "typegen"
+                    "types"
                 ],
                 handler: "proxy"
             }), 
         ],
-        proxy: $f2698429a4aa14ba$export$7191f9b9098a3ea4.generateTypes
+        proxy: $9fbf4c0f86dc9893$export$7191f9b9098a3ea4.generateTypes
     })
 , process.argv);
 
