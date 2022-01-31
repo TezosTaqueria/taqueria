@@ -1,5 +1,6 @@
 import {execSync} from "child_process";
 import {generateTestProject} from "../e2e/utils/utils";
+import fs from "fs";
 
 const testProjectPath = 'integration/auto-test-integration';
 
@@ -21,11 +22,11 @@ describe("Integration tests using taqueria-mock-plugin", () => {
     });
 
     // Comment for debug purpose
-    // afterAll(() => {
-    //     try {
-    //         fs.rmdirSync(testProjectPath, { recursive: true })
-    //     } catch(error){
-    //         throw new Error (`error: ${error}`);
-    //     }
-    // })
+    afterAll(() => {
+        try {
+            fs.rmdirSync(testProjectPath, { recursive: true })
+        } catch(error){
+            throw new Error (`error: ${error}`);
+        }
+    })
 });

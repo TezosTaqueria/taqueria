@@ -10,12 +10,12 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
         await generateTestProject(taqueriaProjectPath, ["taquito"]);
     })
 
-    // TODO: Ask Michael about what are these steps
+    // TODO: Finish next steps
     // 1. Compile contract - I want to skip to reduce number of steps
     // 2. Start sandbox ??? or select test network - (yes I can)
     // 3. Call originate - it will originate everything on artifacts folder
     // 4. Verify that contract has been originated
-    // 5. Stop
+    // 5. Stop sandbox
     test('Verify that taqueria taquito plugin can originate one contract', async () => {
         try {
             // 1. Copy michelson contract from data folder to artifacts folder under taqueria project
@@ -34,12 +34,12 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
     });
 
     // Comment for debug purpose
-    // afterAll(() => {
-    //     try {
-    //         fs.rmdirSync(taqueriaProjectPath, { recursive: true })
-    //     } catch(error){
-    //         throw new Error (`error: ${error}`);
-    //     }
-    // })
+    afterAll(() => {
+        try {
+            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+        } catch(error){
+            throw new Error (`error: ${error}`);
+        }
+    })
 
 });

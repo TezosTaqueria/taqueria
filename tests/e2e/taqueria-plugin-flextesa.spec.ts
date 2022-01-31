@@ -23,9 +23,6 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    // TODO: Ask Michael about this error
-    //     "kind": "E_INVALID_PLUGIN_RESPONSE",
-    //     "msg": "The @taqueria/plugin-flextesa plugin experienced an error when executing the pluginInfo."
     test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
         try {
             // 1. Run list accounts command and verify that it returns list of default accounts
@@ -38,12 +35,12 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
     });
 
     // Comment for debug purpose
-    // afterAll(() => {
-    //     try {
-    //         fs.rmdirSync(taqueriaProjectPath, { recursive: true })
-    //     } catch(error){
-    //         throw new Error (`error: ${error}`);
-    //     }
-    // })
+    afterAll(() => {
+        try {
+            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+        } catch(error){
+            throw new Error (`error: ${error}`);
+        }
+    })
 
 });

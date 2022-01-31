@@ -10,9 +10,7 @@ describe("E2E Testing for taqueria smartpy plugin",  () => {
         await generateTestProject(taqueriaProjectPath, ["smartpy"]);
     })
 
-    // TODO: Ask Michael about the issue with smartpy plugin
-    //
-    test('VVerify that taqueria smartpy plugin can compile one contract using compile all command', async () => {
+    test('Verify that taqueria smartpy plugin can compile one contract using compile all command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
@@ -31,12 +29,12 @@ describe("E2E Testing for taqueria smartpy plugin",  () => {
     });
 
     // Comment for debug purpose
-    // afterAll(() => {
-    //     try {
-    //         fs.rmdirSync(taqueriaProjectPath, { recursive: true })
-    //     } catch(error){
-    //         throw new Error (`error: ${error}`);
-    //     }
-    // })
+    afterAll(() => {
+        try {
+            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+        } catch(error){
+            throw new Error (`error: ${error}`);
+        }
+    })
 
 });

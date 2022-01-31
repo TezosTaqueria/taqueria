@@ -10,9 +10,6 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
         await generateTestProject(taqueriaProjectPath, ["ligo"]);
     })
 
-    // TODO: Ask Michael
-    // Currently this test is failing due to this error
-    // error: TypeError: data.reduce is not a function
     test('Verify that taqueria ligo plugin can compile one contract using compile all command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
@@ -64,12 +61,12 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     });
 
     // Clean up process to remove taquified project folder
-    // afterAll(() => {
-    //     try {
-    //         fs.rmdirSync(taqueriaProjectPath, { recursive: true })
-    //     } catch(error){
-    //         throw new Error (`error: ${error}`);
-    //     }
-    // })
+    afterAll(() => {
+        try {
+            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+        } catch(error){
+            throw new Error (`error: ${error}`);
+        }
+    })
 
 });
