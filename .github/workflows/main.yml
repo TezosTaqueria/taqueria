@@ -131,7 +131,7 @@ jobs:
       - publish-ligo-plugin-to-npm
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
     with:
       dir: taqueria-plugin-flextesa
     secrets:

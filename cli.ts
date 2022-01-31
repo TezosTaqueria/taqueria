@@ -159,7 +159,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         },
         (inputArgs: Arguments) => pipe(
             initNPM(parsedArgs.projectDir, i18n),
-            chain (() => exec('npm install <%= it.pluginName %>', {...inputArgs, ...parsedArgs}, parsedArgs.projectDir)),
+            chain (() => exec('npm install -D <%= it.pluginName %>', {...inputArgs, ...parsedArgs}, parsedArgs.projectDir)),
             chain (() => getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false)),
             chain ((config: ConfigArgs) => {
                 const {pluginName} = inputArgs
@@ -207,7 +207,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             })
         },
         (inputArgs: Arguments) => pipe(
-            exec(debug('npm uninstall <%= it.pluginName %>'), {...inputArgs, ...parsedArgs}, parsedArgs.projectDir),
+            exec(debug('npm uninstall -D <%= it.pluginName %>'), {...inputArgs, ...parsedArgs}, parsedArgs.projectDir),
             chain (() => getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false)),
             chain ((config: ConfigArgs) => {
                 const {pluginName} = inputArgs
