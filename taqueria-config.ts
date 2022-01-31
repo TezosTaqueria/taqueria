@@ -2,7 +2,7 @@ import type {Config, Task, InstalledPlugin, Action, ConfigArgs} from './taqueria
 import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
 import {ConfigDir, i18n} from './taqueria-types.ts'
 import {SanitizedPath, SanitizedAbsPath, SHA256} from './taqueria-utils/taqueria-utils-types.ts'
-import {readJsonFile, writeJsonFile, decodeJson, joinPaths} from './taqueria-utils/taqueria-utils.ts'
+import {readJsonFile, writeJsonFile, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {resolve, reject, map, chain, mapRej, chainRej} from 'https://cdn.skypack.dev/fluture'
 

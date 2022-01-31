@@ -39,9 +39,24 @@ const getFromEnv = <T>(key: EnvKey, defaultValue:T, env: EnvVars) =>
     env.get(key) || defaultValue
 
 
-const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) => 
+const getVersion = (inputArgs: DenoArgs, i18n: i18n) => {
+    const i = inputArgs.findIndex(str => str === '--setVersion')
+    return i > -1
+        ? inputArgs[i+1]
+        : "not-provided"
+}
+    
+const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
     yargs(args)
     .scriptName('taq')
+    .option('setVersion', {
+        describe: i18n.__('setVersionDesc'),
+        demandOption: true,
+        requiresArg: true,
+        type: "string"
+    })
+    .hide('setVersion')
+    .version(getVersion(args, i18n))
     .option('disableState', {
         describe: i18n.__('disableStateDesc'),
         default: getFromEnv('TAQ_DISABLE_STATE', false, env),
@@ -54,11 +69,13 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         boolean: true
     })
     .hide('logPluginCalls')
-    .option('build', {
+    .option('setBuild', {
         describe: i18n.__('buildDesc'),
-        default: Date.now().toString()
+        demandOption: true,
+        requiresArg: true,
+        type: "string"
     })
-    .hide('build')
+    .hide('setBuild')
     .option('maxConcurrency', {
         describe: i18n.__('maxConcurrencyDesc'),
         default: getFromEnv('TAQ_MAX_CONCURRENCY', getDefaultMaxConcurrency(), env),
@@ -142,7 +159,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         },
         (inputArgs: Arguments) => pipe(
             initNPM(parsedArgs.projectDir, i18n),
-            chain (() => exec('npm install <%= it.pluginName %>', {...inputArgs, ...parsedArgs}, parsedArgs.projectDir)),
+            chain (() => exec('npm install -D <%= it.pluginName %>', {...inputArgs, ...parsedArgs}, parsedArgs.projectDir)),
             chain (() => getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false)),
             chain ((config: ConfigArgs) => {
                 const {pluginName} = inputArgs
@@ -188,7 +205,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             })
         },
         (inputArgs: Arguments) => pipe(
-            exec(debug('npm uninstall <%= it.pluginName %>'), {...inputArgs, ...parsedArgs}, parsedArgs.projectDir),
+            exec(debug('npm uninstall -D <%= it.pluginName %>'), {...inputArgs, ...parsedArgs}, parsedArgs.projectDir),
             chain (() => getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false)),
             chain ((config: ConfigArgs) => {
                 const {pluginName} = inputArgs
@@ -500,7 +517,6 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
             )
         },
         handler: (inputArgs: Record<string, unknown>) => {
-            // @ts-ignore
             cliConfig.handled = true
             if (Array.isArray(task.handler)) {
                 console.log("This is a composite task!")
@@ -609,7 +625,7 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
         chain (readTextFile),
         chain (decodeJson),
         chain ((data: {build: string}) =>
-            typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.build
+            typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.setBuild
                 ? resolve(data as State)
                 : reject("state.json was generated with a different build of taqueria")
         ),
@@ -631,7 +647,7 @@ const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqErr
 
 const getComputedState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => pipe(
     retrieveAllPluginInfo(config, env, i18n, parsedArgs),
-    map ((pluginInfo: PluginInfo[]) => State.create(parsedArgs.build, config, pluginInfo, i18n))
+    map ((pluginInfo: PluginInfo[]) => State.create(parsedArgs.setBuild, config, pluginInfo, i18n))
 )
 
 const computeState = (stateAbspath: SanitizedAbsPath, config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => {
@@ -666,6 +682,10 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                 map (sanitizeArgs),
                 chain ((initArgs: SanitizedInitArgs) => {
                     if (initArgs.debug) debugMode(true)
+                    if (initArgs.version) {
+                        console.log(initArgs.setVersion)
+                        return Promise.resolve(initArgs)
+                    }
                     return initArgs._.includes('init') || initArgs._.includes('testFromVsCode')
                         ? resolve(initArgs)
                         : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
@@ -723,9 +743,11 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     env: parsedArgs.env,
     quickstart: parsedArgs.quickstart,
     disableState: parsedArgs.disableState,
-    build: parsedArgs.build,
     logPluginCalls: parsedArgs.logPluginCalls,
-    fromVsCode: parsedArgs.fromVsCode
+    fromVsCode: parsedArgs.fromVsCode,
+    setBuild: parsedArgs.setBuild,
+    setVersion: parsedArgs.setVersion,
+    version: parsedArgs.version
 })
 
 export default {
