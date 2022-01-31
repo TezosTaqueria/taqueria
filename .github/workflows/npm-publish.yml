@@ -46,7 +46,7 @@ jobs:
       - name: Publish for PR
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"
+          npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}" --workspace $GIT_WORKSPACE
           npm publish --workspace $GIT_WORKSPACE --tag "preview" --access public
       
       - name: Publish for prerelease
