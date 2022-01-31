@@ -1,5 +1,5 @@
 ---
-title: Teztnets Plugin
+title: Flextesa Plugin
 ---
 
 Docs about teztnets
