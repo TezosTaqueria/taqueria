@@ -1,4 +1,4 @@
-import { SanitizedArgs, ActionResponse, Failure, LikeAPromise, ProxyAction } from "taqueria-sdk/types";
+import { SanitizedArgs, ActionResponse, Failure, LikeAPromise, ProxyAction } from "@taqueria/node-sdk/types";
 
 type Opts = SanitizedArgs & Record<string, unknown>;
 
