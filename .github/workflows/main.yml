@@ -190,7 +190,7 @@ jobs:
 
             const git_short_sha = "${{ github.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
-            const packageVersion = "0.0.0-pr-${{ github.event.number }}-${git_short_sha}";
+            const packageVersion = `0.0.0-pr-${{ github.event.number }}-${git_short_sha}`;
 
             let body = `
 
