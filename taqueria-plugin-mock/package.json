@@ -1,28 +1,27 @@
 {
     "name": "@taqueria/plugin-mock",
-    "version": "0.0.1",
+    "version": "0.0.4",
     "description": "A plugin used to test Taqueria",
     "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "build": "echo 'Nothing to build.'"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "echo 'Nothing to build.'"
     },
     "keywords": [
-      "taqueria",
-      "tezos",
-      "build",
-      "ecad",
-      "ecadlabs",
-      "smart contract",
-      "compile"
+        "taqueria",
+        "tezos",
+        "build",
+        "ecad",
+        "ecadlabs",
+        "smart contract",
+        "compile"
     ],
     "author": "ECAD Labs",
     "license": "Apache-2.0",
     "bugs": {
-      "url": "https://github.com/ecadlabs/taqueria/issues"
+        "url": "https://github.com/ecadlabs/taqueria/issues"
     },
     "homepage": "https://github.com/ecadlabs/taqueria#readme",
     "dependencies": {
-      "@taqueria/node-sdk": "file:../taqueria-sdk"
+        "@taqueria/node-sdk": "^0.0.1"
     }
-  }
-  
+}
