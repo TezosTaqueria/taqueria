@@ -54,14 +54,14 @@ jobs:
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
       
-      - name: Run Unit Tests on Windows or macOS
-        run: npm test --workspace ${{ env.GIT_WORKSPACE }}
-        if: runner.os != 'Linux'
+      # - name: Run Unit Tests on Windows or macOS
+      #   run: npm test --workspace ${{ env.GIT_WORKSPACE }}
+      #   if: runner.os != 'Linux'
       
-      - name: Run Unit Tests on Linux
-        run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
-        if: runner.os == 'Linux'
-              
+      # - name: Run Unit Tests on Linux
+      #   run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
+      #   if: runner.os == 'Linux'
+
       - name: Package VSCode Extension
         if: runner.os == 'Linux'
         id: packageExtension
