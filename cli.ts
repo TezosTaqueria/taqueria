@@ -1,17 +1,21 @@
 import type {UnvalidatedPluginInfo, InstalledPlugin, Config, ConfigArgs, Action, Alias, Verb, Option, PositionalArg} from './taqueria-protocol/taqueria-protocol-types.ts'
 import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
-import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, CLICommand, CommandArgs, UnvalidatedState} from './taqueria-types.ts'
+import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs} from './taqueria-types.ts'
 import {State} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.skypack.dev/fluture';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {make, getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {isTaqError, debug, joinPaths, mkdir, readJsonFile, writeJsonFile, readTextFile, writeTextFile, decodeJson, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
+import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
+import {exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
+import * as NPM from './npm.ts'
+
+// Debugging tools
+import {log, debug} from './taqueria-utils/taqueria-utils.ts'
 
 export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<void>) => unknown
 
@@ -157,43 +161,14 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
                 required: true
             })
         },
-        (inputArgs: Arguments) => pipe(
-            initNPM(parsedArgs.projectDir, i18n),
-            chain (() => exec('npm install -D <%= it.pluginName %>', {...inputArgs, ...parsedArgs}, parsedArgs.projectDir)),
-            chain (() => getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false)),
-            chain ((config: ConfigArgs) => {
-                const {pluginName} = inputArgs
-
-                // Note, pluginName could be something like @taqueria/plugin-ligo
-                // or ../taqueria-plugin-ligo. Thus, we still need to determine
-                // what the real package name is
-                return pipe(
-                    getPluginPackageJson(pluginName, parsedArgs.projectDir),
-                    map ((manifest: {name: string}) => {
-                        const existingPlugins = config.plugins.filter(plugin => plugin.name != manifest.name)
-                        const plugins = [...existingPlugins, {name: manifest.name, type: "npm"}]
-                        const updatedConfig = Object.entries(config).reduce(
-                            (retval: Record<string, unknown>, [key, val]) => {
-                                if (['configFile', 'hash', 'configDir', 'projectDir'].includes(key))
-                                    return retval
-                                else if (key === 'plugins') return {...retval, plugins}
-                                else {
-                                    const next = {...retval}
-                                    next[key] = val
-                                    return next
-                                }
-                            },
-                            {}
-                        )
-                        return updatedConfig
-                    }),
-                    chain (writeJsonFile(config.configFile.value))                    
-                )
-            }),
-            map (() => i18n.__('pluginInstalled')),
+        // TODO: This function assumes that there is only one type of plugin available to install,
+        // a plugin distributed and installable via NPM. This should support other means of distribution
+        (inputArgs: InstallPluginArgs) => pipe(
+            NPM.installPlugin(parsedArgs.configDir, parsedArgs.projectDir, i18n, inputArgs.pluginName),
             fork (displayError(cliConfig)) (console.log)
         )
     )
+    .alias('i', 'install')
     .command(
         'uninstall <pluginName>',
         i18n.__('uninstallDesc'),
@@ -204,30 +179,20 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
                 required: true
             })
         },
-        (inputArgs: Arguments) => pipe(
-            exec(debug('npm uninstall -D <%= it.pluginName %>'), {...inputArgs, ...parsedArgs}, parsedArgs.projectDir),
-            chain (() => getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false)),
-            chain ((config: ConfigArgs) => {
-                const {pluginName} = inputArgs
-                const plugins = config.plugins.filter(plugin => plugin.name != pluginName)
-                return pipe(
-                    make({...config, plugins}),
-                    chain (writeJsonFile(config.configFile.value))                    
-                )
-            }),
-            map (() => i18n.__('pluginUninstalled')),
-            fork (displayError(cliConfig)) (console.log)
+        (inputArgs: UninstallPluginArgs) => pipe(
+            NPM.uninstallPlugin(parsedArgs.configDir, parsedArgs.projectDir, i18n, inputArgs.pluginName),
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
+    .alias('u', 'uninstall')
     .command(
         'list-known-tasks',
         false, // hide
         () => {},
         (inputArgs: RawInitArgs) => pipe(
             parsedArgs.projectDir.join('.taq', 'state.json').value,
-            readTextFile,
-            chain (decodeJson),
-            map ((state: State) => Object.entries(debug(state.tasks)).reduce(
+            readJsonFile,
+            map ((state: State) => Object.entries(state.tasks).reduce(
                 (retval: Record<string, string[] | null>, [taskName, implementation]) => {
                     if ('task' in implementation) {
                         const task = implementation as Task
@@ -253,7 +218,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
                 },
                 {}
             )),
-            fork (displayError(cliConfig)) (console.log)
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
     .demandCommand()
@@ -263,16 +228,6 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 )
 
 const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync())
-
-const initNPM = (projectDir: SanitizedAbsPath, i18n: i18n) => pipe(
-    readJsonFile(projectDir.join("package.json").value),
-    chainRej (() => reject({kind: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir}))
-)
-
-const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath) => pipe(
-    readJsonFile(SanitizedAbsPath.create(pluginNameOrPath, projectDir).join('package.json').value),
-    chainRej (() => readJsonFile(projectDir.join("node_modules", pluginNameOrPath, "package.json").value))
-)
 
 const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
     getConfig(projectDir, configDir, i18n, true),
@@ -305,48 +260,6 @@ const getPluginExe = (parsedArgs: SanitizedInitArgs, plugin: InstalledPlugin) =>
             return ['echo']
     }
 }
-
-export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cwd?: SanitizedAbsPath) => attemptP(async () => {
-    let command = cmdTemplate
-    try {
-        // NOTE, uses eta templates under the hood. Very performant! https://ghcdn.rawgit.org/eta-dev/eta/master/browser-tests/benchmark.html
-        /**
-         * Template Variables:
-         * - configDir
-         * - projectDir
-         * - maxConcurrency
-         * - plugin
-         * - config.language
-         * - config.plugins
-         * - config.contractsDir
-         * - config.artifactsDir
-         * - config.testsDir
-         * - config.configFile
-         * - config.configDir
-         * - config.projectDir
-         * - env.get()
-         * - i18n.__()
-         */
-        const join = joinPaths
-        const cmd = renderTemplate(cmdTemplate, {join, ...inputArgs})
-        command = cmd
-        const process = Deno.run({
-            cmd: ["sh", "-c", `${cmd}`],
-            cwd: cwd?.value
-        })
-        const status = await process.status()
-
-        return status.code
-    }
-    catch (previous) {
-        throw {
-            kind: "E_FORK",
-            msg: `Could not fork ${command}`,
-            previous
-        }
-    }
-})
-
 
 const retrievePluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => pipe(
     sendPluginQuery("pluginInfo", {}, config, env, i18n, plugin, parsedArgs),
@@ -622,8 +535,7 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
         !parsedArgs.disableState
             ? resolve(stateAbspath.value)
             : reject("State disabled!"),
-        chain (readTextFile),
-        chain (decodeJson),
+        chain (readJsonFile),
         chain ((data: {build: string}) =>
             typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.setBuild
                 ? resolve(data as State)

@@ -1,10 +1,11 @@
-import type {Future, reject, resolve, TaqError} from './taqueria-utils-types.ts'
+import type {Future, reject, resolve, TaqError, SanitizedAbsPath} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {chain, attemptP, map, Future as Fluture} from 'https://cdn.skypack.dev/fluture';
 import JSON from "https://deno.land/x/json5/mod.ts";
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
+
 
 export const decodeJson = (encoded: string) => Fluture((rej: reject, res:resolve) => {
     try {
@@ -74,3 +75,44 @@ export const memoize = memoizy({})
 export const joinPaths = _joinPaths
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string
+
+export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cwd?: SanitizedAbsPath) => attemptP(async () => {
+    let command = cmdTemplate
+    try {
+        // NOTE, uses eta templates under the hood. Very performant! https://ghcdn.rawgit.org/eta-dev/eta/master/browser-tests/benchmark.html
+        /**
+         * Template Variables:
+         * - configDir
+         * - projectDir
+         * - maxConcurrency
+         * - plugin
+         * - config.language
+         * - config.plugins
+         * - config.contractsDir
+         * - config.artifactsDir
+         * - config.testsDir
+         * - config.configFile
+         * - config.configDir
+         * - config.projectDir
+         * - env.get()
+         * - i18n.__()
+         */
+        const join = joinPaths
+        const cmd = renderTemplate(cmdTemplate, {join, ...inputArgs})
+        command = cmd
+        const process = Deno.run({
+            cmd: ["sh", "-c", `${cmd}`],
+            cwd: cwd?.value
+        })
+        const status = await process.status()
+
+        return status.code
+    }
+    catch (previous) {
+        throw {
+            kind: "E_FORK",
+            msg: `Could not fork ${command}`,
+            previous
+        }
+    }
+})
