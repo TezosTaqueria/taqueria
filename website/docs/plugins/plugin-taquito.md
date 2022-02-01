@@ -27,12 +27,6 @@ The Taquito plugin exposes an `originate` task in Taqueria which will originate 
 
 ***Coming soon***
 
-
-### Options
-
-The Taquito plugin has no additional options
-
-
 ### Examples
 
 ***Coming soon***
