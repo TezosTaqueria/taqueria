@@ -7,12 +7,15 @@ import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.skypack.dev/fluture';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {debug, exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
+import {exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
 import * as NPM from './npm.ts'
+
+// Debugging tools
+import {log, debug} from './taqueria-utils/taqueria-utils.ts'
 
 export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<void>) => unknown
 
@@ -165,6 +168,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             fork (displayError(cliConfig)) (console.log)
         )
     )
+    .alias('i', 'install')
     .command(
         'uninstall <pluginName>',
         i18n.__('uninstallDesc'),
@@ -177,9 +181,10 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         },
         (inputArgs: UninstallPluginArgs) => pipe(
             NPM.uninstallPlugin(parsedArgs.configDir, parsedArgs.projectDir, i18n, inputArgs.pluginName),
-            fork (displayError(cliConfig)) (console.log)
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
+    .alias('u', 'uninstall')
     .command(
         'list-known-tasks',
         false, // hide
@@ -213,7 +218,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
                 },
                 {}
             )),
-            fork (displayError(cliConfig)) (console.log)
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
     .demandCommand()

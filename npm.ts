@@ -6,6 +6,8 @@ import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {map, chain, chainRej, reject} from 'https://cdn.skypack.dev/fluture';
 import {getConfig, make} from './taqueria-config.ts'
 
+import {log, debug} from './taqueria-utils/taqueria-utils.ts'
+
 // This file contains lfogic for handling plugins distributed
 // and installable using NPM
 
@@ -66,7 +68,7 @@ export const installPlugin = (configDir: SanitizedPath, projectDir: SanitizedAbs
         // Note, pluginName could be something like @taqueria/plugin-ligo
         // or ../taqueria-plugin-ligo. Thus, we still need to determine
         // what the real package name is
-        addToPluginList(pluginName, config)
+        return addToPluginList(pluginName, config)
     }),
     map (() => i18n.__('pluginInstalled'))
 )
