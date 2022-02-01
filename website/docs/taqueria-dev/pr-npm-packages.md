@@ -2,7 +2,7 @@
 title: NPM Package CICD Pipeline
 ---
 
-# Pull Request NPM Package CICD Behaviour
+## Pull Request NPM Package CICD Behaviour
 
 After submitting a pull request to the `main` branch of the Taqueria repository, the CICD will start building and publishing `npm` packages to npmjs.com. The install instructions are then commented on the PR and will look similar to the following:
 
