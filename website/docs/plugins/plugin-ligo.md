@@ -19,7 +19,7 @@ taq install @taqueria/plugin-ligo
 
 ## Usage
 
-The LIGO plugin exposes a `compile` task in Taqueria which can target one, or all LIGO contracts in the `contracts` folder and compile them to Michelson code output into the `artifacts` folder
+The LIGO plugin exposes a `compile` task in Taqueria which can target one, or all LIGO contracts in the `contracts` folder and compile them to Michelson code output to the `artifacts` folder
 
 ### Running the Compile Task
 
@@ -27,7 +27,7 @@ The LIGO plugin's `taq compile` task can be run with or without arguments. The b
 
 Running the `compile` task with no options will result in any source LIGO smart contracts in the `contracts` folder being compiled to Michelson files in the `artifacts` folder. If you speficy an optional filename, only LIGO contracts matching the specified filename in the `contracts` folder will be compiled
 
-::note
+:::note
 The `compile` task can be implemented by more than one compiler plugin installed on a project (LIGO, SmartPY). If this is the case, you must use the `--plugin ligo` flag to specify a particular compiler
 ::
 
