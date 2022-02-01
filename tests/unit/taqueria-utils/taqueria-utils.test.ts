@@ -36,7 +36,6 @@ Deno.test("Positive scenario test for {decodeJson} function to return () => {}",
 
 Deno.test("Negative scenario test for {decodeJson} function", () => {
     const result = decodeJson(testInvalidJson);
-    // @ts-ignore
     const assertFailed = (err: TaqError) => assertEquals(err.kind, "E_INVALID_JSON")
     const assertUnreachable = () => unreachable();
     fork (assertFailed) (assertUnreachable) (result);
@@ -58,14 +57,12 @@ Deno.test("Negative scenario test for {log} function", () => {
 
 // @ts-ignore
 Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t) => {
-        // @ts-ignore
         await t.step("run test for {mkdir} function", async () => {
             const assert = chai.assert;
             const result = await promise(mkdir("./unit/taqueria-utils/data/test"));
             // @ts-ignore
             exists(result).then((result) => assert.equal(result, true));
         });
-        // @ts-ignore
         await t.step("clean up", async () => {
             try {
                 Deno.removeSync('./unit/taqueria-utils/data/test');
