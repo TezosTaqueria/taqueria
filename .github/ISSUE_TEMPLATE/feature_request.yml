@@ -22,7 +22,7 @@ body:
     id: problem-solved
     attributes:
       label: Is this feature solving a problem? 
-      description: Please tell us about it
+      description: Please tell us about the use case or problem that this feature solves?
       placeholder: 
       value: "Details about the problem your feature solves"
     validations:
