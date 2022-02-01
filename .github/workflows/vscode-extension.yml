@@ -65,10 +65,6 @@ jobs:
       - name: Copy node_modules folder on UNIX
         run: rsync -av node_modules taqueria-vscode-extension/
         if: runner.os != 'Windows'
-
-      - name: Copy node_modules folder on Windows
-        run: xcopy node_modules taqueria-vscode-extension\node_modules /s /e
-        if: runner.os == 'Windows'
       
       - name: Package VSCode Extension
         if: runner.os == 'Linux'
