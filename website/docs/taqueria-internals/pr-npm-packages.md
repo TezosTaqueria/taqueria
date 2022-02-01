@@ -1,5 +1,5 @@
 ---
-title: Pull request packages
+title: Pull Request Packages
 ---
 
 # Pull Request npm packages
