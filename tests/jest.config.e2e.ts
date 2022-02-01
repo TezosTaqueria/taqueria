@@ -17,6 +17,7 @@ export default {
   clearMocks: true,
 
   // Indicates whether the coverage information should be collected while executing the test
+  // Coverage is not applicable for e2e tests
   collectCoverage: false,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
