@@ -35,7 +35,7 @@ const parseContractWithMinimalProtocolLevel = (contractScript: string, format: '
 };
 
 export const generateContractTypesFromMichelsonCode = (contractScript: string, contractName: string, format: 'tz' | 'json', typeAliasData: TypeAliasData, typeUtilsData: TypeUtilsData): {
-    schema: SchemaOutput;
+    schemaOutput: SchemaOutput;
     typescriptCodeOutput: TypescriptCodeOutput;
     parsedContract: M.MichelsonContract;
     minimalProtocol: string;
@@ -53,12 +53,12 @@ export const generateContractTypesFromMichelsonCode = (contractScript: string, c
 
     const parameterResult = contractParameter && parseContractParameter(contractParameter);
     const methods = parameterResult?.methods ?? [];
-    const schemaOutput = toSchema(methods);
+    const schemaOutput = toSchema(methods, storage);
 
     const typescriptCode = toTypescriptCode(storage, methods, contractName, contract, protocol, typeAliasData, typeUtilsData);
 
     return {
-        schema: schemaOutput,
+        schemaOutput,
         typescriptCodeOutput: typescriptCode,
         parsedContract: contract,
         minimalProtocol: protocol.key,

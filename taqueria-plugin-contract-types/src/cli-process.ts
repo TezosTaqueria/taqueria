@@ -89,6 +89,7 @@ export const generateContractTypesProcessContractFiles = async ({
         const inputFilePath = path.join(inputTzContractDirectory, fileRelativePath);
         const typesOutputFilePath = path.join(outputTypescriptDirectory, fileRelativePath.replace(ext, `.types.ts`));
         const codeContentOutputFilePath = path.join(outputTypescriptDirectory, fileRelativePath.replace(ext, `.code.ts`));
+        const schemaContentOutputFilePath = path.join(outputTypescriptDirectory, fileRelativePath.replace(ext, `.schema.json`));
         console.log(`Processing ${fileRelativePath}...`);
 
         try {
@@ -97,6 +98,7 @@ export const generateContractTypesProcessContractFiles = async ({
             const michelsonCode = await fs.readFile(inputFilePath, { encoding: `utf8` });
 
             const {
+                schemaOutput,
                 typescriptCodeOutput: { typesFileContent, contractCodeFileContent }
             } = generateContractTypesFromMichelsonCode(michelsonCode, contractTypeName, format, typeAliasData, typeUtilsData);
 
@@ -104,6 +106,11 @@ export const generateContractTypesProcessContractFiles = async ({
             await fs.mkdir(path.dirname(typesOutputFilePath), { recursive: true });
             await fs.writeFile(typesOutputFilePath, typesFileContent);
             await fs.writeFile(codeContentOutputFilePath, contractCodeFileContent);
+
+            const debugSchema = false;
+            if(debugSchema){
+                await fs.writeFile(schemaContentOutputFilePath, JSON.stringify(schemaOutput, null, 2));
+            }
         } catch (err: unknown) {
             console.error(`❌ Could not process ${fileRelativePath}`, { err });
         }

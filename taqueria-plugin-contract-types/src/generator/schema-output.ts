@@ -1,5 +1,5 @@
 import { GenerateApiError } from './common';
-import { TypedMethod, TypedVar, TypedType } from './contract-parser';
+import { TypedMethod, TypedVar, TypedType, TypedStorage } from './contract-parser';
 
 type SchemaObjectType = { [name: string]: SchemaType };
 type SchemaType = string | SchemaType[] | SchemaObjectType;
@@ -9,10 +9,11 @@ type SchemaMethods = {
     };
 };
 export type SchemaOutput = {
-    schemaMethods: SchemaMethods;
+    methods: SchemaMethods;
+    storage: SchemaType;
 };
 
-export const toSchema = (methods: TypedMethod[]): SchemaOutput => {
+export const toSchema = (methods: TypedMethod[], storage: TypedStorage): SchemaOutput => {
 
     const getSchemaObjectType = (vars: TypedVar[]) => {
         // console.log('getSchemaObjectType', { vars });
@@ -48,7 +49,10 @@ export const toSchema = (methods: TypedMethod[]): SchemaOutput => {
         return out;
     }, {} as SchemaMethods);
 
+    const schemaStorage = getSchemaType(storage.storage);
+
     return {
-        schemaMethods,
+        methods: schemaMethods,
+        storage: schemaStorage,
     };
 };

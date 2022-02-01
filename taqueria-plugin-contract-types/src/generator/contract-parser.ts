@@ -2,11 +2,7 @@ import * as M from '@taquito/michel-codec';
 import { assertExhaustive, GenerateApiError, reduceFlatMap } from './common';
 
 export type TypedStorage = {
-    storage: {
-        kind: 'object';
-        raw: M.MichelsonType;
-        fields: TypedVar[];
-    };
+    storage: TypedType;
 };
 export type TypedParameter = {
     methods: TypedMethod[];
@@ -57,13 +53,20 @@ export const parseContractStorage = (storage: M.MichelsonContractStorage): Typed
         .map(x => visitVar(x))
         .reduce(reduceFlatMap, []);
 
-    const fieldsSimple = fields.length === 1 && !fields[0].name && fields[0].type.kind === 'object' ? fields[0].type.fields : fields;
+    console.log('storage.args', storage.args);
+    console.log('fields', fields);
+
+    if(fields.length === 1 && !fields[0].name){
+        return {
+            storage: fields[0].type
+        };
+    }
 
     return {
         storage: {
-            kind: `object`,
+            kind: `object` as const,
             raw: storage as unknown as M.MichelsonType,
-            fields: fieldsSimple,
+            fields,
         },
     };
 };
