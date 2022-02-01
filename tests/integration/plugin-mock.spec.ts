@@ -13,15 +13,15 @@ describe("Integration tests using taqueria-mock-plugin", () => {
 
     test('Verify that mock-plugin will return pong when taq ping send', () => {
         try{
-            const stdout = execSync(`cd ./${testProjectPath} && taq ping`)
-            console.log(stdout);
+            const stdout = execSync(`cd ./${testProjectPath} && taq ping`).toString().trim();
             expect(stdout).toEqual("pong");
         } catch(error){
             throw new Error (`error: ${error}`);
         }
     });
 
-    // Comment for debug purpose
+    // Clean up process to remove taquified project folder
+    // Comment if need to debug
     afterAll(() => {
         try {
             fs.rmdirSync(testProjectPath, { recursive: true })

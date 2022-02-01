@@ -30,13 +30,13 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     test.skip('Verify that taqueria ligo plugin can compile one contract using compile [sourceFile] command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`)
+            execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq compile ${contractName}
-            execSync(`cd ./${taqueriaProjectPath} && taq compile hello-tacos.mligo`).toString()
+            execSync(`cd ./${taqueriaProjectPath} && taq compile hello-tacos.mligo`);
 
             // 3. Verify that compiled michelson version has been generated
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`, 25000)
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`, 25000);
 
         } catch(error) {
             // throw new Error (`error: ${error}`);
@@ -61,6 +61,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     });
 
     // Clean up process to remove taquified project folder
+    // Comment if need to debug
     afterAll(() => {
         try {
             fs.rmdirSync(taqueriaProjectPath, { recursive: true })

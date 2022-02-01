@@ -23,7 +23,8 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
+
+    test.skip('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
         try {
             // 1. Run list accounts command and verify that it returns list of default accounts
             // execSync(`cd ./${taqueriaProjectPath} && taq compile`).toString()
@@ -34,7 +35,8 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    // Comment for debug purpose
+    // Clean up process to remove taquified project folder
+    // Comment if need to debug
     afterAll(() => {
         try {
             fs.rmdirSync(taqueriaProjectPath, { recursive: true })

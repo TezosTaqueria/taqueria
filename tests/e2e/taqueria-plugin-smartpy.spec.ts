@@ -28,7 +28,8 @@ describe("E2E Testing for taqueria smartpy plugin",  () => {
 
     });
 
-    // Comment for debug purpose
+    // Clean up process to remove taquified project folder
+    // Comment if need to debug
     afterAll(() => {
         try {
             fs.rmdirSync(taqueriaProjectPath, { recursive: true })

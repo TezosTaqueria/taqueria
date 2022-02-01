@@ -16,7 +16,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
     // 3. Call originate - it will originate everything on artifacts folder
     // 4. Verify that contract has been originated
     // 5. Stop sandbox
-    test('Verify that taqueria taquito plugin can originate one contract', async () => {
+    test.skip('Verify that taqueria taquito plugin can originate one contract', async () => {
         try {
             // 1. Copy michelson contract from data folder to artifacts folder under taqueria project
 
@@ -33,7 +33,8 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     });
 
-    // Comment for debug purpose
+    // Clean up process to remove taquified project folder
+    // Comment if need to debug
     afterAll(() => {
         try {
             fs.rmdirSync(taqueriaProjectPath, { recursive: true })

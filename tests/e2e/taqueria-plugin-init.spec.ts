@@ -17,7 +17,8 @@ describe("E2E Testing for taqueria general functionality", () => {
         expect(isTaquified).toBeTruthy();
     });
 
-
+    // Clean up process to remove taquified project folder
+    // Comment if need to debug
     afterAll(() => {
         try {
             fs.rmdirSync(taqueriaProjectPath, { recursive: true })
