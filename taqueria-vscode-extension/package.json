@@ -105,7 +105,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "npx esbuild --bundle src/extension.ts --external:vscode --format=cjs --outfile=out/extension.js --minify --platform=node --sourcemap",
+    "compile": "tsc -p ./ && npx esbuild --bundle src/extension.ts --external:vscode --format=cjs --outfile=out/extension.js --minify --platform=node --sourcemap",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
