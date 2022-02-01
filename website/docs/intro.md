@@ -41,7 +41,7 @@ The Taqueria CLI is the core component of Taqueria and implements the SDK and Pr
 
 Each plugin installed will add tasks to taqueria that will show up under `taq --help` and can be called via `taq [taskName]`, or in the VS Code Command Palette
 
-![Taqueria CLI Help Output](/img/images/taq-help-cli.png)
+![Taqueria CLI Help Output](/img/taq-help-cli.png)
 
 
 
