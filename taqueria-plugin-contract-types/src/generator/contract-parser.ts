@@ -53,9 +53,6 @@ export const parseContractStorage = (storage: M.MichelsonContractStorage): Typed
         .map(x => visitVar(x))
         .reduce(reduceFlatMap, []);
 
-    console.log('storage.args', storage.args);
-    console.log('fields', fields);
-
     if(fields.length === 1 && !fields[0].name){
         return {
             storage: fields[0].type
