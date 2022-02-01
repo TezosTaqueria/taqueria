@@ -6,6 +6,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
+	plugins: ["docusaurus-plugin-sass"],
 	title: "Taqueria - Developer Tooling for Tezos",
 	tagline: "Taqueria - Developer Tooling for Tezos",
 	url: "https://taqueria.io",
@@ -37,7 +38,12 @@ const config = {
 						"https://github.com/ecadlabs/taqueria/edit/main/website/blog/",
 				},
 				theme: {
-					customCss: require.resolve("./src/css/custom.css"),
+					customCss: [
+						require.resolve("./src/css/custom.css"),
+						require.resolve("./src/css/tables.scss"),
+						require.resolve("./src/css/admonitions.scss"),
+						require.resolve("./src/css/codBlock.scss"),
+					],
 				},
 			}),
 		],
