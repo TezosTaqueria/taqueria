@@ -12,7 +12,7 @@ export type key_hash = string & { __type: 'key_hash' };
 export type signature = string & { __type: 'signature' };
 export type ticket = string & { __type: 'ticket' };
 
-export type timestamp = Date & { __type: 'timestamp' };
+export type timestamp = string & { __type: 'timestamp' };
 
 export type int = BigNumber & { __type: 'int' };
 export type nat = BigNumber & { __type: 'nat' };
@@ -20,8 +20,9 @@ export type nat = BigNumber & { __type: 'nat' };
 export type mutez = BigNumber & { __type: 'mutez' };
 export type tez = BigNumber & { __type: 'tez' };
 
-export type MMap<K, V> = Omit<MichelsonMap<K, V>, 'get'> & { get: (key: K) => V };
-export type BigMap<K, V> = Omit<MichelsonMap<K, V>, 'get'> & { get: (key: K) => Promise<V> };
+type MapKey = Array<any> | object | string | boolean | number;
+export type MMap<K extends MapKey, V> = Omit<MichelsonMap<K, V>, 'get'> & { get: (key: K) => V };
+export type BigMap<K extends MapKey, V> = Omit<MichelsonMap<K, V>, 'get'> & { get: (key: K) => Promise<V> };
 
 
 const createStringTypeTas = <T extends string>() => {
@@ -36,7 +37,7 @@ type asMapParamOf<K, V> = K extends string ? { [key: string]: V } | Array<{ key:
     : K extends number ? { [key: number]: V } | Array<{ key: K, value: V }>
     : Array<{ key: K, value: V }>;
 
-function asMap<K, V>(value: asMapParamOf<K, V>): MMap<K, V> {
+function asMap<K extends MapKey, V>(value: asMapParamOf<K, V>): MMap<K, V> {
     const m = new MichelsonMap<K, V>();
     if (Array.isArray(value)) {
         const vArray = value as Array<{ key: K, value: V }>;
@@ -47,7 +48,7 @@ function asMap<K, V>(value: asMapParamOf<K, V>): MMap<K, V> {
     }
     return m as MMap<K, V>;
 }
-const asBigMap = <K, V>(value: asMapParamOf<K, V>) => asMap(value) as unknown as BigMap<K, V>;
+const asBigMap = <K extends MapKey, V>(value: asMapParamOf<K, V>) => asMap(value) as unknown as BigMap<K, V>;
 
 function add<T extends BigNumber>(a: T, b: T): T {
     return a.plus(b) as T;
@@ -61,7 +62,7 @@ export const tas = {
     address: createStringTypeTas<address>(),
     bytes: createStringTypeTas<bytes>(),
     contract: createStringTypeTas<contract>(),
-    timestamp: (value: string | Date): timestamp => new Date(value) as timestamp,
+    timestamp: (value: string | Date): timestamp => new Date(value).toISOString() as timestamp,
 
     int: createBigNumberTypeTas<int>(),
     nat: createBigNumberTypeTas<nat>(),
