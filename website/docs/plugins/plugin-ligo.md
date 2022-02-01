@@ -4,6 +4,14 @@ title: LIGO Plugin
 
 The LIGO plugin provides a task to compile LIGO smart contracts to Michelson
 
+Specifics of the LIGO plugin's task implementation:
+
+|  attribute |  value                   | 
+|------------|:------------------------:|
+|  task      | 'compile'                | 
+|  command   | 'compile [sourceFile]    | 
+|  aliases   | ['c', 'compile-ligo']    |  
+
 ## Requirements
 
 The LIGO plugin requires LIGO v0.27 or later to be installed locally
@@ -33,7 +41,7 @@ The `compile` task can be implemented by more than one compiler plugin installed
 
 ### Options
 
-The LIGO `compile` task will accept the following optional parameters
+The LIGO `compile` task will accept the following optional parameters:
 
 | flag  |  name       | description                           |   
 |-------|:-----------:|---------------------------------------|
