@@ -2,9 +2,13 @@
 title: SmartPy Plugin
 ---
 
-The SmartPy plugin provides a task to compile SmartPy smart contracts to Michelson
+The SmartPy plugin provides a task to compile SmartPy smart contracts to Michelson.
 
-Specifics of the SmartPy plugin's task implementation:
+## Plugin Architecture
+
+This plugin is developed for Taqueria built using TypeScript for NodeJS using the Taqueria Node SDK
+
+The plugin provides a `compile` task used for compiling SmartPy smart contracts to Michelson
 
 |  attribute |  value                   | 
 |------------|:------------------------:|
@@ -14,15 +18,15 @@ Specifics of the SmartPy plugin's task implementation:
 
 ## Requirements
 
-The SmartPy plugin requires SmartPy v0.27 or later to be installed locally
+The SmartPy plugin requires SmartPy v0.8.4 or later to be installed locally
 
-A guide to installing SmartPy can be found [here](https://SmartPylang.org/docs/intro/installation)
+SmartPy is available [here](https://smartpy.io/)
 
 ## Installation
 
 To install the SmartPy plugin on a Taqueria project, navigate to the project folder and run:
 ```shell
-taq install @taqueria/plugin-SmartPy
+taq install @taqueria/plugin-smartpy
 ```
 
 ## Usage
@@ -40,7 +44,3 @@ The `compile` task can be implemented by more than one compiler plugin installed
 ::
 
 
-
-### Basic Usage
-
-***Coming Soon***
