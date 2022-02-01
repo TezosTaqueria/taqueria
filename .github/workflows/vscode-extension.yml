@@ -67,7 +67,7 @@ jobs:
         if: runner.os != 'Windows'
 
       - name: Copy node_modules folder on Windows
-        run: xcopy ..\node_modules node_modules /s /e
+        run: xcopy node_modules taqueria-vscode-extension/node_modules /s /e
         if: runner.os == 'Windows'
       
       - name: Package VSCode Extension
