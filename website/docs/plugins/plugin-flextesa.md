@@ -48,17 +48,6 @@ The plugin provides two lifecycle tasks: `start sandbox` and `stop sandbox`
 ### The `list accounts` Task
 ***Coming soon***
 
-### Options
-
-The LIGO `compile` task will accept the following optional parameters:
-
-| flag  |  name       | description                           |   
-|-------|:-----------:|---------------------------------------|
-|  -e   | entry-point | The entry point that will be compiled |
-|  -s   | syntax      | The syntax used in the contract       |    
-|  -i   | infer       | Enable type inference                 |   
-
-
 ## Plugin Configuration
 
 This plugin stores the sandbox configuration in the `./.taq/config.json` file
