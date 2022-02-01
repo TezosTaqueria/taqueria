@@ -25,7 +25,7 @@ const sidebars = {
       items: [
         "intro",
         "getting-started/installation",
-        "plugins/understanding-taqueria-plugins"
+        "getting-started/understanding-taqueria-plugins"
       ],
     },
     {
