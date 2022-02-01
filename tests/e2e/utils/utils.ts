@@ -45,7 +45,7 @@ export const generateTestProject = async (projectPath: string, packageNames: str
 // It is pull&wait mechanism and it is async by nature, because
 // there is no fs.watch sync solution
 export function checkFolderExistsWithTimeout(filePath:string, timeout:number) {
-    return new Promise(function (resolve, reject) {
+    return new Promise<void>(function (resolve, reject): void {
 
         const dir = path.dirname(filePath);
         const basename = path.basename(filePath);
@@ -54,7 +54,6 @@ export function checkFolderExistsWithTimeout(filePath:string, timeout:number) {
             if (eventType === 'rename' && filename === basename) {
                 clearTimeout(timer);
                 watcher.close();
-                // @ts-ignore
                 resolve();
             }
         });
@@ -68,7 +67,6 @@ export function checkFolderExistsWithTimeout(filePath:string, timeout:number) {
             if (!err) {
                 clearTimeout(timer);
                 watcher.close();
-                // @ts-ignore
                 resolve();
             }
         });

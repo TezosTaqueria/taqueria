@@ -23,9 +23,8 @@ Deno.test("Positive scenario test for {decodeJson} function", () => {
     fork (assertUnreachable) (assertSuccess) (result);
 });
 
-// TODO: Ask Michael if it is possible
+// TODO: Michael to help with solution for return ()
 // This test was built to try to test return () => {} (line 16)
-// But it does not work, need to ask Michael about is there any way to test it
 Deno.test("Positive scenario test for {decodeJson} function to return () => {}", () => {
     const result = decodeJson("{}");
     const assertSuccess = (testJsonOutput: any) => assertEquals(testJsonOutput, {});
@@ -54,14 +53,11 @@ Deno.test("Negative scenario test for {log} function", () => {
     expect(result).not.to.be.a("string")
 });
 
-// @ts-ignore t variable does not have a type in Deno documentation
-// https://deno.land/manual/testing
-Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t) => {
+Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t: any) => {
         await t.step("run test for {mkdir} function", async () => {
             const assert = chai.assert;
             const result = await promise(mkdir("./unit/taqueria-utils/data/test"));
-            // @ts-ignore
-            exists(result).then((result) => assert.equal(result, true));
+            exists(result).then((result: any) => assert.equal(result, true));
         });
         await t.step("clean up", async () => {
             try {
@@ -76,10 +72,7 @@ Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t) =>
 },);
 
 
-// @ts-ignore t variable does not have a type in Deno documentation
-// https://deno.land/manual/testing
-// TODO: Re-write because return has changed
-Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: async (t) => {
+Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: async (t: any) => {
         await t.step("run test for {writeTextFile} function", async () => {
             const assert = chai.assert;
             const result = await promise (writeTextFile("./unit/taqueria-utils/data/testWrite.txt")("testWrite"));
