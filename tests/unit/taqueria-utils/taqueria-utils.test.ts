@@ -83,11 +83,10 @@ Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t) =>
 // TODO: Re-write it same as negative
 Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: async (t) => {
         await t.step("run test for {writeTextFile} function", async () => {
+            const assert = chai.assert;
             const result = await promise (writeTextFile("./unit/taqueria-utils/data/testWrite.txt", "testWrite"));
-            // @ts-ignore
-            // assert.equal(result, 'testWrite');
+            assert.equal(result, 'testWrite');
         });
-        // @ts-ignore
         await t.step("clean up", async () => {
             try {
                 Deno.removeSync('./unit/taqueria-utils/data/testWrite.txt');
