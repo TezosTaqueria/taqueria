@@ -229,7 +229,7 @@ export const makePathToTaq = (i18n: I18N) => (inputPath: string) : PromiseLike<E
  * @returns {PromiseLike<E_EXEC, string>}
  */        
 export const execCmd = (cmd: string): PromiseLike<E_EXEC, string> => new Promise((resolve, reject) => {
-    exec(isWindoze() ? cmd : `sh -c '${cmd}'`, (previous, stdout, msg) => {
+    exec(cmd, (previous, stdout, msg) => {
         log ("Executing command:") (cmd)
         if (previous) reject({code: 'E_EXEC', msg: `An unexpected error occurred when trying to execute the command`, previous, cmd})
         else if (msg.length) reject({code: 'E_EXEC', msg, cmd})
@@ -292,7 +292,7 @@ export const decodeJson = <T>(data: string): PromiseLike<E_INVALID_JSON, Json<T>
     }
 }
 
-export const isWindoze = () => true // process.platform.includes('win')
+export const isWindoze = () => process.platform.includes('win')
 
 export const findTaqBinary = (i18n: I18N) : PromiseLike<E_TAQ_NOT_FOUND, string> =>
     execCmd(isWindoze() ? 'where taq' : 'which taq')
