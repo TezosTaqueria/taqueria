@@ -1,0 +1,48 @@
+html[data-theme="light"] {
+	table {
+		width: 100%;
+		display: flex;
+		grid-template-columns: auto;
+		grid-template-rows: auto;
+		flex-direction: column;
+		box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+		border-radius: 8px;
+		font-family: Montserrat;
+		font-style: normal;
+		font-weight: 500;
+		font-size: 12px;
+		line-height: 16px;
+		thead {
+			background-color: var(--ifm-color-primary-light);
+			width: 100%;
+			font-family: Montserrat;
+			font-style: normal;
+			font-weight: bold;
+			font-size: 14px;
+			line-height: 17px;
+			tr {
+				border: none;
+				width: 100%;
+				th {
+					width: 50%;
+					border: none;
+					text-align: start;
+				}
+			}
+		}
+		tbody {
+			width: 100%;
+			tr {
+				width: 100%;
+				td {
+					text-align: start;
+					border-color: var(--ifm-color-primary-light);
+					width: 50%;
+				}
+			}
+		}
+	}
+	table tr:nth-child(2n) {
+		background-color: var(--ifm-color-primary-lightest);
+	}
+}

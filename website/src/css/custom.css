@@ -26,6 +26,7 @@
 	--ifm-code-font-size: 95%;
 	--ifm-font-color-base: "#000000";
 	--ifm-footer-link-color: #000000;
+	--ifm-alert-background-color-highlight: #fcaf17;
 }
 h1 {
 	font-style: normal;
