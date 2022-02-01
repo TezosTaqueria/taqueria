@@ -5,7 +5,7 @@ title: Flextesa Plugin
 The Flextesa plugin provides a quick and easy way to start, stop, and query a Flextesa sandbox instance
 // Does Taqueria manage the sandbox env/config?
 
- Flextesa is a Tezos sandbox environment that runs in Docker and provides a local Tezos node and test network. This plugin uses a docker image called `taqueria/flextesa`, which is available [here](/docker)
+ Flextesa is a Tezos sandbox environment that runs in Docker and provides a local Tezos node and test network. This plugin uses a docker image called `taqueria/flextesa`, which is available [here](https://tezos.gitlab.io/flextesa/)
 
  Once running, you can originate your smart contracts to the testnet, run tests, and make RPC calls
 
