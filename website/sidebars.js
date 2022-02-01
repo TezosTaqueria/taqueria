@@ -38,6 +38,7 @@ const sidebars = {
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
         "plugins/plugin-flextesa",
+        "plugins/plugin-taquito",
         "plugins/plugin-typescript-generator",
         "plugins/plugin-mock-plugin",
       ],
