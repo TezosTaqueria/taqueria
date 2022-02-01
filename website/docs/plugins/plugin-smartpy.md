@@ -19,7 +19,10 @@ taq install @taqueria/plugin-smartpy
 
 ## Usage
 
-The SmartPy plugin's `taq compile` task can be run with or without arguments. The basic syntax for the task is `taq compile <file-name>`
+The SmartPy plugin's `taq compile` task can be run with or without arguments. The basic syntax for the command is: 
+```shell
+taq compile <file-name>
+```
 
 Running the `compile` task with no options will result in any source SmartPy smart contracts in the `contracts` folder being compiled to Michelson files in the `artifacts` folder. If you speficy an optional filename, only SmartPy contracts matching the specified filename in the `contracts` folder will be compiled
 
