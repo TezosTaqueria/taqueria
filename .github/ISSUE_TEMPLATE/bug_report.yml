@@ -1,0 +1,60 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug", "triage"]
+assignees:
+  - 
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What went wrong?
+      placeholder: Tell us what you see!
+      value: "Details about what happened."
+    validations:
+      required: true
+  - type: textarea
+    id: what-should-happen
+    attributes:
+      label: What should have happened?
+      description: What did you expect to happen?
+      placeholder: 
+      value: "Details about what should have happened."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce the bug
+      description: Please provide the steps to reproduce the bug or error and provide relevant information about your setup. This helps diagnose issues that are only reproducible under certain conditions.
+      placeholder: 
+      value: "Steps to reproduce the error"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/ecadlabs/taqueria/blob/1d6476f92fce0f2f36cd268549aa15e6cbe770d3/code-of-conduct.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
