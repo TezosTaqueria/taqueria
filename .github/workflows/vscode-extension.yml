@@ -61,6 +61,14 @@ jobs:
       - name: Run Unit Tests on Linux
         run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
         if: runner.os == 'Linux'
+
+      - name: Copy node_modules folder on UNIX
+        run: cp -r ../node_modules .
+        if: runner.os != 'Windows'
+
+      - name: Copy node_modules folder on Windows
+        run: xcopy ..\node_modules node_modules /s /e
+        if: runner.os == 'Windows'
       
       - name: Package VSCode Extension
         if: runner.os == 'Linux'
