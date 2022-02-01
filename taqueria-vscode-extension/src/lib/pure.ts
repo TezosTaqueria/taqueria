@@ -2,7 +2,7 @@ import {exec} from 'child_process'
 import {stat, readFile} from 'fs/promises'
 import {join} from 'path'
 import {Config} from '@taqueria/protocol/taqueria-protocol-types'
-import {parse} from 'jsonc-parser'
+import {parse} from 'comment-json'
 
 
 /***********************************************************************/
@@ -292,7 +292,7 @@ export const decodeJson = <T>(data: string): PromiseLike<E_INVALID_JSON, Json<T>
     }
 }
 
-export const isWindoze = () => process.platform.includes('win')
+export const isWindoze = () => true // process.platform.includes('win')
 
 export const findTaqBinary = (i18n: I18N) : PromiseLike<E_TAQ_NOT_FOUND, string> =>
     execCmd(isWindoze() ? 'where taq' : 'which taq')
