@@ -5,7 +5,7 @@ import {
     isTaqError,
     log,
     mkdir,
-    readFile, renderTemplate,
+    renderTemplate,
     writeTextFile
 } from "../../../taqueria-utils/taqueria-utils.ts";
 import chai from "https://cdn.skypack.dev/chai@4.3.4?dts";
@@ -78,20 +78,6 @@ Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t) =>
     sanitizeOps: false
 },);
 
-// TODO: Add test to this line return () => {} same for decodeJson()
-Deno.test({name: "Positive scenario test for {readFile} function",  fn: async () => {
-        let result
-        try {
-            const result = await promise (readFile("./unit/taqueria-utils/data/testRead.txt"));
-            assertEquals(result, 'testRead');
-        }
-        catch {
-            unreachable()
-        }
-    },
-    sanitizeResources: false,
-    sanitizeOps: false
-});
 
 // @ts-ignore
 // TODO: Re-write it same as negative
@@ -113,7 +99,6 @@ Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: asy
     sanitizeResources: false,
     sanitizeOps: false
 });
-
 
 Deno.test({name: "Negative scenario test for {writeTextFile} function to catch error",  fn: async () => {
         assertRejects( ()=> {
