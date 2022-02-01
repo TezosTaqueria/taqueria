@@ -28,7 +28,6 @@ Deno.test("Positive scenario test for {decodeJson} function", () => {
 // But it does not work, need to ask Michael about is there any way to test it
 Deno.test("Positive scenario test for {decodeJson} function to return () => {}", () => {
     const result = decodeJson("{}");
-    // @ts-ignore
     const assertSuccess = (testJsonOutput: any) => assertEquals(testJsonOutput, {});
     const assertUnreachable = () => unreachable();
     fork (assertUnreachable) (assertSuccess) (result);
@@ -55,7 +54,8 @@ Deno.test("Negative scenario test for {log} function", () => {
     expect(result).not.to.be.a("string")
 });
 
-// @ts-ignore
+// @ts-ignore t variable does not have a type in Deno documentation
+// https://deno.land/manual/testing
 Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t) => {
         await t.step("run test for {mkdir} function", async () => {
             const assert = chai.assert;
@@ -76,13 +76,15 @@ Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t) =>
 },);
 
 
-// @ts-ignore
-// TODO: Re-write it same as negative
+// @ts-ignore t variable does not have a type in Deno documentation
+// https://deno.land/manual/testing
+// TODO: Re-write because return has changed
 Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: async (t) => {
         await t.step("run test for {writeTextFile} function", async () => {
             const assert = chai.assert;
-            const result = await promise (writeTextFile("./unit/taqueria-utils/data/testWrite.txt", "testWrite"));
-            assert.equal(result, 'testWrite');
+            const result = await promise (writeTextFile("./unit/taqueria-utils/data/testWrite.txt")("testWrite"));
+            console.log(result)
+            assert.equal(result, './unit/taqueria-utils/data/testWrite.txt');
         });
         await t.step("clean up", async () => {
             try {
@@ -98,7 +100,7 @@ Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: asy
 
 Deno.test({name: "Negative scenario test for {writeTextFile} function to catch error",  fn: async () => {
         assertRejects( ()=> {
-                promise (writeTextFile("./unit/taqueria-utils/data/temp", "test"));
+                promise (writeTextFile("./unit/taqueria-utils/data/temp")("test"));
                 throw new Error("Is a directory (os error 21), open './unit/taqueria-utils/data/temp'\n")
             },
             Error, "Is a directory (os error 21), open './unit/taqueria-utils/data/temp'\n"
