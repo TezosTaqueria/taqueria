@@ -17,6 +17,10 @@ To install the LIGO plugin on a Taqueria project, navigate to the project folder
 taq install @taqueria/plugin-ligo
 ```
 
+## Configuration
+
+***Coming soon***
+
 ## Usage
 
 The LIGO plugin exposes a `compile` task in Taqueria which can target one, or all the LIGO contracts in the `contracts` folder and compile them to Michelson code output to the `artifacts` folder
@@ -29,7 +33,8 @@ Running the `compile` task with no options will result in any source LIGO smart 
 
 :::note
 The `compile` task can be implemented by more than one compiler plugin installed on a project (LIGO, SmartPY). If this is the case, you must use the `--plugin` flag to specify a particular compiler
-::
+:::
+
 
 ### Options
 
@@ -42,11 +47,15 @@ The LIGO `compile` task will accept the following optional parameters:
 |  -i   | infer       | Enable type inference                 |   
 
 
+### Examples
+
+***Coming soon***
+
 ## Plugin Architecture
 
-This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK.
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
 
-The plugin provides a `compile` task used for compiling LIGO smart contracts to Michelson.
+The plugin provides a single task `compile`, used for compiling LIGO smart contracts to Michelson:
 
 |  attribute |  value                   | 
 |------------|:------------------------:|
