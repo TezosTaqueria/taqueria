@@ -43,7 +43,7 @@ body:
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: shell
   - type: textarea
-    id: steps
+    id: images
     attributes:
       label: Screenshots and images
       description: Please include any screenshots or images that are relevant to the bug report.
