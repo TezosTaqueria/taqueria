@@ -61,8 +61,10 @@ jobs:
       - name: Build the binary for ${{ matrix.os }}
         id: build-bin
         shell: bash
+        env:
+          TAQ_VERSION: "{{ github.ref_name }}"
         run: |
-          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts 
+          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild ${{ github.ref_name }} --setVersion ${{ github.ref_name }}
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
@@ -129,7 +131,7 @@ jobs:
       - publish-ligo-plugin-to-npm
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@alex-npm-pre-build-ordering
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
     with:
       dir: taqueria-plugin-flextesa
     secrets:
@@ -176,7 +178,7 @@ jobs:
             const sdk = readInfo("./taqueria-sdk/package.json")
             const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
 
-            const git_short_sha = "${{ github.sha }}".substring(1, 8)
+            const git_short_sha = "${{ github.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
 
             let body = `

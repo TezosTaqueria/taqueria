@@ -1,7 +1,7 @@
 import type {Future, reject, resolve, TaqError} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import { attemptP, map, Future as Fluture} from 'https://cdn.skypack.dev/fluture';
+import {chain, attemptP, map, Future as Fluture} from 'https://cdn.skypack.dev/fluture';
 import JSON from "https://deno.land/x/json5/mod.ts";
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
@@ -32,7 +32,7 @@ const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Den
 
 export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map (() => path))
 
-export const readFile = (path: string) => Fluture(
+export const readTextFile = (path: string) => Fluture(
     (rej: reject, res: resolve) => {
         const decoder = new TextDecoder("utf-8")
         Deno.readFile(path)
@@ -46,12 +46,23 @@ export const readFile = (path: string) => Fluture(
     }
 )
 
-export const writeTextFile = (path: string, data: string) => Fluture(
+export const readJsonFile = <T>(path: string) => pipe(
+    readTextFile(path),
+    chain (decodeJson),
+    map ((result: unknown) => (result as T))
+)
+
+export const writeTextFile = (path: string) => (data: string) => Fluture(
     (rej: reject, res: resolve) => {
         Deno.writeTextFile(path, data).then(() => res(path)).catch(rej)
         return () => {}
     }
         
+)
+
+export const writeJsonFile = <T>(path: string) => (data: T) => pipe(
+    JSON.stringify(data, undefined, 4),
+    writeTextFile(path)
 )
 
 export const isTaqError = (err: unknown) : err is TaqError => {

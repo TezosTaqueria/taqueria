@@ -16,35 +16,36 @@ const FeatureList = [
         icon: require("../../../static/img/briefcase.png").default,
         description:
           "The Taqueria CLI and VS Code plugin bring your development tools to you. Stop moving your code jumping between IDEs. With Taqueria’s plugin infrastructure you can use the tools you need all in one place.",
-        gif: require("../../../static/gif/mp4gifcode.mp4").default,
-      },
-      {
-        title: "Deploy with ease",
-        icon: require("../../../static/img/briefcase.png").default,
-        description:
-          "Remove the complexity of deploying to different networks using Taqueria. Deploy smart contracts directly to a sandbox, testnet or the Tezos network.",
-        gif: require("../../../static/gif/mp4gifcode.mp4").default,
+        gif: require("../../../static/gif/taq_init.mp4").default,
       },
       {
         title: "Effortlessly compile",
         icon: require("../../../static/img/briefcase.png").default,
         description:
           "Taqueria compiles smart contracts written in Ligo.  SmartPy and Michelson compilation is coming soon.",
-        gif: require("../../../static/gif/mp4gifcode.mp4").default,
+        gif: require("../../../static/gif/taq_compile.mp4").default,
       },
       {
-        title: "Simplify testing",
+        title: "Deploy with ease",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Taqueria supports local sandboxes and testing out of the box. Build better and safer applications with less effort.",
-        gif: require("../../../static/gif/mp4gifcode.mp4").default,
+          "Remove the complexity of deploying to different networks using Taqueria. Deploy smart contracts directly to a sandbox, testnet or the Tezos network.",
+          gif: require("../../../static/gif/taq_originate.mp4").default,
       },
+      // {
+        
+      //   title: "Simplify testing",
+      //   icon: require("../../../static/img/briefcase.png").default,
+      //   description:
+      //     "Taqueria supports local sandboxes and testing out of the box. Build better and safer applications with less effort.",
+      //   gif: require("../../../static/gif/mp4gifcode.mp4").default,
+      // },
       {
         title: "Fully customizable",
         icon: require("../../../static/img/briefcase.png").default,
         description:
           "Use Taqueria the way you want to. Taqueria has the flexibility to fit into your workflow the way you need it.",
-        gif: require("../../../static/gif/mp4gifcode.mp4").default,
+        gif: require("../../../static/gif/taq_plugins.mp4").default,
       },
     ],
   },
@@ -129,11 +130,19 @@ function Feature({ title, description, features, button }) {
         <div className={styles.videoBlock}>
           <div className={styles.videoBlockHidden}></div>
           {features.map((feature, index) => {
-            return (
-              isVisible === feature.title && (
-                <video key={index} autoPlay={true} muted src={feature.gif} />
-              )
-            );
+            if('img' in feature) {
+              return (
+                isVisible === feature.title && (
+                  <img id={feature.title} src={feature.img} />
+                )
+              );
+            } else {
+              return (
+                isVisible === feature.title && (
+                  <video key={index} autoPlay={true} muted src={feature.gif} />
+                )
+              );
+            }
           })}
         </div>
         <div>

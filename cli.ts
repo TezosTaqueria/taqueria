@@ -7,7 +7,7 @@ import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.skypack.dev/fluture';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {make, getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {isTaqError, debug, joinPaths, mkdir, readFile, writeTextFile, decodeJson, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
+import {isTaqError, debug, joinPaths, mkdir, readJsonFile, writeJsonFile, readTextFile, writeTextFile, decodeJson, renderTemplate} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
@@ -39,9 +39,24 @@ const getFromEnv = <T>(key: EnvKey, defaultValue:T, env: EnvVars) =>
     env.get(key) || defaultValue
 
 
-const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) => 
+const getVersion = (inputArgs: DenoArgs, i18n: i18n) => {
+    const i = inputArgs.findIndex(str => str === '--setVersion')
+    return i > -1
+        ? inputArgs[i+1]
+        : "not-provided"
+}
+    
+const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
     yargs(args)
     .scriptName('taq')
+    .option('setVersion', {
+        describe: i18n.__('setVersionDesc'),
+        demandOption: true,
+        requiresArg: true,
+        type: "string"
+    })
+    .hide('setVersion')
+    .version(getVersion(args, i18n))
     .option('disableState', {
         describe: i18n.__('disableStateDesc'),
         default: getFromEnv('TAQ_DISABLE_STATE', false, env),
@@ -54,11 +69,13 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         boolean: true
     })
     .hide('logPluginCalls')
-    .option('build', {
+    .option('setBuild', {
         describe: i18n.__('buildDesc'),
-        default: Date.now().toString()
+        demandOption: true,
+        requiresArg: true,
+        type: "string"
     })
-    .hide('build')
+    .hide('setBuild')
     .option('maxConcurrency', {
         describe: i18n.__('maxConcurrencyDesc'),
         default: getFromEnv('TAQ_MAX_CONCURRENCY', getDefaultMaxConcurrency(), env),
@@ -142,7 +159,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         },
         (inputArgs: Arguments) => pipe(
             initNPM(parsedArgs.projectDir, i18n),
-            chain (() => exec('npm install <%= it.pluginName %>', {...inputArgs, ...parsedArgs}, parsedArgs.projectDir)),
+            chain (() => exec('npm install -D <%= it.pluginName %>', {...inputArgs, ...parsedArgs}, parsedArgs.projectDir)),
             chain (() => getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false)),
             chain ((config: ConfigArgs) => {
                 const {pluginName} = inputArgs
@@ -152,7 +169,6 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
                 // what the real package name is
                 return pipe(
                     getPluginPackageJson(pluginName, parsedArgs.projectDir),
-                    map (JSON.parse),
                     map ((manifest: {name: string}) => {
                         const existingPlugins = config.plugins.filter(plugin => plugin.name != manifest.name)
                         const plugins = [...existingPlugins, {name: manifest.name, type: "npm"}]
@@ -171,8 +187,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
                         )
                         return updatedConfig
                     }),
-                    map (JSON.stringify),
-                    chain ((data:string) => writeTextFile(config.configFile.value, data))
+                    chain (writeJsonFile(config.configFile.value))                    
                 )
             }),
             map (() => i18n.__('pluginInstalled')),
@@ -190,15 +205,14 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             })
         },
         (inputArgs: Arguments) => pipe(
-            exec(debug('npm uninstall <%= it.pluginName %>'), {...inputArgs, ...parsedArgs}, parsedArgs.projectDir),
+            exec(debug('npm uninstall -D <%= it.pluginName %>'), {...inputArgs, ...parsedArgs}, parsedArgs.projectDir),
             chain (() => getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false)),
             chain ((config: ConfigArgs) => {
                 const {pluginName} = inputArgs
                 const plugins = config.plugins.filter(plugin => plugin.name != pluginName)
                 return pipe(
                     make({...config, plugins}),
-                    map (JSON.stringify),
-                    chain ((data:string) => writeTextFile(config.configFile.value, data))
+                    chain (writeJsonFile(config.configFile.value))                    
                 )
             }),
             map (() => i18n.__('pluginUninstalled')),
@@ -211,7 +225,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         () => {},
         (inputArgs: RawInitArgs) => pipe(
             parsedArgs.projectDir.join('.taq', 'state.json').value,
-            readFile,
+            readTextFile,
             chain (decodeJson),
             map ((state: State) => Object.entries(debug(state.tasks)).reduce(
                 (retval: Record<string, string[] | null>, [taskName, implementation]) => {
@@ -251,13 +265,13 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync())
 
 const initNPM = (projectDir: SanitizedAbsPath, i18n: i18n) => pipe(
-    readFile(projectDir.join("package.json").value),
+    readJsonFile(projectDir.join("package.json").value),
     chainRej (() => reject({kind: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir}))
 )
 
 const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath) => pipe(
-    readFile(SanitizedAbsPath.create(pluginNameOrPath, projectDir).join('package.json').value),
-    chainRej (() => readFile(projectDir.join("node_modules", pluginNameOrPath, "package.json").value))
+    readJsonFile(SanitizedAbsPath.create(pluginNameOrPath, projectDir).join('package.json').value),
+    chainRej (() => readJsonFile(projectDir.join("node_modules", pluginNameOrPath, "package.json").value))
 )
 
 const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
@@ -271,7 +285,7 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
         return parallel (maxConcurrency) ([mkdir(artifactsAbspath), mkdir(contractsAbspath), mkdir(testsAbspath)])        
     }),
     chain ((results: string[]) => quickstart.length > 0
-        ? writeTextFile(joinPaths(projectDir.value, "quickstart.md"), quickstart)
+        ? writeTextFile (joinPaths(projectDir.value, "quickstart.md")) (quickstart)
         : resolve (results)
     ),
     map (() => i18n.__("bootstrapMsg"))
@@ -503,7 +517,6 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
             )
         },
         handler: (inputArgs: Record<string, unknown>) => {
-            // @ts-ignore
             cliConfig.handled = true
             if (Array.isArray(task.handler)) {
                 console.log("This is a composite task!")
@@ -609,10 +622,10 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
         !parsedArgs.disableState
             ? resolve(stateAbspath.value)
             : reject("State disabled!"),
-        chain (readFile),
+        chain (readTextFile),
         chain (decodeJson),
         chain ((data: {build: string}) =>
-            typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.build
+            typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.setBuild
                 ? resolve(data as State)
                 : reject("state.json was generated with a different build of taqueria")
         ),
@@ -626,15 +639,15 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
 )
 
 const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqError, State> => pipe(
-    state,
-    JSON.stringify,
-    (data: string) => writeTextFile(stateAbspath.value, `// WARNING: This file is autogenerated and should NOT be modified\n${data}`),
+    JSON.stringify(state, undefined, 4),
+    (data: string) => `// WARNING: This file is autogenerated and should NOT be modified\n${data}`,
+    writeTextFile(stateAbspath.value),
     map (() => state)
 )
 
 const getComputedState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => pipe(
     retrieveAllPluginInfo(config, env, i18n, parsedArgs),
-    map ((pluginInfo: PluginInfo[]) => State.create(parsedArgs.build, config, pluginInfo, i18n))
+    map ((pluginInfo: PluginInfo[]) => State.create(parsedArgs.setBuild, config, pluginInfo, i18n))
 )
 
 const computeState = (stateAbspath: SanitizedAbsPath, config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => {
@@ -669,6 +682,10 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                 map (sanitizeArgs),
                 chain ((initArgs: SanitizedInitArgs) => {
                     if (initArgs.debug) debugMode(true)
+                    if (initArgs.version) {
+                        console.log(initArgs.setVersion)
+                        return Promise.resolve(initArgs)
+                    }
                     return initArgs._.includes('init') || initArgs._.includes('testFromVsCode')
                         ? resolve(initArgs)
                         : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
@@ -726,9 +743,11 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     env: parsedArgs.env,
     quickstart: parsedArgs.quickstart,
     disableState: parsedArgs.disableState,
-    build: parsedArgs.build,
     logPluginCalls: parsedArgs.logPluginCalls,
-    fromVsCode: parsedArgs.fromVsCode
+    fromVsCode: parsedArgs.fromVsCode,
+    setBuild: parsedArgs.setBuild,
+    setVersion: parsedArgs.setVersion,
+    version: parsedArgs.version
 })
 
 export default {

@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/taqueria",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "An easy to use opininated tool for building, testing, and deploying Tezos software",
   "main": "index.ts",
   "directories": {
@@ -10,8 +10,7 @@
     "test": "yarn",
     "build": "./bin/build.sh",
     "build-all": "./bin/build-all.sh",
-    "prepare": "husky install",
-    "symlink": "echo 'Creating symlinks'"
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -34,5 +33,8 @@
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "devDependencies": {
     "husky": "^7.0.4"
-  }
+  },
+  "workspaces": [
+    "./taqueria*"
+  ]
 }

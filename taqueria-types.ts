@@ -1,7 +1,7 @@
 import type {SanitizedPath, SanitizedAbsPath} from './taqueria-utils/taqueria-utils-types.ts'
 import {SHA256} from './taqueria-utils/taqueria-utils-types.ts'
 import {Option, Config, ConfigArgs, PluginInfo, InstalledPlugin, Verb, UnvalidatedTask, Task, UnvalidatedNetwork, Network, } from './taqueria-protocol/taqueria-protocol-types.ts'
-import {mkdir, joinPaths } from './taqueria-utils/taqueria-utils.ts'
+import {mkdir, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {resolve, map} from 'https://cdn.skypack.dev/fluture';
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 
@@ -48,8 +48,10 @@ export interface RawInitArgs {
     quickstart: string
     disableState: boolean
     logPluginCalls: boolean
-    build: string
+    setBuild: string
+    setVersion: string
     fromVsCode: boolean
+    version: boolean
 }
 
 export interface SanitizedInitArgs {
@@ -63,15 +65,17 @@ export interface SanitizedInitArgs {
     quickstart: string
     disableState: boolean
     logPluginCalls: boolean
-    build: string
+    setBuild: string
+    setVersion: string
     fromVsCode: boolean
+    version: boolean
 }
 
 export interface i18n {
     __(msg: string, ...params: string[]): string
 }
 
-export type EnvKey = "TAQ_CONFIG_DIR" | "TAQ_MAX_CONCURRENCY" | "TAQ_PROJECT_DIR" | "TAQ_ENV" | "TAQ_DISABLE_STATE"
+export type EnvKey = "TAQ_CONFIG_DIR" | "TAQ_MAX_CONCURRENCY" | "TAQ_PROJECT_DIR" | "TAQ_ENV" | "TAQ_DISABLE_STATE" | "TAQ_VERSION"
 
 export interface EnvVars {
     get: (key: EnvKey) => undefined | string

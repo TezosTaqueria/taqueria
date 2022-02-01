@@ -11,19 +11,24 @@
 ## Build instructions
 
 - Install [deno](https://deno.land/#installation)
-- Run `./bin/build.sh` from the root directory of this project. This will generate a `taqueria` executable.
+- Run `./bin/build.sh` from the root directory of this project. This will generate a `taq` executable.
 
 ## Suggestions
 
-I like adding my project directory to the PATH environment variable which allows me to execute `taqueria` from any directory. Do the following to set that up:
+I like adding my project directory to the PATH environment variable which allows me to execute `taq` from any directory. Do the following to set that up:
 
 1. Run `pwd` from the root directory of this project. This will output a path which you'll need to select and copy.
-2. run `echo 'export PATH=$PATH:[paste path here]' >> ~/.bashrc`. 
+2. Run `echo 'export PATH=$PATH:[paste path here]' >> ~/.bashrc`. This will add `taq` to your PATH so that you can execute it anywhere.
+3. Reload your .bashrc file. Run: `source ~/.bashrc`
 
 > E.g. On my computer, this would be: `echo 'export PATH=$PATH:/Users/mweichert/Projects/taqueria' >> ~/.bashrc`
 
+> NOTE: If you're on Mac Catalina or later, you'll need to use .zshrc instead of .bashrc
+
+> We'll be creating installer packages for Taqueria soon!
+
 ## Create a project
-1. Initialize a new project: `taqueria init test-project`
+1. Initialize a new project: `taq init test-project`
 2. Change directories: `cd test-project`
 3. Initialize the project as an NPM project: `npm init -y`
 4. Install the LIGO plugin: `taq install ../taqueria-plugin-ligo` if installing from a clone of this repo, otherwise use `taq install @taqueria/plugin-ligo`
