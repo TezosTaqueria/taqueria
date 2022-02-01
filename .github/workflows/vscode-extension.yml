@@ -63,7 +63,7 @@ jobs:
         if: runner.os == 'Linux'
 
       - name: Copy node_modules folder on UNIX
-        run: cp -r ../node_modules .
+        run: cp -RL node_modules taqueria-vscode-extension/node_modules
         if: runner.os != 'Windows'
 
       - name: Copy node_modules folder on Windows
