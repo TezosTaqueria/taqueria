@@ -2,7 +2,7 @@
 title: Mock Plugin 
 ---
 
-The mock plugin is a starting point for building new plugins. You can learn more about making plugins for Taqueria [here](taqueria-dev/making-plugins)
+The mock plugin is a starting point for building new plugins. You can learn more about making plugins for Taqueria [here](../taqueria-dev/making-plugins)
 
 The basic implementation for a plugin looks like this:
 ```js
