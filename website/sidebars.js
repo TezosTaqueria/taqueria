@@ -24,7 +24,8 @@ const sidebars = {
       collapsible: false,
       items: [
         "intro",
-        "getting-started/installation"
+        "getting-started/installation",
+        "plugins/understanding-taqueria-plugins"
       ],
     },
     {
@@ -34,7 +35,6 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "plugins/understanding-taqueria-plugins",
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
         "plugins/plugin-flextesa",
