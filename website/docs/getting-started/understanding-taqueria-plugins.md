@@ -2,7 +2,7 @@
 title: Understanding Taqueria Plugins
 ---
 
-Taqueria plugins each implement a specific function such as a smart contract language, testnet, sandbox, or test framework. Taqueria plugins often rely on 3rd party software libraries such as LIGO or Docker which need to be installed on your machine for the plugin to work correctly
+Taqueria plugins each implement a specific function such as a smart contract language, testnet, sandbox, or test framework. ±
 
 Taqueria is designed to be flexible, streamlined, and customizable so plugins are installed on a per-project basis depending on the particular smart contract language, test framework, sandbox environment, and testnet used 
 
