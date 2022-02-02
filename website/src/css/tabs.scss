@@ -1,0 +1,37 @@
+html[data-theme="light"] {
+	.tabs-container {
+		.tabs {
+			height: fit-content;
+
+			.tabs__item:hover {
+				background: rgb(231, 144, 87, 0.2);
+				border-radius: 24px;
+			}
+			.tabs__item {
+				font-family: Montserrat;
+				font-style: normal;
+				font-weight: 500;
+				font-size: 14px;
+				color: #454545;
+				height: fit-content;
+				padding-top: 4px;
+				padding-bottom: 4px;
+				margin-right: 5px;
+				margin-left: 5px;
+			}
+			.tabs__item--active {
+				background: rgb(231, 144, 87, 0.2);
+				border-radius: 24px;
+				border: none;
+				font-family: Montserrat;
+				font-style: normal;
+				font-weight: 500;
+				font-size: 14px;
+				color: #f04e6e;
+				height: fit-content;
+				padding-top: 4px;
+				padding-bottom: 4px;
+			}
+		}
+	}
+}
