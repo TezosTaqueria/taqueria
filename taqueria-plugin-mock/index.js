@@ -7,7 +7,7 @@ Plugin.create(i18n => ({
     tasks: [
         Task.create({
             task: "ping",
-            command: "ping [sourceFile]",
+            command: "ping",
             aliases: ["p", "ping-test"],
             description: "Return predefined result for CLI integration testing",
             options: [
