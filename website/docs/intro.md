@@ -14,7 +14,7 @@ purpose: help the user understand what Taqueria is, what it does, and how to pro
 - what is the MINIMAL amount of detail necessary in this document?
  -->
 
-Taqueria is here to help make your Tezos development experience faster and easier. Taqueria understands the Tezos development lifecycle and provides you with a powerful set of tools that take care of common development tasks so you can focus on what matters 
+Taqueria is here to make your Tezos development experience faster and easier. Taqueria understands the Tezos development lifecycle and provides you with a powerful set of tools that take care of common development tasks so you can focus on what matters 
 
 ## What is Taqueria?
 
