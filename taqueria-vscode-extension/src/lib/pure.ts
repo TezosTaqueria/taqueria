@@ -229,7 +229,7 @@ export const makePathToTaq = (i18n: I18N) => (inputPath: string) : PromiseLike<E
  * @returns {PromiseLike<E_EXEC, string>}
  */        
 export const execCmd = (cmd: string): PromiseLike<E_EXEC, string> => new Promise((resolve, reject) => {
-    exec(cmd, (previous, stdout, msg) => {
+    exec(isWindoze() ? cmd : `sh -c "${cmd}"`, (previous, stdout, msg) => {
         log ("Executing command:") (cmd)
         if (previous) reject({code: 'E_EXEC', msg: `An unexpected error occurred when trying to execute the command`, previous, cmd})
         else if (msg.length) reject({code: 'E_EXEC', msg, cmd})
