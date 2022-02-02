@@ -14,7 +14,7 @@ Plugin.create(i18n => ({
                 Option.create({
                     shortFlag: "e",
                     flag: "error",
-                    description: "Mock plugin is used for integration testing"
+                    description: "Forces the task to return an error."
                 })
             ],
             handler: "proxy"
