@@ -16,13 +16,6 @@ purpose: help the user understand what Taqueria is, what it does, and how to pro
 
 Taqueria is here to help make your Tezos development experience easier. Taqueria can help make common dApp development work faster and easier by providing an easy way to run tasks involved in the dApp development lifecycle
 
-Some of the things Taqueria can do for you include:
-- Compiling smart contracts written in LIGO or SmartPY
-- Running a Flextesa sandbox (a local Tezos testnet)
-- Originating a smart contract
-- Generating TypeScript types from a Michelson contract
-- Autocompletion in VS Code
-
 ## What is Taqueria?
 
 Taqueria is an extensible, open source plugin based framework for Tezos dApp development
@@ -40,7 +33,12 @@ Taqueria has a few major components:
 
 The CLI is the main user interface for Taqueria which provides a command `taq` through which you can initialize a project, install/uninstall plugins, and run tasks
 
-Basic usage of the Taqueria CLI involves running a command following the pattern `taq [task] [options]`. You can see what tasks are available to run in any given context by running `taq --help` from the command line
+Basic usage of the Taqueria CLI involves running a command following the pattern 
+```shell
+taq [task] [options]
+```
+
+You can see what tasks are available to run in any given context by running `taq --help` from the command line
 
 ### Taqueria Project
 
@@ -57,7 +55,7 @@ At this time, all Taqueria projects must also be initialized as node projects by
 :::
 ### Taqueria Plugins
 
-Taqueria plugins add functionality to Taqueria by adding tasks to Taqueria like `taq compile-ligo` or `taq start sandbox`. Plugins are managed right in Taqueria using the `taq install [pluginName]` and `taq uninstall [pluginName]` commands
+Taqueria plugins add functionality to Taqueria by adding tasks to Taqueria. Plugins are managed right in Taqueria using the `taq install [pluginName]` and `taq uninstall [pluginName]` commands
 
 Taqueria plugins are installed on a ***per-project*** basis which allows you to customize the combination of technologies used and tasks avalable on a project. This means that the tasks available to run in each project will differ based on the plugins installed
 
