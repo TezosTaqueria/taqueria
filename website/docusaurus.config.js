@@ -42,6 +42,7 @@ const config = {
 						require.resolve("./src/css/tables.scss"),
 						require.resolve("./src/css/admonitions.scss"),
 						require.resolve("./src/css/codBlock.scss"),
+						require.resolve("./src/css/tabs.scss"),
 					],
 				},
 			}),
