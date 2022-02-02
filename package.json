@@ -38,6 +38,7 @@
     "play-sound-cli": "^1.0.0"
   },
   "workspaces": [
-    "./taqueria*"
+    "./taqueria*",
+    "./taqueria-plugin-flextesa/docker"
   ]
 }
