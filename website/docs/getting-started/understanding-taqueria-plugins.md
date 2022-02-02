@@ -23,10 +23,10 @@ During installation, NPM packages for the plugin are downloaded into the project
 
 Currently available plugins and their associated pluginName used for installation:
 
-| name         |  pluginName                  |
-|--------------|------------------------------|
-| LIGO         | `@taqueria/plugin-ligo`      |
-| SmartPy      | `@taqueria/plugin-smartpy`   |
-| Flextesa     | `@taqueria/plugin-flextesa`  |
-| Taquito      | `@taqueria/plugin/taquito`   |
-| TS Generator | ***Coming soon***            |
+| name         |  pluginName                  |  description                                                |
+|--------------|------------------------------|-------------------------------------------------------------|
+| LIGO         | `@taqueria/plugin-ligo`      | A compiler for the LIGO smart contract language             |
+| SmartPy      | `@taqueria/plugin-smartpy`   | A compiler for the SmartPy contract language                |
+| Flextesa     | `@taqueria/plugin-flextesa`  | A sandbox test network running Tezos Flextesa               | 
+| Taquito      | `@taqueria/plugin/taquito`   | A front-end Tezos framework used to originate               |
+| TS Generator | ***Coming soon***            | A type generator that produces TS types from Michelson code |
