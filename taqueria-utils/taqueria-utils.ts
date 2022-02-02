@@ -2,14 +2,13 @@ import type {Future, reject, resolve, TaqError, SanitizedAbsPath} from './taquer
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {chain, attemptP, map, Future as Fluture} from 'https://cdn.skypack.dev/fluture';
-import JSON from "https://deno.land/x/json5/mod.ts";
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
-
+import * as jsonc from "https://deno.land/x/jsonc@1/main.ts"
 
 export const decodeJson = (encoded: string) => Fluture((rej: reject, res:resolve) => {
     try {
-        const data = JSON.parse(encoded)
+        const data = jsonc.parse(encoded)
         res(data)
     } catch (err) {
         rej({kind: "E_INVALID_JSON", msg: "The provided JSON could not be decoded.", previous: err, context: encoded})
@@ -62,7 +61,13 @@ export const writeTextFile = (path: string) => (data: string) => Fluture(
 )
 
 export const writeJsonFile = <T>(path: string) => (data: T) => pipe(
-    JSON.stringify(data, undefined, 4),
+    JSON.stringify(data),
+    jsonStr => pipe(
+        jsonc.format(jsonStr, undefined, {
+            insertSpaces: true
+        }),
+        edits => jsonc.applyEdits(jsonStr, edits)
+    ),
     writeTextFile(path)
 )
 
