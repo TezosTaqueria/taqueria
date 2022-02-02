@@ -60,7 +60,7 @@ Basic usage of the Taqueria CLI involves running a command following the pattern
 
 ### Taqueria Plugins
 
-Taqueria plugins add functionality to Taqueria by implementing tasks like `taq compile-ligo` or `taq start sandbox`. Plugins are managed right in Taqueria using the `taq install [pluginName]` and `taq uninstall [pluginName]` commands
+Taqueria plugins add functionality to Taqueria by adding tasks to Taqueria like `taq compile-ligo` or `taq start sandbox`. Plugins are managed right in Taqueria using the `taq install [pluginName]` and `taq uninstall [pluginName]` commands
 
 Taqueria plugins are installed on a ***per-project*** basis which allows you to customize the combination of technologies used and tasks avalable on a project. This means that the tasks available to run in each project will differ based on the plugins installed
 

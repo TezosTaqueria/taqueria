@@ -21,7 +21,9 @@ If you aren't seeing tasks listed when running `taq`, make sure that you are in 
 
 During installation, NPM packages for the plugin are downloaded into the project folder and the plugin is registered in `./.taq/config.json`
 
-Currently available plugins and their associated pluginName used for installation:
+
+
+## Available Plugins
 
 | name         |  pluginName                  |  description                                                |
 |--------------|------------------------------|-------------------------------------------------------------|
