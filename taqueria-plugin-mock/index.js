@@ -1,7 +1,9 @@
 const {Plugin, Task, Option} = require('@taqueria/node-sdk')
+
 Plugin.create(i18n => ({
     schema: "1.0",
     version: "0.1",
+    alias: "mock",
     tasks: [
         Task.create({
             task: "ping",
@@ -11,11 +13,17 @@ Plugin.create(i18n => ({
             options: [
                 Option.create({
                     shortFlag: "e",
-                    flag: "return error ",
-                    description: "The "
-                }),
+                    flag: "error",
+                    description: "Forces the task to return an error."
+                })
             ],
-            handler: "pong"
+            handler: "proxy"
         })
     ],
+    proxy: parsedArgs => Promise.resolve({
+        status: "success",
+        stdout:  "pong",
+        stderr: "",
+        artifacts: []
+    })
 }), process.argv)
