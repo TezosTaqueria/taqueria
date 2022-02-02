@@ -55,7 +55,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
         with:
-          platforms: linux/amd64,linux/arm64/v7
+          platforms: linux/amd64,linux/arm64/v8
 
       - name: Set up Docker Buildx
         id: buildx
@@ -66,7 +66,7 @@ jobs:
         with:
           context: ./taqueria-plugin-flextesa/docker/
           push: true
-          platforms: linux/amd64,linux/arm64/v7
+          platforms: linux/amd64,linux/arm64/v8
           tags: ${{ steps.image-metadata.outputs.tags }}
           labels: ${{ steps.image-metadata.outputs.labels }}
 
@@ -80,5 +80,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'The latest docker name:tag for this PR is ***${{ steps.image-metadata.outputs.tags }}*** :whale: :ship:'
+              body: 'The latest docker name:tag for this PR is ***${{ steps.image-metadata.outputs.tags }}*** :whale: :ship:. The image is available for the following platforms: `linux/amd64` and `linux/arm64/v8`'
             })
