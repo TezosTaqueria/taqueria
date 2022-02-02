@@ -25,6 +25,7 @@ Deno.test("Positive scenario test for {decodeJson} function", () => {
 
 // TODO: Michael to help with solution for return ()
 // This test was built to try to test return () => {} (line 16)
+// https://github.com/ecadlabs/taqueria/issues/202
 Deno.test("Positive scenario test for {decodeJson} function to return () => {}", () => {
     const result = decodeJson("{}");
     const assertSuccess = (testJsonOutput: any) => assertEquals(testJsonOutput, {});
