@@ -195,7 +195,7 @@ jobs:
               | npm install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
               | npm install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
               | npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | npm install ${{ env.SCOPE }}/${flextesa.name}@$0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | npm install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
             `;
             
             github.rest.issues.createComment({
