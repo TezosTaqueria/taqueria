@@ -36,28 +36,25 @@ Taqueria has a few major components:
 
 ## Basic Components
 
-### Taqueria Projects
+### Taqueria CLI
 
-A Taqueria project is one that has been initialized by Taqueria using the `taq init` command
+The CLI is the main user interface for Taqueria which provides a command `taq` through which you can initialize a project, install/uninstall plugins, and run tasks
 
-A project initialized with Taqueria will have the following folder structure:
-- 'app' 
+Basic usage of the Taqueria CLI involves running a command following the pattern `taq [task] [options]`. You can see what tasks are available to run in any given context by running `taq --help` from the command line
+
+### Taqueria Project
+
+A Taqueria project is one that has been initialized by Taqueria using the `taq init` command. It will have the following folder structure created:
+- `app`
 - `contracts`
 - `artifacts`
--`./.taq`
+- `./.taq`
 
 The `./.taq` folder contains the Taqueria configuration for a given project. Configuration for Taqueria plugins and sandboxes is done in `./.taq/config.json`
 
 :::note
 At this time, all Taqueria projects must also be initialized as node projects by running `npm init -y` from the root of your project directory
 :::
-
-### Taqueria CLI
-
-The CLI is the user interface for Taqueria which provides a command `taq` through which you can initialize a project, install/uninstall plugins, and run tasks provided by plugins installed on that project
-
-Basic usage of the Taqueria CLI involves running a command following the pattern `taq [task] [options]`. You can see what tasks are available to run in any given context by running `taq --help` from the command line
-
 ### Taqueria Plugins
 
 Taqueria plugins add functionality to Taqueria by adding tasks to Taqueria like `taq compile-ligo` or `taq start sandbox`. Plugins are managed right in Taqueria using the `taq install [pluginName]` and `taq uninstall [pluginName]` commands
@@ -70,6 +67,12 @@ Currently available plugins include:
 - Flextesa Sandbox
 - Taquito 
 - TS Type Generator
+
+### Taqueria SDK
+
+Taqueria has an SDK and protocol at it's core wich are dependencies for the CLI and all plugins. They are provided in the binary file, as well as plugins (npm packages)
+
+Most developers won't ever interact with directly unless they are developing a Taqueria plugin, but it's helpful to know they are there
 
 
 
