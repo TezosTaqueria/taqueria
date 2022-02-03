@@ -292,7 +292,7 @@ export const decodeJson = <T>(data: string): PromiseLike<E_INVALID_JSON, Json<T>
     }
 }
 
-export const isWindoze = () => process.platform.includes('win')
+export const isWindoze = () => process.platform.includes('win') && process.platform.includes('darwin')
 
 export const findTaqBinary = (i18n: I18N) : PromiseLike<E_TAQ_NOT_FOUND, string> =>
     execCmd(isWindoze() ? 'where taq' : 'which taq')
