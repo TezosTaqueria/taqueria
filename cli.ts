@@ -303,7 +303,15 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
                 ...formattedArgs,
             ]
 
-            if (parsedArgs.logPluginCalls) console.log(cmd.join(' '))
+            if (parsedArgs.logPluginCalls) {
+                console.log(`*** START Call to ${plugin.name} ***`)
+                const [exe, ...cmdArgs] = cmd
+                const lastLine = cmdArgs.pop()
+                console.log(`${exe} \\`)
+                cmdArgs.map(line => console.log(`${line} \\`))
+                console.log(lastLine)
+                console.log(`*** END of call to ${plugin.name} ***`)
+            }
 
             const altCmd = ['sh', '-c', cmd.join(' ')]
             const process = Deno.run({cmd: altCmd, stdout: "piped", stderr: "piped"})
