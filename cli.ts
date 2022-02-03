@@ -20,7 +20,6 @@ import {log, debug} from './taqueria-utils/taqueria-utils.ts'
 export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<void>) => unknown
 
 type CLIConfig = ReturnType<typeof yargs> & {
-    completion: () => CLIConfig
     handled?: boolean
 }
 
@@ -221,9 +220,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
-    .demandCommand()
-    .completion()
-    .help(),
+    .demandCommand(),
     extendCLI(env, parsedArgs, i18n)
 )
 
@@ -521,6 +518,9 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
             (parsedArgs: SanitizedInitArgs) => loadState(cliConfig, config, env, parsedArgs, i18n, state)
         ))
     )),
+    map ((cliConfig: CLIConfig) => 
+        cliConfig.help()
+    ),
     chain (parseArgs),
     map (showInvalidTask(cliConfig))
 )
