@@ -23,9 +23,6 @@ env:
 
 jobs:
   build-and-push:
-    defaults:
-      run:
-        working-directory: taqueria-plugin-flextesa/docker
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -53,7 +50,7 @@ jobs:
         run: npm ci
 
       - name: Build package
-        run: npm run build-package
+        run: npm run build -w taqueria-plugin-flextesa/docker
 
       - name: Build and push
         uses: docker/build-push-action@v2

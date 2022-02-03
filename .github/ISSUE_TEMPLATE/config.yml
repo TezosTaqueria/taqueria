@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Taqueria Questions
+    url: https://github.com/ecadlabs/taqueria/discussions
+    about: If you have a question about Taqueria, please use our Discussions page.

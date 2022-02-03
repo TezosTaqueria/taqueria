@@ -37,6 +37,7 @@ export interface CLICommand {
 
 export type DenoArgs = typeof Deno.args
 
+
 export interface RawInitArgs {
     _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
     projectDir: string // path to the project
@@ -54,6 +55,12 @@ export interface RawInitArgs {
     version: boolean
 }
 
+export interface InstallPluginArgs extends RawInitArgs {
+    pluginName: string
+}
+
+export type UninstallPluginArgs = InstallPluginArgs
+
 export interface SanitizedInitArgs {
     _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
     projectDir: SanitizedAbsPath
@@ -69,6 +76,7 @@ export interface SanitizedInitArgs {
     setVersion: string
     fromVsCode: boolean
     version: boolean
+    pluginName?: string
 }
 
 export interface i18n {

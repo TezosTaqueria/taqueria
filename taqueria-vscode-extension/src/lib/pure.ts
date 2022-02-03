@@ -2,7 +2,7 @@ import {exec} from 'child_process'
 import {stat, readFile} from 'fs/promises'
 import {join} from 'path'
 import {Config} from '@taqueria/protocol/taqueria-protocol-types'
-import {parse} from 'jsonc-parser'
+import {parse} from 'comment-json'
 
 
 /***********************************************************************/
@@ -229,7 +229,7 @@ export const makePathToTaq = (i18n: I18N) => (inputPath: string) : PromiseLike<E
  * @returns {PromiseLike<E_EXEC, string>}
  */        
 export const execCmd = (cmd: string): PromiseLike<E_EXEC, string> => new Promise((resolve, reject) => {
-    exec(`sh -c '${cmd}'`, (previous, stdout, msg) => {
+    exec(isWindoze() ? cmd : `sh -c "${cmd}"`, (previous, stdout, msg) => {
         log ("Executing command:") (cmd)
         if (previous) reject({code: 'E_EXEC', msg: `An unexpected error occurred when trying to execute the command`, previous, cmd})
         else if (msg.length) reject({code: 'E_EXEC', msg, cmd})
@@ -292,8 +292,10 @@ export const decodeJson = <T>(data: string): PromiseLike<E_INVALID_JSON, Json<T>
     }
 }
 
+export const isWindoze = () => process.platform.includes('win')
+
 export const findTaqBinary = (i18n: I18N) : PromiseLike<E_TAQ_NOT_FOUND, string> =>
-    execCmd('which taq')
+    execCmd(isWindoze() ? 'where taq' : 'which taq')
     .then(path => path.trim())
     .catch(previous => Promise.reject({code: 'E_TAQ_NOT_FOUND', msg: "Could not find taq in your path.", previous}))
     .then(makePathToTaq(i18n))

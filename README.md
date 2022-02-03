@@ -1,3 +1,5 @@
+
+
 <p align="center">
   <a href="https://taqueria.io">
     <img alt="Taqueria" src="https://user-images.githubusercontent.com/1114943/150659418-e55f1df3-ba4d-4e05-ab26-1f729858c7fb.png" width="" />
@@ -8,25 +10,65 @@
 </h1>
 
 > WARNING: This project has not officially been made public. Congratulations on finding it. Have a look around, but be aware, it's not yet ready for public consumption.! CLIs and APIs are unstable and likely to change.
-## Build instructions
 
-- Install [deno](https://deno.land/#installation)
-- Run `./bin/build.sh` from the root directory of this project. This will generate a `taqueria` executable.
+## What is Taqueria?
 
-## Suggestions
+Taqueria is an extensible, open source plugin based framework for Tezos dApp development
 
-I like adding my project directory to the PATH environment variable which allows me to execute `taqueria` from any directory. Do the following to set that up:
+In more practical terms, Taqueria is a task runner that you can use from the command line or the VS Code command palette to quickly accomplish tasks related to Tezos development. Taqueria uses a plugin architecture to implement tasks that provide complex and domain specific functionality
 
-1. Run `pwd` from the root directory of this project. This will output a path which you'll need to select and copy.
-2. run `echo 'export PATH=$PATH:[paste path here]' >> ~/.bashrc`. 
+Taqueria includes:
+ - A command line interface (CLI) you use in your terminal through a command named `taq`
+ - A library of plugins that add tasks to Taqueria
+ - A VS Code Extension which provides the ability to run Taqueria tasks from the command palette
 
-> E.g. On my computer, this would be: `echo 'export PATH=$PATH:/Users/mweichert/Projects/taqueria' >> ~/.bashrc`
+## Installing the Taqueria CLI
 
-## Create a project
+The Taqueria CLI is an executable binary named `taq` installed globally in your shell's `$PATH`
+
+1. Download the correct build of Taqueria for your operating system
+2. Make the Taqueria binary `taq` executable
+3. Add `taq` to your shell's `$PATH`
+
+Builds for the latest release of Taqueria:
+| OS      | URL                                     |  
+|---------|-----------------------------------------|
+| MacOS   | https://taqueria.io/get/macos/taq       |
+| Linux   | https://taqueria.io/get/linux/taq       |
+| Windows | https://taqueria.io/get/windows/taq.exe |
+
+Builds are also available on the [releases](https://github.com/ecadlabs/taqueria/releases) page on Github
+
+> Detailed instructions for installing and using Taqueria can be found [here](https://taqueria.io/docs/getting-started/installation)
+
+## Getting Started
+
+Once installed, Taqueria is run from the command line using the `taq` command. The basic structure of a Taqueria command is:
+```shell
+taq <taskName> [options]
+```
+
+You can use `taq --help` to list the available tasks in a given context
+![taq help output](/website/static/img/taq-help-cli.png)
+
+### Plugins
+
+Taqueria plugins extend the functionality of Taqueria by adding additional tasks that can be run on a project. Currently available plugins are:
+| name         |  pluginName                  |  description                                                |
+|--------------|------------------------------|-------------------------------------------------------------|
+| LIGO         | `@taqueria/plugin-ligo`      | A compiler for the LIGO smart contract language             |
+| SmartPy      | `@taqueria/plugin-smartpy`   | A compiler for the SmartPy contract language                |
+| Flextesa     | `@taqueria/plugin-flextesa`  | A sandbox test network running Tezos Flextesa               | 
+| Taquito      | `@taqueria/plugin/taquito`   | A front-end Tezos framework used to originate               |
+| TS Generator | ***Coming soon***            | A type generator that produces TS types from Michelson code |
+
+Taqueria manages plugins by providing installation/uninstallation via the `taq install <pluginName>` and `taq uninstall <pluginName>` tasks. Plugins are installed on a per-project basis during which the NPM package is downloaded and installed on the project, and configuration is added in the `./.taq/config.json` file
+
+### Steps to Create a Taqueria Project
 1. Initialize a new project: `taq init test-project`
 2. Change directories: `cd test-project`
 3. Initialize the project as an NPM project: `npm init -y`
-4. Install the LIGO plugin: `taq install ../taqueria-plugin-ligo` if installing from a clone of this repo, otherwise use `taq install @taqueria/plugin-ligo`
+4. Install the LIGO plugin: `taq install @taqueria/plugin-ligo`
 6. Continue steps 4-5 for each additional plugin you want to install
 
 
