@@ -60,6 +60,10 @@ export interface E_EXEC extends E_BASE {
     cmd: string
 }
 
+export interface E_WINDOWS extends E_BASE {
+    code: 'E_WINDOWS'
+}
+
 export type TaqErr =
     E_PROXY |
     E_TAQ_NOT_FOUND |
@@ -69,7 +73,8 @@ export type TaqErr =
     E_INVALID_JSON |
     E_STATE_MISSING |
     E_EXEC |
-    E_NO_TAQUERIA_PROJECTS
+    E_NO_TAQUERIA_PROJECTS |
+    E_WINDOWS
 
 export interface I18N {
     temp?: true
@@ -229,7 +234,8 @@ export const makePathToTaq = (i18n: I18N) => (inputPath: string) : PromiseLike<E
  * @returns {PromiseLike<E_EXEC, string>}
  */        
 export const execCmd = (cmd: string): PromiseLike<E_EXEC, string> => new Promise((resolve, reject) => {
-    exec(isWindoze() ? `wsl "${cmd}"` : `sh -c "${cmd}"`, (previous, stdout, msg) => {
+    if (isWindoze()) reject({code: 'E_WINDOWS', msg: "Running in Windows without WSLv2 is currently not supported."})
+    else exec(`sh -c "${cmd}"`, (previous, stdout, msg) => {
         log ("Executing command:") (cmd)
         if (previous) reject({code: 'E_EXEC', msg: `An unexpected error occurred when trying to execute the command`, previous, cmd})
         else if (msg.length) reject({code: 'E_EXEC', msg, cmd})
@@ -295,7 +301,7 @@ export const decodeJson = <T>(data: string): PromiseLike<E_INVALID_JSON, Json<T>
 export const isWindoze = () => process.platform.includes('win') && process.platform.includes('darwin')
 
 export const findTaqBinary = (i18n: I18N) : PromiseLike<E_TAQ_NOT_FOUND, string> =>
-    execCmd(isWindoze() ? 'where taq' : 'which taq')
+    execCmd('which taq')
     .then(path => path.trim())
     .catch(previous => Promise.reject({code: 'E_TAQ_NOT_FOUND', msg: "Could not find taq in your path.", previous}))
     .then(makePathToTaq(i18n))
