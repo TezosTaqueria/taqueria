@@ -26,7 +26,7 @@ Some of the things Taqueria can do for you include:
 
 ## What is Taqueria?
 
-Taqueria is an extensible, open source plugin based framework and task runner for Tezos dApp development
+Taqueria is an extensible, open source plugin based framework and task runner for Tezos development
 
 In more practical terms, Taqueria is a command line interface (CLI) you use in your terminal via the `taq` command, and a library of plugins that add tasks to Taqueria to do cool and useful things like smart contract compiling, originating, and type generation
 
