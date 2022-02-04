@@ -362,10 +362,54 @@ export const Tip = () => (
 ## Markdown Table
 
 | Markdown |     Table     |  XX |
-| -------- | :-----------: | --: |
+|----------|:-------------:|----:|
 | col 1    | left-aligned  |   y |
 | col 2    |   centered    |   y |
 | col 3    | right-aligned |   y |
+
+| Markdown |     Table     |  XX            |
+|----------|--------------:|----------------|
+| col 1    | left-aligned  |   longer input |
+| col 2    |   centered    |   y            |
+| col 3    | right-aligned |   y            |
+
+
+| Markdown |     Table     |  XX            |  4th col   |
+|----------|---------------|----------------|------------|
+| col 1    | left-aligned  |   longer input |	some     |
+| col 2    |   centered    |   y            |   stuff    |
+| col 3    | right-aligned |   y            |            |
+
+
+
+### `start sandbox`
+|  attribute |  value                         |  
+|------------|--------------------------------|
+|  task      | 'start sandbox'                | 
+|  command   | 'start sandbox [sandboxName]   | 
+|  aliases   | ['start flextesa]              |  
+
+### `stop sandbox`
+|  attribute |  value                         | 
+|------------|:------------------------------:|
+|  task      | 'stop sandbox'                 | 
+|  command   | 'stop sandbox [sandboxName]    | 
+|  aliases   | ['stop flextesa']              |  
+
+ ### `list accounts`
+|  attribute |  value                         | 
+|------------|:------------------------------:|
+|  task      | 'list accounts'                | 
+|  command   | 'list accounts [sandboxName]   | 
+|  aliases   | [ ]                            |  
+
+| name         |  pluginName                  |  description                                                |
+|--------------|------------------------------|-------------------------------------------------------------|
+| LIGO         | `@taqueria/plugin-ligo`      | A compiler for the LIGO smart contract language             |
+| SmartPy      | `@taqueria/plugin-smartpy`   | A compiler for the SmartPy contract language                |
+| Flextesa     | `@taqueria/plugin-flextesa`  | A sandbox test network running Tezos Flextesa               | 
+| Taquito      | `@taqueria/plugin/taquito`   | A front-end Tezos framework used to originate               |
+| TS Generator | ***Coming soon***            | A type generator that produces TS types from Michelson code |
 
 ## Docusaurus Tab Group
 
