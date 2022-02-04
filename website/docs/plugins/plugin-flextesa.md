@@ -6,11 +6,18 @@ title: Flextesa Plugin
 
 ## What is Flextesa?
 
- [Flextesa](https://tezos.gitlab.io/flextesa/) is a flexible Tezos sandbox environment that's easy to work with. It runs a Tezos node in a Docker container on your local machine that you can use for testing
+ [Flextesa](https://tezos.gitlab.io/flextesa/) is a flexible Tezos sandbox environment that's easy to work with. It runs a Tezos node in a Docker container on your local machine that you can use for testing locally
 
 ## Basics
 
-With the Flextesa plugin you configure various sandboxes with different settings, add them to Taqueria environments, and manage their lifecycle from the CLI 
+With the Flextesa plugin you configure various sandboxes for each project that you can start, stop, and query from the CLI
+
+Here are some helpful things to know:
+- Multiple sandboxes can be configured on each project and run concurrently
+- You can configure the Tezos `protocol` for each sandbox, allowing you to test against past, current, and future network upgrades
+- Accounts and balances are pre-configured per-sandbox
+- Sandboxes do not save their state, accounts and balances will be set to configured values each time they are started
+- Sandboxes can be added to Taqueria environments and then targeted from the CLI using the `--env [envName]` option 
 
 
 ## Requirements
@@ -19,7 +26,7 @@ The Flextesa plugin requires [Docker](https://www.docker.com/) v0.8.4 or later t
 
 ## Installation
 
-The Flextesa plugin in a Node.js program distributed as a NPM package which can be installed and uninstalled from the Taqueria CLI
+The Flextesa plugin in a Node.js program distributed as a NPM package which is installed and uninstalled on Taqueria projects from the Taqueria CLI
 
 To install the Flextesa plugin on a Taqueria project, navigate to the project folder and run:
 ```shell
@@ -31,6 +38,12 @@ taq install @taqueria/plugin-flextesa
 Configuration 
 
 ## Usage
+
+What is a dev doing with it?
+- spinning up a sandbox
+- originating to it
+- doing some stuff
+- shutting it down
 
 
 
@@ -48,8 +61,16 @@ The first time you start a sandbox, it might take several minutes to start. This
 :::
 
 
-### Task Reference
-#### The `start sandbox` Task
+## Technical Details
+
+## Plugin Architecture
+
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
+
+
+## Plugin Task Details
+
+### The `start sandbox` Task
 
 |  attribute |  value                         |  
 |------------|:------------------------------:|
@@ -58,7 +79,7 @@ The first time you start a sandbox, it might take several minutes to start. This
 |  aliases   | ['start flextesa]              |  
 
 
-#### The `stop sandbox` Task
+### The `stop sandbox` Task
 
 |  attribute |  value                         | 
 |------------|:------------------------------:|
@@ -66,7 +87,7 @@ The first time you start a sandbox, it might take several minutes to start. This
 |  command   | 'stop sandbox [sandboxName]    | 
 |  aliases   | ['stop flextesa']              |  
 
-#### The `list accounts` Task
+### The `list accounts` Task
 
 |  attribute |  value                         | 
 |------------|:------------------------------:|
@@ -75,6 +96,3 @@ The first time you start a sandbox, it might take several minutes to start. This
 |  aliases   | [ ]                            |  
 
 
-## Plugin Architecture
-
-This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
