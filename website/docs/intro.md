@@ -15,7 +15,7 @@ purpose: help the user understand what Taqueria is, what it does, and how to pro
  -->
 
 
-Taqueria is here to help make your Tezos development experience easier. Taqueria can help make common dApp development work faster and easier by providing an easy way to run tasks involved in the dApp development lifecycle
+Taqueria is here to help make developing on Tezos easier. Taqueria supercharges your projects with a powerful and centralized configuration and access to top Tezos development tools through tasks that you run from the command line
 
 Some of the things Taqueria can do for you include:
 - Compiling smart contracts written in LIGO or SmartPY
