@@ -30,7 +30,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Plugins",
+      label: "Plugin Reference",
       className: "sidebarHeader",
       collapsed: false,
       collapsible: false,
