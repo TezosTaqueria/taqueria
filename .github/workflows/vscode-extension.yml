@@ -7,8 +7,6 @@ on:
   push:
     tags:
       - v*
-    branches:
-      - '**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
