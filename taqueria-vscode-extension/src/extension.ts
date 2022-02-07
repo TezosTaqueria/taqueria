@@ -50,17 +50,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	// then the list of taqified projects might have changed,
 	// and therefore the list of tasks we're aware of might 
 	// have changed as well. We're best to reload.
-	vscode.workspace.onDidChangeWorkspaceFolders(_ => {
-		vscode.window.showWarningMessage("As the list of projects has changed, Taqueria will need to reload.")
-		.then(_ => vscode.window.showQuickPick(["yes", "no"], {
-			canPickMany: false,
-			placeHolder: "Reload now?",
-			title: "Reload this window?"
-		}))
-		.then(input => {
-			if (input) return vscode.commands.executeCommand("workbench.action.reloadWindow")
-		})
-	})
+// 	vscode.workspace.onDidChangeWorkspaceFolders(_ => {
+// 		vscode.window.showWarningMessage("As the list of projects has changed, Taqueria will need to reload.")
+// 		.then(_ => vscode.window.showQuickPick(["yes", "no"], {
+// 			canPickMany: false,
+// 			placeHolder: "Reload now?",
+// 			title: "Reload this window?"
+// 		}))
+// 		.then(input => {
+// 			if (input) return vscode.commands.executeCommand("workbench.action.reloadWindow")
+// 		})
+// 	})
 }
 
 // this method is called when your extension is deactivated
