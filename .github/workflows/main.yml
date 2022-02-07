@@ -165,7 +165,6 @@ jobs:
 
       - name: Run integration tests
         run: |
-          which taq
           ls -al
           npm run test:integration
 
