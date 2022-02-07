@@ -165,7 +165,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          ls -al
+          chmod +x taq
           export PATH=".:$PATH"
           npm run test:integration
 
