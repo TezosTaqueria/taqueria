@@ -166,6 +166,7 @@ jobs:
       - name: Run integration tests
         run: |
           ls -al
+          export PATH=".:$PATH"
           npm run test:integration
 
       - name: Run e2e tests
