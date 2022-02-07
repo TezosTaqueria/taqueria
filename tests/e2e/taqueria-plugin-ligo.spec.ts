@@ -1,6 +1,7 @@
 import {checkFolderExistsWithTimeout, generateTestProject} from "./utils/utils";
 import fs from "fs";
 import {execSync} from "child_process";
+import exp from "constants";
 
 const taqueriaProjectPath = 'e2e/auto-test-ligo-plugin';
 
@@ -10,13 +11,13 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
         await generateTestProject(taqueriaProjectPath, ["ligo"]);
     })
 
-    test('Verify that taqueria ligo plugin can compile one contract using compile all command', async () => {
+    test('Verify that taqueria ligo plugin can compile one contract under contracts folder', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq compile ${contractName}
-            execSync(`cd ./${taqueriaProjectPath} && taq compile`);
+            execSync(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
             await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`, 25000);
@@ -27,31 +28,53 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
 
     });
 
-    test.skip('Verify that taqueria ligo plugin can compile one contract using compile [sourceFile] command', async () => {
+    test('Verify that taqueria ligo plugin can compile one contract using compile [sourceFile] command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq compile ${contractName}
-            execSync(`cd ./${taqueriaProjectPath} && taq compile hello-tacos.mligo`);
+            execSync(`taq compile hello-tacos.mligo`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
             await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`, 25000);
 
         } catch(error) {
-            // throw new Error (`error: ${error}`);
+            throw new Error (`error: ${error}`);
         }
 
     });
 
-    // TODO: Finish test with multiple contracts
-    test.skip('Verify that taqueria ligo plugin can compile all contracts under compile folder', async () => {
+    test('Verify that taqueria ligo plugin can compile multiple contracts under contracts folder', async () => {
         try {
             // 1. Copy two contracts from data folder to /contracts folder under taqueria project
+            execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
+            execSync(`cp e2e/data/hello-tacos-second.mligo ${taqueriaProjectPath}/contracts`);
 
-            // 2. Run taq compile
+            // 2. Run taq compile ${contractName}
+            execSync(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
-            // 3. Verify that compiled michelson version has been generated
+            // 3. Verify that compiled michelson version for both contracts has been generated
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`, 25000);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-second.tz`, 25000);
+
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+
+    });
+
+    test('Verify that taqueria ligo plugin will display proper message if user tries to compile contract that does not exist', async () => {
+        try {
+            // 1. Run taq compile ${contractName} for contract that does not exist
+            const stdout = execSync(`taq compile test.mligo`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();;
+
+            // 2. Verify that output includes next messages:
+            // There was a compilation error.
+            // contracts/test.mligo: No such file or directory
+            expect(stdout).toContain("There was a compilation error.");
+            expect(stdout).toContain("contracts/test.mligo: No such file or directory");
 
 
         } catch(error) {
