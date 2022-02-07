@@ -7,6 +7,8 @@ on:
   push:
     tags:
       - v*
+  release:
+    types: [published]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
@@ -71,6 +73,7 @@ jobs:
           dryRun: true
           yarn: true
           packagePath: ${{ env.GIT_WORKSPACE }}
+          preRelease: true
       - id: setArtifactFilename
         if: runner.os == 'Linux'
         run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}"
@@ -84,7 +87,7 @@ jobs:
 
   publish-marketplace:
     name: Publish VSCode Extension
-    if: github.ref_type == 'tag'
+    if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
     needs:
       - lint-test-build
     runs-on: ubuntu-latest
