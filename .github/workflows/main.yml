@@ -167,6 +167,8 @@ jobs:
         run: |
           chmod +x taq
           export PATH=".:$PATH"
+          echo "$PATH"
+          ls -al
           npm run test:integration
 
       - name: Run e2e tests
