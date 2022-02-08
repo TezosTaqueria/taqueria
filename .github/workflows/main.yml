@@ -156,6 +156,7 @@ jobs:
         run: |
           curl -fsSL https://deno.land/x/install/install.sh | sh
           npm ci
+          npm install --workspace=taqueria-plugin-mock
       
       - name: Run unit tests
         run: |
@@ -167,11 +168,12 @@ jobs:
         run: |
           chmod +x taq
           export PATH="$(pwd):$PATH"
-          echo "$(cd ../taqueria-plugin-mock && npm install)"
           npm run test:integration
 
       - name: Run e2e tests
         run: |
+          chmod +x taq
+          export PATH="$(pwd):$PATH"
           npm run test:e2e
 
   pr-comment:
