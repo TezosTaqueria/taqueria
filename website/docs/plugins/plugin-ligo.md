@@ -37,7 +37,6 @@ Running the `compile` task with no options will result in any source LIGO smart 
 The `compile` task can be implemented by more than one compiler plugin installed on a project (LIGO, SmartPY). If this is the case, you must use the `--plugin ligo` flag to specify a particular compiler
 :::
 
-
 ### Options
 
 The LIGO `compile` task will accept the following optional parameters:
