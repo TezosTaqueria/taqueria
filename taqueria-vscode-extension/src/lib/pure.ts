@@ -60,6 +60,10 @@ export interface E_EXEC extends E_BASE {
     cmd: string
 }
 
+export interface E_WINDOWS extends E_BASE {
+    code: 'E_WINDOWS'
+}
+
 export type TaqErr =
     E_PROXY |
     E_TAQ_NOT_FOUND |
@@ -69,7 +73,8 @@ export type TaqErr =
     E_INVALID_JSON |
     E_STATE_MISSING |
     E_EXEC |
-    E_NO_TAQUERIA_PROJECTS
+    E_NO_TAQUERIA_PROJECTS |
+    E_WINDOWS
 
 export interface I18N {
     temp?: true
@@ -229,7 +234,8 @@ export const makePathToTaq = (i18n: I18N) => (inputPath: string) : PromiseLike<E
  * @returns {PromiseLike<E_EXEC, string>}
  */        
 export const execCmd = (cmd: string): PromiseLike<E_EXEC, string> => new Promise((resolve, reject) => {
-    exec(cmd, (previous, stdout, msg) => {
+    if (isWindoze()) reject({code: 'E_WINDOWS', msg: "Running in Windows without WSLv2 is currently not supported."})
+    else exec(`sh -c "${cmd}"`, (previous, stdout, msg) => {
         log ("Executing command:") (cmd)
         if (previous) reject({code: 'E_EXEC', msg: `An unexpected error occurred when trying to execute the command`, previous, cmd})
         else if (msg.length) reject({code: 'E_EXEC', msg, cmd})
@@ -274,28 +280,38 @@ export const readJsonFile = <T>(_i18n: I18N, make: (data: Record<string, unknown
     readFile(pathToFile, {encoding: 'utf-8'})
     .then(data => {
         try {
+
             const json = parse(data)
-            return make(json) as Json<T>
+            if (json) {
+                const obj = json as Record<string, unknown>
+                return make(obj) as Json<T>
+            }
+            else throw new Error("Could not parse JSON")
         }
         catch (previous) {
-            return Promise.reject({code: 'E_INVALID_JSON', data, msg: "The provided data is invalid JSON", previous})
+            return Promise.reject({code: 'E_INVALID_JSON', data, msg: "The provided data is invalid JSON", previous, context: pathToFile})
         }
     })
 
 export const decodeJson = <T>(data: string): PromiseLike<E_INVALID_JSON, Json<T>> => {
     try {
-        const json : Json<T> = parse(data)
-        return Promise.resolve(json)
+        const json = parse(data)
+        if (json) {
+            const obj = json as unknown as Json<T>
+            return Promise.resolve(obj)
+        }
+        else throw new Error("Could not parse JSON")
     }
     catch (previous) {
         return Promise.reject({code: 'E_INVALID_JSON', data, msg: "The provided data is invalid JSON", previous})
     }
 }
 
-export const isWindoze = () => process.platform.includes('win')
+export const isWindoze = () =>
+    process.platform.includes('win') && !process.platform.includes('darwin')
 
 export const findTaqBinary = (i18n: I18N) : PromiseLike<E_TAQ_NOT_FOUND, string> =>
-    execCmd(isWindoze() ? 'where taq' : 'which taq')
+    execCmd('which taq')
     .then(path => path.trim())
     .catch(previous => Promise.reject({code: 'E_TAQ_NOT_FOUND', msg: "Could not find taq in your path.", previous}))
     .then(makePathToTaq(i18n))

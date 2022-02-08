@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/taqueria",
-  "version": "0.0.5",
+  "version": "0.0.8",
   "description": "An easy to use opininated tool for building, testing, and deploying Tezos software",
   "main": "index.ts",
   "directories": {
@@ -38,6 +38,7 @@
     "play-sound-cli": "^1.0.0"
   },
   "workspaces": [
-    "./taqueria*"
+    "./taqueria*",
+    "./taqueria-plugin-flextesa/docker"
   ]
 }
