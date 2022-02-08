@@ -175,7 +175,7 @@ jobs:
           chmod +x taq
           export PATH="$(pwd):$PATH"
           echo "$(cd ../taqueria-plugin-ligo && npm install)"
-          npm run test:e2e
+          npm run test:e2e 
 
   pr-comment:
     runs-on: ubuntu-latest
