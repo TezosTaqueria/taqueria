@@ -21,11 +21,11 @@ Some helpful things to know:
 ## Requirements
 
 - Node.js v16 or later
-- [Docker](https://www.docker.com/) v0.8.4 or later is required
+- Docker v0.8.4 or later
 
 ## Installation
 
-The Flextesa plugin is distributed as an NPM package that can be installed/uninstalled from the Taqueria CLI
+The Flextesa plugin is distributed as an NPM package that can be installed and uninstalled on a project from the Taqueria CLI
 
 To install the Flextesa plugin on a Taqueria project, navigate to the project folder and run:
 ```shell
@@ -41,12 +41,24 @@ npm init -y
 ``` 
 :::
 
+## CLI Commands
+
+The Flextesa plugin allows you to start, stop, and query the sandboxes configured in `./.taq/config.json` from the CLI
+
+The following commands are available from the CLI or the VS Code Command palette:
+- `taq start sandbox [sandboxName]`
+- `taq stop sandbox [sandboxName]`
+- `taq list accounts [sandboxName]`
+
+:::note
+The first time you start a sandbox, it might take several minutes to start. This is normal when starting a Flextesa image
+:::
+
 ## Plugin Configuration
 
-Configuration is done in the project's Taqueria configuration file: `./.taq/config.json`. Here you can configure additonal named sandboxes and add them to environments
+Configuration is done in the project's `./.taq/config.json` file. Here you can configure additonal named sandboxes and add them to environments
 
-Sandbox configurations are JSON like objects stored as key/value pairs in the `sandbox` property  of `config.json`
-In this example there is one sandbox configuration named `local`:
+Sandbox configurations are stored as key/value pairs in the `sandbox` property. In this example there is one sandbox configuration named `local`:
 ```json
     sandbox: {
         local: {
@@ -66,7 +78,36 @@ In this example there is one sandbox configuration named `local`:
     },
 ```
 
-Once created, plugins can be added to environments by adding the `pluginName` to the `sandboxes` list in the `environment as shown here:
+### Adding a New Sandbox Configuration
+
+Sandbox configurations are added as key/value pairs to the main `sandbox` object using the format:
+```json
+sandboxName : { sandboxConfigObject }
+```
+
+Inside the sandboxConfigObject, there are four properties you can configure:
+#### 'accounts'
+
+A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}
+
+#### 'label'
+An arbitrary string used to describe a particular configuration
+
+#### 'protocol
+
+A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
+
+Currently availble protocols are:
+- Hangzhou `PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx`
+- Ithica2  `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
+
+#### 'rpcUrl'
+
+A string which corresponds to the local URL you would like the sandbox to run on
+
+### Adding a Sandbox to a Taqueria Environment
+
+Once created, sandboxes can be added to environments by adding the `sandboxName` to the `sandboxes` list in the `environment` as shown here:
 ```json
     environment: {
         default: 'development',
@@ -81,51 +122,9 @@ Once created, plugins can be added to environments by adding the `pluginName` to
     },
 ```
 
-### Adding a New Sandbox Configuration
-
-Sandbox configurations are added as key/value pairs to the main `sandbox` object using the format:
-```json
-sandboxName : {sandboxConfig}
-```
-
-Inside the config object, there are four properties you can configure:
-#### Accounts
-
-A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}
-
-#### 
-
-
-### Adding a Sandbox to an Environment
-
-
-### CLI Commands
-
-The Flextesa plugin allows you to start, stop, and query the sandboxes configured in `./.taq/config.json` from the CLI
-
-The following commands are available from the CLI or the VS Code Command palette:
-- `taq start sandbox [sandboxName]`
-- `taq stop sandbox [sandboxName]`
-- `taq list accounts [sandboxName]`
-
-:::note
-The first time you start a sandbox, it might take several minutes to start. This is normal when starting a Flextesa image
-:::
-
-## Usage
-
-What is a dev doing with it?
-- spinning up a sandbox
-- originating to it
-- doing some stuff
-- shutting it down
-
-
-
 ## Plugin Architecture
 
 This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
-
 
 ### Flextesa Plugin Task Registry
 
