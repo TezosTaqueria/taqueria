@@ -15,15 +15,10 @@ If you aren't seeing tasks listed when running `taq`, make sure that you are in 
 
 During installation, NPM packages for the plugin are downloaded into the project folder and the plugin is registered in `./.taq/config.json`
 
-<<<<<<< HEAD:website/docs/getting-started/plugin-basics.md
 <!-- 
 ## What is a Plugin
  -->
 
-=======
-
-
->>>>>>> main:website/docs/getting-started/understanding-taqueria-plugins.md
 ## Available Plugins
 
 | name         |  pluginName                  |  description                                                |
@@ -31,20 +26,5 @@ During installation, NPM packages for the plugin are downloaded into the project
 | LIGO         | `@taqueria/plugin-ligo`      | A compiler for the LIGO smart contract language             |
 | SmartPy      | `@taqueria/plugin-smartpy`   | A compiler for the SmartPy contract language                |
 | Flextesa     | `@taqueria/plugin-flextesa`  | A sandbox test network running Tezos Flextesa               | 
-<<<<<<< HEAD:website/docs/getting-started/plugin-basics.md
-| Taquito      | `@taqueria/plugin-taquito`   | A front-end Tezos framework used to originate               |
-| TS Generator | ***Coming soon***            | A type generator that produces TS types from Michelson code |
-
-
-<!-- ## Installing Plugins
-
-
-## Configuring Plugins
-
-
-## Using Plugins
- -->
-=======
 | Taquito      | `@taqueria/plugin/taquito`   | A front-end Tezos framework used to originate               |
 | TS Generator | ***Coming soon***            | A type generator that produces TS types from Michelson code |
->>>>>>> main:website/docs/getting-started/understanding-taqueria-plugins.md

@@ -14,7 +14,6 @@ purpose: help the user understand what Taqueria is, what it does, and how to pro
 - what is the MINIMAL amount of detail necessary in this document?
  -->
 
-<<<<<<< HEAD
 
 Taqueria is here to help make developing on Tezos easier. Taqueria supercharges your projects with a powerful and centralized configuration and access to top Tezos development tools through tasks that you run from the command line
 
@@ -28,13 +27,6 @@ Some of the things Taqueria can do for you include:
 ## What is Taqueria?
 
 Taqueria is an extensible, open source plugin based framework and task runner for Tezos development
-=======
-Taqueria is here to make your Tezos development experience faster and easier. Taqueria understands the development lifecycle of a Tezos dApp and provides you with a powerful set of tools that take care of common development tasks so you can focus on what matters 
-
-## What is Taqueria?
-
-Taqueria is an extensible, open source plugin based framework for Tezos dApp development
->>>>>>> main
 
 In more practical terms, Taqueria is a task runner that you can use from the command line or the VS Code command palette to quickly accomplish things like starting a sandbox or originating a contract. Taqueria comes with a few basic tasks, but relies on plugins to add tasks that provide complex and domain specific functionality
 
