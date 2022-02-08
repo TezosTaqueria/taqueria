@@ -45,13 +45,8 @@ npm init -y
 
 Configuration is done in the project's Taqueria configuration file: `./.taq/config.json`. Here you can configure additonal named sandboxes and add them to environments
 
-### Adding a New Sandbox Configuration
-
-Sandbox configurations are JSON like objects stored as key/value (sandboxName/configuration) pairs in the `sandbox` property  of `config.json`
-
-
-
-You add additional sandbox configs by 
+Sandbox configurations are JSON like objects stored as key/value pairs in the `sandbox` property  of `config.json`
+In this example there is one sandbox configuration named `local`:
 ```json
     sandbox: {
         local: {
@@ -68,11 +63,37 @@ You add additional sandbox configs by
             protocol: 'PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx',
             rpcUrl: 'http://localhost:20000',
         },
-    newSandboxGoesHere : {
-        newSandbox config goes here
-    }
     },
 ```
+
+Once created, plugins can be added to environments by adding the `pluginName` to the `sandboxes` list in the `environment as shown here:
+```json
+    environment: {
+        default: 'development',
+        development: {
+            networks: [],
+            sandboxes: [
+                'local',
+                'myCustomSandbox'
+            ],
+            storage: {},
+        },
+    },
+```
+
+### Adding a New Sandbox Configuration
+
+Sandbox configurations are added as key/value pairs to the main `sandbox` object using the format:
+```json
+sandboxName : {sandboxConfig}
+```
+
+Inside the config object, there are four properties you can configure:
+#### Accounts
+
+A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}
+
+#### 
 
 
 ### Adding a Sandbox to an Environment
