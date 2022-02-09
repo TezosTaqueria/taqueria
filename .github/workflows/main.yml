@@ -148,21 +148,26 @@ jobs:
         with:
           node-version: 16.x
 
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: "^1.0.0"
+
       - name: get binary and make executable from previous step for tests
         run: |
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
           chmod +x taq
+          echo "$GITHUB_PATH"
+          echo "/home/runner/.deno/bin" >> $GITHUB_PATH
+          echo "$(pwd)" >> $GITHUB_PATH
+          echo "$GITHUB_PATH"
 
       - name: install dependencies for e2e tests in root and test directories
         run: |
           cd ..
-          curl -fsSL https://deno.land/x/install/install.sh | sh
           npm ci
           npm install --workspace=taqueria-plugin-ligo
           npm install --workspace=taqueria-plugin-mock
-          
-          cd tests/
-          npm ci
+          npm install --workspace=tests
       
       - name: Run unit tests
         run: |
