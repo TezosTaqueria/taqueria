@@ -142,11 +142,6 @@ jobs:
       run:
         working-directory: ./tests
 
-    # Putting the path to both the deno installation and the taq binary in the 
-    # path for testing
-    env:
-      TEST_PATH: "/home/runner/.deno/bin:$(pwd):$PATH"
-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -172,18 +167,18 @@ jobs:
       
       - name: Run unit tests
         run: |
-          export PATH=$TEST_PATH
-          echo "$PATH"
+          export DENO_INSTALL="/home/runner/.deno"
+          export PATH="$DENO_INSTALL/bin:$PATH"
           npm run test:unit
 
       - name: Run integration tests
         run: |
-          export TEST_PATH
+          export PATH="$(pwd):$PATH"
           npm run test:integration
 
       - name: Run e2e tests
         run: |
-          export TEST_PATH
+          export PATH="$(pwd):$PATH"
           npm run test:e2e 
 
   pr-comment:
