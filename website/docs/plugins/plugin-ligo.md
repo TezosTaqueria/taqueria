@@ -42,7 +42,7 @@ The `compile` task can be implemented by more than one compiler plugin installed
 The LIGO `compile` task will accept the following optional parameters:
 
 | flag  |  name       | description                           |   
-|-------|:-----------:|---------------------------------------|
+|:-----:|:------------|---------------------------------------|
 |  -e   | entry-point | The entry point that will be compiled |
 |  -s   | syntax      | The syntax used in the contract       |    
 |  -i   | infer       | Enable type inference                 |   
