@@ -155,11 +155,16 @@ jobs:
       - name: install test dependencies
         run: |
           curl -fsSL https://deno.land/x/install/install.sh | sh
+          echo "finished installing deno"
           npm ci
+          echo "finished installing test dependencies"
           cd ..
+          npm ci
+          echo "finished installing highest level dependencies and starting to install dependencies through workspaces"
           npm install --workspace=taqueria-plugin-ligo
+          echo "finished installing ligo dependencies"
           npm install --workspace=taqueria-plugin-mock
-
+          echo "finished installing mock plugin"
       
       - name: Run unit tests
         run: |
