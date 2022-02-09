@@ -52,7 +52,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Deno
-        uses: denoland/setup-deno@v1
+        uses: denoland/setup-deno@v1.1.0
         with:
           deno-version: "^1.0.0"
 
@@ -138,9 +138,9 @@ jobs:
   run-tests:
     needs: build-binaries
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./tests
+    # defaults:
+    #   run:
+    #     working-directory: ./tests
 
     steps:
       - uses: actions/checkout@v2
@@ -148,7 +148,7 @@ jobs:
         with:
           node-version: 16.x
 
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v1.1.0
         with:
           deno-version: "^1.0.0"
 
@@ -156,14 +156,10 @@ jobs:
         run: |
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
           chmod +x taq
-          echo "/home/runner/.deno/bin" >> $GITHUB_PATH
           echo "$(pwd)" >> $GITHUB_PATH
-          echo "$PATH"
 
       - name: install dependencies for e2e tests in root and test directories
         run: |
-          cd ..
-          echo "$PATH"
           npm ci
           npm install --workspace=taqueria-plugin-ligo
           npm install --workspace=taqueria-plugin-mock
@@ -171,18 +167,15 @@ jobs:
       
       - name: Run unit tests
         run: |
-          export PATH="/home/runner/.deno/bin:$PATH"
-          npm run test:unit
+          npm run test:unit --workspace tests
 
       - name: Run integration tests
         run: |
-          export PATH="$(pwd):$PATH"
-          npm run test:integration
+          npm run test:integration --workspace tests
 
       - name: Run e2e tests
         run: |
-          export PATH="$(pwd):$PATH"
-          npm run test:e2e 
+          npm run test:e2e --workspace tests
 
   pr-comment:
     runs-on: ubuntu-latest
