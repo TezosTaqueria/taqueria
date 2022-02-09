@@ -163,6 +163,7 @@ jobs:
       - name: install dependencies for e2e tests in root and test directories
         run: |
           cd ..
+          echo "$PATH"
           npm ci
           npm install --workspace=taqueria-plugin-ligo
           npm install --workspace=taqueria-plugin-mock
