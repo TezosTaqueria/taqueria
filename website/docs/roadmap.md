@@ -2,8 +2,6 @@
 title: Taqueria Roadmap
 ---
 
-Here is an overview of what fun 
-
 ## Shipped
 
 The first MVP of Taqueria was shipped in January 2022. This release included:
