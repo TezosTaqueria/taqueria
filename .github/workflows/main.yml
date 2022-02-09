@@ -172,7 +172,8 @@ jobs:
       
       - name: Run unit tests
         run: |
-          export TEST_PATH
+          export PATH=$TEST_PATH
+          printenv
           npm run test:unit
 
       - name: Run integration tests
