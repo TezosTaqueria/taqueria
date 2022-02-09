@@ -153,7 +153,7 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
           chmod +x taq
 
-      - name: install dependencies for testing in root and test directories
+      - name: install dependencies for e2e tests in root and test directories
         run: |
           cd ..
           curl -fsSL https://deno.land/x/install/install.sh | sh
@@ -163,12 +163,10 @@ jobs:
           
           cd tests/
           npm ci
-
       
       - name: Run unit tests
         run: |
-          export DENO_INSTALL="/home/runner/.deno"
-          export PATH="$DENO_INSTALL/bin:$PATH"
+          export PATH="/home/runner/.deno/bin:$PATH"
           npm run test:unit
 
       - name: Run integration tests
