@@ -142,46 +142,47 @@ jobs:
       run:
         working-directory: ./tests
 
+    # Putting the path to both the deno installation and the taq binary in the 
+    # path for testing
+    env:
+      TEST_PATH: "/home/runner/.deno/bin:$(pwd):$PATH"
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 16.x
 
-      - name: get binary from build and upload step for running e2e tests
+      - name: get binary and make executable from previous step for tests
         run: |
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
+          chmod +x taq
 
-      - name: install test dependencies
+      - name: install dependencies for testing in root and test directories
         run: |
-          curl -fsSL https://deno.land/x/install/install.sh | sh
-          echo "finished installing deno"
-          npm ci
-          echo "finished installing test dependencies"
           cd ..
+          curl -fsSL https://deno.land/x/install/install.sh | sh
           npm ci
-          echo "finished installing highest level dependencies and starting to install dependencies through workspaces"
           npm install --workspace=taqueria-plugin-ligo
-          echo "finished installing ligo dependencies"
           npm install --workspace=taqueria-plugin-mock
-          echo "finished installing mock plugin"
+          
+          cd tests/
+          npm ci
+
       
       - name: Run unit tests
         run: |
-          export DENO_INSTALL="/home/runner/.deno"
-          export PATH="$DENO_INSTALL/bin:$PATH"
+          export TEST_PATH
           npm run test:unit
 
       - name: Run integration tests
         run: |
-          chmod +x taq
-          export PATH="$(pwd):$PATH"
+          export TEST_PATH
           npm run test:integration
 
       - name: Run e2e tests
         run: |
-          chmod +x taq
-          export PATH="$(pwd):$PATH"
+          export TEST_PATH
           npm run test:e2e 
 
   pr-comment:
