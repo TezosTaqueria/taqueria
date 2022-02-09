@@ -138,9 +138,6 @@ jobs:
   run-tests:
     needs: build-binaries
     runs-on: ubuntu-latest
-    # defaults:
-    #   run:
-    #     working-directory: ./tests
 
     steps:
       - uses: actions/checkout@v2
