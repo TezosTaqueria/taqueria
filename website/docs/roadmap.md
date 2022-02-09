@@ -24,8 +24,8 @@ The first MVP of Taqueria was shipped in January 2022. This release included:
 
 These features will be launching in upcoming releases:
 - Project scaffolding
-- JEST plugin
-- Smart contract testing with JEST
+- Jest plugin
+- Smart contract testing with Jest
 - TS Type Generation from `.tz` files with the Type Extractor plugin
 - Complex origination workflows 
 - Contract metadata support
