@@ -70,6 +70,7 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
+        "roadmap",
         "taqueria-dev/contributions",
         "taqueria-dev/making-plugins",
         "taqueria-dev/pr-npm-packages"
