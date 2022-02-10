@@ -11,9 +11,8 @@ The Flextesa plugin provides the following tasks to Taqueria:
 
 ## Requirements
 
-The Flextesa plugin requires Docker v0.8.4 or later to be installed locally
-
-Docker is available [here](https://www.docker.com/)
+- Node.js v16 or later
+- Docker v0.8.4 or later
 
 ## Installation
 
