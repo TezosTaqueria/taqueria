@@ -280,25 +280,35 @@ export const readJsonFile = <T>(_i18n: I18N, make: (data: Record<string, unknown
     readFile(pathToFile, {encoding: 'utf-8'})
     .then(data => {
         try {
+
             const json = parse(data)
-            return make(json) as Json<T>
+            if (json) {
+                const obj = json as Record<string, unknown>
+                return make(obj) as Json<T>
+            }
+            else throw new Error("Could not parse JSON")
         }
         catch (previous) {
-            return Promise.reject({code: 'E_INVALID_JSON', data, msg: "The provided data is invalid JSON", previous})
+            return Promise.reject({code: 'E_INVALID_JSON', data, msg: "The provided data is invalid JSON", previous, context: pathToFile})
         }
     })
 
 export const decodeJson = <T>(data: string): PromiseLike<E_INVALID_JSON, Json<T>> => {
     try {
-        const json : Json<T> = parse(data)
-        return Promise.resolve(json)
+        const json = parse(data)
+        if (json) {
+            const obj = json as unknown as Json<T>
+            return Promise.resolve(obj)
+        }
+        else throw new Error("Could not parse JSON")
     }
     catch (previous) {
         return Promise.reject({code: 'E_INVALID_JSON', data, msg: "The provided data is invalid JSON", previous})
     }
 }
 
-export const isWindoze = () => process.platform.includes('win') && process.platform.includes('darwin')
+export const isWindoze = () =>
+    process.platform.includes('win') && !process.platform.includes('darwin')
 
 export const findTaqBinary = (i18n: I18N) : PromiseLike<E_TAQ_NOT_FOUND, string> =>
     execCmd('which taq')
