@@ -82,7 +82,6 @@ Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: asy
         await t.step("run test for {writeTextFile} function", async () => {
             const assert = chai.assert;
             const result = await promise (writeTextFile("./unit/taqueria-utils/data/testWrite.txt")("testWrite"));
-            console.log(result)
             assert.equal(result, './unit/taqueria-utils/data/testWrite.txt');
         });
         await t.step("clean up", async () => {
