@@ -4,7 +4,7 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 
 The plugin provides a `compile` task used for compiling LIGO smart contracts to Michelson
 
-# Taqueria Flextesa Plugin
+# Taqueria LIGO Plugin
 
 The LIGO plugin exposes a compile task in Taqueria which can target one, or all the LIGO contracts in the contracts folder and compile them to Michelson code output to the artifacts folder
 
