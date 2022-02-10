@@ -1,12 +1,9 @@
 import { I18N } from './lib/pure'
 import { exposeInitTask, exposeInstallTask, exposeTaqTaskAsCommand, exposeSandboxTaskAsCommand } from './lib/helpers'
 import {makeDir} from './lib/pure'
-import {Commands, COMMAND_PREFIX} from './lib/helpers'
+import {COMMAND_PREFIX} from './lib/helpers'
 import * as vscode from 'vscode'
 import path = require('path')
-
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export async function activate(context: vscode.ExtensionContext) {
 	const i18n: I18N = {} // temporary
 	const output = vscode.window.createOutputChannel("Taqueria")
@@ -46,7 +43,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 
 
-	// If the develoepr changes their workspace folders,
+	// If the developer changes their workspace folders,
 	// then the list of taqified projects might have changed,
 	// and therefore the list of tasks we're aware of might 
 	// have changed as well. We're best to reload.
@@ -63,5 +60,4 @@ export async function activate(context: vscode.ExtensionContext) {
 // 	})
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() { }

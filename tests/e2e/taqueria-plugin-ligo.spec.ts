@@ -10,7 +10,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
         await generateTestProject(taqueriaProjectPath, ["ligo"]);
     })
 
-    test('Verify that taqueria ligo plugin can compile one contract using compile all command', async () => {
+    test('Verify that taqueria ligo plugin can compile all contracts using `taq compile`', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
@@ -27,7 +27,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
 
     });
 
-    test.skip('Verify that taqueria ligo plugin can compile one contract using compile [sourceFile] command', async () => {
+    test.skip('Verify that taqueria ligo plugin can compile one contract using `taq compile [sourceFile]` task', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
@@ -45,7 +45,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     });
 
     // TODO: Finish test with multiple contracts
-    test.skip('Verify that taqueria ligo plugin can compile all contracts under compile folder', async () => {
+    test.skip('Verify that taqueria ligo plugin can compile all contracts under contracts folder', async () => {
         try {
             // 1. Copy two contracts from data folder to /contracts folder under taqueria project
 
