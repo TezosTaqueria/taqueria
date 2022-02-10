@@ -128,15 +128,47 @@ jobs:
 
   publish-flextesa-plugin-to-npm:
     needs:
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
+      - publish-sdk-to-npm
     uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
     with:
       dir: taqueria-plugin-flextesa
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
+  run-tests:
+    needs: build-binaries
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: "^1.0.0"
+
+      - name: get binary and make executable from previous step for tests
+        run: |
+          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
+          chmod +x taq
+          echo "$(pwd)" >> $GITHUB_PATH
+
+      - name: install dependencies
+        run: npm ci
+      
+      - name: Run unit tests
+        run: |
+          npm run test:unit --workspace tests
+
+      - name: Run integration tests
+        run: |
+          npm run test:integration --workspace tests
+
+      - name: Run e2e tests
+        run: |
+          npm run test:e2e --workspace tests
 
   pr-comment:
     runs-on: ubuntu-latest
