@@ -264,12 +264,16 @@ export const proxyToTaq = (pathToTaq: PathToTaq, i18n: I18N, projectDir?: PathTo
                 // The error message from the CLI might be JSON
                 // Try to parse it and if so, return its error information
                 return decodeJson (msg)
-                .catch(_ => false)
+                .catch(_ =>
+                    msg.includes('EBADENGINE')
+                        ? "Please install NodeJS v16."
+                        : msg
+                )
                 .then(err => {
                     if (typeof err === 'object') {
                         return Promise.reject(err)
                     }
-                    else return Promise.reject({code: 'E_PROXY', msg: "There was a problem running taq.", previous, cmd})
+                    else return Promise.reject({code: 'E_PROXY', msg: err, previous, cmd})
                 })
             }
         }
