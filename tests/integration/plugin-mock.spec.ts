@@ -24,7 +24,7 @@ describe("Integration tests using taqueria-mock-plugin", () => {
     // Comment if need to debug
     afterAll(() => {
         try {
-            fs.rmdirSync(testProjectPath, { recursive: true })
+            fs.rmSync(testProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }
