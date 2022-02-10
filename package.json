@@ -40,5 +40,8 @@
   "workspaces": [
     "./taqueria*",
     "./taqueria-plugin-flextesa/docker"
-  ]
+  ],
+  "dependencies": {
+    "stack-trace": "github:mweichert/node-stack-trace"
+  }
 }
