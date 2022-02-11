@@ -1,6 +1,7 @@
 {
-  "name": "@taqueria/test",
+  "name": "@taqueria/tests",
   "version": "0.0.1",
+  "private": true,
   "description": "This is Taqueria testing project includes unit, integration and e2e tests",
   "main": "index.js",
   "scripts": {
@@ -11,7 +12,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ecadlabs/taqueria.git"
+    "url": "https://github.com/ecadlabs/taqueria.git",
+    "directory": "tests"
   },
   "keywords": [
     "taqueria",
@@ -35,6 +37,5 @@
     "ts-jest": "^27.0.7",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"
-  },
-  "dependencies": {}
+  }
 }
