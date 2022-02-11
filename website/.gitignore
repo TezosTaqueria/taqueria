@@ -5,11 +5,8 @@
 /build
 
 # Generated files
-/.docusaurus/*
+.docusaurus
 .cache-loader
-
-# Allow docusaurus config file to be tracked
-!/.docusaurus/docusaurus.config.js
 
 # Misc
 .DS_Store
