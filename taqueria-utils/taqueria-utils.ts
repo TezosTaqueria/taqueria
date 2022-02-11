@@ -1,4 +1,5 @@
-import type {Future, reject, resolve, TaqError, SanitizedAbsPath} from './taqueria-utils-types.ts'
+import type {Future, reject, resolve, SanitizedUrl, TaqError} from './taqueria-utils-types.ts'
+import {SanitizedAbsPath} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {chain, attemptP, map, Future as Fluture} from 'https://cdn.skypack.dev/fluture';
@@ -29,8 +30,52 @@ export const debug = <T>(input: T) => {
 }
 
 const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
-
 export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map (() => path))
+
+const ensurePathExistsFuture = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptP(async () =>{
+    try {
+        await Deno.stat(path);
+        return SanitizedAbsPath.create(path);
+    } catch(_e) {
+        return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'TODO i18n message' })
+    }  
+});
+export const ensurePathExists = (path: string) : Future<TaqError, string> => pipe(path, ensurePathExistsFuture, map (() => path))
+
+const ensurePathDoesNotExistFuture = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptP(async () =>{
+    try {
+        await Deno.stat(path);
+        return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'TODO i18n message' })
+    } catch(_e) {
+        // Expect exception when trying to stat a new directory
+        return SanitizedAbsPath.create(path);
+    }
+});
+export const ensurePathDoesNotExist = (path: string) : Future<TaqError, string> => pipe(path, ensurePathDoesNotExistFuture, map (() => path))
+
+
+const rmFuture = (path: SanitizedAbsPath) => attemptP(async () => {
+    try {
+        await Deno.remove(path.value);
+    } catch {
+        // Ignore if path does not exist
+    }
+});
+export const rm = (path: SanitizedAbsPath) : Future<TaqError, string> => pipe(path, rmFuture, map (() => path))
+
+export const gitClone = (url: SanitizedUrl, destinationPath: SanitizedAbsPath) => pipe(
+    attemptP(async () => {
+        const cloneProcess = Deno.run({
+            cmd: ["git", "clone", url.value, destinationPath.value],
+        });
+        const cloneResult = await cloneProcess.status();
+        
+        if (!cloneResult.success) {
+            return Promise.reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'TODO i18n message'})
+        }
+    }), 
+    map (() => destinationPath)
+);
 
 export const readTextFile = (path: string) => Fluture(
     (rej: reject, res: resolve) => {

@@ -15,7 +15,9 @@ export interface EnvVars {
 }
 
 export type ErrorType = 
-    "E_INVALID_PATH"
+  | "E_INVALID_PATH"
+  | "E_INVALID_PATH_DOES_NOT_EXIST"
+  | "E_INVALID_PATH_ALREADY_EXISTS"
   | "E_INVALID_CONFIG"
   | "E_INVALID_JSON"
   | "E_FORK"
@@ -29,7 +31,7 @@ export interface TaqError {
 }
 
 const sanitizedPathType: unique symbol = Symbol()
-export class SanitizedPath extends StringLike{
+export class SanitizedPath extends StringLike {
     [sanitizedPathType]: void
     static create(value: string) {
         const result = value.match(/^(\.\.|\.\/|\/)/)
@@ -52,6 +54,15 @@ export class SanitizedAbsPath {
     
     static create(value: string, cwd?: SanitizedAbsPath) {
         return new SanitizedAbsPath(value, cwd)
+    }
+}
+
+
+const sanitizedUrl: unique symbol = Symbol()
+export class SanitizedUrl extends StringLike {
+    [sanitizedUrl]: void
+    static create(value: string) {
+        return new SanitizedUrl(value)
     }
 }
 

@@ -1,14 +1,14 @@
 import type {UnvalidatedPluginInfo, InstalledPlugin, Config, ConfigArgs, Action, Alias, Verb, Option, PositionalArg} from './taqueria-protocol/taqueria-protocol-types.ts'
 import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
-import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs} from './taqueria-types.ts'
+import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs, SanitizedScaffoldInitArgs} from './taqueria-types.ts'
 import {State} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs/deno.ts'
-import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.skypack.dev/fluture';
+import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode, attempt} from 'https://cdn.skypack.dev/fluture';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
-import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
+import {ensurePathDoesNotExist, exec, gitClone, isTaqError, joinPaths, mkdir, readJsonFile, rm, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
+import {SanitizedAbsPath, SanitizedPath, TaqError, Future, SanitizedUrl} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
@@ -139,17 +139,17 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
                     type: 'string',
                     default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git',
                 })
-                .option('p', {
-                    alias: 'projectDir',
+                .positional('scaffoldProjectDir', {
+                    alias: 'scaffoldProjectDir',
                     type: 'string',
                     describe: i18n.__('scaffoldProjectDirDesc'),
                     default: './taqueria-quickstart',
                 })
         },
         (args: RawInitArgs) => pipe(
-            sanitizeArgs(args), 
-            ({scaffoldUrl, projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
-                return scaffoldProject(scaffoldUrl ?? '', projectDir, configDir, i18n, maxConcurrency, quickstart)
+            sanitizeScaffoldArgs(args), 
+            ({scaffoldUrl, scaffoldProjectDir, configDir, maxConcurrency, quickstart}: SanitizedScaffoldInitArgs) => {
+                return scaffoldProject(scaffoldUrl, scaffoldProjectDir, configDir, i18n, maxConcurrency, quickstart)
             },
             fork (console.error) (console.log)
         )
@@ -268,63 +268,22 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
     map (() => i18n.__("bootstrapMsg"))
 )
 
-const scaffoldProject = (scaffoldUrl: string, projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
+const scaffoldProject = (scaffoldUrl: SanitizedUrl, scaffoldProjectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
+    // TODO: i18n of messages
+    
     // Clone git into destination folder (Initial version assumes git is installed)
-    attemptP(async () => {
-        // TODO: Convert to fluture
-        // TODO: i18n of messages
-
-        console.log(`scaffolding\n into: ${projectDir.value}\n from: ${scaffoldUrl}\n...`)
-
-        // Verify projectDir does not exist
-        try {
-            await Deno.stat(projectDir.value);
-            return Promise.reject({kind: 'E_SCAFFOLD_PROJECT_DIR_ALREADY_EXISTS', msg: 'TODO i18n message'})
-        } catch(_e) {
-            // Expect exception when trying to stat a new directory
-        }
-
-        // git clone
-        console.log(`git clone...`)
-
-        const cloneProcess = Deno.run({
-            cmd: ["git", "clone", scaffoldUrl, projectDir.value],
-        });
-        const cloneResult = await cloneProcess.status();
-        
-        if (!cloneResult.success) {
-            return Promise.reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'TODO i18n message'})
-        }
-
-
-        // Run init found in .taq/scaffold.json
-        console.log(`initializing...`)
-        // TODO: Run initialization script
-        // Load .taq/scaffold.json (if it exists)
-        // Run init command
-
-
-        // Cleanup:
-        console.log(`cleanup...`)
-
-        try {
-            console.log(`removing ${joinPaths(projectDir.value, `.taq/scaffold.json`)}`)
-            await Deno.remove(joinPaths(projectDir.value, `.taq/scaffold.json`));
-        } catch {
-            // Ignore if doesn't exist
-        }
-        try {
-            console.log(`removing ${joinPaths(projectDir.value, `.git`)}`)
-            await Deno.remove(joinPaths(projectDir.value, `.git`), { recursive: true });
-        } catch {
-            // Ignore if doesn't exist
-        }
-
-
-        // Done!
-        console.log(`scaffolding complete!`)
-    }),
-    // Done
+    log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}\n...`),
+    ensurePathDoesNotExist(scaffoldProjectDir.value),
+    log(`git clone...`),
+    gitClone(scaffoldUrl, scaffoldProjectDir),
+    // TODO: Run initialization script
+    // Run init found in .taq/scaffold.json
+    // log(`initializing...`),
+    // Load .taq/scaffold.json (if it exists)
+    // Run init command
+    log(`cleanup...`),
+    rm(scaffoldProjectDir.join(`.taq/scaffold.json`)),
+    rm(scaffoldProjectDir.join(`.git`)),
     map (() => i18n.__("scaffoldDoneMsg"))
 )
 
@@ -744,8 +703,6 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     _: parsedArgs._,
     configDir: SanitizedPath.create(parsedArgs.configDir),
     projectDir: SanitizedAbsPath.create(parsedArgs.projectDir),
-    // TODO: SanatizedUrl
-    scaffoldUrl: parsedArgs.scaffoldUrl,
     maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency,
     debug: parsedArgs.debug,
     plugin: parsedArgs.plugin,
@@ -757,6 +714,11 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     setBuild: parsedArgs.setBuild,
     setVersion: parsedArgs.setVersion,
     version: parsedArgs.version
+})
+const sanitizeScaffoldArgs = (parsedArgs: RawInitArgs) : SanitizedScaffoldInitArgs => ({
+    ...sanitizeArgs(parsedArgs),
+     scaffoldUrl: SanitizedUrl.create(parsedArgs.scaffoldUrl ?? ''),
+     scaffoldProjectDir: SanitizedAbsPath.create(parsedArgs.scaffoldProjectDir ?? ''),
 })
 
 export default {
