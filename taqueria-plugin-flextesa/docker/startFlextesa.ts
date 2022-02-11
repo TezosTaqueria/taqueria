@@ -68,7 +68,7 @@ const writeConfigFile = (filename: string) => (config: Config) =>
     .then(() => config)
     .catch(err => Promise.reject({kind: 'E_WRITE_CONFIG', context: config, previous: err}))
 
-const run = (cmd: string): Promise<string> => new Promise((resolve, reject) => exec(cmd, (err, stdout, stderr) => {
+const run = (cmd: string): Promise<string> => new Promise((resolve, reject) => exec(`flextesa_node_cors_origin='*' ${cmd}`, (err, stdout, stderr) => {
     if (err) reject({kind: 'E_EXEC', context: cmd, previous: err})
     else if (stderr.length) reject({kind: 'E_EXEC', context: {cmd, stderr}})
     else resolve(stdout)
