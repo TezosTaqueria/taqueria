@@ -2,6 +2,7 @@ import {checkFolderExistsWithTimeout, generateTestProject} from "./utils/utils";
 import fs from "fs";
 import {execSync} from "child_process";
 import exp from "constants";
+import path from "path";
 
 const taqueriaProjectPath = 'e2e/auto-test-ligo-plugin';
 
@@ -83,11 +84,23 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
 
     });
 
+    // Remove all files from artifacts folder without removing folder itself
+    afterEach(() => {
+        try {
+            const files = fs.readdirSync(`${taqueriaProjectPath}/artifacts/`);
+            for (const file of files) {
+                fs.unlinkSync(path.join(`${taqueriaProjectPath}/artifacts/`, file));
+            }
+        } catch(error){
+            throw new Error (`error: ${error}`);
+        }
+    })
+
     // Clean up process to remove taquified project folder
     // Comment if need to debug
     afterAll(() => {
         try {
-            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+            // fs.rmdirSync(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }
