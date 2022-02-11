@@ -7,13 +7,15 @@ on:
   push:
     tags:
       - v*
+  release:
+    types: [published]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 env:
-  VSCODE_DIR: taqueria-vscode-extension
+  GIT_WORKSPACE: taqueria-vscode-extension
 
 jobs:
   lint-test-build:
@@ -30,8 +32,6 @@ jobs:
     outputs:
       artifactFilename: ${{ steps.setArtifactFilename.outputs.filename }}
       vsixPath: ${{ steps.packageExtension.outputs.vsixPath }}
-    env:
-      GIT_WORKSPACE: taqueria-vscode-extension
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
@@ -51,19 +51,19 @@ jobs:
         run: npm ci
       
       - name: Linter
-        run: npm run lint --workspace $GIT_WORKSPACE 
+        run: npm run lint --workspace ${{ env.GIT_WORKSPACE }}
       
       - name: Compile TS
-        run: npm run compile --workspace $GIT_WORKSPACE
+        run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
       
       - name: Run Unit Tests on Windows or macOS
-        run: npm run test --workspace $GIT_WORKSPACE
+        run: npm test --workspace ${{ env.GIT_WORKSPACE }}
         if: runner.os != 'Linux'
       
       - name: Run Unit Tests on Linux
-        run: xvfb-run -a npm test --workspace $GIT_WORKSPACE
+        run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
         if: runner.os == 'Linux'
-      
+
       - name: Package VSCode Extension
         if: runner.os == 'Linux'
         id: packageExtension
@@ -72,8 +72,10 @@ jobs:
           pat: stub
           dryRun: true
           yarn: true
-          packagePath: ${{ env.VSCODE_DIR }}
+          packagePath: ${{ env.GIT_WORKSPACE }}
+          preRelease: true
       - id: setArtifactFilename
+        if: runner.os == 'Linux'
         run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}"
       - name: Upload Extension Package as Artifact
         if: runner.os == 'Linux'
@@ -85,7 +87,7 @@ jobs:
 
   publish-marketplace:
     name: Publish VSCode Extension
-    if: github.ref_type == 'tag'
+    if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
     needs:
       - lint-test-build
     runs-on: ubuntu-latest
@@ -103,7 +105,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ needs.lint-test-build.outputs.artifactFilename }}
-          path: ${{ env.VSCODE_DIR }}
+          path: ${{ env.GIT_WORKSPACE }}
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:

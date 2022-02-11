@@ -1,11 +1,10 @@
 {
   "name": "@taqueria/plugin-ligo",
-  "version": "0.0.4",
+  "version": "0.0.8",
   "description": "A taqueria plugin for compiling LIGO smart contracts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "echo 'Nothing to build.' && exit 0",
-    "build-ci": "npm run build",
     "pluginInfo": "node index.js --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
     "compile": "node index.js --taqRun proxy --task compile --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
     "debugPluginInfo": "node --inspect index.js --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\"}' --projectDir ../test-project --configDir ./.taq"
@@ -35,6 +34,6 @@
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "dependencies": {
     "fast-glob": "^3.2.7",
-    "@taqueria/node-sdk": "^0.0.1"
+    "@taqueria/node-sdk": "^0.0.5"
   }
 }

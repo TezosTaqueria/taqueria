@@ -2,7 +2,7 @@ import type {Config, Task, InstalledPlugin, Action, ConfigArgs} from './taqueria
 import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
 import {ConfigDir, i18n} from './taqueria-types.ts'
 import {SanitizedPath, SanitizedAbsPath, SHA256} from './taqueria-utils/taqueria-utils-types.ts'
-import {readTextFile, writeTextFile, decodeJson, joinPaths} from './taqueria-utils/taqueria-utils.ts'
+import {debug, readJsonFile, writeJsonFile, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {resolve, reject, map, chain, mapRej, chainRej} from 'https://cdn.skypack.dev/fluture'
 
@@ -85,26 +85,23 @@ export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: Sanitized
 
 export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedPath,  create=false) : Future<TaqError, ConfigArgs> => pipe(
     getConfigPath(projectDir, configDir, create),
-    chain ( (path:string) => pipe(
-        readTextFile(path),
+    chain ( (configPath : string) => pipe(
+        readJsonFile(configPath),
         chainRej ((err:unknown) => {
             if (!create) return reject(err)
             else {
-                const data = JSON.stringify(defaultConfig)
                 return pipe(
-                    writeTextFile(path, JSON.stringify(defaultConfig)),
-                    chain (readTextFile),
-                    map (() => data)
+                    writeJsonFile(configPath) (defaultConfig),
+                    chain ((configPath: string) => readJsonFile<Config>(configPath))
                 )
             }
         }),
-        chain (decodeJson),
 
         chain ((config: Config) => pipe(
             SHA256.futureOf(JSON.stringify(config)),
             map ((hash: string) => ({
                 ...config,
-                configFile: SanitizedAbsPath.create(path),
+                configFile: SanitizedAbsPath.create(configPath),
                 configDir,
                 projectDir,
                 hash
