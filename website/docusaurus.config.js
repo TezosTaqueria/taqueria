@@ -47,7 +47,7 @@ const config = {
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
 			gtag: {
-				trackingID: "G-R7WYMVNDR1",
+				trackingID: "GTM-N6G3QD5",
 				anonymizeIP: true,
 			},
 			colorMode: {
