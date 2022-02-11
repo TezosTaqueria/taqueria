@@ -33,11 +33,16 @@ Deno.test("Positive scenario test for {decodeJson} function to return () => {}",
     fork (assertUnreachable) (assertSuccess) (result);
 });
 
-Deno.test("Negative scenario test for {decodeJson} function", () => {
-    const result = decodeJson(testInvalidJson);
-    const assertFailed = (err: TaqError) => assertEquals(err.kind, "E_INVALID_JSON")
-    const assertUnreachable = () => unreachable();
-    fork (assertFailed) (assertUnreachable) (result);
+Deno.test({ name: "Negative scenario test for {decodeJson} function", fn: async () => {
+    assertRejects( ()=> {
+                promise (decodeJson(testInvalidJson));
+                throw new Error("The provided JSON could not be decoded.")
+            },
+            Error, "The provided JSON could not be decoded."
+        );
+    },
+    sanitizeResources: false,
+    sanitizeOps: false,
 });
 
 Deno.test("Positive scenario test for {log} function", () => {
@@ -77,7 +82,6 @@ Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: asy
         await t.step("run test for {writeTextFile} function", async () => {
             const assert = chai.assert;
             const result = await promise (writeTextFile("./unit/taqueria-utils/data/testWrite.txt")("testWrite"));
-            console.log(result)
             assert.equal(result, './unit/taqueria-utils/data/testWrite.txt');
         });
         await t.step("clean up", async () => {
