@@ -46,15 +46,15 @@
         },
         "test": {
             "accounts": {
-                "default": "bob",
-                "bob": {
-                    "initialBalance": "3000000000"
+                "default": "ken",
+                "ken": {
+                    "initialBalance": "1"
                 },
-                "alice": {
-                    "initialBalance": "2000000000"
+                "tran": {
+                    "initialBalance": "2"
                 },
-                "john": {
-                    "initialBalance": "4000000000"
+                "mathew": {
+                    "initialBalance": "3"
                 }
             },
             "label": "Test Tezos Sandbox",

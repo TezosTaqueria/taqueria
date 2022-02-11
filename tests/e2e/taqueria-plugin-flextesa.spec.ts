@@ -30,11 +30,20 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             const [,dockerContainerLocal] = execSync(`docker ps --filter "name=${dockerName}"`).toString().trim().split(/\r?\n/);
             expect(dockerContainerLocal).toBeDefined();
 
-            // 4.  Run stop command and verify the output
+            // 4. Verify that sandbox started on the proper port 0.0.0.0:20000->20000/tcp
+            let isReachable = await isPortReachable(20000, {host: 'localhost'});
+            expect(isReachable).toBeTruthy();
+
+            // 5.  Run stop command and verify the output
             const stdoutStop = execSync(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
 
             // 5. Verify that taqueria returns proper message into console
             expect(stdoutStop).toEqual("Stopped local.");
+
+            // 6. Verify that taqueria returns proper message into console
+            expect(stdoutStop).toEqual("Stopped local.");
+            isReachable = await isPortReachable(20000, {host: 'localhost'})
+            expect(isReachable).toBeFalsy();
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -62,10 +71,10 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             let isReachable = await isPortReachable(20000, {host: 'localhost'});
             expect(isReachable).toBeTruthy();
 
-            // 4.  Run stop command and verify the output
+            // 5.  Run stop command and verify the output
             const stdoutStop = execSync(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
 
-            // 5. Verify that taqueria returns proper message into console
+            // 6. Verify that taqueria returns proper message into console
             expect(stdoutStop).toEqual("Stopped local.");
             isReachable = await isPortReachable(20000, {host: 'localhost'})
             expect(isReachable).toBeFalsy();
@@ -141,20 +150,10 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    // TODO: Ask Michael about the using custom accounts with different initialBalance e. g.
-    //             "accounts": {
-    //                 "default": "ken",
-    //                 "ken": {
-    //                     "initialBalance": "1"
-    //                 },
-    //                 "tran": {
-    //                     "initialBalance": "2"
-    //                 },
-    //                 "mathew": {
-    //                     "initialBalance": "3"
-    //                 }
-    //             },
-    test('Verify that taqueria flextesa plugin can start and stop a sandbox with custom name', async () => {
+
+    // TODO: Currently it cannot be done until this issue has been resolved
+    // https://github.com/ecadlabs/taqueria/issues/243
+    test.skip('Verify that taqueria flextesa plugin can start and stop a sandbox with custom name', async () => {
         try {
             // Setting up docker container name
             dockerName = "test"
@@ -175,8 +174,8 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             // 5. Run list accounts command and verify that it returns list of default accounts
             await waitForExpect(() => {
                 const stdoutList = execSync(`taq list accounts ${dockerName}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
-                expect(stdoutList).toContain("bob");
-                expect(stdoutList).not.toContain("jane");
+                expect(stdoutList).toContain("ken");
+                expect(stdoutList).not.toContain("tran");
             });
 
             // 6.  Run stop command and verify the output
@@ -192,18 +191,24 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
     });
 
 
-    // TODO: Need to clarify about updating accounts, otherwise there is no way to do step d.
+    // TODO: Currently it cannot be done until this issue has been resolved
+    // https://github.com/ecadlabs/taqueria/issues/243
     test.skip('Verify that taqueria flextesa plugin can retrieve data from updated config after restart', async () => {
         try {
             // Setting up docker container name
             dockerName = "local"
-            //      a. Start sandbox
-            //      b. Check balance
-            //      c. Stop sandbox
-            //      d. Update config
-            //      e. start sandbox again
-            //      f. Check balance again and see that it changed
 
+            // 1. Start sandbox
+
+            // 2. Check balance
+
+            // 3. Stop sandbox
+
+            // 4. Update config
+
+            // 5. start sandbox again
+
+            // 6. Check balance again and see that it changed
 
         } catch(error) {
             throw new Error (`error: ${error}`);
