@@ -99,7 +99,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     // Comment if need to debug
     afterAll(() => {
         try {
-            // fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }
