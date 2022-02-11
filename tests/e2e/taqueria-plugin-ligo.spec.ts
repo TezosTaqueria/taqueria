@@ -1,7 +1,6 @@
 import {checkFolderExistsWithTimeout, generateTestProject} from "./utils/utils";
 import fs from "fs";
 import {execSync} from "child_process";
-import exp from "constants";
 import path from "path";
 
 const taqueriaProjectPath = 'e2e/auto-test-ligo-plugin';
