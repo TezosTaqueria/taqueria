@@ -48,15 +48,15 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     test('Verify that taqueria ligo plugin can compile multiple contracts under contracts folder', async () => {
         try {
             // 1. Copy two contracts from data folder to /contracts folder under taqueria project
-            execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
-            execSync(`cp e2e/data/hello-tacos-second.mligo ${taqueriaProjectPath}/contracts`);
+            execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos-one.mligo`);
+            execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos-two.mligo`);
 
             // 2. Run taq compile ${contractName}
             execSync(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version for both contracts has been generated
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`, 25000);
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-second.tz`, 25000);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-one.tz`, 25000);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-two.tz`, 25000);
 
 
         } catch(error) {
