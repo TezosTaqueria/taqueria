@@ -462,7 +462,9 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                             renderTable(decoded.stdout as Record<string, string>[])
                         }
                         else if (decoded.render !== 'none') {
-                            console.log(decoded.status === 'success' ? decoded.stdout: decoded.stderr)
+                            decoded.status === 'success'
+                                ? console.log(decoded.stdout)
+                                : console.error(decoded.stderr)
                         }
                     })
                 )
