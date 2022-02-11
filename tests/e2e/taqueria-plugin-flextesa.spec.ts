@@ -27,8 +27,8 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             expect(stdoutStart).toEqual("Started local.");
 
             // 3. Verify that docker container has been started
-            const [,dockerContainerLocal] = execSync(`docker ps --filter "name=${dockerName}"`).toString().trim().split(/\r?\n/);
-            expect(dockerContainerLocal).toBeDefined();
+            const [,dockerContainerTest] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
+            expect(dockerContainerTest).toContain("node startFlextesa.js --sandbox local")
 
             // 4. Verify that sandbox started on the proper port 0.0.0.0:20000->20000/tcp
             let isReachable = await isPortReachable(20000, {host: 'localhost'});
@@ -38,9 +38,6 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             const stdoutStop = execSync(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
 
             // 5. Verify that taqueria returns proper message into console
-            expect(stdoutStop).toEqual("Stopped local.");
-
-            // 6. Verify that taqueria returns proper message into console
             expect(stdoutStop).toEqual("Stopped local.");
             isReachable = await isPortReachable(20000, {host: 'localhost'})
             expect(isReachable).toBeFalsy();
@@ -64,8 +61,8 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             expect(stdoutStart).toEqual("Started local.");
 
             // 3. Verify that docker container has been started
-            const [,dockerContainerLocal] = execSync(`docker ps --filter "name=${dockerName}"`).toString().trim().split(/\r?\n/);
-            expect(dockerContainerLocal).toBeDefined();
+            const [,dockerContainerTest] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
+            expect(dockerContainerTest).toContain("node startFlextesa.js --sandbox local")
 
             // 4. Verify that sandbox started on the proper port 0.0.0.0:20000->20000/tcp
             let isReachable = await isPortReachable(20000, {host: 'localhost'});
@@ -167,21 +164,17 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             // 3. Verify that sandbox has been started and taqueria returns proper message into console
             expect(stdoutStart).toEqual("Started test.");
 
-            // 4. Verify that docker container has been started
-            const [,dockerContainerTest] = execSync(`docker ps --filter "name=${dockerName}"`).toString().trim().split(/\r?\n/);
-            expect(dockerContainerTest).toBeDefined();
-
-            // 5. Run list accounts command and verify that it returns list of default accounts
+            // 4. Run list accounts command and verify that it returns list of default accounts
             await waitForExpect(() => {
                 const stdoutList = execSync(`taq list accounts ${dockerName}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
                 expect(stdoutList).toContain("ken");
                 expect(stdoutList).not.toContain("tran");
             });
 
-            // 6.  Run stop command and verify the output
+            // 5.  Run stop command and verify the output
             const stdoutStop = execSync(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
 
-            // 7. Verify that taqueria returns proper message into console
+            // 6. Verify that taqueria returns proper message into console
             expect(stdoutStop).toEqual("Stopped test.");
 
         } catch(error) {
