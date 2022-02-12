@@ -2,14 +2,8 @@
 title: Understanding Taqueria Plugins
 ---
 
-Plugins are how Taqueria gets things done. Each plugin implements a specific function such as a smart contract compiler, sandbox, or test framework. A plugin will provide one or more tasks that yo4u can use in Taqueria
 
-Currently Taqueria offers the following core plugins:
-- `taqueria/plugin-ligo` - A compiler for the LIGO smart contract language
-- `taqueria/plugin-smartpy` - A compiler for the SmartPy contract language
-- `taqueria/plugin-flextesa` - A sandbox test network running Tezos Flextesa 
-- `taqueria/plugin-taquito` - A front-end Tezos framework used to originate
-- `taqueria/plugin-ts-generator' - A type generator that produces TS types from Michelson code
+Plugins are how Taqueria gets things done. Each plugin implements a specific function such as a smart contract compiler, sandbox, or test framework. A plugin will provide one or more tasks that you can use in Taqueria
 
 Taqueria is designed to be flexible, streamlined, and customizable so plugins are installed on a per-project basis depending on the particular needs of the project
 
@@ -21,7 +15,9 @@ If you aren't seeing tasks listed when running `taq`, make sure that you are in 
 
 During installation, NPM packages for the plugin are downloaded into the project folder and the plugin is registered in `./.taq/config.json`
 
-
+<!-- 
+## What is a Plugin
+ -->
 
 ## Available Plugins
 

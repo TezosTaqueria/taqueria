@@ -25,19 +25,19 @@ const sidebars = {
       items: [
         "intro",
         "getting-started/installation",
-        "getting-started/understanding-taqueria-plugins"
+        "getting-started/plugin-basics"
       ],
     },
     {
       type: "category",
-      label: "Plugins",
+      label: "Plugin Reference",
       className: "sidebarHeader",
       collapsed: false,
       collapsible: false,
       items: [
+        "plugins/plugin-flextesa",
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
-        "plugins/plugin-flextesa",
         "plugins/plugin-taquito",
         "plugins/plugin-typescript-generator",
         "plugins/plugin-mock-plugin",
