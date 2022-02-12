@@ -17,7 +17,7 @@ taq install @taqueria/plugin-ligo
 ```
 
 :::note
-At this time, all Taqueria projects must also be initialized as node projects by `running npm init -y` from the root of your project directory
+At this time, all Taqueria projects must also be initialized as node projects by running `npm init -y` from the root of your project directory
 :::
 
 ## Configuration
