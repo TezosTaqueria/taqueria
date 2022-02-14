@@ -2,8 +2,9 @@ name: VSCode Extension
 
 on:
   pull_request:
-    paths:
-      - 'taqueria-vscode-extension/**'
+    # TODO: add below again after testing
+    # paths:
+    #   - 'taqueria-vscode-extension/**'
   push:
     tags:
       - v*
