@@ -203,7 +203,7 @@ jobs:
             // Build the vscode-extension workflow comment
             const vsCodeWorkflowState = ${{ needs.vscode-extension-workflow.result }}
             let vsCodeCommentBody = ''
-            if (vsCodeWorkflowState == 'success') {
+            if (vsCodeWorkflowState.includes("success")) {
               vsCodeCommentBody = `
                 The VSIX artifact file for commit ${git_short_sha} is available [here](${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }})
               `
