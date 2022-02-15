@@ -136,7 +136,9 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   run-tests:
-    needs: build-binaries
+    needs: 
+      - build-binaries
+      - publish-sdk-to-npm
     runs-on: ubuntu-latest
 
     steps:
