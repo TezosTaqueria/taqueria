@@ -181,12 +181,12 @@ jobs:
     needs: 
       - build-binaries
       - vscode-extension-workflow
-      - publish-protocol-to-npm
-      - publish-sdk-to-npm
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
+      # - publish-protocol-to-npm
+      # - publish-sdk-to-npm
+      # - publish-ligo-plugin-to-npm
+      # - publish-smartpy-plugin-to-npm
+      # - publish-taquito-plugin-to-npm
+      # - publish-flextesa-plugin-to-npm
     steps:
       - uses: actions/checkout@v2
 
