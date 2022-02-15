@@ -1,0 +1,37 @@
+html[data-theme="light"] {
+	.admonition-caution {
+		background: rgba(252, 175, 23, 0.1);
+		border-radius: 0px 5px 5px 0px;
+		border-color: var(--ifm-color-primary);
+		svg {
+			path {
+				fill: var(--ifm-color-primary);
+			}
+		}
+	}
+	.admonition-info {
+		background: rgba(160, 102, 170, 0.1);
+		border-radius: 0px 5px 5px 0px;
+		border-color: #a066aa;
+		.admonition-icon {
+			svg {
+				path {
+					fill: #a066aa;
+				}
+			}
+		}
+	}
+	.admonition-tip {
+		background: rgba(204, 185, 9, 0.1);
+		border-radius: 0px 5px 5px 0px;
+		border-color: var(--ifm-color-bg-yellow);
+
+		.admonition-icon {
+			svg {
+				path {
+					fill: var(--ifm-color-bg-yellow);
+				}
+			}
+		}
+	}
+}

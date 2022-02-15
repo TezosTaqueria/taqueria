@@ -1,0 +1,20 @@
+html[data-theme='light'] {
+	code {
+		background-color: #f9f9f9;
+
+		.token-line {
+			.keyword {
+				color: var(--ifm-color-bg-purple) !important;
+			}
+			.function {
+				color: var(--ifm-color-red-text) !important;
+			}
+			.string {
+				color: var(--ifm-color-primary) !important;
+			}
+			.boolean {
+				color: var(--ifm-color-bg-yellow) !important;
+			}
+		}
+	}
+}

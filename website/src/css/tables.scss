@@ -1,0 +1,51 @@
+html[data-theme='light'] {
+	table {
+		box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
+		border-radius: 8px;
+		font-family: Montserrat;
+		font-style: normal;
+		font-weight: 500;
+		font-size: 12px;
+		line-height: 16px;
+		table-layout: auto !important;
+		width: calc(100% - 5px);
+		border: none;
+		overflow: hidden;
+		@media (max-width: 640px) {
+			overflow: auto;
+		}
+		thead {
+			background-color: var(--ifm-color-primary-light);
+			font-family: Montserrat;
+			font-style: normal;
+			font-weight: bold;
+			font-size: 14px;
+			line-height: 17px;
+			width: 100%;
+			tr {
+				border: none;
+
+				th {
+					border: none;
+					text-align: start;
+				}
+			}
+		}
+		tbody {
+			width: 100%;
+			border: none;
+
+			tr {
+				border: none;
+				td {
+					text-align: start;
+					border-color: var(--ifm-color-primary-light);
+					width: 50vw !important;
+				}
+			}
+		}
+	}
+	table tr:nth-child(2n) {
+		background-color: var(--ifm-color-primary-lightest);
+	}
+}
