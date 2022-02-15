@@ -94,88 +94,88 @@ jobs:
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
       VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
-  publish-protocol-to-npm:
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-    with:
-      dir: taqueria-protocol
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-protocol-to-npm:
+  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+  #   with:
+  #     dir: taqueria-protocol
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-sdk-to-npm:
-    needs: publish-protocol-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-    with:
-      dir: taqueria-sdk
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-sdk-to-npm:
+  #   needs: publish-protocol-to-npm
+  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+  #   with:
+  #     dir: taqueria-sdk
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-ligo-plugin-to-npm:
-    needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-    with:
-      dir: taqueria-plugin-ligo
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-ligo-plugin-to-npm:
+  #   needs: publish-sdk-to-npm
+  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+  #   with:
+  #     dir: taqueria-plugin-ligo
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
   
-  publish-smartpy-plugin-to-npm:
-    needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-    with:
-      dir: taqueria-plugin-smartpy
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-smartpy-plugin-to-npm:
+  #   needs: publish-sdk-to-npm
+  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+  #   with:
+  #     dir: taqueria-plugin-smartpy
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-taquito-plugin-to-npm:
-    needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-    with:
-      dir: taqueria-plugin-taquito
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-taquito-plugin-to-npm:
+  #   needs: publish-sdk-to-npm
+  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+  #   with:
+  #     dir: taqueria-plugin-taquito
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-flextesa-plugin-to-npm:
-    needs:
-      - publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-    with:
-      dir: taqueria-plugin-flextesa
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-flextesa-plugin-to-npm:
+  #   needs:
+  #     - publish-sdk-to-npm
+  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+  #   with:
+  #     dir: taqueria-plugin-flextesa
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  run-tests:
-    needs: build-binaries
-    runs-on: ubuntu-latest
+  # run-tests:
+    # needs: build-binaries
+    # runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16.x
+    # steps:
+    #   - uses: actions/checkout@v2
+    #   - uses: actions/setup-node@v2
+    #     with:
+    #       node-version: 16.x
 
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: "^1.0.0"
+    #   - uses: denoland/setup-deno@v1
+    #     with:
+    #       deno-version: "^1.0.0"
 
-      - name: get binary and make executable from previous step for tests
-        run: |
-          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
-          chmod +x taq
-          echo "$(pwd)" >> $GITHUB_PATH
+    #   - name: get binary and make executable from previous step for tests
+    #     run: |
+    #       wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
+    #       chmod +x taq
+    #       echo "$(pwd)" >> $GITHUB_PATH
 
-      - name: install dependencies
-        run: npm ci
+    #   - name: install dependencies
+    #     run: npm ci
       
-      - name: Run unit tests
-        run: |
-          npm run test:unit --workspace tests
+    #   - name: Run unit tests
+    #     run: |
+    #       npm run test:unit --workspace tests
 
-      - name: Run integration tests
-        run: |
-          npm run test:integration --workspace tests
+    #   - name: Run integration tests
+    #     run: |
+    #       npm run test:integration --workspace tests
 
-      - name: Run e2e tests
-        run: |
-          npm run test:e2e --workspace tests
+    #   - name: Run e2e tests
+    #     run: |
+    #       npm run test:e2e --workspace tests
 
   pr-comment:
     runs-on: ubuntu-latest
