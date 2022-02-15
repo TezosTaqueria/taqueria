@@ -9,12 +9,12 @@ const config = {
 	plugins: ["docusaurus-plugin-sass"],
 	title: "Taqueria - Developer Tooling for Tezos",
 	tagline: "Taqueria - Developer Tooling for Tezos",
-	url: "https://tezostaqueria.io",
+	url: "https://taqueria.io",
 	baseUrl: "/",
 
 	onBrokenLinks: "throw",
 	onBrokenMarkdownLinks: "warn",
-	favicon: "img/favicon.ico",
+	favicon: "/img/favicon.ico",
 	organizationName: "ecadlabs", // Usually your GitHub org/user name.
 	projectName: "taqueria", // Usually your repo name.
 
@@ -22,6 +22,7 @@ const config = {
 		[
 			"@docusaurus/preset-classic",
 			/** @type {import('@docusaurus/preset-classic').Options} */
+
 			({
 				docs: {
 					path: "docs",
@@ -48,10 +49,13 @@ const config = {
 			}),
 		],
 	],
-
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
+			gtag: {
+				trackingID: "GTM-N6G3QD5",
+				anonymizeIP: true,
+			},
 			colorMode: {
 				defaultMode: "light",
 				disableSwitch: true,
@@ -72,7 +76,7 @@ const config = {
 			navbar: {
 				logo: {
 					alt: "Tezos Taqueria Logo",
-					src: "img/Taqueria_magenta_beta.svg",
+					src: "/img/Taqueria_magenta_beta.svg",
 				},
 				items: [
 					{
@@ -189,7 +193,7 @@ const config = {
 							{
 								html: `
 									<a class='footerButton' href='https://github.com/ecadlabs/taqueria'>
-										<img class='footerGihubLogoButton' src="img/githubSVG.svg" alt="" />
+										<img class='footerGihubLogoButton' src="/img/githubSVG.svg" alt="" />
 										GITHUB
 									</a>
 								  `,

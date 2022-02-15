@@ -1,0 +1,55 @@
+name: npm-publish
+
+on:
+  workflow_call:
+    inputs:
+      dir:
+        type: string
+        required: true
+    secrets:
+      NPM_TOKEN:
+        required: true
+
+env:
+  SCOPE: '@taqueria'
+  NPM_REGISTRY: 'https://registry.npmjs.org/'
+  GH_REGISTRY: 'https://npm.pkg.github.com/'
+
+jobs:
+  build-and-publish-npm-packages:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    env: 
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GIT_WORKSPACE: "${{ inputs.dir }}"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with: 
+          registry-url: ${{ env.NPM_REGISTRY }}
+          scope: "${{ env.SCOPE }}"
+
+      - name: Install any dependencies
+        run: npm ci
+
+      - name: Build package
+        run: npm run --workspace $GIT_WORKSPACE build
+      
+      - name: Publish for PR
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}" --workspace $GIT_WORKSPACE
+          npm publish --workspace $GIT_WORKSPACE --tag "preview" --access public
+      
+      - name: Publish for prerelease
+        if:  ${{ github.event.release.prerelease && github.event.action == 'published' }}
+        run: |
+          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}" --workspace $GIT_WORKSPACE
+          npm publish --workspace=$GIT_WORKSPACE --tag 'next' --access public
+      
+      - name: Publish for official release
+        if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
+        run: |
+          npm publish --workspace=$GIT_WORKSPACE --tag 'latest' --access public

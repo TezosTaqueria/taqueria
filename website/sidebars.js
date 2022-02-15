@@ -24,22 +24,23 @@ const sidebars = {
       collapsible: false,
       items: [
         "intro",
-        "getting-started/installation"
+        "getting-started/installation",
+        "getting-started/plugin-basics"
       ],
     },
     {
       type: "category",
-      label: "Plugins",
+      label: "Plugin Reference",
       className: "sidebarHeader",
       collapsed: false,
       collapsible: false,
       items: [
-        "plugins",
-        "plugin_ligo",
-        "plugin_smartpy",
-        "plugin_contract_type_generator",
-        "plugin_teztnets",
-        "plugin_boilerplate_typescript",
+        "plugins/plugin-flextesa",
+        "plugins/plugin-ligo",
+        "plugins/plugin-smartpy",
+        "plugins/plugin-taquito",
+        "plugins/plugin-typescript-generator",
+        "plugins/plugin-mock-plugin",
       ],
     },
     {
@@ -49,9 +50,7 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "hello_tacos",
-        "EXAMPLE_FOR_STYLING"
-
+        "hello-tacos-tutorial"
       ],
     },
     {
@@ -61,8 +60,20 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "architecture",
-        "making_plugins"
+        "taqueria-internals/architecture",
+      ],
+    },
+    {
+      type: "category",
+      label: "Taqueria Development",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "roadmap",
+        "taqueria-dev/contributions",
+        "taqueria-dev/making-plugins",
+        "taqueria-dev/pr-npm-packages"
       ],
     },
   ]

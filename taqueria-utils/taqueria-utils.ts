@@ -1,18 +1,17 @@
-import type {Future, reject, resolve, TaqError} from './taqueria-utils-types.ts'
-import Url from './url.ts'
+import type {Future, reject, resolve, TaqError, SanitizedAbsPath} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {fork, attemptP, map, Future as Fluture} from 'https://cdn.skypack.dev/fluture';
-import JSON from "https://deno.land/x/json5/mod.ts";
+import {chain, attemptP, map, Future as Fluture} from 'https://cdn.skypack.dev/fluture';
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
+import * as jsonc from "https://deno.land/x/jsonc@1/main.ts"
 
 export const decodeJson = (encoded: string) => Fluture((rej: reject, res:resolve) => {
     try {
-        const data = JSON.parse(encoded)
+        const data = jsonc.parse(encoded)
         res(data)
     } catch (err) {
-        rej({kind: "E_INVALID_JSON", msg: "TODO, should this use i18n?", previous: err})
+        rej({kind: "E_INVALID_JSON", msg: "The provided JSON could not be decoded.", previous: err, context: encoded})
     }
     return () => {}
 })
@@ -23,11 +22,17 @@ export const log = <T>(message: string) => (input: T) : T => {
     return input
 }
 
+
+export const debug = <T>(input: T) => {
+    debugger
+    return input
+}
+
 const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
 
 export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map (() => path))
 
-export const readFile = (path: string) => Fluture(
+export const readTextFile = (path: string) => Fluture(
     (rej: reject, res: resolve) => {
         const decoder = new TextDecoder("utf-8")
         Deno.readFile(path)
@@ -41,7 +46,13 @@ export const readFile = (path: string) => Fluture(
     }
 )
 
-export const writeTextFile = (path: string, data: string) => Fluture(
+export const readJsonFile = <T>(path: string) => pipe(
+    readTextFile(path),
+    chain (decodeJson),
+    map ((result: unknown) => (result as T))
+)
+
+export const writeTextFile = (path: string) => (data: string) => Fluture(
     (rej: reject, res: resolve) => {
         Deno.writeTextFile(path, data).then(() => res(path)).catch(rej)
         return () => {}
@@ -49,11 +60,20 @@ export const writeTextFile = (path: string, data: string) => Fluture(
         
 )
 
+export const writeJsonFile = <T>(path: string) => (data: T) => pipe(
+    JSON.stringify(data),
+    jsonStr => pipe(
+        jsonc.format(jsonStr, undefined, {
+            insertSpaces: true
+        }),
+        edits => jsonc.applyEdits(jsonStr, edits)
+    ),
+    writeTextFile(path)
+)
+
 export const isTaqError = (err: unknown) : err is TaqError => {
     return (err as TaqError).kind !== undefined
 }
-
-export const isUrl = (input:string) => fork (() => false) (() => true) (Url.make(input))
 
 export const memoize = memoizy({})
 
@@ -61,24 +81,43 @@ export const joinPaths = _joinPaths
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string
 
-export const commonElements = (...arrs: (unknown[])[]): unknown[] => {
-    const process = (arr1: unknown[], arr2: unknown[]) => arr1.reduce(
-        (retval: unknown[], current) => arr2.includes(current) ? [...retval, current] : retval,
-        []
-    )
+export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cwd?: SanitizedAbsPath) => attemptP(async () => {
+    let command = cmdTemplate
+    try {
+        // NOTE, uses eta templates under the hood. Very performant! https://ghcdn.rawgit.org/eta-dev/eta/master/browser-tests/benchmark.html
+        /**
+         * Template Variables:
+         * - configDir
+         * - projectDir
+         * - maxConcurrency
+         * - plugin
+         * - config.language
+         * - config.plugins
+         * - config.contractsDir
+         * - config.artifactsDir
+         * - config.testsDir
+         * - config.configFile
+         * - config.configDir
+         * - config.projectDir
+         * - env.get()
+         * - i18n.__()
+         */
+        const join = joinPaths
+        const cmd = renderTemplate(cmdTemplate, {join, ...inputArgs})
+        command = cmd
+        const process = Deno.run({
+            cmd: ["sh", "-c", `${cmd}`],
+            cwd: cwd?.value
+        })
+        const status = await process.status()
 
-    const recursiveProcess = (arrs: (unknown[])[]): unknown[] => {
-        const [a, b, ...remainingArrs] = arrs
-        if (!b) return a
-        const result = process(a, b)
-        return recursiveProcess([result, ...remainingArrs])
+        return status.code
     }
-    
-    return recursiveProcess(arrs)
-}
-
-
-export const uncommonElements = (a: unknown[], b: unknown[]) => a.reduce(
-    (retval: unknown[], current) => b.includes(current) ? retval : [...retval, current],
-    []
-)
+    catch (previous) {
+        throw {
+            kind: "E_FORK",
+            msg: `Could not fork ${command}`,
+            previous
+        }
+    }
+})

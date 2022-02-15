@@ -1,13 +1,15 @@
+import { writeJsonFile, readJsonFile } from '@taqueria/node-sdk'
 import yargs from 'yargs'
-import * as L from 'partial.lenses'
-import {readFile, writeFile} from 'fs/promises'
 import {exec} from 'child_process'
 import retry from 'promise-retry'
 
-type Args = ReturnType<typeof yargs> & {config: string, configure: string, sandbox: string}
+// @ts-ignore - partial.lenses doesn't have corresponding @types
+import * as L from 'partial.lenses'
+
+type Args = ReturnType<typeof yargs> & {config: string, configure: boolean, importAccounts: boolean, sandbox: string}
 
 interface Failure {
-    code: 'E_INVALID_CONFIG' | 'E_ACCOUNT_KEY' | 'E_EXEC',
+    kind: 'E_INVALID_CONFIG' | 'E_ACCOUNT_KEY' | 'E_EXEC',
     context: unknown
 }
 
@@ -61,32 +63,16 @@ interface ConfigInput {
     readonly sandbox?: SandboxesInput
 }
 
-const readTextFile = (filename: string) => readFile(filename, {encoding: "utf8"})
-
-const writeTextFile = (filename: string) => (data: string) => writeFile(filename, data, {encoding: "utf8"})
-
 const writeConfigFile = (filename: string) => (config: Config) =>
-    Promise.resolve(config)
-    .then(JSON.stringify)
-    .then(writeTextFile(filename))
+    writeJsonFile(filename) (config)
     .then(() => config)
-    .catch(err => Promise.reject({code: 'E_WRITE_CONFIG', context: config, previous: err}))
+    .catch(err => Promise.reject({kind: 'E_WRITE_CONFIG', context: config, previous: err}))
 
-const run = (cmd: string): Promise<string> => new Promise((resolve, reject) => exec(cmd, (err, stdout, stderr) => {
-    if (err) reject({code: 'E_EXEC', context: cmd, previous: err})
-    else if (stderr.length) reject({code: 'E_EXEC', context: {cmd, stderr}})
+const run = (cmd: string): Promise<string> => new Promise((resolve, reject) => exec(`flextesa_node_cors_origin='*' ${cmd}`, (err, stdout, stderr) => {
+    if (err) reject({kind: 'E_EXEC', context: cmd, previous: err})
+    else if (stderr.length) reject({kind: 'E_EXEC', context: {cmd, stderr}})
     else resolve(stdout)
 }))
-
-const decodeJsonConfig = (input: string): Promise<ConfigInput> => {
-    try {
-        const data: ConfigInput = JSON.parse(input)
-        return Promise.resolve(data)
-    }
-    catch (err) {
-        throw {code: 'E_INVALID_JSOLN', context: input}
-    }
-}
 
 const parseConfig = (input: ConfigInput) => {
     const parseAccountDetails = (input: AccountDetailsInput): AccountDetails | null => {
@@ -162,7 +148,7 @@ const parseConfig = (input: ConfigInput) => {
         if (sandboxes) return Promise.resolve({...input, sandbox: sandboxes})
             
     }
-    return Promise.reject({code: 'E_INVALID_CONFIG', context: input})
+    return Promise.reject({kind: 'E_INVALID_CONFIG', context: input})
 }
 
 
@@ -303,7 +289,8 @@ const isAccountImported = (accountName: string) =>
     
 
 /**** Program Execution Starts Here */
-const inputArgs: Args = yargs(process.argv)
+// @ts-ignore
+const inputArgs: Args = (yargs(process.argv) as unknown as Args)
 .option('config', {
     default: "/project/.taq/config.json"
 })
@@ -314,15 +301,18 @@ const inputArgs: Args = yargs(process.argv)
     default: false,
     boolean: true
 })
+.option('importAccounts', {
+    default: false,
+    boolean: true
+})
 .parse()
 
 if (!inputArgs.sandbox.length) {
-    console.log({code: 'E_INVALID_USAGE', context: inputArgs})
+    console.log({kind: 'E_INVALID_USAGE', context: inputArgs})
     process.exit(-1)
 }
 
-readTextFile(inputArgs.config)
-.then(decodeJsonConfig)
+readJsonFile<ConfigInput>(inputArgs.config)
 .then(parseConfig)
 .then((config: Config) => {
     const lens = L.compose(

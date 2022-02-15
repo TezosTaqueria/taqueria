@@ -2,7 +2,7 @@ import type {Config, Task, InstalledPlugin, Action, ConfigArgs} from './taqueria
 import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
 import {ConfigDir, i18n} from './taqueria-types.ts'
 import {SanitizedPath, SanitizedAbsPath, SHA256} from './taqueria-utils/taqueria-utils-types.ts'
-import {readFile, writeTextFile, decodeJson, joinPaths} from './taqueria-utils/taqueria-utils.ts'
+import {debug, readJsonFile, writeJsonFile, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {resolve, reject, map, chain, mapRej, chainRej} from 'https://cdn.skypack.dev/fluture'
 
@@ -42,7 +42,10 @@ export const defaultConfig : Config = {
                 joe: {
                     initialBalance: "1000000000"
                 }
-            }
+            },
+            label: "Local Tezos Sandbox",
+            protocol: "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            rpcUrl: "http://localhost:20000"
         }
     },
     network: {
@@ -61,17 +64,18 @@ export const defaultConfig : Config = {
 
 export const getDefaultMaxConcurrency = () => 10
 
-export const make = (data: object) : Future<TaqError, Config> => {
+export const make = (data: Record<string, unknown>) : Future<TaqError, ConfigArgs> => {
     // TODO: Change decoding/validation library
     const err = undefined
     const validData = {
         ...defaultConfig,
         ...data
     }
+
     // const [err, validData] = validate(data, ConfigDecoder)
     return err === undefined
         ? resolve(validData)
-        : reject({kind: "E_INVALID_CONFIG", msg: "TODO, should this use i18n?"})
+        : reject({kind: "E_INVALID_CONFIG", msg: "The config.json file does not adhere to the required schema."})
 }
 
 export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
@@ -81,31 +85,29 @@ export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: Sanitized
 
 export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedPath,  create=false) : Future<TaqError, ConfigArgs> => pipe(
     getConfigPath(projectDir, configDir, create),
-    chain ( (path:string) => pipe(
-        readFile(path),
+    chain ( (configPath : string) => pipe(
+        readJsonFile(configPath),
         chainRej ((err:unknown) => {
             if (!create) return reject(err)
             else {
-                const data = JSON.stringify(defaultConfig)
                 return pipe(
-                    writeTextFile(path, JSON.stringify(defaultConfig)),
-                    chain (readFile),
-                    map (() => data)
+                    writeJsonFile(configPath) (defaultConfig),
+                    chain ((configPath: string) => readJsonFile<Config>(configPath))
                 )
             }
         }),
-        chain (decodeJson),
 
         chain ((config: Config) => pipe(
             SHA256.futureOf(JSON.stringify(config)),
             map ((hash: string) => ({
                 ...config,
-                configFile: path,
-                configDir, projectDir,
+                configFile: SanitizedAbsPath.create(configPath),
+                configDir,
+                projectDir,
                 hash
             }))
         )),
-        mapRej ((previous:unknown) => ({kind: "E_INVALID_CONFIG", msg: "TODO, should this use i18n?", previous})),
+        mapRej ((previous:unknown) => ({kind: "E_INVALID_CONFIG", msg: "Your config.json file looks invalid.", previous})),
     ))
 )
 

@@ -1,16 +1,19 @@
 {
-  "name": "@taqueria/test",
-  "version": "1.0.0",
+  "name": "@taqueria/tests",
+  "version": "0.0.9",
+  "private": true,
   "description": "This is Taqueria testing project includes unit, integration and e2e tests",
   "main": "index.js",
   "scripts": {
-    "test:unit": "jest --config jest.config.unit.ts --coverage --no-cache",
+    "test:unit": "deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
+    "test:unit:selected": "deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",
     "test:integration": "jest --config jest.config.integration.ts --no-cache",
-    "test:e2e": "jest --config jest.config.e2e.ts --no-cache"
+    "test:e2e": "jest --detectOpenHandles --config jest.config.e2e.ts --no-cache"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ecadlabs/taqueria.git"
+    "url": "https://github.com/ecadlabs/taqueria.git",
+    "directory": "tests"
   },
   "keywords": [
     "taqueria",
@@ -27,7 +30,9 @@
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "devDependencies": {
     "@taquito/taquito": "^11.0.2",
-    "@types/jest": "^27.0.3",
+    "@types/jest": "^27.4.0",
+    "@types/node": "^17.0.8",
+    "chokidar": "^3.5.3",
     "jest": "^27.4.3",
     "ts-jest": "^27.0.7",
     "ts-node": "^10.4.0",

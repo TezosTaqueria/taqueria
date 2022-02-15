@@ -1,8 +1,8 @@
 import type {SanitizedPath, SanitizedAbsPath} from './taqueria-utils/taqueria-utils-types.ts'
 import {SHA256} from './taqueria-utils/taqueria-utils-types.ts'
 import {Option, Config, ConfigArgs, PluginInfo, InstalledPlugin, Verb, UnvalidatedTask, Task, UnvalidatedNetwork, Network, } from './taqueria-protocol/taqueria-protocol-types.ts'
-import {mkdir, joinPaths, commonElements, uncommonElements} from './taqueria-utils/taqueria-utils.ts'
-import {resolve, map} from 'https://cdn.skypack.dev/fluture';
+import {mkdir, joinPaths, debug} from './taqueria-utils/taqueria-utils.ts'
+import {resolve, map, chain, attemptP, coalesce} from 'https://cdn.skypack.dev/fluture';
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 
 export interface CommandArgs extends SanitizedInitArgs {
@@ -37,6 +37,7 @@ export interface CLICommand {
 
 export type DenoArgs = typeof Deno.args
 
+
 export interface RawInitArgs {
     _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
     projectDir: string // path to the project
@@ -46,7 +47,19 @@ export interface RawInitArgs {
     plugin?: string
     env: 'production' | 'development' | 'testing' | string
     quickstart: string
+    disableState: boolean
+    logPluginCalls: boolean
+    setBuild: string
+    setVersion: string
+    fromVsCode: boolean
+    version: boolean
 }
+
+export interface InstallPluginArgs extends RawInitArgs {
+    pluginName: string
+}
+
+export type UninstallPluginArgs = InstallPluginArgs
 
 export interface SanitizedInitArgs {
     _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
@@ -57,13 +70,20 @@ export interface SanitizedInitArgs {
     plugin?: string
     env: 'production' | 'development' | 'testing' | string
     quickstart: string
+    disableState: boolean
+    logPluginCalls: boolean
+    setBuild: string
+    setVersion: string
+    fromVsCode: boolean
+    version: boolean
+    pluginName?: string
 }
 
 export interface i18n {
     __(msg: string, ...params: string[]): string
 }
 
-export type EnvKey = "TAQ_CONFIG_DIR" | "TAQ_MAX_CONCURRENCY" | "TAQ_PROJECT_DIR" | "TAQ_ENV"
+export type EnvKey = "TAQ_CONFIG_DIR" | "TAQ_MAX_CONCURRENCY" | "TAQ_PROJECT_DIR" | "TAQ_ENV" | "TAQ_DISABLE_STATE" | "TAQ_VERSION"
 
 export interface EnvVars {
     get: (key: EnvKey) => undefined | string
@@ -81,7 +101,6 @@ export class ConfigDir {
         return createDir
             ? map ((path:string) => new ConfigDir(path)) (mkdir(path))
             : resolve(new ConfigDir(path))
-
     }
 }
 const stateType: unique symbol = Symbol()
@@ -119,16 +138,18 @@ type TaskCounts = Record<string, string[]>
 
 export class State {
     [stateType]: void
+    build: string
     configHash: SHA256
     tasks: PluginTaskMap
     networks: Network[]
     plugins: PluginInfo[]
 
-    protected constructor(configHash: SHA256, tasks: PluginTaskMap, networks: Network[], plugins: PluginInfo[]) {
+    protected constructor(build: string, configHash: SHA256, tasks: PluginTaskMap, networks: Network[], plugins: PluginInfo[]) {
         this.configHash = configHash
         this.tasks = tasks
         this.networks = networks
         this.plugins = plugins
+        this.build = build
     }
 
     protected static mapTasksToPlugins = (config: Config, pluginInfo: PluginInfo[], i18n: i18n) => {
@@ -204,8 +225,8 @@ export class State {
         []
     )
 
-    static create(config: ConfigArgs, pluginInfo: PluginInfo[], i18n: i18n) {
+    static create(build: string, config: ConfigArgs, pluginInfo: PluginInfo[], i18n: i18n) {
         const taskMap = this.mapTasksToPlugins(config, pluginInfo, i18n)
-        return new State(config.hash, taskMap, [], pluginInfo)
+        return new State(build, config.hash, taskMap, [], pluginInfo)
     }
 }
