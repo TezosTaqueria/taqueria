@@ -30,14 +30,14 @@ jobs:
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
            taqueria_bin: "taq"
-         - os: windows-latest
-           os_short: windows
-           deno_target: "x86_64-pc-windows-msvc"
-           taqueria_bin: "taq.exe"
-         - os: macOS-latest
-           os_short: macos
-           deno_target: "x86_64-apple-darwin"
-           taqueria_bin: "taq"
+        #  - os: windows-latest
+        #    os_short: windows
+        #    deno_target: "x86_64-pc-windows-msvc"
+        #    taqueria_bin: "taq.exe"
+        #  - os: macOS-latest
+        #    os_short: macos
+        #    deno_target: "x86_64-apple-darwin"
+        #    taqueria_bin: "taq"
 
     outputs:
       public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
@@ -166,7 +166,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          ls taqueria-sdk
+          npm run build -w taqueria-sdk
           npm run test:integration -w tests
 
       - name: Run e2e tests
