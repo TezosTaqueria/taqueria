@@ -20,6 +20,9 @@ env:
 
 jobs:
   lint-test-build:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     name: Test and Package on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
