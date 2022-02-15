@@ -42,7 +42,7 @@ const config = {
 						require.resolve('./src/css/custom.css'),
 						require.resolve('./src/css/tables.scss'),
 						require.resolve('./src/css/admonitions.scss'),
-						require.resolve('./src/css/codBlock.scss'),
+						require.resolve('./src/css/codeBlock.scss'),
 						require.resolve('./src/css/tabs.scss'),
 					],
 				},
