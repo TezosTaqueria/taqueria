@@ -89,6 +89,10 @@ jobs:
 
   vscode-extension-workflow:
     uses: ./.github/workflows/vscode-extension.yml
+    secrets:
+      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
+      VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
   publish-protocol-to-npm:
     uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
