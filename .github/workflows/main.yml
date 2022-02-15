@@ -166,10 +166,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          ls node_modules/@taqueria
-          ls node_modules/@taqueria/node-sdk
-          npm run build -w taqueria-sdk
-          ls node_modules/@taqueria/node-sdk
+          ls taqueria-sdk
           npm run test:integration -w tests
 
       - name: Run e2e tests
