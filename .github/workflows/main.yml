@@ -88,7 +88,7 @@ jobs:
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
   vscode-extension-workflow:
-    uses: ./.github/workflows/vscode-extensions.yml@268-upload-vsix-to-gcs
+    uses: ./.github/workflows/vscode-extension.yml
 
   publish-protocol-to-npm:
     uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
