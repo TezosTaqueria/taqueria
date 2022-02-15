@@ -1,4 +1,4 @@
-html[data-theme="light"] {
+html[data-theme='light'] {
 	table {
 		box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.15);
 		border-radius: 8px;
@@ -7,7 +7,7 @@ html[data-theme="light"] {
 		font-weight: 500;
 		font-size: 12px;
 		line-height: 16px;
-		table-layout: auto;
+		table-layout: auto !important;
 		width: calc(100% - 5px);
 		border: none;
 		overflow: hidden;
@@ -37,11 +37,10 @@ html[data-theme="light"] {
 
 			tr {
 				border: none;
-
 				td {
 					text-align: start;
 					border-color: var(--ifm-color-primary-light);
-					width: 90% !important;
+					width: 50vw !important;
 				}
 			}
 		}
