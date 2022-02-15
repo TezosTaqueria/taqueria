@@ -136,7 +136,8 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   run-tests:
-    needs: build-binaries
+    needs: 
+      - build-binaries
     runs-on: ubuntu-latest
 
     steps:
@@ -164,7 +165,8 @@ jobs:
 
       - name: Run integration tests
         run: |
-          npm run test:integration --workspace tests
+          npm run build -w taqueria-sdk
+          npm run test:integration -w tests
 
       - name: Run e2e tests
         run: |
