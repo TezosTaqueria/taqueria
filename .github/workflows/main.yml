@@ -164,7 +164,7 @@ jobs:
 
       - name: Run integration tests
         run: |
-          npm run test:integration --workspace tests
+          npm run test:integration -w tests
 
       - name: Run e2e tests
         run: |
