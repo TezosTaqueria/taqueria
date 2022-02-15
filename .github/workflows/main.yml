@@ -6,8 +6,6 @@ on:
       - main
 
   push:
-    tags:
-      - v*
 
   release:
     types: [published]
