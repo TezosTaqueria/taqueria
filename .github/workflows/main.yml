@@ -202,6 +202,7 @@ jobs:
 
             // Build the vscode-extension workflow comment
             const vsCodeWorkflowState = ${{ needs.vscode-extension-workflow.result }}
+            console.log(vsCodeWorkflowState)
             let vsCodeCommentBody = ''
             if (vsCodeWorkflowState.includes("success")) {
               vsCodeCommentBody = `
