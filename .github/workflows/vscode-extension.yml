@@ -100,19 +100,11 @@ jobs:
           path: ${{ steps.packageExtension.outputs.vsixPath }}
           destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}/${{ steps.setArtifactFilename.outputs.filename }}"
 
-      - name: Set public url
+      - name: Set package public url
         if: runner.os == 'Linux'
         id: public-url
         run: |
           echo "::set-output name=vsixGcsUrl::https://storage.googleapis.com/taqueria-artifacts/${{ steps.uploadFile.outputs.uploaded }}"
-
-      - name: Upload Extension Package as Artifact
-        if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ steps.setArtifactFilename.outputs.filename }}
-          path: ${{ steps.packageExtension.outputs.vsixPath }}
-          retention-days: 7
 
   publish-marketplace:
     name: Publish VSCode Extension
