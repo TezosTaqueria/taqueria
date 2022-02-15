@@ -43,8 +43,8 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - macos-latest
-          - windows-latest
+          # - macos-latest
+          # - windows-latest
     outputs:
       artifactFilename: ${{ steps.setArtifactFilename.outputs.filename }}
       vsixPath: ${{ steps.packageExtension.outputs.vsixPath }}
