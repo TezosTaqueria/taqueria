@@ -177,133 +177,133 @@ jobs:
   #       run: |
   #         npm run test:e2e --workspace tests
 
-  pr-comment:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    needs: 
-      - build-binaries
-      - vscode-extension-workflow
-      - publish-protocol-to-npm
-      - publish-sdk-to-npm
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-    steps:
-      - uses: actions/checkout@v2
+  # pr-comment:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request'
+  #   needs: 
+  #     - build-binaries
+  #     - vscode-extension-workflow
+  #     - publish-protocol-to-npm
+  #     - publish-sdk-to-npm
+  #     - publish-ligo-plugin-to-npm
+  #     - publish-smartpy-plugin-to-npm
+  #     - publish-taquito-plugin-to-npm
+  #     - publish-flextesa-plugin-to-npm
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: create pr comment
-        uses: actions/github-script@v5
-        id: pr-comment
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const git_short_sha = "${{ github.sha }}".substring(0, 8)
-            const git_tag = "${{ github.ref }}".split('tags/')[1];
+  #     - name: create pr comment
+  #       uses: actions/github-script@v5
+  #       id: pr-comment
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         script: |
+  #           const fs = require('fs');
+  #           const git_short_sha = "${{ github.sha }}".substring(0, 8)
+  #           const git_tag = "${{ github.ref }}".split('tags/')[1];
 
-            // Build the vscode-extension workflow comment
-            const vsCodeWorkflowState = ${{ needs.vscode-extension-workflow.result }}
-            let vsCodeCommentBody = ''
-            if (vsCodeWorkflowState == "success") {
-              vsCodeCommentBody = `
-                The VSIX artifact file for commit ${git_short_sha} is available [here](${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }})
-              `
-            } else {
-              vsCodeCommentBody = `
-                :x: The VSCode extension build was skipped or failed
-              `
-            }
+  #           // Build the vscode-extension workflow comment
+  #           const vsCodeWorkflowState = ${{ needs.vscode-extension-workflow.result }}
+  #           let vsCodeCommentBody = ''
+  #           if (vsCodeWorkflowState == "success") {
+  #             vsCodeCommentBody = `
+  #               The VSIX artifact file for commit ${git_short_sha} is available [here](${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }})
+  #             `
+  #           } else {
+  #             vsCodeCommentBody = `
+  #               :x: The VSCode extension build was skipped or failed
+  #             `
+  #           }
 
-            function readInfo(filePath) {
-              try {
-                const data = fs.readFileSync(filePath)
-                const JSONdata = JSON.parse(data.toString())
-                const name = JSONdata.name.split("/")[1]
-                const version = JSONdata.version
-                return { name, version }
-              } catch (error) {
-                console.error(`Got an error trying to read the file: ${error.message}`)
-              }
-            }
+  #           function readInfo(filePath) {
+  #             try {
+  #               const data = fs.readFileSync(filePath)
+  #               const JSONdata = JSON.parse(data.toString())
+  #               const name = JSONdata.name.split("/")[1]
+  #               const version = JSONdata.version
+  #               return { name, version }
+  #             } catch (error) {
+  #               console.error(`Got an error trying to read the file: ${error.message}`)
+  #             }
+  #           }
 
-            const ligo = readInfo("./taqueria-plugin-ligo/package.json")
-            const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
-            const taquito = readInfo("./taqueria-plugin-taquito/package.json")
-            const sdk = readInfo("./taqueria-sdk/package.json")
-            const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
+  #           const ligo = readInfo("./taqueria-plugin-ligo/package.json")
+  #           const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
+  #           const taquito = readInfo("./taqueria-plugin-taquito/package.json")
+  #           const sdk = readInfo("./taqueria-sdk/package.json")
+  #           const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
 
-            let body = `
-
-
-              | Git Commit | Artifacts |
-              | ---------- | --------- |
-              | ${git_short_sha} | TODO Replace after testing |
+  #           let body = `
 
 
-              | npm package installation instructions |
-              | ------------------------------------- |
-              | npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-
-              ${vsCodeCommentBody}
-            `;
+  #             | Git Commit | Artifacts |
+  #             | ---------- | --------- |
+  #             | ${git_short_sha} | TODO Replace after testing |
 
 
-            const {data: comments} = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            })
+  #             | npm package installation instructions |
+  #             | ------------------------------------- |
+  #             | npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+  #             | taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+  #             | taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+  #             | taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+  #             | taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
 
-            const botComment = comments.find(comment => comment.user.id === 41898282)                                                                       
+  #             ${vsCodeCommentBody}
+  #           `;
 
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body
-              })
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body
-              })
-            }
 
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    needs:
-      - build-binaries
-      - publish-protocol-to-npm
-      - publish-sdk-to-npm
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-    if: startsWith(github.ref, 'refs/tags/v')
-    steps:
-      - uses: actions/checkout@v2
+  #           const {data: comments} = await github.rest.issues.listComments({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             issue_number: context.issue.number,
+  #           })
 
-      - name: Download binaries 
-        id: download-binaries 
-        run: |
-          mkdir release && cd release
-          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
-          wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
-          wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
+  #           const botComment = comments.find(comment => comment.user.id === 41898282)                                                                       
 
-      - name: Release
-        id: release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./release/*
-          draft: true
+  #           if (botComment) {
+  #             await github.rest.issues.updateComment({
+  #               owner: context.repo.owner,
+  #               repo: context.repo.repo,
+  #               comment_id: botComment.id,
+  #               body: body
+  #             })
+  #           } else {
+  #             await github.rest.issues.createComment({
+  #               owner: context.repo.owner,
+  #               repo: context.repo.repo,
+  #               issue_number: context.issue.number,
+  #               body: body
+  #             })
+  #           }
+
+  # release:
+  #   name: Release
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - build-binaries
+  #     - publish-protocol-to-npm
+  #     - publish-sdk-to-npm
+  #     - publish-ligo-plugin-to-npm
+  #     - publish-smartpy-plugin-to-npm
+  #     - publish-taquito-plugin-to-npm
+  #     - publish-flextesa-plugin-to-npm
+  #   if: startsWith(github.ref, 'refs/tags/v')
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: Download binaries 
+  #       id: download-binaries 
+  #       run: |
+  #         mkdir release && cd release
+  #         wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
+  #         wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
+  #         wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
+
+  #     - name: Release
+  #       id: release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: |
+  #           ./release/*
+  #         draft: true
