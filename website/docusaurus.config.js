@@ -16,19 +16,11 @@ const config = {
 	favicon: "/img/favicon.ico",
 	organizationName: "ecadlabs", // Usually your GitHub org/user name.
 	projectName: "taqueria", // Usually your repo name.
-	plugins: [
-		[
-		  require.resolve('docusaurus-gtm-plugin'),
-		  {
-			id: 'GTM-N6G3QD5', // GTM Container ID
-		  }
-		]
-	  ],
 	presets: [
 		[
 			"@docusaurus/preset-classic",
 			/** @type {import('@docusaurus/preset-classic').Options} */
-
+				
 			({
 				docs: {
 					path: "docs",
@@ -52,6 +44,10 @@ const config = {
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
+			gtag: {
+				trackingID: "303602454",
+				anonymizeIP: true,
+			},
 			colorMode: {
 				defaultMode: "light",
 				disableSwitch: true,
