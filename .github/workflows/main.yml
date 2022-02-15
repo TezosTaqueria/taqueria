@@ -129,7 +129,7 @@ jobs:
   publish-flextesa-plugin-to-npm:
     needs:
       - publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-flextesa
     secrets:
