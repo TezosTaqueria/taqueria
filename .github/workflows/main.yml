@@ -201,10 +201,11 @@ jobs:
             const git_tag = "${{ github.ref }}".split('tags/')[1];
 
             // Build the vscode-extension workflow comment
-            const vsCodeWorkflowState = ${{ needs.vscode-extension-workflow.result }}
+            const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
+            
             console.log(vsCodeWorkflowState)
             let vsCodeCommentBody = ''
-            if (vsCodeWorkflowState.includes("success")) {
+            if (vsCodeWorkflowState.includes('success')) {
               vsCodeCommentBody = `
                 The VSIX artifact file for commit ${git_short_sha} is available [here](${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }})
               `
