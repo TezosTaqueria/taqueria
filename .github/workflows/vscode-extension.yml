@@ -153,11 +153,7 @@ jobs:
             const git_tag = "${{ github.ref }}".split('tags/')[1];
 
             let body = `
-              The VSIX artifact file for commit ${git_short_sha} is available here
-
-              | Git Commit | Download URL |
-              | ---------- | --------- |
-              | ${git_short_sha} | [${{ needs.lint-test-build.outputs.artifactFilename }}](${{ needs.lint-test-build.outputs.vsixGcsUrl }}) |
+              The VSIX artifact file for commit ${git_short_sha} is available [here](${{ needs.lint-test-build.outputs.vsixGcsUrl }})
             `;
 
             await github.rest.issues.createComment({
