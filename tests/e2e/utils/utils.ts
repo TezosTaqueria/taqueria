@@ -28,7 +28,6 @@ export const generateTestProject = async (projectPath: string, packageNames: str
     packageNames.forEach(packageName => {
         try {
             if (localPackages) {
-                console.log("checking that this is happening")
                 execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`)
             } else {
                 execSync(`cd ./${projectPath} && taq install @taqueria/plugin-${packageName}`)
