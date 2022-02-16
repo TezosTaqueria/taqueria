@@ -232,13 +232,13 @@ jobs:
             let body = `
               <table>
                 <tr>
-                  <th font-weight="bold", align="left">GitHub Commit</th>
+                  <th font-size="20px", align="left">GitHub Commit</th>
                 </tr>
                 <tr>
                   <td>${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <th font-weight="bold", align="left">Taq Binaries</th>
+                  <th font-size="20px", align="left">Taq Binaries</th>
                 </tr>
                 <tr>
                   <td><p><a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a></p></td>
@@ -250,7 +250,7 @@ jobs:
                   <td><p><a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a></p></td>
                 </tr>
                 <tr>
-                  <th font-weight="bold", align="left">npm Packages</th>
+                  <th font-size="20px", align="left">npm Packages</th>
                 </tr>
                 <tr>
                   <td>npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
@@ -268,7 +268,7 @@ jobs:
                   <td>taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <th font-weight="bold", align="left">VSCode Extension VSIX</th>
+                  <th font-size="20px", align="left">VSCode Extension VSIX</th>
                 </tr>
                 <tr>
                   <td>${vsCodeCommentBody}</td>
