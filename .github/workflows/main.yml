@@ -101,101 +101,111 @@ jobs:
 
   vscode-extension-workflow:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.vscode == 'true' || github.event_name == 'release' }}
+    if: ${{ needs.detect-changes.outputs.vscode == 'true' || 
+            github.event_name == 'release' || 
+            startsWith(github.ref, 'refs/tags/v')}}
     uses: ./.github/workflows/vscode-extension.yml
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
       VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
-  # publish-protocol-to-npm:
-  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-  #   with:
-  #     dir: taqueria-protocol
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-protocol-to-npm:
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-protocol
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  # publish-sdk-to-npm:
-  #   needs: publish-protocol-to-npm
-  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-  #   with:
-  #     dir: taqueria-sdk
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-sdk-to-npm:
+    needs: publish-protocol-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-sdk
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  # publish-ligo-plugin-to-npm:
-  #   needs: publish-sdk-to-npm
-  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-  #   with:
-  #     dir: taqueria-plugin-ligo
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-ligo-plugin-to-npm:
+    needs: publish-sdk-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-plugin-ligo
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
   
-  # publish-smartpy-plugin-to-npm:
-  #   needs: publish-sdk-to-npm
-  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-  #   with:
-  #     dir: taqueria-plugin-smartpy
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-smartpy-plugin-to-npm:
+    needs: publish-sdk-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-plugin-smartpy
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  # publish-taquito-plugin-to-npm:
-  #   needs: publish-sdk-to-npm
-  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-  #   with:
-  #     dir: taqueria-plugin-taquito
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-taquito-plugin-to-npm:
+    needs: publish-sdk-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-plugin-taquito
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  # publish-flextesa-plugin-to-npm:
-  #   needs:
-  #     - publish-sdk-to-npm
-  #   uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
-  #   with:
-  #     dir: taqueria-plugin-flextesa
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-flextesa-plugin-to-npm:
+    needs:
+      - publish-sdk-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-plugin-flextesa
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  # run-tests:
-  #   needs: build-binaries
-  #   runs-on: ubuntu-latest
+  run-tests:
+    needs: build-binaries
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v2
-  #       with:
-  #         node-version: 16.x
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
 
-  #     - uses: denoland/setup-deno@v1
-  #       with:
-  #         deno-version: "^1.0.0"
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: "^1.0.0"
 
-  #     - name: get binary and make executable from previous step for tests
-  #       run: |
-  #         wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
-  #         chmod +x taq
-  #         echo "$(pwd)" >> $GITHUB_PATH
+      - name: get binary and make executable from previous step for tests
+        run: |
+          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
+          chmod +x taq
+          echo "$(pwd)" >> $GITHUB_PATH
 
-  #     - name: install dependencies
-  #       run: npm ci
+      - name: install dependencies
+        run: npm ci
       
-  #     - name: Run unit tests
-  #       run: |
-  #         npm run test:unit --workspace tests
+      - name: Run unit tests
+        run: |
+          npm run test:unit --workspace tests
 
-  #     - name: Run integration tests
-  #       run: |
-  #         npm run test:integration --workspace tests
+      - name: Run integration tests
+        run: |
+          npm run test:integration --workspace tests
 
-  #     - name: Run e2e tests
-  #       run: |
-  #         npm run test:e2e --workspace tests
+      - name: Run e2e tests
+        run: |
+          npm run test:e2e --workspace tests
 
   pr-comment:
     runs-on: ubuntu-latest
-    if: ${{ always() && github.event_name == 'pull_request'}}
+    # Adding the 'always()' expression here allows this job to always run even if the jobs it needs have been skipped
+    if: ${{ always() && 
+            github.event_name == 'pull_request'}}
     needs: 
       - build-binaries
+      - publish-protocol-to-npm
+      - publish-sdk-to-npm
+      - publish-ligo-plugin-to-npm
+      - publish-smartpy-plugin-to-npm
+      - publish-taquito-plugin-to-npm
+      - publish-flextesa-plugin-to-npm
       - vscode-extension-workflow
     steps:
       - uses: actions/checkout@v2
@@ -218,7 +228,7 @@ jobs:
             if (vsCodeWorkflowState.includes('success')) {
               vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
             } else {
-              vsCodeCommentBody = `VSCode extension build skipped/failed`;
+              vsCodeCommentBody = `VSCode extension build skipped`;
             }
 
             function readInfo(filePath) {
@@ -299,33 +309,34 @@ jobs:
               })
             }
 
-  # release:
-  #   name: Release
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - build-binaries
-  #     - publish-protocol-to-npm
-  #     - publish-sdk-to-npm
-  #     - publish-ligo-plugin-to-npm
-  #     - publish-smartpy-plugin-to-npm
-  #     - publish-taquito-plugin-to-npm
-  #     - publish-flextesa-plugin-to-npm
-  #   if: startsWith(github.ref, 'refs/tags/v')
-  #   steps:
-  #     - uses: actions/checkout@v2
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs:
+      - build-binaries
+      - publish-protocol-to-npm
+      - publish-sdk-to-npm
+      - publish-ligo-plugin-to-npm
+      - publish-smartpy-plugin-to-npm
+      - publish-taquito-plugin-to-npm
+      - publish-flextesa-plugin-to-npm
+      - vscode-extension-workflow
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: Download binaries 
-  #       id: download-binaries 
-  #       run: |
-  #         mkdir release && cd release
-  #         wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
-  #         wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
-  #         wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
+      - name: Download binaries 
+        id: download-binaries 
+        run: |
+          mkdir release && cd release
+          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
+          wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
+          wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
 
-  #     - name: Release
-  #       id: release
-  #       uses: softprops/action-gh-release@v1
-  #       with:
-  #         files: |
-  #           ./release/*
-  #         draft: true
+      - name: Release
+        id: release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./release/*
+          draft: true
