@@ -206,9 +206,9 @@ jobs:
             console.log(vsCodeWorkflowState)
             let vsCodeCommentBody = ''
             if (vsCodeWorkflowState.includes('success')) {
-              vsCodeCommentBody = `[${{ needs.vscode-extension-workflow.outputs.artifactFilename }}](${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }})`;
+              vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
             } else {
-              vsCodeCommentBody = `:x: VSCode extension build skipped/failed`;
+              vsCodeCommentBody = `VSCode extension build skipped/failed`;
             }
 
             function readInfo(filePath) {
@@ -235,43 +235,43 @@ jobs:
                   <th>GitHub Commit</th>
                 </tr>
                 <tr>
-                  <td>${git_short_sha}</td>
+                  <td align="center">${git_short_sha}</td>
                 </tr>
                 <tr>
                   <th>Taq Binaries</th>
                 </tr>
                 <tr>
-                  <td><p><a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a></p></td>
+                  <td align="center"><p><a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a></p></td>
                 </tr>
                 <tr>
-                  <td><p><a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a></p></td>
+                  <td align="center"><p><a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a></p></td>
                 </tr>
                 <tr>
-                  <td><p><a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a></p></td>
+                  <td align="center"><p><a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a></p></td>
                 </tr>
                 <tr>
                   <th>npm Packages</th>
                 </tr>
                 <tr>
-                  <td>npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                  <td align="center">npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <td>taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                  <td align="center">taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <td>taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                  <td align="center">taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <td>taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                  <td align="center">taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <td>taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                  <td align="center">taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
                   <th>VSCode Extension VSIX</th>
                 </tr>
                 <tr>
-                  <td>${vsCodeCommentBody}</td>
+                  <td align="center">${vsCodeCommentBody}</td>
                 </tr>
               </table>
             `;
