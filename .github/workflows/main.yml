@@ -102,7 +102,7 @@ jobs:
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
   publish-protocol-to-npm:
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-protocol
     secrets:
@@ -110,7 +110,7 @@ jobs:
 
   publish-sdk-to-npm:
     needs: publish-protocol-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-sdk
     secrets:
@@ -118,7 +118,7 @@ jobs:
 
   publish-ligo-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-ligo
     secrets:
@@ -126,7 +126,7 @@ jobs:
   
   publish-smartpy-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-smartpy
     secrets:
@@ -134,7 +134,7 @@ jobs:
 
   publish-taquito-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-taquito
     secrets:
@@ -143,14 +143,15 @@ jobs:
   publish-flextesa-plugin-to-npm:
     needs:
       - publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-flextesa
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   run-tests:
-    needs: build-binaries
+    needs: 
+      - build-binaries
     runs-on: ubuntu-latest
 
     steps:
@@ -178,7 +179,8 @@ jobs:
 
       - name: Run integration tests
         run: |
-          npm run test:integration --workspace tests
+          npm run build -w taqueria-sdk
+          npm run test:integration -w tests
 
       - name: Run e2e tests
         run: |
