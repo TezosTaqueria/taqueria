@@ -14,6 +14,20 @@ env:
   SCOPE: '@taqueria'
 
 jobs:
+  # When we use reusable we lose the ability to to filter out the workflow for changes to certain paths.
+  # This job creates boolean outputs based on path filters. These outputs can then be used as job conditions
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      vscode: ${{ steps.filter.outputs.vscode }}
+    steps:
+    # For pull requests it's not necessary to checkout the code
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          vscode:
+            - 'taqueria-vscode-extension/**'
   build-binaries:
     permissions:
       contents: 'read'
@@ -86,6 +100,7 @@ jobs:
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
   vscode-extension-workflow:
+    if: ${{ needs.detect-changes.outputs.vscode == 'true' }}
     uses: ./.github/workflows/vscode-extension.yml
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
