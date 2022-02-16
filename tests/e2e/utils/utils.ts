@@ -2,7 +2,7 @@ import {execSync} from "child_process";
 import path from "path";
 import fs from "fs";
 
-export const generateTestProject = async (projectPath: string, packageNames: string[], localPackages = true) =>{
+export const generateTestProject = async (projectPath: string, packageNames: string[] = [], localPackages: boolean = true) => {
     try{
         execSync(`taq init ${projectPath}`)
     } catch(error){
@@ -25,19 +25,21 @@ export const generateTestProject = async (projectPath: string, packageNames: str
 
     await checkFolderExistsWithTimeout(`./${projectPath}/package.json`, 25000);
 
-    packageNames.forEach(packageName => {
-        try {
-            if (localPackages) {
-                execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`)
-            } else {
-                execSync(`cd ./${projectPath} && taq install @taqueria/plugin-${packageName}`)
+    if (packageNames.length > 0) {
+        packageNames.forEach(packageName => {
+            try {
+                if (localPackages) {
+                    execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`)
+                } else {
+                    execSync(`cd ./${projectPath} && taq install @taqueria/plugin-${packageName}`)
+                }
+            } catch (error) {
+                throw new Error(`error: ${error}`);
             }
-        } catch (error) {
-            throw new Error(`error: ${error}`);
-        }
-    });
-
-    await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`, 25000);
+        });
+    
+        await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`, 25000);
+    }
 }
 
 // The solution was taken from this source:
