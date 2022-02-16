@@ -3,25 +3,48 @@ import {exec, execSync} from "child_process";
 import fs from "fs";
 
 const taqueriaProjectPath = './e2e/auto-test-cli';
+const helpContentsNoProject = `taq [command]
+
+Commands:
+  taq init [projectDir]  Initialize a new project
+
+Options:
+      --version     Show version number                           [boolean]
+  -p, --projectDir  Path to your project directory          [default: "./"]
+  -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+
+Taqueria is currently in BETA. You've been warned. :)
+
+Your config.json file looks invalid.
+`;
+
+// Test template
+// test('', () => {
+//     try {
+        
+//     } catch(error) {
+//         throw new Error (`error: ${error}`);
+//     }
+// });
 
 describe("E2E Testing for taqueria general functionality", () => {
 
     // beforeAll(async () => {
-    //     await generateTestProject(taqueriaProjectPath, []);
+    //     await generateTestProject(taqueriaProjectPath);
     // })
 
-    test.skip('Verify that taq gives the help menu', () => {
+    test('Verify that taq --help gives the help menu', () => {
         try {
-            const stdout = execSync("taq").toString();
-            expect(stdout.trim()).toEqual("Project taq'ified!")
-            // console.log(output)
-            // expect(output).toContain("--env")
+            exec('taq --help', (error, stdout, stderr) => {
+                expect(stderr).toBe(helpContentsNoProject)
+            });
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
     });
 
-    test('Verify that taq reports the correct version', () => {
+    test.skip('Verify that taq reports the correct version', () => {
         const version = execSync('taq --version').toString().trim();
         if (process.env.CI === 'true') {
             try {
@@ -39,6 +62,14 @@ describe("E2E Testing for taqueria general functionality", () => {
             }
         }
         
+    });
+
+    test.skip('Test that ', () => {
+        try {
+            console.log("good stuff")
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
     });
 
     // Clean up process to remove taquified project folder
