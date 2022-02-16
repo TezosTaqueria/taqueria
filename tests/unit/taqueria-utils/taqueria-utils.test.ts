@@ -96,7 +96,7 @@ Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t: an
 //     sanitizeOps: false
 // });
 
-Deno.test({name: "Negative scenario test for {writeTextFile} function to catch error",  fn: async () => {
+Deno.test({ignore: true, name: "Negative scenario test for {writeTextFile} function to catch error",  fn: async () => {
         assertRejects( ()=> {
                 promise (writeTextFile("./unit/taqueria-utils/data/temp")("test"));
                 throw new Error("Is a directory (os error 21), open './unit/taqueria-utils/data/temp'\n")
