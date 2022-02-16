@@ -206,9 +206,9 @@ jobs:
             console.log(vsCodeWorkflowState)
             let vsCodeCommentBody = ''
             if (vsCodeWorkflowState.includes('success')) {
-              vsCodeCommentBody = "The VSIX artifact file for commit ${git_short_sha} is available [here](${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }})";
+              vsCodeCommentBody = `The VSIX artifact file for commit ${git_short_sha} is available [here](${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }})`;
             } else {
-              vsCodeCommentBody = ":x: The VSCode extension build was skipped or failed";
+              vsCodeCommentBody = `:x: The VSCode extension build was skipped or failed`;
             }
 
             function readInfo(filePath) {
