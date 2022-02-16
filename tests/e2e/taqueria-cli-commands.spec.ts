@@ -74,7 +74,7 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that taq reports the correct version', () => {
         const version = execSync('taq --version').toString().trim();
         console.log(process.env)
-        if (process.env.CI === 'true') {
+        if (process.env.CI == 'true') {
             try {
                 const packageJsonContents = JSON.parse(fs.readFileSync('package.json').toString())
                 expect(version).toEqual('v' + packageJsonContents.version)
