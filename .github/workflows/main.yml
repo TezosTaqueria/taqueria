@@ -232,25 +232,29 @@ jobs:
             let body = `
               <table>
                 <tr>
-                  <th font-size="32px">GitHub Commit</th>
-                  <td>${git_short_sha}</td>
+                  <th scope="row">Taq Binaries</th>
+                  <td>
+                      <p>
+                          <a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a><br>
+                          <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
+                          <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
+                      </p>
+                  </td>
                 </tr>
                 <tr>
-                  <th font-size="32px">Taq Binaries</th>
-                  <td><p><a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a></p><br>
-                  <td><p><a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a></p><br>
-                  <td><p><a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a></p></td>
+                  <th scope="row">npm Packages</th>
+                  <td>
+                      <p>
+                          npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+                          taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+                          taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+                          taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+                          taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
+                      </p>
+                  </td>
                 </tr>
                 <tr>
-                  <th font-size="32px">npm Packages</th>
-                  <td>npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                  <td>taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                  <td>taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                  <td>taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                  <td>taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
-                </tr>
-                <tr>
-                  <th font-size="32px">VSCode Extension VSIX</th>
+                  <th scope="row">VSCode Extension VSIX</th>
                   <td>${vsCodeCommentBody}</td>
                 </tr>
               </table>
