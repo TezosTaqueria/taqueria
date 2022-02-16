@@ -240,11 +240,9 @@ jobs:
                 <tr>
                   <th>Taq Binaries</th>
                 </tr>
-                <tr>
-                    <td>[Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }})</td>
-                    <td>[MacOS](${{ needs.build-binaries.outputs.public-url-macos }})</td>
-                    <td>[Windows](${{ needs.build-binaries.outputs.public-url-windows }})</td>
-                </tr>
+                <tr><p><a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a></p></tr>
+                <tr>[MacOS](${{ needs.build-binaries.outputs.public-url-macos }})</tr>
+                <tr>[Windows](${{ needs.build-binaries.outputs.public-url-windows }})</tr>
                 <tr>
                   <th>npm Packages</th>
                 </tr>
