@@ -5,12 +5,13 @@ import path from "path";
 import waitForExpect from "wait-for-expect";
 import { TezosToolkit } from '@taquito/taquito';
 
-const tezos = new TezosToolkit('https://hangzhounet.api.tez.ie');
-const taqueriaProjectPath = 'e2e/auto-test-taquito-plugin';
-const contractRegex = new RegExp("^\\w{36}$");
-let environment: string;
 
 describe("E2E Testing for taqueria taquito plugin",  () => {
+
+    const tezos = new TezosToolkit('https://hangzhounet.api.tez.ie');
+    const taqueriaProjectPath = 'e2e/auto-test-taquito-plugin';
+    const contractRegex = new RegExp("^\\w{36}$");
+    let environment: string;
 
     beforeAll(async () => {
         await generateTestProject(taqueriaProjectPath, ["taquito"]);
@@ -118,7 +119,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
                 expect(stdoutDeploy).toContain("hangzhounet");
                 const [,,contractHash] = stdoutDeploy.split("│");
                 smartContractHash = contractHash.trim();
-                expect(contractHash.trim()).toMatch(contractRegex);
+                expect(smartContractHash.trim()).toMatch(contractRegex);
             });
 
             // 4. Verify that contract has been originated to the network
