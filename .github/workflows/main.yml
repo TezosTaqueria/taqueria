@@ -100,7 +100,8 @@ jobs:
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
   vscode-extension-workflow:
-    if: ${{ needs.detect-changes.outputs.vscode == 'true' }}
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.vscode == 'true' || github.event_name == 'release' }}
     uses: ./.github/workflows/vscode-extension.yml
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
@@ -196,12 +197,6 @@ jobs:
     needs: 
       - build-binaries
       - vscode-extension-workflow
-      # - publish-protocol-to-npm
-      # - publish-sdk-to-npm
-      # - publish-ligo-plugin-to-npm
-      # - publish-smartpy-plugin-to-npm
-      # - publish-taquito-plugin-to-npm
-      # - publish-flextesa-plugin-to-npm
     steps:
       - uses: actions/checkout@v2
 
