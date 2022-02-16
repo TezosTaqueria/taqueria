@@ -199,7 +199,6 @@ jobs:
     runs-on: ubuntu-latest
     # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
     if: ${{ always() &&
-            !(contains(needs.*.result, 'failure')) && 
             github.event_name == 'pull_request'}}
     needs: 
       - build-binaries
@@ -209,6 +208,7 @@ jobs:
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
+      - run-tests
       - vscode-extension-workflow
     steps:
       - uses: actions/checkout@v2
