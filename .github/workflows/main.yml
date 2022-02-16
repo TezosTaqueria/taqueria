@@ -232,46 +232,46 @@ jobs:
             let body = `
               <table>
                 <tr>
-                  <th>GitHub Commit</th>
+                  <th font-weight="bold", align="left">GitHub Commit</th>
                 </tr>
                 <tr>
-                  <td align="center">${git_short_sha}</td>
+                  <td>${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <th>Taq Binaries</th>
+                  <th font-weight="bold", align="left">Taq Binaries</th>
                 </tr>
                 <tr>
-                  <td align="center"><p><a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a></p></td>
+                  <td><p><a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a></p></td>
                 </tr>
                 <tr>
-                  <td align="center"><p><a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a></p></td>
+                  <td><p><a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a></p></td>
                 </tr>
                 <tr>
-                  <td align="center"><p><a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a></p></td>
+                  <td><p><a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a></p></td>
                 </tr>
                 <tr>
-                  <th>npm Packages</th>
+                  <th font-weight="bold", align="left">npm Packages</th>
                 </tr>
                 <tr>
-                  <td align="center">npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                  <td>npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <td align="center">taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                  <td>taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <td align="center">taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                  <td>taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <td align="center">taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                  <td>taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <td align="center">taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                  <td>taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
                 </tr>
                 <tr>
-                  <th>VSCode Extension VSIX</th>
+                  <th font-weight="bold", align="left">VSCode Extension VSIX</th>
                 </tr>
                 <tr>
-                  <td align="center">${vsCodeCommentBody}</td>
+                  <td>${vsCodeCommentBody}</td>
                 </tr>
               </table>
             `;
