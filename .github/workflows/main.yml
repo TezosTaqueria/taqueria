@@ -230,28 +230,38 @@ jobs:
             const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
 
             let body = `
-              |                           Git Commit                            |
-              | :-------------------------------------------------------------: |
-              | ${git_short_sha} |
-
-              |                          Taq Binaries                           |
-              | :-------------------------------------------------------------: |
-              | [Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }}) | 
-              | [MacOS](${{ needs.build-binaries.outputs.public-url-macos }}) |
-              | [Windows](${{ needs.build-binaries.outputs.public-url-windows }}) |
-
-
-              |                          npm Packages                           |
-              | :-------------------------------------------------------------: |
-              | npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha} |
-              | taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha} |
-              | taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha} |
-              | taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha} |
-              | taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha} |
-
-              |                     VSCode Extension VSIX                       |
-              | :-------------------------------------------------------------: |
-              | ${vsCodeCommentBody} |
+              <table>
+                <tr>
+                  <th>GitHub Commit</th>
+                </tr>
+                <tr>
+                    <td>${git_short_sha}</td>
+                </tr>
+                <tr>
+                  <th>Taq Binaries</th>
+                </tr>
+                <tr>
+                    <td>[Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }})</td>
+                    <td>[MacOS](${{ needs.build-binaries.outputs.public-url-macos }})</td>
+                    <td>[Windows](${{ needs.build-binaries.outputs.public-url-windows }})</td>
+                </tr>
+                <tr>
+                  <th>npm Packages</th>
+                </tr>
+                <tr>
+                    <td>npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                    <td>taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                    <td>taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                    <td>taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                    <td>taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}</td>
+                </tr>
+                <tr>
+                  <th>VSCode Extension VSIX</th>
+                </tr>
+                <tr>
+                    <td>${vsCodeCommentBody}</td>
+                </tr>
+              </table>
             `;
 
 
