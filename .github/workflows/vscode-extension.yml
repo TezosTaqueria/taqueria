@@ -84,8 +84,7 @@ jobs:
           dryRun: true
           yarn: true
           packagePath: ${{ env.GIT_WORKSPACE }}
-          preRelease: true
-          
+          preRelease: true   
       - id: setArtifactFilename
         if: runner.os == 'Linux'
         run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}"

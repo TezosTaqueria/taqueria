@@ -4,9 +4,11 @@ on:
   pull_request:
     branches:
       - main
+
   push:
     tags:
       - v*
+
   release:
     types: [published]
 
@@ -99,17 +101,6 @@ jobs:
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  vscode-extension-workflow:
-    needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.vscode == 'true' || 
-            github.event_name == 'release' || 
-            startsWith(github.ref, 'refs/tags/v')}}
-    uses: ./.github/workflows/vscode-extension.yml
-    secrets:
-      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
-      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
-      VSCE_PAT: ${{ secrets.VSCE_PAT }} 
-
   publish-protocol-to-npm:
     uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
     with:
@@ -193,10 +184,22 @@ jobs:
         run: |
           npm run test:e2e --workspace tests
 
+  vscode-extension-workflow:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.vscode == 'true' || 
+            github.event_name == 'release' || 
+            startsWith(github.ref, 'refs/tags/v')}}
+    uses: ./.github/workflows/vscode-extension.yml
+    secrets:
+      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
+      VSCE_PAT: ${{ secrets.VSCE_PAT }} 
+
   pr-comment:
     runs-on: ubuntu-latest
-    # Adding the 'always()' expression here allows this job to always run even if the jobs it needs have been skipped
-    if: ${{ always() && 
+    # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
+    if: ${{ always() &&
+            !(contains(needs.*.result, 'failure')) && 
             github.event_name == 'pull_request'}}
     needs: 
       - build-binaries
@@ -228,7 +231,7 @@ jobs:
             if (vsCodeWorkflowState.includes('success')) {
               vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
             } else {
-              vsCodeCommentBody = `VSCode extension build skipped`;
+              vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
             }
 
             function readInfo(filePath) {
