@@ -232,6 +232,10 @@ jobs:
             let body = `
               <table>
                 <tr>
+                  <th scope="row">Latest Commit</th>
+                  <td>${git_short_sha}</td>
+                </tr>
+                <tr>
                   <th scope="row">Taq Binaries</th>
                   <td>
                       <p>
