@@ -55,7 +55,7 @@ export class SanitizedAbsPath {
     }
 }
 
-export type Future<L,R> = unknown
+export type Future<L,R> = ReturnType<typeof attemptP>
 
 export type reject = (_err:TaqError|Error) => void
 
