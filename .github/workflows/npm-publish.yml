@@ -43,13 +43,13 @@ jobs:
           npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}" --workspace $GIT_WORKSPACE
           npm publish --workspace $GIT_WORKSPACE --tag "preview" --access public
       
-      - name: Publish for prerelease
-        if:  ${{ github.event.release.prerelease && github.event.action == 'published' }}
-        run: |
-          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}" --workspace $GIT_WORKSPACE
-          npm publish --workspace=$GIT_WORKSPACE --tag 'next' --access public
+      # - name: Publish for prerelease
+      #   if:  ${{ github.event.release.prerelease && github.event.action == 'published' }}
+      #   run: |
+      #     npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}" --workspace $GIT_WORKSPACE
+      #     npm publish --workspace=$GIT_WORKSPACE --tag 'next' --access public
       
-      - name: Publish for official release
-        if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
-        run: |
-          npm publish --workspace=$GIT_WORKSPACE --tag 'latest' --access public
+      # - name: Publish for official release
+      #   if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
+      #   run: |
+      #     npm publish --workspace=$GIT_WORKSPACE --tag 'latest' --access public
