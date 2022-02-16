@@ -1,15 +1,6 @@
 name: VSCode Extension
 
 on:
-  # pull_request:
-  #   # TODO: add below again after testing
-  #   # paths:
-  #   #   - 'taqueria-vscode-extension/**'
-  # push:
-  #   tags:
-  #     - v*
-  # release:
-  #   types: [published]
   workflow_call:
     secrets:
       GCP_PROJECT:
@@ -22,6 +13,9 @@ on:
       vsixGcsUrl:
         description: "The download URL for the VSIX artifact in GCS"
         value: ${{ jobs.lint-test-build.outputs.vsixGcsUrl }}
+      artifactFilename:
+        description: "The vsix artifact file name"
+        value: ${{ jobs.lint-test-build.outputs.artifactFilename }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
@@ -43,8 +37,8 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          # - macos-latest
-          # - windows-latest
+          - macos-latest
+          - windows-latest
     outputs:
       artifactFilename: ${{ steps.setArtifactFilename.outputs.filename }}
       vsixPath: ${{ steps.packageExtension.outputs.vsixPath }}
@@ -146,31 +140,4 @@ jobs:
           extensionFile: ${{ needs.lint-test-build.outputs.vsixPath }}
           registryUrl: https://marketplace.visualstudio.com
           preRelease: true
-
-  # pr-comment:
-  #   runs-on: ubuntu-latest
-  #   needs: 
-  #     - lint-test-build
-  #   if: github.event_name == 'pull_request'
-  #   steps:
-  #     - uses: actions/checkout@v2
-
-  #     - name: create pr comment
-  #       uses: actions/github-script@v5
-  #       id: pr-comment
-  #       with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         script: |
-  #           const git_short_sha = "${{ github.sha }}".substring(0, 8)
-  #           const git_tag = "${{ github.ref }}".split('tags/')[1];
-
-  #           let body = `
-  #             The VSIX artifact file for commit ${git_short_sha} is available [here](${{ needs.lint-test-build.outputs.vsixGcsUrl }})
-  #           `;
-
-  #           await github.rest.issues.createComment({
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             issue_number: context.issue.number,
-  #             body: body
-  #           })
+          

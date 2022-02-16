@@ -206,9 +206,9 @@ jobs:
             console.log(vsCodeWorkflowState)
             let vsCodeCommentBody = ''
             if (vsCodeWorkflowState.includes('success')) {
-              vsCodeCommentBody = `The VSIX artifact file for commit ${git_short_sha} is available [here](${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }})`;
+              vsCodeCommentBody = `[${{ needs.vscode-extension-workflow.outputs.artifactFilename }}](${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }})`;
             } else {
-              vsCodeCommentBody = `:x: The VSCode extension build was skipped or failed`;
+              vsCodeCommentBody = `:x: VSCode extension build skipped/failed`;
             }
 
             function readInfo(filePath) {
@@ -230,8 +230,6 @@ jobs:
             const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
 
             let body = `
-
-
               |                           Git Commit                            |
               | :-------------------------------------------------------------: |
               | ${git_short_sha} |
