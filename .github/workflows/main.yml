@@ -199,6 +199,7 @@ jobs:
     runs-on: ubuntu-latest
     # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
     if: ${{ always() &&
+            !(contains(needs.*.result, 'failure')) && 
             github.event_name == 'pull_request'}}
     needs: 
       - build-binaries
