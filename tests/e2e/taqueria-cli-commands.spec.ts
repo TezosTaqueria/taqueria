@@ -47,7 +47,7 @@ Taqueria is currently in BETA. You've been warned. :)
 //     }
 // });
 
-describe("E2E Testing for taqueria general functionality", () => {
+describe("E2E Testing for taqueria CLI,", () => {
 
     beforeAll(async () => {
         await generateTestProject(taqueriaProjectPath);
@@ -91,9 +91,39 @@ describe("E2E Testing for taqueria general functionality", () => {
         
     });
 
-    test('Test that ', () => {
+    test('Verify that the config directory can be set when initializing a project', async () => {
+        const projectName = 'test-1'
+        const configDirName = 'configDirProject'
+
         try {
-            console.log("good stuff")
+            await exec(`taq init ${projectName} -d ${configDirName}`)
+
+            const projectContents = await exec(`ls ${projectName}`)
+            const configDirContents = await exec(`ls ${projectName}/${configDirName}`)
+
+            expect(projectContents.stdout).toContain(configDirName)
+            expect(configDirContents.stdout).toContain('config.json')
+
+            await fs.promises.rm(`./${projectName}`, { recursive: true })
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    });
+
+    test('Verify that help message reacts to config directory not being in the default location', async () => {
+        const projectName = 'test-1'
+        const configDirName = 'configDirProject'
+
+        try {
+            await exec(`taq init ${projectName} -d ${configDirName}`)
+
+            const helpContents = await exec(`taq --help -p ${projectName}`)
+            const helpContentsWithDir = await exec(`taq --help -p ${projectName} -d ${configDirName}`)
+
+            expect(helpContents.stderr).toContain('Your config.json file looks invalid.')
+            expect(helpContentsWithDir.stderr).not.toContain('Your config.json file looks invalid.')
+
+            await fs.promises.rm(`./${projectName}`, { recursive: true })
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
