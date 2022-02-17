@@ -126,7 +126,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
             ({projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
                 return initProject(projectDir, configDir, i18n, maxConcurrency, quickstart)
             },
-            fork (console.error) (console.log)
+            forkCatch (console.error) (console.error) (console.log)
         )
     )
     .option('fromVsCode', {
@@ -164,7 +164,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         // a plugin distributed and installable via NPM. This should support other means of distribution
         (inputArgs: InstallPluginArgs) => pipe(
             NPM.installPlugin(parsedArgs.configDir, parsedArgs.projectDir, i18n, inputArgs.pluginName),
-            fork (displayError(cliConfig)) (console.log)
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
     .alias('i', 'install')
@@ -504,7 +504,7 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                 )
                 : exec(task.handler, args)
 
-            fork (displayError(cliConfig)) (identity) (handler)
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (identity) (handler)
         }
     })
 )
@@ -586,11 +586,11 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
                 : reject("state.json was generated with a different build of taqueria")
         ),
         chainRej (_ => computeState(stateAbspath, config, env, parsedArgs, i18n)),
-        // chain ((state: State) => 
-        //     config.hash.value === state.configHash.value
-        //         ? resolve(state)
-        //         : computeState(stateAbspath, config, env, parsedArgs, i18n)
-        // )
+        chain ((state: State) => 
+            config.hash.value === state.configHash.value
+                ? resolve(state)
+                : computeState(stateAbspath, config, env, parsedArgs, i18n)
+        )
     )
 )
 

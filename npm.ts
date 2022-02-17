@@ -3,8 +3,8 @@ import {i18n} from './taqueria-types.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {exec, readJsonFile, writeJsonFile} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {map, chain, chainRej, reject} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
-import {getConfig, make} from './taqueria-config.ts'
+import {map, chain, chainRej, resolve, reject} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {getConfig} from './taqueria-config.ts'
 
 // import {log, debug} from './taqueria-utils/taqueria-utils.ts'
 
@@ -86,7 +86,7 @@ export const uninstallPlugin = (configDir: SanitizedPath, projectDir: SanitizedA
         const pluginName = getPluginName(plugin)
         const plugins = config.plugins.filter(plugin => plugin.name != pluginName)
         return pipe(
-            make({...config, plugins}),
+            resolve({...config, plugins}),
             chain (writeJsonFile(config.configFile.value))                    
         )
     }),

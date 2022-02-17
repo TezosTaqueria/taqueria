@@ -64,20 +64,6 @@ export const defaultConfig : Config = {
 
 export const getDefaultMaxConcurrency = () => 10
 
-export const make = (data: Record<string, unknown>) : Future<TaqError, ConfigArgs> => {
-    // TODO: Change decoding/validation library
-    const err = undefined
-    const validData = {
-        ...defaultConfig,
-        ...data
-    } as ConfigArgs
-
-    // const [err, validData] = validate(data, ConfigDecoder)
-    return err === undefined
-        ? resolve(validData)
-        : reject({kind: "E_INVALID_CONFIG", msg: "The config.json file does not adhere to the required schema."})
-}
-
 export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
     ConfigDir.create(projectDir, configDir, create),
     map ((configDir: ConfigDir) => joinPaths(configDir.value, "config.json"))
@@ -102,7 +88,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedP
 )
 
 
-export const toConfigArgs = (configPath: string, configDir: SanitizedPath, projectDir: SanitizedAbsPath) => (config: Config) => pipe(
+export const toConfigArgs = (configPath: string, configDir: SanitizedPath, projectDir: SanitizedAbsPath, config: Config): Future<TaqError, ConfigArgs> => pipe(
     SHA256.futureOf(JSON.stringify(config)),
     map(hash => ({
         ...config,
@@ -116,6 +102,5 @@ export const toConfigArgs = (configPath: string, configDir: SanitizedPath, proje
 export const getConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, _i18n: i18n, create=false) => pipe(
         getRawConfig(projectDir, configDir, create),
         both (getConfigPath(projectDir, configDir, create)),
-        map (([configPath, config]) => ({configPath, config})),
-        chain (make)
+        chain (([configPath, config]) => toConfigArgs(configPath, configDir, projectDir, config)),
     )
