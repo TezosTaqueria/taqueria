@@ -64,7 +64,7 @@ jobs:
         env:
           TAQ_VERSION: "{{ github.ref_name }}"
         run: |
-          DENO=./deno deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild ${{ github.ref_name }} --setVersion ${{ github.ref_name }}
+          DENO_DIR=./deno deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild ${{ github.ref_name }} --setVersion ${{ github.ref_name }}
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
