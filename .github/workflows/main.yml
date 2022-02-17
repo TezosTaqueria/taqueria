@@ -338,7 +338,7 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
           wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
           wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
-          wget ${{ needs.lint-test-build.outputs.vsixGcsUrl }}
+          wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
       - name: Release
         id: release
