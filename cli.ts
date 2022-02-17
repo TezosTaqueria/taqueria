@@ -8,7 +8,7 @@ import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parall
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import {ensurePathDoesNotExist, exec, gitClone, isTaqError, joinPaths, mkdir, readJsonFile, rm, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
-import {SanitizedAbsPath, SanitizedPath, TaqError, Future, SanitizedUrl} from './taqueria-utils/taqueria-utils-types.ts'
+import {SanitizedAbsPath, SanitizedPath, TaqError, Future, SanitizedUrl, mapFuture, chainFuture} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
@@ -270,21 +270,20 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
 
 const scaffoldProject = (scaffoldUrl: SanitizedUrl, scaffoldProjectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
     // TODO: i18n of messages
-    
     // Clone git into destination folder (Initial version assumes git is installed)
-    log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}\n...`),
-    ensurePathDoesNotExist(scaffoldProjectDir.value),
+    log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}\n...`)(null),
+    () => ensurePathDoesNotExist(scaffoldProjectDir.value),
     log(`git clone...`),
-    gitClone(scaffoldUrl, scaffoldProjectDir),
+    chain(gitClone(scaffoldUrl)),
     // TODO: Run initialization script
     // Run init found in .taq/scaffold.json
     // log(`initializing...`),
     // Load .taq/scaffold.json (if it exists)
     // Run init command
-    log(`cleanup...`),
-    rm(scaffoldProjectDir.join(`.taq/scaffold.json`)),
-    rm(scaffoldProjectDir.join(`.git`)),
-    map (() => i18n.__("scaffoldDoneMsg"))
+    // log(`cleanup...`),
+    () => rm(scaffoldProjectDir.join(`.taq/scaffold.json`)),
+    () => rm(scaffoldProjectDir.join(`.git`)),
+    mapFuture(() => i18n.__("scaffoldDoneMsg"))
 )
 
 const getPluginExe = (parsedArgs: SanitizedInitArgs, plugin: InstalledPlugin) => {

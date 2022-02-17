@@ -1,10 +1,10 @@
 import type {Config, Task, InstalledPlugin, Action, ConfigArgs} from './taqueria-protocol/taqueria-protocol-types.ts'
-import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
+import {Future, TaqError, resolveFuture, rejectFuture} from './taqueria-utils/taqueria-utils-types.ts'
 import {ConfigDir, i18n} from './taqueria-types.ts'
 import {SanitizedPath, SanitizedAbsPath, SHA256} from './taqueria-utils/taqueria-utils-types.ts'
 import {debug, readJsonFile, writeJsonFile, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {resolve, reject, map, chain, mapRej, chainRej} from 'https://cdn.skypack.dev/fluture'
+import {map, chain, mapRej, chainRej} from 'https://cdn.skypack.dev/fluture'
 
 export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<number>) => unknown
 
@@ -70,12 +70,12 @@ export const make = (data: Record<string, unknown>) : Future<TaqError, ConfigArg
     const validData = {
         ...defaultConfig,
         ...data
-    }
+    } as ConfigArgs
 
     // const [err, validData] = validate(data, ConfigDecoder)
     return err === undefined
-        ? resolve(validData)
-        : reject({kind: "E_INVALID_CONFIG", msg: "The config.json file does not adhere to the required schema."})
+        ? resolveFuture(validData)
+        : rejectFuture({kind: "E_INVALID_CONFIG", msg: "The config.json file does not adhere to the required schema."})
 }
 
 export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
@@ -88,7 +88,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedP
     chain ( (configPath : string) => pipe(
         readJsonFile(configPath),
         chainRej ((err:unknown) => {
-            if (!create) return reject(err)
+            if (!create) return resolveFuture(err)
             else {
                 return pipe(
                     writeJsonFile(configPath) (defaultConfig),
