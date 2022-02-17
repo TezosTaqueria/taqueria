@@ -78,7 +78,6 @@ describe("E2E Testing for taqueria CLI,", () => {
         } catch (error) {
             throw new Error (`error: ${error}`);
         }
-        
     });
 
     test('Verify that the config directory can be set when initializing a project', async () => {
