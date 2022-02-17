@@ -1,14 +1,14 @@
 import type {UnvalidatedPluginInfo, InstalledPlugin, Config, ConfigArgs, Action, Alias, Verb, Option, PositionalArg} from './taqueria-protocol/taqueria-protocol-types.ts'
 import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
-import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs} from './taqueria-types.ts'
+import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs, SanitizedScaffoldInitArgs} from './taqueria-types.ts'
 import {State} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs/deno.ts'
-import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.skypack.dev/fluture';
+import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode, attempt} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
-import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
+import {as, ensurePathDoesNotExist, exec, gitClone, isTaqError, joinPaths, mkdir, readJsonFile, rm, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
+import {SanitizedAbsPath, SanitizedPath, TaqError, Future, SanitizedUrl} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
@@ -139,17 +139,17 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
                     type: 'string',
                     default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git',
                 })
-                .option('p', {
-                    alias: 'projectDir',
+                .positional('scaffoldProjectDir', {
+                    alias: 'scaffoldProjectDir',
                     type: 'string',
                     describe: i18n.__('scaffoldProjectDirDesc'),
                     default: './taqueria-quickstart',
                 })
         },
         (args: RawInitArgs) => pipe(
-            sanitizeArgs(args), 
-            ({scaffoldUrl, projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
-                return scaffoldProject(scaffoldUrl ?? '', projectDir, configDir, i18n, maxConcurrency, quickstart)
+            sanitizeScaffoldArgs(args), 
+            ({scaffoldUrl, scaffoldProjectDir, configDir, maxConcurrency, quickstart}: SanitizedScaffoldInitArgs) => {
+                return scaffoldProject(scaffoldUrl, scaffoldProjectDir, configDir, i18n, maxConcurrency, quickstart)
             },
             fork (console.error) (console.log)
         )
@@ -216,7 +216,8 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         (inputArgs: RawInitArgs) => pipe(
             parsedArgs.projectDir.join('.taq', 'state.json').value,
             readJsonFile,
-            map ((state: State) => Object.entries(state.tasks).reduce(
+            as<State>(),
+            map ((state) => Object.entries(state.tasks).reduce(
                 (retval: Record<string, string[] | null>, [taskName, implementation]) => {
                     if ('task' in implementation) {
                         const task = implementation as Task
@@ -249,7 +250,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
     extendCLI(env, parsedArgs, i18n)
 )
 
-const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync())
+const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync()) as Future<TaqError, RawInitArgs>
 
 const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
     getConfig(projectDir, configDir, i18n, true),
@@ -268,64 +269,22 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
     map (() => i18n.__("bootstrapMsg"))
 )
 
-const scaffoldProject = (scaffoldUrl: string, projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
+const scaffoldProject = (scaffoldUrl: SanitizedUrl, scaffoldProjectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
+    // TODO: i18n of messages
     // Clone git into destination folder (Initial version assumes git is installed)
-    attemptP(async () => {
-        // TODO: Convert to fluture
-        // TODO: i18n of messages
-
-        console.log(`scaffolding\n into: ${projectDir.value}\n from: ${scaffoldUrl}\n...`)
-
-        // Verify projectDir does not exist
-        try {
-            await Deno.stat(projectDir.value);
-            return Promise.reject({kind: 'E_SCAFFOLD_PROJECT_DIR_ALREADY_EXISTS', msg: 'TODO i18n message'})
-        } catch(_e) {
-            // Expect exception when trying to stat a new directory
-        }
-
-        // git clone
-        console.log(`git clone...`)
-
-        const cloneProcess = Deno.run({
-            cmd: ["git", "clone", scaffoldUrl, projectDir.value],
-        });
-        const cloneResult = await cloneProcess.status();
-        
-        if (!cloneResult.success) {
-            return Promise.reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'TODO i18n message'})
-        }
-
-
-        // Run init found in .taq/scaffold.json
-        console.log(`initializing...`)
-        // TODO: Run initialization script
-        // Load .taq/scaffold.json (if it exists)
-        // Run init command
-
-
-        // Cleanup:
-        console.log(`cleanup...`)
-
-        try {
-            console.log(`removing ${joinPaths(projectDir.value, `.taq/scaffold.json`)}`)
-            await Deno.remove(joinPaths(projectDir.value, `.taq/scaffold.json`));
-        } catch {
-            // Ignore if doesn't exist
-        }
-        try {
-            console.log(`removing ${joinPaths(projectDir.value, `.git`)}`)
-            await Deno.remove(joinPaths(projectDir.value, `.git`), { recursive: true });
-        } catch {
-            // Ignore if doesn't exist
-        }
-
-
-        // Done!
-        console.log(`scaffolding complete!`)
-    }),
-    // Done
-    map (() => i18n.__("scaffoldDoneMsg"))
+    log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}\n...`)(null),
+    () => ensurePathDoesNotExist(scaffoldProjectDir.value),
+    log(`git clone...`),
+    chain(gitClone(scaffoldUrl)),
+    // TODO: Run initialization script
+    // Run init found in .taq/scaffold.json
+    // log(`initializing...`),
+    // Load .taq/scaffold.json (if it exists)
+    // Run init command
+    // log(`cleanup...`),
+    () => rm(scaffoldProjectDir.join(`.taq/scaffold.json`)),
+    () => rm(scaffoldProjectDir.join(`.git`)),
+    map(() => i18n.__("scaffoldDoneMsg"))
 )
 
 const getPluginExe = (parsedArgs: SanitizedInitArgs, plugin: InstalledPlugin) => {
@@ -346,16 +305,20 @@ const getPluginExe = (parsedArgs: SanitizedInitArgs, plugin: InstalledPlugin) =>
 const retrievePluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => pipe(
     sendPluginQuery("pluginInfo", {}, config, env, i18n, plugin, parsedArgs),
     // map (PluginInfo.create) - I hate this about JS
-    map ((unvalidatedData: UnvalidatedPluginInfo) => PluginInfo.create(unvalidatedData))
+    as<UnvalidatedPluginInfo>(),
+    map ((unvalidatedData) => PluginInfo.create(unvalidatedData))
 )
     
 
 const retrieveAllPluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, parsedArgs: SanitizedInitArgs) => pipe(
     config.plugins.map((plugin: InstalledPlugin) => retrievePluginInfo(config, env, i18n, plugin, parsedArgs)),
-    parallel (parsedArgs.maxConcurrency)
+    parallel (parsedArgs.maxConcurrency),
+    // Filter out any undefined
+    // TODO: Should this be an error?
+    map(pluginInfos => pluginInfos.filter(x => x).map(x => x!))
 )
 
-const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) =>
+const sendPluginQuery = <T>(action: Action, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs): Future<TaqError, T> =>
     attemptP(async () => {
         try {
             // For each argument passed in via the CLI, send it as an argument to the
@@ -531,7 +494,7 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                 ...parsedArgs
             }
             
-            const handler = task.handler === 'proxy' && plugin
+            const handler: Future<TaqError, unknown> = task.handler === 'proxy' && plugin
                 ? pipe(
                     sendPluginQuery(
                         "proxy",
@@ -542,7 +505,8 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                         plugin,
                         args
                     ),
-                    map ((decoded: {status: 'failed'|'success', stderr: string, stdout: unknown, render?: string}) => {
+                    as<{status: 'failed'|'success', stderr: string, stdout: unknown, render?: string}>(),
+                    map ((decoded) => {
                         if (decoded.render == 'table') {
                             renderTable(decoded.stdout as Record<string, string>[])
                         }
@@ -623,15 +587,16 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
 const getStateAbspath = (parsedArgs: SanitizedInitArgs): SanitizedAbsPath => 
     parsedArgs.projectDir.join(parsedArgs.configDir.value, "state.json")
 
-const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => pipe(
+const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n): Future<TaqError | Error, State> => pipe(
     parsedArgs,
     getStateAbspath,
     (stateAbspath: SanitizedAbsPath) => pipe(
-        !parsedArgs.disableState
+        (!parsedArgs.disableState
             ? resolve(stateAbspath.value)
-            : reject("State disabled!"),
+            : reject("State disabled!")) as Future<string, string>,
         chain (readJsonFile),
-        chain ((data: {build: string}) =>
+        as<{build: string}>(),
+        chain ((data) =>
             typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.setBuild
                 ? resolve(data as State)
                 : reject("state.json was generated with a different build of taqueria")
@@ -645,7 +610,7 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
     )
 )
 
-const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqError, State> => pipe(
+const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqError | Error, State> => pipe(
     JSON.stringify(state, undefined, 4),
     (data: string) => `// WARNING: This file is autogenerated and should NOT be modified\n${data}`,
     writeTextFile(stateAbspath.value),
@@ -691,7 +656,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                     if (initArgs.debug) debugMode(true)
                     if (initArgs.version) {
                         console.log(initArgs.setVersion)
-                        return Promise.resolve(initArgs)
+                        return resolve(initArgs)
                     }
                     return initArgs._.includes('init') || initArgs._.includes('testFromVsCode')
                         ? resolve(initArgs)
@@ -706,7 +671,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
     }
 }
 
-export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedInitArgs) => {
+export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedInitArgs | RawInitArgs) => {
     if (executingBuiltInTask(parsedArgs) || cli.handled) {
         return parsedArgs
     }
@@ -744,8 +709,6 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     _: parsedArgs._,
     configDir: SanitizedPath.create(parsedArgs.configDir),
     projectDir: SanitizedAbsPath.create(parsedArgs.projectDir),
-    // TODO: SanatizedUrl
-    scaffoldUrl: parsedArgs.scaffoldUrl,
     maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency,
     debug: parsedArgs.debug,
     plugin: parsedArgs.plugin,
@@ -757,6 +720,11 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     setBuild: parsedArgs.setBuild,
     setVersion: parsedArgs.setVersion,
     version: parsedArgs.version
+})
+const sanitizeScaffoldArgs = (parsedArgs: RawInitArgs) : SanitizedScaffoldInitArgs => ({
+    ...sanitizeArgs(parsedArgs),
+     scaffoldUrl: SanitizedUrl.create(parsedArgs.scaffoldUrl ?? ''),
+     scaffoldProjectDir: SanitizedAbsPath.create(parsedArgs.scaffoldProjectDir ?? ''),
 })
 
 export default {

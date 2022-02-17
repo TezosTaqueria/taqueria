@@ -1,7 +1,31 @@
 # Taqueria Flextesa Plugin
 
-This is a plugin developed for Taqueria built using TypeScript for NodeJS using the Taqueria Node SDK.
+This plugin provides the ability to easily configure and run Flextesa sandbox instances within Taqueria that you can use for development and testing
 
-The plugin provides a `start sandbox` task used for starting a Flextesa-based sandbox, `stop sandbox` to stop the sandbox, and `list accounts` to list the available accounts provided by the sandbox along with their current balances.
+## Tasks
 
-This plugin uses a docker image called `taqueria/flextesa`, which is available [here](/docker): 
+The Flextesa plugin provides the following tasks to Taqueria:
+- `start sandbox`
+- `stop sandbox`
+- `list accounts`
+
+## Requirements
+
+- Taqueria v0.0.6 or later
+- Node.js v16 or later
+- Docker v0.8.4 or later
+
+## Installation
+
+The Flextesa plugin is distributed as an NPM package that can be installed and uninstalled on a project from the Taqueria CLI
+
+To install the Flextesa plugin on a Taqueria project, navigate to the project folder and run:
+```shell
+taq install @taqueria/plugin-flextesa
+```
+
+## Plugin Architecture
+
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
+
+For detailed usage and configuration information, view the Flextesa plugin documentation on the Taqueria website [here](https://taqueria.io/docs/plugins/plugin-flextesa) 

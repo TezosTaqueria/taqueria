@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/plugin-taquito",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A taqueria plugin for originating smart contracts using Taquito",
   "targets": {
     "default": {
@@ -13,7 +13,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
-    "build": "npx parcel build --no-cache",
+    "build": "npx parcel build --no-cache 2>&1",
     "debugPluginInfo": "node --inspect-brk index.js --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
   },
   "keywords": [
@@ -46,6 +46,6 @@
     "@taquito/signer": "^11.1.0",
     "@taquito/taquito": "^11.0.2",
     "fast-glob": "^3.2.10",
-    "@taqueria/node-sdk": "^0.0.5"
+    "@taqueria/node-sdk": "^0.0.9"
   }
 }
