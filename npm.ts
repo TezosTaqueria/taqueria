@@ -1,17 +1,21 @@
 import type {ConfigArgs} from './taqueria-protocol/taqueria-protocol-types.ts'
 import {i18n} from './taqueria-types.ts'
-import {SanitizedAbsPath, SanitizedPath} from './taqueria-utils/taqueria-utils-types.ts'
+import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {exec, readJsonFile, writeJsonFile} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {map, chain, chainRej, reject} from 'https://cdn.skypack.dev/fluture';
+import {map, chain, chainRej, reject} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {getConfig, make} from './taqueria-config.ts'
 
-import {log, debug} from './taqueria-utils/taqueria-utils.ts'
+// import {log, debug} from './taqueria-utils/taqueria-utils.ts'
 
-// This file contains lfogic for handling plugins distributed
+// This file contains logic for handling plugins distributed
 // and installable using NPM
 
 export type NpmPluginName = string & {__kind__: 'NpmPluginName'}
+
+interface Manifest {
+    name: string
+}
 
 export const getPluginName = (input:string): NpmPluginName => {
     const endIndex = input.lastIndexOf('@')
@@ -22,14 +26,16 @@ export const getPluginName = (input:string): NpmPluginName => {
     return (retval as NpmPluginName)
 }
 
-export const requireNPM = (projectDir: SanitizedAbsPath, i18n: i18n) => pipe(
-    readJsonFile(projectDir.join("package.json").value),
-    chainRej (() => reject({kind: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir}))
+export const requireNPM = (projectDir: SanitizedAbsPath, i18n: i18n) : Future<TaqError, Manifest> => pipe(
+    readJsonFile<Manifest>(projectDir.join("package.json").value),
+    chainRej<TaqError, TaqError, Manifest>(previous => reject({kind: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir, previous})),
+
 )
 
 export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath) => pipe(
     readJsonFile(SanitizedAbsPath.create(pluginNameOrPath, projectDir).join('package.json').value),
-    chainRej (() => readJsonFile(projectDir.join("node_modules", pluginNameOrPath, "package.json").value))
+    chainRej (() => readJsonFile(projectDir.join("node_modules", pluginNameOrPath, "package.json").value)),
+    map(value => value as Manifest)
 )
 
 const addToPluginList = (pluginName: NpmPluginName, config: ConfigArgs) => pipe(
@@ -58,9 +64,9 @@ const addToPluginList = (pluginName: NpmPluginName, config: ConfigArgs) => pipe(
 
 export const installPlugin = (configDir: SanitizedPath, projectDir: SanitizedAbsPath, i18n: i18n, plugin: string) => pipe(
     requireNPM(projectDir, i18n),
-    chain (() => exec('npm install -D <%= it.plugin %>', {plugin}, projectDir)),
-    chain (() => getConfig(projectDir, configDir, i18n, false)),
-    chain ((config: ConfigArgs) => {
+    chain(_ => exec('npm install -D <%= it.plugin %>', {plugin}, projectDir)),
+    chain<TaqError, number, ConfigArgs>(_ => getConfig(projectDir, configDir, i18n, false)),
+    chain(config => {
         // The plugin name could look like this: @taqueria/plugin-ligo@1.2.3
         // We need to trim @1.2.3 from the end
         const pluginName = getPluginName(plugin)
@@ -68,9 +74,9 @@ export const installPlugin = (configDir: SanitizedPath, projectDir: SanitizedAbs
         // Note, pluginName could be something like @taqueria/plugin-ligo
         // or ../taqueria-plugin-ligo. Thus, we still need to determine
         // what the real package name is
-        return addToPluginList(pluginName, config)
+        return addToPluginList(pluginName, config)    
     }),
-    map (() => i18n.__('pluginInstalled'))
+    map (_ => i18n.__('pluginInstalled'))
 )
 
 export const uninstallPlugin = (configDir: SanitizedPath, projectDir: SanitizedAbsPath, i18n: i18n, plugin: string) => pipe(

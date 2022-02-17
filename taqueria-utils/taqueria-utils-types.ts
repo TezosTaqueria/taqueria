@@ -1,6 +1,7 @@
 import {resolve as resolvePath, join} from 'https://deno.land/std@0.120.0/path/mod.ts'
 import {StringLike} from '../taqueria-protocol/taqueria-protocol-types.ts'
-import {attemptP, FutureInstance} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import {attemptP} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import type {FutureInstance} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 
 type Callback = () => void
 
@@ -22,7 +23,11 @@ export type ErrorType =
   | "E_INVALID_JSON"
   | "E_FORK"
   | "E_INVALID_TASK"
-
+  | "E_READ"
+  | "E_NPM_INIT"
+  | "E_INVALID_PLUGIN_RESPONSE"
+  | "E_INVALID_ARGS"
+  
 export interface TaqError {
     readonly kind: ErrorType,
     msg: string,
