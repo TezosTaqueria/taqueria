@@ -303,9 +303,10 @@ const getPluginExe = (parsedArgs: SanitizedInitArgs, plugin: InstalledPlugin) =>
 }
 
 const retrievePluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => pipe(
-    sendPluginQuery<UnvalidatedPluginInfo>("pluginInfo", {}, config, env, i18n, plugin, parsedArgs),
+    sendPluginQuery("pluginInfo", {}, config, env, i18n, plugin, parsedArgs),
     // map (PluginInfo.create) - I hate this about JS
-    map ((unvalidatedData: UnvalidatedPluginInfo) => PluginInfo.create(unvalidatedData))
+    as<UnvalidatedPluginInfo>(),
+    map ((unvalidatedData) => PluginInfo.create(unvalidatedData))
 )
     
 
@@ -493,10 +494,9 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                 ...parsedArgs
             }
             
-            type ProxyType = {status: 'failed'|'success', stderr: string, stdout: unknown, render?: string}
             const handler: Future<TaqError, unknown> = task.handler === 'proxy' && plugin
                 ? pipe(
-                    sendPluginQuery<ProxyType>(
+                    sendPluginQuery(
                         "proxy",
                         {task: task.task.value},
                         config,
@@ -505,6 +505,7 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                         plugin,
                         args
                     ),
+                    as<{status: 'failed'|'success', stderr: string, stdout: unknown, render?: string}>(),
                     map ((decoded) => {
                         if (decoded.render == 'table') {
                             renderTable(decoded.stdout as Record<string, string>[])
