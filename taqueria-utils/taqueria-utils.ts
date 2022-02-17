@@ -32,8 +32,8 @@ export const debug = <T>(input: T) => {
     return input
 }
 
-const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
-export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map(() => path))
+const mkdirFuture = (path: string): Future<TaqError | Error, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
+export const mkdir = (path: string) : Future<TaqError | Error, string> => pipe(path, mkdirFuture, map(() => path))
 
 export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptP(async () =>{
     try {
@@ -77,7 +77,7 @@ export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPat
     map(() => destinationPath)
 );
 
-export const readTextFile = (path: string): Future<TaqError, string> => Fluture(
+export const readTextFile = (path: string): Future<TaqError | Error, string> => Fluture(
     (rej: reject, res: resolve) => {
         const decoder = new TextDecoder("utf-8")
         Deno.readFile(path)
@@ -89,15 +89,15 @@ export const readTextFile = (path: string): Future<TaqError, string> => Fluture(
             .catch(rej)
         return () => {}
     }
-) as Future<TaqError, string>
+) as Future<TaqError | Error, string>
 
-export const readJsonFile = <T>(path: string) => pipe(
+export const readJsonFile = <T>(path: string): Future<TaqError | Error, T> => pipe(
     readTextFile(path),
     chain (decodeJson),
     map ((result) => (result as T))
 )
 
-export const writeTextFile = (path: string) => (data: string) => Fluture(
+export const writeTextFile = (path: string) => (data: string): Future<TaqError | Error, unknown> => Fluture(
     (rej: reject, res: resolve) => {
         Deno.writeTextFile(path, data).then(() => res(path)).catch(rej)
         return () => {}
@@ -126,7 +126,7 @@ export const joinPaths = _joinPaths
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string
 
-export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cwd?: SanitizedAbsPath) => attemptP(async () => {
+export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cwd?: SanitizedAbsPath) : Future<TaqError, number> => attemptP(async () => {
     let command = cmdTemplate
     try {
         // NOTE, uses eta templates under the hood. Very performant! https://ghcdn.rawgit.org/eta-dev/eta/master/browser-tests/benchmark.html
@@ -166,3 +166,5 @@ export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cw
         }
     }
 })
+
+// export const typed = <T, TError = TaqError, TArgs = never>(inner: <T2>(args:TArgs) => Future<TError,T2>): (args:TArgs) => Future<TError,T> => inner as (args:TArgs) => Future<TError,T>;

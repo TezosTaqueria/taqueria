@@ -215,7 +215,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         () => {},
         (inputArgs: RawInitArgs) => pipe(
             parsedArgs.projectDir.join('.taq', 'state.json').value,
-            readJsonFile,
+            (x) => readJsonFile<State>(x),
             map ((state: State) => Object.entries(state.tasks).reduce(
                 (retval: Record<string, string[] | null>, [taskName, implementation]) => {
                     if ('task' in implementation) {
@@ -249,7 +249,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
     extendCLI(env, parsedArgs, i18n)
 )
 
-const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync())
+const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync()) as Future<TaqError, RawInitArgs>
 
 const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
     getConfig(projectDir, configDir, i18n, true),
@@ -302,7 +302,7 @@ const getPluginExe = (parsedArgs: SanitizedInitArgs, plugin: InstalledPlugin) =>
 }
 
 const retrievePluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => pipe(
-    sendPluginQuery("pluginInfo", {}, config, env, i18n, plugin, parsedArgs),
+    sendPluginQuery<UnvalidatedPluginInfo>("pluginInfo", {}, config, env, i18n, plugin, parsedArgs),
     // map (PluginInfo.create) - I hate this about JS
     map ((unvalidatedData: UnvalidatedPluginInfo) => PluginInfo.create(unvalidatedData))
 )
@@ -310,10 +310,13 @@ const retrievePluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, plugin
 
 const retrieveAllPluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, parsedArgs: SanitizedInitArgs) => pipe(
     config.plugins.map((plugin: InstalledPlugin) => retrievePluginInfo(config, env, i18n, plugin, parsedArgs)),
-    parallel (parsedArgs.maxConcurrency)
+    parallel (parsedArgs.maxConcurrency),
+    // Filter out any undefined
+    // TODO: Should this be an error?
+    map(pluginInfos => pluginInfos.filter(x => x).map(x => x!))
 )
 
-const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) =>
+const sendPluginQuery = <T>(action: Action, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs): Future<TaqError, T> =>
     attemptP(async () => {
         try {
             // For each argument passed in via the CLI, send it as an argument to the
@@ -489,9 +492,10 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                 ...parsedArgs
             }
             
-            const handler = task.handler === 'proxy' && plugin
+            type ProxyType = {status: 'failed'|'success', stderr: string, stdout: unknown, render?: string}
+            const handler: Future<TaqError, unknown> = task.handler === 'proxy' && plugin
                 ? pipe(
-                    sendPluginQuery(
+                    sendPluginQuery<ProxyType>(
                         "proxy",
                         {task: task.task.value},
                         config,
@@ -500,7 +504,7 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                         plugin,
                         args
                     ),
-                    map ((decoded: {status: 'failed'|'success', stderr: string, stdout: unknown, render?: string}) => {
+                    map ((decoded) => {
                         if (decoded.render == 'table') {
                             renderTable(decoded.stdout as Record<string, string>[])
                         }
@@ -581,15 +585,15 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
 const getStateAbspath = (parsedArgs: SanitizedInitArgs): SanitizedAbsPath => 
     parsedArgs.projectDir.join(parsedArgs.configDir.value, "state.json")
 
-const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => pipe(
+const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n): Future<TaqError | Error, State> => pipe(
     parsedArgs,
     getStateAbspath,
     (stateAbspath: SanitizedAbsPath) => pipe(
-        !parsedArgs.disableState
+        (!parsedArgs.disableState
             ? resolve(stateAbspath.value)
-            : reject("State disabled!"),
-        chain (readJsonFile),
-        chain ((data: {build: string}) =>
+            : reject("State disabled!")) as Future<string, string>,
+        chain (x => readJsonFile<{build: string}>(x)),
+        chain ((data) =>
             typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.setBuild
                 ? resolve(data as State)
                 : reject("state.json was generated with a different build of taqueria")
@@ -603,7 +607,7 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
     )
 )
 
-const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqError, State> => pipe(
+const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqError | Error, State> => pipe(
     JSON.stringify(state, undefined, 4),
     (data: string) => `// WARNING: This file is autogenerated and should NOT be modified\n${data}`,
     writeTextFile(stateAbspath.value),
@@ -649,7 +653,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                     if (initArgs.debug) debugMode(true)
                     if (initArgs.version) {
                         console.log(initArgs.setVersion)
-                        return Promise.resolve(initArgs)
+                        return resolve(initArgs)
                     }
                     return initArgs._.includes('init') || initArgs._.includes('testFromVsCode')
                         ? resolve(initArgs)
@@ -664,7 +668,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
     }
 }
 
-export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedInitArgs) => {
+export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedInitArgs | RawInitArgs) => {
     if (executingBuiltInTask(parsedArgs) || cli.handled) {
         return parsedArgs
     }
