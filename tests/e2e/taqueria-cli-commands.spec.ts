@@ -89,45 +89,39 @@ describe("E2E Testing for taqueria CLI,", () => {
     });
 
     test('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
-        const ligoProjectPath = taqueriaProjectPath + "/ligoProject"
-
         try {
-            await generateTestProject(ligoProjectPath, ["ligo"], false)
+            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
 
-            const ligoHelpContents = await exec(`taq --help --projectDir=${ligoProjectPath}`)
+            const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigo)
 
-            await fs.promises.rm(ligoProjectPath, { recursive: true })
+            await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
     });
 
     test('Verify that the smartpy plugin exposes the associated commands in the help menu', async () => {
-        const smartpyProjectPath = taqueriaProjectPath + "/smartpyProject"
-
         try {
-            await generateTestProject(smartpyProjectPath, ["smartpy"], false)
+            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
 
-            const smartpyHelpContents = await exec(`taq --help --projectDir=${smartpyProjectPath}`)
+            const smartpyHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpy)
 
-            await fs.promises.rm(smartpyProjectPath, { recursive: true })
+            await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
     });
 
     test('Verify that the taquito plugin exposes the associated commands in the help menu', async () => {
-        const taquitoProjectPath = taqueriaProjectPath + "/taquitoProject"
-
         try {
-            await generateTestProject(taquitoProjectPath, ["taquito"], false)
+            await exec(`taq install @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
 
-            const taquitoHelpContents = await exec(`taq --help --projectDir=${taquitoProjectPath}`)
+            const taquitoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquito)
 
-            await fs.promises.rm(taquitoProjectPath, { recursive: true })
+            await exec(`taq uninstall @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
@@ -137,12 +131,12 @@ describe("E2E Testing for taqueria CLI,", () => {
         const flextesaProjectPath = taqueriaProjectPath + "/flextesaProject"
 
         try {
-            await generateTestProject(flextesaProjectPath, ["flextesa"], false)
+            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
 
-            const flextesaHelpContents = await exec(`taq --help --projectDir=${flextesaProjectPath}`)
+            const flextesaHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesa)
 
-            await fs.promises.rm(flextesaProjectPath, { recursive: true })
+            await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
