@@ -148,7 +148,7 @@ jobs:
 
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: "^1.0.0"
+          deno-version: "1.18.2"
 
       - name: get binary and make executable from previous step for tests
         run: |
