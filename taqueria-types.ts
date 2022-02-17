@@ -1,8 +1,8 @@
 import type {SanitizedPath, SanitizedAbsPath} from './taqueria-utils/taqueria-utils-types.ts'
 import {SHA256} from './taqueria-utils/taqueria-utils-types.ts'
 import {Option, Config, ConfigArgs, PluginInfo, InstalledPlugin, Verb, UnvalidatedTask, Task, UnvalidatedNetwork, Network, } from './taqueria-protocol/taqueria-protocol-types.ts'
-import {mkdir, joinPaths} from './taqueria-utils/taqueria-utils.ts'
-import {resolve, map} from 'https://cdn.skypack.dev/fluture';
+import {mkdir, joinPaths, debug} from './taqueria-utils/taqueria-utils.ts'
+import {resolve, map, chain, attemptP, coalesce} from 'https://cdn.skypack.dev/fluture';
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 
 export interface CommandArgs extends SanitizedInitArgs {
@@ -101,7 +101,6 @@ export class ConfigDir {
         return createDir
             ? map ((path:string) => new ConfigDir(path)) (mkdir(path))
             : resolve(new ConfigDir(path))
-
     }
 }
 const stateType: unique symbol = Symbol()

@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
 	title: "Taqueria - Developer Tooling for Tezos",
 	tagline: "Taqueria - Developer Tooling for Tezos",
-	url: "https://tezostaqueria.io",
+	url: "https://taqueria.io",
 	baseUrl: "/",
 
 	onBrokenLinks: "throw",
@@ -42,12 +42,11 @@ const config = {
 			}),
 		],
 	],
-
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
 			gtag: {
-				trackingID: "G-R7WYMVNDR1",
+				trackingID: "GTM-N6G3QD5",
 				anonymizeIP: true,
 			},
 			colorMode: {

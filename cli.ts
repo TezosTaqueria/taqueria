@@ -20,7 +20,6 @@ import {log, debug} from './taqueria-utils/taqueria-utils.ts'
 export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<void>) => unknown
 
 type CLIConfig = ReturnType<typeof yargs> & {
-    completion: () => CLIConfig
     handled?: boolean
 }
 
@@ -221,9 +220,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
-    .demandCommand()
-    .completion()
-    .help(),
+    .demandCommand(),
     extendCLI(env, parsedArgs, i18n)
 )
 
@@ -306,7 +303,15 @@ const sendPluginQuery = (action: Action, requestArgs: Record<string, unknown>, c
                 ...formattedArgs,
             ]
 
-            if (parsedArgs.logPluginCalls) console.log(cmd.join(' '))
+            if (parsedArgs.logPluginCalls) {
+                console.log(`*** START Call to ${plugin.name} ***`)
+                const [exe, ...cmdArgs] = cmd
+                const lastLine = cmdArgs.pop()
+                console.log(`${exe} \\`)
+                cmdArgs.map(line => console.log(`${line} \\`))
+                console.log(lastLine)
+                console.log(`*** END of call to ${plugin.name} ***`)
+            }
 
             const altCmd = ['sh', '-c', cmd.join(' ')]
             const process = Deno.run({cmd: altCmd, stdout: "piped", stderr: "piped"})
@@ -457,7 +462,9 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                             renderTable(decoded.stdout as Record<string, string>[])
                         }
                         else if (decoded.render !== 'none') {
-                            console.log(decoded.status === 'success' ? decoded.stdout: decoded.stderr)
+                            decoded.status === 'success'
+                                ? console.log(decoded.stdout)
+                                : console.error(decoded.stderr)
                         }
                     })
                 )
@@ -521,6 +528,9 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
             (parsedArgs: SanitizedInitArgs) => loadState(cliConfig, config, env, parsedArgs, i18n, state)
         ))
     )),
+    map ((cliConfig: CLIConfig) => 
+        cliConfig.help()
+    ),
     chain (parseArgs),
     map (showInvalidTask(cliConfig))
 )

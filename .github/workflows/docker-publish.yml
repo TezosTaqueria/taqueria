@@ -52,11 +52,21 @@ jobs:
       - name: Build package
         run: npm run build -w taqueria-plugin-flextesa/docker
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@master
+        with:
+          platforms: all
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
           context: ./taqueria-plugin-flextesa/docker/
           push: true
+          platforms: linux/arm64/v8,linux/amd64
           tags: ${{ steps.image-metadata.outputs.tags }}
           labels: ${{ steps.image-metadata.outputs.labels }}
 
@@ -70,5 +80,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'The latest docker name:tag for this PR is ***${{ steps.image-metadata.outputs.tags }}*** :whale: :ship:'
+              body: 'The latest docker name:tag for this PR is ***${{ steps.image-metadata.outputs.tags }}*** :whale: :ship:. The image is available for the following platforms: `linux/amd64` and `linux/arm64/v8`'
             })
