@@ -28,8 +28,7 @@ export const getPluginName = (input:string): NpmPluginName => {
 
 export const requireNPM = (projectDir: SanitizedAbsPath, i18n: i18n) : Future<TaqError, Manifest> => pipe(
     readJsonFile<Manifest>(projectDir.join("package.json").value),
-    chainRej<TaqError, TaqError, Manifest>(previous => reject({kind: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir, previous})),
-
+    chainRej(previous => reject({kind: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir, previous})),
 )
 
 export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath) => pipe(

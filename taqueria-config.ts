@@ -92,7 +92,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedP
             else {
                 return pipe(
                     writeJsonFile<Config>(configPath) (defaultConfig),
-                    chain<TaqError, string, Config> ((configPath: string) => readJsonFile(configPath))
+                    chain((configPath: string) => readJsonFile<Config>(configPath))
                 )
             }
         })

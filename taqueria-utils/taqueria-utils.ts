@@ -48,7 +48,7 @@ export const readTextFile = (path: string) : Future<TaqError, string> =>
 
 export const readJsonFile = <T>(path: string) => pipe(
     readTextFile(path),
-    chain<TaqError, string, T> (decodeJson)
+    chain(x => decodeJson<T>(x))
 )
 
 export const writeTextFile = (path: string) => (data: string) : Future<TaqError, string> => 
