@@ -1,21 +1,20 @@
-import {Future, rejectFuture, resolveFuture, mapFuture, attemptPFuture, chainFuture, SanitizedUrl, TaqError} from './taqueria-utils-types.ts'
-import {SanitizedAbsPath} from './taqueria-utils-types.ts'
+import {Future, reject, resolve, TaqError, SanitizedAbsPath, SanitizedUrl} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {Future as Fluture} from 'https://cdn.skypack.dev/fluture';
+import {chain, attemptP, map, Future as Fluture} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
 import * as jsonc from "https://deno.land/x/jsonc@1/main.ts"
 
-export const decodeJson = <T = unknown>(encoded: string) => Fluture((rej: typeof rejectFuture, res: typeof resolveFuture) => {
+export const decodeJson = <T=unknown>(encoded: string): Future<TaqError, T> => Fluture((rej: reject, res:resolve) => {
     try {
         const data = jsonc.parse(encoded)
-        res(data)
+        res<T>(data)
     } catch (err) {
         rej({kind: "E_INVALID_JSON", msg: "The provided JSON could not be decoded.", previous: err, context: encoded})
     }
-    return () => {}
-}) as Future<Error, T>
+    return () => {};
+}) as Future<TaqError, T>;
 
 export const log = <T>(message: string) => (input: T) : T => {
     console.log(message)
@@ -33,10 +32,10 @@ export const debug = <T>(input: T) => {
     return input
 }
 
-const mkdirFuture = (path: string): Future<TaqError, void> => attemptPFuture(() => Deno.mkdir(path, {recursive: true}))
-export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, mapFuture(() => path))
+const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
+export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map(() => path))
 
-export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptPFuture(async () =>{
+export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptP(async () =>{
     try {
         await Deno.stat(path);
         return SanitizedAbsPath.create(path);
@@ -45,7 +44,7 @@ export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPa
     }  
 });
 
-export const ensurePathDoesNotExist = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptPFuture(async () =>{
+export const ensurePathDoesNotExist = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptP(async () =>{
     try {
         await Deno.stat(path);
         return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'TODO i18n message' })
@@ -55,17 +54,17 @@ export const ensurePathDoesNotExist = (path: string) : Future<TaqError, Sanitize
     }
 });
 
-const rmFuture = (path: SanitizedAbsPath) => attemptPFuture(async () => {
+const rmFuture = (path: SanitizedAbsPath): Future<TaqError | Error, void> => attemptP(async () => {
     try {
         await Deno.remove(path.value);
     } catch {
         // Ignore if path does not exist
     }
 });
-export const rm = (path: SanitizedAbsPath) : Future<TaqError | Error, SanitizedAbsPath> => pipe(path, rmFuture, mapFuture(() => path))
+export const rm = (path: SanitizedAbsPath) : Future<TaqError | Error, SanitizedAbsPath> => pipe(path, rmFuture, map(() => path))
 
 export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) => pipe(
-    attemptPFuture(async () => {
+    attemptP(async () => {
         const cloneProcess = Deno.run({
             cmd: ["git", "clone", url.value, destinationPath.value],
         });
@@ -75,11 +74,11 @@ export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPat
             return Promise.reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'TODO i18n message'})
         }
     }), 
-    mapFuture (() => destinationPath)
+    map(() => destinationPath)
 );
 
-export const readTextFile = (path: string) => Fluture(
-    (rej: typeof rejectFuture, res: typeof resolveFuture) => {
+export const readTextFile = (path: string): Future<TaqError, string> => Fluture(
+    (rej: reject, res: resolve) => {
         const decoder = new TextDecoder("utf-8")
         Deno.readFile(path)
             .then(data => {
@@ -90,20 +89,21 @@ export const readTextFile = (path: string) => Fluture(
             .catch(rej)
         return () => {}
     }
-) as Future<Error, string>;
+) as Future<TaqError, string>
 
 export const readJsonFile = <T>(path: string) => pipe(
     readTextFile(path),
-    chainFuture (decodeJson),
-    mapFuture ((result) => (result as T))
+    chain (decodeJson),
+    map ((result) => (result as T))
 )
 
 export const writeTextFile = (path: string) => (data: string) => Fluture(
-    (rej: typeof rejectFuture, res: typeof resolveFuture) => {
+    (rej: reject, res: resolve) => {
         Deno.writeTextFile(path, data).then(() => res(path)).catch(rej)
         return () => {}
     }
-) as Future<Error, void>;
+        
+)
 
 export const writeJsonFile = <T>(path: string) => (data: T) => pipe(
     JSON.stringify(data),
@@ -126,7 +126,7 @@ export const joinPaths = _joinPaths
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string
 
-export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cwd?: SanitizedAbsPath) => attemptPFuture(async () => {
+export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cwd?: SanitizedAbsPath) => attemptP(async () => {
     let command = cmdTemplate
     try {
         // NOTE, uses eta templates under the hood. Very performant! https://ghcdn.rawgit.org/eta-dev/eta/master/browser-tests/benchmark.html
