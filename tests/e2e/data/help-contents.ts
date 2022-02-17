@@ -11,7 +11,7 @@ Options:
 
 Taqueria is currently in BETA. You've been warned. :)
 
-Your config.json file looks invalid.
+Your config.json file is invalid
 `;
 
 export const helpContentsForProject: string = `taq <command>
