@@ -1,3 +1,4 @@
+import * as contents from "./data/help-contents";
 import { generateTestProject } from "./utils/utils";
 import { exec as exec1, execSync } from "child_process";
 import fs from "fs";
@@ -6,119 +7,6 @@ const exec = util.promisify(exec1);
 
 
 const taqueriaProjectPath = './e2e/auto-test-cli';
-const helpContentsNoProject = `taq [command]
-
-Commands:
-  taq init [projectDir]  Initialize a new project
-
-Options:
-      --version     Show version number                           [boolean]
-  -p, --projectDir  Path to your project directory          [default: "./"]
-  -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
-  -e, --env         Specify an environment configuration
-
-Taqueria is currently in BETA. You've been warned. :)
-
-Your config.json file looks invalid.
-`;
-const helpContentsForProject = `taq <command>
-
-Commands:
-  taq init [projectDir]       Initialize a new project
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-
-Options:
-      --version     Show version number                           [boolean]
-  -p, --projectDir  Path to your project directory          [default: "./"]
-  -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
-  -e, --env         Specify an environment configuration
-      --help        Show help                                     [boolean]
-
-Taqueria is currently in BETA. You've been warned. :)
-`;
-
-const helpContentsLigo = `taq <command>
-
-Commands:
-  taq init [projectDir]       Initialize a new project
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile [sourceFile]    Compile a smart contract written in a Ligo sy
-                              ntax to Michelson code
-                                                 [aliases: c, compile-ligo]
-
-Options:
-      --version     Show version number                           [boolean]
-  -p, --projectDir  Path to your project directory          [default: "./"]
-  -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
-  -e, --env         Specify an environment configuration
-      --help        Show help                                     [boolean]
-
-Taqueria is currently in BETA. You've been warned. :)
-`;
-
-const helpContentsSmartpy = `taq <command>
-
-Commands:
-  taq init [projectDir]       Initialize a new project
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile [sourceFile]    Compile a smart contract written in a SmartPy
-                               syntax to Michelson code
-                                              [aliases: c, compile-smartpy]
-  taq teapot                  Have a cup of tea           [aliases: t, tea]
-
-Options:
-      --version     Show version number                           [boolean]
-  -p, --projectDir  Path to your project directory          [default: "./"]
-  -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
-  -e, --env         Specify an environment configuration
-      --help        Show help                                     [boolean]
-
-Taqueria is currently in BETA. You've been warned. :)
-`;
-
-const helpContentsTaquito = `taq <command>
-
-Commands:
-  taq init [projectDir]       Initialize a new project
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq deploy [contract]       Deploy a smart contract to a particular envir
-                              onment                   [aliases: originate]
-
-Options:
-      --version     Show version number                           [boolean]
-  -p, --projectDir  Path to your project directory          [default: "./"]
-  -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
-  -e, --env         Specify an environment configuration
-      --help        Show help                                     [boolean]
-
-Taqueria is currently in BETA. You've been warned. :)
-`;
-
-const helpContentsFlextesa = `taq <command>
-
-Commands:
-  taq init [projectDir]            Initialize a new project
-  taq install <pluginName>         Install a plugin
-  taq uninstall <pluginName>       Uninstall a plugin
-  taq start sandbox [sandboxName]  Starts a flextesa sandbox
-                                                           [aliases: start]
-  taq stop sandbox [sandboxName]   Stops a flextesa sandbox [aliases: stop]
-  taq list accounts <sandboxName>  List the balances of all sandbox account
-                                   s
-
-Options:
-      --version     Show version number                           [boolean]
-  -p, --projectDir  Path to your project directory          [default: "./"]
-  -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
-  -e, --env         Specify an environment configuration
-      --help        Show help                                     [boolean]
-
-Taqueria is currently in BETA. You've been warned. :)
-`
 
 // Test template
 // test('', () => {
@@ -138,7 +26,7 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that taq --help gives the help menu for a non-initialized project', async () => {
         try {
             const help = await exec('taq --help')
-            expect(help.stderr).toBe(helpContentsNoProject)
+            expect(help.stderr).toBe(contents.helpContentsNoProject)
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
@@ -147,7 +35,7 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that taq --help gives the help menu for an initialized project', async () => {
         try {
             const projectHelp = await exec(`taq --help -p ${taqueriaProjectPath}`)
-            expect(projectHelp.stdout).toBe(helpContentsForProject)
+            expect(projectHelp.stdout).toBe(contents.helpContentsForProject)
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
@@ -207,7 +95,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             await generateTestProject(ligoProjectPath, ["ligo"], false)
 
             const ligoHelpContents = await exec(`taq --help --projectDir=${ligoProjectPath}`)
-            expect(ligoHelpContents.stdout).toBe(helpContentsLigo)
+            expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigo)
 
             await fs.promises.rm(ligoProjectPath, { recursive: true })
         } catch(error) {
@@ -222,7 +110,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             await generateTestProject(smartpyProjectPath, ["smartpy"], false)
 
             const smartpyHelpContents = await exec(`taq --help --projectDir=${smartpyProjectPath}`)
-            expect(smartpyHelpContents.stdout).toBe(helpContentsSmartpy)
+            expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpy)
 
             await fs.promises.rm(smartpyProjectPath, { recursive: true })
         } catch(error) {
@@ -237,7 +125,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             await generateTestProject(taquitoProjectPath, ["taquito"], false)
 
             const taquitoHelpContents = await exec(`taq --help --projectDir=${taquitoProjectPath}`)
-            expect(taquitoHelpContents.stdout).toBe(helpContentsTaquito)
+            expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquito)
 
             await fs.promises.rm(taquitoProjectPath, { recursive: true })
         } catch(error) {
@@ -252,7 +140,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             await generateTestProject(flextesaProjectPath, ["flextesa"], false)
 
             const flextesaHelpContents = await exec(`taq --help --projectDir=${flextesaProjectPath}`)
-            expect(flextesaHelpContents.stdout).toBe(helpContentsFlextesa)
+            expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesa)
 
             await fs.promises.rm(flextesaProjectPath, { recursive: true })
         } catch(error) {
