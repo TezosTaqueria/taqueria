@@ -38,6 +38,10 @@ Options:
 Taqueria is currently in BETA. You've been warned. :)
 `;
 
+const ligoCommand = `taq compile [sourceFile]    Compile a smart contract written in a Ligo sy
+                            ntax to Michelson code
+                                               [aliases: c, compile-ligo]`
+
 // Test template
 // test('', () => {
 //     try {
@@ -113,6 +117,21 @@ describe("E2E Testing for taqueria CLI,", () => {
             expect(helpContentsWithDir.stderr).not.toContain('Your config.json file looks invalid.')
 
             await fs.promises.rm(`./${projectName}`, { recursive: true })
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    });
+
+    test.only('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
+        const ligoProjectPath = taqueriaProjectPath + "/ligoProject"
+
+        try {
+            await generateTestProject(ligoProjectPath, ["ligo"], false)
+
+            const ligoHelpContents = await exec(`taq --help --projectDir=${ligoProjectPath}`)
+            expect(ligoHelpContents.stdout).toContain(ligoCommand)
+
+            await fs.promises.rm(ligoProjectPath, { recursive: true })
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
