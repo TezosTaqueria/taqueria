@@ -129,7 +129,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             await generateTestProject(ligoProjectPath, ["ligo"], false)
 
             const ligoHelpContents = await exec(`taq --help --projectDir=${ligoProjectPath}`)
-            expect(ligoHelpContents.stdout).toContain(ligoCommand)
+            expect(ligoHelpContents.stdout.trim()).toContain(ligoCommand)
 
             await fs.promises.rm(ligoProjectPath, { recursive: true })
         } catch(error) {
