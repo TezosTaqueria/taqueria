@@ -7,7 +7,7 @@ import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode, attempt} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {ensurePathDoesNotExist, exec, gitClone, isTaqError, joinPaths, mkdir, readJsonFile, rm, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
+import {as, ensurePathDoesNotExist, exec, gitClone, isTaqError, joinPaths, mkdir, readJsonFile, rm, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future, SanitizedUrl} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
@@ -215,8 +215,9 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         () => {},
         (inputArgs: RawInitArgs) => pipe(
             parsedArgs.projectDir.join('.taq', 'state.json').value,
-            (x) => readJsonFile<State>(x),
-            map ((state: State) => Object.entries(state.tasks).reduce(
+            readJsonFile,
+            as<State>(),
+            map ((state) => Object.entries(state.tasks).reduce(
                 (retval: Record<string, string[] | null>, [taskName, implementation]) => {
                     if ('task' in implementation) {
                         const task = implementation as Task
@@ -592,7 +593,8 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
         (!parsedArgs.disableState
             ? resolve(stateAbspath.value)
             : reject("State disabled!")) as Future<string, string>,
-        chain (x => readJsonFile<{build: string}>(x)),
+        chain (readJsonFile),
+        as<{build: string}>(),
         chain ((data) =>
             typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.setBuild
                 ? resolve(data as State)

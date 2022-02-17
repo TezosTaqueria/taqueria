@@ -167,4 +167,4 @@ export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cw
     }
 })
 
-// export const typed = <T, TError = TaqError, TArgs = never>(inner: <T2>(args:TArgs) => Future<TError,T2>): (args:TArgs) => Future<TError,T> => inner as (args:TArgs) => Future<TError,T>;
+export const as = <T>() => map(x => x as T);
