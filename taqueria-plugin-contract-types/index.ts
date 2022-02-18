@@ -8,8 +8,8 @@ Plugin.create((i18n: i18n) => ({
     version: "0.1",
     tasks: [
         Task.create({
-            task: "types",
-            command: "types [typescriptDir]",
+            task: "generate types",
+            command: "generate types [typescriptDir]",
             description: "Generate types for a contract to be used with taquito",
             positionals: [
                 PositionalArg.create({
@@ -26,7 +26,7 @@ Plugin.create((i18n: i18n) => ({
                     description: "The type aliases used in the generated types"
                 }),
             ],
-            aliases: ["types"],
+            aliases: ["gen types", "gentypes"],
             handler: "proxy"
         }),
     ],
