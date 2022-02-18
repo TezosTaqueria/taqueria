@@ -142,6 +142,21 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     });
 
+    test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+
+            const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
+            expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoSmartpy)
+
+            await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    });
+
     // Clean up process to remove taquified project folder
     // Comment if need to debug
     afterAll(() => {

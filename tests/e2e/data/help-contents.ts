@@ -72,6 +72,26 @@ Options:
 Taqueria is currently in BETA. You've been warned. :)
 `;
 
+export const helpContentsLigoSmartpy: string = `taq <command>
+
+Commands:
+  taq init [projectDir]       Initialize a new project
+  taq install <pluginName>    Install a plugin
+  taq uninstall <pluginName>  Uninstall a plugin
+  taq compile                 Provided by more than one plugin. The option
+                              --plugin is required.
+  taq teapot                  Have a cup of tea           [aliases: t, tea]
+
+Options:
+      --version     Show version number                           [boolean]
+  -p, --projectDir  Path to your project directory          [default: "./"]
+  -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+      --help        Show help                                     [boolean]
+
+Taqueria is currently in BETA. You've been warned. :)
+`;
+
 export const helpContentsTaquito: string = `taq <command>
 
 Commands:
