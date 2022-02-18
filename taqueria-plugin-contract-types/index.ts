@@ -9,7 +9,7 @@ Plugin.create((i18n: i18n) => ({
     tasks: [
         Task.create({
             task: "types",
-            command: "types [contract]",
+            command: "types [typescriptDir]",
             description: "Generate types for a contract to be used with taquito",
             positionals: [
                 PositionalArg.create({
