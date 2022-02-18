@@ -126,17 +126,17 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
-
-      - name: Download Build Artifact
-        run: |
-          wget ${{ needs.lint-test-build.outputs.vsixGcsUrl }} -P ${{ env.GIT_WORKSPACE }}
+      
+      - name: Compile TS
+        run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
 
       - name: Publish as pre-release
         if: ${{ github.event.release.prerelease }}
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCE_PAT }}
-          extensionFile: ${{ needs.lint-test-build.outputs.vsixPath }}
+          yarn: true
+          packagePath: ${{ env.GIT_WORKSPACE }}
           registryUrl: https://marketplace.visualstudio.com
           preRelease: true
 
@@ -145,6 +145,7 @@ jobs:
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCE_PAT }}
-          extensionFile: ${{ needs.lint-test-build.outputs.vsixPath }}
+          yarn: true
+          packagePath: ${{ env.GIT_WORKSPACE }}
           registryUrl: https://marketplace.visualstudio.com
           
