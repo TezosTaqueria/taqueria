@@ -41,14 +41,17 @@ export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPa
         await Deno.stat(path);
         return SanitizedAbsPath.create(path);
     } catch(_e) {
-        return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'TODO i18n message' })
+        // TODO i18n message
+        return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'Path does not exist', context: path, previous: _e })
     }  
 });
 
 export const ensurePathDoesNotExist = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptP(async () =>{
     try {
         await Deno.stat(path);
-        return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'TODO i18n message' })
+
+        // TODO i18n message
+        return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'Path already exists', context: path })
     } catch(_e) {
         // Expect exception when trying to stat a new directory
         return SanitizedAbsPath.create(path);
@@ -72,7 +75,8 @@ export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPat
         const cloneResult = await cloneProcess.status();
         
         if (!cloneResult.success) {
-            return Promise.reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'TODO i18n message'})
+            // TODO i18n message
+            return Promise.reject({ kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Git clone failed', context: url.value })
         }
     }), 
     map(() => destinationPath)
