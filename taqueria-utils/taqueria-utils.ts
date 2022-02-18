@@ -1,20 +1,21 @@
 import {Future, reject, resolve, TaqError, SanitizedAbsPath, SanitizedUrl} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {chain, attemptP, map, Future as Fluture} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import {chain, attemptP, map, Future as Fluture} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
 import * as jsonc from "https://deno.land/x/jsonc@1/main.ts"
 
-export const decodeJson = <T=unknown>(encoded: string): Future<TaqError, T> => Fluture((rej: reject, res:resolve) => {
-    try {
-        const data = jsonc.parse(encoded)
-        res<T>(data)
-    } catch (err) {
-        rej({kind: "E_INVALID_JSON", msg: "The provided JSON could not be decoded.", previous: err, context: encoded})
-    }
-    return () => {};
-}) as Future<TaqError, T>;
+
+export const decodeJson = <T>(encoded: string): Future<TaqError, T> =>
+    attemptP(() => {
+        try {
+            const data = jsonc.parse(encoded)
+            return Promise.resolve(data as T)
+        } catch (err) {
+            throw({kind: "E_INVALID_JSON", msg: "The provided JSON could not be decoded.", previous: err, context: encoded})
+        }       
+    })
 
 export const log = <T>(message: string) => (input: T) : T => {
     console.log(message)
@@ -32,8 +33,8 @@ export const debug = <T>(input: T) => {
     return input
 }
 
-const mkdirFuture = (path: string): Future<TaqError | Error, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
-export const mkdir = (path: string) : Future<TaqError | Error, string> => pipe(path, mkdirFuture, map(() => path))
+const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
+export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map(() => path))
 
 export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptP(async () =>{
     try {
@@ -54,14 +55,14 @@ export const ensurePathDoesNotExist = (path: string) : Future<TaqError, Sanitize
     }
 });
 
-const rmFuture = (path: SanitizedAbsPath): Future<TaqError | Error, void> => attemptP(async () => {
+const rmFuture = (path: SanitizedAbsPath): Future<TaqError, void> => attemptP(async () => {
     try {
         await Deno.remove(path.value);
     } catch {
         // Ignore if path does not exist
     }
 });
-export const rm = (path: SanitizedAbsPath) : Future<TaqError | Error, SanitizedAbsPath> => pipe(path, rmFuture, map(() => path))
+export const rm = (path: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => pipe(path, rmFuture, map(() => path))
 
 export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) => pipe(
     attemptP(async () => {
@@ -77,33 +78,26 @@ export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPat
     map(() => destinationPath)
 );
 
-export const readTextFile = (path: string): Future<TaqError | Error, string> => Fluture(
-    (rej: reject, res: resolve) => {
+export const readTextFile = (path: string) : Future<TaqError, string> =>
+    attemptP(() => {
         const decoder = new TextDecoder("utf-8")
-        Deno.readFile(path)
+        return Deno.readFile(path)
             .then(data => {
                 const decoded = decoder.decode(data)
                 return decoded
             })
-            .then(res)
-            .catch(rej)
-        return () => {}
-    }
-) as Future<TaqError | Error, string>
+            .catch((previous: Error) => Promise.reject({
+                kind: "E_READ", msg: `Could not read ${path}`, previous
+            }))
+    })
 
-export const readJsonFile = <T>(path: string): Future<TaqError | Error, T> => pipe(
+export const readJsonFile = <T>(path: string) => pipe(
     readTextFile(path),
-    chain (decodeJson),
-    map ((result) => (result as T))
+    chain(x => decodeJson<T>(x))
 )
 
-export const writeTextFile = (path: string) => (data: string): Future<TaqError | Error, unknown> => Fluture(
-    (rej: reject, res: resolve) => {
-        Deno.writeTextFile(path, data).then(() => res(path)).catch(rej)
-        return () => {}
-    }
-        
-)
+export const writeTextFile = (path: string) => (data: string) : Future<TaqError, string> => 
+    attemptP(() => Deno.writeTextFile(path, data).then(() => path))
 
 export const writeJsonFile = <T>(path: string) => (data: T) => pipe(
     JSON.stringify(data),
@@ -163,8 +157,6 @@ export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cw
             kind: "E_FORK",
             msg: `Could not fork ${command}`,
             previous
-        }
+        } as TaqError
     }
 })
-
-export const as = <T>() => map(x => x as T);

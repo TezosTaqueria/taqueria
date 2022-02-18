@@ -1,14 +1,14 @@
-import type {UnvalidatedPluginInfo, InstalledPlugin, Config, ConfigArgs, Action, Alias, Verb, Option, PositionalArg} from './taqueria-protocol/taqueria-protocol-types.ts'
+import type {UnvalidatedPluginInfo, InstalledPlugin, Config, ConfigArgs, Alias, Verb, Option, PositionalArg, PluginResponse, PluginAction, ProxyAction} from './taqueria-protocol/taqueria-protocol-types.ts'
 import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs, SanitizedScaffoldInitArgs} from './taqueria-types.ts'
 import {State} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs/deno.ts'
-import {map, chain, attemptP, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode, attempt} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import {map, chain, attemptP, mapRej, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {as, ensurePathDoesNotExist, exec, gitClone, isTaqError, joinPaths, mkdir, readJsonFile, rm, writeTextFile} from './taqueria-utils/taqueria-utils.ts'
-import {SanitizedAbsPath, SanitizedPath, TaqError, Future, SanitizedUrl} from './taqueria-utils/taqueria-utils-types.ts'
+import {exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile, decodeJson, ensurePathDoesNotExist, gitClone, rm} from './taqueria-utils/taqueria-utils.ts'
+import {SanitizedAbsPath, SanitizedPath, SanitizedUrl, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
@@ -126,7 +126,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
             ({projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
                 return initProject(projectDir, configDir, i18n, maxConcurrency, quickstart)
             },
-            fork (console.error) (console.log)
+            forkCatch (console.error) (console.error) (console.log)
         )
     )
     .command(
@@ -189,7 +189,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         // a plugin distributed and installable via NPM. This should support other means of distribution
         (inputArgs: InstallPluginArgs) => pipe(
             NPM.installPlugin(parsedArgs.configDir, parsedArgs.projectDir, i18n, inputArgs.pluginName),
-            fork (displayError(cliConfig)) (console.log)
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
     .alias('i', 'install')
@@ -213,44 +213,54 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         'list-known-tasks',
         false, // hide
         () => {},
-        (inputArgs: RawInitArgs) => pipe(
-            parsedArgs.projectDir.join('.taq', 'state.json').value,
-            readJsonFile,
-            as<State>(),
-            map ((state) => Object.entries(state.tasks).reduce(
-                (retval: Record<string, string[] | null>, [taskName, implementation]) => {
-                    if ('task' in implementation) {
-                        const task = implementation as Task
-                        const plugins = 
-                            task.options
-                                ? task.options.reduce(
-                                    (retval: string[], option) => 
-                                        option.choices
-                                            ? [...retval, ...option.choices]
-                                            : retval,
-                                    []
-                                )
-                                : []
-                        const obj: Record<string, string[]> = {}
-                        obj[taskName] = plugins
-                        return {...retval, ...obj}
-                    }
-                    else {
-                        const obj: Record<string, null> = {}
-                        obj[taskName] = null
-                        return {...retval, ...obj}
-                    }
-                },
-                {}
-            )),
-            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
-        )
+        listKnownTasks(cliConfig, parsedArgs)
     )
     .demandCommand(),
     extendCLI(env, parsedArgs, i18n)
 )
 
-const parseArgs = (cliConfig: CLIConfig) => attemptP(() => cliConfig.parseAsync()) as Future<TaqError, RawInitArgs>
+const parseArgs = (cliConfig: CLIConfig) => pipe(
+    attemptP(() => cliConfig.parseAsync()),
+    map (rawInitArgs => rawInitArgs as RawInitArgs),
+    mapRej(previous => ({
+        kind: 'E_INVALID_ARGS',
+        msg: "Invalid arguments were provided and could not be parsed",
+        context: cliConfig,
+        previous
+    } as TaqError))
+)
+
+const listKnownTasks = (cliConfig: CLIConfig, parsedArgs: SanitizedInitArgs) => (_inputArgs: RawInitArgs) => pipe(
+    parsedArgs.projectDir.join(parsedArgs.configDir.value, 'state.json').value,
+    stateAbsPath => readJsonFile<State>(stateAbsPath), // TypeScript won't allow pointfree here
+    map (state => Object.entries(state.tasks).reduce(
+        (retval, [taskName, implementation]) => {
+            if ('task' in implementation) {
+                const task = implementation as Task
+                const plugins = 
+                    task.options
+                        ? task.options.reduce(
+                            (retval: string[], option) => 
+                                option.choices
+                                    ? [...retval, ...option.choices]
+                                    : retval,
+                            []
+                        )
+                        : []
+                const obj: Record<string, string[]> = {}
+                obj[taskName] = plugins
+                return {...retval, ...obj}
+            }
+            else {
+                const obj: Record<string, null> = {}
+                obj[taskName] = null
+                return {...retval, ...obj}
+            }
+        },
+        {}
+    )),
+    forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
+)
 
 const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
     getConfig(projectDir, configDir, i18n, true),
@@ -262,11 +272,11 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
         
         return parallel (maxConcurrency) ([mkdir(artifactsAbspath), mkdir(contractsAbspath), mkdir(testsAbspath)])        
     }),
-    chain ((results: string[]) => quickstart.length > 0
+    chain (_ => quickstart.length > 0
         ? writeTextFile (joinPaths(projectDir.value, "quickstart.md")) (quickstart)
-        : resolve (results)
+        : resolve(projectDir.value)
     ),
-    map (() => i18n.__("bootstrapMsg"))
+    map (_ => i18n.__("bootstrapMsg"))
 )
 
 const scaffoldProject = (scaffoldUrl: SanitizedUrl, scaffoldProjectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
@@ -303,92 +313,109 @@ const getPluginExe = (parsedArgs: SanitizedInitArgs, plugin: InstalledPlugin) =>
 }
 
 const retrievePluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => pipe(
-    sendPluginQuery("pluginInfo", {}, config, env, i18n, plugin, parsedArgs),
-    // map (PluginInfo.create) - I hate this about JS
-    as<UnvalidatedPluginInfo>(),
-    map ((unvalidatedData) => PluginInfo.create(unvalidatedData))
+    sendPluginQuery<UnvalidatedPluginInfo>("pluginInfo", {}, config, env, i18n, plugin, parsedArgs),
+    chain (unvalidatedData => {
+        const pluginInfo = PluginInfo.create(unvalidatedData)
+        return pluginInfo
+            ? resolve(pluginInfo)
+            : reject({
+                kind: 'E_INVALID_PLUGIN_RESPONSE',
+                msg: `The ${plugin.name} plugin experienced an error when getting information about the ${plugin.name} plugin.`,
+                context: unvalidatedData
+            } as TaqError)
+
+    })
 )
     
 
 const retrieveAllPluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, parsedArgs: SanitizedInitArgs) => pipe(
     config.plugins.map((plugin: InstalledPlugin) => retrievePluginInfo(config, env, i18n, plugin, parsedArgs)),
-    parallel (parsedArgs.maxConcurrency),
-    // Filter out any undefined
-    // TODO: Should this be an error?
-    map(pluginInfos => pluginInfos.filter(x => x).map(x => x!))
+    parallel (parsedArgs.maxConcurrency)
 )
 
-const sendPluginQuery = <T>(action: Action, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs): Future<TaqError, T> =>
+const toPluginArguments = (parsedArgs: SanitizedInitArgs, requestArgs: Record<string, unknown>) => {
+    // For each argument passed in via the CLI, send it as an argument to the
+    // plugin call as well. Plugins can use this information for additional context
+    // about invocation
+    return Object.entries({...parsedArgs, ...requestArgs}).reduce(
+        (retval: string[], [key, val]) => {
+            // Some parameters we don't need to send, so we omit those
+            if (['$0', 'quickstart'].includes(key) || key.indexOf('-') >= 0 || val === undefined)
+                return retval
+            // Others need renamed
+            else if (key === '_')
+                return [...retval, '--command', String(val)]
+            // String types need their values
+            else if (val instanceof SanitizedAbsPath) 
+                return [...retval, '--'+key, `'${val.value}'`]
+            // Everything else is good
+            else
+                return [...retval, '--'+key, `'${val}'`]
+        },
+        []
+    )
+}
+
+const logPluginCall = (cmd: string[], plugin: InstalledPlugin) => {
+    console.log(`*** START Call to ${plugin.name} ***`)
+    const [exe, ...cmdArgs] = cmd
+    const lastLine = cmdArgs.pop()
+    console.log(`${exe} \\`)
+    cmdArgs.map(line => console.log(`${line} \\`))
+    console.log(lastLine)
+    console.log(`*** END of call to ${plugin.name} ***`)
+}
+
+const sendPluginQuery = <T>(action: PluginAction, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => pipe(
+    toPluginArguments(parsedArgs, requestArgs),
+    execPlugin(action, config, env, i18n, plugin, parsedArgs),
+    chain (([stdout, stderr]) => !stdout && stderr
+        ? reject({
+            kind: 'E_INVALID_PLUGIN_RESPONSE',
+            msg: `The ${plugin.name} plugin experienced an error when executing the ${action}.`,
+            context: {
+                stderr,
+                stdout,
+                parsedArgs,
+                requestArgs
+            }
+        } as TaqError)
+        : decodeJson<T>(stdout)
+    )
+)
+
+const execPlugin = (action: PluginAction, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => (pluginArgs: string[]): Future<TaqError, string[]> =>
     attemptP(async () => {
         try {
-            // For each argument passed in via the CLI, send it as an argument to the
-            // plugin call as well. Plugins can use this information for additional context
-            // about invocation
-            const formattedArgs = Object.entries({...parsedArgs, ...requestArgs}).reduce(
-                (retval: string[], [key, val]) => {
-                    // Some parameters we don't need to send, so we omit those
-                    if (['$0', 'quickstart'].includes(key) || key.indexOf('-') >= 0 || val === undefined)
-                        return retval
-                    // Others need renamed
-                    else if (key === '_')
-                        return [...retval, '--command', String(val)]
-                    // String types need their values
-                    else if (val instanceof SanitizedAbsPath) 
-                        return [...retval, '--'+key, `'${val.value}'`]
-                    // Everything else is good
-                    else
-                        return [...retval, '--'+key, `'${val}'`]
-                },
-                []
-            )
-
             const cmd = [
                 ...getPluginExe(parsedArgs, plugin),
                 '--taqRun', action,
                 '--i18n', "'" + JSON.stringify(i18n) + "'",
                 '--config', "'"+ JSON.stringify(config) + "'",
                 '--envVars', "'" + JSON.stringify(env) + "'",
-                ...formattedArgs,
+                ...pluginArgs                
             ]
 
-            if (parsedArgs.logPluginCalls) {
-                console.log(`*** START Call to ${plugin.name} ***`)
-                const [exe, ...cmdArgs] = cmd
-                const lastLine = cmdArgs.pop()
-                console.log(`${exe} \\`)
-                cmdArgs.map(line => console.log(`${line} \\`))
-                console.log(lastLine)
-                console.log(`*** END of call to ${plugin.name} ***`)
-            }
+            if (parsedArgs.logPluginCalls) logPluginCall(cmd, plugin)
 
-            const altCmd = ['sh', '-c', cmd.join(' ')]
-            const process = Deno.run({cmd: altCmd, stdout: "piped", stderr: "piped"})
+            const process = Deno.run({
+                cmd: ['sh', '-c', cmd.join(' ')],
+                stdout: "piped",
+                stderr: "piped"
+            })
             const output = await process.output()
             const error = await process.stderrOutput()
             const decoder = new TextDecoder()
             const stdout = decoder.decode(output)
             const stderr = decoder.decode(error)
-
-            if (!stdout && stderr) {
-                return Promise.reject({
-                    kind: 'E_INVALID_PLUGIN_RESPONSE',
-                    msg: `The ${plugin.name} plugin experienced an error when executing the ${action}.`,
-                    context: {
-                        stderr,
-                        stdout,
-                        parsedArgs,
-                        requestArgs
-                    }
-                })
-            }
-
-            const decoded = JSON.parse(stdout)
-
-            return decoded
+            return [stdout, stderr]
         }
-        catch (err) {
-            console.log(err)
-            return Promise.reject({kind: 'E_INVALID_JSON', msg: 'TODO i18n message', previous: err})
+        catch (previous: unknown) {
+            return Promise.reject(
+                {kind: 'E_INVALID_JSON',
+                msg: 'TODO i18n message',
+                previous
+            } as TaqError)
         }
     })
 
@@ -494,9 +521,9 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                 ...parsedArgs
             }
             
-            const handler: Future<TaqError, unknown> = task.handler === 'proxy' && plugin
+            const handler = task.handler === 'proxy' && plugin
                 ? pipe(
-                    sendPluginQuery(
+                    sendPluginQuery<ProxyAction>(
                         "proxy",
                         {task: task.task.value},
                         config,
@@ -505,21 +532,22 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                         plugin,
                         args
                     ),
-                    as<{status: 'failed'|'success', stderr: string, stdout: unknown, render?: string}>(),
-                    map ((decoded) => {
-                        if (decoded.render == 'table') {
+                    map (decoded => {
+                        if (decoded.render === 'table') {
                             renderTable(decoded.stdout as Record<string, string>[])
+                            return 0
                         }
-                        else if (decoded.render !== 'none') {
-                            decoded.status === 'success'
-                                ? console.log(decoded.stdout)
-                                : console.error(decoded.stderr)
+                        if (decoded.status === 'success') {
+                            console.log(decoded.stdout)
+                            return 0
                         }
+                        console.error(decoded.stderr)
+                        return 1;
                     })
                 )
                 : exec(task.handler, args)
 
-            fork (displayError(cliConfig)) (identity) (handler)
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (identity) (handler)
         }
     })
 )
@@ -587,21 +615,20 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
 const getStateAbspath = (parsedArgs: SanitizedInitArgs): SanitizedAbsPath => 
     parsedArgs.projectDir.join(parsedArgs.configDir.value, "state.json")
 
-const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n): Future<TaqError | Error, State> => pipe(
+const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => pipe(
     parsedArgs,
     getStateAbspath,
-    (stateAbspath: SanitizedAbsPath) => pipe(
-        (!parsedArgs.disableState
+    stateAbspath => pipe(
+        !parsedArgs.disableState
             ? resolve(stateAbspath.value)
-            : reject("State disabled!")) as Future<string, string>,
-        chain (readJsonFile),
-        as<{build: string}>(),
-        chain ((data) =>
-            typeof(data) === 'object' && typeof(data.build) === 'string' && data.build === parsedArgs.setBuild
-                ? resolve(data as State)
+            : reject("State disabled!"),
+        chain ((value: string) => readJsonFile<State>(value)),
+        chain (data =>
+            data.build === parsedArgs.setBuild
+                ? resolve(data)
                 : reject("state.json was generated with a different build of taqueria")
         ),
-        chainRej (() => computeState(stateAbspath, config, env, parsedArgs, i18n)),
+        chainRej (_ => computeState(stateAbspath, config, env, parsedArgs, i18n)),
         chain ((state: State) => 
             config.hash.value === state.configHash.value
                 ? resolve(state)
@@ -610,7 +637,7 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
     )
 )
 
-const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqError | Error, State> => pipe(
+const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqError, State> => pipe(
     JSON.stringify(state, undefined, 4),
     (data: string) => `// WARNING: This file is autogenerated and should NOT be modified\n${data}`,
     writeTextFile(stateAbspath.value),
@@ -652,7 +679,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                 cliConfig,
                 parseArgs,
                 map (sanitizeArgs),
-                chain ((initArgs: SanitizedInitArgs) => {
+                chain (initArgs => {
                     if (initArgs.debug) debugMode(true)
                     if (initArgs.version) {
                         console.log(initArgs.setVersion)
@@ -671,7 +698,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
     }
 }
 
-export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedInitArgs | RawInitArgs) => {
+export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedInitArgs|RawInitArgs) => {
     if (executingBuiltInTask(parsedArgs) || cli.handled) {
         return parsedArgs
     }
