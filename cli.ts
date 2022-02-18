@@ -148,9 +148,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         },
         (args: RawInitArgs) => pipe(
             sanitizeScaffoldArgs(args), 
-            ({scaffoldUrl, scaffoldProjectDir, configDir, maxConcurrency, quickstart}: SanitizedScaffoldInitArgs) => {
-                return scaffoldProject(scaffoldUrl, scaffoldProjectDir, configDir, i18n, maxConcurrency, quickstart)
-            },
+            scaffoldProject(i18n),
             fork (console.error) (console.log)
         )
     )
@@ -279,7 +277,10 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
     map (_ => i18n.__("bootstrapMsg"))
 )
 
-const scaffoldProject = (scaffoldUrl: SanitizedUrl, scaffoldProjectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
+const scaffoldProject = (i18n: i18n) => ({
+    scaffoldUrl,
+    scaffoldProjectDir,
+}: SanitizedScaffoldInitArgs) => pipe(
     // TODO: i18n of messages
     // Clone git into destination folder (Initial version assumes git is installed)
     log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}\n...`)(null),
