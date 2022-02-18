@@ -27,6 +27,7 @@ export type ErrorType =
   | "E_NPM_INIT"
   | "E_INVALID_PLUGIN_RESPONSE"
   | "E_INVALID_ARGS"
+  | "E_MKDIR_FAILED"
   
 export interface TaqError {
     readonly kind: ErrorType,

@@ -33,41 +33,54 @@ export const debug = <T>(input: T) => {
     return input
 }
 
-const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
-export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map(() => path))
+export const mkdir = (path: string) : Future<TaqError, string> => 
+    attemptP(async () => {
+        try {
+            await Deno.mkdir(path, {recursive: true})
+            return path;
+        } catch (_e) {
+            // TODO i18n message
+            return Promise.reject({ kind: 'E_MKDIR_FAILED', msg: 'Failed to make directory', context: path, previous: _e })
+        }
 
-export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptP(async () =>{
-    try {
-        await Deno.stat(path);
-        return SanitizedAbsPath.create(path);
-    } catch(_e) {
-        // TODO i18n message
-        return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'Path does not exist', context: path, previous: _e })
-    }  
-});
+    })
 
-export const ensurePathDoesNotExist = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptP(async () =>{
-    try {
-        await Deno.stat(path);
+export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPath> => 
+    attemptP(async () =>{
+        try {
+            await Deno.stat(path);
+            return SanitizedAbsPath.create(path);
+        } catch(_e) {
+            // TODO i18n message
+            return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'Path does not exist', context: path, previous: _e })
+        }  
+    });
 
-        // TODO i18n message
-        return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'Path already exists', context: path })
-    } catch(_e) {
-        // Expect exception when trying to stat a new directory
-        return SanitizedAbsPath.create(path);
-    }
-});
+export const ensurePathDoesNotExist = (path: string) : Future<TaqError, SanitizedAbsPath> => 
+    attemptP(async () =>{
+        try {
+            await Deno.stat(path);
 
-const rmFuture = (path: SanitizedAbsPath): Future<TaqError, void> => attemptP(async () => {
-    try {
-        await Deno.remove(path.value);
-    } catch {
-        // Ignore if path does not exist
-    }
-});
-export const rm = (path: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => pipe(path, rmFuture, map(() => path))
+            // TODO i18n message
+            return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'Path already exists', context: path })
+        } catch(_e) {
+            // Expect exception when trying to stat a new directory
+            return SanitizedAbsPath.create(path);
+        }
+    });
 
-export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) => pipe(
+export const rm = (path: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => 
+    attemptP(async () => {
+        try {
+            await Deno.remove(path.value);
+        } catch {
+            // Ignore if path does not exist
+        }
+
+        return path;
+    });
+
+export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => 
     attemptP(async () => {
         const cloneProcess = Deno.run({
             cmd: ["git", "clone", url.value, destinationPath.value],
@@ -81,9 +94,9 @@ export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPat
                 context: { url: url.value, destinationPath: destinationPath.value }
             })
         }
-    }), 
-    map(() => destinationPath)
-);
+
+        return destinationPath;
+    });
 
 export const readTextFile = (path: string) : Future<TaqError, string> =>
     attemptP(() => {
