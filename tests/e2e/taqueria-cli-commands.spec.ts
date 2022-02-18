@@ -31,7 +31,7 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
-    test.only('Verify that taq reports a version', () => {
+    test('Verify that taq reports a version', () => {
         const version = execSync('taq --version')
         try {
             expect(version.length).toBeGreaterThan(0)
@@ -118,8 +118,6 @@ describe("E2E Testing for taqueria CLI,", () => {
     })
 
     test('Verify that the flextesa plugin exposes the associated commands in the help menu', async () => {
-        const flextesaProjectPath = taqueriaProjectPath + "/flextesaProject"
-
         try {
             await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
 
