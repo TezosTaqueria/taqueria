@@ -30,4 +30,3 @@ All while being fully customizable to fit into your Tezos development workflow.
 ### Extension Settings
 
 ### Release Notes
-comment for test

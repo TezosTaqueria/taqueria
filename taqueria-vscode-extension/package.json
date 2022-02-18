@@ -1,6 +1,6 @@
 {
-  "name": "taqueria-vscode-test-release",
-  "displayName": "taqueria-test-release",
+  "name": "taqueria",
+  "displayName": "taqueria",
   "description": "A vscode plugin to make Tezos development easier with Taqueria!",
   "publisher": "ecadlabs",
   "version": "0.0.9",
