@@ -5,17 +5,7 @@ import fs from "fs";
 import util from "util";
 const exec = util.promisify(exec1);
 
-
 const taqueriaProjectPath = './e2e/auto-test-cli';
-
-// Test template
-// test('', () => {
-//     try {
-        
-//     } catch(error) {
-//         throw new Error (`error: ${error}`);
-//     }
-// });
 
 describe("E2E Testing for taqueria CLI,", () => {
 
@@ -55,7 +45,7 @@ describe("E2E Testing for taqueria CLI,", () => {
         const configDirName = 'configDirProject'
 
         try {
-            await exec(`taq init ${projectName} -d ${configDirName}`)
+            await exec(`taq init ${projectName} --configDir ${configDirName}`)
 
             const projectContents = await exec(`ls ${projectName}`)
             const configDirContents = await exec(`ls ${projectName}/${configDirName}`)
