@@ -37,55 +37,54 @@ export const mkdir = (path: string) : Future<TaqError, string> =>
     attemptP(async () => {
         try {
             await Deno.mkdir(path, {recursive: true})
-            return path;
+            return path
         } catch (_e) {
             // TODO i18n message
             return Promise.reject({ kind: 'E_MKDIR_FAILED', msg: 'Failed to make directory', context: path, previous: _e })
         }
-
     })
 
 export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPath> => 
     attemptP(async () =>{
         try {
-            await Deno.stat(path);
-            return SanitizedAbsPath.create(path);
+            await Deno.stat(path)
+            return SanitizedAbsPath.create(path)
         } catch(_e) {
             // TODO i18n message
             return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'Path does not exist', context: path, previous: _e })
         }  
-    });
+    })
 
 export const ensurePathDoesNotExist = (path: string) : Future<TaqError, SanitizedAbsPath> => 
     attemptP(async () =>{
         try {
-            await Deno.stat(path);
+            await Deno.stat(path)
 
             // TODO i18n message
             return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'Path already exists', context: path })
         } catch(_e) {
             // Expect exception when trying to stat a new directory
-            return SanitizedAbsPath.create(path);
+            return SanitizedAbsPath.create(path)
         }
-    });
+    })
 
 export const rm = (path: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => 
     attemptP(async () => {
         try {
-            await Deno.remove(path.value);
+            await Deno.remove(path.value)
         } catch {
             // Ignore if path does not exist
         }
 
-        return path;
-    });
+        return path
+    })
 
 export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => 
     attemptP(async () => {
         const cloneProcess = Deno.run({
             cmd: ["git", "clone", url.value, destinationPath.value],
-        });
-        const cloneResult = await cloneProcess.status();
+        })
+        const cloneResult = await cloneProcess.status()
         
         if (!cloneResult.success) {
             // TODO i18n message
@@ -95,8 +94,8 @@ export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPat
             })
         }
 
-        return destinationPath;
-    });
+        return destinationPath
+    })
 
 export const readTextFile = (path: string) : Future<TaqError, string> =>
     attemptP(() => {
