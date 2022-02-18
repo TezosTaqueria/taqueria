@@ -149,7 +149,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         (args: RawInitArgs) => pipe(
             sanitizeScaffoldArgs(args), 
             scaffoldProject(i18n),
-            fork (console.error) (console.log)
+            forkCatch (console.error) (console.error) (console.log)
         )
     )
     .option('fromVsCode', {
