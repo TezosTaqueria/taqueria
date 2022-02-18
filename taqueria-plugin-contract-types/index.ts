@@ -1,4 +1,4 @@
-import {Plugin, Task, Option} from '@taqueria/node-sdk'
+import {Plugin, Task, Option, PositionalArg} from '@taqueria/node-sdk'
 import type { i18n} from '@taqueria/node-sdk/types'
 import {tasks} from './tasks'
 
@@ -11,12 +11,14 @@ Plugin.create((i18n: i18n) => ({
             task: "types",
             command: "types [contract]",
             description: "Generate types for a contract to be used with taquito",
-            options: [
-                Option.create({
-                    flag: "typescriptDir",
+            positionals: [
+                PositionalArg.create({
+                    placeholder: "typescriptDir",
                     description: "The output directory for the generated type files",
-                    defaultValue: 'types',
-                }),
+                    defaultValue: "types",
+                })
+            ],
+            options: [
                 Option.create({
                     shortFlag: "t",
                     flag: "typeAliasMode",
