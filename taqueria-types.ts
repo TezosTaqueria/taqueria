@@ -2,7 +2,7 @@ import type {SanitizedPath, SanitizedAbsPath, SanitizedUrl} from './taqueria-uti
 import {SHA256} from './taqueria-utils/taqueria-utils-types.ts'
 import {Option, Config, ConfigArgs, PluginInfo, InstalledPlugin, Verb, UnvalidatedTask, Task, UnvalidatedNetwork, Network, } from './taqueria-protocol/taqueria-protocol-types.ts'
 import {mkdir, joinPaths, debug} from './taqueria-utils/taqueria-utils.ts'
-import {resolve, map, chain, attemptP, coalesce} from 'https://cdn.skypack.dev/fluture';
+import {resolve, map, chain, attemptP, coalesce} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 
 export interface CommandArgs extends SanitizedInitArgs {
@@ -67,8 +67,8 @@ export interface SanitizedInitArgs {
     _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
     projectDir: SanitizedAbsPath
     configDir: SanitizedPath,
-    scaffoldUrl?: SanitizedUrl;
-    scaffoldProjectDir?: SanitizedAbsPath;
+    scaffoldUrl: SanitizedUrl;
+    scaffoldProjectDir: SanitizedAbsPath;
     maxConcurrency: number,
     debug: boolean,
     plugin?: string
@@ -81,10 +81,6 @@ export interface SanitizedInitArgs {
     fromVsCode: boolean
     version: boolean
     pluginName?: string
-}
-export interface SanitizedScaffoldInitArgs extends SanitizedInitArgs {
-    scaffoldUrl: SanitizedUrl;
-    scaffoldProjectDir: SanitizedAbsPath;
 }
 
 export interface i18n {
