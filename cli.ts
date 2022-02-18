@@ -287,7 +287,7 @@ const scaffoldProject = (i18n: i18n) => ({
     // TODO: i18n of messages
     // Clone git into destination folder (Initial version assumes git is installed)
     log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}\n...`)(null),
-    () => ensurePathDoesNotExist(scaffoldProjectDir.value),
+    () => ensurePathDoesNotExist(scaffoldProjectDir),
     log(`git clone...`),
     chain(gitClone(scaffoldUrl)),
     // TODO: Run initialization script

@@ -6,6 +6,13 @@ import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
 import * as jsonc from "https://deno.land/x/jsonc@1/main.ts"
 
+type PathTypes = string | SanitizedAbsPath;
+const getPathValue = (path: PathTypes) => 
+    typeof path === 'string' ? path : path.value;
+    
+type UrlTypes = string | SanitizedUrl;
+const getUrlValue = (url: UrlTypes) => 
+    typeof url === 'string' ? url : url.value;
 
 export const decodeJson = <T>(encoded: string): Future<TaqError, T> =>
     attemptP(() => {
@@ -33,10 +40,10 @@ export const debug = <T>(input: T) => {
     return input
 }
 
-export const mkdir = (path: string) : Future<TaqError, string> => 
+export const mkdir = <T extends PathTypes>(path: T): Future<TaqError, T> => 
     attemptP(async () => {
         try {
-            await Deno.mkdir(path, {recursive: true})
+            await Deno.mkdir(getPathValue(path), {recursive: true})
             return path
         } catch (_e) {
             // TODO i18n message
@@ -44,45 +51,44 @@ export const mkdir = (path: string) : Future<TaqError, string> =>
         }
     })
 
-export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPath> => 
+export const ensurePathExists = <T extends PathTypes>(path: T): Future<TaqError, T> => 
     attemptP(async () =>{
         try {
-            await Deno.stat(path)
-            return SanitizedAbsPath.create(path)
+            await Deno.stat(getPathValue(path))
+            return path
         } catch(_e) {
             // TODO i18n message
             return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'Path does not exist', context: path, previous: _e })
         }  
     })
 
-export const ensurePathDoesNotExist = (path: string) : Future<TaqError, SanitizedAbsPath> => 
+export const ensurePathDoesNotExist = <T extends PathTypes>(path: T): Future<TaqError, T> => 
     attemptP(async () =>{
         try {
-            await Deno.stat(path)
+            await Deno.stat(getPathValue(path))
 
             // TODO i18n message
             return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'Path already exists', context: path })
         } catch(_e) {
             // Expect exception when trying to stat a new directory
-            return SanitizedAbsPath.create(path)
+            return path
         }
     })
 
-export const rm = (path: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => 
+export const rm = <T extends PathTypes>(path: T, {recursive} = {recursive: true}) : Future<TaqError, void> => 
     attemptP(async () => {
         try {
-            await Deno.remove(path.value)
-        } catch {
-            // Ignore if path does not exist
+            await Deno.remove(getPathValue(path), {recursive})
+        } catch (_e) {
+            // TODO i18n message
+            return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'Path does not exist', context: path, previous: _e })
         }
-
-        return path
     })
 
-export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => 
+export const gitClone = <TUrl extends UrlTypes>(url: TUrl) => <T extends PathTypes>(path: T) : Future<TaqError, T> => 
     attemptP(async () => {
         const cloneProcess = Deno.run({
-            cmd: ["git", "clone", url.value, destinationPath.value],
+            cmd: ["git", "clone", getUrlValue(url), getPathValue(path)],
         })
         const cloneResult = await cloneProcess.status()
         
@@ -90,23 +96,23 @@ export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPat
             // TODO i18n message
             return Promise.reject({ 
                 kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Git clone failed', 
-                context: { url: url.value, destinationPath: destinationPath.value }
+                context: { url: getUrlValue(url), path: getPathValue(path) }
             })
         }
 
-        return destinationPath
+        return path
     })
 
-export const readTextFile = (path: string) : Future<TaqError, string> =>
+export const readTextFile = <T extends PathTypes>(path: T) : Future<TaqError, string> =>
     attemptP(() => {
         const decoder = new TextDecoder("utf-8")
-        return Deno.readFile(path)
+        return Deno.readFile(getPathValue(path))
             .then(data => {
                 const decoded = decoder.decode(data)
                 return decoded
             })
             .catch((previous: Error) => Promise.reject({
-                kind: "E_READ", msg: `Could not read ${path}`, previous
+                kind: "E_READ", msg: `Could not read ${getPathValue(path)}`, previous
             }))
     })
 
@@ -115,10 +121,10 @@ export const readJsonFile = <T>(path: string) => pipe(
     chain(x => decodeJson<T>(x))
 )
 
-export const writeTextFile = (path: string) => (data: string) : Future<TaqError, string> => 
-    attemptP(() => Deno.writeTextFile(path, data).then(() => path))
+export const writeTextFile = <T extends PathTypes>(path: T) => (data: string) : Future<TaqError, T> => 
+    attemptP(() => Deno.writeTextFile(getPathValue(path), data).then(() => path))
 
-export const writeJsonFile = <T>(path: string) => (data: T) => pipe(
+export const writeJsonFile = <T, TPath extends PathTypes = string>(path: TPath) => (data: T) => pipe(
     JSON.stringify(data),
     jsonStr => pipe(
         jsonc.format(jsonStr, undefined, {
