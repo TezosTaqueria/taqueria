@@ -1,6 +1,6 @@
 import type {UnvalidatedPluginInfo, InstalledPlugin, Config, ConfigArgs, Alias, Verb, Option, PositionalArg, PluginResponse, PluginAction, ProxyAction} from './taqueria-protocol/taqueria-protocol-types.ts'
 import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
-import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs, SanitizedScaffoldInitArgs} from './taqueria-types.ts'
+import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs} from './taqueria-types.ts'
 import {State} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs/deno.ts'
@@ -280,7 +280,10 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
 const scaffoldProject = (i18n: i18n) => ({
     scaffoldUrl,
     scaffoldProjectDir,
-}: SanitizedScaffoldInitArgs) => pipe(
+}: {
+    scaffoldUrl: SanitizedUrl;
+    scaffoldProjectDir: SanitizedAbsPath;
+}) => pipe(
     // TODO: i18n of messages
     // Clone git into destination folder (Initial version assumes git is installed)
     log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}\n...`)(null),
@@ -749,7 +752,7 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     setVersion: parsedArgs.setVersion,
     version: parsedArgs.version
 })
-const sanitizeScaffoldArgs = (parsedArgs: RawInitArgs) : SanitizedScaffoldInitArgs => ({
+const sanitizeScaffoldArgs = (parsedArgs: RawInitArgs) => ({
     ...sanitizeArgs(parsedArgs),
      scaffoldUrl: SanitizedUrl.create(parsedArgs.scaffoldUrl ?? ''),
      scaffoldProjectDir: SanitizedAbsPath.create(parsedArgs.scaffoldProjectDir ?? ''),

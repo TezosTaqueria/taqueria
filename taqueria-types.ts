@@ -82,10 +82,6 @@ export interface SanitizedInitArgs {
     version: boolean
     pluginName?: string
 }
-export interface SanitizedScaffoldInitArgs extends SanitizedInitArgs {
-    scaffoldUrl: SanitizedUrl;
-    scaffoldProjectDir: SanitizedAbsPath;
-}
 
 export interface i18n {
     __(msg: string, ...params: string[]): string
