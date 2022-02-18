@@ -34,13 +34,6 @@ const generateContractTypesAll = async (parsedArgs: Opts & PluginOpts) : Promise
 
 export const generateTypes = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse, Failure<T>> => {
     parsedArgs.typescriptDir = parsedArgs.typescriptDir || 'types';
-    // if(!parsedArgs.typescriptDir){
-    //     return Promise.reject({
-    //         status: 'failed',
-    //         stderr: `No typescriptDir configured`,
-    //         stdout: ""
-    //     });
-    // }
 
     // WORKAROUND: Redirect console.log
     const strOutLog = [] as string[];
@@ -51,13 +44,6 @@ export const generateTypes = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse,
     console.log('generateTypes', { 
         typescriptDir: parsedArgs.typescriptDir
     });
-
-    // console.log = consoleLogOrig;
-    // return Promise.resolve({
-    //     status: 'success',
-    //     stdout: `${strOutLog.join('\n')}`,
-    //     stderr: ""
-    // });
 
     const argsTyped = parsedArgs as Opts & PluginOpts;
 
