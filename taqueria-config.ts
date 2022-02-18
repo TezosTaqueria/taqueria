@@ -2,7 +2,7 @@ import type {Config, Task, InstalledPlugin, ConfigArgs} from './taqueria-protoco
 import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
 import {ConfigDir, i18n} from './taqueria-types.ts'
 import {SanitizedPath, SanitizedAbsPath, SHA256} from './taqueria-utils/taqueria-utils-types.ts'
-import {debug, readJsonFile, writeJsonFile, joinPaths, as} from './taqueria-utils/taqueria-utils.ts'
+import {debug, readJsonFile, writeJsonFile, joinPaths} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {resolve, reject, map, chain, mapRej, chainRej, both} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 
@@ -64,20 +64,6 @@ export const defaultConfig : Config = {
 
 export const getDefaultMaxConcurrency = () => 10
 
-export const make = (data: Partial<ConfigArgs>) : Future<TaqError, ConfigArgs> => {
-    // TODO: Change decoding/validation library
-    const err = undefined
-    const validData = {
-        ...defaultConfig,
-        ...data
-    } as ConfigArgs
-
-    // const [err, validData] = validate(data, ConfigDecoder)
-    return err === undefined
-        ? resolve(validData)
-        : reject({kind: "E_INVALID_CONFIG", msg: "The config.json file does not adhere to the required schema."})
-}
-
 export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
     ConfigDir.create(projectDir, configDir, create),
     map ((configDir: ConfigDir) => joinPaths(configDir.value, "config.json"))
@@ -92,7 +78,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedP
             else {
                 return pipe(
                     writeJsonFile<Config>(configPath) (defaultConfig),
-                    chain<TaqError, string, Config> ((configPath: string) => readJsonFile(configPath))
+                    chain((configPath: string) => readJsonFile<Config>(configPath))
                 )
             }
         })
@@ -102,7 +88,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedP
 )
 
 
-export const toConfigArgs = (configPath: string, configDir: SanitizedPath, projectDir: SanitizedAbsPath) => (config: Config) => pipe(
+export const toConfigArgs = (configPath: string, configDir: SanitizedPath, projectDir: SanitizedAbsPath, config: Config): Future<TaqError, ConfigArgs> => pipe(
     SHA256.futureOf(JSON.stringify(config)),
     map(hash => ({
         ...config,
@@ -116,6 +102,5 @@ export const toConfigArgs = (configPath: string, configDir: SanitizedPath, proje
 export const getConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, _i18n: i18n, create=false) => pipe(
         getRawConfig(projectDir, configDir, create),
         both (getConfigPath(projectDir, configDir, create)),
-        map (([configPath, config]) => ({configPath, config})),
-        chain (make)
+        chain (([configPath, config]) => toConfigArgs(configPath, configDir, projectDir, config)),
     )

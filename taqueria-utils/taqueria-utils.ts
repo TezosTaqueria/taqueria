@@ -33,8 +33,8 @@ export const debug = <T>(input: T) => {
     return input
 }
 
-const mkdirFuture = (path: string): Future<TaqError | Error, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
-export const mkdir = (path: string) : Future<TaqError | Error, string> => pipe(path, mkdirFuture, map(() => path))
+const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
+export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map(() => path))
 
 export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPath> => attemptP(async () =>{
     try {
@@ -91,9 +91,9 @@ export const readTextFile = (path: string) : Future<TaqError, string> =>
             }))
     })
 
-export const readJsonFile = <T>(path: string): Future<TaqError | Error, T> => pipe(
+export const readJsonFile = <T>(path: string) => pipe(
     readTextFile(path),
-    chain<TaqError, string, T> (decodeJson)
+    chain(x => decodeJson<T>(x))
 )
 
 export const writeTextFile = (path: string) => (data: string) : Future<TaqError, string> => 
@@ -160,5 +160,3 @@ export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cw
         } as TaqError
     }
 })
-
-export const as = <T>() => map(x => x as T);

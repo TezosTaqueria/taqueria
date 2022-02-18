@@ -7,8 +7,8 @@ import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, mapRej, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile, decodeJson} from './taqueria-utils/taqueria-utils.ts'
-import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
+import {exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile, decodeJson, ensurePathDoesNotExist, gitClone, rm} from './taqueria-utils/taqueria-utils.ts'
+import {SanitizedAbsPath, SanitizedPath, SanitizedUrl, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
@@ -126,7 +126,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
             ({projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
                 return initProject(projectDir, configDir, i18n, maxConcurrency, quickstart)
             },
-            fork (console.error) (console.log)
+            forkCatch (console.error) (console.error) (console.log)
         )
     )
     .command(
@@ -189,7 +189,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         // a plugin distributed and installable via NPM. This should support other means of distribution
         (inputArgs: InstallPluginArgs) => pipe(
             NPM.installPlugin(parsedArgs.configDir, parsedArgs.projectDir, i18n, inputArgs.pluginName),
-            fork (displayError(cliConfig)) (console.log)
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
     .alias('i', 'install')
@@ -330,10 +330,7 @@ const retrievePluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, plugin
 
 const retrieveAllPluginInfo = (config: ConfigArgs, env: EnvVars, i18n: i18n, parsedArgs: SanitizedInitArgs) => pipe(
     config.plugins.map((plugin: InstalledPlugin) => retrievePluginInfo(config, env, i18n, plugin, parsedArgs)),
-    parallel (parsedArgs.maxConcurrency),
-    // Filter out any undefined
-    // TODO: Should this be an error?
-    map(pluginInfos => pluginInfos.filter(x => x).map(x => x!))
+    parallel (parsedArgs.maxConcurrency)
 )
 
 const toPluginArguments = (parsedArgs: SanitizedInitArgs, requestArgs: Record<string, unknown>) => {
@@ -524,7 +521,7 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                 ...parsedArgs
             }
             
-            const handler: Future<TaqError, unknown> = task.handler === 'proxy' && plugin
+            const handler = task.handler === 'proxy' && plugin
                 ? pipe(
                     sendPluginQuery<ProxyAction>(
                         "proxy",
@@ -550,7 +547,7 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                 )
                 : exec(task.handler, args)
 
-            fork (displayError(cliConfig)) (identity) (handler)
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (identity) (handler)
         }
     })
 )
@@ -618,7 +615,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
 const getStateAbspath = (parsedArgs: SanitizedInitArgs): SanitizedAbsPath => 
     parsedArgs.projectDir.join(parsedArgs.configDir.value, "state.json")
 
-const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n): Future<TaqError | Error, State> => pipe(
+const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => pipe(
     parsedArgs,
     getStateAbspath,
     stateAbspath => pipe(
@@ -632,15 +629,15 @@ const getState = (config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArg
                 : reject("state.json was generated with a different build of taqueria")
         ),
         chainRej (_ => computeState(stateAbspath, config, env, parsedArgs, i18n)),
-        // chain ((state: State) => 
-        //     config.hash.value === state.configHash.value
-        //         ? resolve(state)
-        //         : computeState(stateAbspath, config, env, parsedArgs, i18n)
-        // )
+        chain ((state: State) => 
+            config.hash.value === state.configHash.value
+                ? resolve(state)
+                : computeState(stateAbspath, config, env, parsedArgs, i18n)
+        )
     )
 )
 
-const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqError | Error, State> => pipe(
+const writeState = (stateAbspath: SanitizedAbsPath, state: State): Future<TaqError, State> => pipe(
     JSON.stringify(state, undefined, 4),
     (data: string) => `// WARNING: This file is autogenerated and should NOT be modified\n${data}`,
     writeTextFile(stateAbspath.value),
