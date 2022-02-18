@@ -25,60 +25,12 @@ const generateContractTypes = (parsedArgs: Opts & PluginOpts) => async (contract
     });
 
     return `${contractFilename}: Types generated`;
-
-    // TODO: Generate contract michelson
-    // TODO: Generate types from michelson
-    
-    // throw new Error('Not Implemented');
-
-    // // TODO: Should getting the default environment be provided by the SDK or the framework?
-    // const currentEnv = parsedArgs.env
-    //     ? (parsedArgs.env as string)
-    //     : (
-    //         parsedArgs.config.environment
-    //             ? parsedArgs.config.environment.default
-    //             : 'development'
-    //     )
-    // const env = parsedArgs.config.environment && parsedArgs.config.environment[currentEnv]
-    //         ? parsedArgs.config.environment[currentEnv]
-    //         : undefined
-            
-    // // Has storage been provided for this contract?
-    // if (env && env.storage) {
-    //     try {
-    //         const tezos = new TezosToolkit(env.rpcUrl)
-    //         const contractData = await readFile(contractAbspath, "utf-8")
-
-    //         // TODO: Generate contract michelson
-    //         // TODO: Generate types from michelson
-
-    //         throw new Error('Not Implemented');
-    //         // await importKey(tezos, env.faucet.email, env.faucet.password, env.faucet.mnemonic.join(' '), env.faucet.activation_code)
-    //         // return tezos.contract.originate({
-    //         //     code: contractData,
-    //         //     storage: env.storage[contractFilename]
-    //         // })
-    //         // .then(operation => `${contractFilename}: ${operation.contractAddress}`)
-    //     }
-    //     catch (err) {
-    //         return Promise.reject({
-    //             status: 'failed',
-    //             stdout: "",
-    //             stderr: err
-    //         })
-    //     }
-    // }
-
-    // return Promise.reject({
-    //     status: 'failed',
-    //     stderr: `No storage configured in your configuration file for ${contractFilename}`,
-    //     stdout: ""
-    // })
 }
 
-const generateContractTypesAll = (parsedArgs: Opts & PluginOpts) : Promise<string[]> =>
-    glob("**/*.tz", {cwd: parsedArgs.artifactsDir})
-    .then(files => Promise.all(files.map(generateContractTypes(parsedArgs))))
+const generateContractTypesAll = async (parsedArgs: Opts & PluginOpts) : Promise<string[]> => {
+    const files = await glob("**/*.tz", {cwd: parsedArgs.artifactsDir});
+    return await Promise.all(files.map(generateContractTypes(parsedArgs)));
+}
 
 export const generateTypes = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse, Failure<T>> => {
     parsedArgs.typescriptDir = parsedArgs.typescriptDir || 'types';

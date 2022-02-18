@@ -13,10 +13,9 @@ Plugin.create((i18n: i18n) => ({
             description: "Generate types for a contract to be used with taquito",
             options: [
                 Option.create({
-                    shortFlag: "o",
                     flag: "typescriptDir",
-                    description: "The entry point that will be compiled",
-                    default: 'types',
+                    description: "The output directory for the generated type files",
+                    defaultValue: 'types',
                 }),
                 Option.create({
                     shortFlag: "t",
