@@ -31,10 +31,10 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
-    test('Verify that taq reports a version', () => {
-        const version = execSync('taq --version').toString().trim()
+    test.only('Verify that taq reports a version', () => {
+        const version = execSync('taq --version')
         try {
-            expect(version).not.toBe(undefined)
+            expect(version.length).toBeGreaterThan(0)
         } catch (error) {
             throw new Error (`error: ${error}`)
         }
