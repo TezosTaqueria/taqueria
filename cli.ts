@@ -291,7 +291,7 @@ const scaffoldProject = (scaffoldUrl: SanitizedUrl, scaffoldProjectDir: Sanitize
     // log(`initializing...`),
     // Load .taq/scaffold.json (if it exists)
     // Run init command
-    // log(`cleanup...`),
+    log(`cleanup...`),
     () => rm(scaffoldProjectDir.join(`.taq/scaffold.json`)),
     () => rm(scaffoldProjectDir.join(`.git`)),
     map(() => i18n.__("scaffoldDoneMsg"))
