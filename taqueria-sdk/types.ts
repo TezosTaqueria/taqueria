@@ -1,4 +1,4 @@
-import {Action, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, RuntimeDependency, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig} from '@taqueria/protocol/taqueria-protocol-types'
+import {Action, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, RuntimeDependency, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig, PluginResponse} from '@taqueria/protocol/taqueria-protocol-types'
 
 export type Sandbox = theSandbox
 
@@ -45,40 +45,6 @@ export interface i18n {
     readonly proxyNotSupported: string
 }
 
-export interface RuntimeDependencyReport extends RuntimeDependency {
-    readonly met: boolean
-}
-
-export interface CheckRuntimeDependenciesAction {
-    readonly status: ActionResponseCode,
-    readonly report: RuntimeDependencyReport[]
-}
-
-export interface InstallRuntimeDependenciesAction {
-    readonly status: ActionResponseCode,
-    readonly report: RuntimeDependencyReport[]
-}
-
-export type ActionResponseCode = "success" | "failed" | "notSupported"
-
-export type ActionNotSupported = {
-    readonly status: "notSupported",
-    readonly msg: string
-}
-
-export interface ProxyAction {
-    readonly status: ActionResponseCode,
-    readonly stdout: string | unknown,
-    readonly stderr: string,
-    readonly render?: 'none' | 'string' | 'table'
-}
-
-export interface ActionPluginInfo extends SchemaView {
-    readonly status: ActionResponseCode,
-}
-
-export type ActionResponse = ProxyAction | CheckRuntimeDependenciesAction | InstallRuntimeDependenciesAction | ActionPluginInfo | ActionNotSupported
-
 /**
  * A Schema for a plugin should have the same properties as the PluginInfo type, but
  * many of the properties are optional rather than required as in the PluginInfo type:
@@ -96,9 +62,9 @@ export interface Schema {
     readonly hooks?: (Hook | undefined)[]
     readonly networks?: (Network | undefined)[]
     readonly sandboxes?: (Sandbox | undefined)[]
-    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
-    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
-    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<PluginResponse, Failure<T>>
+    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<PluginResponse, Failure<T>>
+    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<PluginResponse, Failure<T>>
 }
 
 export interface SchemaView {
@@ -111,9 +77,9 @@ export interface SchemaView {
     readonly hooks: UnvalidatedHook[]
     readonly networks: UnvalidatedNetwork[]
     readonly sandboxes: UnvalidatedSandbox[],
-    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
-    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
-    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<ActionResponse, Failure<T>>
+    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<PluginResponse, Failure<T>>
+    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<PluginResponse, Failure<T>>
+    proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<PluginResponse, Failure<T>>
 }
 
 export type Args = string[]

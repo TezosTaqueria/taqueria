@@ -1,5 +1,5 @@
-import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol} from '@taqueria/protocol/taqueria-protocol-types'
-import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, ActionResponse, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView, ProxyAction} from "./types"
+import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol, PluginResponse, ProxyAction} from '@taqueria/protocol/taqueria-protocol-types'
+import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView} from "./types"
 import {join, resolve, dirname} from 'path'
 import {readFile, writeFile} from 'fs/promises'
 import {get} from 'stack-trace'
@@ -178,7 +178,7 @@ const sendError = (err: Failure<unknown>) => {
     console.error(JSON.stringify(err))
 }
 
-const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => (sanitzedArgs: SanitizedArgs): LikeAPromise<ActionResponse, Failure<[]>> => {
+const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => (sanitzedArgs: SanitizedArgs): LikeAPromise<PluginResponse, Failure<[]>> => {
     const {i18n, taqRun} = sanitzedArgs
     const schema = parseSchema(i18n, definer, inferPluginName)
     switch (taqRun) {
