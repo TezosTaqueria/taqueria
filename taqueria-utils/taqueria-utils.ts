@@ -1,15 +1,15 @@
-import {Future, reject, resolve, TaqError, SanitizedAbsPath, SanitizedUrl} from './taqueria-utils-types.ts'
+import {Future, TaqError, SanitizedAbsPath, SanitizedUrl} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {chain, attemptP, map, Future as Fluture} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import {chain, attemptP, map, Future as Fluture, reject, resolve, mapRej} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
 import * as jsonc from "https://deno.land/x/jsonc@1/main.ts"
 
-export const decodeJson = <T=unknown>(encoded: string): Future<TaqError, T> => Fluture((rej: reject, res:resolve) => {
+export const decodeJson = <T=unknown>(encoded: string): Future<TaqError, T> => Fluture((rej, res) => {
     try {
         const data = jsonc.parse(encoded)
-        res<T>(data)
+        res(data as T)
     } catch (err) {
         rej({kind: "E_INVALID_JSON", msg: "The provided JSON could not be decoded.", previous: err, context: encoded})
     }
@@ -64,21 +64,17 @@ const rmFuture = (path: SanitizedAbsPath): Future<TaqError | Error, void> => att
 export const rm = (path: SanitizedAbsPath) : Future<TaqError | Error, SanitizedAbsPath> => pipe(path, rmFuture, map(() => path))
 
 export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) => pipe(
-    attemptP(async () => {
-        const cloneProcess = Deno.run({
-            cmd: ["git", "clone", url.value, destinationPath.value],
-        });
-        const cloneResult = await cloneProcess.status();
-        
-        if (!cloneResult.success) {
-            return Promise.reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'TODO i18n message'})
-        }
-    }), 
+    exec('git clone <%= it.url %> <%= it.outputDir %>', {url: url.value, outputDir: destinationPath.value}),
+    mapRej(previous => ({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Could not scaffold. Is Git installed?', context: {url, destinationPath}, previous})),
+    chain(status => status == 0
+        ? resolve(destinationPath)
+        : reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Could not scaffold. Is Git installed?', context: {url, destinationPath}})
+    ),
     map(() => destinationPath)
 );
 
 export const readTextFile = (path: string): Future<TaqError | Error, string> => Fluture(
-    (rej: reject, res: resolve) => {
+    (rej, res) => {
         const decoder = new TextDecoder("utf-8")
         Deno.readFile(path)
             .then(data => {
@@ -98,7 +94,7 @@ export const readJsonFile = <T>(path: string): Future<TaqError | Error, T> => pi
 )
 
 export const writeTextFile = (path: string) => (data: string): Future<TaqError | Error, unknown> => Fluture(
-    (rej: reject, res: resolve) => {
+    (rej, res) => {
         Deno.writeTextFile(path, data).then(() => res(path)).catch(rej)
         return () => {}
     }

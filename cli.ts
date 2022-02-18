@@ -130,20 +130,19 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         )
     )
     .command(
-        'scaffold [scaffoldUrl]',
+        'scaffold [scaffoldUrl] [scaffoldProjectDir]',
         i18n.__('scaffoldDesc'),
         (yargs: Arguments) => {
             yargs
                 .positional('scaffoldUrl', {
                     describe: i18n.__('scaffoldUrlDesc'),
                     type: 'string',
-                    default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git',
+                    default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git'
                 })
                 .positional('scaffoldProjectDir', {
-                    alias: 'scaffoldProjectDir',
                     type: 'string',
                     describe: i18n.__('scaffoldProjectDirDesc'),
-                    default: './taqueria-quickstart',
+                    default: './taqueria-quickstart'
                 })
         },
         (args: RawInitArgs) => pipe(
@@ -274,7 +273,6 @@ const scaffoldProject = (scaffoldUrl: SanitizedUrl, scaffoldProjectDir: Sanitize
     // Clone git into destination folder (Initial version assumes git is installed)
     log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}\n...`)(null),
     () => ensurePathDoesNotExist(scaffoldProjectDir.value),
-    log(`git clone...`),
     chain(gitClone(scaffoldUrl)),
     // TODO: Run initialization script
     // Run init found in .taq/scaffold.json
@@ -658,7 +656,9 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                         console.log(initArgs.setVersion)
                         return resolve(initArgs)
                     }
-                    return initArgs._.includes('init') || initArgs._.includes('testFromVsCode')
+                    return initArgs._.includes('init') || 
+                        initArgs._.includes('testFromVsCode') ||
+                        initArgs._.includes('scaffold')
                         ? resolve(initArgs)
                         : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
                 }),
