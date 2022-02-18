@@ -41,7 +41,7 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     });
 
-    test('Verify that taq reports the correct version', () => {
+    test('Verify that taq reports a version', () => {
         const version = execSync('taq --version').toString().trim();
         try {
             expect(version).not.toBe(undefined)
@@ -152,6 +152,26 @@ describe("E2E Testing for taqueria CLI,", () => {
 
             await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
             await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    });
+
+    test('Verify that trying a command that is not available returns an error', async () => {
+        try {
+            const response = await exec(`taq compile -p ${taqueriaProjectPath}`)
+            expect(response.stderr).toContain("E_INVALID_TASK")
+            expect(response.stderr).toContain("Taqueria isn't aware of this task. Perhaps you need to install a plugin first?")
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    });
+
+    test('Verify that trying to install a package that does not exist returns an error', async () => {
+        try {
+            const response = await exec(`taq install acoupleofecadhamburgers -p ${taqueriaProjectPath}`)
+            expect(response.stderr).toContain("E_READ")
+            expect(response.stderr).toContain("ENOENT")
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
