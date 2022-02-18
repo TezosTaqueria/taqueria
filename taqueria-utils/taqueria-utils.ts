@@ -55,14 +55,14 @@ export const ensurePathDoesNotExist = (path: string) : Future<TaqError, Sanitize
     }
 });
 
-const rmFuture = (path: SanitizedAbsPath): Future<TaqError | Error, void> => attemptP(async () => {
+const rmFuture = (path: SanitizedAbsPath): Future<TaqError, void> => attemptP(async () => {
     try {
         await Deno.remove(path.value);
     } catch {
         // Ignore if path does not exist
     }
 });
-export const rm = (path: SanitizedAbsPath) : Future<TaqError | Error, SanitizedAbsPath> => pipe(path, rmFuture, map(() => path))
+export const rm = (path: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => pipe(path, rmFuture, map(() => path))
 
 export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) => pipe(
     attemptP(async () => {
