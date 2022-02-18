@@ -224,7 +224,6 @@ jobs:
 
             const git_short_sha = "${{ github.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
-            const packageVersion = `0.0.0-pr-${{ github.event.number }}-${git_short_sha}`;
 
             let body = `
 
@@ -236,12 +235,12 @@ jobs:
 
               | npm package installation instructions |
               | ------------------------------------- |
-              | npm install ${{ env.SCOPE }}/${sdk.name}@${packageVersion}|
-              | taq install ${{ env.SCOPE }}/${ligo.name}@${packageVersion}|
-              | taq install ${{ env.SCOPE }}/${smartpy.name}@${packageVersion}|
-              | taq install ${{ env.SCOPE }}/${taquito.name}@${packageVersion}|
-              | taq install ${{ env.SCOPE }}/${flextesa.name}@${packageVersion}|
-              | taq install ${{ env.SCOPE }}/${contractTypes.name}@${packageVersion}|
+              | npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
             `;
 
 
