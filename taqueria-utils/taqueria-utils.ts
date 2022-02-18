@@ -76,7 +76,10 @@ export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPat
         
         if (!cloneResult.success) {
             // TODO i18n message
-            return Promise.reject({ kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Git clone failed', context: url.value })
+            return Promise.reject({ 
+                kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Git clone failed', 
+                context: { url: url.value, destinationPath: destinationPath.value }
+            })
         }
     }), 
     map(() => destinationPath)
