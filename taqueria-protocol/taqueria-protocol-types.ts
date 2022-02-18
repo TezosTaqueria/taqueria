@@ -586,4 +586,38 @@ export interface Environment {
     readonly storage: Record<string, unknown>
 }
 
-export type Action = "checkRuntimeDependencies" | "installRuntimeDependencies" | "proxy" | "pluginInfo" | string
+export type PluginAction = "checkRuntimeDependencies" | "installRuntimeDependencies" | "proxy" | "pluginInfo" | string
+
+export interface RuntimeDependencyReport extends RuntimeDependency {
+    readonly met: boolean
+}
+
+export interface CheckRuntimeDependenciesAction {
+    readonly status: PluginResponseCode,
+    readonly report: RuntimeDependencyReport[]
+}
+
+export interface InstallRuntimeDependenciesAction {
+    readonly status: PluginResponseCode,
+    readonly report: RuntimeDependencyReport[]
+}
+
+export type PluginResponseCode = "success" | "failed" | "notSupported"
+
+export type PluginActionNotSupported = {
+    readonly status: "notSupported",
+    readonly msg: string
+}
+
+export interface ProxyAction {
+    readonly status: PluginResponseCode,
+    readonly stdout: string | unknown,
+    readonly stderr: string,
+    readonly render?: 'none' | 'string' | 'table'
+}
+
+export interface ActionPluginInfo extends UnvalidatedPluginInfo {
+    readonly status: PluginResponseCode,
+}
+
+export type PluginResponse = ProxyAction | CheckRuntimeDependenciesAction | InstallRuntimeDependenciesAction | ActionPluginInfo | PluginActionNotSupported
