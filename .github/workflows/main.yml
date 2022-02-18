@@ -237,11 +237,11 @@ jobs:
               | npm package installation instructions |
               | ------------------------------------- |
               | npm install ${{ env.SCOPE }}/${sdk.name}@${packageVersion}|
-              | npm install ${{ env.SCOPE }}/${ligo.name}@${packageVersion}|
-              | npm install ${{ env.SCOPE }}/${smartpy.name}@${packageVersion}|
-              | npm install ${{ env.SCOPE }}/${taquito.name}@${packageVersion}|
-              | npm install ${{ env.SCOPE }}/${flextesa.name}@${packageVersion}|
-              | npm install ${{ env.SCOPE }}/${contractTypes.name}@${packageVersion}|
+              | taq install ${{ env.SCOPE }}/${ligo.name}@${packageVersion}|
+              | taq install ${{ env.SCOPE }}/${smartpy.name}@${packageVersion}|
+              | taq install ${{ env.SCOPE }}/${taquito.name}@${packageVersion}|
+              | taq install ${{ env.SCOPE }}/${flextesa.name}@${packageVersion}|
+              | taq install ${{ env.SCOPE }}/${contractTypes.name}@${packageVersion}|
             `;
 
 
