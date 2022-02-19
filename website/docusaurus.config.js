@@ -150,7 +150,7 @@ const config = {
 							},
 							{
 								label: "GitHub",
-								to: "https://github.com/ecadlabs/taqueria",
+								to: "https://github.com/ecadlabs/taqueria/discussions",
 							},
 						],
 					},
