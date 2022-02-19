@@ -163,7 +163,7 @@ const config = {
 							},
 							{
 								label: "Roadmap",
-								to: "https://taqueria.io/docs/roadmap",
+								to: "/docs/roadmap",
 							},
 						],
 					},
