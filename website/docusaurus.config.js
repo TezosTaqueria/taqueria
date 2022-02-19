@@ -163,7 +163,7 @@ const config = {
 							},
 							{
 								label: "Roadmap",
-								to: "https://github.com/ecadlabs/taqueria/milestones?direction=asc&sort=due_date&state=open",
+								to: "https://taqueria.io/docs/roadmap",
 							},
 						],
 					},
