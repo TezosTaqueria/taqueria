@@ -35,23 +35,23 @@ const originateContractToSandbox = async (contractFilename: string, parsedArgs: 
             }
             else {
                 return Promise.reject({
-                    status: 'failed',
-                    stdout: '',
-                    stderr: `Please configure a default account for the ${sandboxName} to be used for origination.`
+                    errCode: "E_INVALID_SANDBOX_ACCOUNT",
+                    errMsg: `Please configure a default account for the ${sandboxName} to be used for origination.`,
+                    context: sandbox
                 })
             }
         }
         return Promise.reject({
-            status: 'failed',
-            stderr: 'The sandbox configuration is invalid and missing the RPC url',
-            stdout: ''
+            errCode: "E_INVALID_SANDBOX_URL",
+            errMsg: 'The sandbox configuration is invalid and missing the RPC url',
+            context: sandbox
         })
     }
     catch (err) {
         return Promise.reject({
-            status: 'failed',
-            stdout: "",
-            stderr: err
+            errCode: "E_ORIGINATE",
+            errMsg: "An unexpected error occured when trying to originate a contract",
+            previous: err
         })
     }
 }
@@ -77,23 +77,23 @@ const originateContractToNetwork = async (contractFilename: string, parsedArgs: 
             }
             else {
                 return Promise.reject({
-                    status: 'failed',
-                    stdout: '',
-                    stderr: `Please configure a faucet for the ${network} network to be used for origination.`
+                    errCode: "E_INVALID_NETWORK_FAUCET",
+                    errMsg: `Please configure a faucet for the ${network} network to be used for origination.`,
+                    context: network
                 })
             }
         }
         return Promise.reject({
-            status: 'failed',
-            stderr: 'The network configuration is invalid and missing the RPC url',
-            stdout: ''
+            errCode: "E_INVALID_NETWORK_URL",
+            errMsg: 'The network configuration is invalid and missing the RPC url',
+            context: network
         })
     }
     catch (err) {
         return Promise.reject({
-            status: 'failed',
-            stdout: "",
-            stderr: err
+            errCode: "E_ORIGINATE",
+            errMsg: "An unexpected error occured when trying to originate a contract",
+            previous: err
         })
     }
 }
@@ -134,17 +134,17 @@ const originateContract = (parsedArgs: Opts) => (contractFilename: string) : Pro
 
     if (!env) {
         return Promise.reject({
-            status: 'failed',
-            stderr: `No environment configured in your configuration file called ${parsedArgs.env}`,
-            stdout: ""
+            errCode: "E_INVALID_ENV",
+            errMsg: `No environment configured in your configuration file called ${parsedArgs.env}`,
+            context: parsedArgs.config
         })    
     }
 
     if (!env.storage || !env.storage[contractFilename]) {
         return Promise.reject({
-            status: 'failed',
-            stderr: `No storage configured in your configuration file for ${contractFilename}`,
-            stdout: ""
+            errCode: "E_INVALID_STORAGE",
+            errMsg: `No storage configured in your configuration file for ${contractFilename}`,
+            context: env
         })
     }
 
@@ -175,6 +175,7 @@ const originateAll = (parsedArgs: Opts) : Promise<unknown[]> =>
 export const originate = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse, Failure<T>> => {
     const p = parsedArgs.contract
         ? originateContract(parsedArgs) (parsedArgs.contract as string)
+            .then(result => [result])
         : originateAll(parsedArgs)
 
     return p.then(data => ({
@@ -183,6 +184,10 @@ export const originate = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse, Fai
         stderr: "",
         render: 'table'
     }))
+    .catch(err => err.errCode
+        ? Promise.resolve({status: 'failed', stdout: '', stderr: err.errMsg, previous: err})
+        : Promise.resolve({status: 'failed', stderr: err.getMessage(), stdout: '', previous: err})
+    )
 }
 
 export default originate

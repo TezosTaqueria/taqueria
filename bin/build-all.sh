@@ -5,24 +5,23 @@ if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
     echo '******* BUILDING ALL TAQUERIA PACKAGES *******'
     echo '**********************************************'
 
-    echo "Installing NPM dependencies"
+    echo "** Installing NPM dependencies"
     npm install
 
-    echo "Building taqueria-protocol"
+    echo "** Building taqueria-protocol"
     npm run build --workspace=taqueria-protocol
 
-    echo "Building node-sdk"
+    echo "** Building node-sdk"
     npm run build --workspace=taqueria-sdk
 
     for dir in `ls -1d *plugin*`; do
-        echo "Building $dir (in parallel)"
-        ./bin/build-plugin.sh $dir &
+        ./bin/build-plugin.sh $dir
     done
 
-    echo "Building taqueria (in parallel)"
-    npm run build &
+    echo "** Building taqueria"
+    npm run build
     wait
-    echo "Builds complete!"
+    echo "** Builds complete!"
 
 else
     echo "Usage: ./bin/build-all.sh"
