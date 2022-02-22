@@ -6,7 +6,7 @@ const FeatureList = [
 	{
 		title: "Built By",
 		Svg: require("../../../static/img/ECAD_logo.svg").default,
-		url: "/",
+		url: "https://ecadlabs.com/",
 	},
 	,
 ];

@@ -10,7 +10,7 @@ Taqueria is designed to be flexible, streamlined, and customizable so plugins ar
 Once installed, plugins provide their functionality by exposing tasks in the Taqueria CLI. The tasks available to run on a particular project can be viewed by running the `taq --help` command in a project directory that's using Taqueria. 
 
 :::note
-If you aren't seeing tasks listed when running `taq`, make sure that you are in the correct project folder and that you have successfully installed that particular plugin on that project `taq install @taqueria/[INSERT_PLUGIN_NAME]
+If you aren't seeing tasks listed when running `taq`, make sure that you are in the correct project folder and that you have successfully installed that particular plugin on that project `taq install @taqueria/[INSERT_PLUGIN_NAME]`
 :::
 
 During installation, NPM packages for the plugin are downloaded into the project folder and the plugin is registered in `./.taq/config.json`
