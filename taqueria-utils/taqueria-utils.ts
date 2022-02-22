@@ -1,11 +1,10 @@
-import type {Future, reject, resolve, TaqError, SanitizedAbsPath} from './taqueria-utils-types.ts'
+import {Future, TaqError, SanitizedAbsPath, SanitizedUrl} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {chain, attemptP, map, Future as Fluture} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {chain, attemptP, map, Future as Fluture, reject, resolve, mapRej} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
 import * as jsonc from "https://deno.land/x/jsonc@1/main.ts"
-
 
 export const decodeJson = <T>(encoded: string): Future<TaqError, T> =>
     attemptP(() => {
@@ -19,19 +18,75 @@ export const decodeJson = <T>(encoded: string): Future<TaqError, T> =>
 
 export const log = <T>(message: string) => (input: T) : T => {
     console.log(message)
-    console.log(input)
     return input
 }
 
+export const logInput = <T>(message: string) => (input: T) : T => {
+    console.log(message)
+    console.log(input)
+    return input
+}
 
 export const debug = <T>(input: T) => {
     debugger
     return input
 }
 
-const mkdirFuture = (path: string): Future<TaqError, void> => attemptP(() => Deno.mkdir(path, {recursive: true}))
+export const mkdir = (path: string) : Future<TaqError, string> => 
+    attemptP(async () => {
+        try {
+            await Deno.mkdir(path, {recursive: true})
+            return path
+        } catch (_e) {
+            // TODO i18n message
+            return Promise.reject({ kind: 'E_MKDIR_FAILED', msg: 'Failed to make directory', context: path, previous: _e })
+        }
+    })
 
-export const mkdir = (path: string) : Future<TaqError, string> => pipe(path, mkdirFuture, map (() => path))
+export const ensurePathExists = (path: string) : Future<TaqError, SanitizedAbsPath> => 
+    attemptP(async () =>{
+        try {
+            await Deno.stat(path)
+            return SanitizedAbsPath.create(path)
+        } catch(_e) {
+            // TODO i18n message
+            return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'Path does not exist', context: path, previous: _e })
+        }  
+    })
+
+export const ensurePathDoesNotExist = (path: string) : Future<TaqError, SanitizedAbsPath> => 
+    attemptP(async () =>{
+        try {
+            await Deno.stat(path)
+
+            // TODO i18n message
+            return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'Path already exists', context: path })
+        } catch(_e) {
+            // Expect exception when trying to stat a new directory
+            return SanitizedAbsPath.create(path)
+        }
+    })
+
+export const rm = (path: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => 
+    attemptP(async () => {
+        try {
+            await Deno.remove(path.value)
+        } catch {
+            // Ignore if path does not exist
+        }
+
+        return path
+    })
+
+export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) => pipe(
+    exec('git clone <%= it.url %> <%= it.outputDir %>', {url: url.value, outputDir: destinationPath.value}),
+    mapRej(previous => ({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Could not scaffold. Is Git installed?', context: {url, destinationPath}, previous})),
+    chain(status => status == 0
+        ? resolve(destinationPath)
+        : reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Could not scaffold. Is Git installed?', context: {url, destinationPath}})
+    ),
+    map(() => destinationPath)
+);
 
 export const readTextFile = (path: string) : Future<TaqError, string> =>
     attemptP(() => {
