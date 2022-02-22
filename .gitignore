@@ -138,3 +138,4 @@ tests/coverage
 .vscode-test
 /taqueria-vscode-extension/state.json
 /taqueria-vscode-extension/config.json
+.history
