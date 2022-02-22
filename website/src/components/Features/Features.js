@@ -15,14 +15,14 @@ const FeatureList = [
         title: "Everything in one place",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "The Taqueria CLI and VS Code plugin brings your development tools to you. Stop moving your code jumping between IDEs. With Taqueria’s plugin infrastructure you can use the tools you need all in one place.",
+          "The Taqueria CLI and VS Code plugin bring your development tools to you. Stop moving your code jumping between IDEs. With Taqueria’s plugin infrastructure you can use the tools you need all in one place.",
         gif: require("../../../static/gif/taq_init.mp4").default,
       },
       {
         title: "Effortlessly compile",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Taqueria compiles smart contracts written in Ligo, SmartPy and Michelson compilation is coming soon.",
+          "Taqueria compiles smart contracts written in Ligo and SmartPy. Michelson and Archetype support is coming soon.",
         gif: require("../../../static/gif/taq_compile.mp4").default,
       },
       {
