@@ -26,9 +26,9 @@ describe("E2E Testing for taqueria scaffolding,", () => {
             await exec('taq scaffold')
             const scaffoldDirContents = await exec(`ls ${scaffoldDirName}`)
 
-            expect(scaffoldDirContents.stdout).toContain('Readme.md')
+            expect(scaffoldDirContents.stdout).toContain('README.md')
             expect(scaffoldDirContents.stdout).toContain('app')
-            expect(scaffoldDirContents.stdout).toContain('contract')
+            expect(scaffoldDirContents.stdout).toContain('taqueria')
             expect(scaffoldDirContents.stdout).toContain('package.json')
 
             await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
@@ -72,9 +72,9 @@ describe("E2E Testing for taqueria scaffolding,", () => {
             await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-quickstart.git ${alternateDirectory}`)
             const scaffoldDirContents = await exec(`ls ${alternateDirectory}`)
 
-            expect(scaffoldDirContents.stdout).toContain('Readme.md')
+            expect(scaffoldDirContents.stdout).toContain('README.md')
             expect(scaffoldDirContents.stdout).toContain('app')
-            expect(scaffoldDirContents.stdout).toContain('contract')
+            expect(scaffoldDirContents.stdout).toContain('taqueria')
             expect(scaffoldDirContents.stdout).toContain('package.json')
 
             await fsPromises.rm(`./${alternateDirectory}`, { recursive: true })
