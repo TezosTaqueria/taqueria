@@ -16,7 +16,7 @@ interface Failure {
 interface AccountKeys {
     alias: string
     encryptedKey: string
-    publicKey: string
+    publicKeyHash: string
     secretKey: string
 }
 
@@ -155,8 +155,8 @@ const parseConfig = (input: ConfigInput) => {
 const getAccountKeys = (accountName: string): Promise<AccountKeys> => 
     run(`flextesa key ${accountName}`)
     .then((result: string) => {
-        const [alias, encryptedKey, publicKey, secretKey] = result.trim().split(',')
-        return {alias, encryptedKey, publicKey, secretKey}
+        const [alias, encryptedKey, publicKeyHash, secretKey] = result.trim().split(',')
+        return {alias, encryptedKey, publicKeyHash, secretKey}
     })
 
 const addAccountKeys = async ([accountName, accountDetails]: [string, AccountDetails]) => {
@@ -283,7 +283,7 @@ const importAccounts = (sandboxName: string, config: Config) => {
 
 
 const isAccountImported = (accountName: string) =>
-    run(`tezos-client list known accounts`)
+    run(`tezos-client list known addresses`)
     .then(output => output.indexOf(accountName) >= 0)
     .catch(() => false)
     
@@ -325,7 +325,7 @@ readJsonFile<ConfigInput>(inputArgs.config)
     return L.modifyAsync(lens, addAccountKeys, config)
 })
 .then(writeConfigFile(inputArgs.config))
-.then(config => { 
+.then((config: Config) => { 
     if (inputArgs.configure)
         return configureTezosClient(config)
     else if (inputArgs.importAccounts)
@@ -334,7 +334,7 @@ readJsonFile<ConfigInput>(inputArgs.config)
         return runMininet(inputArgs.sandbox) (config).then(() => config)
 })
 .then(() => process.exit(0))
-.catch(err => {
+.catch((err: Error) => {
     console.error(err)
     process.exit(-1)
 })

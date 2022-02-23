@@ -454,7 +454,7 @@ export class Option {
 export interface AccountKeys {
     alias: string
     encryptedKey: string
-    publicKey: string
+    publicKeyHash: string
     secretKey: string
 }
 
