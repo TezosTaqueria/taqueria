@@ -1,5 +1,5 @@
 import { assertEquals, assertRejects, unreachable } from "https://deno.land/std@0.121.0/testing/asserts.ts";
-import {fork, mapRej, promise} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {fork, promise} from 'https://cdn.skypack.dev/fluture';
 import {
     decodeJson,
     isTaqError,
@@ -10,11 +10,7 @@ import {
 } from "../../../taqueria-utils/taqueria-utils.ts";
 import chai from "https://cdn.skypack.dev/chai@4.3.4?dts";
 import { exists} from "https://deno.land/std/fs/mod.ts";
-import {TaqError, Future} from "../../../taqueria-utils/taqueria-utils-types.ts";
-
-const toPromise = <T>(future: Future<TaqError|Error, T>) => promise (
-    mapRej(taqError => taqError as Error) (future)
-)
+import {TaqError} from "../../../taqueria-utils/taqueria-utils-types.ts";
 
 const testValidJson = '{"test": "testPayload"}';
 const testInvalidJson = '{"test": testPayload}';
@@ -37,9 +33,9 @@ Deno.test("Positive scenario test for {decodeJson} function to return () => {}",
     fork (assertUnreachable) (assertSuccess) (result);
 });
 
-Deno.test({ name: "Negative scenario test for {decodeJson} function", fn: () => {
+Deno.test({ name: "Negative scenario test for {decodeJson} function", fn: async () => {
     assertRejects( ()=> {
-            toPromise (decodeJson(testInvalidJson));
+                promise (decodeJson(testInvalidJson));
                 throw new Error("The provided JSON could not be decoded.")
             },
             Error, "The provided JSON could not be decoded."
@@ -66,7 +62,7 @@ Deno.test("Negative scenario test for {log} function", () => {
 Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t: any) => {
         await t.step("run test for {mkdir} function", async () => {
             const assert = chai.assert;
-            const result = await toPromise(mkdir("./unit/taqueria-utils/data/test"));
+            const result = await promise(mkdir("./unit/taqueria-utils/data/test"));
             exists(result).then((result: any) => assert.equal(result, true));
         });
         await t.step("clean up", async () => {
@@ -81,28 +77,28 @@ Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t: an
     sanitizeOps: false
 },);
 
-
-Deno.test({ignore: true, name: "Positive scenario test for {writeTextFile} function",  fn: async (t: any) => {
-        await t.step("run test for {writeTextFile} function", async () => {
-            const assert = chai.assert;
-            const result = await toPromise (writeTextFile("./unit/taqueria-utils/data/testWrite.txt")("testWrite"));
-            assert.equal(result, './unit/taqueria-utils/data/testWrite.txt');
-        });
-        await t.step("clean up", async () => {
-            try {
-                Deno.removeSync('./unit/taqueria-utils/data/testWrite.txt');
-            } catch (err) {
-                console.error(err);
-            }
-        });
-    },
-    sanitizeResources: false,
-    sanitizeOps: false
-})
+// TODO: This flaky test is disabled for now, need to come back to fix it later
+// Deno.test({name: "Positive scenario test for {writeTextFile} function",  fn: async (t: any) => {
+//         await t.step("run test for {writeTextFile} function", async () => {
+//             const assert = chai.assert;
+//             const result = await promise (writeTextFile("./unit/taqueria-utils/data/testWrite.txt")("testWrite"));
+//             assert.equal(result, './unit/taqueria-utils/data/testWrite.txt');
+//         });
+//         await t.step("clean up", async () => {
+//             try {
+//                 Deno.removeSync('./unit/taqueria-utils/data/testWrite.txt');
+//             } catch (err) {
+//                 console.error(err);
+//             }
+//         });
+//     },
+//     sanitizeResources: false,
+//     sanitizeOps: false
+// });
 
 Deno.test({ignore: true, name: "Negative scenario test for {writeTextFile} function to catch error",  fn: async () => {
         assertRejects( ()=> {
-            toPromise (writeTextFile("./unit/taqueria-utils/data/temp")("test"));
+                promise (writeTextFile("./unit/taqueria-utils/data/temp")("test"));
                 throw new Error("Is a directory (os error 21), open './unit/taqueria-utils/data/temp'\n")
             },
             Error, "Is a directory (os error 21), open './unit/taqueria-utils/data/temp'\n"
