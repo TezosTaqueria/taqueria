@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/flextesa-docker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Extends the oxheadalpha/flextesa image for use with Taqueria",
   "main": "index.js",
   "scripts": {
