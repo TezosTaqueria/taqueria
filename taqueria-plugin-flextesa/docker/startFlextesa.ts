@@ -185,7 +185,7 @@ const getBootstrapFlags = (sandboxName: string, config:Config) => {
                 const {keys, initialBalance} = accountDetails
                 return [
                     ...retval,
-                    `--add-bootstrap-account="${keys.alias},${keys.encryptedKey},${keys.publicKey},${keys.secretKey}@${initialBalance}"`
+                    `--add-bootstrap-account="${keys.alias},${keys.encryptedKey},${keys.publicKeyHash},${keys.secretKey}@${initialBalance}"`
                 ]
             },
             []
