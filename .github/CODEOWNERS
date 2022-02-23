@@ -3,3 +3,6 @@
 
 # Set the SRE team as code owners for all github workflows
 /.github/workflows/    @ecadlabs/sre
+
+# Add code owners for website
+/website/ @hu3man @alexzbusko @russellmorton
