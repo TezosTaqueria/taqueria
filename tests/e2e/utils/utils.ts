@@ -44,7 +44,7 @@ export const generateTestProject = async (projectPath: string, packageNames: str
 }
 
 export function getContainerName(dockerName: string): string{
-    const [,dockerContainerName] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
+    const [_dockerContainerHeader,dockerContainerName] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
     return dockerContainerName;
 }
 
