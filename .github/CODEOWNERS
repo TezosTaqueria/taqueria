@@ -5,4 +5,4 @@
 /.github/workflows/    @ecadlabs/sre
 
 # Add code owners for website
-/website/ @hu3man @alexzbusko @russellmorton
+/website/ @ecadlabs/taqueria 
