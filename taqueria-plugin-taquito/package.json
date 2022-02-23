@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/plugin-taquito",
-  "version": "0.0.9",
+  "version": "0.1.1",
   "description": "A taqueria plugin for originating smart contracts using Taquito",
   "targets": {
     "default": {
@@ -27,6 +27,9 @@
     "taquito",
     "smart contract"
   ],
+  "engines": {
+    "node": ">=16"
+  },
   "author": "ECAD Labs",
   "license": "Apache-2.0",
   "repository": {
@@ -46,6 +49,6 @@
     "@taquito/signer": "^11.1.0",
     "@taquito/taquito": "^11.0.2",
     "fast-glob": "^3.2.10",
-    "@taqueria/node-sdk": "^0.0.9"
+    "@taqueria/node-sdk": "^0.1.0"
   }
 }

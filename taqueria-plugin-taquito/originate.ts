@@ -1,4 +1,4 @@
-import { SanitizedArgs, ActionResponse, Failure, LikeAPromise, Config, NetworkConfig, SandboxConfig, ProxyAction} from "@taqueria/node-sdk/types";
+import { SanitizedArgs, PluginResponse, AccountDetails, Failure, LikeAPromise, Config, NetworkConfig, SandboxConfig, ProxyAction} from "@taqueria/node-sdk/types";
 import glob from 'fast-glob'
 import {join} from 'path'
 import { TezosToolkit } from '@taquito/taquito';
@@ -111,12 +111,13 @@ const getSandboxConfig = (sandboxName: string, config: Config) => {
 }
 
 const getAccountSecretKey = (sandbox: SandboxConfig) => {
-    return sandbox.accounts && 
-        sandbox.accounts.default &&
-        sandbox.accounts[sandbox.accounts.default] &&
-        sandbox.accounts[sandbox.accounts.default].keys &&
-        sandbox.accounts[sandbox.accounts.default].keys?.secretKey.replace(/unencrypted:/, '')
-        
+    if (sandbox.accounts && sandbox.accounts.default) {
+        const accountName = (sandbox.accounts.default as string);
+        const accountDetails = sandbox.accounts[accountName] as AccountDetails
+        if (accountDetails.keys) return accountDetails.keys.secretKey.replace(/unencrypted:/, '')
+    }
+
+    return undefined        
 }
 
 const originateContract = (parsedArgs: Opts) => (contractFilename: string) : Promise<unknown[]> => {
@@ -172,7 +173,7 @@ const originateAll = (parsedArgs: Opts) : Promise<unknown[]> =>
     .then(files => Promise.all(files.map(originateContract(parsedArgs))))
     .then(results => results.flat(1))
 
-export const originate = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse, Failure<T>> => {
+export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
     const p = parsedArgs.contract
         ? originateContract(parsedArgs) (parsedArgs.contract as string)
             .then(result => [result])

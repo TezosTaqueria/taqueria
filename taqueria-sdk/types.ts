@@ -1,6 +1,8 @@
-import {Action, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, RuntimeDependency, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig, PluginResponse} from '@taqueria/protocol/taqueria-protocol-types'
+import {PluginAction, ProxyAction as theProxyAction, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, RuntimeDependency, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig, PluginResponse as thePluginResponse, AccountDetails as theAccountDetails} from '@taqueria/protocol/taqueria-protocol-types'
 
 export type Sandbox = theSandbox
+
+export type AccountDetails = theAccountDetails
 
 export type Attributes = theAttributes
 
@@ -9,6 +11,10 @@ export type EconomicalProtocol = theProtocol
 export type NetworkConfig = theNetworkConfig
 
 export type SandboxConfig = theSandboxConfig
+
+export type ProxyAction = theProxyAction
+
+export type PluginResponse = thePluginResponse
 
 export interface TaskView {
     readonly task: string
@@ -86,7 +92,7 @@ export type Args = string[]
 
 export interface ParsedArgs {
     i18n: i18n
-    taqRun: Action
+    taqRun: PluginAction
     config: string
     projectDir: string
     configDir: string
@@ -105,7 +111,7 @@ export interface Config extends Record<string, unknown>{
 export interface SanitizedArgs {
     [key: string]: unknown
     i18n: i18n
-    taqRun: Action
+    taqRun: PluginAction
     config: Config
     projectDir: string
     configDir: string
