@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/plugin-smartpy",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "A taqueria plugin for compiling SmartPy smart contracts",
   "targets": {
     "default": {
@@ -26,6 +26,9 @@
     "smart contract",
     "compile"
   ],
+  "engines": {
+    "node": ">=14.5"
+  },
   "author": "ECAD Labs",
   "license": "Apache-2.0",
   "repository": {
@@ -38,7 +41,7 @@
   },
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "dependencies": {
-    "@taqueria/node-sdk": "^0.0.9",
+    "@taqueria/node-sdk": "^0.1.0",
     "fast-glob": "^3.2.7"
   },
   "devDependencies": {
