@@ -65,7 +65,10 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
 
     });
 
-    test('Verify that taqueria ligo plugin will display proper message if user tries to compile contract that does not exist', async () => {
+    // TODO: Currently it cannot be done until the output will be places to stdout
+    // Issue to implement the test: https://github.com/ecadlabs/taqueria/issues/373
+    // Related developer issue: https://github.com/ecadlabs/taqueria/issues/372
+    test.skip('Verify that taqueria ligo plugin will display proper message if user tries to compile contract that does not exist', async () => {
         try {
             // 1. Run taq compile ${contractName} for contract that does not exist
             const stdout = execSync(`taq compile test.mligo`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();;
