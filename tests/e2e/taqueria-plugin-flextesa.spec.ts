@@ -14,7 +14,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
         await generateTestProject(taqueriaProjectPath, ["flextesa"]);
     })
 
-    test('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
+    test.skip('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
         try {
 
             // Setting up docker container name
@@ -30,7 +30,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             const [,dockerContainerTest] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
             expect(dockerContainerTest).toContain("node startFlextesa.js --sandbox local")
 
-            // 4. Verify that sandbox started on the proper port 0.0.0.0:20000->20000/tcp
+            // 4. Verify that sandbox started on the proper port 0.0.0. q0:20000->20000/tcp
             let isReachable = await isPortReachable(20000, {host: 'localhost'});
             expect(isReachable).toBeTruthy();
 
@@ -48,7 +48,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    test('Verify that taqueria flextesa plugin can start and stop a default "local" sandbox', async () => {
+    test.skip('Verify that taqueria flextesa plugin can start and stop a default "local" sandbox', async () => {
         try {
 
             // Setting up docker container name
@@ -61,7 +61,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             expect(stdoutStart).toEqual("Started local.");
 
             // 3. Verify that docker container has been started
-            const [,dockerContainerTest] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
+            const [_dockerContainerHeader,dockerContainerTest] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
             expect(dockerContainerTest).toContain("node startFlextesa.js --sandbox local")
 
             // 4. Verify that sandbox started on the proper port 0.0.0.0:20000->20000/tcp
@@ -82,7 +82,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
+    test.skip('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
         try {
 
             // Setting up docker container name
@@ -104,7 +104,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
     });
 
 
-    test('Verify that taqueria flextesa plugin will return "Already running." if sandbox has started" if user tries to call start sandbox twice', async () => {
+    test.skip('Verify that taqueria flextesa plugin will return "Already running." if sandbox has started" if user tries to call start sandbox twice', async () => {
         try {
 
             // Setting up docker container name
@@ -123,7 +123,22 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    test('Verify that taqueria flextesa plugin will return "The local sandbox is not running." if user tries to retrieve list of accounts that is not running', async () => {
+    test.skip('Verify that taqueria flextesa plugin will return "The local sandbox was not running." if user tries to call stop on sandbox that is not running', async () => {
+        try {
+            // 1. Run stop sandbox local on sandbox that is not running and verify result
+            const stdoutSandboxWasNotRunning = execSync("taq stop sandbox local", {cwd: `./${taqueriaProjectPath}`}).toString().trim();
+            expect(stdoutSandboxWasNotRunning).toEqual("The local sandbox was not running.");
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+
+    });
+
+    // TODO: Currently it cannot be done until the output will be places to stdout
+    // Issue to implement the test: https://github.com/ecadlabs/taqueria/issues/368
+    // Related developer issue: https://github.com/ecadlabs/taqueria/issues/367
+    test.skip('Verify that taqueria flextesa plugin will return "The local sandbox is not running." if user tries to retrieve list of accounts that is not running', async () => {
         try {
             // 1. Run list accounts command on sandbox that is not running and verify result
             const stdoutSandboxIsNotRunning = execSync("taq list accounts local", {cwd: `./${taqueriaProjectPath}`}).toString().trim();
@@ -135,21 +150,9 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    test('Verify that taqueria flextesa plugin will return "he local sandbox was not running." if user tries to call stop on sandbox that is not running', async () => {
-        try {
-            // 1. Run stop sandbox local on sandbox that is not running and verify result
-            const stdoutSandboxIsNotRunning = execSync("taq stop sandbox local", {cwd: `./${taqueriaProjectPath}`}).toString().trim();
-            expect(stdoutSandboxIsNotRunning).toEqual("The local sandbox was not running.");
-
-        } catch(error) {
-            throw new Error (`error: ${error}`);
-        }
-
-    });
-
-
     // TODO: Currently it cannot be done until this issue has been resolved
-    // https://github.com/ecadlabs/taqueria/issues/243
+    // Issue to implement test: https://github.com/ecadlabs/taqueria/issues/366
+    // Related developer issue: https://github.com/ecadlabs/taqueria/issues/243
     test.skip('Verify that taqueria flextesa plugin can start and stop a sandbox with custom name', async () => {
         try {
             // Setting up docker container name
@@ -185,7 +188,8 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
 
     // TODO: Currently it cannot be done until this issue has been resolved
-    // https://github.com/ecadlabs/taqueria/issues/243
+    // Issue to implement test: https://github.com/ecadlabs/taqueria/issues/366
+    // Related developer issue: https://github.com/ecadlabs/taqueria/issues/243
     test.skip('Verify that taqueria flextesa plugin can retrieve data from updated config after restart', async () => {
         try {
             // Setting up docker container name
@@ -213,7 +217,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
     // Clean up process to stop container if it was not stopped properly during the test
     afterEach( () => {
         try {
-            let [,dockerContainer] = execSync(`docker ps --filter "name=${dockerName}"`).toString().trim().split(/\r?\n/);
+            let [_dockerContainerHeader,dockerContainer] = execSync(`docker ps --filter "name=${dockerName}"`).toString().trim().split(/\r?\n/);
             if(dockerContainer !== undefined){
                 execSync(`docker stop ${dockerName}`);
             }
