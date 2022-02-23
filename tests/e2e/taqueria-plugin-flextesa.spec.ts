@@ -1,4 +1,4 @@
-import {generateTestProject} from "./utils/utils";
+import {generateTestProject, getContainerName} from "./utils/utils";
 import {execSync} from "child_process";
 import waitForExpect from "wait-for-expect";
 import fs from "fs";
@@ -14,7 +14,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
         await generateTestProject(taqueriaProjectPath, ["flextesa"]);
     })
 
-    test.skip('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
+    test('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
         try {
 
             // Setting up docker container name
@@ -27,7 +27,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             expect(stdoutStart).toEqual("Started local.");
 
             // 3. Verify that docker container has been started
-            const [,dockerContainerTest] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
+            const dockerContainerTest = getContainerName(dockerName);
             expect(dockerContainerTest).toContain("node startFlextesa.js --sandbox local")
 
             // 4. Verify that sandbox started on the proper port 0.0.0. q0:20000->20000/tcp
@@ -48,7 +48,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    test.skip('Verify that taqueria flextesa plugin can start and stop a default "local" sandbox', async () => {
+    test('Verify that taqueria flextesa plugin can start and stop a default "local" sandbox', async () => {
         try {
 
             // Setting up docker container name
@@ -61,7 +61,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             expect(stdoutStart).toEqual("Started local.");
 
             // 3. Verify that docker container has been started
-            const [_dockerContainerHeader,dockerContainerTest] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
+            const dockerContainerTest = getContainerName(dockerName);
             expect(dockerContainerTest).toContain("node startFlextesa.js --sandbox local")
 
             // 4. Verify that sandbox started on the proper port 0.0.0.0:20000->20000/tcp
@@ -82,7 +82,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    test.skip('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
+    test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
         try {
 
             // Setting up docker container name
@@ -104,7 +104,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
     });
 
 
-    test.skip('Verify that taqueria flextesa plugin will return "Already running." if sandbox has started" if user tries to call start sandbox twice', async () => {
+    test('Verify that taqueria flextesa plugin will return "Already running." if sandbox has started" if user tries to call start sandbox twice', async () => {
         try {
 
             // Setting up docker container name
@@ -123,7 +123,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
     });
 
-    test.skip('Verify that taqueria flextesa plugin will return "The local sandbox was not running." if user tries to call stop on sandbox that is not running', async () => {
+    test('Verify that taqueria flextesa plugin will return "The local sandbox was not running." if user tries to call stop on sandbox that is not running', async () => {
         try {
             // 1. Run stop sandbox local on sandbox that is not running and verify result
             const stdoutSandboxWasNotRunning = execSync("taq stop sandbox local", {cwd: `./${taqueriaProjectPath}`}).toString().trim();
@@ -217,7 +217,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
     // Clean up process to stop container if it was not stopped properly during the test
     afterEach( () => {
         try {
-            let [_dockerContainerHeader,dockerContainer] = execSync(`docker ps --filter "name=${dockerName}"`).toString().trim().split(/\r?\n/);
+            let dockerContainer = getContainerName(dockerName);
             if(dockerContainer !== undefined){
                 execSync(`docker stop ${dockerName}`);
             }

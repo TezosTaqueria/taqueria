@@ -43,6 +43,11 @@ export const generateTestProject = async (projectPath: string, packageNames: str
     }
 }
 
+export function getContainerName(dockerName: string): string{
+    const [,dockerContainerName] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
+    return dockerContainerName;
+}
+
 // The solution was taken from this source:
 // https://stackoverflow.com/questions/26165725/nodejs-check-file-exists-if-not-wait-till-it-exist
 // It is pull&wait mechanism and it is async by nature, because
