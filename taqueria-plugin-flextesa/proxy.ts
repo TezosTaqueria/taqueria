@@ -1,5 +1,5 @@
 import {Sandbox as theSandbox, execCmd, getArch} from '@taqueria/node-sdk'
-import type { SanitizedArgs, ProxyAction, Attributes, SandboxConfig, EconomicalProtocol, ActionResponse, Failure, LikeAPromise, Sandbox } from "@taqueria/node-sdk/types"
+import type { SanitizedArgs, ProxyAction, Attributes, SandboxConfig, EconomicalProtocol, PluginResponse, Failure, LikeAPromise, Sandbox, AccountDetails } from "@taqueria/node-sdk/types"
 import retry from 'promise-retry'
 
 type Opts = SanitizedArgs & {sandboxName?: string}
@@ -154,7 +154,7 @@ const getSandboxes = (parsedArgs: Opts): Sandbox[] =>
             []
         )
 
-const startSandboxTask = <T>(parsedArgs: Opts) : LikeAPromise<ActionResponse, Failure<T>> => {
+const startSandboxTask = <T>(parsedArgs: Opts) : LikeAPromise<PluginResponse, Failure<T>> => {
     if (parsedArgs.sandboxName) {
         const sandbox = getSandbox(parsedArgs)
         return sandbox
@@ -177,7 +177,7 @@ const isSandboxRunning = (sandboxName: string) =>
 
 const getAccountBalances =(sandbox: Sandbox): Promise<ProxyAction> => {
     const processes = Object.entries(sandbox.accounts).reduce(
-        (retval: Promise<unknown>[], [accountName, _accountDetails]) => {
+        (retval: Promise<unknown>[], [accountName, accountDetails] : [string, string | AccountDetails]) => {
             if (accountName === 'default') return retval
 
             const getBalanceProcess =
@@ -185,7 +185,7 @@ const getAccountBalances =(sandbox: Sandbox): Promise<ProxyAction> => {
                 .then(arch => `docker exec ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
                 .then(execCmd)
                 .then(result => result.status === 'success'
-                    ? ({account: accountName, balance: result.stdout})
+                    ? ({account: accountName, balance: result.stdout, address: (accountDetails as AccountDetails).keys?.publicKeyHash})
                     : Promise.reject({code: 'E_BALANCE', context: [accountName, result]})
                 )
             return [...retval, getBalanceProcess]
@@ -203,7 +203,7 @@ const getAccountBalances =(sandbox: Sandbox): Promise<ProxyAction> => {
 }    
 
 
-const listAccountsTask = async <T>(parsedArgs: Opts) : LikeAPromise<ActionResponse, Failure<T>> => {
+const listAccountsTask = async <T>(parsedArgs: Opts) : LikeAPromise<PluginResponse, Failure<T>> => {
     if (parsedArgs.sandboxName) {
         const sandbox = getSandbox(parsedArgs)
         if (sandbox) {
@@ -236,7 +236,7 @@ const listAccountsTask = async <T>(parsedArgs: Opts) : LikeAPromise<ActionRespon
     })
 }
 
-const stopSandboxTask = async <T>(parsedArgs: Opts) : LikeAPromise<ActionResponse, Failure<T>> => {
+const stopSandboxTask = async <T>(parsedArgs: Opts) : LikeAPromise<PluginResponse, Failure<T>> => {
     if (parsedArgs.sandboxName) {
         const sandbox = getSandbox(parsedArgs)
         if (sandbox) {
@@ -271,7 +271,7 @@ const stopSandboxTask = async <T>(parsedArgs: Opts) : LikeAPromise<ActionRespons
     })
 }
 
-export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<ActionResponse, Failure<T>> => {
+export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<PluginResponse, Failure<T>> => {
     switch (parsedArgs.task) {
         case 'list accounts':
             return listAccountsTask(parsedArgs)

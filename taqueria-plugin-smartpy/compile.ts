@@ -1,4 +1,4 @@
-import { SanitizedArgs, ActionResponse, Failure, LikeAPromise, ProxyAction } from "@taqueria/node-sdk/types";
+import { SanitizedArgs, PluginResponse, Failure, LikeAPromise, ProxyAction } from "@taqueria/node-sdk/types";
 import {exec} from 'child_process'
 import glob from 'fast-glob'
 import {join, basename} from 'path'
@@ -58,7 +58,7 @@ const compileAll = (opts: Opts): Promise<{contract: string, artifacts: string[]}
 }
 
 
-export const compile = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse, Failure<T>> => {
+export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
     const p = parsedArgs.sourceFile
     ? compileContract (parsedArgs) (parsedArgs.sourceFile as string)
     : compileAll (parsedArgs)
