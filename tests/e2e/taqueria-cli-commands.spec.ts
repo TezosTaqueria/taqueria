@@ -1,7 +1,6 @@
 import * as contents from "./data/help-contents"
 import { generateTestProject } from "./utils/utils"
 import { exec as exec1, execSync } from "child_process"
-import fs from "fs"
 import fsPromises from "fs/promises"
 import util from "util"
 const exec = util.promisify(exec1)
@@ -54,7 +53,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             expect(projectContents.stdout).toContain(configDirName)
             expect(configDirContents.stdout).toContain('config.json')
 
-            await fs.promises.rm(`./${projectName}`, { recursive: true })
+            await fsPromises.rm(`./${projectName}`, { recursive: true })
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
@@ -73,7 +72,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             expect(helpContents.stderr).toContain('Your config.json file is invalid')
             expect(helpContentsWithDir.stderr).not.toContain('Your config.json file is invalid')
 
-            await fs.promises.rm(`./${projectName}`, { recursive: true })
+            await fsPromises.rm(`./${projectName}`, { recursive: true })
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
