@@ -177,6 +177,8 @@ jobs:
           npm run test:integration -w tests
 
       - name: Run e2e tests
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run test:e2e --workspace tests
 

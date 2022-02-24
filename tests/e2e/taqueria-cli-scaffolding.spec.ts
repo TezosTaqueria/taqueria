@@ -98,4 +98,17 @@ describe("E2E Testing for taqueria scaffolding,", () => {
             throw new Error (`error: ${error}`)
         }
     })
+
+    test.skip('Verify that scaffold project can be set up', async () => {
+        try {
+            await exec('taq scaffold')
+            await exec(`cd ${scaffoldDirName} && npm run setup`)
+
+            await exec('ls')
+
+            await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
 })
