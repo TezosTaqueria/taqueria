@@ -1,6 +1,7 @@
 ---
 title: Introduction
 ---
+
 <!-- 
 content-type: getting started
 audience: crypto literate readers and developers looking to USE Taqueria (rather than build on it)
