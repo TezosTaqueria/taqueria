@@ -11,7 +11,9 @@ describe("E2E Testing for taqueria scaffolding,", () => {
     test('Verify that taq scaffold will create a baseline scaffold of the quickstart project', async () => {
         // the URL for the default scaffold project is https://github.com/ecadlabs/taqueria-scaffold-quickstart.git
         try {
-            await exec('taq scaffold')
+            const response = await exec('taq scaffold')
+            console.log(response.stderr)
+            console.log(response.stdout)
             const homeDirContents = await exec('ls')
             expect(homeDirContents.stdout).toContain(scaffoldDirName)
 
