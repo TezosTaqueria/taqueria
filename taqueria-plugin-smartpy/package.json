@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/plugin-smartpy",
-  "version": "0.0.6",
+  "version": "0.1.1",
   "description": "A taqueria plugin for compiling SmartPy smart contracts",
   "targets": {
     "default": {
@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx parcel build --no-cache",
+    "build": "npx parcel build --no-cache 2>&1",
     "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
   },
   "keywords": [
@@ -26,6 +26,9 @@
     "smart contract",
     "compile"
   ],
+  "engines": {
+    "node": ">=14.5"
+  },
   "author": "ECAD Labs",
   "license": "Apache-2.0",
   "repository": {
@@ -38,11 +41,11 @@
   },
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "dependencies": {
-    "fast-glob": "^3.2.7",
-    "@taqueria/node-sdk": "^0.0.5"
+    "@taqueria/node-sdk": "^0.1.0",
+    "fast-glob": "^3.2.7"
   },
   "devDependencies": {
     "parcel": "^2.0.1",
-    "typescript": "^4.5.2"
+    "typescript": "4.5.4"
   }
 }

@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
 	title: "Taqueria - Developer Tooling for Tezos",
 	tagline: "Taqueria - Developer Tooling for Tezos",
-	url: "https://tezostaqueria.io",
+	url: "https://taqueria.io",
 	baseUrl: "/",
 
 	onBrokenLinks: "throw",
@@ -16,12 +16,11 @@ const config = {
 	favicon: "/img/favicon.ico",
 	organizationName: "ecadlabs", // Usually your GitHub org/user name.
 	projectName: "taqueria", // Usually your repo name.
-
 	presets: [
 		[
 			"@docusaurus/preset-classic",
 			/** @type {import('@docusaurus/preset-classic').Options} */
-
+				
 			({
 				docs: {
 					path: "docs",
@@ -42,12 +41,11 @@ const config = {
 			}),
 		],
 	],
-
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
 			gtag: {
-				trackingID: "G-R7WYMVNDR1",
+				trackingID: "303602454",
 				anonymizeIP: true,
 			},
 			colorMode: {
@@ -89,7 +87,7 @@ const config = {
 					},
 					{
 						type: "doc",
-						docId: "plugins",
+						docId: "getting-started/plugin-basics",
 						label: "Plugins",
 						position: "right",
 						className: "header-link",
@@ -164,7 +162,7 @@ const config = {
 							},
 							{
 								label: "Roadmap",
-								to: "https://github.com/ecadlabs/taqueria/milestones?direction=asc&sort=due_date&state=open",
+								to: "/docs/roadmap",
 							},
 						],
 					},

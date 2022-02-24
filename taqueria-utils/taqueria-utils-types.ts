@@ -1,6 +1,7 @@
 import {resolve as resolvePath, join} from 'https://deno.land/std@0.120.0/path/mod.ts'
 import {StringLike} from '../taqueria-protocol/taqueria-protocol-types.ts'
-import {attemptP} from 'https://cdn.skypack.dev/fluture';
+import {attemptP} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import type {FutureInstance} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 
 type Callback = () => void
 
@@ -15,12 +16,19 @@ export interface EnvVars {
 }
 
 export type ErrorType = 
-    "E_INVALID_PATH"
+  | "E_INVALID_PATH"
+  | "E_INVALID_PATH_DOES_NOT_EXIST"
+  | "E_INVALID_PATH_ALREADY_EXISTS"
   | "E_INVALID_CONFIG"
   | "E_INVALID_JSON"
   | "E_FORK"
   | "E_INVALID_TASK"
-
+  | "E_READ"
+  | "E_NPM_INIT"
+  | "E_INVALID_PLUGIN_RESPONSE"
+  | "E_INVALID_ARGS"
+  | "E_MKDIR_FAILED"
+  
 export interface TaqError {
     readonly kind: ErrorType,
     msg: string,
@@ -29,7 +37,7 @@ export interface TaqError {
 }
 
 const sanitizedPathType: unique symbol = Symbol()
-export class SanitizedPath extends StringLike{
+export class SanitizedPath extends StringLike {
     [sanitizedPathType]: void
     static create(value: string) {
         const result = value.match(/^(\.\.|\.\/|\/)/)
@@ -55,7 +63,15 @@ export class SanitizedAbsPath {
     }
 }
 
-export type Future<L,R> = unknown
+const sanitizedUrl: unique symbol = Symbol()
+export class SanitizedUrl extends StringLike {
+    [sanitizedUrl]: void
+    static create(value: string) {
+        return new SanitizedUrl(value)
+    }
+}
+
+export type Future<L,R> = FutureInstance<L,R>
 
 export type reject = (_err:TaqError|Error) => void
 

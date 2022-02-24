@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/taqueria",
-  "version": "0.0.6",
+  "version": "0.1.1",
   "description": "An easy to use opininated tool for building, testing, and deploying Tezos software",
   "main": "index.ts",
   "directories": {
@@ -39,6 +39,7 @@
   },
   "workspaces": [
     "./taqueria*",
-    "./taqueria-plugin-flextesa/docker"
+    "./taqueria-plugin-flextesa/docker",
+    "./tests"
   ]
 }

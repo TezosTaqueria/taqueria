@@ -54,7 +54,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: "^1.0.0"
+          deno-version: "1.18.2"
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
       ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
@@ -64,7 +64,7 @@ jobs:
         env:
           TAQ_VERSION: "{{ github.ref_name }}"
         run: |
-          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild ${{ github.ref_name }} --setVersion ${{ github.ref_name }}
+          DENO_DIR=./deno deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild ${{ github.ref_name }} --setVersion ${{ github.ref_name }}
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
@@ -88,7 +88,7 @@ jobs:
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
   publish-protocol-to-npm:
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-protocol
     secrets:
@@ -96,7 +96,7 @@ jobs:
 
   publish-sdk-to-npm:
     needs: publish-protocol-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-sdk
     secrets:
@@ -104,7 +104,7 @@ jobs:
 
   publish-ligo-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-ligo
     secrets:
@@ -112,7 +112,7 @@ jobs:
   
   publish-smartpy-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-smartpy
     secrets:
@@ -120,7 +120,7 @@ jobs:
 
   publish-taquito-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-taquito
     secrets:
@@ -128,15 +128,57 @@ jobs:
 
   publish-flextesa-plugin-to-npm:
     needs:
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+      - publish-sdk-to-npm
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-flextesa
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
+  publish-contract-types-plugin-to-npm:
+    needs: publish-sdk-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-plugin-contract-types
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
+  run-tests:
+    needs: 
+      - build-binaries
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: "1.18.2"
+
+      - name: get binary and make executable from previous step for tests
+        run: |
+          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
+          chmod +x taq
+          echo "$(pwd)" >> $GITHUB_PATH
+
+      - name: install dependencies
+        run: npm ci
+      
+      - name: Run unit tests
+        run: |
+          npm run test:unit --workspace tests
+
+      - name: Run integration tests
+        run: |
+          npm run build -w taqueria-sdk
+          npm run test:integration -w tests
+
+      - name: Run e2e tests
+        run: |
+          npm run test:e2e --workspace tests
 
   pr-comment:
     runs-on: ubuntu-latest
@@ -148,6 +190,7 @@ jobs:
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
+      - publish-contract-types-plugin-to-npm
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
@@ -177,6 +220,7 @@ jobs:
             const taquito = readInfo("./taqueria-plugin-taquito/package.json")
             const sdk = readInfo("./taqueria-sdk/package.json")
             const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
+            const contractTypes = readInfo("./taqueria-plugin-contract-types/package.json")
 
             const git_short_sha = "${{ github.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
@@ -191,19 +235,39 @@ jobs:
 
               | npm package installation instructions |
               | ------------------------------------- |
-              | npm install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | npm install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | npm install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
               | npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | npm install ${{ env.SCOPE }}/${flextesa.name}@$0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
             `;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
+
+
+            const {data: comments} = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: body
+              issue_number: context.issue.number,
             })
+
+            const botComment = comments.find(comment => comment.user.id === 41898282)                                                                       
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              })
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              })
+            }
+
   release:
     name: Release
     runs-on: ubuntu-latest
@@ -215,6 +279,7 @@ jobs:
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
+      - publish-contract-types-plugin-to-npm
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v2
