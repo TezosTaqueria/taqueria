@@ -3,7 +3,7 @@
   "displayName": "taqueria",
   "description": "A vscode plugin to make Tezos development easier with Taqueria!",
   "publisher": "ecadlabs",
-  "version": "0.0.9",
+  "version": "0.1.1",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -118,7 +118,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "parcel build --no-cache --no-optimize --no-scope-hoist --detailed-report",
+    "compile": "parcel build --no-cache --no-optimize --no-scope-hoist --detailed-report 2>&1",
     "watch": "parcel watch --no-cache --detailed-report",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",

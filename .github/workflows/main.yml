@@ -54,7 +54,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: "^1.0.0"
+          deno-version: "1.18.2"
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
       ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
@@ -64,7 +64,7 @@ jobs:
         env:
           TAQ_VERSION: "{{ github.ref_name }}"
         run: |
-          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild ${{ github.ref_name }} --setVersion ${{ github.ref_name }}
+          DENO_DIR=./deno deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild ${{ github.ref_name }} --setVersion ${{ github.ref_name }}
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
@@ -135,6 +135,14 @@ jobs:
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
+  publish-contract-types-plugin-to-npm:
+    needs: publish-sdk-to-npm
+    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    with:
+      dir: taqueria-plugin-contract-types
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
   run-tests:
     needs: 
       - build-binaries
@@ -148,7 +156,7 @@ jobs:
 
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: "^1.0.0"
+          deno-version: "1.18.2"
 
       - name: get binary and make executable from previous step for tests
         run: |
@@ -182,6 +190,7 @@ jobs:
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
+      - publish-contract-types-plugin-to-npm
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v2
@@ -211,6 +220,7 @@ jobs:
             const taquito = readInfo("./taqueria-plugin-taquito/package.json")
             const sdk = readInfo("./taqueria-sdk/package.json")
             const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
+            const contractTypes = readInfo("./taqueria-plugin-contract-types/package.json")
 
             const git_short_sha = "${{ github.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
@@ -230,6 +240,7 @@ jobs:
               | taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
               | taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
               | taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              | taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
             `;
 
 
@@ -268,6 +279,7 @@ jobs:
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
+      - publish-contract-types-plugin-to-npm
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v2

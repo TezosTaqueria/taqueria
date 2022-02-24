@@ -12,7 +12,7 @@ const config = {
 	url: 'https://taqueria.io',
 	baseUrl: '/',
 
-	onBrokenLinks: 'throw',
+  onBrokenLinks: 'throw',
 	onBrokenMarkdownLinks: 'warn',
 	favicon: '/img/favicon.ico',
 	organizationName: 'ecadlabs', // Usually your GitHub org/user name.
@@ -22,7 +22,7 @@ const config = {
 		[
 			'@docusaurus/preset-classic',
 			/** @type {import('@docusaurus/preset-classic').Options} */
-
+				
 			({
 				docs: {
 					path: 'docs',
@@ -53,7 +53,7 @@ const config = {
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
 			gtag: {
-				trackingID: 'GTM-N6G3QD5',
+				trackingID: "303602454",
 				anonymizeIP: true,
 			},
 			colorMode: {
@@ -94,11 +94,11 @@ const config = {
 						className: 'header-link',
 					},
 					{
-						type: 'doc',
-						docId: 'plugins',
-						label: 'Plugins',
-						position: 'right',
-						className: 'header-link',
+						type: "doc",
+						docId: "getting-started/plugin-basics",
+						label: "Plugins",
+						position: "right",
+						className: "header-link",
 					},
 					{
 						href: 'https://discord.gg/bujt7syVVT',
@@ -169,8 +169,8 @@ const config = {
 								to: '/docs/intro',
 							},
 							{
-								label: 'Roadmap',
-								to: 'https://github.com/ecadlabs/taqueria/milestones?direction=asc&sort=due_date&state=open',
+								label: "Roadmap",
+								to: "/docs/roadmap",
 							},
 						],
 					},
