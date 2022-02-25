@@ -1,10 +1,9 @@
-import { generateTestProject } from "./utils/utils"
-import { exec as exec1, execSync } from "child_process"
+import { exec as exec1 } from "child_process"
 import fsPromises from "fs/promises"
 import util from "util"
 const exec = util.promisify(exec1)
 
-describe("E2E Testing for taqueria scaffolding,", () => {
+describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     const scaffoldDirName = `taqueria-quickstart`
 
@@ -12,8 +11,6 @@ describe("E2E Testing for taqueria scaffolding,", () => {
         // the URL for the default scaffold project is https://github.com/ecadlabs/taqueria-scaffold-quickstart.git
         try {
             const response = await exec('taq scaffold')
-            console.log(response.stderr)
-            console.log(response.stdout)
             const homeDirContents = await exec('ls')
             expect(homeDirContents.stdout).toContain(scaffoldDirName)
 
@@ -96,19 +93,6 @@ describe("E2E Testing for taqueria scaffolding,", () => {
             expect(scaffoldResponse.stderr).toContain("Path already exists")
 
             await fsPromises.rm(`./${alternateDirectory}`, { recursive: true })
-        } catch(error) {
-            throw new Error (`error: ${error}`)
-        }
-    })
-
-    test.skip('Verify that scaffold project can be set up', async () => {
-        try {
-            await exec('taq scaffold')
-            await exec(`cd ${scaffoldDirName} && npm run setup`)
-
-            await exec('ls')
-
-            await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
