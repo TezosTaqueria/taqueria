@@ -137,7 +137,7 @@ jobs:
 
   publish-contract-types-plugin-to-npm:
     needs: publish-sdk-to-npm
-    uses: ecadlabs/taqueria/.github/workflows/npm-publish.yml@main
+    uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-contract-types
     secrets:
@@ -146,13 +146,6 @@ jobs:
   run-tests:
     needs: 
       - build-binaries
-      - publish-protocol-to-npm
-      - publish-sdk-to-npm
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-      - publish-contract-types-plugin-to-npm
     runs-on: ubuntu-latest
 
     steps:
@@ -173,21 +166,21 @@ jobs:
 
       - name: install dependencies
         run: npm ci
-      
+
+      - name: builds for testing
+        run: npm run build -w taqueria-sdk -w taqueria-plugin-flextesa \
+          -w taqueria-plugin-taquito -w taqueria-plugin-ligo \ 
+          -w taqueria-plugin-smartpy
       - name: Run unit tests
         run: |
           npm run test:unit --workspace tests
 
       - name: Run integration tests
         run: |
-          npm run build -w taqueria-sdk
           npm run test:integration -w tests
 
       - name: Run e2e tests
         run: |
-          pwd
-          ls taqueria-plugin-flextesa
-          npm run build -w taqueria-plugin-flextesa
           npm run test:e2e --workspace tests
 
   pr-comment:

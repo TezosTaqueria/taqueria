@@ -36,9 +36,7 @@ jobs:
 
       - name: Build package
         run: |
-          ls ${{ inputs.dir }}
           npm run build -w $GIT_WORKSPACE
-          ls ${{ inputs.dir }}
       
       - name: Publish for PR
         if: ${{ github.event_name == 'pull_request' }}
