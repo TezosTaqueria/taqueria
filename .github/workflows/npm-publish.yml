@@ -35,8 +35,7 @@ jobs:
         run: npm ci
 
       - name: Build package
-        run: |
-          npm run build -w $GIT_WORKSPACE
+        run: npm run build -w $GIT_WORKSPACE
       
       - name: Publish for PR
         if: ${{ github.event_name == 'pull_request' }}
