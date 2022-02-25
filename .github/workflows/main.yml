@@ -168,9 +168,8 @@ jobs:
         run: npm ci
 
       - name: builds for testing
-        run: npm run build -w taqueria-sdk -w taqueria-plugin-flextesa \
-          -w taqueria-plugin-taquito -w taqueria-plugin-ligo \ 
-          -w taqueria-plugin-smartpy
+        run: npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy
+      
       - name: Run unit tests
         run: |
           npm run test:unit --workspace tests
