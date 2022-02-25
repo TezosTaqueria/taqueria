@@ -1,0 +1,43 @@
+{
+    "language": "en",
+    "plugins": [
+        {
+            "name": "@taqueria/plugin-flextesa",
+            "type": "npm"
+        }
+    ],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts",
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local",
+                "test"
+            ],
+            "storage": {}
+        }
+    },
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "default": "ken",
+                "ken": {
+                    "initialBalance": "1"
+                },
+                "alice": {
+                    "initialBalance": "1000000000"
+                },
+                "john": {
+                    "initialBalance": "2000000000"
+                }
+            },
+            "label": "Local Tezos Sandbox",
+            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+    "network": {}
+}
