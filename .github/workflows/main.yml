@@ -146,6 +146,13 @@ jobs:
   run-tests:
     needs: 
       - build-binaries
+      - publish-protocol-to-npm
+      - publish-sdk-to-npm
+      - publish-ligo-plugin-to-npm
+      - publish-smartpy-plugin-to-npm
+      - publish-taquito-plugin-to-npm
+      - publish-flextesa-plugin-to-npm
+      - publish-contract-types-plugin-to-npm
     runs-on: ubuntu-latest
 
     steps:
