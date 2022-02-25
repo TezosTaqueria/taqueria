@@ -146,13 +146,6 @@ jobs:
   run-tests:
     needs: 
       - build-binaries
-      - publish-protocol-to-npm
-      - publish-sdk-to-npm
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-      - publish-contract-types-plugin-to-npm
     runs-on: ubuntu-latest
 
     steps:
@@ -185,7 +178,7 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          cat taqueria-plugin-flextesa/index.js
+          npm run build -w taqueria-plugin-flextesa
           npm run test:e2e --workspace tests
 
   pr-comment:
