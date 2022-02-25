@@ -30,19 +30,19 @@ jobs:
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
            taqueria_bin: "taq"
-         - os: windows-latest
-           os_short: windows
-           deno_target: "x86_64-pc-windows-msvc"
-           taqueria_bin: "taq.exe"
-         - os: macOS-latest
-           os_short: macos
-           deno_target: "x86_64-apple-darwin"
-           taqueria_bin: "taq"
+        #  - os: windows-latest
+        #    os_short: windows
+        #    deno_target: "x86_64-pc-windows-msvc"
+        #    taqueria_bin: "taq.exe"
+        #  - os: macOS-latest
+        #    os_short: macos
+        #    deno_target: "x86_64-apple-darwin"
+        #    taqueria_bin: "taq"
 
     outputs:
       public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
-      public-url-windows: ${{ steps.public-url.outputs.windows }}
-      public-url-macos: ${{ steps.public-url.outputs.macos }}
+      # public-url-windows: ${{ steps.public-url.outputs.windows }}
+      # public-url-macos: ${{ steps.public-url.outputs.macos }}
 
     env:
       DENO_TARGET: ${{ matrix.deno_target }}
@@ -146,6 +146,13 @@ jobs:
   run-tests:
     needs: 
       - build-binaries
+      - publish-protocol-to-npm
+      - publish-sdk-to-npm
+      - publish-ligo-plugin-to-npm
+      - publish-smartpy-plugin-to-npm
+      - publish-taquito-plugin-to-npm
+      - publish-flextesa-plugin-to-npm
+      - publish-contract-types-plugin-to-npm
     runs-on: ubuntu-latest
 
     steps:
@@ -178,6 +185,8 @@ jobs:
 
       - name: Run e2e tests
         run: |
+          pwd
+          ls taqueria-plugin-flextesa
           npm run build -w taqueria-plugin-flextesa
           npm run test:e2e --workspace tests
 
