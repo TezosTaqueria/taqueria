@@ -1,6 +1,7 @@
 import {execSync} from "child_process";
 import path from "path";
 import fs from "fs";
+import net from "node:net";
 
 export const generateTestProject = async (projectPath: string, packageNames: string[] = [], localPackages: boolean = true) => {
     try{
@@ -42,6 +43,11 @@ export const generateTestProject = async (projectPath: string, packageNames: str
     }
 }
 
+export function getContainerName(dockerName: string): string{
+    const [_dockerContainerHeader,dockerContainerName] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
+    return dockerContainerName;
+}
+
 // The solution was taken from this source:
 // https://stackoverflow.com/questions/26165725/nodejs-check-file-exists-if-not-wait-till-it-exist
 // It is pull&wait mechanism and it is async by nature, because
@@ -73,4 +79,38 @@ export function checkFolderExistsWithTimeout(filePath:string, timeout:number) {
             }
         });
     });
+}
+
+// The solution is slightly modified version of this package
+// https://github.com/sindresorhus/is-port-reachable
+// package itself could not be used due to some issues
+export async function isPortReachable(port: number, {host = "", timeout = 1000} = {}) {
+    if (typeof host !== 'string') {
+        throw new TypeError('Specify a `host`');
+    }
+
+    const promise = new Promise<void>(((resolve, reject) => {
+        const socket = new net.Socket();
+
+        const onError = () => {
+            socket.destroy();
+            reject();
+        };
+
+        socket.setTimeout(timeout);
+        socket.once('error', onError);
+        socket.once('timeout', onError);
+
+        socket.connect(port, host, () => {
+            socket.end();
+            resolve();
+        });
+    }));
+
+    try {
+        await promise;
+        return true;
+    } catch {
+        return false;
+    }
 }

@@ -185,7 +185,7 @@ export default {
   // ],
 
   // Changing default timeout from 5000 to 30000 for tests
-  testTimeout: 60000,
+  testTimeout: 1200000,
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,
