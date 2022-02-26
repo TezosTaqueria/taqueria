@@ -10,7 +10,7 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
     test('Verify that taq scaffold will create a baseline scaffold of the quickstart project', async () => {
         // the URL for the default scaffold project is https://github.com/ecadlabs/taqueria-scaffold-quickstart.git
         try {
-            const response = await exec('taq scaffold')
+            await exec('taq scaffold')
             const homeDirContents = await exec('ls')
             expect(homeDirContents.stdout).toContain(scaffoldDirName)
 
@@ -29,6 +29,16 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
             expect(scaffoldDirContents.stdout).toContain('app')
             expect(scaffoldDirContents.stdout).toContain('taqueria')
             expect(scaffoldDirContents.stdout).toContain('package.json')
+
+            await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test.only('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
+        try {
+            await exec('taq scaffold')
 
             await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
         } catch(error) {
