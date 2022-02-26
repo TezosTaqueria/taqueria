@@ -4,11 +4,14 @@ title: Contract Types Plugin
 
 This plugin provides a `taq generate types` task which will generate and export TypeScript types from compiled Michelson smart contracts
 
-In the simple case, it reads the artifacts folder for any *.tz Michelson files and will generate a types file with the matching filename for each
+In the simple case, it reads the artifacts folder for any *.tz Michelson files and will generate a types file with the matching filename for each contract
 
-These generated types work with Taquito, providing the developer with type safety and an improved code authoring experience. This enables developers (using both Taquito and Taqueria) to use static types at compile time instead of on runtime validation
-
-These generated types also enable tooltip hints in VS Code which show the parameter types required for a method calling a smart contract 
+The TS types generated and exported in the files work with your IDE and Taquito, providing the developer with type safety and an improved code authoring experience. Some of the benefits include:
+- Developers using both Taquito and Taqueria can use static types at compile time instead of on runtime validation
+- Generated types enable auto-completion in your IDE
+- The VS Code Extension provides tooltip hints for parameter types used to call a smart contract method
+- Developers can use types to directly call smart contract methods without using a utility method
+- Simplifies your code and improves readability
 
 ## Requirements
 
@@ -30,17 +33,26 @@ taq install @taqueria/plugin-contract-types
 
 ## Configuration
 
-No additional configuration is available
+This plugin will look for Michelson files according to the `artifactsDir` configured in `./.taq/config.json`. By default, this value is `/artifacts` but can be changed as needed
 
 ## Usage
 
+Basic usage of the plugin is to run `taq generate types`
+
+This will look for `.tz` files in the `/artifacts` directory and will generate a series of related `.ts` files in the `/types` directory. These files export type definitions for each method which can then be used by Taquito and your IDE
+
 ### The `generate types` Command
+
 The task exposed by the plugin to Taqueria is:
 ```shell
 taq generate types [typeOutputDir]
 ```
 
-Basic usage of the plugin is to simply run `taq generate types`. This will look for `.tz` files in the `/artifacts` directory and will generate a series of related `.ts` files in the `/types`
+#### Parameters
+
+| parameter     |  required  | description                                        |       
+|:-------------:|:-----------|----------------------------------------------------|
+| typeOutputDir | no         | The output directory for the `.ts` files generated |
 
 #### CLI Aliases
 
@@ -52,20 +64,102 @@ The following aliases are interchangable with `generate types`
 
 The `generate types` command will accept the following optional parameters:
 
-| flag  |  name         | description                           |       
+| flag  |  name         | description                                  |       
 |:-----:|:--------------|----------------------------------------------|
 |  -t   | typeAliasMode | The type aliases used in the generated types |
  
 
-### Examples
+## Taquito Workflow Improvements
 
-#### Generating Types 
+The generated TS types can be used in a Taquito project which provides an improved developing experience, and simplifies the way types are provided to Taquito method calls. Some examples of how these changes are put into use are detailed below  
 
-### Example Usage (based on an nft auction contract from open minter sdk)
+:::note
+You can view the full example in the `example-usage.ts` file on Github: [taqueria/taqueria-plugin-contract-types/example](https://github.com/ecadlabs/taqueria/blob/main/taqueria-plugin-contract-types/example/example-usage.ts)
+:::
+
+### Calling the `.at` Method of a Contract
+
+Traditionally, calling the `.at` method of a contract with Taquito required the developer to pass the parameter's type via a utility method:
+```ts Utility Method
+const contract = await Tezos.contract.at(`tz123`, contractAbstractionComposer<TestContractType>());
+```
+or a cast:
+```ts Cast
+const contract = await Tezos.contract.at(`tz123`) as ContractProviderFromContractType<TestContractType>;
+```
+
+When using generated types, the developer can now directly use the type in the call to `.at`:
+```ts 
+const contract = await Tezos.contract.at<TestContract>(`tz123`);
+```
+
+### Using a Wallet
+
+Using a wallet is simplified in a similar way:
+```ts 
+const contract = await Tezos.wallet.at(`tz123`, walletAbstractionComposer<TestContractType>());
+```
+
+Becomes:
+```ts 
+const contract = await Tezos.wallet.at<TestWalletContract>(`tz123`);
+```
+
+### Contract Origination
+
+The Taquito contract origination did not have any way to provide a type, so this used to require a cast:
+```ts
+const originationResult = await Tezos.contract.originate({...});
+const contract = await originationResult.contract(5) as ContractProviderFromContractType<TestContractType2>;
+```
+
+Now, it can directly accept a type:
+```ts
+const originationResult = await Tezos.contract.originate({...});
+const contract = await originationResult.contract<TestContract2>(5);
+```
 
 
+### Storage
 
-#### Sample Application Code (Using Taquito)
+When accessing storage, there was no way to pass the type through the contract class. This required providing the type a second time:
+```ts
+const contract = await Tezos.contract.at(`tz123`) as ContractProviderFromContractType<TestContractType>;
+const storage = await contract.storage<StorageFromContractType<TestContractType>>();
+```
+
+Now, the contract type provides the default storage type:
+```ts
+const contract = await Tezos.contract.at<TestContract>(`tz123`);
+const storage = await contract.storage();
+```
+
+## Example 
+
+***Coming Soon***
+
+<!-- ### 
+
+
+First, you generate types by running this command:
+```shell
+taq generate types
+```
+
+This will produce an output such as:
+```shell
+generateTypes
+{
+  "typescriptDir": "types"
+}
+Generating Types: ../test-project/taqueria/artifacts => ../test-project/taqueria/types
+Contracts Found:
+	- ..test-project/taqueria/artifacts/example.tz
+Processing /example.tz...example.tz: Types generated
+```
+
+
+### Sample Application TS Code (Using Taquito)
 ```ts
 export const exampleContractMethods1 = async () => {
 
@@ -113,20 +207,6 @@ export const exampleContractMethods1 = async () => {
 };
 ```
 
-
-### Example typegen task
-
-```console
-$ taqueria typegen --typescriptDir ./types
-generateTypes
-{
-  "typescriptDir": "./types"
-}
-Generating Types: /home/rick/projects/crypto/taqueria/example/artifacts => /home/rick/projects/crypto/taqueria/example/types
-Contracts Found:
-        - /home/rick/projects/crypto/taqueria/example/artifacts/example-contract-1.tz
-Processing /example-contract-1.tz...example-contract-1.tz: Types generated
-```
 
 
 ### Example type output
@@ -186,79 +266,4 @@ type Methods = {
     ) => Promise<void>;
     resolve: (param: nat) => Promise<void>;
 };
-```
-
-
-### Improvements in Taquito Workflow
-
-See [example-usage.ts](example/example-usage.ts) for full example
-
-#### Before
-
-Using taquito with the generated contract types:
-
-The at method can be called providing a type with a utility method that can be provided:
-```ts 
-const contract = await Tezos.contract.at(`tz123`, contractAbstractionComposer<TestContractType>());
-
-// methods can now use typed parameters
-// methodsObject will be able to use type parameters
-```
-
-This can work the same with a wallet
-```ts 
-const contract = await Tezos.wallet.at(`tz123`, walletAbstractionComposer<TestContractType>());
-```
-
-Alternatively, this can be done with a cast:
-```ts
-const contract = await Tezos.contract.at(`tz123`) as ContractProviderFromContractType<TestContractType>;
-```
-
-
-The originate contract does not have any way to provide a type, so this requires a cast:
-```ts
-const originationResult = await Tezos.contract.originate({...});
-const contract = await originationResult.contract(5) as ContractProviderFromContractType<TestContractType2>;
-```
-
-
-For accessing storage, there is no way to pass the type through the contract class, 
-so it requires providing the type again:
-```ts
-const contract = await Tezos.contract.at(`tz123`) as ContractProviderFromContractType<TestContractType>;
-const storage = await contract.storage<StorageFromContractType<TestContractType>>();
-```
-
-
-### After
-
-Extending ContractAbstraction with additional generic types:
-
-The at method can be called with the contract type provided:
-```ts 
-const contract = await Tezos.contract.at<TestContract>(`tz123`);
-
-// methods can now use typed parameters
-// methodsObject will be able to use type parameters
-// storage will be able to use type parameters
-
-```
-
-This can work the same with a wallet
-```ts 
-const contract = await Tezos.wallet.at<TestWalletContract>(`tz123`);
-```
-
-The originate contract now accepts a type:
-```ts
-const originationResult = await Tezos.contract.originate({...});
-const contract = await originationResult.contract<TestContract2>(5);
-```
-
-
-The contract type now also provides the default storage type:
-```ts
-const contract = await Tezos.contract.at<TestContract>(`tz123`);
-const storage = await contract.storage();
-```
+``` -->
