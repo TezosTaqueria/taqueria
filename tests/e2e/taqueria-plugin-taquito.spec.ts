@@ -4,6 +4,7 @@ import {execSync} from "child_process";
 import path from "path";
 import waitForExpect from "wait-for-expect";
 import { TezosToolkit } from '@taquito/taquito';
+import axios from "axios";
 
 
 describe("E2E Testing for taqueria taquito plugin",  () => {
@@ -47,10 +48,15 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             });
 
             // 4. Verify that contract has been originated to the network
+            console.log(tezos.rpc.getRpcUrl())
             await waitForExpect(async () => {
                 const contract = await tezos.contract.at(smartContractHash);
                 expect(contract.address).toBe(smartContractHash);
             });
+
+            // 5. Debug
+            const response = await axios.get("https://hangzhounet.api.tez.ie/chains/main/blocks/head/header");
+            console.log(response);
 
         } catch(error) {
             throw new Error (`error: ${error}`);
