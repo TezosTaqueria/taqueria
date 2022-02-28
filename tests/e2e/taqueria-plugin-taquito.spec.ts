@@ -47,13 +47,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
                 expect(contractHash.trim()).toMatch(contractRegex);
             });
 
-            // For debug purpose
-            const response = await axios.get("https://hangzhounet.api.tez.ie/chains/main/blocks/head/header");
-            console.log(response);
-
             // 4. Verify that contract has been originated to the network
-            console.log(tezos.rpc.getRpcUrl())
-
             await waitForExpect(async () => {
                 const contract = await tezos.contract.at(smartContractHash);
                 expect(contract.address).toBe(smartContractHash);
