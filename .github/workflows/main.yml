@@ -16,6 +16,20 @@ env:
   SCOPE: '@taqueria'
 
 jobs:
+  # When we use reusable we lose the ability to to filter out the workflow for changes to certain paths.
+  # This job creates boolean outputs based on path filters. These outputs can then be used as job conditions
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      vscode: ${{ steps.filter.outputs.vscode }}
+    steps:
+    - uses: actions/checkout@v2
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          vscode:
+            - 'taqueria-vscode-extension/**'
   build-binaries:
     permissions:
       contents: 'read'
@@ -182,8 +196,23 @@ jobs:
         run: |
           npm run test:e2e -w tests
 
+  vscode-extension-workflow:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.vscode == 'true' || 
+            github.event_name == 'release' || 
+            startsWith(github.ref, 'refs/tags/v')}}
+    uses: ./.github/workflows/vscode-extension.yml
+    secrets:
+      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
+      VSCE_PAT: ${{ secrets.VSCE_PAT }} 
+
   pr-comment:
     runs-on: ubuntu-latest
+    # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
+    if: ${{ always() &&
+            !(contains(needs.*.result, 'failure')) && 
+            github.event_name == 'pull_request'}}
     needs: 
       - build-binaries
       - publish-protocol-to-npm
@@ -193,7 +222,8 @@ jobs:
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
       - publish-contract-types-plugin-to-npm
-    if: github.event_name == 'pull_request'
+      - run-tests
+      - vscode-extension-workflow
     steps:
       - uses: actions/checkout@v2
 
@@ -204,6 +234,19 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
+            const git_short_sha = "${{ github.sha }}".substring(0, 8)
+            const git_tag = "${{ github.ref }}".split('tags/')[1];
+
+            // Build the vscode-extension workflow comment
+            const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
+            
+            console.log(vsCodeWorkflowState)
+            let vsCodeCommentBody = ''
+            if (vsCodeWorkflowState.includes('success')) {
+              vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
+            } else {
+              vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
+            }
 
             function readInfo(filePath) {
               try {
@@ -224,25 +267,40 @@ jobs:
             const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
             const contractTypes = readInfo("./taqueria-plugin-contract-types/package.json")
 
-            const git_short_sha = "${{ github.sha }}".substring(0, 8)
-            const git_tag = "${{ github.ref }}".split('tags/')[1];
-
             let body = `
-
-
-              | Git Commit | Artifacts |
-              | ---------- | --------- |
-              | ${git_short_sha} | [Linux](${{ needs.build-binaries.outputs.public-url-ubuntu }}) <br /> [MacOS](${{ needs.build-binaries.outputs.public-url-macos }}) <br /> [Windows](${{ needs.build-binaries.outputs.public-url-windows }}) |
-
-
-              | npm package installation instructions |
-              | ------------------------------------- |
-              | npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
-              | taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}|
+              <table>
+                <tr>
+                  <th scope="row">Latest Commit</th>
+                  <td>${git_short_sha}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Taq Binaries</th>
+                  <td>
+                      <p>
+                          <a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a><br>
+                          <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
+                          <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
+                      </p>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">npm Packages</th>
+                  <td>
+                      <p>
+                          npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+                          taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+                          taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+                          taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+                          taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+                          taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
+                      </p>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">VSCode Extension VSIX</th>
+                  <td>${vsCodeCommentBody}</td>
+                </tr>
+              </table>
             `;
 
 
@@ -282,6 +340,7 @@ jobs:
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
       - publish-contract-types-plugin-to-npm
+      - vscode-extension-workflow
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v2
@@ -293,6 +352,7 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
           wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
           wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
+          wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
       - name: Release
         id: release
