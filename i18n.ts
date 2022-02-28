@@ -38,7 +38,8 @@ await i18next.init({
                 "logPluginCallsDesc": "Logs any execution calls to a plugin to the console",
                 "npmInitRequired": "This project isn't a valid NPM project. Please run: npm init",
                 "testFromVsCode": "An internal command used by VS Code to test for the taq binary",
-                "fromVsCode": "An internal flag used to indicate that taq is executed via vscode"
+                "fromVsCode": "An internal flag used to indicate that taq is executed via vscode",
+                "buildDesc": "Display build information about the current version",
             }
         }
     }
