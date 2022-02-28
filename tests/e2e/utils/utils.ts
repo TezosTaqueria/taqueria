@@ -1,8 +1,9 @@
 import {execSync} from "child_process";
 import path from "path";
 import fs from "fs";
+import net from "node:net";
 
-export const generateTestProject = async (projectPath: string, packageNames: string[], localPackages = true) =>{
+export const generateTestProject = async (projectPath: string, packageNames: string[] = [], localPackages: boolean = true) => {
     try{
         execSync(`taq init ${projectPath}`)
     } catch(error){
@@ -25,19 +26,26 @@ export const generateTestProject = async (projectPath: string, packageNames: str
 
     await checkFolderExistsWithTimeout(`./${projectPath}/package.json`, 25000);
 
-    packageNames.forEach(packageName => {
-        try {
-            if (localPackages) {
-                execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`)
-            } else {
-                execSync(`cd ./${projectPath} && taq install @taqueria/plugin-${packageName}`)
+    if (packageNames.length > 0) {
+        packageNames.forEach(packageName => {
+            try {
+                if (localPackages) {
+                    execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`)
+                } else {
+                    execSync(`cd ./${projectPath} && taq install @taqueria/plugin-${packageName}`)
+                }
+            } catch (error) {
+                throw new Error(`error: ${error}`);
             }
-        } catch (error) {
-            throw new Error(`error: ${error}`);
-        }
-    });
+        });
+    
+        await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`, 25000);
+    }
+}
 
-    await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`, 25000);
+export function getContainerName(dockerName: string): string{
+    const [_dockerContainerHeader,dockerContainerName] = execSync(`docker ps --filter "name=${dockerName}" --no-trunc`).toString().trim().split(/\r?\n/);
+    return dockerContainerName;
 }
 
 // The solution was taken from this source:
@@ -71,4 +79,38 @@ export function checkFolderExistsWithTimeout(filePath:string, timeout:number) {
             }
         });
     });
+}
+
+// The solution is slightly modified version of this package
+// https://github.com/sindresorhus/is-port-reachable
+// package itself could not be used due to some issues
+export async function isPortReachable(port: number, {host = "", timeout = 1000} = {}) {
+    if (typeof host !== 'string') {
+        throw new TypeError('Specify a `host`');
+    }
+
+    const promise = new Promise<void>(((resolve, reject) => {
+        const socket = new net.Socket();
+
+        const onError = () => {
+            socket.destroy();
+            reject();
+        };
+
+        socket.setTimeout(timeout);
+        socket.once('error', onError);
+        socket.once('timeout', onError);
+
+        socket.connect(port, host, () => {
+            socket.end();
+            resolve();
+        });
+    }));
+
+    try {
+        await promise;
+        return true;
+    } catch {
+        return false;
+    }
 }

@@ -1,4 +1,4 @@
-import type {SanitizedPath, SanitizedAbsPath} from './taqueria-utils/taqueria-utils-types.ts'
+import type {SanitizedPath, SanitizedAbsPath, SanitizedUrl} from './taqueria-utils/taqueria-utils-types.ts'
 import {SHA256} from './taqueria-utils/taqueria-utils-types.ts'
 import {Option, Config, ConfigArgs, PluginInfo, InstalledPlugin, Verb, UnvalidatedTask, Task, UnvalidatedNetwork, Network, } from './taqueria-protocol/taqueria-protocol-types.ts'
 import {mkdir, joinPaths, debug} from './taqueria-utils/taqueria-utils.ts'
@@ -42,6 +42,8 @@ export interface RawInitArgs {
     _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
     projectDir: string // path to the project
     configDir: string
+    scaffoldUrl?: string;
+    scaffoldProjectDir?: string;
     maxConcurrency: number
     debug: boolean
     plugin?: string
@@ -65,6 +67,8 @@ export interface SanitizedInitArgs {
     _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
     projectDir: SanitizedAbsPath
     configDir: SanitizedPath,
+    scaffoldUrl: SanitizedUrl;
+    scaffoldProjectDir: SanitizedAbsPath;
     maxConcurrency: number,
     debug: boolean,
     plugin?: string

@@ -7,8 +7,8 @@ import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, mapRej, chainRej, resolve, reject, fork, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile, decodeJson} from './taqueria-utils/taqueria-utils.ts'
-import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
+import {exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile, decodeJson, ensurePathDoesNotExist, gitClone, rm} from './taqueria-utils/taqueria-utils.ts'
+import {SanitizedAbsPath, SanitizedPath, SanitizedUrl, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
@@ -126,6 +126,28 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
             ({projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
                 return initProject(projectDir, configDir, i18n, maxConcurrency, quickstart)
             },
+            forkCatch (console.error) (console.error) (console.log)
+        )
+    )
+    .command(
+        'scaffold [scaffoldUrl] [scaffoldProjectDir]',
+        i18n.__('scaffoldDesc'),
+        (yargs: Arguments) => {
+            yargs
+                .positional('scaffoldUrl', {
+                    describe: i18n.__('scaffoldUrlDesc'),
+                    type: 'string',
+                    default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git'
+                })
+                .positional('scaffoldProjectDir', {
+                    type: 'string',
+                    describe: i18n.__('scaffoldProjectDirDesc'),
+                    default: './taqueria-quickstart'
+                })
+        },
+        (args: RawInitArgs) => pipe(
+            sanitizeArgs(args),
+            scaffoldProject(i18n),
             forkCatch (console.error) (console.error) (console.log)
         )
     )
@@ -252,6 +274,24 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
         : resolve(projectDir.value)
     ),
     map (_ => i18n.__("bootstrapMsg"))
+)
+
+const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: SanitizedInitArgs) => pipe(
+    // TODO: i18n of messages
+    // Clone git into destination folder (Initial version assumes git is installed)
+    log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}`)(null),
+    _ => ensurePathDoesNotExist(scaffoldProjectDir.value),
+    chain(gitClone(scaffoldUrl)),
+    // TODO: Run initialization script
+    // Run init found in .taq/scaffold.json
+    // log(`initializing...`),
+    // Load .taq/scaffold.json (if it exists)
+    // Run init command
+    map(log(`Cleanup...`)),
+    chain(_ => rm(scaffoldProjectDir.join(`.taq/scaffold.json`))),
+    chain(_ => rm(scaffoldProjectDir.join(`.git`))),
+    chain(_ => exec("npm install", {}, scaffoldProjectDir)),
+    map(() => i18n.__("scaffoldDoneMsg"))
 )
 
 const getPluginExe = (parsedArgs: SanitizedInitArgs, plugin: InstalledPlugin) => {
@@ -642,7 +682,9 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                         console.log(initArgs.setVersion)
                         return resolve(initArgs)
                     }
-                    return initArgs._.includes('init') || initArgs._.includes('testFromVsCode')
+                    return initArgs._.includes('init') || 
+                        initArgs._.includes('testFromVsCode') ||
+                        initArgs._.includes('scaffold')
                         ? resolve(initArgs)
                         : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
                 }),
@@ -703,7 +745,9 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     fromVsCode: parsedArgs.fromVsCode,
     setBuild: parsedArgs.setBuild,
     setVersion: parsedArgs.setVersion,
-    version: parsedArgs.version
+    version: parsedArgs.version,
+    scaffoldUrl: SanitizedUrl.create(parsedArgs.scaffoldUrl ? parsedArgs.scaffoldUrl : ''),
+    scaffoldProjectDir: SanitizedAbsPath.create(parsedArgs.scaffoldProjectDir ? parsedArgs.scaffoldProjectDir : '')
 })
 
 export default {
