@@ -179,6 +179,7 @@ jobs:
 
       - name: Run e2e tests
         run: |
+          npm run build -w taqueria-plugin-flextesa
           npm run test:e2e --workspace tests
 
   pr-comment:
