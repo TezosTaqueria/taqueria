@@ -53,6 +53,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
             // 4. Verify that contract has been originated to the network
             console.log(tezos.rpc.getRpcUrl())
+
             await waitForExpect(async () => {
                 const contract = await tezos.contract.at(smartContractHash);
                 expect(contract.address).toBe(smartContractHash);
