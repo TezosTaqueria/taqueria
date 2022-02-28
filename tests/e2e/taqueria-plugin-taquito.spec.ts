@@ -51,6 +51,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             await waitForExpect(async () => {
                 const contract = await tezos.contract.at(smartContractHash);
                 expect(contract.address).toBe(smartContractHash);
+
             });
 
         } catch(error) {
