@@ -18,8 +18,6 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     test('Verify that scaffold project can be set up', async () => {
         try {
-            const cwdContents = await exec(`pwd`)
-            console.log(cwdContents.stdout)
             const appContents = await exec(`ls ${scaffoldDirName}/app`)
             const taqContents = await exec(`ls ${scaffoldDirName}/taqueria`)
 
@@ -38,15 +36,10 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     test.only('Verify that scaffold project can build taqueria', async () => {
         try {
-            await exec(``)
-            const taqContents = await exec(`ls ${scaffoldDirName}/taqueria`)
+            await exec('npm run build:taqueria')
+            const taqContents = await exec(`ls ${scaffoldDirName}/taqueria/artifacts`)
 
-            expect(appContents.stdout).toContain('node_modules')
-
-            expect(taqContents.stdout).toContain('node_modules')
-            expect(taqContents.stdout).toContain('contracts')
-            expect(taqContents.stdout).toContain('artifacts')
-            expect(taqContents.stdout).toContain('tests')
+            expect(taqContents.stdout).toContain('example.tz')
 
             await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
         } catch(error) {
