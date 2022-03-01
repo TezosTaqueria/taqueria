@@ -79,6 +79,10 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         type: "string"
     })
     .hide('setBuild')
+    .option('build', {
+        describe: i18n.__('buildDesc'),
+        type: "boolean"
+    })
     .option('maxConcurrency', {
         describe: i18n.__('maxConcurrencyDesc'),
         default: getFromEnv('TAQ_MAX_CONCURRENCY', getDefaultMaxConcurrency(), env),
@@ -682,6 +686,10 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                         console.log(initArgs.setVersion)
                         return resolve(initArgs)
                     }
+                    else if (initArgs.build) {
+                        console.log(initArgs.setBuild)
+                        return resolve(initArgs)
+                    }
                     return initArgs._.includes('init') || 
                         initArgs._.includes('testFromVsCode') ||
                         initArgs._.includes('scaffold')
@@ -746,6 +754,7 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     setBuild: parsedArgs.setBuild,
     setVersion: parsedArgs.setVersion,
     version: parsedArgs.version,
+    build: parsedArgs.build,
     scaffoldUrl: SanitizedUrl.create(parsedArgs.scaffoldUrl ? parsedArgs.scaffoldUrl : ''),
     scaffoldProjectDir: SanitizedAbsPath.create(parsedArgs.scaffoldProjectDir ? parsedArgs.scaffoldProjectDir : '')
 })

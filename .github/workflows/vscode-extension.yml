@@ -1,14 +1,21 @@
 name: VSCode Extension
 
 on:
-  pull_request:
-    paths:
-      - 'taqueria-vscode-extension/**'
-  push:
-    tags:
-      - v*
-  release:
-    types: [published]
+  workflow_call:
+    secrets:
+      GCP_PROJECT:
+        required: true
+      GCP_SERVICE_ACCOUNT:
+        required: true
+      VSCE_PAT:
+        required: true
+    outputs:
+      vsixGcsUrl:
+        description: "The download URL for the VSIX artifact in GCS"
+        value: ${{ jobs.lint-test-build.outputs.vsixGcsUrl }}
+      artifactFilename:
+        description: "The vsix artifact file name"
+        value: ${{ jobs.lint-test-build.outputs.artifactFilename }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
@@ -19,6 +26,9 @@ env:
 
 jobs:
   lint-test-build:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     name: Test and Package on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
@@ -32,6 +42,7 @@ jobs:
     outputs:
       artifactFilename: ${{ steps.setArtifactFilename.outputs.filename }}
       vsixPath: ${{ steps.packageExtension.outputs.vsixPath }}
+      vsixGcsUrl: ${{ steps.publicUrl.outputs.vsixGcsUrl }}
     steps:
       - name: Checkout Source
         uses: actions/checkout@v2
@@ -73,43 +84,69 @@ jobs:
           dryRun: true
           yarn: true
           packagePath: ${{ env.GIT_WORKSPACE }}
-          preRelease: true
+          preRelease: true   
       - id: setArtifactFilename
         if: runner.os == 'Linux'
         run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}"
-      - name: Upload Extension Package as Artifact
+
+      - name: Authenticate with GCP
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v2
+        id: gcp-auth
+        uses: google-github-actions/auth@v0
         with:
-          name: ${{ steps.setArtifactFilename.outputs.filename }}
+          workload_identity_provider: "projects/${{ secrets.GCP_PROJECT }}/locations/global/workloadIdentityPools/github-actions-storage-pool/providers/github-actions-oidc-provider"
+          service_account: "${{ secrets.GCP_SERVICE_ACCOUNT }}"
+
+      - name: Upload binary to GCP
+        if: runner.os == 'Linux'
+        id: uploadFile
+        uses: 'google-github-actions/upload-cloud-storage@v0'
+        with:
           path: ${{ steps.packageExtension.outputs.vsixPath }}
-          retention-days: 7
+          destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}/${{ steps.setArtifactFilename.outputs.filename }}"
+
+      - name: Set package public url
+        if: runner.os == 'Linux'
+        id: publicUrl
+        run: |
+          echo "::set-output name=vsixGcsUrl::https://storage.googleapis.com/taqueria-artifacts/${{ steps.uploadFile.outputs.uploaded }}"
 
   publish-marketplace:
     name: Publish VSCode Extension
-    if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
+    if: ${{ github.event.action == 'published' }}
     needs:
       - lint-test-build
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v2
-      - name: Install Node
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
         with:
           node-version: 16
+
       - name: Install Dependencies
         run: npm ci
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: ${{ needs.lint-test-build.outputs.artifactFilename }}
-          path: ${{ env.GIT_WORKSPACE }}
-      - name: Publish to Visual Studio Marketplace
+      
+      - name: Compile TS
+        run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
+
+      # Seperate steps for prerelease and release workflows
+      - name: Publish as pre-release
+        if: ${{ github.event.release.prerelease }}
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           pat: ${{ secrets.VSCE_PAT }}
-          extensionFile: ${{ needs.lint-test-build.outputs.vsixPath }}
+          yarn: true
+          packagePath: ${{ env.GIT_WORKSPACE }}
           registryUrl: https://marketplace.visualstudio.com
           preRelease: true
+
+      - name: Publish as official release
+        if: ${{ !github.event.release.prerelease }}
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          pat: ${{ secrets.VSCE_PAT }}
+          yarn: true
+          packagePath: ${{ env.GIT_WORKSPACE }}
+          registryUrl: https://marketplace.visualstudio.com
+          
