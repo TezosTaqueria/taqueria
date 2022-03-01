@@ -52,9 +52,10 @@ const config = {
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
-			gtag: {
-				trackingID: "UA-93014135-3",
-				anonymizeIP: true,
+				googleAnalytics: {
+					trackingID: "UA-93014135-3",
+				  anonymizeIP: true,
+
 			},
 			colorMode: {
 				defaultMode: 'light',
