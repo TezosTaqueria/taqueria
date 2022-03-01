@@ -76,7 +76,7 @@ jobs:
         id: build-bin
         shell: bash
         env:
-          TAQ_VERSION: "{{ github.ref_name }}"
+          TAQ_VERSION: ${{ github.ref_name }}
           DENO_DIR: "./deno"
         run: |
           COMMIT=`git rev-parse --short "$GITHUB_SHA"`
