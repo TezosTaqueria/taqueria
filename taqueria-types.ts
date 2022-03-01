@@ -39,7 +39,7 @@ export type DenoArgs = typeof Deno.args
 
 
 export interface RawInitArgs {
-    _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
+    _: ['init' | 'install' | 'uninstall' | 'scaffold' | string]
     projectDir: string // path to the project
     configDir: string
     scaffoldUrl?: string;
@@ -65,7 +65,7 @@ export interface InstallPluginArgs extends RawInitArgs {
 export type UninstallPluginArgs = InstallPluginArgs
 
 export interface SanitizedInitArgs {
-    _: ['init' | 'install' | 'uninstall', 'refresh-teztnets' | string]
+    _: ['init' | 'install' | 'uninstall' | 'scaffold' | string]
     projectDir: SanitizedAbsPath
     configDir: SanitizedPath,
     scaffoldUrl: SanitizedUrl;
