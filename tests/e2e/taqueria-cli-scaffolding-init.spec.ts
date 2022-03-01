@@ -36,17 +36,20 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         }
     })
 
-    test.only('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
+    // We will not need to remove the .git directory once https://github.com/ecadlabs/taqueria/issues/390 is complete
+    // That being said when it is complete it will be easy to remove since this test will fail then 
+    test('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
         const tarFileName = 'taq-quickstart.tar'
         try {
             await exec('taq scaffold')
-            await exec(`tar -cf ${tarFileName} ${scaffoldDirName}`)
+            await fsPromises.rm(`./${scaffoldDirName}/.git`, { recursive: true })
+            await exec(`tar -cf ${tarFileName} ${scaffoldDirName} --mtime=2020-01-30`)
             const tarMD5Sum = await exec(`md5sum ${tarFileName}`)
             const md5sum = tarMD5Sum.stdout.split(' ')[0]
-            expect(md5sum).toBe("12345")
-
+            expect(md5sum).toBe("a4b0c9e1ac65a41455a2ad64a56783d2")
 
             await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
+            await fsPromises.rm(`./${tarFileName}`)
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
