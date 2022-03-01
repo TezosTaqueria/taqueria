@@ -30,7 +30,7 @@ const sanitizedArgs : SanitizedInitArgs = {
     version: false
 }
 
-Deno.test("Positive test for {toPluginArguments}", () => {
+Deno.test("toPluginArguments() returns an array suitable for invoking a plugin task", () => {
     const requestArgs = {foo: "bar", bar: "foo"}
 
     const result = toPluginArguments(sanitizedArgs, requestArgs)
@@ -73,7 +73,7 @@ Deno.test("Positive test for {toPluginArguments}", () => {
     ])
 });
 
-Deno.test("Positive test for logPluginCalls", () => {
+Deno.test("logPluginCalls() outputs the call to a plugin", () => {
     const actual: string[] = []
 
     const plugin : InstalledPlugin = {
