@@ -44,9 +44,10 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
             await exec('taq scaffold')
             await fsPromises.rm(`./${scaffoldDirName}/.git`, { recursive: true })
             await exec(`tar -cf ${tarFileName} ${scaffoldDirName} --mtime=2020-01-30`)
+            
             const tarMD5Sum = await exec(`md5sum ${tarFileName}`)
             const md5sum = tarMD5Sum.stdout.split(' ')[0]
-            expect(md5sum).toBe("a4b0c9e1ac65a41455a2ad64a56783d2")
+            expect(md5sum).toBe("b7fc04da4a4f33980b93d1fd279d4a03")
 
             await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
             await fsPromises.rm(`./${tarFileName}`)
