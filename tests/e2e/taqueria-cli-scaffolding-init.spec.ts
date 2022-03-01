@@ -37,8 +37,14 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
     })
 
     test.only('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
+        const tarFileName = 'taq-quickstart.tar'
         try {
             await exec('taq scaffold')
+            await exec(`tar -cf ${tarFileName} ${scaffoldDirName}`)
+            const tarMD5Sum = await exec(`md5sum ${tarFileName}`)
+            const md5sum = tarMD5Sum.stdout.split(' ')[0]
+            expect(md5sum).toBe("12345")
+
 
             await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
         } catch(error) {
