@@ -8,13 +8,6 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
 	plugins: [
 		'docusaurus-plugin-sass',
-		[
-			'@docusaurus/plugin-google-gtag',
-			{
-			  trackingID: '303602454',
-			  anonymizeIP: true,
-			},
-		  ],
 	],
 	title: 'Taqueria - Developer Tooling for Tezos',
 	tagline: 'Taqueria - Developer Tooling for Tezos',
@@ -60,6 +53,14 @@ const config = {
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
+			gtag: {
+				trackingID: '303602454',
+				anonymizeIP: true,
+			  },
+			  googleAnalytics: {
+				trackingID: 'UA-93014135-3',
+				anonymizeIP: true,
+			  },
 			colorMode: {
 				defaultMode: 'light',
 				disableSwitch: true,
