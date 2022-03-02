@@ -31,6 +31,10 @@ const config = {
 
 					editUrl: 'https://github.com/ecadlabs/taqueria/edit/main/website/',
 				},
+				gtag: {
+					  trackingID: '303602454',
+					  anonymizeIP: true,
+				},
 				blog: {
 					showReadingTime: true,
 					// Please change this to your repo.
