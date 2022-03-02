@@ -24,6 +24,7 @@ export const Chart = () => (
  </div>
 );
 
+
 export const Caution = () => (
   <span
     style={{
