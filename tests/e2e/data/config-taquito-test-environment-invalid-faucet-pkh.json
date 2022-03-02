@@ -1,0 +1,83 @@
+{
+    "language": "en",
+    "plugins": [
+        {
+            "name": "@taqueria/plugin-taquito",
+            "type": "npm"
+        }
+    ],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts",
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {}
+        },
+        "test": {
+            "networks": ["hangzhounet"],
+            "sandboxes": [],
+            "storage": {"hello-tacos.tz": "100"}
+        }
+    },
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "default": "bob",
+                "bob": {
+                    "initialBalance": "3000000000"
+                },
+                "alice": {
+                    "initialBalance": "2000000000"
+                },
+                "john": {
+                    "initialBalance": "4000000000"
+                },
+                "jane": {
+                    "initialBalance": "5000000000"
+                },
+                "joe": {
+                    "initialBalance": "1000000000"
+                }
+            },
+            "label": "Local Tezos Sandbox",
+            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+    "network": {
+        "hangzhounet": {
+            "label": "hangzhounet",
+            "rpcUrl": "https://hangzhounet.api.tez.ie",
+            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "faucet": {
+                "pkh": "invalid",
+                "mnemonic": [
+                    "bone",
+                    "copper",
+                    "early",
+                    "light",
+                    "shallow",
+                    "sense",
+                    "burden",
+                    "civil",
+                    "knee",
+                    "knife",
+                    "excuse",
+                    "noise",
+                    "enable",
+                    "piano",
+                    "loyal"
+                ],
+                "email": "tasbcxmi.wbdftfiw@teztnets.xyz",
+                "password": "sz2Trjg3Z5",
+                "amount": "55579807681",
+                "activation_code": "cce0f1f37d4eb45b5ac0cdf755825abd5fd53b10"
+            }
+        }
+    }
+}
