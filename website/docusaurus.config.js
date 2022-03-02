@@ -22,9 +22,7 @@ const config = {
 		[
 			'@docusaurus/preset-classic',
 			/** @type {import('@docusaurus/preset-classic').Options} */
-			
-
-			({
+			{
 				docs: {
 					path: 'docs',
 					sidebarPath: require.resolve('./sidebars.js'),
@@ -51,7 +49,7 @@ const config = {
 					trackingID: "UA-93014135-3",
 					anonymizeIP: true,
 				}
-			}),
+			},
 		],
 	],
 	themeConfig:
