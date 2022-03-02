@@ -6,13 +6,21 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-	plugins: ['docusaurus-plugin-sass', '@docusaurus/plugin-google-gtag'],
+	plugins: [
+		'docusaurus-plugin-sass',
+		[
+			'@docusaurus/plugin-google-gtag',
+			{
+			  trackingID: '303602454',
+			  anonymizeIP: true,
+			},
+		  ],
+	],
 	title: 'Taqueria - Developer Tooling for Tezos',
 	tagline: 'Taqueria - Developer Tooling for Tezos',
 	url: 'https://taqueria.io',
 	baseUrl: '/',
-
-  onBrokenLinks: 'throw',
+    onBrokenLinks: 'throw',
 	onBrokenMarkdownLinks: 'warn',
 	favicon: '/img/favicon.ico',
 	organizationName: 'ecadlabs', // Usually your GitHub org/user name.
@@ -23,7 +31,7 @@ const config = {
 			'@docusaurus/preset-classic',
 			/** @type {import('@docusaurus/preset-classic').Options} */
 				
-			({
+			{
 				docs: {
 					path: 'docs',
 					sidebarPath: require.resolve('./sidebars.js'),
@@ -46,16 +54,12 @@ const config = {
 						require.resolve('./src/css/tabs.scss'),
 					],
 				},
-			}),
+			},
 		],
 	],
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
-			gtag: {
-				trackingID: '303602454',
-				anonymizeIP: true,
-		  },
 			colorMode: {
 				defaultMode: 'light',
 				disableSwitch: true,
