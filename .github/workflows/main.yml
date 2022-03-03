@@ -169,15 +169,15 @@ jobs:
         include:
         - os: ubuntu-latest
           url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
-          make-executable-cmd: chmod +x
+          final-name: taq
           get-current-dir: echo "$(pwd)"
         - os: windows-latest
           url: ${{ needs.build-binaries.outputs.public-url-windows }}
-          make-executable-cmd: ""
+          final-name: taq.exe
           get-current-dir: echo %cd%
         - os: macOS-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
-          make-executable-cmd: chmod +x
+          final-name: taq
           get-current-dir: echo "$(pwd)"
 
     steps:
@@ -192,8 +192,7 @@ jobs:
 
       - name: get binary and make executable from previous step for tests
         run: |
-          curl --url ${{ matrix.url }} -o taq -L
-          ${{ matrix.make-executable-cmd }} taq
+          curl --url ${{ matrix.url }} -o ${{ matrix.final-name }} -L
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
       - name: install dependencies
