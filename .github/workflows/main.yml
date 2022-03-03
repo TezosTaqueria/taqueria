@@ -175,7 +175,7 @@ jobs:
         - os: windows-latest
           url: ${{ needs.build-binaries.outputs.public-url-windows }}
           final-name: taq.exe
-          make-executable-cmd: "csc"
+          make-executable-cmd: echo
           get-current-dir: echo %cd%
         - os: macOS-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
