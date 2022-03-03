@@ -32,9 +32,9 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         }
     })
 
-    test.only('Verify that scaffold project can build taqueria', async () => {
+    test('Verify that scaffold project can build taqueria', async () => {
         try {
-            await exec('npm run build:taqueria')
+            await exec(`cd ${scaffoldDirName} && npm run build:taqueria`)
             const taqContents = await exec(`ls ${scaffoldDirName}/taqueria/artifacts`)
             expect(taqContents.stdout).toContain('example.tz')
         } catch(error) {
@@ -42,13 +42,24 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         }
     })
 
-    test.only('Verify that scaffold project can start taqueria locally', async () => {
+    test('Verify that scaffold project can start taqueria locally', async () => {
         try {
-            const startResults = await exec('npm run start:taqueria:local')
+            const startResults = await exec(`cd ${scaffoldDirName} && npm run start:taqueria:local`)
             expect(startResults.stdout).toContain('Processing /example.tz...example.tz: Types generated')
             expect(startResults.stdout).toContain('Started local.')
+
+            await exec(`docker stop local`)
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
+    })
+
+    afterAll(async () => {
+        try {
+            await fsPromises.rm(`${scaffoldDirName}`, { recursive: true })
+        } catch (error) {
+            throw new Error (`error: ${error}`)
+        }
+
     })
 })
