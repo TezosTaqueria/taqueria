@@ -164,7 +164,7 @@ jobs:
       - build-binaries
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      # fail-fast: true
       matrix:
         include:
         - os: ubuntu-latest
