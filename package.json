@@ -39,7 +39,6 @@
   },
   "workspaces": [
     "./taqueria*",
-    "./taqueria-flextesa-manager",
     "./tests"
   ]
 }
