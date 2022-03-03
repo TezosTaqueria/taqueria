@@ -18,7 +18,7 @@ const attributesToParams = (attributes: Attributes): Record<string, string> => [
     {}
 )
 
-const getDockerImage = () => 'ghcr.io/ecadlabs/taqueria-flextesa:latest'
+const getDockerImage = (build:string) => `ghcr.io/ecadlabs/taqueria-flextesa:${build}`
 
 const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string, debug:boolean): string => {
     const _envVars = Object.entries(attributesToParams(sandbox.attributes)).reduce(
@@ -62,7 +62,7 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<ProxyAction> 
                     stderr: ''
                 })
                 : getArch()
-                    .then(arch => getStartCommand(sandbox, getDockerImage(), opts, arch, opts.debug)) 
+                    .then(arch => getStartCommand(sandbox, getDockerImage(opts.setBuild), opts, arch, opts.debug)) 
                     .then(execCmd)
                 .then(() => configureTezosClient(sandbox, opts))
                 .then(() => importAccounts(sandbox, opts))

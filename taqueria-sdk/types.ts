@@ -119,6 +119,7 @@ export interface SanitizedArgs {
     testsDir: string
     artifactsDir: string
     debug: boolean
+    setBuild: string
     task?: string
 }
 
