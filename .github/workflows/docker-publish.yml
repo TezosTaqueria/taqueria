@@ -45,6 +45,7 @@ jobs:
             type=ref,event=pr,suffix=-{{sha}}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=${{ github.ref_name }}/{{sha}}
 
       - name: Install npm dependencies
         run: npm ci
