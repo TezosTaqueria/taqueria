@@ -41,7 +41,7 @@ jobs:
         id: "vars"
         run: |
           echo "::set-output name=short_sha::$(git rev-parse --short $GITHUB_SHA)"
-          echo "::set-output name=taq_version::${$GITHUB_REF_NAME,'/','-'}"
+          echo "::set-output name=taq_version::${$GITHUB_REF_NAME/\//-}"
 
       - name: Extract metadata
         id: image-metadata
