@@ -172,11 +172,11 @@ jobs:
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
-        - os: windows-latest
-          url: ${{ needs.build-binaries.outputs.public-url-windows }}
-          final-name: taq.exe
-          make-executable-cmd: echo
-          get-current-dir: echo %cd%
+        # - os: windows-latest
+        #   url: ${{ needs.build-binaries.outputs.public-url-windows }}
+        #   final-name: taq.exe
+        #   make-executable-cmd: echo
+        #   get-current-dir: echo %cd%
         - os: macOS-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
@@ -198,6 +198,9 @@ jobs:
           curl --url ${{ matrix.url }} -o ${{ matrix.final-name }} -L
           ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
+
+      - name: setup-docker
+        uses: docker-practice/actions-setup-docker@1.0.8
 
       - name: install dependencies
         run: npm ci
