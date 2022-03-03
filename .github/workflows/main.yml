@@ -162,7 +162,23 @@ jobs:
   run-tests:
     needs: 
       - build-binaries
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+        - os: ubuntu-latest
+          url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
+          make-executable-cmd: chmod +x
+          get-current-dir: echo "$(pwd)"
+        - os: windows-latest
+          url: ${{ needs.build-binaries.outputs.public-url-windows }}
+          make-executable-cmd: ""
+          get-current-dir: echo %cd%
+        - os: macOS-latest
+          url: ${{ needs.build-binaries.outputs.public-url-macos }}
+          make-executable-cmd: chmod +x
+          get-current-dir: echo "$(pwd)"
 
     steps:
       - uses: actions/checkout@v2
@@ -176,9 +192,9 @@ jobs:
 
       - name: get binary and make executable from previous step for tests
         run: |
-          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
-          chmod +x taq
-          echo "$(pwd)" >> $GITHUB_PATH
+          curl --url ${{ matrix.url }} -o taq -L
+          ${{ matrix.make-executable-cmd }} taq
+          ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
       - name: install dependencies
         run: npm ci
