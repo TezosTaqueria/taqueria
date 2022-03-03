@@ -1,11 +1,11 @@
 {
-  "name": "@taqueria/flextesa-docker",
+  "name": "@taqueria/flextesa-manager",
   "version": "0.1.2",
-  "description": "Extends the oxheadalpha/flextesa image for use with Taqueria",
+  "description": "Provides an interface and abstraction over a flextesa mininet",
   "main": "index.js",
   "scripts": {
     "prebuild-package": "npm install",
-    "build-package": "npx esbuild --platform=node --bundle startFlextesa.ts --outdir=.",
+    "build-package": "npx esbuild --platform=node --bundle index.ts --outdir=.",
     "build-docker": "docker build . -t ghcr.io/ecadlabs/taqueria-flextesa:latest",
     "build": "npm run build-package"
   },

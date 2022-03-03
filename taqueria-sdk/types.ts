@@ -118,6 +118,7 @@ export interface SanitizedArgs {
     contractsDir: string
     testsDir: string
     artifactsDir: string
+    debug: boolean
     task?: string
 }
 

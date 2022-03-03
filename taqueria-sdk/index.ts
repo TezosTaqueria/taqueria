@@ -36,7 +36,7 @@ export const execCmd = (cmd:string): Promise<ProxyAction> => new Promise((resolv
     })
 })
 
-export const getArch = () => 
+export const getArch = (): Promise<string> => 
     execCmd("uname -m")
     .then(result => (result.stdout as string).trim().toLowerCase())
     .then(arch => {

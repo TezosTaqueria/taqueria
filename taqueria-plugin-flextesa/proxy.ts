@@ -20,21 +20,25 @@ const attributesToParams = (attributes: Attributes): Record<string, string> => [
 
 const getDockerImage = () => 'ghcr.io/ecadlabs/taqueria-flextesa:latest'
 
-const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
+const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string, debug:boolean): string => {
     const _envVars = Object.entries(attributesToParams(sandbox.attributes)).reduce(
         (retval, [key, val]) => `${retval} -e ${key} ${val} `,
         ""
     )
 
-    return `docker run --name ${sandbox.name} --rm --detach --platform ${arch} -p ${sandbox.rpcUrl.url.port}:20000 -v ${config.projectDir}:/project -w /app ${image} node startFlextesa.js --sandbox ${sandbox.name}`
+    const ports = debug
+        ? `-p ${sandbox.rpcUrl.url.port}:20000 -p 19229:9229`
+        : `-p ${sandbox.rpcUrl.url.port}:20000`
+
+    return `docker run --name ${sandbox.name} --rm --detach --platform ${arch} ${ports} -v ${config.projectDir}:/project -w /app ${image} node index.js --sandbox ${sandbox.name}`
 }
 
 const getConfigureCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
-    return `docker exec ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --configure`
+    return `docker exec ${sandbox.name} node index.js --sandbox ${sandbox.name} --configure`
 }
 
 const getImportAccountsCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
-    return `docker exec ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --importAccounts`
+    return `docker exec ${sandbox.name} node index.js --sandbox ${sandbox.name} --importAccounts`
 }
 
 const doesUseFlextesa = (sandbox: Sandbox) => !sandbox.plugin || sandbox.plugin === 'flextesa'
@@ -58,7 +62,7 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<ProxyAction> 
                     stderr: ''
                 })
                 : getArch()
-                    .then(arch => getStartCommand(sandbox, getDockerImage(), opts, arch)) 
+                    .then(arch => getStartCommand(sandbox, getDockerImage(), opts, arch, opts.debug)) 
                     .then(execCmd)
                 .then(() => configureTezosClient(sandbox, opts))
                 .then(() => importAccounts(sandbox, opts))
