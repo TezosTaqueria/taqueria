@@ -53,7 +53,7 @@ jobs:
             type=ref,event=pr,suffix=-{{sha}}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=${{ github.ref_name }}/${{ steps.vars.outputs.short_sha }}
+            type=raw,value=${{ steps.vars.outputs.taq_version }}/${{ steps.vars.outputs.short_sha }}
 
       - name: Install npm dependencies
         run: npm ci
