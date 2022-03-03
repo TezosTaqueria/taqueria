@@ -5,14 +5,14 @@ on:
     branches:
       - 'main'
     paths:
-      - 'taqueria-plugin-flextesa/docker/*'
+      - 'taqueria-flextesa-manager/*'
     tags:
       - 'v*'
   pull_request:
     branches:
       - 'main'
     paths:
-      - 'taqueria-plugin-flextesa/docker/*'
+      - 'taqueria-flextesa-manager/*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
@@ -50,7 +50,7 @@ jobs:
         run: npm ci
 
       - name: Build package
-        run: npm run build -w taqueria-plugin-flextesa/docker
+        run: npm run build -w taqueria-flextesa-manager
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
@@ -64,7 +64,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: ./taqueria-plugin-flextesa/docker/
+          context: ./taqueria-flextesa-manager
           push: true
           platforms: linux/arm64/v8,linux/amd64
           tags: ${{ steps.image-metadata.outputs.tags }}
