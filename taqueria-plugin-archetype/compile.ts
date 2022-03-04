@@ -46,23 +46,26 @@ const getCompileCommand = (opts: Opts) => (sourceFile: string) => {
   return cmd
 }
 
-const compileContract = (opts: Opts) => (sourceFile: string) => {
+const compileContractUnit = (opts: Opts) => (sourceFile: string): Promise<{ contract: string, artifact: string }> => {
   // const sourceAbspath = join(opts.contractsDir, sourceFile)
   return execCmd(getCompileCommand(opts)(sourceFile))
     .then(() => getContractArtifactFilename(opts)(sourceFile))
-    .then((artifact: string) => ({ contract: sourceFile, artifacts: [artifact] }))
+    .then((artifact: string) => ({ contract: sourceFile, artifact: artifact }))
 }
 
-const compileAll = (opts: Opts): Promise<{ contract: string, artifacts: string[] }[]> => {
+const compileAll = (opts: Opts): Promise<{ contract: string, artifact: string }[]> => {
   // TODO: Fetch list of files from SDK
   return glob(
     ['**/*.arl'],
     { cwd: opts.contractsDir, absolute: false }
   )
-    .then(entries => entries.map(compileContract(opts)))
+    .then(entries => entries.map(compileContractUnit(opts)))
     .then(promises => Promise.all(promises))
 }
 
+const compileContract = (opts: Opts) => (sourceFile: string): Promise<{ contract: string, artifact: string }[]> => {
+  return Promise.all([compileContractUnit(opts)(sourceFile)])
+}
 
 export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
   const p = parsedArgs.sourceFile
