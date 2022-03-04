@@ -47,7 +47,7 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
             
             const tarMD5Sum = await exec(`md5sum ${tarFileName}`)
             const md5sum = tarMD5Sum.stdout.split(' ')[0]
-            expect(md5sum).toBe("b7fc04da4a4f33980b93d1fd279d4a03")
+            expect(md5sum).toBe("24a9f5d69f164be3cd94901bdfe8da22")
 
             await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
             await fsPromises.rm(`./${tarFileName}`)
