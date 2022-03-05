@@ -54,7 +54,7 @@ const config = {
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
 			gtag: {
-				trackingID: 'G-R7WYMVNDR1',
+				trackingID: 'G-2VB2D1DHC0',
 				anonymizeIP: true,
 			  },
 			  googleAnalytics: {
