@@ -2,7 +2,7 @@
 title: Contract Types Plugin
 ---
 
-This plugin provides a `taq generate types` task which will generate and export TypeScript types from compiled Michelson smart contracts. These types work with your IDE and Taquito, providing type safety and an improved code authoring experience
+This plugin provides a `taq generate types` command which will generate and export TypeScript types from compiled Michelson smart contracts. These generated types then work with your IDE and Taquito, providing type safety and an improved code authoring experience
 
 Benefits of using generated types:
 - Static types used to call smart contract methods are checked at compile time, improving code reliability
