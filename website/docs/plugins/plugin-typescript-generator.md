@@ -2,27 +2,21 @@
 title: Contract Types Plugin
 ---
 
-This plugin provides a `taq generate types` task which will generate and export TypeScript types from compiled Michelson smart contracts
+This plugin provides a `taq generate types` task which will generate and export TypeScript types from compiled Michelson smart contracts. These types work with your IDE and Taquito, providing type safety and an improved code authoring experience
 
-In the simple case, it reads the artifacts folder for any *.tz Michelson files and will generate a types file with the matching filename for each contract
-
-The TS types generated and exported in the files work with your IDE and Taquito, providing the developer with type safety and an improved code authoring experience. Some of the benefits include:
+Benefits of using generated types:
 - Developers using both Taquito and Taqueria can use static types at compile time instead of on runtime validation
-- Generated types enable auto-completion in your IDE
+- Generated types enable auto-completion and syntax highlighting in your IDE
 - The VS Code Extension provides tooltip hints for parameter types used to call a smart contract method
-- Developers can use types to directly call smart contract methods without using a utility method
+- Calling smart contract methods with types is done directly, removing the need for utility methods 
 - Simplifies your code and improves readability
+
+The basic usage of the plugin involves running the `taq generate types` command reads the artifacts folder for any *.tz Michelson files and will generate a types file with the matching filename for each contract
 
 ## Requirements
 
 - Node JS v16 or later
-- Taquito v11.1.0-6bfb6c08--1343
-
-:::caution
-This plugin currently is using an [unmerged Taquito PR](https://github.com/ecadlabs/taquito/pull/1343)
-To install, run:
-- `npm install @taquito/taquito@11.1.0-6bfb6c08--1343 --registry https://npm.preview.tezostaquito.io/`
-:::
+- Taquito v11.2 or later
 
 ## Installation
 
