@@ -5,18 +5,17 @@ title: Contract Types Plugin
 This plugin provides a `taq generate types` task which will generate and export TypeScript types from compiled Michelson smart contracts. These types work with your IDE and Taquito, providing type safety and an improved code authoring experience
 
 Benefits of using generated types:
-- Developers using both Taquito and Taqueria can use static types at compile time instead of on runtime validation
+- Static types used to call smart contract methods are checked at compile time, improving code reliability
 - Generated types enable auto-completion and syntax highlighting in your IDE
+- Developing apps with Taquito is faster and more reliable
 - The VS Code Extension provides tooltip hints for parameter types used to call a smart contract method
 - Calling smart contract methods with types is done directly, removing the need for utility methods 
 - Simplifies your code and improves readability
 
-The basic usage of the plugin involves running the `taq generate types` command reads the artifacts folder for any *.tz Michelson files and will generate a types file with the matching filename for each contract
-
 ## Requirements
 
 - Node JS v16 or later
-- Taquito v11.2 or later
+- Taquito v11.2 or later (optional)
 
 ## Installation
 
@@ -31,13 +30,13 @@ This plugin will look for Michelson files according to the `artifactsDir` config
 
 ## Usage
 
-Basic usage of the plugin is to run `taq generate types`
+The plugin provides a single command to Taqueria: `taq generate types`
 
 This will look for `.tz` files in the `/artifacts` directory and will generate a series of related `.ts` files in the `/types` directory. These files export type definitions for each method which can then be used by Taquito and your IDE
 
 ### The `generate types` Command
 
-The task exposed by the plugin to Taqueria is:
+#### Syntax
 ```shell
 taq generate types [typeOutputDir]
 ```
@@ -127,172 +126,4 @@ Now, the contract type provides the default storage type:
 const contract = await Tezos.contract.at<TestContract>(`tz123`);
 const storage = await contract.storage();
 ```
-
-## Example 
-
-The following example illustrates the workflow and usage of this plugin
-
-
-### Initialize a Taqueria Project
-
-***Detail initializing a project and adding the relavent contract and app.ts code, or provide a scaffold***
-
-### Source Contract
-
-Add this `.tz` contract to your `/artifacts` directory:
-```
-{ parameter (or (or (int %decrement) (int %increment)) (unit %reset)) ;
-  storage int ;
-  code { UNPAIR ;
-         IF_LEFT { IF_LEFT { SWAP ; SUB } { ADD } } { DROP 2 ; PUSH int 0 } ;
-         NIL operation ;
-         PAIR } }
-
-```
-***Detail what types are extracted from the real example***
-
-### Generating TS Types
-
-Now that you have a source file in your `/artifacts` directory, proceed to generating types by running this command:
-```shell
-taq generate types
-```
-***Update following snippet with final example output***
-This will produce an output such as:
-```shell
-generateTypes
-{
-  "typescriptDir": "types"
-}
-Generating Types: ../test-project/taqueria/artifacts => ../test-project/taqueria/types
-Contracts Found:
-	- ..test-project/taqueria/artifacts/example.tz
-Processing /example.tz...example.tz: Types generated
-```
-
-### Output Files
-
-Detail the files generated (as well as the other helper files in the /types dir)
-- type-aliases.ts
-- type-utils.ts
-- xyz.types.ts
-- xys.code.ts
-
-### Example of Types Generated
-
-If you view the `xyz' file, you can see that that the plugin has extracted these types:
-
-```ts
-type Storage = {
-    pauseable_admin?: {
-        admin: address;
-        paused: boolean;
-        pending_admin?: address;
-    };
-    current_id: nat;
-    max_auction_time: nat;
-    max_config_to_start_time: nat;
-    auctions: BigMap<nat, {
-        seller: address;
-        current_bid: mutez;
-        start_time: timestamp;
-        last_bid_time: timestamp;
-        round_time: int;
-        extend_time: int;
-        asset: Array<{
-            fa2_address: address;
-            fa2_batch: Array<{
-                token_id: nat;
-                amount: nat;
-            }>;
-        }>;
-        min_raise_percent: nat;
-        min_raise: mutez;
-        end_time: timestamp;
-        highest_bidder: address;
-    }>;
-};
-
-type Methods = {
-    confirm_admin: () => Promise<void>;
-    pause: (param: boolean) => Promise<void>;
-    set_admin: (param: address) => Promise<void>;
-    bid: (param: nat) => Promise<void>;
-    cancel: (param: nat) => Promise<void>;
-    configure: (
-        opening_price: mutez,
-        min_raise_percent: nat,
-        min_raise: mutez,
-        round_time: nat,
-        extend_time: nat,
-        asset: Array<{
-            fa2_address: address;
-            fa2_batch: Array<{
-                token_id: nat;
-                amount: nat;
-            }>;
-        }>,
-        start_time: timestamp,
-        end_time: timestamp,
-    ) => Promise<void>;
-    resolve: (param: nat) => Promise<void>;
-};
-```
-
-### Sample Application TS Code (Using Taquito)
-
-Now that types have been generated and exported, they can be used in your Taquito project. Open the file `xyz`
-
-***Detail usage***
-
-***Ensure importing of types is shown and update snippet with final example***
-```ts
-export const exampleContractMethods1 = async () => {
-
-    const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
-
-    const contract = await Tezos.contract.at<TestContract>(`tz123`);
-
-    contract.methods.bid(tas.nat(0));
-    contract.methods.configure(
-        /*opening_price:*/ tas.mutez(10),
-        /*min_raise_percent:*/ tas.nat(10),
-        /*min_raise:*/ tas.mutez(10),
-        /*round_time:*/ tas.nat(10),
-        /*extend_time:*/ tas.nat(10),
-        /*asset:*/ [{
-            fa2_address: tas.address(`tz123`),
-            fa2_batch: [{
-                amount: tas.nat(100),
-                token_id: tas.nat(`100000000000000`),
-            }],
-        }],
-        /*start_time:*/ tas.timestamp(new Date()),
-        /*end_time:*/ tas.timestamp(`2020-01-01`),
-    );
-
-    // methodsObject
-    contract.methodsObject.bid(tas.nat(0));
-    contract.methodsObject.configure({
-        asset: [{
-            fa2_address: tas.address(`tz123`),
-            fa2_batch: [{
-                amount: tas.nat(100),
-                token_id: tas.nat(`100000000000000`),
-            }],
-        }],
-        start_time: tas.timestamp(new Date()),
-        end_time: tas.timestamp(`2020-01-01`),
-        extend_time: tas.nat(10),
-        min_raise: tas.mutez(10),
-        min_raise_percent: tas.nat(10),
-        opening_price: tas.mutez(10),
-        round_time: tas.nat(10),
-    });
-
-};
-```
-
-
-
 
