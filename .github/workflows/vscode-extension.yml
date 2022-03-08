@@ -3,10 +3,6 @@ name: VSCode Extension
 on:
   workflow_call:
     secrets:
-      GCP_PROJECT:
-        required: true
-      GCP_SERVICE_ACCOUNT:
-        required: true
       VSCE_PAT:
         required: true
     outputs:
