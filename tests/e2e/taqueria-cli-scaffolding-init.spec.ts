@@ -52,8 +52,6 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
             await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
             await fsPromises.rm(`./${tarFileName}`)
         } catch(error) {
-            await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
-            await fsPromises.rm(`./${tarFileName}`)
             throw new Error (`error: ${error}`)
         }
     })
