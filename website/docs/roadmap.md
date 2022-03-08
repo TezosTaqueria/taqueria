@@ -8,6 +8,7 @@ title: Taqueria Roadmap
 
 These features will be launching in upcoming releases:
 - Jest plugin
+- Scaffold registry
 - Smart contract testing with Jest
 - Complex origination workflows 
 - Contract metadata support
