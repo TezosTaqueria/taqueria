@@ -31,6 +31,7 @@ These features will be launching in upcoming releases:
 
 :::note
 For full detail on changes, fixes, and improvements made in each release, please refer to the [Taqueria Release Page](https://github.com/ecadlabs/taqueria/releases)
+:::
 
 - Taqueria v0.1.1 shipped in February 2022 which added two major features:
   - Project scaffolding
