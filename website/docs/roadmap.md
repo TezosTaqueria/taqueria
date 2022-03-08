@@ -33,7 +33,7 @@ These features will be launching in upcoming releases:
 For full detail on changes, fixes, and improvements made in each release, please refer to the [Taqueria Release Page](https://github.com/ecadlabs/taqueria/releases)
 :::
 
-- Taqueria v0.1.1 shipped in February 2022 which added two major features:
+- February 2022:
   - Project scaffolding
   - TS Type Generation from Michelson`.tz` files which includes:
     - A new Taqueria NPM plugin: @taqueria/plugin-contract-types
@@ -42,8 +42,7 @@ For full detail on changes, fixes, and improvements made in each release, please
       - Compile time type checking for TS types 
 
 
-
--The first MVP of Taqueria was shipped in January 2022. This release included:
+- January 2022:
   - CLI
   - Visual Studio Code Extension
   - Initialization of a Tezos Project
