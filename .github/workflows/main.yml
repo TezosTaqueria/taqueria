@@ -20,6 +20,7 @@ jobs:
   # This job creates boolean outputs based on path filters. These outputs can then be used as job conditions
   detect-changes:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     outputs:
       vscode: ${{ steps.filter.outputs.vscode }}
     steps:
@@ -35,7 +36,8 @@ jobs:
       contents: 'read'
       id-token: 'write'
     runs-on: ${{ matrix.os }}
-    if: github.event_name != 'release'
+    if: ${{ github.event_name != 'release' &&
+            !github.event.pull_request.head.repo.fork }}
     strategy:
       fail-fast: true
       matrix:
@@ -104,6 +106,7 @@ jobs:
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
   publish-protocol-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-protocol
@@ -111,6 +114,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-sdk-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-protocol-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -119,6 +123,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-ligo-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -127,6 +132,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
   
   publish-smartpy-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -135,6 +141,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-taquito-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -143,6 +150,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-flextesa-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs:
       - publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
@@ -152,6 +160,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-contract-types-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -160,8 +169,6 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   run-tests:
-    needs: 
-      - build-binaries
     runs-on: ubuntu-latest
 
     steps:
@@ -205,9 +212,10 @@ jobs:
 
   vscode-extension-workflow:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.vscode == 'true' || 
+    if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
             github.event_name == 'release' || 
-            startsWith(github.ref, 'refs/tags/v')}}
+            startsWith(github.ref, 'refs/tags/v')) &&
+            !github.event.pull_request.head.repo.fork }}
     uses: ./.github/workflows/vscode-extension.yml
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
@@ -219,7 +227,8 @@ jobs:
     # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
     if: ${{ always() &&
             !(contains(needs.*.result, 'failure')) && 
-            github.event_name == 'pull_request'}}
+            github.event_name == 'pull_request' &&
+            !github.event.pull_request.head.repo.fork }}
     needs: 
       - build-binaries
       - publish-protocol-to-npm
@@ -348,7 +357,8 @@ jobs:
       - publish-flextesa-plugin-to-npm
       - publish-contract-types-plugin-to-npm
       - vscode-extension-workflow
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: ${{ startsWith(github.ref, 'refs/tags/v') &&
+            !github.event.pull_request.head.repo.fork }}
     steps:
       - uses: actions/checkout@v2
 
