@@ -1,16 +1,16 @@
 name: main
 
 on:
-  pull_request:
-    branches:
-      - main
+  pull_request_target:
+    # branches:
+    #   - main
 
-  push:
-    tags:
-      - v*
+  # push:
+  #   tags:
+  #     - v*
 
-  release:
-    types: [published]
+  # release:
+  #   types: [published]
 
 env:
   SCOPE: '@taqueria'
@@ -103,109 +103,109 @@ jobs:
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  publish-protocol-to-npm:
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-protocol
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-protocol-to-npm:
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-protocol
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-sdk-to-npm:
-    needs: publish-protocol-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-sdk
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-sdk-to-npm:
+  #   needs: publish-protocol-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-sdk
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-ligo-plugin-to-npm:
-    needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-ligo
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-ligo-plugin-to-npm:
+  #   needs: publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-ligo
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
   
-  publish-smartpy-plugin-to-npm:
-    needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-smartpy
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-smartpy-plugin-to-npm:
+  #   needs: publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-smartpy
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-taquito-plugin-to-npm:
-    needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-taquito
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-taquito-plugin-to-npm:
+  #   needs: publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-taquito
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-flextesa-plugin-to-npm:
-    needs:
-      - publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-flextesa
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-flextesa-plugin-to-npm:
+  #   needs:
+  #     - publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-flextesa
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-contract-types-plugin-to-npm:
-    needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-contract-types
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-contract-types-plugin-to-npm:
+  #   needs: publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-contract-types
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  run-tests:
-    needs: 
-      - build-binaries
-    runs-on: ubuntu-latest
+  # run-tests:
+  #   needs: 
+  #     - build-binaries
+  #   runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16.x
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: 16.x
 
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: "1.18.2"
+  #     - uses: denoland/setup-deno@v1
+  #       with:
+  #         deno-version: "1.18.2"
 
-      - name: get binary and make executable from previous step for tests
-        run: |
-          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
-          chmod +x taq
-          echo "$(pwd)" >> $GITHUB_PATH
+  #     - name: get binary and make executable from previous step for tests
+  #       run: |
+  #         wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
+  #         chmod +x taq
+  #         echo "$(pwd)" >> $GITHUB_PATH
 
-      - name: install dependencies
-        run: npm ci
+  #     - name: install dependencies
+  #       run: npm ci
 
-      - name: builds for testing
-        run: npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy
+  #     - name: builds for testing
+  #       run: npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy
       
-      - name: Run unit tests
-        run: |
-          npm run test:unit -w tests
+  #     - name: Run unit tests
+  #       run: |
+  #         npm run test:unit -w tests
 
-      - name: Run integration tests
-        run: |
-          npm run test:integration -w tests
+  #     - name: Run integration tests
+  #       run: |
+  #         npm run test:integration -w tests
 
-      - name: Run e2e tests
-        run: |
-          npm run test:e2e -w tests
+  #     - name: Run e2e tests
+  #       run: |
+  #         npm run test:e2e -w tests
 
-  vscode-extension-workflow:
-    needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.vscode == 'true' || 
-            github.event_name == 'release' || 
-            startsWith(github.ref, 'refs/tags/v')}}
-    uses: ./.github/workflows/vscode-extension.yml
-    secrets:
-      VSCE_PAT: ${{ secrets.VSCE_PAT }} 
+  # vscode-extension-workflow:
+  #   needs: detect-changes
+  #   if: ${{ needs.detect-changes.outputs.vscode == 'true' || 
+  #           github.event_name == 'release' || 
+  #           startsWith(github.ref, 'refs/tags/v')}}
+  #   uses: ./.github/workflows/vscode-extension.yml
+  #   secrets:
+  #     VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
   pr-comment:
     runs-on: ubuntu-latest
@@ -215,15 +215,15 @@ jobs:
             github.event_name == 'pull_request'}}
     needs: 
       - build-binaries
-      - publish-protocol-to-npm
-      - publish-sdk-to-npm
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-      - publish-contract-types-plugin-to-npm
-      - run-tests
-      - vscode-extension-workflow
+      # - publish-protocol-to-npm
+      # - publish-sdk-to-npm
+      # - publish-ligo-plugin-to-npm
+      # - publish-smartpy-plugin-to-npm
+      # - publish-taquito-plugin-to-npm
+      # - publish-flextesa-plugin-to-npm
+      # - publish-contract-types-plugin-to-npm
+      # - run-tests
+      # - vscode-extension-workflow
     steps:
       - uses: actions/checkout@v2
 
