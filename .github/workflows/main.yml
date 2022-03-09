@@ -1,7 +1,7 @@
 name: main
 
 on:
-  pull_request_target:
+  pull_request:
     # branches:
     #   - main
 
@@ -88,7 +88,7 @@ jobs:
         id: gcp-auth
         uses: google-github-actions/auth@v0
         with:
-          workload_identity_provider: "projects/tez-ie/locations/global/workloadIdentityPools/github-actions-storage-pool/providers/github-actions-oidc-provider"
+          workload_identity_provider: "projects/108868714658/locations/global/workloadIdentityPools/github-actions-storage-pool/providers/github-actions-oidc-provider"
           service_account: github-storage-service-account
 
       - name: Upload binary to GCP
