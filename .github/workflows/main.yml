@@ -2,8 +2,6 @@ name: main
 
 on:
   pull_request_target:
-    # branches:
-    #   - main
 
   # push:
   #   tags:
