@@ -187,7 +187,7 @@ jobs:
           DENO_DIR: "./deno"
         run: |
           COMMIT=`git rev-parse --short "$GITHUB_SHA"`
-          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$TAQ_VERSION/$COMMIT" --setVersion "$TAQ_VERSION"
+          deno compile --output taq --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$TAQ_VERSION/$COMMIT" --setVersion "$TAQ_VERSION"
           [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]] 
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
@@ -376,3 +376,20 @@ jobs:
           files: |
             ./release/*
           draft: true
+
+    dump_contexts_to_log:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Dump GitHub context
+          id: github_context_step
+          run: echo '${{ toJSON(github) }}'
+        - name: Dump job context
+          run: echo '${{ toJSON(job) }}'
+        - name: Dump steps context
+          run: echo '${{ toJSON(steps) }}'
+        - name: Dump runner context
+          run: echo '${{ toJSON(runner) }}'
+        - name: Dump strategy context
+          run: echo '${{ toJSON(strategy) }}'
+        - name: Dump matrix context
+          run: echo '${{ toJSON(matrix) }}'
