@@ -217,6 +217,8 @@ jobs:
             startsWith(github.ref, 'refs/tags/v')) &&
             github.repository == 'ecadlabs/taqueria' }}
     uses: ./.github/workflows/vscode-extension.yml
+    secrets:
+      VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
   pr-comment:
     runs-on: ubuntu-latest
