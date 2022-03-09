@@ -174,9 +174,14 @@ jobs:
         with:
           deno-version: "1.18.2"
 
-      - name: get binary and make executable from previous step for tests
+      - name: build binary and make executable
+        env:
+          TAQ_VERSION: ${{ github.ref_name }}
+          DENO_DIR: "./deno"
         run: |
-          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
+          COMMIT=`git rev-parse --short "$GITHUB_SHA"`
+          deno compile --output taq --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$TAQ_VERSION/$COMMIT" --setVersion "$TAQ_VERSION"
+          [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]] 
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
 
