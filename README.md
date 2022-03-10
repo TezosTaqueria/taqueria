@@ -86,7 +86,7 @@ There are two approaches to initializing a Taqueria project: initializing an emp
 If you prefer to build the Taqueria binary and plugins locally, follow the steps detailed below
 
 #### Requirements
-- [deno](https://deno.land/) version: "1.18.2"
+- [Deno](https://deno.land/) version: "1.18.2"
 - [NodeJS](https://nodejs.org/en/) version: "16.x"
 - [Docker](https://www.docker.com/) version: "0.9" or later
 
