@@ -79,6 +79,10 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         type: "string"
     })
     .hide('setBuild')
+    .option('build', {
+        describe: i18n.__('buildDesc'),
+        type: "boolean"
+    })
     .option('maxConcurrency', {
         describe: i18n.__('maxConcurrencyDesc'),
         default: getFromEnv('TAQ_MAX_CONCURRENCY', getDefaultMaxConcurrency(), env),
@@ -335,7 +339,7 @@ const toPluginArguments = (parsedArgs: SanitizedInitArgs, requestArgs: Record<st
     // plugin call as well. Plugins can use this information for additional context
     // about invocation
     return Object.entries({...parsedArgs, ...requestArgs}).reduce(
-        (retval: string[], [key, val]) => {
+        (retval: (string|number|boolean)[], [key, val]) => {
             // Some parameters we don't need to send, so we omit those
             if (['$0', 'quickstart'].includes(key) || key.indexOf('-') >= 0 || val === undefined)
                 return retval
@@ -345,7 +349,9 @@ const toPluginArguments = (parsedArgs: SanitizedInitArgs, requestArgs: Record<st
             // String types need their values
             else if (val instanceof SanitizedAbsPath) 
                 return [...retval, '--'+key, `'${val.value}'`]
-            // Everything else is good
+            // Pass numbers and bools as is
+            else if (typeof val === 'boolean' || typeof val === 'number')
+                return [...retval, '--'+key, val]
             else
                 return [...retval, '--'+key, `'${val}'`]
         },
@@ -353,35 +359,37 @@ const toPluginArguments = (parsedArgs: SanitizedInitArgs, requestArgs: Record<st
     )
 }
 
-const logPluginCall = (cmd: string[], plugin: InstalledPlugin) => {
-    console.log(`*** START Call to ${plugin.name} ***`)
+const logPluginCall = (cmd: (string|number|boolean)[], plugin: InstalledPlugin, log=console.log) => {
+    log(`*** START Call to ${plugin.name} ***`)
     const [exe, ...cmdArgs] = cmd
     const lastLine = cmdArgs.pop()
-    console.log(`${exe} \\`)
-    cmdArgs.map(line => console.log(`${line} \\`))
-    console.log(lastLine)
-    console.log(`*** END of call to ${plugin.name} ***`)
+    log(`${exe} \\`)
+    cmdArgs.map(line => log(`${line} \\`))
+    log(lastLine)
+    log(`*** END of call to ${plugin.name} ***`)
 }
 
-const sendPluginQuery = <T>(action: PluginAction, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => pipe(
-    toPluginArguments(parsedArgs, requestArgs),
-    execPlugin(action, config, env, i18n, plugin, parsedArgs),
-    chain (([stdout, stderr]) => !stdout && stderr
-        ? reject({
-            kind: 'E_INVALID_PLUGIN_RESPONSE',
-            msg: `The ${plugin.name} plugin experienced an error when executing the ${action}.`,
-            context: {
-                stderr,
-                stdout,
-                parsedArgs,
-                requestArgs
-            }
-        } as TaqError)
-        : decodeJson<T>(stdout)
+const sendPluginQuery = <T>(action: PluginAction, requestArgs: Record<string, unknown>, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => {
+    const pluginArguments = toPluginArguments(parsedArgs, requestArgs)
+    return pipe(
+        pluginArguments,
+        execPlugin(action, config, env, i18n, plugin, parsedArgs),
+        chain (([stdout, stderr]) => !stdout && stderr
+            ? reject({
+                kind: 'E_INVALID_PLUGIN_RESPONSE',
+                msg: `The ${plugin.name} plugin experienced an error when executing the ${action}.`,
+                context: {
+                    stderr,
+                    stdout,
+                    pluginArguments
+                }
+            } as TaqError)
+            : decodeJson<T>(stdout)
+        )
     )
-)
+}
 
-const execPlugin = (action: PluginAction, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => (pluginArgs: string[]): Future<TaqError, string[]> =>
+const execPlugin = (action: PluginAction, config: Config, env: EnvVars, i18n: i18n, plugin: InstalledPlugin, parsedArgs: SanitizedInitArgs) => (pluginArgs: (string|number|boolean)[]): Future<TaqError, string[]> =>
     attemptP(async () => {
         try {
             const cmd = [
@@ -682,6 +690,10 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                         console.log(initArgs.setVersion)
                         return resolve(initArgs)
                     }
+                    else if (initArgs.build) {
+                        console.log(initArgs.setBuild)
+                        return resolve(initArgs)
+                    }
                     return initArgs._.includes('init') || 
                         initArgs._.includes('testFromVsCode') ||
                         initArgs._.includes('scaffold')
@@ -746,6 +758,7 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     setBuild: parsedArgs.setBuild,
     setVersion: parsedArgs.setVersion,
     version: parsedArgs.version,
+    build: parsedArgs.build,
     scaffoldUrl: SanitizedUrl.create(parsedArgs.scaffoldUrl ? parsedArgs.scaffoldUrl : ''),
     scaffoldProjectDir: SanitizedAbsPath.create(parsedArgs.scaffoldProjectDir ? parsedArgs.scaffoldProjectDir : '')
 })
@@ -755,6 +768,6 @@ export default {
 }
 
 export const __TEST__ = {
-    sanitizeArgs,
-    computeState
+    toPluginArguments,
+    logPluginCall
 }

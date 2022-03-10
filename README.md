@@ -64,7 +64,7 @@ Taqueria plugins extend the functionality of Taqueria by adding additional tasks
 
 Taqueria manages plugins by providing installation/uninstallation via the `taq install <pluginName>` and `taq uninstall <pluginName>` tasks. Plugins are installed on a per-project basis during which the NPM package is downloaded and installed on the project, and configuration is added in the `./.taq/config.json` file
 
-### Steps to Create a Taqueria Project
+### Creating a Taqueria Project
 
 There are two approaches to initializing a Taqueria project: initializing an empty project, or using a pre-configured project scaffold
 
@@ -80,3 +80,18 @@ There are two approaches to initializing a Taqueria project: initializing an emp
 2. Change directories: `cd test-project`
 3. Run the project setup command `npm run setup`
 4. Start the app by running `npm run start`
+
+### Building From Source
+
+If you prefer to build the Taqueria binary and plugins locally, follow the steps detailed below
+
+#### Requirements
+- [deno](https://deno.land/) version: "1.18.2"
+- [NodeJS](https://nodejs.org/en/) version: "16.x"
+- [Docker](https://www.docker.com/) version: "0.9" or later
+
+#### Run Build Script
+From the root of the Taqueria directory, run the build-all script:
+```shell
+npm run build-all
+```

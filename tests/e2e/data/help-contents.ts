@@ -7,6 +7,8 @@ Commands:
 
 Options:
       --version     Show version number                           [boolean]
+      --build       Display build information about the current version
+                                                                  [boolean]
   -p, --projectDir  Path to your project directory          [default: "./"]
   -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
   -e, --env         Specify an environment configuration
@@ -27,6 +29,8 @@ Commands:
 
 Options:
       --version     Show version number                           [boolean]
+      --build       Display build information about the current version
+                                                                  [boolean]
   -p, --projectDir  Path to your project directory          [default: "./"]
   -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
   -e, --env         Specify an environment configuration
@@ -49,6 +53,8 @@ Commands:
 
 Options:
       --version     Show version number                           [boolean]
+      --build       Display build information about the current version
+                                                                  [boolean]
   -p, --projectDir  Path to your project directory          [default: "./"]
   -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
   -e, --env         Specify an environment configuration
@@ -72,6 +78,8 @@ Commands:
 
 Options:
       --version     Show version number                           [boolean]
+      --build       Display build information about the current version
+                                                                  [boolean]
   -p, --projectDir  Path to your project directory          [default: "./"]
   -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
   -e, --env         Specify an environment configuration
@@ -94,6 +102,8 @@ Commands:
 
 Options:
       --version     Show version number                           [boolean]
+      --build       Display build information about the current version
+                                                                  [boolean]
   -p, --projectDir  Path to your project directory          [default: "./"]
   -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
   -e, --env         Specify an environment configuration
@@ -116,6 +126,8 @@ Commands:
 
 Options:
       --version     Show version number                           [boolean]
+      --build       Display build information about the current version
+                                                                  [boolean]
   -p, --projectDir  Path to your project directory          [default: "./"]
   -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
   -e, --env         Specify an environment configuration
@@ -141,6 +153,8 @@ Commands:
 
 Options:
       --version     Show version number                           [boolean]
+      --build       Display build information about the current version
+                                                                  [boolean]
   -p, --projectDir  Path to your project directory          [default: "./"]
   -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
   -e, --env         Specify an environment configuration

@@ -4,5 +4,8 @@
 # Set the SRE team as code owners for all github workflows
 /.github/workflows/    @ecadlabs/sre
 
-# Add code owners for website
-/website/ @ecadlabs/taqueria 
+# Add Taqueria team as code owners for website
+/website/ @ecadlabs/taqueria
+
+# Add Taqueria team as code owners for readme.md
+/readme.md @ecadlabs/taqueria
