@@ -18,6 +18,7 @@ const config = {
 	favicon: '/img/favicon.ico',
 	organizationName: 'ecadlabs', // Usually your GitHub org/user name.
 	projectName: 'taqueria', // Usually your repo name.
+	trailingSlash: true,
 
 	presets: [
 		[
