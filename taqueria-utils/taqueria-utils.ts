@@ -1,7 +1,7 @@
-import {Future, TaqError, SanitizedAbsPath, SanitizedUrl} from './taqueria-utils-types.ts'
+import {Future, TaqError, E_TaqError, SanitizedAbsPath, SanitizedUrl} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {chain, attemptP, map, Future as Fluture, reject, resolve, mapRej} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import {chain, attemptP, map, reject, resolve, mapRej, promise} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
 import * as jsonc from "https://deno.land/x/jsonc@1/main.ts"
@@ -170,3 +170,9 @@ export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cw
         } as TaqError
     }
 })
+
+export const toPromise = <T>(f: Future<TaqError, T>) => pipe(
+    f,
+    mapRej(taqErr => new E_TaqError(taqErr)),
+    promise
+)

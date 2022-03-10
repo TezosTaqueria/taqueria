@@ -98,3 +98,16 @@ export class SHA256 extends StringLike {
         return attemptP(() => SHA256.of(value).then(result => result ? result : Promise.reject({kind: "E_SHA256", message: "Could not create hash", context: value})))
     }
 }
+
+export class E_TaqError extends Error {
+    readonly context
+    readonly kind
+    readonly previous
+    constructor(taqErr: TaqError) {
+        super(taqErr.msg)
+        this.context = taqErr.context
+        this.kind = taqErr.kind
+        this.name = this.kind
+        this.previous = taqErr.previous
+    }
+}
