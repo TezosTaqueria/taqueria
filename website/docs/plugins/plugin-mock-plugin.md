@@ -2,7 +2,7 @@
 title: Mock Plugin 
 ---
 
-The mock plugin is a starting point for building new plugins. You can learn more about making plugins for Taqueria [here](../taqueria-dev/making-plugins)
+The mock plugin is a starting point for building new plugins. You can learn more about making plugins for Taqueria [here](/do/taqueria-dev/making-plugins/)
 
 The basic implementation for a plugin looks like this:
 ```js
@@ -27,6 +27,8 @@ Plugin.create(i18n => ({
         })
     ],
 }), process.argv)
+
+
 ```
 
 You can find the source code on Github [here](https://github.com/ecadlabs/taqueria/tree/main/taqueria-plugin-mock)
