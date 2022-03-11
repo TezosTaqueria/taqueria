@@ -1,6 +1,6 @@
-import {checkFolderExistsWithTimeout, generateTestProject} from "./utils/utils";
+import {generateTestProject} from "./utils/utils";
 import fs from "fs";
-import { exec as exec1, execSync } from "child_process"
+import { exec as exec1} from "child_process"
 import path from "path";
 import util from "util"
 const exec = util.promisify(exec1)
