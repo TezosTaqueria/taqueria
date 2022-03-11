@@ -97,6 +97,11 @@ export interface ParsedArgs {
     projectDir: string
     configDir: string
     artifactsDir: string
+    task?: string
+    debug?: boolean
+    maxConcurrency?: number
+    setVersion?: string
+    setBuild?: string
 }
 
 export interface Config extends Record<string, unknown>{
@@ -118,7 +123,12 @@ export interface SanitizedArgs {
     contractsDir: string
     testsDir: string
     artifactsDir: string
+    debug: boolean
+    maxConcurrency: number
+    version: string,
+    build: string,
     task?: string
+    
 }
 
 export type pluginDefiner = (i18n: i18n) => Schema

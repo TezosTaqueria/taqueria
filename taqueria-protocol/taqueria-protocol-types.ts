@@ -226,7 +226,7 @@ export interface UnvalidatedTask {
     readonly handler: "proxy" | string | string[]
     readonly hidden?: boolean
     readonly example?: string
-    readonly encoding?: string
+    readonly encoding?: "json" | "application/json" | "none"
 }
 
 export interface UnvalidatedPluginInfo {

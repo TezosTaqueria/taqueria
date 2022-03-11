@@ -1,6 +1,6 @@
 import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol, PluginResponse} from '@taqueria/protocol/taqueria-protocol-types'
 import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView} from "./types"
-import {join, resolve, dirname} from 'path'
+import {join, resolve, dirname, parse} from 'path'
 import {readFile, writeFile} from 'fs/promises'
 import {get} from 'stack-trace'
 import {exec, ExecException} from 'child_process'
@@ -69,7 +69,7 @@ export const sendRes = (msg:string, newline=true) => {
 }
 
 export const sendAsyncRes = (msg: string, newline=true) : Promise<void> =>
-    Promise.resolve(sendAsyncRes(msg, newline))
+    Promise.resolve(sendRes(msg, newline))
 
 
 export const sendErr = (msg: string, newline=true) => {
@@ -133,7 +133,12 @@ const sanitizeArgs = (parsedArgs: ParsedArgs) : Promise<SanitizedArgs> =>
             config,
             contractsDir: join(projectDir, config.contractsDir),
             testsDir: join(projectDir, config.testsDir),
-            artifactsDir: join(projectDir, config.artifactsDir)
+            artifactsDir: join(projectDir, config.artifactsDir),
+            build: parsedArgs.setBuild ?? '',
+            version: parsedArgs.setVersion ?? '',
+            maxConcurrency: parsedArgs.maxConcurrency ?? 10,
+            debug: parsedArgs.debug ?? false,
+            task: parsedArgs.task ? parsedArgs.task.trim() : ''
         })
     })
 
@@ -297,8 +302,6 @@ export const Plugin = {
         return parseArgs(unparsedArgs)
         .then(sanitizeArgs)
         .then(getResponse(definer, inferPluginName(stack)))
-        .then(JSON.stringify)
-        .then(console.log)
         .catch(console.error)
     }
 }

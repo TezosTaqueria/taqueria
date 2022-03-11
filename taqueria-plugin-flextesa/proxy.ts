@@ -17,23 +17,25 @@ const attributesToParams = (attributes: Attributes): Record<string, string> => [
 
 const getDockerImage = () => 'ghcr.io/ecadlabs/taqueria-flextesa:latest'
 
-const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string) : string => {
+const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string, debug:boolean): string => {
     const _envVars = Object.entries(attributesToParams(sandbox.attributes)).reduce(
         (retval, [key, val]) => `${retval} -e ${key} ${val} `,
         ""
     )
 
-    const retval = `docker run --name ${sandbox.name} --rm --detach --platform ${arch} -p ${sandbox.rpcUrl.url.port}:20000 -v ${config.projectDir}:/project -w /app ${image} node startFlextesa.js --sandbox ${sandbox.name}`
-    sendErr(retval)
-    return retval
+    const ports = debug
+        ? `-p ${sandbox.rpcUrl.url.port}:20000 -p 19229:9229`
+        : `-p ${sandbox.rpcUrl.url.port}:20000`
+
+    return `docker run --name ${sandbox.name} --rm --detach --platform ${arch} ${ports} -v ${config.projectDir}:/project -w /app ${image} node index.js --sandbox ${sandbox.name}`
 }
 
 const getConfigureCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
-    return `docker exec ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --configure`
+    return `docker exec ${sandbox.name} node index.js --sandbox ${sandbox.name} --configure`
 }
 
 const getImportAccountsCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
-    return `docker exec ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --importAccounts`
+    return `docker exec ${sandbox.name} node index.js --sandbox ${sandbox.name} --importAccounts`
 }
 
 const doesUseFlextesa = (sandbox: Sandbox) => !sandbox.plugin || sandbox.plugin === 'flextesa'
@@ -41,6 +43,7 @@ const doesUseFlextesa = (sandbox: Sandbox) => !sandbox.plugin || sandbox.plugin 
 const doesNotUseFlextesa = (sandbox: Sandbox) => !doesUseFlextesa(sandbox)
 
 const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<void> => {
+    debugger
     if (doesNotUseFlextesa(sandbox))
         return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
 
@@ -49,7 +52,7 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<void> => {
             running => running
                 ? sendAsyncRes("Already running")
                 : getArch()
-                    .then(arch => getStartCommand(sandbox, getDockerImage(), opts, arch)) 
+                    .then(arch => getStartCommand(sandbox, getDockerImage(), opts, arch, opts.debug)) 
                     .then(execCmd)
                     .then(({stderr}) => {
                         if (opts.debug && stderr) sendErr(stderr)
@@ -71,6 +74,9 @@ const configureTezosClient = (sandbox: Sandbox, opts: Opts) =>
         () => getArch()
                 .then(arch => getConfigureCommand(sandbox, getDockerImage(), opts, arch))
                 .then(execCmd)
+                .then(({stderr}) => {
+                    return stderr.length > 0 ? Promise.reject() : Promise.resolve()
+                })
     )
 
 
@@ -79,6 +85,9 @@ const importAccounts = (sandbox: Sandbox, opts: Opts) =>
         () => getArch()
                 .then(arch => getImportAccountsCommand(sandbox, getDockerImage(), opts, arch))
                 .then(execCmd)
+                .then(({stderr}) => {
+                    return stderr.length > 0 ? Promise.reject() : Promise.resolve()
+                })
     )
 
 const startAll = (sandboxes: Sandbox[], opts: Opts): Promise<void> => {
@@ -224,8 +233,4 @@ export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
     }
 }
 
-export const runProxy = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
-    return proxy(parsedArgs).catch(sendAsyncErr)
-}
-
-export default runProxy
+export default proxy

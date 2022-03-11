@@ -64,6 +64,7 @@ export interface InstallPluginArgs extends RawInitArgs {
 
 export type UninstallPluginArgs = InstallPluginArgs
 
+// TODO: Consolidate SanitizedInitArgs with SanitizedArgs from the SDK
 export interface SanitizedInitArgs {
     _: ['init' | 'install' | 'uninstall' | 'scaffold' | string]
     projectDir: SanitizedAbsPath
