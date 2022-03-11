@@ -131,4 +131,9 @@ export interface SanitizedArgs {
     
 }
 
+export interface StdIO {
+    stdout: string,
+    stderr: string
+}
+
 export type pluginDefiner = (i18n: i18n) => Schema

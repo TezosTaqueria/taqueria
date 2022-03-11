@@ -1,5 +1,5 @@
 import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendAsyncRes, sendJsonRes} from '@taqueria/node-sdk'
-import type { SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails } from "@taqueria/node-sdk/types"
+import type { SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO } from "@taqueria/node-sdk/types"
 import type {ExecException} from 'child_process'
 import retry from 'promise-retry'
 
@@ -69,24 +69,36 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<void> => {
         )
 }
 
-const configureTezosClient = (sandbox: Sandbox, opts: Opts) =>
+const configureTezosClient = (sandbox: Sandbox, opts: Opts) : LikeAPromise<StdIO, Failure<StdIO>> =>
     retry(
         () => getArch()
                 .then(arch => getConfigureCommand(sandbox, getDockerImage(), opts, arch))
                 .then(execCmd)
-                .then(({stderr}) => {
-                    return stderr.length > 0 ? Promise.reject() : Promise.resolve()
+                .then(({stderr, stdout}) => {
+                    return stderr.length > 0
+                        ? Promise.reject({
+                            errCode: 'E_CONFIGURE_SANDBOX',
+                            errorMsg: "Could not configure sandbox",
+                            context: {stderr, stdout}
+                        }) 
+                        : Promise.resolve({stderr, stdout})
                 })
     )
 
 
-const importAccounts = (sandbox: Sandbox, opts: Opts) =>
+const importAccounts = (sandbox: Sandbox, opts: Opts): LikeAPromise<StdIO, Failure<StdIO>> =>
     retry(
         () => getArch()
                 .then(arch => getImportAccountsCommand(sandbox, getDockerImage(), opts, arch))
                 .then(execCmd)
-                .then(({stderr}) => {
-                    return stderr.length > 0 ? Promise.reject() : Promise.resolve()
+                .then(({stderr, stdout}) => {
+                    return stderr.length > 0
+                        ? Promise.reject({
+                            errCode: 'E_IMPORT_ACCOUNTs',
+                            errorMsg: "Could not import test accounts into sandbox",
+                            context: {stderr, stdout}
+                        }) 
+                        : Promise.resolve({stderr, stdout})
                 })
     )
 

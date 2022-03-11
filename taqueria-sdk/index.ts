@@ -1,5 +1,5 @@
 import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol, PluginResponse} from '@taqueria/protocol/taqueria-protocol-types'
-import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView} from "./types"
+import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView, StdIO} from "./types"
 import {join, resolve, dirname, parse} from 'path'
 import {readFile, writeFile} from 'fs/promises'
 import {get} from 'stack-trace'
@@ -17,7 +17,7 @@ export const readJsonFile = <T>(filename: string): Promise<T> =>
     .then(JSON.parse)
     .then(result => (result as T))
 
-export const execCmd = (cmd:string) : LikeAPromise<{stdout: string, stderr: string}, ExecException> => new Promise((resolve, reject) => {
+export const execCmd = (cmd:string) : LikeAPromise<StdIO, ExecException> => new Promise((resolve, reject) => {
     exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
         if (err) reject(err)
         else resolve({

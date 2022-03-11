@@ -229,7 +229,7 @@ Deno.test('inject()', async (t) => {
         assertEquals(output, ["node", "/tmp/test-project/node_modules/@taqueria/plugin-ligo/index.js"])
     })
 
-    await t.step("logPluginRequests() outputs the call to a plugin", () => {
+    await t.step("logPluginRequests() outputs the call to a plugin", async () => {
         const {toPluginArguments, logPluginRequest} = pluginLib.__TEST__
 
         const plugin : InstalledPlugin = {
@@ -247,7 +247,7 @@ Deno.test('inject()', async (t) => {
         ].join("\n")
 
         deps.stdout.clear()
-        logPluginRequest (plugin) (["node index.js", ...pluginArgs])
+        await toPromise( logPluginRequest (plugin) (["node index.js", ...pluginArgs]) )
 
         const actual = deps.stdout.toString()
         assertEquals(actual, expected)
