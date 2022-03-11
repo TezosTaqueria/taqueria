@@ -8,9 +8,8 @@ type Storage = {
 
 type Methods = {
     update_token_metadata: (
-        // FAILURE: int arg name is invalid
-        0: nat,
-        1: bytes,
+        _0: nat,
+        _1: bytes,
     ) => Promise<void>;
 };
 
