@@ -115,7 +115,7 @@ Deno.test({ignore: true, name: "Negative scenario test for {writeTextFile} funct
 Deno.test({name: "Positive scenario test for {isTaqError} function",  fn: async () => {
         const assert = chai.assert;
         const taqErrorTest : TaqError = {
-            kind: "E_INVALID_PATH",
+            kind: "E_FORK",
             msg: "Test"
         };
         const result = isTaqError(taqErrorTest);

@@ -16,18 +16,18 @@ export interface EnvVars {
 }
 
 export type ErrorType = 
-  | "E_INVALID_PATH"
   | "E_INVALID_PATH_DOES_NOT_EXIST"
   | "E_INVALID_PATH_ALREADY_EXISTS"
   | "E_INVALID_CONFIG"
   | "E_INVALID_JSON"
   | "E_FORK"
   | "E_INVALID_TASK"
-  | "E_READ"
+  | "E_READFILE"
   | "E_NPM_INIT"
   | "E_INVALID_PLUGIN_RESPONSE"
   | "E_INVALID_ARGS"
   | "E_MKDIR_FAILED"
+  | "E_SCAFFOLD_URL_GIT_CLONE_FAILED"
   
 export interface TaqError {
     readonly kind: ErrorType,

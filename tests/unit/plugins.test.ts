@@ -84,16 +84,10 @@ Deno.test('inject()', async (t) => {
         const result = toPluginArguments(requestArgs)
     
         assertEquals(result, [
-            "--command",
-            "init",
-            "--build",
-            false,
             "--debug",
             false,
             "--configDir",
             "'./.taq'",
-            "--disableState",
-            false,
             "--env",
             "'development'",
             "--fromVsCode",
@@ -104,16 +98,10 @@ Deno.test('inject()', async (t) => {
             10,
             "--projectDir",
             "'/tmp/test-project'",
-            "--scaffoldProjectDir",
-            "'/tmp/scaffold-project'",
-            "--scaffoldUrl",
-            "'http://foo.bar'",
             "--setBuild",
             "'foo/bar'",
             "--setVersion",
             "'1.0.0'",
-            "--version",
-            false,
             "--foo",
             "'bar'",
             "--bar",
@@ -254,7 +242,7 @@ Deno.test('inject()', async (t) => {
             "*** START Call to @taqueria/plugin-ligo ***",
             "node index.js \\",
             ...pluginArgs.slice(0, -1).map(item => `${item} \\`),
-            false,
+            `${pluginArgs.slice(-1)}`,
             "*** END of call to @taqueria/plugin-ligo ***\n"
         ].join("\n")
 

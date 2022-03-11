@@ -78,12 +78,12 @@ export const rm = (path: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> 
         return path
     })
 
-export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) => pipe(
+export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => pipe(
     exec('git clone <%= it.url %> <%= it.outputDir %>', {url: url.value, outputDir: destinationPath.value}),
-    mapRej(previous => ({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Could not scaffold. Is Git installed?', context: {url, destinationPath}, previous})),
-    chain(status => status == 0
+    mapRej<TaqError, TaqError>(previous => ({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Could not scaffold. Is Git installed?', context: {url, destinationPath}, previous})),
+    chain(status => status === 0
         ? resolve(destinationPath)
-        : reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Could not scaffold. Is Git installed?', context: {url, destinationPath}})
+        : reject<TaqError>({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Could not scaffold. Is Git installed?', context: {url, destinationPath}})
     ),
     map(() => destinationPath)
 );
@@ -97,7 +97,7 @@ export const readTextFile = (path: string) : Future<TaqError, string> =>
                 return decoded
             })
             .catch((previous: Error) => Promise.reject({
-                kind: "E_READ", msg: `Could not read ${path}`, previous
+                kind: "E_READFILE", msg: `Could not read ${path}`, previous
             }))
     })
 

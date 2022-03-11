@@ -54,8 +54,8 @@ export interface RawInitArgs {
     setBuild: string
     setVersion: string
     fromVsCode: boolean
-    version: boolean
-    build: boolean
+    version?: boolean
+    build?: boolean
 }
 
 export interface InstallPluginArgs extends RawInitArgs {

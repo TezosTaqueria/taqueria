@@ -32,7 +32,7 @@ export const inject = (deps: PluginDeps) => {
             const lastLine = cmdArgs.pop()
             stdout.write(encoder.encode((`${exe} \\\n`)))
             cmdArgs.map(line => stdout.write(encoder.encode(`${line} \\\n`)))
-            if (lastLine !== undefined) stdout.write(encoder.encode(lastLine.toString() + "\n"))
+            stdout.write(encoder.encode(lastLine + "\n"))
             stdout.write(encoder.encode(`*** END of call to ${plugin.name} ***\n`))
         }
     }
@@ -176,13 +176,20 @@ export const inject = (deps: PluginDeps) => {
         // about invocation
         return Object.entries({...parsedArgs, ...requestArgs}).reduce(
             (retval: (string|number|boolean)[], [key, val]) => {
+                const omit = [
+                    '$0',
+                    'quickstart',
+                    'version',
+                    'build',
+                    'scaffoldUrl',
+                    'scaffoldProjectDir',
+                    'disableState',
+                    '_',
+                ]
                 // Some parameters we don't need to send, so we omit those
-                if (['$0', 'quickstart'].includes(key) || key.indexOf('-') >= 0 || val === undefined)
+                if (omit.includes(key) || key.indexOf('-') >= 0 || val === undefined)
                     return retval
-                // Others need renamed
-                else if (key === '_')
-                    return [...retval, '--command', String(val)]
-                // String types need their values
+                // String types need their values quoted
                 else if (val instanceof SanitizedAbsPath) 
                     return [...retval, '--'+key, `'${val.value}'`]
                 // Pass numbers and bools as is
@@ -194,8 +201,6 @@ export const inject = (deps: PluginDeps) => {
             []
         )
     }
-
-
 
     // Using all plugin info, compute an in-memory representation that we'll
     // refer to as state

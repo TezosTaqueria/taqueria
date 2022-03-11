@@ -1,10 +1,11 @@
-import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol, PluginResponse, ProxyAction} from '@taqueria/protocol/taqueria-protocol-types'
+import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol, PluginResponse} from '@taqueria/protocol/taqueria-protocol-types'
 import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView} from "./types"
 import {join, resolve, dirname} from 'path'
 import {readFile, writeFile} from 'fs/promises'
 import {get} from 'stack-trace'
-import {exec} from 'child_process'
+import {exec, ExecException} from 'child_process'
 import generateName from 'project-name-generator'
+import {omit} from 'rambda'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 
 export const writeJsonFile = <T>(filename: string) => (data: T): Promise<string> =>
@@ -16,27 +17,17 @@ export const readJsonFile = <T>(filename: string): Promise<T> =>
     .then(JSON.parse)
     .then(result => (result as T))
 
-export const execCmd = (cmd:string): Promise<ProxyAction> => new Promise((resolve, _) => {
+export const execCmd = (cmd:string) : LikeAPromise<{stdout: string, stderr: string}, ExecException> => new Promise((resolve, reject) => {
     exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
-        if (err) resolve({
-            status: 'failed',
-            stdout: stdout,
-            stderr: err.message
-        })
-        else if (stderr) resolve({
-            status: 'failed',
-            stdout,
-            stderr
-        })
+        if (err) reject(err)
         else resolve({
-            status: 'success',
             stdout,
             stderr
         })
     })
 })
 
-export const getArch = () => 
+export const getArch = () : LikeAPromise<string, Failure<string>> => 
     execCmd("uname -m")
     .then(result => (result.stdout as string).trim().toLowerCase())
     .then(arch => {
@@ -46,12 +37,16 @@ export const getArch = () =>
             case 'arm64':
                 return 'linux/arm64/v8'
             default:
-                return 'linux/amd64'
+                return Promise.reject({
+                    errCode: "E_INVALID_ARCH",
+                    errMsg: `We do not know how to handle the ${arch} architecture`,
+                    context: arch
+                })
         }
     })
 
 
-const parseJSON = (input: string) : Promise<Config> => new Promise((resolve, reject) => {
+export const parseJSON = (input: string) : LikeAPromise<Config, Failure<string>> => new Promise((resolve, reject) => {
     try {
         const json = JSON.parse(input)
         resolve(json)
@@ -66,12 +61,59 @@ const parseJSON = (input: string) : Promise<Config> => new Promise((resolve, rej
     }
 })
 
+export const sendRes = (msg:string, newline=true) => {
+    if (!msg || msg.length === 0) return
+    return newline
+        ? console.log(msg)
+        : process.stdout.write(msg) as unknown as void
+}
+
+export const sendAsyncRes = (msg: string, newline=true) : Promise<void> =>
+    Promise.resolve(sendAsyncRes(msg, newline))
+
+
+export const sendErr = (msg: string, newline=true) => {
+    if (!msg || msg.length === 0) return
+    return newline
+        ? console.error(msg)
+        : process.stderr.write(msg) as unknown as void
+}
+
+export const sendAsyncErr = (msg: string, newline=true) =>
+    Promise.reject(sendErr(msg, newline)) // should this be Promise.reject?
+
+
+export const sendJson = (msg:unknown, newline=true) =>
+    sendRes(JSON.stringify(msg), newline)
+
+export const sendJsonErr = (msg:unknown, newline=true) =>
+    sendErr(JSON.stringify(msg), newline)
+
+export const sendAsyncJson = (msg:unknown, newline=true) =>
+    sendAsyncRes(JSON.stringify(msg), newline)
+
+export const sendAsyncJsonErr = (msg:unknown, newline=true) =>
+    sendAsyncErr(JSON.stringify(msg), newline)
+
+
+export const sendJsonRes = <T>(data: T) => typeof data === 'object'
+    ? sendJson({
+        data,
+        render: 'table'
+    })
+    : sendJson({
+        data,
+        render: 'string'
+    })
+
+export const noop = () => {}
+
 const parseConfig = (config:string|Record<string, unknown>) : Promise<Record<string, unknown>> => typeof config === 'string'
     ? parseJSON(config)
     : Promise.resolve(config)
 
 
-const sanitizeConfig = (config: Record<string, unknown>) : Promise<Config> =>
+const sanitizeConfig = (config: Record<string, unknown>) : LikeAPromise<Config, Failure<Record<string, unknown>>> =>
     typeof config.contractsDir === 'string' && typeof config.testsDir === 'string'
         ? Promise.resolve(config as Config)
         : Promise.reject({
@@ -126,7 +168,7 @@ const viewPositionalArg = ({placeholder, description, type, defaultValue}: aPosi
     defaultValue
 })
 
-const viewTask = ({task, command, aliases, description, options, positionals, handler}: aTask|TaskLike): TaskView => ({
+const viewTask = ({task, command, aliases, description, options, positionals, handler, encoding}: aTask|TaskLike): TaskView => ({
     task: task.value,
     command: command.value,
     aliases: !aliases ? [] : aliases.reduce(
@@ -142,7 +184,8 @@ const viewTask = ({task, command, aliases, description, options, positionals, ha
         (retval: PositionalArgView[], arg: aPositionalArg | undefined) => arg ? [...retval, viewPositionalArg(arg)] : retval,
         []
     ),
-    handler: handler === "proxy" ? "proxy" : handler
+    handler: handler === "proxy" ? "proxy" : handler,
+    encoding
 })   
 
 const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): SchemaView | undefined => {
@@ -172,34 +215,47 @@ const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => 
     }
 }
 
-const sendResponse = (response: unknown) => console.log(JSON.stringify(response))
-
-const sendError = (err: Failure<unknown>) => {
-    console.error(JSON.stringify(err))
-}
-
 const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => (sanitzedArgs: SanitizedArgs): LikeAPromise<PluginResponse, Failure<[]>> => {
     const {i18n, taqRun} = sanitzedArgs
     const schema = parseSchema(i18n, definer, inferPluginName)
-    switch (taqRun) {
-        case "pluginInfo":
-            return schema ? Promise.resolve({...schema, status: "success"}) : Promise.reject({err: "E_INVALID_SCHEMA", msg: "The schema of the plugin is invalid."})
-        case "proxy":
-            return schema && schema.proxy
-                    ? schema.proxy(sanitzedArgs)
-                    : Promise.resolve({status: "notSupported", stdout: "", stderr: i18n.proxyNotSupported, artifacts: []})
-        case "checkRuntimeDependencies":
-            return schema && schema.checkRuntimeDependencies
-                    ? schema.checkRuntimeDependencies(i18n, sanitzedArgs)
-                    : Promise.resolve({status: "notSupported", report: []})
-        case "installRuntimeDependencies":
-            return schema && schema.installRuntimeDependencies
-                    ? schema.installRuntimeDependencies(i18n, sanitzedArgs)
-                    : Promise.resolve({status: "notSupported", report: []})
-        default:
-            return Promise.resolve({status: "notSupported", msg: i18n.actionNotSupported})
-
+    if (schema) {
+        switch (taqRun) {
+            case "pluginInfo":
+                const output = {
+                    ...schema,
+                    proxy: schema.proxy ? true: false,
+                    checkRuntimeDependencies: schema.checkRuntimeDependencies ? true: false,
+                    installRuntimeDependencies: schema.installRuntimeDependencies ? true : false
+                }
+                return Promise.resolve(output)
+            case "proxy":
+                return schema.proxy
+                        ? schema.proxy(sanitzedArgs)
+                        : Promise.reject({
+                            errCode: 'E_NOT_SUPPORTED',
+                            message: i18n.proxyNotSupported,
+                            context: sanitizeArgs
+                        })
+            case "checkRuntimeDependencies":
+                return schema.checkRuntimeDependencies
+                        ? schema.checkRuntimeDependencies(i18n, sanitzedArgs)
+                        : Promise.resolve({report: []})
+            case "installRuntimeDependencies":
+                return schema.installRuntimeDependencies
+                        ? schema.installRuntimeDependencies(i18n, sanitzedArgs)
+                        : Promise.resolve({report: []})
+            default:
+                return Promise.reject({
+                    errCode: 'E_NOT_SUPPORTED',
+                    message: i18n.actionNotSupported,
+                    context: sanitizeArgs
+                })
+        }
     }
+    return Promise.reject({
+        errCode: 'E_INVALID_SCHEMA',
+        message: i18n.invalidSchema
+    })
 }
 
 const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
@@ -241,10 +297,10 @@ export const Plugin = {
         return parseArgs(unparsedArgs)
         .then(sanitizeArgs)
         .then(getResponse(definer, inferPluginName(stack)))
-        .then(sendResponse)
-        .catch(sendError)
+        .then(JSON.stringify)
+        .then(console.log)
+        .catch(console.error)
     }
-        
 }
 
 export const Task = aTask

@@ -7,13 +7,14 @@ import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, mapRej, resolve, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {exec, isTaqError, joinPaths, mkdir, readJsonFile, writeTextFile, ensurePathDoesNotExist, gitClone, rm} from './taqueria-utils/taqueria-utils.ts'
+import {exec, joinPaths, mkdir, readJsonFile, writeTextFile, ensurePathDoesNotExist, gitClone, rm} from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, SanitizedUrl, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
 import * as NPM from './npm.ts'
 import inject from './plugins.ts'
+import { match, __ } from 'https://esm.sh/ts-pattern';
 
 // Debugging tools
 import {log, debug} from './taqueria-utils/taqueria-utils.ts'
@@ -85,6 +86,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
     })
     .hide('maxConcurrency')
     .option('debug', {
+        alias: 'd',
         describe: i18n.__('Enable internal debugging'),
         default: false
     })
@@ -100,8 +102,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         describe: i18n.__('initPathDesc')
     })
     .hide('projectDir')
-    .option('d', {
-        alias: 'configDir',
+    .option('configDir', {
         default: getFromEnv("TAQ_CONFIG_DIR", "./.taq", env),
         describe: i18n.__('configDirDesc')
     })
@@ -109,7 +110,6 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         alias: 'env',
         describe: i18n.__('envDesc')
     })
-    .wrap(75)
     .epilogue(i18n.__('betaWarning'))
     .command(
         'init [projectDir]',
@@ -216,15 +216,14 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
     extendCLI(env, parsedArgs, i18n)
 )
 
-const parseArgs = (cliConfig: CLIConfig) => pipe(
-    attemptP(() => cliConfig.parseAsync()),
-    map (rawInitArgs => rawInitArgs as RawInitArgs),
-    mapRej(previous => ({
+const parseArgs = (cliConfig: CLIConfig) : Future<TaqError, RawInitArgs> => pipe(
+    attemptP<Error, RawInitArgs>(() => cliConfig.parseAsync().then((rawInitArgs: unknown) => rawInitArgs as RawInitArgs)),
+    mapRej<Error, TaqError>(previous => ({
         kind: 'E_INVALID_ARGS',
         msg: "Invalid arguments were provided and could not be parsed",
         context: cliConfig,
         previous
-    } as TaqError))
+    }))
 )
 
 const listKnownTasks = (cliConfig: CLIConfig, parsedArgs: SanitizedInitArgs) => (_inputArgs: RawInitArgs) => pipe(
@@ -555,22 +554,22 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
         console.error("") // empty line
     }
 
-    if (isTaqError(err)) {
-        switch (err.kind) {
-            case 'E_INVALID_CONFIG':
-                console.error(err.msg)
-                break;
-            default: {
-                const encoder = new TextEncoder()
-                const json = inputArgs.fromVsCode
-                    ? JSON.stringify(err, undefined, 0)
-                    : JSON.stringify(err, undefined, 4)
-                const output = encoder.encode(json)
-                Deno.stderr.writeSync(output)
-            }
-        }
-    }
-    else console.error(err)
+    const msg = inputArgs.debug ? err : match(err)
+        .with({kind: 'E_FORK'}, err => err.msg)
+        .with({kind: 'E_INVALID_CONFIG'}, err => err.msg)
+        .with({kind: 'E_INVALID_JSON'}, err => err)
+        .with({kind: 'E_INVALID_PATH_ALREADY_EXISTS'}, err => `${err.msg}: ${err.context}`)
+        .with({kind: 'E_INVALID_PATH_DOES_NOT_EXIST'}, err => `${err.msg}: ${err.context}`)
+        .with({kind: 'E_INVALID_TASK'}, err => err.msg)
+        .with({kind: 'E_INVALID_PLUGIN_RESPONSE'}, err => err.msg)
+        .with({kind: 'E_MKDIR_FAILED'}, err => `${err.msg}: ${err.context}`)
+        .with({kind: 'E_NPM_INIT'}, err => err.msg)
+        .with({kind: 'E_READFILE'}, err => err.msg)
+        .with({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED'}, err => `${err.msg}: ${err.context}`)
+        .with({kind: 'E_INVALID_ARGS'}, err => err.msg)
+        .with({message: __.string}, err => err.message)
+        .exhaustive()
+    console.error(msg)
 }
 
 const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
@@ -587,8 +586,8 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     fromVsCode: parsedArgs.fromVsCode,
     setBuild: parsedArgs.setBuild,
     setVersion: parsedArgs.setVersion,
-    version: parsedArgs.version,
-    build: parsedArgs.build,
+    version: parsedArgs.version ?? false ,
+    build: parsedArgs.build ?? false,
     scaffoldUrl: SanitizedUrl.create(parsedArgs.scaffoldUrl ? parsedArgs.scaffoldUrl : ''),
     scaffoldProjectDir: SanitizedAbsPath.create(parsedArgs.scaffoldProjectDir ? parsedArgs.scaffoldProjectDir : '')
 })
