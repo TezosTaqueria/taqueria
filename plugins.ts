@@ -10,6 +10,7 @@ import {joinPaths, readJsonFile, writeTextFile, decodeJson} from './taqueria-uti
 import {map, chain, attemptP, chainRej, resolve, reject, parallel} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {copy} from 'https://deno.land/std@0.128.0/streams/conversion.ts'
+import clipboard from 'https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts'
 
 // No-operation
 // noop: () -> void
@@ -24,17 +25,24 @@ export const inject = (deps: PluginDeps) => {
     // Logs a request to a plugin to stdout if logPluginRequests has been
     // set to true for parsedArgs
     // logPluginRequest
-    const logPluginRequest = (plugin: InstalledPlugin) => (cmd: (string|number|boolean)[]) => {
-        if (parsedArgs.logPluginRequests)  {
-            const encoder = new TextEncoder()
-            stdout.write(encoder.encode(`*** START Call to ${plugin.name} ***\n`))
-            const [exe, ...cmdArgs] = cmd
-            const lastLine = cmdArgs.pop()
-            stdout.write(encoder.encode((`${exe} \\\n`)))
-            cmdArgs.map(line => stdout.write(encoder.encode(`${line} \\\n`)))
-            stdout.write(encoder.encode(lastLine + "\n"))
-            stdout.write(encoder.encode(`*** END of call to ${plugin.name} ***\n`))
-        }
+    const logPluginRequest = (plugin: InstalledPlugin) => (cmd: (string|number|boolean)[]) : Future<TaqError, void> => 
+        attemptP(async () => {
+            if (parsedArgs.logPluginRequests)  {
+                const encoder = new TextEncoder()
+                const output = pluginRequestToString (plugin) (cmd)
+                await stdout.write(encoder.encode(`*** START Call to ${plugin.name} ***\n`))
+                await stdout.write(encoder.encode(`${output}\n`))
+                await stdout.write(encoder.encode(`*** END of call to ${plugin.name} ***\n`))
+                await clipboard.writeText(output.replace("\\\n", ''))
+            }
+            return
+        })
+
+    const pluginRequestToString = (plugin: InstalledPlugin) => (cmd: (string|number|boolean)[]) => {
+        const lines = [...cmd]
+        const lastLine = lines.pop()
+        const output = lines.map(line => `${line} \\`).join("\n")
+        return `${output}\n${lastLine}`
     }
 
     // Invokes a command which will 
@@ -126,18 +134,19 @@ export const inject = (deps: PluginDeps) => {
     
         const shellCmd = ['sh', '-c', cmd.join(' ')]
     
-        // TODO: Clear side-effect here. Can we handle this better?
-        logPluginRequest (plugin) (cmd)
-    
-        // All actions other than "proxy" return JSON output
-        // Proxy output can either be configured to passthru or
-        // encoded as JSON
-        if (typeof(action) === "string" || action.encoding !== "none") {
-            // TODO: Validate output
-            return execPluginJson(shellCmd)
-        }
-    
-        return map (noop) (execPluginPassthru(shellCmd))
+        
+        return pipe(
+            // TODO: Clear side-effect here. Can we handle this better?
+            logPluginRequest (plugin) (cmd),
+
+            // All actions other than "proxy" return JSON output
+            // Proxy output can either be configured to passthru or
+            // encoded as JSON
+            chain(_ => typeof(action) === "string" || action.encoding !== "none"
+                ? execPluginJson(shellCmd)
+                : map (noop) (execPluginPassthru(shellCmd))
+            )
+        )
     }
 
     // Sends getPluginInfo action to an installed plugin to get the plugin info
