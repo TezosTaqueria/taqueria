@@ -181,6 +181,13 @@ jobs:
         with:
           deno-version: "1.18.2"
 
+      - name: download the binary from the build-binaries job and make it executable
+        run: |
+          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
+          chmod +x taq
+          echo "$(pwd)" >> $GITHUB_PATH
+        if: ${{ !github.event.pull_request.head.repo.fork }}
+
       - name: build binary and make executable
         env:
           TAQ_VERSION: ${{ github.ref_name }}
@@ -191,6 +198,7 @@ jobs:
           [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]] 
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
+        if: ${{ github.event.pull_request.head.repo.fork }}
 
       - name: install dependencies
         run: npm ci
