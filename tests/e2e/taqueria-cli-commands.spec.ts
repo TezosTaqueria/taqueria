@@ -145,7 +145,6 @@ describe("E2E Testing for taqueria CLI,", () => {
             await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
 
             const generateTypesHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
-            console.log(generateTypesHelpContents)
             expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypes)
 
             await exec(`taq uninstall @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
