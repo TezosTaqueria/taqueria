@@ -1,6 +1,5 @@
-import fs from "fs";
 import fsPromises from "fs/promises"
-import { exec as exec1, execSync } from "child_process"
+import { exec as exec1 } from "child_process"
 import util from "util"
 const exec = util.promisify(exec1)
 
@@ -35,18 +34,21 @@ const fileContentsFull =
 }
 
 describe("E2E Testing for taqueria general functionality", () => {
-    test('Verify that taq init creates test folder', () => {
+    test('Verify that taq init creates test folder', async () => {
 
         try {
-            const stdout = execSync(`taq init ${taqueriaProjectPath}`).toString();
-            expect(stdout.trim()).toEqual("Project taq'ified!")
+            const projectInit = await exec(`taq init ${taqueriaProjectPath}`)
+            expect(projectInit.stdout.trim()).toEqual("Project taq'ified!")
 
-            const isTaquified = fs.existsSync(taqueriaProjectPath);
-            expect(isTaquified).toBeTruthy();
+            const taquifiedDirContents = await fsPromises.readdir(taqueriaProjectPath)
+            expect(taquifiedDirContents).toContain("artifacts")
+            expect(taquifiedDirContents).toContain("contracts")
+            expect(taquifiedDirContents).toContain("quickstart.md")
+            expect(taquifiedDirContents).toContain("tests")
 
-            fs.rmSync(taqueriaProjectPath, { recursive: true })
+            await fsPromises.rm(taqueriaProjectPath, { recursive: true })
         } catch(error) {
-            throw new Error (`error: ${error}`);
+            throw new Error (`error: ${error}`)
         }
     });
 
