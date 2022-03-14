@@ -93,7 +93,20 @@ describe("E2E Testing for taqueria CLI,", () => {
             await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
 
             const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
-            expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigo)
+            expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPlugin)
+
+            await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that the ligo plugin exposes the associated options in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+
+            const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
+            expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific)
 
             await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
         } catch(error) {
@@ -106,7 +119,20 @@ describe("E2E Testing for taqueria CLI,", () => {
             await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
 
             const smartpyHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
-            expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpy)
+            expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyPlugin)
+
+            await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that the smartpy plugin exposes the associated options in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+
+            const smartpyHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
+            expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific)
 
             await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
         } catch(error) {
@@ -119,7 +145,20 @@ describe("E2E Testing for taqueria CLI,", () => {
             await exec(`taq install @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
 
             const taquitoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
-            expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquito)
+            expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPlugin)
+
+            await exec(`taq uninstall @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that the taquito plugin exposes the associated options in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
+
+            const taquitoHelpContents = await exec(`taq deploy --help --projectDir=${taqueriaProjectPath}`)
+            expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific)
 
             await exec(`taq uninstall @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
         } catch(error) {
@@ -132,7 +171,46 @@ describe("E2E Testing for taqueria CLI,", () => {
             await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
 
             const flextesaHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
-            expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesa)
+            expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPlugin)
+
+            await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that the flextesa plugin exposes the associated option for starting a sandbox in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+
+            const flextesaHelpContents = await exec(`taq start sandbox --help --projectDir=${taqueriaProjectPath}`)
+            expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStartSandbox)
+
+            await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that the flextesa plugin exposes the associated option for stopping a sandbox in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+
+            const flextesaHelpContents = await exec(`taq stop sandbox --help --projectDir=${taqueriaProjectPath}`)
+            expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStopSandbox)
+
+            await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that the flextesa plugin exposes the associated option for listing sandbox accounts in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+
+            const flextesaHelpContents = await exec(`taq list accounts --help --projectDir=${taqueriaProjectPath}`)
+            expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginListAccounts)
 
             await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
         } catch(error) {
@@ -155,9 +233,24 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
+    test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+
+            const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
+            expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoSmartpySpecific)
+
+            await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
     test('Verify that trying a command that is not available returns an error', async () => {
         try {
-            const response = await exec(`taq compile -p ${taqueriaProjectPath}`)
+            const response = await exec(`taq something -p ${taqueriaProjectPath}`)
             expect(response.stderr).toContain("E_INVALID_TASK")
             expect(response.stderr).toContain(
                 "Taqueria isn't aware of this task. Perhaps you need to install a plugin first?"
