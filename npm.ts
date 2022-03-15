@@ -1,10 +1,19 @@
 import type {ConfigArgs} from './taqueria-protocol/taqueria-protocol-types.ts'
 import {i18n} from './taqueria-types.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
-import {exec, readJsonFile, writeJsonFile} from './taqueria-utils/taqueria-utils.ts'
+import * as utils from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {map, chain, chainRej, resolve, reject} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {getConfig} from './taqueria-config.ts'
+
+// Get utils
+const {execText, readJsonFile, writeJsonFile} = utils.inject({
+    stdout: Deno.stdout,
+    stderr: Deno.stderr
+})
+
+// Alias
+const exec = execText
 
 // import {log, debug} from './taqueria-utils/taqueria-utils.ts'
 

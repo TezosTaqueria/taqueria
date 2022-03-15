@@ -27,7 +27,7 @@ export type ErrorType =
   | "E_INVALID_PLUGIN_RESPONSE"
   | "E_INVALID_ARGS"
   | "E_MKDIR_FAILED"
-  | "E_SCAFFOLD_URL_GIT_CLONE_FAILED"
+  | "GIT_CLONE_FAILED"
   
 export interface TaqError {
     readonly kind: ErrorType,
@@ -110,4 +110,9 @@ export class E_TaqError extends Error {
         this.name = this.kind
         this.previous = taqErr.previous
     }
+}
+
+export interface UtilsDependencies {
+    stdout: Deno.Writer
+    stderr: Deno.Writer
 }

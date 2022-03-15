@@ -5,33 +5,8 @@ import type {InstalledPlugin} from "../../taqueria-protocol/taqueria-protocol-ty
 import {SanitizedAbsPath, SanitizedPath, SanitizedUrl, TaqError, E_TaqError} from '../../taqueria-utils/taqueria-utils-types.ts'
 import {toPromise} from "../../taqueria-utils/taqueria-utils.ts"
 import { assertEquals, assert, assertRejects} from "https://deno.land/std@0.127.0/testing/asserts.ts";
-import { fork } from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
-import {StringWriter} from "https://deno.land/std@0.128.0/io/writers.ts"
 import {i18n} from '../../i18n.ts'
-
-// Provides a Writable implementation to be used
-// as stdout/stderr in tests 
-class MockWriter implements Deno.Writer {
-    writer: StringWriter
-
-    constructor() {
-        this.writer = new StringWriter()
-    }
-
-    clear() {
-        this.writer = new StringWriter()
-    }
-
-    write(p: Uint8Array) : Promise<number> {
-        return this.writer.write(p)
-    }
-
-    toString() {
-        const str = this.writer.toString()
-        this.clear()
-        return str
-    }
-}
+import {MockWriter} from "./helpers.ts"
 
 Deno.test('inject()', async (t) => {
     const projectDir = SanitizedAbsPath.create("/tmp/test-project") as SanitizedAbsPath

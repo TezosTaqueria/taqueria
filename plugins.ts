@@ -4,13 +4,19 @@ import {PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {SanitizedInitArgs, PluginRequestArgs, PluginDeps} from './taqueria-types.ts'
 import {State} from './taqueria-types.ts'
 import {SanitizedAbsPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
-import {joinPaths, readJsonFile, writeTextFile, decodeJson} from './taqueria-utils/taqueria-utils.ts'
+import * as utils from './taqueria-utils/taqueria-utils.ts'
 
 // Third-party dependencies
 import {map, chain, attemptP, chainRej, resolve, reject, parallel} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {copy} from 'https://deno.land/std@0.128.0/streams/conversion.ts'
 import clipboard from 'https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts'
+
+// Get utils
+const {joinPaths, readJsonFile, writeTextFile, decodeJson} = utils.inject({
+    stdout: Deno.stdout,
+    stderr: Deno.stderr
+})
 
 // No-operation
 // noop: () -> void

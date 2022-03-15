@@ -7,7 +7,7 @@ import yargs from 'https://deno.land/x/yargs/deno.ts'
 import {map, chain, attemptP, mapRej, resolve, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
-import {exec, joinPaths, mkdir, readJsonFile, writeTextFile, ensurePathDoesNotExist, gitClone, rm} from './taqueria-utils/taqueria-utils.ts'
+import * as utils from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, SanitizedUrl, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case/mod.ts";
@@ -16,8 +16,26 @@ import * as NPM from './npm.ts'
 import inject from './plugins.ts'
 import { match, __ } from 'https://esm.sh/ts-pattern';
 
-// Debugging tools
-import {log, debug} from './taqueria-utils/taqueria-utils.ts'
+// Get utils
+const {
+    execText,
+    joinPaths,
+    mkdir,
+    readJsonFile,
+    writeTextFile,
+    ensurePathDoesNotExist,
+    gitClone,
+    rm,
+    log,
+    // debug
+} = utils.inject({
+    stdout: Deno.stdout,
+    stderr: Deno.stderr
+})
+
+// Add alias
+const exec = execText
+
 type SendPluginActionRequest = (plugin: InstalledPlugin) => (action: PluginAction) => (requestArgs: Record<string, unknown>) => Future<TaqError, PluginResponse>
 
 /**
@@ -574,7 +592,7 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
         .with({kind: 'E_MKDIR_FAILED'}, err                 => [-8, `${err.msg}: ${err.context}`])
         .with({kind: 'E_NPM_INIT'}, err                     => [-9, err.msg])
         .with({kind: 'E_READFILE'}, err                     => [-10, err.msg])
-        .with({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED'},err => [-11, `${err.msg}: ${err.context}`])
+        .with({kind: 'GIT_CLONE_FAILED'},err            => [-11, `${err.msg}: ${err.context}`])
         .with({kind: 'E_INVALID_ARGS'}, err                 => [-12, err.msg])
         .with({message: __.string}, err                     => [1, err.message])
         .exhaustive()
