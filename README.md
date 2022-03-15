@@ -71,4 +71,18 @@ Taqueria manages plugins by providing installation/uninstallation via the `taq i
 4. Install the LIGO plugin: `taq install @taqueria/plugin-ligo`
 6. Continue steps 4-5 for each additional plugin you want to install
 
+### Building From Source
+
+If you prefer to build the Taqueria binary and plugins locally, follow the steps detailed below
+
+#### Requirements
+- [deno](https://deno.land/) version: "1.18.2"
+- [NodeJS](https://nodejs.org/en/) version: "16.x"
+- [Docker](https://www.docker.com/) version: "0.9" or later
+
+#### Run Build Script
+From the root of the Taqueria directory, run the build-all script:
+```shell
+npm run build-all
+```
 

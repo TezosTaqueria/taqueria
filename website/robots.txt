@@ -1,0 +1,4 @@
+User-Agent: *
+Disallow: https://taqueria.io/cdn-cgi/l/email-protection
+
+Sitemap: https://taqueria.io/sitemap.xml

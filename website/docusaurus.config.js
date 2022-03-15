@@ -6,23 +6,24 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-	plugins: ['docusaurus-plugin-sass'],
+	plugins: [
+		'docusaurus-plugin-sass',
+	],
 	title: 'Taqueria - Developer Tooling for Tezos',
 	tagline: 'Taqueria - Developer Tooling for Tezos',
 	url: 'https://taqueria.io',
 	baseUrl: '/',
-
-  onBrokenLinks: 'throw',
+    onBrokenLinks: 'throw',
 	onBrokenMarkdownLinks: 'warn',
 	favicon: '/img/favicon.ico',
 	organizationName: 'ecadlabs', // Usually your GitHub org/user name.
 	projectName: 'taqueria', // Usually your repo name.
+	trailingSlash: true,
 
 	presets: [
 		[
 			'@docusaurus/preset-classic',
 			/** @type {import('@docusaurus/preset-classic').Options} */
-			{
 				docs: {
 					path: 'docs',
 					sidebarPath: require.resolve('./sidebars.js'),
