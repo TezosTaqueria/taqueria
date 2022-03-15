@@ -26,6 +26,11 @@ const config = {
 			/** @type {import('@docusaurus/preset-classic').Options} */
 				
 			{
+				sitemap: {
+					changefreq: 'weekly',
+					priority: 0.5,
+					trailingSlash: false,
+				},
 				docs: {
 					path: 'docs',
 					sidebarPath: require.resolve('./sidebars.js'),
