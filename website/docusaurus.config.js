@@ -47,17 +47,17 @@ const config = {
 						require.resolve('./src/css/tabs.scss'),
 					],
 				},
+				sitemap: {
+					changefreq: 'weekly',
+					priority: 0.5,
+				},
 				gtag: {
 					trackingID: 'G-2VB2D1DHC0',
 					anonymizeIP: true,
 				},
-				  googleAnalytics: {
+					googleAnalytics: {
 					trackingID: 'UA-93014135-3',
 					anonymizeIP: true,
-				},
-				sitemap: {
-					changefreq: 'weekly',
-					priority: 0.5,
 				},
 			},
 		],
