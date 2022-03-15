@@ -8,7 +8,7 @@ const FeatureList = [
       "Don’t know where to start building on Tezos? Want a smarter way to integrate your tools? If so, Taqueria is for you. This flexible framework will help you to start faster and build better applications.",
     button: {
       label: "Try the Taqueria Beta",
-      link: "/docs/intro",
+      link: "/docs/intro/",
     },
     features: [
       {
