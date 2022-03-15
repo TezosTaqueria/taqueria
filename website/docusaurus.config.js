@@ -48,11 +48,15 @@ const config = {
 				gtag: {
 					trackingID: 'G-2VB2D1DHC0',
 					anonymizeIP: true,
-				  },
+				},
 				  googleAnalytics: {
 					trackingID: 'UA-93014135-3',
 					anonymizeIP: true,
-				  },
+				},
+				sitemap: {
+					changefreq: 'weekly',
+					priority: 0.5,
+				},
 			},
 		],
 	],
