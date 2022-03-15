@@ -130,7 +130,7 @@ export const joinPaths = _joinPaths
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string
 
-export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cwd?: SanitizedAbsPath) : Future<TaqError, number> => attemptP(async () => {
+export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, bufferOutput=false, cwd?: SanitizedAbsPath) : Future<TaqError, number|string> => attemptP(async () => {
     let command = cmdTemplate
     try {
         // NOTE, uses eta templates under the hood. Very performant! https://ghcdn.rawgit.org/eta-dev/eta/master/browser-tests/benchmark.html
@@ -156,16 +156,24 @@ export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cw
         command = cmd
         const process = Deno.run({
             cmd: ["sh", "-c", `${cmd}`],
-            cwd: cwd?.value
+            cwd: cwd?.value,
+            stdout: bufferOutput ? "piped" : "inherit"
         })
+        const output = bufferOutput ? await process.output() : undefined
         const status = await process.status()
+        Deno.close(process.rid)
+
+        if (bufferOutput) {
+            const decoder = new TextDecoder()
+            return decoder.decode(output);
+        }
 
         return status.code
     }
     catch (previous) {
         throw {
             kind: "E_FORK",
-            msg: `Could not fork ${command}`,
+            msg: `There was a problem trying to run: ${command}`,
             previous
         } as TaqError
     }

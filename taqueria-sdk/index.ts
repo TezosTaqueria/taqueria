@@ -106,6 +106,8 @@ export const sendJsonRes = <T>(data: T) => typeof data === 'object'
         render: 'string'
     })
 
+export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data))
+
 export const noop = () => {}
 
 const parseConfig = (config:string|Record<string, unknown>) : Promise<Record<string, unknown>> => typeof config === 'string'
@@ -224,37 +226,57 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => (
     const {i18n, taqRun} = sanitzedArgs
     const schema = parseSchema(i18n, definer, inferPluginName)
     if (schema) {
-        switch (taqRun) {
-            case "pluginInfo":
-                const output = {
-                    ...schema,
-                    proxy: schema.proxy ? true: false,
-                    checkRuntimeDependencies: schema.checkRuntimeDependencies ? true: false,
-                    installRuntimeDependencies: schema.installRuntimeDependencies ? true : false
-                }
-                return Promise.resolve(output)
-            case "proxy":
-                return schema.proxy
-                        ? schema.proxy(sanitzedArgs)
-                        : Promise.reject({
-                            errCode: 'E_NOT_SUPPORTED',
-                            message: i18n.proxyNotSupported,
-                            context: sanitizeArgs
+        try {
+            switch (taqRun) {
+                case "pluginInfo":
+                    const output = {
+                        ...schema,
+                        proxy: schema.proxy ? true: false,
+                        checkRuntimeDependencies: schema.checkRuntimeDependencies ? true: false,
+                        installRuntimeDependencies: schema.installRuntimeDependencies ? true : false
+                    }
+                    return sendAsyncJson(output);
+                case "proxy":
+                    if (schema.proxy) {
+                        const retval = schema.proxy(sanitzedArgs)
+                        if (retval) return retval
+                        return Promise.reject({
+                            errCode: "E_PROXY",
+                            message: "The plugin's proxy method must return a promise.",
+                            context: retval
                         })
-            case "checkRuntimeDependencies":
-                return schema.checkRuntimeDependencies
-                        ? schema.checkRuntimeDependencies(i18n, sanitzedArgs)
-                        : Promise.resolve({report: []})
-            case "installRuntimeDependencies":
-                return schema.installRuntimeDependencies
-                        ? schema.installRuntimeDependencies(i18n, sanitzedArgs)
-                        : Promise.resolve({report: []})
-            default:
-                return Promise.reject({
-                    errCode: 'E_NOT_SUPPORTED',
-                    message: i18n.actionNotSupported,
-                    context: sanitizeArgs
-                })
+                    }
+                    return Promise.reject({
+                        errCode: 'E_NOT_SUPPORTED',
+                        message: i18n.proxyNotSupported,
+                        context: sanitizeArgs
+                    })
+                case "checkRuntimeDependencies":
+                    return sendAsyncJson(
+                        schema.checkRuntimeDependencies
+                            ? schema.checkRuntimeDependencies(i18n, sanitzedArgs)
+                            : Promise.resolve({report: []})
+                    )
+                case "installRuntimeDependencies":
+                    return sendAsyncJson(
+                        schema.installRuntimeDependencies
+                            ? schema.installRuntimeDependencies(i18n, sanitzedArgs)
+                            : Promise.resolve({report: []})
+                    )
+                default:
+                    return Promise.reject({
+                        errCode: 'E_NOT_SUPPORTED',
+                        message: i18n.actionNotSupported,
+                        context: sanitizeArgs
+                    })
+            }
+        }
+        catch (previous) {
+            return Promise.reject({
+                errCode: "E_UNEXPECTED",
+                message: "The plugin encountered a fatal error",
+                previous
+            })
         }
     }
     return Promise.reject({
@@ -302,7 +324,10 @@ export const Plugin = {
         return parseArgs(unparsedArgs)
         .then(sanitizeArgs)
         .then(getResponse(definer, inferPluginName(stack)))
-        .catch(console.error)
+        .catch(err => {
+            console.error(err)
+            process.exit(-1)
+        })
     }
 }
 

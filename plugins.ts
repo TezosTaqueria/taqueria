@@ -35,7 +35,7 @@ export const inject = (deps: PluginDeps) => {
                 await stdout.write(encoder.encode(`*** END of call to ${plugin.name} ***\n`))
                 await clipboard.writeText(output.replace("\\\n", ''))
             }
-            return
+            return await Promise.resolve()
         })
 
     const pluginRequestToString = (plugin: InstalledPlugin) => (cmd: (string|number|boolean)[]) => {
@@ -56,7 +56,8 @@ export const inject = (deps: PluginDeps) => {
                 process.stderr.close()
                 await process.status()
                 process.close()
-                return await decoder.decode(output)
+                const retval = await decoder.decode(output)
+                return retval
             }
             catch (previous) {
                 throw {

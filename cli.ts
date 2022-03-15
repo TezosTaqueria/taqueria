@@ -289,7 +289,7 @@ const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: Sani
     map(log(`Cleanup...`)),
     chain(_ => rm(scaffoldProjectDir.join(`.taq/scaffold.json`))),
     chain(_ => rm(scaffoldProjectDir.join(`.git`))),
-    chain(_ => exec("npm install", {}, scaffoldProjectDir)),
+    chain(_ => exec("npm install", {}, false, scaffoldProjectDir)),
     map(() => i18n.__("scaffoldDoneMsg"))
 )
 
@@ -395,27 +395,33 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
                     sendPluginActionRequest (plugin) (task) ({...inputArgs, task: task.task.value}),
                     map (res => {
                         const decoded = res as PluginJsonResponse | void
-                        if (decoded) {
-                            switch (decoded.render) {
-                                case "table":
-                                    renderTable((decoded.data ? decoded.data as Record<string, string>[] : []))
-                                    break
-                                case "string":
-                                    console.log(decoded.data)
-                                    break
-                            }
-                        }
+                        if (decoded) return renderPluginJsonRes(decoded)
                     })
                 )
                 : pipe(
-                    exec(task.handler, {...parsedArgs, ...inputArgs}),
-                    map(_ => {})
+                    exec(task.handler, {...parsedArgs, ...inputArgs}, ['json', 'application/json'].includes(task.encoding)),
+                    map((res: string|number) => {
+                        if (typeof(res) === 'string') {
+                            return renderPluginJsonRes(JSON.parse(res))
+                        }
+                    })
                 )
 
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (identity) (handler)
         }
     })
 )
+
+const renderPluginJsonRes = (decoded: PluginJsonResponse) => {
+    switch (decoded.render) {
+        case "table":
+            renderTable((decoded.data ? decoded.data as Record<string, string>[] : []))
+            break
+        case "string":
+            console.log(decoded.data)
+            break
+    }
+}
  
 const renderTable = (data: Record<string, string>[]) => {
     const keys: string[] = pipe(
@@ -515,6 +521,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                 map (sanitizeArgs),
                 chain (initArgs => {
                     if (initArgs.debug) debugMode(true)
+
                     if (initArgs.version) {
                         console.log(initArgs.setVersion)
                         return resolve(initArgs)
@@ -525,7 +532,9 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                     }
                     return initArgs._.includes('init') || 
                         initArgs._.includes('testFromVsCode') ||
-                        initArgs._.includes('scaffold')
+                        initArgs._.includes('scaffold') //||
+                        // initArgs._.includes('install') ||
+                        // initArgs._.includes('uninstall')
                         ? resolve(initArgs)
                         : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
                 }),
@@ -554,22 +563,25 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
         console.error("") // empty line
     }
 
-    const msg = inputArgs.debug ? err : match(err)
-        .with({kind: 'E_FORK'}, err => err.msg)
-        .with({kind: 'E_INVALID_CONFIG'}, err => err.msg)
-        .with({kind: 'E_INVALID_JSON'}, err => err)
-        .with({kind: 'E_INVALID_PATH_ALREADY_EXISTS'}, err => `${err.msg}: ${err.context}`)
-        .with({kind: 'E_INVALID_PATH_DOES_NOT_EXIST'}, err => `${err.msg}: ${err.context}`)
-        .with({kind: 'E_INVALID_TASK'}, err => err.msg)
-        .with({kind: 'E_INVALID_PLUGIN_RESPONSE'}, err => err.msg)
-        .with({kind: 'E_MKDIR_FAILED'}, err => `${err.msg}: ${err.context}`)
-        .with({kind: 'E_NPM_INIT'}, err => err.msg)
-        .with({kind: 'E_READFILE'}, err => err.msg)
-        .with({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED'}, err => `${err.msg}: ${err.context}`)
-        .with({kind: 'E_INVALID_ARGS'}, err => err.msg)
-        .with({message: __.string}, err => err.message)
+    const res = match(err)
+        .with({kind: 'E_FORK'}, err                         => [-1, err.msg])
+        .with({kind: 'E_INVALID_CONFIG'}, err               => [-2, err.msg])
+        .with({kind: 'E_INVALID_JSON'}, err                 => [-3, err])
+        .with({kind: 'E_INVALID_PATH_ALREADY_EXISTS'}, err  => [-4, `${err.msg}: ${err.context}`])
+        .with({kind: 'E_INVALID_PATH_DOES_NOT_EXIST'}, err  => [-5, `${err.msg}: ${err.context}`])
+        .with({kind: 'E_INVALID_TASK'}, err                 => [-6, err.msg])
+        .with({kind: 'E_INVALID_PLUGIN_RESPONSE'}, err      => [-7, err.msg])
+        .with({kind: 'E_MKDIR_FAILED'}, err                 => [-8, `${err.msg}: ${err.context}`])
+        .with({kind: 'E_NPM_INIT'}, err                     => [-9, err.msg])
+        .with({kind: 'E_READFILE'}, err                     => [-10, err.msg])
+        .with({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED'},err => [-11, `${err.msg}: ${err.context}`])
+        .with({kind: 'E_INVALID_ARGS'}, err                 => [-12, err.msg])
+        .with({message: __.string}, err                     => [1, err.message])
         .exhaustive()
-    console.error(msg)
+    
+    const [exitCode, msg] = res
+    console.log(inputArgs.debug ? err : msg)
+    Deno.exit(exitCode as number)
 }
 
 const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
