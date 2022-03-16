@@ -24,13 +24,7 @@ const config = {
 		[
 			'@docusaurus/preset-classic',
 			/** @type {import('@docusaurus/preset-classic').Options} */
-				
 			{
-				sitemap: {
-					changefreq: 'weekly',
-					priority: 0.5,
-					trailingSlash: false,
-				},
 				docs: {
 					path: 'docs',
 					sidebarPath: require.resolve('./sidebars.js'),
@@ -53,36 +47,41 @@ const config = {
 						require.resolve('./src/css/tabs.scss'),
 					],
 				},
+				sitemap: {
+					changefreq: 'weekly',
+					priority: 0.5,
+				},
+				gtag: {
+					trackingID: 'G-2VB2D1DHC0',
+					anonymizeIP: true,
+				},
+					googleAnalytics: {
+					trackingID: 'UA-93014135-3',
+					anonymizeIP: true,
+				},
 			},
 		],
 	],
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
-			gtag: {
-				trackingID: 'G-2VB2D1DHC0',
-				anonymizeIP: true,
-			  },
-			  googleAnalytics: {
-				trackingID: 'UA-93014135-3',
-				anonymizeIP: true,
-			  },
 			colorMode: {
 				defaultMode: 'light',
 				disableSwitch: true,
 				respectPrefersColorScheme: false,
-				switchConfig: {
-					darkIcon: '🌙',
-					darkIconStyle: {
-						marginLeft: '2px',
-					},
-					// Unicode icons such as '\u2600' will work
-					// Unicode with 5 chars require brackets: '\u{1F602}'
-					lightIcon: '\u{1F602}',
-					lightIconStyle: {
-						marginLeft: '1px',
-					},
-				},
+// The following value has been deprecated and will need to be re-implemented when dark mode is implemented
+				// switchConfig: {
+				// 	darkIcon: '🌙',
+				// 	darkIconStyle: {
+				// 		marginLeft: '2px',
+				// 	},
+				// 	// Unicode icons such as '\u2600' will work
+				// 	// Unicode with 5 chars require brackets: '\u{1F602}'
+				// 	lightIcon: '\u{1F602}',
+				// 	lightIconStyle: {
+				// 		marginLeft: '1px',
+				// 	},
+				// },
 			},
 			navbar: {
 				logo: {
