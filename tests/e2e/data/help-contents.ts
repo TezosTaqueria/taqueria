@@ -104,7 +104,7 @@ Options:
 Taqueria is currently in BETA. You've been warned. :)
 `
 
-export const helpContentsSmartpyPluginSpecific = `taq compile [sourceFile]
+export const helpContentsSmartpyCompileSpecific = `taq compile [sourceFile]
 
 Compile a smart contract written in a SmartPy syntax to Michelson code
 
@@ -116,6 +116,21 @@ Options:
   -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
   -e, --env         Specify an environment configuration
       --help        Show help                                     [boolean]
+`
+
+export const helpContentsSmartpyTeapotSpecific = `taq teapot
+
+Have a cup of tea
+
+Options:
+      --version     Show version number                           [boolean]
+      --build       Display build information about the current version
+                                                                  [boolean]
+  -p, --projectDir  Path to your project directory          [default: "./"]
+  -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+      --help        Show help                                     [boolean]
+  -g, --green       Make green tea instead                        [boolean]
 `
 
 export const helpContentsLigoSmartpy: string = `taq <command>
@@ -272,4 +287,48 @@ Options:
   -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
   -e, --env         Specify an environment configuration
       --help        Show help                                     [boolean]
+`
+
+export const helpContentsGenerateTypesPlugin = `taq <command>
+
+Commands:
+  taq init [projectDir]                  Initialize a new project
+  taq scaffold [scaffoldUrl] [scaffoldP  Generate a new project using a pre
+  rojectDir]                             -configured scaffold
+  taq install <pluginName>               Install a plugin
+  taq uninstall <pluginName>             Uninstall a plugin
+  taq generate types [typescriptDir]     Generate types for a contract to b
+                                         e used with taquito
+                                                   [aliases: gen, gentypes]
+
+Options:
+      --version     Show version number                           [boolean]
+      --build       Display build information about the current version
+                                                                  [boolean]
+  -p, --projectDir  Path to your project directory          [default: "./"]
+  -d, --configDir   Config directory (default ./.taq)   [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+      --help        Show help                                     [boolean]
+
+Taqueria is currently in BETA. You've been warned. :)
+`
+
+export const helpContentsGenerateTypesPluginSpecific = `taq generate types [typescriptDir]
+
+Generate types for a contract to be used with taquito
+
+Positionals:
+  typescriptDir  The output directory for the generated type files
+                                                         [default: "types"]
+
+Options:
+      --version        Show version number                        [boolean]
+      --build          Display build information about the current version
+                                                                  [boolean]
+  -p, --projectDir     Path to your project directory       [default: "./"]
+  -d, --configDir      Config directory (default ./.taq)[default: "./.taq"]
+  -e, --env            Specify an environment configuration
+      --help           Show help                                  [boolean]
+  -t, --typeAliasMode  The type aliases used in the generated types
+                                                [choices: "file", "simple"]
 `
