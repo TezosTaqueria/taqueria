@@ -1,5 +1,5 @@
 ---
-title: Understanding Taqueria Plugins
+title: Understanding Plugins
 ---
 
 
