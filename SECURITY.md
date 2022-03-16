@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Taqueria v0.1.x is the latest release branch and is fully supported. Older releases will not be maintained.
+We support the latest minor release only. After v1.0 is released, we will readjust our support window.
 
 ## Reporting a Vulnerability
 
