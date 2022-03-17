@@ -15,7 +15,6 @@ purpose: help the user understand what Taqueria is, what it does, and how to pro
 - what is the MINIMAL amount of detail necessary in this document?
  -->
 
-%%THIS IS A TEST TERM|test_term%%
 
 Taqueria is here to help make developing on Tezos easier. Taqueria supercharges your projects with a powerful and centralized configuration and access to top Tezos development tools through tasks that you run from the command line
 
