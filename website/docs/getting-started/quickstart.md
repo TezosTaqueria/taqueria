@@ -141,7 +141,7 @@ If you open this file (`/artifacts/counter.tz`), you can view the raw Michelson 
 ```
 
 
-### Flextesa
+### Starting a Flextesa Sandbox
 
 The next step is to install the Flextesa plugin which provides a local Tezos sandbox network:
 ```shell
@@ -186,7 +186,7 @@ If successful, you will see a list of the accounts and balances specified in the
 └─────────┴─────────┴──────────────────────────────────────┘
 ```
 
-### Taquito
+### Originating a Contract with Taquito
 
 With a sandbox now running, the next step is to originate the `counter.tz` file to the sandbox network using the Taquito plugin
 
@@ -219,7 +219,16 @@ For the `counter.tz` contract, you simply need to provide an integer value for t
 
 Now you can originate the contract by running:
 ```shell
-taq originate counter.tz
+taq originate
+```
+
+This will originate all contracts in the `/artifacts` directory to the sandbox and return the address of the deployed contract and destination sandbox:
+```
+┌────────────┬──────────────────────────────────────┬─────────────┐
+│ Contract   │ Address                              │ Destination │
+├────────────┼──────────────────────────────────────┼─────────────┤
+│ counter.tz │ KT1Ayz8qos7G4U3Jucp6QWoM7ayhbShNXcat │ local       │
+└────────────┴──────────────────────────────────────┴─────────────┘
 ```
 
 
