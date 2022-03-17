@@ -8,6 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
 	plugins: [
 		'docusaurus-plugin-sass',
+		'@docusaurus-terminology/parser'
 	],
 	title: 'Taqueria - Developer Tooling for Tezos',
 	tagline: 'Taqueria - Developer Tooling for Tezos',
