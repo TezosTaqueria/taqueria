@@ -5,7 +5,7 @@
 /.github/workflows/    @ecadlabs/sre
 
 # Add Taqueria team as code owners for website
-/website/ @ecadlabs/taqueria
+/website/ @ecadlabs/taqueria @GImbrailo
 
 # Add Taqueria team as code owners for readme.md
 /readme.md @ecadlabs/taqueria
