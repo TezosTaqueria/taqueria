@@ -219,6 +219,15 @@ jobs:
       - name: Run e2e tests
         run: |
           npm run test:e2e -w tests
+  
+      - name: Report Status
+        uses: ravsamhq/notify-slack-action@v1
+        if: always()
+        with:
+          status: ${{ job.status }} # required
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
   vscode-extension-workflow:
     needs: detect-changes
