@@ -79,7 +79,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             const helpContents = await exec(`taq --help -p ${projectName}`)
             const helpContentsWithDir = await exec(`taq --help -p ${projectName} -d ${configDirName}`)
 
-            expect(helpContents.stderr).toContain('Your config.json file is invalid and some other stuff for testing')
+            expect(helpContents.stderr).toContain('Your config.json file is invalid')
             expect(helpContentsWithDir.stderr).not.toContain('Your config.json file is invalid')
 
             await fs.promises.rm(`./${projectName}`, { recursive: true })
