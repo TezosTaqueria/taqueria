@@ -9,7 +9,7 @@ on:
       - synchronize
 
 jobs:
-  CLA Assistant:
+  CLAssistant:
     runs-on: ubuntu-latest
     steps:
       - name: "CLA Assistant"
