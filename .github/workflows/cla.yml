@@ -25,3 +25,4 @@ jobs:
           branch: 'main'
           allowlist: '@ecadlabs/ecad-team'
           custom-notsigned-prcomment: 'Thank you for your contribution. Like many open-source projects, we require that contributors sign a Contributor License Agreement (based on the Apache Foundation CLA). Please sign the Taqueria project CLA by posting a Pull Request comment of the text below:'
+          custom-pr-sign-comment: 'I have read and agree to the CLA'
