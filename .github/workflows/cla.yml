@@ -22,6 +22,6 @@ jobs:
         with:
           path-to-signatures: 'cla/signatures/cla_signatures.json'
           path-to-document: 'https://hackmd.io/@nmangan/ECAD_CLA_draft'
-          branch: 'main'
+          branch: '401-add-cla-assistant'
           allowlist: '@ecadlabs/ecad-team'
           custom-notsigned-prcomment: 'Thank you for your contribution to Taqueria. Like many open-source projects, we ask that you sign our Contributor License Agreement before we can accept your contribution. Sign the CLA by posting a Pull Request comment of the text below:'
