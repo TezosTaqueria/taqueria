@@ -19,9 +19,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PERSONAL_ACCESS_TOKEN : ${{ secrets.CLA_TOKEN }}
         with:
-          path-to-signatures: 'cla/signatures/cla_signatures.json'
-          path-to-document: 'https://hackmd.io/@nmangan/ECAD_CLA_draft'
+          path-to-document: 'https://github.com/ecadlabs/ecadlabs-cla/blob/main/ECAD_Labs_CLA.md'
           branch: 'main'
           allowlist: '@ecadlabs/ecad-team'
-          custom-notsigned-prcomment: 'Thank you for your contribution. Like many open-source projects, we require that contributors sign a [Contributor License Agreement](https://hackmd.io/@nmangan/ECAD_CLA_draft) (based on the Apache Foundation CLA). Please sign the Taqueria project CLA by posting a Pull Request comment of the text below:'
+          custom-notsigned-prcomment: 'Thank you for your contribution. Like many open-source projects, we require that contributors sign a [Contributor License Agreement](https://github.com/ecadlabs/ecadlabs-cla/blob/main/ECAD_Labs_CLA.md) (based on the Apache Foundation CLA). Please sign the Taqueria project CLA by posting a Pull Request comment of the text below:'
           custom-pr-sign-comment: 'I have read and agree to the CLA'
+          remote-organization-name: 'ecadlabs'
+          remote-repository-name: 'ecadlabs-cla'
