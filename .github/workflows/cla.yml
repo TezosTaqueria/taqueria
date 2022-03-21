@@ -1,8 +1,7 @@
 name: "CLA"
 on:
   issue_comment:
-    types: 
-      - created
+    types: [created]
   pull_request_target:
     types: 
       - opened 
@@ -10,7 +9,7 @@ on:
       - synchronize
 
 jobs:
-  CLAssistant:
+  CLA Assistant:
     runs-on: ubuntu-latest
     steps:
       - name: "CLA Assistant"
@@ -24,5 +23,5 @@ jobs:
           path-to-document: 'https://hackmd.io/@nmangan/ECAD_CLA_draft'
           branch: 'main'
           allowlist: '@ecadlabs/ecad-team'
-          custom-notsigned-prcomment: 'Thank you for your contribution. Like many open-source projects, we require that contributors sign a Contributor License Agreement (based on the Apache Foundation CLA). Please sign the Taqueria project CLA by posting a Pull Request comment of the text below:'
+          custom-notsigned-prcomment: 'Thank you for your contribution. Like many open-source projects, we require that contributors sign a [Contributor License Agreement](${input.getPathToDocument()) (based on the Apache Foundation CLA). Please sign the Taqueria project CLA by posting a Pull Request comment of the text below:'
           custom-pr-sign-comment: 'I have read and agree to the CLA'
