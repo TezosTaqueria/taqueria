@@ -4,7 +4,6 @@ import {execSync} from "child_process";
 import path from "path";
 import waitForExpect from "wait-for-expect";
 import { TezosToolkit } from '@taquito/taquito';
-import axios from "axios";
 
 
 describe("E2E Testing for taqueria taquito plugin",  () => {
