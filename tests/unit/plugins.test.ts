@@ -197,6 +197,8 @@ Deno.test('inject()', async (t) => {
     
     // TODO: Once we have more than one type of plugin, we'll need to add
     // appropriate tests for getPluginExe
+    // No issue exists for this as it only come up when we decide to implement
+    // a plugin that isn't an NPM package.
     await t.step("getPluginExe() returns the correct command to invoke an NPM script", () => {
         const {getPluginExe} = pluginLib.__TEST__
 
@@ -204,6 +206,10 @@ Deno.test('inject()', async (t) => {
         assertEquals(output, ["node", "/tmp/test-project/node_modules/@taqueria/plugin-ligo/index.js"])
     })
 
+
+    // TODO: Move this test to e2e. Its not really a unit test.
+    // See https://github.com/ecadlabs/taqueria/issues/507
+    return
     await t.step("logPluginRequests() outputs the call to a plugin", async () => {
         const {toPluginArguments, logPluginRequest} = pluginLib.__TEST__
 
