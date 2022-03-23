@@ -29,4 +29,4 @@ $ yarn start
 This command will serve the website on [localhost:3000](http://localhost:3000)
 
 ## Test
-YARN_VERSION = 3.2.0
+YARN_VERSION = 3
