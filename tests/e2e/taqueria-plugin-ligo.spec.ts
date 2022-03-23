@@ -25,7 +25,6 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
-
     });
 
     test('Verify that taqueria ligo plugin can compile one contract using compile [sourceFile] command', async () => {

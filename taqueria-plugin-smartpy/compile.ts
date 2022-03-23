@@ -1,31 +1,11 @@
-import { SanitizedArgs, PluginResponse, Failure, LikeAPromise, ProxyAction } from "@taqueria/node-sdk/types";
+import { SanitizedArgs, PluginResponse, Failure, LikeAPromise, } from "@taqueria/node-sdk/types";
+import { execCmd, sendAsyncJsonRes } from "@taqueria/node-sdk";
 import {exec} from 'child_process'
 import glob from 'fast-glob'
 import {join, basename} from 'path'
 import {readFile} from 'fs/promises'
 
 type Opts = SanitizedArgs & Record<string, unknown>
-
-// TODO: Move to SDK
-const execCmd = (cmd:string): Promise<ProxyAction> => new Promise((resolve, reject) => {
-    exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
-        if (err) reject({
-            status: 'failed',
-            stdout: stdout,
-            stderr: err.message
-        })
-        else if (stderr) reject({
-            status: 'failed',
-            stdout,
-            stderr
-        })
-        else resolve({
-            status: 'success',
-            stdout,
-            stderr
-        })
-    })
-})
 
 const getArtifacts = (sourceAbspath: string) => {
     return readFile(sourceAbspath, {encoding: "utf-8"})
@@ -61,14 +41,10 @@ const compileAll = (opts: Opts): Promise<{contract: string, artifacts: string[]}
 export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
     const p = parsedArgs.sourceFile
     ? compileContract (parsedArgs) (parsedArgs.sourceFile as string)
+        .then(data => [data])
     : compileAll (parsedArgs)
 
-    return p.then(results => ({
-        status: 'success',
-        stdout: results,
-        stderr: "",
-        render: 'table'
-    }))
+    return p.then(sendAsyncJsonRes)
 }
     
 
