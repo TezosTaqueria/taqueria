@@ -1,6 +1,9 @@
-import {generateTestProject} from "./utils/utils";
-import fs from "fs";
-import {execSync} from "child_process";
+import { generateTestProject } from "./utils/utils";
+import fs from "fs"
+import fsPromises from "fs/promises"
+import { exec as exec1, execSync } from "child_process"
+import util from "util"
+const exec = util.promisify(exec1)
 import path from "path";
 import waitForExpect from "wait-for-expect";
 import { TezosToolkit } from '@taquito/taquito';
@@ -10,7 +13,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     const tezos = new TezosToolkit('https://hangzhounet.api.tez.ie');
     const taqueriaProjectPath = 'e2e/auto-test-taquito-plugin';
-    const contractRegex = new RegExp("^\\w{36}$");
+    const contractRegex = new RegExp(/(KT1)+\w{33}?/);
     let environment: string;
 
     beforeAll(async () => {
@@ -19,38 +22,47 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     // TODO: Consider in future to use keygen service to update account balance programmatically
     // https://github.com/ecadlabs/taqueria/issues/378
-    test.skip('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
+    test.only('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
         try {
             environment = "test";
             let smartContractHash = "";
 
             // 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
-            execSync(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+            await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
             // Sometimes running two deploy commands in a short period of time cause an issue
             // More details about the error - "counter %x already used for contract %y"
             // It is applicable only for auto-tests that run very fast
             // Uses retry mechanism to avoid test to fail
 
-            await waitForExpect(() => {
+            // 2. Run taq deploy on a selected test network described in "test" environment
+            const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
+            console.log(deployCommand.stdout)
+            await new Promise(resolve => setTimeout(resolve, 25000))
+            const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
+            console.log(deployResponse)
 
-                // 2. Run taq deploy on a selected test network described in "test" environment
-                const stdoutDeploy = execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim().split(/\r?\n/)[3];
+            // 3. Verify that contract has been originated on the network
+            expect(deployResponse).toContain("hello-tacos.tz");
+            expect(deployResponse).toContain("hangzhounet");
+            const contractHash = deployResponse.split("│")[2];
 
-                // 3. Verify that contract has been originated on the network
-                expect(stdoutDeploy).toContain("hello-tacos.tz");
-                expect(stdoutDeploy).toContain("hangzhounet");
-                const contractHash = stdoutDeploy.split("│")[2];
-                smartContractHash = contractHash.trim();
-                expect(contractHash.trim()).toMatch(contractRegex);
-            });
+            smartContractHash = contractHash.trim();
+            expect(smartContractHash).toMatch(contractRegex);
 
             // 4. Verify that contract has been originated to the network
-            await waitForExpect(async () => {
-                const contract = await tezos.contract.at(smartContractHash);
-                expect(contract.address).toBe(smartContractHash);
-            });
+            // const stuff = await tezos.contract.at(smartContractHash)
+            // console.log(stuff)
+
+
+
+
+            // await waitForExpect( async () => {
+            //     expect((await tezos.contract.at(smartContractHash)).address).toBe(smartContractHash)
+            // }, 60000, 1000)
+            const contract = await tezos.contract.at(smartContractHash)
+            expect(contract.address).toBe(smartContractHash);
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -304,11 +316,11 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
     });
 
     // Remove all files from artifacts folder without removing folder itself
-    afterEach(() => {
+    afterEach( async () => {
         try {
-            const files = fs.readdirSync(`${taqueriaProjectPath}/artifacts/`);
+            const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
             for (const file of files) {
-                fs.unlinkSync(path.join(`${taqueriaProjectPath}/artifacts/`, file));
+                await fsPromises.rm(`${taqueriaProjectPath}/artifacts/${file}`);
             }
         } catch(error){
             throw new Error (`error: ${error}`);
@@ -317,9 +329,9 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     // Clean up process to remove taquified project folder
     // Comment if need to debug
-    afterAll(() => {
+    afterAll( async () => {
         try {
-            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+            await fsPromises.rm(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }
