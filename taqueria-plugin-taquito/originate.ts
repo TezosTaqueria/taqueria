@@ -193,7 +193,6 @@ const originateAll = (parsedArgs: Opts) =>
 export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
     const p = parsedArgs.contract
         ? originateContract(parsedArgs) (parsedArgs.contract as string)
-            .then(result => [result])
         : originateAll(parsedArgs)
 
     return p.then(sendAsyncJsonRes)
