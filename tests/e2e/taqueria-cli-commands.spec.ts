@@ -1,6 +1,7 @@
 import * as contents from "./data/help-contents"
 import { generateTestProject } from "./utils/utils"
 import { exec as exec1, execSync } from "child_process"
+import type { ExecException } from "child_process"
 import fs from "fs"
 import fsPromises from "fs/promises"
 import util from "util"
@@ -14,10 +15,16 @@ describe("E2E Testing for taqueria CLI,", () => {
         await generateTestProject(taqueriaProjectPath)
     })
 
-    test('Verify that taq --help gives the help menu for a non-initialized project', async () => {
+    test('Verify that taq --help gives the help menu for a non-initialized project', async () => {        
         try {
-            const help = await exec('taq --help')
-            expect(help.stderr).toBe(contents.helpContentsNoProject)
+            await exec('taq --help').catch(
+                (err: ExecException & {stdout: string, stderr: string}) => {
+                    console.log(err.stderr)
+                    expect(err.code).toEqual(1)
+                    expect(err.stderr).toBe(contents.helpContentsNoProject)
+                }
+            )
+            
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
