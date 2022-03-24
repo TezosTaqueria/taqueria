@@ -26,4 +26,3 @@ This command runs a parser and pre-processor, then generates the static site con
 ```shell
 $ yarn start
 ```
-This command will serve the website on [localhost:3000](http://localhost:3000)
