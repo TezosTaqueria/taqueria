@@ -29,7 +29,7 @@ export const execCmd = (cmd:string) : LikeAPromise<StdIO, ExecException> => new 
 
 export const getArch = () : LikeAPromise<string, Failure<string>> => 
     execCmd("uname -m")
-    .then(result => (result.stdout as string).trim().toLowerCase())
+    .then(result => result.stdout.trim().toLowerCase())
     .then(arch => {
         switch(arch) {
             case 'x86_64':

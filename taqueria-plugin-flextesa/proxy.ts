@@ -1,7 +1,7 @@
 import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendAsyncRes, sendJsonRes} from '@taqueria/node-sdk'
 import type { SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO } from "@taqueria/node-sdk/types"
 import type {ExecException} from 'child_process'
-import retry from 'promise-retry'
+import retry from 'async-retry'
 
 type Opts = SanitizedArgs & {sandboxName?: string}
 
@@ -74,6 +74,14 @@ const configureTezosClient = (sandbox: Sandbox, opts: Opts) : LikeAPromise<StdIO
         () => getArch()
                 .then(arch => getConfigureCommand(sandbox, getDockerImage(), opts, arch))
                 .then(execCmd)
+                .catch(previous => 
+                    Promise.reject({
+                        errCode: 'E_CONFIGURE_SANDBOX',
+                        errorMsg: "Could not configure sandbox",
+                        context: sandbox,
+                        previous
+                    })
+                )
                 .then(({stderr, stdout}) => {
                     return stderr.length > 0
                         ? Promise.reject({
@@ -91,6 +99,14 @@ const importAccounts = (sandbox: Sandbox, opts: Opts): LikeAPromise<StdIO, Failu
         () => getArch()
                 .then(arch => getImportAccountsCommand(sandbox, getDockerImage(), opts, arch))
                 .then(execCmd)
+                .catch(previous =>
+                    Promise.reject({
+                        errCode: 'E_IMPORT_ACCOUNTs',
+                        errorMsg: "Could not import test accounts into sandbox",
+                        context: sandbox,
+                        previous
+                    })
+                )
                 .then(({stderr, stdout}) => {
                     return stderr.length > 0
                         ? Promise.reject({
