@@ -4,7 +4,6 @@
   "description": "Provides an interface and abstraction over a flextesa mininet",
   "main": "index.js",
   "scripts": {
-    "prebuild-package": "npm install",
     "build-package": "npx esbuild --platform=node --bundle index.ts --outdir=.",
     "build-docker": "docker build . -t ghcr.io/ecadlabs/taqueria-flextesa:latest",
     "build": "npm run build-package"
