@@ -598,7 +598,7 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
         .exhaustive()
     
     const [exitCode, msg] = res
-    console.log(inputArgs.debug ? err : msg)
+    console.error(inputArgs.debug ? err : msg)
     Deno.exit(exitCode as number)
 }
 
