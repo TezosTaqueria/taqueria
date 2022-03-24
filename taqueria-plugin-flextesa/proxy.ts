@@ -50,7 +50,7 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<void> => {
     return isSandboxRunning(sandbox.name.value)
         .then(
             running => running
-                ? sendAsyncRes("Already running")
+                ? sendAsyncRes("Already running.")
                 : getArch()
                     .then(arch => getStartCommand(sandbox, getDockerImage(), opts, arch, opts.debug)) 
                     .then(execCmd)
