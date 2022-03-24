@@ -33,10 +33,14 @@ const compileContract = (opts) => (sourceFile) =>
             artifact: getContractArtifactFilename(opts) (sourceFile)
         }
     })
-    .catch(err => Promise.resolve({
-        contract: sourceFile,
-        artifact: err.message
-    }))
+    .catch(err => {
+        sendErr(" ")
+        sendErr(err.message.split("\n").slice(1).join("\n"))
+        return Promise.resolve({
+            contract: sourceFile,
+            artifact: "Not compiled"
+        })
+    })
 
 const compileAll = parsedArgs => {
     // TODO: Fetch list of files from SDK
