@@ -1,5 +1,5 @@
-import { SanitizedArgs, PluginResponse, Failure, LikeAPromise, } from "@taqueria/node-sdk/types";
-import { execCmd, sendAsyncJsonRes } from "@taqueria/node-sdk";
+import { SanitizedArgs, PluginResponse, Failure, LikeAPromise} from "@taqueria/node-sdk/types";
+import { execCmd, sendAsyncJsonRes, sendErr } from "@taqueria/node-sdk";
 import {exec} from 'child_process'
 import glob from 'fast-glob'
 import {join, basename} from 'path'
@@ -23,6 +23,22 @@ const getCompileCommand = (opts: Opts) => (sourceAbspath: string) => `~/smartpy-
 const compileContract = (opts: Opts) => (sourceFile: string) => {
     const sourceAbspath = join(opts.contractsDir, sourceFile)
     return execCmd(getCompileCommand (opts) (sourceAbspath))
+    .then(async ({stderr}) => { // How should we output warnings?
+        if (stderr.length > 0) sendErr(`\n${stderr}`)
+
+        return {
+            contract: sourceFile,
+            artifact: await getArtifacts(sourceAbspath)
+        }
+    })
+    .catch(err => {
+        sendErr(" ")
+        sendErr(err.message.split("\n").slice(1).join("\n"))
+        return Promise.resolve({
+            contract: sourceFile,
+            artifact: "Not compiled"
+        })
+    })
     .then(() => getArtifacts(sourceAbspath))
     .then((artifacts: string[]) => ({contract: sourceFile, artifacts}))
 }
@@ -43,6 +59,10 @@ export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failu
     ? compileContract (parsedArgs) (parsedArgs.sourceFile as string)
         .then(data => [data])
     : compileAll (parsedArgs)
+        .then(results => {
+            if (results.length === 0) sendErr("No contracts found to compile.")
+            return results
+        })
 
     return p.then(sendAsyncJsonRes)
 }

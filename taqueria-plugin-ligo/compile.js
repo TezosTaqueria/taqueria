@@ -61,6 +61,10 @@ const compile = parsedArgs => {
         ? compileContract(parsedArgs) (parsedArgs.sourceFile)
             .then(result => [result])
         : compileAll(parsedArgs)
+            .then(results => {
+                if (results.length === 0) sendErr("No contracts found to compile.")
+                return results
+            })
     
     return p
     .then(sendJsonRes)
