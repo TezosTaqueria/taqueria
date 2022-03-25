@@ -23,7 +23,7 @@ jobs:
       matrix:
         language:
           - javascript
-          - typeScript
+          - typescript
 
     steps:
       - uses: actions/checkout@v2
