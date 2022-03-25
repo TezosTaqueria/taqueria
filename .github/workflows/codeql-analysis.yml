@@ -19,8 +19,8 @@ jobs:
       security-events: write
 
     strategy:
+      fail-fast: true
       matrix:
-        fail-fast: true
         language:
           - javascript
           - typeScript
