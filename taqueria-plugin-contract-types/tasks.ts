@@ -33,7 +33,6 @@ const generateContractTypesAll = async (parsedArgs: Opts & PluginOpts) : Promise
 }
 
 export const generateTypes = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
-    debugger
     parsedArgs.typescriptDir = parsedArgs.typescriptDir || 'types';
 
     console.log('generateTypes', { 
