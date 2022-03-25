@@ -1,10 +1,10 @@
-import type {InstalledPlugin, Config, ConfigArgs, Alias, Option, PositionalArg, PluginAction, PluginJsonResponse, PluginResponse} from './taqueria-protocol/taqueria-protocol-types.ts'
+import type {InstalledPlugin, ConfigArgs, Alias, Option, PositionalArg, PluginAction, PluginJsonResponse, PluginResponse} from './taqueria-protocol/taqueria-protocol-types.ts'
 import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
-import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs, CLIConfig} from './taqueria-types.ts'
-import {State} from './taqueria-types.ts'
+import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, CLIConfig} from './taqueria-types.ts'
+import {State, InternalTaskOutput} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs/deno.ts'
-import {map, chain, attemptP, mapRej, resolve, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {map, chain, attemptP, mapRej, resolve, forkCatch, parallel, debugMode, reject, bichain} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import * as utils from './taqueria-utils/taqueria-utils.ts'
@@ -138,14 +138,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
                 type: 'string',
                 default: getFromEnv("TAQ_PROJECT_DIR", ".", env),
             })
-        },
-        (args: RawInitArgs) => pipe(
-            sanitizeArgs(args), 
-            ({projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
-                return initProject(projectDir, configDir, i18n, maxConcurrency, quickstart)
-            },
-            forkCatch (console.error) (console.error) (console.log)
-        )
+        }
     )
     .command(
         'scaffold [scaffoldUrl] [scaffoldProjectDir]',
@@ -162,12 +155,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
                     describe: i18n.__('scaffoldProjectDirDesc'),
                     default: './taqueria-quickstart'
                 })
-        },
-        (args: RawInitArgs) => pipe(
-            sanitizeArgs(args),
-            scaffoldProject(i18n),
-            forkCatch (console.error) (console.error) (console.log)
-        )
+        }
     )
     .option('fromVsCode', {
         describe: i18n.__('fromVsCodeDesc'),
@@ -199,13 +187,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
                 type: 'string',
                 required: true
             })
-        },
-        // TODO: This function assumes that there is only one type of plugin available to install,
-        // a plugin distributed and installable via NPM. This should support other means of distribution
-        (inputArgs: InstallPluginArgs) => pipe(
-            NPM.installPlugin(parsedArgs.configDir, parsedArgs.projectDir, i18n, inputArgs.pluginName),
-            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
-        )
+        }
     )
     .alias('i', 'install')
     .command(
@@ -217,18 +199,13 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
                 type: 'string',
                 required: true
             })
-        },
-        (inputArgs: UninstallPluginArgs) => pipe(
-            NPM.uninstallPlugin(parsedArgs.configDir, parsedArgs.projectDir, i18n, inputArgs.pluginName),
-            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
-        )
+        }
     )
     .alias('u', 'uninstall')
     .command(
         'list-known-tasks',
         false, // hide
-        () => {},
-        listKnownTasks(cliConfig, parsedArgs)
+        () => {}
     )
     .demandCommand(),
     extendCLI(env, parsedArgs, i18n)
@@ -244,7 +221,7 @@ const parseArgs = (cliConfig: CLIConfig) : Future<TaqError, RawInitArgs> => pipe
     }))
 )
 
-const listKnownTasks = (cliConfig: CLIConfig, parsedArgs: SanitizedInitArgs) => (_inputArgs: RawInitArgs) => pipe(
+const listKnownTasks = (parsedArgs: SanitizedInitArgs) => pipe(
     parsedArgs.projectDir.join(parsedArgs.configDir.value, 'state.json').value,
     stateAbsPath => readJsonFile<State>(stateAbsPath), // TypeScript won't allow pointfree here
     map (state => Object.entries(state.tasks).reduce(
@@ -273,7 +250,7 @@ const listKnownTasks = (cliConfig: CLIConfig, parsedArgs: SanitizedInitArgs) => 
         },
         {}
     )),
-    forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
+    map (InternalTaskOutput.create)
 )
 
 const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
@@ -290,7 +267,7 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
         ? writeTextFile (joinPaths(projectDir.value, "quickstart.md")) (quickstart)
         : resolve(projectDir.value)
     ),
-    map (_ => i18n.__("bootstrapMsg"))
+    map (_ => InternalTaskOutput.create(i18n.__("bootstrapMsg")))
 )
 
 const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: SanitizedInitArgs) => pipe(
@@ -306,9 +283,12 @@ const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: Sani
     // Run init command
     map(log(`Cleanup...`)),
     chain(_ => rm(scaffoldProjectDir.join(`.taq/scaffold.json`))),
+    bichain<TaqError,TaqError,SanitizedAbsPath>
+        (err => err.kind === 'E_INVALID_PATH_DOES_NOT_EXIST' ? resolve(scaffoldProjectDir) : reject(err))
+        (resolve),
     chain(_ => rm(scaffoldProjectDir.join(`.git`))),
     chain(_ => exec("npm install", {}, false, scaffoldProjectDir)),
-    map(() => i18n.__("scaffoldDoneMsg"))
+    map(_ => InternalTaskOutput.create(i18n.__("scaffoldDoneMsg")))
 )
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: State) => state.plugins.reduce(
@@ -511,72 +491,84 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
             cliConfig.help()
         ),
         chain (parseArgs),
-        map (showInvalidTask(cliConfig))
+        chain (context => {
+            const err: TaqError = {kind: 'E_INVALID_TASK', msg: `Taqueria isn't aware of this task. Perhaps you need to install a plugin first?`, context}
+            return reject(err)
+        })
 )
-
-const executingBuiltInTask = (inputArgs: SanitizedInitArgs | RawInitArgs) =>
-    [
-        'init',
-        'install',
-        'uninstall',
-        'testFromVsCode',
-        'list-known-tasks',
-        'listKnownTasks',
-
-    ].reduce(
-        (retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
-        false
-    )
             
 export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
-    try {
-        // Parse the args required for core built-in tasks
-        return pipe(
-            initCLI(env, inputArgs, i18n),
-            (cliConfig: CLIConfig) => pipe(
-                cliConfig,
-                parseArgs,
-                map (sanitizeArgs),
-                chain (initArgs => {
-                    if (initArgs.debug) debugMode(true)
+    // Parse the args required for core built-in tasks
+    return pipe(
+        initCLI(env, inputArgs, i18n),
+        (cliConfig: CLIConfig) => pipe(
+            cliConfig,
+            parseArgs,
+            map (sanitizeArgs),
+            chain<TaqError, SanitizedInitArgs, InternalTaskOutput|never>(initArgs => {
+                if (initArgs.debug) debugMode(true)
 
-                    if (initArgs.version) {
-                        console.log(initArgs.setVersion)
-                        return resolve(initArgs)
-                    }
-                    else if (initArgs.build) {
-                        console.log(initArgs.setBuild)
-                        return resolve(initArgs)
-                    }
-                    return initArgs._.includes('init') || 
-                        initArgs._.includes('testFromVsCode') ||
-                        initArgs._.includes('scaffold') //||
-                        // initArgs._.includes('install') ||
-                        // initArgs._.includes('uninstall')
-                        ? resolve(initArgs)
-                        : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
-                }),
-                forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (identity)
-            )
+                if (initArgs.version) {
+                    return resolve(InternalTaskOutput.create(initArgs.setVersion))
+                }
+                else if (initArgs.build) {
+                    return resolve(InternalTaskOutput.create(initArgs.setBuild))
+                }
+                else if (initArgs._.includes('testFromVsCode')) {
+                    return resolve(InternalTaskOutput.create(initArgs))
+                }
+                else if (initArgs._.includes('init')) {
+                    const {projectDir, configDir, maxConcurrency, quickstart} = initArgs
+                    return initProject(projectDir, configDir, i18n, maxConcurrency, quickstart)
+                }
+                else if (initArgs._.includes('scaffold')) {
+                    return scaffoldProject(i18n)(initArgs)
+                }
+                else if (initArgs._.includes('uninstall')) {
+                    // TODO: This function assumes that there is only one type of plugin available to install,
+                    // a plugin distributed and installable via NPM. This should support other means of distribution
+                    const {projectDir, configDir, pluginName} = initArgs
+                    return pluginName
+                        ? NPM.uninstallPlugin(configDir, projectDir, i18n, pluginName)
+                        : reject<TaqError>({
+                            kind: "E_PLUGIN_NAME_REQUIRED",
+                            msg: "A plugin name is required",
+                            context: initArgs
+                        })
+                }
+                else if (initArgs._.includes('install')) {
+                    // TODO: This function assumes that there is only one type of plugin available to install,
+                    // a plugin distributed and installable via NPM. This should support other means of distribution
+                    const {projectDir, configDir, pluginName} = initArgs
+                    return pluginName
+                        ? NPM.installPlugin(configDir, projectDir, i18n, pluginName)
+                        : reject<TaqError>({
+                            kind: "E_PLUGIN_NAME_REQUIRED",
+                            msg: "A plugin name is required",
+                            context: initArgs
+                        })
+                }
+                else if (initArgs._.includes('list-known-task')) {
+                    return listKnownTasks(initArgs)
+                }
+                
+                return postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
+            }),
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (displayOutput)
         )
-    }
-    catch (err) {
-        console.error(err)
-    }
+    )
 }
 
-export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedInitArgs|RawInitArgs) => {
-    if (executingBuiltInTask(parsedArgs) || cli.handled) {
-        return parsedArgs
+export const displayOutput = (output: InternalTaskOutput|never) => {
+    if (output) {
+        console.log(output.value)
     }
-    const err: TaqError = {kind: 'E_INVALID_TASK', msg: `Taqueria isn't aware of this task. Perhaps you need to install a plugin first?`, context: parsedArgs}
-    return displayError (cli) (err)
 }
 
 export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
     const inputArgs = (cli.parsed as unknown as {argv: RawInitArgs}).argv
-    
     if (!inputArgs.fromVsCode) {
+        console.error("") // empty line
         cli.getInternalMethods().getCommandInstance().usage.showHelp()
         console.error("") // empty line
     }
@@ -584,7 +576,6 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
     const res = match(err)
         .with({kind: 'E_FORK'}, err                         => [125, err.msg])
         .with({kind: 'E_INVALID_CONFIG'}, err               => [1, err.msg])
-        .with({kind: 'E_INVALID_JSON'}, err                 => [12, err])
         .with({kind: 'E_INVALID_PATH_ALREADY_EXISTS'}, err  => [3, `${err.msg}: ${err.context}`])
         .with({kind: 'E_INVALID_PATH_DOES_NOT_EXIST'}, err  => [4, `${err.msg}: ${err.context}`])
         .with({kind: 'E_INVALID_TASK'}, err                 => [5, err.msg])
@@ -592,8 +583,10 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
         .with({kind: 'E_MKDIR_FAILED'}, err                 => [7, `${err.msg}: ${err.context}`])
         .with({kind: 'E_NPM_INIT'}, err                     => [8, err.msg])
         .with({kind: 'E_READFILE'}, err                     => [9, err.msg])
-        .with({kind: 'GIT_CLONE_FAILED'},err            => [10, `${err.msg}: ${err.context}`])
+        .with({kind: 'GIT_CLONE_FAILED'}, err               => [10, err.msg])
         .with({kind: 'E_INVALID_ARGS'}, err                 => [11, err.msg])
+        .with({kind: 'E_INVALID_JSON'}, err                 => [12, err])
+        .with({kind: 'E_PLUGIN_NAME_REQUIRED'}, err         => [13, err.msg])
         .with({message: __.string}, err                     => [128, err.message])
         .exhaustive()
     

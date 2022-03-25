@@ -1,5 +1,5 @@
 import type {ConfigArgs} from './taqueria-protocol/taqueria-protocol-types.ts'
-import {i18n} from './taqueria-types.ts'
+import {i18n, InternalTaskOutput} from './taqueria-types.ts'
 import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import * as utils from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
@@ -84,7 +84,7 @@ export const installPlugin = (configDir: SanitizedPath, projectDir: SanitizedAbs
         // what the real package name is
         return addToPluginList(pluginName, config)    
     }),
-    map (_ => i18n.__('pluginInstalled'))
+    map (_ => InternalTaskOutput.create(i18n.__('pluginInstalled')))
 )
 
 export const uninstallPlugin = (configDir: SanitizedPath, projectDir: SanitizedAbsPath, i18n: i18n, plugin: string) => pipe(
@@ -99,5 +99,5 @@ export const uninstallPlugin = (configDir: SanitizedPath, projectDir: SanitizedA
             chain (writeJsonFile(config.configFile.value))                    
         )
     }),
-    map (() => i18n.__('pluginUninstalled')),
+    map (_ => InternalTaskOutput.create(i18n.__('pluginUninstalled'))),
 )

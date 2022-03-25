@@ -28,6 +28,7 @@ export type ErrorType =
   | "E_INVALID_ARGS"
   | "E_MKDIR_FAILED"
   | "GIT_CLONE_FAILED"
+  | "E_PLUGIN_NAME_REQUIRED"
   
 export interface TaqError {
     readonly kind: ErrorType,

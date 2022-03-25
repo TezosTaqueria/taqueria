@@ -58,12 +58,6 @@ export interface RawInitArgs {
     build?: boolean
 }
 
-export interface InstallPluginArgs extends RawInitArgs {
-    pluginName: string
-}
-
-export type UninstallPluginArgs = InstallPluginArgs
-
 // TODO: Consolidate SanitizedInitArgs with SanitizedArgs from the SDK
 export interface SanitizedInitArgs {
     _: ['init' | 'install' | 'uninstall' | 'scaffold' | string]
@@ -94,6 +88,18 @@ export type EnvKey = "TAQ_CONFIG_DIR" | "TAQ_MAX_CONCURRENCY" | "TAQ_PROJECT_DIR
 
 export interface EnvVars {
     get: (key: EnvKey) => undefined | string
+}
+
+const internalTaskOutputType: unique symbol = Symbol()
+export class InternalTaskOutput {
+    [internalTaskOutputType]: void
+    readonly value: unknown
+    private constructor(value: unknown) {
+        this.value = value
+    }
+    static create(value: unknown) {
+        return new InternalTaskOutput(value)
+    }
 }
 
 const configDirType: unique symbol = Symbol()
