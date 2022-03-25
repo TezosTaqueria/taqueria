@@ -8,6 +8,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const config = {
 	plugins: [
 		'docusaurus-plugin-sass',
+		'@docusaurus-terminology/parser'
 	],
 	title: 'Taqueria - Developer Tooling for Tezos',
 	tagline: 'Taqueria - Developer Tooling for Tezos',
@@ -18,12 +19,12 @@ const config = {
 	favicon: '/img/favicon.ico',
 	organizationName: 'ecadlabs', // Usually your GitHub org/user name.
 	projectName: 'taqueria', // Usually your repo name.
+	trailingSlash: true,
 
 	presets: [
 		[
 			'@docusaurus/preset-classic',
 			/** @type {import('@docusaurus/preset-classic').Options} */
-				
 			{
 				docs: {
 					path: 'docs',
@@ -47,36 +48,41 @@ const config = {
 						require.resolve('./src/css/tabs.scss'),
 					],
 				},
+				sitemap: {
+					changefreq: 'weekly',
+					priority: 0.5,
+				},
+				gtag: {
+					trackingID: 'G-2VB2D1DHC0',
+					anonymizeIP: true,
+				},
+					googleAnalytics: {
+					trackingID: 'UA-93014135-3',
+					anonymizeIP: true,
+				},
 			},
 		],
 	],
 	themeConfig:
 		/** @type {import('@docusaurus/preset-classic').ThemeConfig} */
 		({
-			gtag: {
-				trackingID: 'G-2VB2D1DHC0',
-				anonymizeIP: true,
-			  },
-			  googleAnalytics: {
-				trackingID: 'UA-93014135-3',
-				anonymizeIP: true,
-			  },
 			colorMode: {
 				defaultMode: 'light',
 				disableSwitch: true,
 				respectPrefersColorScheme: false,
-				switchConfig: {
-					darkIcon: '🌙',
-					darkIconStyle: {
-						marginLeft: '2px',
-					},
-					// Unicode icons such as '\u2600' will work
-					// Unicode with 5 chars require brackets: '\u{1F602}'
-					lightIcon: '\u{1F602}',
-					lightIconStyle: {
-						marginLeft: '1px',
-					},
-				},
+// The following value has been deprecated and will need to be re-implemented when dark mode is implemented
+				// switchConfig: {
+				// 	darkIcon: '🌙',
+				// 	darkIconStyle: {
+				// 		marginLeft: '2px',
+				// 	},
+				// 	// Unicode icons such as '\u2600' will work
+				// 	// Unicode with 5 chars require brackets: '\u{1F602}'
+				// 	lightIcon: '\u{1F602}',
+				// 	lightIconStyle: {
+				// 		marginLeft: '1px',
+				// 	},
+				// },
 			},
 			navbar: {
 				logo: {

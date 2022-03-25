@@ -1,27 +1,29 @@
 # Website
 
-The Taqueria website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+The Taqueria website is based on [Docusaurus 2](https://docusaurus.io/), a modern static website generator that uses Yarn as a package manager and build tool
 
-### Installation
+The generated site is deployed to [http://taqueria.io](https://taqueria.io), but can also be built and served locally
 
+## How to Run the Website Locally
+
+### Requirements
+- Yarn v1.2 or later
+- Node.js v16 or later
+
+### Install dependencies
+```shell
+$ yarn
 ```
-$ npm install
+This command downloads the dependincies and plugins required by the site
+
+### Build the Site
+```shell
+$ yarn build
 ```
+This command runs a parser and pre-processor, then generates the static site content into the `build` directory
 
-### Local Development
-
+### Launch the Site
+```shell
+$ yarn start
 ```
-$ npm start
-```
-
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
-
-### Build
-
-```
-$ npm build
-```
-
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
-
-## Notes
+This command will serve the website on [localhost:3000](http://localhost:3000)
