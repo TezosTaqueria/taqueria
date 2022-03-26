@@ -4,7 +4,6 @@ import {execSync} from "child_process";
 import path from "path";
 import waitForExpect from "wait-for-expect";
 import { TezosToolkit } from '@taquito/taquito';
-import axios from "axios";
 
 
 describe("E2E Testing for taqueria taquito plugin",  () => {
@@ -20,7 +19,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     // TODO: Consider in future to use keygen service to update account balance programmatically
     // https://github.com/ecadlabs/taqueria/issues/378
-    test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
+    test.skip('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
         try {
             environment = "test";
             let smartContractHash = "";
