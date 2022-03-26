@@ -41,6 +41,12 @@ export const generateTypes = <T>(parsedArgs: Opts): LikeAPromise<ActionResponse,
     console.log = (message:string, data?:unknown) => {
         strOutLog.push(`${message}${data?`\n${JSON.stringify(data,null,2)}`:''}`);
     }
+    console.error = (message:string, data?:unknown) => {
+        console.log(`ERROR: ${message}`, data);
+    }
+    console.warn = (message:string, data?:unknown) => {
+        console.log(`WARN: ${message}`, data);
+    }
     console.log('generateTypes', { 
         typescriptDir: parsedArgs.typescriptDir
     });
