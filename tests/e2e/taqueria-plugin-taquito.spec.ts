@@ -1,10 +1,8 @@
 import { generateTestProject } from "./utils/utils";
-import fs from "fs"
 import fsPromises from "fs/promises"
 import { exec as exec1, execSync } from "child_process"
 import util from "util"
 const exec = util.promisify(exec1)
-import path from "path";
 import waitForExpect from "wait-for-expect";
 import { TezosToolkit } from '@taquito/taquito';
 
@@ -45,10 +43,6 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
                 await new Promise(resolve => setTimeout(resolve, 25000))
                 return deployResponse
             })
-            console.log(deployCommand)
-
-            // const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
-            // console.log(deployResponse)
 
             // 3. Verify that contract has been originated on the network
             expect(deployCommand).toContain("hello-tacos.tz");
@@ -59,15 +53,6 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             expect(smartContractHash).toMatch(contractRegex);
 
             // 4. Verify that contract has been originated to the network
-            const stuff = await tezos.contract.at(smartContractHash)
-            console.log(stuff)
-
-
-
-
-            // await waitForExpect( async () => {
-            //     expect((await tezos.contract.at(smartContractHash)).address).toBe(smartContractHash)
-            // }, 60000, 1000)
             const contract = await tezos.contract.at(smartContractHash)
             expect(contract.address).toBe(smartContractHash);
 
