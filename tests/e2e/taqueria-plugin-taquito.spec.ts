@@ -37,8 +37,6 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // 2. Run taq deploy on a selected test network described in "test" environment
             // const deployCommand = 
             const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).then(async (resp) => {
-                console.log(resp.stdout)
-                console.log(resp.stdout.trim().split(/\r?\n/)[3])
                 const deployResponse = resp.stdout.trim().split(/\r?\n/)[3]
                 await new Promise(resolve => setTimeout(resolve, 30000))
                 return deployResponse
