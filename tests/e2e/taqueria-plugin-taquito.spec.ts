@@ -37,23 +37,30 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // Uses retry mechanism to avoid test to fail
 
             // 2. Run taq deploy on a selected test network described in "test" environment
-            const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
-            console.log(deployCommand.stdout)
-            await new Promise(resolve => setTimeout(resolve, 25000))
-            const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
-            console.log(deployResponse)
+            // const deployCommand = 
+            const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).then(async (resp) => {
+                console.log(resp.stdout)
+                console.log(resp.stdout.trim().split(/\r?\n/)[3])
+                const deployResponse = resp.stdout.trim().split(/\r?\n/)[3]
+                await new Promise(resolve => setTimeout(resolve, 25000))
+                return deployResponse
+            })
+            console.log(deployCommand)
+
+            // const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
+            // console.log(deployResponse)
 
             // 3. Verify that contract has been originated on the network
-            expect(deployResponse).toContain("hello-tacos.tz");
-            expect(deployResponse).toContain("hangzhounet");
-            const contractHash = deployResponse.split("│")[2];
+            expect(deployCommand).toContain("hello-tacos.tz");
+            expect(deployCommand).toContain("hangzhounet");
+            const contractHash = deployCommand.split("│")[2];
 
             smartContractHash = contractHash.trim();
             expect(smartContractHash).toMatch(contractRegex);
 
             // 4. Verify that contract has been originated to the network
-            // const stuff = await tezos.contract.at(smartContractHash)
-            // console.log(stuff)
+            const stuff = await tezos.contract.at(smartContractHash)
+            console.log(stuff)
 
 
 
