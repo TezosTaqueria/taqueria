@@ -20,7 +20,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     // TODO: Consider in future to use keygen service to update account balance programmatically
     // https://github.com/ecadlabs/taqueria/issues/378
-    test.only('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
+    test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
         try {
             environment = "test";
             let smartContractHash = "";
@@ -40,7 +40,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
                 console.log(resp.stdout)
                 console.log(resp.stdout.trim().split(/\r?\n/)[3])
                 const deployResponse = resp.stdout.trim().split(/\r?\n/)[3]
-                await new Promise(resolve => setTimeout(resolve, 25000))
+                await new Promise(resolve => setTimeout(resolve, 30000))
                 return deployResponse
             })
 
