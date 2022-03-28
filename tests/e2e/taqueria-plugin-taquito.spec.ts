@@ -174,7 +174,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
 
         } catch(error) {
-            // 3. Verify that proper error displays in the console
+            // 3. Verify that proper error is displayed in the console
             expect(error).toContain("No environment configured in your configuration file called tes");
         }
 
