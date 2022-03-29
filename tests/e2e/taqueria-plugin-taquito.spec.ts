@@ -38,7 +38,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // const deployCommand = 
             const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).then(async (resp) => {
                 const deployResponse = resp.stdout.trim().split(/\r?\n/)[3]
-                await new Promise(resolve => setTimeout(resolve, 30000))
+                await new Promise(resolve => setTimeout(resolve, 45000))
                 return deployResponse
             })
 
