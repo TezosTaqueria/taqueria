@@ -19,7 +19,6 @@ jobs:
       security-events: write
 
     strategy:
-      fail-fast: true
       matrix:
         language:
           - javascript
