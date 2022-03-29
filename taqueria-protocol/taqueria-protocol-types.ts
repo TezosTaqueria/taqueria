@@ -82,7 +82,7 @@ const commandType: unique symbol = Symbol()
 export class Command extends StringLike {
     [commandType]: void
     static create(value: string) : Command | undefined {
-        if (value.match(/^([A-Za-z-_ ]+ ?)((\[[^\]\[\n]*\] ?)|(<[^<>\n]+>) ?)*$/)) {
+        if (value.match(/^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/)) {
             return new Command(value)
         }
         return undefined   
