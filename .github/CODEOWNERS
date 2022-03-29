@@ -1,5 +1,5 @@
 # Set the global owners for the taqueria repository
-*       @mweichert @jevonearth
+*  @ecadlabs/taqueria
 
 # Set the SRE team as code owners for all github workflows
 /.github/workflows/    @ecadlabs/sre
