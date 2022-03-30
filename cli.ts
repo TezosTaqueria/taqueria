@@ -14,7 +14,7 @@ import { titleCase } from "https://deno.land/x/case@2.1.1/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
 import * as NPM from './npm.ts'
 import inject from './plugins.ts'
-import { match, __ } from 'https://esm.sh/ts-pattern@3.3.5';
+import { match, __ } from 'https://cdn.esm.sh/v74/ts-pattern@3.3.5/deno/ts-pattern.js';
 
 // Get utils
 const {
