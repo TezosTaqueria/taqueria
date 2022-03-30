@@ -124,9 +124,10 @@ export interface SanitizedArgs {
     testsDir: string
     artifactsDir: string
     debug: boolean
+    setBuild: string
     maxConcurrency: number
-    version: string,
-    build: string,
+    version: string
+    build: string
     task?: string
     
 }
