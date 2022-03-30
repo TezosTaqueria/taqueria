@@ -24,6 +24,7 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2

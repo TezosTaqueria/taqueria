@@ -1,11 +1,14 @@
 import {generateTestProject} from "./utils/utils";
 import fs from "fs";
-import {execSync} from "child_process";
+import {execSync, exec as exec1} from "child_process";
 import path from "path";
 import waitForExpect from "wait-for-expect";
 import { TezosToolkit } from '@taquito/taquito';
 import axios from "axios";
-
+import { stdout } from "process";
+import utils from 'util'
+import * as contents from './data/taquito-contents'
+const exec = utils.promisify(exec1)
 
 describe("E2E Testing for taqueria taquito plugin",  () => {
 
@@ -15,12 +18,12 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
     let environment: string;
 
     beforeAll(async () => {
-        await generateTestProject(taqueriaProjectPath, ["taquito"]);
+        await generateTestProject(taqueriaProjectPath, ["taquito"], true);
     })
 
     // TODO: Consider in future to use keygen service to update account balance programmatically
     // https://github.com/ecadlabs/taqueria/issues/378
-    test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
+    test.skip('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
         try {
             environment = "test";
             let smartContractHash = "";
@@ -61,9 +64,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     // TODO: Consider in future to use keygen service to update account balance programmatically
     // https://github.com/ecadlabs/taqueria/issues/378
-    // TODO: Issue to fix the it https://github.com/ecadlabs/taqueria/issues/387
-    // Issue to re-enable test once it's been fixed https://github.com/ecadlabs/taqueria/issues/388
-    test.skip('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
+    test('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
         try {
             environment = "test";
             let smartContractHash = "";
@@ -75,26 +76,22 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // Sometimes running two deploy commands in a short period of time cause an issue
             // More details about the error - "counter %x already used for contract %y"
             // It is applicable only for auto-tests that run very fast
-            // Uses retry mechanism to avoid test to fail
 
-            await waitForExpect(() => {
+             // 2. Run taq deploy ${contractName} on a selected test network described in "test" environment
+             const stdoutDeploy = execSync(`taq deploy hello-tacos.tz -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString()
 
-                // 2. Run taq deploy ${contractName} on a selected test network described in "test" environment
-                const stdoutDeploy = execSync(`taq deploy hello-tacos.tz -e ${environment} --logPluginCalls`, {cwd: `./${taqueriaProjectPath}`}).toString() // .trim().split(/\r?\n/)[3];
+             // 3. Get the KT address from the output
+             const matches = stdoutDeploy.match(/KT[^\s]+/m)
+             expect(matches).toHaveLength(1)
+             const address = matches ? matches[0] : 'Missing'
 
-                console.log(stdoutDeploy)
-                // 3. Verify that contract has been originated on the network
-                expect(stdoutDeploy).toContain("hello-tacos.tz");
-                expect(stdoutDeploy).toContain("hangzhounet");
-                const contractHash = stdoutDeploy.split("│")[2];
-                smartContractHash = contractHash.trim();
-                expect(contractHash.trim()).toMatch(contractRegex);
-            });
+             // 4. Verify that the table output matches what is expected
+             expect(stdoutDeploy).toBe(contents.originateSingleOutput(address))
 
-            // 4. Verify that contract has been originated to the network
+            // 5. Verify that contract has been originated to the network
             await waitForExpect(async () => {
-                const contract = await tezos.contract.at(smartContractHash);
-                expect(contract.address).toBe(smartContractHash);
+                const contract = await tezos.contract.at(address);
+                expect(contract.address).toBe(address);
             });
 
         } catch(error) {
@@ -113,6 +110,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
     // TODO: Consider in future to use keygen service to update account balance programmatically
     // https://github.com/ecadlabs/taqueria/issues/378
     // There is an issue with contract name https://github.com/ecadlabs/taqueria/issues/403
+    // There is also an issue with multiple origination operations: https://github.com/ecadlabs/taqueria/issues/512
     // There is an issue to re-enable test after the issue has been resolved - https://github.com/ecadlabs/taqueria/issues/404
     test.skip('Verify that taqueria taquito plugin can deploy multiple contracts using deploy command', async () => {
         try {
@@ -131,7 +129,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // Uses retry mechanism to avoid test to fail
             await waitForExpect(() => {
                 // 2. Run taq deploy on a network described in "test" environment
-                const stdoutDeploy = execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim().split(/\r?\n/);
+                const stdoutDeploy = execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString()
 
                 console.log(stdoutDeploy)
                 // 3. Verify that contracts have been originated on the network
@@ -176,7 +174,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
 
         } catch(error) {
-            // 3. Verify that proper error displays in the console
+            // 3. Verify that proper error is displayed in the console
             expect(error).toContain("No environment configured in your configuration file called tes");
         }
 
@@ -195,7 +193,9 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
             // 2. Run taq deploy on a network described in "test" environment
-            const stdoutDeploy = execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
+            const stdoutDeploy = await exec(`taq --inspect-brk deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
+
+            console.log(stdoutDeploy)
 
             // 3. Verify that proper error displays in the console
             expect(stdoutDeploy).toContain("E_INVALID_PLUGIN_RESPONSE");
