@@ -16,5 +16,8 @@
 <stop offset="0.8686" stop-color="#F9810C"/>
 <stop offset="0.9132" stop-color="#FA8601"/>
 </linearGradient>
+ <style type="text/css"><![CDATA[
+        #rect1 { fill: url(#Gradient1); }
+      ]]></style>
 </defs>
 </svg>
