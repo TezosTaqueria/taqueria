@@ -69,6 +69,8 @@ jobs:
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
+        # TODO: Remove once this issue is fixed:
+        # https://github.com/denoland/deno/issues/13904
         with:
           deno-version: "1.18.2"
 

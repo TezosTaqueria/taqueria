@@ -39,7 +39,6 @@
   },
   "workspaces": [
     "./taqueria*",
-    "./taqueria-plugin-flextesa/docker",
     "./tests"
   ]
 }

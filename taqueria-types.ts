@@ -2,8 +2,8 @@ import type {SanitizedPath, SanitizedAbsPath, SanitizedUrl} from './taqueria-uti
 import {SHA256} from './taqueria-utils/taqueria-utils-types.ts'
 import {Option, Config, ConfigArgs, PluginInfo, InstalledPlugin, Verb, UnvalidatedTask, Task, UnvalidatedNetwork, Network, } from './taqueria-protocol/taqueria-protocol-types.ts'
 import {mkdir, joinPaths, debug} from './taqueria-utils/taqueria-utils.ts'
-import {resolve, map, chain, attemptP, coalesce} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
-import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
+import {resolve, map} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts'
 
 export interface CommandArgs extends SanitizedInitArgs {
     plugin: string
@@ -50,12 +50,12 @@ export interface RawInitArgs {
     env: 'production' | 'development' | 'testing' | string
     quickstart: string
     disableState: boolean
-    logPluginCalls: boolean
+    logPluginRequests: boolean
     setBuild: string
     setVersion: string
     fromVsCode: boolean
-    version: boolean
-    build: boolean
+    version?: boolean
+    build?: boolean
 }
 
 export interface InstallPluginArgs extends RawInitArgs {
@@ -64,6 +64,7 @@ export interface InstallPluginArgs extends RawInitArgs {
 
 export type UninstallPluginArgs = InstallPluginArgs
 
+// TODO: Consolidate SanitizedInitArgs with SanitizedArgs from the SDK
 export interface SanitizedInitArgs {
     _: ['init' | 'install' | 'uninstall' | 'scaffold' | string]
     projectDir: SanitizedAbsPath
@@ -76,7 +77,7 @@ export interface SanitizedInitArgs {
     env: 'production' | 'development' | 'testing' | string
     quickstart: string
     disableState: boolean
-    logPluginCalls: boolean
+    logPluginRequests: boolean
     setBuild: string
     setVersion: string
     fromVsCode: boolean
@@ -235,4 +236,24 @@ export class State {
         const taskMap = this.mapTasksToPlugins(config, pluginInfo, i18n)
         return new State(build, config.hash, taskMap, [], pluginInfo)
     }
+}
+
+export type CLIConfig = ReturnType<typeof yargs> & {
+    handled?: boolean
+}
+
+export type PluginRequestArgs = (string|number|boolean)[]
+
+// Common dependencies before we retrieved the config
+export interface PreExtendDeps {
+    readonly parsedArgs: SanitizedInitArgs
+    readonly env: EnvVars
+    readonly i18n: i18n
+    readonly stdout: Deno.Writer
+    readonly stderr: Deno.Writer
+}
+
+// Common dependencies after we retrieved the config
+export interface PluginDeps extends PreExtendDeps {
+    readonly config: ConfigArgs
 }
