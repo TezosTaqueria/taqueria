@@ -28,7 +28,8 @@ Plugin.create(i18n => ({
                     description: "Enable type inference"
                 })
             ],
-            handler: 'proxy'
+            handler: 'proxy',
+            encoding: 'json'
         })
     ],
     checkRuntimeDependencies: (_) => Promise.resolve({

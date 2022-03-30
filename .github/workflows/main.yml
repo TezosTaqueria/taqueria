@@ -20,6 +20,7 @@ jobs:
   # This job creates boolean outputs based on path filters. These outputs can then be used as job conditions
   detect-changes:
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     outputs:
       vscode: ${{ steps.filter.outputs.vscode }}
     steps:
@@ -35,7 +36,8 @@ jobs:
       contents: 'read'
       id-token: 'write'
     runs-on: ${{ matrix.os }}
-    if: github.event_name != 'release'
+    if: ${{ github.event_name != 'release' &&
+            !github.event.pull_request.head.repo.fork }}
     strategy:
       fail-fast: true
       matrix:
@@ -67,6 +69,8 @@ jobs:
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
+        # TODO: Remove once this issue is fixed:
+        # https://github.com/denoland/deno/issues/13904
         with:
           deno-version: "1.18.2"
 
@@ -105,6 +109,7 @@ jobs:
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
   publish-protocol-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-protocol
@@ -112,6 +117,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-sdk-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-protocol-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -120,6 +126,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-ligo-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -128,6 +135,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
   
   publish-smartpy-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -136,6 +144,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-taquito-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -144,6 +153,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-flextesa-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs:
       - publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
@@ -153,6 +163,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-contract-types-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -161,10 +172,10 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   run-tests:
+    runs-on: ubuntu-latest
     needs: 
       - build-binaries
-    runs-on: ubuntu-latest
-
+    if: ${{ always() && !(contains(needs.*.result, 'failure')) }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -175,11 +186,24 @@ jobs:
         with:
           deno-version: "1.18.2"
 
-      - name: get binary and make executable from previous step for tests
+      - name: download the binary from the build-binaries job and make it executable
         run: |
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
+        if: ${{ !github.event.pull_request.head.repo.fork }}
+
+      - name: build binary and make executable
+        env:
+          TAQ_VERSION: ${{ github.ref_name }}
+          DENO_DIR: "./deno"
+        run: |
+          COMMIT=`git rev-parse --short "$GITHUB_SHA"`
+          deno compile --output taq --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$TAQ_VERSION/$COMMIT" --setVersion "$TAQ_VERSION"
+          [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]] 
+          chmod +x taq
+          echo "$(pwd)" >> $GITHUB_PATH
+        if: ${{ github.event.pull_request.head.repo.fork }}
 
       - name: install dependencies
         run: npm ci
@@ -198,12 +222,22 @@ jobs:
       - name: Run e2e tests
         run: |
           npm run test:e2e -w tests
+  
+      - name: Report Status
+        uses: ravsamhq/notify-slack-action@v1
+        if: always()
+        with:
+          status: ${{ job.status }} # required
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
   vscode-extension-workflow:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.vscode == 'true' || 
+    if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
             github.event_name == 'release' || 
-            startsWith(github.ref, 'refs/tags/v')}}
+            startsWith(github.ref, 'refs/tags/v')) &&
+            !github.event.pull_request.head.repo.fork }}
     uses: ./.github/workflows/vscode-extension.yml
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
@@ -215,7 +249,8 @@ jobs:
     # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
     if: ${{ always() &&
             !(contains(needs.*.result, 'failure')) && 
-            github.event_name == 'pull_request'}}
+            github.event_name == 'pull_request' &&
+            !github.event.pull_request.head.repo.fork }}
     needs: 
       - build-binaries
       - publish-protocol-to-npm
@@ -344,7 +379,8 @@ jobs:
       - publish-flextesa-plugin-to-npm
       - publish-contract-types-plugin-to-npm
       - vscode-extension-workflow
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: ${{ startsWith(github.ref, 'refs/tags/v') &&
+            !github.event.pull_request.head.repo.fork }}
     steps:
       - uses: actions/checkout@v2
 
