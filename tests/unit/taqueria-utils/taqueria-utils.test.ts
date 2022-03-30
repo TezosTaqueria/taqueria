@@ -2,7 +2,7 @@ import { assertEquals, assertRejects, unreachable, assert } from "https://deno.l
 import {fork, mapRej, promise} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {inject} from "../../../taqueria-utils/taqueria-utils.ts";
 import chai from "https://cdn.skypack.dev/chai@4.3.4?dts";
-import { exists} from "https://deno.land/std/fs/mod.ts";
+import { exists} from "https://deno.land/std@0.132.0/fs/mod.ts";
 import {TaqError, SanitizedAbsPath} from "../../../taqueria-utils/taqueria-utils-types.ts";
 import {MockWriter} from "../helpers.ts"
 const {

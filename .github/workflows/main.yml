@@ -69,6 +69,10 @@ jobs:
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
+        # TODO: Remove once this issue is fixed:
+        # https://github.com/denoland/deno/issues/13904
+        with:
+          deno-version: "1.18.2"
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
       ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
