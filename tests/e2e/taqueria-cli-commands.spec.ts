@@ -81,7 +81,14 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigo)
@@ -94,7 +101,15 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the smartpy plugin exposes the associated commands in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const smartpyHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpy)
 
@@ -106,7 +121,14 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the taquito plugin exposes the associated commands in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-taquito -p ${taqueriaProjectPath}`)
+            
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const taquitoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquito)
@@ -119,7 +141,14 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the flextesa plugin exposes the associated commands in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const flextesaHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesa)
@@ -132,8 +161,15 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
-            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`)
+            
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoSmartpy)

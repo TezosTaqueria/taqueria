@@ -28,7 +28,8 @@ Deno.test('inject()', async (t) => {
         scaffoldUrl: SanitizedUrl.create("http://foo.bar") as SanitizedUrl,
         setBuild: "foo/bar",
         setVersion: "1.0.0",
-        version: false
+        version: false,
+        help: false
     }
 
     const config = await toPromise (toConfigArgs(
@@ -77,6 +78,8 @@ Deno.test('inject()', async (t) => {
             "'foo/bar'",
             "--setVersion",
             "'1.0.0'",
+            "--help",
+            false,
             "--foo",
             "'bar'",
             "--bar",
