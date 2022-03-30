@@ -2,19 +2,19 @@ import type {InstalledPlugin, ConfigArgs, Alias, Option, PositionalArg, PluginAc
 import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, CLIConfig} from './taqueria-types.ts'
 import {State, InternalTaskOutput} from './taqueria-types.ts'
-import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
-import yargs from 'https://deno.land/x/yargs/deno.ts'
+import type {Arguments} from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts'
+import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts'
 import {map, chain, attemptP, mapRej, resolve, forkCatch, parallel, debugMode, reject, bichain} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import * as utils from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, SanitizedUrl, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
-import { titleCase } from "https://deno.land/x/case/mod.ts";
+import { titleCase } from "https://deno.land/x/case@2.1.1/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
 import * as NPM from './npm.ts'
 import inject from './plugins.ts'
-import { match, __ } from 'https://esm.sh/ts-pattern';
+import { match, __ } from 'https://esm.sh/ts-pattern@3.3.5';
 
 // Get utils
 const {
@@ -27,6 +27,7 @@ const {
     gitClone,
     rm,
     log,
+    logInput,
     // debug
 } = utils.inject({
     stdout: Deno.stdout,
@@ -167,7 +168,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         'testFromVsCode',
         false,
         () => {},
-        () => console.log("OK")
+        () => log("OK")
     )
     .help(false)
 
@@ -273,7 +274,7 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
 const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: SanitizedInitArgs) => pipe(
     // TODO: i18n of messages
     // Clone git into destination folder (Initial version assumes git is installed)
-    log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}`)(null),
+    log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}`),
     _ => ensurePathDoesNotExist(scaffoldProjectDir.value),
     chain(gitClone(scaffoldUrl)),
     // TODO: Run initialization script
@@ -281,7 +282,7 @@ const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: Sani
     // log(`initializing...`),
     // Load .taq/scaffold.json (if it exists)
     // Run init command
-    map(log(`Cleanup...`)),
+    map(_ => log(`Cleanup...`)),
     chain(_ => rm(scaffoldProjectDir.join(`.taq/scaffold.json`))),
     bichain<TaqError,TaqError,SanitizedAbsPath>
         (err => err.kind === 'E_INVALID_PATH_DOES_NOT_EXIST' ? resolve(scaffoldProjectDir) : reject(err))
@@ -384,7 +385,7 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
         handler: (inputArgs: Record<string, unknown>) => {
             cliConfig.handled = true
             if (Array.isArray(task.handler)) {
-                console.log("This is a composite task!")
+                log("This is a composite task!")
                 return;
             }
             
@@ -416,7 +417,7 @@ const renderPluginJsonRes = (decoded: PluginJsonResponse) => {
             renderTable((decoded.data ? decoded.data as Record<string, string>[] : []))
             break
         case "string":
-            console.log(decoded.data)
+            log(decoded.data as string)
             break
     }
 }
@@ -505,7 +506,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
             cliConfig,
             parseArgs,
             map (sanitizeArgs),
-            chain<TaqError, SanitizedInitArgs, InternalTaskOutput|never>(initArgs => {
+            chain<TaqError, SanitizedInitArgs, InternalTaskOutput|never>((initArgs: SanitizedInitArgs) => {
                 if (initArgs.debug) debugMode(true)
 
                 if (initArgs.version) {
@@ -567,32 +568,37 @@ export const displayOutput = (output: InternalTaskOutput|never) => {
 
 export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
     const inputArgs = (cli.parsed as unknown as {argv: RawInitArgs}).argv
-    if (!inputArgs.fromVsCode) {
+    if (inputArgs.help) {
+        cli.getInternalMethods().getUsageInstance().showHelp('log')
+    }
+    else if (!inputArgs.fromVsCode) {
         console.error("") // empty line
-        cli.getInternalMethods().getCommandInstance().usage.showHelp()
+        cli.getInternalMethods().getUsageInstance().showHelp('error')
         console.error("") // empty line
     }
 
-    const res = match(err)
-        .with({kind: 'E_FORK'}, err                         => [125, err.msg])
-        .with({kind: 'E_INVALID_CONFIG'}, err               => [1, err.msg])
-        .with({kind: 'E_INVALID_PATH_ALREADY_EXISTS'}, err  => [3, `${err.msg}: ${err.context}`])
-        .with({kind: 'E_INVALID_PATH_DOES_NOT_EXIST'}, err  => [4, `${err.msg}: ${err.context}`])
-        .with({kind: 'E_INVALID_TASK'}, err                 => [5, err.msg])
-        .with({kind: 'E_INVALID_PLUGIN_RESPONSE'}, err      => [6, err.msg])
-        .with({kind: 'E_MKDIR_FAILED'}, err                 => [7, `${err.msg}: ${err.context}`])
-        .with({kind: 'E_NPM_INIT'}, err                     => [8, err.msg])
-        .with({kind: 'E_READFILE'}, err                     => [9, err.msg])
-        .with({kind: 'GIT_CLONE_FAILED'}, err               => [10, err.msg])
-        .with({kind: 'E_INVALID_ARGS'}, err                 => [11, err.msg])
-        .with({kind: 'E_INVALID_JSON'}, err                 => [12, err])
-        .with({kind: 'E_PLUGIN_NAME_REQUIRED'}, err         => [13, err.msg])
-        .with({message: __.string}, err                     => [128, err.message])
-        .exhaustive()
+    if (!inputArgs.help) {
+        const res = match(err)
+            .with({kind: 'E_FORK'}, err                         => [125, err.msg])
+            .with({kind: 'E_INVALID_CONFIG'}, err               => [1, err.msg])
+            .with({kind: 'E_INVALID_PATH_ALREADY_EXISTS'}, err  => [3, `${err.msg}: ${err.context}`])
+            .with({kind: 'E_INVALID_PATH_DOES_NOT_EXIST'}, err  => [4, `${err.msg}: ${err.context}`])
+            .with({kind: 'E_INVALID_TASK'}, err                 => [5, err.msg])
+            .with({kind: 'E_INVALID_PLUGIN_RESPONSE'}, err      => [6, err.msg])
+            .with({kind: 'E_MKDIR_FAILED'}, err                 => [7, `${err.msg}: ${err.context}`])
+            .with({kind: 'E_NPM_INIT'}, err                     => [8, err.msg])
+            .with({kind: 'E_READFILE'}, err                     => [9, err.msg])
+            .with({kind: 'GIT_CLONE_FAILED'}, err               => [10, err.msg])
+            .with({kind: 'E_INVALID_ARGS'}, err                 => [11, err.msg])
+            .with({kind: 'E_INVALID_JSON'}, err                 => [12, err])
+            .with({kind: 'E_PLUGIN_NAME_REQUIRED'}, err         => [13, err.msg])
+            .with({message: __.string}, err                     => [128, err.message])
+            .exhaustive()
     
-    const [exitCode, msg] = res
-    console.error(inputArgs.debug ? err : msg)
-    Deno.exit(exitCode as number)
+        const [exitCode, msg] = res
+        console.error(inputArgs.debug ? err : msg)
+        Deno.exit(exitCode as number)
+    }
 }
 
 const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
@@ -612,7 +618,8 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     version: parsedArgs.version ?? false ,
     build: parsedArgs.build ?? false,
     scaffoldUrl: SanitizedUrl.create(parsedArgs.scaffoldUrl ? parsedArgs.scaffoldUrl : ''),
-    scaffoldProjectDir: SanitizedAbsPath.create(parsedArgs.scaffoldProjectDir ? parsedArgs.scaffoldProjectDir : '')
+    scaffoldProjectDir: SanitizedAbsPath.create(parsedArgs.scaffoldProjectDir ? parsedArgs.scaffoldProjectDir : ''),
+    help: parsedArgs.help ?? false
 })
 
 export default {

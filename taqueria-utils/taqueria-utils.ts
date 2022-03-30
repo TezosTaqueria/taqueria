@@ -134,17 +134,17 @@ export const inject = (deps: UtilsDependencies) => {
 
     const {stdout, stderr} = deps
 
-    const log = <T>(message: string) => (input: T) : T => {
+    const log = (message: string) => {
         const encoder = new TextEncoder()
         stdout.write(encoder.encode(`${message}\n`))
-        return input
     }
 
     const logInput = <T>(message: string) => (input: T) : T => {
         const encoder = new TextEncoder()
+        const data = typeof(input) === 'object' ? JSON.stringify(input, null, 4) : input
         stdout.write(encoder.encode(`${message}\n`))
-        stdout.write(encoder.encode(`${input}\n`))
-        return input
+        stdout.write(encoder.encode(`${data}\n`))
+        return input as T
     }
 
     const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => pipe(

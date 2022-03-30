@@ -3,7 +3,7 @@ import {SHA256} from './taqueria-utils/taqueria-utils-types.ts'
 import {Option, Config, ConfigArgs, PluginInfo, InstalledPlugin, Verb, UnvalidatedTask, Task, UnvalidatedNetwork, Network, } from './taqueria-protocol/taqueria-protocol-types.ts'
 import {mkdir, joinPaths, debug} from './taqueria-utils/taqueria-utils.ts'
 import {resolve, map} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
-import yargs from 'https://deno.land/x/yargs/deno.ts'
+import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts'
 
 export interface CommandArgs extends SanitizedInitArgs {
     plugin: string
@@ -56,6 +56,7 @@ export interface RawInitArgs {
     fromVsCode: boolean
     version?: boolean
     build?: boolean
+    help: boolean
 }
 
 // TODO: Consolidate SanitizedInitArgs with SanitizedArgs from the SDK
@@ -78,6 +79,7 @@ export interface SanitizedInitArgs {
     version: boolean
     build: boolean
     pluginName?: string
+    help: boolean
 }
 
 export interface i18n {

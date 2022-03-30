@@ -23,7 +23,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     // TODO: Consider in future to use keygen service to update account balance programmatically
     // https://github.com/ecadlabs/taqueria/issues/378
-    test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
+    test.skip('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
         try {
             environment = "test";
             let smartContractHash = "";
@@ -174,7 +174,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
 
         } catch(error) {
-            // 3. Verify that proper error displays in the console
+            // 3. Verify that proper error is displayed in the console
             expect(error).toContain("No environment configured in your configuration file called tes");
         }
 

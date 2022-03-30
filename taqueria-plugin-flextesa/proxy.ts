@@ -15,7 +15,7 @@ const attributesToParams = (attributes: Attributes): Record<string, string> => [
     {}
 )
 
-const getDockerImage = () => 'ghcr.io/ecadlabs/taqueria-flextesa:latest'
+const getDockerImage = (build:string) => `ghcr.io/ecadlabs/taqueria-flextesa:${build}`
 
 const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string, debug:boolean): string => {
     const _envVars = Object.entries(attributesToParams(sandbox.attributes)).reduce(
@@ -51,7 +51,7 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<void> => {
             running => running
                 ? sendAsyncRes("Already running.")
                 : getArch()
-                    .then(arch => getStartCommand(sandbox, getDockerImage(), opts, arch, opts.debug)) 
+                    .then(arch => getStartCommand(sandbox, getDockerImage(opts.setBuild), opts, arch, opts.debug)) 
                     .then(execCmd)
                     .then(({stderr}) => {
                         if (opts.debug && stderr) sendErr(stderr)
@@ -190,16 +190,22 @@ const getAccountBalances =(sandbox: Sandbox): Promise<AccountBalance[]> => {
                 getArch()
                 .then(_ => `docker exec ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
                 .then(execCmd)
-                .then(({stdout}) => ({
-                    account: accountName, 
-                    balance: stdout.trim(),
-                    address: (accountDetails as AccountDetails).keys?.publicKeyHash
-                }))
-                .catch((err: ExecException) => ({
-                    account: accountName,
-                    balance: err.message,
-                    address: (accountDetails as AccountDetails).keys?.publicKeyHash
-                }))
+                .then(({stdout, stderr}) => {
+                    if (stderr.length > 0) sendErr(stderr)
+                    return {
+                        account: accountName, 
+                        balance: stdout.trim(),
+                        address: (accountDetails as AccountDetails).keys?.publicKeyHash
+                    }
+                })
+                .catch((err: ExecException) => {
+                    sendErr(err.message)
+                    return {
+                        account: accountName,
+                        balance: "Error",
+                        address: (accountDetails as AccountDetails).keys?.publicKeyHash
+                    }
+                })
             return [...retval, getBalanceProcess]
         },
         []

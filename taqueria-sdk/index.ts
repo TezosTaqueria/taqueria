@@ -324,8 +324,8 @@ export const Plugin = {
         return parseArgs(unparsedArgs)
         .then(sanitizeArgs)
         .then(getResponse(definer, inferPluginName(stack)))
-        .catch(err => {
-            console.error(err)
+        .catch((err: unknown) => {
+            if (err) console.error(err)
             process.exit(1)
         })
     }

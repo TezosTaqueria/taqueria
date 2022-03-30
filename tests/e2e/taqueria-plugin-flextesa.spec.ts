@@ -92,6 +92,9 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             execSync(`taq start sandbox`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
 
             // 2. Run list accounts command and verify that it returns list of default accounts
+            // There is a delay between taq start sandbox and container to be fully up and running
+            // There is an issue associated with it -https://github.com/ecadlabs/taqueria/issues/225
+            // That is why calling list of accounts is wrapped inside retry mechanism to repeat it few times before failing
             await waitForExpect(() => {
                 const stdoutList = execSync(`taq list accounts ${dockerName}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
                 expect(stdoutList).toContain("bob");

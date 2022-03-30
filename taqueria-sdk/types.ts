@@ -125,10 +125,9 @@ export interface SanitizedArgs {
     artifactsDir: string
     debug: boolean
     maxConcurrency: number
-    version: string,
-    build: string,
+    version: string
+    build: string
     task?: string
-    
 }
 
 export interface StdIO {
