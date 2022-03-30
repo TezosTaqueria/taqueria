@@ -56,6 +56,7 @@ export interface RawInitArgs {
     fromVsCode: boolean
     version?: boolean
     build?: boolean
+    help: boolean
 }
 
 export interface InstallPluginArgs extends RawInitArgs {
@@ -84,6 +85,7 @@ export interface SanitizedInitArgs {
     version: boolean
     build: boolean
     pluginName?: string
+    help: boolean
 }
 
 export interface i18n {
