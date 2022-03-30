@@ -2,19 +2,19 @@ import type {InstalledPlugin, Config, ConfigArgs, Alias, Option, PositionalArg, 
 import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs, CLIConfig} from './taqueria-types.ts'
 import {State} from './taqueria-types.ts'
-import type {Arguments} from 'https://deno.land/x/yargs/deno-types.ts'
-import yargs from 'https://deno.land/x/yargs/deno.ts'
+import type {Arguments} from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts'
+import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts'
 import {map, chain, attemptP, mapRej, resolve, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import * as utils from './taqueria-utils/taqueria-utils.ts'
 import {SanitizedAbsPath, SanitizedPath, SanitizedUrl, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
-import { titleCase } from "https://deno.land/x/case/mod.ts";
+import { titleCase } from "https://deno.land/x/case@2.1.1/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
 import * as NPM from './npm.ts'
 import inject from './plugins.ts'
-import { match, __ } from 'https://esm.sh/ts-pattern';
+import { match, __ } from 'https://esm.sh/ts-pattern@3.3.5';
 
 // Get utils
 const {

@@ -1,4 +1,4 @@
-import i18next from 'https://deno.land/x/i18next/index.js'
+import i18next from 'https://deno.land/x/i18next@v21.6.14/index.js'
 
 // TODO: i18next is feature-rich, but rather large. Determine whether you need all of the functionality
 await i18next.init({
