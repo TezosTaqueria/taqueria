@@ -32,6 +32,9 @@ export const generateTestProject = async (projectPath: string, packageNames: str
                 if (localPackages) {
                     const cwd = execSync(`pwd`).toString()
                     console.log(cwd)
+                    execSync(`cd ./${projectPath}`).toString()
+                    const cwd2 = execSync(`pwd`).toString()
+                    console.log(cwd2)
                     execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`)
                 } else {
                     execSync(`cd ./${projectPath} && taq install @taqueria/plugin-${packageName}`)
