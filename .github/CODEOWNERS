@@ -9,3 +9,6 @@
 
 # Add Taqueria team as code owners for readme.md
 /readme.md @ecadlabs/taqueria
+
+# Add SDET team as code owners for tests directory in taqueria
+/tests/ @ecadlabs/sdet 
