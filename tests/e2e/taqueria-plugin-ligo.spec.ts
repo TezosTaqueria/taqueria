@@ -1,7 +1,10 @@
 import {checkFolderExistsWithTimeout, generateTestProject} from "./utils/utils";
 import fs from "fs";
-import {execSync} from "child_process";
+import {execSync, exec as exec1} from "child_process";
 import path from "path";
+import util from "util"
+import * as contents from './data/ligo-contents'
+const exec = util.promisify(exec1)
 
 const taqueriaProjectPath = 'e2e/auto-test-ligo-plugin';
 
@@ -25,7 +28,6 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
-
     });
 
     test('Verify that taqueria ligo plugin can compile one contract using compile [sourceFile] command', async () => {
@@ -65,26 +67,35 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
 
     });
 
-    // TODO: Currently it cannot be done until the output will be places to stdout
-    // Issue to implement the test: https://github.com/ecadlabs/taqueria/issues/373
-    // Related developer issue: https://github.com/ecadlabs/taqueria/issues/372
-    test.skip('Verify that taqueria ligo plugin will display proper message if user tries to compile contract that does not exist', async () => {
+    test('Verify that taqueria ligo plugin will display proper message if user tries to compile contract that does not exist', async () => {
         try {
             // 1. Run taq compile ${contractName} for contract that does not exist
-            const stdout = execSync(`taq compile test.mligo`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();;
+            const {stdout, stderr} = await exec(`taq compile test.mligo`, {cwd: `./${taqueriaProjectPath}`})
 
             // 2. Verify that output includes next messages:
             // There was a compilation error.
             // contracts/test.mligo: No such file or directory
-            expect(stdout).toContain("There was a compilation error.");
-            expect(stdout).toContain("contracts/test.mligo: No such file or directory");
+            expect(stdout).toBe(contents.compileNonExistent)
+            expect(stderr).toContain("contracts/test.mligo: No such file or directory");
 
 
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
-
     });
+
+    test("Verify that taqueria ligo plugin emits error and yet displays table if contract is invalid", async () => {
+        try {
+            execSync(`cp e2e/data/invalid-contract.mligo ${taqueriaProjectPath}/contracts`)
+
+            const {stdout, stderr} = await exec(`taq compile invalid-contract.mligo`, {cwd: `./${taqueriaProjectPath}`})
+
+            expect(stdout).toBe(contents.compileInvalid)
+            expect(stderr).toContain("File \"contracts/invalid-contract.mligo\", line 1, characters 23-27");
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    })
 
     // Remove all files from artifacts folder without removing folder itself
     afterEach(() => {
@@ -102,7 +113,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     // Comment if need to debug
     afterAll(() => {
         try {
-            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+            fs.rmSync(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }

@@ -1,20 +1,25 @@
-import { assertEquals, assertRejects, unreachable } from "https://deno.land/std@0.121.0/testing/asserts.ts";
+import { assertEquals, assertRejects, unreachable, assert } from "https://deno.land/std@0.121.0/testing/asserts.ts";
 import {fork, mapRej, promise} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
-import {
+import {inject} from "../../../taqueria-utils/taqueria-utils.ts";
+import chai from "https://cdn.skypack.dev/chai@4.3.4?dts";
+import { exists} from "https://deno.land/std@0.132.0/fs/mod.ts";
+import {TaqError, SanitizedAbsPath} from "../../../taqueria-utils/taqueria-utils-types.ts";
+import {MockWriter} from "../helpers.ts"
+const {
     decodeJson,
     isTaqError,
-    log,
+    logInput,
     mkdir,
     renderTemplate,
-    writeTextFile
-} from "../../../taqueria-utils/taqueria-utils.ts";
-import chai from "https://cdn.skypack.dev/chai@4.3.4?dts";
-import { exists} from "https://deno.land/std/fs/mod.ts";
-import {TaqError, Future} from "../../../taqueria-utils/taqueria-utils-types.ts";
-
-const toPromise = <T>(future: Future<TaqError|Error, T>) => promise (
-    mapRej(taqError => taqError as Error) (future)
-)
+    writeTextFile,
+    execText,
+    toPromise,
+    stdout,
+    stderr
+} = inject({
+    stdout: new MockWriter(),
+    stderr: new MockWriter()
+})
 
 const testValidJson = '{"test": "testPayload"}';
 const testInvalidJson = '{"test": testPayload}';
@@ -44,22 +49,20 @@ Deno.test({ name: "Negative scenario test for {decodeJson} function", fn: () => 
             },
             Error, "The provided JSON could not be decoded."
         );
-    },
-    sanitizeResources: false,
-    sanitizeOps: false,
+    }
 });
 
-Deno.test("Positive scenario test for {log} function", () => {
+Deno.test("Positive scenario test for {logInput} function", () => {
     const assert = chai.assert;
-    const resultLogOneArgument = log("test");
+    const resultLogOneArgument = logInput("test");
     assert.typeOf(resultLogOneArgument, "Function", "Verify that log returns a function for first call");
-    const resultLogTwoArguments = log("test")("test");
+    const resultLogTwoArguments = logInput("test")("test");
     assert.equal(resultLogTwoArguments, "test", "log called twice should return second argument `test`");
 });
 
 Deno.test("Negative scenario test for {log} function", () => {
     const expect = chai.expect;
-    const result = log("test");
+    const result = logInput("test");
     expect(result).not.to.be.a("string")
 });
 
@@ -69,7 +72,7 @@ Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t: an
             const result = await toPromise(mkdir("./unit/taqueria-utils/data/test"));
             exists(result).then((result: any) => assert.equal(result, true));
         });
-        await t.step("clean up", async () => {
+        await t.step("clean up", () => {
             try {
                 Deno.removeSync('./unit/taqueria-utils/data/test');
             } catch (err) {
@@ -77,8 +80,7 @@ Deno.test({name: "Positive scenario test for {mkdir} function", fn: async (t: an
             }
         });
     },
-    sanitizeResources: false,
-    sanitizeOps: false
+    
 },);
 
 
@@ -88,7 +90,7 @@ Deno.test({ignore: true, name: "Positive scenario test for {writeTextFile} funct
             const result = await toPromise (writeTextFile("./unit/taqueria-utils/data/testWrite.txt")("testWrite"));
             assert.equal(result, './unit/taqueria-utils/data/testWrite.txt');
         });
-        await t.step("clean up", async () => {
+        await t.step("clean up", () => {
             try {
                 Deno.removeSync('./unit/taqueria-utils/data/testWrite.txt');
             } catch (err) {
@@ -100,7 +102,7 @@ Deno.test({ignore: true, name: "Positive scenario test for {writeTextFile} funct
     sanitizeOps: false
 })
 
-Deno.test({ignore: true, name: "Negative scenario test for {writeTextFile} function to catch error",  fn: async () => {
+Deno.test({ignore: true, name: "Negative scenario test for {writeTextFile} function to catch error",  fn: () => {
         assertRejects( ()=> {
             toPromise (writeTextFile("./unit/taqueria-utils/data/temp")("test"));
                 throw new Error("Is a directory (os error 21), open './unit/taqueria-utils/data/temp'\n")
@@ -112,10 +114,10 @@ Deno.test({ignore: true, name: "Negative scenario test for {writeTextFile} funct
     sanitizeOps: false
 });
 
-Deno.test({name: "Positive scenario test for {isTaqError} function",  fn: async () => {
+Deno.test({name: "Positive scenario test for {isTaqError} function",  fn: () => {
         const assert = chai.assert;
         const taqErrorTest : TaqError = {
-            kind: "E_INVALID_PATH",
+            kind: "E_FORK",
             msg: "Test"
         };
         const result = isTaqError(taqErrorTest);
@@ -126,7 +128,7 @@ Deno.test({name: "Positive scenario test for {isTaqError} function",  fn: async 
 });
 
 
-Deno.test({name: "Negative scenario test for {isTaqError} function",  fn: async () => {
+Deno.test({name: "Negative scenario test for {isTaqError} function",  fn: () => {
         const assert = chai.assert;
         const taqErrorTest = "error"
         const result = isTaqError(taqErrorTest);
@@ -136,7 +138,7 @@ Deno.test({name: "Negative scenario test for {isTaqError} function",  fn: async 
     sanitizeOps: false
 });
 
-Deno.test({name: "Positive scenario test for {renderTemplate} function",  fn: async () => {
+Deno.test({name: "Positive scenario test for {renderTemplate} function",  fn: () => {
         const assert = chai.assert;
         const testTemplate = "<p>My favorite kind of cake is: <%= it.favoriteCake %></p>";
         const result = renderTemplate(testTemplate, { favoriteCake: "Chocolate!" });
@@ -146,6 +148,62 @@ Deno.test({name: "Positive scenario test for {renderTemplate} function",  fn: as
     sanitizeOps: false
 });
 
+Deno.test("execText() can execute a command without buffering", async () => {
+    const stdOut = (stdout as MockWriter)
+    const stdErr = (stderr as MockWriter)
+    stdOut.clear()
+    stdErr.clear()
 
+    const retval = await toPromise ( execText("echo foobar", {}) )
+    assertEquals(retval, 0)
+    assertEquals(stdout.toString(), "foobar\n")
+    assertEquals(stderr.toString(), "")
+})
 
+Deno.test("execText() handles errors correctly", async () => {
+    const stdOut = (stdout as MockWriter)
+    const stdErr = (stderr as MockWriter)
+    stdOut.clear()
+    stdErr.clear()
 
+    const retval = await toPromise ( execText("node -e \"console.error('foobar'); process.exit(-1)\"", {}) )
+    assertEquals(retval, 255)
+    assertEquals(stdout.toString(), "")
+    assertEquals(stderr.toString(), "foobar\n")
+})
+
+Deno.test("execText() can parse ESJ templates", async () => {
+    const stdOut = (stdout as MockWriter)
+    const stdErr = (stderr as MockWriter)
+    stdOut.clear()
+    stdErr.clear()
+
+    const retval = await toPromise ( execText("echo <%= it.text%>", {text: "foobar"}) )
+    assertEquals(retval, 0)
+    assertEquals(stdout.toString(), "foobar\n")
+    assertEquals(stderr.toString(), "")  
+})
+
+Deno.test("execText() can buffer stdout", async () => {
+    const stdOut = (stdout as MockWriter)
+    const stdErr = (stderr as MockWriter)
+    stdOut.clear()
+    stdErr.clear()
+
+    const retval = await toPromise ( execText("echo <%= it.text%>", {text: "foobar"}, true) )
+    assertEquals(retval, "foobar\n")
+    assertEquals(stdout.toString(), "")
+    assertEquals(stderr.toString(), "")
+})
+
+Deno.test("execText() can execute in a different working directory", async () => {
+    const stdOut = (stdout as MockWriter)
+    const stdErr = (stderr as MockWriter)
+    stdOut.clear()
+    stdErr.clear()
+
+    const retval = await toPromise ( execText("pwd", {}, false, SanitizedAbsPath.create("/tmp") ) )
+    assertEquals(retval, 0)
+    assert(stdout.toString().includes('tmp'))
+    assertEquals(stderr.toString(), "")    
+})
