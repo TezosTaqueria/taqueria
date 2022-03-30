@@ -1,12 +1,9 @@
-import {Sandbox as theSandbox, execCmd, getArch} from '@taqueria/node-sdk'
-import type { SanitizedArgs, ProxyAction, Attributes, SandboxConfig, EconomicalProtocol, PluginResponse, Failure, LikeAPromise, Sandbox, AccountDetails } from "@taqueria/node-sdk/types"
-import retry from 'promise-retry'
+import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendAsyncRes, sendJsonRes} from '@taqueria/node-sdk'
+import type { SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO } from "@taqueria/node-sdk/types"
+import type {ExecException} from 'child_process'
+import retry from 'async-retry'
 
 type Opts = SanitizedArgs & {sandboxName?: string}
-
-const sleep = (milliseconds: number) => new Promise((resolve, _reject) => {
-    setTimeout(resolve, milliseconds)
-})
 
 const attributesToParams = (attributes: Attributes): Record<string, string> => ['blockTime'].reduce(
     (retval: Record<string, string>, attributeName: string) => {
@@ -18,107 +15,118 @@ const attributesToParams = (attributes: Attributes): Record<string, string> => [
     {}
 )
 
-const getDockerImage = () => 'ghcr.io/ecadlabs/taqueria-flextesa:latest'
+const getDockerImage = (build:string) => `ghcr.io/ecadlabs/taqueria-flextesa:${build}`
 
-const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
+const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string, debug:boolean): string => {
     const _envVars = Object.entries(attributesToParams(sandbox.attributes)).reduce(
         (retval, [key, val]) => `${retval} -e ${key} ${val} `,
         ""
     )
 
-    return `docker run --name ${sandbox.name} --rm --detach --platform ${arch} -p ${sandbox.rpcUrl.url.port}:20000 -v ${config.projectDir}:/project -w /app ${image} node startFlextesa.js --sandbox ${sandbox.name}`
+    const ports = debug
+        ? `-p ${sandbox.rpcUrl.url.port}:20000 -p 19229:9229`
+        : `-p ${sandbox.rpcUrl.url.port}:20000`
+
+    return `docker run --name ${sandbox.name} --rm --detach --platform ${arch} ${ports} -v ${config.projectDir}:/project -w /app ${image} node index.js --sandbox ${sandbox.name}`
 }
 
 const getConfigureCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
-    return `docker exec ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --configure`
+    return `docker exec ${sandbox.name} node index.js --sandbox ${sandbox.name} --configure`
 }
 
 const getImportAccountsCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
-    return `docker exec ${sandbox.name} node startFlextesa.js --sandbox ${sandbox.name} --importAccounts`
+    return `docker exec ${sandbox.name} node index.js --sandbox ${sandbox.name} --importAccounts`
 }
 
 const doesUseFlextesa = (sandbox: Sandbox) => !sandbox.plugin || sandbox.plugin === 'flextesa'
 
 const doesNotUseFlextesa = (sandbox: Sandbox) => !doesUseFlextesa(sandbox)
 
-const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<ProxyAction> => {
+const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<void> => {
+    debugger
     if (doesNotUseFlextesa(sandbox))
-        return Promise.resolve({
-            status: 'failed',
-            stdout: "",
-            stderr: `Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`
-        })
+        return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
 
     return isSandboxRunning(sandbox.name.value)
         .then(
             running => running
-                ? Promise.resolve({
-                    status: 'success',
-                    stdout: "Already running.",
-                    stderr: ''
-                })
+                ? sendAsyncRes("Already running.")
                 : getArch()
-                    .then(arch => getStartCommand(sandbox, getDockerImage(), opts, arch)) 
+                    .then(arch => getStartCommand(sandbox, getDockerImage(opts.setBuild), opts, arch, opts.debug)) 
                     .then(execCmd)
-                .then(() => configureTezosClient(sandbox, opts))
-                .then(() => importAccounts(sandbox, opts))
-                .then(() => ({
-                    status: 'success',
-                    stdout: `Started ${sandbox.name.value}.`,
-                    stderr: ''
-                }))
+                    .then(({stderr}) => {
+                        if (opts.debug && stderr) sendErr(stderr)
+                        return configureTezosClient(sandbox, opts)
+                    })
+                    .then(({stderr}) => {
+                        if (opts.debug && stderr) sendErr(stderr)
+                        return importAccounts(sandbox, opts)
+                    })
+                    .then(({stderr}) => {
+                        if (opts.debug && stderr) sendErr(stderr)
+                        sendAsyncRes(`Started ${sandbox.name.value}.`)
+                    })
         )
 }
 
-const configureTezosClient = (sandbox: Sandbox, opts: Opts) =>
+const configureTezosClient = (sandbox: Sandbox, opts: Opts) : LikeAPromise<StdIO, Failure<StdIO>> =>
     retry(
         () => getArch()
                 .then(arch => getConfigureCommand(sandbox, getDockerImage(), opts, arch))
                 .then(execCmd)
+                .catch(previous => 
+                    Promise.reject({
+                        errCode: 'E_CONFIGURE_SANDBOX',
+                        errorMsg: "Could not configure sandbox",
+                        context: sandbox,
+                        previous
+                    })
+                )
+                .then(({stderr, stdout}) => {
+                    return stderr.length > 0
+                        ? Promise.reject({
+                            errCode: 'E_CONFIGURE_SANDBOX',
+                            errorMsg: "Could not configure sandbox",
+                            context: {stderr, stdout}
+                        }) 
+                        : Promise.resolve({stderr, stdout})
+                })
     )
 
 
-const importAccounts = (sandbox: Sandbox, opts: Opts) =>
+const importAccounts = (sandbox: Sandbox, opts: Opts): LikeAPromise<StdIO, Failure<StdIO>> =>
     retry(
         () => getArch()
                 .then(arch => getImportAccountsCommand(sandbox, getDockerImage(), opts, arch))
                 .then(execCmd)
+                .catch(previous =>
+                    Promise.reject({
+                        errCode: 'E_IMPORT_ACCOUNTs',
+                        errorMsg: "Could not import test accounts into sandbox",
+                        context: sandbox,
+                        previous
+                    })
+                )
+                .then(({stderr, stdout}) => {
+                    return stderr.length > 0
+                        ? Promise.reject({
+                            errCode: 'E_IMPORT_ACCOUNTs',
+                            errorMsg: "Could not import test accounts into sandbox",
+                            context: {stderr, stdout}
+                        }) 
+                        : Promise.resolve({stderr, stdout})
+                })
     )
 
-const startAll = (sandboxes: Sandbox[], opts: Opts): Promise<ProxyAction> => {
-    if (!sandboxes.length) return Promise.resolve({
-        status: 'failed',
-        stdout: "",
-        stderr: "No sandboxes configured to start"
-    })
+const startAll = (sandboxes: Sandbox[], opts: Opts): Promise<void> => {
+    if (!sandboxes.length) return sendAsyncErr("No sandboxes configured to start")
 
     const jobs = 
         sandboxes
         .filter(sandbox => doesUseFlextesa(sandbox))
         .map(startInstance(opts))
 
-    const initialResponse: ProxyAction = {
-        status: 'success',
-        stdout: '',
-        stderr: ''
-    }
-
-    return Promise.all(jobs)
-        .then(results => results.reduce(
-            (retval, result: ProxyAction) => ({
-                ...retval,
-                status: retval.status === 'failed'
-                    ? 'failed'
-                    : result.status,
-                stdout: result.stdout
-                    ? retval.stdout + `\n${result.stdout}`
-                    : retval.stdout,
-                stderr: result.stderr.length
-                ? retval.stderr + `\n${result.stderr}`
-                : retval.stderr,
-            }),
-            initialResponse
-    ))
+    return Promise.all(jobs).then(_ => sendAsyncRes("Done."))
 }
     
 const getSandbox = ({sandboxName, config}: Opts ) => {
@@ -139,6 +147,7 @@ const getSandbox = ({sandboxName, config}: Opts ) => {
             return theSandbox.create(unvalidated)
         }
     }
+    // TODO: Should we throw instead?
     return undefined
 }
 
@@ -154,16 +163,12 @@ const getSandboxes = (parsedArgs: Opts): Sandbox[] =>
             []
         )
 
-const startSandboxTask = <T>(parsedArgs: Opts) : LikeAPromise<PluginResponse, Failure<T>> => {
+const startSandboxTask = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
     if (parsedArgs.sandboxName) {
         const sandbox = getSandbox(parsedArgs)
         return sandbox
             ? startInstance (parsedArgs) (sandbox)
-            : Promise.resolve({
-                status: "failed",
-                stdout: "",
-                stderr: `There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`
-            })
+            : sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
     }
     return startAll(getSandboxes(parsedArgs), parsedArgs)
 }
@@ -172,106 +177,97 @@ const startSandboxTask = <T>(parsedArgs: Opts) : LikeAPromise<PluginResponse, Fa
 
 const isSandboxRunning = (sandboxName: string) =>
     execCmd(`docker ps --filter name=${sandboxName} | grep -w ${sandboxName}`)
-    .then(res => res.status !== 'failed')
+    .then(_ => true)
+    .catch(_ => false)
 
 
-const getAccountBalances =(sandbox: Sandbox): Promise<ProxyAction> => {
+type AccountBalance = {account: string, balance: string, address: string|undefined}
+const getAccountBalances =(sandbox: Sandbox): Promise<AccountBalance[]> => {
     const processes = Object.entries(sandbox.accounts).reduce(
-        (retval: Promise<unknown>[], [accountName, accountDetails] : [string, string | AccountDetails]) => {
+        (retval: Promise<AccountBalance>[], [accountName, accountDetails] : [string, string | AccountDetails]) => {
             if (accountName === 'default') return retval
 
             const getBalanceProcess =
                 getArch()
-                .then(arch => `docker exec ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
+                .then(_ => `docker exec ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
                 .then(execCmd)
-                .then(result => result.status === 'success'
-                    ? ({account: accountName, balance: result.stdout, address: (accountDetails as AccountDetails).keys?.publicKeyHash})
-                    : Promise.reject({code: 'E_BALANCE', context: [accountName, result]})
-                )
+<<<<<<< HEAD
+                .then(({stdout}) => ({
+                    account: accountName, 
+                    balance: stdout.trim(),
+                    address: (accountDetails as AccountDetails).keys?.publicKeyHash
+                }))
+                .catch((err: ExecException) => ({
+                    account: accountName,
+                    balance: err.message,
+                    address: (accountDetails as AccountDetails).keys?.publicKeyHash
+                }))
+=======
+                .then(({stdout, stderr}) => {
+                    if (stderr.length > 0) sendErr(stderr)
+                    return {
+                        account: accountName, 
+                        balance: stdout.trim(),
+                        address: (accountDetails as AccountDetails).keys?.publicKeyHash
+                    }
+                })
+                .catch((err: ExecException) => {
+                    sendErr(err.message)
+                    return {
+                        account: accountName,
+                        balance: "Error",
+                        address: (accountDetails as AccountDetails).keys?.publicKeyHash
+                    }
+                })
+>>>>>>> 431-list-accounts-error
             return [...retval, getBalanceProcess]
         },
         []
     )
 
     return Promise.all(processes)
-    .then(balances => ({
-        status: 'success',
-        stdout: balances,
-        stderr: '',
-        render: 'table'
-    }))
 }    
 
 
-const listAccountsTask = async <T>(parsedArgs: Opts) : LikeAPromise<PluginResponse, Failure<T>> => {
+const listAccountsTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
     if (parsedArgs.sandboxName) {
         const sandbox = getSandbox(parsedArgs)
         if (sandbox) {
             if (doesUseFlextesa(sandbox)) {
                 return await isSandboxRunning(sandbox.name.value)
                 ? getAccountBalances(sandbox)
-                : Promise.resolve({
-                    status: 'failed',
-                    stderr: `The ${sandbox.name} sandbox is not running.`,
-                    stdout: ''
-                })
+                    .then(sendJsonRes)
+                : sendAsyncErr(`The ${sandbox.name} sandbox is not running.`)
             }
-            return Promise.resolve({
-                status: 'failed',
-                stdout: '',
-                stderr: `Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`
-            })
+            return sendAsyncErr(
+                `Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`
+            )
         }
-        return Promise.resolve({
-            status: 'failed',
-            stdout: '',
-            stderr: `There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`
-        })
+        return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
 
     }
-    return Promise.resolve({
-        status: "failed",
-        stdout: "",
-        stderr: `No sandbox specified`
-    })
+    return sendAsyncErr(`Please specify a sandbox. E.g. taq list accounts local`)
 }
 
-const stopSandboxTask = async <T>(parsedArgs: Opts) : LikeAPromise<PluginResponse, Failure<T>> => {
+const stopSandboxTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
     if (parsedArgs.sandboxName) {
         const sandbox = getSandbox(parsedArgs)
         if (sandbox) {
             if (doesUseFlextesa(sandbox)) {
                 return await isSandboxRunning(sandbox.name.value)
                 ? execCmd(`docker kill ${sandbox.name}`)
-                .then(result => ({...result, stdout: `Stopped ${sandbox.name.value}.`}))
-                //   .then(() => execCmd(`docker rm ${sandbox.name}`))
-                : Promise.resolve({
-                    status: 'success',
-                    stdout: `The ${sandbox.name} sandbox was not running.`,
-                    stderr: ''
-                })
+                    .then(_ => sendAsyncRes(`Stopped ${sandbox.name.value}.`))
+                : sendAsyncRes(`The ${sandbox.name} sandbox was not running.`)
             }
-            return Promise.resolve({
-                status: 'failed',
-                stdout: '',
-                stderr: `Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`
-            })
+            return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
         }
-        return Promise.resolve({
-            status: 'failed',
-            stdout: '',
-            stderr: `There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`
-        })
+        return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
 
     }
-    return Promise.resolve({
-        status: "failed",
-        stdout: "",
-        stderr: `No sandbox specified`
-    })
+    return sendAsyncErr(`No sandbox specified`)
 }
 
-export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<PluginResponse, Failure<T>> => {
+export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
     switch (parsedArgs.task) {
         case 'list accounts':
             return listAccountsTask(parsedArgs)
@@ -280,11 +276,7 @@ export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<PluginResponse, Failur
         case 'stop sandbox':
             return stopSandboxTask(parsedArgs)
         default:
-            return Promise.reject({
-                errorCode: 'E_INVALID_TASK',
-                errorMsg: `${parsedArgs.task} is not an understand task by the SmartPy plugin`,
-                context: parsedArgs
-            })
+            return sendAsyncErr(`${parsedArgs.task} is not an understood task by the Flextesa plugin`,)
     }
 }
 

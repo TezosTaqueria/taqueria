@@ -4,7 +4,6 @@ import { exec as exec1, execSync } from "child_process"
 import util from "util"
 const exec = util.promisify(exec1)
 import waitForExpect from "wait-for-expect";
-import fs from "fs";
 import {isPortReachable} from "./utils/utils";
 
 
