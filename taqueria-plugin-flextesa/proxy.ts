@@ -15,7 +15,7 @@ const attributesToParams = (attributes: Attributes): Record<string, string> => [
     {}
 )
 
-const getDockerImage = (build:string) => `ghcr.io/ecadlabs/taqueria-flextesa:${build}`
+const getDockerImage = (opts: Opts) => `ghcr.io/ecadlabs/taqueria-flextesa:${opts.setVersion}-${opts.setBuild}`
 
 const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string, debug:boolean): string => {
     const _envVars = Object.entries(attributesToParams(sandbox.attributes)).reduce(
@@ -52,7 +52,7 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<void> => {
             running => running
                 ? sendAsyncRes("Already running.")
                 : getArch()
-                    .then(arch => getStartCommand(sandbox, getDockerImage(opts.setBuild), opts, arch, opts.debug)) 
+                    .then(arch => getStartCommand(sandbox, getDockerImage(opts), opts, arch, opts.debug)) 
                     .then(execCmd)
                     .then(({stderr}) => {
                         if (opts.debug && stderr) sendErr(stderr)
@@ -72,7 +72,7 @@ const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<void> => {
 const configureTezosClient = (sandbox: Sandbox, opts: Opts) : LikeAPromise<StdIO, Failure<StdIO>> =>
     retry(
         () => getArch()
-                .then(arch => getConfigureCommand(sandbox, getDockerImage(), opts, arch))
+                .then(arch => getConfigureCommand(sandbox, getDockerImage(opts), opts, arch))
                 .then(execCmd)
                 .catch(previous => 
                     Promise.reject({
@@ -97,7 +97,7 @@ const configureTezosClient = (sandbox: Sandbox, opts: Opts) : LikeAPromise<StdIO
 const importAccounts = (sandbox: Sandbox, opts: Opts): LikeAPromise<StdIO, Failure<StdIO>> =>
     retry(
         () => getArch()
-                .then(arch => getImportAccountsCommand(sandbox, getDockerImage(), opts, arch))
+                .then(arch => getImportAccountsCommand(sandbox, getDockerImage(opts), opts, arch))
                 .then(execCmd)
                 .catch(previous =>
                     Promise.reject({
