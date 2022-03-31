@@ -12,7 +12,8 @@ Plugin.create(i18n => ({
             aliases: ["c", "compile-smartpy"],
             description: "Compile a smart contract written in a SmartPy syntax to Michelson code",
             options: [],
-            handler: "proxy"
+            handler: "proxy",
+            encoding: "json"
         }),
         Task.create({
             task: "teapot",

@@ -20,7 +20,7 @@ const FeatureList = [
 		),
 		link: {
 			title: "Try the Beta",
-			url: "/docs/getting-started/installation",
+			url: "/docs/getting-started/installation/",
 		},
 
 		features: [
