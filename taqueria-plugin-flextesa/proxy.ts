@@ -191,18 +191,6 @@ const getAccountBalances =(sandbox: Sandbox): Promise<AccountBalance[]> => {
                 getArch()
                 .then(_ => `docker exec ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
                 .then(execCmd)
-<<<<<<< HEAD
-                .then(({stdout}) => ({
-                    account: accountName, 
-                    balance: stdout.trim(),
-                    address: (accountDetails as AccountDetails).keys?.publicKeyHash
-                }))
-                .catch((err: ExecException) => ({
-                    account: accountName,
-                    balance: err.message,
-                    address: (accountDetails as AccountDetails).keys?.publicKeyHash
-                }))
-=======
                 .then(({stdout, stderr}) => {
                     if (stderr.length > 0) sendErr(stderr)
                     return {
@@ -219,7 +207,6 @@ const getAccountBalances =(sandbox: Sandbox): Promise<AccountBalance[]> => {
                         address: (accountDetails as AccountDetails).keys?.publicKeyHash
                     }
                 })
->>>>>>> 431-list-accounts-error
             return [...retval, getBalanceProcess]
         },
         []
