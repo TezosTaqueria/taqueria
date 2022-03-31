@@ -18,10 +18,10 @@ describe("Integration tests using taqueria-mock-plugin", () => {
         await generateTestProject(testProjectPath, ["mock"]);
     })
 
-    // test('Verify that proxied requests with no encoding output valid string', () => {
-    //     const stdout = execSync(`cd ./${testProjectPath} && taq ping`).toString().trim();
-    //     expect(stdout).toEqual("pong");
-    // });
+    test('Verify that proxied requests with no encoding output valid string', () => {
+        const stdout = execSync(`cd ./${testProjectPath} && taq ping`).toString().trim();
+        expect(stdout).toEqual("pong");
+    });
 
     // test("Verify that proxied requests with no encoding return error", () => {
     //     try {
