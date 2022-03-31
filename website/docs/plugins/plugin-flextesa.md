@@ -60,22 +60,30 @@ Configuration is done in the project's `./.taq/config.json` file. Here you can c
 
 Sandbox configurations are stored as key/value pairs in the `sandbox` property. In this example there is one sandbox configuration named `local`:
 ```json
-    sandbox: {
-        local: {
-            accounts: {
-                default: 'bob',
-                bob: {
-                    initialBalance: '3000000000',
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "default": "bob",
+                "bob": {
+                    "initialBalance": "3000000000"
                 },
-                alice: {
-                    initialBalance: '2000000000',
+                "alice": {
+                    "initialBalance": "2000000000"
+                },
+                "john": {
+                    "initialBalance": "4000000000"
+                },
+                "jane": {
+                    "initialBalance": "5000000000"
+                },
+                "joe": {
+                    "initialBalance": "1000000000"
                 }
             },
-            label: 'Local Tezos Sandbox',
-            protocol: 'PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx',
-            rpcUrl: 'http://localhost:20000',
-        },
-    },
+            "label": "Local Tezos Sandbox",
+            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "rpcUrl": "http://localhost:20000"
+        }
 ```
 
 ### Adding a New Sandbox Configuration
