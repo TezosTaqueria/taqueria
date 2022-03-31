@@ -32,7 +32,6 @@ if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
     echo '**********************************************'
     echo "** Building taqueria"
     npm run build
-    wait
 
     echo ""
     echo '**********************************************'
