@@ -131,7 +131,6 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
                 // 2. Run taq deploy on a network described in "test" environment
                 const stdoutDeploy = execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString()
 
-                console.log(stdoutDeploy)
                 // 3. Verify that contracts have been originated on the network
                 expect(stdoutDeploy[3]).toContain("hello-tacos-one.tz");
                 expect(stdoutDeploy[3]).toContain("hangzhounet");
@@ -194,8 +193,6 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
             // 2. Run taq deploy on a network described in "test" environment
             const stdoutDeploy = await exec(`taq --inspect-brk deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
-
-            console.log(stdoutDeploy)
 
             // 3. Verify that proper error displays in the console
             expect(stdoutDeploy).toContain("E_INVALID_PLUGIN_RESPONSE");
@@ -320,7 +317,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
     // Comment if need to debug
     afterAll(() => {
         try {
-            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+            fs.rmSync(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }

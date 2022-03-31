@@ -3,7 +3,6 @@ import { generateTestProject } from "./utils/utils"
 import { exec as exec1, execSync } from "child_process"
 import type { ExecException } from "child_process"
 import fs from "fs"
-import fsPromises from "fs/promises"
 import util from "util"
 const exec = util.promisify(exec1)
 
@@ -210,9 +209,9 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     // Clean up process to remove taquified project folder
     // Comment if need to debug
-    afterAll(async () => {
+    afterAll(() => {
         try {
-            await fsPromises.rm(taqueriaProjectPath, { recursive: true })
+            fs.rmSync(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`)
         }

@@ -6,7 +6,7 @@ import util from 'util'
 import * as contents from "./data/smartpy-contents"
 const exec = util.promisify(exec1)
 
-const taqueriaProjectPath = 'e2e/auto-test-ligo-plugin';
+const taqueriaProjectPath = 'e2e/auto-test-smartpy-plugin';
 
 describe("E2E Testing for taqueria SmartPy plugin",  () => {
     beforeAll(async () => {
@@ -29,7 +29,7 @@ describe("E2E Testing for taqueria SmartPy plugin",  () => {
     // Comment if need to debug
     afterAll(() => {
         try {
-            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+            fs.rmSync(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }
@@ -59,9 +59,6 @@ describe("E2E Testing for taqueria SmartPy plugin",  () => {
         try {
             // 1. Run taq compile ${contractName}
             const {stdout, stderr} = await exec(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
-
-            console.log(stdout)
-            console.log(stderr)
 
             expect(stderr).toBe(contents.smartPyNothingCompiled)
 
