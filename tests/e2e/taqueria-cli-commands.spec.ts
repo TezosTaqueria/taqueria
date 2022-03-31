@@ -45,7 +45,7 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that taq reports a version', () => {
         const version = execSync('taq --version')
         try {
-            expect(version.toString("utf8").trim()).toMatch(/((\d+\.\d+\.\d+)|(dev:.+\/\w+)|(\d+\/\w{5,}))$/)
+            expect(version.toString("utf8").trim()).toMatch(/^((\d+\.\d+\.\d+)|(dev-\w+))$/)
         } catch (error) {
             throw new Error (`error: ${error}`)
         }
@@ -54,7 +54,7 @@ describe("E2E Testing for taqueria CLI,", () => {
     test("Verify that build reports build information about the version", () => {
         const build = execSync('taq --build')
         try {
-            expect(build.toString('utf8').trim()).toMatch(/\/\w+$/)
+            expect(build.toString('utf8').trim()).toMatch(/^\w+$/)
         } catch (error) {
             throw new Error (`error: ${error}`)
         }
