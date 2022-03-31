@@ -76,8 +76,8 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         try {
             const response = await exec('taq scaffold https://github.com/microsoft/supersecretproject.git')
 
-            expect(response.stderr).toContain("E_SCAFFOLD_URL_GIT_CLONE_FAILED")
-            expect(response.stderr).toContain("Could not scaffold")
+            expect(response.stderr).toContain("GIT_CLONE_FAILED")
+            expect(response.stderr).toContain("Could not clone https://github.com/microsoft/supersecretproject.git.")
 
         } catch(error) {
             throw new Error (`error: ${error}`)

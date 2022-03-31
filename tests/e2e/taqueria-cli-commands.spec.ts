@@ -84,10 +84,10 @@ describe("E2E Testing for taqueria CLI,", () => {
         const configDirName = 'configDirProject'
 
         try {
-            await exec(`taq init ${projectName} -d ${configDirName}`)
+            await exec(`taq init ${projectName} --configDir ${configDirName}`)
 
             const helpContents = await exec(`taq --help -p ${projectName}`)
-            const helpContentsWithDir = await exec(`taq --help -p ${projectName} -d ${configDirName}`)
+            const helpContentsWithDir = await exec(`taq --help -p ${projectName} --configDir ${configDirName}`)
 
             expect(helpContents.stderr).toContain('Your config.json file is invalid')
             expect(helpContentsWithDir.stderr).not.toContain('Your config.json file is invalid')
