@@ -128,6 +128,8 @@ export interface SanitizedArgs {
     version: string
     build: string
     task?: string
+    setBuild: string
+    setVersion: string
 }
 
 export interface StdIO {

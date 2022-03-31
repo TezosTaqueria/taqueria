@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build-package": "npx esbuild --platform=node --bundle index.ts --outdir=.",
-    "build-docker": "docker build . -t ghcr.io/ecadlabs/taqueria-flextesa:latest",
+    "build-docker": "TAQ_VERSION=`taq --version` BUILD=`taq --build`; docker build . -t \"ghcr.io/ecadlabs/taqueria-flextesa:${TAQ_VERSION}-${BUILD}\"",
     "build": "npm run build-package"
   },
   "keywords": [
