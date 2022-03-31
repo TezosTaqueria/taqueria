@@ -23,6 +23,15 @@ Some helpful things to know:
 - Node.js v16 or later
 - Docker v0.8.4 or later
 
+## Build Instructions
+
+To build the plugin locally from source, open the `taqueria-plugin-flextesa` directory and run the following:
+1. `npm i`
+2. `npm run build -w taqueria-flextesa-manager`
+3. `npm run build-docker -w taqueria-flextesa-manager`
+
+To build all Taqueria plugins and the Taqueria binary, run the following from the `taqueria` folder:
+1. `npm run build all`
 ## Installation
 
 The Flextesa plugin is distributed as an NPM package that can be installed and uninstalled on a project from the Taqueria CLI
