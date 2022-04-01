@@ -46,7 +46,8 @@ Plugin.create(_i18n => ({
                     placeholder: "sandboxName",
                     description: "The name of the sandbox to use"
                 })
-            ]
+            ],
+            encoding: "json"
         }),
     ],
     checkRuntimeDependencies: () => Promise.resolve({

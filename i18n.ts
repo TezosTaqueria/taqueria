@@ -1,4 +1,4 @@
-import i18next from 'https://deno.land/x/i18next/index.js'
+import i18next from 'https://deno.land/x/i18next@v21.6.14/index.js'
 
 // TODO: i18next is feature-rich, but rather large. Determine whether you need all of the functionality
 await i18next.init({
@@ -15,7 +15,7 @@ await i18next.init({
                 "configDirDesc": "Config directory (default ./.taq)",
                 "initDesc": "Initialize a new project",
                 "initPathDesc": "Path to your project directory",
-                "scaffoldDesc": "Generate a new project using a pre-configured scaffold",
+                "scaffoldDesc": "Generate a new project using pre-made scaffold",
                 "scaffoldUrlDesc": "Alias or Url for the scaffold project",
                 "scaffoldProjectDirDesc": "Path where to create the new project. This must be a new directory.",
                 "scaffoldDoneMsg": "The project was created using the scaffold.",
