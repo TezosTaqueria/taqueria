@@ -1,6 +1,6 @@
 FROM oxheadalpha/flextesa:latest
 RUN mkdir /app
 WORKDIR /app
-COPY startFlextesa.js /app/
+COPY index.js /app/
 RUN apk add net-tools nodejs npm
-CMD node /app/startFlextesa.js
+CMD node /app/index.js
