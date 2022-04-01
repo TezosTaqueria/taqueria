@@ -221,6 +221,8 @@ jobs:
 
       - name: Run e2e tests
         run: |
+          taq --version
+          taq --build
           npm run test:e2e -w tests
   
       - name: Report Status
