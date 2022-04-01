@@ -84,8 +84,7 @@ jobs:
           DENO_DIR: "./deno"
         run: |
           COMMIT=`git rev-parse --short "$GITHUB_SHA"`
-          echo $TAQ_VERSION
-          echo $COMMIT
+          TAQ_VERSION="${TAQ_VERSION/\//-}"
           deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION"
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
@@ -211,9 +210,8 @@ jobs:
 
       - name: builds for testing
         run: |
-          taq --version
-          taq --build
-          npm run build-all
+          npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy -w taqueria-flextesa-manager
+          npm run build-docker -w taqueria-flextesa-manager
       
       - name: Run unit tests
         run: |
@@ -225,8 +223,6 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          taq --version
-          taq --build
           npm run test:e2e -w tests
   
       - name: Report Status
