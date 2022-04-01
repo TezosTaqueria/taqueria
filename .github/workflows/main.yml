@@ -84,7 +84,8 @@ jobs:
           DENO_DIR: "./deno"
         run: |
           COMMIT=`git rev-parse --short "$GITHUB_SHA"`
-          
+          echo $TAQ_VERSION
+          echo $COMMIT
           deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION"
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
@@ -191,8 +192,6 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
-          taq --version
-          taq --build
         if: ${{ !github.event.pull_request.head.repo.fork }}
 
       - name: build binary and make executable
@@ -211,7 +210,10 @@ jobs:
         run: npm ci
 
       - name: builds for testing
-        run: npm run build-all
+        run: |
+          taq --version
+          taq --build
+          npm run build-all
       
       - name: Run unit tests
         run: |
