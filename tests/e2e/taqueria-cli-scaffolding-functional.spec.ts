@@ -45,7 +45,8 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
     test('Verify that scaffold project can start and stop taqueria locally', async () => {
         try {
             const startResults = await exec(`cd ${scaffoldDirName} && npm run start:taqueria:local`)
-            expect(startResults.stdout).toContain('Processing /example.tz...example.tz: Types generated')
+            expect(startResults.stdout).toContain('Processing /example.tz...')
+            expect(startResults.stdout).toContain('example.tz: Types generated')
             expect(startResults.stdout).toContain('Started local.')
 
             const stopResults = await exec(`cd ${scaffoldDirName}/taqueria && npm run stop:local`)

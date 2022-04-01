@@ -45,7 +45,7 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that taq reports a version', () => {
         const version = execSync('taq --version')
         try {
-            expect(version.toString("utf8").trim()).toMatch(/^((\d+\.\d+\.\d+)|(dev-\w+))$/)
+            expect(version.toString("utf8").trim()).toMatch(/^((v\d+\.\d+\.\d+)|(dev-[\w-]+))$/)
         } catch (error) {
             throw new Error (`error: ${error}`)
         }
@@ -72,25 +72,6 @@ describe("E2E Testing for taqueria CLI,", () => {
 
             expect(projectContents.stdout).toContain(configDirName)
             expect(configDirContents.stdout).toContain('config.json')
-
-            await fsPromises.rm(`./${projectName}`, { recursive: true })
-        } catch(error) {
-            throw new Error (`error: ${error}`)
-        }
-    })
-
-    test('Verify that help message reacts to config directory not being in the default location', async () => {
-        const projectName = 'test-1'
-        const configDirName = 'configDirProject'
-
-        try {
-            await exec(`taq init ${projectName} --configDir ${configDirName}`)
-
-            const helpContents = await exec(`taq --help -p ${projectName}`)
-            const helpContentsWithDir = await exec(`taq --help -p ${projectName} --configDir ${configDirName}`)
-
-            expect(helpContents.stderr).toContain('Your config.json file is invalid')
-            expect(helpContentsWithDir.stderr).not.toContain('Your config.json file is invalid')
 
             await fsPromises.rm(`./${projectName}`, { recursive: true })
         } catch(error) {
