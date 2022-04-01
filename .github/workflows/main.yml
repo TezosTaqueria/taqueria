@@ -191,6 +191,8 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
+          taq --version
+          taq --build
         if: ${{ !github.event.pull_request.head.repo.fork }}
 
       - name: build binary and make executable
