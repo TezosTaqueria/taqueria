@@ -56,7 +56,7 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         }
     })
 
-    afterAll(async () => {
+    afterAll( async () => {
         try {
             await fsPromises.rm(`${scaffoldDirName}`, { recursive: true })
         } catch (error) {
