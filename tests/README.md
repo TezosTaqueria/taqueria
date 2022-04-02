@@ -22,4 +22,3 @@ $ npm install -w tests
 ### Running the Tests:
 - The tests should be run from the taqueria root folder by calling the test run script with the workspace specified: `npm run test:{unit|integration|e2e} -w tests`
     - If you're going to be running the unit tests then you will need deno installed on your system
-    
