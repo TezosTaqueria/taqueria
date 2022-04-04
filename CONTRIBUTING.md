@@ -1,5 +1,7 @@
 # Contributions
 
+Thank you for your interested in contributing to Taqueria!
+
 Please use the [GitHub issue tracker](https://github.com/ecadlabs/taqueria/issues) to report bugs or request features.
 
 To contribute, please check the issue tracker to see if an existing issue exists for your planned contribution. If there's no issue, please create one first, and then submit a pull request with your contribution.

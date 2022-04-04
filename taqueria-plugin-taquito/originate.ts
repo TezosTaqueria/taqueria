@@ -1,17 +1,24 @@
-import { SanitizedArgs, PluginResponse, AccountDetails, Failure, LikeAPromise, Config, NetworkConfig, SandboxConfig, ProxyAction} from "@taqueria/node-sdk/types";
+import { SanitizedArgs, PluginResponse, AccountDetails, Failure, LikeAPromise, Config, NetworkConfig, SandboxConfig} from "@taqueria/node-sdk/types";
 import glob from 'fast-glob'
 import {join} from 'path'
 import { TezosToolkit } from '@taquito/taquito';
 import {readFile} from 'fs/promises'
 import { InMemorySigner, importKey } from '@taquito/signer';
+import { sendAsyncJsonRes } from "@taqueria/node-sdk";
 
 type Opts = SanitizedArgs & Record<string, unknown>
+
+interface OriginationResult {
+    contract: string
+    address: string
+    destination: string
+}
 
 const getContractAbspath = (contractFilename: string, parsedArgs: Opts) => 
     join(parsedArgs.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`)
 
 
-const originateContractToSandbox = async (contractFilename: string, parsedArgs: Opts, storage: unknown, sandboxName: string, sandbox: SandboxConfig | undefined) => {
+const originateContractToSandbox = async (contractFilename: string, parsedArgs: Opts, storage: unknown, sandboxName: string, sandbox: SandboxConfig | undefined): LikeAPromise<OriginationResult, Failure<unknown>> => {
     try {
         if (sandbox && sandbox.rpcUrl) {
             const contractAbspath = getContractAbspath(contractFilename, parsedArgs)
@@ -29,8 +36,13 @@ const originateContractToSandbox = async (contractFilename: string, parsedArgs: 
                 })
                 .then(operation => ({
                     contract: contractFilename,
-                    address: operation.contractAddress,
+                    address: operation.contractAddress as string,
                     destination: sandboxName
+                }))
+                .catch(previous => Promise.reject({
+                    errCode: "E_ORIGINATE",
+                    errMsg: `Could not originate ${contractFilename} on the sandbox '${sandboxName}'`,
+                    previous
                 }))
             }
             else {
@@ -56,7 +68,7 @@ const originateContractToSandbox = async (contractFilename: string, parsedArgs: 
     }
 }
 
-const originateContractToNetwork = async (contractFilename: string, parsedArgs: Opts, storage: unknown, networkName: string, network: NetworkConfig|undefined) => {
+const originateContractToNetwork = async (contractFilename: string, parsedArgs: Opts, storage: unknown, networkName: string, network: NetworkConfig|undefined): LikeAPromise<OriginationResult, Failure<unknown>> => {
     try {
         if (network && network.rpcUrl) {
             const contractAbspath = getContractAbspath(contractFilename, parsedArgs)
@@ -71,8 +83,13 @@ const originateContractToNetwork = async (contractFilename: string, parsedArgs: 
                 })
                 .then(operation => ({
                     contract: contractFilename,
-                    address: operation.contractAddress,
+                    address: operation.contractAddress as string,
                     destination: networkName
+                }))
+                .catch(previous => Promise.reject({
+                    errCode: "E_ORIGINATE",
+                    errMsg: `Could not originate ${contractFilename} on the network '${networkName}'`,
+                    previous
                 }))
             }
             else {
@@ -120,7 +137,7 @@ const getAccountSecretKey = (sandbox: SandboxConfig) => {
     return undefined        
 }
 
-const originateContract = (parsedArgs: Opts) => (contractFilename: string) : Promise<unknown[]> => {
+const originateContract = (parsedArgs: Opts) => (contractFilename: string) => {
     // TODO: Should getting the default environment be provided by the SDK or the framework?
     const currentEnv = parsedArgs.env
         ? (parsedArgs.env as string)
@@ -150,7 +167,7 @@ const originateContract = (parsedArgs: Opts) => (contractFilename: string) : Pro
     }
 
     const networkProcesses = !env.networks ? [] : env.networks.reduce(
-        (retval: Promise<unknown>[], network) => 
+        (retval: LikeAPromise<OriginationResult, Failure<unknown>>[], network) => 
             getNetworkConfig(network, parsedArgs.config)
                 ? [...retval, originateContractToNetwork(contractFilename, parsedArgs, env.storage[contractFilename], network, getNetworkConfig(network, parsedArgs.config))]
                 : retval,
@@ -158,7 +175,7 @@ const originateContract = (parsedArgs: Opts) => (contractFilename: string) : Pro
     )
 
     const allProcesses = !env.sandboxes ? [] : env.sandboxes.reduce(
-        (retval: Promise<unknown>[], sandbox) => getSandboxConfig(sandbox, parsedArgs.config)
+        (retval: LikeAPromise<OriginationResult, Failure<unknown>>[], sandbox) => getSandboxConfig(sandbox, parsedArgs.config)
             ? [...retval, originateContractToSandbox(contractFilename, parsedArgs, env.storage[contractFilename], sandbox, getSandboxConfig(sandbox, parsedArgs.config))]
             : retval            
         ,
@@ -168,7 +185,7 @@ const originateContract = (parsedArgs: Opts) => (contractFilename: string) : Pro
     return Promise.all(allProcesses)
 }
 
-const originateAll = (parsedArgs: Opts) : Promise<unknown[]> =>
+const originateAll = (parsedArgs: Opts) =>
     glob("**/*.tz", {cwd: parsedArgs.artifactsDir})
     .then(files => Promise.all(files.map(originateContract(parsedArgs))))
     .then(results => results.flat(1))
@@ -176,19 +193,9 @@ const originateAll = (parsedArgs: Opts) : Promise<unknown[]> =>
 export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
     const p = parsedArgs.contract
         ? originateContract(parsedArgs) (parsedArgs.contract as string)
-            .then(result => [result])
         : originateAll(parsedArgs)
 
-    return p.then(data => ({
-        status: 'success',
-        stdout: data,
-        stderr: "",
-        render: 'table'
-    }))
-    .catch(err => err.errCode
-        ? Promise.resolve({status: 'failed', stdout: '', stderr: err.errMsg, previous: err})
-        : Promise.resolve({status: 'failed', stderr: err.getMessage(), stdout: '', previous: err})
-    )
+    return p.then(sendAsyncJsonRes)
 }
 
 export default originate

@@ -118,8 +118,8 @@ ${tabs(indent)}`;
         throw new GenerateApiError(`Unknown type node`, { t });
     };
 
-    const varToCode = (t: TypedVar, i: number, indent: number): string => {
-        return `${t.name ?? i}${t.type.optional ? `?` : ``}: ${typeToCode(t.type, indent)}`;
+    const varToCode = (t: TypedVar, i: number, indent: number, numberVarNamePrefix = ''): string => {
+        return `${t.name ?? `${numberVarNamePrefix}${i}`}${t.type.optional ? `?` : ``}: ${typeToCode(t.type, indent)}`;
     };
 
     const argsToCode = (args: TypedVar[], indent: number, asObject: boolean): string => {
@@ -129,7 +129,7 @@ ${tabs(indent)}`;
         }
 
         const result = `${toIndentedItems(indent, {},
-            args.filter(x => x.name || x.type.kind !== `unit`).map((a, i) => varToCode(a, i, indent + 1) + `,`),
+            args.filter(x => x.name || x.type.kind !== `unit`).map((a, i) => varToCode(a, i, indent + 1, asObject ? '' : '_') + `,`),
         )}`;
 
         if(asObject){
