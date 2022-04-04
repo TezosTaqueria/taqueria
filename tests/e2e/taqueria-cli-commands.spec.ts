@@ -162,6 +162,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const generateTypesHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypes)
 

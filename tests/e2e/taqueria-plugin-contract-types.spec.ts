@@ -16,7 +16,7 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
     test('Verify that contract types plugin only outputs typeScriptDir and does not create types dir when no contracts exist', async () => {
         try {
             const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types`)
-            expect(generateTypesOutput.stdout).toContain(`"typescriptDir": "types"`)
+            expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`)
 
             const dirContents = await exec(`ls ${taqueriaProjectPath}`)
             expect(dirContents.stdout).not.toContain('types')
@@ -35,7 +35,7 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
             await exec(`taq compile -p ${taqueriaProjectPath}`)
 
             const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types`)
-            expect(generateTypesOutput.stdout).toContain(`"typescriptDir": "types"`)
+            expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`)
             
             expect(generateTypesOutput.stdout).toContain(
                 `Generating Types: ${pwd}/${taqueriaProjectPath}/artifacts => ${pwd}/${taqueriaProjectPath}/types`)
@@ -70,7 +70,7 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
             await exec(`taq compile -p ${taqueriaProjectPath}`)
 
             const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types ${folderName}`)
-            expect(generateTypesOutput.stdout).toContain(`"typescriptDir": "${folderName}"`)
+            expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: '${folderName}' }`)
             
             expect(generateTypesOutput.stdout).toContain(
                 `Generating Types: ${pwd}/${taqueriaProjectPath}/artifacts => ${pwd}/${taqueriaProjectPath}/${folderName}`)
@@ -99,7 +99,7 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
             await exec(`taq compile -p ${taqueriaProjectPath}`)
 
             const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types`)
-            expect(generateTypesOutput.stdout).toContain(`"typescriptDir": "types"`)
+            expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`)
             expect(generateTypesOutput.stdout).toContain(
                 `Generating Types: ${pwd}/${taqueriaProjectPath}/artifacts => ${pwd}/${taqueriaProjectPath}/types`)
             
@@ -109,8 +109,8 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
                 `Contracts Found: \n\t- ${pwd}/${taqueriaProjectPath}/artifacts/hello-tacos.tz`)
 
             expect(generateTypesOutput.stdout).toContain(`Processing /increment.tz...`)
-            expect(generateTypesOutput.stdout).toContain(`increment.tz: Types generated`)
             expect(generateTypesOutput.stdout).toContain(`Processing /hello-tacos.tz...`)
+            expect(generateTypesOutput.stdout).toContain(`increment.tz: Types generated`)
             expect(generateTypesOutput.stdout).toContain(`hello-tacos.tz: Types generated`)
 
         } catch(error) {
