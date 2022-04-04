@@ -25,7 +25,7 @@ Some helpful things to know:
 
 ## Build Instructions
 
-To build the plugin locally from source, open the `taqueria-plugin-flextesa` directory and run the following:
+To build the plugin locally from source, run the following from the project root:
 1. `npm i`
 2. `npm run build -w taqueria-flextesa-manager`
 3. `npm run build-docker -w taqueria-flextesa-manager`
