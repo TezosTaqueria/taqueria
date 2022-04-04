@@ -1,0 +1,7 @@
+{ 
+  parameter
+    (pair %update_token_metadata nat bytes);
+  storage
+    (nat %total_supply);
+}
+

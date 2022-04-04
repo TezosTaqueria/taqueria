@@ -19,7 +19,7 @@ while [ $retry -ne 0 ]; do
     else
         retry=0
     fi
-    
+    echo "*** ${output}"
 done
 
 if [ $success -ne 0 ]; then

@@ -1,4 +1,4 @@
-const {execCmd, getArch} = require('@taqueria/node-sdk')
+const {execCmd, getArch, sendAsyncErr, sendJsonRes, sendErr} = require('@taqueria/node-sdk')
 const {extname, basename, join} = require('path')
 const glob = require('fast-glob')
 
@@ -22,21 +22,25 @@ const getCompileCommand = (opts, _arch) => (sourceFile) => {
     return cmd
 }
 
-const getLigoCompilationError = (stderr) => {
-    const err = stderr.split("\n").slice(1).join("\n")
-    return `There was a compilation error.\n\n${err}`
-}
-
 const compileContract = (opts) => (sourceFile) =>
     getArch()
     .then(arch => getCompileCommand(opts, arch) (sourceFile))
     .then(execCmd)
-    .then(result => result.status === 'success'
-        ? ({contract: sourceFile, artifact: getContractArtifactFilename(opts) (sourceFile)})
-        : Promise.reject({
-            errCode: "E_COMPILE", context: result, errMsg: getLigoCompilationError(result.stderr)}
-        )
-    )
+    .then(({stderr}) => { // How should we output warnings?
+        if (stderr.length > 0) sendErr(stderr)
+        return {
+            contract: sourceFile,
+            artifact: getContractArtifactFilename(opts) (sourceFile)
+        }
+    })
+    .catch(err => {
+        sendErr(" ")
+        sendErr(err.message.split("\n").slice(1).join("\n"))
+        return Promise.resolve({
+            contract: sourceFile,
+            artifact: "Not compiled"
+        })
+    })
 
 const compileAll = parsedArgs => {
     // TODO: Fetch list of files from SDK
@@ -44,7 +48,7 @@ const compileAll = parsedArgs => {
         ['**/*.ligo', '**/*.religo', '**/*.mligo', '**/*.jsligo'],
         {cwd: parsedArgs.contractsDir, absolute: false}
     )
-    .then(entries => entries.map(compileContract(parsedArgs)))
+    .then(entries => entries.map(sourceFile => compileContract(parsedArgs) (sourceFile)))
     .then(processes => processes.length > 0
         ? processes
         : [{contract: "None found", artifact: "N/A"}]
@@ -57,18 +61,14 @@ const compile = parsedArgs => {
         ? compileContract(parsedArgs) (parsedArgs.sourceFile)
             .then(result => [result])
         : compileAll(parsedArgs)
+            .then(results => {
+                if (results.length === 0) sendErr("No contracts found to compile.")
+                return results
+            })
     
     return p
-    .then(results => ({
-        status: 'success',
-        stdout: results,
-        stderr: "",
-        render: 'table'
-    }))
-    .catch(err => err.errCode
-        ? Promise.resolve({status: 'failed', stdout: '', stderr: err.errMsg, previous: err})
-        : Promise.resolve({status: 'failed', stderr: err.getMessage(), stdout: '', previous: err})
-    )
+    .then(sendJsonRes)
+    .catch(err => sendAsyncErr(err, false))
 }
 
 module.exports = compile
