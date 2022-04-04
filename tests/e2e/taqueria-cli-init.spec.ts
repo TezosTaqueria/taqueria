@@ -1,37 +1,13 @@
 import fsPromises from "fs/promises"
 import { exec as exec1 } from "child_process"
+import type { ExecException } from "child_process"
 import util from "util"
 const exec = util.promisify(exec1)
 
 const taqueriaProjectPath = './e2e/auto-test'
-const taqueriaProjectPathNPM = './e2e/auto-test-npm-fail';
+const taqueriaProjectPathNPM = './e2e/auto-test-npm-empty';
 const taqueriaProjectPathNPMSuccess = './e2e/auto-test-npm-success';
 const taqueriaProjectPathNPMFull = './e2e/auto-test-npm-full';
-const fileContentsBare =
-{
-  "devDependencies": {
-    "@taqueria/plugin-ligo": "^0.1.2"
-  }
-}
-const fileContentsFull = 
-{
-  "name": "auto-test-npm-full",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@taqueria/plugin-ligo": "^0.1.2"
-  }
-}
 
 describe("E2E Testing for taqueria general functionality", () => {
     test('Verify that taq init creates test folder', async () => {
@@ -57,13 +33,12 @@ describe("E2E Testing for taqueria general functionality", () => {
         try {
             await exec(`taq init ${taqueriaProjectPathNPM}`);
 
-            const npmError = await exec(`cd ${taqueriaProjectPathNPM} && taq install @taqueria/plugin-ligo`)
-            expect(npmError.stderr).toContain(`"kind": "E_NPM_INIT"`)
-            expect(npmError.stderr).toContain(`"msg": "This project isn't a valid NPM project. Please run: npm init"`)
-            
-            expect(npmError.stderr).toContain(`"kind": "E_READ"`)
-            expect(npmError.stderr).toContain(`"name": "NotFound"`)
-            expect(npmError.stderr).toContain(`"code": "ENOENT"`)
+            await exec(`cd ${taqueriaProjectPathNPM} && taq install @taqueria/plugin-ligo`).catch(
+                (err: ExecException & {stdout: string, stderr: string}) => {
+                    expect(err.code).toEqual(8)
+                    expect(err.stderr).toContain(`This project isn't a valid NPM project. Please run: npm init`)
+                }
+            )
 
             await fsPromises.rm(`${taqueriaProjectPathNPM}`, {recursive: true})
         } catch(error) {
@@ -77,7 +52,17 @@ describe("E2E Testing for taqueria general functionality", () => {
             await exec(`echo "{}" > ${taqueriaProjectPathNPMSuccess}/package.json`)
             await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPathNPMSuccess}`)
 
+            const ligoPackageContents = await exec(`cat ../taqueria-plugin-ligo/package.json`)
+            const ligoVersion = JSON.parse(ligoPackageContents.stdout).version
             const packageContents = await exec(`cd ${taqueriaProjectPathNPMSuccess} && cat package.json`)
+
+            const fileContentsBare =
+            {
+            "devDependencies": {
+                "@taqueria/plugin-ligo": `^${ligoVersion}`
+                }
+            }
+
             expect(JSON.parse(packageContents.stdout)).toEqual(fileContentsBare)
 
             await fsPromises.rm(`${taqueriaProjectPathNPMSuccess}`, {recursive: true})
@@ -92,7 +77,30 @@ describe("E2E Testing for taqueria general functionality", () => {
             await exec(`cd ${taqueriaProjectPathNPMFull} && npm init -y`)
             await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPathNPMFull}`)
 
+            const ligoPackageContents = await exec(`cat ../taqueria-plugin-ligo/package.json`)
+            const ligoVersion = JSON.parse(ligoPackageContents.stdout).version
             const packageContentsFull = await exec(`cd ${taqueriaProjectPathNPMFull} && cat package.json`)
+
+            const fileContentsFull = 
+            {
+            "name": "auto-test-npm-full",
+            "version": "1.0.0",
+            "description": "",
+            "main": "index.js",
+            "directories": {
+                "test": "tests"
+            },
+            "scripts": {
+                "test": "echo \"Error: no test specified\" && exit 1"
+            },
+            "keywords": [],
+            "author": "",
+            "license": "ISC",
+            "devDependencies": {
+                "@taqueria/plugin-ligo": `^${ligoVersion}`
+            }
+            }
+
             expect(JSON.parse(packageContentsFull.stdout)).toEqual(fileContentsFull)
 
             await fsPromises.rm(`${taqueriaProjectPathNPMFull}`, {recursive: true})
