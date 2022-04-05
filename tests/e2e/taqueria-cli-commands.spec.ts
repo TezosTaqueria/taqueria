@@ -1,6 +1,7 @@
 import * as contents from "./data/help-contents"
 import { generateTestProject } from "./utils/utils"
 import { exec as exec1, execSync } from "child_process"
+import fsPromises from "fs/promises"
 import type { ExecException } from "child_process"
 import fs from "fs"
 import util from "util"
@@ -72,7 +73,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             expect(projectContents.stdout).toContain(configDirName)
             expect(configDirContents.stdout).toContain('config.json')
 
-            await fs.promises.rm(`./${projectName}`, { recursive: true })
+            await fsPromises.rm(`./${projectName}`, { recursive: true })
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
