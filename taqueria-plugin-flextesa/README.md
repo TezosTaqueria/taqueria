@@ -15,7 +15,7 @@ Some helpful things to know:
 - Multiple sandboxes can be configured and run concurrently
 - You can configure the Tezos `protocol` for each sandbox to test against current, and future network upgrades
 - Accounts and balances are pre-configured per-sandbox and do not persist their state
-    - Accounts and balances will be re-initialized each time they are started
+- Accounts and balances will be re-initialized each time they are started
 - Sandboxes can be added to Taqueria environments and then targeted from the CLI using the `--env [envName]` option 
 
 ## Requirements
