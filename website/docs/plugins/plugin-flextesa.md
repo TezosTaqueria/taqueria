@@ -161,4 +161,3 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  command   | 'list accounts [sandboxName]'  | 
 |  aliases   | [ ]                            |  
 
-
