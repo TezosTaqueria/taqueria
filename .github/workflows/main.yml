@@ -181,7 +181,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16.13.x
-
+          # Setting node version to 16.13.2 to enable integration tests to pass
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "1.18.2"
