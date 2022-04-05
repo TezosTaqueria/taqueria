@@ -19,4 +19,7 @@
 <rect width="242.515" height="242.515" fill="white" transform="translate(70.0376) rotate(16.6558)"/>
 </clipPath>
 </defs>
+ <style type="text/css"><![CDATA[
+        #rect1 { fill: url(#Gradient1); }
+      ]]></style>
 </svg>

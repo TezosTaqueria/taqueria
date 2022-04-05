@@ -180,8 +180,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 16.x
-
+          node-version: 16.13.x
+          # Setting node version to 16.13.2 to enable integration tests to pass
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "1.18.2"
@@ -209,7 +209,9 @@ jobs:
         run: npm ci
 
       - name: builds for testing
-        run: npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy
+        run: |
+          npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy -w taqueria-flextesa-manager
+          npm run build-docker -w taqueria-flextesa-manager
       
       - name: Run unit tests
         run: |
