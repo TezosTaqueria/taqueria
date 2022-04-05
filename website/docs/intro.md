@@ -83,4 +83,4 @@ Currently available plugins include:
 
 Taqueria has an SDK and protocol at its core which all Taqueria plugins and the cli depend on
 
-Most developers won't ever interact with directly unless they are developing a Taqueria plugin, but it's helpful to know they are there
+> Note: Most developers won't ever interact with the SDK directly unless they are developing a plugin
