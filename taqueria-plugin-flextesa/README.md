@@ -31,7 +31,7 @@ To build the plugin locally from source, run the following from the project root
 3. `npm run build-docker -w taqueria-flextesa-manager`
 
 To build all Taqueria plugins and the Taqueria binary, run the following from the `taqueria` folder:
-1. `npm run build all`
+1. `npm run build-all`
 ## Installation
 
 The Flextesa plugin is distributed as an NPM package that can be installed and uninstalled on a project from the Taqueria CLI
