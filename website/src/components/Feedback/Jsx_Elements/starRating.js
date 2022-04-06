@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MDBContainer, MDBRating } from 'mdbreact';
 
-const RatingPage = () => {
+const PageRating = () => {
   const [basic] = useState([
     {
       tooltip: 'Very Bad'
@@ -28,4 +28,4 @@ const RatingPage = () => {
   );
 };
 
-export default RatingPage;
+export default PageRating;
