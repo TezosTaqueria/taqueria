@@ -14,7 +14,8 @@ Plugin.create((i18n: i18n) => ({
             options: [
             ],
             aliases: ["originate"],
-            handler: "proxy"
+            handler: "proxy",
+            encoding: "application/json"
         }),
     ],
     proxy: originate

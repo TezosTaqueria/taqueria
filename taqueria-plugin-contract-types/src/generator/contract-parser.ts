@@ -180,9 +180,10 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
         if (fields.some(x => !x)) {
             throw new GenerateApiError(`pair: Some fields are null`, { node, args: node.args, fields });
         }
-        if (fields.length !== 2) {
-            throw new GenerateApiError(`pair: Expected 2 items`, { node, length: fields.length, fields });
-        }
+        // Disabled Check: Apparently pairs can have more than 2 items
+        // if (fields.length !== 2) {
+        //     throw new GenerateApiError(`pair: Expected 2 items`, { node, length: fields.length, fields });
+        // }
 
         // Flatten with unnamed child pairs
         const fieldsFlat = fields.map(x => (!x.name || options?.ignorePairName) && x.type.kind === 'object' ? x.type.fields : [x]).reduce(reduceFlatMap, []);

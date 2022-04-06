@@ -21,7 +21,7 @@ describe("E2E Testing for taqueria general functionality", () => {
     // Comment if need to debug
     afterAll(() => {
         try {
-            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+            fs.rmSync(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }
