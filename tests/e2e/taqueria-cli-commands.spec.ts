@@ -123,6 +123,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const ligoAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`)
             expect(ligoAliasCHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific)
 
@@ -179,6 +186,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const smartpyHelpContents = await exec(`taq teapot --help --projectDir=${taqueriaProjectPath}`)
             expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyTeapotSpecific)
 
@@ -191,6 +205,13 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that the smartpy plugin aliases expose the correct info in the help menu', async () => {
         try {
             await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const smartpyAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`)
             expect(smartpyAliasCHelpContents.stdout).toBe(contents.helpContentsSmartpyCompileSpecific)
@@ -248,6 +269,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const taquitoHelpContents = await exec(`taq originate --help --projectDir=${taqueriaProjectPath}`)
             expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific)
 
@@ -301,6 +329,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const flextesaHelpContents = await exec(`taq start --help --projectDir=${taqueriaProjectPath}`)
             expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStartSandbox)
 
@@ -333,6 +368,13 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that the flextesa plugin exposes the associated alias for stopping a sandbox in the help menu', async () => {
         try {
             await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const flextesaHelpContents = await exec(`taq stop --help --projectDir=${taqueriaProjectPath}`)
             expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStopSandbox)
@@ -367,6 +409,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const generateTypesHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypesPlugin)
 
@@ -379,6 +428,13 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that the contract types plugin exposes the associated options in the help menu', async () => {
         try {
             await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const generateTypesHelpContents = await exec(`taq generate types --help --projectDir=${taqueriaProjectPath}`)
             expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypesPluginSpecific)
@@ -393,6 +449,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+            
             const generateTypesHelpContentsGen = await exec(`taq gen --help --projectDir=${taqueriaProjectPath}`)
             expect(generateTypesHelpContentsGen.stdout).toBe(contents.helpContentsGenerateTypesPluginSpecific)
 
