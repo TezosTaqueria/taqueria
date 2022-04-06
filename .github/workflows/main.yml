@@ -210,7 +210,7 @@ jobs:
 
       - name: builds for testing
         run: |
-          npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy -w taqueria-flextesa-manager
+          npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy -w taqueria-flextesa-manager -w taqueria-plugin-contract-types
           npm run build-docker -w taqueria-flextesa-manager
       
       - name: Run unit tests
