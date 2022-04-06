@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-
 import ThumbsUp from './assets/thumb-up.svg';
 import ThumbsDown from './assets/thumb-down.svg';
-
 import './index.scss';
 
 const genClassName = (className) => {

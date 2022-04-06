@@ -1,0 +1,91 @@
+$outline: black;
+$successGreen: #93C47d;
+$errorRed: #E06666;
+
+.BinaryFeedback__container {
+  display: inline-block;
+}
+
+.BinaryFeedback__actions {
+  display: flex;
+  flex-direction: row;
+}
+
+.BinaryFeedback__positive, .BinaryFeedback__negative {
+  align-items: center;
+  border: 0.5px solid $outline;
+  display: flex;
+  justify-content: center;
+  padding: 6px;
+  outline: none;
+  transition: 0.2s ease-in-out;
+}
+
+.BinaryFeedback__positive:hover, .BinaryFeedback__negative:hover {
+  cursor: pointer;
+}
+
+.BinaryFeedback__positive {
+  border-radius: 8px 0 0 8px;
+
+  path {
+    fill: $successGreen;
+    transition: 0.2s ease-in-out;
+  }
+}
+
+:not(.BinaryFeedback__disabled).BinaryFeedback__positive:hover {
+  background-color: $successGreen;
+
+  path {
+    fill: white;
+  }
+}
+
+.BinaryFeedback__negative {
+  border-left: 0;
+  border-radius: 0 8px 8px 0;
+
+  path {
+    fill: $errorRed;
+    transition: 0.2s ease-in-out;
+  }
+}
+
+:not(.BinaryFeedback__disabled).BinaryFeedback__negative:hover {
+  background-color: $errorRed;
+
+  path {
+    fill: white;
+  }
+}
+
+.BinaryFeedback__positive.BinaryFeedback__selected {
+  background-color: $successGreen;
+
+  path {
+    fill: white;
+  }
+}
+
+.BinaryFeedback__negative.BinaryFeedback__selected{
+  background-color: $errorRed;
+
+  path {
+    fill: white;
+  }
+}
+
+.BinaryFeedback__disabled {
+  background-color: #efefef;
+
+  path {
+    fill: white;
+  }
+}
+
+.BinaryFeedback__icon {
+  color: blue;
+  height: 20px;
+  width: 20px;
+}

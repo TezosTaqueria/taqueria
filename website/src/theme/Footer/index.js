@@ -14,6 +14,7 @@ import styles from "./styles.module.css";
 import ThemedImage from "@theme/ThemedImage";
 import IconExternalLink from "@theme/IconExternalLink";
 import FooterForm from "../../components/FooterForm/FooterForm";
+import { BinaryFeedback } from "../../feedback/BinaryFeedback";
 
 function FooterLink({
 	to,
@@ -83,6 +84,7 @@ function Footer() {
 				"footer--dark": footer.style === "dark",
 			})}
 		>
+			<BinaryFeedback />
 			<div className="container">
 				{links && links.length > 0 && (
 					<div className="row footer__links">
