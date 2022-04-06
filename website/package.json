@@ -29,6 +29,7 @@
     "firebase": "^9.6.10",
     "html-react-parser": "^1.4.5",
     "mdb-react-ui-kit": "^3.0.0",
+    "mdbreact": "^5.2.0",
     "prism-react-renderer": "^1.2.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
