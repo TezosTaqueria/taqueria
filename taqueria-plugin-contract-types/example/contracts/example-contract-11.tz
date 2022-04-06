@@ -1,0 +1,7 @@
+{ 
+  parameter
+    (list %mint (pair (nat %token_id) (bytes %ipfs_hash) (address %owner)));
+  storage
+    (nat %total_supply);
+}
+
