@@ -103,6 +103,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
             expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific)
 
@@ -135,6 +142,13 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that the smartpy plugin exposes the associated options in the help menu', async () => {
         try {
             await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const smartpyHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
             expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific)
@@ -169,6 +183,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const taquitoHelpContents = await exec(`taq deploy --help --projectDir=${taqueriaProjectPath}`)
             expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific)
 
@@ -202,6 +223,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const flextesaHelpContents = await exec(`taq start sandbox --help --projectDir=${taqueriaProjectPath}`)
             expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStartSandbox)
 
@@ -215,6 +243,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
 
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
             const flextesaHelpContents = await exec(`taq stop sandbox --help --projectDir=${taqueriaProjectPath}`)
             expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStopSandbox)
 
@@ -227,6 +262,13 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that the flextesa plugin exposes the associated option for listing sandbox accounts in the help menu', async () => {
         try {
             await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const flextesaHelpContents = await exec(`taq list accounts --help --projectDir=${taqueriaProjectPath}`)
             expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginListAccounts)
@@ -263,6 +305,13 @@ describe("E2E Testing for taqueria CLI,", () => {
         try {
             await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
             await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
             expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoSmartpySpecific)
