@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/plugin-contract-types",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "",
   "targets": {
     "default": {
@@ -44,7 +44,7 @@
     "@taquito/taquito": "^11.2.0",
     "bignumber.js": "^9.0.2",
     "fast-glob": "^3.2.10",
-    "@taqueria/node-sdk": "^1.0.0"
+    "@taqueria/node-sdk": "^0.2.0"
   },
   "jest": {
     "transform": {
