@@ -204,8 +204,6 @@ export default (state) => ({
     },
     when: () => {
       state.contracts["increment.mligo"]?.modifiedTime > state.lastRunTime
-        ? true
-        : false
     }
 })
 ```
