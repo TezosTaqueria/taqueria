@@ -151,7 +151,7 @@ To apply the operation, the end-developer would call a built-in CLI task called 
 This would create an artifacts/increment.tz file, and too, add the following to .taq/state.json:
 
 ```json
-operations: {
+"operations": {
     ...
     "ligo.compile.increment.mligo": [{
         "contract": "increment.mligo", "artifact": "increment.tz"
@@ -179,7 +179,7 @@ export default () => ({
 Assuming this operation were executed as-is, then the following would be added to .taq/state.json:
 
 ```json
-operations: {
+"operations": {
     ...
     "custom.helloworld": {
         "result": "helloworld"
