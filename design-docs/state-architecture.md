@@ -8,7 +8,7 @@ Revision:   1
 
 ---
 
-This document is to provide a comprhensive overview of what the State Architecture is in Taqueria, and how it is used to power much of Taqueria's core functionality.
+This document is to provide a comprehensive overview of what the State Architecture is in Taqueria, and how it is used to power much of Taqueria's core functionality.
 
 ## Initial Assumptions
 
@@ -16,38 +16,40 @@ In the context of the design for the Taqueria State Architecture, the following 
 
 ### .taq/state.json has been renamed to ".taq/cache.json".
 
-When speaking of state, we should differentiate from the current state.json file in the .taq directory that is used to cache the list of available tasks provided by plugins installed in the Taqueria project.
+When speaking of state, we should differentiate from the current _state.json_ file in the _.taq_ directory that is used to cache the list of available tasks provided by plugins installed in the Taqueria project.
 
-From hereon, .taq/state.json will be referred to as .taq/cache.json or the "ephemeral state". Any subsequent uses of .taq/state.json will refer to the "persistent state".
+From hereon, _.taq/state.json_ will be referred to as _.taq/cache.json_ or the "ephemeral state". Any subsequent uses of _.taq/state.json_ will refer to the "persistent state".
 
 ## What is the State Archecture
 
-Taqueria has a state architecture that is segmented into two parts, ephemeral state and persistent state.
+The Taqueria CLI has a state architecture that is segmented into two parts, ephemeral state and persistent state.
 
 ### Ephemeral State
 
 This segment of the state architecture represents data that is cached for performance reasons, and its existence shouldn't be relied upon. It can change or be deleted at any time.
 
-The ephemeral state will be temporarily persisted to .taq/cache.json (formally .taq/state.json).
+The ephemeral state will be temporarily persisted to _.taq/cache.json_ (formally _.taq/state.json_).
 
-Currently, the ephermal state is represented as a JSON object, with a _hash_ field that stores the md5sum of the config.json file when the state was initially constructed. A second field called _tasks_ is used to store and represent a task-to-plugin mapping. This mapping can be used to reduce the amount of communication conducted at the plugin protocol layer.
+Currently, the ephermal state is represented as a JSON object, with a _hash_ field that stores the md5sum of the _config.json_ file when the state was initially constructed. A second field called _tasks_ is used to store and represent a task-to-plugin mapping. This mapping can be used to reduce the amount of communication conducted at the plugin protocol layer.
 
-When a user requests Taqueria to execute a task, internally Taqueria determines whether a .taq/cache.json exists, and if so, extracts the value of the hash field, and compares that to the md5sum of the current config.json file. If the hashes differ, then the state is invalid and regenerated.
+When the Taqueria CLI is used to execute a task, internally the CLI determines whether a _.taq/cache.json_ exists, and if so, extracts the value of the hash field, and compares that to the md5sum of the current _.taq/config.json_ file. If the hashes differ, then the state is invalid and regenerated.
 
 ### Persistent State
 
 This segment of the state architecture is designed to persist throughout the lifetime of the project.
 
-The persistent state is persisted to .taq/state.json. State files are specific to an environment, and therefore
-it is possible to have more than one. The default environment uses .taq/state.json, but other environments use _[environment-name]-state.json_.
+The persistent state is persisted to _.taq/state.json_. State files are specific to an environment, and therefore
+it is possible to have more than one. The default environment uses _.taq/state.json_, but other environments use _[environment-name]-state.json_.
 
 It is populated via the execution of operations. An operation is an on-chain or off-chain process that when executed, produces outputs. These outputs compose the project state, hence why they are used to populate the persistent state.
+
+> NOTE: Operations are considered low-level building blocks. The expectation is that an end-developer needs to be aware of what they are, what they do, and how they're used - but it should be rare that the CLI is used to manually create an operation.
 
 # Plugins
 
 ## Templates
 
-Plugins currently expose a list of tasks which can be consumed by Taqueria and re-exposed via the CLI or VS Code Plugin.
+Plugins currently expose a list of tasks which can be consumed by the Taqueria CLI and re-exposed via the CLI or VS Code Plugin.
 
 However, plugins can also expose a list of templates, used to construct new entities.
 
@@ -81,7 +83,7 @@ PLugin.create({
 
 The above API for exposing a template is very similiar to that for a task.
 
-To use this template, the end-developer would call a built-in task to Taqueria called _create_:
+To use this template, the end-developer would call a built-in task of the CLI called _create_:
 
 `taq create contract increment --syntax mligo`
 
@@ -100,6 +102,7 @@ Plugin.create({
         ...
     ],
     templates: [
+        // Templates defined here
         ...
     ],
     operations: [
@@ -121,7 +124,7 @@ Plugin.create({
 })
 ```
 
-The above defines an operation that when executed, would compile a contract using the _compile_ task provided by the current plugin.
+The above defines an operation that when executed, would compile a contract using the _compile_ task provided by the current plugin. An operation can represent a the execution of a task, or some arbitary process defined in TypeScript.
 
 To create this operation, the end-developer would execute:
 
@@ -141,7 +144,7 @@ export default () => ({
 })
 ```
 
-To apply the operation, the end-developer would call a built-in Taqueria task called _apply_:
+To apply the operation, the end-developer would call a built-in CLI task called _apply_:
 
 `taq apply ligo.compile.increment.mligo`
 
@@ -268,19 +271,19 @@ It's expected that your project's state will be populated via multiple operation
 
 The invocation of `taq apply` starts a process of a few different steps:
 
-1. Check if a .taq/state.lock file exists, which indicates that another process is running and applying operations. If the file exists, then we display an error message indicating that another process needs to complete before we can start another.
+1. Check if a _.taq/state.lock_ file exists, which indicates that another process is running and applying operations. If the file exists, then we display an error message indicating that another process needs to complete before we can start another.
 
 2. We parse all operations in the _operations_ directory and create a directed acyclic graph, which is then processed using a batch-alternative to the Kahn's topological sorting algorithm. This returns a list of lists, indicating what operations can be executed in parallel and what must be executed serially. In TypeScript, the data structure would be: `(Operation[])[]`
 
 The outer list is processed sequentially, and the inner lists are processed in parallel.
 
-3. The .taq/state.json is read if it exists, otherwise one is created with an empty as its contents: `{}`.
+3. The _.taq/state.json_ is read if it exists, otherwise one is created with an empty object as its contents: `{}`.
 
-4. The initial state is passed to the first list of operations which will return the updated state representation. This is then passed as input to the remaining operation lists in sequence till all operations have been executed.
+4. The initial state is passed to the first list of operations which will return the updated state representation. This is then passed as input to the remaining operation lists in sequence, each returning the next state update, till all operations have been executed.
 
-5. The final state is written to the .taq/state.json file.
+5. The final state is written to the _.taq/state.json_ file.
 
-6. The .taq/state.lock file is removed.
+6. The _.taq/state.lock_ file is removed.
 
 ## Visualizing Operations
 
@@ -296,11 +299,17 @@ I suspect that we'll add multiple outputs over time.
 
 Our Taqueria VS Code extension can make use of this to show a dependency graph as well.
 
+# Abstraction
+
+The following contructs are described and provided to create an abstraction around operations, and reduce the need to create them manually using the CLI.
+
 ## Hooks
 
 It would be rather inconvenient for an end-developer if they were required to manually create every operation needed to deploy their project.
 
-To address this, plugin authors can attach a hook that gets executed when the end-developer executes a task using Taqueria.
+To address this, plugin authors can attach a hook that gets executed when a task is invoked.
+
+> REMINDER: A task can be invoked by the end-developer interacting with the CLI or VS Code extension, or it could be triggered by some kind of automation such as a cron job, CI/CD process, etc.
 
 For instance, the LIGO plugin author might want to generate an operation for compiling the contract when a new contract is created from one their templates:
 
@@ -332,7 +341,9 @@ The above defines a hook to the "create" task when the "template" parameter is s
 
 `taq create contract increment.mligo`
 
-When the above task is executed, the handler defined will be executed which will have its EJS template variables substituted with the names of the positional arguments the _contract_ template accepts. Below is an example of the handler that would get executed in this example:
+When the above task is executed, the handler defined will be executed which will have its EJS template variables substituted with the names of the positional arguments the _contract_ template accepts. Like tasks and templates, a handler can also be function for more advanced use-cases.
+
+Below is an example of the handler that would get executed in this example:
 
 `taq create op compile increment.mligo compile_increment.mligo.ts`
 
@@ -373,9 +384,17 @@ Running `taq create contract increment.mligo` could result in the following:
 
 Because the operations are just TypeScript code, the end-developer can tweak them, remove them, replace them, etc.
 
+
+> NOTE: Hooks allow for a lot of different manifestations of workflow automation.
+> Some examples:
+> - Start a sandbox automatically when originating
+> - Top-up the account balance after originating or calling an entrypoint
+> - Run formal verification software before deploying
+> - Post a message on Slack if a test fails
+
 ## Hook Configuration
 
-The configuration of a hook can be customized in the .taq/config.json file, either by having its properties overwritten, or disabled:
+The configuration of a hook can be customized in the _.taq/config.json_ file, either by having its properties overwritten, or disabled:
 
 ```
 hooks: {
@@ -385,9 +404,17 @@ hooks: {
 }
 ```
 
+## Desired Outcome
+
+Using tasks, templates, operations, and hooks as underyling building blocks, the developer experience should resemble the following:
+- A developer will utlilize templates provided by plugins to create entities with the necessary boilerplate that will greatly minimize the amount of code they have to write, as well as minimize the need to think about project structure.
+- Related to the previous point, some of the most common CLI tasks will be `taq create contract` and `taq plan`
+- Many operations will be generated when `taq create` is used.
+- Developers remain in full control with the ability to CRUD operations using fully typed TypeScript code with a simple API.
+
 ## Other considerations
 
-Below are some ideas for discussion.
+Below are some other ideas for discussion to help with abstractions and advanced use-cases.
 
 ### Multi-file contracts via operations
 
@@ -456,12 +483,13 @@ export default (state, api) => ({
     })
 ```
 
+> NOTE: If a developer always uses `taq create contract`, then there's no need for the above as operations will be created to compile and originate the contract.
 
 ### End-developer defined tasks
 
-A developer should have the ability to custom tasks of their own that complement their own workflow.
+A developer should have the ability to define custom tasks of their own that complement their own workflow.
 
-To faciliate this, an end-developer can modify their .taq/config.json file add define custom tasks:
+To faciliate this, an end-developer can modify their _.taq/config.json_ file and define custom tasks:
 
 ```json
 {
@@ -491,4 +519,7 @@ To compile the tacoshop contract:
 To compile both:
 `taq run compile`
 
-This mechanism would also allow you to alias longer existing commands.
+This mechanism would allow you to:
+- alias longer existing commands
+- create an approach for handling multi-file contracts
+- integrate third-party tools for which no plugin exists yet
