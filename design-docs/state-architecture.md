@@ -1,8 +1,12 @@
 # Taqueria State Architecture
 
-Authors:    Michael Weichert <michael.weichert@ecadlabs.com>
+Authors:    Michael Weichert <<michael.weichert@ecadlabs.com>>
+
 Date:       Apr 7, 2022
+
 Revision:   1
+
+---
 
 This document is to provide a comprhensive overview of what the State Architecture is in Taqueria, and how it is used to power much of Taqueria's core functionality.
 
