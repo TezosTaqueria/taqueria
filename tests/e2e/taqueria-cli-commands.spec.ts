@@ -1,6 +1,7 @@
 import * as contents from "./data/help-contents"
 import { generateTestProject } from "./utils/utils"
 import { exec as exec1, execSync } from "child_process"
+import fsPromises from "fs/promises"
 import type { ExecException } from "child_process"
 import fs from "fs"
 import util from "util"
@@ -72,7 +73,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             expect(projectContents.stdout).toContain(configDirName)
             expect(configDirContents.stdout).toContain('config.json')
 
-            await fs.promises.rm(`./${projectName}`, { recursive: true })
+            await fsPromises.rm(`./${projectName}`, { recursive: true })
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
@@ -153,6 +154,26 @@ describe("E2E Testing for taqueria CLI,", () => {
             expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesa)
 
             await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that the contract types plugin exposes the associated commands in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
+            const generateTypesHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
+            expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypes)
+
+            await exec(`taq uninstall @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
