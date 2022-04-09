@@ -90,5 +90,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: The docker image has been published and is avaiable here: https://github.com/ecadlabs/taqueria/pkgs/container/taqueria-flextesa. Look for the image with the tag `pr-${{ github.event.number }}-${{ steps.vars.outputs.short_sha }}` :whale: :ship:. The image is available for the following platforms: `linux/amd64` and `linux/arm64/v8`.
+              body: The docker image has been published and is avaiable here: https://github.com/ecadlabs/taqueria/pkgs/container/taqueria-flextesa. Look for the image with the tag `pr-${{ github.event.number }}-${{ steps.vars.outputs.short_sha }}`. The image is available for the following platforms: `linux/amd64` and `linux/arm64/v8`.
             })
