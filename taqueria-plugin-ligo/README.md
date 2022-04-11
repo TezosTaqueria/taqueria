@@ -1,6 +1,8 @@
+<!-- 
 ---
 title: LIGO Plugin
 ---
+-->
 
 The LIGO plugin provides a task to compile LIGO smart contracts to Michelson `.tz` files
 
