@@ -69,6 +69,8 @@ jobs:
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
+        # TODO: Remove once this issue is fixed:
+        # https://github.com/denoland/deno/issues/13904
         with:
           deno-version: "1.18.2"
 
@@ -82,7 +84,8 @@ jobs:
           DENO_DIR: "./deno"
         run: |
           COMMIT=`git rev-parse --short "$GITHUB_SHA"`
-          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$TAQ_VERSION/$COMMIT" --setVersion "$TAQ_VERSION"
+          TAQ_VERSION="${TAQ_VERSION/\//-}"
+          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION"
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
@@ -177,8 +180,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 16.x
-
+          node-version: 16.13.x
+          # Setting node version to 16.13.2 to enable integration tests to pass
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "1.18.2"
@@ -206,7 +209,9 @@ jobs:
         run: npm ci
 
       - name: builds for testing
-        run: npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy
+        run: |
+          npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy -w taqueria-flextesa-manager -w taqueria-plugin-contract-types
+          npm run build-docker -w taqueria-flextesa-manager
       
       - name: Run unit tests
         run: |
@@ -219,6 +224,15 @@ jobs:
       - name: Run e2e tests
         run: |
           npm run test:e2e -w tests
+  
+      - name: Report Status
+        uses: ravsamhq/notify-slack-action@v1
+        if: always()
+        with:
+          status: ${{ job.status }} # required
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
   vscode-extension-workflow:
     needs: detect-changes

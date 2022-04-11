@@ -51,7 +51,7 @@ The following commands are available from the CLI or the VS Code Command palette
 - `taq list accounts [sandboxName]`
 
 :::note
-The first time you start a sandbox, it might take several minutes to start. This is normal when starting a Flextesa image
+The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer
 :::
 
 ## Plugin Configuration
@@ -60,22 +60,30 @@ Configuration is done in the project's `./.taq/config.json` file. Here you can c
 
 Sandbox configurations are stored as key/value pairs in the `sandbox` property. In this example there is one sandbox configuration named `local`:
 ```json
-    sandbox: {
-        local: {
-            accounts: {
-                default: 'bob',
-                bob: {
-                    initialBalance: '3000000000',
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "default": "bob",
+                "bob": {
+                    "initialBalance": "3000000000"
                 },
-                alice: {
-                    initialBalance: '2000000000',
+                "alice": {
+                    "initialBalance": "2000000000"
+                },
+                "john": {
+                    "initialBalance": "4000000000"
+                },
+                "jane": {
+                    "initialBalance": "5000000000"
+                },
+                "joe": {
+                    "initialBalance": "1000000000"
                 }
             },
-            label: 'Local Tezos Sandbox',
-            protocol: 'PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx',
-            rpcUrl: 'http://localhost:20000',
-        },
-    },
+            "label": "Local Tezos Sandbox",
+            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "rpcUrl": "http://localhost:20000"
+        }
 ```
 
 ### Adding a New Sandbox Configuration

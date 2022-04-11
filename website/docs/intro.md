@@ -2,6 +2,9 @@
 title: Introduction
 ---
 
+import Term from "@docusaurus-terminology/term";
+
+
 <!-- 
 content-type: getting started
 audience: crypto literate readers and developers looking to USE Taqueria (rather than build on it)
@@ -15,6 +18,7 @@ purpose: help the user understand what Taqueria is, what it does, and how to pro
 - what is the MINIMAL amount of detail necessary in this document?
  -->
 
+<Term popup="This hover text will appear in the documentation page that you reference this term" reference="/docs/terms/taquito">Name of the term</Term>
 
 Taqueria is here to help make developing on Tezos easier. Taqueria supercharges your projects with a powerful and centralized configuration and access to top Tezos development tools through tasks that you run from the command line
 
@@ -79,4 +83,4 @@ Currently available plugins include:
 
 Taqueria has an SDK and protocol at its core which all Taqueria plugins and the cli depend on
 
-Most developers won't ever interact with directly unless they are developing a Taqueria plugin, but it's helpful to know they are there
+> Note: Most developers won't ever interact with the SDK directly unless they are developing a plugin
