@@ -12,22 +12,8 @@ Plugin.create(i18n => ({
             aliases: ["c", "compile-archetype"],
             description: "Compile a smart contract written in a Archetype syntax to Michelson code",
             options: [],
-            handler: "proxy"
-        }),
-        Task.create({
-            task: "teapot",
-            command: "teapot",
-            aliases: ["t", "tea"],
-            description: "Have a cup of tea",
-            options: [
-                Option.create({
-                    shortFlag: "g",
-                    flag: "green",
-                    description: "Make green tea instead",
-                    boolean: true // TODO: Why isn't this working?
-                })
-            ],
-            handler: 'proxy'
+            handler: "proxy",
+            encoding: "json"
         })
     ],
     checkRuntimeDependencies: () => Promise.resolve({
