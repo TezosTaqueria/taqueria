@@ -1,4 +1,4 @@
-import {PluginAction, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig, PluginResponse as thePluginResponse, AccountDetails as theAccountDetails} from '@taqueria/protocol/taqueria-protocol-types'
+import {PluginAction, TaskHandler, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig, PluginResponse as thePluginResponse, AccountDetails as theAccountDetails} from '@taqueria/protocol/taqueria-protocol-types'
 
 export type Sandbox = theSandbox
 
@@ -21,7 +21,7 @@ export interface TaskView {
     readonly aliases: string[]
     readonly options: UnvalidatedOption[]
     readonly positionals: UnvalidatedPositionalArg[]
-    readonly handler: "proxy" | string | string[]
+    readonly handler: TaskHandler
     readonly encoding: "json" | "application/json" | "none"
 }
 

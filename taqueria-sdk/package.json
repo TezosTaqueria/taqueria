@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx esbuild --bundle index.ts --outfile=index.js --minify --platform=node --sourcemap",
+    "build": "npx tsc -noEmit index.ts && npx esbuild --bundle index.ts --outfile=index.js --minify --platform=node --sourcemap",
     "gen-schema": "npx ts-node schema-generator.ts"
   },
   "keywords": [
