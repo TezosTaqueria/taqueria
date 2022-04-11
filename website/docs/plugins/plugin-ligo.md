@@ -1,6 +1,8 @@
+<!-- 
 ---
 title: LIGO Plugin
 ---
+-->
 
 The LIGO plugin provides a task to compile LIGO smart contracts to Michelson `.tz` files
 
@@ -16,9 +18,11 @@ To install the LIGO plugin on a Taqueria project, navigate to the project folder
 taq install @taqueria/plugin-ligo
 ```
 
+<!--
 :::note
 At this time, all Taqueria projects must also be initialized as node projects by running `npm init -y` from the root of your project directory
 :::
+-->
 
 ## Configuration
 
