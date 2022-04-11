@@ -21,7 +21,7 @@
         "test": {
             "networks": ["hangzhounet"],
             "sandboxes": [],
-            "storage": {"hello-tacos.tz": "100"}
+            "storage": {}
         }
     },
     "sandbox": {

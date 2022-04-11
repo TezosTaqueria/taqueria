@@ -21,7 +21,7 @@
         "test": {
             "networks": ["hangzhounet"],
             "sandboxes": [],
-            "storage": {"hello-tacos.tz": "100"}
+            "storage": {"hello-tacos.tz": "abc"}
         }
     },
     "sandbox": {
@@ -55,7 +55,7 @@
             "rpcUrl": "https://hangzhounet.api.tez.ie",
             "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
             "faucet": {
-                "pkh": "invalid_pkh",
+                "pkh": "tz1UjBsGr8Tkogbz8fcySP6x77S5TKBvs99t",
                 "mnemonic": [
                     "bone",
                     "copper",

@@ -235,15 +235,8 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             await exec(`cp e2e/data/config-taquito-test-environment-invalid-config-networkname.json ${taqueriaProjectPath}/.taq/config.json`);
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
-            // TODO: This can removed after this is resolved:
-            // https://github.com/ecadlabs/taqueria/issues/528
-            try {
-                await exec(`taq -p ${taqueriaProjectPath}`)
-            }
-            catch (_) {}
-
             // 2. Run taq deploy on a network described in "test" environment
-            await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
+            const stdoutDeploy = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             // .catch(
             //     (err: ExecException & {stdout: string, stderr: string}) => {
             //         expect(err.code).toEqual(6)
@@ -252,12 +245,14 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // )
 
             // 3. Verify that proper error displays in the console
-            // console.log(stdoutDeploy.stdout)
+            console.log(stdoutDeploy)
             // console.log(stdoutDeploy.stderr)
             // expect(stdoutDeploy.stdout).toContain("E_INVALID_PLUGIN_RESPONSE");
 
         } catch(error) {
-            throw new Error (`error: ${error}`);
+            console.error(error)
+            expect(error).toContain("E_INVALID_PLUGIN_RESPONSE");
+            // throw new Error (`error: ${error}`);
         }
 
     });
@@ -265,7 +260,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
     // TODO: Currently there is no output to stdout/stderr to be caught by automation
     // Issue to investigate and re-enable these tests https://github.com/ecadlabs/taqueria/issues/377
     // Issue associated https://github.com/ecadlabs/taqueria/issues/313
-    test.only('Verify that taqueria taquito plugin will show proper error when faucet is wrong -> network url is wrong', async () => {
+    test('Verify that taqueria taquito plugin will show proper error when faucet is wrong -> network url is wrong', async () => {
         try {
             // Environment test does not exist on default config.json
             environment = "test"
@@ -276,18 +271,11 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
             // 2. Run taq deploy on a network described in "test" environment
             const stdoutDeploy = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
-            // .catch(
-            //     (err: ExecException & {stdout: string, stderr: string}) => {
-            //         expect(err.code).toEqual(5634634346)
-            //         expect(err.stderr).toEqual("Taqueria isn't aware of this task. Perhaps you need to install a plugin first? and Alex is a super cool guy")
-            //     }
-            // )
 
             // 3. Verify that proper error displays in the console
-            const errResponse = stdoutDeploy.stderr
-            console.log(errResponse)
-            expect(errResponse).toContain("E_ORIGINATE");
-            expect(stdoutDeploy).toContain('\\"status\\":\\"failed\\"');
+            expect(stdoutDeploy.stderr).toContain("E_ORIGINATE");
+            expect(stdoutDeploy.stderr).toContain("An unexpected error occured when trying to originate a contract");
+            expect(stdoutDeploy.stderr).toContain("HttpRequestFailed: Request to https://invalid.test/chains/main/blocks/head~2/header failed");
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -298,20 +286,23 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
     // TODO: Currently there is no output to stdout/stderr to be caught by automation
     // Issue to investigate and re-enable these tests https://github.com/ecadlabs/taqueria/issues/377
     // Issue associated https://github.com/ecadlabs/taqueria/issues/313
-    test.skip('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> empty', async () => {
+    test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> empty', async () => {
         try {
             // Environment test does not exist on default config.json
             environment = "test"
 
             // 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
-            execSync(`cp e2e/data/config-taquito-test-environment-invalid-faucet-empty.json ${taqueriaProjectPath}/.taq/config.json`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
+            await exec(`cp e2e/data/config-taquito-test-environment-invalid-faucet-empty.json ${taqueriaProjectPath}/.taq/config.json`);
 
             // 2. Run taq deploy on a network described in "test" environment
-            const stdoutDeploy = execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
+            const stdoutDeploy = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
 
             // 3. Verify that proper error displays in the console
-            expect(stdoutDeploy).toContain("E_INVALID_PLUGIN_RESPONSE");
+            expect(stdoutDeploy.stderr).toContain("E_ORIGINATE");
+            expect(stdoutDeploy.stderr).toContain("An unexpected error occured when trying to originate a contract");
+            expect(stdoutDeploy.stderr).toContain("Error: Unsupported key type");
+
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -328,14 +319,16 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             environment = "test"
 
             // 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
-            execSync(`cp e2e/data/config-taquito-test-environment-invalid-faucet-pkh.json ${taqueriaProjectPath}/.taq/config.json`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
+            await exec(`cp e2e/data/config-taquito-test-environment-invalid-faucet-pkh.json ${taqueriaProjectPath}/.taq/config.json`);
 
             // 2. Run taq deploy on a network described in "test" environment
-            const stdoutDeploy = execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
+            const stdoutDeploy = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
 
             // 3. Verify that proper error displays in the console
-            expect(stdoutDeploy).toContain("E_INVALID_PLUGIN_RESPONSE");
+            expect(stdoutDeploy.stderr).toContain("E_ORIGINATE");
+            expect(stdoutDeploy.stderr).toContain("An unexpected error occured when trying to originate a contract");
+            expect(stdoutDeploy.stderr).toContain("Error: Probably something about the PKH");
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -346,21 +339,47 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
     // TODO: Currently there is no output to stdout/stderr to be caught by automation
     // Issue to investigate and re-enable these tests https://github.com/ecadlabs/taqueria/issues/377
     // Issue associated https://github.com/ecadlabs/taqueria/issues/313
-    test.skip('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> initial storage is not provided', async () => {
+    test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> initial storage is not provided', async () => {
         try {
             // Environment test does not exist on default config.json
             environment = "test"
 
             // 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
-            execSync(`cp e2e/data/config-taquito-test-environment-invalid-initial-storage.json ${taqueriaProjectPath}/.taq/config.json`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
+            await exec(`cp e2e/data/config-taquito-test-environment-invalid-initial-storage.json ${taqueriaProjectPath}/.taq/config.json`);
 
             // 2. Run taq deploy on a network described in "test" environment
-            const stdoutDeploy = execSync(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
+            const stdoutDeploy  = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
 
             // 3. Verify that proper error displays in the console
-            expect(stdoutDeploy).toContain("E_INVALID_PLUGIN_RESPONSE");
-            expect(stdoutDeploy).toContain('"No storage configured in your configuration file for hello-tacos.tz')
+            expect(stdoutDeploy.stderr).toContain("E_INVALID_STORAGE");
+            expect(stdoutDeploy.stderr).toContain("No storage configured in your configuration file for hello-tacos.tz");
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+
+    });
+
+    // TODO: Currently there is no output to stdout/stderr to be caught by automation
+    // Issue to investigate and re-enable these tests https://github.com/ecadlabs/taqueria/issues/377
+    // Issue associated https://github.com/ecadlabs/taqueria/issues/313
+    test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> initial storage is not a number', async () => {
+        try {
+            // Environment test does not exist on default config.json
+            environment = "test"
+
+            // 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
+            await exec(`cp e2e/data/config-taquito-test-environment-invalid-initial-storage-string.json ${taqueriaProjectPath}/.taq/config.json`);
+
+            // 2. Run taq deploy on a network described in "test" environment
+            const stdoutDeploy  = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
+
+            // 3. Verify that proper error displays in the console
+            expect(stdoutDeploy.stderr).toContain("E_ORIGINATE");
+            expect(stdoutDeploy.stderr).toContain("Could not originate hello-tacos.tz on the network 'hangzhounet'");
+            expect(stdoutDeploy.stderr).toContain("NatValidationError: [0] Value is not a number: abc");
 
         } catch(error) {
             throw new Error (`error: ${error}`);
