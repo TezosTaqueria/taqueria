@@ -133,6 +133,8 @@ tests/coverage
 /taqueria-plugin-teztnets/.parcel-cache
 /taqueria-plugin-contract-types/index.js
 /taqueria-plugin-contract-types/index.js.map
+/taqueria-plugin-archetype/index.js
+/taqueria-plugin-archetype/index.js.map
 
 # VS Code Extension
 /taqueria-vscode-extension/out
