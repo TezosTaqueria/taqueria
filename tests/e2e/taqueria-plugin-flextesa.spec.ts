@@ -3,7 +3,6 @@ import fsPromises from "fs/promises"
 import { exec as exec1, execSync } from "child_process"
 import util from "util"
 const exec = util.promisify(exec1)
-import waitForExpect from "wait-for-expect";
 import {isPortReachable} from "./utils/utils";
 
 
@@ -16,7 +15,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
         await generateTestProject(taqueriaProjectPath, ["flextesa"]);
     })
 
-    test.only('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
+    test('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
         try {
 
             // Setting up docker container name
@@ -26,7 +25,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             const sandboxStart = await exec(`taq start sandbox`, {cwd: `./${taqueriaProjectPath}`})
 
             // 2. Verify that sandbox has been started and taqueria returns proper message into console
-            expect(sandboxStart.stdout).toEqual("Started local.\n");
+            expect(sandboxStart.stdout).toEqual("Started local.\nDone.\n");
 
             // 3. Verify that docker container has been started
             const dockerContainerTest = getContainerName(dockerName);
@@ -123,7 +122,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
             // 2.  Run start command second time and verify the output
             const sandboxStart = await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
-            expect(sandboxStart.stdout).toContain("Already running.");
+            expect(sandboxStart.stdout).toEqual("Already running.\n");
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -135,7 +134,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
         try {
             // 1. Run stop sandbox local on sandbox that is not running and verify result
             const sandboxWasNotRunning = await exec("taq stop sandbox local", {cwd: `./${taqueriaProjectPath}`})
-            expect(sandboxWasNotRunning.stdout).toContain("The local sandbox was not running.");
+            expect(sandboxWasNotRunning.stdout).toEqual("The local sandbox was not running.\n");
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -150,7 +149,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
         try {
             // 1. Run list accounts command on sandbox that is not running and verify result
             const stdoutSandboxIsNotRunning = await exec("taq list accounts local", {cwd: `./${taqueriaProjectPath}`})
-            expect(stdoutSandboxIsNotRunning.stderr).toEqual("The local sandbox is not running.");
+            expect(stdoutSandboxIsNotRunning.stderr).toEqual("The local sandbox is not running.\n");
 
         } catch(error) {
             throw new Error (`error: ${error}`);
