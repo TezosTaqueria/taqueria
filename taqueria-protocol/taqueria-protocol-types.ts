@@ -226,6 +226,7 @@ export interface UnvalidatedTask {
     readonly handler: "proxy" | string | string[]
     readonly hidden?: boolean
     readonly example?: string
+    readonly encoding?: "json" | "application/json" | "none"
 }
 
 export interface UnvalidatedPluginInfo {
@@ -372,6 +373,8 @@ export class Option {
     }
 }
 
+export type TaskEncoding = "none" | "json" | "application/json"
+
  const taskType: unique symbol = Symbol()
  export class Task {
      [taskType]: void
@@ -384,7 +387,8 @@ export class Option {
      readonly handler: TaskHandler
      readonly hidden: boolean
      readonly positionals: PositionalArg[]
-     protected constructor(name: Verb, command: Command, description: string, handler: TaskHandler, options: Option[]=[], positionals: PositionalArg[]=[], aliases: Alias[]=[], hidden=false, example?: string) {
+     readonly encoding: TaskEncoding
+     protected constructor(name: Verb, command: Command, description: string, handler: TaskHandler, options: Option[]=[], positionals: PositionalArg[]=[], aliases: Alias[]=[], hidden=false, encoding="none", example?: string) {
          this.task = name
          this.command = command
          this.description = description
@@ -394,6 +398,9 @@ export class Option {
          this.hidden = hidden
          this.example = example
          this.positionals = positionals
+         this.encoding = ["none", "json", "application/json"].includes(encoding)
+            ? encoding as TaskEncoding
+            : "none"
      }
      static createAlias(value: string): Alias | undefined {
         return Verb.create(value) || SingleChar.create(value)
@@ -446,7 +453,7 @@ export class Option {
         )
 
         return name && command
-            ? new Task(name, command, task.description, task.handler, options, positionals, aliases, task.hidden ? true : false, task.example)
+            ? new Task(name, command, task.description, task.handler, options, positionals, aliases, task.hidden ? true : false, task.encoding, task.example)
             : undefined
         }
 }
@@ -586,38 +593,34 @@ export interface Environment {
     readonly storage: Record<string, unknown>
 }
 
-export type PluginAction = "checkRuntimeDependencies" | "installRuntimeDependencies" | "proxy" | "pluginInfo" | string
+export type PluginActionName = "checkRuntimeDependencies" | "installRuntimeDependencies" | "proxy" | "pluginInfo" | string
+
+export type PluginProxyAction = Task
+
+export type PluginAction = "checkRuntimeDependencies" | "installRuntimeDependencies" | "pluginInfo" | PluginProxyAction
 
 export interface RuntimeDependencyReport extends RuntimeDependency {
     readonly met: boolean
 }
 
-export interface CheckRuntimeDependenciesAction {
-    readonly status: PluginResponseCode,
+export interface CheckRuntimeDependenciesResponse {
     readonly report: RuntimeDependencyReport[]
 }
 
-export interface InstallRuntimeDependenciesAction {
-    readonly status: PluginResponseCode,
+export interface InstallRuntimeDependenciesResponse {
     readonly report: RuntimeDependencyReport[]
 }
 
-export type PluginResponseCode = "success" | "failed" | "notSupported"
-
-export type PluginActionNotSupported = {
+export type PluginActionNotSupportedResponse = {
     readonly status: "notSupported",
     readonly msg: string
 }
 
-export interface ProxyAction {
-    readonly status: PluginResponseCode,
-    readonly stdout: string | unknown,
-    readonly stderr: string,
+export interface PluginJsonResponse {
+    readonly data?: unknown
     readonly render?: 'none' | 'string' | 'table'
 }
 
-export interface ActionPluginInfo extends UnvalidatedPluginInfo {
-    readonly status: PluginResponseCode,
-}
+export type ActionPluginInfo = UnvalidatedPluginInfo
 
-export type PluginResponse = ProxyAction | CheckRuntimeDependenciesAction | InstallRuntimeDependenciesAction | ActionPluginInfo | PluginActionNotSupported
+export type PluginResponse = PluginJsonResponse | CheckRuntimeDependenciesResponse | InstallRuntimeDependenciesResponse | ActionPluginInfo | PluginActionNotSupportedResponse | void

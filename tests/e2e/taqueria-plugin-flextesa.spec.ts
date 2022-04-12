@@ -24,11 +24,11 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             const stdoutStart = execSync(`taq start sandbox`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
 
             // 2. Verify that sandbox has been started and taqueria returns proper message into console
-            expect(stdoutStart).toEqual("Started local.");
+            expect(stdoutStart).toEqual("Started local.\nDone.");
 
             // 3. Verify that docker container has been started
             const dockerContainerTest = getContainerName(dockerName);
-            expect(dockerContainerTest).toContain("node startFlextesa.js --sandbox local")
+            expect(dockerContainerTest).toContain("node index.js --sandbox local")
 
             // 4. Verify that sandbox started on the proper port 0.0.0. q0:20000->20000/tcp
             let isReachable = await isPortReachable(20000, {host: 'localhost'});
@@ -62,7 +62,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
             // 3. Verify that docker container has been started
             const dockerContainerTest = getContainerName(dockerName);
-            expect(dockerContainerTest).toContain("node startFlextesa.js --sandbox local")
+            expect(dockerContainerTest).toContain("node index.js --sandbox local")
 
             // 4. Verify that sandbox started on the proper port 0.0.0.0:20000->20000/tcp
             let isReachable = await isPortReachable(20000, {host: 'localhost'});
@@ -92,6 +92,9 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
             execSync(`taq start sandbox`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
 
             // 2. Run list accounts command and verify that it returns list of default accounts
+            // There is a delay between taq start sandbox and container to be fully up and running
+            // There is an issue associated with it -https://github.com/ecadlabs/taqueria/issues/225
+            // That is why calling list of accounts is wrapped inside retry mechanism to repeat it few times before failing
             await waitForExpect(() => {
                 const stdoutList = execSync(`taq list accounts ${dockerName}`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
                 expect(stdoutList).toContain("bob");
@@ -235,7 +238,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
     // Comment if need to debug
     afterAll(() => {
         try {
-            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+            fs.rmSync(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }

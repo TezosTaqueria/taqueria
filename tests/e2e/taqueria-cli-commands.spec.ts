@@ -1,8 +1,9 @@
 import * as contents from "./data/help-contents"
 import { generateTestProject } from "./utils/utils"
 import { exec as exec1, execSync } from "child_process"
-import fs from "fs"
 import fsPromises from "fs/promises"
+import type { ExecException } from "child_process"
+import fs from "fs"
 import util from "util"
 const exec = util.promisify(exec1)
 
@@ -14,10 +15,15 @@ describe("E2E Testing for taqueria CLI,", () => {
         await generateTestProject(taqueriaProjectPath)
     })
 
-    test('Verify that taq --help gives the help menu for a non-initialized project', async () => {
+    test('Verify that taq --help gives the help menu for a non-initialized project', async () => {        
         try {
-            const help = await exec('taq --help')
-            expect(help.stderr).toBe(contents.helpContentsNoProject)
+            await exec('taq --help').catch(
+                (err: ExecException & {stdout: string, stderr: string}) => {
+                    expect(err.code).toEqual(1)
+                    expect(err.stderr).toBe(contents.helpContentsNoProject)
+                }
+            )
+            
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
@@ -25,8 +31,12 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that taq --help gives the help menu for an initialized project', async () => {
         try {
-            const projectHelp = await exec(`taq --help -p ${taqueriaProjectPath}`)
-            expect(projectHelp.stdout).toBe(contents.helpContentsForProject)
+            await exec(`taq --help -p ${taqueriaProjectPath}`).catch(
+                (err: ExecException & {stdout: string, stderr: string}) => {
+                    expect(err.code).toEqual(1)
+                    expect(err.stderr).toBe(contents.helpContentsForProject)
+                }
+            )
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
@@ -35,7 +45,7 @@ describe("E2E Testing for taqueria CLI,", () => {
     test('Verify that taq reports a version', () => {
         const version = execSync('taq --version')
         try {
-            expect(version.toString("utf8").trim()).toMatch(/((\d+\.\d+\.\d+)|(dev:.+\/\w+)|(\d+\/\w{5,}))$/)
+            expect(version.toString("utf8").trim()).toMatch(/^((v\d+\.\d+\.\d+)|(dev-[\w-]+)|(\d+)-[\w-]+)$/)
         } catch (error) {
             throw new Error (`error: ${error}`)
         }
@@ -44,7 +54,7 @@ describe("E2E Testing for taqueria CLI,", () => {
     test("Verify that build reports build information about the version", () => {
         const build = execSync('taq --build')
         try {
-            expect(build.toString('utf8').trim()).toMatch(/\/\w+$/)
+            expect(build.toString('utf8').trim()).toMatch(/^\w+$/)
         } catch (error) {
             throw new Error (`error: ${error}`)
         }
@@ -63,26 +73,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             expect(projectContents.stdout).toContain(configDirName)
             expect(configDirContents.stdout).toContain('config.json')
 
-            await fs.promises.rm(`./${projectName}`, { recursive: true })
-        } catch(error) {
-            throw new Error (`error: ${error}`)
-        }
-    })
-
-    test('Verify that help message reacts to config directory not being in the default location', async () => {
-        const projectName = 'test-1'
-        const configDirName = 'configDirProject'
-
-        try {
-            await exec(`taq init ${projectName} -d ${configDirName}`)
-
-            const helpContents = await exec(`taq --help -p ${projectName}`)
-            const helpContentsWithDir = await exec(`taq --help -p ${projectName} -d ${configDirName}`)
-
-            expect(helpContents.stderr).toContain('Your config.json file is invalid')
-            expect(helpContentsWithDir.stderr).not.toContain('Your config.json file is invalid')
-
-            await fs.promises.rm(`./${projectName}`, { recursive: true })
+            await fsPromises.rm(`./${projectName}`, { recursive: true })
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
@@ -90,7 +81,14 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigo)
@@ -103,7 +101,14 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the smartpy plugin exposes the associated commands in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const smartpyHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpy)
@@ -116,7 +121,14 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the taquito plugin exposes the associated commands in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-taquito -p ${taqueriaProjectPath}`)
+            
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const taquitoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquito)
@@ -129,7 +141,14 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the flextesa plugin exposes the associated commands in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const flextesaHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesa)
@@ -140,10 +159,37 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
+    test('Verify that the contract types plugin exposes the associated commands in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
+            const generateTypesHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
+            expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypes)
+
+            await exec(`taq uninstall @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
     test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
-            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`)
+            
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
 
             const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
             expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoSmartpy)
@@ -157,10 +203,11 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that trying a command that is not available returns an error', async () => {
         try {
-            const response = await exec(`taq compile -p ${taqueriaProjectPath}`)
-            expect(response.stderr).toContain("E_INVALID_TASK")
-            expect(response.stderr).toContain(
-                "Taqueria isn't aware of this task. Perhaps you need to install a plugin first?"
+            await exec(`taq compile -p ${taqueriaProjectPath}`).catch(
+                (err: ExecException & {stdout: string, stderr: string}) => {
+                    expect(err.code).toEqual(5)
+                    expect(err.stderr).toContain("Taqueria isn't aware of this task. Perhaps you need to install a plugin first?")
+                }
             )
         } catch(error) {
             throw new Error (`error: ${error}`)
@@ -169,9 +216,13 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that trying to install a package that does not exist returns an error', async () => {
         try {
-            const response = await exec(`taq install acoupleofecadhamburgers -p ${taqueriaProjectPath}`)
-            expect(response.stderr).toContain("E_READ")
-            expect(response.stderr).toContain("ENOENT")
+            await exec(`taq install acoupleofecadhamburgers -p ${taqueriaProjectPath}`).catch(
+                (err: ExecException & {stdout: string, stderr: string}) => {
+                    const pattern = /Could not read.*acoupleofecadhamburgers\/package\.json$/m
+                    expect(err.code).toEqual(9)
+                    expect(err.stderr).toMatch(pattern)
+                }
+            )
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
@@ -179,9 +230,9 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     // Clean up process to remove taquified project folder
     // Comment if need to debug
-    afterAll(async () => {
+    afterAll(() => {
         try {
-            await fsPromises.rm(taqueriaProjectPath, { recursive: true })
+            fs.rmSync(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`)
         }

@@ -1,31 +1,10 @@
-import { Failure, LikeAPromise, ProxyAction, PluginResponse, SanitizedArgs } from "@taqueria/node-sdk/types";
-import { exec } from 'child_process'
+import {execCmd, sendErr, sendJsonRes, sendAsyncErr} from "@taqueria/node-sdk"
+import { Failure, LikeAPromise, ParsedArgs, PluginResponse, SanitizedArgs } from "@taqueria/node-sdk/types";
 import glob from 'fast-glob'
 import { extname, join, basename } from 'path'
 import { readFile } from 'fs/promises'
 
-type Opts = SanitizedArgs & Record<string, unknown>
-
-// TODO: Move to SDK
-const execCmd = (cmd: string): Promise<ProxyAction> => new Promise((resolve, reject) => {
-  exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
-    if (err) reject({
-      status: 'failed',
-      stdout: stdout,
-      stderr: err.message
-    })
-    else if (stderr) reject({
-      status: 'failed',
-      stdout,
-      stderr
-    })
-    else resolve({
-      status: 'success',
-      stdout,
-      stderr
-    })
-  })
-})
+type Opts = SanitizedArgs & {sourceFile: string}
 
 const getInputFilename = (opts: Opts) => (sourceFile: string) => {
   const inputFile = basename(sourceFile, extname(sourceFile))
@@ -46,12 +25,24 @@ const getCompileCommand = (opts: Opts) => (sourceFile: string) => {
   return cmd
 }
 
-const compileContractUnit = (opts: Opts) => (sourceFile: string): Promise<{ contract: string, artifact: string }> => {
+const compileContract = (opts: Opts) => (sourceFile: string): Promise<{ contract: string, artifact: string }> =>
   // const sourceAbspath = join(opts.contractsDir, sourceFile)
-  return execCmd(getCompileCommand(opts)(sourceFile))
-    .then(() => getContractArtifactFilename(opts)(sourceFile))
-    .then((artifact: string) => ({ contract: sourceFile, artifact: artifact }))
-}
+  execCmd(getCompileCommand(opts)(sourceFile))
+  .then(({stderr}) => { // How should we output warnings?
+      if (stderr.length > 0) sendErr(stderr)
+      return {
+          contract: sourceFile,
+          artifact: getContractArtifactFilename(opts) (sourceFile)
+      }
+  })
+  .catch(err => {
+      sendErr(" ")
+      sendErr(err.message.split("\n").slice(1).join("\n"))
+      return Promise.resolve({
+          contract: sourceFile,
+          artifact: "Not compiled"
+      })
+  })
 
 const compileAll = (opts: Opts): Promise<{ contract: string, artifact: string }[]> => {
   // TODO: Fetch list of files from SDK
@@ -59,25 +50,28 @@ const compileAll = (opts: Opts): Promise<{ contract: string, artifact: string }[
     ['**/*.arl'],
     { cwd: opts.contractsDir, absolute: false }
   )
-    .then(entries => entries.map(compileContractUnit(opts)))
+    .then(entries => entries.map(compileContract(opts)))
+    .then(processes => processes.length > 0
+      ? processes
+      : [{contract: "None found", artifact: "N/A"}]
+  )
     .then(promises => Promise.all(promises))
 }
 
-const compileContract = (opts: Opts) => (sourceFile: string): Promise<{ contract: string, artifact: string }[]> => {
-  return Promise.all([compileContractUnit(opts)(sourceFile)])
-}
-
-export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
+const compile = <T>(parsedArgs: SanitizedArgs): LikeAPromise<PluginResponse, Failure<T>> => {
+  const params = parsedArgs as Opts
   const p = parsedArgs.sourceFile
-    ? compileContract(parsedArgs)(parsedArgs.sourceFile as string)
-    : compileAll(parsedArgs)
-
-  return p.then(results => ({
-    status: 'success',
-    stdout: results,
-    stderr: "",
-    render: 'table'
-  }))
+      ? compileContract(params) (params.sourceFile)
+          .then(result => [result])
+      : compileAll(params)
+          .then(results => {
+              if (results.length === 0) sendErr("No contracts found to compile.")
+              return results
+          })
+  
+  return p
+  .then(sendJsonRes)
+  .catch(err => sendAsyncErr(err, false))
 }
 
 export default compile
