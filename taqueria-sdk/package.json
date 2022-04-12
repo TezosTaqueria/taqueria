@@ -50,7 +50,6 @@
     "@types/yargs": "^17.0.7",
     "caller-id": "^0.1.0",
     "esbuild": "^0.14.13",
-    "json-schema-generator": "^2.0.6",
     "parcel": "^2.2.1",
     "stack-trace": "github:mweichert/node-stack-trace",
     "typescript": "4.5.4"
