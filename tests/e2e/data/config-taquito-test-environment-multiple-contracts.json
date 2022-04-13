@@ -19,7 +19,7 @@
             "storage": {}
         },
         "test": {
-            "networks": ["hangzhounet"],
+            "networks": ["ithacanet"],
             "sandboxes": [],
             "storage": {
                 "hello-tacos-one.tz": "100",
@@ -48,38 +48,38 @@
                 }
             },
             "label": "Local Tezos Sandbox",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "rpcUrl": "http://localhost:20000"
         }
     },
     "network": {
-        "hangzhounet": {
-            "label": "hangzhounet",
+        "ithacanet": {
+            "label": "ithacanet",
             "rpcUrl": "https://hangzhounet.api.tez.ie",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "faucet": {
-                "pkh": "tz1UjBsGr8Tkogbz8fcySP6x77S5TKBvs99t",
+                "pkh": "tz1fsJPyLDCqeG8qX1Wxvv4xFRLZrzuB4EtE",
                 "mnemonic": [
-                    "bone",
-                    "copper",
-                    "early",
-                    "light",
-                    "shallow",
-                    "sense",
-                    "burden",
-                    "civil",
-                    "knee",
-                    "knife",
-                    "excuse",
-                    "noise",
-                    "enable",
-                    "piano",
-                    "loyal"
+                    "feature",
+                    "coyote",
+                    "similar",
+                    "snap",
+                    "print",
+                    "brisk",
+                    "horror",
+                    "vessel",
+                    "bunker",
+                    "together",
+                    "sauce",
+                    "match",
+                    "salute",
+                    "among",
+                    "seminar"
                 ],
-                "email": "tasbcxmi.wbdftfiw@teztnets.xyz",
-                "password": "sz2Trjg3Z5",
-                "amount": "55579807681",
-                "activation_code": "cce0f1f37d4eb45b5ac0cdf755825abd5fd53b10"
+                "email": "osfkofhi.mhckkmcv@teztnets.xyz",
+                "password": "qo8QtQSghQ",
+                "amount": "10183000200",
+                "activation_code": "2b860cd01699588f007927093e0c6d54c6c5df2f"
             }
         }
     }

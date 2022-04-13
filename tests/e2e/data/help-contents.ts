@@ -237,6 +237,29 @@ Positionals:
   sandboxName  The name of the sandbox to stop
 
 Options:
+    --version     Show version number                                [boolean]
+    --build       Display build information about the current version[boolean]
+-p, --projectDir  Path to your project directory               [default: "./"]
+    --configDir   Config directory (default ./.taq)        [default: "./.taq"]
+-e, --env         Specify an environment configuration
+    --help        Show help                                          [boolean]
+
+Taqueria is currently in BETA. You've been warned. :)
+`;
+
+export const helpContentsGenerateTypes = `taq <command>
+
+Commands:
+  taq init [projectDir]                     Initialize a new project
+  taq scaffold [scaffoldUrl] [scaffoldProj  Generate a new project using pre-mad
+  ectDir]                                   e scaffold
+  taq install <pluginName>                  Install a plugin
+  taq uninstall <pluginName>                Uninstall a plugin
+  taq generate types [typescriptDir]        Generate types for a contract to be
+                                            used with taquito
+                                                        [aliases: gen, gentypes]
+
+Options:
       --version     Show version number                                [boolean]
       --build       Display build information about the current version[boolean]
   -p, --projectDir  Path to your project directory               [default: "./"]
@@ -259,4 +282,6 @@ Options:
       --configDir   Config directory (default ./.taq)        [default: "./.taq"]
   -e, --env         Specify an environment configuration
       --help        Show help                                          [boolean]
+
+Taqueria is currently in BETA. You've been warned. :)
 `

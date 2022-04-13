@@ -4,6 +4,7 @@ import {join, resolve, dirname, parse} from 'path'
 import {readFile, writeFile} from 'fs/promises'
 import {get} from 'stack-trace'
 import {exec, ExecException} from 'child_process'
+// @ts-ignore interop issue. Maybe find a different library later
 import generateName from 'project-name-generator'
 import {omit} from 'rambda'
 const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
@@ -136,8 +137,10 @@ const sanitizeArgs = (parsedArgs: ParsedArgs) : Promise<SanitizedArgs> =>
             contractsDir: join(projectDir, config.contractsDir),
             testsDir: join(projectDir, config.testsDir),
             artifactsDir: join(projectDir, config.artifactsDir),
-            build: parsedArgs.setBuild ?? '',
-            version: parsedArgs.setVersion ?? '',
+            build: '',
+            setBuild: parsedArgs.setBuild ?? '',
+            version: '',
+            setVersion: parsedArgs.setVersion ?? '',
             maxConcurrency: parsedArgs.maxConcurrency ?? 10,
             debug: parsedArgs.debug ?? false,
             task: parsedArgs.task ? parsedArgs.task.trim() : ''

@@ -279,6 +279,26 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
+    test('Verify that the contract types plugin exposes the associated commands in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
+            const generateTypesHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
+            expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypes)
+
+            await exec(`taq uninstall @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
     test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
         try {
             await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
