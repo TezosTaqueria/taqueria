@@ -4,7 +4,7 @@ import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, In
 import {State} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts'
-import {map, chain, attemptP, mapRej, resolve, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {map, chain, bichain, attemptP, mapRej, resolve, reject, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import * as utils from './taqueria-utils/taqueria-utils.ts'
@@ -310,9 +310,16 @@ const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: Sani
     // Run init command
     map(_ => log(`Cleanup...`)),
     chain(_ => rm(scaffoldProjectDir.join(`.taq/scaffold.json`))),
+    bichain<TaqError,TaqError,SanitizedAbsPath>
+        (err => err.kind === 'E_INVALID_PATH_DOES_NOT_EXIST' ? resolve(scaffoldProjectDir) : reject(err))
+        (resolve),
     chain(_ => rm(scaffoldProjectDir.join(`.git`))),
+    chain(_ => rm(scaffoldProjectDir.join(`.gitignore`))),
+    bichain<TaqError,TaqError,SanitizedAbsPath>
+        (err => err.kind === 'E_INVALID_PATH_DOES_NOT_EXIST' ? resolve(scaffoldProjectDir) : reject(err))
+        (resolve),
     chain(_ => exec("npm install", {}, false, scaffoldProjectDir)),
-    map(() => i18n.__("scaffoldDoneMsg"))
+    map(_ => i18n.__("scaffoldDoneMsg"))
 )
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: State) => state.plugins.reduce(
