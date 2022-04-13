@@ -41,24 +41,30 @@
                 }
             },
             "label": "Local Tezos Sandbox",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "rpcUrl": "http://localhost:20000"
         },
         "test": {
             "accounts": {
                 "default": "ken",
                 "ken": {
-                    "initialBalance": "1"
+                    "initialBalance": "3000000000"
                 },
                 "tran": {
-                    "initialBalance": "2"
+                    "initialBalance": "2000000000"
                 },
                 "mathew": {
-                    "initialBalance": "3"
+                    "initialBalance": "4000000000"
+                },
+                "john": {
+                    "initialBalance": "5000000000"
+                },
+                "maggie": {
+                    "initialBalance": "1000000000"
                 }
             },
             "label": "Test Tezos Sandbox",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "rpcUrl": "http://localhost:20000"
         }
     },

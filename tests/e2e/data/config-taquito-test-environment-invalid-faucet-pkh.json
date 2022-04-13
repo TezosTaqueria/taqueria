@@ -19,7 +19,7 @@
             "storage": {}
         },
         "test": {
-            "networks": ["hangzhounet"],
+            "networks": ["ithacanet"],
             "sandboxes": [],
             "storage": {"hello-tacos.tz": "100"}
         }
@@ -45,17 +45,17 @@
                 }
             },
             "label": "Local Tezos Sandbox",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "rpcUrl": "http://localhost:20000"
         }
     },
     "network": {
-        "hangzhounet": {
-            "label": "hangzhounet",
-            "rpcUrl": "https://hangzhounet.api.tez.ie",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+        "ithacanet": {
+            "label": "ithacanet",
+            "rpcUrl": "https://ithacanet.ecadinfra.com",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "faucet": {
-                "pkh": "invalid",
+                "pkh": "invalid_pkh",
                 "mnemonic": [
                     "bone",
                     "copper",
