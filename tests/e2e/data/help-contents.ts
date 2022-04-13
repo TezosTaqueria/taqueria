@@ -237,14 +237,12 @@ Positionals:
   sandboxName  The name of the sandbox to stop
 
 Options:
-    --version     Show version number                                [boolean]
-    --build       Display build information about the current version[boolean]
--p, --projectDir  Path to your project directory               [default: "./"]
-    --configDir   Config directory (default ./.taq)        [default: "./.taq"]
--e, --env         Specify an environment configuration
-    --help        Show help                                          [boolean]
-
-Taqueria is currently in BETA. You've been warned. :)
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+      --configDir   Config directory (default ./.taq)        [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+      --help        Show help                                          [boolean]
 `;
 
 export const helpContentsGenerateTypes = `taq <command>
@@ -266,6 +264,8 @@ Options:
       --configDir   Config directory (default ./.taq)        [default: "./.taq"]
   -e, --env         Specify an environment configuration
       --help        Show help                                          [boolean]
+
+Taqueria is currently in BETA. You've been warned. :)
 `
 
 export const helpContentsFlextesaPluginListAccounts = `taq list accounts <sandboxName>
@@ -282,6 +282,4 @@ Options:
       --configDir   Config directory (default ./.taq)        [default: "./.taq"]
   -e, --env         Specify an environment configuration
       --help        Show help                                          [boolean]
-
-Taqueria is currently in BETA. You've been warned. :)
 `
