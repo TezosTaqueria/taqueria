@@ -1,16 +1,14 @@
 import fsPromises from "fs/promises"
-import {generateTestProject} from "./utils/utils";
-import {execSync, exec as exec1} from "child_process";
-import waitForExpect from "wait-for-expect";
+import { generateTestProject } from "./utils/utils";
+import { exec as exec1 } from "child_process";
 import { TezosToolkit } from '@taquito/taquito';
 import utils from 'util'
-import * as contents from './data/taquito-contents'
-import type { ExecException } from "child_process"
+import { networkInfo } from './data/network-info'
 const exec = utils.promisify(exec1)
 
 describe("E2E Testing for taqueria taquito plugin",  () => {
 
-    const tezos = new TezosToolkit('https://hangzhounet.api.tez.ie');
+    const tezos = new TezosToolkit(networkInfo.networkURL);
     const taqueriaProjectPath = 'e2e/auto-test-taquito-plugin';
     const contractRegex = new RegExp(/(KT1)+\w{33}?/);
     let environment: string;
@@ -39,13 +37,13 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // const deployCommand = 
             const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).then(async (resp) => {
                 const deployResponse = resp.stdout.trim().split(/\r?\n/)[3]
-                await new Promise(resolve => setTimeout(resolve, 60000))
+                await new Promise(resolve => setTimeout(resolve, 45000))
                 return deployResponse
             })
 
             // 3. Verify that contract has been originated on the network
             expect(deployCommand).toContain("hello-tacos.tz");
-            expect(deployCommand).toContain("hangzhounet");
+            expect(deployCommand).toContain(networkInfo.networkName);
             const contractHash = deployCommand.split("│")[2];
 
             smartContractHash = contractHash.trim();
@@ -80,12 +78,12 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // const stdoutDeploy = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             const deployCommand = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).then(async (resp) => {
                 const deployResponse = resp.stdout.trim().split(/\r?\n/)[3]
-                await new Promise(resolve => setTimeout(resolve, 60000))
+                await new Promise(resolve => setTimeout(resolve, 45000))
                 return deployResponse
             })
             // 3. Get the KT address from the output
             expect(deployCommand).toContain("hello-tacos.tz");
-            expect(deployCommand).toContain("hangzhounet");
+            expect(deployCommand).toContain(networkInfo.networkName);
             const contractHash = deployCommand.split("│")[2];
 
             // const matches = stdoutDeploy.match(/KT[^\s]+/m)
@@ -134,13 +132,13 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // const deployCommand = 
             const deployCommand = await exec(`taq originate -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).then(async (resp) => {
                 const deployResponse = resp.stdout.trim().split(/\r?\n/)[3]
-                await new Promise(resolve => setTimeout(resolve, 60000))
+                await new Promise(resolve => setTimeout(resolve, 45000))
                 return deployResponse
             })
 
             // 3. Verify that contract has been originated on the network
             expect(deployCommand).toContain("hello-tacos.tz");
-            expect(deployCommand).toContain("hangzhounet");
+            expect(deployCommand).toContain(networkInfo.networkName);
             const contractHash = deployCommand.split("│")[2];
 
             smartContractHash = contractHash.trim();
@@ -183,13 +181,13 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             })
             
             expect(deployCommand1).toContain("hello-tacos-one.tz");
-            expect(deployCommand1).toContain("hangzhounet");
+            expect(deployCommand1).toContain(networkInfo.networkName);
             const contractOneHash = deployCommand1.split("│")[2];
             smartContractOneHash = contractOneHash.trim();
             expect(smartContractOneHash).toMatch(contractRegex);
             
             expect(deployCommand2).toContain("hello-tacos-two.tz");
-            expect(deployCommand2).toContain("hangzhounet");
+            expect(deployCommand2).toContain(networkInfo.networkName);
             const contractTwoHash = deployCommand2.split("│")[2];
             smartContractTwoHash = contractTwoHash.trim();
             expect(contractTwoHash.trim()).toMatch(contractRegex);
@@ -236,21 +234,9 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
             // 2. Run taq deploy on a network described in "test" environment
-            const stdoutDeploy = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
-            // .catch(
-            //     (err: ExecException & {stdout: string, stderr: string}) => {
-            //         expect(err.code).toEqual(6)
-            //         expect(err.stderr).toEqual("Taqueria isn't aware of this task. Perhaps you need to install a plugin first? and Alex is a super cool guy")
-            //     }
-            // )
-
-            // 3. Verify that proper error displays in the console
-            console.log(stdoutDeploy)
-            // console.log(stdoutDeploy.stderr)
-            // expect(stdoutDeploy.stdout).toContain("E_INVALID_PLUGIN_RESPONSE");
+            await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
 
         } catch(error) {
-            console.error(error)
             expect(error).toContain("E_INVALID_PLUGIN_RESPONSE");
             // throw new Error (`error: ${error}`);
         }
@@ -275,7 +261,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // 3. Verify that proper error displays in the console
             expect(stdoutDeploy.stderr).toContain("E_ORIGINATE");
             expect(stdoutDeploy.stderr).toContain("An unexpected error occured when trying to originate a contract");
-            expect(stdoutDeploy.stderr).toContain("HttpRequestFailed: Request to https://invalid.test/chains/main/blocks/head~2/header failed");
+            expect(stdoutDeploy.stderr).toContain("HttpRequestFailed: Request to https://invalid.test/chains/main/blocks/");
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -378,7 +364,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
             // 3. Verify that proper error displays in the console
             expect(stdoutDeploy.stderr).toContain("E_ORIGINATE");
-            expect(stdoutDeploy.stderr).toContain("Could not originate hello-tacos.tz on the network 'hangzhounet'");
+            expect(stdoutDeploy.stderr).toContain("Could not originate hello-tacos.tz on the network 'ithacanet'");
             expect(stdoutDeploy.stderr).toContain("NatValidationError: [0] Value is not a number: abc");
 
         } catch(error) {
