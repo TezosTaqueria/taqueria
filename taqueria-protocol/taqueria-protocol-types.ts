@@ -1,9 +1,9 @@
 // TODO - using .ts is necessary for Deno. Explore how to make this
 // consumable by Deno or the TypeScript compiler without any warnings
 // or errors emited
-// @ts-ignore
+// @ts-ignore see above
 import {SanitizedAbsPath, SHA256} from '../taqueria-utils/taqueria-utils-types.ts'
-// @ts-ignore
+// @ts-ignore see above
 import {urlParse} from './url-parse.ts'
 
 type URL = ReturnType<typeof urlParse>
@@ -223,7 +223,7 @@ export interface UnvalidatedTask {
     readonly aliases?: string[]
     readonly options?: (UnvalidatedOption|Option|undefined)[],
     readonly positionals?: (UnvalidatedPositionalArg|undefined|PositionalArg)[]
-    readonly handler: "proxy" | string | string[]
+    readonly handler: TaskHandler
     readonly hidden?: boolean
     readonly example?: string
     readonly encoding?: "json" | "application/json" | "none"

@@ -162,7 +162,7 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
-    test('Verify that the smartpy plugin exposes the associated options for compile in the help menu', async () => {
+    test('Verify that the smartpy plugin exposes the associated options in the help menu', async () => {
         try {
             await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
 
@@ -214,10 +214,10 @@ describe("E2E Testing for taqueria CLI,", () => {
             catch (_) {}
 
             const smartpyAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`)
-            expect(smartpyAliasCHelpContents.stdout).toBe(contents.helpContentsSmartpyCompileSpecific)
+            expect(smartpyAliasCHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific)
 
             const smartpyAliasCompileLigoHelpContents = await exec(`taq compile-smartpy --help --projectDir=${taqueriaProjectPath}`)
-            expect(smartpyAliasCompileLigoHelpContents.stdout).toBe(contents.helpContentsSmartpyCompileSpecific)
+            expect(smartpyAliasCompileLigoHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific)
 
             await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
         } catch(error) {
@@ -420,11 +420,33 @@ describe("E2E Testing for taqueria CLI,", () => {
             expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypesPlugin)
 
             await exec(`taq uninstall @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
     })
 
+    test('Verify that the flextesa plugin exposes the associated option for stopping a sandbox in the help menu', async () => {
+        try {
+            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
+            const flextesaHelpContents = await exec(`taq stop sandbox --help --projectDir=${taqueriaProjectPath}`)
+            expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStopSandbox)
+
+            await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+<<<<<<< HEAD
     test('Verify that the contract types plugin exposes the associated options in the help menu', async () => {
         try {
             await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
@@ -436,10 +458,12 @@ describe("E2E Testing for taqueria CLI,", () => {
             }
             catch (_) {}
 
+<<<<<<< HEAD
             const generateTypesHelpContents = await exec(`taq generate types --help --projectDir=${taqueriaProjectPath}`)
             expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypesPluginSpecific)
 
             await exec(`taq uninstall @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+
         } catch(error) {
             throw new Error (`error: ${error}`)
         }

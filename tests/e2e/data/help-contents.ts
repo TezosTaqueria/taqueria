@@ -101,7 +101,7 @@ Options:
 Taqueria is currently in BETA. You've been warned. :)
 `
 
-export const helpContentsSmartpyCompileSpecific = `taq compile [sourceFile]
+export const helpContentsSmartpyPluginSpecific = `taq compile [sourceFile]
 
 Compile a smart contract written in a SmartPy syntax to Michelson code
 
@@ -316,4 +316,20 @@ Options:
       --help           Show help                                       [boolean]
   -t, --typeAliasMode  The type aliases used in the generated types
                                                      [choices: "file", "simple"]
+`
+
+export const helpContentsFlextesaPluginListAccounts = `taq list accounts <sandboxName>
+
+List the balances of all sandbox accounts
+
+Positionals:
+  sandboxName  The name of the sandbox to use                         [required]
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+      --configDir   Config directory (default ./.taq)        [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+      --help        Show help                                          [boolean]
 `

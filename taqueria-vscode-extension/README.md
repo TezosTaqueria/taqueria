@@ -1,32 +1,45 @@
 # Taqueria for Visual Studio Code
 
-## A New Way to Build on Tezos
+## Taqueria, A New Way to Build on Tezos
 
-The Taqueria extension provides a seamless development workflow to easily build, test and deploy your Tezos applications.
+The Taqueria developer suite provides a seamless development workflow to easily build, test and deploy your Tezos applications
 
-## A Better Development Experience
-The Taqueria extension brings all of the power of the Taqueria right into Visual Studio code so you can:
-1. All the power of Taqueria right in the command palette 
-2. Compile your smart contracts with a single command
-3. Simplfy your testing workflow
-4. Deploy to a sandbox, testnet, or main-net with ease
-
-All while being fully customizable to fit into your Tezos development workflow.
-
-## Features:
-1. All of the Taqueria power inside of Visual Studio Code
-2. Initialize new projects
-3. Add the plugins you need
-4. Compile smart contracts in in Ligo or SmartPy
-5. Deploy smart contracts to any network
-6. Start and stop a local sandbox
-
-## Quick Start
-
-*Describe specific Quick Start steps with screenshots*
+## Taqueria VS Code Features:
+Run Taqueria commands right in the VS Code Command Palette:
+- Initialize Taqueria projects
+- Install and manage plugins
+- Compile smart contracts in in Ligo, SmartPy, or Archetype
+- Launch and query Flextesa sandboxes
+- Originate contracts to sandbox and testnet environments
 
 ### Requirements
 
-### Extension Settings
+- Taqueria v0.1.8 or later must be [installed](https://taqueria.io/docs/getting-started/installation/) and available in your system's `#PATH`
+- Node.js v16 or later
+- Docker v0.8 or later
 
-### Release Notes
+### Running Taqueria Commands in VS Code
+1. Open the VS Code command palette by pressing the keys `cmd` + `shift` +`P` together
+2. Type `taq` to filter the list of commands to Taqueria
+3. Select a Taqueria command from the list to run it
+
+### Quickstart
+
+A basic workflow Taqueria is:
+
+1. Initialize the project by running the `taq init` command
+2. Install necessary plugins (LIGO, SmarPy, Flextesa, Taquito, ect)
+3. Complile contracts
+4. Launch and deploy to a local sandbox
+5. Originate to a testnet
+
+## Available Plugins
+
+| name         |  pluginName                       |  description                                                |
+|--------------|------------------------------     |-------------------------------------------------------------|
+| LIGO         | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language             |
+| SmartPy      | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy contract language                |
+| Flextesa     | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa               | 
+| Taquito      | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate               |
+| TS Generator | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code |
+
