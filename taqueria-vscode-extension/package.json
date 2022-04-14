@@ -122,11 +122,11 @@
     "watch": "parcel watch --no-cache --detailed-report",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "echo 'No tests to run for VSCode yet'"
+    "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
-    "@types/mocha": "^9.1.0",
+    "@types/mocha": "^5.2.6",
     "@types/node": "^17.0.17",
     "@types/promise-memoize": "^1.2.1",
     "@types/vscode": "1.63.0",
