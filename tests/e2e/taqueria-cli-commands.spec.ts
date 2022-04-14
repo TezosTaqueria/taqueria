@@ -174,7 +174,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             catch (_) {}
 
             const smartpyHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
-            expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyCompileSpecific)
+            expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific)
 
             await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
         } catch(error) {
@@ -426,27 +426,6 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
-    test('Verify that the flextesa plugin exposes the associated option for stopping a sandbox in the help menu', async () => {
-        try {
-            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
-
-            // TODO: This can removed after this is resolved:
-            // https://github.com/ecadlabs/taqueria/issues/528
-            try {
-                await exec(`taq -p ${taqueriaProjectPath}`)
-            }
-            catch (_) {}
-
-            const flextesaHelpContents = await exec(`taq stop sandbox --help --projectDir=${taqueriaProjectPath}`)
-            expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStopSandbox)
-
-            await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
-        } catch(error) {
-            throw new Error (`error: ${error}`)
-        }
-    })
-
-<<<<<<< HEAD
     test('Verify that the contract types plugin exposes the associated options in the help menu', async () => {
         try {
             await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
@@ -458,7 +437,6 @@ describe("E2E Testing for taqueria CLI,", () => {
             }
             catch (_) {}
 
-<<<<<<< HEAD
             const generateTypesHelpContents = await exec(`taq generate types --help --projectDir=${taqueriaProjectPath}`)
             expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypesPluginSpecific)
 

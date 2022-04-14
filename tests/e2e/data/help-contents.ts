@@ -259,22 +259,6 @@ Options:
       --help        Show help                                          [boolean]
 `
 
-export const helpContentsFlextesaPluginListAccounts = `taq list accounts <sandboxName>
-
-List the balances of all sandbox accounts
-
-Positionals:
-  sandboxName  The name of the sandbox to use                         [required]
-
-Options:
-      --version     Show version number                                [boolean]
-      --build       Display build information about the current version[boolean]
-  -p, --projectDir  Path to your project directory               [default: "./"]
-      --configDir   Config directory (default ./.taq)        [default: "./.taq"]
-  -e, --env         Specify an environment configuration
-      --help        Show help                                          [boolean]
-`
-
 export const helpContentsGenerateTypesPlugin = `taq <command>
 
 Commands:
