@@ -171,8 +171,17 @@ export const inject = (deps: UtilsDependencies) => {
             const join = joinPaths
             const cmd = renderTemplate(cmdTemplate, {join, ...inputArgs})
             command = cmd
+        }
+        catch (previous) {
+            throw {
+                kind: "E_FORK",
+                msg: `There was a problem trying to evaluate this template: ${cmdTemplate}\n${previous}`,
+                previous
+            } as TaqError
+        }
+        try {
             const process = Deno.run({
-                cmd: ["sh", "-c", `${cmd}`],
+                cmd: ["sh", "-c", `${command}`],
                 cwd: cwd?.value,
                 stdout: "piped",
                 stderr: "piped"
