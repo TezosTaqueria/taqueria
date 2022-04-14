@@ -114,6 +114,20 @@ Options:
       --help        Show help                                          [boolean]
 `
 
+export const helpContentsSmartpyTeapotSpecific = `taq teapot
+
+Have a cup of tea
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+      --configDir   Config directory (default ./.taq)        [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+      --help        Show help                                          [boolean]
+  -g, --green       Make green tea instead                             [boolean]
+`
+
 export const helpContentsLigoSmartpy: string = `taq <command>
 
 Commands:
@@ -243,9 +257,9 @@ Options:
       --configDir   Config directory (default ./.taq)        [default: "./.taq"]
   -e, --env         Specify an environment configuration
       --help        Show help                                          [boolean]
-`;
+`
 
-export const helpContentsGenerateTypes = `taq <command>
+export const helpContentsGenerateTypesPlugin = `taq <command>
 
 Commands:
   taq init [projectDir]                     Initialize a new project
@@ -266,6 +280,26 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
+`
+
+export const helpContentsGenerateTypesPluginSpecific = `taq generate types [typescriptDir]
+
+Generate types for a contract to be used with taquito
+
+Positionals:
+  typescriptDir  The output directory for the generated type files
+                                                              [default: "types"]
+
+Options:
+      --version        Show version number                             [boolean]
+      --build          Display build information about the current version
+                                                                       [boolean]
+  -p, --projectDir     Path to your project directory            [default: "./"]
+      --configDir      Config directory (default ./.taq)     [default: "./.taq"]
+  -e, --env            Specify an environment configuration
+      --help           Show help                                       [boolean]
+  -t, --typeAliasMode  The type aliases used in the generated types
+                                                     [choices: "file", "simple"]
 `
 
 export const helpContentsFlextesaPluginListAccounts = `taq list accounts <sandboxName>
