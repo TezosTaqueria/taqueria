@@ -1,7 +1,10 @@
 import {checkFolderExistsWithTimeout, generateTestProject} from "./utils/utils";
 import fs from "fs";
-import {execSync} from "child_process";
+import { exec as exec1} from "child_process";
 import path from "path";
+import utils from 'util'
+const exec = utils.promisify(exec1)
+import * as contents from './data/archetype-contents'
 
 const taqueriaProjectPath = 'e2e/auto-test-archetype-plugin';
 
@@ -11,13 +14,25 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
         await generateTestProject(taqueriaProjectPath, ["archetype"], true);
     })
 
+    test('Verify that taqueria archetype plugin outputs no contracts found if no contracts exist', async () => {
+        try {
+            const noContracts = await exec(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
+
+            expect(noContracts.stdout).toEqual(contents.archetypeNoContracts)
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+
+    });
+    
     test('Verify that taqueria archetype plugin can compile one contract under contracts folder', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq compile ${contractName}
-            execSync(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
+            await exec(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
             await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`, 25000);
@@ -31,10 +46,10 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     test('Verify that taqueria archetype plugin can compile one contract using compile [sourceFile] command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq compile ${contractName}
-            execSync(`taq compile fa12.arl`, {cwd: `./${taqueriaProjectPath}`});
+            await exec(`taq compile fa12.arl`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
             await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`, 25000);
@@ -48,11 +63,11 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     test('Verify that taqueria archetype plugin can compile multiple contracts under contracts folder', async () => {
         try {
             // 1. Copy two contracts from data folder to /contracts folder under taqueria project
-            execSync(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
-            execSync(`cp e2e/data/animal_tracking.arl ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/animal_tracking.arl ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq compile ${contractName}
-            execSync(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
+            await exec(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version for both contracts has been generated
             await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`, 25000);
@@ -68,16 +83,15 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     // TODO: Currently it cannot be done until the output will be places to stdout
     // Issue to implement the test: https://github.com/ecadlabs/taqueria/issues/373
     // Related developer issue: https://github.com/ecadlabs/taqueria/issues/372
-    test.skip('Verify that taqueria archetype plugin will display proper message if user tries to compile contract that does not exist', async () => {
+    test('Verify that taqueria archetype plugin will display proper message if user tries to compile contract that does not exist', async () => {
         try {
             // 1. Run taq compile ${contractName} for contract that does not exist
-            const stdout = execSync(`taq compile test.arl`, {cwd: `./${taqueriaProjectPath}`}).toString().trim();
+            const compileOutput = await exec(`taq compile test.arl`, {cwd: `./${taqueriaProjectPath}`})
 
             // 2. Verify that output includes next messages:
             // There was a compilation error.
             // contracts/test.mligo: No such file or directory
-            expect(stdout).toContain("There was a compilation error.");
-            expect(stdout).toContain("contracts/test.mligo: No such file or directory");
+            expect(compileOutput.stdout).toContain(contents.archetypeNotCompiled);
 
 
         } catch(error) {
@@ -89,12 +103,12 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     test('Verify that taqueria archetype plugin requires the plugin argument when other compile plugins installed', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
 
-            execSync('taq install @taqueria/plugin-ligo', {cwd: `./${taqueriaProjectPath}`})
+            await exec('taq install @taqueria/plugin-ligo', {cwd: `./${taqueriaProjectPath}`})
 
             // 2. Run taq compile ${contractName}
-            execSync(`taq compile fa12.arl --plugin @taqueria/plugin-archetype`, {cwd: `./${taqueriaProjectPath}`});
+            await exec(`taq compile fa12.arl --plugin @taqueria/plugin-archetype`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
             await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`, 25000);
