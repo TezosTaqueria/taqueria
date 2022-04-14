@@ -1,4 +1,4 @@
-import {PluginAction, ProxyAction as theProxyAction, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, RuntimeDependency, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig, PluginResponse as thePluginResponse, AccountDetails as theAccountDetails} from '@taqueria/protocol/taqueria-protocol-types'
+import {PluginAction, TaskHandler, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig, PluginResponse as thePluginResponse, AccountDetails as theAccountDetails} from '@taqueria/protocol/taqueria-protocol-types'
 
 export type Sandbox = theSandbox
 
@@ -12,8 +12,6 @@ export type NetworkConfig = theNetworkConfig
 
 export type SandboxConfig = theSandboxConfig
 
-export type ProxyAction = theProxyAction
-
 export type PluginResponse = thePluginResponse
 
 export interface TaskView {
@@ -23,7 +21,8 @@ export interface TaskView {
     readonly aliases: string[]
     readonly options: UnvalidatedOption[]
     readonly positionals: UnvalidatedPositionalArg[]
-    readonly handler: "proxy" | string | string[]
+    readonly handler: TaskHandler
+    readonly encoding: "json" | "application/json" | "none"
 }
 
 export interface PositionalArgView {
@@ -49,6 +48,7 @@ export interface i18n {
     [key: string]: i18nMessage,
     readonly actionNotSupported: string,
     readonly proxyNotSupported: string
+    readonly invalidSchema: string
 }
 
 /**
@@ -97,6 +97,11 @@ export interface ParsedArgs {
     projectDir: string
     configDir: string
     artifactsDir: string
+    task?: string
+    debug?: boolean
+    maxConcurrency?: number
+    setVersion?: string
+    setBuild?: string
 }
 
 export interface Config extends Record<string, unknown>{
@@ -118,7 +123,18 @@ export interface SanitizedArgs {
     contractsDir: string
     testsDir: string
     artifactsDir: string
+    debug: boolean
+    maxConcurrency: number
+    version: string
+    build: string
     task?: string
+    setBuild: string
+    setVersion: string
+}
+
+export interface StdIO {
+    stdout: string,
+    stderr: string
 }
 
 export type pluginDefiner = (i18n: i18n) => Schema

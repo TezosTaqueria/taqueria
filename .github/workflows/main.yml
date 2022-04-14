@@ -69,6 +69,8 @@ jobs:
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
+        # TODO: Remove once this issue is fixed:
+        # https://github.com/denoland/deno/issues/13904
         with:
           deno-version: "1.18.2"
 
@@ -82,7 +84,8 @@ jobs:
           DENO_DIR: "./deno"
         run: |
           COMMIT=`git rev-parse --short "$GITHUB_SHA"`
-          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$TAQ_VERSION/$COMMIT" --setVersion "$TAQ_VERSION"
+          TAQ_VERSION="${TAQ_VERSION/\//-}"
+          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION"
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
@@ -159,6 +162,17 @@ jobs:
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
+
+  publish-archetype-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    needs:
+      - publish-sdk-to-npm
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-plugin-archetype
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
   publish-contract-types-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
@@ -177,8 +191,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 16.x
-
+          node-version: 16.13.x
+          # Setting node version to 16.13.2 to enable integration tests to pass
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "1.18.2"
@@ -196,7 +210,8 @@ jobs:
           DENO_DIR: "./deno"
         run: |
           COMMIT=`git rev-parse --short "$GITHUB_SHA"`
-          deno compile --output taq --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$TAQ_VERSION/$COMMIT" --setVersion "$TAQ_VERSION"
+          TAQ_VERSION="${TAQ_VERSION/\//-}"
+          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION"
           [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]] 
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
@@ -206,7 +221,9 @@ jobs:
         run: npm ci
 
       - name: builds for testing
-        run: npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy
+        run: |
+          npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy -w taqueria-flextesa-manager -w taqueria-plugin-contract-types -w taqueria-plugin-archetype
+          npm run build-docker -w taqueria-flextesa-manager
       
       - name: Run unit tests
         run: |
@@ -219,6 +236,15 @@ jobs:
       - name: Run e2e tests
         run: |
           npm run test:e2e -w tests
+  
+      - name: Report Status
+        uses: ravsamhq/notify-slack-action@v1
+        if: always()
+        with:
+          status: ${{ job.status }} # required
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
   vscode-extension-workflow:
     needs: detect-changes
@@ -248,6 +274,7 @@ jobs:
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
       - publish-contract-types-plugin-to-npm
+      - publish-archetype-plugin-to-npm
       - run-tests
       - vscode-extension-workflow
     steps:
@@ -292,6 +319,7 @@ jobs:
             const sdk = readInfo("./taqueria-sdk/package.json")
             const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
             const contractTypes = readInfo("./taqueria-plugin-contract-types/package.json")
+            const archetype = readInfo("./taqueria-plugin-archetype/package.json")
 
             let body = `
               <table>
@@ -318,7 +346,8 @@ jobs:
                           taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
                           taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
                           taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
+                          taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
+                          taq install ${{ env.SCOPE }}/${archetype.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
                       </p>
                   </td>
                 </tr>
@@ -366,6 +395,7 @@ jobs:
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
       - publish-contract-types-plugin-to-npm
+      - publish-archetype-plugin-to-npm
       - vscode-extension-workflow
     if: ${{ startsWith(github.ref, 'refs/tags/v') &&
             !github.event.pull_request.head.repo.fork }}

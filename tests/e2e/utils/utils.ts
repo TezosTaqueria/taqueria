@@ -4,35 +4,33 @@ import fs from "fs";
 import net from "node:net";
 
 export const generateTestProject = async (projectPath: string, packageNames: string[] = [], localPackages: boolean = true) => {
+    const targetDir = path.join("/tmp", projectPath)
+    
     try{
-        execSync(`taq init ${projectPath}`)
+        execSync(`taq init ${targetDir}`)
     } catch(error){
         throw new Error (`error: ${error}`);
     }
 
-    await checkFolderExistsWithTimeout(`./${projectPath}/`, 25000);
-
+    await checkFolderExistsWithTimeout(targetDir, 25000);
     try{
-        fs.chmodSync(`./${projectPath}/`, 0o777)
+        fs.chmodSync(targetDir, 0o777)
     } catch(error){
         throw new Error (`error: ${error}`);
     }
 
-    try{
-        execSync(`cd ./${projectPath} && npm init -y`)
-    } catch(error){
-        throw new Error (`error: ${error}`);
-    }
+    const _npmOutput = execSync("npm init -y", { cwd: targetDir, encoding: "utf-8"})
+    const _mvOutput = execSync(`mv ${targetDir} ./${projectPath}`, {encoding: "utf8"})
 
-    await checkFolderExistsWithTimeout(`./${projectPath}/package.json`, 25000);
+    await checkFolderExistsWithTimeout(path.join("./", projectPath, 'package.json'), 25000);
 
     if (packageNames.length > 0) {
         packageNames.forEach(packageName => {
             try {
                 if (localPackages) {
-                    execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`)
+                    const _installOut = execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`, {encoding: "utf8"})
                 } else {
-                    execSync(`cd ./${projectPath} && taq install @taqueria/plugin-${packageName}`)
+                    execSync(`taq install @taqueria/plugin-${packageName}`, {cwd: targetDir})
                 }
             } catch (error) {
                 throw new Error(`error: ${error}`);
@@ -54,7 +52,6 @@ export function getContainerName(dockerName: string): string{
 // there is no fs.watch sync solution
 export function checkFolderExistsWithTimeout(filePath:string, timeout:number) {
     return new Promise<void>(function (resolve, reject): void {
-
         const dir = path.dirname(filePath);
         const basename = path.basename(filePath);
 
@@ -68,7 +65,7 @@ export function checkFolderExistsWithTimeout(filePath:string, timeout:number) {
 
         const timer = setTimeout(function () {
             watcher.close();
-            reject(new Error('File did not exists and was not created during the timeout.'));
+            reject(new Error(`File did not exists and was not created during the timeout: ${filePath}.`));
         }, timeout);
 
         fs.access(filePath, fs.constants.R_OK, function (err) {

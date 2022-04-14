@@ -1,9 +1,9 @@
 #!/bin/bash
 BRANCH=`git branch --show-current`
 COMMIT=`git rev-parse --short HEAD`
-TAQ_VERSION="dev:$BRANCH/$COMMIT"
+TAQ_VERSION="dev-$BRANCH"
 TIMESTAMP=`date +%s`
-BUILD="$TAQ_VERSION"
+BUILD="$COMMIT"
 
 
 if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
