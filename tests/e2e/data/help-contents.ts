@@ -202,7 +202,7 @@ Options:
       --help        Show help                                          [boolean]
       --plugin      Use to specify what plugin you'd like when running this task
                     .
-     [required] [choices: "@taqueria/plugin-archetype", "@taqueria/plugin-ligo"]
+     [required] [choices: "@taqueria/plugin-ligo", "@taqueria/plugin-archetype"]
 `
 
 export const helpContentsArchetypePlugin: string = `taq <command>

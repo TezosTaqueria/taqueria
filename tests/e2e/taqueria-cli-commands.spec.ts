@@ -593,7 +593,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoArchetype)
 
             await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
-            await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+            await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`)
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
@@ -601,8 +601,8 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that ligo and archetype expose the plugin choice option for compile in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
-            await exec(`taq install @taqueria/plugin-archetype -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
