@@ -1,45 +1,48 @@
 {
-  "name": "@taqueria/taqueria",
-  "version": "0.2.0",
-  "description": "An easy to use opininated tool for building, testing, and deploying Tezos software",
-  "main": "index.ts",
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "yarn",
-    "build": "./bin/build.sh || npx play-sound beep.mp3",
-    "build-all": "./bin/build-all.sh",
-    "build-website": "cd website && npm ci && npm run build",
-    "watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build || npx play-sound beep.mp3\" --initial",
-    "prepare": "husky install"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ecadlabs/taqueria.git"
-  },
-  "keywords": [
-    "taqueria",
-    "tezos",
-    "build",
-    "test",
-    "deploy",
-    "ecad",
-    "ecadlabs"
-  ],
-  "author": "ECAD Labs",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/ecadlabs/taqueria/issues"
-  },
-  "homepage": "https://github.com/ecadlabs/taqueria#readme",
-  "devDependencies": {
-    "chokidar-cli": "^3.0.0",
-    "husky": "^7.0.4",
-    "play-sound-cli": "^1.0.0"
-  },
-  "workspaces": [
-    "./taqueria*",
-    "./tests"
-  ]
+    "name": "@taqueria/taqueria",
+    "version": "0.2.0",
+    "description": "An easy to use opininated tool for building, testing, and deploying Tezos software",
+    "main": "index.ts",
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "test": "yarn",
+        "build": "./bin/build.sh || npx play-sound beep.mp3",
+        "build-all": "./bin/build-all.sh",
+        "build-website": "cd website && npm ci && npm run build",
+        "format": "prettier --config .prettierrc '**/*.{ts,js,json,md}' --write",
+        "format:check": "prettier --config .prettierrc 'src/**/*.ts' 'tests/**/*.ts' --check",
+        "watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build || npx play-sound beep.mp3\" --initial",
+        "prepare": "husky install"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ecadlabs/taqueria.git"
+    },
+    "keywords": [
+        "taqueria",
+        "tezos",
+        "build",
+        "test",
+        "deploy",
+        "ecad",
+        "ecadlabs"
+    ],
+    "author": "ECAD Labs",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/ecadlabs/taqueria/issues"
+    },
+    "homepage": "https://github.com/ecadlabs/taqueria#readme",
+    "devDependencies": {
+        "chokidar-cli": "^3.0.0",
+        "husky": "^7.0.4",
+        "play-sound-cli": "^1.0.0",
+        "prettier": "^2.6.2"
+    },
+    "workspaces": [
+        "./taqueria*",
+        "./tests"
+    ]
 }
