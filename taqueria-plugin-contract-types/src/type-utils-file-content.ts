@@ -35,4 +35,4 @@ export type WalletContractAbstractionFromContractType<TContract extends BaseCont
         {},
         ContractStorageOf<TContract>
     >;
-`;
+`

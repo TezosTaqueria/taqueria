@@ -1,4 +1,27 @@
-import {PluginAction, TaskHandler, Scaffold, Hook, Sandbox as theSandbox, Network, Attributes as theAttributes, Task, UnvalidatedSandbox, UnvalidatedHook, UnvalidatedOption, UnvalidatedScaffold, UnvalidatedNetwork, EconomicalProtocol as theProtocol, UnvalidatedPositionalArg, OptionType, Environment as anEnvironment, SandboxConfig as theSandboxConfig, NetworkConfig as theNetworkConfig, EnvironmentConfig, PluginResponse as thePluginResponse, AccountDetails as theAccountDetails} from '@taqueria/protocol/taqueria-protocol-types'
+import {
+    PluginAction,
+    TaskHandler,
+    Scaffold,
+    Hook,
+    Sandbox as theSandbox,
+    Network,
+    Attributes as theAttributes,
+    Task,
+    UnvalidatedSandbox,
+    UnvalidatedHook,
+    UnvalidatedOption,
+    UnvalidatedScaffold,
+    UnvalidatedNetwork,
+    EconomicalProtocol as theProtocol,
+    UnvalidatedPositionalArg,
+    OptionType,
+    Environment as anEnvironment,
+    SandboxConfig as theSandboxConfig,
+    NetworkConfig as theNetworkConfig,
+    EnvironmentConfig,
+    PluginResponse as thePluginResponse,
+    AccountDetails as theAccountDetails,
+} from '@taqueria/protocol/taqueria-protocol-types'
 
 export type Sandbox = theSandbox
 
@@ -22,7 +45,7 @@ export interface TaskView {
     readonly options: UnvalidatedOption[]
     readonly positionals: UnvalidatedPositionalArg[]
     readonly handler: TaskHandler
-    readonly encoding: "json" | "application/json" | "none"
+    readonly encoding: 'json' | 'application/json' | 'none'
 }
 
 export interface PositionalArgView {
@@ -33,8 +56,8 @@ export interface PositionalArgView {
 }
 
 export interface Failure<Params> {
-    readonly errorCode: string,
-    readonly errorMsg: string,
+    readonly errorCode: string
+    readonly errorMsg: string
     readonly context: Params
 }
 
@@ -42,11 +65,11 @@ export type LikeAPromise<Success, Failure> = Promise<Success>
 
 export type PositiveInt = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
 
-export type i18nMessage = string | {message: string, numOfArguments: PositiveInt}
+export type i18nMessage = string | { message: string; numOfArguments: PositiveInt }
 
 export interface i18n {
-    [key: string]: i18nMessage,
-    readonly actionNotSupported: string,
+    [key: string]: i18nMessage
+    readonly actionNotSupported: string
     readonly proxyNotSupported: string
     readonly invalidSchema: string
 }
@@ -82,7 +105,7 @@ export interface SchemaView {
     readonly scaffolds: UnvalidatedScaffold[]
     readonly hooks: UnvalidatedHook[]
     readonly networks: UnvalidatedNetwork[]
-    readonly sandboxes: UnvalidatedSandbox[],
+    readonly sandboxes: UnvalidatedSandbox[]
     checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: SanitizedArgs) => LikeAPromise<PluginResponse, Failure<T>>
     installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: SanitizedArgs) => LikeAPromise<PluginResponse, Failure<T>>
     proxy?: <T>(parsedArgs: SanitizedArgs) => LikeAPromise<PluginResponse, Failure<T>>
@@ -104,13 +127,13 @@ export interface ParsedArgs {
     setBuild?: string
 }
 
-export interface Config extends Record<string, unknown>{
+export interface Config extends Record<string, unknown> {
     testsDir: string
     contractsDir: string
     artifactsDir: string
     sandbox: Record<string, SandboxConfig>
     network: Record<string, NetworkConfig>
-    environment: Record<string, EnvironmentConfig> & {default: string}
+    environment: Record<string, EnvironmentConfig> & { default: string }
 }
 
 export interface SanitizedArgs {
@@ -133,7 +156,7 @@ export interface SanitizedArgs {
 }
 
 export interface StdIO {
-    stdout: string,
+    stdout: string
     stderr: string
 }
 

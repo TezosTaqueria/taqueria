@@ -6,12 +6,13 @@ The LIGO plugin provides a task to compile LIGO smart contracts to Michelson `.t
 
 ## Requirements
 
-- Node.js v16 or later
-- Docker v0.8.2 or later
+-   Node.js v16 or later
+-   Docker v0.8.2 or later
 
 ## Installation
 
 To install the LIGO plugin on a Taqueria project, navigate to the project folder and run:
+
 ```shell
 taq install @taqueria/plugin-ligo
 ```
@@ -23,9 +24,10 @@ At this time, all Taqueria projects must also be initialized as node projects by
 ## Configuration
 
 No additional configuration is available
+
 ## Usage
 
-The LIGO plugin exposes a `compile` task in Taqueria which can target one, or all the LIGO contracts in the `contracts` folder and compile them to Michelson `.tz` files  output to the `artifacts` folder
+The LIGO plugin exposes a `compile` task in Taqueria which can target one, or all the LIGO contracts in the `contracts` folder and compile them to Michelson `.tz` files output to the `artifacts` folder
 
 ### Running the Compile Task
 
@@ -41,12 +43,11 @@ The `compile` task can be implemented by more than one compiler plugin installed
 
 The LIGO `compile` task will accept the following optional parameters:
 
-| flag  |  name       | description                           |   
-|:-----:|:------------|---------------------------------------|
-|  -e   | entry-point | The entry point that will be compiled |
-|  -s   | syntax      | The syntax used in the contract       |    
-|  -i   | infer       | Enable type inference                 |   
-
+| flag | name        | description                           |
+| :--: | :---------- | ------------------------------------- |
+|  -e  | entry-point | The entry point that will be compiled |
+|  -s  | syntax      | The syntax used in the contract       |
+|  -i  | infer       | Enable type inference                 |
 
 ## Plugin Architecture
 
@@ -56,8 +57,8 @@ Docker is used under the hood to provide a self contained environment for LIGO t
 
 The plugin provides a single task `compile`, used for compiling LIGO smart contracts to Michelson:
 
-|  attribute |  value                   | 
-|------------|:------------------------:|
-|  task      | 'compile'                | 
-|  command   | 'compile [sourceFile]    | 
-|  aliases   | ['c', 'compile-ligo']    |  
+| attribute |         value         |
+| --------- | :-------------------: |
+| task      |       'compile'       |
+| command   | 'compile [sourceFile] |
+| aliases   | ['c', 'compile-ligo'] |

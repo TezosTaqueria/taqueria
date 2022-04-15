@@ -1,62 +1,67 @@
-import * as M from '@taquito/michel-codec';
-import { assertExhaustive, GenerateApiError, reduceFlatMap } from './common';
+import * as M from '@taquito/michel-codec'
+import { assertExhaustive, GenerateApiError, reduceFlatMap } from './common'
 
 export type TypedStorage = {
-    storage: TypedType;
-};
+    storage: TypedType
+}
 export type TypedParameter = {
-    methods: TypedMethod[];
-};
+    methods: TypedMethod[]
+}
 export type TypedMethod = {
-    name: string;
-    args: TypedVar[];
-};
+    name: string
+    args: TypedVar[]
+}
 export type TypedVar = {
-    name?: string;
-    type: TypedType;
-};
+    name?: string
+    type: TypedType
+}
 export type TypedType = {
-    raw: M.MichelsonType;
-    optional?: boolean;
+    raw: M.MichelsonType
+    optional?: boolean
 } & (
-        {
-            kind: 'unit';
-        } | {
-            kind: 'never';
-        } | {
-            kind: 'unknown';
-        } | {
-            kind: 'value';
-            value: string;
-            typescriptType: 'string' | 'boolean' | 'number' | 'Date';
-        } | {
-            kind: 'union';
-            union: TypedVar[];
-        } | {
-            kind: 'object';
-            fields: TypedVar[];
-        } | {
-            kind: 'array';
-            array: { item: TypedType };
-        } | {
-            kind: 'map';
-            map: { key: TypedType, value: TypedType, isBigMap: boolean };
-        }
-    );
+    | {
+          kind: 'unit'
+      }
+    | {
+          kind: 'never'
+      }
+    | {
+          kind: 'unknown'
+      }
+    | {
+          kind: 'value'
+          value: string
+          typescriptType: 'string' | 'boolean' | 'number' | 'Date'
+      }
+    | {
+          kind: 'union'
+          union: TypedVar[]
+      }
+    | {
+          kind: 'object'
+          fields: TypedVar[]
+      }
+    | {
+          kind: 'array'
+          array: { item: TypedType }
+      }
+    | {
+          kind: 'map'
+          map: { key: TypedType; value: TypedType; isBigMap: boolean }
+      }
+)
 
 const toDebugSource = (node: M.MichelsonType) => {
-    return JSON.stringify(node);
-};
+    return JSON.stringify(node)
+}
 
 export const parseContractStorage = (storage: M.MichelsonContractStorage): TypedStorage => {
-    const fields = storage.args
-        .map(x => visitVar(x))
-        .reduce(reduceFlatMap, []);
+    const fields = storage.args.map((x) => visitVar(x)).reduce(reduceFlatMap, [])
 
-    if(fields.length === 1 && !fields[0].name){
+    if (fields.length === 1 && !fields[0].name) {
         return {
-            storage: fields[0].type
-        };
+            storage: fields[0].type,
+        }
     }
 
     return {
@@ -65,54 +70,52 @@ export const parseContractStorage = (storage: M.MichelsonContractStorage): Typed
             raw: storage as unknown as M.MichelsonType,
             fields,
         },
-    };
-};
+    }
+}
 
 export const parseContractParameter = (parameter: M.MichelsonContractParameter): TypedParameter => {
     return {
-        methods: parameter.args
-            .map(x => visitContractParameterEndpoint(x as MMethod))
-            .reduce(reduceFlatMap, []),
-    };
-};
+        methods: parameter.args.map((x) => visitContractParameterEndpoint(x as MMethod)).reduce(reduceFlatMap, []),
+    }
+}
 
-
-type MMethod = M.MichelsonTypeOr<[M.MichelsonType, M.MichelsonType]>;
+type MMethod = M.MichelsonTypeOr<[M.MichelsonType, M.MichelsonType]>
 const visitContractParameterEndpoint = (node: MMethod): TypedMethod[] => {
-
     // console.log('visitContractParameterEndpoint', { node });
 
     // Sub endpoints (i.e. admin endpoints that are imported)
     if (node.prim === `or`) {
-        return node.args.map(x => visitContractParameterEndpoint(x as MMethod)).reduce(reduceFlatMap, []);
+        return node.args.map((x) => visitContractParameterEndpoint(x as MMethod)).reduce(reduceFlatMap, [])
     }
 
     // Sub endpoints as a list with a single or (i.e. admin endpoints that are imported)
-    if (node.prim === `list` && node.args.length as number === 1 && (node.args[0] as MMethod)?.prim === `or`) {
-        return node.args.map(x => visitContractParameterEndpoint(x as MMethod)).reduce(reduceFlatMap, []);
+    if (node.prim === `list` && (node.args.length as number) === 1 && (node.args[0] as MMethod)?.prim === `or`) {
+        return node.args.map((x) => visitContractParameterEndpoint(x as MMethod)).reduce(reduceFlatMap, [])
     }
 
-    const nameRaw = node.annots?.[0];
-    const name = nameRaw?.startsWith('%') ? nameRaw.substr(1) : null;
+    const nameRaw = node.annots?.[0]
+    const name = nameRaw?.startsWith('%') ? nameRaw.substr(1) : null
 
     if (!name) {
-        console.warn(`Unknown method: ${node.prim as string}`, { node, args: node.args });
-        return [];
+        console.warn(`Unknown method: ${node.prim as string}`, { node, args: node.args })
+        return []
     }
 
-    const nodeType = visitType(node, { ignorePairName: node.prim === 'pair' });
+    const nodeType = visitType(node, { ignorePairName: node.prim === 'pair' })
 
     // Method args are usually objects
     if (nodeType.kind === 'object') {
-        return [{ name, args: nodeType.fields }];
+        return [{ name, args: nodeType.fields }]
     }
 
     // Simple methods can have a single unnamed argument
-    return [{
-        name,
-        args: [{ type: nodeType }],
-    }];
-};
+    return [
+        {
+            name,
+            args: [{ type: nodeType }],
+        },
+    ]
+}
 
 // type PrimOf<T extends M.MichelsonType> = T extends { prim: infer U } ? U : never;
 // type WithPrim<T extends M.MichelsonType, P extends PrimOf<T>> = T extends { prim: P } ? T : never;
@@ -120,18 +123,20 @@ const visitContractParameterEndpoint = (node: MMethod): TypedMethod[] => {
 //     return (node && 'prim' in node && node.prim === prim) || false;
 // };
 
-type MVarArgs = M.MichelsonType;
+type MVarArgs = M.MichelsonType
 const visitVar = (node: MVarArgs): TypedVar[] => {
-    const name = `annots` in node && node.annots?.length === 1 ? node.annots[0].substr(1) : undefined;
-    const type = visitType(node);
+    const name = `annots` in node && node.annots?.length === 1 ? node.annots[0].substr(1) : undefined
+    const type = visitType(node)
 
-    return [{
-        name,
-        type,
-    }];
-};
+    return [
+        {
+            name,
+            type,
+        },
+    ]
+}
 
-type MType = M.MichelsonType;
+type MType = M.MichelsonType
 const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedType => {
     // console.log('visitType', { node });
     // const debug_source = toDebugSource(node);
@@ -142,16 +147,21 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
 
     if (!(`prim` in node)) {
         // Unknown
-        console.error(`visitType no prim`, { node });
-        return { kind: `unknown`, raw: node };
+        console.error(`visitType no prim`, { node })
+        return { kind: `unknown`, raw: node }
     }
 
     // Union
     if (node.prim === `or`) {
-        const unionVars = node.args.map(x => visitVar(x)).reduce(reduceFlatMap, []).map(x => x);
+        const unionVars = node.args
+            .map((x) => visitVar(x))
+            .reduce(reduceFlatMap, [])
+            .map((x) => x)
 
         // Flatten with child unions
-        const union = unionVars.map(x => !x.name && x.type.kind === 'union' ? x.type.union : [x]).reduce(reduceFlatMap, []);
+        const union = unionVars
+            .map((x) => (!x.name && x.type.kind === 'union' ? x.type.union : [x]))
+            .reduce(reduceFlatMap, [])
         // const union = unionVars.map(x=>x.type);
 
         // const union = unionVars.map(x => x.type);
@@ -164,21 +174,21 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
         //     union.push(...rightSide.union);
         // }
 
-        if (union.some(x => !x)) {
-            throw new GenerateApiError(`or: Some fields are null`, { node });
+        if (union.some((x) => !x)) {
+            throw new GenerateApiError(`or: Some fields are null`, { node })
         }
         return {
             kind: `union`,
             raw: node,
             union,
-        };
+        }
     }
 
     // Intersect
     if (node.prim === `pair`) {
-        const fields = node.args.map(x => visitVar(x)).reduce(reduceFlatMap, []);
-        if (fields.some(x => !x)) {
-            throw new GenerateApiError(`pair: Some fields are null`, { node, args: node.args, fields });
+        const fields = node.args.map((x) => visitVar(x)).reduce(reduceFlatMap, [])
+        if (fields.some((x) => !x)) {
+            throw new GenerateApiError(`pair: Some fields are null`, { node, args: node.args, fields })
         }
         // Disabled Check: Apparently pairs can have more than 2 items
         // if (fields.length !== 2) {
@@ -186,46 +196,44 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
         // }
 
         // Flatten with unnamed child pairs
-        const fieldsFlat = fields.map(x => (!x.name || options?.ignorePairName) && x.type.kind === 'object' ? x.type.fields : [x]).reduce(reduceFlatMap, []);
+        const fieldsFlat = fields
+            .map((x) => ((!x.name || options?.ignorePairName) && x.type.kind === 'object' ? x.type.fields : [x]))
+            .reduce(reduceFlatMap, [])
 
         return {
             kind: `object`,
             raw: node,
             fields: fieldsFlat,
-        };
+        }
     }
 
     // list
-    if (node.prim === `list`
-        || node.prim === `set`
-    ) {
+    if (node.prim === `list` || node.prim === `set`) {
         if (node.args.length !== 1) {
-            throw new GenerateApiError(`list does not have 1 arg`, { node, args: node.args });
+            throw new GenerateApiError(`list does not have 1 arg`, { node, args: node.args })
         }
 
-        const arrayItem = visitType(node.args[0]);
+        const arrayItem = visitType(node.args[0])
         if (!arrayItem) {
-            throw new GenerateApiError(`arrayItem are null`, { node, args: node.args, arrayItem });
+            throw new GenerateApiError(`arrayItem are null`, { node, args: node.args, arrayItem })
         }
         return {
             kind: `array`,
             raw: node,
             array: { item: arrayItem },
-        };
+        }
     }
 
     // map
-    if (node.prim === `map`
-        || node.prim === `big_map`
-    ) {
+    if (node.prim === `map` || node.prim === `big_map`) {
         if (node.args.length !== 2) {
-            throw new GenerateApiError(`map does not have 2 args`, { node, args: node.args });
+            throw new GenerateApiError(`map does not have 2 args`, { node, args: node.args })
         }
 
-        const mapKey = visitType(node.args[0]);
-        const mapValue = visitType(node.args[1]);
+        const mapKey = visitType(node.args[0])
+        const mapValue = visitType(node.args[1])
         if (!mapKey || !mapValue) {
-            throw new GenerateApiError(`map is missing key or value`, { node, args: node.args, mapKey, mapValue });
+            throw new GenerateApiError(`map is missing key or value`, { node, args: node.args, mapKey, mapValue })
         }
         return {
             kind: `map`,
@@ -235,7 +243,7 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
                 value: mapValue,
                 isBigMap: node.prim === `big_map`,
             },
-        };
+        }
     }
 
     // option
@@ -243,7 +251,7 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
         return {
             ...visitType(node.args[0]),
             optional: true,
-        };
+        }
     }
 
     // boolean
@@ -253,64 +261,59 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
             raw: node,
             value: node.prim,
             typescriptType: `boolean`,
-        };
+        }
     }
 
     // numbers
-    if (node.prim === `nat`
-        || node.prim === `int`
-        || node.prim === `mutez`
-    ) {
+    if (node.prim === `nat` || node.prim === `int` || node.prim === `mutez`) {
         return {
             kind: `value`,
             raw: node,
             value: node.prim,
             typescriptType: `number`,
-        };
+        }
     }
 
     // Date
-    if (node.prim === `timestamp`
-
-    ) {
+    if (node.prim === `timestamp`) {
         return {
             kind: `value`,
             raw: node,
             value: node.prim,
             typescriptType: `Date`,
-        };
+        }
     }
 
     // strings
-    if (node.prim === `address`
-        || node.prim === `key`
-        || node.prim === `key_hash`
-        || node.prim === `chain_id`
-        || node.prim === `string`
-        || node.prim === `signature`
-        || node.prim === `ticket`
-        || node.prim === `bls12_381_fr`
-        || node.prim === `bls12_381_g1`
-        || node.prim === `bls12_381_g2`
-        || node.prim === `sapling_state`
-        || node.prim === `sapling_transaction`
-        || node.prim === `contract`
+    if (
+        node.prim === `address` ||
+        node.prim === `key` ||
+        node.prim === `key_hash` ||
+        node.prim === `chain_id` ||
+        node.prim === `string` ||
+        node.prim === `signature` ||
+        node.prim === `ticket` ||
+        node.prim === `bls12_381_fr` ||
+        node.prim === `bls12_381_g1` ||
+        node.prim === `bls12_381_g2` ||
+        node.prim === `sapling_state` ||
+        node.prim === `sapling_transaction` ||
+        node.prim === `contract`
     ) {
         return {
             kind: `value`,
             raw: node,
             value: node.prim,
             typescriptType: `string`,
-        };
+        }
     }
-
 
     // void
     if (node.prim === `unit`) {
         return {
             kind: `unit`,
             raw: node,
-        };
+        }
     }
 
     // bytes?
@@ -320,40 +323,36 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
             raw: node,
             value: node.prim,
             typescriptType: `string`,
-        };
+        }
     }
 
     // misc?
-    if (node.prim === `lambda`
-        || node.prim === `operation`
-    ) {
+    if (node.prim === `lambda` || node.prim === `operation`) {
         return {
             kind: `value`,
             raw: node,
             value: node.prim,
             typescriptType: `string`,
-        };
+        }
     }
 
     // chest
-    if(node.prim === 'chest'){
-        throw new Error('Not Implemented: chest');
+    if (node.prim === 'chest') {
+        throw new Error('Not Implemented: chest')
     }
-    if(node.prim === 'chest_key'){
-        throw new Error('Not Implemented: chest_key');
+    if (node.prim === 'chest_key') {
+        throw new Error('Not Implemented: chest_key')
     }
 
     // never
-    if (node.prim === `never`
-    ) {
+    if (node.prim === `never`) {
         return {
             kind: `never`,
             raw: node,
-        };
+        }
     }
 
-
     // Unknown
-    assertExhaustive(node, `Unknown type`);
-    throw new GenerateApiError(`Unknown type`, { node });
-};
+    assertExhaustive(node, `Unknown type`)
+    throw new GenerateApiError(`Unknown type`, { node })
+}

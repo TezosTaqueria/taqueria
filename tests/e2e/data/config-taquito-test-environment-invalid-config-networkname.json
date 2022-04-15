@@ -13,15 +13,13 @@
         "default": "development",
         "development": {
             "networks": [],
-            "sandboxes": [
-                "local"
-            ],
+            "sandboxes": ["local"],
             "storage": {}
         },
         "test": {
             "networks": ["ithaca"],
             "sandboxes": [],
-            "storage": {"hello-tacos.tz": "100"}
+            "storage": { "hello-tacos.tz": "100" }
         }
     },
     "sandbox": {

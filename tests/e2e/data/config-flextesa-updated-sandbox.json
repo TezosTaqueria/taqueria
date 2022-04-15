@@ -13,10 +13,7 @@
         "default": "development",
         "development": {
             "networks": [],
-            "sandboxes": [
-                "local",
-                "test"
-            ],
+            "sandboxes": ["local", "test"],
             "storage": {}
         }
     },

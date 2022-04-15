@@ -13,13 +13,15 @@ SmartPy is available [here](https://smartpy.io/)
 ## Installation
 
 To install the SmartPy plugin on a Taqueria project, navigate to the project folder and run:
+
 ```shell
 taq install @taqueria/plugin-smartpy
 ```
 
 ## Usage
 
-The SmartPy plugin's `taq compile` task can be run with or without arguments. The basic syntax for the command is: 
+The SmartPy plugin's `taq compile` task can be run with or without arguments. The basic syntax for the command is:
+
 ```shell
 taq compile <file-name>
 ```
@@ -36,8 +38,8 @@ This plugin is developed for Taqueria built using TypeScript for NodeJS using th
 
 The plugin provides a `compile` task used for compiling SmartPy smart contracts to Michelson
 
-|  attribute |  value                   | 
-|------------|:------------------------:|
-|  task      | 'compile'                | 
-|  command   | 'compile [sourceFile]    | 
-|  aliases   | ['c', 'compile-smartpy'] |        
+| attribute |          value           |
+| --------- | :----------------------: |
+| task      |        'compile'         |
+| command   |  'compile [sourceFile]   |
+| aliases   | ['c', 'compile-smartpy'] |

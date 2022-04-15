@@ -2,19 +2,18 @@
 title: Hello Tacos
 ---
 
-
 We have made a basic Hello ~~World~~ _Tacos_ Tezos dApp. This dApp shows off the structure of a Tezos dApp and all its components
 
 You can find the Github repo here: [hello_tacos]: https://github.com/ecadlabs/hello-tacos
 
 The Hello Tacos dApp consists of:
 
-- A Taco counting Smart Contract implemented in the following languages
-    - Ligo
-    - SmartPy
-    - Michelson
-- A React web application that interacts with the on-chain smart-contract
-- Intergration tests that verify the expected behaviour of the smart-contract when on-chain
+-   A Taco counting Smart Contract implemented in the following languages
+    -   Ligo
+    -   SmartPy
+    -   Michelson
+-   A React web application that interacts with the on-chain smart-contract
+-   Intergration tests that verify the expected behaviour of the smart-contract when on-chain
 
 Follow the steps below to convert (taq'ify) the demo app into a Taqueria project
 
@@ -31,15 +30,19 @@ As taqueria's plugins are distribed using NPM, the dapp also needs to be an NPM 
 
 I noticed the the 'test' folder is an NPM project, and so I just moved the package.json and package-lock.json file from there to the root.
 
-1. git mv test/package* .
+1. git mv test/package\* .
 2. npm i
 3. There was an existing .gitignore file, but it was assuming that the "test" directory would contain a node_modules folder. As the root of the project is now an NPM project instead, I'll update this:
+
 ##### Before:
+
 ```
 test/node_modules
 app/node_modules
 ```
+
 ##### After:
+
 ```
 app/node_modules
 /node_modules
@@ -51,10 +54,10 @@ app/node_modules
 2. `taq install ../taqueria/taqueria-plugin-flextesa`
 3. `taq install ../taqueria/taqueria-plugin-taquito`
 
-
 ## Remove unncessary scripts
 
 In the package.json file, I'll remove the following NPM scripts which are redundant with taqueria's functionality:
+
 ```
 "compile-contract": "ligo compile-contract ./contract/hello-tacos.mligo main",
 "start-flextesa": "docker run --rm --name hangzhou-sandbox --detach -p 20000:20000 tqtezos/flextesa:20211119 hangzbox start"
@@ -65,12 +68,17 @@ In the package.json file, I'll remove the following NPM scripts which are redund
 1. Moved the contract from the "contract" directory to "contracts": `git mv contract/hello-tacos.mligo contracts/`
 2. Moved the integration tests from the "test" directory to the default "tests" directory that Taqueria generates: `git mv test/*.js tests/`
 3. In the package.json file, there's a script for running tests in jest:
+
 ##### Before:
+
 ```
 "test": "jest ./hello-tacos.test.js",
 ```
+
 ##### After:
+
 I've modified that to use the "tests" folder:
+
 ```
 "test": "jest ./tests/hello-tacos.test.js",
 ```
@@ -83,11 +91,15 @@ In the mean time, to keep the structure consistent, I'll move the unit test file
 
 1. `git mv contract/hello-tacos-test.mligo tests/`
 2. I'll need to update the script in NPM used to run those unit tests:
+
 ##### Before:
+
 ```
 "ligo-test": "ligo run test ./contract/hello-tacos-test.mligo"
 ```
+
 ##### After:
+
 ```
 "ligo-test": "ligo run test ./tests/hello-tacos-test.mligo"
 ```
@@ -97,6 +109,7 @@ In the mean time, to keep the structure consistent, I'll move the unit test file
 I think we've done enough and can see how Taqueria handles our project. Lets try compiling our contract: `taq compile`
 
 ##### Output:
+
 <pre>
 ┌───────────────────┬──────────────────────────┐
 │ Contract          │ Artifact                 │
@@ -106,9 +119,12 @@ I think we've done enough and can see how Taqueria handles our project. Lets try
 </pre>
 
 I'll start up a sandbox and see if I can originate:
+
 1. `taq start sandbox local`
 2. Specify an initial storage value for the contract in _.taq/config.json_:
+
 ###### Before
+
 ```
 "environment": {
         "default": "development",
@@ -121,7 +137,9 @@ I'll start up a sandbox and see if I can originate:
         }
     },
 ```
+
 ###### After
+
 ```
 "environment": {
         "default": "development",
@@ -136,8 +154,11 @@ I'll start up a sandbox and see if I can originate:
         }
     },
 ```
+
 2. `taq originate`
+
 ###### Output
+
 <pre>
 ┌────────────────┬──────────────────────────────────────┬─────────────┐
 │ Contract       │ Address                              │ Destination │
@@ -153,7 +174,9 @@ Looking good!
 Claude, the author of this dapp, did a nice job of writing some tests. Let see if we can have those run against our sandbox.
 
 I noticed that Claude has some account information in the _hello-tacos.test.js_ file. I'll modify this so that the accounts are pulled from Taqueria:
+
 ###### Before:
+
 ```
 const contractCode = require("../contract/contract.json");
 
@@ -172,7 +195,9 @@ describe("JavaScript tests for Hello Tacos contract", () => {
   const rpcUrl = "http://localhost:20000";
   ...
 ```
+
 ###### After:
+
 ```
 const config = require('../.taq/config.json')
 
@@ -188,6 +213,7 @@ describe("JavaScript tests for Hello Tacos contract", () => {
 ```
 
 In Taqueria's .taq/config.json, sandbox acounts look like this:
+
 ```
 "bob": {
     "initialBalance": "3000000000",
@@ -211,27 +237,36 @@ In Taqueria's .taq/config.json, sandbox acounts look like this:
 ```
 
 As such, I'll need update a few references in the test to assure that the keys can be retrieved properly:
+
 ###### Before: (Line 18)
+
 ```
 signer = new InMemorySigner(alice.sk);
 ```
+
 ###### After:
+
 ```
 // Taquito requires that the unencrypted key not have a prefix:
 signer = new InMemorySigner(alice.keys.secretKey.replace(/unencrypted:/, ''));
 ```
 
 ###### Before:(Line 20)
+
 ```
 const op = await Tezos.contract.transfer({ to: bob.pk, amount: 1 });
 ```
+
 ###### After:
+
 ```
 const op = await Tezos.contract.transfer({ to: bob.pk, amount: 1 });
 ```
 
 Also, Taquito now allows us to provide Michelson code directly without having to compile it to Michelson-JSON. Thus, we'll provide the Michelson contract code to Taquito:
+
 ###### Before (Line 24):
+
 ```
 test("Should originate the Hello Tacos contract", async () => {
     const originationOp = await Tezos.contract.originate({
@@ -240,7 +275,9 @@ test("Should originate the Hello Tacos contract", async () => {
     });
     ...
 ```
+
 ###### After:
+
 ```
 test("Should originate the Hello Tacos contract", async () => {
     const {readFile} = require('fs/promise')
@@ -257,6 +294,7 @@ That should do it. Lets try running the tests:
 `npm run test`
 
 ###### Output:
+
 <pre>
 > hello-tacos@1.0.0 test
 > jest ./tests/hello-tacos.test.js
@@ -279,16 +317,15 @@ Ran all test suites matching /.\/tests\/hello-tacos.test.js/i
 Lets clean up after ourselves:
 
 1. The "contract" directory is no longer needed
-`git rm -r contract && rm -rf contract`
+   `git rm -r contract && rm -rf contract`
 2. Nor is the "test" directory
-`git rm -r test && rm -rf test`
+   `git rm -r test && rm -rf test`
 
 ## Start the Dapp
 
 1. `cd app`
 2. `npm i`
 3. TBC
-
 
 --
 [hello_tacos]: https://github.com/ecadlabs/hello-tacos

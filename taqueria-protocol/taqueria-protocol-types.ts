@@ -2,9 +2,9 @@
 // consumable by Deno or the TypeScript compiler without any warnings
 // or errors emited
 // @ts-ignore see above
-import {SanitizedAbsPath, SHA256} from '../taqueria-utils/taqueria-utils-types.ts'
+import { SanitizedAbsPath, SHA256 } from '../taqueria-utils/taqueria-utils-types.ts'
 // @ts-ignore see above
-import {urlParse} from './url-parse.ts'
+import { urlParse } from './url-parse.ts'
 
 type URL = ReturnType<typeof urlParse>
 
@@ -14,10 +14,10 @@ type URL = ReturnType<typeof urlParse>
 
 export abstract class StringLike {
     readonly value: string
-    protected constructor(value: string){
+    protected constructor(value: string) {
         this.value = value
     }
-    static create (value: string) {
+    static create(value: string) {
         return this.constructor.call(this, value)
     }
     public toString() {
@@ -28,20 +28,15 @@ export abstract class StringLike {
 const stringMax30Type: unique symbol = Symbol()
 export class StringMax30 extends StringLike {
     [stringMax30Type]: void
-    static create(value: string, truncate=false) : StringMax30 | undefined {
-        return (value.length <= 30)
-            ? new StringMax30(value)
-            : (truncate
-                ? new StringMax30(value.substr(0, 30))
-                : undefined
-            )
+    static create(value: string, truncate = false): StringMax30 | undefined {
+        return value.length <= 30 ? new StringMax30(value) : truncate ? new StringMax30(value.substr(0, 30)) : undefined
     }
 }
 
 const stringNoSpaces: unique symbol = Symbol()
 export class StringNoSpaces extends StringLike {
     [stringNoSpaces]: void
-    static create(value: string) : StringNoSpaces {
+    static create(value: string): StringNoSpaces {
         return new StringNoSpaces(value.replace(/\s+/g, '_'))
     }
 }
@@ -81,11 +76,11 @@ export class Verb extends StringLike {
 const commandType: unique symbol = Symbol()
 export class Command extends StringLike {
     [commandType]: void
-    static create(value: string) : Command | undefined {
+    static create(value: string): Command | undefined {
         if (value.match(/^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/)) {
             return new Command(value)
         }
-        return undefined   
+        return undefined
     }
 }
 
@@ -93,9 +88,7 @@ const singleChar: unique symbol = Symbol()
 export class SingleChar extends StringLike {
     [singleChar]: void
     static create(value: string): SingleChar | undefined {
-        return value && value.toString().match(/^[A-Za-z]/)
-            ? new SingleChar(value[0])
-            : undefined
+        return value && value.toString().match(/^[A-Za-z]/) ? new SingleChar(value[0]) : undefined
     }
 }
 
@@ -110,12 +103,11 @@ export class Url {
         try {
             const url = urlParse(value)
             return new Url(url)
-        }
-        catch (_) {
+        } catch (_) {
             return undefined
         }
     }
-} 
+}
 
 export type Alias = Verb | SingleChar
 
@@ -125,7 +117,7 @@ export type Alias = Verb | SingleChar
 
 export interface InstalledPlugin {
     readonly name: string
-    readonly type: 'npm' | 'binary' | "deno"
+    readonly type: 'npm' | 'binary' | 'deno'
 }
 
 export interface Config {
@@ -135,7 +127,7 @@ export interface Config {
     readonly testsDir: string
     readonly artifactsDir: string
 
-    readonly environment: Record<'default'|string, string|EnvironmentConfig>
+    readonly environment: Record<'default' | string, string | EnvironmentConfig>
 
     readonly sandbox: Record<string, SandboxConfig>
 
@@ -143,9 +135,9 @@ export interface Config {
 }
 
 export interface ConfigArgs extends Config {
-    projectDir: SanitizedAbsPath,
-    configFile: SanitizedAbsPath,
-    
+    projectDir: SanitizedAbsPath
+    configFile: SanitizedAbsPath
+
     hash: SHA256
 }
 
@@ -159,7 +151,6 @@ export interface UnvalidatedPositionalArg {
     readonly defaultValue?: string | number | boolean
     readonly description: string
 }
-
 
 export interface UnvalidatedOption {
     readonly shortFlag?: string
@@ -190,16 +181,16 @@ export interface UnvalidatedNetwork {
 // NOTE: This is a workaround as TypeScript doesn't support
 // recursive / cyclical types yet. :(
 type Accounts_Base = Record<string, AccountDetails>
-export type Accounts = Record<string, (keyof Accounts_Base)|AccountDetails>
+export type Accounts = Record<string, keyof Accounts_Base | AccountDetails>
 
 export interface UnvalidatedSandbox extends UnvalidatedNetwork {
     readonly plugin?: string
-    readonly accounts?: Accounts 
+    readonly accounts?: Accounts
 }
 
 const hookType: unique symbol = Symbol()
 export class Hook {
-    [hookType] : void
+    [hookType]: void
     static create(unvalidatedHook: UnvalidatedHook): Hook | undefined {
         return undefined
     }
@@ -207,26 +198,25 @@ export class Hook {
 
 const scaffoldType: unique symbol = Symbol()
 export class Scaffold {
-    [scaffoldType] : void
+    [scaffoldType]: void
     static create(unvalidatedScaffold: UnvalidatedScaffold): Scaffold | undefined {
         return undefined
     }
 }
 
-export type TaskHandler = "proxy" | string | string[]
-
+export type TaskHandler = 'proxy' | string | string[]
 
 export interface UnvalidatedTask {
     readonly task: string
     readonly command: string
     readonly description: string
     readonly aliases?: string[]
-    readonly options?: (UnvalidatedOption|Option|undefined)[],
-    readonly positionals?: (UnvalidatedPositionalArg|undefined|PositionalArg)[]
+    readonly options?: (UnvalidatedOption | Option | undefined)[]
+    readonly positionals?: (UnvalidatedPositionalArg | undefined | PositionalArg)[]
     readonly handler: TaskHandler
     readonly hidden?: boolean
     readonly example?: string
-    readonly encoding?: "json" | "application/json" | "none"
+    readonly encoding?: 'json' | 'application/json' | 'none'
 }
 
 export interface UnvalidatedPluginInfo {
@@ -234,11 +224,11 @@ export interface UnvalidatedPluginInfo {
     readonly name: string
     readonly alias?: string
     readonly version: string
-    readonly tasks?: (UnvalidatedTask|undefined)[]
-    readonly scaffolds?: (UnvalidatedScaffold|undefined)[]
-    readonly hooks?: (UnvalidatedHook|undefined)[]
-    readonly networks?: (UnvalidatedNetwork|undefined)[]
-    readonly sandboxes?: (UnvalidatedSandbox|undefined)[]
+    readonly tasks?: (UnvalidatedTask | undefined)[]
+    readonly scaffolds?: (UnvalidatedScaffold | undefined)[]
+    readonly hooks?: (UnvalidatedHook | undefined)[]
+    readonly networks?: (UnvalidatedNetwork | undefined)[]
+    readonly sandboxes?: (UnvalidatedSandbox | undefined)[]
 }
 
 export class PluginInfo {
@@ -251,7 +241,17 @@ export class PluginInfo {
     readonly hooks: Hook[]
     readonly networks: Network[]
     readonly sandboxes: Sandbox[]
-    constructor(schema: string, name: string, version: string, tasks: Task[], scaffolds: Scaffold[], hooks: Hook[], networks: Network[], sandboxes: Sandbox[], alias?: string) {
+    constructor(
+        schema: string,
+        name: string,
+        version: string,
+        tasks: Task[],
+        scaffolds: Scaffold[],
+        hooks: Hook[],
+        networks: Network[],
+        sandboxes: Sandbox[],
+        alias?: string,
+    ) {
         this.schema = schema
         this.alias = alias
         this.name = name
@@ -263,48 +263,44 @@ export class PluginInfo {
         this.sandboxes = sandboxes
     }
 
-    static convert<A, B>(factory: (item: A) => B|undefined) {
-        return (obj: UnvalidatedPluginInfo, prop: keyof UnvalidatedPluginInfo) : B[] => obj[prop] ? (obj[prop] as (A|undefined)[]).reduce(
-            (retval: B[], unvalidatedItem: A|undefined) => {
-                if (unvalidatedItem) {
-                    try {
-                        const item = factory(unvalidatedItem)
-                        return item ? [...retval, item]: retval
-                    }
-                    catch (_) {
-                        return retval
-                    }
-                }
-                return retval
-            },
-            []
-        ) : []
+    static convert<A, B>(factory: (item: A) => B | undefined) {
+        return (obj: UnvalidatedPluginInfo, prop: keyof UnvalidatedPluginInfo): B[] =>
+            obj[prop]
+                ? (obj[prop] as (A | undefined)[]).reduce((retval: B[], unvalidatedItem: A | undefined) => {
+                      if (unvalidatedItem) {
+                          try {
+                              const item = factory(unvalidatedItem)
+                              return item ? [...retval, item] : retval
+                          } catch (_) {
+                              return retval
+                          }
+                      }
+                      return retval
+                  }, [])
+                : []
     }
 
-    static create(obj: UnvalidatedPluginInfo) : PluginInfo | undefined {
+    static create(obj: UnvalidatedPluginInfo): PluginInfo | undefined {
         if (obj.version && obj.schema) {
             try {
                 const createTask = Task.create.bind(Task)
                 //TODO: Finish doing the above for each factory/constructor
 
-                const temp: Record<string, string> = obj.alias
-                    ? {alias: obj.alias}
-                    : {}
+                const temp: Record<string, string> = obj.alias ? { alias: obj.alias } : {}
 
-                const pluginInfo : PluginInfo = {
+                const pluginInfo: PluginInfo = {
                     ...temp,
                     name: obj.name,
                     schema: obj.schema,
                     version: obj.version,
-                    tasks: this.convert<UnvalidatedTask, Task>(createTask) (obj, "tasks"),
-                    hooks: this.convert(Hook.create) (obj, "hooks"),
-                    scaffolds: this.convert(Scaffold.create) (obj, "scaffolds"),
-                    networks: this.convert(Network.create) (obj, "networks"),
-                    sandboxes: this.convert(Sandbox.create) (obj, "sandboxes")
+                    tasks: this.convert<UnvalidatedTask, Task>(createTask)(obj, 'tasks'),
+                    hooks: this.convert(Hook.create)(obj, 'hooks'),
+                    scaffolds: this.convert(Scaffold.create)(obj, 'scaffolds'),
+                    networks: this.convert(Network.create)(obj, 'networks'),
+                    sandboxes: this.convert(Sandbox.create)(obj, 'sandboxes'),
                 }
                 return pluginInfo
-            }
-            catch (_) {
+            } catch (_) {
                 return undefined
             }
         }
@@ -322,7 +318,12 @@ export class PositionalArg {
     readonly defaultValue?: string | number | boolean
     readonly type?: OptionType
 
-    protected constructor(placeholder: HumanReadableIdentifier, description: string, type?: OptionType, defaultValue?: string | number | boolean) {
+    protected constructor(
+        placeholder: HumanReadableIdentifier,
+        description: string,
+        type?: OptionType,
+        defaultValue?: string | number | boolean,
+    ) {
         this.placeholder = placeholder
         this.defaultValue = defaultValue
         this.description = description
@@ -331,9 +332,7 @@ export class PositionalArg {
 
     static create(arg: UnvalidatedPositionalArg) {
         const placeholder = HumanReadableIdentifier.create(arg.placeholder)
-        return placeholder
-            ? new PositionalArg(placeholder, arg.description, arg.type, arg.defaultValue)
-            : undefined
+        return placeholder ? new PositionalArg(placeholder, arg.description, arg.type, arg.defaultValue) : undefined
     }
 }
 
@@ -347,7 +346,15 @@ export class Option {
     readonly choices?: string[]
     readonly required?: boolean
     readonly boolean?: boolean
-    private constructor(shortFlag: SingleChar | undefined, flag: Verb, description: string, choices: string[], required: boolean, boolean: boolean, defaultValue?: string | number | boolean) {
+    private constructor(
+        shortFlag: SingleChar | undefined,
+        flag: Verb,
+        description: string,
+        choices: string[],
+        required: boolean,
+        boolean: boolean,
+        defaultValue?: string | number | boolean,
+    ) {
         this.shortFlag = shortFlag
         this.flag = flag
         this.description = description
@@ -360,12 +367,28 @@ export class Option {
         const flag = Verb.create(option.flag)
 
         if (!option.shortFlag && flag)
-            return new Option(undefined, flag, option.description, option.choices || [], option.required || false, option.boolean ? true : false, option.defaultValue)
+            return new Option(
+                undefined,
+                flag,
+                option.description,
+                option.choices || [],
+                option.required || false,
+                option.boolean ? true : false,
+                option.defaultValue,
+            )
 
         if (option.shortFlag && flag) {
             const shortFlag = SingleChar.create(option.shortFlag)
             return shortFlag
-                ? new Option(shortFlag, flag, option.description, option.choices || [], option.required || false, option.boolean ? true : false, option.defaultValue)
+                ? new Option(
+                      shortFlag,
+                      flag,
+                      option.description,
+                      option.choices || [],
+                      option.required || false,
+                      option.boolean ? true : false,
+                      option.defaultValue,
+                  )
                 : undefined
         }
 
@@ -373,89 +396,99 @@ export class Option {
     }
 }
 
-export type TaskEncoding = "none" | "json" | "application/json"
+export type TaskEncoding = 'none' | 'json' | 'application/json'
 
- const taskType: unique symbol = Symbol()
- export class Task {
-     [taskType]: void
-     readonly task: Verb
-     readonly command: Command
-     readonly aliases: Alias[]
-     readonly description: string
-     readonly example?: string
-     readonly options?: Option[]
-     readonly handler: TaskHandler
-     readonly hidden: boolean
-     readonly positionals: PositionalArg[]
-     readonly encoding: TaskEncoding
-     protected constructor(name: Verb, command: Command, description: string, handler: TaskHandler, options: Option[]=[], positionals: PositionalArg[]=[], aliases: Alias[]=[], hidden=false, encoding="none", example?: string) {
-         this.task = name
-         this.command = command
-         this.description = description
-         this.options = options
-         this.aliases = aliases
-         this.handler = handler
-         this.hidden = hidden
-         this.example = example
-         this.positionals = positionals
-         this.encoding = ["none", "json", "application/json"].includes(encoding)
-            ? encoding as TaskEncoding
-            : "none"
-     }
-     static createAlias(value: string): Alias | undefined {
+const taskType: unique symbol = Symbol()
+export class Task {
+    [taskType]: void
+    readonly task: Verb
+    readonly command: Command
+    readonly aliases: Alias[]
+    readonly description: string
+    readonly example?: string
+    readonly options?: Option[]
+    readonly handler: TaskHandler
+    readonly hidden: boolean
+    readonly positionals: PositionalArg[]
+    readonly encoding: TaskEncoding
+    protected constructor(
+        name: Verb,
+        command: Command,
+        description: string,
+        handler: TaskHandler,
+        options: Option[] = [],
+        positionals: PositionalArg[] = [],
+        aliases: Alias[] = [],
+        hidden = false,
+        encoding = 'none',
+        example?: string,
+    ) {
+        this.task = name
+        this.command = command
+        this.description = description
+        this.options = options
+        this.aliases = aliases
+        this.handler = handler
+        this.hidden = hidden
+        this.example = example
+        this.positionals = positionals
+        this.encoding = ['none', 'json', 'application/json'].includes(encoding) ? (encoding as TaskEncoding) : 'none'
+    }
+    static createAlias(value: string): Alias | undefined {
         return Verb.create(value) || SingleChar.create(value)
     }
 
-     static create (task: UnvalidatedTask): Task | undefined {
+    static create(task: UnvalidatedTask): Task | undefined {
         const name = Verb.create(task.task)
         const command = Command.create(task.command)
         const aliases = task.aliases
-            ? task.aliases.reduce(
-                (retval: Alias[], unvalidatedAlias) => {
-                    const alias  = this.createAlias(unvalidatedAlias)
-                    return alias ? [...retval, alias] : retval
-                },
-                []
-            )
+            ? task.aliases.reduce((retval: Alias[], unvalidatedAlias) => {
+                  const alias = this.createAlias(unvalidatedAlias)
+                  return alias ? [...retval, alias] : retval
+              }, [])
             : []
 
-        const options = !task.options ? [] : task.options.reduce(
-            (retval: Option[], option) => {
-                if (option instanceof Option) {
-                    return [...retval, option]
-                }
-                else if (option === undefined) {
-                    return retval
-                }
-                else {
-                    const validOption = Option.create(option as UnvalidatedOption)
-                    return validOption ? [...retval, validOption] : retval
-                }
-            },
-            []
-        )
+        const options = !task.options
+            ? []
+            : task.options.reduce((retval: Option[], option) => {
+                  if (option instanceof Option) {
+                      return [...retval, option]
+                  } else if (option === undefined) {
+                      return retval
+                  } else {
+                      const validOption = Option.create(option as UnvalidatedOption)
+                      return validOption ? [...retval, validOption] : retval
+                  }
+              }, [])
 
-        const positionals = !task.positionals ? [] : task.positionals.reduce(
-            (retval: PositionalArg[], item) => {
-                if (item instanceof PositionalArg) {
-                    return [...retval, item]
-                }
-                else if (item === undefined) {
-                    return retval
-                }
+        const positionals = !task.positionals
+            ? []
+            : task.positionals.reduce((retval: PositionalArg[], item) => {
+                  if (item instanceof PositionalArg) {
+                      return [...retval, item]
+                  } else if (item === undefined) {
+                      return retval
+                  }
 
-                const positional = PositionalArg.create(item as UnvalidatedPositionalArg)
-                return positional
-                    ? [...retval, positional]:
-                    retval
-            },
-            []
-        )
+                  const positional = PositionalArg.create(item as UnvalidatedPositionalArg)
+                  return positional ? [...retval, positional] : retval
+              }, [])
 
         return name && command
-            ? new Task(name, command, task.description, task.handler, options, positionals, aliases, task.hidden ? true : false, task.encoding, task.example)
+            ? new Task(
+                  name,
+                  command,
+                  task.description,
+                  task.handler,
+                  options,
+                  positionals,
+                  aliases,
+                  task.hidden ? true : false,
+                  task.encoding,
+                  task.example,
+              )
             : undefined
-        }
+    }
 }
 
 export interface AccountKeys {
@@ -466,13 +499,13 @@ export interface AccountKeys {
 }
 
 export interface AccountDetails {
-    readonly initialBalance?: string,
+    readonly initialBalance?: string
     keys?: AccountKeys
 }
 
 export interface SandboxConfig {
-    readonly label?: string,
-    readonly plugin?: string,
+    readonly label?: string
+    readonly plugin?: string
     readonly rpcUrl?: string
     readonly protocol?: string
     readonly attributes?: Attributes
@@ -480,12 +513,12 @@ export interface SandboxConfig {
 }
 
 export interface NetworkConfig {
-    readonly label?: string,
-    readonly rpcUrl?: string 
+    readonly label?: string
+    readonly rpcUrl?: string
     readonly protocol?: string
     readonly faucet: {
         readonly pkh: string
-        readonly mnemonic: string[]   
+        readonly mnemonic: string[]
         readonly email: string
         readonly password: string
         readonly amount: string
@@ -500,14 +533,14 @@ export interface EnvironmentConfig {
 }
 
 export interface RuntimeDependency {
-    readonly name: string,
-    readonly path: string,
-    readonly version: string,
-    readonly kind: "required" | "optional"
+    readonly name: string
+    readonly path: string
+    readonly version: string
+    readonly kind: 'required' | 'optional'
 }
 
 export interface Attributes {
-    [key: string]: string|number|boolean
+    [key: string]: string | number | boolean
 }
 
 const economicalPrototypeHashType: unique symbol = Symbol()
@@ -525,16 +558,14 @@ export class EconomicalProtocol {
     [economicProtocalType]: void
     readonly hash: EconomicalProtocolHash
     readonly label: HumanReadableIdentifier | undefined
-    constructor(hash: EconomicalProtocolHash, label: (HumanReadableIdentifier|undefined)=undefined) {
+    constructor(hash: EconomicalProtocolHash, label: HumanReadableIdentifier | undefined = undefined) {
         this.hash = hash
         this.label = label
     }
-    static create(hash: string, label: (string|undefined)=undefined) {
+    static create(hash: string, label: string | undefined = undefined) {
         const validHash = EconomicalProtocolHash.create(hash)
         const validLabel = label ? HumanReadableIdentifier.create(label) : undefined
-        return validHash
-            ? new EconomicalProtocol(validHash, validLabel)
-            : undefined
+        return validHash ? new EconomicalProtocol(validHash, validLabel) : undefined
     }
 }
 
@@ -546,7 +577,13 @@ export class Network {
     readonly rpcUrl: Url
     readonly protocol: EconomicalProtocol
     readonly attributes: Attributes
-    public constructor (name: HumanReadableIdentifier, label: StringMax30, rpcUrl: Url, protocol: EconomicalProtocol, attributes: Attributes) {
+    public constructor(
+        name: HumanReadableIdentifier,
+        label: StringMax30,
+        rpcUrl: Url,
+        protocol: EconomicalProtocol,
+        attributes: Attributes,
+    ) {
         this.name = name
         this.label = label
         this.rpcUrl = rpcUrl
@@ -554,7 +591,7 @@ export class Network {
         this.attributes = attributes
     }
 
-    static create(network : UnvalidatedNetwork) {
+    static create(network: UnvalidatedNetwork) {
         const validName = HumanReadableIdentifier.create(network.name)
         const validLabel = StringMax30.create(network.label)
         const validUrl = Url.create(network.rpcUrl)
@@ -568,20 +605,36 @@ export class Network {
 
 const sandboxType: unique symbol = Symbol()
 export class Sandbox extends Network {
-    readonly accounts: Accounts
+    readonly accounts: Accounts;
     [sandboxType]: void
     readonly plugin?: string
 
-    protected constructor(name: HumanReadableIdentifier, label: StringMax30, rpcUrl: Url, protocol: EconomicalProtocol, attributes: Attributes, plugin?: string, accounts?: Accounts) {
+    protected constructor(
+        name: HumanReadableIdentifier,
+        label: StringMax30,
+        rpcUrl: Url,
+        protocol: EconomicalProtocol,
+        attributes: Attributes,
+        plugin?: string,
+        accounts?: Accounts,
+    ) {
         super(name, label, rpcUrl, protocol, attributes)
         this.plugin = plugin
-        this.accounts = accounts ? accounts: {}
+        this.accounts = accounts ? accounts : {}
     }
 
     static create(sandbox: UnvalidatedSandbox) {
         const network = super.create(sandbox)
         return network
-            ? new Sandbox(network.name, network.label, network.rpcUrl, network.protocol, network.attributes, sandbox.plugin, sandbox.accounts)
+            ? new Sandbox(
+                  network.name,
+                  network.label,
+                  network.rpcUrl,
+                  network.protocol,
+                  network.attributes,
+                  sandbox.plugin,
+                  sandbox.accounts,
+              )
             : undefined
     }
 }
@@ -593,11 +646,16 @@ export interface Environment {
     readonly storage: Record<string, unknown>
 }
 
-export type PluginActionName = "checkRuntimeDependencies" | "installRuntimeDependencies" | "proxy" | "pluginInfo" | string
+export type PluginActionName =
+    | 'checkRuntimeDependencies'
+    | 'installRuntimeDependencies'
+    | 'proxy'
+    | 'pluginInfo'
+    | string
 
 export type PluginProxyAction = Task
 
-export type PluginAction = "checkRuntimeDependencies" | "installRuntimeDependencies" | "pluginInfo" | PluginProxyAction
+export type PluginAction = 'checkRuntimeDependencies' | 'installRuntimeDependencies' | 'pluginInfo' | PluginProxyAction
 
 export interface RuntimeDependencyReport extends RuntimeDependency {
     readonly met: boolean
@@ -612,7 +670,7 @@ export interface InstallRuntimeDependenciesResponse {
 }
 
 export type PluginActionNotSupportedResponse = {
-    readonly status: "notSupported",
+    readonly status: 'notSupported'
     readonly msg: string
 }
 
@@ -623,4 +681,10 @@ export interface PluginJsonResponse {
 
 export type ActionPluginInfo = UnvalidatedPluginInfo
 
-export type PluginResponse = PluginJsonResponse | CheckRuntimeDependenciesResponse | InstallRuntimeDependenciesResponse | ActionPluginInfo | PluginActionNotSupportedResponse | void
+export type PluginResponse =
+    | PluginJsonResponse
+    | CheckRuntimeDependenciesResponse
+    | InstallRuntimeDependenciesResponse
+    | ActionPluginInfo
+    | PluginActionNotSupportedResponse
+    | void

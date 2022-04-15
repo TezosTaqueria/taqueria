@@ -1,33 +1,33 @@
 {
-  "name": "@taqueria/flextesa-manager",
-  "version": "0.2.0",
-  "description": "Provides an interface and abstraction over a flextesa mininet",
-  "main": "index.js",
-  "scripts": {
-    "build-package": "npx tsc -noEmit index.ts && npx esbuild --platform=node --bundle index.ts --outdir=.",
-    "build-docker": "TAQ_VERSION=`taq --version` BUILD=`taq --build`; docker build . -t \"ghcr.io/ecadlabs/taqueria-flextesa:${TAQ_VERSION}-${BUILD}\"",
-    "build": "npm run build-package"
-  },
-  "keywords": [
-    "taqueria",
-    "docker",
-    "flextesa",
-    "sandbox",
-    "local",
-    "ecad",
-    "ecadlabs",
-    "tezos"
-  ],
-  "author": "ECAD Labs",
-  "license": "Apache-2.0",
-  "devDependencies": {
-    "esbuild": "^0.14.11",
-    "typescript": "4.5.4"
-  },
-  "dependencies": {
-    "@taqueria/node-sdk": "^0.2.0",
-    "partial.lenses": "^14.17.0",
-    "promise-retry": "^2.0.1",
-    "yargs": "^17.3.1"
-  }
+    "name": "@taqueria/flextesa-manager",
+    "version": "0.2.0",
+    "description": "Provides an interface and abstraction over a flextesa mininet",
+    "main": "index.js",
+    "scripts": {
+        "build-package": "npx tsc -noEmit index.ts && npx esbuild --platform=node --bundle index.ts --outdir=.",
+        "build-docker": "TAQ_VERSION=`taq --version` BUILD=`taq --build`; docker build . -t \"ghcr.io/ecadlabs/taqueria-flextesa:${TAQ_VERSION}-${BUILD}\"",
+        "build": "npm run build-package"
+    },
+    "keywords": [
+        "taqueria",
+        "docker",
+        "flextesa",
+        "sandbox",
+        "local",
+        "ecad",
+        "ecadlabs",
+        "tezos"
+    ],
+    "author": "ECAD Labs",
+    "license": "Apache-2.0",
+    "devDependencies": {
+        "esbuild": "^0.14.11",
+        "typescript": "4.5.4"
+    },
+    "dependencies": {
+        "@taqueria/node-sdk": "^0.2.0",
+        "partial.lenses": "^14.17.0",
+        "promise-retry": "^2.0.1",
+        "yargs": "^17.3.1"
+    }
 }

@@ -19,48 +19,34 @@
                                                 "args": [
                                                     {
                                                         "prim": "unit",
-                                                        "annots": [
-                                                            "%confirm_admin"
-                                                        ]
+                                                        "annots": ["%confirm_admin"]
                                                     },
                                                     {
                                                         "prim": "bool",
-                                                        "annots": [
-                                                            "%pause"
-                                                        ]
+                                                        "annots": ["%pause"]
                                                     }
                                                 ]
                                             },
                                             {
                                                 "prim": "address",
-                                                "annots": [
-                                                    "%set_admin"
-                                                ]
+                                                "annots": ["%set_admin"]
                                             }
                                         ],
-                                        "annots": [
-                                            "%admin"
-                                        ]
+                                        "annots": ["%admin"]
                                     },
                                     {
                                         "prim": "pair",
                                         "args": [
                                             {
                                                 "prim": "nat",
-                                                "annots": [
-                                                    "%asset_id"
-                                                ]
+                                                "annots": ["%asset_id"]
                                             },
                                             {
                                                 "prim": "nat",
-                                                "annots": [
-                                                    "%bid_amount"
-                                                ]
+                                                "annots": ["%bid_amount"]
                                             }
                                         ],
-                                        "annots": [
-                                            "%bid"
-                                        ]
+                                        "annots": ["%bid"]
                                     }
                                 ]
                             },
@@ -69,54 +55,42 @@
                                 "args": [
                                     {
                                         "prim": "nat",
-                                        "annots": [
-                                            "%cancel"
-                                        ]
+                                        "annots": ["%cancel"]
                                     },
                                     {
                                         "prim": "pair",
                                         "args": [
                                             {
                                                 "prim": "nat",
-                                                "annots": [
-                                                    "%opening_price"
-                                                ]
+                                                "annots": ["%opening_price"]
                                             },
                                             {
                                                 "prim": "pair",
                                                 "args": [
                                                     {
                                                         "prim": "nat",
-                                                        "annots": [
-                                                            "%min_raise_percent"
-                                                        ]
+                                                        "annots": ["%min_raise_percent"]
                                                     },
                                                     {
                                                         "prim": "pair",
                                                         "args": [
                                                             {
                                                                 "prim": "nat",
-                                                                "annots": [
-                                                                    "%min_raise"
-                                                                ]
+                                                                "annots": ["%min_raise"]
                                                             },
                                                             {
                                                                 "prim": "pair",
                                                                 "args": [
                                                                     {
                                                                         "prim": "nat",
-                                                                        "annots": [
-                                                                            "%round_time"
-                                                                        ]
+                                                                        "annots": ["%round_time"]
                                                                     },
                                                                     {
                                                                         "prim": "pair",
                                                                         "args": [
                                                                             {
                                                                                 "prim": "nat",
-                                                                                "annots": [
-                                                                                    "%extend_time"
-                                                                                ]
+                                                                                "annots": ["%extend_time"]
                                                                             },
                                                                             {
                                                                                 "prim": "pair",
@@ -161,9 +135,7 @@
                                                                                                 ]
                                                                                             }
                                                                                         ],
-                                                                                        "annots": [
-                                                                                            "%asset"
-                                                                                        ]
+                                                                                        "annots": ["%asset"]
                                                                                     },
                                                                                     {
                                                                                         "prim": "pair",
@@ -176,9 +148,7 @@
                                                                                             },
                                                                                             {
                                                                                                 "prim": "timestamp",
-                                                                                                "annots": [
-                                                                                                    "%end_time"
-                                                                                                ]
+                                                                                                "annots": ["%end_time"]
                                                                                             }
                                                                                         ]
                                                                                     }
@@ -193,9 +163,7 @@
                                                 ]
                                             }
                                         ],
-                                        "annots": [
-                                            "%configure"
-                                        ]
+                                        "annots": ["%configure"]
                                     }
                                 ]
                             }
@@ -203,9 +171,7 @@
                     },
                     {
                         "prim": "nat",
-                        "annots": [
-                            "%resolve"
-                        ]
+                        "annots": ["%resolve"]
                     }
                 ]
             }
@@ -228,15 +194,11 @@
                                         "args": [
                                             {
                                                 "prim": "address",
-                                                "annots": [
-                                                    "%admin"
-                                                ]
+                                                "annots": ["%admin"]
                                             },
                                             {
                                                 "prim": "bool",
-                                                "annots": [
-                                                    "%paused"
-                                                ]
+                                                "annots": ["%paused"]
                                             }
                                         ]
                                     },
@@ -247,43 +209,33 @@
                                                 "prim": "address"
                                             }
                                         ],
-                                        "annots": [
-                                            "%pending_admin"
-                                        ]
+                                        "annots": ["%pending_admin"]
                                     }
                                 ]
                             }
                         ],
-                        "annots": [
-                            "%pauseable_admin"
-                        ]
+                        "annots": ["%pauseable_admin"]
                     },
                     {
                         "prim": "pair",
                         "args": [
                             {
                                 "prim": "nat",
-                                "annots": [
-                                    "%current_id"
-                                ]
+                                "annots": ["%current_id"]
                             },
                             {
                                 "prim": "pair",
                                 "args": [
                                     {
                                         "prim": "nat",
-                                        "annots": [
-                                            "%max_auction_time"
-                                        ]
+                                        "annots": ["%max_auction_time"]
                                     },
                                     {
                                         "prim": "pair",
                                         "args": [
                                             {
                                                 "prim": "nat",
-                                                "annots": [
-                                                    "%max_config_to_start_time"
-                                                ]
+                                                "annots": ["%max_config_to_start_time"]
                                             },
                                             {
                                                 "prim": "pair",
@@ -293,20 +245,14 @@
                                                         "args": [
                                                             {
                                                                 "prim": "address",
-                                                                "annots": [
-                                                                    "%fa2_address"
-                                                                ]
+                                                                "annots": ["%fa2_address"]
                                                             },
                                                             {
                                                                 "prim": "nat",
-                                                                "annots": [
-                                                                    "%token_id"
-                                                                ]
+                                                                "annots": ["%token_id"]
                                                             }
                                                         ],
-                                                        "annots": [
-                                                            "%bid_currency"
-                                                        ]
+                                                        "annots": ["%bid_currency"]
                                                     },
                                                     {
                                                         "prim": "big_map",
@@ -319,27 +265,21 @@
                                                                 "args": [
                                                                     {
                                                                         "prim": "address",
-                                                                        "annots": [
-                                                                            "%seller"
-                                                                        ]
+                                                                        "annots": ["%seller"]
                                                                     },
                                                                     {
                                                                         "prim": "pair",
                                                                         "args": [
                                                                             {
                                                                                 "prim": "nat",
-                                                                                "annots": [
-                                                                                    "%current_bid"
-                                                                                ]
+                                                                                "annots": ["%current_bid"]
                                                                             },
                                                                             {
                                                                                 "prim": "pair",
                                                                                 "args": [
                                                                                     {
                                                                                         "prim": "timestamp",
-                                                                                        "annots": [
-                                                                                            "%start_time"
-                                                                                        ]
+                                                                                        "annots": ["%start_time"]
                                                                                     },
                                                                                     {
                                                                                         "prim": "pair",
@@ -469,9 +409,7 @@
                                                                 ]
                                                             }
                                                         ],
-                                                        "annots": [
-                                                            "%auctions"
-                                                        ]
+                                                        "annots": ["%auctions"]
                                                     }
                                                 ]
                                             }
@@ -827,9 +765,7 @@
                                                 "args": [
                                                     {
                                                         "prim": "address",
-                                                        "annots": [
-                                                            "%from_"
-                                                        ]
+                                                        "annots": ["%from_"]
                                                     },
                                                     {
                                                         "prim": "list",
@@ -839,42 +775,32 @@
                                                                 "args": [
                                                                     {
                                                                         "prim": "address",
-                                                                        "annots": [
-                                                                            "%to_"
-                                                                        ]
+                                                                        "annots": ["%to_"]
                                                                     },
                                                                     {
                                                                         "prim": "pair",
                                                                         "args": [
                                                                             {
                                                                                 "prim": "nat",
-                                                                                "annots": [
-                                                                                    "%token_id"
-                                                                                ]
+                                                                                "annots": ["%token_id"]
                                                                             },
                                                                             {
                                                                                 "prim": "nat",
-                                                                                "annots": [
-                                                                                    "%amount"
-                                                                                ]
+                                                                                "annots": ["%amount"]
                                                                             }
                                                                         ]
                                                                     }
                                                                 ]
                                                             }
                                                         ],
-                                                        "annots": [
-                                                            "%txs"
-                                                        ]
+                                                        "annots": ["%txs"]
                                                     }
                                                 ]
                                             }
                                         ]
                                     }
                                 ],
-                                "annots": [
-                                    "%transfer"
-                                ]
+                                "annots": ["%transfer"]
                             },
                             {
                                 "prim": "IF_NONE",

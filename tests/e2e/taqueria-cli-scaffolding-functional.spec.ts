@@ -1,10 +1,9 @@
-import { exec as exec1 } from "child_process"
-import fsPromises from "fs/promises"
-import util from "util"
+import { exec as exec1 } from 'child_process'
+import fsPromises from 'fs/promises'
+import util from 'util'
 const exec = util.promisify(exec1)
 
-describe("E2E Testing for taqueria scaffolding initialization,", () => {
-
+describe('E2E Testing for taqueria scaffolding initialization,', () => {
     const scaffoldDirName = `taqueria-quickstart`
 
     beforeAll(async () => {
@@ -12,7 +11,7 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
             await exec('taq scaffold')
             await exec(`cd ${scaffoldDirName} && npm run setup`)
         } catch (error) {
-            throw new Error (`error: ${error}`)
+            throw new Error(`error: ${error}`)
         }
     })
 
@@ -27,8 +26,8 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
             expect(taqContents.stdout).toContain('contracts')
             expect(taqContents.stdout).toContain('artifacts')
             expect(taqContents.stdout).toContain('tests')
-        } catch(error) {
-            throw new Error (`error: ${error}`)
+        } catch (error) {
+            throw new Error(`error: ${error}`)
         }
     })
 
@@ -37,8 +36,8 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
             await exec(`cd ${scaffoldDirName} && npm run build:taqueria`)
             const taqContents = await exec(`ls ${scaffoldDirName}/taqueria/artifacts`)
             expect(taqContents.stdout).toContain('example.tz')
-        } catch(error) {
-            throw new Error (`error: ${error}`)
+        } catch (error) {
+            throw new Error(`error: ${error}`)
         }
     })
 
@@ -51,8 +50,8 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
             const stopResults = await exec(`cd ${scaffoldDirName}/taqueria && npm run stop:local`)
             expect(stopResults.stdout).toContain('Stopped local.')
-        } catch(error) {
-            throw new Error (`error: ${error}`)
+        } catch (error) {
+            throw new Error(`error: ${error}`)
         }
     })
 
@@ -60,8 +59,7 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         try {
             await fsPromises.rm(`${scaffoldDirName}`, { recursive: true })
         } catch (error) {
-            throw new Error (`error: ${error}`)
+            throw new Error(`error: ${error}`)
         }
-
     })
 })

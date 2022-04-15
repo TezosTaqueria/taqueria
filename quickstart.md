@@ -5,13 +5,16 @@
 Taqueria is extensible via plugins. Most projects will require plugins to be installed, which will extend Taqueria with tasks for compiling contracts, origination, and testing.
 
 Taqueria supports many types of plugins, with several published on npmjs.com:
-- **LIGO** (@taqueria/plugin-ligo) - provides the ability to compile LIGO contracts
-- **Taqueria** (@taqueria/plugin-taquito) - provides the ability to originate (deploy) contracts to a testnet or sandbox
-- **Flextesa** (@taqueria/plugin-flextesa) - sandbox support
+
+-   **LIGO** (@taqueria/plugin-ligo) - provides the ability to compile LIGO contracts
+-   **Taqueria** (@taqueria/plugin-taquito) - provides the ability to originate (deploy) contracts to a testnet or sandbox
+-   **Flextesa** (@taqueria/plugin-flextesa) - sandbox support
 
 To install a plugin:
+
 1. Run `taq install @taqueria/plugin-ligo`
 2. Add the following to your plugins array in `.taq/config.json`:
+
 ```
 { "plugin": "@taqueria/plugin-ligo", "type": "npm"}
 ```

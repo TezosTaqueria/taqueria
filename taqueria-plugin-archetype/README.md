@@ -7,18 +7,20 @@ The Archetype plugin exposes a compile task in Taqueria which can target one, or
 ## Tasks
 
 The Archetype plugin provides the following tasks to Taqueria:
-- `compile`
+
+-   `compile`
 
 ## Requirements
 
-- Taqueria v0.0.6 or later
-- Node.js v16 or later
+-   Taqueria v0.0.6 or later
+-   Node.js v16 or later
 
 ## Installation
 
 The Archetype plugin is distributed as an NPM package that can be installed and uninstalled on a project from the Taqueria CLI
 
 To install the Archetype plugin on a Taqueria project, navigate to the project folder and run:
+
 ```shell
 taq install @taqueria/plugin-archetype
 ```

@@ -13,71 +13,67 @@
 
 /** @type {import('@docusaurus/plugin-content-docs').SidebarsConfig} */
 const sidebars = {
-  // By default, Docusaurus generates a sidebar from the docs folder structure
+    // By default, Docusaurus generates a sidebar from the docs folder structure
 
-  docs: [
-    {
-      type: "category",
-      label: "Getting Started",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "intro",
-        "getting-started/installation",
-        "getting-started/plugin-basics",
-        "getting-started/quickstart"
-      ],
-    },
-    {
-      type: "category",
-      label: "Plugin Reference",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "plugins/plugin-flextesa",
-        "plugins/plugin-ligo",
-        "plugins/plugin-smartpy",
-        "plugins/plugin-taquito",
-        "plugins/plugin-typescript-generator",
-        "plugins/plugin-mock-plugin",
-      ],
-    },
-    {
-      type: "category",
-      label: "Example App",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "hello-tacos-tutorial"
-      ],
-    },
-    {
-      type: "category",
-      label: "Taqueria Internals",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "taqueria-internals/architecture",
-      ],
-    },
-    {
-      type: "category",
-      label: "Taqueria Development",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "roadmap",
-        "taqueria-dev/contributions",
-        "taqueria-dev/making-plugins",
-        "taqueria-dev/pr-npm-packages"
-      ],
-    },
-  ]
-};
+    docs: [
+        {
+            type: 'category',
+            label: 'Getting Started',
+            className: 'sidebarHeader',
+            collapsed: false,
+            collapsible: false,
+            items: [
+                'intro',
+                'getting-started/installation',
+                'getting-started/plugin-basics',
+                'getting-started/quickstart',
+            ],
+        },
+        {
+            type: 'category',
+            label: 'Plugin Reference',
+            className: 'sidebarHeader',
+            collapsed: false,
+            collapsible: false,
+            items: [
+                'plugins/plugin-flextesa',
+                'plugins/plugin-ligo',
+                'plugins/plugin-smartpy',
+                'plugins/plugin-taquito',
+                'plugins/plugin-typescript-generator',
+                'plugins/plugin-mock-plugin',
+            ],
+        },
+        {
+            type: 'category',
+            label: 'Example App',
+            className: 'sidebarHeader',
+            collapsed: false,
+            collapsible: false,
+            items: ['hello-tacos-tutorial'],
+        },
+        {
+            type: 'category',
+            label: 'Taqueria Internals',
+            className: 'sidebarHeader',
+            collapsed: false,
+            collapsible: false,
+            items: ['taqueria-internals/architecture'],
+        },
+        {
+            type: 'category',
+            label: 'Taqueria Development',
+            className: 'sidebarHeader',
+            collapsed: false,
+            collapsible: false,
+            items: [
+                'roadmap',
+                'taqueria-dev/contributions',
+                'taqueria-dev/making-plugins',
+                'taqueria-dev/pr-npm-packages',
+            ],
+        },
+    ],
+}
 
-module.exports = sidebars;
+module.exports = sidebars
