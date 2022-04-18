@@ -1,10 +1,11 @@
-import { SanitizedArgs, PluginResponse, AccountDetails, Failure, LikeAPromise, Config, NetworkConfig, SandboxConfig} from "@taqueria/node-sdk/types";
+import { SanitizedArgs, PluginResponse, AccountDetails, Failure, LikeAPromise, Config, NetworkConfig, SandboxConfig, EnvironmentConfig} from "@taqueria/node-sdk/types";
 import glob from 'fast-glob'
 import {join} from 'path'
-import { TezosToolkit } from '@taquito/taquito';
+import { TezosToolkit, OriginateParams, WalletOperationBatch } from '@taquito/taquito';
 import {readFile} from 'fs/promises'
 import { InMemorySigner, importKey } from '@taquito/signer';
-import { sendAsyncJsonRes } from "@taqueria/node-sdk";
+import { sendAsyncJsonRes, getCurrentEnvironmentConfig, getNetworkConfig, getSandboxAccountConfig, getInitialStorage, sendErr, getSandboxConfig, getDefaultAccount } from "@taqueria/node-sdk";
+import { BatchWalletOperation } from "@taquito/taquito/dist/types/wallet/batch-operation";
 
 type Opts = SanitizedArgs & Record<string, unknown>
 
@@ -17,138 +18,115 @@ interface OriginationResult {
 const getContractAbspath = (contractFilename: string, parsedArgs: Opts) => 
     join(parsedArgs.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`)
 
+const addOrigination = (parsedArgs: Opts, batch: Promise<WalletOperationBatch>) => async (contractFilename: string) => {
+    const contractAbspath = getContractAbspath(contractFilename, parsedArgs)
+    const contractData = await readFile(contractAbspath, "utf-8")
 
-const originateContractToSandbox = async (contractFilename: string, parsedArgs: Opts, storage: unknown, sandboxName: string, sandbox: SandboxConfig | undefined): LikeAPromise<OriginationResult, Failure<unknown>> => {
-    try {
-        if (sandbox && sandbox.rpcUrl) {
-            const contractAbspath = getContractAbspath(contractFilename, parsedArgs)
-            const tezos = new TezosToolkit(sandbox.rpcUrl)
-            const secretKey = getAccountSecretKey(sandbox)
-            if (secretKey) {
-                tezos.setProvider({
-                    signer: new InMemorySigner(secretKey),
-                });
-
-                const contractData = await readFile(contractAbspath, "utf-8")
-                return tezos.contract.originate({
-                    code: contractData,
-                    storage: storage
-                })
-                .then(operation => ({
-                    contract: contractFilename,
-                    address: operation.contractAddress as string,
-                    destination: sandboxName
-                }))
-                .catch(previous => Promise.reject({
-                    errCode: "E_ORIGINATE",
-                    errMsg: `Could not originate ${contractFilename} on the sandbox '${sandboxName}'`,
-                    previous
-                }))
-            }
-            else {
-                return Promise.reject({
-                    errCode: "E_INVALID_SANDBOX_ACCOUNT",
-                    errMsg: `Please configure a default account for the ${sandboxName} to be used for origination.`,
-                    context: sandbox
-                })
-            }
-        }
-        return Promise.reject({
-            errCode: "E_INVALID_SANDBOX_URL",
-            errMsg: 'The sandbox configuration is invalid and missing the RPC url',
-            context: sandbox
+    const initialStorage = getInitialStorage(parsedArgs) (contractFilename)
+    if (initialStorage) {
+        return (await batch).withOrigination({
+            code: contractData,
+            storage: initialStorage,
+            
         })
     }
-    catch (err) {
-        return Promise.reject({
-            errCode: "E_ORIGINATE",
-            errMsg: "An unexpected error occured when trying to originate a contract",
-            previous: err
-        })
-    }
+
+    sendErr(`No initial storage value found for ${contractFilename}`)
+    return await batch
 }
 
-const originateContractToNetwork = async (contractFilename: string, parsedArgs: Opts, storage: unknown, networkName: string, network: NetworkConfig|undefined): LikeAPromise<OriginationResult, Failure<unknown>> => {
-    try {
-        if (network && network.rpcUrl) {
-            const contractAbspath = getContractAbspath(contractFilename, parsedArgs)
-            const tezos = new TezosToolkit(network.rpcUrl)
-            if (network.faucet) {
-                await importKey(tezos, network.faucet.email, network.faucet.password, network.faucet.mnemonic.join(' '), network.faucet.activation_code)
+const originateToNetworks = (parsedArgs: Opts, currentEnv: EnvironmentConfig) =>
+    currentEnv.networks
+        ? currentEnv.networks.reduce(
+            (retval, networkName) => {
+                debugger
+                const network = getNetworkConfig (parsedArgs) (networkName)
+                if (network.rpcUrl) {
+                    if (network.faucet) {
+                        const result = (async () => {
+                            const tezos = new TezosToolkit(network.rpcUrl as string)
+                            await importKey(tezos, network.faucet.email, network.faucet.password, network.faucet.mnemonic.join(' '), network.faucet.activation_code)
+    
+                            const contracts = parsedArgs.contract
+                                ? [parsedArgs.contract as string]
+                                : (await glob("**/*.tz", {cwd: parsedArgs.artifactsDir})) as string[]
+    
+                            const batch = await contracts.reduce(
+                                (batch, contractFilename) => addOrigination(parsedArgs, batch) (contractFilename),
+                                Promise.resolve(tezos.wallet.batch())
+                            )
+                            
+                            try {
+                                const op = await batch.send()
+                                const confirmed = await op.confirmation()
+                                return op
+                            }
+                            catch (err) {
+                                return undefined
+                            }
+                        })()
 
-                const contractData = await readFile(contractAbspath, "utf-8")
-                return tezos.contract.originate({
-                    code: contractData,
-                    storage: storage
-                })
-                .then(operation => ({
-                    contract: contractFilename,
-                    address: operation.contractAddress as string,
-                    destination: networkName
-                }))
-                .catch(previous => Promise.reject({
-                    errCode: "E_ORIGINATE",
-                    errMsg: `Could not originate ${contractFilename} on the network '${networkName}'`,
-                    previous
-                }))
-            }
-            else {
-                return Promise.reject({
-                    errCode: "E_INVALID_NETWORK_FAUCET",
-                    errMsg: `Please configure a faucet for the ${network} network to be used for origination.`,
-                    context: network
-                })
-            }
-        }
-        return Promise.reject({
-            errCode: "E_INVALID_NETWORK_URL",
-            errMsg: 'The network configuration is invalid and missing the RPC url',
-            context: network
-        })
-    }
-    catch (err) {
-        return Promise.reject({
-            errCode: "E_ORIGINATE",
-            errMsg: "An unexpected error occured when trying to originate a contract",
-            previous: err
-        })
-    }
-}
-
-const getNetworkConfig = (networkName: string, config: Config) => {
-    return !config.network[networkName]
-        ? undefined
-        : config.network[networkName]
-}
-
-const getSandboxConfig = (sandboxName: string, config: Config) => {
-    return !config.sandbox[sandboxName]
-    ? undefined
-    : config.sandbox[sandboxName]
-}
-
-const getAccountSecretKey = (sandbox: SandboxConfig) => {
-    if (sandbox.accounts && sandbox.accounts.default) {
-        const accountName = (sandbox.accounts.default as string);
-        const accountDetails = sandbox.accounts[accountName] as AccountDetails
-        if (accountDetails.keys) return accountDetails.keys.secretKey.replace(/unencrypted:/, '')
-    }
-
-    return undefined        
-}
-
-const originateContract = (parsedArgs: Opts) => (contractFilename: string) => {
-    // TODO: Should getting the default environment be provided by the SDK or the framework?
-    const currentEnv = parsedArgs.env
-        ? (parsedArgs.env as string)
-        : (
-            parsedArgs.config.environment
-                ? parsedArgs.config.environment.default
-                : 'development'
+                        return [...retval, result]
+                    }
+                    else sendErr(`Network ${networkName} requires a valid faucet`)
+                }
+                else sendErr(`Network "${networkName} is missing an RPC url"`)
+                return retval
+            },
+            [] as  Promise<BatchWalletOperation|undefined>[]
         )
-    const env = parsedArgs.config.environment && parsedArgs.config.environment[currentEnv]
-            ? parsedArgs.config.environment[currentEnv]
-            : undefined
+        : []
+
+const originateToSandboxes = (parsedArgs: Opts, currentEnv: EnvironmentConfig) =>
+    currentEnv.sandboxes
+        ? currentEnv.sandboxes.reduce(
+            (retval, sandboxName) => {
+                debugger
+                const sandbox = getSandboxConfig (parsedArgs) (sandboxName)
+                if (sandbox.rpcUrl) {
+                    const secretKey = getDefaultAccount(parsedArgs) (sandboxName) ?.keys?.secretKey
+                    if (secretKey) {
+                        const result = (async () => {
+                            const tezos = new TezosToolkit(sandbox.rpcUrl as string)
+                            tezos.setProvider({
+                                signer: new InMemorySigner(secretKey.replace(/^unencrypted:/, '')),
+                            });
+    
+                            const contracts = parsedArgs.contract
+                                ? [parsedArgs.contract as string]
+                                : (await glob("**/*.tz", {cwd: parsedArgs.artifactsDir})) as string[]
+    
+                            const batch = await contracts.reduce(
+                                (batch, contractFilename) => addOrigination(parsedArgs, batch) (contractFilename),
+                                Promise.resolve(tezos.wallet.batch())
+                            )
+                            try {
+                                const op = await batch.send()
+                                debugger
+                                const confirmed = await op.confirmation()
+                                return op
+                            }
+                            catch (err) {
+                                return undefined
+                            }
+                        })()
+                        
+                        return [...retval, result]
+                    }
+                    else sendErr(`Sandbox ${sandboxName}'s default account is missing keys`)
+                }
+                else sendErr(`Sandbox "${sandboxName} is missing an RPC url"`)
+
+                return retval
+            },
+            [] as Promise<BatchWalletOperation|undefined>[]
+        )
+        : []
+    
+    
+
+export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
+    const env = getCurrentEnvironmentConfig(parsedArgs)
 
     if (!env) {
         return Promise.reject({
@@ -158,44 +136,12 @@ const originateContract = (parsedArgs: Opts) => (contractFilename: string) => {
         })    
     }
 
-    if (!env.storage || !env.storage[contractFilename]) {
-        return Promise.reject({
-            errCode: "E_INVALID_STORAGE",
-            errMsg: `No storage configured in your configuration file for ${contractFilename}`,
-            context: env
-        })
-    }
+    const jobs = [
+        ...originateToNetworks(parsedArgs, env),
+        ...originateToSandboxes(parsedArgs, env)
+    ]
 
-    const networkProcesses = !env.networks ? [] : env.networks.reduce(
-        (retval: LikeAPromise<OriginationResult, Failure<unknown>>[], network) => 
-            getNetworkConfig(network, parsedArgs.config)
-                ? [...retval, originateContractToNetwork(contractFilename, parsedArgs, env.storage[contractFilename], network, getNetworkConfig(network, parsedArgs.config))]
-                : retval,
-        []
-    )
-
-    const allProcesses = !env.sandboxes ? [] : env.sandboxes.reduce(
-        (retval: LikeAPromise<OriginationResult, Failure<unknown>>[], sandbox) => getSandboxConfig(sandbox, parsedArgs.config)
-            ? [...retval, originateContractToSandbox(contractFilename, parsedArgs, env.storage[contractFilename], sandbox, getSandboxConfig(sandbox, parsedArgs.config))]
-            : retval            
-        ,
-        networkProcesses
-    )
-            
-    return Promise.all(allProcesses)
-}
-
-const originateAll = (parsedArgs: Opts) =>
-    glob("**/*.tz", {cwd: parsedArgs.artifactsDir})
-    .then(files => Promise.all(files.map(originateContract(parsedArgs))))
-    .then(results => results.flat(1))
-
-export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
-    const p = parsedArgs.contract
-        ? originateContract(parsedArgs) (parsedArgs.contract as string)
-        : originateAll(parsedArgs)
-
-    return p.then(sendAsyncJsonRes)
+    return Promise.all(jobs).then(console.log)
 }
 
 export default originate
