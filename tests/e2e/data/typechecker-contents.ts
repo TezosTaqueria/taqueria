@@ -17,11 +17,11 @@ export const typecheckTableTwoRows = `
 `.trimStart()
 
 export const typecheckNonExistent = `
-┌────────────┬──────────────┐
-│ Contract   │ Artifact     │
-├────────────┼──────────────┤
-│ test.tz    │ Not typed    │
-└────────────┴──────────────┘
+┌────────────┬────────────────┐
+│ Contract   │ Artifact       │
+├────────────┼────────────────┤
+│ test.tz    │ Does not exist │
+└────────────┴────────────────┘
 `.trimStart()
 
 export const typecheckIllTyped = `

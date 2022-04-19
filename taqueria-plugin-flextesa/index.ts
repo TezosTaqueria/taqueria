@@ -49,6 +49,25 @@ Plugin.create(_i18n => ({
             ],
             encoding: "json"
         }),
+        Task.create({
+            task: "typecheck",
+            command: "typecheck [sourceFile]",
+            aliases: [],
+            description: "Typecheck Michelson contracts",
+            options: [],
+            handler: "proxy",
+            positionals: [
+                PositionalArg.create({
+                    placeholder: "sourceFile",
+                    description: "The names of the Michelson contracts you wish to typecheck, separated by space"
+                }),
+                // PositionalArg.create({
+                //     placeholder: "sandboxName",
+                //     description: "The name of the sandbox to use"
+                // }),
+            ],
+            encoding: "json"
+        }),
     ],
     checkRuntimeDependencies: () => Promise.resolve({
         status: "success",

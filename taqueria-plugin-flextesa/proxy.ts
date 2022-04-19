@@ -3,7 +3,14 @@ import type { SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, S
 import type {ExecException} from 'child_process'
 import retry from 'async-retry'
 
+import {PluginResponse} from "@taqueria/node-sdk/types";
+import {sendAsyncJsonRes} from "@taqueria/node-sdk";
+import {join} from 'path'
+import glob from 'fast-glob'
+
 type Opts = SanitizedArgs & {sandboxName?: string}
+
+const defaultSandbox: string = "local"
 
 const attributesToParams = (attributes: Attributes): Record<string, string> => ['blockTime'].reduce(
     (retval: Record<string, string>, attributeName: string) => {
@@ -128,8 +135,8 @@ const startAll = (sandboxes: Sandbox[], opts: Opts): Promise<void> => {
 
     return Promise.all(jobs).then(_ => sendAsyncRes("Done."))
 }
-    
-const getSandbox = ({sandboxName, config}: Opts ) => {
+
+const getSandbox = ({sandboxName, config}: Opts) => {
     if (sandboxName && config.sandbox[sandboxName]) {
         const sandboxConfig : SandboxConfig = config.sandbox[sandboxName]
 
@@ -254,6 +261,77 @@ const stopSandboxTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure
     return sendAsyncErr(`No sandbox specified`)
 }
 
+const getInputFilename = (opts: Opts) => (sourceFile: string) => {
+    return join("/project", opts.config.contractsDir, sourceFile)
+}
+
+const getTypecheckCommand = (opts: Opts, sandbox: Sandbox) => (sourcePath: string) => `docker exec ${sandbox.name} tezos-client typecheck script ${sourcePath}`
+
+const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) => {
+    const sourcePath = getInputFilename (opts) (sourceFile)
+    return execCmd(getTypecheckCommand (opts, sandbox) (sourcePath))
+    .then(async ({stderr}) => { // How should we output warnings?
+        if (stderr.length > 0) sendErr(`\n${stderr}`)
+        return {
+            contract: sourceFile,
+            artifact: "Well typed"
+        }
+    })
+    .catch(err => {
+        sendErr(" ")
+        let artifact
+        if (err.message.includes("syntax error in program")) {
+            err.message = err.message.replace(/syntax error in program/, "Contract does not exist")
+            artifact = "Does not exist"
+        } else {
+            artifact = "Ill-typed"
+        }
+        sendErr(err.message.split("\n").slice(1).join("\n"))
+        return Promise.resolve({
+            contract: sourceFile,
+            artifact
+        })
+    })
+    .then(({contract, artifact}) => ({contract, artifacts: [artifact]}))
+}
+
+const typecheckAll = (opts: Opts, sandbox: Sandbox): Promise<{contract: string, artifacts: string[]}[]> => {
+    // TODO: Fetch list of files from SDK
+    return glob(
+        ['**/*.tz'],
+        {cwd: opts.contractsDir, absolute: false}
+    )
+    .then(entries => entries.map(typecheckContract(opts, sandbox)))
+    .then(promises => Promise.all(promises))
+}
+
+const typecheck = <T>(parsedArgs: Opts, sandbox: Sandbox): LikeAPromise<PluginResponse, Failure<T>> => {
+    const p = parsedArgs.sourceFile
+    ? typecheckContract (parsedArgs, sandbox) (parsedArgs.sourceFile as string)
+        .then(data => [data])
+    : typecheckAll (parsedArgs, sandbox)
+        .then(results => {
+            if (results.length === 0) sendErr("No contracts found to compile.")
+            return results
+        })
+
+    return p.then(sendAsyncJsonRes)
+}
+
+const typecheckTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
+    parsedArgs.sandboxName = defaultSandbox
+    const sandbox = getSandbox(parsedArgs)
+    if (sandbox) {
+        if (doesUseFlextesa(sandbox)) {
+            return await isSandboxRunning(sandbox.name.value)
+            ? typecheck(parsedArgs, sandbox).then(sendJsonRes)
+            : sendAsyncErr(`The ${sandbox.name} sandbox is not running.`)
+        }
+        return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
+    }
+    return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
+}
+
 export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
     switch (parsedArgs.task) {
         case 'list accounts':
@@ -262,6 +340,8 @@ export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
             return startSandboxTask(parsedArgs)
         case 'stop sandbox':
             return stopSandboxTask(parsedArgs)
+        case 'typecheck':
+            return typecheckTask(parsedArgs)
         default:
             return sendAsyncErr(`${parsedArgs.task} is not an understood task by the Flextesa plugin`,)
     }
