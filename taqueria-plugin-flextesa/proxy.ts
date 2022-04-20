@@ -288,7 +288,7 @@ const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string)
     .then(typecheckContractHelper)
     .catch(err => {
         sendErr(" ")
-        sendErr(sourceFile + " does not exist\n")
+        sendErr(sourceFile + ": Does not exist\n")
         return Promise.resolve({
             contract: sourceFile,
             artifact: "Does not exist"
