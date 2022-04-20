@@ -1,4 +1,4 @@
-import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendAsyncRes, sendJsonRes, sendAsyncJsonRes} from '@taqueria/node-sdk'
+import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendRes, sendAsyncRes, sendJsonRes, sendAsyncJsonRes} from '@taqueria/node-sdk'
 import type {SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO, PluginResponse} from "@taqueria/node-sdk/types"
 import type {ExecException} from 'child_process'
 import retry from 'async-retry'
@@ -260,6 +260,8 @@ const getInputFilename = (opts: Opts, sourceFile: string) => join("/project", op
 
 const getCheckFileExistenceCommand = (sandbox: Sandbox, sourcePath: string) => `docker exec ${sandbox.name} ls ${sourcePath}`
 
+//////////// Typecheck task ////////////
+
 const getTypecheckCommand = (sandbox: Sandbox, sourcePath: string) => `docker exec ${sandbox.name} tezos-client typecheck script ${sourcePath}`
 
 const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) : Promise<{contract: string, artifact: string}> => {
@@ -271,7 +273,7 @@ const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string)
             if (stderr.length > 0) sendErr(`\n${stderr}`)
             return {
                 contract: sourceFile,
-                artifact: "Well typed"
+                artifact: "Valid"
             }
         })
         .catch(err => {
@@ -279,7 +281,7 @@ const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string)
             sendErr(err.message.split("\n").slice(1).join("\n"))
             return Promise.resolve({
                 contract: sourceFile,
-                artifact: "Ill-typed"
+                artifact: "Invalid"
             })
         })
     }
@@ -344,6 +346,76 @@ const typecheckTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T
     return sendAsyncErr(`Please specify a sandbox. E.g. taq typecheck local`)
 }
 
+//////////// Simulate task ////////////
+
+const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourcePath: string) => {
+    // TODO: handle non-integers
+    const storage = opts.storage
+    const input = opts.input
+    const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage ${storage} and input ${input}`
+    return cmd
+}
+
+const simulateContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) : Promise<{contract: string, artifact: string}> => {
+    const sourcePath = getInputFilename(opts, sourceFile)
+
+    const simulateContractHelper = () => {
+        return execCmd(getSimulateCommand(opts, sandbox, sourcePath))
+        .then(async ({stdout, stderr}) => { // How should we output warnings?
+            // if (stdout.length > 0) sendErr(`\n${stdout}`) // TODO: sendRes doesn't work because calling console.log will somehow hide the table
+            if (stderr.length > 0) sendErr(`\n${stderr}`)
+            return {
+                contract: sourceFile,
+                artifact: "Valid"
+            }
+        })
+        .catch(err => {
+            sendErr(" ")
+            sendErr(err.message.split("\n").slice(1).join("\n"))
+            return Promise.resolve({
+                contract: sourceFile,
+                artifact: "Invalid"
+            })
+        })
+    }
+
+    return execCmd(getCheckFileExistenceCommand(sandbox, sourcePath))
+    .then(simulateContractHelper)
+    .catch(err => {
+        sendErr(" ")
+        sendErr(sourceFile + ": Does not exist\n")
+        return Promise.resolve({
+            contract: sourceFile,
+            artifact: "Does not exist"
+        })
+    })
+}
+
+const simulate = <T>(parsedArgs: Opts, sandbox: Sandbox): LikeAPromise<PluginResponse, Failure<T>> => {
+    if (parsedArgs.sourceFile) {
+        return simulateContract (parsedArgs, sandbox) (parsedArgs.sourceFile as string)
+               .then(data => [data])
+               .then(sendAsyncJsonRes)
+    }
+    return sendAsyncErr(`Please specify a contract. E.g. taq simulate local <contractName> ...`)
+}
+
+const simulateTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
+    if (parsedArgs.sandboxName) {
+        const sandbox = getSandbox(parsedArgs)
+        if (sandbox) {
+            if (doesUseFlextesa(sandbox)) {
+                return await isSandboxRunning(sandbox.name.value)
+                ? simulate(parsedArgs, sandbox).then(sendJsonRes)
+                : sendAsyncErr(`The ${sandbox.name} sandbox is not running.`)
+            }
+            return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
+        }
+        return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
+    }
+    return sendAsyncErr(`Please specify a sandbox. E.g. taq typecheck local ...`)
+}
+
 export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
     switch (parsedArgs.task) {
         case 'list accounts':
@@ -354,6 +426,8 @@ export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
             return stopSandboxTask(parsedArgs)
         case 'typecheck':
             return typecheckTask(parsedArgs)
+        case 'simulate':
+            return simulateTask(parsedArgs)
         default:
             return sendAsyncErr(`${parsedArgs.task} is not an understood task by the Flextesa plugin`,)
     }

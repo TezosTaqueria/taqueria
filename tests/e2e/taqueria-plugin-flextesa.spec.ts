@@ -4,7 +4,7 @@ import { exec as exec1, execSync } from "child_process"
 import util from "util"
 const exec = util.promisify(exec1)
 import {isPortReachable} from "./utils/utils";
-import * as contents from './data/typechecker-contents'
+import * as contents from './data/typechecker-simulator-contents'
 import fs from "fs";
 import path from "path";
 
@@ -239,7 +239,7 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 
 });
 
-describe("E2E Testing for taqueria typechecker plugin", () => {
+describe("E2E Testing for taqueria typechecker and simulator tasks of the flextesa plugin", () => {
 
     beforeAll(async () => {
         dockerName = "local"
@@ -256,7 +256,7 @@ describe("E2E Testing for taqueria typechecker plugin", () => {
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName}`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that it's well-typed and contains no errors
-            expect(stdout).toContain("Well typed");
+            expect(stdout).toContain("Valid");
             expect(stderr).toBe("");
 
         } catch(error) {
@@ -273,7 +273,7 @@ describe("E2E Testing for taqueria typechecker plugin", () => {
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName} hello-tacos.tz`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that it's well-typed and contains no errors
-            expect(stdout).toBe(contents.typecheckTableOneRow);
+            expect(stdout).toBe(contents.oneRowTable);
             expect(stderr).toBe("");
 
         } catch(error) {
@@ -291,7 +291,7 @@ describe("E2E Testing for taqueria typechecker plugin", () => {
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName}`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that both are well-typed and contain no errors
-            expect(stdout).toBe(contents.typecheckTableTwoRows);
+            expect(stdout).toBe(contents.twoRowTable);
             expect(stderr).toBe("");
 
         } catch(error) {
@@ -310,7 +310,7 @@ describe("E2E Testing for taqueria typechecker plugin", () => {
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName} hello-tacos-one.tz hello-tacos-two.tz`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that both are well-typed and contain no errors
-            expect(stdout).toBe(contents.typecheckTableTwoRows);
+            expect(stdout).toBe(contents.twoRowTable);
             expect(stderr).toBe("");
 
         } catch(error) {
@@ -324,7 +324,7 @@ describe("E2E Testing for taqueria typechecker plugin", () => {
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName} test.tz`, {cwd: `./${taqueriaProjectPath}`})
 
             // 2. Verify that output includes a table and an error message
-            expect(stdout).toBe(contents.typecheckNonExistent)
+            expect(stdout).toBe(contents.nonExistent)
             expect(stderr).toContain("Does not exist");
 
         } catch(error) {
@@ -341,8 +341,56 @@ describe("E2E Testing for taqueria typechecker plugin", () => {
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName} hello-tacos-ill-typed.tz`, {cwd: `./${taqueriaProjectPath}`})
 
             // 3. Verify that output includes a table and an error message
-            expect(stdout).toBe(contents.typecheckIllTyped)
+            expect(stdout).toBe(contents.typeError)
             expect(stderr).toContain("Type nat is not compatible with type string");
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    })
+
+    test('Verify that taqueria simulator plugin can simulate one contract using simulate [sourceFile] command', async () => {
+        try {
+            // 1. Copy contract from data folder to taqueria project folder
+            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
+
+            // 2. Run taq simulate hello-tacos.tz
+            const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '2'`, {cwd: `./${taqueriaProjectPath}`});
+
+            // 3. Verify that it's valid and contains no errors
+            expect(stdout).toBe(contents.oneRowTable);
+            expect(stderr).toBe("");
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    });
+
+    test('Verify that taqueria simulator plugin will display proper message if user tries to simulate contract that does not exist', async () => {
+        try {
+            // 1. Run taq simulate ${contractName} for contract that does not exist
+            const {stdout, stderr} = await exec(`taq simulate ${dockerName} test.tz --storage '5' --input '2'`, {cwd: `./${taqueriaProjectPath}`})
+
+            // 2. Verify that output includes a table and an error message
+            expect(stdout).toBe(contents.nonExistent)
+            expect(stderr).toContain("Does not exist");
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    });
+
+    test("Verify that taqueria simulator plugin emits error and yet displays table if contract has runtime error", async () => {
+        try {
+            // 1. Copy contract from data folder to taqueria project folder
+            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
+
+            // 2. Run taq simulate hello-tacos.tz
+            const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '10'`, {cwd: `./${taqueriaProjectPath}`})
+
+            // 3. Verify that output includes a table and an error message
+            expect(stdout).toBe(contents.runtimeError)
+            expect(stderr).toContain("NOT_ENOUGH_TACOS");
 
         } catch(error) {
             throw new Error (`error: ${error}`);
