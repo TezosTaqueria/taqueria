@@ -281,7 +281,7 @@ describe("E2E Testing for taqueria typechecker plugin", () => {
         }
     });
 
-    test('Verify that taqueria typechecker plugin can typecheck multiple contracts under contracts folder', async () => {
+    test('Verify that taqueria typechecker plugin can typecheck all contracts under contracts folder', async () => {
         try {
             // 1. Copy two contracts from data folder to /contracts folder under taqueria project
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-one.tz`);
@@ -299,11 +299,12 @@ describe("E2E Testing for taqueria typechecker plugin", () => {
         }
     });
 
-    test('Verify that taqueria typechecker plugin can typecheck multiple contracts using typecheck [sourceFile1] [sourceFile2] command', async () => {
+    test('Verify that taqueria typechecker plugin can typecheck multiple (but not all) contracts using typecheck [sourceFile1] [sourceFile2] command', async () => {
         try {
             // 1. Copy two contracts from data folder to /contracts folder under taqueria project
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-one.tz`);
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-two.tz`);
+            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-three.tz`);
 
             // 2. Run taq typecheck hello-tacos-one.tz hello-tacos-two.tz
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName} hello-tacos-one.tz hello-tacos-two.tz`, {cwd: `./${taqueriaProjectPath}`});

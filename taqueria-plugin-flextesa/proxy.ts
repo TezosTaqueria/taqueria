@@ -296,6 +296,10 @@ const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string)
     })
 }
 
+const typecheckMultiple = (opts: Opts, sandbox: Sandbox) => (sourceFiles: string[]) : Promise<{contract: string, artifact: string}[]> => {
+    return Promise.all(sourceFiles.map(typecheckContract(opts, sandbox)))
+}
+
 const typecheckAll = (opts: Opts, sandbox: Sandbox): Promise<{contract: string, artifact: string}[]> => {
     // TODO: Fetch list of files from SDK
     return glob(
@@ -307,15 +311,20 @@ const typecheckAll = (opts: Opts, sandbox: Sandbox): Promise<{contract: string, 
 }
 
 const typecheck = <T>(parsedArgs: Opts, sandbox: Sandbox): LikeAPromise<PluginResponse, Failure<T>> => {
-    const p = parsedArgs.sourceFile
-    ? typecheckContract (parsedArgs, sandbox) (parsedArgs.sourceFile as string)
-        .then(data => [data])
-    : typecheckAll (parsedArgs, sandbox)
-        .then(results => {
-            if (results.length === 0) sendErr("No contracts found to compile.")
-            return results
-        })
-
+    const sourceFiles = (parsedArgs.sourceFiles as string).split(',')
+    let p;
+    if (parsedArgs.sourceFiles) {
+        if (sourceFiles.length == 1)
+            p = typecheckContract (parsedArgs, sandbox) (parsedArgs.sourceFiles as string).then(data => [data])
+        else
+            p = typecheckMultiple (parsedArgs, sandbox) (sourceFiles)
+    } else {
+        p = typecheckAll (parsedArgs, sandbox)
+            .then(results => {
+                if (results.length === 0) sendErr("No contracts found to compile.")
+                return results
+            })
+    }
     return p.then(sendAsyncJsonRes)
 }
 
