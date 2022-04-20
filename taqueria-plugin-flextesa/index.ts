@@ -51,7 +51,7 @@ Plugin.create(_i18n => ({
         }),
         Task.create({
             task: "typecheck",
-            command: "typecheck [sourceFile]",
+            command: "typecheck <sandboxName> [sourceFile]",
             aliases: [],
             description: "Typecheck Michelson contracts",
             options: [],
@@ -61,10 +61,10 @@ Plugin.create(_i18n => ({
                     placeholder: "sourceFile",
                     description: "The names of the Michelson contracts you wish to typecheck, separated by space"
                 }),
-                // PositionalArg.create({
-                //     placeholder: "sandboxName",
-                //     description: "The name of the sandbox to use"
-                // }),
+                PositionalArg.create({
+                    placeholder: "sandboxName",
+                    description: "The name of the sandbox to use"
+                }),
             ],
             encoding: "json"
         }),

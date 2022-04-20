@@ -319,17 +319,19 @@ const typecheck = <T>(parsedArgs: Opts, sandbox: Sandbox): LikeAPromise<PluginRe
 }
 
 const typecheckTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
-    parsedArgs.sandboxName = defaultSandbox
-    const sandbox = getSandbox(parsedArgs)
-    if (sandbox) {
-        if (doesUseFlextesa(sandbox)) {
-            return await isSandboxRunning(sandbox.name.value)
-            ? typecheck(parsedArgs, sandbox).then(sendJsonRes)
-            : sendAsyncErr(`The ${sandbox.name} sandbox is not running.`)
+    if (parsedArgs.sandboxName) {
+        const sandbox = getSandbox(parsedArgs)
+        if (sandbox) {
+            if (doesUseFlextesa(sandbox)) {
+                return await isSandboxRunning(sandbox.name.value)
+                ? typecheck(parsedArgs, sandbox).then(sendJsonRes)
+                : sendAsyncErr(`The ${sandbox.name} sandbox is not running.`)
+            }
+            return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
         }
-        return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
+        return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
     }
-    return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
+    return sendAsyncErr(`Please specify a sandbox. E.g. taq typecheck local`)
 }
 
 export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
