@@ -1,16 +1,11 @@
-import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendAsyncRes, sendJsonRes} from '@taqueria/node-sdk'
-import type { SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO } from "@taqueria/node-sdk/types"
+import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendAsyncRes, sendJsonRes, sendAsyncJsonRes} from '@taqueria/node-sdk'
+import type {SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO, PluginResponse} from "@taqueria/node-sdk/types"
 import type {ExecException} from 'child_process'
 import retry from 'async-retry'
-
-import {PluginResponse} from "@taqueria/node-sdk/types";
-import {sendAsyncJsonRes} from "@taqueria/node-sdk";
 import {join} from 'path'
 import glob from 'fast-glob'
 
 type Opts = SanitizedArgs & {sandboxName?: string}
-
-const defaultSandbox: string = "local"
 
 const attributesToParams = (attributes: Attributes): Record<string, string> => ['blockTime'].reduce(
     (retval: Record<string, string>, attributeName: string) => {
@@ -261,41 +256,47 @@ const stopSandboxTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure
     return sendAsyncErr(`No sandbox specified`)
 }
 
-const getInputFilename = (opts: Opts) => (sourceFile: string) => {
-    return join("/project", opts.config.contractsDir, sourceFile)
-}
+const getInputFilename = (opts: Opts, sourceFile: string) => join("/project", opts.config.contractsDir, sourceFile)
 
-const getTypecheckCommand = (opts: Opts, sandbox: Sandbox) => (sourcePath: string) => `docker exec ${sandbox.name} tezos-client typecheck script ${sourcePath}`
+const getCheckFileExistenceCommand = (sandbox: Sandbox, sourcePath: string) => `docker exec ${sandbox.name} ls ${sourcePath}`
 
-const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) => {
-    const sourcePath = getInputFilename (opts) (sourceFile)
-    return execCmd(getTypecheckCommand (opts, sandbox) (sourcePath))
-    .then(async ({stderr}) => { // How should we output warnings?
-        if (stderr.length > 0) sendErr(`\n${stderr}`)
-        return {
-            contract: sourceFile,
-            artifact: "Well typed"
-        }
-    })
+const getTypecheckCommand = (sandbox: Sandbox, sourcePath: string) => `docker exec ${sandbox.name} tezos-client typecheck script ${sourcePath}`
+
+const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) : Promise<{contract: string, artifact: string}> => {
+    const sourcePath = getInputFilename(opts, sourceFile)
+
+    const typecheckContractHelper = () => {
+        return execCmd(getTypecheckCommand(sandbox, sourcePath))
+        .then(async ({stderr}) => { // How should we output warnings?
+            if (stderr.length > 0) sendErr(`\n${stderr}`)
+            return {
+                contract: sourceFile,
+                artifact: "Well typed"
+            }
+        })
+        .catch(err => {
+            sendErr(" ")
+            sendErr(err.message.split("\n").slice(1).join("\n"))
+            return Promise.resolve({
+                contract: sourceFile,
+                artifact: "Ill-typed"
+            })
+        })
+    }
+
+    return execCmd(getCheckFileExistenceCommand(sandbox, sourcePath))
+    .then(typecheckContractHelper)
     .catch(err => {
         sendErr(" ")
-        let artifact
-        if (err.message.includes("syntax error in program")) {
-            err.message = err.message.replace(/syntax error in program/, "Contract does not exist")
-            artifact = "Does not exist"
-        } else {
-            artifact = "Ill-typed"
-        }
-        sendErr(err.message.split("\n").slice(1).join("\n"))
+        sendErr(sourceFile + " does not exist\n")
         return Promise.resolve({
             contract: sourceFile,
-            artifact
+            artifact: "Does not exist"
         })
     })
-    .then(({contract, artifact}) => ({contract, artifacts: [artifact]}))
 }
 
-const typecheckAll = (opts: Opts, sandbox: Sandbox): Promise<{contract: string, artifacts: string[]}[]> => {
+const typecheckAll = (opts: Opts, sandbox: Sandbox): Promise<{contract: string, artifact: string}[]> => {
     // TODO: Fetch list of files from SDK
     return glob(
         ['**/*.tz'],
