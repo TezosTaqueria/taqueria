@@ -37,6 +37,7 @@ const sidebars = {
       collapsible: false,
       items: [
         "plugins/plugin-flextesa",
+        "plugins/plugin-archetype",
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
