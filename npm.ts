@@ -41,7 +41,10 @@ export const requireNPM = (projectDir: SanitizedAbsPath, i18n: i18n) : Future<Ta
 )
 
 export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath) => pipe(
-    readJsonFile(SanitizedAbsPath.create(pluginNameOrPath, projectDir).join('package.json').value),
+    /^\//.test(pluginNameOrPath) 
+        ? SanitizedAbsPath.create(pluginNameOrPath)
+        : SanitizedAbsPath.create(pluginNameOrPath, projectDir),
+    pluginPath => readJsonFile(pluginPath.join('package.json').value),
     chainRej (() => readJsonFile(projectDir.join("node_modules", pluginNameOrPath, "package.json").value)),
     map(value => value as Manifest)
 )

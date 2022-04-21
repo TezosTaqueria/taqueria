@@ -21,7 +21,7 @@
         "test": {
             "networks": ["ithacanet"],
             "sandboxes": [],
-            "storage": {}
+            "storage": {"hello-tacos.tz": "abc"}
         }
     },
     "sandbox": {
@@ -55,28 +55,28 @@
             "rpcUrl": "https://ithacanet.ecadinfra.com",
             "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "faucet": {
-                "pkh": "tz1RpaT227GeV4eaBXTjJMwUYEPRDpf32SzD",
+                "pkh": "tz1KzVETBx96ptgGQEJAQt8xSxXPhYAQw1z8",
                 "mnemonic": [
-                    "avoid",
-                    "bench",
-                    "spawn",
-                    "clarify",
-                    "finger",
-                    "cattle",
-                    "crucial",
-                    "alcohol",
-                    "oval",
-                    "quarter",
-                    "access",
-                    "front",
-                    "wish",
-                    "security",
-                    "brave"
+                    "arrange",
+                    "unaware",
+                    "stand",
+                    "stumble",
+                    "before",
+                    "luxury",
+                    "aim",
+                    "pumpkin",
+                    "arm",
+                    "miracle",
+                    "habit",
+                    "myth",
+                    "throw",
+                    "almost",
+                    "foot"
                 ],
-                "email": "qdwxhfkk.ssallqeu@teztnets.xyz",
-                "password": "HzIpCJeQ6L",
-                "amount": "52489411219",
-                "activation_code": "941db3280a2ccff63380c26c64d6e592be6240f8"
+                "email": "wjrymeon.dwbfcmmu@teztnets.xyz",
+                "password": "3vatCDurAc",
+                "amount": "150016922505",
+                "activation_code": "87b8f640e23f0082932b1c9aa23f0120e5cfbe21"
             }
         }
     }
