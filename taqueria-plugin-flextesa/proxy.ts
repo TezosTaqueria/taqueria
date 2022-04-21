@@ -264,7 +264,7 @@ const getCheckFileExistenceCommand = (sandbox: Sandbox, sourcePath: string) => `
 
 const getTypecheckCommand = (sandbox: Sandbox, sourcePath: string) => `docker exec ${sandbox.name} tezos-client typecheck script ${sourcePath}`
 
-const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) : Promise<{contract: string, artifact: string}> => {
+const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) : Promise<{contract: string, result: string}> => {
     const sourcePath = getInputFilename(opts, sourceFile)
 
     const typecheckContractHelper = () => {
@@ -273,7 +273,7 @@ const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string)
             if (stderr.length > 0) sendErr(`\n${stderr}`)
             return {
                 contract: sourceFile,
-                artifact: "Valid"
+                result: "Valid"
             }
         })
         .catch(err => {
@@ -281,7 +281,7 @@ const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string)
             sendErr(err.message.split("\n").slice(1).join("\n"))
             return Promise.resolve({
                 contract: sourceFile,
-                artifact: "Invalid"
+                result: "Invalid"
             })
         })
     }
@@ -293,16 +293,16 @@ const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string)
         sendErr(sourceFile + ": Does not exist\n")
         return Promise.resolve({
             contract: sourceFile,
-            artifact: "Does not exist"
+            result: "Does not exist"
         })
     })
 }
 
-const typecheckMultiple = (opts: Opts, sandbox: Sandbox) => (sourceFiles: string[]) : Promise<{contract: string, artifact: string}[]> => {
+const typecheckMultiple = (opts: Opts, sandbox: Sandbox) => (sourceFiles: string[]) : Promise<{contract: string, result: string}[]> => {
     return Promise.all(sourceFiles.map(typecheckContract(opts, sandbox)))
 }
 
-const typecheckAll = (opts: Opts, sandbox: Sandbox): Promise<{contract: string, artifact: string}[]> => {
+const typecheckAll = (opts: Opts, sandbox: Sandbox): Promise<{contract: string, result: string}[]> => {
     // TODO: Fetch list of files from SDK
     return glob(
         ['**/*.tz'],
@@ -356,7 +356,7 @@ const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourcePath: string) =>
     return cmd
 }
 
-const simulateContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) : Promise<{contract: string, artifact: string}> => {
+const simulateContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) : Promise<{contract: string, result: string}> => {
     const sourcePath = getInputFilename(opts, sourceFile)
 
     const simulateContractHelper = () => {
@@ -366,7 +366,7 @@ const simulateContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) 
             if (stderr.length > 0) sendErr(`\n${stderr}`)
             return {
                 contract: sourceFile,
-                artifact: "Valid"
+                result: "Valid"
             }
         })
         .catch(err => {
@@ -374,7 +374,7 @@ const simulateContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) 
             sendErr(err.message.split("\n").slice(1).join("\n"))
             return Promise.resolve({
                 contract: sourceFile,
-                artifact: "Invalid"
+                result: "Invalid"
             })
         })
     }
@@ -386,7 +386,7 @@ const simulateContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) 
         sendErr(sourceFile + ": Does not exist\n")
         return Promise.resolve({
             contract: sourceFile,
-            artifact: "Does not exist"
+            result: "Does not exist"
         })
     })
 }
