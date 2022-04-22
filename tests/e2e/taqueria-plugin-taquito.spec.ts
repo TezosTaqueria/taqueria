@@ -19,7 +19,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     // TODO: Consider in future to use keygen service to update account balance programmatically
     // https://github.com/ecadlabs/taqueria/issues/378
-    test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
+    test.only('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
         try {
             environment = "test";
             let smartContractHash = "";
@@ -37,11 +37,12 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // const deployCommand = 
             const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).then(async (resp) => {
                 const deployResponse = resp.stdout.trim().split(/\r?\n/)[3]
-                await new Promise(resolve => setTimeout(resolve, 45000))
+                await new Promise(resolve => setTimeout(resolve, 25000))
                 return deployResponse
             })
 
             // 3. Verify that contract has been originated on the network
+            console.log(deployCommand)
             expect(deployCommand).toContain("hello-tacos.tz");
             expect(deployCommand).toContain(networkInfo.networkName);
             const contractHash = deployCommand.split("│")[2];
@@ -78,7 +79,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // const stdoutDeploy = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             const deployCommand = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).then(async (resp) => {
                 const deployResponse = resp.stdout.trim().split(/\r?\n/)[3]
-                await new Promise(resolve => setTimeout(resolve, 45000))
+                await new Promise(resolve => setTimeout(resolve, 25000))
                 return deployResponse
             })
             // 3. Get the KT address from the output
@@ -132,7 +133,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // const deployCommand = 
             const deployCommand = await exec(`taq originate -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).then(async (resp) => {
                 const deployResponse = resp.stdout.trim().split(/\r?\n/)[3]
-                await new Promise(resolve => setTimeout(resolve, 45000))
+                await new Promise(resolve => setTimeout(resolve, 25000))
                 return deployResponse
             })
 
@@ -176,7 +177,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             const [deployCommand1, deployCommand2] = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`}).then(async (resp) => {
                 const deployResponse1 = resp.stdout.trim().split(/\r?\n/)[3]
                 const deployResponse2 = resp.stdout.trim().split(/\r?\n/)[5]
-                await new Promise(resolve => setTimeout(resolve, 45000))
+                await new Promise(resolve => setTimeout(resolve, 25000))
                 return [deployResponse1, deployResponse2]
             })
             
