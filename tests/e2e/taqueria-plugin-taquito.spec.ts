@@ -19,7 +19,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     // TODO: Consider in future to use keygen service to update account balance programmatically
     // https://github.com/ecadlabs/taqueria/issues/378
-    test.only('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
+    test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
         try {
             environment = "test";
             let smartContractHash = "";
