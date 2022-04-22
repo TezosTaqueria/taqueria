@@ -11,7 +11,7 @@ const taqueriaProjectPath = 'e2e/auto-test-archetype-plugin';
 describe("E2E Testing for taqueria archetype plugin",  () => {
 
     beforeAll(async () => {
-        await generateTestProject(taqueriaProjectPath, ["archetype"], true);
+        await generateTestProject(taqueriaProjectPath, ["archetype"]);
     })
 
     test('Verify that taqueria archetype plugin outputs no contracts found if no contracts exist', async () => {
