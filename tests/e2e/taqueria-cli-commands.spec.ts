@@ -285,6 +285,69 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
+    test('Verify that the archetype plugin exposes the associated commands in the help menu', async () => {
+        try {
+            await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`)
+            
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
+            const archetypeHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
+            expect(archetypeHelpContents.stdout).toBe(contents.helpContentsArchetypePlugin)
+
+            await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that the archetype plugin exposes the associated options in the help menu', async () => {
+        try {
+            await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`)
+            
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
+            const archetypeHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
+            expect(archetypeHelpContents.stdout).toBe(contents.helpContentsArchetypePluginSpecific)
+
+            await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that the archetype plugin aliases expose the correct info in the help menu', async () => {
+        try {
+            await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
+            const archetypeAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`)
+            expect(archetypeAliasCHelpContents.stdout).toBe(contents.helpContentsArchetypePluginSpecific)
+
+            const archetypeAliasCompileArchetypeHelpContents = await exec(`taq compile-archetype --help --projectDir=${taqueriaProjectPath}`)
+            expect(archetypeAliasCompileArchetypeHelpContents.stdout).toBe(contents.helpContentsArchetypePluginSpecific)
+
+            await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
     test('Verify that the flextesa plugin exposes the associated commands in the help menu', async () => {
         try {
             await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`)
@@ -509,6 +572,50 @@ describe("E2E Testing for taqueria CLI,", () => {
 
             await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
             await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that ligo and archetype expose the plugin choice option for compile in the help menu', async () => {
+        try {
+            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`)
+            
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
+            const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
+            expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoArchetype)
+
+            await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`)
+        } catch(error) {
+            throw new Error (`error: ${error}`)
+        }
+    })
+
+    test('Verify that ligo and archetype expose the plugin choice option for compile in the help menu', async () => {
+        try {
+            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`)
+
+            // TODO: This can removed after this is resolved:
+            // https://github.com/ecadlabs/taqueria/issues/528
+            try {
+                await exec(`taq -p ${taqueriaProjectPath}`)
+            }
+            catch (_) {}
+
+            const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
+            expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoArchetypeSpecific)
+
+            await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`)
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
