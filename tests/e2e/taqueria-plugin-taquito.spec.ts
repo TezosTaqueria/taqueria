@@ -42,7 +42,6 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             })
 
             // 3. Verify that contract has been originated on the network
-            console.log(deployCommand)
             expect(deployCommand).toContain("hello-tacos.tz");
             expect(deployCommand).toContain(networkInfo.networkName);
             const contractHash = deployCommand.split("│")[2];
