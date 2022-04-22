@@ -413,6 +413,7 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
             )
         },
         handler: (inputArgs: Record<string, unknown>) => {
+            // console.log("======JCC\n", inputArgs.storage, "\n======")
             cliConfig.handled = true
             if (Array.isArray(task.handler)) {
                 log("This is a composite task!")
@@ -541,6 +542,10 @@ const executingBuiltInTask = (inputArgs: SanitizedInitArgs | RawInitArgs) =>
             
 export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
     try {
+        // A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command
+        // Refer to https://github.com/yargs/yargs-parser/issues/201
+        inputArgs = inputArgs.map(arg => arg.match(/^".*"$/) ? "___" + arg + "___" : arg)
+
         // Parse the args required for core built-in tasks
         return pipe(
             initCLI(env, inputArgs, i18n),

@@ -380,7 +380,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     });
 
-    test("Verify that taqueria simulator plugin emits error and yet displays table if contract has runtime error", async () => {
+    test("Verify that taqueria simulator plugin emits logic error (runtime exception to be thrown)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
@@ -391,6 +391,40 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
             // 3. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.runtimeError)
             expect(stderr).toContain("NOT_ENOUGH_TACOS");
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    })
+
+    test("Verify that taqueria simulator plugin emits parameter type error (supplying string instead of nat)", async () => {
+        try {
+            // 1. Copy contract from data folder to taqueria project folder
+            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
+
+            // 2. Run taq simulate hello-tacos.tz
+            const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '"hi"'`, {cwd: `./${taqueriaProjectPath}`})
+
+            // 3. Verify that output includes a table and an error message
+            expect(stdout).toBe(contents.runtimeError)
+            expect(stderr).toContain("unexpected string, only an int can be used here");
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    })
+
+    test("Verify that taqueria simulator plugin emits parameter type error (supplying list instead of nat)", async () => {
+        try {
+            // 1. Copy contract from data folder to taqueria project folder
+            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
+
+            // 2. Run taq simulate hello-tacos.tz
+            const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '{1;2;3}'`, {cwd: `./${taqueriaProjectPath}`})
+
+            // 3. Verify that output includes a table and an error message
+            expect(stdout).toBe(contents.runtimeError)
+            expect(stderr).toContain("unexpected sequence, only an int can be used here");
 
         } catch(error) {
             throw new Error (`error: ${error}`);

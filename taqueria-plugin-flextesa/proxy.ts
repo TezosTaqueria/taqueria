@@ -349,10 +349,18 @@ const typecheckTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T
 //////////// Simulate task ////////////
 
 const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourcePath: string) => {
-    // TODO: handle non-integers
-    const storage = opts.storage
-    const input = opts.input
-    const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage ${storage} and input ${input}`
+    let storage = opts.storage
+    let input = opts.input
+
+    // If the string contains leading and trailing double quotes, escape them, otherwise docker exec will complain
+    storage = typeof storage === 'string' && storage.match(/^".*"$/) ? "\\" + storage.slice(0, -1) + "\\\"" : storage
+    input = typeof input === 'string' && input.match(/^".*"$/) ? "\\" + input.slice(0, -1) + "\\\"" : input
+
+    const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage '${storage}' and input '${input}'`
+    // console.error("======\nJCC")
+    // console.error(storage)
+    // console.error(input)
+    // console.error(cmd)
     return cmd
 }
 
