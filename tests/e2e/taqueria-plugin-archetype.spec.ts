@@ -8,7 +8,7 @@ import * as contents from './data/archetype-contents'
 
 const taqueriaProjectPath = 'e2e/auto-test-archetype-plugin';
 
-describe("E2E Testing for taqueria ligo plugin",  () => {
+describe("E2E Testing for taqueria archetype plugin",  () => {
 
     beforeAll(async () => {
         await generateTestProject(taqueriaProjectPath, ["archetype"], true);
