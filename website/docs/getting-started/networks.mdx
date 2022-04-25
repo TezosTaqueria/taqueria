@@ -113,7 +113,9 @@ In order to interact with the network, you will need some Tez in an account. The
 
 To get your own unique faucet key for testing, visit [https://teztnets.xyz/ithacanet-faucet](https://teztnets.xyz/ithacanet-faucet), and complete the captcha validation. Once this is done, you will see the faucet key shown as a JSON object
 
-To add the faucet key to your Taqueria project, simply copy and paste the JSON object into the `faucet` field of the network configuration shown above:
+To add the faucet key to your Taqueria project, simply copy and paste the JSON object into the `faucet` field of the network configuration shown above
+
+Your `network` property should now look something like this:
 ```json
 {
    "network":{
@@ -123,9 +125,9 @@ To add the faucet key to your Taqueria project, simply copy and paste the JSON o
          "protocol":"Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
          "faucet":{
             "key": {
-	            "pkh": "tz1cEqJmGnzcGDa9cyj437RmLL5GYPiawiUb",
+	            "pkh": "tz1cEqJmGnzcGDa9cyj437RmLL5GYPiawiUc",
                 "mnemonic": [
-                    "supreme",
+                    "other",
                     "nerve",
                     "awkward",
                     "jaguar",
@@ -151,8 +153,6 @@ To add the faucet key to your Taqueria project, simply copy and paste the JSON o
    }
 }
 ```
-
-
 
 ### Environment Configuration
 
