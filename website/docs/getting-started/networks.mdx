@@ -8,12 +8,13 @@ This document details the configuration and use of Tezos testnets. If you are lo
 
 ## Introduction
 
-Taqueria provides support to interact with Tezos networks in a simplified and streamlined manner. Taqueria provides a centralized configuration for testnets (including faucet keys) which can then be targeted by Taqueria through the use of Taqueria Environments
+Taqueria provides support to interact with Tezos networks in a simplified and streamlined manner. Taqueria provides a centralized configuration for testnets (including faucet keys) which can then be targeted by Taqueria commands through the use of Taqueria environments
 
-To work with Taqueria Networks, there are three basic steps:
-1. Networks are configured and named in the Taqueria `config.json` file where you can add a faucet key
-2. Named networks are added to an environment in `config.json`, which is then used to target a specific network
-3. The network can then be targeted by Taqueria by passing the environment name to the CLI command `taq originate --env ithicaNet`
+To work with Taqueria networks, these are the basic steps you need to take:
+1. Configure and name a network in the Taqueria `config.json` file
+2. Add a faucet key
+3. Add the created network to an environment
+4. Target the network in Taqueria by passing the environment name to the CLI command (ie. `taq originate --env ithicaNet`)
 
 
 ## Requirements
