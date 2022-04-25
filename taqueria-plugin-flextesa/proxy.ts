@@ -349,18 +349,23 @@ const typecheckTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T
 //////////// Simulate task ////////////
 
 const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourcePath: string) => {
-    let storage = opts.storage
-    let input = opts.input
+    let storage: string = opts.storage && typeof opts.storage === 'string' ? opts.storage as string : `${opts.storage}`
+    let input: string = opts.input && typeof opts.input === 'string' ? opts.input as string : `${opts.input}`
+
+    // If the string contains escaped double quotes, escape them further
+    storage = storage.replace(/\\"/g, '\\\\\\"')
+    input = input.replace(/\\"/g, '\\\\\\"')
 
     // If the string contains leading and trailing double quotes, escape them, otherwise docker exec will complain
-    storage = typeof storage === 'string' && storage.match(/^".*"$/) ? "\\" + storage.slice(0, -1) + "\\\"" : storage
-    input = typeof input === 'string' && input.match(/^".*"$/) ? "\\" + input.slice(0, -1) + "\\\"" : input
+    storage = storage.match(/^".*"$/) ? "\\" + storage.slice(0, -1) + "\\\"" : storage
+    input = input.match(/^".*"$/) ? "\\" + input.slice(0, -1) + "\\\"" : input
 
-    const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage '${storage}' and input '${input}'`
-    // console.error("======\nJCC")
+    const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage \'${storage}\' and input \'${input}\'`
+    // console.error("============")
     // console.error(storage)
     // console.error(input)
     // console.error(cmd)
+    // console.error("============")
     return cmd
 }
 

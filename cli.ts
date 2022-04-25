@@ -544,7 +544,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
     try {
         // A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command
         // Refer to https://github.com/yargs/yargs-parser/issues/201
-        inputArgs = inputArgs.map(arg => arg.match(/^".*"$/) ? "___" + arg + "___" : arg)
+        inputArgs = inputArgs.map(arg => arg.match(/^"(.|\n)*"$/) ? "___" + arg + "___" : arg)
 
         // Parse the args required for core built-in tasks
         return pipe(
