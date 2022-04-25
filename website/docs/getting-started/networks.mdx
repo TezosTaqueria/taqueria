@@ -91,22 +91,68 @@ Taqueria does not have a default network configured, so a freshly initialized pr
 
 The first step is to add a named network configuration to your `config.json` file
 
-The basic structure of the network configuration is as follows:
+Add the following entry ("ithicanet": {...}) to the `network` property::
 ```json
 {
    "network":{
-      "hangzhounet":{
-         "label":"ithicaTestnet",
-         "rpcUrl":"https://invalid.test",
-         "protocol":"PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+      "ithicanet":{
+         "label":"Ithica Protocol Testnet",
+         "rpcUrl":"https://rpc.ithacanet.teztnets.xyz",
+         "protocol":"Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
          "faucet":{  }
       }
    }
 ```
-
-F
+:::note
+The information for `rpcUrl` and`protocol` are taken from the [https://teztnets.xyz/ithacanet-about](https://teztnets.xyz/ithacanet-about) page
+:::
 
 ### Faucets 
+
+In order to interact with the network, you will need some Tez in an account. The way this is done on Tezos is to provide a faucet key. The faucet key provides Tez on a particular testnet, which can then be used to interact with the network
+
+To get your own unique faucet key for testing, visit [https://teztnets.xyz/ithacanet-faucet](https://teztnets.xyz/ithacanet-faucet), and complete the captcha validation. Once this is done, you will see the faucet key shown as a JSON object
+
+To add the faucet key to your Taqueria project, simply copy and paste the JSON object into the `faucet` field of the network configuration shown above:
+```json
+{
+   "network":{
+      "ithicanet":{
+         "label":"Ithica Protocol Testnet",
+         "rpcUrl":"https://rpc.ithacanet.teztnets.xyz",
+         "protocol":"Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+         "faucet":{
+            "key": {
+	            "pkh": "tz1cEqJmGnzcGDa9cyj437RmLL5GYPiawiUb",
+                "mnemonic": [
+                    "supreme",
+                    "nerve",
+                    "awkward",
+                    "jaguar",
+                    "anchor",
+                    "conduct",
+                    "drill",
+                    "upon",
+                    "roof",
+                    "planet",
+                    "glass",
+                    "among",
+                    "turkey",
+                    "also",
+                    "urban"
+                ],
+                "email": "kgwzskbc.tootktlz@teztnets.xyz",
+                "password": "JTMMX6FPNL",
+                "amount": "20064327205",
+                "activation_code": "50fe648444288c8dd1fe1e976ca26160536fda97"
+            }
+         }
+      }
+   }
+}
+```
+
+
 
 ### Environment Configuration
 
