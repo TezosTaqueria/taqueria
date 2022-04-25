@@ -2,11 +2,50 @@
 title: Networks
 ---
 
-Taqueria provides support to interact with Tezos networks in a streamlined manner. Networks are configured in the Taqueria `config.json` file and added to an environment which allows you to target that network when running commands such as `taq originate`
-
-Currently Taqueria only supports testnets. Support for mainnet will be added in a future release
-
 :::note
 This document details the configuration and use of Tezos testnets. If you are looking for information on running or deploying to a sandbox, please see the Flextesa documentation [here](../plugins/flextesa/flextesa.md)
 :::
+
+## Introduction
+
+Taqueria provides support to interact with Tezos networks in a simplified and streamlined manner. Taqueria provides a centralized configuration for testnets (including faucet keys) which can then be targeted by Taqueria through the use of Taqueria Environments
+
+To work with Taqueria Networks, there are three basic steps:
+1. Networks are configured and named in the Taqueria `config.json` file where you can add a faucet key
+2. Named networks are added to an environment in `config.json`, which is then used to target a specific network
+3. The network can then be targeted by Taqueria by passing the environment name to the CLI command `taq originate --env ithicaNet`
+
+
+## Requirements
+
+:::note
+Currently Taqueria only supports testnets. Support for mainnet will be added in a future release
+:::
+
+To configure and use a Taqueria network, you will require the following:
+1. Configuration details for the network you wish to target (Can be found at [teztnets.xyz](https://teztnets.xyz/))
+2. A faucet key for the network you wish to target (Also found at [teztnets.xyz](https://teztnets.xyz/))
+3. The [Taquito plugin](../plugins/taquito/taquito.md) (Used for originating to a network)
+
+### Supported Protocols
+
+Taqueria will support all prootocols available on the [teztnets.xyz](https://teztnets.xyz/) site. If you notice an issue with a recent protocol update, please report it as a bug [here]https://github.com/ecadlabs/taqueria/issues/new?assignees=&labels=bug%2Ctriage&template=bug_report.yml&title=%5BBug%5D%3A+) 
+
+
+## Configuration
+
+
+### Network Configuration
+
+### Faucets 
+
+### Environment Configuration
+
+## Targeting a Network
+
+Taqueria uses Environments to target a specific network. An environment is a named collection of network configurations which can be passed to the CLI using the `--env` flag
+
+
+
+
 
