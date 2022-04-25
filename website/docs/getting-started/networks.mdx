@@ -38,7 +38,7 @@ Taqueria will support all prootocols available on the [teztnets.xyz](https://tez
 The network configuration for various protocols, as well as the faucet for each can be found at [teztnets.xyz](https://teztnets.xyz/).
 :::
 
-To configure a network for use, you will need to configure the network, and then add that network to an environment. To illustrate the configuration of a network, we will use the [Ithica testnet](https://teztnets.xyz/ithica-testnet/) as an example in this document
+To configure a network for use, you will need to configure the network, and then add that network to an environment. To illustrate the configuration of a network, we will use the [Ithica testnet](https://teztnets.xyz/ithica-testnet/) as an example in this document and will configure a network named `ithica`, and an environment named `ithicanet`
 
 Taqueria does not have a default network configured, so a freshly initialized project will have a `config.json` file that looks like this:
 ```json
@@ -144,9 +144,9 @@ Your `network` property should now look something like this:
                     "urban"
                 ],
                 "email": "kgwzskbc.tootktlz@teztnets.xyz",
-                "password": "JTMMX6FPNL",
-                "amount": "20064327205",
-                "activation_code": "50fe648444288c8dd1fe1e976ca26160536fda97"
+                "password": "JTMMX6FPNM",
+                "amount": "2006437205",
+                "activation_code": "50fe648444288c8dd1fe1e976ca26160536fda94"
             }
          }
       }
@@ -156,11 +156,145 @@ Your `network` property should now look something like this:
 
 ### Environment Configuration
 
+:::note
+For additional information regarding Taqueria Environments, please see the documentation [here](environments.mdx/)
+:::
+
+The final step in configuration is to add the network to an environment. In this example, we will create a new environment named `ithicanet` which will contain the `ithica` network
+
+To do this, find the `environment` property in your `config.json` file. By default it will look something like this:
+```json
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {}
+        },
+    },
+```
+
+Add a new environment named `ithicanet`, and add the named network `ithica` to it's `networks` array.
+```json
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {}
+        },
+        "ithicanet": {
+            "networks": [
+                "ithica"
+            ],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {}
+        }
+    },
+```
+
+### Finished Configuration
+
+At this point, you should have a fully configured network named `ithica` which is configured to target the Ithica testnet using a faucet, and an environment named `ithicanet` which can be used to target the network from the CLI
+
+Your `config.json` file should look something like this: 
+```json
+{
+    "language": "en",
+    "plugins": [],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts",
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {}
+        },
+        "ithicanet": {
+            "networks": [
+                "ithica"
+            ],
+            "sandboxes": [],
+            "storage": {}
+        }
+    },
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "default": "bob",
+                "bob": {
+                    "initialBalance": "3000000000"
+                },
+                "alice": {
+                    "initialBalance": "2000000000"
+                },
+                "john": {
+                    "initialBalance": "4000000000"
+                },
+                "jane": {
+                    "initialBalance": "5000000000"
+                },
+                "joe": {
+                    "initialBalance": "1000000000"
+                }
+            },
+            "label": "Local Tezos Sandbox",
+            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+    "network": {
+        "ithica":{
+            "label":"Ithica Protocol Testnet",
+            "rpcUrl":"https://rpc.ithacanet.teztnets.xyz",
+            "protocol":"Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "faucet":{
+               "key": {
+                   "pkh": "tz1cEqJmGnzcGDa9cyj437RmLL5GYPiawiUc",
+                   "mnemonic": [
+                       "other",
+                       "nerve",
+                       "awkward",
+                       "jaguar",
+                       "anchor",
+                       "conduct",
+                       "drill",
+                       "upon",
+                       "roof",
+                       "planet",
+                       "glass",
+                       "among",
+                       "turkey",
+                       "also",
+                       "urban"
+                   ],
+                   "email": "kgwzskbc.tootktlz@teztnets.xyz",
+                   "password": "JTMMX6FPNM",
+                   "amount": "2006437205",
+                   "activation_code": "50fe648444288c8dd1fe1e976ca26160536fda94"
+               }
+            }
+         }
+      }
+    }
+}
+```
+
 ## Targeting a Network
 
-Taqueria uses Environments to target a specific network. An environment is a named collection of network configurations which can be passed to the CLI using the `--env` flag
+Taqueria uses Environments to target a specific network or sandbox. An environment is a named collection of network configurations which can be passed to the CLI using the `--env` flag
 
-To target the `ithica` network we configured above using the `ithicanet` environment, we would run the following command:
+To target the `ithica` network we configured above using the `ithicanet` environment, simply run the following command:
 ```shell
 taq originate --env ithicanet
 ```
