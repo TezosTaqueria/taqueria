@@ -119,7 +119,7 @@ Your `network` property should now look something like this:
 ```json
 {
    "network":{
-      "ithicanet":{
+      "ithica":{
          "label":"Ithica Protocol Testnet",
          "rpcUrl":"https://rpc.ithacanet.teztnets.xyz",
          "protocol":"Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
@@ -160,6 +160,10 @@ Your `network` property should now look something like this:
 
 Taqueria uses Environments to target a specific network. An environment is a named collection of network configurations which can be passed to the CLI using the `--env` flag
 
+To target the `ithica` network we configured above using the `ithicanet` environment, we would run the following command:
+```shell
+taq originate --env ithicanet
+```
 
 
 
