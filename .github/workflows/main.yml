@@ -199,6 +199,7 @@ jobs:
 
       - name: download the binary from the build-binaries job and make it executable
         run: |
+          exit 123
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
@@ -241,8 +242,11 @@ jobs:
         uses: ravsamhq/notify-slack-action@v1
         if: always()
         with:
+          notification_title: "Failure in the e2e Tests"
           status: ${{ job.status }} # required
           notify_when: 'failure'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          message_format: '${{ github.event.head_commit.author.name }}, *{workflow}* {status_message}, please see: {workflow_url}'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
