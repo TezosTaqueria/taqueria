@@ -6,6 +6,20 @@ export const oneRowTable = `
 └────────────────┴────────┘
 `.trimStart()
 
+export const oneRowTableSimulateResult = `
+┌────────────────┬────────────────────┐
+│ Contract       │ Result             │
+├────────────────┼────────────────────┤
+│ hello-tacos.tz │ storage            │
+│                │   3                │
+│                │ emitted operations │
+│                │                    │
+│                │ big_map diff       │
+│                │                    │
+│                │                    │
+└────────────────┴────────────────────┘
+`.trimStart()
+
 export const twoRowTable = `
 ┌────────────────────┬────────┐
 │ Contract           │ Result │

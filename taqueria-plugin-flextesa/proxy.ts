@@ -375,11 +375,10 @@ const simulateContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) 
     const simulateContractHelper = () => {
         return execCmd(getSimulateCommand(opts, sandbox, sourcePath))
         .then(async ({stdout, stderr}) => { // How should we output warnings?
-            // if (stdout.length > 0) sendErr(`\n${stdout}`) // TODO: sendRes doesn't work because calling console.log will somehow hide the table
             if (stderr.length > 0) sendErr(`\n${stderr}`)
             return {
                 contract: sourceFile,
-                result: "Valid"
+                result: stdout
             }
         })
         .catch(err => {

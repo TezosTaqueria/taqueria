@@ -247,7 +247,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
     })
 
-    test('Verify that taqueria typechecker plugin can typecheck one contract under contracts folder', async () => {
+    test('Verify that taqueria typechecker task can typecheck one contract under contracts folder', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
@@ -264,7 +264,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     });
 
-    test('Verify that taqueria typechecker plugin can typecheck one contract using typecheck [sourceFile] command', async () => {
+    test('Verify that taqueria typechecker task can typecheck one contract using typecheck [sourceFile] command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
@@ -281,7 +281,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     });
 
-    test('Verify that taqueria typechecker plugin can typecheck all contracts under contracts folder', async () => {
+    test('Verify that taqueria typechecker task can typecheck all contracts under contracts folder', async () => {
         try {
             // 1. Copy two contracts from data folder to /contracts folder under taqueria project
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-one.tz`);
@@ -299,7 +299,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     });
 
-    test('Verify that taqueria typechecker plugin can typecheck multiple (but not all) contracts using typecheck [sourceFile1] [sourceFile2] command', async () => {
+    test('Verify that taqueria typechecker task can typecheck multiple (but not all) contracts using typecheck [sourceFile1] [sourceFile2] command', async () => {
         try {
             // 1. Copy two contracts from data folder to /contracts folder under taqueria project
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-one.tz`);
@@ -318,7 +318,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     });
 
-    test('Verify that taqueria typechecker plugin will display proper message if user tries to typecheck contract that does not exist', async () => {
+    test('Verify that taqueria typechecker task will display proper message if user tries to typecheck contract that does not exist', async () => {
         try {
             // 1. Run taq typecheck ${contractName} for contract that does not exist
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName} test.tz`, {cwd: `./${taqueriaProjectPath}`})
@@ -332,7 +332,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     });
 
-    test("Verify that taqueria typechecker plugin emits error and yet displays table if contract is ill-typed", async () => {
+    test("Verify that taqueria typechecker task emits error and yet displays table if contract is ill-typed", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos-ill-typed.tz ${taqueriaProjectPath}/contracts`)
@@ -349,7 +349,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     })
 
-    test('Verify that taqueria simulator plugin can simulate one contract using simulate [sourceFile] command', async () => {
+    test('Verify that taqueria simulator task can simulate one contract using simulate [sourceFile] command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
@@ -358,7 +358,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
             const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '2'`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that it's valid and contains no errors
-            expect(stdout).toBe(contents.oneRowTable);
+            expect(stdout).toBe(contents.oneRowTableSimulateResult);
             expect(stderr).toBe("");
 
         } catch(error) {
@@ -366,7 +366,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     });
 
-    test('Verify that taqueria simulator plugin will display proper message if user tries to simulate contract that does not exist', async () => {
+    test('Verify that taqueria simulator task will display proper message if user tries to simulate contract that does not exist', async () => {
         try {
             // 1. Run taq simulate ${contractName} for contract that does not exist
             const {stdout, stderr} = await exec(`taq simulate ${dockerName} test.tz --storage '5' --input '2'`, {cwd: `./${taqueriaProjectPath}`})
@@ -380,7 +380,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     });
 
-    test("Verify that taqueria simulator plugin emits logic error (runtime exception to be thrown)", async () => {
+    test("Verify that taqueria simulator task emits logic error (runtime exception to be thrown)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
@@ -397,7 +397,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     })
 
-    test("Verify that taqueria simulator plugin emits parameter type error (supplying string instead of nat)", async () => {
+    test("Verify that taqueria simulator task emits parameter type error (supplying string instead of nat)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
@@ -414,7 +414,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         }
     })
 
-    test("Verify that taqueria simulator plugin emits parameter type error (supplying list instead of nat)", async () => {
+    test("Verify that taqueria simulator task emits parameter type error (supplying list instead of nat)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
