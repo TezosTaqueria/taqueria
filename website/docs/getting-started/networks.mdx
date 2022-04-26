@@ -3,7 +3,7 @@ title: Networks
 ---
 
 :::note
-This document details the configuration and use of Tezos testnets. If you are looking for information on running or deploying to a sandbox, please see the Flextesa documentation [here](../docs/plugins/plugin-flextesa.md/))
+This document details the configuration and use of Tezos testnets. If you are looking for information on running or deploying to a sandbox, please see the Flextesa documentation [here](../docs/plugins/plugin-flextesa.md/)
 :::
 
 ## Introduction
@@ -157,10 +157,6 @@ Your `network` property should now look something like this:
 
 ### Environment Configuration
 
-:::note
-For additional information regarding Taqueria Environments, please see the documentation [here](environments.mdx/)
-:::
-
 The final step in configuration is to add the network to an environment. In this example, we will create a new environment named `ithacanet` which will contain the `ithaca` network
 
 To do this, find the `environment` property in your `config.json` file. By default it will look something like this:
@@ -199,6 +195,10 @@ Add a new environment named `ithacanet`, and add the named network `ithaca` to i
         }
     },
 ```
+
+:::note
+For additional information regarding Taqueria Environments, please see the documentation [here](environments.mdx/)
+:::
 
 ### Finished Configuration
 
