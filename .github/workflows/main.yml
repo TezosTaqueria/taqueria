@@ -199,7 +199,6 @@ jobs:
 
       - name: download the binary from the build-binaries job and make it executable
         run: |
-          exit 123
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
@@ -245,7 +244,7 @@ jobs:
           notification_title: "Failure in the e2e Tests"
           status: ${{ job.status }} # required
           notify_when: 'failure'
-          message_format: '{emoji} ${{ github.actor }}, *{workflow}*: {job} {status_message}, please investigate: <{run_url}|Failing Run>'
+          message_format: '{emoji} ${{ github.actor }}, *{workflow}* {status_message}, please investigate: <{run_url}|Failing Run>'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
