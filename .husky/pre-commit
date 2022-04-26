@@ -2,3 +2,5 @@
 . "$(dirname "$0")/_/husky.sh"
 
 npm run test:unit -w tests
+#TODO: add this `npx ts-node ./parse-readme.ts`
+npx ts-node ./parse-readme-template.ts
