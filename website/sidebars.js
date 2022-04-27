@@ -26,7 +26,9 @@ const sidebars = {
         "intro",
         "getting-started/installation",
         "getting-started/plugin-basics",
-        "getting-started/quickstart"
+        "getting-started/quickstart",
+        "getting-started/networks",
+        "getting-started/environments",
       ],
     },
     {
