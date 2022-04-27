@@ -11,7 +11,7 @@
     "build": "./bin/build.sh || npx play-sound beep.mp3",
     "build-all": "./bin/build-all.sh",
     "parse-readme-template": "ts-node ./parse-readme-template.ts",
-    "build-website": "npm run parse-readme-template && cd website && npm run get-docs && npm ci && npm run build",
+    "build-website": "npm run parse-readme-template && cd website && npm ci && npm run build",
     "watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build || npx play-sound beep.mp3\" --initial",
     "prepare": "husky install"
   },
