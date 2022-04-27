@@ -256,7 +256,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName}`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that it's well-typed and contains no errors
-            expect(stdout).toContain("Valid");
+            expect(stdout).toBe(contents.oneRowTable);
             expect(stderr).toBe("");
 
         } catch(error) {

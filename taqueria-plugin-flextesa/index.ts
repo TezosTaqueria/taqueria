@@ -77,13 +77,13 @@ Plugin.create(_i18n => ({
                 Option.create({
                     shortFlag: "s",
                     flag: "storage",
-                    description: "The initial storage used to run the script",
+                    description: "The initial storage used to run the script (a string wrapped in single quotes)",
                     required: true
                 }),
                 Option.create({
                     shortFlag: "i",
                     flag: "input",
-                    description: "The input used to run the script",
+                    description: "The input used to run the script (a string wrapped in single quotes)",
                     required: true
                 }),
             ],

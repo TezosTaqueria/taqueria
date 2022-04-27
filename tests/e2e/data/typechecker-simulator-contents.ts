@@ -31,11 +31,11 @@ export const twoRowTable = `
 `.trimStart()
 
 export const nonExistent = `
-┌──────────┬────────────────┐
-│ Contract │ Result         │
-├──────────┼────────────────┤
-│ test.tz  │ Does not exist │
-└──────────┴────────────────┘
+┌──────────┬────────┐
+│ Contract │ Result │
+├──────────┼────────┤
+│ test.tz  │ N/A    │
+└──────────┴────────┘
 `.trimStart()
 
 export const typeError = `

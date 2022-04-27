@@ -413,7 +413,6 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
             )
         },
         handler: (inputArgs: Record<string, unknown>) => {
-            // console.log("======JCC\n", inputArgs.storage, "\n======")
             cliConfig.handled = true
             if (Array.isArray(task.handler)) {
                 log("This is a composite task!")

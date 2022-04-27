@@ -293,7 +293,7 @@ const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string)
         sendErr(sourceFile + ": Does not exist\n")
         return Promise.resolve({
             contract: sourceFile,
-            result: "Does not exist"
+            result: "N/A"
         })
     })
 }
@@ -398,7 +398,7 @@ const simulateContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) 
         sendErr(sourceFile + ": Does not exist\n")
         return Promise.resolve({
             contract: sourceFile,
-            result: "Does not exist"
+            result: "N/A"
         })
     })
 }
