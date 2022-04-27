@@ -19,7 +19,7 @@
             "storage": {}
         },
         "test": {
-            "networks": ["hangzhounet"],
+            "networks": ["ithacanet"],
             "sandboxes": [],
             "storage": {"hello-tacos.tz": "100"}
         }
@@ -45,38 +45,38 @@
                 }
             },
             "label": "Local Tezos Sandbox",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "rpcUrl": "http://localhost:20000"
         }
     },
     "network": {
-        "hangzhounet": {
-            "label": "hangzhounet",
+        "ithacanet": {
+            "label": "ithacanet",
             "rpcUrl": "https://invalid.test",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "faucet": {
-                "pkh": "tz1UjBsGr8Tkogbz8fcySP6x77S5TKBvs99t",
+                "pkh": "tz1c2fnjgqPLLpi868v1JEEkTCSpvGCHwAB4",
                 "mnemonic": [
-                    "bone",
-                    "copper",
-                    "early",
-                    "light",
-                    "shallow",
-                    "sense",
-                    "burden",
-                    "civil",
-                    "knee",
-                    "knife",
-                    "excuse",
-                    "noise",
-                    "enable",
+                    "cute",
+                    "will",
+                    "core",
+                    "industry",
+                    "much",
+                    "carbon",
                     "piano",
-                    "loyal"
+                    "truth",
+                    "grunt",
+                    "twist",
+                    "wage",
+                    "marble",
+                    "profit",
+                    "text",
+                    "cradle"
                 ],
-                "email": "tasbcxmi.wbdftfiw@teztnets.xyz",
-                "password": "sz2Trjg3Z5",
-                "amount": "55579807681",
-                "activation_code": "cce0f1f37d4eb45b5ac0cdf755825abd5fd53b10"
+                "email": "koylsfnp.nhwyqepc@teztnets.xyz",
+                "password": "uFP1Ep650w",
+                "amount": "166703139463",
+                "activation_code": "409bcde89e7946e51b7c19da994d0997276e676f"
             }
         }
     }

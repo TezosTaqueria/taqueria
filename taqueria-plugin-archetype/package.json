@@ -1,7 +1,7 @@
 {
-  "name": "@taqueria/plugin-smartpy",
+  "name": "@taqueria/plugin-archetype",
   "version": "0.2.1",
-  "description": "A taqueria plugin for compiling SmartPy smart contracts",
+  "description": "A taqueria plugin for compiling Archetype smart contracts",
   "targets": {
     "default": {
       "source": "./index.ts",
@@ -13,7 +13,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx parcel build --no-cache 2>&1",
-    "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
+    "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
+    "compile": "node index.js --taqRun proxy --task compile --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
+    "debugPluginInfo": "node --inspect index.js --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\"}' --projectDir ../test-project --configDir ./.taq"
   },
   "keywords": [
     "taqueria",
@@ -22,19 +24,16 @@
     "ecad",
     "ecadlabs",
     "plugin",
-    "smartpy",
+    "archetype",
     "smart contract",
     "compile"
   ],
-  "engines": {
-    "node": ">=14.5"
-  },
   "author": "ECAD Labs",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/ecadlabs/taqueria.git",
-    "directory": "taqueria-plugin-smartpy"
+    "directory": "taqueria-plugin-archetype"
   },
   "bugs": {
     "url": "https://github.com/ecadlabs/taqueria/issues"

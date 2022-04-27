@@ -51,7 +51,11 @@ export const ensurePathDoesNotExist = (path: string) : Future<TaqError, Sanitize
             await Deno.stat(path)
 
             // TODO i18n message
-            return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'Path already exists', context: path })
+            return Promise.reject({
+                kind: 'E_INVALID_PATH_ALREADY_EXISTS',
+                msg: 'Path already exists',
+                context: path 
+            })
         } catch(_e) {
             // Expect exception when trying to stat a new directory
             return SanitizedAbsPath.create(path)
@@ -61,9 +65,15 @@ export const ensurePathDoesNotExist = (path: string) : Future<TaqError, Sanitize
 export const rm = (path: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => 
     attemptP(async () => {
         try {
-            await Deno.remove(path.value)
-        } catch {
-            // Ignore if path does not exist
+            await Deno.remove(path.value, { recursive: true })
+        } catch (previous) {
+            const err: TaqError = {
+                kind: 'E_INVALID_PATH_DOES_NOT_EXIST',
+                msg: `Failed to remove ${path.value}`,
+                context: path,
+                previous
+            }
+            return Promise.reject(err)
         }
 
         return path
@@ -139,10 +149,10 @@ export const inject = (deps: UtilsDependencies) => {
 
     const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => pipe(
         execText('git clone <%= it.url %> <%= it.outputDir %>', {url: url.value, outputDir: destinationPath.value}),
-        mapRej<TaqError, TaqError>(previous => ({kind: 'GIT_CLONE_FAILED', msg: `Could not clone ${url.value}. Is Git installed?`, context: {url, destinationPath}, previous})),
+        mapRej<TaqError, TaqError>(previous => ({kind: 'GIT_CLONE_FAILED', msg: `Could not clone ${url.value}. Please check the Git url and ensure that Git is installed.`, context: {url, destinationPath}, previous})),
         chain(status => status === 0
             ? resolve(destinationPath)
-            : reject<TaqError>({kind: 'GIT_CLONE_FAILED', msg: `Could not clone ${url.value}. Is Git installed?`, context: {url, destinationPath}})
+            : reject<TaqError>({kind: 'GIT_CLONE_FAILED', msg: `Could not clone ${url.value}. Please check the Git url and ensure that Git is installed.`, context: {url, destinationPath}})
         ),
         map(() => destinationPath)
     );
@@ -171,8 +181,17 @@ export const inject = (deps: UtilsDependencies) => {
             const join = joinPaths
             const cmd = renderTemplate(cmdTemplate, {join, ...inputArgs})
             command = cmd
+        }
+        catch (previous) {
+            throw {
+                kind: "E_FORK",
+                msg: `There was a problem trying to evaluate this template: ${cmdTemplate}\n${previous}`,
+                previous
+            } as TaqError
+        }
+        try {
             const process = Deno.run({
-                cmd: ["sh", "-c", `${cmd}`],
+                cmd: ["sh", "-c", `${command}`],
                 cwd: cwd?.value,
                 stdout: "piped",
                 stderr: "piped"

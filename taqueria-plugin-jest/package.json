@@ -1,13 +1,13 @@
 {
-  "name": "@taqueria/plugin-flextesa",
+  "name": "@taqueria/plugin-jest",
   "version": "0.2.1",
-  "description": "A plugin for Taqueria providing local sandbox capabilities built on Flextesa",
+  "description": "A plugin for Taqueria providing automated testing using the Jest Testing Framework",
   "keywords": [
     "taqueria",
     "plugin",
-    "flextesa",
-    "sandbox",
-    "local",
+    "jest",
+    "testing",
+    "tdd",
     "ecad",
     "ecadlabs",
     "tezos"
@@ -21,19 +21,14 @@
     }
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build-plugin": "npx parcel build --no-cache  2>&1",
-    "build-docker": "cd docker && npm run build",
-    "build-dev": "npm run build-docker && npm run build-plugin",
-    "build": "npm run build-plugin",
-    "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
+    "build": "echo 'Nothing to build'"
   },
   "author": "ECAD Labs",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/ecadlabs/taqueria.git",
-    "directory": "taqueria-plugin-flextesa"
+    "directory": "taqueria-plugin-jest"
   },
   "dependencies": {
     "@taqueria/node-sdk": "^0.2.1",
