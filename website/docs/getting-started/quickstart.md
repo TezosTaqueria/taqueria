@@ -196,13 +196,14 @@ First, install the plugin:
 taq install @taqueria/plugin-taquito
 ```
 
-Next, configure the initial storage value for the `counter.tz` contract by navigating to the file `./.taq/config.json` and locate the `"environment"` property. There are two values that need to be configured:
-- The name of the sandbox to originate to target
+Next, you need to configure some values for origination:
 - The initial storage for the smart contract 
-
+- The name of the sandbox to target (by default it is pre-configured to the sandbox named `local`)
+:::note
 As the default configuration comes with the sandbox named `local` preconfigured, simply provide a value for the initial storage in the `"storage"` property 
+:::
 
-For the `counter.tz` contract, you simply need to provide an integer value for the `counter.tz` file which looks like this:
+To set these values in Taqueria, navigate to the file `./.taq/config.json` and locate the `"environment"` property. For the `counter.tz` contract, simply need to provide an integer value for the `counter.tz` file which looks like this:
 ```
     "environment": {
         "default": "development",
@@ -223,7 +224,7 @@ Now you can originate the contract by running:
 taq originate
 ```
 
-This will originate all contracts in the `/artifacts` directory to the sandbox and return the address of the deployed contract and destination sandbox:
+This will originate all contracts in the `/artifacts` directory to the sandbox and return the address of the deployed contract and destination sandbox. The output for this command will display which contracts were originated, what the destination was, and what the on-chain address for the deployed address is. This will look something like this:
 ```
 ┌────────────┬──────────────────────────────────────┬─────────────┐
 │ Contract   │ Address                              │ Destination │
@@ -232,5 +233,13 @@ This will originate all contracts in the `/artifacts` directory to the sandbox a
 └────────────┴──────────────────────────────────────┴─────────────┘
 ```
 
+## Finishing Up
 
+Congratulations! At this point, you have run through the basic usage of Taqueria including:
+- Initializing a new Taqueria project
+- Installing plugins for LIGO, Flextesa, and Taquito
+- Compiling a LIGO smart contract
+- Starting and querying a local Flextesa sandbox 
+- Originating a compiled smart contract to the sandbox
 
+For more details on the usage of specific Taqueria tasks, you can refer to the plugin documentation which contains additional context, configuration, and usage of the many Taqueria tasks; or continue on with the getting started guides
