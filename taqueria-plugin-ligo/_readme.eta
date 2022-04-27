@@ -1,4 +1,4 @@
- Taqueria LIGO Plugin
+# Taqueria LIGO Plugin
 
 This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
 
