@@ -113,6 +113,7 @@ let main = ([action, store] : [parameter, storage]) : return_ => {
     Decrement: (n: int) => sub ([store, n]),
     Reset:     ()  => 0}))
   ]
+}
 ```
 
 You can now compile this contract by running the following command from the project directory:
