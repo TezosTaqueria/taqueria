@@ -250,7 +250,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
     test('Verify that taqueria typechecker task can typecheck one contract under contracts folder', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq typecheck
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName}`, {cwd: `./${taqueriaProjectPath}`});
@@ -267,7 +267,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
     test('Verify that taqueria typechecker task can typecheck one contract using typecheck [sourceFile] command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq typecheck hello-tacos.tz
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName} hello-tacos.tz`, {cwd: `./${taqueriaProjectPath}`});
@@ -284,8 +284,8 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
     test('Verify that taqueria typechecker task can typecheck all contracts under contracts folder', async () => {
         try {
             // 1. Copy two contracts from data folder to /contracts folder under taqueria project
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-one.tz`);
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-two.tz`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-one.tz`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-two.tz`);
 
             // 2. Run taq typecheck
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName}`, {cwd: `./${taqueriaProjectPath}`});
@@ -302,9 +302,9 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
     test('Verify that taqueria typechecker task can typecheck multiple (but not all) contracts using typecheck [sourceFile1] [sourceFile2] command', async () => {
         try {
             // 1. Copy two contracts from data folder to /contracts folder under taqueria project
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-one.tz`);
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-two.tz`);
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-three.tz`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-one.tz`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-two.tz`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-three.tz`);
 
             // 2. Run taq typecheck hello-tacos-one.tz hello-tacos-two.tz
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName} hello-tacos-one.tz hello-tacos-two.tz`, {cwd: `./${taqueriaProjectPath}`});
@@ -335,7 +335,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
     test("Verify that taqueria typechecker task emits error and yet displays table if contract is ill-typed", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/hello-tacos-ill-typed.tz ${taqueriaProjectPath}/contracts`)
+            await exec(`cp e2e/data/hello-tacos-ill-typed.tz ${taqueriaProjectPath}/contracts`)
 
             // 2. Run taq typecheck hello-tacos-ill-typed.tz
             const {stdout, stderr} = await exec(`taq typecheck ${dockerName} hello-tacos-ill-typed.tz`, {cwd: `./${taqueriaProjectPath}`})
@@ -352,7 +352,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
     test('Verify that taqueria simulator task can simulate one contract using simulate [sourceFile] command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '2'`, {cwd: `./${taqueriaProjectPath}`});
@@ -383,7 +383,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
     test("Verify that taqueria simulator task emits logic error (runtime exception to be thrown)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '10'`, {cwd: `./${taqueriaProjectPath}`})
@@ -400,7 +400,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
     test("Verify that taqueria simulator task emits parameter type error (supplying string instead of nat)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '"hi"'`, {cwd: `./${taqueriaProjectPath}`})
@@ -417,7 +417,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
     test("Verify that taqueria simulator task emits parameter type error (supplying list instead of nat)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            execSync(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '{1;2;3}'`, {cwd: `./${taqueriaProjectPath}`})
@@ -451,10 +451,10 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the flexte
         try {
             let dockerContainer = getContainerName(dockerName);
             if(dockerContainer !== undefined){
-                execSync(`docker stop ${dockerName}`);
+                await exec(`docker stop ${dockerName}`);
             }
 
-            const dockerListStdout = execSync("docker ps").toString().trim();
+            const dockerListStdout = await exec("docker ps").toString().trim();
             if(dockerListStdout.includes(dockerName)){
                 throw new Error("Container was not stopped properly");
             }
