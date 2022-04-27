@@ -69,3 +69,5 @@ The plugin provides a single task `compile`, used for compiling LIGO smart contr
 |  task      | 'compile'                | 
 |  command   | 'compile [sourceFile]    | 
 |  aliases   | ['c', 'compile-ligo']    |  
+
+## Note. Deleted the README file and added this to the template
