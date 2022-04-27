@@ -40,8 +40,7 @@ The LIGO plugin's `taq compile` task can be run with or without arguments. The b
 
 Running the `compile` task with no options will result in any source LIGO smart contracts in the `contracts` folder being compiled to Michelson files in the `artifacts` folder. If you speficy an optional filename, only LIGO contracts matching the specified filename in the `contracts` folder will be compiled
 
-> ### :warning: WARNING
-> The `compile` task can be implemented by more than one compiler plugin installed on a project (LIGO, SmartPY). If this is the case, you must use the `--plugin ligo` flag to specify a particular compiler
+undefinedThe `compile` task can be implemented by more than one compiler plugin installed on a project (LIGO, SmartPY). If this is the case, you must use the `--plugin ligo` flag to specify a particular compiler
 
 ### Options
 
@@ -67,5 +66,3 @@ The plugin provides a single task `compile`, used for compiling LIGO smart contr
 |  task      | 'compile'                | 
 |  command   | 'compile [sourceFile]    | 
 |  aliases   | ['c', 'compile-ligo']    |  
-
-## Note. Deleted the README file and added this to the template

@@ -7,29 +7,29 @@ const docsDir = path.join(__dirname, "website", "docs", "plugins");
 
 // typed list of plugin paths to search
 const plugins: string[] = [
-  // 'taqueria-flextesa-manager',
-  // 'taqueria-plugin-contract-types',
-//   'taqueria-plugin-flextesa',
+  "taqueria-plugin-archetype",
+  // "taqueria-plugin-contract-types",
+  // "taqueria-plugin-flextesa",
   "taqueria-plugin-ligo",
-  // 'taqueria-plugin-smartpy',
-  // 'taqueria-plugin-taquito',
-  // 'taqueria-protocol',
-  // 'taqueria-sdk',
-  // 'taqueria-vscode-extension',
+  // "taqueria-plugin-smartpy",
+  // "taqueria-plugin-taquito",
+  // "taqueria-protocol",
+  // "taqueria-sdk",
+  // "taqueria-vscode-extension",
 ];
 
 // typed list of github variables with their values
 const gitHubVariables: { [key: string]: string } = {
-    warningOpenAdmonition: '\> ### :warning: WARNING\n\> ',
-    noteOpenAdmonition: '\> ### :page_with_curl: Note\n\> ',
-    closeAdmonition: '',
+    cautionOpenAdmonition: "\> ### :warning: CAUTION\n\> ",
+    noteOpenAdmonition: "\> ### :page_with_curl: Note\n\> ",
+    closeAdmonition: "",
 };
 
 // typed list of docusaurus variables with their values
 const docVariables: { [key: string]: string } = {
-    warningOpenAdmonition: ':::warning\n',
-    noteOpenAdmonition: ':::note\n',
-    closeAdmonition: ':::\n',
+    cautionOpenAdmonition: ":::caution\n",
+    noteOpenAdmonition: ":::note\n",
+    closeAdmonition: ":::\n",
 };
 
 // for each plugin process the readme file
