@@ -54,4 +54,3 @@ const processNewReadmeFiles = plugins.map((pluginName) => {
 });
 
 export {};
-// test comment
