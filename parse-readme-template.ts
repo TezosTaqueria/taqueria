@@ -32,7 +32,7 @@ const docVariables: { [key: string]: string } = {
     closeAdmonition: ':::\n',
 };
 
-// for each plugin get the readme file
+// for each plugin process the readme file
 const processNewReadmeFiles = plugins.map((pluginName) => {
     console.log(`Started processing ${pluginName}`);
     const template = fs.readFileSync(
