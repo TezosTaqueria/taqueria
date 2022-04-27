@@ -193,7 +193,7 @@ With a sandbox now running, the next step is to originate the `counter.tz` file 
 
 First, install the plugin:
 ```shell
-taq install @taqueria/plugin-ligo
+taq install @taqueria/plugin-taquito
 ```
 
 Next, configure the initial storage value for the `counter.tz` contract by navigating to the file `./.taq/config.json` and locate the `"environment"` property. There are two values that need to be configured:
