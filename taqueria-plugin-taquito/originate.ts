@@ -4,7 +4,7 @@ import {join} from 'path'
 import { TezosToolkit, OriginateParams, WalletOperationBatch } from '@taquito/taquito';
 import {readFile} from 'fs/promises'
 import { InMemorySigner, importKey } from '@taquito/signer';
-import { sendAsyncJsonRes, getCurrentEnvironmentConfig, getNetworkConfig, getSandboxAccountConfig, getInitialStorage, sendErr, getSandboxConfig, getDefaultAccount, sendJsonRes } from "@taqueria/node-sdk";
+import { sendAsyncJsonRes, getCurrentEnvironmentConfig, getNetworkConfig, getSandboxAccountConfig, getInitialStorage, sendErr, getSandboxConfig, getDefaultAccount, sendJsonRes, sendAsyncErr } from "@taqueria/node-sdk";
 import { BatchWalletOperation } from "@taquito/taquito/dist/types/wallet/batch-operation";
 import { OperationContentsAndResultOrigination } from "@taquito/rpc";
 
@@ -37,12 +37,12 @@ const addOrigination = (parsedArgs: Opts, batch: Promise<WalletOperationBatch>) 
 const getValidContracts = async (parsedArgs: Opts) => {
     const contracts = parsedArgs.contract
         ? [parsedArgs.contract as string]
-        : (await glob("**/*.tz", {cwd: parsedArgs.artifactsDir})) as string[]
-    
+        : (await glob("**/*.tz", {cwd: parsedArgs.artifactsDir})) as string[]    
+
     return contracts.reduce(
         (retval, filename) => {
             const storage = getInitialStorage(parsedArgs) (filename)
-            if (!storage) sendErr(`No initial storage provided for ${filename}`)
+            if (!storage) throw(`No initial storage provided for ${filename}`)
             return [...retval, {filename, storage}]
         },
         [] as ContractStorageMapping[]
@@ -98,12 +98,13 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
     )
     
     try {
-        debugger
         const op = await batch.send()
         const confirmed = await op.confirmation()
         return await mapOpToContract(contracts, op, destination)
     }
     catch (err) {
+        const error = (err as {message: string})
+        if (error.message) sendErr(error.message)
         return undefined
     }
 }
@@ -166,11 +167,7 @@ export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Fai
     const env = getCurrentEnvironmentConfig(parsedArgs)
 
     if (!env) {
-        return Promise.reject({
-            errCode: "E_INVALID_ENV",
-            errMsg: `No environment configured in your configuration file called ${parsedArgs.env}`,
-            context: parsedArgs.config
-        })    
+        return sendAsyncErr(`No environment configured in your configuration file called ${parsedArgs.env}`)
     }
 
     const jobs = [
@@ -187,7 +184,7 @@ export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Fai
             },
             []
         ))
-        .then(results => results && results.length > 0 ? sendJsonRes(results): sendErr(`No contract found`))
+        .then(results => results && results.length > 0 ? sendJsonRes(results): sendErr(`No contracts originated.`))
 }
 
 export default originate
