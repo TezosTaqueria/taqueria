@@ -1,4 +1,4 @@
-import {Plugin, Task, PositionalArg, Option} from '@taqueria/node-sdk'
+import {Plugin, Task, PositionalArg} from '@taqueria/node-sdk'
 import proxy from './proxy'
 
 Plugin.create(_i18n => ({
@@ -46,57 +46,6 @@ Plugin.create(_i18n => ({
                     placeholder: "sandboxName",
                     description: "The name of the sandbox to use"
                 })
-            ],
-            encoding: "json"
-        }),
-        Task.create({
-            task: "typecheck",
-            command: "typecheck <sandboxName> [sourceFiles...]",
-            aliases: ["tc"],
-            description: "Typecheck Michelson contracts",
-            options: [],
-            handler: "proxy",
-            positionals: [
-                PositionalArg.create({
-                    placeholder: "sandboxName",
-                    description: "The name of the sandbox to use"
-                }),
-                PositionalArg.create({
-                    placeholder: "sourceFiles",
-                    description: "The names of the Michelson contracts you wish to typecheck, separated by space"
-                }),
-            ],
-            encoding: "json"
-        }),
-        Task.create({
-            task: "simulate",
-            command: "simulate <sandboxName> <sourceFile>",
-            aliases: ["sim"],
-            description: "Run Michelson contracts as a simulation",
-            options: [
-                Option.create({
-                    shortFlag: "s",
-                    flag: "storage",
-                    description: "The initial storage used to run the script (a string wrapped in single quotes)",
-                    required: true
-                }),
-                Option.create({
-                    shortFlag: "i",
-                    flag: "input",
-                    description: "The input used to run the script (a string wrapped in single quotes)",
-                    required: true
-                }),
-            ],
-            handler: "proxy",
-            positionals: [
-                PositionalArg.create({
-                    placeholder: "sandboxName",
-                    description: "The name of the sandbox to use"
-                }),
-                PositionalArg.create({
-                    placeholder: "sourceFile",
-                    description: "The name of the Michelson contract you wish to simulate, separated by space"
-                }),
             ],
             encoding: "json"
         }),

@@ -216,10 +216,6 @@ Commands:
                                                                  [aliases: stop]
   taq list accounts <sandboxName>           List the balances of all sandbox acc
                                             ounts
-  taq typecheck <sandboxName> [sourceFiles  Typecheck Michelson contracts
-  ...]                                                             [aliases: tc]
-  taq simulate <sandboxName> <sourceFile>   Run Michelson contracts as a simulat
-                                            ion                   [aliases: sim]
 
 Options:
       --version     Show version number                                [boolean]

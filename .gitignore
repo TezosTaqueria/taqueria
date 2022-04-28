@@ -135,6 +135,8 @@ tests/coverage
 /taqueria-plugin-contract-types/index.js.map
 /taqueria-plugin-archetype/index.js
 /taqueria-plugin-archetype/index.js.map
+/taqueria-plugin-tezos-client/index.js
+/taqueria-plugin-tezos-client/index.js.map
 
 # VS Code Extension
 /taqueria-vscode-extension/out
