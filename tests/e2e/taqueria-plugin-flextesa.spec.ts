@@ -252,10 +252,10 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
         await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
     })
 
-    test('Verify that taqueria typechecker task can typecheck one contract under contracts folder', async () => {
+    test('Verify that taqueria typechecker task can typecheck one contract under artifacts folder', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`);
 
             // 2. Run taq typecheck
             const {stdout, stderr} = await exec(`taq typecheck`, {cwd: `./${taqueriaProjectPath}`});
@@ -272,7 +272,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     test('Verify that taqueria typechecker task can typecheck one contract using typecheck [sourceFile] command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`);
 
             // 2. Run taq typecheck hello-tacos.tz
             const {stdout, stderr} = await exec(`taq typecheck hello-tacos.tz`, {cwd: `./${taqueriaProjectPath}`});
@@ -286,11 +286,11 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
         }
     });
 
-    test('Verify that taqueria typechecker task can typecheck all contracts under contracts folder', async () => {
+    test('Verify that taqueria typechecker task can typecheck all contracts under artifacts folder', async () => {
         try {
-            // 1. Copy two contracts from data folder to /contracts folder under taqueria project
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-one.tz`);
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-two.tz`);
+            // 1. Copy two contracts from data folder to /artifacts folder under taqueria project
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos-one.tz`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos-two.tz`);
 
             // 2. Run taq typecheck
             const {stdout, stderr} = await exec(`taq typecheck`, {cwd: `./${taqueriaProjectPath}`});
@@ -306,10 +306,10 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
     test('Verify that taqueria typechecker task can typecheck multiple (but not all) contracts using typecheck [sourceFile1] [sourceFile2] command', async () => {
         try {
-            // 1. Copy two contracts from data folder to /contracts folder under taqueria project
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-one.tz`);
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-two.tz`);
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-three.tz`);
+            // 1. Copy two contracts from data folder to /artifacts folder under taqueria project
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos-one.tz`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos-two.tz`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos-three.tz`);
 
             // 2. Run taq typecheck hello-tacos-one.tz hello-tacos-two.tz
             const {stdout, stderr} = await exec(`taq typecheck hello-tacos-one.tz hello-tacos-two.tz`, {cwd: `./${taqueriaProjectPath}`});
@@ -340,7 +340,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     test("Verify that taqueria typechecker task emits error and yet displays table if contract is ill-typed", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            await exec(`cp e2e/data/hello-tacos-ill-typed.tz ${taqueriaProjectPath}/contracts`)
+            await exec(`cp e2e/data/hello-tacos-ill-typed.tz ${taqueriaProjectPath}/artifacts`)
 
             // 2. Run taq typecheck hello-tacos-ill-typed.tz
             const {stdout, stderr} = await exec(`taq typecheck hello-tacos-ill-typed.tz`, {cwd: `./${taqueriaProjectPath}`})
@@ -357,7 +357,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     test('Verify that taqueria simulator task can simulate one contract using simulate [sourceFile] command', async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`);
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '2' --storage '5'`, {cwd: `./${taqueriaProjectPath}`});
@@ -388,7 +388,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     test("Verify that taqueria simulator task emits logic error (runtime exception to be thrown)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`)
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '10' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
@@ -405,7 +405,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     test("Verify that taqueria simulator task emits parameter type error (supplying string instead of nat)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`)
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '"hi"' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
@@ -422,7 +422,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     test("Verify that taqueria simulator task emits parameter type error (supplying list instead of nat)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`)
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '{1;2;3}' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
@@ -436,12 +436,12 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
         }
     })
 
-    // Remove all files from contracts folder without removing folder itself
+    // Remove all files from artifacts folder without removing folder itself
     afterEach(() => {
         try {
-            const files = fs.readdirSync(`${taqueriaProjectPath}/contracts/`);
+            const files = fs.readdirSync(`${taqueriaProjectPath}/artifacts/`);
             for (const file of files) {
-                fs.unlinkSync(path.join(`${taqueriaProjectPath}/contracts/`, file));
+                fs.unlinkSync(path.join(`${taqueriaProjectPath}/artifacts/`, file));
             }
         } catch(error){
             throw new Error (`error: ${error}`);

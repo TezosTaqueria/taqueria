@@ -43,7 +43,9 @@ const getSandbox = ({sandboxName, config}: Opts) => {
 
 const doesUseFlextesa = (sandbox: Sandbox) => !sandbox.plugin || sandbox.plugin === 'flextesa'
 
-const getInputFilename = (opts: Opts, sourceFile: string) => join("/project", opts.config.contractsDir, sourceFile)
+const getInputFilenameFromContractDir = (opts: Opts, sourceFile: string) => join("/project", opts.config.contractsDir, sourceFile)
+
+const getInputFilenameFromArtifactsDir = (opts: Opts, sourceFile: string) => join("/project", opts.config.artifactsDir, sourceFile)
 
 const getCheckFileExistenceCommand = (sandbox: Sandbox, sourcePath: string) => `docker exec ${sandbox.name} ls ${sourcePath}`
 
@@ -51,8 +53,11 @@ const getCheckFileExistenceCommand = (sandbox: Sandbox, sourcePath: string) => `
 
 const getTypecheckCommand = (sandbox: Sandbox, sourcePath: string) => `docker exec ${sandbox.name} tezos-client typecheck script ${sourcePath}`
 
-const typecheckContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) : Promise<{contract: string, result: string}> => {
-    const sourcePath = getInputFilename(opts, sourceFile)
+const typecheckContract = (opts: Opts, sandbox: Sandbox) => async (sourceFile: string) : Promise<{contract: string, result: string}> => {
+    let sourcePath: string = getInputFilenameFromArtifactsDir(opts, sourceFile)
+    sourcePath = await execCmd(getCheckFileExistenceCommand(sandbox, sourcePath))
+                       .then(() => sourcePath)
+                       .catch(() => getInputFilenameFromContractDir(opts, sourceFile))
 
     const typecheckContractHelper = () => {
         return execCmd(getTypecheckCommand(sandbox, sourcePath))
@@ -91,11 +96,13 @@ const typecheckMultiple = (opts: Opts, sandbox: Sandbox) => (sourceFiles: string
 
 const typecheckAll = (opts: Opts, sandbox: Sandbox): Promise<{contract: string, result: string}[]> => {
     // TODO: Fetch list of files from SDK
-    return glob(
-        ['**/*.tz'],
-        {cwd: opts.contractsDir, absolute: false}
+    return glob(['**/*.tz'], {cwd: opts.artifactsDir, absolute: false})
+    .then(entriesFromArtifactsDir =>
+        glob(['**/*.tz'], {cwd: opts.contractsDir, absolute: false})
+        .then(entriesFromContractsDir =>
+            [...new Set([...entriesFromArtifactsDir, ...entriesFromContractsDir])].map(typecheckContract(opts, sandbox))
+        )
     )
-    .then(entries => entries.map(typecheckContract(opts, sandbox)))
     .then(promises => Promise.all(promises))
 }
 
@@ -160,14 +167,17 @@ const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourceFile: string, so
     storage = storage.match(/^".*"$/) ? "\\" + storage.slice(0, -1) + "\\\"" : storage
     input = input.match(/^".*"$/) ? "\\" + input.slice(0, -1) + "\\\"" : input
 
-    // TODO: maybe validate storage and input before passing it to tezos-client
+    // TODO: maybe validate storage and input value before passing it to tezos-client to prevent tezos-client menu being displayed?
 
     const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage \'${storage}\' and input \'${input}\'`
     return cmd
 }
 
-const simulateContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) : Promise<{contract: string, result: string}> => {
-    const sourcePath = getInputFilename(opts, sourceFile)
+const simulateContract = (opts: Opts, sandbox: Sandbox) => async (sourceFile: string) : Promise<{contract: string, result: string}> => {
+    let sourcePath: string = getInputFilenameFromArtifactsDir(opts, sourceFile)
+    sourcePath = await execCmd(getCheckFileExistenceCommand(sandbox, sourcePath))
+                       .then(() => sourcePath)
+                       .catch(() => getInputFilenameFromContractDir(opts, sourceFile))
 
     const simulateContractHelper = () => {
         try {
