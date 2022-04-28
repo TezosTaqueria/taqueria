@@ -167,6 +167,80 @@ Options:
        [required] [choices: "@taqueria/plugin-ligo", "@taqueria/plugin-smartpy"]
 `
 
+export const helpContentsLigoArchetype: string = `taq <command>
+
+Commands:
+  taq init [projectDir]                     Initialize a new project
+  taq scaffold [scaffoldUrl] [scaffoldProj  Generate a new project using pre-mad
+  ectDir]                                   e scaffold
+  taq install <pluginName>                  Install a plugin
+  taq uninstall <pluginName>                Uninstall a plugin
+  taq compile                               Provided by more than one plugin. Th
+                                            e option --plugin is required.
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+      --configDir   Config directory (default ./.taq)        [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+      --help        Show help                                          [boolean]
+
+Taqueria is currently in BETA. You've been warned. :)
+`
+
+export const helpContentsLigoArchetypeSpecific = `taq compile
+
+Provided by more than one plugin. The option --plugin is required.
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+      --configDir   Config directory (default ./.taq)        [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+      --help        Show help                                          [boolean]
+      --plugin      Use to specify what plugin you'd like when running this task
+                    .
+     [required] [choices: "@taqueria/plugin-ligo", "@taqueria/plugin-archetype"]
+`
+
+export const helpContentsArchetypePlugin: string = `taq <command>
+
+Commands:
+  taq init [projectDir]                     Initialize a new project
+  taq scaffold [scaffoldUrl] [scaffoldProj  Generate a new project using pre-mad
+  ectDir]                                   e scaffold
+  taq install <pluginName>                  Install a plugin
+  taq uninstall <pluginName>                Uninstall a plugin
+  taq compile [sourceFile]                  Compile a smart contract written in
+                                            a Archetype syntax to Michelson code
+                                                 [aliases: c, compile-archetype]
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+      --configDir   Config directory (default ./.taq)        [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+      --help        Show help                                          [boolean]
+
+Taqueria is currently in BETA. You've been warned. :)
+`
+
+export const helpContentsArchetypePluginSpecific: string = `taq compile [sourceFile]
+
+Compile a smart contract written in a Archetype syntax to Michelson code
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+      --configDir   Config directory (default ./.taq)        [default: "./.taq"]
+  -e, --env         Specify an environment configuration
+      --help        Show help                                          [boolean]
+`
+
 export const helpContentsTaquitoPlugin: string = `taq <command>
 
 Commands:

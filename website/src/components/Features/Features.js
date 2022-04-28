@@ -22,7 +22,7 @@ const FeatureList = [
         title: "Effortlessly compile",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Taqueria compiles smart contracts written in Ligo and SmartPy. Michelson and Archetype support is coming soon.",
+          "Taqueria compiles smart contracts written in Archetype, LIGO and SmartPy. Michelson support is coming soon.",
         gif: require("../../../static/gif/taq_compile.mp4").default,
       },
       {

@@ -186,7 +186,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: 
       - build-binaries
-    if: ${{ always() && !(contains(needs.*.result, 'failure')) }}
+    if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -241,8 +241,10 @@ jobs:
         uses: ravsamhq/notify-slack-action@v1
         if: always()
         with:
+          notification_title: "Failure in the e2e Tests"
           status: ${{ job.status }} # required
           notify_when: 'failure'
+          message_format: '{emoji} ${{ github.actor }}, *{workflow}* {status_message}, please investigate: <{run_url}|Failing Run>'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 

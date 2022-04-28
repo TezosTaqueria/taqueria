@@ -26,7 +26,8 @@ const sidebars = {
         "intro",
         "getting-started/installation",
         "getting-started/plugin-basics",
-        "getting-started/quickstart"
+        "getting-started/quickstart",
+        "getting-started/networks",
       ],
     },
     {
@@ -37,6 +38,7 @@ const sidebars = {
       collapsible: false,
       items: [
         "plugins/plugin-flextesa",
+        "plugins/plugin-archetype",
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
