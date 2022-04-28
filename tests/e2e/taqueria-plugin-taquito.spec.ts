@@ -213,9 +213,6 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
         // 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
         await exec(`cp e2e/data/config-taquito-test-environment-invalid-config-network-url.json ${taqueriaProjectPath}/.taq/config.json`);
         await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
-        
-        // TODO: Temp - remove
-        await exec(`rm -rf /Users/mweichert/Projects/taqueria/temp-project && cp -r ${taqueriaProjectPath} /Users/mweichert/Projects/taqueria/temp-project`)
 
         // 2. Run taq deploy on a network described in "test" environment
         const stdoutDeploy = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
