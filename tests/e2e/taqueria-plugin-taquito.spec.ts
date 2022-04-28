@@ -186,9 +186,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     });
 
-    // TODO: Currently there is no output to stdout/stderr to be caught by automation
-    // Issue to investigate and re-enable these tests https://github.com/ecadlabs/taqueria/issues/377
-    // Issue associated https://github.com/ecadlabs/taqueria/issues/313
+    // TODO: Reinstate test after https://github.com/ecadlabs/taqueria/issues/642
     test.skip('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> invalid network name in the environment', async () => {
         try {
             // Environment test does not exist on default config.json
@@ -241,7 +239,8 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
         expect(stdoutDeploy.stderr).toContain("Error: Unsupported key type");
     });
 
-    test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> invalid pkh', async () => {
+    // TODO: Reinstate this test after https://github.com/ecadlabs/taqueria/issues/641
+    test.skip('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> invalid pkh', async () => {
         // Environment test does not exist on default config.json
         environment = "test"
 
