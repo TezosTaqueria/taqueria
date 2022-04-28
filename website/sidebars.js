@@ -48,12 +48,13 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Example App",
+      label: "Tutorials",
       className: "sidebarHeader",
       collapsed: false,
       collapsible: false,
       items: [
-        "hello-tacos-tutorial"
+        "tutorials/scaffoldTutorial",
+        "hello-tacos-tutorial",
       ],
     },
     {
