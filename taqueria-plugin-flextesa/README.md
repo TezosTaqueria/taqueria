@@ -1,6 +1,4 @@
----
-title: Flextesa Plugin
----
+# Taqueria Flextesa Plugin
 
 [Flextesa](https://tezos.gitlab.io/flextesa/) is a flexible Tezos sandbox environment that's easy to work with. It runs a Tezos node and network in a Docker container on your local machine
 
@@ -22,7 +20,6 @@ Some helpful things to know:
 
 - Node.js v16 or later
 - Docker v0.8.4 or later
-
 ## Build Instructions
 
 To build the plugin locally from source, run the following from the project root:
@@ -32,6 +29,7 @@ To build the plugin locally from source, run the following from the project root
 
 To build all Taqueria plugins and the Taqueria binary, run the following from the `taqueria` folder:
 1. `npm run build-all`
+
 ## Installation
 
 The Flextesa plugin is distributed as an NPM package that can be installed and uninstalled on a project from the Taqueria CLI
@@ -43,12 +41,10 @@ taq install @taqueria/plugin-flextesa
 
 Once installed, you can confirm functionality by runing the command `taq start sandbox` which will start a sandbox with the default `local` configuration
 
-:::note
 The project you install it on must be initialized by NPM. This only needs to be done once on a project and is accomplished by running the command:
 ```shell
 npm init -y
 ``` 
-:::
 
 ## CLI Commands
 
@@ -59,8 +55,7 @@ The following commands are available from the CLI or the VS Code Command palette
 - `taq stop sandbox [sandboxName]`
 - `taq list accounts [sandboxName]`
 
-
-> The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer.
+The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer
 
 ## Plugin Configuration
 
@@ -168,3 +163,5 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  task      | 'list accounts'                | 
 |  command   | 'list accounts [sandboxName]   | 
 |  aliases   | [ ]                            |  
+
+

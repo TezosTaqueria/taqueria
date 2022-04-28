@@ -9,7 +9,7 @@ const docsDir = path.join(__dirname, "website", "docs", "plugins");
 const plugins: string[] = [
   "taqueria-plugin-archetype",
   // "taqueria-plugin-contract-types",
-  // "taqueria-plugin-flextesa",
+  "taqueria-plugin-flextesa",
   "taqueria-plugin-ligo",
   // "taqueria-plugin-smartpy",
   // "taqueria-plugin-taquito",
