@@ -155,7 +155,7 @@ While the React app `package.json` from `/app` dir looks like this:
 
 As you can see, each project has a different set of dependencies, scripts, and settings. The `package.json` files are used to specify the dependencies, scripts, and settings for each project. This means each project can be built, started, and used independently
 
-### Main Project
+#### Root Project Settings
 
 The `package.json` file in the project root is used to bundle both apps together into a single node app that can be run from a single command. It contains only the scripts needed to run both apps and looks like this:
 ```json
@@ -178,7 +178,10 @@ The `package.json` file in the project root is used to bundle both apps together
 
 ## Building and Starting the Project
 
-The root Node project contains a one line script which will run the `setup` and `start` scripts for the root project. This will install the npm dependencies, run the required scripts to build and deploy the Taqueria project, then start up the React app
+The root Node project contains `setup` and `start` scripts which can be run together on a single line to build, deploy, and launch the dapp. This process involves the following steps: 
+1. Install npm dependencies
+2. Run the required commands to build and deploy the Taqueria project
+3. Start up the React app
 
 From the root of the project, run the following command to build and start the project:
 ```bash
