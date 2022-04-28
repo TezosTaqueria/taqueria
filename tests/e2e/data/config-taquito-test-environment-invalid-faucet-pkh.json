@@ -55,7 +55,7 @@
             "rpcUrl": "https://ithacanet.ecadinfra.com",
             "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "faucet": {
-                "pkh": "tz1RWs1bLmga24RybaC5Di441sK6aGLmCTpx",
+                "pkh": "invalid_pkh",
                 "mnemonic": [
                     "throw",
                     "cactus",
