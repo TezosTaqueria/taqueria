@@ -71,13 +71,14 @@ ls -al
 ```
 
 This will give you an output that looks something this:
-`
+```
 -rw-r--r--   1 demoUser README.md
 drwxr-xr-x   9 demoUser app
 drwxr-xr-x   5 demoUser taqueria
 -rw-r--r--   1 demoUser package.json
 -rw-r--r--   1 demoUser package-lock.json
-`
+```
+
 As you can see, there are two executable directories, `app` and `taqueria`. The `app` directory contains the frontend React app, and the `taqueria` directory contains the Taqueria project which includes the smart contracts and Taqueria plugins
 
 ### Use of Node.js
@@ -100,7 +101,8 @@ The `package-lock.json` file contains the dependencies for each project, and is 
 If you open the package.json file, you will see the node configuration required for each project
 
 Taqueria `package.json` from `/taqueria` dir looks like this:
-```json{
+```json
+{
   "private": true,
   "name": "@local/contract",
   "scripts": {
