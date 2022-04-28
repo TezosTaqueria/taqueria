@@ -124,9 +124,9 @@ const originateToNetworks = (parsedArgs: Opts, currentEnv: EnvironmentConfig) =>
 
                         return [...retval, result]
                     }
-                    else sendErr(`Network ${networkName} requires a valid faucet`)
+                    else sendErr(`Network ${networkName} requires a valid faucet in config.json.`)
                 }
-                else sendErr(`Network "${networkName} is missing an RPC url"`)
+                else sendErr(`Network "${networkName} is missing an RPC url in config.json."`)
                 return retval
             },
             [] as  Promise<OriginationResult[]|undefined>[]
@@ -151,9 +151,9 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: EnvironmentConfig) =
                         
                         return [...retval, result]
                     }
-                    else sendErr(`Sandbox ${sandboxName}'s default account is missing keys`)
+                    else sendErr(`Sandbox ${sandboxName}'s default account is missing keys in config.json.`)
                 }
-                else sendErr(`Sandbox "${sandboxName} is missing an RPC url"`)
+                else sendErr(`Sandbox "${sandboxName} is missing an RPC url in config.json."`)
 
                 return retval
             },
@@ -167,7 +167,7 @@ export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Fai
     const env = getCurrentEnvironmentConfig(parsedArgs)
 
     if (!env) {
-        return sendAsyncErr(`No environment configured in your configuration file called ${parsedArgs.env}`)
+        return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`)
     }
 
     const jobs = [
