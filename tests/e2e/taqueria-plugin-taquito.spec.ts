@@ -181,7 +181,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
         } catch(error) {
             // 2. Verify that proper error is displayed in the console
-            expect(error).toContain("No environment configured in your configuration file called tes");
+            expect(error).toContain("There is no environment called tes in your config.json.");
         }
 
     });
