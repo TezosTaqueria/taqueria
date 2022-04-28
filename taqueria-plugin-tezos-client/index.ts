@@ -8,16 +8,19 @@ Plugin.create(i18n => ({
     tasks: [
         Task.create({
             task: "typecheck",
-            command: "typecheck <sandboxName> [sourceFiles...]",
+            command: "typecheck [sourceFiles...]",
             aliases: ["tc"],
             description: "Typecheck Michelson contracts",
-            options: [],
+            options: [
+                Option.create({
+                    shortFlag: "s",
+                    flag: "sandboxName",
+                    description: "The name of the sandbox to use",
+                    required: false
+                }),
+            ],
             handler: "proxy",
             positionals: [
-                PositionalArg.create({
-                    placeholder: "sandboxName",
-                    description: "The name of the sandbox to use"
-                }),
                 PositionalArg.create({
                     placeholder: "sourceFiles",
                     description: "The names of the Michelson contracts you wish to typecheck, separated by space"
@@ -27,32 +30,31 @@ Plugin.create(i18n => ({
         }),
         Task.create({
             task: "simulate",
-            command: "simulate <sandboxName> <sourceFile>",
+            command: "simulate <sourceFile> <input>",
             aliases: ["sim"],
             description: "Run Michelson contracts as a simulation",
             options: [
                 Option.create({
-                    shortFlag: "s",
                     flag: "storage",
                     description: "The initial storage used to run the script (a string wrapped in single quotes)",
-                    required: true
+                    required: false
                 }),
                 Option.create({
-                    shortFlag: "i",
-                    flag: "input",
-                    description: "The input used to run the script (a string wrapped in single quotes)",
-                    required: true
+                    shortFlag: "s",
+                    flag: "sandboxName",
+                    description: "The name of the sandbox to use",
+                    required: false
                 }),
             ],
             handler: "proxy",
             positionals: [
                 PositionalArg.create({
-                    placeholder: "sandboxName",
-                    description: "The name of the sandbox to use"
+                    placeholder: "sourceFile",
+                    description: "The name of the Michelson contract you wish to simulate"
                 }),
                 PositionalArg.create({
-                    placeholder: "sourceFile",
-                    description: "The name of the Michelson contract you wish to simulate, separated by space"
+                    placeholder: "input",
+                    description: "The input used to run the script (a string wrapped in single quotes)"
                 }),
             ],
             encoding: "json"

@@ -258,7 +258,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq typecheck
-            const {stdout, stderr} = await exec(`taq typecheck ${dockerName}`, {cwd: `./${taqueriaProjectPath}`});
+            const {stdout, stderr} = await exec(`taq typecheck`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that it's well-typed and contains no errors
             expect(stdout).toBe(contents.oneRowTable);
@@ -275,7 +275,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq typecheck hello-tacos.tz
-            const {stdout, stderr} = await exec(`taq typecheck ${dockerName} hello-tacos.tz`, {cwd: `./${taqueriaProjectPath}`});
+            const {stdout, stderr} = await exec(`taq typecheck hello-tacos.tz`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that it's well-typed and contains no errors
             expect(stdout).toBe(contents.oneRowTable);
@@ -293,7 +293,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-two.tz`);
 
             // 2. Run taq typecheck
-            const {stdout, stderr} = await exec(`taq typecheck ${dockerName}`, {cwd: `./${taqueriaProjectPath}`});
+            const {stdout, stderr} = await exec(`taq typecheck`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that both are well-typed and contain no errors
             expect(stdout).toBe(contents.twoRowTable);
@@ -312,7 +312,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts/hello-tacos-three.tz`);
 
             // 2. Run taq typecheck hello-tacos-one.tz hello-tacos-two.tz
-            const {stdout, stderr} = await exec(`taq typecheck ${dockerName} hello-tacos-one.tz hello-tacos-two.tz`, {cwd: `./${taqueriaProjectPath}`});
+            const {stdout, stderr} = await exec(`taq typecheck hello-tacos-one.tz hello-tacos-two.tz`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that both are well-typed and contain no errors
             expect(stdout).toBe(contents.twoRowTable);
@@ -326,7 +326,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     test('Verify that taqueria typechecker task will display proper message if user tries to typecheck contract that does not exist', async () => {
         try {
             // 1. Run taq typecheck ${contractName} for contract that does not exist
-            const {stdout, stderr} = await exec(`taq typecheck ${dockerName} test.tz`, {cwd: `./${taqueriaProjectPath}`})
+            const {stdout, stderr} = await exec(`taq typecheck test.tz`, {cwd: `./${taqueriaProjectPath}`})
 
             // 2. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.nonExistent)
@@ -343,7 +343,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
             await exec(`cp e2e/data/hello-tacos-ill-typed.tz ${taqueriaProjectPath}/contracts`)
 
             // 2. Run taq typecheck hello-tacos-ill-typed.tz
-            const {stdout, stderr} = await exec(`taq typecheck ${dockerName} hello-tacos-ill-typed.tz`, {cwd: `./${taqueriaProjectPath}`})
+            const {stdout, stderr} = await exec(`taq typecheck hello-tacos-ill-typed.tz`, {cwd: `./${taqueriaProjectPath}`})
 
             // 3. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.typeError)
@@ -360,7 +360,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq simulate hello-tacos.tz
-            const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '2'`, {cwd: `./${taqueriaProjectPath}`});
+            const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '2' --storage '5'`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that it's valid and contains no errors
             expect(stdout).toBe(contents.oneRowTableSimulateResult);
@@ -374,7 +374,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     test('Verify that taqueria simulator task will display proper message if user tries to simulate contract that does not exist', async () => {
         try {
             // 1. Run taq simulate ${contractName} for contract that does not exist
-            const {stdout, stderr} = await exec(`taq simulate ${dockerName} test.tz --storage '5' --input '2'`, {cwd: `./${taqueriaProjectPath}`})
+            const {stdout, stderr} = await exec(`taq simulate test.tz '2' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
 
             // 2. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.nonExistent)
@@ -391,7 +391,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
 
             // 2. Run taq simulate hello-tacos.tz
-            const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '10'`, {cwd: `./${taqueriaProjectPath}`})
+            const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '10' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
 
             // 3. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.runtimeError)
@@ -408,7 +408,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
 
             // 2. Run taq simulate hello-tacos.tz
-            const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '"hi"'`, {cwd: `./${taqueriaProjectPath}`})
+            const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '"hi"' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
 
             // 3. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.runtimeError)
@@ -425,7 +425,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/contracts`)
 
             // 2. Run taq simulate hello-tacos.tz
-            const {stdout, stderr} = await exec(`taq simulate ${dockerName} hello-tacos.tz --storage '5' --input '{1;2;3}'`, {cwd: `./${taqueriaProjectPath}`})
+            const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '{1;2;3}' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
 
             // 3. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.runtimeError)

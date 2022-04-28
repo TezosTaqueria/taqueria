@@ -1,5 +1,5 @@
 import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendRes, sendAsyncRes, sendJsonRes, sendAsyncJsonRes} from '@taqueria/node-sdk'
-import type {SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO, PluginResponse} from "@taqueria/node-sdk/types"
+import type {SanitizedArgs, Config, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO, PluginResponse} from "@taqueria/node-sdk/types"
 import type {ExecException} from 'child_process'
 import retry from 'async-retry'
 import {join} from 'path'
@@ -12,8 +12,15 @@ const isSandboxRunning = (sandboxName: string) =>
     .then(_ => true)
     .catch(_ => false)
 
+const getDefaultSandboxName = (config: Config) : string => {
+    const defaultEnv = config.environment.default
+    const sandbox = config.environment[defaultEnv].sandboxes[0]
+    return sandbox
+}
+
 const getSandbox = ({sandboxName, config}: Opts) => {
-    if (sandboxName && config.sandbox[sandboxName]) {
+    if (!sandboxName) sandboxName = getDefaultSandboxName(config)
+    if (config.sandbox[sandboxName]) {
         const sandboxConfig : SandboxConfig = config.sandbox[sandboxName]
 
         // This should probably go into the SDK or protocol
@@ -111,25 +118,38 @@ const typecheck = <T>(parsedArgs: Opts, sandbox: Sandbox): LikeAPromise<PluginRe
 }
 
 const typecheckTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
-    if (parsedArgs.sandboxName) {
-        const sandbox = getSandbox(parsedArgs)
-        if (sandbox) {
-            if (doesUseFlextesa(sandbox)) {
-                return await isSandboxRunning(sandbox.name.value)
-                ? typecheck(parsedArgs, sandbox).then(sendJsonRes)
-                : sendAsyncErr(`The ${sandbox.name} sandbox is not running.`)
-            }
-            return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
+    const sandbox = getSandbox(parsedArgs)
+    if (sandbox) {
+        if (doesUseFlextesa(sandbox)) {
+            return await isSandboxRunning(sandbox.name.value)
+            ? typecheck(parsedArgs, sandbox).then(sendJsonRes)
+            : sendAsyncErr(`The ${sandbox.name} sandbox is not running.`)
         }
-        return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
+        return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
     }
-    return sendAsyncErr(`Please specify a sandbox. E.g. taq typecheck local`)
+    return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
 }
 
 //////////// Simulate task ////////////
 
-const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourcePath: string) => {
-    let storage: string = opts.storage && typeof opts.storage === 'string' ? opts.storage as string : `${opts.storage}`
+const getStorageFromConfig = (opts: Opts, sourceFile: string) : string|undefined => {
+    const config = opts.config
+    const defaultEnv = config.environment.default
+    const storages = config.environment[defaultEnv].storage
+    const storageValue = storages[sourceFile]
+    return storageValue ? storageValue as string : undefined
+}
+
+const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourceFile: string, sourcePath: string) => {
+    let storage: string|undefined
+    if (opts.storage) {
+        if (typeof opts.storage === 'string') storage = opts.storage as string
+        else storage = `${opts.storage}`
+    } else {
+        storage = getStorageFromConfig(opts, sourceFile)
+        if (!storage) throw new Error('Error: Please specify a non-empty storage value in the CLI or in the config file.')
+    }
+
     let input: string = opts.input && typeof opts.input === 'string' ? opts.input as string : `${opts.input}`
 
     // If the string contains escaped double quotes, escape them further
@@ -140,12 +160,9 @@ const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourcePath: string) =>
     storage = storage.match(/^".*"$/) ? "\\" + storage.slice(0, -1) + "\\\"" : storage
     input = input.match(/^".*"$/) ? "\\" + input.slice(0, -1) + "\\\"" : input
 
+    // TODO: maybe validate storage and input before passing it to tezos-client
+
     const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage \'${storage}\' and input \'${input}\'`
-    // console.error("============")
-    // console.error(storage)
-    // console.error(input)
-    // console.error(cmd)
-    // console.error("============")
     return cmd
 }
 
@@ -153,22 +170,32 @@ const simulateContract = (opts: Opts, sandbox: Sandbox) => (sourceFile: string) 
     const sourcePath = getInputFilename(opts, sourceFile)
 
     const simulateContractHelper = () => {
-        return execCmd(getSimulateCommand(opts, sandbox, sourcePath))
-        .then(async ({stdout, stderr}) => { // How should we output warnings?
-            if (stderr.length > 0) sendErr(`\n${stderr}`)
-            return {
-                contract: sourceFile,
-                result: stdout
-            }
-        })
-        .catch(err => {
+        try {
+            const cmd = getSimulateCommand(opts, sandbox, sourceFile, sourcePath)
+            return execCmd(cmd)
+            .then(async ({stdout, stderr}) => { // How should we output warnings?
+                if (stderr.length > 0) sendErr(`\n${stderr}`)
+                return {
+                    contract: sourceFile,
+                    result: stdout
+                }
+            })
+            .catch(err => {
+                sendErr(" ")
+                sendErr(err.message.split("\n").slice(1).join("\n"))
+                return Promise.resolve({
+                    contract: sourceFile,
+                    result: "Invalid"
+                })
+            })
+        } catch (err) {
             sendErr(" ")
-            sendErr(err.message.split("\n").slice(1).join("\n"))
+            sendErr((err as Error).message)
             return Promise.resolve({
                 contract: sourceFile,
-                result: "Invalid"
+                result: "Bad input or storage value"
             })
-        })
+        }
     }
 
     return execCmd(getCheckFileExistenceCommand(sandbox, sourcePath))
@@ -193,19 +220,16 @@ const simulate = <T>(parsedArgs: Opts, sandbox: Sandbox): LikeAPromise<PluginRes
 }
 
 const simulateTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
-    if (parsedArgs.sandboxName) {
-        const sandbox = getSandbox(parsedArgs)
-        if (sandbox) {
-            if (doesUseFlextesa(sandbox)) {
-                return await isSandboxRunning(sandbox.name.value)
-                ? simulate(parsedArgs, sandbox).then(sendJsonRes)
-                : sendAsyncErr(`The ${sandbox.name} sandbox is not running.`)
-            }
-            return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
+    const sandbox = getSandbox(parsedArgs)
+    if (sandbox) {
+        if (doesUseFlextesa(sandbox)) {
+            return await isSandboxRunning(sandbox.name.value)
+            ? simulate(parsedArgs, sandbox).then(sendJsonRes)
+            : sendAsyncErr(`The ${sandbox.name} sandbox is not running.`)
         }
-        return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
+        return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
     }
-    return sendAsyncErr(`Please specify a sandbox. E.g. taq typecheck local ...`)
+    return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
 }
 
 export const client = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
