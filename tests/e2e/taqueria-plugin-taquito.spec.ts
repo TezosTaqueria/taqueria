@@ -238,7 +238,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
         const stdoutDeploy = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
 
         // 3. Verify that proper error displays in the console
-        expect(stdoutDeploy.stderr).toContain("E_ORIGINATE");
+        expect(stdoutDeploy.stderr).toContain("Error: Unsupported key type");
     });
 
     test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> invalid pkh', async () => {

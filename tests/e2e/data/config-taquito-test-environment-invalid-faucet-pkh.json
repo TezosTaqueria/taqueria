@@ -55,28 +55,28 @@
             "rpcUrl": "https://ithacanet.ecadinfra.com",
             "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "faucet": {
-                "pkh": "invalid_pkh",
+                "pkh": "tz1RWs1bLmga24RybaC5Di441sK6aGLmCTpx",
                 "mnemonic": [
-                    "bone",
-                    "copper",
-                    "early",
-                    "light",
+                    "throw",
+                    "cactus",
+                    "romance",
+                    "lake",
+                    "step",
+                    "floor",
+                    "limit",
                     "shallow",
-                    "sense",
-                    "burden",
-                    "civil",
-                    "knee",
-                    "knife",
-                    "excuse",
-                    "noise",
-                    "enable",
-                    "piano",
-                    "loyal"
+                    "leader",
+                    "pride",
+                    "thrive",
+                    "void",
+                    "carbon",
+                    "wreck",
+                    "retreat"
                 ],
-                "email": "tasbcxmi.wbdftfiw@teztnets.xyz",
-                "password": "sz2Trjg3Z5",
-                "amount": "55579807681",
-                "activation_code": "cce0f1f37d4eb45b5ac0cdf755825abd5fd53b10"
+                "email": "tskwglte.mscstjny@teztnets.xyz",
+                "password": "fvzAbTJ7Uz",
+                "amount": "8780051082",
+                "activation_code": "07739888a2615d5176505c900f411dcf7990073d"
             }
         }
     }
