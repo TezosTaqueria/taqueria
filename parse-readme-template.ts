@@ -20,6 +20,7 @@ const plugins: string[] = [
 
 // typed list of github variables with their values
 const gitHubVariables: { [key: string]: string } = {
+    output: "github",
     cautionOpenAdmonition: "\> ### :warning: CAUTION\n\> ",
     noteOpenAdmonition: "\> ### :page_with_curl: Note\n\> ",
     closeAdmonition: "",
@@ -27,6 +28,7 @@ const gitHubVariables: { [key: string]: string } = {
 
 // typed list of docusaurus variables with their values
 const docVariables: { [key: string]: string } = {
+    output: "docs",
     cautionOpenAdmonition: ":::caution\n",
     noteOpenAdmonition: ":::note\n",
     closeAdmonition: ":::\n",
