@@ -1,13 +1,14 @@
-# Taqueria Smartpy Plugin
+# Taqueria Tezos Client Plugin
 
 This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
 
-The SmartPy plugin exposes a compile task in Taqueria which can target one, or all the SmartPy contracts in the contracts folder and compile them to Michelson code output to the artifacts folder
+The Tezos Client plugin exposes the typecheck and simulate tasks. The typecheck task will type check one or more Michelson contracts found in the /artifacts subfolder of the project root. The simulate task will dry run a Michelson contract found in the same abovementioned subfolder.
 
 ## Tasks
 
-The SmartPy plugin provides the following tasks to Taqueria:
-- `compile`
+The Tezos Client plugin provides the following tasks to Taqueria:
+- `typecheck`
+- `simulate`
 
 ## Requirements
 
@@ -17,15 +18,15 @@ The SmartPy plugin provides the following tasks to Taqueria:
 
 ## Installation
 
-The SmartPy plugin is distributed as an NPM package that can be installed and uninstalled on a project from the Taqueria CLI
+The Tezos Client plugin is distributed as an NPM package that can be installed and uninstalled on a project from the Taqueria CLI
 
-To install the LIGO plugin on a Taqueria project, navigate to the project folder and run:
+To install the Tezos Client plugin on a Taqueria project, navigate to the project folder and run:
 ```shell
-taq install @taqueria/plugin-smartpy
+taq install @taqueria/plugin-tezos-client
 ```
 
 ## Plugin Architecture
 
 This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
 
-For detailed usage and configuration information, view the LIGO plugin documentation on the Taqueria website [here](https://taqueria.io/docs/plugins/plugin-smartpy) 
+For detailed usage and configuration information, view the Tezos Client plugin documentation on the Taqueria website [here](https://taqueria.io/docs/plugins/plugin-tezos-client) 

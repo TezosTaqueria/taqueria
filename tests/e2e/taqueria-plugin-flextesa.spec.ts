@@ -441,12 +441,29 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
         }
     })
 
-    // Remove all files from artifacts folder without removing folder itself
-    afterEach(() => {
+    test("Verify that taqueria simulator task emits parameter type error (supplying map instead of nat)", async () => {
         try {
-            const files = fs.readdirSync(`${taqueriaProjectPath}/artifacts/`);
+            // 1. Copy contract from data folder to taqueria project folder
+            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`)
+
+            // 2. Run taq simulate hello-tacos.tz
+            const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '{ Elt "bar" True ; Elt "foo" False }' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
+
+            // 3. Verify that output includes a table and an error message
+            expect(stdout).toBe(contents.runtimeError)
+            expect(stderr).toContain("unexpected sequence, only an int can be used here");
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    })
+
+    // Remove all files from artifacts folder without removing folder itself
+    afterEach( async () => {
+        try {
+            const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
             for (const file of files) {
-                fs.unlinkSync(path.join(`${taqueriaProjectPath}/artifacts/`, file));
+                await fsPromises.rm(`${taqueriaProjectPath}/artifacts/${file}`);
             }
         } catch(error){
             throw new Error (`error: ${error}`);

@@ -36,7 +36,7 @@ Plugin.create(i18n => ({
             options: [
                 Option.create({
                     flag: "storage",
-                    description: "The initial storage used to run the script (a string wrapped in single quotes)",
+                    description: "The initial storage used to run the script. The value is a Michelson expression, wrapped in single quotes if specified in the CLI, wrapped in double quotes instead if specified in config.json",
                     required: false
                 }),
                 Option.create({
@@ -54,7 +54,7 @@ Plugin.create(i18n => ({
                 }),
                 PositionalArg.create({
                     placeholder: "input",
-                    description: "The input used to run the script (a string wrapped in single quotes)"
+                    description: "The input used to run the script. The value is a Michelson expression wrapped in single quotes"
                 }),
             ],
             encoding: "json"

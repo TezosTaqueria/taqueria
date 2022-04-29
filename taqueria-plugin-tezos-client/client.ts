@@ -147,6 +147,17 @@ const getStorageFromConfig = (opts: Opts, sourceFile: string) => {
     return storageValue
 }
 
+// This is needed mostly due to the fact that execCmd() wraps the command in double quotes
+const preprocessString = (value: string): string => {
+    // 1. if the string contains escaped double quotes, escape them further
+    value = value.replace(/\\"/g, '\\\\\\"')
+
+    // 2. if the string contains unescaped double quotes, escape them
+    value = value.replace(/(?<!\\)"/g, '\\"')
+
+    return value
+}
+
 const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourceFile: string, sourcePath: string) => {
     let storage
     if (opts.storage) {
@@ -158,13 +169,8 @@ const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourceFile: string, so
     storage = typeof storage === 'string' ? storage : `${storage}`
     let input = opts.input && typeof opts.input === 'string' ? opts.input : `${opts.input}`
 
-    // If the string contains escaped double quotes, escape them further
-    storage = storage.replace(/\\"/g, '\\\\\\"')
-    input = input.replace(/\\"/g, '\\\\\\"')
-
-    // If the string contains leading and trailing double quotes, escape them, otherwise docker exec will complain
-    storage = storage.match(/^".*"$/) ? "\\" + storage.slice(0, -1) + "\\\"" : storage
-    input = input.match(/^".*"$/) ? "\\" + input.slice(0, -1) + "\\\"" : input
+    storage = preprocessString(storage)
+    input = preprocessString(input)
 
     // TODO: maybe validate storage and input value before passing it to tezos-client to prevent tezos-client menu being displayed? Alternatively, just perform trimming.
 
