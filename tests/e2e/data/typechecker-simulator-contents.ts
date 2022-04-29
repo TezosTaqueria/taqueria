@@ -53,3 +53,13 @@ export const runtimeError = `
 │ hello-tacos.tz │ Invalid │
 └────────────────┴─────────┘
 `.trimStart()
+
+export const tezosClientError =
+` 
+Error:
+  Erroneous command line argument 6 (hello).
+  Invalid primitive.
+  Unknown primitive hello.
+
+
+`

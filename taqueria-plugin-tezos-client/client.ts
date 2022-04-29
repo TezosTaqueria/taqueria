@@ -148,7 +148,7 @@ const getStorageFromConfig = (opts: Opts, sourceFile: string) => {
 }
 
 // This is needed mostly due to the fact that execCmd() wraps the command in double quotes
-const preprocessString = (value: string): string => {
+const preprocessString = (value: string) : string => {
     // 1. if the string contains escaped double quotes, escape them further
     value = value.replace(/\\"/g, '\\\\\\"')
 
@@ -172,10 +172,12 @@ const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourceFile: string, so
     storage = preprocessString(storage)
     input = preprocessString(input)
 
-    // TODO: maybe validate storage and input value before passing it to tezos-client to prevent tezos-client menu being displayed? Alternatively, just perform trimming.
-
     const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage \'${storage}\' and input \'${input}\'`
     return cmd
+}
+
+const trimTezosClientMenuIfPresent = (msg: string) : string => {
+    return msg.replace(/Usage:(.|\n)+/, '')
 }
 
 const simulateContract = (opts: Opts, sandbox: Sandbox) => async (sourceFile: string) : Promise<{contract: string, result: string}> => {
@@ -196,8 +198,9 @@ const simulateContract = (opts: Opts, sandbox: Sandbox) => async (sourceFile: st
                 }
             })
             .catch(err => {
+                const msg: string = trimTezosClientMenuIfPresent(err.message)
                 sendErr(" ")
-                sendErr(err.message.split("\n").slice(1).join("\n"))
+                sendErr(msg.split("\n").slice(1).join("\n"))
                 return Promise.resolve({
                     contract: sourceFile,
                     result: "Invalid"
