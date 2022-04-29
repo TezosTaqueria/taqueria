@@ -199,7 +199,6 @@ const simulateContract = (opts: Opts, sandbox: Sandbox) => async (sourceFile: st
             })
             .catch(err => {
                 const msg: string = trimTezosClientMenuIfPresent(err.message)
-                sendErr(" ")
                 sendErr(msg.split("\n").slice(1).join("\n"))
                 return Promise.resolve({
                     contract: sourceFile,

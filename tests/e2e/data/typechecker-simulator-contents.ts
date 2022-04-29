@@ -54,12 +54,11 @@ export const runtimeError = `
 └────────────────┴─────────┘
 `.trimStart()
 
-export const tezosClientError =
-` 
+export const tezosClientError = `
 Error:
   Erroneous command line argument 6 (hello).
   Invalid primitive.
   Unknown primitive hello.
 
 
-`
+`.trimStart()
