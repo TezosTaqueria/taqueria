@@ -27,7 +27,7 @@
     "simulate"
   ],
   "engines": {
-    "node": ">=14.5"
+    "node": ">=16"
   },
   "author": "ECAD Labs",
   "license": "Apache-2.0",

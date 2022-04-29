@@ -242,8 +242,13 @@ describe("E2E Testing for taqueria flextesa plugin",  () => {
 // TODO: to be moved into a different spec file when the tezos-client plugin no longer depends on the flextesa plugin.
 // If I move it now, testing won't work.
 // Starting docker in e2e/auto-test-flextesa-plugin and then e2e/auto-test-tezos-client-plugin won't work
-// because Jest parallelizes test runs across spec files it seems.
-// The volumes end up being different, and so the tests below will complain that files don't exist.
+// One solution is to have an extra parameter for the container name (docker run --name <the name>) when starting one. 
+// Right now it's "hardcoded" (in a sense) to be the same as the sandbox name.
+// This might fix the problem because, right now, when we test flextesa and tezos-client at the same time
+// (assuming we moved all tezos-client tests to its own spec file), it will start the container for flextesa.spec,
+// but then it will attempt to start another container for tezos-client.spec in parallel, which would be a "no-op"
+// since a container is already running. However, this container was started using a volume associated with the e2e/auto-test-flextesa-plugin.
+// As a result, when running tests in tezos-client.spec, it will complain that files don't exist.
 describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-client plugin", () => {
 
     beforeAll(async () => {

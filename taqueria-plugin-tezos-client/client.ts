@@ -139,25 +139,24 @@ const typecheckTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T
 
 //////////// Simulate task ////////////
 
-const getStorageFromConfig = (opts: Opts, sourceFile: string) : string|undefined => {
+const getStorageFromConfig = (opts: Opts, sourceFile: string) => {
     const config = opts.config
     const defaultEnv = config.environment.default
     const storages = config.environment[defaultEnv].storage
     const storageValue = storages[sourceFile]
-    return storageValue ? storageValue as string : undefined
+    return storageValue
 }
 
 const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourceFile: string, sourcePath: string) => {
-    let storage: string|undefined
+    let storage
     if (opts.storage) {
-        if (typeof opts.storage === 'string') storage = opts.storage as string
-        else storage = `${opts.storage}`
+        storage = opts.storage
     } else {
         storage = getStorageFromConfig(opts, sourceFile)
         if (!storage) throw new Error('Error: Please specify a non-empty storage value in the CLI or in the config file.')
     }
-
-    let input: string = opts.input && typeof opts.input === 'string' ? opts.input as string : `${opts.input}`
+    storage = typeof storage === 'string' ? storage : `${storage}`
+    let input = opts.input && typeof opts.input === 'string' ? opts.input : `${opts.input}`
 
     // If the string contains escaped double quotes, escape them further
     storage = storage.replace(/\\"/g, '\\\\\\"')
@@ -167,7 +166,7 @@ const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourceFile: string, so
     storage = storage.match(/^".*"$/) ? "\\" + storage.slice(0, -1) + "\\\"" : storage
     input = input.match(/^".*"$/) ? "\\" + input.slice(0, -1) + "\\\"" : input
 
-    // TODO: maybe validate storage and input value before passing it to tezos-client to prevent tezos-client menu being displayed?
+    // TODO: maybe validate storage and input value before passing it to tezos-client to prevent tezos-client menu being displayed? Alternatively, just perform trimming.
 
     const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage \'${storage}\' and input \'${input}\'`
     return cmd
