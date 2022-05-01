@@ -116,7 +116,7 @@ Deno.test({ignore: true, name: "Negative scenario test for {writeTextFile} funct
 
 Deno.test({name: "Positive scenario test for {isTaqError} function",  fn: () => {
         const assert = chai.assert;
-        const taqErrorTest : TaqError = {
+        const taqErrorTest : TaqError.t = {
             kind: "E_FORK",
             msg: "Test"
         };
@@ -202,7 +202,7 @@ Deno.test("execText() can execute in a different working directory", async () =>
     stdOut.clear()
     stdErr.clear()
 
-    const retval = await toPromise ( execText("pwd", {}, false, SanitizedAbsPath.create("/tmp") ) )
+    const retval = await toPromise ( execText("pwd", {}, false, SanitizedAbsPath.make("/tmp") ) )
     assertEquals(retval, 0)
     assert(stdout.toString().includes('tmp'))
     assertEquals(stderr.toString(), "")    

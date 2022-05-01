@@ -1,14 +1,14 @@
-import type {InstalledPlugin, ConfigArgs, Alias, Option, PositionalArg, PluginAction, PluginJsonResponse, PluginResponse} from './taqueria-protocol/taqueria-protocol-types.ts'
-import {Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
+import type {InstalledPlugin, Option, PositionalArg, PluginAction, PluginJsonResponse, PluginResponse} from './taqueria-protocol/taqueria-protocol-types.ts'
+import {EphemeralState, Task, PluginInfo, Url} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {EnvKey, EnvVars, DenoArgs, RawInitArgs, SanitizedInitArgs, i18n, InstallPluginArgs, UninstallPluginArgs, CLIConfig} from './taqueria-types.ts'
-import {State} from './taqueria-types.ts'
+import {LoadedConfig} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts'
 import {map, chain, bichain, attemptP, mapRej, resolve, reject, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import * as utils from './taqueria-utils/taqueria-utils.ts'
-import {SanitizedAbsPath, SanitizedPath, SanitizedUrl, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
+import {SanitizedAbsPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case@2.1.1/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
@@ -23,7 +23,7 @@ const {
     mkdir,
     readJsonFile,
     writeTextFile,
-    ensurePathDoesNotExist,
+    doesPathNotExist,
     gitClone,
     rm,
     log,
@@ -37,7 +37,9 @@ const {
 // Add alias
 const exec = execText
 
-type SendPluginActionRequest = (plugin: InstalledPlugin) => (action: PluginAction) => (requestArgs: Record<string, unknown>) => Future<TaqError, PluginResponse>
+type SendPluginActionRequest = (plugin: InstalledPlugin.t) => (action: PluginAction) => (requestArgs: Record<string, unknown>) => Future.t<TaqError.t, PluginResponse>
+
+type PluginLib = ReturnType<typeof inject>
 
 /**
  * Parsing arguments is done in two different stages.
@@ -58,7 +60,7 @@ const getFromEnv = <T>(key: EnvKey, defaultValue:T, env: EnvVars) =>
     env.get(key) || defaultValue
 
 
-const getVersion = (inputArgs: DenoArgs, i18n: i18n) => {
+const getVersion = (inputArgs: DenoArgs, _i18n: i18n) => {
     const i = inputArgs.findIndex(str => str === '--setVersion')
     return i > -1
         ? inputArgs[i+1]
@@ -121,10 +123,6 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         describe: i18n.__('initPathDesc')
     })
     .hide('projectDir')
-    .option('configDir', {
-        default: getFromEnv("TAQ_CONFIG_DIR", "./.taq", env),
-        describe: i18n.__('configDirDesc')
-    })
     .option('e', {
         alias: 'env',
         describe: i18n.__('envDesc')
@@ -142,8 +140,8 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n) =>
         },
         (args: RawInitArgs) => pipe(
             sanitizeArgs(args), 
-            ({projectDir, configDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
-                return initProject(projectDir, configDir, i18n, maxConcurrency, quickstart)
+            ({projectDir, maxConcurrency, quickstart}: SanitizedInitArgs) => {
+                return initProject(projectDir, i18n, maxConcurrency, quickstart)
             },
             forkCatch (console.error) (console.error) (console.log)
         )
@@ -204,7 +202,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         // TODO: This function assumes that there is only one type of plugin available to install,
         // a plugin distributed and installable via NPM. This should support other means of distribution
         (inputArgs: InstallPluginArgs) => pipe(
-            NPM.installPlugin(parsedArgs.configDir, parsedArgs.projectDir, i18n, inputArgs.pluginName),
+            NPM.installPlugin(parsedArgs.projectDir, i18n, inputArgs.pluginName),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
@@ -220,7 +218,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             })
         },
         (inputArgs: UninstallPluginArgs) => pipe(
-            NPM.uninstallPlugin(parsedArgs.configDir, parsedArgs.projectDir, i18n, inputArgs.pluginName),
+            NPM.uninstallPlugin(parsedArgs.projectDir, i18n, inputArgs.pluginName),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
@@ -230,7 +228,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         false, // hide
         () => {},
         (inputArgs: UninstallPluginArgs) => pipe(
-            listKnownTasks(cliConfig, parsedArgs) (inputArgs),
+            listKnownTasks(parsedArgs) (inputArgs),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
         )
     )
@@ -238,9 +236,9 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
     extendCLI(env, parsedArgs, i18n)
 )
 
-const parseArgs = (cliConfig: CLIConfig) : Future<TaqError, RawInitArgs> => pipe(
+const parseArgs = (cliConfig: CLIConfig) : Future.t<TaqError.t, RawInitArgs> => pipe(
     attemptP<Error, RawInitArgs>(() => cliConfig.parseAsync().then((rawInitArgs: unknown) => rawInitArgs as RawInitArgs)),
-    mapRej<Error, TaqError>(previous => ({
+    mapRej<Error, TaqError.t>(previous => ({
         kind: 'E_INVALID_ARGS',
         msg: "Invalid arguments were provided and could not be parsed",
         context: cliConfig,
@@ -248,13 +246,13 @@ const parseArgs = (cliConfig: CLIConfig) : Future<TaqError, RawInitArgs> => pipe
     }))
 )
 
-const listKnownTasks = (cliConfig: CLIConfig, parsedArgs: SanitizedInitArgs) => (_inputArgs: RawInitArgs) => pipe(
-    parsedArgs.projectDir.join(parsedArgs.configDir.value, 'state.json').value,
-    stateAbsPath => readJsonFile<State>(stateAbsPath), // TypeScript won't allow pointfree here
+const listKnownTasks = (parsedArgs: SanitizedInitArgs) => (_inputArgs: RawInitArgs) => pipe(
+    joinPaths(parsedArgs.projectDir, 'state.json'),
+    stateAbsPath => readJsonFile<EphemeralState.t>(stateAbsPath), // TypeScript won't allow pointfree here
     map (state => Object.entries(state.tasks).reduce(
         (retval, [taskName, implementation]) => {
             if ('task' in implementation) {
-                const task = implementation as Task
+                const task = implementation as Task.t
                 const plugins = 
                     task.options
                         ? task.options.reduce(
@@ -280,19 +278,18 @@ const listKnownTasks = (cliConfig: CLIConfig, parsedArgs: SanitizedInitArgs) => 
     map (JSON.stringify)
 )
 
-const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
-    getConfig(projectDir, configDir, i18n, true),
-    chain (({artifactsDir, contractsDir, testsDir, projectDir}: ConfigArgs) => {
-        const
-            artifactsAbspath = joinPaths(projectDir.value, artifactsDir),
-            contractsAbspath = joinPaths(projectDir.value, contractsDir),
-            testsAbspath = joinPaths(projectDir.value, testsDir)
-        
-        return parallel (maxConcurrency) ([mkdir(artifactsAbspath), mkdir(contractsAbspath), mkdir(testsAbspath)])        
+const initProject = (projectDir: SanitizedAbsPath.t, i18n: i18n, maxConcurrency: number, quickstart: string) => pipe(
+    getConfig(projectDir, i18n, true),
+    chain (({artifactsDir, contractsDir, testsDir, projectDir, operationsDir}: LoadedConfig.t) => {
+        const jobs = [operationsDir, artifactsDir, contractsDir, testsDir].reduce(
+            (retval, abspath) => abspath ? [...retval, mkdir(joinPaths(projectDir, abspath))] : retval,
+            [] as Future.t<TaqError.TaqError, string>[]
+        )
+        return parallel (maxConcurrency) (jobs)
     }),
     chain (_ => quickstart.length > 0
-        ? writeTextFile (joinPaths(projectDir.value, "quickstart.md")) (quickstart)
-        : resolve(projectDir.value)
+        ? writeTextFile (joinPaths(projectDir, "quickstart.md")) (quickstart)
+        : resolve(projectDir)
     ),
     map (_ => i18n.__("bootstrapMsg"))
 )
@@ -300,8 +297,8 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
 const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: SanitizedInitArgs) => pipe(
     // TODO: i18n of messages
     // Clone git into destination folder (Initial version assumes git is installed)
-    log(`scaffolding\n into: ${scaffoldProjectDir.value}\n from: ${scaffoldUrl}`),
-    _ => ensurePathDoesNotExist(scaffoldProjectDir.value),
+    log(`scaffolding\n into: ${scaffoldProjectDir}\n from: ${scaffoldUrl}`),
+    _ => doesPathNotExist(scaffoldProjectDir),
     chain(gitClone(scaffoldUrl)),
     // TODO: Run initialization script
     // Run init found in .taq/scaffold.json
@@ -309,36 +306,83 @@ const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: Sani
     // Load .taq/scaffold.json (if it exists)
     // Run init command
     map(_ => log(`Cleanup...`)),
-    chain(_ => rm(scaffoldProjectDir.join(`.taq/scaffold.json`))),
-    bichain<TaqError,TaqError,SanitizedAbsPath>
+    chain(_ => rm(SanitizedAbsPath.make(`${scaffoldProjectDir}/.taq/scaffold.json`))),
+    bichain<TaqError.t,TaqError.t,SanitizedAbsPath.t>
         (err => err.kind === 'E_INVALID_PATH_DOES_NOT_EXIST' ? resolve(scaffoldProjectDir) : reject(err))
         (resolve),
-    chain(_ => rm(scaffoldProjectDir.join(`.git`))),
-    chain(_ => rm(scaffoldProjectDir.join(`.gitignore`))),
-    bichain<TaqError,TaqError,SanitizedAbsPath>
+    chain(_ => rm(SanitizedAbsPath.make(`${scaffoldProjectDir}/.git`))),
+    chain(_ => rm(SanitizedAbsPath.make(`${scaffoldProjectDir}/.gitignore`))),
+    bichain<TaqError.t,TaqError.t,SanitizedAbsPath.t>
         (err => err.kind === 'E_INVALID_PATH_DOES_NOT_EXIST' ? resolve(scaffoldProjectDir) : reject(err))
         (resolve),
     chain(_ => exec("npm install", {}, false, scaffoldProjectDir)),
     map(_ => i18n.__("scaffoldDoneMsg"))
 )
 
-const getCanonicalTask = (pluginName: string, taskName: string, state: State) => state.plugins.reduce(
-    (retval: Task|undefined, pluginInfo: PluginInfo) => 
+const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) => state.plugins.reduce(
+    (retval: Task.t|undefined, pluginInfo: PluginInfo.t) => 
         pluginInfo.name === pluginName
-            ? pluginInfo.tasks.find((task: Task) => task.task.value === taskName)
+            ? pluginInfo.tasks.find((task: Task.t) => task.task === taskName)
             : retval
     ,
     undefined
 )
 
-const loadState = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, state: State, sendPluginActionRequest: SendPluginActionRequest): CLIConfig =>
+const addOperations = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, parsedArgs: SanitizedInitArgs, _i18n: i18n, _state: EphemeralState.t, _pluginLib: PluginLib) => 
+    cliConfig.command(
+        'new op <operation> [..operation args]',
+        'Create an operation to manipulate project state',
+        (yargs: CLIConfig) => {
+            console.log("Configuring op")
+            yargs.positional('operation', {
+                describe: 'The name of the operation to create', 
+                required: true,
+                type: 'string'
+            })
+            if (parsedArgs._.includes('originate')) {
+                yargs
+                    .option('storage', {
+                        required: true,
+                        group: 'originate'
+                    })
+                    .positional('sourceFile', {
+                        describe: 'Name of source file to originate',
+                        required: true,
+                        group: 'originate'
+                    })
+            }
+        },
+        (argv: Arguments) => {
+            console.log("Create op!")
+            console.log(argv)
+            Deno.exit(10)
+        }
+    ).alias('create-op', 'new op')
+
+const addTemplates = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, _parsedArgs: SanitizedInitArgs, _i18n: i18n, _state: EphemeralState.t, _pluginLib: PluginLib) => 
+    cliConfig.command(
+        'create <template>',
+        'Create an entity from a pre-existing template',
+        () => {
+            console.log("Configuring create template!")
+        },
+        () => {
+            console.log("Create template!")
+            Deno.exit(10)
+        }
+    )
+    .alias('create-tmpl', 'create')
+    .alias('create-template', 'create')
+    
+
+const addTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, state: EphemeralState.t, pluginLib: PluginLib) => 
     Object.entries(state.tasks).reduce(
-        (retval: CLIConfig, pair: [string, InstalledPlugin|Task]) => {
+        (retval: CLIConfig, pair: [string, InstalledPlugin.t|Task.t]) => {
             const [taskName, implementation] = pair
 
             // Composite task...
             if ('task' in implementation) {
-                const task: Task = implementation
+                const task: Task.t = implementation
 
                 // For composite tasks, we do one of two things:
                 // 1)   If no --plugin argument was specified, we then add a task
@@ -359,34 +403,34 @@ const loadState = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parse
                             parsedArgs,
                             i18n,
                             canonicalTask,
-                            sendPluginActionRequest,
-                            config.plugins.find((found: InstalledPlugin) => found.name === parsedArgs.plugin)
+                            pluginLib.sendPluginActionRequest,
+                            config.plugins?.find((found: InstalledPlugin.t) => found.name === parsedArgs.plugin)
                         )
                         : retval
                 }
 
                 // No plugin provider was specified (path #1)
-                return addTask(retval, config, env, parsedArgs, i18n, task, sendPluginActionRequest)
+                return addTask(retval, config, env, parsedArgs, i18n, task, pluginLib.sendPluginActionRequest)
             }
 
             // Canonical task...
             const foundTask = getCanonicalTask(implementation.name, taskName, state)
-            return foundTask ? addTask(retval, config, env, parsedArgs, i18n, foundTask, sendPluginActionRequest, implementation) : retval
+            return foundTask ? addTask(retval, config, env, parsedArgs, i18n, foundTask, pluginLib.sendPluginActionRequest, implementation) : retval
         },
         cliConfig
     )
 
-const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, task: Task, sendPluginActionRequest: SendPluginActionRequest, plugin?: InstalledPlugin) => pipe(
+const addTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, parsedArgs: SanitizedInitArgs, _i18n: i18n, task: Task.t, sendPluginActionRequest: SendPluginActionRequest, plugin?: InstalledPlugin.t) => pipe(
     cliConfig.command({
-        command: task.command.value,
-        aliases: task.aliases.map((alias: Alias) => alias.value),
+        command: task.command,
+        aliases: task.aliases,
         description: task.description,
         example: task.example,
         builder: (cliConfig: CLIConfig) => {
             if (task.options) task.options.reduce(
-                (cli: CLIConfig, option: Option) => {
+                (cli: CLIConfig, option: Option.t) => {
                     const optionSettings: Record<string, unknown> = {
-                        alias: option.shortFlag ? option.shortFlag.value : undefined,
+                        alias: option.shortFlag ? option.shortFlag : undefined,
                         default: option.defaultValue,
                         demandOption: option.required,
                         describe: option.description
@@ -394,20 +438,20 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
 
                     if (option.choices && option.choices.length) optionSettings.choices = option.choices
                     if (option.boolean) optionSettings['boolean'] = true
-                    return cli.option(option.flag.value, optionSettings)
+                    return cli.option(option.flag, optionSettings)
                 },
                 cliConfig
             )
 
             if (task.positionals) task.positionals.reduce(
-                (cli: CLIConfig, positional: PositionalArg) => {
+                (cli: CLIConfig, positional: PositionalArg.t) => {
                     const positionalSettings = {
                         describe: positional.description,
                         type: positional.type,
                         default: positional.defaultValue,
                     }
 
-                    return cli.positional(positional.placeholder.value, positionalSettings)
+                    return cli.positional(positional.placeholder, positionalSettings)
                 },
                 cliConfig
             )
@@ -421,14 +465,14 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
             
             const handler = task.handler === 'proxy' && plugin
                 ? pipe(
-                    sendPluginActionRequest (plugin) (task) ({...inputArgs, task: task.task.value}),
+                    sendPluginActionRequest (plugin) (task) ({...inputArgs, task: task.task}),
                     map (res => {
                         const decoded = res as PluginJsonResponse | void
                         if (decoded) return renderPluginJsonRes(decoded)
                     })
                 )
                 : pipe(
-                    exec(task.handler, {...parsedArgs, ...inputArgs}, ['json', 'application/json'].includes(task.encoding)),
+                    exec(task.handler, {...parsedArgs, ...inputArgs}, ['json', 'application/json'].includes(task.encoding ?? 'none')),
                     map((res: string|number) => {
                         if (typeof(res) === 'string') {
                             return renderPluginJsonRes(JSON.parse(res))
@@ -439,6 +483,12 @@ const addTask = (cliConfig: CLIConfig, config: ConfigArgs, env: EnvVars, parsedA
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (identity) (handler)
         }
     })
+)
+
+const loadState = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n, state: EphemeralState.t, pluginLib: PluginLib): CLIConfig =>
+[addTasks, addOperations, addTemplates].reduce(
+    (cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
+    cliConfig
 )
 
 const renderPluginJsonRes = (decoded: PluginJsonResponse) => {
@@ -482,13 +532,13 @@ const renderTable = (data: Record<string, string>[]) => {
         .render()
 }
 
-const resolvePluginName = (parsedArgs: SanitizedInitArgs, state: State) =>
+const resolvePluginName = (parsedArgs: SanitizedInitArgs, state: EphemeralState.t) =>
     !parsedArgs.plugin
         ? parsedArgs
         : {
             ...parsedArgs,
             plugin: state.plugins.reduce(
-                (retval, pluginInfo: PluginInfo) =>
+                (retval, pluginInfo: PluginInfo.t) =>
                     pluginInfo.alias === retval
                         ? pluginInfo.name
                         : retval,
@@ -499,8 +549,8 @@ const resolvePluginName = (parsedArgs: SanitizedInitArgs, state: State) =>
         
 
 const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (cliConfig: CLIConfig) => pipe(
-        getConfig(parsedArgs.projectDir, parsedArgs.configDir, i18n, false),
-        chain ((config: ConfigArgs) => {
+        getConfig(parsedArgs.projectDir, i18n, false),
+        chain ((config: LoadedConfig.t) => {
             const pluginLib = inject({
                 parsedArgs,
                 i18n,
@@ -512,9 +562,9 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedInitArgs, i18n: i18n) => (
 
             return pipe(
                 pluginLib.getState(),
-                map ((state: State) => pipe(
+                map ((state: EphemeralState.t) => pipe(
                     resolvePluginName(parsedArgs, state),
-                    (parsedArgs: SanitizedInitArgs) => loadState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib.sendPluginActionRequest)
+                    (parsedArgs: SanitizedInitArgs) => loadState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib)
                 ))
             )
         }),
@@ -548,6 +598,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                 cliConfig,
                 parseArgs,
                 map (sanitizeArgs),
+                map (logInput("Sanitized Args: ")),
                 chain (initArgs => {
                     if (initArgs.debug) debugMode(true)
 
@@ -580,11 +631,11 @@ export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedInitArg
     if (executingBuiltInTask(parsedArgs) || cli.handled) {
         return parsedArgs
     }
-    const err: TaqError = {kind: 'E_INVALID_TASK', msg: `Taqueria isn't aware of this task. Perhaps you need to install a plugin first?`, context: parsedArgs}
+    const err: TaqError.t = {kind: 'E_INVALID_TASK', msg: `Taqueria isn't aware of this task. Perhaps you need to install a plugin first?`, context: parsedArgs}
     return displayError (cli) (err)
 }
 
-export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
+export const displayError = (cli:CLIConfig) => (err: Error|TaqError.t) => {
     const inputArgs = (cli.parsed as unknown as {argv: RawInitArgs}).argv
     
     if (!inputArgs.fromVsCode) {
@@ -615,10 +666,16 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError) => {
     }
 }
 
+const sanitizeCmd = (cmd: string[]) => {
+    if (cmd.length > 1 && cmd[0] === 'create' && (['op', 'operation'].includes(cmd[1]))) {
+        return ['create-op']
+    }
+    return cmd
+}
+
 const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
-    _: parsedArgs._,
-    configDir: SanitizedPath.create(parsedArgs.configDir),
-    projectDir: SanitizedAbsPath.create(parsedArgs.projectDir),
+    _: sanitizeCmd(parsedArgs._),
+    projectDir: SanitizedAbsPath.make(parsedArgs.projectDir),
     maxConcurrency: parsedArgs.maxConcurrency <= 0 ? getDefaultMaxConcurrency() : parsedArgs.maxConcurrency,
     debug: parsedArgs.debug,
     plugin: parsedArgs.plugin,
@@ -631,9 +688,10 @@ const sanitizeArgs = (parsedArgs: RawInitArgs) : SanitizedInitArgs => ({
     setVersion: parsedArgs.setVersion,
     version: parsedArgs.version ?? false ,
     build: parsedArgs.build ?? false,
-    scaffoldUrl: SanitizedUrl.create(parsedArgs.scaffoldUrl ? parsedArgs.scaffoldUrl : ''),
-    scaffoldProjectDir: SanitizedAbsPath.create(parsedArgs.scaffoldProjectDir ? parsedArgs.scaffoldProjectDir : ''),
-    help: parsedArgs.help ?? false
+    scaffoldUrl: Url.make(parsedArgs.scaffoldUrl ? parsedArgs.scaffoldUrl : ''),
+    scaffoldProjectDir: SanitizedAbsPath.make(parsedArgs.scaffoldProjectDir ? parsedArgs.scaffoldProjectDir : ''),
+    help: parsedArgs.help ?? false,
+    template: parsedArgs.template
 })
 
 export default {
