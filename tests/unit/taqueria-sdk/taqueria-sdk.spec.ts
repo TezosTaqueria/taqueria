@@ -1,11 +1,11 @@
 import {getArch, readJsonFile, writeJsonFile} from "@taqueria/node-sdk";
 import * as fs from "fs";
 
-describe("Integration tests using taqueria-mock-plugin", () => {
+const jsonObject = {
+    "testkey": "testvalue"
+}
 
-    const jsonObject = {
-        "testkey": "testvalue"
-    }
+describe("Integration tests using taqueria-mock-plugin", () => {
 
     test('Verify that writeJsonFile can write json data to a file', async () => {
         const filePath = ".\/unit\/taqueria-sdk\/data\/writeJsonFileTest.json";
