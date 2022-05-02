@@ -1,7 +1,6 @@
 import {getArch, readJsonFile, writeJsonFile} from "@taqueria/node-sdk";
 import * as fs from "fs";
 
-
 const jsonObject = {
     "testkey": "testvalue"
 }
