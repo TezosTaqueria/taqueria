@@ -20,9 +20,9 @@ export default {
   collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  collectCoverageFrom: [
-      "<rootDir>/unit/taqueria-sdk/*.{js,jsx,ts,tsx}"
-  ],
+  // collectCoverageFrom: [
+  //     "<rootDir>/unit/taqueria-sdk/*.{js,jsx,ts,tsx}"
+  // ],
 
   // The directory where Jest should output its coverage files
   coverageDirectory: "coverage",
@@ -120,7 +120,7 @@ export default {
   // restoreMocks: false,
 
   // The root directory that Jest should scan for tests and modules within
-  rootDir: './../',
+  // rootDir: './../',
 
   // A list of paths to directories that Jest should use to search for files in
   // roots: [
@@ -178,7 +178,7 @@ export default {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  transform: {"^.+\\.(ts)$":"<rootDir>/tests/node_modules/ts-jest"},
+  transform: {"^.+\\.(ts)$":"./node_modules/ts-jest"},
 
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
