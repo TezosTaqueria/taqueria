@@ -3,11 +3,12 @@ import inject from "../../plugins.ts"
 import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 import * as Url from "@taqueria/protocol/Url"
-import * as InstalledPlugin from "../../taqueria-protocol/InstalledPlugin.ts"
+import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
 import {TaqError} from '../../taqueria-utils/taqueria-utils-types.ts'
 import {toPromise} from "../../taqueria-utils/taqueria-utils.ts"
 import { assertEquals, assert, assertRejects} from "https://deno.land/std@0.127.0/testing/asserts.ts";
-import {i18n} from '../../i18n.ts'
+import type {i18n} from '@taqueria/protocol/i18n'
+import loadI18n from '@taqueria/protocol/i18n'
 import {MockWriter} from "./helpers.ts"
 
 Deno.test('inject()', async (t) => {
@@ -35,6 +36,8 @@ Deno.test('inject()', async (t) => {
         SanitizedAbsPath.make(`${projectDir}/.taq`),
         defaultConfig
     ))
+
+    const i18n = await loadI18n()
 
     const deps = {
         config,
