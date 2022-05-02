@@ -1,11 +1,7 @@
-// @ts-ignore see above
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
-// @ts-ignore see above
-import * as Verb from './Verb.ts'
-// @ts-ignore see above
-import * as Command from './Command.ts'
-// @ts-ignore see above
-import * as Option from './Option.ts'
+import {z} from 'zod'
+import * as Verb from '@taqueria/protocol/Verb'
+import * as Command from '@taqueria/protocol/Command'
+import * as Option from '@taqueria/protocol/Option'
 
 type Handler = <T extends Record<string, unknown>>(parsedArgs: T) => string
 
@@ -27,6 +23,8 @@ export const schema = internalSchema.transform(val => val as Operation)
 const operationType: unique symbol = Symbol("Operation")
 
 type Input = z.infer<typeof internalSchema>
+
+export type RawInput = Input
 
 export type Operation = Input & {
     readonly [operationType]: void

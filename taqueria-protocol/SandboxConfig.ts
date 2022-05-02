@@ -1,16 +1,8 @@
-// TODO - using .ts is necessary for Deno. Explore how to make this
-// consumable by Deno or the TypeScript compiler without any warnings
-// or errors emited
-// @ts-ignore see above
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
-// @ts-ignore see above
-import * as HumanReadableIdentifier from "./HumanReadableIdentifier.ts"
-// @ts-ignore see above
-import * as Url from "../taqueria-utils/Url.ts"
-// @ts-ignore see above
-import * as EconomicalProtocolHash from "./EconomicalProtocolHash.ts"
-// @ts-ignore see above
-import * as SandboxAccountConfig from "./SandboxAccountConfig.ts"
+import {z} from 'zod'
+import * as HumanReadableIdentifier from "@taqueria/protocol/HumanReadableIdentifier"
+import * as Url from "@taqueria/protocol/Url"
+import * as EconomicalProtocolHash from "@taqueria/protocol/EconomicalProtocolHash"
+import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
 
 const accountMapSchema = z.union([
     z.object({default: z.string().nonempty()}),

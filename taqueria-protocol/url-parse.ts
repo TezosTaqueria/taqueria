@@ -1,5 +1,4 @@
-// @ts-ignore
-import { urlJoin } from "./url-join.ts"
+import { urlJoin } from "@taqueria/protocol/url-join"
 
 export interface IUrlParams {
   key: string;

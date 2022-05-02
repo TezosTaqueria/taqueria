@@ -1,11 +1,14 @@
-import {Config, Task, InstalledPlugin} from './taqueria-protocol/taqueria-protocol-types.ts'
+import * as Config from "@taqueria/protocol/Config"
+import * as Task from "@taqueria/protocol/Task"
+import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
+import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
+import * as SHA256 from "@taqueria/protocol/SHA256"
+import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
 import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
-import * as LoadedConfig from "./LoadedConfig.ts"
-import {i18n} from './taqueria-types.ts'
-import {SanitizedAbsPath, SHA256} from './taqueria-utils/taqueria-utils-types.ts'
+import type {i18n} from '@taqueria/protocol/i18n'
 import {readJsonFile, writeJsonFile, joinPaths, ensureDirExists} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {resolve, reject, map, chain, mapRej, chainRej, both} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import {resolve, reject, attemptP, map, chain, mapRej, chainRej, both} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 
 export type AddTaskCallback = (task: Task.t, plugin: InstalledPlugin.t, handler: (taskArgs: Record<string, unknown>) => Promise<number>) => unknown
 
@@ -74,7 +77,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath.t, create=false) => pi
 
 
 export const toLoadedConfig = (configPath: string, projectDir: SanitizedAbsPath.t, config: Config.t): Future.t<TaqError.t, LoadedConfig.t> => pipe(
-    SHA256.futureOf(JSON.stringify(config)),
+    attemptP<TaqError.t, SHA256.t>(() => SHA256.of(JSON.stringify(config))),
     map(hash => LoadedConfig.make({
         ...config,
         configFile: SanitizedAbsPath.make(configPath),

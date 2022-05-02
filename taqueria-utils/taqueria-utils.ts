@@ -1,5 +1,6 @@
-import {Future, TaqError, SanitizedAbsPath, UtilsDependencies} from './taqueria-utils-types.ts'
-import * as Url from "./Url.ts"
+import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath'
+import * as Url from '@taqueria/protocol/Url'
+import {Future, TaqError, UtilsDependencies} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {chain, attemptP, map, reject, resolve, mapRej, promise} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'

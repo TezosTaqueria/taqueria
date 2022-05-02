@@ -1,16 +1,12 @@
-// @ts-ignore see above
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
-// @ts-ignore see above
-import * as Alias from "./Alias.ts"
-// @ts-ignore see above
-import * as VersionNumber from './VersionNumber.ts'
-// @ts-ignore see above
-import * as Task from './Task.ts'
-// @ts-ignore see above
-import * as Operation from './Operation.ts'
+import {z} from 'zod'
+
+import * as Alias from "@taqueria/protocol/Alias"
+import * as VersionNumber from "@taqueria/protocol/VersionNumber"
+import * as Task from '@taqueria/protocol/Task'
+import * as Operation from '@taqueria/protocol/Operation'
 
 const internalSchema = z.object({
-    name: z.string(),
+    name: z.string().nonempty(),
     schema: VersionNumber.schema,
     version: VersionNumber.schema,
     alias: Alias.schema,
@@ -18,20 +14,31 @@ const internalSchema = z.object({
     operations: z.array(Operation.schema).default([])
 })
 
-export const schema = internalSchema.transform(val => val as t)
+export const rawSchema = z.object({
+    name: z.string().nonempty(),
+    schema: VersionNumber.rawSchema,
+    version: VersionNumber.rawSchema,
+    alias: Alias.rawSchema,
+    tasks: z.array(Task.schema).default([]),
+    operations: z.array(Operation.schema).default([])
+})
 
 const pluginInfoType: unique symbol = Symbol("PluginInfo")
 
 type Input = z.infer<typeof internalSchema>
 
-export type t = Input & {
+export type RawInput = z.infer<typeof rawSchema>
+
+export type PluginInfo = Input & {
     readonly [pluginInfoType]: void
     readonly tasks: Task.t[]
     readonly operations: Operation.t[]
 }
 
-export type PluginInfo = t
+export type t = PluginInfo
+
+export const schema = internalSchema.transform((val: unknown) => val as PluginInfo)
 
 export const make = (data: Input) => schema.parse(data)
 
-export const from = (data: unknown) => schema.parse(data)
+export const create = (data: RawInput|unknown) => schema.parse(data)

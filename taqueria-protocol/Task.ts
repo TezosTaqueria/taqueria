@@ -1,15 +1,9 @@
-// @ts-ignore see above
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
-// @ts-ignore see above
-import * as Verb from './Verb.ts'
-// @ts-ignore see above
-import * as Command from './Command.ts'
-// @ts-ignore see above
-import * as SingleChar from './SingleChar.ts'
-// @ts-ignore see above
-import * as Option from './Option.ts'
-// @ts-ignore see above
-import * as PositionalArg from './PositionalArg.ts'
+import {z} from 'zod'
+import * as Verb from '@taqueria/protocol/Verb'
+import * as Command from '@taqueria/protocol/Command'
+import * as SingleChar from '@taqueria/protocol/SingleChar'
+import * as Option from '@taqueria/protocol/Option'
+import * as PositionalArg from '@taqueria/protocol/PositionalArg'
 
 const taskAliasSchema = z
     .union([Verb.schema, SingleChar.schema])
@@ -24,7 +18,7 @@ const taskEncodingSchema = z
     .default('none')
     .optional()
 
-const taskHandlerSchema = z.union([z.string(), z.array(z.string()), z.literal('proxy')])
+const taskHandlerSchema = z.union([z.literal('proxy'), z.string()])
 
 const internalSchema = z.object({
     task: Verb.schema,
@@ -52,19 +46,23 @@ export const rawSchema = z.object({
     positionals: z.array(PositionalArg.rawSchema).default([]).optional()
 })
 
-export const schema = internalSchema.transform(val => val as t)
+export const schema = internalSchema.transform(val => val as Task)
 
 const taskType: unique symbol = Symbol("Task")
 
-type Input = z.infer<typeof internalSchema>
+interface Input extends z.infer<typeof internalSchema> {
+    handler: "proxy" | string
+}
 
-type RawInput = z.infer<typeof rawSchema>
+interface RawInput extends z.infer<typeof rawSchema> {
+    handler: "proxy" | string
+}
 
-export type t = Input & {
+export type Task = Input & {
     readonly [taskType]: void
 }
 
-export type Task = t
+export type t = Task
 
 export const make = (data: Input) => schema.parse(data)
 export const create = (data: RawInput) => schema.parse(data)

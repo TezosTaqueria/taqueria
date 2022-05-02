@@ -1,26 +1,13 @@
-// TODO - using .ts is necessary for Deno. Explore how to make this
-// consumable by Deno or the TypeScript compiler without any warnings
-// or errors emited
-// @ts-ignore see above
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
-// @ts-ignore see above
-import * as Verb from "./Verb.ts"
-// @ts-ignore see above
-import * as InstalledPlugin from "./InstalledPlugin.ts"
-// @ts-ignore see above
-import * as Command from "./Command.ts"
-// @ts-ignore see above
-import * as Option from './Option.ts'
-// @ts-ignore see above
-import * as Task from './Task.ts'
-// @ts-ignore see above
-import * as Operation from './Operation.ts'
-// @ts-ignore see above
-import * as PluginInfo from './PluginInfo.ts'
-// @ts-ignore see above
-import * as Config from "./Config.ts"
-// @ts-ignore see above
-import type i18n from "./i18n.ts"
+import {z} from 'zod'
+import * as Verb from "@taqueria/protocol/Verb"
+import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
+import * as Command from "@taqueria/protocol/Command"
+import * as Option from '@taqueria/protocol/Option'
+import * as Task from '@taqueria/protocol/Task'
+import * as Operation from '@taqueria/protocol/Operation'
+import * as PluginInfo from '@taqueria/protocol/PluginInfo'
+import * as Config from "@taqueria/protocol/Config"
+import type {i18n} from "@taqueria/protocol/i18n"
 
 const taskToPluginMap = z.map(
     Verb.schema,
@@ -130,7 +117,7 @@ export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], 
                                     required: true
                                 })
                             ],
-                            handler: taskCounts[taskName]
+                            handler: "proxy"
                         })
                         if (compositeTask) retval.set(taskName, compositeTask)
                         return retval

@@ -1,9 +1,6 @@
-// @ts-ignore see above
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
-// @ts-ignore see above
-import * as Verb from './Verb.ts'
-// @ts-ignore see above
-import * as SingleChar from './SingleChar.ts'
+import {z} from 'zod'
+import * as Verb from '@taqueria/protocol/Verb'
+import * as SingleChar from '@taqueria/protocol/SingleChar'
 
 const internalSchema = z.object({
     shortFlag: SingleChar.schema.optional(),
@@ -31,7 +28,7 @@ const optionType: unique symbol = Symbol("Option")
 
 type Input = z.infer<typeof internalSchema>
 
-type RawInput = z.infer<typeof rawSchema>
+export type RawInput = z.infer<typeof rawSchema>
 
 export type t = Input & {
     readonly [optionType]: void

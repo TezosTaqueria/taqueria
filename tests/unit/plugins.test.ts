@@ -1,8 +1,10 @@
 import {defaultConfig, toLoadedConfig} from '../../taqueria-config.ts'
 import inject from "../../plugins.ts"
-import type {SanitizedInitArgs} from '../../taqueria-types.ts'
+import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
+import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
+import * as Url from "@taqueria/protocol/Url"
 import * as InstalledPlugin from "../../taqueria-protocol/InstalledPlugin.ts"
-import {SanitizedAbsPath, Url, TaqError} from '../../taqueria-utils/taqueria-utils-types.ts'
+import {TaqError} from '../../taqueria-utils/taqueria-utils-types.ts'
 import {toPromise} from "../../taqueria-utils/taqueria-utils.ts"
 import { assertEquals, assert, assertRejects} from "https://deno.land/std@0.127.0/testing/asserts.ts";
 import {i18n} from '../../i18n.ts'
@@ -11,7 +13,7 @@ import {MockWriter} from "./helpers.ts"
 Deno.test('inject()', async (t) => {
     const projectDir = SanitizedAbsPath.make("/tmp/test-project")
 
-    const sanitizedArgs : SanitizedInitArgs = {
+    const sanitizedArgs = SanitizedArgs.create({
         _: ["init"],
         build: false,
         debug: false,
@@ -22,13 +24,11 @@ Deno.test('inject()', async (t) => {
         maxConcurrency: 10,
         projectDir,
         quickstart: "Foo",
-        scaffoldProjectDir: SanitizedAbsPath.make("/tmp/scaffold-project"),
-        scaffoldUrl: Url.make("http://foo.bar"),
         setBuild: "foo/bar",
         setVersion: "1.0.0",
         version: false,
         help: false
-    }
+    })
 
     const config = await toPromise (toLoadedConfig(
         "config.json",
@@ -57,22 +57,22 @@ Deno.test('inject()', async (t) => {
         const result = toPluginArguments(requestArgs)
     
         assertEquals(result, [
+            "--projectDir",
+            "'/tmp/test-project'",
+            "--maxConcurrency",
+            10,
             "--debug",
             false,
             "--env",
             "'development'",
-            "--fromVsCode",
-            false,
             "--logPluginRequests",
             true,
-            "--maxConcurrency",
-            10,
-            "--projectDir",
-            "'/tmp/test-project'",
             "--setBuild",
             "'foo/bar'",
             "--setVersion",
             "'1.0.0'",
+            "--fromVsCode",
+            false,
             "--help",
             false,
             "--foo",

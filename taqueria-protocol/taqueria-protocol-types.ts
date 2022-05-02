@@ -1,40 +1,27 @@
-// TODO - using .ts is necessary for Deno. Explore how to make this
-// consumable by Deno or the TypeScript compiler without any warnings
-// or errors emited
-// @ts-ignore see above
-import {SanitizedAbsPath, SanitizedPath, SHA256, Url} from '../taqueria-utils/taqueria-utils-types.ts'
-// @ts-ignore see above
-import * as StringMax30 from './StringMax30.ts'
-// @ts-ignore see above
-import * as StringNoSpaces from './StringNoSpaces.ts'
-// @ts-ignore see above
-import * as Verb from "./Verb.ts"
-// @ts-ignore see above
-import * as EconomicalProtocolHash from './EconomicalProtocolHash.ts'
-// @ts-ignore see above
-import * as VersionNumber from './VersionNumber.ts'
-// @ts-ignore see above
-import * as HumanReadableIdentifier from './HumanReadableIdentifier.ts'
-// @ts-ignore see above
-import * as Alias from './Alias.ts'
-// @ts-ignore see above
-import * as PositionalArg from './PositionalArg.ts'
-// @ts-ignore see above
-import * as Option from './Option.ts'
-// @ts-ignore see above
-import * as Task from './Task.ts'
-// @ts-ignore see above
-import * as Operation from './Operation.ts'
-// @ts-ignore see above
-import * as InstalledPlugin from './InstalledPlugin.ts'
-// @ts-ignore see above
-import * as PluginInfo from './PluginInfo.ts'
-// @ts-ignore see above
-import * as Config from "./Config.ts"
-// @ts-ignore see above
-import * as Environment from "./Environment.ts"
-// @ts-ignore see above
-import * as EphemeralState from "./EphermalState.ts"
+import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath'
+import * as SanitizedPath from '@taqueria/protocol/SanitizedPath'
+import * as SHA256 from '@taqueria/protocol/SHA256'
+import * as Url from '@taqueria/protocol/Url'
+import * as StringMax30 from '@taqueria/protocol/StringMax30'
+import * as StringNoSpaces from '@taqueria/protocol/StringNoSpaces'
+import * as Verb from "@taqueria/protocol/Verb"
+import * as EconomicalProtocolHash from '@taqueria/protocol/EconomicalProtocolHash'
+import * as VersionNumber from '@taqueria/protocol/VersionNumber'
+import * as HumanReadableIdentifier from '@taqueria/protocol/HumanReadableIdentifier'
+import * as Alias from '@taqueria/protocol/Alias'
+import * as PositionalArg from "@taqueria/protocol/PositionalArg"
+import * as Option from '@taqueria/protocol/Option'
+import * as Task from '@taqueria/protocol/Task'
+import * as Operation from '@taqueria/protocol/Operation'
+import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin'
+import * as PluginInfo from '@taqueria/protocol/PluginInfo'
+import * as Config from "@taqueria/protocol/Config"
+import * as Environment from "@taqueria/protocol/Environment"
+import * as EphemeralState from "@taqueria/protocol/EphermalState"
+import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
+import * as RequestArgs from "@taqueria/protocol/RequestArgs"
+import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
+import * as i18n from "@taqueria/protocol/i18n"
 
 export {
     SanitizedPath,
@@ -56,7 +43,11 @@ export {
     InstalledPlugin,
     Config,
     Environment,
-    EphemeralState
+    EphemeralState,
+    SanitizedArgs,
+    RequestArgs,
+    LoadedConfig,
+    i18n
 }
 
 export interface RuntimeDependency {

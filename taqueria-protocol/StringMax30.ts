@@ -1,5 +1,4 @@
-// @ts-ignore see above
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
+import {z} from 'zod'
 
 const schema = z
     .string()

@@ -1,18 +1,9 @@
-// TODO - using .ts is necessary for Deno. Explore how to make this
-// consumable by Deno or the TypeScript compiler without any warnings
-// or errors emited
-// @ts-ignore see above
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
-// @ts-ignore see above
-import * as InstalledPlugin from './InstalledPlugin.ts'
-// @ts-ignore see above
-import * as NetworkConfig from './NetworkConfig.ts'
-// @ts-ignore see above
-import * as SandboxConfig from "./SandboxConfig.ts"
-// @ts-ignore see above
-import * as Environment from "./Environment.ts"
-// @ts-ignore see above
-import * as Tz from "./Tz.ts"
+import {z} from 'zod'
+import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin'
+import * as NetworkConfig from '@taqueria/protocol/NetworkConfig'
+import * as SandboxConfig from "@taqueria/protocol/SandboxConfig"
+import * as Environment from "@taqueria/protocol/Environment"
+import * as Tz from "@taqueria/protocol/Tz"
 
 const networkMap = z.record(
     z.union([

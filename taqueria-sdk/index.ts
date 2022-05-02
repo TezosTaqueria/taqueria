@@ -1,13 +1,21 @@
-import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol, PluginResponse} from '@taqueria/protocol/taqueria-protocol-types'
-import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView, StdIO} from "./types"
-import {join, resolve, dirname, parse} from 'path'
+import * as Protocol from '@taqueria/protocol/taqueria-protocol-types'
+import type {i18n} from "@taqueria/protocol/i18n"
+import load from "@taqueria/protocol/i18n"
+import {PluginResponse} from "@taqueria/protocol/taqueria-protocol-types"
+import * as RequestArgs from "@taqueria/protocol/RequestArgs"
+import * as PluginInfo from "@taqueria/protocol/PluginInfo"
+import type {Schema} from "./types"
+import {Args, pluginDefiner, LikeAPromise, Failure, StdIO} from "./types"
+import {join, dirname} from 'path'
 import {readFile, writeFile} from 'fs/promises'
 import {get} from 'stack-trace'
 import {exec, ExecException} from 'child_process'
+
 // @ts-ignore interop issue. Maybe find a different library later
 import generateName from 'project-name-generator'
-import {omit} from 'rambda'
-const yargs = require('yargs') // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
+
+// To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
+const yargs = require('yargs')
 
 export const writeJsonFile = <T>(filename: string) => (data: T): Promise<string> =>
     writeFile(filename, JSON.stringify(data, undefined, 4), {encoding: "utf8"})
@@ -47,7 +55,7 @@ export const getArch = () : LikeAPromise<string, Failure<string>> =>
     })
 
 
-export const parseJSON = (input: string) : LikeAPromise<Config, Failure<string>> => new Promise((resolve, reject) => {
+export const parseJSON = <T>(input: string) : LikeAPromise<T, Failure<string>> => new Promise((resolve, reject) => {
     try {
         const json = JSON.parse(input)
         resolve(json)
@@ -111,48 +119,10 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 
 export const noop = () => {}
 
-const parseConfig = (config:string|Record<string, unknown>) : Promise<Record<string, unknown>> => typeof config === 'string'
-    ? parseJSON(config)
-    : Promise.resolve(config)
-
-
-const sanitizeConfig = (config: Record<string, unknown>) : LikeAPromise<Config, Failure<Record<string, unknown>>> =>
-    typeof config.contractsDir === 'string' && typeof config.testsDir === 'string'
-        ? Promise.resolve(config as Config)
-        : Promise.reject({
-            errCode: "E_INVALID_ARGS",
-            errMsg: `Invalid config: ${JSON.stringify(config)}`,
-            context: config
-        })
-
-const sanitizeArgs = (parsedArgs: ParsedArgs) : Promise<SanitizedArgs> =>
-    parseConfig(parsedArgs.config)
-    .then(sanitizeConfig)
-    .then(config => {
-        const projectDir = resolve(parsedArgs.projectDir)
-        return ({
-            ...parsedArgs,
-            projectDir,
-            config,
-            contractsDir: join(projectDir, config.contractsDir),
-            testsDir: join(projectDir, config.testsDir),
-            artifactsDir: join(projectDir, config.artifactsDir),
-            build: '',
-            setBuild: parsedArgs.setBuild ?? '',
-            version: '',
-            setVersion: parsedArgs.setVersion ?? '',
-            maxConcurrency: parsedArgs.maxConcurrency ?? 10,
-            debug: parsedArgs.debug ?? false,
-            task: parsedArgs.task ? parsedArgs.task.trim() : ''
-        })
-    })
-
-const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefined>> => {
+const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, Failure<undefined>> => {
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
-        const argv = yargs(unparsedArgs.slice(2)).argv as unknown as ParsedArgs
-        if (argv.i18n && argv.taqRun && argv.projectDir && argv.configDir) {
-            return Promise.resolve(argv)
-        }
+        const argv = yargs(unparsedArgs.slice(2)).argv
+        return Promise.resolve(RequestArgs.make(argv))
     }
     return Promise.reject({
         errCode: "E_INVALID_ARGS",
@@ -161,72 +131,24 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefin
     })
 }
 
-const viewOption = ({shortFlag, flag, description, boolean, choices, defaultValue, required}: anOption): OptionView => ({
-    shortFlag: shortFlag ? shortFlag.value : undefined,
-    flag: flag.value,
-    description,
-    boolean: boolean,
-    choices: choices,
-    defaultValue: defaultValue,
-    required: required
-})
-
-const viewPositionalArg = ({placeholder, description, type, defaultValue}: aPositionalArg) : PositionalArgView => ({
-    placeholder: placeholder.value,
-    description,
-    type,
-    defaultValue
-})
-
-const viewTask = ({task, command, aliases, description, options, positionals, handler, encoding}: aTask|TaskLike): TaskView => ({
-    task: task.value,
-    command: command.value,
-    aliases: !aliases ? [] : aliases.reduce(
-        (retval: string[], alias: Alias|undefined) => alias ? [...retval, alias.value] : retval,
-        []
-    ),
-    description,
-    options: !options ? [] : options.reduce(
-        (retval: OptionView[], option: anOption | undefined) => option ? [...retval, viewOption(option)] : retval,
-        []
-    ),
-    positionals: !positionals ? [] : positionals.reduce(
-        (retval: PositionalArgView[], arg: aPositionalArg | undefined) => arg ? [...retval, viewPositionalArg(arg)] : retval,
-        []
-    ),
-    handler: handler === "proxy" ? "proxy" : handler,
-    encoding
-})   
-
-const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): SchemaView | undefined => {
+const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): Schema | undefined => {
     try {
-        const {name, alias, schema, version, tasks, scaffolds, hooks, networks, sandboxes, ...functions} = definer(i18n)
+        const inputSchema = definer(i18n)
 
         return {
-            name: name ? name : inferPluginName(),
-            alias,
-            schema,
-            version,
-            tasks: tasks
-                ? tasks.reduce(
-                    (retval: TaskView[], task) => task ? [...retval, viewTask(task)] : retval,
-                    []
-                )
-                : [],
-            hooks: [],
-            scaffolds: [],
-            networks: [],
-            sandboxes: [],
-            ...functions
+            ...inputSchema,
+            ...PluginInfo.create(inputSchema)
         }
     }
-    catch (_) {
+    catch (e) {
+        sendErr((e as Error).message)
         return undefined
     }
 }
 
-const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => (sanitzedArgs: SanitizedArgs): LikeAPromise<PluginResponse, Failure<[]>> => {
-    const {i18n, taqRun} = sanitzedArgs
+const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => async (requestArgs: RequestArgs.t) => {
+    const {taqRun} = requestArgs
+    const i18n = await load()
     const schema = parseSchema(i18n, definer, inferPluginName)
     if (schema) {
         try {
@@ -241,7 +163,7 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => (
                     return sendAsyncJson(output);
                 case "proxy":
                     if (schema.proxy) {
-                        const retval = schema.proxy(sanitzedArgs)
+                        const retval = schema.proxy(RequestArgs.createProxyArgs(requestArgs))
                         if (retval) return retval
                         return Promise.reject({
                             errCode: "E_PROXY",
@@ -251,26 +173,26 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => (
                     }
                     return Promise.reject({
                         errCode: 'E_NOT_SUPPORTED',
-                        message: i18n.proxyNotSupported,
-                        context: sanitizeArgs
+                        message: i18n.__('proxyNotSupported'),
+                        context: requestArgs
                     })
                 case "checkRuntimeDependencies":
                     return sendAsyncJson(
                         schema.checkRuntimeDependencies
-                            ? schema.checkRuntimeDependencies(i18n, sanitzedArgs)
+                            ? schema.checkRuntimeDependencies(i18n, requestArgs)
                             : Promise.resolve({report: []})
                     )
                 case "installRuntimeDependencies":
                     return sendAsyncJson(
                         schema.installRuntimeDependencies
-                            ? schema.installRuntimeDependencies(i18n, sanitzedArgs)
+                            ? schema.installRuntimeDependencies(i18n, requestArgs)
                             : Promise.resolve({report: []})
                     )
                 default:
                     return Promise.reject({
                         errCode: 'E_NOT_SUPPORTED',
-                        message: i18n.actionNotSupported,
-                        context: sanitizeArgs
+                        message: i18n.__('actionNotSupported'),
+                        context: requestArgs
                     })
             }
         }
@@ -284,7 +206,7 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => (
     }
     return Promise.reject({
         errCode: 'E_INVALID_SCHEMA',
-        message: i18n.invalidSchema
+        message: i18n.__('invalidSchema')
     })
 }
 
@@ -325,7 +247,6 @@ export const Plugin = {
     create: (definer: pluginDefiner, unparsedArgs: Args) => {
         const stack = get()
         return parseArgs(unparsedArgs)
-        .then(sanitizeArgs)
         .then(getResponse(definer, inferPluginName(stack)))
         .catch((err: unknown) => {
             if (err) console.error(err)
@@ -334,17 +255,4 @@ export const Plugin = {
     }
 }
 
-export const Task = aTask
-export const Option = anOption
-export const Network = aNetwork
-export const Sandbox = theSandbox
-export const EconomicalProtocol = anEconomicalProtocol
-export const PositionalArg = aPositionalArg
-export default {
-    Plugin,
-    Task,
-    Option,
-    Sandbox,
-    EconomicalProtocol,
-    PositionalArg,
-}
+export default Protocol

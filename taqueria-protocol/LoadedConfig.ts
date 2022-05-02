@@ -1,6 +1,7 @@
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
-import {Config} from './taqueria-protocol/taqueria-protocol-types.ts'
-import {SanitizedAbsPath, SHA256} from './taqueria-utils/taqueria-utils-types.ts'
+import {z} from 'zod'
+import * as Config from '@taqueria/protocol/Config'
+import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath'
+import * as SHA256 from '@taqueria/protocol/SHA256'
 
 export const rawSchema = Config.internalSchema.extend({
     projectDir: SanitizedAbsPath.rawSchema,

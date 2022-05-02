@@ -1,5 +1,7 @@
-import {LoadedConfig, i18n} from './taqueria-types.ts'
-import {SanitizedAbsPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
+import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
+import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
+import type {i18n} from "@taqueria/protocol/i18n"
+import {TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import * as utils from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {map, chain, chainRej, resolve, reject} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';

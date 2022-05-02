@@ -1,7 +1,5 @@
-// @ts-ignore see above
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
-// @ts-ignore see above
-import * as HumanReadableIdentifier from './HumanReadableIdentifier.ts'
+import {z} from 'zod'
+import * as HumanReadableIdentifier from '@taqueria/protocol/HumanReadableIdentifier'
 
 const internalSchema = z.object({
     placeholder: HumanReadableIdentifier.schema,
@@ -23,7 +21,7 @@ const postionalArgType: unique symbol = Symbol('PositionalArg')
 
 type Input = z.infer<typeof internalSchema>
 
-type RawInput = z.infer<typeof rawSchema>
+export type RawInput = z.infer<typeof rawSchema>
 
 export type t = Input & {
     readonly [postionalArgType]: void

@@ -1,4 +1,4 @@
-export const urlJoin = function (...args: any[]) {
+export const urlJoin = function (...args: string[]) {
     let input;
   
     if (typeof args[0] === 'object') {
@@ -66,7 +66,7 @@ export const urlJoin = function (...args: any[]) {
     str = str.replace(/\/(\?|&|#[^!])/g, '$1');
   
     // replace ? in parameters with &
-    let parts = str.split('?');
+    const parts = str.split('?');
     str = parts.shift() + (parts.length > 0 ? '?' : '') + parts.join('&');
   
     return str;

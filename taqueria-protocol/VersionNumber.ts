@@ -1,16 +1,20 @@
-// @ts-ignore see above
-import {z} from 'https://deno.land/x/zod@v3.14.4/mod.ts'
+import {z} from 'zod'
 
 const versionType: unique symbol = Symbol("VersionNumber")
 
-export const schema = z.string()
-    .regex(/^\d+\.\d+\d+$/)
-    .transform(val => val as t)
-
-export type t = string & {
+export type VersionNumber = string & {
     readonly [versionType]: void
 }
 
-export type VersionNumber = t
+export type t = VersionNumber
+
+export const rawSchema = z.string()
+    .regex(/^\d+\.\d+\d+$/)
+
+export const schema = rawSchema.transform((val: unknown) => val as VersionNumber)
 
 export const make = (value: string) => schema.parse(value)
+
+export default {
+    rawSchema
+}

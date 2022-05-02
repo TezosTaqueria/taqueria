@@ -1,11 +1,11 @@
 // First-party dependencies
 import type {InstalledPlugin, PluginAction, PluginResponse} from './taqueria-protocol/taqueria-protocol-types.ts'
-import {EphemeralState, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
-import type {SanitizedInitArgs, PluginRequestArgs, PluginDeps} from './taqueria-types.ts'
+import {EphemeralState, PluginInfo, SanitizedArgs} from './taqueria-protocol/taqueria-protocol-types.ts'
+import type {PluginRequestArgs, PluginDeps} from './taqueria-types.ts'
 import {LoadedConfig} from './taqueria-types.ts'
 import {TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import * as utils from './taqueria-utils/taqueria-utils.ts'
-import * as SanitizedAbsPath from "./taqueria-utils/SanitizedAbsPath.ts"
+import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 
 // Third-party dependencies
 import {map, chain, attemptP, chainRej, resolve, reject, parallel} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
@@ -162,7 +162,7 @@ export const inject = (deps: PluginDeps) => {
     const retrievePluginInfo = (plugin: InstalledPlugin.t) => pipe(
         sendPluginActionRequest (plugin) ("pluginInfo") ({}),
         chain (unvalidatedData => {
-            const pluginInfo = PluginInfo.from(unvalidatedData)
+            const pluginInfo = PluginInfo.create(unvalidatedData)
             return pluginInfo
                 ? resolve(pluginInfo)
                 : reject({
@@ -293,7 +293,7 @@ export const inject = (deps: PluginDeps) => {
         const mem : Record<string, EphemeralState.t> = {
         }
 
-        const toMemHash = (hash: string, parsedArgs: SanitizedInitArgs) =>
+        const toMemHash = (hash: string, parsedArgs: SanitizedArgs.t) =>
             JSON.stringify({hash, parsedArgs})
 
         return () => {
