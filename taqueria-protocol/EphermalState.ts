@@ -9,15 +9,13 @@ import * as PluginInfo from '@taqueria/protocol/PluginInfo'
 import * as Config from "@taqueria/protocol/Config"
 import type {i18n} from "@taqueria/protocol/i18n"
 
-const taskToPluginMap = z.map(
-    Verb.schema,
+const taskToPluginMap = z.record(
     z.union([
         InstalledPlugin.schema,
         Task.schema
     ])
 )
-const operationToPluginMap = z.map(
-    Verb.schema,
+const operationToPluginMap = z.record(
     z.union([
         InstalledPlugin.schema,
         Operation.schema
@@ -102,8 +100,7 @@ export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], 
                 // If this is a composite task, we'll construct
                 // a task which proxies to a canonical task
                 if (isCompositeTask(taskName)) {
-                    retval.has(taskName)
-                    if (!retval.has(taskName)) {
+                    if (!retval[taskName]) {
                         const compositeTask = Task.create({
                             task: taskName,
                             command: taskName,
@@ -119,7 +116,7 @@ export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], 
                             ],
                             handler: "proxy"
                         })
-                        if (compositeTask) retval.set(taskName, compositeTask)
+                        if (compositeTask) retval[taskName] = compositeTask
                         return retval
                     }
                     return retval
@@ -131,7 +128,7 @@ export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], 
                         (plugin: InstalledPlugin.t) => [`taqueria-plugin-${pluginInfo.name}`, pluginInfo.name].includes(plugin.name)
                     )
                     if (!installedPlugin) return retval // we should log that a problem occured here
-                    retval.set(taskName, installedPlugin)
+                    retval[taskName] = installedPlugin
                     return retval
                 }
             },
@@ -153,8 +150,7 @@ export const mapOperationsToPlugins = (config: Config.t, pluginInfo: PluginInfo.
                 // If this is a composite task, we'll construct
                 // a task which proxies to a canonical task
                 if (isCompositeOp(operationName)) {
-                    retval.has(operationName)
-                    if (!retval.has(operationName)) {
+                    if (!retval[operationName]) {
                         const compositeOp = Operation.make({
                             operation: operationName,
                             command: Command.make(operationName),
@@ -169,7 +165,7 @@ export const mapOperationsToPlugins = (config: Config.t, pluginInfo: PluginInfo.
                             ],
                             handler: () => ""
                         })
-                        if (compositeOp) retval.set(operationName, compositeOp)
+                        if (compositeOp) retval[operationName] = compositeOp
                         return retval
                     }
                     return retval
@@ -181,7 +177,7 @@ export const mapOperationsToPlugins = (config: Config.t, pluginInfo: PluginInfo.
                         (plugin: InstalledPlugin.t) => [`taqueria-plugin-${pluginInfo.name}`, pluginInfo.name].includes(plugin.name)
                     )
                     if (!installedPlugin) return retval // we should log that a problem occured here
-                    retval.set(operationName, installedPlugin)
+                    retval[operationName] = installedPlugin
                     return retval
                 }
             },

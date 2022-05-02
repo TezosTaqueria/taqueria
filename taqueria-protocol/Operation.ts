@@ -5,7 +5,7 @@ import * as Option from '@taqueria/protocol/Option'
 
 type Handler = <T extends Record<string, unknown>>(parsedArgs: T) => string
 
-const parsedArgs = z.map(z.string(), z.unknown())
+const parsedArgs = z.record(z.unknown())
 
 const internalSchema = z.object({
     operation: Verb.schema,

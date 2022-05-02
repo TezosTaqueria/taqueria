@@ -6,14 +6,14 @@ import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
 
 const accountMapSchema = z.union([
     z.object({default: z.string().nonempty()}),
-    z.map(z.string().nonempty(), SandboxAccountConfig.schema)
+    z.record(SandboxAccountConfig.schema)
 ])
 
 const internalSchema = z.object({
     label: HumanReadableIdentifier.schema,
     rpcUrl: Url.schema,
     protocol: EconomicalProtocolHash.schema,
-    attributes: z.map(z.string().nonempty(), z.union([z.string(), z.number(), z.boolean()])).optional(),
+    attributes: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
     accounts: accountMapSchema.optional()
 })
 
@@ -21,10 +21,10 @@ export const rawSchema = z.object({
     label: z.string().nonempty(),
     rpcUrl: z.string().nonempty().url(),
     protocol: z.string().nonempty(),
-    attributes: z.map(z.string().nonempty(), z.union([z.string(), z.number(), z.boolean()])).optional(),
+    attributes: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
     accounts: z.union([
         z.object({default: z.string().nonempty()}),
-        z.map(z.string().nonempty(), SandboxAccountConfig.rawSchema)
+        z.record(SandboxAccountConfig.rawSchema)
     ]).optional()
 })
 

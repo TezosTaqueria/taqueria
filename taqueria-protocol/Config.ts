@@ -26,7 +26,9 @@ const environmentMap = z.record(
     ])
 ).optional()
 
-const accountsMap = z.record(Tz.schema).optional()
+const accountsMap = z.record(
+    z.union([Tz.rawSchema, z.number()])
+)
 
 export const internalSchema = z.object({
     language: z.union([z.literal('en'), z.literal('fr')]).default('en').optional(),
@@ -38,7 +40,7 @@ export const internalSchema = z.object({
     network: networkMap,
     sandbox: sandboxMap,
     environment: environmentMap,
-    accountsMap
+    accounts: accountsMap
 })
 
 export const rawSchema = z.object({
