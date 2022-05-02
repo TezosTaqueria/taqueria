@@ -21,7 +21,7 @@ export default {
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
   collectCoverageFrom: [
-      "<rootDir>/taqueria-utils/*.{js,jsx,ts,tsx}"
+      "<rootDir>/unit/taqueria-sdk/*.{js,jsx,ts,tsx}"
   ],
 
   // The directory where Jest should output its coverage files
@@ -36,12 +36,12 @@ export default {
   coverageProvider: "v8",
 
   // A list of reporter names that Jest uses when writing coverage reports
-  // coverageReporters: [
-  //   "json",
-  //   "text",
-  //   "lcov",
-  //   "clover"
-  // ],
+  coverageReporters: [
+    "json",
+    "text",
+    "lcov",
+    "clover"
+  ],
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,
@@ -62,7 +62,11 @@ export default {
   // globalTeardown: undefined,
 
   // A set of global variables that need to be available in all test environments
-  // globals: {},
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.test.json'
+    }
+  },
 
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
   // maxWorkers: "50%",
@@ -150,7 +154,7 @@ export default {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    "**/unit/**/?(*.)+(spec|test).[tj]s?(x)"
+    "**/unit/**/?(*.)+(spec).[tj]s?(x)"
   ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
@@ -174,7 +178,7 @@ export default {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  transform: {"^.+\\.(ts|js)$":"<rootDir>/tests/node_modules/ts-jest"},
+  transform: {"^.+\\.(ts)$":"<rootDir>/tests/node_modules/ts-jest"},
 
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
