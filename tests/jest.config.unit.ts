@@ -14,15 +14,15 @@ export default {
   // cacheDirectory: "/private/var/folders/9r/5ywb4tg96ls8vxxcfbd2p50h0000gn/T/jest_dx",
 
   // Automatically clear mock calls, instances and results before every test
-  clearMocks: true,
+  // clearMocks: true,
 
   // Indicates whether the coverage information should be collected while executing the test
   collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  // collectCoverageFrom: [
-  //     "<rootDir>/unit/taqueria-sdk/*.{js,jsx,ts,tsx}"
-  // ],
+  collectCoverageFrom: [
+      "**/*.{js,jsx,ts,tsx}"
+  ],
 
   // The directory where Jest should output its coverage files
   coverageDirectory: "coverage",
@@ -33,7 +33,7 @@ export default {
   // ],
 
   // Indicates which provider should be used to instrument code for coverage
-  coverageProvider: "v8",
+  // coverageProvider: "v8",
 
   // A list of reporter names that Jest uses when writing coverage reports
   coverageReporters: [
@@ -99,7 +99,7 @@ export default {
   // notifyMode: "failure-change",
 
   // A preset that is used as a base for Jest's configuration
-  // preset: "<rootDir>/tests/node_modules/ts-jest/",
+  preset: 'ts-jest',
 
   // Run tests from one or more projects
   // projects: undefined,
@@ -120,13 +120,13 @@ export default {
   // restoreMocks: false,
 
   // The root directory that Jest should scan for tests and modules within
-  // rootDir: './../',
+  rootDir: './../',
 
   // A list of paths to directories that Jest should use to search for files in
-  // roots: [
-  //     "<rootDir>",
-  //     "<rootDir>/tests/"
-  // ],
+  roots: [
+      "<rootDir>/taqueria-sdk",
+      "<rootDir>/tests/unit/taqueria-sdk"
+  ],
 
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
@@ -178,7 +178,7 @@ export default {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  transform: {"^.+\\.(ts)$":"./node_modules/ts-jest"},
+  // transform: {"^.+\\.(ts)$":"<rootDir>/tests/node_modules/ts-jest"},
 
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation

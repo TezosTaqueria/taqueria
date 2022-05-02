@@ -7,7 +7,7 @@
   "scripts": {
     "test:unit": "deno test unit/ --allow-all --unstable && jest --config jest.config.unit.ts --no-cache",
     "test:unit:deno": "deno test unit/ --allow-all --unstable",
-    "test:unit:jest": "jest --config jest.config.unit.ts --no-cache",
+    "test:unit:jest": "jest --config jest.config.unit.ts --coverage --no-cache",
     "test:unit:deno:debug": "deno test unit/ --allow-all --unstable --inspect-brk",
     "test:unit:deno:with-coverage": "deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
     "test:unit:selected": "deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",
