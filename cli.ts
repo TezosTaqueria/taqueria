@@ -28,7 +28,7 @@ const {
     rm,
     log,
     logInput,
-    // debug
+    debug
 } = utils.inject({
     stdout: Deno.stdout,
     stderr: Deno.stderr
@@ -113,9 +113,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n.t) =>
     })
     .boolean('debug')
     .hide('debug')
-    .option('quickstart', {
-        default: ''
-    })
+    .option('quickstart')
     .hide('quickstart')
     .option('p', {
         alias: 'projectDir',
@@ -202,7 +200,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         // TODO: This function assumes that there is only one type of plugin available to install,
         // a plugin distributed and installable via NPM. This should support other means of distribution
         (inputArgs: Record<string, unknown>) => pipe(
-            SanitizedArgs.installArgs(inputArgs),
+            debug(SanitizedArgs.installArgs(inputArgs)),
             args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
@@ -281,7 +279,7 @@ const listKnownTasks = (parsedArgs: SanitizedArgs.t) => pipe(
     map (JSON.stringify)
 )
 
-const initProject = (projectDir: SanitizedAbsPath.t, i18n: i18n.t, maxConcurrency: number, quickstart: string) => pipe(
+const initProject = (projectDir: SanitizedAbsPath.t, i18n: i18n.t, maxConcurrency: number, quickstart: string|undefined) => pipe(
     getConfig(projectDir, i18n, true),
     chain (({artifactsDir, contractsDir, testsDir, projectDir, operationsDir}: LoadedConfig.t) => {
         const jobs = [operationsDir, artifactsDir, contractsDir, testsDir].reduce(
@@ -290,7 +288,7 @@ const initProject = (projectDir: SanitizedAbsPath.t, i18n: i18n.t, maxConcurrenc
         )
         return parallel (maxConcurrency) (jobs)
     }),
-    chain (_ => quickstart.length > 0
+    chain (_ => quickstart && quickstart.length > 0
         ? writeTextFile (joinPaths(projectDir, "quickstart.md")) (quickstart)
         : resolve(projectDir)
     ),
@@ -566,7 +564,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) => (
             return pipe(
                 pluginLib.getState(),
                 map ((state: EphemeralState.t) => pipe(
-                    resolvePluginName(parsedArgs, state),
+                    debug(resolvePluginName(parsedArgs, state)),
                     (parsedArgs: SanitizedArgs.t) => loadState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib)
                 ))
             )
@@ -575,7 +573,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) => (
             cliConfig.help()
         ),
         chain (parseArgs),
-        map (SanitizedArgs.create),
+        map (inputArgs => debug(SanitizedArgs.create(inputArgs))),
         map (showInvalidTask(cliConfig))
 )
 

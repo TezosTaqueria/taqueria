@@ -5,20 +5,45 @@ import * as Url from "@taqueria/protocol/Url"
  const initRawSchema =  z.object({
     _: z.array(z.string().nonempty()),
     projectDir: z.string().nonempty().transform((val: unknown) => val as SanitizedAbsPath.t),
-    maxConcurrency: z.number().min(1).default(10),
-    debug: z.boolean().default(false),
+    maxConcurrency: z.preprocess(
+        val => typeof val === 'string' ? parseInt(val) : Number(val),
+        z.number().int().min(1).default(10),
+    ),
+    debug: z.preprocess(
+        val => Boolean(val),
+        z.boolean().default(false)
+    ),
+    disableState: z.preprocess(
+        val => Boolean(val),
+        z.boolean().default(false)
+    ),
+    logPluginRequests: z.preprocess(
+        val => Boolean(val),
+        z.boolean().default(false)
+    ),
+    fromVsCode: z.preprocess(
+        val => Boolean(val),
+        z.boolean().default(false)
+    ),
+    version: z.preprocess(
+        val => Boolean(val),
+        z.boolean().optional()
+    ),
+    build: z.preprocess(
+        val => Boolean(val),
+        z.boolean().optional()
+    ),
+    help: z.preprocess(
+        val => Boolean(val),
+        z.boolean().optional()
+    ),
     plugin: z.string().nonempty().optional(),
     env: z.union([z.literal('production'), z.literal('testing'), z.literal('development'), z.string().nonempty()]).optional(),
-    quickstart: z.string().nonempty(),
-    disableState: z.boolean().default(false),
-    logPluginRequests: z.boolean().default(false),
+    quickstart: z.string().nonempty().optional(),
     setBuild: z.string().nonempty(),
     setVersion: z.string().nonempty(),
-    fromVsCode: z.boolean().default(false),
-    version: z.boolean().optional(),
-    build: z.boolean().optional(),
-    help: z.boolean().optional(),
-    template: z.string().nonempty().optional()
+    template: z.string().nonempty().optional(),
+    pluginName: z.string().nonempty().optional()
 })
 
 const scaffoldRawSchema = initRawSchema.extend({

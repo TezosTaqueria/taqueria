@@ -14,7 +14,7 @@ import {copy} from 'https://deno.land/std@0.128.0/streams/conversion.ts'
 import clipboard from 'https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts'
 
 // Get utils
-const {joinPaths, readJsonFile, writeTextFile, decodeJson} = utils.inject({
+const {joinPaths, readJsonFile, writeTextFile, decodeJson, debug} = utils.inject({
     stdout: Deno.stdout,
     stderr: Deno.stderr
 })
@@ -57,6 +57,7 @@ export const inject = (deps: PluginDeps) => {
         async () => {
             try {
                 const process = Deno.run({cmd, stdout: "piped", stderr: "piped"})
+                const status = await process.status()
                 const output = await process.output()
                 await copy(process.stderr, stderr)
                 const decoder = new TextDecoder()
@@ -264,7 +265,7 @@ export const inject = (deps: PluginDeps) => {
     // persisted to state.json before its returned
     // getNonMemoizedState: () -> Future<TaqError, State>
     const getNonMemoizedState = () => pipe(
-        parsedArgs,
+        debug(parsedArgs),
         getStateAbspath,
         stateAbspath => pipe(
             !parsedArgs.disableState

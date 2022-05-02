@@ -2,6 +2,7 @@ import {z} from 'zod'
 
 export const rawSchema = z
     .string()
+    .nonempty()
     .regex(/^[A-Za-z\-\ ]+/)
 
 export const schema = rawSchema.transform(val => val as t)    

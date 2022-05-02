@@ -11,7 +11,10 @@ const internalSchema = sanitizedArgsSchema.extend({
         z.literal('checkRuntimeDependencies'),
         z.literal('installRuntimeDependencies'),
     ]),
-    config: LoadedConfig.schema
+    config: z.preprocess(
+        val => typeof val === 'string' ? JSON.parse(val) : val,
+        LoadedConfig.schema
+    )
 })
 
 const internalProxySchema = internalSchema.extend({

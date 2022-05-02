@@ -22,34 +22,6 @@ import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
 import * as RequestArgs from "@taqueria/protocol/RequestArgs"
 import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
 import * as i18n from "@taqueria/protocol/i18n"
-
-export {
-    SanitizedPath,
-    SanitizedAbsPath,
-    SHA256,
-    StringMax30,
-    StringNoSpaces,
-    Verb,
-    EconomicalProtocolHash,
-    Url,
-    VersionNumber,
-    HumanReadableIdentifier,
-    Alias,
-    PositionalArg,
-    Option,
-    Task,
-    Operation,
-    PluginInfo,
-    InstalledPlugin,
-    Config,
-    Environment,
-    EphemeralState,
-    SanitizedArgs,
-    RequestArgs,
-    LoadedConfig,
-    i18n
-}
-
 export interface RuntimeDependency {
     readonly name: string,
     readonly path: string,
@@ -86,3 +58,30 @@ export interface PluginJsonResponse {
 }
 
 export type PluginResponse = PluginJsonResponse | CheckRuntimeDependenciesResponse | InstallRuntimeDependenciesResponse | PluginInfo.t | PluginActionNotSupportedResponse | void
+
+export {
+    SanitizedPath,
+    SanitizedAbsPath,
+    SHA256,
+    StringMax30,
+    StringNoSpaces,
+    Verb,
+    EconomicalProtocolHash,
+    Url,
+    VersionNumber,
+    HumanReadableIdentifier,
+    Alias,
+    PositionalArg,
+    Option,
+    Task,
+    Operation,
+    PluginInfo,
+    InstalledPlugin,
+    Config,
+    Environment,
+    EphemeralState,
+    SanitizedArgs,
+    RequestArgs,
+    LoadedConfig,
+    i18n
+}

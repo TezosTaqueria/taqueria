@@ -43,7 +43,6 @@ const doesUseFlextesa = (sandbox: Sandbox) => !sandbox.plugin || sandbox.plugin 
 const doesNotUseFlextesa = (sandbox: Sandbox) => !doesUseFlextesa(sandbox)
 
 const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<void> => {
-    debugger
     if (doesNotUseFlextesa(sandbox))
         return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
 

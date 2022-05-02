@@ -1,5 +1,6 @@
 import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
+import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
 import type {i18n} from "@taqueria/protocol/i18n"
 import {TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
 import * as utils from './taqueria-utils/taqueria-utils.ts'
@@ -50,28 +51,18 @@ export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: Sanit
     map(value => value as Manifest)
 )
 
-const addToPluginList = (pluginName: NpmPluginName, config: LoadedConfig.t) => pipe(
-    getPluginPackageJson(pluginName, config.projectDir),
+const addToPluginList = (pluginName: NpmPluginName, loadedConfig: LoadedConfig.t) => pipe(
+    getPluginPackageJson(pluginName, loadedConfig.projectDir),
     map ((manifest: {name: string}) => {
-        const allPlugins = config.plugins ?? []
+        const allPlugins = loadedConfig.plugins ?? []
         const existingPlugins = allPlugins.filter(plugin => plugin.name != manifest.name)
-        const plugins = [...existingPlugins, {name: manifest.name, type: "npm"}]
-        const updatedConfig = Object.entries(config).reduce(
-            (retval: Record<string, unknown>, [key, val]) => {
-                if (['configFile', 'hash', 'configDir', 'projectDir'].includes(key))
-                    return retval
-                else if (key === 'plugins') return {...retval, plugins}
-                else {
-                    const next = {...retval}
-                    next[key] = val
-                    return next
-                }
-            },
-            {}
-        )
-        return updatedConfig
+        const plugins: InstalledPlugin.t[] = [...existingPlugins, {name: manifest.name, type: "npm"}]
+        return LoadedConfig.toConfig({
+            ...loadedConfig,
+            plugins
+        })
     }),
-    chain (writeJsonFile(config.configFile))                    
+    chain (writeJsonFile(loadedConfig.configFile))                    
 )
 
 
@@ -99,9 +90,13 @@ export const uninstallPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plug
     chain ((config: LoadedConfig.t) => {
         const pluginName = getPluginName(plugin)
         const plugins = config.plugins?.filter(plugin => plugin.name != pluginName)
+
         return pipe(
-            resolve({...config, plugins}),
-            chain (writeJsonFile(config.configFile))                    
+            LoadedConfig.toConfig({
+                ...config,
+                plugins
+            }),
+            writeJsonFile(config.configFile) 
         )
     }),
     map (() => i18n.__('pluginUninstalled')),

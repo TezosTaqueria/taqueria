@@ -4,7 +4,7 @@ import load from "@taqueria/protocol/i18n"
 import {PluginResponse} from "@taqueria/protocol/taqueria-protocol-types"
 import * as RequestArgs from "@taqueria/protocol/RequestArgs"
 import * as PluginInfo from "@taqueria/protocol/PluginInfo"
-import type {Schema} from "./types"
+import {Schema} from "./types"
 import {Args, pluginDefiner, LikeAPromise, Failure, StdIO} from "./types"
 import {join, dirname} from 'path'
 import {readFile, writeFile} from 'fs/promises'
@@ -122,7 +122,18 @@ export const noop = () => {}
 const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, Failure<undefined>> => {
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
         const argv = yargs(unparsedArgs.slice(2)).argv
-        return Promise.resolve(RequestArgs.make(argv))
+        try {
+            const requestArgs = RequestArgs.make(argv)
+            return Promise.resolve(requestArgs)
+        }
+        catch (previous) {
+            return Promise.reject({
+                errCode: "E_INVALID_ARGS",
+                errMsg: "Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?",
+                context: undefined,
+                previous
+            })
+        }
     }
     return Promise.reject({
         errCode: "E_INVALID_ARGS",
@@ -137,7 +148,10 @@ const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => 
 
         return {
             ...inputSchema,
-            ...PluginInfo.create(inputSchema)
+            ...PluginInfo.create({
+                ...inputSchema,
+                name: inputSchema.name ?? inferPluginName()
+            })
         }
     }
     catch (e) {
@@ -255,4 +269,12 @@ export const Plugin = {
     }
 }
 
-export default Protocol
+const {Task, Option, PositionalArg, Operation} = Protocol
+
+export {
+    Protocol,
+    Task,
+    Option,
+    PositionalArg,
+    Operation
+}

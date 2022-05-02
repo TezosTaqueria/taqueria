@@ -9,7 +9,8 @@ export type VersionNumber = string & {
 export type t = VersionNumber
 
 export const rawSchema = z.string()
-    .regex(/^\d+\.\d+\d+$/)
+    .nonempty()
+    .regex(/^\d+\.\d+(\.\d+)*$/)
 
 export const schema = rawSchema.transform((val: unknown) => val as VersionNumber)
 

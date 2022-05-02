@@ -5,9 +5,9 @@ import * as SingleChar from '@taqueria/protocol/SingleChar'
 const internalSchema = z.object({
     shortFlag: SingleChar.schema.optional(),
     flag: Verb.schema,
-    description: z.string(),
+    description: z.string().nonempty(),
     defaultValue: z.union([z.string(), z.number(), z.boolean()]).optional(),
-    choices: z.array(z.string()),
+    choices: z.array(z.string()).optional(),
     required: z.boolean().default(false).optional(),
     boolean: z.boolean().default(false).optional()
 })
@@ -17,7 +17,7 @@ export const rawSchema = z.object({
     flag: Verb.rawSchema,
     description: z.string().nonempty(),
     defaultValue: z.union([z.string(), z.number(), z.boolean()]).optional(),
-    choices: z.array(z.string()),
+    choices: z.array(z.string()).optional(),
     required: z.boolean().default(false).optional(),
     boolean: z.boolean().default(false).optional()
 })
