@@ -5,17 +5,14 @@ const eta = require("eta");
 // website plugin docs directory
 const docsDir = path.join(__dirname, "website", "docs", "plugins");
 
-// typed list of plugin paths to search
+// new plugins or document directories can be added to this list
 const plugins: string[] = [
   "taqueria-plugin-archetype",
-  // "taqueria-plugin-contract-types",
+  "taqueria-plugin-contract-types",
   "taqueria-plugin-flextesa",
   "taqueria-plugin-ligo",
   "taqueria-plugin-smartpy",
   "taqueria-plugin-taquito",
-  // "taqueria-protocol",
-  // "taqueria-sdk",
-  // "taqueria-vscode-extension",
 ];
 
 // typed list of github variables with their values
