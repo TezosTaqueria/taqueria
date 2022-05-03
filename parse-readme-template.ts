@@ -11,7 +11,7 @@ const plugins: string[] = [
   // "taqueria-plugin-contract-types",
   "taqueria-plugin-flextesa",
   "taqueria-plugin-ligo",
-  // "taqueria-plugin-smartpy",
+  "taqueria-plugin-smartpy",
   // "taqueria-plugin-taquito",
   // "taqueria-protocol",
   // "taqueria-sdk",
