@@ -1,16 +1,6 @@
 # Taqueria Taquito Plugin
 
-This is a plugin developed for Taqueria built using TypeScript for NodeJS using the Taqueria Node SDK
-
-
-This is a plugin developed for Taqueria built using TypeScript for NodeJS using the Taqueria Node SDK and distributed via NPM
-
-The Taquito plugin exposes a compile task in Taqueria which can target one, or all the Taquito contracts in the contracts folder and compile them to Michelson code output to the artifacts folder
-
-## Tasks
-
-The Taquito plugin provides the following tasks to Taqueria:
-- `originate`
+The Taquito plugin provides a task to originate a smart contract to a Tezos network
 
 ## Requirements
 
@@ -20,15 +10,35 @@ The Taquito plugin provides the following tasks to Taqueria:
 
 ## Installation
 
-The Taquito plugin is distributed as an NPM package that can be installed and uninstalled on a project from the Taqueria CLI
-
-To install the LIGO plugin on a Taqueria project, navigate to the project folder and run:
+To install the Taquito plugin on a Taqueria project, navigate to the project folder and run:
 ```shell
 taq install @taqueria/plugin-taquito
 ```
 
+## Configuration
+
+***Coming soon***
+
+## Usage
+
+The Taquito plugin exposes an `originate` task in Taqueria which will originate the specified Michelson contract to the configured network
+
+### Originating a Michelson Contract
+
+***Coming soon***
+
+### Examples
+
+***Coming soon***
+
 ## Plugin Architecture
 
-This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
 
-For detailed usage and configuration information, view the LIGO plugin documentation on the Taqueria website [here](https://taqueria.io/docs/plugins/plugin-taquito) 
+The plugin provides a single task `originate`, used for originating Michelson contracts to a Tezos network:
+
+|  attribute |  value                   | 
+|------------|:-------------------------|
+|  task      | 'deploy'                 | 
+|  command   | 'deploy [contract]`      | 
+|  aliases   | ['originate']            |  

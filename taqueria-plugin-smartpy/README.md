@@ -28,7 +28,8 @@ taq compile <file-name>
 
 Running the `compile` task with no options will result in any source SmartPy smart contracts in the `contracts` folder being compiled to Michelson files in the `artifacts` folder. If you speficy an optional filename, only SmartPy contracts matching the specified filename in the `contracts` folder will be compiled
 
-The `compile` task can be implemented by more than one compiler plugin installed on a project (SmartPy, SmartPY). If this is the case, you must use the `--plugin` flag to specify a particular compiler
+> ### :page_with_curl: Note
+> The `compile` task can be implemented by more than one compiler plugin installed on a project (SmartPy, SmartPY). If this is the case, you must use the `--plugin` flag to specify a particular compiler
 
 ## Plugin Architecture
 

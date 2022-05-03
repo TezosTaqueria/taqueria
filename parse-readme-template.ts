@@ -12,7 +12,7 @@ const plugins: string[] = [
   "taqueria-plugin-flextesa",
   "taqueria-plugin-ligo",
   "taqueria-plugin-smartpy",
-  // "taqueria-plugin-taquito",
+  "taqueria-plugin-taquito",
   // "taqueria-protocol",
   // "taqueria-sdk",
   // "taqueria-vscode-extension",
