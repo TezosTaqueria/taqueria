@@ -1,5 +1,5 @@
-{ parameter (nat %numTacosToConsume) ;
-  storage nat ;
+{ parameter nat ;
+  storage string ;
   code { UNPAIR ;
          SWAP ;
          DUP ;
