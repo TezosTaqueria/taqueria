@@ -31,8 +31,8 @@ No project level configuration is available for the Tezos Client plugin
 ## Taqueria Tasks
 
 The Tezos Client plugin currently provides the following tasks:
-1. `taq typecheck <inputFile>` - typechecks one or more Michelson smart contracts
-2. `taq simulate [inputFile] [inputData]` - simulates calling a Michelson smart contract
+1. `taq typecheck [inputFiles]` - typechecks one or more Michelson smart contracts
+2. `taq simulate <inputFile> <inputData>` - simulates calling a Michelson smart contract
 
 As this plugin calls the tezos-client instance that is running in the sandbox, the protocol that will be used in the typecheck or simulation is the one that is currently running in the sandbox which can be configured in `./.taq/config.json`
 
@@ -42,7 +42,7 @@ The `taq typecheck` task typechecks one or more Michelson smart contracts agains
 
 The structure of the command for the typecheck task including all optional parameters is:
 ```shell
-taq typecheck <inputFile> -s sandboxName
+taq typecheck [inputFiles] -s sandboxName
 ```
 
 A particular Michelson smart contract can be specified by the optional `<inputFile>` argument. If the file name is not specified, the task will typecheck all Michelson smart contracts in the `/artifacts` and `/contracts` directories
@@ -61,13 +61,13 @@ The `taq simulate` task uses the tezos-client instance running in the Flextesa s
 
 The structure of the command for the typecheck task including all optional parameters is:
 ```shell
-taq simulate [inputFile] [inputData] -s sandboxName --storage valueOfInitialStorage
+taq simulate <inputFile> <inputData> -s sandboxName --storage valueOfInitialStorage
 ```
  This command has 2 required parameters, and 2 optional parameters as shown above
  
 ### Required Parameters
-- `[inputFile]` - The name of the Michelson smart contract to simulate. The task will first look in the `/artifacts` directory, then the `/contracts` directory and execute the first instance of the contract name
-- `[inputData]` - The input data to pass to the Michelson smart contract. This is a single quote wrapped string value which is passed to the Michelson smart contract as the `input` parameter
+- `<inputFile>` - The name of the Michelson smart contract to simulate. The task will first look in the `/artifacts` directory, then the `/contracts` directory and execute the first instance of the contract name
+- `<inputData>` - The input data to pass to the Michelson smart contract. This is a single quote wrapped string value which is passed to the Michelson smart contract as the `input` parameter
 
 ### Storage Value
 
@@ -107,4 +107,4 @@ The plugin requires the tezos-client software to be running in a local Flextesa 
 
 The plugin provides two task to the Taqueria CLI:
 - `taq typecheck [inputFiles] [--sandboxName sandbox]`
-- `taq simulate <inputFile> <input> [--storage value] [--sandboxName sandbox]`
+- `taq simulate <inputFile> <inputData> [--storage value] [--sandboxName sandbox]`
