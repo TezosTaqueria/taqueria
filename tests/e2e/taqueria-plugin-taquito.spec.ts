@@ -222,7 +222,8 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
         expect(stdoutDeploy.stderr).toContain("HttpRequestFailed: Request to https://invalid.test/chains/main/blocks/");
     });
 
-    test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> empty', async () => {
+    // TODO: Reinstate this test after https://github.com/ecadlabs/taqueria/issues/641
+    test.skip('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> empty', async () => {
         // Environment test does not exist on default config.json
         environment = "test"
 
