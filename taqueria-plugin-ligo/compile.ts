@@ -1,8 +1,7 @@
 import {execCmd, getArch, sendAsyncErr, sendJsonRes, sendErr} from '@taqueria/node-sdk'
 import {SanitizedArgs, PluginResponse, Failure, LikeAPromise} from "@taqueria/node-sdk/types";
 import {extname, basename, join} from 'path'
-// @ts-ignore interop issue. Maybe find a different library later
-import glob from 'fast-glob'
+import * as glob from 'fast-glob'
 
 type Opts = SanitizedArgs & Record<string, unknown>
 
