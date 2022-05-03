@@ -1,17 +1,20 @@
-const {execCmd, getArch, sendAsyncErr, sendJsonRes, sendErr} = require('@taqueria/node-sdk')
-const {extname, basename, join} = require('path')
-const glob = require('fast-glob')
+import {execCmd, getArch, sendAsyncErr, sendJsonRes, sendErr} from '@taqueria/node-sdk'
+import {SanitizedArgs, PluginResponse, Failure, LikeAPromise} from "@taqueria/node-sdk/types";
+import {extname, basename, join} from 'path'
+import glob = require('fast-glob')
 
-const getContractArtifactFilename = (opts) => (sourceFile) => {
+type Opts = SanitizedArgs & Record<string, unknown>
+
+const getContractArtifactFilename = (opts: Opts) => (sourceFile: string) => {
     const outFile = basename(sourceFile, extname(sourceFile))
     return join(opts.config.artifactsDir, `${outFile}.tz`)
 }
 
-const getInputFilename = (opts) => sourceFile => {
+const getInputFilename = (opts: Opts) => (sourceFile: string) => {
     return join(opts.config.contractsDir, sourceFile)
 }
 
-const getCompileCommand = (opts, _arch) => (sourceFile) => {
+const getCompileCommand = (opts: Opts) => (sourceFile: string) => {
     const {projectDir} = opts
     const inputFile = getInputFilename (opts) (sourceFile)
     const baseCommand = `DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:next compile contract ${inputFile}`
@@ -22,15 +25,15 @@ const getCompileCommand = (opts, _arch) => (sourceFile) => {
     return cmd
 }
 
-const compileContract = (opts) => (sourceFile) =>
+const compileContract = (opts: Opts) => (sourceFile: string): Promise<{contract: string, artifact: string}> =>
     getArch()
-    .then(arch => getCompileCommand(opts, arch) (sourceFile))
+    .then(() => getCompileCommand (opts) (sourceFile))
     .then(execCmd)
     .then(({stderr}) => { // How should we output warnings?
         if (stderr.length > 0) sendErr(stderr)
         return {
             contract: sourceFile,
-            artifact: getContractArtifactFilename(opts) (sourceFile)
+            artifact: getContractArtifactFilename (opts) (sourceFile)
         }
     })
     .catch(err => {
@@ -42,13 +45,13 @@ const compileContract = (opts) => (sourceFile) =>
         })
     })
 
-const compileAll = parsedArgs => {
+const compileAll = (parsedArgs: Opts): Promise<{contract: string, artifact: string}[]> => {
     // TODO: Fetch list of files from SDK
     return glob(
         ['**/*.ligo', '**/*.religo', '**/*.mligo', '**/*.jsligo'],
         {cwd: parsedArgs.contractsDir, absolute: false}
     )
-    .then(entries => entries.map(sourceFile => compileContract(parsedArgs) (sourceFile)))
+    .then(entries => entries.map(compileContract (parsedArgs)))
     .then(processes => processes.length > 0
         ? processes
         : [{contract: "None found", artifact: "N/A"}]
@@ -56,9 +59,9 @@ const compileAll = parsedArgs => {
     .then(promises => Promise.all(promises))
 }
 
-const compile = parsedArgs => {
+export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
     const p = parsedArgs.sourceFile
-        ? compileContract(parsedArgs) (parsedArgs.sourceFile)
+        ? compileContract (parsedArgs) (parsedArgs.sourceFile as string)
             .then(result => [result])
         : compileAll(parsedArgs)
             .then(results => {
@@ -71,4 +74,4 @@ const compile = parsedArgs => {
     .catch(err => sendAsyncErr(err, false))
 }
 
-module.exports = compile
+export default compile
