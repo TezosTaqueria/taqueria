@@ -7,8 +7,8 @@ The Tezos Client plugin exposes the typecheck and simulate tasks. The typecheck 
 ## Tasks
 
 The Tezos Client plugin provides the following tasks to Taqueria:
-- `typecheck [sourceFiles] [--sandboxName sandbox]`
-- `simulate <sourceFiles> <input> [--storage value] [--sandboxName sandbox]`
+- `taq typecheck <sourceFiles> [--sandboxName local]`
+- `taq simulate [sourceFile] [inputParameters] <--storage initialStorage> < --sandboxName local>`
 
 ## Requirements
 
