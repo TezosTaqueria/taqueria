@@ -4,7 +4,7 @@ import * as Url from "@taqueria/protocol/Url"
 
  const initRawSchema =  z.object({
     _: z.array(z.string().nonempty()),
-    projectDir: z.string().nonempty().transform((val: unknown) => val as SanitizedAbsPath.t),
+    projectDir: z.string().nonempty().transform(SanitizedAbsPath.make),
     maxConcurrency: z.preprocess(
         val => typeof val === 'string' ? parseInt(val) : Number(val),
         z.number().int().min(1).default(10),
@@ -44,7 +44,7 @@ import * as Url from "@taqueria/protocol/Url"
     setVersion: z.string().nonempty(),
     template: z.string().nonempty().optional(),
     pluginName: z.string().nonempty().optional()
-})
+}).passthrough()
 
 const scaffoldRawSchema = initRawSchema.extend({
     scaffoldProjectDir: z.string().nonempty().transform((val: unknown) => val as SanitizedAbsPath.t),

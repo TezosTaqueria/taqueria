@@ -55,9 +55,10 @@ export const inject = (deps: PluginDeps) => {
     // Invokes a command which will 
     const execPluginText = (cmd: string[]) : Future.t<TaqError.t, string> => attemptP(
         async () => {
+            let status = undefined
             try {
                 const process = Deno.run({cmd, stdout: "piped", stderr: "piped"})
-                const status = await process.status()
+                status = await process.status()
                 const output = await process.output()
                 await copy(process.stderr, stderr)
                 const decoder = new TextDecoder()
@@ -71,7 +72,9 @@ export const inject = (deps: PluginDeps) => {
                 throw {
                     kind: "E_EXEC",
                     msg: "Could not execute command",
-                    context: cmd,
+                    context: status !== undefined
+                        ? `Exit code: ${status}, Command: ${cmd}`
+                        : cmd,
                     previous
                 }
             }

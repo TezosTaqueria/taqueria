@@ -5,8 +5,9 @@ const sanitizedAbsPath: unique symbol = Symbol()
 export const rawSchema = z.string().nonempty()
 
 export const schema = rawSchema
-    .transform(resolve)
-    .transform(val => val as SanitizedAbsPath)
+    .transform((val: string) => {
+        return resolve(val) as SanitizedAbsPath
+    })
 
 type Input = z.infer<typeof rawSchema>
 

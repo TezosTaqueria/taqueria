@@ -15,11 +15,11 @@ const internalSchema = sanitizedArgsSchema.extend({
         val => typeof val === 'string' ? JSON.parse(val) : val,
         LoadedConfig.schema
     )
-})
+}).passthrough()
 
 const internalProxySchema = internalSchema.extend({
     task: z.string().nonempty()
-})
+}).passthrough()
 
 type Input = z.infer<typeof internalSchema>
 
