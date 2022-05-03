@@ -1,7 +1,7 @@
 import {execCmd, getArch, sendAsyncErr, sendJsonRes, sendErr} from '@taqueria/node-sdk'
 import {SanitizedArgs, PluginResponse, Failure, LikeAPromise} from "@taqueria/node-sdk/types";
 import {extname, basename, join} from 'path'
-import * as glob from 'fast-glob'
+import glob = require('fast-glob')
 
 type Opts = SanitizedArgs & Record<string, unknown>
 
