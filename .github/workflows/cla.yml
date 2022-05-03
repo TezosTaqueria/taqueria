@@ -22,7 +22,7 @@ jobs:
           path-to-signatures: 'signatures/cla_signatures.json'
           path-to-document: 'https://github.com/ecadlabs/ecadlabs-cla/blob/main/ECAD_Labs_CLA.md'
           branch: 'main'
-          allowlist: 'hu3man,HamidGoudarzi1988,jevonearth,russellmorton,mweichert,GImbrailo,danielelisi,alexzbusko,mosesintech,Renesauve,sinapsist,ricklove,carte7000,neilmangan,AbineshECAD,AlirezaHaghshenas,BGMurphy,CalebBarnes,claudebarde,dsawali,e-asphyx,eddingston,Innkst,jchenche,michaelkernaghan,Renesauve,roxaneletourneau,sinapsist'
+          allowlist: 'hu3man,HamidGoudarzi1988,jevonearth,russellmorton,mweichert,GImbrailo,danielelisi,alexzbusko,mosesintech,Renesauve,sinapsist,ricklove,carte7000,neilmangan,AbineshECAD,AlirezaHaghshenas,BGMurphy,CalebBarnes,claudebarde,dsawali,e-asphyx,eddingston,Innkst,jchenche,michaelkernaghan,Renesauve,roxaneletourneau'
           custom-notsigned-prcomment: 'Thank you for your contribution. Like many open-source projects, we require that contributors sign a [Contributor License Agreement](https://github.com/ecadlabs/ecadlabs-cla/blob/main/ECAD_Labs_CLA.md) (based on the Apache Foundation CLA). Please sign the Taqueria project CLA by posting a Pull Request comment of the text below:'
           custom-pr-sign-comment: 'I have read and agree to the CLA'
           # Use a remote repository to ensure that the main branch remains protected
