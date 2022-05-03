@@ -206,7 +206,8 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
     });
 
-    test('Verify that taqueria taquito plugin will show proper error when faucet is wrong -> network url is wrong', async () => {
+    // TODO: https://github.com/ecadlabs/taqueria/issues/673
+    test.skip('Verify that taqueria taquito plugin will show proper error when faucet is wrong -> network url is wrong', async () => {
         // Environment test does not exist on default config.json
         environment = "test"
 
