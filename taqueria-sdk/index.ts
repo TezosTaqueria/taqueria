@@ -1,5 +1,5 @@
 import {Task as aTask, Sandbox as theSandbox, PositionalArg as aPositionalArg, Alias, Option as anOption, Network as aNetwork, UnvalidatedOption as OptionView, Task as TaskLike, EconomicalProtocol as anEconomicalProtocol, PluginResponse} from '@taqueria/protocol/taqueria-protocol-types'
-import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView, StdIO} from "./types"
+import {Config, SchemaView, TaskView, i18n, Args, ParsedArgs, pluginDefiner, LikeAPromise, Failure, SanitizedArgs, PositionalArgView, StdIO, AccountDetails} from "./types"
 import {join, resolve, dirname, parse} from 'path'
 import {readFile, writeFile} from 'fs/promises'
 import {get} from 'stack-trace'
@@ -297,6 +297,91 @@ const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
     }
 }
 
+/**
+ * Gets the name of the current environment
+ **/
+export const getCurrentEnvironment = (parsedArgs: SanitizedArgs) => {
+    return parsedArgs.env
+        ? (parsedArgs.env as string)
+        : (
+            parsedArgs.config.environment
+                ? parsedArgs.config.environment.default
+                : 'development'
+        )
+}
+
+/**
+ * Gets the configuration for the current environment, if one is configured
+ */
+export const getCurrentEnvironmentConfig = (parsedArgs: SanitizedArgs) => {
+    const currentEnv = getCurrentEnvironment(parsedArgs)
+
+    return parsedArgs.config.environment && parsedArgs.config.environment[currentEnv]
+        ? parsedArgs.config.environment[currentEnv]
+        : undefined
+}
+
+/**
+ * Gets the configuration for the named network
+ */
+export const getNetworkConfig = (parsedArgs: SanitizedArgs) => (networkName: string) =>
+    parsedArgs.config.network[networkName] ?? undefined
+
+
+/**
+ * Gets the configuration for the named sandbox
+ */
+export const getSandboxConfig = (parsedArgs: SanitizedArgs) => (sandboxName: string) =>
+    parsedArgs.config.sandbox[sandboxName] ?? undefined
+
+
+/**
+ * Gets the name of accounts for the given sandbox
+ */
+export const getSandboxAccountNames = (parsedArgs:SanitizedArgs) => (sandboxName: string) => {
+    const sandbox = getSandboxConfig(parsedArgs) (sandboxName)
+
+    return sandbox
+        ? Object.keys(sandbox.accounts).filter(accountName => accountName !== 'default')
+        : []
+}
+
+/**
+ * Gets the account config for the named account of the given sandbox
+ */
+export const getSandboxAccountConfig = (parsedArgs:SanitizedArgs) => (sandboxName: string) => (accountName: string) => {
+    const sandbox = getSandboxConfig (parsedArgs) (sandboxName)
+    
+    return sandbox
+        ? sandbox.accounts[accountName]
+        : undefined
+}
+
+/**
+ * Gets the initial storage for the contract
+ */
+export const getInitialStorage = (parsedArgs: SanitizedArgs) => (contractFilename : string) => {
+    const env = getCurrentEnvironmentConfig(parsedArgs)
+    
+    return env
+        ? env.storage && env.storage[contractFilename]
+        : undefined
+}
+
+/**
+ * Gets the default account associated with a sandbox
+ */
+export const getDefaultAccount = (parsedArgs: SanitizedArgs) => (sandboxName: string) => {
+    const defaultAccount = getSandboxConfig(parsedArgs) (sandboxName).accounts["default"] as string
+    if (defaultAccount) {
+        const details = getSandboxAccountConfig(parsedArgs) (sandboxName) (defaultAccount)
+        if (details) {
+            return details as AccountDetails
+        }
+    }
+    return undefined
+}
+    
 const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
     // The definer function can provide a name for the plugin in its schema, or it
     // can omit it and we infer it from the package.json file.

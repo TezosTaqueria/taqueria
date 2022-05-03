@@ -117,6 +117,8 @@ tests/coverage
 /taqueria-sdk/index.js.map
 /taqueria-plugin-smartpy/index.js
 /taqueria-plugin-smartpy/index.js.map
+/taqueria-plugin-ligo/index.js
+/taqueria-plugin-ligo/index.js.map
 /tests/coverage_report
 /taqueria-plugin-smartpy/.parcel-cache
 /taqueria-plugin-taquito/index.js
@@ -135,6 +137,8 @@ tests/coverage
 /taqueria-plugin-contract-types/index.js.map
 /taqueria-plugin-archetype/index.js
 /taqueria-plugin-archetype/index.js.map
+/taqueria-plugin-tezos-client/index.js
+/taqueria-plugin-tezos-client/index.js.map
 
 # VS Code Extension
 /taqueria-vscode-extension/out
