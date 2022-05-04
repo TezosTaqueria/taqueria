@@ -21,3 +21,8 @@
   align-items: center;
   gap: 10px;
 }
+
+#disclaimer-text {
+  font-size: 9px;
+  font-style: italic;
+}
