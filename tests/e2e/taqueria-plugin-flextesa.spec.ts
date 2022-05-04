@@ -433,13 +433,13 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     // Comment if need to debug
     afterAll( async () => {
         try {
-            let dockerContainer = getContainerName(dockerName);
-            if(dockerContainer !== undefined){
+            let dockerContainer = await getContainerName(dockerName);
+            if(dockerContainer !== ""){
                 await exec(`docker stop ${dockerName}`);
             }
 
-            const dockerListStdout = await exec("docker ps").toString().trim();
-            if(dockerListStdout.includes(dockerName)){
+            const dockerListStdout = await exec("docker ps")
+            if(dockerListStdout.stdout.includes(dockerName)){
                 throw new Error("Container was not stopped properly");
             }
             await fsPromises.rm(taqueriaProjectPath, { recursive: true })
