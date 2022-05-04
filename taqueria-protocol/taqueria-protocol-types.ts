@@ -6,6 +6,9 @@ import * as StringMax30 from '@taqueria/protocol/StringMax30'
 import * as StringNoSpaces from '@taqueria/protocol/StringNoSpaces'
 import * as Verb from "@taqueria/protocol/Verb"
 import * as EconomicalProtocolHash from '@taqueria/protocol/EconomicalProtocolHash'
+import * as NetworkConfig from "@taqueria/protocol/NetworkConfig"
+import * as SandboxConfig from "@taqueria/protocol/SandboxConfig"
+import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
 import * as VersionNumber from '@taqueria/protocol/VersionNumber'
 import * as HumanReadableIdentifier from '@taqueria/protocol/HumanReadableIdentifier'
 import * as Alias from '@taqueria/protocol/Alias'
@@ -83,5 +86,8 @@ export {
     SanitizedArgs,
     RequestArgs,
     LoadedConfig,
+    SandboxConfig,
+    NetworkConfig,
+    SandboxAccountConfig,
     i18n
 }

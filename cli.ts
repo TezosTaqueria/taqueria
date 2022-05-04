@@ -121,7 +121,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n.t) =>
         describe: i18n.__('initPathDesc')
     })
     .hide('projectDir')
-    .option('e', {
+    .option('environment', {
         alias: 'env',
         describe: i18n.__('envDesc')
     })
@@ -200,7 +200,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         // TODO: This function assumes that there is only one type of plugin available to install,
         // a plugin distributed and installable via NPM. This should support other means of distribution
         (inputArgs: Record<string, unknown>) => pipe(
-            debug(SanitizedArgs.installArgs(inputArgs)),
+            SanitizedArgs.installArgs(inputArgs),
             args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
@@ -564,7 +564,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) => (
             return pipe(
                 pluginLib.getState(),
                 map ((state: EphemeralState.t) => pipe(
-                    debug(resolvePluginName(parsedArgs, state)),
+                    resolvePluginName(parsedArgs, state),
                     (parsedArgs: SanitizedArgs.t) => loadState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib)
                 ))
             )
@@ -573,7 +573,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) => (
             cliConfig.help()
         ),
         chain (parseArgs),
-        map (inputArgs => debug(SanitizedArgs.create(inputArgs))),
+        map (inputArgs => SanitizedArgs.create(inputArgs)),
         map (showInvalidTask(cliConfig))
 )
 
@@ -593,6 +593,10 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
             
 export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
     try {
+        // A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command
+        // Refer to https://github.com/yargs/yargs-parser/issues/201
+        inputArgs = inputArgs.map(arg => arg.match(/^"(.|\n)*"$/) ? "___" + arg + "___" : arg)
+
         // Parse the args required for core built-in tasks
         return pipe(
             initCLI(env, inputArgs, i18n),

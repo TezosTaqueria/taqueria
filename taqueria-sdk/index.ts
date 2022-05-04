@@ -1,10 +1,14 @@
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types'
 import type {i18n} from "@taqueria/protocol/i18n"
 import load from "@taqueria/protocol/i18n"
-import {PluginResponse} from "@taqueria/protocol/taqueria-protocol-types"
 import * as RequestArgs from "@taqueria/protocol/RequestArgs"
 import * as PluginInfo from "@taqueria/protocol/PluginInfo"
-import {Schema} from "./types"
+import * as Task from "@taqueria/protocol/Task"
+import * as Option from "@taqueria/protocol/Option"
+import * as Operation from "@taqueria/protocol/Operation"
+import * as PositionalArg from "@taqueria/protocol/PositionalArg"
+
+import {Schema, InputSchema} from "./types"
 import {Args, pluginDefiner, LikeAPromise, Failure, StdIO} from "./types"
 import {join, dirname} from 'path'
 import {readFile, writeFile} from 'fs/promises'
@@ -120,6 +124,7 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 export const noop = () => {}
 
 const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, Failure<undefined>> => {
+    debugger
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
         const argv = yargs(unparsedArgs.slice(2)).argv
         try {
@@ -130,7 +135,7 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, Failure<unde
             return Promise.reject({
                 errCode: "E_INVALID_ARGS",
                 errMsg: "Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?",
-                context: undefined,
+                context: unparsedArgs,
                 previous
             })
         }
@@ -138,20 +143,24 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, Failure<unde
     return Promise.reject({
         errCode: "E_INVALID_ARGS",
         errMsg: "Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?",
-        context: undefined
+        context: unparsedArgs
     })
 }
 
 const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): Schema | undefined => {
     try {
-        const inputSchema = definer(i18n)
+        const inputSchema: InputSchema = typeof(definer) === 'function' ? definer(i18n) : definer
+
+        const {proxy} = inputSchema
+
+        const pluginInfo = PluginInfo.create({
+            ...inputSchema,
+            name: inputSchema.name ?? inferPluginName()
+        })
 
         return {
-            ...inputSchema,
-            ...PluginInfo.create({
-                ...inputSchema,
-                name: inputSchema.name ?? inferPluginName()
-            })
+            ...pluginInfo,
+            proxy
         }
     }
     catch (e) {
@@ -233,6 +242,94 @@ const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
     }
 }
 
+/**
+ * Gets the name of the current environment
+ **/
+export const getCurrentEnvironment = (parsedArgs: RequestArgs.t) : string => {
+    return parsedArgs.env
+        ? (parsedArgs.env as string)
+        : (
+            parsedArgs.config.environment
+                ? parsedArgs.config.environment.default as string
+                : 'development'
+        )
+}
+
+/**
+ * Gets the configuration for the current environment, if one is configured
+ */
+export const getCurrentEnvironmentConfig = (parsedArgs: RequestArgs.t) => {
+    const currentEnv = getCurrentEnvironment(parsedArgs)
+
+    return parsedArgs.config.environment && parsedArgs.config.environment[currentEnv]
+        ? parsedArgs.config.environment[currentEnv] as Protocol.Environment.t | undefined
+        : undefined
+}
+
+/**
+ * Gets the configuration for the named network
+ */
+export const getNetworkConfig = (parsedArgs: RequestArgs.t) => (networkName: string) =>
+    parsedArgs.config.network![networkName] ?? undefined
+
+
+/**
+ * Gets the configuration for the named sandbox
+ */
+export const getSandboxConfig = (parsedArgs: RequestArgs.t) => (sandboxName: string): Protocol.SandboxConfig.t | undefined =>
+    (parsedArgs.config.sandbox![sandboxName] ?? undefined) as Protocol.SandboxConfig.t | undefined
+
+
+/**
+ * Gets the name of accounts for the given sandbox
+ */
+export const getSandboxAccountNames = (parsedArgs:RequestArgs.t) => (sandboxName: string) => {
+    const sandbox = getSandboxConfig(parsedArgs) (sandboxName)
+
+    return sandbox
+        ? Object.keys(sandbox.accounts ?? []).filter(accountName => accountName !== 'default')
+        : []
+}
+
+/**
+ * Gets the account config for the named account of the given sandbox
+ */
+export const getSandboxAccountConfig = (parsedArgs:RequestArgs.t) => (sandboxName: string) => (accountName: string) => {
+    const sandbox = getSandboxConfig (parsedArgs) (sandboxName)
+    
+    if (sandbox && sandbox.accounts) {
+        const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>
+        return accounts[accountName]
+    }
+    return undefined
+}
+
+/**
+ * Gets the initial storage for the contract
+ */
+export const getInitialStorage = (parsedArgs: RequestArgs.t) => (contractFilename : string) => {
+    const env = getCurrentEnvironmentConfig(parsedArgs)
+    
+    return env
+        ? env.storage && env.storage[contractFilename]
+        : undefined
+}
+
+/**
+ * Gets the default account associated with a sandbox
+ */
+export const getDefaultAccount = (parsedArgs: RequestArgs.t) => (sandboxName: string) => {
+    const sandboxConfig = getSandboxConfig(parsedArgs) (sandboxName)
+    if (sandboxConfig) {
+        const defaultAccount = sandboxConfig.accounts!["default"] as string | undefined
+        if (defaultAccount) {
+            return getSandboxAccountConfig(parsedArgs) (sandboxName) (defaultAccount)
+        }
+    }
+    
+    return undefined
+}
+    
 const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
     // The definer function can provide a name for the plugin in its schema, or it
     // can omit it and we infer it from the package.json file.
@@ -268,8 +365,6 @@ export const Plugin = {
         })
     }
 }
-
-const {Task, Option, PositionalArg, Operation} = Protocol
 
 export {
     Protocol,

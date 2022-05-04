@@ -192,7 +192,6 @@ export const inject = (deps: PluginDeps) => {
     // which includes all dependencies and the individual request args
     // toPluginArguments: Record<string, unknown> -> PluginRequestArgs
     const toPluginArguments = (requestArgs: Record<string, unknown>): PluginRequestArgs => {
-    
         // For each argument passed in via the CLI, send it as an argument to the
         // plugin call as well. Plugins can use this information for additional context
         // about invocation
@@ -208,6 +207,11 @@ export const inject = (deps: PluginDeps) => {
                     'disableState',
                     '_',
                 ]
+
+                // A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command
+                // Refer to https://github.com/yargs/yargs-parser/issues/201
+                if (typeof val === 'string' && val.match(/^___(.|\n)*___$/)) val = val.slice(3, -3)
+
                 // Some parameters we don't need to send, so we omit those
                 if (omit.includes(key) || key.indexOf('-') >= 0 || val === undefined)
                     return retval
@@ -268,7 +272,7 @@ export const inject = (deps: PluginDeps) => {
     // persisted to state.json before its returned
     // getNonMemoizedState: () -> Future<TaqError, State>
     const getNonMemoizedState = () => pipe(
-        debug(parsedArgs),
+        parsedArgs,
         getStateAbspath,
         stateAbspath => pipe(
             !parsedArgs.disableState

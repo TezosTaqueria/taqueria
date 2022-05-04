@@ -72,21 +72,23 @@ const getTaskCounts = (pluginInfo: PluginInfo.t[]): TaskCounts => {
 }
 
 type OperationCounts = Record<string, string[]>
-const getOperationCounts = (pluginInfo: PluginInfo.t[]): OperationCounts => pluginInfo.reduce(
-    (retval, pluginInfo) => pluginInfo.operations.reduce(
-        (retval: OperationCounts, operation: Operation.t) => {
-            const operationName = operation.operation
-            const providers = retval[operationName]
-                ? [...retval[operationName], pluginInfo.name]
-                : [pluginInfo.name]
-            const mapping: OperationCounts = {}
-            mapping[operationName] = providers
-            return {...retval, ...mapping}
-        },
-        retval
-    ),
-    {} as OperationCounts
-)
+const getOperationCounts = (pluginInfo: PluginInfo.t[]): OperationCounts => {
+    return pluginInfo.reduce(
+        (retval, pluginInfo) => pluginInfo.operations.reduce(
+            (retval: OperationCounts, operation: Operation.t) => {
+                const operationName = operation.operation
+                const providers = retval[operationName]
+                    ? [...retval[operationName], pluginInfo.name]
+                    : [pluginInfo.name]
+                const mapping: OperationCounts = {}
+                mapping[operationName] = providers
+                return {...retval, ...mapping}
+            },
+            retval
+        ),
+        {} as OperationCounts
+    )
+}
 
 export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], i18n: i18n) => {
     const taskCounts = getTaskCounts(pluginInfo)

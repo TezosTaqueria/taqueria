@@ -1,13 +1,9 @@
 import {z} from 'zod'
-import * as Verb from '@taqueria/protocol/Verb'
+import * as Verb from "@taqueria/protocol/Verb"
+import * as Alias from "@taqueria/protocol/Alias"
 import * as Command from '@taqueria/protocol/Command'
-import * as SingleChar from '@taqueria/protocol/SingleChar'
 import * as Option from '@taqueria/protocol/Option'
 import * as PositionalArg from '@taqueria/protocol/PositionalArg'
-
-const taskAliasSchema = z
-    .union([Verb.schema, SingleChar.schema])
-    .transform(val => val as unknown as (Verb.t | SingleChar.t))
 
 const taskEncodingSchema = z
     .union([
@@ -23,7 +19,7 @@ const taskHandlerSchema = z.union([z.literal('proxy'), z.string()])
 const internalSchema = z.object({
     task: Verb.schema,
     command: Command.schema,
-    aliases: z.array(taskAliasSchema).default([]).optional(),
+    aliases: z.array(Alias.rawSchema).default([]).optional(),
     description: z.string().nonempty(),
     example: z.string().optional(),
     hidden: z.boolean().default(false).optional(),
@@ -36,7 +32,7 @@ const internalSchema = z.object({
 export const rawSchema = z.object({
     task: Verb.rawSchema,
     command: Command.rawSchema,
-    aliases: z.array(z.union([Verb.schema, SingleChar.schema])).default([]).optional(),
+    aliases: z.array(Alias.rawSchema).default([]).optional(),
     description: z.string().nonempty(),
     example: z.string().optional(),
     hidden: z.boolean().default(false).optional(),

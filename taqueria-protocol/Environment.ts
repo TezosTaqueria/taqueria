@@ -2,7 +2,8 @@ import {z} from 'zod'
 
 export const rawSchema = z.object({
     networks: z.array(z.string().nonempty()),
-    sandboxes: z.array(z.string().nonempty())
+    sandboxes: z.array(z.string().nonempty()),
+    storage: z.record(z.any()).optional()
 })
 
 export const schema = rawSchema.transform(val => val as Environment)

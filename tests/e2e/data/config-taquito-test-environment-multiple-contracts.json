@@ -55,31 +55,31 @@
     "network": {
         "ithacanet": {
             "label": "ithacanet",
-            "rpcUrl": "https://hangzhounet.api.tez.ie",
+            "rpcUrl": "https://ithacanet.ecadinfra.com",
             "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "faucet": {
-                "pkh": "tz1fsJPyLDCqeG8qX1Wxvv4xFRLZrzuB4EtE",
+                "pkh": "tz1RWs1bLmga24RybaC5Di441sK6aGLmCTpx",
                 "mnemonic": [
-                    "feature",
-                    "coyote",
-                    "similar",
-                    "snap",
-                    "print",
-                    "brisk",
-                    "horror",
-                    "vessel",
-                    "bunker",
-                    "together",
-                    "sauce",
-                    "match",
-                    "salute",
-                    "among",
-                    "seminar"
+                    "throw",
+                    "cactus",
+                    "romance",
+                    "lake",
+                    "step",
+                    "floor",
+                    "limit",
+                    "shallow",
+                    "leader",
+                    "pride",
+                    "thrive",
+                    "void",
+                    "carbon",
+                    "wreck",
+                    "retreat"
                 ],
-                "email": "osfkofhi.mhckkmcv@teztnets.xyz",
-                "password": "qo8QtQSghQ",
-                "amount": "10183000200",
-                "activation_code": "2b860cd01699588f007927093e0c6d54c6c5df2f"
+                "email": "tskwglte.mscstjny@teztnets.xyz",
+                "password": "fvzAbTJ7Uz",
+                "amount": "8780051082",
+                "activation_code": "07739888a2615d5176505c900f411dcf7990073d"
             }
         }
     }

@@ -1,7 +1,9 @@
-import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendAsyncRes, sendJsonRes} from '@taqueria/node-sdk'
-import type { SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO } from "@taqueria/node-sdk/types"
+import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendRes, sendAsyncRes, sendJsonRes, sendAsyncJsonRes} from '@taqueria/node-sdk'
+import type {SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO, PluginResponse} from "@taqueria/node-sdk/types"
 import type {ExecException} from 'child_process'
 import retry from 'async-retry'
+import {join} from 'path'
+import glob from 'fast-glob'
 
 type Opts = SanitizedArgs & {sandboxName?: string}
 
@@ -127,8 +129,8 @@ const startAll = (sandboxes: Sandbox[], opts: Opts): Promise<void> => {
 
     return Promise.all(jobs).then(_ => sendAsyncRes("Done."))
 }
-    
-const getSandbox = ({sandboxName, config}: Opts ) => {
+
+const getSandbox = ({sandboxName, config}: Opts) => {
     if (sandboxName && config.sandbox[sandboxName]) {
         const sandboxConfig : SandboxConfig = config.sandbox[sandboxName]
 

@@ -60,7 +60,7 @@ export const getConfigPath = (projectDir: SanitizedAbsPath.t, create=false) : Fu
 export const getRawConfig = (projectDir: SanitizedAbsPath.t, create=false) => pipe(
     getConfigPath(projectDir, create),
     chain ((configPath : string) => pipe(
-        readJsonFile(configPath),
+        readJsonFile<Config.t>(configPath),
         chainRej (err => {
             if (!create) return reject(err)
             else {
@@ -72,7 +72,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath.t, create=false) => pi
         })
     )),
     mapRej<TaqError.t, TaqError.t>(previous => ({kind: "E_INVALID_CONFIG", msg: "Your config.json file is invalid", previous})),
-    map(val => val as Config.t)
+    map((val: Config.t) => Config.create(val))
 )
 
 

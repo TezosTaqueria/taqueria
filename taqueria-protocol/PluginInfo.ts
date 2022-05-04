@@ -5,22 +5,39 @@ import * as VersionNumber from "@taqueria/protocol/VersionNumber"
 import * as Task from '@taqueria/protocol/Task'
 import * as Operation from '@taqueria/protocol/Operation'
 
-const internalSchema = z.object({
+interface CreateSchemaArgs {
+    versionSchema: z.ZodTypeAny, 
+    aliasSchema: z.ZodTypeAny,
+    taskSchema: z.ZodTypeAny,
+    opSchema: z.ZodTypeAny
+}
+const createSchema = (schemas: CreateSchemaArgs) => z.object({
     name: z.string().nonempty(),
-    schema: VersionNumber.schema,
-    version: VersionNumber.schema,
-    alias: Alias.schema,
-    tasks: z.array(Task.schema).default([]),
-    operations: z.array(Operation.schema).default([])
+    schema: schemas.versionSchema,
+    version: schemas.versionSchema,
+    alias: schemas.aliasSchema.optional(),
+    tasks: z.preprocess(
+        val => val ?? [],
+        z.array(schemas.taskSchema).optional()
+    ),  
+    operations: z.preprocess(
+        val => val ?? [],
+        z.array(schemas.opSchema).optional()
+    )
 })
 
-export const rawSchema = z.object({
-    name: z.string().nonempty(),
-    schema: VersionNumber.rawSchema,
-    version: VersionNumber.rawSchema,
-    alias: Alias.rawSchema,
-    tasks: z.array(Task.schema).default([]),
-    operations: z.array(Operation.schema).default([])
+const internalSchema = createSchema({
+    versionSchema: VersionNumber.schema,
+    aliasSchema: Alias.schema,
+    taskSchema: Task.schema,
+    opSchema: Operation.schema
+})
+
+export const rawSchema = createSchema({
+    aliasSchema: Alias.schema,
+    taskSchema: Task.schema,
+    opSchema: Operation.schema,
+    versionSchema: VersionNumber.schema
 })
 
 const pluginInfoType: unique symbol = Symbol("PluginInfo")

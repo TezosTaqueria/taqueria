@@ -18,6 +18,17 @@ const internalSchema = z.object({
         .transform(fn => fn as Handler)
 })
 
+export const rawSchema = z.object({
+    operation: Verb.rawSchema,
+    command: Command.rawSchema,
+    description: z.string().optional(),
+    options: z.array(Option.rawSchema).default([]),
+    handler: z.function()
+        .args(parsedArgs)
+        .returns(z.string())
+        .transform(fn => fn as Handler)
+})
+
 export const schema = internalSchema.transform(val => val as Operation)
 
 const operationType: unique symbol = Symbol("Operation")
