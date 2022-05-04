@@ -192,14 +192,38 @@ jobs:
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  run-tests:
+  gather-info-for-e2e-tests:
     runs-on: ubuntu-latest
     needs: 
       - build-binaries
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
+    outputs:
+      test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+      test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16.13.x
+      - id: set-test-chunks
+        name: Set Chunks
+        run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -cM '[_nwise(length / 4 | ceil)]')"
+      - id: set-test-chunk-ids
+        name: Set Chunk IDs
+        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
+        env:
+          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+
+  run-tests:
+    name: test (chunk ${{ matrix.chunk }})
+    runs-on: ubuntu-latest
+    needs: 
+      - build-binaries
+      - gather-info-for-e2e-tests
+    if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
     strategy:
       matrix:
-        chunk: ${{ steps['set-test-chunk-ids'].outputs['test-chunks-ids'] }}
+        chunk: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -230,15 +254,6 @@ jobs:
           echo "$(pwd)" >> $GITHUB_PATH
         if: ${{ github.event.pull_request.head.repo.fork }}
 
-      - id: set-test-chunks
-        name: Set Chunks
-        run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -cM '[_nwise(length / 4 | ceil)]')"
-      - id: set-test-chunk-ids
-        name: Set Chunk IDs
-        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
-        env:
-          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
-
       - name: install dependencies
         run: npm ci
 
@@ -258,6 +273,8 @@ jobs:
       - name: Run e2e tests
         run: |
           echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npm run test:e2e -w tests
+        env:
+          CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks'] }
   
       - name: Report Status
         uses: ravsamhq/notify-slack-action@v1
