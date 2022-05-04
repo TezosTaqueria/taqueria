@@ -168,21 +168,15 @@ describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops",  () =>
 // As a result, when running tests in tezos-client.spec, it will complain that files don't exist.
 describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-client plugin", () => {
 
+    dockerName = "local"
+
     beforeAll(async () => {
-        dockerName = "local"
         await generateTestProject(taqueriaProjectPath, ["tezos-client", "flextesa"]);
         await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
     })
 
     test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
         try {
-
-            // Setting up docker container name
-            dockerName = "local"
-
-            // 1. Run sandbox start command
-            await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
-
             const accounts = await exec(`taq list accounts ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
             expect(accounts.stdout).toContain("bob")
 
@@ -193,13 +187,6 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
     test('Verify that taqueria flextesa plugin will return "Already running." if sandbox has started" if user tries to call start sandbox twice', async () => {
         try {
-
-            // Setting up docker container name
-            dockerName = "local"
-
-            // 1. Run sandbox start command
-            await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
-
             // 2.  Run start command second time and verify the output
             const sandboxStart = await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
             expect(sandboxStart.stdout).toEqual("Already running.\n");
