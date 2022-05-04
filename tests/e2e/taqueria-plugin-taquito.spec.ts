@@ -32,7 +32,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // const deployCommand = 
             const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
-            await new Promise(resolve => setTimeout(resolve, 45000))
+            await new Promise(resolve => setTimeout(resolve, 20000))
 
             // 3. Verify that contract has been originated on the network
             expect(deployResponse).toContain("hello-tacos.tz");
@@ -66,7 +66,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // const stdoutDeploy = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             const deployCommand = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
-            await new Promise(resolve => setTimeout(resolve, 45000))
+            await new Promise(resolve => setTimeout(resolve, 20000))
 
             // 3. Get the KT address from the output
             expect(deployResponse).toContain("hello-tacos.tz");
@@ -106,7 +106,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             // const deployCommand = 
             const deployCommand = await exec(`taq originate -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
-            await new Promise(resolve => setTimeout(resolve, 45000))
+            await new Promise(resolve => setTimeout(resolve, 20000))
 
             // 3. Verify that contract has been originated on the network
             expect(deployResponse).toContain("hello-tacos.tz");
@@ -139,7 +139,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
         const deployCommand = await exec(`taq originate -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
         const deployResponse = deployCommand.stdout.trim()
-        await new Promise(resolve => setTimeout(resolve, 45000))
+        await new Promise(resolve => setTimeout(resolve, 20000))
         
         expect(deployResponse).toContain(contract1);
         expect(deployResponse).toContain(networkInfo.networkName);
