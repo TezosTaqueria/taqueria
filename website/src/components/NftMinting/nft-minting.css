@@ -1,6 +1,12 @@
 .nft-minting-page h4 {
   margin: 0px;
-  padding: 20px;
+  padding: 0px;
+}
+
+.nft-minting-page h5 {
+  margin: 0px;
+  padding: 0px;
+  font-size: 12px;
 }
 
 .nft-minting-page button {
