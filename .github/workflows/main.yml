@@ -197,6 +197,9 @@ jobs:
     needs: 
       - build-binaries
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
+    strategy:
+      matrix:
+        chunk: ${{ steps['set-test-chunk-ids'].outputs['test-chunks-ids'] }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -227,6 +230,15 @@ jobs:
           echo "$(pwd)" >> $GITHUB_PATH
         if: ${{ github.event.pull_request.head.repo.fork }}
 
+      - id: set-test-chunks
+        name: Set Chunks
+        run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -cM '[_nwise(length / 4 | ceil)]')"
+      - id: set-test-chunk-ids
+        name: Set Chunk IDs
+        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
+        env:
+          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+
       - name: install dependencies
         run: npm ci
 
@@ -245,7 +257,7 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          npm run test:e2e -w tests
+          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npm run test:e2e -w tests
   
       - name: Report Status
         uses: ravsamhq/notify-slack-action@v1
