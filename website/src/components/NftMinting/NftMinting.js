@@ -247,13 +247,12 @@ export default function NftMinting() {
       </p>
       <h4>About Taqueria NFTs</h4>
       <p>
-        Taqueria NFTs are a proof that you have been a part of Taqueria from Day
-        1. Taqueria will release limited edition NFTs to mark significant events
-        in the Taqueria journey. The NFTs will only be available for a limited
-        time and will not be reissued once they are closed. Whilst we don't have
-        an exact roadmap for these NFTs just yet, holding Taqueria NFTs in
-        future may entitle you to receive Taqueria swag or special entrance to
-        Taqueria events.
+        Join the Taqueria community and show your support by minting free
+        limited edition Taqueria NFTs. These NFTs are issued to mark significant
+        events in the Taqueria journey. Each NFT is only available for a limited
+        time. Taqueria NFTs will be used to recognize and reward community
+        participation, give away swag, run NFT holder contests and grant special
+        access to Taqueria events.
       </p>
     </div>
   );
