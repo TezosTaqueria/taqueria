@@ -1,4 +1,4 @@
-    import fsPromises from "fs/promises"
+import fsPromises from "fs/promises"
 import { generateTestProject } from "./utils/utils";
 import { exec as exec1 } from "child_process";
 import { TezosToolkit } from '@taquito/taquito';
