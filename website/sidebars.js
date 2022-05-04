@@ -23,10 +23,10 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "intro",
         "getting-started/installation",
+        "intro",
         "getting-started/quickstart",
-        "getting-started/networks",
+        "getting-started/networks"
       ],
     },
     {
