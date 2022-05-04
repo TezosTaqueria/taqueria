@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/node-sdk",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A TypeScript SDK for NodeJS used for Taqueria plugin development.",
   "main": "./index.js",
   "source": "./index.ts",
@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "dependencies": {
-    "@taqueria/protocol": "^0.2.1",
+    "@taqueria/protocol": "^0.3.0",
     "project-name-generator": "^2.1.9",
     "rambda": "^7.0.3",
     "yargs": "^17.2.1"
@@ -49,8 +49,7 @@
     "@types/stack-trace": "^0.0.29",
     "@types/yargs": "^17.0.7",
     "caller-id": "^0.1.0",
-    "esbuild": "^0.14.13",
-    "parcel": "^2.2.1",
+    "esbuild": "^0.14.38",
     "stack-trace": "github:mweichert/node-stack-trace",
     "typescript": "4.5.4"
   }

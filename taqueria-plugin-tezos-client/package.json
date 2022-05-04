@@ -1,7 +1,7 @@
 {
-  "name": "@taqueria/plugin-smartpy",
+  "name": "@taqueria/plugin-tezos-client",
   "version": "0.3.0",
-  "description": "A taqueria plugin for compiling SmartPy smart contracts",
+  "description": "A taqueria plugin for utilizing tezos-client",
   "targets": {
     "default": {
       "source": "./index.ts",
@@ -22,19 +22,19 @@
     "ecad",
     "ecadlabs",
     "plugin",
-    "smartpy",
-    "smart contract",
-    "compile"
+    "tezos-client",
+    "typecheck",
+    "simulate"
   ],
   "engines": {
-    "node": ">=14.5"
+    "node": ">=16"
   },
   "author": "ECAD Labs",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/ecadlabs/taqueria.git",
-    "directory": "taqueria-plugin-smartpy"
+    "directory": "taqueria-plugin-tezos-client"
   },
   "bugs": {
     "url": "https://github.com/ecadlabs/taqueria/issues"
