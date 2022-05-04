@@ -34,7 +34,7 @@ In more practical terms, Taqueria is a task runner that you can use from the com
 
 Taqueria has a few major components:
  - A command line interface (CLI) you use in your terminal through a command named `taq`
- - A library of plugins that add tasks to Taqueria to do cool and useful things like smart contract compiling, originating, and type generation
+ - A library of plugins that add tasks to Taqueria to do cool and useful things like compiling and originating smart contracts, and type generation
  - A VS Code Extension which provides the ability to run Taqueria tasks from the command palette
 
 ## Basic Components
@@ -45,8 +45,14 @@ The CLI is the main user interface for Taqueria which provides a command `taq` t
 
 Basic usage of the Taqueria CLI involves running a command following the pattern 
 ```shell
-taq [task] [options]
+taq [taskName] [options]
 ```
+
+:::note
+Taqueria uses the following conventions for displaying command structure:
+- Square brackets `[value]` are  used to indicate optional arguments
+- Angle brackets `<value>` are used to indicate required arguments
+:::
 
 You can see what tasks are available to run in any given context by running `taq --help` from the command line
 
