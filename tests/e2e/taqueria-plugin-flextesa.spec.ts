@@ -8,154 +8,6 @@ import * as contents from './data/typechecker-simulator-contents'
 const taqueriaProjectPath = 'e2e/auto-test-flextesa-plugin';
 let dockerName: string;
 
-describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops",  () => {
-
-    beforeAll(async () => {
-        await generateTestProject(taqueriaProjectPath, ["flextesa"]);
-    })
-
-    test('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
-        try {
-
-            // Setting up docker container name
-            dockerName = "local"
-
-            // 1. Run sandbox start command
-            const sandboxStart = await exec(`taq start sandbox`, {cwd: `./${taqueriaProjectPath}`})
-
-            // 2. Verify that sandbox has been started and taqueria returns proper message into console
-            expect(sandboxStart.stdout).toEqual("Started local.\nDone.\n");
-
-            // 3. Verify that docker container has been started
-            const dockerContainerTest = await getContainerName(dockerName);
-            expect(dockerContainerTest).toContain("node index.js --sandbox local")
-
-            // 5.  Run stop command and verify the output
-            const sandboxStop = await exec(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
-
-            // 5. Verify that taqueria returns proper message into console
-            expect(sandboxStop.stdout).toEqual("Stopped local.\n");
-            const dockerContainerStopTest = await getContainerName(dockerName);
-            expect(dockerContainerStopTest).toBe("")
-
-        } catch(error) {
-            throw new Error (`error: ${error}`);
-        }
-
-    });
-
-    test('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
-        try {
-
-            // Setting up docker container name
-            dockerName = "test"
-
-            // 1. Run sandbox start command
-            await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);
-            const sandboxStart = await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
-
-            // 2. Verify that sandbox has been started and taqueria returns proper message into console
-            expect(sandboxStart.stdout).toContain(`Started ${dockerName}.`);
-
-            // 3. Verify that docker container has been started
-            const dockerContainerTest = await getContainerName(dockerName);
-            expect(dockerContainerTest).toContain(`node index.js --sandbox ${dockerName}`)
-
-            // 5.  Run stop command and verify the output
-            const sandboxStop = await exec(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
-
-            // 5. Verify that taqueria returns proper message into console
-            expect(sandboxStop.stdout).toContain(`Stopped ${dockerName}.`);
-
-        } catch(error) {
-            throw new Error (`error: ${error}`);
-        }
-
-    });
-
-    test('Verify that taqueria flextesa plugin will return "The local sandbox was not running." if user tries to call stop on sandbox that is not running', async () => {
-        try {
-            // 1. Run stop sandbox local on sandbox that is not running and verify result
-            const sandboxWasNotRunning = await exec("taq stop sandbox local", {cwd: `./${taqueriaProjectPath}`})
-            expect(sandboxWasNotRunning.stdout).toEqual("The local sandbox was not running.\n");
-
-        } catch(error) {
-            throw new Error (`error: ${error}`);
-        }
-
-    });
-
-    // TODO: Currently it cannot be done until the output will be places to stdout
-    // Issue to implement the test: https://github.com/ecadlabs/taqueria/issues/368
-    // Related developer issue: https://github.com/ecadlabs/taqueria/issues/367
-    test('Verify that taqueria flextesa plugin will return "The local sandbox is not running." if user tries to retrieve list of accounts that is not running', async () => {
-        try {
-            // 1. Run list accounts command on sandbox that is not running and verify result
-            const stdoutSandboxIsNotRunning = await exec("taq list accounts local", {cwd: `./${taqueriaProjectPath}`})
-            expect(stdoutSandboxIsNotRunning.stderr).toEqual("The local sandbox is not running.\n");
-
-        } catch(error) {
-            throw new Error (`error: ${error}`);
-        }
-
-    });
-
-    // TODO: Currently it cannot be done until this issue has been resolved
-    // Issue to implement test: https://github.com/ecadlabs/taqueria/issues/366
-    // Related developer issue: https://github.com/ecadlabs/taqueria/issues/243
-    test.skip('Verify that taqueria flextesa plugin can retrieve data from updated config after restart', async () => {
-        try {
-            // Setting up docker container name
-            dockerName = "local"
-
-            // 1. Start sandbox
-
-            // 2. Check balance
-
-            // 3. Stop sandbox
-
-            // 4. Update config
-
-            // 5. start sandbox again
-
-            // 6. Check balance again and see that it changed
-
-        } catch(error) {
-            throw new Error (`error: ${error}`);
-        }
-
-    });
-
-
-    // Clean up process to stop container if it was not stopped properly during the test
-    afterEach(async () => {
-        try {
-            const dockerContainer = await getContainerName(dockerName);
-            if(dockerContainer !== ""){
-                await exec(`docker stop ${dockerName}`);
-            }
-
-            const dockerListStdout = await exec("docker ps")
-            if(dockerListStdout.stdout.includes(dockerName)){
-                throw new Error("Container was not stopped properly");
-            }
-        } catch(error){
-            throw new Error (`error: ${error}`);
-        }
-    });
-
-    // Clean up process to remove taquified project folder
-    // Comment if need to debug
-    afterAll( async () => {
-        try {
-            await fsPromises.rm(taqueriaProjectPath, { recursive: true })
-        } catch(error){
-            throw new Error (`error: ${error}`);
-        }
-    })
-
-});
-
 // TODO: to be moved into a different spec file when the tezos-client plugin no longer depends on the flextesa plugin.
 // If I move it now, testing won't work.
 // Starting docker in e2e/auto-test-flextesa-plugin and then e2e/auto-test-tezos-client-plugin won't work
@@ -449,3 +301,152 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     })
 
 })
+
+describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops", () => {
+
+    beforeAll(async () => {
+        await generateTestProject(taqueriaProjectPath, ["flextesa"]);
+    })
+
+    test('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
+        try {
+
+            // Setting up docker container name
+            dockerName = "local"
+
+            // 1. Run sandbox start command
+            const sandboxStart = await exec(`taq start sandbox`, {cwd: `./${taqueriaProjectPath}`})
+
+            // 2. Verify that sandbox has been started and taqueria returns proper message into console
+            expect(sandboxStart.stdout).toEqual("Started local.\nDone.\n");
+
+            // 3. Verify that docker container has been started
+            const dockerContainerTest = await getContainerName(dockerName);
+            expect(dockerContainerTest).toContain("node index.js --sandbox local")
+
+            // 5.  Run stop command and verify the output
+            const sandboxStop = await exec(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
+
+            // 5. Verify that taqueria returns proper message into console
+            expect(sandboxStop.stdout).toEqual("Stopped local.\n");
+            const dockerContainerStopTest = await getContainerName(dockerName);
+            expect(dockerContainerStopTest).toBe("")
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+
+    });
+
+    test('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
+        try {
+
+            // Setting up docker container name
+            dockerName = "test"
+
+            // 1. Run sandbox start command
+            await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);
+            const sandboxStart = await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
+
+            // 2. Verify that sandbox has been started and taqueria returns proper message into console
+            expect(sandboxStart.stdout).toContain(`Started ${dockerName}.`);
+
+            // 3. Verify that docker container has been started
+            const dockerContainerTest = await getContainerName(dockerName);
+            expect(dockerContainerTest).toContain(`node index.js --sandbox ${dockerName}`)
+
+            // 5.  Run stop command and verify the output
+            const sandboxStop = await exec(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
+
+            // 5. Verify that taqueria returns proper message into console
+            expect(sandboxStop.stdout).toContain(`Stopped ${dockerName}.`);
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+
+    });
+
+    test('Verify that taqueria flextesa plugin will return "The local sandbox was not running." if user tries to call stop on sandbox that is not running', async () => {
+        try {
+            // 1. Run stop sandbox local on sandbox that is not running and verify result
+            const sandboxWasNotRunning = await exec("taq stop sandbox local", {cwd: `./${taqueriaProjectPath}`})
+            expect(sandboxWasNotRunning.stdout).toEqual("The local sandbox was not running.\n");
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+
+    });
+
+    // TODO: Currently it cannot be done until the output will be places to stdout
+    // Issue to implement the test: https://github.com/ecadlabs/taqueria/issues/368
+    // Related developer issue: https://github.com/ecadlabs/taqueria/issues/367
+    test('Verify that taqueria flextesa plugin will return "The local sandbox is not running." if user tries to retrieve list of accounts that is not running', async () => {
+        try {
+            // 1. Run list accounts command on sandbox that is not running and verify result
+            const stdoutSandboxIsNotRunning = await exec("taq list accounts local", {cwd: `./${taqueriaProjectPath}`})
+            expect(stdoutSandboxIsNotRunning.stderr).toEqual("The local sandbox is not running.\n");
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+
+    });
+
+    // TODO: Currently it cannot be done until this issue has been resolved
+    // Issue to implement test: https://github.com/ecadlabs/taqueria/issues/366
+    // Related developer issue: https://github.com/ecadlabs/taqueria/issues/243
+    test.skip('Verify that taqueria flextesa plugin can retrieve data from updated config after restart', async () => {
+        try {
+            // Setting up docker container name
+            dockerName = "local"
+
+            // 1. Start sandbox
+
+            // 2. Check balance
+
+            // 3. Stop sandbox
+
+            // 4. Update config
+
+            // 5. start sandbox again
+
+            // 6. Check balance again and see that it changed
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+
+    });
+
+
+    // Clean up process to stop container if it was not stopped properly during the test
+    afterEach(async () => {
+        try {
+            const dockerContainer = await getContainerName(dockerName);
+            if(dockerContainer !== ""){
+                await exec(`docker stop ${dockerName}`);
+            }
+
+            const dockerListStdout = await exec("docker ps")
+            if(dockerListStdout.stdout.includes(dockerName)){
+                throw new Error("Container was not stopped properly");
+            }
+        } catch(error){
+            throw new Error (`error: ${error}`);
+        }
+    });
+
+    // Clean up process to remove taquified project folder
+    // Comment if need to debug
+    afterAll( async () => {
+        try {
+            await fsPromises.rm(taqueriaProjectPath, { recursive: true })
+        } catch(error){
+            throw new Error (`error: ${error}`);
+        }
+    })
+
+});
+

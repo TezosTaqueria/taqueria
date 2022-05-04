@@ -26,14 +26,8 @@ export const generateTestProject = async (projectPath: string, packageNames: str
 
     await checkFolderExistsWithTimeout(path.join("./", projectPath, 'package.json'));
 
-    await installPlugins(projectPath, packageNames, localPackages)
-    
-        await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`);
-}
-
-export async function installPlugins(projectPath: string, packageNames: string[], localPackages: boolean) {
     if (packageNames.length > 0) {
-        packageNames.forEach(async (packageName) => {
+        packageNames.forEach(packageName => {
            try {
                 if (localPackages) {
                    execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`, {encoding: "utf8"})
@@ -45,6 +39,8 @@ export async function installPlugins(projectPath: string, packageNames: string[]
            }
        });
     }
+    
+    await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`);
 }
 
 export async function getContainerName(dockerName: string): Promise<string>{
