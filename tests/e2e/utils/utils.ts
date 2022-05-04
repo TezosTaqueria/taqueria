@@ -27,19 +27,6 @@ export const generateTestProject = async (projectPath: string, packageNames: str
     await checkFolderExistsWithTimeout(path.join("./", projectPath, 'package.json'));
 
     await installPlugins(projectPath, packageNames, localPackages)
-
-    // if (packageNames.length > 0) {
-    //      packageNames.forEach(packageName => {
-    //         try {
-    //             if (localPackages) {
-    //                 exec(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`, {encoding: "utf8"})
-    //             } else {
-    //                 exec(`taq install @taqueria/plugin-${packageName}`, {cwd: targetDir})
-    //             }
-    //         } catch (error) {
-    //             throw new Error(`error: ${error}`);
-    //         }
-    //     });
     
         await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`);
 }
@@ -91,37 +78,3 @@ export async function checkFolderExistsWithTimeout(filePath:string) {
         throw new Error (`error: ${error}`);
     }
 }
-
-// // The solution is slightly modified version of this package
-// // https://github.com/sindresorhus/is-port-reachable
-// // package itself could not be used due to some issues
-// export async function isPortReachable(port: number, {host = "", timeout = 1000} = {}) {
-//     if (typeof host !== 'string') {
-//         throw new TypeError('Specify a `host`');
-//     }
-
-//     const promise = new Promise<void>(((resolve, reject) => {
-//         const socket = new net.Socket();
-
-//         const onError = () => {
-//             socket.destroy();
-//             reject();
-//         };
-
-//         socket.setTimeout(timeout);
-//         socket.once('error', onError);
-//         socket.once('timeout', onError);
-
-//         socket.connect(port, host, () => {
-//             socket.end();
-//             resolve();
-//         });
-//     }));
-
-//     try {
-//         await promise;
-//         return true;
-//     } catch {
-//         return false;
-//     }
-// }

@@ -48,7 +48,7 @@ describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops",  () =>
         try {
 
             // Setting up docker container name
-            dockerName = "tester"
+            dockerName = "test"
 
             // 1. Run sandbox start command
             await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);

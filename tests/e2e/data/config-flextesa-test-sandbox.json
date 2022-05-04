@@ -15,7 +15,7 @@
             "networks": [],
             "sandboxes": [
                 "local",
-                "tester"
+                "test"
             ],
             "storage": {}
         }
@@ -44,7 +44,7 @@
             "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "rpcUrl": "http://localhost:20000"
         },
-        "tester": {
+        "test": {
             "accounts": {
                 "default": "ken",
                 "ken": {
