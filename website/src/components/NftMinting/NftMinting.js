@@ -161,7 +161,7 @@ export default function NftMinting() {
         style={{
           marginBottom: stdMarginBottom
         }}
-        src="https://source.unsplash.com/6WHl6T-fxU0"
+        src="/img/tezTalksBanner.png"
       />
       <p
         style={{
@@ -243,7 +243,7 @@ export default function NftMinting() {
         Taqueria is a Tezos developer tool suite, designed to make working with
         Tezos easier and more secure. Whether you are an aspiring NFT artist or
         a seasoned dapp developer, you can use Taqueria to make your development
-        experience better. Try the beta on <a href="/">taqueria.io</a>
+        experience better. Try the beta <a href="https://taqueria.io/docs/getting-started/installation/">here</a>!
       </p>
       <h4>About Taqueria NFTs</h4>
       <p>
@@ -256,38 +256,30 @@ export default function NftMinting() {
       </p>
 
             <div id="disclaimer-text">
-        <h4>NFT Mint & License Terms</h4>
+        <h5>NFT Mint & License Terms</h5>
         <p>
           Non-fungible tokens ("NFTs") issued by ECAD Labs Inc. ("ECAD Labs")
           are for entertainment and promotional purposes only. NFTs do not grant
           any current or future rights to any property, services or rewards.
           NFTs are not intended to have any economic value
-        </p>
-
-        <p>
+ 
           All intellectual property rights in the NFTs and their related assets
           and artifacts (the "Artifacts"), including but not limited to all
           copyright, applicable moral rights, and trademarks, remains with the
           sole property of ECAD Labs and those parties expressly identified by
           ECAD Labs as owners or controllers of specific Artifacts
-        </p>
 
-        <p>
           The NFTs are intended for personal, non-commercial use and Artifacts
           may only be viewed or displayed in personal wallets and other similar
           services used to view non-fungible tokens. Any use or reproduction of
           Artifacts for any commercial purpose or that contravenes the ECAD Labs
           Acceptable Use Policy (ecadlabs.com/aup) is strictly prohibited
-        </p>
 
-        <p>
           Any contests or promotions operated by ECAD Labs that incorporate or
           utilize the NFTs may be subject to additional terms and conditions and
           may be restricted by age, location and other criteria established by
           ECAD Labs in its sole discretion
-        </p>
 
-        <p>
           ECAD Labs makes no representations or warranties that NFTs and
           Artifacts will remain accessible in the future, and all current and
           previous persons identified as owners or controllers of the NFTs on
@@ -296,15 +288,11 @@ export default function NftMinting() {
           assigns from any and all claims that may arise in relation to the
           NFTs, including any and all claims for direct, indirect, economic or
           consequential loss or damages
-        </p>
 
-        <p>
           Current and future owners and controllers of NFTs must accept these
           terms as a condition of receipt. Any transfer or assignment in
           violation of this requirement will make such transfer null and void
-        </p>
 
-        <p>
           Except as modified here, all ECAD Labs policies
           (ecadlabs.com/policies) apply to the NFTs
         </p>
