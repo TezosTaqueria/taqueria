@@ -27,29 +27,32 @@ Questions:
 
 Installing Taqueria is a quick and easy process if you understand a few basic concepts and follow the steps outlined in this guide
 
-There are two main components to install:
+There are two main components you can install:
 
-- The Taqueria CLI, an executable binary named `taq` installed globally in your shell's `$PATH`
-- A VS Code plugin installed directly through the VS Code Extension Marketplace
+- The Taqueria CLI (required)
+- The VS Code plugin for Taqueria (optional)
+
+:::note
+The Taqueria CLI is required to use the VS Code extension and as such, must be installed first
+:::
 
 ## Requirements
 
 ### Taqueria CLI
 
+- Node.js v16.x or later
 - A compatable operating system:
   - MacOS
   - Linux
   - Windows (via [WSL](https://docs.microsoft.com/en-us/windows/wsl/))
-- [Docker](https://www.docker.com/) 
+- [Docker](https://www.docker.com/) v0.8 or later
 
-
-### VS Code Extension
-
-The VS Code Extension requires a recent version of Microsoft Visual Studio Code which can be installed [here](https://code.visualstudio.com/)
 
 ## Installing the Taqueria CLI
 
 ### Overview
+
+The Taqueria CLI is an executable binary named `taq`, installed globally in your shell's `$PATH`
 
 Installing the Taqueria CLI involves the following steps:
 
@@ -121,20 +124,43 @@ sudo mv taq /usr/local/bin
 </TabItem>
 <TabItem value="win" label="Windows">
 
-We recomend Windows users run [WSL](https://docs.microsoft.com/en-us/windows/wsl/install) and follow the instructions detailed for Linux users
+:::warning
+Windows support is currently in alpha
+:::
 
+Windows users will run the Linux version of Taqueria via ([WSL2](https://docs.microsoft.com/en-us/windows/wsl/install)). Once WSL is installed and configured, the installation and usage steps are the same as for Linux:
+
+1. Download the latest Linux build of Taqueria
+
+```shell
+curl -LO https://taqueria.io/get/linux/taq
+```
+
+2. Make the binary file executable
+
+```shell
+chmod +x taq
+```
+
+3. Move the binary to a directory in your shell's `$PATH`
+
+```shell
+sudo mv taq /usr/local/bin
+```
+
+<!-- 
 :::caution
 A Windows x86_64 binary is available for those who are interested, however this is entirley unsupported and not reccomended
 
 ```shell
 curl -LO https://taqueria.io/get/windows/taq.exe
 ```
-:::
+::: -->
 
 </TabItem>
 </Tabs>
 
-## Installing the VS Code Extension
+## Installing the VS Code Extension (optional)
 
 The Taqueria VS Code Extension is installed from the Extensions pane within VS Code. The steps to install are:
 
