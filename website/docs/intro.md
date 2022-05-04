@@ -54,21 +54,20 @@ Taqueria uses the following conventions for displaying command structure:
 - Angle brackets `<value>` are used to indicate required arguments
 :::
 
-You can see what tasks are available to run in any given context by running `taq --help` from the command line
+You can see what tasks are available to run in any given context by running `taq` from the command line
 
 ### Taqueria Project
 
-A Taqueria project is one that has been initialized by Taqueria using the `taq init` command. It will have the following folder structure created:
-- `app`
-- `contracts`
-- `artifacts`
-- `./.taq`
-
-The `./.taq` folder contains the Taqueria configuration for a given project. Configuration for Taqueria plugins and sandboxes is done in `./.taq/config.json`
+A Taqueria project is one that has been initialized by Taqueria using the `taq init` command. It will have the following directory structure created:
+- `/artifacts`: This is where Taqueria will store artifacts that it creates during the course of its execution
+- `/contracts`: This is where Taqueria will store smart contracts that it compiles
+- `/tests`: This is where Taqueria will store tests that it runs 
+- `./.taq`: This is where Taqueria will store its configuration
 
 :::note
-At this time, all Taqueria projects must also be initialized as node projects by running `npm init -y` from the root of your project directory
+Configuration for Taqueria plugins and sandboxes is done in `./.taq/config.json`
 :::
+
 ### Taqueria Plugins
 
 Taqueria plugins add functionality to Taqueria by adding tasks to Taqueria. Plugins are managed right in Taqueria using the `taq install [pluginName]` and `taq uninstall [pluginName]` commands
@@ -78,12 +77,16 @@ Taqueria plugins are installed on a ***per-project*** basis which allows you to 
 Currently available plugins include:
 - LIGO Compiler
 - SmartPy Compiler
+- Archetype Compiler
 - Flextesa Sandbox
 - Taquito 
 - TS Type Generator
+- Tezos Client
 
 ### Taqueria SDK
 
-Taqueria has an SDK and protocol at its core which all Taqueria plugins and the cli depend on
+Taqueria has a Node.js SDK which is used by plugins to interact with the Taqueria protocol
 
-> Note: Most developers won't ever interact with the SDK directly unless they are developing a plugin
+:::note
+Most developers won't ever interact with the SDK directly unless they are developing a plugin
+:::
