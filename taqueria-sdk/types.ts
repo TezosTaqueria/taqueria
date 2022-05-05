@@ -6,6 +6,11 @@ import * as Task from "@taqueria/protocol/Task"
 import * as Option from "@taqueria/protocol/Option"
 import * as Operation from "@taqueria/protocol/Operation"
 import * as PositionalArg from "@taqueria/protocol/PositionalArg"
+import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
+import * as SandboxConfig from "@taqueria/protocol/SandboxConfig"
+import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
+import * as NetworkConfig from "@taqueria/protocol/NetworkConfig"
+import * as Environment from "@taqueria/protocol/Environment"
 import type {i18n} from "@taqueria/protocol/i18n"
 import { P } from 'ts-pattern'
 export type PluginResponse = Protocol.PluginResponse
@@ -16,7 +21,12 @@ export {
     Task,
     Option,
     Operation,
-    PositionalArg
+    PositionalArg,
+    LoadedConfig,
+    SandboxConfig,
+    SandboxAccountConfig,
+    NetworkConfig,
+    Environment
 }
 
 export interface Failure<Params> {

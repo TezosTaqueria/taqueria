@@ -7,6 +7,11 @@ import * as Task from "@taqueria/protocol/Task"
 import * as Option from "@taqueria/protocol/Option"
 import * as Operation from "@taqueria/protocol/Operation"
 import * as PositionalArg from "@taqueria/protocol/PositionalArg"
+import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
+import * as SandboxConfig from "@taqueria/protocol/SandboxConfig"
+import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
+import * as NetworkConfig from "@taqueria/protocol/NetworkConfig"
+import * as Environment from "@taqueria/protocol/Environment"
 
 import {Schema, InputSchema} from "./types"
 import {Args, pluginDefiner, LikeAPromise, Failure, StdIO} from "./types"
@@ -124,7 +129,6 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 export const noop = () => {}
 
 const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, Failure<undefined>> => {
-    debugger
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
         const argv = yargs(unparsedArgs.slice(2)).argv
         try {
@@ -270,7 +274,7 @@ export const getCurrentEnvironmentConfig = (parsedArgs: RequestArgs.t) => {
  * Gets the configuration for the named network
  */
 export const getNetworkConfig = (parsedArgs: RequestArgs.t) => (networkName: string) =>
-    parsedArgs.config.network![networkName] ?? undefined
+    (parsedArgs.config.network![networkName] ?? undefined) as Protocol.NetworkConfig.t | undefined
 
 
 /**
@@ -298,8 +302,10 @@ export const getSandboxAccountConfig = (parsedArgs:RequestArgs.t) => (sandboxNam
     const sandbox = getSandboxConfig (parsedArgs) (sandboxName)
     
     if (sandbox && sandbox.accounts) {
-        const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>
-        return accounts[accountName]
+        if (sandbox.accounts) {
+            const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>
+            return accounts[sandboxName]
+        }
     }
     return undefined
 }
@@ -371,5 +377,10 @@ export {
     Task,
     Option,
     PositionalArg,
-    Operation
+    Operation,
+    LoadedConfig,
+    SandboxConfig,
+    SandboxAccountConfig,
+    NetworkConfig,
+    Environment
 }

@@ -26,8 +26,15 @@ const environmentMap = z.record(
     ])
 ).optional()
 
-const accountsMap = z.record(
-    z.union([Tz.rawSchema, z.number()])
+const accountsMap = z.preprocess(
+    val => val ?? {
+        "bob": "5_000_000_000",
+        "alice": "5_000_000_000",
+        "john": "5_000_000_000",
+    },
+    z.record(
+        z.union([Tz.rawSchema, z.number()])
+    )
 )
 
 const commonSchema = z.object({

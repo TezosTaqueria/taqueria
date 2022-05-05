@@ -1,9 +1,4 @@
-// @ts-ignore see above
 import {z} from 'zod'
-// @ts-ignore see above
-import {urlParse} from './url-parse.ts'
-
-type URL = ReturnType<typeof urlParse>
 
 const urlType: unique symbol = Symbol('Url')
 
@@ -23,4 +18,7 @@ export type t = Url
 
 export const make = (value: string) => schema.parse(value)
 
-export const toComponents = (url: Url) => urlParse(url)
+export const toComponents = (url: Url) => {
+    const parts = new URL(url)
+    return parts
+}

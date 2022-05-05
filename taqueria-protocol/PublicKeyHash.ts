@@ -3,7 +3,7 @@ export const schema = z
     .string()
     .nonempty()
     .refine(
-        val => val.startsWith("tk1"),
+        val => val.startsWith("tz1"),
         val => ({message: `${val} is not a valid public key hash`}) 
     )
     .transform(val => val as t)

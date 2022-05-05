@@ -146,7 +146,6 @@ export const inject = (deps: PluginDeps) => {
     
         const shellCmd = ['sh', '-c', cmd.join(' ')]
     
-        
         return pipe(
             // TODO: Clear side-effect here. Can we handle this better?
             logPluginRequest (plugin) (cmd),

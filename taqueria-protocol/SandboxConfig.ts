@@ -3,6 +3,7 @@ import * as HumanReadableIdentifier from "@taqueria/protocol/HumanReadableIdenti
 import * as Url from "@taqueria/protocol/Url"
 import * as EconomicalProtocolHash from "@taqueria/protocol/EconomicalProtocolHash"
 import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
+import * as Verb from "@taqueria/protocol/Verb"
 
 const accountMapSchema = z.union([
     z.object({default: z.string().nonempty()}),
@@ -14,6 +15,7 @@ const internalSchema = z.object({
     rpcUrl: Url.schema,
     protocol: EconomicalProtocolHash.schema,
     attributes: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
+    plugin: Verb.schema.optional(),
     accounts: accountMapSchema.optional()
 })
 
@@ -22,6 +24,7 @@ export const rawSchema = z.object({
     rpcUrl: z.string().nonempty().url(),
     protocol: z.string().nonempty(),
     attributes: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
+    plugin: Verb.rawSchema.optional(),
     accounts: z.union([
         z.object({default: z.string().nonempty()}),
         z.record(SandboxAccountConfig.rawSchema)

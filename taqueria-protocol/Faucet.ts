@@ -1,6 +1,5 @@
 import {z} from 'zod'
-// @ts-ignore using file extension not idiomatic in TS
-import * as PublicKeyHash from "./PublicKeyHash.ts"
+import * as PublicKeyHash from "@taqueria/protocol/PublicKeyHash"
 
 const internalSchema = z.object({
     pkh: PublicKeyHash.schema,
@@ -10,7 +9,7 @@ const internalSchema = z.object({
     email: z.string().regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
     password: z.string().nonempty(),
     account: z.string().nonempty(),
-    activation_Code: z.string().nonempty()
+    activation_code: z.string().nonempty()
 })
 
 export const rawSchema = z.object({
@@ -19,10 +18,10 @@ export const rawSchema = z.object({
     email: z.string().regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
     password: z.string().nonempty(),
     account: z.string().nonempty(),
-    activation_Code: z.string().nonempty()
+    activation_code: z.string().nonempty()
 })
 
-export const schema = internalSchema.transform(val => val as t)
+export const schema = internalSchema.transform(val => val as Faucet)
 
 type Input = z.infer<typeof internalSchema>
 
@@ -30,11 +29,11 @@ type RawInput = z.infer<typeof rawSchema>
 
 const faucetType: unique symbol = Symbol("Faucet")
 
-export type t = Input & {
+export type Faucet = Input & {
     readonly [faucetType]: void
 }
 
-export type Faucet = t
+export type t = Faucet
 
 export const make = (data: Input) => schema.parse(data)
 

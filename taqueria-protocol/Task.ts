@@ -5,14 +5,16 @@ import * as Command from '@taqueria/protocol/Command'
 import * as Option from '@taqueria/protocol/Option'
 import * as PositionalArg from '@taqueria/protocol/PositionalArg'
 
-const taskEncodingSchema = z
-    .union([
+const taskEncodingSchema = z.preprocess(
+    (val: unknown) => val ?? 'none',
+    z.union([
         z.literal('json'),
         z.literal('application/json'),
         z.literal('none')
     ])
     .default('none')
     .optional()
+)
 
 const taskHandlerSchema = z.union([z.literal('proxy'), z.string()])
 
