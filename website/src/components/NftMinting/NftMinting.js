@@ -18,8 +18,8 @@ const rpcUrl = {
   mainnet: "https://mainnet.api.tez.ie"
 };
 const CONTRACT_ADDRESS = {
-  ithacanet: "KT1Wmc6wsVP5ELdGZp1Byt8FuXW13bspT6DM",
-  mainnet: ""
+  ithacanet: "KT1BEzoXUzG1S6e8Aw9VctmaGu7pchenK7hn",
+  mainnet: "KT1D6er82V26zwV7RUxA9Wq7YyjziC52STjo"
 };
 
 export default function NftMinting() {
@@ -224,7 +224,11 @@ export default function NftMinting() {
             <b>
               You can find it in your wallet or in the{" "}
               <a
-                href="https://better-call.dev/ithacanet/big_map/62449/keys"
+                href={`https://better-call.dev/${
+                  process.env.NODE_ENV === "development"
+                    ? "ithacanet"
+                    : "mainnet"
+                }/big_map/62449/keys`}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
               >
