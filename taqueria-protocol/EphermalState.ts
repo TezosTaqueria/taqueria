@@ -59,10 +59,10 @@ const getTaskCounts = (pluginInfo: PluginInfo.t[]): TaskCounts => {
             (retval: TaskCounts, task: Task.t) => {
                 const taskName = task.task
                 const providers = retval[taskName]
-                    ? [...retval[taskName], pluginInfo.name]
-                    : [pluginInfo.name]
+                    ? [...retval[taskName], pluginInfo.name, pluginInfo.alias]
+                    : [pluginInfo.name, pluginInfo.alias]
                 const mapping: TaskCounts = {}
-                mapping[taskName] = providers
+                mapping[taskName] = providers.filter(provider => provider !== undefined)
                 return {...retval, ...mapping}
             },
             retval
@@ -78,10 +78,10 @@ const getOperationCounts = (pluginInfo: PluginInfo.t[]): OperationCounts => {
             (retval: OperationCounts, operation: Operation.t) => {
                 const operationName = operation.operation
                 const providers = retval[operationName]
-                    ? [...retval[operationName], pluginInfo.name]
-                    : [pluginInfo.name]
+                    ? [...retval[operationName], pluginInfo.name, pluginInfo.alias]
+                    : [pluginInfo.name, pluginInfo.alias]
                 const mapping: OperationCounts = {}
-                mapping[operationName] = providers
+                mapping[operationName] = providers.filter(provider => provider !== undefined)
                 return {...retval, ...mapping}
             },
             retval
@@ -111,7 +111,7 @@ export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], 
                             options: [
                                 Option.create({
                                     flag: "plugin",
-                                    choices: taskCounts[taskName].map((pluginName: string) => pluginName.replace(/taqueria-plugin-/, '')),
+                                    choices: taskCounts[taskName],
                                     description: "Use to specify what plugin you'd like when running this task.",
                                     required: true
                                 })
@@ -160,7 +160,7 @@ export const mapOperationsToPlugins = (config: Config.t, pluginInfo: PluginInfo.
                             options: [
                                 Option.create({
                                     flag: "plugin",
-                                    choices: operationCounts[operationName].map((pluginName: string) => pluginName.replace(/taqueria-plugin-/, '')),
+                                    choices: operationCounts[operationName],
                                     description: "Use to specify what plugin you'd like when running this operation.",
                                     required: true
                                 })

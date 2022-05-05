@@ -322,7 +322,7 @@ const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir}: Sa
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) => state.plugins.reduce(
     (retval: Task.t|undefined, pluginInfo: PluginInfo.t) => 
-        pluginInfo.name === pluginName
+        pluginInfo.name === pluginName || pluginInfo.alias === pluginName
             ? pluginInfo.tasks.find((task: Task.t) => task.task === taskName)
             : retval
     ,
@@ -376,6 +376,11 @@ const addTemplates = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVa
     .alias('create-template', 'create')
     
 
+const getPluginOption = (task: Task.t) => {
+    return task.options?.find(option => option.flag === 'plugin')
+}
+
+
 const addTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib) => 
     Object.entries(state.tasks).reduce(
         (retval: CLIConfig, pair: [string, InstalledPlugin.t|Task.t]) => {
@@ -394,7 +399,7 @@ const addTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, pa
                 //      as if no other implementation was possible
 
                 // Was a plugin provider specified? (path #2 above)
-                if (parsedArgs.plugin && task.handler.includes(parsedArgs.plugin)) {
+                if (parsedArgs.plugin && getPluginOption(task)?.choices?.includes(parsedArgs.plugin)) {
                     const canonicalTask = getCanonicalTask(parsedArgs.plugin, taskName, state)
                     return canonicalTask
                         ? addTask(
