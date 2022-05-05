@@ -1,10 +1,12 @@
 import {execCmd, sendErr, sendJsonRes, sendAsyncErr} from "@taqueria/node-sdk"
-import { Failure, LikeAPromise, ParsedArgs, PluginResponse, SanitizedArgs } from "@taqueria/node-sdk/types";
+import { Failure, LikeAPromise, PluginResponse, RequestArgs } from "@taqueria/node-sdk/types";
 import glob from 'fast-glob'
 import { extname, join, basename } from 'path'
 import { readFile } from 'fs/promises'
 
-type Opts = SanitizedArgs & {sourceFile: string}
+interface Opts extends RequestArgs.t {
+  sourceFile?: string
+}
 
 const getInputFilename = (opts: Opts) => (sourceFile: string) => {
   const inputFile = basename(sourceFile, extname(sourceFile))
@@ -48,7 +50,7 @@ const compileAll = (opts: Opts): Promise<{ contract: string, artifact: string }[
   // TODO: Fetch list of files from SDK
   return glob(
     ['**/*.arl'],
-    { cwd: opts.contractsDir, absolute: false }
+    { cwd: opts.config.contractsDir, absolute: false }
   )
     .then(entries => entries.map(compileContract(opts)))
     .then(processes => processes.length > 0
@@ -58,12 +60,11 @@ const compileAll = (opts: Opts): Promise<{ contract: string, artifact: string }[
     .then(promises => Promise.all(promises))
 }
 
-const compile = <T>(parsedArgs: SanitizedArgs): LikeAPromise<PluginResponse, Failure<T>> => {
-  const params = parsedArgs as Opts
+const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
   const p = parsedArgs.sourceFile
-      ? compileContract(params) (params.sourceFile)
+      ? compileContract(parsedArgs) (parsedArgs.sourceFile)
           .then(result => [result])
-      : compileAll(params)
+      : compileAll(parsedArgs)
           .then(results => {
               if (results.length === 0) sendErr("No contracts found to compile.")
               return results
