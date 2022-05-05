@@ -25,7 +25,7 @@ Run Taqueria commands right in the VS Code Command Palette:
 
 ### Quickstart
 
-A basic workflow Taqueria is:
+A basic workflow in Taqueria is:
 
 1. Initialize the project by running the `taq init` command
 2. Install necessary plugins (LIGO, SmarPy, Flextesa, Taquito, ect)
