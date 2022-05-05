@@ -115,7 +115,7 @@
 
 ## Environment _(Phase 0)_
 - Many environments can be configured, and distinguishable by name. E.g. development, testing, production
-- A target for deployment and testing
+- A target for origination and testing
 - An environment can reference a named network or sandbox, and provide the ability to override default settings
 - Plugins can expose new environments
 - Down the road, we could have two types of environments, _static_ and _dynamic_. A static environment would refer to a single network or sandbox. It's a 1:1 relationship. A dynamic environment would refer to a list of attributes, which at runtime would match underlying networks or sandboxes. It provides a 1:many relationship, and could be used for intents like "target all networks and sandboxes that support protocol I"
