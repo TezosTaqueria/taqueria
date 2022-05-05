@@ -227,9 +227,9 @@ export default function NftMinting() {
               <a
                 href={`https://better-call.dev/${
                   process.env.NODE_ENV === "development"
-                    ? "ithacanet"
-                    : "mainnet"
-                }/big_map/62449/keys`}
+                    ? "ithacanet/big_map/62449/keys"
+                    : "mainnet/big_map/164359/keys"
+                }`}
 
                 target="_blank"
                 rel="noopener noreferrer nofollow"
