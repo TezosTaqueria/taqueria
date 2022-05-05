@@ -302,10 +302,8 @@ export const getSandboxAccountConfig = (parsedArgs:RequestArgs.t) => (sandboxNam
     const sandbox = getSandboxConfig (parsedArgs) (sandboxName)
     
     if (sandbox && sandbox.accounts) {
-        if (sandbox.accounts) {
-            const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>
-            return accounts[sandboxName]
-        }
+        const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>
+        return accounts[accountName]
     }
     return undefined
 }
