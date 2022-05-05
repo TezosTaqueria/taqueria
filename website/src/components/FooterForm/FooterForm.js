@@ -46,16 +46,7 @@ function Feature() {
             onChange={handleInputChange}
             className={styles.footerEmail}
           />
-          {/* <input type="hidden" name="group[218840]" id="mce-group[218840]" value="Taqueria (Developer Tools)" /> */}
-          <select type="hidden" name="group[218840]" class="REQ_CSS" id="mce-group[218840]" hidden>
-			<optgroup hidden>
-				<option value="1" selected>Taqueria (Developer Tools)</option>
-				<option value="2">Taquito (Typescript Library)</option>
-				<option value="4">Signatory (Remote Signer)</option>
-			</optgroup>	
-            <option value=""></option>
-
-          </select>
+          <input type="hidden" name="tags" value="2262640" />
           <button className={styles.signupButton} type="submit">
             Sign up
           </button>
