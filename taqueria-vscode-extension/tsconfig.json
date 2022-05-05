@@ -12,7 +12,7 @@
 		"strict": true   /* enable all strict type-checking options */
 	},
 	"exclude": [
-		"../node_modules",
+		"../node_modules/",
 		"node_modules",
 		".vscode-test"
 	]
