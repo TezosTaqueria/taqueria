@@ -18,7 +18,7 @@ purpose: help the user understand what Taqueria is, what it does, and how to pro
  -->
 
 :::note
-This is a quick introduction to the main concepts of Taqueria. If you are looking to get started with Taqueria right away with a hands on approach, you can jump to the [quickstart guide](/docs/quickstart/) 
+This is a quick introduction to the main concepts of Taqueria. If you are looking to get started with Taqueria right away with a hands on approach, you can jump to the [quickstart guide](/docs/getting-started/quickstart/) 
 :::
 
 Taqueria is here to help make developing on Tezos easier. Taqueria supercharges your projects with a powerful and centralized configuration and access to top Tezos development tools through tasks that you run from the command line
