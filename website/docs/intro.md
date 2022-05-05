@@ -84,7 +84,7 @@ Currently available plugins include:
 - Archetype Compiler
 - Flextesa Sandbox
 - Taquito 
-- TS Type Generator
+- Contract Types Generator
 - Tezos Client
 
 ### Taqueria SDK
