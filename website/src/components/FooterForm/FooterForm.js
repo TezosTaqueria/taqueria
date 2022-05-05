@@ -46,6 +46,7 @@ function Feature() {
 						onChange={handleInputChange}
 						className={styles.footerEmail}
 					/>
+					<input type="hidden" name="group[218840]" id="mce-group[218840]" value="Taqueria (Developer Tools)" />
 					<button className={styles.signupButton} type="submit">
 						Sign up
 					</button>
