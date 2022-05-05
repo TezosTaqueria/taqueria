@@ -13,6 +13,7 @@ const stdMarginBottom = "40px";
 
 const network =
   process.env.NODE_ENV === "development" ? "ithacanet" : "mainnet";
+
 const rpcUrl = {
   ithacanet: "https://ithacanet.ecadinfra.com/",
   mainnet: "https://mainnet.api.tez.ie"
@@ -229,6 +230,7 @@ export default function NftMinting() {
                     ? "ithacanet"
                     : "mainnet"
                 }/big_map/62449/keys`}
+
                 target="_blank"
                 rel="noopener noreferrer nofollow"
               >
@@ -258,6 +260,7 @@ export default function NftMinting() {
           here
         </a>
         !
+
       </p>
       <h4>About Taqueria NFTs</h4>
       <p>
@@ -268,7 +271,7 @@ export default function NftMinting() {
         participation, give away swag, run NFT holder contests and grant special
         access to Taqueria events
       </p>
-
+      
       <div id="disclaimer-text">
         <h5>NFT Mint & License Terms</h5>
         <p>
