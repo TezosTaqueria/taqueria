@@ -101,13 +101,13 @@ A list of accounts and balances to provision at startup of the Flextesa image an
 #### 'label'
 An arbitrary string used to describe a particular configuration
 
-#### 'protocol
+#### 'protocol'
 
 A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
 
 Currently availble protocols are:
 - Hangzhou `PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx`
-- Ithica2  `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
+- Ithica   `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
 
 #### 'rpcUrl'
 
