@@ -51,7 +51,7 @@ taq generate types [typeOutputDir]
 
 The following aliases are interchangable with `generate types`
 - `gen types`
-- `genTypes`
+- `gentypes`
 
 #### Options
 
@@ -59,7 +59,7 @@ The `generate types` command will accept the following optional parameters:
 
 | flag  |  name         | description                                  |       
 |:-----:|:--------------|----------------------------------------------|
-|  -t   | typeAliasMode | The type aliases used in the generated types |
+|  -t   | typeAliasMode | Use type aliases in the generated types      |
  
 
 ## Taquito Workflow Improvements

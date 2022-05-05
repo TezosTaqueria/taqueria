@@ -1,14 +1,62 @@
-This plugin will generate typescript types for a contract.
+This plugin provides a `taq generate types` command which will generate and export TypeScript types from compiled Michelson smart contracts. These generated types then work with your IDE and Taquito, providing type safety and an improved code authoring experience
 
-In the simple case, it reads the `artifacts` folder for any `*.tz` Michelson files and will generate a types file with the matching filename for each.
+Benefits of using generated types:
+- Static types used to call smart contract methods are checked at compile time, improving code reliability
+- Generated types enable auto-completion and syntax highlighting in your IDE
+- Developing apps with Taquito is faster and more reliable
+- The VS Code Extension provides tooltip hints for parameter types used to call a smart contract method
+- Calling smart contract methods with types is done directly, removing the need for utility methods 
+- Simplifies your code and improves readability
 
 ## Requirements
 
-This is using a unmerged taquito PR:
+- Node JS v16 or later
+- Taquito v11.2 or later (optional)
 
-- https://github.com/ecadlabs/taquito/pull/1343
-    - `npm i @taquito/taquito@11.1.0-6bfb6c08--1343 --registry https://npm.preview.tezostaquito.io/`
+## Installation
 
+To install the Contract Types plugin on a Taqueria project, navigate to the project folder and run:
+```shell
+taq install @taqueria/plugin-contract-types
+```
+
+## Configuration
+
+This plugin will look for Michelson files according to the `artifactsDir` configured in `./.taq/config.json`. By default, this value is `/artifacts` but can be changed as needed
+
+## Usage
+
+The plugin provides a single command to Taqueria: `taq generate types`
+
+This will look for `.tz` files in the `/artifacts` directory and will generate a series of related `.ts` files in the `/types` directory. These files export type definitions for each method which can then be used by Taquito and your IDE
+
+### The `generate types` Command
+
+#### Syntax
+```shell
+taq generate types [typeOutputDir]
+```
+
+#### Parameters
+
+| parameter     |  required  | description                                        |       
+|:-------------:|:-----------|----------------------------------------------------|
+| typeOutputDir | no         | The output directory for the `.ts` files generated |
+
+#### CLI Aliases
+
+The following aliases are interchangable with `generate types`
+- `gen types`
+- `gentypes`
+
+#### Options
+
+The `generate types` command will accept the following optional parameters:
+
+| flag  |  name         | description                                  |       
+|:-----:|:--------------|----------------------------------------------|
+|  -t   | typeAliasMode | Use type aliases in the generated types      |
+ 
 ## Examples
 
 ### Example Usage (based on an nft auction contract from open minter sdk)
@@ -59,7 +107,6 @@ export const exampleContractMethods1 = async () => {
 
 };
 ```
-
 
 ### Example typegen task
 
