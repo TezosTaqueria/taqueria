@@ -65,7 +65,7 @@ npm init -y
 
 Now that the project has been properly initialized, plugins can be installed to provide support for specific functionality such as compilation, smart contract origination, or sandbox environments
 
-Plugins are installed using the `taq install command` which appears in the command list once a project is initialized. You can view the list of commands available in the current project contexts by running `taq --help` from the CLI:
+Plugins are installed using the `taq install` command which appears in the command list once a project is initialized. You can view the list of commands available in the current project contexts by running `taq --help` from the CLI:
 ```shell
 ❯ taq --help
 taq <command>
