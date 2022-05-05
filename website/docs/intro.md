@@ -24,11 +24,11 @@ This is a quick introduction to the main concepts of Taqueria. If you are lookin
 Taqueria is here to help make developing on Tezos easier. Taqueria supercharges your projects with a powerful and centralized configuration and access to top Tezos development tools through tasks that you run from the command line
 
 Some of the things Taqueria can do for you include:
-- Compiling smart contracts written in LIGO or SmartPY
-- Running a Flextesa sandbox (a local Tezos testnet)
-- Originating a smart contract 
-- Generating TypeScript types from a Michelson contract
-- Autocompletion in VS Code
+- Compiling smart contracts using the [LIGO](/docs/plugins/plugin-ligo/), [SmartPY](/docs/plugins/plugin-smartpy/), or [Archetype](/docs/plugins/plugin-archetype/) plugins
+- Running a local sandbox with the [Flextesa plugin](/docs/plugins/plugin-flextesa/)
+- Originating a smart contract to a sandbox and testnet with the [Taquito plugin](/docs/plugins/plugin-taquito/)
+- Generating TypeScript types from a Michelson contract with the [Contract Types plugin](/docs/plugins/plugin-typescript-generator/), providing Taquito type safety and autocompletion in VS Code
+- Typechecking Michelson contracts and simulating contract calls with the [Tezos Client](/docs/plugins/plugin-tezos-client/) plugin
 
 ## What is Taqueria?
 
