@@ -29,8 +29,8 @@ A basic workflow Taqueria is:
 
 1. Initialize the project by running the `taq init` command
 2. Install necessary plugins (LIGO, SmarPy, Flextesa, Taquito, ect)
-3. Complile the source code of your smart contracts
-4. Launch a local sandbox an originate contracts to it
+3. Compile the source code of your smart contracts
+4. Launch a local sandbox and originate contracts to it
 5. Originate contracts to a testnet
 
 ## Available Plugins
