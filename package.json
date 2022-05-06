@@ -13,7 +13,9 @@
     "parse-readme-template": "ts-node ./parse-readme-template.ts",
     "build-website": "npm run parse-readme-template && cd website && npm ci && npm run build",
     "watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build || npx play-sound beep.mp3\" --initial",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "format": "dprint fmt",
+    "format:check": "dprint check"
   },
   "repository": {
     "type": "git",
@@ -45,5 +47,8 @@
   "workspaces": [
     "./taqueria*",
     "./tests"
-  ]
+  ],
+  "dependencies": {
+    "dprint": "^0.27.1"
+  }
 }
