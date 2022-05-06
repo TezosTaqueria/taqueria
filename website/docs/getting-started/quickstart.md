@@ -30,7 +30,8 @@ What you will accomplish:
 
 To successfully follow this guide, you must ensure that:
 - The Taqueria CLI has been [installed](./installation.mdx) and is available in your `$PATH` 
-- Docker is installed and currently running
+- Docker 0.8 (or later) is installed and currently running
+- Node.js v16.x (or later) is installed
 
 :::note
 The Taqueria VS Code Extension provides direct access to Taqueria tasks from the command palette. Under the hood, the VS Code Extension makes calls to the CLI, so you can be assured the behaviour of tasks will remain consistent regardless of wether they are executed from a terminal or the command palette. The steps in this guide are for using the Taqueria CLI, but you can also run the commands from the Taqueria extension via the VS Code command palette if you prefer
@@ -113,6 +114,7 @@ let main = ([action, store] : [parameter, storage]) : return_ => {
     Decrement: (n: int) => sub ([store, n]),
     Reset:     ()  => 0}))
   ]
+}
 ```
 
 You can now compile this contract by running the following command from the project directory:
@@ -192,16 +194,17 @@ With a sandbox now running, the next step is to originate the `counter.tz` file 
 
 First, install the plugin:
 ```shell
-taq install @taqueria/plugin-ligo
+taq install @taqueria/plugin-taquito
 ```
 
-Next, configure the initial storage value for the `counter.tz` contract by navigating to the file `./.taq/config.json` and locate the `"environment"` property. There are two values that need to be configured:
-- The name of the sandbox to originate to target
+Next, you need to configure some values for origination:
 - The initial storage for the smart contract 
-
+- The name of the sandbox to target (by default it is pre-configured to the sandbox named `local`)
+:::note
 As the default configuration comes with the sandbox named `local` preconfigured, simply provide a value for the initial storage in the `"storage"` property 
+:::
 
-For the `counter.tz` contract, you simply need to provide an integer value for the `counter.tz` file which looks like this:
+To set these values in Taqueria, navigate to the file `./.taq/config.json` and locate the `"environment"` property. For the `counter.tz` contract, simply need to provide an integer value for the `counter.tz` file which looks like this:
 ```
     "environment": {
         "default": "development",
@@ -222,7 +225,7 @@ Now you can originate the contract by running:
 taq originate
 ```
 
-This will originate all contracts in the `/artifacts` directory to the sandbox and return the address of the deployed contract and destination sandbox:
+This will originate all contracts in the `/artifacts` directory to the sandbox and return the on-chain addresses of the originated contracts. This will look something like this:
 ```
 ┌────────────┬──────────────────────────────────────┬─────────────┐
 │ Contract   │ Address                              │ Destination │
@@ -231,5 +234,13 @@ This will originate all contracts in the `/artifacts` directory to the sandbox a
 └────────────┴──────────────────────────────────────┴─────────────┘
 ```
 
+## Finishing Up
 
+Congratulations! At this point, you have run through the basic usage of Taqueria including:
+- Initializing a new Taqueria project
+- Installing plugins for LIGO, Flextesa, and Taquito
+- Compiling a LIGO smart contract
+- Starting and querying a local Flextesa sandbox 
+- Originating a compiled smart contract to the sandbox
 
+For more details on the usage of specific Taqueria tasks, you can refer to the plugin documentation which contains additional context, configuration, and usage of the many Taqueria tasks; or continue on with the getting started guides

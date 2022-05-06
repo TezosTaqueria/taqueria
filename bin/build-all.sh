@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
     echo '**********************************************'
