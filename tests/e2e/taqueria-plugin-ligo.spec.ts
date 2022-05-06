@@ -23,7 +23,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
             execSync(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`, 25000);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -39,7 +39,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
             execSync(`taq compile hello-tacos.mligo`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`, 25000);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -57,8 +57,8 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
             execSync(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version for both contracts has been generated
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-one.tz`, 25000);
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-two.tz`, 25000);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-one.tz`);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-two.tz`);
 
 
         } catch(error) {
