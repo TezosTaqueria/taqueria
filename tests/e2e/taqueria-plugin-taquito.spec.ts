@@ -1,5 +1,5 @@
-    import fsPromises from "fs/promises"
-import { generateTestProject } from "./utils/utils";
+import fsPromises from "fs/promises"
+import { generateTestProject, checkContractExistsOnNetwork } from "./utils/utils";
 import { exec as exec1 } from "child_process";
 import { TezosToolkit } from '@taquito/taquito';
 import utils from 'util'
@@ -32,19 +32,23 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
             const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
-            await new Promise(resolve => setTimeout(resolve, 20000))
+            // await new Promise(resolve => setTimeout(resolve, 20000))
 
             // 3. Verify that contract has been originated on the network
             expect(deployResponse).toContain("hello-tacos.tz");
             expect(deployResponse).toContain(networkInfo.networkName);
-            const contractHash = deployResponse.split("│")[2];
+            const contractHash = deployResponse.split("│")[2].trim();
 
-            smartContractHash = contractHash.trim();
-            expect(smartContractHash).toMatch(contractRegex);
+            expect(contractHash).toMatch(contractRegex);
+
+            expect(await checkContractExistsOnNetwork(
+                contractHash, 
+                networkInfo.networkURL))
+            .toBe(contractHash)
 
             // 4. Verify that contract has been originated to the network
-            const contract = await tezos.contract.at(smartContractHash)
-            expect(contract.address).toBe(smartContractHash);
+            // const contract = await tezos.contract.at(contractHash)
+            // expect(contract.address).toBe(contractHash);
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -75,49 +79,19 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
 
             expect(contractHash).toMatch(contractRegex);
 
+            expect(await checkContractExistsOnNetwork(
+                contractHash, 
+                networkInfo.networkURL))
+            .toBe(contractHash)
+
             // 4. Verify that contract has been originated to the network
-            const contract = await tezos.contract.at(contractHash)
-            expect(contract.address).toBe(contractHash);
+            // const contract = await tezos.contract.at(contractHash)
+            // expect(contract.address).toBe(contractHash);
 
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
 
-    });
-
-    // TODO: Implement verification that originate will work by not deploying a
-    //  contract but comparing the output of the taq deploy --help and taq originate --help and making sure they are the same
-    // There is an issue associated with it - https://github.com/ecadlabs/taqueria/issues/379
-    test('Verify that taqueria taquito plugin can deploy one contract using originate {contractName} command', async () => {
-        try {
-            environment = "test";
-            let smartContractHash = "";
-
-            // 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
-            await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
-
-            // 2. Run taq deploy on a selected test network described in "test" environment
-
-            const deployCommand = await exec(`taq originate -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
-            const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
-            await new Promise(resolve => setTimeout(resolve, 20000))
-
-            // 3. Verify that contract has been originated on the network
-            expect(deployResponse).toContain("hello-tacos.tz");
-            expect(deployResponse).toContain(networkInfo.networkName);
-            const contractHash = deployResponse.split("│")[2];
-
-            smartContractHash = contractHash.trim();
-            expect(smartContractHash).toMatch(contractRegex);
-
-            // 4. Verify that contract has been originated to the network
-            const contract = await tezos.contract.at(smartContractHash)
-            expect(contract.address).toBe(smartContractHash);
-
-        } catch(error) {
-            throw new Error (`error: ${error}`);
-        }
     });
 
     // TODO: Consider in future to use keygen service to update account balance programmatically
@@ -156,11 +130,22 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             .trim()) ?? 'two'  
         expect(contractTwoHash).toMatch(contractRegex);
 
+
+        expect(await checkContractExistsOnNetwork(
+            contractOneHash, 
+                networkInfo.networkURL))
+            .toBe(contractOneHash)
+
+        expect(await checkContractExistsOnNetwork(
+                contractTwoHash, 
+                networkInfo.networkURL))
+            .toBe(contractTwoHash)
+
         // 4. Verify that contracts have been originated to the network
-        const contractOne = await tezos.contract.at(contractOneHash);
-        expect(contractOne.address).toBe(contractOneHash);
-        const contractTwo = await tezos.contract.at(contractTwoHash);
-        expect(contractTwo.address).toBe(contractTwoHash);
+        // const contractOne = await tezos.contract.at(contractOneHash);
+        // expect(contractOne.address).toBe(contractOneHash);
+        // const contractTwo = await tezos.contract.at(contractTwoHash);
+        // expect(contractTwo.address).toBe(contractTwoHash);
 
         // 5. Verify that contracts originated on the network have different addresses
         expect(contractOneHash).not.toEqual(contractTwoHash);

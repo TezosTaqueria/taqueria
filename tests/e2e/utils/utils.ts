@@ -2,6 +2,8 @@ import retry from "async-retry"
 import path from "path";
 import fsPromises from "fs/promises"
 import { exec as exec1, execSync } from "child_process"
+import { TezosToolkit } from '@taquito/taquito';
+import { networkInfo } from '../data/network-info'
 import util from "util"
 const exec = util.promisify(exec1)
 
@@ -57,7 +59,6 @@ export async function checkFolderExistsWithTimeout(filePath:string) {
 
     try {
         const dir = path.dirname(filePath);
-        const basename = path.basename(filePath);
 
         await retry(
             async() => {
@@ -72,5 +73,16 @@ export async function checkFolderExistsWithTimeout(filePath:string) {
 
     } catch (error) {
         throw new Error (`error: ${error}`);
+    }
+}
+
+export async function checkContractExistsOnNetwork(contractAddress: string, networkNodeURL: string) {
+    const tezos = new TezosToolkit(networkNodeURL)
+    try {
+        const address = await tezos.contract.at(contractAddress)
+        return address.address
+
+    } catch (error) {
+        return error
     }
 }
