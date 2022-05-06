@@ -29,7 +29,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
             // 2. Run taq deploy on a selected test network described in "test" environment
-            // const deployCommand = 
+
             const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
             await new Promise(resolve => setTimeout(resolve, 45000))
@@ -63,7 +63,7 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             await exec(`cp e2e/data/increment.tz ${taqueriaProjectPath}/artifacts/`)
 
             // 2. Run taq deploy ${contractName} on a selected test network described in "test" environment
-            // const stdoutDeploy = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
+
             const deployCommand = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
             await new Promise(resolve => setTimeout(resolve, 45000))
@@ -97,13 +97,8 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
             await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
-            // Sometimes running two deploy commands in a short period of time cause an issue
-            // More details about the error - "counter %x already used for contract %y"
-            // It is applicable only for auto-tests that run very fast
-            // Uses retry mechanism to avoid test to fail
-
             // 2. Run taq deploy on a selected test network described in "test" environment
-            // const deployCommand = 
+
             const deployCommand = await exec(`taq originate -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
             const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
             await new Promise(resolve => setTimeout(resolve, 45000))
