@@ -23,11 +23,10 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "intro",
         "getting-started/installation",
-        "getting-started/plugin-basics",
+        "intro",
         "getting-started/quickstart",
-        "getting-started/networks",
+        "getting-started/networks"
       ],
     },
     {
@@ -37,6 +36,7 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
+        "getting-started/plugin-basics",
         "plugins/plugin-flextesa",
         "plugins/plugin-archetype",
         "plugins/plugin-ligo",
