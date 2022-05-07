@@ -1,6 +1,6 @@
 import {z} from 'zod'
 export const schema = z
-    .string()
+    .string({description: "Public Key Hash"})
     .nonempty()
     .refine(
         val => val.startsWith("tz1"),

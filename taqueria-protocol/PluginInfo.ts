@@ -5,40 +5,48 @@ import * as VersionNumber from "@taqueria/protocol/VersionNumber"
 import * as Task from '@taqueria/protocol/Task'
 import * as Operation from '@taqueria/protocol/Operation'
 
-interface CreateSchemaArgs {
-    versionSchema: z.ZodTypeAny, 
-    aliasSchema: z.ZodTypeAny,
-    taskSchema: z.ZodTypeAny,
-    opSchema: z.ZodTypeAny
-}
-const createSchema = (schemas: CreateSchemaArgs) => z.object({
-    name: z.string().nonempty(),
-    schema: schemas.versionSchema,
-    version: schemas.versionSchema,
-    alias: schemas.aliasSchema.optional(),
+export const internalSchema = z.object({
+    name: z.string({description: "Plugin Name"}).nonempty(),
+    version: VersionNumber.schema.describe("Plugin Version #"),
+    schema: VersionNumber.schema.describe("Plugin Schema Version #"),
+    alias: Alias.schema.describe("Plugin Alias").optional(),
     tasks: z.preprocess(
         val => val ?? [],
-        z.array(schemas.taskSchema).optional()
-    ),  
+        z.array(
+            Task.schema.describe("Plugin Task"),
+            {description: "Plugin Tasks"}
+        ).optional()
+    ),
     operations: z.preprocess(
         val => val ?? [],
-        z.array(schemas.opSchema).optional()
+        z.array(
+            Operation.schema.describe("Plugin Operation"),
+            {description: "Plugin Operations"}
+        ).optional()
     )
-})
+}).describe("Plugin Schema")
 
-const internalSchema = createSchema({
-    versionSchema: VersionNumber.schema,
-    aliasSchema: Alias.schema,
-    taskSchema: Task.schema,
-    opSchema: Operation.schema
-})
-
-export const rawSchema = createSchema({
-    aliasSchema: Alias.schema,
-    taskSchema: Task.schema,
-    opSchema: Operation.schema,
-    versionSchema: VersionNumber.schema
-})
+export const rawSchema = z.object({
+    name: z.string({description: "Plugin Name"}).nonempty(),
+    version: VersionNumber.rawSchema.describe("Plugin Version #"),
+    schema: VersionNumber.rawSchema.describe("Plugin Schema Version #"),
+    alias: Alias.rawSchema.describe("Plugin Alias").optional(),
+    tasks: z.preprocess(
+        val => val ?? [],
+        z.array(
+            Task.rawSchema.describe("Plugin Task"),
+            {description: "Plugin Tasks"}
+        ).optional()
+    ),
+    operations: z.preprocess(
+        val => val ?? [],
+        z.array(
+            Operation.rawSchema.describe("Plugin Operation"),
+            {description: "Plugin Operations"}
+        ).optional()
+    )
+    
+}).describe("Plugin Schema")
 
 const pluginInfoType: unique symbol = Symbol("PluginInfo")
 

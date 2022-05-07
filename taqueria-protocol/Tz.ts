@@ -1,6 +1,6 @@
 import {z} from 'zod'
 
-export const rawSchema = z.string().nonempty().regex(/^\d([\d_]+\d)?$/)
+export const rawSchema = z.string({description: "Tz"}).nonempty().regex(/^\d([\d_]+\d)?$/)
 
 export const schema = rawSchema.transform(val => val as Tz)
 

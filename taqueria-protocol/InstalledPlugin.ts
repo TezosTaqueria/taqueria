@@ -1,9 +1,12 @@
 import {z} from 'zod'
 
 const internalSchema = z.object({
-    name: z.string().nonempty(),
-    type: z.union([z.literal('npm'), z.literal('binary'), z.literal('deno')])
-})
+    name: z.string({description: "Plugin Name"}).nonempty(),
+    type: z.union(
+        [z.literal('npm'), z.literal('binary'), z.literal('deno')],
+        {description: "Plugin Type"}
+    )
+}).describe("InstalledPlugin")
 
 export const schema = internalSchema.transform(val => val as t)
 

@@ -3,24 +3,36 @@ import * as Verb from '@taqueria/protocol/Verb'
 import * as SingleChar from '@taqueria/protocol/SingleChar'
 
 const internalSchema = z.object({
-    shortFlag: SingleChar.schema.optional(),
-    flag: Verb.schema,
-    description: z.string().nonempty(),
-    defaultValue: z.union([z.string(), z.number(), z.boolean()]).optional(),
-    choices: z.array(z.string()).optional(),
-    required: z.boolean().default(false).optional(),
-    boolean: z.boolean().default(false).optional()
-})
+    shortFlag: SingleChar.schema.describe("Option Short Flag").optional(),
+    flag: Verb.schema.describe("Option Long Flag"),
+    description: z.string({description: "Option Description"}).nonempty(),
+    defaultValue: z.union(
+        [z.string(), z.number(), z.boolean()],
+        {description: "Option Default Value"}
+    ).optional(),
+    choices: z.array(
+        z.string({description: "Option Choice"}),
+        {description: "Option Choices"}
+    ).optional(),
+    required: z.boolean({description: "Option Is Required"}).default(false).optional(),
+    boolean: z.boolean({description: "Option Is Boolean"}).default(false).optional()
+}).describe("Option")
 
 export const rawSchema = z.object({
-    shortFlag: SingleChar.rawSchema.optional(),
-    flag: Verb.rawSchema,
-    description: z.string().nonempty(),
-    defaultValue: z.union([z.string(), z.number(), z.boolean()]).optional(),
-    choices: z.array(z.string()).optional(),
-    required: z.boolean().default(false).optional(),
-    boolean: z.boolean().default(false).optional()
-})
+    shortFlag: SingleChar.rawSchema.describe("Option Short Flag").optional(),
+    flag: Verb.rawSchema.describe("Option Long Flag"),
+    description: z.string({description: "Option Description"}).nonempty(),
+    defaultValue: z.union(
+        [z.string(), z.number(), z.boolean()],
+        {description: "Option Default Value"}
+    ).optional(),
+    choices: z.array(
+        z.string({description: "Option Choice"}),
+        {description: "Option Choices"}
+    ).optional(),
+    required: z.boolean({description: "Option Is Required"}).default(false).optional(),
+    boolean: z.boolean({description: "Option Is Boolean"}).default(false).optional()
+}).describe("Option")
 
 export const schema = internalSchema.transform(val => val as t)
 

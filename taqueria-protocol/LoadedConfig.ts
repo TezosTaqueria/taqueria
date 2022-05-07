@@ -4,16 +4,16 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath'
 import * as SHA256 from '@taqueria/protocol/SHA256'
 
 export const rawSchema = Config.internalSchema.extend({
-    projectDir: SanitizedAbsPath.rawSchema,
-    configFile: SanitizedAbsPath.rawSchema,
-    hash: SHA256.schema
-})
+    projectDir: SanitizedAbsPath.rawSchema.describe("loadedConfig.projectDir"),
+    configFile: SanitizedAbsPath.rawSchema.describe("loadedConfig.configFile"),
+    hash: SHA256.schema.describe("loadedConfig.hash")
+}).describe("LoadedConfig")
 
 const internalSchema = Config.internalSchema.extend({
-    projectDir: SanitizedAbsPath.schema,
-    configFile: SanitizedAbsPath.schema,
-    hash: SHA256.schema
-})
+    projectDir: SanitizedAbsPath.schema.describe("loadedConfig.projectDir"),
+    configFile: SanitizedAbsPath.schema.describe("loadedConfig.configFile"),
+    hash: SHA256.schema.describe("loadedConfig.hash")
+}).describe("LoadedConfig")
 
 export const schema = internalSchema.transform(val => val as LoadedConfig)
 

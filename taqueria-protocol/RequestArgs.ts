@@ -10,16 +10,16 @@ const internalSchema = sanitizedArgsSchema.extend({
         z.literal('proxy'),
         z.literal('checkRuntimeDependencies'),
         z.literal('installRuntimeDependencies'),
-    ]),
+    ], {description: "request.taq_run"}),
     config: z.preprocess(
         val => typeof val === 'string' ? JSON.parse(val) : val,
-        LoadedConfig.schema
+        LoadedConfig.schema.describe("request.config")
     )
-}).passthrough()
+}).describe("RequestArgs").passthrough()
 
 const internalProxySchema = internalSchema.extend({
     task: z.string().nonempty()
-}).passthrough()
+}).describe("ProxyRequestArgs").passthrough()
 
 type Input = z.infer<typeof internalSchema>
 

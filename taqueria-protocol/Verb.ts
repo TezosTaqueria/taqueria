@@ -1,18 +1,18 @@
 import {z} from 'zod'
 
 export const rawSchema = z
-    .string()
-    .nonempty()
-    .regex(/^[A-Za-z\-\ ]+/)
+    .string({description: "Verb"})
+    .nonempty("Must be a valid verb")
+    .regex(/^[A-Za-z\-\ ]+/, "Must be a valid verb")
 
-export const schema = rawSchema.transform(val => val as t)    
+export const schema = rawSchema.transform(val => val as Verb)    
 
 const verbType: unique symbol = Symbol("Verb")
 
-export type t = string & {
+export type Verb = string & {
     readonly [verbType]: void
 }
 
-export type Verb = t
+export type t = Verb
 
 export const make = (value: string) => schema.parse(value)

@@ -8,7 +8,7 @@ export type VersionNumber = string & {
 
 export type t = VersionNumber
 
-export const rawSchema = z.string()
+export const rawSchema = z.string({description: "Version Number"})
     .nonempty()
     .regex(/^\d+\.\d+(\.\d+)*$/)
 

@@ -11,6 +11,7 @@ import * as SandboxConfig from "@taqueria/protocol/SandboxConfig"
 import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
 import * as NetworkConfig from "@taqueria/protocol/NetworkConfig"
 import * as Environment from "@taqueria/protocol/Environment"
+import * as PersistentState from "@taqueria/protocol/PersistentState"
 import type {i18n} from "@taqueria/protocol/i18n"
 import { P } from 'ts-pattern'
 export type PluginResponse = Protocol.PluginResponse
@@ -26,7 +27,8 @@ export {
     SandboxConfig,
     SandboxAccountConfig,
     NetworkConfig,
-    Environment
+    Environment,
+    PersistentState
 }
 
 export interface Failure<Params> {

@@ -44,7 +44,7 @@ import * as Url from "@taqueria/protocol/Url"
     setVersion: z.string().nonempty(),
     template: z.string().nonempty().optional(),
     pluginName: z.string().nonempty().optional()
-}).passthrough()
+}, {description: "Sanitizied Args"}).passthrough()
 
 const scaffoldRawSchema = initRawSchema.extend({
     scaffoldProjectDir: z.string().nonempty().transform((val: unknown) => val as SanitizedAbsPath.t),

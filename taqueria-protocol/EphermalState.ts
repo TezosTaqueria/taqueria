@@ -1,11 +1,12 @@
 import {z} from 'zod'
-import * as Verb from "@taqueria/protocol/Verb"
 import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
 import * as Command from "@taqueria/protocol/Command"
 import * as Option from '@taqueria/protocol/Option'
+import * as Alias from "@taqueria/protocol/Alias"
+import * as Verb from "@taqueria/protocol/Verb"
 import * as Task from '@taqueria/protocol/Task'
-import * as Operation from '@taqueria/protocol/Operation'
-import * as PluginInfo from '@taqueria/protocol/PluginInfo'
+import * as ParsedOperation from '@taqueria/protocol/ParsedOperation'
+import * as ParsedPluginInfo from '@taqueria/protocol/ParsedPluginInfo'
 import * as Config from "@taqueria/protocol/Config"
 import type {i18n} from "@taqueria/protocol/i18n"
 
@@ -13,22 +14,22 @@ const taskToPluginMap = z.record(
     z.union([
         InstalledPlugin.schema,
         Task.schema
-    ])
+    ], {description: "Task/Plugin Mapping"})
 )
 const operationToPluginMap = z.record(
     z.union([
         InstalledPlugin.schema,
-        Operation.schema
-    ])
+        ParsedOperation.schema
+    ], {description: "Operation/Plugin Mapping"})
 )
 
 const internalSchema = z.object({
-    build: z.string(),
-    configHash: z.string(),
+    build: z.string({description: "cache.build"}),
+    configHash: z.string({description: "cache.configHash"}),
     tasks: taskToPluginMap,
     operations: operationToPluginMap,
-    plugins: z.array(PluginInfo.schema)
-})
+    plugins: z.array(ParsedPluginInfo.schema, {description: "cache.plugins"})
+}).describe("Ephermal State")
 
 export const schema = internalSchema.transform(val => val as EphemeralState)
 
@@ -52,15 +53,18 @@ export const make = (data: Input) => schema.parse(data)
 /**
  * Private functions
  */
-type TaskCounts = Record<string, string[]>
-const getTaskCounts = (pluginInfo: PluginInfo.t[]): TaskCounts => {
+type TaskName = Verb.t
+type TaskCounts = Record<TaskName, ParsedPluginInfo.t[]>
+const getTaskCounts = (pluginInfo: ParsedPluginInfo.t[]): TaskCounts => {
     return pluginInfo.reduce(
-        (retval, pluginInfo) => pluginInfo.tasks.reduce(
+        (retval, pluginInfo) => pluginInfo.tasks === undefined
+        ? {}
+        : pluginInfo.tasks.reduce(
             (retval: TaskCounts, task: Task.t) => {
                 const taskName = task.task
-                const providers = retval[taskName]
-                    ? [...retval[taskName], pluginInfo.name, pluginInfo.alias]
-                    : [pluginInfo.name, pluginInfo.alias]
+                const providers: ParsedPluginInfo.t[] = retval[taskName]
+                    ? [...retval[taskName], pluginInfo]
+                    : [pluginInfo]
                 const mapping: TaskCounts = {}
                 mapping[taskName] = providers.filter(provider => provider !== undefined)
                 return {...retval, ...mapping}
@@ -71,15 +75,17 @@ const getTaskCounts = (pluginInfo: PluginInfo.t[]): TaskCounts => {
     )
 }
 
-type OperationCounts = Record<string, string[]>
-const getOperationCounts = (pluginInfo: PluginInfo.t[]): OperationCounts => {
+type OperationCounts = Record<string, ParsedPluginInfo.t[]>
+const getOperationCounts = (pluginInfo: ParsedPluginInfo.t[]): OperationCounts => {
     return pluginInfo.reduce(
-        (retval, pluginInfo) => pluginInfo.operations.reduce(
-            (retval: OperationCounts, operation: Operation.t) => {
+        (retval, pluginInfo) => pluginInfo.operations === undefined
+        ? retval
+        : pluginInfo.operations.reduce(
+            (retval: OperationCounts, operation: ParsedOperation.t) => {
                 const operationName = operation.operation
                 const providers = retval[operationName]
-                    ? [...retval[operationName], pluginInfo.name, pluginInfo.alias]
-                    : [pluginInfo.name, pluginInfo.alias]
+                    ? [...retval[operationName], pluginInfo]
+                    : [pluginInfo]
                 const mapping: OperationCounts = {}
                 mapping[operationName] = providers.filter(provider => provider !== undefined)
                 return {...retval, ...mapping}
@@ -90,12 +96,22 @@ const getOperationCounts = (pluginInfo: PluginInfo.t[]): OperationCounts => {
     )
 }
 
-export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], i18n: i18n) => {
+const toChoices = (plugins: ParsedPluginInfo.t[]) => plugins.reduce(
+    (retval, pluginInfo) => {
+        return [...retval, pluginInfo.name as string, pluginInfo.alias as string]
+    },
+    [] as string[]
+)
+
+export const mapTasksToPlugins = (config: Config.t, pluginInfo: ParsedPluginInfo.t[], i18n: i18n) => {
+    debugger
     const taskCounts = getTaskCounts(pluginInfo)
-    const isCompositeTask = (taskName: string) => taskCounts[taskName].length > 1
+    const isCompositeTask = (taskName: Verb.t) => taskCounts[taskName].length > 1
 
     return pluginInfo.reduce(
-        (retval: TaskToPluginMap, pluginInfo: PluginInfo.t) => pluginInfo.tasks.reduce(
+        (retval: TaskToPluginMap, pluginInfo: ParsedPluginInfo.t) => pluginInfo.tasks == undefined
+            ? retval
+            : pluginInfo.tasks.reduce(
             (retval: TaskToPluginMap, task: Task.t) => {
                 const taskName = task.task
 
@@ -111,7 +127,7 @@ export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], 
                             options: [
                                 Option.create({
                                     flag: "plugin",
-                                    choices: taskCounts[taskName],
+                                    choices: toChoices(taskCounts[taskName]),
                                     description: "Use to specify what plugin you'd like when running this task.",
                                     required: true
                                 })
@@ -140,32 +156,33 @@ export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], 
     )
 }
 
-export const mapOperationsToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], i18n: i18n) => {
+export const mapOperationsToPlugins = (config: Config.t, pluginInfo: ParsedPluginInfo.t[], i18n: i18n) => {
     const operationCounts = getOperationCounts(pluginInfo)
     const isCompositeOp = (operationName: string) => operationCounts[operationName].length > 1
 
     return pluginInfo.reduce(
-        (retval: OpToPluginMap, pluginInfo: PluginInfo.t) => pluginInfo.operations.reduce(
-            (retval: OpToPluginMap, op: Operation.t) => {
+        (retval: OpToPluginMap, pluginInfo: ParsedPluginInfo.t) => pluginInfo.operations === undefined
+        ? retval
+        : pluginInfo.operations.reduce(
+            (retval: OpToPluginMap, op: ParsedOperation.t) => {
                 const operationName = op.operation
 
                 // If this is a composite task, we'll construct
                 // a task which proxies to a canonical task
                 if (isCompositeOp(operationName)) {
                     if (!retval[operationName]) {
-                        const compositeOp = Operation.make({
+                        const compositeOp = ParsedOperation.make({
                             operation: operationName,
                             command: Command.make(operationName),
                             description: i18n.__("providedByMany"),
                             options: [
                                 Option.create({
                                     flag: "plugin",
-                                    choices: operationCounts[operationName],
+                                    choices: toChoices(operationCounts[operationName]),
                                     description: "Use to specify what plugin you'd like when running this operation.",
                                     required: true
                                 })
-                            ],
-                            handler: () => ""
+                            ]
                         })
                         if (compositeOp) retval[operationName] = compositeOp
                         return retval
@@ -189,7 +206,7 @@ export const mapOperationsToPlugins = (config: Config.t, pluginInfo: PluginInfo.
     )
 }
 
-export const getTasks = (pluginInfo: PluginInfo.t[]) => pluginInfo.reduce(
-    (retval: Task.t[], pluginInfo) => [...retval, ...pluginInfo.tasks],
+export const getTasks = (pluginInfo: ParsedPluginInfo.t[]) => pluginInfo.reduce(
+    (retval: Task.t[], pluginInfo) => [...retval, ...(pluginInfo.tasks ?? [])],
     []
 )

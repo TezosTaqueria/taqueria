@@ -1,7 +1,7 @@
 import {z} from 'zod'
 export const rawSchema = z
-    .string()
-    .regex(/^[A-Za-z]+[A-Za-z0-9-_ ]*$/)
+    .string({description: "Human Readable Identifier"})
+    .regex(/^[A-Za-z]+[A-Za-z0-9-_ ]*$/, "Must be a valid human-readable identifier")
 
 export const schema = rawSchema.transform(val => val as t)
 

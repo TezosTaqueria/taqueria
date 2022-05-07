@@ -1,5 +1,5 @@
 import type {InstalledPlugin, Option, PositionalArg, PluginAction, PluginJsonResponse, PluginResponse} from './taqueria-protocol/taqueria-protocol-types.ts'
-import {i18n, SanitizedArgs, SanitizedAbsPath, EphemeralState, Task, PluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
+import {i18n, SanitizedArgs, SanitizedAbsPath, EphemeralState, Task, ParsedPluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {EnvKey, EnvVars, DenoArgs, CLIConfig} from './taqueria-types.ts'
 import {LoadedConfig} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts'
@@ -321,9 +321,9 @@ const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir}: Sa
 )
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) => state.plugins.reduce(
-    (retval: Task.t|undefined, pluginInfo: PluginInfo.t) => 
+    (retval: Task.t|undefined, pluginInfo: ParsedPluginInfo.t) => 
         pluginInfo.name === pluginName || pluginInfo.alias === pluginName
-            ? pluginInfo.tasks.find((task: Task.t) => task.task === taskName)
+            ? pluginInfo.tasks?.find((task: Task.t) => task.task === taskName)
             : retval
     ,
     undefined
@@ -331,7 +331,7 @@ const getCanonicalTask = (pluginName: string, taskName: string, state: Ephemeral
 
 const addOperations = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, parsedArgs: SanitizedArgs.t, _i18n: i18n.t, _state: EphemeralState.t, _pluginLib: PluginLib) => 
     cliConfig.command(
-        'new op <operation> [..operation args]',
+        'create-op <name> <operation> [..operation args]',
         'Create an operation to manipulate project state',
         (yargs: CLIConfig) => {
             console.log("Configuring op")
@@ -340,18 +340,6 @@ const addOperations = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvV
                 required: true,
                 type: 'string'
             })
-            if (parsedArgs._.includes('originate')) {
-                yargs
-                    .option('storage', {
-                        required: true,
-                        group: 'originate'
-                    })
-                    .positional('sourceFile', {
-                        describe: 'Name of source file to originate',
-                        required: true,
-                        group: 'originate'
-                    })
-            }
         },
         (argv: Arguments) => {
             console.log("Create op!")
@@ -544,7 +532,7 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
         : {
             ...parsedArgs,
             plugin: state.plugins.reduce(
-                (retval, pluginInfo: PluginInfo.t) =>
+                (retval, pluginInfo: ParsedPluginInfo.t) =>
                     pluginInfo.alias === retval
                         ? pluginInfo.name
                         : retval,

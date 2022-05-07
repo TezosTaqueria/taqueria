@@ -3,7 +3,7 @@ import {z} from 'zod'
 const protocolHashType: unique symbol = Symbol("EconomicalProtocolHash")
 
 export const schema = z
-    .string()
+    .string({description: "Protocol hash"})
     .refine(
         value => (value.length === 51 && value[0] === 'P' && /[A-Za-z0-9]+/.test(value)),
         value => ({message: `${value} is an invalid hash for an economical protocol`})

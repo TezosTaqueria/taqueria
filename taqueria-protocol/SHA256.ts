@@ -1,7 +1,8 @@
 import {z} from 'zod'
 import {TextEncoder} from "util"
 
-export const schema = z.string().length(64)
+export const schema = z.string({description: "SHA256"}).length(64)
+export const rawSchema = schema
 
 const sha256Type: unique symbol = Symbol("SHA256")
 

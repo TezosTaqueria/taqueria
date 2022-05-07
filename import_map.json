@@ -9,6 +9,7 @@
         "@taqueria/protocol/VersionNumber": "./taqueria-protocol/VersionNumber.ts",
         "@taqueria/protocol/Alias": "./taqueria-protocol/Alias.ts",
         "@taqueria/protocol/Operation": "./taqueria-protocol/Operation.ts",
+        "@taqueria/protocol/ParsedOperation": "./taqueria-protocol/ParsedOperation.ts",
         "@taqueria/protocol/Task": "./taqueria-protocol/Task.ts",
         "@taqueria/protocol/Verb": "./taqueria-protocol/Verb.ts",
         "@taqueria/protocol/SingleChar": "./taqueria-protocol/SingleChar.ts",
@@ -21,6 +22,7 @@
         "@taqueria/protocol/Config": "./taqueria-protocol/Config.ts",
         "@taqueria/protocol/i18n": "./taqueria-protocol/i18n.ts",
         "@taqueria/protocol/PluginInfo": "./taqueria-protocol/PluginInfo.ts",
+        "@taqueria/protocol/ParsedPluginInfo": "./taqueria-protocol/ParsedPluginInfo.ts",
         "@taqueria/protocol/Option": "./taqueria-protocol/Option.ts",
         "@taqueria/protocol/PositionalArg": "./taqueria-protocol/PositionalArg.ts",
         "@taqueria/protocol/HumanReadableIdentifier": "./taqueria-protocol/HumanReadableIdentifier.ts",
@@ -37,6 +39,7 @@
         "@taqueria/protocol/SanitizedPath": "./taqueria-protocol/SanitizedPath.ts",
         "@taqueria/protocol/Url": "./taqueria-protocol/Url.ts",
         "@taqueria/protocol/SHA256": "./taqueria-protocol/SHA256.ts",
-        "@taqueria/protocol/LoadedConfig": "./taqueria-protocol/LoadedConfig.ts"
+        "@taqueria/protocol/LoadedConfig": "./taqueria-protocol/LoadedConfig.ts",
+        "@taqueria/protocol/PersistentState": "./taqueria-protocol/PersistentState.ts"
     }
 }

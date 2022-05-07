@@ -1,9 +1,11 @@
 import {z} from "zod"
 
-export const schema = z.string().transform(value => {
-    const result = value.match(/^(\.\.|\.\/|\/)/)
-    return result ? value : `./${value}`
-})
+export const schema = z
+    .string({description: "Sanitized Path"})
+    .transform(value => {
+        const result = value.match(/^(\.\.|\.\/|\/)/)
+        return result ? value : `./${value}`
+    })
 
 const sanitizedPathType: unique symbol = Symbol("SanitizedPath")
 

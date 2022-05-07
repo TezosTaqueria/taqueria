@@ -13,36 +13,37 @@ const taskEncodingSchema = z.preprocess(
         z.literal('none')
     ])
     .default('none')
+    .describe("Task Encoding")
     .optional()
 )
 
 const taskHandlerSchema = z.union([z.literal('proxy'), z.string()])
 
 const internalSchema = z.object({
-    task: Verb.schema,
-    command: Command.schema,
-    aliases: z.array(Alias.rawSchema).default([]).optional(),
-    description: z.string().nonempty(),
-    example: z.string().optional(),
-    hidden: z.boolean().default(false).optional(),
-    encoding: taskEncodingSchema,
-    handler: taskHandlerSchema,
-    options: z.array(Option.schema).default([]).optional(),
-    positionals: z.array(PositionalArg.schema).default([]).optional()
-})
+    task: Verb.schema.describe("Task Name"),
+    command: Command.schema.describe("Task Command"),
+    aliases: z.array(Alias.rawSchema).default([]).describe("Task Aliases").optional(),
+    description: z.string({description: "Task Description"}).nonempty(),
+    example: z.string({description: "Task Example"}).optional(),
+    hidden: z.boolean({description: "Task Is Hidden"}).default(false).optional(),
+    encoding: taskEncodingSchema.describe("Task Encoding"),
+    handler: taskHandlerSchema.describe("Task Handler"),
+    options: z.array(Option.schema).default([]).describe("Task Options").optional(),
+    positionals: z.array(PositionalArg.schema).default([]).describe("Task Positional Args").optional()
+}).describe("Task")
 
 export const rawSchema = z.object({
-    task: Verb.rawSchema,
-    command: Command.rawSchema,
-    aliases: z.array(Alias.rawSchema).default([]).optional(),
-    description: z.string().nonempty(),
-    example: z.string().optional(),
-    hidden: z.boolean().default(false).optional(),
-    encoding: taskEncodingSchema,
-    handler:  taskHandlerSchema,
-    options: z.array(Option.rawSchema).default([]).optional(),
-    positionals: z.array(PositionalArg.rawSchema).default([]).optional()
-})
+    task: Verb.rawSchema.describe("Task Name"),
+    command: Command.rawSchema.describe("Task Command"),
+    aliases: z.array(Alias.rawSchema).default([]).describe("Task Aliases").optional(),
+    description: z.string({description: "Task Description"}).nonempty(),
+    example: z.string({description: "Task Example"}).optional(),
+    hidden: z.boolean({description: "Task Is Hidden"}).default(false).optional(),
+    encoding: taskEncodingSchema.describe("Task Encoding"),
+    handler:  taskHandlerSchema.describe("Task Handler"),
+    options: z.array(Option.rawSchema).default([]).describe("Task Options").optional(),
+    positionals: z.array(PositionalArg.rawSchema).default([]).describe("Task Positional Args").optional()
+}).describe("Task")
 
 export const schema = internalSchema.transform(val => val as Task)
 

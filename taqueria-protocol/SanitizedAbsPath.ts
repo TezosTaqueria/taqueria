@@ -2,7 +2,7 @@ import {z} from "zod"
 import {resolve} from 'path'
 
 const sanitizedAbsPath: unique symbol = Symbol()
-export const rawSchema = z.string().nonempty()
+export const rawSchema = z.string({description: "SanitizedAbsPath"}).nonempty()
 
 export const schema = rawSchema
     .transform((val: string) => {

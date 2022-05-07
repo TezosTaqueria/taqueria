@@ -5,18 +5,18 @@ import * as EconomicalProtocolHash from "@taqueria/protocol/EconomicalProtocolHa
 import * as Faucet from "@taqueria/protocol/Faucet"
 
 const internalSchema = z.object({
-    label: HumanReadableIdentifier.schema,
-    rpcUrl: Url.schema,
-    protocol: EconomicalProtocolHash.schema,
-    faucet: Faucet.schema
-})
+    label: HumanReadableIdentifier.schema.describe("Network Label"),
+    rpcUrl: Url.schema.describe("Network RPC Url"),
+    protocol: EconomicalProtocolHash.schema.describe("Network Protocol Hash"),
+    faucet: Faucet.schema.describe("Network Faucet")
+}).describe("Network Config")
 
 export const rawSchema = z.object({
-    label: z.string().nonempty(),
-    rpcUrl: z.string().nonempty().url(),
-    protocol: z.string().nonempty(),
-    facuet: Faucet.rawSchema
-})
+    label: z.string({description: "Network Label"}).nonempty(),
+    rpcUrl: z.string({description: "Network RPC Url"}).nonempty().url(),
+    protocol: z.string({description: "Network Protocol Hash"}).nonempty(),
+    facuet: Faucet.rawSchema.describe("Network Faucet")
+}).describe("Network Config")
 
 export const schema = internalSchema.transform(val => val as t)
 

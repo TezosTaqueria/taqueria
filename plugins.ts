@@ -1,6 +1,6 @@
 // First-party dependencies
 import type {InstalledPlugin, PluginAction, PluginResponse} from './taqueria-protocol/taqueria-protocol-types.ts'
-import {EphemeralState, PluginInfo, SanitizedArgs} from './taqueria-protocol/taqueria-protocol-types.ts'
+import {EphemeralState, SanitizedArgs, ParsedPluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {PluginRequestArgs, PluginDeps} from './taqueria-types.ts'
 import {LoadedConfig} from './taqueria-types.ts'
 import {TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
@@ -165,7 +165,7 @@ export const inject = (deps: PluginDeps) => {
     const retrievePluginInfo = (plugin: InstalledPlugin.t) => pipe(
         sendPluginActionRequest (plugin) ("pluginInfo") ({}),
         chain (unvalidatedData => {
-            const pluginInfo = PluginInfo.create(unvalidatedData)
+            const pluginInfo = ParsedPluginInfo.create(unvalidatedData)
             return pluginInfo
                 ? resolve(pluginInfo)
                 : reject({
@@ -229,7 +229,7 @@ export const inject = (deps: PluginDeps) => {
     // getComputedState: () -> Future<TaqError, State>
     const getComputedState = () => pipe(
         retrieveAllPluginInfo(),
-        map ((pluginInfo: PluginInfo.t[]) => 
+        map ((pluginInfo: ParsedPluginInfo.t[]) => 
             EphemeralState.make ({
                 build: parsedArgs.setBuild,
                 configHash: config.hash,

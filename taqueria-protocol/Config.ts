@@ -5,26 +5,38 @@ import * as SandboxConfig from "@taqueria/protocol/SandboxConfig"
 import * as Environment from "@taqueria/protocol/Environment"
 import * as Tz from "@taqueria/protocol/Tz"
 
-const networkMap = z.record(
-    z.union([
-        NetworkConfig.schema,
-        z.string().nonempty()
-    ])
-).optional()
+const networkMap = z
+    .record(
+        z.union([
+            NetworkConfig.schema,
+            z.string({description: "config.network"})
+            .nonempty("Default network must reference the name of an  existing network configuration.")
+        ]),
+        {description: "Network configurations"}
+    )
+    .optional()
 
-const sandboxMap = z.record(
-    z.union([
-        SandboxConfig.schema,
-        z.string().nonempty()
-    ])
-).optional()
+const sandboxMap = z
+    .record(
+        z.union([
+            SandboxConfig.schema,
+            z.string({description: "config.sandbox"})
+            .nonempty("Default sandbox must reference the name of an existing sandbox configuration.")
+        ]),
+        {description: "Sandbox configurations"}
+    )
+    .optional()
 
-const environmentMap = z.record(
-    z.union([
-        Environment.schema,
-        z.string().nonempty()
-    ])
-).optional()
+const environmentMap = z
+    .record(
+        z.union([
+            Environment.schema,
+            z.string({description: "config.environment"})
+            .nonempty("Default environment must reference the name of an existing environment.")
+        ]),
+        {description: "Environment configurations"}
+    )
+    .optional()
 
 const accountsMap = z.preprocess(
     val => val ?? {
@@ -33,39 +45,49 @@ const accountsMap = z.preprocess(
         "john": "5_000_000_000",
     },
     z.record(
-        z.union([Tz.rawSchema, z.number()])
+        z.union([Tz.rawSchema, z.number()]),
+        {description: "config.accounts"}
     )
 )
 
 const commonSchema = z.object({
     language: z
-        .union([z.literal('en'), z.literal('fr')])
+        .union([z.literal('en'), z.literal('fr')], {description: "config.language"})
         .optional()
         .transform(val => val ?? 'en'),
     plugins: z
-        .array(InstalledPlugin.schema)
+        .array(InstalledPlugin.schema, {description: "config.plugins"})
         .optional()
         .transform(val => val ?? []),
     testsDir: z
-        .string()
-        .optional()
-        .transform(val => val ?? 'tests'),
+        .preprocess(
+            (val: unknown) => val ?? "tests",
+            z.string({description: "config.testsDir"})
+            .nonempty("config.testsDir must have a value")
+            .optional()
+        ),
     contractsDir: z
-        .string()
-        .nonempty()
-        .optional()
-        .transform(val => val ?? 'contracts'),
+        .preprocess(
+            (val: unknown) => val ?? "contracts",
+            z.string({description: "config.contractsDir"})
+            .nonempty("config.contractsDir must have a value")
+            .optional()
+        ),
     artifactsDir: z
-        .string()
-        .nonempty()
-        .optional()
-        .transform(val => val ?? 'artifacts'),
+        .preprocess(
+            (val: unknown) => val ?? "artifacts",
+            z.string({description: "config.artifactsDir"})
+            .nonempty("config.artifactsDir must have a value")
+            .optional()
+        ),
     operationsDir: z
-        .string()
-        .nonempty()
-        .optional()
-        .transform(val => val ?? 'operations'),        
-})
+        .preprocess(
+            (val: unknown) => val ?? "operations",
+            z.string({description: "config.operationsDir"})
+            .nonempty("config.operationsDir must have a value")
+            .optional()
+        )
+}).describe("config")
 
 export const internalSchema = commonSchema.extend({
     network: networkMap,
@@ -79,7 +101,8 @@ export const rawSchema = commonSchema.extend({
         .record(
             z.union([
                 NetworkConfig.rawSchema,
-                z.string().nonempty()
+                z.string({description: "config.network"})
+                .nonempty("Default network must reference the name of an  existing network configuration.")
             ])
         )
         .optional(),
@@ -87,23 +110,26 @@ export const rawSchema = commonSchema.extend({
         .record(
             z.union([
                 SandboxConfig.rawSchema,
-                z.string().nonempty()
+                z.string({description: "config.sandbox"})
+            .nonempty("Default sandbox must reference the name of an existing sandbox configuration.")
             ])
         ),
     environment: z
         .record(
             z.union([
                 Environment.rawSchema,
-                z.string().nonempty()
+                z.string({description: "config.environment"})
+            .nonempty("Default environment must reference the name of an existing environment.")
             ])
         )
         .optional(),
     accounts: z
         .record(
-            z.union([Tz.rawSchema, z.number()])
+            z.union([Tz.rawSchema, z.number()]),
+            {description: "config.accounts"}
         )
         .optional()
-})
+}).describe("config")
 
 export const schema = internalSchema.transform(val => val as t)
 

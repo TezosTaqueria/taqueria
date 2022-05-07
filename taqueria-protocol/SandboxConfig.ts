@@ -8,27 +8,36 @@ import * as Verb from "@taqueria/protocol/Verb"
 const accountMapSchema = z.union([
     z.object({default: z.string().nonempty()}),
     z.record(SandboxAccountConfig.schema)
-])
+], {description: "Sandbox Accounts"})
 
 const internalSchema = z.object({
-    label: HumanReadableIdentifier.schema,
-    rpcUrl: Url.schema,
-    protocol: EconomicalProtocolHash.schema,
-    attributes: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
-    plugin: Verb.schema.optional(),
+    label: HumanReadableIdentifier.schema.describe("Sandbox Label"),
+    rpcUrl: Url.schema.describe("Sandbox RPC Url"),
+    protocol: EconomicalProtocolHash.schema.describe("Sandbox Protocol Hash"),
+    attributes: z.record(
+        z.union([z.string(), z.number(), z.boolean()]),
+        {description: "Sandbox Attributes"}
+    ).optional(),
+    plugin: Verb.schema.describe("Sandbox Plugin").optional(),
     accounts: accountMapSchema.optional()
-})
+}, {description: "Sandbox Configuration"})
 
 export const rawSchema = z.object({
-    label: z.string().nonempty(),
-    rpcUrl: z.string().nonempty().url(),
-    protocol: z.string().nonempty(),
-    attributes: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
-    plugin: Verb.rawSchema.optional(),
+    label: z.string({description: "Sandbox Label"}).nonempty(),
+    rpcUrl: z.string({description: "Sandbox RPC Url"}).nonempty().url(),
+    protocol: z.string({description: "Sandbox Protocol Hash"}).nonempty(),
+    attributes: z.record(
+        z.union(
+            [z.string(), z.number(), z.boolean()],
+            {description: "Sandbox Attribute"}
+        ),
+        {description: "Sandbox Attributes"}
+    ).optional(),
+    plugin: Verb.rawSchema.describe("Sandbox Plugin").optional(),
     accounts: z.union([
         z.object({default: z.string().nonempty()}),
         z.record(SandboxAccountConfig.rawSchema)
-    ]).optional()
+    ], {description: "Sandbox Accounts"}).optional()
 })
 
 export const schema = internalSchema.transform(val => val as t)

@@ -3,7 +3,7 @@ import {z} from 'zod'
 const urlType: unique symbol = Symbol('Url')
 
 const urlSchema = z
-    .string()
+    .string({description: "Url"})
     .url()
 
 export const schema = urlSchema.transform(val => val as Url)

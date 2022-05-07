@@ -15,8 +15,10 @@ import * as Alias from '@taqueria/protocol/Alias'
 import * as PositionalArg from "@taqueria/protocol/PositionalArg"
 import * as Option from '@taqueria/protocol/Option'
 import * as Task from '@taqueria/protocol/Task'
+import * as ParsedOperation from '@taqueria/protocol/ParsedOperation'
 import * as Operation from '@taqueria/protocol/Operation'
 import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin'
+import * as ParsedPluginInfo from "@taqueria/protocol/ParsedPluginInfo"
 import * as PluginInfo from '@taqueria/protocol/PluginInfo'
 import * as Config from "@taqueria/protocol/Config"
 import * as Environment from "@taqueria/protocol/Environment"
@@ -24,6 +26,7 @@ import * as EphemeralState from "@taqueria/protocol/EphermalState"
 import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
 import * as RequestArgs from "@taqueria/protocol/RequestArgs"
 import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
+import * as PersistentState from "@taqueria/protocol/PersistentState"
 import * as i18n from "@taqueria/protocol/i18n"
 export interface RuntimeDependency {
     readonly name: string,
@@ -89,5 +92,8 @@ export {
     SandboxConfig,
     NetworkConfig,
     SandboxAccountConfig,
-    i18n
+    PersistentState,
+    i18n,
+    ParsedPluginInfo,
+    ParsedOperation
 }

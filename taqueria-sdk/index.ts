@@ -12,6 +12,7 @@ import * as SandboxConfig from "@taqueria/protocol/SandboxConfig"
 import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
 import * as NetworkConfig from "@taqueria/protocol/NetworkConfig"
 import * as Environment from "@taqueria/protocol/Environment"
+import * as PersistentState from "@taqueria/protocol/PersistentState"
 
 import {Schema, InputSchema} from "./types"
 import {Args, pluginDefiner, LikeAPromise, Failure, StdIO} from "./types"
@@ -131,45 +132,25 @@ export const noop = () => {}
 const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, Failure<undefined>> => {
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
         const argv = yargs(unparsedArgs.slice(2)).argv
-        try {
-            const requestArgs = RequestArgs.make(argv)
-            return Promise.resolve(requestArgs)
-        }
-        catch (previous) {
-            return Promise.reject({
-                errCode: "E_INVALID_ARGS",
-                errMsg: "Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?",
-                context: unparsedArgs,
-                previous
-            })
-        }
+        const requestArgs = RequestArgs.make(argv)
+        return Promise.resolve(requestArgs)
     }
-    return Promise.reject({
-        errCode: "E_INVALID_ARGS",
-        errMsg: "Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?",
-        context: unparsedArgs
-    })
+    return Promise.reject("Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?")
 }
 
-const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): Schema | undefined => {
-    try {
-        const inputSchema: InputSchema = typeof(definer) === 'function' ? definer(i18n) : definer
+const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): Schema => {
+    const inputSchema: InputSchema = definer(i18n)
 
-        const {proxy} = inputSchema
+    const {proxy} = inputSchema
 
-        const pluginInfo = PluginInfo.create({
-            ...inputSchema,
-            name: inputSchema.name ?? inferPluginName()
-        })
+    const pluginInfo = PluginInfo.create({
+        ...inputSchema,
+        name: inputSchema.name ?? inferPluginName()
+    })
 
-        return {
-            ...pluginInfo,
-            proxy
-        }
-    }
-    catch (e) {
-        sendErr((e as Error).message)
-        return undefined
+    return {
+        ...pluginInfo,
+        proxy
     }
 }
 
@@ -177,64 +158,58 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => a
     const {taqRun} = requestArgs
     const i18n = await load()
     const schema = parseSchema(i18n, definer, inferPluginName)
-    if (schema) {
-        try {
-            switch (taqRun) {
-                case "pluginInfo":
-                    const output = {
-                        ...schema,
-                        proxy: schema.proxy ? true: false,
-                        checkRuntimeDependencies: schema.checkRuntimeDependencies ? true: false,
-                        installRuntimeDependencies: schema.installRuntimeDependencies ? true : false
-                    }
-                    return sendAsyncJson(output);
-                case "proxy":
-                    if (schema.proxy) {
-                        const retval = schema.proxy(RequestArgs.createProxyArgs(requestArgs))
-                        if (retval) return retval
-                        return Promise.reject({
-                            errCode: "E_PROXY",
-                            message: "The plugin's proxy method must return a promise.",
-                            context: retval
-                        })
-                    }
+    try {
+        switch (taqRun) {
+            case "pluginInfo":
+                const output = {
+                    ...schema,
+                    proxy: schema.proxy ? true: false,
+                    checkRuntimeDependencies: schema.checkRuntimeDependencies ? true: false,
+                    installRuntimeDependencies: schema.installRuntimeDependencies ? true : false
+                }
+                return sendAsyncJson(output);
+            case "proxy":
+                if (schema.proxy) {
+                    const retval = schema.proxy(RequestArgs.createProxyArgs(requestArgs))
+                    if (retval) return retval
                     return Promise.reject({
-                        errCode: 'E_NOT_SUPPORTED',
-                        message: i18n.__('proxyNotSupported'),
-                        context: requestArgs
+                        errCode: "E_PROXY",
+                        message: "The plugin's proxy method must return a promise.",
+                        context: retval
                     })
-                case "checkRuntimeDependencies":
-                    return sendAsyncJson(
-                        schema.checkRuntimeDependencies
-                            ? schema.checkRuntimeDependencies(i18n, requestArgs)
-                            : Promise.resolve({report: []})
-                    )
-                case "installRuntimeDependencies":
-                    return sendAsyncJson(
-                        schema.installRuntimeDependencies
-                            ? schema.installRuntimeDependencies(i18n, requestArgs)
-                            : Promise.resolve({report: []})
-                    )
-                default:
-                    return Promise.reject({
-                        errCode: 'E_NOT_SUPPORTED',
-                        message: i18n.__('actionNotSupported'),
-                        context: requestArgs
-                    })
-            }
-        }
-        catch (previous) {
-            return Promise.reject({
-                errCode: "E_UNEXPECTED",
-                message: "The plugin encountered a fatal error",
-                previous
-            })
+                }
+                return Promise.reject({
+                    errCode: 'E_NOT_SUPPORTED',
+                    message: i18n.__('proxyNotSupported'),
+                    context: requestArgs
+                })
+            case "checkRuntimeDependencies":
+                return sendAsyncJson(
+                    schema.checkRuntimeDependencies
+                        ? schema.checkRuntimeDependencies(i18n, requestArgs)
+                        : Promise.resolve({report: []})
+                )
+            case "installRuntimeDependencies":
+                return sendAsyncJson(
+                    schema.installRuntimeDependencies
+                        ? schema.installRuntimeDependencies(i18n, requestArgs)
+                        : Promise.resolve({report: []})
+                )
+            default:
+                return Promise.reject({
+                    errCode: 'E_NOT_SUPPORTED',
+                    message: i18n.__('actionNotSupported'),
+                    context: requestArgs
+                })
         }
     }
-    return Promise.reject({
-        errCode: 'E_INVALID_SCHEMA',
-        message: i18n.__('invalidSchema')
-    })
+    catch (previous) {
+        return Promise.reject({
+            errCode: "E_UNEXPECTED",
+            message: "The plugin encountered a fatal error",
+            previous
+        })
+    }
 }
 
 const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
@@ -380,5 +355,6 @@ export {
     SandboxConfig,
     SandboxAccountConfig,
     NetworkConfig,
-    Environment
+    Environment,
+    PersistentState
 }

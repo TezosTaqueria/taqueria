@@ -1,8 +1,8 @@
 import {z} from 'zod'
 
 export const rawSchema = z
-    .string()
-    .regex(/^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/)
+    .string({description: "Command"})
+    .regex(/^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/, "Must be a command that can be interpreted using yargs")
 
 export const schema = rawSchema.transform(val => val as t)
 
