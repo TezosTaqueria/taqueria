@@ -212,3 +212,5 @@ This will originate all contracts in the `/artifacts` directory to the sandbox a
 Congratulations! At this point, you have run through the basic usage of Taqueria
 
 For more details on the usage of specific Taqueria tasks, you can refer to the plugin documentation which contains additional context, configuration, and usage of the many Taqueria tasks; or continue on with the getting started guides
+
+TESTING DOCKER ENV
