@@ -1,0 +1,54 @@
+{
+    "language": "en",
+    "plugins": [
+        {
+            "name": "@taqueria/plugin-taquito",
+            "type": "npm"
+        },{
+            "name": "@taqueria/plugin-flextesa",
+            "type": "npm"
+        }
+    ],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts",
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {
+                "hello-tacos.tz": "1",
+                "increment.tz": "2"
+            }
+        }
+    },
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "default": "bob",
+                "bob": {
+                    "initialBalance": "3000000000"
+                },
+                "alice": {
+                    "initialBalance": "2000000000"
+                },
+                "john": {
+                    "initialBalance": "4000000000"
+                },
+                "jane": {
+                    "initialBalance": "5000000000"
+                },
+                "joe": {
+                    "initialBalance": "1000000000"
+                }
+            },
+            "label": "Local Ithaca Tezos Sandbox",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+    "network": {}
+}
