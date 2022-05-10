@@ -20,7 +20,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
             execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq compile ${contractName}
-            execSync(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
+            execSync(`PROJECT_DIR="./" taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
             await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
@@ -36,7 +36,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
             execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 
             // 2. Run taq compile ${contractName}
-            execSync(`taq compile hello-tacos.mligo`, {cwd: `./${taqueriaProjectPath}`});
+            execSync(`PROJECT_DIR="./" taq compile hello-tacos.mligo`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
             await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
@@ -54,7 +54,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
             execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos-two.mligo`);
 
             // 2. Run taq compile ${contractName}
-            execSync(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
+            execSync(`PROJECT_DIR="./" taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version for both contracts has been generated
             await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-one.tz`);
@@ -70,7 +70,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
     test('Verify that taqueria ligo plugin will display proper message if user tries to compile contract that does not exist', async () => {
         try {
             // 1. Run taq compile ${contractName} for contract that does not exist
-            const {stdout, stderr} = await exec(`taq compile test.mligo`, {cwd: `./${taqueriaProjectPath}`})
+            const {stdout, stderr} = await exec(`PROJECT_DIR="./" taq compile test.mligo`, {cwd: `./${taqueriaProjectPath}`})
 
             // 2. Verify that output includes next messages:
             // There was a compilation error.
@@ -88,7 +88,7 @@ describe("E2E Testing for taqueria ligo plugin",  () => {
         try {
             execSync(`cp e2e/data/invalid-contract.mligo ${taqueriaProjectPath}/contracts`)
 
-            const {stdout, stderr} = await exec(`taq compile invalid-contract.mligo`, {cwd: `./${taqueriaProjectPath}`})
+            const {stdout, stderr} = await exec(`PROJECT_DIR="./" taq compile invalid-contract.mligo`, {cwd: `./${taqueriaProjectPath}`})
 
             expect(stdout).toBe(contents.compileInvalid)
             expect(stderr).toContain("File \"contracts/invalid-contract.mligo\", line 1, characters 23-27");
