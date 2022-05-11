@@ -32,7 +32,7 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
 
         try {
             await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`)
-            await exec(`PROJECT_DIR=$(pwd) taq compile -p ${taqueriaProjectPath}`)
+            await exec(`PROJECT_DIR=${taqueriaProjectPath} taq compile -p ${taqueriaProjectPath}`)
 
             const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types`)
             expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`)
@@ -67,7 +67,7 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
 
         try {
             await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`)
-            await exec(`PROJECT_DIR=$(pwd) taq compile -p ${taqueriaProjectPath}`)
+            await exec(`PROJECT_DIR=${taqueriaProjectPath} taq compile -p ${taqueriaProjectPath}`)
 
             const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types ${folderName}`)
             expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: '${folderName}' }`)
@@ -96,7 +96,7 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
         try {
             await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`)
             await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`)
-            await exec(`PROJECT_DIR=$(pwd) taq compile -p ${taqueriaProjectPath}`)
+            await exec(`PROJECT_DIR=${taqueriaProjectPath} taq compile -p ${taqueriaProjectPath}`)
 
             const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types`)
             expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`)
