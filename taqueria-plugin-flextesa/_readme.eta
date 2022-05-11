@@ -43,12 +43,12 @@ taq install @taqueria/plugin-flextesa
 
 Once installed, you can confirm functionality by runing the command `taq start sandbox` which will start a sandbox with the default `local` configuration
 
-<% it.noteOpenAdmonition %>
+<%~ it.noteOpenAdmonition %>
 The project you install it on must be initialized by NPM. This only needs to be done once on a project and is accomplished by running the command:
 ```shell
 npm init -y
 ``` 
-<% it.closeAdmonition %>
+<%= it.closeAdmonition %>
 
 ## CLI Commands
 
@@ -59,9 +59,9 @@ The following commands are available from the CLI or the VS Code Command palette
 - `taq stop sandbox [sandboxName]`
 - `taq list accounts [sandboxName]`
 
-<% it.noteOpenAdmonition %>
+<%~ it.noteOpenAdmonition %>
 The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer
-<% it.closeAdmonition %>
+<%= it.closeAdmonition %>
 
 ## Plugin Configuration
 

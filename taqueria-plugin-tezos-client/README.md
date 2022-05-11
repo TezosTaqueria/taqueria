@@ -11,7 +11,8 @@ In future releases, this plugin will be extended to support more Tezos Client fe
 - Taqueria v0.0.6 or later
 - [Taqueria Flextesa plugin](../plugin-flextesa) v0.2.1 or later
 
-Currently, the Tezos Client plugin requires the Tezos Client to be running in a local Flextesa sandbox. The recommended approach is to install the Taqueria Flextesa plugin on the project, and then run `taq start sandbox local` to start up the sandbox so the Tezos Client plugin can connect to it
+> ### :page_with_curl: Note
+> Currently, the Tezos Client plugin requires the Tezos Client to be running in a local Flextesa sandbox. The recommended approach is to install the Taqueria Flextesa plugin on the project, and then run `taq start sandbox local` to start up the sandbox so the Tezos Client plugin can connect to it
 
 ## Installation
 
