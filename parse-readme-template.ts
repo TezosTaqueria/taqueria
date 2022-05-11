@@ -13,6 +13,7 @@ const plugins: string[] = [
   "taqueria-plugin-ligo",
   "taqueria-plugin-smartpy",
   "taqueria-plugin-taquito",
+  "taqueria-plugin-tezos-client",
 ];
 
 // typed list of github variables with their values
