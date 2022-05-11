@@ -40,6 +40,8 @@
         "@taqueria/protocol/Url": "./taqueria-protocol/Url.ts",
         "@taqueria/protocol/SHA256": "./taqueria-protocol/SHA256.ts",
         "@taqueria/protocol/LoadedConfig": "./taqueria-protocol/LoadedConfig.ts",
-        "@taqueria/protocol/PersistentState": "./taqueria-protocol/PersistentState.ts"
+        "@taqueria/protocol/PersistentState": "./taqueria-protocol/PersistentState.ts",
+        "@taqueria/protocol/Provisioner": "./taqueria-protocol/Provisioner.ts",
+        "@taqueria/protocol/Provisions": "./taqueria-protocol/Provisions.ts"
     }
 }

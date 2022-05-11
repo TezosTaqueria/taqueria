@@ -9,7 +9,7 @@ export const internalSchema = z.object({
     name: z.string({description: "Plugin Name"}).nonempty(),
     version: VersionNumber.schema.describe("Plugin Version #"),
     schema: VersionNumber.schema.describe("Plugin Schema Version #"),
-    alias: Alias.schema.describe("Plugin Alias").optional(),
+    alias: Alias.schema.describe("Plugin Alias"),
     tasks: z.preprocess(
         val => val ?? [],
         z.array(
@@ -30,7 +30,7 @@ export const rawSchema = z.object({
     name: z.string({description: "Plugin Name"}).nonempty(),
     version: VersionNumber.rawSchema.describe("Plugin Version #"),
     schema: VersionNumber.rawSchema.describe("Plugin Schema Version #"),
-    alias: Alias.rawSchema.describe("Plugin Alias").optional(),
+    alias: Alias.rawSchema.describe("Plugin Alias"),
     tasks: z.preprocess(
         val => val ?? [],
         z.array(

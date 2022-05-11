@@ -4,6 +4,7 @@ import * as Command from '@taqueria/protocol/Command'
 import * as Option from '@taqueria/protocol/Option'
 import * as RequestArgs from "@taqueria/protocol/RequestArgs"
 import * as PersistentState from "@taqueria/protocol/PersistentState"
+import * as PositionalArg from "@taqueria/protocol/PositionalArg"
 
 type Handler = (state: PersistentState.t) => <T extends RequestArgs.t>(opts: T) => unknown
 
@@ -11,6 +12,7 @@ export const internalSchema = z.object({
     operation: Verb.schema.describe("Operation Name"),
     command: Command.schema.describe("Operation Command"),
     description: z.string({description: "Optionation Description"}).optional(),
+    positionals: z.array(PositionalArg.schema).default([]).describe("Operation Positional Args").optional(),
     options: z.preprocess(
         (val: unknown) => val ?? [] as Option.t[],
         z.array(Option.schema.describe("Operation Option"), {description: "Operation Options"}).optional()
@@ -30,6 +32,7 @@ export const rawSchema = z.object({
     operation: Verb.rawSchema.describe("Operation Name"),
     command: Command.rawSchema.describe("Operation Command"),
     description: z.string({description: "Operation Description"}).optional(),
+    positionals: z.array(PositionalArg.schema).default([]).describe("Operation Positional Args").optional(),
     options: z.preprocess(
         (val: unknown) => val ?? [],
         z.array(

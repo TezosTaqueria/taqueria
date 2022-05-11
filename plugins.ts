@@ -14,7 +14,7 @@ import {copy} from 'https://deno.land/std@0.128.0/streams/conversion.ts'
 import clipboard from 'https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts'
 
 // Get utils
-const {joinPaths, readJsonFile, writeTextFile, decodeJson, debug} = utils.inject({
+const {joinPaths, readJsonFile, writeTextFile, decodeJson} = utils.inject({
     stdout: Deno.stdout,
     stderr: Deno.stderr
 })

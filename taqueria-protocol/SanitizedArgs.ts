@@ -51,6 +51,21 @@ const scaffoldRawSchema = initRawSchema.extend({
     scaffoldUrl: z.string().nonempty().url().transform((val: unknown) => val as Url.t),
 })
 
+const provisionRawSchema = initRawSchema
+    .extend({
+        operation: z
+            .string()
+            .nonempty()
+            .describe("Operation name"),
+        name: z
+            .string()
+            .nonempty()
+            .regex(/^[a-z0-9]+[a-z0-9-_]$/, "Provisioner name must consist of one or more letters/numbers and may not start with an underscore or dash.")
+            .describe("Provisioner name")
+            .optional()
+    })
+    .passthrough()
+
 const managePluginRawSchema = initRawSchema.extend({
     pluginName: z.string().nonempty()
 })
@@ -70,6 +85,8 @@ export type t = SanitizedArgs
 type ScaffoldInput = z.infer<typeof scaffoldRawSchema>
 type ManagePluginInput = z.infer<typeof managePluginRawSchema>
 type VersionInput = z.infer<typeof versionRawSchema>
+type ProvisionInput = z.infer<typeof provisionRawSchema>
+
 export type ScaffoldArgs = ScaffoldInput & {
     readonly [sanitizedArgsType]: void
 }
@@ -79,12 +96,17 @@ export type ManagePluginArgs = ManagePluginInput & {
 export type VersionArgs = VersionInput & {
     readonly [sanitizedArgsType]: void
 }
+export interface ProvisionArgs extends ProvisionInput {
+    readonly [sanitizedArgsType]: void
+}
 
 const scaffoldSchema = scaffoldRawSchema.transform((val: unknown) => val as ScaffoldArgs)
 
 const managePluginSchema = managePluginRawSchema.transform((val: unknown) => val as ManagePluginArgs)
 
 const versionSchema = versionRawSchema.transform((val: unknown) => val as VersionArgs)
+
+const provisionSchema = provisionRawSchema.transform((val: unknown) => val as ProvisionArgs)
 
 export const rawSchema = initRawSchema
 
@@ -103,3 +125,5 @@ export const uninstallArgs = (inputArgs: Record<string, unknown>) => managePlugi
 export const scaffoldArgs = (inputArgs: Record<string, unknown>) => scaffoldSchema.parse(inputArgs)
 
 export const versionArgs = (inputArgs: Record<string, unknown>) => versionSchema.parse(inputArgs)
+
+export const provisionArgs = (inputArgs: ProvisionInput | Record<string, unknown>) => provisionSchema.parse(inputArgs)

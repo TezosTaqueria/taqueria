@@ -15,6 +15,7 @@ import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
 import * as NPM from './npm.ts'
 import inject from './plugins.ts'
 import { match, __ } from 'https://esm.sh/ts-pattern@3.3.5';
+import {addNewProvision} from "./provisions.ts"
 
 // Get utils
 const {
@@ -27,8 +28,8 @@ const {
     gitClone,
     rm,
     log,
-    logInput,
-    debug
+    // logInput,
+    // debug
 } = utils.inject({
     stdout: Deno.stdout,
     stderr: Deno.stderr
@@ -329,23 +330,27 @@ const getCanonicalTask = (pluginName: string, taskName: string, state: Ephemeral
     undefined
 )
 
-const addOperations = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, parsedArgs: SanitizedArgs.t, _i18n: i18n.t, _state: EphemeralState.t, _pluginLib: PluginLib) => 
+const addOperations = (cliConfig: CLIConfig, config: LoadedConfig.t, _env: EnvVars, _parsedArgs: SanitizedArgs.t, _i18n: i18n.t, state: EphemeralState.t, _pluginLib: PluginLib) => 
     cliConfig.command(
-        'create-op <name> <operation> [..operation args]',
-        'Create an operation to manipulate project state',
+        'provision <operation> [..operation args]',
+        'Provision an operation to populate project state',
         (yargs: CLIConfig) => {
-            console.log("Configuring op")
             yargs.positional('operation', {
-                describe: 'The name of the operation to create', 
+                describe: 'The name of the operation to provision', 
                 required: true,
+                type: 'string',
+                choices: Object.keys(state.operations)
+            })
+            yargs.option("name", {
+                describe: "Unique name of the provisioner",
                 type: 'string'
             })
         },
-        (argv: Arguments) => {
-            console.log("Create op!")
-            console.log(argv)
-            Deno.exit(10)
-        }
+        (argv: Arguments) => pipe(
+            addNewProvision(SanitizedArgs.provisionArgs(argv), config, state),
+            map(() => "Added provision to .taq/provisions.ts"),
+            forkCatch (console.error) (console.error) (log)
+        )
     ).alias('create-op', 'new op')
 
 const addTemplates = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, _parsedArgs: SanitizedArgs.t, _i18n: i18n.t, _state: EphemeralState.t, _pluginLib: PluginLib) => 
@@ -578,6 +583,7 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
         'testFromVsCode',
         'list-known-tasks',
         'listKnownTasks',
+        'provision'
 
     ].reduce(
         (retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
@@ -651,8 +657,9 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError.t) => {
             .with({kind: 'E_MKDIR_FAILED'}, err                 => [7, `${err.msg}: ${err.context}`])
             .with({kind: 'E_NPM_INIT'}, err                     => [8, err.msg])
             .with({kind: 'E_READFILE'}, err                     => [9, err.msg])
-            .with({kind: 'GIT_CLONE_FAILED'},err            => [10, `${err.msg}: ${err.context}`])
+            .with({kind: 'E_GIT_CLONE_FAILED'},err              => [10, `${err.msg}: ${err.context}`])
             .with({kind: 'E_INVALID_ARGS'}, err                 => [11, err.msg])
+            .with({kind: 'E_PROVISION'}, err                    => [12, err.msg])
             .with({message: __.string}, err                     => [128, err.message])
             .exhaustive()
         
@@ -660,13 +667,6 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError.t) => {
         console.error(inputArgs.debug ? err : msg)
         Deno.exit(exitCode as number)
     }
-}
-
-const sanitizeCmd = (cmd: string[]) => {
-    if (cmd.length > 1 && cmd[0] === 'create' && (['op', 'operation'].includes(cmd[1]))) {
-        return ['create-op']
-    }
-    return cmd
 }
 
 export default {

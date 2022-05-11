@@ -166,10 +166,10 @@ export const inject = (deps: UtilsDependencies) => {
 
     const gitClone = (url: Url.t) => (destinationPath: SanitizedAbsPath.t) : Future.t<TaqError.t, SanitizedAbsPath.t> => pipe(
         execText('git clone <%= it.url %> <%= it.outputDir %>', {url: url.toString(), outputDir: destinationPath}),
-        mapRej<TaqError.t, TaqError.t>(previous => ({kind: 'GIT_CLONE_FAILED', msg: `Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed.`, context: {url, destinationPath}, previous})),
+        mapRej<TaqError.t, TaqError.t>(previous => ({kind: 'E_GIT_CLONE_FAILED', msg: `Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed.`, context: {url, destinationPath}, previous})),
         chain(status => status === 0
             ? resolve(destinationPath)
-            : reject<TaqError.t>({kind: 'GIT_CLONE_FAILED', msg: `Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed.`, context: {url, destinationPath}})
+            : reject<TaqError.t>({kind: 'E_GIT_CLONE_FAILED', msg: `Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed.`, context: {url, destinationPath}})
         ),
         map(() => destinationPath)
     );

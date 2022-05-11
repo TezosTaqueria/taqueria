@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc -noEmit index.ts && npx esbuild --bundle index.ts types.ts --outdir=. --minify --platform=node --sourcemap"
+    "build": "npx tsc -noEmit && npx esbuild --bundle index.ts types.ts --outdir=. --minify --platform=node --sourcemap"
   },
   "keywords": [
     "taqueria",
