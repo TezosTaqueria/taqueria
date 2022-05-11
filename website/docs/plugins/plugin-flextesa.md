@@ -107,7 +107,7 @@ A string value which accepts valid Tezos protocol hashes. This value will config
 
 Currently availble protocols are:
 - Hangzhou `PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx`
-- Ithica   `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
+- Ithaca   `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
 
 #### 'rpcUrl'
 
