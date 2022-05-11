@@ -1,5 +1,4 @@
 # Taqueria Tezos Client Plugin
-# Taqueria Tezos Client Plugin
 
 The Tezos Client plugin provides tasks for interacting with the Tezos client including type checking of Michelson smart contracts, and simulating smart contracts
 

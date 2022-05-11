@@ -1,4 +1,3 @@
-# Taqueria Tezos Client Plugin
 <% if (it.output == "github") { %>
 # Taqueria Tezos Client Plugin
 <% } %>
