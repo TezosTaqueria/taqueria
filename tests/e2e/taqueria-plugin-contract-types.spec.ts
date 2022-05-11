@@ -1,5 +1,5 @@
 import {generateTestProject} from "./utils/utils";
-import fs from "fs";
+import fsPromises from "fs/promises"
 import { exec as exec1} from "child_process"
 import path from "path";
 import util from "util"
@@ -119,11 +119,11 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
     });
 
     // Remove all files from artifacts folder without removing folder itself
-    afterEach(() => {
+    afterEach( async () => {
         try {
-            const files = fs.readdirSync(`${taqueriaProjectPath}/artifacts/`);
+            const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
             for (const file of files) {
-                fs.unlinkSync(path.join(`${taqueriaProjectPath}/artifacts/`, file));
+                await fsPromises.rm(path.join(`${taqueriaProjectPath}/artifacts/`, file));
             }
         } catch(error){
             throw new Error (`error: ${error}`);
@@ -132,9 +132,9 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
 
     // Clean up process to remove taquified project folder
     // Comment if need to debug
-    afterAll(() => {
+    afterAll( async () => {
         try {
-            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+            await fsPromises.rm(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }

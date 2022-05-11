@@ -30,7 +30,8 @@ What you will accomplish:
 
 To successfully follow this guide, you must ensure that:
 - The Taqueria CLI has been [installed](./installation.mdx) and is available in your `$PATH` 
-- Docker is installed and currently running
+- Docker 0.8 (or later) is installed and currently running
+- Node.js v16.x (or later) is installed
 
 :::note
 The Taqueria VS Code Extension provides direct access to Taqueria tasks from the command palette. Under the hood, the VS Code Extension makes calls to the CLI, so you can be assured the behaviour of tasks will remain consistent regardless of wether they are executed from a terminal or the command palette. The steps in this guide are for using the Taqueria CLI, but you can also run the commands from the Taqueria extension via the VS Code command palette if you prefer
@@ -224,7 +225,7 @@ Now you can originate the contract by running:
 taq originate
 ```
 
-This will originate all contracts in the `/artifacts` directory to the sandbox and return the address of the deployed contract and destination sandbox. The output for this command will display which contracts were originated, what the destination was, and what the on-chain address for the deployed address is. This will look something like this:
+This will originate all contracts in the `/artifacts` directory to the sandbox and return the on-chain addresses of the originated contracts. This will look something like this:
 ```
 ┌────────────┬──────────────────────────────────────┬─────────────┐
 │ Contract   │ Address                              │ Destination │
