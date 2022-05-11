@@ -210,14 +210,6 @@ const config = {
 									</p>
 								  `
               },
-              // {
-              //   html: `
-							// 		<a class='footerButton' href='https://github.com/ecadlabs/taqueria'>
-							// 			<img class='footerGihubLogoButton' src="/img/githubSVG.svg" alt="" />
-							// 			GITHUB
-							// 		</a>
-							// 	  `
-              // },
               {
                 html: `form`
               },
