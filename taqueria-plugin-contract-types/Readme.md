@@ -46,7 +46,7 @@ taq generate types [typeOutputDir]
 #### CLI Aliases
 
 The following aliases are interchangable with `generate types`
-- `gen types`
+- `gen`
 - `gentypes`
 
 #### Options
