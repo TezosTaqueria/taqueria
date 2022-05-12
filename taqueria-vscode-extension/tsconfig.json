@@ -1,7 +1,8 @@
 {
+	"extends": "../tsconfig.json",
 	"compilerOptions": {
 		"module": "commonjs",
-		"target": "es2020",
+		"target": "es2021",
 		"outDir": "out",
 		"lib": [
 			"ESNext",
@@ -12,8 +13,6 @@
 		"strict": true   /* enable all strict type-checking options */
 	},
 	"exclude": [
-		"../node_modules/",
-		"node_modules",
 		".vscode-test"
 	]
 }
