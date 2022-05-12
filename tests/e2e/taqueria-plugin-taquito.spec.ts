@@ -1,9 +1,5 @@
 import fsPromises from "fs/promises"
-<<<<<<< HEAD
-import { generateTestProject } from "./utils/utils";
-=======
 import { generateTestProject, checkContractExistsOnNetwork } from "./utils/utils";
->>>>>>> origin/main
 import { exec as exec1 } from "child_process";
 import utils from 'util'
 import { networkInfo } from './data/network-info'
