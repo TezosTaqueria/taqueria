@@ -133,7 +133,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "parcel build --no-cache --no-optimize --no-scope-hoist --detailed-report 2>&1",
+    "compile": "npx tsc -noEmit && parcel build --no-cache --no-optimize --no-scope-hoist --detailed-report 2>&1",
     "watch": "parcel watch --no-cache --detailed-report",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",

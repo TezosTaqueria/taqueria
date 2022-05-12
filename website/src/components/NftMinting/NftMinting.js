@@ -11,14 +11,16 @@ import "@typeform/embed/build/css/widget.css";
 
 const stdMarginBottom = "40px";
 
-const network = "ithacanet";
+const network =
+  process.env.NODE_ENV === "development" ? "ithacanet" : "mainnet";
+
 const rpcUrl = {
   ithacanet: "https://ithacanet.ecadinfra.com/",
   mainnet: "https://mainnet.api.tez.ie"
 };
 const CONTRACT_ADDRESS = {
-  ithacanet: "KT1PK9Bq7dDhvpbhk4zTKizHCiB4AdCKdjt2",
-  mainnet: ""
+  ithacanet: "KT1BEzoXUzG1S6e8Aw9VctmaGu7pchenK7hn",
+  mainnet: "KT1D6er82V26zwV7RUxA9Wq7YyjziC52STjo"
 };
 
 export default function NftMinting() {
@@ -103,6 +105,7 @@ export default function NftMinting() {
   };
 
   useEffect(() => {
+    console.log("Connected to", network);
     window.Buffer = Buffer;
     (async () => {
       const tezos = new TezosToolkit(rpcUrl[network]);
@@ -210,7 +213,11 @@ export default function NftMinting() {
         </>
       )}
       {userAddress && alreadyMinted && (
-        <div>
+        <div
+          style={{
+            marginBottom: stdMarginBottom
+          }}
+        >
           <p>
             <b>Sorry, you already minted your Taqueria NFT!</b>
           </p>
@@ -218,7 +225,12 @@ export default function NftMinting() {
             <b>
               You can find it in your wallet or in the{" "}
               <a
-                href="https://better-call.dev/ithacanet/big_map/62449/keys"
+                href={`https://better-call.dev/${
+                  process.env.NODE_ENV === "development"
+                    ? "ithacanet/big_map/62449/keys"
+                    : "mainnet/big_map/164359/keys"
+                }`}
+
                 target="_blank"
                 rel="noopener noreferrer nofollow"
               >
@@ -243,7 +255,12 @@ export default function NftMinting() {
         Taqueria is a Tezos developer tool suite, designed to make working with
         Tezos easier and more secure. Whether you are an aspiring NFT artist or
         a seasoned dapp developer, you can use Taqueria to make your development
-        experience better. Try the beta <a href="https://taqueria.io/docs/getting-started/installation/">here</a>!
+        experience better. Try the beta{" "}
+        <a href="https://taqueria.io/docs/getting-started/installation/">
+          here
+        </a>
+        !
+
       </p>
       <h4>About Taqueria NFTs</h4>
       <p>
@@ -254,47 +271,39 @@ export default function NftMinting() {
         participation, give away swag, run NFT holder contests and grant special
         access to Taqueria events
       </p>
-
-            <div id="disclaimer-text">
+      
+      <div id="disclaimer-text">
         <h5>NFT Mint & License Terms</h5>
         <p>
           Non-fungible tokens ("NFTs") issued by ECAD Labs Inc. ("ECAD Labs")
           are for entertainment and promotional purposes only. NFTs do not grant
           any current or future rights to any property, services or rewards.
-          NFTs are not intended to have any economic value
- 
-          All intellectual property rights in the NFTs and their related assets
-          and artifacts (the "Artifacts"), including but not limited to all
-          copyright, applicable moral rights, and trademarks, remains with the
-          sole property of ECAD Labs and those parties expressly identified by
-          ECAD Labs as owners or controllers of specific Artifacts
-
-          The NFTs are intended for personal, non-commercial use and Artifacts
-          may only be viewed or displayed in personal wallets and other similar
-          services used to view non-fungible tokens. Any use or reproduction of
-          Artifacts for any commercial purpose or that contravenes the ECAD Labs
-          Acceptable Use Policy (ecadlabs.com/aup) is strictly prohibited
-
-          Any contests or promotions operated by ECAD Labs that incorporate or
+          NFTs are not intended to have any economic value All intellectual
+          property rights in the NFTs and their related assets and artifacts
+          (the "Artifacts"), including but not limited to all copyright,
+          applicable moral rights, and trademarks, remains with the sole
+          property of ECAD Labs and those parties expressly identified by ECAD
+          Labs as owners or controllers of specific Artifacts The NFTs are
+          intended for personal, non-commercial use and Artifacts may only be
+          viewed or displayed in personal wallets and other similar services
+          used to view non-fungible tokens. Any use or reproduction of Artifacts
+          for any commercial purpose or that contravenes the ECAD Labs
+          Acceptable Use Policy (ecadlabs.com/aup) is strictly prohibited Any
+          contests or promotions operated by ECAD Labs that incorporate or
           utilize the NFTs may be subject to additional terms and conditions and
           may be restricted by age, location and other criteria established by
-          ECAD Labs in its sole discretion
-
-          ECAD Labs makes no representations or warranties that NFTs and
-          Artifacts will remain accessible in the future, and all current and
-          previous persons identified as owners or controllers of the NFTs on
-          the Tezos blockchain forever waive, release and indemnify ECAD Labs
-          and its directors, employees, agents, contractors, affiliates and
-          assigns from any and all claims that may arise in relation to the
-          NFTs, including any and all claims for direct, indirect, economic or
-          consequential loss or damages
-
-          Current and future owners and controllers of NFTs must accept these
-          terms as a condition of receipt. Any transfer or assignment in
-          violation of this requirement will make such transfer null and void
-
-          Except as modified here, all ECAD Labs policies
-          (ecadlabs.com/policies) apply to the NFTs
+          ECAD Labs in its sole discretion ECAD Labs makes no representations or
+          warranties that NFTs and Artifacts will remain accessible in the
+          future, and all current and previous persons identified as owners or
+          controllers of the NFTs on the Tezos blockchain forever waive, release
+          and indemnify ECAD Labs and its directors, employees, agents,
+          contractors, affiliates and assigns from any and all claims that may
+          arise in relation to the NFTs, including any and all claims for
+          direct, indirect, economic or consequential loss or damages Current
+          and future owners and controllers of NFTs must accept these terms as a
+          condition of receipt. Any transfer or assignment in violation of this
+          requirement will make such transfer null and void Except as modified
+          here, all ECAD Labs policies (ecadlabs.com/policies) apply to the NFTs
         </p>
       </div>
     </div>
