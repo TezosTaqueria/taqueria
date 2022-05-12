@@ -6,9 +6,7 @@ The Taquito plugin provides a task to originate a smart contract to a Tezos netw
 
 ## Requirements
 
-- Taqueria v0.0.6 or later
-- Node.js v16 or later
-- Docker v0.8.4 or later
+The Taquito plugin has no additional requirements
 
 ## Installation
 
