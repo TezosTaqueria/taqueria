@@ -21,7 +21,7 @@ const getCompileCommand = (opts: Opts) => (sourceFile: string) => {
         projectDir = process.env.PROJECT_DIR
     }
     const inputFile = getInputFilename (opts) (sourceFile)
-    const baseCommand = `cd ${projectDir} $DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v "$PROJECT_DIR:/project" -w /project ligolang/ligo:0.41.0 compile contract ${inputFile}`
+    const baseCommand = `$DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:0.41.0 compile contract ${inputFile}`
     const entryPoint = opts.e ? `-e ${opts.e}` : ""
     const syntax = opts["-s"] ? `s ${opts['s']} : ""` : ""
     const outFile = `-o ${getContractArtifactFilename(opts)(sourceFile)}`
