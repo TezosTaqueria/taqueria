@@ -4,10 +4,6 @@ The SmartPy plugin provides a task to compile SmartPy smart contracts to Michels
 
 ## Requirements
 
-- Taqueria v0.0.6 or later
-- Node.js v16 or later
-- Docker v0.8.4 or later
-
 The SmartPy plugin requires SmartPy v0.8.4 or later to be installed locally
 
 SmartPy is available [here](https://smartpy.io/)
