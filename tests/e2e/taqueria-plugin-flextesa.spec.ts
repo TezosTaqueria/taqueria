@@ -259,7 +259,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
         // 3. Verify that output includes a table and an error message
         expect(stdout).toBe(contents.runtimeError)
-        expect(stderr).toBe(contents.tezosClientError);
+        expect(stderr).toContain('Unknown primitive hello.');
     })
 
     // Remove all files from artifacts folder without removing folder itself
