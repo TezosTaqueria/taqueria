@@ -4,9 +4,9 @@ title: Contribute to Taqueria
 
 The Taqueria source code repository is hosted on Github. This public repository is used to collaborate on all Taqueria work, including monitoring development progress, bug tracking, enhancement tracking and discussions:
 
-Repository: https://github.com/ecadlabs/taqueria
-Issues (Bugs, features and development tracking): https://github.com/ecadlabs/taqueria/issues
-Discussions: https://github.com/ecadlabs/taqueria/discussions 
+- Repository: https://github.com/ecadlabs/taqueria
+- Issues (Bugs, features and development tracking): https://github.com/ecadlabs/taqueria/issues
+- Discussions: https://github.com/ecadlabs/taqueria/discussions 
 
 As Taqueria is an open-source project, we believe it is essential for this work to be publicly visible.
 
