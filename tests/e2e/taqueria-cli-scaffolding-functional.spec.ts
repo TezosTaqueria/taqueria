@@ -3,14 +3,14 @@ import fsPromises from "fs/promises"
 import util from "util"
 const exec = util.promisify(exec1)
 
-describe("E2E Testing for taqueria scaffolding initialization,", () => {
+const scaffoldDirName = `taqueria-quickstart`
 
-    const scaffoldDirName = `taqueria-quickstart`
+describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     beforeAll(async () => {
         try {
             await exec('taq scaffold')
-            await exec(`cd ${scaffoldDirName} && npm run setup`)
+            console.log(await exec(`cd ${scaffoldDirName} && npm run setup`))
         } catch (error) {
             throw new Error (`error: ${error}`)
         }
@@ -42,7 +42,7 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         }
     })
 
-    test.only('Verify that scaffold project can start and stop taqueria locally', async () => {
+    test.only ('Verify that scaffold project can start and stop taqueria locally', async () => {
         try {
             const startResults = await exec(`cd ${scaffoldDirName} && npm run start:taqueria:local`)
             expect(startResults.stdout).toContain('Processing /example.tz...')
