@@ -275,7 +275,7 @@ jobs:
           docker image ls ghcr.io/ecadlabs/taqueria-flextesa
           taq --version
           taq --build
-          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npm run test:e2e -w tests
+          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npm run test:e2e -w tests --detectOpenHandles
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks'] }}
   
