@@ -62,6 +62,5 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         } catch (error) {
             throw new Error (`error: ${error}`)
         }
-
     })
 })
