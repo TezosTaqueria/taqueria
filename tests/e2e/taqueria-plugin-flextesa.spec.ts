@@ -335,7 +335,6 @@ describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops", () => 
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
-
     });
 
     test('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
