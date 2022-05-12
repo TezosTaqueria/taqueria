@@ -34,7 +34,6 @@ const docVariables: { [key: string]: string } = {
 
 // for each plugin process the readme file
 const processNewReadmeFiles = plugins.map((pluginName) => {
-    console.log(`Started processing ${pluginName}`);
     const template = fs.readFileSync(
         path.join(__dirname, pluginName, "_readme.eta"),
         "utf8"
@@ -50,7 +49,6 @@ const processNewReadmeFiles = plugins.map((pluginName) => {
         eta.render(template, docVariables),
         "utf8"
     );
-    console.log(`Finished processing ${pluginName}`);
 });
 
 export {};
