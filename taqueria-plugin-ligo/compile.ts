@@ -22,6 +22,7 @@ const getCompileCommand = (opts: Opts) => (sourceFile: string) => {
     const syntax = opts["-s"] ? `s ${opts['s']} : ""` : ""
     const outFile = `-o ${getContractArtifactFilename(opts)(sourceFile)}`
     const cmd = `${baseCommand} ${entryPoint} ${syntax} ${outFile}`
+    console.log(cmd)
     return cmd
 }
 
