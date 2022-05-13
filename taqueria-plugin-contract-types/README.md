@@ -254,6 +254,7 @@ type Methods = {
 
 See [example-usage.ts](example/example-usage.ts) for full example
 
+
 ### Before
 
 Using taquito with the generated contract types:
