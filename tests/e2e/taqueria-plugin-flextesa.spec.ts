@@ -233,7 +233,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
         }
     })
 
-    test.skip("Verify that taqueria simulator task emits parameter type error (supplying map instead of nat)", async () => {
+    test("Verify that taqueria simulator task emits parameter type error (supplying map instead of nat)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`)
@@ -250,7 +250,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
         }
     })
 
-    test("Verify that taqueria simulator task emits parameter type error (supplying an unknown type instead of nat)", async () => {
+    test.skip("Verify that taqueria simulator task emits parameter type error (supplying an unknown type instead of nat)", async () => {
         try {
             // 1. Copy contract from data folder to taqueria project folder
             await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`)
