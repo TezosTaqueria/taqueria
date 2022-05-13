@@ -112,6 +112,7 @@ describe('Extension Test Suite', () => {
 
     after(async () => {
         await fse.rmdir(testProjectDestination, {recursive: true})
-        await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
+        // Uncomment for local development
+        // await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
     });
 });
