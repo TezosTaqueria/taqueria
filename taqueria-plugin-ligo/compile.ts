@@ -15,11 +15,11 @@ const getInputFilename = (opts: Opts) => (sourceFile: string) => {
 }
 
 const getCompileCommand = (opts: Opts) => (sourceFile: string) => {
-    const {projectDir} = opts
+    let {projectDir} = opts
     // if process.env.PROJECT_DIR is not null 
-    // if (process.env.PROJECT_DIR && process.env.PROJECT_DIR?.length > 0) {
-    //     projectDir = process.env.PROJECT_DIR
-    // }
+    if (process.env.PROJECT_DIR && process.env.PROJECT_DIR?.length > 0) {
+        projectDir = process.env.PROJECT_DIR
+    }
     const inputFile = getInputFilename (opts) (sourceFile)
     const baseCommand = `DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:0.41.0 compile contract ${inputFile}`
     const entryPoint = opts.e ? `-e ${opts.e}` : ""
