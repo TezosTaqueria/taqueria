@@ -9,7 +9,7 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     beforeAll(async () => {
         try {
-            await exec('taq scaffold')
+            console.log(await exec('taq scaffold'))
             console.log(await exec(`cd ${scaffoldDirName} && npm run setup`))
         } catch (error) {
             throw new Error (`error: ${error}`)
@@ -42,7 +42,7 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         }
     })
 
-    test.only ('Verify that scaffold project can start and stop taqueria locally', async () => {
+    test('Verify that scaffold project can start and stop taqueria locally', async () => {
         try {
             const startResults = await exec(`cd ${scaffoldDirName} && npm run start:taqueria:local`)
             expect(startResults.stdout).toContain('Processing /example.tz...')
