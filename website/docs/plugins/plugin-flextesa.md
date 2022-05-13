@@ -15,7 +15,7 @@ Some helpful things to know:
 - Multiple sandboxes can be configured and run concurrently
 - You can configure the Tezos `protocol` for each sandbox to test against current, and future network upgrades
 - Accounts and balances are pre-configured per-sandbox and do not persist their state
-    - Accounts and balances will be re-initialized each time they are started
+- Accounts and balances will be re-initialized each time they are started
 - Sandboxes can be added to Taqueria environments and then targeted from the CLI using the `--env [envName]` option 
 
 ## Requirements
@@ -51,7 +51,7 @@ The following commands are available from the CLI or the VS Code Command palette
 - `taq list accounts [sandboxName]`
 
 :::note
-The first time you start a sandbox, it might take several minutes to start. This is normal when starting a Flextesa image
+The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer
 :::
 
 ## Plugin Configuration
@@ -60,22 +60,30 @@ Configuration is done in the project's `./.taq/config.json` file. Here you can c
 
 Sandbox configurations are stored as key/value pairs in the `sandbox` property. In this example there is one sandbox configuration named `local`:
 ```json
-    sandbox: {
-        local: {
-            accounts: {
-                default: 'bob',
-                bob: {
-                    initialBalance: '3000000000',
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "default": "bob",
+                "bob": {
+                    "initialBalance": "3000000000"
                 },
-                alice: {
-                    initialBalance: '2000000000',
+                "alice": {
+                    "initialBalance": "2000000000"
+                },
+                "john": {
+                    "initialBalance": "4000000000"
+                },
+                "jane": {
+                    "initialBalance": "5000000000"
+                },
+                "joe": {
+                    "initialBalance": "1000000000"
                 }
             },
-            label: 'Local Tezos Sandbox',
-            protocol: 'PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx',
-            rpcUrl: 'http://localhost:20000',
-        },
-    },
+            "label": "Local Tezos Sandbox",
+            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "rpcUrl": "http://localhost:20000"
+        }
 ```
 
 ### Adding a New Sandbox Configuration
@@ -88,18 +96,18 @@ sandboxName : { sandboxConfigObject }
 Inside the sandboxConfigObject, there are four properties you can configure:
 #### 'accounts'
 
-A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}
+A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}`
 
 #### 'label'
 An arbitrary string used to describe a particular configuration
 
-#### 'protocol
+#### 'protocol'
 
 A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
 
 Currently availble protocols are:
 - Hangzhou `PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx`
-- Ithica2  `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
+- Ithaca   `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
 
 #### 'rpcUrl'
 
@@ -133,8 +141,8 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  attribute |  value                         |  
 |------------|:------------------------------:|
 |  task      | 'start sandbox'                | 
-|  command   | 'start sandbox [sandboxName]   | 
-|  aliases   | ['start flextesa]              |  
+|  command   | 'start sandbox [sandboxName]'  | 
+|  aliases   | ['start flextesa']             |  
 
 
 #### The `stop sandbox` Task
@@ -142,7 +150,7 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  attribute |  value                         | 
 |------------|:------------------------------:|
 |  task      | 'stop sandbox'                 | 
-|  command   | 'stop sandbox [sandboxName]    | 
+|  command   | 'stop sandbox [sandboxName]'   | 
 |  aliases   | ['stop flextesa']              |  
 
 #### The `list accounts` Task
@@ -150,7 +158,7 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  attribute |  value                         | 
 |------------|:------------------------------:|
 |  task      | 'list accounts'                | 
-|  command   | 'list accounts [sandboxName]   | 
+|  command   | 'list accounts [sandboxName]'  | 
 |  aliases   | [ ]                            |  
 
 

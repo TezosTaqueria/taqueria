@@ -1,4 +1,4 @@
-{ parameter nat ;
+{ parameter (nat %numTacosToConsume) ;
   storage nat ;
   code { UNPAIR ;
          SWAP ;

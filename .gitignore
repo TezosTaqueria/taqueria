@@ -115,8 +115,12 @@ node_modules
 tests/coverage
 /taqueria-sdk/index.js
 /taqueria-sdk/index.js.map
+/taqueria-sdk/types.js
+/taqueria-sdk/types.js.map
 /taqueria-plugin-smartpy/index.js
 /taqueria-plugin-smartpy/index.js.map
+/taqueria-plugin-ligo/index.js
+/taqueria-plugin-ligo/index.js.map
 /tests/coverage_report
 /taqueria-plugin-smartpy/.parcel-cache
 /taqueria-plugin-taquito/index.js
@@ -127,12 +131,16 @@ tests/coverage
 /taqueria-plugin-flextesa/index.js
 /taqueria-plugin-flextesa/index.js.map
 /taqueria-plugin-flextesa/.parcel-cache
-/taqueria-plugin-flextesa/docker/startFlextesa.js
+/taqueria-flextesa-manager/index.js
 /taqueria-plugin-teztnets/index.js
 /taqueria-plugin-teztnets/index.js.map
 /taqueria-plugin-teztnets/.parcel-cache
 /taqueria-plugin-contract-types/index.js
 /taqueria-plugin-contract-types/index.js.map
+/taqueria-plugin-archetype/index.js
+/taqueria-plugin-archetype/index.js.map
+/taqueria-plugin-tezos-client/index.js
+/taqueria-plugin-tezos-client/index.js.map
 
 # VS Code Extension
 /taqueria-vscode-extension/out
@@ -140,3 +148,5 @@ tests/coverage
 .vscode-test
 /taqueria-vscode-extension/state.json
 /taqueria-vscode-extension/config.json
+website/docs/glossary.md
+website/yarn.lock

@@ -1,7 +1,7 @@
 {
   "name": "@taqueria/taqueria",
-  "version": "0.1.2",
-  "description": "An easy to use opininated tool for building, testing, and deploying Tezos software",
+  "version": "0.3.0",
+  "description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
   "main": "index.ts",
   "directories": {
     "test": "tests"
@@ -10,6 +10,7 @@
     "test": "yarn",
     "build": "./bin/build.sh || npx play-sound beep.mp3",
     "build-all": "./bin/build-all.sh",
+    "build-website": "cd website && npm ci && npm run build",
     "watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build || npx play-sound beep.mp3\" --initial",
     "prepare": "husky install"
   },
@@ -23,6 +24,7 @@
     "build",
     "test",
     "deploy",
+    "originate",
     "ecad",
     "ecadlabs"
   ],
@@ -39,7 +41,6 @@
   },
   "workspaces": [
     "./taqueria*",
-    "./taqueria-plugin-flextesa/docker",
     "./tests"
   ]
 }

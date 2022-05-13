@@ -2,6 +2,8 @@
 title: Introduction
 ---
 
+import Term from "@docusaurus-terminology/term";
+
 <!-- 
 content-type: getting started
 audience: crypto literate readers and developers looking to USE Taqueria (rather than build on it)
@@ -15,15 +17,18 @@ purpose: help the user understand what Taqueria is, what it does, and how to pro
 - what is the MINIMAL amount of detail necessary in this document?
  -->
 
+:::note
+This is a quick introduction to the main concepts of Taqueria. If you are looking to get started with Taqueria right away with a hands on approach, you can jump to the [quickstart guide](/docs/getting-started/quickstart/) 
+:::
 
 Taqueria is here to help make developing on Tezos easier. Taqueria supercharges your projects with a powerful and centralized configuration and access to top Tezos development tools through tasks that you run from the command line
 
 Some of the things Taqueria can do for you include:
-- Compiling smart contracts written in LIGO or SmartPY
-- Running a Flextesa sandbox (a local Tezos testnet)
-- Originating a smart contract 
-- Generating TypeScript types from a Michelson contract
-- Autocompletion in VS Code
+- Compiling smart contracts using the [LIGO](/docs/plugins/plugin-ligo/), [SmartPY](/docs/plugins/plugin-smartpy/), or [Archetype](/docs/plugins/plugin-archetype/) plugins
+- Running a local sandbox with the [Flextesa plugin](/docs/plugins/plugin-flextesa/)
+- Originating a smart contract to a sandbox and testnet with the [Taquito plugin](/docs/plugins/plugin-taquito/)
+- Generating TypeScript types from a Michelson contract with the [Contract Types plugin](/docs/plugins/plugin-typescript-generator/), providing Taquito type safety and autocompletion in VS Code
+- Typechecking Michelson contracts and simulating contract calls with the [Tezos Client](/docs/plugins/plugin-tezos-client/) plugin
 
 ## What is Taqueria?
 
@@ -33,7 +38,7 @@ In more practical terms, Taqueria is a task runner that you can use from the com
 
 Taqueria has a few major components:
  - A command line interface (CLI) you use in your terminal through a command named `taq`
- - A library of plugins that add tasks to Taqueria to do cool and useful things like smart contract compiling, originating, and type generation
+ - A library of plugins that add tasks to Taqueria to do cool and useful things like compiling and originating smart contracts, and type generation
  - A VS Code Extension which provides the ability to run Taqueria tasks from the command palette
 
 ## Basic Components
@@ -44,24 +49,29 @@ The CLI is the main user interface for Taqueria which provides a command `taq` t
 
 Basic usage of the Taqueria CLI involves running a command following the pattern 
 ```shell
-taq [task] [options]
+taq [taskName] [options]
 ```
 
-You can see what tasks are available to run in any given context by running `taq --help` from the command line
+:::note
+Taqueria uses the following conventions for displaying command structure:
+- Square brackets `[value]` are  used to indicate optional arguments
+- Angle brackets `<value>` are used to indicate required arguments
+:::
+
+You can see what tasks are available to run in any given context by running `taq` from the command line
 
 ### Taqueria Project
 
-A Taqueria project is one that has been initialized by Taqueria using the `taq init` command. It will have the following folder structure created:
-- `app`
-- `contracts`
-- `artifacts`
-- `./.taq`
-
-The `./.taq` folder contains the Taqueria configuration for a given project. Configuration for Taqueria plugins and sandboxes is done in `./.taq/config.json`
+A Taqueria project is one that has been initialized by Taqueria using the `taq init` command. It will have the following directory structure created:
+- `/artifacts`: This is where Taqueria will store artifacts that it creates during the course of its execution
+- `/contracts`: This is where Taqueria will store smart contracts that it compiles
+- `/tests`: This is where Taqueria will store tests that it runs 
+- `./.taq`: This is where Taqueria will store its configuration
 
 :::note
-At this time, all Taqueria projects must also be initialized as node projects by running `npm init -y` from the root of your project directory
+Configuration for Taqueria plugins and sandboxes is done in `./.taq/config.json`
 :::
+
 ### Taqueria Plugins
 
 Taqueria plugins add functionality to Taqueria by adding tasks to Taqueria. Plugins are managed right in Taqueria using the `taq install [pluginName]` and `taq uninstall [pluginName]` commands
@@ -71,12 +81,16 @@ Taqueria plugins are installed on a ***per-project*** basis which allows you to 
 Currently available plugins include:
 - LIGO Compiler
 - SmartPy Compiler
+- Archetype Compiler
 - Flextesa Sandbox
 - Taquito 
-- TS Type Generator
+- Contract Types Generator
+- Tezos Client
 
 ### Taqueria SDK
 
-Taqueria has an SDK and protocol at its core which all Taqueria plugins and the cli depend on
+Taqueria has a Node.js SDK which is used by plugins to interact with the Taqueria protocol
 
-Most developers won't ever interact with directly unless they are developing a Taqueria plugin, but it's helpful to know they are there
+:::note
+Most developers won't ever interact with the SDK directly unless they are developing a plugin
+:::

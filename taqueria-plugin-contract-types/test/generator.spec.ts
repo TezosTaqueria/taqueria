@@ -3,7 +3,7 @@ import path from 'path';
 import { promisify } from 'util';
 import { generateContractTypesFromMichelsonCode } from '../src/generator/process';
 import { normalizeContractName } from '../src/generator/contract-name';
-import { TypeAliasData } from '../src/generator/typescript-output';
+import { TypeAliasData, TypeUtilsData } from '../src/generator/typescript-output';
 
 
 const readFileText = async (filePath: string): Promise<string> => {
@@ -23,7 +23,8 @@ describe('Generate Example Contracts', () => {
         const expectedCodeFileContent = await readFileText(`${exampleDir}/types${mode === 'simple' ? '-simple' : ''}/${contractFileName}.code.ts`);
         const contractName = normalizeContractName(contractFileName);
         const typeAliasData = mode === 'library' ? typeAliasDataLibrary : typeAliasDataSimple;
-        const { typescriptCodeOutput: { typesFileContent: actualTypesFileContent, contractCodeFileContent: actualCodeFileContent } } = generateContractTypesFromMichelsonCode(contractRaw, contractName, format, typeAliasData);
+        const typeUtilsData: TypeUtilsData = { importPath: `./type-utils` };
+        const { typescriptCodeOutput: { typesFileContent: actualTypesFileContent, contractCodeFileContent: actualCodeFileContent } } = generateContractTypesFromMichelsonCode(contractRaw, contractName, format, typeAliasData, typeUtilsData);
         expect(actualTypesFileContent.trim()).toEqual(expectedTypeFileContent.trim());
         expect(actualCodeFileContent.trim()).toEqual(expectedCodeFileContent.trim());
     };

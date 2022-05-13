@@ -44,7 +44,7 @@ export const defaultConfig : Config = {
                 }
             },
             label: "Local Tezos Sandbox",
-            protocol: "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            protocol: "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             rpcUrl: "http://localhost:20000"
         }
     },
@@ -84,6 +84,14 @@ export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedP
         })
     )),
     mapRej<TaqError, TaqError>(previous => ({kind: "E_INVALID_CONFIG", msg: "Your config.json file is invalid", previous})),
+    
+    // TODO: Config should be a discrete type that we parse (like SanitizedAbsPath)
+    // This will ensure that the config is actually valid
+    //
+    // E.g.:
+    // map (Config.create)
+    //
+    // See: https://github.com/ecadlabs/taqueria/issues/642
     map(val => val as Config)
 )
 

@@ -1,0 +1,83 @@
+{
+    "language": "en",
+    "plugins": [
+        {
+            "name": "@taqueria/plugin-taquito",
+            "type": "npm"
+        }
+    ],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts",
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {}
+        },
+        "test": {
+            "networks": ["ithacanet"],
+            "sandboxes": [],
+            "storage": {"hello-tacos.tz": "abc"}
+        }
+    },
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "default": "bob",
+                "bob": {
+                    "initialBalance": "3000000000"
+                },
+                "alice": {
+                    "initialBalance": "2000000000"
+                },
+                "john": {
+                    "initialBalance": "4000000000"
+                },
+                "jane": {
+                    "initialBalance": "5000000000"
+                },
+                "joe": {
+                    "initialBalance": "1000000000"
+                }
+            },
+            "label": "Local Tezos Sandbox",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+    "network": {
+        "ithacanet": {
+            "label": "ithacanet",
+            "rpcUrl": "https://ithacanet.ecadinfra.com",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "faucet": {
+                "pkh": "tz1RWs1bLmga24RybaC5Di441sK6aGLmCTpx",
+                "mnemonic": [
+                    "throw",
+                    "cactus",
+                    "romance",
+                    "lake",
+                    "step",
+                    "floor",
+                    "limit",
+                    "shallow",
+                    "leader",
+                    "pride",
+                    "thrive",
+                    "void",
+                    "carbon",
+                    "wreck",
+                    "retreat"
+                ],
+                "email": "tskwglte.mscstjny@teztnets.xyz",
+                "password": "fvzAbTJ7Uz",
+                "amount": "8780051082",
+                "activation_code": "07739888a2615d5176505c900f411dcf7990073d"
+            }
+        }
+    }
+}

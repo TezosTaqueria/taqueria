@@ -1,10 +1,12 @@
-import {Future, TaqError, SanitizedAbsPath, SanitizedUrl} from './taqueria-utils-types.ts'
+import {Future, TaqError, E_TaqError, SanitizedAbsPath, SanitizedUrl, UtilsDependencies} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {chain, attemptP, map, Future as Fluture, reject, resolve, mapRej} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import {chain, attemptP, map, reject, resolve, mapRej, promise} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
 import * as jsonc from "https://deno.land/x/jsonc@1/main.ts"
+import {copy} from 'https://deno.land/std@0.128.0/streams/conversion.ts'
+
 
 export const decodeJson = <T>(encoded: string): Future<TaqError, T> =>
     attemptP(() => {
@@ -15,17 +17,6 @@ export const decodeJson = <T>(encoded: string): Future<TaqError, T> =>
             throw({kind: "E_INVALID_JSON", msg: "The provided JSON could not be decoded.", previous: err, context: encoded})
         }       
     })
-
-export const log = <T>(message: string) => (input: T) : T => {
-    console.log(message)
-    return input
-}
-
-export const logInput = <T>(message: string) => (input: T) : T => {
-    console.log(message)
-    console.log(input)
-    return input
-}
 
 export const debug = <T>(input: T) => {
     debugger
@@ -60,7 +51,11 @@ export const ensurePathDoesNotExist = (path: string) : Future<TaqError, Sanitize
             await Deno.stat(path)
 
             // TODO i18n message
-            return Promise.reject({ kind: 'E_INVALID_PATH_ALREADY_EXISTS', msg: 'Path already exists', context: path })
+            return Promise.reject({
+                kind: 'E_INVALID_PATH_ALREADY_EXISTS',
+                msg: 'Path already exists',
+                context: path 
+            })
         } catch(_e) {
             // Expect exception when trying to stat a new directory
             return SanitizedAbsPath.create(path)
@@ -70,23 +65,20 @@ export const ensurePathDoesNotExist = (path: string) : Future<TaqError, Sanitize
 export const rm = (path: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => 
     attemptP(async () => {
         try {
-            await Deno.remove(path.value)
-        } catch {
-            // Ignore if path does not exist
+            await Deno.remove(path.value, { recursive: true })
+        } catch (previous) {
+            const err: TaqError = {
+                kind: 'E_INVALID_PATH_DOES_NOT_EXIST',
+                msg: `Failed to remove ${path.value}`,
+                context: path,
+                previous
+            }
+            return Promise.reject(err)
         }
 
         return path
     })
 
-export const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) => pipe(
-    exec('git clone <%= it.url %> <%= it.outputDir %>', {url: url.value, outputDir: destinationPath.value}),
-    mapRej(previous => ({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Could not scaffold. Is Git installed?', context: {url, destinationPath}, previous})),
-    chain(status => status == 0
-        ? resolve(destinationPath)
-        : reject({kind: 'E_SCAFFOLD_URL_GIT_CLONE_FAILED', msg: 'Could not scaffold. Is Git installed?', context: {url, destinationPath}})
-    ),
-    map(() => destinationPath)
-);
 
 export const readTextFile = (path: string) : Future<TaqError, string> =>
     attemptP(() => {
@@ -97,7 +89,7 @@ export const readTextFile = (path: string) : Future<TaqError, string> =>
                 return decoded
             })
             .catch((previous: Error) => Promise.reject({
-                kind: "E_READ", msg: `Could not read ${path}`, previous
+                kind: "E_READFILE", msg: `Could not read ${path}`, previous
             }))
     })
 
@@ -130,43 +122,134 @@ export const joinPaths = _joinPaths
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string
 
-export const exec = (cmdTemplate: string, inputArgs: Record<string, unknown>, cwd?: SanitizedAbsPath) : Future<TaqError, number> => attemptP(async () => {
-    let command = cmdTemplate
-    try {
-        // NOTE, uses eta templates under the hood. Very performant! https://ghcdn.rawgit.org/eta-dev/eta/master/browser-tests/benchmark.html
-        /**
-         * Template Variables:
-         * - configDir
-         * - projectDir
-         * - maxConcurrency
-         * - plugin
-         * - config.language
-         * - config.plugins
-         * - config.contractsDir
-         * - config.artifactsDir
-         * - config.testsDir
-         * - config.configFile
-         * - config.configDir
-         * - config.projectDir
-         * - env.get()
-         * - i18n.__()
-         */
-        const join = joinPaths
-        const cmd = renderTemplate(cmdTemplate, {join, ...inputArgs})
-        command = cmd
-        const process = Deno.run({
-            cmd: ["sh", "-c", `${cmd}`],
-            cwd: cwd?.value
-        })
-        const status = await process.status()
+export const toPromise = <T>(f: Future<TaqError, T>) => pipe(
+    f,
+    mapRej(taqErr => new E_TaqError(taqErr)),
+    promise
+)
 
-        return status.code
+// Exports a function to inject dependencies needed by this
+// utilities package
+export const inject = (deps: UtilsDependencies) => {
+
+    const {stdout, stderr} = deps
+
+    const log = (message: string) => {
+        const encoder = new TextEncoder()
+        stdout.write(encoder.encode(`${message}\n`))
     }
-    catch (previous) {
-        throw {
-            kind: "E_FORK",
-            msg: `Could not fork ${command}`,
-            previous
-        } as TaqError
+
+    const logInput = <T>(message: string) => (input: T) : T => {
+        const encoder = new TextEncoder()
+        const data = typeof(input) === 'object' ? JSON.stringify(input, null, 4) : input
+        stdout.write(encoder.encode(`${message}\n`))
+        stdout.write(encoder.encode(`${data}\n`))
+        return input as T
     }
-})
+
+    const gitClone = (url: SanitizedUrl) => (destinationPath: SanitizedAbsPath) : Future<TaqError, SanitizedAbsPath> => pipe(
+        execText('git clone <%= it.url %> <%= it.outputDir %>', {url: url.value, outputDir: destinationPath.value}),
+        mapRej<TaqError, TaqError>(previous => ({kind: 'GIT_CLONE_FAILED', msg: `Could not clone ${url.value}. Please check the Git url and ensure that Git is installed.`, context: {url, destinationPath}, previous})),
+        chain(status => status === 0
+            ? resolve(destinationPath)
+            : reject<TaqError>({kind: 'GIT_CLONE_FAILED', msg: `Could not clone ${url.value}. Please check the Git url and ensure that Git is installed.`, context: {url, destinationPath}})
+        ),
+        map(() => destinationPath)
+    );
+
+    const execText = (cmdTemplate: string, inputArgs: Record<string, unknown>, bufferOutput=false, cwd?: SanitizedAbsPath) : Future<TaqError, number|string> => attemptP(async () => {
+        let command = cmdTemplate
+        try {
+            // NOTE, uses eta templates under the hood. Very performant! https://ghcdn.rawgit.org/eta-dev/eta/master/browser-tests/benchmark.html
+            /**
+             * Template Variables:
+             * - configDir
+             * - projectDir
+             * - maxConcurrency
+             * - plugin
+             * - config.language
+             * - config.plugins
+             * - config.contractsDir
+             * - config.artifactsDir
+             * - config.testsDir
+             * - config.configFile
+             * - config.configDir
+             * - config.projectDir
+             * - env.get()
+             * - i18n.__()
+             */
+            const join = joinPaths
+            const cmd = renderTemplate(cmdTemplate, {join, ...inputArgs})
+            command = cmd
+        }
+        catch (previous) {
+            throw {
+                kind: "E_FORK",
+                msg: `There was a problem trying to evaluate this template: ${cmdTemplate}\n${previous}`,
+                previous
+            } as TaqError
+        }
+        try {
+            const process = Deno.run({
+                cmd: ["sh", "-c", `${command}`],
+                cwd: cwd?.value,
+                stdout: "piped",
+                stderr: "piped"
+            })
+
+            // Output for the subprocess' stderr should be copied to the parent stderr
+            await copy(process.stderr, stderr)
+            process.stderr.close()
+
+            // Get output. Buffer if desired
+            const output = await (async () => {
+                
+                if (bufferOutput) {
+                    const output = await process.output()
+                    const decoder = new TextDecoder()
+                    return decoder.decode(output)
+                }
+                else {
+                    await copy(process.stdout, stdout)
+                    process.stdout.close()
+                }
+            })()
+
+            // Wait for subprocess to exit
+            const status = await process.status()
+            Deno.close(process.rid)
+            return output ?? status.code
+        }
+        catch (previous) {
+            throw {
+                kind: "E_FORK",
+                msg: `There was a problem trying to run: ${command}`,
+                previous
+            } as TaqError
+        }
+    })
+
+    return {
+        decodeJson,
+        log,
+        logInput,
+        debug,
+        mkdir,
+        ensurePathDoesNotExist,
+        ensurePathExists,
+        rm,
+        gitClone,
+        readTextFile,
+        readJsonFile,
+        writeTextFile,
+        writeJsonFile,
+        isTaqError,
+        memoize,
+        joinPaths,
+        renderTemplate,
+        execText,
+        toPromise,
+        stdout,
+        stderr
+    }
+}

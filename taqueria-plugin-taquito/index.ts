@@ -1,4 +1,4 @@
-import {Plugin, Task, EconomicalProtocol} from '@taqueria/node-sdk'
+import {Plugin, Task} from '@taqueria/node-sdk'
 import type { i18n} from '@taqueria/node-sdk/types'
 import originate from './originate'
 
@@ -14,7 +14,8 @@ Plugin.create((i18n: i18n) => ({
             options: [
             ],
             aliases: ["originate"],
-            handler: "proxy"
+            handler: "proxy",
+            encoding: "application/json"
         }),
     ],
     proxy: originate

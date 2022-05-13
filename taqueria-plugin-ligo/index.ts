@@ -1,5 +1,5 @@
-const {Plugin, Task, Option} = require('@taqueria/node-sdk')
-const compile = require('./compile')
+import {Plugin, Task, Option} from '@taqueria/node-sdk'
+import compile from './compile'
 
 Plugin.create(i18n => ({
     schema: "1.0",
@@ -28,16 +28,17 @@ Plugin.create(i18n => ({
                     description: "Enable type inference"
                 })
             ],
-            handler: 'proxy'
+            handler: 'proxy',
+            encoding: 'json'
         })
     ],
-    checkRuntimeDependencies: (_) => Promise.resolve({
+    checkRuntimeDependencies: () => Promise.resolve({
         status: "success",
         report: [
             {name: "LIGO", path: "ligo", version: ">=0.27.0", kind: "required", met: true}
         ]
     }),
-    installRunTimeDependencies: (_) => Promise.resolve({
+    installRunTimeDependencies: () => Promise.resolve({
         status: "success",
         output: "LIGO was found in /usr/bin/ligo" // TODO this should use i18n
     }),

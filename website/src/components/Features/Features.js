@@ -8,7 +8,7 @@ const FeatureList = [
       "Don’t know where to start building on Tezos? Want a smarter way to integrate your tools? If so, Taqueria is for you. This flexible framework will help you to start faster and build better applications.",
     button: {
       label: "Try the Taqueria Beta",
-      link: "/docs/intro",
+      link: "/docs/getting-started/installation/",
     },
     features: [
       {
@@ -22,7 +22,7 @@ const FeatureList = [
         title: "Effortlessly compile",
         icon: require("../../../static/img/briefcase.png").default,
         description:
-          "Taqueria compiles smart contracts written in Ligo and SmartPy. Michelson and Archetype support is coming soon.",
+          "Taqueria compiles smart contracts written in Archetype, LIGO and SmartPy. Michelson support is coming soon.",
         gif: require("../../../static/gif/taq_compile.mp4").default,
       },
       {

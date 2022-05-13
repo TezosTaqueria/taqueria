@@ -1,0 +1,44 @@
+archetype animal_tracking
+
+enum animal_e =
+| Sheep
+| Cattle
+| Pig
+| Other
+
+enum movement_e =
+| In_field initial
+| In_transit
+
+asset animal_a identified by ida {
+  ida      : string;
+  typ      : animal_e;
+  location : pkey<field_a>;
+} with states movement_e
+
+asset business_a identified by id {
+  id        : string;
+  incomings : aggregate<animal_a>;
+}
+
+asset field_a identified by name {
+  name     : string;
+  business : pkey<business_a>;
+}
+
+transition transit (fk : string) on (ak : pkey<animal_a>) {
+  from In_field
+  to In_transit
+  with effect {
+    business_a[field_a[fk].business].incomings.add(ak)
+  }
+}
+
+transition arrival (toField : pkey<field_a>) on (ak : pkey<animal_a>) {
+  from In_transit
+  to In_field
+  with effect {
+    animal_a[ak].location := toField;
+    business_a[field_a[toField].business].incomings.remove(ak)
+  }
+}
