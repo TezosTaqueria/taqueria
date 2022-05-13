@@ -136,7 +136,7 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
-    }, 200000);
+    }, 400000);
 
     // Remove all files from artifacts folder without removing folder itself
     afterEach( async () => {
