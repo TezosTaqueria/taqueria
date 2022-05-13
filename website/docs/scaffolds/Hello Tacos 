@@ -2,12 +2,12 @@
 title: Hello Tacos Scaffold
 ---
 
+```shell
+taq scaffold https://github.com/ecadlabs/taqueria-scaffold-hello-tacos hello-tacos
+```
 ## Introduction
 
 This scaffold is a simple Hello ~~World~~ *_Tacos_* Tezos dApp. It has a simple React app that interacts with a LIGO smart contract which can be deployed on a local sandbox, or testnet
-
-<img src={useBaseUrl('/img/hello-tacos-screenshot.png')} />
-
 
 The project is pre-configured with the following:
 - Taqueria v0.3.0 and the LIGO, Flextesa, and Taquito plugins
@@ -19,13 +19,6 @@ The project is pre-configured with the following:
 - Passing the deployed contract address to the React app via the State API
 - Deploying and testing on a local sandbox
 
-:::note
-Currently, the contract address is hardcoded into the React app and must be updated manually in `/app/index.tsx`
-
-This will be fixed in the future when it will be passed via the State API dynamically 
-:::
-
-
 ## Project Overview
 
 The projct is structured as follows:
@@ -35,7 +28,7 @@ The projct is structured as follows:
 - `/tests` - This folder contains the tests
 - `/artifacts` - This folder contains the compiled Michelson `.tz` contracts
 
-The smart contract `hello-tacos.mligo` stores the number of available tacos, and provides a method to buy tacos which will decrease the number of tacos available if valid as you can see here:
+The smart contract `hello-tacos.mligo` is simple and straightforward. It stores the number of available tacos, and provides a method to buy tacos which will decrease the number of tacos available 
 
 ```js
 type available_tacos = nat
@@ -47,6 +40,15 @@ let main (tacos_to_buy, available_tacos: tacos_to_buy * available_tacos): operat
     else ([]: operation list), abs(available_tacos - tacos_to_buy)
 ```
 
+The React app retrieves the number of available tacos from the smart contract and displays the value. It provides an interface for the user to buy tacos and looks like this:
+
+<img src={useBaseUrl('/img/hello-tacos-screenshot.png')} />
+
+:::note
+In order for the React app to connect to the smart contract, the contract must be deployed to the testnet and the returned address of the contract must be added to the `/app/index.tsx` file:
+
+This will be fixed in the future when it will be passed via the State API dynamically
+:::
 
 ## Requirements
 
@@ -56,38 +58,64 @@ let main (tacos_to_buy, available_tacos: tacos_to_buy * available_tacos): operat
 - Temple Wallet (latest version)
 
 
-
 ## Scaffold the Project
 
 This project is available as a Taqueria scaffold. To create a new project from this scaffold, run the following command:
 
 ```shell
-
 taq scaffold https://github.com/ecadlabs/taqueria-scaffold-hello-tacos-tutorial hello-tacos
-
 ```
 
 This will clone the Hello Tacos scaffold project into the `hello-tacos` directory
 
 ## Project Setup
 
-There are two steps to setting up the project:
+To set up the project, first change into the project directory:
+```shell
+cd hello-tacos
+```
 
-1. Initialize the project with Taqueria:
+Next, initialize the project with Taqueria:
 ```shell
 taq init
 ```
 
+Then install dependencies:
+```
+npm install
+```
 
+## Using the Project
 
-## Project Workflow
+The intended workflow for this project is as follows:
+1. Compile the LIGO source code
+2. Originate the smart contract to the testnet
+3. Insert the contract address into the React app
+4. Build and start the React app
+5. Connect to Temple wallet
+6. Buy tacos!
 
 ### Compile the Contract
 
-### Start the local Sandbox
+```shell
+taq compile
+```
 
-- **** Coming soon with the State API *****
+### Originate to the Testnet
 
-### Originate to the Sandbox
+Run the following command to originate the contract to the ithacanet testnet:
+```shell
+taq originate -e ithacanet
+```
+
+This should return the address of the contract on the testnet which looks like this:
+```shell
+
+```
+
+
+###
+
+
 
 - **** Coming soon with the State API *****
