@@ -220,18 +220,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        chunk: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
         include:
         - os: ubuntu-latest
           url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
+          chunk: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
         - os: macOS-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
+          chunk: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
     # runs-on: ubuntu-latest
     needs: 
       - build-binaries
@@ -293,10 +294,7 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          docker image ls ghcr.io/ecadlabs/taqueria-flextesa
-          taq --version
-          taq --build
-          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npm run test:e2e -w tests --detectOpenHandles
+          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npm run test:e2e -w tests
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks'] }}
   
