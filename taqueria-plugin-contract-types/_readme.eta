@@ -258,7 +258,6 @@ type Methods = {
 <% if (it.output == "github") { %>
 See [example-usage.ts](example/example-usage.ts) for full example
 <% } else { %>
-See [example-usage.ts](../../../taqueria-plugin-contract-types/example/example-usage.ts) for full example
 See [example-usage.ts](https://github.com/ecadlabs/taqueria/blob/main/taqueria-plugin-contract-types/example/example-usage.ts) for full example
 <% } %>
 
