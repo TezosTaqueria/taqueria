@@ -104,7 +104,7 @@ sandboxName : { sandboxConfigObject }
 Inside the sandboxConfigObject, there are four properties you can configure:
 #### 'accounts'
 
-A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}
+A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}`
 
 #### 'label'
 An arbitrary string used to describe a particular configuration
@@ -149,7 +149,7 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  attribute |  value                         |  
 |------------|:------------------------------:|
 |  task      | 'start sandbox'                | 
-|  command   | 'start sandbox [sandboxName]   | 
+|  command   | 'start sandbox [sandboxName]'  | 
 |  aliases   | ['start flextesa]              |  
 
 
@@ -158,7 +158,7 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  attribute |  value                         | 
 |------------|:------------------------------:|
 |  task      | 'stop sandbox'                 | 
-|  command   | 'stop sandbox [sandboxName]    | 
+|  command   | 'stop sandbox [sandboxName]'   | 
 |  aliases   | ['stop flextesa']              |  
 
 #### The `list accounts` Task
@@ -166,5 +166,5 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  attribute |  value                         | 
 |------------|:------------------------------:|
 |  task      | 'list accounts'                | 
-|  command   | 'list accounts [sandboxName]   | 
+|  command   | 'list accounts [sandboxName]'  | 
 |  aliases   | [ ]                            |  
