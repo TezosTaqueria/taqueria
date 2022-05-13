@@ -9,8 +9,8 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     beforeAll(async () => {
         try {
-            console.log(await exec('taq scaffold'))
-            console.log(await exec(`cd ${scaffoldDirName} && npm run setup`))
+            await exec('taq scaffold')
+            await exec(`cd ${scaffoldDirName} && npm run setup`)
         } catch (error) {
             throw new Error (`error: ${error}`)
         }
