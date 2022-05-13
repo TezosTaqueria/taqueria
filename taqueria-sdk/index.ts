@@ -28,24 +28,21 @@ export const execCmd = (cmd:string) : LikeAPromise<StdIO, ExecException> => new 
     })
 })
 
-export const getArch = () : LikeAPromise<string, Failure<string>> => 
-    execCmd("uname -m")
-    .then(result => result.stdout.trim().toLowerCase())
-    .then(arch => {
-        switch(arch) {
-            case 'x86_64':
-                return 'linux/amd64'
-            case 'arm64':
-                return 'linux/arm64/v8'
-            default:
-                return Promise.reject({
-                    errCode: "E_INVALID_ARCH",
-                    errMsg: `We do not know how to handle the ${arch} architecture`,
-                    context: arch
-                })
-        }
-    })
-
+export const getArch = () : LikeAPromise<string, Failure<string>> => {
+    switch(process.arch) {
+        case 'arm64':
+            return Promise.resolve('linux/arm64/v8')
+        case 'x32':
+        case 'x64':
+            return Promise.resolve('linux/amd64')
+        default:
+            return Promise.reject({
+                errCode: "E_INVALID_ARCH",
+                errMsg: `We do not know how to handle the ${process.arch} architecture`,
+                context: process.arch
+            })
+    }
+}
 
 export const parseJSON = (input: string) : LikeAPromise<Config, Failure<string>> => new Promise((resolve, reject) => {
     try {

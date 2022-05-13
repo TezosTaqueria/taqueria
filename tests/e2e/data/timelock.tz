@@ -1,0 +1,33 @@
+# This contract takes a chest and chest key as parameter.
+# It tries to open it and stores the resulting bytes if successful.
+# Otherwise it stores some hardcoded bytes to test that we are in
+# the expected branch
+
+# Sample chest_key and chest pair can be found at https://github.com/completium/timelock-utils
+storage (bytes);
+parameter (pair %time (chest_key) (chest));
+code {
+       UNPAIR;
+       DIP {DROP};
+       UNPAIR;
+       DIIP {PUSH nat 3600};
+       OPEN_CHEST;
+       IF_LEFT
+         { # successful case
+           NIL operation;
+           PAIR ;
+         }
+         {
+           IF
+             { # first type of failure
+               PUSH bytes 0x01;
+               NIL operation;
+               PAIR;
+             }
+             { # second type of failure
+               PUSH bytes 0x00;
+               NIL operation;
+               PAIR;
+             }
+         }
+     }

@@ -336,11 +336,13 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
     }
 
     // chest
-    if(node.prim === 'chest'){
-        throw new Error('Not Implemented: chest');
-    }
-    if(node.prim === 'chest_key'){
-        throw new Error('Not Implemented: chest_key');
+    if (node.prim === 'chest' || node.prim === 'chest_key') {
+        return {
+            kind: `value`,
+            raw: node,
+            value: node.prim,
+            typescriptType: `string`,
+        };
     }
 
     // never
