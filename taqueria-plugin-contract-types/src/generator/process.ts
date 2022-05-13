@@ -53,6 +53,10 @@ export const generateContractTypesFromMichelsonCode = (contractScript: string, c
 
     const parameterResult = contractParameter && parseContractParameter(contractParameter);
     const methods = parameterResult?.methods ?? [];
+
+    // If there's only one entrypoint, then we call it "default"
+    if (methods.length === 1) methods[0].name = `default`
+
     const schemaOutput = toSchema(methods, storage);
 
     const typescriptCode = toTypescriptCode(storage, methods, contractName, contract, protocol, typeAliasData, typeUtilsData);
