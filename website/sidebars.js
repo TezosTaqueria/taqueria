@@ -44,7 +44,6 @@ const sidebars = {
         "plugins/plugin-taquito",
         "plugins/plugin-typescript-generator",
         "plugins/plugin-tezos-client",
-        "plugins/plugin-mock-plugin",
       ],
     },
     {
