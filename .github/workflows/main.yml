@@ -220,19 +220,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        chunks: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunks']) }}
         include:
         - os: ubuntu-latest
           url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
-          chunk: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
         - os: macOS-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
-          chunk: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
     # runs-on: ubuntu-latest
     needs: 
       - build-binaries
@@ -293,10 +292,9 @@ jobs:
           npm run test:integration -w tests
 
       - name: Run e2e tests
-        run: |
-          echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | xargs npm run test:e2e -w tests
-        env:
-          CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks'] }}
+        run: npm run test:e2e -w tests ${{matrix.chunks}}
+        # env:
+        #   CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks'] }}
   
       - name: Report Status
         uses: ravsamhq/notify-slack-action@v1
