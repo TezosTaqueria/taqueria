@@ -118,6 +118,26 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
         }
     });
 
+    test('Verify that users can properly use the generated types (involves origination to a testnet and calling an entrypoint, which will take a while)', async () => {
+        try {
+            await exec(`cp e2e/data/timelock.tz ${taqueriaProjectPath}/artifacts`)
+            await exec(`cd ${taqueriaProjectPath} && taq generate types`)
+            await exec(`cp e2e/data/timelock.ts ${taqueriaProjectPath}/types`)
+            await exec(`cd ${taqueriaProjectPath}/types &&
+                        npm init -y &&
+                        npm install typescript --save-dev &&
+                        npm install @taquito/taquito &&
+                        npm install @taquito/signer &&
+                        npx tsc timelock.ts`)
+            const {stdout, stderr} = await exec(`cd ${taqueriaProjectPath}/types && node timelock.js`)
+            expect(stdout).toBe("initialStorage: 00 , newStorage: 050080890f\n")
+            expect(stderr).toBe("")
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    }, 400000);
+
     // Remove all files from artifacts folder without removing folder itself
     afterEach( async () => {
         try {

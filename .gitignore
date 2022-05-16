@@ -115,6 +115,8 @@ node_modules
 tests/coverage
 /taqueria-sdk/index.js
 /taqueria-sdk/index.js.map
+/taqueria-sdk/types.js
+/taqueria-sdk/types.js.map
 /taqueria-plugin-smartpy/index.js
 /taqueria-plugin-smartpy/index.js.map
 /taqueria-plugin-ligo/index.js

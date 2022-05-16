@@ -3,9 +3,9 @@ import fsPromises from "fs/promises"
 import util from "util"
 const exec = util.promisify(exec1)
 
-describe("E2E Testing for taqueria scaffolding initialization,", () => {
+const scaffoldDirName = `taqueria-quickstart`
 
-    const scaffoldDirName = `taqueria-quickstart`
+describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     beforeAll(async () => {
         try {
@@ -62,6 +62,5 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         } catch (error) {
             throw new Error (`error: ${error}`)
         }
-
     })
 })
