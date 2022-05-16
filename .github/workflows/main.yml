@@ -215,12 +215,13 @@ jobs:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
   run-tests:
-    name: test (chunk ${{ matrix.chunk }})
+    name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest]
+        chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
         chunks: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunks']) }}
         include:
         - os: ubuntu-latest
@@ -293,7 +294,9 @@ jobs:
           npm run test:integration -w tests
 
       - name: Run e2e tests
-        run: npm run test:e2e -w tests ${{ matrix.chunks }}
+        run: |
+          echo ${{ matrix.chunks }}
+          npm run test:e2e -w tests ${{ matrix.chunks }}
         # env:
         #   CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks'] }}
   
