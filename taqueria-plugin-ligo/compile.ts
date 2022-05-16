@@ -16,7 +16,6 @@ const getInputFilename = (opts: Opts) => (sourceFile: string) => {
 
 const getCompileCommand = (opts: Opts) => (sourceFile: string) => {
     let {projectDir} = opts
-    // if process.env.PROJECT_DIR is not null 
     if (process.env.PROJECT_DIR && process.env.PROJECT_DIR?.length > 0) {
         projectDir = process.env.PROJECT_DIR
     }
