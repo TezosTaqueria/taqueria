@@ -220,6 +220,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, macOS-latest]
         chunks: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunks']) }}
         include:
         - os: ubuntu-latest
@@ -292,7 +293,7 @@ jobs:
           npm run test:integration -w tests
 
       - name: Run e2e tests
-        run: npm run test:e2e -w tests ${{matrix.chunks}}
+        run: npm run test:e2e -w tests ${{ matrix.chunks }}
         # env:
         #   CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks'] }}
   
