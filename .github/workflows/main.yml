@@ -210,10 +210,7 @@ jobs:
         run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -cM '[_nwise(length / 4 | ceil)]')"
       - id: set-test-chunk-ids
         name: Set Chunk IDs
-        run: |
-          echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
-          echo ${{ fromJSON(steps['set-test-chunks'].outputs['test-chunks'])[0][0] }}
-          echo "$CHUNKS[1]"
+        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
@@ -297,7 +294,7 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          npm run test:e2e -w tests ${{ matrix.chunks }}
+          npm run test:e2e -w tests ${{ join($CHUNKS[${{ matrix.chunk-ids }}], " ") }}
         env:
           CHUNKS: ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks']) }}
   
