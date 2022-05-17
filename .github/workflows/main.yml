@@ -201,8 +201,10 @@ jobs:
       test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
       test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
       test-chunks-formatted: ${{ steps['format-test-chunks'].outputs['test-chunks-formatted'] }}
+    
     env:
-          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+      CHUNKS2: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+    
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -211,12 +213,14 @@ jobs:
       - id: set-test-chunks
         name: Set Chunks
         run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -cM '[_nwise(length / 4 | ceil)]')"
+        env:
+          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
       - id: set-test-chunk-ids
         name: Set Chunk IDs
-        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
+        run: echo "::set-output name=test-chunk-ids::$(echo CHUNKS | jq -cM 'to_entries | map(.key)')"
       - id: format-test-chunks
         name: Format Chunks
-        run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS | jq -cM '[.[] | join(" ")]')"
+        run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS2 | jq -cM '[.[] | join(" ")]')"
         
 
   run-tests:
