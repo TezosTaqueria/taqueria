@@ -40,7 +40,7 @@
     "husky": "^7.0.4",
     "play-sound-cli": "^1.0.0",
     "eta": "^1.12.3",
-    "ts-node": "^8.0.0"
+    "ts-node": "^9.0.0"
   },
   "workspaces": [
     "./taqueria*",
