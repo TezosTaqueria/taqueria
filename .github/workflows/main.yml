@@ -215,7 +215,7 @@ jobs:
           echo "$CHUNKS"
           echo "$CHUNKS[1]"
         env:
-          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+          CHUNKS: ${{ fromJSON(steps['set-test-chunks'].outputs['test-chunks']) }}
 
   run-tests:
     name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
@@ -223,16 +223,15 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest, windows-latest]
         chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
-        # chunks: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunks']) }}
         include:
         - os: ubuntu-latest
           url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
-        - os: macOS-latest
+        - os: windows-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
           make-executable-cmd: chmod +x
@@ -297,9 +296,12 @@ jobs:
           npm run test:integration -w tests
 
       - name: Run e2e tests
-        run: npm run test:e2e -w tests ${{ matrix.chunks }}
-        # env:
-        #   CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks'] }}
+        run: |
+          echo "$CHUNKS"
+          echo "$CHUNKS[0]"
+          npm run test:e2e -w tests ${{ matrix.chunks }}
+        env:
+          CHUNKS: ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks']) }}
   
       - name: Report Status
         uses: ravsamhq/notify-slack-action@v1
