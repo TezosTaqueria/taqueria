@@ -215,7 +215,7 @@ jobs:
           echo "$CHUNKS"
           echo "$CHUNKS[1]"
         env:
-          CHUNKS: ${{ fromJSON(steps['set-test-chunks'].outputs['test-chunks']) }}
+          CHUNKS: ${{ toJSON(steps['set-test-chunks'].outputs['test-chunks']) }}
 
   run-tests:
     name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
