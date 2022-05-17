@@ -294,7 +294,7 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          npm run test:e2e -w tests ${{ join($CHUNKS[${{ matrix.chunk-ids }}], " ") }}
+          npm run test:e2e -w tests ${{ join(${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks']) }}[${{ matrix.chunk-ids }}], " ") }}
         env:
           CHUNKS: ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks']) }}
   
