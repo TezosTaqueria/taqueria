@@ -251,20 +251,15 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     })
 
     test("Verify that taqueria simulator task emits parameter type error (supplying an unknown type instead of nat)", async () => {
-        try {
-            // 1. Copy contract from data folder to taqueria project folder
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`)
+        // 1. Copy contract from data folder to taqueria project folder
+        await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`)
 
-            // 2. Run taq simulate hello-tacos.tz
-            const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '2' --storage 'hello'`, {cwd: `./${taqueriaProjectPath}`})
+        // 2. Run taq simulate hello-tacos.tz
+        const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '2' --storage 'hello'`, {cwd: `./${taqueriaProjectPath}`})
 
-            // 3. Verify that output includes a table and an error message
-            expect(stdout).toBe(contents.runtimeError)
-            expect(stderr).toBe(contents.tezosClientError);
-
-        } catch(error) {
-            throw new Error (`error: ${error}`);
-        }
+        // 3. Verify that output includes a table and an error message
+        expect(stdout).toBe(contents.runtimeError)
+        expect(stderr).toContain('Unknown primitive hello.');
     })
 
     // Remove all files from artifacts folder without removing folder itself
@@ -335,7 +330,6 @@ describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops", () => 
         } catch(error) {
             throw new Error (`error: ${error}`);
         }
-
     });
 
     test('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
