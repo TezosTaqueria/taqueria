@@ -35,10 +35,13 @@ export const inject = (deps: PluginDeps) => {
         attemptP(async () => {
             if (parsedArgs.logPluginRequests)  {
                 const encoder = new TextEncoder()
-                const output = pluginRequestToString (plugin) (cmd)
+                let output = pluginRequestToString (plugin) (cmd)
                 await stdout.write(encoder.encode(`*** START Call to ${plugin.name} ***\n`))
                 await stdout.write(encoder.encode(`${output}\n`))
                 await stdout.write(encoder.encode(`*** END of call to ${plugin.name} ***\n`))
+                if (parsedArgs.debug) {
+                    if (/^node /.test(output)) output = output.replace(/^node /, "node --inspect-brk ")
+                }
                 await clipboard.writeText(output.replace("\\\n", ''))
             }
             return await Promise.resolve()
