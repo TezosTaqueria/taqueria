@@ -108,89 +108,89 @@ jobs:
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  publish-protocol-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-protocol
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-protocol-to-npm:
+  #   if: ${{ !github.event.pull_request.head.repo.fork }}
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-protocol
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-sdk-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    needs: publish-protocol-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-sdk
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-sdk-to-npm:
+  #   if: ${{ !github.event.pull_request.head.repo.fork }}
+  #   needs: publish-protocol-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-sdk
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-ligo-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-ligo
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-ligo-plugin-to-npm:
+  #   if: ${{ !github.event.pull_request.head.repo.fork }}
+  #   needs: publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-ligo
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
   
-  publish-smartpy-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-smartpy
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-smartpy-plugin-to-npm:
+  #   if: ${{ !github.event.pull_request.head.repo.fork }}
+  #   needs: publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-smartpy
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-taquito-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-taquito
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-taquito-plugin-to-npm:
+  #   if: ${{ !github.event.pull_request.head.repo.fork }}
+  #   needs: publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-taquito
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-flextesa-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    needs:
-      - publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-flextesa
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-flextesa-plugin-to-npm:
+  #   if: ${{ !github.event.pull_request.head.repo.fork }}
+  #   needs:
+  #     - publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-flextesa
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
 
-  publish-archetype-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    needs:
-      - publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-archetype
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-archetype-plugin-to-npm:
+  #   if: ${{ !github.event.pull_request.head.repo.fork }}
+  #   needs:
+  #     - publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-archetype
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-tezos-client-plugin-to-npm:
-     if: ${{ !github.event.pull_request.head.repo.fork }}
-     needs:
-       - publish-sdk-to-npm
-     uses: ./.github/workflows/npm-publish.yml
-     with:
-       dir: taqueria-plugin-tezos-client
-     secrets:
-       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-tezos-client-plugin-to-npm:
+  #    if: ${{ !github.event.pull_request.head.repo.fork }}
+  #    needs:
+  #      - publish-sdk-to-npm
+  #    uses: ./.github/workflows/npm-publish.yml
+  #    with:
+  #      dir: taqueria-plugin-tezos-client
+  #    secrets:
+  #      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-contract-types-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-contract-types
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-contract-types-plugin-to-npm:
+  #   if: ${{ !github.event.pull_request.head.repo.fork }}
+  #   needs: publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-contract-types
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   gather-info-for-e2e-tests:
     runs-on: ubuntu-latest
@@ -256,8 +256,8 @@ jobs:
           ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
-      - name: setup-docker
-        uses: docker-practice/actions-setup-docker@1.0.8
+      # - name: setup-docker
+      #   uses: docker-practice/actions-setup-docker@1.0.8
           
           ## PRobably good to go but testing first, if this is all good delete these lines
           # wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
@@ -311,179 +311,179 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
-  vscode-extension-workflow:
-    needs: detect-changes
-    if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
-            github.event_name == 'release' || 
-            startsWith(github.ref, 'refs/tags/v')) &&
-            !github.event.pull_request.head.repo.fork }}
-    uses: ./.github/workflows/vscode-extension.yml
-    secrets:
-      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
-      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
-      VSCE_PAT: ${{ secrets.VSCE_PAT }} 
+  # vscode-extension-workflow:
+  #   needs: detect-changes
+  #   if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
+  #           github.event_name == 'release' || 
+  #           startsWith(github.ref, 'refs/tags/v')) &&
+  #           !github.event.pull_request.head.repo.fork }}
+  #   uses: ./.github/workflows/vscode-extension.yml
+  #   secrets:
+  #     GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+  #     GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
+  #     VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
-  pr-comment:
-    runs-on: ubuntu-latest
-    # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
-    if: ${{ always() &&
-            !(contains(needs.*.result, 'failure')) && 
-            github.event_name == 'pull_request' &&
-            !github.event.pull_request.head.repo.fork }}
-    needs: 
-      - build-binaries
-      - publish-protocol-to-npm
-      - publish-sdk-to-npm
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-      - publish-contract-types-plugin-to-npm
-      - publish-archetype-plugin-to-npm
-      - publish-tezos-client-plugin-to-npm
-      - run-tests
-      - vscode-extension-workflow
-    steps:
-      - uses: actions/checkout@v2
+  # pr-comment:
+  #   runs-on: ubuntu-latest
+  #   # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
+  #   if: ${{ always() &&
+  #           !(contains(needs.*.result, 'failure')) && 
+  #           github.event_name == 'pull_request' &&
+  #           !github.event.pull_request.head.repo.fork }}
+  #   needs: 
+  #     - build-binaries
+  #     - publish-protocol-to-npm
+  #     - publish-sdk-to-npm
+  #     - publish-ligo-plugin-to-npm
+  #     - publish-smartpy-plugin-to-npm
+  #     - publish-taquito-plugin-to-npm
+  #     - publish-flextesa-plugin-to-npm
+  #     - publish-contract-types-plugin-to-npm
+  #     - publish-archetype-plugin-to-npm
+  #     - publish-tezos-client-plugin-to-npm
+  #     - run-tests
+  #     - vscode-extension-workflow
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: create pr comment
-        uses: actions/github-script@v5
-        id: pr-comment
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const git_short_sha = "${{ github.sha }}".substring(0, 8)
-            const git_tag = "${{ github.ref }}".split('tags/')[1];
+  #     - name: create pr comment
+  #       uses: actions/github-script@v5
+  #       id: pr-comment
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         script: |
+  #           const fs = require('fs');
+  #           const git_short_sha = "${{ github.sha }}".substring(0, 8)
+  #           const git_tag = "${{ github.ref }}".split('tags/')[1];
 
-            // Build the vscode-extension workflow comment
-            const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
+  #           // Build the vscode-extension workflow comment
+  #           const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
             
-            console.log(vsCodeWorkflowState)
-            let vsCodeCommentBody = ''
-            if (vsCodeWorkflowState.includes('success')) {
-              vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
-            } else {
-              vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
-            }
+  #           console.log(vsCodeWorkflowState)
+  #           let vsCodeCommentBody = ''
+  #           if (vsCodeWorkflowState.includes('success')) {
+  #             vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
+  #           } else {
+  #             vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
+  #           }
 
-            function readInfo(filePath) {
-              try {
-                const data = fs.readFileSync(filePath)
-                const JSONdata = JSON.parse(data.toString())
-                const name = JSONdata.name.split("/")[1]
-                const version = JSONdata.version
-                return { name, version }
-              } catch (error) {
-                console.error(`Got an error trying to read the file: ${error.message}`)
-              }
-            }
+  #           function readInfo(filePath) {
+  #             try {
+  #               const data = fs.readFileSync(filePath)
+  #               const JSONdata = JSON.parse(data.toString())
+  #               const name = JSONdata.name.split("/")[1]
+  #               const version = JSONdata.version
+  #               return { name, version }
+  #             } catch (error) {
+  #               console.error(`Got an error trying to read the file: ${error.message}`)
+  #             }
+  #           }
 
-            const ligo = readInfo("./taqueria-plugin-ligo/package.json")
-            const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
-            const taquito = readInfo("./taqueria-plugin-taquito/package.json")
-            const sdk = readInfo("./taqueria-sdk/package.json")
-            const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
-            const contractTypes = readInfo("./taqueria-plugin-contract-types/package.json")
-            const archetype = readInfo("./taqueria-plugin-archetype/package.json")
-            const tezosClient = readInfo("./taqueria-plugin-tezos-client/package.json")
+  #           const ligo = readInfo("./taqueria-plugin-ligo/package.json")
+  #           const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
+  #           const taquito = readInfo("./taqueria-plugin-taquito/package.json")
+  #           const sdk = readInfo("./taqueria-sdk/package.json")
+  #           const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
+  #           const contractTypes = readInfo("./taqueria-plugin-contract-types/package.json")
+  #           const archetype = readInfo("./taqueria-plugin-archetype/package.json")
+  #           const tezosClient = readInfo("./taqueria-plugin-tezos-client/package.json")
 
-            let body = `
-              <table>
-                <tr>
-                  <th scope="row">Latest Commit</th>
-                  <td>${git_short_sha}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Taq Binaries</th>
-                  <td>
-                      <p>
-                          <a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a><br>
-                          <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
-                          <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
-                      </p>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">npm Packages</th>
-                  <td>
-                      <p>
-                          npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
-                          taq install ${{ env.SCOPE }}/${archetype.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
-                          taq install ${{ env.SCOPE }}/${tezosClient.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
-                      </p>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">VSCode Extension VSIX</th>
-                  <td>${vsCodeCommentBody}</td>
-                </tr>
-              </table>
-            `;
+  #           let body = `
+  #             <table>
+  #               <tr>
+  #                 <th scope="row">Latest Commit</th>
+  #                 <td>${git_short_sha}</td>
+  #               </tr>
+  #               <tr>
+  #                 <th scope="row">Taq Binaries</th>
+  #                 <td>
+  #                     <p>
+  #                         <a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a><br>
+  #                         <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
+  #                         <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
+  #                     </p>
+  #                 </td>
+  #               </tr>
+  #               <tr>
+  #                 <th scope="row">npm Packages</th>
+  #                 <td>
+  #                     <p>
+  #                         npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+  #                         taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+  #                         taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+  #                         taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+  #                         taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
+  #                         taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
+  #                         taq install ${{ env.SCOPE }}/${archetype.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
+  #                         taq install ${{ env.SCOPE }}/${tezosClient.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
+  #                     </p>
+  #                 </td>
+  #               </tr>
+  #               <tr>
+  #                 <th scope="row">VSCode Extension VSIX</th>
+  #                 <td>${vsCodeCommentBody}</td>
+  #               </tr>
+  #             </table>
+  #           `;
 
 
-            const {data: comments} = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            })
+  #           const {data: comments} = await github.rest.issues.listComments({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             issue_number: context.issue.number,
+  #           })
 
-            const botComment = comments.find(comment => comment.user.id === 41898282)                                                                       
+  #           const botComment = comments.find(comment => comment.user.id === 41898282)                                                                       
 
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body
-              })
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body
-              })
-            }
+  #           if (botComment) {
+  #             await github.rest.issues.updateComment({
+  #               owner: context.repo.owner,
+  #               repo: context.repo.repo,
+  #               comment_id: botComment.id,
+  #               body: body
+  #             })
+  #           } else {
+  #             await github.rest.issues.createComment({
+  #               owner: context.repo.owner,
+  #               repo: context.repo.repo,
+  #               issue_number: context.issue.number,
+  #               body: body
+  #             })
+  #           }
 
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    needs:
-      - build-binaries
-      - publish-protocol-to-npm
-      - publish-sdk-to-npm
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-      - publish-contract-types-plugin-to-npm
-      - publish-archetype-plugin-to-npm
-      - publish-tezos-client-plugin-to-npm
-      - vscode-extension-workflow
-    if: ${{ startsWith(github.ref, 'refs/tags/v') &&
-            !github.event.pull_request.head.repo.fork }}
-    steps:
-      - uses: actions/checkout@v2
+  # release:
+  #   name: Release
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - build-binaries
+  #     - publish-protocol-to-npm
+  #     - publish-sdk-to-npm
+  #     - publish-ligo-plugin-to-npm
+  #     - publish-smartpy-plugin-to-npm
+  #     - publish-taquito-plugin-to-npm
+  #     - publish-flextesa-plugin-to-npm
+  #     - publish-contract-types-plugin-to-npm
+  #     - publish-archetype-plugin-to-npm
+  #     - publish-tezos-client-plugin-to-npm
+  #     - vscode-extension-workflow
+  #   if: ${{ startsWith(github.ref, 'refs/tags/v') &&
+  #           !github.event.pull_request.head.repo.fork }}
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: Download binaries 
-        id: download-binaries 
-        run: |
-          mkdir release && cd release
-          wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
-          wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
-          wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
-          wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
+  #     - name: Download binaries 
+  #       id: download-binaries 
+  #       run: |
+  #         mkdir release && cd release
+  #         wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
+  #         wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
+  #         wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
+  #         wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
-      - name: Release
-        id: release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./release/*
-          draft: true
+  #     - name: Release
+  #       id: release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: |
+  #           ./release/*
+  #         draft: true
