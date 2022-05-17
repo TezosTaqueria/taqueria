@@ -146,9 +146,29 @@ const sanitizeArgs = (parsedArgs: ParsedArgs) : Promise<SanitizedArgs> =>
 
 const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefined>> => {
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
+
+        // A hack to protect all hex from being messed by yargs
+        unparsedArgs = unparsedArgs.map(arg => /^0x[0-9a-fA-F]+$/.test(arg) ? "___" + arg + "___" : arg)
+
         const argv = yargs(unparsedArgs.slice(2)).argv as unknown as ParsedArgs
-        if (argv.i18n && argv.taqRun && argv.projectDir && argv.configDir) {
-            return Promise.resolve(argv)
+
+        // Unprotect all hex now that yargs is done doing its thing
+        const processedArgv = Object.entries(argv).map(([key, val]) =>
+            [key,
+             typeof val === 'string' && /^___0x[0-9a-fA-F]+___$/.test(val)
+             ? val.slice(3, -3)
+             : val
+            ]
+        )
+
+        const groupedArgv = processedArgv.reduce((acc, arg) => {
+            const key = arg[0]
+            const val = arg[1]
+            return {...acc, [key]: val}
+        }, {}) as unknown as ParsedArgs
+
+        if (groupedArgv.i18n && groupedArgv.taqRun && groupedArgv.projectDir && groupedArgv.configDir) {
+            return Promise.resolve(groupedArgv)
         }
     }
     return Promise.reject({

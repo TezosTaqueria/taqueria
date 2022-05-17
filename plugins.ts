@@ -202,9 +202,9 @@ export const inject = (deps: PluginDeps) => {
                     '_',
                 ]
 
-                // A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command
+                // A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command. This same hack is used to prevent yargs from turning 0x00 into 0
                 // Refer to https://github.com/yargs/yargs-parser/issues/201
-                if (typeof val === 'string' && val.match(/^___(.|\n)*___$/)) val = val.slice(3, -3)
+                if (typeof val === 'string' && /^___(.|\n)*___$/.test(val)) val = val.slice(3, -3)
 
                 // Some parameters we don't need to send, so we omit those
                 if (omit.includes(key) || key.indexOf('-') >= 0 || val === undefined)
