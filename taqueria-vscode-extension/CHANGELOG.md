@@ -39,7 +39,7 @@ These features will be launching in upcoming releases:
   - Improvements and bugfixes for the Flextesa plugin
   - Updated the UX for the Taquito plugin
   - Added Michelson types to the Contract Types plugin
-  - 
+  
 
 - February 2022:
   - Project scaffolding
