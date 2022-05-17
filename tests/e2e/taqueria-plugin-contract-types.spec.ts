@@ -123,13 +123,13 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
             await exec(`cp e2e/data/timelock.tz ${taqueriaProjectPath}/artifacts`)
             await exec(`cd ${taqueriaProjectPath} && taq generate types`)
             await exec(`cp e2e/data/timelock.ts ${taqueriaProjectPath}/types`)
-            await exec(`cd ${taqueriaProjectPath}/types &&
-                        npm init -y &&
-                        npm install typescript --save-dev &&
-                        npm install @taquito/taquito &&
-                        npm install @taquito/signer &&
-                        npx tsc timelock.ts`)
-            const {stdout, stderr} = await exec(`cd ${taqueriaProjectPath}/types && node timelock.js`)
+            await exec(`cp e2e/data/tsconfig.timelock.json ${taqueriaProjectPath}/types`)
+            await exec(`npm init -y`, {cwd: `./${taqueriaProjectPath}/types`})
+            await exec(`npm install typescript --save-dev`, {cwd: `./${taqueriaProjectPath}/types`})
+            await exec(`npm install @taquito/taquito`, {cwd: `./${taqueriaProjectPath}/types`})
+            await exec(`npm install @taquito/signer`, {cwd: `./${taqueriaProjectPath}/types`})
+            await exec(`npx tsc --project tsconfig.timelock.json`, {cwd: `./${taqueriaProjectPath}/types`})
+            const {stdout, stderr} = await exec(`node timelock.js`, {cwd: `./${taqueriaProjectPath}/types`})
             expect(stdout).toBe("initialStorage: 00 , newStorage: 050080890f\n")
             expect(stderr).toBe("")
 
