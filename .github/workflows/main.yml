@@ -212,13 +212,11 @@ jobs:
       - id: set-test-chunk-ids
         name: Set Chunk IDs
         run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
-      # - id: format-test-chunks
-      #   name: Format Chunks
-      #   run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS | jq -cM '[.[] | join(" ")]')"
-        
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
-        
+      - id: format-test-chunks
+        name: Format Chunks
+        run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS | jq -cM '[.[] | join(" ")]')"  
 
   run-tests:
     name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
