@@ -213,7 +213,7 @@ jobs:
         run: |
           echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
           echo ${{ fromJSON(steps['set-test-chunks'].outputs['test-chunks']) }}
-          echo ${{ fromJSON(steps['set-test-chunks'].outputs['test-chunks']) }}[1]
+          echo ${${{ fromJSON(steps['set-test-chunks'].outputs['test-chunks']) }}[1]}
           echo "$CHUNKS[1]"
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
