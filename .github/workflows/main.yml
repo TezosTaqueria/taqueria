@@ -302,7 +302,7 @@ jobs:
           echo ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted']) }}[0]
           npm run test:e2e -w tests ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'])[0] }}
         env:
-          CHUNKS: ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted']) }}
+          CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
   
       # - name: Report Status
       #   uses: ravsamhq/notify-slack-action@v1
