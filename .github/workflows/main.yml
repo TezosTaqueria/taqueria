@@ -200,6 +200,7 @@ jobs:
     outputs:
       test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
       test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
+      test-chunks-formatted: ${{ steps['format-test-chunks'].outputs['test-chunks-formatted'] }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -211,6 +212,9 @@ jobs:
       - id: set-test-chunk-ids
         name: Set Chunk IDs
         run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
+      - id: format-test-chunks
+        name: Format Chunks
+        run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS | jq -cM '[.[] | join(" ")]')"
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
@@ -294,9 +298,9 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          npm run test:e2e -w tests ${{ join(fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks'])[${{ matrix.chunk-ids }}], " ") }}
+          npm run test:e2e -w tests $CHUNKS[${{ matrix.chunk-ids }}]
         env:
-          CHUNKS: ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks']) }}
+          CHUNKS: ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted']) }}
   
       # - name: Report Status
       #   uses: ravsamhq/notify-slack-action@v1
