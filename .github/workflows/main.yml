@@ -212,7 +212,7 @@ jobs:
         name: Set Chunk IDs
         run: |
           echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
-          echo ${{ fromJSON(steps['set-test-chunks'].outputs['test-chunks'])[0] }}
+          echo ${{ fromJSON(steps['set-test-chunks'].outputs['test-chunks'])[0][0] }}
           echo "$CHUNKS[1]"
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
@@ -297,22 +297,20 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          echo "$CHUNKS"
-          echo "$CHUNKS[0]"
           npm run test:e2e -w tests ${{ matrix.chunks }}
         env:
           CHUNKS: ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks']) }}
   
-      - name: Report Status
-        uses: ravsamhq/notify-slack-action@v1
-        if: always()
-        with:
-          notification_title: "Failure in the e2e Tests"
-          status: ${{ job.status }} # required
-          notify_when: 'failure'
-          message_format: '{emoji} ${{ github.actor }}, *{workflow}* {status_message}, please investigate: <{run_url}|Failing Run>'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
+      # - name: Report Status
+      #   uses: ravsamhq/notify-slack-action@v1
+      #   if: always()
+      #   with:
+      #     notification_title: "Failure in the e2e Tests"
+      #     status: ${{ job.status }} # required
+      #     notify_when: 'failure'
+      #     message_format: '{emoji} ${{ github.actor }}, *{workflow}* {status_message}, please investigate: <{run_url}|Failing Run>'
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
   # vscode-extension-workflow:
   #   needs: detect-changes
