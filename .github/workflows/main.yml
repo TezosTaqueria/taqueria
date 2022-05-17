@@ -295,7 +295,9 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          npm run test:e2e -w tests $CHUNKS[${{ matrix.chunk-ids }}]
+          echo "[${{ matrix.chunk-ids }}]"
+          echo $CHUNKS
+          npm run test:e2e -w tests echo "$CHUNKS"[${{ matrix.chunk-ids }}]
         env:
           CHUNKS: ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted']) }}
   
