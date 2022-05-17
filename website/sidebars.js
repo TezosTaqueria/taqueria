@@ -42,7 +42,7 @@ const sidebars = {
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
-        "plugins/plugin-typescript-generator",
+        "plugins/plugin-contract-types",
         "plugins/plugin-tezos-client",
       ],
     },
