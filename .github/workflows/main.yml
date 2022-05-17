@@ -212,10 +212,8 @@ jobs:
         name: Set Chunk IDs
         run: |
           echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
-          TEST=${{ fromJSON(steps['set-test-chunks'].outputs['test-chunks']) }}
-          echo "${TEST[0]}"
-          echo "${TEST}"[0]
-          echo ${{ fromJSON(steps['set-test-chunks'].outputs['test-chunks']) }}[1]
+          echo ${{ toJSON(steps['set-test-chunks'].outputs['test-chunks']) }}
+          echo ${{ toJSON(steps['set-test-chunks'].outputs['test-chunks']) }}[0]
           echo "$CHUNKS[1]"
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
