@@ -261,11 +261,6 @@ jobs:
 
       # - name: setup-docker
       #   uses: docker-practice/actions-setup-docker@1.0.8
-          
-          ## PRobably good to go but testing first, if this is all good delete these lines
-          # wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
-          # chmod +x taq
-          # echo "$(pwd)" >> $GITHUB_PATH
 
       - name: build binary and make executable
         if: ${{ github.event.pull_request.head.repo.fork }}
