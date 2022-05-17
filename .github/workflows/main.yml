@@ -197,6 +197,8 @@ jobs:
     needs: 
       - build-binaries
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
+    env:
+      CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
     outputs:
       test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
       test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
@@ -212,13 +214,13 @@ jobs:
       - id: set-test-chunk-ids
         name: Set Chunk IDs
         run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
-        env:
-          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+        # env:
+        #   CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
       - id: format-test-chunks
         name: Format Chunks
         run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS | jq -cM '[.[] | join(" ")]')"
-        env:
-          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+        # env:
+        #   CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
   run-tests:
     name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
