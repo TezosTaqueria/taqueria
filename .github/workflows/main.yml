@@ -295,7 +295,7 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          echo ${{ matrix.chunk-ids }}]
+          echo ${{ matrix.chunk-ids }}
           echo $CHUNKS
           TEST=$CHUNKS[${{ matrix.chunk-ids }}] && echo $TEST
           echo $CHUNKS[0]
