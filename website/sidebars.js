@@ -36,7 +36,7 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "getting-started/plugin-basics",
+        "plugins/plugin-basics",
         "plugins/plugin-flextesa",
         "plugins/plugin-archetype",
         "plugins/plugin-ligo",
@@ -53,7 +53,7 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "hello-tacos-tutorial"
+        "tutorials/hello-tacos-tutorial"
       ],
     },
     {
