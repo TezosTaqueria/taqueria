@@ -1,4 +1,6 @@
+<% if (it.output == "github") { %>
 # Taqueria Flextesa Plugin
+<% } %>
 
 [Flextesa](https://tezos.gitlab.io/flextesa/) is a flexible Tezos sandbox environment that's easy to work with. It runs a Tezos node and network in a Docker container on your local machine
 
@@ -32,11 +34,12 @@ taq install @taqueria/plugin-flextesa
 
 Once installed, you can confirm functionality by runing the command `taq start sandbox` which will start a sandbox with the default `local` configuration
 
-> ### :page_with_curl: Note
-> The project you install it on must be initialized by NPM. This only needs to be done once on a project and is accomplished by running the command:
+<%~ it.noteOpenAdmonition %>
+The project you install it on must be initialized by NPM. This only needs to be done once on a project and is accomplished by running the command:
 ```shell
 npm init -y
 ``` 
+<%= it.closeAdmonition %>
 
 ## CLI Commands
 
@@ -47,8 +50,9 @@ The following commands are available from the CLI or the VS Code Command palette
 - `taq stop sandbox [sandboxName]`
 - `taq list accounts [sandboxName]`
 
-> ### :page_with_curl: Note
-> The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer
+<%~ it.noteOpenAdmonition %>
+The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer
+<%= it.closeAdmonition %>
 
 ## Plugin Configuration
 

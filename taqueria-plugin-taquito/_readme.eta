@@ -1,4 +1,6 @@
+<% if (it.output == "github") { %>
 # Taqueria Taquito Plugin
+<% } %>
 
 The Taquito plugin provides a task to originate a smart contract to a Tezos network
 
