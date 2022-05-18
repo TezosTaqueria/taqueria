@@ -1,5 +1,4 @@
 
-
 <p align="center">
   <a href="https://taqueria.io">
     <img alt="Taqueria" src="https://user-images.githubusercontent.com/1114943/150659418-e55f1df3-ba4d-4e05-ab26-1f729858c7fb.png" width="" />
@@ -45,6 +44,7 @@ Builds are also available on the [releases](https://github.com/ecadlabs/taqueria
 ## Getting Started
 
 Once installed, Taqueria is run from the command line using the `taq` command. The basic structure of a Taqueria command is:
+
 ```shell
 taq <taskName> [options]
 ```
@@ -59,7 +59,7 @@ Taqueria plugins extend the functionality of Taqueria by adding additional tasks
 |--------------|------------------------------     |-------------------------------------------------------------|
 | LIGO         | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language             |
 | SmartPy      | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy contract language                |
-| Flextesa     | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa               | 
+| Flextesa     | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa               |
 | Taquito      | `@taqueria/plugin/taquito`        | A front-end Tezos framework used to originate               |
 | TS Generator | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code |
 
@@ -75,7 +75,7 @@ There are two approaches to initializing a Taqueria project: initializing an emp
 2. Change directories: `cd test-project`
 3. Initialize the project as an NPM project: `npm init -y`
 4. Install the LIGO plugin: `taq install @taqueria/plugin-ligo`
-6. Continue steps 4-5 for each additional plugin you want to install
+5. Continue steps 4-5 for each additional plugin you want to install
 
 #### Using a Taqueria Project Scaffold
 
