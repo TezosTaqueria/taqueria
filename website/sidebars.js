@@ -42,19 +42,28 @@ const sidebars = {
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
-        "plugins/plugin-typescript-generator",
+        "plugins/plugin-contract-types",
         "plugins/plugin-tezos-client",
-        "plugins/plugin-mock-plugin",
       ],
     },
     {
       type: "category",
-      label: "Example App",
+      label: "Tutorials",
       className: "sidebarHeader",
       collapsed: false,
       collapsible: false,
       items: [
         "hello-tacos-tutorial"
+      ],
+    },
+    {
+      type: "category",
+      label: "Scaffolds",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "scaffolds/taco-shop"
       ],
     },
     {
