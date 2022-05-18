@@ -267,6 +267,7 @@ jobs:
           brew install docker
           brew install docker-compose
 
+          minikube delete
           minikube start
 
           eval $(minikube docker-env)
