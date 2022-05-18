@@ -296,9 +296,8 @@ jobs:
         run: |
           echo $CHUNKS
           echo ${{ fromJSON(env.CHUNKS) }}
-          echo env.CHUNKS
-          echo ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'])[0] }}
-          npm run test:e2e -w tests ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'])[0] }}
+          echo ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'])[matrix.chunk-ids] }}
+          npm run test:e2e -w tests ${{ fromJSON(needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'])[matrix.chunk-ids] }}
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
   
