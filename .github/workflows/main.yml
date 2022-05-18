@@ -235,11 +235,13 @@ jobs:
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
+          deno_target: "x86_64-unknown-linux-gnu"
         - os: windows-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
+          deno_target: "x86_64-pc-windows-msvc"
     # runs-on: ubuntu-latest
     needs: 
       # - build-binaries
@@ -273,6 +275,7 @@ jobs:
         run: |
           COMMIT=`git rev-parse --short "$GITHUB_SHA"`
           TAQ_VERSION="${TAQ_VERSION/\//-}"
+          DENO_TARGET=${{matrix.deno_target}}
           deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION"
           [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]] 
           chmod +x taq
