@@ -4,7 +4,6 @@
 
 ## In Development
 
-These features will be launching in upcoming releases:
 - Jest plugin
 - Scaffold registry
 - Smart contract testing with Jest
@@ -14,6 +13,7 @@ These features will be launching in upcoming releases:
 - Artifact Registry
 
 ## On the Horizon
+
 - CI integration with CI/CD tests
 - Multi-file smart contract compilation, origination, and testing
 - Token metadata support
@@ -23,16 +23,16 @@ These features will be launching in upcoming releases:
 - Full SmartPy support
 - Explorer integration
 - Account integration
-- Formal proof of verification for smart contracts
+- Formal verification of smart contracts
 
 ## [Shipped]
 
 > For full detail on changes, fixes, and improvements made in each release, please refer to the [Taqueria Release Page](https://github.com/ecadlabs/taqueria/releases)
 
 - April 2022:
-  - Added the Archetype plugin
-  - Implemented several scaffolds
-  - Added the Tezos-Client plugin
+  - Released the Archetype plugin
+  - Released the Tezos-Client plugin
+  - Added a new basic project scaffold `taqueria-scaffold-demo`
 
 - March 2022:
   - Major refactor to the taqueria-sdk library
