@@ -18,9 +18,10 @@ Taqueria is an extensible, open source plugin based framework for Tezos dApp dev
 In more practical terms, Taqueria is a task runner that you can use from the command line or the VS Code command palette to quickly accomplish tasks related to Tezos development. Taqueria uses a plugin architecture to implement tasks that provide complex and domain specific functionality
 
 Taqueria includes:
- - A command line interface (CLI) you use in your terminal through a command named `taq`
- - A library of plugins that add tasks to Taqueria
- - A VS Code Extension which provides the ability to run Taqueria tasks from the command palette
+
+- A command line interface (CLI) you use in your terminal through a command named `taq`
+- A library of plugins that add tasks to Taqueria
+- A VS Code Extension which provides the ability to run Taqueria tasks from the command palette
 
 ## Installing the Taqueria CLI
 
@@ -31,11 +32,11 @@ The Taqueria CLI is an executable binary named `taq` installed globally in your 
 3. Add `taq` to your shell's `$PATH`
 
 Builds for the latest release of Taqueria:
-| OS      | URL                                     |  
-|---------|-----------------------------------------|
-| MacOS   | https://taqueria.io/get/macos/taq       |
-| Linux   | https://taqueria.io/get/linux/taq       |
-| Windows | https://taqueria.io/get/windows/taq.exe |
+| OS      | URL                                                                        |  
+|---------|----------------------------------------------------------------------------|
+| MacOS   | [taqueria.io/get/macos/taq](https://taqueria.io/get/macos/taq)             |
+| Linux   | [taqueria.io/get/linux/taq](https://taqueria.io/get/linux/taq)             |
+| Windows | [taqueria.io/get/windows/taq.exe](https://taqueria.io/get/windows/taq.exe) |
 
 Builds are also available on the [releases](https://github.com/ecadlabs/taqueria/releases) page on Github
 
