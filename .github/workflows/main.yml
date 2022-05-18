@@ -277,7 +277,7 @@ jobs:
           TAQ_VERSION="${TAQ_VERSION/\//-}"
           DENO_TARGET=${{matrix.deno_target}}
           deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION"
-          [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]] 
+          
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
 
