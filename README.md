@@ -70,6 +70,7 @@ Taqueria manages plugins by providing installation/uninstallation via the `taq i
 There are two approaches to initializing a Taqueria project: initializing an empty project, or using a pre-configured project scaffold
 
 #### Initializing an empty Taqueria project
+
 1. Initialize a new project: `taq init test-project`
 2. Change directories: `cd test-project`
 3. Initialize the project as an NPM project: `npm init -y`
@@ -77,6 +78,7 @@ There are two approaches to initializing a Taqueria project: initializing an emp
 6. Continue steps 4-5 for each additional plugin you want to install
 
 #### Using a Taqueria Project Scaffold
+
 1. Run the command `taq scaffold https://github.com/ecadlabs/taqueria-scaffold-quickstart test-project`
 2. Change directories: `cd test-project`
 3. Run the project setup command `npm run setup`
@@ -87,12 +89,15 @@ There are two approaches to initializing a Taqueria project: initializing an emp
 If you prefer to build the Taqueria binary and plugins locally, follow the steps detailed below
 
 #### Requirements
-- [Deno](https://deno.land/) version: "1.18.2"
-- [NodeJS](https://nodejs.org/en/) version: "16.x"
-- [Docker](https://www.docker.com/) version: "0.9" or later
+
+- [Deno](https://deno.land/) v1.18.2 or later
+- [NodeJS](https://nodejs.org/en/) v16 or later
+- [Docker](https://www.docker.com/) v0.9 or later
 
 #### Run Build Script
+
 From the root of the Taqueria directory, run the build-all script:
+
 ```shell
 npm run build-all
 ```
