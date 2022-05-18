@@ -225,7 +225,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest]
         chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
         include:
         - os: ubuntu-latest
@@ -233,12 +233,11 @@ jobs:
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
-        - os: windows-latest
+        - os: macos-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
-    # runs-on: ubuntu-latest
     needs: 
       - build-binaries
       - gather-info-for-e2e-tests
@@ -260,8 +259,8 @@ jobs:
           ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
-      # - name: setup-docker
-      #   uses: docker-practice/actions-setup-docker@1.0.8
+      - name: setup-docker
+        uses: docker-practice/actions-setup-docker@1.0.9
 
       - name: build binary and make executable
         if: ${{ github.event.pull_request.head.repo.fork }}
@@ -293,10 +292,7 @@ jobs:
           npm run test:integration -w tests
 
       - name: Run e2e tests
-        run: |
-          echo $CHUNKS
-          echo ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
-          npm run test:e2e -w tests ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
+        run: npm run test:e2e -w tests ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
   
