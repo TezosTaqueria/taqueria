@@ -45,6 +45,11 @@ Plugin.create(i18n => ({
                     description: "The name of the sandbox to use",
                     required: false
                 }),
+                Option.create({
+                    flag: "entrypoint",
+                    description: "This makes contract invocation easier by specifying the annotation of an entrypoint (if it exists)",
+                    required: false
+                }),
             ],
             handler: "proxy",
             positionals: [
