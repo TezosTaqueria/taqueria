@@ -159,20 +159,18 @@ const preprocessString = (value: string) : string => {
 }
 
 const getSimulateCommand = (opts: Opts, sandbox: Sandbox, sourceFile: string, sourcePath: string) => {
-    let storage
-    if (opts.storage) {
-        storage = opts.storage
-    } else {
-        storage = getStorageFromConfig(opts, sourceFile)
-        if (!storage) throw new Error('Error: Please specify a non-empty storage value in the CLI or in the config file.')
-    }
-    storage = typeof storage === 'string' ? storage : `${storage}`
-    let input = opts.input && typeof opts.input === 'string' ? opts.input : `${opts.input}`
+    const rawStorage = opts.storage ?? getStorageFromConfig(opts, sourceFile)
+    if (rawStorage === undefined) throw new Error('Error: Please specify a non-empty storage value in the CLI or in the config file.')
+    
+    const storage = typeof rawStorage === 'string' ? rawStorage : `${rawStorage}`
+    const input = opts.input && typeof opts.input === 'string' ? opts.input : `${opts.input}`
 
-    storage = preprocessString(storage)
-    input = preprocessString(input)
+    const processedStorage = preprocessString(storage)
+    const processedInput = preprocessString(input)
 
-    const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage \'${storage}\' and input \'${input}\'`
+    const entrypoint = opts.entrypoint ? `--entrypoint ${opts.entrypoint}` : ''
+
+    const cmd = `docker exec ${sandbox.name} tezos-client run script ${sourcePath} on storage \'${processedStorage}\' and input \'${processedInput}\' ${entrypoint}`
     return cmd
 }
 

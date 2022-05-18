@@ -262,6 +262,39 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
         expect(stderr).toContain('Unknown primitive hello.');
     })
 
+    test("Verify that the Taqueria CLI will pass 0x00 (not 0, which is in int, not a byte) to the simulator", async () => {
+        // 1. Copy contract from data folder to taqueria project folder
+        await exec(`cp e2e/data/byteSlice.tz ${taqueriaProjectPath}/artifacts`)
+
+        // 2. Run taq simulate
+        const {stdout, stderr} = await exec(`taq simulate byteSlice.tz '0x12a47ef2' --storage '0x00'`, {cwd: `./${taqueriaProjectPath}`})
+
+        expect(stdout).toContain('0xa47ef2')
+        expect(stderr).toBe('');
+    })
+
+    test("Verify that taqueria simulator task can understand Left and Right (part of input and storage value) correctly", async () => {
+        // 1. Copy contract from data folder to taqueria project folder
+        await exec(`cp e2e/data/increment.tz ${taqueriaProjectPath}/artifacts`)
+
+        // 2. Run taq simulate
+        const {stdout, stderr} = await exec(`taq simulate increment.tz 'Left (Right 3)' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
+
+        expect(stdout).toContain('8')
+        expect(stderr).toBe('');
+    })
+
+    test("Verify that taqueria simulator task accepts --entrypoint flag to make calling entry points easier", async () => {
+        // 1. Copy contract from data folder to taqueria project folder
+        await exec(`cp e2e/data/increment.tz ${taqueriaProjectPath}/artifacts`)
+
+        // 2. Run taq simulate
+        const {stdout, stderr} = await exec(`taq simulate increment.tz '3' --storage '5' --entrypoint increment`, {cwd: `./${taqueriaProjectPath}`})
+
+        expect(stdout).toContain('8')
+        expect(stderr).toBe('');
+    })
+
     // Remove all files from artifacts folder without removing folder itself
     afterEach( async () => {
         try {
