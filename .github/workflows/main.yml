@@ -264,7 +264,7 @@ jobs:
       #   uses: docker-practice/actions-setup-docker@1.0.8
 
       - name: build binary and make executable
-        if: ${{ !github.event.pull_request.head.repo.fork }}
+        if: ${{ github.event.pull_request.head.repo.fork }}
         env:
           TAQ_VERSION: ${{ github.ref_name }}
           DENO_DIR: "./deno"
