@@ -277,9 +277,8 @@ jobs:
           TAQ_VERSION="${TAQ_VERSION/\//-}"
           DENO_TARGET=${{matrix.deno_target}}
           deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION"
-          
-          chmod +x taq
-          echo "$(pwd)" >> $GITHUB_PATH
+          ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
+          ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
       - name: install dependencies
         run: npm ci
