@@ -265,6 +265,7 @@ jobs:
           brew install minikube
 
           brew install docker
+          brew install docker-compose
 
           minikube start
 
