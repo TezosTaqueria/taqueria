@@ -279,6 +279,7 @@ jobs:
       - name: setup-docker
         run: |
           brew install docker
+          which docker
           docker info
 
       - name: build binary and make executable
