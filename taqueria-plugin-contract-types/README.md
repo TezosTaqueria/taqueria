@@ -1,6 +1,4 @@
----
-title: Contract Types Plugin
----
+# Taqueria Contract Types Plugin
 
 This plugin provides a `taq generate types` command which will generate and export TypeScript types from compiled Michelson smart contracts. These generated types then work with your IDE and Taquito, providing type safety and an improved code authoring experience
 
@@ -66,36 +64,35 @@ The `generate types` command will accept the following optional parameters:
 
 The generated TS types can be used in a Taquito project which provides an improved developing experience, and simplifies the way types are provided to Taquito method calls. Some examples of how these changes are put into use are detailed below  
 
-:::note
-You can view the full example in the `example-usage.ts` file on Github: [taqueria/taqueria-plugin-contract-types/example](https://github.com/ecadlabs/taqueria/blob/main/taqueria-plugin-contract-types/example/example-usage.ts)
-:::
+> ### :page_with_curl: Note
+> You can view the full example in the `example-usage.ts` file on Github: [taqueria/taqueria-plugin-contract-types/example](https://github.com/ecadlabs/taqueria/blob/main/taqueria-plugin-contract-types/example/example-usage.ts)
 
 ### Calling the `.at` Method of a Contract
 
 Traditionally, calling the `.at` method of a contract with Taquito required the developer to pass the parameter's type via a utility method:
 ```ts Utility Method
-const contract = await Tezos.contract.at(`tz123`, contractAbstractionComposer<TestContractType>());
+const contract = await Tezos.contract.at(`KT123...`, contractAbstractionComposer<TestContractType>());
 ```
 or a cast:
 ```ts Cast
-const contract = await Tezos.contract.at(`tz123`) as ContractProviderFromContractType<TestContractType>;
+const contract = await Tezos.contract.at(`KT123...`) as ContractProviderFromContractType<TestContractType>;
 ```
 
 When using generated types, the developer can now directly use the type in the call to `.at`:
 ```ts 
-const contract = await Tezos.contract.at<TestContract>(`tz123`);
+const contract = await Tezos.contract.at<TestContract>(`KT123...`);
 ```
 
 ### Using a Wallet
 
 Using a wallet is simplified in a similar way:
 ```ts 
-const contract = await Tezos.wallet.at(`tz123`, walletAbstractionComposer<TestContractType>());
+const contract = await Tezos.wallet.at(`KT123...`, walletAbstractionComposer<TestContractType>());
 ```
 
 Becomes:
 ```ts 
-const contract = await Tezos.wallet.at<TestWalletContract>(`tz123`);
+const contract = await Tezos.wallet.at<TestWalletContract>(`KT123...`);
 ```
 
 ### Contract Origination
@@ -117,13 +114,12 @@ const contract = await originationResult.contract<TestContract2>(5);
 
 When accessing storage, there was no way to pass the type through the contract class. This required providing the type a second time:
 ```ts
-const contract = await Tezos.contract.at(`tz123`) as ContractProviderFromContractType<TestContractType>;
+const contract = await Tezos.contract.at(`KT123...`) as ContractProviderFromContractType<TestContractType>;
 const storage = await contract.storage<StorageFromContractType<TestContractType>>();
 ```
 
 Now, the contract type provides the default storage type:
 ```ts
-const contract = await Tezos.contract.at<TestContract>(`tz123`);
+const contract = await Tezos.contract.at<TestContract>(`KT123...`);
 const storage = await contract.storage();
 ```
-

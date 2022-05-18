@@ -144,11 +144,37 @@ const sanitizeArgs = (parsedArgs: ParsedArgs) : Promise<SanitizedArgs> =>
         })
     })
 
+// A hack to protect all hex from being messed by yargs
+const preprocessArgs = (args: Args) : Args => {
+    return args.map(arg => /^0x[0-9a-fA-F]+$/.test(arg) ? "___" + arg + "___" : arg)
+}
+
+// A hack to protect all hex from being messed by yargs
+const postprocessArgs = (args: ParsedArgs) : ParsedArgs =>  {
+    const postprocessedArgs = Object.entries(args).map(([key, val]) =>
+        [key,
+            typeof val === 'string' && /^___0x[0-9a-fA-F]+___$/.test(val)
+            ? val.slice(3, -3)
+            : val
+        ]
+    )
+
+    const groupedArgs = postprocessedArgs.reduce((acc, arg) => {
+        const key = arg[0]
+        const val = arg[1]
+        return {...acc, [key]: val}
+    }, {}) as unknown as ParsedArgs
+
+    return groupedArgs
+}
+
 const parseArgs = (unparsedArgs: Args): LikeAPromise<ParsedArgs, Failure<undefined>> => {
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
-        const argv = yargs(unparsedArgs.slice(2)).argv as unknown as ParsedArgs
-        if (argv.i18n && argv.taqRun && argv.projectDir && argv.configDir) {
-            return Promise.resolve(argv)
+        const preprocessedArgs = preprocessArgs(unparsedArgs)
+        const argv = yargs(preprocessedArgs.slice(2)).argv as unknown as ParsedArgs
+        const postprocessedArgs = postprocessArgs(argv)
+        if (postprocessedArgs.i18n && postprocessedArgs.taqRun && postprocessedArgs.projectDir && postprocessedArgs.configDir) {
+            return Promise.resolve(postprocessedArgs)
         }
     }
     return Promise.reject({
