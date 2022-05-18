@@ -260,7 +260,20 @@ jobs:
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
       - name: setup-docker
-        uses: docker-practice/actions-setup-docker@1.0.10
+        run: |
+          brew install hyperkit
+          brew install minikube
+
+          brew install docker
+          brew install docker-compose
+
+          minikube start
+
+          eval $(minikube docker-env)
+
+          echo "`minikube ip` docker.local" | sudo tee -a /etc/hosts > /dev/null
+
+          docker run hello-world
 
       - name: build binary and make executable
         if: ${{ github.event.pull_request.head.repo.fork }}
