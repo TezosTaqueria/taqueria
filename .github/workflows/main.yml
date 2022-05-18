@@ -260,7 +260,7 @@ jobs:
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
       - name: setup-docker
-        uses: docker-practice/actions-setup-docker@latest
+        uses: docker-practice/actions-setup-docker@1.0.10
 
       - name: build binary and make executable
         if: ${{ github.event.pull_request.head.repo.fork }}
