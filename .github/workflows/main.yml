@@ -279,8 +279,9 @@ jobs:
       - name: setup-docker
         run: |
           brew install docker
+          brew install colima
+          colima start
           which docker
-          sudo dockerd
           docker info
 
       - name: build binary and make executable
