@@ -1,8 +1,8 @@
 import {execCmd, getArch, sendAsyncErr, sendErr, sendAsyncRes, sendJsonRes, sendRes} from '@taqueria/node-sdk'
-import {Failure, LikeAPromise, StdIO, Protocol, RequestArgs, SandboxConfig, SandboxAccountConfig} from "@taqueria/node-sdk/types"
+import {LikeAPromise, StdIO, Protocol, RequestArgs, SandboxConfig, SandboxAccountConfig} from "@taqueria/node-sdk/types"
 import type {ExecException} from 'child_process'
 import retry from 'async-retry'
-import { SanitizedArgs } from '@taqueria/protocol/taqueria-protocol-types'
+import { SanitizedArgs, TaqError } from '@taqueria/protocol/taqueria-protocol-types'
 
 const {Url} = Protocol
 
@@ -72,7 +72,7 @@ const startInstance = (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts
         )
 }
 
-const configureTezosClient = (sandboxName: string, opts: Opts) : LikeAPromise<StdIO, Failure<StdIO>> =>
+const configureTezosClient = (sandboxName: string, opts: Opts) : Promise<StdIO> =>
     retry(
         () => Promise.resolve(getConfigureCommand(sandboxName, opts))
                 .then(execCmd)
@@ -83,7 +83,7 @@ const configureTezosClient = (sandboxName: string, opts: Opts) : LikeAPromise<St
     )
 
 
-const importAccounts = (sandboxName: string, opts: Opts): LikeAPromise<StdIO, Failure<StdIO>> =>
+const importAccounts = (sandboxName: string, opts: Opts): Promise<StdIO> =>
     retry(
         () => Promise.resolve(getImportAccountsCommand(sandboxName, opts))
                 .then(execCmd)
@@ -120,7 +120,7 @@ const getSandbox = ({sandboxName, config}: Opts) => {
     return undefined
 }
 
-const startSandboxTask = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
+const startSandboxTask = (parsedArgs: Opts) : LikeAPromise<void, TaqError.t> => {
     if (parsedArgs.sandboxName) {
         const sandbox = getSandbox(parsedArgs)
         return sandbox
@@ -209,7 +209,7 @@ const stopSandboxTask = async (parsedArgs: Opts) : Promise<void> => {
     return sendAsyncErr(`No sandbox specified`)
 }
 
-export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
+export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, TaqError.t> => {
     switch (parsedArgs.task) {
         case 'list accounts':
             return listAccountsTask(parsedArgs)

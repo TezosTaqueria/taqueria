@@ -1,4 +1,6 @@
-import {z} from "zod"
+import {z, ZodError} from "zod"
+import {reject, resolve} from "fluture"
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 
 export const schema = z
     .string({description: "Sanitized Path"})
@@ -15,4 +17,15 @@ export type SanitizedPath = z.infer<typeof schema> & {
 
 export type t = SanitizedPath
 
-export const make = (value: string) => schema.parse(value) as SanitizedPath
+export const make = (value: string) => {
+    try {
+        const retval = schema.parse(value) as SanitizedPath
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<SanitizedPath>(err, `${value} is not a valid path`, value)
+        }
+        return toParseUnknownErr<SanitizedPath>(err, "There was a problem trying to parse the path", value)
+    }
+}

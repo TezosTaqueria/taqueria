@@ -1,4 +1,6 @@
-import {z} from 'zod'
+import {z, ZodError} from 'zod'
+import {resolve, reject} from "fluture"
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 import * as HumanReadableIdentifier from "@taqueria/protocol/HumanReadableIdentifier"
 import * as Url from "@taqueria/protocol/Url"
 import * as EconomicalProtocolHash from "@taqueria/protocol/EconomicalProtocolHash"
@@ -40,7 +42,7 @@ export const rawSchema = z.object({
     ], {description: "Sandbox Accounts"}).optional()
 })
 
-export const schema = internalSchema.transform(val => val as t)
+export const schema = internalSchema.transform(val => val as SandboxConfig)
 
 const sandboxType: unique symbol = Symbol("SandboxConfig")
 
@@ -48,12 +50,23 @@ type Input = z.infer<typeof internalSchema>
 
 type RawInput = z.infer<typeof rawSchema>
 
-export type t = Input & {
+export interface SandboxConfig extends Input {
     readonly [sandboxType]: void
 }
 
-export type SandboxConfig = t
+export type t = SandboxConfig
 
-export const make = (data: Input) => schema.parse(data)
+export const make = (data: Input) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<SandboxConfig>(err, `The provided sandbox configuration is invalid.`, data)
+        }
+        return toParseUnknownErr<SandboxConfig>(err, "There was a problem trying to parse the sandbox configuration", data)
+    }
+}
 
 export const create = (data: RawInput) => schema.parse(data)

@@ -1,14 +1,21 @@
-import {z} from 'zod'
+import {z, ZodError} from 'zod'
+import {FutureInstance as Future, resolve, mapRej, attemptP, promise} from "fluture"
+import {TaqError, toParseErr, toParseUnknownErr, E_TaqError} from "@taqueria/protocol/TaqError"
 import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
 import * as Command from "@taqueria/protocol/Command"
 import * as Option from '@taqueria/protocol/Option'
-import * as Alias from "@taqueria/protocol/Alias"
 import * as Verb from "@taqueria/protocol/Verb"
 import * as Task from '@taqueria/protocol/Task'
 import * as ParsedOperation from '@taqueria/protocol/ParsedOperation'
 import * as ParsedPluginInfo from '@taqueria/protocol/ParsedPluginInfo'
 import * as Config from "@taqueria/protocol/Config"
 import type {i18n} from "@taqueria/protocol/i18n"
+
+const eager = <T>(f: Future<TaqError, T>) => promise (
+    mapRej
+    ((err: TaqError) => new E_TaqError(err))
+    (f)
+)
 
 const taskToPluginMap = z.record(
     z.union([
@@ -47,52 +54,62 @@ export type TaskToPluginMap = z.infer<typeof taskToPluginMap>
 
 export type OpToPluginMap = z.infer<typeof operationToPluginMap>
 
-export const make = (data: Input) => schema.parse(data)
+export const make = (value: Input) => {
+    try {
+        const retval = schema.parse(value)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<EphemeralState>(err, `The ephermal state is invalid`, value)
+        }
+        return toParseUnknownErr<EphemeralState>(err, `Something went wrong trying to parse the ephermal state`, value)
+    }
+}
 
 
 /**
  * Private functions
  */
-type TaskName = Verb.t
-type TaskCounts = Record<TaskName, ParsedPluginInfo.t[]>
-const getTaskCounts = (pluginInfo: ParsedPluginInfo.t[]): TaskCounts => {
+type Counts = Record<Verb.t, ParsedPluginInfo.t[]>
+const getTaskCounts = (pluginInfo: ParsedPluginInfo.t[]): Counts => {
     return pluginInfo.reduce(
         (retval, pluginInfo) => pluginInfo.tasks === undefined
         ? {}
         : pluginInfo.tasks.reduce(
-            (retval: TaskCounts, task: Task.t) => {
+            (retval: Counts, task: Task.t) => {
                 const taskName = task.task
                 const providers: ParsedPluginInfo.t[] = retval[taskName]
                     ? [...retval[taskName], pluginInfo]
                     : [pluginInfo]
-                const mapping: TaskCounts = {}
+                const mapping: Counts = {}
                 mapping[taskName] = providers.filter(provider => provider !== undefined)
                 return {...retval, ...mapping}
             },
             retval
         ),
-        ({} as TaskCounts)
+        ({} as Counts)
     )
 }
 
-type OperationCounts = Record<string, ParsedPluginInfo.t[]>
-const getOperationCounts = (pluginInfo: ParsedPluginInfo.t[]): OperationCounts => {
+
+const getOperationCounts = (pluginInfo: ParsedPluginInfo.t[]): Counts => {
     return pluginInfo.reduce(
         (retval, pluginInfo) => pluginInfo.operations === undefined
         ? retval
         : pluginInfo.operations.reduce(
-            (retval: OperationCounts, operation: ParsedOperation.t) => {
+            (retval: Counts, operation: ParsedOperation.t) => {
                 const operationName = operation.operation
                 const providers = retval[operationName]
                     ? [...retval[operationName], pluginInfo]
                     : [pluginInfo]
-                const mapping: OperationCounts = {}
+                const mapping: Counts = {}
                 mapping[operationName] = providers.filter(provider => provider !== undefined)
                 return {...retval, ...mapping}
             },
             retval
         ),
-        {} as OperationCounts
+        {} as Counts
     )
 }
 
@@ -103,107 +120,87 @@ const toChoices = (plugins: ParsedPluginInfo.t[]) => plugins.reduce(
     [] as string[]
 )
 
+const isComposite = (name: Verb.t, counts: Counts) => counts[name].length > 1
+
+const getInstalledPlugin = (config: Config.t, name: string) => config.plugins?.find(
+    (plugin: InstalledPlugin.t) => [`taqueria-plugin-${name}`, name].includes(plugin.name)
+)
+
+
 export const mapTasksToPlugins = (config: Config.t, pluginInfo: ParsedPluginInfo.t[], i18n: i18n) => {
-    debugger
     const taskCounts = getTaskCounts(pluginInfo)
-    const isCompositeTask = (taskName: Verb.t) => taskCounts[taskName].length > 1
-
-    return pluginInfo.reduce(
-        (retval: TaskToPluginMap, pluginInfo: ParsedPluginInfo.t) => pluginInfo.tasks == undefined
-            ? retval
-            : pluginInfo.tasks.reduce(
-            (retval: TaskToPluginMap, task: Task.t) => {
-                const taskName = task.task
-
-                // If this is a composite task, we'll construct
-                // a task which proxies to a canonical task
-                if (isCompositeTask(taskName)) {
-                    if (!retval[taskName]) {
-                        const compositeTask = Task.create({
-                            task: taskName,
-                            command: taskName,
+    return attemptP<TaqError, TaskToPluginMap>(async () => await pluginInfo.reduce(
+        async (retval, pluginInfo) => !pluginInfo.tasks
+            ? Promise.resolve({} as TaskToPluginMap)
+            : await pluginInfo.tasks.reduce(
+                async (retval, {task}) => {
+                    if (isComposite(task, taskCounts)) {
+                        const command = await eager (Command.make(task))
+                        const compositeTask = await eager (Task.make({
+                            task,
+                            command,
                             description: i18n.__("providedByMany"),
                             hidden: false,
                             options: [
-                                Option.create({
-                                    flag: "plugin",
-                                    choices: toChoices(taskCounts[taskName]),
-                                    description: "Use to specify what plugin you'd like when running this task.",
+                                await eager (Option.make({
+                                    flag: await eager (Verb.make("plugin")),
+                                    description: "Specify which plugin should be used to execute this task",
+                                    choices: toChoices(taskCounts[task]),
                                     required: true
-                                })
+                                }))
                             ],
                             handler: "proxy"
-                        })
-                        if (compositeTask) retval[taskName] = compositeTask
-                        return retval
+                        }))
+                        return {...await retval, [task]: compositeTask}
                     }
-                    return retval
-                }
 
-                // This task is only provided by a single plugin
-                else {
-                    const installedPlugin = config.plugins?.find(
-                        (plugin: InstalledPlugin.t) => [`taqueria-plugin-${pluginInfo.name}`, pluginInfo.name].includes(plugin.name)
-                    )
-                    if (!installedPlugin) return retval // we should log that a problem occured here
-                    retval[taskName] = installedPlugin
-                    return retval
-                }
-            },
-            retval
-        ),
-        {} as TaskToPluginMap
-    )
+                    // Task is provided by just a single plugin
+                    const installedPlugin = getInstalledPlugin(config, pluginInfo.name)
+                    return installedPlugin
+                        ? {...await retval, [task]: installedPlugin}
+                        : retval
+                },
+                retval
+            ),
+        Promise.resolve({} as TaskToPluginMap)
+    )).pipe(mapRej (rej => rej as TaqError))
 }
 
 export const mapOperationsToPlugins = (config: Config.t, pluginInfo: ParsedPluginInfo.t[], i18n: i18n) => {
-    const operationCounts = getOperationCounts(pluginInfo)
-    const isCompositeOp = (operationName: string) => operationCounts[operationName].length > 1
-
-    return pluginInfo.reduce(
-        (retval: OpToPluginMap, pluginInfo: ParsedPluginInfo.t) => pluginInfo.operations === undefined
-        ? retval
-        : pluginInfo.operations.reduce(
-            (retval: OpToPluginMap, op: ParsedOperation.t) => {
-                const operationName = op.operation
-
-                // If this is a composite task, we'll construct
-                // a task which proxies to a canonical task
-                if (isCompositeOp(operationName)) {
-                    if (!retval[operationName]) {
-                        const compositeOp = ParsedOperation.make({
-                            operation: operationName,
-                            command: Command.make(operationName),
+    const opCounts = getOperationCounts(pluginInfo)
+    return attemptP(async () => await pluginInfo.reduce(
+        async (retval, pluginInfo) => !pluginInfo.operations
+            ? Promise.resolve({} as OpToPluginMap)
+            : await pluginInfo.operations.reduce(
+                async (retval, {operation}) => {
+                    if (isComposite(operation, opCounts)) {
+                        const command = await eager (Command.make(operation))
+                        const compositeOp = await eager (ParsedOperation.make({
+                            operation,
+                            command,
                             description: i18n.__("providedByMany"),
                             options: [
-                                Option.create({
-                                    flag: "plugin",
-                                    choices: toChoices(operationCounts[operationName]),
-                                    description: "Use to specify what plugin you'd like when running this operation.",
+                                await eager (Option.make({
+                                    flag: await eager (Verb.make("plugin")),
+                                    description: "Specify which plugin should be used to execute this operation",
+                                    choices: toChoices(opCounts[operation]),
                                     required: true
-                                })
+                                }))
                             ]
-                        })
-                        if (compositeOp) retval[operationName] = compositeOp
-                        return retval
+                        }))
+                        return {...await retval, [operation]: compositeOp}
                     }
-                    return retval
-                }
 
-                // This operation is only provided by a single plugin
-                else {
-                    const installedPlugin = config.plugins?.find(
-                        (plugin: InstalledPlugin.t) => [`taqueria-plugin-${pluginInfo.name}`, pluginInfo.name].includes(plugin.name)
-                    )
-                    if (!installedPlugin) return retval // we should log that a problem occured here
-                    retval[operationName] = installedPlugin
-                    return retval
-                }
-            },
-            retval
-        ),
-        {} as OpToPluginMap
-    )
+                    // Operation is provided by just a single plugin
+                    const installedPlugin = getInstalledPlugin(config, pluginInfo.name)
+                    return installedPlugin
+                        ? {...await retval, [operation]: installedPlugin}
+                        : retval
+                },
+                retval
+            ),
+        Promise.resolve({} as OpToPluginMap)
+    )).pipe(mapRej (rej => rej as TaqError))
 }
 
 export const getTasks = (pluginInfo: ParsedPluginInfo.t[]) => pluginInfo.reduce(

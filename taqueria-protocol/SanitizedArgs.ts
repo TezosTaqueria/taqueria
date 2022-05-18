@@ -1,10 +1,12 @@
-import {z} from 'zod'
+import {z, ZodError} from 'zod'
+import {resolve} from "fluture"
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 import * as Url from "@taqueria/protocol/Url"
 
  const initRawSchema =  z.object({
     _: z.array(z.string().nonempty()),
-    projectDir: z.string().nonempty().transform(SanitizedAbsPath.make),
+    projectDir: SanitizedAbsPath.schema,
     maxConcurrency: z.preprocess(
         val => typeof val === 'string' ? parseInt(val) : Number(val),
         z.number().int().min(1).default(10),
@@ -112,18 +114,98 @@ export const rawSchema = initRawSchema
 
 export const schema = initRawSchema.transform((val: unknown) => val as SanitizedArgs)
 
-export const make = (input: Input) => schema.parse(input)
+export const make = (data: Input) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<SanitizedArgs>(err, `The provided arguments are invalid.`, data)
+        }
+        return toParseUnknownErr<SanitizedArgs>(err, "There was a problem trying to parse the arguments for this command", data)
+    }
+}
+
+export const makeInitArgs = make
+
+export const makeInstallArgs = (data: Input) => {
+    try {
+        const retval = managePluginSchema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<ManagePluginArgs>(err, `The provided arguments to install a plugin are invalid.`, data)
+        }
+        return toParseUnknownErr<ManagePluginArgs>(err, "There was a problem trying to parse the arguments for the install task", data)
+    }
+}
+
+export const makeUninstallArgs = (data: Input) => {
+    try {
+        const retval = managePluginSchema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<ManagePluginArgs>(err, `The provided arguments to uninstall a plugin are invalid.`, data)
+        }
+        return toParseUnknownErr<ManagePluginArgs>(err, "There was a problem trying to parse the arguments for the uninstall task", data)
+    }
+}
+
+export const makeScaffoldArgs = (data: Input) => {
+    try {
+        const retval = scaffoldSchema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<ScaffoldArgs>(err, `The provided arguments to scaffold a project are invalid.`, data)
+        }
+        return toParseUnknownErr<ScaffoldArgs>(err, "There was a problem trying to parse the arguments for the scaffold task", data)
+    }
+}
+
+export const makeVersionArgs = (data: Input) => {
+    try {
+        const retval = versionSchema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<VersionArgs>(err, `The provided arguments are invalid.`, data)
+        }
+        return toParseUnknownErr<VersionArgs>(err, "There was a problem trying to parse the arguments for the version command", data)
+    }
+}
+
+export const makeProvisionArgs = (data: Input) => {
+    try {
+        const retval = provisionSchema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<ProvisionArgs>(err, `The provided arguments to provision an operation are invalid.`, data)
+        }
+        return toParseUnknownErr<ProvisionArgs>(err, "There was a problem trying to parse the arguments for the provision task", data)
+    }
+}
+
+export const of = (data: Record<string, unknown>) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<SanitizedArgs>(err, `The provided arguments are invalid.`, data)
+        }
+        return toParseUnknownErr<SanitizedArgs>(err, "There was a problem trying to parse the arguments for this command", data)
+    }
+}
+
 
 export const create = (input: Record<string, unknown>) => schema.parse(input)
-
-export const initArgs = (inputArgs: Record<string, unknown>) => schema.parse(inputArgs)
-
-export const installArgs = (inputArgs: Record<string, unknown>) => managePluginSchema.parse(inputArgs)
-
-export const uninstallArgs = (inputArgs: Record<string, unknown>) => managePluginSchema.parse(inputArgs)
-
-export const scaffoldArgs = (inputArgs: Record<string, unknown>) => scaffoldSchema.parse(inputArgs)
-
-export const versionArgs = (inputArgs: Record<string, unknown>) => versionSchema.parse(inputArgs)
-
-export const provisionArgs = (inputArgs: ProvisionInput | Record<string, unknown>) => provisionSchema.parse(inputArgs)

@@ -2,10 +2,10 @@ import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
 import type {i18n} from "@taqueria/protocol/i18n"
-import {TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
+import * as TaqError from "@taqueria/protocol/TaqError"
 import * as utils from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {map, chain, chainRej, resolve, reject} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {map, chain, chainRej, mapRej} from 'fluture';
 import {getConfig} from './taqueria-config.ts'
 
 // Get utils
@@ -37,31 +37,46 @@ export const getPluginName = (input:string): NpmPluginName => {
     return (retval as NpmPluginName)
 }
 
-export const requireNPM = (projectDir: SanitizedAbsPath.t, i18n: i18n) : Future.t<TaqError.t, Manifest> => pipe(
-    readJsonFile<Manifest>(SanitizedAbsPath.make(`${projectDir}/package.json`)),
-    chainRej(previous => reject({kind: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir, previous})),
+export const requireNPM = (projectDir: SanitizedAbsPath.t, i18n: i18n) => pipe(
+    SanitizedAbsPath.make(`${projectDir}/package.json`),
+    chain (abspath => readJsonFile<Manifest>(abspath)),
+    mapRej (previous => {
+        const taqErr: TaqError.t = {
+            kind: "E_NPM_INIT",
+            msg: i18n.__("npmInitRequired"),
+            context: projectDir,
+            previous
+        }
+        return taqErr
+    }),
 )
 
 export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath.t) => pipe(
     /^\//.test(pluginNameOrPath) 
         ? SanitizedAbsPath.make(pluginNameOrPath)
         : SanitizedAbsPath.make(`${projectDir}/${pluginNameOrPath}`),
-    pluginPath => readJsonFile(SanitizedAbsPath.make(`${pluginPath}/package.json`)),
-    chainRej (() => readJsonFile(SanitizedAbsPath.make(`node_modules/${pluginNameOrPath}/package.json`))),
+    chain(pluginPath => SanitizedAbsPath.make(`${pluginPath}/package.json`)),
+    chain(readJsonFile),
+    chainRej (() => pipe(
+        SanitizedAbsPath.make(`node_modules/${pluginNameOrPath}/package.json`),
+        chain (readJsonFile)
+    )),
     map(value => value as Manifest)
 )
 
 const addToPluginList = (pluginName: NpmPluginName, loadedConfig: LoadedConfig.t) => pipe(
     getPluginPackageJson(pluginName, loadedConfig.projectDir),
-    map ((manifest: {name: string}) => {
+    chain ((manifest: {name: string}) => {
         const allPlugins = loadedConfig.plugins ?? []
         const existingPlugins = allPlugins.filter(plugin => plugin.name != manifest.name)
-        const plugins: InstalledPlugin.t[] = [...existingPlugins, {name: manifest.name, type: "npm"}]
-        return LoadedConfig.toConfig({
-            ...loadedConfig,
-            plugins
-        })
+
+        return InstalledPlugin.make({name: manifest.name, type: "npm"})
+            .pipe(map (installedPlugin => [...existingPlugins, installedPlugin]))
     }),
+    chain ( plugins => LoadedConfig.toConfig({
+        ...loadedConfig,
+        plugins
+    })),
     chain (writeJsonFile(loadedConfig.configFile))                    
 )
 
@@ -89,7 +104,7 @@ export const uninstallPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plug
     chain (() => getConfig(projectDir, i18n, false)),
     chain ((config: LoadedConfig.t) => {
         const pluginName = getPluginName(plugin)
-        const plugins = config.plugins?.filter(plugin => plugin.name != pluginName)
+        const plugins = config.plugins.filter(plugin => plugin.name != pluginName)
 
         return pipe(
             LoadedConfig.toConfig({

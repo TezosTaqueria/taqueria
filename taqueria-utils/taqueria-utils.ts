@@ -1,16 +1,17 @@
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath'
 import * as Url from '@taqueria/protocol/Url'
-import {Future, TaqError, UtilsDependencies} from './taqueria-utils-types.ts'
+import * as TaqError from "@taqueria/protocol/TaqError"
+import {UtilsDependencies} from './taqueria-utils-types.ts'
 import memoizy from "https://deno.land/x/memoizy@1.0.0/fp.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {chain, attemptP, map, reject, resolve, mapRej, promise} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import {FutureInstance as Future, chain, attemptP, map, reject, resolve, mapRej, chainRej, swap, promise} from 'fluture'
 import {join as _joinPaths} from 'https://deno.land/std@0.115.1/path/mod.ts'
 import {render} from 'https://deno.land/x/eta@v1.12.3/mod.ts'
 import * as jsonc from "https://deno.land/x/jsonc@1/main.ts"
 import {copy} from 'https://deno.land/std@0.128.0/streams/conversion.ts'
 
 
-export const decodeJson = <T>(encoded: string): Future.t<TaqError.t, T> =>
+export const decodeJson = <T>(encoded: string): Future<TaqError.t, T> =>
     attemptP(() => {
         try {
             const data = jsonc.parse(encoded)
@@ -21,11 +22,12 @@ export const decodeJson = <T>(encoded: string): Future.t<TaqError.t, T> =>
     })
 
 export const debug = <T>(input: T) => {
+    // deno-lint-ignore no-debugger
     debugger
     return input
 }
 
-export const mkdir = (path: string) : Future.t<TaqError.t, string> => 
+export const mkdir = (path: string) : Future<TaqError.t, string> => 
     attemptP(async () => {
         try {
             await Deno.mkdir(path, {recursive: true})
@@ -36,50 +38,49 @@ export const mkdir = (path: string) : Future.t<TaqError.t, string> =>
         }
     })
 
-export const ensureDirExists = (path: string) : Future.t<TaqError.t, SanitizedAbsPath.t> => 
-    attemptP(async () =>{
-        try {
-            await Deno.mkdir(path, {recursive: true})
-            return SanitizedAbsPath.make(path)
-        } catch(previous) {
-            if (previous.name == 'AlreadyExists') {
-                return SanitizedAbsPath.make(path)
-            }
-            // TODO i18n message
-            return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'Path does not exist', context: path, previous })
+export const ensureDirExists = (path: string) => SanitizedAbsPath
+    .make(path)
+    .pipe( chain (abspath => attemptP(() => Deno.stat(abspath))))
+    .pipe( chainRej (() => attemptP(() => Deno.mkdir(path))))
+    .pipe( chain (() => SanitizedAbsPath.make(path)))
+    .pipe( mapRej (previous => {
+        const taqErr: TaqError.t = {
+            kind: "E_INVALID_PATH_DOES_NOT_EXIST",
+            msg: "Path does not exist",
+            context: path,
+            previous
         }
-    })
+        return taqErr
+    }))
 
-
-export const doesPathExist = (path: string) : Future.t<TaqError.t, SanitizedAbsPath.t> => 
-    attemptP(async () =>{
-        try {
-            await Deno.stat(path)
-            return SanitizedAbsPath.make(path)
-        } catch(_e) {
-            // TODO i18n message
-            return Promise.reject({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST', msg: 'Path does not exist', context: path, previous: _e })
-        }  
-    })
-
-export const doesPathNotExist = (path: string) : Future.t<TaqError.t, SanitizedAbsPath.t> => 
-    attemptP(async () =>{
-        try {
-            await Deno.stat(path)
-
-            // TODO i18n message
-            return Promise.reject({
-                kind: 'E_INVALID_PATH_ALREADY_EXISTS',
-                msg: 'Path already exists',
-                context: path 
-            })
-        } catch(_e) {
-            // Expect exception when trying to stat a new directory
-            return SanitizedAbsPath.make(path)
+export const doesPathExist = (path: string) => SanitizedAbsPath
+    .make(path)
+    .pipe( chain (abspath => attemptP(() => Deno.stat(abspath))))
+    .pipe( chain (() => SanitizedAbsPath.make(path)))
+    .pipe( mapRej (previous => {
+        const taqErr: TaqError.t = {
+            kind: "E_INVALID_PATH_DOES_NOT_EXIST",
+            msg: "Path does not exist",
+            context: path,
+            previous
         }
-    })
+        return taqErr
+    }))
+    
 
-export const rm = (path: SanitizedAbsPath.t) : Future.t<TaqError.t, SanitizedAbsPath.t> => 
+export const doesPathNotExist = (path: string) => doesPathExist(path)
+    .pipe (swap)
+    .pipe (chain (() => SanitizedAbsPath.make(path)))
+    .pipe (mapRej (() => {
+        const taqErr: TaqError.t = {
+            kind: "E_INVALID_PATH_ALREADY_EXISTS",
+            msg: "Path already exists",
+            context: path
+        }
+        return taqErr
+    }))
+
+export const rm = (path: SanitizedAbsPath.t) : Future<TaqError.t, SanitizedAbsPath.t> => 
     attemptP(async () => {
         try {
             await Deno.remove(path, { recursive: true })
@@ -97,7 +98,7 @@ export const rm = (path: SanitizedAbsPath.t) : Future.t<TaqError.t, SanitizedAbs
     })
 
 
-export const readTextFile = (path: string) : Future.t<TaqError.t, string> =>
+export const readTextFile = (path: string) : Future<TaqError.t, string> =>
     attemptP(() => {
         const decoder = new TextDecoder("utf-8")
         return Deno.readFile(path)
@@ -115,7 +116,7 @@ export const readJsonFile = <T>(path: string) => pipe(
     chain(x => decodeJson<T>(x))
 )
 
-export const writeTextFile = (path: string) => (data: string) : Future.t<TaqError.t, string> => 
+export const writeTextFile = (path: string) => (data: string) : Future<TaqError.t, string> => 
     attemptP(() => Deno.writeTextFile(path, data).then(() => path))
 
 export const writeJsonFile = <T>(path: string) => (data: T) => pipe(
@@ -139,11 +140,13 @@ export const joinPaths = _joinPaths
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => render(template, values) as string
 
-export const toPromise = <T>(f: Future.t<TaqError.t, T>) => pipe(
+export const toPromise = <T>(f: Future<TaqError.t, T>) => pipe(
     f,
     mapRej(taqErr => new TaqError.E_TaqError(taqErr)),
     promise
 )
+
+export const eager = toPromise
 
 // Exports a function to inject dependencies needed by this
 // utilities package
@@ -164,7 +167,7 @@ export const inject = (deps: UtilsDependencies) => {
         return input as T
     }
 
-    const gitClone = (url: Url.t) => (destinationPath: SanitizedAbsPath.t) : Future.t<TaqError.t, SanitizedAbsPath.t> => pipe(
+    const gitClone = (url: Url.t) => (destinationPath: SanitizedAbsPath.t) : Future<TaqError.t, SanitizedAbsPath.t> => pipe(
         execText('git clone <%= it.url %> <%= it.outputDir %>', {url: url.toString(), outputDir: destinationPath}),
         mapRej<TaqError.t, TaqError.t>(previous => ({kind: 'E_GIT_CLONE_FAILED', msg: `Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed.`, context: {url, destinationPath}, previous})),
         chain(status => status === 0
@@ -174,7 +177,7 @@ export const inject = (deps: UtilsDependencies) => {
         map(() => destinationPath)
     );
 
-    const execText = (cmdTemplate: string, inputArgs: Record<string, unknown>, bufferOutput=false, cwd?: SanitizedAbsPath.t) : Future.t<TaqError.t, number|string> => attemptP(async () => {
+    const execText = (cmdTemplate: string, inputArgs: Record<string, unknown>, bufferOutput=false, cwd?: SanitizedAbsPath.t) : Future<TaqError.t, number|string> => attemptP(async () => {
         let command = cmdTemplate
         try {
             // NOTE, uses eta templates under the hood. Very performant! https://ghcdn.rawgit.org/eta-dev/eta/master/browser-tests/benchmark.html
@@ -268,6 +271,7 @@ export const inject = (deps: UtilsDependencies) => {
         execText,
         toPromise,
         stdout,
-        stderr
+        stderr,
+        eager
     }
 }

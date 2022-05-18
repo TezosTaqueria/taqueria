@@ -1,3 +1,4 @@
+import { ZodError } from 'zod'
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types'
 import type {i18n} from "@taqueria/protocol/i18n"
 import load from "@taqueria/protocol/i18n"
@@ -13,19 +14,28 @@ import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
 import * as NetworkConfig from "@taqueria/protocol/NetworkConfig"
 import * as Environment from "@taqueria/protocol/Environment"
 import * as PersistentState from "@taqueria/protocol/PersistentState"
-
+import {toParseErr, toParseUnknownErr, E_TaqError} from "@taqueria/protocol/TaqError"
+import type {TaqError} from "@taqueria/protocol/TaqError"
 import {Schema, InputSchema} from "./types"
-import {Args, pluginDefiner, LikeAPromise, Failure, StdIO} from "./types"
+import {Args, pluginDefiner, LikeAPromise, StdIO} from "./types"
 import {join, dirname} from 'path'
 import {readFile, writeFile} from 'fs/promises'
 import {get} from 'stack-trace'
 import {exec, ExecException} from 'child_process'
+import {FutureInstance as Future, promise, mapRej} from "fluture"
 
 // @ts-ignore interop issue. Maybe find a different library later
 import generateName from 'project-name-generator'
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 const yargs = require('yargs')
+
+
+export const eager = <T>(f: Future<TaqError, T>) => promise (
+    mapRej 
+    ((err: TaqError) => new E_TaqError(err))
+    (f)
+)
 
 export const writeJsonFile = <T>(filename: string) => (data: T): Promise<string> =>
     writeFile(filename, JSON.stringify(data, undefined, 4), {encoding: "utf8"})
@@ -46,7 +56,7 @@ export const execCmd = (cmd:string) : LikeAPromise<StdIO, ExecException> => new 
     })
 })
 
-export const getArch = () : LikeAPromise<string, Failure<string>> => 
+export const getArch = () : LikeAPromise<string, TaqError> => 
     execCmd("uname -m")
     .then(result => result.stdout.trim().toLowerCase())
     .then(arch => {
@@ -56,27 +66,29 @@ export const getArch = () : LikeAPromise<string, Failure<string>> =>
             case 'arm64':
                 return 'linux/arm64/v8'
             default:
-                return Promise.reject({
-                    errCode: "E_INVALID_ARCH",
-                    errMsg: `We do not know how to handle the ${arch} architecture`,
+                const taqErr: TaqError = {
+                    kind: "E_INVALID_ARCH",
+                    msg: `We do not know how to handle the ${arch} architecture`,
                     context: arch
-                })
+                }
+                return Promise.reject(taqErr)
         }
     })
 
 
-export const parseJSON = <T>(input: string) : LikeAPromise<T, Failure<string>> => new Promise((resolve, reject) => {
+export const parseJSON = <T>(input: string) : LikeAPromise<T, TaqError> => new Promise((resolve, reject) => {
     try {
         const json = JSON.parse(input)
         resolve(json)
     }
-    catch (err) {
-        return reject({
-            errCode: "E_INVALID_JSON",
-            errMsg: `Invalid JSON: ${input}`,
-            previous: err,
+    catch (previous) {
+        const taqErr: TaqError = {
+            kind: "E_INVALID_JSON",
+            msg: `Invalid JSON: ${input}`,
+            previous,
             context: input
-        })
+        }
+        return reject(taqErr)
     }
 })
 
@@ -129,11 +141,19 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 
 export const noop = () => {}
 
-const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, Failure<undefined>> => {
+const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> => {
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
-        const argv = yargs(unparsedArgs.slice(2)).argv
-        const requestArgs = RequestArgs.make(argv)
-        return Promise.resolve(requestArgs)
+        try {
+            const argv = yargs(unparsedArgs.slice(2)).argv
+            const requestArgs = RequestArgs.create(argv)
+            return Promise.resolve(requestArgs)
+        }
+        catch (previous) {
+            if (previous instanceof ZodError) {
+                return eager (toParseErr<RequestArgs.t>(previous, "The plugin request arguments are invalid", unparsedArgs))
+            }
+            return eager (toParseUnknownErr<RequestArgs.t>(previous, "There was a problem trying to parse the plugin request arguments", unparsedArgs))
+        }
     }
     return Promise.reject("Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?")
 }

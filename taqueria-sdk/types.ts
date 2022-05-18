@@ -12,6 +12,7 @@ import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
 import * as NetworkConfig from "@taqueria/protocol/NetworkConfig"
 import * as Environment from "@taqueria/protocol/Environment"
 import * as PersistentState from "@taqueria/protocol/PersistentState"
+import * as TaqError from "@taqueria/protocol/TaqError"
 import type {i18n} from "@taqueria/protocol/i18n"
 import { P } from 'ts-pattern'
 export type PluginResponse = Protocol.PluginResponse
@@ -28,16 +29,11 @@ export {
     SandboxAccountConfig,
     NetworkConfig,
     Environment,
-    PersistentState
+    PersistentState,
+    TaqError
 }
 
-export interface Failure<Params> {
-    readonly errorCode: string,
-    readonly errorMsg: string,
-    readonly context: Params
-}
-
-export interface LikeAPromise<Success, Failure> extends Promise<Success> {
+export interface LikeAPromise<Success, TaqError> extends Promise<Success> {
 
 }
 
@@ -46,9 +42,9 @@ export type PositiveInt = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 
 export type i18nMessage = string | {message: string, numOfArguments: PositiveInt}
 
 export interface Schema extends PluginInfo.t{
-    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: RequestArgs.t) => LikeAPromise<PluginResponse, Failure<T>>|Promise<PluginResponse>
-    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: RequestArgs.t) => LikeAPromise<PluginResponse, Failure<T>>|Promise<PluginResponse>
-    proxy?: <T>(parsedArgs: RequestArgs.ProxyRequestArgs) => LikeAPromise<PluginResponse, Failure<T>>    
+    checkRuntimeDependencies?: (i18n: i18n, parsedArgs: RequestArgs.t) => LikeAPromise<PluginResponse, TaqError.t>|Promise<PluginResponse>
+    installRuntimeDependencies?: (i18n: i18n, parsedargs: RequestArgs.t) => LikeAPromise<PluginResponse, TaqError.t>|Promise<PluginResponse>
+    proxy?: (parsedArgs: RequestArgs.ProxyRequestArgs) => LikeAPromise<PluginResponse, TaqError.t>    
 }
 
 export const inputSchema = PluginInfo.rawSchema.extend({
@@ -56,9 +52,9 @@ export const inputSchema = PluginInfo.rawSchema.extend({
 })
 
 export interface InputSchema extends z.infer<typeof inputSchema> {
-    checkRuntimeDependencies?: <T>(i18n: i18n, parsedArgs: RequestArgs.t) => LikeAPromise<PluginResponse, Failure<T>>|Promise<PluginResponse>
-    installRuntimeDependencies?: <T>(i18n: i18n, parsedargs: RequestArgs.t) => LikeAPromise<PluginResponse, Failure<T>>|Promise<PluginResponse>
-    proxy?: <T>(parsedArgs: RequestArgs.ProxyRequestArgs) => LikeAPromise<PluginResponse, Failure<T>>
+    checkRuntimeDependencies?: (i18n: i18n, parsedArgs: RequestArgs.t) => LikeAPromise<PluginResponse, TaqError.t>|Promise<PluginResponse>
+    installRuntimeDependencies?: (i18n: i18n, parsedargs: RequestArgs.t) => LikeAPromise<PluginResponse, TaqError.t>|Promise<PluginResponse>
+    proxy?: (parsedArgs: RequestArgs.ProxyRequestArgs) => LikeAPromise<PluginResponse, TaqError.t>
 }
 
 export type Args = string[]

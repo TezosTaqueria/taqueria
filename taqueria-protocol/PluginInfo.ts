@@ -1,4 +1,6 @@
-import {z} from 'zod'
+import {z, ZodError} from 'zod'
+import {resolve, reject} from "fluture"
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 
 import * as Alias from "@taqueria/protocol/Alias"
 import * as VersionNumber from "@taqueria/protocol/VersionNumber"
@@ -64,6 +66,17 @@ export type t = PluginInfo
 
 export const schema = internalSchema.transform((val: unknown) => val as PluginInfo)
 
-export const make = (data: Input) => schema.parse(data)
+export const make = (data: Input) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<PluginInfo>(err, `The provided plugin info is invalid.`, data)
+        }
+        return toParseUnknownErr<PluginInfo>(err, "There was a problem trying to parse the plugin information", data)
+    }
+}
 
 export const create = (data: RawInput|unknown) => schema.parse(data)

@@ -1,4 +1,3 @@
-import {z} from "zod"
 import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
 import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
 import * as EphemeralState from "@taqueria/protocol/EphermalState"
@@ -7,41 +6,44 @@ import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedPath"
 import * as Provisions from "@taqueria/protocol/Provisions"
 import * as Provisioner from "@taqueria/protocol/Provisioner"
 import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
-import * as TaqError from "./taqueria-utils/TaqError.ts"
-import * as Future from "./taqueria-utils/Future.ts"
+import * as TaqError from "@taqueria/protocol/TaqError"
 import {inject} from "./taqueria-utils/taqueria-utils.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {map, chain, attemptP, chainRej, reject} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {Future, mapRej, map, chain, attemptP, chainRej, reject} from 'fluture';
 import generate from "https://cdn.skypack.dev/retronid"
 
-const {doesPathExist, writeTextFile, joinPaths} = inject({
+const {doesPathExist, writeJsonFile, joinPaths, eager, isTaqError, readJsonFile, renderTemplate, execText} = inject({
     stderr: Deno.stderr,
     stdout: Deno.stdout
 })
 
-const loadProvisions = (provisionsAbspath: SanitizedAbsPath.t) => attemptP(async () => {
-    const provisions = await import(provisionsAbspath)
-    return Provisions.create(provisions.default)    
-}) as Future.t<TaqError.t, Provisions.t>
+const getProvisions = (provisionsAbsPath: SanitizedAbsPath.t) => pipe(
+    readJsonFile(provisionsAbsPath),
+    chain(Provisions.of)
+)
 
-const writeProvisions = (provisionsAbspath: SanitizedAbsPath.t) => (provisioners: Provisioner.t[]) => {
-    const output = provisioners.map(provisioner => `\tProvisioner.create(q${JSON.stringify(provisioner, null, 4)})`)
+const loadProvisions = (provisionsAbspath: SanitizedAbsPath.t) => pipe(
+    getProvisions(provisionsAbspath),
+    mapRej((previous: Error|TaqError.t) => isTaqError(previous) 
+        ? previous as unknown as TaqError.t
+        : TaqError.create({
+            kind: "E_PROVISION",
+            msg: "Could not parse provisions file",
+            previous
+        })
+    )
+)
 
-    return writeTextFile(provisionsAbspath) (`
-import * as Provisioner from "@taqueria/protocol/Provisioner"
-export default [
-${output.join(",\n")}
-]`)
-} 
+const writeProvisions = (provisionsAbspath: SanitizedAbsPath.t) => (provisioners: Provisioner.t[] | Provisions.t) =>
+    writeJsonFile(provisionsAbspath) (provisioners)
+    .pipe(map(() => provisioners)) 
     
 
 const addProvision = (provisioner: Provisioner.t, provisionsAbspath: SanitizedAbsPath.t) => pipe(
-    provisionsAbspath,
-    doesPathExist,
-    chainRej(() => writeProvisions(provisionsAbspath) ([])),
+    doesPathExist(provisionsAbspath),
+    chainRej(() => writeProvisions(provisionsAbspath) ([]) ),
     chain(() => loadProvisions(provisionsAbspath)),
-    map(Provisions.create),
-    map(provisioners => [...provisioners, provisioner] as Provisioner.t[]),
+    map(provisioners => [...provisioners, provisioner]),
     chain(writeProvisions(provisionsAbspath))
 )
 
@@ -94,13 +96,12 @@ const newProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, state: EphemeralS
     })
 }
 
-export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, config: LoadedConfig.t, state: EphemeralState.t): Future.t<TaqError.t, string> => {
+export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, config: LoadedConfig.t, state: EphemeralState.t) => attemptP(async () => {
     try {
-        const provision = newProvision(parsedArgs, state)
-        return addProvision(
-            provision, 
-            SanitizedAbsPath.make(joinPaths(config.projectDir, ".taq", "provisions.ts")),
-        )
+        const provisionAbspath = await eager (SanitizedAbsPath.make(joinPaths(config.projectDir, ".taq", "provisions.ts")))
+        const provision = await eager (newProvision(parsedArgs, state))
+        const provisions = await eager (addProvision(provision, provisionAbspath))
+        return provisions
     }
     catch (previous) {
         const err: TaqError.t = {
@@ -108,6 +109,6 @@ export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, config:
             msg: `Could not provision. Please check the operation name and try again.`,
             previous
         }
-        return reject(err)
+        return Promise.reject(err)
     }
-}
+})

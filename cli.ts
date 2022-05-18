@@ -4,11 +4,11 @@ import type {EnvKey, EnvVars, DenoArgs, CLIConfig} from './taqueria-types.ts'
 import {LoadedConfig} from './taqueria-types.ts'
 import type {Arguments} from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts'
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts'
-import {map, chain, bichain, attemptP, mapRej, resolve, reject, forkCatch, parallel, debugMode} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {FutureInstance as Future, map, chain, bichain, attemptP, mapRej, resolve, reject, forkCatch, parallel, debugMode} from 'fluture';
 import {pipe, identity} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {getConfig, getDefaultMaxConcurrency} from './taqueria-config.ts'
 import * as utils from './taqueria-utils/taqueria-utils.ts'
-import {TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
+import * as TaqError from "@taqueria/protocol/TaqError"
 import {Table} from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts'
 import { titleCase } from "https://deno.land/x/case@2.1.1/mod.ts";
 import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
@@ -28,6 +28,7 @@ const {
     gitClone,
     rm,
     log,
+    eager
     // logInput,
     // debug
 } = utils.inject({
@@ -38,7 +39,7 @@ const {
 // Add alias
 const exec = execText
 
-type SendPluginActionRequest = (plugin: InstalledPlugin.t) => (action: PluginAction) => (requestArgs: Record<string, unknown>) => Future.t<TaqError.t, PluginResponse>
+type SendPluginActionRequest = (plugin: InstalledPlugin.t) => (action: PluginAction) => (requestArgs: Record<string, unknown>) => Future<TaqError.t, PluginResponse>
 
 type PluginLib = ReturnType<typeof inject>
 
@@ -62,7 +63,7 @@ const getFromEnv = <T>(key: EnvKey, defaultValue:T, env: EnvVars) =>
 
 
 const getVersion = (inputArgs: DenoArgs, _i18n: i18n.t) => {
-    const i = inputArgs.findIndex(str => str === '--setVersion')
+    const i = inputArgs.findIndex((str: string)=> str === '--setVersion')
     return i > -1
         ? inputArgs[i+1]
         : "not-provided"
@@ -138,10 +139,10 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n.t) =>
             })
         },
         (args: Record<string, unknown>) => pipe(
-            SanitizedArgs.create(args), 
-            ({projectDir, maxConcurrency, quickstart}: SanitizedArgs.t) => {
+            SanitizedArgs.of(args), 
+            chain(({projectDir, maxConcurrency, quickstart}: SanitizedArgs.t) => {
                 return initProject(projectDir, i18n, maxConcurrency, quickstart)
-            },
+            }),
             forkCatch (console.error) (console.error) (console.log)
         )
     )
@@ -162,8 +163,9 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n.t) =>
                 })
         },
         (args: Record<string, unknown>) => pipe(
-            SanitizedArgs.scaffoldArgs(args),
-            scaffoldProject(i18n),
+            SanitizedArgs.of(args),
+            chain(SanitizedArgs.makeScaffoldArgs),
+            chain(scaffoldProject(i18n)),
             forkCatch (console.error) (console.error) (console.log)
         )
     )
@@ -201,9 +203,10 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         // TODO: This function assumes that there is only one type of plugin available to install,
         // a plugin distributed and installable via NPM. This should support other means of distribution
         (inputArgs: Record<string, unknown>) => pipe(
-            SanitizedArgs.installArgs(inputArgs),
-            args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName),
-            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
+            SanitizedArgs.of(inputArgs),
+            chain(SanitizedArgs.makeInstallArgs),
+            chain(args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName)),
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log),
         )
     )
     .alias('i', 'install')
@@ -218,8 +221,9 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             })
         },
         (inputArgs: Record<string, unknown>) => pipe(
-            SanitizedArgs.uninstallArgs(inputArgs),
-            inputArgs => NPM.uninstallPlugin(parsedArgs.projectDir, i18n, inputArgs.pluginName),
+            SanitizedArgs.of(inputArgs),
+            chain(SanitizedArgs.makeUninstallArgs),
+            chain(inputArgs => NPM.uninstallPlugin(parsedArgs.projectDir, i18n, inputArgs.pluginName)),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
     )
@@ -238,7 +242,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
     extendCLI(env, parsedArgs, i18n)
 )
 
-const parseArgs = (cliConfig: CLIConfig) : Future.t<TaqError.t, Record<string, unknown>> => pipe(
+const parseArgs = (cliConfig: CLIConfig) : Future<TaqError.t, Record<string, unknown>> => pipe(
     attemptP<Error, Record<string, unknown>>(() => cliConfig.parseAsync()),
     mapRej<Error, TaqError.t>(previous => ({
         kind: 'E_INVALID_ARGS',
@@ -285,7 +289,7 @@ const initProject = (projectDir: SanitizedAbsPath.t, i18n: i18n.t, maxConcurrenc
     chain (({artifactsDir, contractsDir, testsDir, projectDir, operationsDir}: LoadedConfig.t) => {
         const jobs = [operationsDir, artifactsDir, contractsDir, testsDir].reduce(
             (retval, abspath) => abspath ? [...retval, mkdir(joinPaths(projectDir, abspath))] : retval,
-            [] as Future.t<TaqError.TaqError, string>[]
+            [] as Future<TaqError.TaqError, string>[]
         )
         return parallel (maxConcurrency) (jobs)
     }),
@@ -296,30 +300,31 @@ const initProject = (projectDir: SanitizedAbsPath.t, i18n: i18n.t, maxConcurrenc
     map (_ => i18n.__("bootstrapMsg"))
 )
 
-const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir}: SanitizedArgs.ScaffoldArgs) => pipe(
-    // TODO: i18n of messages
-    // Clone git into destination folder (Initial version assumes git is installed)
-    log(`scaffolding\n into: ${scaffoldProjectDir}\n from: ${scaffoldUrl}`),
-    _ => doesPathNotExist(scaffoldProjectDir),
-    chain(gitClone(scaffoldUrl)),
-    // TODO: Run initialization script
-    // Run init found in .taq/scaffold.json
-    // log(`initializing...`),
-    // Load .taq/scaffold.json (if it exists)
-    // Run init command
-    map(_ => log(`Cleanup...`)),
-    chain(_ => rm(SanitizedAbsPath.make(`${scaffoldProjectDir}/.taq/scaffold.json`))),
-    bichain<TaqError.t,TaqError.t,SanitizedAbsPath.t>
-        (err => err.kind === 'E_INVALID_PATH_DOES_NOT_EXIST' ? resolve(scaffoldProjectDir) : reject(err))
-        (resolve),
-    chain(_ => rm(SanitizedAbsPath.make(`${scaffoldProjectDir}/.git`))),
-    chain(_ => rm(SanitizedAbsPath.make(`${scaffoldProjectDir}/.gitignore`))),
-    bichain<TaqError.t,TaqError.t,SanitizedAbsPath.t>
-        (err => err.kind === 'E_INVALID_PATH_DOES_NOT_EXIST' ? resolve(scaffoldProjectDir) : reject(err))
-        (resolve),
-    chain(_ => exec("npm install", {}, false, scaffoldProjectDir)),
-    map(_ => i18n.__("scaffoldDoneMsg"))
-)
+const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir}: SanitizedArgs.ScaffoldArgs) => attemptP(async () => {
+    try {
+        const abspath = await eager (SanitizedAbsPath.make(`${scaffoldProjectDir}/.taq/scaffold.json`))
+        const destDir = await eager (doesPathNotExist(abspath))
+        
+        log(`scaffolding\n into: ${destDir}\n from: ${scaffoldUrl}`)    
+        await eager (gitClone (scaffoldUrl) (destDir))
+
+        log("Cleanup...")
+        const scaffoldConfig = await eager (SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`))
+        const gitDir = await eager (SanitizedAbsPath.make(`${destDir}/.git`))
+        const _gitIgnore = await eager (SanitizedAbsPath.make(`${destDir}/.gitignore`))
+        await eager (rm(scaffoldConfig))
+        await eager (rm(gitDir))
+        // await eager (rm(gitIgnore))
+
+        log("Installing plugins...")
+        await eager (exec("npm install", {}, false, destDir))
+
+        return i18n.__("scaffoldDoneMsg")
+    }
+    catch (err) {
+        return reject(err)
+    }
+})
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) => state.plugins.reduce(
     (retval: Task.t|undefined, pluginInfo: ParsedPluginInfo.t) => 
@@ -347,7 +352,9 @@ const addOperations = (cliConfig: CLIConfig, config: LoadedConfig.t, _env: EnvVa
             })
         },
         (argv: Arguments) => pipe(
-            addNewProvision(SanitizedArgs.provisionArgs(argv), config, state),
+            SanitizedArgs.of(argv),
+            chain(SanitizedArgs.makeProvisionArgs),
+            chain(inputArgs => addNewProvision(inputArgs, config, state)),
             map(() => "Added provision to .taq/provisions.ts"),
             forkCatch (console.error) (console.error) (log)
         )
@@ -602,23 +609,23 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
             (cliConfig: CLIConfig) => pipe(
                 cliConfig,
                 parseArgs,
-                map (SanitizedArgs.create),
+                chain(SanitizedArgs.of),
                 chain (initArgs => {
                     if (initArgs.debug) debugMode(true)
 
                     if (initArgs.version) {
                         log(initArgs.setVersion)
-                        return resolve(initArgs)
+                        return resolve(initArgs) as Future<TaqError.t, SanitizedArgs.t>
                     }
                     else if (initArgs.build) {
                         log(initArgs.setBuild)
-                        return resolve(initArgs)
+                        return resolve(initArgs) as Future<TaqError.t, SanitizedArgs.t>
                     }
                     return initArgs._.includes('init') || 
                         initArgs._.includes('testFromVsCode') ||
                         initArgs._.includes('scaffold')
-                        ? resolve(initArgs)
-                        : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
+                        ? resolve(initArgs) as Future<TaqError.t, SanitizedArgs.t>
+                        : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n) as Future<TaqError.t, SanitizedArgs.t>
                 }),
                 forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (identity)
             )
@@ -660,6 +667,9 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError.t) => {
             .with({kind: 'E_GIT_CLONE_FAILED'},err              => [10, `${err.msg}: ${err.context}`])
             .with({kind: 'E_INVALID_ARGS'}, err                 => [11, err.msg])
             .with({kind: 'E_PROVISION'}, err                    => [12, err.msg])
+            .with({kind: 'E_PARSE'}, err                        => [13, err.msg])
+            .with({kind: 'E_PARSE_UNKNOWN'}, err                => [14, err.msg])
+            .with({kind: 'E_INVALID_ARCH'}, err                 => [15, err.msg])
             .with({message: __.string}, err                     => [128, err.message])
             .exhaustive()
         

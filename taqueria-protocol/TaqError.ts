@@ -1,3 +1,6 @@
+import {ZodError} from "zod"
+import {reject, map} from "fluture"
+
 export type ErrorType = 
   | "E_INVALID_PATH_DOES_NOT_EXIST"
   | "E_INVALID_PATH_ALREADY_EXISTS"
@@ -12,11 +15,14 @@ export type ErrorType =
   | "E_MKDIR_FAILED"
   | "E_GIT_CLONE_FAILED"
   | "E_PROVISION"
+  | "E_PARSE"
+  | "E_PARSE_UNKNOWN"
+  | "E_INVALID_ARCH"
   
 export interface TaqError {
     readonly kind: ErrorType,
     msg: string,
-    previous?: TaqError | Error
+    previous?: TaqError | Error | unknown
     context?: unknown
 }
 
@@ -35,3 +41,25 @@ export class E_TaqError extends Error {
       this.previous = taqErr.previous
   }
 }
+
+export const toParseErr = <T>(previous: ZodError, msg: string, context?: unknown)  => {
+  const taqErr: TaqError = {
+    kind: "E_PARSE",
+    msg: msg,
+    context,
+    previous
+  }
+  return reject(taqErr).pipe(map((val: unknown) => val as T))
+}
+
+export const toParseUnknownErr = <T>(previous: Error|TaqError|E_TaqError|unknown, msg: string, context?: unknown) => {
+  const taqErr: TaqError = {
+    kind: "E_PARSE_UNKNOWN",
+    msg: msg,
+    context,
+    previous
+  }
+  return reject(taqErr).pipe(map((val: unknown) => val as T))
+}
+
+export const create = (err: TaqError) => err

@@ -1,5 +1,7 @@
-import {z} from 'zod'
+import {z, ZodError} from 'zod'
 import * as PublicKeyHash from "@taqueria/protocol/PublicKeyHash"
+import {resolve, reject} from 'fluture'
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 
 const internalSchema = z.object({
     pkh: PublicKeyHash.schema,
@@ -39,6 +41,17 @@ export type Faucet = Input & {
 
 export type t = Faucet
 
-export const make = (data: Input) => schema.parse(data)
+export const make = (data: Input) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<Faucet>(err, `The provided faucet is invalid.`, data)
+        }
+        return toParseUnknownErr<Faucet>(err, "There was a problem trying to parse the faucet configuration", data)
+    }
+}
 
 export const create = (data: RawInput) => schema.parse(data)

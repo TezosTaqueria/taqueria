@@ -1,9 +1,9 @@
 import { assertEquals, assertRejects, unreachable, assert } from "https://deno.land/std@0.121.0/testing/asserts.ts";
-import {fork} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {fork} from 'fluture';
 import {inject} from "../../../taqueria-utils/taqueria-utils.ts";
 import chai from "https://cdn.skypack.dev/chai@4.3.4?dts";
 import { exists} from "https://deno.land/std@0.132.0/fs/mod.ts";
-import {TaqError} from "../../../taqueria-utils/taqueria-utils-types.ts";
+import * as TaqError from "@taqueria/protocol/TaqError"
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 import {MockWriter} from "../helpers.ts"
 const {
@@ -203,7 +203,8 @@ Deno.test("execText() can execute in a different working directory", async () =>
     stdOut.clear()
     stdErr.clear()
 
-    const retval = await toPromise ( execText("pwd", {}, false, SanitizedAbsPath.make("/tmp") ) )
+    const tmpAbspath = await toPromise (SanitizedAbsPath.make("/tmp"))
+    const retval = await toPromise ( execText("pwd", {}, false, tmpAbspath ) )
     assertEquals(retval, 0)
     assert(stdout.toString().includes('tmp'))
     assertEquals(stderr.toString(), "")    

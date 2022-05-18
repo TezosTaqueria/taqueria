@@ -1,4 +1,6 @@
-import {z} from 'zod'
+import {z, ZodError} from 'zod'
+import {resolve, reject} from "fluture"
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 import * as Verb from '@taqueria/protocol/Verb'
 import * as Command from '@taqueria/protocol/Command'
 import * as Option from '@taqueria/protocol/Option'
@@ -64,6 +66,17 @@ export type Operation = Input & {
 
 export type t = Operation
 
-export const make = (data: Input) => schema.parse(data)
+export const make = (data: Input) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<Operation>(err, `The provided operation is invalid.`, data)
+        }
+        return toParseUnknownErr<Operation>(err, "There was a problem trying to parse the operation", data)
+    }
+}
 
 export const create = (data: RawInput | unknown | Record<string, unknown>) => schema.parse(data)

@@ -1,9 +1,11 @@
-import {z} from 'zod'
+import {z, ZodError} from 'zod'
 import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin'
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig'
 import * as SandboxConfig from "@taqueria/protocol/SandboxConfig"
 import * as Environment from "@taqueria/protocol/Environment"
 import * as Tz from "@taqueria/protocol/Tz"
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {resolve, reject} from "fluture"
 
 const networkMap = z
     .record(
@@ -39,7 +41,7 @@ const environmentMap = z
     .optional()
 
 const accountsMap = z.preprocess(
-    val => val ?? {
+    (val: unknown) => val ?? {
         "bob": "5_000_000_000",
         "alice": "5_000_000_000",
         "john": "5_000_000_000",
@@ -54,11 +56,11 @@ const commonSchema = z.object({
     language: z
         .union([z.literal('en'), z.literal('fr')], {description: "config.language"})
         .optional()
-        .transform(val => val ?? 'en'),
+        .transform((val: unknown) => val ?? 'en'),
     plugins: z
         .array(InstalledPlugin.schema, {description: "config.plugins"})
         .optional()
-        .transform(val => val ?? []),
+        .transform((val: unknown) => val ?? ([] as InstalledPlugin.t[])),
     testsDir: z
         .preprocess(
             (val: unknown) => val ?? "tests",
@@ -111,9 +113,10 @@ export const rawSchema = commonSchema.extend({
             z.union([
                 SandboxConfig.rawSchema,
                 z.string({description: "config.sandbox"})
-            .nonempty("Default sandbox must reference the name of an existing sandbox configuration.")
+                .nonempty("Default sandbox must reference the name of an existing sandbox configuration.")
             ])
-        ),
+        )
+        .optional(),
     environment: z
         .record(
             z.union([
@@ -131,7 +134,7 @@ export const rawSchema = commonSchema.extend({
         .optional()
 }).describe("config")
 
-export const schema = internalSchema.transform(val => val as t)
+export const schema = internalSchema.transform((val: unknown) => val as t)
 
 const configType: unique symbol = Symbol("Config")
 
@@ -141,10 +144,25 @@ type RawInput = z.infer<typeof rawSchema>
 
 export type t = Input & {
     readonly [configType]: void
+    readonly contractsDir: string
+    readonly artifactsDir: string
+    readonly testsDir: string
+    readonly plugins: InstalledPlugin.t[]
 }
 
 export type Config = t
 
-export const make = (data: Input) => schema.parse(data)
+export const make = (data: Input) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<Config>(err, `The provided config is invalid.`, data)
+        }
+        return toParseUnknownErr<Config>(err, 'There was a problem trying to parse the Taqueria configuration', data)
+    }
+}
 
 export const create = (data: RawInput | Record<string, unknown>) => schema.parse(data)

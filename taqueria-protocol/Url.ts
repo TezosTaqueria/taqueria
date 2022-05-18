@@ -1,4 +1,6 @@
-import {z} from 'zod'
+import {z, ZodError} from 'zod'
+import {resolve, reject} from "fluture"
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 
 const urlType: unique symbol = Symbol('Url')
 
@@ -16,7 +18,18 @@ export type Url =  Input & {
 
 export type t = Url
 
-export const make = (value: string) => schema.parse(value)
+export const make = (value: string) => {
+    try {
+        const retval = schema.parse(value)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<Url>(err, `${value} is not a valid url`, value)
+        }
+        return toParseUnknownErr<Url>(err, "There was a problem trying to parse the url", value)
+    }
+}
 
 export const toComponents = (url: Url) => {
     const parts = new URL(url)

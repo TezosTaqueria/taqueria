@@ -1,4 +1,6 @@
-import {z} from "zod"
+import {z, ZodError} from "zod"
+import {reject, resolve} from "fluture"
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 import * as Provisioner from "@taqueria/protocol/Provisioner"
 
 const getAllProvisionerIds = (input: Provisioner.RawInput[]) => input.reduce(
@@ -11,9 +13,7 @@ const rawSchema = z
         Provisioner.rawSchema
     )
     .describe("Provisions")
-
-const noop = (_input: unknown) => {}    
-
+    
 type RawInput = z.infer<typeof rawSchema>
 export type Provisions = RawInput
 export type t = Provisions
@@ -37,5 +37,31 @@ export const schema = z
         "The depends_on property of a provision must refer to another provision"
     )
     .transform(val => val as Provisions)
+
+export const make = (data: RawInput) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<Provisions>(err, `The provided provisions is invalid.`, data)
+        }
+        return toParseUnknownErr<Provisions>(err, "There was a problem trying to parse the provisions", data)
+    }
+}
+
+export const of = (data: RawInput | Record<string, unknown> | unknown) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<Provisions>(err, `The provided provisions is invalid.`, data)
+        }
+        return toParseUnknownErr<Provisions>(err, "There was a problem trying to parse the provisions", data)
+    }
+}
 
 export const create = (input: RawInput | Record<string, unknown> | unknown) =>  schema.parse(input) as Provisions

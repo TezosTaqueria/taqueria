@@ -1,4 +1,6 @@
-import {z} from 'zod'
+import {z, ZodError} from 'zod'
+import {reject, resolve} from "fluture"
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 
 export const rawSchema = z.object({
     networks: z.array(
@@ -28,4 +30,15 @@ export type Environment = Input & {
 
 export type t = Environment
 
-export const make = (data: Input) => schema.parse(data)
+export const make = (value: Input) => {
+    try {
+        const retval = schema.parse(value)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<Environment>(err, `The provided environment is invalid`, value)
+        }
+        return toParseUnknownErr<Environment>(err, "There was a problem trying to parse the environment configuration", value)
+    }
+}

@@ -4,7 +4,7 @@ import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 import * as Url from "@taqueria/protocol/Url"
 import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
-import {TaqError} from '../../taqueria-utils/taqueria-utils-types.ts'
+import * as TaqError from "@taqueria/protocol/TaqError"
 import {toPromise} from "../../taqueria-utils/taqueria-utils.ts"
 import { assertEquals, assert, assertRejects} from "https://deno.land/std@0.127.0/testing/asserts.ts";
 import type {i18n} from '@taqueria/protocol/i18n'
@@ -12,7 +12,7 @@ import loadI18n from '@taqueria/protocol/i18n'
 import {MockWriter} from "./helpers.ts"
 
 Deno.test('inject()', async (t) => {
-    const projectDir = SanitizedAbsPath.make("/tmp/test-project")
+    const projectDir = await toPromise (SanitizedAbsPath.make("/tmp/test-project"))
 
     const sanitizedArgs = SanitizedArgs.create({
         _: ["init"],
@@ -31,9 +31,10 @@ Deno.test('inject()', async (t) => {
         help: false
     })
 
+    const taqDir = await toPromise (SanitizedAbsPath.make(`${projectDir}/.taq`))
     const config = await toPromise (toLoadedConfig(
         "config.json",
-        SanitizedAbsPath.make(`${projectDir}/.taq`),
+        taqDir,
         defaultConfig
     ))
 
@@ -200,10 +201,14 @@ Deno.test('inject()', async (t) => {
     // appropriate tests for getPluginExe
     // No issue exists for this as it only come up when we decide to implement
     // a plugin that isn't an NPM package.
-    await t.step("getPluginExe() returns the correct command to invoke an NPM script", () => {
+    await t.step("getPluginExe() returns the correct command to invoke an NPM script", async () => {
         const {getPluginExe} = pluginLib.__TEST__
+        const installedPlugin = await toPromise (InstalledPlugin.make({
+            name: "@taqueria/plugin-ligo",
+            type: "npm"
+        }))
 
-        const output = getPluginExe({name: "@taqueria/plugin-ligo", type: "npm"})
+        const output = getPluginExe(installedPlugin)
         assertEquals(output, ["node", "/tmp/test-project/node_modules/@taqueria/plugin-ligo/index.js"])
     })
 
@@ -214,10 +219,10 @@ Deno.test('inject()', async (t) => {
     await t.step("logPluginRequests() outputs the call to a plugin", async () => {
         const {toPluginArguments, logPluginRequest} = pluginLib.__TEST__
 
-        const plugin : InstalledPlugin.t = {
+        const plugin = await toPromise (InstalledPlugin.make({
             name: "@taqueria/plugin-ligo",
             type: "npm"
-        }
+        }))
         const pluginArgs = toPluginArguments({})
 
         const expected = [

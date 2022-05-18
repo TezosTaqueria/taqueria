@@ -3,18 +3,18 @@ import type {InstalledPlugin, PluginAction, PluginResponse} from './taqueria-pro
 import {EphemeralState, SanitizedArgs, ParsedPluginInfo} from './taqueria-protocol/taqueria-protocol-types.ts'
 import type {PluginRequestArgs, PluginDeps} from './taqueria-types.ts'
 import {LoadedConfig} from './taqueria-types.ts'
-import {TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
+import * as TaqError from "@taqueria/protocol/TaqError"
 import * as utils from './taqueria-utils/taqueria-utils.ts'
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 
 // Third-party dependencies
-import {map, chain, attemptP, chainRej, resolve, reject, parallel} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {FutureInstance as Future, map, chain, attemptP, chainRej, resolve, reject, parallel} from 'fluture';
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {copy} from 'https://deno.land/std@0.128.0/streams/conversion.ts'
 import clipboard from 'https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts'
 
 // Get utils
-const {joinPaths, readJsonFile, writeTextFile, decodeJson} = utils.inject({
+const {joinPaths, readJsonFile, writeTextFile, decodeJson, eager} = utils.inject({
     stdout: Deno.stdout,
     stderr: Deno.stderr
 })
@@ -32,7 +32,7 @@ export const inject = (deps: PluginDeps) => {
     // Logs a request to a plugin to stdout if logPluginRequests has been
     // set to true for parsedArgs
     // logPluginRequest
-    const logPluginRequest = (plugin: InstalledPlugin.t) => (cmd: (string|number|boolean)[]) : Future.t<TaqError.t, void> => 
+    const logPluginRequest = (plugin: InstalledPlugin.t) => (cmd: (string|number|boolean)[]) : Future<TaqError.t, void> => 
         attemptP(async () => {
             if (parsedArgs.logPluginRequests)  {
                 const encoder = new TextEncoder()
@@ -53,7 +53,7 @@ export const inject = (deps: PluginDeps) => {
     }
 
     // Invokes a command which will 
-    const execPluginText = (cmd: string[]) : Future.t<TaqError.t, string> => attemptP(
+    const execPluginText = (cmd: string[]) : Future<TaqError.t, string> => attemptP(
         async () => {
             let status = undefined
             try {
@@ -83,7 +83,7 @@ export const inject = (deps: PluginDeps) => {
     
     // Invokes a command which will print to stdout and stderr
     // execPluginPassthru: string[] -> Future<TaqError, Deno.Process>
-    const execPluginPassthru = (cmd: string[]) : Future.t<TaqError.t, Deno.Process> => attemptP(
+    const execPluginPassthru = (cmd: string[]) : Future<TaqError.t, Deno.Process> => attemptP(
         async () => {
             try {
                 const process = Deno.run({cmd, stdout: "piped", stderr: "piped"})
@@ -107,7 +107,7 @@ export const inject = (deps: PluginDeps) => {
     
     // Invokes a command which is expected to return JSON on stdout
     // execPluginJson: string[] -> Future<TaqError, PluginResponse>
-    const execPluginJson = (cmd: string[]) : Future.t<TaqError.t, PluginResponse> => pipe(
+    const execPluginJson = (cmd: string[]) : Future<TaqError.t, PluginResponse> => pipe(
         execPluginText(cmd),
         chain<TaqError.t, string, PluginResponse>(decodeJson)
     )
@@ -134,7 +134,7 @@ export const inject = (deps: PluginDeps) => {
 
     // Sends a request to a plugin for a particular action
     // sendPluginActionRequest: InstalledPlugin -> PluginAction -> Record<string, unknown> -> Future<TaqError, PluginResponse>
-    const sendPluginActionRequest = (plugin: InstalledPlugin.t) => (action: PluginAction) => (requestArgs: Record<string, unknown>) : Future.t<TaqError.t, PluginResponse> => {
+    const sendPluginActionRequest = (plugin: InstalledPlugin.t) => (action: PluginAction) => (requestArgs: Record<string, unknown>) : Future<TaqError.t, PluginResponse> => {
         const cmd = [
             ...getPluginExe(plugin),
             '--taqRun', typeof action === 'string' ? action : "proxy",
@@ -229,20 +229,24 @@ export const inject = (deps: PluginDeps) => {
     // getComputedState: () -> Future<TaqError, State>
     const getComputedState = () => pipe(
         retrieveAllPluginInfo(),
-        map ((pluginInfo: ParsedPluginInfo.t[]) => 
-            EphemeralState.make ({
+        chain ((pluginInfo: ParsedPluginInfo.t[]) => attemptP(async () => {
+            return await eager (EphemeralState.make ({
                 build: parsedArgs.setBuild,
                 configHash: config.hash,
                 plugins: pluginInfo,
-                tasks: EphemeralState.mapTasksToPlugins(LoadedConfig.toConfig(config), pluginInfo, i18n),
-                operations: EphemeralState.mapOperationsToPlugins(LoadedConfig.toConfig(config), pluginInfo, i18n),
-            })
-        )
+                tasks: await eager (EphemeralState.mapTasksToPlugins(
+                    await eager (LoadedConfig.toConfig(config)), pluginInfo, i18n
+                )),
+                operations: await eager (EphemeralState.mapOperationsToPlugins(
+                    await eager (LoadedConfig.toConfig(config)), pluginInfo, i18n
+                )),
+            }))
+        }))
     )
 
     // Writes the State representation to state.json file
     // writeState: SanitizedAbsPath -> State -> Future<TaqError, State>
-    const writeState = (stateAbspath: SanitizedAbsPath.t) => (state: EphemeralState.t): Future.t<TaqError.t, EphemeralState.t> => pipe(
+    const writeState = (stateAbspath: SanitizedAbsPath.t) => (state: EphemeralState.t): Future<TaqError.t, EphemeralState.t> => pipe(
         JSON.stringify(state, undefined, 4),
         (data: string) => `// WARNING: This file is autogenerated and should NOT be modified\n${data}`,
         writeTextFile(stateAbspath),
@@ -261,7 +265,7 @@ export const inject = (deps: PluginDeps) => {
 
     // Returns the absolute path to the state.json file
     // getStateAbsPath: () -> SanitizedAbsPath
-    const getStateAbspath = () : SanitizedAbsPath.t =>
+    const getStateAbspath = () =>
         SanitizedAbsPath.make(`${parsedArgs.projectDir}/.taq/state.json`)
 
 
@@ -272,8 +276,8 @@ export const inject = (deps: PluginDeps) => {
     // getNonMemoizedState: () -> Future<TaqError, State>
     const getNonMemoizedState = () => pipe(
         parsedArgs,
-        getStateAbspath,
-        stateAbspath => pipe(
+        getStateAbspath,        
+        chain (stateAbspath => pipe(
             !parsedArgs.disableState
                 ? resolve(stateAbspath)
                 : reject("State disabled!"),
@@ -289,7 +293,7 @@ export const inject = (deps: PluginDeps) => {
                     ? resolve(state)
                     : computeState(stateAbspath)
             )
-        )
+        ))
     )
 
     // Gets the State representation of the current config.

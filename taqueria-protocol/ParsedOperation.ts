@@ -1,4 +1,6 @@
-import {z} from "zod"
+import {z, ZodError} from "zod"
+import {resolve, reject} from "fluture"
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 import * as Operation from "@taqueria/protocol/Operation"
 
 const parsedOperationType: unique symbol = Symbol()
@@ -25,6 +27,17 @@ export type t = ParsedOperation
 
 export const schema = internalSchema.transform((val: unknown) => val as ParsedOperation)
 
-export const make = (input: Input) => schema.parse(input)
+export const make = (data: Input) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<ParsedOperation>(err, `The provided operation is invalid.`, data)
+        }
+        return toParseUnknownErr<ParsedOperation>(err, "There was a problem trying to parse the operation", data)
+    }
+}
 
 export const create = (input: RawInput | Record<string, unknown> | unknown) => schema.parse(input)

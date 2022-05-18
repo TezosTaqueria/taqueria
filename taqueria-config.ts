@@ -4,11 +4,11 @@ import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 import * as SHA256 from "@taqueria/protocol/SHA256"
 import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
-import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
+import * as TaqError from "@taqueria/protocol/TaqError"
 import type {i18n} from '@taqueria/protocol/i18n'
-import {readJsonFile, writeJsonFile, joinPaths, ensureDirExists} from './taqueria-utils/taqueria-utils.ts'
+import {readJsonFile, writeJsonFile, joinPaths, ensureDirExists, eager} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {resolve, reject, attemptP, map, chain, mapRej, chainRej, both} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import {FutureInstance as Future, resolve, reject, attemptP, map, chain, mapRej, chainRej, both} from 'fluture'
 
 export type AddTaskCallback = (task: Task.t, plugin: InstalledPlugin.t, handler: (taskArgs: Record<string, unknown>) => Promise<number>) => unknown
 
@@ -51,7 +51,7 @@ export const defaultConfig : Config.t = Config.create({
 
 export const getDefaultMaxConcurrency = () => 10
 
-export const getConfigPath = (projectDir: SanitizedAbsPath.t, create=false) : Future.t<TaqError.t, string> => pipe(
+export const getConfigPath = (projectDir: SanitizedAbsPath.t, create=false) : Future<TaqError.t, string> => pipe(
     joinPaths(projectDir, '.taq'),
     abspath => create ? ensureDirExists(abspath): resolve(abspath),
     map (abspath => joinPaths(abspath, 'config.json'))
@@ -76,14 +76,16 @@ export const getRawConfig = (projectDir: SanitizedAbsPath.t, create=false) => pi
 )
 
 
-export const toLoadedConfig = (configPath: string, projectDir: SanitizedAbsPath.t, config: Config.t): Future.t<TaqError.t, LoadedConfig.t> => pipe(
+export const toLoadedConfig = (configPath: string, projectDir: SanitizedAbsPath.t, config: Config.t): Future<TaqError.t, LoadedConfig.t> => pipe(
     attemptP<TaqError.t, SHA256.t>(() => SHA256.of(JSON.stringify(config))),
-    map(hash => LoadedConfig.make({
-        ...config,
-        configFile: SanitizedAbsPath.make(configPath),
-        projectDir,
-        hash
-    }))
+    chain (hash => 
+        attemptP<TaqError.t, LoadedConfig.t>(async () => await eager (LoadedConfig.make({
+            ...config,
+            configFile: await eager (SanitizedAbsPath.make(configPath)),
+            projectDir,
+            hash
+        })))
+    )
 )
 
 export const getConfig = (projectDir: SanitizedAbsPath.t, _i18n: i18n, create=false) => pipe(

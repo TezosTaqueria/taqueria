@@ -1,4 +1,6 @@
-import {z} from 'zod'
+import {z, ZodError} from 'zod'
+import {reject, resolve} from 'fluture'
+import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 import * as Verb from '@taqueria/protocol/Verb'
 import * as SingleChar from '@taqueria/protocol/SingleChar'
 
@@ -34,7 +36,7 @@ export const rawSchema = z.object({
     boolean: z.boolean({description: "Option Is Boolean"}).default(false).optional()
 }).describe("Option")
 
-export const schema = internalSchema.transform(val => val as t)
+export const schema = internalSchema.transform(val => val as Option)
 
 const optionType: unique symbol = Symbol("Option")
 
@@ -42,11 +44,22 @@ type Input = z.infer<typeof internalSchema>
 
 export type RawInput = z.infer<typeof rawSchema>
 
-export type t = Input & {
+export interface Option extends Input {
     readonly [optionType]: void
 }
 
-export type Option = t
+export type t = Option
 
-export const make = (data: Input) => schema.parse(data)
+export const make = (data: Input) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<Option>(err, `The provided option is invalid.`, data)
+        }
+        return toParseUnknownErr<Option>(err, "There was a problem trying to parse the option", data)
+    }
+}
 export const create = (data: RawInput) => schema.parse(data)

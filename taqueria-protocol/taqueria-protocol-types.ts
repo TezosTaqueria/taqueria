@@ -2,8 +2,6 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath'
 import * as SanitizedPath from '@taqueria/protocol/SanitizedPath'
 import * as SHA256 from '@taqueria/protocol/SHA256'
 import * as Url from '@taqueria/protocol/Url'
-import * as StringMax30 from '@taqueria/protocol/StringMax30'
-import * as StringNoSpaces from '@taqueria/protocol/StringNoSpaces'
 import * as Verb from "@taqueria/protocol/Verb"
 import * as EconomicalProtocolHash from '@taqueria/protocol/EconomicalProtocolHash'
 import * as NetworkConfig from "@taqueria/protocol/NetworkConfig"
@@ -28,6 +26,7 @@ import * as RequestArgs from "@taqueria/protocol/RequestArgs"
 import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
 import * as PersistentState from "@taqueria/protocol/PersistentState"
 import * as i18n from "@taqueria/protocol/i18n"
+import * as TaqError from "@taqueria/protocol/TaqError"
 export interface RuntimeDependency {
     readonly name: string,
     readonly path: string,
@@ -69,8 +68,7 @@ export {
     SanitizedPath,
     SanitizedAbsPath,
     SHA256,
-    StringMax30,
-    StringNoSpaces,
+    TaqError,
     Verb,
     EconomicalProtocolHash,
     Url,

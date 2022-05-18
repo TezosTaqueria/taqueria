@@ -1,5 +1,5 @@
 import {execCmd, getArch, sendAsyncErr, sendJsonRes, sendErr} from '@taqueria/node-sdk'
-import {RequestArgs, PluginResponse, Failure, LikeAPromise} from "@taqueria/node-sdk/types";
+import {RequestArgs, PluginResponse, LikeAPromise} from "@taqueria/node-sdk/types";
 import {extname, basename, join} from 'path'
 import glob = require('fast-glob')
 
@@ -63,7 +63,7 @@ const compileAll = (parsedArgs: Opts): Promise<{contract: string, artifact: stri
     .then(promises => Promise.all(promises))
 }
 
-export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
+export const compile = (parsedArgs: Opts): Promise<PluginResponse> => {
     const p = parsedArgs.sourceFile
         ? compileContract (parsedArgs) (parsedArgs.sourceFile as string)
             .then(result => [result])
