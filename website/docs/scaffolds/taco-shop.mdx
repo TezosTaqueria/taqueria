@@ -5,7 +5,7 @@ title: Taco Shop Scaffold
 |                  |                         |         
 |------------------|-------------------------|
 | complexity       | beginner                |
-| frontend app     | yes                     |
+| frontend dApp    | yes                     |
 | automated tests  | yes                     |
 | plugins          | LIGO, Taquito, Flextesa |
 
@@ -21,9 +21,9 @@ Run the following commands to get up and running immediatley:
 
 ## Overview
 
-This scaffold implements a simple full stack Tezos project. It has a simple React app that interacts with a smart contract which stores the number of available_tacos and provides a function to buy tacos
+This scaffold implements a simple full stack Tezos project. It has a simple React dApp that interacts with a smart contract which stores the number of available_tacos and provides a function to buy tacos
 
-The React app uses Beacon Wallet to interact with Tezos wallets in the browser and once connected, will display the number of available_tacos stored on-chain in the smart contract. There is also a basic interface which allows the user to buy tacos by sending a transaction to the smart contract with the number_of_tacos_to_buy as a parameter
+The React dApp uses Beacon Wallet to interact with Tezos wallets in the browser and once connected, will display the number of available_tacos stored on-chain in the smart contract. There is also a basic interface which allows the user to buy tacos by sending a transaction to the smart contract with the number_of_tacos_to_buy as a parameter
 
 The smart contract has been deployed to ithacanet at the address for demonstration purposes: `KT1KBBk3PXkKmGZn3K6FkktqyPRpEbzJoEPE`
 
@@ -33,12 +33,12 @@ The project comes pre-configured with the following:
 - A LIGO smart contract `hello-tacos.mligo`  
 - A network configuration for the Ithaca testnet
 - A faucet file to fund operations on the testnet
-- An environment named ithacanet
+- An environment named `ithacanet`
 
 ***Coming soon***
 
 - Native Taqueria testing (Taqueria Jest plugin)
-- Passing the deployed contract address to the React app via the State API
+- Passing the deployed contract address to the React dA via the State API
 - Deploying the contract using Taqueria operations
 - Targeting a specific network for contract deployment and testing (sandboxes and testnets)
 - Deploying the contract to mainnet
@@ -49,14 +49,15 @@ The project comes pre-configured with the following:
 - Docker v0.9 or later
 - Node.js v16 or later
 - Beacon or Kukai Wallet
-- A testnet account funded with a [faucet](https://teztnets.xyz)  
+- A funded testnet account
+- A [faucet file](https://teztnets.xyz)   
 
 ## Project Overview
 
 ## Project Structure
 
 - `/.taq` - This hidden folder stores the project configuration and State
-- `/app` - This is the React app
+- `/dA` - This is the React dA
 - `/contracts` - This folder contains the LIGO smart contracts
 - `/tests` - This folder contains the tests
 - `/artifacts` - This folder contains the compiled Michelson `.tz` contracts
@@ -78,14 +79,14 @@ let main (tacos_to_buy, available_tacos: tacos_to_buy * available_tacos): operat
 
 **Coming soon with the Taqueria Jest plugin**
 
-### React App
+### React dA
 
-The React app retrieves the number of available tacos from the smart contract and displays the value. It provides an interface for the user to buy tacos and looks like this:
+The React dApp retrieves the number of available tacos from the smart contract and displays the value. It provides an interface for the user to buy tacos and looks like this:
 
 <img src={useBaseUrl('/img/hello-tacos-screenshot.png')} />
 
 :::note
-In order for the React app to connect to the smart contract, the contract must be deployed to the testnet and the returned address of the contract must be added to the `/app/index.tsx` file. The scaffold comes pre-configured with the address of the deployed contract for demonstration purposes but it is recommended that you add your own faucet file, then re-deploy the contract and update the references to it in the project for your own use
+In order for the React dA to connect to the smart contract, the contract must be deployed to the testnet and the returned address of the contract must be added to the `/dA/index.tsx` file. The scaffold comes pre-configured with the address of the deployed contract for demonstration purposes but it is recommended that you add your own faucet file, then re-deploy the contract and update the references to it in the project for your own use
 
 This will be fixed in the future when contract addresses will be passed via the State API dynamically
 :::
@@ -133,8 +134,8 @@ The intended workflow for this project is as follows:
 
 1. Compile the LIGO source code
 2. Originate the smart contract to the testnet
-3. Insert the returned contract address into the React app
-4. Build and start the React app
+3. Insert the returned contract address into the React dA
+4. Build and start the React dA
 5. Connect to Temple wallet
 6. Buy tacos!
 
@@ -170,10 +171,10 @@ This scaffold comes with a pre-configured faucet file for the testnet which is s
 
 ### Insert the Contract Address
 
-Now that the contract has been deployed, you need to insert the address of the contract into the `/app/index.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/index.tsx` file as shown here:
+Now that the contract has been deployed, you need to insert the address of the contract into the `/dA/index.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/dA/index.tsx` file as shown here:
 
-```ts /app/src/App.tsx
-function App() {
+```ts /dA/src/dA.tsx
+function dA() {
   const [rpcUrl, setRpcUrl] = useState("https://ithacanet.ecadinfra.com");
   const [contractAddress, setContractAddress] = useState(
     "KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3"
@@ -185,12 +186,50 @@ function App() {
   const [connected, setConnected] = useState(false);
 ```
 
-### Build and Start the React App
+### Build and Start the React dA
 
-Now that the contract has been deployed and the address added to the app, you can build and start the React app:
+Now that the contract has been deployed and the address added to the dA, you can build and start the React dA
+
+Change into the `/dA` directory:
 
 ```shell
-cd 
+cd dA
 ```
 
-- **** Coming soon with the State API *****
+Install dependencies:
+
+```shell
+npm install
+```
+
+Build the React dA:
+
+```shell
+npm run build
+```
+
+Start and serve the dA:
+
+```shell 
+npm run start
+```
+
+You should now be able to access the Taco shop dApp at `http://localhost:3000/`
+
+### Connect to Temple Wallet
+
+Open a browser and navigate to `http://localhost:3000/`
+
+You should see the number of `available_tacos` displayed
+
+Click on the `Connect wallet` button in the top right corner of the page and select `Temple Wallet`
+
+Provide your credentials for the wallet, select a funded account, and click `connect`
+
+### Buy Tacos
+
+With your wallet connected, you can now interact with the contract entrypoint
+
+Click the `order` button and then authorize the transaction in Temple Wallet
+
+Once completed, you will see the value of `available_tacos` decrease in the dApp by the number of tacos you order
