@@ -355,7 +355,7 @@ const addOperations = (cliConfig: CLIConfig, config: LoadedConfig.t, _env: EnvVa
             SanitizedArgs.of(argv),
             chain(SanitizedArgs.makeProvisionArgs),
             chain(inputArgs => addNewProvision(inputArgs, config, state)),
-            map(() => "Added provision to .taq/provisions.ts"),
+            map(() => "Added provision to .taq/provisions.json"),
             forkCatch (console.error) (console.error) (log)
         )
     ).alias('create-op', 'new op')

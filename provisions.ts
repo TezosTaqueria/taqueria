@@ -98,7 +98,7 @@ const newProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, state: EphemeralS
 
 export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, config: LoadedConfig.t, state: EphemeralState.t) => attemptP(async () => {
     try {
-        const provisionAbspath = await eager (SanitizedAbsPath.make(joinPaths(config.projectDir, ".taq", "provisions.ts")))
+        const provisionAbspath = await eager (SanitizedAbsPath.make(joinPaths(config.projectDir, ".taq", "provisions.json")))
         const provision = await eager (newProvision(parsedArgs, state))
         const provisions = await eager (addProvision(provision, provisionAbspath))
         return provisions
