@@ -225,14 +225,14 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [macos-latest]
         chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
         include:
-        - os: ubuntu-latest
-          url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
-          final-name: taq
-          make-executable-cmd: chmod +x
-          get-current-dir: echo "$(pwd)"
+        # - os: ubuntu-latest
+        #   url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
+        #   final-name: taq
+        #   make-executable-cmd: chmod +x
+        #   get-current-dir: echo "$(pwd)"
         - os: macos-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
@@ -260,7 +260,7 @@ jobs:
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
       - name: setup-docker
-        uses: docker-practice/actions-setup-docker@1.0.9
+        uses: docker-practice/actions-setup-docker@latest
 
       - name: build binary and make executable
         if: ${{ github.event.pull_request.head.repo.fork }}
