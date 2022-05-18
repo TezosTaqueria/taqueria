@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "devDependencies": {
+    "@taquito/signer": "^12.1.0",
     "@taquito/taquito": "^12.1.0",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.8",
