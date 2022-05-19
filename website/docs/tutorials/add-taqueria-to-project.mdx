@@ -2,25 +2,63 @@
 title: Using Taqueria on an Existing Project
 ---
 
-## Starter Project Overview
+Taqueria can be added to existing Tezos projects. This tutorial will guide you through the process of adding Taqueria to an existing project called Hello Tacos
+
+The Hello Tacos starter, like most Tezos projects, requires the developer to install, manage, and run commands on a variety of frameworks and tools in order to accomplish things like compiling smart contracts, running tests, managing sandboxes, and originating contracts on the blockchain. Taqueria manages these tasks and tools for you, providing a simple interface to turbocharge your development process
+
+This tutorial will walk you through the steps of adding Taqueria to an existing project and using Taqueria plugins to compile, test, and deploy smart contracts to a local sandbox and testnet environments
+
+Things you will accomplish:
+- Add and initialize Taqueria on the project
+- Install Taqueria plugins for LIGO, Flextesa, and Taquito
+- Configure sandboxes, networks, and Environments
+- Refactor tests to use Taqueria's powerful tools
+- Use the Taqueria State API to link your smart contracts to your dApp 
+
+## Requirements
+
+- Taqueria v0.3.0 or later
+- Node.js v16.0 or later
+- Docker v0.9 or later
+
+## Introduction
+
+Hello Tacos is a hello world type project that demonstrates a simple full stack Tezos dApp. The dApp is composed of a simple React app that interacts with a smart contract written in the LIGO language and uses Beacon Wallet to connect to browser based wallets. The smart contract stores a value for the number of available tacos and provides a function to buy tacos
+
+
+
+
 
 ## Scaffolding the Starter Project
 
+
+
 ```shell
-taq scaffold https://github.com/ecadlabs/taqueria-scaffold-hello-tacos-tutorial hello-taco
+taq scaffold https://github.com/ecadlabs/taqueria-scaffold-hello-tacos-tutorial hello-tacos
 ```
 
-## Adding Taqueria to the Project
+## Exploring the project
+
+## Taq'ifying the Project
+
+
 
 ### Initializing the Project
 
+
+
 ### Installing Plugins
+
+
 
 ## Refactoring the Project
 
-### Removing and Updating Scripts
 
-### Updating Tests
+
+
+### Updating Tests to Use Taqueria
+
+*** Coming Soon!
 
 ### Implementing the Taqueria State API
 
