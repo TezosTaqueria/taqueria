@@ -322,7 +322,7 @@ jobs:
       - uses: ravsamhq/notify-slack-action@v1
         with:
           notification_title: "Failure in the e2e Tests"
-          status: ${{ job.status }} # required
+          status: ${{ needs.run-tests.result }} # required
           notify_when: 'failure'
           message_format: '{emoji} ${{ github.actor }}, *{workflow}* {status_message}, please investigate: <{run_url}|Failing Run>'
         env:
