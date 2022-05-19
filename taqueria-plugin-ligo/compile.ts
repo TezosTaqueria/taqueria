@@ -19,11 +19,20 @@ const getInputFilename = (opts: Opts) => (sourceFile: string) => {
 }
 
 const getCompileCommand = (opts: Opts) => (sourceFile: string) => {
-    const {projectDir} = opts
+    const projectDir = process.env.PROJECT_DIR ??  opts.projectDir
+
+    if (!projectDir) throw `No project directory provided`
+    
     const inputFile = getInputFilename (opts) (sourceFile)
+<<<<<<< HEAD
     const baseCommand = `DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:next compile contract ${inputFile}`
     const entryPoint = opts.entrypoint ? `-e ${opts.entrypoint}` : ""
     const syntax = opts["syntax"] ? `-s ${opts['syntax']} : ""` : ""
+=======
+    const baseCommand = `DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:0.41.0 compile contract ${inputFile}`
+    const entryPoint = opts.e ? `-e ${opts.e}` : ""
+    const syntax = opts["-s"] ? `s ${opts['s']} : ""` : ""
+>>>>>>> 5395aac5 (chore: add environment variable option to compile operation for ligo plugin (#704))
     const outFile = `-o ${getContractArtifactFilename(opts)(sourceFile)}`
     const cmd = `${baseCommand} ${entryPoint} ${syntax} ${outFile}`
     return cmd
