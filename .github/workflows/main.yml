@@ -35,6 +35,7 @@ jobs:
         filters: |
           vscode:
             - 'taqueria-vscode-extension/**'
+  
   build-binaries:
     permissions:
       contents: 'read'
