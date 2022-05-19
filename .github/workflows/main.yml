@@ -15,6 +15,10 @@ on:
 env:
   SCOPE: '@taqueria'
 
+concurrency:
+  group: ${{ github.ref_name || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # When we use reusable we lose the ability to to filter out the workflow for changes to certain paths.
   # This job creates boolean outputs based on path filters. These outputs can then be used as job conditions
