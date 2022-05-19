@@ -202,17 +202,24 @@ jobs:
       test-chunks-formatted: ${{ steps['format-test-chunks'].outputs['test-chunks-formatted'] }}
     steps:
       - uses: actions/checkout@v2
+      
       - uses: actions/setup-node@v2
         with:
           node-version: 16.13.x
+      
+      - name: install dependencies
+        run: npm install jest
+      
       - id: set-test-chunks
         name: Set Chunks
         run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq '[_nwise(length / 4 | ceil)]')"
+      
       - id: set-test-chunk-ids
         name: Set Chunk IDs
         run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq 'to_entries | map(.key)')"
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+      
       - id: format-test-chunks
         name: Format Chunks
         run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS | jq '[.[] | join(" ") | sub("(/home|/Users)/runner/work/taqueria/taqueria/tests/e2e/";"";"g")]')"
@@ -244,10 +251,12 @@ jobs:
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
     steps:
       - uses: actions/checkout@v2
+      
       - uses: actions/setup-node@v2
         with:
           node-version: 16.13.x
           # Setting node version to 16.13.2 to enable integration tests to pass
+      
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "1.18.2"
