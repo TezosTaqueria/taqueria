@@ -2,6 +2,7 @@ import {z, ZodError} from 'zod'
 import {FutureInstance as Future, resolve, promise, mapRej} from "fluture"
 import {TaqError, E_TaqError, toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
 import {TextEncoder} from "util"
+import {Crypto} from "@peculiar/webcrypto"
 
 const eager = <T>(f: Future<TaqError, T>) => promise (
     mapRej ((err: TaqError) => new E_TaqError(err))
@@ -36,6 +37,7 @@ export const make = (value: string) => {
 export const of = async (value: string) => {
     const encoder = new TextEncoder();
     const data = encoder.encode(value)
+    const crypto = new Crypto()
     const hash = await crypto.subtle.digest('SHA-256', data)
     const hashArray = Array.from(new Uint8Array(hash));                     // convert buffer to byte array
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');

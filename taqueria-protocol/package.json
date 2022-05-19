@@ -32,6 +32,7 @@
     "typescript": "4.5.4"
   },
   "dependencies": {
+    "@peculiar/webcrypto": "^1.4.0",
     "batching-toposort": "^1.2.0",
     "fluture": "^14.0.0",
     "remeda": "^0.0.32",

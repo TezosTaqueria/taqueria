@@ -1,4 +1,4 @@
-import { RequestArgs, PluginResponse, Failure, LikeAPromise, Protocol} from "@taqueria/node-sdk/types";
+import { RequestArgs, PluginResponse, TaqError, LikeAPromise, Protocol} from "@taqueria/node-sdk/types";
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { InMemorySigner, importKey } from '@taquito/signer';
 import { getSandboxAccountNames, getCurrentEnvironmentConfig, getNetworkConfig, getSandboxAccountConfig, getInitialStorage, sendErr, getSandboxConfig, getDefaultAccount, sendJsonRes, sendAsyncErr } from "@taqueria/node-sdk";
@@ -184,7 +184,7 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
     
     
 
-export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
+export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
     const env = getCurrentEnvironmentConfig(parsedArgs)
 
     if (!env) {

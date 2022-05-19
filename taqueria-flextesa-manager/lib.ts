@@ -39,7 +39,7 @@ export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
     .then(config => ({...parsedArgs, config}) as SanitizedArgs.t)
 
 export const startMininet = (parsedArgs: SanitizedArgs.t) => {
-    const cmdArgs = [
+    const cmdArgs: string[] = [
         'mini-network',
         '--root /tmp/mini-box',
         '--size 1',
@@ -59,14 +59,16 @@ export const startMininet = (parsedArgs: SanitizedArgs.t) => {
         detached: false,
         shell: true,
         all: true
-    }).all.pipe(process.stderr);
+    })
+    
+    // .all.pipe(process.stderr);
     // return run(cmdArgs.join(' '))
 }
 
 
 export const importAccounts = (opts: SanitizedArgs.t) => {
     const sandbox = opts.config.sandbox[opts.sandbox] as SandboxConfig.t
-    const processes = Object.entries(sandbox.accounts).reduce(
+    const processes = Object.entries(sandbox.accounts || []).reduce(
         (retval, [accountName, accountDetails]) => {
             if (accountName === 'default') return retval
             const account = accountDetails as SandboxAccountConfig.t
@@ -77,7 +79,7 @@ export const importAccounts = (opts: SanitizedArgs.t) => {
                 run(`tezos-client --protocol ${protocol} import secret key ${accountName} ${account.secretKey} --force | tee /tmp/import-key.log`)
             ]
         },
-        []
+        [] as Promise<string>[]
     )
     return Promise.all(processes) as Promise<string[]>
 }
@@ -104,20 +106,20 @@ const addAccount = (accountName: string): Promise<SandboxAccount.t> =>
 
 const getBootstrapFlags = (parsedArgs: SanitizedArgs.t) => {
     const sandboxConfig = (parsedArgs.config.sandbox[parsedArgs.sandbox] as SandboxConfig.t)
-    return Object.entries(sandboxConfig.accounts).reduce(
+    return Object.entries(sandboxConfig.accounts || []).reduce(
         (retval, [accountName, accountDetails]) => {
             if (typeof accountDetails === 'string') return retval
             const account = accountDetails as SandboxAccountConfig.t
             const initialBalance = parsedArgs.config.accounts[accountName]
             return [...retval, `--add-bootstrap-account="${accountName},${account.encryptedKey},${account.publicKeyHash},${account.secretKey}@${initialBalance}"`]
         },
-        []
+        [] as string[]
     )
 }
 
 const getNoDaemonFlags = (parsedArgs: SanitizedArgs.t) => {
     const sandboxConfig = parsedArgs.config.sandbox[parsedArgs.sandbox] as SandboxConfig.t
-    return Object.entries(sandboxConfig.accounts).reduce(
+    return Object.entries(sandboxConfig.accounts || []).reduce(
         (retval, [accountName, _]) => {
             if (accountName === 'default') return retval;
             return [
@@ -125,7 +127,7 @@ const getNoDaemonFlags = (parsedArgs: SanitizedArgs.t) => {
                 `--no-daemons-for=${accountName}`
             ]
         },
-        []
+        [] as string[]
     )
 }
 

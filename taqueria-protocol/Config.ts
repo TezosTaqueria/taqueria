@@ -56,7 +56,7 @@ const commonSchema = z.object({
     language: z
         .union([z.literal('en'), z.literal('fr')], {description: "config.language"})
         .optional()
-        .transform((val: unknown) => val ?? 'en'),
+        .transform((val?: 'en' | 'fr' | string) => val ?? 'en'),
     plugins: z
         .array(InstalledPlugin.schema, {description: "config.plugins"})
         .optional()

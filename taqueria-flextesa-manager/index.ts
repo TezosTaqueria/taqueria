@@ -3,7 +3,7 @@ import yargs from 'yargs'
 import * as SanitizedArgs from "./SanitizedArgs"
 import {configureTezosClient, configureAccounts, importAccounts, startMininet} from "./lib"
 
-const sleep = ms => new Promise((resolve, reject) => {
+const sleep = (ms: number) => new Promise((resolve, reject) => {
     setTimeout(() => {}, ms)
 })
     

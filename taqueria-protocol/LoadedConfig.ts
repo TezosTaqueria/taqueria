@@ -12,7 +12,7 @@ export const rawSchema = Config.internalSchema.extend({
     hash: SHA256.schema.describe("loadedConfig.hash")
 }).describe("LoadedConfig")
 
-const internalSchema = Config.internalSchema.extend({
+export const internalSchema = Config.internalSchema.extend({
     projectDir: SanitizedAbsPath.schema.describe("loadedConfig.projectDir"),
     configFile: SanitizedAbsPath.schema.describe("loadedConfig.configFile"),
     hash: SHA256.schema.describe("loadedConfig.hash")

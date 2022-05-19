@@ -1,10 +1,10 @@
-import { PluginResponse, Failure, LikeAPromise, RequestArgs} from "@taqueria/node-sdk/types";
+import { PluginResponse, TaqError, LikeAPromise, RequestArgs} from "@taqueria/node-sdk/types";
 import { execCmd, sendAsyncJsonRes, sendErr } from "@taqueria/node-sdk";
 import glob from 'fast-glob'
 import {join, basename} from 'path'
 import {readFile} from 'fs/promises'
 
-interface Opts extends RequestArgs.t {
+interface Opts extends RequestArgs.ProxyRequestArgs {
     sourceFile?: string
 }
 
@@ -19,7 +19,7 @@ const getArtifacts = (sourceAbspath: string) => {
     })
 }
 
-const getCompileCommand = (opts: Opts) => (sourceAbspath: string) => `~/smartpy-cli/SmartPy.sh compile ${sourceAbspath} ${opts.artifactsDir}`
+const getCompileCommand = (opts: Opts) => (sourceAbspath: string) => `~/smartpy-cli/SmartPy.sh compile ${sourceAbspath} ${opts.config.artifactsDir}`
 
 const compileContract = (opts: Opts) => (sourceFile: string) => {
     const sourceAbspath = join(opts.config.contractsDir, sourceFile)
@@ -55,7 +55,7 @@ const compileAll = (opts: Opts): Promise<{contract: string, artifacts: string[]}
 }
 
 
-export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
+export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
     const p = parsedArgs.sourceFile
     ? compileContract (parsedArgs) (parsedArgs.sourceFile)
         .then(data => [data])

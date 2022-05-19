@@ -7,10 +7,12 @@ import * as EconomicalProtocolHash from "@taqueria/protocol/EconomicalProtocolHa
 import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
 import * as Verb from "@taqueria/protocol/Verb"
 
-const accountMapSchema = z.union([
-    z.object({default: z.string().nonempty()}),
-    z.record(SandboxAccountConfig.schema)
-], {description: "Sandbox Accounts"})
+const accountMapSchema = z.record(
+    z.union([
+        z.string().nonempty(),
+        SandboxAccountConfig.schema
+    ])
+)
 
 const internalSchema = z.object({
     label: HumanReadableIdentifier.schema.describe("Sandbox Label"),
