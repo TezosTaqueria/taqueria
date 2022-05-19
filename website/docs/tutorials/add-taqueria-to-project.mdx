@@ -55,18 +55,62 @@ cd hello-tacos
 
 ## Taq'ifying the Project
 
+To make the project a Taqueria project, run the following command from the root of the project:
 
+```shell
+taq init
+```
+
+This creates the following directory structure and initializes the `config.json` and ephemeral state for the project
+
+- /.taq - This hidden folder stores the Taqueria configuration and state
+- /app - This is the React dApp
+- /contracts - This folder contains the LIGO smart contracts
+- /tests - This folder contains the automated tests
+- /artifacts - This folder contains the compiled Michelson .tz contracts
 
 ### Initializing the Project
 
+As Taqueria uses NPM packages for the SDK and plugins, you will need to initialize this project as a Node project by running:
 
+```shell
+npm init -y
+```
+
+With NPM initialized, you can now install dependencies by running:
+
+```shell
+npm install
+```
 
 ### Installing Plugins
 
+This project requires the following plugins to be installed:
+
+- LIGO - Provides the compiler needed to compile the LIGO smart contract  
+- Flextesa - Provides a sandbox (Tezos node that runs on your machine) for testing
+- Taquito - Used to originate the smart contract on the sandbox or a testnet
+
+To install these plugins, run the following three commands:
+
+```shell
+taq install @taqueria/plugin-ligo
+```
+
+```shell
+taq install @taqueria/plugin-flextesa
+```
+
+```shell
+taq install @taqueria/plugin-taquito
+```
+
+:::note
+To confirm this was successful, you can run the `taq` command and ensure you see the `compile`, `originate`, and `start sandbox` tasks listed
+:::
 
 
 ## Refactoring the Project
-
 
 
 
