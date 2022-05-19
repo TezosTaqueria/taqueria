@@ -10,7 +10,8 @@
     "test": "yarn",
     "build": "./bin/build.sh || npx play-sound beep.mp3",
     "build-all": "./bin/build-all.sh",
-    "build-website": "cd website && npm ci && npm run build",
+    "parse-readme-template": "ts-node ./parse-readme-template.ts",
+    "build-website": "npm run parse-readme-template && cd website && npm ci && npm run build",
     "watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build || npx play-sound beep.mp3\" --initial",
     "prepare": "husky install"
   },
@@ -37,7 +38,9 @@
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
     "husky": "^7.0.4",
-    "play-sound-cli": "^1.0.0"
+    "play-sound-cli": "^1.0.0",
+    "eta": "^1.12.3",
+    "ts-node": "^9.0.0"
   },
   "workspaces": [
     "./taqueria*",
