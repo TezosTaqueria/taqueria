@@ -39,6 +39,10 @@ import * as Url from "@taqueria/protocol/Url"
         val => Boolean(val),
         z.boolean().optional()
     ),
+    yes: z.preprocess(
+        val => Boolean(val),
+        z.boolean().optional()
+    ),
     plugin: z.string().nonempty().optional(),
     env: z.union([z.literal('production'), z.literal('testing'), z.literal('development'), z.string().nonempty()]).default("development"),
     quickstart: z.string().nonempty().optional(),

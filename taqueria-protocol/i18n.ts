@@ -48,7 +48,8 @@ export default async (): Promise<i18n> => {
                         "testFromVsCode": "An internal command used by VS Code to test for the taq binary",
                         "fromVsCode": "An internal flag used to indicate that taq is executed via vscode",
                         "buildDesc": "Display build information about the current version",
-                        "pluginOption": "Use to specify what plugin you'd like when running this task."
+                        "pluginOption": "Use to specify what plugin you'd like when running this task.",
+                        "yesOptionDesc": "Select \"yes\" to any prompt"
                     }
                 }
             }

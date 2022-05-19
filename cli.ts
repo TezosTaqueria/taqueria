@@ -15,7 +15,7 @@ import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
 import * as NPM from './npm.ts'
 import inject from './plugins.ts'
 import { match, __ } from 'https://esm.sh/ts-pattern@3.3.5';
-import {addNewProvision, loadProvisions, plan} from "./provisions.ts"
+import {addNewProvision, loadProvisions, plan, apply} from "./provisions.ts"
 
 // Get utils
 const {
@@ -239,6 +239,12 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
         )
     )
+    .option('y', {
+        describe: i18n.__('yesOptionDesc'),
+        alias: 'yes',
+        default: false,
+        boolean: true
+    })
     .demandCommand(),
     extendCLI(env, parsedArgs, i18n)
 )
@@ -359,19 +365,36 @@ const addOperations = (cliConfig: CLIConfig, config: LoadedConfig.t, _env: EnvVa
             map(() => "Added provision to .taq/provisions.json"),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
         )
-    ).command(
-        'plan',
-        'Display the execution plan for applying all provisioned operations',
-        () => {},
-        (argv: Arguments) => pipe(
-            SanitizedArgs.of(argv),
-            map (inputArgs => joinPaths(inputArgs.projectDir, ".taq", "provisions.json")),
-            chain (SanitizedAbsPath.make),
-            chain (loadProvisions),
-            map (plan),
-            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
-        )
     )
+    // .command(
+    //     'plan',
+    //     'Display the execution plan for applying all provisioned operations',
+    //     () => {},
+    //     (argv: Arguments) => pipe(
+    //         SanitizedArgs.of(argv),
+    //         map (inputArgs => joinPaths(inputArgs.projectDir, ".taq", "provisions.json")),
+    //         chain (SanitizedAbsPath.make),
+    //         chain (loadProvisions),
+    //         map (plan),
+    //         forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
+    //     )
+    // )
+    // .command(
+    //     'apply',
+    //     'Applies the pending list of provisioned operations for the project',
+    //     () => {},
+    //     (argv: Arguments) => pipe(
+    //         SanitizedArgs.of(argv),
+    //         map (inputArgs => joinPaths(inputArgs.projectDir, ".taq", "provisions.json")),
+    //         chain (SanitizedAbsPath.make),
+    //         chain (sanitizedArgs => pipe(
+    //             sanitizedArgs,
+    //             chain (loadProvisions),
+    //             chain (apply(sanitizedArgs)),
+    //         )),
+    //         forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)   
+    //     )
+    // )
 
 const addTemplates = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, _parsedArgs: SanitizedArgs.t, _i18n: i18n.t, _state: EphemeralState.t, _pluginLib: PluginLib) => 
     cliConfig.command(

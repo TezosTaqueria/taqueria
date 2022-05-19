@@ -207,6 +207,20 @@ export const plan = (data: Provisions.t) => {
     return toMermaid(batches).content
 }
 
-export const apply = (batches: (Provisioner.t[])[]) => {
+export const apply = (sanitizedArgs: SanitizedArgs.t, data: Provisions.t) => {
+    const ids = toDAG(data).reduce(
+        (retval, batch) => [...retval, ...batch.map(p => p.id)],
+        [] as ProvisionerID.t[]
+    )
     
+    const lines = ids.map(id => `- ${id}`)
+
+    console.log("This will apply the following operations:")
+    console.log(lines.join("\n"))
+    console.log("\nDo you wish to continue (y/N)?")
+
+    return attemptP(() => {
+        const input = new Uint8Array(1)
+        return Deno.stdin.read(input)
+    })
 }
