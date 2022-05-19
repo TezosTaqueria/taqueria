@@ -254,6 +254,10 @@ jobs:
       - build-binaries
       - gather-info-for-e2e-tests
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
+
+    outputs:
+      status: ${{ steps['set-job-status'].outputs['job-status'] }}
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -268,6 +272,7 @@ jobs:
       - name: download the binary from the build-binaries job and make it executable
         if: ${{ !github.event.pull_request.head.repo.fork }}
         run: |
+          exit 1
           curl --url ${{ matrix.url }} -o ${{ matrix.final-name }} -L
           ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
@@ -310,10 +315,14 @@ jobs:
         run: npm run test:e2e -w tests ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
+      
+      - id: set-job-status
+        name: Set Status
+        run: echo "::set-output name=job-status::${{ job.status }}"
   
   report-e2e-status:
     needs: run-tests
-    if: (github.event_name != 'release' && ((contains(needs.*.result, 'failure')) || (contains(needs.*.result, 'skipped')) || (contains(needs.*.result, 'cancelled'))))
+    if: (always() && github.event_name != 'release' && (!contains(needs.*.result, 'success')))
     runs-on: ubuntu-latest
     steps:
       - uses: ravsamhq/notify-slack-action@v1
