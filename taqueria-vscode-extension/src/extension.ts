@@ -1,10 +1,20 @@
 import { I18N } from './lib/pure'
-import { exposeInitTask, exposeInstallTask, exposeTaqTaskAsCommand, exposeSandboxTaskAsCommand } from './lib/helpers'
+import { sanitizeDeps, inject, InjectedDependencies } from './lib/helpers'
 import {makeDir} from './lib/pure'
 import {COMMAND_PREFIX} from './lib/helpers'
-import * as vscode from 'vscode'
+import * as api from 'vscode'
 import path = require('path')
-export async function activate(context: vscode.ExtensionContext) {
+
+export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
+	const deps = sanitizeDeps(input)
+	const {vscode} = deps
+	const { 
+		exposeInitTask, 
+		exposeInstallTask, 
+		exposeTaqTaskAsCommand, 
+		exposeSandboxTaskAsCommand
+	} = inject(deps)
+
 	const i18n: I18N = {} // temporary
 	const output = vscode.window.createOutputChannel("Taqueria")
 	const folders = vscode.workspace.workspaceFolders
