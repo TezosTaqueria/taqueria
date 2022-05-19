@@ -32,7 +32,9 @@
     "typescript": "4.5.4"
   },
   "dependencies": {
+    "batching-toposort": "^1.2.0",
     "fluture": "^14.0.0",
+    "remeda": "^0.0.32",
     "zod": "^3.16.0"
   }
 }

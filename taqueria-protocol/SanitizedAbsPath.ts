@@ -13,7 +13,7 @@ export const schema = rawSchema
 
 type Input = z.infer<typeof rawSchema>
 
-export type SanitizedAbsPath = Input & {
+export type SanitizedAbsPath = string & {
     readonly [sanitizedAbsPath]: void
 }
 

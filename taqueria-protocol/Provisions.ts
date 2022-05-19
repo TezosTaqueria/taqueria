@@ -1,44 +1,57 @@
 import {z, ZodError} from "zod"
-import {reject, resolve} from "fluture"
+import {resolve} from "fluture"
 import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import * as ProvisionerID from "@taqueria/protocol/ProvisionerID"
 import * as Provisioner from "@taqueria/protocol/Provisioner"
+import {partitionArray, uniq} from "rambda"
+import {memoizy} from "memoizy"
 
-const getAllProvisionerIds = (input: Provisioner.RawInput[]) => input.reduce(
-    (retval, provisioner) => ([...retval, provisioner.id]),
-    [] as string[]
-)
+
+const getInvalidIds = memoizy((provisions: Provisioner.t[]) => {
+    const ids = provisions.map(p => p.id)
+    return provisions.reduce(
+        (retval, provision) => {
+            const depends_on = provision.depends_on ?? []
+            const invalid = partitionArray(
+                (id: ProvisionerID.t) => ids.includes(id),
+                depends_on
+            ).pop() as ProvisionerID.t[]
+
+            return uniq([...retval, ...invalid])
+        },
+        [] as ProvisionerID.t[]
+    )
+})
 
 const rawSchema = z
     .array(
         Provisioner.rawSchema
     )
+    .refine(
+        provisions => getInvalidIds(provisions).length === 0,
+        provisions => ({message: `One or more of your provisioners depends on an invalid provisioner. The following provisioner ids were referenced that do not exist: ${getInvalidIds(provisions).join(", ")}`})
+    )
     .describe("Provisions")
     
 type RawInput = z.infer<typeof rawSchema>
-export type Provisions = RawInput
+
+const internalSchema = z
+    .array(Provisioner.schema)
+    .refine(
+        provisions => getInvalidIds(provisions).length === 0,
+        provisions => ({message: `One or more of your provisioners depends on an invalid provisioner. The following provisioner ids were referenced that do not exist: ${getInvalidIds(provisions).join(", ")}`})
+    )
+    .describe("Provisions")
+
+
+type Input = z.infer<typeof internalSchema>
+
+const schema = internalSchema.transform(val => val as Provisions)
+
+export type Provisions = Input
 export type t = Provisions
 
-export const schema = z
-    .array(Provisioner.schema)
-    .refine((val: Provisioner.RawInput[]) =>
-        val.reduce(
-            (retval, provisioner) => {
-                if (provisioner.depends_on) {
-                    const ids = getAllProvisionerIds(val)
-                    provisioner.depends_on.reduce(
-                        (retval, dep) => !retval && ids.includes(dep),
-                        retval
-                    )
-                }
-                return true
-            },
-            true as boolean
-        ),
-        "The depends_on property of a provision must refer to another provision"
-    )
-    .transform(val => val as Provisions)
-
-export const make = (data: RawInput) => {
+export const make = (data: Input) => {
     try {
         const retval = schema.parse(data)
         return resolve(retval)

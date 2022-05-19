@@ -15,7 +15,7 @@ import {uniq} from 'https://deno.land/x/ramda@v0.27.2/mod.ts'
 import * as NPM from './npm.ts'
 import inject from './plugins.ts'
 import { match, __ } from 'https://esm.sh/ts-pattern@3.3.5';
-import {addNewProvision} from "./provisions.ts"
+import {addNewProvision, loadProvisions, plan} from "./provisions.ts"
 
 // Get utils
 const {
@@ -28,7 +28,8 @@ const {
     gitClone,
     rm,
     log,
-    eager
+    eager,
+    isTaqError
     // logInput,
     // debug
 } = utils.inject({
@@ -356,9 +357,21 @@ const addOperations = (cliConfig: CLIConfig, config: LoadedConfig.t, _env: EnvVa
             chain(SanitizedArgs.makeProvisionArgs),
             chain(inputArgs => addNewProvision(inputArgs, config, state)),
             map(() => "Added provision to .taq/provisions.json"),
-            forkCatch (console.error) (console.error) (log)
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
         )
-    ).alias('create-op', 'new op')
+    ).command(
+        'plan',
+        'Display the execution plan for applying all provisioned operations',
+        () => {},
+        (argv: Arguments) => pipe(
+            SanitizedArgs.of(argv),
+            map (inputArgs => joinPaths(inputArgs.projectDir, ".taq", "provisions.json")),
+            chain (SanitizedAbsPath.make),
+            chain (loadProvisions),
+            map (plan),
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
+        )
+    )
 
 const addTemplates = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, _parsedArgs: SanitizedArgs.t, _i18n: i18n.t, _state: EphemeralState.t, _pluginLib: PluginLib) => 
     cliConfig.command(
@@ -373,7 +386,7 @@ const addTemplates = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVa
         }
     )
     .alias('create-tmpl', 'create')
-    .alias('create-template', 'create')
+    .alias('create-template', 'create')    
     
 
 const getPluginOption = (task: Task.t) => {
@@ -590,7 +603,8 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
         'testFromVsCode',
         'list-known-tasks',
         'listKnownTasks',
-        'provision'
+        'provision',
+        'plan'
 
     ].reduce(
         (retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
@@ -670,13 +684,22 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError.t) => {
             .with({kind: 'E_PARSE'}, err                        => [13, err.msg])
             .with({kind: 'E_PARSE_UNKNOWN'}, err                => [14, err.msg])
             .with({kind: 'E_INVALID_ARCH'}, err                 => [15, err.msg])
+            .with({kind: 'E_NO_PROVISIONS'}, err                => [16, err.msg])
             .with({message: __.string}, err                     => [128, err.message])
             .exhaustive()
         
         const [exitCode, msg] = res
-        console.error(inputArgs.debug ? err : msg)
+        if (inputArgs.debug) {
+            logAllErrors(err)
+        }
+        else console.error(msg)
         Deno.exit(exitCode as number)
     }
+}
+
+const logAllErrors = (err: Error | TaqError.E_TaqError | TaqError.t | unknown) => {
+    console.error(err)
+    if (isTaqError(err) && err.previous) logAllErrors(err.previous)
 }
 
 export default {

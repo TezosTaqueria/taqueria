@@ -1,17 +1,14 @@
 import {z, ZodError} from "zod"
 import {reject, resolve} from "fluture"
 import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import * as ProvisionerID from "@taqueria/protocol/ProvisionerID"
 import * as PersistentState from "@taqueria/protocol/PersistentState"
 
 const provisionerType: unique symbol = Symbol("Provisioner")
 
-const internalSchema = z.object(
+export const rawSchema = z.object(
     {
-        id: z
-            .string()
-            .nonempty()
-            .regex(/^[A-Za-z0-9]+[A-Za-z0-9-_]+\.[A-Za-z0-9]+[A-Za-z0-9-_]+\.[A-Za-z0-9]+[A-Za-z0-9-_]+$/)
-            .describe('Provisioner ID'),
+        id: ProvisionerID.rawSchema,
         plugin: z
             .string()
             .nonempty()
@@ -27,9 +24,13 @@ const internalSchema = z.object(
             .string()
             .describe("Provisioner Custom Command")
             .optional(),
+        label: z
+            .string()
+            .describe("Provisioner Label")
+            .optional(),
         depends_on: z.
             array(
-                z.string()
+                ProvisionerID.rawSchema
             )
             .optional()
     },
@@ -39,16 +40,16 @@ const internalSchema = z.object(
 )
 .passthrough()
 
-export const rawSchema = internalSchema
+export const internalSchema = rawSchema.extend({
+    id: ProvisionerID.schema,
+    depends_on: z.array(ProvisionerID.schema).optional()
+})
 
-export interface RawInput extends z.infer<typeof rawSchema> {
-    handler?: Handler
-}
+export type RawInput = z.infer<typeof rawSchema>
 
-type OperationCallback = (...args: unknown[]) => unknown
-type Handler = (state: PersistentState.t, op: OperationCallback) => unknown
+export type Input = z.infer<typeof internalSchema>
 
-export interface Provisioner extends RawInput {
+export interface Provisioner extends Input {
     readonly [provisionerType]: void
     toString: () => string
     

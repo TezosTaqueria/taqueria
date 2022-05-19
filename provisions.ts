@@ -2,15 +2,18 @@ import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
 import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
 import * as EphemeralState from "@taqueria/protocol/EphermalState"
 import * as PersistentState from "@taqueria/protocol/PersistentState"
-import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedPath"
+import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
+import * as ProvisionerID from "@taqueria/protocol/ProvisionerID"
 import * as Provisions from "@taqueria/protocol/Provisions"
 import * as Provisioner from "@taqueria/protocol/Provisioner"
 import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
 import * as TaqError from "@taqueria/protocol/TaqError"
 import {inject} from "./taqueria-utils/taqueria-utils.ts"
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {Future, mapRej, map, chain, attemptP, chainRej, reject} from 'fluture';
+import {Future, mapRej, map, chain, attemptP, chainRej, resolve, reject} from 'fluture';
 import generate from "https://cdn.skypack.dev/retronid"
+import {times} from "rambda"
+import batchingToposort from "https://cdn.skypack.dev/batching-toposort"
 
 const {doesPathExist, writeJsonFile, joinPaths, eager, isTaqError, readJsonFile, renderTemplate, execText} = inject({
     stderr: Deno.stderr,
@@ -22,7 +25,7 @@ const getProvisions = (provisionsAbsPath: SanitizedAbsPath.t) => pipe(
     chain(Provisions.of)
 )
 
-const loadProvisions = (provisionsAbspath: SanitizedAbsPath.t) => pipe(
+export const loadProvisions = (provisionsAbspath: SanitizedAbsPath.t) => pipe(
     getProvisions(provisionsAbspath),
     mapRej((previous: Error|TaqError.t) => isTaqError(previous) 
         ? previous as unknown as TaqError.t
@@ -31,7 +34,18 @@ const loadProvisions = (provisionsAbspath: SanitizedAbsPath.t) => pipe(
             msg: "Could not parse provisions file",
             previous
         })
-    )
+    ),
+    chainRej (previous => {
+        if (previous.kind === 'E_READFILE') {
+            return reject(TaqError.create({
+                kind: "E_NO_PROVISIONS",
+                msg: "You have not provisioned any operations yet. See `taq provision --help` for more information.",
+                previous,
+                context: provisionsAbspath
+            }))
+        }
+        return reject(previous)
+    })
 )
 
 const writeProvisions = (provisionsAbspath: SanitizedAbsPath.t) => (provisioners: Provisioner.t[] | Provisions.t) =>
@@ -80,23 +94,16 @@ const newProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, state: EphemeralS
         return plugin!.alias
     })()
 
-    const customHandler = (_state: PersistentState.t ) => {
-        return "custom"
-    }
-
-    customHandler.toJSON = function() {
-        return this.toString()
-    }
     return Provisioner.make({
         id: `${plugin}.${operation}.${name}`,
         operation,
         plugin,
         ...getOperationParams (state) (operation, plugin),
-        handler: operation === "custom" ? customHandler : undefined
+        command: operation === "custom" ? "echo 'Custom Provision'" : undefined
     })
 }
 
-export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, config: LoadedConfig.t, state: EphemeralState.t) => attemptP(async () => {
+export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, config: LoadedConfig.t, state: EphemeralState.t) => attemptP<TaqError.t, Provisions.t>(async () => {
     try {
         const provisionAbspath = await eager (SanitizedAbsPath.make(joinPaths(config.projectDir, ".taq", "provisions.json")))
         const provision = await eager (newProvision(parsedArgs, state))
@@ -112,3 +119,94 @@ export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, config:
         return Promise.reject(err)
     }
 })
+
+export const toDAGInput = (data: Provisions.t) => data.reduce(
+    (retval, provisioner) => {
+        const deps = provisioner.depends_on?.reduce(
+            (retval, parentId) => {
+                if (retval[parentId]) {
+                    retval[parentId] = [
+                        ...retval[parentId],
+                        provisioner.id
+                    ]
+                    return retval
+                }
+                retval[parentId] = [provisioner.id]
+                return retval
+            },
+            retval
+        ) ?? retval
+        deps[provisioner.id] = deps[provisioner.id] ?? []
+        return deps
+    },
+    {} as Record<ProvisionerID.t, ProvisionerID.t[]>
+)
+
+export const toDAG = (data: Provisions.t) => batchingToposort(toDAGInput(data)).reduce(
+    (retval, batch) => [
+        ...retval,
+        batch.reduce(
+            (retval, id) => {
+                const provision = data.find(provision => String(provision.id) === id)
+                return provision ? [...retval, provision] : retval
+            },
+            [] as Provisioner.t[]
+        )
+    ],
+    [] as (Provisioner.t[])[]
+)
+
+export const outputTab = (tabs: number) => new Array(tabs).fill("  ").join('')
+
+export const provisionerToMermaid = (parent: ProvisionerID.t|string, tabs: number) => (provisioner: Provisioner.t) => {
+    const state = provisioner.label
+        ? `${outputTab(tabs)}${provisioner.id} : ${provisioner.label}`
+        : `${outputTab(tabs)}${provisioner.id}`
+
+    return state
+}
+
+
+const mermaidConfig = {
+    content: "stateDiagram-v2\n",
+    tabs: 1,
+    parent: 'Start',
+}
+
+const toMermaidSubgraph = (batchName: string, batchDescription: string) => ({content, tabs, parent}: typeof mermaidConfig, batch: Provisioner.t[]) => {
+    const ops = batch.map(provisionerToMermaid(parent, tabs+1)).join("\n")
+
+    return {
+        content: [
+            content,
+            `${outputTab(tabs)}${batchName} : ${batchDescription}`,
+            `${outputTab(tabs)}${parent} --> ${batchName}`,
+            `${outputTab(tabs)}state ${batchName} {`,
+            ops,
+            `${outputTab(tabs)}}`
+        ].join("\n"),
+        parent: batchName,
+        tabs: 1 
+    }
+}
+
+
+const toMermaid = (data: (Provisioner.t[])[]) => data.reduce(
+    ({content, parent}, batch, i) => batch.length > 1
+        ? toMermaidSubgraph(`Batch${i+1}`, `Parallel Operation Group #${i+1}`) ({content, tabs: 1, parent}, batch)
+        : ({
+            content: `${content}${provisionerToMermaid(parent, 1) (batch[0])}`,
+            parent: String(batch[0].id),
+            tabs: 1
+        }),
+    mermaidConfig
+)
+
+export const plan = (data: Provisions.t) => {
+    const batches = toDAG(data)
+    return toMermaid(batches).content
+}
+
+export const apply = (batches: (Provisioner.t[])[]) => {
+    
+}
