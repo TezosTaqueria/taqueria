@@ -73,6 +73,8 @@ Deno.test('inject()', async (t) => {
             false,
             "--help",
             false,
+            "--yes",
+            false,
             "--env",
             "'development'",
             "--setBuild",
