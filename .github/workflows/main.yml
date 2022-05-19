@@ -313,7 +313,7 @@ jobs:
   
   report-e2e-status:
     needs: run-tests
-    if: ((contains(needs.*.result, 'failure')) && github.event_name != 'release')
+    if: (github.event_name != 'release' && ((contains(needs.*.result, 'failure')) || (contains(needs.*.result, 'skipped')) || (contains(needs.*.result, 'cancelled')))
     runs-on: ubuntu-latest
     steps:
       - uses: ravsamhq/notify-slack-action@v1
