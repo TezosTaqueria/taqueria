@@ -41,7 +41,7 @@ export const mkdir = (path: string) : Future<TaqError.t, string> =>
 export const ensureDirExists = (path: string) => SanitizedAbsPath
     .make(path)
     .pipe( chain (abspath => attemptP(() => Deno.stat(abspath))))
-    .pipe( chainRej (() => attemptP(() => Deno.mkdir(path))))
+    .pipe( chainRej (() => attemptP(() => Deno.mkdir(path, {recursive: true}))))
     .pipe( chain (() => SanitizedAbsPath.make(path)))
     .pipe( mapRej (previous => {
         const taqErr: TaqError.t = {
