@@ -314,9 +314,12 @@ jobs:
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
   
-      - name: Report Status
-        uses: ravsamhq/notify-slack-action@v1
-        if: always()
+  report-e2e-status:
+    needs: run-tests
+    if: (contains(needs.*.result, 'failure')) && github.event_name != 'release')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ravsamhq/notify-slack-action@v1
         with:
           notification_title: "Failure in the e2e Tests"
           status: ${{ job.status }} # required
