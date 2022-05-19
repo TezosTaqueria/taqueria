@@ -15,6 +15,15 @@ Things you will accomplish:
 - Refactor tests to use Taqueria's powerful tools
 - Use the Taqueria State API to link your smart contracts to your dApp 
 
+:::note 
+This tutorial is a work in progress. Future updates will include:
+- Native Taqueria testing (Taqueria Jest plugin)
+- Passing the deployed contract address to the React dApp via the State API
+- Deploying the contract using Taqueria operations
+- Targeting a specific network for contract deployment and testing (sandboxes and testnets)
+- Deploying the contract to mainnet
+:::
+
 ## Requirements
 
 - Taqueria v0.3.0 or later
@@ -26,18 +35,23 @@ Things you will accomplish:
 Hello Tacos is a hello world type project that demonstrates a simple full stack Tezos dApp. The dApp is composed of a simple React app that interacts with a smart contract written in the LIGO language and uses Beacon Wallet to connect to browser based wallets. The smart contract stores a value for the number of available tacos and provides a function to buy tacos
 
 
-
-
-
 ## Scaffolding the Starter Project
 
-
+The first step is to scaffold the Hello Tacos starter project using the `taq scaffold` task. Open up a terminal and run the following command:
 
 ```shell
 taq scaffold https://github.com/ecadlabs/taqueria-scaffold-hello-tacos-tutorial hello-tacos
 ```
 
+This will clone the project into a directory called `hello-tacos`. Change into that directory by running:
+
+```shell
+cd hello-tacos
+```
+
 ## Exploring the project
+
+
 
 ## Taq'ifying the Project
 
