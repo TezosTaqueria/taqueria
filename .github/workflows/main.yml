@@ -234,9 +234,6 @@ jobs:
   run-tests:
     name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
     runs-on: ${{ matrix.os }}
-    concurrency:
-      group: ${{ github.ref_name || github.ref }}
-      cancel-in-progress: true
     strategy:
       fail-fast: true
       matrix:
