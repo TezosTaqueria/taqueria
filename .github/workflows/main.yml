@@ -272,7 +272,6 @@ jobs:
       - name: download the binary from the build-binaries job and make it executable
         if: ${{ !github.event.pull_request.head.repo.fork }}
         run: |
-          exit 1
           curl --url ${{ matrix.url }} -o ${{ matrix.final-name }} -L
           ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
@@ -323,7 +322,7 @@ jobs:
   
   report-e2e-status:
     needs: run-tests
-    if: (always() && ${{ failure() }})
+    if:  ${{ failure() }} && github.event_name != 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: ravsamhq/notify-slack-action@v1
