@@ -207,9 +207,6 @@ jobs:
         with:
           node-version: 16.13.x
       
-      - name: install dependencies
-        run: npm install jest
-      
       - id: set-test-chunks
         name: Set Chunks
         run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -c '[_nwise(length / 4 | ceil)]')"
