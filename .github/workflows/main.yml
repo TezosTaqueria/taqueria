@@ -323,7 +323,7 @@ jobs:
   
   report-e2e-status:
     needs: run-tests
-    if: (always() && (${{ needs.run-tests.outputs['job-status'] }} != ('success')))
+    if: (always() && ${{ failure() }})
     runs-on: ubuntu-latest
     steps:
       - uses: ravsamhq/notify-slack-action@v1
