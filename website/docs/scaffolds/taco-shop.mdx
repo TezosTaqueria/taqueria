@@ -79,14 +79,14 @@ let main (tacos_to_buy, available_tacos: tacos_to_buy * available_tacos): operat
 
 **Coming soon with the Taqueria Jest plugin**
 
-### React dA
+### React Dapp
 
 The React dApp retrieves the number of available tacos from the smart contract and displays the value. It provides an interface for the user to buy tacos and looks like this:
 
-<img src={useBaseUrl('/img/hello-tacos-screenshot.png')} />
+![Hello Tacos Screenshot](/img/hello-tacos-screenshot.png)
 
 :::note
-In order for the React dA to connect to the smart contract, the contract must be deployed to the testnet and the returned address of the contract must be added to the `/dA/index.tsx` file. The scaffold comes pre-configured with the address of the deployed contract for demonstration purposes but it is recommended that you add your own faucet file, then re-deploy the contract and update the references to it in the project for your own use
+In order for the React dApp to connect to the smart contract, the contract must be deployed to the testnet and the returned address of the contract must be added to the `/app/index.tsx` file. The scaffold comes pre-configured with the address of the deployed contract for demonstration purposes but it is recommended that you add your own faucet file, then re-deploy the contract and update the references to it in the project for your own use
 
 This will be fixed in the future when contract addresses will be passed via the State API dynamically
 :::
@@ -134,8 +134,8 @@ The intended workflow for this project is as follows:
 
 1. Compile the LIGO source code
 2. Originate the smart contract to the testnet
-3. Insert the returned contract address into the React dA
-4. Build and start the React dA
+3. Insert the returned contract address into the React dApp
+4. Build and start the React dApp
 5. Connect to Temple wallet
 6. Buy tacos!
 
@@ -171,9 +171,9 @@ This scaffold comes with a pre-configured faucet file for the testnet which is s
 
 ### Insert the Contract Address
 
-Now that the contract has been deployed, you need to insert the address of the contract into the `/dA/index.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/dA/index.tsx` file as shown here:
+Now that the contract has been deployed, you need to insert the address of the contract into the `/app/index.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/index.tsx` file as shown here:
 
-```ts /dA/src/dA.tsx
+```ts /app/src/app.tsx
 function dA() {
   const [rpcUrl, setRpcUrl] = useState("https://ithacanet.ecadinfra.com");
   const [contractAddress, setContractAddress] = useState(
@@ -190,10 +190,10 @@ function dA() {
 
 Now that the contract has been deployed and the address added to the dA, you can build and start the React dA
 
-Change into the `/dA` directory:
+Change into the `/app` directory:
 
 ```shell
-cd dA
+cd app
 ```
 
 Install dependencies:
@@ -214,7 +214,7 @@ Start and serve the dA:
 npm run start
 ```
 
-You should now be able to access the Taco shop dApp at `http://localhost:3000/`
+You should now be able to access the Taco Shop dApp at `http://localhost:3000/`
 
 ### Connect to Temple Wallet
 
