@@ -36,15 +36,14 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "getting-started/plugin-basics",
+        "plugins/plugin-basics",
         "plugins/plugin-flextesa",
         "plugins/plugin-archetype",
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
-        "plugins/plugin-typescript-generator",
+        "plugins/plugin-contract-types",
         "plugins/plugin-tezos-client",
-        "plugins/plugin-mock-plugin",
       ],
     },
     {

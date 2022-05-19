@@ -538,16 +538,24 @@ const executingBuiltInTask = (inputArgs: SanitizedInitArgs | RawInitArgs) =>
         (retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
         false
     )
-            
-export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
-    try {
+
+const preprocessArgs = (inputArgs: DenoArgs) : DenoArgs => {
+    return inputArgs.map(arg => {
         // A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command
         // Refer to https://github.com/yargs/yargs-parser/issues/201
-        inputArgs = inputArgs.map(arg => arg.match(/^"(.|\n)*"$/) ? "___" + arg + "___" : arg)
+        const protectedArg = /^"(.|\n)*"$/.test(arg) ? "___" + arg + "___" : arg
+        // This same hack is used to prevent yargs from messing with hex values
+        return /^0x[0-9a-fA-F]+$/.test(protectedArg) ? "___" + protectedArg + "___" : protectedArg
+    })
+}
+
+export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
+    try {
+        const processedInputArgs = preprocessArgs(inputArgs)
 
         // Parse the args required for core built-in tasks
         return pipe(
-            initCLI(env, inputArgs, i18n),
+            initCLI(env, processedInputArgs, i18n),
             (cliConfig: CLIConfig) => pipe(
                 cliConfig,
                 parseArgs,
@@ -569,7 +577,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n) => {
                         // initArgs._.includes('install') ||
                         // initArgs._.includes('uninstall')
                         ? resolve(initArgs)
-                        : postInitCLI(cliConfig, env, inputArgs, initArgs, i18n)
+                        : postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n)
                 }),
                 forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (identity)
             )

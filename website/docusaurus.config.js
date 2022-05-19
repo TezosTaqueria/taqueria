@@ -108,7 +108,7 @@ const config = {
           },
           {
             type: "doc",
-            docId: "getting-started/plugin-basics",
+            docId: "plugins/plugin-basics",
             label: "Plugins",
             position: "right",
             className: "header-link"
