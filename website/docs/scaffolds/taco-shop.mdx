@@ -2,12 +2,13 @@
 title: Taco Shop Scaffold
 ---
 
-|                  |                         |         
-|------------------|-------------------------|
-| complexity       | beginner                |
-| frontend dApp    | yes                     |
-| automated tests  | yes                     |
-| plugins          | LIGO, Taquito, Flextesa |
+| Scaffold Property  | Value                   |         
+|--------------------|-------------------------|
+| Complexity         | Beginner                |
+| Automated Tests    | Yes                     |
+| Installed Plugins  | LIGO, Taquito, Flextesa |
+| Frontend Dapp      | Yes                     |
+| Wallet Integration | Yes                     |
 
 
 ## Quickstart
@@ -22,7 +23,7 @@ Run the following commands to get up and running immediatley:
 
 This scaffold implements a simple full stack Tezos project. It has a simple React dApp that interacts with a smart contract which stores the number of available_tacos and provides a function to buy tacos
 
-The React dApp uses Beacon Wallet to interact with Tezos wallets in the browser and once connected, will display the number of available_tacos stored on-chain in the smart contract. There is also a basic interface which allows the user to buy tacos by sending a transaction to the smart contract with the number_of_tacos_to_buy as a parameter
+The React dApp uses Beacon Wallet to interact with Tezos wallets in the browser and once connected, will display the number of `available_tacos` stored on-chain in the smart contract. There is also a basic interface which allows the user to buy tacos by sending a transaction to the smart contract with the `number_of_tacos_to_buy` as a parameter
 
 The smart contract has been deployed to ithacanet at the address for demonstration purposes: `KT1KBBk3PXkKmGZn3K6FkktqyPRpEbzJoEPE`
 
@@ -37,7 +38,7 @@ The project comes pre-configured with the following:
 ***Coming soon***
 
 - Native Taqueria testing (Taqueria Jest plugin)
-- Passing the deployed contract address to the React dA via the State API
+- Passing the deployed contract address to the React dApp via the State API
 - Deploying the contract using Taqueria operations
 - Targeting a specific network for contract deployment and testing (sandboxes and testnets)
 - Deploying the contract to mainnet
@@ -56,7 +57,7 @@ The project comes pre-configured with the following:
 ## Project Structure
 
 - `/.taq` - This hidden folder stores the project configuration and State
-- `/dA` - This is the React dA
+- `/app` - This is the React dA
 - `/contracts` - This folder contains the LIGO smart contracts
 - `/tests` - This folder contains the tests
 - `/artifacts` - This folder contains the compiled Michelson `.tz` contracts
@@ -74,6 +75,7 @@ let main (tacos_to_buy, available_tacos: tacos_to_buy * available_tacos): operat
     then (failwith "NOT_ENOUGH_TACOS": operation list * available_tacos)
     else ([]: operation list), abs(available_tacos - tacos_to_buy)
 ```
+
 ### Testing
 
 **Coming soon with the Taqueria Jest plugin**
@@ -84,18 +86,12 @@ The React dApp retrieves the number of available tacos from the smart contract a
 
 ![Hello Tacos Screenshot](/img/hello-tacos-screenshot.png)
 
+
 :::note
 In order for the React dApp to connect to the smart contract, the contract must be deployed to the testnet and the returned address of the contract must be added to the `/app/index.tsx` file. The scaffold comes pre-configured with the address of the deployed contract for demonstration purposes but it is recommended that you add your own faucet file, then re-deploy the contract and update the references to it in the project for your own use
 
 This will be fixed in the future when contract addresses will be passed via the State API dynamically
 :::
-
-## Requirements
-
-- Node.js v16.x (or later)
-- Docker v 0.8.0 (or later)
-- Taqueria v0.3.1 (or later)
-- Temple Wallet (latest version)
 
 ## Scaffold the Project
 
@@ -105,7 +101,7 @@ This project is available as a Taqueria scaffold. To create a new project from t
 taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop taco-shop
 ```
 
-This will clone the Taco Shop scaffold project into the `taco-shop` directory
+This will clone the Taco Shop scaffold project into a directory called `taco-shop`
 
 ## Project Setup
 
@@ -173,7 +169,7 @@ This scaffold comes with a pre-configured faucet file for the testnet which is s
 Now that the contract has been deployed, you need to insert the address of the contract into the `/app/index.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/index.tsx` file as shown here:
 
 ```ts /app/src/app.tsx
-function dA() {
+function app() {
   const [rpcUrl, setRpcUrl] = useState("https://ithacanet.ecadinfra.com");
   const [contractAddress, setContractAddress] = useState(
     "KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3"
@@ -185,9 +181,9 @@ function dA() {
   const [connected, setConnected] = useState(false);
 ```
 
-### Build and Start the React dA
+### Build and Start the React Dapp
 
-Now that the contract has been deployed and the address added to the dA, you can build and start the React dA
+Now that the contract has been deployed and the address added to the dA, you can build and start the React dApp
 
 Change into the `/app` directory:
 
@@ -201,13 +197,13 @@ Install dependencies:
 npm install
 ```
 
-Build the React dA:
+Build the React dApp:
 
 ```shell
 npm run build
 ```
 
-Start and serve the dA:
+Start and serve the dApp:
 
 ```shell 
 npm run start
