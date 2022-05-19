@@ -23,11 +23,10 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "intro",
         "getting-started/installation",
-        "getting-started/plugin-basics",
+        "intro",
         "getting-started/quickstart",
-        "getting-started/networks",
+        "getting-started/networks"
       ],
     },
     {
@@ -37,13 +36,14 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
+        "plugins/plugin-basics",
         "plugins/plugin-flextesa",
         "plugins/plugin-archetype",
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
-        "plugins/plugin-typescript-generator",
-        "plugins/plugin-mock-plugin",
+        "plugins/plugin-contract-types",
+        "plugins/plugin-tezos-client",
       ],
     },
     {

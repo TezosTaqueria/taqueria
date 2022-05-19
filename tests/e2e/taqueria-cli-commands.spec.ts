@@ -101,7 +101,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the ligo plugin exposes the associated options in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -121,7 +121,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the ligo plugin aliases expose the correct info in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -164,7 +164,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the smartpy plugin exposes the associated options in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -184,7 +184,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the smartpy plugin exposes the associated options for teapot in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -204,7 +204,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the smartpy plugin aliases expose the correct info in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -247,7 +247,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the taquito plugin exposes the associated options in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-taquito -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -267,7 +267,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the taquito plugin aliases expose the correct info in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-taquito -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-taquito -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -370,7 +370,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the flextesa plugin exposes the associated option for starting a sandbox in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -390,7 +390,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the flextesa plugin exposes the associated alias for starting a sandbox in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -410,7 +410,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the flextesa plugin exposes the associated option for stopping a sandbox in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -430,7 +430,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the flextesa plugin exposes the associated alias for stopping a sandbox in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -450,7 +450,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the flextesa plugin exposes the associated option for listing sandbox accounts in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -470,7 +470,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the contract types plugin exposes the associated commands in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-contract-types -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -491,7 +491,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the contract types plugin exposes the associated options in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-contract-types -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -512,7 +512,7 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that the contract types plugin exposes the associated aliases in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-contract-types -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528
@@ -557,8 +557,8 @@ describe("E2E Testing for taqueria CLI,", () => {
 
     test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
         try {
-            await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
-            await exec(`taq install @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
+            await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`)
 
             // TODO: This can removed after this is resolved:
             // https://github.com/ecadlabs/taqueria/issues/528

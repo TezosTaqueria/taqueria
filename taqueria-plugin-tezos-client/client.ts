@@ -1,5 +1,5 @@
 import {execCmd, sendAsyncErr, sendErr, sendJsonRes, sendAsyncJsonRes, getSandboxConfig, getCurrentEnvironmentConfig} from '@taqueria/node-sdk'
-import type {RequestArgs, LoadedConfig, SandboxConfig, Environment, Failure, LikeAPromise, PluginResponse} from "@taqueria/node-sdk/types"
+import type {RequestArgs, LoadedConfig, SandboxConfig, Environment, LikeAPromise, PluginResponse} from "@taqueria/node-sdk/types"
 import type {ExecException} from 'child_process'
 import retry from 'async-retry'
 import {join} from 'path'
@@ -11,6 +11,7 @@ interface Opts extends RequestArgs.ProxyRequestArgs {
     sourceFiles?: string
     storage?: string
     input?: string
+    entrypoint?: string
 }
 
 const isSandboxRunning = (sandboxName: string) =>
@@ -98,7 +99,7 @@ const typecheckAll = (opts: Opts, sandboxName: string, sandbox: SandboxConfig.t)
     .then(promises => Promise.all(promises))
 }
 
-const typecheck = <T>(parsedArgs: Opts, sandboxName: string, sandbox: SandboxConfig.t): LikeAPromise<PluginResponse, Failure<T>> => {
+const typecheck = <T>(parsedArgs: Opts, sandboxName: string, sandbox: SandboxConfig.t): Promise<PluginResponse> => {
     const sourceFiles = (parsedArgs.sourceFiles as string).split(',')
     let p;
     if (parsedArgs.sourceFiles) {
@@ -155,20 +156,18 @@ const preprocessString = (value: string) : string => {
 }
 
 const getSimulateCommand = (opts: Opts, sandboxName: string, sandbox: SandboxConfig.t, sourceFile: string, sourcePath: string) => {
-    let storage
-    if (opts.storage) {
-        storage = opts.storage
-    } else {
-        storage = getStorageFromConfig(opts, sourceFile)
-        if (!storage) throw new Error('Error: Please specify a non-empty storage value in the CLI or in the config file.')
-    }
-    storage = typeof storage === 'string' ? storage : `${storage}`
-    let input = opts.input && typeof opts.input === 'string' ? opts.input : `${opts.input}`
+    const rawStorage = opts.storage ?? getStorageFromConfig(opts, sourceFile)
+    if (rawStorage === undefined) throw new Error('Error: Please specify a non-empty storage value in the CLI or in the config file.')
+    
+    const storage = typeof rawStorage === 'string' ? rawStorage : `${rawStorage}`
+    const input = opts.input && typeof opts.input === 'string' ? opts.input : `${opts.input}`
 
-    storage = preprocessString(storage)
-    input = preprocessString(input)
+    const processedStorage = preprocessString(storage)
+    const processedInput = preprocessString(input)
 
-    const cmd = `docker exec ${sandboxName} tezos-client run script ${sourcePath} on storage \'${storage}\' and input \'${input}\'`
+    const entrypoint = opts.entrypoint ? `--entrypoint ${opts.entrypoint}` : ''
+
+    const cmd = `docker exec ${sandboxName} tezos-client run script ${sourcePath} on storage \'${processedStorage}\' and input \'${processedInput}\' ${entrypoint}`
     return cmd
 }
 
@@ -223,7 +222,7 @@ const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfi
     })
 }
 
-const simulate = <T>(parsedArgs: Opts, sandboxName: string, sandbox: SandboxConfig.t): LikeAPromise<PluginResponse, Failure<T>> => {
+const simulate = <T>(parsedArgs: Opts, sandboxName: string, sandbox: SandboxConfig.t): Promise<PluginResponse> => {
     if (parsedArgs.sourceFile) {
         return simulateContract (parsedArgs, sandboxName, sandbox) (parsedArgs.sourceFile as string)
                .then(data => [data])
@@ -249,7 +248,7 @@ const simulateTask = async <T>(parsedArgs: Opts) : Promise<void> => {
     else return sendAsyncErr("No sandbox specified or found in your .taq/config.json file")
 }
 
-export const client = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
+export const client = <T>(parsedArgs: Opts) : Promise<void> => {
     switch (parsedArgs.task) {
         case 'typecheck':
             return typecheckTask(parsedArgs)

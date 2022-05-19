@@ -1,12 +1,12 @@
-import { RequestArgs, PluginResponse, Failure, LikeAPromise } from "@taqueria/node-sdk/types";
+import { RequestArgs, PluginResponse, LikeAPromise, TaqError } from "@taqueria/node-sdk/types";
 import glob from 'fast-glob'
 import { join } from 'path'
 import { generateContractTypesProcessContractFiles } from "./src/cli-process";
 interface Opts extends RequestArgs.ProxyRequestArgs {
 // TODO: Document these
-typescriptDir: string,
+typescriptDir?: string,
 typeAliasMode?: 'local' | 'file' | 'library' | 'simple',
-contract: string
+contract?: string
 }
 
 const getContractAbspath = (contractFilename: string, parsedArgs: Opts) => 
@@ -18,7 +18,7 @@ const generateContractTypes = (parsedArgs: Opts) => async (contractFilename: str
     await generateContractTypesProcessContractFiles({
         inputTzContractDirectory: parsedArgs.config.artifactsDir,
         inputFiles: [contractAbspath],
-        outputTypescriptDirectory: parsedArgs.typescriptDir,
+        outputTypescriptDirectory: parsedArgs.typescriptDir || 'types',
         format: 'tz',
         typeAliasMode: parsedArgs.typeAliasMode ?? 'file',
     });
@@ -31,18 +31,16 @@ const generateContractTypesAll = async (parsedArgs: Opts) : Promise<string[]> =>
     return await Promise.all(files.map(generateContractTypes(parsedArgs)));
 }
 
-export const generateTypes = <T>(parsedArgs: RequestArgs.ProxyRequestArgs): LikeAPromise<PluginResponse, Failure<T>> => {
-    const typedArgs = parsedArgs as Opts
-
-    typedArgs.typescriptDir = typedArgs.typescriptDir || 'types';
+export const generateTypes = (parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
+    parsedArgs.typescriptDir = parsedArgs.typescriptDir || 'types';
 
     console.log('generateTypes', { 
-        typescriptDir: typedArgs.typescriptDir
+        typescriptDir: parsedArgs.typescriptDir
     });
 
-    const p = typedArgs.contract
-        ? generateContractTypes(typedArgs) (typedArgs.contract)
-        : generateContractTypesAll(typedArgs)
+    const p = parsedArgs.contract
+        ? generateContractTypes(parsedArgs) (parsedArgs.contract)
+        : generateContractTypesAll(parsedArgs)
 
     return p.then(data => {
         console.log(

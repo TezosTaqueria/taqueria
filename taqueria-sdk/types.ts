@@ -44,7 +44,7 @@ export type i18nMessage = string | {message: string, numOfArguments: PositiveInt
 export interface Schema extends PluginInfo.t{
     checkRuntimeDependencies?: (i18n: i18n, parsedArgs: RequestArgs.t) => LikeAPromise<PluginResponse, TaqError.t>|Promise<PluginResponse>
     installRuntimeDependencies?: (i18n: i18n, parsedargs: RequestArgs.t) => LikeAPromise<PluginResponse, TaqError.t>|Promise<PluginResponse>
-    proxy?: (parsedArgs: RequestArgs.ProxyRequestArgs) => LikeAPromise<PluginResponse, TaqError.t>    
+    proxy?: <T extends RequestArgs.ProxyRequestArgs>(parsedArgs: T) => LikeAPromise<PluginResponse, TaqError.t>
 }
 
 export const inputSchema = PluginInfo.rawSchema.extend({
@@ -54,7 +54,7 @@ export const inputSchema = PluginInfo.rawSchema.extend({
 export interface InputSchema extends z.infer<typeof inputSchema> {
     checkRuntimeDependencies?: (i18n: i18n, parsedArgs: RequestArgs.t) => LikeAPromise<PluginResponse, TaqError.t>|Promise<PluginResponse>
     installRuntimeDependencies?: (i18n: i18n, parsedargs: RequestArgs.t) => LikeAPromise<PluginResponse, TaqError.t>|Promise<PluginResponse>
-    proxy?: (parsedArgs: RequestArgs.ProxyRequestArgs) => LikeAPromise<PluginResponse, TaqError.t>
+    proxy?: <T extends RequestArgs.ProxyRequestArgs>(parsedArgs: T) => LikeAPromise<PluginResponse, TaqError.t>
 }
 
 export type Args = string[]

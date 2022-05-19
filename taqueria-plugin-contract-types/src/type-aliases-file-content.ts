@@ -26,6 +26,8 @@ type MapKey = Array<any> | object | string | boolean | number;
 export type MMap<K extends MapKey, V> = Omit<MichelsonMap<K, V>, 'get'> & { get: (key: K) => V };
 export type BigMap<K extends MapKey, V> = Omit<MichelsonMap<K, V>, 'get'> & { get: (key: K) => Promise<V> };
 
+export type chest = string & { __type: 'chest' };
+export type chest_key = string & { __type: 'chest_key' };
 
 const createStringTypeTas = <T extends string>() => {
     return (value: string): T => value as T;
@@ -64,6 +66,8 @@ export const tas = {
     address: createStringTypeTas<address>(),
     bytes: createStringTypeTas<bytes>(),
     contract: createStringTypeTas<contract>(),
+    chest: createStringTypeTas<chest>(),
+    chest_key: createStringTypeTas<chest_key>(),
     timestamp: (value: string | Date): timestamp => new Date(value).toISOString() as timestamp,
 
     int: createBigNumberTypeTas<int>(),

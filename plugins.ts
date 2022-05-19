@@ -36,10 +36,15 @@ export const inject = (deps: PluginDeps) => {
         attemptP(async () => {
             if (parsedArgs.logPluginRequests)  {
                 const encoder = new TextEncoder()
-                const output = pluginRequestToString (plugin) (cmd)
+                let output = pluginRequestToString (plugin) (cmd)
                 await stdout.write(encoder.encode(`*** START Call to ${plugin.name} ***\n`))
                 await stdout.write(encoder.encode(`${output}\n`))
                 await stdout.write(encoder.encode(`*** END of call to ${plugin.name} ***\n`))
+                // TODO: this logic will be refactored to achieve better SoC.
+                // Issue that captures this: https://github.com/ecadlabs/taqueria/issues/732
+                if (parsedArgs.debug) {
+                    if (/^node /.test(output)) output = output.replace(/^node /, "node --inspect-brk ")
+                }
                 await clipboard.writeText(output.replace("\\\n", ''))
             }
             return await Promise.resolve()
@@ -207,9 +212,9 @@ export const inject = (deps: PluginDeps) => {
                     '_',
                 ]
 
-                // A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command
+                // A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command. This same hack is used to prevent yargs from turning 0x00 into 0
                 // Refer to https://github.com/yargs/yargs-parser/issues/201
-                if (typeof val === 'string' && val.match(/^___(.|\n)*___$/)) val = val.slice(3, -3)
+                if (typeof val === 'string' && /^___(.|\n)*___$/.test(val)) val = val.slice(3, -3)
 
                 // Some parameters we don't need to send, so we omit those
                 if (omit.includes(key) || key.indexOf('-') >= 0 || val === undefined)
@@ -229,7 +234,7 @@ export const inject = (deps: PluginDeps) => {
     // getComputedState: () -> Future<TaqError, State>
     const getComputedState = () => pipe(
         retrieveAllPluginInfo(),
-        chain ((pluginInfo: ParsedPluginInfo.t[]) => attemptP(async () => {
+        chain ((pluginInfo: ParsedPluginInfo.t[]) => attemptP<TaqError.t, EphemeralState.t>(async () => {
             return await eager (EphemeralState.make ({
                 build: parsedArgs.setBuild,
                 configHash: config.hash,

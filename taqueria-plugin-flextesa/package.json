@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/plugin-flextesa",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A plugin for Taqueria providing local sandbox capabilities built on Flextesa",
   "keywords": [
     "taqueria",
@@ -23,7 +23,7 @@
   "types": "./index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build-plugin": "npx tsc -noEmit -p ./tsconfig.json && npx parcel build --no-cache  2>&1",
+    "build-plugin": "npx tsc -noEmit && npx parcel build --no-cache  2>&1",
     "build-docker": "cd docker && npm run build",
     "build-dev": "npm run build-docker && npm run build-plugin",
     "build": "npm run build-plugin",

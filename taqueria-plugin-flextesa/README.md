@@ -1,6 +1,4 @@
----
-title: Flextesa Plugin
----
+# Taqueria Flextesa Plugin
 
 [Flextesa](https://tezos.gitlab.io/flextesa/) is a flexible Tezos sandbox environment that's easy to work with. It runs a Tezos node and network in a Docker container on your local machine
 
@@ -23,15 +21,6 @@ Some helpful things to know:
 - Node.js v16 or later
 - Docker v0.8.4 or later
 
-## Build Instructions
-
-To build the plugin locally from source, run the following from the project root:
-1. `npm i`
-2. `npm run build -w taqueria-flextesa-manager`
-3. `npm run build-docker -w taqueria-flextesa-manager`
-
-To build all Taqueria plugins and the Taqueria binary, run the following from the `taqueria` folder:
-1. `npm run build-all`
 ## Installation
 
 The Flextesa plugin is distributed as an NPM package that can be installed and uninstalled on a project from the Taqueria CLI
@@ -43,12 +32,11 @@ taq install @taqueria/plugin-flextesa
 
 Once installed, you can confirm functionality by runing the command `taq start sandbox` which will start a sandbox with the default `local` configuration
 
-:::note
-The project you install it on must be initialized by NPM. This only needs to be done once on a project and is accomplished by running the command:
+> ### :page_with_curl: Note
+> The project you install it on must be initialized by NPM. This only needs to be done once on a project and is accomplished by running the command:
 ```shell
 npm init -y
 ``` 
-:::
 
 ## CLI Commands
 
@@ -59,8 +47,8 @@ The following commands are available from the CLI or the VS Code Command palette
 - `taq stop sandbox [sandboxName]`
 - `taq list accounts [sandboxName]`
 
-
-> The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer.
+> ### :page_with_curl: Note
+> The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer
 
 ## Plugin Configuration
 
@@ -104,18 +92,18 @@ sandboxName : { sandboxConfigObject }
 Inside the sandboxConfigObject, there are four properties you can configure:
 #### 'accounts'
 
-A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}
+A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}`
 
 #### 'label'
 An arbitrary string used to describe a particular configuration
 
-#### 'protocol
+#### 'protocol'
 
 A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
 
 Currently availble protocols are:
 - Hangzhou `PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx`
-- Ithica2  `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
+- Ithaca   `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
 
 #### 'rpcUrl'
 
@@ -149,8 +137,8 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  attribute |  value                         |  
 |------------|:------------------------------:|
 |  task      | 'start sandbox'                | 
-|  command   | 'start sandbox [sandboxName]   | 
-|  aliases   | ['start flextesa]              |  
+|  command   | 'start sandbox [sandboxName]'  | 
+|  aliases   | ['start flextesa']             |  
 
 
 #### The `stop sandbox` Task
@@ -158,7 +146,7 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  attribute |  value                         | 
 |------------|:------------------------------:|
 |  task      | 'stop sandbox'                 | 
-|  command   | 'stop sandbox [sandboxName]    | 
+|  command   | 'stop sandbox [sandboxName]'   | 
 |  aliases   | ['stop flextesa']              |  
 
 #### The `list accounts` Task
@@ -166,5 +154,5 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  attribute |  value                         | 
 |------------|:------------------------------:|
 |  task      | 'list accounts'                | 
-|  command   | 'list accounts [sandboxName]   | 
+|  command   | 'list accounts [sandboxName]'  | 
 |  aliases   | [ ]                            |  

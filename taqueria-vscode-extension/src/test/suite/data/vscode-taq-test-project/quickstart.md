@@ -1,20 +1,3 @@
----
-title: Quickstart
----
-<!-- 
-Content Type: Getting Started Documentation
-
-Purpose: To get a developer set up and ready to go with Taqueria in under 5 minutes
-
-Goal: To onboard as many devs as possible by translating their interest into them actually developing on Taqueria
-
-Questions:
-- What is the quickest explanation of Taqueria and what it does?
-- What are the most important questions new users will have?
-- What are the cool things you can do with Taqueria? 
--->
-
-
 ## Overview
 
 This quickstart guide will teach you the fundamentals of using Taqueria in 10 minutes by going through the process of running some basic tasks in Taqueria from the CLI
@@ -28,19 +11,16 @@ What you will accomplish:
 
 ## Requirements
 
-To successfully follow this guide, you must ensure that:
+To successfully use Taqueria, you must ensure that:
 - The Taqueria CLI has been [installed](./installation.mdx) and is available in your `$PATH` 
-- Docker is installed and currently running
-
-:::note
-The Taqueria VS Code Extension provides direct access to Taqueria tasks from the command palette. Under the hood, the VS Code Extension makes calls to the CLI, so you can be assured the behaviour of tasks will remain consistent regardless of wether they are executed from a terminal or the command palette. The steps in this guide are for using the Taqueria CLI, but you can also run the commands from the Taqueria extension via the VS Code command palette if you prefer
-:::
+- Docker v0.8 or later is installed and currently running
+- Node.js v16.x or later
 
 ## Starting a Taqueria Project
 
 There are two things required to start using Taqueria on a project
 
-First, the project must have been initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts`, `/artifacts`, and `/tests` have been created 
+1. The project must be initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts`, `/artifacts`, and `/tests` have been created 
 
 Taqueria provides the command `init` which will create a new directory with the correct structure and configuration. To create a new Taqueria project called `my-first-project`, run the command:
 ```shell
@@ -50,12 +30,7 @@ taq init my-first-project
 If a project has already been initialized, Taqueria will not re-initialize the project, but will still return a success message. This will be fixed in an upcoming release
 :::
 
-Next, the project directory must be initialized as an NPM project as all current plugins implemented as NPM packages. To do this, first change directories:
-```shell
-cd my-first-project
-```
-
-Then initialize the directory as an NPM project:
+2. The project directory must be initialized as an NPM project as all current plugins implemented as NPM packages. To do this, run:
 ```shell
 npm init -y
 ```
@@ -64,20 +39,20 @@ npm init -y
 
 Now that the project has been properly initialized, plugins can be installed to provide support for specific functionality such as compilation, smart contract origination, or sandbox environments
 
-Plugins are installed using the `taq install command` which appears in the command list once a project is initialized. You can view the list of commands available in the current project contexts by running `taq --help` from the CLI:
-```shell
-❯ taq --help
-taq <command>
+Plugins are installed using the `taq install [pluginName]` command (requires the project to be initialized). Once a plugin has been installed, it's tasks will become available in Taqueria
 
-Commands:
-  taq init [projectDir]                  Initialize a new project
-  taq scaffold [scaffoldUrl] [scaffoldP  Generate a new project using a pre
-  rojectDir]                             -configured scaffold
-  taq install <pluginName>               Install a plugin
-  taq uninstall <pluginName>             Uninstall a plugin
-```
+You can view the list of commands available in the current project context by running `taq` from the command line
 
-Once a plugin has been installed, you will see the additional commands provided by the plugin added to the list
+### Available Plugins
+
+| name           |  pluginName                       |  description                                                        |
+|----------------|------------------------------     |---------------------------------------------------------------------|
+| LIGO           | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language                     |
+| SmartPy        | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy contract language                        |
+| Flextesa       | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa                       | 
+| Taquito        | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate                       |
+| Contract Types | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code         |
+| Tezos Client   | `@taqueria/plugin-tezos-client`   | Interacts with a Tezos node, providing simulation and type checking |
 
 ## Compiling a LIGO Smart Contract
 
@@ -140,7 +115,6 @@ If you open this file (`/artifacts/counter.tz`), you can view the raw Michelson 
          NIL operation ;
          PAIR } }
 ```
-
 
 ### Starting a Flextesa Sandbox
 
@@ -235,11 +209,6 @@ This will originate all contracts in the `/artifacts` directory to the sandbox a
 
 ## Finishing Up
 
-Congratulations! At this point, you have run through the basic usage of Taqueria including:
-- Initializing a new Taqueria project
-- Installing plugins for LIGO, Flextesa, and Taquito
-- Compiling a LIGO smart contract
-- Starting and querying a local Flextesa sandbox 
-- Originating a compiled smart contract to the sandbox
+Congratulations! At this point, you have run through the basic usage of Taqueria
 
 For more details on the usage of specific Taqueria tasks, you can refer to the plugin documentation which contains additional context, configuration, and usage of the many Taqueria tasks; or continue on with the getting started guides

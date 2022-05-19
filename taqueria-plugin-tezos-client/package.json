@@ -1,6 +1,6 @@
 {
   "name": "@taqueria/plugin-tezos-client",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A taqueria plugin for utilizing tezos-client",
   "targets": {
     "default": {
@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx parcel build --no-cache 2>&1",
+    "build": "npx tsc -noEmit && npx parcel build --no-cache 2>&1",
     "pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
   },
   "keywords": [

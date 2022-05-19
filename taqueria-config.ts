@@ -27,7 +27,7 @@ export const defaultConfig : Config.t = Config.create({
     sandbox: {
         local: {
             label: "Local Tezos Sandbox",
-            protocol: "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            protocol: "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             rpcUrl: "http://localhost:20000"
         }
     },

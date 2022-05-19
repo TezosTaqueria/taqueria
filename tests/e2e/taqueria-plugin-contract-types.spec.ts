@@ -1,5 +1,5 @@
 import {generateTestProject} from "./utils/utils";
-import fs from "fs";
+import fsPromises from "fs/promises"
 import { exec as exec1} from "child_process"
 import path from "path";
 import util from "util"
@@ -118,12 +118,29 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
         }
     });
 
-    // Remove all files from artifacts folder without removing folder itself
-    afterEach(() => {
+    test('Verify that users can properly use the generated types (involves origination to a testnet and calling an entrypoint, which will take a while)', async () => {
         try {
-            const files = fs.readdirSync(`${taqueriaProjectPath}/artifacts/`);
+            await exec(`cp e2e/data/timelock.tz ${taqueriaProjectPath}/artifacts`)
+            await exec(`cd ${taqueriaProjectPath} && taq generate types`)
+            await exec(`cp e2e/data/timelock.ts ${taqueriaProjectPath}/types`)
+            await exec(`cp e2e/data/tsconfig.timelock.json ${taqueriaProjectPath}/types`)
+            await exec(`npm init -y`, {cwd: `./${taqueriaProjectPath}/types`})
+            await exec(`npx tsc --project tsconfig.timelock.json`, {cwd: `./${taqueriaProjectPath}/types`})
+            const {stdout, stderr} = await exec(`node timelock.js`, {cwd: `./${taqueriaProjectPath}/types`})
+            expect(stdout).toBe("initialStorage: 00 , newStorage: 050080890f\n")
+            expect(stderr).toBe("")
+
+        } catch(error) {
+            throw new Error (`error: ${error}`);
+        }
+    }, 400000);
+
+    // Remove all files from artifacts folder without removing folder itself
+    afterEach( async () => {
+        try {
+            const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
             for (const file of files) {
-                fs.unlinkSync(path.join(`${taqueriaProjectPath}/artifacts/`, file));
+                await fsPromises.rm(path.join(`${taqueriaProjectPath}/artifacts/`, file));
             }
         } catch(error){
             throw new Error (`error: ${error}`);
@@ -132,9 +149,9 @@ describe("E2E Testing for taqueria contract types plugin",  () => {
 
     // Clean up process to remove taquified project folder
     // Comment if need to debug
-    afterAll(() => {
+    afterAll( async () => {
         try {
-            fs.rmdirSync(taqueriaProjectPath, { recursive: true })
+            await fsPromises.rm(taqueriaProjectPath, { recursive: true })
         } catch(error){
             throw new Error (`error: ${error}`);
         }

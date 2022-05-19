@@ -11,7 +11,7 @@ const taqueriaProjectPath = 'e2e/auto-test-archetype-plugin';
 describe("E2E Testing for taqueria archetype plugin",  () => {
 
     beforeAll(async () => {
-        await generateTestProject(taqueriaProjectPath, ["archetype"], true);
+        await generateTestProject(taqueriaProjectPath, ["archetype"]);
     })
 
     test('Verify that taqueria archetype plugin outputs no contracts found if no contracts exist', async () => {
@@ -35,7 +35,7 @@ describe("E2E Testing for taqueria archetype plugin",  () => {
             await exec(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`, 25000);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`);
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -52,7 +52,7 @@ describe("E2E Testing for taqueria archetype plugin",  () => {
             await exec(`taq compile fa12.arl`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`, 25000);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`);
 
         } catch(error) {
             throw new Error (`error: ${error}`);
@@ -70,8 +70,8 @@ describe("E2E Testing for taqueria archetype plugin",  () => {
             await exec(`taq compile`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version for both contracts has been generated
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`, 25000);
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/animal_tracking.tz`, 25000);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/animal_tracking.tz`);
 
 
         } catch(error) {
@@ -111,7 +111,7 @@ describe("E2E Testing for taqueria archetype plugin",  () => {
             await exec(`taq compile fa12.arl --plugin @taqueria/plugin-archetype`, {cwd: `./${taqueriaProjectPath}`});
 
             // 3. Verify that compiled michelson version has been generated
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`, 25000);
+            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`);
 
         } catch(error) {
             throw new Error (`error: ${error}`);

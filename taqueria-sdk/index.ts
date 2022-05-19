@@ -56,25 +56,21 @@ export const execCmd = (cmd:string) : LikeAPromise<StdIO, ExecException> => new 
     })
 })
 
-export const getArch = () : LikeAPromise<string, TaqError> => 
-    execCmd("uname -m")
-    .then(result => result.stdout.trim().toLowerCase())
-    .then(arch => {
-        switch(arch) {
-            case 'x86_64':
-                return 'linux/amd64'
-            case 'arm64':
-                return 'linux/arm64/v8'
-            default:
-                const taqErr: TaqError = {
-                    kind: "E_INVALID_ARCH",
-                    msg: `We do not know how to handle the ${arch} architecture`,
-                    context: arch
-                }
-                return Promise.reject(taqErr)
-        }
-    })
-
+export const getArch = () : LikeAPromise<string, TaqError> => {
+    switch(process.arch) {
+        case 'arm64':
+            return Promise.resolve('linux/arm64/v8')
+        case 'x32':
+        case 'x64':
+            return Promise.resolve('linux/amd64')
+        default:
+            return Promise.reject({
+                errCode: "E_INVALID_ARCH",
+                errMsg: `We do not know how to handle the ${process.arch} architecture`,
+                context: process.arch
+            })
+    }
+}
 
 export const parseJSON = <T>(input: string) : LikeAPromise<T, TaqError> => new Promise((resolve, reject) => {
     try {
@@ -144,7 +140,8 @@ export const noop = () => {}
 const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> => {
     if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
         try {
-            const argv = yargs(unparsedArgs.slice(2)).argv
+            const preprocessedArgs = preprocessArgs(unparsedArgs)
+            const argv = yargs(preprocessedArgs.slice(2)).argv
             const requestArgs = RequestArgs.create(argv)
             return Promise.resolve(requestArgs)
         }
@@ -156,6 +153,34 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> =>
         }
     }
     return Promise.reject("Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?")
+}
+
+
+// A hack to protect all hex from being messed by yargs
+const preprocessArgs = (args: Args) : Args => {
+    return args.map(arg => /^0x[0-9a-fA-F]+$/.test(arg) ? "___" + arg + "___" : arg)
+}
+
+// A hack to protect all hex from being messed by yargs
+const postprocessArgs = (args: Args) : Record<string, unknown> =>  {
+    const postprocessedArgs = Object.entries(args).map(([key, val]) =>
+        [key,
+            typeof val === 'string' && /^___0x[0-9a-fA-F]+___$/.test(val)
+            ? val.slice(3, -3)
+            : val
+        ]
+    )
+
+    const groupedArgs = postprocessedArgs.reduce(
+        (acc, arg) => {
+            const key = arg[0]
+            const val = arg[1]
+            return {...acc, [key]: val}
+        },
+        {}
+    )
+
+    return groupedArgs
 }
 
 const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): Schema => {

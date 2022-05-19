@@ -1,6 +1,6 @@
----
-title: Taquito Plugin
----
+<% if (it.output == "github") { %>
+# Taqueria Taquito Plugin
+<% } %>
 
 The Taquito plugin provides a task to originate a smart contract to a Tezos network
 
@@ -42,9 +42,3 @@ The plugin provides a single task `originate`, used for originating Michelson co
 |  task      | 'deploy'                 | 
 |  command   | 'deploy [contract]`      | 
 |  aliases   | ['originate']            |  
-
-
-
-
-
-
