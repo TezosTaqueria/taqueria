@@ -211,7 +211,6 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
-      
       - uses: actions/setup-node@v2
         with:
           node-version: 16.13.x
@@ -257,7 +256,6 @@ jobs:
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
     steps:
       - uses: actions/checkout@v2
-      
       - uses: actions/setup-node@v2
         with:
           node-version: 16.13.x
@@ -303,12 +301,10 @@ jobs:
           npm run build-docker -w taqueria-flextesa-manager
       
       - name: Run unit tests
-        run: |
-          npm run test:unit -w tests
+        run: npm run test:unit -w tests
 
       - name: Run integration tests
-        run: |
-          npm run test:integration -w tests
+        run: npm run test:integration -w tests
 
       - name: Run e2e tests
         run: npm run test:e2e -w tests ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
