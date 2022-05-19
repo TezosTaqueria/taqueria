@@ -317,12 +317,13 @@ jobs:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
       
       - id: set-job-status
+        if: always()
         name: Set Status
         run: echo "::set-output name=job-status::${{ job.status }}"
   
   report-e2e-status:
     needs: run-tests
-    if: (always() && github.event_name != 'release' && (!contains(needs.*.result, 'success')))
+    if: (always() && (${{ needs.run-tests.outputs['job-status'] }} != ('success')))
     runs-on: ubuntu-latest
     steps:
       - uses: ravsamhq/notify-slack-action@v1
