@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as taqueriaExtension from '../../extension';
+import * as MockedObject from "./MockedObject"
 import {ExtensionContext, Uri} from "vscode";
 import {sleep} from "./utils/utils";
 import * as path from "path";
@@ -17,7 +18,11 @@ describe('Extension Test Suite', () => {
         const context: ExtensionContext = {
             subscriptions: [],
         } as any
-        await taqueriaExtension.activate(context)
+        await taqueriaExtension.activate(context, {
+            vscode: MockedObject.make(vscode, {
+                "window.showInformationMessage": (msg: string) => Promise.resolve(console.log(msg))
+            })
+        })
         await fse.copy(testProjectSource, testProjectDestination)
 
         vscode.window.showInformationMessage('Start all tests.');
