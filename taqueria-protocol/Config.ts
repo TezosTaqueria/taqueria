@@ -165,4 +165,17 @@ export const make = (data: Input) => {
     }
 }
 
+export const of = (data: RawInput | Record<string, unknown>) => {
+    try {
+        const retval = schema.parse(data)
+        return resolve(retval)
+    }
+    catch (err) {
+        if (err instanceof ZodError) {
+            return toParseErr<Config>(err, `The provided config is invalid.`, data)
+        }
+        return toParseUnknownErr<Config>(err, 'There was a problem trying to parse the Taqueria configuration', data)
+    }
+}
+
 export const create = (data: RawInput | Record<string, unknown>) => schema.parse(data)

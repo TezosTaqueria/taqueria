@@ -72,7 +72,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath.t, create=false) => pi
         })
     )),
     mapRej<TaqError.t, TaqError.t>(previous => ({kind: "E_INVALID_CONFIG", msg: "Your config.json file is invalid", previous})),
-    map((val: Config.t) => Config.create(val))
+    chain(Config.of)
 )
 
 
