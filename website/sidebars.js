@@ -54,7 +54,7 @@ const sidebars = {
       collapsible: false,
       items: [
         "tutorials/hello-tacos-tutorial",
-        "tutorials/lecagy-hello-tacos-tutorial"
+        "tutorials/legacy-hello-tacos-tutorial"
       ],
     },
     {
