@@ -142,7 +142,7 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n.t) =>
         (args: Record<string, unknown>) => pipe(
             SanitizedArgs.of(args), 
             chain(({projectDir, maxConcurrency, quickstart}: SanitizedArgs.t) => {
-                return initProject(projectDir, i18n, maxConcurrency, quickstart)
+                return initProject(projectDir, quickstart, maxConcurrency, i18n)
             }),
             forkCatch (console.error) (console.error) (console.log)
         )
@@ -291,7 +291,7 @@ const listKnownTasks = (parsedArgs: SanitizedArgs.t) => pipe(
     map (JSON.stringify)
 )
 
-const initProject = (projectDir: SanitizedAbsPath.t, i18n: i18n.t, maxConcurrency: number, quickstart: string|undefined) => pipe(
+const mkInitialDirectories = (projectDir: SanitizedAbsPath.t, maxConcurrency: number, i18n: i18n.t) => pipe(
     getConfig(projectDir, i18n, true),
     chain (({artifactsDir, contractsDir, testsDir, projectDir, operationsDir}: LoadedConfig.t) => {
         const jobs = [operationsDir, artifactsDir, contractsDir, testsDir].reduce(
@@ -299,7 +299,11 @@ const initProject = (projectDir: SanitizedAbsPath.t, i18n: i18n.t, maxConcurrenc
             [] as Future<TaqError.TaqError, string>[]
         )
         return parallel (maxConcurrency) (jobs)
-    }),
+    })
+)
+
+const initProject = (projectDir: SanitizedAbsPath.t, quickstart: string|undefined, maxConcurrency: number, i18n: i18n.t) => pipe(
+    mkInitialDirectories(projectDir, maxConcurrency, i18n),
     chain (_ => quickstart && quickstart.length > 0
         ? writeTextFile (joinPaths(projectDir, "quickstart.md")) (quickstart)
         : resolve(projectDir)
@@ -307,21 +311,38 @@ const initProject = (projectDir: SanitizedAbsPath.t, i18n: i18n.t, maxConcurrenc
     map (_ => i18n.__("bootstrapMsg"))
 )
 
-const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir}: SanitizedArgs.ScaffoldArgs) => attemptP(async () => {
+const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, maxConcurrency}: SanitizedArgs.ScaffoldArgs) => attemptP(async () => {
     try {
-        const abspath = await eager (SanitizedAbsPath.make(`${scaffoldProjectDir}/.taq/scaffold.json`))
+        const abspath = await eager (SanitizedAbsPath.make(scaffoldProjectDir))
         const destDir = await eager (doesPathNotExist(abspath))
         
         log(`scaffolding\n into: ${destDir}\n from: ${scaffoldUrl}`)    
         await eager (gitClone (scaffoldUrl) (destDir))
 
+        // TODO: Remove after 620-operations is merged in both the
+        // taqueria repo as well as the taqueria-scaffold-quickstart repo
+        //
+        // See issue: https://github.com/ecadlabs/taqueria/issues/736
+        await eager (exec("git checkout 620-operations", {}, true, destDir))
+
         log("Cleanup...")
         const scaffoldConfig = await eager (SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`))
         const gitDir = await eager (SanitizedAbsPath.make(`${destDir}/.git`))
-        const _gitIgnore = await eager (SanitizedAbsPath.make(`${destDir}/.gitignore`))
-        await eager (rm(scaffoldConfig))
-        await eager (rm(gitDir))
+        // const _gitIgnore = await eager (SanitizedAbsPath.make(`${destDir}/.gitignore`))
         // await eager (rm(gitIgnore))
+        
+        // Remove the scaffold.json file, if not exists
+        // If it doesn't exist, don't throw...
+        try {
+            await eager (rm(scaffoldConfig))
+        }
+        catch (err) {
+            if (!isTaqError(err) || err.kind !== "E_INVALID_PATH_DOES_NOT_EXIST") {
+                throw err
+            }
+        }
+        
+        await eager (rm(gitDir))
 
         log("Installing plugins...")
         await eager (exec("npm install", {}, false, destDir))
