@@ -114,13 +114,6 @@ const config = {
             className: "header-link"
           },
           {
-            type: "doc",
-            docId: "nft_minting",
-            label: "NFTs",
-            position: "right",
-            className: "header-link"
-          },
-          {
             href: "https://discord.gg/bujt7syVVT",
             position: "right",
             className: "header-discord-link",
