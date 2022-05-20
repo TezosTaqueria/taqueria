@@ -271,6 +271,7 @@ const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
  * Gets the name of the current environment
  **/
 export const getCurrentEnvironment = (parsedArgs: RequestArgs.t) : string => {
+    debugger
     return parsedArgs.env
         ? (parsedArgs.env as string)
         : (
@@ -346,7 +347,8 @@ export const getInitialStorage = (parsedArgs: RequestArgs.t) => (contractFilenam
 export const getDefaultAccount = (parsedArgs: RequestArgs.t) => (sandboxName: string) => {
     const sandboxConfig = getSandboxConfig(parsedArgs) (sandboxName)
     if (sandboxConfig) {
-        const defaultAccount = sandboxConfig.accounts!["default"] as string | undefined
+        const accounts = sandboxConfig.accounts ?? {}
+        const defaultAccount = accounts["default"] as string | undefined
         if (defaultAccount) {
             return getSandboxAccountConfig(parsedArgs) (sandboxName) (defaultAccount)
         }

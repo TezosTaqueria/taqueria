@@ -11,7 +11,7 @@ const internalSchema = z.object({
     ),
     email: z.string({description: "Faucet E-mail"}).regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
     password: z.string({description: "Faucet Password"}).nonempty(),
-    account: z.string({description: "Faucet Account"}).nonempty(),
+    amount: z.string({description: "Faucet Account"}).nonempty().regex(/^\d+$/),
     activation_code: z.string({description: "Faucet Activation Code"}).nonempty()
 }).describe("Faucet")
 
@@ -23,7 +23,7 @@ export const rawSchema = z.object({
     ),
     email: z.string({description: "Faucet E-mail"}).regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
     password: z.string({description: "Faucet Password"}).nonempty(),
-    account: z.string({description: "Faucet Account"}).nonempty(),
+    amount: z.string({description: "Faucet Account"}).nonempty().regex(/^\d+$/),
     activation_code: z.string({description: "Faucet Activation Code"}).nonempty()
 }).describe("Faucet")
 

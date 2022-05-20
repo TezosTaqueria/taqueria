@@ -18,34 +18,29 @@ describe("E2E Testing for taqueria taquito plugin",  () => {
     // TODO: Consider in future to use keygen service to update account balance programmatically
     // https://github.com/ecadlabs/taqueria/issues/378
     test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
-        try {
-            environment = "test";
+        environment = "test";
 
-            // 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
-            await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
-            await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+        // 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
+        await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
+        await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
-            // 2. Run taq deploy on a selected test network described in "test" environment
+        // 2. Run taq deploy on a selected test network described in "test" environment
 
-            const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
-            const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
+        const deployCommand = await exec(`taq deploy -e ${environment}`, {cwd: `./${taqueriaProjectPath}`})
+        const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3]
 
-            // 3. Verify that contract has been originated on the network
-            expect(deployResponse).toContain("hello-tacos.tz");
-            expect(deployResponse).toContain(networkInfo.networkName);
-            const contractHash = deployResponse.split("│")[2].trim();
+        // 3. Verify that contract has been originated on the network
+        expect(deployResponse).toContain("hello-tacos.tz");
+        expect(deployResponse).toContain(networkInfo.networkName);
+        const contractHash = deployResponse.split("│")[2].trim();
 
-            expect(contractHash).toMatch(contractRegex);
+        expect(contractHash).toMatch(contractRegex);
 
-            // 4. Verify that contract has been originated to the network
-            expect(await checkContractExistsOnNetwork(
-                contractHash, 
-                networkInfo.networkURL))
-            .toBe(contractHash)
-
-        } catch(error) {
-            throw new Error (`error: ${error}`);
-        }
+        // 4. Verify that contract has been originated to the network
+        expect(await checkContractExistsOnNetwork(
+            contractHash, 
+            networkInfo.networkURL))
+        .toBe(contractHash)
     });
 
     // TODO: Consider in future to use keygen service to update account balance programmatically

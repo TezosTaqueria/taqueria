@@ -124,8 +124,8 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n.t) =>
         describe: i18n.__('initPathDesc')
     })
     .hide('projectDir')
-    .option('environment', {
-        alias: 'env',
+    .option('env', {
+        alias: 'e',
         describe: i18n.__('envDesc')
     })
     .epilogue(i18n.__('betaWarning'))
