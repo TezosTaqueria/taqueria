@@ -198,7 +198,6 @@ jobs:
 
   gather-info-for-e2e-tests:
     runs-on: ubuntu-latest
-    
     needs: 
       - build-binaries
     
