@@ -231,6 +231,12 @@ a.menu__link--sublist {
 	padding-bottom: 15px;
 }
 
+.footer__items {
+  list-style: none;
+  margin-bottom: 0;
+  padding-left: 0;
+}
+
 .footer__title {
 	white-space: nowrap;
 }
