@@ -53,7 +53,8 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "tutorials/hello-tacos-tutorial"
+        "tutorials/hello-tacos-tutorial",
+        "tutorials/lecagy-hello-tacos-tutorial"
       ],
     },
     {
@@ -63,7 +64,8 @@ const sidebars = {
       collapsed: false,
       collapsible: false,
       items: [
-        "scaffolds/taco-shop"
+        "scaffolds/taco-shop",
+        "scaffolds/quickstart-demo"
       ],
     },
     {
