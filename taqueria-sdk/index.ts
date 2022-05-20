@@ -142,7 +142,8 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> =>
         try {
             const preprocessedArgs = preprocessArgs(unparsedArgs)
             const argv = yargs(preprocessedArgs.slice(2)).argv
-            const requestArgs = RequestArgs.create(argv)
+            const postprocessedArgs = postprocessArgs(argv)
+            const requestArgs = RequestArgs.create(postprocessedArgs)
             return Promise.resolve(requestArgs)
         }
         catch (previous) {

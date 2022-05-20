@@ -47,7 +47,7 @@ const startInstance = (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts
     if (doesNotUseFlextesa(sandbox))
         return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
 
-    return isSandboxRunning(sandboxName)
+    return isSandboxRunning(sandboxName, opts)
         .then(
             running => running
                 ? sendAsyncRes("Already running.")
@@ -130,10 +130,12 @@ const startSandboxTask = (parsedArgs: Opts) : LikeAPromise<void, TaqError.t> => 
     return startAll(parsedArgs)
 }
 
-const isSandboxRunning = (sandboxName: string) =>
-    execCmd(`docker ps --filter name=${sandboxName} | grep -w ${sandboxName}`)
+const isSandboxRunning = (sandboxName: string, opts: Opts) => {
+    const containerName = getContainerName(sandboxName, opts)
+    return execCmd(`docker ps --filter name=${containerName} | grep -w ${containerName}`)
     .then(_ => true)
     .catch(_ => false)
+}
 
 
 type AccountBalance = {account: string, balance: string, address: string|undefined}
@@ -176,7 +178,7 @@ const listAccountsTask = async <T>(parsedArgs: Opts) : Promise<void> => {
         const sandbox = getSandbox(parsedArgs)
         if (sandbox) {
             if (doesUseFlextesa(sandbox)) {
-                return await isSandboxRunning(parsedArgs.sandboxName)
+                return await isSandboxRunning(parsedArgs.sandboxName, parsedArgs)
                 ? getAccountBalances(parsedArgs.sandboxName, sandbox, parsedArgs)
                     .then(sendJsonRes)
                 : sendAsyncErr(`The ${parsedArgs.sandboxName} sandbox is not running.`)
@@ -196,7 +198,7 @@ const stopSandboxTask = async (parsedArgs: Opts) : Promise<void> => {
         const sandbox = getSandbox(parsedArgs)
         if (sandbox) {
             if (doesUseFlextesa(sandbox)) {
-                return await isSandboxRunning(parsedArgs.sandboxName)
+                return await isSandboxRunning(parsedArgs.sandboxName, parsedArgs)
                 ? execCmd(`docker kill ${getContainerName(parsedArgs.sandboxName, parsedArgs)}`)
                     .then(_ => sendAsyncRes(`Stopped ${parsedArgs.sandboxName}.`))
                 : sendAsyncRes(`The ${parsedArgs.sandboxName} sandbox was not running.`)

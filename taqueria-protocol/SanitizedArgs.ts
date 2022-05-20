@@ -5,7 +5,7 @@ import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 import * as Url from "@taqueria/protocol/Url"
 
  const initRawSchema =  z.object({
-    _: z.array(z.string().nonempty()),
+    _: z.array(z.union([z.string().nonempty(), z.number()])),
     projectDir: SanitizedAbsPath.schema,
     maxConcurrency: z.preprocess(
         val => typeof val === 'string' ? parseInt(val) : Number(val),

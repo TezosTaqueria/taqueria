@@ -14,10 +14,13 @@ interface Opts extends RequestArgs.ProxyRequestArgs {
     entrypoint?: string
 }
 
-const isSandboxRunning = (sandboxName: string) =>
-    execCmd(`docker ps --filter name=${sandboxName} | grep -w ${sandboxName}`)
+const isSandboxRunning = (sandboxName: string, opts: Opts) => {
+    const containerName = getContainerName(sandboxName, opts)
+    return execCmd(`docker ps --filter name=${containerName} | grep -w ${containerName}`)
     .then(_ => true)
     .catch(_ => false)
+}
+    
 
 const getDefaultSandboxName = (config: LoadedConfig.t) => {
     const defaultEnv = config.environment?.default as string | undefined
@@ -123,7 +126,7 @@ const typecheckTask = async <T>(parsedArgs: Opts) : Promise<void> => {
         const sandbox = getSandboxConfig(parsedArgs) (sandboxName)
         if (sandbox) {
             if (doesUseFlextesa(sandbox)) {
-                return await isSandboxRunning(sandboxName)
+                return await isSandboxRunning(sandboxName, parsedArgs)
                 ? typecheck(parsedArgs, sandboxName, sandbox).then(sendJsonRes)
                 : sendAsyncErr(`The ${sandboxName} sandbox is not running.`)
             }
@@ -156,6 +159,8 @@ const preprocessString = (value: string) : string => {
 }
 
 const getSimulateCommand = (opts: Opts, sandboxName: string, sandbox: SandboxConfig.t, sourceFile: string, sourcePath: string) => {
+
+    const containerName = getContainerName(sandboxName, opts)
     const rawStorage = opts.storage ?? getStorageFromConfig(opts, sourceFile)
     if (rawStorage === undefined) throw new Error('Error: Please specify a non-empty storage value in the CLI or in the config file.')
     
@@ -167,7 +172,7 @@ const getSimulateCommand = (opts: Opts, sandboxName: string, sandbox: SandboxCon
 
     const entrypoint = opts.entrypoint ? `--entrypoint ${opts.entrypoint}` : ''
 
-    const cmd = `docker exec ${sandboxName} tezos-client run script ${sourcePath} on storage \'${processedStorage}\' and input \'${processedInput}\' ${entrypoint}`
+    const cmd = `docker exec ${containerName} tezos-client run script ${sourcePath} on storage \'${processedStorage}\' and input \'${processedInput}\' ${entrypoint}`
     return cmd
 }
 
@@ -237,7 +242,7 @@ const simulateTask = async <T>(parsedArgs: Opts) : Promise<void> => {
         const sandbox = getSandboxConfig(parsedArgs) (sandboxName)
         if (sandbox) {
             if (doesUseFlextesa(sandbox)) {
-                return await isSandboxRunning(sandboxName)
+                return await isSandboxRunning(sandboxName, parsedArgs)
                 ? simulate(parsedArgs, sandboxName, sandbox).then(sendJsonRes)
                 : sendAsyncErr(`The ${sandboxName} sandbox is not running.`)
             }
