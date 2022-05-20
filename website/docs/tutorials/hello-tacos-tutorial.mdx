@@ -51,7 +51,19 @@ cd hello-tacos
 
 ## Exploring the project
 
+This starter project is a Tezos project that does not use Taqueria. The front end dApp is a React app which requires it's companion smart contract to be deployed to the blockchain, and the address of the originated contract to be hardcoded into the React app manually
 
+The project structure looks like this:
+- `/app` - This is the React dApp 
+- `/contracts` - This folder contains the LIGO smart contract
+- `/tests` - This folder contains the automated tests
+
+The workflow for a legacy Tezos project like this requires a significant amount of manual work to get sandboxes up and running, and to compile and originate the contract. Doing this would involve running shell commands such as:
+
+- `ligo compile-contract ./contract/hello-tacos.mligo main`
+- `docker run --rm --name hangzhou-sandbox --detach -p 20000:20000 tqtezos/flextesa:20211119 hangzbox start`
+
+Taqueria will take care of all of this for you with simple tasks and a centralized configuration!
 
 ## Taq'ifying the Project
 
@@ -108,10 +120,6 @@ taq install @taqueria/plugin-taquito
 :::note
 To confirm this was successful, you can run the `taq` command and ensure you see the `compile`, `originate`, and `start sandbox` tasks listed
 :::
-
-
-## Refactoring the Project
-
 
 
 ### Updating Tests to Use Taqueria
