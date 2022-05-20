@@ -147,29 +147,6 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n.t) =>
             forkCatch (console.error) (console.error) (console.log)
         )
     )
-    .command(
-        'scaffold [scaffoldUrl] [scaffoldProjectDir]',
-        i18n.__('scaffoldDesc'),
-        (yargs: Arguments) => {
-            yargs
-                .positional('scaffoldUrl', {
-                    describe: i18n.__('scaffoldUrlDesc'),
-                    type: 'string',
-                    default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git'
-                })
-                .positional('scaffoldProjectDir', {
-                    type: 'string',
-                    describe: i18n.__('scaffoldProjectDirDesc'),
-                    default: './taqueria-quickstart'
-                })
-        },
-        (args: Record<string, unknown>) => pipe(
-            SanitizedArgs.of(args),
-            chain(SanitizedArgs.makeScaffoldArgs),
-            chain(scaffoldProject(i18n)),
-            forkCatch (console.error) (console.error) (console.log)
-        )
-    )
     .option('fromVsCode', {
         describe: i18n.__('fromVsCodeDesc'),
         default: false,
@@ -185,9 +162,33 @@ const commonCLI = (env:EnvVars, args:DenoArgs, i18n: i18n.t) =>
     .help(false)
 
 
-const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => pipe(
-    commonCLI(env, args, i18n).help(false)
-)
+const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
+    const cliConfig = commonCLI(env, args, i18n).help(false)
+    return cliConfig
+        .command(
+            'scaffold [scaffoldUrl] [scaffoldProjectDir]',
+            i18n.__('scaffoldDesc'),
+            (yargs: Arguments) => {
+                yargs
+                    .positional('scaffoldUrl', {
+                        describe: i18n.__('scaffoldUrlDesc'),
+                        type: 'string',
+                        default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git'
+                    })
+                    .positional('scaffoldProjectDir', {
+                        type: 'string',
+                        describe: i18n.__('scaffoldProjectDirDesc'),
+                        default: './taqueria-quickstart'
+                    })
+            },
+            (args: Record<string, unknown>) => pipe(
+                SanitizedArgs.of(args),
+                chain(SanitizedArgs.makeScaffoldArgs),
+                chain(scaffoldProject(i18n)),
+                forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
+            )
+        )
+}
 
 const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedArgs: SanitizedArgs.t, i18n: i18n.t) => pipe(
     commonCLI(env, args, i18n)
@@ -311,47 +312,42 @@ const initProject = (projectDir: SanitizedAbsPath.t, quickstart: string|undefine
     map (_ => i18n.__("bootstrapMsg"))
 )
 
-const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, maxConcurrency}: SanitizedArgs.ScaffoldArgs) => attemptP(async () => {
+const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, maxConcurrency}: SanitizedArgs.ScaffoldArgs) => attemptP<TaqError.t, string>(async () => {
+    const abspath = await eager (SanitizedAbsPath.make(scaffoldProjectDir))
+    const destDir = await eager (doesPathNotExist(abspath))
+    
+    log(`scaffolding\n into: ${destDir}\n from: ${scaffoldUrl}`)    
+    await eager (gitClone (scaffoldUrl) (destDir))
+
+    // TODO: Remove after 620-operations is merged in both the
+    // taqueria repo as well as the taqueria-scaffold-quickstart repo
+    //
+    // See issue: https://github.com/ecadlabs/taqueria/issues/736
+    await eager (exec("git checkout 620-operations", {}, true, destDir))
+
+    log("Cleanup...")
+    const scaffoldConfig = await eager (SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`))
+    const gitDir = await eager (SanitizedAbsPath.make(`${destDir}/.git`))
+    // const _gitIgnore = await eager (SanitizedAbsPath.make(`${destDir}/.gitignore`))
+    // await eager (rm(gitIgnore))
+    
+    // Remove the scaffold.json file, if not exists
+    // If it doesn't exist, don't throw...
     try {
-        const abspath = await eager (SanitizedAbsPath.make(scaffoldProjectDir))
-        const destDir = await eager (doesPathNotExist(abspath))
-        
-        log(`scaffolding\n into: ${destDir}\n from: ${scaffoldUrl}`)    
-        await eager (gitClone (scaffoldUrl) (destDir))
-
-        // TODO: Remove after 620-operations is merged in both the
-        // taqueria repo as well as the taqueria-scaffold-quickstart repo
-        //
-        // See issue: https://github.com/ecadlabs/taqueria/issues/736
-        await eager (exec("git checkout 620-operations", {}, true, destDir))
-
-        log("Cleanup...")
-        const scaffoldConfig = await eager (SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`))
-        const gitDir = await eager (SanitizedAbsPath.make(`${destDir}/.git`))
-        // const _gitIgnore = await eager (SanitizedAbsPath.make(`${destDir}/.gitignore`))
-        // await eager (rm(gitIgnore))
-        
-        // Remove the scaffold.json file, if not exists
-        // If it doesn't exist, don't throw...
-        try {
-            await eager (rm(scaffoldConfig))
-        }
-        catch (err) {
-            if (!isTaqError(err) || err.kind !== "E_INVALID_PATH_DOES_NOT_EXIST") {
-                throw err
-            }
-        }
-        
-        await eager (rm(gitDir))
-
-        log("Installing plugins...")
-        await eager (exec("npm install", {}, false, destDir))
-
-        return i18n.__("scaffoldDoneMsg")
+        await eager (rm(scaffoldConfig))
     }
     catch (err) {
-        return reject(err)
+        if (!isTaqError(err) || err.kind !== "E_INVALID_PATH_DOES_NOT_EXIST") {
+            throw err
+        }
     }
+    
+    await eager (rm(gitDir))
+
+    log("Installing plugins...")
+    await eager (exec("npm install", {}, false, destDir))
+
+    return i18n.__("scaffoldDoneMsg")
 })
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) => state.plugins.reduce(
@@ -712,6 +708,16 @@ export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedArgs.t)
     return displayError (cli) (err)
 }
 
+export const normalizeErr = (err: TaqError.t | TaqError.E_TaqError | Error) => {
+    if (err instanceof TaqError.E_TaqError) {
+        return TaqError.create({
+            ...err,
+            msg: err.message
+        })       
+    }
+    return err
+}
+
 export const displayError = (cli:CLIConfig) => (err: Error|TaqError.t) => {
     const inputArgs = (cli.parsed as unknown as {argv: Record<string, unknown>}).argv
     
@@ -721,7 +727,7 @@ export const displayError = (cli:CLIConfig) => (err: Error|TaqError.t) => {
 
     if (!inputArgs.help) {
         console.error("") // empty line
-        const res = match(err)
+        const res = match(normalizeErr(err))
             .with({kind: 'E_FORK'}, err                         => [125, err.msg])
             .with({kind: 'E_INVALID_CONFIG'}, err               => [1, err.msg])
             .with({kind: 'E_INVALID_JSON'}, err                 => [12, err])

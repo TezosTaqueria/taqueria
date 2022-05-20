@@ -57,28 +57,22 @@ export const doesPathExist = (path: string) => SanitizedAbsPath
     .make(path)
     .pipe( chain (abspath => attemptP(() => Deno.stat(abspath))))
     .pipe( chain (() => SanitizedAbsPath.make(path)))
-    .pipe( mapRej (previous => {
-        const taqErr: TaqError.t = {
-            kind: "E_INVALID_PATH_DOES_NOT_EXIST",
-            msg: "Path does not exist",
-            context: path,
-            previous
-        }
-        return taqErr
-    }))
-    
+    .pipe( mapRej (previous => TaqError.create({
+        kind: "E_INVALID_PATH_DOES_NOT_EXIST",
+        msg: "Path does not exist",
+        context: path,
+        previous
+    })))
 
 export const doesPathNotExist = (path: string) => doesPathExist(path)
     .pipe (swap)
     .pipe (chain (() => SanitizedAbsPath.make(path)))
-    .pipe (mapRej (() => {
-        const taqErr: TaqError.t = {
-            kind: "E_INVALID_PATH_ALREADY_EXISTS",
+    .pipe (mapRej (previous => TaqError.create({
+        kind: "E_INVALID_PATH_ALREADY_EXISTS",
             msg: "Path already exists",
-            context: path
-        }
-        return taqErr
-    }))
+            context: path,
+            previous
+    })))
 
 export const rm = (path: SanitizedAbsPath.t) : Future<TaqError.t, SanitizedAbsPath.t> => 
     attemptP(async () => {
