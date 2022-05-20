@@ -215,16 +215,19 @@ jobs:
         with:
           node-version: 16.13.x
       
+      # This step currently attempts to put all test files found in the e2e folder into 4 equal sized buckets. The output is a list of lists 
       - id: set-test-chunks
         name: Set Chunks
         run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -c '[_nwise(length / 4 | ceil)]')"
       
+      # This step just creates a list of numbers representing the different buckets of tests
       - id: set-test-chunk-ids
         name: Set Chunk IDs
         run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -c 'to_entries | map(.key)')"
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
       
+      # This step will take in the buckets of tests and format the names to remove the absolute path part leaving only the name we care about
       - id: format-test-chunks
         name: Format Chunks
         run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS | jq -c '[.[] | join(" ") | sub("(/home|/Users)/runner/work/taqueria/taqueria/tests/e2e/";"";"g")]')"
