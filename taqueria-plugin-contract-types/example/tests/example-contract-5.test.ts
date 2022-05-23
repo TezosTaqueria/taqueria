@@ -13,19 +13,49 @@ describe('example-contract-5', () => {
 
     it('should call confirm_admin', async () => {
         
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
         const confirm_adminRequest = await contract.methodsObject.confirm_admin().send();
         await confirm_adminRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call pause', async () => {
         
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
         const pauseRequest = await contract.methodsObject.pause(true).send();
         await pauseRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call set_admin', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
         
         const set_adminRequest = await contract.methodsObject.set_admin({
                 bid: tas.nat('42'),
@@ -53,23 +83,56 @@ describe('example-contract-5', () => {
             }).send();
         await set_adminRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call bid', async () => {
         
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
         const bidRequest = await contract.methodsObject.bid(tas.nat('42')).send();
         await bidRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call cancel', async () => {
         
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
         const cancelRequest = await contract.methodsObject.cancel(tas.nat('42')).send();
         await cancelRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call configure', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
         
         const configureRequest = await contract.methodsObject.configure({
                 opening_price: tas.mutez('42'),
@@ -89,9 +152,20 @@ describe('example-contract-5', () => {
             }).send();
         await configureRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call propose', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
         
         const proposeRequest = await contract.methodsObject.propose({
                 frozen_token: tas.nat('42'),
@@ -121,6 +195,9 @@ describe('example-contract-5', () => {
             }).send();
         await proposeRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
 });

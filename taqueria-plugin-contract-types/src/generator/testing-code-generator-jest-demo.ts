@@ -7,10 +7,11 @@ export const toJest = async (contractName: string, contractSource: string, forma
 
     const methodCalls = gen.methods.map(m => ({
         name: m.name,
-        code: gen.generateMethodCall({
+        methodCall: gen.generateMethodCall({
             methodName: m.name,
             indent: 2
         }),
+        storageAccess: gen.generateStorageAccess({ storagePath: '' }),
     }));
 
     const jestCode = `
@@ -27,7 +28,12 @@ describe('${contractName}', () => {
 
 ${methodCalls.map(x => `
     it('should call ${x.name}', async () => {
-        ${x.code}
+        ${x.storageAccess.getStorageValueFunctionCode}
+        const storageValueBefore = await ${x.storageAccess.getStorageValueFunctionName}();
+        ${x.methodCall.methodCallCode}
+        const storageValueAfter = await ${x.storageAccess.getStorageValueFunctionName}();
+
+        expect(storageValueAfter).toBe('');
     });
 `).join('')}
 });

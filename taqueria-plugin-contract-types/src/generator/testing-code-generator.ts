@@ -113,7 +113,9 @@ ${tabs(indent)}const ${method.name}Request = await ${contractVarName}.methodsObj
 ${tabs(indent)}await ${method.name}Request.confirmation(${minConfirmations})${semi}
 ${tabs(indent)}`;
 
-    return code;
+    return {
+        methodCallCode: code,
+    };
 };
 
 /*
@@ -161,19 +163,24 @@ const generateStorageAccess = ({
     } = codeGenerator;
 
     const semi = useSemicolons ? ';' : '';
-    const funcName = getStorageValueFunctionName ?? `get${storagePath
+    const funcName = getStorageValueFunctionName ?? `getStorageValue${storagePath
         .split('.')
         .map(x => x.replace(/[^A-Za-z0-9]/g, ''))
         .map(x => `${x.substring(0, 1).toLocaleUpperCase()}${x.substring(1)}`)
         .join('')}`;
 
-    const getStorageValueExpr = ``;
+    const getStorageValueExpr = `${storageVarName}`;
 
-    const code = `
+    const funcCode = `
 ${tabs(indent)}const ${funcName} = async () => {
 ${tabs(indent + 1)}const ${storageVarName} = await ${contractVarName}.storage()${semi}
 ${tabs(indent + 1)}const ${storageValueVarName} = ${getStorageValueExpr}${semi}
-${tabs(indent)}}${semi}`;
+${tabs(indent + 1)}return ${storageValueVarName}${semi}
+${tabs(indent)}}${semi}
+`;
 
-    return code;
+    return {
+        getStorageValueFunctionCode: funcCode,
+        getStorageValueFunctionName: funcName,
+    };
 };
