@@ -2,12 +2,36 @@ import fs from 'fs';
 import path from 'path';
 import { createTestingCodeGenerator } from './testing-code-generator';
 
-export const toJest = async (contractSource: string, format: 'tz') => {
+export const toJest = async (contractName: string, contractSource: string, format: 'tz') => {
     const gen = createTestingCodeGenerator({ contractSource, format });
 
-    const methodCalls = gen.methods.map(m => gen.generateMethodCall(m.name)).join('');
+    const methodCalls = gen.methods.map(m => ({
+        name: m.name,
+        code: gen.generateMethodCall({
+            methodName: m.name,
+            indent: 2
+        }),
+    }));
 
-    const jestCode = `${methodCalls}`;
+    const jestCode = `
+import { TezosToolkit } from '@taquito/taquito';
+import { tas } from '../types-file/type-aliases';
+import { ExampleContract0ContractType as ContractType } from '../types-file/${contractName}.types';
+
+describe('${contractName}', () => {
+    const Tezos = new TezosToolkit('RPC_URL');
+    let contract: ContractType = undefined as unknown as ContractType;
+    beforeAll(async () => {
+            contract = await Tezos.contract.at<ContractType>('DEPLOYED_CONTRACT_ADDRESS');
+    });
+
+${methodCalls.map(x => `
+    it('should call ${x.name}', async () => {
+        ${x.code}
+    });
+`).join('')}
+});
+`;
     return {
         jestCode,
     };
@@ -27,7 +51,7 @@ const run = async () => {
         console.log('Create Jest Test', { contractFilePath, outputFilePath });
 
         const fileContent = await fs.promises.readFile(contractFilePath, { encoding: 'utf-8' });
-        const result = await toJest(fileContent, 'tz');
+        const result = await toJest(f.replace(/\.tz$/, ''), fileContent, 'tz');
 
         await fs.promises.mkdir(path.dirname(outputFilePath), { recursive: true });
         await fs.promises.writeFile(outputFilePath, result.jestCode);

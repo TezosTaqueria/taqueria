@@ -1,9 +1,31 @@
 
-        const confirm_adminRequest = await contract.methodsObject.confirm_admin();
+import { TezosToolkit } from '@taquito/taquito';
+import { tas } from '../types-file/type-aliases';
+import { ExampleContract0ContractType as ContractType } from '../types-file/example-contract-5.types';
+
+describe('example-contract-5', () => {
+    const Tezos = new TezosToolkit('RPC_URL');
+    let contract: ContractType = undefined as unknown as ContractType;
+    beforeAll(async () => {
+            contract = await Tezos.contract.at<ContractType>('DEPLOYED_CONTRACT_ADDRESS');
+    });
+
+
+    it('should call confirm_admin', async () => {
+        
+        const confirm_adminRequest = await contract.methodsObject.confirm_admin().send();
         await confirm_adminRequest.confirmation(3);
         
-        const pauseRequest = await contract.methodsObject.pause(true);
+    });
+
+    it('should call pause', async () => {
+        
+        const pauseRequest = await contract.methodsObject.pause(true).send();
         await pauseRequest.confirmation(3);
+        
+    });
+
+    it('should call set_admin', async () => {
         
         const set_adminRequest = await contract.methodsObject.set_admin({
                 bid: tas.nat('42'),
@@ -28,14 +50,26 @@
                         }
                     }
                 )],
-            });
+            }).send();
         await set_adminRequest.confirmation(3);
         
-        const bidRequest = await contract.methodsObject.bid(tas.nat('42'));
+    });
+
+    it('should call bid', async () => {
+        
+        const bidRequest = await contract.methodsObject.bid(tas.nat('42')).send();
         await bidRequest.confirmation(3);
         
-        const cancelRequest = await contract.methodsObject.cancel(tas.nat('42'));
+    });
+
+    it('should call cancel', async () => {
+        
+        const cancelRequest = await contract.methodsObject.cancel(tas.nat('42')).send();
         await cancelRequest.confirmation(3);
+        
+    });
+
+    it('should call configure', async () => {
         
         const configureRequest = await contract.methodsObject.configure({
                 opening_price: tas.mutez('42'),
@@ -52,8 +86,12 @@
                 }],
                 start_time: tas.timestamp(new Date()),
                 end_time: tas.timestamp(new Date()),
-            });
+            }).send();
         await configureRequest.confirmation(3);
+        
+    });
+
+    it('should call propose', async () => {
         
         const proposeRequest = await contract.methodsObject.propose({
                 frozen_token: tas.nat('42'),
@@ -80,6 +118,9 @@
                     }
                 )],
                 }),
-            });
+            }).send();
         await proposeRequest.confirmation(3);
         
+    });
+
+});
