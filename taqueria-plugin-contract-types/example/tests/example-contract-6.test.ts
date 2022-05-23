@@ -13,26 +13,67 @@ describe('example-contract-6', () => {
 
     it('should call confirm_admin', async () => {
         
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
         const confirm_adminRequest = await contract.methodsObject.confirm_admin().send();
         await confirm_adminRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call pause', async () => {
         
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
         const pauseRequest = await contract.methodsObject.pause(true).send();
         await pauseRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call set_admin', async () => {
         
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
         const set_adminRequest = await contract.methodsObject.set_admin(tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456')).send();
         await set_adminRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call balance_of', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
         
         const balance_ofRequest = await contract.methodsObject.balance_of({
                 requests: [{
@@ -43,9 +84,20 @@ describe('example-contract-6', () => {
             }).send();
         await balance_ofRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call transfer', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
         
         const transferRequest = await contract.methodsObject.transfer([{
                     from_: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
@@ -57,9 +109,20 @@ describe('example-contract-6', () => {
                 }]).send();
         await transferRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call add_operator', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
         
         const add_operatorRequest = await contract.methodsObject.add_operator({
                 owner: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
@@ -68,9 +131,20 @@ describe('example-contract-6', () => {
             }).send();
         await add_operatorRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call remove_operator', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
         
         const remove_operatorRequest = await contract.methodsObject.remove_operator({
                 owner: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
@@ -79,9 +153,20 @@ describe('example-contract-6', () => {
             }).send();
         await remove_operatorRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call burn_tokens', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
         
         const burn_tokensRequest = await contract.methodsObject.burn_tokens([{
                     owner: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
@@ -90,9 +175,20 @@ describe('example-contract-6', () => {
                 }]).send();
         await burn_tokensRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call create_token', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
         
         const create_tokenRequest = await contract.methodsObject.create_token({
                 token_id: tas.nat('42'),
@@ -102,9 +198,20 @@ describe('example-contract-6', () => {
             }).send();
         await create_tokenRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
     it('should call mint_tokens', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
         
         const mint_tokensRequest = await contract.methodsObject.mint_tokens([{
                     owner: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
@@ -113,6 +220,9 @@ describe('example-contract-6', () => {
                 }]).send();
         await mint_tokensRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
 });

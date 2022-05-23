@@ -13,6 +13,14 @@ describe('example-contract-11', () => {
 
     it('should call mint', async () => {
         
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
         const mintRequest = await contract.methodsObject.mint([{
                     token_id: tas.nat('42'),
                     ipfs_hash: tas.bytes(char2Bytes('DATA')),
@@ -20,6 +28,9 @@ describe('example-contract-11', () => {
                 }]).send();
         await mintRequest.confirmation(3);
         
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
     });
 
 });
