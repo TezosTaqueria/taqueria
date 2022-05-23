@@ -29,8 +29,25 @@ export const createTestingCodeGenerator = ({
     return {
         storage,
         methods,
-        generateMethodCall: (methodName: string) => generateMethodCall({ codeGenerator, method: getMethodByName(methodName) }),
-        generateStorageAccess: (storagePath: string) => generateStorageAccess({ codeGenerator, storagePath }),
+        generateMethodCall: ({
+            methodName,
+            indent,
+        }: {
+            methodName: string;
+            indent?: number;
+        }) => generateMethodCall({
+            codeGenerator,
+            method: getMethodByName(methodName),
+            indent,
+        }),
+        generateStorageAccess: ({
+            storagePath,
+        }: {
+            storagePath: string;
+        }) => generateStorageAccess({
+            codeGenerator,
+            storagePath,
+        }),
     };
 };
 
@@ -92,7 +109,7 @@ const generateMethodCall = ({
     const semi = useSemicolons ? ';' : '';
 
     const code = `
-${tabs(indent)}const ${method.name}Request = await ${contractVarName}.methodsObject.${method.name}(${argsToCode(method.args, indent + 1, true)})${semi}
+${tabs(indent)}const ${method.name}Request = await ${contractVarName}.methodsObject.${method.name}(${argsToCode(method.args, indent + 1, true)}).send()${semi}
 ${tabs(indent)}await ${method.name}Request.confirmation(${minConfirmations})${semi}
 ${tabs(indent)}`;
 
