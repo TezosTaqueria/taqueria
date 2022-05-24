@@ -137,7 +137,7 @@ Commands:
   taq install <pluginName>                  Install a plugin
   taq uninstall <pluginName>                Uninstall a plugin
   taq compile                               Provided by more than one plugin. Th
-                                            e option --plugin is required.
+                                            e option --plugin is required
   taq teapot                                Have a cup of tea  [aliases: t, tea]
 
 Options:
@@ -153,7 +153,7 @@ Taqueria is currently in BETA. You've been warned. :)
 
 export const helpContentsLigoSmartpySpecific = `taq compile
 
-Provided by more than one plugin. The option --plugin is required.
+Provided by more than one plugin. The option --plugin is required
 
 Options:
       --version     Show version number                                [boolean]
@@ -176,7 +176,7 @@ Commands:
   taq install <pluginName>                  Install a plugin
   taq uninstall <pluginName>                Uninstall a plugin
   taq compile                               Provided by more than one plugin. Th
-                                            e option --plugin is required.
+                                            e option --plugin is required
 
 Options:
       --version     Show version number                                [boolean]
@@ -191,7 +191,7 @@ Taqueria is currently in BETA. You've been warned. :)
 
 export const helpContentsLigoArchetypeSpecific = `taq compile
 
-Provided by more than one plugin. The option --plugin is required.
+Provided by more than one plugin. The option --plugin is required
 
 Options:
       --version     Show version number                                [boolean]
