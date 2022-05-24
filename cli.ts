@@ -294,6 +294,7 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
         ? writeTextFile (joinPaths(projectDir.value, "quickstart.md")) (quickstart)
         : resolve(projectDir.value)
     ),
+    chain (_ => exec("npm init -y", {}, false, projectDir)),
     map (_ => i18n.__("bootstrapMsg"))
 )
 
