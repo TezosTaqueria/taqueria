@@ -25,14 +25,14 @@ const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: st
         ""
     )
 
-    const projectDir = process.env.PROJECT_DIR ??  config.projectDir
-    const sandboxNetwork = process.env.SANDBOX_NETWORK
+    const projectDir = process.env.PROJECT_DIR ?? config.projectDir
+    const sandboxNetwork = process.env.SANDBOX_NETWORK ?? sandbox.name
 
     const ports = debug
         ? `-p ${sandbox.rpcUrl.url.port}:20000 -p 19229:9229`
         : `-p ${sandbox.rpcUrl.url.port}:20000`
 
-    return `docker run --name ${sandbox.name} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${sandboxNetwork} ${image} node index.js --sandbox ${sandbox.name}`
+    return `docker run --name ${sandbox.name} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app --network ${sandboxNetwork} ${image} node index.js --sandbox ${sandbox.name}`
 }
 
 const getConfigureCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
