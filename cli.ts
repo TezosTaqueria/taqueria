@@ -308,7 +308,7 @@ const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: Sani
     // log(`initializing...`),
     // Load .taq/scaffold.json (if it exists)
     // Run init command
-    map(_ => log(`Cleanup...`)),
+    map(_ => log(`Initializing Taqueria Project...`)),
     chain(_ => rm(scaffoldProjectDir.join(`.taq/scaffold.json`))),
     bichain<TaqError,TaqError,SanitizedAbsPath>
         (err => err.kind === 'E_INVALID_PATH_DOES_NOT_EXIST' ? resolve(scaffoldProjectDir) : reject(err))
