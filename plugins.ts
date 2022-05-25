@@ -186,7 +186,7 @@ export const inject = (deps: PluginDeps) => {
     // Calls getPluginInfo() for each installed plugin in parallel
     // retrievePluginInfo: () -> Future<TaqError, PluginInfo[]>
     const retrieveAllPluginInfo = () => pipe(
-        config.plugins ?? [],
+        config.plugins || [],
         plugins => plugins.map((plugin: InstalledPlugin.t) => retrievePluginInfo(plugin) ),
         parallel (parsedArgs.maxConcurrency)
     )
@@ -230,7 +230,7 @@ export const inject = (deps: PluginDeps) => {
     }
 
     // Using all plugin info, compute an in-memory representation that we'll
-    // refer to as ephermal state
+    // refer to as ephemeral state
     // getComputedState: () -> Future<TaqError, State>
     const getComputedState = () => pipe(
         retrieveAllPluginInfo(),

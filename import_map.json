@@ -38,7 +38,7 @@
         "@taqueria/protocol/SandboxAccountConfig": "./taqueria-protocol/SandboxAccountConfig.ts",
         "@taqueria/protocol/StringMax30": "./taqueria-protocol/StringMax30.ts",
         "@taqueria/protocol/StringNoSpaces": "./taqueria-protocol/StringNoSpaces.ts",
-        "@taqueria/protocol/EphermalState": "./taqueria-protocol/EphermalState.ts",
+        "@taqueria/protocol/EphemeralState": "./taqueria-protocol/EphemeralState.ts",
         "@taqueria/protocol/SanitizedArgs": "./taqueria-protocol/SanitizedArgs.ts",
         "@taqueria/protocol/RequestArgs": "./taqueria-protocol/RequestArgs.ts",
         "@taqueria/protocol/SanitizedAbsPath": "./taqueria-protocol/SanitizedAbsPath.ts",

@@ -1,6 +1,6 @@
 import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
 import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
-import * as EphemeralState from "@taqueria/protocol/EphermalState"
+import * as EphemeralState from "@taqueria/protocol/EphemeralState"
 import * as PersistentState from "@taqueria/protocol/PersistentState"
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 import * as ProvisionerID from "@taqueria/protocol/ProvisionerID"

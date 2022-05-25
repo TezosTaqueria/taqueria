@@ -37,18 +37,18 @@ const rawSchema = z.object({
     tasks: taskToPluginMap,
     operations: operationToPluginMap,
     plugins: z.array(ParsedPluginInfo.schemas.schema, {description: "cache.plugins"})
-}).describe("Ephermal State")
+}).describe("Ephemeral State")
 
 type RawInput = z.infer<typeof rawSchema>
 
 export const {schemas, factory} = createType<RawInput>({
     rawSchema,
-    parseErrMsg: (value: unknown) => `${value} is not a valid representation of ephermal state`,
-    unknownErrMsg: "Something went wrong when parsing the ephermal state"
+    parseErrMsg: (value: unknown) => `${value} is not a valid representation of ephemeral state`,
+    unknownErrMsg: "Something went wrong when parsing the ephemeral state"
 })
 
-export type EphermalState = z.infer<typeof schemas.schema>
-export type t = EphermalState
+export type EphemeralState = z.infer<typeof schemas.schema>
+export type t = EphemeralState
 export type TaskToPluginMap = z.infer<typeof taskToPluginMap>
 export type OpToPluginMap = z.infer<typeof operationToPluginMap>
 

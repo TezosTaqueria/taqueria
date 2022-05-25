@@ -20,7 +20,7 @@ import * as ParsedPluginInfo from "@taqueria/protocol/ParsedPluginInfo"
 import * as PluginInfo from '@taqueria/protocol/PluginInfo'
 import * as Config from "@taqueria/protocol/Config"
 import * as Environment from "@taqueria/protocol/Environment"
-import * as EphemeralState from "@taqueria/protocol/EphermalState"
+import * as EphemeralState from "@taqueria/protocol/EphemeralState"
 import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
 import * as RequestArgs from "@taqueria/protocol/RequestArgs"
 import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
