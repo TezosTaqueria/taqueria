@@ -124,21 +124,18 @@ Options:
 export const helpContentsLigoSmartpy: string = `taq <command>
 
 Commands:
-  taq init [projectDir]                     Initialize a new project
-  taq scaffold [scaffoldUrl] [scaffoldProj  Generate a new project using pre-mad
-  ectDir]                                   e scaffold
-  taq install <pluginName>                  Install a plugin
-  taq uninstall <pluginName>                Uninstall a plugin
-  taq compile                               Provided by more than one plugin. Th
-                                            e option --plugin is required.
-  taq teapot                                Have a cup of tea  [aliases: t, tea]
+  taq init [projectDir]       Initialize a new project
+  taq install <pluginName>    Install a plugin
+  taq uninstall <pluginName>  Uninstall a plugin
+  taq compile                 Provided by more than one plugin. The option --plu
+                              gin is required.
 
 Options:
       --version     Show version number                                [boolean]
       --build       Display build information about the current version[boolean]
   -p, --projectDir  Path to your project directory               [default: "./"]
   -e, --env         Specify an environment configuration
-  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]  
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
@@ -189,11 +186,11 @@ Options:
       --build       Display build information about the current version[boolean]
   -p, --projectDir  Path to your project directory               [default: "./"]
   -e, --env         Specify an environment configuration
-  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]  
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-      --plugin      Use to specify what plugin you'd like when running this task
-                    .
-     [required] [choices: "@taqueria/plugin-ligo", "@taqueria/plugin-archetype"]
+      --plugin      Specify which plugin should be used to execute this task
+  [required] [choices: "@taqueria/plugin-ligo", "ligo", "@taqueria/plugin-archet
+                                                              ype", "archetype"]
 `
 
 export const helpContentsArchetypePlugin: string = `taq <command>
