@@ -37,6 +37,9 @@ export const defaultConfig : Config.t = Config.create({
         john: "3_000_000_000",
         jane: "3_000_000_000",
         joe: "3_000_000_000"
+    },
+    network: {
+        
     }
     // defaultTasks: {
     //     compile: {
