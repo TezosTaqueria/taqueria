@@ -5,7 +5,7 @@
   "description": "This is Taqueria testing project includes unit, integration and e2e tests",
   "main": "index.js",
   "scripts": {
-    "test:unit": "npm run test:unit:deno && npm run test:unit:jest",
+    "test:unit": "npm run test:unit:deno",
     "test:unit:deno": "deno test unit/ --allow-all --unstable --import-map ../import_map.json",
     "test:unit:jest": "jest --config jest.config.unit.ts --coverage --no-cache",
     "test:unit:deno:debug": "deno test unit/ --allow-all --unstable --inspect-brk",
