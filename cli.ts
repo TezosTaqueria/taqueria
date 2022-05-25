@@ -380,35 +380,19 @@ const addOperations = (cliConfig: CLIConfig, config: LoadedConfig.t, _env: EnvVa
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
         )
     )
-    // .command(
-    //     'plan',
-    //     'Display the execution plan for applying all provisioned operations',
-    //     () => {},
-    //     (argv: Arguments) => pipe(
-    //         SanitizedArgs.of(argv),
-    //         map (inputArgs => joinPaths(inputArgs.projectDir, ".taq", "provisions.json")),
-    //         chain (SanitizedAbsPath.make),
-    //         chain (loadProvisions),
-    //         map (plan),
-    //         forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
-    //     )
-    // )
-    // .command(
-    //     'apply',
-    //     'Applies the pending list of provisioned operations for the project',
-    //     () => {},
-    //     (argv: Arguments) => pipe(
-    //         SanitizedArgs.of(argv),
-    //         map (inputArgs => joinPaths(inputArgs.projectDir, ".taq", "provisions.json")),
-    //         chain (SanitizedAbsPath.make),
-    //         chain (sanitizedArgs => pipe(
-    //             sanitizedArgs,
-    //             chain (loadProvisions),
-    //             chain (apply(sanitizedArgs)),
-    //         )),
-    //         forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)   
-    //     )
-    // )
+    .command(
+        'plan',
+        'Display the execution plan for applying all provisioned operations',
+        () => {},
+        (argv: Arguments) => pipe(
+            SanitizedArgs.of(argv),
+            map (inputArgs => joinPaths(inputArgs.projectDir, ".taq", "provisions.json")),
+            chain (SanitizedAbsPath.make),
+            chain (loadProvisions),
+            map (plan),
+            forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
+        )
+    )
 
 const addTemplates = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, _parsedArgs: SanitizedArgs.t, _i18n: i18n.t, _state: EphemeralState.t, _pluginLib: PluginLib) => 
     cliConfig.command(
@@ -542,7 +526,7 @@ const addTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, p
 )
 
 const loadEphermeralState = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib): CLIConfig =>
-[addTasks, addOperations, /*addTemplates*/].reduce(
+[addTasks, /* addOperations, addTemplates*/].reduce(
     (cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
     cliConfig
 )
