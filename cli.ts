@@ -295,7 +295,7 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
         : resolve(projectDir.value)
     ),
     map (_ => i18n.__("bootstrapMsg")),
-    chain  (_ => exec ('npm init -y', {}, false, projectDir.value));
+    chain  (_ => exec ('npm init -y', {}, false, projectDir.value))
 )
 
 const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: SanitizedInitArgs) => pipe(
