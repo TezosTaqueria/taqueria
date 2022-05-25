@@ -142,6 +142,8 @@ export const toPromise = <T>(f: Future<TaqError.t, T>) => pipe(
 
 export const eager = toPromise
 
+export const taqResolve = <T>(data: T): Future<TaqError.t, T> => resolve(data) as Future<TaqError.t, T>
+
 // Exports a function to inject dependencies needed by this
 // utilities package
 export const inject = (deps: UtilsDependencies) => {
@@ -266,6 +268,7 @@ export const inject = (deps: UtilsDependencies) => {
         toPromise,
         stdout,
         stderr,
-        eager
+        eager,
+        taqResolve
     }
 }

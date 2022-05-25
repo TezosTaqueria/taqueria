@@ -29,7 +29,8 @@ const {
     rm,
     log,
     eager,
-    isTaqError
+    isTaqError,
+    taqResolve
     // logInput,
     // debug
 } = utils.inject({
@@ -675,16 +676,16 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 
                     if (initArgs.version) {
                         log(initArgs.setVersion)
-                        return resolve(initArgs) as Future<TaqError.t, SanitizedArgs.t>
+                        return taqResolve(initArgs)
                     }
                     else if (initArgs.build) {
                         log(initArgs.setBuild)
-                        return resolve(initArgs) as Future<TaqError.t, SanitizedArgs.t>
+                        return taqResolve(initArgs)
                     }
                     return initArgs._.includes('init') || 
                         initArgs._.includes('testFromVsCode') ||
                         initArgs._.includes('scaffold')
-                        ? resolve(initArgs) as Future<TaqError.t, SanitizedArgs.t>
+                        ? taqResolve(initArgs)
                         : postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n)
                 }),
                 forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (identity)
