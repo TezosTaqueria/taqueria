@@ -124,11 +124,78 @@ sudo mv taq /usr/local/bin
 </TabItem>
 <TabItem value="win" label="Windows">
 
-:::warning
-Windows support is currently in alpha
-:::
+Windows users will run the Linux version of Taqueria in Unbuntu using Windows Subsystem for Linux ([WSL2](https://docs.microsoft.com/en-us/windows/wsl/install))
 
-Windows users will run the Linux version of Taqueria via ([WSL2](https://docs.microsoft.com/en-us/windows/wsl/install)). Once WSL is installed and configured, the installation and usage steps are the same as for Linux:
+#### Requirements
+
+You must be running Windows 10 version 2004 and higher, or Windows 11
+
+#### Install WSL 2
+
+1. Open a Power Shell or Windows Command Prompt and run:
+  
+  ```shell
+  wsl --install
+  ```
+
+2. Restart your machine
+
+3. Open the Ubuntu distribution using the Start menu
+
+4. Create a user name and password
+
+#### Install Docker Desktop WSL 2 backend
+
+1. Download [Docker Desktop for Windows](https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe)
+
+2. Run the installer making sure to enable WSL 2during the installation when prompted
+
+3. Start Docker Desktop from the Windows Start menu
+
+4. From the Docker menu, navigate to `Settings > General` and select `Use WSL 2 based engine`
+
+5. Click `Apply & Restart`
+
+To confirm that Docker Desktop backend has been installed properly, open a WSL 2 terminal and run:
+```shell
+wsl.exe -l -v
+```
+
+#### Install Node v16
+
+1. Update the `apt` package index:
+
+```shell
+sudo apt update
+```
+
+2. Install dependencies:
+
+```shell
+sudo apt install curl git
+```
+
+3. Download Node.js v16.x
+
+```shell
+curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+```
+
+4. Install Node.js
+
+```shell
+sudo apt install nodejs
+```
+
+To confirm that Node v16.x has been installed properly, open a new WSL 2 terminal and run:
+
+```shell
+node --version
+```
+
+You should see `v16.15.0` or similar returned
+
+#### Install the Taqueria Binary
 
 1. Download the latest Linux build of Taqueria
 
@@ -147,15 +214,6 @@ chmod +x taq
 ```shell
 sudo mv taq /usr/local/bin
 ```
-
-<!-- 
-:::caution
-A Windows x86_64 binary is available for those who are interested, however this is entirley unsupported and not reccomended
-
-```shell
-curl -LO https://taqueria.io/get/windows/taq.exe
-```
-::: -->
 
 </TabItem>
 </Tabs>
