@@ -540,7 +540,7 @@ const addTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, p
     })
 )
 
-const loadState = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib): CLIConfig =>
+const loadEphermeralState = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib): CLIConfig =>
 [addTasks, addOperations, /*addTemplates*/].reduce(
     (cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
     cliConfig
@@ -619,7 +619,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) => (
                 pluginLib.getState(),
                 map ((state: EphemeralState.t) => pipe(
                     resolvePluginName(parsedArgs, state),
-                    (parsedArgs: SanitizedArgs.t) => loadState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib)
+                    (parsedArgs: SanitizedArgs.t) => loadEphermeralState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib)
                 ))
             )
         }),
