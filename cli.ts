@@ -319,6 +319,7 @@ const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: Sani
         (err => err.kind === 'E_INVALID_PATH_DOES_NOT_EXIST' ? resolve(scaffoldProjectDir) : reject(err))
         (resolve),
     chain(_ => exec("npm install", {}, false, scaffoldProjectDir)),
+    chain(_ => exec("taq init", {}, false, scaffoldProjectDir)),
     map(_ => i18n.__("scaffoldDoneMsg"))
 )
 
