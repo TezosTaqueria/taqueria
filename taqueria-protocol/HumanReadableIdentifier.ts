@@ -1,30 +1,24 @@
-import {z, ZodError} from 'zod'
-import {resolve, reject} from 'fluture'
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
+import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z
     .string({description: "Human Readable Identifier"})
     .regex(/^[A-Za-z]+[A-Za-z0-9-_ ]*$/, "Must be a valid human-readable identifier")
 
-export const schema = rawSchema.transform(val => val as t)
+type RawInput = z.infer<typeof rawSchema>    
 
-const hrType: unique symbol = Symbol("HumanReadableIdentifier")
+const {schemas: generatedSchemas, factory} = createType<RawInput>({
+    isStringLike: true,
+    rawSchema,
+    parseErrMsg: (value: unknown) => `${value} is not a valid human-readable identifier`,
+    unknownErrMsg: "Something went wrong trying to parse the human readable identifier"
+})
 
-export type t = string & {
-    readonly [hrType]: void
-}
+export type HumanReadableIdentifier = z.infer<typeof generatedSchemas.schema>
+export type t = HumanReadableIdentifier
+export const {create, of, make} = factory
 
-export type HumanReadableIdentifier = t
-
-export const make = (value: string) => {
-    try {
-        const retval = schema.parse(value)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<HumanReadableIdentifier>(err, `${value} is not a valid identifier`, value)
-        }
-        return toParseUnknownErr<HumanReadableIdentifier>(err, "There was a problem trying to parse the identifier", value)
-    }
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as HumanReadableIdentifier)
 }

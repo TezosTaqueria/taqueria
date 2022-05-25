@@ -1,16 +1,13 @@
-import {z, ZodError} from "zod"
-import {reject, resolve} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from "zod"
 import * as ParsedOperation from "@taqueria/protocol/ParsedOperation"
 import * as PluginInfo from "@taqueria/protocol/PluginInfo"
-
-const parsedPluginInfo: unique symbol = Symbol("ParsedPluginInfo")
+import createType from "@taqueria/protocol/Base"
 
 const internalSchema = PluginInfo.internalSchema.extend({
     operations: z.preprocess(
         val => val ?? [],
         z.array(
-            ParsedOperation.schema,
+            ParsedOperation.schemas.schema,
             {description: "ParsedOperations"}
         )
         .optional()
@@ -28,29 +25,18 @@ export const rawSchema = PluginInfo.internalSchema.extend({
     .optional()
 }).describe("ParsedPluginInfo")
 
+
 type Input = z.infer<typeof internalSchema>
 
 type RawInput = z.infer<typeof rawSchema>
 
-export interface ParsedPluginInfo extends Input {
-    readonly [parsedPluginInfo]: void
-}
+export const {schemas, factory} = createType<RawInput, Input>({
+    rawSchema,
+    internalSchema,
+    parseErrMsg: (value: unknown) => `The following plugin info gave us trouble when parsing the following plugin information: ${value}`,
+    unknownErrMsg: "Something went wrong trying to parse the plugin information"
+})
 
+export type ParsedPluginInfo = z.infer<typeof schemas.schema>
 export type t = ParsedPluginInfo
-
-export const schema = internalSchema.transform((val: unknown) => val as ParsedPluginInfo)
-
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<ParsedPluginInfo>(err, `The provided plugin information is invalid.`, data)
-        }
-        return toParseUnknownErr<ParsedPluginInfo>(err, "There was a problem trying to parse the plugin information", data)
-    }
-}
-
-export const create = (input: RawInput | Record<string, unknown> | unknown) => schema.parse(input)
+export const {create, of, make} = factory

@@ -54,7 +54,7 @@ export const getDefaultMaxConcurrency = () => 10
 export const getConfigPath = (projectDir: SanitizedAbsPath.t, create=false) : Future<TaqError.t, string> => pipe(
     joinPaths(projectDir, '.taq'),
     abspath => create ? ensureDirExists(abspath): resolve(abspath),
-    map (abspath => joinPaths(abspath, 'config.json'))
+    map ((abspath: string) => joinPaths(abspath, 'config.json'))
 )
 
 export const getRawConfig = (projectDir: SanitizedAbsPath.t, create=false) => pipe(
@@ -77,7 +77,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath.t, create=false) => pi
 
 
 export const toLoadedConfig = (configPath: string, projectDir: SanitizedAbsPath.t, config: Config.t): Future<TaqError.t, LoadedConfig.t> => pipe(
-    attemptP<TaqError.t, SHA256.t>(() => SHA256.of(JSON.stringify(config))),
+    attemptP<TaqError.t, SHA256.t>(() => SHA256.toSHA256(JSON.stringify(config))),
     chain (hash => 
         attemptP<TaqError.t, LoadedConfig.t>(async () => await eager (LoadedConfig.make({
             ...config,

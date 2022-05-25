@@ -1,29 +1,17 @@
-import {z, ZodError} from 'zod'
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
+import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z.string({description: "Tz"}).nonempty().regex(/^\d([\d_]+\d)?$/)
 
-export const schema = rawSchema.transform(val => val as Tz)
+type RawInput = z.infer<typeof rawSchema>
 
-const tzType: unique symbol = Symbol("Tz")
+export const {schemas, factory} = createType<RawInput>({
+    isStringLike: true,
+    rawSchema,
+    parseErrMsg: (value: unknown) => `${value} is an invalid Tz amount`,
+    unknownErrMsg: "Something went wrong when parsing the Tz amount"
+})
 
-type Input = z.infer<typeof rawSchema>
+export type Tz = z.infer<typeof schemas.schema>
 
-export type Tz = Input & {
-    readonly [tzType]: void
-}
-export type t = Tz
-
-export const make = (value: string) => {
-    try {
-        const retval = schema.parse(value)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<Tz>(err, `${value} is not a valid Tz amount`, value)
-        }
-        return toParseUnknownErr<Tz>(err, "There was a problem trying to parse the Tz amount", value)
-    }
-}
+export const {create, of, make} = factory

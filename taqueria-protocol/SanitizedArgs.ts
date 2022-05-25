@@ -1,12 +1,11 @@
-import {z, ZodError} from 'zod'
-import {resolve} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 import * as Url from "@taqueria/protocol/Url"
+import createType from "@taqueria/protocol/Base"
 
- const initRawSchema =  z.object({
+ export const rawSchema =  z.object({
     _: z.array(z.union([z.string().nonempty(), z.number()])),
-    projectDir: SanitizedAbsPath.schema,
+    projectDir: SanitizedAbsPath.schemas.schema,
     maxConcurrency: z.preprocess(
         val => typeof val === 'string' ? parseInt(val) : Number(val),
         z.number().int().min(1).default(10),
@@ -52,12 +51,12 @@ import * as Url from "@taqueria/protocol/Url"
     pluginName: z.string().nonempty().optional()
 }, {description: "Sanitizied Args"}).passthrough()
 
-const scaffoldRawSchema = initRawSchema.extend({
+export const scaffoldRawSchema = rawSchema.extend({
     scaffoldProjectDir: z.string().nonempty().transform((val: unknown) => val as SanitizedAbsPath.t),
     scaffoldUrl: z.string().nonempty().url().transform((val: unknown) => val as Url.t),
 })
 
-const provisionRawSchema = initRawSchema
+export const provisionRawSchema = rawSchema
     .extend({
         operation: z
             .string()
@@ -72,144 +71,72 @@ const provisionRawSchema = initRawSchema
     })
     .passthrough()
 
-const managePluginRawSchema = initRawSchema.extend({
+export const managePluginRawSchema = rawSchema.omit({pluginName: true}).extend({
     pluginName: z.string().nonempty()
 })
 
-const versionRawSchema = initRawSchema.extend({
+export const versionRawSchema = rawSchema.extend({
     version: z.boolean().default(true)
 })
 
-const sanitizedArgsType: unique symbol = Symbol("SanitizedArgs")
+type RawInput = z.infer<typeof rawSchema>
+type RawScaffoldInput = z.infer<typeof scaffoldRawSchema>
+type RawProvisionInput = z.infer<typeof provisionRawSchema>
+type RawManagePluginInput = z.infer<typeof managePluginRawSchema>
+type RawVersionInput = z.infer<typeof versionRawSchema>
 
-type Input = z.infer<typeof initRawSchema>
+export const {schemas, factory} = createType<RawInput>({
+    rawSchema,
+    parseErrMsg: "The arguments provided are invalid",
+    unknownErrMsg: "Something went wrong parsing the command-line arguments"
+})
 
-export type SanitizedArgs = Input & {
-    readonly [sanitizedArgsType]: void
-}
+export const {create, of, make} = factory
+
+export type SanitizedArgs = z.infer<typeof schemas.schema>
 export type t = SanitizedArgs
-type ScaffoldInput = z.infer<typeof scaffoldRawSchema>
-type ManagePluginInput = z.infer<typeof managePluginRawSchema>
-type VersionInput = z.infer<typeof versionRawSchema>
-type ProvisionInput = z.infer<typeof provisionRawSchema>
 
-export type ScaffoldArgs = ScaffoldInput & {
-    readonly [sanitizedArgsType]: void
-}
-export type ManagePluginArgs = ManagePluginInput & {
-    readonly [sanitizedArgsType]: void
-}
-export type VersionArgs = VersionInput & {
-    readonly [sanitizedArgsType]: void
-}
-export interface ProvisionArgs extends ProvisionInput {
-    readonly [sanitizedArgsType]: void
-}
+export const scaffoldTaskArgs = createType<RawScaffoldInput>({
+    rawSchema: scaffoldRawSchema,
+    parseErrMsg: "The arguments provided are invalid for the scaffold task",
+    unknownErrMsg: "Something went wrong parsing the arguments for the scaffold task"
+})
 
-const scaffoldSchema = scaffoldRawSchema.transform((val: unknown) => val as ScaffoldArgs)
+export const provisionTaskArgs = createType<RawProvisionInput>({
+    rawSchema: provisionRawSchema,
+    parseErrMsg: "The arguments provided are invalid for the provision task",
+    unknownErrMsg: "Something went wrong parsing the arguments for the provision task"
+})
 
-const managePluginSchema = managePluginRawSchema.transform((val: unknown) => val as ManagePluginArgs)
+export const installTaskArgs = createType<RawManagePluginInput>({
+    rawSchema: managePluginRawSchema,
+    parseErrMsg: "The arguments provided are invalid for the install task",
+    unknownErrMsg: "Something went wrong parsing the arguments for the install task"
+})
 
-const versionSchema = versionRawSchema.transform((val: unknown) => val as VersionArgs)
+export const uninstallTaskArgs = createType<RawManagePluginInput>({
+    rawSchema: managePluginRawSchema,
+    parseErrMsg: "The arguments provided are invalid for the uninstall task",
+    unknownErrMsg: "Something went wrong parsing the arguments for the uninstall task"
+})
 
-const provisionSchema = provisionRawSchema.transform((val: unknown) => val as ProvisionArgs)
+export type ScaffoldTaskArgs = z.infer<typeof scaffoldTaskArgs.schemas.schema>
+export type ProvisionTaskArgs = z.infer<typeof provisionTaskArgs.schemas.schema>
+export type InstallTaskArgs = z.infer<typeof installTaskArgs.schemas.schema>
+export type UninstallTaskArgs = z.infer<typeof uninstallTaskArgs.schemas.schema>
 
-export const rawSchema = initRawSchema
+export const createScaffoldTaskArgs = scaffoldTaskArgs.factory.create
+export const makeScaffoldTaskArgs = scaffoldTaskArgs.factory.make
+export const ofScaffoldTaskArgs = scaffoldTaskArgs.factory.of
 
-export const schema = initRawSchema.transform((val: unknown) => val as SanitizedArgs)
+export const createProvisionTaskArgs = provisionTaskArgs.factory.create
+export const makeProvisionTaskArgs = provisionTaskArgs.factory.make
+export const ofProvisionTaskArgs = provisionTaskArgs.factory.of
 
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<SanitizedArgs>(err, `The provided arguments are invalid.`, data)
-        }
-        return toParseUnknownErr<SanitizedArgs>(err, "There was a problem trying to parse the arguments for this command", data)
-    }
-}
+export const createInstallTaskArgs = installTaskArgs.factory.create
+export const makeInstallTaskArgs = installTaskArgs.factory.make
+export const ofInstallTaskArgs = installTaskArgs.factory.of
 
-export const makeInitArgs = make
-
-export const makeInstallArgs = (data: Input) => {
-    try {
-        const retval = managePluginSchema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<ManagePluginArgs>(err, `The provided arguments to install a plugin are invalid.`, data)
-        }
-        return toParseUnknownErr<ManagePluginArgs>(err, "There was a problem trying to parse the arguments for the install task", data)
-    }
-}
-
-export const makeUninstallArgs = (data: Input) => {
-    try {
-        const retval = managePluginSchema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<ManagePluginArgs>(err, `The provided arguments to uninstall a plugin are invalid.`, data)
-        }
-        return toParseUnknownErr<ManagePluginArgs>(err, "There was a problem trying to parse the arguments for the uninstall task", data)
-    }
-}
-
-export const makeScaffoldArgs = (data: Input) => {
-    try {
-        const retval = scaffoldSchema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<ScaffoldArgs>(err, `The provided arguments to scaffold a project are invalid.`, data)
-        }
-        return toParseUnknownErr<ScaffoldArgs>(err, "There was a problem trying to parse the arguments for the scaffold task", data)
-    }
-}
-
-export const makeVersionArgs = (data: Input) => {
-    try {
-        const retval = versionSchema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<VersionArgs>(err, `The provided arguments are invalid.`, data)
-        }
-        return toParseUnknownErr<VersionArgs>(err, "There was a problem trying to parse the arguments for the version command", data)
-    }
-}
-
-export const makeProvisionArgs = (data: Input) => {
-    try {
-        const retval = provisionSchema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<ProvisionArgs>(err, `The provided arguments to provision an operation are invalid.`, data)
-        }
-        return toParseUnknownErr<ProvisionArgs>(err, "There was a problem trying to parse the arguments for the provision task", data)
-    }
-}
-
-export const of = (data: Record<string, unknown>) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<SanitizedArgs>(err, `The provided arguments are invalid.`, data)
-        }
-        return toParseUnknownErr<SanitizedArgs>(err, "There was a problem trying to parse the arguments for this command", data)
-    }
-}
-
-
-export const create = (input: Record<string, unknown>) => schema.parse(input)
+export const createUninstallTaskArgs = uninstallTaskArgs.factory.create
+export const makeUninstallTaskArgs = uninstallTaskArgs.factory.make
+export const ofUninstallTaskArgs = uninstallTaskArgs.factory.of

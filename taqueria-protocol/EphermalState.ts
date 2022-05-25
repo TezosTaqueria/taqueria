@@ -1,6 +1,6 @@
-import {z, ZodError} from 'zod'
-import {FutureInstance as Future, resolve, mapRej, attemptP, promise} from "fluture"
-import {TaqError, toParseErr, toParseUnknownErr, E_TaqError} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
+import {FutureInstance as Future, mapRej, attemptP, promise} from "fluture"
+import {TaqError, E_TaqError} from "@taqueria/protocol/TaqError"
 import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
 import * as Command from "@taqueria/protocol/Command"
 import * as Option from '@taqueria/protocol/Option'
@@ -10,6 +10,7 @@ import * as ParsedOperation from '@taqueria/protocol/ParsedOperation'
 import * as ParsedPluginInfo from '@taqueria/protocol/ParsedPluginInfo'
 import * as Config from "@taqueria/protocol/Config"
 import type {i18n} from "@taqueria/protocol/i18n"
+import createType from "@taqueria/protocol/Base"
 
 const eager = <T>(f: Future<TaqError, T>) => promise (
     mapRej
@@ -19,54 +20,39 @@ const eager = <T>(f: Future<TaqError, T>) => promise (
 
 const taskToPluginMap = z.record(
     z.union([
-        InstalledPlugin.schema,
-        Task.schema
+        InstalledPlugin.schemas.schema,
+        Task.schemas.schema
     ], {description: "Task/Plugin Mapping"})
 )
 const operationToPluginMap = z.record(
     z.union([
-        InstalledPlugin.schema,
-        ParsedOperation.schema
+        InstalledPlugin.schemas.schema,
+        ParsedOperation.schemas.schema
     ], {description: "Operation/Plugin Mapping"})
 )
 
-const internalSchema = z.object({
+const rawSchema = z.object({
     build: z.string({description: "cache.build"}),
     configHash: z.string({description: "cache.configHash"}),
     tasks: taskToPluginMap,
     operations: operationToPluginMap,
-    plugins: z.array(ParsedPluginInfo.schema, {description: "cache.plugins"})
+    plugins: z.array(ParsedPluginInfo.schemas.schema, {description: "cache.plugins"})
 }).describe("Ephermal State")
 
-export const schema = internalSchema.transform(val => val as EphemeralState)
+type RawInput = z.infer<typeof rawSchema>
 
-const ephemeralStateType: unique symbol = Symbol("EphemeralState")
+export const {schemas, factory} = createType<RawInput>({
+    rawSchema,
+    parseErrMsg: (value: unknown) => `${value} is not a valid representation of ephermal state`,
+    unknownErrMsg: "Something went wrong when parsing the ephermal state"
+})
 
-export type Input = z.infer<typeof internalSchema>
-
-export type EphemeralState = Input & {
-    readonly [ephemeralStateType]: void
-}
-
-export type t = EphemeralState
-
+export type EphermalState = z.infer<typeof schemas.schema>
+export type t = EphermalState
 export type TaskToPluginMap = z.infer<typeof taskToPluginMap>
-
 export type OpToPluginMap = z.infer<typeof operationToPluginMap>
 
-export const make = (value: Input) => {
-    try {
-        const retval = schema.parse(value)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<EphemeralState>(err, `The ephermal state is invalid`, value)
-        }
-        return toParseUnknownErr<EphemeralState>(err, `Something went wrong trying to parse the ephermal state`, value)
-    }
-}
-
+export const {create, of, make} = factory
 
 /**
  * Private functions

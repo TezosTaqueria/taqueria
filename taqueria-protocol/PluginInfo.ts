@@ -1,28 +1,26 @@
-import {z, ZodError} from 'zod'
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
-
+import {z} from 'zod'
 import * as Alias from "@taqueria/protocol/Alias"
 import * as VersionNumber from "@taqueria/protocol/VersionNumber"
 import * as Task from '@taqueria/protocol/Task'
 import * as Operation from '@taqueria/protocol/Operation'
+import createType, {Flatten} from "@taqueria/protocol/Base"
 
 export const internalSchema = z.object({
     name: z.string({description: "Plugin Name"}).nonempty(),
-    version: VersionNumber.schema.describe("Plugin Version #"),
-    schema: VersionNumber.schema.describe("Plugin Schema Version #"),
-    alias: Alias.schema.describe("Plugin Alias"),
+    version: VersionNumber.schemas.schema.describe("Plugin Version #"),
+    schema: VersionNumber.schemas.schema.describe("Plugin Schema Version #"),
+    alias: Alias.schemas.schema.describe("Plugin Alias"),
     tasks: z.preprocess(
         val => val ?? [],
         z.array(
-            Task.schema.describe("Plugin Task"),
+            Task.schemas.schema.describe("Plugin Task"),
             {description: "Plugin Tasks"}
         ).optional()
     ),
     operations: z.preprocess(
         val => val ?? [],
         z.array(
-            Operation.schema.describe("Plugin Operation"),
+            Operation.schemas.schema.describe("Plugin Operation"),
             {description: "Plugin Operations"}
         ).optional()
     )
@@ -50,33 +48,16 @@ export const rawSchema = z.object({
     
 }).describe("Plugin Schema")
 
-const pluginInfoType: unique symbol = Symbol("PluginInfo")
+type RawInput = z.infer<typeof rawSchema>
+type Input = Flatten<z.infer<typeof internalSchema>>
 
-type Input = z.infer<typeof internalSchema>
+export const {schemas, factory} = createType<RawInput, Input>({
+    rawSchema,
+    internalSchema,
+    parseErrMsg: "The schema returned from the plugin is invalid",
+    unknownErrMsg: "Something went wrong parsing the schema from a plugin"
+})
 
-export type RawInput = z.infer<typeof rawSchema>
-
-export type PluginInfo = Input & {
-    readonly [pluginInfoType]: void
-    readonly tasks: Task.t[]
-    readonly operations: Operation.t[]
-}
-
+export type PluginInfo = Flatten<z.infer<typeof schemas.schema>>
 export type t = PluginInfo
-
-export const schema = internalSchema.transform((val: unknown) => val as PluginInfo)
-
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<PluginInfo>(err, `The provided plugin info is invalid.`, data)
-        }
-        return toParseUnknownErr<PluginInfo>(err, "There was a problem trying to parse the plugin information", data)
-    }
-}
-
-export const create = (data: RawInput|unknown) => schema.parse(data)
+export const {create, of, make} = factory

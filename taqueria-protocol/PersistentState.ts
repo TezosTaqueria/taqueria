@@ -1,41 +1,35 @@
-import {z, ZodError} from "zod"
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from "zod"
 import * as SHA256 from "@taqueria/protocol/SHA256"
+import createType from "@taqueria/protocol/Base"
 
-const internalOp = z.object({
+const rawOpSchema = z.object({
     hash: SHA256.rawSchema.describe("state.op.hash"),
     time: z.number().min(1651846877).describe("state.op.time"),
     output: z.unknown().describe("state.op.output")
-}).describe("Persistent State")
+}).describe("Persistent State Operation") 
 
-export const rawSchema = z.record(internalOp)
+const internalOpSchema = z.object({
+    hash: SHA256.schemas.schema.describe("state.op.hash"),
+    time: z.number().min(1651846877).describe("state.op.time"),
+    output: z.unknown().describe("state.op.output")
+})
 
-export const stateType: unique symbol = Symbol("PersistentState")
+export const rawSchema = z.record(rawOpSchema)
 
-type Input = z.infer<typeof rawSchema>
+export const internalSchema = z.record(internalOpSchema)
 
-export interface PersistentState extends Input {
-    readonly [stateType]: void
-}
+type RawInput = z.infer<typeof rawSchema>
 
+type Input = z.infer<typeof internalSchema>
+
+export const {schemas, factory} = createType<RawInput, Input>({
+    rawSchema,
+    parseErrMsg: `The persistent state is invalid`,
+    unknownErrMsg: `Something went wrong trying to parse the persistent state`
+})
+
+export type PersistentState = z.infer<typeof schemas.schema>
 export type t = PersistentState
-
 export type State = PersistentState
 
-export const schema = rawSchema.transform((val: unknown) => val as PersistentState)
-
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<PersistentState>(err, `The persistent state is invalid.`, data)
-        }
-        return toParseUnknownErr<PersistentState>(err, "There was a problem trying to parse the persistent state", data)
-    }
-}
-
-export const create = (data: Input | Record<string, unknown> | unknown) => schema.parse(data)
+export const {create, of, make} = factory

@@ -1,11 +1,10 @@
-import {z, ZodError} from 'zod'
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
 import * as Verb from "@taqueria/protocol/Verb"
 import * as Alias from "@taqueria/protocol/Alias"
 import * as Command from '@taqueria/protocol/Command'
 import * as Option from '@taqueria/protocol/Option'
 import * as PositionalArg from '@taqueria/protocol/PositionalArg'
+import createType from "@taqueria/protocol/Base"
 
 const taskEncodingSchema = z.preprocess(
     (val: unknown) => val ?? 'none',
@@ -21,19 +20,6 @@ const taskEncodingSchema = z.preprocess(
 
 const taskHandlerSchema = z.union([z.literal('proxy'), z.string()])
 
-const internalSchema = z.object({
-    task: Verb.schema.describe("Task Name"),
-    command: Command.schema.describe("Task Command"),
-    aliases: z.array(Alias.rawSchema).default([]).describe("Task Aliases").optional(),
-    description: z.string({description: "Task Description"}).nonempty(),
-    example: z.string({description: "Task Example"}).optional(),
-    hidden: z.boolean({description: "Task Is Hidden"}).default(false).optional(),
-    encoding: taskEncodingSchema.describe("Task Encoding"),
-    handler: taskHandlerSchema.describe("Task Handler"),
-    options: z.array(Option.schema).default([]).describe("Task Options").optional(),
-    positionals: z.array(PositionalArg.schema).default([]).describe("Task Positional Args").optional()
-}).describe("Task")
-
 export const rawSchema = z.object({
     task: Verb.rawSchema.describe("Task Name"),
     command: Command.rawSchema.describe("Task Command"),
@@ -47,34 +33,33 @@ export const rawSchema = z.object({
     positionals: z.array(PositionalArg.rawSchema).default([]).describe("Task Positional Args").optional()
 }).describe("Task")
 
-export const schema = internalSchema.transform(val => val as Task)
+const internalSchema = z.object({
+    task: Verb.schemas.schema.describe("Task Name"),
+    command: Command.schemas.schema.describe("Task Command"),
+    aliases: z.array(Alias.rawSchema).default([]).describe("Task Aliases").optional(),
+    description: z.string({description: "Task Description"}).nonempty(),
+    example: z.string({description: "Task Example"}).optional(),
+    hidden: z.boolean({description: "Task Is Hidden"}).default(false).optional(),
+    encoding: taskEncodingSchema.describe("Task Encoding"),
+    handler: taskHandlerSchema.describe("Task Handler"),
+    options: z.array(Option.schemas.schema).default([]).describe("Task Options").optional(),
+    positionals: z.array(PositionalArg.schemas.schema).default([]).describe("Task Positional Args").optional()
+}).describe("Task")
 
-const taskType: unique symbol = Symbol("Task")
+type RawInput = z.infer<typeof rawSchema>
+type Input = z.infer<typeof internalSchema>
 
-interface Input extends z.infer<typeof internalSchema> {
-    handler: "proxy" | string
-}
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
+    rawSchema,
+    internalSchema,
+    parseErrMsg: (value: unknown) => `The following task is invalid: ${value}`,
+    unknownErrMsg: "Something went wrong trying to parse the task"
+})
 
-interface RawInput extends z.infer<typeof rawSchema> {
-    handler: "proxy" | string
-}
-
-export type Task = Input & {
-    readonly [taskType]: void
-}
-
+export type Task = z.infer<typeof generatedSchemas.schema>
 export type t = Task
-
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<Task>(err, `The provided task is invalid.`, data)
-        }
-        return toParseUnknownErr<Task>(err, "There was a problem trying to parse the task", data)
-    }
+export const {create, make, of} = factory
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as unknown as Task)
 }
-export const create = (data: RawInput) => schema.parse(data)

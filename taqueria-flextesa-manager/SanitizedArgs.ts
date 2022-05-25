@@ -25,7 +25,7 @@ type Input = z.infer<typeof internalSchema>
 const configInternalSchema = Config.internalSchema.omit({sandbox: true}).extend({
     sandbox: z.record(
         z.union([
-            SandboxConfig.schema,
+            SandboxConfig.schemas.schema,
             z.string().nonempty()
         ])
     )

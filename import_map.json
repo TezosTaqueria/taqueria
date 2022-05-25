@@ -10,6 +10,7 @@
         "memoizy": "https://deno.land/x/memoizy@1.0.0/mod.ts",
         "@peculiar/webcrypto": "./taqueria-protocol/Crypto.ts",
         "@taqueria/protocol/TaqError": "./taqueria-protocol/TaqError.ts",
+        "@taqueria/protocol/Base": "./taqueria-protocol/Base.ts",
         "@taqueria/protocol/url-join": "./taqueria-protocol/url-join.ts",
         "@taqueria/protocol/VersionNumber": "./taqueria-protocol/VersionNumber.ts",
         "@taqueria/protocol/Alias": "./taqueria-protocol/Alias.ts",

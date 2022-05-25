@@ -1,7 +1,7 @@
 import i18next from 'i18next'
 
 export interface i18n {
-    __: typeof i18next.t
+    __: (...args: unknown[]) => string
 }
 
 export type t = i18n

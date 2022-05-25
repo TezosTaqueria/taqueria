@@ -1,20 +1,6 @@
-import {z, ZodError} from 'zod'
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
 import * as HumanReadableIdentifier from '@taqueria/protocol/HumanReadableIdentifier'
-
-const internalSchema = z.object({
-    placeholder: HumanReadableIdentifier.schema.describe("Positional Arg Placeholder"),
-    description: z.string({description: "Positional Arg Description"}).nonempty(),
-    defaultValue: z.union(
-        [z.string(), z.number(), z.boolean()],
-        {description: "Positional Arg Default Value"}
-    ).optional(),
-    type: z.union(
-        [z.literal('string'), z.literal('number'), z.literal('boolean')],
-        {description: "Positional Arg Datatype"}
-    ).optional()
-}).describe("Positional Arg")
+import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z.object({
     placeholder: HumanReadableIdentifier.rawSchema.describe("Positional Arg Placeholder"),
@@ -29,34 +15,30 @@ export const rawSchema = z.object({
     ).optional()
 }).describe("Positional Arg")
 
-export const schema = internalSchema.transform(val => val as PositionalArg)
+const internalSchema = z.object({
+    placeholder: HumanReadableIdentifier.schemas.schema.describe("Positional Arg Placeholder"),
+    description: z.string({description: "Positional Arg Description"}).nonempty(),
+    defaultValue: z.union(
+        [z.string(), z.number(), z.boolean()],
+        {description: "Positional Arg Default Value"}
+    ).optional(),
+    type: z.union(
+        [z.literal('string'), z.literal('number'), z.literal('boolean')],
+        {description: "Positional Arg Datatype"}
+    ).optional()
+}).describe("Positional Arg")
 
-const postionalArgType: unique symbol = Symbol('PositionalArg')
-
+type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
-export type RawInput = z.infer<typeof rawSchema>
+export const {schemas, factory} = createType<RawInput, Input>({
+    rawSchema,
+    internalSchema,
+    parseErrMsg: (value: unknown) => `The following positional argument is invalid: ${value}`,
+    unknownErrMsg: "Something went wrong parsing the positional argument"
+})
 
-export interface PositionalArg extends Input {
-    readonly [postionalArgType]: void
-}
-
+export type PositionalArg = z.infer<typeof schemas.schema>
 export type t = PositionalArg
 
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            const msg = data.placeholder
-                ? `${data.placeholder} is not a valid positional argrument.`
-                : `The provided positional argrument is invalid.`
-
-            return toParseErr<PositionalArg>(err, msg, data)
-        }
-        return toParseUnknownErr<PositionalArg>(err, "There was a problem trying to parse the positional argument", data)
-    }
-}
-export const create = (data: RawInput) => schema.parse(data)
+export const {create, of, make} = factory

@@ -1,9 +1,6 @@
-import {z, ZodError} from "zod"
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from "zod"
 import * as Operation from "@taqueria/protocol/Operation"
-
-const parsedOperationType: unique symbol = Symbol()
+import createType from "@taqueria/protocol/Base"
 
 const internalSchema = Operation
     .internalSchema
@@ -15,29 +12,17 @@ export const rawSchema = Operation
     .omit({handler: true})
     .describe("ParsedOperation")
 
+type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
-type RawInput = z.infer<typeof rawSchema>
+export const {schemas, factory} = createType<RawInput, Input>({
+    rawSchema,
+    internalSchema,
+    parseErrMsg: (value: unknown) => `Could not parse the following operation: ${value}`,
+    unknownErrMsg: "Something went wrong trying to parse an operation"
+})
 
-export interface ParsedOperation extends Input {
-    readonly [parsedOperationType]: void
-}
-
+export type ParsedOperation = z.infer<typeof schemas.schema>
 export type t = ParsedOperation
 
-export const schema = internalSchema.transform((val: unknown) => val as ParsedOperation)
-
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<ParsedOperation>(err, `The provided operation is invalid.`, data)
-        }
-        return toParseUnknownErr<ParsedOperation>(err, "There was a problem trying to parse the operation", data)
-    }
-}
-
-export const create = (input: RawInput | Record<string, unknown> | unknown) => schema.parse(input)
+export const {create, make, of} = factory

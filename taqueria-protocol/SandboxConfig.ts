@@ -1,30 +1,17 @@
-import {z, ZodError} from 'zod'
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
 import * as HumanReadableIdentifier from "@taqueria/protocol/HumanReadableIdentifier"
 import * as Url from "@taqueria/protocol/Url"
 import * as EconomicalProtocolHash from "@taqueria/protocol/EconomicalProtocolHash"
 import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
 import * as Verb from "@taqueria/protocol/Verb"
+import createType from "@taqueria/protocol/Base"
 
 const accountMapSchema = z.record(
     z.union([
         z.string().nonempty(),
-        SandboxAccountConfig.schema
+        SandboxAccountConfig.schemas.schema
     ])
 )
-
-const internalSchema = z.object({
-    label: HumanReadableIdentifier.schema.describe("Sandbox Label"),
-    rpcUrl: Url.schema.describe("Sandbox RPC Url"),
-    protocol: EconomicalProtocolHash.schema.describe("Sandbox Protocol Hash"),
-    attributes: z.record(
-        z.union([z.string(), z.number(), z.boolean()]),
-        {description: "Sandbox Attributes"}
-    ).optional(),
-    plugin: Verb.schema.describe("Sandbox Plugin").optional(),
-    accounts: accountMapSchema.optional()
-}, {description: "Sandbox Configuration"})
 
 export const rawSchema = z.object({
     label: z.string({description: "Sandbox Label"}).nonempty(),
@@ -44,31 +31,28 @@ export const rawSchema = z.object({
     ], {description: "Sandbox Accounts"}).optional()
 })
 
-export const schema = internalSchema.transform(val => val as SandboxConfig)
-
-const sandboxType: unique symbol = Symbol("SandboxConfig")
-
-type Input = z.infer<typeof internalSchema>
+const internalSchema = z.object({
+    label: HumanReadableIdentifier.schemas.schema.describe("Sandbox Label"),
+    rpcUrl: Url.schemas.schema.describe("Sandbox RPC Url"),
+    protocol: EconomicalProtocolHash.schemas.schema.describe("Sandbox Protocol Hash"),
+    attributes: z.record(
+        z.union([z.string(), z.number(), z.boolean()]),
+        {description: "Sandbox Attributes"}
+    ).optional(),
+    plugin: Verb.schemas.schema.describe("Sandbox Plugin").optional(),
+    accounts: accountMapSchema.optional()
+}, {description: "Sandbox Configuration"})
 
 type RawInput = z.infer<typeof rawSchema>
+type Input = z.infer<typeof internalSchema>
 
-export interface SandboxConfig extends Input {
-    readonly [sandboxType]: void
-}
+export const {schemas, factory} = createType<RawInput, Input>({
+    rawSchema,
+    internalSchema,
+    parseErrMsg: (value: unknown) => `${value} is not a valid sandbox configuration `,
+    unknownErrMsg: "Something went wrong trying to parse the sandbox configuration"
+})
 
+export type SandboxConfig = z.infer<typeof schemas.schema>
 export type t = SandboxConfig
-
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<SandboxConfig>(err, `The provided sandbox configuration is invalid.`, data)
-        }
-        return toParseUnknownErr<SandboxConfig>(err, "There was a problem trying to parse the sandbox configuration", data)
-    }
-}
-
-export const create = (data: RawInput) => schema.parse(data)
+export const {create, of, make} = factory

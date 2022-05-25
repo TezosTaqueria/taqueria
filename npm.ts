@@ -95,7 +95,8 @@ export const installPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin
         // what the real package name is
         return addToPluginList(pluginName, config)    
     }),
-    map (_ => i18n.__('pluginInstalled'))
+    map (_ => i18n.__('pluginInstalled')),
+
 )
 
 export const uninstallPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string) => pipe(

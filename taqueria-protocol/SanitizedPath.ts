@@ -1,31 +1,26 @@
-import {z, ZodError} from "zod"
-import {reject, resolve} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from "zod"
+import createType from "@taqueria/protocol/Base"
 
-export const schema = z
+export const rawSchema = z
     .string({description: "Sanitized Path"})
     .transform(value => {
         const result = value.match(/^(\.\.|\.\/|\/)/)
         return result ? value : `./${value}`
     })
 
-const sanitizedPathType: unique symbol = Symbol("SanitizedPath")
+type RawInput = z.infer<typeof rawSchema>
 
-export type SanitizedPath = z.infer<typeof schema> & {
-    readonly [sanitizedPathType]: void
-}
+const {schemas: generatedSchemas, factory} = createType<RawInput>({
+    isStringLike: true,
+    rawSchema,
+    parseErrMsg: (value: unknown) => `${value} is an invalid filesystem path`,
+    unknownErrMsg: (value: unknown) => `Something went wrong trying to parse the filesystem path, ${value}`
+})
 
+export type SanitizedPath = z.infer<typeof generatedSchemas.schema>
 export type t = SanitizedPath
-
-export const make = (value: string) => {
-    try {
-        const retval = schema.parse(value) as SanitizedPath
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<SanitizedPath>(err, `${value} is not a valid path`, value)
-        }
-        return toParseUnknownErr<SanitizedPath>(err, "There was a problem trying to parse the path", value)
-    }
+export const {create, of, make} = factory
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as SanitizedPath)
 }

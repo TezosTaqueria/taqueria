@@ -1,6 +1,5 @@
-import {z, ZodError} from 'zod'
-import {reject, resolve} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
+import createType, {Flatten} from "@taqueria/protocol/Base"
 
 export const rawSchema = z.object({
     networks: z.array(
@@ -18,27 +17,17 @@ export const rawSchema = z.object({
     .optional()
 }).describe("Environment Config")
 
-export const schema = rawSchema.transform(val => val as Environment)
+type RawInput = z.infer<typeof rawSchema>
 
-const envType: unique symbol = Symbol("Environment")
+export const {schemas, factory} = createType<RawInput>({
+    rawSchema,
+    parseErrMsg: (value: unknown) => `${value} is not an valid environment configuration`,
+    unknownErrMsg: "Something went wrong trying to parse the environment configuration"
+})
 
-type Input = z.infer<typeof rawSchema>
-
-export type Environment = Input & {
-    readonly [envType]: void
-}
-
+export type Environment = Flatten<z.infer<typeof schemas.schema>>
 export type t = Environment
 
-export const make = (value: Input) => {
-    try {
-        const retval = schema.parse(value)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<Environment>(err, `The provided environment is invalid`, value)
-        }
-        return toParseUnknownErr<Environment>(err, "There was a problem trying to parse the environment configuration", value)
-    }
-}
+export const {create, make, of} = factory
+
+export const {internalSchema} = schemas

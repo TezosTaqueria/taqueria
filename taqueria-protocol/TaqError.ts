@@ -43,24 +43,28 @@ export class E_TaqError extends Error {
   }
 }
 
-export const toParseErr = <T>(previous: ZodError, msg: string, context?: unknown)  => {
-  const taqErr: TaqError = {
+export const toFutureParseErr = <T>(previous: ZodError, msg: string, context?: unknown)  => 
+  reject(toParseErr(previous, msg, context))
+  .pipe(map((val: unknown) => val as T))
+
+
+export const toParseErr = (previous: ZodError, msg: string, context?: unknown) => create({
     kind: "E_PARSE",
     msg: msg,
     context,
     previous
-  }
-  return reject(taqErr).pipe(map((val: unknown) => val as T))
-}
+})
 
-export const toParseUnknownErr = <T>(previous: Error|TaqError|E_TaqError|unknown, msg: string, context?: unknown) => {
-  const taqErr: TaqError = {
+export const toParseUnknownErr = (previous: Error|TaqError|E_TaqError|unknown, msg: string, context?: unknown) => create({
     kind: "E_PARSE_UNKNOWN",
     msg: msg,
     context,
     previous
-  }
-  return reject(taqErr).pipe(map((val: unknown) => val as T))
-}
+})
+
+export const toFutureParseUnknownErr = <T>(previous: Error|TaqError|E_TaqError|unknown, msg: string, context?: unknown) => 
+reject(toParseUnknownErr(previous, msg, context))
+  .pipe(map((val: unknown) => val as T))
+
 
 export const create = (err: TaqError) => err

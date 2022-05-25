@@ -14,7 +14,7 @@ import * as SandboxAccountConfig from "@taqueria/protocol/SandboxAccountConfig"
 import * as NetworkConfig from "@taqueria/protocol/NetworkConfig"
 import * as Environment from "@taqueria/protocol/Environment"
 import * as PersistentState from "@taqueria/protocol/PersistentState"
-import {toParseErr, toParseUnknownErr, E_TaqError} from "@taqueria/protocol/TaqError"
+import {toFutureParseErr, toFutureParseUnknownErr, E_TaqError} from "@taqueria/protocol/TaqError"
 import type {TaqError} from "@taqueria/protocol/TaqError"
 import {Schema, InputSchema} from "./types"
 import {Args, pluginDefiner, LikeAPromise, StdIO} from "./types"
@@ -148,9 +148,9 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> =>
         }
         catch (previous) {
             if (previous instanceof ZodError) {
-                return eager (toParseErr<RequestArgs.t>(previous, "The plugin request arguments are invalid", unparsedArgs))
+                return eager (toFutureParseErr<RequestArgs.t>(previous, "The plugin request arguments are invalid", unparsedArgs))
             }
-            return eager (toParseUnknownErr<RequestArgs.t>(previous, "There was a problem trying to parse the plugin request arguments", unparsedArgs))
+            return eager (toFutureParseUnknownErr<RequestArgs.t>(previous, "There was a problem trying to parse the plugin request arguments", unparsedArgs))
         }
     }
     return Promise.reject("Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?")
@@ -216,7 +216,7 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) => a
                 return sendAsyncJson(output);
             case "proxy":
                 if (schema.proxy) {
-                    const retval = schema.proxy(RequestArgs.createProxyArgs(requestArgs))
+                    const retval = schema.proxy(RequestArgs.createProxyRequestArgs(requestArgs))
                     if (retval) return retval
                     return Promise.reject({
                         errCode: "E_PROXY",

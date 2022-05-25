@@ -1,11 +1,9 @@
-import {z, ZodError} from "zod"
-import {resolve} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from "zod"
 import * as ProvisionerID from "@taqueria/protocol/ProvisionerID"
 import * as Provisioner from "@taqueria/protocol/Provisioner"
 import {partitionArray, uniq} from "rambda"
 import {memoizy} from "memoizy"
-
+import createType, {Flatten} from "@taqueria/protocol/Base"
 
 const getInvalidIds = memoizy((provisions: Provisioner.t[]) => {
     const ids = provisions.map(p => p.id)
@@ -36,7 +34,7 @@ const rawSchema = z
 type RawInput = z.infer<typeof rawSchema>
 
 const internalSchema = z
-    .array(Provisioner.schema)
+    .array(Provisioner.schemas.schema)
     .refine(
         provisions => getInvalidIds(provisions).length === 0,
         provisions => ({message: `One or more of your provisioners depends on an invalid provisioner. The following provisioner ids were referenced that do not exist: ${getInvalidIds(provisions).join(", ")}`})
@@ -46,35 +44,13 @@ const internalSchema = z
 
 type Input = z.infer<typeof internalSchema>
 
-const schema = internalSchema.transform(val => val as Provisions)
+export const {schemas, factory} = createType<RawInput, Input>({
+    rawSchema,
+    internalSchema,
+    parseErrMsg: (value: unknown) => `The following provision is invalid: ${value}`,
+    unknownErrMsg: "Something went wrong parsing the list of provisioners"
+})
 
-export type Provisions = Input
+export type Provisions = Flatten<z.infer<typeof schemas.schema>>
 export type t = Provisions
-
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<Provisions>(err, `The provided provisions is invalid.`, data)
-        }
-        return toParseUnknownErr<Provisions>(err, "There was a problem trying to parse the provisions", data)
-    }
-}
-
-export const of = (data: RawInput | Record<string, unknown> | unknown) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<Provisions>(err, `The provided provisions is invalid.`, data)
-        }
-        return toParseUnknownErr<Provisions>(err, "There was a problem trying to parse the provisions", data)
-    }
-}
-
-export const create = (input: RawInput | Record<string, unknown> | unknown) =>  schema.parse(input) as Provisions
+export const {create, of, make} = factory

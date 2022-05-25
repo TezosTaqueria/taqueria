@@ -1,32 +1,28 @@
-import {z, ZodError} from 'zod'
-import {reject, resolve} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
-export const schema = z
+import {z} from 'zod'
+import createType from "@taqueria/protocol/Base"
+
+export const rawSchema = z
     .string({description: "Public Key Hash"})
     .nonempty()
     .refine(
         val => val.startsWith("tz1"),
         val => ({message: `${val} is not a valid public key hash`}) 
     )
-    .transform(val => val as PublicKeyHash)
 
-const pkhType: unique symbol = Symbol("PublicKeyHash")
+type RawInput = z.infer<typeof rawSchema>
 
-export type PublicKeyHash = string & {
-    readonly [pkhType]: void
-}
+export const {schemas: generatedSchemas, factory} = createType<RawInput>({
+    isStringLike: true,
+    rawSchema,
+    parseErrMsg: (value: unknown) => `${value} is an invalid public key hash`,
+    unknownErrMsg: "Something went wrong parsing the public key hash"
+})
 
+export type PublicKeyHash = z.infer<typeof generatedSchemas.schema>
 export type t = PublicKeyHash
-
-export const make = (value: string) => {
-    try {
-        const retval = schema.parse(value)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<PublicKeyHash>(err, `${value} is not a valid public key hash`, value)
-        }
-        return toParseUnknownErr<PublicKeyHash>(err, "There was a problem trying to parse the public key hash", value)
-    }
+export type PKH = PublicKeyHash
+export const {create, of, make} = factory
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as PublicKeyHash)
 }

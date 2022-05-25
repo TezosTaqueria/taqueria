@@ -182,8 +182,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
                     })
             },
             (args: Record<string, unknown>) => pipe(
-                SanitizedArgs.of(args),
-                chain(SanitizedArgs.makeScaffoldArgs),
+                SanitizedArgs.ofScaffoldTaskArgs(args),
                 chain(scaffoldProject(i18n)),
                 forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
             )
@@ -205,8 +204,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         // TODO: This function assumes that there is only one type of plugin available to install,
         // a plugin distributed and installable via NPM. This should support other means of distribution
         (inputArgs: Record<string, unknown>) => pipe(
-            SanitizedArgs.of(inputArgs),
-            chain(SanitizedArgs.makeInstallArgs),
+            SanitizedArgs.ofInstallTaskArgs(inputArgs),
             chain(args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName)),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log),
         )
@@ -223,8 +221,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
             })
         },
         (inputArgs: Record<string, unknown>) => pipe(
-            SanitizedArgs.of(inputArgs),
-            chain(SanitizedArgs.makeUninstallArgs),
+            SanitizedArgs.ofUninstallTaskArgs(inputArgs),
             chain(inputArgs => NPM.uninstallPlugin(parsedArgs.projectDir, i18n, inputArgs.pluginName)),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (console.log)
         )
@@ -312,7 +309,7 @@ const initProject = (projectDir: SanitizedAbsPath.t, quickstart: string|undefine
     map (_ => i18n.__("bootstrapMsg"))
 )
 
-const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, maxConcurrency}: SanitizedArgs.ScaffoldArgs) => attemptP<TaqError.t, string>(async () => {
+const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, maxConcurrency}: SanitizedArgs.ScaffoldTaskArgs) => attemptP<TaqError.t, string>(async () => {
     const abspath = await eager (SanitizedAbsPath.make(scaffoldProjectDir))
     const destDir = await eager (doesPathNotExist(abspath))
     
@@ -376,8 +373,7 @@ const addOperations = (cliConfig: CLIConfig, config: LoadedConfig.t, _env: EnvVa
             })
         },
         (argv: Arguments) => pipe(
-            SanitizedArgs.of(argv),
-            chain(SanitizedArgs.makeProvisionArgs),
+            SanitizedArgs.ofProvisionTaskArgs(argv),
             chain(inputArgs => addNewProvision(inputArgs, config, state)),
             map(() => "Added provision to .taq/provisions.json"),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
@@ -545,7 +541,7 @@ const addTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, p
 )
 
 const loadState = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib): CLIConfig =>
-[addTasks, addOperations, addTemplates].reduce(
+[addTasks, addOperations, /*addTemplates*/].reduce(
     (cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
     cliConfig
 )

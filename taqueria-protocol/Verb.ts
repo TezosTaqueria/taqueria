@@ -1,31 +1,24 @@
-import {z, ZodError} from 'zod'
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
+import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z
     .string({description: "Verb"})
     .nonempty("Must be a valid verb")
     .regex(/^[A-Za-z\-\ ]+/, "Must be a valid verb")
 
-export const schema = rawSchema.transform(val => val as Verb)    
+type Input = z.infer<typeof rawSchema>
 
-const verbType: unique symbol = Symbol("Verb")
+export const {factory, schemas: generatedSchemas} = createType<Input>({
+    isStringLike: true,
+    rawSchema,
+    parseErrMsg: (value: unknown) => `${value} is not an invalid verb`,
+    unknownErrMsg: `Something went wrong trying to parse a verb`
+})
 
-export type Verb = string & {
-    readonly [verbType]: void
-}
-
+export type Verb = z.infer<typeof generatedSchemas.schema>
 export type t = Verb
-
-export const make = (value: string) => {
-    try {
-        const retval = schema.parse(value)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<Verb>(err, `${value} is not a valid verb`, value)
-        }
-        return toParseUnknownErr<Verb>(err, "There was a problem trying to parse a verb", value)
-    }
+export const {create, make, of} = factory
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as Verb)
 }

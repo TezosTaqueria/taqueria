@@ -84,7 +84,7 @@ const getOperationParams = (state: EphemeralState.t) => (operationName: string, 
     throw `Could not collect arguments for the operation, ${operationName}`
 }
 
-const newProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, state: EphemeralState.t) => {
+const newProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t) => {
     const operation = parsedArgs.operation
     const name = parsedArgs.name ?? generate()
     const plugin = (() => {
@@ -94,21 +94,24 @@ const newProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, state: EphemeralS
         return plugin!.alias
     })()
 
-    return Provisioner.make({
-        id: `${plugin}.${operation}.${name}`,
-        operation,
-        plugin,
-        ...getOperationParams (state) (operation, plugin),
-        command: operation === "custom" ? "echo 'Custom Provision'" : undefined
-    })
+    return pipe(
+        ProvisionerID.make(`${plugin}.${operation}.${name}`),
+        chain(id => Provisioner.make({
+            id,
+            operation,
+            plugin,
+            ...getOperationParams (state) (operation, plugin),
+            command: operation === "custom" ? "echo 'Custom Provision'" : undefined
+        }))
+    )
 }
 
-export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionArgs, config: LoadedConfig.t, state: EphemeralState.t) => attemptP<TaqError.t, Provisions.t>(async () => {
+export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, config: LoadedConfig.t, state: EphemeralState.t) => attemptP<TaqError.t, Provisions.t>(async () => {
     try {
         const provisionAbspath = await eager (SanitizedAbsPath.make(joinPaths(config.projectDir, ".taq", "provisions.json")))
         const provision = await eager (newProvision(parsedArgs, state))
         const provisions = await eager (addProvision(provision, provisionAbspath))
-        return provisions
+        return provisions as Provisions.t
     }
     catch (previous) {
         const err: TaqError.t = {

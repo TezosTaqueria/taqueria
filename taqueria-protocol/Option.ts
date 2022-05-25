@@ -1,12 +1,11 @@
-import {z, ZodError} from 'zod'
-import {reject, resolve} from 'fluture'
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
 import * as Verb from '@taqueria/protocol/Verb'
 import * as SingleChar from '@taqueria/protocol/SingleChar'
+import createType, {Flatten} from "@taqueria/protocol/Base"
 
-const internalSchema = z.object({
-    shortFlag: SingleChar.schema.describe("Option Short Flag").optional(),
-    flag: Verb.schema.describe("Option Long Flag"),
+export const internalSchema = z.object({
+    shortFlag: SingleChar.schemas.schema.describe("Option Short Flag").optional(),
+    flag: Verb.schemas.schema.describe("Option Long Flag"),
     description: z.string({description: "Option Description"}).nonempty(),
     defaultValue: z.union(
         [z.string(), z.number(), z.boolean()],
@@ -36,30 +35,17 @@ export const rawSchema = z.object({
     boolean: z.boolean({description: "Option Is Boolean"}).default(false).optional()
 }).describe("Option")
 
-export const schema = internalSchema.transform(val => val as Option)
-
-const optionType: unique symbol = Symbol("Option")
-
+type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
-export type RawInput = z.infer<typeof rawSchema>
+export const {schemas, factory} = createType<RawInput, Input>({
+    rawSchema,
+    internalSchema,
+    parseErrMsg: (value: unknown) => `The following option is invalid: ${value}`,
+    unknownErrMsg: "Something went wrong trying to parse the option"
+})
 
-export interface Option extends Input {
-    readonly [optionType]: void
-}
-
+export type Option = Flatten<z.infer<typeof schemas.schema>>
 export type t = Option
 
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<Option>(err, `The provided option is invalid.`, data)
-        }
-        return toParseUnknownErr<Option>(err, "There was a problem trying to parse the option", data)
-    }
-}
-export const create = (data: RawInput) => schema.parse(data)
+export const {make, create, of} = factory

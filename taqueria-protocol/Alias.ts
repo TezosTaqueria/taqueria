@@ -1,34 +1,41 @@
-import {z, ZodError} from "zod"
+import {z} from "zod"
 import * as Verb from '@taqueria/protocol/Verb'
 import * as SingleChar from '@taqueria/protocol/SingleChar'
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import createType from "@taqueria/protocol/Base"
 
-export const internalSchema = z
-    .union([Verb.schema, SingleChar.schema], {description: "Alias"})
 
 export const rawSchema = z
-    .union([Verb.rawSchema, SingleChar.rawSchema], {description: "Alias"})
+    .union([
+        Verb.rawSchema,
+        SingleChar.rawSchema], 
+        {description: "Alias"}
+    )
 
-const aliasType: unique symbol = Symbol("Alias")
+export const internalSchema = z
+    .union([
+        Verb.schemas.schema,
+        SingleChar.schemas.schema],
+        {description: "Alias"}
+    )
 
-export type Alias = string & {
-    readonly [aliasType]: void
-}
+type RawInput = z.infer<typeof rawSchema>
+type Input = z.infer<typeof internalSchema>    
 
-export type t = Alias    
-    
-export const schema = internalSchema.transform((val: unknown) => val as Alias)
+const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
+    isStringLike: true,
+    rawSchema,
+    internalSchema,
+    parseErrMsg: (value: unknown) => `${value} is not a valid alias`,
+    unknownErrMsg: 'Something went wrong trying to parse an alias'
+})
 
-export const make = (value: string) => {
-    try {
-        const alias = schema.parse(value)
-        return resolve(alias)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<Alias>(err, `${value} is not a valid alias`, value)
-        }
-        return toParseUnknownErr<Alias>(err, 'Something went wrong trying to parse an alias', value)
-    }
+export type Alias = z.infer<typeof generatedSchemas.schema>
+
+export type t = Alias
+
+export const {create, of, make} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as Alias)
 }

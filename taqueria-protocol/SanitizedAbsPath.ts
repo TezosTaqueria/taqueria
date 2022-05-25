@@ -1,33 +1,23 @@
-import {z, ZodError} from "zod"
+import {z} from "zod"
 import * as path from 'path'
-import {reject, resolve} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import createType from "@taqueria/protocol/Base"
 
-const sanitizedAbsPath: unique symbol = Symbol()
 export const rawSchema = z.string({description: "SanitizedAbsPath"}).nonempty()
 
-export const schema = rawSchema
-    .transform((val: string) => {
-        return path.resolve(val) as SanitizedAbsPath
-    })
+type RawInput = z.infer<typeof rawSchema>
 
-type Input = z.infer<typeof rawSchema>
+export const {schemas: generatedSchemas, factory} = createType<RawInput>({
+    isStringLike: true,
+    rawSchema,
+    transformer: (value: unknown) => path.resolve(value as string) as unknown,
+    parseErrMsg: (value: unknown) => `${value} is an invalid absolute path`,
+    unknownErrMsg: (value: unknown) => `Something went wrong trying to parse the absolute path, ${value}`
+})
 
-export type SanitizedAbsPath = string & {
-    readonly [sanitizedAbsPath]: void
-}
-
+export type SanitizedAbsPath = z.infer<typeof generatedSchemas.schema>
 export type t = SanitizedAbsPath
-
-export const make = (value: string) => {
-    try {
-        const retval = schema.parse(value)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<SanitizedAbsPath>(err, `${value} is not a valid absolute path`, value)
-        }
-        return toParseUnknownErr<SanitizedAbsPath>(err, "There was a problem trying to parse the absolute path", value)
-    }
+export const {create, make, of} = factory
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as SanitizedAbsPath)
 }

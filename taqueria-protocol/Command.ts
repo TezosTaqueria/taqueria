@@ -1,33 +1,23 @@
-import {z, ZodError} from 'zod'
-import {resolve, reject, mapRej} from "fluture"
-import {TaqError, toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
+import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z
     .string({description: "Command"})
     .regex(/^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/, "Must be a command that can be interpreted using yargs")
 
-export const schema = rawSchema.transform(val => val as Command)
+type RawInput = z.infer<typeof rawSchema>    
 
-const commandType: unique symbol = Symbol("Command")
+const {schemas: generatedSchemas, factory} = createType<RawInput>({
+    isStringLike: true,
+    rawSchema,
+    parseErrMsg: (value: unknown) => `${value} is an invalid command. Expected format is: taskName [optional] <required>`,
+    unknownErrMsg: "Something went wrong when parsing the command"
+})
 
-export type Command = string & {
-    readonly [commandType]: void
-}
-
+export type Command = z.infer<typeof generatedSchemas.schema>
 export type t = Command
-
-export const make = (value: string) => {
-    try {
-        const retval = schema.parse(value)
-        return resolve(retval)
-            .pipe(mapRej(err => err as TaqError))
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<Command>(err, `${value} is not a valid command`, value)
-        }
-        return toParseUnknownErr<Command>(err, 'There was a problem trying to parse the command', value)
-    }
+export const {create, make, of} = factory
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as Command)
 }
-
-export const create = (value: string) => schema.parse(value)

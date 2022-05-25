@@ -1,54 +1,37 @@
-import {z, ZodError} from 'zod'
-import {reject, resolve} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
 import * as Config from '@taqueria/protocol/Config'
-import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin'
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath'
 import * as SHA256 from '@taqueria/protocol/SHA256'
+import createType, {Flatten} from "@taqueria/protocol/Base"
 
-export const rawSchema = Config.internalSchema.extend({
+export const rawSchema = Config.rawSchema.extend({
     projectDir: SanitizedAbsPath.rawSchema.describe("loadedConfig.projectDir"),
     configFile: SanitizedAbsPath.rawSchema.describe("loadedConfig.configFile"),
-    hash: SHA256.schema.describe("loadedConfig.hash")
+    hash: SHA256.rawSchema.describe("loadedConfig.hash")
 }).describe("LoadedConfig")
 
 export const internalSchema = Config.internalSchema.extend({
-    projectDir: SanitizedAbsPath.schema.describe("loadedConfig.projectDir"),
-    configFile: SanitizedAbsPath.schema.describe("loadedConfig.configFile"),
-    hash: SHA256.schema.describe("loadedConfig.hash")
+    projectDir: SanitizedAbsPath.schemas.schema.describe("loadedConfig.projectDir"),
+    configFile: SanitizedAbsPath.schemas.schema.describe("loadedConfig.configFile"),
+    hash: SHA256.schemas.schema.describe("loadedConfig.hash")
 }).describe("LoadedConfig")
 
-export const schema = internalSchema.transform((val: unknown) => val as LoadedConfig)
-
-const loadedConfigType: unique symbol = Symbol("LoadedConfig")
-
+type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
-type RawInput = z.infer<typeof rawSchema>
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
+    rawSchema,
+    internalSchema,
+    parseErrMsg: (value: unknown) => `The following configuration is invalid: ${value}`,
+    unknownErrMsg: "Something went wrong trying to parse the configuration to load"
+})
 
-export interface LoadedConfig extends Input, Config.t {
-    readonly [loadedConfigType]: void
-    readonly contractsDir: string
-    readonly artifactsDir: string
-    readonly testsDir: string
-    readonly plugins: InstalledPlugin.t[]
-}
-
+export type LoadedConfig = z.infer<typeof generatedSchemas.schema>
 export type t = LoadedConfig
-
-export const make = (data: Input) => {
-    try {
-        const retval = schema.parse(data)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<LoadedConfig>(err, "The provided Taqueria configuration is invalid", data)
-        }
-        return toParseUnknownErr<LoadedConfig>(err, "There was a problem trying to parse the Taqueria configuration", data)
-    }
+export const {create, of, make} = factory
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as LoadedConfig)
 }
 
-export const create = (data: RawInput) => schema.parse(data)
-
-export const toConfig = (loadedConfig: LoadedConfig) => Config.make(loadedConfig)
+export const toConfig = (config: LoadedConfig) => Config.make(config)

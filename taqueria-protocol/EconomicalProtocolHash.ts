@@ -1,32 +1,26 @@
-import {z, ZodError} from 'zod'
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
+import createType from "@taqueria/protocol/Base"
 
-const protocolHashType: unique symbol = Symbol("EconomicalProtocolHash")
-
-export const schema = z
+export const rawSchema = z
     .string({description: "Protocol hash"})
     .refine(
         value => (value.length === 51 && value[0] === 'P' && /[A-Za-z0-9]+/.test(value)),
         value => ({message: `${value} is an invalid hash for an economical protocol`})
     )
-    .transform(val => val as EconomicalProtocolHash)
 
-export type EconomicalProtocolHash = string & {
-    readonly [protocolHashType]: void
-}
+type RawInput = z.infer<typeof rawSchema>    
 
-export type t = EconomicalProtocolHash
+export const {schemas: generatedSchemas, factory} = createType<RawInput>({
+    rawSchema,
+    parseErrMsg: (value: unknown) => `${value} is an invalid economical protocol hash`,
+    unknownErrMsg: "Somethign went wrong trying to parse the economical protocol hash"
+})
 
-export const make = (value: string) => {
-    try {
-        const retval = schema.parse(value)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<EconomicalProtocolHash>(err, `${value} is not a valid economical protocol hash`, value)
-        }
-        return toParseUnknownErr<EconomicalProtocolHash>(err, "There was a problem trying to parse the economical protocol", value)
-    }
+export type EconomicalPrototypeHash = z.infer<typeof generatedSchemas.schema>
+export type t = EconomicalPrototypeHash
+
+export const {create, of, make} = factory
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as EconomicalPrototypeHash)
 }

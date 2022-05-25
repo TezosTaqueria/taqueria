@@ -1,37 +1,28 @@
-import {z, ZodError} from 'zod'
-import {resolve, reject} from "fluture"
-import {toParseErr, toParseUnknownErr} from "@taqueria/protocol/TaqError"
+import {z} from 'zod'
+import createType from "@taqueria/protocol/Base"
 
-const urlType: unique symbol = Symbol('Url')
-
-const urlSchema = z
+export const rawSchema = z
     .string({description: "Url"})
     .url()
 
-export const schema = urlSchema.transform(val => val as Url)
+type RawInput = z.infer<typeof rawSchema>    
 
-type Input = z.infer<typeof urlSchema>    
-
-export type Url =  Input & {
-    readonly [urlType]: void
-}
-
-export type t = Url
-
-export const make = (value: string) => {
-    try {
-        const retval = schema.parse(value)
-        return resolve(retval)
-    }
-    catch (err) {
-        if (err instanceof ZodError) {
-            return toParseErr<Url>(err, `${value} is not a valid url`, value)
-        }
-        return toParseUnknownErr<Url>(err, "There was a problem trying to parse the url", value)
-    }
-}
+export const {schemas: generatedSchemas, factory} = createType<RawInput>({
+    rawSchema,
+    isStringLike: true,
+    parseErrMsg: (value: unknown) => `${value} is an invalid url`,
+    unknownErrMsg: "Something went wrong trying to parse the url"
+})
 
 export const toComponents = (url: Url) => {
-    const parts = new URL(url)
+    const parts = new URL(url.toString())
     return parts
+}
+
+export type Url = z.infer<typeof generatedSchemas.schema>
+export type t = Url
+export const {create, of, make} = factory
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as Url)
 }
