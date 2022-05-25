@@ -294,7 +294,8 @@ const initProject = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, i18
         ? writeTextFile (joinPaths(projectDir.value, "quickstart.md")) (quickstart)
         : resolve(projectDir.value)
     ),
-    map (_ => i18n.__("bootstrapMsg"))
+    map (_ => i18n.__("bootstrapMsg")),
+    chain  (_ => exec ('npm init -y', {}, false, projectDir.value));
 )
 
 const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: SanitizedInitArgs) => pipe(
@@ -320,7 +321,7 @@ const scaffoldProject = (i18n: i18n) => ({scaffoldUrl, scaffoldProjectDir}: Sani
         (resolve),
     chain(_ => exec("npm install", {}, false, scaffoldProjectDir)),
     chain(_ => exec("taq init", {}, false, scaffoldProjectDir)),
-    map(_ => i18n.__("scaffoldDoneMsg"))
+    map(_ => i18n.__("scaffoldDoneMsg", {}));
 )
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: State) => state.plugins.reduce(
