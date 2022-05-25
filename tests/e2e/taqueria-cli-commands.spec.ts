@@ -9,6 +9,9 @@ const exec = util.promisify(exec1)
 
 const taqueriaProjectPath = './e2e/auto-test-cli'
 
+// Useful function for debugging
+const debug = (projectDir: string) => exec(`rm -rf /tmp/temp-project && cp -r ${projectDir} /tmp/temp-project`)
+
 describe("E2E Testing for taqueria CLI,", () => {
 
     beforeAll(async () => {
@@ -60,25 +63,6 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
-    test('Verify that the config directory can be set when initializing a project', async () => {
-        const projectName = 'test-1'
-        const configDirName = 'configDirProject'
-
-        try {
-            await exec(`taq init ${projectName} --configDir ${configDirName}`)
-
-            const projectContents = await exec(`ls ${projectName}`)
-            const configDirContents = await exec(`ls ${projectName}/${configDirName}`)
-
-            expect(projectContents.stdout).toContain(configDirName)
-            expect(configDirContents.stdout).toContain('config.json')
-
-            await fsPromises.rm(`./${projectName}`, { recursive: true })
-        } catch(error) {
-            throw new Error (`error: ${error}`)
-        }
-    })
-
     test('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
         try {
             await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
@@ -91,6 +75,7 @@ describe("E2E Testing for taqueria CLI,", () => {
             catch (_) {}
 
             const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`)
+
             expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPlugin)
 
             await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
@@ -175,26 +160,6 @@ describe("E2E Testing for taqueria CLI,", () => {
 
             const smartpyHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
             expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific)
-
-            await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
-        } catch(error) {
-            throw new Error (`error: ${error}`)
-        }
-    })
-
-    test('Verify that the smartpy plugin exposes the associated options for teapot in the help menu', async () => {
-        try {
-            await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`)
-
-            // TODO: This can removed after this is resolved:
-            // https://github.com/ecadlabs/taqueria/issues/528
-            try {
-                await exec(`taq -p ${taqueriaProjectPath}`)
-            }
-            catch (_) {}
-
-            const smartpyHelpContents = await exec(`taq teapot --help --projectDir=${taqueriaProjectPath}`)
-            expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyTeapotSpecific)
 
             await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
         } catch(error) {
@@ -555,28 +520,7 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
-    test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
-        try {
-            await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
-            await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`)
-
-            // TODO: This can removed after this is resolved:
-            // https://github.com/ecadlabs/taqueria/issues/528
-            try {
-                await exec(`taq -p ${taqueriaProjectPath}`)
-            }
-            catch (_) {}
-
-            const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`)
-            expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoSmartpySpecific)
-
-            await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`)
-            await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`)
-        } catch(error) {
-            throw new Error (`error: ${error}`)
-        }
-    })
-
+    // NOTE: runs fine on its own
     test('Verify that ligo and archetype expose the plugin choice option for compile in the help menu', async () => {
         try {
             await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`)
