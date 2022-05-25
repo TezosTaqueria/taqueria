@@ -40,7 +40,7 @@ The Taqueria CLI is required to use the VS Code extension and as such, must be i
 
 ### Taqueria CLI
 
-- Node.js v16.x or later
+- Node.js v18.x or later
 - A compatable operating system:
   - MacOS
   - Linux
@@ -124,7 +124,7 @@ sudo mv taq /usr/local/bin
 </TabItem>
 <TabItem value="win" label="Windows">
 
-Windows users will run the Linux version of Taqueria in Unbuntu using Windows Subsystem for Linux ([WSL2](https://docs.microsoft.com/en-us/windows/wsl/install))
+Windows users will run the Linux version of Taqueria in Unbuntu using Windows Subsystem for Linux ([WSL 2](https://docs.microsoft.com/en-us/windows/wsl/install))
 
 #### Requirements
 
@@ -148,7 +148,7 @@ You must be running Windows 10 version 2004 and higher, or Windows 11
 
 1. Download [Docker Desktop for Windows](https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe)
 
-2. Run the installer making sure to enable WSL 2during the installation when prompted
+2. Run the installer making sure to enable WSL 2 during the installation when prompted
 
 3. Start Docker Desktop from the Windows Start menu
 
@@ -161,7 +161,7 @@ To confirm that Docker Desktop backend has been installed properly, open a WSL 2
 wsl.exe -l -v
 ```
 
-#### Install Node v16
+#### Install Node v18
 
 1. Update the `apt` package index:
 
@@ -175,7 +175,7 @@ sudo apt update
 sudo apt install curl git
 ```
 
-3. Download Node.js v16.x
+3. Download Node.js v18.x
 
 ```shell
 curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
@@ -187,13 +187,13 @@ curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 sudo apt install nodejs
 ```
 
-To confirm that Node v16.x has been installed properly, open a new WSL 2 terminal and run:
+To confirm that Node v18.x has been installed properly, open a new WSL 2 terminal and run:
 
 ```shell
 node --version
 ```
 
-You should see `v16.15.0` or similar returned
+You should see `v18.1.0` or similar returned
 
 #### Install the Taqueria Binary
 
@@ -221,11 +221,13 @@ sudo mv taq /usr/local/bin
 ### Test the CLI
 
 At this point, Taqueria should be installed and ready to use. You can test this by running the following command:
+
 ```shell
 taq --version
 ```
 
 You should see the version of Taqueria installed output:
+
 ```shell
 v0.3.1
 ```
