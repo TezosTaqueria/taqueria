@@ -1,4 +1,4 @@
-const {Plugin, Task, Option, sendAsyncRes, sendAsyncJsonRes} = require('@taqueria/node-sdk')
+const {Plugin, Task, Option, Operation, sendAsyncRes, sendAsyncJsonRes} = require('@taqueria/node-sdk')
 
 const tableResponse = JSON.stringify({
     render: 'table',
@@ -31,8 +31,8 @@ Plugin.create(i18n => ({
             description: "Gets a JSON response from a plugin and outputs a string",
             options: [
                 Option.create({
-                    shortFlag: "-r",
-                    flag: "--return",
+                    shortFlag: "r",
+                    flag: "return",
                     description: "Return either a string or object in the JSON response",
                     choices: [
                         "string",
@@ -68,8 +68,8 @@ Plugin.create(i18n => ({
             description: "Tests handling a task that returns JSON without proxy",
             options: [
                 Option.create({
-                    shortFlag: "-r",
-                    flag: "--return",
+                    shortFlag: "r",
+                    flag: "return",
                     description: "Return either a string or object in the JSON response",
                     choices: [
                         "string",
@@ -78,13 +78,21 @@ Plugin.create(i18n => ({
                     required: true
                 }),
                 Option.create({
-                    shortFlag: "-o",
-                    flag: "--object",
+                    shortFlag: "o",
+                    flag: "object",
                     description: "Render object in table encoded in JSON response"
                 }),
             ],
         encoding: "application/json",
         handler: `echo '<% if (it.return == 'object') { %>${tableResponse}<% } else %><%= "pong" %>'`
+        })
+    ],
+    operations: [
+        Operation.create({
+            operation: "greeting",
+            command: "greeting <firstName>",
+            description: "Example output which produces an output",
+            handler: (state) => (args) => `Hello, ${args.FirstName}`
         })
     ],
     proxy: parsedArgs => {

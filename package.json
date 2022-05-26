@@ -37,10 +37,10 @@
   "homepage": "https://github.com/ecadlabs/taqueria#readme",
   "devDependencies": {
     "chokidar-cli": "^3.0.0",
-    "husky": "^7.0.4",
-    "play-sound-cli": "^1.0.0",
     "eta": "^1.12.3",
-    "ts-node": "^9.0.0"
+    "husky": "^8.0.1",
+    "play-sound-cli": "^1.0.0",
+    "ts-node": "^10.8.0"
   },
   "workspaces": [
     "./taqueria*",

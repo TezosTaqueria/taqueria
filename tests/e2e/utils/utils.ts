@@ -46,7 +46,7 @@ export const generateTestProject = async (projectPath: string, packageNames: str
 }
 
 export async function getContainerName(dockerName: string): Promise<string>{
-    const [_dockerContainerHeader,dockerContainerName] = (await exec(`docker ps --filter "name=${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
+    const [_dockerContainerHeader,dockerContainerName] = (await exec(`docker ps --filter "name=taqueria-development-${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
     return dockerContainerName;
 }
 

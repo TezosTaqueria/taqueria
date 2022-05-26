@@ -34,7 +34,7 @@ describe("Integration tests using taqueria-mock-plugin", () => {
 
 
     test('Verify that proxied requests with JSON encoding output valid string', () => {
-        const stdout = execSync(`cd ./${testProjectPath} && taq proxy-json`).toString().trim();
+        const stdout = execSync(`cd ./${testProjectPath} && taq proxy-json -r string`).toString().trim();
         expect(stdout).toEqual("pong");
     })
 
