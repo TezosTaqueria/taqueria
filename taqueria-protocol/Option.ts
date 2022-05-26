@@ -6,7 +6,7 @@ import createType, {Flatten} from "@taqueria/protocol/Base"
 export const internalSchema = z.object({
     shortFlag: SingleChar.schemas.schema.describe("Option Short Flag").optional(),
     flag: Verb.schemas.schema.describe("Option Long Flag"),
-    description: z.string({description: "Option Description"}).nonempty(),
+    description: z.string({description: "Option Description"}).min(1),
     defaultValue: z.union(
         [z.string(), z.number(), z.boolean()],
         {description: "Option Default Value"}
@@ -22,7 +22,7 @@ export const internalSchema = z.object({
 export const rawSchema = z.object({
     shortFlag: SingleChar.rawSchema.describe("Option Short Flag").optional(),
     flag: Verb.rawSchema.describe("Option Long Flag"),
-    description: z.string({description: "Option Description"}).nonempty(),
+    description: z.string({description: "Option Description"}).min(1),
     defaultValue: z.union(
         [z.string(), z.number(), z.boolean()],
         {description: "Option Default Value"}

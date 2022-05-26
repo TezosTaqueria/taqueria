@@ -7,12 +7,12 @@ export const rawSchema = z.object(
         id: ProvisionerID.rawSchema,
         plugin: z
             .string()
-            .nonempty()
+            .min(1)
             .describe("Provisioner Plugin")
             .optional(),
         operation: z
             .union([
-                z.string().nonempty(),
+                z.string().min(1),
                 z.literal('custom')
             ])
             .describe("Provisioner Operation"),

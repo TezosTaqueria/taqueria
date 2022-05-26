@@ -2,7 +2,7 @@ import {z} from 'zod'
 import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z.object({
-    name: z.string({description: "Plugin Name"}).nonempty(),
+    name: z.string({description: "Plugin Name"}).min(1),
     type: z.union(
         [z.literal('npm'), z.literal('binary'), z.literal('deno')],
         {description: "Plugin Type"}
@@ -11,7 +11,7 @@ export const rawSchema = z.object({
 
 type RawInput = z.infer<typeof rawSchema>
 
-export const {schemas, factory} = createType<RawInput>({
+export const {schemas, factory} = createType<RawInput, RawInput>({
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is not a valid installed plugin`,
     unknownErrMsg: "Something went wrong when parsing the installed plugin"

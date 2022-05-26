@@ -4,7 +4,7 @@ import * as Url from "@taqueria/protocol/Url"
 import createType from "@taqueria/protocol/Base"
 
  export const rawSchema =  z.object({
-    _: z.array(z.union([z.string().nonempty(), z.number()])),
+    _: z.array(z.union([z.string().min(1), z.number()])),
     projectDir: SanitizedAbsPath.schemas.schema,
     maxConcurrency: z.preprocess(
         val => typeof val === 'string' ? parseInt(val) : Number(val),
@@ -42,29 +42,29 @@ import createType from "@taqueria/protocol/Base"
         val => Boolean(val),
         z.boolean().optional()
     ),
-    plugin: z.string().nonempty().optional(),
+    plugin: z.string().min(1).optional(),
     env: z.union([z.literal('production'), z.literal('testing'), z.literal('development'), z.string().nonempty()]).default("development"),
-    quickstart: z.string().nonempty().optional(),
-    setBuild: z.string().nonempty(),
-    setVersion: z.string().nonempty(),
-    template: z.string().nonempty().optional(),
-    pluginName: z.string().nonempty().optional()
+    quickstart: z.string().min(1).optional(),
+    setBuild: z.string().min(3),
+    setVersion: z.string().min(3),
+    template: z.string().min(1).optional(),
+    pluginName: z.string().min(1).optional()
 }, {description: "Sanitizied Args"}).passthrough()
 
 export const scaffoldRawSchema = rawSchema.extend({
-    scaffoldProjectDir: z.string().nonempty().transform((val: unknown) => val as SanitizedAbsPath.t),
-    scaffoldUrl: z.string().nonempty().url().transform((val: unknown) => val as Url.t),
+    scaffoldProjectDir: z.string().min(1).transform((val: unknown) => val as SanitizedAbsPath.t),
+    scaffoldUrl: z.string().min(1).url().transform((val: unknown) => val as Url.t),
 })
 
 export const provisionRawSchema = rawSchema
     .extend({
         operation: z
             .string()
-            .nonempty()
+            .min(1)
             .describe("Operation name"),
         name: z
             .string()
-            .nonempty()
+            .min(1)
             .regex(/^[a-z0-9]+[a-z0-9-_]$/, "Provisioner name must consist of one or more letters/numbers and may not start with an underscore or dash.")
             .describe("Provisioner name")
             .optional()
@@ -72,7 +72,7 @@ export const provisionRawSchema = rawSchema
     .passthrough()
 
 export const managePluginRawSchema = rawSchema.omit({pluginName: true}).extend({
-    pluginName: z.string().nonempty()
+    pluginName: z.string().min(1)
 })
 
 export const versionRawSchema = rawSchema.extend({
@@ -85,7 +85,7 @@ type RawProvisionInput = z.infer<typeof provisionRawSchema>
 type RawManagePluginInput = z.infer<typeof managePluginRawSchema>
 type RawVersionInput = z.infer<typeof versionRawSchema>
 
-export const {schemas, factory} = createType<RawInput>({
+export const {schemas, factory} = createType<RawInput, RawInput>({
     rawSchema,
     parseErrMsg: "The arguments provided are invalid",
     unknownErrMsg: "Something went wrong parsing the command-line arguments"
@@ -96,25 +96,25 @@ export const {create, of, make} = factory
 export type SanitizedArgs = z.infer<typeof schemas.schema>
 export type t = SanitizedArgs
 
-export const scaffoldTaskArgs = createType<RawScaffoldInput>({
+export const scaffoldTaskArgs = createType<RawScaffoldInput, RawScaffoldInput>({
     rawSchema: scaffoldRawSchema,
     parseErrMsg: "The arguments provided are invalid for the scaffold task",
     unknownErrMsg: "Something went wrong parsing the arguments for the scaffold task"
 })
 
-export const provisionTaskArgs = createType<RawProvisionInput>({
+export const provisionTaskArgs = createType<RawProvisionInput, RawProvisionInput>({
     rawSchema: provisionRawSchema,
     parseErrMsg: "The arguments provided are invalid for the provision task",
     unknownErrMsg: "Something went wrong parsing the arguments for the provision task"
 })
 
-export const installTaskArgs = createType<RawManagePluginInput>({
+export const installTaskArgs = createType<RawManagePluginInput, RawManagePluginInput>({
     rawSchema: managePluginRawSchema,
     parseErrMsg: "The arguments provided are invalid for the install task",
     unknownErrMsg: "Something went wrong parsing the arguments for the install task"
 })
 
-export const uninstallTaskArgs = createType<RawManagePluginInput>({
+export const uninstallTaskArgs = createType<RawManagePluginInput, RawManagePluginInput>({
     rawSchema: managePluginRawSchema,
     parseErrMsg: "The arguments provided are invalid for the uninstall task",
     unknownErrMsg: "Something went wrong parsing the arguments for the uninstall task"

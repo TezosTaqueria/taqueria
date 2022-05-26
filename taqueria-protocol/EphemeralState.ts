@@ -41,7 +41,7 @@ const rawSchema = z.object({
 
 type RawInput = z.infer<typeof rawSchema>
 
-export const {schemas, factory} = createType<RawInput>({
+export const {schemas, factory} = createType<RawInput, RawInput>({
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is not a valid representation of ephemeral state`,
     unknownErrMsg: "Something went wrong when parsing the ephemeral state"

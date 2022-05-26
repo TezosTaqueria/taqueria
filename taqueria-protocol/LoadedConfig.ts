@@ -17,7 +17,7 @@ export const internalSchema = Config.internalSchema.extend({
 }).describe("LoadedConfig")
 
 type RawInput = z.infer<typeof rawSchema>
-type Input = z.infer<typeof internalSchema>
+type Input = Flatten<z.infer<typeof internalSchema>>
 
 export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,

@@ -1,11 +1,11 @@
 import {z} from 'zod'
 import createType from "@taqueria/protocol/Base"
 
-export const rawSchema = z.string({description: "Tz"}).nonempty().regex(/^\d([\d_]+\d)?$/)
+export const rawSchema = z.string({description: "Tz"}).min(1).regex(/^\d([\d_]+\d)?$/)
 
 type RawInput = z.infer<typeof rawSchema>
 
-export const {schemas, factory} = createType<RawInput>({
+export const {schemas, factory} = createType<RawInput, RawInput>({
     isStringLike: true,
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is an invalid Tz amount`,

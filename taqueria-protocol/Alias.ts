@@ -3,7 +3,6 @@ import * as Verb from '@taqueria/protocol/Verb'
 import * as SingleChar from '@taqueria/protocol/SingleChar'
 import createType from "@taqueria/protocol/Base"
 
-
 export const rawSchema = z
     .union([
         Verb.rawSchema,

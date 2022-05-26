@@ -14,7 +14,7 @@ export const rawSchema = z.string({description: "SHA256"}).length(64)
 
 type RawInput = z.infer<typeof rawSchema>
 
-const {schemas: generatedSchemas, factory} = createType<RawInput>({
+const {schemas: generatedSchemas, factory} = createType<RawInput, RawInput>({
     isStringLike: true,
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is an invalid SHA256 hash`,

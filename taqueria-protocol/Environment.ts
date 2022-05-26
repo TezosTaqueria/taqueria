@@ -4,11 +4,11 @@ import createType, {Flatten} from "@taqueria/protocol/Base"
 export const rawSchema = z.object({
     networks: z.array(
         z.string({description: "Environment network"})
-        .nonempty("Must reference the name of an existing network configuration")
+        .min(1, "Must reference the name of an existing network configuration")
     ),
     sandboxes: z.array(
         z.string({description: "Environment sandbox"})
-        .nonempty("Must reference the name of an existing sandbox configuration")
+        .min(1, "Must reference the name of an existing sandbox configuration")
     ),
     storage: z.record(
         z.any({description: "Environment storage value"}),
@@ -19,7 +19,7 @@ export const rawSchema = z.object({
 
 type RawInput = z.infer<typeof rawSchema>
 
-export const {schemas, factory} = createType<RawInput>({
+export const {schemas, factory} = createType<RawInput, RawInput>({
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is not an valid environment configuration`,
     unknownErrMsg: "Something went wrong trying to parse the environment configuration"

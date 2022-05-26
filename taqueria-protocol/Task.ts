@@ -4,7 +4,7 @@ import * as Alias from "@taqueria/protocol/Alias"
 import * as Command from '@taqueria/protocol/Command'
 import * as Option from '@taqueria/protocol/Option'
 import * as PositionalArg from '@taqueria/protocol/PositionalArg'
-import createType from "@taqueria/protocol/Base"
+import createType, {Flatten} from "@taqueria/protocol/Base"
 
 const taskEncodingSchema = z.preprocess(
     (val: unknown) => val ?? 'none',
@@ -24,7 +24,7 @@ export const rawSchema = z.object({
     task: Verb.rawSchema.describe("Task Name"),
     command: Command.rawSchema.describe("Task Command"),
     aliases: z.array(Alias.rawSchema).default([]).describe("Task Aliases").optional(),
-    description: z.string({description: "Task Description"}).nonempty(),
+    description: z.string({description: "Task Description"}).min(3),
     example: z.string({description: "Task Example"}).optional(),
     hidden: z.boolean({description: "Task Is Hidden"}).default(false).optional(),
     encoding: taskEncodingSchema.describe("Task Encoding"),
@@ -37,12 +37,15 @@ const internalSchema = z.object({
     task: Verb.schemas.schema.describe("Task Name"),
     command: Command.schemas.schema.describe("Task Command"),
     aliases: z.array(Alias.rawSchema).default([]).describe("Task Aliases").optional(),
-    description: z.string({description: "Task Description"}).nonempty(),
+    description: z.string({description: "Task Description"}).min(3),
     example: z.string({description: "Task Example"}).optional(),
     hidden: z.boolean({description: "Task Is Hidden"}).default(false).optional(),
     encoding: taskEncodingSchema.describe("Task Encoding"),
     handler: taskHandlerSchema.describe("Task Handler"),
-    options: z.array(Option.schemas.schema).default([]).describe("Task Options").optional(),
+    options: z.preprocess(
+        val => val ?? [],
+        z.array(Option.schemas.schema).describe("Task Options").optional(),
+    ),
     positionals: z.array(PositionalArg.schemas.schema).default([]).describe("Task Positional Args").optional()
 }).describe("Task")
 
@@ -61,5 +64,5 @@ export type t = Task
 export const {create, make, of} = factory
 export const schemas = {
     ...generatedSchemas,
-    schema: generatedSchemas.schema.transform(val => val as unknown as Task)
+    // schema: generatedSchemas.schema.transform(val => val as unknown as Task)
 }

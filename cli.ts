@@ -292,8 +292,8 @@ const listKnownTasks = (parsedArgs: SanitizedArgs.t) => pipe(
 
 const mkInitialDirectories = (projectDir: SanitizedAbsPath.t, maxConcurrency: number, i18n: i18n.t) => pipe(
     getConfig(projectDir, i18n, true),
-    chain (({artifactsDir, contractsDir, testsDir, projectDir, operationsDir}: LoadedConfig.t) => {
-        const jobs = [operationsDir, artifactsDir, contractsDir, testsDir].reduce(
+    chain (({artifactsDir, contractsDir, testsDir, projectDir}: LoadedConfig.t) => {
+        const jobs = [artifactsDir, contractsDir, testsDir].reduce(
             (retval, abspath) => abspath ? [...retval, mkdir(joinPaths(projectDir, abspath))] : retval,
             [] as Future<TaqError.TaqError, string>[]
         )

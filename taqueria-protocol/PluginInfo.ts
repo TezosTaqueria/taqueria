@@ -6,7 +6,7 @@ import * as Operation from '@taqueria/protocol/Operation'
 import createType, {Flatten} from "@taqueria/protocol/Base"
 
 export const internalSchema = z.object({
-    name: z.string({description: "Plugin Name"}).nonempty(),
+    name: z.string({description: "Plugin Name"}).min(1),
     version: VersionNumber.schemas.schema.describe("Plugin Version #"),
     schema: VersionNumber.schemas.schema.describe("Plugin Schema Version #"),
     alias: Alias.schemas.schema.describe("Plugin Alias"),
@@ -27,7 +27,7 @@ export const internalSchema = z.object({
 }).describe("Plugin Schema")
 
 export const rawSchema = z.object({
-    name: z.string({description: "Plugin Name"}).nonempty(),
+    name: z.string({description: "Plugin Name"}).min(1),
     version: VersionNumber.rawSchema.describe("Plugin Version #"),
     schema: VersionNumber.rawSchema.describe("Plugin Schema Version #"),
     alias: Alias.rawSchema.describe("Plugin Alias"),

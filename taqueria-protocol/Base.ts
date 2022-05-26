@@ -1,4 +1,4 @@
-import {z, ZodError, ZodSchema, ZodEffects} from 'zod'
+import {z, ZodError, ZodSchema} from 'zod'
 import {toFutureParseErr, toFutureParseUnknownErr} from "@taqueria/protocol/TaqError"
 import {resolve, FutureInstance} from "fluture"
 
@@ -44,13 +44,21 @@ export const createSchema = <I>(params: CreateSchemaParams) => {
     }
 }
 
-export const createType = <R, I = R>(params: CreateTypeParams) => {
+
+// TODO: 
+// TypeScript appears to have a bug with default generic values
+// For instance, I'd like to use this:
+// export const createType = <R, I = R>(params: CreateTypeParams) => {
+//
+// However, I == unknown when having I default to R if no I was given.
+// So, we need to require R and I explicitly
+export const createType = <R, I>(params: CreateTypeParams) => {
     const schemas = createSchema<I>(params)
     const {parseErrMsg, unknownErrMsg} = params
 
     type T = z.infer<typeof schemas.schema>
 
-    const of = (input: I | unknown) => {
+    const of = (input: R | I | unknown) => {
         try {
             return resolve<T>(schemas.schema.parse(input))
         }
@@ -72,7 +80,7 @@ export const createType = <R, I = R>(params: CreateTypeParams) => {
 
     const make = (input: I) => of(input)
 
-    const create = (input: R | I | unknown) => schemas.schema.parse(input)
+    const create = (input: R | I | unknown) => schemas.schema.parse(input) as T
 
     const factory = {
         make,

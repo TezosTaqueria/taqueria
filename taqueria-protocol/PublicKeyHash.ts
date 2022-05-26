@@ -3,7 +3,7 @@ import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z
     .string({description: "Public Key Hash"})
-    .nonempty()
+    .min(1) // TODO: what's the actual minimum length here?
     .refine(
         val => val.startsWith("tz1"),
         val => ({message: `${val} is not a valid public key hash`}) 
@@ -11,7 +11,7 @@ export const rawSchema = z
 
 type RawInput = z.infer<typeof rawSchema>
 
-export const {schemas: generatedSchemas, factory} = createType<RawInput>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, RawInput>({
     isStringLike: true,
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is an invalid public key hash`,

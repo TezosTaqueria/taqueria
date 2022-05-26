@@ -9,7 +9,7 @@ export const rawSchema = z.object({
     label: HumanReadableIdentifier.rawSchema,
     rpcUrl: Url.rawSchema,
     protocol: EconomicalProtocolHash.rawSchema,
-    facuet: Faucet.rawSchema.describe("Network Faucet")
+    faucet: Faucet.rawSchema.describe("Network Faucet")
 }).describe("Network Config")
 
 const internalSchema = z.object({

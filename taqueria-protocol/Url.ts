@@ -7,7 +7,7 @@ export const rawSchema = z
 
 type RawInput = z.infer<typeof rawSchema>    
 
-export const {schemas: generatedSchemas, factory} = createType<RawInput>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, RawInput>({
     rawSchema,
     isStringLike: true,
     parseErrMsg: (value: unknown) => `${value} is an invalid url`,

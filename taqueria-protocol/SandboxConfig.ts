@@ -14,9 +14,9 @@ const accountMapSchema = z.record(
 )
 
 export const rawSchema = z.object({
-    label: z.string({description: "Sandbox Label"}).nonempty(),
-    rpcUrl: z.string({description: "Sandbox RPC Url"}).nonempty().url(),
-    protocol: z.string({description: "Sandbox Protocol Hash"}).nonempty(),
+    label: z.string({description: "Sandbox Label"}).min(1),
+    rpcUrl: z.string({description: "Sandbox RPC Url"}).min(5).url(),
+    protocol: z.string({description: "Sandbox Protocol Hash"}).min(8),
     attributes: z.record(
         z.union(
             [z.string(), z.number(), z.boolean()],
@@ -26,7 +26,7 @@ export const rawSchema = z.object({
     ).optional(),
     plugin: Verb.rawSchema.describe("Sandbox Plugin").optional(),
     accounts: z.union([
-        z.object({default: z.string().nonempty()}),
+        z.object({default: z.string().min(1)}),
         z.record(SandboxAccountConfig.rawSchema)
     ], {description: "Sandbox Accounts"}).optional()
 })

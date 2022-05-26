@@ -22,7 +22,7 @@ const sandboxMap = z
         z.union([
             SandboxConfig.schemas.schema,
             z.string({description: "config.sandbox"})
-            .nonempty("Default sandbox must reference the name of an existing sandbox configuration.")
+            .min(1, "Default sandbox must reference the name of an existing sandbox configuration.")
         ]),
         {description: "Sandbox configurations"}
     )
@@ -33,7 +33,7 @@ const environmentMap = z
         z.union([
             Environment.schemas.schema,
             z.string({description: "config.environment"})
-            .nonempty("Default environment must reference the name of an existing environment.")
+            .min(1, "Default environment must reference the name of an existing environment.")
         ]),
         {description: "Environment configurations"}
     )
@@ -64,26 +64,19 @@ const commonSchema = z.object({
         .preprocess(
             (val: unknown) => val ?? "tests",
             z.string({description: "config.testsDir"})
-            .nonempty("config.testsDir must have a value")
+            .min(1, "config.testsDir must have a value")
         ),
     contractsDir: z
         .preprocess(
             (val: unknown) => val ?? "contracts",
             z.string({description: "config.contractsDir"})
-            .nonempty("config.contractsDir must have a value")
+            .min(1, "config.contractsDir must have a value")
         ),
     artifactsDir: z
         .preprocess(
             (val: unknown) => val ?? "artifacts",
             z.string({description: "config.artifactsDir"})
-            .nonempty("config.artifactsDir must have a value")
-        ),
-    operationsDir: z
-        .preprocess(
-            (val: unknown) => val ?? "operations",
-            z.string({description: "config.operationsDir"})
-            .nonempty("config.operationsDir must have a value")
-            .optional()
+            .min(1, "config.artifactsDir must have a value")
         )
 }).describe("config")
 
@@ -100,7 +93,7 @@ export const rawSchema = commonSchema.extend({
             z.union([
                 NetworkConfig.rawSchema,
                 z.string({description: "config.network"})
-                .nonempty("Default network must reference the name of an  existing network configuration.")
+                .min(1, "Default network must reference the name of an  existing network configuration.")
             ])
         )
         .optional(),
@@ -109,7 +102,7 @@ export const rawSchema = commonSchema.extend({
             z.union([
                 SandboxConfig.rawSchema,
                 z.string({description: "config.sandbox"})
-                .nonempty("Default sandbox must reference the name of an existing sandbox configuration.")
+                .min(1, "Default sandbox must reference the name of an existing sandbox configuration.")
             ])
         )
         .optional(),
@@ -118,7 +111,7 @@ export const rawSchema = commonSchema.extend({
             z.union([
                 Environment.rawSchema,
                 z.string({description: "config.environment"})
-            .nonempty("Default environment must reference the name of an existing environment.")
+                .min(1, "Default environment must reference the name of an existing environment.")
             ])
         )
         .optional(),

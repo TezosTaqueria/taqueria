@@ -3,15 +3,15 @@ import * as PublicKeyHash from "@taqueria/protocol/PublicKeyHash"
 import createType from "@taqueria/protocol/Base"
 
 const internalSchema = z.object({
-    encryptedKey: z.string({description: "Sandbox Account Encrypted Key"}).nonempty(),
+    encryptedKey: z.string({description: "Sandbox Account Encrypted Key"}).min(1),
     publicKeyHash: PublicKeyHash.schemas.schema.describe("Sandbox Account Public Key Hash"),
-    secretKey: z.string({description: "Sandbox Account Secret Key"}).nonempty()
+    secretKey: z.string({description: "Sandbox Account Secret Key"}).min(1)
 }, {description: "Sandbox Account Configuration"})
 
 export const rawSchema = z.object({
-    encryptedKey: z.string({description: "Sandbox Account Encrypted Key"}).nonempty(),
-    publicKeyHash: z.string({description: "Sandbox Account Public Key Hash"}).nonempty(),
-    secretKey: z.string({description: "Sandbox Account Secret Key"}).nonempty()
+    encryptedKey: z.string({description: "Sandbox Account Encrypted Key"}).min(1),
+    publicKeyHash: z.string({description: "Sandbox Account Public Key Hash"}).min(1),
+    secretKey: z.string({description: "Sandbox Account Secret Key"}).min(1)
 }, {description: "Sandbox Account Configuration"})
 
 type Input = z.infer<typeof internalSchema>

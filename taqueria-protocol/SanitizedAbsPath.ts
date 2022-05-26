@@ -2,11 +2,11 @@ import {z} from "zod"
 import * as path from 'path'
 import createType from "@taqueria/protocol/Base"
 
-export const rawSchema = z.string({description: "SanitizedAbsPath"}).nonempty()
+export const rawSchema = z.string({description: "SanitizedAbsPath"}).min(1)
 
 type RawInput = z.infer<typeof rawSchema>
 
-export const {schemas: generatedSchemas, factory} = createType<RawInput>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, RawInput>({
     isStringLike: true,
     rawSchema,
     transformer: (value: unknown) => path.resolve(value as string) as unknown,

@@ -3,12 +3,12 @@ import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z
     .string({description: "Verb"})
-    .nonempty("Must be a valid verb")
+    .min(1, "Must be a valid verb")
     .regex(/^[A-Za-z\-\ ]+/, "Must be a valid verb")
 
 type Input = z.infer<typeof rawSchema>
 
-export const {factory, schemas: generatedSchemas} = createType<Input>({
+export const {factory, schemas: generatedSchemas} = createType<Input, Input>({
     isStringLike: true,
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is not an invalid verb`,

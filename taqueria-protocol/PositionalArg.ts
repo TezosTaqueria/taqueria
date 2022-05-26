@@ -4,7 +4,7 @@ import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z.object({
     placeholder: HumanReadableIdentifier.rawSchema.describe("Positional Arg Placeholder"),
-    description: z.string({description: "Positional Arg Description"}).nonempty(),
+    description: z.string({description: "Positional Arg Description"}).min(1),
     defaultValue: z.union(
         [z.string(), z.number(), z.boolean()],
         {description: "Positional Arg Default Value"}
@@ -17,7 +17,7 @@ export const rawSchema = z.object({
 
 const internalSchema = z.object({
     placeholder: HumanReadableIdentifier.schemas.schema.describe("Positional Arg Placeholder"),
-    description: z.string({description: "Positional Arg Description"}).nonempty(),
+    description: z.string({description: "Positional Arg Description"}).min(1),
     defaultValue: z.union(
         [z.string(), z.number(), z.boolean()],
         {description: "Positional Arg Default Value"}

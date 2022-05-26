@@ -3,11 +3,12 @@ import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z
     .string({description: "Command"})
+    .min(1)
     .regex(/^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$/, "Must be a command that can be interpreted using yargs")
 
 type RawInput = z.infer<typeof rawSchema>    
 
-const {schemas: generatedSchemas, factory} = createType<RawInput>({
+const {schemas: generatedSchemas, factory} = createType<RawInput, RawInput>({
     isStringLike: true,
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is an invalid command. Expected format is: taskName [optional] <required>`,

@@ -2,7 +2,7 @@ import {z} from 'zod'
 import createType from "@taqueria/protocol/Base"
 
 export const rawSchema = z.string({description: "Version Number"})
-    .nonempty()
+    .min(1)
     .regex(/^\d+\.\d+(\.\d+)*$/)
 
 

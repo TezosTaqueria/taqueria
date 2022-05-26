@@ -7,7 +7,7 @@ export const rawSchema = z
 
 type RawInput = z.infer<typeof rawSchema>
 
-export const {factory, schemas: generatedSchemas} = createType<RawInput>({
+export const {factory, schemas: generatedSchemas} = createType<RawInput, RawInput>({
     isStringLike: true,
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is not a single character`,

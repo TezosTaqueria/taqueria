@@ -10,7 +10,7 @@ export const rawSchema = z
 
 type RawInput = z.infer<typeof rawSchema>    
 
-export const {schemas: generatedSchemas, factory} = createType<RawInput>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, RawInput>({
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is an invalid economical protocol hash`,
     unknownErrMsg: "Somethign went wrong trying to parse the economical protocol hash"

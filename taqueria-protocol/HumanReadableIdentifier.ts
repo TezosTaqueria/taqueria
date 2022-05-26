@@ -7,7 +7,7 @@ export const rawSchema = z
 
 type RawInput = z.infer<typeof rawSchema>    
 
-const {schemas: generatedSchemas, factory} = createType<RawInput>({
+const {schemas: generatedSchemas, factory} = createType<RawInput, RawInput>({
     isStringLike: true,
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is not a valid human-readable identifier`,
