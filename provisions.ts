@@ -1,3 +1,4 @@
+import * as Alias from "@taqueria/protocol/Alias"
 import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
 import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
 import * as EphemeralState from "@taqueria/protocol/EphemeralState"
@@ -84,15 +85,22 @@ const getOperationParams = (state: EphemeralState.t) => (operationName: string, 
     throw `Could not collect arguments for the operation, ${operationName}`
 }
 
+/**
+ * Gets the plugin associated with the request
+ * @param parsedArgs 
+ * @returns {Alias.t}
+ */
+const getPluginAlias = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t) => {    if (parsedArgs.plugin) return parsedArgs.plugin
+    const operation = parsedArgs.operation
+    const op = state.operations[operation] as InstalledPlugin.t
+    const plugin = state.plugins.find(plugin => plugin.name == op.name)
+    return plugin!.alias
+}
+
 const newProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t) => {
     const operation = parsedArgs.operation
     const name = parsedArgs.name ?? generate()
-    const plugin = (() => {
-        if (parsedArgs.plugin) return parsedArgs.plugin
-        const op = state.operations[operation] as InstalledPlugin.t
-        const plugin = state.plugins.find(plugin => plugin.name == op.name)
-        return plugin!.alias
-    })()
+    const plugin = getPluginAlias(parsedArgs, state)
 
     return pipe(
         ProvisionerID.make(`${plugin}.${operation}.${name}`),
