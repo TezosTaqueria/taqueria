@@ -22,6 +22,13 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     test('Verify that taq scaffold quickstart project has the correct file structure', async () => {
         try {
+            try {
+                await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true })
+            }
+            catch {
+                // Ensure that this path doesn't already exist
+            }
+
             await exec('taq scaffold')
             const scaffoldDirContents = await exec(`ls ${scaffoldDirName}`)
 
@@ -41,6 +48,13 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
     test.skip('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
         const tarFileName = 'taq-quickstart.tar'
         try {
+            try {
+                await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true })
+            }
+            catch {
+                // Ensure that this path doesn't already exist
+            }
+
             await exec('taq scaffold')
             await fsPromises.rm(`./${scaffoldDirName}/.git`, { recursive: true })
             await exec(`tar -cf ${tarFileName} ${scaffoldDirName} --mtime=2020-01-30`)
@@ -58,6 +72,13 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     test('Verify that taq scaffold can use the URL parameter to clone a different scaffold into the project', async () => {
         try {
+            try {
+                await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true })
+            }
+            catch {
+                // Ensure that this path doesn't already exist
+            }
+            
             await exec('taq scaffold https://github.com/microsoft/calculator.git')
             const scaffoldDirContents = await exec(`ls ${scaffoldDirName}`)
 

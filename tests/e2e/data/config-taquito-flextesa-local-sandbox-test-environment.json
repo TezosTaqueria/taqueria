@@ -1,0 +1,36 @@
+{
+    "language": "en",
+    "plugins": [
+        {
+            "name": "@taqueria/plugin-taquito",
+            "type": "npm"
+        },{
+            "name": "@taqueria/plugin-flextesa",
+            "type": "npm"
+        }
+    ],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts",
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {
+                "hello-tacos.tz": "1",
+                "increment.tz": "2"
+            }
+        }
+    },
+    "sandbox": {
+        "local": {
+            "label": "Local Ithaca Tezos Sandbox",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+    "network": {}
+}
