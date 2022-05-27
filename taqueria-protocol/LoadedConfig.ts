@@ -4,17 +4,25 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath'
 import * as SHA256 from '@taqueria/protocol/SHA256'
 import createType, {Flatten} from "@taqueria/protocol/Base"
 
-export const rawSchema = Config.rawSchema.extend({
-    projectDir: SanitizedAbsPath.rawSchema.describe("loadedConfig.projectDir"),
-    configFile: SanitizedAbsPath.rawSchema.describe("loadedConfig.configFile"),
-    hash: SHA256.rawSchema.describe("loadedConfig.hash")
-}).describe("LoadedConfig")
+export const rawSchema = Config.rawSchema
+    .omit({plugins: true})
+    .extend({
+        plugins: Config.pluginsRawSchema,
+        projectDir: SanitizedAbsPath.rawSchema.describe("loadedConfig.projectDir"),
+        configFile: SanitizedAbsPath.rawSchema.describe("loadedConfig.configFile"),
+        hash: SHA256.rawSchema.describe("loadedConfig.hash")
+    })
+    .describe("LoadedConfig")
 
-export const internalSchema = Config.internalSchema.extend({
-    projectDir: SanitizedAbsPath.schemas.schema.describe("loadedConfig.projectDir"),
-    configFile: SanitizedAbsPath.schemas.schema.describe("loadedConfig.configFile"),
-    hash: SHA256.schemas.schema.describe("loadedConfig.hash")
-}).describe("LoadedConfig")
+export const internalSchema = Config.internalSchema
+    .omit({plugins: true})
+    .extend({
+        plugins: Config.pluginsInternalSchema,
+        projectDir: SanitizedAbsPath.schemas.schema.describe("loadedConfig.projectDir"),
+        configFile: SanitizedAbsPath.schemas.schema.describe("loadedConfig.configFile"),
+        hash: SHA256.schemas.schema.describe("loadedConfig.hash")
+    })
+    .describe("LoadedConfig")
 
 type RawInput = z.infer<typeof rawSchema>
 type Input = Flatten<z.infer<typeof internalSchema>>

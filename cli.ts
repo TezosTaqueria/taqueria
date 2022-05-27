@@ -16,6 +16,7 @@ import * as NPM from './npm.ts'
 import inject from './plugins.ts'
 import { match, __ } from 'https://esm.sh/ts-pattern@3.3.5';
 import {addNewProvision, loadProvisions, plan, apply} from "./provisions.ts"
+import {addTask} from "./persistent-state.ts"
 
 // Get utils
 const {
@@ -233,8 +234,8 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         false, // hide
         () => {},
         (inputArgs: Record<string, unknown>) => pipe(
-            SanitizedArgs.create(inputArgs),
-            listKnownTasks,
+            SanitizedArgs.of(inputArgs),
+            chain(listKnownTasks),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
         )
     )
@@ -292,8 +293,8 @@ const listKnownTasks = (parsedArgs: SanitizedArgs.t) => pipe(
 
 const mkInitialDirectories = (projectDir: SanitizedAbsPath.t, maxConcurrency: number, i18n: i18n.t) => pipe(
     getConfig(projectDir, i18n, true),
-    chain (({artifactsDir, contractsDir, testsDir, projectDir}: LoadedConfig.t) => {
-        const jobs = [artifactsDir, contractsDir, testsDir].reduce(
+    chain (({artifactsDir, contractsDir, projectDir}: LoadedConfig.t) => {
+        const jobs = [artifactsDir, contractsDir].reduce(
             (retval, abspath) => abspath ? [...retval, mkdir(joinPaths(projectDir, abspath))] : retval,
             [] as Future<TaqError.TaqError, string>[]
         )
@@ -415,7 +416,7 @@ const getPluginOption = (task: Task.t) => {
 }
 
 
-const addTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib) => 
+const exposeTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib) => 
     Object.entries(state.tasks).reduce(
         (retval: CLIConfig, pair: [string, InstalledPlugin.t|Task.t]) => {
             const [taskName, implementation] = pair
@@ -436,11 +437,12 @@ const addTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, pa
                 if (parsedArgs.plugin && getPluginOption(task)?.choices?.includes(parsedArgs.plugin)) {
                     const canonicalTask = getCanonicalTask(parsedArgs.plugin, taskName, state)
                     return canonicalTask
-                        ? addTask(
+                        ? exposeTask(
                             retval,
                             config,
                             env,
                             parsedArgs,
+                            state,
                             i18n,
                             canonicalTask,
                             pluginLib.sendPluginActionRequest,
@@ -450,17 +452,17 @@ const addTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, pa
                 }
 
                 // No plugin provider was specified (path #1)
-                return addTask(retval, config, env, parsedArgs, i18n, task, pluginLib.sendPluginActionRequest)
+                return exposeTask(retval, config, env, parsedArgs, state, i18n, task, pluginLib.sendPluginActionRequest)
             }
 
             // Canonical task...
             const foundTask = getCanonicalTask(implementation.name, taskName, state)
-            return foundTask ? addTask(retval, config, env, parsedArgs, i18n, foundTask, pluginLib.sendPluginActionRequest, implementation) : retval
+            return foundTask ? exposeTask(retval, config, env, parsedArgs, state, i18n, foundTask, pluginLib.sendPluginActionRequest, implementation) : retval
         },
         cliConfig
     )
 
-const addTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, parsedArgs: SanitizedArgs.t, _i18n: i18n.t, task: Task.t, sendPluginActionRequest: SendPluginActionRequest, plugin?: InstalledPlugin.t) => pipe(
+const exposeTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, parsedArgs: SanitizedArgs.t, state: EphemeralState.t, _i18n: i18n.t, task: Task.t, sendPluginActionRequest: SendPluginActionRequest, plugin?: InstalledPlugin.t) => pipe(
     cliConfig.command({
         command: task.command,
         aliases: task.aliases,
@@ -506,6 +508,7 @@ const addTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, p
             const handler = task.handler === 'proxy' && plugin
                 ? pipe(
                     sendPluginActionRequest (plugin) (task) ({...inputArgs, task: task.task}),
+                    chain (addTask(parsedArgs, task.task, plugin.name)),
                     map (res => {
                         const decoded = res as PluginJsonResponse | void
                         if (decoded) return renderPluginJsonRes(decoded)
@@ -526,7 +529,7 @@ const addTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, p
 )
 
 const loadEphermeralState = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib): CLIConfig =>
-[addTasks, /* addOperations, addTemplates*/].reduce(
+[exposeTasks /* addOperations, addTemplates*/].reduce(
     (cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
     cliConfig
 )
@@ -612,7 +615,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) => (
             cliConfig.help()
         ),
         chain (parseArgs),
-        map (inputArgs => SanitizedArgs.create(inputArgs)),
+        chain (inputArgs => SanitizedArgs.of(inputArgs)),
         map (showInvalidTask(cliConfig))
 )
 

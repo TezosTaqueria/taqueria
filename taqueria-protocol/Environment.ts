@@ -28,6 +28,6 @@ export const {schemas, factory} = createType<RawInput, RawInput>({
 export type Environment = Flatten<z.infer<typeof schemas.schema>>
 export type t = Environment
 
-export const {create, make, of} = factory
+export const {create, make, of, from} = factory
 
 export const {internalSchema} = schemas

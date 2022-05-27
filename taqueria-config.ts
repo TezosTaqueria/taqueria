@@ -15,14 +15,14 @@ export type AddTaskCallback = (task: Task.t, plugin: InstalledPlugin.t, handler:
 export const defaultConfig : Config.t = Config.create({
     language: 'en',
     contractsDir: "contracts",
-    testsDir: "tests",
     artifactsDir: "artifacts",
     environment: {
         default: "development",
         development: {
             networks: [],
             sandboxes: ["local"]
-        }
+        },
+        storage: {} as unknown
     },
     sandbox: {
         local: {
@@ -82,7 +82,7 @@ export const getRawConfig = (projectDir: SanitizedAbsPath.t, create=false) => pi
 export const toLoadedConfig = (configPath: string, projectDir: SanitizedAbsPath.t, config: Config.t): Future<TaqError.t, LoadedConfig.t> => pipe(
     attemptP<TaqError.t, SHA256.t>(() => SHA256.toSHA256(JSON.stringify(config))),
     chain (hash => 
-        attemptP<TaqError.t, LoadedConfig.t>(async () => await eager (LoadedConfig.make({
+        attemptP<TaqError.t, LoadedConfig.t>(async () => await eager (LoadedConfig.of({
             ...config,
             configFile: await eager (SanitizedAbsPath.make(configPath)),
             projectDir,

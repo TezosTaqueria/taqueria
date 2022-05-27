@@ -47,7 +47,7 @@ export type t = SanitizedArgs
 
 export const create = async (data: unknown) => {
     const inputArgs = internalSchema.parse(data)
-    const rawConfig = await readJsonFile<Record<string, unknown>>(inputArgs.configAbsPath)
+    const rawConfig = await readJsonFile<Config.t>(inputArgs.configAbsPath)
     const config = Config.create(rawConfig)
     if (!config.sandbox) throw `No sandboxes have been defined in your .taq/config.json file.`
     

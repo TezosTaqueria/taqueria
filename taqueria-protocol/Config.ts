@@ -6,6 +6,20 @@ import * as Environment from "@taqueria/protocol/Environment"
 import * as Tz from "@taqueria/protocol/Tz"
 import createType, {Flatten} from "@taqueria/protocol/Base"
 
+export const pluginsRawSchema = z.preprocess(
+    val => val ?? [],
+    z.array(
+        InstalledPlugin.rawSchema, {description: "config.plugins"}
+    )
+)
+
+export const pluginsInternalSchema = z.preprocess(
+    val => val ?? [],
+    z.array(
+        InstalledPlugin.schemas.schema, {description: "config.plugins"}
+    )
+)
+
 const networkMap = z
     .record(
         z.union([
@@ -27,13 +41,15 @@ const sandboxMap = z
         {description: "Sandbox configurations"}
     )
     .optional()
+    
+const storageSchema = z.unknown().optional()
 
 const environmentMap = z
     .record(
         z.union([
             Environment.schemas.schema,
-            z.string({description: "config.environment"})
-            .min(1, "Default environment must reference the name of an existing environment.")
+            z.string().min(1, "Default environment must reference the name of an existing environment."),
+            storageSchema
         ]),
         {description: "Environment configurations"}
     )
@@ -52,20 +68,15 @@ const accountsMap = z.preprocess(
 )
 
 const commonSchema = z.object({
-    language: z
-        .union([z.literal('en'), z.literal('fr')], {description: "config.language"})
+    language: z.preprocess(
+        val => val ?? 'en',
+        z.union([
+            z.literal('en'),
+            z.literal('fr')
+        ], {description: "config.language"})
         .optional()
-        .transform((val?: 'en' | 'fr' | string) => val ?? 'en'),
-    plugins: z
-        .array(InstalledPlugin.schemas.schema, {description: "config.plugins"})
-        .optional()
-        .transform((val: unknown) => (val ?? []) as InstalledPlugin.t[]),
-    testsDir: z
-        .preprocess(
-            (val: unknown) => val ?? "tests",
-            z.string({description: "config.testsDir"})
-            .min(1, "config.testsDir must have a value")
-        ),
+    ),
+    plugins: pluginsInternalSchema.optional(),
     contractsDir: z
         .preprocess(
             (val: unknown) => val ?? "contracts",
@@ -88,6 +99,7 @@ export const internalSchema = commonSchema.extend({
 })
 
 export const rawSchema = commonSchema.extend({
+    plugins: pluginsRawSchema.optional(),
     network: z
         .record(
             z.union([
@@ -111,7 +123,8 @@ export const rawSchema = commonSchema.extend({
             z.union([
                 Environment.rawSchema,
                 z.string({description: "config.environment"})
-                .min(1, "Default environment must reference the name of an existing environment.")
+                .min(1, "Default environment must reference the name of an existing environment."),
+                storageSchema
             ])
         )
         .optional(),
@@ -123,7 +136,7 @@ export const rawSchema = commonSchema.extend({
         .optional()
 }).describe("config")
 
-type RawInput = Flatten<z.infer<typeof rawSchema>>
+type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
 export const {schemas, factory} = createType<RawInput, Input>({

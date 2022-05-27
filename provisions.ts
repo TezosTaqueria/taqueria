@@ -22,7 +22,7 @@ const {doesPathExist, writeJsonFile, joinPaths, eager, isTaqError, readJsonFile,
 })
 
 const getProvisions = (provisionsAbsPath: SanitizedAbsPath.t) => pipe(
-    readJsonFile(provisionsAbsPath),
+    readJsonFile<Provisions.t>(provisionsAbsPath),
     chain(Provisions.of)
 )
 
@@ -97,7 +97,7 @@ const getPluginAlias = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: Ephe
     return plugin!.alias
 }
 
-const newProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t) => {
+export const newProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t) => {
     const operation = parsedArgs.operation
     const name = parsedArgs.name ?? generate()
     const plugin = getPluginAlias(parsedArgs, state)
@@ -216,6 +216,30 @@ const toMermaid = (data: (Provisioner.t[])[]) => data.reduce(
 export const plan = (data: Provisions.t) => {
     const batches = toDAG(data)
     return toMermaid(batches).content
+}
+
+
+export const runProvisioner = (provisioner: Provisioner.t, state: PersistentState.t) => {
+    return {
+        ...state,
+        operations: {
+            ...state.operations,
+            "task.originate.123123": {
+                "id": "task.originate.123123",
+                "hash": "asdfasdfasfdsadf",
+                "label": "Task invocation",
+                "operation": "task.originate",
+                "output": []
+            }
+        },
+        tasks: {
+            "taquito.originate": {
+                contract: null,
+                provisionedAt: 1231231232131,
+                outputs: ""
+            }
+        }
+    }
 }
 
 export const apply = (sanitizedArgs: SanitizedArgs.t, data: Provisions.t) => {
