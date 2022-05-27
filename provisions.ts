@@ -220,26 +220,7 @@ export const plan = (data: Provisions.t) => {
 
 
 export const runProvisioner = (provisioner: Provisioner.t, state: PersistentState.t) => {
-    return {
-        ...state,
-        operations: {
-            ...state.operations,
-            "task.originate.123123": {
-                "id": "task.originate.123123",
-                "hash": "asdfasdfasfdsadf",
-                "label": "Task invocation",
-                "operation": "task.originate",
-                "output": []
-            }
-        },
-        tasks: {
-            "taquito.originate": {
-                contract: null,
-                provisionedAt: 1231231232131,
-                outputs: ""
-            }
-        }
-    }
+    
 }
 
 export const apply = (sanitizedArgs: SanitizedArgs.t, data: Provisions.t) => {

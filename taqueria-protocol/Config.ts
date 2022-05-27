@@ -41,15 +41,12 @@ const sandboxMap = z
         {description: "Sandbox configurations"}
     )
     .optional()
-    
-const storageSchema = z.unknown().optional()
 
 const environmentMap = z
     .record(
         z.union([
             Environment.schemas.schema,
-            z.string().min(1, "Default environment must reference the name of an existing environment."),
-            storageSchema
+            z.string().min(1, "Default environment must reference the name of an existing environment.")
         ]),
         {description: "Environment configurations"}
     )
@@ -123,8 +120,7 @@ export const rawSchema = commonSchema.extend({
             z.union([
                 Environment.rawSchema,
                 z.string({description: "config.environment"})
-                .min(1, "Default environment must reference the name of an existing environment."),
-                storageSchema
+                .min(1, "Default environment must reference the name of an existing environment.")
             ])
         )
         .optional(),
