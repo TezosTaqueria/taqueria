@@ -1,9 +1,13 @@
 import {execCmd, getArch, sendAsyncErr, sendJsonRes, sendErr} from '@taqueria/node-sdk'
-import {SanitizedArgs, PluginResponse, Failure, LikeAPromise} from "@taqueria/node-sdk/types";
+import {RequestArgs, PluginResponse, LikeAPromise} from "@taqueria/node-sdk/types";
 import {extname, basename, join} from 'path'
 import glob = require('fast-glob')
 
-type Opts = SanitizedArgs & Record<string, unknown>
+interface Opts extends RequestArgs.t {
+    entrypoint?: string
+    syntax?: string
+    sourceFile?: string
+}
 
 const getContractArtifactFilename = (opts: Opts) => (sourceFile: string) => {
     const outFile = basename(sourceFile, extname(sourceFile))
@@ -20,9 +24,9 @@ const getCompileCommand = (opts: Opts) => (sourceFile: string) => {
     if (!projectDir) throw `No project directory provided`
     
     const inputFile = getInputFilename (opts) (sourceFile)
-    const baseCommand = `DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:0.41.0 compile contract ${inputFile}`
-    const entryPoint = opts.e ? `-e ${opts.e}` : ""
-    const syntax = opts["-s"] ? `s ${opts['s']} : ""` : ""
+    const baseCommand = `DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:next compile contract ${inputFile}`
+    const entryPoint = opts.entrypoint ? `-e ${opts.entrypoint}` : ""
+    const syntax = opts["syntax"] ? `-s ${opts['syntax']} : ""` : ""
     const outFile = `-o ${getContractArtifactFilename(opts)(sourceFile)}`
     const cmd = `${baseCommand} ${entryPoint} ${syntax} ${outFile}`
     return cmd
@@ -52,7 +56,7 @@ const compileAll = (parsedArgs: Opts): Promise<{contract: string, artifact: stri
     // TODO: Fetch list of files from SDK
     return glob(
         ['**/*.ligo', '**/*.religo', '**/*.mligo', '**/*.jsligo'],
-        {cwd: parsedArgs.contractsDir, absolute: false}
+        {cwd: parsedArgs.config.contractsDir, absolute: false}
     )
     .then(entries => entries.map(compileContract (parsedArgs)))
     .then(processes => processes.length > 0
@@ -62,7 +66,7 @@ const compileAll = (parsedArgs: Opts): Promise<{contract: string, artifact: stri
     .then(promises => Promise.all(promises))
 }
 
-export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
+export const compile = (parsedArgs: Opts): Promise<PluginResponse> => {
     const p = parsedArgs.sourceFile
         ? compileContract (parsedArgs) (parsedArgs.sourceFile as string)
             .then(result => [result])

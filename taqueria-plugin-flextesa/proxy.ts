@@ -1,206 +1,160 @@
-import {Sandbox as theSandbox, execCmd, getArch, sendAsyncErr, sendErr, sendRes, sendAsyncRes, sendJsonRes, sendAsyncJsonRes} from '@taqueria/node-sdk'
-import type {SanitizedArgs, Attributes, SandboxConfig, Failure, LikeAPromise, Sandbox, AccountDetails, StdIO, PluginResponse} from "@taqueria/node-sdk/types"
+import {execCmd, getArch, sendAsyncErr, sendErr, sendAsyncRes, sendJsonRes, sendRes} from '@taqueria/node-sdk'
+import {LikeAPromise, StdIO, Protocol, RequestArgs, SandboxConfig, SandboxAccountConfig} from "@taqueria/node-sdk/types"
 import type {ExecException} from 'child_process'
 import retry from 'async-retry'
-import {join} from 'path'
-import glob from 'fast-glob'
+import { SanitizedArgs, TaqError } from '@taqueria/protocol/taqueria-protocol-types'
 
-type Opts = SanitizedArgs & {sandboxName?: string}
+const {Url} = Protocol
 
-const attributesToParams = (attributes: Attributes): Record<string, string> => ['blockTime'].reduce(
-    (retval: Record<string, string>, attributeName: string) => {
-        if (attributes[attributeName]) {
-            retval[attributeName] = attributes[attributeName].toString()
-        }
-        return retval
-    },
-    {}
-)
+interface Opts extends RequestArgs.ProxyRequestArgs {
+    sandboxName?: string
+}
 
 const getDockerImage = (opts: Opts) => `ghcr.io/ecadlabs/taqueria-flextesa:${opts.setVersion}-${opts.setBuild}`
 
-const getStartCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string, debug:boolean): string => {
-    const _envVars = Object.entries(attributesToParams(sandbox.attributes)).reduce(
-        (retval, [key, val]) => `${retval} -e ${key} ${val} `,
-        ""
-    )
-
-    const projectDir = process.env.PROJECT_DIR ?? config.projectDir
-
-    const ports = debug
-        ? `-p ${sandbox.rpcUrl.url.port}:20000 -p 19229:9229`
-        : `-p ${sandbox.rpcUrl.url.port}:20000`
-
-    return `docker run --name ${sandbox.name} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} node index.js --sandbox ${sandbox.name}`
+const getContainerName = (sandboxName: string, parsedArgs: Opts) => {
+    return `taqueria-${parsedArgs.env}-${sandboxName}`
 }
 
-const getConfigureCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
-    return `docker exec ${sandbox.name} node index.js --sandbox ${sandbox.name} --configure`
+const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts) => {
+    const port = Url.toComponents(sandbox.rpcUrl).port
+    const containerName = getContainerName(sandboxName, opts)
+    const arch = await getArch()
+    const image = getDockerImage(opts)
+    const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir
+
+    const ports = opts.debug
+        ? `-p ${port}:20000 -p 19229:9229`
+        : `-p ${port}:20000`
+
+    return `docker run --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} node index.js --sandbox ${sandboxName}`
 }
 
-const getImportAccountsCommand = (sandbox: Sandbox, image: string, config: Opts, arch: string): string => {
-    return `docker exec ${sandbox.name} node index.js --sandbox ${sandbox.name} --importAccounts`
+const getConfigureCommand = (sandboxName: string, opts: Opts): string => {
+    const containerName = getContainerName(sandboxName, opts)
+    return `docker exec ${containerName} node index.js --sandbox ${sandboxName} --configure`
 }
 
-const doesUseFlextesa = (sandbox: Sandbox) => !sandbox.plugin || sandbox.plugin === 'flextesa'
+const getImportAccountsCommand = (sandboxName: string, opts: Opts): string => {
+    const containerName = getContainerName(sandboxName, opts)
+    return `docker exec ${containerName} node index.js --sandbox ${sandboxName} --importAccounts`
+}
 
-const doesNotUseFlextesa = (sandbox: Sandbox) => !doesUseFlextesa(sandbox)
+const doesUseFlextesa = (sandbox: SandboxConfig.t) => !sandbox.plugin || sandbox.plugin === 'flextesa'
 
-const startInstance = (opts: Opts) => (sandbox: Sandbox) : Promise<void> => {
-    debugger
+const doesNotUseFlextesa = (sandbox: SandboxConfig.t) => !doesUseFlextesa(sandbox)
+
+const startInstance = (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts) : Promise<void> => {
     if (doesNotUseFlextesa(sandbox))
         return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
 
-    return isSandboxRunning(sandbox.name.value)
+    return isSandboxRunning(sandboxName, opts)
         .then(
             running => running
                 ? sendAsyncRes("Already running.")
-                : getArch()
-                    .then(arch => getStartCommand(sandbox, getDockerImage(opts), opts, arch, opts.debug)) 
-                    .then(execCmd)
-                    .then(({stderr}) => {
-                        if (opts.debug && stderr) sendErr(stderr)
-                        return configureTezosClient(sandbox, opts)
+                : getStartCommand(sandboxName, sandbox, opts)
+                    .then(cmd => {
+                        console.log("Booting sandbox...")
+                        return execCmd(cmd)
+                    })
+                    .then(() => {
+                        console.log("Configuring sandbox...")
+                        return configureTezosClient(sandboxName, opts)
                     })
                     .then(({stderr}) => {
-                        if (opts.debug && stderr) sendErr(stderr)
-                        return importAccounts(sandbox, opts)
+                        if (stderr.length) sendErr(stderr)
+                        console.log("Adding accounts...")
+                        return importAccounts(sandboxName, opts)
                     })
                     .then(({stderr}) => {
-                        if (opts.debug && stderr) sendErr(stderr)
-                        sendAsyncRes(`Started ${sandbox.name.value}.`)
+                        if (stderr.length) sendErr(stderr)
+                        sendAsyncRes(`Started ${sandboxName}.`)
                     })
         )
 }
 
-const configureTezosClient = (sandbox: Sandbox, opts: Opts) : LikeAPromise<StdIO, Failure<StdIO>> =>
+const configureTezosClient = (sandboxName: string, opts: Opts) : Promise<StdIO> =>
     retry(
-        () => getArch()
-                .then(arch => getConfigureCommand(sandbox, getDockerImage(opts), opts, arch))
+        () => Promise.resolve(getConfigureCommand(sandboxName, opts))
                 .then(execCmd)
-                .catch(previous => 
-                    Promise.reject({
-                        errCode: 'E_CONFIGURE_SANDBOX',
-                        errorMsg: "Could not configure sandbox",
-                        context: sandbox,
-                        previous
-                    })
-                )
                 .then(({stderr, stdout}) => {
-                    return stderr.length > 0
-                        ? Promise.reject({
-                            errCode: 'E_CONFIGURE_SANDBOX',
-                            errorMsg: "Could not configure sandbox",
-                            context: {stderr, stdout}
-                        }) 
-                        : Promise.resolve({stderr, stdout})
+                    if (stderr.length) return Promise.reject(stderr)
+                    return ({stderr, stdout})
                 })
     )
 
 
-const importAccounts = (sandbox: Sandbox, opts: Opts): LikeAPromise<StdIO, Failure<StdIO>> =>
+const importAccounts = (sandboxName: string, opts: Opts): Promise<StdIO> =>
     retry(
-        () => getArch()
-                .then(arch => getImportAccountsCommand(sandbox, getDockerImage(opts), opts, arch))
+        () => Promise.resolve(getImportAccountsCommand(sandboxName, opts))
                 .then(execCmd)
-                .catch(previous =>
-                    Promise.reject({
-                        errCode: 'E_IMPORT_ACCOUNTs',
-                        errorMsg: "Could not import test accounts into sandbox",
-                        context: sandbox,
-                        previous
-                    })
-                )
                 .then(({stderr, stdout}) => {
-                    return stderr.length > 0
-                        ? Promise.reject({
-                            errCode: 'E_IMPORT_ACCOUNTs',
-                            errorMsg: "Could not import test accounts into sandbox",
-                            context: {stderr, stdout}
-                        }) 
-                        : Promise.resolve({stderr, stdout})
+                    if (stderr.length) {
+                        return Promise.reject(stderr)
+                    }
+                    return ({stderr, stdout})
                 })
+                .catch(stderr => {
+                    return Promise.reject(`There was a problem trying to import accounts into tezos-client for the sandbox: ${stderr}`)
+                }),
     )
 
-const startAll = (sandboxes: Sandbox[], opts: Opts): Promise<void> => {
-    if (!sandboxes.length) return sendAsyncErr("No sandboxes configured to start")
+const startAll = (opts: Opts): Promise<void> => {
+    if (opts.config.sandbox === undefined) return sendAsyncErr("No sandboxes configured to start")
+    
+    const processes = Object.entries(opts.config.sandbox).reduce(
+        (retval, [sandboxName, sandboxDetails]) => {
+            if (sandboxName === 'default') return retval
+            return [...retval, startInstance(sandboxName, sandboxDetails as SandboxConfig.t, opts)]
+        },
+        [] as Promise<void>[]
+    )
 
-    const jobs = 
-        sandboxes
-        .filter(sandbox => doesUseFlextesa(sandbox))
-        .map(startInstance(opts))
-
-    return Promise.all(jobs).then(_ => sendAsyncRes("Done."))
+    return Promise.all(processes).then(_ => sendAsyncRes("Done."))
 }
 
 const getSandbox = ({sandboxName, config}: Opts) => {
-    if (sandboxName && config.sandbox[sandboxName]) {
-        const sandboxConfig : SandboxConfig = config.sandbox[sandboxName]
-
-        // This should probably go into the SDK or protocol
-        if (sandboxName && sandboxConfig.label && sandboxConfig.protocol && sandboxConfig.rpcUrl) {
-            const {label, protocol, rpcUrl, plugin, accounts} = sandboxConfig
-            const unvalidated = {
-                name: sandboxName,
-                label,
-                protocol,
-                rpcUrl,
-                plugin,
-                accounts
-            }
-            return theSandbox.create(unvalidated)
-        }
+    if (sandboxName && config.sandbox && config.sandbox[sandboxName]) {
+        const sandboxConfig = config.sandbox![sandboxName] as SandboxConfig.t
+        return sandboxConfig
     }
-    // TODO: Should we throw instead?
     return undefined
 }
 
-const getSandboxes = (parsedArgs: Opts): Sandbox[] =>
-    Object.keys(parsedArgs.config.sandbox)
-        .reduce(
-            (retval: Sandbox[], sandboxName) => {
-                const sandbox = getSandbox({...parsedArgs, sandboxName})
-                return sandbox
-                    ? [...retval, sandbox]
-                    : retval
-            },
-            []
-        )
-
-const startSandboxTask = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
+const startSandboxTask = (parsedArgs: Opts) : LikeAPromise<void, TaqError.t> => {
     if (parsedArgs.sandboxName) {
         const sandbox = getSandbox(parsedArgs)
         return sandbox
-            ? startInstance (parsedArgs) (sandbox)
+            ? startInstance (parsedArgs.sandboxName, sandbox, parsedArgs)
             : sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`)
     }
-    return startAll(getSandboxes(parsedArgs), parsedArgs)
+    return startAll(parsedArgs)
+}
+
+const isSandboxRunning = (sandboxName: string, opts: Opts) => {
+    const containerName = getContainerName(sandboxName, opts)
+    return execCmd(`docker ps --filter name=${containerName} | grep -w ${containerName}`)
+    .then(_ => true)
+    .catch(_ => false)
 }
 
 
-
-const isSandboxRunning = (sandboxName: string) =>
-    execCmd(`docker ps --filter name=${sandboxName} | grep -w ${sandboxName}`)
-    .then(_ => true)
-    .catch(_ => false)
-
-
 type AccountBalance = {account: string, balance: string, address: string|undefined}
-const getAccountBalances =(sandbox: Sandbox): Promise<AccountBalance[]> => {
-    const processes = Object.entries(sandbox.accounts).reduce(
-        (retval: Promise<AccountBalance>[], [accountName, accountDetails] : [string, string | AccountDetails]) => {
+const getAccountBalances = (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts): Promise<AccountBalance[]> => {
+    const processes = Object.entries(sandbox.accounts ?? {}).reduce(
+        (retval: Promise<AccountBalance>[], [accountName, accountDetails]) => {
             if (accountName === 'default') return retval
 
             const getBalanceProcess =
                 getArch()
-                .then(_ => `docker exec ${sandbox.name} tezos-client get balance for ${accountName.trim()}`)
+                .then(_ => `docker exec ${getContainerName(sandboxName, opts)} tezos-client get balance for ${accountName.trim()}`)
                 .then(execCmd)
                 .then(({stdout, stderr}) => {
                     if (stderr.length > 0) sendErr(stderr)
                     return {
                         account: accountName, 
                         balance: stdout.trim(),
-                        address: (accountDetails as AccountDetails).keys?.publicKeyHash
+                        address: (accountDetails as SandboxAccountConfig.t).publicKeyHash
                     }
                 })
                 .catch((err: ExecException) => {
@@ -208,7 +162,7 @@ const getAccountBalances =(sandbox: Sandbox): Promise<AccountBalance[]> => {
                     return {
                         account: accountName,
                         balance: "Error",
-                        address: (accountDetails as AccountDetails).keys?.publicKeyHash
+                        address: (accountDetails as SandboxAccountConfig.t).publicKeyHash
                     }
                 })
             return [...retval, getBalanceProcess]
@@ -220,15 +174,15 @@ const getAccountBalances =(sandbox: Sandbox): Promise<AccountBalance[]> => {
 }    
 
 
-const listAccountsTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
+const listAccountsTask = async <T>(parsedArgs: Opts) : Promise<void> => {
     if (parsedArgs.sandboxName) {
         const sandbox = getSandbox(parsedArgs)
         if (sandbox) {
             if (doesUseFlextesa(sandbox)) {
-                return await isSandboxRunning(sandbox.name.value)
-                ? getAccountBalances(sandbox)
+                return await isSandboxRunning(parsedArgs.sandboxName, parsedArgs)
+                ? getAccountBalances(parsedArgs.sandboxName, sandbox, parsedArgs)
                     .then(sendJsonRes)
-                : sendAsyncErr(`The ${sandbox.name} sandbox is not running.`)
+                : sendAsyncErr(`The ${parsedArgs.sandboxName} sandbox is not running.`)
             }
             return sendAsyncErr(
                 `Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`
@@ -240,15 +194,15 @@ const listAccountsTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failur
     return sendAsyncErr(`Please specify a sandbox. E.g. taq list accounts local`)
 }
 
-const stopSandboxTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
+const stopSandboxTask = async (parsedArgs: Opts) : Promise<void> => {
     if (parsedArgs.sandboxName) {
         const sandbox = getSandbox(parsedArgs)
         if (sandbox) {
             if (doesUseFlextesa(sandbox)) {
-                return await isSandboxRunning(sandbox.name.value)
-                ? execCmd(`docker kill ${sandbox.name}`)
-                    .then(_ => sendAsyncRes(`Stopped ${sandbox.name.value}.`))
-                : sendAsyncRes(`The ${sandbox.name} sandbox was not running.`)
+                return await isSandboxRunning(parsedArgs.sandboxName, parsedArgs)
+                ? execCmd(`docker kill ${getContainerName(parsedArgs.sandboxName, parsedArgs)}`)
+                    .then(_ => sendAsyncRes(`Stopped ${parsedArgs.sandboxName}.`))
+                : sendAsyncRes(`The ${parsedArgs.sandboxName} sandbox was not running.`)
             }
             return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`)
         }
@@ -258,7 +212,7 @@ const stopSandboxTask = async <T>(parsedArgs: Opts) : LikeAPromise<void, Failure
     return sendAsyncErr(`No sandbox specified`)
 }
 
-export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, Failure<T>> => {
+export const proxy = <T>(parsedArgs: Opts) : LikeAPromise<void, TaqError.t> => {
     switch (parsedArgs.task) {
         case 'list accounts':
             return listAccountsTask(parsedArgs)

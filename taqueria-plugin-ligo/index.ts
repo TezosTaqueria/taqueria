@@ -14,7 +14,7 @@ Plugin.create(i18n => ({
             options: [
                 Option.create({
                     shortFlag: "e",
-                    flag: "entry-point",
+                    flag: "entrypoint",
                     description: "The entry point that will be compiled"
                 }),
                 Option.create({

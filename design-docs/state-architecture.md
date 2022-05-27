@@ -30,7 +30,7 @@ This segment of the state architecture represents data that is cached for perfor
 
 The ephemeral state will be temporarily persisted to _.taq/cache.json_ (formally _.taq/state.json_).
 
-Currently, the ephermal state is represented as a JSON object, with a _hash_ field that stores the md5sum of the _config.json_ file when the state was initially constructed. A second field called _tasks_ is used to store and represent a task-to-plugin mapping. This mapping can be used to reduce the amount of communication conducted at the plugin protocol layer.
+Currently, the ephemeral state is represented as a JSON object, with a _hash_ field that stores the md5sum of the _config.json_ file when the state was initially constructed. A second field called _tasks_ is used to store and represent a task-to-plugin mapping. This mapping can be used to reduce the amount of communication conducted at the plugin protocol layer.
 
 When the Taqueria CLI is used to execute a task, internally the CLI determines whether a _.taq/cache.json_ exists, and if so, extracts the value of the hash field, and compares that to the md5sum of the current _.taq/config.json_ file. If the hashes differ, then the state is invalid and regenerated.
 

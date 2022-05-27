@@ -1,11 +1,12 @@
-import { SanitizedArgs, PluginResponse, Failure, LikeAPromise} from "@taqueria/node-sdk/types";
+import { PluginResponse, TaqError, LikeAPromise, RequestArgs} from "@taqueria/node-sdk/types";
 import { execCmd, sendAsyncJsonRes, sendErr } from "@taqueria/node-sdk";
-import {exec} from 'child_process'
 import glob from 'fast-glob'
 import {join, basename} from 'path'
 import {readFile} from 'fs/promises'
 
-type Opts = SanitizedArgs & Record<string, unknown>
+interface Opts extends RequestArgs.ProxyRequestArgs {
+    sourceFile?: string
+}
 
 const getArtifacts = (sourceAbspath: string) => {
     return readFile(sourceAbspath, {encoding: "utf-8"})
@@ -18,10 +19,10 @@ const getArtifacts = (sourceAbspath: string) => {
     })
 }
 
-const getCompileCommand = (opts: Opts) => (sourceAbspath: string) => `~/smartpy-cli/SmartPy.sh compile ${sourceAbspath} ${opts.artifactsDir}`
+const getCompileCommand = (opts: Opts) => (sourceAbspath: string) => `~/smartpy-cli/SmartPy.sh compile ${sourceAbspath} ${opts.config.artifactsDir}`
 
 const compileContract = (opts: Opts) => (sourceFile: string) => {
-    const sourceAbspath = join(opts.contractsDir, sourceFile)
+    const sourceAbspath = join(opts.config.contractsDir, sourceFile)
     return execCmd(getCompileCommand (opts) (sourceAbspath))
     .then(async ({stderr}) => { // How should we output warnings?
         if (stderr.length > 0) sendErr(`\n${stderr}`)
@@ -47,16 +48,16 @@ const compileAll = (opts: Opts): Promise<{contract: string, artifacts: string[]}
     // TODO: Fetch list of files from SDK
     return glob(
         ['**/*.py'],
-        {cwd: opts.contractsDir, absolute: false}
+        {cwd: opts.config.contractsDir, absolute: false}
     )
     .then(entries => entries.map(compileContract(opts)))
     .then(promises => Promise.all(promises))
 }
 
 
-export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
+export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
     const p = parsedArgs.sourceFile
-    ? compileContract (parsedArgs) (parsedArgs.sourceFile as string)
+    ? compileContract (parsedArgs) (parsedArgs.sourceFile)
         .then(data => [data])
     : compileAll (parsedArgs)
         .then(results => {

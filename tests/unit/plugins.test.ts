@@ -1,22 +1,23 @@
-import {defaultConfig, toConfigArgs} from '../../taqueria-config.ts'
+import {defaultConfig, toLoadedConfig} from '../../taqueria-config.ts'
 import inject from "../../plugins.ts"
-import type {SanitizedInitArgs} from '../../taqueria-types.ts'
-import type {InstalledPlugin} from "../../taqueria-protocol/taqueria-protocol-types.ts"
-import {SanitizedAbsPath, SanitizedPath, SanitizedUrl, TaqError, E_TaqError} from '../../taqueria-utils/taqueria-utils-types.ts'
+import * as SanitizedArgs from "@taqueria/protocol/SanitizedArgs"
+import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
+import * as Url from "@taqueria/protocol/Url"
+import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
+import * as TaqError from "@taqueria/protocol/TaqError"
 import {toPromise} from "../../taqueria-utils/taqueria-utils.ts"
 import { assertEquals, assert, assertRejects} from "https://deno.land/std@0.127.0/testing/asserts.ts";
-import {i18n} from '../../i18n.ts'
+import type {i18n} from '@taqueria/protocol/i18n'
+import loadI18n from '@taqueria/protocol/i18n'
 import {MockWriter} from "./helpers.ts"
 
 Deno.test('inject()', async (t) => {
-    const projectDir = SanitizedAbsPath.create("/tmp/test-project") as SanitizedAbsPath
-    const configDir = SanitizedPath.create(".taq") as SanitizedPath
+    const projectDir = await toPromise (SanitizedAbsPath.make("/tmp/test-project"))
 
-    const sanitizedArgs : SanitizedInitArgs = {
+    const sanitizedArgs = SanitizedArgs.create({
         _: ["init"],
         build: false,
         debug: false,
-        configDir,
         disableState: false,
         env: "development",
         fromVsCode: false,
@@ -24,20 +25,20 @@ Deno.test('inject()', async (t) => {
         maxConcurrency: 10,
         projectDir,
         quickstart: "Foo",
-        scaffoldProjectDir: SanitizedAbsPath.create("/tmp/scaffold-project") as SanitizedAbsPath,
-        scaffoldUrl: SanitizedUrl.create("http://foo.bar") as SanitizedUrl,
         setBuild: "foo/bar",
         setVersion: "1.0.0",
         version: false,
         help: false
-    }
+    })
 
-    const config = await toPromise (toConfigArgs(
+    const taqDir = await toPromise (SanitizedAbsPath.make(`${projectDir}/.taq`))
+    const config = await toPromise (toLoadedConfig(
         "config.json",
-        configDir,
-        projectDir.join('.taq'),
+        taqDir,
         defaultConfig
     ))
+
+    const i18n = await loadI18n()
 
     const deps = {
         config,
@@ -60,26 +61,26 @@ Deno.test('inject()', async (t) => {
         const result = toPluginArguments(requestArgs)
     
         assertEquals(result, [
+            "--projectDir",
+            "'/tmp/test-project'",
+            "--maxConcurrency",
+            10,
             "--debug",
-            false,
-            "--configDir",
-            "'./.taq'",
-            "--env",
-            "'development'",
-            "--fromVsCode",
             false,
             "--logPluginRequests",
             true,
-            "--maxConcurrency",
-            10,
-            "--projectDir",
-            "'/tmp/test-project'",
+            "--fromVsCode",
+            false,
+            "--help",
+            false,
+            "--yes",
+            false,
+            "--env",
+            "'development'",
             "--setBuild",
             "'foo/bar'",
             "--setVersion",
             "'1.0.0'",
-            "--help",
-            false,
             "--foo",
             "'bar'",
             "--bar",
@@ -122,7 +123,7 @@ Deno.test('inject()', async (t) => {
 
     await t.step("execPluginText() throws an error when given an invalid command", () => {
         const {execPluginText} = pluginLib.__TEST__
-        assertRejects<E_TaqError>(() => toPromise(execPluginText(['foobar'])))
+        assertRejects<TaqError.E_TaqError>(() => toPromise(execPluginText(['foobar'])))
         assertEquals(deps.stderr.toString(), '')
         assertEquals(deps.stdout.toString(), '')
     })
@@ -153,7 +154,7 @@ Deno.test('inject()', async (t) => {
 
     await t.step("execPluginPassThru() throws an error when given an invalid command", () => {
         const {execPluginPassthru} = pluginLib.__TEST__
-        assertRejects<E_TaqError>(() => toPromise(execPluginPassthru(['foobar'])))
+        assertRejects<TaqError.E_TaqError>(() => toPromise(execPluginPassthru(['foobar'])))
         assertEquals(deps.stderr.toString(), '')
         assertEquals(deps.stdout.toString(), '')
     })
@@ -189,9 +190,9 @@ Deno.test('inject()', async (t) => {
             await toPromise(execPluginJson(['echo', "foobar"]))
         }
         catch (err) {
-            assert(err instanceof E_TaqError)
+            assert(err instanceof TaqError.E_TaqError)
             assertEquals(err.kind, "E_EXEC")
-            assertEquals((err.previous as TaqError).kind, "E_INVALID_JSON")
+            assertEquals((err.previous as TaqError.t).kind, "E_INVALID_JSON")
         }
 
         assertEquals(deps.stderr.toString(), '')
@@ -202,10 +203,14 @@ Deno.test('inject()', async (t) => {
     // appropriate tests for getPluginExe
     // No issue exists for this as it only come up when we decide to implement
     // a plugin that isn't an NPM package.
-    await t.step("getPluginExe() returns the correct command to invoke an NPM script", () => {
+    await t.step("getPluginExe() returns the correct command to invoke an NPM script", async () => {
         const {getPluginExe} = pluginLib.__TEST__
+        const installedPlugin = await toPromise (InstalledPlugin.make({
+            name: "@taqueria/plugin-ligo",
+            type: "npm"
+        }))
 
-        const output = getPluginExe({name: "@taqueria/plugin-ligo", type: "npm"})
+        const output = getPluginExe(installedPlugin)
         assertEquals(output, ["node", "/tmp/test-project/node_modules/@taqueria/plugin-ligo/index.js"])
     })
 
@@ -216,10 +221,10 @@ Deno.test('inject()', async (t) => {
     await t.step("logPluginRequests() outputs the call to a plugin", async () => {
         const {toPluginArguments, logPluginRequest} = pluginLib.__TEST__
 
-        const plugin : InstalledPlugin = {
+        const plugin = await toPromise (InstalledPlugin.make({
             name: "@taqueria/plugin-ligo",
             type: "npm"
-        }
+        }))
         const pluginArgs = toPluginArguments({})
 
         const expected = [
