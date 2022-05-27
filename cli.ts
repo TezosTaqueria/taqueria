@@ -347,6 +347,8 @@ const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, max
     log("Installing plugins...")
     await eager (exec("npm install", {}, false, destDir))
 
+    await eager (exec("taq init", {}, false, destDir))
+
     return i18n.__("scaffoldDoneMsg")
 })
 
