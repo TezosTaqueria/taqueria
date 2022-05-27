@@ -316,7 +316,7 @@ const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, max
     const abspath = await eager (SanitizedAbsPath.make(scaffoldProjectDir))
     const destDir = await eager (doesPathNotExist(abspath))
     
-    log(`scaffolding\n into: ${destDir}\n from: ${scaffoldUrl}`)    
+    log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`)    
     await eager (gitClone (scaffoldUrl) (destDir))
 
     // TODO: Remove after 620-operations is merged in both the
@@ -325,11 +325,12 @@ const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, max
     // See issue: https://github.com/ecadlabs/taqueria/issues/736
     await eager (exec("git checkout 620-operations", {}, true, destDir))
 
-    log("Cleanup...")
+    log("\n Initializing Project...")
+    
     const scaffoldConfig = await eager (SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`))
+    log("    ✓ Cleanup scaffold config")
+
     const gitDir = await eager (SanitizedAbsPath.make(`${destDir}/.git`))
-    // const _gitIgnore = await eager (SanitizedAbsPath.make(`${destDir}/.gitignore`))
-    // await eager (rm(gitIgnore))
     
     // Remove the scaffold.json file, if not exists
     // If it doesn't exist, don't throw...
@@ -343,13 +344,17 @@ const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, max
     }
     
     await eager (rm(gitDir))
+    log("    ✓ Remove Git directory")
 
-    log("Installing plugins...")
-    await eager (exec("npm install", {}, false, destDir))
+    await eager (exec("npm install 2>&1 > /dev/null", {}, false, destDir))
+    log("    ✓ Install plugins")
 
-    await eager (exec("taq init", {}, false, destDir))
+    await eager (exec("taq init 2>&1 > /dev/null", {}, false, destDir))
+    log("    ✓ Project Taq'ified \n")
 
-    return i18n.__("scaffoldDoneMsg")
+    return("🌮 Project created successfully 🌮")
+    
+    //return i18n.__("scaffoldDoneMsg")
 })
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) => state.plugins.reduce(
