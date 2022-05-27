@@ -21,12 +21,13 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
     const containerName = getContainerName(sandboxName, opts)
     const arch = await getArch()
     const image = getDockerImage(opts)
+    const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir
 
     const ports = opts.debug
         ? `-p ${port}:20000 -p 19229:9229`
         : `-p ${port}:20000`
 
-    return `docker run --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${opts.config.projectDir}:/project -w /app ${image} node index.js --sandbox ${sandboxName}`
+    return `docker run --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} node index.js --sandbox ${sandboxName}`
 }
 
 const getConfigureCommand = (sandboxName: string, opts: Opts): string => {
