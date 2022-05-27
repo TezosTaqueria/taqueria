@@ -5,6 +5,7 @@ import fsPromises from "fs/promises"
 import type { ExecException } from "child_process"
 import fs from "fs"
 import util from "util"
+import { stderr, stdout } from "process"
 const exec = util.promisify(exec1)
 
 const taqueriaProjectPath = './e2e/auto-test-cli'
@@ -32,14 +33,21 @@ describe("E2E Testing for taqueria CLI,", () => {
         }
     })
 
-    test('Verify that taq --help gives the help menu for an initialized project', async () => {
+    test.only('Verify that taq --help gives the help menu for an initialized project', async () => {
         try {
-            await exec(`taq --help -p ${taqueriaProjectPath}`).catch(
-                (err: ExecException & {stdout: string, stderr: string}) => {
-                    expect(err.code).toEqual(1)
-                    expect(err.stderr).toBe(contents.helpContentsForProject)
-                }
-            )
+            const output = await exec(`taq --help -p ${taqueriaProjectPath}`)
+            console.log(output)
+            expect(output.stdout).toBe(contents.helpContentsForProject)
+
+            // await exec(`taq --help -p ${taqueriaProjectPath}`).catch(
+            //     (err: ExecException & {stdout: string, stderr: string}) => {
+            //         console.log(err)
+            //         console.log(stderr)
+            //         console.log(stdout)
+            //         expect(err.code).toEqual(1)
+            //         expect(err.stderr).toBe(contents.helpContentsForProject)
+            //     }
+            // )
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
