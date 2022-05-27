@@ -20,9 +20,9 @@ export const defaultConfig : Config.t = Config.create({
         default: "development",
         development: {
             networks: [],
-            sandboxes: ["local"]
-        },
-        storage: {} as unknown
+            sandboxes: ["local"],
+            storage: {}
+        }
     },
     sandbox: {
         local: {
