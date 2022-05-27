@@ -12,9 +12,9 @@ This plugin integrates automated testing into your workflow via the Jest Testing
 
 Our Jest plugin exposes the following tasks:
 
-`taq init [testsDir]`
+`taq test init [testsDir]`
 
-Initializes the Jest plugin and Jest Testing Framework. Manual invocations of this task are not usually required, as uninitialzed test folders will be initialzed automatically. However, for explicit control, `taq init` is available as a task for your convenience.
+Initializes the Jest plugin and Jest Testing Framework. Manual invocations of this task are not usually required, as uninitialzed test folders will be initialzed automatically. However, for explicit control, `taq test init` is available as a task for your convenience.
 
 When executed, a _.taq/jest.config.js_ file is created if one doesn't exist, and then too, a _jest.config.js_ is created in _testsDir_ as specified in the positional arguments. _testsDir_ defaults to _jestTestsRootDir if no value was provided.
 

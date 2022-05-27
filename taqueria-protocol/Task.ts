@@ -18,7 +18,10 @@ const taskEncodingSchema = z.preprocess(
     .optional()
 )
 
-const taskHandlerSchema = z.union([z.literal('proxy'), z.string()])
+const taskHandlerSchema = z.union([
+    z.literal('proxy'),
+    z.string().min(1),
+])
 
 export const rawSchema = z.object({
     task: Verb.rawSchema.describe("Task Name"),
@@ -64,5 +67,5 @@ export type t = Task
 export const {create, make, of} = factory
 export const schemas = {
     ...generatedSchemas,
-    // schema: generatedSchemas.schema.transform(val => val as unknown as Task)
+    schema: generatedSchemas.schema.transform(val => val as unknown as Task)
 }

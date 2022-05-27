@@ -125,7 +125,7 @@ export type ProvisionTaskArgs = z.infer<typeof provisionTaskArgs.schemas.schema>
 export type InstallTaskArgs = z.infer<typeof installTaskArgs.schemas.schema>
 export type UninstallTaskArgs = z.infer<typeof uninstallTaskArgs.schemas.schema>
 
-export const createScaffoldTaskArgs = scaffoldTaskArgs.factory.create
+export const createScaffoldTaskArgs = scaffoldTaskArgs.factory.from
 export const makeScaffoldTaskArgs = scaffoldTaskArgs.factory.make
 export const ofScaffoldTaskArgs = scaffoldTaskArgs.factory.of
 

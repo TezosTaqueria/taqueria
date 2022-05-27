@@ -43,11 +43,11 @@ export type RequestArgs = z.infer<typeof schemas.schema>
 export type t = RequestArgs
 
 const rawProxySchema = rawSchema.extend({
-    task: z.string().nonempty()
+    task: z.string().min(1)
 }).describe("ProxyRequestArgs").passthrough()
 
 const internalProxySchema = internalSchema.extend({
-    task: z.string().nonempty()
+    task: z.string().min(1)
 }).describe("ProxyRequestArgs").passthrough()
 
 type RawProxyInput = z.infer<typeof rawProxySchema>
@@ -65,7 +65,7 @@ export const proxyFactory = proxy.factory
 
 export type ProxyRequestArgs = z.infer<typeof proxySchemas.schema>
 
-export const createProxyRequestArgs = proxyFactory.create
+export const createProxyRequestArgs = proxyFactory.from
 export const makeProxyRequestArgs = proxyFactory.make
 export const ofProxyRequestArgs = proxyFactory.of
-export const {create, of, make} = factory
+export const {create, make, of, from} = factory

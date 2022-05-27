@@ -143,7 +143,7 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> =>
             const preprocessedArgs = preprocessArgs(unparsedArgs)
             const argv = yargs(preprocessedArgs.slice(2)).argv
             const postprocessedArgs = postprocessArgs(argv)
-            const requestArgs = RequestArgs.create(postprocessedArgs)
+            const requestArgs = RequestArgs.from(postprocessedArgs)
             return Promise.resolve(requestArgs)
         }
         catch (previous) {
@@ -271,7 +271,6 @@ const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
  * Gets the name of the current environment
  **/
 export const getCurrentEnvironment = (parsedArgs: RequestArgs.t) : string => {
-    debugger
     return parsedArgs.env
         ? (parsedArgs.env as string)
         : (

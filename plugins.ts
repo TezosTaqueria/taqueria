@@ -8,7 +8,7 @@ import * as utils from './taqueria-utils/taqueria-utils.ts'
 import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 
 // Third-party dependencies
-import {FutureInstance as Future, map, chain, attemptP, chainRej, resolve, reject, parallel} from 'fluture';
+import {FutureInstance as Future, map, chain, attemptP, chainRej, mapRej, resolve, reject, parallel} from 'fluture';
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
 import {copy} from 'https://deno.land/std@0.128.0/streams/conversion.ts'
 import clipboard from 'https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts'
@@ -169,17 +169,15 @@ export const inject = (deps: PluginDeps) => {
     // retrievePluginInfo: InstalledPlugin -> Future<TaqError, PluginInfo>
     const retrievePluginInfo = (plugin: InstalledPlugin.t) => pipe(
         sendPluginActionRequest (plugin) ("pluginInfo") ({}),
-        chain (unvalidatedData => {
-            const pluginInfo = ParsedPluginInfo.create(unvalidatedData)
-            return pluginInfo
-                ? resolve(pluginInfo)
-                : reject({
-                    kind: 'E_INVALID_PLUGIN_RESPONSE',
-                    msg: `The ${plugin.name} plugin experienced an error when getting information about the ${plugin.name} plugin.`,
-                    context: unvalidatedData
-                } as TaqError.t)
-    
-        })
+        chain (unvalidatedData => pipe(
+            ParsedPluginInfo.of(unvalidatedData),
+            mapRej (previous => TaqError.create({
+                kind: 'E_INVALID_PLUGIN_RESPONSE',
+                msg: `The ${plugin.name} plugin experienced an error when getting information about the ${plugin.name} plugin.`,
+                context: unvalidatedData,
+                previous
+            }))
+        ))
     )
 
 

@@ -20,7 +20,6 @@ describe("E2E Testing for taqueria general functionality", () => {
             expect(taquifiedDirContents).toContain("artifacts")
             expect(taquifiedDirContents).toContain("contracts")
             expect(taquifiedDirContents).toContain("quickstart.md")
-            expect(taquifiedDirContents).toContain("tests")
 
             await fsPromises.rm(taqueriaProjectPath, { recursive: true })
         } catch(error) {
