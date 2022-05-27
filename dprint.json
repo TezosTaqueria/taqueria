@@ -2,14 +2,19 @@
 	"lineWidth": 120,
 	"useTabs": true,
 	"typescript": {
-		"quoteStyle": "preferSingle"
+		"quoteStyle": "preferSingle",
+		"singleBodyPosition": "sameLine",
+		"arrowFunction.useParentheses": "preferNone"
 	},
 	"json": {
 	},
 	"includes": ["**/*.{ts,tsx,js,jsx,cjs,mjs,json}"],
 	"excludes": [
 		"**/node_modules",
-		"**/*-lock.json"
+		"**/*-lock.json",
+		"./website",
+		"tests/e2e/data",
+		""
 	],
 	"plugins": [
 		"https://plugins.dprint.dev/typescript-0.68.2.wasm",
