@@ -1,13 +1,61 @@
 
 import { TezosToolkit } from '@taquito/taquito';
 import { tas } from '../types-file/type-aliases';
-import { ExampleContract0ContractType as ContractType } from '../types-file/example-contract-6.types';
+import { ExampleContract6ContractType as ContractType } from '../types-file/example-contract-6.types';
+import { ExampleContract6Code as ContractCode } from '../types-file/example-contract-6.code';
 
 describe('example-contract-6', () => {
     const Tezos = new TezosToolkit('RPC_URL');
     let contract: ContractType = undefined as unknown as ContractType;
     beforeAll(async () => {
-            contract = await Tezos.contract.at<ContractType>('DEPLOYED_CONTRACT_ADDRESS');
+            
+            const newContractOrigination = await Tezos.contract.originate<ContractType>({
+                code: ContractCode.code,
+                storage: {
+                        admin: {
+                            admin: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                            paused: true,
+                            pending_admin: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                        },
+                        assets: {
+                            ledger: tas.bigMap([{ 
+                                key: {
+                                0: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                1: tas.nat('42'),
+                            }, 
+                                value: tas.nat('42'),
+                            }]),
+                            operators: tas.bigMap([{ 
+                                key: {
+                                0: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                1: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                2: tas.nat('42'),
+                            }, 
+                                value: undefined,
+                            }]),
+                            token_metadata: tas.bigMap([{ 
+                                key: tas.nat('42'), 
+                                value: {
+                                token_id: tas.nat('42'),
+                                token_info: tas.map({ 
+                                    'VALUE': tas.bytes(char2Bytes('DATA')),
+                                }),
+                            },
+                            }]),
+                            token_total_supply: tas.bigMap([{ 
+                                key: tas.nat('42'), 
+                                value: tas.nat('42'),
+                            }]),
+                        },
+                        metadata: tas.bigMap({ 
+                            'VALUE': tas.bytes(char2Bytes('DATA')),
+                        }),
+                    },
+            });
+            const newContractResult = await newContractOrigination.contract();
+            const newContractAddress = newContractResult.address;
+            contract = await Tezos.contract.at<ContractType>(newContractAddress);
+            
     });
 
 

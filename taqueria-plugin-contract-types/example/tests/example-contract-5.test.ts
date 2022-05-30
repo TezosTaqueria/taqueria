@@ -1,13 +1,44 @@
 
 import { TezosToolkit } from '@taquito/taquito';
 import { tas } from '../types-file/type-aliases';
-import { ExampleContract0ContractType as ContractType } from '../types-file/example-contract-5.types';
+import { ExampleContract5ContractType as ContractType } from '../types-file/example-contract-5.types';
+import { ExampleContract5Code as ContractCode } from '../types-file/example-contract-5.code';
 
 describe('example-contract-5', () => {
     const Tezos = new TezosToolkit('RPC_URL');
     let contract: ContractType = undefined as unknown as ContractType;
     beforeAll(async () => {
-            contract = await Tezos.contract.at<ContractType>('DEPLOYED_CONTRACT_ADDRESS');
+            
+            const newContractOrigination = await Tezos.contract.originate<ContractType>({
+                code: ContractCode.code,
+                storage: {
+                        transfers: [(
+                            {
+                                xtz_transfer_type: {
+                                    amount: tas.mutez('42'),
+                                    recipient: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                }
+                            }
+                            | {
+                                token_transfer_type: {
+                                    contract_address: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                    transfer_list: [{
+                                        from_: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                        txs: [{
+                                            to_: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                            token_id: tas.nat('42'),
+                                            amount: tas.nat('42'),
+                                        }],
+                                    }],
+                                }
+                            }
+                        )],
+                    },
+            });
+            const newContractResult = await newContractOrigination.contract();
+            const newContractAddress = newContractResult.address;
+            contract = await Tezos.contract.at<ContractType>(newContractAddress);
+            
     });
 
 

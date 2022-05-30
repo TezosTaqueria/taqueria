@@ -1,13 +1,40 @@
 
 import { TezosToolkit } from '@taquito/taquito';
 import { tas } from '../types-file/type-aliases';
-import { ExampleContract0ContractType as ContractType } from '../types-file/example-contract-7.types';
+import { ExampleContract7ContractType as ContractType } from '../types-file/example-contract-7.types';
+import { ExampleContract7Code as ContractCode } from '../types-file/example-contract-7.code';
 
 describe('example-contract-7', () => {
     const Tezos = new TezosToolkit('RPC_URL');
     let contract: ContractType = undefined as unknown as ContractType;
     beforeAll(async () => {
-            contract = await Tezos.contract.at<ContractType>('DEPLOYED_CONTRACT_ADDRESS');
+            
+            const newContractOrigination = await Tezos.contract.originate<ContractType>({
+                code: ContractCode.code,
+                storage: {
+                        admin: {
+                            admin: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                            paused: true,
+                            pending_admin: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                        },
+                        sales: tas.bigMap([{ 
+                            key: {
+                            sale_seller: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                            tokens: {
+                                token_for_sale_address: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                token_for_sale_token_id: tas.nat('42'),
+                                money_token_address: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                money_token_token_id: tas.nat('42'),
+                            },
+                        }, 
+                            value: tas.nat('42'),
+                        }]),
+                    },
+            });
+            const newContractResult = await newContractOrigination.contract();
+            const newContractAddress = newContractResult.address;
+            contract = await Tezos.contract.at<ContractType>(newContractAddress);
+            
     });
 
 
