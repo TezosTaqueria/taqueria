@@ -1,5 +1,6 @@
 
 import { TezosToolkit } from '@taquito/taquito';
+import { char2Bytes } from '@taquito/utils';
 import { tas } from '../types-file/type-aliases';
 import { ExampleContract6ContractType as ContractType } from '../types-file/example-contract-6.types';
 import { ExampleContract6Code as ContractCode } from '../types-file/example-contract-6.code';
@@ -31,7 +32,7 @@ describe('example-contract-6', () => {
                                 1: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
                                 2: tas.nat('42'),
                             }, 
-                                value: undefined,
+                                value: tas.unit(),
                             }]),
                             token_metadata: tas.bigMap([{ 
                                 key: tas.nat('42'), 

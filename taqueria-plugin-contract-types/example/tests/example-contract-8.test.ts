@@ -1,5 +1,6 @@
 
 import { TezosToolkit } from '@taquito/taquito';
+import { char2Bytes } from '@taquito/utils';
 import { tas } from '../types-file/type-aliases';
 import { ExampleContract8ContractType as ContractType } from '../types-file/example-contract-8.types';
 import { ExampleContract8Code as ContractCode } from '../types-file/example-contract-8.code';
@@ -15,17 +16,17 @@ describe('example-contract-8', () => {
                         entries: tas.bigMap([{ 
                             key: tas.nat('42'), 
                             value: (
-                            { waiting01: undefined }
-                            | { waiting02: undefined }
+                            { waiting01: tas.unit() }
+                            | { waiting02: tas.unit() }
                             | { p1: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456') }
                             | { p2: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456') }
                             | {
                                 finished: {
                                     bob: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
                                     result: (
-                                        { result1: undefined }
-                                        | { result2: undefined }
-                                        | { ok: undefined }
+                                        { result1: tas.unit() }
+                                        | { result2: tas.unit() }
+                                        | { ok: tas.unit() }
                                     ),
                                 }
                             }
@@ -121,9 +122,9 @@ describe('example-contract-8', () => {
         const acceptRequest = await contract.methodsObject.accept({
                 id: tas.nat('42'),
                 result: (
-                    { result1: undefined }
-                    | { result2: undefined }
-                    | { ok: undefined }
+                    { result1: tas.unit() }
+                    | { result2: tas.unit() }
+                    | { ok: tas.unit() }
                 ),
             }).send();
         await acceptRequest.confirmation(3);

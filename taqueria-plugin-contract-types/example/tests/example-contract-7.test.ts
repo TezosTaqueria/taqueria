@@ -1,5 +1,6 @@
 
 import { TezosToolkit } from '@taquito/taquito';
+import { char2Bytes } from '@taquito/utils';
 import { tas } from '../types-file/type-aliases';
 import { ExampleContract7ContractType as ContractType } from '../types-file/example-contract-7.types';
 import { ExampleContract7Code as ContractCode } from '../types-file/example-contract-7.code';
