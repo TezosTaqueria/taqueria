@@ -36,7 +36,7 @@ export {
 }
 
 export interface LikeAPromise<Success, TaqError> extends Promise<Success> {
-
+  // TODO: Consider moving this type to the protocol module, can also be re-used in VsX
 }
 
 export type PositiveInt = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15
