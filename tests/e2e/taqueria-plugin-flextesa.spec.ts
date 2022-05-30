@@ -37,8 +37,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
         expect(accounts.stdout).toContain("bob")
     });
 
-    // TODO: Come back to!
-    test.skip('Verify that taqueria flextesa plugin will return "Already running." if sandbox has started" if user tries to call start sandbox twice', async () => {
+    test('Verify that taqueria flextesa plugin will return "Already running." if sandbox has started" if user tries to call start sandbox twice', async () => {
         try {
             // 2.  Run start command second time and verify the output
             const sandboxStart = await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
