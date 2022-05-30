@@ -1,13 +1,53 @@
 
 import { TezosToolkit } from '@taquito/taquito';
 import { tas } from '../types-file/type-aliases';
-import { ExampleContract0ContractType as ContractType } from '../types-file/example-contract-1.types';
+import { ExampleContract1ContractType as ContractType } from '../types-file/example-contract-1.types';
+import { ExampleContract1Code as ContractCode } from '../types-file/example-contract-1.code';
 
 describe('example-contract-1', () => {
     const Tezos = new TezosToolkit('RPC_URL');
     let contract: ContractType = undefined as unknown as ContractType;
     beforeAll(async () => {
-            contract = await Tezos.contract.at<ContractType>('DEPLOYED_CONTRACT_ADDRESS');
+            
+            const newContractOrigination = await Tezos.contract.originate<ContractType>({
+                code: ContractCode.code,
+                storage: {
+                        pauseable_admin: {
+                            admin: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                            paused: true,
+                            pending_admin: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                        },
+                        current_id: tas.nat('42'),
+                        max_auction_time: tas.nat('42'),
+                        max_config_to_start_time: tas.nat('42'),
+                        auctions: tas.bigMap([{ 
+                            key: tas.nat('42'), 
+                            value: {
+                            seller: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                            current_bid: tas.mutez('42'),
+                            start_time: tas.timestamp(new Date()),
+                            last_bid_time: tas.timestamp(new Date()),
+                            round_time: tas.int('42'),
+                            extend_time: tas.int('42'),
+                            asset: [{
+                                fa2_address: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                fa2_batch: [{
+                                    token_id: tas.nat('42'),
+                                    amount: tas.nat('42'),
+                                }],
+                            }],
+                            min_raise_percent: tas.nat('42'),
+                            min_raise: tas.mutez('42'),
+                            end_time: tas.timestamp(new Date()),
+                            highest_bidder: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                        },
+                        }]),
+                    },
+            });
+            const newContractResult = await newContractOrigination.contract();
+            const newContractAddress = newContractResult.address;
+            contract = await Tezos.contract.at<ContractType>(newContractAddress);
+            
     });
 
 

@@ -2,12 +2,21 @@
 import { TezosToolkit } from '@taquito/taquito';
 import { tas } from '../types-file/type-aliases';
 import { ExampleContract0ContractType as ContractType } from '../types-file/example-contract-0.types';
+import { ExampleContract0Code as ContractCode } from '../types-file/example-contract-0.code';
 
 describe('example-contract-0', () => {
     const Tezos = new TezosToolkit('RPC_URL');
     let contract: ContractType = undefined as unknown as ContractType;
     beforeAll(async () => {
-            contract = await Tezos.contract.at<ContractType>('DEPLOYED_CONTRACT_ADDRESS');
+            
+            const newContractOrigination = await Tezos.contract.originate<ContractType>({
+                code: ContractCode.code,
+                storage: tas.int('42'),
+            });
+            const newContractResult = await newContractOrigination.contract();
+            const newContractAddress = newContractResult.address;
+            contract = await Tezos.contract.at<ContractType>(newContractAddress);
+            
     });
 
 

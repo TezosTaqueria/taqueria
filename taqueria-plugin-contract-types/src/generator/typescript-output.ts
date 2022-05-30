@@ -211,7 +211,7 @@ ${tabs(indent)}}])`;
     };
 
     const varToCode = (t: TypedVar, i: number, indent: number, numberVarNamePrefix = ''): string => {
-        return `${t.name ?? `${numberVarNamePrefix}${i}`}${t.type.optional ? `?` : ``}: ${typeToCode(t.type, indent)}`;
+        return `${t.name ?? `${numberVarNamePrefix}${i}`}${t.type.optional && options?.mode !== 'defaultValue' ? `?` : ``}: ${typeToCode(t.type, indent)}`;
     };
 
     const argsToCode = (args: TypedVar[], indent: number, asObject: boolean): string => {

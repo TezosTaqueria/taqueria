@@ -1,13 +1,48 @@
 
 import { TezosToolkit } from '@taquito/taquito';
 import { tas } from '../types-file/type-aliases';
-import { ExampleContract0ContractType as ContractType } from '../types-file/example-contract-8.types';
+import { ExampleContract8ContractType as ContractType } from '../types-file/example-contract-8.types';
+import { ExampleContract8Code as ContractCode } from '../types-file/example-contract-8.code';
 
 describe('example-contract-8', () => {
     const Tezos = new TezosToolkit('RPC_URL');
     let contract: ContractType = undefined as unknown as ContractType;
     beforeAll(async () => {
-            contract = await Tezos.contract.at<ContractType>('DEPLOYED_CONTRACT_ADDRESS');
+            
+            const newContractOrigination = await Tezos.contract.originate<ContractType>({
+                code: ContractCode.code,
+                storage: {
+                        entries: tas.bigMap([{ 
+                            key: tas.nat('42'), 
+                            value: (
+                            { waiting01: undefined }
+                            | { waiting02: undefined }
+                            | { p1: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456') }
+                            | { p2: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456') }
+                            | {
+                                finished: {
+                                    bob: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                                    result: (
+                                        { result1: undefined }
+                                        | { result2: undefined }
+                                        | { ok: undefined }
+                                    ),
+                                }
+                            }
+                            | { cancelled: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456') }
+                        ),
+                        }]),
+                        alice: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                        caleb: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                        dodge: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
+                        count: tas.nat('42'),
+                        free: true,
+                    },
+            });
+            const newContractResult = await newContractOrigination.contract();
+            const newContractAddress = newContractResult.address;
+            contract = await Tezos.contract.at<ContractType>(newContractAddress);
+            
     });
 
 
@@ -25,7 +60,7 @@ describe('example-contract-8', () => {
                 id: tas.nat('42'),
                 p1: tas.address('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456'),
                 fee: tas.mutez('42'),
-                otherFee?: tas.mutez('42'),
+                otherFee: tas.mutez('42'),
             }).send();
         await makeRequest.confirmation(3);
         
