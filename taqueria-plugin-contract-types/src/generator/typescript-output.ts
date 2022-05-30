@@ -197,7 +197,7 @@ ${tabs(indent)}}])`;
             )})`;
         }
         if (t.kind === `unit`) {
-            return `undefined`;
+            return `tas.unit()`;
         }
         if (t.kind === `never`) {
             return `never`;

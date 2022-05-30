@@ -21,6 +21,7 @@ export const toJest = async (contractName: string, contractSource: string, forma
 
     const jestCode = `
 import { TezosToolkit } from '@taquito/taquito';
+import { char2Bytes } from '@taquito/utils';
 import { tas } from '../types-file/type-aliases';
 import { ${contractTypeName}ContractType as ContractType } from '../types-file/${contractName}.types';
 import { ${contractTypeName}Code as ContractCode } from '../types-file/${contractName}.code';
