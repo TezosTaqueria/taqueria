@@ -45,7 +45,10 @@ import createType from "@taqueria/protocol/Base"
     plugin: z.string().min(1).optional(),
     env: z.union([z.literal('production'), z.literal('testing'), z.literal('development'), z.string().nonempty()]).default("development"),
     quickstart: z.string().min(1).optional(),
-    setBuild: z.string().min(3),
+    setBuild: z.preprocess(
+        val => String(val),
+        z.string().min(3)
+    ),
     setVersion: z.string().min(3),
     template: z.string().min(1).optional(),
     pluginName: z.string().min(1).optional()
