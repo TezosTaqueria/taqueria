@@ -133,4 +133,3 @@ const getSandboxProtocol = (parsedArgs: SanitizedArgs.t) => {
     const sandboxConfig = parsedArgs.config.sandbox[parsedArgs.sandbox] as SandboxConfig.t
     return sandboxConfig.protocol
 }
-  
