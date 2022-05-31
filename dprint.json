@@ -13,8 +13,10 @@
 		"**/node_modules",
 		"**/*-lock.json",
 		"./website",
-		"tests/e2e/data",
-		""
+		"taqueria-plugin-contract-types/example",
+		"taqueria-vscode-extension/src/test/suite/data",
+		"**/tests/**/data",
+		"tests/e2e/data"
 	],
 	"plugins": [
 		"https://plugins.dprint.dev/typescript-0.68.2.wasm",
