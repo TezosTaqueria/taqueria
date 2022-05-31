@@ -36,7 +36,7 @@ Person: {
 Both fields are of type Name.t.
 
 
-Name.t would have a rawSchema that parses input as a string, with a minimum length of 2, and match against a regex to ensure that the string begins with an uppercase letter, and that only alphabetical characters, hyphons, and spaces are allowed. The rawSchema is essentially parsing the input into a built-in type, a string in this case, and validating that the string represents the data expected.
+Name.t would have a rawSchema that parses input as a string, with a minimum length of 2, and match against a regex to ensure that the string begins with an uppercase letter, and that only alphabetical characters, hyphens, and spaces are allowed. The rawSchema is essentially parsing the input into a built-in type, a string in this case, and validating that the string represents the data expected.
 
 The internalSchema of the Name.t type would be the same as the rawSchema in this place, as the rawSchema is parsing the input into a scalar value and simple type, rather than a complex type, such as an object.
 
