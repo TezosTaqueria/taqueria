@@ -19,8 +19,6 @@ export type ErrorType =
   | "E_PARSE_UNKNOWN"
   | "E_INVALID_ARCH"
   | "E_NO_PROVISIONS"
-  | "E_PROXY"
-  | "E_TAQ_NOT_FOUND"
   
 export interface TaqError {
     readonly kind: ErrorType,

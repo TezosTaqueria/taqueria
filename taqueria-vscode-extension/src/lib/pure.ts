@@ -3,8 +3,8 @@ import {stat, readFile} from 'fs/promises'
 import {join} from 'path'
 import * as Config from '@taqueria/protocol/Config'
 import {i18n} from '@taqueria/protocol/i18n'
-import {TaqVsxError, E_TaqVsxError, TaqVsxCommandError} from './TaqVsxError'
-import {PersistentState} from '@taqueria/protocol/PersistentState'
+import {TaqVsxError} from './TaqVsxError'
+import {EphemeralState} from '@taqueria/protocol/EphemeralState'
 import {parse} from 'comment-json'
 
 
@@ -12,7 +12,8 @@ import {parse} from 'comment-json'
 // This module provides pure helper functions that do not use the VS Code API
 // All helper functions should utilize dependency injection
 /***********************************************************************/
-export type PromiseLike<L, R> = Promise<R>
+export interface LikeAPromise<Success, TaqError> extends Promise<Success> {
+}
 
 export type PathToTaq = string & {__kind__: 'PathToTaq'}
 
@@ -28,9 +29,9 @@ export class TaqifiedDir {
     [taqifiedDirType]: void
     readonly dir: PathToDir
     readonly config: Config.t
-    readonly state: PersistentState
+    readonly state: EphemeralState
     
-    protected constructor(dir: PathToDir, config: Config.t, state: PersistentState) {
+    protected constructor(dir: PathToDir, config: Config.t, state: EphemeralState) {
         this.dir = dir
         this.config = config
         this.state = state
@@ -40,9 +41,9 @@ export class TaqifiedDir {
      * Makes a TaqifiedDir from an existing directory
      * @param {PathToDir} dir 
      * @param {I18N} i18n 
-     * @returns {PromiseLike<E_NOT_TAQIFIED|E_STATE_MISSING, TaqifiedDir>}
+     * @returns {LikeAPromise<TaqifiedDir, E_NOT_TAQIFIED|E_STATE_MISSING>}
      */
-    static create(dir: PathToDir, i18n: i18n): PromiseLike<TaqVsxError, TaqifiedDir> {
+    static create(dir: PathToDir, i18n: i18n): LikeAPromise<TaqifiedDir, TaqVsxError> {
         return makeDir(join(dir, '.taq'), i18n)
         .then(dotTaqDir =>
             makeFile(join(dotTaqDir, 'config.json'), i18n)
@@ -57,7 +58,7 @@ export class TaqifiedDir {
             .then(config => 
                 makeFile(join(dotTaqDir, 'state.json'), i18n)
                 // TODO - validate state!
-                .then(pathToState => readJsonFile<PersistentState>(i18n, data => (data as PersistentState)) (pathToState))
+                .then(pathToState => readJsonFile<EphemeralState>(i18n, data => (data as EphemeralState)) (pathToState))
                 .then(state => new TaqifiedDir(dir, config, state))
                 .catch(previous => Promise.reject({
                     code: 'E_STATE_MISSING',
@@ -80,9 +81,9 @@ export class TaqifiedDir {
      * Makes a TaqifiedDir from a path to a directory
      * @param {string} inputDir 
      * @param {I18N} i18n 
-     * @returns {PromiseLike<E_NOT_TAQIFIED|E_STATE_MISSING, TaqifiedDir>}
+     * @returns {LikeAPromise<TaqifiedDir, E_NOT_TAQIFIED|E_STATE_MISSING>}
      */
-    static createFromString(inputDir: string, i18n: i18n) : PromiseLike<TaqVsxError, TaqifiedDir> {
+    static createFromString(inputDir: string, i18n: i18n) : LikeAPromise<TaqifiedDir, TaqVsxError> {
         return makeDir(inputDir, i18n)
         .then(dir => this.create(dir, i18n))
         .catch(previous => Promise.reject({
@@ -100,9 +101,9 @@ export class TaqifiedDir {
  * @todo Use i18n 
  * @param {string} pathToFile 
  * @param {I18N} _i18n 
- * @returns {PromiseLike<E_INVALID_FILE, PathToFile>}
+ * @returns {LikeAPromise<PathToFile, E_INVALID_FILE>}
  */
-export const makeFile = (pathToFile: string, _i18n: i18n): PromiseLike<TaqVsxError, PathToFile> =>
+export const makeFile = (pathToFile: string, _i18n: i18n): LikeAPromise<PathToFile, TaqVsxError> =>
     stat(pathToFile)
     .then(
         stat => stat.isFile()
@@ -118,9 +119,9 @@ export const makeFile = (pathToFile: string, _i18n: i18n): PromiseLike<TaqVsxErr
  * @todo Use i18n
  * @param {string} dirPath 
  * @param {I18N} _i18n 
- * @returns {PromiseLike<E_INVALID_DIR, PathToDir>}
+ * @returns {LikeAPromise<PathToDir, E_INVALID_DIR>}
  */
-export const makeDir = (dirPath: string, _i18n: i18n): PromiseLike<TaqVsxError, PathToDir> => 
+export const makeDir = (dirPath: string, _i18n: i18n): LikeAPromise<PathToDir, TaqVsxError> => 
     stat(dirPath)
     .then(
         result => result.isDirectory()
@@ -135,9 +136,9 @@ export const makeDir = (dirPath: string, _i18n: i18n): PromiseLike<TaqVsxError, 
  * Assures that the provided inputPath points to the taq binary
  * @param {string} inputPath 
  * @param {I18N} _i18n 
- * @returns {(inputPath:string) => PromiseLike<E_TAQ_NOT_FOUND, PathToTaq>}
+ * @returns {(inputPath:string) => LikeAPromise<PathToTaq, E_TAQ_NOT_FOUND>}
  */
-export const makePathToTaq = (i18n: i18n) => (inputPath: string) : PromiseLike<TaqVsxError, PathToTaq> =>
+export const makePathToTaq = (i18n: i18n) => (inputPath: string) : LikeAPromise<PathToTaq, TaqVsxError> =>
         stat(inputPath)
         .then(_ => proxyToTaq (inputPath as PathToTaq, i18n) ('testFromVsCode'))
         .then(
@@ -150,9 +151,9 @@ export const makePathToTaq = (i18n: i18n) => (inputPath: string) : PromiseLike<T
 /**
  * Executes a shell command
  * @param {string} cmd
- * @returns {PromiseLike<E_EXEC, string>}
+ * @returns {LikeAPromise<string, E_EXEC>}
  */        
-export const execCmd = (cmd: string): PromiseLike<TaqVsxError, string> => new Promise((resolve, reject) => {
+export const execCmd = (cmd: string): LikeAPromise<string, TaqVsxError> => new Promise((resolve, reject) => {
     if (isWindows()) reject({code: 'E_WINDOWS', msg: "Running in Windows without WSLv2 is currently not supported."})
     else exec(`sh -c "${cmd}"`, (previous, stdout, msg) => {
         log ("Executing command:") (cmd)
@@ -167,9 +168,9 @@ export const execCmd = (cmd: string): PromiseLike<TaqVsxError, string> => new Pr
  * @todo Use i18n 
  * @param {string} cmd 
  * @param {I18N} _i18n
- * @returns {(taskWithArgs: string) => PromiseLike<ProxyErr, string>}
+ * @returns {(taskWithArgs: string) => LikeAPromise<string, ProxyErr>}
  */
-export const proxyToTaq = (pathToTaq: PathToTaq, i18n: i18n, projectDir?: PathToDir) => (taskWithArgs: string): PromiseLike<TaqVsxCommandError, string> =>
+export const proxyToTaq = (pathToTaq: PathToTaq, i18n: i18n, projectDir?: PathToDir) => (taskWithArgs: string): LikeAPromise<string, TaqVsxError> =>
     (
         projectDir
             ? execCmd(`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`)
@@ -216,7 +217,7 @@ export const readJsonFile = <T>(_i18n: i18n, make: (data: Record<string, unknown
         }
     })
 
-export const decodeJson = <T>(data: string): PromiseLike<TaqVsxError, Json<T>> => {
+export const decodeJson = <T>(data: string): LikeAPromise<Json<T>, TaqVsxError> => {
     try {
         const json = parse(data)
         if (json) {
@@ -233,7 +234,7 @@ export const decodeJson = <T>(data: string): PromiseLike<TaqVsxError, Json<T>> =
 export const isWindows = () =>
     process.platform.includes('win') && !process.platform.includes('darwin')
 
-export const findTaqBinary = (i18n: i18n) : PromiseLike<TaqVsxError, string> =>
+export const findTaqBinary = (i18n: i18n) : LikeAPromise<string, TaqVsxError> =>
     execCmd('which taq')
     .then(path => path.trim())
     .catch(previous => Promise.reject({code: 'E_TAQ_NOT_FOUND', msg: "Could not find taq in your path.", previous}))
@@ -242,7 +243,7 @@ export const findTaqBinary = (i18n: i18n) : PromiseLike<TaqVsxError, string> =>
 
 export const makeState = (_i18n: i18n) => (input: Record<string, unknown>) => {
     // TODO: Validate input
-    return input as unknown as PersistentState
+    return input as unknown as EphemeralState
 }
 
 export const log = <T>(heading: string) => (input: T): T => {

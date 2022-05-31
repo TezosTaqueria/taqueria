@@ -1,6 +1,6 @@
 import * as Util from './pure'
 import loadI18n, {i18n} from '@taqueria/protocol/i18n'
-import {PersistentState} from '@taqueria/protocol/PersistentState'
+import {EphemeralState} from '@taqueria/protocol/EphemeralState'
 import { stat } from 'fs/promises';
 import { join } from 'path';
 import { path } from 'rambda';
@@ -162,7 +162,7 @@ export const inject = (deps: InjectedDependencies) => {
 		(projectDir: Util.PathToDir) => {
 			getTaqBinPath(i18n)
 			.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, projectDir) ('list-known-tasks'))
-			.then(data => Util.decodeJson<PersistentState>(data))
+			.then(data => Util.decodeJson<EphemeralState>(data))
 			.then(state => {
 				// const cmdId = taskNameToCmdId(taskName)
 				return state
@@ -196,38 +196,10 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const showError = (err: TaqVsxError) => {
 		Util.log ("Error:") (err)
-		switch (err.kind) {
-			case 'E_EXEC':
-				return vscode.window.showErrorMessage(err.msg, err.cmd)
-				.then(_ => Promise.resolve()) as Promise<void>
-			case 'E_INVALID_DIR':
-				return vscode.window.showErrorMessage(err.msg, err.pathProvided)
-				.then(_ => Promise.resolve()) as Promise<void>
-			case 'E_INVALID_FILE':
-				return vscode.window.showErrorMessage(err.msg, err.pathProvided)
-				.then(_ => Promise.resolve()) as Promise<void>
-			case 'E_INVALID_JSON':
-				return vscode.window.showErrorMessage(err.msg, err.data)
-				.then(_ => Promise.resolve()) as Promise<void>
-			case 'E_NOT_TAQIFIED':
-				return vscode.window.showErrorMessage(err.msg, err.pathProvided)
-				.then(_ => Promise.resolve()) as Promise<void>
-			case 'E_PROXY':
-				return (err.cmd
-					? vscode.window.showErrorMessage(err.msg, err.cmd)
-					: vscode.window.showErrorMessage(err.msg)
-				)
-				.then(_ => Promise.resolve()) as Promise<void>
-			case 'E_STATE_MISSING':
-				return vscode.window.showErrorMessage(err.msg, err.taqifiedDir)
-				.then(_ => Promise.resolve()) as Promise<void>
-			case 'E_TAQ_NOT_FOUND':
-				return (err.pathProvided ? vscode.window.showErrorMessage(err.msg, err.pathProvided) : vscode.window.showErrorMessage(err.msg)) 
-				.then(_ => Promise.resolve()) as Promise<void>
-			default:
-				return vscode.window.showErrorMessage(err.msg)
-				.then(_ => Promise.resolve()) as Promise<void>
-		}
+		return (err.context
+			? vscode.window.showErrorMessage(err.msg, err.context)
+			: vscode.window.showErrorMessage(err.msg))
+		.then(_ => Promise.resolve()) as Promise<void>
 	}
 	
 	const notify = (msg: string) => 
