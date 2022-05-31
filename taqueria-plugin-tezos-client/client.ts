@@ -184,7 +184,10 @@ const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfi
     let sourcePath: string = getInputFilenameFromArtifactsDir(opts, sourceFile)
     sourcePath = await execCmd(getCheckFileExistenceCommand(sandboxName, sandbox, sourcePath, opts))
                        .then(() => sourcePath)
-                       .catch(() => getInputFilenameFromContractDir(opts, sourceFile))
+                       .catch((err) => {
+                           if (opts.debug) sendErr(err)
+                           return getInputFilenameFromContractDir(opts, sourceFile)
+                       })
 
     const simulateContractHelper = () => {
         try {
@@ -219,6 +222,7 @@ const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfi
     .then(simulateContractHelper)
     .catch(err => {
         sendErr(" ")
+        if (opts.debug) sendErr(err)
         sendErr(sourceFile + ": Does not exist\n")
         return Promise.resolve({
             contract: sourceFile,

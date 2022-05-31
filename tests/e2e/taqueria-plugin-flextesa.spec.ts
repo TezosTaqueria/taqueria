@@ -27,12 +27,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
         await exec(`taq start sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
     })
 
-    // TODO: Skip for now. 
-    //
-    // This test works fine when run on its own (using test.only) but fails
-    // when running along with the other tests.
-    // See issue https://github.com/ecadlabs/taqueria/issues/737
-    test.skip('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
+    test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
         const accounts = await exec(`taq list accounts ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
         expect(accounts.stdout).toContain("bob")
     });
@@ -56,6 +51,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
             // 2. Run taq typecheck
             const {stdout, stderr} = await exec(`taq typecheck`, {cwd: `./${taqueriaProjectPath}`});
+            if (stderr) console.log(stderr)
 
             // 3. Verify that it's well-typed and contains no errors
             expect(stdout).toBe(contents.oneRowTable);
@@ -73,6 +69,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
             // 2. Run taq typecheck hello-tacos.tz
             const {stdout, stderr} = await exec(`taq typecheck hello-tacos.tz`, {cwd: `./${taqueriaProjectPath}`});
+            if (stderr) console.log(stderr)
 
             // 3. Verify that it's well-typed and contains no errors
             expect(stdout).toBe(contents.oneRowTable);
@@ -91,6 +88,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
             // 2. Run taq typecheck
             const {stdout, stderr} = await exec(`taq typecheck`, {cwd: `./${taqueriaProjectPath}`});
+            if (stderr) console.log(stderr)
 
             // 3. Verify that both are well-typed and contain no errors
             expect(stdout).toBe(contents.twoRowTable);
@@ -110,6 +108,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
             // 2. Run taq typecheck hello-tacos-one.tz hello-tacos-two.tz
             const {stdout, stderr} = await exec(`taq typecheck hello-tacos-one.tz hello-tacos-two.tz`, {cwd: `./${taqueriaProjectPath}`});
+            if (stderr) console.log(stderr)
 
             // 3. Verify that both are well-typed and contain no errors
             expect(stdout).toBe(contents.twoRowTable);
@@ -141,6 +140,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
             // 2. Run taq typecheck hello-tacos-ill-typed.tz
             const {stdout, stderr} = await exec(`taq typecheck hello-tacos-ill-typed.tz`, {cwd: `./${taqueriaProjectPath}`})
+            if (stderr) console.log(stderr)
 
             // 3. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.typeError)
@@ -157,6 +157,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
         // 2. Run taq simulate hello-tacos.tz
         const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '2' --storage '5'`, {cwd: `./${taqueriaProjectPath}`});
+        if (stderr) console.log(stderr)
 
         // 3. Verify that it's valid and contains no errors
         expect(stdout).toBe(contents.oneRowTableSimulateResult);
@@ -167,6 +168,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
         try {
             // 1. Run taq simulate ${contractName} for contract that does not exist
             const {stdout, stderr} = await exec(`taq simulate test.tz '2' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
+            if (stderr) console.log(stderr)
 
             // 2. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.nonExistent)
@@ -184,6 +186,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '10' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
+            if (stderr) console.log(stderr)
 
             // 3. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.runtimeError)
@@ -201,6 +204,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '"hi"' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
+            if (stderr) console.log(stderr)
 
             // 3. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.runtimeError)
@@ -218,6 +222,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '{1;2;3}' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
+            if (stderr) console.log(stderr)
 
             // 3. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.runtimeError)
@@ -235,6 +240,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
             // 2. Run taq simulate hello-tacos.tz
             const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '{ Elt "bar" True ; Elt "foo" False }' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
+            if (stderr) console.log(stderr)
 
             // 3. Verify that output includes a table and an error message
             expect(stdout).toBe(contents.runtimeError)
@@ -251,6 +257,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
         // 2. Run taq simulate hello-tacos.tz
         const {stdout, stderr} = await exec(`taq simulate hello-tacos.tz '2' --storage 'hello'`, {cwd: `./${taqueriaProjectPath}`})
+        if (stderr) console.log(stderr)
 
         // 3. Verify that output includes a table and an error message
         expect(stdout).toBe(contents.runtimeError)
@@ -263,6 +270,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
         // 2. Run taq simulate
         const {stdout, stderr} = await exec(`taq simulate byteSlice.tz '0x12a47ef2' --storage '0x00'`, {cwd: `./${taqueriaProjectPath}`})
+        if (stderr) console.log(stderr)
 
         expect(stdout).toContain('0xa47ef2')
         expect(stderr).toBe('');
@@ -274,6 +282,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
         // 2. Run taq simulate
         const {stdout, stderr} = await exec(`taq simulate increment.tz 'Left (Right 3)' --storage '5'`, {cwd: `./${taqueriaProjectPath}`})
+        if (stderr) console.log(stderr)
 
         expect(stdout).toContain('8')
         expect(stderr).toBe('');
@@ -285,6 +294,7 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
         // 2. Run taq simulate
         const {stdout, stderr} = await exec(`taq simulate increment.tz '3' --storage '5' --entrypoint increment`, {cwd: `./${taqueriaProjectPath}`})
+        if (stderr) console.log(stderr)
 
         expect(stdout).toContain('8')
         expect(stderr).toBe('');
@@ -308,22 +318,11 @@ describe("E2E Testing for taqueria typechecker and simulator tasks of the tezos-
     // Comment if need to debug
     afterAll( async () => {
         try {
-            // TODO: See issue https://github.com/ecadlabs/taqueria/issues/737
-            //
-            // Disabling this for now.
-            // let dockerContainer = await getContainerName(dockerName);
-            // if(dockerContainer !== ""){
-            //     await exec(`docker stop ${dockerName}`);
-            // }
+            await exec(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
+        } catch {
 
-            // const dockerListStdout = await exec("docker ps")
-            // if(dockerListStdout.stdout.includes(dockerName)){
-            //     throw new Error("Container was not stopped properly");
-            // }
-            await fsPromises.rm(taqueriaProjectPath, { recursive: true })
-        } catch(error){
-            throw new Error (`error: ${error}`);
         }
+        await fsPromises.rm(taqueriaProjectPath, { recursive: true })
     })
 
 })
@@ -333,9 +332,7 @@ describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops", () => 
         await generateTestProject(taqueriaProjectPath, ["flextesa"]);
     })
 
-    // TODO - disabling for now
-    // See issue https://github.com/ecadlabs/taqueria/issues/737
-    test.skip('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
+    test('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
         try {
 
             // Setting up docker container name
@@ -345,11 +342,11 @@ describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops", () => 
             const sandboxStart = await exec(`taq start sandbox`, {cwd: `./${taqueriaProjectPath}`})
 
             // 2. Verify that sandbox has been started and taqueria returns proper message into console
-            expect(sandboxStart.stdout).toEqual("Started local.\nDone.\n");
+            expect(sandboxStart.stdout).toContain("Started local.\nDone.\n");
 
             // 3. Verify that docker container has been started
             const dockerContainerTest = await getContainerName(dockerName);
-            expect(dockerContainerTest).toContain("node index.js --sandbox local")
+            expect(dockerContainerTest).toContain("node index.js --sandbox")
 
             // 5.  Run stop command and verify the output
             const sandboxStop = await exec(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
@@ -364,9 +361,7 @@ describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops", () => 
         }
     });
 
-    // TODO - disabling for now
-    // See issue https://github.com/ecadlabs/taqueria/issues/737
-    test.skip('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
+    test('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
         try {
 
             // Setting up docker container name
@@ -395,9 +390,7 @@ describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops", () => 
 
     });
 
-    // TODO - disabling for now
-    // See issue https://github.com/ecadlabs/taqueria/issues/737
-    test.skip('Verify that taqueria flextesa plugin will return "The local sandbox was not running." if user tries to call stop on sandbox that is not running', async () => {
+    test('Verify that taqueria flextesa plugin will return "The local sandbox was not running." if user tries to call stop on sandbox that is not running', async () => {
         try {
             // 1. Run stop sandbox local on sandbox that is not running and verify result
             const sandboxWasNotRunning = await exec("taq stop sandbox local", {cwd: `./${taqueriaProjectPath}`})
@@ -453,19 +446,9 @@ describe("E2E Testing for taqueria flextesa plugin sandbox starts/stops", () => 
 
     // Clean up process to stop container if it was not stopped properly during the test
     afterEach(async () => {
-        // try {
-        //     const dockerContainer = await getContainerName(dockerName);
-        //     if(dockerContainer !== ""){
-        //         await exec(`docker stop ${dockerName}`);
-        //     }
-
-        //     const dockerListStdout = await exec("docker ps")
-        //     if(dockerListStdout.stdout.includes(dockerName)){
-        //         throw new Error("Container was not stopped properly");
-        //     }
-        // } catch(error){
-        //     throw new Error (`error: ${error}`);
-        // }
+        try {
+            await exec(`taq stop sandbox ${dockerName}`, {cwd: `./${taqueriaProjectPath}`})
+        } catch {}
     });
 
     // Clean up process to remove taquified project folder
