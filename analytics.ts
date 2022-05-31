@@ -11,10 +11,10 @@ const {
     stderr: Deno.stderr
 })
 
-const consentFilePath = Deno.env.get("HOME") + "/.taq-consent.txt"
+export const consentFilePath = Deno.env.get("HOME") + "/.taq-consent.txt"
 const consentPrompt = "Do you consent being tracked? [y/yes] or [n/no]"
-const OPT_IN = "opt_in"
-const OPT_OUT = "opt_out"
+export const OPT_IN = "opt_in"
+export const OPT_OUT = "opt_out"
 
 const promptForConsent = async () => {
     const input = prompt(consentPrompt);

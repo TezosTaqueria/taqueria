@@ -19,7 +19,7 @@ import { uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
-import { sendEvent } from './analytics.ts';
+import { consentFilePath, OPT_IN, OPT_OUT, sendEvent } from './analytics.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -98,6 +98,122 @@ const getVersion = (inputArgs: DenoArgs, _i18n: i18n.t) => {
 		? inputArgs[i + 1]
 		: 'not-provided';
 };
+
+const optInAnalytics = () => writeTextFile(consentFilePath)(OPT_IN);
+
+const optOutAnalytics = () => writeTextFile(consentFilePath)(OPT_OUT);
+
+const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
+	yargs(args)
+		.scriptName('taq')
+		.option('setVersion', {
+			describe: i18n.__('setVersionDesc'),
+			demandOption: true,
+			requiresArg: true,
+			type: 'string',
+		})
+		.hide('setVersion')
+		.version(getVersion(args, i18n))
+		.option('disableState', {
+			describe: i18n.__('disableStateDesc'),
+			default: getFromEnv('TAQ_DISABLE_STATE', false, env),
+			boolean: true,
+		})
+		.hide('disableState')
+		.option('logPluginRequests', {
+			describe: i18n.__('logPluginCallsDesc'),
+			default: false,
+			boolean: true,
+		})
+		.hide('logPluginRequests')
+		.option('setBuild', {
+			describe: i18n.__('buildDesc'),
+			demandOption: true,
+			requiresArg: true,
+			type: 'string',
+		})
+		.hide('setBuild')
+		.option('build', {
+			describe: i18n.__('buildDesc'),
+			type: 'boolean',
+		})
+		.option('maxConcurrency', {
+			describe: i18n.__('maxConcurrencyDesc'),
+			default: getFromEnv('TAQ_MAX_CONCURRENCY', getDefaultMaxConcurrency(), env),
+		})
+		.hide('maxConcurrency')
+		.option('debug', {
+			alias: 'd',
+			describe: i18n.__('Enable internal debugging'),
+			default: false,
+		})
+		.boolean('debug')
+		.hide('debug')
+		.option('quickstart')
+		.hide('quickstart')
+		.option('p', {
+			alias: 'projectDir',
+			default: './',
+			describe: i18n.__('initPathDesc'),
+		})
+		.hide('projectDir')
+		.option('env', {
+			alias: 'e',
+			describe: i18n.__('envDesc'),
+		})
+		.epilogue(i18n.__('betaWarning'))
+		.command(
+			'init [projectDir]',
+			i18n.__('initDesc'),
+			(yargs: Arguments) => {
+				yargs.positional('projectDir', {
+					describe: i18n.__('initPathDesc'),
+					type: 'string',
+					default: getFromEnv('TAQ_PROJECT_DIR', '.', env),
+				});
+			},
+			(args: Record<string, unknown>) =>
+				pipe(
+					SanitizedArgs.of(args),
+					chain(({ projectDir, maxConcurrency, quickstart }: SanitizedArgs.t) => {
+						return initProject(projectDir, quickstart, maxConcurrency, i18n);
+					}),
+					forkCatch(console.error)(console.error)(console.log),
+				),
+		)
+		.command(
+			'optin',
+			i18n.__('optInDesc'),
+			() => {},
+			() =>
+				pipe(
+					optInAnalytics(),
+					forkCatch(console.error)(console.error)(console.log),
+				),
+		)
+		.command(
+			'optout',
+			i18n.__('optOutDesc'),
+			() => {},
+			() =>
+				pipe(
+					optOutAnalytics(),
+					forkCatch(console.error)(console.error)(console.log),
+				),
+		)
+		.option('fromVsCode', {
+			describe: i18n.__('fromVsCodeDesc'),
+			default: false,
+			boolean: true,
+		})
+		.hide('fromVsCode')
+		.command(
+			'testFromVsCode',
+			false,
+			() => {},
+			() => log('OK'),
+		)
+		.help(false);
 
 const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 	yargs(args)
@@ -744,6 +860,8 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 		'listKnownTasks',
 		'provision',
 		'plan',
+		'optin',
+		'optout',
 	].reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,
