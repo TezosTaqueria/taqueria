@@ -18,13 +18,18 @@ type Input = z.infer<typeof internalSchema>
 
 type RawInput = z.infer<typeof rawSchema>
 
-export const {schemas, factory} = createType<RawInput, Input>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,
     internalSchema,
     parseErrMsg: "The sandbox account configuration is invalid",
     unknownErrMsg: "Something went wrong trying to parse the sandbox account configuration"
 })
 
-export type SandboxAccountConfig = z.infer<typeof schemas.schema>
+export type SandboxAccountConfig = z.infer<typeof generatedSchemas.schema>
 export type t = SandboxAccountConfig
 export const {create, of, make} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as SandboxAccountConfig)
+}

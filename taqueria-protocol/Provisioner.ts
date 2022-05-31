@@ -44,13 +44,18 @@ export const internalSchema = rawSchema.extend({
 type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
-export const {schemas, factory} = createType<RawInput, Input>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,
     internalSchema,
     parseErrMsg: "There was a problem trying to parse the provisioner",
     unknownErrMsg: "Something went wrong trying to parse the provisioner"
 })
 
-export type Provisioner = z.infer<typeof schemas.schema>
+export type Provisioner = z.infer<typeof generatedSchemas.schema>
 export type t = Provisioner
 export const {create, of, make} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as unknown as Provisioner)
+}

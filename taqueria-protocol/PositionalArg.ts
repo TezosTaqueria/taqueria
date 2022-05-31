@@ -31,14 +31,19 @@ const internalSchema = z.object({
 type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
-export const {schemas, factory} = createType<RawInput, Input>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,
     internalSchema,
     parseErrMsg: (value: unknown) => `The following positional argument is invalid: ${value}`,
     unknownErrMsg: "Something went wrong parsing the positional argument"
 })
 
-export type PositionalArg = z.infer<typeof schemas.schema>
+export type PositionalArg = z.infer<typeof generatedSchemas.schema>
 export type t = PositionalArg
 
 export const {create, of, make} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as unknown as PositionalArg)
+}

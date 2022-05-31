@@ -16,6 +16,7 @@ import * as NPM from './npm.ts'
 import inject from './plugins.ts'
 import { match, __ } from 'https://esm.sh/ts-pattern@3.3.5';
 import {addNewProvision, loadProvisions, plan, apply} from "./provisions.ts"
+import {addTask} from "./persistent-state.ts"
 
 // Get utils
 const {
@@ -233,8 +234,8 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
         false, // hide
         () => {},
         (inputArgs: Record<string, unknown>) => pipe(
-            SanitizedArgs.create(inputArgs),
-            listKnownTasks,
+            SanitizedArgs.of(inputArgs),
+            chain(listKnownTasks),
             forkCatch (displayError(cliConfig)) (displayError(cliConfig)) (log)
         )
     )
@@ -292,8 +293,8 @@ const listKnownTasks = (parsedArgs: SanitizedArgs.t) => pipe(
 
 const mkInitialDirectories = (projectDir: SanitizedAbsPath.t, maxConcurrency: number, i18n: i18n.t) => pipe(
     getConfig(projectDir, i18n, true),
-    chain (({artifactsDir, contractsDir, testsDir, projectDir}: LoadedConfig.t) => {
-        const jobs = [artifactsDir, contractsDir, testsDir].reduce(
+    chain (({artifactsDir, contractsDir, projectDir}: LoadedConfig.t) => {
+        const jobs = [artifactsDir, contractsDir].reduce(
             (retval, abspath) => abspath ? [...retval, mkdir(joinPaths(projectDir, abspath))] : retval,
             [] as Future<TaqError.TaqError, string>[]
         )
@@ -307,6 +308,7 @@ const initProject = (projectDir: SanitizedAbsPath.t, quickstart: string|undefine
         ? writeTextFile (joinPaths(projectDir, "quickstart.md")) (quickstart)
         : resolve(projectDir)
     ),
+    chain(_ => exec("npm init -y 2>&1 > /dev/null", {}, false, projectDir)),
     map (_ => i18n.__("bootstrapMsg"))
 )
 
@@ -314,7 +316,7 @@ const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, max
     const abspath = await eager (SanitizedAbsPath.make(scaffoldProjectDir))
     const destDir = await eager (doesPathNotExist(abspath))
     
-    log(`scaffolding\n into: ${destDir}\n from: ${scaffoldUrl}`)    
+    log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`)    
     await eager (gitClone (scaffoldUrl) (destDir))
 
     // TODO: Remove after 620-operations is merged in both the
@@ -323,11 +325,12 @@ const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, max
     // See issue: https://github.com/ecadlabs/taqueria/issues/736
     await eager (exec("git checkout 620-operations", {}, true, destDir))
 
-    log("Cleanup...")
+    log("\n Initializing Project...")
+    
     const scaffoldConfig = await eager (SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`))
+    log("    ✓ Cleanup scaffold config")
+
     const gitDir = await eager (SanitizedAbsPath.make(`${destDir}/.git`))
-    // const _gitIgnore = await eager (SanitizedAbsPath.make(`${destDir}/.gitignore`))
-    // await eager (rm(gitIgnore))
     
     // Remove the scaffold.json file, if not exists
     // If it doesn't exist, don't throw...
@@ -341,11 +344,17 @@ const scaffoldProject = (i18n: i18n.t) => ({scaffoldUrl, scaffoldProjectDir, max
     }
     
     await eager (rm(gitDir))
+    log("    ✓ Remove Git directory")
 
-    log("Installing plugins...")
-    await eager (exec("npm install", {}, false, destDir))
+    await eager (exec("npm install 2>&1 > /dev/null", {}, false, destDir))
+    log("    ✓ Install plugins")
 
-    return i18n.__("scaffoldDoneMsg")
+    await eager (exec("taq init 2>&1 > /dev/null", {}, false, destDir))
+    log("    ✓ Project Taq'ified \n")
+
+    return("🌮 Project created successfully 🌮")
+    
+    //return i18n.__("scaffoldDoneMsg")
 })
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) => state.plugins.reduce(
@@ -415,7 +424,7 @@ const getPluginOption = (task: Task.t) => {
 }
 
 
-const addTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib) => 
+const exposeTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib) => 
     Object.entries(state.tasks).reduce(
         (retval: CLIConfig, pair: [string, InstalledPlugin.t|Task.t]) => {
             const [taskName, implementation] = pair
@@ -436,11 +445,12 @@ const addTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, pa
                 if (parsedArgs.plugin && getPluginOption(task)?.choices?.includes(parsedArgs.plugin)) {
                     const canonicalTask = getCanonicalTask(parsedArgs.plugin, taskName, state)
                     return canonicalTask
-                        ? addTask(
+                        ? exposeTask(
                             retval,
                             config,
                             env,
                             parsedArgs,
+                            state,
                             i18n,
                             canonicalTask,
                             pluginLib.sendPluginActionRequest,
@@ -450,17 +460,17 @@ const addTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, pa
                 }
 
                 // No plugin provider was specified (path #1)
-                return addTask(retval, config, env, parsedArgs, i18n, task, pluginLib.sendPluginActionRequest)
+                return exposeTask(retval, config, env, parsedArgs, state, i18n, task, pluginLib.sendPluginActionRequest)
             }
 
             // Canonical task...
             const foundTask = getCanonicalTask(implementation.name, taskName, state)
-            return foundTask ? addTask(retval, config, env, parsedArgs, i18n, foundTask, pluginLib.sendPluginActionRequest, implementation) : retval
+            return foundTask ? exposeTask(retval, config, env, parsedArgs, state, i18n, foundTask, pluginLib.sendPluginActionRequest, implementation) : retval
         },
         cliConfig
     )
 
-const addTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, parsedArgs: SanitizedArgs.t, _i18n: i18n.t, task: Task.t, sendPluginActionRequest: SendPluginActionRequest, plugin?: InstalledPlugin.t) => pipe(
+const exposeTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, parsedArgs: SanitizedArgs.t, state: EphemeralState.t, _i18n: i18n.t, task: Task.t, sendPluginActionRequest: SendPluginActionRequest, plugin?: InstalledPlugin.t) => pipe(
     cliConfig.command({
         command: task.command,
         aliases: task.aliases,
@@ -506,6 +516,7 @@ const addTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, p
             const handler = task.handler === 'proxy' && plugin
                 ? pipe(
                     sendPluginActionRequest (plugin) (task) ({...inputArgs, task: task.task}),
+                    chain (addTask(parsedArgs, task.task, plugin.name)),
                     map (res => {
                         const decoded = res as PluginJsonResponse | void
                         if (decoded) return renderPluginJsonRes(decoded)
@@ -526,7 +537,7 @@ const addTask = (cliConfig: CLIConfig, _config: LoadedConfig.t, _env: EnvVars, p
 )
 
 const loadEphermeralState = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t, state: EphemeralState.t, pluginLib: PluginLib): CLIConfig =>
-[addTasks, /* addOperations, addTemplates*/].reduce(
+[exposeTasks /* addOperations, addTemplates*/].reduce(
     (cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
     cliConfig
 )
@@ -612,7 +623,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) => (
             cliConfig.help()
         ),
         chain (parseArgs),
-        map (inputArgs => SanitizedArgs.create(inputArgs)),
+        chain (inputArgs => SanitizedArgs.of(inputArgs)),
         map (showInvalidTask(cliConfig))
 )
 

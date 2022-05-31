@@ -32,28 +32,33 @@ const internalSchema = sanitizedArgsSchema.extend({
 type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
-export const {schemas, factory} = createType<RawInput, Input>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,
     internalSchema,
     parseErrMsg: "The request is invalid",
     unknownErrMsg: "Something went wrong trying to parse the request"
 })
 
-export type RequestArgs = z.infer<typeof schemas.schema>
+export type RequestArgs = z.infer<typeof generatedSchemas.schema>
 export type t = RequestArgs
 
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as RequestArgs)
+}
+
 const rawProxySchema = rawSchema.extend({
-    task: z.string().nonempty()
+    task: z.string().min(1)
 }).describe("ProxyRequestArgs").passthrough()
 
 const internalProxySchema = internalSchema.extend({
-    task: z.string().nonempty()
+    task: z.string().min(1)
 }).describe("ProxyRequestArgs").passthrough()
 
 type RawProxyInput = z.infer<typeof rawProxySchema>
 type ProxyInput = z.infer<typeof internalProxySchema>
 
-const proxy = createType<RawProxyInput, ProxyInput>({
+export const proxy = createType<RawProxyInput, ProxyInput>({
     rawSchema: rawProxySchema,
     internalSchema: internalProxySchema,
     parseErrMsg: "The request is invalid",
@@ -65,7 +70,7 @@ export const proxyFactory = proxy.factory
 
 export type ProxyRequestArgs = z.infer<typeof proxySchemas.schema>
 
-export const createProxyRequestArgs = proxyFactory.create
+export const createProxyRequestArgs = proxyFactory.from
 export const makeProxyRequestArgs = proxyFactory.make
 export const ofProxyRequestArgs = proxyFactory.of
-export const {create, of, make} = factory
+export const {create, make, of, from} = factory

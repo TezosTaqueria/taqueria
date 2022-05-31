@@ -15,14 +15,19 @@ export const rawSchema = Operation
 type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
-export const {schemas, factory} = createType<RawInput, Input>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,
     internalSchema,
     parseErrMsg: (value: unknown) => `Could not parse the following operation: ${value}`,
     unknownErrMsg: "Something went wrong trying to parse an operation"
 })
 
-export type ParsedOperation = z.infer<typeof schemas.schema>
+export type ParsedOperation = z.infer<typeof generatedSchemas.schema>
 export type t = ParsedOperation
 
 export const {create, make, of} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as ParsedOperation)
+}

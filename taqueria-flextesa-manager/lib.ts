@@ -6,8 +6,6 @@ import yargs, { parse } from 'yargs'
 import {exec} from 'child_process'
 import {execa} from 'execa'
 
-// @ts-ignore - partial.lenses doesn't have corresponding @types
-import * as L from 'partial.lenses'
 import { Config, SandboxAccountConfig} from '@taqueria/protocol/taqueria-protocol-types'
 
 type Args = ReturnType<typeof yargs> & {config: string, configure: boolean, importAccounts: boolean, sandbox: string}

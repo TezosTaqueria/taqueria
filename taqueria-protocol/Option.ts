@@ -38,14 +38,19 @@ export const rawSchema = z.object({
 type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
-export const {schemas, factory} = createType<RawInput, Input>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,
     internalSchema,
     parseErrMsg: (value: unknown) => `The following option is invalid: ${value}`,
     unknownErrMsg: "Something went wrong trying to parse the option"
 })
 
-export type Option = Flatten<z.infer<typeof schemas.schema>>
+export type Option = Flatten<z.infer<typeof generatedSchemas.schema>>
 export type t = Option
 
 export const {make, create, of} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as Option)
+}

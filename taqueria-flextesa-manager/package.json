@@ -29,7 +29,6 @@
   "dependencies": {
     "@taqueria/node-sdk": "^0.4.1",
     "execa": "^6.1.0",
-    "partial.lenses": "^14.17.0",
     "promise-retry": "^2.0.1",
     "yargs": "^17.3.1",
     "zod": "^3.17.3"

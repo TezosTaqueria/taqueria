@@ -28,7 +28,6 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
         expect(taqContents.stdout).toContain('node_modules')
         expect(taqContents.stdout).toContain('contracts')
         expect(taqContents.stdout).toContain('artifacts')
-        expect(taqContents.stdout).toContain('tests')
     })
     test('Verify that scaffold project can build taqueria', async () => {
         await exec(`cd ${scaffoldDirName} && npm run build:taqueria`)

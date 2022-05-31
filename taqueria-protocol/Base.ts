@@ -28,11 +28,11 @@ export const createSchema = <I>(params: CreateSchemaParams) => {
     const schema = isStringLike
         ? internalSchema
             .transform((val: unknown) => transformer(val) as I & {
-                readonly __kind: "generated" & typeof internalSchema
+                readonly __kind: "generated" & z.infer<typeof internalSchema>
             })
         : internalSchema
             .transform((val: unknown) => transformer(val) as Flatten<I & {
-                readonly __kind: "generated" & typeof internalSchema
+                readonly __kind: "generated" & z.infer<typeof internalSchema>
             }>)
 
     type GeneratedSchema = typeof schema         
@@ -58,7 +58,7 @@ export const createType = <R, I>(params: CreateTypeParams) => {
 
     type T = z.infer<typeof schemas.schema>
 
-    const of = (input: R | I | unknown) => {
+    const internalOf = (input: unknown) => {
         try {
             return resolve<T>(schemas.schema.parse(input))
         }
@@ -77,15 +77,19 @@ export const createType = <R, I>(params: CreateTypeParams) => {
             return toFutureParseUnknownErr<T>(previous, unknownMsg, input)
         }
     }
+    const of = internalOf
 
-    const make = (input: I) => of(input)
+    const make = (input: I) => internalOf(input)
 
-    const create = (input: R | I | unknown) => schemas.schema.parse(input) as T
+    const create = (input: R | I) => schemas.schema.parse(input) as T
+
+    const from = (input: unknown) => schemas.schema.parse(input) as T
 
     const factory = {
         make,
         of,
-        create
+        create,
+        from
     }
 
     return {

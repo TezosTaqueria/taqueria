@@ -65,7 +65,11 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
             // If initial storage was provided for the contract
             // then we submitted an operation to originate that contract
             if (contract.storage) {
-                const result = results.pop() as OperationContentsAndResultOrigination
+
+                // WARNING - using side effect here.
+                // For each iteration of reduce, results array is being modified-in-place.
+                // TODO: Adjust to use recursion to avoid side-effect.
+                const result = results.shift() as OperationContentsAndResultOrigination
                 const address = result && result.metadata.operation_result.originated_contracts
                     ? result.metadata.operation_result.originated_contracts.join(',')
                     : 'Error'
