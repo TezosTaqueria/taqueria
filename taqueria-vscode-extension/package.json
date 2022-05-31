@@ -1,168 +1,168 @@
 {
-  "name": "taqueria-vscode",
-  "displayName": "taqueria",
-  "description": "A vscode plugin to make Tezos development easier with Taqueria!",
-  "publisher": "ecadlabs",
-  "version": "0.3.1",
-  "engines": {
-    "vscode": "^1.63.0"
-  },
-  "targets": {
-    "default": {
-      "source": "./src/extension.ts",
-      "distDir": "./out",
-      "context": "node",
-      "engines": {
-        "node": ">= 16"
-      },
-      "includeNodeModules": {
-        "vscode": false
-      }
-    },
-    "test": {
-      "source": [
-        "./src/test/runTest.ts",
-        "./src/test/suite/index.ts",
-        "./src/test/suite/extension.test.ts"
-      ],
-      "distDir": "./out/test",
-      "context": "node",
-      "engines": {
-        "node": ">= 12"
-      },
-      "includeNodeModules": {
-        "vscode": false
-      }
-    }
-  },
-  "author": "ECAD Labs",
-  "license": "Apache-2.0",
-  "icon": "images/taqueria-icon.png",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ecadlabs/taqueria.git"
-  },
-  "bugs": {
-    "url": "https://github.com/ecadlabs/taqueria/issues"
-  },
-  "homepage": "https://github.com/ecadlabs/taqueria#readme",
-  "keywords": [
-    "taqueria",
-    "tezos",
-    "build",
-    "test",
-    "deploy",
-    "ecad",
-    "ecadlabs"
-  ],
-  "activationEvents": [
-    "onCommand:taqueria.init",
-    "onCommand:taqueria.install",
-    "onCommand:taqueria.compile_smartpy",
-    "onCommand:taqueria.compile_ligo",
-    "onCommand:taqueria.start_sandbox",
-    "onCommand:taqueria.stop_sandbox",
-    "onCommand:taqueria.list_accounts",
-    "onCommand:taqueria.deploy"
-  ],
-  "main": "./out/extension.js",
-  "contributes": {
-    "configuration": {
-      "title": "Taqueria",
-      "properties": {
-        "taqueria.path": {
-          "type": [
-            "string",
-            "null"
-          ],
-          "default": null,
-          "description": "Specifies taqueria binary path"
-        }
-      }
-    },
-    "commands": [
-      {
-        "command": "taqueria.init",
-        "category": "Taqueria",
-        "title": "Initialize Project",
-        "shortTitle": "init"
-      },
-      {
-        "command": "taqueria.install",
-        "category": "Taqueria",
-        "title": "Install Plugin",
-        "shortTitle": "install"
-      },
-      {
-        "command": "taqueria.compile_smartpy",
-        "category": "Taqueria",
-        "title": "Compile (SmartPy)",
-        "shortTitle": "compile --plugin smartpy"
-      },
-      {
-        "command": "taqueria.compile_ligo",
-        "category": "Taqueria",
-        "title": "Compile (LIGO)",
-        "shortTitle": "compile --plugin ligo"
-      },
-      {
-        "command": "taqueria.start_sandbox",
-        "category": "Taqueria",
-        "title": "Start Sandbox",
-        "shortTitle": "start sandbox <name>"
-      },
-      {
-        "command": "taqueria.stop_sandbox",
-        "category": "Taqueria",
-        "title": "Stop Sandbox",
-        "shortTitle": "stop sandbox <name>"
-      },
-      {
-        "command": "taqueria.list_accounts",
-        "category": "Taqueria",
-        "title": "List Sandbox Accounts",
-        "shortTitle": "list accounts <name>"
-      },
-      {
-        "command": "taqueria.deploy",
-        "category": "Taqueria",
-        "title": "Deploy contracts",
-        "shortTitle": "deploy"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "npx tsc -noEmit && parcel build --no-cache --no-optimize --no-scope-hoist --detailed-report 2>&1",
-    "watch": "parcel watch --no-cache --detailed-report",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
-  },
-  "devDependencies": {
-    "@taquito/taquito": "^12.1.0",
-    "@types/fs-extra": "^9.0.13",
-    "@types/glob": "^7.2.0",
-    "@types/mocha": "^5.2.6",
-    "@types/node": "^17.0.17",
-    "@types/promise-memoize": "^1.2.1",
-    "@types/vscode": "1.63.0",
-    "@typescript-eslint/eslint-plugin": "^5.9.1",
-    "@typescript-eslint/parser": "^5.9.1",
-    "@vscode/test-electron": "^2.1.2",
-    "esbuild": "^0.14.15",
-    "eslint": "^8.6.0",
-    "fs-extra": "^10.1.0",
-    "glob": "^7.2.0",
-    "mocha": "^9.2.1",
-    "parcel": "^2.3.1",
-    "typescript": "4.5.4",
-    "vsce": "^2.6.4"
-  },
-  "dependencies": {
-    "@taqueria/protocol": "^0.3.1",
-    "comment-json": "^4.1.1",
-    "promise-memoize": "^1.2.1",
-    "rambda": "^7.0.1"
-  }
+	"name": "taqueria-vscode",
+	"displayName": "taqueria",
+	"description": "A vscode plugin to make Tezos development easier with Taqueria!",
+	"publisher": "ecadlabs",
+	"version": "0.3.1",
+	"engines": {
+		"vscode": "^1.63.0"
+	},
+	"targets": {
+		"default": {
+			"source": "./src/extension.ts",
+			"distDir": "./out",
+			"context": "node",
+			"engines": {
+				"node": ">= 16"
+			},
+			"includeNodeModules": {
+				"vscode": false
+			}
+		},
+		"test": {
+			"source": [
+				"./src/test/runTest.ts",
+				"./src/test/suite/index.ts",
+				"./src/test/suite/extension.test.ts"
+			],
+			"distDir": "./out/test",
+			"context": "node",
+			"engines": {
+				"node": ">= 12"
+			},
+			"includeNodeModules": {
+				"vscode": false
+			}
+		}
+	},
+	"author": "ECAD Labs",
+	"license": "Apache-2.0",
+	"icon": "images/taqueria-icon.png",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ecadlabs/taqueria.git"
+	},
+	"bugs": {
+		"url": "https://github.com/ecadlabs/taqueria/issues"
+	},
+	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"keywords": [
+		"taqueria",
+		"tezos",
+		"build",
+		"test",
+		"deploy",
+		"ecad",
+		"ecadlabs"
+	],
+	"activationEvents": [
+		"onCommand:taqueria.init",
+		"onCommand:taqueria.install",
+		"onCommand:taqueria.compile_smartpy",
+		"onCommand:taqueria.compile_ligo",
+		"onCommand:taqueria.start_sandbox",
+		"onCommand:taqueria.stop_sandbox",
+		"onCommand:taqueria.list_accounts",
+		"onCommand:taqueria.deploy"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"configuration": {
+			"title": "Taqueria",
+			"properties": {
+				"taqueria.path": {
+					"type": [
+						"string",
+						"null"
+					],
+					"default": null,
+					"description": "Specifies taqueria binary path"
+				}
+			}
+		},
+		"commands": [
+			{
+				"command": "taqueria.init",
+				"category": "Taqueria",
+				"title": "Initialize Project",
+				"shortTitle": "init"
+			},
+			{
+				"command": "taqueria.install",
+				"category": "Taqueria",
+				"title": "Install Plugin",
+				"shortTitle": "install"
+			},
+			{
+				"command": "taqueria.compile_smartpy",
+				"category": "Taqueria",
+				"title": "Compile (SmartPy)",
+				"shortTitle": "compile --plugin smartpy"
+			},
+			{
+				"command": "taqueria.compile_ligo",
+				"category": "Taqueria",
+				"title": "Compile (LIGO)",
+				"shortTitle": "compile --plugin ligo"
+			},
+			{
+				"command": "taqueria.start_sandbox",
+				"category": "Taqueria",
+				"title": "Start Sandbox",
+				"shortTitle": "start sandbox <name>"
+			},
+			{
+				"command": "taqueria.stop_sandbox",
+				"category": "Taqueria",
+				"title": "Stop Sandbox",
+				"shortTitle": "stop sandbox <name>"
+			},
+			{
+				"command": "taqueria.list_accounts",
+				"category": "Taqueria",
+				"title": "List Sandbox Accounts",
+				"shortTitle": "list accounts <name>"
+			},
+			{
+				"command": "taqueria.deploy",
+				"category": "Taqueria",
+				"title": "Deploy contracts",
+				"shortTitle": "deploy"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "npx tsc -noEmit && parcel build --no-cache --no-optimize --no-scope-hoist --detailed-report 2>&1",
+		"watch": "parcel watch --no-cache --detailed-report",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@taquito/taquito": "^12.1.0",
+		"@types/fs-extra": "^9.0.13",
+		"@types/glob": "^7.2.0",
+		"@types/mocha": "^5.2.6",
+		"@types/node": "^17.0.17",
+		"@types/promise-memoize": "^1.2.1",
+		"@types/vscode": "1.63.0",
+		"@typescript-eslint/eslint-plugin": "^5.9.1",
+		"@typescript-eslint/parser": "^5.9.1",
+		"@vscode/test-electron": "^2.1.2",
+		"esbuild": "^0.14.15",
+		"eslint": "^8.6.0",
+		"fs-extra": "^10.1.0",
+		"glob": "^7.2.0",
+		"mocha": "^9.2.1",
+		"parcel": "^2.3.1",
+		"typescript": "4.5.4",
+		"vsce": "^2.6.4"
+	},
+	"dependencies": {
+		"@taqueria/protocol": "^0.3.1",
+		"comment-json": "^4.1.1",
+		"promise-memoize": "^1.2.1",
+		"rambda": "^7.0.1"
+	}
 }
