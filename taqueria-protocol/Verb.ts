@@ -14,7 +14,6 @@ export const {factory, schemas: generatedSchemas} = createType<Input, Input>({
     parseErrMsg: (value: unknown) => `${value} is not an invalid verb`,
     unknownErrMsg: `Something went wrong trying to parse a verb`
 })
-
 export type Verb = z.infer<typeof generatedSchemas.schema>
 export type t = Verb
 export const {create, make, of} = factory

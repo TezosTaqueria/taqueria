@@ -51,13 +51,18 @@ export const rawSchema = z.object({
 type RawInput = z.infer<typeof rawSchema>
 type Input = Flatten<z.infer<typeof internalSchema>>
 
-export const {schemas, factory} = createType<RawInput, Input>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,
     internalSchema,
     parseErrMsg: "The schema returned from the plugin is invalid",
     unknownErrMsg: "Something went wrong parsing the schema from a plugin"
 })
 
-export type PluginInfo = Flatten<z.infer<typeof schemas.schema>>
+export type PluginInfo = Flatten<z.infer<typeof generatedSchemas.schema>>
 export type t = PluginInfo
 export const {create, of, make} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as unknown as PluginInfo)
+}

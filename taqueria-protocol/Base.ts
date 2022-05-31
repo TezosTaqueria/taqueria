@@ -28,11 +28,11 @@ export const createSchema = <I>(params: CreateSchemaParams) => {
     const schema = isStringLike
         ? internalSchema
             .transform((val: unknown) => transformer(val) as I & {
-                readonly __kind: "generated" & typeof internalSchema
+                readonly __kind: "generated" & z.infer<typeof internalSchema>
             })
         : internalSchema
             .transform((val: unknown) => transformer(val) as Flatten<I & {
-                readonly __kind: "generated" & typeof internalSchema
+                readonly __kind: "generated" & z.infer<typeof internalSchema>
             }>)
 
     type GeneratedSchema = typeof schema         

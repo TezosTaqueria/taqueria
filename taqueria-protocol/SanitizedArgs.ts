@@ -88,7 +88,7 @@ type RawProvisionInput = z.infer<typeof provisionRawSchema>
 type RawManagePluginInput = z.infer<typeof managePluginRawSchema>
 type RawVersionInput = z.infer<typeof versionRawSchema>
 
-export const {schemas, factory} = createType<RawInput, RawInput>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, RawInput>({
     rawSchema,
     parseErrMsg: "The arguments provided are invalid",
     unknownErrMsg: "Something went wrong parsing the command-line arguments"
@@ -96,8 +96,14 @@ export const {schemas, factory} = createType<RawInput, RawInput>({
 
 export const {create, of, make} = factory
 
-export type SanitizedArgs = z.infer<typeof schemas.schema>
+
+export type SanitizedArgs = z.infer<typeof generatedSchemas.schema>
 export type t = SanitizedArgs
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as SanitizedArgs)
+}
 
 export const scaffoldTaskArgs = createType<RawScaffoldInput, RawScaffoldInput>({
     rawSchema: scaffoldRawSchema,

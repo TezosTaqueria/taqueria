@@ -44,13 +44,18 @@ const internalSchema = z
 
 type Input = z.infer<typeof internalSchema>
 
-export const {schemas, factory} = createType<RawInput, Input>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,
     internalSchema,
     parseErrMsg: (value: unknown) => `The following provision is invalid: ${value}`,
     unknownErrMsg: "Something went wrong parsing the list of provisioners"
 })
 
-export type Provisions = Flatten<z.infer<typeof schemas.schema>>
+export type Provisions = Flatten<z.infer<typeof generatedSchemas.schema>>
 export type t = Provisions
 export const {create, of, make} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as Provisions)
+}

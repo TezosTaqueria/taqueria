@@ -50,14 +50,19 @@ type RawInput = z.infer<typeof rawSchema>
 
 type Input = z.infer<typeof internalSchema>
 
-export const {schemas, factory} = createType<RawInput, Input>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,
     parseErrMsg: `The persistent state is invalid`,
     unknownErrMsg: `Something went wrong trying to parse the persistent state`
 })
 
-export type PersistentState = z.infer<typeof schemas.schema>
+export type PersistentState = z.infer<typeof generatedSchemas.schema>
 export type t = PersistentState
 export type State = PersistentState
 
 export const {create, of, make} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as unknown as PersistentState)
+}

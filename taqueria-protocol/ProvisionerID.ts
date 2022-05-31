@@ -9,12 +9,17 @@ export const rawSchema = z
 
 type RawInput = z.infer<typeof rawSchema>
 
-export const {schemas, factory} = createType<RawInput, RawInput>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, RawInput>({
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is not a valid provisioner ID`,
     unknownErrMsg: "Something went wrong trying to parse the provision ID"
 })
 
-export type ProvisionerID = z.infer<typeof schemas.schema>
+export type ProvisionerID = z.infer<typeof generatedSchemas.schema>
 export type t = ProvisionerID
 export const {create, of, make} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as ProvisionerID)
+}

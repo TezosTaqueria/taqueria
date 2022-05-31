@@ -19,15 +19,18 @@ export const rawSchema = z.object({
 
 type RawInput = z.infer<typeof rawSchema>
 
-export const {schemas, factory} = createType<RawInput, RawInput>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, RawInput>({
     rawSchema,
     parseErrMsg: (value: unknown) => `${value} is not an valid environment configuration`,
     unknownErrMsg: "Something went wrong trying to parse the environment configuration"
 })
 
-export type Environment = Flatten<z.infer<typeof schemas.schema>>
+export type Environment = Flatten<z.infer<typeof generatedSchemas.schema>>
 export type t = Environment
 
 export const {create, make, of, from} = factory
 
-export const {internalSchema} = schemas
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as Environment)
+}

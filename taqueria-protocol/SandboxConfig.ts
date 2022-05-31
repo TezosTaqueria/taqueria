@@ -46,13 +46,18 @@ const internalSchema = z.object({
 type RawInput = z.infer<typeof rawSchema>
 type Input = z.infer<typeof internalSchema>
 
-export const {schemas, factory} = createType<RawInput, Input>({
+export const {schemas: generatedSchemas, factory} = createType<RawInput, Input>({
     rawSchema,
     internalSchema,
     parseErrMsg: (value: unknown) => `${value} is not a valid sandbox configuration `,
     unknownErrMsg: "Something went wrong trying to parse the sandbox configuration"
 })
 
-export type SandboxConfig = z.infer<typeof schemas.schema>
+export type SandboxConfig = z.infer<typeof generatedSchemas.schema>
 export type t = SandboxConfig
 export const {create, of, make} = factory
+
+export const schemas = {
+    ...generatedSchemas,
+    schema: generatedSchemas.schema.transform(val => val as SandboxConfig)
+}
