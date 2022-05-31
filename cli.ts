@@ -879,9 +879,11 @@ const preprocessArgs = (inputArgs: DenoArgs): DenoArgs => {
 
 export const run = async (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 	try {
-		if (!inputArgs.includes('--version') && !inputArgs.includes('--build')) await sendEvent('v3.0.1', 'CLI');
-
 		const processedInputArgs = preprocessArgs(inputArgs);
+
+		if (!inputArgs.includes('--version') && !inputArgs.includes('--build')) {
+			await sendEvent(getVersion(processedInputArgs, i18n), inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI');
+		}
 
 		// Parse the args required for core built-in tasks
 		return pipe(
