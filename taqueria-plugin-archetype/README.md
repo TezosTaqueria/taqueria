@@ -6,8 +6,8 @@ The Archetype plugin provides a task to compile Archetype smart contracts (`.arl
 
 ## Requirements
 
-- Node.js v16 or later
-- Docker v0.8.2 or later
+- Node.js v16.x or later
+- Docker v0.8.6 or later
 
 ## Installation
 
