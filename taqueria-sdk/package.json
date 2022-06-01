@@ -43,7 +43,7 @@
     "rambda": "^7.1.4",
     "stack-trace": "github:mweichert/node-stack-trace",
     "ts-pattern": "^4.0.2",
-    "yargs": "^17.2.1",
+    "yargs": "^17.5.1",
     "zod": "^3.17.3"
   },
   "devDependencies": {
