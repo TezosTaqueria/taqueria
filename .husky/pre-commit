@@ -1,10 +1,10 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm run test:unit -w tests
+npx lint-staged
 
 ## Process documentation files and add modified files to the git commit
 echo "Processing documentation files..."
 npx ts-node ./parse-readme-template.ts
 echo "Adding any modified doc files to the commit"
-HUSKY=0 git ls-files **/*.md **/*.mdx --others --exclude-standard --modified| xargs git add 
+HUSKY=0 git ls-files **/*.md **/*.mdx --others --exclude-standard --modified | xargs git add
