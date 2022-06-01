@@ -12,9 +12,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc -noEmit && npm run build-cjs && npm run build-esm-index && npm run build-esm-types",
-    "build-cjs": "npx esbuild --bundle index.ts types.ts --outdir=. --minify --platform=node --sourcemap",
-    "build-esm-index": "npx esbuild --bundle index.ts --outfile=index.esm.js --minify --platform=node --format=esm --sourcemap",
-    "build-esm-types": "npx esbuild --bundle types.ts --outfile=types.esm.js --minify --platform=node --format=esm --sourcemap"
+    "build-cjs": "npx esbuild --bundle index.ts types.ts --outdir=. --platform=node --sourcemap",
+    "build-esm-index": "npx esbuild --bundle index.ts --outfile=index.esm.js --platform=node --format=esm --sourcemap",
+    "build-esm-types": "npx esbuild --bundle types.ts --outfile=types.esm.js --platform=node --format=esm --sourcemap"
   },
   "keywords": [
     "taqueria",
