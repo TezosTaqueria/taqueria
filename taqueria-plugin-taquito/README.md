@@ -1,6 +1,8 @@
 # Taqueria Taquito Plugin
 
-The Taquito plugin provides a task to originate a smart contract to a Tezos network
+The Taquito plugin provides a task and operation to originate a smart contract to a Tezos sandbox or testnet
+
+While both will originate contracts to a network or sandbox, the operation will store the deploped address for the contract in the projects persistant state
 
 ## Requirements
 
@@ -13,21 +15,17 @@ To install the Taquito plugin on a Taqueria project, navigate to the project fol
 taq install @taqueria/plugin-taquito
 ```
 
-## Configuration
+## Configurationlg
 
-***Coming soon***
+The target networks, sandboxes, and environments are configured in the Taqueria project's `config.json` file. For additional information on configuring network, documentation can be found [here](https://taqueria.io/docs/getting-started/networks/)
 
 ## Usage
 
 The Taquito plugin exposes an `originate` task in Taqueria which will originate the specified Michelson contract to the configured network
 
-### Originating a Michelson Contract
+### Targeting
 
-***Coming soon***
 
-### Examples
-
-***Coming soon***
 
 ## Plugin Architecture
 
@@ -40,3 +38,4 @@ The plugin provides a single task `originate`, used for originating Michelson co
 |  task      | 'deploy'                 | 
 |  command   | 'deploy [contract]`      | 
 |  aliases   | ['originate']            |  
+
