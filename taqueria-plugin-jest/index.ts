@@ -29,12 +29,9 @@ Plugin.create(() => ({
                 }),
                 Option.create({
                     flag: "testPattern",
-                    shortFlag: "t",
                     description: "Run test files that match the provided pattern",
                     boolean: true
                 })
             ]
-        })
-    ],
     proxy
 }), process.argv)
