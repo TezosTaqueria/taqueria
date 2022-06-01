@@ -30,7 +30,6 @@ describe('Extension Test Suite', () => {
 
     it('Verify that Taqueria Initiate will init new taquifed  project ', async () => {
 
-
         await vscode.commands.getCommands(true).then(allCommands => {
             const taqCommands = allCommands.filter( command => command.toLowerCase().includes("taq"))
             assert.notEqual(taqCommands, undefined);
@@ -42,8 +41,7 @@ describe('Extension Test Suite', () => {
         //      Even if I exclude it it keeps asking to rebuild it due to an old version of npm
         //      https://stackoverflow.com/questions/46384591/node-was-compiled-against-a-different-node-js-version-using-node-module-versio
 
-        // await vscode.commands.executeCommand("taqueria.init").then( ()=>{
-        // });
+        await vscode.commands.executeCommand("taqueria.init").then( ()=>{});
 
         // Example how to use sleep to stop VS Code for a moment
         // await sleep(60000);
@@ -52,8 +50,6 @@ describe('Extension Test Suite', () => {
     // TODO: https://github.com/ecadlabs/taqueria/issues/605
     it.skip('Verify that VS Code command Taqueria Scaffold will scaffold a project', async () => {
 
-        // Open taquified project in workspace under testProjectDestination
-
         // Run taqueria scaffold command
         await vscode.commands.executeCommand("taqueria.scaffold");
 
@@ -61,6 +57,9 @@ describe('Extension Test Suite', () => {
 
     // TODO: https://github.com/ecadlabs/taqueria/issues/686
     it.skip('Verify that VS Code command Taqueria Start Sandbox starts flextesa sandbox', async () => {
+
+        // Open folder with test project
+        await vscode.commands.executeCommand("vscode.openFolder",vscode.Uri.parse(testProjectDestination))
 
         // Install plugin
         await vscode.commands.executeCommand("taqueria.install @taqueria/plugin-flextesa");
@@ -85,12 +84,15 @@ describe('Extension Test Suite', () => {
     });
 
     // TODO: https://github.com/ecadlabs/taqueria/issues/645
-    it.skip('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+    it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+
+        // Open folder with test project
+        await vscode.commands.executeCommand("vscode.openFolder",vscode.Uri.parse(testProjectDestination))
 
         // Install plugin
         await vscode.commands.executeCommand("taqueria.install @taqueria/plugin-ligo");
 
-        await vscode.commands.executeCommand("taqueria.compile_ligo");
+        // await vscode.commands.executeCommand("taqueria.compile_ligo");
 
         // In last test or after all block
         // vscode.commands.executeCommand("workbench.action.closeActiveEditor");
@@ -98,6 +100,9 @@ describe('Extension Test Suite', () => {
 
     // TODO: https://github.com/ecadlabs/taqueria/issues/687
     it.skip('Verify that VS Code command Taqueria Compile SmartPy will compile SmartPy contract', async () => {
+
+        // Open folder with test project
+        await vscode.commands.executeCommand("vscode.openFolder",vscode.Uri.parse(testProjectDestination))
 
         // Install plugin
         await vscode.commands.executeCommand("taqueria.install @taqueria/plugin-smartpy");
@@ -109,6 +114,9 @@ describe('Extension Test Suite', () => {
     // TODO: https://github.com/ecadlabs/taqueria/issues/688
     it.skip('Verify that VS Code command Taqueria Deploy Contract will deploy contract to a test network', async () => {
 
+        // Open folder with test project
+        await vscode.commands.executeCommand("vscode.openFolder",vscode.Uri.parse(testProjectDestination))
+
         // Install plugin
         await vscode.commands.executeCommand("taqueria.install @taqueria/plugin-smartpy");
 
@@ -118,6 +126,6 @@ describe('Extension Test Suite', () => {
     after(async () => {
         await fse.rmdir(testProjectDestination, {recursive: true})
         // Uncomment for local development
-        // await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
+        await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
     });
 });
