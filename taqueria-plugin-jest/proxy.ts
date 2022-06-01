@@ -55,9 +55,15 @@ const ensurePartitionExists = (args: Opts) => args.partition
         SanitizedAbsPath.create(join(args.projectDir, args.partition)),
         args.projectDir
     )
-    : ensureRootConfigExists(args.config.projectDir)
+    : createPartition(
+        SanitizedAbsPath.create(
+            join( args.projectDir, getTestsRootDir(args.config) )
+        ),
+        args.projectDir
+    )
 
 const execCmd = (cmd: string, args: string[]) => execa(cmd, args, {reject: false})
+
 export default async (args: RequestArgs.ProxyRequestArgs) =>
         ensurePartitionExists(args as Opts)
         .then(configAbsPath => execCmd('npx', ['jest', '-c', configAbsPath, /*"--passWithNoTests"*/]))
