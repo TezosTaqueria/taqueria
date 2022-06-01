@@ -18,13 +18,19 @@ Plugin.create(() => ({
                     description: "Name of the partition for these tests",
                     defaultValue: "tests",
                     type: "string"
-                })
+                }),
             ],
             options: [
                 Option.create({
                     flag: "init",
                     shortFlag: "i",
                     description: "Initializes the partition for Jest",
+                    boolean: true
+                }),
+                Option.create({
+                    flag: "testPattern",
+                    shortFlag: "t",
+                    description: "Run test files that match the provided pattern",
                     boolean: true
                 })
             ]
