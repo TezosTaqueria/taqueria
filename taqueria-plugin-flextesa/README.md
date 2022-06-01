@@ -18,7 +18,7 @@ Some helpful things to know:
 
 ## Requirements
 
-- Node.js v16 or later
+- Node.js v16.x or later
 - Docker v0.8.4 or later
 
 ## Installation
@@ -52,44 +52,90 @@ The following commands are available from the CLI or the VS Code Command palette
 
 ## Plugin Configuration
 
-Configuration is done in the project's `./.taq/config.json` file. Here you can configure additonal named sandboxes and add them to environments
+Configuration is done in the project's `./.taq/config.json` file. Here you can configure additonal sandboxes
 
-Sandbox configurations are stored as key/value pairs in the `sandbox` property. In this example there is one sandbox configuration named `local`:
+
+### The Default Sandbox Configuration
+
+Named sandbox configurations are stored as key/value pairs in the `sandbox` property using the sandbox name as the key
+
+This example shows the configuration for the default sandbox named `local`:
+
 ```json
     "sandbox": {
         "local": {
-            "accounts": {
-                "default": "bob",
-                "bob": {
-                    "initialBalance": "3000000000"
-                },
-                "alice": {
-                    "initialBalance": "2000000000"
-                },
-                "john": {
-                    "initialBalance": "4000000000"
-                },
-                "jane": {
-                    "initialBalance": "5000000000"
-                },
-                "joe": {
-                    "initialBalance": "1000000000"
-                }
-            },
             "label": "Local Tezos Sandbox",
             "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
             "rpcUrl": "http://localhost:20000"
         }
 ```
 
+When this sandbox is started, the implicit accounts defined in the configuration will be created on the sandbox and the `accounts` property will be populated with the account data as shown in this example:
+
+```json
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "bob": {
+                    "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+                    "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+                    "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+                },
+                "alice": {
+                    "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+                    "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+                    "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+                },
+                "john": {
+                    "encryptedKey": "edpktt6t2ENhxiQqun6bXPPWC6tFVvNPTDRh1gEPGX4BgDgbDnmGzP",
+                    "publicKeyHash": "tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6",
+                    "secretKey": "unencrypted:edsk3Un2KRUUoWZufi914HQem96ejVFnkyD8GXRPUSkgqy5etsYXEN"
+                },
+                "jane": {
+                    "encryptedKey": "edpkvS6TDSWcqqj3EJi3NRrCMyN7oNw1B3Hp37R19tMThqM8YNhAuS",
+                    "publicKeyHash": "tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph",
+                    "secretKey": "unencrypted:edsk3UkdS1UBfTBkMAoFxmfdmUHmCdNhTzDJ1cSJuZhU1b6k6fZZoQ"
+                },
+                "joe": {
+                    "encryptedKey": "edpkuT1QYPYbLLQz9dXhQS33ncsixxeGHbNGmntPTR4VBbWmskHPrV",
+                    "publicKeyHash": "tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB",
+                    "secretKey": "unencrypted:edsk3Un2FU9Zeb4KEoATWdpAqcX5JArMUj2ew8S4SuzhPRDmGoqNx2"
+                }
+            },
+            "label": "Local Tezos Sandbox",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+```
+
+### Accounts
+
+Accounts are defined in the `accounts` property of `config.json` and are global to the project. Each sandbox configuration will instantiate the accounts defined in the `accounts` array on startup
+
+Taqueria provides five default accounts in the default configuration:
+
+```json
+    "accounts": {
+        "bob": "3_000_000_000",
+        "alice": "3_000_000_000",
+        "john": "3_000_000_000",
+        "jane": "3_000_000_000",
+        "joe": "3_000_000_000"
+    }
+```
+
+
 ### Adding a New Sandbox Configuration
 
 Sandbox configurations are added as key/value pairs to the main `sandbox` object using the format:
+
 ```json
 sandboxName : { sandboxConfigObject }
 ```
 
 Inside the sandboxConfigObject, there are four properties you can configure:
+
 #### 'accounts'
 
 A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}`
