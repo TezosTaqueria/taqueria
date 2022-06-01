@@ -3,7 +3,6 @@ interface MockedObject {
 }
 
 export const make = <T extends Record<string, unknown>>(obj: T, methodMap: Record<string, Function>, currentPath?: string[]): T => {
-    debugger
     if (obj.__mocked) return obj
 
     const proxy = new Proxy(obj, {

@@ -101,21 +101,16 @@ describe("E2E Testing for taqueria archetype plugin",  () => {
     });
 
     test('Verify that taqueria archetype plugin requires the plugin argument when other compile plugins installed', async () => {
-        try {
-            // 1. Copy contract from data folder to taqueria project folder
-            await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
+        // 1. Copy contract from data folder to taqueria project folder
+        await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
 
-            await exec('taq install @taqueria/plugin-ligo', {cwd: `./${taqueriaProjectPath}`})
+        await exec('taq install ../../../taqueria-plugin-ligo', {cwd: `./${taqueriaProjectPath}`})
 
-            // 2. Run taq compile ${contractName}
-            await exec(`taq compile fa12.arl --plugin @taqueria/plugin-archetype`, {cwd: `./${taqueriaProjectPath}`});
+        // 2. Run taq compile ${contractName}
+        await exec(`taq compile fa12.arl --plugin @taqueria/plugin-archetype`, {cwd: `./${taqueriaProjectPath}`});
 
-            // 3. Verify that compiled michelson version has been generated
-            await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`);
-
-        } catch(error) {
-            throw new Error (`error: ${error}`);
-        }
+        // 3. Verify that compiled michelson version has been generated
+        await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`);
 
     });
 

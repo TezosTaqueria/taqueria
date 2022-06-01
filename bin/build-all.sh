@@ -19,6 +19,11 @@ if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
     echo "** Building node-sdk"
     npm run build --workspace=taqueria-sdk
 
+    echo ""
+    echo '**********************************************'
+    echo "** Building taqueria-state-js"
+    npm run build --workspace=taqueria-state-js
+
     for dir in `ls -1d *plugin*`; do
         if [ -d $dir ]; then
             echo ""

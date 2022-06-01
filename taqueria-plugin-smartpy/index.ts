@@ -14,21 +14,6 @@ Plugin.create(i18n => ({
             options: [],
             handler: "proxy",
             encoding: "json"
-        }),
-        Task.create({
-            task: "teapot",
-            command: "teapot",
-            aliases: ["t", "tea"],
-            description: "Have a cup of tea",
-            options: [
-                Option.create({
-                    shortFlag: "g",
-                    flag: "green",
-                    description: "Make green tea instead",
-                    boolean: true // TODO: Why isn't this working?
-                })
-            ],
-            handler: `echo "I'm a little teapot <%= it.green ? "full of green tea!" : "!" %>"`
         })
     ],
     checkRuntimeDependencies: () => Promise.resolve({

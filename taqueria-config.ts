@@ -1,52 +1,42 @@
-import type {Config, Task, InstalledPlugin, ConfigArgs} from './taqueria-protocol/taqueria-protocol-types.ts'
-import type {Future, TaqError} from './taqueria-utils/taqueria-utils-types.ts'
-import {ConfigDir, i18n} from './taqueria-types.ts'
-import {SanitizedPath, SanitizedAbsPath, SHA256} from './taqueria-utils/taqueria-utils-types.ts'
-import {debug, readJsonFile, writeJsonFile, joinPaths} from './taqueria-utils/taqueria-utils.ts'
+import * as Config from "@taqueria/protocol/Config"
+import * as Task from "@taqueria/protocol/Task"
+import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
+import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
+import * as SHA256 from "@taqueria/protocol/SHA256"
+import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
+import * as TaqError from "@taqueria/protocol/TaqError"
+import type {i18n} from '@taqueria/protocol/i18n'
+import {readJsonFile, writeJsonFile, joinPaths, ensureDirExists, eager} from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {resolve, reject, map, chain, mapRej, chainRej, both} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js'
+import {FutureInstance as Future, resolve, reject, attemptP, map, chain, mapRej, chainRej, both} from 'fluture'
 
-export type AddTaskCallback = (task: Task, plugin: InstalledPlugin, handler: (taskArgs: Record<string, unknown>) => Promise<number>) => unknown
+export type AddTaskCallback = (task: Task.t, plugin: InstalledPlugin.t, handler: (taskArgs: Record<string, unknown>) => Promise<number>) => unknown
 
-export const defaultConfig : Config = {
+export const defaultConfig : Config.t = Config.create({
     language: 'en',
-    plugins: [],
     contractsDir: "contracts",
-    testsDir: "tests",
     artifactsDir: "artifacts",
     environment: {
         default: "development",
         development: {
             networks: [],
             sandboxes: ["local"],
-            storage: {
-           }
+            storage: {}
         }
     },
     sandbox: {
         local: {
-            accounts: {
-                default: "bob",
-                bob: {
-                    initialBalance: "3000000000"
-                },
-                alice: {
-                    initialBalance: "2000000000"
-                },
-                john: {
-                    initialBalance: "4000000000"
-                },
-                jane: {
-                    initialBalance: "5000000000"
-                },
-                joe: {
-                    initialBalance: "1000000000"
-                }
-            },
             label: "Local Tezos Sandbox",
             protocol: "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             rpcUrl: "http://localhost:20000"
         }
+    },
+    accounts: {
+        bob: "3_000_000_000",
+        alice:  "3_000_000_000",
+        john: "3_000_000_000",
+        jane: "3_000_000_000",
+        joe: "3_000_000_000"
     },
     network: {
         
@@ -60,55 +50,49 @@ export const defaultConfig : Config = {
     //         }
     //     }
     // }
-}
+})
 
 export const getDefaultMaxConcurrency = () => 10
 
-export const getConfigPath = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, create=false) : Future<TaqError, string> => pipe(
-    ConfigDir.create(projectDir, configDir, create),
-    map ((configDir: ConfigDir) => joinPaths(configDir.value, "config.json"))
+export const getConfigPath = (projectDir: SanitizedAbsPath.t, create=false) : Future<TaqError.t, string> => pipe(
+    joinPaths(projectDir, '.taq'),
+    abspath => create ? ensureDirExists(abspath): resolve(abspath),
+    map ((abspath: string) => joinPaths(abspath, 'config.json'))
 )
 
-export const getRawConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedPath,  create=false) => pipe(
-    getConfigPath(projectDir, configDir, create),
+export const getRawConfig = (projectDir: SanitizedAbsPath.t, create=false) => pipe(
+    getConfigPath(projectDir, create),
     chain ((configPath : string) => pipe(
-        readJsonFile(configPath),
+        readJsonFile<Config.t>(configPath),
         chainRej (err => {
             if (!create) return reject(err)
             else {
                 return pipe(
-                    writeJsonFile<Config>(configPath) (defaultConfig),
-                    chain((configPath: string) => readJsonFile<Config>(configPath))
+                    writeJsonFile<Config.t>(configPath) (defaultConfig),
+                    chain((configPath: string) => readJsonFile<Config.t>(configPath))
                 )
             }
         })
     )),
-    mapRej<TaqError, TaqError>(previous => ({kind: "E_INVALID_CONFIG", msg: "Your config.json file is invalid", previous})),
-    
-    // TODO: Config should be a discrete type that we parse (like SanitizedAbsPath)
-    // This will ensure that the config is actually valid
-    //
-    // E.g.:
-    // map (Config.create)
-    //
-    // See: https://github.com/ecadlabs/taqueria/issues/642
-    map(val => val as Config)
+    mapRej<TaqError.t, TaqError.t>(previous => ({kind: "E_INVALID_CONFIG", msg: "Your config.json file is invalid", previous})),
+    chain(Config.of)
 )
 
 
-export const toConfigArgs = (configPath: string, configDir: SanitizedPath, projectDir: SanitizedAbsPath, config: Config): Future<TaqError, ConfigArgs> => pipe(
-    SHA256.futureOf(JSON.stringify(config)),
-    map(hash => ({
-        ...config,
-        configFile: SanitizedAbsPath.create(configPath),
-        configDir,
-        projectDir,
-        hash
-    }) as ConfigArgs)
+export const toLoadedConfig = (configPath: string, projectDir: SanitizedAbsPath.t, config: Config.t): Future<TaqError.t, LoadedConfig.t> => pipe(
+    attemptP<TaqError.t, SHA256.t>(() => SHA256.toSHA256(JSON.stringify(config))),
+    chain (hash => 
+        attemptP<TaqError.t, LoadedConfig.t>(async () => await eager (LoadedConfig.of({
+            ...config,
+            configFile: await eager (SanitizedAbsPath.make(configPath)),
+            projectDir,
+            hash
+        })))
+    )
 )
 
-export const getConfig = (projectDir: SanitizedAbsPath, configDir: SanitizedPath, _i18n: i18n, create=false) => pipe(
-        getRawConfig(projectDir, configDir, create),
-        both (getConfigPath(projectDir, configDir, create)),
-        chain (([configPath, config]) => toConfigArgs(configPath, configDir, projectDir, config)),
+export const getConfig = (projectDir: SanitizedAbsPath.t, _i18n: i18n, create=false) => pipe(
+        getRawConfig(projectDir, create),
+        both (getConfigPath(projectDir, create)),
+        chain (([configPath, config]) => toLoadedConfig(configPath, projectDir, config)),
     )

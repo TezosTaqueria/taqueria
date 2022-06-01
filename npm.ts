@@ -1,9 +1,11 @@
-import type {ConfigArgs} from './taqueria-protocol/taqueria-protocol-types.ts'
-import {i18n} from './taqueria-types.ts'
-import {SanitizedAbsPath, SanitizedPath, TaqError, Future} from './taqueria-utils/taqueria-utils-types.ts'
+import * as LoadedConfig from "@taqueria/protocol/LoadedConfig"
+import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
+import * as InstalledPlugin from "@taqueria/protocol/InstalledPlugin"
+import type {i18n} from "@taqueria/protocol/i18n"
+import * as TaqError from "@taqueria/protocol/TaqError"
 import * as utils from './taqueria-utils/taqueria-utils.ts'
 import {pipe} from "https://deno.land/x/fun@v1.0.0/fns.ts"
-import {map, chain, chainRej, resolve, reject} from 'https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js';
+import {map, chain, chainRej, mapRej} from 'fluture';
 import {getConfig} from './taqueria-config.ts'
 
 // Get utils
@@ -35,48 +37,54 @@ export const getPluginName = (input:string): NpmPluginName => {
     return (retval as NpmPluginName)
 }
 
-export const requireNPM = (projectDir: SanitizedAbsPath, i18n: i18n) : Future<TaqError, Manifest> => pipe(
-    readJsonFile<Manifest>(projectDir.join("package.json").value),
-    chainRej(previous => reject({kind: 'E_NPM_INIT', msg: i18n.__("npmInitRequired"), context: projectDir, previous})),
+export const requireNPM = (projectDir: SanitizedAbsPath.t, i18n: i18n) => pipe(
+    SanitizedAbsPath.make(`${projectDir}/package.json`),
+    chain (abspath => readJsonFile<Manifest>(abspath)),
+    mapRej (previous => {
+        const taqErr: TaqError.t = {
+            kind: "E_NPM_INIT",
+            msg: i18n.__("npmInitRequired"),
+            context: projectDir,
+            previous
+        }
+        return taqErr
+    }),
 )
 
-export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath) => pipe(
+export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath.t) => pipe(
     /^\//.test(pluginNameOrPath) 
-        ? SanitizedAbsPath.create(pluginNameOrPath)
-        : SanitizedAbsPath.create(pluginNameOrPath, projectDir),
-    pluginPath => readJsonFile(pluginPath.join('package.json').value),
-    chainRej (() => readJsonFile(projectDir.join("node_modules", pluginNameOrPath, "package.json").value)),
+        ? SanitizedAbsPath.make(pluginNameOrPath)
+        : SanitizedAbsPath.make(`${projectDir}/${pluginNameOrPath}`),
+    chain(pluginPath => SanitizedAbsPath.make(`${pluginPath}/package.json`)),
+    chain(readJsonFile),
+    chainRej (() => pipe(
+        SanitizedAbsPath.make(`node_modules/${pluginNameOrPath}/package.json`),
+        chain (readJsonFile)
+    )),
     map(value => value as Manifest)
 )
 
-const addToPluginList = (pluginName: NpmPluginName, config: ConfigArgs) => pipe(
-    getPluginPackageJson(pluginName, config.projectDir),
-    map ((manifest: {name: string}) => {
-        const existingPlugins = config.plugins.filter(plugin => plugin.name != manifest.name)
-        const plugins = [...existingPlugins, {name: manifest.name, type: "npm"}]
-        const updatedConfig = Object.entries(config).reduce(
-            (retval: Record<string, unknown>, [key, val]) => {
-                if (['configFile', 'hash', 'configDir', 'projectDir'].includes(key))
-                    return retval
-                else if (key === 'plugins') return {...retval, plugins}
-                else {
-                    const next = {...retval}
-                    next[key] = val
-                    return next
-                }
-            },
-            {}
-        )
-        return updatedConfig
+const addToPluginList = (pluginName: NpmPluginName, loadedConfig: LoadedConfig.t) => pipe(
+    getPluginPackageJson(pluginName, loadedConfig.projectDir),
+    chain ((manifest: {name: string}) => {
+        const allPlugins = loadedConfig.plugins ?? []
+        const existingPlugins = allPlugins.filter(plugin => plugin.name != manifest.name)
+
+        return InstalledPlugin.make({name: manifest.name, type: "npm"})
+            .pipe(map (installedPlugin => [...existingPlugins, installedPlugin]))
     }),
-    chain (writeJsonFile(config.configFile.value))                    
+    chain ( plugins => LoadedConfig.toConfig({
+        ...loadedConfig,
+        plugins
+    })),
+    chain (writeJsonFile(loadedConfig.configFile))                    
 )
 
 
-export const installPlugin = (configDir: SanitizedPath, projectDir: SanitizedAbsPath, i18n: i18n, plugin: string) => pipe(
+export const installPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string) => pipe(
     requireNPM(projectDir, i18n),
     chain(_ => exec('npm install -D <%= it.plugin %>', {plugin}, false, projectDir)),
-    chain(_ => getConfig(projectDir, configDir, i18n, false)),
+    chain(_ => getConfig(projectDir, i18n, false)),
     chain(config => {
         // The plugin name could look like this: @taqueria/plugin-ligo@1.2.3
         // We need to trim @1.2.3 from the end
@@ -87,19 +95,24 @@ export const installPlugin = (configDir: SanitizedPath, projectDir: SanitizedAbs
         // what the real package name is
         return addToPluginList(pluginName, config)    
     }),
-    map (_ => i18n.__('pluginInstalled'))
+    map (_ => i18n.__('pluginInstalled')),
+
 )
 
-export const uninstallPlugin = (configDir: SanitizedPath, projectDir: SanitizedAbsPath, i18n: i18n, plugin: string) => pipe(
+export const uninstallPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string) => pipe(
     requireNPM(projectDir, i18n),
     chain(() => exec('npm uninstall -D <%= it.plugin %>', {plugin}, false, projectDir)),
-    chain (() => getConfig(projectDir, configDir, i18n, false)),
-    chain ((config: ConfigArgs) => {
+    chain (() => getConfig(projectDir, i18n, false)),
+    chain ((config: LoadedConfig.t) => {
         const pluginName = getPluginName(plugin)
         const plugins = config.plugins.filter(plugin => plugin.name != pluginName)
+
         return pipe(
-            resolve({...config, plugins}),
-            chain (writeJsonFile(config.configFile.value))                    
+            LoadedConfig.toConfig({
+                ...config,
+                plugins
+            }),
+            writeJsonFile(config.configFile) 
         )
     }),
     map (() => i18n.__('pluginUninstalled')),

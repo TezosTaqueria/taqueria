@@ -1,25 +1,24 @@
-import { SanitizedArgs, PluginResponse, Failure, LikeAPromise } from "@taqueria/node-sdk/types";
+import { RequestArgs, PluginResponse, LikeAPromise, TaqError } from "@taqueria/node-sdk/types";
 import glob from 'fast-glob'
 import { join } from 'path'
 import { generateContractTypesProcessContractFiles } from "./src/cli-process";
-
-type PluginOpts = {
-    // TODO: Document these
-    typescriptDir: string,
-    typeAliasMode?: 'local' | 'file' | 'library' | 'simple',
-};
-type Opts = SanitizedArgs & Record<string, unknown>;
+interface Opts extends RequestArgs.ProxyRequestArgs {
+// TODO: Document these
+typescriptDir?: string,
+typeAliasMode?: 'local' | 'file' | 'library' | 'simple',
+contract?: string
+}
 
 const getContractAbspath = (contractFilename: string, parsedArgs: Opts) => 
-    join(parsedArgs.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`)
+    join(parsedArgs.config.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`)
 
 
-const generateContractTypes = (parsedArgs: Opts & PluginOpts) => async (contractFilename: string) : Promise<string> => {
+const generateContractTypes = (parsedArgs: Opts) => async (contractFilename: string) : Promise<string> => {
     const contractAbspath = getContractAbspath(contractFilename, parsedArgs);
     await generateContractTypesProcessContractFiles({
-        inputTzContractDirectory: parsedArgs.artifactsDir,
+        inputTzContractDirectory: parsedArgs.config.artifactsDir,
         inputFiles: [contractAbspath],
-        outputTypescriptDirectory: parsedArgs.typescriptDir,
+        outputTypescriptDirectory: parsedArgs.typescriptDir || 'types',
         format: 'tz',
         typeAliasMode: parsedArgs.typeAliasMode ?? 'file',
     });
@@ -27,23 +26,21 @@ const generateContractTypes = (parsedArgs: Opts & PluginOpts) => async (contract
     return `${contractFilename}: Types generated`;
 }
 
-const generateContractTypesAll = async (parsedArgs: Opts & PluginOpts) : Promise<string[]> => {
-    const files = await glob("**/*.tz", {cwd: parsedArgs.artifactsDir});
+const generateContractTypesAll = async (parsedArgs: Opts) : Promise<string[]> => {
+    const files = await glob("**/*.tz", {cwd: parsedArgs.config.artifactsDir});
     return await Promise.all(files.map(generateContractTypes(parsedArgs)));
 }
 
-export const generateTypes = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, Failure<T>> => {
+export const generateTypes = (parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
     parsedArgs.typescriptDir = parsedArgs.typescriptDir || 'types';
 
     console.log('generateTypes', { 
         typescriptDir: parsedArgs.typescriptDir
     });
 
-    const argsTyped = parsedArgs as Opts & PluginOpts;
-
-    const p = argsTyped.contract
-        ? generateContractTypes(argsTyped) (argsTyped.contract as string)
-        : generateContractTypesAll(argsTyped)
+    const p = parsedArgs.contract
+        ? generateContractTypes(parsedArgs) (parsedArgs.contract)
+        : generateContractTypesAll(parsedArgs)
 
     return p.then(data => {
         console.log(

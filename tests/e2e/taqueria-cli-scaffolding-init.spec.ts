@@ -22,6 +22,13 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     test('Verify that taq scaffold quickstart project has the correct file structure', async () => {
         try {
+            try {
+                await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true })
+            }
+            catch {
+                // Ensure that this path doesn't already exist
+            }
+
             await exec('taq scaffold')
             const scaffoldDirContents = await exec(`ls ${scaffoldDirName}`)
 
@@ -41,6 +48,13 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
     test.skip('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
         const tarFileName = 'taq-quickstart.tar'
         try {
+            try {
+                await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true })
+            }
+            catch {
+                // Ensure that this path doesn't already exist
+            }
+
             await exec('taq scaffold')
             await fsPromises.rm(`./${scaffoldDirName}/.git`, { recursive: true })
             await exec(`tar -cf ${tarFileName} ${scaffoldDirName} --mtime=2020-01-30`)
@@ -58,6 +72,13 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
 
     test('Verify that taq scaffold can use the URL parameter to clone a different scaffold into the project', async () => {
         try {
+            try {
+                await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true })
+            }
+            catch {
+                // Ensure that this path doesn't already exist
+            }
+            
             await exec('taq scaffold https://github.com/microsoft/calculator.git')
             const scaffoldDirContents = await exec(`ls ${scaffoldDirName}`)
 
@@ -66,18 +87,18 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
             expect(scaffoldDirContents.stdout).toContain('docs')
             expect(scaffoldDirContents.stdout).toContain('nuget.config')
 
-            await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true })
+            await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true })
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
     })
 
-    test('Verify that taq scaffold returns an error with a bogus URL', async () => {
+    // TODO: https://github.com/ecadlabs/taqueria/issues/737
+    test.skip('Verify that taq scaffold returns an error with a bogus URL', async () => {
         try {
             const response = await exec('taq scaffold https://github.com/microsoft/supersecretproject.git')
 
-            expect(response.stderr).toContain("GIT_CLONE_FAILED")
-            expect(response.stderr).toContain("Could not clone https://github.com/microsoft/supersecretproject.git.")
+            expect(response.stderr).toContain("Repository not found")
 
         } catch(error) {
             throw new Error (`error: ${error}`)
@@ -96,25 +117,32 @@ describe("E2E Testing for taqueria scaffolding initialization,", () => {
             expect(scaffoldDirContents.stdout).toContain('taqueria')
             expect(scaffoldDirContents.stdout).toContain('package.json')
 
-            await fsPromises.rm(`./${alternateDirectory}`, { recursive: true })
+            await fsPromises.rm(`./${alternateDirectory}`, { recursive: true , force: true})
         } catch(error) {
             throw new Error (`error: ${error}`)
         }
     })
 
-    test('Verify that taq scaffold quickstart project cannot be injected into an existing directory', async () => {
+    // TODO: https://github.com/ecadlabs/taqueria/issues/737
+    test.skip('Verify that taq scaffold quickstart project cannot be injected into an existing directory', async () => {
         const alternateDirectory = 'alt-directory'
-        
-        try {
-            await fsPromises.mkdir(`${alternateDirectory}`)
+        await fsPromises.mkdir(`${alternateDirectory}`)
 
-            const scaffoldResponse = await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-quickstart.git ${alternateDirectory}`)
-            expect(scaffoldResponse.stderr).toContain("E_INVALID_PATH_ALREADY_EXISTS")
-            expect(scaffoldResponse.stderr).toContain("Path already exists")
+        const scaffoldResponse = await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-quickstart.git ${alternateDirectory}`)
+        expect(scaffoldResponse.stderr).toContain("Path already exists")
 
-            await fsPromises.rm(`./${alternateDirectory}`, { recursive: true })
-        } catch(error) {
-            throw new Error (`error: ${error}`)
-        }
+        await fsPromises.rm(`./${alternateDirectory}`, { recursive: true, force: true })
     })
+
+    // If a test fails before cleaning up after itself, this
+    // directory could remain.
+    const cleanup = async() => {
+        try {
+            await fsPromises.rm('alt-directory', {recursive: true, force: true})
+        }
+        catch {
+            // Deliberately empty
+        }
+    }
+    beforeEach(cleanup)
 })
