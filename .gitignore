@@ -143,6 +143,8 @@ tests/coverage
 /taqueria-plugin-tezos-client/index.js.map
 /taqueria-state-js/index.js
 /taqueria-state-js/index.js.map
+/taqueria-plugin-jest/index.js.map
+/taqueria-plugin-jest/index.js
 
 # VS Code Extension
 /taqueria-vscode-extension/out
