@@ -60,6 +60,7 @@ export const getArch = () : LikeAPromise<string, TaqError> => {
     switch(process.arch) {
         case 'arm64':
             return Promise.resolve('linux/arm64/v8')
+        // @ts-ignore: x32 is valid for some versions of NodeJS
         case 'x32':
         case 'x64':
             return Promise.resolve('linux/amd64')

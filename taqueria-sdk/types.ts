@@ -13,6 +13,7 @@ import * as NetworkConfig from "@taqueria/protocol/NetworkConfig"
 import * as Environment from "@taqueria/protocol/Environment"
 import * as PersistentState from "@taqueria/protocol/PersistentState"
 import * as TaqError from "@taqueria/protocol/TaqError"
+import * as SanitizedAbsPath from "@taqueria/protocol/SanitizedAbsPath"
 import type {i18n} from "@taqueria/protocol/i18n"
 import { P } from 'ts-pattern'
 export type PluginResponse = Protocol.PluginResponse
@@ -30,7 +31,8 @@ export {
     NetworkConfig,
     Environment,
     PersistentState,
-    TaqError
+    TaqError,
+    SanitizedAbsPath
 }
 
 export interface LikeAPromise<Success, TaqError> extends Promise<Success> {
