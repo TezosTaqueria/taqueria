@@ -363,7 +363,7 @@ const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
     // To do so, we need to get the directory for the plugin from the call stack
     const pluginManifest = stack.reduce(
         (retval: null|string, callsite) => {
-            const callerFile = callsite.getFileName()
+            const callerFile = callsite.getFileName()?.replace(/^file:\/\//, '')
             return retval || (
                 callerFile.includes('taqueria-sdk') || 
                 callerFile.includes('taqueria-node-sdk') ||
