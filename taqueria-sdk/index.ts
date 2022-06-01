@@ -60,6 +60,7 @@ export const getArch = () : LikeAPromise<string, TaqError> => {
     switch(process.arch) {
         case 'arm64':
             return Promise.resolve('linux/arm64/v8')
+        // @ts-ignore: x32 is valid for some versions of NodeJS
         case 'x32':
         case 'x64':
             return Promise.resolve('linux/amd64')
@@ -362,7 +363,7 @@ const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
     // To do so, we need to get the directory for the plugin from the call stack
     const pluginManifest = stack.reduce(
         (retval: null|string, callsite) => {
-            const callerFile = callsite.getFileName()
+            const callerFile = callsite.getFileName()?.replace(/^file:\/\//, '')
             return retval || (
                 callerFile.includes('taqueria-sdk') || 
                 callerFile.includes('taqueria-node-sdk') ||
