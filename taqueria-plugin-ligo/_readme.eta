@@ -7,7 +7,7 @@ The LIGO plugin provides a task to compile LIGO smart contracts to Michelson `.t
 ## Requirements
 
 - Taqueria v0.0.6 or later
-- Node.js v16 or later
+- Node.js v16.x or later
 - Docker v0.8.4 or later
 
 ## Installation
