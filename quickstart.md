@@ -1,5 +1,6 @@
 ## Overview
 
+
 Welcome to Taqueria! This quickstart guide will teach you the fundamentals of using Taqueria in 10 minutes by going through the process of running some basic tasks in Taqueria from the CLI
 
 What you will accomplish:
