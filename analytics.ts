@@ -25,14 +25,17 @@ const promptForConsent = async () => {
 	}
 };
 
+const isCIRun = () => Deno.env.get('CI') !== undefined;
+
 const allowTracking = async (): Promise<boolean> => {
+	if (isCIRun()) return false;
 	try {
 		await eager(doesPathExist(consentFilePath));
 	} catch {
 		await promptForConsent();
 	}
 	const consent = await eager(readTextFile(consentFilePath));
-	return consent === OPT_IN && Deno.env.get('CI') === undefined;
+	return consent === OPT_IN;
 };
 
 export const sendEvent = async (taq_version: string, taq_ui: 'CLI' | 'VSCode') => {
