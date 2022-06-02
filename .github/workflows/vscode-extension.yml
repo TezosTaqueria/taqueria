@@ -12,10 +12,10 @@ on:
     outputs:
       vsixGcsUrl:
         description: "The download URL for the VSIX artifact in GCS"
-        value: ${{ jobs.lint-test-build.outputs.vsixGcsUrl }}
+        value: ${{ jobs.test-build.outputs.vsixGcsUrl }}
       artifactFilename:
         description: "The vsix artifact file name"
-        value: ${{ jobs.lint-test-build.outputs.artifactFilename }}
+        value: ${{ jobs.test-build.outputs.artifactFilename }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
@@ -25,7 +25,7 @@ env:
   GIT_WORKSPACE: taqueria-vscode-extension
 
 jobs:
-  lint-test-build:
+  test-build:
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -60,9 +60,6 @@ jobs:
       
       - name: Install Dependencies
         run: npm ci
-      
-      - name: Linter
-        run: npm run lint --workspace ${{ env.GIT_WORKSPACE }}
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
@@ -115,7 +112,7 @@ jobs:
     name: Publish VSCode Extension
     if: ${{ github.event.action == 'published' }}
     needs:
-      - lint-test-build
+      - test-build
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

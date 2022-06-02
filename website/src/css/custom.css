@@ -3,7 +3,7 @@
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
  */
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700&display=swap');
 /* You can override the default Infima variables here. */
 
 :root {
@@ -22,9 +22,9 @@
 	--ifm-color-bg-white: #ffffff;
 	--ifm-color-black-text: #000000;
 	--ifm-font-size-base: 16px;
-	--ifm-font-family-base: "Montserrat";
+	--ifm-font-family-base: 'Montserrat';
 	--ifm-code-font-size: 95%;
-	--ifm-font-color-base: "#000000";
+	--ifm-font-color-base: '#000000';
 	--ifm-footer-link-color: #000000;
 }
 h1 {
@@ -70,10 +70,10 @@ h4 {
 	padding: 0 var(--ifm-pre-padding);
 }
 
-html[data-theme="dark"] .docusaurus-highlight-code-line {
+html[data-theme='dark'] .docusaurus-highlight-code-line {
 	background-color: rgba(0, 0, 0, 0.3);
 }
-html[data-theme="light"] .docusaurus-highlight-code-line {
+html[data-theme='light'] .docusaurus-highlight-code-line {
 	background-color: var(--ifm-color-primary-lightest);
 }
 
@@ -100,23 +100,23 @@ html[data-theme="light"] .docusaurus-highlight-code-line {
 	width: 213px;
 }
 .header-discord-link:before {
-	background: url("../../static/img/discordSVG.svg") no-repeat;
-	content: "";
+	background: url('../../static/img/discordSVG.svg') no-repeat;
+	content: '';
 	display: flex;
 	height: 24px;
 	width: 24px;
 }
 
 .header-twitter-link:before {
-	background: url("../../static/img/twitterSVG.svg") no-repeat;
-	content: "";
+	background: url('../../static/img/twitterSVG.svg') no-repeat;
+	content: '';
 	display: flex;
 	height: 24px;
 	width: 24px;
 }
 .header-github-link:before {
-	background: url("../../static/img/githubSVG.svg") no-repeat;
-	content: "";
+	background: url('../../static/img/githubSVG.svg') no-repeat;
+	content: '';
 	display: flex;
 	height: 24px;
 	width: 24px;
@@ -229,6 +229,12 @@ a.menu__link--sublist {
 	background-color: var(--ifm-color-primary-lightest);
 	padding-top: 80px;
 	padding-bottom: 15px;
+}
+
+.footer__items {
+	list-style: none;
+	margin-bottom: 0;
+	padding-left: 0;
 }
 
 .footer__title {
@@ -370,7 +376,7 @@ a.menu__link--sublist {
 	.copyright {
 		white-space: unset;
 	}
-	.row .col.col.col {
+	.row .footer__col .col.col.col {
 		--ifm-col-width: 50%;
 		flex-basis: unset;
 		margin-left: 0;

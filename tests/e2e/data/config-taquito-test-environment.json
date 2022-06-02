@@ -26,24 +26,6 @@
     },
     "sandbox": {
         "local": {
-            "accounts": {
-                "default": "bob",
-                "bob": {
-                    "initialBalance": "3000000000"
-                },
-                "alice": {
-                    "initialBalance": "2000000000"
-                },
-                "john": {
-                    "initialBalance": "4000000000"
-                },
-                "jane": {
-                    "initialBalance": "5000000000"
-                },
-                "joe": {
-                    "initialBalance": "1000000000"
-                }
-            },
             "label": "Local Tezos Sandbox",
             "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "rpcUrl": "http://localhost:20000"
@@ -79,5 +61,12 @@
                 "activation_code": "07739888a2615d5176505c900f411dcf7990073d"
             }
         }
-    }
+    },
+    "accounts": {
+        "bob": "3000000000",
+        "alice": "2000000000",
+        "john": "4000000000",
+        "jane": "5000000000",
+        "joe": "1000000000"
+    } 
 }

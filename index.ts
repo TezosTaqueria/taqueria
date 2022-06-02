@@ -1,4 +1,6 @@
-import i18n from './i18n.ts'
-import {run} from './cli.ts'
+import load from '@taqueria/protocol/i18n';
+import { run } from './cli.ts';
 
-run(Deno.env, Deno.args, i18n)
+const i18n = await load();
+
+run(Deno.env, Deno.args, i18n);
