@@ -22,6 +22,8 @@ export default async (): Promise<i18n> => {
 						'betaWarning': "Taqueria is currently in BETA. You've been warned. :)",
 						'configDirDesc': 'Config directory (default ./.taq)',
 						'initDesc': 'Initialize a new project',
+						'optInDesc': 'Opt in for Google Analytics',
+						'optOutDesc': 'Opt out of Google Analytics',
 						'initPathDesc': 'Path to your project directory',
 						'scaffoldDesc': 'Generate a new project using pre-made scaffold',
 						'scaffoldUrlDesc': 'Alias or Url for the scaffold project',

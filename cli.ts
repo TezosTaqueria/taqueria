@@ -19,6 +19,7 @@ import { uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
+import { consentFilePath, OPT_IN, OPT_OUT, sendEvent } from './analytics.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -98,6 +99,10 @@ const getVersion = (inputArgs: DenoArgs, _i18n: i18n.t) => {
 		: 'not-provided';
 };
 
+const optInAnalytics = () => writeTextFile(consentFilePath)(OPT_IN);
+
+const optOutAnalytics = () => writeTextFile(consentFilePath)(OPT_OUT);
+
 const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 	yargs(args)
 		.scriptName('taq')
@@ -173,6 +178,26 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 					chain(({ projectDir, maxConcurrency, quickstart }: SanitizedArgs.t) => {
 						return initProject(projectDir, quickstart, maxConcurrency, i18n);
 					}),
+					forkCatch(console.error)(console.error)(console.log),
+				),
+		)
+		.command(
+			'optin',
+			i18n.__('optInDesc'),
+			() => {},
+			() =>
+				pipe(
+					optInAnalytics(),
+					forkCatch(console.error)(console.error)(console.log),
+				),
+		)
+		.command(
+			'optout',
+			i18n.__('optOutDesc'),
+			() => {},
+			() =>
+				pipe(
+					optOutAnalytics(),
 					forkCatch(console.error)(console.error)(console.log),
 				),
 		)
@@ -743,6 +768,8 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 		'listKnownTasks',
 		'provision',
 		'plan',
+		'optin',
+		'optout',
 	].reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,
@@ -758,9 +785,13 @@ const preprocessArgs = (inputArgs: DenoArgs): DenoArgs => {
 	});
 };
 
-export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
+export const run = async (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 	try {
 		const processedInputArgs = preprocessArgs(inputArgs);
+
+		if (!inputArgs.includes('--version') && !inputArgs.includes('--build')) {
+			await sendEvent(getVersion(processedInputArgs, i18n), inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI');
+		}
 
 		// Parse the args required for core built-in tasks
 		return pipe(
