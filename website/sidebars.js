@@ -48,12 +48,24 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Example App",
+      label: "Tutorials",
       className: "sidebarHeader",
       collapsed: false,
       collapsible: false,
       items: [
-        "hello-tacos-tutorial"
+        "tutorials/hello-tacos-tutorial",
+        "tutorials/legacy-hello-tacos-tutorial"
+      ],
+    },
+    {
+      type: "category",
+      label: "Scaffolds",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "scaffolds/taco-shop",
+        "scaffolds/quickstart-demo"
       ],
     },
     {

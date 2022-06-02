@@ -1,5 +1,4 @@
 
-
 <p align="center">
   <a href="https://taqueria.io">
     <img alt="Taqueria" src="https://user-images.githubusercontent.com/1114943/150659418-e55f1df3-ba4d-4e05-ab26-1f729858c7fb.png" width="" />
@@ -18,9 +17,10 @@ Taqueria is an extensible, open source plugin based framework for Tezos dApp dev
 In more practical terms, Taqueria is a task runner that you can use from the command line or the VS Code command palette to quickly accomplish tasks related to Tezos development. Taqueria uses a plugin architecture to implement tasks that provide complex and domain specific functionality
 
 Taqueria includes:
- - A command line interface (CLI) you use in your terminal through a command named `taq`
- - A library of plugins that add tasks to Taqueria
- - A VS Code Extension which provides the ability to run Taqueria tasks from the command palette
+
+- A command line interface (CLI) you use in your terminal through a command named `taq`
+- A library of plugins that add tasks to Taqueria
+- A VS Code Extension which provides the ability to run Taqueria tasks from the command palette
 
 ## Installing the Taqueria CLI
 
@@ -31,11 +31,11 @@ The Taqueria CLI is an executable binary named `taq` installed globally in your 
 3. Add `taq` to your shell's `$PATH`
 
 Builds for the latest release of Taqueria:
-| OS      | URL                                     |  
-|---------|-----------------------------------------|
-| MacOS   | https://taqueria.io/get/macos/taq       |
-| Linux   | https://taqueria.io/get/linux/taq       |
-| Windows | https://taqueria.io/get/windows/taq.exe |
+| OS      | URL                                                                        |  
+|---------|----------------------------------------------------------------------------|
+| MacOS   | [taqueria.io/get/macos/taq](https://taqueria.io/get/macos/taq)             |
+| Linux   | [taqueria.io/get/linux/taq](https://taqueria.io/get/linux/taq)             |
+| Windows | [taqueria.io/get/windows/taq.exe](https://taqueria.io/get/windows/taq.exe) |
 
 Builds are also available on the [releases](https://github.com/ecadlabs/taqueria/releases) page on Github
 
@@ -44,6 +44,7 @@ Builds are also available on the [releases](https://github.com/ecadlabs/taqueria
 ## Getting Started
 
 Once installed, Taqueria is run from the command line using the `taq` command. The basic structure of a Taqueria command is:
+
 ```shell
 taq <taskName> [options]
 ```
@@ -58,7 +59,7 @@ Taqueria plugins extend the functionality of Taqueria by adding additional tasks
 |--------------|------------------------------     |-------------------------------------------------------------|
 | LIGO         | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language             |
 | SmartPy      | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy contract language                |
-| Flextesa     | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa               | 
+| Flextesa     | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa               |
 | Taquito      | `@taqueria/plugin/taquito`        | A front-end Tezos framework used to originate               |
 | TS Generator | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code |
 
@@ -69,13 +70,15 @@ Taqueria manages plugins by providing installation/uninstallation via the `taq i
 There are two approaches to initializing a Taqueria project: initializing an empty project, or using a pre-configured project scaffold
 
 #### Initializing an empty Taqueria project
+
 1. Initialize a new project: `taq init test-project`
 2. Change directories: `cd test-project`
 3. Initialize the project as an NPM project: `npm init -y`
 4. Install the LIGO plugin: `taq install @taqueria/plugin-ligo`
-6. Continue steps 4-5 for each additional plugin you want to install
+5. Continue steps 4-5 for each additional plugin you want to install
 
 #### Using a Taqueria Project Scaffold
+
 1. Run the command `taq scaffold https://github.com/ecadlabs/taqueria-scaffold-quickstart test-project`
 2. Change directories: `cd test-project`
 3. Run the project setup command `npm run setup`
@@ -92,7 +95,9 @@ If you prefer to build the Taqueria binary and plugins locally, follow the steps
 - [Docker](https://www.docker.com/) v0.9 or later
 
 #### Run Build Script
+
 From the root of the Taqueria directory, run the build-all script:
+
 ```shell
 npm run build-all
 ```

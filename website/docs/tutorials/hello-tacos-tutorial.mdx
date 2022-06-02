@@ -1,0 +1,137 @@
+---
+title: Using Taqueria on an Existing Project
+---
+
+Taqueria can be added to existing Tezos projects. This tutorial will guide you through the process of adding Taqueria to an existing project called Hello Tacos
+
+The Hello Tacos starter, like most Tezos projects, requires the developer to install, manage, and run commands on a variety of frameworks and tools in order to accomplish things like compiling smart contracts, running tests, managing sandboxes, and originating contracts on the blockchain. Taqueria manages these tasks and tools for you, providing a simple interface to turbocharge your development process
+
+This tutorial will walk you through the steps of adding Taqueria to an existing project and using Taqueria plugins to compile, test, and deploy smart contracts to a local sandbox and testnet environments
+
+Things you will accomplish:
+- Add and initialize Taqueria on the project
+- Install Taqueria plugins for LIGO, Flextesa, and Taquito
+- Configure sandboxes, networks, and Environments
+- Refactor tests to use Taqueria's powerful tools
+- Use the Taqueria State API to link your smart contracts to your dApp 
+
+:::note 
+This tutorial is a work in progress. Future updates will include:
+- Native Taqueria testing (Taqueria Jest plugin)
+- Passing the deployed contract address to the React dApp via the State API
+- Deploying the contract using Taqueria operations
+- Targeting a specific network for contract deployment and testing (sandboxes and testnets)
+- Deploying the contract to mainnet
+:::
+
+## Requirements
+
+- Taqueria v0.3.0 or later
+- Node.js v16.0 or later
+- Docker v0.9 or later
+
+## Introduction
+
+Hello Tacos is a hello world type project that demonstrates a simple full stack Tezos dApp. The dApp is composed of a simple React app that interacts with a smart contract written in the LIGO language and uses Beacon Wallet to connect to browser based wallets. The smart contract stores a value for the number of available tacos and provides a function to buy tacos
+
+
+## Scaffolding the Starter Project
+
+The first step is to scaffold the Hello Tacos starter project using the `taq scaffold` task. Open up a terminal and run the following command:
+
+```shell
+taq scaffold https://github.com/ecadlabs/taqueria-scaffold-hello-tacos-tutorial hello-tacos
+```
+
+This will clone the project into a directory called `hello-tacos`. Change into that directory by running:
+
+```shell
+cd hello-tacos
+```
+
+## Exploring the project
+
+This starter project is a Tezos project that does not use Taqueria. The front end dApp is a React app which requires it's companion smart contract to be deployed to the blockchain, and the address of the originated contract to be hardcoded into the React app manually
+
+The project structure looks like this:
+- `/app` - This is the React dApp 
+- `/contracts` - This folder contains the LIGO smart contract
+- `/tests` - This folder contains the automated tests
+
+The workflow for a legacy Tezos project like this requires a significant amount of manual work to get sandboxes up and running, and to compile and originate the contract. Doing this would involve running shell commands such as:
+
+- `ligo compile-contract ./contract/hello-tacos.mligo main`
+- `docker run --rm --name hangzhou-sandbox --detach -p 20000:20000 tqtezos/flextesa:20211119 hangzbox start`
+
+Taqueria will take care of all of this for you with simple tasks and a centralized configuration!
+
+## Taq'ifying the Project
+
+To make the project a Taqueria project, run the following command from the root of the project:
+
+```shell
+taq init
+```
+
+This creates the following directory structure and initializes the `config.json` and ephemeral state for the project
+
+- /.taq - This hidden folder stores the Taqueria configuration and state
+- /app - This is the React dApp
+- /contracts - This folder contains the LIGO smart contracts
+- /tests - This folder contains the automated tests
+- /artifacts - This folder contains the compiled Michelson .tz contracts
+
+### Initializing the Project
+
+As Taqueria uses NPM packages for the SDK and plugins, you will need to initialize this project as a Node project by running:
+
+```shell
+npm init -y
+```
+
+With NPM initialized, you can now install dependencies by running:
+
+```shell
+npm install
+```
+
+### Installing Plugins
+
+This project requires the following plugins to be installed:
+
+- LIGO - Provides the compiler needed to compile the LIGO smart contract  
+- Flextesa - Provides a sandbox (Tezos node that runs on your machine) for testing
+- Taquito - Used to originate the smart contract on the sandbox or a testnet
+
+To install these plugins, run the following three commands:
+
+```shell
+taq install @taqueria/plugin-ligo
+```
+
+```shell
+taq install @taqueria/plugin-flextesa
+```
+
+```shell
+taq install @taqueria/plugin-taquito
+```
+
+:::note
+To confirm this was successful, you can run the `taq` command and ensure you see the `compile`, `originate`, and `start sandbox` tasks listed
+:::
+
+
+### Updating Tests to Use Taqueria
+
+*** Coming Soon!
+
+### Implementing the Taqueria State API
+
+The Taqueria State API provides a way to access the return value of an operation such as originating a contract. Currently, the address for the deployed smart contract 
+
+*** Coming Soon! ***
+
+### Using Taqueria Environments
+
+*** Coming Soon! ***

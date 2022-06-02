@@ -7,23 +7,29 @@ The generated site is deployed to [http://taqueria.io](https://taqueria.io), but
 ## How to Run the Website Locally
 
 ### Requirements
+
 - Yarn v1.2 or later
 - Node.js v16 or later
 
 ### Install dependencies
+
 ```shell
-$ yarn
+yarn
 ```
+
 This command downloads the dependincies and plugins required by the site
 
 ### Build the Site
+
 ```shell
-$ yarn build
+yarn build
 ```
+
 This command runs a parser and pre-processor, then generates the static site content into the `build` directory
 
 ### Launch the Site
+
 ```shell
-$ yarn start
+yarn start
 ```
 This command will serve the website on [localhost:3000](http://localhost:3000)
