@@ -54,12 +54,12 @@ export const exampleTypedMethods_existingWallet = async () => {
 
     const contract = await Tezos.wallet.at<TestWallet>(`tz123`);
 
-    // SendParams are not stictly typed yet
+    // SendParams are not strictly typed yet
     // const bidSendResult = await contract.methods.bid(tas.nat(0)).send({ amount: tas.mutez(1000000) });
     const bidSendResult = await contract.methods.bid(tas.nat(0)).send({ amount: tas.number(tas.mutez(1000000)) });
 
     // Receipt only exists on wallet
-    const bidReciptResult = await bidSendResult.receipt();
+    const bidReceiptResult = await bidSendResult.receipt();
     const bidConfirmationResult = await bidSendResult.confirmation(10);
 
     contract.methods.configure(
