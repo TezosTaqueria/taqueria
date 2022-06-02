@@ -14,6 +14,7 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
+import * as Template from '@taqueria/protocol/Template';
 import { P } from 'ts-pattern';
 import { z } from 'zod';
 export type PluginResponse = Protocol.PluginResponse;
@@ -33,6 +34,7 @@ export {
 	SanitizedAbsPath,
 	TaqError,
 	Task,
+	Template,
 };
 
 export interface LikeAPromise<Success, TaqError> extends Promise<Success> {

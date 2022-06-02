@@ -1,4 +1,5 @@
-import { Option, Plugin, PositionalArg, Task } from '@taqueria/node-sdk';
+import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
+import contractTemplateHandler from './contract-template';
 import proxy from './proxy';
 
 Plugin.create(() => ({
@@ -31,6 +32,20 @@ Plugin.create(() => ({
 					flag: 'testPattern',
 					description: 'Run test files that match the provided pattern',
 					boolean: true,
+				}),
+			],
+		}),
+	],
+	templates: [
+		Template.create({
+			command: 'contract-test <artifactName>',
+			template: 'contract-test',
+			description: 'Generate a test suite for a contract',
+			handler: contractTemplateHandler,
+			options: [
+				Option.create({
+					flag: 'partition',
+					description: 'The partition to create the test within',
 				}),
 			],
 		}),

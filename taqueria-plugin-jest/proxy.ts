@@ -34,10 +34,6 @@ const getRootConfigAbspath = (projectDir: SanitizedAbsPath.t) =>
 		join(projectDir, '.taq', 'jest.config.js'),
 	);
 
-const getTestsRootDir = (config: CustomConfig) => {
-	return config.jestTestsRootDir || 'tests';
-};
-
 const toPartitionCfg = (partitionAbspath: SanitizedAbsPath.t, rootConfigAbsPath: SanitizedAbsPath.t) => `
 const parentConfig = require('${rootConfigAbsPath}')
 
