@@ -32,22 +32,16 @@ describe('Extension Test Suite', () => {
 			assert.notEqual(taqCommands, undefined);
 		});
 
-		// TODO: Need to figure out if it is possible to interact with showDialogBox
-		//      If no this test cannot be automated
-		//      I tried to use RobotJS, but it has an issue to work with parser properly
-		//      Even if I exclude it it keeps asking to rebuild it due to an old version of npm
-		//      https://stackoverflow.com/questions/46384591/node-was-compiled-against-a-different-node-js-version-using-node-module-versio
-
-		// await vscode.commands.executeCommand("taqueria.init").then( ()=>{
-		// });
-
+		vscode.commands.executeCommand('workbench.action.closeActiveEditor');
 		// Example how to use sleep to stop VS Code for a moment
-		// await sleep(60000);
+		await sleep(180000);
 	});
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/605
 	it.skip('Verify that VS Code command Taqueria Scaffold will scaffold a project', async () => {
 		// Open taquified project in workspace under testProjectDestination
+
+		await sleep(180000);
 
 		// Run taqueria scaffold command
 		await vscode.commands.executeCommand('taqueria.scaffold');
@@ -74,6 +68,10 @@ describe('Extension Test Suite', () => {
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/645
 	it.skip('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+		// Open test folder
+		await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
+
+		await sleep(180000);
 		// Install plugin
 		await vscode.commands.executeCommand('taqueria.install @taqueria/plugin-ligo');
 
@@ -100,8 +98,8 @@ describe('Extension Test Suite', () => {
 	});
 
 	after(async () => {
-		await fse.rmdir(testProjectDestination, { recursive: true });
+		// await fse.rmdir(testProjectDestination, { recursive: true });
 		// Uncomment for local development
-		// await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
+		await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, { recursive: true });
 	});
 });
