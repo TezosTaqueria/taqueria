@@ -3,15 +3,10 @@
 	"displayName": "taqueria",
 	"description": "A vscode plugin to make Tezos development easier with Taqueria!",
 	"publisher": "ecadlabs",
-	"version": "0.4.1",
+	"version": "0.3.1",
 	"engines": {
-		"vscode": "^1.63.0",
-		"node": "^16.0.0"
+		"vscode": "^1.63.0"
 	},
-	"engineStrict": true,
-	"extensionKind": [
-		"ui"
-	],
 	"targets": {
 		"default": {
 			"source": "./src/extension.ts",
@@ -145,7 +140,7 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
-		"@taquito/taquito": "^12.1.1",
+		"@taquito/taquito": "^12.1.0",
 		"@types/fs-extra": "^9.0.13",
 		"@types/glob": "^7.2.0",
 		"@types/mocha": "^5.2.6",
@@ -160,12 +155,12 @@
 		"fs-extra": "^10.1.0",
 		"glob": "^7.2.0",
 		"mocha": "^9.2.1",
-		"parcel": "^2.6.0",
-		"typescript": "4.7.2",
+		"parcel": "^2.3.1",
+		"typescript": "4.5.4",
 		"vsce": "^2.6.4"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.4.1",
+		"@taqueria/protocol": "^0.3.1",
 		"comment-json": "^4.1.1",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1"

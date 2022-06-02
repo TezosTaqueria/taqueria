@@ -1,11 +1,9 @@
-import { EphemeralState } from '@taqueria/protocol/EphemeralState';
-import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { stat } from 'fs/promises';
 import { join } from 'path';
 import { path } from 'rambda';
 import * as api from 'vscode';
 import * as Util from './pure';
-import { TaqVsxError } from './TaqVsxError';
+import type { I18N } from './pure';
 
 export const COMMAND_PREFIX = 'taqueria.';
 
@@ -29,10 +27,10 @@ export const sanitizeDeps = (deps?: InjectedDependencies) =>
 export const inject = (deps: InjectedDependencies) => {
 	const { vscode } = deps;
 
-	const exposeInitTask = async (
+	const exposeInitTask = (
 		context: api.ExtensionContext,
 		output: api.OutputChannel,
-		i18n: i18n,
+		i18n: I18N,
 		folders: readonly api.WorkspaceFolder[],
 	) => {
 		const exposeTask = exposeTaqTaskAsCommand(context, output, i18n);
@@ -70,7 +68,7 @@ export const inject = (deps: InjectedDependencies) => {
 		}
 	};
 
-	const getTaqifiedDirectories = (folders: readonly api.WorkspaceFolder[], i18n: i18n) => {
+	const getTaqifiedDirectories = (folders: readonly api.WorkspaceFolder[], i18n: I18N) => {
 		const processes = folders.map(folder => {
 			const taqifiedPath = join(folder.uri.path, '.taq');
 			return stat(taqifiedPath)
@@ -81,33 +79,25 @@ export const inject = (deps: InjectedDependencies) => {
 		return Promise.all(processes)
 			.then(results =>
 				results.reduce(
-					(paths: Util.PathToDir[], pathToDir) => {
+					(retval: Util.PathToDir[], pathToDir) => {
 						return pathToDir
-							? [...paths, pathToDir]
-							: paths;
+							? [...retval, pathToDir]
+							: retval;
 					},
 					[],
 				)
 			);
 	};
 
-	const promptForPluginSelection = (_i18n: i18n, debug: api.DebugSession | undefined, availablePlugins: string[]) =>
-		debug
-			? vscode.window.showQuickPick(availablePlugins, {
-				canPickMany: false,
-				ignoreFocusOut: false,
-				placeHolder: 'Plugin name',
-				title: 'Select a plugin',
-			})
-			: vscode.window.showOpenDialog({
-				canSelectFiles: false,
-				canSelectFolders: true,
-				canSelectMany: false,
-				title: 'Select plugin folder',
-				openLabel: 'Select plugin',
-			}).then(val => val ? val[0].fsPath : '');
+	const promptForPluginSelection = (_i18n: I18N, availablePlugins: string[]) =>
+		vscode.window.showQuickPick(availablePlugins, {
+			canPickMany: false,
+			ignoreFocusOut: false,
+			placeHolder: 'Plugin name',
+			title: 'Select a plugin',
+		});
 
-	const promptForTaqProject = (_i18n: i18n, availableProjects: readonly string[]) =>
+	const promptForTaqProject = (_i18n: I18N, availableProjects: readonly string[]) =>
 		vscode.window.showQuickPick(availableProjects, {
 			canPickMany: false,
 			ignoreFocusOut: false,
@@ -115,11 +105,11 @@ export const inject = (deps: InjectedDependencies) => {
 			placeHolder: 'Directory',
 		});
 
-	const exposeInstallTask = async (
+	const exposeInstallTask = (
 		context: api.ExtensionContext,
 		output: api.OutputChannel,
 		folders: readonly api.WorkspaceFolder[],
-		i18n: i18n,
+		i18n: I18N,
 	) => {
 		const exposeTask = exposeTaskAsCommand(context, output, i18n);
 		const availablePlugins = [
@@ -128,7 +118,7 @@ export const inject = (deps: InjectedDependencies) => {
 			'@taqueria/plugin-taquito',
 			'@taqueria/plugin-flextesa',
 		];
-		const proxyInstall = (pluginName: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
+		const proxyInstall = (pluginName: string, pathToTaq: Util.PathToTaq, i18n: I18N, projectDir?: Util.PathToDir) =>
 			Util.proxyToTaq(pathToTaq, i18n, projectDir)(`install ${pluginName}`)
 				.then(notify)
 				.catch(showError);
@@ -141,7 +131,7 @@ export const inject = (deps: InjectedDependencies) => {
 					if (results.length === 0) {
 						return addCommand(context)(Commands.install, () =>
 							showError({
-								kind: 'E_NO_TAQUERIA_PROJECTS',
+								code: 'E_NO_TAQUERIA_PROJECTS',
 								msg:
 									"You don't have any Taqueria projects. You'll need to taq'ify a project using \"Taqueria: Init\" before you can install a plugin.",
 							}));
@@ -149,7 +139,7 @@ export const inject = (deps: InjectedDependencies) => {
 					// exactly where to install a plugin
 					else if (results.length === 1) {
 						const projectDir = results[0];
-						return promptForPluginSelection(i18n, api.debug.activeDebugSession, availablePlugins)
+						return promptForPluginSelection(i18n, availablePlugins)
 							.then(pluginName => {
 								if (pluginName) {
 									return proxyInstall(pluginName, pathToTaq, i18n, projectDir);
@@ -162,7 +152,7 @@ export const inject = (deps: InjectedDependencies) => {
 								if (selectedDir) {
 									return Util.makeDir(selectedDir, i18n)
 										.then(projectDir =>
-											promptForPluginSelection(i18n, api.debug.activeDebugSession, availablePlugins)
+											promptForPluginSelection(i18n, availablePlugins)
 												.then(pluginName => {
 													if (pluginName) return proxyInstall(pluginName, pathToTaq, i18n, projectDir);
 												})
@@ -179,12 +169,12 @@ export const inject = (deps: InjectedDependencies) => {
 		context: api.ExtensionContext,
 		output: api.OutputChannel,
 		folders: readonly api.WorkspaceFolder[],
-		i18n: i18n,
+		i18n: I18N,
 	) =>
 		(projectDir: Util.PathToDir) => {
 			getTaqBinPath(i18n)
 				.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, projectDir)('list-known-tasks'))
-				.then(data => Util.decodeJson<EphemeralState>(data))
+				.then(data => Util.decodeJson<Util.State>(data))
 				.then(state => {
 					// const cmdId = taskNameToCmdId(taskName)
 					return state;
@@ -195,7 +185,7 @@ export const inject = (deps: InjectedDependencies) => {
 		context: api.ExtensionContext,
 		output: api.OutputChannel,
 		folders: readonly api.WorkspaceFolder[],
-		i18n: i18n,
+		i18n: I18N,
 	) =>
 		getTaqifiedDirectories(folders, i18n)
 			.then(projectDirs =>
@@ -208,7 +198,7 @@ export const inject = (deps: InjectedDependencies) => {
 				)
 			);
 
-	const getTaqBinPath = (i18n: i18n) => {
+	const getTaqBinPath = (i18n: I18N) => {
 		const providedPath = vscode.workspace.getConfiguration('taqueria').get('path', '');
 		return providedPath && (providedPath as string).length > 0
 			? Util.makePathToTaq(i18n)(providedPath)
@@ -223,12 +213,41 @@ export const inject = (deps: InjectedDependencies) => {
 			);
 		};
 
-	const showError = (err: TaqVsxError) => {
+	const showError = (err: Util.TaqErr) => {
 		Util.log('Error:')(err);
-		return (err.context
-			? vscode.window.showErrorMessage(err.msg, err.context)
-			: vscode.window.showErrorMessage(err.msg))
-			.then(_ => Promise.resolve()) as Promise<void>;
+		switch (err.code) {
+			case 'E_EXEC':
+				return vscode.window.showErrorMessage(err.msg, err.cmd)
+					.then(_ => Promise.resolve()) as Promise<void>;
+			case 'E_INVALID_DIR':
+				return vscode.window.showErrorMessage(err.msg, err.pathProvided)
+					.then(_ => Promise.resolve()) as Promise<void>;
+			case 'E_INVALID_FILE':
+				return vscode.window.showErrorMessage(err.msg, err.pathProvided)
+					.then(_ => Promise.resolve()) as Promise<void>;
+			case 'E_INVALID_JSON':
+				return vscode.window.showErrorMessage(err.msg, err.data)
+					.then(_ => Promise.resolve()) as Promise<void>;
+			case 'E_NOT_TAQIFIED':
+				return vscode.window.showErrorMessage(err.msg, err.pathProvided)
+					.then(_ => Promise.resolve()) as Promise<void>;
+			case 'E_PROXY':
+				return (err.cmd
+					? vscode.window.showErrorMessage(err.msg, err.cmd)
+					: vscode.window.showErrorMessage(err.msg))
+					.then(_ => Promise.resolve()) as Promise<void>;
+			case 'E_STATE_MISSING':
+				return vscode.window.showErrorMessage(err.msg, err.taqifiedDir)
+					.then(_ => Promise.resolve()) as Promise<void>;
+			case 'E_TAQ_NOT_FOUND':
+				return (err.pathProvided
+					? vscode.window.showErrorMessage(err.msg, err.pathProvided)
+					: vscode.window.showErrorMessage(err.msg))
+					.then(_ => Promise.resolve()) as Promise<void>;
+			default:
+				return vscode.window.showErrorMessage(err.msg)
+					.then(_ => Promise.resolve()) as Promise<void>;
+		}
 	};
 
 	const notify = (msg: string) =>
@@ -242,15 +261,12 @@ export const inject = (deps: InjectedDependencies) => {
 				.then(_ => output.append(data))
 				.then(_ => output.show());
 
-	const getSandboxNames = (projectDir: Util.TaqifiedDir) =>
-		projectDir.config.sandbox
-			? Object.keys(projectDir.config.sandbox)
-			: [];
+	const getSandboxNames = (projectDir: Util.TaqifiedDir) => Object.keys(projectDir.config.sandbox);
 
 	const exposeTaqTaskAsCommand = (
 		context: api.ExtensionContext,
 		output: api.OutputChannel,
-		i18n: i18n,
+		i18n: I18N,
 		projectDir?: Util.PathToDir,
 	) =>
 		(cmdId: string, taskWithArgs: string, outputTo: 'output' | 'notify', otherNotification?: string) =>
@@ -270,7 +286,7 @@ export const inject = (deps: InjectedDependencies) => {
 	const exposeTaskAsCommand = (
 		context: api.ExtensionContext,
 		output: api.OutputChannel,
-		i18n: i18n,
+		i18n: I18N,
 		projectDir?: Util.PathToDir,
 	) =>
 		(cmdId: string, handler: ((pathToTaq: Util.PathToTaq) => Promise<void>)) =>
@@ -285,7 +301,7 @@ export const inject = (deps: InjectedDependencies) => {
 	const exposeSandboxTaskAsCommand = (
 		context: api.ExtensionContext,
 		output: api.OutputChannel,
-		i18n: i18n,
+		i18n: I18N,
 		projectDir: Util.PathToDir,
 	) =>
 		(cmdId: string, taskName: string, outputTo: 'output' | 'notify', otherNotification?: string) => {
