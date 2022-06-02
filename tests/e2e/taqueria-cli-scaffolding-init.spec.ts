@@ -41,9 +41,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		}
 	});
 
-	// We will not need to remove the .git directory once https://github.com/ecadlabs/taqueria/issues/390 is complete
-	// That being said when it is complete it will be easy to remove since this test will fail then
-	test.skip('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
+	test('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
 		const tarFileName = 'taq-quickstart.tar';
 		try {
 			try {
@@ -52,15 +50,9 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 				// Ensure that this path doesn't already exist
 			}
 
-    test('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
-        const tarFileName = 'taq-quickstart.tar'
-        try {
-            try {
-                await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true })
-            }
-            catch {
-                // Ensure that this path doesn't already exist
-            }
+			await exec('taq scaffold');
+			await fsPromises.rm(`./${scaffoldDirName}/.git`, { recursive: true });
+			await exec(`tar -cf ${tarFileName} ${scaffoldDirName} --mtime=2020-01-30`);
 
 			const tarMD5Sum = await exec(`md5sum ${tarFileName}`);
 			const md5sum = tarMD5Sum.stdout.split(' ')[0];
@@ -89,13 +81,13 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 			expect(scaffoldDirContents.stdout).toContain('docs');
 			expect(scaffoldDirContents.stdout).toContain('nuget.config');
 
+			await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true });
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
 
-    test('Verify that taq scaffold returns an error with a bogus URL', async () => {
-        try {
-            const response = await exec('taq scaffold https://github.com/microsoft/supersecretproject.git')
-
-	// TODO: https://github.com/ecadlabs/taqueria/issues/737
-	test.skip('Verify that taq scaffold returns an error with a bogus URL', async () => {
+	test('Verify that taq scaffold returns an error with a bogus URL', async () => {
 		try {
 			const response = await exec('taq scaffold https://github.com/microsoft/supersecretproject.git');
 
@@ -117,13 +109,13 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 			expect(scaffoldDirContents.stdout).toContain('taqueria');
 			expect(scaffoldDirContents.stdout).toContain('package.json');
 
+			await fsPromises.rm(`./${alternateDirectory}`, { recursive: true, force: true });
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
 
-    test('Verify that taq scaffold quickstart project cannot be injected into an existing directory', async () => {
-        const alternateDirectory = 'alt-directory'
-        await fsPromises.mkdir(`${alternateDirectory}`)
-
-	// TODO: https://github.com/ecadlabs/taqueria/issues/737
-	test.skip('Verify that taq scaffold quickstart project cannot be injected into an existing directory', async () => {
+	test('Verify that taq scaffold quickstart project cannot be injected into an existing directory', async () => {
 		const alternateDirectory = 'alt-directory';
 		await fsPromises.mkdir(`${alternateDirectory}`);
 
