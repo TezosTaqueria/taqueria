@@ -21,11 +21,7 @@ export type PathToDir = string & { __kind__: 'PathToDir' };
 export type PathToFile = string & { __kind__: 'PathToFile' };
 
 export type Json<T> = T;
-
-export const taqifiedDirType: unique symbol = Symbol('taqifiedDirType');
-
 export class TaqifiedDir {
-	[taqifiedDirType]: void;
 	readonly dir: PathToDir;
 	readonly config: Config.t;
 	readonly state: EphemeralState;
