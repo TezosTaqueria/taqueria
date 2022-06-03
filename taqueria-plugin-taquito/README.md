@@ -9,7 +9,7 @@ To install the Taquito plugin on a Taqueria project, navigate to the project fol
 taq install @taqueria/plugin-taquito
 ```
 
-## Configurationlg
+## Configuration
 
 The target networks, sandboxes, and environments are configured in the Taqueria project's `config.json` file. For additional information on configuring network, documentation can be found [here](https://taqueria.io/docs/getting-started/networks/)
 
