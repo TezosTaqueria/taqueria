@@ -51,10 +51,11 @@ const sidebars = {
         "plugins/plugin-flextesa",
         "plugins/plugin-archetype",
         "plugins/plugin-ligo",
-        "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
         "plugins/plugin-contract-types",
         "plugins/plugin-tezos-client",
+        "plugins/plugin-smartpy",
+        "plugins/plugin-jest",
         "plugins/state-js"
       ],
     },

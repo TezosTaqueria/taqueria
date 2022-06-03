@@ -4,6 +4,7 @@ title: Taqueria Releases
 
 # Taqueria v0.4.0   
 
+| Details     |               |
 | ----------- | ------------- |
 |Release Date | June 3, 2022  |
 |Release Type | Major         |
@@ -14,7 +15,7 @@ title: Taqueria Releases
 - Taqueria State functionality
 - A new JS/TS library `@taqueria/state-js` to interact with Taqueria State (access data persisted to state and reference accounts by name)
 - A new plugin `@taqueria/plugin-jest` that allows you to test your smart contracts and dapps with Jest in creative and powerful ways  
-- Implicit accounts and desired balances are declared at the root of the config.json file ***breaking change***
+- Implicit accounts and desired balances are declared at the root of the config.json file **Note: Breaking Change!**
 - Robust data integrity checks following the "parse; don't validate" practice
 - @taqueria/plugin-taquito - The `originate` task is now stateful and persists the contract address
 - @taqueria/plugin-tezos-client -  Added support for invoking endpoints by annotation
@@ -94,52 +95,98 @@ const results = getOriginations()
      .filter(contract => contract.destination === "local")
 ```
 
-## JEST Plugin
+## Jest Plugin 
+
+pluginName: `@taqueria/plugin-jest`
+
+:::note
+The Taqueria team is excited to include the first version of the Jest plugin `@taqueria/plugin-jest` in this release. This plugin allows you to partition your tests in powerful and flexible ways while easing the burden of managing Jest configuration files. The next feature already under active development is automatic test stub generation from Michelson files using generated types
+:::
+
+The `@taqueria/plugin-jest` plugin provides the `taq test` task which provides a means to instantiate test directories and run Jest tests
+
+### Installation
+
+To install the Jest plugin on a Taqueria project, run:
+
+```shell
+taq install @taqueria/plugin-jest
+```
+
+### Usage
+
+:::note
+The Jest plugin will automatically initialize a Jest test directory when you run `taq test <test-directory>`
+
+The easiest way to start using the plugin is to:
+
+1. Create a new directory in the root of your project `/tests`
+2. Add one or more tests to the directory
+3. Run `taq test tests`
+:::
 
 
+### Initializing Partitions
 
-Partitions - directories with their own JEST config (so you can segment tests into different buckets:  e.g. type / )
+The Jest plugin uses partitions. These are just directories with their own JEST config but allow you to group and manage your tests with great flexibility. This allows you to segment and run tests in different buckets such as:
 
-Unlimited number of partitions: by default there are no partitions
+- By type (unit tests, integration tests, acceptance tests, e2e tests)
+- Structural (dapp, smart contract, serverless functions)
 
-Treate one by running `taq test -init` -> creates a partition using the folder specifed in [jestTestsRootDir] 
+To create a new partition (initialized test directory), run:
 
-Config can be overridden by setting `jestTestsRootDir` in `taqueria.config.js`
+```shell
+taq test --init
+```
+
+This will do several things:
+
+- Create a new directory (in this case it uses the default directory `/tests`)
+- Create a Jest configuration in the directory
+- Create a global Jest configuration file in `./.taq/jest.config.js`
+
+:::note
+You can create any number of partitions. By default there are no partitions
+:::
+
+To create additional partitions, simply run:
+
+```shell
+taq test [partitionName]`
+```
+
+### Running Jest tests
+
+The `taq test [partitionName]` task will run the Jest tests associated with a particular partition
 
 Create tests in that folder `tests/example.spec.ts`
 
-```
-describe('Jest example', () => {
-    test('This is a test. Nothing more; nothing less', () => {
-        expect('tests').toContain('fun')
-    })
-})
-```
+### Jest Configuration
 
-`taq test [partitionName]`
+A Global Config for Jest is created in the project's Taq directory: `./.taq/jest.config.js`
 
-Global Config:
-- `./.taq/jest.config.js`
+Each partition will have it's own Jest configuration file (`./tests/jest.config.js`)
 
-implicitly:
-- if no provision created, `taq test [dirName]`
+The Jest configurations cascade down from the global config. If you want to override a value in the global config, simply define it in the partition config. The partition config will override the global config
 
-### Implicit accounts
+:::note
+The default root directory for Jest can be overridden by setting `"jestTestsRootDir"` in `taqueria.config.js`
+:::
+
+## Implicit accounts
 
 :::warning
-This release makes a breaking change to the schema of `config.json`. If you use Taqueria v0.4.0 on an existing project, you will need to make minor adjustments to your `config.json
+This release makes a breaking change to the schema of `config.json`. If you use Taqueria v0.4.0 on an existing project, you will need to make minor adjustments to your `config.json` file
 :::
 
 Taqueria now allows you to be declarative when naming your implicit accounts and the desired balance for each. These accounts are declared at the root level in `config.json`. Previously, accounts were defined in each sandbox configuration
 
-The basic structure of `config.json` is now:
+The default configuration for Taqueria projects includes five pre-defined accounts as shown here:
 
 ```json
 {
     "language": "en",
-    "plugins": [
-
-    ],
+    "plugins": [ ],
     "contractsDir": "contracts",
     "testsDir": "tests",
     "artifactsDir": "artifacts",
@@ -150,9 +197,6 @@ The basic structure of `config.json` is now:
             "sandboxes": [
                 "local"
             ],
-            "storage": {
-                "example.tz": 42
-            }
         }
     },
     "sandbox": {
@@ -179,24 +223,6 @@ These accounts will be created and funded automatically when a sandbox starts. A
 
 ```json
 {
-    "language": "en",
-    "plugins": [
-    ],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {
-                "example.tz": 42
-            }
-        }
-    },
     "sandbox": {
         "local": {
             "accounts": {
@@ -282,10 +308,9 @@ taq simulate sample.tz 'Left (Left 3)' --storage 5
 
 ### Conceptual Changes to Note
 
-- Taqueria now stores the project in a new auto-generated file `development-state.json` specific to the environment located in the `./.taq/` directory 
-- Taqueria's ephermal state `state.json` will now be referred to as the Taqueria cache
+- Taqueria has a new auto-generated file `development-state.json` located in the `./.taq/` directory 
+- Taqueria's `ephermal state` (`state.json`) will now be referred to as the Taqueria `cache`
 - Implicit accounts are now defined at the root level in the `config.json` file
-- The balance of these accounts is now global to the project
 - On startup, a sandbox will create and fund each defined implicit account  
 
 ### Bugfixes
