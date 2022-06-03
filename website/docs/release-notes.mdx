@@ -306,6 +306,14 @@ Previously, a raw Michelson expression was required:
 taq simulate sample.tz 'Left (Left 3)' --storage 5
 ```
 
+### Reduced Number of Setup steps
+
+This release improves the Taqueria workflow by improving the `taq init` and `taq scaffold` tasks, reducing the number of CLI commands required to setup a project
+
+Specifically:
+- `taq init` now runs `npm init -y` implicitly
+- `taq scaffold` now runs `npm i` and several housekeeping tasks implicitly 
+
 ### Conceptual Changes to Note
 
 - Taqueria has a new auto-generated file `development-state.json` located in the `./.taq/` directory 
