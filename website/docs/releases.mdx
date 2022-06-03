@@ -1,0 +1,256 @@
+--- 
+title: Taqueria Releases
+---
+
+
+# Taqueria v0.4.0
+
+| -------     | ----  |
+|Release Date | June 3, 2022  |
+|Release Type | Major         |
+|Release Page | v0.4.0(https://github.com/ecadlabs/taqueria/releases/tag/v0.4.0) |
+
+## Summary of Impactful Changes
+
+- Taqueria Persistant State & API
+- Project level named implicit accounts * *breaking change* *
+- SDK added support for new plugin constructs: Operations, Hooks, and Templates
+- @taqueria/plugin-taquito: stateful `originate` operation now available
+- @taqueria/plugin-tezos-client: added support for invoking endpoints by annotation
+- Taqueria protocol now uses schema based type enforcement (Zod)
+
+
+## New features
+
+### Persistant State
+
+Taqueria is implementing support for stateful operations which will allow for:
+- Reliable reproduction of on-chain state 
+- A means to store and query the results of operations
+- Complex use cases with multiple operations and dependencies
+
+Taqueria now tracks and stores each task executed, along with any returned values. This data is is stored in a new auto-generated file named `development-state.json` which is referred to as the `persistant state`
+
+This file is JSON encoded and is stored in the `.taq` directory of the project. Records follow the format:
+
+```json
+        "@taqueria/plugin-taquito.deploy.1654212273655": {
+            "time": 1654212273655,
+            "output": [
+                {
+                    "contract": "test.tz",
+                    "address": "KT1ShFinJPuXqdAUXomKAB8t6s3q6JGjAN2G",
+                    "destination": "local"
+                }
+            ]
+        }
+```
+
+:::note
+At this time, only the `originate` task is supported but full support for operations and additional plugin tasks is coming soon
+:::
+
+### State API
+
+A new package `@taqueria-state-js` has been added to the project which provides a simple interface for working with the persistant state 
+
+To use the package, import it into any JS or TS file:
+
+```js
+import loadProject from "@taqueria/state-js"
+```
+
+Once imported, you can retrieve the list of originations like this:
+
+```js
+const {getOriginations} = await loadProject()
+const results = getOriginations("increment.tz")
+console.log(results)
+```
+
+
+To retrieve the most recently deployed version of a contract and the address:
+
+
+```js
+const [latest] = getOriginations("increment.tz")
+```
+
+
+To retrieve a list of all contracts deployed to the sandbox `local`:
+
+```js
+const results = getOriginations()
+     .filter(contract => contract.destination === "local")
+```
+
+### Implicit accounts
+
+:::warning
+This release makes a breaking change to the schema of `config.json`
+:::
+
+Taqueria now defines named implicit accounts at the root level in `config.json`. Previously, accounts were defined separatley in each sandbox configuration
+
+The basic structure of `config.json` is now:
+
+```json
+{
+    "language": "en",
+    "plugins": [
+
+    ],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts",
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {
+                "example.tz": 42
+            }
+        }
+    },
+    "sandbox": {
+        "local": {
+            "label": "Local Tezos Sandbox",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+    "network": {},
+    "accounts": {
+        "bob": "3_000_000_000",
+        "alice": "3_000_000_000",
+        "john": "3_000_000_000",
+        "jane": "3_000_000_000",
+        "joe": "3_000_000_000"
+    }
+}
+```
+
+These accounts will be created and funded automatically when a sandbox starts. After starting a sandbox, you will see the defined accounts appear in the configuration:
+
+```json
+{
+    "language": "en",
+    "plugins": [
+    ],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts",
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {
+                "example.tz": 42
+            }
+        }
+    },
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "bob": {
+                    "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+                    "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+                    "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+                },
+                "alice": {
+                    "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+                    "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+                    "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+                }
+            },
+            "label": "Local Tezos Sandbox",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+    "network": {},
+    "accounts": {
+        "bob": "3_000_000_000",
+        "alice": "3_000_000_000"
+    }
+}
+```
+
+:::note
+To set a default account for a sandbox, you must define it explicitly in the sandbox config:
+
+```json
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "default": "bob",
+                "bob": {
+                    "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+                    "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+                    "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+                },
+                "alice": {
+                    "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+                    "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+                    "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+                }
+            },
+            "label": "Local Tezos Sandbox",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+```
+:::
+
+
+### SDK Contructs
+
+******** NEEDS CONSIDERATION ********
+
+
+## Product Changes
+
+### @taqueria/plugin-tezos-client - `simulate` task improved
+
+The Tezos Client now supports invoking entrypoints by annotation. The flag `--entrypoint` has been added to the simulate task
+
+You can now invoke an entrypoint annotated `decrement` by running the following:
+
+```shell
+taq simulate sample.tz '3' --storage 5 --entrypoint decrement
+```
+
+Previously, a raw Michelson expression was required:
+
+```shell
+taq simulate sample.tz 'Left (Left 3)' --storage 5
+```
+
+### Conceptual Changes to Note
+
+- Taqueria now stores the persistant state of a project in a new auto-generated file `development-state.json`, located in the `./.taq/` directory 
+- Taqueria's program cache (`state.json`), previously known as `state` will now be referred to as `ephemeral state`
+- Implicit accounts are now defined at the root level in the `config.json` file
+- The balance of these accounts is now global to the project
+- On startup, a sandbox will create and fund each defined account 
+
+### Bugfixes
+
+- @taqueria/plugin-flextesa: Deploying multiple contracts can fail [#512](https://github.com/ecadlabs/taqueria/issues/512)
+- @taqueria/plugin-flextesa: Contract contents in sandbox deployment don't match what is printed out in console message[#707]](https://github.com/ecadlabs/taqueria/issues/707)
+- @taqueria/plugin-tezos-client: Tezos client plugin storage or input value of 0 is treated as empty [#702]](https://github.com/ecadlabs/taqueria/issues/702)
+
+### Other Improvements
+
+- MacOS runners added to CI pipeline which has enabled automated testing in MacOs environments
+- E2E tests now asynchronously and in batches, up to 4x faster 
+- Plugin documentation is now all built from a common source
+- Dependency injection added to VS Code Extension
+- Improved test coverage of VS Code Extension
