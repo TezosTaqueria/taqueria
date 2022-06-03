@@ -1,0 +1,46 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "build-and-watch-vscode",
+			"type": "npm",
+			"script": "build-and-watch-vscode",
+			"isBackground": true,
+			"problemMatcher": [
+				"$tsc",
+				{
+					"owner": "typescript",
+					"fileLocation": [
+						"relative",
+						"${workspaceFolder}"
+					],
+					"background": {
+						"activeOnStart": true,
+						"endsPattern": {
+							"regexp": "out/extension.js"
+						},
+						"beginsPattern": {
+							"regexp": "compile"
+						}
+					},
+					"pattern": {
+						"regexp": "thisnevermatches", // TODO: find a way to remove this
+						"file": 1,
+						"line": 2,
+						"column": 3,
+						"severity": 4,
+						"message": 5
+					}
+				}
+			],
+			"presentation": {
+				"reveal": "never",
+				"group": "watchers"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
