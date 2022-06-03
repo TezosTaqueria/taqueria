@@ -15,7 +15,7 @@ title: Taqueria Releases
 - Project level named implicit accounts * *breaking change* *
 - @taqueria/plugin-taquito: stateful `originate` operation now available
 - @taqueria/plugin-tezos-client: added support for invoking endpoints by annotation
-- Taqueria protocol now uses schema based type enforcement (Zod)
+
 
 ## New features
 
@@ -50,9 +50,26 @@ implicitly:
 
 ### Taqueria State
 
-Taqueria now tracks and stores each task executed, along with any returned values. This data is is stored in a new auto-generated file named `development-state.json` which is referred to as `Taqueria State`
+:::note
+Message from the dev team:
 
-This file is JSON encoded and is stored in the `.taq` directory of the project. Records follow the format:
+We've made many under-the-hood changes to give Taqueria a wide array of capabilities when it comes to persisting the state of your project. Although they're not visible on the surface, you'll soon have the ability to provision on-chain and off-chain operations which produce outputs that persist across the project lifecycle and environments
+
+These operations can link to and depend on one-another. Internally they are represented as a directed acyclic graph (DAG) which will ultimately provide much flexibility and powerful capabilities. We don't want to spoil this for you, but just know that we've put all the things in place to start making this visible very shortly!
+:::
+
+Taqueria now keeps a record of the stateful tasks and operations executed, along with the values in the resulting state  
+
+In the initial implementation, `@taqueria/plugin-taquito` has been refactored so the `taq originate` task is now stateful. When run, a record is created which includes the deployed contract address
+
+This data is is stored in a new auto-generated file named `development-state.json`. This file is JSON encoded and is stored in the `./.taq` directory of the project
+
+:::note
+This file is not generated until the first time you run a supported task or operation. Currently, this will occur the first time you run `taq originate` in the project
+:::
+
+
+Records follow the format shown below:
 
 ```json
         "@taqueria/plugin-taquito.deploy.1654212273655": {
@@ -67,15 +84,16 @@ This file is JSON encoded and is stored in the `.taq` directory of the project. 
         }
 ```
 
+
 :::note
-At this time, only the `originate` task is supported but full support for operations and additional plugin tasks is coming soon
+At this time, only the `originate` task is supported but full support for operations and additional plugin tasks is coming soon!
 :::
 
-### State API
+### The `@taqueria/state-js` Library
 
-A new package `@taqueria-state-js` has been added to the project which provides a simple interface for working with the persistant state 
+Included in this release is a new NPM package `@taqueria/state-js`. This is an abstraction library which provides an easy way to interact with Taqueria State
 
-To use the package, import it into any JS or TS file:
+To use the package in your front end code or tests, you can import it into any JS or TS file:
 
 ```js
 import loadProject from "@taqueria/state-js"
@@ -106,12 +124,10 @@ const results = getOriginations()
 ### Implicit accounts
 
 :::warning
-This release makes a breaking change to the schema of `config.json`
+This release makes a breaking change to the schema of `config.json`. If you use Taqueria v0.4.0 on an existing project, you will need to make minor adjustments to your `config.json
 :::
 
-Taqueria now allows you to be declarative when naming your implicit accounts and the desired balance for each. These accounts are declared at the root level in config.json. Previously, accounts were in each sandbox configuration
-
-Taqueria now defines named implicit accounts at the root level in `config.json`. Previously, accounts were defined separatley in each sandbox configuration
+Taqueria now allows you to be declarative when naming your implicit accounts and the desired balance for each. These accounts are declared at the root level in `config.json`. Previously, accounts were defined in each sandbox configuration
 
 The basic structure of `config.json` is now:
 
@@ -153,6 +169,8 @@ The basic structure of `config.json` is now:
     }
 }
 ```
+
+You may define as many accounts as you need. Taqueria imposes no limits on how many accounts you would like to reference in your project
 
 These accounts will be created and funded automatically when a sandbox starts. After starting a sandbox, you will see the defined accounts appear in the configuration:
 
@@ -204,7 +222,11 @@ These accounts will be created and funded automatically when a sandbox starts. A
 ```
 
 :::note
-To set a default account for a sandbox, you must define it explicitly in the sandbox config:
+Future improvements will extend implicit account provisioning to testnets
+:::
+
+
+To set a default account for a sandbox, you must now define it explicitly in the sandbox config:
 
 ```json
     "sandbox": {
@@ -228,15 +250,22 @@ To set a default account for a sandbox, you must define it explicitly in the san
         }
     },
 ```
-:::
 
-## Product Changes
+### Migration from Legacy Versions
+
+To migrate a project to the new `config.json` schema, only minor changes are required:
+
+1. Define your list of implicit accounts at the root level of `config.json`
+2. Remove the "accounts" property from the "sandbox" config
+3. (Optional) Set a default account for each sandbox
+
+## Other Product Changes
 
 ### @taqueria/plugin-tezos-client - `simulate` task improved
 
 The Tezos Client now supports invoking entrypoints by annotation. The flag `--entrypoint` has been added to the simulate task
 
-You can now invoke an entrypoint annotated `decrement` by running the following:
+For example, you can now invoke an entrypoint annotated `decrement` by running the following:
 
 ```shell
 taq simulate sample.tz '3' --storage 5 --entrypoint decrement
@@ -254,7 +283,7 @@ taq simulate sample.tz 'Left (Left 3)' --storage 5
 - Taqueria's ephermal state `state.json` will now be referred to as the Taqueria cache
 - Implicit accounts are now defined at the root level in the `config.json` file
 - The balance of these accounts is now global to the project
-- On startup, a sandbox will create and fund each defined account  
+- On startup, a sandbox will create and fund each defined implicit account  
 
 ### Bugfixes
 
@@ -264,6 +293,7 @@ taq simulate sample.tz 'Left (Left 3)' --storage 5
 
 ### Other Improvements
 
+- The Taqueria protocol now uses schema based type enforcement 
 - MacOS runners added to CI pipeline which has enabled automated testing in MacOs environments
 - E2E tests now asynchronously and in batches, up to 4x faster 
 - Plugin documentation is now all built from a common source
