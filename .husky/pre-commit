@@ -1,6 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
+npx lint-staged
 
 ## Process documentation files and add modified files to the git commit
 echo "Processing documentation files..."
