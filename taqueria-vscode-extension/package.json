@@ -155,8 +155,8 @@
 		"fs-extra": "^10.1.0",
 		"glob": "^7.2.0",
 		"mocha": "^9.2.1",
-		"parcel": "^2.3.1",
-		"typescript": "4.5.4",
+		"parcel": "^2.6.0",
+		"typescript": "4.7.2",
 		"vsce": "^2.6.4"
 	},
 	"dependencies": {

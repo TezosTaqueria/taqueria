@@ -61,6 +61,7 @@ Taqueria plugins extend the functionality of Taqueria by adding additional tasks
 | Flextesa     | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa               | 
 | Taquito      | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate               |
 | TS Generator | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code |
+| Tezos Client | `@taqueria/plugin-tezos-client`   | A Tezos client that can be used to interact with the network|
 
 Taqueria manages plugins by providing installation/uninstallation via the `taq install <pluginName>` and `taq uninstall <pluginName>` tasks. Plugins are installed on a per-project basis during which the NPM package is downloaded and installed on the project, and configuration is added in the `./.taq/config.json` file
 
