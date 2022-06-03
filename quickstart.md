@@ -47,6 +47,7 @@ You can view the list of commands available in the current project context by ru
 | Taquito        | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate                       |
 | Contract Types | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code         |
 | Tezos Client   | `@taqueria/plugin-tezos-client`   | Interacts with a Tezos node, providing simulation and type checking |
+| Jest           | `@taqueria/plugin-jest`           | A Jest plugin for testing smart contracts                           |
 
 ## Compiling a LIGO Smart Contract
 
