@@ -57,7 +57,16 @@ const sidebars = {
         "plugins/plugin-tezos-client",
         "plugins/plugin-smartpy",
         "plugins/plugin-jest",
-        "plugins/state"
+      ],
+    },
+    {
+      type: "category",
+      label: "Taqueria Libraries",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "libraries/taqueria-state"
       ],
     },
     // {
