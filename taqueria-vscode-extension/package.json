@@ -140,7 +140,7 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
-		"@taquito/taquito": "^12.1.0",
+		"@taquito/taquito": "^12.1.1",
 		"@types/fs-extra": "^9.0.13",
 		"@types/glob": "^7.2.0",
 		"@types/mocha": "^5.2.6",
