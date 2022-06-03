@@ -13,51 +13,14 @@ title: Taqueria Releases
 ## Summary of Impactful Changes
 
 - Taqueria State functionality
-- A new JS/TS library `@taqueria/state` to interact with Taqueria State (access data persisted to state and reference accounts by name)
+- A new JS/TS library `@taqueria/state-js` to interact with Taqueria State (access data persisted to state and reference accounts by name)
 - A new plugin `@taqueria/plugin-jest` that allows you to test your smart contracts and dapps with Jest in creative and powerful ways  
-- Implicit accounts and desired balances are declared at the root of the config.json file **Note: Breaking Change!**
+- Implicit accounts and desired balances are declared at the root of the config.json file ***breaking change***
 - Robust data integrity checks following the "parse; don't validate" practice
 - @taqueria/plugin-taquito - The `originate` task is now stateful and persists the contract address
 - @taqueria/plugin-tezos-client -  Added support for invoking endpoints by annotation
 
 ## New features
-
-- Taqueria State 
-- Project level named implicit accounts * *breaking change* *
-- @taqueria/plugin-taquito: stateful `originate` operation now available
-- @taqueria/plugin-tezos-client: added support for invoking endpoints by annotation
-
-
-## New features
-
-## JEST Plugin
-
-Partitions - directories with their own JEST config (so you can segment tests into different buckets:  e.g. type / )
-
-Unlimited number of partitions: by default there are no partitions
-
-Treate one by running `taq test -init` -> creates a partition using the folder specifed in [jestTestsRootDir] 
-
-Config can be overridden by setting `jestTestsRootDir` in `taqueria.config.js`
-
-Create tests in that folder `tests/example.spec.ts`
-
-```
-describe('Jest example', () => {
-    test('This is a test. Nothing more; nothing less', () => {
-        expect('tests').toContain('fun')
-    })
-})
-```
-
-`taq test [partitionName]`
-
-Global Config:
-- `./.taq/jest.config.js`
-
-implicitly:
-- if no provision created, `taq test [dirName]`
-
 
 ### Taqueria State
 
