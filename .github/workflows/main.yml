@@ -193,6 +193,15 @@ jobs:
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
+  publish-jest-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    needs: publish-sdk-to-npm
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-plugin-jest
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
   publish-state-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
@@ -365,6 +374,7 @@ jobs:
       - publish-archetype-plugin-to-npm
       - publish-tezos-client-plugin-to-npm
       - publish-state-plugin-to-npm
+      - publish-jest-plugin-to-npm
       - run-tests
       - vscode-extension-workflow
     steps:
@@ -491,6 +501,7 @@ jobs:
       - publish-archetype-plugin-to-npm
       - publish-tezos-client-plugin-to-npm
       - publish-state-plugin-to-npm
+      - publish-jest-plugin-to-npm
       - vscode-extension-workflow
     if: ${{ startsWith(github.ref, 'refs/tags/v') &&
             !github.event.pull_request.head.repo.fork }}
