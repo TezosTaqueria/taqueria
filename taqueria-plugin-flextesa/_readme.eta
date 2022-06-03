@@ -20,7 +20,7 @@ Some helpful things to know:
 
 ## Requirements
 
-- Node.js v16.x or later
+- Node.js v16.3 or later
 - Docker v0.8.4 or later
 
 ## Installation

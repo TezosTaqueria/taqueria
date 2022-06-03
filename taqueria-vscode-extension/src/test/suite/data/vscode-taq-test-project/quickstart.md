@@ -14,7 +14,7 @@ What you will accomplish:
 To successfully use Taqueria, you must ensure that:
 - The Taqueria CLI has been [installed](./installation.mdx) and is available in your `$PATH` 
 - Docker v0.8 or later is installed and currently running
-- Node.js v16.x or later
+- Node.js v16.3 or later
 
 ## Starting a Taqueria Project
 
