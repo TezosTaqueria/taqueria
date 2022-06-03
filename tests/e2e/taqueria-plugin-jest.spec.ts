@@ -1,19 +1,14 @@
-import { exec as exec1 } from 'child_process';
+import { exec as exec1, execSync } from 'child_process';
 import fsPromises from 'fs/promises';
 import util from 'util';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
 const taqueriaProjectPath = 'e2e/auto-test-jest-plugin';
-let directory = 'tests';
 
 describe('E2E Testing for the taqueria jest plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['jest']);
-	});
-
-	beforeEach(async () => {
-		await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
 	});
 
 	test.skip('', async () => {
@@ -24,7 +19,6 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('Jest plugin creates default "tests" partition and jest config when running command with no arguments', async () => {
-		directory = 'tests';
 		try {
 			await exec(`taq test -p ${taqueriaProjectPath}`);
 			const directoryContents = await exec(`ls ${taqueriaProjectPath}`);
@@ -40,7 +34,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('Initializing a different partition with the init argument', async () => {
-		directory = 'automated-tests-initialization';
+		const directory = 'automated-tests-initialization';
 		try {
 			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
 			const directoryContents = await exec(`ls ${taqueriaProjectPath}`);
@@ -52,8 +46,9 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('local jest config references global config with local info added', async () => {
-		directory = 'tests';
+		const directory = 'test-config';
 		try {
+			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
 			const pwd = await exec(`pwd`);
 			const pwdFormatted = pwd.stdout.replace(/(\r\n|\n|\r)/gm, '');
 			const localConfigContents = await exec(`cat ${pwdFormatted}/${taqueriaProjectPath}/${directory}/jest.config.js`);
@@ -69,27 +64,71 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		}
 	});
 
-	test.skip('simple jest test file can be run successfully with plugin', async () => {
-		directory = 'dummy-test';
+	test('simple jest test file can be run successfully with plugin', async () => {
+		const directory = 'dummy-test';
 		try {
-			await exec(``);
-			await exec(`cp e2e/data/empty-jest-test-file-1.spec.ts `);
+			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
+			await exec(
+				`cp e2e/data/empty-jest-test-file-1.spec.ts ${taqueriaProjectPath}/${directory}/empty-jest-test-file-1.spec.ts`,
+			);
+			const testOutput = await exec(`taq test ${directory} -p ${taqueriaProjectPath}`);
+			console.log(testOutput);
+
+			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/empty-jest-test-file-1.spec.ts`);
+			expect(testOutput.stdout).toContain('dummy test for jest plugin testing');
+			expect(testOutput.stdout).toContain('✓ 1 test for jest');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
 	});
 
-	// afterEach(async () => {
-	// 	try {
-	// 		await fsPromises.rm(`${taqueriaProjectPath}/${directory}`, { recursive: true })
-	// 	} catch {}
-	// });
+	test('Run all tests inside of a test partition', async () => {
+		const directory = 'multi-file-test';
+		const file1 = 'empty-jest-test-file-1.spec.ts';
+		const file2 = 'empty-jest-test-file-2.spec.ts';
+		try {
+			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
 
-	// afterAll(async () => {
-	// 	try {
-	// 		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-	// 	} catch (error) {
-	// 		throw new Error(`error: ${error}`);
-	// 	}
-	// });
+			await exec(`cp e2e/data/${file1} ${taqueriaProjectPath}/${directory}/`);
+			await exec(`cp e2e/data/${file2} ${taqueriaProjectPath}/${directory}/`);
+			const testOutput = await exec(`taq test ${directory} -p ${taqueriaProjectPath}`);
+
+			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file1}`);
+			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file2}`);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Run all tests matching test pattern inside of a test partition', async () => {
+		const directory = 'multi-file-single-test';
+		const file1 = 'empty-jest-test-file-1.spec.ts';
+		const file2 = 'empty-jest-test-file-2.spec.ts';
+		try {
+			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
+
+			await exec(`cp e2e/data/${file1} ${taqueriaProjectPath}/${directory}/`);
+			await exec(`cp e2e/data/${file2} ${taqueriaProjectPath}/${directory}/`);
+			const testOutput = await exec(`taq test ${directory} -p ${taqueriaProjectPath}`);
+			console.log(testOutput);
+
+			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file1}`);
+			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file2}`);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	afterEach(async () => {
+		try {
+		} catch {}
+	});
+
+	afterAll(async () => {
+		try {
+			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
 });
