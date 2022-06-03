@@ -37,7 +37,8 @@ const sidebars = {
       collapsible: false,
       items: [
         "config/networks",
-        "config/implicit-accounts"
+        "config/implicit-accounts",
+        "config/sandbox-config"
       ],
     },
     {
@@ -59,16 +60,16 @@ const sidebars = {
         "plugins/state-js"
       ],
     },
-    {
-      type: "category",
-      label: "Example App",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "hello-tacos-tutorial"
-      ],
-    },
+    // {
+    //   type: "category",
+    //   label: "Example App",
+    //   className: "sidebarHeader",
+    //   collapsed: false,
+    //   collapsible: false,
+    //   items: [
+    //     "hello-tacos-tutorial"
+    //   ],
+    // },
     {
       type: "category",
       label: "Taqueria Internals",
