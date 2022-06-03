@@ -74,6 +74,8 @@ describe('Extension Test Suite', () => {
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/645
 	it.skip('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+		await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
+
 		// Install plugin
 		await vscode.commands.executeCommand('taqueria.install @taqueria/plugin-ligo');
 
