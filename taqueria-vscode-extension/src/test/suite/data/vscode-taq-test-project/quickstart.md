@@ -18,9 +18,7 @@ To successfully use Taqueria, you must ensure that:
 
 ## Starting a Taqueria Project
 
-There are two things required to start using Taqueria on a project
-
-1. The project must be initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts`, `/artifacts`, and `/tests` have been created 
+To get started with Taqueria, the project directory must be initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts`, `/artifacts`, and `/tests` have been created 
 
 Taqueria provides the command `init` which will create a new directory with the correct structure and configuration. To create a new Taqueria project called `my-first-project`, run the command:
 ```shell
@@ -29,11 +27,6 @@ taq init my-first-project
 :::caution
 If a project has already been initialized, Taqueria will not re-initialize the project, but will still return a success message. This will be fixed in an upcoming release
 :::
-
-2. The project directory must be initialized as an NPM project as all current plugins implemented as NPM packages. To do this, run:
-```shell
-npm init -y
-```
 
 ## Working with Plugins
 

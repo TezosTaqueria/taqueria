@@ -15,9 +15,6 @@ To install the LIGO plugin on a Taqueria project, navigate to the project folder
 taq install @taqueria/plugin-ligo
 ```
 
-> ### :page_with_curl: Note
-> At this time, all Taqueria projects must also be initialized as node projects by running `npm init -y` from the root of your project directory
-
 ## Configuration
 
 No additional configuration is available

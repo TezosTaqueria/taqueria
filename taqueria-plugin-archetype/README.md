@@ -16,9 +16,6 @@ To install the Archetype plugin on a Taqueria project, navigate to the project f
 taq install @taqueria/plugin-archetype
 ```
 
-> ### :page_with_curl: Note
-> At this time, all Taqueria projects must also be initialized as node projects by running `npm init -y` from the root of your project directory
-
 ## Configuration
 
 No additional configuration is available

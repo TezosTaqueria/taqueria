@@ -32,12 +32,6 @@ taq install @taqueria/plugin-flextesa
 
 Once installed, you can confirm functionality by runing the command `taq start sandbox` which will start a sandbox with the default `local` configuration
 
-> ### :page_with_curl: Note
-> The project you install it on must be initialized by NPM. This only needs to be done once on a project and is accomplished by running the command:
-```shell
-npm init -y
-``` 
-
 ## CLI Commands
 
 The Flextesa plugin allows you to start, stop, and query the sandboxes configured in `./.taq/config.json` from the CLI
