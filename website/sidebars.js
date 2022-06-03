@@ -26,7 +26,18 @@ const sidebars = {
         "getting-started/installation",
         "intro",
         "getting-started/quickstart",
-        "getting-started/networks"
+        
+      ],
+    },
+    {
+      type: "category",
+      label: "Configuration",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "config/networks",
+        "config/implicit-accounts"
       ],
     },
     {
@@ -44,6 +55,7 @@ const sidebars = {
         "plugins/plugin-taquito",
         "plugins/plugin-contract-types",
         "plugins/plugin-tezos-client",
+        "plugins/state-js"
       ],
     },
     {
@@ -74,6 +86,7 @@ const sidebars = {
       collapsible: false,
       items: [
         "roadmap",
+        "release-notes",
         "taqueria-dev/contributions",
         "taqueria-dev/making-plugins",
         "taqueria-dev/pr-npm-packages"
