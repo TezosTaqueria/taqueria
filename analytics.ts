@@ -1,4 +1,5 @@
 import { getMachineId } from 'https://deno.land/x/machine_id@v0.3.0/mod.ts';
+import type { DenoArgs } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
 
 const {
@@ -11,24 +12,35 @@ const {
 	stderr: Deno.stderr,
 });
 
-export const consentFilePath = Deno.env.get('HOME') + '/.taq-consent.txt';
+export const consentFilePath = Deno.env.get('HOME') + '/.taq-settings.json';
 const consentPrompt = 'Do you consent being tracked? [y/yes] or [n/no]';
 export const OPT_IN = 'opt_in';
 export const OPT_OUT = 'opt_out';
 
+export const optInAnalytics = () => writeTextFile(consentFilePath)(OPT_IN);
+
+export const optOutAnalytics = () => writeTextFile(consentFilePath)(OPT_OUT);
+
 const promptForConsent = async () => {
 	const input = prompt(consentPrompt);
 	if (input && /^y(es)?$/i.test(input)) {
-		await eager(writeTextFile(consentFilePath)(OPT_IN));
+		await eager(optInAnalytics());
 	} else {
-		await eager(writeTextFile(consentFilePath)(OPT_OUT));
+		await eager(optOutAnalytics());
 	}
 };
 
 const isCIRun = () => Deno.env.get('CI') !== undefined;
 
-const allowTracking = async (): Promise<boolean> => {
-	if (isCIRun()) return false;
+const allowTracking = async (inputArgs: DenoArgs): Promise<boolean> => {
+	if (
+		isCIRun()
+		|| inputArgs.includes('--version')
+		|| inputArgs.includes('--build')
+		|| inputArgs.includes('testFromVsCode')
+	) {
+		return false;
+	}
 	try {
 		await eager(doesPathExist(consentFilePath));
 	} catch {
@@ -38,8 +50,9 @@ const allowTracking = async (): Promise<boolean> => {
 	return consent === OPT_IN;
 };
 
-export const sendEvent = async (taq_version: string, taq_ui: 'CLI' | 'VSCode') => {
-	if (!(await allowTracking())) return;
+export const sendEvent = async (inputArgs: DenoArgs, taq_version: string, taq_ui: 'CLI' | 'VSCode') => {
+	if (taq_ui === 'VSCode') return; // Disable for VSCode for now
+	if (!(await allowTracking(inputArgs))) return;
 
 	const measurement_id = 'G-8LSQ6J7P0Q';
 	const api_secret = '3aHoMp2USE21ZPmAVTI1Lg';

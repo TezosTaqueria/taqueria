@@ -19,7 +19,7 @@ import { uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
-import { consentFilePath, OPT_IN, OPT_OUT, sendEvent } from './analytics.ts';
+import { optInAnalytics, optOutAnalytics, sendEvent } from './analytics.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -98,10 +98,6 @@ const getVersion = (inputArgs: DenoArgs, _i18n: i18n.t) => {
 		? inputArgs[i + 1]
 		: 'not-provided';
 };
-
-const optInAnalytics = () => writeTextFile(consentFilePath)(OPT_IN);
-
-const optOutAnalytics = () => writeTextFile(consentFilePath)(OPT_OUT);
 
 const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 	yargs(args)
@@ -188,6 +184,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() =>
 				pipe(
 					optInAnalytics(),
+					map(() => "You've successfully opt in for anonymous usage reporting"),
 					forkCatch(console.error)(console.error)(console.log),
 				),
 		)
@@ -198,6 +195,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() =>
 				pipe(
 					optOutAnalytics(),
+					map(() => "You've successfully opt out of anonymous usage reporting"),
 					forkCatch(console.error)(console.error)(console.log),
 				),
 		)
@@ -787,11 +785,9 @@ const preprocessArgs = (inputArgs: DenoArgs): DenoArgs => {
 
 export const run = async (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 	try {
-		const processedInputArgs = preprocessArgs(inputArgs);
+		await sendEvent(inputArgs, getVersion(inputArgs, i18n), inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI');
 
-		if (!inputArgs.includes('--version') && !inputArgs.includes('--build')) {
-			await sendEvent(getVersion(processedInputArgs, i18n), inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI');
-		}
+		const processedInputArgs = preprocessArgs(inputArgs);
 
 		// Parse the args required for core built-in tasks
 		return pipe(
@@ -814,6 +810,8 @@ export const run = async (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 						return initArgs._.includes('init')
 								|| initArgs._.includes('testFromVsCode')
 								|| initArgs._.includes('scaffold')
+								|| initArgs._.includes('optin')
+								|| initArgs._.includes('optout')
 							? taqResolve(initArgs)
 							: postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n);
 					}),
