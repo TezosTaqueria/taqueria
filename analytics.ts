@@ -32,9 +32,12 @@ const promptForConsent = async () => {
 
 const isCIRun = () => Deno.env.get('CI') !== undefined;
 
+const isTestRun = () => Deno.env.get('TEST') !== undefined;
+
 const allowTracking = async (inputArgs: DenoArgs): Promise<boolean> => {
 	if (
 		isCIRun()
+		|| isTestRun()
 		|| inputArgs.includes('--version')
 		|| inputArgs.includes('--build')
 		|| inputArgs.includes('testFromVsCode')

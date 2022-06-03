@@ -6,13 +6,13 @@
 	"main": "index.js",
 	"scripts": {
 		"test:unit": "npm run test:unit:deno",
-		"test:unit:deno": "deno test unit/ --allow-all --unstable --import-map ../import_map.json",
-		"test:unit:jest": "jest --config jest.config.unit.ts --coverage --no-cache",
-		"test:unit:deno:debug": "deno test unit/ --allow-all --unstable --inspect-brk",
-		"test:unit:deno:with-coverage": "deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
-		"test:unit:selected": "deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",
-		"test:integration": "jest --config jest.config.integration.ts --no-cache",
-		"test:e2e": "jest --config jest.config.e2e.ts"
+		"test:unit:deno": "TEST=true deno test unit/ --allow-all --unstable --import-map ../import_map.json",
+		"test:unit:jest": "TEST=true jest --config jest.config.unit.ts --coverage --no-cache",
+		"test:unit:deno:debug": "TEST=true deno test unit/ --allow-all --unstable --inspect-brk",
+		"test:unit:deno:with-coverage": "TEST=true deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
+		"test:unit:selected": "TEST=true deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",
+		"test:integration": "TEST=true jest --config jest.config.integration.ts --no-cache",
+		"test:e2e": "TEST=true jest --config jest.config.e2e.ts"
 	},
 	"repository": {
 		"type": "git",
