@@ -1,0 +1,125 @@
+---
+title: Named Sandboxes
+---
+
+Taqueria provides a centralized configuration for sandboxes. Named sandbox configurations are defined in the `./.taq/config.json` file for each project
+
+Related to sandboxes 
+
+### The Default Sandbox Configuration
+
+Named sandbox configurations are stored as key/value pairs in the `sandbox` property using the sandbox name as the key
+
+This example shows the configuration for the default sandbox named `local`:
+
+```json
+    "sandbox": {
+        "local": {
+            "label": "Local Tezos Sandbox",
+            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "rpcUrl": "http://localhost:20000"
+        }
+```
+
+### Adding a New Sandbox Configuration
+
+Sandbox configurations are added as key/value pairs to the main `sandbox` object using the format:
+
+```json
+sandboxName : { sandboxConfigObject }
+```
+
+Inside the sandboxConfigObject, there are four properties you can configure:
+
+#### 'accounts'
+
+A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}`
+
+#### 'label'
+An arbitrary string used to describe a particular configuration
+
+#### 'protocol'
+
+A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
+
+Currently availble protocols are:
+- Hangzhou `PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx`
+- Ithaca   `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
+
+#### 'rpcUrl'
+
+A string which corresponds to the local URL you would like the sandbox to run on
+
+### Adding a Sandbox to a Taqueria Environment
+
+Once created, sandboxes can be added to environments by adding the `sandboxName` to the `sandboxes` list in the `environment` as shown here:
+```json
+    environment: {
+        default: 'development',
+        development: {
+            networks: [],
+            sandboxes: [
+                'local',
+                'myCustomSandbox'
+            ],
+            storage: {},
+        },
+    },
+```
+
+
+
+### Sandbox Accounts
+
+Sandbox accounts are defined as [Implicit Accounts](/docs/config/implicit-accounts/) and are global to the project
+
+Taqueria provides five default accounts in the default configuration:
+
+```json
+    "accounts": {
+        "bob": "3_000_000_000",
+        "alice": "3_000_000_000",
+        "john": "3_000_000_000",
+        "jane": "3_000_000_000",
+        "joe": "3_000_000_000"
+    }
+```
+
+When a sandbox is started, the implicit accounts defined in the configuration will be created on the sandbox and the `accounts` property will be populated with the account data as shown in this example:
+
+```json
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "bob": {
+                    "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+                    "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+                    "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+                },
+                "alice": {
+                    "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+                    "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+                    "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+                },
+                "john": {
+                    "encryptedKey": "edpktt6t2ENhxiQqun6bXPPWC6tFVvNPTDRh1gEPGX4BgDgbDnmGzP",
+                    "publicKeyHash": "tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6",
+                    "secretKey": "unencrypted:edsk3Un2KRUUoWZufi914HQem96ejVFnkyD8GXRPUSkgqy5etsYXEN"
+                },
+                "jane": {
+                    "encryptedKey": "edpkvS6TDSWcqqj3EJi3NRrCMyN7oNw1B3Hp37R19tMThqM8YNhAuS",
+                    "publicKeyHash": "tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph",
+                    "secretKey": "unencrypted:edsk3UkdS1UBfTBkMAoFxmfdmUHmCdNhTzDJ1cSJuZhU1b6k6fZZoQ"
+                },
+                "joe": {
+                    "encryptedKey": "edpkuT1QYPYbLLQz9dXhQS33ncsixxeGHbNGmntPTR4VBbWmskHPrV",
+                    "publicKeyHash": "tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB",
+                    "secretKey": "unencrypted:edsk3Un2FU9Zeb4KEoATWdpAqcX5JArMUj2ew8S4SuzhPRDmGoqNx2"
+                }
+            },
+            "label": "Local Tezos Sandbox",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+```
