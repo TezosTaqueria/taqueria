@@ -13,7 +13,7 @@ title: Taqueria Releases
 ## Summary of Impactful Changes
 
 - Taqueria State functionality
-- A new JS/TS library `@taqueria/state-js` to interact with Taqueria State (access data persisted to state and reference accounts by name)
+- A new JS/TS library `@taqueria/state` to interact with Taqueria State (access data persisted to state and reference accounts by name)
 - A new plugin `@taqueria/plugin-jest` that allows you to test your smart contracts and dapps with Jest in creative and powerful ways  
 - Implicit accounts and desired balances are declared at the root of the config.json file **Note: Breaking Change!**
 - Robust data integrity checks following the "parse; don't validate" practice
@@ -63,14 +63,20 @@ Records follow the format shown below:
 At this time, only the `originate` task is supported but full support for operations and additional plugin tasks is coming soon!
 :::
 
-### The `@taqueria/state-js` Library
+### The `@taqueria/state` Library
 
-Included in this release is a new NPM package `@taqueria/state-js`. This is an abstraction library which provides an easy way to interact with Taqueria State
+Included in this release is a new NPM package `@taqueria/state`. This is an abstraction library which provides an easy way to interact with Taqueria State
+
+To install the library on your project, run:
+
+```shell
+taq install @taqueria/state
+```
 
 To use the package in your front end code or tests, you can import it into any JS or TS file:
 
 ```js
-import loadProject from "@taqueria/state-js"
+import loadProject from "@taqueria/state"
 ```
 
 Once imported, you can retrieve the list of originations like this:

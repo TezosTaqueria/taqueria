@@ -1,0 +1,23 @@
+{
+	"private": true,
+	"name": "@local/contract",
+	"scripts": {
+		"build": "taq compile && taq generate types ../app/src/types",
+		"start:local": "npm run build && taq start sandbox local && taq deploy",
+		"stop:local": "taq stop sandbox local"
+	},
+	"dependencies": {
+		"@taqueria/plugin-contract-types": "latest",
+		"@taqueria/plugin-flextesa": "latest",
+		"@taqueria/plugin-ligo": "latest",
+		"@taqueria/plugin-taquito": "latest",
+		"@taquito/taquito": "^11.2.0"
+	},
+	"version": "1.0.0",
+	"main": "index.js",
+	"devDependencies": {},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": ""
+}

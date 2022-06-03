@@ -57,7 +57,7 @@ const sidebars = {
         "plugins/plugin-tezos-client",
         "plugins/plugin-smartpy",
         "plugins/plugin-jest",
-        "plugins/state-js"
+        "plugins/state"
       ],
     },
     // {

@@ -1,0 +1,30 @@
+{
+	"language": "en",
+	"contractsDir": "contracts",
+	"artifactsDir": "artifacts",
+	"network": {},
+	"sandbox": {
+		"local": {
+			"label": "Local Tezos Sandbox",
+			"rpcUrl": "http://localhost:20000",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
+		}
+	},
+	"environment": {
+		"default": "development",
+		"development": {
+			"networks": [],
+			"sandboxes": [
+				"local"
+			],
+			"storage": {}
+		}
+	},
+	"accounts": {
+		"bob": "3_000_000_000",
+		"alice": "3_000_000_000",
+		"john": "3_000_000_000",
+		"jane": "3_000_000_000",
+		"joe": "3_000_000_000"
+	}
+}
