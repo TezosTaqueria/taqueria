@@ -23,6 +23,8 @@ Commands:
   taq init [projectDir]                  Initialize a new project
   taq scaffold [scaffoldUrl] [scaffoldP  Generate a new project using a pre
   rojectDir]                             -configured scaffold
+  taq optin                              Opt in for Google Analytics
+  taq optout                             Opt out of Google Analytics
   taq install <pluginName>               Install a plugin
   taq uninstall <pluginName>             Uninstall a plugin
 
@@ -276,6 +278,8 @@ export const helpContentsFlextesaPlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]            Initialize a new project
+  taq optin                        Opt in for Google Analytics
+  taq optout                       Opt out of Google Analytics
   taq install <pluginName>         Install a plugin
   taq uninstall <pluginName>       Uninstall a plugin
   taq start sandbox [sandboxName]  Starts a flextesa sandbox    [aliases: start]
@@ -328,6 +332,8 @@ export const helpContentsGenerateTypesPlugin = `taq <command>
 
 Commands:
   taq init [projectDir]               Initialize a new project
+  taq optin                           Opt in for Google Analytics
+  taq optout                          Opt out of Google Analytics
   taq install <pluginName>            Install a plugin
   taq uninstall <pluginName>          Uninstall a plugin
   taq generate types [typescriptDir]  Generate types for a contract to be used w
