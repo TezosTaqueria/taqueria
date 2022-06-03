@@ -15,7 +15,7 @@ title: Taqueria Releases
 - Taqueria State functionality
 - A new JS/TS library `@taqueria/state-js` to interact with Taqueria State (access data persisted to state and reference accounts by name)
 - A new plugin `@taqueria/plugin-jest` that allows you to test your smart contracts and dapps with Jest in creative and powerful ways  
-- Implicit accounts and desired balances are declared at the root of the config.json file ***breaking change***
+- Implicit accounts and desired balances are declared at the root of the config.json file **Note: Breaking Change!**
 - Robust data integrity checks following the "parse; don't validate" practice
 - @taqueria/plugin-taquito - The `originate` task is now stateful and persists the contract address
 - @taqueria/plugin-tezos-client -  Added support for invoking endpoints by annotation
@@ -192,13 +192,26 @@ The default configuration for Taqueria projects includes five pre-defined accoun
 ```json
 {
     "language": "en",
-    "plugins": [],
     "contractsDir": "contracts",
-    "testsDir": "tests",
     "artifactsDir": "artifacts",
-    "environment": {},
-    "sandbox": {},
     "network": {},
+    "sandbox": {
+        "local": {
+            "label": "Local Tezos Sandbox",
+            "rpcUrl": "http://localhost:20000",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
+        }
+    },
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {}
+        }
+    },
     "accounts": {
         "bob": "3_000_000_000",
         "alice": "3_000_000_000",
@@ -215,24 +228,6 @@ These accounts will be created and funded automatically when a sandbox starts. A
 
 ```json
 {
-    "language": "en",
-    "plugins": [
-    ],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {
-                "example.tz": 42
-            }
-        }
-    },
     "sandbox": {
         "local": {
             "accounts": {
@@ -331,10 +326,9 @@ Specifically:
 - Implicit accounts are now defined at the root level in the `config.json` file
 ### Conceptual Changes to Note
 
-- Taqueria now stores the project in a new auto-generated file `development-state.json` specific to the environment located in the `./.taq/` directory 
-- Taqueria's ephermal state `state.json` will now be referred to as the Taqueria cache
+- Taqueria has a new auto-generated file `development-state.json` located in the `./.taq/` directory 
+- Taqueria's `ephermal state` (`state.json`) will now be referred to as the Taqueria `cache`
 - Implicit accounts are now defined at the root level in the `config.json` file
-- The balance of these accounts is now global to the project
 - On startup, a sandbox will create and fund each defined implicit account  
 
 ### Bugfixes
