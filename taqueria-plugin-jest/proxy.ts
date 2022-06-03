@@ -44,7 +44,6 @@ const parentConfig = require('${rootConfigAbsPath}')
 module.exports = {
     ...parentConfig,
     roots: [
-        ...parentConfig.roots,
         "${partitionAbspath}"
     ]
 }
@@ -100,13 +99,18 @@ export default async (args: RequestArgs.ProxyRequestArgs) => {
 	const opts = args as Opts;
 
 	return ensurePartitionExists(opts)
-		.then(configAbsPath =>
-			opts.testPattern
-				? execCmd('npx', ['jest', '-c', configAbsPath, '-t', opts.testPattern])
-				: execCmd('npx', ['jest', '-c', configAbsPath])
-		)
-		.then(({ stdout, stderr }) => {
-			if (stderr) sendErr(stderr);
-			return sendAsyncRes(stdout);
+		.then(configAbsPath => {
+			if (!opts.init) {
+				const cmd = opts.testPattern
+					? execCmd('npx', ['jest', '-c', configAbsPath, '-t', opts.testPattern])
+					: execCmd('npx', ['jest', '-c', configAbsPath]);
+
+				return cmd.then(({ stdout, stderr }) => {
+					if (stderr) sendErr(stderr);
+					return sendAsyncRes(stdout);
+				});
+			}
+
+			return sendAsyncRes('Initialized successfully.');
 		});
 };
