@@ -3,7 +3,7 @@
 	"displayName": "taqueria",
 	"description": "A vscode plugin to make Tezos development easier with Taqueria!",
 	"publisher": "ecadlabs",
-	"version": "0.3.1",
+	"version": "0.4.0",
 	"engines": {
 		"vscode": "^1.63.0"
 	},
@@ -160,7 +160,7 @@
 		"vsce": "^2.6.4"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.4.1",
+		"@taqueria/protocol": "^0.4.0",
 		"comment-json": "^4.1.1",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1"
