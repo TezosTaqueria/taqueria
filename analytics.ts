@@ -15,9 +15,11 @@ const {
 	stderr: Deno.stderr,
 });
 
-const consentPrompt = 'Do you consent being tracked? [y/yes] or [n/no]';
-const optInConfirmationPrompt = 'Do you confirm you want to opt in for tracking? [y/yes] or [n/no]';
-const optOutConfirmationPrompt = 'Do you confirm you want to opt out of tracking? [y/yes] or [n/no]';
+const consentPrompt =
+	'Allow Taqueria anonymously report usage statistics, in accordance with the privacy policy to help make Taqueria better? [y/yes] or [n/no]';
+const optInConfirmationPrompt =
+	'Allow Taqueria anonymously report usage statistics, in accordance with the privacy policy to help make Taqueria better? [y/yes] or [n/no]';
+const optOutConfirmationPrompt = 'Are you sure you want to turn off usage statistic reporting? [y/yes] or [n/no]';
 export const settingsFilePath = Deno.env.get('HOME') + '/.taq-settings.json';
 export const OPT_IN = 'opt_in';
 export const OPT_OUT = 'opt_out';
