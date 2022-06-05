@@ -1,32 +1,64 @@
+import * as Settings from '@taqueria/protocol/Settings';
+import { chain, map, resolve } from 'fluture';
+import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { getMachineId } from 'https://deno.land/x/machine_id@v0.3.0/mod.ts';
 import type { DenoArgs } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
 
 const {
 	doesPathExist,
-	readTextFile,
-	writeTextFile,
+	readJsonFile,
+	writeJsonFile,
 	eager,
 } = utils.inject({
 	stdout: Deno.stdout,
 	stderr: Deno.stderr,
 });
 
-export const consentFilePath = Deno.env.get('HOME') + '/.taq-settings.json';
 const consentPrompt = 'Do you consent being tracked? [y/yes] or [n/no]';
+const optInConfirmationPrompt = 'Do you confirm you want to opt in for tracking? [y/yes] or [n/no]';
+const optOutConfirmationPrompt = 'Do you confirm you want to opt out of tracking? [y/yes] or [n/no]';
+export const settingsFilePath = Deno.env.get('HOME') + '/.taq-settings.json';
 export const OPT_IN = 'opt_in';
 export const OPT_OUT = 'opt_out';
 
-export const optInAnalytics = () => writeTextFile(consentFilePath)(OPT_IN);
+export const optInAnalyticsFirstTime = () => createSettingsFileWithConsent(OPT_IN);
 
-export const optOutAnalytics = () => writeTextFile(consentFilePath)(OPT_OUT);
+export const optOutAnalyticsFirstTime = () => createSettingsFileWithConsent(OPT_OUT);
+
+const createSettingsFileWithConsent = (option: 'opt_in' | 'opt_out') =>
+	pipe(
+		Settings.make({ consent: option }),
+		chain(writeJsonFile(settingsFilePath)),
+	);
+
+export const optInAnalytics = () => writeConsentValueToSettings(OPT_IN);
+
+export const optOutAnalytics = () => writeConsentValueToSettings(OPT_OUT);
+
+const writeConsentValueToSettings = (option: 'opt_in' | 'opt_out') => {
+	const input = prompt(option === OPT_IN ? optInConfirmationPrompt : optOutConfirmationPrompt);
+	if (input && /^y(es)?$/i.test(input)) {
+		return pipe(
+			readJsonFile<Settings.t>(settingsFilePath),
+			map((settingsContent: Settings.t) => {
+				settingsContent.consent = option;
+				return settingsContent;
+			}),
+			chain(writeJsonFile(settingsFilePath)),
+			map(() => true),
+		);
+	} else {
+		return resolve(false);
+	}
+};
 
 const promptForConsent = async () => {
 	const input = prompt(consentPrompt);
 	if (input && /^y(es)?$/i.test(input)) {
-		await eager(optInAnalytics());
+		await eager(optInAnalyticsFirstTime());
 	} else {
-		await eager(optOutAnalytics());
+		await eager(optOutAnalyticsFirstTime());
 	}
 };
 
@@ -45,12 +77,12 @@ const allowTracking = async (inputArgs: DenoArgs): Promise<boolean> => {
 		return false;
 	}
 	try {
-		await eager(doesPathExist(consentFilePath));
+		await eager(doesPathExist(settingsFilePath));
 	} catch {
 		await promptForConsent();
 	}
-	const consent = await eager(readTextFile(consentFilePath));
-	return consent === OPT_IN;
+	const settings = await eager(readJsonFile<Settings.t>(settingsFilePath));
+	return settings.consent === OPT_IN;
 };
 
 export const sendEvent = async (inputArgs: DenoArgs, taq_version: string, taq_ui: 'CLI' | 'VSCode') => {

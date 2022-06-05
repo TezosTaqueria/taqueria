@@ -184,7 +184,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() =>
 				pipe(
 					optInAnalytics(),
-					map(() => "You've successfully opt in for anonymous usage reporting"),
+					map(rv => rv === true ? "You've successfully opt in for anonymous usage reporting" : ''),
 					forkCatch(console.error)(console.error)(console.log),
 				),
 		)
@@ -195,7 +195,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() =>
 				pipe(
 					optOutAnalytics(),
-					map(() => "You've successfully opt out of anonymous usage reporting"),
+					map(rv => rv === true ? "You've successfully opt out of anonymous usage reporting" : ''),
 					forkCatch(console.error)(console.error)(console.log),
 				),
 		)
