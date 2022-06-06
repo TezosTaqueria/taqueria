@@ -1,4 +1,4 @@
-import { exec as exec1, execSync } from 'child_process';
+import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import util from 'util';
 import { generateTestProject } from './utils/utils';
@@ -100,7 +100,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		}
 	});
 
-	test('Run all tests matching test pattern inside of a test partition', async () => {
+	test.skip('Run all tests matching test pattern inside of a test partition', async () => {
 		const directory = 'multi-file-single-test';
 		const file1 = 'empty-jest-test-file-1.spec.ts';
 		const file2 = 'empty-jest-test-file-2.spec.ts';
@@ -109,11 +109,34 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 
 			await exec(`cp e2e/data/${file1} ${taqueriaProjectPath}/${directory}/`);
 			await exec(`cp e2e/data/${file2} ${taqueriaProjectPath}/${directory}/`);
-			const testOutput = await exec(`taq test ${directory} -p ${taqueriaProjectPath}`);
+			const testOutput = await exec(`taq test ${directory} --testPattern file-* -p ${taqueriaProjectPath}`);
 			console.log(testOutput);
 
 			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file1}`);
 			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file2}`);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test.skip('no tests present will result in an error', async () => {
+		try {
+			const testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
+			expect(testOutput.stderr).toContain('No tests found, exiting with code 1');
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test.only('global jest config matches reference config', async () => {
+		const directory = 'config-matching';
+		try {
+			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
+
+			const configContents = await exec(`cat ${taqueriaProjectPath}/.taq/jest.config.js`);
+			console.log(await exec(`pwd`));
+			const referenceContents = await exec(`cat ./e2e/data/jest.config-reference.js`);
+			expect(configContents.stdout).toBe(referenceContents.stdout);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
