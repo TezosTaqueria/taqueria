@@ -11,13 +11,6 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		await generateTestProject(taqueriaProjectPath, ['jest']);
 	});
 
-	test.skip('', async () => {
-		try {
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
-
 	test('Jest plugin creates default "tests" partition and jest config when running command with no arguments', async () => {
 		try {
 			await exec(`taq test -p ${taqueriaProjectPath}`);
