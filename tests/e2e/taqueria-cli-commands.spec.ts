@@ -479,6 +479,64 @@ describe('E2E Testing for taqueria CLI,', () => {
 		}
 	});
 
+	test('Verify that the jest plugin exposes the associated commands in the help menu', async () => {
+		try {
+			await exec(`taq install ../../../taqueria-plugin-jest -p ${taqueriaProjectPath}`);
+
+			// TODO: This can removed after this is resolved:
+			// https://github.com/ecadlabs/taqueria/issues/528
+			try {
+				await exec(`taq -p ${taqueriaProjectPath}`);
+			} catch (_) {}
+
+			const jestHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+
+			expect(jestHelpContents.stdout).toBe(contents.helpContentsJestPlugin);
+
+			await exec(`taq uninstall @taqueria/plugin-jest -p ${taqueriaProjectPath}`);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the jest plugin exposes the associated options in the help menu', async () => {
+		try {
+			await exec(`taq install ../../../taqueria-plugin-jest -p ${taqueriaProjectPath}`);
+
+			// TODO: This can removed after this is resolved:
+			// https://github.com/ecadlabs/taqueria/issues/528
+			try {
+				await exec(`taq -p ${taqueriaProjectPath}`);
+			} catch (_) {}
+
+			const jestHelpContents = await exec(`taq test --help --projectDir=${taqueriaProjectPath}`);
+			expect(jestHelpContents.stdout).toBe(contents.helpContentsJestPluginSpecific);
+
+			await exec(`taq uninstall @taqueria/plugin-jest -p ${taqueriaProjectPath}`);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the jest plugin aliases expose the correct info in the help menu', async () => {
+		try {
+			await exec(`taq install ../../../taqueria-plugin-jest -p ${taqueriaProjectPath}`);
+
+			// TODO: This can removed after this is resolved:
+			// https://github.com/ecadlabs/taqueria/issues/528
+			try {
+				await exec(`taq -p ${taqueriaProjectPath}`);
+			} catch (_) {}
+
+			const jestAliasCHelpContents = await exec(`taq jest --help --projectDir=${taqueriaProjectPath}`);
+			expect(jestAliasCHelpContents.stdout).toBe(contents.helpContentsJestPluginSpecific);
+
+			await exec(`taq uninstall @taqueria/plugin-jest -p ${taqueriaProjectPath}`);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
 	test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
 		try {
 			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);

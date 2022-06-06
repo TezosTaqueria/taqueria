@@ -92,6 +92,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 			await exec(`cp e2e/data/${file1} ${taqueriaProjectPath}/${directory}/`);
 			await exec(`cp e2e/data/${file2} ${taqueriaProjectPath}/${directory}/`);
 			const testOutput = await exec(`taq test ${directory} -p ${taqueriaProjectPath}`);
+			console.log(testOutput);
 
 			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file1}`);
 			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file2}`);
@@ -119,7 +120,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		}
 	});
 
-	test.skip('no tests present will result in an error', async () => {
+	test('no tests present will result in an error', async () => {
 		try {
 			const testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
 			expect(testOutput.stderr).toContain('No tests found, exiting with code 1');
@@ -128,7 +129,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		}
 	});
 
-	test.only('global jest config matches reference config', async () => {
+	test('global jest config matches reference config', async () => {
 		const directory = 'config-matching';
 		try {
 			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
