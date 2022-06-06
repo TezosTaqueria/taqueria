@@ -1,9 +1,9 @@
+import loadI18n, { i18n } from '@taqueria/protocol/i18n';
+import path from 'path';
 import * as api from 'vscode';
 import { inject, InjectedDependencies, sanitizeDeps } from './lib/helpers';
 import { COMMAND_PREFIX } from './lib/helpers';
-import { I18N } from './lib/pure';
 import { makeDir } from './lib/pure';
-import path = require('path');
 
 export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
 	const deps = sanitizeDeps(input);
@@ -15,7 +15,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeSandboxTaskAsCommand,
 	} = inject(deps);
 
-	const i18n: I18N = {}; // temporary
+	const i18n: i18n = await loadI18n();
 	const output = vscode.window.createOutputChannel('Taqueria');
 	const folders = vscode.workspace.workspaceFolders
 		? vscode.workspace.workspaceFolders

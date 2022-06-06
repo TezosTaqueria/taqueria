@@ -107,7 +107,7 @@ dist
 .DS_Store
 node_modules
 /deno
-.vscode
+*/**/.vscode
 .idea
 **/.parcel-cache/*
 /taqueria
