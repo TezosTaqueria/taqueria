@@ -91,21 +91,21 @@ export const inject = (deps: InjectedDependencies) => {
 			);
 	};
 
-	const promptForPluginSelection = (_i18n: i18n, debug: api.DebugSession | undefined, availablePlugins: string[]) =>
+	const promptForPluginSelection = (_i18n: i18n, debug: boolean, availablePlugins: string[]) =>
 		debug
-			? vscode.window.showQuickPick(availablePlugins, {
-				canPickMany: false,
-				ignoreFocusOut: false,
-				placeHolder: 'Plugin name',
-				title: 'Select a plugin',
-			})
-			: vscode.window.showOpenDialog({
+			? vscode.window.showOpenDialog({
 				canSelectFiles: false,
 				canSelectFolders: true,
 				canSelectMany: false,
 				title: 'Select plugin folder',
 				openLabel: 'Select plugin',
-			}).then(val => val ? val[0].fsPath : '');
+			}).then(val => val ? val[0].fsPath : '')
+			: vscode.window.showQuickPick(availablePlugins, {
+				canPickMany: false,
+				ignoreFocusOut: false,
+				placeHolder: 'Plugin name',
+				title: 'Select a plugin',
+			});
 
 	const promptForTaqProject = (_i18n: i18n, availableProjects: readonly string[]) =>
 		vscode.window.showQuickPick(availableProjects, {
@@ -149,7 +149,7 @@ export const inject = (deps: InjectedDependencies) => {
 					// exactly where to install a plugin
 					else if (results.length === 1) {
 						const projectDir = results[0];
-						return promptForPluginSelection(i18n, api.debug.activeDebugSession, availablePlugins)
+						return promptForPluginSelection(i18n, context.extensionMode !== 1, availablePlugins)
 							.then(pluginName => {
 								if (pluginName) {
 									return proxyInstall(pluginName, pathToTaq, i18n, projectDir);
@@ -162,7 +162,7 @@ export const inject = (deps: InjectedDependencies) => {
 								if (selectedDir) {
 									return Util.makeDir(selectedDir, i18n)
 										.then(projectDir =>
-											promptForPluginSelection(i18n, api.debug.activeDebugSession, availablePlugins)
+											promptForPluginSelection(i18n, context.extensionMode !== 1, availablePlugins)
 												.then(pluginName => {
 													if (pluginName) return proxyInstall(pluginName, pathToTaq, i18n, projectDir);
 												})
