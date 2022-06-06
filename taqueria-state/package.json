@@ -14,6 +14,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "npx tsc -p ./tsconfig.json && npx esbuild --bundle ./node/index.ts --outfile=./index.js --minify --platform=node --sourcemap"
 	},
+	"types": "./node/index.d.ts",
 	"keywords": [
 		"taqueria",
 		"tezos",

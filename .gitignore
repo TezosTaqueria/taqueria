@@ -147,6 +147,8 @@ tests/coverage
 /taqueria-plugin-tezos-client/index.js.map
 /taqueria-state-js/index.js
 /taqueria-state-js/index.js.map
+/taqueria-state-js/*.d.ts
+/taqueria-state-js/node/*.d.ts
 /taqueria-plugin-jest/index.js.map
 /taqueria-plugin-jest/index.js
 
