@@ -39,13 +39,13 @@ const getConfig = async (projectAbspath: string) => {
 };
 
 const getState = async (projectAbspath: string, env?: string) => {
+	const configAbspath = join(projectAbspath, '.taq', `${env}-state.json`);
 	try {
-		const configAbspath = join(projectAbspath, '.taq', `${env}-state.json`);
 		const contents = await readFile(configAbspath, 'utf-8');
 		const unvalided = JSON.parse(contents);
 		return PersistentState.create(unvalided);
 	} catch {
-		throw 'Could not load .taq/config.json';
+		throw `Could not load ${configAbspath}`;
 	}
 };
 
