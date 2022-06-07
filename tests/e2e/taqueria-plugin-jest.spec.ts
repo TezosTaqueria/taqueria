@@ -56,7 +56,6 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 			`cp e2e/data/empty-jest-test-file-1.ts ${taqueriaProjectPath}/${directory}/empty-jest-test-file-1.spec.ts`,
 		);
 		const testOutput = await exec(`taq test ${directory} -p ${taqueriaProjectPath}`);
-		console.log(testOutput);
 
 		expect(testOutput.stderr).toContain(
 			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1mempty-jest-test-file-1.spec.ts\x1B[22m`,
@@ -126,7 +125,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		const directory = 'config-matching';
 
 		await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
-
+		console.log(process.env);
 		const configContents = await exec(`cat ${taqueriaProjectPath}/.taq/jest.config.js`);
 		const referenceContents = await exec(`cat ./e2e/data/jest.config-reference.js`);
 		expect(configContents.stdout).toBe(referenceContents.stdout);
