@@ -3,6 +3,8 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
+import { reference } from './data/jest.config-reference';
+import { referenceCI } from './data/jest.config-reference-ci';
 
 const taqueriaProjectPath = 'e2e/auto-test-jest-plugin';
 
@@ -125,14 +127,12 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		const directory = 'config-matching';
 
 		await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
-		const configContents = await exec(`cat ${taqueriaProjectPath}/.taq/jest.config.js`);
+		const configContents = require(`../${taqueriaProjectPath}/.taq/jest.config.js`);
 
 		if (process.env.CI === 'true') {
-			const referenceContents = await exec(`cat ./e2e/data/jest.config-reference-ci.js`);
-			expect(configContents.stdout).toBe(referenceContents.stdout);
+			expect(configContents).toMatchObject(referenceCI);
 		} else {
-			const referenceContents = await exec(`cat ./e2e/data/jest.config-reference.js`);
-			expect(configContents.stdout).toBe(referenceContents.stdout);
+			expect(configContents).toMatchObject(reference);
 		}
 	});
 

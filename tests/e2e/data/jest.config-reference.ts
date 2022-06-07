@@ -1,9 +1,8 @@
 
-module.exports = {
+export const reference = {
     "automock": false,
     "bail": 0,
     "cache": true,
-    "cacheDirectory": "/tmp/jest_rs",
     "changedFilesWithAncestor": false,
     "ci": false,
     "clearMocks": false,
