@@ -31,7 +31,6 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		try {
 			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
 			const directoryContents = await exec(`ls ${taqueriaProjectPath}`);
-
 			expect(directoryContents.stdout).toContain(directory);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
@@ -147,11 +146,6 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
-	});
-
-	afterEach(async () => {
-		try {
-		} catch {}
 	});
 
 	afterAll(async () => {
