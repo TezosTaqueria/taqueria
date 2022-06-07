@@ -2,7 +2,9 @@ import * as TaqError from '@taqueria/protocol/TaqError';
 import {
 	attemptP,
 	bichain,
+	bimap,
 	chain,
+	chainRej,
 	debugMode,
 	forkCatch,
 	FutureInstance as Future,
@@ -184,7 +186,6 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() =>
 				pipe(
 					optInAnalytics(),
-					map(rv => rv === true ? "You've successfully opt in for anonymous usage reporting" : ''),
 					forkCatch(console.error)(console.error)(console.log),
 				),
 		)
@@ -195,7 +196,6 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() =>
 				pipe(
 					optOutAnalytics(),
-					map(rv => rv === true ? "You've successfully opt out of anonymous usage reporting" : ''),
 					forkCatch(console.error)(console.error)(console.log),
 				),
 		)
@@ -783,10 +783,8 @@ const preprocessArgs = (inputArgs: DenoArgs): DenoArgs => {
 	});
 };
 
-export const run = async (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
+export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 	try {
-		await sendEvent(inputArgs, getVersion(inputArgs, i18n), inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI');
-
 		const processedInputArgs = preprocessArgs(inputArgs);
 
 		// Parse the args required for core built-in tasks
@@ -815,6 +813,22 @@ export const run = async (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 							? taqResolve(initArgs)
 							: postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n);
 					}),
+					chain(() =>
+						sendEvent(
+							inputArgs,
+							getVersion(inputArgs, i18n),
+							inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI',
+							i18n,
+						)
+					),
+					chainRej(() =>
+						sendEvent(
+							inputArgs,
+							getVersion(inputArgs, i18n),
+							inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI',
+							i18n,
+						)
+					),
 					forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
 				),
 		);
