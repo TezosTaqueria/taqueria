@@ -558,7 +558,6 @@ describe('E2E Testing for taqueria CLI,', () => {
 		}
 	});
 
-	// NOTE: runs fine on its own
 	test('Verify that ligo and archetype expose the plugin choice option for compile in the help menu', async () => {
 		try {
 			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);

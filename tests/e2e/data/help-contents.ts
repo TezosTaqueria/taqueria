@@ -404,5 +404,5 @@ Options:
   -y, --yes          Select "yes" to any prompt       [boolean] [default: false]
       --help         Show help                                         [boolean]
   -i, --init         Initializes the partition for Jest                [boolean]
-      --testPattern  Run test files that match the provided pattern    [boolean]
+  -t, --testPattern  Run test files that match the provided pattern
 `
