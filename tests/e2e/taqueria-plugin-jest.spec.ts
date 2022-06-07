@@ -62,7 +62,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		try {
 			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
 			await exec(
-				`cp e2e/data/empty-jest-test-file-1.spec.ts ${taqueriaProjectPath}/${directory}/empty-jest-test-file-1.spec.ts`,
+				`cp e2e/data/empty-jest-test-file-1.ts ${taqueriaProjectPath}/${directory}/empty-jest-test-file-1.spec.ts`,
 			);
 			const testOutput = await exec(`taq test ${directory} -p ${taqueriaProjectPath}`);
 
@@ -81,8 +81,8 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		try {
 			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
 
-			await exec(`cp e2e/data/${file1} ${taqueriaProjectPath}/${directory}/`);
-			await exec(`cp e2e/data/${file2} ${taqueriaProjectPath}/${directory}/`);
+			await exec(`cp e2e/data/empty-jest-test-file-1.ts ${taqueriaProjectPath}/${directory}/${file1}`);
+			await exec(`cp e2e/data/empty-jest-test-file-2.ts ${taqueriaProjectPath}/${directory}/${file2}`);
 			const testOutput = await exec(`taq test ${directory} -p ${taqueriaProjectPath}`);
 
 			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file1}`);
@@ -99,8 +99,8 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		try {
 			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
 
-			await exec(`cp e2e/data/${file1} ${taqueriaProjectPath}/${directory}/`);
-			await exec(`cp e2e/data/${file2} ${taqueriaProjectPath}/${directory}/`);
+			await exec(`cp e2e/data/empty-jest-test-file-1.ts ${taqueriaProjectPath}/${directory}/${file1}`);
+			await exec(`cp e2e/data/empty-jest-test-file-2.ts ${taqueriaProjectPath}/${directory}/${file2}`);
 			const testOutput = await exec(`taq test ${directory} --testPattern file-* -p ${taqueriaProjectPath}`);
 
 			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file1}`);
@@ -117,8 +117,8 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		try {
 			await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
 
-			await exec(`cp e2e/data/${file1} ${taqueriaProjectPath}/${directory}/`);
-			await exec(`cp e2e/data/${file2} ${taqueriaProjectPath}/${directory}/`);
+			await exec(`cp e2e/data/empty-jest-test-file-1.ts ${taqueriaProjectPath}/${directory}/${file1}`);
+			await exec(`cp e2e/data/empty-jest-test-file-2.ts ${taqueriaProjectPath}/${directory}/${file2}`);
 			const testOutput = await exec(`taq test ${directory} --testPattern 1 -p ${taqueriaProjectPath}`);
 
 			expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file1}`);
