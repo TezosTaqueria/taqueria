@@ -6,6 +6,9 @@ const exec = util.promisify(exec1);
 
 const taqueriaProjectPath = 'e2e/auto-test-jest-plugin';
 
+// Jest currently outputs to stderr by default and an open issue exists for it here:
+// https://github.com/facebook/jest/issues/11925. Once that is fixed we can update these tests
+
 describe('E2E Testing for the taqueria jest plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['jest']);
@@ -53,10 +56,11 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 			`cp e2e/data/empty-jest-test-file-1.ts ${taqueriaProjectPath}/${directory}/empty-jest-test-file-1.spec.ts`,
 		);
 		const testOutput = await exec(`taq test ${directory} -p ${taqueriaProjectPath}`);
+		console.log(testOutput);
 
-		expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/empty-jest-test-file-1.spec.ts`);
-		expect(testOutput.stdout).toContain('dummy test for jest plugin testing');
-		expect(testOutput.stdout).toContain('✓ 1 test for jest');
+		expect(testOutput.stderr).toContain(
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1mempty-jest-test-file-1.spec.ts\x1B[22m`,
+		);
 	});
 
 	test('Run all tests inside of a test partition', async () => {
@@ -70,8 +74,12 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		await exec(`cp e2e/data/empty-jest-test-file-2.ts ${taqueriaProjectPath}/${directory}/${file2}`);
 		const testOutput = await exec(`taq test ${directory} -p ${taqueriaProjectPath}`);
 
-		expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file1}`);
-		expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file2}`);
+		expect(testOutput.stderr).toContain(
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1m${file1}\x1B[22m`,
+		);
+		expect(testOutput.stderr).toContain(
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1m${file2}\x1B[22m`,
+		);
 	});
 
 	test('Run all tests matching test pattern inside of a test partition', async () => {
@@ -85,8 +93,12 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		await exec(`cp e2e/data/empty-jest-test-file-2.ts ${taqueriaProjectPath}/${directory}/${file2}`);
 		const testOutput = await exec(`taq test ${directory} --testPattern file-* -p ${taqueriaProjectPath}`);
 
-		expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file1}`);
-		expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file2}`);
+		expect(testOutput.stderr).toContain(
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1m${file1}\x1B[22m`,
+		);
+		expect(testOutput.stderr).toContain(
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1m${file2}\x1B[22m`,
+		);
 	});
 
 	test('Run only tests matching test pattern inside of a test partition', async () => {
@@ -100,12 +112,14 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		await exec(`cp e2e/data/empty-jest-test-file-2.ts ${taqueriaProjectPath}/${directory}/${file2}`);
 		const testOutput = await exec(`taq test ${directory} --testPattern 1 -p ${taqueriaProjectPath}`);
 
-		expect(testOutput.stdout).toContain(`PASS ${taqueriaProjectPath}/${directory}/${file1}`);
+		expect(testOutput.stderr).toContain(
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1m${file1}\x1B[22m`,
+		);
 	});
 
 	test('no tests present will result in an error', async () => {
 		const testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
-		expect(testOutput.stderr).toContain('No tests found, exiting with code 1');
+		expect(testOutput.stdout).toContain('No tests found, exiting with code 1');
 	});
 
 	test('global jest config matches reference config', async () => {
