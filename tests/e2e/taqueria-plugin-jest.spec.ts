@@ -125,10 +125,15 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		const directory = 'config-matching';
 
 		await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
-		console.log(process.env);
 		const configContents = await exec(`cat ${taqueriaProjectPath}/.taq/jest.config.js`);
-		const referenceContents = await exec(`cat ./e2e/data/jest.config-reference.js`);
-		expect(configContents.stdout).toBe(referenceContents.stdout);
+
+		if (process.env.CI === 'true') {
+			const referenceContents = await exec(`cat ./e2e/data/jest.config-reference-ci.js`);
+			expect(configContents.stdout).toBe(referenceContents.stdout);
+		} else {
+			const referenceContents = await exec(`cat ./e2e/data/jest.config-reference.js`);
+			expect(configContents.stdout).toBe(referenceContents.stdout);
+		}
 	});
 
 	afterAll(async () => {
