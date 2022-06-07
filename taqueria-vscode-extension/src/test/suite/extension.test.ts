@@ -1,4 +1,5 @@
 import assert from 'assert';
+import { exec } from 'child_process';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -48,6 +49,7 @@ describe('Extension Test Suite', () => {
 	// TODO: https://github.com/ecadlabs/taqueria/issues/605
 	it.skip('Verify that VS Code command Taqueria Scaffold will scaffold a project', async () => {
 		// Open taquified project in workspace under testProjectDestination
+		await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
 
 		// Run taqueria scaffold command
 		await vscode.commands.executeCommand('taqueria.scaffold');
@@ -55,6 +57,9 @@ describe('Extension Test Suite', () => {
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/686
 	it.skip('Verify that VS Code command Taqueria Start Sandbox starts flextesa sandbox', async () => {
+		// Open taquified project in workspace under testProjectDestination
+		await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
+
 		// Install plugin
 		await vscode.commands.executeCommand('taqueria.install @taqueria/plugin-flextesa');
 
@@ -81,20 +86,34 @@ describe('Extension Test Suite', () => {
 
 		await vscode.commands.executeCommand('taqueria.compile_ligo');
 
+		const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
+		// Need to find library to use contains or build it
+		assert.notEqual(checkArtifact, undefined);
+
 		// In last test or after all block
 		// vscode.commands.executeCommand("workbench.action.closeActiveEditor");
 	});
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/687
 	it.skip('Verify that VS Code command Taqueria Compile SmartPy will compile SmartPy contract', async () => {
+		// Open taquified project in workspace under testProjectDestination
+		await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
+
 		// Install plugin
 		await vscode.commands.executeCommand('taqueria.install @taqueria/plugin-smartpy');
 
 		await vscode.commands.executeCommand('taqueria.compile_smartpy');
+
+		const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
+		// Need to find library to use contains or build it
+		assert.notEqual(checkArtifact, undefined);
 	});
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/688
 	it.skip('Verify that VS Code command Taqueria Deploy Contract will deploy contract to a test network', async () => {
+		// Open taquified project in workspace under testProjectDestination
+		await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
+
 		// Install plugin
 		await vscode.commands.executeCommand('taqueria.install @taqueria/plugin-smartpy');
 

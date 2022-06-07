@@ -12,6 +12,18 @@
 				"${workspaceFolder}/taqueria-vscode-extension/out/*.js"
 			],
 			"preLaunchTask": "build-and-watch-vscode"
+		},
+		{
+			"name": "Run Extension Tests",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}/taqueria-vscode-extension",
+				"--extensionTestsPath=${workspaceFolder}/taqueria-vscode-extension//out/test/suite/index"
+			],
+			"outFiles": ["${workspaceFolder}/taqueria-vscode-extension/out/**/*.js"],
+			"preLaunchTask": "build-and-watch-vscode"
 		}
 	]
 }
