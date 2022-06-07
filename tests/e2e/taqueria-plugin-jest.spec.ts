@@ -52,7 +52,6 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 
 	test('simple jest test file can be run successfully with plugin', async () => {
 		const directory = 'dummy-test';
-
 		await exec(`taq test -i ${directory} -p ${taqueriaProjectPath}`);
 		await exec(
 			`cp e2e/data/empty-jest-test-file-1.ts ${taqueriaProjectPath}/${directory}/empty-jest-test-file-1.spec.ts`,
