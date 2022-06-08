@@ -332,8 +332,10 @@ export const helpContentsGenerateTypesPlugin = `taq <command>
 
 Commands:
   taq init [projectDir]               Initialize a new project
-  taq opt-in                          Opt-in to sharing anonymous usage analytics
-  taq opt-out                         Opt-out of sharing anonymous usage analytics
+  taq opt-in                          Opt-in to sharing anonymous usage analytic
+                                      s
+  taq opt-out                         Opt-out of sharing anonymous usage analyti
+                                      cs
   taq install <pluginName>            Install a plugin
   taq uninstall <pluginName>          Uninstall a plugin
   taq generate types [typescriptDir]  Generate types for a contract to be used w
