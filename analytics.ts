@@ -12,7 +12,6 @@ const {
 	doesPathExist,
 	readJsonFile,
 	writeJsonFile,
-	eager,
 	taqResolve,
 } = utils.inject({
 	stdout: Deno.stdout,

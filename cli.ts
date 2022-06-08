@@ -821,14 +821,6 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 							i18n,
 						)
 					),
-					chainRej(() =>
-						sendEvent(
-							inputArgs,
-							getVersion(inputArgs, i18n),
-							inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI',
-							i18n,
-						)
-					),
 					forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
 				),
 		);
