@@ -18,8 +18,10 @@ const {
 	stderr: Deno.stderr,
 });
 
+type Consent = 'opt_in' | 'opt_out';
+
 const consentPrompt =
-	'Allow Taqueria anonymously report usage statistics, in accordance with the privacy policy to help make Taqueria better? [y/yes] or [n/no]';
+	'Help improve Taqueria by sharing anonymous usage statistics in accordance with the privacy policy? [y/yes] or [n/no]';
 const optInConfirmationPrompt = consentPrompt;
 const optOutConfirmationPrompt = 'Are you sure you want to turn off usage statistic reporting? [y/yes] or [n/no]';
 export const settingsFolder = Deno.env.get('HOME') + '/.taq-settings';
@@ -31,7 +33,7 @@ export const optInAnalyticsFirstTime = () => createSettingsFileWithConsent(OPT_I
 
 export const optOutAnalyticsFirstTime = () => createSettingsFileWithConsent(OPT_OUT);
 
-const createSettingsFileWithConsent = (option: 'opt_in' | 'opt_out') =>
+const createSettingsFileWithConsent = (option: Consent) =>
 	pipe(
 		Settings.make({ consent: option }),
 		chain(writeJsonFile(settingsFilePath)),
@@ -41,7 +43,7 @@ export const optInAnalytics = () => writeConsentValueToSettings(OPT_IN);
 
 export const optOutAnalytics = () => writeConsentValueToSettings(OPT_OUT);
 
-const writeConsentValueToSettings = (option: 'opt_in' | 'opt_out') => {
+const writeConsentValueToSettings = (option: Consent) => {
 	const input = prompt(option === OPT_IN ? optInConfirmationPrompt : optOutConfirmationPrompt);
 	if (input && /^y(es)?$/i.test(input)) {
 		return pipe(
@@ -53,8 +55,8 @@ const writeConsentValueToSettings = (option: 'opt_in' | 'opt_out') => {
 			chain(writeJsonFile(settingsFilePath)),
 			map(() =>
 				option === OPT_IN
-					? "You've successfully opt out of anonymous usage reporting"
-					: "You've successfully opt in for anonymous usage reporting"
+					? 'You have successfully opted-in to sharing anonymous usage analytics'
+					: 'You have successfully opted-out from sharing anonymous usage analytics'
 			),
 		);
 	} else {

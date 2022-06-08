@@ -23,8 +23,8 @@ Commands:
   taq init [projectDir]                  Initialize a new project
   taq scaffold [scaffoldUrl] [scaffoldP  Generate a new project using a pre
   rojectDir]                             -configured scaffold
-  taq optin                              Opt in for Google Analytics
-  taq optout                             Opt out of Google Analytics
+  taq opt-in                             Opt-in to sharing anonymous usage analytics
+  taq opt-out                            Opt-out of sharing anonymous usage analytics
   taq install <pluginName>               Install a plugin
   taq uninstall <pluginName>             Uninstall a plugin
 
@@ -44,8 +44,8 @@ export const helpContentsLigoPlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
-  taq optin                   Opt in for Google Analytics
-  taq optout                  Opt out of Google Analytics
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a Ligo syntax
@@ -82,8 +82,8 @@ export const helpContentsSmartpyPlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
-  taq optin                   Opt in for Google Analytics
-  taq optout                  Opt out of Google Analytics
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a SmartPy synt
@@ -131,8 +131,8 @@ export const helpContentsLigoSmartpy: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
-  taq optin                   Opt in for Google Analytics
-  taq optout                  Opt out of Google Analytics
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile                 Provided by more than one plugin. The option --plu
@@ -169,8 +169,8 @@ export const helpContentsLigoArchetype: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
-  taq optin                   Opt in for Google Analytics
-  taq optout                  Opt out of Google Analytics
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile                 Provided by more than one plugin. The option --plu
@@ -207,8 +207,8 @@ export const helpContentsArchetypePlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
-  taq optin                   Opt in for Google Analytics
-  taq optout                  Opt out of Google Analytics
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a Archetype sy
@@ -243,8 +243,8 @@ export const helpContentsTaquitoPlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
-  taq optin                   Opt in for Google Analytics
-  taq optout                  Opt out of Google Analytics
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq deploy [contract]       Deploy a smart contract to a particular environmen
@@ -278,8 +278,8 @@ export const helpContentsFlextesaPlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]            Initialize a new project
-  taq optin                        Opt in for Google Analytics
-  taq optout                       Opt out of Google Analytics
+  taq opt-in                       Opt-in to sharing anonymous usage analytics
+  taq opt-out                      Opt-out of sharing anonymous usage analytics
   taq install <pluginName>         Install a plugin
   taq uninstall <pluginName>       Uninstall a plugin
   taq start sandbox [sandboxName]  Starts a flextesa sandbox    [aliases: start]
@@ -332,8 +332,8 @@ export const helpContentsGenerateTypesPlugin = `taq <command>
 
 Commands:
   taq init [projectDir]               Initialize a new project
-  taq optin                           Opt in for Google Analytics
-  taq optout                          Opt out of Google Analytics
+  taq opt-in                          Opt-in to sharing anonymous usage analytics
+  taq opt-out                         Opt-out of sharing anonymous usage analytics
   taq install <pluginName>            Install a plugin
   taq uninstall <pluginName>          Uninstall a plugin
   taq generate types [typescriptDir]  Generate types for a contract to be used w

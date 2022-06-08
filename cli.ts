@@ -180,7 +180,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 				),
 		)
 		.command(
-			'optin',
+			'opt-in',
 			i18n.__('optInDesc'),
 			() => {},
 			() =>
@@ -190,7 +190,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 				),
 		)
 		.command(
-			'optout',
+			'opt-out',
 			i18n.__('optOutDesc'),
 			() => {},
 			() =>
@@ -766,8 +766,8 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 		'listKnownTasks',
 		'provision',
 		'plan',
-		'optin',
-		'optout',
+		'opt-in',
+		'opt-out',
 	].reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,
@@ -808,8 +808,8 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 						return initArgs._.includes('init')
 								|| initArgs._.includes('testFromVsCode')
 								|| initArgs._.includes('scaffold')
-								|| initArgs._.includes('optin')
-								|| initArgs._.includes('optout')
+								|| initArgs._.includes('opt-in')
+								|| initArgs._.includes('opt-out')
 							? taqResolve(initArgs)
 							: postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n);
 					}),
