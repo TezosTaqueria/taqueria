@@ -37,7 +37,10 @@ export type EnvKey =
 	| 'TAQ_PROJECT_DIR'
 	| 'TAQ_ENV'
 	| 'TAQ_DISABLE_STATE'
-	| 'TAQ_VERSION';
+	| 'TAQ_VERSION'
+	| 'HOME'
+	| 'CI'
+	| 'TEST';
 
 export interface EnvVars {
 	get: (key: EnvKey) => undefined | string;
@@ -61,6 +64,11 @@ export interface PreExtendDeps {
 // Common dependencies after we retrieved the config
 export interface PluginDeps extends PreExtendDeps {
 	readonly config: LoadedConfig.t;
+}
+
+export interface UsageAnalyticsDeps {
+	readonly inputArgs: DenoArgs;
+	readonly env: EnvVars;
 }
 
 export { LoadedConfig };

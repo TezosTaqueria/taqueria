@@ -21,7 +21,7 @@ import { uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
-import { optInAnalytics, optOutAnalytics, sendEvent } from './analytics.ts';
+import * as Analytics from './analytics.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -66,6 +66,15 @@ const {
 } = utils.inject({
 	stdout: Deno.stdout,
 	stderr: Deno.stderr,
+});
+
+const {
+	optInAnalytics,
+	optOutAnalytics,
+	sendEvent,
+} = Analytics.inject({
+	env: Deno.env,
+	inputArgs: Deno.args,
 });
 
 // Add alias
@@ -815,10 +824,8 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 					}),
 					chain(() =>
 						sendEvent(
-							inputArgs,
 							getVersion(inputArgs, i18n),
 							inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI',
-							i18n,
 						)
 					),
 					forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
