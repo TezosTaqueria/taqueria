@@ -149,6 +149,8 @@ tests/coverage
 /taqueria-state-js/index.js.map
 /taqueria-plugin-jest/index.js.map
 /taqueria-plugin-jest/index.js
+/taqueria-plugin-contract-types/src/generator/*.js
+/taqueria-plugin-contract-types/src/generator/*.js.map 
 
 # VS Code Extension
 /taqueria-vscode-extension/out

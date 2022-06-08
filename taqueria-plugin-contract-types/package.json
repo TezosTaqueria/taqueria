@@ -8,11 +8,21 @@
 			"distDir": "./",
 			"context": "node",
 			"isLibrary": true
+		},
+		"generator": {
+			"source": [
+				"./src/generator/contract-name.ts",
+				"./src/generator/testing-code-generator.ts"
+			],
+			"distDir": "./",
+			"context": "node",
+			"isLibrary": true,
+			"outputFormat": "commonjs"
 		}
 	},
 	"scripts": {
 		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
-		"build": "npx tsc -noEmit && npx parcel build",
+		"build": "npx tsc && npx parcel build",
 		"build-ci": "npm run build",
 		"debugPluginInfo": "node --inspect-brk index.js --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
 		"examples": "npm run example && npm run example-json && npm run example-simple && npm run example-file && npm run example-local",

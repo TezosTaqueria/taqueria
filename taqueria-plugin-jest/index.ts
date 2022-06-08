@@ -38,14 +38,19 @@ Plugin.create(() => ({
 	],
 	templates: [
 		Template.create({
-			command: 'contract-test <artifactName>',
-			template: 'contract-test',
+			command: 'test-suite <contractName>',
+			template: 'test-suite',
 			description: 'Generate a test suite for a contract',
 			handler: contractTemplateHandler,
 			options: [
 				Option.create({
 					flag: 'partition',
 					description: 'The partition to create the test within',
+				}),
+				Option.create({
+					shortFlag: 'o',
+					flag: 'output',
+					description: 'The output filename',
 				}),
 			],
 		}),

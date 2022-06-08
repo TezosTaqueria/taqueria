@@ -455,7 +455,7 @@ const addOperations = (
 				),
 		);
 
-const addTemplates = (
+const exposeTemplates = (
 	cliConfig: CLIConfig,
 	_config: LoadedConfig.t,
 	_env: EnvVars,
@@ -642,7 +642,7 @@ const loadEphermeralState = (
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
 ): CLIConfig =>
-	[exposeTasks /* addOperations, addTemplates*/].reduce(
+	[exposeTasks, exposeTemplates /*, addOperations*/].reduce(
 		(cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
 		cliConfig,
 	);
