@@ -1,5 +1,5 @@
 ---
-title: Understanding Plugins
+title: Taqueria Plugins
 ---
 
 Plugins are how Taqueria gets things done. Each plugin implements a specific function such as a smart contract compiler, sandbox, or test framework. A plugin will provide one or more tasks that you can use in Taqueria
@@ -16,12 +16,13 @@ During installation, NPM packages for the plugin are downloaded into the project
 
 ## Available Plugins
 
-| name                                           |  `<pluginName>`                   |  description                                                        |
-|------------------------------------------------|-----------------------------------|---------------------------------------------------------------------|
-| [LIGO](./plugin-ligo.mdx/)                     | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language                     |
-| [SmartPy](./plugin-smartpy.mdx/)               | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy smart contract language                  |
-| [Archetype](./plugin-archetype.mdx/)           | `@taqueria/plugin-archetype`      | A compiler for the Archetype smart contract language                |
-| [Flextesa](./plugin-flextesa.mdx/)             | `@taqueria/plugin-flextesa`       | A Tezos sandbox (testnet) that runs locally on your machine         | 
-| [Taquito](./plugin-taquito.mdx/)               | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate smart contracts       |
-| [Contract Types](./plugin-contract-types.mdx/) | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code         |
-| [Tezos Client](./plugin-tezos-client.mdx/)     | `@taqueria/plugin-tezos-client`   | Interacts with a Tezos node, providing simulation and type checking |
+| Name                                                   |  `<pluginName>`                   |  Description                                                            |
+|--------------------------------------------------------|-----------------------------------|-------------------------------------------------------------------------|
+| [LIGO](/docs/plugins/plugin-ligo/)                     | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language                         |
+| [Archetype](/docs/plugins/plugin-archetype/)           | `@taqueria/plugin-archetype`      | A compiler for the Archetype smart contract language                    |
+| [Flextesa](/docs/plugins/plugin-flextesa/)             | `@taqueria/plugin-flextesa`       | A Tezos sandbox (testnet) that runs locally on your machine             | 
+| [Taquito](/docs/plugins/plugin-taquito/)               | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate smart contracts           |
+| [Contract Types](/docs/plugins/plugin-contract-types/) | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code             |
+| [Tezos Client](/docs/plugins/plugin-tezos-client/)     | `@taqueria/plugin-tezos-client`   | An abstraction of `tezos-client`, providing simulation and typechecking |
+| [Jest](/docs/plugins/plugin-jest/)                     | `@taqueria/plugin-jest`           | Provides support for Jest testing                                       |
+| [SmartPy](/docs/plugins/plugin-smartpy/)               | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy smart contract language                      |

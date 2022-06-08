@@ -1,4 +1,6 @@
-# Change Log
+--- 
+title: Taqueria Releases
+---
 
 # Taqueria v0.4.2   
 
@@ -12,11 +14,12 @@
 
 - [Bug Fix] VS Code Extension doesn't update `config.json` with installed plugin when installing from NPM
 
+
 # Taqueria v0.4.0   
 
 | Details     |               |
 | ----------- | ------------- |
-|Release Date | June 6, 2022  |
+|Release Date | June 8, 2022  |
 |Release Type | Major         |
 |Release Page | [v0.4.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.4.0) |
 
@@ -34,20 +37,23 @@
 
 ### Taqueria State
 
-> Message from the Taqueria team:
-`We've made many under-the-hood changes to give Taqueria a wide array of capabilities when it comes to persisting the state of your project. Although they're not visible on the surface, you'll soon have the ability to provision on-chain and off-chain operations which produce outputs that persist across the project lifecycle and environments
-These operations can link to and depend on one-another.` 
-`Internally they are represented as a directed acyclic graph (DAG) which will ultimately provide much flexibility and powerful capabilities. We don't want to spoil this for you, but just know that we've put all the things in place to start making this visible very shortly!`
+:::note
+Message from the dev team:
+
+We've made many under-the-hood changes to give Taqueria a wide array of capabilities when it comes to persisting the state of your project. Although they're not visible on the surface, you'll soon have the ability to provision on-chain and off-chain operations which produce outputs that persist across the project lifecycle and environments
+
+These operations can link to and depend on one-another. Internally they are represented as a directed acyclic graph (DAG) which will ultimately provide much flexibility and powerful capabilities. We don't want to spoil this for you, but just know that we've put all the things in place to start making this visible very shortly!
+:::
 
 Taqueria now keeps a record of the stateful tasks and operations executed, along with the values in the resulting state  
 
 In the initial implementation, `@taqueria/plugin-taquito` has been refactored so the `taq originate` task is now stateful. When run, a record is created which includes the deployed contract address
 
-This data is stored in a new auto-generated file named `development-state.json`. This file is JSON encoded and is stored in the `./.taq` directory of the project
+This data is is stored in a new auto-generated file named `development-state.json`. This file is JSON encoded and is stored in the `./.taq` directory of the project
 
-
-> Note: This file is not generated until the first time you run a supported task or operation. Currently, this will occur the first time you run `taq originate` in the project
-
+:::note
+This file is not generated until the first time you run a supported task or operation. Currently, this will occur the first time you run `taq originate` in the project
+:::
 
 
 Records follow the format shown below:
@@ -66,8 +72,9 @@ Records follow the format shown below:
 ```
 
 
-
-> Note: At this time, only the `originate` task is supported but full support for operations and additional plugin tasks is coming soon!
+:::note
+At this time, only the `originate` task is supported but full support for operations and additional plugin tasks is coming soon!
+:::
 
 ### The `@taqueria/state` Library
 
@@ -111,7 +118,9 @@ const results = getOriginations()
 
 pluginName: `@taqueria/plugin-jest`
 
-> Note: The Taqueria team is excited to include the first version of the Jest plugin `@taqueria/plugin-jest` in this release. This plugin allows you to partition your tests in powerful and flexible ways while easing the burden of managing Jest configuration files. The next feature already under active development is automatic test stub generation from Michelson files using generated types
+:::note
+The Taqueria team is excited to include the first version of the Jest plugin `@taqueria/plugin-jest` in this release. This plugin allows you to partition your tests in powerful and flexible ways while easing the burden of managing Jest configuration files. The next feature already under active development is automatic test stub generation from Michelson files using generated types
+:::
 
 The `@taqueria/plugin-jest` plugin provides the `taq test` task which provides a means to instantiate test directories and run Jest tests
 
@@ -125,6 +134,7 @@ taq install @taqueria/plugin-jest
 
 ### Usage
 
+:::note
 The Jest plugin will automatically initialize a Jest test directory when you run `taq test <test-directory>`
 
 The easiest way to start using the plugin is to:
@@ -132,6 +142,7 @@ The easiest way to start using the plugin is to:
 1. Create a new directory in the root of your project `/tests`
 2. Add one or more tests to the directory
 3. Run `taq test tests`
+:::
 
 
 ### Initializing Partitions
@@ -153,7 +164,9 @@ This will do several things:
 - Create a Jest configuration in the directory
 - Create a global Jest configuration file in `./.taq/jest.config.js`
 
-> Note: You can create any number of partitions. By default there are no partitions
+:::note
+You can create any number of partitions. By default there are no partitions
+:::
 
 To create additional partitions, simply run:
 
@@ -175,11 +188,15 @@ Each partition will have it's own Jest configuration file (`./tests/jest.config.
 
 The Jest configurations cascade down from the global config. If you want to override a value in the global config, simply define it in the partition config. The partition config will override the global config
 
-> Note: The default root directory for Jest can be overridden by setting `"jestTestsRootDir"` in `taqueria.config.js`
+:::note
+The default root directory for Jest can be overridden by setting `"jestTestsRootDir"` in `taqueria.config.js`
+:::
 
 ## Implicit accounts
 
-> WARNING: This release makes a breaking change to the schema of `config.json`. If you use Taqueria v0.4.0 on an existing project, you will need to make minor adjustments to your `config.json` file
+:::warning
+This release makes a breaking change to the schema of `config.json`. If you use Taqueria v0.4.0 on an existing project, you will need to make minor adjustments to your `config.json` file
+:::
 
 Taqueria now allows you to be declarative when naming your implicit accounts and the desired balance for each. These accounts are declared at the root level in `config.json`. Previously, accounts were defined in each sandbox configuration
 
@@ -188,10 +205,16 @@ The default configuration for Taqueria projects includes five pre-defined accoun
 ```json
 {
     "language": "en",
-    "plugins": [ ],
     "contractsDir": "contracts",
-    "testsDir": "tests",
     "artifactsDir": "artifacts",
+    "network": {},
+    "sandbox": {
+        "local": {
+            "label": "Local Tezos Sandbox",
+            "rpcUrl": "http://localhost:20000",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
+        }
+    },
     "environment": {
         "default": "development",
         "development": {
@@ -199,16 +222,9 @@ The default configuration for Taqueria projects includes five pre-defined accoun
             "sandboxes": [
                 "local"
             ],
+            "storage": {}
         }
     },
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-            "rpcUrl": "http://localhost:20000"
-        }
-    },
-    "network": {},
     "accounts": {
         "bob": "3_000_000_000",
         "alice": "3_000_000_000",
@@ -252,7 +268,10 @@ These accounts will be created and funded automatically when a sandbox starts. A
 }
 ```
 
-> Note: Future improvements will extend implicit account provisioning to testnets
+:::note
+Future improvements will extend implicit account provisioning to testnets
+:::
+
 
 To set a default account for a sandbox, you must now define it explicitly in the sandbox config:
 
@@ -305,7 +324,7 @@ Previously, a raw Michelson expression was required:
 taq simulate sample.tz 'Left (Left 3)' --storage 5
 ```
 
-### Reduced Number of CLI Commands Required
+### Reduced Number of Setup steps
 
 This release improves the Taqueria workflow by improving the `taq init` and `taq scaffold` tasks, reducing the number of CLI commands required to setup a project
 
@@ -313,6 +332,11 @@ Specifically:
 - `taq init` now runs `npm init -y` implicitly
 - `taq scaffold` now runs `taq init`, `npm i`, and several housekeeping tasks implicitly 
 
+### Conceptual Changes to Note
+
+- Taqueria has a new auto-generated file `development-state.json` located in the `./.taq/` directory 
+- Taqueria's `ephermal state` (`state.json`) will now be referred to as the Taqueria `cache`
+- Implicit accounts are now defined at the root level in the `config.json` file
 ### Conceptual Changes to Note
 
 - Taqueria has a new auto-generated file `development-state.json` located in the `./.taq/` directory 
@@ -334,43 +358,3 @@ Specifically:
 - Plugin documentation is now all built from a common source
 - Dependency injection added to VS Code Extension
 - Improved test coverage of VS Code Extension
-
-## [Shipped]
-
-> For full detail on changes, fixes, and improvements made in each release, please refer to the [Taqueria Release Page](https://github.com/ecadlabs/taqueria/releases)
-
-- April 2022:
-  - Released the Archetype plugin
-  - Released the Tezos-Client plugin
-  - Added a new basic project scaffold `taqueria-scaffold-demo`
-
-- March 2022:
-  - Major refactor to the taqueria-sdk library
-  - Improvements and bugfixes for the Flextesa plugin
-  - Updated the UX for the Taquito plugin
-  - Added Michelson types to the Contract Types plugin
-  
-
-- February 2022:
-  - Project scaffolding
-  - TS Type Generation from Michelson`.tz` files which includes:
-    - A new Taqueria NPM plugin: @taqueria/plugin-contract-types
-    - Awareness of generated types in VS Code Extension
-      - Intellisense tooltips for contract parameters
-      - Compile time type checking for TS types 
-
-
-- January 2022:
-  - CLI
-  - Visual Studio Code Extension
-  - Initialization of a Tezos Project
-  - A demo smart contract and app, `hello-tacos`
-  - Compile LIGO and SmartPy smart contracts
-  - Using a local sandbox with test accounts
-  - SDK for developers to build their own plugins
-  - Origination to local, test, and main networks
-  - Several plugins:
-    - LIGO
-    - SmartPy
-    - Taquito
-    - Flextesa
