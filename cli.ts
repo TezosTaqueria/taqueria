@@ -75,6 +75,7 @@ const {
 } = Analytics.inject({
 	env: Deno.env,
 	inputArgs: Deno.args,
+	build: Deno.build,
 });
 
 // Add alias

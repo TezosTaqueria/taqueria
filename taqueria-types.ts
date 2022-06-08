@@ -31,6 +31,8 @@ export interface CLICommand {
 
 export type DenoArgs = typeof Deno.args;
 
+export type DenoBuild = typeof Deno.build;
+
 export type EnvKey =
 	| 'TAQ_CONFIG_DIR'
 	| 'TAQ_MAX_CONCURRENCY'
@@ -69,6 +71,7 @@ export interface PluginDeps extends PreExtendDeps {
 export interface UsageAnalyticsDeps {
 	readonly inputArgs: DenoArgs;
 	readonly env: EnvVars;
+	readonly build: DenoBuild;
 }
 
 export { LoadedConfig };

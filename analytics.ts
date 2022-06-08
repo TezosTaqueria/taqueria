@@ -20,18 +20,20 @@ const {
 type Consent = 'opt_in' | 'opt_out';
 
 const consentPrompt =
-	'Help improve Taqueria by sharing anonymous usage statistics in accordance with the privacy policy? [y/yes] or [n/no]';
+	'Help improve Taqueria by sharing anonymous usage statistics in accordance with the privacy policy? (Y/n)';
 const optInConfirmationPrompt = consentPrompt;
-const optOutConfirmationPrompt = 'Are you sure you want to turn off usage statistic reporting? [y/yes] or [n/no]';
+const optOutConfirmationPrompt = 'Are you sure you want to turn off usage statistic reporting? (Y/n)';
 
 const OPT_IN = 'opt_in';
 const OPT_OUT = 'opt_out';
 
 export const inject = (deps: UsageAnalyticsDeps) => {
-	const { env, inputArgs } = deps;
+	const { env, inputArgs, build } = deps;
 
 	const settingsFolder = env.get('HOME') + '/.taq-settings';
 	const settingsFilePath = settingsFolder + '/taq-settings.json';
+
+	const didUserChooseYes = (input: string | null) => input === null || /^y(es)?$/i.test(input);
 
 	const optInAnalyticsFirstTime = () => createSettingsFileWithConsent(OPT_IN);
 	const optOutAnalyticsFirstTime = () => createSettingsFileWithConsent(OPT_OUT);
@@ -45,7 +47,7 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 	const optOutAnalytics = () => writeConsentValueToSettings(OPT_OUT);
 	const writeConsentValueToSettings = (option: Consent) => {
 		const input = prompt(option === OPT_IN ? optInConfirmationPrompt : optOutConfirmationPrompt);
-		if (input && /^y(es)?$/i.test(input)) {
+		if (didUserChooseYes(input)) {
 			return pipe(
 				readJsonFile<Settings.t>(settingsFilePath),
 				map((settingsContent: Settings.t) => {
@@ -70,7 +72,7 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 
 	const promptForConsent = (): Future<TaqError.t, string> => {
 		const input = prompt(consentPrompt);
-		const option = input && /^y(es)?$/i.test(input) ? optInAnalyticsFirstTime : optOutAnalyticsFirstTime;
+		const option = didUserChooseYes(input) ? optInAnalyticsFirstTime : optOutAnalyticsFirstTime;
 		return pipe(
 			mkdir(settingsFolder),
 			chain(() => option()),
@@ -136,7 +138,7 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 												taq_version,
 												taq_ui,
 												taq_timestamp,
-												taq_os: Deno.build.os,
+												taq_os: build.os,
 											},
 										}],
 									}),
