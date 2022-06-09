@@ -50,21 +50,21 @@ jobs:
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
            cache_path: |
-              ~/.deno
-              ~/.cache/deno
+              ./deno
+              ~/cache/deno
            taqueria_bin: "taq"
          - os: windows-latest
            os_short: windows
            deno_target: "x86_64-pc-windows-msvc"
            cache_path: |
-            ~/.deno
+            ./deno
             ~/AppData/Local/deno
            taqueria_bin: "taq.exe"
          - os: macOS-latest
            os_short: macos
            deno_target: "x86_64-apple-darwin"
            cache_path: |
-            ~/.deno
+            ./deno
             ~/Library/Caches/deno
            taqueria_bin: "taq"
 
@@ -108,7 +108,7 @@ jobs:
             exit 1
           fi
           echo "Test for cache"
-          ls -ltr ./.deno
+          ls -ltr
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
       - name: Authenticate with GCP
