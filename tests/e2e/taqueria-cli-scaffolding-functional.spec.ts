@@ -36,6 +36,6 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	});
 
 	afterAll(async () => {
-		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true, force: true });
+		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true });
 	});
 });

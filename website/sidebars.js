@@ -26,7 +26,19 @@ const sidebars = {
         "getting-started/installation",
         "intro",
         "getting-started/quickstart",
-        "getting-started/networks"
+        
+      ],
+    },
+    {
+      type: "category",
+      label: "Configuration",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "config/networks",
+        "config/implicit-accounts",
+        "config/sandbox-config"
       ],
     },
     {
@@ -40,22 +52,33 @@ const sidebars = {
         "plugins/plugin-flextesa",
         "plugins/plugin-archetype",
         "plugins/plugin-ligo",
-        "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
         "plugins/plugin-contract-types",
         "plugins/plugin-tezos-client",
+        "plugins/plugin-smartpy",
+        "plugins/plugin-jest",
       ],
     },
     {
       type: "category",
-      label: "Example App",
+      label: "Taqueria Libraries",
       className: "sidebarHeader",
       collapsed: false,
       collapsible: false,
       items: [
-        "hello-tacos-tutorial"
+        "libraries/taqueria-state"
       ],
     },
+    // {
+    //   type: "category",
+    //   label: "Example App",
+    //   className: "sidebarHeader",
+    //   collapsed: false,
+    //   collapsible: false,
+    //   items: [
+    //     "hello-tacos-tutorial"
+    //   ],
+    // },
     {
       type: "category",
       label: "Taqueria Internals",
@@ -74,6 +97,7 @@ const sidebars = {
       collapsible: false,
       items: [
         "roadmap",
+        "release-notes",
         "taqueria-dev/contributions",
         "taqueria-dev/making-plugins",
         "taqueria-dev/pr-npm-packages"

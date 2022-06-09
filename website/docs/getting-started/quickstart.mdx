@@ -29,9 +29,10 @@ What you will accomplish:
 ## Requirements
 
 To successfully follow this guide, you must ensure that:
+
 - The Taqueria CLI has been [installed](./installation.mdx) and is available in your `$PATH` 
-- Docker 0.8 (or later) is installed and currently running
-- Node.js v16.x (or later) is installed
+- Docker 0.8 or later is installed
+- Node.js v16.3 or later is installed
 
 :::note
 The Taqueria VS Code Extension provides direct access to Taqueria tasks from the command palette. Under the hood, the VS Code Extension makes calls to the CLI, so you can be assured the behaviour of tasks will remain consistent regardless of whether they are executed from a terminal or the command palette. The steps in this guide are for using the Taqueria CLI, but you can also run the commands from the Taqueria extension via the VS Code command palette if you prefer
@@ -39,9 +40,7 @@ The Taqueria VS Code Extension provides direct access to Taqueria tasks from the
 
 ## Starting a Taqueria Project
 
-There are two things required to start using Taqueria on a project
-
-First, the project must have been initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts`, `/artifacts`, and `/tests` have been created 
+To get started with Taqueria on a project, the project directory must have been initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts`, `/artifacts`, and `/tests` have been created 
 
 Taqueria provides the command `init` which will create a new directory with the correct structure and configuration. To create a new Taqueria project called `my-first-project`, run the command:
 ```shell
@@ -50,16 +49,6 @@ taq init my-first-project
 :::caution
 If a project has already been initialized, Taqueria will not re-initialize the project, but will still return a success message. This will be fixed in an upcoming release
 :::
-
-Next, the project directory must be initialized as an NPM project as all current plugins implemented as NPM packages. To do this, first change directories:
-```shell
-cd my-first-project
-```
-
-Then initialize the directory as an NPM project:
-```shell
-npm init -y
-```
 
 ## Working with Plugins
 
@@ -90,7 +79,7 @@ taq install @taqueria/plugin-ligo
 Once installed, the plugin provides the command `taq compile` which when run, will look for any LIGO files in the `/contracts` directory and compile them to Michelson `.tz` files in the `/artifacts` directory
 
 To demonstrate this, create a file called `counter.jsligo` in the `/contracts` directory and insert the following JSLigo code:
-```ligo title="/contracts/counter.jsligo"
+```js title="/contracts/counter.jsligo"
 type storage = int;
 
 type parameter =

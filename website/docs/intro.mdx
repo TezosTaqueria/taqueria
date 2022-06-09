@@ -29,6 +29,7 @@ Some of the things Taqueria can do for you include:
 - Originating a smart contract to a sandbox and testnet with the [Taquito plugin](/docs/plugins/plugin-taquito/)
 - Generating TypeScript types from a Michelson contract with the [Contract Types](/docs/plugins/plugin-contract-types/) plugin
 - Typechecking Michelson contracts and simulating contract calls with the [Tezos Client](/docs/plugins/plugin-tezos-client/) plugin
+- Testing dapps and smart contracts with the [Jest](/docs/plugins/plugin-jest/) plugin
 
 ## What is Taqueria?
 
@@ -69,7 +70,7 @@ A Taqueria project is one that has been initialized by Taqueria using the `taq i
 - `./.taq`: This is where Taqueria will store its configuration
 
 :::note
-Configuration for Taqueria plugins and sandboxes is done in `./.taq/config.json`
+Configuration for Taqueria projects including accounts, networks, and sandboxes is done in `./.taq/config.json`
 :::
 
 ### Taqueria Plugins
@@ -86,6 +87,7 @@ Currently available plugins include:
 - Taquito 
 - Contract Types Generator
 - Tezos Client
+- Jest Test Runner
 
 ### Taqueria SDK
 
