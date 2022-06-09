@@ -6,8 +6,8 @@ The Archetype plugin provides a task to compile Archetype smart contracts (`.arl
 
 ## Requirements
 
-- Node.js v16 or later
-- Docker v0.8.2 or later
+- Node.js v16.3 or later
+- Docker v0.8.6 or later
 
 ## Installation
 
@@ -15,9 +15,6 @@ To install the Archetype plugin on a Taqueria project, navigate to the project f
 ```shell
 taq install @taqueria/plugin-archetype
 ```
-
-> ### :page_with_curl: Note
-> At this time, all Taqueria projects must also be initialized as node projects by running `npm init -y` from the root of your project directory
 
 ## Configuration
 

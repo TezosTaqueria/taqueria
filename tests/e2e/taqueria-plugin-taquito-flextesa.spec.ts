@@ -93,7 +93,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			?.split('│')[2]
 			?.trim()) ?? 'one';
 		expect(contractOneHash).toMatch(contractRegex);
-		console.log(contractOneHash);
 
 		expect(deployResponse).toContain(contract2);
 		expect(deployResponse).toContain(dockerName);
@@ -103,7 +102,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			?.split('│')[2]
 			.trim()) ?? 'two';
 		expect(contractTwoHash).toMatch(contractRegex);
-		console.log(contractTwoHash);
 
 		// 4. Verify that contracts have been originated to the network
 		const contractOneFromSandbox = await exec(

@@ -395,12 +395,6 @@ const scaffoldProject = (i18n: i18n.t) =>
 			log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
 			await eager(gitClone(scaffoldUrl)(destDir));
 
-			// TODO: Remove after 620-operations is merged in both the
-			// taqueria repo as well as the taqueria-scaffold-quickstart repo
-			//
-			// See issue: https://github.com/ecadlabs/taqueria/issues/736
-			await eager(exec('git checkout 620-operations', {}, true, destDir));
-
 			log('\n Initializing Project...');
 
 			const scaffoldConfig = await eager(SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`));

@@ -92,6 +92,8 @@ const ensurePartitionExists = (args: Opts) =>
 		);
 
 const execCmd = (cmd: string, args: string[]) => {
+	// console.log([cmd, ...args].join(' '))
+
 	const child = execa(cmd, args, {
 		reject: false,
 		buffer: false,
@@ -100,9 +102,8 @@ const execCmd = (cmd: string, args: string[]) => {
 		stdio: 'inherit',
 		env: { FORCE_COLOR: 'true' },
 	});
-	child.stdout?.pipe(process.stdout);
-	child.stderr?.pipe(process.stdout);
-	return;
+
+	return child.then(_ => {});
 };
 
 export default async (args: RequestArgs.ProxyRequestArgs) => {
