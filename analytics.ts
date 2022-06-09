@@ -1,7 +1,7 @@
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as Settings from '@taqueria/protocol/Settings';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import { attemptP, chain, chainRej, FutureInstance as Future, map, resolve } from 'fluture';
+import { attemptP, chain, chainRej, FutureInstance as Future, map, mapRej, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { getMachineId } from 'https://deno.land/x/machine_id@v0.3.0/mod.ts';
 import type { UsageAnalyticsDeps } from './taqueria-types.ts';
@@ -46,26 +46,35 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 
 	const optInAnalytics = () => writeConsentValueToSettings(OPT_IN);
 	const optOutAnalytics = () => writeConsentValueToSettings(OPT_OUT);
-	const writeConsentValueToSettings = (option: Consent) => {
-		const input = prompt(option === OPT_IN ? optInConfirmationPrompt : optOutConfirmationPrompt);
-		if (didUserChooseYes(input)) {
-			return pipe(
-				readJsonFile<Settings.t>(settingsFilePath),
-				map((settingsContent: Settings.t) => {
-					settingsContent.consent = option;
-					return settingsContent;
-				}),
-				chain(writeJsonFile(settingsFilePath)),
-				map(() =>
-					option === OPT_IN
-						? 'You have successfully opted-in to sharing anonymous usage analytics'
-						: 'You have successfully opted-out from sharing anonymous usage analytics'
-				),
-			);
-		} else {
-			return taqResolve('');
-		}
-	};
+	const writeConsentValueToSettings = (option: Consent) =>
+		pipe(
+			doesPathExist(settingsFilePath),
+			chain(() => {
+				const input = prompt(option === OPT_IN ? optInConfirmationPrompt : optOutConfirmationPrompt);
+				if (didUserChooseYes(input)) {
+					return pipe(
+						readJsonFile<Settings.t>(settingsFilePath),
+						map((settingsContent: Settings.t) => {
+							settingsContent.consent = option;
+							return settingsContent;
+						}),
+						chain(writeJsonFile(settingsFilePath)),
+						map(() =>
+							option === OPT_IN
+								? 'You have successfully opted-in to sharing anonymous usage analytics'
+								: 'You have successfully opted-out from sharing anonymous usage analytics'
+						),
+					);
+				} else {
+					return taqResolve('');
+				}
+			}),
+			mapRej(() =>
+				option === OPT_IN
+					? 'The command "taq opt-in" is ignored as this might be the first time running Taqueria...'
+					: 'The command "taq opt-out" is ignored as this might be the first time running Taqueria...'
+			),
+		);
 
 	const isCIRun = () => env.get('CI') !== undefined;
 
