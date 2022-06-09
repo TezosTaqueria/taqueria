@@ -83,7 +83,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: "v1.18.2"
+          deno-version: v1.x
 
       - uses: actions/cache@v3
         with:
