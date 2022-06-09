@@ -92,7 +92,10 @@ jobs:
           echo "Try and init a new project"
           ls -la
           ./"${{ matrix.taqueria_bin }}" init -p ./test_project
-          [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
+          if [ ! -f ./test_project/.taq/config.json ]; then
+            echo "Project not initialized"
+            exit 1
+          fi
           echo "Move the binary"
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
