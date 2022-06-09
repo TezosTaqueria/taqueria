@@ -90,6 +90,8 @@ jobs:
           echo "Running compile"
           deno compile -o taq --allow-run --allow-write --allow-read --allow-env --import-map ./import_map.json --no-prompt --target $DENO_TARGET index.ts --quickstart "`cat quickstart.md`" --setBuild "$BUILD" --setVersion "$TAQ_VERSION"
           echo "Try and init a new project"
+          ls -la
+          ./"${{ matrix.taqueria_bin }}" init -p ./test_project
           [[ $(./"${{ matrix.taqueria_bin }}" init -p ./test_project) == "Project taq'ified!" ]] 
           echo "Move the binary"
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
