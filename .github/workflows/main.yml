@@ -51,7 +51,7 @@ jobs:
            deno_target: "x86_64-unknown-linux-gnu"
            cache_path: |
               ./deno
-              ~/cache/deno
+              ~/.cache/deno
            taqueria_bin: "taq"
          - os: windows-latest
            os_short: windows
