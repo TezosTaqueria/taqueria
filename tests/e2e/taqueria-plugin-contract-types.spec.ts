@@ -1,4 +1,4 @@
-import { exec as exec1 } from 'child_process';
+import { exec as exec1, execSync } from 'child_process';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import util from 'util';
@@ -22,12 +22,12 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 
 	// TODO: Skipping this test for now. See in-line comments for more details.
 	// See issue: https://github.com/ecadlabs/taqueria/issues/736
-	test.skip('Verify that taqueria contract types plugin can compile one contract and generate types', async () => {
+	test('Verify that taqueria contract types plugin can compile one contract and generate types', async () => {
 		const pwdPromise = await exec(`pwd`);
 		const pwd = pwdPromise.stdout.trim();
 
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq compile -p ${taqueriaProjectPath}`);
+		await exec(`cd ${taqueriaProjectPath} && taq compile`);
 
 		// TODO:
 		// Related to issue #736 above, when investigating I found that
@@ -61,13 +61,13 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 
 	// TODO: Skipping this test for now. See in-line comments for more details.
 	// See issue: https://github.com/ecadlabs/taqueria/issues/736
-	test.skip('Verify that taqueria contract types plugin allows for different types folder specification', async () => {
+	test('Verify that taqueria contract types plugin allows for different types folder specification', async () => {
 		const pwdPromise = await exec(`pwd`);
 		const pwd = pwdPromise.stdout.trim();
 		const folderName = 'otherFolder';
 
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq compile -p ${taqueriaProjectPath}`);
+		await exec(`cd ${taqueriaProjectPath} && taq compile`);
 
 		const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types ${folderName}`);
 		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: '${folderName}' }`);
@@ -86,13 +86,13 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 		expect(typesContents.stdout).toContain('type-utils.ts');
 	});
 
-	test.skip('Verify that taqueria contract types plugin can compile multiple contracts and generate types', async () => {
+	test('Verify that taqueria contract types plugin can compile multiple contracts and generate types', async () => {
 		const pwdPromise = await exec(`pwd`);
 		const pwd = pwdPromise.stdout.trim();
 
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
 		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq compile -p ${taqueriaProjectPath}`);
+		await exec(`cd ${taqueriaProjectPath} && taq compile`);
 
 		const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types`);
 		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
@@ -126,7 +126,6 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 			expect(stdout).toBe('initialStorage: 00 , newStorage: 050080890f\n');
 			expect(stderr).toBe('');
 		},
-		400000,
 	);
 
 	// Remove all files from artifacts folder without removing folder itself
