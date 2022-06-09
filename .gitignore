@@ -107,6 +107,7 @@ dist
 .DS_Store
 node_modules
 /deno
+**/deno
 */**/.vscode
 .idea
 **/.parcel-cache/*
@@ -160,3 +161,4 @@ tests/coverage
 /taqueria-vscode-extension/config.json
 website/docs/glossary.md
 website/yarn.lock
+
