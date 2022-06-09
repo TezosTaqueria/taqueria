@@ -1,3 +1,4 @@
+import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as Settings from '@taqueria/protocol/Settings';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { attemptP, chain, chainRej, FutureInstance as Future, map, resolve } from 'fluture';
@@ -72,10 +73,10 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 
 	const promptForConsent = (): Future<TaqError.t, string> => {
 		const input = prompt(consentPrompt);
-		const option = didUserChooseYes(input) ? optInAnalyticsFirstTime : optOutAnalyticsFirstTime;
+		const consentOption = didUserChooseYes(input) ? optInAnalyticsFirstTime : optOutAnalyticsFirstTime;
 		return pipe(
 			mkdir(settingsFolder),
-			chain(() => option()),
+			chain(() => consentOption()),
 		);
 	};
 
@@ -105,6 +106,7 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 	const noop = () => {};
 
 	const sendEvent = (
+		initArgs: SanitizedArgs.t,
 		taq_version: string,
 		taq_ui: 'CLI' | 'VSCode',
 	): Future<TaqError.t, void> => {
@@ -139,6 +141,7 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 												taq_ui,
 												taq_timestamp,
 												taq_os: build.os,
+												taq_args: initArgs._.join(),
 											},
 										}],
 									}),

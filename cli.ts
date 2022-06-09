@@ -805,7 +805,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 					cliConfig,
 					parseArgs,
 					chain(SanitizedArgs.of),
-					chain(initArgs => {
+					chain((initArgs: SanitizedArgs.t) => {
 						if (initArgs.debug) debugMode(true);
 
 						if (initArgs.version) {
@@ -821,10 +821,14 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 								|| initArgs._.includes('opt-in')
 								|| initArgs._.includes('opt-out')
 							? taqResolve(initArgs)
-							: postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n);
+							: pipe(
+								postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n),
+								chain(() => taqResolve(initArgs)),
+							);
 					}),
-					chain(() =>
+					chain((initArgs: SanitizedArgs.t) =>
 						sendEvent(
+							initArgs,
 							getVersion(inputArgs, i18n),
 							inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI',
 						)
