@@ -20,7 +20,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	// expected in this branch, and therefore fail.
 	//
 	// See issue: https://github.com/ecadlabs/taqueria/issues/736
-	test.only('Verify that scaffold project can be set up', async () => {
+	test('Verify that scaffold project can be set up', async () => {
 		const appContents = await exec(`ls ${scaffoldDirName}/app`);
 		const taqContents = await exec(`ls ${scaffoldDirName}/taqueria`);
 		expect(appContents.stdout).toContain('node_modules');
@@ -45,6 +45,6 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	});
 
 	afterAll(async () => {
-		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true, force: true });
+		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true });
 	});
 });
