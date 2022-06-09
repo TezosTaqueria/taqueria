@@ -392,6 +392,8 @@ export const helpContentsJestPlugin = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq test [partition]        Setup a directory as a partition to run Jest tests
