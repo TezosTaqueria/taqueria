@@ -49,14 +49,23 @@ jobs:
          - os: ubuntu-latest
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
+           cache_path: |
+              ~/.deno
+              ~/.cache/deno
            taqueria_bin: "taq"
          - os: windows-latest
            os_short: windows
            deno_target: "x86_64-pc-windows-msvc"
+           cache_path: |
+            ~/.deno
+            ~/AppData/Local/deno
            taqueria_bin: "taq.exe"
          - os: macOS-latest
            os_short: macos
            deno_target: "x86_64-apple-darwin"
+           cache_path: |
+            ~/.deno
+            ~/Library/Caches/deno
            taqueria_bin: "taq"
 
     outputs:
@@ -74,7 +83,12 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: "v1.21"
+          deno-version: "v1.18.2"
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ matrix.cache_path }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/*') }}
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
       ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
@@ -87,16 +101,12 @@ jobs:
         run: |
           BUILD=`git rev-parse --short "$GITHUB_SHA"`
           TAQ_VERSION="${TAQ_VERSION/\//-}"
-          echo "Running compile"
           deno compile -o taq --allow-run --allow-write --allow-read --allow-env --import-map ./import_map.json --no-prompt --target $DENO_TARGET index.ts --quickstart "`cat quickstart.md`" --setBuild "$BUILD" --setVersion "$TAQ_VERSION"
-          echo "Try and init a new project"
-          ls -la
           ./"${{ matrix.taqueria_bin }}" init -p ./test_project
           if [ ! -f ./test_project/.taq/config.json ]; then
             echo "Project not initialized"
             exit 1
           fi
-          echo "Move the binary"
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
       - name: Authenticate with GCP
@@ -270,11 +280,17 @@ jobs:
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
+          cache_path: |
+            ~/.deno
+            ~/.cache/deno
         - os: macos-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
+          cache_path: |
+            ~/.deno
+            ~/Library/Caches/deno
     needs: 
       - build-binaries
       - gather-info-for-e2e-tests
@@ -290,6 +306,11 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "1.18.2"
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ matrix.cache_path }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/*') }}
 
       - name: download the binary from the build-binaries job and make it executable
         if: ${{ !github.event.pull_request.head.repo.fork }}
