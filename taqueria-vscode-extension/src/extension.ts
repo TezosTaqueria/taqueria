@@ -13,7 +13,8 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeInstallTask,
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
-		updateCommandStates,
+		createWatcherIfNotExists,
+		clearFileSystemWatchers,
 	} = inject(deps);
 
 	const i18n: i18n = await loadI18n();
@@ -55,9 +56,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 				// Originate task
 				exposeTaqTask(COMMAND_PREFIX + 'deploy', 'deploy', 'output', 'Deployment successful.');
 
-				setTimeout(async () => {
-					await updateCommandStates(context, output, i18n, projectDir);
-				}, 3000);
+				createWatcherIfNotExists(context, output, i18n, projectDir);
 			});
 	}
 
@@ -78,4 +77,6 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	// 	})
 }
 
-export function deactivate() {}
+export function deactivate() {
+	// clearFileSystemWatchers(); TODO: Cannot call this, help needed
+}

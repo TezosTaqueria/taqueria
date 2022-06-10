@@ -22,6 +22,8 @@ export interface InjectedDependencies {
 	vscode: VSCodeAPI;
 }
 
+const watchers = new Map<string, api.FileSystemWatcher>();
+
 export const sanitizeDeps = (deps?: InjectedDependencies) =>
 	deps
 		? deps
@@ -336,14 +338,40 @@ export const inject = (deps: InjectedDependencies) => {
 		i18n: i18n,
 		projectDir: Util.PathToDir,
 	) => {
-		debugger;
-		output.appendLine('Called');
 		const config = await Util.TaqifiedDir.create(projectDir, i18n);
 		for (let plugin of getWellKnownPlugins()) {
 			const found = config.config.plugins?.find(item => item.name === plugin) !== undefined;
-			output.appendLine(`${plugin}: ${found}`);
 			vscode.commands.executeCommand('setContext', plugin, found);
 		}
+	};
+
+	const createWatcherIfNotExists = (
+		context: api.ExtensionContext,
+		output: api.OutputChannel,
+		i18n: i18n,
+		projectDir: Util.PathToDir,
+	) => {
+		if (watchers.has(projectDir)) {
+			return;
+		}
+
+		const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/**/*'));
+		watchers.set(projectDir, watcher);
+
+		updateCommandStates(context, output, i18n, projectDir);
+
+		// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
+		watcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+		// TODO: does on change also happen when create/delete happens?
+		// watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+		// watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+	};
+
+	const clearFileSystemWatchers = () => {
+		for (const watcher of watchers.values()) {
+			watcher.dispose();
+		}
+		watchers.clear();
 	};
 
 	return {
@@ -365,5 +393,7 @@ export const inject = (deps: InjectedDependencies) => {
 		exposeTaskAsCommand,
 		exposeSandboxTaskAsCommand,
 		updateCommandStates,
+		createWatcherIfNotExists,
+		clearFileSystemWatchers,
 	};
 };
