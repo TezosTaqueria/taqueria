@@ -298,7 +298,7 @@ jobs:
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
       - name: build binary and make executable
-        if: ${{ !github.event.pull_request.head.repo.fork }}
+        if: ${{ github.event.pull_request.head.repo.fork }}
         env:
           TAQ_VERSION: ${{ github.ref_name }}
           DENO_DIR: "./deno"
