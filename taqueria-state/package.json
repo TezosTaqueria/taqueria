@@ -1,5 +1,5 @@
 {
-	"name": "@taqueria/state-js",
+	"name": "@taqueria/state",
 	"version": "0.4.2",
 	"description": "A TypeScript library for NodeJS and Deno to work with Taqueria projects",
 	"main": "./index.js",
