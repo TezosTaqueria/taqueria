@@ -1,4 +1,3 @@
-import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as Settings from '@taqueria/protocol/Settings';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { attemptP, chain, chainRej, FutureInstance as Future, map, mapRej, resolve } from 'fluture';
@@ -115,10 +114,11 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 	const noop = () => {};
 
 	const sendEvent = (
-		initArgs: SanitizedArgs.t,
+		taq_args: string,
 		taq_version: string,
-		taq_ui: 'CLI' | 'VSCode',
+		taqError: boolean,
 	): Future<TaqError.t, void> => {
+		const taq_ui = inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI';
 		if (taq_ui === 'VSCode') return resolve(noop()); // Disable for VSCode for now
 		return pipe(
 			allowTracking(),
@@ -150,7 +150,8 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 												taq_ui,
 												taq_timestamp,
 												taq_os: build.os,
-												taq_args: initArgs._.join(),
+												taq_args,
+												taq_error: taqError === true ? 'yes' : 'no',
 											},
 										}],
 									}),
