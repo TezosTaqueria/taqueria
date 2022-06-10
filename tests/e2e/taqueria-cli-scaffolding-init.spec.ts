@@ -3,7 +3,7 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 const exec = util.promisify(exec1);
 
-describe('E2E Testing for taqueria scaffolding initialization,', () => {
+describe.skip('E2E Testing for taqueria scaffolding initialization,', () => {
 	const scaffoldDirName = `taqueria-quickstart`;
 
 	test('Verify that taq scaffold will create a baseline scaffold of the quickstart project', async () => {

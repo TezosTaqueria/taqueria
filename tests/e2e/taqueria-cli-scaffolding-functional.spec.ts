@@ -5,7 +5,7 @@ const exec = util.promisify(exec1);
 
 const scaffoldDirName = `taqueria-quickstart`;
 
-describe('E2E Testing for taqueria scaffolding initialization,', () => {
+describe.skip('E2E Testing for taqueria scaffolding initialization,', () => {
 	beforeAll(async () => {
 		await exec('taq scaffold');
 		await exec(`cd ${scaffoldDirName} && npm run setup`);
