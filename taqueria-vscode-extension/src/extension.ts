@@ -13,6 +13,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeInstallTask,
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
+		updateCommandStates,
 	} = inject(deps);
 
 	const i18n: i18n = await loadI18n();
@@ -33,7 +34,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	// Third-party plugins aren't exposed via the VS Code interface
 	if (folders.length === 1) {
 		await makeDir(folders[0].uri.path, i18n)
-			.then(projectDir => {
+			.then(async projectDir => {
 				const exposeTaqTask = exposeTaqTaskAsCommand(context, output, i18n, projectDir);
 				const exposeSandboxTask = exposeSandboxTaskAsCommand(context, output, i18n, projectDir);
 
@@ -53,6 +54,10 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 
 				// Originate task
 				exposeTaqTask(COMMAND_PREFIX + 'deploy', 'deploy', 'output', 'Deployment successful.');
+
+				setTimeout(async () => {
+					await updateCommandStates(context, output, i18n, projectDir);
+				}, 3000);
 			});
 	}
 

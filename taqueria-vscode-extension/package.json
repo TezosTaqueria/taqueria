@@ -103,7 +103,8 @@
 				"command": "taqueria.compile_ligo",
 				"category": "Taqueria",
 				"title": "Compile (LIGO)",
-				"shortTitle": "compile --plugin ligo"
+				"shortTitle": "compile --plugin ligo",
+				"enablement": "@taqueria/plugin-ligo"
 			},
 			{
 				"command": "taqueria.start_sandbox",
@@ -129,7 +130,15 @@
 				"title": "Deploy contracts",
 				"shortTitle": "deploy"
 			}
-		]
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "taqueria.compile_ligo",
+					"when": "@taqueria/plugin-ligo"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

@@ -108,6 +108,13 @@ export const inject = (deps: InjectedDependencies) => {
 			placeHolder: 'Directory',
 		});
 
+	const getWellKnownPlugins = () => [
+		'@taqueria/plugin-ligo',
+		'@taqueria/plugin-smartpy',
+		'@taqueria/plugin-taquito',
+		'@taqueria/plugin-flextesa',
+	];
+
 	const getAvailablePlugins = async (context: api.ExtensionContext) => {
 		try {
 			const HOME_DIR = process.env.HOME;
@@ -120,12 +127,7 @@ export const inject = (deps: InjectedDependencies) => {
 		} catch {
 			// Ignore
 		}
-		return [
-			'@taqueria/plugin-ligo',
-			'@taqueria/plugin-smartpy',
-			'@taqueria/plugin-taquito',
-			'@taqueria/plugin-flextesa',
-		];
+		return getWellKnownPlugins();
 	};
 
 	const exposeInstallTask = async (
@@ -328,6 +330,22 @@ export const inject = (deps: InjectedDependencies) => {
 			);
 		};
 
+	const updateCommandStates = async (
+		context: api.ExtensionContext,
+		output: api.OutputChannel,
+		i18n: i18n,
+		projectDir: Util.PathToDir,
+	) => {
+		debugger;
+		output.appendLine('Called');
+		const config = await Util.TaqifiedDir.create(projectDir, i18n);
+		for (let plugin of getWellKnownPlugins()) {
+			const found = config.config.plugins?.find(item => item.name === plugin) !== undefined;
+			output.appendLine(`${plugin}: ${found}`);
+			vscode.commands.executeCommand('setContext', plugin, found);
+		}
+	};
+
 	return {
 		exposeInitTask,
 		getTaqifiedDirectories,
@@ -346,5 +364,6 @@ export const inject = (deps: InjectedDependencies) => {
 		exposeTaqTaskAsCommand,
 		exposeTaskAsCommand,
 		exposeSandboxTaskAsCommand,
+		updateCommandStates,
 	};
 };
