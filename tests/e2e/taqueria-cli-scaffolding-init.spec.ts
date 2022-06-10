@@ -127,7 +127,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		} catch (error) {
 			expect(JSON.stringify(error)).toContain('Path already exists');
 
-			await fsPromises.rm(`./${alternateDirectory}`, { recursive: true, force: true });
+			await fsPromises.rm(`./${alternateDirectory}`, { recursive: true });
 		}
 	});
 });
