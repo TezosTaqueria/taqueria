@@ -217,8 +217,8 @@ jobs:
 
   gather-info-for-e2e-tests:
     runs-on: ubuntu-latest
-    needs: 
-      - build-binaries
+    # needs: 
+    #   - build-binaries
     
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
     
@@ -272,7 +272,7 @@ jobs:
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
     needs: 
-      - build-binaries
+      # - build-binaries
       - gather-info-for-e2e-tests
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
 
@@ -287,15 +287,15 @@ jobs:
         with:
           deno-version: "1.18.2"
 
-      - name: download the binary from the build-binaries job and make it executable
-        if: ${{ !github.event.pull_request.head.repo.fork }}
-        run: |
-          curl --url ${{ matrix.url }} -o ${{ matrix.final-name }} -L
-          ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
-          ${{ matrix.get-current-dir }} >> $GITHUB_PATH
+      # - name: download the binary from the build-binaries job and make it executable
+      #   if: ${{ !github.event.pull_request.head.repo.fork }}
+      #   run: |
+      #     curl --url ${{ matrix.url }} -o ${{ matrix.final-name }} -L
+      #     ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
+      #     ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
       - name: build binary and make executable
-        if: ${{ github.event.pull_request.head.repo.fork }}
+        if: ${{ !github.event.pull_request.head.repo.fork }}
         env:
           TAQ_VERSION: ${{ github.ref_name }}
           DENO_DIR: "./deno"
