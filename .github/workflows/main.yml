@@ -333,6 +333,7 @@ jobs:
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ secrets.GITHUB_TOKEN }}
   
   report-e2e-status:
     needs: run-tests
