@@ -1,4 +1,4 @@
-import { exec as exec1, execSync } from 'child_process';
+import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import util from 'util';
