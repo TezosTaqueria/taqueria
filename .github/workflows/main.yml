@@ -109,6 +109,7 @@ jobs:
           fi
           echo "Test for cache"
           ls -ltr
+          ls -ltr ./deno
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
       - name: Authenticate with GCP
