@@ -41,7 +41,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		}
 	});
 
-	test('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
+	test.skip('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
 		const tarFileName = 'taq-quickstart.tar';
 		try {
 			try {
