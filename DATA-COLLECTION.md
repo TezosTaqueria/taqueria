@@ -2,7 +2,7 @@
 
 Help improve Taqueria by sharing anonymous usage data!
 
-## Scope of data collected
+## Scope of Data Collected
 
 With consent, Taqueria will collect anonymous usage statistics. Taqueria collects the data points for:
 
@@ -12,5 +12,7 @@ With consent, Taqueria will collect anonymous usage statistics. Taqueria collect
 - Whether the task was executed via the Taqueria CLI or Visual Studio Code Extension - to determine how many of our users are using the different ways to interact with Taqueria
 - Timestamp of when the Taqueria task was performed - to determine trends about how Taqueria is used over time
 - Operating system of the user - to inform future product decisions
+
+## Privacy Policy
 
 Taqueria is committed to preserving user privacy and gathering usage analytics in compliance with the [ECAD Labs privacy policy](http://ecadlabs.com/privacy)
