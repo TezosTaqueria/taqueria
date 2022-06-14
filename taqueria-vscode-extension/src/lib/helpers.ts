@@ -338,10 +338,15 @@ export const inject = (deps: InjectedDependencies) => {
 		i18n: i18n,
 		projectDir: Util.PathToDir,
 	) => {
-		const config = await Util.TaqifiedDir.create(projectDir, i18n);
-		for (let plugin of getWellKnownPlugins()) {
-			const found = config.config.plugins?.find(item => item.name === plugin) !== undefined;
-			vscode.commands.executeCommand('setContext', plugin, found);
+		try {
+			const config = await Util.TaqifiedDir.create(projectDir, i18n);
+			vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config.config);
+			for (let plugin of getWellKnownPlugins()) {
+				const found = config.config.plugins?.find(item => item.name === plugin) !== undefined;
+				vscode.commands.executeCommand('setContext', plugin, found);
+			}
+		} catch (e: any) {
+			// After logging PR is merged, log this error
 		}
 	};
 
@@ -356,6 +361,7 @@ export const inject = (deps: InjectedDependencies) => {
 		}
 
 		const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/**/*'));
+		// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
 		watchers.set(projectDir, watcher);
 
 		updateCommandStates(context, output, i18n, projectDir);

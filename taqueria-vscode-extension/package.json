@@ -87,13 +87,15 @@
 				"command": "taqueria.init",
 				"category": "Taqueria",
 				"title": "Initialize Project",
-				"shortTitle": "init"
+				"shortTitle": "init",
+				"enablement": "!@taqueria-state/is-taqified"
 			},
 			{
 				"command": "taqueria.install",
 				"category": "Taqueria",
 				"title": "Install Plugin",
-				"shortTitle": "install"
+				"shortTitle": "install",
+				"enablement": "@taqueria-state/is-taqified"
 			},
 			{
 				"command": "taqueria.compile_smartpy",
@@ -140,6 +142,14 @@
 		],
 		"menus": {
 			"commandPalette": [
+				{
+					"command": "taqueria.init",
+					"when": "!@taqueria-state/is-taqified"
+				},
+				{
+					"command": "taqueria.install",
+					"when": "@taqueria-state/is-taqified"
+				},
 				{
 					"command": "taqueria.compile_ligo",
 					"when": "@taqueria/plugin-ligo"
