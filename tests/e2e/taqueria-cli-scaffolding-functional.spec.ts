@@ -5,22 +5,13 @@ const exec = util.promisify(exec1);
 
 const scaffoldDirName = `taqueria-quickstart`;
 
-describe('E2E Testing for taqueria scaffolding initialization,', () => {
+describe.skip('E2E Testing for taqueria scaffolding initialization,', () => {
 	beforeAll(async () => {
 		await exec('taq scaffold');
 		await exec(`cd ${scaffoldDirName} && npm run setup`);
 	});
 
-	// TODO: Activate other tests after 620-operations branch has
-	// been merged and released.
-	//
-	// Why? The version of the plugins used by the scaffold are offical
-	// versions published on the NPM registry. The pluginInfo that is
-	// returned from those versions of plugins doesn't match the shape/type
-	// expected in this branch, and therefore fail.
-	//
-	// See issue: https://github.com/ecadlabs/taqueria/issues/736
-	test.only('Verify that scaffold project can be set up', async () => {
+	test('Verify that scaffold project can be set up', async () => {
 		const appContents = await exec(`ls ${scaffoldDirName}/app`);
 		const taqContents = await exec(`ls ${scaffoldDirName}/taqueria`);
 		expect(appContents.stdout).toContain('node_modules');
@@ -45,6 +36,6 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	});
 
 	afterAll(async () => {
-		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true, force: true });
+		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true });
 	});
 });

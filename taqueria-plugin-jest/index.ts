@@ -3,7 +3,7 @@ import proxy from './proxy';
 
 Plugin.create(() => ({
 	schema: '0.1',
-	version: '0.4.1',
+	version: '0.4.0',
 	alias: 'jest',
 	tasks: [
 		Task.create({
@@ -29,8 +29,8 @@ Plugin.create(() => ({
 				}),
 				Option.create({
 					flag: 'testPattern',
+					shortFlag: 't',
 					description: 'Run test files that match the provided pattern',
-					boolean: true,
 				}),
 			],
 		}),

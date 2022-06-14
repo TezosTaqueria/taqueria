@@ -92,7 +92,18 @@ const ensurePartitionExists = (args: Opts) =>
 		);
 
 const execCmd = (cmd: string, args: string[]) => {
-	return execa(cmd, args, { reject: false });
+	// console.log([cmd, ...args].join(' '))
+
+	const child = execa(cmd, args, {
+		reject: false,
+		buffer: false,
+		// encoding: null,
+		shell: true,
+		stdio: 'inherit',
+		env: { FORCE_COLOR: 'true' },
+	});
+
+	return child.then(_ => {});
 };
 
 export default async (args: RequestArgs.ProxyRequestArgs) => {
@@ -101,14 +112,9 @@ export default async (args: RequestArgs.ProxyRequestArgs) => {
 	return ensurePartitionExists(opts)
 		.then(configAbsPath => {
 			if (!opts.init) {
-				const cmd = opts.testPattern
-					? execCmd('npx', ['jest', '-c', configAbsPath, '-t', opts.testPattern])
+				return opts.testPattern
+					? execCmd('npx', ['jest', '-c', configAbsPath, '--testPathPattern', opts.testPattern])
 					: execCmd('npx', ['jest', '-c', configAbsPath]);
-
-				return cmd.then(({ stdout, stderr }) => {
-					if (stderr) sendErr(stderr);
-					return sendAsyncRes(stdout);
-				});
 			}
 
 			return sendAsyncRes('Initialized successfully.');

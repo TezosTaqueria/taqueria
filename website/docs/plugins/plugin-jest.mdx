@@ -1,0 +1,76 @@
+---
+title: '@taqueria/plugin-jest'
+---
+
+## Jest Plugin 
+
+The `@taqueria/plugin-jest` plugin provides the `taq test` task which provides a means to initialize Jest test directories and run Jest tests
+
+### Installation
+
+To install the Jest plugin on a Taqueria project, run:
+
+```shell
+taq install @taqueria/plugin-jest
+```
+
+### Usage
+
+:::note
+The Jest plugin will automatically initialize a Jest test directory when you run `taq test <test-directory>`
+
+The easiest way to start using the plugin is to:
+
+1. Create a new directory in the root of your project `/tests`
+2. Add one or more tests to the directory
+3. Run `taq test tests`
+:::
+
+
+### Initializing Partitions
+
+The Jest plugin uses partitions. These are just directories with their own JEST config but allow you to group and manage your tests with great flexibility. This allows you to segment and run tests in different buckets such as:
+
+- By type (unit tests, integration tests, acceptance tests, e2e tests)
+- Structural (dapp, smart contract, serverless functions)
+
+To create a new partition (initialized test directory), run:
+
+```shell
+taq test --init
+```
+
+This will do several things:
+
+- Create a new directory (in this case it uses the default directory `/tests`)
+- Create a Jest configuration in the directory
+- Create a global Jest configuration file in `./.taq/jest.config.js`
+
+:::note
+You can create any number of partitions. By default there are no partitions
+:::
+
+To create additional partitions, simply run:
+
+```shell
+taq test [partitionName]`
+```
+
+### Running Jest tests
+
+The `taq test [partitionName]` task will run the Jest tests associated with a particular partition
+
+Create tests in that folder `tests/example.spec.ts`
+
+### Jest Configuration
+
+A Global Config for Jest is created in the project's Taq directory: `./.taq/jest.config.js`
+
+Each partition will have it's own Jest configuration file (`./tests/jest.config.js`)
+
+The Jest configurations cascade down from the global config. If you want to override a value in the global config, simply define it in the partition config. The partition config will override the global config
+
+:::note
+The default root directory for Jest can be overridden by setting `"jestTestsRootDir"` in `taqueria.config.js`
+:::
+ 

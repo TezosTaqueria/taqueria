@@ -60,7 +60,7 @@ const getValidContracts = async (parsedArgs: Opts) => {
 	return contracts.reduce(
 		(retval, filename) => {
 			const storage = getInitialStorage(parsedArgs)(filename);
-			if (!storage) throw (`No initial storage provided for ${filename}`);
+			if (storage === undefined || storage === null) throw (`No initial storage provided for ${filename}`);
 			return [...retval, { filename, storage }];
 		},
 		[] as ContractStorageMapping[],

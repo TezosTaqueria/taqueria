@@ -1,5 +1,6 @@
 import { EphemeralState } from '@taqueria/protocol/EphemeralState';
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
+import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import { join } from 'path';
 import { path } from 'rambda';
@@ -91,21 +92,13 @@ export const inject = (deps: InjectedDependencies) => {
 			);
 	};
 
-	const promptForPluginSelection = (_i18n: i18n, debug: api.DebugSession | undefined, availablePlugins: string[]) =>
-		debug
-			? vscode.window.showQuickPick(availablePlugins, {
-				canPickMany: false,
-				ignoreFocusOut: false,
-				placeHolder: 'Plugin name',
-				title: 'Select a plugin',
-			})
-			: vscode.window.showOpenDialog({
-				canSelectFiles: false,
-				canSelectFolders: true,
-				canSelectMany: false,
-				title: 'Select plugin folder',
-				openLabel: 'Select plugin',
-			}).then(val => val ? val[0].fsPath : '');
+	const promptForPluginSelection = (_i18n: i18n, _debug: api.DebugSession | undefined, availablePlugins: string[]) =>
+		vscode.window.showQuickPick(availablePlugins, {
+			canPickMany: false,
+			ignoreFocusOut: false,
+			placeHolder: 'Plugin name',
+			title: 'Select a plugin',
+		});
 
 	const promptForTaqProject = (_i18n: i18n, availableProjects: readonly string[]) =>
 		vscode.window.showQuickPick(availableProjects, {
@@ -115,6 +108,26 @@ export const inject = (deps: InjectedDependencies) => {
 			placeHolder: 'Directory',
 		});
 
+	const getAvailablePlugins = async (context: api.ExtensionContext) => {
+		try {
+			const HOME_DIR = process.env.HOME;
+			if (HOME_DIR) {
+				const availablePluginsFile = join(HOME_DIR, 'taqueria-plugins.json');
+				const contents = await readFile(availablePluginsFile, { encoding: 'utf-8' });
+				const decoded = JSON.parse(contents);
+				return decoded as string[];
+			}
+		} catch {
+			// Ignore
+		}
+		return [
+			'@taqueria/plugin-ligo',
+			'@taqueria/plugin-smartpy',
+			'@taqueria/plugin-taquito',
+			'@taqueria/plugin-flextesa',
+		];
+	};
+
 	const exposeInstallTask = async (
 		context: api.ExtensionContext,
 		output: api.OutputChannel,
@@ -122,12 +135,7 @@ export const inject = (deps: InjectedDependencies) => {
 		i18n: i18n,
 	) => {
 		const exposeTask = exposeTaskAsCommand(context, output, i18n);
-		const availablePlugins = [
-			'@taqueria/plugin-ligo',
-			'@taqueria/plugin-smartpy',
-			'@taqueria/plugin-taquito',
-			'@taqueria/plugin-flextesa',
-		];
+		const availablePlugins = await getAvailablePlugins(context);
 		const proxyInstall = (pluginName: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
 			Util.proxyToTaq(pathToTaq, i18n, projectDir)(`install ${pluginName}`)
 				.then(notify)
