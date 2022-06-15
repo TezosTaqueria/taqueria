@@ -2,7 +2,9 @@ import * as TaqError from '@taqueria/protocol/TaqError';
 import {
 	attemptP,
 	bichain,
+	bimap,
 	chain,
+	chainRej,
 	debugMode,
 	forkCatch,
 	FutureInstance as Future,
@@ -19,6 +21,7 @@ import { uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
+import * as Analytics from './analytics.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -65,6 +68,16 @@ const {
 	stderr: Deno.stderr,
 });
 
+const {
+	optInAnalytics,
+	optOutAnalytics,
+	sendEvent,
+} = Analytics.inject({
+	env: Deno.env,
+	inputArgs: Deno.args,
+	build: Deno.build,
+});
+
 // Add alias
 const exec = execText;
 
@@ -91,7 +104,7 @@ type PluginLib = ReturnType<typeof inject>;
 
 const getFromEnv = <T>(key: EnvKey, defaultValue: T, env: EnvVars) => env.get(key) || defaultValue;
 
-const getVersion = (inputArgs: DenoArgs, _i18n: i18n.t) => {
+const getVersion = (inputArgs: DenoArgs) => {
 	const i = inputArgs.findIndex((str: string) => str === '--setVersion');
 	return i > -1
 		? inputArgs[i + 1]
@@ -108,7 +121,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			type: 'string',
 		})
 		.hide('setVersion')
-		.version(getVersion(args, i18n))
+		.version(getVersion(args))
 		.option('disableState', {
 			describe: i18n.__('disableStateDesc'),
 			default: getFromEnv('TAQ_DISABLE_STATE', false, env),
@@ -173,6 +186,26 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 					chain(({ projectDir, maxConcurrency, quickstart }: SanitizedArgs.t) => {
 						return initProject(projectDir, quickstart, maxConcurrency, i18n);
 					}),
+					forkCatch(console.error)(console.error)(console.log),
+				),
+		)
+		.command(
+			'opt-in',
+			i18n.__('optInDesc'),
+			() => {},
+			() =>
+				pipe(
+					optInAnalytics(),
+					forkCatch(console.error)(console.error)(console.log),
+				),
+		)
+		.command(
+			'opt-out',
+			i18n.__('optOutDesc'),
+			() => {},
+			() =>
+				pipe(
+					optOutAnalytics(),
 					forkCatch(console.error)(console.error)(console.log),
 				),
 		)
@@ -724,7 +757,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 			map((cliConfig: CLIConfig) => cliConfig.help()),
 			chain(parseArgs),
 			chain(inputArgs => SanitizedArgs.of(inputArgs)),
-			map(showInvalidTask(cliConfig)),
+			chain(showInvalidTask(cliConfig)),
 		);
 
 const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
@@ -737,6 +770,8 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 		'listKnownTasks',
 		'provision',
 		'plan',
+		'opt-in',
+		'opt-out',
 	].reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,
@@ -764,7 +799,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 					cliConfig,
 					parseArgs,
 					chain(SanitizedArgs.of),
-					chain(initArgs => {
+					chain((initArgs: SanitizedArgs.t) => {
 						if (initArgs.debug) debugMode(true);
 
 						if (initArgs.version) {
@@ -777,10 +812,25 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 						return initArgs._.includes('init')
 								|| initArgs._.includes('testFromVsCode')
 								|| initArgs._.includes('scaffold')
+								|| initArgs._.includes('opt-in')
+								|| initArgs._.includes('opt-out')
 							? taqResolve(initArgs)
 							: postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n);
 					}),
-					forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+					chain((initArgs: SanitizedArgs.t) =>
+						sendEvent(
+							initArgs._.join(),
+							getVersion(inputArgs),
+							false,
+						)
+					),
+					forkCatch(async (error: Error | TaqError.t) => {
+						await eager(sendEvent(inputArgs.join(), getVersion(inputArgs), true));
+						displayError(cliConfig)(error);
+					})(async (error: Error | TaqError.t) => {
+						await eager(sendEvent(inputArgs.join(), getVersion(inputArgs), true));
+						displayError(cliConfig)(error);
+					})(identity),
 				),
 		);
 	} catch (err) {
@@ -791,14 +841,14 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 export const showInvalidTask = (cli: CLIConfig) =>
 	(parsedArgs: SanitizedArgs.t) => {
 		if (executingBuiltInTask(parsedArgs) || cli.handled) {
-			return parsedArgs;
+			return taqResolve(parsedArgs);
 		}
 		const err: TaqError.t = {
 			kind: 'E_INVALID_TASK',
 			msg: `Taqueria isn't aware of this task. Perhaps you need to install a plugin first?`,
 			context: parsedArgs,
 		};
-		return displayError(cli)(err);
+		return reject(err);
 	};
 
 export const normalizeErr = (err: TaqError.t | TaqError.E_TaqError | Error) => {
@@ -846,6 +896,7 @@ export const displayError = (cli: CLIConfig) =>
 			if (inputArgs.debug) {
 				logAllErrors(err);
 			} else console.error(msg);
+
 			Deno.exit(exitCode as number);
 		}
 	};
