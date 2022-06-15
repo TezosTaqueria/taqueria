@@ -16,6 +16,12 @@
 		"build-esm-index": "npx esbuild --bundle index.ts --outfile=index.esm.js --platform=node --format=esm --sourcemap",
 		"build-esm-types": "npx esbuild --bundle types.ts --outfile=types.esm.js --platform=node --format=esm --sourcemap"
 	},
+	"targets": {
+		"main": {
+			"context": "node",
+			"isLibrary": true
+		}
+	},
 	"keywords": [
 		"taqueria",
 		"tezos",

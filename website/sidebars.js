@@ -87,6 +87,7 @@ const sidebars = {
       collapsible: false,
       items: [
         "taqueria-internals/architecture",
+        "data-collection-policy"
       ],
     },
     {

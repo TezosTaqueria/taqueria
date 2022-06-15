@@ -50,6 +50,7 @@
 		"@taqueria/protocol/PersistentState": "./taqueria-protocol/PersistentState.ts",
 		"@taqueria/protocol/ProvisionerID": "./taqueria-protocol/ProvisionerID.ts",
 		"@taqueria/protocol/Provisioner": "./taqueria-protocol/Provisioner.ts",
-		"@taqueria/protocol/Provisions": "./taqueria-protocol/Provisions.ts"
+		"@taqueria/protocol/Provisions": "./taqueria-protocol/Provisions.ts",
+		"@taqueria/protocol/Settings": "./taqueria-protocol/Settings.ts"
 	}
 }
