@@ -1,0 +1,41 @@
+---
+title: '@taqueria/state'
+---
+
+:::warning
+This library is currently in alpha stage and is under active development
+:::
+
+`@taqueria/state` is an abstraction library which provides an easy way to interact with Taqueria State
+
+To use the package in your front end code or tests, you can import it into any JS or TS file:
+
+```js
+import loadProject from "@taqueria/state"
+```
+
+Once imported, you can retrieve the list of originations like this:
+
+```js
+const {getOriginations} = await loadProject()
+const results = getOriginations("increment.tz")
+console.log(results)
+```
+
+To retrieve the most recently deployed version of a contract and the address:
+
+
+```js
+const [latest] = getOriginations("increment.tz")
+```
+
+To retrieve a list of all contracts deployed to the sandbox `local`:
+
+```js
+const results = getOriginations()
+     .filter(contract => contract.destination === "local")
+```
+
+:::note
+Additional documentation and live examples in scaffolds are coming soon
+:::

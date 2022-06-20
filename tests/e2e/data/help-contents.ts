@@ -23,6 +23,8 @@ Commands:
   taq init [projectDir]                  Initialize a new project
   taq scaffold [scaffoldUrl] [scaffoldP  Generate a new project using a pre
   rojectDir]                             -configured scaffold
+  taq opt-in                             Opt-in to sharing anonymous usage analytics
+  taq opt-out                            Opt-out of sharing anonymous usage analytics
   taq install <pluginName>               Install a plugin
   taq uninstall <pluginName>             Uninstall a plugin
 
@@ -42,6 +44,8 @@ export const helpContentsLigoPlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a Ligo syntax
@@ -78,6 +82,8 @@ export const helpContentsSmartpyPlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a SmartPy synt
@@ -125,6 +131,8 @@ export const helpContentsLigoSmartpy: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile                 Provided by more than one plugin. The option --plu
@@ -161,6 +169,8 @@ export const helpContentsLigoArchetype: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile                 Provided by more than one plugin. The option --plu
@@ -197,6 +207,8 @@ export const helpContentsArchetypePlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a Archetype sy
@@ -231,6 +243,8 @@ export const helpContentsTaquitoPlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]       Initialize a new project
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq deploy [contract]       Deploy a smart contract to a particular environmen
@@ -264,6 +278,8 @@ export const helpContentsFlextesaPlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]            Initialize a new project
+  taq opt-in                       Opt-in to sharing anonymous usage analytics
+  taq opt-out                      Opt-out of sharing anonymous usage analytics
   taq install <pluginName>         Install a plugin
   taq uninstall <pluginName>       Uninstall a plugin
   taq start sandbox [sandboxName]  Starts a flextesa sandbox    [aliases: start]
@@ -316,6 +332,10 @@ export const helpContentsGenerateTypesPlugin = `taq <command>
 
 Commands:
   taq init [projectDir]               Initialize a new project
+  taq opt-in                          Opt-in to sharing anonymous usage analytic
+                                      s
+  taq opt-out                         Opt-out of sharing anonymous usage analyti
+                                      cs
   taq install <pluginName>            Install a plugin
   taq uninstall <pluginName>          Uninstall a plugin
   taq generate types [typescriptDir]  Generate types for a contract to be used w
@@ -366,4 +386,45 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
+`
+
+export const helpContentsJestPlugin = `taq <command>
+
+Commands:
+  taq init [projectDir]       Initialize a new project
+  taq opt-in                  Opt-in to sharing anonymous usage analytics
+  taq opt-out                 Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>    Install a plugin
+  taq uninstall <pluginName>  Uninstall a plugin
+  taq test [partition]        Setup a directory as a partition to run Jest tests
+                                                                 [aliases: jest]
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+  -e, --env         Specify an environment configuration
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
+      --help        Show help                                          [boolean]
+
+Taqueria is currently in BETA. You've been warned. :)
+`
+
+export const helpContentsJestPluginSpecific = `taq test [partition]
+
+Setup a directory as a partition to run Jest tests
+
+Positionals:
+  partition  Name of the partition for these tests   [string] [default: "tests"]
+
+Options:
+      --version      Show version number                               [boolean]
+      --build        Display build information about the current version
+                                                                       [boolean]
+  -p, --projectDir   Path to your project directory              [default: "./"]
+  -e, --env          Specify an environment configuration
+  -y, --yes          Select "yes" to any prompt       [boolean] [default: false]
+      --help         Show help                                         [boolean]
+  -i, --init         Initializes the partition for Jest                [boolean]
+  -t, --testPattern  Run test files that match the provided pattern
 `

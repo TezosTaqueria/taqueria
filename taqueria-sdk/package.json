@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/node-sdk",
-	"version": "0.4.0",
+	"version": "0.4.2",
 	"description": "A TypeScript SDK for NodeJS used for Taqueria plugin development.",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -15,6 +15,12 @@
 		"build-cjs": "npx esbuild --bundle index.ts types.ts --outdir=. --platform=node --sourcemap",
 		"build-esm-index": "npx esbuild --bundle index.ts --outfile=index.esm.js --platform=node --format=esm --sourcemap",
 		"build-esm-types": "npx esbuild --bundle types.ts --outfile=types.esm.js --platform=node --format=esm --sourcemap"
+	},
+	"targets": {
+		"main": {
+			"context": "node",
+			"isLibrary": true
+		}
 	},
 	"keywords": [
 		"taqueria",
@@ -37,7 +43,7 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/protocol": "^0.4.0",
+		"@taqueria/protocol": "^0.4.2",
 		"i18next": "^21.8.4",
 		"project-name-generator": "^2.1.9",
 		"rambda": "^7.1.4",

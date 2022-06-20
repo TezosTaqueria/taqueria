@@ -12,7 +12,7 @@ Benefits of using generated types:
 
 ## Requirements
 
-- Node JS v16 or later
+- Node JS v16.3 or later
 - Taquito v11.2 or later (optional)
 
 ## Installation
