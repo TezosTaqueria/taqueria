@@ -58,6 +58,8 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 	test('testing that type generation artifacts will have the correct permissions', async () => {
 		await exec(`taq compile --plugin ligo`, { cwd: `./${taqueriaProjectPath}` });
 		await exec(`taq generate types`, { cwd: `./${taqueriaProjectPath}` });
+		console.log(await exec(`ls -al ./${taqueriaProjectPath}`));
+		console.log(await exec(`ls -al ./${taqueriaProjectPath}/types`));
 		const incrementCodeUser = await exec(`stat -c %U ${taqueriaProjectPath}/types/increment.code.ts`);
 		const incrementCodeGroup = await exec(`stat -c %G ${taqueriaProjectPath}/types/increment.code.ts`);
 
