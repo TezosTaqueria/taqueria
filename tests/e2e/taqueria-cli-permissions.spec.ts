@@ -16,7 +16,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
 		await exec(`cp e2e/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
 
-		userGroup = (await exec(`id -g -n ${username}`)).stdout;
+		userGroup = (await exec(`id -g -n ${username}`)).stdout.trim();
 	});
 
 	test('testing that ligo artifacts will have the correct permissions', async () => {
