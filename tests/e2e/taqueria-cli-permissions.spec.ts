@@ -1,4 +1,4 @@
-import { exec as exec1 } from 'child_process';
+import { exec as exec1, execSync } from 'child_process';
 import fsPromises from 'fs/promises';
 import os from 'os';
 import util from 'util';
@@ -39,7 +39,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 	});
 
 	test('testing that smartpy artifacts will have the correct permissions', async () => {
-		await exec(`taq compile --plugin smartpy`, { cwd: `./${taqueriaProjectPath}` });
+		execSync(`taq compile --plugin smartpy`, { cwd: `./${taqueriaProjectPath}` });
 		const fileFolderUser = await exec(`stat -c %U ${taqueriaProjectPath}/artifacts/HelloTacos_comp/`);
 		const fileFolderGroup = await exec(`stat -c %G ${taqueriaProjectPath}/artifacts/HelloTacos_comp/`);
 
