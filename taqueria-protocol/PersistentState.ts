@@ -11,6 +11,8 @@ const rawOpSchema = z.object({
 }).describe('Persistent State Operation');
 
 const rawTaskSchema = z.object({
+	task: Verb.schemas.rawSchema,
+	plugin: z.string().min(1),
 	time: Timestamp.rawSchema.describe('state.task.time'),
 	output: z.unknown().describe('state.task.output'),
 });
