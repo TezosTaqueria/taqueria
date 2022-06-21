@@ -39,7 +39,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 	});
 
 	test('testing that smartpy artifacts will have the correct permissions', async () => {
-		execSync(`taq compile --plugin smartpy`, { cwd: `./${taqueriaProjectPath}` });
+		await exec(`taq compile --plugin smartpy`, { cwd: `./${taqueriaProjectPath}` });
 		const fileFolderUser = await exec(`stat -c %U ${taqueriaProjectPath}/artifacts/HelloTacos_comp/`);
 		const fileFolderGroup = await exec(`stat -c %G ${taqueriaProjectPath}/artifacts/HelloTacos_comp/`);
 
