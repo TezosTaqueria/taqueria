@@ -12,6 +12,7 @@ let userGroup: string;
 describe('E2E Testing for taqueria plugin file permissions,', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo', 'archetype', 'smartpy', 'contract-types']);
+
 		await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
 		await exec(`cp e2e/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
