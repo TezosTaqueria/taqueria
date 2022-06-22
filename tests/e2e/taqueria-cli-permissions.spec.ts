@@ -20,7 +20,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		userGroup = (await exec(`id -g -n ${username}`)).stdout.trim();
 	});
 
-	test.skip('testing that ligo artifacts will have the correct permissions', async () => {
+	test('testing that ligo artifacts will have the correct permissions', async () => {
 		await exec(`taq compile --plugin ligo`, { cwd: `./${taqueriaProjectPath}` });
 		const fileUser = await exec(`stat -c %U ${taqueriaProjectPath}/artifacts/increment.tz`);
 		const fileGroup = await exec(`stat -c %G ${taqueriaProjectPath}/artifacts/increment.tz`);
@@ -29,7 +29,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		expect(fileGroup.stdout.trim()).toBe(userGroup);
 	});
 
-	test.skip('testing that archetype artifacts will have the correct permissions', async () => {
+	test('testing that archetype artifacts will have the correct permissions', async () => {
 		await exec(`taq compile --plugin archetype`, { cwd: `./${taqueriaProjectPath}` });
 		const fileUser = await exec(`stat -c %U ${taqueriaProjectPath}/artifacts/fa12.tz`);
 		const fileGroup = await exec(`stat -c %G ${taqueriaProjectPath}/artifacts/fa12.tz`);
@@ -38,7 +38,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		expect(fileGroup.stdout.trim()).toBe(userGroup);
 	});
 
-	test('testing that smartpy artifacts will have the correct permissions', async () => {
+	test.skip('testing that smartpy artifacts will have the correct permissions', async () => {
 		await exec(`taq compile --plugin smartpy`, { cwd: `./${taqueriaProjectPath}` });
 		const fileFolderUser = await exec(`stat -c %U ${taqueriaProjectPath}/artifacts/HelloTacos_comp/`);
 		const fileFolderGroup = await exec(`stat -c %G ${taqueriaProjectPath}/artifacts/HelloTacos_comp/`);
