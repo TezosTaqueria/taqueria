@@ -137,7 +137,7 @@
 				"category": "Taqueria",
 				"title": "Deploy contracts",
 				"shortTitle": "deploy",
-				"enablement": "@taqueria/plugin-flextesa && @taqueria/plugin-taquito"
+				"enablement": "@taqueria/plugin-taquito"
 			}
 		],
 		"menus": {
@@ -172,7 +172,7 @@
 				},
 				{
 					"command": "taqueria.deploy",
-					"when": "@taqueria/plugin-flextesa && @taqueria/plugin-taquito"
+					"when": "@taqueria/plugin-taquito"
 				}
 			]
 		}

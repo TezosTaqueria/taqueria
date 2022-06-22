@@ -22,7 +22,14 @@ export interface InjectedDependencies {
 	vscode: VSCodeAPI;
 }
 
-const watchers = new Map<string, api.FileSystemWatcher>();
+export const clearFileSystemWatchers = (
+	watchers: Map<string, api.FileSystemWatcher>,
+) => {
+	for (const watcher of watchers.values()) {
+		watcher.dispose();
+	}
+	watchers.clear();
+};
 
 export const sanitizeDeps = (deps?: InjectedDependencies) =>
 	deps
@@ -341,7 +348,8 @@ export const inject = (deps: InjectedDependencies) => {
 		try {
 			const config = await Util.TaqifiedDir.create(projectDir, i18n);
 			vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config.config);
-			for (let plugin of getWellKnownPlugins()) {
+			const plugins = getWellKnownPlugins();
+			for (const plugin of plugins) {
 				const found = config.config.plugins?.find(item => item.name === plugin) !== undefined;
 				vscode.commands.executeCommand('setContext', plugin, found);
 			}
@@ -355,12 +363,13 @@ export const inject = (deps: InjectedDependencies) => {
 		output: api.OutputChannel,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
+		watchers: Map<string, api.FileSystemWatcher>,
 	) => {
 		if (watchers.has(projectDir)) {
 			return;
 		}
 
-		const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/**/*'));
+		const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
 		// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
 		watchers.set(projectDir, watcher);
 
@@ -368,16 +377,8 @@ export const inject = (deps: InjectedDependencies) => {
 
 		// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
 		watcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-		// TODO: does on change also happen when create/delete happens?
-		// watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-		// watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-	};
-
-	const clearFileSystemWatchers = () => {
-		for (const watcher of watchers.values()) {
-			watcher.dispose();
-		}
-		watchers.clear();
+		watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+		watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
 	};
 
 	return {

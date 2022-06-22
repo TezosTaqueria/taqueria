@@ -1,9 +1,11 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import path from 'path';
 import * as api from 'vscode';
-import { inject, InjectedDependencies, sanitizeDeps } from './lib/helpers';
+import { clearFileSystemWatchers, inject, InjectedDependencies, sanitizeDeps } from './lib/helpers';
 import { COMMAND_PREFIX } from './lib/helpers';
 import { makeDir } from './lib/pure';
+
+const watchers = new Map<string, api.FileSystemWatcher>();
 
 export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
 	const deps = sanitizeDeps(input);
@@ -14,7 +16,6 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
 		createWatcherIfNotExists,
-		clearFileSystemWatchers,
 	} = inject(deps);
 
 	const i18n: i18n = await loadI18n();
@@ -56,7 +57,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 				// Originate task
 				exposeTaqTask(COMMAND_PREFIX + 'deploy', 'deploy', 'output', 'Deployment successful.');
 
-				createWatcherIfNotExists(context, output, i18n, projectDir);
+				createWatcherIfNotExists(context, output, i18n, projectDir, watchers);
 			});
 	}
 
@@ -78,5 +79,5 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 }
 
 export function deactivate() {
-	// clearFileSystemWatchers(); TODO: Cannot call this, help needed
+	clearFileSystemWatchers(watchers);
 }
