@@ -22,15 +22,6 @@ export interface InjectedDependencies {
 	vscode: VSCodeAPI;
 }
 
-export const clearFileSystemWatchers = (
-	watchers: Map<string, api.FileSystemWatcher>,
-) => {
-	for (const watcher of watchers.values()) {
-		watcher.dispose();
-	}
-	watchers.clear();
-};
-
 export const sanitizeDeps = (deps?: InjectedDependencies) =>
 	deps
 		? deps
@@ -363,22 +354,20 @@ export const inject = (deps: InjectedDependencies) => {
 		output: api.OutputChannel,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
-		watchers: Map<string, api.FileSystemWatcher>,
+		createConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
 	) => {
-		if (watchers.has(projectDir)) {
-			return;
-		}
+		createConfigWatcherIfNotExists(projectDir, () => {
+			const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+			// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
 
-		const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
-		// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
-		watchers.set(projectDir, watcher);
+			updateCommandStates(context, output, i18n, projectDir);
 
-		updateCommandStates(context, output, i18n, projectDir);
-
-		// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
-		watcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-		watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-		watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+			// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
+			watcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+			watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+			watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+			return watcher;
+		});
 	};
 
 	return {
@@ -401,6 +390,5 @@ export const inject = (deps: InjectedDependencies) => {
 		exposeSandboxTaskAsCommand,
 		updateCommandStates,
 		createWatcherIfNotExists,
-		clearFileSystemWatchers,
 	};
 };

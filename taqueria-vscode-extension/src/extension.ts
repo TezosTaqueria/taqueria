@@ -1,11 +1,38 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import path from 'path';
 import * as api from 'vscode';
-import { clearFileSystemWatchers, inject, InjectedDependencies, sanitizeDeps } from './lib/helpers';
+import { inject, InjectedDependencies, sanitizeDeps } from './lib/helpers';
 import { COMMAND_PREFIX } from './lib/helpers';
 import { makeDir } from './lib/pure';
 
-const watchers = new Map<string, api.FileSystemWatcher>();
+const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
+	const inMemoryState = {
+		configWatchers: new Map<string, api.FileSystemWatcher>(),
+	};
+
+	const clearConfigWatchers = () => {
+		for (const watcher of inMemoryState.configWatchers.values()) {
+			watcher.dispose();
+		}
+		inMemoryState.configWatchers.clear();
+	};
+
+	const getConfigWatchers = () => inMemoryState.configWatchers.values();
+
+	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher) => {
+		if (inMemoryState.configWatchers.has(folder)) {
+			return;
+		}
+		const watcher = factory();
+		inMemoryState.configWatchers.set(folder, watcher);
+	};
+
+	return {
+		clearConfigWatchers,
+		getConfigWatchers,
+		addConfigWatcherIfNotExists,
+	};
+})();
 
 export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
 	const deps = sanitizeDeps(input);
@@ -36,7 +63,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	// Third-party plugins aren't exposed via the VS Code interface
 	if (folders.length === 1) {
 		await makeDir(folders[0].uri.path, i18n)
-			.then(async projectDir => {
+			.then(projectDir => {
 				const exposeTaqTask = exposeTaqTaskAsCommand(context, output, i18n, projectDir);
 				const exposeSandboxTask = exposeSandboxTaskAsCommand(context, output, i18n, projectDir);
 
@@ -57,7 +84,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 				// Originate task
 				exposeTaqTask(COMMAND_PREFIX + 'deploy', 'deploy', 'output', 'Deployment successful.');
 
-				createWatcherIfNotExists(context, output, i18n, projectDir, watchers);
+				createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
 			});
 	}
 
@@ -79,5 +106,5 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 }
 
 export function deactivate() {
-	clearFileSystemWatchers(watchers);
+	clearConfigWatchers();
 }
