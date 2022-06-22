@@ -9,7 +9,7 @@ const taqueriaProjectPath = './e2e/auto-test-cli-permissions';
 let username = os.userInfo().username;
 let userGroup: string;
 
-describe.skip('E2E Testing for taqueria plugin file permissions,', () => {
+describe('E2E Testing for taqueria plugin file permissions,', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo', 'archetype', 'smartpy', 'contract-types']);
 
