@@ -19,8 +19,8 @@ if (operatingSystem == `Linux`) {
 }
 
 if (operatingSystem == `Darwin`) {
-	userStatCommand = `stat -f %u`;
-	groupStatCommand = `stat -f %g`;
+	userStatCommand = `stat -f %Su`;
+	groupStatCommand = `stat -f %Sg`;
 }
 
 describe('E2E Testing for taqueria plugin file permissions,', () => {
