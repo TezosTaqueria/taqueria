@@ -20,6 +20,13 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		userGroup = (await exec(`id -g -n ${username}`)).stdout.trim();
 	});
 
+	test('testing that CI pipeline is not running as root', async () => {
+		expect(username).not.toBe('root');
+		expect(userGroup).not.toBe('root');
+		// If the CI pipeline is running as root, the following tests will always pass
+		// even if the logic being tested is failing
+	});
+
 	test('testing that ligo artifacts will have the correct permissions', async () => {
 		await exec(`taq compile --plugin ligo`, { cwd: `./${taqueriaProjectPath}` });
 		const fileUser = await exec(`stat -c %U ${taqueriaProjectPath}/artifacts/increment.tz`);
