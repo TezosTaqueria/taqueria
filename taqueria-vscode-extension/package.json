@@ -68,7 +68,9 @@
 		"onCommand:taqueria.start_sandbox",
 		"onCommand:taqueria.stop_sandbox",
 		"onCommand:taqueria.list_accounts",
-		"onCommand:taqueria.deploy"
+		"onCommand:taqueria.deploy",
+		"workspaceContains:.taq",
+		"onStartupFinished"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -90,51 +92,95 @@
 				"command": "taqueria.init",
 				"category": "Taqueria",
 				"title": "Initialize Project",
-				"shortTitle": "init"
+				"shortTitle": "init",
+				"enablement": "!@taqueria-state/is-taqified"
 			},
 			{
 				"command": "taqueria.install",
 				"category": "Taqueria",
 				"title": "Install Plugin",
-				"shortTitle": "install"
+				"shortTitle": "install",
+				"enablement": "@taqueria-state/is-taqified"
 			},
 			{
 				"command": "taqueria.compile_smartpy",
 				"category": "Taqueria",
 				"title": "Compile (SmartPy)",
-				"shortTitle": "compile --plugin smartpy"
+				"shortTitle": "compile --plugin smartpy",
+				"enablement": "@taqueria/plugin-smartpy"
 			},
 			{
 				"command": "taqueria.compile_ligo",
 				"category": "Taqueria",
 				"title": "Compile (LIGO)",
-				"shortTitle": "compile --plugin ligo"
+				"shortTitle": "compile --plugin ligo",
+				"enablement": "@taqueria/plugin-ligo"
 			},
 			{
 				"command": "taqueria.start_sandbox",
 				"category": "Taqueria",
 				"title": "Start Sandbox",
-				"shortTitle": "start sandbox <name>"
+				"shortTitle": "start sandbox <name>",
+				"enablement": "@taqueria/plugin-flextesa"
 			},
 			{
 				"command": "taqueria.stop_sandbox",
 				"category": "Taqueria",
 				"title": "Stop Sandbox",
-				"shortTitle": "stop sandbox <name>"
+				"shortTitle": "stop sandbox <name>",
+				"enablement": "@taqueria/plugin-flextesa"
 			},
 			{
 				"command": "taqueria.list_accounts",
 				"category": "Taqueria",
 				"title": "List Sandbox Accounts",
-				"shortTitle": "list accounts <name>"
+				"shortTitle": "list accounts <name>",
+				"enablement": "@taqueria/plugin-flextesa"
 			},
 			{
 				"command": "taqueria.deploy",
 				"category": "Taqueria",
 				"title": "Deploy contracts",
-				"shortTitle": "deploy"
+				"shortTitle": "deploy",
+				"enablement": "@taqueria/plugin-taquito"
 			}
-		]
+		],
+		"menus": {
+			"commandPalette": [
+				{
+					"command": "taqueria.init",
+					"when": "!@taqueria-state/is-taqified"
+				},
+				{
+					"command": "taqueria.install",
+					"when": "@taqueria-state/is-taqified"
+				},
+				{
+					"command": "taqueria.compile_ligo",
+					"when": "@taqueria/plugin-ligo"
+				},
+				{
+					"command": "taqueria.compile_smartpy",
+					"when": "@taqueria/plugin-smartpy"
+				},
+				{
+					"command": "taqueria.start_sandbox",
+					"when": "@taqueria/plugin-flextesa"
+				},
+				{
+					"command": "taqueria.stop_sandbox",
+					"when": "@taqueria/plugin-flextesa"
+				},
+				{
+					"command": "taqueria.list_accounts",
+					"when": "@taqueria/plugin-flextesa"
+				},
+				{
+					"command": "taqueria.deploy",
+					"when": "@taqueria/plugin-taquito"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
