@@ -5,6 +5,35 @@ import { inject, InjectedDependencies, sanitizeDeps } from './lib/helpers';
 import { COMMAND_PREFIX } from './lib/helpers';
 import { makeDir } from './lib/pure';
 
+const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
+	const inMemoryState = {
+		configWatchers: new Map<string, api.FileSystemWatcher>(),
+	};
+
+	const clearConfigWatchers = () => {
+		for (const watcher of inMemoryState.configWatchers.values()) {
+			watcher.dispose();
+		}
+		inMemoryState.configWatchers.clear();
+	};
+
+	const getConfigWatchers = () => inMemoryState.configWatchers.values();
+
+	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher) => {
+		if (inMemoryState.configWatchers.has(folder)) {
+			return;
+		}
+		const watcher = factory();
+		inMemoryState.configWatchers.set(folder, watcher);
+	};
+
+	return {
+		clearConfigWatchers,
+		getConfigWatchers,
+		addConfigWatcherIfNotExists,
+	};
+})();
+
 export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
 	const deps = sanitizeDeps(input);
 	const { vscode } = deps;
@@ -13,6 +42,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeInstallTask,
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
+		createWatcherIfNotExists,
 	} = inject(deps);
 
 	const i18n: i18n = await loadI18n();
@@ -53,6 +83,8 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 
 				// Originate task
 				exposeTaqTask(COMMAND_PREFIX + 'deploy', 'deploy', 'output', 'Deployment successful.');
+
+				createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
 			});
 	}
 
@@ -73,4 +105,6 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	// 	})
 }
 
-export function deactivate() {}
+export function deactivate() {
+	clearConfigWatchers();
+}

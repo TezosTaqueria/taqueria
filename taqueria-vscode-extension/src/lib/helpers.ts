@@ -108,6 +108,13 @@ export const inject = (deps: InjectedDependencies) => {
 			placeHolder: 'Directory',
 		});
 
+	const getWellKnownPlugins = () => [
+		'@taqueria/plugin-ligo',
+		'@taqueria/plugin-smartpy',
+		'@taqueria/plugin-taquito',
+		'@taqueria/plugin-flextesa',
+	];
+
 	const getAvailablePlugins = async (context: api.ExtensionContext) => {
 		try {
 			const HOME_DIR = process.env.HOME;
@@ -120,12 +127,7 @@ export const inject = (deps: InjectedDependencies) => {
 		} catch {
 			// Ignore
 		}
-		return [
-			'@taqueria/plugin-ligo',
-			'@taqueria/plugin-smartpy',
-			'@taqueria/plugin-taquito',
-			'@taqueria/plugin-flextesa',
-		];
+		return getWellKnownPlugins();
 	};
 
 	const exposeInstallTask = async (
@@ -328,6 +330,46 @@ export const inject = (deps: InjectedDependencies) => {
 			);
 		};
 
+	const updateCommandStates = async (
+		context: api.ExtensionContext,
+		output: api.OutputChannel,
+		i18n: i18n,
+		projectDir: Util.PathToDir,
+	) => {
+		try {
+			const config = await Util.TaqifiedDir.create(projectDir, i18n);
+			vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config.config);
+			const plugins = getWellKnownPlugins();
+			for (const plugin of plugins) {
+				const found = config.config.plugins?.find(item => item.name === plugin) !== undefined;
+				vscode.commands.executeCommand('setContext', plugin, found);
+			}
+		} catch (e: any) {
+			// After logging PR is merged, log this error
+		}
+	};
+
+	const createWatcherIfNotExists = (
+		context: api.ExtensionContext,
+		output: api.OutputChannel,
+		i18n: i18n,
+		projectDir: Util.PathToDir,
+		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
+	) => {
+		addConfigWatcherIfNotExists(projectDir, () => {
+			const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+			// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
+
+			updateCommandStates(context, output, i18n, projectDir);
+
+			// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
+			watcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+			watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+			watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+			return watcher;
+		});
+	};
+
 	return {
 		exposeInitTask,
 		getTaqifiedDirectories,
@@ -346,5 +388,7 @@ export const inject = (deps: InjectedDependencies) => {
 		exposeTaqTaskAsCommand,
 		exposeTaskAsCommand,
 		exposeSandboxTaskAsCommand,
+		updateCommandStates,
+		createWatcherIfNotExists,
 	};
 };
