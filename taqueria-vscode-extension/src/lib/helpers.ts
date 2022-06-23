@@ -354,9 +354,9 @@ export const inject = (deps: InjectedDependencies) => {
 		output: api.OutputChannel,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
-		createConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
+		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
 	) => {
-		createConfigWatcherIfNotExists(projectDir, () => {
+		addConfigWatcherIfNotExists(projectDir, () => {
 			const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
 			// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
 
