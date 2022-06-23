@@ -38,6 +38,8 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		expect(fileGroup.stdout.trim()).toBe(userGroup);
 	});
 
+	// Skipping test currently due to smartpy installation in pipeline causing build to hang for hours
+	// and in the future we will use a docker container. When that is a reality we can enable this test
 	test.skip('testing that smartpy artifacts will have the correct permissions', async () => {
 		await exec(`taq compile --plugin smartpy`, { cwd: `./${taqueriaProjectPath}` });
 		const fileFolderUser = await exec(`stat -c %U ${taqueriaProjectPath}/artifacts/HelloTacos_comp/`);
