@@ -67,11 +67,11 @@ describe('E2E Testing for taqueria general functionality', () => {
 		}
 	});
 
-	test('Verify plugin install with full npm initialization', async () => {
+	test.skip('Verify plugin install with full npm initialization', async () => {
 		try {
-			console.log(await exec(`taq init ${taqueriaProjectPathNPMFull}`));
-			// console.log(await exec(`npm init -y`, {cwd: `./${taqueriaProjectPathNPMFull}`}));
-			console.log(await exec(`npm init -y && taq install @taqueria/plugin-ligo -p ./${taqueriaProjectPathNPMFull}`));
+			await exec(`taq init ${taqueriaProjectPathNPMFull}`);
+			await exec(`npm init -y`, { cwd: `./${taqueriaProjectPathNPMFull}` });
+			await exec(`npm init -y && taq install @taqueria/plugin-ligo -p ./${taqueriaProjectPathNPMFull}`);
 
 			const ligoPackageContents = await exec(`cat ../taqueria-plugin-ligo/package.json`);
 			const ligoVersion = JSON.parse(ligoPackageContents.stdout).version;
