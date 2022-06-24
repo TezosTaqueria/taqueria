@@ -22,7 +22,7 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 	dockerName = 'local';
 
 	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath, ['tezos-client', 'flextesa']);
+		await generateTestProject(taqueriaProjectPath, ['flextesa', 'tezos-client']);
 		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
