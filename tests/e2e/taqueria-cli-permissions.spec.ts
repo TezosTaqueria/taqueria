@@ -31,7 +31,13 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
 		await exec(`cp e2e/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
 
-		userGroup = (await exec(`id -g -n ${username}`)).stdout.trim();
+		if (operatingSystem == `Linux`) {
+			userGroup = (await exec(`id -g -n ${username}`)).stdout.trim();
+		}
+
+		if (operatingSystem == `Darwin`) {
+			userGroup = 'wheel';
+		}
 	});
 
 	test('testing that CI pipeline is not running as root', async () => {
