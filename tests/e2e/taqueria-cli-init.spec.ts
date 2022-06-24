@@ -43,11 +43,11 @@ describe('E2E Testing for taqueria general functionality', () => {
 		}
 	});
 
-	test.skip('Verify that to install a plugin all you need is a package.json file with {}', async () => {
+	test('Verify that to install a plugin all you need is a package.json file with {}', async () => {
 		try {
 			await exec(`taq init ${taqueriaProjectPathNPMSuccess}`);
 			await exec(`echo "{}" > ${taqueriaProjectPathNPMSuccess}/package.json`);
-			await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPathNPMSuccess}`);
+			await exec(`taq install @taqueria/plugin-ligo`, { cwd: `./${taqueriaProjectPathNPMSuccess}` });
 
 			const ligoPackageContents = await exec(`cat ../taqueria-plugin-ligo/package.json`);
 			const ligoVersion = JSON.parse(ligoPackageContents.stdout).version;
@@ -67,11 +67,11 @@ describe('E2E Testing for taqueria general functionality', () => {
 		}
 	});
 
-	test.skip('Verify plugin install with full npm initialization', async () => {
+	test('Verify plugin install with full npm initialization', async () => {
 		try {
-			await exec(`taq init ${taqueriaProjectPathNPMFull}`);
-			await exec(`cd ${taqueriaProjectPathNPMFull} && npm init -y`);
-			await exec(`taq install @taqueria/plugin-ligo -p ${taqueriaProjectPathNPMFull}`);
+			console.log(await exec(`taq init ${taqueriaProjectPathNPMFull}`));
+			// console.log(await exec(`npm init -y`, {cwd: `./${taqueriaProjectPathNPMFull}`}));
+			console.log(await exec(`npm init -y && taq install @taqueria/plugin-ligo -p ./${taqueriaProjectPathNPMFull}`));
 
 			const ligoPackageContents = await exec(`cat ../taqueria-plugin-ligo/package.json`);
 			const ligoVersion = JSON.parse(ligoPackageContents.stdout).version;

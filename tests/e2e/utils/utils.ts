@@ -27,6 +27,7 @@ export const generateTestProject = async (
 		throw new Error(`error: ${error}`);
 	}
 
+	await exec('npm init -y', { cwd: targetDir, encoding: 'utf-8' });
 	await exec(`mv ${targetDir} ./${projectPath}`, { encoding: 'utf8' });
 
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
