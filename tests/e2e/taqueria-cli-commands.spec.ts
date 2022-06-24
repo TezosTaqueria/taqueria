@@ -9,9 +9,6 @@ const exec = util.promisify(exec1);
 
 const taqueriaProjectPath = './e2e/auto-test-cli';
 
-// Useful function for debugging
-const debug = (projectDir: string) => exec(`rm -rf /tmp/temp-project && cp -r ${projectDir} /tmp/temp-project`);
-
 describe('E2E Testing for taqueria CLI,', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath);

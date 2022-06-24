@@ -27,7 +27,6 @@ export const generateTestProject = async (
 		throw new Error(`error: ${error}`);
 	}
 
-	await exec('npm init -y', { cwd: targetDir, encoding: 'utf-8' });
 	await exec(`mv ${targetDir} ./${projectPath}`, { encoding: 'utf8' });
 
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
@@ -36,9 +35,12 @@ export const generateTestProject = async (
 		packageNames.forEach(packageName => {
 			try {
 				if (localPackages) {
-					execSync(`cd ./${projectPath} && taq install ../../../taqueria-plugin-${packageName}`, { encoding: 'utf8' });
+					execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
+						cwd: `./${projectPath}`,
+						encoding: 'utf8',
+					});
 				} else {
-					execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: projectPath });
+					execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
 				}
 			} catch (error) {
 				throw new Error(`error: ${error}`);
