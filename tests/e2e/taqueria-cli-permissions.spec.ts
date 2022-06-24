@@ -48,7 +48,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 	});
 
 	test('testing that ligo artifacts will have the correct permissions', async () => {
-		console.log(await exec(`taq compile --plugin ligo`, { cwd: `./${taqueriaProjectPath}` }));
+		await exec(`taq compile --plugin ligo`, { cwd: `./${taqueriaProjectPath}` });
 		const fileUser = await exec(`${userStatCommand} ${taqueriaProjectPath}/artifacts/increment.tz`);
 		const fileGroup = await exec(`${groupStatCommand} ${taqueriaProjectPath}/artifacts/increment.tz`);
 
