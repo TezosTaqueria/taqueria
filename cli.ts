@@ -25,7 +25,8 @@ import * as Analytics from './analytics.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
-import { addNewProvision, apply, loadProvisions, plan } from './provisions.ts';
+import { generateProvisionTypes } from './provisioner.ts';
+import { addNewProvision, apply, plan } from './provisions.ts';
 import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
 import type {
 	InstalledPlugin,
@@ -435,7 +436,7 @@ const getCanonicalTask = (pluginName: string, taskName: string, state: Ephemeral
 		undefined,
 	);
 
-const addOperations = (
+const exposeProvisioningTasks = (
 	cliConfig: CLIConfig,
 	config: LoadedConfig.t,
 	_env: EnvVars,
@@ -445,14 +446,14 @@ const addOperations = (
 	_pluginLib: PluginLib,
 ) =>
 	cliConfig.command(
-		'provision <operation> [..operation args]',
+		'provision <task> [..operation args]',
 		'Provision an operation to populate project state',
 		(yargs: CLIConfig) => {
-			yargs.positional('operation', {
-				describe: 'The name of the operation to provision',
+			yargs.positional('task', {
+				describe: 'The name of the task to provision',
 				required: true,
 				type: 'string',
-				choices: Object.keys(state.operations),
+				choices: Object.keys(state.tasks),
 			});
 			yargs.option('name', {
 				describe: 'Unique name of the provisioner',
@@ -462,27 +463,27 @@ const addOperations = (
 		(argv: Arguments) =>
 			pipe(
 				SanitizedArgs.ofProvisionTaskArgs(argv),
-				chain(inputArgs => addNewProvision(inputArgs, config, state)),
-				map(() => 'Added provision to .taq/provisions.json'),
-				forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+				// chain(inputArgs => addNewProvision(inputArgs, config, state)),
+				// map(() => 'Added provision to .taq/provisions.json'),
+				// forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
 			),
 	)
 		.command(
 			'plan',
-			'Display the execution plan for applying all provisioned operations',
+			'Display the execution plan for applying all provisioned tasks',
 			() => {},
 			(argv: Arguments) =>
 				pipe(
 					SanitizedArgs.of(argv),
-					map(inputArgs => joinPaths(inputArgs.projectDir, '.taq', 'provisions.json')),
-					chain(SanitizedAbsPath.make),
-					chain(loadProvisions),
-					map(plan),
-					forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+					// map(inputArgs => joinPaths(inputArgs.projectDir, '.taq', 'provisions.json')),
+					// chain(SanitizedAbsPath.make),
+					// chain(loadProvisions),
+					// map(plan),
+					// forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
 				),
 		);
 
-const addTemplates = (
+const exposeTemplates = (
 	cliConfig: CLIConfig,
 	_config: LoadedConfig.t,
 	_env: EnvVars,
@@ -601,10 +602,10 @@ const exposeTask = (
 								default: option.defaultValue,
 								demandOption: option.required,
 								describe: option.description,
+								type: option.type,
 							};
 
 							if (option.choices && option.choices.length) optionSettings.choices = option.choices;
-							if (option.boolean) optionSettings['boolean'] = true;
 							return cli.option(option.flag, optionSettings);
 						},
 						cliConfig,
@@ -618,6 +619,7 @@ const exposeTask = (
 								describe: positional.description,
 								type: positional.type,
 								default: positional.defaultValue,
+								required: positional.required,
 							};
 
 							return cli.positional(positional.placeholder, positionalSettings);
@@ -669,7 +671,7 @@ const loadEphermeralState = (
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
 ): CLIConfig =>
-	[exposeTasks /* addOperations, addTemplates*/].reduce(
+	[exposeTasks, exposeProvisioningTasks, exposeTemplates].reduce(
 		(cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
 		cliConfig,
 	);
@@ -745,11 +747,12 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 
 				return pipe(
 					pluginLib.getState(),
-					map((state: EphemeralState.t) =>
+					chain((state: EphemeralState.t) =>
 						pipe(
 							resolvePluginName(parsedArgs, state),
 							(parsedArgs: SanitizedArgs.t) =>
 								loadEphermeralState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
+							generateProvisionTypes(state, config),
 						)
 					),
 				);

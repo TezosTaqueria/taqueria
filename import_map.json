@@ -48,9 +48,9 @@
 		"@taqueria/protocol/SHA256": "./taqueria-protocol/SHA256.ts",
 		"@taqueria/protocol/LoadedConfig": "./taqueria-protocol/LoadedConfig.ts",
 		"@taqueria/protocol/PersistentState": "./taqueria-protocol/PersistentState.ts",
-		"@taqueria/protocol/ProvisionerID": "./taqueria-protocol/ProvisionerID.ts",
-		"@taqueria/protocol/Provisioner": "./taqueria-protocol/Provisioner.ts",
-		"@taqueria/protocol/Provisions": "./taqueria-protocol/Provisions.ts",
-		"@taqueria/protocol/Settings": "./taqueria-protocol/Settings.ts"
+		"@taqueria/protocol/ProvisionID": "./taqueria-protocol/ProvisionID.ts",
+		"@taqueria/protocol/Provision": "./taqueria-protocol/Provision.ts",
+		"@taqueria/protocol/Settings": "./taqueria-protocol/Settings.ts",
+		"@taqueria/provisioner": "./taqueria-provisioner/index.ts"
 	}
 }
