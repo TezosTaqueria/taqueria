@@ -62,10 +62,10 @@ export const scaffoldRawSchema = rawSchema.extend({
 
 export const provisionRawSchema = rawSchema
 	.extend({
-		operation: z
+		task: z
 			.string()
 			.min(1)
-			.describe('Operation name'),
+			.describe('Task name'),
 		name: z
 			.string()
 			.min(1)
