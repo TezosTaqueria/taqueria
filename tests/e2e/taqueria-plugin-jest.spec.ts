@@ -59,7 +59,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		const testOutput = await exec(`taq test ${directory}`, { cwd: `${taqueriaProjectPath}` });
 
 		expect(testOutput.stderr).toContain(
-			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1mempty-jest-test-file-1.spec.ts\x1B[22m`,
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${directory}/\x1B[22m\x1B[1mempty-jest-test-file-1.spec.ts\x1B[22m`,
 		);
 	});
 
@@ -75,10 +75,10 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		const testOutput = await exec(`taq test ${directory}`, { cwd: `${taqueriaProjectPath}` });
 
 		expect(testOutput.stderr).toContain(
-			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1m${file1}\x1B[22m`,
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${directory}/\x1B[22m\x1B[1m${file1}\x1B[22m`,
 		);
 		expect(testOutput.stderr).toContain(
-			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1m${file2}\x1B[22m`,
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${directory}/\x1B[22m\x1B[1m${file2}\x1B[22m`,
 		);
 	});
 
@@ -94,10 +94,10 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		const testOutput = await exec(`taq test ${directory} --testPattern file-*`, { cwd: `${taqueriaProjectPath}` });
 
 		expect(testOutput.stderr).toContain(
-			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1m${file1}\x1B[22m`,
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${directory}/\x1B[22m\x1B[1m${file1}\x1B[22m`,
 		);
 		expect(testOutput.stderr).toContain(
-			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1m${file2}\x1B[22m`,
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${directory}/\x1B[22m\x1B[1m${file2}\x1B[22m`,
 		);
 	});
 
@@ -113,7 +113,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		const testOutput = await exec(`taq test ${directory} --testPattern 1`, { cwd: `${taqueriaProjectPath}` });
 
 		expect(testOutput.stderr).toContain(
-			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${taqueriaProjectPath}/${directory}/\x1B[22m\x1B[1m${file1}\x1B[22m`,
+			`\x1B[0m\x1B[7m\x1B[1m\x1B[32m PASS \x1B[39m\x1B[22m\x1B[27m\x1B[0m \x1B[2m${directory}/\x1B[22m\x1B[1m${file1}\x1B[22m`,
 		);
 	});
 
