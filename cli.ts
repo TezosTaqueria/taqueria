@@ -25,8 +25,9 @@ import * as Analytics from './analytics.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
-import { generateProvisionTypes } from './provisioner.ts';
+import { createProvisioner, createProvisionerTypes } from './provisioner.ts';
 import { addNewProvision, apply, plan } from './provisions.ts';
+import { createStateRegistry } from './state-registry.ts';
 import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
 import type {
 	InstalledPlugin,
@@ -446,8 +447,8 @@ const exposeProvisioningTasks = (
 	_pluginLib: PluginLib,
 ) =>
 	cliConfig.command(
-		'provision <task> [..operation args]',
-		'Provision an operation to populate project state',
+		'provision <task> [..task args]',
+		'Provision a task to populate project state',
 		(yargs: CLIConfig) => {
 			yargs.positional('task', {
 				describe: 'The name of the task to provision',
@@ -747,12 +748,14 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 
 				return pipe(
 					pluginLib.getState(),
-					chain((state: EphemeralState.t) =>
+					chain(createStateRegistry(config)),
+					chain(createProvisionerTypes(config)),
+					chain(createProvisioner(config)),
+					map((state: EphemeralState.t) =>
 						pipe(
 							resolvePluginName(parsedArgs, state),
 							(parsedArgs: SanitizedArgs.t) =>
 								loadEphermeralState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
-							generateProvisionTypes(state, config),
 						)
 					),
 				);

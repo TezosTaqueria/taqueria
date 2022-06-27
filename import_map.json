@@ -15,8 +15,6 @@
 		"@taqueria/protocol/VersionNumber": "./taqueria-protocol/VersionNumber.ts",
 		"@taqueria/protocol/Timestamp": "./taqueria-protocol/Timestamp.ts",
 		"@taqueria/protocol/Alias": "./taqueria-protocol/Alias.ts",
-		"@taqueria/protocol/Operation": "./taqueria-protocol/Operation.ts",
-		"@taqueria/protocol/ParsedOperation": "./taqueria-protocol/ParsedOperation.ts",
 		"@taqueria/protocol/Task": "./taqueria-protocol/Task.ts",
 		"@taqueria/protocol/Verb": "./taqueria-protocol/Verb.ts",
 		"@taqueria/protocol/SingleChar": "./taqueria-protocol/SingleChar.ts",

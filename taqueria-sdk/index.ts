@@ -3,7 +3,6 @@ import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
-import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
 import * as PersistentState from '@taqueria/protocol/PersistentState';
 import * as PluginInfo from '@taqueria/protocol/PluginInfo';
@@ -402,7 +401,6 @@ export {
 	Environment,
 	LoadedConfig,
 	NetworkConfig,
-	Operation,
 	Option,
 	PersistentState,
 	PositionalArg,
