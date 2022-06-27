@@ -5,7 +5,7 @@ import util from 'util';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
-const taqueriaProjectPath = './e2e/auto-test-cli-permissions';
+const taqueriaProjectPath = 'e2e/auto-test-cli-permissions';
 let username = os.userInfo().username;
 let userGroup: string;
 
