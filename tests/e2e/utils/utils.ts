@@ -11,8 +11,8 @@ export const generateTestProject = async (
 	packageNames: string[] = [],
 	localPackages: boolean = true,
 ) => {
-	// const targetDir = path.join('/tmp', projectPath);
-	const targetDir = projectPath;
+	const targetDir = path.join('/tmp', projectPath);
+	// const targetDir = projectPath;
 
 	try {
 		await exec(`taq init ${targetDir}`);
@@ -27,9 +27,9 @@ export const generateTestProject = async (
 		throw new Error(`error: ${error}`);
 	}
 
-	await exec(`touch package.json`, { cwd: `./${targetDir}`, encoding: `utf-8` });
-	await exec('npm init -y', { cwd: `./${targetDir}`, encoding: 'utf-8' });
-	// await exec(`mv ${targetDir} ./${projectPath}`, { encoding: 'utf8' });
+	await exec(`touch package.json`, { cwd: `${targetDir}`, encoding: `utf-8` });
+	await exec('npm init -y', { cwd: `${targetDir}`, encoding: 'utf-8' });
+	await exec(`mv ${targetDir} ./${projectPath}`, { encoding: 'utf8' });
 
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
 
@@ -121,14 +121,14 @@ export async function installDependencies(
 						cwd: `./${projectPath}`,
 						encoding: 'utf8',
 					});
-					await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/@taqueria/plugin-${packageName}/index.js`);
 				} else {
 					await exec(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
-					await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/@taqueria/plugin-${packageName}/index.js`);
 				}
 			} catch (error) {
 				throw new Error(`error: ${error}`);
 			}
+
+			await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/@taqueria/plugin-${packageName}/index.js`);
 		}
 	}
 }
