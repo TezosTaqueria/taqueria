@@ -4,7 +4,6 @@ import { exec as exec1, execSync } from 'child_process';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import util from 'util';
-import { networkInfo } from '../data/network-info';
 const exec = util.promisify(exec1);
 
 export const generateTestProject = async (
@@ -27,7 +26,7 @@ export const generateTestProject = async (
 		throw new Error(`error: ${error}`);
 	}
 
-	await exec('npm init -y', { cwd: targetDir, encoding: 'utf-8' });
+	await exec('npm init -y', { cwd: `./${targetDir}`, encoding: 'utf-8' });
 	await exec(`mv ${targetDir} ./${projectPath}`, { encoding: 'utf8' });
 
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
