@@ -1,7 +1,7 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import path from 'path';
 import * as api from 'vscode';
-import { inject, InjectedDependencies, sanitizeDeps } from './lib/helpers';
+import { inject, InjectedDependencies, OutputLevels, sanitizeDeps } from './lib/helpers';
 import { COMMAND_PREFIX } from './lib/helpers';
 import { makeDir } from './lib/pure';
 
@@ -43,10 +43,20 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
 		createWatcherIfNotExists,
+		showOutput,
 	} = inject(deps);
 
+	const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
+	const logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
+	const outputChannel = vscode.window.createOutputChannel('Taqueria');
+	const output = {
+		outputChannel,
+		logLevel,
+	};
+	showOutput(output, OutputLevels.info)('the activate function was called for the Taqueria VsCode Extension.');
+
 	const i18n: i18n = await loadI18n();
-	const output = vscode.window.createOutputChannel('Taqueria');
+
 	const folders = vscode.workspace.workspaceFolders
 		? vscode.workspace.workspaceFolders
 		: [];
