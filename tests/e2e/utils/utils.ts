@@ -32,7 +32,7 @@ export const generateTestProject = async (
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
 
 	if (packageNames.length > 0) {
-		packageNames.forEach(packageName => {
+		for (const packageName of packageNames) {
 			try {
 				if (localPackages) {
 					execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
@@ -45,7 +45,34 @@ export const generateTestProject = async (
 			} catch (error) {
 				throw new Error(`error: ${error}`);
 			}
-		});
+		}
+		// packageNames.forEach(packageName => {
+		// 	try {
+		// 		if (localPackages) {
+		// 			execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
+		// 				cwd: `./${projectPath}`,
+		// 				encoding: 'utf8',
+		// 			});
+		// 		} else {
+		// 			execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
+		// 		}
+		// 	} catch (error) {
+		// 		throw new Error(`error: ${error}`);
+		// 	}
+
+		// try {
+		// 	if (localPackages) {
+		// 		execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
+		// 			cwd: `./${projectPath}`,
+		// 			encoding: 'utf8',
+		// 		});
+		// 	} else {
+		// 		execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
+		// 	}
+		// } catch (error) {
+		// 	throw new Error(`error: ${error}`);
+		// }
+		// });
 	}
 
 	await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`);
