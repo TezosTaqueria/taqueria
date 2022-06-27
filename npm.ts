@@ -122,7 +122,7 @@ export const uninstallPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plug
 					...config,
 					plugins,
 				}),
-				writeJsonFile(config.configFile),
+				chain(writeJsonFile(config.configFile)),
 			);
 		}),
 		map(() => i18n.__('pluginUninstalled')),

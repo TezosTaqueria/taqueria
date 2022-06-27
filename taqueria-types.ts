@@ -31,13 +31,18 @@ export interface CLICommand {
 
 export type DenoArgs = typeof Deno.args;
 
+export type DenoBuild = typeof Deno.build;
+
 export type EnvKey =
 	| 'TAQ_CONFIG_DIR'
 	| 'TAQ_MAX_CONCURRENCY'
 	| 'TAQ_PROJECT_DIR'
 	| 'TAQ_ENV'
 	| 'TAQ_DISABLE_STATE'
-	| 'TAQ_VERSION';
+	| 'TAQ_VERSION'
+	| 'HOME'
+	| 'CI'
+	| 'TEST';
 
 export interface EnvVars {
 	get: (key: EnvKey) => undefined | string;
@@ -61,6 +66,12 @@ export interface PreExtendDeps {
 // Common dependencies after we retrieved the config
 export interface PluginDeps extends PreExtendDeps {
 	readonly config: LoadedConfig.t;
+}
+
+export interface UsageAnalyticsDeps {
+	readonly inputArgs: DenoArgs;
+	readonly env: EnvVars;
+	readonly build: DenoBuild;
 }
 
 export { LoadedConfig };

@@ -11,19 +11,40 @@
 			"outFiles": [
 				"${workspaceFolder}/taqueria-vscode-extension/out/*.js"
 			],
-			"preLaunchTask": "build-and-watch-vscode"
+			"preLaunchTask": "build-and-watch-vscode",
+			"env": {
+				"LogLevel": "warn"
+			}
 		},
 		{
-			"name": "Run Extension Tests",
-			"type": "extensionHost",
 			"request": "launch",
-			"runtimeExecutable": "${execPath}",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}/taqueria-vscode-extension",
-				"--extensionTestsPath=${workspaceFolder}/taqueria-vscode-extension//out/test/suite/index"
+			"name": "Launch CLI",
+			"type": "pwa-node",
+			"program": "${workspaceFolder}/index.ts",
+			"cwd": "/Users/jimmychenchen/Desktop/bugbug",
+			"runtimeExecutable": "deno",
+			"runtimeArgs": [
+				"run",
+				"--inspect-brk",
+				"--allow-run",
+				"--allow-write",
+				"--allow-read",
+				"--allow-env",
+				"--allow-net",
+				"--import-map",
+				"${workspaceFolder}/import_map.json"
 			],
-			"outFiles": ["${workspaceFolder}/taqueria-vscode-extension/out/**/*.js"],
-			"preLaunchTask": "build-and-watch-vscode"
+			"args": [
+				"--quickstart",
+				"Dummy text",
+				"--setBuild",
+				"Dummy-build",
+				"--setVersion",
+				"Dummy-version",
+				"uninstall",
+				"../../taqueria/taqueria-plugin-flextesa"
+			],
+			"attachSimplePort": 9229
 		}
 	]
 }
