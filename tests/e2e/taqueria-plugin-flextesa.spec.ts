@@ -330,9 +330,9 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 	afterAll(async () => {
 		try {
 			await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		} catch {
 		}
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 	});
 });
 
