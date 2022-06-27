@@ -31,7 +31,7 @@ export const generateTestProject = async (
 
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
 
-	installDependencies(projectPath, packageNames, localPackages);
+	await installDependencies(projectPath, packageNames, localPackages);
 
 	await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`);
 
