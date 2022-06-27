@@ -285,7 +285,7 @@ export const inject = (deps: InjectedDependencies) => {
 				// TODO: We might need to separate the output pane from logs pane.
 				// For now, this is just a quick update to improve debugging
 				// .then(_ => output.clear())
-				.then(_ => output.outputChannel.append(data))
+				.then(_ => output.outputChannel.appendLine(data))
 				.then(_ => output.outputChannel.show());
 		};
 
@@ -369,7 +369,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const updateCommandStates = async (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
 	) => {
@@ -388,7 +388,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const createWatcherIfNotExists = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
 		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,

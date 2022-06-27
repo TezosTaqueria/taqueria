@@ -43,9 +43,9 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
 		createWatcherIfNotExists,
+		showOutput,
 	} = inject(deps);
 
-	const i18n: i18n = await loadI18n();
 	const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
 	const logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
 	const outputChannel = vscode.window.createOutputChannel('Taqueria');
@@ -53,6 +53,9 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		outputChannel,
 		logLevel,
 	};
+	showOutput(output, OutputLevels.info)('the activate function was called for the Taqueria VsCode Extension.');
+
+	const i18n: i18n = await loadI18n();
 
 	const folders = vscode.workspace.workspaceFolders
 		? vscode.workspace.workspaceFolders
