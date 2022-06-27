@@ -12,7 +12,6 @@ export const generateTestProject = async (
 	localPackages: boolean = true,
 ) => {
 	const targetDir = path.join('/tmp', projectPath);
-	// const targetDir = projectPath;
 
 	try {
 		await exec(`taq init ${targetDir}`);
@@ -34,8 +33,6 @@ export const generateTestProject = async (
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
 
 	await installDependencies(projectPath, packageNames, localPackages);
-
-	await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/`);
 
 	// packageNames.forEach(packageName => {
 	// 	try {
