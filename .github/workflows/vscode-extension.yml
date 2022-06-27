@@ -91,7 +91,7 @@ jobs:
 
 
       - name: Package VSCode Extension
-        run: vsce packageExtension --yarn --pre-release --out ${{ steps.setArtifactFilename.outputs.filename }}
+        run: vsce package --yarn --pre-release --out ${{ steps.setArtifactFilename.outputs.filename }}
 
       - name: Authenticate with GCP
         if: runner.os == 'Linux'
