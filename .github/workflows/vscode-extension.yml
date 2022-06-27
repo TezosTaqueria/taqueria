@@ -60,6 +60,9 @@ jobs:
       
       - name: Install Dependencies
         run: npm ci
+
+      - name: Install vsce
+        run: npm i -g vsce
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
@@ -72,19 +75,23 @@ jobs:
         run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
         if: runner.os == 'Linux'
 
-      - name: Package VSCode Extension
-        if: runner.os == 'Linux'
-        id: packageExtension
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          pat: stub
-          dryRun: true
-          yarn: true
-          packagePath: ${{ env.GIT_WORKSPACE }}
-          preRelease: true   
+      # - name: Package VSCode Extension
+      #   if: runner.os == 'Linux'
+      #   id: packageExtension
+      #   uses: HaaLeo/publish-vscode-extension@v1
+      #   with:
+      #     pat: stub
+      #     dryRun: true
+      #     yarn: true
+      #     packagePath: ${{ env.GIT_WORKSPACE }}
+      #     preRelease: true   
       - id: setArtifactFilename
         if: runner.os == 'Linux'
         run: echo "::set-output name=filename::taqueria-vscode-${{ github.head_ref || github.ref_name }}-${{ runner.os }}"
+
+
+      - name: Package VSCode Extension
+        run: vsce packageExtension --yarn --pre-release --out ${{ steps.setArtifactFilename.outputs.filename }}
 
       - name: Authenticate with GCP
         if: runner.os == 'Linux'
@@ -99,7 +106,7 @@ jobs:
         id: uploadFile
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
-          path: ${{ steps.packageExtension.outputs.vsixPath }}
+          path: ${{ steps.setArtifactFilename.outputs.filename }}
           destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}/${{ steps.setArtifactFilename.outputs.filename }}"
 
       - name: Set package public url
@@ -123,6 +130,8 @@ jobs:
 
       - name: Install Dependencies
         run: npm ci
+
+        # vsce publish -p ${{ secrets.VSCE_PAT }}
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
