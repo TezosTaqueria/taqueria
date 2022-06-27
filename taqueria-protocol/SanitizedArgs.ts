@@ -1,6 +1,7 @@
 import createType from '@taqueria/protocol/Base';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as Url from '@taqueria/protocol/Url';
+import { omit } from 'rambda';
 import { z } from 'zod';
 
 export const rawSchema = z.object({
@@ -105,7 +106,7 @@ export type t = SanitizedArgs;
 
 export const schemas = {
 	...generatedSchemas,
-	schema: generatedSchemas.schema.transform(val => val as SanitizedArgs),
+	schema: generatedSchemas.schema.transform(val => omit(['p', 'project-dir'], val) as SanitizedArgs),
 };
 
 export const scaffoldTaskArgs = createType<RawScaffoldInput, RawScaffoldInput>({

@@ -23,11 +23,10 @@ import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
 import * as Analytics from './analytics.ts';
 import * as NPM from './npm.ts';
-import { addTask } from './persistent-state.ts';
+import { addTask, createStateRegistry } from './persistent-state.ts';
 import inject from './plugins.ts';
 import { createProvisioner, createProvisionerTypes } from './provisioner.ts';
 import { addNewProvision, apply, plan } from './provisions.ts';
-import { createStateRegistry } from './state-registry.ts';
 import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
 import type {
 	InstalledPlugin,
@@ -161,10 +160,11 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 		.hide('debug')
 		.option('quickstart')
 		.hide('quickstart')
-		.option('p', {
-			alias: 'projectDir',
+		.option('projectDir', {
+			alias: 'p',
 			default: './',
 			describe: i18n.__('initPathDesc'),
+			type: 'string',
 		})
 		.hide('projectDir')
 		.option('env', {
@@ -179,7 +179,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 				yargs.positional('projectDir', {
 					describe: i18n.__('initPathDesc'),
 					type: 'string',
-					default: getFromEnv('TAQ_PROJECT_DIR', '.', env),
+					default: getFromEnv('TAQ_PROJECT_DIR', './', env),
 				});
 			},
 			(args: Record<string, unknown>) =>
@@ -748,7 +748,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 
 				return pipe(
 					pluginLib.getState(),
-					chain(createStateRegistry(config)),
+					chain(createStateRegistry(parsedArgs)),
 					chain(createProvisionerTypes(config)),
 					chain(createProvisioner(config)),
 					map((state: EphemeralState.t) =>
