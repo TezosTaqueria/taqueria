@@ -114,12 +114,12 @@ export async function installDependencies(
 		for (const packageName of packageNames) {
 			try {
 				if (localPackages) {
-					await exec(`taq install ../../../taqueria-plugin-${packageName}`, {
+					execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
 						cwd: `./${projectPath}`,
 						encoding: 'utf8',
 					});
 				} else {
-					await exec(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
+					execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
 				}
 			} catch (error) {
 				throw new Error(`error: ${error}`);
