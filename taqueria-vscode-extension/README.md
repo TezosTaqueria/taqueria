@@ -43,3 +43,4 @@ A basic workflow in Taqueria is:
 | Taquito      | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate               |
 | TS Generator | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code |
 
+### Dummy change to trigger a pipeline
