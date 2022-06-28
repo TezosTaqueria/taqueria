@@ -1,41 +1,41 @@
 {
-  "name": "@taqueria/protocol",
-  "version": "0.4.1",
-  "description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "echo 'Nothing to build.' && exit 0 "
-  },
-  "keywords": [
-    "taqueria",
-    "tezos",
-    "build",
-    "test",
-    "deploy",
-    "ecad",
-    "ecadlabs",
-    "protocol"
-  ],
-  "author": "ECAD Labs",
-  "license": "Apache-2.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ecadlabs/taqueria.git",
-    "directory": "taqueria-protocol"
-  },
-  "bugs": {
-    "url": "https://github.com/ecadlabs/taqueria/issues"
-  },
-  "homepage": "https://github.com/ecadlabs/taqueria#readme",
-  "devDependencies": {
-    "typescript": "^4.7.2"
-  },
-  "dependencies": {
-    "@peculiar/webcrypto": "^1.4.0",
-    "batching-toposort": "^1.2.0",
-    "fluture": "^14.0.0",
-    "remeda": "^0.0.34",
-    "zod": "^3.17.3"
-  }
+	"name": "@taqueria/protocol",
+	"version": "0.4.2",
+	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "echo 'Nothing to build.' && exit 0 "
+	},
+	"keywords": [
+		"taqueria",
+		"tezos",
+		"build",
+		"test",
+		"deploy",
+		"ecad",
+		"ecadlabs",
+		"protocol"
+	],
+	"author": "ECAD Labs",
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ecadlabs/taqueria.git",
+		"directory": "taqueria-protocol"
+	},
+	"bugs": {
+		"url": "https://github.com/ecadlabs/taqueria/issues"
+	},
+	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"devDependencies": {
+		"typescript": "^4.7.2"
+	},
+	"dependencies": {
+		"@peculiar/webcrypto": "^1.4.0",
+		"batching-toposort": "^1.2.0",
+		"fluture": "^14.0.0",
+		"remeda": "^0.0.34",
+		"zod": "^3.17.3"
+	}
 }

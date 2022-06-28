@@ -1,5 +1,5 @@
 ---
-title: Networks
+title: Testnets
 ---
 
 :::note
@@ -61,30 +61,19 @@ Taqueria does not have a default network configured, so a freshly initialized pr
     },
     "sandbox": {
         "local": {
-            "accounts": {
-                "default": "bob",
-                "bob": {
-                    "initialBalance": "3000000000"
-                },
-                "alice": {
-                    "initialBalance": "2000000000"
-                },
-                "john": {
-                    "initialBalance": "4000000000"
-                },
-                "jane": {
-                    "initialBalance": "5000000000"
-                },
-                "joe": {
-                    "initialBalance": "1000000000"
-                }
-            },
             "label": "Local Tezos Sandbox",
             "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "rpcUrl": "http://localhost:20000"
         }
     },
-    "network": {}
+    "network": {},
+    "accounts": {
+        "bob": "3_000_000_000",
+        "alice": "3_000_000_000",
+        "john": "3_000_000_000",
+        "jane": "3_000_000_000",
+        "joe": "3_000_000_000"
+    }
 }
 ```
 
@@ -197,7 +186,7 @@ Add a new environment named `ithacanet`, and add the named network `ithaca` to i
 ```
 
 :::note
-For additional information regarding Taqueria Environments, please see the documentation [here](environments.mdx/)
+For additional information regarding Taqueria Environments, please see the documentation [here](/docs/config/environments.mdx/)
 :::
 
 ### Finished Configuration
@@ -231,24 +220,6 @@ Your `config.json` file should look something like this:
     },
     "sandbox": {
         "local": {
-            "accounts": {
-                "default": "bob",
-                "bob": {
-                    "initialBalance": "3000000000"
-                },
-                "alice": {
-                    "initialBalance": "2000000000"
-                },
-                "john": {
-                    "initialBalance": "4000000000"
-                },
-                "jane": {
-                    "initialBalance": "5000000000"
-                },
-                "joe": {
-                    "initialBalance": "1000000000"
-                }
-            },
             "label": "Local Tezos Sandbox",
             "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "rpcUrl": "http://localhost:20000"
@@ -287,6 +258,13 @@ Your `config.json` file should look something like this:
             }
          }
       }
+    },
+    "accounts": {
+        "bob": "3_000_000_000",
+        "alice": "3_000_000_000",
+        "john": "3_000_000_000",
+        "jane": "3_000_000_000",
+        "joe": "3_000_000_000"
     }
 }
 ```

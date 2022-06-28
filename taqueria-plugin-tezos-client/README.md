@@ -91,10 +91,11 @@ If not specified, the storage value will be set to the value of the `storage` pr
 
 The `simulate` task will accept the following optional parameters:
 
-| flag         |  name       | description                                |   
-|:------------:|:------------|--------------------------------------------|
-|  -s          | sandboxName | The name of the sandbox to target          |
-|  --storage   | storage     | The initial storage value for the contract |
+| Flag          |  Name       | Description                                  |   
+|:-------------:|:------------|----------------------------------------------|
+|  -s           | sandboxName | The name of the sandbox to target            |
+|  --storage    | storage     | The initial storage value for the contract   |
+|  --entryPoint | entryPoint  | The annotated name of the entrypoint to call |
 
 ## Plugin Architecture
 

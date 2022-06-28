@@ -1,0 +1,47 @@
+{
+	"name": "@taqueria/state",
+	"version": "0.4.2",
+	"description": "A TypeScript library for NodeJS and Deno to work with Taqueria projects",
+	"main": "./index.js",
+	"source": "./node/index.ts",
+	"targets": {
+		"main": {
+			"context": "node",
+			"isLibrary": true
+		}
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"build": "npx tsc -p ./tsconfig.json && npx esbuild --bundle ./node/index.ts --outfile=./index.js --minify --platform=node --sourcemap"
+	},
+	"types": "./node/index.d.ts",
+	"keywords": [
+		"taqueria",
+		"tezos",
+		"build",
+		"test",
+		"deploy",
+		"ecad",
+		"ecadlabs"
+	],
+	"author": "ECAD Labs",
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ecadlabs/taqueria.git",
+		"directory": "taqueria-state"
+	},
+	"bugs": {
+		"url": "https://github.com/ecadlabs/taqueria/issues"
+	},
+	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"devDependencies": {
+		"@types/node": "^17.0.12",
+		"esbuild": "^0.14.39",
+		"typescript": "^4.7.2"
+	},
+	"dependencies": {
+		"@taqueria/protocol": "0.4.2",
+		"rambda": "^7.1.4"
+	}
+}

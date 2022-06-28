@@ -108,8 +108,8 @@ const config = {
           },
           {
             type: "doc",
-            docId: "plugins/plugin-basics",
-            label: "Plugins",
+            docId: "release-notes",
+            label: "Release Notes",
             position: "right",
             className: "header-link"
           },
