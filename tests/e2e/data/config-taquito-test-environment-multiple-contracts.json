@@ -19,7 +19,7 @@
             "storage": {}
         },
         "test": {
-            "networks": ["ithacanet"],
+            "networks": ["ghostnet"],
             "sandboxes": [],
             "storage": {
                 "hello-tacos-one.tz": "100",
@@ -30,38 +30,38 @@
     "sandbox": {
         "local": {
             "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "rpcUrl": "http://localhost:20000"
         }
     },
     "network": {
-        "ithacanet": {
-            "label": "ithacanet",
-            "rpcUrl": "https://ithacanet.ecadinfra.com",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+        "ghostnet": {
+            "label": "ghostnet",
+            "rpcUrl": "https://rpc.ithacanet.teztnets.xyz",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "faucet": {
-                "pkh": "tz1RWs1bLmga24RybaC5Di441sK6aGLmCTpx",
+                "pkh": "tz1gFhXGGK4Ui6UwD92djr61XhwukFYgtwmF",
                 "mnemonic": [
-                    "throw",
-                    "cactus",
-                    "romance",
-                    "lake",
-                    "step",
-                    "floor",
-                    "limit",
-                    "shallow",
-                    "leader",
-                    "pride",
-                    "thrive",
-                    "void",
-                    "carbon",
-                    "wreck",
-                    "retreat"
+                    "jeans",
+                    "meadow",
+                    "door",
+                    "apology",
+                    "unfair",
+                    "device",
+                    "water",
+                    "eternal",
+                    "slow",
+                    "hockey",
+                    "sadness",
+                    "wagon",
+                    "hold",
+                    "aim",
+                    "during"
                 ],
-                "email": "tskwglte.mscstjny@teztnets.xyz",
-                "password": "fvzAbTJ7Uz",
-                "amount": "8780051082",
-                "activation_code": "07739888a2615d5176505c900f411dcf7990073d"
+                "email": "ykvlizei.xfkvqfnw@teztnets.xyz",
+                "password": "sXsuHFWSit",
+                "amount": "319967537732",
+                "activation_code": "2489771b09855087e55ce506b9a3d7f119d94517"
             }
         }
     },
