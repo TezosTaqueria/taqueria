@@ -41,10 +41,39 @@ describe('E2E Testing for taqueria CLI,', () => {
 		}
 	});
 
-	test.only('Verify that build reports build information about the version', async () => {
+	test('Verify that build reports build information about the version', async () => {
 		const build = await exec('taq --build');
 		try {
 			expect(build.stdout.trim()).toMatch(/^\w+$/);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that trying a command that is not available returns an error', async () => {
+		try {
+			await exec(`taq compile -p ${taqueriaProjectPath}`).catch(
+				(err: ExecException & { stdout: string; stderr: string }) => {
+					expect(err.code).toEqual(5);
+					expect(err.stderr).toContain(
+						"Taqueria isn't aware of this task. Perhaps you need to install a plugin first?",
+					);
+				},
+			);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that trying to install a package that does not exist returns an error', async () => {
+		try {
+			await exec(`taq install acoupleofecadhamburgers -p ${taqueriaProjectPath}`).catch(
+				(err: ExecException & { stdout: string; stderr: string }) => {
+					const pattern = /Could not read.*acoupleofecadhamburgers\/package\.json$/m;
+					expect(err.code).toEqual(9);
+					expect(err.stderr).toMatch(pattern);
+				},
+			);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -108,35 +137,6 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 			await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
 			await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
-
-	test('Verify that trying a command that is not available returns an error', async () => {
-		try {
-			await exec(`taq compile -p ${taqueriaProjectPath}`).catch(
-				(err: ExecException & { stdout: string; stderr: string }) => {
-					expect(err.code).toEqual(5);
-					expect(err.stderr).toContain(
-						"Taqueria isn't aware of this task. Perhaps you need to install a plugin first?",
-					);
-				},
-			);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
-
-	test('Verify that trying to install a package that does not exist returns an error', async () => {
-		try {
-			await exec(`taq install acoupleofecadhamburgers -p ${taqueriaProjectPath}`).catch(
-				(err: ExecException & { stdout: string; stderr: string }) => {
-					const pattern = /Could not read.*acoupleofecadhamburgers\/package\.json$/m;
-					expect(err.code).toEqual(9);
-					expect(err.stderr).toMatch(pattern);
-				},
-			);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
