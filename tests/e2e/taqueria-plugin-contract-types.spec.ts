@@ -9,7 +9,7 @@ const taqueriaProjectPath = 'e2e/auto-test-contract-types-plugin';
 
 describe('E2E Testing for taqueria contract types plugin', () => {
 	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath, ['contract-types', 'ligo']);
+		await generateTestProject(taqueriaProjectPath, ['ligo', 'contract-types']);
 	});
 
 	test('Verify that contract types plugin only outputs typeScriptDir and does not create types dir when no contracts exist', async () => {
