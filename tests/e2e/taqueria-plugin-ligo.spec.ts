@@ -11,6 +11,43 @@ const taqueriaProjectPath = 'e2e/auto-test-ligo-plugin';
 describe('E2E Testing for taqueria ligo plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+	});
+
+	test('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
+		try {
+			const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPlugin);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the ligo plugin exposes the associated options in the help menu', async () => {
+		try {
+			const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
+			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the ligo plugin aliases expose the correct info in the help menu', async () => {
+		try {
+			const ligoAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`);
+			expect(ligoAliasCHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
+
+			const ligoAliasCompileLigoHelpContents = await exec(
+				`taq compile-ligo --help --projectDir=${taqueriaProjectPath}`,
+			);
+			expect(ligoAliasCompileLigoHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
 	});
 
 	test('Verify that taqueria ligo plugin can compile one contract under contracts folder', async () => {

@@ -11,6 +11,11 @@ const taqueriaProjectPath = 'e2e/auto-test-smartpy-plugin';
 describe('E2E Testing for taqueria SmartPy plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['smartpy']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
 	});
 
 	// Remove all files from artifacts folder without removing folder itself
@@ -30,6 +35,39 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 	afterAll(() => {
 		try {
 			fs.rmSync(taqueriaProjectPath, { recursive: true });
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	// Putting these tests here so they can be part of the smartpy suite when it gets looked at for Milestone 3
+	test('Verify that the smartpy plugin exposes the associated commands in the help menu', async () => {
+		try {
+			const smartpyHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+			expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyPlugin);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the smartpy plugin exposes the associated options in the help menu', async () => {
+		try {
+			const smartpyHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
+			expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the smartpy plugin aliases expose the correct info in the help menu', async () => {
+		try {
+			const smartpyAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`);
+			expect(smartpyAliasCHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific);
+
+			const smartpyAliasCompileLigoHelpContents = await exec(
+				`taq compile-smartpy --help --projectDir=${taqueriaProjectPath}`,
+			);
+			expect(smartpyAliasCompileLigoHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}

@@ -3,6 +3,7 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 import { generateTestProject, getContainerName } from './utils/utils';
 const exec = util.promisify(exec1);
+import * as flexContents from './data/flextesa-contents';
 import * as contents from './data/typechecker-simulator-contents';
 
 const taqueriaProjectPath = 'e2e/auto-test-flextesa-plugin';
@@ -339,6 +340,65 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['flextesa']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+	});
+
+	test('Verify that the flextesa plugin exposes the associated commands in the help menu', async () => {
+		try {
+			const flextesaHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+			expect(flextesaHelpContents.stdout).toBe(flexContents.helpContentsFlextesaPlugin);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the flextesa plugin exposes the associated option for starting a sandbox in the help menu', async () => {
+		try {
+			const flextesaHelpContents = await exec(`taq start sandbox --help --projectDir=${taqueriaProjectPath}`);
+			expect(flextesaHelpContents.stdout).toBe(flexContents.helpContentsFlextesaPluginStartSandbox);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the flextesa plugin exposes the associated alias for starting a sandbox in the help menu', async () => {
+		try {
+			const flextesaHelpContents = await exec(`taq start --help --projectDir=${taqueriaProjectPath}`);
+			expect(flextesaHelpContents.stdout).toBe(flexContents.helpContentsFlextesaPluginStartSandbox);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the flextesa plugin exposes the associated option for stopping a sandbox in the help menu', async () => {
+		try {
+			const flextesaHelpContents = await exec(`taq stop sandbox --help --projectDir=${taqueriaProjectPath}`);
+			expect(flextesaHelpContents.stdout).toBe(flexContents.helpContentsFlextesaPluginStopSandbox);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the flextesa plugin exposes the associated alias for stopping a sandbox in the help menu', async () => {
+		try {
+			const flextesaHelpContents = await exec(`taq stop --help --projectDir=${taqueriaProjectPath}`);
+			expect(flextesaHelpContents.stdout).toBe(flexContents.helpContentsFlextesaPluginStopSandbox);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the flextesa plugin exposes the associated option for listing sandbox accounts in the help menu', async () => {
+		try {
+			const flextesaHelpContents = await exec(`taq list accounts --help --projectDir=${taqueriaProjectPath}`);
+			expect(flextesaHelpContents.stdout).toBe(flexContents.helpContentsFlextesaPluginListAccounts);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
 	});
 
 	test('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {

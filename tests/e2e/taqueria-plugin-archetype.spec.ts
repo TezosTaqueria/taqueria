@@ -11,6 +11,43 @@ const taqueriaProjectPath = 'e2e/auto-test-archetype-plugin';
 describe('E2E Testing for taqueria archetype plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['archetype']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+	});
+
+	test('Verify that the archetype plugin exposes the associated commands in the help menu', async () => {
+		try {
+			const archetypeHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+			expect(archetypeHelpContents.stdout).toBe(contents.helpContentsArchetypePlugin);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the archetype plugin exposes the associated options in the help menu', async () => {
+		try {
+			const archetypeHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
+			expect(archetypeHelpContents.stdout).toBe(contents.helpContentsArchetypePluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the archetype plugin aliases expose the correct info in the help menu', async () => {
+		try {
+			const archetypeAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`);
+			expect(archetypeAliasCHelpContents.stdout).toBe(contents.helpContentsArchetypePluginSpecific);
+
+			const archetypeAliasCompileArchetypeHelpContents = await exec(
+				`taq compile-archetype --help --projectDir=${taqueriaProjectPath}`,
+			);
+			expect(archetypeAliasCompileArchetypeHelpContents.stdout).toBe(contents.helpContentsArchetypePluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
 	});
 
 	test('Verify that taqueria archetype plugin outputs no contracts found if no contracts exist', async () => {
