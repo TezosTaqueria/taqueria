@@ -350,15 +350,7 @@ jobs:
   vscode-extension-workflow:
     needs: 
       - detect-changes
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-      - publish-contract-types-plugin-to-npm
-      - publish-archetype-plugin-to-npm
-      - publish-tezos-client-plugin-to-npm
       - publish-state-plugin-to-npm
-      - publish-jest-plugin-to-npm
 
     if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
             github.event_name == 'release' || 
