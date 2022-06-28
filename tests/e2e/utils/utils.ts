@@ -33,35 +33,6 @@ export const generateTestProject = async (
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
 
 	await installDependencies(projectPath, packageNames, localPackages);
-
-	// packageNames.forEach(packageName => {
-	// 	try {
-	// 		if (localPackages) {
-	// 			execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
-	// 				cwd: `./${projectPath}`,
-	// 				encoding: 'utf8',
-	// 			});
-	// 		} else {
-	// 			execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
-	// 		}
-	// 	} catch (error) {
-	// 		throw new Error(`error: ${error}`);
-	// 	}
-
-	// try {
-	// 	if (localPackages) {
-	// 		execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
-	// 			cwd: `./${projectPath}`,
-	// 			encoding: 'utf8',
-	// 		});
-	// 	} else {
-	// 		execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
-	// 	}
-	// } catch (error) {
-	// 	throw new Error(`error: ${error}`);
-	// }
-	// });
-	// }
 };
 
 export async function getContainerName(dockerName: string): Promise<string> {
