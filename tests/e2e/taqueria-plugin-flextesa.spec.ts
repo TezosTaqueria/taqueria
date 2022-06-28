@@ -3,8 +3,8 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 import { generateTestProject, getContainerName } from './utils/utils';
 const exec = util.promisify(exec1);
-import * as flexContents from './data/flextesa-contents';
-import * as contents from './data/typechecker-simulator-contents';
+import * as flexContents from './data/help-contents/flextesa-contents';
+import * as contents from './data/help-contents/typechecker-simulator-contents';
 
 const taqueriaProjectPath = 'e2e/auto-test-flextesa-plugin';
 let dockerName: string;

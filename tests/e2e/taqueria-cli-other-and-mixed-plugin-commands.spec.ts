@@ -3,7 +3,7 @@ import type { ExecException } from 'child_process';
 import fs from 'fs';
 import fsPromises from 'fs/promises';
 import util from 'util';
-import * as contents from './data/help-contents';
+import * as contents from './data/help-contents/help-contents';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 

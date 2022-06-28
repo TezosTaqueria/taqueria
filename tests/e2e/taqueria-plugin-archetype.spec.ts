@@ -4,7 +4,7 @@ import path from 'path';
 import utils from 'util';
 import { checkFolderExistsWithTimeout, generateTestProject } from './utils/utils';
 const exec = utils.promisify(exec1);
-import * as contents from './data/archetype-contents';
+import * as contents from './data/help-contents/archetype-contents';
 
 const taqueriaProjectPath = 'e2e/auto-test-archetype-plugin';
 

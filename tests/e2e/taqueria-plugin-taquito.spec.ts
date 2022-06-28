@@ -1,8 +1,8 @@
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import utils from 'util';
+import * as contents from './data/help-contents/taquito-contents';
 import { networkInfo } from './data/network-info';
-import * as contents from './data/taquito-contents';
 import { checkContractExistsOnNetwork, generateTestProject } from './utils/utils';
 const exec = utils.promisify(exec1);
 

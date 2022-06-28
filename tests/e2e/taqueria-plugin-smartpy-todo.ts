@@ -2,7 +2,7 @@ import { exec as exec1, execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import util from 'util';
-import * as contents from './data/smartpy-contents';
+import * as contents from './data/help-contents/smartpy-contents';
 import { checkFolderExistsWithTimeout, generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 

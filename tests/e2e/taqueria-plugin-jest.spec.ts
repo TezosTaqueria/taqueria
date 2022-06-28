@@ -3,7 +3,7 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
-import * as contents from './data/jest-contents';
+import * as contents from './data/help-contents/jest-contents';
 import { reference } from './data/jest.config-reference';
 import { referenceCI } from './data/jest.config-reference-ci';
 

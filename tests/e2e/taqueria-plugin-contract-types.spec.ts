@@ -2,7 +2,7 @@ import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import util from 'util';
-import * as contents from './data/contract-types-contents';
+import * as contents from './data/help-contents/contract-types-contents';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
