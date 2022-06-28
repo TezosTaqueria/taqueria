@@ -86,11 +86,28 @@ export const versionRawSchema = rawSchema.extend({
 	version: z.boolean().default(true),
 });
 
+export const manageContractsRawSchema = z.preprocess(
+	val => {
+		const obj: {
+			contractName?: string;
+			sourceFile?: string;
+		} = typeof val === 'object' ? Object(val) : ({ contractName: '', sourceFile: '' });
+		return !obj.contractName && obj.sourceFile
+			? { ...obj, contractName: obj['sourceFile'] }
+			: obj;
+	},
+	rawSchema.extend({
+		sourceFile: z.string().min(1),
+		contractName: z.string().min(1),
+	}),
+);
+
 type RawInput = z.infer<typeof rawSchema>;
 type RawScaffoldInput = z.infer<typeof scaffoldRawSchema>;
 type RawProvisionInput = z.infer<typeof provisionRawSchema>;
 type RawManagePluginInput = z.infer<typeof managePluginRawSchema>;
 type RawVersionInput = z.infer<typeof versionRawSchema>;
+type RawManageContractsInput = z.infer<typeof manageContractsRawSchema>;
 
 export const { schemas: generatedSchemas, factory } = createType<RawInput, RawInput>({
 	rawSchema,
@@ -132,10 +149,17 @@ export const uninstallTaskArgs = createType<RawManagePluginInput, RawManagePlugi
 	unknownErrMsg: 'Something went wrong parsing the arguments for the uninstall task',
 });
 
+export const manageContractsArgs = createType<RawManageContractsInput, RawManageContractsInput>({
+	rawSchema: manageContractsRawSchema,
+	parseErrMsg: "You're missing the sourceFile argument for this task",
+	unknownErrMsg: 'Something went wrong parsing the arguments for this task',
+});
+
 export type ScaffoldTaskArgs = z.infer<typeof scaffoldTaskArgs.schemas.schema>;
 export type ProvisionTaskArgs = z.infer<typeof provisionTaskArgs.schemas.schema>;
 export type InstallTaskArgs = z.infer<typeof installTaskArgs.schemas.schema>;
 export type UninstallTaskArgs = z.infer<typeof uninstallTaskArgs.schemas.schema>;
+export type ManageContractsArgs = z.infer<typeof manageContractsArgs.schemas.schema>;
 
 export const createScaffoldTaskArgs = scaffoldTaskArgs.factory.from;
 export const makeScaffoldTaskArgs = scaffoldTaskArgs.factory.make;
@@ -152,3 +176,7 @@ export const ofInstallTaskArgs = installTaskArgs.factory.of;
 export const createUninstallTaskArgs = uninstallTaskArgs.factory.create;
 export const makeUninstallTaskArgs = uninstallTaskArgs.factory.make;
 export const ofUninstallTaskArgs = uninstallTaskArgs.factory.of;
+
+export const createManageContractsArgs = manageContractsArgs.factory.create;
+export const makeManageContractsArgs = manageContractsArgs.factory.make;
+export const ofManageContractArgs = manageContractsArgs.factory.of;

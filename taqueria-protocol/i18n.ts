@@ -54,6 +54,8 @@ export default async (): Promise<i18n> => {
 						'buildDesc': 'Display build information about the current version',
 						'pluginOption': "Use to specify what plugin you'd like when running this task.",
 						'yesOptionDesc': 'Select "yes" to any prompt',
+						'addContractDesc': 'Add a contract to the contract registry',
+						'addSourceFileDesc': 'Source file to add to the contract registry',
 					},
 				},
 			},

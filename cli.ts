@@ -22,6 +22,7 @@ import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-type
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
 import * as Analytics from './analytics.ts';
+import { addContract } from './contracts.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -309,6 +310,28 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 				default: false,
 				boolean: true,
 			})
+			.command(
+				'add-contract <sourceFile>',
+				i18n.__('addContractDesc'),
+				(yargs: Arguments) => {
+					yargs.positional('sourceFile', {
+						describe: i18n.__('addSourceFileDesc'),
+						type: 'string',
+						required: true,
+					});
+
+					yargs.option('contractName', {
+						alias: ['name', 'n'],
+						type: 'string',
+					});
+				},
+				(inputArgs: Record<string, unknown>) =>
+					pipe(
+						SanitizedArgs.ofManageContractArgs(inputArgs),
+						chain(args => addContract(args, i18n)),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+					),
+			)
 			.demandCommand(),
 		extendCLI(env, parsedArgs, i18n),
 	);
@@ -466,21 +489,21 @@ const addOperations = (
 				map(() => 'Added provision to .taq/provisions.json'),
 				forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
 			),
-	)
-		.command(
-			'plan',
-			'Display the execution plan for applying all provisioned operations',
-			() => {},
-			(argv: Arguments) =>
-				pipe(
-					SanitizedArgs.of(argv),
-					map(inputArgs => joinPaths(inputArgs.projectDir, '.taq', 'provisions.json')),
-					chain(SanitizedAbsPath.make),
-					chain(loadProvisions),
-					map(plan),
-					forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
-				),
-		);
+	);
+// .command(
+// 	'plan',
+// 	'Display the execution plan for applying all provisioned operations',
+// 	() => {},
+// 	(argv: Arguments) =>
+// 		pipe(
+// 			SanitizedArgs.of(argv),
+// 			map(inputArgs => joinPaths(inputArgs.projectDir, '.taq', 'provisions.json')),
+// 			chain(SanitizedAbsPath.make),
+// 			chain(loadProvisions),
+// 			map(plan),
+// 			forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+// 		),
+// );
 
 const addTemplates = (
 	cliConfig: CLIConfig,
@@ -772,6 +795,7 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 		'plan',
 		'opt-in',
 		'opt-out',
+		'add-contract',
 	].reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,
@@ -889,6 +913,7 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_PARSE_UNKNOWN' }, err => [14, err.msg])
 				.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
 				.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
+				.with({ kind: 'E_CONTRACT_REGISTERED' }, err => [17, err.msg])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 
