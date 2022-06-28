@@ -19,11 +19,14 @@ const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = 
 
 	const getConfigWatchers = () => inMemoryState.configWatchers.values();
 
-	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher) => {
+	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher | null) => {
 		if (inMemoryState.configWatchers.has(folder)) {
 			return;
 		}
 		const watcher = factory();
+		if (watcher == null) {
+			return;
+		}
 		inMemoryState.configWatchers.set(folder, watcher);
 	};
 
