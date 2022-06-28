@@ -5,30 +5,30 @@ import { TimelockContractType } from './timelock.types'
 import { chest_key, chest, tas } from './type-aliases';
 
 export const utilizingContractTypes = async () => {
-	const Tezos = new TezosToolkit('https://ithacanet.ecadinfra.com');
+	const Tezos = new TezosToolkit('https://rpc.ithacanet.teztnets.xyz');
 	const FAUCET_KEY = {
-		"pkh": "tz1NgYYBSS3y7APsh934i7ipmN5ko4hynN2N",
+		"pkh": "tz1USDW6CgSTXJWvQjC1ivsPjXE8Y9wbfANM",
 		"mnemonic": [
-			"student",
-			"canal",
-			"sound",
-			"doll",
-			"sentence",
-			"breeze",
-			"tornado",
-			"crack",
-			"true",
-			"disagree",
-			"prison",
-			"defense",
-			"have",
-			"wave",
-			"disagree"
+			"infant",
+			"cool",
+			"ill",
+			"offer",
+			"enemy",
+			"olive",
+			"shrimp",
+			"night",
+			"second",
+			"media",
+			"admit",
+			"reform",
+			"cement",
+			"own",
+			"uncle"
 		],
-		"email": "nqkuhqqt.sxvaaovo@teztnets.xyz",
-		"password": "6xEPIPn9i3",
-		"amount": "44309046027",
-		"activation_code": "399cb8eb81716a254a1cdeb0e8863993307d314a"
+		"email": "gnaqmiry.jcdaybrh@teztnets.xyz",
+		"password": "7zSr9Pn1Gn",
+		"amount": "15017827241",
+		"activation_code": "dd0fd000aa62fed1b64554ea56b230e1d8ba2aad"
 	}
 	importKey(
 		Tezos,

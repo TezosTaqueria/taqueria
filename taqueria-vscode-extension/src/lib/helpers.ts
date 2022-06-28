@@ -16,6 +16,37 @@ export enum Commands {
 	uninstall = 'taqueria.uninstall',
 }
 
+export enum OutputLevels {
+	output,
+	fatal,
+	error,
+	warn,
+	info,
+	debug,
+	trace,
+}
+
+const outputLevelsOrder = [
+	OutputLevels.trace,
+	OutputLevels.debug,
+	OutputLevels.info,
+	OutputLevels.warn,
+	OutputLevels.error,
+	OutputLevels.fatal,
+	OutputLevels.output,
+];
+
+const shouldOutput = (currentLogLevel: OutputLevels, configuredLogLevel: OutputLevels) => {
+	const currentLogIndex = outputLevelsOrder.indexOf(currentLogLevel);
+	const configuredLogIndex = outputLevelsOrder.indexOf(configuredLogLevel);
+	return currentLogIndex >= configuredLogIndex;
+};
+
+export type Output = {
+	outputChannel: api.OutputChannel;
+	logLevel: OutputLevels;
+};
+
 type VSCodeAPI = typeof api;
 
 export interface InjectedDependencies {
@@ -32,7 +63,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeInitTask = async (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		folders: readonly api.WorkspaceFolder[],
 	) => {
@@ -132,7 +163,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeInstallTask = async (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		folders: readonly api.WorkspaceFolder[],
 		i18n: i18n,
 	) => {
@@ -187,7 +218,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeTasksFromProject = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		folders: readonly api.WorkspaceFolder[],
 		i18n: i18n,
 	) =>
@@ -203,7 +234,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeTasksFromState = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		folders: readonly api.WorkspaceFolder[],
 		i18n: i18n,
 	) =>
@@ -245,12 +276,18 @@ export const inject = (deps: InjectedDependencies) => {
 		vscode.window.showInformationMessage(msg)
 			.then(_ => Promise.resolve()) as Promise<void>;
 
-	const showOutput = (output: api.OutputChannel) =>
-		(data: string) =>
+	const showOutput = (output: Output, currentOutputLevel: OutputLevels) =>
+		(data: string) => {
+			if (!shouldOutput(currentOutputLevel, output.logLevel)) {
+				return;
+			}
 			Promise.resolve()
-				.then(_ => output.clear())
-				.then(_ => output.append(data))
-				.then(_ => output.show());
+				// TODO: We might need to separate the output pane from logs pane.
+				// For now, this is just a quick update to improve debugging
+				// .then(_ => output.clear())
+				.then(_ => output.outputChannel.appendLine(data))
+				.then(_ => output.outputChannel.show());
+		};
 
 	const getSandboxNames = (projectDir: Util.TaqifiedDir) =>
 		projectDir.config.sandbox
@@ -259,7 +296,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeTaqTaskAsCommand = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		projectDir?: Util.PathToDir,
 	) =>
@@ -270,7 +307,7 @@ export const inject = (deps: InjectedDependencies) => {
 					Util.proxyToTaq(pathToTaq, i18n, projectDir)(taskWithArgs)
 						.then(stdout =>
 							outputTo === 'output'
-								? showOutput(output)(stdout)
+								? showOutput(output, OutputLevels.output)(stdout)
 								: notify(stdout)
 						)
 						.then(_ => {
@@ -279,7 +316,7 @@ export const inject = (deps: InjectedDependencies) => {
 			);
 	const exposeTaskAsCommand = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		projectDir?: Util.PathToDir,
 	) =>
@@ -294,7 +331,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeSandboxTaskAsCommand = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
 	) =>
@@ -318,7 +355,7 @@ export const inject = (deps: InjectedDependencies) => {
 								? Util.proxyToTaq(pathToTaq, i18n, projectDir)(`${taskName} ${sandboxName}`)
 									.then(stdout =>
 										outputTo === 'output'
-											? showOutput(output)(stdout)
+											? showOutput(output, OutputLevels.output)(stdout)
 											: notify(stdout)
 									)
 									.then(_ => {
@@ -332,7 +369,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const updateCommandStates = async (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
 	) => {
@@ -351,7 +388,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const createWatcherIfNotExists = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
 		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
