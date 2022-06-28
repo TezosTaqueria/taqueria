@@ -91,7 +91,9 @@ jobs:
 
 
       - name: Package VSCode Extension
-        run: vsce package --yarn --pre-release --out ${{ steps.setArtifactFilename.outputs.filename }}
+        run: |
+          cd ${{ env.GIT_WORKSPACE }}
+          vsce package --yarn --pre-release --out ${{ steps.setArtifactFilename.outputs.filename }}
 
       - name: Authenticate with GCP
         if: runner.os == 'Linux'
@@ -106,7 +108,7 @@ jobs:
         id: uploadFile
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
-          path: ${{ steps.setArtifactFilename.outputs.filename }}
+          path: ${{ env.GIT_WORKSPACE }}/${{ steps.setArtifactFilename.outputs.filename }}
           destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}/${{ steps.setArtifactFilename.outputs.filename }}"
 
       - name: Set package public url
