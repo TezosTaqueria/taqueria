@@ -17,6 +17,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 		await exec(`cp e2e/data/increment.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp e2e/data/all-types.tz ${taqueriaProjectPath}/artifacts/`);
 		await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 	});
@@ -118,6 +119,34 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 5. Verify that contracts originated on the network have different addresses
 		expect(contractOneHash).not.toEqual(contractTwoHash);
+	});
+
+	test('Verify that taqueria taquito plugin can deploy the all types contract to check storage of all michelson types', async () => {
+		try {
+			environment = 'development';
+
+			// 1. Run taq deploy ${contractName} on a selected test network described in "test" environment
+			const deployCommand = await exec(`taq deploy all-types.tz -e ${environment}`, {
+				cwd: `./${taqueriaProjectPath}`,
+			});
+			const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
+
+			// 2. Get the KT address from the output
+			expect(deployResponse).toContain('all-types.tz');
+			expect(deployResponse).toContain(dockerName);
+			const contractHash = deployResponse.split('│')[2].trim();
+
+			expect(contractHash).toMatch(contractRegex);
+
+			// 3. Verify that contract has been originated to the network
+			const contractFromSandbox = await exec(
+				`curl http://localhost:20000/chains/main/blocks/head/context/contracts/${contractHash}`,
+			);
+			expect(contractFromSandbox.stdout).toContain('Jimmy I dont know what goes here');
+			expect(contractFromSandbox.stdout).toContain('Jimmy I dont know what goes here');
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
 	});
 
 	// Clean up process to remove taquified project folder
