@@ -63,7 +63,7 @@ export const sanitizeDeps = (deps?: InjectedDependencies) =>
 export const inject = (deps: InjectedDependencies) => {
 	const { vscode } = deps;
 
-	const exposeInitTask = async (
+	const exposeInitTask = (
 		context: api.ExtensionContext,
 		output: Output,
 		i18n: i18n,
@@ -84,14 +84,14 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeScaffoldTask = async (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		folders: readonly api.WorkspaceFolder[],
 		i18n: i18n,
 	) => {
 		const exposeTask = exposeTaskAsCommand(context, output, i18n);
 		const availableScaffolds: { name: string; url: string }[] = await getAvailableScaffolds(context);
 		const proxyScaffold = (scaffoldUrl: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
-			Util.proxyToTaq(pathToTaq, i18n, projectDir)(`scaffold ${scaffoldUrl}`)
+			Util.proxyToTaq(pathToTaq, i18n, projectDir)(`scaffold ${scaffoldUrl} ${projectDir}`)
 				.then(notify)
 				.catch(err => logAllNestedErrors(err, output));
 
@@ -112,7 +112,7 @@ export const inject = (deps: InjectedDependencies) => {
 			if (scaffoldUrl === undefined) {
 				return;
 			}
-			return proxyScaffold(scaffoldUrl, pathToTaq, i18n, projectUri.path as Util.PathToDir);
+			await proxyScaffold(scaffoldUrl, pathToTaq, i18n, projectUri.path as Util.PathToDir);
 		});
 	};
 
@@ -139,7 +139,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const getFolderForScaffolding = async (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		folders: readonly api.WorkspaceFolder[],
 	) => {
@@ -346,12 +346,13 @@ export const inject = (deps: InjectedDependencies) => {
 			.then(_ => Promise.resolve()) as Promise<void>;
 	};
 
-	const logAllNestedErrors = (err: TaqVsxError | TaqError | Error | any, output: api.OutputChannel) => {
+	const logAllNestedErrors = (err: TaqVsxError | TaqError | Error | any, output: Output) => {
 		if (!err) {
 			return;
 		}
 		const message = getErrorMessage(err);
-		output.appendLine(message);
+		output.outputChannel.appendLine(message);
+		output.outputChannel.show();
 		if ('previous' in err) {
 			logAllNestedErrors(err.previous, output);
 		}
