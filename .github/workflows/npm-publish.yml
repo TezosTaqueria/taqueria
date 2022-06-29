@@ -33,11 +33,8 @@ jobs:
 
       - name: Check versions
         run: |
-          echo "Check version"
-          jq '.version' $GIT_WORKSPACE/package.json
-          echo "Check dependency version"
-          jq '.dependencies."@taqueria/node-sdk"|ltrimstr("^")' $GIT_WORKSPACE/package.json
-          jq '.version as $version | .dependencies."@taqueria/node-sdk"|ltrimstr("^") == $version' $GIT_WORKSPACE/package.json
+          jq -e '.version as $version | .dependencies."@taqueria/node-sdk"|ltrimstr("^") == $version' $GIT_WORKSPACE/package.json && npm install @taqueria/node-sdk@latest -w $GIT_WORKSPACE
+          jq -e '.version as $version | .dependencies."@taqueria/protocol"|ltrimstr("^") == $version' $GIT_WORKSPACE/package.json && npm install @taqueria/protocol@latest -w $GIT_WORKSPACE
 
       - name: Install any dependencies
         run: |
