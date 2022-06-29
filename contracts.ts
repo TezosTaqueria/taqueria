@@ -8,9 +8,17 @@ import * as SHA256 from '@taqueria/protocol/SHA256';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { attemptP, chain, map, reject, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { omit } from 'rambda';
+import { isEmpty, omit, toPairs } from 'rambda';
 import { getConfig } from './taqueria-config.ts';
 import { joinPaths, readTextFile, writeJsonFile } from './taqueria-utils/taqueria-utils.ts';
+
+type contractRow = {
+	'Name': string;
+	'Last Known Hash': string;
+	'Source file': string;
+};
+
+const hasContracts = (config: LoadedConfig.t) => isEmpty(config.contracts);
 
 const isContractRegistered = (contractName: string, config: LoadedConfig.t | Config.t) =>
 	config.contracts && config.contracts[contractName] ? true : false;
@@ -53,6 +61,7 @@ export const addContract = (parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18
 					chain(writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))),
 				)
 		),
+		chain(_ => listContracts(parsedArgs, i18n)),
 	);
 
 export const removeContract = (parsedArgs: SanitizedArgs.RemoveContractArgs, i18n: i18n.t) =>
@@ -74,4 +83,22 @@ export const removeContract = (parsedArgs: SanitizedArgs.RemoveContractArgs, i18
 			};
 			return writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))(updatedConfig);
 		}),
+		chain(_ => listContracts(parsedArgs, i18n)),
+	);
+
+export const listContracts = (parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
+	pipe(
+		getConfig(parsedArgs.projectDir, i18n),
+		map(config =>
+			hasContracts(config)
+				? [{ contract: i18n.__('noContractsRegistered') }]
+				: toPairs(config.contracts).reduce(
+					(retval: contractRow[], [key, val]) => [
+						...retval,
+						{ 'Name': key, 'Source file': val.sourceFile, 'Last Known Hash': val.hash.slice(0, 8) },
+					],
+					[],
+				)
+		),
+		map(rows => rows as Record<string, string>[]),
 	);

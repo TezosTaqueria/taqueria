@@ -22,7 +22,7 @@ import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-type
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
 import * as Analytics from './analytics.ts';
-import { addContract, removeContract } from './contracts.ts';
+import { addContract, listContracts, removeContract } from './contracts.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -329,7 +329,8 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 					pipe(
 						SanitizedArgs.ofAddContractArgs(inputArgs),
 						chain(args => addContract(args, i18n)),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+						map(renderTable),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
 					),
 			)
 			.command(
@@ -346,10 +347,24 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 					pipe(
 						SanitizedArgs.ofRemoveContractsArgs(inputArgs),
 						chain(args => removeContract(args, i18n)),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+						map(renderTable),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
 					),
 			)
 			.alias('remove-contract', 'rm-contract')
+			.command(
+				'list-contracts',
+				i18n.__('listContractsDesc'),
+				() => {},
+				(inputArgs: Record<string, unknown>) =>
+					pipe(
+						SanitizedArgs.of(inputArgs),
+						chain(args => listContracts(args, i18n)),
+						map(renderTable),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+					),
+			)
+			.alias('show-contracts', 'list-contracts')
 			.demandCommand(),
 		extendCLI(env, parsedArgs, i18n),
 	);
@@ -816,6 +831,8 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 		'add-contract',
 		'rm-contract',
 		'remove-contract',
+		'list-contracts',
+		'show-contracts',
 	].reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,

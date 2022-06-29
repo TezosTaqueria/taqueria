@@ -9,6 +9,13 @@ const exec = util.promisify(exec1);
 const taqueriaProjectPath = 'e2e/auto-test-registered-contracts';
 const configFile = join(taqueriaProjectPath, '.taq', 'config.json');
 
+const expectedTableOutput = `┌───────────────────┬───────────────────┬─────────────────┐
+│ Name              │ Source File       │ Last Known Hash │
+├───────────────────┼───────────────────┼─────────────────┤
+│ hello-tacos.mligo │ hello-tacos.mligo │ 530f224f        │
+└───────────────────┴───────────────────┴─────────────────┘
+`;
+
 describe('E2E for Registered Contracts', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath);
@@ -154,5 +161,33 @@ describe('E2E for Registered Contracts', () => {
 		const jsonAfter = JSON.parse(configAfter);
 		expect(jsonAfter).toBeInstanceOf(Object);
 		expect(jsonAfter.contracts).toEqual({});
+	});
+
+	test('List registered contracts', async () => {
+		await copyFile(
+			'e2e/data/hello-tacos.mligo',
+			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
+		);
+
+		const bytes = await readFile(join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'));
+		const digest = createHash('sha256');
+		digest.update(bytes);
+		const hash = digest.digest('hex');
+
+		const config = await readFile(configFile, { encoding: 'utf-8' });
+		const json = JSON.parse(config);
+		expect(json).toBeInstanceOf(Object);
+		json.contracts = {
+			'hello-tacos.mligo': {
+				sourceFile: 'hello-tacos.mligo',
+				hash,
+			},
+		};
+		await writeFile(configFile, JSON.stringify(json), { encoding: 'utf-8' });
+
+		const result = exec('taq list-contracts', { cwd: taqueriaProjectPath });
+		expect(result).resolves.toHaveProperty('stdout');
+		const output = (await result).stdout;
+		expect(output).toEqual(expectedTableOutput);
 	});
 });

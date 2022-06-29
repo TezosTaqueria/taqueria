@@ -58,6 +58,7 @@ export default async (): Promise<i18n> => {
 						'addSourceFileDesc': 'Source file to add to the contract registry',
 						'removeContractDesc': 'Remove a contract from the contract registry',
 						'removeContractNameDesc': 'The name of the contract to remove',
+						'noContractsRegistered': 'No registered contracts found',
 					},
 				},
 			},
