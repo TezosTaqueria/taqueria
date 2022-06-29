@@ -32,6 +32,7 @@ jobs:
           scope: "${{ env.SCOPE }}"
 
       - name: Check versions
+        if: ${{ env.GIT_WORKSPACE != "taqueria-protocol" }}
         run: |
           jq -e '.version as $version | .dependencies."@taqueria/node-sdk"|ltrimstr("^") == $version' $GIT_WORKSPACE/package.json && npm install @taqueria/node-sdk@latest -w $GIT_WORKSPACE
           jq -e '.version as $version | .dependencies."@taqueria/protocol"|ltrimstr("^") == $version' $GIT_WORKSPACE/package.json && npm install @taqueria/protocol@latest -w $GIT_WORKSPACE
