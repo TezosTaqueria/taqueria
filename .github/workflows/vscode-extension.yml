@@ -59,8 +59,10 @@ jobs:
           node-version: 16
       
       - name: Install Dependencies
-        run: npm ci
-      
+        run: |
+          npm update
+          npm ci
+                
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
       
@@ -122,7 +124,9 @@ jobs:
           node-version: 16
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          npm update
+          npm ci
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
