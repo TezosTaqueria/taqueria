@@ -19,7 +19,7 @@
             "storage": {}
         },
         "test": {
-            "networks": ["ithacanet"],
+            "networks": ["ghostnet"],
             "sandboxes": [],
             "storage": {}
         }
@@ -32,33 +32,33 @@
         }
     },
     "network": {
-        "ithacanet": {
-            "label": "ithacanet",
-            "rpcUrl": "https://ithacanet.ecadinfra.com",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+        "ghostnet": {
+            "label": "ghostnet",
+            "rpcUrl": "https://rpc.ithacanet.teztnets.xyz",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "faucet": {
-                "pkh": "tz1RWs1bLmga24RybaC5Di441sK6aGLmCTpx",
+                "pkh": "tz1PG2VvCR6bJB6C45tg3hF7fAXYYNfEk2jD",
                 "mnemonic": [
-                    "throw",
-                    "cactus",
-                    "romance",
-                    "lake",
-                    "step",
-                    "floor",
-                    "limit",
-                    "shallow",
-                    "leader",
-                    "pride",
-                    "thrive",
-                    "void",
-                    "carbon",
-                    "wreck",
-                    "retreat"
+                    "sand",
+                    "vapor",
+                    "tuition",
+                    "clump",
+                    "hover",
+                    "lonely",
+                    "bicycle",
+                    "harvest",
+                    "clerk",
+                    "payment",
+                    "mass",
+                    "stone",
+                    "shed",
+                    "item",
+                    "spoil"
                 ],
-                "email": "tskwglte.mscstjny@teztnets.xyz",
-                "password": "fvzAbTJ7Uz",
-                "amount": "8780051082",
-                "activation_code": "07739888a2615d5176505c900f411dcf7990073d"
+                "email": "kdqlmsrt.ngwydazb@teztnets.xyz",
+                "password": "sUk13wla36",
+                "amount": "37848414225",
+                "activation_code": "d98923b01a6c8aef592dab53f2a75d9e1e09c060"
             }
         }
     },
