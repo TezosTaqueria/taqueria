@@ -252,47 +252,47 @@ jobs:
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
-  run-tests:
-    name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-latest,macos-latest]
-        chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
-        include:
-        - os: ubuntu-latest
-          url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
-          final-name: taq
-          make-executable-cmd: chmod +x
-          get-current-dir: echo "$(pwd)"
-        - os: macos-latest
-          url: ${{ needs.build-binaries.outputs.public-url-macos }}
-          final-name: taq
-          make-executable-cmd: chmod +x
-          get-current-dir: echo "$(pwd)"
-    needs: 
-      - build-binaries
-      - gather-info-for-e2e-tests
-    if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
+  # run-tests:
+  #   name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       os: [ubuntu-latest,macos-latest]
+  #       chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
+  #       include:
+  #       - os: ubuntu-latest
+  #         url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
+  #         final-name: taq
+  #         make-executable-cmd: chmod +x
+  #         get-current-dir: echo "$(pwd)"
+  #       - os: macos-latest
+  #         url: ${{ needs.build-binaries.outputs.public-url-macos }}
+  #         final-name: taq
+  #         make-executable-cmd: chmod +x
+  #         get-current-dir: echo "$(pwd)"
+  #   needs: 
+  #     - build-binaries
+  #     - gather-info-for-e2e-tests
+  #   if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: 16.13.x
-          # Setting node version to 16.13.2 to enable integration tests to pass
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #       with:
+  #         node-version: 16.13.x
+  #         # Setting node version to 16.13.2 to enable integration tests to pass
       
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: "1.18.2"
+  #     - uses: denoland/setup-deno@v1
+  #       with:
+  #         deno-version: "1.18.2"
 
-      - name: download the binary from the build-binaries job and make it executable
-        if: ${{ !github.event.pull_request.head.repo.fork }}
-        run: |
-          curl --url ${{ matrix.url }} -o ${{ matrix.final-name }} -L
-          ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
-          ${{ matrix.get-current-dir }} >> $GITHUB_PATH
+  #     - name: download the binary from the build-binaries job and make it executable
+  #       if: ${{ !github.event.pull_request.head.repo.fork }}
+  #       run: |
+  #         curl --url ${{ matrix.url }} -o ${{ matrix.final-name }} -L
+  #         ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
+  #         ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
       - name: build binary and make executable
         if: ${{ github.event.pull_request.head.repo.fork }}
@@ -333,19 +333,19 @@ jobs:
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
   
-  report-e2e-status:
-    needs: run-tests
-    if:  ${{ failure() && github.event_name != 'release' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: ravsamhq/notify-slack-action@v1
-        with:
-          notification_title: "Failure in the e2e Tests"
-          status: ${{ needs.run-tests.result }} # required
-          notify_when: 'failure'
-          message_format: '{emoji} ${{ github.actor }}, *{workflow}* {status_message}, please investigate: <{run_url}|Failing Run>'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
+  # report-e2e-status:
+  #   needs: run-tests
+  #   if:  ${{ failure() && github.event_name != 'release' }}
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: ravsamhq/notify-slack-action@v1
+  #       with:
+  #         notification_title: "Failure in the e2e Tests"
+  #         status: ${{ needs.run-tests.result }} # required
+  #         notify_when: 'failure'
+  #         message_format: '{emoji} ${{ github.actor }}, *{workflow}* {status_message}, please investigate: <{run_url}|Failing Run>'
+  #       env:
+  #         SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
   vscode-extension-workflow:
     needs: 
@@ -380,7 +380,7 @@ jobs:
       - publish-tezos-client-plugin-to-npm
       - publish-state-plugin-to-npm
       - publish-jest-plugin-to-npm
-      - run-tests
+      # - run-tests
       - vscode-extension-workflow
     steps:
       - uses: actions/checkout@v2

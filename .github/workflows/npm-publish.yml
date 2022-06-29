@@ -31,8 +31,17 @@ jobs:
           registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
 
+      - name: Check versions
+        run: |
+          echo "Check version"
+          jq '.version' $GIT_WORKSPACE/package.json
+          echo "Check dependency version"
+          jq '.dependencies."@taqueria/node-sdk"|ltrimstr("^")' $GIT_WORKSPACE/package.json
+          jq '.version as $version | .dependencies."@taqueria/node-sdk"|ltrimstr("^") == $version' package.json
+
       - name: Install any dependencies
-        run: npm ci
+        run: |
+          npm ci
 
       - name: Build package
         run: npm run build -w $GIT_WORKSPACE
