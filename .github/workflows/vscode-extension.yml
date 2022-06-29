@@ -128,22 +128,22 @@ jobs:
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
 
       # Seperate steps for prerelease and release workflows
-      - name: Publish as pre-release
-        if: ${{ github.event.release.prerelease }}
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          pat: ${{ secrets.VSCE_PAT }}
-          yarn: true
-          packagePath: ${{ env.GIT_WORKSPACE }}
-          registryUrl: https://marketplace.visualstudio.com
-          preRelease: true
+      # - name: Publish as pre-release
+      #   if: ${{ github.event.release.prerelease }}
+      #   uses: HaaLeo/publish-vscode-extension@v1
+      #   with:
+      #     pat: ${{ secrets.VSCE_PAT }}
+      #     yarn: true
+      #     packagePath: ${{ env.GIT_WORKSPACE }}
+      #     registryUrl: https://marketplace.visualstudio.com
+      #     preRelease: true
 
-      - name: Publish as official release
-        if: ${{ !github.event.release.prerelease }}
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          pat: ${{ secrets.VSCE_PAT }}
-          yarn: true
-          packagePath: ${{ env.GIT_WORKSPACE }}
-          registryUrl: https://marketplace.visualstudio.com
+      # - name: Publish as official release
+      #   if: ${{ !github.event.release.prerelease }}
+      #   uses: HaaLeo/publish-vscode-extension@v1
+      #   with:
+      #     pat: ${{ secrets.VSCE_PAT }}
+      #     yarn: true
+      #     packagePath: ${{ env.GIT_WORKSPACE }}
+      #     registryUrl: https://marketplace.visualstudio.com
           
