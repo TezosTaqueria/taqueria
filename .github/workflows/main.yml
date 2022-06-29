@@ -309,8 +309,8 @@ jobs:
 
       - name: install dependencies
         run: |
-        npm update
-        npm ci
+          npm update
+          npm ci
 
       - name: setup-docker
         if: runner.os == 'macOS'
