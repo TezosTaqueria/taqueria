@@ -56,6 +56,8 @@ export default async (): Promise<i18n> => {
 						'yesOptionDesc': 'Select "yes" to any prompt',
 						'addContractDesc': 'Add a contract to the contract registry',
 						'addSourceFileDesc': 'Source file to add to the contract registry',
+						'removeContractDesc': 'Remove a contract from the contract registry',
+						'removeContractNameDesc': 'The name of the contract to remove',
 					},
 				},
 			},

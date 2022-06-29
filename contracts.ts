@@ -8,6 +8,7 @@ import * as SHA256 from '@taqueria/protocol/SHA256';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { attemptP, chain, map, reject, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
+import { omit } from 'rambda';
 import { getConfig } from './taqueria-config.ts';
 import { joinPaths, readTextFile, writeJsonFile } from './taqueria-utils/taqueria-utils.ts';
 
@@ -26,7 +27,7 @@ const newContract = (sourceFile: string, projectDir: SanitiziedAbsPath.t, contra
 		),
 	);
 
-export const addContract = (parsedArgs: SanitizedArgs.ManageContractsArgs, i18n: i18n.t) =>
+export const addContract = (parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18n.t) =>
 	pipe(
 		getConfig(parsedArgs.projectDir, i18n),
 		chain(LoadedConfig.toConfig),
@@ -52,4 +53,25 @@ export const addContract = (parsedArgs: SanitizedArgs.ManageContractsArgs, i18n:
 					chain(writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))),
 				)
 		),
+	);
+
+export const removeContract = (parsedArgs: SanitizedArgs.RemoveContractArgs, i18n: i18n.t) =>
+	pipe(
+		getConfig(parsedArgs.projectDir, i18n),
+		chain(LoadedConfig.toConfig),
+		chain(config => {
+			if (!isContractRegistered(parsedArgs.contractName, config)) {
+				return reject(TaqError.create({
+					kind: 'E_CONTRACT_NOT_REGISTERED',
+					context: parsedArgs,
+					msg: `${parsedArgs.contractName} is not a registered contract`,
+				}));
+			}
+
+			const updatedConfig = {
+				...config,
+				contracts: omit([parsedArgs.contractName], config.contracts),
+			};
+			return writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))(updatedConfig);
+		}),
 	);

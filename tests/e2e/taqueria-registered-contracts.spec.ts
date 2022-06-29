@@ -1,6 +1,6 @@
 import { exec as exec1 } from 'child_process';
 import { createHash } from 'crypto';
-import { copyFile, readFile, rm } from 'fs/promises';
+import { copyFile, readFile, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import util from 'util';
 import { generateTestProject, sleep } from './utils/utils';
@@ -96,5 +96,63 @@ describe('E2E for Registered Contracts', () => {
 				hash,
 			},
 		});
+	});
+
+	test('Ensure that a contract can be registered with a specific name', async () => {
+		await copyFile(
+			'e2e/data/hello-tacos.mligo',
+			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
+		);
+
+		const result = exec('taq add-contract -n tacos hello-tacos.mligo', { cwd: taqueriaProjectPath });
+		expect(result).resolves.toHaveProperty('stdout');
+		await result;
+
+		const bytes = await readFile(join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'));
+		const digest = createHash('sha256');
+		digest.update(bytes);
+		const hash = digest.digest('hex');
+
+		const config = await readFile(configFile, { encoding: 'utf-8' });
+		const json = JSON.parse(config);
+		expect(json).toBeInstanceOf(Object);
+		expect(json).toHaveProperty('contracts');
+		return expect(json.contracts['tacos']).toEqual({
+			sourceFile: 'hello-tacos.mligo',
+			hash,
+		});
+	});
+
+	test('Assure that a contract can be deregistered', async () => {
+		await copyFile(
+			'e2e/data/hello-tacos.mligo',
+			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
+		);
+
+		const bytes = await readFile(join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'));
+		const digest = createHash('sha256');
+		digest.update(bytes);
+		const hash = digest.digest('hex');
+
+		const config = await readFile(configFile, { encoding: 'utf-8' });
+		const json = JSON.parse(config);
+		expect(json).toBeInstanceOf(Object);
+		json.contracts = {
+			'hello-tacos.mligo': {
+				sourceFile: 'hello-tacos.mligo',
+				hash,
+			},
+		};
+		await writeFile(configFile, JSON.stringify(json), { encoding: 'utf-8' });
+
+		// Remove the contract by sourcefile
+		const result = exec('taq rm-contract hello-tacos.mligo', { cwd: taqueriaProjectPath });
+		expect(result).resolves.toHaveProperty('stdout');
+		await result;
+
+		const configAfter = await readFile(configFile, { encoding: 'utf-8' });
+		const jsonAfter = JSON.parse(configAfter);
+		expect(jsonAfter).toBeInstanceOf(Object);
+		expect(jsonAfter.contracts).toEqual({});
 	});
 });

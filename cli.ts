@@ -22,7 +22,7 @@ import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-type
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
 import * as Analytics from './analytics.ts';
-import { addContract } from './contracts.ts';
+import { addContract, removeContract } from './contracts.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -327,11 +327,29 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 				},
 				(inputArgs: Record<string, unknown>) =>
 					pipe(
-						SanitizedArgs.ofManageContractArgs(inputArgs),
+						SanitizedArgs.ofAddContractArgs(inputArgs),
 						chain(args => addContract(args, i18n)),
 						forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
 					),
 			)
+			.command(
+				'rm-contract <contractName>',
+				i18n.__('removeContractDesc'),
+				(yargs: Arguments) => {
+					yargs.positional('contractName', {
+						describe: i18n.__('removeContractNameDesc'),
+						type: 'string',
+						required: true,
+					});
+				},
+				(inputArgs: Record<string, unknown>) =>
+					pipe(
+						SanitizedArgs.ofRemoveContractsArgs(inputArgs),
+						chain(args => removeContract(args, i18n)),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+					),
+			)
+			.alias('remove-contract', 'rm-contract')
 			.demandCommand(),
 		extendCLI(env, parsedArgs, i18n),
 	);
@@ -796,6 +814,8 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 		'opt-in',
 		'opt-out',
 		'add-contract',
+		'rm-contract',
+		'remove-contract',
 	].reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,
@@ -914,6 +934,7 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
 				.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
 				.with({ kind: 'E_CONTRACT_REGISTERED' }, err => [17, err.msg])
+				.with({ kind: 'E_CONTRACT_NOT_REGISTERED' }, err => [18, err.msg])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 
