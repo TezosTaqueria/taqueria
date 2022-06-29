@@ -32,7 +32,8 @@ jobs:
           registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
 
-      - name: Install any dependencies
+      - name: Install dependencies for a pre-release 
+        if: ${{ github.event.release.prerelease }}
         run: |
           if jq -e '.version as $version | .dependencies."@taqueria/node-sdk"|ltrimstr("^") == $version' "$GIT_WORKSPACE/package.json"; then 
             npm install @taqueria/node-sdk@next --workspace "$GIT_WORKSPACE" --save;
@@ -40,8 +41,9 @@ jobs:
           if jq -e '.version as $version | .dependencies."@taqueria/protocol"|ltrimstr("^") == $version' "$GIT_WORKSPACE/package.json"; then 
             npm install @taqueria/protocol@next --workspace "$GIT_WORKSPACE" --save;
           fi
-          npm ci
-          npm list --workspace "$GIT_WORKSPACE"
+
+      - name: Install any dependencies
+        run: npm ci
 
       - name: Build package
         run: npm run build -w $GIT_WORKSPACE
