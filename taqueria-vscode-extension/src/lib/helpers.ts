@@ -70,7 +70,7 @@ export const inject = (deps: InjectedDependencies) => {
 		folders: readonly api.WorkspaceFolder[],
 	) => {
 		addCommand(context)(Commands.init, async () => {
-			const uri = await getFolderForScaffolding(context, output, i18n, folders);
+			const uri = await getFolderForInitOrScaffold(context, output, i18n, folders);
 			if (uri === undefined) {
 				return;
 			}
@@ -97,7 +97,7 @@ export const inject = (deps: InjectedDependencies) => {
 				.catch(err => logAllNestedErrors(err, output));
 
 		return exposeTask(Commands.scaffold, async (pathToTaq: Util.PathToTaq) => {
-			const projectUri = await getFolderForScaffolding(context, output, i18n, folders);
+			const projectUri = await getFolderForInitOrScaffold(context, output, i18n, folders);
 			if (projectUri === undefined) {
 				return;
 			}
@@ -139,7 +139,7 @@ export const inject = (deps: InjectedDependencies) => {
 			);
 	};
 
-	const getFolderForScaffolding = async (
+	const getFolderForInitOrScaffold = async (
 		context: api.ExtensionContext,
 		output: Output,
 		i18n: i18n,
@@ -165,7 +165,7 @@ export const inject = (deps: InjectedDependencies) => {
 		if (uris.length === 1) {
 			return uris[0];
 		} else {
-			console.log('Coming soon!');
+			showOutput(output, OutputLevels.warn)('Scaffolding with multiple open folders is not yet implemented.');
 			return undefined;
 		}
 	};
