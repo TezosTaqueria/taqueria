@@ -2,6 +2,7 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Url from '@taqueria/protocol/Url';
 import {
+	alt,
 	attemptP,
 	chain,
 	chainRej,
@@ -74,7 +75,7 @@ export const doesPathExist = (path: string) =>
 		.make(path)
 		.pipe(chain(abspath => attemptP(() => Deno.stat(abspath))))
 		.pipe(chain(() => SanitizedAbsPath.make(path)))
-		.pipe(mapRej(previous =>
+		.pipe(mapRej((previous: unknown) =>
 			TaqError.create({
 				kind: 'E_INVALID_PATH_DOES_NOT_EXIST',
 				msg: 'Path does not exist',
@@ -83,14 +84,43 @@ export const doesPathExist = (path: string) =>
 			})
 		));
 
+export const isPathEmptyDirectory = (path: string) =>
+	attemptP(async () => {
+		const dirInfo = Deno.readDir(path);
+		for await (const _item of dirInfo) {
+			throw TaqError.create({
+				kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE',
+				msg: 'The path is not an empty directory',
+			});
+		}
+	})
+		.pipe(chain(() => SanitizedAbsPath.make(path)))
+		.pipe(mapRej(() =>
+			TaqError.create({
+				kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE',
+				msg: 'The path is not an empty directory',
+			})
+		));
+
 export const doesPathNotExist = (path: string) =>
 	doesPathExist(path)
 		.pipe(swap)
 		.pipe(chain(() => SanitizedAbsPath.make(path)))
-		.pipe(mapRej(previous =>
+		.pipe(mapRej((previous: unknown) =>
 			TaqError.create({
 				kind: 'E_INVALID_PATH_ALREADY_EXISTS',
 				msg: 'Path already exists',
+				context: path,
+				previous,
+			})
+		));
+
+export const doesPathNotExistOrIsEmptyDir = (path: string) =>
+	alt(doesPathNotExist(path))(isPathEmptyDirectory(path))
+		.pipe(mapRej((previous: unknown) =>
+			TaqError.create({
+				kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR',
+				msg: 'Path exists and is not an empty dir',
 				context: path,
 				previous,
 			})
@@ -296,8 +326,8 @@ export const inject = (deps: UtilsDependencies) => {
 		logInput,
 		debug,
 		mkdir,
-		doesPathNotExist,
 		doesPathExist,
+		doesPathNotExistOrIsEmptyDir,
 		ensureDirExists,
 		rm,
 		gitClone,

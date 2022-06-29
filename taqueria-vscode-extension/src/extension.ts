@@ -39,6 +39,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	const { vscode } = deps;
 	const {
 		exposeInitTask,
+		exposeScaffoldTask,
 		exposeInstallTask,
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
@@ -63,6 +64,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 
 	// Add built-in tasks for Taqueria
 	await exposeInitTask(context, output, i18n, folders);
+	await exposeScaffoldTask(context, output, folders, i18n);
 	await exposeInstallTask(context, output, folders, i18n);
 	// await exposeTasksFromState (context, output, folders, i18n)
 
