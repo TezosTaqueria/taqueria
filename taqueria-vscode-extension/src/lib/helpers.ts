@@ -78,7 +78,8 @@ export const inject = (deps: InjectedDependencies) => {
 				.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, undefined)(`init ${uri.path}`))
 				.then(_ => vscode.window.showInformationMessage("Project taq'fied!", uri.path))
 				.then(_ => vscode.workspace.updateWorkspaceFolders(0, undefined, { uri }))
-				.then(console.log);
+				.then(console.log)
+				.catch(e => logAllNestedErrors(e, output));
 		});
 	};
 
