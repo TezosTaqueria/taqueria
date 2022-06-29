@@ -1,36 +1,36 @@
 {
-    "language": "en",
-    "plugins": [
-        {
-            "name": "@taqueria/plugin-flextesa",
-            "type": "npm"
-        }
-    ],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local",
-                "test"
-            ],
-            "storage": {}
-        }
-    },
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-            "rpcUrl": "http://localhost:20000"
-        }
-    },
-    "network": {},
-    "accounts": {
-        "ken": "1",
-        "alice": "1000000000",
-        "john": "2000000000"
-    }
+	"language": "en",
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-flextesa",
+			"type": "npm"
+		}
+	],
+	"contractsDir": "contracts",
+	"testsDir": "tests",
+	"artifactsDir": "artifacts",
+	"environment": {
+		"default": "development",
+		"development": {
+			"networks": [],
+			"sandboxes": [
+				"local",
+				"test"
+			],
+			"storage": {}
+		}
+	},
+	"sandbox": {
+		"local": {
+			"label": "Local Tezos Sandbox",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"rpcUrl": "http://localhost:20000"
+		}
+	},
+	"network": {},
+	"accounts": {
+		"ken": "1",
+		"alice": "1000000000",
+		"john": "2000000000"
+	}
 }
