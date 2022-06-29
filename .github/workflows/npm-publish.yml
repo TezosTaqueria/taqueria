@@ -35,10 +35,10 @@ jobs:
       - name: Install any dependencies
         run: |
           if jq -e '.version as $version | .dependencies."@taqueria/node-sdk"|ltrimstr("^") == $version' "$GIT_WORKSPACE/package.json"; then 
-            npm install @taqueria/node-sdk@latest -w "$GIT_WORKSPACE";
+            npm install @taqueria/node-sdk@next -w "$GIT_WORKSPACE" --save;
           fi
           if jq -e '.version as $version | .dependencies."@taqueria/protocol"|ltrimstr("^") == $version' "$GIT_WORKSPACE/package.json"; then 
-            npm install @taqueria/protocol@latest -w "$GIT_WORKSPACE";
+            npm install @taqueria/protocol@next -w "$GIT_WORKSPACE" --save;
           fi
           npm ci
 
