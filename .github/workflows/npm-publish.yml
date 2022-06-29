@@ -6,6 +6,7 @@ on:
       dir:
         type: string
         required: true
+      
     secrets:
       NPM_TOKEN:
         required: true
@@ -31,14 +32,14 @@ jobs:
           registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
 
-      - name: Check versions
-        if: ${{ env.GIT_WORKSPACE != 'taqueria-protocol' }}
-        run: |
-          jq -e '.version as $version | .dependencies."@taqueria/node-sdk"|ltrimstr("^") == $version' $GIT_WORKSPACE/package.json && npm install @taqueria/node-sdk@latest -w $GIT_WORKSPACE
-          jq -e '.version as $version | .dependencies."@taqueria/protocol"|ltrimstr("^") == $version' $GIT_WORKSPACE/package.json && npm install @taqueria/protocol@latest -w $GIT_WORKSPACE
-
       - name: Install any dependencies
         run: |
+          if jq -e '.version as $version | .dependencies."@taqueria/node-sdk"|ltrimstr("^") == $version' $GIT_WORKSPACE/package.json; then 
+            npm install @taqueria/node-sdk@latest -w $GIT_WORKSPACE;
+          fi
+          if jq -e '.version as $version | .dependencies."@taqueria/protocol"|ltrimstr("^") == $version' $GIT_WORKSPACE/package.json: then 
+            npm install @taqueria/protocol@latest -w $GIT_WORKSPACE;
+          fi
           npm ci
 
       - name: Build package
