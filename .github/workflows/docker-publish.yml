@@ -57,8 +57,10 @@ jobs:
             type=raw,value=${{ steps.vars.outputs.taq_version }}-${{ steps.vars.outputs.short_sha }}
 
       - name: Install npm dependencies
-        run: npm ci
-
+        run: |
+          npm update
+          npm ci
+          
       - name: Build package
         run: | 
           npm run build -w taqueria-sdk
