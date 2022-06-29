@@ -1,75 +1,75 @@
 {
-    "language": "en",
-    "plugins": [
-        {
-            "name": "@taqueria/plugin-taquito",
-            "type": "npm"
-        }
-    ],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {}
-        },
-        "test": {
-            "networks": ["ithacanet"],
-            "sandboxes": [],
-            "storage": {
-                "hello-tacos-one.tz": "100",
-                "hello-tacos-two.tz": "100"
-            }
-        }
-    },
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-            "rpcUrl": "http://localhost:20000"
-        }
-    },
-    "network": {
-        "ithacanet": {
-            "label": "ithacanet",
-            "rpcUrl": "https://ithacanet.ecadinfra.com",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-            "faucet": {
-                "pkh": "tz1RWs1bLmga24RybaC5Di441sK6aGLmCTpx",
-                "mnemonic": [
-                    "throw",
-                    "cactus",
-                    "romance",
-                    "lake",
-                    "step",
-                    "floor",
-                    "limit",
-                    "shallow",
-                    "leader",
-                    "pride",
-                    "thrive",
-                    "void",
-                    "carbon",
-                    "wreck",
-                    "retreat"
-                ],
-                "email": "tskwglte.mscstjny@teztnets.xyz",
-                "password": "fvzAbTJ7Uz",
-                "amount": "8780051082",
-                "activation_code": "07739888a2615d5176505c900f411dcf7990073d"
-            }
-        }
-    },
-    "accounts": {
-        "bob": "3000000000",
-        "alice": "2000000000",
-        "john": "4000000000",
-        "jane": "5000000000",
-        "joe": "1000000000"
-    } 
+	"language": "en",
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-taquito",
+			"type": "npm"
+		}
+	],
+	"contractsDir": "contracts",
+	"testsDir": "tests",
+	"artifactsDir": "artifacts",
+	"environment": {
+		"default": "development",
+		"development": {
+			"networks": [],
+			"sandboxes": [
+				"local"
+			],
+			"storage": {}
+		},
+		"test": {
+			"networks": ["ghostnet"],
+			"sandboxes": [],
+			"storage": {
+				"hello-tacos-one.tz": "100",
+				"hello-tacos-two.tz": "100"
+			}
+		}
+	},
+	"sandbox": {
+		"local": {
+			"label": "Local Tezos Sandbox",
+			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+			"rpcUrl": "http://localhost:20000"
+		}
+	},
+	"network": {
+		"ghostnet": {
+			"label": "ghostnet",
+			"rpcUrl": "https://rpc.ithacanet.teztnets.xyz",
+			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+			"faucet": {
+				"pkh": "tz1gFhXGGK4Ui6UwD92djr61XhwukFYgtwmF",
+				"mnemonic": [
+					"jeans",
+					"meadow",
+					"door",
+					"apology",
+					"unfair",
+					"device",
+					"water",
+					"eternal",
+					"slow",
+					"hockey",
+					"sadness",
+					"wagon",
+					"hold",
+					"aim",
+					"during"
+				],
+				"email": "ykvlizei.xfkvqfnw@teztnets.xyz",
+				"password": "sXsuHFWSit",
+				"amount": "319967537732",
+				"activation_code": "2489771b09855087e55ce506b9a3d7f119d94517"
+			}
+		}
+	},
+	"accounts": {
+		"bob": "3000000000",
+		"alice": "2000000000",
+		"john": "4000000000",
+		"jane": "5000000000",
+		"joe": "1000000000"
+	}
 }

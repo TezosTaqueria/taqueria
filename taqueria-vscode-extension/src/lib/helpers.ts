@@ -16,6 +16,37 @@ export enum Commands {
 	uninstall = 'taqueria.uninstall',
 }
 
+export enum OutputLevels {
+	output,
+	fatal,
+	error,
+	warn,
+	info,
+	debug,
+	trace,
+}
+
+const outputLevelsOrder = [
+	OutputLevels.trace,
+	OutputLevels.debug,
+	OutputLevels.info,
+	OutputLevels.warn,
+	OutputLevels.error,
+	OutputLevels.fatal,
+	OutputLevels.output,
+];
+
+const shouldOutput = (currentLogLevel: OutputLevels, configuredLogLevel: OutputLevels) => {
+	const currentLogIndex = outputLevelsOrder.indexOf(currentLogLevel);
+	const configuredLogIndex = outputLevelsOrder.indexOf(configuredLogLevel);
+	return currentLogIndex >= configuredLogIndex;
+};
+
+export type Output = {
+	outputChannel: api.OutputChannel;
+	logLevel: OutputLevels;
+};
+
 type VSCodeAPI = typeof api;
 
 export interface InjectedDependencies {
@@ -32,7 +63,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeInitTask = async (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		folders: readonly api.WorkspaceFolder[],
 	) => {
@@ -108,6 +139,13 @@ export const inject = (deps: InjectedDependencies) => {
 			placeHolder: 'Directory',
 		});
 
+	const getWellKnownPlugins = () => [
+		'@taqueria/plugin-ligo',
+		'@taqueria/plugin-smartpy',
+		'@taqueria/plugin-taquito',
+		'@taqueria/plugin-flextesa',
+	];
+
 	const getAvailablePlugins = async (context: api.ExtensionContext) => {
 		try {
 			const HOME_DIR = process.env.HOME;
@@ -120,17 +158,12 @@ export const inject = (deps: InjectedDependencies) => {
 		} catch {
 			// Ignore
 		}
-		return [
-			'@taqueria/plugin-ligo',
-			'@taqueria/plugin-smartpy',
-			'@taqueria/plugin-taquito',
-			'@taqueria/plugin-flextesa',
-		];
+		return getWellKnownPlugins();
 	};
 
 	const exposeInstallTask = async (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		folders: readonly api.WorkspaceFolder[],
 		i18n: i18n,
 	) => {
@@ -185,7 +218,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeTasksFromProject = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		folders: readonly api.WorkspaceFolder[],
 		i18n: i18n,
 	) =>
@@ -201,7 +234,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeTasksFromState = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		folders: readonly api.WorkspaceFolder[],
 		i18n: i18n,
 	) =>
@@ -243,12 +276,18 @@ export const inject = (deps: InjectedDependencies) => {
 		vscode.window.showInformationMessage(msg)
 			.then(_ => Promise.resolve()) as Promise<void>;
 
-	const showOutput = (output: api.OutputChannel) =>
-		(data: string) =>
+	const showOutput = (output: Output, currentOutputLevel: OutputLevels) =>
+		(data: string) => {
+			if (!shouldOutput(currentOutputLevel, output.logLevel)) {
+				return;
+			}
 			Promise.resolve()
-				.then(_ => output.clear())
-				.then(_ => output.append(data))
-				.then(_ => output.show());
+				// TODO: We might need to separate the output pane from logs pane.
+				// For now, this is just a quick update to improve debugging
+				// .then(_ => output.clear())
+				.then(_ => output.outputChannel.appendLine(data))
+				.then(_ => output.outputChannel.show());
+		};
 
 	const getSandboxNames = (projectDir: Util.TaqifiedDir) =>
 		projectDir.config.sandbox
@@ -257,7 +296,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeTaqTaskAsCommand = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		projectDir?: Util.PathToDir,
 	) =>
@@ -268,7 +307,7 @@ export const inject = (deps: InjectedDependencies) => {
 					Util.proxyToTaq(pathToTaq, i18n, projectDir)(taskWithArgs)
 						.then(stdout =>
 							outputTo === 'output'
-								? showOutput(output)(stdout)
+								? showOutput(output, OutputLevels.output)(stdout)
 								: notify(stdout)
 						)
 						.then(_ => {
@@ -277,7 +316,7 @@ export const inject = (deps: InjectedDependencies) => {
 			);
 	const exposeTaskAsCommand = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		projectDir?: Util.PathToDir,
 	) =>
@@ -292,7 +331,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	const exposeSandboxTaskAsCommand = (
 		context: api.ExtensionContext,
-		output: api.OutputChannel,
+		output: Output,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
 	) =>
@@ -316,7 +355,7 @@ export const inject = (deps: InjectedDependencies) => {
 								? Util.proxyToTaq(pathToTaq, i18n, projectDir)(`${taskName} ${sandboxName}`)
 									.then(stdout =>
 										outputTo === 'output'
-											? showOutput(output)(stdout)
+											? showOutput(output, OutputLevels.output)(stdout)
 											: notify(stdout)
 									)
 									.then(_ => {
@@ -327,6 +366,46 @@ export const inject = (deps: InjectedDependencies) => {
 						.catch(showError),
 			);
 		};
+
+	const updateCommandStates = async (
+		context: api.ExtensionContext,
+		output: Output,
+		i18n: i18n,
+		projectDir: Util.PathToDir,
+	) => {
+		try {
+			const config = await Util.TaqifiedDir.create(projectDir, i18n);
+			vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config.config);
+			const plugins = getWellKnownPlugins();
+			for (const plugin of plugins) {
+				const found = config.config.plugins?.find(item => item.name === plugin) !== undefined;
+				vscode.commands.executeCommand('setContext', plugin, found);
+			}
+		} catch (e: any) {
+			// After logging PR is merged, log this error
+		}
+	};
+
+	const createWatcherIfNotExists = (
+		context: api.ExtensionContext,
+		output: Output,
+		i18n: i18n,
+		projectDir: Util.PathToDir,
+		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
+	) => {
+		addConfigWatcherIfNotExists(projectDir, () => {
+			const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+			// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
+
+			updateCommandStates(context, output, i18n, projectDir);
+
+			// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
+			watcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+			watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+			watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+			return watcher;
+		});
+	};
 
 	return {
 		exposeInitTask,
@@ -346,5 +425,7 @@ export const inject = (deps: InjectedDependencies) => {
 		exposeTaqTaskAsCommand,
 		exposeTaskAsCommand,
 		exposeSandboxTaskAsCommand,
+		updateCommandStates,
+		createWatcherIfNotExists,
 	};
 };

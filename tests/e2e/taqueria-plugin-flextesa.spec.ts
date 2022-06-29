@@ -330,9 +330,9 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 	afterAll(async () => {
 		try {
 			await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		} catch {
 		}
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 	});
 });
 
@@ -404,10 +404,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		}
 	});
 
-	// TODO: Currently it cannot be done until the output will be places to stdout
-	// Issue to implement the test: https://github.com/ecadlabs/taqueria/issues/368
-	// Related developer issue: https://github.com/ecadlabs/taqueria/issues/367
-	test.skip('Verify that taqueria flextesa plugin will return "The local sandbox is not running." if user tries to retrieve list of accounts that is not running', async () => {
+	test('Verify that taqueria flextesa plugin will return "The local sandbox is not running." if user tries to retrieve list of accounts that is not running', async () => {
 		try {
 			// 1. Run list accounts command on sandbox that is not running and verify result
 			const stdoutSandboxIsNotRunning = await exec('taq list accounts local', { cwd: `./${taqueriaProjectPath}` });

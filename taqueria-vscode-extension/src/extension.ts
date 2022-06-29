@@ -1,9 +1,38 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import path from 'path';
 import * as api from 'vscode';
-import { inject, InjectedDependencies, sanitizeDeps } from './lib/helpers';
+import { inject, InjectedDependencies, OutputLevels, sanitizeDeps } from './lib/helpers';
 import { COMMAND_PREFIX } from './lib/helpers';
 import { makeDir } from './lib/pure';
+
+const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
+	const inMemoryState = {
+		configWatchers: new Map<string, api.FileSystemWatcher>(),
+	};
+
+	const clearConfigWatchers = () => {
+		for (const watcher of inMemoryState.configWatchers.values()) {
+			watcher.dispose();
+		}
+		inMemoryState.configWatchers.clear();
+	};
+
+	const getConfigWatchers = () => inMemoryState.configWatchers.values();
+
+	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher) => {
+		if (inMemoryState.configWatchers.has(folder)) {
+			return;
+		}
+		const watcher = factory();
+		inMemoryState.configWatchers.set(folder, watcher);
+	};
+
+	return {
+		clearConfigWatchers,
+		getConfigWatchers,
+		addConfigWatcherIfNotExists,
+	};
+})();
 
 export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
 	const deps = sanitizeDeps(input);
@@ -13,10 +42,21 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeInstallTask,
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
+		createWatcherIfNotExists,
+		showOutput,
 	} = inject(deps);
 
+	const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
+	const logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
+	const outputChannel = vscode.window.createOutputChannel('Taqueria');
+	const output = {
+		outputChannel,
+		logLevel,
+	};
+	showOutput(output, OutputLevels.info)('the activate function was called for the Taqueria VsCode Extension.');
+
 	const i18n: i18n = await loadI18n();
-	const output = vscode.window.createOutputChannel('Taqueria');
+
 	const folders = vscode.workspace.workspaceFolders
 		? vscode.workspace.workspaceFolders
 		: [];
@@ -53,6 +93,8 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 
 				// Originate task
 				exposeTaqTask(COMMAND_PREFIX + 'deploy', 'deploy', 'output', 'Deployment successful.');
+
+				createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
 			});
 	}
 
@@ -73,4 +115,6 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	// 	})
 }
 
-export function deactivate() {}
+export function deactivate() {
+	clearConfigWatchers();
+}

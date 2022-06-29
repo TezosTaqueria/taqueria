@@ -1,43 +1,43 @@
 {
-    "language": "en",
-    "plugins": [
-        {
-            "name": "@taqueria/plugin-flextesa",
-            "type": "npm"
-        }
-    ],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local",
-                "test"
-            ],
-            "storage": {}
-        }
-    },
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-            "rpcUrl": "http://localhost:20000"
-        },
-        "test": {
-            "label": "Test Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-            "rpcUrl": "http://localhost:20000"
-        }
-    },
-    "network": {},
-    "accounts": {
-        "bob": "3_000_000_000",
-        "alice": "3_000_000_000",
-        "john": "3_000_000_000",
-        "jane": "3_000_000_000",
-        "joe": "3_000_000_000"
-    }
+	"language": "en",
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-flextesa",
+			"type": "npm"
+		}
+	],
+	"contractsDir": "contracts",
+	"testsDir": "tests",
+	"artifactsDir": "artifacts",
+	"environment": {
+		"default": "development",
+		"development": {
+			"networks": [],
+			"sandboxes": [
+				"local",
+				"test"
+			],
+			"storage": {}
+		}
+	},
+	"sandbox": {
+		"local": {
+			"label": "Local Tezos Sandbox",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"rpcUrl": "http://localhost:20000"
+		},
+		"test": {
+			"label": "Test Tezos Sandbox",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"rpcUrl": "http://localhost:20000"
+		}
+	},
+	"network": {},
+	"accounts": {
+		"bob": "3_000_000_000",
+		"alice": "3_000_000_000",
+		"john": "3_000_000_000",
+		"jane": "3_000_000_000",
+		"joe": "3_000_000_000"
+	}
 }
