@@ -3,31 +3,45 @@ import { exec } from 'child_process';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { ExtensionContext, Uri } from 'vscode';
+import { ExtensionContext, Uri, workspace } from 'vscode';
 import * as taqueriaExtension from '../../extension';
 import * as MockedObject from './MockedObject';
 import { sleep } from './utils/utils';
 
+const taqRoot = path.resolve(__dirname, '../../../../../');
 const projectRoot = path.resolve(__dirname, '../../../../');
 const testProjectDestination = `${projectRoot}/out/vscode-taq-test-project`;
 const testProjectSource = `${projectRoot}/src/test/suite/data/vscode-taq-test-project`;
+
+const mockedMethods = {
+	'window.showInformationMessage': (msg: string) => Promise.resolve(console.log(msg)),
+	'taqueria.install': (msg: string) => Promise.resolve(console.log('Test2')),
+	// window.showQuickPick(availablePlugins, {
+	// 		canPickMany: false,
+	// 		ignoreFocusOut: false,
+	// 		placeHolder: 'Plugin name',
+	// 		title: 'Select a plugin',
+	// 	});
+};
 
 describe('Extension Test Suite', () => {
 	before(async () => {
 		const context: ExtensionContext = {
 			subscriptions: [],
 		} as any;
-		await taqueriaExtension.activate(context, {
-			vscode: MockedObject.make(vscode, {
-				'window.showInformationMessage': (msg: string) => Promise.resolve(console.log(msg)),
-			}),
-		});
-		await fse.copy(testProjectSource, testProjectDestination);
+		// await taqueriaExtension.activate(context, {vscode: vscodeMock});
+		// await fse.copy(testProjectSource, testProjectDestination);
 
 		vscode.window.showInformationMessage('Start all tests.');
 	});
 
-	it('Verify that Taqueria Initiate will init new taquifed  project ', async () => {
+	beforeEach(async () => {
+		mockedMethods['window.showInformationMessage']('Test1');
+		mockedMethods['window.showInformationMessage']('Test3');
+		const vscodeMock: typeof vscode = MockedObject.make(vscode, mockedMethods);
+	});
+
+	it.skip('Verify that Taqueria Initiate will init new taquifed  project ', async () => {
 		await vscode.commands.getCommands(true).then(allCommands => {
 			const taqCommands = allCommands.filter(command => command.toLowerCase().includes('taq'));
 			assert.notEqual(taqCommands, undefined);
@@ -78,17 +92,36 @@ describe('Extension Test Suite', () => {
 	});
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/645
-	it.skip('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
-		await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
+	it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+		// Create folder
+		await fse.mkdir(testProjectDestination);
 
-		// Install plugin
-		await vscode.commands.executeCommand('taqueria.install @taqueria/plugin-ligo');
+		// Replace with
+		vscode.workspace.onDidChangeWorkspaceFolders(async () => {
+			await vscode.commands.executeCommand('taqueria.init');
+		});
+		const success = vscode.workspace.updateWorkspaceFolders(0, workspace.workspaceFolders?.length ?? null, {
+			uri: vscode.Uri.file(testProjectDestination),
+		});
+		// await vscode.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
 
+		// Run taq init
+
+		// Install plugin currently disabled and it will require to
+		// Need to mock the function that display the quick-pick that we can return a pre-defined list
+		// And then compare with expected output -
+		// await vscode.commands.executeCommand(`taqueria.install @taqueria/plugin-ligo`);
+		// mockedMethods['window.showInformationMessage']("Hello")
+
+		// Execute ligo compile command
 		await vscode.commands.executeCommand('taqueria.compile_ligo');
 
+		// Run ls command
 		const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
 		// Need to find library to use contains or build it
 		assert.notEqual(checkArtifact, undefined);
+
+		// await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
 
 		// In last test or after all block
 		// vscode.commands.executeCommand("workbench.action.closeActiveEditor");
