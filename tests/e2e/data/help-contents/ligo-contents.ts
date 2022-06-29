@@ -18,7 +18,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoPluginSpecific = `taq compile [sourceFile]
 
@@ -34,7 +34,15 @@ Options:
   -e, --entrypoint  The entry point that will be compiled
   -s, --syntax      The syntax used in the contract
   -i, --infer       Enable type inference
-`
+`;
+
+export const ligoNoContracts = `
+┌────────────┬──────────┐
+│ Contract   │ Artifact │
+├────────────┼──────────┤
+│ None found │ N/A      │
+└────────────┴──────────┘
+`.trimStart();
 
 export const compileNonExistent = `
 ┌────────────┬──────────────┐
@@ -42,7 +50,7 @@ export const compileNonExistent = `
 ├────────────┼──────────────┤
 │ test.mligo │ Not compiled │
 └────────────┴──────────────┘
-`.trimStart()
+`.trimStart();
 
 export const compileInvalid = `
 ┌────────────────────────┬──────────────┐
@@ -50,4 +58,4 @@ export const compileInvalid = `
 ├────────────────────────┼──────────────┤
 │ invalid-contract.mligo │ Not compiled │
 └────────────────────────┴──────────────┘
-`.trimStart()
+`.trimStart();
