@@ -308,7 +308,9 @@ jobs:
           echo "$(pwd)" >> $GITHUB_PATH
 
       - name: install dependencies
-        run: npm ci
+        run: |
+        npm update
+        npm ci
 
       - name: setup-docker
         if: runner.os == 'macOS'
