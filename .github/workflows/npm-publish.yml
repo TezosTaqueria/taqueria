@@ -44,7 +44,9 @@ jobs:
           fi
 
       - name: Install any dependencies
-        run: npm ci
+        run: | 
+          npm update
+          npm ci
 
       - name: Build package
         run: npm run build -w $GIT_WORKSPACE
