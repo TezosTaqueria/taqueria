@@ -1,5 +1,5 @@
-import { exec as exec1, execSync } from 'child_process';
-import fs from 'fs';
+import { exec as exec1 } from 'child_process';
+import fsPromises from 'fs/promises';
 import path from 'path';
 import util from 'util';
 import * as contents from './data/help-contents/ligo-contents';
@@ -53,10 +53,10 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 	test('Verify that taqueria ligo plugin can compile one contract under contracts folder', async () => {
 		try {
 			// 1. Copy contract from data folder to taqueria project folder
-			execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
+			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 
 			// 2. Run taq compile ${contractName}
-			execSync(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 3. Verify that compiled michelson version has been generated
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
@@ -68,10 +68,10 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 	test('Verify that taqueria ligo plugin can compile one contract using compile [sourceFile] command', async () => {
 		try {
 			// 1. Copy contract from data folder to taqueria project folder
-			execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
+			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 
 			// 2. Run taq compile ${contractName}
-			execSync(`taq compile hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq compile hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 3. Verify that compiled michelson version has been generated
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
@@ -83,11 +83,11 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 	test('Verify that taqueria ligo plugin can compile multiple contracts under contracts folder', async () => {
 		try {
 			// 1. Copy two contracts from data folder to /contracts folder under taqueria project
-			execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos-one.mligo`);
-			execSync(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos-two.mligo`);
+			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos-one.mligo`);
+			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos-two.mligo`);
 
 			// 2. Run taq compile ${contractName}
-			execSync(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 3. Verify that compiled michelson version for both contracts has been generated
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-one.tz`);
@@ -114,7 +114,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 
 	test('Verify that taqueria ligo plugin emits error and yet displays table if contract is invalid', async () => {
 		try {
-			execSync(`cp e2e/data/invalid-contract.mligo ${taqueriaProjectPath}/contracts`);
+			await exec(`cp e2e/data/invalid-contract.mligo ${taqueriaProjectPath}/contracts`);
 
 			const { stdout, stderr } = await exec(`taq compile invalid-contract.mligo`, { cwd: `./${taqueriaProjectPath}` });
 
@@ -126,11 +126,11 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 	});
 
 	// Remove all files from artifacts folder without removing folder itself
-	afterEach(() => {
+	afterEach(async () => {
 		try {
-			const files = fs.readdirSync(`${taqueriaProjectPath}/artifacts/`);
+			const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
 			for (const file of files) {
-				fs.unlinkSync(path.join(`${taqueriaProjectPath}/artifacts/`, file));
+				await fsPromises.rm(path.join(`${taqueriaProjectPath}/artifacts/`, file));
 			}
 		} catch (error) {
 			throw new Error(`error: ${error}`);
@@ -139,9 +139,9 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
-	afterAll(() => {
+	afterAll(async () => {
 		try {
-			fs.rmSync(taqueriaProjectPath, { recursive: true });
+			fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
