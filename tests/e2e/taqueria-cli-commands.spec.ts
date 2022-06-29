@@ -46,7 +46,9 @@ describe('E2E Testing for taqueria CLI,', () => {
 	test('Verify that taq reports a version', () => {
 		const version = execSync('taq --version');
 		try {
-			expect(version.toString('utf8').trim()).toMatch(/^((v\d+\.\d+\.\d+)|(dev-[\w-]+)|(\d+)-[\w-]+)$/);
+			expect(version.toString('utf8').trim()).toMatch(
+				/^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/,
+			);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
