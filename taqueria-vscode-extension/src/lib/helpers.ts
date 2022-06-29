@@ -113,6 +113,7 @@ export const inject = (deps: InjectedDependencies) => {
 				return;
 			}
 			await proxyScaffold(scaffoldUrl, pathToTaq, i18n, projectUri.path as Util.PathToDir);
+			vscode.window.showInformationMessage('Scaffold completed!', projectUri.path);
 		});
 	};
 
