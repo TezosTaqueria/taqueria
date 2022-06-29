@@ -1,3 +1,4 @@
+import * as Config from '@taqueria/protocol/Config';
 import * as Contract from '@taqueria/protocol/Contract';
 import * as i18n from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
@@ -10,7 +11,7 @@ import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { getConfig } from './taqueria-config.ts';
 import { joinPaths, readTextFile, writeJsonFile } from './taqueria-utils/taqueria-utils.ts';
 
-const isContractRegistered = (contractName: string, config: LoadedConfig.t) =>
+const isContractRegistered = (contractName: string, config: LoadedConfig.t | Config.t) =>
 	config.contracts && config.contracts[contractName] ? true : false;
 
 const newContract = (sourceFile: string, projectDir: SanitiziedAbsPath.t, contractsDir: string) =>
@@ -28,6 +29,7 @@ const newContract = (sourceFile: string, projectDir: SanitiziedAbsPath.t, contra
 export const addContract = (parsedArgs: SanitizedArgs.ManageContractsArgs, i18n: i18n.t) =>
 	pipe(
 		getConfig(parsedArgs.projectDir, i18n),
+		chain(LoadedConfig.toConfig),
 		chain(config =>
 			isContractRegistered(parsedArgs.contractName, config)
 				? reject(TaqError.create({
@@ -40,14 +42,14 @@ export const addContract = (parsedArgs: SanitizedArgs.ManageContractsArgs, i18n:
 					map(contract => {
 						const contracts = config.contracts || {};
 						return {
-							...LoadedConfig.toConfig(config),
+							...config,
 							contracts: {
 								...contracts,
 								...Object.fromEntries([[parsedArgs.contractName, contract]]),
 							},
 						};
 					}),
-					chain(writeJsonFile(joinPaths(config.projectDir, '.taq', 'config.json'))),
+					chain(writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))),
 				)
 		),
 	);

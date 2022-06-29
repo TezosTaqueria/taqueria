@@ -7,6 +7,8 @@ import util from 'util';
 import { networkInfo } from '../data/network-info';
 const exec = util.promisify(exec1);
 
+export const sleep = (ms: number) => new Promise((resolve, reject) => setTimeout(resolve, ms));
+
 export const generateTestProject = async (
 	projectPath: string,
 	packageNames: string[] = [],
