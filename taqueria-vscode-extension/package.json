@@ -96,6 +96,13 @@
 				"enablement": "!@taqueria-state/is-taqified"
 			},
 			{
+				"command": "taqueria.scaffold",
+				"category": "Taqueria",
+				"title": "Scaffold Project",
+				"shortTitle": "scaffold",
+				"enablement": "!@taqueria-state/is-taqified"
+			},
+			{
 				"command": "taqueria.install",
 				"category": "Taqueria",
 				"title": "Install Plugin",

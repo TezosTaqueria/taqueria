@@ -1,5 +1,6 @@
 import { EphemeralState } from '@taqueria/protocol/EphemeralState';
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
+import { TaqError } from '@taqueria/protocol/TaqError';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import { join } from 'path';
@@ -12,6 +13,7 @@ export const COMMAND_PREFIX = 'taqueria.';
 
 export enum Commands {
 	init = 'taqueria.init',
+	scaffold = 'taqueria.scaffold',
 	install = 'taqueria.install',
 	uninstall = 'taqueria.uninstall',
 }
@@ -61,45 +63,59 @@ export const sanitizeDeps = (deps?: InjectedDependencies) =>
 export const inject = (deps: InjectedDependencies) => {
 	const { vscode } = deps;
 
-	const exposeInitTask = async (
+	const exposeInitTask = (
 		context: api.ExtensionContext,
 		output: Output,
 		i18n: i18n,
 		folders: readonly api.WorkspaceFolder[],
 	) => {
-		const exposeTask = exposeTaqTaskAsCommand(context, output, i18n);
+		addCommand(context)(Commands.init, async () => {
+			const uri = await getFolderForInitOrScaffold(context, output, i18n, folders);
+			if (uri === undefined) {
+				return;
+			}
+			getTaqBinPath(i18n)
+				.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, undefined)(`init ${uri.path}`))
+				.then(_ => vscode.window.showInformationMessage("Project taq'fied!", uri.path))
+				.then(_ => vscode.workspace.updateWorkspaceFolders(0, undefined, { uri }))
+				.then(console.log)
+				.catch(e => logAllNestedErrors(e, output));
+		});
+	};
 
-		// As the developer has no folder open, we must prompt
-		// them for a path they would like to taqify
-		if (folders.length === 0) {
-			addCommand(context)(Commands.init, () => {
-				return vscode.window.showOpenDialog({
-					canSelectFolders: true,
-					canSelectFiles: false,
-					openLabel: 'Select project folder',
-					title: "Select a project folder to taq'ify",
-					canSelectMany: false,
-				})
-					.then(uris =>
-						uris?.map(
-							uri =>
-								getTaqBinPath(i18n)
-									.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, undefined)(`init ${uri.path}`))
-									.then(_ => vscode.window.showInformationMessage("Project taq'fied!", uri.path))
-									.then(_ => vscode.workspace.updateWorkspaceFolders(0, undefined, { uri })),
-						)
-					)
-					.then(console.log) as Promise<void>;
-			});
-		} // The developer has one folder open. We can assume that
-		// is the folder they wish to taqify
-		else if (folders.length === 1) {
-			return exposeTask('taqueria.init', `init ${folders[0].uri.path}`, 'notify');
-		} // The developer has multiple folders in the their workspace.
-		// As can't really know which one to taqify without prompting them
-		else {
-			console.log('Coming soon!');
-		}
+	const exposeScaffoldTask = async (
+		context: api.ExtensionContext,
+		output: Output,
+		folders: readonly api.WorkspaceFolder[],
+		i18n: i18n,
+	) => {
+		const exposeTask = exposeTaskAsCommand(context, output, i18n);
+		const availableScaffolds: { name: string; url: string }[] = await getAvailableScaffolds(context);
+		const proxyScaffold = (scaffoldUrl: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
+			Util.proxyToTaq(pathToTaq, i18n, projectDir)(`scaffold ${scaffoldUrl} ${projectDir}`)
+				.then(notify)
+				.catch(err => logAllNestedErrors(err, output));
+
+		return exposeTask(Commands.scaffold, async (pathToTaq: Util.PathToTaq) => {
+			const projectUri = await getFolderForInitOrScaffold(context, output, i18n, folders);
+			if (projectUri === undefined) {
+				return;
+			}
+			const scaffold = await promptForScaffoldSelection(
+				i18n,
+				api.debug.activeDebugSession,
+				availableScaffolds.map(template => template.name),
+			);
+			if (scaffold === null) {
+				return;
+			}
+			const scaffoldUrl = availableScaffolds.find(template => template.name === scaffold)?.url;
+			if (scaffoldUrl === undefined) {
+				return;
+			}
+			await proxyScaffold(scaffoldUrl, pathToTaq, i18n, projectUri.path as Util.PathToDir);
+			vscode.window.showInformationMessage('Scaffold completed!', projectUri.path);
+		});
 	};
 
 	const getTaqifiedDirectories = (folders: readonly api.WorkspaceFolder[], i18n: i18n) => {
@@ -123,7 +139,46 @@ export const inject = (deps: InjectedDependencies) => {
 			);
 	};
 
+	const getFolderForInitOrScaffold = async (
+		context: api.ExtensionContext,
+		output: Output,
+		i18n: i18n,
+		folders: readonly api.WorkspaceFolder[],
+	) => {
+		let uris: api.Uri[] | undefined = folders.map(folder => folder.uri);
+		if (uris.length === 0) {
+			uris = await vscode.window.showOpenDialog({
+				canSelectFolders: true,
+				canSelectFiles: false,
+				openLabel: 'Select project folder',
+				title: 'Select a project folder to scaffold into',
+				canSelectMany: false,
+			});
+			if (uris === undefined) {
+				return undefined;
+			}
+		}
+
+		if (uris.length === 0) {
+			return undefined;
+		}
+		if (uris.length === 1) {
+			return uris[0];
+		} else {
+			showOutput(output, OutputLevels.warn)('Scaffolding with multiple open folders is not yet implemented.');
+			return undefined;
+		}
+	};
+
 	const promptForPluginSelection = (_i18n: i18n, _debug: api.DebugSession | undefined, availablePlugins: string[]) =>
+		vscode.window.showQuickPick(availablePlugins, {
+			canPickMany: false,
+			ignoreFocusOut: false,
+			placeHolder: 'Plugin name',
+			title: 'Select a plugin',
+		});
+
+	const promptForScaffoldSelection = (_i18n: i18n, _debug: api.DebugSession | undefined, availablePlugins: string[]) =>
 		vscode.window.showQuickPick(availablePlugins, {
 			canPickMany: false,
 			ignoreFocusOut: false,
@@ -159,6 +214,27 @@ export const inject = (deps: InjectedDependencies) => {
 			// Ignore
 		}
 		return getWellKnownPlugins();
+	};
+
+	const getAvailableScaffolds = async (context: api.ExtensionContext) => {
+		return [
+			{
+				name: 'Quick Start',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart',
+			},
+			{
+				name: 'Demo',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-demo',
+			},
+			{
+				name: 'Taco Shop',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-taco-shop',
+			},
+			{
+				name: 'Hello Tacos Tutorial',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-hello-tacos-tutorial',
+			},
+		];
 	};
 
 	const exposeInstallTask = async (
@@ -272,6 +348,35 @@ export const inject = (deps: InjectedDependencies) => {
 			.then(_ => Promise.resolve()) as Promise<void>;
 	};
 
+	const logAllNestedErrors = (err: TaqVsxError | TaqError | Error | any, output: Output) => {
+		if (!err) {
+			return;
+		}
+		const message = getErrorMessage(err);
+		output.outputChannel.appendLine(message);
+		output.outputChannel.show();
+		if ('previous' in err) {
+			logAllNestedErrors(err.previous, output);
+		}
+		if ('cause' in err) {
+			logAllNestedErrors(err.cause, output);
+		}
+	};
+
+	const getErrorMessage = (err: any) => {
+		let text = '';
+		if ('kind' in err) {
+			text += err.kind + ': ';
+		}
+		if ('msg' in err) {
+			text += err.msg;
+		}
+		if ('message' in err) {
+			text += err.message;
+		}
+		return text;
+	};
+
 	const notify = (msg: string) =>
 		vscode.window.showInformationMessage(msg)
 			.then(_ => Promise.resolve()) as Promise<void>;
@@ -314,6 +419,7 @@ export const inject = (deps: InjectedDependencies) => {
 							if (otherNotification) notify(otherNotification);
 						}),
 			);
+
 	const exposeTaskAsCommand = (
 		context: api.ExtensionContext,
 		output: Output,
@@ -409,6 +515,7 @@ export const inject = (deps: InjectedDependencies) => {
 
 	return {
 		exposeInitTask,
+		exposeScaffoldTask,
 		getTaqifiedDirectories,
 		promptForPluginSelection,
 		promptForTaqProject,
