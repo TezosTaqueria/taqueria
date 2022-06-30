@@ -59,6 +59,7 @@ export default async (): Promise<i18n> => {
 						'removeContractDesc': 'Remove a contract from the contract registry',
 						'removeContractNameDesc': 'The name of the contract to remove',
 						'noContractsRegistered': 'No registered contracts found',
+						'listContractsDesc': 'List registered contracts',
 					},
 				},
 			},

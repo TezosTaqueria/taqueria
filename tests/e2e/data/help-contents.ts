@@ -43,13 +43,17 @@ Taqueria is currently in BETA. You've been warned. :)
 export const helpContentsLigoPlugin: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile [sourceFile]    Compile a smart contract written in a Ligo syntax
-                              to Michelson code       [aliases: c, compile-ligo]
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq compile [sourceFile]        Compile a smart contract written in a Ligo syn
+                                  tax to Michelson code
+                                                      [aliases: c, compile-ligo]
 
 Options:
       --version     Show version number                                [boolean]
@@ -81,13 +85,17 @@ Options:
 export const helpContentsSmartpyPlugin: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile [sourceFile]    Compile a smart contract written in a SmartPy synt
-                              ax to Michelson code [aliases: c, compile-smartpy]
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq compile [sourceFile]        Compile a smart contract written in a SmartPy
+                                  syntax to Michelson code
+                                                   [aliases: c, compile-smartpy]
 
 Options:
       --version     Show version number                                [boolean]
@@ -206,13 +214,16 @@ Options:
 export const helpContentsArchetypePlugin: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile [sourceFile]    Compile a smart contract written in a Archetype sy
-                              ntax to Michelson code
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq compile [sourceFile]        Compile a smart contract written in a Archetyp
+                                  e syntax to Michelson code
                                                  [aliases: c, compile-archetype]
 
 Options:
@@ -242,13 +253,16 @@ Options:
 export const helpContentsTaquitoPlugin: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq deploy [contract]       Deploy a smart contract to a particular environmen
-                              t                             [aliases: originate]
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq deploy [contract]           Deploy a smart contract to a particular enviro
+                                  nment                     [aliases: originate]
 
 Options:
       --version     Show version number                                [boolean]
@@ -282,6 +296,9 @@ Commands:
   taq opt-out                      Opt-out of sharing anonymous usage analytics
   taq install <pluginName>         Install a plugin
   taq uninstall <pluginName>       Uninstall a plugin
+  taq add-contract <sourceFile>    Add a contract to the contract registry
+  taq rm-contract <contractName>   Remove a contract from the contract registry
+  taq list-contracts               List registered contracts
   taq start sandbox [sandboxName]  Starts a flextesa sandbox    [aliases: start]
   taq stop sandbox [sandboxName]   Stops a flextesa sandbox      [aliases: stop]
   taq list accounts <sandboxName>  List the balances of all sandbox accounts
@@ -338,6 +355,10 @@ Commands:
                                       cs
   taq install <pluginName>            Install a plugin
   taq uninstall <pluginName>          Uninstall a plugin
+  taq add-contract <sourceFile>       Add a contract to the contract registry
+  taq rm-contract <contractName>      Remove a contract from the contract regist
+                                      ry
+  taq list-contracts                  List registered contracts
   taq generate types [typescriptDir]  Generate types for a contract to be used w
                                       ith taquito       [aliases: gen, gentypes]
 
