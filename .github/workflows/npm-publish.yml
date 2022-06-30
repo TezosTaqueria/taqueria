@@ -43,7 +43,7 @@ jobs:
             npm install @taqueria/protocol@next --workspace "$GIT_WORKSPACE" --save;
           fi
           npm update
-          
+
       - name: Install any dependencies
         run: npm i
 
@@ -53,14 +53,14 @@ jobs:
       - name: Publish for PR
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}" --workspace $GIT_WORKSPACE
+          cat "$GIT_WORKSPACE/package.json" | jq '.version |= "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"' > "$GIT_WORKSPACE/package.json"
           cd $GIT_WORKSPACE
           npm publish --tag "preview" --access public
       
       - name: Publish for prerelease
         if:  ${{ github.event.release.prerelease && github.event.action == 'published' }}
         run: |
-          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}" --workspace $GIT_WORKSPACE
+          cat "$GIT_WORKSPACE/package.json" | jq '.version |= "${GITHUB_REF/refs\/tags\/v}"' > "$GIT_WORKSPACE/package.json"
           cd $GIT_WORKSPACE
           npm publish --tag 'next' --access public
       
