@@ -57,7 +57,9 @@ jobs:
           npm update
 
       - name: Install any dependencies
-        run: npm ci --workspace "$GIT_WORKSPACE"
+        run: |
+          npm i --workspace "$GIT_WORKSPACE"
+          npm update
 
       - name: Build package
         run: npm run build --workspace $GIT_WORKSPACE
