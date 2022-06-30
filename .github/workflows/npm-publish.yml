@@ -53,15 +53,15 @@ jobs:
       - name: Publish for PR
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}" --workspace $GIT_WORKSPACE
-          cd $GIT_WORKSPACE
+          cd $GIT_WORKSPACE        
+          npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"
           npm publish --tag "preview" --access public
       
       - name: Publish for prerelease
         if:  ${{ github.event.release.prerelease && github.event.action == 'published' }}
         run: |
-          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}" --workspace $GIT_WORKSPACE
           cd $GIT_WORKSPACE
+          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
           npm publish --tag 'next' --access public
       
       - name: Publish for official release
