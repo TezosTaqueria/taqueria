@@ -57,7 +57,7 @@ jobs:
           npm update
 
       - name: Install any dependencies
-        run: npm i
+        run: npm ci --workspace "$GIT_WORKSPACE"
 
       - name: Build package
         run: npm run build -w $GIT_WORKSPACE
@@ -65,20 +65,14 @@ jobs:
       - name: Publish for PR
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          cat "./$GIT_WORKSPACE/package.json"
-          export VERSION="0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"
-          echo $VERSION
-          node -e "console.log({...require('./taqueria-protocol/package.json'), version: '$VERSION' })" > "$GIT_WORKSPACE/package.json"
+          npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}" --workspace $GIT_WORKSPACE
           cd $GIT_WORKSPACE
-          npm publish --tag "preview" --access public
+          npm publish --workspace $GIT_WORKSPACE --tag "preview" --access public
       
       - name: Publish for prerelease
         if:  ${{ github.event.release.prerelease && github.event.action == 'published' }}
         run: |
-          cat "./$GIT_WORKSPACE/package.json"
-          export VERSION="${GITHUB_REF/refs\/tags\/v}"
-          echo $VERSION
-          node -e "console.log({...require('./$GIT_WORKSPACE/package.json'), version: '$VERSION' })" > "$GIT_WORKSPACE/package.json"
+          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}" --workspace $GIT_WORKSPACE
           cd $GIT_WORKSPACE
           npm publish --tag 'next' --access public
       
