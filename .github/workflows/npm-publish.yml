@@ -42,7 +42,8 @@ jobs:
           if jq --exit-status '.version as $version | .dependencies."@taqueria/protocol"|ltrimstr("^") == $version' "$GIT_WORKSPACE/package.json"; then 
             npm install @taqueria/protocol@next --workspace "$GIT_WORKSPACE" --save;
           fi
-
+          npm update
+          
       - name: Install any dependencies
         run: npm i
 
