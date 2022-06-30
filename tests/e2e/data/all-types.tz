@@ -1,5 +1,5 @@
 parameter unit;
-storage (pair address (pair (big_map string int) (pair bls12_381_fr (pair bls12_381_g1 (pair bls12_381_g2 (pair bool (pair bytes (pair chain_id (pair int (pair key (pair key_hash (pair (list int) (pair (map string int) (pair mutez (pair nat (pair (option int) (pair (or (string %stringTest) (int %intTest)) (pair (sapling_state 2) (pair (set int) (pair signature (pair string (pair timestamp (pair unit (pair chest_key chest))))))))))))))))))))))));
+storage (pair address (pair (big_map string int) (pair bls12_381_fr (pair bls12_381_g1 (pair bls12_381_g2 (pair bool (pair bytes (pair chain_id (pair int (pair key (pair key_hash (pair (list int) (pair (map string int) (pair mutez (pair nat (pair (option int) (pair (or (string %stringTest) (int %intTest)) (pair (sapling_state 2) (pair (set int) (pair signature (pair string (pair timestamp (pair unit (pair chest_key (pair chest (lambda unit (list operation)))))))))))))))))))))))))));
 code { CDR ;
        NIL operation ;
        PAIR };
