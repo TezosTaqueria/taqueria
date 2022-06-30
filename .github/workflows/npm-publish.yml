@@ -33,6 +33,18 @@ jobs:
           scope: "${{ env.SCOPE }}"
 
       # If the package has a dependency on @taqueria/node-sdk or @taqueria/protocol and the dependency version matches the package version then install the "next" version tag
+      - name: Install dependencies for a PR 
+        if: ${{ github.event.release.prerelease }}
+        run: |
+          if jq --exit-status '.version as $version | .dependencies."@taqueria/node-sdk"|ltrimstr("^") == $version' "$GIT_WORKSPACE/package.json"; then 
+            npm install @taqueria/node-sdk@next --workspace "$GIT_WORKSPACE" --save;
+          fi
+          if jq --exit-status '.version as $version | .dependencies."@taqueria/protocol"|ltrimstr("^") == $version' "$GIT_WORKSPACE/package.json"; then 
+            npm install @taqueria/protocol@next --workspace "$GIT_WORKSPACE" --save;
+          fi
+          npm update
+
+      # If the package has a dependency on @taqueria/node-sdk or @taqueria/protocol and the dependency version matches the package version then install the "next" version tag
       - name: Install dependencies for a pre-release 
         if: ${{ github.event.release.prerelease }}
         run: |
@@ -53,14 +65,20 @@ jobs:
       - name: Publish for PR
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          node -e "console.log({...require('./$GIT_WORKSPACE/package.json'), version: '0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}' })" > "$GIT_WORKSPACE/package.json"
+          cat "./$GIT_WORKSPACE/package.json"
+          export VERSION="0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"
+          echo $VERSION
+          node -e "console.log({...require('./$GIT_WORKSPACE/package.json'), version: '$VERSION' })" > "$GIT_WORKSPACE/package.json"
           cd $GIT_WORKSPACE
           npm publish --tag "preview" --access public
       
       - name: Publish for prerelease
         if:  ${{ github.event.release.prerelease && github.event.action == 'published' }}
         run: |
-          node -e "console.log({...require('./$GIT_WORKSPACE/package.json'), version: '${GITHUB_REF/refs\/tags\/v}' })" > "$GIT_WORKSPACE/package.json"
+          cat "./$GIT_WORKSPACE/package.json"
+          export VERSION="${GITHUB_REF/refs\/tags\/v}"
+          echo $VERSION
+          node -e "console.log({...require('./$GIT_WORKSPACE/package.json'), version: '$VERSION' })" > "$GIT_WORKSPACE/package.json"
           cd $GIT_WORKSPACE
           npm publish --tag 'next' --access public
       
