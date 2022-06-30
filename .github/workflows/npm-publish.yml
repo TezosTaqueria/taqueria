@@ -29,6 +29,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with: 
+          node-version: 16.13.2
           registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
 
@@ -60,24 +61,24 @@ jobs:
         run: npm ci --workspace "$GIT_WORKSPACE"
 
       - name: Build package
-        run: npm run build -w $GIT_WORKSPACE
+        run: npm run build --workspace $GIT_WORKSPACE
       
       - name: Publish for PR
         if: ${{ github.event_name == 'pull_request' }}
         run: |
-          npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}" --workspace $GIT_WORKSPACE
           cd $GIT_WORKSPACE
-          npm publish --workspace $GIT_WORKSPACE --tag "preview" --access public
+          npm --no-git-tag-version version "0.0.0-pr-${{ github.event.number }}-${GITHUB_SHA::8}"
+          npm publish --tag 'preview' --access public
       
       - name: Publish for prerelease
         if:  ${{ github.event.release.prerelease && github.event.action == 'published' }}
         run: |
-          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}" --workspace $GIT_WORKSPACE
           cd $GIT_WORKSPACE
+          npm --no-git-tag-version version "${GITHUB_REF/refs\/tags\/v}"
           npm publish --tag 'next' --access public
       
       - name: Publish for official release
         if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
         run: |
           cd $GIT_WORKSPACE
-          npm publish --workspace=$GIT_WORKSPACE --tag 'latest' --access public
+          npm publish --tag 'latest' --access public
