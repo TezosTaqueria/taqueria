@@ -83,4 +83,5 @@ jobs:
       - name: Publish for official release
         if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
         run: |
+          cd "$GIT_WORKSPACE"
           npm publish --tag 'latest' --access public
