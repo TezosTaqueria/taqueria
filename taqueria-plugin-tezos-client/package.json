@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-tezos-client",
-	"version": "0.6.3",
+	"version": "0.6.4",
 	"description": "A taqueria plugin for utilizing tezos-client",
 	"targets": {
 		"default": {
