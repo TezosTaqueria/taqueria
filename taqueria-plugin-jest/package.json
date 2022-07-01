@@ -33,7 +33,7 @@
 		"directory": "taqueria-plugin-jest"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.6.3",
+		"@taqueria/node-sdk": "^0.6.2",
 		"async-retry": "^1.3.3",
 		"execa": "^6.1.0",
 		"fast-glob": "^3.2.7",

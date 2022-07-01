@@ -41,7 +41,7 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.6.3",
+		"@taqueria/node-sdk": "^0.6.2",
 		"fast-glob": "^3.2.11"
 	},
 	"devDependencies": {
