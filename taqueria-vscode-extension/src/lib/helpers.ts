@@ -75,7 +75,14 @@ export const inject = (deps: InjectedDependencies) => {
 				return;
 			}
 			getTaqBinPath(i18n)
-				.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, undefined)(`init ${uri.path}`))
+				.then(pathToTaq =>
+					Util.proxyToTaq(pathToTaq, i18n, undefined)(`init ${uri.path}`)
+						.then(() =>
+							Util.proxyToTaq(pathToTaq, i18n, uri.path as Util.PathToDir)(``)
+								.catch(() => Promise.resolve())
+						)
+						.then(() => updateCommandStates(context, output, i18n, uri.path as Util.PathToDir))
+				)
 				.then(_ => vscode.window.showInformationMessage("Project taq'fied!", uri.path))
 				.then(_ => vscode.workspace.updateWorkspaceFolders(0, undefined, { uri }))
 				.then(console.log)
@@ -348,35 +355,6 @@ export const inject = (deps: InjectedDependencies) => {
 			.then(_ => Promise.resolve()) as Promise<void>;
 	};
 
-	const logAllNestedErrors = (err: TaqVsxError | TaqError | Error | any, output: Output) => {
-		if (!err) {
-			return;
-		}
-		const message = getErrorMessage(err);
-		output.outputChannel.appendLine(message);
-		output.outputChannel.show();
-		if ('previous' in err) {
-			logAllNestedErrors(err.previous, output);
-		}
-		if ('cause' in err) {
-			logAllNestedErrors(err.cause, output);
-		}
-	};
-
-	const getErrorMessage = (err: any) => {
-		let text = '';
-		if ('kind' in err) {
-			text += err.kind + ': ';
-		}
-		if ('msg' in err) {
-			text += err.msg;
-		}
-		if ('message' in err) {
-			text += err.message;
-		}
-		return text;
-	};
-
 	const notify = (msg: string) =>
 		vscode.window.showInformationMessage(msg)
 			.then(_ => Promise.resolve()) as Promise<void>;
@@ -389,8 +367,8 @@ export const inject = (deps: InjectedDependencies) => {
 			if (!shouldOutput(OutputLevels.error, output.logLevel)) {
 				return;
 			}
-			const message = getErrorMessage(err);
-			output.outputChannel.appendLine(message);
+			output.outputChannel.appendLine(JSON.stringify(err, undefined, 4));
+			output.outputChannel.show();
 			if ('previous' in err) {
 				logAllNestedErrors(err.previous, output);
 			}
@@ -404,20 +382,6 @@ export const inject = (deps: InjectedDependencies) => {
 				// at this point, we cannot do anything
 			}
 		}
-	};
-
-	const getErrorMessage = (err: any) => {
-		let text = '';
-		if ('kind' in err) {
-			text += err.kind + ': ';
-		}
-		if ('msg' in err) {
-			text += err.msg;
-		}
-		if ('message' in err) {
-			text += err.message;
-		}
-		return text;
 	};
 
 	const showOutput = (output: Output, currentOutputLevel: OutputLevels) =>
@@ -541,7 +505,7 @@ export const inject = (deps: InjectedDependencies) => {
 		output: Output,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
-		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher | null) => void,
+		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
 	) => {
 		showOutput(output, OutputLevels.debug)(`Directory ${projectDir} should be watched.`);
 		addConfigWatcherIfNotExists(projectDir, () => {
@@ -552,6 +516,7 @@ export const inject = (deps: InjectedDependencies) => {
 				logAllNestedErrors(error, output);
 			}
 			try {
+				// TODO: this does not trigger when .taq	folder is deleted.
 				const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
 				// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
 
@@ -560,11 +525,14 @@ export const inject = (deps: InjectedDependencies) => {
 				watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
 				watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
 				return watcher;
-			} catch (error: any) {
-				showOutput(output, OutputLevels.error)(`Error: Could not create a watcher for ${projectDir}:`);
-				logAllNestedErrors(error, output);
+			} catch (error: unknown) {
+				throw {
+					kind: 'E_UnknownError',
+					msg: `Unexpected error occurred while trying to watch ${join(projectDir, '.taq/config.json')}`,
+					context: projectDir,
+					previous: error,
+				} as TaqVsxError;
 			}
-			return null;
 		});
 	};
 
@@ -589,5 +557,6 @@ export const inject = (deps: InjectedDependencies) => {
 		exposeSandboxTaskAsCommand,
 		updateCommandStates,
 		createWatcherIfNotExists,
+		logAllNestedErrors,
 	};
 };

@@ -19,14 +19,11 @@ const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = 
 
 	const getConfigWatchers = () => inMemoryState.configWatchers.values();
 
-	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher | null) => {
+	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher) => {
 		if (inMemoryState.configWatchers.has(folder)) {
 			return;
 		}
 		const watcher = factory();
-		if (watcher == null) {
-			return;
-		}
 		inMemoryState.configWatchers.set(folder, watcher);
 	};
 
@@ -48,6 +45,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeSandboxTaskAsCommand,
 		createWatcherIfNotExists,
 		showOutput,
+		logAllNestedErrors,
 	} = inject(deps);
 
 	const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
@@ -99,7 +97,11 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 				// Originate task
 				exposeTaqTask(COMMAND_PREFIX + 'deploy', 'deploy', 'output', 'Deployment successful.');
 
-				createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
+				try {
+					createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
+				} catch (error: unknown) {
+					logAllNestedErrors(error, output);
+				}
 			});
 	}
 
