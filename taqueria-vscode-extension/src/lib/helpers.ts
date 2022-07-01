@@ -28,6 +28,8 @@ export enum OutputLevels {
 	trace,
 }
 
+export type OutputFunction = (currentLogLevel: OutputLevels, log: string) => void;
+
 const outputLevelsOrder = [
 	OutputLevels.trace,
 	OutputLevels.debug,
@@ -74,8 +76,15 @@ export const inject = (deps: InjectedDependencies) => {
 			if (uri === undefined) {
 				return;
 			}
-			getTaqBinPath(i18n)
-				.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, undefined)(`init ${uri.path}`))
+			getTaqBinPath(i18n, output)
+				.then(pathToTaq =>
+					Util.proxyToTaq(pathToTaq, i18n, showOutput(output), undefined)(`init ${uri.path}`)
+						.then(() =>
+							Util.proxyToTaq(pathToTaq, i18n, showOutput(output), uri.path as Util.PathToDir)(``)
+								.catch(() => Promise.resolve())
+						)
+						.then(() => updateCommandStates(context, output, i18n, uri.path as Util.PathToDir))
+				)
 				.then(_ => vscode.window.showInformationMessage("Project taq'fied!", uri.path))
 				.then(_ => vscode.workspace.updateWorkspaceFolders(0, undefined, { uri }))
 				.then(console.log)
@@ -91,9 +100,12 @@ export const inject = (deps: InjectedDependencies) => {
 	) => {
 		const exposeTask = exposeTaskAsCommand(context, output, i18n);
 		const availableScaffolds: { name: string; url: string }[] = await getAvailableScaffolds(context);
-		const proxyScaffold = (scaffoldUrl: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
-			Util.proxyToTaq(pathToTaq, i18n, projectDir)(`scaffold ${scaffoldUrl} ${projectDir}`)
-				.then(notify)
+		const proxyScaffold = (scaffoldUrl: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir: Util.PathToDir) =>
+			Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(`scaffold ${scaffoldUrl} ${projectDir}`)
+				.then(() =>
+					Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(``)
+						.catch(() => Promise.resolve())
+				).then(() => updateCommandStates(context, output, i18n, projectDir))
 				.catch(err => logAllNestedErrors(err, output));
 
 		return exposeTask(Commands.scaffold, async (pathToTaq: Util.PathToTaq) => {
@@ -165,7 +177,7 @@ export const inject = (deps: InjectedDependencies) => {
 		if (uris.length === 1) {
 			return uris[0];
 		} else {
-			showOutput(output, OutputLevels.warn)('Scaffolding with multiple open folders is not yet implemented.');
+			showOutput(output)(OutputLevels.warn, 'Scaffolding with multiple open folders is not yet implemented.');
 			return undefined;
 		}
 	};
@@ -199,6 +211,10 @@ export const inject = (deps: InjectedDependencies) => {
 		'@taqueria/plugin-smartpy',
 		'@taqueria/plugin-taquito',
 		'@taqueria/plugin-flextesa',
+		'@taqueria/plugin-archetype',
+		'@taqueria/plugin-contract-types',
+		'@taqueria/plugin-tezos-client',
+		'@taqueria/plugin-jest',
 	];
 
 	const getAvailablePlugins = async (context: api.ExtensionContext) => {
@@ -246,7 +262,7 @@ export const inject = (deps: InjectedDependencies) => {
 		const exposeTask = exposeTaskAsCommand(context, output, i18n);
 		const availablePlugins = await getAvailablePlugins(context);
 		const proxyInstall = (pluginName: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
-			Util.proxyToTaq(pathToTaq, i18n, projectDir)(`install ${pluginName}`)
+			Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(`install ${pluginName}`)
 				.then(notify)
 				.catch(showError);
 
@@ -299,8 +315,8 @@ export const inject = (deps: InjectedDependencies) => {
 		i18n: i18n,
 	) =>
 		(projectDir: Util.PathToDir) => {
-			getTaqBinPath(i18n)
-				.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, projectDir)('list-known-tasks'))
+			getTaqBinPath(i18n, output)
+				.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)('list-known-tasks'))
 				.then(data => Util.decodeJson<EphemeralState>(data))
 				.then(state => {
 					// const cmdId = taskNameToCmdId(taskName)
@@ -325,12 +341,12 @@ export const inject = (deps: InjectedDependencies) => {
 				)
 			);
 
-	const getTaqBinPath = (i18n: i18n) => {
+	const getTaqBinPath = (i18n: i18n, output: Output) => {
 		const providedPath = vscode.workspace.getConfiguration('taqueria').get('path', '');
 		return providedPath && (providedPath as string).length > 0
-			? Util.makePathToTaq(i18n)(providedPath)
-			: Util.findTaqBinary(i18n)
-				.then(Util.makePathToTaq(i18n));
+			? Util.makePathToTaq(i18n, showOutput(output))(providedPath)
+			: Util.findTaqBinary(i18n, showOutput(output))
+				.then(Util.makePathToTaq(i18n, showOutput(output)));
 	};
 
 	const addCommand = (context: api.ExtensionContext) =>
@@ -348,41 +364,31 @@ export const inject = (deps: InjectedDependencies) => {
 			.then(_ => Promise.resolve()) as Promise<void>;
 	};
 
-	const logAllNestedErrors = (err: TaqVsxError | TaqError | Error | any, output: Output) => {
-		if (!err) {
-			return;
-		}
-		const message = getErrorMessage(err);
-		output.outputChannel.appendLine(message);
-		output.outputChannel.show();
-		if ('previous' in err) {
-			logAllNestedErrors(err.previous, output);
-		}
-		if ('cause' in err) {
-			logAllNestedErrors(err.cause, output);
-		}
-	};
-
-	const getErrorMessage = (err: any) => {
-		let text = '';
-		if ('kind' in err) {
-			text += err.kind + ': ';
-		}
-		if ('msg' in err) {
-			text += err.msg;
-		}
-		if ('message' in err) {
-			text += err.message;
-		}
-		return text;
-	};
-
 	const notify = (msg: string) =>
 		vscode.window.showInformationMessage(msg)
 			.then(_ => Promise.resolve()) as Promise<void>;
 
-	const showOutput = (output: Output, currentOutputLevel: OutputLevels) =>
-		(data: string) => {
+	const logAllNestedErrors = (err: TaqVsxError | TaqError | Error | unknown, output: Output) => {
+		try {
+			if (!err) {
+				return;
+			}
+			if (!shouldOutput(OutputLevels.error, output.logLevel)) {
+				return;
+			}
+			output.outputChannel.appendLine(JSON.stringify(err, undefined, 4));
+			output.outputChannel.show();
+		} catch {
+			try {
+				output.outputChannel.appendLine(`unknown error occurred while trying to log an error.`);
+			} catch {
+				// at this point, we cannot do anything
+			}
+		}
+	};
+
+	const showOutput = (output: Output) =>
+		(currentOutputLevel: OutputLevels, data: string) => {
 			if (!shouldOutput(currentOutputLevel, output.logLevel)) {
 				return;
 			}
@@ -409,10 +415,10 @@ export const inject = (deps: InjectedDependencies) => {
 			exposeTaskAsCommand(context, output, i18n, projectDir)(
 				cmdId,
 				(pathToTaq: Util.PathToTaq) =>
-					Util.proxyToTaq(pathToTaq, i18n, projectDir)(taskWithArgs)
+					Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(taskWithArgs)
 						.then(stdout =>
 							outputTo === 'output'
-								? showOutput(output, OutputLevels.output)(stdout)
+								? showOutput(output)(OutputLevels.output, stdout)
 								: notify(stdout)
 						)
 						.then(_ => {
@@ -430,7 +436,7 @@ export const inject = (deps: InjectedDependencies) => {
 			addCommand(context)(
 				cmdId,
 				() =>
-					getTaqBinPath(i18n)
+					getTaqBinPath(i18n, output)
 						.then(handler)
 						.catch(showError),
 			);
@@ -458,10 +464,10 @@ export const inject = (deps: InjectedDependencies) => {
 						)
 						.then(sandboxName =>
 							(sandboxName
-								? Util.proxyToTaq(pathToTaq, i18n, projectDir)(`${taskName} ${sandboxName}`)
+								? Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(`${taskName} ${sandboxName}`)
 									.then(stdout =>
 										outputTo === 'output'
-											? showOutput(output, OutputLevels.output)(stdout)
+											? showOutput(output)(OutputLevels.output, stdout)
 											: notify(stdout)
 									)
 									.then(_ => {
@@ -479,16 +485,21 @@ export const inject = (deps: InjectedDependencies) => {
 		i18n: i18n,
 		projectDir: Util.PathToDir,
 	) => {
+		showOutput(output)(OutputLevels.debug, 'Project config changed, updating command states...');
 		try {
 			const config = await Util.TaqifiedDir.create(projectDir, i18n);
+			showOutput(output)(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config.config}`);
 			vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config.config);
 			const plugins = getWellKnownPlugins();
+			showOutput(output)(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
 			for (const plugin of plugins) {
 				const found = config.config.plugins?.find(item => item.name === plugin) !== undefined;
+				showOutput(output)(OutputLevels.debug, `plugins ${plugin}: ${found}`);
 				vscode.commands.executeCommand('setContext', plugin, found);
 			}
 		} catch (e: any) {
-			// After logging PR is merged, log this error
+			showOutput(output)(OutputLevels.error, 'Error: Could not update command states:');
+			logAllNestedErrors(e, output);
 		}
 	};
 
@@ -499,17 +510,32 @@ export const inject = (deps: InjectedDependencies) => {
 		projectDir: Util.PathToDir,
 		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
 	) => {
+		showOutput(output)(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
 		addConfigWatcherIfNotExists(projectDir, () => {
-			const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
-			// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
+			showOutput(output)(OutputLevels.info, `Adding watcher for directory ${projectDir}.`);
+			try {
+				updateCommandStates(context, output, i18n, projectDir);
+			} catch (error: any) {
+				logAllNestedErrors(error, output);
+			}
+			try {
+				// TODO: this does not trigger when .taq	folder is deleted.
+				const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+				// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
 
-			updateCommandStates(context, output, i18n, projectDir);
-
-			// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
-			watcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-			watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-			watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-			return watcher;
+				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
+				watcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				return watcher;
+			} catch (error: unknown) {
+				throw {
+					kind: 'E_UnknownError',
+					msg: `Unexpected error occurred while trying to watch ${join(projectDir, '.taq/config.json')}`,
+					context: projectDir,
+					previous: error,
+				} as TaqVsxError;
+			}
 		});
 	};
 
@@ -534,5 +560,6 @@ export const inject = (deps: InjectedDependencies) => {
 		exposeSandboxTaskAsCommand,
 		updateCommandStates,
 		createWatcherIfNotExists,
+		logAllNestedErrors,
 	};
 };
