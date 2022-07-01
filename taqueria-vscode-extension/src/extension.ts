@@ -55,7 +55,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		outputChannel,
 		logLevel,
 	};
-	showOutput(output, OutputLevels.info)('the activate function was called for the Taqueria VsCode Extension.');
+	showOutput(output)(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
 
 	const i18n: i18n = await loadI18n();
 

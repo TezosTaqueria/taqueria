@@ -28,6 +28,8 @@ export enum OutputLevels {
 	trace,
 }
 
+export type OutputFunction = (currentLogLevel: OutputLevels, log: string) => void;
+
 const outputLevelsOrder = [
 	OutputLevels.trace,
 	OutputLevels.debug,
@@ -74,11 +76,11 @@ export const inject = (deps: InjectedDependencies) => {
 			if (uri === undefined) {
 				return;
 			}
-			getTaqBinPath(i18n)
+			getTaqBinPath(i18n, output)
 				.then(pathToTaq =>
-					Util.proxyToTaq(pathToTaq, i18n, undefined)(`init ${uri.path}`)
+					Util.proxyToTaq(pathToTaq, i18n, showOutput(output), undefined)(`init ${uri.path}`)
 						.then(() =>
-							Util.proxyToTaq(pathToTaq, i18n, uri.path as Util.PathToDir)(``)
+							Util.proxyToTaq(pathToTaq, i18n, showOutput(output), uri.path as Util.PathToDir)(``)
 								.catch(() => Promise.resolve())
 						)
 						.then(() => updateCommandStates(context, output, i18n, uri.path as Util.PathToDir))
@@ -99,7 +101,7 @@ export const inject = (deps: InjectedDependencies) => {
 		const exposeTask = exposeTaskAsCommand(context, output, i18n);
 		const availableScaffolds: { name: string; url: string }[] = await getAvailableScaffolds(context);
 		const proxyScaffold = (scaffoldUrl: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
-			Util.proxyToTaq(pathToTaq, i18n, projectDir)(`scaffold ${scaffoldUrl} ${projectDir}`)
+			Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(`scaffold ${scaffoldUrl} ${projectDir}`)
 				.then(notify)
 				.catch(err => logAllNestedErrors(err, output));
 
@@ -172,7 +174,7 @@ export const inject = (deps: InjectedDependencies) => {
 		if (uris.length === 1) {
 			return uris[0];
 		} else {
-			showOutput(output, OutputLevels.warn)('Scaffolding with multiple open folders is not yet implemented.');
+			showOutput(output)(OutputLevels.warn, 'Scaffolding with multiple open folders is not yet implemented.');
 			return undefined;
 		}
 	};
@@ -206,6 +208,10 @@ export const inject = (deps: InjectedDependencies) => {
 		'@taqueria/plugin-smartpy',
 		'@taqueria/plugin-taquito',
 		'@taqueria/plugin-flextesa',
+		'@taqueria/plugin-archetype',
+		'@taqueria/plugin-contract-types',
+		'@taqueria/plugin-tezos-client',
+		'@taqueria/plugin-jest',
 	];
 
 	const getAvailablePlugins = async (context: api.ExtensionContext) => {
@@ -253,7 +259,7 @@ export const inject = (deps: InjectedDependencies) => {
 		const exposeTask = exposeTaskAsCommand(context, output, i18n);
 		const availablePlugins = await getAvailablePlugins(context);
 		const proxyInstall = (pluginName: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
-			Util.proxyToTaq(pathToTaq, i18n, projectDir)(`install ${pluginName}`)
+			Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(`install ${pluginName}`)
 				.then(notify)
 				.catch(showError);
 
@@ -306,8 +312,8 @@ export const inject = (deps: InjectedDependencies) => {
 		i18n: i18n,
 	) =>
 		(projectDir: Util.PathToDir) => {
-			getTaqBinPath(i18n)
-				.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, projectDir)('list-known-tasks'))
+			getTaqBinPath(i18n, output)
+				.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)('list-known-tasks'))
 				.then(data => Util.decodeJson<EphemeralState>(data))
 				.then(state => {
 					// const cmdId = taskNameToCmdId(taskName)
@@ -332,12 +338,12 @@ export const inject = (deps: InjectedDependencies) => {
 				)
 			);
 
-	const getTaqBinPath = (i18n: i18n) => {
+	const getTaqBinPath = (i18n: i18n, output: Output) => {
 		const providedPath = vscode.workspace.getConfiguration('taqueria').get('path', '');
 		return providedPath && (providedPath as string).length > 0
-			? Util.makePathToTaq(i18n)(providedPath)
-			: Util.findTaqBinary(i18n)
-				.then(Util.makePathToTaq(i18n));
+			? Util.makePathToTaq(i18n, showOutput(output))(providedPath)
+			: Util.findTaqBinary(i18n, showOutput(output))
+				.then(Util.makePathToTaq(i18n, showOutput(output)));
 	};
 
 	const addCommand = (context: api.ExtensionContext) =>
@@ -384,8 +390,8 @@ export const inject = (deps: InjectedDependencies) => {
 		}
 	};
 
-	const showOutput = (output: Output, currentOutputLevel: OutputLevels) =>
-		(data: string) => {
+	const showOutput = (output: Output) =>
+		(currentOutputLevel: OutputLevels, data: string) => {
 			if (!shouldOutput(currentOutputLevel, output.logLevel)) {
 				return;
 			}
@@ -412,10 +418,10 @@ export const inject = (deps: InjectedDependencies) => {
 			exposeTaskAsCommand(context, output, i18n, projectDir)(
 				cmdId,
 				(pathToTaq: Util.PathToTaq) =>
-					Util.proxyToTaq(pathToTaq, i18n, projectDir)(taskWithArgs)
+					Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(taskWithArgs)
 						.then(stdout =>
 							outputTo === 'output'
-								? showOutput(output, OutputLevels.output)(stdout)
+								? showOutput(output)(OutputLevels.output, stdout)
 								: notify(stdout)
 						)
 						.then(_ => {
@@ -433,7 +439,7 @@ export const inject = (deps: InjectedDependencies) => {
 			addCommand(context)(
 				cmdId,
 				() =>
-					getTaqBinPath(i18n)
+					getTaqBinPath(i18n, output)
 						.then(handler)
 						.catch(showError),
 			);
@@ -461,10 +467,10 @@ export const inject = (deps: InjectedDependencies) => {
 						)
 						.then(sandboxName =>
 							(sandboxName
-								? Util.proxyToTaq(pathToTaq, i18n, projectDir)(`${taskName} ${sandboxName}`)
+								? Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(`${taskName} ${sandboxName}`)
 									.then(stdout =>
 										outputTo === 'output'
-											? showOutput(output, OutputLevels.output)(stdout)
+											? showOutput(output)(OutputLevels.output, stdout)
 											: notify(stdout)
 									)
 									.then(_ => {
@@ -482,20 +488,20 @@ export const inject = (deps: InjectedDependencies) => {
 		i18n: i18n,
 		projectDir: Util.PathToDir,
 	) => {
-		showOutput(output, OutputLevels.debug)('Project config changed, updating command states...');
+		showOutput(output)(OutputLevels.debug, 'Project config changed, updating command states...');
 		try {
 			const config = await Util.TaqifiedDir.create(projectDir, i18n);
-			showOutput(output, OutputLevels.debug)(`@taqueria-state/is-taqified: ${!!config.config}`);
+			showOutput(output)(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config.config}`);
 			vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config.config);
 			const plugins = getWellKnownPlugins();
-			showOutput(output, OutputLevels.debug)(`Known plugins: ${JSON.stringify(plugins)}`);
+			showOutput(output)(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
 			for (const plugin of plugins) {
 				const found = config.config.plugins?.find(item => item.name === plugin) !== undefined;
-				showOutput(output, OutputLevels.debug)(`plugins ${plugin}: ${found}`);
+				showOutput(output)(OutputLevels.debug, `plugins ${plugin}: ${found}`);
 				vscode.commands.executeCommand('setContext', plugin, found);
 			}
 		} catch (e: any) {
-			showOutput(output, OutputLevels.error)('Error: Could not update command states:');
+			showOutput(output)(OutputLevels.error, 'Error: Could not update command states:');
 			logAllNestedErrors(e, output);
 		}
 	};
@@ -507,9 +513,9 @@ export const inject = (deps: InjectedDependencies) => {
 		projectDir: Util.PathToDir,
 		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
 	) => {
-		showOutput(output, OutputLevels.debug)(`Directory ${projectDir} should be watched.`);
+		showOutput(output)(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
 		addConfigWatcherIfNotExists(projectDir, () => {
-			showOutput(output, OutputLevels.info)(`Adding watcher for directory ${projectDir}.`);
+			showOutput(output)(OutputLevels.info, `Adding watcher for directory ${projectDir}.`);
 			try {
 				updateCommandStates(context, output, i18n, projectDir);
 			} catch (error: any) {
