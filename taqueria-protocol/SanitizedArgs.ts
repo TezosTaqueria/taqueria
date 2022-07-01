@@ -54,6 +54,7 @@ export const rawSchema = z.object({
 	setVersion: z.string().min(3),
 	template: z.string().min(1).optional(),
 	pluginName: z.string().min(1).optional(),
+	task: z.string().min(1).optional(),
 }, { description: 'Sanitizied Args' }).passthrough();
 
 export const scaffoldRawSchema = rawSchema.extend({
@@ -119,6 +120,7 @@ export const provisionTaskArgs = createType<RawProvisionInput, RawProvisionInput
 	rawSchema: provisionRawSchema,
 	parseErrMsg: 'The arguments provided are invalid for the provision task',
 	unknownErrMsg: 'Something went wrong parsing the arguments for the provision task',
+	passthrough: true,
 });
 
 export const installTaskArgs = createType<RawManagePluginInput, RawManagePluginInput>({

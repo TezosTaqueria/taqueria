@@ -1,4 +1,4 @@
-import { Option, Plugin, Task } from '@taqueria/node-sdk';
+import { Option, Plugin, PositionalArg, Task } from '@taqueria/node-sdk';
 import compile from './compile';
 
 Plugin.create(i18n => ({
@@ -29,6 +29,13 @@ Plugin.create(i18n => ({
 					flag: 'infer',
 					description: 'Enable type inference',
 					type: 'boolean',
+				}),
+			],
+			positionals: [
+				PositionalArg.create({
+					description: 'Source file of the contract to compile',
+					placeholder: 'sourceFile',
+					type: 'string',
 				}),
 			],
 			handler: 'proxy',

@@ -25,8 +25,7 @@ import * as Analytics from './analytics.ts';
 import * as NPM from './npm.ts';
 import { addTask, createStateRegistry } from './persistent-state.ts';
 import inject from './plugins.ts';
-import { createProvisioner, createProvisionerTypes } from './provisioner.ts';
-import { addNewProvision, apply, plan } from './provisions.ts';
+import { addNewProvision, createProvisioner, createProvisionerTypes, toYargsOptions } from './provisioner.ts';
 import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
 import type {
 	InstalledPlugin,
@@ -223,10 +222,11 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() => {},
 			() => log('OK'),
 		)
+		.command('provision <task>')
 		.help(false);
 
 const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
-	const cliConfig = commonCLI(env, args, i18n).help(false);
+	const cliConfig = commonCLI(env, args, i18n);
 	return cliConfig
 		.command(
 			'scaffold [scaffoldUrl] [scaffoldProjectDir]',
@@ -441,13 +441,13 @@ const exposeProvisioningTasks = (
 	cliConfig: CLIConfig,
 	config: LoadedConfig.t,
 	_env: EnvVars,
-	_parsedArgs: SanitizedArgs.t,
-	_i18n: i18n.t,
+	parsedArgs: SanitizedArgs.t,
+	i18n: i18n.t,
 	state: EphemeralState.t,
 	_pluginLib: PluginLib,
 ) =>
 	cliConfig.command(
-		'provision <task> [..task args]',
+		'provision <task>',
 		'Provision a task to populate project state',
 		(yargs: CLIConfig) => {
 			yargs.positional('task', {
@@ -460,13 +460,20 @@ const exposeProvisioningTasks = (
 				describe: 'Unique name of the provisioner',
 				type: 'string',
 			});
+
+			toYargsOptions(state, parsedArgs.task, parsedArgs.plugin)(yargs);
 		},
 		(argv: Arguments) =>
 			pipe(
 				SanitizedArgs.ofProvisionTaskArgs(argv),
-				// chain(inputArgs => addNewProvision(inputArgs, config, state)),
+				map(inputArgs => {
+					console.log(inputArgs);
+					return inputArgs;
+				}),
+				chain(inputArgs => addNewProvision(inputArgs, state, i18n)),
+				map(result => JSON.stringify(result)),
 				// map(() => 'Added provision to .taq/provisions.json'),
-				// forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+				forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
 			),
 	)
 		.command(
@@ -671,10 +678,15 @@ const loadEphermeralState = (
 	i18n: i18n.t,
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
-): CLIConfig =>
-	[exposeTasks, exposeProvisioningTasks, exposeTemplates].reduce(
-		(cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
-		cliConfig,
+) =>
+	pipe(
+		taqResolve(cliConfig),
+		map((cliConfig: CLIConfig) =>
+			[exposeTasks, exposeProvisioningTasks, exposeTemplates].reduce(
+				(cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
+				cliConfig,
+			)
+		),
 	);
 
 const renderPluginJsonRes = (decoded: PluginJsonResponse) => {
@@ -751,7 +763,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 					chain(createStateRegistry(parsedArgs)),
 					chain(createProvisionerTypes(config)),
 					chain(createProvisioner(config)),
-					map((state: EphemeralState.t) =>
+					chain((state: EphemeralState.t) =>
 						pipe(
 							resolvePluginName(parsedArgs, state),
 							(parsedArgs: SanitizedArgs.t) =>
@@ -802,7 +814,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 			initCLI(env, processedInputArgs, i18n),
 			(cliConfig: CLIConfig) =>
 				pipe(
-					cliConfig,
+					cliConfig.help(false),
 					parseArgs,
 					chain(SanitizedArgs.of),
 					chain((initArgs: SanitizedArgs.t) => {
