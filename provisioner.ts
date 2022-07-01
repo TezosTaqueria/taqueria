@@ -4,7 +4,7 @@ import * as PositionalArg from '@taqueria/protocol/PositionalArg';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Task from '@taqueria/protocol/Task';
-import { chain, chainRej, FutureInstance as Future, map, reject, resolve } from 'fluture';
+import { attemptP, chain, chainRej, FutureInstance as Future, map, mapRej, reject, resolve } from 'fluture';
 import { camelCase } from 'https://deno.land/x/case@2.1.1/mod.ts';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { defaultTo, has } from 'rambda';
@@ -21,6 +21,7 @@ import * as utils from './taqueria-utils/taqueria-utils.ts';
 const {
 	joinPaths,
 	writeTextFile,
+	readTextFile,
 	doesPathExist,
 	taqResolve,
 } = utils.inject({
@@ -393,15 +394,89 @@ const getSchemaForTask = (parsedArgs: SanitizedArgs.ProvisionTaskArgs) =>
 							[shape.name, toZodMethod(shape)],
 						]),
 					}),
-					{},
+					{
+						task: z.string().min(1),
+						name: z.string().min(1).optional(),
+					},
 				);
 
 				return z.object(schema);
 			}),
 		);
 
-export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t, _i18n: i18n.t) =>
+const provision = (provisionName: string) => {
+	const id = provisionName;
+	const task = (state: {}) => {
+	};
+
+	return {
+		id,
+		task,
+	};
+};
+
+declare global {
+	const tasks: Record<string, Record<string, (taskArgs: Record<string, unknown>) => void>>;
+}
+
+export const getProvisionersAbspath = (projectDir: SanitizedAbsPath.t) =>
+	joinPaths(
+		projectDir,
+		'.taq',
+		'provisioners.ts',
+	);
+
+export const getProvisionersImportUrl = (projectDir: SanitizedAbsPath.t) =>
+	pipe(
+		getProvisionerAbspath(projectDir),
+		readTextFile,
+		map(contents => `const provision = globalThis.provision\n${contents}`),
+		map(btoa),
+		map(b64 => `data:text/javascript;base64,${b64}`),
+	);
+type Provision = {} & { __kind: 'provision' };
+
+export const newProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t, _i18n: i18n.t) =>
 	pipe(
 		getSchemaForTask(parsedArgs)(state),
-		map(schema => schema.parse({ ...parsedArgs })),
+		chain(schema => attemptP(() => schema.parseAsync(parsedArgs))),
+		map(result => result as unknown as Provision),
+		mapRej(previous =>
+			TaqError.create({
+				kind: 'E_INVALID_ARGS',
+				msg: `Invalid arguments for this task`,
+				context: parsedArgs,
+				previous,
+			})
+		),
 	);
+
+export const addNewProvision = (parsedargs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t) => {
+	// Define tasks global object
+	globalThis.tasks = state.plugins.reduce(
+		(retval, plugin) => {
+			const pluginTasks = plugin.tasks?.reduce(
+				(tasks, task) => ({
+					...tasks,
+					...Object.fromEntries([
+						[task.task, (taskArgs: Record<string, unknown>) => {}],
+					]),
+				}),
+				{},
+			);
+			return {
+				...retval,
+				...Object.entries([
+					[plugin.name, pluginTasks],
+					[plugin.alias, pluginTasks],
+				]),
+			};
+		},
+		{},
+	);
+
+	// 1) Create new provision
+	// 2) Create globalThis.provision() method
+	// 3) Dynamically import the provisioners.ts file
+	// 4)
+};

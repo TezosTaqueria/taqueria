@@ -13,16 +13,6 @@ import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { times } from 'rambda';
 import { inject } from './taqueria-utils/taqueria-utils.ts';
 
-// We include the @taqueria/provisioner package in our compiled
-// bundler, and then store it in memory.
-// This allows us to use this package in a module that was imported
-// via the dynamic import mechanism
-import * as provisioner from '@taqueria/provisioner';
-declare global {
-	var __provisioner: typeof provisioner;
-}
-globalThis.__provisioner = provisioner;
-
 const { doesPathExist, writeJsonFile, joinPaths, eager, isTaqError, renderTemplate, execText, readTextFile } = inject({
 	stderr: Deno.stderr,
 	stdout: Deno.stdout,
