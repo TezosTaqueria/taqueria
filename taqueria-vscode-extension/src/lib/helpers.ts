@@ -365,7 +365,7 @@ export const inject = (deps: InjectedDependencies) => {
 		vscode.window.showInformationMessage(msg)
 			.then(_ => Promise.resolve()) as Promise<void>;
 
-	const logAllNestedErrors = (err: TaqVsxError | TaqError | Error | any, output: Output) => {
+	const logAllNestedErrors = (err: TaqVsxError | TaqError | Error | unknown, output: Output) => {
 		try {
 			if (!err) {
 				return;
@@ -375,12 +375,6 @@ export const inject = (deps: InjectedDependencies) => {
 			}
 			output.outputChannel.appendLine(JSON.stringify(err, undefined, 4));
 			output.outputChannel.show();
-			if ('previous' in err) {
-				logAllNestedErrors(err.previous, output);
-			}
-			if ('cause' in err) {
-				logAllNestedErrors(err.cause, output);
-			}
 		} catch {
 			try {
 				output.outputChannel.appendLine(`unknown error occurred while trying to log an error.`);
