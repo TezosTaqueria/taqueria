@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/state",
-	"version": "0.6.4",
+	"version": "0.6.5",
 	"description": "A TypeScript library for NodeJS and Deno to work with Taqueria projects",
 	"main": "./index.js",
 	"source": "./node/index.ts",
