@@ -100,9 +100,12 @@ export const inject = (deps: InjectedDependencies) => {
 	) => {
 		const exposeTask = exposeTaskAsCommand(context, output, i18n);
 		const availableScaffolds: { name: string; url: string }[] = await getAvailableScaffolds(context);
-		const proxyScaffold = (scaffoldUrl: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
+		const proxyScaffold = (scaffoldUrl: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir: Util.PathToDir) =>
 			Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(`scaffold ${scaffoldUrl} ${projectDir}`)
-				.then(notify)
+				.then(() =>
+					Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(``)
+						.catch(() => Promise.resolve())
+				).then(() => updateCommandStates(context, output, i18n, projectDir))
 				.catch(err => logAllNestedErrors(err, output));
 
 		return exposeTask(Commands.scaffold, async (pathToTaq: Util.PathToTaq) => {
