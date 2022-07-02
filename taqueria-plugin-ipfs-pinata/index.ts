@@ -1,5 +1,5 @@
 import { Option, Plugin, PositionalArg, Task } from '@taqueria/node-sdk';
-import proxy from './proxy';
+import proxy from './src/proxy';
 
 Plugin.create(() => ({
 	schema: '0.1',

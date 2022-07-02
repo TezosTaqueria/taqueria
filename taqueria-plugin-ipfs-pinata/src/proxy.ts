@@ -1,9 +1,9 @@
 import { sendAsyncErr, sendAsyncRes, sendErr } from '@taqueria/node-sdk';
 import { LoadedConfig, PluginResponse, RequestArgs, SanitizedAbsPath } from '@taqueria/node-sdk/types';
 import path from 'path';
-import { processFiles } from './src/file-processing';
-import { PinataAuth, publishFileToIpfs } from './src/pinata-api';
-import { createProcessBackoffController } from './src/utils';
+import { processFiles } from './file-processing';
+import { PinataAuth, publishFileToIpfs } from './pinata-api';
+import { createProcessBackoffController } from './utils';
 
 interface Opts extends RequestArgs.ProxyRequestArgs {
 	readonly path?: string;
