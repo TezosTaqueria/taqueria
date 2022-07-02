@@ -18,6 +18,7 @@ export type TypeAliasData = {
 } | {
 	mode: 'simple';
 };
+
 export type TypeUtilsData = {
 	importPath: string;
 };
