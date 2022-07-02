@@ -4,10 +4,10 @@ import proxy from './src/proxy';
 Plugin.create(() => ({
 	schema: '0.1',
 	version: '0.4.0',
-	alias: 'jest',
+	alias: 'ipfs',
 	tasks: [
 		Task.create({
-			task: 'ipfs',
+			task: 'publish',
 			command: 'publish [path]',
 			description: 'Upload and pin files using your pinata account.',
 			aliases: [],
@@ -22,7 +22,7 @@ Plugin.create(() => ({
 		}),
 		// Pinning Not Implemented Yet
 		// Task.create({
-		// 	task: 'ipfs',
+		// 	task: 'pin',
 		// 	command: 'pin [hash]',
 		// 	description: 'Pin a file already on ipfs with your pinata account.',
 		// 	aliases: [],
