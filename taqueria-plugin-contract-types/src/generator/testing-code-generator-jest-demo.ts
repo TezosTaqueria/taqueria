@@ -4,22 +4,22 @@ import { normalizeContractName } from './contract-name';
 import { createTestingCodeGenerator } from './testing-code-generator';
 
 export const toJest = async (contractName: string, contractSource: string, format: 'tz') => {
-    const gen = createTestingCodeGenerator({ contractSource, contractFormat: format });
+	const gen = createTestingCodeGenerator({ contractSource, contractFormat: format });
 
-    const methodCalls = gen.methods.map(m => ({
-        name: m.name,
-        methodCall: gen.generateMethodCall({
-            methodName: m.name,
-            formatting: {
-                indent: 2
-            },
-        }),
-        storageAccess: gen.generateStorageAccess({ storagePath: '' }),
-    }));
+	const methodCalls = gen.methods.map(m => ({
+		name: m.name,
+		methodCall: gen.generateMethodCall({
+			methodName: m.name,
+			formatting: {
+				indent: 2,
+			},
+		}),
+		storageAccess: gen.generateStorageAccess({ storagePath: '' }),
+	}));
 
-    const contractTypeName = normalizeContractName(contractName);
+	const contractTypeName = normalizeContractName(contractName);
 
-    const jestCode = `
+	const jestCode = `
 import { TezosToolkit } from '@taquito/taquito';
 import { char2Bytes } from '@taquito/utils';
 import { tas } from '../types-file/type-aliases';
@@ -33,7 +33,8 @@ describe('${contractName}', () => {
             ${gen.generateOrigination({ formatting: { indent: 3 } }).code}
     });
 
-${methodCalls.map(x => `
+${
+		methodCalls.map(x => `
     it('should call ${x.name}', async () => {
         ${x.storageAccess.getStorageValueFunctionCode}
         const storageValueBefore = await ${x.storageAccess.getStorageValueFunctionName}();
@@ -42,32 +43,33 @@ ${methodCalls.map(x => `
 
         expect(storageValueAfter).toBe('');
     });
-`).join('')}
+`).join('')
+	}
 });
 `;
-    return {
-        jestCode,
-    };
+	return {
+		jestCode,
+	};
 };
 
 const run = async () => {
-    const contractDirPath = path.join(__dirname, '../../example/contracts');
-    const dirFiles = await fs.promises.readdir(contractDirPath);
-    const tzFiles = dirFiles.filter(x => x.endsWith('.tz'));
+	const contractDirPath = path.join(__dirname, '../../example/contracts');
+	const dirFiles = await fs.promises.readdir(contractDirPath);
+	const tzFiles = dirFiles.filter(x => x.endsWith('.tz'));
 
-    for (const f of tzFiles) {
-        const contractFilePath = path.join(contractDirPath, f);
-        const outputFilePath = contractFilePath
-            .replace('/example/contracts/', '/example/tests/')
-            .replace(/\.tz$/, '.test.ts');
+	for (const f of tzFiles) {
+		const contractFilePath = path.join(contractDirPath, f);
+		const outputFilePath = contractFilePath
+			.replace('/example/contracts/', '/example/test-generation/')
+			.replace(/\.tz$/, '.jest-demo.ts');
 
-        console.log('Create Jest Test', { contractFilePath, outputFilePath });
+		console.log('Create Jest Test', { contractFilePath, outputFilePath });
 
-        const fileContent = await fs.promises.readFile(contractFilePath, { encoding: 'utf-8' });
-        const result = await toJest(f.replace(/\.tz$/, ''), fileContent, 'tz');
+		const fileContent = await fs.promises.readFile(contractFilePath, { encoding: 'utf-8' });
+		const result = await toJest(f.replace(/\.tz$/, ''), fileContent, 'tz');
 
-        await fs.promises.mkdir(path.dirname(outputFilePath), { recursive: true });
-        await fs.promises.writeFile(outputFilePath, result.jestCode);
-    }
+		await fs.promises.mkdir(path.dirname(outputFilePath), { recursive: true });
+		await fs.promises.writeFile(outputFilePath, result.jestCode);
+	}
 };
 void run();

@@ -21,6 +21,7 @@
 		"example-simple": "npx ts-node run.ts --types simple --g ./example/contracts ./example/types-simple",
 		"example-file": "npx ts-node run.ts --types file --g ./example/contracts ./example/types-file",
 		"example-local": "npx ts-node run.ts --types local --g ./example/contracts ./example/types-local",
+		"example-jest-test-generation": "npx ts-node ./src/generator/testing-code-generator-jest-demo.ts",
 		"test": "npm run examples && npx jest"
 	},
 	"keywords": [],
@@ -50,9 +51,6 @@
 		"transform": {
 			".(ts|tsx)": "ts-jest"
 		},
-		"testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-		"testPathIgnorePatterns": [
-			"example"
-		]
+		"testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$"
 	}
 }
