@@ -76,7 +76,7 @@ const pinToIpfs = async (hash: undefined | string, auth: PinataAuth): Promise<Pl
 	throw new Error('pinToIpfs: Not Implemented');
 };
 
-const process = async (opts: Opts): Promise<PluginResponse> => {
+const execute = async (opts: Opts): Promise<PluginResponse> => {
 	const {
 		task,
 		path,
@@ -87,7 +87,7 @@ const process = async (opts: Opts): Promise<PluginResponse> => {
 	const auth: PinataAuth = {
 		// TODO: Where should this be stored?
 		// pinataJwtToken: (config as Record<string, any>).credentials.pinataJwtToken,
-		pinataJwtToken: process.env['pinataJwtToken'],
+		pinataJwtToken: process.env['pinataJwtToken'] as string,
 	};
 
 	if (!auth.pinataJwtToken) {
@@ -108,7 +108,7 @@ export default async (args: RequestArgs.ProxyRequestArgs): Promise<PluginRespons
 	const opts = args as Opts;
 
 	try {
-		return process(opts);
+		return execute(opts);
 	} catch (err) {
 		const error = err as Error;
 		if (error.message) {
