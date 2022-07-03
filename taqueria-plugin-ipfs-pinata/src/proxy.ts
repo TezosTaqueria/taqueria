@@ -27,8 +27,8 @@ const publishToIpfs = async (fileOrDirPath: undefined | string, auth: PinataAuth
 		fileOrDirPath,
 		parallelCount: 10,
 		processFile: async filePath => {
-			// TEMP: Debug
-			console.log(`publishing: ${filePath}`);
+			// // TEMP: Debug
+			// console.log(`publishing: ${filePath}`);
 
 			return processWithBackoff(() =>
 				publishFileToIpfs({
@@ -42,16 +42,16 @@ const publishToIpfs = async (fileOrDirPath: undefined | string, auth: PinataAuth
 				let ratio = processedFilesCount / estimateFileCount;
 				if (ratio > 1) ratio = 1;
 
-				// TODO: Call task sdk progress
-				console.log(`Progress: ${(ratio * 100).toFixed(0)}%`);
+				// // TODO: Call task sdk progress
+				// console.log(`Progress: ${(ratio * 100).toFixed(0)}%`);
 			}
 		},
 	});
 
-	// TEMP: DEBUG: Show error
-	if (result.failures.length) {
-		console.log('❗ Failures:\n' + result.failures.map(f => `${f.filePath}: ${f.error}`).join('\n'));
-	}
+	// // TEMP: DEBUG: Show error
+	// if (result.failures.length) {
+	// 	console.log('❗ Failures:\n' + result.failures.map(f => `${f.filePath}: ${f.error}`).join('\n'));
+	// }
 
 	return {
 		data: {
