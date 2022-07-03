@@ -41,8 +41,17 @@ const publishToIpfs = async (fileOrDirPath: undefined | string, auth: PinataAuth
 		},
 	});
 
+	// TEMP: DEBUG: Show error
+	if (result.failures.length) {
+		console.log('❗ Failures:\n' + result.failures.map(f => `${f.filePath}: ${f.error}`).join('\n'));
+	}
+
 	return {
 		data: {
+			failures: result.failures.map(x => ({
+				filePath: x.filePath,
+				error: x.error,
+			})),
 			fileIpfsHashes: result.successes.map(x => ({
 				filePath: x.filePath,
 				ipfsHash: x.result.ipfsHash,
