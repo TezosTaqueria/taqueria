@@ -81,9 +81,13 @@ const process = async (opts: Opts): Promise<PluginResponse> => {
 	} = opts;
 
 	const auth: PinataAuth = {
-		// TODO: get pinata api key from config
-		pinataJwtToken: '',
+		// TODO: Where should this be stored?
+		pinataJwtToken: (config as Record<string, any>).credentials.pinataJwtToken,
 	};
+
+	if (!auth.pinataJwtToken) {
+		throw new Error(`The 'credentials.pinataJwtToken' was not found in config`);
+	}
 
 	switch (task) {
 		case 'publish':
