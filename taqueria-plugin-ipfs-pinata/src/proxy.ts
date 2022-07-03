@@ -54,16 +54,18 @@ const publishToIpfs = async (fileOrDirPath: undefined | string, auth: PinataAuth
 	// }
 
 	return {
-		data: {
-			failures: result.failures.map(x => ({
+		data: [
+			...result.failures.map(x => ({
 				filePath: x.filePath,
+				ipfsHash: undefined,
 				error: x.error,
 			})),
-			fileIpfsHashes: result.successes.map(x => ({
+			...result.successes.map(x => ({
 				filePath: x.filePath,
 				ipfsHash: x.result.ipfsHash,
+				error: undefined,
 			})),
-		},
+		],
 	};
 };
 
