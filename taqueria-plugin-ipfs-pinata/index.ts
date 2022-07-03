@@ -4,7 +4,7 @@ import proxy from './src/proxy';
 Plugin.create(() => ({
 	schema: '0.1',
 	version: '0.4.0',
-	alias: 'ipfs',
+	alias: 'pinata',
 	tasks: [
 		Task.create({
 			task: 'publish',
