@@ -19,6 +19,7 @@ Plugin.create(() => ({
 					type: 'string',
 				}),
 			],
+			encoding: 'json',
 		}),
 		// Pinning Not Implemented Yet
 		// Task.create({
