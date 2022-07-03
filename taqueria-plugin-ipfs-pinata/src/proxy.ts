@@ -23,6 +23,9 @@ const publishToIpfs = async (fileOrDirPath: undefined | string, auth: PinataAuth
 		fileOrDirPath,
 		parallelCount: 10,
 		processFile: async filePath => {
+			// TEMP: Debug
+			console.log(`publishing: ${filePath}`);
+
 			return processWithBackoff(() =>
 				publishFileToIpfs({
 					auth,
