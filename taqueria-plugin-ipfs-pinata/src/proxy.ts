@@ -58,13 +58,13 @@ const publishToIpfs = async (fileOrDirPath: undefined | string, auth: PinataAuth
 		data: [
 			...result.failures.map(x => ({
 				'?': '❌',
-				filePath: x.filePath,
+				filePath: path.basename(x.filePath),
 				ipfsHash: undefined,
 				error: x.error,
 			})),
 			...result.successes.map(x => ({
 				'?': '✔',
-				filePath: x.filePath,
+				filePath: path.basename(x.filePath),
 				ipfsHash: x.result.ipfsHash,
 				error: undefined,
 			})),
@@ -113,7 +113,10 @@ export default async (args: RequestArgs.ProxyRequestArgs): Promise<PluginRespons
 	const opts = args as Opts;
 
 	try {
-		const result = await execute(opts);
+		const resultRaw = await execute(opts) as Record<string, unknown>;
+		// TODO: Fix deno parsing
+		// Without this, `data.reduce is not a function`
+		const result = ('data' in resultRaw) ? resultRaw.data : resultRaw;
 		return sendJsonRes(result);
 	} catch (err) {
 		const error = err as Error;
