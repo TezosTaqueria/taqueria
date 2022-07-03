@@ -5,6 +5,10 @@ import { processFiles } from './file-processing';
 import { PinataAuth, publishFileToIpfs } from './pinata-api';
 import { createProcessBackoffController } from './utils';
 
+// Load .env for jwt token
+// TODO: How should this be stored in a secure way?
+import 'dotenv/config';
+
 interface Opts extends RequestArgs.ProxyRequestArgs {
 	readonly path?: string;
 	readonly hash?: string;
@@ -82,7 +86,8 @@ const process = async (opts: Opts): Promise<PluginResponse> => {
 
 	const auth: PinataAuth = {
 		// TODO: Where should this be stored?
-		pinataJwtToken: (config as Record<string, any>).credentials.pinataJwtToken,
+		// pinataJwtToken: (config as Record<string, any>).credentials.pinataJwtToken,
+		pinataJwtToken: process.env['pinataJwtToken'],
 	};
 
 	if (!auth.pinataJwtToken) {

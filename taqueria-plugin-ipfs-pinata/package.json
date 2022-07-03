@@ -35,7 +35,8 @@
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.6.2",
 		"form-data": "^4.0.0",
-		"node-fetch": "^2.6.7"
+		"node-fetch": "^2.6.7",
+		"dotenv": "^16.0.0"
 	},
 	"devDependencies": {
 		"@types/node-fetch": "^2.6.1",
