@@ -1,4 +1,4 @@
-import { sendAsyncErr, sendAsyncRes, sendErr } from '@taqueria/node-sdk';
+import { sendAsyncErr, sendAsyncRes, sendErr, sendJsonRes } from '@taqueria/node-sdk';
 import { LoadedConfig, PluginResponse, RequestArgs, SanitizedAbsPath } from '@taqueria/node-sdk/types';
 import path from 'path';
 import { processFiles } from './file-processing';
@@ -108,7 +108,8 @@ export default async (args: RequestArgs.ProxyRequestArgs): Promise<PluginRespons
 	const opts = args as Opts;
 
 	try {
-		return execute(opts);
+		const result = await execute(opts);
+		return sendJsonRes(result);
 	} catch (err) {
 		const error = err as Error;
 		if (error.message) {
