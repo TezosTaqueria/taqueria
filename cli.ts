@@ -482,19 +482,25 @@ const addOperations = (
 				),
 		);
 
-const addTemplates = (
+const exposeTemplates = (
 	cliConfig: CLIConfig,
 	_config: LoadedConfig.t,
 	_env: EnvVars,
 	_parsedArgs: SanitizedArgs.t,
 	_i18n: i18n.t,
-	_state: EphemeralState.t,
+	state: EphemeralState.t,
 	_pluginLib: PluginLib,
 ) =>
 	cliConfig.command(
 		'create <template>',
 		'Create an entity from a pre-existing template',
-		() => {
+		(yargs: CLIConfig) => {
+			yargs.positional('template', {
+				describe: 'Name of the template to instantiate from',
+				type: 'string',
+				required: true,
+				choices: Object.keys(state.templates),
+			});
 			console.log('Configuring create template!');
 		},
 		() => {
@@ -669,7 +675,7 @@ const loadEphermeralState = (
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
 ): CLIConfig =>
-	[exposeTasks /* addOperations, addTemplates*/].reduce(
+	[exposeTasks, exposeTemplates /* addOperations*/].reduce(
 		(cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
 		cliConfig,
 	);
