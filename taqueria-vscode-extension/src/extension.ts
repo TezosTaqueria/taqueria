@@ -39,11 +39,13 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	const { vscode } = deps;
 	const {
 		exposeInitTask,
+		exposeScaffoldTask,
 		exposeInstallTask,
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
 		createWatcherIfNotExists,
 		showOutput,
+		logAllNestedErrors,
 	} = inject(deps);
 
 	const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
@@ -53,7 +55,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		outputChannel,
 		logLevel,
 	};
-	showOutput(output, OutputLevels.info)('the activate function was called for the Taqueria VsCode Extension.');
+	showOutput(output)(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
 
 	const i18n: i18n = await loadI18n();
 
@@ -63,6 +65,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 
 	// Add built-in tasks for Taqueria
 	await exposeInitTask(context, output, i18n, folders);
+	await exposeScaffoldTask(context, output, folders, i18n);
 	await exposeInstallTask(context, output, folders, i18n);
 	// await exposeTasksFromState (context, output, folders, i18n)
 
@@ -94,7 +97,11 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 				// Originate task
 				exposeTaqTask(COMMAND_PREFIX + 'deploy', 'deploy', 'output', 'Deployment successful.');
 
-				createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
+				try {
+					createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
+				} catch (error: unknown) {
+					logAllNestedErrors(error, output);
+				}
 			});
 	}
 
