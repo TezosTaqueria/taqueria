@@ -54,7 +54,7 @@ const {
 	mkdir,
 	readJsonFile,
 	writeTextFile,
-	doesPathNotExist,
+	doesPathNotExistOrIsEmptyDir,
 	gitClone,
 	rm,
 	log,
@@ -390,7 +390,7 @@ const scaffoldProject = (i18n: i18n.t) =>
 	({ scaffoldUrl, scaffoldProjectDir, maxConcurrency }: SanitizedArgs.ScaffoldTaskArgs) =>
 		attemptP<TaqError.t, string>(async () => {
 			const abspath = await eager(SanitizedAbsPath.make(scaffoldProjectDir));
-			const destDir = await eager(doesPathNotExist(abspath));
+			const destDir = await eager(doesPathNotExistOrIsEmptyDir(abspath));
 
 			log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
 			await eager(gitClone(scaffoldUrl)(destDir));
@@ -889,6 +889,8 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_PARSE_UNKNOWN' }, err => [14, err.msg])
 				.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
 				.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
+				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
+				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 
