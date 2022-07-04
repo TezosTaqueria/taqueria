@@ -13,7 +13,7 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 	});
 
 	test('Verify that contract types plugin only outputs typeScriptDir and does not create types dir when no contracts exist', async () => {
-		const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types`);
+		const generateTypesOutput = await exec(`taq generate types`, { cwd: `${taqueriaProjectPath}` });
 		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
 
 		const dirContents = await exec(`ls ${taqueriaProjectPath}`);
@@ -27,7 +27,7 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 		const pwd = pwdPromise.stdout.trim();
 
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
-		await exec(`cd ${taqueriaProjectPath} && taq compile`);
+		await exec(`taq compile`, { cwd: `${taqueriaProjectPath}` });
 
 		// TODO:
 		// Related to issue #736 above, when investigating I found that
@@ -35,7 +35,7 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 		// line of output which is why the expect assertion fails.
 		// However, when I run the `generate types` task manually I see all
 		// lines of output
-		const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types`);
+		const generateTypesOutput = await exec(`taq generate types`, { cwd: `${taqueriaProjectPath}` });
 		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
 
 		expect(generateTypesOutput.stdout).toContain(
@@ -67,9 +67,9 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 		const folderName = 'otherFolder';
 
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
-		await exec(`cd ${taqueriaProjectPath} && taq compile`);
+		await exec(`taq compile`, { cwd: `${taqueriaProjectPath}` });
 
-		const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types ${folderName}`);
+		const generateTypesOutput = await exec(`taq generate types ${folderName}`, { cwd: `${taqueriaProjectPath}` });
 		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: '${folderName}' }`);
 
 		expect(generateTypesOutput.stdout).toContain(
@@ -92,9 +92,9 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
 		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
-		await exec(`cd ${taqueriaProjectPath} && taq compile`);
+		await exec(`taq compile`, { cwd: `${taqueriaProjectPath}` });
 
-		const generateTypesOutput = await exec(`cd ${taqueriaProjectPath} && taq generate types`);
+		const generateTypesOutput = await exec(`taq generate types`, { cwd: `${taqueriaProjectPath}` });
 		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
 		expect(generateTypesOutput.stdout).toContain(
 			`Generating Types: ${pwd}/${taqueriaProjectPath}/artifacts => ${pwd}/${taqueriaProjectPath}/types`,
@@ -117,7 +117,7 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 		'Verify that users can properly use the generated types (involves origination to a testnet and calling an entrypoint, which will take a while)',
 		async () => {
 			await exec(`cp e2e/data/timelock.tz ${taqueriaProjectPath}/artifacts`);
-			await exec(`cd ${taqueriaProjectPath} && taq generate types`);
+			await exec(`taq generate types`, { cwd: `${taqueriaProjectPath}` });
 			await exec(`cp e2e/data/timelock.ts ${taqueriaProjectPath}/types`);
 			await exec(`cp e2e/data/tsconfig.timelock.json ${taqueriaProjectPath}/types`);
 			await exec(`npm init -y`, { cwd: `./${taqueriaProjectPath}/types` });
