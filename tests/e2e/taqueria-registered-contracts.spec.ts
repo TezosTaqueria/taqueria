@@ -30,12 +30,12 @@ describe('E2E for Registered Contracts', () => {
 		const config = await readFile(configFile, { encoding: 'utf-8' });
 		const json = JSON.parse(config);
 		expect(json).toBeInstanceOf(Object);
-		return expect(json).not.toHaveProperty('contracts');
+		expect(json).not.toHaveProperty('contracts');
 	});
 
 	test('Assure that a non-existing contract cannot be registered', async () => {
 		const nonExistingContract = join(taqueriaProjectPath, 'contracts', 'nonexisting');
-		const result = exec('taq add-contract nonexisting', { cwd: taqueriaProjectPath });
+		const result = await exec('taq add-contract nonexisting', { cwd: taqueriaProjectPath });
 		expect(result).rejects.toHaveProperty('stderr');
 		try {
 			await result;
