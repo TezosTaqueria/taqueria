@@ -230,9 +230,6 @@ export const inject = (deps: InjectedDependencies) => {
 	) => {
 		const availablePlugins = await getAvailablePlugins(context);
 		const config = await Util.TaqifiedDir.create(projectDir, i18n);
-		if (!config.config || !config.config.plugins || !config.config.plugins.length) {
-			return undefined;
-		}
 		const availablePluginsNotInstalled = config.config?.plugins
 			? availablePlugins.filter(name => config.config.plugins?.findIndex(p => p.name === name) === -1)
 			: availablePlugins;
