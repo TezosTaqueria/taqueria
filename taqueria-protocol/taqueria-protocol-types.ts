@@ -24,6 +24,7 @@ import * as SanitizedPath from '@taqueria/protocol/SanitizedPath';
 import * as SHA256 from '@taqueria/protocol/SHA256';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Task from '@taqueria/protocol/Task';
+import * as Template from '@taqueria/protocol/Template';
 import * as Url from '@taqueria/protocol/Url';
 import * as Verb from '@taqueria/protocol/Verb';
 import * as VersionNumber from '@taqueria/protocol/VersionNumber';
@@ -102,6 +103,7 @@ export {
 	SHA256,
 	TaqError,
 	Task,
+	Template,
 	Url,
 	Verb,
 	VersionNumber,

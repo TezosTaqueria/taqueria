@@ -57,6 +57,17 @@ describe('Integration tests using taqueria-mock-plugin', () => {
 		expect(stdout).toEqual(tableOutput.trimStart());
 	});
 
+	test('Verify that a template is included in the create help contents', () => {
+		const stdout = execSync('taq create --help', { cwd: testProjectPath }).toString().trim();
+		expect(stdout).toMatch(/choices.*json/);
+		expect(stdout).toMatch(/choices:.*text/);
+	});
+
+	test("Verify that a template's options are included in the help contents", () => {
+		const stdout = execSync('taq create json --help', { cwd: testProjectPath }).toString().trim();
+		expect(stdout).toMatch(/--greeting/);
+	});
+
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
 	afterAll(() => {

@@ -6,12 +6,12 @@ import * as Verb from '@taqueria/protocol/Verb';
 import { z } from 'zod';
 
 const handlerSchema = z.union([
-	z.literal('proxy'),
 	z.string().min(1),
+	z.literal('proxy'),
 ]);
 
 export const rawSchema = z.object({
-	name: Verb.rawSchema,
+	template: Verb.rawSchema,
 	command: Command.rawSchema,
 	description: z.string().min(4),
 	hidden: z.preprocess(
@@ -30,7 +30,7 @@ export const rawSchema = z.object({
 });
 
 const internalSchema = rawSchema.extend({
-	name: Verb.schemas.schema,
+	template: Verb.schemas.schema,
 	command: Command.schemas.schema,
 	options: z.preprocess(
 		val => val ?? [],

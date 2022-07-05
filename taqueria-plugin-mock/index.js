@@ -1,4 +1,6 @@
-const { Plugin, Task, Option, Operation, sendAsyncRes, sendAsyncJsonRes } = require('@taqueria/node-sdk');
+const { Plugin, Task, Option, PositionalArg, Operation, Template, sendAsyncRes, sendAsyncJsonRes } = require(
+	'@taqueria/node-sdk',
+);
 
 const tableResponse = JSON.stringify({
 	render: 'table',
@@ -95,25 +97,79 @@ Plugin.create(i18n => ({
 			handler: state => args => `Hello, ${args.FirstName}`,
 		}),
 	],
+	templates: [
+		Template.create({
+			template: 'json',
+			command: 'json <filename>',
+			description: 'Creates a JSON artifact using proxy handler',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'filename',
+					type: 'string',
+					required: true,
+					description: 'The name of the filename to generate',
+				}),
+			],
+			options: [
+				Option.create({
+					shortFlag: 'g',
+					flag: 'greeting',
+					type: 'string',
+					description: 'Greeting to include in JSON file',
+				}),
+			],
+			handler: 'proxy',
+		}),
+		Template.create({
+			template: 'text',
+			command: 'text <filename>',
+			description: 'Creates a textfile artifact using shell command',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'filename',
+					type: 'string',
+					required: true,
+					description: 'The name of the filename to generate',
+				}),
+			],
+			options: [
+				Option.create({
+					shortFlag: 'g',
+					flag: 'greeting',
+					type: 'string',
+					description: 'Greeting to include in JSON file',
+				}),
+			],
+			handler:
+				"echo 'Hi there, <%= it.greeting ? it.greeting : 'Tester' %>!' > <%= it.artifactsDir %?/<%= it.filename %>>",
+		}),
+	],
 	proxy: parsedArgs => {
-		switch (parsedArgs.task) {
-			case 'proxy':
-			case 'ping':
-				return parsedArgs.error
-					? Promise.reject('error')
-					: sendAsyncRes('pong', false);
-				break;
-			case 'proxy-json':
-				return parsedArgs.error
-					? sendAsyncErr('error')
-					: sendAsyncJsonRes(
-						parsedArgs.return === 'object'
-							? [{ 'ping': 'pong' }]
-							: 'pong',
-					);
-				break;
-			default:
-				return sendAsyncErr('Non-expected task');
+		if (parsedArgs.task) {
+			switch (parsedArgs.task) {
+				case 'proxy':
+				case 'ping':
+					return parsedArgs.error
+						? Promise.reject('error')
+						: sendAsyncRes('pong', false);
+					break;
+				case 'proxy-json':
+					return parsedArgs.error
+						? sendAsyncErr('error')
+						: sendAsyncJsonRes(
+							parsedArgs.return === 'object'
+								? [{ 'ping': 'pong' }]
+								: 'pong',
+						);
+					break;
+				default:
+					return sendAsyncErr('Non-expected task');
+			}
+		} else if (parsedArgs.template) {
+			switch (parsedArgs.template) {
+				case 'json':
+					return;
+			}
 		}
 	},
 }), process.argv);

@@ -42,6 +42,7 @@ import {
 	SanitizedAbsPath,
 	SanitizedArgs,
 	Task,
+	Template,
 } from './taqueria-protocol/taqueria-protocol-types.ts';
 import type { CLIConfig, DenoArgs, EnvKey, EnvVars } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
@@ -221,6 +222,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() => {},
 			() => log('OK'),
 		)
+		.command('create <template>')
 		.help(false);
 
 const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
@@ -486,7 +488,7 @@ const exposeTemplates = (
 	cliConfig: CLIConfig,
 	_config: LoadedConfig.t,
 	_env: EnvVars,
-	_parsedArgs: SanitizedArgs.t,
+	parsedArgs: SanitizedArgs.t,
 	_i18n: i18n.t,
 	state: EphemeralState.t,
 	_pluginLib: PluginLib,
@@ -501,7 +503,40 @@ const exposeTemplates = (
 				required: true,
 				choices: Object.keys(state.templates),
 			});
-			console.log('Configuring create template!');
+
+			if (parsedArgs.template) {
+				pipe(
+					state.plugins.reduce(
+						(retval, plugin) => plugin.templates ? [...retval, ...plugin.templates] : retval,
+						[] as Template.t[],
+					),
+					templates => templates.find(template => template.template === parsedArgs.template),
+					template => {
+						if (template) {
+							(template.positionals || []).reduce(
+								(cliConfig: CLIConfig, positional: PositionalArg.t) =>
+									cliConfig.positional(positional.placeholder, {
+										describe: positional.description,
+										type: positional.type,
+										default: positional.defaultValue,
+									}),
+								yargs,
+							);
+
+							(template.options || []).reduce(
+								(cliConfig: CLIConfig, option: Option.t) =>
+									cliConfig.option(option.flag, {
+										describe: option.description,
+										required: option.required,
+										default: option.defaultValue,
+										choices: option.choices,
+									}),
+								yargs,
+							);
+						}
+					},
+				);
+			}
 		},
 		() => {
 			console.log('Create template!');

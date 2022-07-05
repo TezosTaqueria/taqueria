@@ -15,6 +15,7 @@ import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria
 import type { TaqError } from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
+import * as Template from '@taqueria/protocol/Template';
 import { exec, ExecException } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
@@ -410,4 +411,5 @@ export {
 	SandboxAccountConfig,
 	SandboxConfig,
 	Task,
+	Template,
 };
