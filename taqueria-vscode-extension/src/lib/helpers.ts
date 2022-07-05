@@ -1,6 +1,6 @@
 import { EphemeralState } from '@taqueria/protocol/EphemeralState';
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
-import { TaqError } from '@taqueria/protocol/TaqError';
+import { E_TaqError, TaqError } from '@taqueria/protocol/TaqError';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import { join } from 'path';
@@ -468,7 +468,11 @@ export const inject = (deps: InjectedDependencies) => {
 				// For now, this is just a quick update to improve debugging
 				// .then(_ => output.clear())
 				.then(_ => output.outputChannel.appendLine(data))
-				.then(_ => output.outputChannel.show());
+				.then(_ => {
+					if (currentOutputLevel === OutputLevels.output) {
+						output.outputChannel.show();
+					}
+				});
 		};
 
 	const getSandboxNames = (projectDir: Util.TaqifiedDir) =>
@@ -583,6 +587,11 @@ export const inject = (deps: InjectedDependencies) => {
 				vscode.commands.executeCommand('setContext', plugin, found);
 			}
 		} catch (e: any) {
+			if (
+				e.code === 'E_NOT_TAQIFIED' && e.msg === `The given directory is not taqified as it's missing a .taq directory.`
+			) {
+				return;
+			}
 			showOutput(output)(OutputLevels.error, 'Error: Could not update command states:');
 			logAllNestedErrors(e, output);
 		}
