@@ -56,19 +56,11 @@
 		"tezos",
 		"build",
 		"test",
-		"deploy",
+		"originate",
 		"ecad",
 		"ecadlabs"
 	],
 	"activationEvents": [
-		"onCommand:taqueria.init",
-		"onCommand:taqueria.install",
-		"onCommand:taqueria.compile_smartpy",
-		"onCommand:taqueria.compile_ligo",
-		"onCommand:taqueria.start_sandbox",
-		"onCommand:taqueria.stop_sandbox",
-		"onCommand:taqueria.list_accounts",
-		"onCommand:taqueria.deploy",
 		"workspaceContains:.taq",
 		"onStartupFinished"
 	],
@@ -110,6 +102,13 @@
 				"enablement": "@taqueria-state/is-taqified"
 			},
 			{
+				"command": "taqueria.uninstall",
+				"category": "Taqueria",
+				"title": "Uninstall Plugin",
+				"shortTitle": "uninstall",
+				"enablement": "@taqueria-state/is-taqified && @taqueria-state/installed-plugin-count != 0"
+			},
+			{
 				"command": "taqueria.compile_smartpy",
 				"category": "Taqueria",
 				"title": "Compile (SmartPy)",
@@ -122,6 +121,13 @@
 				"title": "Compile (LIGO)",
 				"shortTitle": "compile --plugin ligo",
 				"enablement": "@taqueria/plugin-ligo"
+			},
+			{
+				"command": "taqueria.compile_archetype",
+				"category": "Taqueria",
+				"title": "Compile (Archetype)",
+				"shortTitle": "compile --plugin archetype",
+				"enablement": "@taqueria/plugin-archetype"
 			},
 			{
 				"command": "taqueria.start_sandbox",
@@ -145,11 +151,23 @@
 				"enablement": "@taqueria/plugin-flextesa"
 			},
 			{
-				"command": "taqueria.deploy",
+				"command": "taqueria.originate",
 				"category": "Taqueria",
-				"title": "Deploy contracts",
-				"shortTitle": "deploy",
+				"title": "Originate contracts",
+				"shortTitle": "originate",
 				"enablement": "@taqueria/plugin-taquito"
+			},
+			{
+				"command": "taqueria.opt_in",
+				"category": "Taqueria",
+				"title": "Opt-in to analytics",
+				"shortTitle": "opt-in"
+			},
+			{
+				"command": "taqueria.opt_out",
+				"category": "Taqueria",
+				"title": "Opt-out from analytics",
+				"shortTitle": "opt-out"
 			}
 		],
 		"menus": {
@@ -183,7 +201,7 @@
 					"when": "@taqueria/plugin-flextesa"
 				},
 				{
-					"command": "taqueria.deploy",
+					"command": "taqueria.originate",
 					"when": "@taqueria/plugin-taquito"
 				}
 			]

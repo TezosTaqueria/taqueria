@@ -16,6 +16,8 @@ export enum Commands {
 	scaffold = 'taqueria.scaffold',
 	install = 'taqueria.install',
 	uninstall = 'taqueria.uninstall',
+	optIn = 'taqueria.optIn',
+	optOut = 'taqueria.optOut',
 }
 
 export enum OutputLevels {
@@ -72,7 +74,7 @@ export const inject = (deps: InjectedDependencies) => {
 		folders: readonly api.WorkspaceFolder[],
 	) => {
 		addCommand(context)(Commands.init, async () => {
-			const uri = await getFolderForInitOrScaffold(context, output, i18n, folders);
+			const uri = await getFolderForInitOrScaffold('init', context, output, i18n, folders);
 			if (uri === undefined) {
 				return;
 			}
@@ -109,7 +111,7 @@ export const inject = (deps: InjectedDependencies) => {
 				.catch(err => logAllNestedErrors(err, output));
 
 		return exposeTask(Commands.scaffold, async (pathToTaq: Util.PathToTaq) => {
-			const projectUri = await getFolderForInitOrScaffold(context, output, i18n, folders);
+			const projectUri = await getFolderForInitOrScaffold('scaffold', context, output, i18n, folders);
 			if (projectUri === undefined) {
 				return;
 			}
@@ -152,6 +154,7 @@ export const inject = (deps: InjectedDependencies) => {
 	};
 
 	const getFolderForInitOrScaffold = async (
+		taskTitle: string,
 		context: api.ExtensionContext,
 		output: Output,
 		i18n: i18n,
@@ -163,7 +166,7 @@ export const inject = (deps: InjectedDependencies) => {
 				canSelectFolders: true,
 				canSelectFiles: false,
 				openLabel: 'Select project folder',
-				title: 'Select a project folder to scaffold into',
+				title: `Select a project folder to ${taskTitle} into`,
 				canSelectMany: false,
 			});
 			if (uris === undefined) {
@@ -177,18 +180,74 @@ export const inject = (deps: InjectedDependencies) => {
 		if (uris.length === 1) {
 			return uris[0];
 		} else {
-			showOutput(output)(OutputLevels.warn, 'Scaffolding with multiple open folders is not yet implemented.');
+			showOutput(output)(
+				OutputLevels.warn,
+				`Error: running ${taskTitle} with multiple open folders is not yet implemented.`,
+			);
 			return undefined;
 		}
 	};
 
-	const promptForPluginSelection = (_i18n: i18n, _debug: api.DebugSession | undefined, availablePlugins: string[]) =>
+	const getFolderForTasksOnTaqifiedFolders = async (
+		taskTitle: string,
+		context: api.ExtensionContext,
+		output: Output,
+		folders: readonly api.WorkspaceFolder[],
+		i18n: i18n,
+	) => {
+		const taqifiedDirectories = await getTaqifiedDirectories(folders, i18n);
+
+		// The developer has no taqified workspace folders. As such,
+		// we cannot proceed
+		if (taqifiedDirectories.length === 0) {
+			showError({
+				kind: 'E_NO_TAQUERIA_PROJECTS',
+				msg:
+					`You don't have any Taqueria projects. You'll need to taq'ify a project using \"Taqueria: Init\" and open the folder in VsCode before you can ${taskTitle}.`,
+			});
+			return undefined;
+		}
+
+		// The developer has a single taqified workspace folder, so we know
+		// exactly where to install a plugin
+		if (taqifiedDirectories.length === 1) {
+			return taqifiedDirectories[0];
+		}
+
+		// The developer has multiple taqified folders
+		const selectedDir = await promptForTaqProject(i18n, taqifiedDirectories);
+		if (!selectedDir) {
+			return undefined;
+		}
+		return await Util.makeDir(selectedDir, i18n);
+	};
+
+	const promptForPluginInstallation = (_i18n: i18n, _debug: api.DebugSession | undefined, availablePlugins: string[]) =>
 		vscode.window.showQuickPick(availablePlugins, {
 			canPickMany: false,
 			ignoreFocusOut: false,
 			placeHolder: 'Plugin name',
 			title: 'Select a plugin',
 		});
+
+	const promptForPluginUninstall = async (
+		i18n: i18n,
+		_debug: api.DebugSession | undefined,
+		projectDir: Util.PathToDir,
+	) => {
+		const config = await Util.TaqifiedDir.create(projectDir, i18n);
+		if (!config.config || !config.config.plugins || !config.config.plugins.length) {
+			return undefined;
+		}
+		const pluginNames = config.config.plugins.map(plugin => plugin.name);
+		const selectedPluginName = await vscode.window.showQuickPick(pluginNames, {
+			canPickMany: false,
+			ignoreFocusOut: false,
+			placeHolder: 'Plugin name',
+			title: 'Select a plugin',
+		});
+		return selectedPluginName;
+	};
 
 	const promptForScaffoldSelection = (_i18n: i18n, _debug: api.DebugSession | undefined, availablePlugins: string[]) =>
 		vscode.window.showQuickPick(availablePlugins, {
@@ -266,44 +325,42 @@ export const inject = (deps: InjectedDependencies) => {
 				.then(notify)
 				.catch(showError);
 
-		return exposeTask(Commands.install, (pathToTaq: Util.PathToTaq) =>
-			getTaqifiedDirectories(folders, i18n)
-				.then(results => {
-					// The developer has no taqified workspace folders. As such,
-					// we cannot install any plugins
-					if (results.length === 0) {
-						return addCommand(context)(Commands.install, () =>
-							showError({
-								kind: 'E_NO_TAQUERIA_PROJECTS',
-								msg:
-									"You don't have any Taqueria projects. You'll need to taq'ify a project using \"Taqueria: Init\" before you can install a plugin.",
-							}));
-					} // The developer has a single taqified workspace folder, so we know
-					// exactly where to install a plugin
-					else if (results.length === 1) {
-						const projectDir = results[0];
-						return promptForPluginSelection(i18n, api.debug.activeDebugSession, availablePlugins)
-							.then(pluginName => {
-								if (pluginName) {
-									return proxyInstall(pluginName, pathToTaq, i18n, projectDir);
-								}
-							});
-					} // The developer has multiple
-					else {
-						return promptForTaqProject(i18n, results)
-							.then(selectedDir => {
-								if (selectedDir) {
-									return Util.makeDir(selectedDir, i18n)
-										.then(projectDir =>
-											promptForPluginSelection(i18n, api.debug.activeDebugSession, availablePlugins)
-												.then(pluginName => {
-													if (pluginName) return proxyInstall(pluginName, pathToTaq, i18n, projectDir);
-												})
-										);
-								}
-							});
-					}
-				}));
+		await exposeTask(Commands.install, async (pathToTaq: Util.PathToTaq) => {
+			const projectDir = await getFolderForTasksOnTaqifiedFolders('install', context, output, folders, i18n);
+			if (projectDir === undefined) {
+				return;
+			}
+			const pluginName = await promptForPluginInstallation(i18n, api.debug.activeDebugSession, availablePlugins);
+			if (!pluginName) {
+				return;
+			}
+			await proxyInstall(pluginName, pathToTaq, i18n, projectDir);
+		});
+	};
+
+	const exposeUninstallTask = async (
+		context: api.ExtensionContext,
+		output: Output,
+		folders: readonly api.WorkspaceFolder[],
+		i18n: i18n,
+	) => {
+		const exposeTask = exposeTaskAsCommand(context, output, i18n);
+		const proxyUninstall = (pluginName: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
+			Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(`uninstall ${pluginName}`)
+				.then(notify)
+				.catch(showError);
+
+		exposeTask(Commands.uninstall, async (pathToTaq: Util.PathToTaq) => {
+			const projectDir = await getFolderForTasksOnTaqifiedFolders('install', context, output, folders, i18n);
+			if (projectDir === undefined) {
+				return;
+			}
+			const pluginName = await promptForPluginUninstall(i18n, api.debug.activeDebugSession, projectDir);
+			if (!pluginName) {
+				return;
+			}
+			await proxyUninstall(pluginName, pathToTaq, i18n, projectDir);
+		});
 	};
 
 	const taskNameToCmdId = (taskName: string) => 'taqueria.' + taskName.replace(/\s+/g, '_');
@@ -490,10 +547,15 @@ export const inject = (deps: InjectedDependencies) => {
 			const config = await Util.TaqifiedDir.create(projectDir, i18n);
 			showOutput(output)(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config.config}`);
 			vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config.config);
+			vscode.commands.executeCommand(
+				'setContext',
+				'@taqueria-state/installed-plugin-count',
+				config.config?.plugins?.length ?? 0,
+			);
 			const plugins = getWellKnownPlugins();
 			showOutput(output)(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
 			for (const plugin of plugins) {
-				const found = config.config.plugins?.find(item => item.name === plugin) !== undefined;
+				const found = config.config?.plugins?.find(item => item.name === plugin) !== undefined;
 				showOutput(output)(OutputLevels.debug, `plugins ${plugin}: ${found}`);
 				vscode.commands.executeCommand('setContext', plugin, found);
 			}
@@ -543,9 +605,10 @@ export const inject = (deps: InjectedDependencies) => {
 		exposeInitTask,
 		exposeScaffoldTask,
 		getTaqifiedDirectories,
-		promptForPluginSelection,
+		promptForPluginInstallation,
 		promptForTaqProject,
 		exposeInstallTask,
+		exposeUninstallTask,
 		taskNameToCmdId,
 		exposeTasksFromProject,
 		exposeTasksFromState,
