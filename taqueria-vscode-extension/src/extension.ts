@@ -108,6 +108,24 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 					'output',
 					'Compilation successful.',
 				);
+				exposeTaqTask(
+					COMMAND_PREFIX + 'generate_types',
+					'generate types',
+					'output',
+					'Type generation successful.',
+				);
+				exposeTaqTask(
+					COMMAND_PREFIX + 'typecheck',
+					'typecheck',
+					'output',
+					'Type generation successful.',
+				);
+				exposeTaqTask(
+					COMMAND_PREFIX + 'test',
+					'test',
+					'output',
+					'Test setup successful.',
+				);
 
 				// Sandbox tasks
 				exposeSandboxTask(COMMAND_PREFIX + 'start_sandbox', 'start sandbox', 'notify');

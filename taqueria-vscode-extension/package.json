@@ -99,7 +99,7 @@
 				"category": "Taqueria",
 				"title": "Install Plugin",
 				"shortTitle": "install",
-				"enablement": "@taqueria-state/is-taqified"
+				"enablement": "@taqueria-state/is-taqified && @taqueria-state/not-installed-plugin-count != 0"
 			},
 			{
 				"command": "taqueria.uninstall",
@@ -168,6 +168,27 @@
 				"category": "Taqueria",
 				"title": "Opt-out from analytics",
 				"shortTitle": "opt-out"
+			},
+			{
+				"command": "taqueria.generate_types",
+				"category": "Taqueria",
+				"title": "Generate Types",
+				"shortTitle": "generate types",
+				"enablement": "@taqueria/plugin-contract-types"
+			},
+			{
+				"command": "taqueria.typecheck",
+				"category": "Taqueria",
+				"title": "Typecheck Michelson contracts",
+				"shortTitle": "typecheck",
+				"enablement": "@taqueria/plugin-contract-types"
+			},
+			{
+				"command": "taqueria.test",
+				"category": "Taqueria",
+				"title": "Setup directory as a partition to run Jest tests",
+				"shortTitle": "test",
+				"enablement": "@taqueria/plugin-jest"
 			}
 		],
 		"menus": {
@@ -203,6 +224,18 @@
 				{
 					"command": "taqueria.originate",
 					"when": "@taqueria/plugin-taquito"
+				},
+				{
+					"command": "taqueria.generate_types",
+					"when": "@taqueria/plugin-contract-types"
+				},
+				{
+					"command": "taqueria.typecheck",
+					"when": "@taqueria/plugin-contract-types"
+				},
+				{
+					"command": "taqueria.test",
+					"enablement": "@taqueria/plugin-jest"
 				}
 			]
 		}

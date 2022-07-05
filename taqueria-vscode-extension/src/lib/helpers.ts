@@ -222,13 +222,28 @@ export const inject = (deps: InjectedDependencies) => {
 		return await Util.makeDir(selectedDir, i18n);
 	};
 
-	const promptForPluginInstallation = (_i18n: i18n, _debug: api.DebugSession | undefined, availablePlugins: string[]) =>
-		vscode.window.showQuickPick(availablePlugins, {
+	const promptForPluginInstallation = async (
+		i18n: i18n,
+		_debug: api.DebugSession | undefined,
+		context: api.ExtensionContext,
+		projectDir: Util.PathToDir,
+	) => {
+		const availablePlugins = await getAvailablePlugins(context);
+		const config = await Util.TaqifiedDir.create(projectDir, i18n);
+		if (!config.config || !config.config.plugins || !config.config.plugins.length) {
+			return undefined;
+		}
+		const availablePluginsNotInstalled = config.config?.plugins
+			? availablePlugins.filter(name => config.config.plugins?.findIndex(p => p.name === name) === -1)
+			: availablePlugins;
+		const pluginName = vscode.window.showQuickPick(availablePluginsNotInstalled, {
 			canPickMany: false,
 			ignoreFocusOut: false,
 			placeHolder: 'Plugin name',
 			title: 'Select a plugin',
 		});
+		return pluginName;
+	};
 
 	const promptForPluginUninstall = async (
 		i18n: i18n,
@@ -319,7 +334,6 @@ export const inject = (deps: InjectedDependencies) => {
 		i18n: i18n,
 	) => {
 		const exposeTask = exposeTaskAsCommand(context, output, i18n);
-		const availablePlugins = await getAvailablePlugins(context);
 		const proxyInstall = (pluginName: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
 			Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(`install ${pluginName}`)
 				.then(notify)
@@ -330,7 +344,7 @@ export const inject = (deps: InjectedDependencies) => {
 			if (projectDir === undefined) {
 				return;
 			}
-			const pluginName = await promptForPluginInstallation(i18n, api.debug.activeDebugSession, availablePlugins);
+			const pluginName = await promptForPluginInstallation(i18n, api.debug.activeDebugSession, context, projectDir);
 			if (!pluginName) {
 				return;
 			}
@@ -545,12 +559,21 @@ export const inject = (deps: InjectedDependencies) => {
 		showOutput(output)(OutputLevels.debug, 'Project config changed, updating command states...');
 		try {
 			const config = await Util.TaqifiedDir.create(projectDir, i18n);
+			const availablePlugins = await getAvailablePlugins(context);
+			const availablePluginsNotInstalled = config.config?.plugins
+				? availablePlugins.filter(name => config.config.plugins?.findIndex(p => p.name === name) === -1)
+				: availablePlugins;
 			showOutput(output)(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config.config}`);
 			vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config.config);
 			vscode.commands.executeCommand(
 				'setContext',
 				'@taqueria-state/installed-plugin-count',
 				config.config?.plugins?.length ?? 0,
+			);
+			vscode.commands.executeCommand(
+				'setContext',
+				'@taqueria-state/not-installed-plugin-count',
+				availablePluginsNotInstalled.length,
 			);
 			const plugins = getWellKnownPlugins();
 			showOutput(output)(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
