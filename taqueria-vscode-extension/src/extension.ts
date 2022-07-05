@@ -42,6 +42,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeScaffoldTask,
 		exposeInstallTask,
 		exposeUninstallTask,
+		exposeOriginateTask,
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
 		createWatcherIfNotExists,
@@ -132,8 +133,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 				exposeSandboxTask(COMMAND_PREFIX + 'stop_sandbox', 'stop sandbox', 'notify');
 				exposeSandboxTask(COMMAND_PREFIX + 'list_accounts', 'list accounts', 'output');
 
-				// Originate task
-				exposeTaqTask(COMMAND_PREFIX + 'originate', 'originate', 'output', 'Origination successful.');
+				exposeOriginateTask(context, output, folders, i18n);
 
 				try {
 					createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);

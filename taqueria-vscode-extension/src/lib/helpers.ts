@@ -18,6 +18,7 @@ export enum Commands {
 	uninstall = 'taqueria.uninstall',
 	optIn = 'taqueria.optIn',
 	optOut = 'taqueria.optOut',
+	originate = 'taqueria.originate',
 }
 
 export enum OutputLevels {
@@ -374,6 +375,53 @@ export const inject = (deps: InjectedDependencies) => {
 		});
 	};
 
+	const exposeOriginateTask = async (
+		context: api.ExtensionContext,
+		output: Output,
+		folders: readonly api.WorkspaceFolder[],
+		i18n: i18n,
+	) => {
+		const exposeTask = exposeTaskAsCommand(context, output, i18n);
+		const proxyOriginate = (
+			pathToTaq: Util.PathToTaq,
+			i18n: i18n,
+			projectDir?: Util.PathToDir,
+			environmentName?: string,
+		) =>
+			Util.proxyToTaq(pathToTaq, i18n, showOutput(output), projectDir)(`originate -e ${environmentName}`)
+				.then(msg => {
+					showOutput(output)(OutputLevels.output, msg);
+					notify('Origination Succeeded');
+				})
+				.catch(err => {
+					showOutput(output)(OutputLevels.error, '\nError(s) occurred while trying to originate contract(s):');
+					logAllNestedErrors(err, output);
+					showError({
+						kind: 'E_EXEC',
+						msg: 'Origination Failed, see the output window for details.',
+					});
+				});
+
+		exposeTask(Commands.originate, async (pathToTaq: Util.PathToTaq) => {
+			const projectDir = await getFolderForTasksOnTaqifiedFolders('install', context, output, folders, i18n);
+			if (projectDir === undefined) {
+				return;
+			}
+			const config = await Util.TaqifiedDir.create(projectDir, i18n);
+			const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
+			const environmentName = await vscode.window.showQuickPick(environmentNames, {
+				canPickMany: false,
+				ignoreFocusOut: false,
+				placeHolder: 'Environment Name',
+				title: 'Select an environment',
+			});
+			if (!environmentName) {
+				return;
+			}
+			await proxyOriginate(pathToTaq, i18n, projectDir, environmentName);
+		});
+	};
+
 	const taskNameToCmdId = (taskName: string) => 'taqueria.' + taskName.replace(/\s+/g, '_');
 
 	const exposeTasksFromProject = (
@@ -460,16 +508,13 @@ export const inject = (deps: InjectedDependencies) => {
 			if (!shouldOutput(currentOutputLevel, output.logLevel)) {
 				return;
 			}
-			Promise.resolve()
-				// TODO: We might need to separate the output pane from logs pane.
-				// For now, this is just a quick update to improve debugging
-				// .then(_ => output.clear())
-				.then(_ => output.outputChannel.appendLine(data))
-				.then(_ => {
-					if (currentOutputLevel === OutputLevels.output) {
-						output.outputChannel.show();
-					}
-				});
+			// TODO: We might need to separate the output pane from logs pane.
+			// For now, this is just a quick update to improve debugging
+			// .then(_ => output.clear())
+			output.outputChannel.appendLine(data);
+			if (currentOutputLevel === OutputLevels.output) {
+				output.outputChannel.show();
+			}
 		};
 
 	const getSandboxNames = (projectDir: Util.TaqifiedDir) =>
@@ -638,6 +683,7 @@ export const inject = (deps: InjectedDependencies) => {
 		promptForTaqProject,
 		exposeInstallTask,
 		exposeUninstallTask,
+		exposeOriginateTask,
 		taskNameToCmdId,
 		exposeTasksFromProject,
 		exposeTasksFromState,
