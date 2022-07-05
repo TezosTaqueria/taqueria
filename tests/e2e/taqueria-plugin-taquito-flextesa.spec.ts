@@ -1,6 +1,13 @@
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import utils from 'util';
+import {
+	storage_part1,
+	storage_part2,
+	storage_part3,
+	storage_part4,
+	storage_part5,
+} from './data/all-types-storage-data';
 import { generateTestProject, getContainerName } from './utils/utils';
 const exec = utils.promisify(exec1);
 
@@ -142,8 +149,12 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			const contractFromSandbox = await exec(
 				`curl http://localhost:20000/chains/main/blocks/head/context/contracts/${contractHash}`,
 			);
-			expect(contractFromSandbox.stdout).toContain('Jimmy I dont know what goes here');
-			expect(contractFromSandbox.stdout).toContain('Jimmy I dont know what goes here');
+
+			expect(contractFromSandbox.stdout).toContain(storage_part1);
+			expect(contractFromSandbox.stdout).toMatch(storage_part2);
+			expect(contractFromSandbox.stdout).toContain(storage_part3);
+			expect(contractFromSandbox.stdout).toMatch(storage_part4);
+			expect(contractFromSandbox.stdout).toContain(storage_part5);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
