@@ -1,3 +1,5 @@
+import * as Config from '@taqueria/protocol/Config';
+import * as Contract from '@taqueria/protocol/Contract';
 import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
@@ -11,6 +13,7 @@ import * as PositionalArg from '@taqueria/protocol/PositionalArg';
 import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
+import * as SHA256 from '@taqueria/protocol/SHA256';
 import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import type { TaqError } from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
@@ -386,6 +389,44 @@ const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
 			: getNameFromPluginManifest(pluginManifest);
 };
 
+const joinPaths = (...paths: string[]): string => paths.join('/');
+
+const newContract = async (sourceFile: string, parsedArgs: RequestArgs.t) => {
+	const contractPath = joinPaths(parsedArgs.projectDir, parsedArgs.config.contractsDir, sourceFile);
+	try {
+		const contents = await readFile(contractPath, { encoding: 'utf-8' });
+		const hash = await SHA256.toSHA256(contents);
+		return await eager(Contract.of({
+			sourceFile,
+			hash,
+		}));
+	} catch (err) {
+		await Promise.reject(`Could not read ${contractPath}`);
+	}
+};
+
+const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): Promise<void> => {
+	try {
+		const config = await readJsonFile<Config.t>(parsedArgs.config.configFile);
+		if (config.contracts && config.contracts[sourceFile]) {
+			await sendAsyncErr(`${sourceFile} has already been registered`);
+		} else {
+			const contract = await newContract(sourceFile, parsedArgs);
+			const contracts = config.contracts || {};
+			const updatedConfig = {
+				...config,
+				contracts: {
+					...contracts,
+					...Object.fromEntries([[sourceFile, contract]]),
+				},
+			};
+			await writeJsonFile(parsedArgs.config.configFile)(updatedConfig);
+		}
+	} catch (err) {
+		if (err) console.error('Error registering contract:', err);
+	}
+};
+
 export const Plugin = {
 	create: (definer: pluginDefiner, unparsedArgs: Args) => {
 		const stack = get();
@@ -410,4 +451,8 @@ export {
 	SandboxAccountConfig,
 	SandboxConfig,
 	Task,
+};
+
+export const experimental = {
+	registerContract,
 };

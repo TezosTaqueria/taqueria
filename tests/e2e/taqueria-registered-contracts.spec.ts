@@ -267,3 +267,95 @@ describe('E2E for Registered Contracts', () => {
 		expect(output).toEqual(expectedTableOutput);
 	});
 });
+
+describe('E2E for Registered Contracts via SDK', () => {
+	beforeAll(async () => {
+		await generateTestProject(taqueriaProjectPath, ['mock']);
+		await sleep(1000);
+
+		const config = await readFile(configFile, { encoding: 'utf-8' });
+		configFileContents = JSON.stringify(config);
+	});
+
+	// Remove all files from contracts folder without removing folder itself
+	afterEach(async () => {
+		await writeFile(configFile, JSON.parse(configFileContents), { encoding: 'utf-8' });
+	});
+
+	afterAll(async () => {
+		await rm(taqueriaProjectPath, { force: true, recursive: true });
+	});
+
+	test('Assure that a non-existing contract cannot be registered', async () => {
+		const nonExistingContract = join(taqueriaProjectPath, 'contracts', 'nonexisting');
+
+		// testRegisterContract is a task from the mock plugin that calls registerContract from the SDK
+		const { stderr } = await exec('taq testRegisterContract nonexisting', { cwd: taqueriaProjectPath });
+
+		expect(stderr).toContain('Could not read');
+		expect(stderr).toContain(nonExistingContract);
+
+		const config = await readFile(configFile, { encoding: 'utf-8' });
+		const json = JSON.parse(config);
+		expect(json).toBeInstanceOf(Object);
+		return expect(json).not.toHaveProperty('contracts');
+	});
+
+	test('Assure that an existing contract can be registered', async () => {
+		await copyFile(
+			'e2e/data/hello-tacos.mligo',
+			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
+		);
+
+		// testRegisterContract is a task from the mock plugin that calls registerContract from the SDK
+		await exec('taq testRegisterContract hello-tacos.mligo', { cwd: taqueriaProjectPath });
+
+		const bytes = await readFile(join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'));
+		const digest = createHash('sha256');
+		digest.update(bytes);
+		const hash = digest.digest('hex');
+
+		const config = await readFile(configFile, { encoding: 'utf-8' });
+		const json = JSON.parse(config);
+		expect(json).toBeInstanceOf(Object);
+		expect(json).toHaveProperty('contracts');
+		return expect(json.contracts).toEqual({
+			'hello-tacos.mligo': {
+				sourceFile: 'hello-tacos.mligo',
+				hash,
+			},
+		});
+	});
+
+	test('Assure that the same contract cannot be registered twice', async () => {
+		await copyFile(
+			'e2e/data/hello-tacos.mligo',
+			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
+		);
+
+		// testRegisterContract is a task from the mock plugin that calls registerContract from the SDK
+		await exec('taq testRegisterContract hello-tacos.mligo', { cwd: taqueriaProjectPath });
+
+		// testRegisterContract is a task from the mock plugin that calls registerContract from the SDK
+		const { stderr } = await exec('taq testRegisterContract hello-tacos.mligo', { cwd: taqueriaProjectPath });
+
+		expect(stderr).toContain('hello-tacos.mligo has already been registered');
+
+		// Assure that just a single contract is registered
+		const bytes = await readFile(join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'));
+		const digest = createHash('sha256');
+		digest.update(bytes);
+		const hash = digest.digest('hex');
+
+		const config = await readFile(configFile, { encoding: 'utf-8' });
+		const json = JSON.parse(config);
+		expect(json).toBeInstanceOf(Object);
+		expect(json).toHaveProperty('contracts');
+		return expect(json.contracts).toEqual({
+			'hello-tacos.mligo': {
+				sourceFile: 'hello-tacos.mligo',
+				hash,
+			},
+		});
+	});
+});
