@@ -32,10 +32,12 @@ describe('E2E Testing for taqueria CLI,', () => {
 		}
 	});
 
-	test('Verify that taq reports a version', async () => {
-		const version = await exec('taq --version');
+	test('Verify that taq reports a version', () => {
+		const version = execSync('taq --version');
 		try {
-			expect(version.stdout.trim()).toMatch(/^((v\d+\.\d+\.\d+)|(dev-[\w-]+)|(\d+)-[\w-]+)$/);
+			expect(version.toString('utf8').trim()).toMatch(
+				/^((v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)|(dev-[\w-]+)|(\d+)-[\w-]+)$/,
+			);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -100,7 +102,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 		}
 	});
 
-	test('Verify that ligo and archetype expose the plugin choice option for compile in the help menu', async () => {
+	test('Verify that ligo and archetype expose the plugin choice option in the help menu', async () => {
 		try {
 			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);
 			await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`);
