@@ -1,5 +1,6 @@
 {
 	"words": [
+		"abspath",
 		"EBADENGINE",
 		"ecad",
 		"ecadlabs",
@@ -19,6 +20,7 @@
 		"taqify",
 		"Taqueria",
 		"taquito",
-		"Tezos"
+		"Tezos",
+		"typecheck"
 	]
 }

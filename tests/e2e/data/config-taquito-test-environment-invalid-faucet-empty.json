@@ -1,56 +1,56 @@
 {
-    "language": "en",
-    "plugins": [
-        {
-            "name": "@taqueria/plugin-taquito",
-            "type": "npm"
-        }
-    ],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {}
-        },
-        "test": {
-            "networks": ["ithacanet"],
-            "sandboxes": [],
-            "storage": {"hello-tacos.tz": "100"}
-        }
-    },
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-            "rpcUrl": "http://localhost:20000"
-        }
-    },
-    "network": {
-        "ithacanet": {
-            "label": "ithacanet",
-            "rpcUrl": "https://ithacanet.ecadinfra.com",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-            "faucet": {
-                "pkh": "",
-                "mnemonic": [],
-                "email": "",
-                "password": "",
-                "amount": "",
-                "activation_code": ""
-            }
-        }
-    },
-    "accounts": {
-        "bob": "3000000000",
-        "alice": "2000000000",
-        "john": "4000000000",
-        "jane": "5000000000",
-        "joe": "1000000000"
-    } 
+	"language": "en",
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-taquito",
+			"type": "npm"
+		}
+	],
+	"contractsDir": "contracts",
+	"testsDir": "tests",
+	"artifactsDir": "artifacts",
+	"environment": {
+		"default": "development",
+		"development": {
+			"networks": [],
+			"sandboxes": [
+				"local"
+			],
+			"storage": {}
+		},
+		"test": {
+			"networks": ["ithacanet"],
+			"sandboxes": [],
+			"storage": { "hello-tacos.tz": "100" }
+		}
+	},
+	"sandbox": {
+		"local": {
+			"label": "Local Tezos Sandbox",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"rpcUrl": "http://localhost:20000"
+		}
+	},
+	"network": {
+		"ithacanet": {
+			"label": "ithacanet",
+			"rpcUrl": "https://ithacanet.ecadinfra.com",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"faucet": {
+				"pkh": "",
+				"mnemonic": [],
+				"email": "",
+				"password": "",
+				"amount": "",
+				"activation_code": ""
+			}
+		}
+	},
+	"accounts": {
+		"bob": "3000000000",
+		"alice": "2000000000",
+		"john": "4000000000",
+		"jane": "5000000000",
+		"joe": "1000000000"
+	}
 }
