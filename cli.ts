@@ -415,7 +415,7 @@ const scaffoldProject = (i18n: i18n.t) =>
 			await eager(rm(gitDir));
 			log('    ✓ Remove Git directory');
 
-			await eager(exec('npm install 2>&1 > /dev/null', {}, false, destDir));
+			await eager(exec('npm run setup 2>&1 > /dev/null', {}, false, destDir));
 			log('    ✓ Install plugins');
 
 			await eager(exec('taq init 2>&1 > /dev/null', {}, false, destDir));
