@@ -9,9 +9,6 @@ const exec = util.promisify(exec1);
 
 const taqueriaProjectPath = './e2e/auto-test-cli';
 
-// Useful function for debugging
-const debug = (projectDir: string) => exec(`rm -rf /tmp/temp-project && cp -r ${projectDir} /tmp/temp-project`);
-
 describe('E2E Testing for taqueria CLI,', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath);
@@ -46,7 +43,9 @@ describe('E2E Testing for taqueria CLI,', () => {
 	test('Verify that taq reports a version', () => {
 		const version = execSync('taq --version');
 		try {
-			expect(version.toString('utf8').trim()).toMatch(/^((v\d+\.\d+\.\d+)|(dev-[\w-]+)|(\d+)-[\w-]+)$/);
+			expect(version.toString('utf8').trim()).toMatch(
+				/^((v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)|(dev-[\w-]+)|(\d+)-[\w-]+)$/,
+			);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -63,7 +62,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -75,7 +74,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPlugin);
 
-			await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -83,7 +82,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the ligo plugin exposes the associated options in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -94,7 +93,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
 			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -102,7 +101,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the ligo plugin aliases expose the correct info in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -118,7 +117,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			);
 			expect(ligoAliasCompileLigoHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -126,7 +125,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the smartpy plugin exposes the associated commands in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-smartpy`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -137,7 +136,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const smartpyHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyPlugin);
 
-			await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-smartpy`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -145,7 +144,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the smartpy plugin exposes the associated options in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-smartpy`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -156,7 +155,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const smartpyHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
 			expect(smartpyHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-smartpy`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -164,7 +163,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the smartpy plugin aliases expose the correct info in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-smartpy`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -180,7 +179,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			);
 			expect(smartpyAliasCompileLigoHelpContents.stdout).toBe(contents.helpContentsSmartpyPluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-smartpy`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -188,7 +187,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the taquito plugin exposes the associated commands in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-taquito -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-taquito`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -199,7 +198,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const taquitoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPlugin);
 
-			await exec(`taq uninstall @taqueria/plugin-taquito -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-taquito`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -207,7 +206,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the taquito plugin exposes the associated options in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-taquito -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-taquito`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -218,7 +217,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const taquitoHelpContents = await exec(`taq deploy --help --projectDir=${taqueriaProjectPath}`);
 			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-taquito -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-taquito`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -226,7 +225,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the taquito plugin aliases expose the correct info in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-taquito -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-taquito`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -237,7 +236,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const taquitoHelpContents = await exec(`taq originate --help --projectDir=${taqueriaProjectPath}`);
 			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-taquito -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-taquito`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -245,7 +244,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the archetype plugin exposes the associated commands in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-archetype`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -256,7 +255,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const archetypeHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(archetypeHelpContents.stdout).toBe(contents.helpContentsArchetypePlugin);
 
-			await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-archetype`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -264,7 +263,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the archetype plugin exposes the associated options in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-archetype`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -275,7 +274,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const archetypeHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
 			expect(archetypeHelpContents.stdout).toBe(contents.helpContentsArchetypePluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-archetype`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -283,7 +282,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the archetype plugin aliases expose the correct info in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-archetype`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -299,7 +298,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			);
 			expect(archetypeAliasCompileArchetypeHelpContents.stdout).toBe(contents.helpContentsArchetypePluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-archetype`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -307,7 +306,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the flextesa plugin exposes the associated commands in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -318,7 +317,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const flextesaHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPlugin);
 
-			await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -326,7 +325,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the flextesa plugin exposes the associated option for starting a sandbox in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -337,7 +336,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const flextesaHelpContents = await exec(`taq start sandbox --help --projectDir=${taqueriaProjectPath}`);
 			expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStartSandbox);
 
-			await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -345,7 +344,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the flextesa plugin exposes the associated alias for starting a sandbox in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -356,7 +355,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const flextesaHelpContents = await exec(`taq start --help --projectDir=${taqueriaProjectPath}`);
 			expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStartSandbox);
 
-			await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -364,7 +363,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the flextesa plugin exposes the associated option for stopping a sandbox in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -375,7 +374,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const flextesaHelpContents = await exec(`taq stop sandbox --help --projectDir=${taqueriaProjectPath}`);
 			expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStopSandbox);
 
-			await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -383,7 +382,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the flextesa plugin exposes the associated alias for stopping a sandbox in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -394,7 +393,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const flextesaHelpContents = await exec(`taq stop --help --projectDir=${taqueriaProjectPath}`);
 			expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginStopSandbox);
 
-			await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -402,7 +401,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the flextesa plugin exposes the associated option for listing sandbox accounts in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -413,7 +412,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const flextesaHelpContents = await exec(`taq list accounts --help --projectDir=${taqueriaProjectPath}`);
 			expect(flextesaHelpContents.stdout).toBe(contents.helpContentsFlextesaPluginListAccounts);
 
-			await exec(`taq uninstall @taqueria/plugin-flextesa -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-flextesa`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -421,7 +420,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the contract types plugin exposes the associated commands in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-contract-types -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-contract-types`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -432,7 +431,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const generateTypesHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypesPlugin);
 
-			await exec(`taq uninstall @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-contract-types`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -440,7 +439,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the contract types plugin exposes the associated options in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-contract-types -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-contract-types`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -451,7 +450,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const generateTypesHelpContents = await exec(`taq generate types --help --projectDir=${taqueriaProjectPath}`);
 			expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsGenerateTypesPluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-contract-types`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -459,7 +458,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the contract types plugin exposes the associated aliases in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-contract-types -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-contract-types`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -473,7 +472,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const generateTypesHelpContentsGenTypes = await exec(`taq gentypes --help --projectDir=${taqueriaProjectPath}`);
 			expect(generateTypesHelpContentsGenTypes.stdout).toBe(contents.helpContentsGenerateTypesPluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-contract-types -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-contract-types`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -481,7 +480,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the jest plugin exposes the associated commands in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-jest -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-jest`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -493,7 +492,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 			expect(jestHelpContents.stdout).toBe(contents.helpContentsJestPlugin);
 
-			await exec(`taq uninstall @taqueria/plugin-jest -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-jest`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -501,7 +500,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the jest plugin exposes the associated options in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-jest -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-jest`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -512,7 +511,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const jestHelpContents = await exec(`taq test --help --projectDir=${taqueriaProjectPath}`);
 			expect(jestHelpContents.stdout).toBe(contents.helpContentsJestPluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-jest -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-jest`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -520,7 +519,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that the jest plugin aliases expose the correct info in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-jest -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-jest`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -531,7 +530,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const jestAliasCHelpContents = await exec(`taq jest --help --projectDir=${taqueriaProjectPath}`);
 			expect(jestAliasCHelpContents.stdout).toBe(contents.helpContentsJestPluginSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-jest -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-jest`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -539,8 +538,8 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);
-			await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq install ../../../taqueria-plugin-smartpy`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -551,8 +550,8 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoSmartpy);
 
-			await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
-			await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq uninstall @taqueria/plugin-smartpy`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -560,8 +559,8 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that ligo and archetype expose the plugin choice option for compile in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);
-			await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq install ../../../taqueria-plugin-archetype`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -572,8 +571,8 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoArchetype);
 
-			await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
-			await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq uninstall @taqueria/plugin-archetype`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -581,8 +580,8 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that ligo and archetype expose the plugin choice option for compile in the help menu', async () => {
 		try {
-			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);
-			await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`);
+			await exec(`taq install ../../../taqueria-plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq install ../../../taqueria-plugin-archetype`, { cwd: `./${taqueriaProjectPath}` });
 
 			// TODO: This can removed after this is resolved:
 			// https://github.com/ecadlabs/taqueria/issues/528
@@ -593,8 +592,8 @@ describe('E2E Testing for taqueria CLI,', () => {
 			const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
 			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoArchetypeSpecific);
 
-			await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
-			await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`);
+			await exec(`taq uninstall @taqueria/plugin-ligo`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq uninstall @taqueria/plugin-archetype`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -617,7 +616,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	test('Verify that trying to install a package that does not exist returns an error', async () => {
 		try {
-			await exec(`taq install acoupleofecadhamburgers -p ${taqueriaProjectPath}`).catch(
+			await exec(`taq install acoupleofecadhamburgers`, { cwd: `./${taqueriaProjectPath}` }).catch(
 				(err: ExecException & { stdout: string; stderr: string }) => {
 					const pattern = /Could not read.*acoupleofecadhamburgers\/package\.json$/m;
 					expect(err.code).toEqual(9);

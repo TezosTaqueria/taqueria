@@ -4,7 +4,7 @@ export const oneRowTable = `
 ├────────────────┼────────┤
 │ hello-tacos.tz │ Valid  │
 └────────────────┴────────┘
-`.trimStart()
+`.trimStart();
 
 export const oneRowTableSimulateResult = `
 ┌────────────────┬────────────────────┐
@@ -18,7 +18,7 @@ export const oneRowTableSimulateResult = `
 │                │                    │
 │                │                    │
 └────────────────┴────────────────────┘
-`.trimStart()
+`.trimStart();
 
 export const twoRowTable = `
 ┌────────────────────┬────────┐
@@ -28,7 +28,7 @@ export const twoRowTable = `
 ├────────────────────┼────────┤
 │ hello-tacos-two.tz │ Valid  │
 └────────────────────┴────────┘
-`.trimStart()
+`.trimStart();
 
 export const nonExistent = `
 ┌──────────┬────────┐
@@ -36,7 +36,7 @@ export const nonExistent = `
 ├──────────┼────────┤
 │ test.tz  │ N/A    │
 └──────────┴────────┘
-`.trimStart()
+`.trimStart();
 
 export const typeError = `
 ┌──────────────────────────┬─────────┐
@@ -44,7 +44,7 @@ export const typeError = `
 ├──────────────────────────┼─────────┤
 │ hello-tacos-ill-typed.tz │ Invalid │
 └──────────────────────────┴─────────┘
-`.trimStart()
+`.trimStart();
 
 export const runtimeError = `
 ┌────────────────┬─────────┐
@@ -52,7 +52,7 @@ export const runtimeError = `
 ├────────────────┼─────────┤
 │ hello-tacos.tz │ Invalid │
 └────────────────┴─────────┘
-`.trimStart()
+`.trimStart();
 
 export const tezosClientError = `
 Error:
@@ -61,4 +61,4 @@ Error:
   Unknown primitive hello.
 
 
-`.trimStart()
+`.trimStart();
