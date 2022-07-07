@@ -199,16 +199,28 @@
 					"when": "!@taqueria-state/is-taqified"
 				},
 				{
+					"command": "taqueria.scaffold",
+					"when": "!@taqueria-state/is-taqified"
+				},
+				{
 					"command": "taqueria.install",
 					"when": "@taqueria-state/is-taqified"
+				},
+				{
+					"command": "taqueria.uninstall",
+					"when": "@taqueria-state/is-taqified && @taqueria-state/installed-plugin-count != 0"
+				},
+				{
+					"command": "taqueria.compile_smartpy",
+					"when": "@taqueria/plugin-smartpy"
 				},
 				{
 					"command": "taqueria.compile_ligo",
 					"when": "@taqueria/plugin-ligo"
 				},
 				{
-					"command": "taqueria.compile_smartpy",
-					"when": "@taqueria/plugin-smartpy"
+					"command": "taqueria.compile_archetype",
+					"when": "@taqueria/plugin-archetype"
 				},
 				{
 					"command": "taqueria.start_sandbox",
@@ -236,7 +248,7 @@
 				},
 				{
 					"command": "taqueria.test",
-					"enablement": "@taqueria/plugin-jest"
+					"when": "@taqueria/plugin-jest"
 				}
 			]
 		}

@@ -603,39 +603,52 @@ export const inject = (deps: InjectedDependencies) => {
 		projectDir: Util.PathToDir,
 	) => {
 		showOutput(output)(OutputLevels.debug, 'Project config changed, updating command states...');
+		let taqFolderFound: boolean;
 		try {
-			const config = await Util.TaqifiedDir.create(projectDir, i18n);
-			const availablePlugins = await getAvailablePlugins(context);
-			const availablePluginsNotInstalled = config.config?.plugins
-				? availablePlugins.filter(name => config.config.plugins?.findIndex(p => p.name === name) === -1)
-				: availablePlugins;
-			showOutput(output)(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config.config}`);
-			vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config.config);
-			vscode.commands.executeCommand(
-				'setContext',
-				'@taqueria-state/installed-plugin-count',
-				config.config?.plugins?.length ?? 0,
-			);
-			vscode.commands.executeCommand(
-				'setContext',
-				'@taqueria-state/not-installed-plugin-count',
-				availablePluginsNotInstalled.length,
-			);
-			const plugins = getWellKnownPlugins();
-			showOutput(output)(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
-			for (const plugin of plugins) {
-				const found = config.config?.plugins?.find(item => item.name === plugin) !== undefined;
-				showOutput(output)(OutputLevels.debug, `plugins ${plugin}: ${found}`);
-				vscode.commands.executeCommand('setContext', plugin, found);
-			}
+			Util.makeDir(join(projectDir, '.taq'), i18n);
+			showOutput(output)(OutputLevels.debug, 'Taq folder is found');
+			taqFolderFound = true;
+		} catch {
+			showOutput(output)(OutputLevels.debug, 'Taq folder not found');
+			taqFolderFound = false;
+		}
+		let enableAllCommands: boolean;
+		let config: Util.TaqifiedDir | null;
+		try {
+			config = await Util.TaqifiedDir.create(projectDir, i18n);
+			enableAllCommands = false;
 		} catch (e: any) {
-			if (
-				e.code === 'E_NOT_TAQIFIED' && e.msg === `The given directory is not taqified as it's missing a .taq directory.`
-			) {
-				return;
+			config = null;
+			enableAllCommands = true;
+			// We don't want to show messages to users when they are working with non-taqified folders (Except when output level is set to info or more verbose)
+			if (shouldOutput(OutputLevels.info, output.logLevel) || taqFolderFound) {
+				vscode.commands.executeCommand('setContext', '@taqueria-state/enable-all-commands', true);
+				showOutput(output)(OutputLevels.error, 'Error: Could not update command states, enabling all commands:');
+				logAllNestedErrors(e, output);
 			}
-			showOutput(output)(OutputLevels.error, 'Error: Could not update command states:');
-			logAllNestedErrors(e, output);
+		}
+		const availablePlugins = await getAvailablePlugins(context);
+		const availablePluginsNotInstalled = config?.config?.plugins
+			? availablePlugins.filter(name => config?.config.plugins?.findIndex(p => p.name === name) === -1)
+			: availablePlugins;
+		showOutput(output)(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config?.config}`);
+		vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', enableAllCommands || !!config?.config);
+		vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/installed-plugin-count',
+			enableAllCommands ? 1 : config?.config?.plugins?.length ?? 0,
+		);
+		vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/not-installed-plugin-count',
+			enableAllCommands ? 1 : availablePluginsNotInstalled.length,
+		);
+		const plugins = getWellKnownPlugins();
+		showOutput(output)(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
+		for (const plugin of plugins) {
+			const found = config?.config?.plugins?.find(item => item.name === plugin) !== undefined;
+			showOutput(output)(OutputLevels.debug, `plugins ${plugin}: ${found}`);
+			vscode.commands.executeCommand('setContext', plugin, enableAllCommands || found);
 		}
 	};
 
