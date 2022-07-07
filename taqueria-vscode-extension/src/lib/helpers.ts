@@ -605,7 +605,7 @@ export const inject = (deps: InjectedDependencies) => {
 		showOutput(output)(OutputLevels.debug, 'Project config changed, updating command states...');
 		let taqFolderFound: boolean;
 		try {
-			Util.makeDir(join(projectDir, '.taq'), i18n);
+			await Util.makeDir(join(projectDir, '.taq'), i18n);
 			showOutput(output)(OutputLevels.debug, 'Taq folder is found');
 			taqFolderFound = true;
 		} catch {
@@ -617,14 +617,20 @@ export const inject = (deps: InjectedDependencies) => {
 		try {
 			config = await Util.TaqifiedDir.create(projectDir, i18n);
 			enableAllCommands = false;
-		} catch (e: any) {
+		} catch (e: unknown) {
 			config = null;
-			enableAllCommands = true;
+			enableAllCommands = taqFolderFound;
 			// We don't want to show messages to users when they are working with non-taqified folders (Except when output level is set to info or more verbose)
 			if (shouldOutput(OutputLevels.info, output.logLevel) || taqFolderFound) {
 				vscode.commands.executeCommand('setContext', '@taqueria-state/enable-all-commands', true);
-				showOutput(output)(OutputLevels.error, 'Error: Could not update command states, enabling all commands:');
+				showOutput(output)(OutputLevels.error, 'Error: Could not update command states:');
 				logAllNestedErrors(e, output);
+				if (taqFolderFound) {
+					showOutput(output)(
+						OutputLevels.warn,
+						'Taq folder is found, but config could not be loaded, all commands will be enabled as a safeguard.',
+					);
+				}
 			}
 		}
 		const availablePlugins = await getAvailablePlugins(context);
@@ -657,7 +663,7 @@ export const inject = (deps: InjectedDependencies) => {
 		output: Output,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
-		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
+		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher[]) => void,
 	) => {
 		showOutput(output)(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
 		addConfigWatcherIfNotExists(projectDir, () => {
@@ -668,15 +674,23 @@ export const inject = (deps: InjectedDependencies) => {
 				logAllNestedErrors(error, output);
 			}
 			try {
-				// TODO: this does not trigger when .taq	folder is deleted.
-				const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
-				// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
+				const folderWatcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq'));
+				const configWatcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+				const stateWatcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/state.json'));
 
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
-				watcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-				watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-				watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-				return watcher;
+				folderWatcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				folderWatcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				folderWatcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+
+				configWatcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				configWatcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				configWatcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+
+				stateWatcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				stateWatcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				stateWatcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				return [folderWatcher, configWatcher, stateWatcher];
 			} catch (error: unknown) {
 				throw {
 					kind: 'E_UnknownError',
