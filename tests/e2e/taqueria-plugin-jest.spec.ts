@@ -76,10 +76,10 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		const localConfigContents = await exec(`cat ${pwdFormatted}/${taqueriaProjectPath}/${directory}/jest.config.js`);
 
 		expect(localConfigContents.stdout).toContain(
-			`const parentConfig = require('${pwdFormatted}/${taqueriaProjectPath}/.taq/jest.config.js')`,
+			`const parentConfig = require('../.taq/jest.config.js'`,
 		);
 		expect(localConfigContents.stdout).toContain(
-			`roots: [\n        "${pwdFormatted}/${taqueriaProjectPath}/${directory}"\n    ]`,
+			`roots: [\n        "./"\n    ]`,
 		);
 	});
 

@@ -41,6 +41,8 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		exposeInitTask,
 		exposeScaffoldTask,
 		exposeInstallTask,
+		exposeUninstallTask,
+		exposeOriginateTask,
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
 		createWatcherIfNotExists,
@@ -67,6 +69,19 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	await exposeInitTask(context, output, i18n, folders);
 	await exposeScaffoldTask(context, output, folders, i18n);
 	await exposeInstallTask(context, output, folders, i18n);
+	await exposeUninstallTask(context, output, folders, i18n);
+	exposeTaqTaskAsCommand(context, output, i18n)(
+		COMMAND_PREFIX + 'opt_in',
+		'opt-in',
+		'output',
+		'Successfully opted in to analytics.',
+	);
+	exposeTaqTaskAsCommand(context, output, i18n)(
+		COMMAND_PREFIX + 'opt_out',
+		'opt-out',
+		'output',
+		'Successfully opted out from analytics.',
+	);
 	// await exposeTasksFromState (context, output, folders, i18n)
 
 	// Temporary - hard coded list of tasks we know we need to support
@@ -88,14 +103,37 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 					'Compilation successful.',
 				);
 				exposeTaqTask(COMMAND_PREFIX + 'compile_ligo', '--plugin ligo compile', 'output', 'Compilation successful.');
+				exposeTaqTask(
+					COMMAND_PREFIX + 'compile_archetype',
+					'--plugin archetype compile',
+					'output',
+					'Compilation successful.',
+				);
+				exposeTaqTask(
+					COMMAND_PREFIX + 'generate_types',
+					'generate types',
+					'output',
+					'Type generation successful.',
+				);
+				exposeTaqTask(
+					COMMAND_PREFIX + 'typecheck',
+					'typecheck',
+					'output',
+					'Type generation successful.',
+				);
+				exposeTaqTask(
+					COMMAND_PREFIX + 'test',
+					'test',
+					'output',
+					'Test setup successful.',
+				);
 
 				// Sandbox tasks
 				exposeSandboxTask(COMMAND_PREFIX + 'start_sandbox', 'start sandbox', 'notify');
 				exposeSandboxTask(COMMAND_PREFIX + 'stop_sandbox', 'stop sandbox', 'notify');
 				exposeSandboxTask(COMMAND_PREFIX + 'list_accounts', 'list accounts', 'output');
 
-				// Originate task
-				exposeTaqTask(COMMAND_PREFIX + 'deploy', 'deploy', 'output', 'Deployment successful.');
+				exposeOriginateTask(context, output, folders, i18n);
 
 				try {
 					createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
