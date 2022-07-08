@@ -273,7 +273,9 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const stdoutDeploy = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 
 		// 3. Verify that proper error displays in the console
-		expect(stdoutDeploy.stderr).toContain('No initial storage provided for hello-tacos.tz');
+		expect(stdoutDeploy.stderr).toContain(
+			'Michelson artifact hello-tacos.tz has no initial storage specified. Storage is expected to be specified in .taq/config.json at JSON path: environment.test.storage."hello-tacos.tz"',
+		);
 	});
 
 	test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> initial storage is not a number', async () => {
