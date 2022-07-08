@@ -6,6 +6,7 @@ import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
 import * as PersistentState from '@taqueria/protocol/PersistentState';
 import * as PluginInfo from '@taqueria/protocol/PluginInfo';
+import * as PluginResponse from '@taqueria/protocol/PluginResponse';
 import * as PositionalArg from '@taqueria/protocol/PositionalArg';
 import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
@@ -17,7 +18,6 @@ import * as Task from '@taqueria/protocol/Task';
 import * as Template from '@taqueria/protocol/Template';
 import { P } from 'ts-pattern';
 import { z } from 'zod';
-export type PluginResponse = Protocol.PluginResponse;
 export {
 	Environment,
 	LoadedConfig,
@@ -48,12 +48,12 @@ export interface Schema extends PluginInfo.t {
 	checkRuntimeDependencies?: (
 		i18n: i18n,
 		parsedArgs: RequestArgs.t,
-	) => LikeAPromise<PluginResponse, TaqError.t> | Promise<PluginResponse>;
+	) => LikeAPromise<PluginResponse.t, TaqError.t> | Promise<PluginResponse.t>;
 	installRuntimeDependencies?: (
 		i18n: i18n,
 		parsedargs: RequestArgs.t,
-	) => LikeAPromise<PluginResponse, TaqError.t> | Promise<PluginResponse>;
-	proxy?: (parsedArgs: RequestArgs.ProxyRequestArgs) => LikeAPromise<PluginResponse, TaqError.t>;
+	) => LikeAPromise<PluginResponse.t, TaqError.t> | Promise<PluginResponse.t>;
+	proxy?: (parsedArgs: RequestArgs.ProxyRequestArgs) => LikeAPromise<PluginResponse.t, TaqError.t>;
 }
 
 export const inputSchema = PluginInfo.rawSchema.extend({

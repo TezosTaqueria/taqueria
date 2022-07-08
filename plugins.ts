@@ -1,4 +1,5 @@
 // First-party dependencies
+import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import type { InstalledPlugin, PluginAction, PluginResponse } from './taqueria-protocol/taqueria-protocol-types.ts';
@@ -113,10 +114,10 @@ export const inject = (deps: PluginDeps) => {
 
 	// Invokes a command which is expected to return JSON on stdout
 	// execPluginJson: string[] -> Future<TaqError, PluginResponse>
-	const execPluginJson = (cmd: string[]): Future<TaqError.t, PluginResponse> =>
+	const execPluginJson = (cmd: string[]): Future<TaqError.t, PluginResponse.t> =>
 		pipe(
 			execPluginText(cmd),
-			chain<TaqError.t, string, PluginResponse>(decodeJson),
+			chain<TaqError.t, string, PluginResponse.t>(decodeJson),
 		);
 
 	// Gets the command line arguments to invoke the plugin.
@@ -142,12 +143,12 @@ export const inject = (deps: PluginDeps) => {
 	// Sends a request to a plugin for a particular action
 	// sendPluginActionRequest: InstalledPlugin -> PluginAction -> Record<string, unknown> -> Future<TaqError, PluginResponse>
 	const sendPluginActionRequest = (plugin: InstalledPlugin.t) =>
-		(action: PluginAction) =>
-			(requestArgs: Record<string, unknown>): Future<TaqError.t, PluginResponse> => {
+		(action: PluginAction, encoding?: PluginResponseEncoding.t) =>
+			(requestArgs: Record<string, unknown>): Future<TaqError.t, PluginResponse.t> => {
 				const cmd = [
 					...getPluginExe(plugin),
 					'--taqRun',
-					typeof action === 'string' ? action : 'proxy',
+					action,
 					'--i18n',
 					"'" + JSON.stringify(i18n) + "'",
 					'--config',
@@ -166,7 +167,7 @@ export const inject = (deps: PluginDeps) => {
 					// Proxy output can either be configured to passthru or
 					// encoded as JSON
 					chain(_ =>
-						typeof (action) === 'string' || action.encoding !== 'none'
+						!encoding || encoding !== 'none'
 							? execPluginJson(shellCmd)
 							: map(noop)(execPluginPassthru(shellCmd))
 					),
@@ -177,7 +178,7 @@ export const inject = (deps: PluginDeps) => {
 	// retrievePluginInfo: InstalledPlugin -> Future<TaqError, PluginInfo>
 	const retrievePluginInfo = (plugin: InstalledPlugin.t) =>
 		pipe(
-			sendPluginActionRequest(plugin)('pluginInfo')({}),
+			sendPluginActionRequest(plugin)('pluginInfo', PluginResponseEncoding.create('json'))({}),
 			chain(unvalidatedData =>
 				pipe(
 					ParsedPluginInfo.of(unvalidatedData),

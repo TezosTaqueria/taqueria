@@ -1,4 +1,5 @@
 import createType from '@taqueria/protocol/Base';
+import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as Url from '@taqueria/protocol/Url';
 import { z } from 'zod';
@@ -78,6 +79,10 @@ export const provisionRawSchema = rawSchema
 	})
 	.passthrough();
 
+export const templateRawSchema = rawSchema.extend({
+	template: z.string().min(1),
+}).passthrough();
+
 export const managePluginRawSchema = rawSchema.omit({ pluginName: true }).extend({
 	pluginName: z.string().min(1),
 });
@@ -91,6 +96,7 @@ type RawScaffoldInput = z.infer<typeof scaffoldRawSchema>;
 type RawProvisionInput = z.infer<typeof provisionRawSchema>;
 type RawManagePluginInput = z.infer<typeof managePluginRawSchema>;
 type RawVersionInput = z.infer<typeof versionRawSchema>;
+type RawTemplateInput = z.infer<typeof templateRawSchema>;
 
 export const { schemas: generatedSchemas, factory } = createType<RawInput, RawInput>({
 	rawSchema,
@@ -132,10 +138,17 @@ export const uninstallTaskArgs = createType<RawManagePluginInput, RawManagePlugi
 	unknownErrMsg: 'Something went wrong parsing the arguments for the uninstall task',
 });
 
+export const createTaskArgs = createType<RawTemplateInput, RawTemplateInput>({
+	rawSchema: templateRawSchema,
+	parseErrMsg: 'The arguments provided are invalid for the create task',
+	unknownErrMsg: 'Something went wrong parsing the arguments for the create task',
+});
+
 export type ScaffoldTaskArgs = z.infer<typeof scaffoldTaskArgs.schemas.schema>;
 export type ProvisionTaskArgs = z.infer<typeof provisionTaskArgs.schemas.schema>;
 export type InstallTaskArgs = z.infer<typeof installTaskArgs.schemas.schema>;
 export type UninstallTaskArgs = z.infer<typeof uninstallTaskArgs.schemas.schema>;
+export type CreateTaskArgs = z.infer<typeof createTaskArgs.schemas.schema>;
 
 export const createScaffoldTaskArgs = scaffoldTaskArgs.factory.from;
 export const makeScaffoldTaskArgs = scaffoldTaskArgs.factory.make;
@@ -152,3 +165,7 @@ export const ofInstallTaskArgs = installTaskArgs.factory.of;
 export const createUninstallTaskArgs = uninstallTaskArgs.factory.create;
 export const makeUninstallTaskArgs = uninstallTaskArgs.factory.make;
 export const ofUninstallTaskArgs = uninstallTaskArgs.factory.of;
+
+export const createCreateTaskArgs = createTaskArgs.factory.create;
+export const makeCreateTaskArgs = createTaskArgs.factory.make;
+export const ofCreateTaskArgs = createTaskArgs.factory.of;

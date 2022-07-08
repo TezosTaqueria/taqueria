@@ -1,5 +1,6 @@
 import createType from '@taqueria/protocol/Base';
 import * as ParsedOperation from '@taqueria/protocol/ParsedOperation';
+import * as ParsedTemplate from '@taqueria/protocol/ParsedTemplate';
 import * as PluginInfo from '@taqueria/protocol/PluginInfo';
 import { z } from 'zod';
 
@@ -12,6 +13,12 @@ const internalSchema = PluginInfo.internalSchema.extend({
 		)
 			.optional(),
 	),
+	templates: z.preprocess(
+		val => val ?? [],
+		z.array(
+			ParsedTemplate.schemas.schema,
+		).optional(),
+	),
 }).describe('ParsedPluginInfo');
 
 export const rawSchema = PluginInfo.internalSchema.extend({
@@ -23,6 +30,12 @@ export const rawSchema = PluginInfo.internalSchema.extend({
 		),
 	)
 		.optional(),
+	templates: z.preprocess(
+		val => val ?? [],
+		z.array(
+			ParsedTemplate.schemas.schema,
+		).optional(),
+	),
 }).describe('ParsedPluginInfo');
 
 type Input = z.infer<typeof internalSchema>;

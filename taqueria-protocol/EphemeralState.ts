@@ -6,9 +6,10 @@ import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
 import * as Option from '@taqueria/protocol/Option';
 import * as ParsedOperation from '@taqueria/protocol/ParsedOperation';
 import * as ParsedPluginInfo from '@taqueria/protocol/ParsedPluginInfo';
+import * as ParsedTemplate from '@taqueria/protocol/ParsedTemplate';
+import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import { E_TaqError, TaqError } from '@taqueria/protocol/TaqError';
 import * as Task from '@taqueria/protocol/Task';
-import * as Template from '@taqueria/protocol/Template';
 import * as Verb from '@taqueria/protocol/Verb';
 import { attemptP, FutureInstance as Future, mapRej, promise } from 'fluture';
 import { z } from 'zod';
@@ -34,7 +35,7 @@ const operationToPluginMap = z.record(
 const templateToPluginMap = z.record(
 	z.union([
 		InstalledPlugin.schemas.schema,
-		Template.schemas.schema,
+		ParsedTemplate.schemas.schema,
 	]),
 );
 
@@ -99,7 +100,7 @@ const getTemplateCounts = (pluginInfo: ParsedPluginInfo.t[]): Counts => {
 			pluginInfo.templates === undefined
 				? retval
 				: pluginInfo.templates.reduce(
-					(retval: Counts, template: Template.t) => {
+					(retval: Counts, template: ParsedTemplate.t) => {
 						const templateName = template.template;
 						const providers = retval[templateName]
 							? [...retval[templateName], pluginInfo]
@@ -243,7 +244,7 @@ export const mapTemplatesToPlugins = (config: Config.t, pluginInfo: ParsedPlugin
 						async (retval, { template }) => {
 							if (isComposite(template, tmplCounts)) {
 								const command = await eager(Command.make(template));
-								const compositeTmpl = await eager(Template.make({
+								const compositeTmpl = await eager(ParsedTemplate.make({
 									template,
 									command,
 									description: i18n.__('providedByMany'),
@@ -256,6 +257,7 @@ export const mapTemplatesToPlugins = (config: Config.t, pluginInfo: ParsedPlugin
 										})),
 									],
 									handler: 'proxy',
+									encoding: PluginResponseEncoding.create('none'),
 								}));
 								return { ...await retval, [template]: compositeTmpl };
 							}

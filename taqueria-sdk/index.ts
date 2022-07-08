@@ -26,6 +26,7 @@ import { InputSchema, Schema } from './types';
 import { Args, LikeAPromise, pluginDefiner, StdIO } from './types';
 
 // @ts-ignore interop issue. Maybe find a different library later
+import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
 import generateName from 'project-name-generator';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
@@ -213,6 +214,16 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 				case 'pluginInfo':
 					const output = {
 						...schema,
+						templates: schema.templates
+							? schema.templates.map(
+								template => typeof template.handler === 'function' ? 'function' : template.handler,
+							)
+							: [],
+						tasks: schema.tasks
+							? schema.tasks.map(
+								task => typeof task.handler === 'function' ? 'function' : task.handler,
+							)
+							: [],
 						proxy: schema.proxy ? true : false,
 						checkRuntimeDependencies: schema.checkRuntimeDependencies ? true : false,
 						installRuntimeDependencies: schema.installRuntimeDependencies ? true : false,
@@ -231,6 +242,24 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 					return Promise.reject({
 						errCode: 'E_NOT_SUPPORTED',
 						message: i18n.__('proxyNotSupported'),
+						context: requestArgs,
+					});
+				case 'proxyTemplate':
+					const proxyArgs = RequestArgs.createProxyTemplateRequestArgs(requestArgs);
+					const template = schema.templates?.find(tmpl => tmpl.template === proxyArgs.template);
+					if (template) {
+						if (typeof template.handler === 'function') {
+							template.handler(proxyArgs);
+						}
+						return Promise.reject({
+							errCode: 'E_NOT_SUPPORTED',
+							message: i18n.__('proxyNotSupported'),
+							context: requestArgs,
+						});
+					}
+					return Promise.reject({
+						errCode: 'E_INVALID_TEMPLATE',
+						message: i18n.__('invalidTemplate'),
 						context: requestArgs,
 					});
 				case 'checkRuntimeDependencies':

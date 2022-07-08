@@ -1,13 +1,19 @@
 import createType from '@taqueria/protocol/Base';
 import * as Command from '@taqueria/protocol/Command';
 import * as Option from '@taqueria/protocol/Option';
+import * as PluginJsonResponse from '@taqueria/protocol/PluginJsonResponse';
+import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as PositionalArg from '@taqueria/protocol/PositionalArg';
+import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as Verb from '@taqueria/protocol/Verb';
 import { z } from 'zod';
 
 const handlerSchema = z.union([
 	z.string().min(1),
-	z.literal('proxy'),
+	z.function().args(RequestArgs.schemas.schema).returns(z.union([
+		z.void(),
+		PluginJsonResponse.schemas.schema,
+	])),
 ]);
 
 export const rawSchema = z.object({
@@ -27,9 +33,10 @@ export const rawSchema = z.object({
 		z.array(PositionalArg.rawSchema),
 	).optional(),
 	handler: handlerSchema.describe('Template Handler'),
+	encoding: PluginResponseEncoding.schemas.schema.optional(),
 });
 
-const internalSchema = rawSchema.extend({
+export const internalSchema = rawSchema.extend({
 	template: Verb.schemas.schema,
 	command: Command.schemas.schema,
 	options: z.preprocess(

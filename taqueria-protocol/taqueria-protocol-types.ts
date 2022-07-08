@@ -12,8 +12,12 @@ import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
 import * as ParsedOperation from '@taqueria/protocol/ParsedOperation';
 import * as ParsedPluginInfo from '@taqueria/protocol/ParsedPluginInfo';
+import * as ParsedTemplate from '@taqueria/protocol/ParsedTemplate';
 import * as PersistentState from '@taqueria/protocol/PersistentState';
 import * as PluginInfo from '@taqueria/protocol/PluginInfo';
+import * as PluginJsonResponse from '@taqueria/protocol/PluginJsonResponse';
+import * as PluginResponse from '@taqueria/protocol/PluginResponse';
+import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as PositionalArg from '@taqueria/protocol/PositionalArg';
 import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
@@ -28,53 +32,9 @@ import * as Template from '@taqueria/protocol/Template';
 import * as Url from '@taqueria/protocol/Url';
 import * as Verb from '@taqueria/protocol/Verb';
 import * as VersionNumber from '@taqueria/protocol/VersionNumber';
-export interface RuntimeDependency {
-	readonly name: string;
-	readonly path: string;
-	readonly version: string;
-	readonly kind: 'required' | 'optional';
-}
 
-export type PluginActionName =
-	| 'checkRuntimeDependencies'
-	| 'installRuntimeDependencies'
-	| 'proxy'
-	| 'pluginInfo'
-	| string;
-
-export type PluginProxyAction = Task.t;
-
-export type PluginAction = 'checkRuntimeDependencies' | 'installRuntimeDependencies' | 'pluginInfo' | PluginProxyAction;
-
-export interface RuntimeDependencyReport extends RuntimeDependency {
-	readonly met: boolean;
-}
-
-export interface CheckRuntimeDependenciesResponse {
-	readonly report: RuntimeDependencyReport[];
-}
-
-export interface InstallRuntimeDependenciesResponse {
-	readonly report: RuntimeDependencyReport[];
-}
-
-export type PluginActionNotSupportedResponse = {
-	readonly status: 'notSupported';
-	readonly msg: string;
-};
-
-export interface PluginJsonResponse {
-	readonly data?: unknown;
-	readonly render?: 'none' | 'string' | 'table';
-}
-
-export type PluginResponse =
-	| PluginJsonResponse
-	| CheckRuntimeDependenciesResponse
-	| InstallRuntimeDependenciesResponse
-	| PluginInfo.t
-	| PluginActionNotSupportedResponse
-	| void;
+export type PluginAction = PluginResponse.PluginActionName;
+export type PluginActionName = PluginResponse.PluginActionName;
 
 export {
 	Alias,
@@ -91,8 +51,12 @@ export {
 	Option,
 	ParsedOperation,
 	ParsedPluginInfo,
+	ParsedTemplate,
 	PersistentState,
 	PluginInfo,
+	PluginJsonResponse,
+	PluginResponse,
+	PluginResponseEncoding,
 	PositionalArg,
 	RequestArgs,
 	SandboxAccountConfig,
