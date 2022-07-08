@@ -1,6 +1,7 @@
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import utils from 'util';
+import * as contents from './data/help-contents/taquito-contents';
 import { networkInfo } from './data/network-info';
 import { checkContractExistsOnNetwork, generateTestProject } from './utils/utils';
 const exec = utils.promisify(exec1);
@@ -12,6 +13,38 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['taquito']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+	});
+
+	test('Verify that the taquito plugin exposes the associated commands in the help menu', async () => {
+		try {
+			const taquitoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPlugin);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the taquito plugin exposes the associated options in the help menu', async () => {
+		try {
+			const taquitoHelpContents = await exec(`taq deploy --help --projectDir=${taqueriaProjectPath}`);
+			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the taquito plugin aliases expose the correct info in the help menu', async () => {
+		try {
+			const taquitoHelpContents = await exec(`taq originate --help --projectDir=${taqueriaProjectPath}`);
+			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
 	});
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
