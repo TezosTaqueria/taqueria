@@ -86,28 +86,28 @@
 				"category": "Taqueria",
 				"title": "Initialize Project",
 				"shortTitle": "init",
-				"enablement": "!@taqueria-state/is-taqified"
+				"enablement": "@taqueria-state/enable-init-scaffold"
 			},
 			{
 				"command": "taqueria.scaffold",
 				"category": "Taqueria",
 				"title": "Scaffold Project",
 				"shortTitle": "scaffold",
-				"enablement": "!@taqueria-state/is-taqified"
+				"enablement": "@taqueria-state/enable-init-scaffold"
 			},
 			{
 				"command": "taqueria.install",
 				"category": "Taqueria",
 				"title": "Install Plugin",
 				"shortTitle": "install",
-				"enablement": "@taqueria-state/is-taqified && @taqueria-state/not-installed-plugin-count != 0"
+				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/not-installed-plugin-count != 0"
 			},
 			{
 				"command": "taqueria.uninstall",
 				"category": "Taqueria",
 				"title": "Uninstall Plugin",
 				"shortTitle": "uninstall",
-				"enablement": "@taqueria-state/is-taqified && @taqueria-state/installed-plugin-count != 0"
+				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/installed-plugin-count != 0"
 			},
 			{
 				"command": "taqueria.compile_smartpy",
@@ -182,7 +182,7 @@
 				"category": "Taqueria",
 				"title": "Typecheck Michelson contracts",
 				"shortTitle": "typecheck",
-				"enablement": "@taqueria/plugin-contract-types"
+				"enablement": "@taqueria/plugin-tezos-client"
 			},
 			{
 				"command": "taqueria.test",
@@ -191,67 +191,7 @@
 				"shortTitle": "test",
 				"enablement": "@taqueria/plugin-jest"
 			}
-		],
-		"menus": {
-			"commandPalette": [
-				{
-					"command": "taqueria.init",
-					"when": "!@taqueria-state/is-taqified"
-				},
-				{
-					"command": "taqueria.scaffold",
-					"when": "!@taqueria-state/is-taqified"
-				},
-				{
-					"command": "taqueria.install",
-					"when": "@taqueria-state/is-taqified"
-				},
-				{
-					"command": "taqueria.uninstall",
-					"when": "@taqueria-state/is-taqified && @taqueria-state/installed-plugin-count != 0"
-				},
-				{
-					"command": "taqueria.compile_smartpy",
-					"when": "@taqueria/plugin-smartpy"
-				},
-				{
-					"command": "taqueria.compile_ligo",
-					"when": "@taqueria/plugin-ligo"
-				},
-				{
-					"command": "taqueria.compile_archetype",
-					"when": "@taqueria/plugin-archetype"
-				},
-				{
-					"command": "taqueria.start_sandbox",
-					"when": "@taqueria/plugin-flextesa"
-				},
-				{
-					"command": "taqueria.stop_sandbox",
-					"when": "@taqueria/plugin-flextesa"
-				},
-				{
-					"command": "taqueria.list_accounts",
-					"when": "@taqueria/plugin-flextesa"
-				},
-				{
-					"command": "taqueria.originate",
-					"when": "@taqueria/plugin-taquito"
-				},
-				{
-					"command": "taqueria.generate_types",
-					"when": "@taqueria/plugin-contract-types"
-				},
-				{
-					"command": "taqueria.typecheck",
-					"when": "@taqueria/plugin-contract-types"
-				},
-				{
-					"command": "taqueria.test",
-					"when": "@taqueria/plugin-jest"
-				}
-			]
-		}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

@@ -1,4 +1,5 @@
 import {
+	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
 	getInitialStorage,
@@ -60,9 +61,10 @@ const getValidContracts = async (parsedArgs: Opts) => {
 	return contracts.reduce(
 		(retval, filename) => {
 			const storage = getInitialStorage(parsedArgs)(filename);
-			// TODO. The environment name in the error string should be a variable.
 			if (storage === undefined || storage === null) {
-				sendErr(`Michelson artifact ${filename} has no initial storage specifed. Storage is expected to be specified at JSON path: environment.development.storage.${filename}`);
+				sendErr(`Michelson artifact ${filename} has no initial storage specified. Storage is expected to be specified in .taq/config.json at JSON path: environment.${
+					getCurrentEnvironment(parsedArgs)
+				}.storage."${filename}"`);
 				return retval;
 			}
 			return [...retval, { filename, storage }];
@@ -182,10 +184,9 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 							const first = getFirstAccountAlias(sandboxName, parsedArgs);
 							if (first) {
 								defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
-								// TODO: error must be generalized for non sandbox deployment scenarious
 								// TODO: The error should be a warning, not an error. Descriptive string should not begin with 'Warning:'
 								sendErr(
-									`Warning: A default origination account is not specified for sandbox ${sandboxName}. Using the account ${first} for this origination. Specify a default account in .taq/config.json at location sandbox.local.accounts.default`,
+									`Warning: A default origination account is not specified for sandbox ${sandboxName}. Using the account ${first} for this origination. Specify a default account in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default`,
 								);
 							}
 						}

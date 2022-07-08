@@ -609,8 +609,8 @@ export const inject = (deps: InjectedDependencies) => {
 			showOutput(output)(OutputLevels.debug, 'Taq folder is found');
 			taqFolderFound = true;
 		} catch {
-			showOutput(output)(OutputLevels.debug, 'Taq folder not found');
 			taqFolderFound = false;
+			showOutput(output)(OutputLevels.debug, 'Taq folder not found');
 		}
 		let enableAllCommands: boolean;
 		let config: Util.TaqifiedDir | null;
@@ -637,8 +637,29 @@ export const inject = (deps: InjectedDependencies) => {
 		const availablePluginsNotInstalled = config?.config?.plugins
 			? availablePlugins.filter(name => config?.config.plugins?.findIndex(p => p.name === name) === -1)
 			: availablePlugins;
+		showOutput(output)(
+			OutputLevels.debug,
+			`@taqueria-state/enable-init-scaffold: ${enableAllCommands || !config?.config}`,
+		);
+		vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/enable-init-scaffold',
+			enableAllCommands || !config?.config,
+		);
+
+		showOutput(output)(
+			OutputLevels.debug,
+			`@taqueria-state/enable-install-uninstall: ${enableAllCommands || !!config?.config}`,
+		);
+		vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/enable-install-uninstall',
+			enableAllCommands || !!config?.config,
+		);
+
 		showOutput(output)(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config?.config}`);
-		vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', enableAllCommands || !!config?.config);
+		vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config?.config);
+
 		vscode.commands.executeCommand(
 			'setContext',
 			'@taqueria-state/installed-plugin-count',
