@@ -60,7 +60,10 @@ const getValidContracts = async (parsedArgs: Opts) => {
 	return contracts.reduce(
 		(retval, filename) => {
 			const storage = getInitialStorage(parsedArgs)(filename);
-			if (storage === undefined || storage === null) throw (`No initial storage provided for ${filename}`);
+			if (storage === undefined || storage === null) {
+				sendErr(`No initial storage provided for ${filename}`);
+				return retval;
+			}
 			return [...retval, { filename, storage }];
 		},
 		[] as ContractStorageMapping[],
@@ -108,6 +111,9 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
 
 const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: string) => {
 	const contracts = await getValidContracts(parsedArgs);
+	if (!contracts.length) {
+		return undefined;
+	}
 
 	const batch = await contracts.reduce(
 		(batch, contractMapping) =>
