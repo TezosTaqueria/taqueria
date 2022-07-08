@@ -182,8 +182,10 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 							const first = getFirstAccountAlias(sandboxName, parsedArgs);
 							if (first) {
 								defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
+								// TODO: error must be generalized for non sandbox deployment scenarious
+								// TODO: The error should be a warning, not an error. Descriptive string should not begin with 'Warning:'
 								sendErr(
-									`No default account has been configured for the sandbox called ${sandboxName}. Using the account called ${first} for origination.`,
+									`Warning: A default origination account is not specified for sandbox ${sandboxName}. Using the account ${first} for this origination. Specify a default account in .taq/config.json at location sandbox.local.accounts.default`,
 								);
 							}
 						}
