@@ -234,12 +234,12 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 					.positional('scaffoldUrl', {
 						describe: i18n.__('scaffoldUrlDesc'),
 						type: 'string',
-						default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git',
+						default: 'https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git',
 					})
 					.positional('scaffoldProjectDir', {
 						type: 'string',
 						describe: i18n.__('scaffoldProjectDirDesc'),
-						default: './taqueria-quickstart',
+						default: './taqueria-taco-shop',
 					});
 			},
 			(args: Record<string, unknown>) =>
@@ -415,12 +415,14 @@ const scaffoldProject = (i18n: i18n.t) =>
 			await eager(rm(gitDir));
 			log('    ✓ Remove Git directory');
 
-			log('    ✓ Scan for plugins');
-
-			await eager(exec('npm run setup 2>&1 > /dev/null', {}, false, destDir));
-			log('    ✓ Install dependencies');
+			await eager(exec('npm install 2>&1 > /dev/null', {}, false, destDir));
+			log('    ✓ Install plugins');
 
 			await eager(exec('taq init 2>&1 > /dev/null', {}, false, destDir));
+
+			// Remove injected quickstart file
+			const quickstartFile = await eager(SanitizedAbsPath.make(`${destDir}/quickstart.md`));
+			await eager(rm(quickstartFile));
 			log("    ✓ Project Taq'ified \n");
 
 			return ('🌮 Project created successfully 🌮');
