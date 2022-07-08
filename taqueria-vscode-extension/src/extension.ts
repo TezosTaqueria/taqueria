@@ -7,19 +7,21 @@ import { makeDir } from './lib/pure';
 
 const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
 	const inMemoryState = {
-		configWatchers: new Map<string, api.FileSystemWatcher>(),
+		configWatchers: new Map<string, api.FileSystemWatcher[]>(),
 	};
 
 	const clearConfigWatchers = () => {
-		for (const watcher of inMemoryState.configWatchers.values()) {
-			watcher.dispose();
+		for (const watcherList of inMemoryState.configWatchers.values()) {
+			for (const watcher of watcherList) {
+				watcher.dispose();
+			}
 		}
 		inMemoryState.configWatchers.clear();
 	};
 
 	const getConfigWatchers = () => inMemoryState.configWatchers.values();
 
-	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher) => {
+	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher[]) => {
 		if (inMemoryState.configWatchers.has(folder)) {
 			return;
 		}
