@@ -62,9 +62,11 @@ const getValidContracts = async (parsedArgs: Opts) => {
 		(retval, filename) => {
 			const storage = getInitialStorage(parsedArgs)(filename);
 			if (storage === undefined || storage === null) {
-				sendErr(`Michelson artifact ${filename} has no initial storage specified. Storage is expected to be specified in .taq/config.json at JSON path: environment.${
-					getCurrentEnvironment(parsedArgs)
-				}.storage."${filename}"`);
+				sendErr(
+					`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
+						getCurrentEnvironment(parsedArgs)
+					}.storage."${filename}"\n`,
+				);
 				return retval;
 			}
 			return [...retval, { filename, storage }];
@@ -186,7 +188,7 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 								defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
 								// TODO: The error should be a warning, not an error. Descriptive string should not begin with 'Warning:'
 								sendErr(
-									`Warning: A default origination account is not specified for sandbox ${sandboxName}. Using the account ${first} for this origination. Specify a default account in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default`,
+									`Warning: A default origination account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this origination.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
 								);
 							}
 						}

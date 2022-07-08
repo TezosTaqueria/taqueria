@@ -628,7 +628,7 @@ export const inject = (deps: InjectedDependencies) => {
 				if (taqFolderFound) {
 					showOutput(output)(
 						OutputLevels.warn,
-						'The Taqueria config could not be loaded, all commands will be enabled.\nPlease try fixing the errors in config.json',
+						'The Taqueria config for this project could not be loaded. All Taqueria commands will be temporarily enabled.\nPlease check for errors in the .taq/config.json file\n',
 					);
 				}
 			}
