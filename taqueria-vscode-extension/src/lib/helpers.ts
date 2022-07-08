@@ -603,39 +603,79 @@ export const inject = (deps: InjectedDependencies) => {
 		projectDir: Util.PathToDir,
 	) => {
 		showOutput(output)(OutputLevels.debug, 'Project config changed, updating command states...');
+		let taqFolderFound: boolean;
 		try {
-			const config = await Util.TaqifiedDir.create(projectDir, i18n);
-			const availablePlugins = await getAvailablePlugins(context);
-			const availablePluginsNotInstalled = config.config?.plugins
-				? availablePlugins.filter(name => config.config.plugins?.findIndex(p => p.name === name) === -1)
-				: availablePlugins;
-			showOutput(output)(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config.config}`);
-			vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config.config);
-			vscode.commands.executeCommand(
-				'setContext',
-				'@taqueria-state/installed-plugin-count',
-				config.config?.plugins?.length ?? 0,
-			);
-			vscode.commands.executeCommand(
-				'setContext',
-				'@taqueria-state/not-installed-plugin-count',
-				availablePluginsNotInstalled.length,
-			);
-			const plugins = getWellKnownPlugins();
-			showOutput(output)(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
-			for (const plugin of plugins) {
-				const found = config.config?.plugins?.find(item => item.name === plugin) !== undefined;
-				showOutput(output)(OutputLevels.debug, `plugins ${plugin}: ${found}`);
-				vscode.commands.executeCommand('setContext', plugin, found);
+			await Util.makeDir(join(projectDir, '.taq'), i18n);
+			showOutput(output)(OutputLevels.debug, 'Taq folder is found');
+			taqFolderFound = true;
+		} catch {
+			taqFolderFound = false;
+			showOutput(output)(OutputLevels.debug, 'Taq folder not found');
+		}
+		let enableAllCommands: boolean;
+		let config: Util.TaqifiedDir | null;
+		try {
+			config = await Util.TaqifiedDir.create(projectDir, i18n);
+			enableAllCommands = false;
+		} catch (e: unknown) {
+			config = null;
+			enableAllCommands = taqFolderFound;
+			// We don't want to show messages to users when they are working with non-taqified folders (Except when output level is set to info or more verbose)
+			if (shouldOutput(OutputLevels.info, output.logLevel) || taqFolderFound) {
+				vscode.commands.executeCommand('setContext', '@taqueria-state/enable-all-commands', true);
+				showOutput(output)(OutputLevels.error, 'Error: Could not update command states:');
+				logAllNestedErrors(e, output);
+				if (taqFolderFound) {
+					showOutput(output)(
+						OutputLevels.warn,
+						'The Taqueria config for this project could not be loaded. All Taqueria commands will be temporarily enabled.\nPlease check for errors in the .taq/config.json file\n',
+					);
+				}
 			}
-		} catch (e: any) {
-			if (
-				e.code === 'E_NOT_TAQIFIED' && e.msg === `The given directory is not taqified as it's missing a .taq directory.`
-			) {
-				return;
-			}
-			showOutput(output)(OutputLevels.error, 'Error: Could not update command states:');
-			logAllNestedErrors(e, output);
+		}
+		const availablePlugins = await getAvailablePlugins(context);
+		const availablePluginsNotInstalled = config?.config?.plugins
+			? availablePlugins.filter(name => config?.config.plugins?.findIndex(p => p.name === name) === -1)
+			: availablePlugins;
+		showOutput(output)(
+			OutputLevels.debug,
+			`@taqueria-state/enable-init-scaffold: ${enableAllCommands || !config?.config}`,
+		);
+		vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/enable-init-scaffold',
+			enableAllCommands || !config?.config,
+		);
+
+		showOutput(output)(
+			OutputLevels.debug,
+			`@taqueria-state/enable-install-uninstall: ${enableAllCommands || !!config?.config}`,
+		);
+		vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/enable-install-uninstall',
+			enableAllCommands || !!config?.config,
+		);
+
+		showOutput(output)(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config?.config}`);
+		vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config?.config);
+
+		vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/installed-plugin-count',
+			enableAllCommands ? 1 : config?.config?.plugins?.length ?? 0,
+		);
+		vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/not-installed-plugin-count',
+			enableAllCommands ? 1 : availablePluginsNotInstalled.length,
+		);
+		const plugins = getWellKnownPlugins();
+		showOutput(output)(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
+		for (const plugin of plugins) {
+			const found = config?.config?.plugins?.find(item => item.name === plugin) !== undefined;
+			showOutput(output)(OutputLevels.debug, `plugins ${plugin}: ${found}`);
+			vscode.commands.executeCommand('setContext', plugin, enableAllCommands || found);
 		}
 	};
 
@@ -644,7 +684,7 @@ export const inject = (deps: InjectedDependencies) => {
 		output: Output,
 		i18n: i18n,
 		projectDir: Util.PathToDir,
-		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher) => void,
+		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher[]) => void,
 	) => {
 		showOutput(output)(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
 		addConfigWatcherIfNotExists(projectDir, () => {
@@ -655,15 +695,23 @@ export const inject = (deps: InjectedDependencies) => {
 				logAllNestedErrors(error, output);
 			}
 			try {
-				// TODO: this does not trigger when .taq	folder is deleted.
-				const watcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
-				// TODO: We should detect the event that VsCode's current Folder is changed and the watcher should be disposed
+				const folderWatcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq'));
+				const configWatcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+				const stateWatcher = vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/state.json'));
 
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
-				watcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-				watcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-				watcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
-				return watcher;
+				folderWatcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				folderWatcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				folderWatcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+
+				configWatcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				configWatcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				configWatcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+
+				stateWatcher.onDidChange((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				stateWatcher.onDidCreate((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				stateWatcher.onDidDelete((e: api.Uri) => updateCommandStates(context, output, i18n, projectDir));
+				return [folderWatcher, configWatcher, stateWatcher];
 			} catch (error: unknown) {
 				throw {
 					kind: 'E_UnknownError',
