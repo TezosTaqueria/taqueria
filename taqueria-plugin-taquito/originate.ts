@@ -60,8 +60,9 @@ const getValidContracts = async (parsedArgs: Opts) => {
 	return contracts.reduce(
 		(retval, filename) => {
 			const storage = getInitialStorage(parsedArgs)(filename);
+			// TODO. The environment name in the error string should be a variable.
 			if (storage === undefined || storage === null) {
-				sendErr(`No initial storage provided for ${filename}`);
+				sendErr(`Michelson artifact ${filename} has no initial storage specifed. Storage is expected to be specified at JSON path: environment.development.storage.${filename}`);
 				return retval;
 			}
 			return [...retval, { filename, storage }];
