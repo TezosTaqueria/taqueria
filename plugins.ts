@@ -2,8 +2,8 @@
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import type { InstalledPlugin, PluginAction, PluginResponse } from './taqueria-protocol/taqueria-protocol-types.ts';
-import { EphemeralState, ParsedPluginInfo, SanitizedArgs } from './taqueria-protocol/taqueria-protocol-types.ts';
+import type { InstalledPlugin, PluginActionName } from './taqueria-protocol/taqueria-protocol-types.ts';
+import { EphemeralState, PluginInfo, SanitizedArgs } from './taqueria-protocol/taqueria-protocol-types.ts';
 import type { PluginDeps, PluginRequestArgs } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
@@ -22,7 +22,7 @@ const { joinPaths, readJsonFile, writeTextFile, decodeJson, eager } = utils.inje
 
 // No-operation
 // noop: () -> void
-const noop = () => {};
+const noop = (): void => {};
 
 // Provides a library of functions with dependencies injected
 export const inject = (deps: PluginDeps) => {
@@ -113,11 +113,11 @@ export const inject = (deps: PluginDeps) => {
 		);
 
 	// Invokes a command which is expected to return JSON on stdout
-	// execPluginJson: string[] -> Future<TaqError, PluginResponse>
-	const execPluginJson = (cmd: string[]): Future<TaqError.t, PluginResponse.t> =>
+	// execPluginJson: string[] -> Future<TaqError, T>
+	const execPluginJson = <T>(cmd: string[]): Future<TaqError.t, T> =>
 		pipe(
 			execPluginText(cmd),
-			chain<TaqError.t, string, PluginResponse.t>(decodeJson),
+			chain<TaqError.t, string, T>(decodeJson),
 		);
 
 	// Gets the command line arguments to invoke the plugin.
@@ -141,10 +141,10 @@ export const inject = (deps: PluginDeps) => {
 	};
 
 	// Sends a request to a plugin for a particular action
-	// sendPluginActionRequest: InstalledPlugin -> PluginAction -> Record<string, unknown> -> Future<TaqError, PluginResponse>
-	const sendPluginActionRequest = (plugin: InstalledPlugin.t) =>
-		(action: PluginAction, encoding?: PluginResponseEncoding.t) =>
-			(requestArgs: Record<string, unknown>): Future<TaqError.t, PluginResponse.t> => {
+	// sendPluginActionRequest: InstalledPlugin -> PluginActionName -> Record<string, unknown> -> Future<TaqError, PluginResponse>
+	const sendPluginActionRequest = <T>(plugin: InstalledPlugin.t) =>
+		(action: PluginActionName.t, encoding?: PluginResponseEncoding.t) =>
+			(requestArgs: Record<string, unknown>): Future<TaqError.t, T | void> => {
 				const cmd = [
 					...getPluginExe(plugin),
 					'--taqRun',
@@ -181,7 +181,7 @@ export const inject = (deps: PluginDeps) => {
 			sendPluginActionRequest(plugin)('pluginInfo', PluginResponseEncoding.create('json'))({}),
 			chain(unvalidatedData =>
 				pipe(
-					ParsedPluginInfo.of(unvalidatedData),
+					PluginInfo.of(unvalidatedData),
 					mapRej(previous =>
 						TaqError.create({
 							kind: 'E_INVALID_PLUGIN_RESPONSE',
@@ -245,7 +245,7 @@ export const inject = (deps: PluginDeps) => {
 	const getComputedState = () =>
 		pipe(
 			retrieveAllPluginInfo(),
-			chain((pluginInfo: ParsedPluginInfo.t[]) =>
+			chain((pluginInfo: PluginInfo.t[]) =>
 				attemptP<TaqError.t, EphemeralState.t>(async () => {
 					return await eager(EphemeralState.make({
 						build: parsedArgs.setBuild,

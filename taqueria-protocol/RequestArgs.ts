@@ -63,7 +63,7 @@ const internalProxyTemplateSchema = rawSchema.extend({
 
 type RawProxyInput = z.infer<typeof rawProxyTaskSchema>;
 type ProxyInput = z.infer<typeof internalProxyTaskSchema>;
-type RawProxyTemplateInput = z.infer<typeof rawProxyTaskSchema>;
+type RawProxyTemplateInput = z.infer<typeof rawProxyTemplateSchema>;
 type ProxyTemplateInput = z.infer<typeof internalProxyTemplateSchema>;
 
 export const proxy = createType<RawProxyInput, ProxyInput>({

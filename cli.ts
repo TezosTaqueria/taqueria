@@ -30,17 +30,15 @@ import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
 import type {
 	InstalledPlugin,
 	Option,
-	PluginAction,
 	PluginJsonResponse,
-	PluginResponse,
 	PluginResponseEncoding,
 	PositionalArg,
 } from './taqueria-protocol/taqueria-protocol-types.ts';
 import {
 	EphemeralState,
 	i18n,
-	ParsedPluginInfo,
 	ParsedTemplate,
+	PluginInfo,
 	SanitizedAbsPath,
 	SanitizedArgs,
 	Task,
@@ -425,7 +423,7 @@ const scaffoldProject = (i18n: i18n.t) =>
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) =>
 	state.plugins.reduce(
-		(retval: Task.t | undefined, pluginInfo: ParsedPluginInfo.t) =>
+		(retval: Task.t | undefined, pluginInfo: PluginInfo.t) =>
 			pluginInfo.name === pluginName || pluginInfo.alias === pluginName
 				? pluginInfo.tasks?.find((task: Task.t) => task.task === taskName)
 				: retval,
@@ -434,7 +432,7 @@ const getCanonicalTask = (pluginName: string, taskName: string, state: Ephemeral
 
 const getCanonicalTemplate = (pluginName: string, templateName: string, state: EphemeralState.t) =>
 	state.plugins.reduce(
-		(retval: ParsedTemplate.t | undefined, pluginInfo: ParsedPluginInfo.t) =>
+		(retval: ParsedTemplate.t | undefined, pluginInfo: PluginInfo.t) =>
 			pluginInfo.name === pluginName || pluginInfo.alias === pluginName
 				? pluginInfo.templates?.find((template: ParsedTemplate.t) => template.template == templateName)
 				: retval,
@@ -584,12 +582,11 @@ const handleTemplate = (
 	if (template) {
 		return template.handler === 'proxy'
 			? pipe(
-				pluginLib.sendPluginActionRequest(plugin)('proxyTemplate', template.encoding)({
+				pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)('proxyTemplate', template.encoding)({
 					...parsedArgs,
 					action: 'proxyTemplate',
 				}),
-				map(res => {
-					const decoded = res as PluginJsonResponse.t | void;
+				map(decoded => {
 					if (decoded) return renderPluginJsonRes(decoded);
 				}),
 			)
@@ -825,7 +822,7 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
 		: {
 			...parsedArgs,
 			plugin: state.plugins.reduce(
-				(retval, pluginInfo: ParsedPluginInfo.t) =>
+				(retval, pluginInfo: PluginInfo.t) =>
 					pluginInfo.alias === retval
 						? pluginInfo.name
 						: retval,

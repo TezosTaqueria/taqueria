@@ -22,7 +22,7 @@ import { readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
 import { get } from 'stack-trace';
 import { ZodError } from 'zod';
-import { InputSchema, Schema } from './types';
+import { PluginSchema } from './types';
 import { Args, LikeAPromise, pluginDefiner, StdIO } from './types';
 
 // @ts-ignore interop issue. Maybe find a different library later
@@ -188,12 +188,12 @@ const postprocessArgs = (args: Args): Record<string, unknown> => {
 	return groupedArgs;
 };
 
-const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): Schema => {
-	const inputSchema: InputSchema = definer(i18n);
+const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): PluginSchema.t => {
+	const inputSchema: PluginSchema.RawPluginSchema = definer(i18n);
 
 	const { proxy } = inputSchema;
 
-	const pluginInfo = PluginInfo.create({
+	const pluginInfo = PluginSchema.create({
 		...inputSchema,
 		name: inputSchema.name ?? inferPluginName(),
 	});
@@ -216,12 +216,12 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 						...schema,
 						templates: schema.templates
 							? schema.templates.map(
-								template => typeof template.handler === 'function' ? 'function' : template.handler,
+								(template: Template.t) => typeof template.handler === 'function' ? 'function' : template.handler,
 							)
 							: [],
 						tasks: schema.tasks
 							? schema.tasks.map(
-								task => typeof task.handler === 'function' ? 'function' : task.handler,
+								(task: Task.t) => typeof task.handler === 'function' ? 'function' : task.handler,
 							)
 							: [],
 						proxy: schema.proxy ? true : false,
