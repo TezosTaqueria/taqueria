@@ -805,7 +805,7 @@ const renderPluginJsonRes = (decoded: PluginJsonResponse.t) => {
 		case 'table':
 			renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
 			break;
-		case 'string':
+		default:
 			log(decoded.data as string);
 			break;
 	}

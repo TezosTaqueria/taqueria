@@ -256,12 +256,12 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 						message: i18n.__('proxyNotSupported'),
 						context: requestArgs,
 					});
-				case 'proxyTemplate':
+				case 'proxyTemplate': {
 					const proxyArgs = RequestArgs.createProxyTemplateRequestArgs(requestArgs);
 					const template = schema.templates?.find(tmpl => tmpl.template === proxyArgs.template);
 					if (template) {
 						if (typeof template.handler === 'function') {
-							template.handler(proxyArgs);
+							return template.handler(proxyArgs);
 						}
 						return Promise.reject({
 							errCode: 'E_NOT_SUPPORTED',
@@ -274,6 +274,7 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 						message: i18n.__('invalidTemplate'),
 						context: requestArgs,
 					});
+				}
 				case 'checkRuntimeDependencies':
 					return sendAsyncJson(
 						schema.checkRuntimeDependencies

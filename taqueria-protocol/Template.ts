@@ -13,6 +13,14 @@ const handlerSchema = z.union([
 	z.function().args(RequestArgs.schemas.schema).returns(z.union([
 		z.void(),
 		PluginJsonResponse.schemas.schema,
+		PluginJsonResponse.schemas.internalSchema,
+		z.promise(
+			z.union([
+				z.void(),
+				PluginJsonResponse.schemas.schema,
+				PluginJsonResponse.schemas.internalSchema,
+			]),
+		),
 	])),
 ]);
 

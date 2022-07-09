@@ -74,8 +74,8 @@ export const proxy = createType<RawProxyInput, ProxyInput>({
 });
 
 export const proxyTemplate = createType<RawProxyTemplateInput, ProxyTemplateInput>({
-	rawSchema: rawProxyTaskSchema,
-	internalSchema: internalProxyTaskSchema,
+	rawSchema: rawProxyTemplateSchema,
+	internalSchema: internalProxyTemplateSchema,
 	parseErrMsg: 'The request is invalid',
 	unknownErrMsg: 'Something went wrong trying to parse the request',
 });

@@ -1,6 +1,8 @@
 const { Plugin, Task, Option, PositionalArg, Operation, Template, sendAsyncRes, sendAsyncJsonRes } = require(
 	'@taqueria/node-sdk',
 );
+const { join } = require('path');
+const { writeFile } = require('fs/promises');
 
 const tableResponse = JSON.stringify({
 	render: 'table',
@@ -118,7 +120,17 @@ Plugin.create(i18n => ({
 					description: 'Greeting to include in JSON file',
 				}),
 			],
-			handler: 'proxy',
+			handler: async requestArgs => {
+				await writeFile(
+					join(requestArgs.projectDir, requestArgs.config.artifactsDir, requestArgs.filename),
+					JSON.stringify({
+						greeting: `Hello, ${requestArgs.greeting ?? 'Tester'}!`,
+					}),
+					'utf8',
+				);
+				return sendAsyncJsonRes('Your wish is my command!');
+			},
+			encoding: 'json',
 		}),
 		Template.create({
 			template: 'text',
@@ -137,7 +149,7 @@ Plugin.create(i18n => ({
 					shortFlag: 'g',
 					flag: 'greeting',
 					type: 'string',
-					description: 'Greeting to include in JSON file',
+					description: 'Greeting to include in text file',
 				}),
 			],
 			handler: `

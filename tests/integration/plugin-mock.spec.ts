@@ -96,6 +96,22 @@ describe('Integration tests using taqueria-mock-plugin', () => {
 		expect(output).toEqual('Hi there, QA Team!\n');
 	});
 
+	test('Verify that the json template creates a JSON file from a function', async () => {
+		const stdout = execSync('taq create json hello.json', { cwd: testProjectPath }).toString().trim();
+		expect(stdout).toEqual('Your wish is my command!');
+
+		const output = await readFile(join(testProjectPath, 'artifacts', 'hello.json'), 'utf-8');
+		expect(output).toEqual('{"greeting":"Hello, Tester!"}');
+	});
+
+	test('Verify that the json template creates a JSON file from a function with custom greeting', async () => {
+		const stdout = execSync('taq create json hello.json -g "QA Team"', { cwd: testProjectPath }).toString().trim();
+		expect(stdout).toEqual('Your wish is my command!');
+
+		const output = await readFile(join(testProjectPath, 'artifacts', 'hello.json'), 'utf-8');
+		expect(output).toEqual('{"greeting":"Hello, QA Team!"}');
+	});
+
 	// Clean up process to remove taqified project folder
 	// Comment if need to debug
 	afterAll(async () => {
