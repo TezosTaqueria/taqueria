@@ -216,12 +216,24 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 						...schema,
 						templates: schema.templates
 							? schema.templates.map(
-								(template: Template.t) => typeof template.handler === 'function' ? 'function' : template.handler,
+								(template: Template.t) => {
+									const handler = typeof template.handler === 'function' ? 'function' : template.handler;
+									return {
+										...template,
+										handler,
+									};
+								},
 							)
 							: [],
 						tasks: schema.tasks
 							? schema.tasks.map(
-								(task: Task.t) => typeof task.handler === 'function' ? 'function' : task.handler,
+								(task: Task.t) => {
+									const handler = typeof task.handler === 'function' ? 'function' : task.handler;
+									return {
+										...task,
+										handler,
+									};
+								},
 							)
 							: [],
 						proxy: schema.proxy ? true : false,
