@@ -10,7 +10,7 @@ import {
 	sendErr,
 	sendJsonRes,
 } from '@taqueria/node-sdk';
-import { LikeAPromise, PluginResponse, Protocol, RequestArgs, TaqError } from '@taqueria/node-sdk/types';
+import { Protocol, RequestArgs } from '@taqueria/node-sdk/types';
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
@@ -205,7 +205,7 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 		)
 		: [];
 
-export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
+export const originate = <T>(parsedArgs: Opts) => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 
 	if (!env) {

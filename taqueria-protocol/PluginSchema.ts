@@ -38,7 +38,7 @@ const internalSchema = PluginInfo.internalSchema.extend({
 	installRuntimeDependencies: runtimeDependenciesFn.optional(),
 }).describe('ParsedPluginInfo');
 
-export const rawSchema = PluginInfo.internalSchema.extend({
+export const rawSchema = PluginInfo.rawSchema.extend({
 	name: Alias.rawSchema.optional(),
 	operations: z.preprocess(
 		val => val ?? [],

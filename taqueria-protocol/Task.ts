@@ -19,19 +19,16 @@ export const rawSchema = z.object({
 	description: z.string({ description: 'Task Description' }).min(3),
 	example: z.string({ description: 'Task Example' }).optional(),
 	hidden: z.boolean({ description: 'Task Is Hidden' }).default(false).optional(),
-	encoding: PluginResponseEncoding.schemas.schema.optional(),
+	encoding: PluginResponseEncoding.rawSchema.optional(),
 	handler: taskHandlerSchema.describe('Task Handler'),
 	options: z.array(Option.rawSchema).default([]).describe('Task Options').optional(),
 	positionals: z.array(PositionalArg.rawSchema).default([]).describe('Task Positional Args').optional(),
 }).describe('Task');
 
-const internalSchema = z.object({
+const internalSchema = rawSchema.extend({
 	task: Verb.schemas.schema.describe('Task Name'),
 	command: Command.schemas.schema.describe('Task Command'),
-	aliases: z.array(Alias.rawSchema).default([]).describe('Task Aliases').optional(),
-	description: z.string({ description: 'Task Description' }).min(3),
-	example: z.string({ description: 'Task Example' }).optional(),
-	hidden: z.boolean({ description: 'Task Is Hidden' }).default(false).optional(),
+	aliases: z.array(Alias.schemas.schema).default([]).describe('Task Aliases').optional(),
 	encoding: PluginResponseEncoding.schemas.schema.optional(),
 	handler: taskHandlerSchema.describe('Task Handler'),
 	options: z.preprocess(

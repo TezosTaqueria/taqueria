@@ -50,17 +50,5 @@ Plugin.create(_i18n => ({
 			encoding: 'json',
 		}),
 	],
-	checkRuntimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			report: [
-				{ name: 'Docker', path: '/usr/bin/docker', version: '>=0.8.4', kind: 'required', met: true },
-			],
-		}),
-	installRunTimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			output: 'Docker was found in /usr/bin/ligo', // TODO this should use i18n
-		}),
 	proxy: proxy,
 }), process.argv);

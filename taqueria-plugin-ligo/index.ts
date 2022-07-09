@@ -32,17 +32,5 @@ Plugin.create(i18n => ({
 			encoding: 'json',
 		}),
 	],
-	checkRuntimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			report: [
-				{ name: 'LIGO', path: 'ligo', version: '>=0.27.0', kind: 'required', met: true },
-			],
-		}),
-	installRunTimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			output: 'LIGO was found in /usr/bin/ligo', // TODO this should use i18n
-		}),
 	proxy: compile,
 }), process.argv);
