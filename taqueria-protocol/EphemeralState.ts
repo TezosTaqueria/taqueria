@@ -144,7 +144,7 @@ const toChoices = (plugins: PluginInfo.t[]) =>
 		[] as string[],
 	);
 
-const isComposite = (name: Verb.t, counts: Counts) => counts[name].length > 1;
+const isComposite = (name: Verb.t, counts: Counts) => counts[name] && counts[name].length > 1;
 
 const getInstalledPlugin = (config: Config.t, name: string) =>
 	config.plugins?.find(
