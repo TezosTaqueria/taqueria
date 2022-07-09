@@ -140,8 +140,13 @@ Plugin.create(i18n => ({
 					description: 'Greeting to include in JSON file',
 				}),
 			],
-			handler:
-				"echo 'Hi there, <%= it.greeting ? it.greeting : 'Tester' %>!' > <%= it.artifactsDir %?/<%= it.filename %>>",
+			handler: `
+<%
+var greeting = it.greeting ?? "Tester!";
+var outputFile = it.joinPaths(it.projectDir, it.config.artifactsDir, it.filename);
+%>
+echo 'Hi there, <%= greeting %>!' ><%= outputFile %>
+`,
 		}),
 	],
 	proxy: parsedArgs => {
