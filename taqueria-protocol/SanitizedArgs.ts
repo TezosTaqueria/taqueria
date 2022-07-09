@@ -52,7 +52,6 @@ export const rawSchema = z.object({
 		z.string().min(3),
 	),
 	setVersion: z.string().min(3),
-	template: z.string().min(1).optional(),
 	pluginName: z.string().min(1).optional(),
 }, { description: 'Sanitizied Args' }).passthrough();
 

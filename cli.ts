@@ -17,7 +17,7 @@ import {
 import { titleCase } from 'https://deno.land/x/case@2.1.1/mod.ts';
 import { Table } from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts';
 import { identity, pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { has, uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
+import { has, last, uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
@@ -27,18 +27,15 @@ import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
 import { addNewProvision, apply, loadProvisions, plan } from './provisions.ts';
 import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
-import type {
-	InstalledPlugin,
-	Option,
-	PluginJsonResponse,
-	PluginResponseEncoding,
-	PositionalArg,
-} from './taqueria-protocol/taqueria-protocol-types.ts';
 import {
 	EphemeralState,
 	i18n,
+	InstalledPlugin,
+	Option,
 	ParsedTemplate,
 	PluginInfo,
+	PluginJsonResponse,
+	PositionalArg,
 	SanitizedAbsPath,
 	SanitizedArgs,
 	Task,
@@ -486,6 +483,73 @@ const addOperations = (
 				),
 		);
 
+const getTemplateName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t) => {
+	if (parsedArgs._.length >= 2 && parsedArgs._[0] === 'create') {
+		const templateName = last(parsedArgs._.slice(0, 2));
+		return templateName && state.templates[templateName]
+			? templateName
+			: undefined;
+	}
+	return undefined;
+};
+
+const addRequiredTemplatePositional = (yargs: CLIConfig, state: EphemeralState.t, i18n: i18n.t) =>
+	yargs.positional('template', {
+		describe: i18n.__('templateDesc'),
+		type: 'string',
+		choices: Object.keys(state.templates),
+		required: true,
+	});
+
+const getTemplateCommandArgs = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t, i18n: i18n.t) => {
+	const templateName = getTemplateName(parsedArgs, state);
+	if (templateName) {
+		const implementation = state.templates[templateName];
+
+		// Get the template
+		const template: ParsedTemplate.t = has('template', implementation)
+			? implementation as ParsedTemplate.t
+			: getCanonicalTemplate(
+				(implementation as InstalledPlugin.t).name,
+				templateName,
+				state,
+			) as ParsedTemplate.t;
+
+		const command = 'create ' + template.command.replace(
+			new RegExp(`^${template.template}`),
+			'<template>',
+		);
+
+		const builder = (yargs: CLIConfig) => {
+			addRequiredTemplatePositional(yargs, state, i18n);
+			template.options?.map(option =>
+				yargs.option(option.flag, {
+					alias: option.shortFlag,
+					describe: option.description,
+					type: option.type,
+					required: option.required,
+					default: option.defaultValue,
+					choices: option.choices,
+				})
+			);
+			template.positionals?.map(p =>
+				yargs.positional(p.placeholder, {
+					default: p.defaultValue,
+					describe: p.description,
+					type: p.type,
+					required: p.required,
+				})
+			);
+			return yargs;
+		};
+		return { command, builder };
+	}
+	return {
+		command: 'create <template>',
+		builder: (yargs: CLIConfig) => addRequiredTemplatePositional(yargs, state, i18n),
+	};
+};
+
 const exposeTemplates = (
 	cliConfig: CLIConfig,
 	config: LoadedConfig.t,
@@ -496,52 +560,12 @@ const exposeTemplates = (
 	pluginLib: PluginLib,
 ) => {
 	if (state.templates) {
+		const { command, builder } = getTemplateCommandArgs(parsedArgs, state, i18n);
+
 		cliConfig.command(
-			'create <template>',
+			command,
 			i18n.__('createDesc'),
-			(yargs: CLIConfig) => {
-				yargs.positional('template', {
-					describe: i18n.__('templateDesc'),
-					type: 'string',
-					choices: Object.keys(state.templates),
-					required: true,
-				});
-
-				// If we're executing this task, and a template has been provided,
-				// then we'll add help context for the template's positionals and options
-				if (parsedArgs.template && state.templates[parsedArgs.template]) {
-					const implementation = state.templates[parsedArgs.template];
-
-					// Get the template
-
-					const template: ParsedTemplate.t = has('template', implementation)
-						? implementation as ParsedTemplate.t
-						: getCanonicalTemplate(
-							(implementation as InstalledPlugin.t).name,
-							parsedArgs.template,
-							state,
-						) as ParsedTemplate.t;
-
-					// Add the templates options and positional args to the help context
-					template.options?.map(option =>
-						yargs.option(option.flag, {
-							alias: option.shortFlag,
-							describe: option.description,
-							type: option.type,
-							required: option.required,
-							default: option.defaultValue,
-							choices: option.choices,
-						})
-					);
-					template.positionals?.map(p =>
-						yargs.positional(p.placeholder, {
-							default: p.defaultValue,
-							describe: p.description,
-							type: p.type,
-						})
-					);
-				}
-			},
+			builder,
 			(args: Arguments) =>
 				pipe(
 					SanitizedArgs.ofCreateTaskArgs(args),
@@ -555,14 +579,14 @@ const exposeTemplates = (
 							if (parsedArgs.plugin) {
 								const installedPlugin = config.plugins.find(plugin => plugin.name === parsedArgs.plugin);
 								if (installedPlugin) {
-									return handleTemplate(parsedArgs, installedPlugin, state, pluginLib, i18n);
+									return handleTemplate(parsedArgs, config, installedPlugin, state, pluginLib, i18n);
 								}
 							}
 							return resolve(log(i18n.__('providedByMany')));
 						}
 
 						const installedPlugin = state.templates[parsedArgs.template] as InstalledPlugin.t;
-						return handleTemplate(parsedArgs, installedPlugin, state, pluginLib, i18n);
+						return handleTemplate(parsedArgs, config, installedPlugin, state, pluginLib, i18n);
 					}),
 					forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
 				),
@@ -573,6 +597,7 @@ const exposeTemplates = (
 
 const handleTemplate = (
 	parsedArgs: SanitizedArgs.CreateTaskArgs,
+	config: LoadedConfig.t,
 	plugin: InstalledPlugin.t,
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
@@ -580,7 +605,7 @@ const handleTemplate = (
 ) => {
 	const template = getCanonicalTemplate(plugin.name, parsedArgs.template, state);
 	if (template) {
-		return template.handler === 'proxy'
+		return template.handler === 'function'
 			? pipe(
 				pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)('proxyTemplate', template.encoding)({
 					...parsedArgs,
@@ -593,7 +618,7 @@ const handleTemplate = (
 			: pipe(
 				exec(
 					template.handler,
-					parsedArgs,
+					{ ...parsedArgs, config },
 					['json', 'application/json'].includes(template.encoding ?? 'none'),
 				),
 				map((res: string | number) => {
@@ -936,6 +961,8 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 				),
 		);
 	} catch (err) {
+		// Something went wrong that we didn't handle.
+		// TODO: Generate bug report with stack trace
 		console.error(err);
 	}
 };
