@@ -8,6 +8,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a SmartPy synt
                               ax to Michelson code [aliases: c, compile-smartpy]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -31,20 +32,6 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`;
-
-export const helpContentsSmartpyTeapotSpecific = `taq teapot
-
-Have a cup of tea
-
-Options:
-      --version     Show version number                                [boolean]
-      --build       Display build information about the current version[boolean]
-  -p, --projectDir  Path to your project directory               [default: "./"]
-  -e, --env         Specify an environment configuration
-  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]  
-      --help        Show help                                          [boolean]
-  -g, --green       Make green tea instead                             [boolean]
 `;
 
 export const smartPyCompiledOutput = `

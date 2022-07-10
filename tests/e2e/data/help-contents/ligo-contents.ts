@@ -8,6 +8,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a Ligo syntax
                               to Michelson code       [aliases: c, compile-ligo]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]

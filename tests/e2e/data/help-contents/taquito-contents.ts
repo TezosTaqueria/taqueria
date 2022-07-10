@@ -8,6 +8,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq deploy [contract]       Deploy a smart contract to a particular environmen
                               t                             [aliases: originate]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]

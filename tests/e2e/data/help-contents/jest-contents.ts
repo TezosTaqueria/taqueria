@@ -8,6 +8,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq test [partition]        Setup a directory as a partition to run Jest tests
                                                                  [aliases: jest]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
