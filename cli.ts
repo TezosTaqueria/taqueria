@@ -54,7 +54,7 @@ const {
 	mkdir,
 	readJsonFile,
 	writeTextFile,
-	doesPathNotExist,
+	doesPathNotExistOrIsEmptyDir,
 	gitClone,
 	rm,
 	log,
@@ -392,7 +392,7 @@ const scaffoldProject = (i18n: i18n.t) =>
 	({ scaffoldUrl, scaffoldProjectDir, maxConcurrency }: SanitizedArgs.ScaffoldTaskArgs) =>
 		attemptP<TaqError.t, string>(async () => {
 			const abspath = await eager(SanitizedAbsPath.make(scaffoldProjectDir));
-			const destDir = await eager(doesPathNotExist(abspath));
+			const destDir = await eager(doesPathNotExistOrIsEmptyDir(abspath));
 
 			log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
 			await eager(gitClone(scaffoldUrl)(destDir));
@@ -417,8 +417,10 @@ const scaffoldProject = (i18n: i18n.t) =>
 			await eager(rm(gitDir));
 			log('    ✓ Remove Git directory');
 
-			await eager(exec('npm install 2>&1 > /dev/null', {}, false, destDir));
-			log('    ✓ Install plugins');
+			log('    ✓ Scan for plugins');
+
+			await eager(exec('npm run setup 2>&1 > /dev/null', {}, false, destDir));
+			log('    ✓ Install dependencies');
 
 			await eager(exec('taq init 2>&1 > /dev/null', {}, false, destDir));
 			log("    ✓ Project Taq'ified \n");
@@ -466,10 +468,6 @@ const exposeProvisioningTasks = (
 		(argv: Arguments) =>
 			pipe(
 				SanitizedArgs.ofProvisionTaskArgs(argv),
-				map(inputArgs => {
-					console.log(inputArgs);
-					return inputArgs;
-				}),
 				chain(inputArgs => addNewProvision(inputArgs, state, i18n)),
 				map(result => JSON.stringify(result)),
 				// map(() => 'Added provision to .taq/provisions.json'),
@@ -490,29 +488,6 @@ const exposeProvisioningTasks = (
 					// forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
 				),
 		);
-
-const exposeTemplates = (
-	cliConfig: CLIConfig,
-	_config: LoadedConfig.t,
-	_env: EnvVars,
-	_parsedArgs: SanitizedArgs.t,
-	_i18n: i18n.t,
-	_state: EphemeralState.t,
-	_pluginLib: PluginLib,
-) =>
-	cliConfig.command(
-		'create <template>',
-		'Create an entity from a pre-existing template',
-		() => {
-			console.log('Configuring create template!');
-		},
-		() => {
-			console.log('Create template!');
-			Deno.exit(10);
-		},
-	)
-		.alias('create-tmpl', 'create')
-		.alias('create-template', 'create');
 
 const getPluginOption = (task: Task.t) => {
 	return task.options?.find(option => option.flag === 'plugin');
@@ -682,7 +657,7 @@ const loadEphermeralState = (
 	pipe(
 		taqResolve(cliConfig),
 		map((cliConfig: CLIConfig) =>
-			[exposeTasks, exposeProvisioningTasks, exposeTemplates].reduce(
+			[exposeTasks, exposeProvisioningTasks].reduce(
 				(cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
 				cliConfig,
 			)
@@ -907,6 +882,8 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_PARSE_UNKNOWN' }, err => [14, err.msg])
 				.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
 				.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
+				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
+				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 

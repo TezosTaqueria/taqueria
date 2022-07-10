@@ -1,6 +1,7 @@
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import utils from 'util';
+import * as contents from './data/help-contents/taquito-contents';
 import { networkInfo } from './data/network-info';
 import { checkContractExistsOnNetwork, generateTestProject } from './utils/utils';
 const exec = utils.promisify(exec1);
@@ -12,6 +13,38 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['taquito']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+	});
+
+	test('Verify that the taquito plugin exposes the associated commands in the help menu', async () => {
+		try {
+			const taquitoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPlugin);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the taquito plugin exposes the associated options in the help menu', async () => {
+		try {
+			const taquitoHelpContents = await exec(`taq deploy --help --projectDir=${taqueriaProjectPath}`);
+			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the taquito plugin aliases expose the correct info in the help menu', async () => {
+		try {
+			const taquitoHelpContents = await exec(`taq originate --help --projectDir=${taqueriaProjectPath}`);
+			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
 	});
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
@@ -240,7 +273,9 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const stdoutDeploy = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 
 		// 3. Verify that proper error displays in the console
-		expect(stdoutDeploy.stderr).toContain('No initial storage provided for hello-tacos.tz');
+		expect(stdoutDeploy.stderr).toContain(
+			'Michelson artifact hello-tacos.tz has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.test.storage."hello-tacos.tz"',
+		);
 	});
 
 	test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> initial storage is not a number', async () => {

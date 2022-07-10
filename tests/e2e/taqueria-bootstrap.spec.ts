@@ -1,111 +1,12 @@
-import { spawnSync } from 'child_process';
+import { exec as nodeExec } from 'child_process';
 import { readdir, readFile, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
+import util from 'util';
 import { generateTestProject } from './utils/utils';
+const exec = util.promisify(nodeExec);
 
 const taqueriaProjectPath = 'e2e/taq-bootstrap';
-
-const expectedConfig = `
-{
-    "language": "en",
-    "contractsDir": "contracts",
-    "artifactsDir": "artifacts",
-    "network": {},
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "rpcUrl": "http://localhost:20000",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
-        }
-    },
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {}
-        }
-    },
-    "accounts": {
-        "bob": "3_000_000_000",
-        "alice": "3_000_000_000",
-        "john": "3_000_000_000",
-        "jane": "3_000_000_000",
-        "joe": "3_000_000_000"
-    }
-}
-`;
-
-const newConfig = `
-{
-    "language": "en",
-    "contractsDir": "contracts",
-    "artifactsDir": "artifacts",
-    "network": {},
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "rpcUrl": "http://localhost:20000",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
-        }
-    },
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {}
-        },
-		"testing": {
-			"networks": [],
-			"sandboxes": [
-				"local"
-			],
-			"storage": {}
-		}
-    },
-    "accounts": {
-        "bob": "3_000_000_000",
-        "alice": "3_000_000_000",
-        "john": "3_000_000_000",
-        "jane": "3_000_000_000",
-        "joe": "3_000_000_000"
-    }
-}
-`;
-
-const expectedProvisionerDeclaration = `
-import development_state from "./development-state.json" assert {type: "json"}
-
-declare global {
-export type development = typeof development_state
-
-export type RawState = development
-
-export interface State {
-raw: RawState
-}
-
-export type ID = string
-
-export interface Provision {
-readonly id: ID
-after: ID[]
-when: (fn: (state: State) => boolean) => Provision
-task: (fn: (state: State) => unknown) => Provision
-}
-
-export function provision(id: ID): Provision
-
-export interface Tasks {
-}
-export const tasks: Tasks
-}
-`;
+import { expectedConfig, expectedProvisionerDeclaration, newConfig } from './data/bootstrap-contents';
 
 const expectedProvisioner = `/// <reference types="./provisioner.d.ts" />\n`;
 
@@ -122,7 +23,11 @@ describe('Taqueria Bootstrap Files', () => {
 		const filesBefore = await readdir(join(taqueriaProjectPath, '.taq'));
 		expect(filesBefore).toEqual(['config.json']);
 
-		spawnSync('taq', { cwd: taqueriaProjectPath, shell: true });
+		try {
+			await exec('taq', { cwd: taqueriaProjectPath });
+		} catch {
+			// Deliberately empty
+		}
 
 		const filesAfter = await readdir(join(taqueriaProjectPath, '.taq'));
 		expect(filesAfter.sort()).toEqual([
@@ -162,7 +67,11 @@ describe('Taqueria Bootstrap Files', () => {
 	test('Assure that testing-state.json is generated when a different environment is targeted', async () => {
 		const configFile = join(taqueriaProjectPath, '.taq', 'config.json');
 		await writeFile(configFile, newConfig, { encoding: 'utf8' });
-		spawnSync('taq -e testing', { cwd: taqueriaProjectPath, shell: true });
+		try {
+			await exec('taq -e testing', { cwd: taqueriaProjectPath });
+		} catch {
+			// Deliberately empty
+		}
 
 		const filesAfter = await readdir(join(taqueriaProjectPath, '.taq'));
 		expect(filesAfter.sort()).toEqual([

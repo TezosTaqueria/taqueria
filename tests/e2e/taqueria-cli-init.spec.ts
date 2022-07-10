@@ -58,7 +58,6 @@ describe('E2E Testing for taqueria general functionality', () => {
 					'@taqueria/plugin-ligo': `^${ligoVersion}`,
 				},
 			};
-
 			expect(JSON.parse(packageContents.stdout)).toEqual(fileContentsBare);
 
 			await fsPromises.rm(`${taqueriaProjectPathNPMSuccess}`, { recursive: true });
