@@ -35,6 +35,7 @@ import {
 	ParsedTemplate,
 	PluginInfo,
 	PluginJsonResponse,
+	PluginResponseEncoding,
 	PositionalArg,
 	SanitizedAbsPath,
 	SanitizedArgs,
@@ -761,7 +762,10 @@ const exposeTask = (
 
 				const handler = task.handler === 'proxy' && plugin
 					? pipe(
-						pluginLib.sendPluginActionRequest(plugin)('proxy', task.encoding)({ ...inputArgs, task: task.task }),
+						pluginLib.sendPluginActionRequest(plugin)('proxy', task.encoding ?? PluginResponseEncoding.create('none'))({
+							...inputArgs,
+							task: task.task,
+						}),
 						chain(addTask(parsedArgs, task.task, plugin.name)),
 						map(res => {
 							const decoded = res as PluginJsonResponse.t | void;

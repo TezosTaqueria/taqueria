@@ -119,6 +119,9 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 
 	test('no tests present will result in an error', async () => {
 		const testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
+
+		// NOTE, jest outputs this on stdout, hence why stdout is used here
+		// instead of stderr. This is NOT an issue with the plugin itself.
 		expect(testOutput.stdout).toContain('No tests found, exiting with code 1');
 	});
 

@@ -143,7 +143,7 @@ export const inject = (deps: PluginDeps) => {
 	// Sends a request to a plugin for a particular action
 	// sendPluginActionRequest: InstalledPlugin -> PluginActionName -> Record<string, unknown> -> Future<TaqError, PluginResponse>
 	const sendPluginActionRequest = <T>(plugin: InstalledPlugin.t) =>
-		(action: PluginActionName.t, encoding?: PluginResponseEncoding.t) =>
+		(action: PluginActionName.t, encoding: PluginResponseEncoding.t) =>
 			(requestArgs: Record<string, unknown>): Future<TaqError.t, T | void> => {
 				const cmd = [
 					...getPluginExe(plugin),
@@ -167,7 +167,7 @@ export const inject = (deps: PluginDeps) => {
 					// Proxy output can either be configured to passthru or
 					// encoded as JSON
 					chain(_ =>
-						!encoding || encoding !== 'none'
+						encoding !== 'none'
 							? execPluginJson(shellCmd)
 							: map(noop)(execPluginPassthru(shellCmd))
 					),
