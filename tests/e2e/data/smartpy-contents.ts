@@ -4,6 +4,6 @@ export const smartPyCompiledOutput = `
 ├────────────────┼─────────────────┤
 │ hello-tacos.py │ HelloTacos_comp │
 └────────────────┴─────────────────┘
-`.trimStart()
+`.trimStart();
 
-export const smartPyNothingCompiled = `No contracts found to compile.\n`
+export const smartPyNothingCompiled = `No contracts found to compile.\n`;

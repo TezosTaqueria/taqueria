@@ -1,4 +1,5 @@
 import {
+	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
 	getInitialStorage,
@@ -60,7 +61,14 @@ const getValidContracts = async (parsedArgs: Opts) => {
 	return contracts.reduce(
 		(retval, filename) => {
 			const storage = getInitialStorage(parsedArgs)(filename);
-			if (storage === undefined || storage === null) throw (`No initial storage provided for ${filename}`);
+			if (storage === undefined || storage === null) {
+				sendErr(
+					`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
+						getCurrentEnvironment(parsedArgs)
+					}.storage."${filename}"\n`,
+				);
+				return retval;
+			}
 			return [...retval, { filename, storage }];
 		},
 		[] as ContractStorageMapping[],
@@ -108,6 +116,9 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
 
 const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: string) => {
 	const contracts = await getValidContracts(parsedArgs);
+	if (!contracts.length) {
+		return undefined;
+	}
 
 	const batch = await contracts.reduce(
 		(batch, contractMapping) =>
@@ -175,8 +186,9 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 							const first = getFirstAccountAlias(sandboxName, parsedArgs);
 							if (first) {
 								defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
+								// TODO: The error should be a warning, not an error. Descriptive string should not begin with 'Warning:'
 								sendErr(
-									`No default account has been configured for the sandbox called ${sandboxName}. Using the account called ${first} for origination.`,
+									`Warning: A default origination account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this origination.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
 								);
 							}
 						}

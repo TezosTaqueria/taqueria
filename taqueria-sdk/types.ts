@@ -12,6 +12,7 @@ import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
+import * as SanitizedPath from '@taqueria/protocol/SanitizedPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
@@ -32,6 +33,7 @@ export {
 	SandboxAccountConfig,
 	SandboxConfig,
 	SanitizedAbsPath,
+	SanitizedPath,
 	TaqError,
 	Task,
 	Template,

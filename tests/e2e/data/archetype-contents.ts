@@ -4,7 +4,7 @@ export const archetypeNoContracts = `
 ├────────────┼──────────┤
 │ None found │ N/A      │
 └────────────┴──────────┘
-`.trimStart()
+`.trimStart();
 
 export const archetypeNotCompiled = `
 ┌──────────┬──────────────┐
@@ -12,4 +12,4 @@ export const archetypeNotCompiled = `
 ├──────────┼──────────────┤
 │ test.arl │ Not compiled │
 └──────────┴──────────────┘
-`.trimStart()
+`.trimStart();

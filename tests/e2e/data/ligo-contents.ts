@@ -1,10 +1,18 @@
+export const ligoNoContracts = `
+┌────────────┬──────────┐
+│ Contract   │ Artifact │
+├────────────┼──────────┤
+│ None found │ N/A      │
+└────────────┴──────────┘
+`.trim();
+
 export const compileNonExistent = `
 ┌────────────┬──────────────┐
 │ Contract   │ Artifact     │
 ├────────────┼──────────────┤
 │ test.mligo │ Not compiled │
 └────────────┴──────────────┘
-`.trimStart()
+`.trimStart();
 
 export const compileInvalid = `
 ┌────────────────────────┬──────────────┐
@@ -12,4 +20,4 @@ export const compileInvalid = `
 ├────────────────────────┼──────────────┤
 │ invalid-contract.mligo │ Not compiled │
 └────────────────────────┴──────────────┘
-`.trimStart()
+`.trimStart();

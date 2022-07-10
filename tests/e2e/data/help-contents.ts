@@ -15,7 +15,7 @@ Options:
 Taqueria is currently in BETA. You've been warned. :)
 
 Your config.json file is invalid
-`
+`;
 
 export const helpContentsForProject: string = `taq <command>
 
@@ -38,7 +38,7 @@ Options:
       --help        Show help                                     [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoPlugin: string = `taq <command>
 
@@ -61,7 +61,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoPluginSpecific = `taq compile [sourceFile]
 
@@ -77,7 +77,7 @@ Options:
   -e, --entrypoint  The entry point that will be compiled
   -s, --syntax      The syntax used in the contract
   -i, --infer       Enable type inference
-`
+`;
 
 export const helpContentsSmartpyPlugin: string = `taq <command>
 
@@ -100,7 +100,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsSmartpyPluginSpecific = `taq compile [sourceFile]
 
@@ -113,7 +113,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 
 export const helpContentsLigoSmartpy: string = `taq <command>
 
@@ -136,7 +136,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoSmartpySpecific = `taq compile
 
@@ -152,7 +152,7 @@ Options:
       --plugin      Specify which plugin should be used to execute this task
   [required] [choices: "@taqueria/plugin-ligo", "ligo", "@taqueria/plugin-smartp
                                                                   y", "smartpy"]
-`
+`;
 
 export const helpContentsLigoArchetype: string = `taq <command>
 
@@ -175,7 +175,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoArchetypeSpecific = `taq compile
 
@@ -191,7 +191,7 @@ Options:
       --plugin      Specify which plugin should be used to execute this task
   [required] [choices: "@taqueria/plugin-ligo", "ligo", "@taqueria/plugin-archet
                                                               ype", "archetype"]
-`
+`;
 
 export const helpContentsArchetypePlugin: string = `taq <command>
 
@@ -215,7 +215,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsArchetypePluginSpecific: string = `taq compile [sourceFile]
 
@@ -228,7 +228,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 
 export const helpContentsTaquitoPlugin: string = `taq <command>
 
@@ -251,7 +251,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsTaquitoPluginSpecific = `taq deploy [contract]
 
@@ -264,7 +264,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 
 export const helpContentsFlextesaPlugin: string = `taq <command>
 
@@ -288,7 +288,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsFlextesaPluginStartSandbox = `taq start sandbox [sandboxName]
 
@@ -304,7 +304,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 export const helpContentsFlextesaPluginStopSandbox = `taq stop sandbox [sandboxName]
 
 Stops a flextesa sandbox
@@ -319,7 +319,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 
 export const helpContentsGenerateTypesPlugin = `taq <command>
 
@@ -344,7 +344,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsGenerateTypesPluginSpecific = `taq generate types [typescriptDir]
 
@@ -364,7 +364,7 @@ Options:
       --help           Show help                                       [boolean]
   -t, --typeAliasMode  The type aliases used in the generated types
                                                      [choices: "file", "simple"]
-`
+`;
 
 export const helpContentsFlextesaPluginListAccounts = `taq list accounts <sandboxName>
 
@@ -380,7 +380,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 
 export const helpContentsJestPlugin = `taq <command>
 
@@ -403,7 +403,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsJestPluginSpecific = `taq test [partition]
 
@@ -422,4 +422,4 @@ Options:
       --help         Show help                                         [boolean]
   -i, --init         Initializes the partition for Jest                [boolean]
   -t, --testPattern  Run test files that match the provided pattern
-`
+`;
