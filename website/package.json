@@ -1,6 +1,6 @@
 {
   "name": "taqueria_website",
-  "version": "0.4.0",
+  "version": "0.6.2",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -23,8 +23,8 @@
     "@docusaurus/preset-classic": "2.0.0-beta.20",
     "@mdx-js/react": "^1.6.22",
     "@svgr/webpack": "^5.5.0",
-    "@taquito/beacon-wallet": "^12.1.0",
-    "@taquito/taquito": "^12.1.1",
+    "@taquito/beacon-wallet": "^13.0.1",
+    "@taquito/taquito": "^13.0.1",
     "@typeform/embed": "^1.35.1",
     "clsx": "^1.1.1",
     "docusaurus-plugin-sass": "^0.2.2",

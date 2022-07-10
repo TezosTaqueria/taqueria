@@ -3,9 +3,9 @@
 	"displayName": "taqueria",
 	"description": "A vscode plugin to make Tezos development easier with Taqueria!",
 	"publisher": "ecadlabs",
-	"version": "0.4.2",
+	"version": "0.6.5",
 	"engines": {
-		"vscode": "^1.63.0",
+		"vscode": "^1.68.1",
 		"node": "^16.0.0"
 	},
 	"engineStrict": true,
@@ -57,18 +57,13 @@
 		"build",
 		"test",
 		"deploy",
+		"originate",
 		"ecad",
 		"ecadlabs"
 	],
 	"activationEvents": [
-		"onCommand:taqueria.init",
-		"onCommand:taqueria.install",
-		"onCommand:taqueria.compile_smartpy",
-		"onCommand:taqueria.compile_ligo",
-		"onCommand:taqueria.start_sandbox",
-		"onCommand:taqueria.stop_sandbox",
-		"onCommand:taqueria.list_accounts",
-		"onCommand:taqueria.deploy"
+		"workspaceContains:.taq",
+		"onStartupFinished"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -90,49 +85,111 @@
 				"command": "taqueria.init",
 				"category": "Taqueria",
 				"title": "Initialize Project",
-				"shortTitle": "init"
+				"shortTitle": "init",
+				"enablement": "@taqueria-state/enable-init-scaffold"
+			},
+			{
+				"command": "taqueria.scaffold",
+				"category": "Taqueria",
+				"title": "Scaffold Project",
+				"shortTitle": "scaffold",
+				"enablement": "@taqueria-state/enable-init-scaffold"
 			},
 			{
 				"command": "taqueria.install",
 				"category": "Taqueria",
 				"title": "Install Plugin",
-				"shortTitle": "install"
+				"shortTitle": "install",
+				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/not-installed-plugin-count != 0"
+			},
+			{
+				"command": "taqueria.uninstall",
+				"category": "Taqueria",
+				"title": "Uninstall Plugin",
+				"shortTitle": "uninstall",
+				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/installed-plugin-count != 0"
 			},
 			{
 				"command": "taqueria.compile_smartpy",
 				"category": "Taqueria",
 				"title": "Compile (SmartPy)",
-				"shortTitle": "compile --plugin smartpy"
+				"shortTitle": "compile --plugin smartpy",
+				"enablement": "@taqueria/plugin-smartpy"
 			},
 			{
 				"command": "taqueria.compile_ligo",
 				"category": "Taqueria",
 				"title": "Compile (LIGO)",
-				"shortTitle": "compile --plugin ligo"
+				"shortTitle": "compile --plugin ligo",
+				"enablement": "@taqueria/plugin-ligo"
+			},
+			{
+				"command": "taqueria.compile_archetype",
+				"category": "Taqueria",
+				"title": "Compile (Archetype)",
+				"shortTitle": "compile --plugin archetype",
+				"enablement": "@taqueria/plugin-archetype"
 			},
 			{
 				"command": "taqueria.start_sandbox",
 				"category": "Taqueria",
 				"title": "Start Sandbox",
-				"shortTitle": "start sandbox <name>"
+				"shortTitle": "start sandbox <name>",
+				"enablement": "@taqueria/plugin-flextesa"
 			},
 			{
 				"command": "taqueria.stop_sandbox",
 				"category": "Taqueria",
 				"title": "Stop Sandbox",
-				"shortTitle": "stop sandbox <name>"
+				"shortTitle": "stop sandbox <name>",
+				"enablement": "@taqueria/plugin-flextesa"
 			},
 			{
 				"command": "taqueria.list_accounts",
 				"category": "Taqueria",
 				"title": "List Sandbox Accounts",
-				"shortTitle": "list accounts <name>"
+				"shortTitle": "list accounts <name>",
+				"enablement": "@taqueria/plugin-flextesa"
 			},
 			{
-				"command": "taqueria.deploy",
+				"command": "taqueria.originate",
 				"category": "Taqueria",
-				"title": "Deploy contracts",
-				"shortTitle": "deploy"
+				"title": "Originate contracts",
+				"shortTitle": "originate",
+				"enablement": "@taqueria/plugin-taquito"
+			},
+			{
+				"command": "taqueria.opt_in",
+				"category": "Taqueria",
+				"title": "Opt-in to analytics",
+				"shortTitle": "opt-in"
+			},
+			{
+				"command": "taqueria.opt_out",
+				"category": "Taqueria",
+				"title": "Opt-out from analytics",
+				"shortTitle": "opt-out"
+			},
+			{
+				"command": "taqueria.generate_types",
+				"category": "Taqueria",
+				"title": "Generate Types",
+				"shortTitle": "generate types",
+				"enablement": "@taqueria/plugin-contract-types"
+			},
+			{
+				"command": "taqueria.typecheck",
+				"category": "Taqueria",
+				"title": "Typecheck Michelson contracts",
+				"shortTitle": "typecheck",
+				"enablement": "@taqueria/plugin-tezos-client"
+			},
+			{
+				"command": "taqueria.test",
+				"category": "Taqueria",
+				"title": "Setup directory as a partition to run Jest tests",
+				"shortTitle": "test",
+				"enablement": "@taqueria/plugin-jest"
 			}
 		]
 	},
@@ -145,7 +202,7 @@
 		"test": "node ./out/test/runTest.js"
 	},
 	"devDependencies": {
-		"@taquito/taquito": "^12.1.1",
+		"@taquito/taquito": "^13.0.1",
 		"@types/fs-extra": "^9.0.13",
 		"@types/glob": "^7.2.0",
 		"@types/mocha": "^5.2.6",
@@ -165,7 +222,7 @@
 		"vsce": "^2.6.4"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.4.0",
+		"@taqueria/protocol": "^0.6.2",
 		"comment-json": "^4.1.1",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1"

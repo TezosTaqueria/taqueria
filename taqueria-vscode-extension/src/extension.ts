@@ -1,29 +1,89 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import path from 'path';
 import * as api from 'vscode';
-import { inject, InjectedDependencies, sanitizeDeps } from './lib/helpers';
+import { inject, InjectedDependencies, OutputLevels, sanitizeDeps } from './lib/helpers';
 import { COMMAND_PREFIX } from './lib/helpers';
 import { makeDir } from './lib/pure';
+
+const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
+	const inMemoryState = {
+		configWatchers: new Map<string, api.FileSystemWatcher[]>(),
+	};
+
+	const clearConfigWatchers = () => {
+		for (const watcherList of inMemoryState.configWatchers.values()) {
+			for (const watcher of watcherList) {
+				watcher.dispose();
+			}
+		}
+		inMemoryState.configWatchers.clear();
+	};
+
+	const getConfigWatchers = () => inMemoryState.configWatchers.values();
+
+	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher[]) => {
+		if (inMemoryState.configWatchers.has(folder)) {
+			return;
+		}
+		const watcher = factory();
+		inMemoryState.configWatchers.set(folder, watcher);
+	};
+
+	return {
+		clearConfigWatchers,
+		getConfigWatchers,
+		addConfigWatcherIfNotExists,
+	};
+})();
 
 export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
 	const deps = sanitizeDeps(input);
 	const { vscode } = deps;
 	const {
 		exposeInitTask,
+		exposeScaffoldTask,
 		exposeInstallTask,
+		exposeUninstallTask,
+		exposeOriginateTask,
 		exposeTaqTaskAsCommand,
 		exposeSandboxTaskAsCommand,
+		createWatcherIfNotExists,
+		showOutput,
+		logAllNestedErrors,
 	} = inject(deps);
 
+	const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
+	const logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
+	const outputChannel = vscode.window.createOutputChannel('Taqueria');
+	const output = {
+		outputChannel,
+		logLevel,
+	};
+	showOutput(output)(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
+
 	const i18n: i18n = await loadI18n();
-	const output = vscode.window.createOutputChannel('Taqueria');
+
 	const folders = vscode.workspace.workspaceFolders
 		? vscode.workspace.workspaceFolders
 		: [];
 
 	// Add built-in tasks for Taqueria
 	await exposeInitTask(context, output, i18n, folders);
+	await exposeScaffoldTask(context, output, folders, i18n);
 	await exposeInstallTask(context, output, folders, i18n);
+	await exposeUninstallTask(context, output, folders, i18n);
+	exposeTaqTaskAsCommand(context, output, i18n)(
+		COMMAND_PREFIX + 'opt_in',
+		'opt-in',
+		'output',
+		'Successfully opted in to analytics.',
+	);
+	exposeTaqTaskAsCommand(context, output, i18n)(
+		COMMAND_PREFIX + 'opt_out',
+		'opt-out',
+		'output',
+		'Successfully opted out from analytics.',
+	);
 	// await exposeTasksFromState (context, output, folders, i18n)
 
 	// Temporary - hard coded list of tasks we know we need to support
@@ -45,14 +105,43 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 					'Compilation successful.',
 				);
 				exposeTaqTask(COMMAND_PREFIX + 'compile_ligo', '--plugin ligo compile', 'output', 'Compilation successful.');
+				exposeTaqTask(
+					COMMAND_PREFIX + 'compile_archetype',
+					'--plugin archetype compile',
+					'output',
+					'Compilation successful.',
+				);
+				exposeTaqTask(
+					COMMAND_PREFIX + 'generate_types',
+					'generate types',
+					'output',
+					'Type generation successful.',
+				);
+				exposeTaqTask(
+					COMMAND_PREFIX + 'typecheck',
+					'typecheck',
+					'output',
+					'Type generation successful.',
+				);
+				exposeTaqTask(
+					COMMAND_PREFIX + 'test',
+					'test',
+					'output',
+					'Test setup successful.',
+				);
 
 				// Sandbox tasks
 				exposeSandboxTask(COMMAND_PREFIX + 'start_sandbox', 'start sandbox', 'notify');
 				exposeSandboxTask(COMMAND_PREFIX + 'stop_sandbox', 'stop sandbox', 'notify');
 				exposeSandboxTask(COMMAND_PREFIX + 'list_accounts', 'list accounts', 'output');
 
-				// Originate task
-				exposeTaqTask(COMMAND_PREFIX + 'deploy', 'deploy', 'output', 'Deployment successful.');
+				exposeOriginateTask(context, output, folders, i18n);
+
+				try {
+					createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
+				} catch (error: unknown) {
+					logAllNestedErrors(error, output);
+				}
 			});
 	}
 
@@ -73,4 +162,6 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	// 	})
 }
 
-export function deactivate() {}
+export function deactivate() {
+	clearConfigWatchers();
+}

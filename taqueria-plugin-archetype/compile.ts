@@ -25,7 +25,7 @@ const getCompileCommand = (opts: Opts) =>
 		const { projectDir } = opts;
 		const inputFile = getInputFilename(opts)(sourceFile);
 		const baseCommand =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project completium/archetype:1.2.12 ${inputFile}`;
+			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -u $(id -u):$(id -g) -w /project completium/archetype:1.2.12 ${inputFile}`;
 		const outFile = `-o ${getContractArtifactFilename(opts)(sourceFile)}`;
 		const cmd = `${baseCommand} ${outFile}`;
 		return cmd;
