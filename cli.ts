@@ -437,76 +437,6 @@ const getCanonicalTask = (pluginName: string, taskName: string, state: Ephemeral
 		undefined,
 	);
 
-const exposeProvisioningTasks = (
-	cliConfig: CLIConfig,
-	config: LoadedConfig.t,
-	_env: EnvVars,
-	_parsedArgs: SanitizedArgs.t,
-	_i18n: i18n.t,
-	state: EphemeralState.t,
-	_pluginLib: PluginLib,
-) =>
-	cliConfig.command(
-		'provision <task> [..task args]',
-		'Provision a task to populate project state',
-		(yargs: CLIConfig) => {
-			yargs.positional('task', {
-				describe: 'The name of the task to provision',
-				required: true,
-				type: 'string',
-				choices: Object.keys(state.tasks),
-			});
-			yargs.option('name', {
-				describe: 'Unique name of the provisioner',
-				type: 'string',
-			});
-		},
-		(argv: Arguments) =>
-			pipe(
-				SanitizedArgs.ofProvisionTaskArgs(argv),
-				// chain(inputArgs => addNewProvision(inputArgs, config, state)),
-				// map(() => 'Added provision to .taq/provisions.json'),
-				// forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
-			),
-	)
-		.command(
-			'plan',
-			'Display the execution plan for applying all provisioned tasks',
-			() => {},
-			(argv: Arguments) =>
-				pipe(
-					SanitizedArgs.of(argv),
-					// map(inputArgs => joinPaths(inputArgs.projectDir, '.taq', 'provisions.json')),
-					// chain(SanitizedAbsPath.make),
-					// chain(loadProvisions),
-					// map(plan),
-					// forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
-				),
-		);
-
-const exposeTemplates = (
-	cliConfig: CLIConfig,
-	_config: LoadedConfig.t,
-	_env: EnvVars,
-	_parsedArgs: SanitizedArgs.t,
-	_i18n: i18n.t,
-	_state: EphemeralState.t,
-	_pluginLib: PluginLib,
-) =>
-	cliConfig.command(
-		'create <template>',
-		'Create an entity from a pre-existing template',
-		() => {
-			console.log('Configuring create template!');
-		},
-		() => {
-			console.log('Create template!');
-			Deno.exit(10);
-		},
-	)
-		.alias('create-tmpl', 'create')
-		.alias('create-template', 'create');
-
 const getPluginOption = (task: Task.t) => {
 	return task.options?.find(option => option.flag === 'plugin');
 };
@@ -672,7 +602,7 @@ const loadEphermeralState = (
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
 ): CLIConfig =>
-	[exposeTasks, exposeProvisioningTasks, exposeTemplates].reduce(
+	[exposeTasks].reduce(
 		(cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
 		cliConfig,
 	);
