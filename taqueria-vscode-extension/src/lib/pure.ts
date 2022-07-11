@@ -5,6 +5,7 @@ import { exec } from 'child_process';
 import { parse } from 'comment-json';
 import { readFile, stat } from 'fs/promises';
 import { join } from 'path';
+import { Output, OutputFunction, OutputLevels } from './helpers';
 import { TaqVsxError } from './TaqVsxError';
 
 /***********************************************************************/
@@ -158,10 +159,10 @@ export const makeDir = (dirPath: string, _i18n: i18n): LikeAPromise<PathToDir, T
  * @param {I18N} _i18n
  * @returns {(inputPath:string) => LikeAPromise<PathToTaq, E_TAQ_NOT_FOUND>}
  */
-export const makePathToTaq = (i18n: i18n) =>
+export const makePathToTaq = (i18n: i18n, showOutput: OutputFunction) =>
 	(inputPath: string): LikeAPromise<PathToTaq, TaqVsxError> =>
 		stat(inputPath)
-			.then(_ => proxyToTaq(inputPath as PathToTaq, i18n)('testFromVsCode'))
+			.then(_ => proxyToTaq(inputPath as PathToTaq, i18n, showOutput)('testFromVsCode'))
 			.then(
 				output =>
 					output.includes('OK')
@@ -182,11 +183,18 @@ export const makePathToTaq = (i18n: i18n) =>
  * @param {string} cmd
  * @returns {LikeAPromise<string, E_EXEC>}
  */
-export const execCmd = (cmd: string): LikeAPromise<string, TaqVsxError> =>
+export const execCmd = (
+	cmd: string,
+	showOutput: OutputFunction,
+	projectDir?: PathToDir,
+): LikeAPromise<string, TaqVsxError> =>
 	new Promise((resolve, reject) => {
+		showOutput(OutputLevels.info, `Running command:\n${cmd}`);
 		if (isWindows()) reject({ code: 'E_WINDOWS', msg: 'Running in Windows without WSLv2 is currently not supported.' });
 		else {
-			exec(`sh -c "${cmd}"`, (previous, stdout, msg) => {
+			const shellCommand = `sh -c "${projectDir ? 'cd ' + projectDir + ' && ' : ''}${cmd}"`;
+			showOutput(OutputLevels.debug, shellCommand);
+			exec(shellCommand, (previous, stdout, msg) => {
 				log('Executing command:')(cmd);
 				if (previous) {
 					reject({
@@ -208,12 +216,12 @@ export const execCmd = (cmd: string): LikeAPromise<string, TaqVsxError> =>
  * @param {I18N} _i18n
  * @returns {(taskWithArgs: string) => LikeAPromise<string, ProxyErr>}
  */
-export const proxyToTaq = (pathToTaq: PathToTaq, i18n: i18n, projectDir?: PathToDir) =>
+export const proxyToTaq = (pathToTaq: PathToTaq, i18n: i18n, showOutput: OutputFunction, projectDir?: PathToDir) =>
 	(taskWithArgs: string): LikeAPromise<string, TaqVsxError> =>
 		(
 			projectDir
-				? execCmd(`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`)
-				: execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`)
+				? execCmd(`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`, showOutput, projectDir)
+				: execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`, showOutput)
 		)
 			.catch(previous => {
 				if ('code' in previous) {
@@ -273,11 +281,11 @@ export const decodeJson = <T>(data: string): LikeAPromise<Json<T>, TaqVsxError> 
 
 export const isWindows = () => process.platform.includes('win') && !process.platform.includes('darwin');
 
-export const findTaqBinary = (i18n: i18n): LikeAPromise<string, TaqVsxError> =>
-	execCmd('which taq')
+export const findTaqBinary = (i18n: i18n, showOutput: OutputFunction): LikeAPromise<string, TaqVsxError> =>
+	execCmd('which taq', showOutput)
 		.then(path => path.trim())
 		.catch(previous => Promise.reject({ code: 'E_TAQ_NOT_FOUND', msg: 'Could not find taq in your path.', previous }))
-		.then(makePathToTaq(i18n));
+		.then(makePathToTaq(i18n, showOutput));
 
 export const makeState = (_i18n: i18n) =>
 	(input: Record<string, unknown>) => {

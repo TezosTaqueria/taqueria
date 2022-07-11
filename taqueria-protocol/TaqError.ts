@@ -3,6 +3,7 @@ import { ZodError } from 'zod';
 
 export type ErrorType =
 	| 'E_INVALID_PATH_DOES_NOT_EXIST'
+	| 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR'
 	| 'E_INVALID_PATH_ALREADY_EXISTS'
 	| 'E_INVALID_CONFIG'
 	| 'E_INVALID_JSON'
@@ -19,8 +20,9 @@ export type ErrorType =
 	| 'E_PARSE_UNKNOWN'
 	| 'E_INVALID_ARCH'
 	| 'E_CONTRACT_REGISTERED'
+	| 'E_CONTRACT_NOT_REGISTERED'
 	| 'E_NO_PROVISIONS'
-	| 'E_CONTRACT_NOT_REGISTERED';
+	| 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE';
 
 export interface TaqError {
 	readonly kind: ErrorType;
