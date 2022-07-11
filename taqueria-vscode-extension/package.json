@@ -246,6 +246,8 @@
 		"compile": "npx tsc -noEmit && parcel build --no-cache --no-optimize --no-scope-hoist --detailed-report 2>&1",
 		"watch": "parcel watch --no-cache --detailed-report",
 		"pretest": "npm run compile",
+		"create": "mkdir -p ./out/vscode-taq-test-project",
+		"create-compile": "npm run create | npm run compile",
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js"
 	},
