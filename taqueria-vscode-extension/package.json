@@ -10,7 +10,7 @@
 	},
 	"engineStrict": true,
 	"extensionKind": [
-		"ui"
+		"workspace"
 	],
 	"targets": {
 		"default": {
