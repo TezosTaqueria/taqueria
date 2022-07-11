@@ -10,6 +10,14 @@
 			"problemMatcher": [],
 			"label": "npm: pretest",
 			"detail": "compile project before running tests"
+		},
+		{
+			"type": "npm",
+			"script": "create-compile",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: create-compile",
+			"detail": "Compile project and create folders before running tests"
 		}
 	]
 }
