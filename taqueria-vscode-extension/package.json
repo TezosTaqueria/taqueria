@@ -45,7 +45,7 @@
 	"icon": "images/taqueria-icon.png",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ecadlabs/taqueria.git"
+		"url": "https://github.com/ecadlabs/taqueria.git"
 	},
 	"bugs": {
 		"url": "https://github.com/ecadlabs/taqueria/issues"
@@ -79,6 +79,43 @@
 					"description": "Specifies taqueria binary path"
 				}
 			}
+		},
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "taqueria",
+					"title": "Taqueria",
+					"icon": "images/taq-black.svg"
+				}
+			]
+		},
+		"views": {
+			"taqueria": [
+				{
+					"id": "taqueria-sandboxes",
+					"name": "Sandboxes",
+					"icon": "images/taq-black.svg",
+					"contextualTitle": "Sandboxes"
+				},
+				{
+					"id": "taqueria-plugins",
+					"name": "Plugins",
+					"icon": "images/taq-black.svg",
+					"contextualTitle": "Plugins"
+				},
+				{
+					"id": "taqueria-networks",
+					"name": "Networks",
+					"icon": "images/taq-black.svg",
+					"contextualTitle": "Networks"
+				},
+				{
+					"id": "taqueria-environments",
+					"name": "Environments",
+					"icon": "images/taq-black.svg",
+					"contextualTitle": "Environments"
+				}
+			]
 		},
 		"commands": [
 			{

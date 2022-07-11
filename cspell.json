@@ -1,6 +1,8 @@
 {
 	"words": [
 		"abspath",
+		"autocrlf",
+		"dprint",
 		"EBADENGINE",
 		"ecad",
 		"ecadlabs",
@@ -9,6 +11,7 @@
 		"fluture",
 		"ligo",
 		"mutez",
+		"oidc",
 		"outfile",
 		"rambda",
 		"READFILE",
@@ -22,6 +25,8 @@
 		"taquito",
 		"Tezos",
 		"retval",
-		"typecheck"
+		"typecheck",
+		"vsix",
+		"xvfb"
 	]
 }

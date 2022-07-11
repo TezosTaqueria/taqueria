@@ -127,7 +127,7 @@ jobs:
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
 
-      # Seperate steps for prerelease and release workflows
+      # Separate steps for prerelease and release workflows
       - name: Publish as pre-release
         if: ${{ github.event.release.prerelease }}
         uses: HaaLeo/publish-vscode-extension@v1

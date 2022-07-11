@@ -1,7 +1,8 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import path from 'path';
 import * as api from 'vscode';
-import { inject, InjectedDependencies, OutputLevels, sanitizeDeps } from './lib/helpers';
+import { PluginsDataProvider } from './lib/gui/PluginDataProvider';
+import { InjectedDependencies, OutputLevels, sanitizeDeps, VsCodeHelper } from './lib/helpers';
 import { COMMAND_PREFIX } from './lib/helpers';
 import { makeDir } from './lib/pure';
 
@@ -39,18 +40,7 @@ const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = 
 export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
 	const deps = sanitizeDeps(input);
 	const { vscode } = deps;
-	const {
-		exposeInitTask,
-		exposeScaffoldTask,
-		exposeInstallTask,
-		exposeUninstallTask,
-		exposeOriginateTask,
-		exposeTaqTaskAsCommand,
-		exposeSandboxTaskAsCommand,
-		createWatcherIfNotExists,
-		showOutput,
-		logAllNestedErrors,
-	} = inject(deps);
+	const helper = new VsCodeHelper(deps);
 
 	const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
 	const logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
@@ -59,7 +49,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		outputChannel,
 		logLevel,
 	};
-	showOutput(output)(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
+	helper.showOutput(output)(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
 
 	const i18n: i18n = await loadI18n();
 
@@ -68,17 +58,17 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		: [];
 
 	// Add built-in tasks for Taqueria
-	await exposeInitTask(context, output, i18n, folders);
-	await exposeScaffoldTask(context, output, folders, i18n);
-	await exposeInstallTask(context, output, folders, i18n);
-	await exposeUninstallTask(context, output, folders, i18n);
-	exposeTaqTaskAsCommand(context, output, i18n)(
+	await helper.exposeInitTask(context, output, i18n, folders);
+	await helper.exposeScaffoldTask(context, output, folders, i18n);
+	await helper.exposeInstallTask(context, output, folders, i18n);
+	await helper.exposeUninstallTask(context, output, folders, i18n);
+	helper.exposeTaqTaskAsCommand(context, output, i18n)(
 		COMMAND_PREFIX + 'opt_in',
 		'opt-in',
 		'output',
 		'Successfully opted in to analytics.',
 	);
-	exposeTaqTaskAsCommand(context, output, i18n)(
+	helper.exposeTaqTaskAsCommand(context, output, i18n)(
 		COMMAND_PREFIX + 'opt_out',
 		'opt-out',
 		'output',
@@ -94,8 +84,8 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	if (folders.length === 1) {
 		await makeDir(folders[0].uri.path, i18n)
 			.then(projectDir => {
-				const exposeTaqTask = exposeTaqTaskAsCommand(context, output, i18n, projectDir);
-				const exposeSandboxTask = exposeSandboxTaskAsCommand(context, output, i18n, projectDir);
+				const exposeTaqTask = helper.exposeTaqTaskAsCommand(context, output, i18n, projectDir);
+				const exposeSandboxTask = helper.exposeSandboxTaskAsCommand(context, output, i18n, projectDir);
 
 				// Compilation tasks
 				exposeTaqTask(
@@ -135,14 +125,15 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 				exposeSandboxTask(COMMAND_PREFIX + 'stop_sandbox', 'stop sandbox', 'notify');
 				exposeSandboxTask(COMMAND_PREFIX + 'list_accounts', 'list accounts', 'output');
 
-				exposeOriginateTask(context, output, folders, i18n);
+				helper.exposeOriginateTask(context, output, folders, i18n);
 
 				try {
-					createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
+					helper.createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
 				} catch (error: unknown) {
-					logAllNestedErrors(error, output);
+					helper.logAllNestedErrors(error, output);
 				}
 			});
+		helper.registerDataProviders(folders[0].uri.fsPath, context, output, i18n);
 	}
 
 	// If the developer changes their workspace folders,
