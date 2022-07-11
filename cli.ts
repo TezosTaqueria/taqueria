@@ -469,8 +469,6 @@ const exposeProvisioningTasks = (
 			pipe(
 				SanitizedArgs.ofProvisionTaskArgs(argv),
 				chain(inputArgs => addNewProvision(inputArgs, state, i18n)),
-				map(result => JSON.stringify(result)),
-				// map(() => 'Added provision to .taq/provisions.json'),
 				forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
 			),
 	)

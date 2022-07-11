@@ -7,7 +7,7 @@ import * as Task from '@taqueria/protocol/Task';
 import { attemptP, chain, chainRej, FutureInstance as Future, map, mapRej, reject, resolve } from 'fluture';
 import { camelCase } from 'https://deno.land/x/case@2.1.1/mod.ts';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { defaultTo, has } from 'rambda';
+import { pick, has } from 'rambda';
 import { z } from 'zod';
 import {
 	EphemeralState,
@@ -28,6 +28,13 @@ const {
 	stdout: Deno.stdout,
 	stderr: Deno.stderr,
 });
+
+declare global {
+	var tasks: Record<string, Record<string, (taskArgs: Record<string, unknown>) => void>>;
+	function provision(name: string) {
+
+	}
+}
 
 const toInterfaceName = (value: string) =>
 	pipe(
@@ -415,8 +422,32 @@ const provision = (provisionName: string) => {
 	};
 };
 
-declare global {
-	const tasks: Record<string, Record<string, (taskArgs: Record<string, unknown>) => void>>;
+const createProvisionFns = () => {
+	const knownProvisions: string[] = []
+
+	// This provision function is exposed to the provisioners.ts file, and
+	// has a side-effect - it updates 
+	const provision = (provisionName: string) => {
+		if (!knownProvisions.includes(provisionName)){
+			knownProvisions.push(provisionName)
+
+			const task = (state: {}) => {
+			};
+
+			return {task}
+		}
+		return TaqError.create({
+			kind: 'E_PROVISION',
+			msg: `The name ${provisionName} is already used by another provision.`,
+			context: knownProvisions
+		})
+	}
+
+	const getKnownProvisions = () => knownProvisions
+
+	return [
+		provision, getKnownProvisions
+	]
 }
 
 export const getProvisionersAbspath = (projectDir: SanitizedAbsPath.t) =>
@@ -434,13 +465,16 @@ export const getProvisionersImportUrl = (projectDir: SanitizedAbsPath.t) =>
 		map(btoa),
 		map(b64 => `data:text/javascript;base64,${b64}`),
 	);
-type Provision = {} & { __kind: 'provision' };
+type TaskInput = {} & { __kind: 'TaskInput' };
 
-export const newProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t, _i18n: i18n.t) =>
+export const getTaskInput = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t, _i18n: i18n.t) =>
 	pipe(
 		getSchemaForTask(parsedArgs)(state),
-		chain(schema => attemptP(() => schema.parseAsync(parsedArgs))),
-		map(result => result as unknown as Provision),
+		chain(schema => attemptP(() => {
+			const input = pick(Object.keys(schema), parsedArgs) || {}
+			return schema.parseAsync(input)
+		})),
+		map(result => result as unknown as TaskInput),
 		mapRej(previous =>
 			TaqError.create({
 				kind: 'E_INVALID_ARGS',
@@ -451,7 +485,11 @@ export const newProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state:
 		),
 	);
 
-export const addNewProvision = (parsedargs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t) => {
+export const newProvision(input: TaskInput) => {
+
+}
+
+const setupProvisionContext = (state: EphemeralState.t) => {
 	// Define tasks global object
 	globalThis.tasks = state.plugins.reduce(
 		(retval, plugin) => {
@@ -475,8 +513,19 @@ export const addNewProvision = (parsedargs: SanitizedArgs.ProvisionTaskArgs, sta
 		{},
 	);
 
+	const {provision, getKnownProvisions} = createProvisionFns()
+
+	globalThis.provision = provision
+}
+
+export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t, i18n: i18n.t) => {
+	
+
+	
+
 	// 1) Create new provision
 	// 2) Create globalThis.provision() method
 	// 3) Dynamically import the provisioners.ts file
-	// 4)
+	// 4) Count the number of exports. Find the last.
+	// 5) Insert the new provision, using the last as input to the after function.
 };
