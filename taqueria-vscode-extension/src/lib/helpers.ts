@@ -5,7 +5,7 @@ import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import { join } from 'path';
 import * as api from 'vscode';
-import { PluginsDataProvider } from './gui/PluginDataProvider';
+import { PluginsDataProvider, PluginTreeItem } from './gui/PluginDataProvider';
 import * as Util from './pure';
 import { TaqVsxError } from './TaqVsxError';
 
@@ -338,28 +338,38 @@ export class VsCodeHelper {
 		folders: readonly api.WorkspaceFolder[],
 		i18n: i18n,
 	) {
-		const exposeTask = this.exposeTaskAsCommand(context, output, i18n);
-		const proxyInstall = (pluginName: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
-			Util.proxyToTaq(pathToTaq, i18n, this.showOutput(output), projectDir)(`install ${pluginName}`)
-				.then(this.notify)
-				.catch(this.showError);
-
-		await exposeTask(Commands.install, async (pathToTaq: Util.PathToTaq) => {
-			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install', context, output, folders, i18n);
-			if (projectDir === undefined) {
-				return;
-			}
-			const pluginName = await this.promptForPluginInstallation(
-				i18n,
-				api.debug.activeDebugSession,
-				context,
-				projectDir,
-			);
-			if (!pluginName) {
-				return;
-			}
-			await proxyInstall(pluginName, pathToTaq, i18n, projectDir);
-		});
+		context.subscriptions.push(
+			this.vscode.commands.registerCommand(Commands.install, async (pluginInfo?: PluginTreeItem | undefined) => {
+				const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install', context, output, folders, i18n);
+				if (projectDir === undefined) {
+					return;
+				}
+				let pluginName = pluginInfo?.label;
+				if (!pluginName) {
+					pluginName = await this.promptForPluginInstallation(
+						i18n,
+						api.debug.activeDebugSession,
+						context,
+						projectDir,
+					);
+				}
+				if (!pluginName) {
+					return;
+				}
+				try {
+					const pathToTaq = await this.getTaqBinPath(i18n, output);
+					const message = await Util.proxyToTaq(
+						pathToTaq,
+						i18n,
+						(level, log) => this.showOutput(output)(level, log),
+						projectDir,
+					)(`install ${pluginName}`);
+					this.notify(message);
+				} catch (e: any) {
+					this.showError(e);
+				}
+			}),
+		);
 	}
 
 	async exposeUninstallTask(
@@ -368,23 +378,30 @@ export class VsCodeHelper {
 		folders: readonly api.WorkspaceFolder[],
 		i18n: i18n,
 	) {
-		const exposeTask = this.exposeTaskAsCommand(context, output, i18n);
-		const proxyUninstall = (pluginName: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
-			Util.proxyToTaq(pathToTaq, i18n, this.showOutput(output), projectDir)(`uninstall ${pluginName}`)
-				.then(this.notify)
-				.catch(this.showError);
-
-		exposeTask(Commands.uninstall, async (pathToTaq: Util.PathToTaq) => {
-			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install', context, output, folders, i18n);
-			if (projectDir === undefined) {
-				return;
-			}
-			const pluginName = await this.promptForPluginUninstall(i18n, api.debug.activeDebugSession, projectDir);
-			if (!pluginName) {
-				return;
-			}
-			await proxyUninstall(pluginName, pathToTaq, i18n, projectDir);
-		});
+		context.subscriptions.push(
+			this.vscode.commands.registerCommand(Commands.uninstall, async (pluginInfo?: PluginTreeItem | undefined) => {
+				const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install', context, output, folders, i18n);
+				if (projectDir === undefined) {
+					return;
+				}
+				let pluginName = pluginInfo?.label;
+				if (!pluginName) {
+					pluginName = await this.promptForPluginUninstall(i18n, api.debug.activeDebugSession, projectDir);
+				}
+				if (!pluginName) {
+					return;
+				}
+				try {
+					const pathToTaq = await this.getTaqBinPath(i18n, output);
+					const message = await Util.proxyToTaq(pathToTaq, i18n, this.showOutput(output), projectDir)(
+						`uninstall ${pluginName}`,
+					);
+					this.notify(message);
+				} catch (e: any) {
+					this.showError(e);
+				}
+			}),
+		);
 	}
 
 	async exposeOriginateTask(

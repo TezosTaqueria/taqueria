@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { Output, OutputLevels, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
 
-export class PluginsDataProvider implements vscode.TreeDataProvider<PluginInfo> {
+export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeItem> {
 	constructor(
 		private workspaceRoot: string,
 		private helper: VsCodeHelper,
@@ -12,11 +12,11 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginInfo> 
 		private context: vscode.ExtensionContext,
 	) {}
 
-	getTreeItem(element: PluginInfo): vscode.TreeItem {
+	getTreeItem(element: PluginTreeItem): vscode.TreeItem {
 		return element;
 	}
 
-	async getChildren(element?: PluginInfo): Promise<PluginInfo[]> {
+	async getChildren(element?: PluginTreeItem): Promise<PluginTreeItem[]> {
 		let pathToDir: Util.PathToDir | null;
 		let config: Util.TaqifiedDir | null;
 		if (!this.workspaceRoot) {
@@ -44,9 +44,10 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginInfo> 
 			this.context,
 		);
 		const allPlugins = [...new Set(installedPlugins.concat(availablePlugins))];
+		allPlugins.sort();
 		return allPlugins.map(
 			name =>
-				new PluginInfo(
+				new PluginTreeItem(
 					name,
 					installedPlugins.indexOf(name) >= 0,
 					vscode.TreeItemCollapsibleState.None,
@@ -55,17 +56,17 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginInfo> 
 		);
 	}
 
-	private _onDidChangeTreeData: vscode.EventEmitter<PluginInfo | undefined | null | void> = new vscode.EventEmitter<
-		PluginInfo | undefined | null | void
+	private _onDidChangeTreeData: vscode.EventEmitter<PluginTreeItem | undefined | null | void> = new vscode.EventEmitter<
+		PluginTreeItem | undefined | null | void
 	>();
-	readonly onDidChangeTreeData: vscode.Event<PluginInfo | undefined | null | void> = this._onDidChangeTreeData.event;
+	readonly onDidChangeTreeData: vscode.Event<PluginTreeItem | undefined | null | void> =
+		this._onDidChangeTreeData.event;
 
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
 	}
 }
-
-class PluginInfo extends vscode.TreeItem {
+export class PluginTreeItem extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
 		private installed: boolean,
@@ -76,5 +77,6 @@ class PluginInfo extends vscode.TreeItem {
 		this.tooltip = version === undefined ? `${this.label}` : `${this.label}-${this.version}`;
 		this.description = this.version;
 		this.iconPath = new vscode.ThemeIcon(installed ? 'check' : 'cloud-download');
+		this.contextValue = installed ? 'installed' : 'notInstalled';
 	}
 }

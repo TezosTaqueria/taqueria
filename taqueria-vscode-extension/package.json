@@ -137,14 +137,16 @@
 				"category": "Taqueria",
 				"title": "Install Plugin",
 				"shortTitle": "install",
-				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/not-installed-plugin-count != 0"
+				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/not-installed-plugin-count != 0",
+				"icon": "$(cloud-download)"
 			},
 			{
 				"command": "taqueria.uninstall",
 				"category": "Taqueria",
 				"title": "Uninstall Plugin",
 				"shortTitle": "uninstall",
-				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/installed-plugin-count != 0"
+				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/installed-plugin-count != 0",
+				"icon": "$(close)"
 			},
 			{
 				"command": "taqueria.compile_smartpy",
@@ -228,7 +230,21 @@
 				"shortTitle": "test",
 				"enablement": "@taqueria/plugin-jest"
 			}
-		]
+		],
+		"menus": {
+			"view/item/context": [
+				{
+					"command": "taqueria.install",
+					"when": "view == taqueria-plugins && viewItem == notInstalled",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.uninstall",
+					"when": "view == taqueria-plugins && viewItem == installed",
+					"group": "inline"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
