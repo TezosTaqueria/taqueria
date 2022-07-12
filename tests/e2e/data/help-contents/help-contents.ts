@@ -16,16 +16,19 @@ Options:
   -e, --env         Specify an environment configuration
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsForProject: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
 
 Options:
       --version     Show version number                                [boolean]
@@ -36,18 +39,21 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoSmartpy: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile                 Provided by more than one plugin. The option --plu
-                              gin is required.
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq compile                     Provided by more than one plugin. The option -
+                                  -plugin is required.
 
 Options:
       --version     Show version number                                [boolean]
@@ -58,7 +64,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoSmartpySpecific = `taq compile
 
@@ -74,18 +80,21 @@ Options:
       --plugin      Specify which plugin should be used to execute this task
   [required] [choices: "@taqueria/plugin-ligo", "ligo", "@taqueria/plugin-smartp
                                                                   y", "smartpy"]
-`
+`;
 
 export const helpContentsLigoArchetype: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile                 Provided by more than one plugin. The option --plu
-                              gin is required.
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq compile                     Provided by more than one plugin. The option -
+                                  -plugin is required.
 
 Options:
       --version     Show version number                                [boolean]
@@ -96,7 +105,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoArchetypeSpecific = `taq compile
 
@@ -112,4 +121,4 @@ Options:
       --plugin      Specify which plugin should be used to execute this task
   [required] [choices: "@taqueria/plugin-ligo", "ligo", "@taqueria/plugin-archet
                                                               ype", "archetype"]
-`
+`;

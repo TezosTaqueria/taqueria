@@ -22,6 +22,7 @@ import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-type
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
 import * as Analytics from './analytics.ts';
+import { addContract, listContracts, removeContract } from './contracts.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -309,6 +310,61 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 				default: false,
 				boolean: true,
 			})
+			.command(
+				'add-contract <sourceFile>',
+				i18n.__('addContractDesc'),
+				(yargs: Arguments) => {
+					yargs.positional('sourceFile', {
+						describe: i18n.__('addSourceFileDesc'),
+						type: 'string',
+						required: true,
+					});
+
+					yargs.option('contractName', {
+						alias: ['name', 'n'],
+						type: 'string',
+					});
+				},
+				(inputArgs: Record<string, unknown>) =>
+					pipe(
+						SanitizedArgs.ofAddContractArgs(inputArgs),
+						chain(args => addContract(args, i18n)),
+						map(renderTable),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+					),
+			)
+			.command(
+				'rm-contract <contractName>',
+				i18n.__('removeContractDesc'),
+				(yargs: Arguments) => {
+					yargs.positional('contractName', {
+						describe: i18n.__('removeContractNameDesc'),
+						type: 'string',
+						required: true,
+					});
+				},
+				(inputArgs: Record<string, unknown>) =>
+					pipe(
+						SanitizedArgs.ofRemoveContractsArgs(inputArgs),
+						chain(args => removeContract(args, i18n)),
+						map(renderTable),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+					),
+			)
+			.alias('remove-contract', 'rm-contract')
+			.command(
+				'list-contracts',
+				i18n.__('listContractsDesc'),
+				() => {},
+				(inputArgs: Record<string, unknown>) =>
+					pipe(
+						SanitizedArgs.of(inputArgs),
+						chain(args => listContracts(args, i18n)),
+						map(renderTable),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+					),
+			)
+			.alias('show-contracts', 'list-contracts')
 			.demandCommand(),
 		extendCLI(env, parsedArgs, i18n),
 	);
@@ -468,21 +524,21 @@ const addOperations = (
 				map(() => 'Added provision to .taq/provisions.json'),
 				forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
 			),
-	)
-		.command(
-			'plan',
-			'Display the execution plan for applying all provisioned operations',
-			() => {},
-			(argv: Arguments) =>
-				pipe(
-					SanitizedArgs.of(argv),
-					map(inputArgs => joinPaths(inputArgs.projectDir, '.taq', 'provisions.json')),
-					chain(SanitizedAbsPath.make),
-					chain(loadProvisions),
-					map(plan),
-					forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
-				),
-		);
+	);
+// .command(
+// 	'plan',
+// 	'Display the execution plan for applying all provisioned operations',
+// 	() => {},
+// 	(argv: Arguments) =>
+// 		pipe(
+// 			SanitizedArgs.of(argv),
+// 			map(inputArgs => joinPaths(inputArgs.projectDir, '.taq', 'provisions.json')),
+// 			chain(SanitizedAbsPath.make),
+// 			chain(loadProvisions),
+// 			map(plan),
+// 			forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+// 		),
+// );
 
 const addTemplates = (
 	cliConfig: CLIConfig,
@@ -774,6 +830,11 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 		'plan',
 		'opt-in',
 		'opt-out',
+		'add-contract',
+		'rm-contract',
+		'remove-contract',
+		'list-contracts',
+		'show-contracts',
 	].reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,
@@ -891,6 +952,8 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_PARSE_UNKNOWN' }, err => [14, err.msg])
 				.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
 				.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
+				.with({ kind: 'E_CONTRACT_REGISTERED' }, err => [21, err.msg])
+				.with({ kind: 'E_CONTRACT_NOT_REGISTERED' }, err => [22, err.msg])
 				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
 				.with({ message: __.string }, err => [128, err.message])
