@@ -8,7 +8,7 @@ import * as SHA256 from '@taqueria/protocol/SHA256';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { attemptP, chain, map, reject, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { isEmpty, omit, toPairs } from 'rambda';
+import { has, isEmpty, omit, toPairs } from 'rambda';
 import { getConfig } from './taqueria-config.ts';
 import { joinPaths, readTextFile, writeJsonFile } from './taqueria-utils/taqueria-utils.ts';
 
@@ -18,7 +18,7 @@ type contractRow = {
 	'Source file': string;
 };
 
-const hasContracts = (config: LoadedConfig.t) => isEmpty(config.contracts);
+const hasContracts = (config: LoadedConfig.t) => config.contracts && !isEmpty(config.contracts);
 
 const isContractRegistered = (contractName: string, config: LoadedConfig.t | Config.t) =>
 	config.contracts && config.contracts[contractName] ? true : false;
@@ -90,7 +90,7 @@ export const listContracts = (parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 	pipe(
 		getConfig(parsedArgs.projectDir, i18n),
 		map(config =>
-			hasContracts(config)
+			!hasContracts(config)
 				? [{ contract: i18n.__('noContractsRegistered') }]
 				: toPairs(config.contracts).reduce(
 					(retval: contractRow[], [key, val]) => [
