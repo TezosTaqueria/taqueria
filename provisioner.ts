@@ -4,10 +4,10 @@ import * as PositionalArg from '@taqueria/protocol/PositionalArg';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Task from '@taqueria/protocol/Task';
-import { attemptP, chain, chainRej, FutureInstance as Future, map, mapRej, reject, resolve } from 'fluture';
+import { attemptP, both, chain, chainRej, FutureInstance as Future, map, mapRej, reject, resolve } from 'fluture';
 import { camelCase } from 'https://deno.land/x/case@2.1.1/mod.ts';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { pick, has } from 'rambda';
+import { has, isEmpty, pick, prop } from 'rambda';
 import { z } from 'zod';
 import {
 	EphemeralState,
@@ -30,10 +30,10 @@ const {
 });
 
 declare global {
+	// deno-fmt-ignore
 	var tasks: Record<string, Record<string, (taskArgs: Record<string, unknown>) => void>>;
-	function provision(name: string) {
-
-	}
+	// deno-fmt-ignore
+	var provision: (provisionName: string) => unknown;
 }
 
 const toInterfaceName = (value: string) =>
@@ -117,7 +117,11 @@ const toPluginInterface = (plugin: PluginInfo.t): [string, string, string, strin
 	const output = [
 		...tasks.map(([_, __, taskInterface]) => taskInterface),
 		`export interface ${interfaceName} {`,
-		...tasks.map(([taskName, taskInterfaceName, _]) => `${toInterfaceName(taskName)}: ${taskInterfaceName}`),
+		...tasks.map(([taskName, taskInterfaceName, taskInterfaceDef]) =>
+			taskInterfaceDef.split('\n').length > 6
+				? `${toInterfaceName(taskName)}: (taskArgs: ${taskInterfaceName}) => unknown`
+				: `${toInterfaceName(taskName)}: () => unknown`
+		),
 		'}',
 	];
 
@@ -165,7 +169,7 @@ export type ID = string
 
 export interface Provision {
 readonly id: ID
-after: ID[]
+after: (provisions: Provision[]) => Provision
 when: (fn: (state: State) => boolean) => Provision
 task: (fn: (state: State) => unknown) => Provision
 }
@@ -216,8 +220,7 @@ const getPluginsForTask = (taskName: string, state: EphemeralState.t) =>
 				plugin.alias,
 			],
 			[] as string[],
-		)
-		.join(', ');
+		);
 
 const isKnownPlugin = (pluginName: string, state: EphemeralState.t) =>
 	state.plugins.find(plugin => plugin.name === pluginName || plugin.alias === pluginName) !== undefined;
@@ -240,7 +243,7 @@ const getTask = (taskName: string, state: EphemeralState.t, plugin?: string): Fu
 		validateTask(taskName, state),
 		map(isCompositeTask(state)),
 		chain(isComposite => {
-			const pluginsProviding = getPluginsForTask(taskName, state);
+			const pluginsProviding = getPluginsForTask(taskName, state).join(', ');
 			if (isComposite) {
 				if (!plugin) {
 					reject(TaqError.create({
@@ -407,48 +410,45 @@ const getSchemaForTask = (parsedArgs: SanitizedArgs.ProvisionTaskArgs) =>
 					},
 				);
 
-				return z.object(schema);
+				const retval = z.object(schema);
+				return retval;
 			}),
 		);
 
-const provision = (provisionName: string) => {
-	const id = provisionName;
-	const task = (state: {}) => {
-	};
-
-	return {
-		id,
-		task,
-	};
-};
-
 const createProvisionFns = () => {
-	const knownProvisions: string[] = []
+	const knownProvisions: string[] = [];
 
 	// This provision function is exposed to the provisioners.ts file, and
-	// has a side-effect - it updates 
+	// has a side-effect - it updates
 	const provision = (provisionName: string) => {
-		if (!knownProvisions.includes(provisionName)){
-			knownProvisions.push(provisionName)
+		if (!knownProvisions.includes(provisionName)) {
+			knownProvisions.push(provisionName);
 
-			const task = (state: {}) => {
+			const retval = {
+				id: knownProvisions.length,
+				task: function(state: {}) {
+					return this;
+				},
+				after: function(provisions: unknown[]) {
+					return this;
+				},
 			};
-
-			return {task}
+			return retval;
 		}
 		return TaqError.create({
 			kind: 'E_PROVISION',
 			msg: `The name ${provisionName} is already used by another provision.`,
-			context: knownProvisions
-		})
-	}
+			context: knownProvisions,
+		});
+	};
 
-	const getKnownProvisions = () => knownProvisions
+	const getKnownProvisions = () => knownProvisions;
 
 	return [
-		provision, getKnownProvisions
-	]
-}
+		provision,
+		getKnownProvisions,
+	];
+};
 
 export const getProvisionersAbspath = (projectDir: SanitizedAbsPath.t) =>
 	joinPaths(
@@ -470,10 +470,13 @@ type TaskInput = {} & { __kind: 'TaskInput' };
 export const getTaskInput = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t, _i18n: i18n.t) =>
 	pipe(
 		getSchemaForTask(parsedArgs)(state),
-		chain(schema => attemptP(() => {
-			const input = pick(Object.keys(schema), parsedArgs) || {}
-			return schema.parseAsync(input)
-		})),
+		chain(schema =>
+			attemptP(async () => {
+				const input = pick(Object.keys(schema.shape), parsedArgs) || {};
+				const { name: _name, task: _task, ...taskArgs } = await schema.parseAsync(input);
+				return taskArgs;
+			})
+		),
 		map(result => result as unknown as TaskInput),
 		mapRej(previous =>
 			TaqError.create({
@@ -485,13 +488,29 @@ export const getTaskInput = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state:
 		),
 	);
 
-export const newProvision(input: TaskInput) => {
+export const newProvision = (
+	constName: string,
+	provisionName: string,
+	taskName: string,
+	taskArgs: TaskInput,
+	pluginName: string,
+	after = '',
+) => {
+	const taskCall = isEmpty(taskArgs)
+		? `${taskName}()`
+		: `${taskName}(${JSON.stringify(taskArgs, null, 12)})`;
 
-}
+	const afterCall = isEmpty(after) ? '' : `.after([${after}])`;
 
-const setupProvisionContext = (state: EphemeralState.t) => {
-	// Define tasks global object
-	globalThis.tasks = state.plugins.reduce(
+	return `
+export const ${constName} =
+    provision('${provisionName}')
+        .task(_state => tasks['${pluginName}'].${taskCall})
+        ${afterCall}`;
+};
+
+const computeTasks = (state: EphemeralState.t) =>
+	state.plugins.reduce(
 		(retval, plugin) => {
 			const pluginTasks = plugin.tasks?.reduce(
 				(tasks, task) => ({
@@ -513,19 +532,51 @@ const setupProvisionContext = (state: EphemeralState.t) => {
 		{},
 	);
 
-	const {provision, getKnownProvisions} = createProvisionFns()
+type Provisioners = Record<string, {
+	id: number;
+}>;
+const importProvisioners = (url: string) =>
+	attemptP<TaqError.t, Provisioners>(async () => {
+		return await import(url) as Provisioners;
+	});
 
-	globalThis.provision = provision
-}
+const getProvisionerDetails = (projectDir: SanitizedAbsPath.t, state: EphemeralState.t) => {
+	// Define tasks global object
+	globalThis.tasks = computeTasks(state);
 
-export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t, i18n: i18n.t) => {
-	
+	// Define provision fn
+	const [provision, _getKnownProvisions] = createProvisionFns();
+	globalThis.provision = provision;
 
-	
-
-	// 1) Create new provision
-	// 2) Create globalThis.provision() method
-	// 3) Dynamically import the provisioners.ts file
-	// 4) Count the number of exports. Find the last.
-	// 5) Insert the new provision, using the last as input to the after function.
+	return pipe(
+		getProvisionersImportUrl(projectDir),
+		chain(importProvisioners),
+		// Provisioners looks like this: {
+		// p10: 0,
+		// p20: 1,
+		// p30: 2
+		// }
+		map(provisioners => ({
+			last: Object.entries(provisioners).reduce(
+				(retval, [constant, p]) => (!retval || p.id > prop(retval, provisioners).id) ? constant : retval,
+				undefined as undefined | string,
+			),
+			count: Object.keys(provisioners).length,
+		})),
+	);
 };
+
+export const addNewProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t, i18n: i18n.t) =>
+	pipe(
+		both(getTaskInput(parsedArgs, state, i18n))(getProvisionerDetails(parsedArgs.projectDir, state)),
+		map(([taskArgs, details]) => {
+			const constName = `p${10 * (details.count + 1)}`;
+			const provisionName = parsedArgs.name ?? `${constName}-${parsedArgs.task}`;
+			const pluginName = parsedArgs.plugin ?? getPluginsForTask(parsedArgs.task, state)[0];
+			const provision = newProvision(constName, provisionName, parsedArgs.task, taskArgs, pluginName, details.last);
+			return provision;
+		}),
+		both(readTextFile(getProvisionerAbspath(parsedArgs.projectDir))),
+		map(([contents, provision]) => `${contents}${provision}`),
+		chain(writeTextFile(getProvisionerAbspath(parsedArgs.projectDir))),
+	);

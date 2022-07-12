@@ -135,7 +135,7 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> =>
 	if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
 		try {
 			const preprocessedArgs = preprocessArgs(unparsedArgs);
-			const argv = yargs(preprocessedArgs.slice(2)).argv;
+			const argv = yargs(preprocessedArgs.slice(2)).help(false).argv;
 			const postprocessedArgs = postprocessArgs(argv);
 			const requestArgs = RequestArgs.from(postprocessedArgs);
 			return Promise.resolve(requestArgs);

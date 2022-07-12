@@ -222,7 +222,6 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() => {},
 			() => log('OK'),
 		)
-		.command('provision <task>')
 		.help(false);
 
 const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
@@ -463,7 +462,9 @@ const exposeProvisioningTasks = (
 				type: 'string',
 			});
 
-			toYargsOptions(state, parsedArgs.task, parsedArgs.plugin)(yargs);
+			if (parsedArgs._.length >= 2) {
+				toYargsOptions(state, parsedArgs._[1].toString(), parsedArgs.plugin)(yargs);
+			}
 		},
 		(argv: Arguments) =>
 			pipe(
@@ -745,7 +746,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 					),
 				);
 			}),
-			map((cliConfig: CLIConfig) => cliConfig.help()),
+			map((cliConfig: CLIConfig) => cliConfig.help(true)),
 			chain(parseArgs),
 			chain(inputArgs => SanitizedArgs.of(inputArgs)),
 			chain(showInvalidTask(cliConfig)),
@@ -860,38 +861,36 @@ export const displayError = (cli: CLIConfig) =>
 			cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
 		}
 
-		if (!inputArgs.help) {
-			console.error(''); // empty line
-			const res = match(normalizeErr(err))
-				.with({ kind: 'E_FORK' }, err => [125, err.msg])
-				.with({ kind: 'E_INVALID_CONFIG' }, err => [1, err.msg])
-				.with({ kind: 'E_INVALID_JSON' }, err => [12, err])
-				.with({ kind: 'E_INVALID_PATH_ALREADY_EXISTS' }, err => [3, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST' }, err => [4, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_INVALID_TASK' }, err => [5, err.msg])
-				.with({ kind: 'E_INVALID_PLUGIN_RESPONSE' }, err => [6, err.msg])
-				.with({ kind: 'E_MKDIR_FAILED' }, err => [7, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_NPM_INIT' }, err => [8, err.msg])
-				.with({ kind: 'E_READFILE' }, err => [9, err.msg])
-				.with({ kind: 'E_GIT_CLONE_FAILED' }, err => [10, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_INVALID_ARGS' }, err => [11, err.msg])
-				.with({ kind: 'E_PROVISION' }, err => [12, err.msg])
-				.with({ kind: 'E_PARSE' }, err => [13, err.msg])
-				.with({ kind: 'E_PARSE_UNKNOWN' }, err => [14, err.msg])
-				.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
-				.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
-				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
-				.with({ message: __.string }, err => [128, err.message])
-				.exhaustive();
+		console.error(''); // empty line
+		const res = match(normalizeErr(err))
+			.with({ kind: 'E_FORK' }, err => [125, err.msg])
+			.with({ kind: 'E_INVALID_CONFIG' }, err => [1, err.msg])
+			.with({ kind: 'E_INVALID_JSON' }, err => [12, err])
+			.with({ kind: 'E_INVALID_PATH_ALREADY_EXISTS' }, err => [3, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST' }, err => [4, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_INVALID_TASK' }, err => [5, err.msg])
+			.with({ kind: 'E_INVALID_PLUGIN_RESPONSE' }, err => [6, err.msg])
+			.with({ kind: 'E_MKDIR_FAILED' }, err => [7, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_NPM_INIT' }, err => [8, err.msg])
+			.with({ kind: 'E_READFILE' }, err => [9, err.msg])
+			.with({ kind: 'E_GIT_CLONE_FAILED' }, err => [10, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_INVALID_ARGS' }, err => [11, err.msg])
+			.with({ kind: 'E_PROVISION' }, err => [12, err.msg])
+			.with({ kind: 'E_PARSE' }, err => [13, err.msg])
+			.with({ kind: 'E_PARSE_UNKNOWN' }, err => [14, err.msg])
+			.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
+			.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
+			.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
+			.with({ message: __.string }, err => [128, err.message])
+			.exhaustive();
 
-			const [exitCode, msg] = res;
-			if (inputArgs.debug) {
-				logAllErrors(err);
-			} else console.error(msg);
+		const [exitCode, msg] = res;
+		if (inputArgs.debug) {
+			logAllErrors(err);
+		} else console.error(msg);
 
-			Deno.exit(exitCode as number);
-		}
+		Deno.exit(exitCode as number);
 	};
 
 const logAllErrors = (err: Error | TaqError.E_TaqError | TaqError.t | unknown) => {
