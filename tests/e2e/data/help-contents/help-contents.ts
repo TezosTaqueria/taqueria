@@ -21,12 +21,15 @@ Taqueria is currently in BETA. You've been warned. :)
 export const helpContentsForProject: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq create <template>       Create files from pre-existing templates
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -42,14 +45,17 @@ Taqueria is currently in BETA. You've been warned. :)
 export const helpContentsLigoSmartpy: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile                 Provided by more than one plugin. The option --plu
-                              gin is required.
-  taq create <template>       Create files from pre-existing templates
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq compile                     Provided by more than one plugin. The option -
+                                  -plugin is required.
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -81,14 +87,17 @@ Options:
 export const helpContentsLigoArchetype: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile                 Provided by more than one plugin. The option --plu
-                              gin is required.
-  taq create <template>       Create files from pre-existing templates
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq compile                     Provided by more than one plugin. The option -
+                                  -plugin is required.
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]

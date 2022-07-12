@@ -1,6 +1,7 @@
-const { Plugin, Task, Option, PositionalArg, Operation, Template, sendAsyncRes, sendAsyncJsonRes } = require(
-	'@taqueria/node-sdk',
-);
+const { Plugin, Task, Option, PositionalArg, Operation, Template, sendAsyncRes, sendAsyncJsonRes, experimental } =
+	require(
+		'@taqueria/node-sdk',
+	);
 const { join } = require('path');
 const { writeFile } = require('fs/promises');
 
@@ -89,6 +90,13 @@ Plugin.create(i18n => ({
 			],
 			encoding: 'application/json',
 			handler: `echo '<% if (it.return == 'object') { %>${tableResponse}<% } else %><%= "pong" %>'`,
+		}),
+		Task.create({
+			task: 'testRegisterContract',
+			command: 'testRegisterContract <sourceFile>',
+			description: 'Tests handling a task that registers a contract',
+			encoding: 'application/json',
+			handler: 'proxy',
 		}),
 	],
 	operations: [
@@ -179,6 +187,8 @@ echo 'Hi there, <%= greeting %>!' ><%= outputFile %>
 								: 'pong',
 						);
 					break;
+				case 'testRegisterContract':
+					return experimental.registerContract(parsedArgs, parsedArgs.sourceFile);
 				default:
 					return sendAsyncErr('Non-expected task');
 			}

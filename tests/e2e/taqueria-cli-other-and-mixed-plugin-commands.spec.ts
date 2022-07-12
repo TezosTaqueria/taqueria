@@ -1,6 +1,5 @@
 import { exec as exec1, execSync } from 'child_process';
 import type { ExecException } from 'child_process';
-import fs from 'fs';
 import fsPromises from 'fs/promises';
 import util from 'util';
 import * as contents from './data/help-contents/help-contents';
@@ -148,7 +147,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 	// Comment if need to debug
 	afterAll(() => {
 		try {
-			fs.rmSync(taqueriaProjectPath, { recursive: true });
+			fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}

@@ -1,4 +1,5 @@
 import createType, { Flatten } from '@taqueria/protocol/Base';
+import * as Contract from '@taqueria/protocol/Contract';
 import * as Environment from '@taqueria/protocol/Environment';
 import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
@@ -89,6 +90,9 @@ const commonSchema = z.object({
 			z.string({ description: 'config.artifactsDir' })
 				.min(1, 'config.artifactsDir must have a value'),
 		),
+	contracts: z.record(
+		Contract.rawSchema,
+	).optional(),
 }).describe('config');
 
 export const internalSchema = commonSchema.extend({
@@ -96,6 +100,7 @@ export const internalSchema = commonSchema.extend({
 	sandbox: sandboxMap,
 	environment: environmentMap,
 	accounts: accountsMap,
+	contracts: z.record(Contract.schemas.schema).optional(),
 });
 
 export const rawSchema = commonSchema.extend({

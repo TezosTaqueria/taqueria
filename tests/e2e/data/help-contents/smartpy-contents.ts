@@ -34,6 +34,20 @@ Options:
       --help        Show help                                          [boolean]
 `;
 
+export const helpContentsSmartpyTeapotSpecific = `taq teapot
+
+Have a cup of tea
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+  -e, --env         Specify an environment configuration
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]  
+      --help        Show help                                          [boolean]
+  -g, --green       Make green tea instead                             [boolean]
+`;
+
 export const smartPyCompiledOutput = `
 ┌────────────────┬─────────────────┐
 │ Contract       │ Artifacts       │

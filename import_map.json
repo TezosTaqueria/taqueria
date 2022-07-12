@@ -59,6 +59,7 @@
 		"@taqueria/protocol/PluginProxyResponse": "./taqueria-protocol/PluginProxyResponse.ts",
 		"@taqueria/protocol/PluginJsonResponse": "./taqueria-protocol/PluginJsonResponse.ts",
 		"@taqueria/protocol/PluginDependenciesResponse": "./taqueria-protocol/PluginDependenciesResponse.ts",
-		"@taqueria/protocol/PluginResponseEncoding": "./taqueria-protocol/PluginResponseEncoding.ts"
+		"@taqueria/protocol/PluginResponseEncoding": "./taqueria-protocol/PluginResponseEncoding.ts",
+		"@taqueria/protocol/Contract": "./taqueria-protocol/Contract.ts"
 	}
 }

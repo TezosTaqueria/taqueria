@@ -1,14 +1,17 @@
 export const helpContentsTaquitoPlugin: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq deploy [contract]       Deploy a smart contract to a particular environmen
-                              t                             [aliases: originate]
-  taq create <template>       Create files from pre-existing templates
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq deploy [contract]           Deploy a smart contract to a particular enviro
+                                  nment                     [aliases: originate]
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]

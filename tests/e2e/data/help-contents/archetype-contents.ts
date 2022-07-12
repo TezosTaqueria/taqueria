@@ -1,15 +1,18 @@
 export const helpContentsArchetypePlugin: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile [sourceFile]    Compile a smart contract written in a Archetype sy
-                              ntax to Michelson code
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq compile [sourceFile]        Compile a smart contract written in a Archetyp
+                                  e syntax to Michelson code
                                                  [aliases: c, compile-archetype]
-  taq create <template>       Create files from pre-existing templates
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
