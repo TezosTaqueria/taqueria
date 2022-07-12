@@ -1,5 +1,6 @@
-import { Option, Plugin, Task } from '@taqueria/node-sdk';
+import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
 import compile from './compile';
+import createContract from './createContract';
 
 Plugin.create(i18n => ({
 	schema: '1.0',
@@ -30,6 +31,21 @@ Plugin.create(i18n => ({
 			],
 			handler: 'proxy',
 			encoding: 'json',
+		}),
+	],
+	templates: [
+		Template.create({
+			template: 'contract',
+			command: 'contract <sourceFileName>',
+			description: 'Create a LIGO contract with boilerplate code',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'sourceFileName',
+					type: 'string',
+					description: 'The name of the LIGO contract to generate',
+				}),
+			],
+			handler: createContract,
 		}),
 	],
 	proxy: compile,
