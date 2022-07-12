@@ -1,5 +1,6 @@
 import FormData from 'form-data';
 import fs from 'fs';
+import Hash from 'ipfs-only-hash';
 import fetch from 'node-fetch';
 
 export type PinataAuth = {
@@ -20,19 +21,13 @@ export const publishFileToIpfs = async ({
 		filePath: string;
 	};
 }): Promise<PublishFileResult> => {
-	const ipfsJsonFilePath = `${item.filePath}.ipfs.json`;
-
-	// // Skip if already uploaded
-	// try {
-	//     const ipfsJsonFileContent = await fs.promises.readFile(ipfsJsonFilePath, { encoding: 'utf-8' });
-	//     const ipfsResult = JSON.parse(ipfsJsonFileContent) as PublishFileResult;
-	//     if (ipfsResult.ipfsHash) {
-	//         console.log(`Skipping ${item.filePath}`);
-	//         return;
-	//     }
-	// } catch (err) {
-	//     // Ignore
-	// }
+	// Skip if already pinned
+	const { isPinned, ipfsHash } = await checkIfFileIsPinned({ auth, item });
+	if (isPinned) {
+		return {
+			ipfsHash,
+		};
+	}
 
 	const data = new FormData();
 	data.append('file', fs.createReadStream(item.filePath));
@@ -64,5 +59,61 @@ export const publishFileToIpfs = async ({
 
 	return {
 		ipfsHash: uploadResult.IpfsHash,
+	};
+};
+
+const checkIfFileIsPinned = async ({
+	auth,
+	item,
+}: {
+	auth: PinataAuth;
+	item: {
+		name: string;
+		filePath: string;
+	};
+}) => {
+	const ipfsHash = await Hash.of(fs.createReadStream(item.filePath));
+
+	const response = await fetch(`https://api.pinata.cloud/data/pinList?status=pinned&hashContains=${ipfsHash}`, {
+		headers: {
+			Authorization: `Bearer ${auth.pinataJwtToken}`,
+		},
+		method: 'get',
+	});
+
+	if (!response.ok) {
+		throw new Error(`Failed to query '${item.name}' status from pinata ${response.statusText}`);
+	}
+
+	const pinResult = await response.json() as {
+		count: number;
+		rows: {
+			id: string;
+			ipfs_pin_hash: string;
+			size: number;
+			user_id: string;
+			date_pinned: null | string;
+			date_unpinned: null | string;
+			metadata: {
+				name: string;
+				keyvalues: null | string;
+			};
+			regions: {
+				regionId: string;
+				currentReplicationCount: number;
+				desiredReplicationCount: number;
+			}[];
+		}[];
+	};
+
+	const isPinned = pinResult.rows.some(x =>
+		x.ipfs_pin_hash === ipfsHash
+		&& x.date_pinned
+		&& !x.date_unpinned
+	);
+
+	return {
+		isPinned,
+		ipfsHash,
 	};
 };
