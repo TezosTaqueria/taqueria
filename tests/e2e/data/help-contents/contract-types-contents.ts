@@ -8,6 +8,10 @@ Commands:
                                       cs
   taq install <pluginName>            Install a plugin
   taq uninstall <pluginName>          Uninstall a plugin
+  taq add-contract <sourceFile>       Add a contract to the contract registry
+  taq rm-contract <contractName>      Remove a contract from the contract regist
+                                      ry
+  taq list-contracts                  List registered contracts
   taq generate types [typescriptDir]  Generate types for a contract to be used w
                                       ith taquito       [aliases: gen, gentypes]
 

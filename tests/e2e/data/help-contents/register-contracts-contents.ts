@@ -15,7 +15,7 @@ Options:
                                                       [boolean] [default: false]
       --help                  Show help                                [boolean]
   -n, --contractName, --name                                            [string]
-`
+`;
 
 export const registerRemoveContract: string = `taq rm-contract <contractName>
 
@@ -31,7 +31,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 
 export const registerListContracts: string = `taq list-contracts
 
@@ -44,4 +44,4 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;

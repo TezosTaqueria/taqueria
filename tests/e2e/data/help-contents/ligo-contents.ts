@@ -1,13 +1,17 @@
 export const helpContentsLigoPlugin: string = `taq <command>
 
 Commands:
-  taq init [projectDir]       Initialize a new project
-  taq opt-in                  Opt-in to sharing anonymous usage analytics
-  taq opt-out                 Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>    Install a plugin
-  taq uninstall <pluginName>  Uninstall a plugin
-  taq compile [sourceFile]    Compile a smart contract written in a Ligo syntax
-                              to Michelson code       [aliases: c, compile-ligo]
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+  taq compile [sourceFile]        Compile a smart contract written in a Ligo syn
+                                  tax to Michelson code
+                                                      [aliases: c, compile-ligo]
 
 Options:
       --version     Show version number                                [boolean]

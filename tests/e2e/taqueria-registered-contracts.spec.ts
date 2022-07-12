@@ -3,7 +3,7 @@ import { createHash } from 'crypto';
 import { copyFile, readFile, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 import util from 'util';
-import * as contents from './data/register-contracts-contents';
+import * as contents from './data/help-contents/register-contracts-contents';
 import { generateTestProject, sleep } from './utils/utils';
 const exec = util.promisify(exec1);
 

@@ -6,6 +6,9 @@ Commands:
   taq opt-out                      Opt-out of sharing anonymous usage analytics
   taq install <pluginName>         Install a plugin
   taq uninstall <pluginName>       Uninstall a plugin
+  taq add-contract <sourceFile>    Add a contract to the contract registry
+  taq rm-contract <contractName>   Remove a contract from the contract registry
+  taq list-contracts               List registered contracts
   taq start sandbox [sandboxName]  Starts a flextesa sandbox    [aliases: start]
   taq stop sandbox [sandboxName]   Stops a flextesa sandbox      [aliases: stop]
   taq list accounts <sandboxName>  List the balances of all sandbox accounts
