@@ -1,5 +1,5 @@
 ---
-title: Testnets
+title: Testnet Configuration
 ---
 
 :::note
@@ -11,11 +11,10 @@ This document details the configuration and use of Tezos testnets. If you are lo
 Taqueria provides support to interact with Tezos networks in a simplified and streamlined manner. Taqueria provides a centralized configuration for testnets (including faucet keys) which can then be targeted by Taqueria commands through the use of Taqueria environments
 
 To work with Taqueria networks, these are the basic steps you need to take:
-1. Configure and name a network in the Taqueria `config.json` file
+1. Add a network configuration to the Taqueria `.taq/config.json` file
 2. Add a faucet key
 3. Add the created network to an environment
-4. Target the network in Taqueria by passing the environment name to the CLI command (ie. `taq originate --env ithacanet`)
-
+4. Target the network in Taqueria by passing the environment name to the CLI command (ie. `taq originate --env testing`)
 
 ## Requirements
 
@@ -24,6 +23,7 @@ Currently Taqueria only supports testnets. Support for mainnet will be added in 
 :::
 
 To configure and use a Taqueria network, you will require the following:
+
 1. Configuration details for the network you wish to target (Can be found at [teztnets.xyz](https://teztnets.xyz/))
 2. A faucet key for the network you wish to target (Also found at [teztnets.xyz](https://teztnets.xyz/))
 3. The [Taquito plugin](../plugins/plugin-taquito.mdx/) (Used for originating to a network)
@@ -32,14 +32,13 @@ To configure and use a Taqueria network, you will require the following:
 
 Taqueria will support all protocols available on the [teztnets.xyz](https://teztnets.xyz/) site. If you notice an issue with a recent protocol update, please report it as a bug [here](https://github.com/ecadlabs/taqueria/issues/new?assignees=&labels=bug%2Ctriage&template=bug_report.yml&title=%5BBug%5D%3A+) 
 
-
 ## Configuration
 
 :::note
 The network configuration for various protocols, as well as the faucet for each can be found at [teztnets.xyz](https://teztnets.xyz/).
 :::
 
-To configure a network for use, you will need to configure the network, and then add that network to an environment. To illustrate the configuration of a network, we will use the [ithaca testnet](https://teztnets.xyz/ithaca-testnet/) as an example in this document and will configure a network named `ithaca`, and an environment named `ithacanet`
+To configure a network for use, you will need to configure the network, and then add that network to an environment. To illustrate the configuration of a network, we will use [ghostnet](https://teztnets.xyz/ithaca-testnet/), a long running Tezos test network as an example in this document and will configure a network named `ithaca`, and an environment named `testing`
 
 Taqueria does not have a default network configured, so a freshly initialized project will have a `config.json` file that looks like this:
 ```json
@@ -62,7 +61,7 @@ Taqueria does not have a default network configured, so a freshly initialized pr
     "sandbox": {
         "local": {
             "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "rpcUrl": "http://localhost:20000"
         }
     },
@@ -81,27 +80,27 @@ Taqueria does not have a default network configured, so a freshly initialized pr
 
 The first step is to add a named network configuration to your `config.json` file
 
-Add the following entry ("ithacanet": {...}) to the `network` property::
+Add the following entry ("testing": {...}) to the `network` property::
 ```json
 {
    "network":{
-      "ithacanet":{
-         "label":"Ithaca Protocol Testnet",
-         "rpcUrl":"https://rpc.ithacanet.teztnets.xyz",
-         "protocol":"Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+      "ghostnet":{
+         "label":"Ghostnet Testnet",
+         "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
+         "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
          "faucet":{  }
       }
    }
 ```
 :::note
-The information for `rpcUrl` and`protocol` are taken from the [https://teztnets.xyz/ithacanet-about](https://teztnets.xyz/ithacanet-about) page
+The information for `rpcUrl` and`protocol` are taken from the [https://teztnets.xyz/ghostnet-about](https://teztnets.xyz/ghostnet-about) page
 :::
 
 ### Faucets 
 
 In order to interact with the network, you will need some Tez in an account. The way this is done on Tezos is to provide a faucet key. The faucet key provides Tez on a particular testnet, which can then be used to interact with the network
 
-To get your own unique faucet key for testing, visit [https://teztnets.xyz/ithacanet-faucet](https://teztnets.xyz/ithacanet-faucet), and complete the captcha validation. Once this is done, you will see the faucet key shown as a JSON object
+To get your own unique faucet key for testing, visit [https://teztnets.xyz/ghostnet-faucet](https://teztnets.xyz/ghostnet-faucet), and complete the captcha validation. Once this is done, you will see the faucet key shown as a JSON object
 
 To add the faucet key to your Taqueria project, simply copy and paste the JSON object into the `faucet` field of the network configuration shown above
 
@@ -109,10 +108,10 @@ Your `network` property should now look something like this:
 ```json
 {
    "network":{
-      "ithaca":{
-         "label":"Ithaca Protocol Testnet",
-         "rpcUrl":"https://rpc.ithacanet.teztnets.xyz",
-         "protocol":"Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+      "Ghostnet":{
+         "label":"Ghostnet Protocol Testnet",
+         "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
+         "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
          "faucet":{
             "key": {
 	            "pkh": "tz1cEqJmGnzcGDa9cyj437RmLL5GYPiawiUc",
@@ -146,7 +145,7 @@ Your `network` property should now look something like this:
 
 ### Environment Configuration
 
-The final step in configuration is to add the network to an environment. In this example, we will create a new environment named `ithacanet` which will contain the `ithaca` network
+The final step in configuration is to add the network to an environment. In this example, we will create a new environment named `testing` which will contain the `ghost` network
 
 To do this, find the `environment` property in your `config.json` file. By default it will look something like this:
 ```json
@@ -162,7 +161,7 @@ To do this, find the `environment` property in your `config.json` file. By defau
     },
 ```
 
-Add a new environment named `ithacanet`, and add the named network `ithaca` to its `networks` array:
+Add a new environment named `testing`, and add the named network `ghost` to its `networks` array:
 ```json
     "environment": {
         "default": "development",
@@ -173,7 +172,7 @@ Add a new environment named `ithacanet`, and add the named network `ithaca` to i
             ],
             "storage": {}
         },
-        "ithacanet": {
+        "testing": {
             "networks": [
                 "ithaca"
             ],
@@ -191,7 +190,7 @@ For additional information regarding Taqueria Environments, please see the docum
 
 ### Finished Configuration
 
-At this point, you should have a fully configured network named `ithaca` which is configured to target [Ithacanet](https://teztnets.xyz/ithacanet-about) using a faucet, and an environment named `ithacanet` which can be used to target the network from the CLI
+At this point, you should have a fully configured network named `ghostnet` which is configured to target [ghostnet](https://teztnets.xyz/ghostnet-about) using a faucet, and an environment named `ghostnet` which can be used to target the network from the CLI
 
 Your `config.json` file should look something like this: 
 ```json
@@ -210,7 +209,7 @@ Your `config.json` file should look something like this:
             ],
             "storage": {}
         },
-        "ithacanet": {
+        "ghostnet": {
             "networks": [
                 "ithaca"
             ],
@@ -221,15 +220,15 @@ Your `config.json` file should look something like this:
     "sandbox": {
         "local": {
             "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "rpcUrl": "http://localhost:20000"
         }
     },
     "network": {
         "ithaca":{
-            "label":"Ithaca Protocol Testnet",
-            "rpcUrl":"https://rpc.ithacanet.teztnets.xyz",
-            "protocol":"Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "label":"Ghostnet Testnet",
+            "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
+            "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "faucet":{
                "key": {
                    "pkh": "tz1cEqJmGnzcGDa9cyj437RmLL5GYPiawiUc",
@@ -271,11 +270,11 @@ Your `config.json` file should look something like this:
 
 ## Targeting a Network
 
-Taqueria uses Environments to target a specific network or sandbox. An environment is a named collection of network configurations which can be passed to the CLI using the `--env` flag
+Taqueria uses [Environments](/docs/configuration/environments) to target a specific network or sandbox. An environment is a named collection of network configurations which can be passed to the CLI using the `--env` flag
 
-To target the `ithaca` network we configured above using the `ithacanet` environment, simply run the following command:
+To target the `ghost` network we configured above using the `ghostnet` environment, simply run the following command:
 ```shell
-taq originate --env ithacanet
+taq originate --env testing
 ```
 
 
