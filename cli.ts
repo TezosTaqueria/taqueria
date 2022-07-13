@@ -17,7 +17,7 @@ import {
 import { titleCase } from 'https://deno.land/x/case@2.1.1/mod.ts';
 import { Table } from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts';
 import { identity, pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
+import { has, last, uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
@@ -28,18 +28,16 @@ import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
 import { addNewProvision, apply, loadProvisions, plan } from './provisions.ts';
 import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
-import type {
-	InstalledPlugin,
-	Option,
-	PluginAction,
-	PluginJsonResponse,
-	PluginResponse,
-	PositionalArg,
-} from './taqueria-protocol/taqueria-protocol-types.ts';
 import {
 	EphemeralState,
 	i18n,
-	ParsedPluginInfo,
+	InstalledPlugin,
+	Option,
+	ParsedTemplate,
+	PluginInfo,
+	PluginJsonResponse,
+	PluginResponseEncoding,
+	PositionalArg,
 	SanitizedAbsPath,
 	SanitizedArgs,
 	Task,
@@ -81,11 +79,6 @@ const {
 
 // Add alias
 const exec = execText;
-
-type SendPluginActionRequest = (
-	plugin: InstalledPlugin.t,
-) => (action: PluginAction) => (requestArgs: Record<string, unknown>) => Future<TaqError.t, PluginResponse>;
-
 type PluginLib = ReturnType<typeof inject>;
 
 /**
@@ -486,9 +479,18 @@ const scaffoldProject = (i18n: i18n.t) =>
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) =>
 	state.plugins.reduce(
-		(retval: Task.t | undefined, pluginInfo: ParsedPluginInfo.t) =>
+		(retval: Task.t | undefined, pluginInfo: PluginInfo.t) =>
 			pluginInfo.name === pluginName || pluginInfo.alias === pluginName
 				? pluginInfo.tasks?.find((task: Task.t) => task.task === taskName)
+				: retval,
+		undefined,
+	);
+
+const getCanonicalTemplate = (pluginName: string, templateName: string, state: EphemeralState.t) =>
+	state.plugins.reduce(
+		(retval: ParsedTemplate.t | undefined, pluginInfo: PluginInfo.t) =>
+			pluginInfo.name === pluginName || pluginInfo.alias === pluginName
+				? pluginInfo.templates?.find((template: ParsedTemplate.t) => template.template == templateName)
 				: retval,
 		undefined,
 	);
@@ -540,28 +542,153 @@ const addOperations = (
 // 		),
 // );
 
-const addTemplates = (
+const getTemplateName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t) => {
+	if (parsedArgs._.length >= 2 && parsedArgs._[0] === 'create') {
+		const templateName = last(parsedArgs._.slice(0, 2));
+		return templateName && state.templates[templateName]
+			? templateName
+			: undefined;
+	}
+	return undefined;
+};
+
+const addRequiredTemplatePositional = (yargs: CLIConfig, state: EphemeralState.t, i18n: i18n.t) =>
+	yargs.positional('template', {
+		describe: i18n.__('templateDesc'),
+		type: 'string',
+		choices: Object.keys(state.templates),
+		required: true,
+	});
+
+const getTemplateCommandArgs = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t, i18n: i18n.t) => {
+	const templateName = getTemplateName(parsedArgs, state);
+	if (templateName) {
+		const implementation = state.templates[templateName];
+
+		// Get the template
+		const template: ParsedTemplate.t = has('template', implementation)
+			? implementation as ParsedTemplate.t
+			: getCanonicalTemplate(
+				(implementation as InstalledPlugin.t).name,
+				templateName,
+				state,
+			) as ParsedTemplate.t;
+
+		const command = 'create ' + template.command.replace(
+			new RegExp(`^${template.template}`),
+			'<template>',
+		);
+
+		const builder = (yargs: CLIConfig) => {
+			addRequiredTemplatePositional(yargs, state, i18n);
+			template.options?.map(option =>
+				yargs.option(option.flag, {
+					alias: option.shortFlag,
+					describe: option.description,
+					type: option.type,
+					required: option.required,
+					default: option.defaultValue,
+					choices: option.choices,
+				})
+			);
+			template.positionals?.map(p =>
+				yargs.positional(p.placeholder, {
+					default: p.defaultValue,
+					describe: p.description,
+					type: p.type,
+					required: p.required,
+				})
+			);
+			return yargs;
+		};
+		return { command, builder };
+	}
+	return {
+		command: 'create <template>',
+		builder: (yargs: CLIConfig) => addRequiredTemplatePositional(yargs, state, i18n),
+	};
+};
+
+const exposeTemplates = (
 	cliConfig: CLIConfig,
-	_config: LoadedConfig.t,
+	config: LoadedConfig.t,
 	_env: EnvVars,
-	_parsedArgs: SanitizedArgs.t,
-	_i18n: i18n.t,
-	_state: EphemeralState.t,
-	_pluginLib: PluginLib,
-) =>
-	cliConfig.command(
-		'create <template>',
-		'Create an entity from a pre-existing template',
-		() => {
-			console.log('Configuring create template!');
-		},
-		() => {
-			console.log('Create template!');
-			Deno.exit(10);
-		},
-	)
-		.alias('create-tmpl', 'create')
-		.alias('create-template', 'create');
+	parsedArgs: SanitizedArgs.t,
+	i18n: i18n.t,
+	state: EphemeralState.t,
+	pluginLib: PluginLib,
+) => {
+	if (state.templates) {
+		const { command, builder } = getTemplateCommandArgs(parsedArgs, state, i18n);
+
+		cliConfig.command(
+			command,
+			i18n.__('createDesc'),
+			builder,
+			(args: Arguments) =>
+				pipe(
+					SanitizedArgs.ofCreateTaskArgs(args),
+					chain((parsedArgs: SanitizedArgs.CreateTaskArgs) => {
+						// We need to determine first if the template is provided by more than one plugin, and if so,
+						// that the plugin option was provided to know which one should be targeted.
+						// We can then see if handling this template should be proxied to the plugin or have a shell command executed
+						const isComposite = has('template', state.templates[parsedArgs.template]);
+
+						if (isComposite) {
+							if (parsedArgs.plugin) {
+								const installedPlugin = config.plugins.find(plugin => plugin.name === parsedArgs.plugin);
+								if (installedPlugin) {
+									return handleTemplate(parsedArgs, config, installedPlugin, state, pluginLib, i18n);
+								}
+							}
+							return resolve(log(i18n.__('providedByMany')));
+						}
+
+						const installedPlugin = state.templates[parsedArgs.template] as InstalledPlugin.t;
+						return handleTemplate(parsedArgs, config, installedPlugin, state, pluginLib, i18n);
+					}),
+					forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+				),
+		);
+	}
+	return cliConfig;
+};
+
+const handleTemplate = (
+	parsedArgs: SanitizedArgs.CreateTaskArgs,
+	config: LoadedConfig.t,
+	plugin: InstalledPlugin.t,
+	state: EphemeralState.t,
+	pluginLib: PluginLib,
+	i18n: i18n.t,
+) => {
+	const template = getCanonicalTemplate(plugin.name, parsedArgs.template, state);
+	if (template) {
+		return template.handler === 'function'
+			? pipe(
+				pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)('proxyTemplate', template.encoding)({
+					...parsedArgs,
+					action: 'proxyTemplate',
+				}),
+				map(decoded => {
+					if (decoded) return renderPluginJsonRes(decoded);
+				}),
+			)
+			: pipe(
+				exec(
+					template.handler,
+					{ ...parsedArgs, config },
+					['json', 'application/json'].includes(template.encoding ?? 'none'),
+				),
+				map((res: string | number) => {
+					if (typeof (res) === 'string') {
+						return renderPluginJsonRes(JSON.parse(res));
+					}
+				}),
+			);
+	}
+	return resolve(log(i18n.__('templateNotFound')));
+};
 
 const getPluginOption = (task: Task.t) => {
 	return task.options?.find(option => option.flag === 'plugin');
@@ -604,14 +731,14 @@ const exposeTasks = (
 							state,
 							i18n,
 							canonicalTask,
-							pluginLib.sendPluginActionRequest,
+							pluginLib,
 							config.plugins?.find((found: InstalledPlugin.t) => found.name === parsedArgs.plugin),
 						)
 						: retval;
 				}
 
 				// No plugin provider was specified (path #1)
-				return exposeTask(retval, config, env, parsedArgs, state, i18n, task, pluginLib.sendPluginActionRequest);
+				return exposeTask(retval, config, env, parsedArgs, state, i18n, task, pluginLib);
 			}
 
 			// Canonical task...
@@ -625,7 +752,7 @@ const exposeTasks = (
 					state,
 					i18n,
 					foundTask,
-					pluginLib.sendPluginActionRequest,
+					pluginLib,
 					implementation,
 				)
 				: retval;
@@ -641,7 +768,7 @@ const exposeTask = (
 	state: EphemeralState.t,
 	_i18n: i18n.t,
 	task: Task.t,
-	sendPluginActionRequest: SendPluginActionRequest,
+	pluginLib: PluginLib,
 	plugin?: InstalledPlugin.t,
 ) =>
 	pipe(
@@ -693,10 +820,13 @@ const exposeTask = (
 
 				const handler = task.handler === 'proxy' && plugin
 					? pipe(
-						sendPluginActionRequest(plugin)(task)({ ...inputArgs, task: task.task }),
+						pluginLib.sendPluginActionRequest(plugin)('proxy', task.encoding ?? PluginResponseEncoding.create('none'))({
+							...inputArgs,
+							task: task.task,
+						}),
 						chain(addTask(parsedArgs, task.task, plugin.name)),
 						map(res => {
-							const decoded = res as PluginJsonResponse | void;
+							const decoded = res as PluginJsonResponse.t | void;
 							if (decoded) return renderPluginJsonRes(decoded);
 						}),
 					)
@@ -727,17 +857,17 @@ const loadEphermeralState = (
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
 ): CLIConfig =>
-	[exposeTasks /* addOperations, addTemplates*/].reduce(
+	[exposeTasks, exposeTemplates /* addOperations*/].reduce(
 		(cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
 		cliConfig,
 	);
 
-const renderPluginJsonRes = (decoded: PluginJsonResponse) => {
+const renderPluginJsonRes = (decoded: PluginJsonResponse.t) => {
 	switch (decoded.render) {
 		case 'table':
 			renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
 			break;
-		case 'string':
+		default:
 			log(decoded.data as string);
 			break;
 	}
@@ -779,7 +909,7 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
 		: {
 			...parsedArgs,
 			plugin: state.plugins.reduce(
-				(retval, pluginInfo: ParsedPluginInfo.t) =>
+				(retval, pluginInfo: PluginInfo.t) =>
 					pluginInfo.alias === retval
 						? pluginInfo.name
 						: retval,
@@ -830,6 +960,7 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 		'plan',
 		'opt-in',
 		'opt-out',
+		'create',
 		'add-contract',
 		'rm-contract',
 		'remove-contract',
@@ -897,6 +1028,8 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 				),
 		);
 	} catch (err) {
+		// Something went wrong that we didn't handle.
+		// TODO: Generate bug report with stack trace
 		console.error(err);
 	}
 };

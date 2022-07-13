@@ -16,17 +16,5 @@ Plugin.create(i18n => ({
 			encoding: 'json',
 		}),
 	],
-	checkRuntimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			report: [
-				{ name: 'Archetype', path: 'archetype', version: '>=1.2.12', kind: 'required', met: true },
-			],
-		}),
-	installRunTimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			output: 'Archetype was found in /usr/bin/archetype', // TODO this should use i18n
-		}),
 	proxy: compile,
 }), process.argv);

@@ -29,6 +29,7 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -54,6 +55,7 @@ Commands:
   taq list-contracts              List registered contracts
   taq compile                     Provided by more than one plugin. The option -
                                   -plugin is required.
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -95,6 +97,7 @@ Commands:
   taq list-contracts              List registered contracts
   taq compile                     Provided by more than one plugin. The option -
                                   -plugin is required.
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]

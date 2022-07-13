@@ -11,6 +11,7 @@ Commands:
   taq list-contracts              List registered contracts
   taq deploy [contract]           Deploy a smart contract to a particular enviro
                                   nment                     [aliases: originate]
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
