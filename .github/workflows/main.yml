@@ -50,8 +50,8 @@ jobs:
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
            cache_path: |
-              ./deno
-              ~/.cache/deno
+            ./deno
+            ~/.cache/deno
            taqueria_bin: "taq"
          - os: windows-latest
            os_short: windows
@@ -88,7 +88,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ${{ matrix.cache_path }}
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno-lock.json') }}
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
       ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
@@ -131,26 +131,26 @@ jobs:
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  # publish-protocol-to-npm:
-  #   if: ${{ !github.event.pull_request.head.repo.fork }}
-  #   uses: ./.github/workflows/npm-publish.yml
-  #   with:
-  #     dir: taqueria-protocol
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-protocol-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-protocol
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  # publish-sdk-to-npm:
-  #   if: ${{ !github.event.pull_request.head.repo.fork }}
-  #   needs: publish-protocol-to-npm
-  #   uses: ./.github/workflows/npm-publish.yml
-  #   with:
-  #     dir: taqueria-sdk
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-sdk-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    needs: publish-protocol-to-npm
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-sdk
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-ligo-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-ligo
@@ -159,7 +159,7 @@ jobs:
   
   publish-smartpy-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-smartpy
@@ -168,7 +168,7 @@ jobs:
 
   publish-taquito-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-taquito
@@ -177,7 +177,7 @@ jobs:
 
   publish-flextesa-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-flextesa
@@ -186,7 +186,7 @@ jobs:
 
   publish-archetype-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-archetype
@@ -195,7 +195,7 @@ jobs:
 
   publish-tezos-client-plugin-to-npm:
      if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+     needs: publish-sdk-to-npm
      uses: ./.github/workflows/npm-publish.yml
      with:
        dir: taqueria-plugin-tezos-client
@@ -204,7 +204,7 @@ jobs:
 
   publish-contract-types-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-contract-types
@@ -213,7 +213,7 @@ jobs:
 
   publish-jest-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-jest
@@ -222,7 +222,7 @@ jobs:
 
   publish-state-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-state

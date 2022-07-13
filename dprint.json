@@ -8,7 +8,7 @@
 	},
 	"json": {
 	},
-	"includes": ["**/*.{ts,tsx,js,jsx,cjs,mjs,json}"],
+	"includes": ["**/*.{ts,tsx,js,jsx,cjs,mjs,json,yml}"],
 	"excludes": [
 		"**/node_modules",
 		"**/*-lock.json",
