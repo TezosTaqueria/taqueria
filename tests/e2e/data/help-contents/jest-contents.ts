@@ -11,6 +11,7 @@ Commands:
   taq list-contracts              List registered contracts
   taq test [partition]            Setup a directory as a partition to run Jest t
                                   ests                           [aliases: jest]
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]

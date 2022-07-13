@@ -1,4 +1,4 @@
-import { LikeAPromise, PluginResponse, RequestArgs, TaqError } from '@taqueria/node-sdk/types';
+import { LikeAPromise, RequestArgs, TaqError } from '@taqueria/node-sdk/types';
 import glob from 'fast-glob';
 import { join } from 'path';
 import { generateContractTypesProcessContractFiles } from './src/cli-process';
@@ -31,7 +31,7 @@ const generateContractTypesAll = async (parsedArgs: Opts): Promise<string[]> => 
 	return await Promise.all(files.map(generateContractTypes(parsedArgs)));
 };
 
-export const generateTypes = (parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
+export const generateTypes = (parsedArgs: Opts) => {
 	parsedArgs.typescriptDir = parsedArgs.typescriptDir || 'types';
 
 	console.log('generateTypes', {

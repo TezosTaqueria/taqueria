@@ -18,16 +18,18 @@ import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria
 import type { TaqError } from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
+import * as Template from '@taqueria/protocol/Template';
 import { exec, ExecException } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
 import { get } from 'stack-trace';
 import { ZodError } from 'zod';
-import { InputSchema, Schema } from './types';
+import { PluginSchema } from './types';
 import { Args, LikeAPromise, pluginDefiner, StdIO } from './types';
 
 // @ts-ignore interop issue. Maybe find a different library later
+import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
 import generateName from 'project-name-generator';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
@@ -189,12 +191,12 @@ const postprocessArgs = (args: Args): Record<string, unknown> => {
 	return groupedArgs;
 };
 
-const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): Schema => {
-	const inputSchema: InputSchema = definer(i18n);
+const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): PluginSchema.t => {
+	const inputSchema: PluginSchema.RawPluginSchema = definer(i18n);
 
 	const { proxy } = inputSchema;
 
-	const pluginInfo = PluginInfo.create({
+	const pluginInfo = PluginSchema.create({
 		...inputSchema,
 		name: inputSchema.name ?? inferPluginName(),
 	});
@@ -215,6 +217,28 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 				case 'pluginInfo':
 					const output = {
 						...schema,
+						templates: schema.templates
+							? schema.templates.map(
+								(template: Template.t) => {
+									const handler = typeof template.handler === 'function' ? 'function' : template.handler;
+									return {
+										...template,
+										handler,
+									};
+								},
+							)
+							: [],
+						tasks: schema.tasks
+							? schema.tasks.map(
+								(task: Task.t) => {
+									const handler = typeof task.handler === 'function' ? 'function' : task.handler;
+									return {
+										...task,
+										handler,
+									};
+								},
+							)
+							: [],
 						proxy: schema.proxy ? true : false,
 						checkRuntimeDependencies: schema.checkRuntimeDependencies ? true : false,
 						installRuntimeDependencies: schema.installRuntimeDependencies ? true : false,
@@ -235,6 +259,25 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 						message: i18n.__('proxyNotSupported'),
 						context: requestArgs,
 					});
+				case 'proxyTemplate': {
+					const proxyArgs = RequestArgs.createProxyTemplateRequestArgs(requestArgs);
+					const template = schema.templates?.find(tmpl => tmpl.template === proxyArgs.template);
+					if (template) {
+						if (typeof template.handler === 'function') {
+							return template.handler(proxyArgs);
+						}
+						return Promise.reject({
+							errCode: 'E_NOT_SUPPORTED',
+							message: i18n.__('proxyNotSupported'),
+							context: requestArgs,
+						});
+					}
+					return Promise.reject({
+						errCode: 'E_INVALID_TEMPLATE',
+						message: i18n.__('invalidTemplate'),
+						context: requestArgs,
+					});
+				}
 				case 'checkRuntimeDependencies':
 					return sendAsyncJson(
 						schema.checkRuntimeDependencies
@@ -459,6 +502,7 @@ export {
 	SandboxAccountConfig,
 	SandboxConfig,
 	Task,
+	Template,
 };
 
 export const experimental = {

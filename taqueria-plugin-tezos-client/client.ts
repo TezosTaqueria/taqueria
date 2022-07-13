@@ -7,14 +7,7 @@ import {
 	sendErr,
 	sendJsonRes,
 } from '@taqueria/node-sdk';
-import type {
-	Environment,
-	LikeAPromise,
-	LoadedConfig,
-	PluginResponse,
-	RequestArgs,
-	SandboxConfig,
-} from '@taqueria/node-sdk/types';
+import type { Environment, LoadedConfig, RequestArgs, SandboxConfig } from '@taqueria/node-sdk/types';
 import retry from 'async-retry';
 import type { ExecException } from 'child_process';
 import glob from 'fast-glob';
@@ -128,7 +121,7 @@ const typecheckAll = (
 		.then(promises => Promise.all(promises));
 };
 
-const typecheck = <T>(parsedArgs: Opts, sandboxName: string, sandbox: SandboxConfig.t): Promise<PluginResponse> => {
+const typecheck = <T>(parsedArgs: Opts, sandboxName: string, sandbox: SandboxConfig.t) => {
 	const sourceFiles = (parsedArgs.sourceFiles as string).split(',');
 	let p;
 	if (parsedArgs.sourceFiles) {
@@ -264,7 +257,7 @@ const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfi
 			});
 	};
 
-const simulate = <T>(parsedArgs: Opts, sandboxName: string, sandbox: SandboxConfig.t): Promise<PluginResponse> => {
+const simulate = <T>(parsedArgs: Opts, sandboxName: string, sandbox: SandboxConfig.t) => {
 	if (parsedArgs.sourceFile) {
 		return simulateContract(parsedArgs, sandboxName, sandbox)(parsedArgs.sourceFile as string)
 			.then(data => [data])

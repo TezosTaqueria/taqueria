@@ -273,8 +273,12 @@ export const inject = (deps: UtilsDependencies) => {
 				 * - env.get()
 				 * - i18n.__()
 				 */
-				const join = joinPaths;
-				const cmd = renderTemplate(cmdTemplate, { join, ...inputArgs });
+				const cmdArgs = {
+					join: joinPaths,
+					joinPaths,
+					...inputArgs,
+				};
+				const cmd = renderTemplate(cmdTemplate, cmdArgs);
 				command = cmd;
 			} catch (previous) {
 				throw {

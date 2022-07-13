@@ -12,6 +12,7 @@ Commands:
   taq compile [sourceFile]        Compile a smart contract written in a Archetyp
                                   e syntax to Michelson code
                                                  [aliases: c, compile-archetype]
+  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]

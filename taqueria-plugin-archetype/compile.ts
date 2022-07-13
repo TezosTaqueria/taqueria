@@ -1,7 +1,5 @@
 import { execCmd, getContracts, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
-import { LikeAPromise, PluginResponse, RequestArgs, TaqError } from '@taqueria/node-sdk/types';
-import glob from 'fast-glob';
-import { readFile } from 'fs/promises';
+import { RequestArgs, TaqError } from '@taqueria/node-sdk/types';
 import { basename, extname, join } from 'path';
 
 interface Opts extends RequestArgs.t {
@@ -61,7 +59,7 @@ const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[
 		)
 		.then(promises => Promise.all(promises));
 
-const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
+const compile = <T>(parsedArgs: Opts) => {
 	const p = parsedArgs.sourceFile
 		? compileContract(parsedArgs)(parsedArgs.sourceFile)
 			.then(result => [result])
