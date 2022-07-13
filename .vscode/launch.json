@@ -21,7 +21,7 @@
 			"name": "Launch CLI",
 			"type": "pwa-node",
 			"program": "${workspaceFolder}/index.ts",
-			"cwd": "/Users/jimmychenchen/Desktop/bugbug",
+			"cwd": "${workspaceFolder}",
 			"runtimeExecutable": "deno",
 			"runtimeArgs": [
 				"run",

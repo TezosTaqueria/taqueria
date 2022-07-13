@@ -1,15 +1,11 @@
-import { i18n } from '@taqueria/protocol/i18n';
 import * as vscode from 'vscode';
-import { Output, OutputLevels, VsCodeHelper } from '../helpers';
+import { OutputLevels, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
 
 export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeItem> {
 	constructor(
 		private workspaceRoot: string,
 		private helper: VsCodeHelper,
-		private i18n: i18n,
-		private output: Output,
-		private context: vscode.ExtensionContext,
 	) {}
 
 	getTreeItem(element: PluginTreeItem): vscode.TreeItem {
@@ -24,15 +20,15 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeIt
 			config = null;
 		} else {
 			try {
-				pathToDir = await Util.makeDir(this.workspaceRoot, this.i18n);
-				config = await Util.TaqifiedDir.create(pathToDir, this.i18n);
+				pathToDir = await Util.makeDir(this.workspaceRoot, this.helper.i18n);
+				config = await Util.TaqifiedDir.create(pathToDir, this.helper.i18n);
 			} catch (e: any) {
 				config = null;
-				this.helper.showOutput(this.output)(
+				this.helper.showOutput(
 					OutputLevels.error,
 					'\nError(s) occurred while trying to originate contract(s):',
 				);
-				this.helper.logAllNestedErrors(e, this.output);
+				this.helper.logAllNestedErrors(e);
 			}
 		}
 
@@ -40,9 +36,7 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeIt
 			return [];
 		}
 		const installedPlugins = config?.config?.plugins?.map(plugin => plugin.name) ?? [];
-		const availablePlugins = await this.helper.getAvailablePlugins(
-			this.context,
-		);
+		const availablePlugins = await this.helper.getAvailablePlugins();
 		const allPlugins = [...new Set(installedPlugins.concat(availablePlugins))];
 		allPlugins.sort();
 		return allPlugins.map(

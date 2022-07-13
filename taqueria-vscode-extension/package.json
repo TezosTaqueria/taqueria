@@ -174,21 +174,24 @@
 				"category": "Taqueria",
 				"title": "Start Sandbox",
 				"shortTitle": "start sandbox <name>",
-				"enablement": "@taqueria/plugin-flextesa"
+				"enablement": "@taqueria/plugin-flextesa",
+				"icon": "$(debug-start)"
 			},
 			{
 				"command": "taqueria.stop_sandbox",
 				"category": "Taqueria",
 				"title": "Stop Sandbox",
 				"shortTitle": "stop sandbox <name>",
-				"enablement": "@taqueria/plugin-flextesa"
+				"enablement": "@taqueria/plugin-flextesa",
+				"icon": "$(debug-stop)"
 			},
 			{
 				"command": "taqueria.list_accounts",
 				"category": "Taqueria",
 				"title": "List Sandbox Accounts",
 				"shortTitle": "list accounts <name>",
-				"enablement": "@taqueria/plugin-flextesa"
+				"enablement": "@taqueria/plugin-flextesa",
+				"icon": "$(list-unordered)"
 			},
 			{
 				"command": "taqueria.originate",
@@ -241,6 +244,21 @@
 				{
 					"command": "taqueria.uninstall",
 					"when": "view == taqueria-plugins && viewItem == installed",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.start_sandbox",
+					"when": "view == taqueria-sandboxes && viewItem != running",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.stop_sandbox",
+					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.list_accounts",
+					"when": "view == taqueria-sandboxes && viewItem != stopped",
 					"group": "inline"
 				}
 			]
