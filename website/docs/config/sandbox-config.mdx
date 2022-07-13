@@ -1,8 +1,13 @@
 ---
-title: Named Sandboxes
+title: Sandbox Configuration
 ---
 
 Taqueria provides a centralized configuration for sandboxes. Named sandbox configurations are defined in the `./.taq/config.json` file for each project
+
+:::note
+These sandbox configurations are used by sandbox plugins. At this time, Taqueria supports the Flextesa sandbox with the [Taqueria Flextesa Plugin](/docs/plugins/flextesa)
+:::
+
 
 ### The Default Sandbox Configuration
 
@@ -14,7 +19,7 @@ This example shows the configuration for the default sandbox named `local`:
     "sandbox": {
         "local": {
             "label": "Local Tezos Sandbox",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "rpcUrl": "http://localhost:20000"
         }
 ```
@@ -24,14 +29,12 @@ This example shows the configuration for the default sandbox named `local`:
 Sandbox configurations are added as key/value pairs to the main `sandbox` object using the format:
 
 ```json
-sandboxName : { sandboxConfigObject }
+sandboxName : { sandboxConfig }
 ```
 
-Inside the sandboxConfigObject, there are four properties you can configure:
+Inside the sandboxConfigObject, there are three static properties you can configure, and the `accounts` property which is automatically populated when you start up a sandbox
 
-#### 'accounts'
-
-A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}`
+The fields you can configure are:
 
 #### 'label'
 An arbitrary string used to describe a particular configuration
@@ -40,13 +43,9 @@ An arbitrary string used to describe a particular configuration
 
 A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
 
-Currently availble protocols are:
-- Hangzhou `PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx`
-- Ithaca   `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
-
 #### 'rpcUrl'
 
-A string which corresponds to the local URL you would like the sandbox to run on
+A string which corresponds to the local URL you would like the sandbox to run on. The default is `http://localhost:2000`
 
 ### Adding a Sandbox to a Taqueria Environment
 
@@ -64,8 +63,6 @@ Once created, sandboxes can be added to environments by adding the `sandboxName`
         },
     },
 ```
-
-
 
 ### Sandbox Accounts
 
