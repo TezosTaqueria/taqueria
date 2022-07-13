@@ -70,20 +70,21 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		await makeDir(folders[0].uri.path, helper.i18n)
 			.then(projectDir => {
 				// Compilation tasks
-				helper.exposeTaqTaskAsCommand(
+				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
 					COMMAND_PREFIX + 'compile_smartpy',
 					'--plugin smartpy compile',
 					'output',
 					'Compilation successful.',
+					projectDir,
 				);
-				helper.exposeTaqTaskAsCommand(
+				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
 					COMMAND_PREFIX + 'compile_ligo',
 					'--plugin ligo compile',
 					'output',
 					'Compilation successful.',
 					projectDir,
 				);
-				helper.exposeTaqTaskAsCommand(
+				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
 					COMMAND_PREFIX + 'compile_archetype',
 					'--plugin archetype compile',
 					'output',

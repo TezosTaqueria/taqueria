@@ -5,6 +5,8 @@ import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import { join } from 'path';
 import * as api from 'vscode';
+import { ContractsDataProvider } from './gui/ContractsDataProvider';
+import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
 import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvider';
 import * as Util from './pure';
@@ -77,6 +79,10 @@ export const showOutput = (output: Output) => {
 		}
 	};
 };
+
+export interface HasFileName {
+	fileName: string;
+}
 
 function mapAsync<T, U>(array: T[], callbackfn: (value: T, index: number, array: T[]) => Promise<U>): Promise<U[]> {
 	return Promise.all(array.map(callbackfn));
@@ -525,6 +531,33 @@ export class VsCodeHelper {
 			: [];
 	}
 
+	exposeTaqTaskAsCommandWithOptionalFileArgument(
+		cmdId: string,
+		taskWithArgs: string,
+		outputTo: 'output' | 'notify',
+		otherNotification?: string,
+		projectDir?: Util.PathToDir,
+	) {
+		this.registerCommand(
+			cmdId,
+			async (item?: HasFileName | undefined) => {
+				const pathToTaq = await this.getTaqBinPath();
+				if (item) {
+					taskWithArgs = `${taskWithArgs} ${item.fileName}`;
+				}
+				const result = await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(taskWithArgs);
+				if (outputTo === 'output') {
+					this.showOutput(OutputLevels.output, result);
+				} else {
+					this.notify(result);
+				}
+				if (otherNotification) {
+					this.notify(otherNotification);
+				}
+			},
+		);
+	}
+
 	exposeTaqTaskAsCommand(
 		cmdId: string,
 		taskWithArgs: string,
@@ -737,5 +770,17 @@ export class VsCodeHelper {
 			treeDataProvider: sandboxesDataProvider,
 		});
 		this.dataProviders.push(sandboxesDataProvider);
+
+		const environmentsDataProvider = new EnvironmentsDataProvider(workspaceFolder, this);
+		this.vscode.window.createTreeView('taqueria-environments', {
+			treeDataProvider: environmentsDataProvider,
+		});
+		this.dataProviders.push(environmentsDataProvider);
+
+		const contractsDataProvider = new ContractsDataProvider(workspaceFolder, this);
+		this.vscode.window.createTreeView('taqueria-contracts', {
+			treeDataProvider: contractsDataProvider,
+		});
+		this.dataProviders.push(contractsDataProvider);
 	}
 }

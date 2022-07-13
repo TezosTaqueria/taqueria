@@ -24,11 +24,7 @@ export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTre
 				config = await Util.TaqifiedDir.create(pathToDir, this.helper.i18n);
 			} catch (e: any) {
 				config = null;
-				this.helper.showOutput(
-					OutputLevels.error,
-					'\nError(s) occurred while trying to originate contract(s):',
-				);
-				this.helper.logAllNestedErrors(e);
+				this.helper.notifyAndLogError('Error while loading config, sandboxes list will fail to populate', e);
 			}
 		}
 

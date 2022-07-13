@@ -94,25 +94,21 @@
 				{
 					"id": "taqueria-sandboxes",
 					"name": "Sandboxes",
-					"icon": "images/taq-black.svg",
 					"contextualTitle": "Sandboxes"
 				},
 				{
 					"id": "taqueria-plugins",
 					"name": "Plugins",
-					"icon": "images/taq-black.svg",
 					"contextualTitle": "Plugins"
 				},
 				{
-					"id": "taqueria-networks",
-					"name": "Networks",
-					"icon": "images/taq-black.svg",
-					"contextualTitle": "Networks"
+					"id": "taqueria-contracts",
+					"name": "Contracts",
+					"contextualTitle": "Contracts"
 				},
 				{
 					"id": "taqueria-environments",
 					"name": "Environments",
-					"icon": "images/taq-black.svg",
 					"contextualTitle": "Environments"
 				}
 			]
@@ -153,21 +149,24 @@
 				"category": "Taqueria",
 				"title": "Compile (SmartPy)",
 				"shortTitle": "compile --plugin smartpy",
-				"enablement": "@taqueria/plugin-smartpy"
+				"enablement": "@taqueria/plugin-smartpy",
+				"icon": "images/smartpy.svg"
 			},
 			{
 				"command": "taqueria.compile_ligo",
 				"category": "Taqueria",
 				"title": "Compile (LIGO)",
 				"shortTitle": "compile --plugin ligo",
-				"enablement": "@taqueria/plugin-ligo"
+				"enablement": "@taqueria/plugin-ligo",
+				"icon": "images/ligo.svg"
 			},
 			{
 				"command": "taqueria.compile_archetype",
 				"category": "Taqueria",
 				"title": "Compile (Archetype)",
 				"shortTitle": "compile --plugin archetype",
-				"enablement": "@taqueria/plugin-archetype"
+				"enablement": "@taqueria/plugin-archetype",
+				"icon": "images/archetype.svg"
 			},
 			{
 				"command": "taqueria.start_sandbox",
@@ -259,6 +258,21 @@
 				{
 					"command": "taqueria.list_accounts",
 					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.compile_smartpy",
+					"when": "view == taqueria-contracts && viewItem == smartpy",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.compile_ligo",
+					"when": "view == taqueria-contracts && viewItem == ligo",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.compile_archetype",
+					"when": "view == taqueria-contracts && viewItem == archetype",
 					"group": "inline"
 				}
 			]
