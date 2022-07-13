@@ -732,6 +732,9 @@ export class VsCodeHelper {
 				const configWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
 				const stateWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/state.json'));
 
+				const contractsFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts'));
+				const contractsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts/*'));
+
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
 				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates(projectDir));
 				folderWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates(projectDir));
@@ -744,7 +747,15 @@ export class VsCodeHelper {
 				stateWatcher.onDidChange((e: api.Uri) => this.updateCommandStates(projectDir));
 				stateWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates(projectDir));
 				stateWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates(projectDir));
-				return [folderWatcher, configWatcher, stateWatcher];
+
+				contractsFolderWatcher.onDidChange(_ => this.contractsDataProvider?.refresh());
+				contractsFolderWatcher.onDidCreate(_ => this.contractsDataProvider?.refresh());
+				contractsFolderWatcher.onDidDelete(_ => this.contractsDataProvider?.refresh());
+				contractsWatcher.onDidChange(_ => this.contractsDataProvider?.refresh());
+				contractsWatcher.onDidCreate(_ => this.contractsDataProvider?.refresh());
+				contractsWatcher.onDidDelete(_ => this.contractsDataProvider?.refresh());
+
+				return [folderWatcher, configWatcher, stateWatcher, contractsFolderWatcher, contractsWatcher];
 			} catch (error: unknown) {
 				throw {
 					kind: 'E_UnknownError',
@@ -757,6 +768,7 @@ export class VsCodeHelper {
 	}
 
 	private dataProviders: { refresh: () => void }[] = [];
+	private contractsDataProvider?: ContractsDataProvider;
 
 	registerDataProviders(workspaceFolder: string) {
 		const pluginsDataProvider = new PluginsDataProvider(workspaceFolder, this);
@@ -777,10 +789,10 @@ export class VsCodeHelper {
 		});
 		this.dataProviders.push(environmentsDataProvider);
 
-		const contractsDataProvider = new ContractsDataProvider(workspaceFolder, this);
+		this.contractsDataProvider = new ContractsDataProvider(workspaceFolder, this);
 		this.vscode.window.createTreeView('taqueria-contracts', {
-			treeDataProvider: contractsDataProvider,
+			treeDataProvider: this.contractsDataProvider,
 		});
-		this.dataProviders.push(contractsDataProvider);
+		this.dataProviders.push(this.contractsDataProvider);
 	}
 }
