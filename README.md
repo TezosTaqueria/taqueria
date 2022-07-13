@@ -96,3 +96,5 @@ From the root of the Taqueria directory, run the build-all script:
 ```shell
 npm run build-all
 ```
+
+Testing cache change
