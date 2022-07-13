@@ -49,14 +49,23 @@ jobs:
          - os: ubuntu-latest
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
+           cache_path: |
+            ./deno
+            ~/.cache/deno
            taqueria_bin: "taq"
          - os: windows-latest
            os_short: windows
            deno_target: "x86_64-pc-windows-msvc"
+           cache_path: |
+            ./deno
+            ~/AppData/Local/deno
            taqueria_bin: "taq.exe"
          - os: macOS-latest
            os_short: macos
            deno_target: "x86_64-apple-darwin"
+           cache_path: |
+            ./deno
+            ~/Library/Caches/deno
            taqueria_bin: "taq"
 
     outputs:
@@ -75,6 +84,11 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ matrix.cache_path }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno-lock.json') }}
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
       ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
@@ -178,7 +192,7 @@ jobs:
 
   publish-tezos-client-plugin-to-npm:
      if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    #  needs: publish-sdk-to-npm
      uses: ./.github/workflows/npm-publish.yml
      with:
        dir: taqueria-plugin-tezos-client
@@ -263,11 +277,17 @@ jobs:
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
+          cache_path: |
+            ~/.deno
+            ~/.cache/deno
         - os: macos-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
+          cache_path: |
+            ~/.deno
+            ~/Library/Caches/deno
     needs: 
       - build-binaries
       - gather-info-for-e2e-tests
@@ -283,6 +303,11 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "1.18.2"
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ matrix.cache_path }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno-lock.json') }}
 
       - name: download the binary from the build-binaries job and make it executable
         if: ${{ !github.event.pull_request.head.repo.fork }}
