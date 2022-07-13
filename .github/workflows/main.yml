@@ -107,9 +107,6 @@ jobs:
             echo "Project not initialized"
             exit 1
           fi
-          echo "Test for cache"
-          ls -ltr
-          ls -ltr ./deno
           mv "${{ matrix.taqueria_bin }}" "taq.${{ matrix.deno_target }}"
 
       - name: Authenticate with GCP
