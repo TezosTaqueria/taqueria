@@ -8,10 +8,7 @@
 	},
 	"json": {
 	},
-	"includes": [
-		"**/*.{ts,tsx,js,jsx,cjs,mjs,json}",
-		"**/deno-lock.json"
-	],
+	"includes": ["**/*.{ts,tsx,js,jsx,cjs,mjs,json}"],
 	"excludes": [
 		"**/node_modules",
 		"**/*-lock.json",
