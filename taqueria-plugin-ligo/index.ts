@@ -45,6 +45,14 @@ Plugin.create(i18n => ({
 					description: 'The name of the LIGO contract to generate',
 				}),
 			],
+			options: [
+				Option.create({
+					shortFlag: 's',
+					flag: 'syntax',
+					type: 'string',
+					description: 'The syntax used in the contract',
+				}),
+			],
 			handler: createContract,
 		}),
 	],
