@@ -1,7 +1,6 @@
-import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
+import { execCmd, getArch, getContracts, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import { basename, extname, join } from 'path';
-import glob = require('fast-glob');
 
 interface Opts extends RequestArgs.t {
 	entrypoint?: string;
@@ -57,12 +56,8 @@ const compileContract = (opts: Opts) =>
 				});
 			});
 
-const compileAll = (parsedArgs: Opts): Promise<{ contract: string; artifact: string }[]> => {
-	// TODO: Fetch list of files from SDK
-	return glob(
-		['**/*.ligo', '**/*.religo', '**/*.mligo', '**/*.jsligo'],
-		{ cwd: parsedArgs.config.contractsDir, absolute: false },
-	)
+const compileAll = (parsedArgs: Opts): Promise<{ contract: string; artifact: string }[]> =>
+	Promise.all(getContracts(/\.(ligo|religo|mligo|jsligo)$/, parsedArgs.config))
 		.then(entries => entries.map(compileContract(parsedArgs)))
 		.then(processes =>
 			processes.length > 0
@@ -70,7 +65,6 @@ const compileAll = (parsedArgs: Opts): Promise<{ contract: string; artifact: str
 				: [{ contract: 'None found', artifact: 'N/A' }]
 		)
 		.then(promises => Promise.all(promises));
-};
 
 export const compile = (parsedArgs: Opts) => {
 	const p = parsedArgs.sourceFile
