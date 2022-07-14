@@ -46,6 +46,7 @@ export const ligoNoContracts = `┌────────────┬──
 ├────────────┼──────────┤
 │ None found │ N/A      │
 └────────────┴──────────┘
+
 `;
 
 export const compileNonExistent = `┌────────────┬──────────────┐
