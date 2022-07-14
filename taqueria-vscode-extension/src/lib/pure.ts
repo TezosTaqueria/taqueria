@@ -199,7 +199,7 @@ export const execCmd = (
 				if (previous) {
 					reject({
 						code: 'E_EXEC',
-						msg: `An unexpected error occurred when trying to execute the command`,
+						msg: `An unexpected error occurred when trying to execute the command` + (msg ? `:\n${msg}` : ''),
 						previous,
 						cmd,
 					});

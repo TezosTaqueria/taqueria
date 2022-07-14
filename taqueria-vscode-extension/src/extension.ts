@@ -1,8 +1,5 @@
-import loadI18n, { i18n } from '@taqueria/protocol/i18n';
-import path from 'path';
 import * as api from 'vscode';
-import { PluginsDataProvider } from './lib/gui/PluginsDataProvider';
-import { InjectedDependencies, OutputLevels, sanitizeDeps, VsCodeHelper } from './lib/helpers';
+import { InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
 import { COMMAND_PREFIX } from './lib/helpers';
 import { makeDir } from './lib/pure';
 
@@ -58,13 +55,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		'output',
 		'Successfully opted out from analytics.',
 	);
-	// await exposeTasksFromState (context, output, folders, i18n)
 
-	// Temporary - hard coded list of tasks we know we need to support
-	// Caveats:
-	// 1) We're only supporting a project with a single workspace folder open
-	// 2) We're displaying all known tasks from our first-party list of plugins.
-	// Third-party plugins aren't exposed via the VS Code interface
 	const folders = helper.getFolders();
 	if (folders.length === 1) {
 		await makeDir(folders[0].uri.path, helper.i18n)
@@ -98,13 +89,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 					'Type generation successful.',
 					projectDir,
 				);
-				helper.exposeTaqTaskAsCommand(
-					COMMAND_PREFIX + 'typecheck',
-					'typecheck',
-					'output',
-					'Type generation successful.',
-					projectDir,
-				);
+				helper.exposeTypecheckCommand();
 				helper.exposeTaqTaskAsCommand(
 					COMMAND_PREFIX + 'test',
 					'test',
@@ -145,23 +130,9 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 				}
 			});
 		helper.registerDataProviders(folders[0].uri.fsPath);
+	} else if (folders.length === 0) {
+		helper.updateCommandStates();
 	}
-
-	// If the developer changes their workspace folders,
-	// then the list of taqified projects might have changed,
-	// and therefore the list of tasks we're aware of might
-	// have changed as well. We're best to reload.
-	// 	vscode.workspace.onDidChangeWorkspaceFolders(_ => {
-	// 		vscode.window.showWarningMessage("As the list of projects has changed, Taqueria will need to reload.")
-	// 		.then(_ => vscode.window.showQuickPick(["yes", "no"], {
-	// 			canPickMany: false,
-	// 			placeHolder: "Reload now?",
-	// 			title: "Reload this window?"
-	// 		}))
-	// 		.then(input => {
-	// 			if (input) return vscode.commands.executeCommand("workbench.action.reloadWindow")
-	// 		})
-	// 	})
 }
 
 export function deactivate() {

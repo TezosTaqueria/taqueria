@@ -62,6 +62,8 @@
 		"ecadlabs"
 	],
 	"activationEvents": [
+		"onCommand:taqueria.init",
+		"onCommand:taqueria.scaffold",
 		"workspaceContains:.taq",
 		"onStartupFinished"
 	],
@@ -197,7 +199,8 @@
 				"category": "Taqueria",
 				"title": "Originate contracts",
 				"shortTitle": "originate",
-				"enablement": "@taqueria/plugin-taquito"
+				"enablement": "@taqueria/plugin-taquito",
+				"icon": "$(cloud-upload)"
 			},
 			{
 				"command": "taqueria.opt_in",
@@ -223,7 +226,8 @@
 				"category": "Taqueria",
 				"title": "Typecheck Michelson contracts",
 				"shortTitle": "typecheck",
-				"enablement": "@taqueria/plugin-tezos-client"
+				"enablement": "@taqueria/plugin-tezos-client",
+				"icon": "$(check)"
 			},
 			{
 				"command": "taqueria.test",
@@ -273,6 +277,16 @@
 				{
 					"command": "taqueria.compile_archetype",
 					"when": "view == taqueria-contracts && viewItem == archetype",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.originate",
+					"when": "view == taqueria-environments || view == taqueria-contracts",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.typecheck",
+					"when": "view == taqueria-sandboxes || view != stopped",
 					"group": "inline"
 				}
 			]

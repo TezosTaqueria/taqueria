@@ -3,9 +3,11 @@ import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { TaqError } from '@taqueria/protocol/TaqError';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
-import { join } from 'path';
+import path, { join, resolve } from 'path';
 import * as api from 'vscode';
+import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
+import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
 import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvider';
@@ -427,26 +429,43 @@ export class VsCodeHelper {
 		});
 	}
 
+	getContractFileName(fileName: string) {
+		return fileName.replace(/\.[^/.]+$/, '') + '.tz';
+	}
+
 	async exposeOriginateTask() {
-		this.exposeTaskAsCommand(Commands.originate, async (pathToTaq: Util.PathToTaq) => {
+		this.registerCommand(Commands.originate, async (arg?: ContractTreeItem | EnvironmentTreeItem | undefined) => {
 			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
 			if (projectDir === undefined) {
 				return;
 			}
-			const config = await Util.TaqifiedDir.create(projectDir, this.i18);
-			const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
-			const environmentName = await this.vscode.window.showQuickPick(environmentNames, {
-				canPickMany: false,
-				ignoreFocusOut: false,
-				placeHolder: 'Environment Name',
-				title: 'Select an environment',
-			});
+			let environmentName: string | undefined = undefined;
+			let fileName: string | undefined = undefined;
+			if (arg) {
+				if (arg instanceof EnvironmentTreeItem) {
+					environmentName = (arg as EnvironmentTreeItem).label;
+				}
+				if (arg instanceof ContractTreeItem) {
+					fileName = this.getContractFileName((arg as ContractTreeItem).fileName);
+				}
+			}
 			if (!environmentName) {
-				return;
+				const config = await Util.TaqifiedDir.create(projectDir, this.i18);
+				const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
+				environmentName = await this.vscode.window.showQuickPick(environmentNames, {
+					canPickMany: false,
+					ignoreFocusOut: false,
+					placeHolder: 'Environment Name',
+					title: 'Select an environment',
+				});
+				if (!environmentName) {
+					return;
+				}
 			}
 			try {
+				const pathToTaq = await this.getTaqBinPath();
 				const message = await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(
-					`originate -e ${environmentName}`,
+					`originate -e ${environmentName} ${fileName ?? ''}`,
 				);
 				this.showOutput(OutputLevels.output, message);
 				this.notify('Origination Succeeded');
@@ -523,6 +542,52 @@ export class VsCodeHelper {
 				// at this point, we cannot do anything
 			}
 		}
+	}
+
+	exposeTypecheckCommand() {
+		this.registerCommand(COMMAND_PREFIX + 'typecheck', async (arg: SandboxTreeItem | ContractTreeItem | undefined) => {
+			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
+			if (projectDir === undefined) {
+				return;
+			}
+			let fileName: string | undefined = undefined;
+			let sandboxName: string | undefined = undefined;
+			if (arg) {
+				if (arg instanceof SandboxTreeItem) {
+					sandboxName = (arg as SandboxTreeItem).label;
+				}
+				if (arg instanceof ContractTreeItem) {
+					fileName = this.getContractFileName((arg as ContractTreeItem).fileName);
+				}
+			}
+			if (!sandboxName) {
+				const config = await Util.TaqifiedDir.create(projectDir, this.i18);
+				const sandboxNames = [...Object.keys(config?.config?.sandbox ?? {})];
+				if (sandboxNames.length === 1) {
+					sandboxName = sandboxNames[0];
+				} else {
+					sandboxName = await this.vscode.window.showQuickPick(sandboxNames, {
+						canPickMany: false,
+						ignoreFocusOut: false,
+						placeHolder: 'Sandbox Name',
+						title: 'Select a sandbox',
+					});
+					if (!sandboxName) {
+						return;
+					}
+				}
+			}
+			const pathToTaq = await this.getTaqBinPath();
+			try {
+				const result = await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(
+					`typecheck -s ${sandboxName} ${fileName ?? ''}`,
+				);
+				this.showOutput(OutputLevels.output, result);
+			} catch (e: unknown) {
+				this.notifyAndLogError('Errors during typecheck', e);
+			}
+			this.notify('Type check successful');
+		});
 	}
 
 	getSandboxNames(projectDir: Util.TaqifiedDir) {
@@ -633,9 +698,16 @@ export class VsCodeHelper {
 		});
 	}
 
-	async updateCommandStates(
-		projectDir: Util.PathToDir,
-	) {
+	async updateCommandStates(projectDir?: Util.PathToDir | undefined) {
+		if (projectDir === undefined) {
+			this.showOutput(OutputLevels.debug, 'No folder is open, enabling init and scaffold');
+			this.vscode.commands.executeCommand(
+				'setContext',
+				'@taqueria-state/enable-init-scaffold',
+				true,
+			);
+			return;
+		}
 		this.dataProviders.forEach(dataProvider => dataProvider.refresh());
 
 		this.showOutput(OutputLevels.debug, 'Project config changed, updating command states...');
