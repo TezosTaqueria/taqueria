@@ -164,8 +164,24 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 			expect(json).toHaveProperty('contracts');
 			return expect(json.contracts).toEqual({
 				'counter.mligo': {
-					sourceFile: 'counter.mligo',
-					hash,
+					'hash': '241556bb7f849d22564378991ce6c15ffd7fd5727620f207fb53e6dc538e66ef',
+					'sourceFile': 'counter.mligo',
+				},
+				'hello-tacos-one.mligo': {
+					'hash': '530f224fb713e4fb6d250f1c94fdc4a10a4cdde16fe02385071021637cc914e6',
+					'sourceFile': 'hello-tacos-one.mligo',
+				},
+				'hello-tacos-two.mligo': {
+					'hash': '530f224fb713e4fb6d250f1c94fdc4a10a4cdde16fe02385071021637cc914e6',
+					'sourceFile': 'hello-tacos-two.mligo',
+				},
+				'hello-tacos.mligo': {
+					'hash': '530f224fb713e4fb6d250f1c94fdc4a10a4cdde16fe02385071021637cc914e6',
+					'sourceFile': 'hello-tacos.mligo',
+				},
+				'invalid-contract.mligo': {
+					'hash': '2c7affa29be3adc8cb8b751a27a880165327e96cf8b446a9f73df323b1dceb0f',
+					'sourceFile': 'invalid-contract.mligo',
 				},
 			});
 		} catch (error) {
