@@ -1,9 +1,9 @@
-import { sendAsyncErr, sendAsyncRes, sendErr } from '@taqueria/node-sdk';
-import { LoadedConfig, RequestArgs, SanitizedAbsPath } from '@taqueria/node-sdk/types';
+import { noop, sendAsyncErr, sendAsyncRes } from '@taqueria/node-sdk';
+import { LoadedConfig, RequestArgs, SanitizedAbsPath, SanitizedPath } from '@taqueria/node-sdk/types';
 import { execa } from 'execa';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import { defaults } from 'jest-config';
-import { join } from 'path';
+import { join, relative } from 'path';
 
 type DefaultConfig = typeof defaults;
 
@@ -38,13 +38,13 @@ const getTestsRootDir = (config: CustomConfig) => {
 	return config.jestTestsRootDir || 'tests';
 };
 
-const toPartitionCfg = (partitionAbspath: SanitizedAbsPath.t, rootConfigAbsPath: SanitizedAbsPath.t) => `
-const parentConfig = require('${rootConfigAbsPath}')
+const toPartitionCfg = (partitionRelpath: SanitizedPath.t, rootConfigRelPath: SanitizedPath.t) => `
+const parentConfig = require('${rootConfigRelPath}')
 
 module.exports = {
     ...parentConfig,
     roots: [
-        "${partitionAbspath}"
+        "${partitionRelpath}"
     ]
 }
 `;
@@ -70,8 +70,8 @@ const createPartition = async (partitionDir: SanitizedAbsPath.t, projectDir: San
 					writeFile(
 						partitionCfgAbsPath,
 						toPartitionCfg(
-							getPartitionAbspath(partitionDir),
-							getRootConfigAbspath(projectDir),
+							SanitizedPath.create(relative(partitionDir, partitionDir)),
+							SanitizedPath.create(relative(partitionDir, getRootConfigAbspath(projectDir))),
 						),
 					)
 				)
@@ -92,18 +92,16 @@ const ensurePartitionExists = (args: Opts) =>
 		);
 
 const execCmd = (cmd: string, args: string[]) => {
-	// console.log([cmd, ...args].join(' '))
-
 	const child = execa(cmd, args, {
-		reject: false,
-		buffer: false,
-		// encoding: null,
 		shell: true,
-		stdio: 'inherit',
+		reject: false,
 		env: { FORCE_COLOR: 'true' },
 	});
 
-	return child.then(_ => {});
+	child.stdout?.pipe(process.stdout);
+	child.stderr?.pipe(process.stderr);
+
+	return child.then(noop);
 };
 
 export default async (args: RequestArgs.ProxyRequestArgs) => {

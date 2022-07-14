@@ -1,5 +1,5 @@
 import { sendAsyncErr, sendAsyncRes, sendErr, sendJsonRes } from '@taqueria/node-sdk';
-import { LoadedConfig, PluginResponse, RequestArgs, SanitizedAbsPath } from '@taqueria/node-sdk/types';
+import { LoadedConfig, RequestArgs, SanitizedAbsPath } from '@taqueria/node-sdk/types';
 import path from 'path';
 import { processFiles } from './file-processing';
 import { PinataAuth, publishFileToIpfs } from './pinata-api';
@@ -8,6 +8,14 @@ import { createProcessBackoffController } from './utils';
 // Load .env for jwt token
 // TODO: How should this be stored in a secure way?
 import 'dotenv/config';
+
+// TODO: What should this be, it was removed from the sdk
+type PluginResponse =
+	| void
+	| {
+		render: 'table';
+		data: unknown[];
+	};
 
 interface Opts extends RequestArgs.ProxyRequestArgs {
 	readonly path?: string;
