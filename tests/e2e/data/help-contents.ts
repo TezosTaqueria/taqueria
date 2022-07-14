@@ -15,7 +15,7 @@ Options:
 Taqueria is currently in BETA. You've been warned. :)
 
 Your config.json file is invalid
-`
+`;
 
 export const helpContentsForProject: string = `taq <command>
 
@@ -38,7 +38,7 @@ Options:
       --help        Show help                                     [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoPlugin: string = `taq <command>
 
@@ -50,6 +50,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a Ligo syntax
                               to Michelson code       [aliases: c, compile-ligo]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -60,7 +61,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoPluginSpecific = `taq compile [sourceFile]
 
@@ -76,7 +77,7 @@ Options:
   -e, --entrypoint  The entry point that will be compiled
   -s, --syntax      The syntax used in the contract
   -i, --infer       Enable type inference
-`
+`;
 
 export const helpContentsSmartpyPlugin: string = `taq <command>
 
@@ -88,6 +89,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a SmartPy synt
                               ax to Michelson code [aliases: c, compile-smartpy]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -98,7 +100,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsSmartpyPluginSpecific = `taq compile [sourceFile]
 
@@ -111,21 +113,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
-
-export const helpContentsSmartpyTeapotSpecific = `taq teapot
-
-Have a cup of tea
-
-Options:
-      --version     Show version number                                [boolean]
-      --build       Display build information about the current version[boolean]
-  -p, --projectDir  Path to your project directory               [default: "./"]
-  -e, --env         Specify an environment configuration
-  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]  
-      --help        Show help                                          [boolean]
-  -g, --green       Make green tea instead                             [boolean]
-`
+`;
 
 export const helpContentsLigoSmartpy: string = `taq <command>
 
@@ -137,6 +125,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile                 Provided by more than one plugin. The option --plu
                               gin is required.
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -147,7 +136,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoSmartpySpecific = `taq compile
 
@@ -163,7 +152,7 @@ Options:
       --plugin      Specify which plugin should be used to execute this task
   [required] [choices: "@taqueria/plugin-ligo", "ligo", "@taqueria/plugin-smartp
                                                                   y", "smartpy"]
-`
+`;
 
 export const helpContentsLigoArchetype: string = `taq <command>
 
@@ -175,6 +164,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile                 Provided by more than one plugin. The option --plu
                               gin is required.
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -185,7 +175,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsLigoArchetypeSpecific = `taq compile
 
@@ -201,7 +191,7 @@ Options:
       --plugin      Specify which plugin should be used to execute this task
   [required] [choices: "@taqueria/plugin-ligo", "ligo", "@taqueria/plugin-archet
                                                               ype", "archetype"]
-`
+`;
 
 export const helpContentsArchetypePlugin: string = `taq <command>
 
@@ -214,6 +204,7 @@ Commands:
   taq compile [sourceFile]    Compile a smart contract written in a Archetype sy
                               ntax to Michelson code
                                                  [aliases: c, compile-archetype]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -224,7 +215,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsArchetypePluginSpecific: string = `taq compile [sourceFile]
 
@@ -237,7 +228,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 
 export const helpContentsTaquitoPlugin: string = `taq <command>
 
@@ -249,6 +240,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq deploy [contract]       Deploy a smart contract to a particular environmen
                               t                             [aliases: originate]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -259,7 +251,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsTaquitoPluginSpecific = `taq deploy [contract]
 
@@ -272,7 +264,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 
 export const helpContentsFlextesaPlugin: string = `taq <command>
 
@@ -285,6 +277,7 @@ Commands:
   taq start sandbox [sandboxName]  Starts a flextesa sandbox    [aliases: start]
   taq stop sandbox [sandboxName]   Stops a flextesa sandbox      [aliases: stop]
   taq list accounts <sandboxName>  List the balances of all sandbox accounts
+  taq create <template>            Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -295,7 +288,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsFlextesaPluginStartSandbox = `taq start sandbox [sandboxName]
 
@@ -311,7 +304,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 export const helpContentsFlextesaPluginStopSandbox = `taq stop sandbox [sandboxName]
 
 Stops a flextesa sandbox
@@ -326,7 +319,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 
 export const helpContentsGenerateTypesPlugin = `taq <command>
 
@@ -340,6 +333,7 @@ Commands:
   taq uninstall <pluginName>          Uninstall a plugin
   taq generate types [typescriptDir]  Generate types for a contract to be used w
                                       ith taquito       [aliases: gen, gentypes]
+  taq create <template>               Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -350,7 +344,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsGenerateTypesPluginSpecific = `taq generate types [typescriptDir]
 
@@ -370,7 +364,7 @@ Options:
       --help           Show help                                       [boolean]
   -t, --typeAliasMode  The type aliases used in the generated types
                                                      [choices: "file", "simple"]
-`
+`;
 
 export const helpContentsFlextesaPluginListAccounts = `taq list accounts <sandboxName>
 
@@ -386,7 +380,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-`
+`;
 
 export const helpContentsJestPlugin = `taq <command>
 
@@ -398,6 +392,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq test [partition]        Setup a directory as a partition to run Jest tests
                                                                  [aliases: jest]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -408,7 +403,7 @@ Options:
       --help        Show help                                          [boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
-`
+`;
 
 export const helpContentsJestPluginSpecific = `taq test [partition]
 
@@ -427,4 +422,4 @@ Options:
       --help         Show help                                         [boolean]
   -i, --init         Initializes the partition for Jest                [boolean]
   -t, --testPattern  Run test files that match the provided pattern
-`
+`;

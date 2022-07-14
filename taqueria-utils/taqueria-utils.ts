@@ -210,7 +210,7 @@ export const taqResolve = <T>(data: T): Future<TaqError.t, T> => resolve(data) a
 export const inject = (deps: UtilsDependencies) => {
 	const { stdout, stderr } = deps;
 
-	const log = (message: string) => {
+	const log = (message: unknown) => {
 		const encoder = new TextEncoder();
 		stdout.write(encoder.encode(`${message}\n`));
 	};
@@ -273,8 +273,12 @@ export const inject = (deps: UtilsDependencies) => {
 				 * - env.get()
 				 * - i18n.__()
 				 */
-				const join = joinPaths;
-				const cmd = renderTemplate(cmdTemplate, { join, ...inputArgs });
+				const cmdArgs = {
+					join: joinPaths,
+					joinPaths,
+					...inputArgs,
+				};
+				const cmd = renderTemplate(cmdTemplate, cmdArgs);
 				command = cmd;
 			} catch (previous) {
 				throw {

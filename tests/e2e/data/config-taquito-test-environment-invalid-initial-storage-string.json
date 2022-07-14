@@ -1,72 +1,72 @@
 {
-    "language": "en",
-    "plugins": [
-        {
-            "name": "@taqueria/plugin-taquito",
-            "type": "npm"
-        }
-    ],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {}
-        },
-        "test": {
-            "networks": ["ghostnet"],
-            "sandboxes": [],
-            "storage": {"hello-tacos.tz": "abc"}
-        }
-    },
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-            "rpcUrl": "http://localhost:20000"
-        }
-    },
-    "network": {
-        "ghostnet": {
-            "label": "ghostnet",
-            "rpcUrl": "https://rpc.ithacanet.teztnets.xyz",
-            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
-            "faucet": {
-                "pkh": "tz1Qjvu8xaRgTjQmHBBDHaM1HGomCTYBgLZJ",
-                "mnemonic": [
-                    "away",
-                    "virus",
-                    "stand",
-                    "kingdom",
-                    "sorry",
-                    "absurd",
-                    "close",
-                    "found",
-                    "warrior",
-                    "icon",
-                    "nominee",
-                    "theme",
-                    "enough",
-                    "kiss",
-                    "double"
-                ],
-                "email": "mpyuqqza.jqszvrsy@teztnets.xyz",
-                "password": "9OvRmgifTP",
-                "amount": "17415095578",
-                "activation_code": "8e54d45a59d21089fc60c6d4e94ecf4ecc44c417"
-            }
-        }
-    },
-    "accounts": {
-        "bob": "3000000000",
-        "alice": "2000000000",
-        "john": "4000000000",
-        "jane": "5000000000",
-        "joe": "1000000000"
-    } 
+	"language": "en",
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-taquito",
+			"type": "npm"
+		}
+	],
+	"contractsDir": "contracts",
+	"testsDir": "tests",
+	"artifactsDir": "artifacts",
+	"environment": {
+		"default": "development",
+		"development": {
+			"networks": [],
+			"sandboxes": [
+				"local"
+			],
+			"storage": {}
+		},
+		"test": {
+			"networks": ["ghostnet"],
+			"sandboxes": [],
+			"storage": { "hello-tacos.tz": "abc" }
+		}
+	},
+	"sandbox": {
+		"local": {
+			"label": "Local Tezos Sandbox",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"rpcUrl": "http://localhost:20000"
+		}
+	},
+	"network": {
+		"ghostnet": {
+			"label": "ghostnet",
+			"rpcUrl": "https://rpc.ithacanet.teztnets.xyz",
+			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+			"faucet": {
+				"pkh": "tz1Qjvu8xaRgTjQmHBBDHaM1HGomCTYBgLZJ",
+				"mnemonic": [
+					"away",
+					"virus",
+					"stand",
+					"kingdom",
+					"sorry",
+					"absurd",
+					"close",
+					"found",
+					"warrior",
+					"icon",
+					"nominee",
+					"theme",
+					"enough",
+					"kiss",
+					"double"
+				],
+				"email": "mpyuqqza.jqszvrsy@teztnets.xyz",
+				"password": "9OvRmgifTP",
+				"amount": "17415095578",
+				"activation_code": "8e54d45a59d21089fc60c6d4e94ecf4ecc44c417"
+			}
+		}
+	},
+	"accounts": {
+		"bob": "3000000000",
+		"alice": "2000000000",
+		"john": "4000000000",
+		"jane": "5000000000",
+		"joe": "1000000000"
+	}
 }

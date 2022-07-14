@@ -47,8 +47,8 @@
 	},
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.6.2",
-		"@taquito/signer": "^12.1.1",
-		"@taquito/taquito": "^12.1.1",
+		"@taquito/signer": "^13.0.1",
+		"@taquito/taquito": "^13.0.1",
 		"fast-glob": "^3.2.11"
 	}
 }
