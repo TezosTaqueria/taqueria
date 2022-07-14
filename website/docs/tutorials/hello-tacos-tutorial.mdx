@@ -102,6 +102,7 @@ This project requires the following plugins to be installed:
 - LIGO - Provides the compiler needed to compile the LIGO smart contract  
 - Flextesa - Provides a sandbox (Tezos node that runs on your machine) for testing
 - Taquito - Used to originate the smart contract on the sandbox or a testnet
+- Jest - Used to run the automated tests
 
 To install these plugins, run the following three commands:
 
@@ -117,21 +118,173 @@ taq install @taqueria/plugin-flextesa
 taq install @taqueria/plugin-taquito
 ```
 
+```shell
+taq install @taqueria/plugin-jest
+```
+
 :::note
-To confirm this was successful, you can run the `taq` command and ensure you see the `compile`, `originate`, and `start sandbox` tasks listed
+To confirm this was successful, you can run the `taq` command and ensure you see the `compile`, `originate`, `test`, and `start sandbox` tasks listed
 :::
 
+## Deploying the Contract to a Sandbox
 
-### Updating Tests to Use Taqueria
+Now that the project is initialized and some plugins are installed, you can deploy the contract to a local sandbox using Taqueria tasks
 
-*** Coming Soon!
+To compile the ligo contract, run the following command:
 
-### Implementing the Taqueria State API
+```shell
+taq compile
+```
 
-The Taqueria State API provides a way to access the return value of an operation such as originating a contract. Currently, the address for the deployed smart contract 
+The compiled contract will be stored in the `artifacts` directory
 
-*** Coming Soon! ***
+Next, start up a Flextesa using the default configuration by running:
 
-### Using Taqueria Environments
+```shell
+taq start sandbox local
+```
 
-*** Coming Soon! ***
+This will start a Flextesa instance running on `http://localhost:20000` and will create the accounts defined in the `accounts` property of `config.json`
+
+:::note
+This task will update the `config.json` file with the sandbox specific accounts in the `accounts` property of the `sandbox` object
+:::
+
+Once the sandbox is running, you can deploy the contract by running:
+
+```Shell
+taq originate
+```
+
+This will originate the contract using the default environment which targets the sandbox named `local` that was started above
+
+Taqueria will output the address of the originated contract to the console. Copy this address, then open the file `/app/src/App.tsx`
+
+On line 29, replace the address with the one you just copied as seen here:
+
+```js
+  const [contractAddress, setContractAddress] = useState(
+    "KT18izS1s5Hsv9tRaB8VjxdTU6MFpLviLCrS"
+  );
+```
+
+## Updating Tests to Use Taqueria
+
+The project has some Jest tests written in the `tests` folder. These tests can be refactored to use configuration values from Taqueria and the Taqueria Jest plugin to run the tests
+
+Open the `hello-tacos.test.js` file in the `tests` folder. You can see the tests reference hardcoded values:
+
+```js
+const contractCode = require("../contract/contract.json");
+
+describe("JavaScript tests for Hello Tacos contract", () => {
+  let Tezos;
+  let signer;
+  let helloTacosAddress;
+  const alice = {
+    sk: "edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq",
+    pk: "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"
+  };
+  const bob = {
+    sk: "edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt",
+    pk: "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6"
+  };
+  const rpcUrl = "http://localhost:20000";
+  ...
+```
+
+Import the Taqueria `config.json` file and assign the accounts and RPC URL to the relavent properties in the config file as shown here:
+
+```js
+const config = require('../.taq/config.json')
+
+describe("JavaScript tests for Hello Tacos contract", () => {
+  let Tezos;
+  let signer;
+  let helloTacosAddress;
+  const {alice} = config.sandbox.local.accounts
+  const {bob} = config.sandbox.local.accounts
+  const {rpcUrl} = config.sandbox.local
+  const originalNrOfTacos = 100;
+  ...
+```
+
+In Taqueria's .taq/config.json, sandbox acounts are instantited based on the accounts defined in the `accounts` property of `config.json`. Once a sandbox is started, the accounts are created and added to the `accounts` property of the `sandbox` property as seen here:
+
+```json
+"sandbox": {
+  "local": {
+    "accounts": {
+    "bob": {
+        "initialBalance": "3000000000",
+        "keys": {
+            "alias": "bob",
+            "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+            "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+            "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+        }
+    },
+    "alice": {
+        "initialBalance": "2000000000",
+        "keys": {
+            "alias": "alice",
+            "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+            "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+            "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+        }
+    },
+    "rpcUrl": "http://localhost:20000"
+  }
+}
+```
+
+As such, there are a few other references that need to be updated:
+
+### The Signer
+
+On line 18 you can see the `signer` variable is assigned the `alice` account. This is the account that will be used to sign the transaction
+
+```js
+signer = new InMemorySigner(alice.sk);
+```
+
+Change this to reference the secret key of the alice account as shown below:
+
+:::note
+Taquito requires that the unencrypted key not have a prefix
+:::
+
+```js
+signer = new InMemorySigner(alice.keys.secretKey.replace(/unencrypted:/, ''));
+```
+
+### The Transfer operation
+
+On line 20, you can see where the transfer operation is defined:
+
+```js
+const op = await Tezos.contract.transfer({ to: bob.pk, amount: 1 });
+```
+
+This also needs to reference the account in the local sandbox as seen here:
+
+```js
+const op = await Tezos.contract.transfer({ to: bob.keys.publicKey, amount: 1 });
+```
+
+## Using the Jest plugin
+
+The [Taqueria Jest plugin](/docs/plugins/jest) can be used to configure and run the tests. First you initialize the `tests` directory as a partition by running the command:
+
+```shell
+taq test tests --init
+```
+
+Now that the `tests` directory is a partition, you can run the tests by running the command:
+
+```shell
+taq test
+```
+
+You should see the tests run and pass
+
