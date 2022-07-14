@@ -57,7 +57,7 @@ const compileContract = (opts: Opts) =>
 			});
 
 const compileAll = (parsedArgs: Opts): Promise<{ contract: string; artifact: string }[]> =>
-	Promise.all(getContracts(/ligo|religo|mligo|jsligo$/, parsedArgs.config))
+	Promise.all(getContracts(/\.(ligo|religo|mligo|jsligo)$/, parsedArgs.config))
 		.then(entries => entries.map(compileContract(parsedArgs)))
 		.then(processes =>
 			processes.length > 0
