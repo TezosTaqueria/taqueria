@@ -300,7 +300,7 @@ jobs:
     needs: 
       - build-binaries
       - gather-info-for-e2e-tests
-    if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
+    if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' && !(startsWith(github.ref, 'refs/tags/v')) }}
 
     steps:
       - uses: actions/checkout@v2
