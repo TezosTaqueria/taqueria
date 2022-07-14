@@ -560,4 +560,3 @@ jobs:
           files: |
             ./release/*
           draft: true
-          
