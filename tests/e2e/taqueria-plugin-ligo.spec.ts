@@ -84,7 +84,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 
 			// 2. Register the contracts
-			await exec(`taq add-contract hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
+			// await exec(`taq add-contract hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 2. Run taq compile ${contractName}
 			await exec(`taq compile hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });

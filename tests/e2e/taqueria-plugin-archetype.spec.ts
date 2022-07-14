@@ -84,7 +84,7 @@ describe('E2E Testing for taqueria archetype plugin', () => {
 			await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
 
 			// 2. Register the contract
-			await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
+			// await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 3. Run taq compile ${contractName}
 			await exec(`taq compile fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
@@ -103,7 +103,7 @@ describe('E2E Testing for taqueria archetype plugin', () => {
 			await exec(`cp e2e/data/animal_tracking.arl ${taqueriaProjectPath}/contracts`);
 
 			// 2. Register the contracts
-			await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
+			// await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
 			await exec(`taq add-contract animal_tracking.arl`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 3. Run taq compile ${contractName}
