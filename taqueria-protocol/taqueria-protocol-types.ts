@@ -25,6 +25,7 @@ export * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 export * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 export * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 export * as SanitizedPath from '@taqueria/protocol/SanitizedPath';
+export * as ScaffoldConfig from '@taqueria/protocol/ScaffoldConfig';
 export * as SHA256 from '@taqueria/protocol/SHA256';
 export * as TaqError from '@taqueria/protocol/TaqError';
 export * as Task from '@taqueria/protocol/Task';
