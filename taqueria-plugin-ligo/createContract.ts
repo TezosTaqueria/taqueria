@@ -27,10 +27,10 @@ const getLigoTemplate = async (contractName: string, syntax: string | undefined)
 		if (ext === 'religo') return religo_template;
 		if (ext === 'jsligo') return jsligo_template;
 		return sendAsyncErr(
-			`Unable to infer LIGO syntax from ${contractName}. Please specify a LIGO syntax via the --syntax option`,
+			`Unable to infer LIGO syntax from "${contractName}". Please specify a LIGO syntax via the --syntax option`,
 		);
 	} else {
-		return sendAsyncErr(`${syntax} is not a valid syntax. Please specify a valid LIGO syntax`);
+		return sendAsyncErr(`"${syntax}" is not a valid syntax. Please specify a valid LIGO syntax`);
 	}
 };
 
