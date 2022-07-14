@@ -15,6 +15,7 @@ import {
 	swap,
 } from 'fluture';
 import { join as _joinPaths } from 'https://deno.land/std@0.115.1/path/mod.ts';
+import { bold, red, rgb24 } from 'https://deno.land/std@0.123.0/fmt/colors.ts';
 import { copy } from 'https://deno.land/std@0.128.0/streams/conversion.ts';
 import { render } from 'https://deno.land/x/eta@v1.12.3/mod.ts';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
@@ -215,6 +216,30 @@ export const inject = (deps: UtilsDependencies) => {
 		stdout.write(encoder.encode(`${message}\n`));
 	};
 
+	const outputWarning = (message: string) => {
+		return 'WARNING: ' + message;
+	};
+
+	const outputError = (message: string) => {
+		return 'ERROR: ' + message;
+	};
+
+	const output = (message: string) => {
+		return message;
+	};
+
+	const renderWarning = (message: string) => {
+		return rgb24(message, { r: 255, g: 128, b: 0 });
+	};
+
+	const renderError = (message: string) => {
+		return red(bold(message));
+	};
+
+	const render = (message: string) => {
+		return message;
+	};
+
 	const logInput = <T>(message: string) =>
 		(input: T): T => {
 			const encoder = new TextEncoder();
@@ -345,5 +370,11 @@ export const inject = (deps: UtilsDependencies) => {
 		stderr,
 		eager,
 		taqResolve,
+		outputWarning,
+		outputError,
+		output,
+		renderWarning,
+		renderError,
+		render,
 	};
 };

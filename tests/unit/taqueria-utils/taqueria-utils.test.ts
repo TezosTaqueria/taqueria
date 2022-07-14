@@ -22,6 +22,12 @@ const {
 	toPromise,
 	stdout,
 	stderr,
+	outputWarning,
+	outputError,
+	output,
+	renderWarning,
+	renderError,
+	render,
 } = inject({
 	stdout: new MockWriter(),
 	stderr: new MockWriter(),
@@ -225,4 +231,40 @@ Deno.test('execText() can execute in a different working directory', async () =>
 	assertEquals(retval, 0);
 	assert(stdout.toString().includes('tmp'));
 	assertEquals(stderr.toString(), '');
+});
+
+Deno.test('outputWaring() will return message with WARNING: prefix', () => {
+	const msg = 'message';
+	const result = outputWarning(msg);
+	assertEquals(result, `WARNING: ${msg}`);
+});
+
+Deno.test('outputError() will return message with ERROR: prefix', () => {
+	const msg = 'message';
+	const result = outputError(msg);
+	assertEquals(result, `ERROR: ${msg}`);
+});
+
+Deno.test('output() will return plain message', () => {
+	const msg = 'message';
+	const result = output(msg);
+	assertEquals(result, `${msg}`);
+});
+
+Deno.test('renderWaring() will return message in orange', () => {
+	const msg = 'message';
+	const result = renderWarning(msg);
+	assertEquals(result, `[38;2;255;128;0m${msg}[39m`);
+});
+
+Deno.test('renderError() will return message in bold and red', () => {
+	const msg = 'message';
+	const result = renderError(msg);
+	assertEquals(result, `[31m[1m${msg}[22m[39m`);
+});
+
+Deno.test('render() will return plain message', () => {
+	const msg = 'message';
+	const result = render(msg);
+	assertEquals(result, `${msg}`);
 });
