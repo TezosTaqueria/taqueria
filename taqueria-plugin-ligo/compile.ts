@@ -56,14 +56,13 @@ const compileContract = (opts: Opts) =>
 				});
 			});
 
-const compileAll = (parsedArgs: Opts): Promise<{ contract: string; artifact: string }[]> =>
+const compileAll = (parsedArgs: Opts) =>
 	Promise.all(getContracts(/\.(ligo|religo|mligo|jsligo)$/, parsedArgs.config))
 		.then(entries => entries.map(compileContract(parsedArgs)))
-		.then(processes =>
-			processes.length > 0
-				? processes
-				: [{ contract: 'None found', artifact: 'N/A' }]
-		)
+		.then(processes => {
+			if (processes.length > 0) return processes;
+			return [];
+		})
 		.then(promises => Promise.all(promises));
 
 export const compile = (parsedArgs: Opts) => {
@@ -72,7 +71,9 @@ export const compile = (parsedArgs: Opts) => {
 			.then(result => [result])
 		: compileAll(parsedArgs)
 			.then(results => {
-				if (results.length === 0) sendErr('No contracts found to compile.');
+				if (results.length === 0) {
+					sendErr('No contracts found to compile. Have you run "taq add-contract [sourceFile]" ?');
+				}
 				return results;
 			});
 
