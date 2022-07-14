@@ -1,4 +1,3 @@
-import { EphemeralState } from '@taqueria/protocol/EphemeralState';
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { TaqError } from '@taqueria/protocol/TaqError';
 import { readFile } from 'fs/promises';
@@ -57,6 +56,7 @@ const shouldOutput = (currentLogLevel: OutputLevels, configuredLogLevel: OutputL
 export type Output = {
 	outputChannel: api.OutputChannel;
 	logLevel: OutputLevels;
+	logChannel: api.OutputChannel;
 };
 
 type VSCodeAPI = typeof api;
@@ -71,14 +71,18 @@ export const sanitizeDeps = (deps?: InjectedDependencies) =>
 		: { vscode: api };
 
 export const showOutput = (output: Output) => {
+	return (data: string) => {
+		output.outputChannel.appendLine(data);
+		output.outputChannel.show();
+	};
+};
+
+export const showLog = (output: Output) => {
 	return (currentOutputLevel: OutputLevels, data: string) => {
 		if (!shouldOutput(currentOutputLevel, output.logLevel)) {
 			return;
 		}
-		output.outputChannel.appendLine(data);
-		if (currentOutputLevel === OutputLevels.output) {
-			output.outputChannel.show();
-		}
+		output.logChannel.appendLine(data);
 	};
 };
 
@@ -113,11 +117,13 @@ export class VsCodeHelper {
 		const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
 		const logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
 		const outputChannel = vscode.window.createOutputChannel('Taqueria');
+		const logChannel = vscode.window.createOutputChannel('TaqueriaLogs');
 		const output = {
 			outputChannel,
+			logChannel,
 			logLevel,
 		};
-		showOutput(output)(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
+		showLog(output)(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
 
 		const i18n = await loadI18n();
 
@@ -140,35 +146,36 @@ export class VsCodeHelper {
 		return showOutput(this.output);
 	}
 
-	showOutput(currentOutputLevel: OutputLevels, data: string) {
-		return showOutput(this.output)(currentOutputLevel, data);
+	getLog() {
+		return showLog(this.output);
+	}
+
+	showOutput(data: string) {
+		return showOutput(this.output)(data);
+	}
+
+	showLog(currentOutputLevel: OutputLevels, data: string) {
+		return showLog(this.output)(currentOutputLevel, data);
 	}
 
 	exposeInitTask() {
 		this.registerCommand(Commands.init, async () => {
-			try {
-				const uri = await this.getFolderForInitOrScaffold('init');
-				if (uri === undefined) {
-					return;
-				}
-				const pathToTaq = await this.getTaqBinPath();
-				const result = await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), undefined)(`init ${uri.path}`);
-				this.showOutput(OutputLevels.info, result);
-				try {
-					await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), uri.path as Util.PathToDir)(``);
-				} catch {
-					// Ignored
-				}
-				await this.updateCommandStates(uri.path as Util.PathToDir);
-				this.vscode.window.showInformationMessage("Project taq'fied!", uri.path);
-				this.vscode.workspace.updateWorkspaceFolders(0, undefined, { uri });
-			} catch (e: unknown) {
-				this.notifyAndLogError('Error while trying to Taq`ify the folder.', e);
+			const uri = await this.getFolderForInitOrScaffold('init');
+			if (uri === undefined) {
+				return;
 			}
+			await this.proxyToTaqAndShowOutput(`init ${uri.path}`, 'init', uri.path as Util.PathToDir, false);
+			try {
+				await this.proxyToTaq(``, uri.path as Util.PathToDir);
+			} catch {
+				// Ignored
+			}
+			await this.updateCommandStates(uri.path as Util.PathToDir);
+			this.vscode.workspace.updateWorkspaceFolders(0, undefined, { uri });
 		});
 	}
 
-	async exposeScaffoldTask() {
+	exposeScaffoldTask() {
 		this.registerCommand(Commands.scaffold, async () => {
 			const availableScaffolds: { name: string; url: string }[] = await this.getAvailableScaffolds();
 			const projectUri = await this.getFolderForInitOrScaffold('scaffold');
@@ -187,18 +194,10 @@ export class VsCodeHelper {
 			if (scaffoldUrl === undefined) {
 				return;
 			}
-			const pathToTaq = await this.getTaqBinPath();
 			const projectDir = await Util.makeDir(projectUri.path, this.i18);
-			try {
-				await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(
-					`scaffold ${scaffoldUrl} ${projectDir}`,
-				);
-				await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(``);
-				await this.updateCommandStates(projectDir);
-				this.vscode.window.showInformationMessage('Scaffold completed!', projectUri.path);
-			} catch (e: unknown) {
-				this.notifyAndLogError('Error while scaffolding.', e);
-			}
+			await this.proxyToTaqAndShowOutput(`scaffold ${scaffoldUrl} ${projectDir}`, 'scaffold', projectDir, false);
+			await this.proxyToTaq(``, projectDir);
+			await this.updateCommandStates(projectDir);
 		});
 	}
 
@@ -239,8 +238,7 @@ export class VsCodeHelper {
 		if (uris.length === 1) {
 			return uris[0];
 		} else {
-			this.showOutput(
-				OutputLevels.warn,
+			this.vscode.window.showWarningMessage(
 				`Error: running ${taskTitle} with multiple open folders is not yet implemented.`,
 			);
 			return undefined;
@@ -275,7 +273,7 @@ export class VsCodeHelper {
 		return await Util.makeDir(selectedDir, this.i18);
 	}
 
-	async getPathForPluginInstallation(pluginName: string) {
+	async getPathForPluginSource(pluginName: string) {
 		if (pluginName && process.env.InstallDevPlugins === 'true') {
 			const pathToTaq = await this.getTaqBinPath();
 			const taqFolder = path.dirname(pathToTaq);
@@ -400,19 +398,8 @@ export class VsCodeHelper {
 			if (!pluginName) {
 				return;
 			}
-			pluginName = await this.getPathForPluginInstallation(pluginName);
-			try {
-				const pathToTaq = await this.getTaqBinPath();
-				const message = await Util.proxyToTaq(
-					pathToTaq,
-					this.i18,
-					(level, log) => this.showOutput(level, log),
-					projectDir,
-				)(`install ${pluginName}`);
-				this.notify(message);
-			} catch (e: unknown) {
-				this.notifyAndLogError('Error while trying to install plugin.', e);
-			}
+			pluginName = await this.getPathForPluginSource(pluginName);
+			await this.proxyToTaqAndShowOutput(`install ${pluginName}`, 'install', projectDir, false);
 		});
 	}
 
@@ -429,15 +416,7 @@ export class VsCodeHelper {
 			if (!pluginName) {
 				return;
 			}
-			try {
-				const pathToTaq = await this.getTaqBinPath();
-				const message = await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(
-					`uninstall ${pluginName}`,
-				);
-				this.notify(message);
-			} catch (e: unknown) {
-				this.notifyAndLogError('Error while trying to uninstall plugin', e);
-			}
+			await this.proxyToTaqAndShowOutput(`uninstall ${pluginName}`, 'uninstall', projectDir, false);
 		});
 	}
 
@@ -474,16 +453,12 @@ export class VsCodeHelper {
 					return;
 				}
 			}
-			try {
-				const pathToTaq = await this.getTaqBinPath();
-				const message = await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(
-					`originate -e ${environmentName} ${fileName ?? ''}`,
-				);
-				this.showOutput(OutputLevels.output, message);
-				this.notify('Origination Succeeded');
-			} catch (e: unknown) {
-				this.notifyAndLogError('Error occurred while trying to originate:', e);
-			}
+			await this.proxyToTaqAndShowOutput(
+				`originate -e ${environmentName} ${fileName ?? ''}`,
+				'originate',
+				projectDir,
+				true,
+			);
 		});
 	}
 
@@ -494,9 +469,9 @@ export class VsCodeHelper {
 	async getTaqBinPath() {
 		let providedPath = this.vscode.workspace.getConfiguration('taqueria').get('path', '');
 		if (!providedPath || (providedPath as string).length === 0) {
-			providedPath = await Util.findTaqBinary(this.i18, this.getOutput());
+			providedPath = await Util.findTaqBinary(this.i18, this.getLog());
 		}
-		return Util.makePathToTaq(this.i18, this.getOutput())(providedPath);
+		return Util.makePathToTaq(this.i18, this.getLog())(providedPath);
 	}
 
 	async showProgressAndProxyToTaq(progressTitle: string, projectDir: Util.PathToDir, command: string) {
@@ -507,7 +482,7 @@ export class VsCodeHelper {
 			title: progressTitle,
 		}, async progress => {
 			progress.report({ increment: 0 });
-			const result = Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(command);
+			const result = this.proxyToTaqAndShowOutput(command, progressTitle, projectDir, false);
 			progress.report({ increment: 100 });
 			return result;
 		});
@@ -515,7 +490,16 @@ export class VsCodeHelper {
 
 	registerCommand(cmdId: string, callback: (...args: any[]) => any) {
 		this.context.subscriptions.push(
-			this.vscode.commands.registerCommand(cmdId, callback),
+			this.vscode.commands.registerCommand(cmdId, async (...args: any[]) => {
+				try {
+					const result = callback(...args);
+					if (result.then) {
+						await result;
+					}
+				} catch (e: any) {
+					this.notifyAndLogError(`Error while running ${cmdId}`, e);
+				}
+			}),
 		);
 	}
 
@@ -532,24 +516,43 @@ export class VsCodeHelper {
 			.then(_ => Promise.resolve()) as Promise<void>;
 	}
 
-	notifyAndLogError(message: string, err: TaqVsxError | TaqError | Error | unknown) {
-		this.vscode.window.showErrorMessage(`${message}\nPlease check out the output window for diagnostics information`);
-		this.logAllNestedErrors(err);
+	async workspaceHasTaqFolder() {
+		if (this.folders.length === 0) {
+			return false;
+		}
+		const folder = this.folders[0];
+		try {
+			await Util.makeDir(path.join(folder.uri.path, '.taq'), this.i18);
+			return true;
+		} catch (_: unknown) {
+			return false;
+		}
 	}
 
-	logAllNestedErrors(err: TaqVsxError | TaqError | Error | unknown) {
+	async notifyAndLogError(message: string, err: TaqVsxError | TaqError | Error | unknown) {
+		const hasTaqFolder = await this.workspaceHasTaqFolder();
+		if (hasTaqFolder) {
+			this.vscode.window.showErrorMessage(`${message}\nPlease check out the output window for diagnostics information`);
+		}
+		this.logAllNestedErrors(err, !hasTaqFolder);
+	}
+
+	logAllNestedErrors(err: TaqVsxError | TaqError | Error | unknown, suppressWindow?: boolean | undefined) {
+		const outputLevel = suppressWindow ? OutputLevels.debug : OutputLevels.error;
+		if (!err) {
+			return;
+		}
 		try {
-			if (!err) {
+			if (!shouldOutput(outputLevel, this.output.logLevel)) {
 				return;
 			}
-			if (!shouldOutput(OutputLevels.error, this.output.logLevel)) {
-				return;
+			this.output.logChannel.appendLine(JSON.stringify(err, undefined, 4));
+			if (!suppressWindow) {
+				this.output.logChannel.show();
 			}
-			this.output.outputChannel.appendLine(JSON.stringify(err, undefined, 4));
-			this.output.outputChannel.show();
 		} catch {
 			try {
-				this.output.outputChannel.appendLine(`unknown error occurred while trying to log an error.`);
+				this.output.logChannel.appendLine(`unknown error occurred while trying to log an error.`);
 			} catch {
 				// at this point, we cannot do anything
 			}
@@ -589,16 +592,12 @@ export class VsCodeHelper {
 					}
 				}
 			}
-			const pathToTaq = await this.getTaqBinPath();
-			try {
-				const result = await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(
-					`typecheck -s ${sandboxName} ${fileName ?? ''}`,
-				);
-				this.showOutput(OutputLevels.output, result);
-			} catch (e: unknown) {
-				this.notifyAndLogError('Errors during typecheck', e);
-			}
-			this.notify('Type check successful');
+			await this.proxyToTaqAndShowOutput(
+				`typecheck -s ${sandboxName} ${fileName ?? ''}`,
+				'typecheck',
+				projectDir,
+				true,
+			);
 		});
 	}
 
@@ -608,11 +607,60 @@ export class VsCodeHelper {
 			: [];
 	}
 
+	async proxyToTaqAndShowOutput(
+		taskWithArgs: string,
+		taskTitle: string,
+		projectDir: Util.PathToDir | undefined,
+		logStandardErrorToOutput: boolean | undefined,
+	) {
+		try {
+			const result = await this.proxyToTaq(taskWithArgs, projectDir);
+			if (result.executionError) {
+				this.logAllNestedErrors(result.executionError);
+			}
+			if (result.standardError) {
+				if (logStandardErrorToOutput) {
+					this.showOutput(result.standardError);
+				} else {
+					this.showLog(OutputLevels.warn, result.standardError);
+				}
+			}
+			if (result.standardOutput) {
+				this.showOutput(result.standardOutput);
+			}
+			if (result.executionError || result.standardError) {
+				this.vscode.window.showWarningMessage(
+					`Warnings while running ${taskTitle}. Please check the Taqueria Log window for diagnostics information.`,
+				);
+			} else {
+				this.vscode.window.showInformationMessage(`Successfully executed ${taskTitle}.`);
+			}
+		} catch (e: unknown) {
+			this.vscode.window.showErrorMessage(
+				`Error while running ${taskTitle}. Please check the Taqueria Log window for diagnostics information.`,
+			);
+			this.logAllNestedErrors(e);
+		}
+	}
+
+	async proxyToTaq(taskWithArgs: string, projectDir?: Util.PathToDir | undefined) {
+		const pathToTaq = await this.getTaqBinPath();
+		if (projectDir) {
+			return await Util.execCmd(
+				`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`,
+				this.getLog(),
+				projectDir,
+			);
+		} else {
+			return await Util.execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`, this.getLog());
+		}
+	}
+
 	exposeTaqTaskAsCommandWithOptionalFileArgument(
 		cmdId: string,
 		taskWithArgs: string,
 		outputTo: 'output' | 'notify',
-		otherNotification?: string,
+		taskTitle: string,
 		projectDir?: Util.PathToDir,
 	) {
 		this.registerCommand(
@@ -622,15 +670,7 @@ export class VsCodeHelper {
 				if (item) {
 					taskWithArgs = `${taskWithArgs} ${item.fileName}`;
 				}
-				const result = await Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(taskWithArgs);
-				if (outputTo === 'output') {
-					this.showOutput(OutputLevels.output, result);
-				} else {
-					this.notify(result);
-				}
-				if (otherNotification) {
-					this.notify(otherNotification);
-				}
+				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitle, projectDir, outputTo === 'output');
 			},
 		);
 	}
@@ -639,21 +679,14 @@ export class VsCodeHelper {
 		cmdId: string,
 		taskWithArgs: string,
 		outputTo: 'output' | 'notify',
-		otherNotification?: string,
+		taskTitle: string,
 		projectDir?: Util.PathToDir,
 	) {
-		this.exposeTaskAsCommand(
+		this.registerCommand(
 			cmdId,
-			(pathToTaq: Util.PathToTaq) =>
-				Util.proxyToTaq(pathToTaq, this.i18, this.getOutput(), projectDir)(taskWithArgs)
-					.then(stdout =>
-						outputTo === 'output'
-							? this.showOutput(OutputLevels.output, stdout)
-							: this.notify(stdout)
-					)
-					.then(_ => {
-						if (otherNotification) this.notify(otherNotification);
-					}),
+			async () => {
+				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitle, projectDir, outputTo === 'output');
+			},
 		);
 	}
 
@@ -680,39 +713,27 @@ export class VsCodeHelper {
 		otherNotification?: string,
 	) {
 		this.registerCommand(cmdId, async (sandbox?: SandboxTreeItem | undefined) => {
-			try {
-				let sandboxName = sandbox?.label;
-				if (!sandboxName) {
-					const taqifiedDir = await Util.TaqifiedDir.create(projectDir, this.i18);
-					const sandboxes = this.getSandboxNames(taqifiedDir);
-					sandboxName = await this.vscode.window.showQuickPick(sandboxes, {
-						canPickMany: false,
-						ignoreFocusOut: false,
-						placeHolder: 'Sandbox name',
-						title: 'Select a sandbox',
-					});
-				}
-				if (!sandboxName) {
-					return;
-				}
-				const result = await this.showProgressAndProxyToTaq(progressTitle, projectDir, `${taskName} ${sandboxName}`);
-				if (outputTo === 'output') {
-					this.showOutput(OutputLevels.output, result);
-				} else {
-					this.notify(result);
-				}
-				if (otherNotification) {
-					this.notify(otherNotification);
-				}
-			} catch (e: unknown) {
-				this.notifyAndLogError(`Error while running ${taskName}.`, e);
+			let sandboxName = sandbox?.label;
+			if (!sandboxName) {
+				const taqifiedDir = await Util.TaqifiedDir.create(projectDir, this.i18);
+				const sandboxes = this.getSandboxNames(taqifiedDir);
+				sandboxName = await this.vscode.window.showQuickPick(sandboxes, {
+					canPickMany: false,
+					ignoreFocusOut: false,
+					placeHolder: 'Sandbox name',
+					title: 'Select a sandbox',
+				});
 			}
+			if (!sandboxName) {
+				return;
+			}
+			await this.showProgressAndProxyToTaq(progressTitle, projectDir, `${taskName} ${sandboxName}`);
 		});
 	}
 
 	async updateCommandStates(projectDir?: Util.PathToDir | undefined) {
 		if (projectDir === undefined) {
-			this.showOutput(OutputLevels.debug, 'No folder is open, enabling init and scaffold');
+			this.showLog(OutputLevels.debug, 'No folder is open, enabling init and scaffold');
 			this.vscode.commands.executeCommand(
 				'setContext',
 				'@taqueria-state/enable-init-scaffold',
@@ -722,15 +743,15 @@ export class VsCodeHelper {
 		}
 		this.dataProviders.forEach(dataProvider => dataProvider.refresh());
 
-		this.showOutput(OutputLevels.debug, 'Project config changed, updating command states...');
+		this.showLog(OutputLevels.debug, 'Project config changed, updating command states...');
 		let taqFolderFound: boolean;
 		try {
 			await Util.makeDir(join(projectDir, '.taq'), this.i18);
-			this.showOutput(OutputLevels.debug, 'Taq folder is found');
+			this.showLog(OutputLevels.debug, 'Taq folder is found');
 			taqFolderFound = true;
 		} catch {
 			taqFolderFound = false;
-			this.showOutput(OutputLevels.debug, 'Taq folder not found');
+			this.showLog(OutputLevels.debug, 'Taq folder not found');
 		}
 		let enableAllCommands: boolean;
 		let config: Util.TaqifiedDir | null;
@@ -743,10 +764,10 @@ export class VsCodeHelper {
 			// We don't want to show messages to users when they are working with non-taqified folders (Except when output level is set to info or more verbose)
 			if (shouldOutput(OutputLevels.info, this.output.logLevel) || taqFolderFound) {
 				this.vscode.commands.executeCommand('setContext', '@taqueria-state/enable-all-commands', true);
-				this.showOutput(OutputLevels.error, 'Error: Could not update command states:');
+				this.showLog(OutputLevels.error, 'Error: Could not update command states:');
 				this.logAllNestedErrors(e);
 				if (taqFolderFound) {
-					this.showOutput(
+					this.showLog(
 						OutputLevels.warn,
 						'The Taqueria config for this project could not be loaded. All Taqueria commands will be temporarily enabled.\nPlease check for errors in the .taq/config.json file\n',
 					);
@@ -757,7 +778,7 @@ export class VsCodeHelper {
 		const availablePluginsNotInstalled = config?.config?.plugins
 			? availablePlugins.filter(name => config?.config.plugins?.findIndex(p => p.name === name) === -1)
 			: availablePlugins;
-		this.showOutput(
+		this.showLog(
 			OutputLevels.debug,
 			`@taqueria-state/enable-init-scaffold: ${enableAllCommands || !config?.config}`,
 		);
@@ -767,7 +788,7 @@ export class VsCodeHelper {
 			enableAllCommands || !config?.config,
 		);
 
-		this.showOutput(
+		this.showLog(
 			OutputLevels.debug,
 			`@taqueria-state/enable-install-uninstall: ${enableAllCommands || !!config?.config}`,
 		);
@@ -777,7 +798,7 @@ export class VsCodeHelper {
 			enableAllCommands || !!config?.config,
 		);
 
-		this.showOutput(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config?.config}`);
+		this.showLog(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config?.config}`);
 		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config?.config);
 
 		this.vscode.commands.executeCommand(
@@ -791,10 +812,10 @@ export class VsCodeHelper {
 			enableAllCommands ? 1 : availablePluginsNotInstalled.length,
 		);
 		const plugins = this.getWellKnownPlugins();
-		this.showOutput(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
+		this.showLog(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
 		for (const plugin of plugins) {
 			const found = config?.config?.plugins?.find(item => item.name === plugin) !== undefined;
-			this.showOutput(OutputLevels.debug, `plugins ${plugin}: ${found}`);
+			this.showLog(OutputLevels.debug, `plugins ${plugin}: ${found}`);
 			this.vscode.commands.executeCommand('setContext', plugin, enableAllCommands || found);
 		}
 	}
@@ -803,9 +824,9 @@ export class VsCodeHelper {
 		projectDir: Util.PathToDir,
 		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher[]) => void,
 	) {
-		this.showOutput(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
+		this.showLog(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
 		addConfigWatcherIfNotExists(projectDir, () => {
-			this.showOutput(OutputLevels.info, `Adding watcher for directory ${projectDir}.`);
+			this.showLog(OutputLevels.info, `Adding watcher for directory ${projectDir}.`);
 			try {
 				this.updateCommandStates(projectDir);
 			} catch (error: any) {

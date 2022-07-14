@@ -39,8 +39,8 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	const helper = await VsCodeHelper.construct(context, deps);
 
 	// Add built-in tasks for Taqueria
-	await helper.exposeInitTask();
-	await helper.exposeScaffoldTask();
+	helper.exposeInitTask();
+	helper.exposeScaffoldTask();
 	await helper.exposeInstallTask();
 	await helper.exposeUninstallTask();
 	helper.exposeTaqTaskAsCommand(
@@ -65,21 +65,21 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 					COMMAND_PREFIX + 'compile_smartpy',
 					'--plugin smartpy compile',
 					'output',
-					'Compilation successful.',
+					'compile',
 					projectDir,
 				);
 				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
 					COMMAND_PREFIX + 'compile_ligo',
 					'--plugin ligo compile',
 					'output',
-					'Compilation successful.',
+					'compile',
 					projectDir,
 				);
 				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
 					COMMAND_PREFIX + 'compile_archetype',
 					'--plugin archetype compile',
 					'output',
-					'Compilation successful.',
+					'compile',
 					projectDir,
 				);
 				helper.exposeTaqTaskAsCommand(

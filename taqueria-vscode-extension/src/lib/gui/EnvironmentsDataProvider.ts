@@ -24,7 +24,7 @@ export class EnvironmentsDataProvider implements vscode.TreeDataProvider<Environ
 				config = await Util.TaqifiedDir.create(pathToDir, this.helper.i18n);
 			} catch (e: any) {
 				config = null;
-				this.helper.notifyAndLogError('Error while loading config, environments list will fail to populate', e);
+				await this.helper.notifyAndLogError('Error while loading config, environments list will fail to populate', e);
 			}
 		}
 

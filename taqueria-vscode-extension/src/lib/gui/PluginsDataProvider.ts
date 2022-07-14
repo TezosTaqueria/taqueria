@@ -24,7 +24,7 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeIt
 				config = await Util.TaqifiedDir.create(pathToDir, this.helper.i18n);
 			} catch (e: any) {
 				config = null;
-				this.helper.notifyAndLogError('Error while loading config, installed plugins will fail to populate', e);
+				await this.helper.notifyAndLogError('Error while loading config, installed plugins will fail to populate', e);
 			}
 		}
 
