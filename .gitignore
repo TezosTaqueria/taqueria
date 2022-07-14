@@ -151,6 +151,8 @@ tests/coverage
 /taqueria-state/node/*.d.ts
 /taqueria-plugin-jest/index.js.map
 /taqueria-plugin-jest/index.js
+/taqueria-plugin-metadata/index.js.map
+/taqueria-plugin-metadata/index.js
 
 # VS Code Extension
 /taqueria-vscode-extension/out

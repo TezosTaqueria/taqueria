@@ -24,7 +24,7 @@ const createContractMetadata = async (contractName: undefined | string): Promise
 	// Basic Tzip-16 contract metadata
 	const contractMetadata = {
 		version: 'v1.0.0',
-		name: 'Taqueria Metadata Plugin',
+		name: contractName,
 		description: 'This is a great project!',
 		authors: [
 			'ECAD Labs',
