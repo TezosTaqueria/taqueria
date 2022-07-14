@@ -1,40 +1,48 @@
-# Taqueria docker action
+---
+title: Taqueria GitHub Action
+---
 
-Taqueria has a GitHub action that helps simplify and standardize the use of [Taqueria](https://taqueria.io/) in GitHub workflows
+Taqueria has a GitHub action that helps simplify and standardize the use of in GitHub workflows. The action provides a Taqueria environment in a Docker container that can be used to run Taqueria commands in automated tests and CI/CD pipelines 
+
+You can find the action on the GitHub Marketplace [here](https://github.com/marketplace/actions/taqueria-actions)
+
+The action GitHub repo for the project is located [here](https://github.com/ecadlabs/taqueria-github-action)
+
+You can see the action being used on the [Taco Shop Scaffold](https://github.com/ecadlabs/taqueria-scaffold-taco-shop)
 
 ## Inputs
 
 ### `project_directory`
 
-The name of the project directory. If nothing is specified the repository root directory is used.
+The name of the project directory. If nothing is specified the repository root directory is used
 
 ### `task`
 
-The name of a specific task to run. This input is mainly used for testing purposes.
+The name of a specific task to run. This input is mainly used for testing purposes
 
 ### `plugins`
 
-A comma separated list of plugins to install.
+A comma separated list of plugins to install
 
 ### `sandbox_name`
 
-The name of the Flextesa sandbox to use. A sandbox will only be created if this input is specified. When running the sandbox, the action will automatically change the value of `rpcUrl` for the sandbox in `config.json`. This is to enable origination to the local sandbox in CI.
+The name of the Flextesa sandbox to use. A sandbox will only be created if this input is specified. When running the sandbox, the action will automatically change the value of `rpcUrl` for the sandbox in `config.json`. This is to enable origination to the local sandbox in CI
 
 ### `compile_command`
 
-The compile command used to compile the contracts.
+The compile command used to compile the contracts
 
 ### `originate`
 
-When set to true, contracts will be originated to the environment defined with the `environment` variable (leave empty for default). This option makes use of the `taquito` plugin so please make sure to install it.
+When set to true, contracts will be originated to the environment defined with the `environment` variable (leave empty for default). This option makes use of the `taquito` plugin so please make sure to install it
 
 ### `tests`
 
-When set to true, all tests in the `tests` directory will be run using the Jest plugin. This option makes use of the `jest` plugin so please make sure to install it. 
+When set to true, all tests in the `tests` directory will be run using the Jest plugin. This option makes use of the `jest` plugin so please make sure to install it
 
 ### `environment`
 
-This input is used to select the configured environment for `taqueria` to originate to. The default is set to `development`.
+This input is used to select the configured environment for `taqueria` to originate to. The default is set to `development`
 
 ## Example usage
 
