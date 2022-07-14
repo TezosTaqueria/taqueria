@@ -39,13 +39,6 @@ This project is a full stack dapp which includes:
 
 This tutorial will walk you through the process of scaffolding the `taqueria-scaffold-quickstart` project right from Taqueria and getting the project up and running on your local machine, and give you an understanding of how the project is structured so you can start modifying it to suit your needs
 
-Things you will accomplish:
-- Scaffold the `taqueria-scaffold-quickstart` project from the CLI
-- Install dependencies, build, and start up the app
-- Understand how Taqueria plugins are used implicitly
-- Learn how the Taqueria Type Generator plugin works with Taquito on the front end
-- Connect a wallet via Beacon, and operate the dapp
-
 ## Requirements
 
 To successfully follow this tutorial, you must ensure that:
@@ -65,7 +58,7 @@ The command for the scaffold task has this structure: `taq scaffold <repo-url> [
 
 Run the following to scaffold the `taqueria-scaffold-quickstart` project into the `quickstart-project` directory:
 ```bash
-taq scaffold https://github.com/ecadlabs/taqueria-scaffold-quickstart quickstart-project 
+taq scaffold https://github.com/ecadlabs/taqueria-scaffold-quickstart
 ```
 
 ## Understanding the Project
@@ -168,7 +161,7 @@ As you can see, each project has a different set of dependencies, scripts, and s
 
 #### Root Project Settings
 
-The `package.json` file in the project root is used to bundle both apps together into a single node app that can be run from a single command. It contains only the scripts needed to run both apps and looks like this:
+The `package.json` file in the project root is used to bundle both apps together into a single node app that can be run from a single command. It changes directories looks like this:
 ```json
 {
   "private": true,
@@ -209,22 +202,3 @@ If you inspect the scripts in `/taqueria/package.json`, you will see the followi
 2. Compile the ligo contract: `taq compile` - uses the LIGO Taqueria plugin to compile the smart contract located in `/taqueria/contracts`, outputing compiled Michelson `.tz` files in the `/artifacts` directory
 3. Generates TS types: `taq generate types` - uses the Taqueria Type Generator plugin to generate TS types from the compiled smart contract, and install them into the React app (`/app/types`) for use with Taquito in the frontend
 
-#### Compiling the Smart Contract
-
-#### Type Generation
-
-
-
-## Using the Dapp 
-
-### Connecting a Wallet
-
-### Interacting with the Smart Contract
-
-
-
-## How Generated Types are Applied 
-Detail:
-- running from taq
-- understanding artifacts
-- importing and using in the front-end (Using types in Taquito calls)
