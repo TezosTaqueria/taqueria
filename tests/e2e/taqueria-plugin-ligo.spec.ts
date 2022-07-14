@@ -65,10 +65,13 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 
-			// 2. Run taq compile ${contractName}
+			// 2. Register the contracts
+			await exec(`taq add-contract hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
+
+			// 3. Run taq compile ${contractName}
 			await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
 
-			// 3. Verify that compiled michelson version has been generated
+			// 4. Verify that compiled michelson version has been generated
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
@@ -79,6 +82,9 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		try {
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
+
+			// 2. Register the contracts
+			await exec(`taq add-contract hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 2. Run taq compile ${contractName}
 			await exec(`taq compile hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
@@ -96,10 +102,14 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos-one.mligo`);
 			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos-two.mligo`);
 
-			// 2. Run taq compile ${contractName}
+			// 2. Register the contracts
+			await exec(`taq add-contract hello-tacos-one.mligo`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq add-contract hello-tacos-two.mligo`, { cwd: `./${taqueriaProjectPath}` });
+
+			// 3. Run taq compile ${contractName}
 			await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
 
-			// 3. Verify that compiled michelson version for both contracts has been generated
+			// 4. Verify that compiled michelson version for both contracts has been generated
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-one.tz`);
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos-two.tz`);
 		} catch (error) {
@@ -125,6 +135,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 	test('Verify that taqueria ligo plugin emits error and yet displays table if contract is invalid', async () => {
 		try {
 			await exec(`cp e2e/data/invalid-contract.mligo ${taqueriaProjectPath}/contracts`);
+			await exec(`taq add-contract invalid-contract.mligo`, { cwd: `./${taqueriaProjectPath}` });
 
 			const { stdout, stderr } = await exec(`taq compile invalid-contract.mligo`, { cwd: `./${taqueriaProjectPath}` });
 
