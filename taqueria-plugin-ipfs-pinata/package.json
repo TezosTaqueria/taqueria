@@ -1,0 +1,47 @@
+{
+	"name": "@taqueria/plugin-ipfs-pinata",
+	"version": "0.6.5",
+	"description": "A plugin for Taqueria providing ipfs publishing and pinning using the Pinata service",
+	"keywords": [
+		"taqueria",
+		"plugin",
+		"jest",
+		"testing",
+		"tdd",
+		"ecad",
+		"ecadlabs",
+		"tezos"
+	],
+	"targets": {
+		"default": {
+			"source": "./index.ts",
+			"distDir": "./",
+			"context": "node",
+			"isLibrary": true,
+			"outputFormat": "esmodule"
+		}
+	},
+	"scripts": {
+		"build": "npx tsc -noEmit -p ./tsconfig.json && npx parcel build --no-cache 2>&1"
+	},
+	"author": "ECAD Labs",
+	"license": "Apache-2.0",
+	"type": "module",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ecadlabs/taqueria.git",
+		"directory": "taqueria-plugin-ipfs-pinata"
+	},
+	"dependencies": {
+		"@taqueria/node-sdk": "^0.6.2",
+		"dotenv": "^16.0.0",
+		"form-data": "^4.0.0",
+		"ipfs-only-hash": "^4.0.0",
+		"node-fetch": "^2.6.7"
+	},
+	"devDependencies": {
+		"@types/node-fetch": "^2.6.1",
+		"parcel": "^2.6.0",
+		"typescript": "4.7.2"
+	}
+}
