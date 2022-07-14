@@ -286,7 +286,7 @@
 				},
 				{
 					"command": "taqueria.typecheck",
-					"when": "view == taqueria-sandboxes || view != stopped",
+					"when": "view == taqueria-sandboxes && view != stopped",
 					"group": "inline"
 				}
 			]

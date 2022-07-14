@@ -275,6 +275,17 @@ export class VsCodeHelper {
 		return await Util.makeDir(selectedDir, this.i18);
 	}
 
+	async getPathForPluginInstallation(pluginName: string) {
+		if (pluginName && process.env.InstallDevPlugins === 'true') {
+			const pathToTaq = await this.getTaqBinPath();
+			const taqFolder = path.dirname(pathToTaq);
+			const pluginFolder = pluginName.replace('@', '').replace('/', '-');
+			const pluginPath = path.join(taqFolder, pluginFolder);
+			return pluginPath;
+		}
+		return pluginName;
+	}
+
 	async promptForPluginInstallation(
 		projectDir: Util.PathToDir,
 	) {
@@ -283,7 +294,7 @@ export class VsCodeHelper {
 		const availablePluginsNotInstalled = config.config?.plugins
 			? availablePlugins.filter(name => config.config.plugins?.findIndex(p => p.name === name) === -1)
 			: availablePlugins;
-		const pluginName = this.vscode.window.showQuickPick(availablePluginsNotInstalled, {
+		const pluginName = await this.vscode.window.showQuickPick(availablePluginsNotInstalled, {
 			canPickMany: false,
 			ignoreFocusOut: false,
 			placeHolder: 'Plugin name',
@@ -389,6 +400,7 @@ export class VsCodeHelper {
 			if (!pluginName) {
 				return;
 			}
+			pluginName = await this.getPathForPluginInstallation(pluginName);
 			try {
 				const pathToTaq = await this.getTaqBinPath();
 				const message = await Util.proxyToTaq(

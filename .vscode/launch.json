@@ -13,7 +13,8 @@
 			],
 			"preLaunchTask": "build-and-watch-vscode",
 			"env": {
-				"LogLevel": "warn"
+				"LogLevel": "warn",
+				"InstallDevPlugins": "false"
 			}
 		},
 		{
