@@ -61,7 +61,9 @@ The sandboxes property holds a comma separated list of named sandboxes. The sand
 You must declare initial storage values for each contract you are originating. Trying to originate a contract to an environment that does not have a storage value for that contract will result in an error
 :::
 
-The storage property holds an array of initial storage values that will be used to originate each smart contract. You must define an initial storage for each `.tz` file that you will be originating
+The storage property is a key/value mapping, with the key being the name of the contract, and the value being the initial storage value
+
+The initial storage value may be specified as any JSON literal value, a string containing a Michelson expression, or a JSON-encoded Michelson expression
 
 Storage values use the following format:
 
