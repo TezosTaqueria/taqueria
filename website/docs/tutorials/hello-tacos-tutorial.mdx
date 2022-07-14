@@ -158,7 +158,17 @@ taq originate
 
 This will originate the contract using the default environment which targets the sandbox named `local` that was started above
 
-Taqueria will output the address of the originated contract to the console. Copy this address, then open the file `/app/src/App.tsx`
+Taqueria will output the address of the originated contract to the console as seen here:
+
+```shell
+┌────────────────┬──────────────────────────────────────┬─────────────┐
+│ Contract       │ Address                              │ Destination │
+├────────────────┼──────────────────────────────────────┼─────────────┤
+│ hello-tacos.tz │ KT1VAufHWYaxkXgBjdTtXE5fJMe2ieDWS4dp │ local       │
+└────────────────┴──────────────────────────────────────┴─────────────┘
+```
+
+Copy this address, then open the file `/app/src/App.tsx`
 
 On line 29, replace the address with the one you just copied as seen here:
 
