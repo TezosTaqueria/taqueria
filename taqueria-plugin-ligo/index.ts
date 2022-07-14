@@ -1,5 +1,6 @@
-import { Option, Plugin, Task } from '@taqueria/node-sdk';
+import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
 import compile from './compile';
+import createContract from './createContract';
 
 Plugin.create(i18n => ({
 	schema: '1.0',
@@ -32,17 +33,28 @@ Plugin.create(i18n => ({
 			encoding: 'json',
 		}),
 	],
-	checkRuntimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			report: [
-				{ name: 'LIGO', path: 'ligo', version: '>=0.27.0', kind: 'required', met: true },
+	templates: [
+		Template.create({
+			template: 'contract',
+			command: 'contract <sourceFileName>',
+			description: 'Create a LIGO contract with boilerplate code',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'sourceFileName',
+					type: 'string',
+					description: 'The name of the LIGO contract to generate',
+				}),
 			],
+			options: [
+				Option.create({
+					shortFlag: 's',
+					flag: 'syntax',
+					type: 'string',
+					description: 'The syntax used in the contract',
+				}),
+			],
+			handler: createContract,
 		}),
-	installRunTimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			output: 'LIGO was found in /usr/bin/ligo', // TODO this should use i18n
-		}),
+	],
 	proxy: compile,
 }), process.argv);

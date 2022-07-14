@@ -3,6 +3,7 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
+import * as contents from './data/help-contents/jest-contents';
 import { reference } from './data/jest.config-reference';
 import { referenceCI } from './data/jest.config-reference-ci';
 
@@ -14,6 +15,38 @@ const taqueriaProjectPath = 'e2e/auto-test-jest-plugin';
 describe('E2E Testing for the taqueria jest plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['jest']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+	});
+
+	test('Verify that the jest plugin exposes the associated commands in the help menu', async () => {
+		try {
+			const jestHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+			expect(jestHelpContents.stdout).toBe(contents.helpContentsJestPlugin);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the jest plugin exposes the associated options in the help menu', async () => {
+		try {
+			const jestHelpContents = await exec(`taq test --help --projectDir=${taqueriaProjectPath}`);
+			expect(jestHelpContents.stdout).toBe(contents.helpContentsJestPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the jest plugin aliases expose the correct info in the help menu', async () => {
+		try {
+			const jestAliasCHelpContents = await exec(`taq jest --help --projectDir=${taqueriaProjectPath}`);
+			expect(jestAliasCHelpContents.stdout).toBe(contents.helpContentsJestPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
 	});
 
 	test('Jest plugin creates default "tests" partition and jest config when running command with no arguments', async () => {
@@ -43,10 +76,10 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		const localConfigContents = await exec(`cat ${pwdFormatted}/${taqueriaProjectPath}/${directory}/jest.config.js`);
 
 		expect(localConfigContents.stdout).toContain(
-			`const parentConfig = require('${pwdFormatted}/${taqueriaProjectPath}/.taq/jest.config.js')`,
+			`const parentConfig = require('../.taq/jest.config.js'`,
 		);
 		expect(localConfigContents.stdout).toContain(
-			`roots: [\n        "${pwdFormatted}/${taqueriaProjectPath}/${directory}"\n    ]`,
+			`roots: [\n        "./"\n    ]`,
 		);
 	});
 
@@ -118,7 +151,10 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('no tests present will result in an error', async () => {
-		const testOutput = await exec(`taq test`, { cwd: `${taqueriaProjectPath}` });
+		const testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
+
+		// NOTE, jest outputs this on stdout, hence why stdout is used here
+		// instead of stderr. This is NOT an issue with the plugin itself.
 		expect(testOutput.stdout).toContain('No tests found, exiting with code 1');
 	});
 

@@ -1,8 +1,9 @@
 import { exec as exec1 } from 'child_process';
+import { createHash } from 'crypto';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import util from 'util';
-import * as contents from './data/ligo-contents';
+import * as contents from './data/help-contents/ligo-contents';
 import { checkFolderExistsWithTimeout, generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
@@ -11,6 +12,52 @@ const taqueriaProjectPath = 'e2e/auto-test-ligo-plugin';
 describe('E2E Testing for taqueria ligo plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+	});
+
+	test('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
+		try {
+			const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPlugin);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the ligo plugin exposes the associated options in the help menu', async () => {
+		try {
+			const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
+			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the ligo plugin aliases expose the correct info in the help menu', async () => {
+		try {
+			const ligoAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`);
+			expect(ligoAliasCHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
+
+			const ligoAliasCompileLigoHelpContents = await exec(
+				`taq compile-ligo --help --projectDir=${taqueriaProjectPath}`,
+			);
+			expect(ligoAliasCompileLigoHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that taqueria ligo plugin outputs no contracts found if no contracts exist', async () => {
+		try {
+			const noContracts = await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
+			expect(noContracts.stdout).toEqual(contents.ligoNoContracts);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
 	});
 
 	test('Verify that taqueria ligo plugin can compile one contract under contracts folder', async () => {
@@ -83,6 +130,33 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 
 			expect(stdout).toBe(contents.compileInvalid);
 			expect(stderr).toContain('File "contracts/invalid-contract.mligo", line 1, characters 23-27');
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the LIGO contract template is instantiated with the right content and registered', async () => {
+		try {
+			await exec(`taq create contract counter.mligo`, { cwd: `./${taqueriaProjectPath}` });
+			const artifactsContents = await exec(`ls ${taqueriaProjectPath}/contracts`);
+			expect(artifactsContents.stdout).toContain('counter.mligo');
+
+			const bytes = await fsPromises.readFile(path.join(taqueriaProjectPath, 'contracts', 'counter.mligo'));
+			const digest = createHash('sha256');
+			digest.update(bytes);
+			const hash = digest.digest('hex');
+
+			const configFile = path.join(taqueriaProjectPath, '.taq', 'config.json');
+			const config = await fsPromises.readFile(configFile, { encoding: 'utf-8' });
+			const json = JSON.parse(config);
+			expect(json).toBeInstanceOf(Object);
+			expect(json).toHaveProperty('contracts');
+			return expect(json.contracts).toEqual({
+				'counter.mligo': {
+					sourceFile: 'counter.mligo',
+					hash,
+				},
+			});
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}

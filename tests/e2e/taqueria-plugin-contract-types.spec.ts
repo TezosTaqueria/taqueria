@@ -2,14 +2,50 @@ import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import util from 'util';
+import * as contents from './data/help-contents/contract-types-contents';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
 const taqueriaProjectPath = 'e2e/auto-test-contract-types-plugin';
 
-describe('E2E Testing for taqueria contract types plugin', () => {
+describe('E2E Testing for taqueria contract types plugin only', () => {
 	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath, ['ligo', 'contract-types']);
+		await generateTestProject(taqueriaProjectPath, ['contract-types']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+	});
+
+	test('Verify that the contract types plugin exposes the associated commands in the help menu', async () => {
+		try {
+			const generateTypesHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+			expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsContractTypesPlugin);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the contract types plugin exposes the associated options in the help menu', async () => {
+		try {
+			const generateTypesHelpContents = await exec(`taq generate types --help --projectDir=${taqueriaProjectPath}`);
+			expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsContractTypesPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that the contract types plugin exposes the associated aliases in the help menu', async () => {
+		try {
+			const generateTypesHelpContentsGen = await exec(`taq gen --help --projectDir=${taqueriaProjectPath}`);
+			expect(generateTypesHelpContentsGen.stdout).toBe(contents.helpContentsContractTypesPluginSpecific);
+
+			const generateTypesHelpContentsGenTypes = await exec(`taq gentypes --help --projectDir=${taqueriaProjectPath}`);
+			expect(generateTypesHelpContentsGenTypes.stdout).toBe(contents.helpContentsContractTypesPluginSpecific);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
 	});
 
 	test('Verify that contract types plugin only outputs typeScriptDir and does not create types dir when no contracts exist', async () => {
@@ -20,8 +56,27 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 		expect(dirContents.stdout).not.toContain('types');
 	});
 
-	// TODO: Skipping this test for now. See in-line comments for more details.
-	// See issue: https://github.com/ecadlabs/taqueria/issues/736
+	// Clean up process to remove taquified project folder
+	// Comment if need to debug
+	afterAll(async () => {
+		try {
+			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+});
+
+describe('E2E Testing for taqueria contract types plugin with ligo', () => {
+	beforeAll(async () => {
+		await generateTestProject(taqueriaProjectPath, ['ligo', 'contract-types']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+	});
+
 	test('Verify that taqueria contract types plugin can compile one contract and generate types', async () => {
 		const pwdPromise = await exec(`pwd`);
 		const pwd = pwdPromise.stdout.trim();
@@ -29,12 +84,6 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
 		await exec(`taq compile`, { cwd: `${taqueriaProjectPath}` });
 
-		// TODO:
-		// Related to issue #736 above, when investigating I found that
-		// `generateTypesOutput.stdout` has been truncated - its just one
-		// line of output which is why the expect assertion fails.
-		// However, when I run the `generate types` task manually I see all
-		// lines of output
 		const generateTypesOutput = await exec(`taq generate types`, { cwd: `${taqueriaProjectPath}` });
 		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
 
@@ -59,8 +108,6 @@ describe('E2E Testing for taqueria contract types plugin', () => {
 		expect(typesContents.stdout).toContain('type-utils.ts');
 	});
 
-	// TODO: Skipping this test for now. See in-line comments for more details.
-	// See issue: https://github.com/ecadlabs/taqueria/issues/736
 	test('Verify that taqueria contract types plugin allows for different types folder specification', async () => {
 		const pwdPromise = await exec(`pwd`);
 		const pwd = pwdPromise.stdout.trim();

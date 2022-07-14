@@ -17,6 +17,10 @@ export const internalSchema = z.object({
 	).optional(),
 	required: z.boolean({ description: 'Option Is Required' }).default(false).optional(),
 	boolean: z.boolean({ description: 'Option Is Boolean' }).default(false).optional(),
+	type: z.union(
+		[z.literal('string'), z.literal('number'), z.literal('boolean')],
+		{ description: 'Positional Arg Datatype' },
+	).optional(),
 }).describe('Option');
 
 export const rawSchema = z.object({
@@ -33,6 +37,10 @@ export const rawSchema = z.object({
 	).optional(),
 	required: z.boolean({ description: 'Option Is Required' }).default(false).optional(),
 	boolean: z.boolean({ description: 'Option Is Boolean' }).default(false).optional(),
+	type: z.union(
+		[z.literal('string'), z.literal('number'), z.literal('boolean')],
+		{ description: 'Positional Arg Datatype' },
+	).optional(),
 }).describe('Option');
 
 type RawInput = z.infer<typeof rawSchema>;

@@ -1,3 +1,5 @@
+import * as Config from '@taqueria/protocol/Config';
+import * as Contract from '@taqueria/protocol/Contract';
 import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
@@ -11,20 +13,23 @@ import * as PositionalArg from '@taqueria/protocol/PositionalArg';
 import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
+import * as SHA256 from '@taqueria/protocol/SHA256';
 import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import type { TaqError } from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
+import * as Template from '@taqueria/protocol/Template';
 import { exec, ExecException } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
 import { get } from 'stack-trace';
 import { ZodError } from 'zod';
-import { InputSchema, Schema } from './types';
+import { PluginSchema } from './types';
 import { Args, LikeAPromise, pluginDefiner, StdIO } from './types';
 
 // @ts-ignore interop issue. Maybe find a different library later
+import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
 import generateName from 'project-name-generator';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
@@ -186,12 +191,12 @@ const postprocessArgs = (args: Args): Record<string, unknown> => {
 	return groupedArgs;
 };
 
-const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): Schema => {
-	const inputSchema: InputSchema = definer(i18n);
+const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): PluginSchema.t => {
+	const inputSchema: PluginSchema.RawPluginSchema = definer(i18n);
 
 	const { proxy } = inputSchema;
 
-	const pluginInfo = PluginInfo.create({
+	const pluginInfo = PluginSchema.create({
 		...inputSchema,
 		name: inputSchema.name ?? inferPluginName(),
 	});
@@ -212,6 +217,28 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 				case 'pluginInfo':
 					const output = {
 						...schema,
+						templates: schema.templates
+							? schema.templates.map(
+								(template: Template.t) => {
+									const handler = typeof template.handler === 'function' ? 'function' : template.handler;
+									return {
+										...template,
+										handler,
+									};
+								},
+							)
+							: [],
+						tasks: schema.tasks
+							? schema.tasks.map(
+								(task: Task.t) => {
+									const handler = typeof task.handler === 'function' ? 'function' : task.handler;
+									return {
+										...task,
+										handler,
+									};
+								},
+							)
+							: [],
 						proxy: schema.proxy ? true : false,
 						checkRuntimeDependencies: schema.checkRuntimeDependencies ? true : false,
 						installRuntimeDependencies: schema.installRuntimeDependencies ? true : false,
@@ -232,6 +259,25 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 						message: i18n.__('proxyNotSupported'),
 						context: requestArgs,
 					});
+				case 'proxyTemplate': {
+					const proxyArgs = RequestArgs.createProxyTemplateRequestArgs(requestArgs);
+					const template = schema.templates?.find(tmpl => tmpl.template === proxyArgs.template);
+					if (template) {
+						if (typeof template.handler === 'function') {
+							return template.handler(proxyArgs);
+						}
+						return Promise.reject({
+							errCode: 'E_NOT_SUPPORTED',
+							message: i18n.__('proxyNotSupported'),
+							context: requestArgs,
+						});
+					}
+					return Promise.reject({
+						errCode: 'E_INVALID_TEMPLATE',
+						message: i18n.__('invalidTemplate'),
+						context: requestArgs,
+					});
+				}
 				case 'checkRuntimeDependencies':
 					return sendAsyncJson(
 						schema.checkRuntimeDependencies
@@ -386,6 +432,44 @@ const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
 			: getNameFromPluginManifest(pluginManifest);
 };
 
+const joinPaths = (...paths: string[]): string => paths.join('/');
+
+const newContract = async (sourceFile: string, parsedArgs: RequestArgs.t) => {
+	const contractPath = joinPaths(parsedArgs.projectDir, parsedArgs.config.contractsDir, sourceFile);
+	try {
+		const contents = await readFile(contractPath, { encoding: 'utf-8' });
+		const hash = await SHA256.toSHA256(contents);
+		return await eager(Contract.of({
+			sourceFile,
+			hash,
+		}));
+	} catch (err) {
+		await Promise.reject(`Could not read ${contractPath}`);
+	}
+};
+
+const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): Promise<void> => {
+	try {
+		const config = await readJsonFile<Config.t>(parsedArgs.config.configFile);
+		if (config.contracts && config.contracts[sourceFile]) {
+			await sendAsyncErr(`${sourceFile} has already been registered`);
+		} else {
+			const contract = await newContract(sourceFile, parsedArgs);
+			const contracts = config.contracts || {};
+			const updatedConfig = {
+				...config,
+				contracts: {
+					...contracts,
+					...Object.fromEntries([[sourceFile, contract]]),
+				},
+			};
+			await writeJsonFile(parsedArgs.config.configFile)(updatedConfig);
+		}
+	} catch (err) {
+		if (err) console.error('Error registering contract:', err);
+	}
+};
+
 export const Plugin = {
 	create: (definer: pluginDefiner, unparsedArgs: Args) => {
 		const stack = get();
@@ -410,4 +494,9 @@ export {
 	SandboxAccountConfig,
 	SandboxConfig,
 	Task,
+	Template,
+};
+
+export const experimental = {
+	registerContract,
 };
