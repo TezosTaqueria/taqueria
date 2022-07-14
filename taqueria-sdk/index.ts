@@ -408,6 +408,14 @@ export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>
 		return undefined;
 	};
 
+export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
+	if (!config.contracts) return [];
+	return Object.values(config.contracts).reduce(
+		(retval: string[], contract) => [...retval, contract.sourceFile],
+		[],
+	);
+};
+
 const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
 	// The definer function can provide a name for the plugin in its schema, or it
 	// can omit it and we infer it from the package.json file.

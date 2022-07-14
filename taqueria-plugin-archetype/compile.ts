@@ -1,7 +1,5 @@
-import { execCmd, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
-import { LikeAPromise, RequestArgs, TaqError } from '@taqueria/node-sdk/types';
-import glob from 'fast-glob';
-import { readFile } from 'fs/promises';
+import { execCmd, getContracts, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
+import { RequestArgs, TaqError } from '@taqueria/node-sdk/types';
 import { basename, extname, join } from 'path';
 
 interface Opts extends RequestArgs.t {
@@ -51,12 +49,8 @@ const compileContract = (opts: Opts) =>
 				});
 			});
 
-const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[]> => {
-	// TODO: Fetch list of files from SDK
-	return glob(
-		['**/*.arl'],
-		{ cwd: opts.config.contractsDir, absolute: false },
-	)
+const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[]> =>
+	Promise.all(getContracts(/\.arl$/, opts.config))
 		.then(entries => entries.map(compileContract(opts)))
 		.then(processes =>
 			processes.length > 0
@@ -64,7 +58,6 @@ const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[
 				: [{ contract: 'None found', artifact: 'N/A' }]
 		)
 		.then(promises => Promise.all(promises));
-};
 
 const compile = <T>(parsedArgs: Opts) => {
 	const p = parsedArgs.sourceFile
