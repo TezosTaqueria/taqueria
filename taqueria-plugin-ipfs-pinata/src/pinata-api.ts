@@ -21,13 +21,17 @@ export const publishFileToIpfs = async ({
 		filePath: string;
 	};
 }): Promise<PublishFileResult> => {
-	// Skip if already pinned
-	const { isPinned, ipfsHash } = await checkIfFileIsPinned({ auth, item });
-	if (isPinned) {
-		return {
-			ipfsHash,
-		};
-	}
+	// The data api to check for existing file is limited to 30 requests per minute
+	// While uploading allows 180 requests per minute
+	// i.e. it's faster to just upload again
+
+	// // Skip if already pinned
+	// const { isPinned, ipfsHash } = await checkIfFileIsPinned({ auth, item });
+	// if (isPinned) {
+	// 	return {
+	// 		ipfsHash,
+	// 	};
+	// }
 
 	const data = new FormData();
 	data.append('file', fs.createReadStream(item.filePath));

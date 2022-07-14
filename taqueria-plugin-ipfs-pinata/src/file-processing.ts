@@ -1,6 +1,5 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { delay } from './utils';
 
 // Async generator
 // https://stackoverflow.com/questions/5827612/node-js-fs-readdir-recursive-directory-search
@@ -60,7 +59,6 @@ const createFileProvider = async ({
 
 		while (nextFile && !filter(nextFile)) {
 			nextFile = await getNextFile();
-			continue;
 		}
 
 		return nextFile;
@@ -111,7 +109,6 @@ export const processFiles = async <TResult>({
 			try {
 				const result = await processFile(fileToProcess, progressInfo);
 				successes.push({ filePath: fileToProcess, result });
-				break;
 			} catch (err) {
 				failures.push({ filePath: fileToProcess, error: err });
 			}

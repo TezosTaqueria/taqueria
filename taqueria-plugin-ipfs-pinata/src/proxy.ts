@@ -19,8 +19,12 @@ const publishToIpfs = async (fileOrDirPath: undefined | string, auth: PinataAuth
 		throw new Error(`path was not provided`);
 	}
 
+	// Pinata is limited to 180 requests per minute
+	// So for the first 180 requests they can go fast
+
 	const { processWithBackoff } = createProcessBackoffController({
 		retryCount: 5,
+		targetRequestsPerMinute: 180,
 	});
 
 	const result = await processFiles({
@@ -60,7 +64,7 @@ const publishToIpfs = async (fileOrDirPath: undefined | string, auth: PinataAuth
 				'?': '❌',
 				filePath: x.filePath,
 				ipfsHash: undefined,
-				error: x.error,
+				error: (x.error as { message?: string })?.message ?? JSON.stringify(x.error),
 			})),
 			...result.successes.map(x => ({
 				'?': '✔',

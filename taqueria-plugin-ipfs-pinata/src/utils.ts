@@ -6,32 +6,41 @@ export async function delay(timeout: number): Promise<void> {
 
 export const createProcessBackoffController = ({
 	retryCount = 5,
+	targetRequestsPerMinute = 180,
 }: {
-	retryCount: number;
+	retryCount?: number;
+	targetRequestsPerMinute?: number;
 }) => {
-	const DELAY_MIN = 10;
-	const DELAY_SUCCESS_REDUCTION = 10;
-	const DELAY_FAILURE_INCREASE = 200;
-
-	let delayTimeMs = 100;
+	let averageTimePerRequest = 5000;
+	let targetTimePerRequest = 60000 / targetRequestsPerMinute;
+	let lastTime = Date.now();
 
 	const processWithBackoff = async <TResult>(process: () => Promise<TResult>) => {
 		let attempt = 0;
 		let lastError = undefined as unknown;
 		while (attempt < retryCount) {
 			try {
-				await delay(delayTimeMs);
+				let delayTimeMs = Math.max(10, targetTimePerRequest - averageTimePerRequest);
+
+				// Partially randomized delay to ensure parallel requests don't line up
+				await delay(Math.floor(delayTimeMs * (1 + 0.5 * Math.random())));
 
 				const result = await process();
 
-				delayTimeMs -= DELAY_SUCCESS_REDUCTION;
-				delayTimeMs = Math.max(DELAY_MIN, delayTimeMs);
+				const timeNow = Date.now();
+				const timeElapsed = timeNow - lastTime;
+				lastTime = timeNow;
+
+				// Running average
+				averageTimePerRequest = averageTimePerRequest * 0.97 + timeElapsed * 0.03;
 
 				return result;
 			} catch (err) {
 				lastError = err;
 			}
-			delayTimeMs += DELAY_FAILURE_INCREASE;
+
+			// Quickly increase time to wait if failure (allow negatives to wait longer than target)
+			averageTimePerRequest -= (attempt + 1) * 1000;
 			attempt++;
 		}
 
