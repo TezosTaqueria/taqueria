@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-smartpy",
-	"version": "0.7.4-rc",
+	"version": "0.7.5",
 	"description": "A taqueria plugin for compiling SmartPy smart contracts",
 	"targets": {
 		"default": {
@@ -41,7 +41,7 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "0.7.4-rc",
+		"@taqueria/node-sdk": "0.7.5-rc4",
 		"fast-glob": "^3.2.11"
 	},
 	"devDependencies": {
