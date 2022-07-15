@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-archetype",
-	"version": "0.7.3-rc",
+	"version": "0.7.4-rc",
 	"description": "A taqueria plugin for compiling Archetype smart contracts",
 	"targets": {
 		"default": {
@@ -40,7 +40,7 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "0.7.3-rc",
+		"@taqueria/node-sdk": "0.7.4-rc",
 		"fast-glob": "^3.2.11"
 	},
 	"devDependencies": {
