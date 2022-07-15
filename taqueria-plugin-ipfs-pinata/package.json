@@ -33,7 +33,7 @@
 		"directory": "taqueria-plugin-ipfs-pinata"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "0.7.5-rc4",
+		"@taqueria/node-sdk": "0.7.6-rc5",
 		"dotenv": "^16.0.0",
 		"form-data": "^4.0.0",
 		"ipfs-only-hash": "^4.0.0",
