@@ -60,6 +60,7 @@
 		"@taqueria/protocol/PluginJsonResponse": "./taqueria-protocol/PluginJsonResponse.ts",
 		"@taqueria/protocol/PluginDependenciesResponse": "./taqueria-protocol/PluginDependenciesResponse.ts",
 		"@taqueria/protocol/PluginResponseEncoding": "./taqueria-protocol/PluginResponseEncoding.ts",
-		"@taqueria/protocol/Contract": "./taqueria-protocol/Contract.ts"
+		"@taqueria/protocol/Contract": "./taqueria-protocol/Contract.ts",
+		"@taqueria/protocol/ScaffoldConfig": "./taqueria-protocol/ScaffoldConfig.ts"
 	}
 }

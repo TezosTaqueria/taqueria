@@ -11,7 +11,7 @@
 		"test:unit:deno:debug": "TEST=true deno test unit/ --allow-all --unstable --inspect-brk",
 		"test:unit:deno:with-coverage": "TEST=true deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
 		"test:unit:selected": "TEST=true deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",
-		"test:integration": "NODE_OPTIONS=\"--experimental-vm-modules\" TEST=true jest --config jest.config.integration.ts --no-cache",
+		"test:integration": "TEST=true jest --config jest.config.integration.ts --no-cache",
 		"test:e2e": "TEST=true jest --config jest.config.e2e.ts"
 	},
 	"repository": {

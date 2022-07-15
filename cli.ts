@@ -40,6 +40,7 @@ import {
 	PositionalArg,
 	SanitizedAbsPath,
 	SanitizedArgs,
+	ScaffoldConfig,
 	Task,
 } from './taqueria-protocol/taqueria-protocol-types.ts';
 import type { CLIConfig, DenoArgs, EnvKey, EnvVars } from './taqueria-types.ts';
@@ -446,21 +447,7 @@ const scaffoldProject = (i18n: i18n.t) =>
 
 			log('\n Initializing Project...');
 
-			const scaffoldConfig = await eager(SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`));
-			log('    ✓ Cleanup scaffold config');
-
 			const gitDir = await eager(SanitizedAbsPath.make(`${destDir}/.git`));
-
-			// Remove the scaffold.json file, if not exists
-			// If it doesn't exist, don't throw...
-			try {
-				await eager(rm(scaffoldConfig));
-			} catch (err) {
-				if (!isTaqError(err) || err.kind !== 'E_INVALID_PATH_DOES_NOT_EXIST') {
-					throw err;
-				}
-			}
-
 			await eager(rm(gitDir));
 			log('    ✓ Remove Git directory');
 
@@ -468,6 +455,30 @@ const scaffoldProject = (i18n: i18n.t) =>
 			log('    ✓ Install plugins');
 
 			await eager(exec('taq init 2>&1 > /dev/null', {}, false, destDir));
+
+			// Remove the scaffold.json file, if not exists
+			// If it doesn't exist, don't throw...
+			const scaffoldConfigAbspath = await eager(SanitizedAbsPath.make(`${destDir}/scaffold.json`));
+			try {
+				const scaffoldConfig = await eager(readJsonFile<ScaffoldConfig.t>(scaffoldConfigAbspath));
+				if (
+					typeof scaffoldConfig === 'object' && Object.hasOwn(scaffoldConfig, 'postInit') && scaffoldConfig.postInit
+				) {
+					await eager(exec(scaffoldConfig.postInit!, {}, false, destDir));
+				}
+			} catch (err) {
+				if (!isTaqError(err) || err.kind !== 'E_INVALID_PATH_DOES_NOT_EXIST') {
+					throw err;
+				}
+			}
+			try {
+				await eager(rm(scaffoldConfigAbspath));
+			} catch (err) {
+				if (!isTaqError(err) || err.kind !== 'E_INVALID_PATH_DOES_NOT_EXIST') {
+					throw err;
+				}
+			}
+			log('    ✓ Run scaffold post-init script');
 
 			// Remove injected quickstart file
 			const quickstartFile = await eager(SanitizedAbsPath.make(`${destDir}/quickstart.md`));
@@ -1063,7 +1074,7 @@ export const displayError = (cli: CLIConfig) =>
 	(err: Error | TaqError.t) => {
 		const inputArgs = (cli.parsed as unknown as { argv: Record<string, unknown> }).argv;
 
-		if (!inputArgs.fromVsCode) {
+		if (!inputArgs.fromVsCode && (isTaqError(err) && err.kind !== 'E_EXEC')) {
 			cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
 		}
 
@@ -1091,13 +1102,14 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_CONTRACT_NOT_REGISTERED' }, err => [22, err.msg])
 				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
+				.with({ kind: 'E_EXEC' }, err => [19, false])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 
 			const [exitCode, msg] = res;
 			if (inputArgs.debug) {
 				logAllErrors(err);
-			} else console.error(msg);
+			} else if (msg) console.error(msg);
 
 			Deno.exit(exitCode as number);
 		}
