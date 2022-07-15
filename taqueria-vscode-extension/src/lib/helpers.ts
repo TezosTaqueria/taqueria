@@ -382,6 +382,10 @@ export class VsCodeHelper {
 				name: 'Hello Tacos Tutorial',
 				url: 'https://github.com/ecadlabs/taqueria-scaffold-hello-tacos-tutorial',
 			},
+			{
+				name: 'NFT',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-nft',
+			},
 		];
 	}
 
@@ -472,20 +476,6 @@ export class VsCodeHelper {
 			providedPath = await Util.findTaqBinary(this.i18, this.getLog());
 		}
 		return Util.makePathToTaq(this.i18, this.getLog())(providedPath);
-	}
-
-	async showProgressAndProxyToTaq(progressTitle: string, projectDir: Util.PathToDir, command: string) {
-		const pathToTaq = await this.getTaqBinPath();
-		return this.vscode.window.withProgress({
-			location: this.vscode.ProgressLocation.Window,
-			cancellable: false,
-			title: progressTitle,
-		}, async progress => {
-			progress.report({ increment: 0 });
-			const result = this.proxyToTaqAndShowOutput(command, progressTitle, projectDir, false);
-			progress.report({ increment: 100 });
-			return result;
-		});
 	}
 
 	registerCommand(cmdId: string, callback: (...args: any[]) => any) {
@@ -613,34 +603,42 @@ export class VsCodeHelper {
 		projectDir: Util.PathToDir | undefined,
 		logStandardErrorToOutput: boolean | undefined,
 	) {
-		try {
-			const result = await this.proxyToTaq(taskWithArgs, projectDir);
-			if (result.executionError) {
-				this.logAllNestedErrors(result.executionError);
-			}
-			if (result.standardError) {
-				if (logStandardErrorToOutput) {
-					this.showOutput(result.standardError);
-				} else {
-					this.showLog(OutputLevels.warn, result.standardError);
+		this.vscode.window.withProgress({
+			location: this.vscode.ProgressLocation.Notification,
+			cancellable: false,
+			title: `Taqueria is running ${taskTitle}`,
+		}, async progress => {
+			progress.report({ increment: 0 });
+			try {
+				const result = await this.proxyToTaq(taskWithArgs, projectDir);
+				if (result.executionError) {
+					this.logAllNestedErrors(result.executionError);
 				}
-			}
-			if (result.standardOutput) {
-				this.showOutput(result.standardOutput);
-			}
-			if (result.executionError || result.standardError) {
-				this.vscode.window.showWarningMessage(
-					`Warnings while running ${taskTitle}. Please check the Taqueria Log window for diagnostics information.`,
+				if (result.standardError) {
+					if (logStandardErrorToOutput) {
+						this.showOutput(result.standardError);
+					} else {
+						this.showLog(OutputLevels.warn, result.standardError);
+					}
+				}
+				if (result.standardOutput) {
+					this.showOutput(result.standardOutput);
+				}
+				if (result.executionError || result.standardError) {
+					this.vscode.window.showWarningMessage(
+						`Warnings while running ${taskTitle}. Please check the Taqueria Log window for diagnostics information.`,
+					);
+				} else {
+					this.vscode.window.showInformationMessage(`Successfully executed ${taskTitle}.`);
+				}
+			} catch (e: unknown) {
+				this.vscode.window.showErrorMessage(
+					`Error while running ${taskTitle}. Please check the Taqueria Log window for diagnostics information.`,
 				);
-			} else {
-				this.vscode.window.showInformationMessage(`Successfully executed ${taskTitle}.`);
+				this.logAllNestedErrors(e);
 			}
-		} catch (e: unknown) {
-			this.vscode.window.showErrorMessage(
-				`Error while running ${taskTitle}. Please check the Taqueria Log window for diagnostics information.`,
-			);
-			this.logAllNestedErrors(e);
-		}
+			progress.report({ increment: 100 });
+		});
 	}
 
 	async proxyToTaq(taskWithArgs: string, projectDir?: Util.PathToDir | undefined) {
@@ -727,7 +725,7 @@ export class VsCodeHelper {
 			if (!sandboxName) {
 				return;
 			}
-			await this.showProgressAndProxyToTaq(progressTitle, projectDir, `${taskName} ${sandboxName}`);
+			await this.proxyToTaqAndShowOutput(`${taskName} ${sandboxName}`, progressTitle, projectDir, false);
 		});
 	}
 
