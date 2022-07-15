@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { OutputLevels, VsCodeHelper } from '../helpers';
+import { HasRefresh, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
 
-export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTreeItem> {
+export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTreeItem>, HasRefresh {
 	constructor(
 		private workspaceRoot: string,
 		private helper: VsCodeHelper,

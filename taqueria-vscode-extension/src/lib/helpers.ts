@@ -2,7 +2,7 @@ import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { TaqError } from '@taqueria/protocol/TaqError';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
-import path, { join, resolve } from 'path';
+import path, { join } from 'path';
 import * as api from 'vscode';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
@@ -90,6 +90,10 @@ export interface HasFileName {
 	fileName: string;
 }
 
+export interface HasRefresh {
+	refresh(): void;
+}
+
 function mapAsync<T, U>(array: T[], callbackfn: (value: T, index: number, array: T[]) => Promise<U>): Promise<U[]> {
 	return Promise.all(array.map(callbackfn));
 }
@@ -101,6 +105,11 @@ async function filterAsync<T>(
 	const filterMap = await mapAsync(array, callbackfn);
 	return array.filter((value, index) => filterMap[index]);
 }
+
+export type TaskTitles = {
+	progressTitle: string;
+	finishedTitle: string;
+};
 
 export class VsCodeHelper {
 	private constructor(
@@ -164,7 +173,15 @@ export class VsCodeHelper {
 			if (uri === undefined) {
 				return;
 			}
-			await this.proxyToTaqAndShowOutput(`init ${uri.path}`, 'init', uri.path as Util.PathToDir, false);
+			await this.proxyToTaqAndShowOutput(
+				`init ${uri.path}`,
+				{
+					finishedTitle: `Taqified folder ${uri.fsPath}`,
+					progressTitle: `Taqifying folder ${uri.fsPath}`,
+				},
+				uri.path as Util.PathToDir,
+				false,
+			);
 			try {
 				await this.proxyToTaq(``, uri.path as Util.PathToDir);
 			} catch {
@@ -195,7 +212,15 @@ export class VsCodeHelper {
 				return;
 			}
 			const projectDir = await Util.makeDir(projectUri.path, this.i18);
-			await this.proxyToTaqAndShowOutput(`scaffold ${scaffoldUrl} ${projectDir}`, 'scaffold', projectDir, false);
+			await this.proxyToTaqAndShowOutput(
+				`scaffold ${scaffoldUrl} ${projectDir}`,
+				{
+					finishedTitle: `scaffolded ${scaffoldUrl}`,
+					progressTitle: `scaffolding ${scaffoldUrl}`,
+				},
+				projectDir,
+				false,
+			);
 			await this.proxyToTaq(``, projectDir);
 			await this.updateCommandStates(projectDir);
 		});
@@ -398,12 +423,20 @@ export class VsCodeHelper {
 			let pluginName = pluginInfo?.label;
 			if (!pluginName) {
 				pluginName = await this.promptForPluginInstallation(projectDir);
-			}
-			if (!pluginName) {
-				return;
+				if (!pluginName) {
+					return;
+				}
 			}
 			pluginName = await this.getPathForPluginSource(pluginName);
-			await this.proxyToTaqAndShowOutput(`install ${pluginName}`, 'install', projectDir, false);
+			await this.proxyToTaqAndShowOutput(
+				`install ${pluginName}`,
+				{
+					finishedTitle: `installed ${pluginName}`,
+					progressTitle: `installing ${pluginName}`,
+				},
+				projectDir,
+				false,
+			);
 		});
 	}
 
@@ -420,7 +453,15 @@ export class VsCodeHelper {
 			if (!pluginName) {
 				return;
 			}
-			await this.proxyToTaqAndShowOutput(`uninstall ${pluginName}`, 'uninstall', projectDir, false);
+			await this.proxyToTaqAndShowOutput(
+				`uninstall ${pluginName}`,
+				{
+					finishedTitle: `uninstalled ${pluginName}`,
+					progressTitle: `uninstalling ${pluginName}`,
+				},
+				projectDir,
+				false,
+			);
 		});
 	}
 
@@ -459,15 +500,14 @@ export class VsCodeHelper {
 			}
 			await this.proxyToTaqAndShowOutput(
 				`originate -e ${environmentName} ${fileName ?? ''}`,
-				'originate',
+				{
+					finishedTitle: 'originated contracts',
+					progressTitle: 'originating contracts',
+				},
 				projectDir,
 				true,
 			);
 		});
-	}
-
-	taskNameToCmdId(taskName: string) {
-		return 'taqueria.' + taskName.replace(/\s+/g, '_');
 	}
 
 	async getTaqBinPath() {
@@ -498,11 +538,6 @@ export class VsCodeHelper {
 		return (err.context
 			? this.vscode.window.showErrorMessage(err.msg, err.context)
 			: this.vscode.window.showErrorMessage(err.msg))
-			.then(_ => Promise.resolve()) as Promise<void>;
-	}
-
-	notify(msg: string) {
-		return this.vscode.window.showInformationMessage(msg)
 			.then(_ => Promise.resolve()) as Promise<void>;
 	}
 
@@ -584,7 +619,10 @@ export class VsCodeHelper {
 			}
 			await this.proxyToTaqAndShowOutput(
 				`typecheck -s ${sandboxName} ${fileName ?? ''}`,
-				'typecheck',
+				{
+					finishedTitle: 'checked contract types',
+					progressTitle: 'checking types',
+				},
 				projectDir,
 				true,
 			);
@@ -599,14 +637,14 @@ export class VsCodeHelper {
 
 	async proxyToTaqAndShowOutput(
 		taskWithArgs: string,
-		taskTitle: string,
+		taskTitles: TaskTitles,
 		projectDir: Util.PathToDir | undefined,
 		logStandardErrorToOutput: boolean | undefined,
 	) {
 		this.vscode.window.withProgress({
 			location: this.vscode.ProgressLocation.Notification,
 			cancellable: false,
-			title: `Taqueria is running ${taskTitle}`,
+			title: `Taqueria is ${taskTitles.progressTitle}`,
 		}, async progress => {
 			progress.report({ increment: 0 });
 			try {
@@ -626,14 +664,14 @@ export class VsCodeHelper {
 				}
 				if (result.executionError || result.standardError) {
 					this.vscode.window.showWarningMessage(
-						`Warnings while running ${taskTitle}. Please check the Taqueria Log window for diagnostics information.`,
+						`Warnings while ${taskTitles.progressTitle}. Please check the Taqueria Log window for diagnostics information.`,
 					);
 				} else {
-					this.vscode.window.showInformationMessage(`Successfully executed ${taskTitle}.`);
+					this.vscode.window.showInformationMessage(`Successfully ${taskTitles.finishedTitle}.`);
 				}
 			} catch (e: unknown) {
 				this.vscode.window.showErrorMessage(
-					`Error while running ${taskTitle}. Please check the Taqueria Log window for diagnostics information.`,
+					`Error while ${taskTitles.progressTitle}. Please check the Taqueria Log window for diagnostics information.`,
 				);
 				this.logAllNestedErrors(e);
 			}
@@ -658,7 +696,7 @@ export class VsCodeHelper {
 		cmdId: string,
 		taskWithArgs: string,
 		outputTo: 'output' | 'notify',
-		taskTitle: string,
+		taskTitles: TaskTitles,
 		projectDir?: Util.PathToDir,
 	) {
 		this.registerCommand(
@@ -668,7 +706,7 @@ export class VsCodeHelper {
 				if (item) {
 					taskWithArgs = `${taskWithArgs} ${item.fileName}`;
 				}
-				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitle, projectDir, outputTo === 'output');
+				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitles, projectDir, outputTo === 'output');
 			},
 		);
 	}
@@ -677,27 +715,13 @@ export class VsCodeHelper {
 		cmdId: string,
 		taskWithArgs: string,
 		outputTo: 'output' | 'notify',
-		taskTitle: string,
+		taskTitles: TaskTitles,
 		projectDir?: Util.PathToDir,
 	) {
 		this.registerCommand(
 			cmdId,
 			async () => {
-				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitle, projectDir, outputTo === 'output');
-			},
-		);
-	}
-
-	exposeTaskAsCommand(cmdId: string, handler: ((pathToTaq: Util.PathToTaq) => Promise<void>)) {
-		this.registerCommand(
-			cmdId,
-			async () => {
-				try {
-					const pathToTaq = await this.getTaqBinPath();
-					await handler(pathToTaq);
-				} catch (e: unknown) {
-					this.logAllNestedErrors(e);
-				}
+				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitles, projectDir, outputTo === 'output');
 			},
 		);
 	}
@@ -705,7 +729,7 @@ export class VsCodeHelper {
 	async exposeSandboxTaskAsCommand(
 		cmdId: string,
 		taskName: string,
-		progressTitle: string,
+		taskTitles: TaskTitles,
 		outputTo: 'output' | 'notify',
 		projectDir: Util.PathToDir,
 		otherNotification?: string,
@@ -725,7 +749,7 @@ export class VsCodeHelper {
 			if (!sandboxName) {
 				return;
 			}
-			await this.proxyToTaqAndShowOutput(`${taskName} ${sandboxName}`, progressTitle, projectDir, false);
+			await this.proxyToTaqAndShowOutput(`${taskName} ${sandboxName}`, taskTitles, projectDir, false);
 		});
 	}
 
@@ -824,7 +848,7 @@ export class VsCodeHelper {
 	) {
 		this.showLog(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
 		addConfigWatcherIfNotExists(projectDir, () => {
-			this.showLog(OutputLevels.info, `Adding watcher for directory ${projectDir}.`);
+			this.showLog(OutputLevels.info, `Adding watchers for directory ${projectDir}.`);
 			try {
 				this.updateCommandStates(projectDir);
 			} catch (error: any) {
@@ -874,28 +898,23 @@ export class VsCodeHelper {
 	private contractsDataProvider?: ContractsDataProvider;
 
 	registerDataProviders(workspaceFolder: string) {
-		const pluginsDataProvider = new PluginsDataProvider(workspaceFolder, this);
-		this.vscode.window.createTreeView('taqueria-plugins', {
-			treeDataProvider: pluginsDataProvider,
-		});
-		this.dataProviders.push(pluginsDataProvider);
+		this.registerDataProvider('taqueria-plugins', new PluginsDataProvider(workspaceFolder, this));
+		this.registerDataProvider('taqueria-sandboxes', new SandboxesDataProvider(workspaceFolder, this));
+		this.registerDataProvider('taqueria-environments', new EnvironmentsDataProvider(workspaceFolder, this));
+		this.contractsDataProvider = this.registerDataProvider(
+			'taqueria-contracts',
+			new ContractsDataProvider(workspaceFolder, this),
+		);
+	}
 
-		const sandboxesDataProvider = new SandboxesDataProvider(workspaceFolder, this);
-		this.vscode.window.createTreeView('taqueria-sandboxes', {
-			treeDataProvider: sandboxesDataProvider,
+	private registerDataProvider<T extends api.TreeDataProvider<unknown> & HasRefresh>(
+		treeViewName: string,
+		dataProvider: T,
+	) {
+		this.vscode.window.createTreeView(treeViewName, {
+			treeDataProvider: dataProvider,
 		});
-		this.dataProviders.push(sandboxesDataProvider);
-
-		const environmentsDataProvider = new EnvironmentsDataProvider(workspaceFolder, this);
-		this.vscode.window.createTreeView('taqueria-environments', {
-			treeDataProvider: environmentsDataProvider,
-		});
-		this.dataProviders.push(environmentsDataProvider);
-
-		this.contractsDataProvider = new ContractsDataProvider(workspaceFolder, this);
-		this.vscode.window.createTreeView('taqueria-contracts', {
-			treeDataProvider: this.contractsDataProvider,
-		});
-		this.dataProviders.push(this.contractsDataProvider);
+		this.dataProviders.push(dataProvider);
+		return dataProvider;
 	}
 }

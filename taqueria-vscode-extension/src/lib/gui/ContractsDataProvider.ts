@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { HasFileName, VsCodeHelper } from '../helpers';
+import { HasFileName, HasRefresh, VsCodeHelper } from '../helpers';
 
-export class ContractsDataProvider implements vscode.TreeDataProvider<ContractTreeItem> {
+export class ContractsDataProvider implements vscode.TreeDataProvider<ContractTreeItem>, HasRefresh {
 	constructor(
 		private workspaceRoot: string,
 		private helper: VsCodeHelper,
