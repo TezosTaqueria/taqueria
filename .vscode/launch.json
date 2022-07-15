@@ -22,7 +22,7 @@
 			"name": "Launch CLI",
 			"type": "pwa-node",
 			"program": "${workspaceFolder}/index.ts",
-			"cwd": "${workspaceFolder}",
+			"cwd": "${workspaceFolder}", // If you want to run taq from a different location, set the address in this line
 			"runtimeExecutable": "deno",
 			"runtimeArgs": [
 				"run",
