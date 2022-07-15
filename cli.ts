@@ -1074,7 +1074,7 @@ export const displayError = (cli: CLIConfig) =>
 	(err: Error | TaqError.t) => {
 		const inputArgs = (cli.parsed as unknown as { argv: Record<string, unknown> }).argv;
 
-		if (!inputArgs.fromVsCode) {
+		if (!inputArgs.fromVsCode && (isTaqError(err) && err.kind !== 'E_EXEC')) {
 			cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
 		}
 
@@ -1102,13 +1102,14 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_CONTRACT_NOT_REGISTERED' }, err => [22, err.msg])
 				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
+				.with({ kind: 'E_EXEC' }, err => [19, false])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 
 			const [exitCode, msg] = res;
 			if (inputArgs.debug) {
 				logAllErrors(err);
-			} else console.error(msg);
+			} else if (msg) console.error(msg);
 
 			Deno.exit(exitCode as number);
 		}
