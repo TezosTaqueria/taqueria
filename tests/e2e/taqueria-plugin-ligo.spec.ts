@@ -54,7 +54,9 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 	test('Verify that taqueria ligo plugin outputs no contracts found if no contracts exist', async () => {
 		try {
 			const noContracts = await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
-			expect(noContracts.stdout).toEqual(contents.ligoNoContracts);
+			expect(noContracts.stderr).toContain(
+				`No contracts found to compile. Have you run "taq add-contract [sourceFile]" ?`,
+			);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
