@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-contract-types",
-	"version": "0.7.0",
+	"version": "0.7.1-rc1",
 	"description": "",
 	"targets": {
 		"default": {

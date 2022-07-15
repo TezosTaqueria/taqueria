@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-jest",
-	"version": "0.7.0",
+	"version": "0.7.1-rc1",
 	"description": "A plugin for Taqueria providing automated testing using the Jest Testing Framework",
 	"keywords": [
 		"taqueria",
