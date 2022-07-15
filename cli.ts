@@ -458,7 +458,7 @@ const scaffoldProject = (i18n: i18n.t) =>
 
 			// Remove the scaffold.json file, if not exists
 			// If it doesn't exist, don't throw...
-			const scaffoldConfigAbspath = await eager(SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`));
+			const scaffoldConfigAbspath = await eager(SanitizedAbsPath.make(`${destDir}/scaffold.json`));
 			try {
 				const scaffoldConfig = await eager(readJsonFile<ScaffoldConfig.t>(scaffoldConfigAbspath));
 				if (
