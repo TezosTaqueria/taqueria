@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-ligo",
-	"version": "0.6.5",
+	"version": "0.6.7",
 	"description": "A taqueria plugin for compiling LIGO smart contracts",
 	"targets": {
 		"default": {
@@ -41,7 +41,7 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.6.2",
+		"@taqueria/node-sdk": "^0.6.7",
 		"fast-glob": "^3.2.11"
 	},
 	"devDependencies": {
