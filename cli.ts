@@ -684,7 +684,7 @@ const handleTemplate = (
 					action: 'proxyTemplate',
 				}),
 				map(decoded => {
-					if (decoded) return renderPluginJsonRes(decoded);
+					if (decoded) return renderPluginJsonRes(decoded, parsedArgs);
 				}),
 			)
 			: pipe(
@@ -695,7 +695,7 @@ const handleTemplate = (
 				),
 				map((res: string | number) => {
 					if (typeof (res) === 'string') {
-						return renderPluginJsonRes(JSON.parse(res));
+						return renderPluginJsonRes(JSON.parse(res), parsedArgs);
 					}
 				}),
 			);
@@ -840,7 +840,7 @@ const exposeTask = (
 						chain(addTask(parsedArgs, task.task, plugin.name)),
 						map(res => {
 							const decoded = res as PluginJsonResponse.t | void;
-							if (decoded) return renderPluginJsonRes(decoded);
+							if (decoded) return renderPluginJsonRes(decoded, parsedArgs);
 						}),
 					)
 					: pipe(
@@ -851,7 +851,7 @@ const exposeTask = (
 						),
 						map((res: string | number) => {
 							if (typeof (res) === 'string') {
-								return renderPluginJsonRes(JSON.parse(res));
+								return renderPluginJsonRes(JSON.parse(res), parsedArgs);
 							}
 						}),
 					);
@@ -875,7 +875,12 @@ const loadEphermeralState = (
 		cliConfig,
 	);
 
-const renderPluginJsonRes = (decoded: PluginJsonResponse.t) => {
+const renderPluginJsonRes = (decoded: PluginJsonResponse.t, parsedArgs: SanitizedArgs.t) => {
+	// do not render object/array ASCII table if the request comes from TVsCE
+	if (parsedArgs.fromVsCode) {
+		log(JSON.stringify(decoded.data));
+	}
+
 	switch (decoded.render) {
 		case 'table':
 			renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
