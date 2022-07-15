@@ -8,3 +8,7 @@ echo "Processing documentation files..."
 npx ts-node ./parse-readme-template.ts
 echo "Adding any modified doc files to the commit"
 HUSKY=0 git ls-files **/*.md **/*.mdx --others --exclude-standard --modified | xargs git add
+
+# Update deno-lock file for CICD caching
+deno cache --import-map ./import_map.json --lock ./deno-lock.json --lock-write index.ts
+HUSKY=0 git add ./deno-lock.json
