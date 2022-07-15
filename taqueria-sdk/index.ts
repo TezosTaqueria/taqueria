@@ -411,7 +411,10 @@ export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>
 export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
 	if (!config.contracts) return [];
 	return Object.values(config.contracts).reduce(
-		(retval: string[], contract) => [...retval, contract.sourceFile],
+		(retval: string[], contract) =>
+			regex.test(contract.sourceFile)
+				? [...retval, contract.sourceFile]
+				: retval,
 		[],
 	);
 };
