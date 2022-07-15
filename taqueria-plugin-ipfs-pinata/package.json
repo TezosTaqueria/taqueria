@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-ipfs-pinata",
-	"version": "0.7.1-rc1",
+	"version": "0.7.2-rc1",
 	"description": "A plugin for Taqueria providing ipfs publishing and pinning using the Pinata service",
 	"keywords": [
 		"taqueria",
