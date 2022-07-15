@@ -98,13 +98,20 @@ export const inject = (deps: PluginDeps) => {
 					await Promise.all([copy(process.stderr, stderr), copy(process.stdout, stdout)]);
 					process.stderr.close();
 					process.stdout.close();
-					await process.status();
+					const status = await process.status();
+					if (!status.success) {
+						throw TaqError.create({
+							kind: 'E_EXEC',
+							msg: `The plugin returned a status code of ${status.code}`,
+							context: cmd,
+						});
+					}
 					process.close();
 					return process;
 				} catch (previous) {
 					throw {
 						kind: 'E_EXEC',
-						msg: 'Could not execute command',
+						msg: 'There was a problem executing the task.',
 						context: cmd,
 						previous,
 					};
