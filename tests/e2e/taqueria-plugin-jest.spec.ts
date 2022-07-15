@@ -151,7 +151,10 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('no tests present will result in an error', async () => {
-		const testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
+		try {
+			const testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
+		} catch {
+		}
 
 		// NOTE, jest outputs this on stdout, hence why stdout is used here
 		// instead of stderr. This is NOT an issue with the plugin itself.
