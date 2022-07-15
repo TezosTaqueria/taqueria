@@ -1,17 +1,23 @@
 {
 	"words": [
 		"abspath",
+		"autocrlf",
+		"dprint",
 		"EBADENGINE",
 		"ecad",
 		"ecadlabs",
 		"esbuild",
 		"flextesa",
 		"fluture",
+		"jsligo",
 		"ligo",
+		"mligo",
 		"mutez",
+		"oidc",
 		"outfile",
 		"rambda",
 		"READFILE",
+		"religo",
 		"smartpy",
 		"taq'fied",
 		"taq'ified",
@@ -22,6 +28,8 @@
 		"taquito",
 		"Tezos",
 		"retval",
-		"typecheck"
+		"typecheck",
+		"vsix",
+		"xvfb"
 	]
 }
