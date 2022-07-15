@@ -101,7 +101,7 @@ const execCmd = (cmd: string, args: string[]) => {
 	child.stdout?.pipe(process.stdout);
 	child.stderr?.pipe(process.stderr);
 
-	return child.then(noop);
+	return child;
 };
 
 export default async (args: RequestArgs.ProxyRequestArgs) => {
@@ -110,9 +110,13 @@ export default async (args: RequestArgs.ProxyRequestArgs) => {
 	return ensurePartitionExists(opts)
 		.then(configAbsPath => {
 			if (!opts.init) {
-				return opts.testPattern
+				const retval = opts.testPattern
 					? execCmd('npx', ['jest', '-c', configAbsPath, '--testPathPattern', opts.testPattern])
 					: execCmd('npx', ['jest', '-c', configAbsPath]);
+				return retval.then(child => {
+					if (child.exitCode === 0) return;
+					else process.exit(child.exitCode);
+				});
 			}
 
 			return sendAsyncRes('Initialized successfully.');
