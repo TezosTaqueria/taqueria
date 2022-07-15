@@ -68,7 +68,9 @@ describe('Integration tests using taqueria-mock-plugin', () => {
 		expect(stdout).toMatch(/--greeting/);
 	});
 
-	test('Verify that a template cannot be instantiated without required positional args', async () => {
+	// Wait till NodeJS doesn't require experimental VM modules
+	// NODE_OPTIONS=\"--experimental-vm-modules\"
+	test.skip('Verify that a template cannot be instantiated without required positional args', async () => {
 		const execa = await import('execa');
 		const { execaCommand } = execa;
 		const result = await execaCommand('taq create text', {

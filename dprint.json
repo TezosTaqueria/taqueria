@@ -8,7 +8,10 @@
 	},
 	"json": {
 	},
-	"includes": ["**/*.{ts,tsx,js,jsx,cjs,mjs,json}"],
+	"includes": [
+		"**/*.{ts,tsx,js,jsx,cjs,mjs,json}",
+		".github/workflows/*"
+	],
 	"excludes": [
 		"**/node_modules",
 		"**/*-lock.json",
