@@ -151,8 +151,9 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('no tests present will result in an error', async () => {
+		let testOutput;
 		try {
-			const testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
+			testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
 		} catch {
 		}
 
