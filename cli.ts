@@ -621,7 +621,7 @@ const getTemplateCommandArgs = (parsedArgs: SanitizedArgs.t, state: EphemeralSta
 		return { command, builder };
 	}
 	return {
-		command: 'create <template>',
+		command: 'pwdtemplate>',
 		builder: (yargs: CLIConfig) => addRequiredTemplatePositional(yargs, state, i18n),
 	};
 };
@@ -635,7 +635,7 @@ const exposeTemplates = (
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
 ) => {
-	if (state.templates) {
+	if (Object.keys(state.templates).length > 0) {
 		const { command, builder } = getTemplateCommandArgs(parsedArgs, state, i18n);
 
 		cliConfig.command(
