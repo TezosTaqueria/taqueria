@@ -54,6 +54,7 @@ const {
 	mkdir,
 	readJsonFile,
 	writeTextFile,
+	appendTextFile,
 	doesPathNotExistOrIsEmptyDir,
 	gitClone,
 	rm,
@@ -451,20 +452,23 @@ const scaffoldProject = (i18n: i18n.t) =>
 			await eager(rm(gitDir));
 			log('    ✓ Remove Git directory');
 
-			await eager(exec('npm install > /dev/null', {}, false, destDir));
+			const installOutput = await eager(exec(`npm install 2>&1`, {}, true, destDir));
+			await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(installOutput.toString()));
 			log('    ✓ Install plugins');
 
-			await eager(exec('taq init 2>&1 > /dev/null', {}, false, destDir));
+			const initOutput = await eager(exec(`taq init 2>&1`, {}, true, destDir));
+			await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(initOutput.toString()));
 
 			// Remove the scaffold.json file, if not exists
 			// If it doesn't exist, don't throw...
-			const scaffoldConfigAbspath = await eager(SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`));
+			const scaffoldConfigAbspath = await eager(SanitizedAbsPath.make(`${destDir}/scaffold.json`));
 			try {
 				const scaffoldConfig = await eager(readJsonFile<ScaffoldConfig.t>(scaffoldConfigAbspath));
 				if (
 					typeof scaffoldConfig === 'object' && Object.hasOwn(scaffoldConfig, 'postInit') && scaffoldConfig.postInit
 				) {
-					await eager(exec(scaffoldConfig.postInit!, {}, false, destDir));
+					const setupOutput = await eager(exec(`${scaffoldConfig.postInit!} 2>&1`, {}, true, destDir));
+					await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(setupOutput.toString()));
 				}
 			} catch (err) {
 				if (!isTaqError(err) || err.kind !== 'E_INVALID_PATH_DOES_NOT_EXIST') {
@@ -617,7 +621,7 @@ const getTemplateCommandArgs = (parsedArgs: SanitizedArgs.t, state: EphemeralSta
 		return { command, builder };
 	}
 	return {
-		command: 'create <template>',
+		command: 'pwdtemplate>',
 		builder: (yargs: CLIConfig) => addRequiredTemplatePositional(yargs, state, i18n),
 	};
 };
@@ -631,7 +635,7 @@ const exposeTemplates = (
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
 ) => {
-	if (state.templates) {
+	if (Object.keys(state.templates).length > 0) {
 		const { command, builder } = getTemplateCommandArgs(parsedArgs, state, i18n);
 
 		cliConfig.command(
@@ -693,10 +697,9 @@ const handleTemplate = (
 					{ ...parsedArgs, config },
 					['json', 'application/json'].includes(template.encoding ?? 'none'),
 				),
-				map((res: string | number) => {
-					if (typeof (res) === 'string') {
-						return renderPluginJsonRes(JSON.parse(res));
-					}
+				map(([_, output, errOutput]) => {
+					if (errOutput.length > 0) console.error(errOutput);
+					if (output.length > 0) return renderPluginJsonRes(JSON.parse(output));
 				}),
 			);
 	}
@@ -849,10 +852,9 @@ const exposeTask = (
 							{ ...parsedArgs, ...inputArgs },
 							['json', 'application/json'].includes(task.encoding ?? 'none'),
 						),
-						map((res: string | number) => {
-							if (typeof (res) === 'string') {
-								return renderPluginJsonRes(JSON.parse(res));
-							}
+						map(([_, output, errOutput]) => {
+							if (errOutput.length > 0) console.error(errOutput);
+							if (output.length > 0) return renderPluginJsonRes(JSON.parse(output));
 						}),
 					);
 
@@ -1074,7 +1076,7 @@ export const displayError = (cli: CLIConfig) =>
 	(err: Error | TaqError.t) => {
 		const inputArgs = (cli.parsed as unknown as { argv: Record<string, unknown> }).argv;
 
-		if (!inputArgs.fromVsCode) {
+		if (!inputArgs.fromVsCode && (isTaqError(err) && err.kind !== 'E_EXEC')) {
 			cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
 		}
 
@@ -1102,13 +1104,14 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_CONTRACT_NOT_REGISTERED' }, err => [22, err.msg])
 				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
+				.with({ kind: 'E_EXEC' }, err => [19, false])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 
 			const [exitCode, msg] = res;
 			if (inputArgs.debug) {
 				logAllErrors(err);
-			} else console.error(msg);
+			} else if (msg) console.error(msg);
 
 			Deno.exit(exitCode as number);
 		}
