@@ -97,9 +97,9 @@ const getTaskCounts = (pluginInfo: PluginInfo.t[]): Counts => {
 const getTemplateCounts = (pluginInfo: PluginInfo.t[]): Counts => {
 	return pluginInfo.reduce(
 		(retval, pluginInfo) =>
-			pluginInfo.templates
+			!pluginInfo.templates
 				? retval
-				: pluginInfo.templates!.reduce(
+				: pluginInfo.templates.reduce(
 					(retval: Counts, template: ParsedTemplate.t) => {
 						const templateName = template.template;
 						const providers = retval[templateName]
