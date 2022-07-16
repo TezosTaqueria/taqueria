@@ -158,7 +158,6 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 			try {
 				await exec('taq test', { cwd: taqueriaProjectPath });
 			} catch (err) {
-				console.log(err);
 				const execErr = err as { stdout: '' };
 				return execErr.stdout;
 			}
