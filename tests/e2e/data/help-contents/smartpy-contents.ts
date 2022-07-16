@@ -8,7 +8,6 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a SmartPy synt
                               ax to Michelson code [aliases: c, compile-smartpy]
-  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
