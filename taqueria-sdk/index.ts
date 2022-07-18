@@ -460,13 +460,14 @@ const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): 
 const getPackageName = () => {
 	const stack = getSync({
 		filter: (stackFrame => {
-			const filename = stackFrame.getFileName().replace(/^file:\/\//, '').replace(/^file:/, '');
+			const filename = stackFrame.getFileName();
 			return !filename.includes('taqueria-sdk') && !filename.includes('@taqueria/node-sdk');
 		}),
 	});
 	const frame = stack.shift();
 	if (frame) {
-		const pluginManifest = join(dirname(frame.getFileName()), 'package.json');
+		const filename = frame.getFileName().replace(/^file:\/\//, '').replace(/^file:/, '');
+		const pluginManifest = join(dirname(filename), 'package.json');
 		return getNameFromPluginManifest(pluginManifest);
 	}
 	return generateName().dashed;
