@@ -38,7 +38,8 @@ const sidebars = {
       items: [
         "config/networks",
         "config/implicit-accounts",
-        "config/sandbox-config"
+        "config/sandbox-config",
+        "config/environments"
       ],
     },
     {
@@ -59,26 +60,38 @@ const sidebars = {
         "plugins/plugin-jest",
       ],
     },
-    {
-      type: "category",
-      label: "Taqueria Libraries",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "libraries/taqueria-state"
-      ],
-    },
     // {
     //   type: "category",
-    //   label: "Example App",
+    //   label: "Taqueria Libraries",
     //   className: "sidebarHeader",
     //   collapsed: false,
     //   collapsible: false,
     //   items: [
-    //     "hello-tacos-tutorial"
+    //     "libraries/taqueria-state"
     //   ],
     // },
+    {
+      type: "category",
+      label: "Scaffolds",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "scaffolds/scaffold-basics",
+        "scaffolds/taco-shop",
+        "scaffolds/quickstart",
+      ],
+    },    
+    {
+      type: "category",
+      label: "Tutorials",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "tutorials/hello-tacos-tutorial"
+      ],
+    },
     {
       type: "category",
       label: "Taqueria Internals",
