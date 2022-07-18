@@ -21,7 +21,8 @@ This quickstart guide will teach you the fundamentals of using Taqueria in 10 mi
 What you will accomplish:
 - Initialize a new Taqueria project
 - Install plugins for LIGO, Flextesa, and Taquito
-- Compile a LIGO smart contract
+- Create a new Ligo contract from a template and register it
+- Compile the Ligo smart contract
 - Start a local Flextesa sandbox 
 - Originate the compiled smart contract to the sandbox
 
@@ -79,16 +80,33 @@ Commands:
 
 Once a plugin has been installed, you will see the additional commands provided by the plugin added to the list
 
-## Compiling a LIGO Smart Contract
+## Working with LIGO Smart Contracts
 
 To add support for the LIGO smart contract language, install the LIGO plugin by running:
 ```shell
 taq install @taqueria/plugin-ligo
 ```
 
-Once installed, the plugin provides the command `taq compile` which when run, will look for any LIGO files in the `/contracts` directory and compile them to Michelson `.tz` files in the `/artifacts` directory
+Once installed, the plugin provides the task `taq compile` which when run, will look for any LIGO files in the `/contracts` directory and compile them to Michelson `.tz` files in the `/artifacts` directory. The plugin also provides a template to easily create and register a Ligo contract using the `taq create contract taks
 
-To demonstrate this, create a file called `counter.jsligo` in the `/contracts` directory and insert the following JSLigo code:
+To demonstrate this, create and register a new Ligo contract called `counter.jsligo` by running:
+
+```shell
+taq create contract counter.jsligo
+```
+
+This will create a new Ligo file called `counter.jsligo` and register it with Taqueria
+
+You can see that the contract has been registered by running:
+
+```shell
+taq list-contracts
+```
+
+Open the created file `counter.jsligo` in the `/contracts` directory
+
+Then, insert the following JSLigo code and save the file:
+
 ```ligo title="/contracts/counter.jsligo"
 type storage = int;
 
@@ -238,6 +256,7 @@ This will originate all contracts in the `/artifacts` directory to the sandbox a
 Congratulations! At this point, you have run through the basic usage of Taqueria including:
 - Initializing a new Taqueria project
 - Installing plugins for LIGO, Flextesa, and Taquito
+- Creating a new Ligo contract from a template and registering it
 - Compiling a LIGO smart contract
 - Starting and querying a local Flextesa sandbox 
 - Originating a compiled smart contract to the sandbox
