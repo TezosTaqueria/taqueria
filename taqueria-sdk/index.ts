@@ -459,7 +459,10 @@ const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): 
 
 const getPackageName = () => {
 	const stack = getSync({
-		filter: (stackFrame => !stackFrame.getFileName().includes('taqueria-sdk')),
+		filter: (stackFrame => {
+			const filename = stackFrame.getFileName().replace(/^file:\/\//, '');
+			return !filename.includes('taqueria-sdk') && !filename.includes('@taqueria/node-sdk');
+		}),
 	});
 	const frame = stack.shift();
 	if (frame) {
