@@ -635,17 +635,26 @@ export class VsCodeHelper {
 			: [];
 	}
 
+	private _currentlyRunningTask: string | undefined;
+
 	async proxyToTaqAndShowOutput(
 		taskWithArgs: string,
 		taskTitles: TaskTitles,
 		projectDir: Util.PathToDir | undefined,
 		logStandardErrorToOutput: boolean | undefined,
 	) {
+		if (this._currentlyRunningTask !== undefined) {
+			this.vscode.window.showErrorMessage(
+				`Taqueria is currently busy ${this._currentlyRunningTask}. Please wait for it to finish before running another command.`,
+			);
+			return;
+		}
 		this.vscode.window.withProgress({
 			location: this.vscode.ProgressLocation.Notification,
 			cancellable: false,
 			title: `Taqueria is ${taskTitles.progressTitle}`,
 		}, async progress => {
+			this._currentlyRunningTask = taskTitles.progressTitle;
 			progress.report({ increment: 0 });
 			try {
 				const result = await this.proxyToTaq(taskWithArgs, projectDir);
@@ -676,6 +685,7 @@ export class VsCodeHelper {
 				this.logAllNestedErrors(e);
 			}
 			progress.report({ increment: 100 });
+			this._currentlyRunningTask = undefined;
 		});
 	}
 
