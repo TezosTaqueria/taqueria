@@ -621,7 +621,7 @@ const getTemplateCommandArgs = (parsedArgs: SanitizedArgs.t, state: EphemeralSta
 		return { command, builder };
 	}
 	return {
-		command: 'pwdtemplate>',
+		command: 'create <template>',
 		builder: (yargs: CLIConfig) => addRequiredTemplatePositional(yargs, state, i18n),
 	};
 };

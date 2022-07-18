@@ -29,7 +29,6 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
-  taq create <template>           Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
