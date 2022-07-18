@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/node-sdk",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"description": "A TypeScript SDK for NodeJS used for Taqueria plugin development.",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -47,7 +47,6 @@
 		"i18next": "^21.8.4",
 		"project-name-generator": "^2.1.9",
 		"rambda": "^7.1.4",
-		"stack-trace": "github:mweichert/node-stack-trace",
 		"ts-pattern": "^4.0.2",
 		"yargs": "^17.5.1",
 		"zod": "^3.17.3"

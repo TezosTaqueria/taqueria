@@ -22,9 +22,8 @@ import * as Template from '@taqueria/protocol/Template';
 import { exec, ExecException } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
-import { dirname, join } from 'path';
-import { get } from 'stack-trace';
 import { ZodError } from 'zod';
+import packageInfo from './package.json';
 import { PluginSchema } from './types';
 import { Args, LikeAPromise, pluginDefiner, StdIO } from './types';
 
@@ -191,14 +190,14 @@ const postprocessArgs = (args: Args): Record<string, unknown> => {
 	return groupedArgs;
 };
 
-const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): PluginSchema.t => {
+const parseSchema = (i18n: i18n, definer: pluginDefiner, defaultPluginName: string): PluginSchema.t => {
 	const inputSchema: PluginSchema.RawPluginSchema = definer(i18n);
 
 	const { proxy } = inputSchema;
 
 	const pluginInfo = PluginSchema.create({
 		...inputSchema,
-		name: inputSchema.name ?? inferPluginName(),
+		name: inputSchema.name ?? defaultPluginName,
 	});
 
 	return {
@@ -207,11 +206,11 @@ const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => 
 	};
 };
 
-const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
+const getResponse = (definer: pluginDefiner, defaultPluginName: string) =>
 	async (requestArgs: RequestArgs.t) => {
 		const { taqRun } = requestArgs;
 		const i18n = await load();
-		const schema = parseSchema(i18n, definer, inferPluginName);
+		const schema = parseSchema(i18n, definer, defaultPluginName);
 		try {
 			switch (taqRun) {
 				case 'pluginInfo':
@@ -419,30 +418,6 @@ export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
 	);
 };
 
-const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
-	// The definer function can provide a name for the plugin in its schema, or it
-	// can omit it and we infer it from the package.json file.
-	// To do so, we need to get the directory for the plugin from the call stack
-	const pluginManifest = stack.reduce(
-		(retval: null | string, callsite) => {
-			const callerFile = callsite.getFileName()?.replace(/^file:\/\//, '');
-			return retval || (
-					callerFile.includes('taqueria-sdk')
-					|| callerFile.includes('taqueria-node-sdk')
-					|| callerFile.includes('@taqueria/node-sdk')
-				)
-				? retval
-				: join(dirname(callerFile), 'package.json');
-		},
-		null,
-	);
-
-	return () =>
-		!pluginManifest
-			? generateName().dashed
-			: getNameFromPluginManifest(pluginManifest);
-};
-
 const joinPaths = (...paths: string[]): string => paths.join('/');
 
 const newContract = async (sourceFile: string, parsedArgs: RequestArgs.t) => {
@@ -483,9 +458,8 @@ const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): 
 
 export const Plugin = {
 	create: (definer: pluginDefiner, unparsedArgs: Args) => {
-		const stack = get();
 		return parseArgs(unparsedArgs)
-			.then(getResponse(definer, inferPluginName(stack)))
+			.then(getResponse(definer, packageInfo.name))
 			.catch((err: unknown) => {
 				if (err) console.error(err);
 				process.exit(1);
