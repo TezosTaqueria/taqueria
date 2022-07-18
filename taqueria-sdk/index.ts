@@ -22,8 +22,9 @@ import * as Template from '@taqueria/protocol/Template';
 import { exec, ExecException } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
+import { dirname, join } from 'path';
+import { getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
-import packageInfo from './package.json';
 import { PluginSchema } from './types';
 import { Args, LikeAPromise, pluginDefiner, StdIO } from './types';
 
@@ -456,10 +457,23 @@ const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): 
 	}
 };
 
+const getPackageName = () => {
+	const stack = getSync({
+		filter: (stackFrame => !stackFrame.getFileName().includes('taqueria-sdk')),
+	});
+	const frame = stack.shift();
+	if (frame) {
+		const pluginManifest = join(dirname(frame.getFileName()), 'package.json');
+		return getNameFromPluginManifest(pluginManifest);
+	}
+	return generateName().dashed;
+};
+
 export const Plugin = {
-	create: (definer: pluginDefiner, unparsedArgs: Args) => {
+	create: async (definer: pluginDefiner, unparsedArgs: Args) => {
+		const packageName = getPackageName();
 		return parseArgs(unparsedArgs)
-			.then(getResponse(definer, packageInfo.name))
+			.then(getResponse(definer, packageName))
 			.catch((err: unknown) => {
 				if (err) console.error(err);
 				process.exit(1);
