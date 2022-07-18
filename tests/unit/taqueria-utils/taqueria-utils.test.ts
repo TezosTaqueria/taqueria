@@ -29,8 +29,8 @@ const {
 	renderError,
 	render,
 } = inject({
-	stdout: new MockWriter(),
 	stderr: new MockWriter(),
+	stdout: new MockWriter(),
 });
 
 const testValidJson = '{"test": "testPayload"}';
@@ -233,38 +233,71 @@ Deno.test('execText() can execute in a different working directory', async () =>
 	assertEquals(stderr.toString(), '');
 });
 
-Deno.test('outputWaring() will return message with WARNING: prefix', () => {
-	const msg = 'message';
-	const result = outputWarning(msg);
-	assertEquals(result, `WARNING: ${msg}`);
+Deno.test('renderWaring() will return message with WARNING: prefix in orange', () => {
+	const message = 'test';
+	assertEquals(renderWarning(message), `[38;2;255;128;0mWARNING: ${message}[39m`);
 });
 
-Deno.test('outputError() will return message with ERROR: prefix', () => {
-	const msg = 'message';
-	const result = outputError(msg);
-	assertEquals(result, `ERROR: ${msg}`);
-});
-
-Deno.test('output() will return plain message', () => {
-	const msg = 'message';
-	const result = output(msg);
-	assertEquals(result, `${msg}`);
-});
-
-Deno.test('renderWaring() will return message in orange', () => {
-	const msg = 'message';
-	const result = renderWarning(msg);
-	assertEquals(result, `[38;2;255;128;0m${msg}[39m`);
-});
-
-Deno.test('renderError() will return message in bold and red', () => {
-	const msg = 'message';
-	const result = renderError(msg);
-	assertEquals(result, `[31m[1m${msg}[22m[39m`);
+Deno.test('renderError() will return message with ERROR: prefix in bold and red', () => {
+	const message = 'test';
+	assertEquals(renderError(message), `[31m[1mERROR: ${message}[22m[39m`);
 });
 
 Deno.test('render() will return plain message', () => {
-	const msg = 'message';
-	const result = render(msg);
-	assertEquals(result, `${msg}`);
+	const message = 'test';
+	assertEquals(render(message), `${message}`);
+});
+
+Deno.test('outputWaring() will stdout message with prefix WARNING: in orange', () => {
+	const { stderr, stdout, outputWarning } = inject({
+		stdout: new MockWriter(),
+		stderr: new MockWriter(),
+	});
+
+	// const stdOut = (stdout as MockWriter);
+	// const stdErr = (stderr as MockWriter);
+	// stdOut.clear();
+	// stdErr.clear();
+
+	const message = 'test';
+	const result = outputWarning(message);
+	assertEquals(result, undefined);
+	assert(stdout.toString().includes(`[38;2;255;128;0mWARNING: ${message}\n[39m`));
+	assertEquals(stderr.toString(), '');
+});
+
+Deno.test('outputError() will stderr message with prefix ERROR: in bold and red', () => {
+	const { stderr, stdout, outputError } = inject({
+		stdout: new MockWriter(),
+		stderr: new MockWriter(),
+	});
+
+	// const stdOut = (stdout as MockWriter);
+	// const stdErr = (stderr as MockWriter);
+	// stdOut.clear();
+	// stdErr.clear();
+
+	const message = 'test';
+	const result = outputError(message);
+	assertEquals(result, undefined);
+	assertEquals(stdout.toString(), '');
+	assertEquals(stderr.toString(), `[31m[1mERROR: ${message}\n[22m[39m`);
+});
+
+Deno.test('output() will stdout message', () => {
+	const { stderr, stdout, output } = inject({
+		stdout: new MockWriter(),
+		stderr: new MockWriter(),
+	});
+
+	// const stdOut = (stdout as MockWriter);
+	// const stdErr = (stderr as MockWriter);
+	// stdOut.clear();
+	// stdErr.clear();
+
+	const message = 'test';
+	const result = output(message);
+	assertEquals(result, undefined);
+	assertEquals(stdout.toString(), `${message}\n`);
+	assertEquals(stderr.toString(), '');
 });

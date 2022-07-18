@@ -216,24 +216,30 @@ export const inject = (deps: UtilsDependencies) => {
 		stdout.write(encoder.encode(`${message}\n`));
 	};
 
-	const outputWarning = (message: string) => {
-		return 'WARNING: ' + message;
+	const outputWarning = (message: string, appendNewline = true) => {
+		const encoder = new TextEncoder();
+		if (appendNewline) message += '\n';
+		stdout.write(encoder.encode(renderWarning(message)));
 	};
 
-	const outputError = (message: string) => {
-		return 'ERROR: ' + message;
+	const outputError = (message: string, appendNewline = true) => {
+		const encoder = new TextEncoder();
+		if (appendNewline) message += '\n';
+		stderr.write(encoder.encode(renderError(message)));
 	};
 
-	const output = (message: string) => {
-		return message;
+	const output = (message: string, appendNewline = true) => {
+		const encoder = new TextEncoder();
+		if (appendNewline) message += '\n';
+		stdout.write(encoder.encode(`${render(message)}`));
 	};
 
 	const renderWarning = (message: string) => {
-		return rgb24(message, { r: 255, g: 128, b: 0 });
+		return rgb24('WARNING: ' + message, { r: 255, g: 128, b: 0 });
 	};
 
 	const renderError = (message: string) => {
-		return red(bold(message));
+		return red(bold('ERROR: ' + message));
 	};
 
 	const render = (message: string) => {
