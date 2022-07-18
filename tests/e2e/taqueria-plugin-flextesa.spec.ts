@@ -24,6 +24,9 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['tezos-client', 'flextesa']);
+		await exec(
+			`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`,
+		);
 		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
