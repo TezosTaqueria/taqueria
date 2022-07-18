@@ -20,6 +20,7 @@ title: Taqueria Releases
 - Added missing functionality from the VSCE 
 - The initial storage values in `config.json` now support complex data types via object literals
 - Support for contract and token metadata
+- Taqueria now has a GitHub action for use in CI/CD Pipelines
 
 ### Conceptual Changes to Note
 
@@ -102,6 +103,16 @@ taq install @taqueria/plugin-ipfs-pinata
 #### Use 
 
 To use this plugin, add a metadata or media file to a directory (`dirName`) inside your project, and then run `taq publish <dirName>`
+
+### Taqueria Github Action
+
+Taqueria now provides a GitHub action which has been published on the GitHub marketplace
+
+This action allows you to use Taqueria in your CI/CD pipeline so you can test, deploy, and maintain your projects in CI as you do locally
+
+The action can be found on the marketplace here
+
+For more information, VIEW THE DOCS or see a live example in the TACO-SHOP-SCAFFOLD REPO
 
 ## Migrating from Legacy Versions
 
