@@ -17,6 +17,7 @@ Some helpful things to know:
 - Accounts and balances are pre-configured per-sandbox and do not persist their state
 - Accounts and balances will be re-initialized each time they are started
 - Sandboxes can be added to Taqueria environments and then targeted from the CLI using the `--env [envName]` option 
+- Contracts must be registered in the Taqueria contract registry prior to originating
 
 ## Requirements
 
@@ -62,7 +63,7 @@ This example shows the configuration for the default sandbox named `local`:
     "sandbox": {
         "local": {
             "label": "Local Tezos Sandbox",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
             "rpcUrl": "http://localhost:20000"
         }
 ```
