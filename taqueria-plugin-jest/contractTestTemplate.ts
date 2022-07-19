@@ -1,5 +1,5 @@
 // import { normalizeContractName } from '@taqueria/plugin-contract-types/src/generator/contract-name';
-import { generateContractTypesProcessContractFiles } from '@taqueria/plugin-contract-types/src/cli-process';
+import { generateContractTypesProcessContractFiles } from '@taqueria/plugin-contract-types';
 import { join } from 'path';
 import { CustomRequestArgs, ensurePartitionExists } from './common';
 
