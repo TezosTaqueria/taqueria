@@ -8,7 +8,7 @@ You can find the action on the GitHub Marketplace [here](https://github.com/mark
 
 The action GitHub repo for the project is located [here](https://github.com/ecadlabs/taqueria-github-action)
 
-You can see the action being used on the [Taco Shop Scaffold](https://github.com/ecadlabs/taqueria-scaffold-taco-shop)
+You can see the action being used on the [Taco Shop Scaffold](https://github.com/ecadlabs/taqueria-scaffold-taco-shop/blob/main/.github/workflows/main.yml)
 
 ## Inputs
 
@@ -44,9 +44,15 @@ When set to true, all tests in the `tests` directory will be run using the Jest 
 
 This input is used to select the configured environment for `taqueria` to originate to. The default is set to `development`
 
-## Example usage
+## Adding The Action to Your Project
 
-### Single step action
+Adding a GitHub action to your project requires adding a workflow YML file (the default is `main.yml`) to your GitHub repository in the `.github/workflows` directory. After that you can add what you need in the file to make taqueria run as part of your project workflow. There are some examples of adding the action to your workflow below
+
+You can also check out the quickstart guide for GitHub actions in the GitHub docs located [here](https://docs.github.com/en/actions/quickstart)
+
+## Example Usage
+
+### Single Step Action
 ```yaml
 - name: taqueria tasks
     uses: ecadlabs/taqueria-github-action@v0.1.2
@@ -58,7 +64,7 @@ This input is used to select the configured environment for `taqueria` to origin
         tests: 'true'
 ```
 
-### Multiple step action
+### Multiple Step Action
 ```yaml
 - name: compile contracts
     uses: ecadlabs/taqueria-github-action@v0.1.2
@@ -78,7 +84,7 @@ This input is used to select the configured environment for `taqueria` to origin
         project_directory: 'example-projects/hello-tacos'
         originate: 'true'
 
-- name: originate contracts
+- name: run tests
     uses: ecadlabs/taqueria-github-action@v0.1.2
     with:
         project_directory: 'example-projects/hello-tacos'
