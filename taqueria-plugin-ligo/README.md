@@ -5,7 +5,7 @@ The LIGO plugin provides a task to compile LIGO smart contracts to Michelson `.t
 ## Requirements
 
 - Taqueria v0.0.6 or later
-- Node.js v16 or later
+- Node.js v16.3 or later
 - Docker v0.8.4 or later
 
 ## Installation
@@ -14,9 +14,6 @@ To install the LIGO plugin on a Taqueria project, navigate to the project folder
 ```shell
 taq install @taqueria/plugin-ligo
 ```
-
-> ### :page_with_curl: Note
-> At this time, all Taqueria projects must also be initialized as node projects by running `npm init -y` from the root of your project directory
 
 ## Configuration
 

@@ -1,0 +1,123 @@
+---
+title: Account Configuration
+---
+
+Taqueria provides an easy way to define and fund accounts at the project level
+
+:::note
+On Tezos, implicit accounts are accounts that do not have smart contract functionality and are prefixed with `tz1`
+:::
+
+The default Taqueria `config.json` provides 5 accounts as shown here:
+
+```json
+{
+    "language": "en",
+    "plugins": [ ],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts",
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": []
+        }
+    },
+    "sandbox": {
+        "local": {
+            "label": "Local Tezos Sandbox",
+            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+    "network": {},
+    "accounts": {
+        "bob": "3_000_000_000",
+        "alice": "3_000_000_000",
+        "john": "3_000_000_000",
+        "jane": "3_000_000_000",
+        "joe": "3_000_000_000"
+    }
+}
+```
+
+You may define as many accounts as you need. Taqueria imposes no limits on how many accounts you would like to reference in your project
+
+These accounts will be created and funded automatically when a sandbox starts. After starting a sandbox, you will see the defined accounts appear in the configuration:
+
+```json
+{
+    "language": "en",
+    "plugins": [
+    ],
+    "contractsDir": "contracts",
+    "testsDir": "tests",
+    "artifactsDir": "artifacts",
+    "environment": {
+        "default": "development",
+        "development": {
+            "networks": [],
+            "sandboxes": [
+                "local"
+            ],
+            "storage": {
+                "example.tz": 42
+            }
+        }
+    },
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "bob": {
+                    "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+                    "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+                    "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+                },
+                "alice": {
+                    "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+                    "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+                    "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+                }
+            },
+            "label": "Local Tezos Sandbox",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+    "network": {},
+    "accounts": {
+        "bob": "3_000_000_000",
+        "alice": "3_000_000_000"
+    }
+}
+```
+
+:::note
+Future improvements will extend implicit account provisioning to testnets
+:::
+
+To set a default account for a sandbox, you must now define it explicitly in the sandbox config:
+
+```json
+    "sandbox": {
+        "local": {
+            "accounts": {
+                "default": "bob",
+                "bob": {
+                    "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+                    "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+                    "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+                },
+                "alice": {
+                    "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+                    "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+                    "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+                }
+            },
+            "label": "Local Tezos Sandbox",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+            "rpcUrl": "http://localhost:20000"
+        }
+    },
+```

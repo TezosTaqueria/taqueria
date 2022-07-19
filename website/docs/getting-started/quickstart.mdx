@@ -14,7 +14,6 @@ Questions:
 - What are the cool things you can do with Taqueria? 
 -->
 
-
 ## Overview
 
 This quickstart guide will teach you the fundamentals of using Taqueria in 10 minutes by going through the process of running some basic tasks in Taqueria from the CLI

@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/node-sdk",
-	"version": "0.4.0",
+	"version": "0.8.7",
 	"description": "A TypeScript SDK for NodeJS used for Taqueria plugin development.",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -15,6 +15,12 @@
 		"build-cjs": "npx esbuild --bundle index.ts types.ts --outdir=. --platform=node --sourcemap",
 		"build-esm-index": "npx esbuild --bundle index.ts --outfile=index.esm.js --platform=node --format=esm --sourcemap",
 		"build-esm-types": "npx esbuild --bundle types.ts --outfile=types.esm.js --platform=node --format=esm --sourcemap"
+	},
+	"targets": {
+		"main": {
+			"context": "node",
+			"isLibrary": true
+		}
 	},
 	"keywords": [
 		"taqueria",
@@ -37,11 +43,11 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/protocol": "^0.4.0",
+		"@taqueria/protocol": "^0.8.7",
 		"i18next": "^21.8.4",
 		"project-name-generator": "^2.1.9",
 		"rambda": "^7.1.4",
-		"stack-trace": "github:mweichert/node-stack-trace",
+		"stacktrace-js": "^2.0.2",
 		"ts-pattern": "^4.0.2",
 		"yargs": "^17.5.1",
 		"zod": "^3.17.3"
@@ -51,7 +57,6 @@
 		"@types/json-schema-generator": "^2.0.0",
 		"@types/node": "^17.0.12",
 		"@types/project-name-generator": "^2.1.1",
-		"@types/stack-trace": "^0.0.29",
 		"@types/yargs": "^17.0.7",
 		"esbuild": "^0.14.39",
 		"typescript": "^4.7.2"

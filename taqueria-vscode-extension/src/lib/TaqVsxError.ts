@@ -10,7 +10,8 @@ export type TaqVsxErrorType =
 	| 'E_STATE_MISSING'
 	| 'E_EXEC'
 	| 'E_NO_TAQUERIA_PROJECTS'
-	| 'E_WINDOWS';
+	| 'E_WINDOWS'
+	| 'E_UnknownError';
 
 export type TaqVsxError = {
 	readonly kind: TaqVsxErrorType;

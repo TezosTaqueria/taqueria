@@ -13,10 +13,7 @@ export const rawSchema = z.object({
 	operation: Verb.rawSchema.describe('Operation Name'),
 	command: Command.rawSchema.describe('Operation Command'),
 	description: z.string({ description: 'Operation Description' }).optional(),
-	positionals: z.preprocess(
-		(val: unknown) => val || [],
-		z.array(PositionalArg.rawSchema).describe('Operation Positional Args').optional(),
-	),
+	positionals: z.array(PositionalArg.rawSchema).default([]).describe('Operation Positional Args').optional(),
 	options: z.preprocess(
 		(val: unknown) => val ?? [],
 		z.array(
@@ -38,10 +35,7 @@ export const internalSchema = z.object({
 	operation: Verb.schemas.schema.describe('Operation Name'),
 	command: Command.schemas.schema.describe('Operation Command'),
 	description: z.string({ description: 'Optionation Description' }).optional(),
-	positionals: z.preprocess(
-		(val: unknown) => val || [],
-		z.array(PositionalArg.schemas.schema).describe('Operation Positional Args').optional(),
-	),
+	positionals: z.array(PositionalArg.schemas.schema).default([]).describe('Operation Positional Args').optional(),
 	options: z.preprocess(
 		(val: unknown) => val ?? [] as Option.t[],
 		z.array(Option.schemas.schema.describe('Operation Option'), { description: 'Operation Options' }).optional(),

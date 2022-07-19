@@ -1,6 +1,6 @@
 {
-	"name": "@taqueria/state-js",
-	"version": "0.4.0",
+	"name": "@taqueria/state",
+	"version": "0.8.7",
 	"description": "A TypeScript library for NodeJS and Deno to work with Taqueria projects",
 	"main": "./index.js",
 	"source": "./node/index.ts",
@@ -14,6 +14,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "npx tsc -p ./tsconfig.json && npx esbuild --bundle ./node/index.ts --outfile=./index.js --minify --platform=node --sourcemap"
 	},
+	"types": "./node/index.d.ts",
 	"keywords": [
 		"taqueria",
 		"tezos",
@@ -28,7 +29,7 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/ecadlabs/taqueria.git",
-		"directory": "taqueria-state-js"
+		"directory": "taqueria-state"
 	},
 	"bugs": {
 		"url": "https://github.com/ecadlabs/taqueria/issues"
@@ -40,7 +41,7 @@
 		"typescript": "^4.7.2"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "0.4.0",
+		"@taqueria/protocol": "^0.8.7",
 		"rambda": "^7.1.4"
 	}
 }

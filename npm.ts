@@ -55,13 +55,16 @@ export const requireNPM = (projectDir: SanitizedAbsPath.t, i18n: i18n) =>
 export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: SanitizedAbsPath.t) =>
 	pipe(
 		/^\//.test(pluginNameOrPath)
+			// If starts with a slash, we can assume that its a path
 			? SanitizedAbsPath.make(pluginNameOrPath)
-			: SanitizedAbsPath.make(`${projectDir}/${pluginNameOrPath}`),
+			: // Otherwise, we assume that its a relative path
+				SanitizedAbsPath.make(`${projectDir}/${pluginNameOrPath}`),
 		chain(pluginPath => SanitizedAbsPath.make(`${pluginPath}/package.json`)),
 		chain(readJsonFile),
 		chainRej(() =>
+			// Assumptions failed above. Assume that we're given a package name
 			pipe(
-				SanitizedAbsPath.make(`node_modules/${pluginNameOrPath}/package.json`),
+				SanitizedAbsPath.make(`${projectDir}/node_modules/${pluginNameOrPath}/package.json`),
 				chain(readJsonFile),
 			)
 		),
@@ -119,7 +122,7 @@ export const uninstallPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plug
 					...config,
 					plugins,
 				}),
-				writeJsonFile(config.configFile),
+				chain(writeJsonFile(config.configFile)),
 			);
 		}),
 		map(() => i18n.__('pluginUninstalled')),

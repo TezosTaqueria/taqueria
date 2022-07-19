@@ -8,15 +8,16 @@
 	},
 	"json": {
 	},
-	"includes": ["**/*.{ts,tsx,js,jsx,cjs,mjs,json}"],
+	"includes": [
+		"**/*.{ts,tsx,js,jsx,cjs,mjs,json}",
+		".github/workflows/*"
+	],
 	"excludes": [
 		"**/node_modules",
 		"**/*-lock.json",
 		"./website",
 		"taqueria-plugin-contract-types/example",
-		"taqueria-vscode-extension/src/test/suite/data",
-		"**/tests/**/data",
-		"tests/e2e/data"
+		"taqueria-vscode-extension/src/test/suite/data"
 	],
 	"plugins": [
 		"https://plugins.dprint.dev/typescript-0.68.2.wasm",

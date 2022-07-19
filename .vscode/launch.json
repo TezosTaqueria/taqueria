@@ -11,7 +11,41 @@
 			"outFiles": [
 				"${workspaceFolder}/taqueria-vscode-extension/out/*.js"
 			],
-			"preLaunchTask": "build-and-watch-vscode"
+			"preLaunchTask": "build-and-watch-vscode",
+			"env": {
+				"LogLevel": "warn",
+				"InstallDevPlugins": "false"
+			}
+		},
+		{
+			"request": "launch",
+			"name": "Launch CLI",
+			"type": "pwa-node",
+			"program": "${workspaceFolder}/index.ts",
+			"cwd": "${workspaceFolder}", // If you want to run taq from a different location, set the address in this line
+			"runtimeExecutable": "deno",
+			"runtimeArgs": [
+				"run",
+				"--inspect-brk",
+				"--allow-run",
+				"--allow-write",
+				"--allow-read",
+				"--allow-env",
+				"--allow-net",
+				"--import-map",
+				"${workspaceFolder}/import_map.json"
+			],
+			"args": [
+				"--quickstart",
+				"Dummy text",
+				"--setBuild",
+				"Dummy-build",
+				"--setVersion",
+				"Dummy-version",
+				"uninstall",
+				"../../taqueria/taqueria-plugin-flextesa"
+			],
+			"attachSimplePort": 9229
 		}
 	]
 }

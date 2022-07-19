@@ -75,7 +75,7 @@ jobs:
       - name: Package VSCode Extension
         if: runner.os == 'Linux'
         id: packageExtension
-        uses: HaaLeo/publish-vscode-extension@v1
+        uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: stub
           dryRun: true
@@ -127,10 +127,10 @@ jobs:
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
 
-      # Seperate steps for prerelease and release workflows
+      # Separate steps for prerelease and release workflows
       - name: Publish as pre-release
         if: ${{ github.event.release.prerelease }}
-        uses: HaaLeo/publish-vscode-extension@v1
+        uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}
           yarn: true
@@ -140,7 +140,7 @@ jobs:
 
       - name: Publish as official release
         if: ${{ !github.event.release.prerelease }}
-        uses: HaaLeo/publish-vscode-extension@v1
+        uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}
           yarn: true

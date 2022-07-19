@@ -2,7 +2,9 @@ import * as TaqError from '@taqueria/protocol/TaqError';
 import {
 	attemptP,
 	bichain,
+	bimap,
 	chain,
+	chainRej,
 	debugMode,
 	forkCatch,
 	FutureInstance as Future,
@@ -15,29 +17,30 @@ import {
 import { titleCase } from 'https://deno.land/x/case@2.1.1/mod.ts';
 import { Table } from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts';
 import { identity, pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
+import { has, last, uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
+import * as Analytics from './analytics.ts';
+import { addContract, listContracts, removeContract } from './contracts.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
 import { addNewProvision, apply, loadProvisions, plan } from './provisions.ts';
 import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
-import type {
-	InstalledPlugin,
-	Option,
-	PluginAction,
-	PluginJsonResponse,
-	PluginResponse,
-	PositionalArg,
-} from './taqueria-protocol/taqueria-protocol-types.ts';
 import {
 	EphemeralState,
 	i18n,
-	ParsedPluginInfo,
+	InstalledPlugin,
+	Option,
+	ParsedTemplate,
+	PluginInfo,
+	PluginJsonResponse,
+	PluginResponseEncoding,
+	PositionalArg,
 	SanitizedAbsPath,
 	SanitizedArgs,
+	ScaffoldConfig,
 	Task,
 } from './taqueria-protocol/taqueria-protocol-types.ts';
 import type { CLIConfig, DenoArgs, EnvKey, EnvVars } from './taqueria-types.ts';
@@ -51,7 +54,8 @@ const {
 	mkdir,
 	readJsonFile,
 	writeTextFile,
-	doesPathNotExist,
+	appendTextFile,
+	doesPathNotExistOrIsEmptyDir,
 	gitClone,
 	rm,
 	log,
@@ -65,13 +69,18 @@ const {
 	stderr: Deno.stderr,
 });
 
+const {
+	optInAnalytics,
+	optOutAnalytics,
+	sendEvent,
+} = Analytics.inject({
+	env: Deno.env,
+	inputArgs: Deno.args,
+	build: Deno.build,
+});
+
 // Add alias
 const exec = execText;
-
-type SendPluginActionRequest = (
-	plugin: InstalledPlugin.t,
-) => (action: PluginAction) => (requestArgs: Record<string, unknown>) => Future<TaqError.t, PluginResponse>;
-
 type PluginLib = ReturnType<typeof inject>;
 
 /**
@@ -91,7 +100,7 @@ type PluginLib = ReturnType<typeof inject>;
 
 const getFromEnv = <T>(key: EnvKey, defaultValue: T, env: EnvVars) => env.get(key) || defaultValue;
 
-const getVersion = (inputArgs: DenoArgs, _i18n: i18n.t) => {
+const getVersion = (inputArgs: DenoArgs) => {
 	const i = inputArgs.findIndex((str: string) => str === '--setVersion');
 	return i > -1
 		? inputArgs[i + 1]
@@ -108,7 +117,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			type: 'string',
 		})
 		.hide('setVersion')
-		.version(getVersion(args, i18n))
+		.version(getVersion(args))
 		.option('disableState', {
 			describe: i18n.__('disableStateDesc'),
 			default: getFromEnv('TAQ_DISABLE_STATE', false, env),
@@ -176,6 +185,26 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 					forkCatch(console.error)(console.error)(console.log),
 				),
 		)
+		.command(
+			'opt-in',
+			i18n.__('optInDesc'),
+			() => {},
+			() =>
+				pipe(
+					optInAnalytics(),
+					forkCatch(console.error)(console.error)(console.log),
+				),
+		)
+		.command(
+			'opt-out',
+			i18n.__('optOutDesc'),
+			() => {},
+			() =>
+				pipe(
+					optOutAnalytics(),
+					forkCatch(console.error)(console.error)(console.log),
+				),
+		)
 		.option('fromVsCode', {
 			describe: i18n.__('fromVsCodeDesc'),
 			default: false,
@@ -201,12 +230,12 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 					.positional('scaffoldUrl', {
 						describe: i18n.__('scaffoldUrlDesc'),
 						type: 'string',
-						default: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart.git',
+						default: 'https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git',
 					})
 					.positional('scaffoldProjectDir', {
 						type: 'string',
 						describe: i18n.__('scaffoldProjectDirDesc'),
-						default: './taqueria-quickstart',
+						default: './taqueria-taco-shop',
 					});
 			},
 			(args: Record<string, unknown>) =>
@@ -276,6 +305,61 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 				default: false,
 				boolean: true,
 			})
+			.command(
+				'add-contract <sourceFile>',
+				i18n.__('addContractDesc'),
+				(yargs: Arguments) => {
+					yargs.positional('sourceFile', {
+						describe: i18n.__('addSourceFileDesc'),
+						type: 'string',
+						required: true,
+					});
+
+					yargs.option('contractName', {
+						alias: ['name', 'n'],
+						type: 'string',
+					});
+				},
+				(inputArgs: Record<string, unknown>) =>
+					pipe(
+						SanitizedArgs.ofAddContractArgs(inputArgs),
+						chain(args => addContract(args, i18n)),
+						map(renderTable),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+					),
+			)
+			.command(
+				'rm-contract <contractName>',
+				i18n.__('removeContractDesc'),
+				(yargs: Arguments) => {
+					yargs.positional('contractName', {
+						describe: i18n.__('removeContractNameDesc'),
+						type: 'string',
+						required: true,
+					});
+				},
+				(inputArgs: Record<string, unknown>) =>
+					pipe(
+						SanitizedArgs.ofRemoveContractsArgs(inputArgs),
+						chain(args => removeContract(args, i18n)),
+						map(renderTable),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+					),
+			)
+			.alias('remove-contract', 'rm-contract')
+			.command(
+				'list-contracts',
+				i18n.__('listContractsDesc'),
+				() => {},
+				(inputArgs: Record<string, unknown>) =>
+					pipe(
+						SanitizedArgs.of(inputArgs),
+						chain(args => listContracts(args, i18n)),
+						map(renderTable),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+					),
+			)
+			.alias('show-contracts', 'list-contracts')
 			.demandCommand(),
 		extendCLI(env, parsedArgs, i18n),
 	);
@@ -357,41 +441,52 @@ const scaffoldProject = (i18n: i18n.t) =>
 	({ scaffoldUrl, scaffoldProjectDir, maxConcurrency }: SanitizedArgs.ScaffoldTaskArgs) =>
 		attemptP<TaqError.t, string>(async () => {
 			const abspath = await eager(SanitizedAbsPath.make(scaffoldProjectDir));
-			const destDir = await eager(doesPathNotExist(abspath));
+			const destDir = await eager(doesPathNotExistOrIsEmptyDir(abspath));
 
 			log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
 			await eager(gitClone(scaffoldUrl)(destDir));
 
-			// TODO: Remove after 620-operations is merged in both the
-			// taqueria repo as well as the taqueria-scaffold-quickstart repo
-			//
-			// See issue: https://github.com/ecadlabs/taqueria/issues/736
-			await eager(exec('git checkout 620-operations', {}, true, destDir));
-
 			log('\n Initializing Project...');
 
-			const scaffoldConfig = await eager(SanitizedAbsPath.make(`${destDir}/.taq/scaffold.json`));
-			log('    ✓ Cleanup scaffold config');
-
 			const gitDir = await eager(SanitizedAbsPath.make(`${destDir}/.git`));
+			await eager(rm(gitDir));
+			log('    ✓ Remove Git directory');
+
+			const installOutput = await eager(exec(`npm install 2>&1`, {}, true, destDir));
+			await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(installOutput.toString()));
+			log('    ✓ Install plugins');
+
+			const initOutput = await eager(exec(`taq init 2>&1`, {}, true, destDir));
+			await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(initOutput.toString()));
 
 			// Remove the scaffold.json file, if not exists
 			// If it doesn't exist, don't throw...
+			const scaffoldConfigAbspath = await eager(SanitizedAbsPath.make(`${destDir}/scaffold.json`));
 			try {
-				await eager(rm(scaffoldConfig));
+				const scaffoldConfig = await eager(readJsonFile<ScaffoldConfig.t>(scaffoldConfigAbspath));
+				if (
+					typeof scaffoldConfig === 'object' && Object.hasOwn(scaffoldConfig, 'postInit') && scaffoldConfig.postInit
+				) {
+					const setupOutput = await eager(exec(`${scaffoldConfig.postInit!} 2>&1`, {}, true, destDir));
+					await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(setupOutput.toString()));
+				}
 			} catch (err) {
 				if (!isTaqError(err) || err.kind !== 'E_INVALID_PATH_DOES_NOT_EXIST') {
 					throw err;
 				}
 			}
+			try {
+				await eager(rm(scaffoldConfigAbspath));
+			} catch (err) {
+				if (!isTaqError(err) || err.kind !== 'E_INVALID_PATH_DOES_NOT_EXIST') {
+					throw err;
+				}
+			}
+			log('    ✓ Run scaffold post-init script');
 
-			await eager(rm(gitDir));
-			log('    ✓ Remove Git directory');
-
-			await eager(exec('npm install 2>&1 > /dev/null', {}, false, destDir));
-			log('    ✓ Install plugins');
-
-			await eager(exec('taq init 2>&1 > /dev/null', {}, false, destDir));
+			// Remove injected quickstart file
+			const quickstartFile = await eager(SanitizedAbsPath.make(`${destDir}/quickstart.md`));
+			await eager(rm(quickstartFile));
 			log("    ✓ Project Taq'ified \n");
 
 			return ('🌮 Project created successfully 🌮');
@@ -401,9 +496,18 @@ const scaffoldProject = (i18n: i18n.t) =>
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) =>
 	state.plugins.reduce(
-		(retval: Task.t | undefined, pluginInfo: ParsedPluginInfo.t) =>
+		(retval: Task.t | undefined, pluginInfo: PluginInfo.t) =>
 			pluginInfo.name === pluginName || pluginInfo.alias === pluginName
 				? pluginInfo.tasks?.find((task: Task.t) => task.task === taskName)
+				: retval,
+		undefined,
+	);
+
+const getCanonicalTemplate = (pluginName: string, templateName: string, state: EphemeralState.t) =>
+	state.plugins.reduce(
+		(retval: ParsedTemplate.t | undefined, pluginInfo: PluginInfo.t) =>
+			pluginInfo.name === pluginName || pluginInfo.alias === pluginName
+				? pluginInfo.templates?.find((template: ParsedTemplate.t) => template.template == templateName)
 				: retval,
 		undefined,
 	);
@@ -439,44 +543,168 @@ const addOperations = (
 				map(() => 'Added provision to .taq/provisions.json'),
 				forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
 			),
-	)
-		.command(
-			'plan',
-			'Display the execution plan for applying all provisioned operations',
-			() => {},
-			(argv: Arguments) =>
-				pipe(
-					SanitizedArgs.of(argv),
-					map(inputArgs => joinPaths(inputArgs.projectDir, '.taq', 'provisions.json')),
-					chain(SanitizedAbsPath.make),
-					chain(loadProvisions),
-					map(plan),
-					forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
-				),
+	);
+// .command(
+// 	'plan',
+// 	'Display the execution plan for applying all provisioned operations',
+// 	() => {},
+// 	(argv: Arguments) =>
+// 		pipe(
+// 			SanitizedArgs.of(argv),
+// 			map(inputArgs => joinPaths(inputArgs.projectDir, '.taq', 'provisions.json')),
+// 			chain(SanitizedAbsPath.make),
+// 			chain(loadProvisions),
+// 			map(plan),
+// 			forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+// 		),
+// );
+
+const getTemplateName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t) => {
+	if (parsedArgs._.length >= 2 && parsedArgs._[0] === 'create') {
+		const templateName = last(parsedArgs._.slice(0, 2));
+		return templateName && state.templates[templateName]
+			? templateName
+			: undefined;
+	}
+	return undefined;
+};
+
+const addRequiredTemplatePositional = (yargs: CLIConfig, state: EphemeralState.t, i18n: i18n.t) =>
+	yargs.positional('template', {
+		describe: i18n.__('templateDesc'),
+		type: 'string',
+		choices: Object.keys(state.templates),
+		required: true,
+	});
+
+const getTemplateCommandArgs = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t, i18n: i18n.t) => {
+	const templateName = getTemplateName(parsedArgs, state);
+	if (templateName) {
+		const implementation = state.templates[templateName];
+
+		// Get the template
+		const template: ParsedTemplate.t = has('template', implementation)
+			? implementation as ParsedTemplate.t
+			: getCanonicalTemplate(
+				(implementation as InstalledPlugin.t).name,
+				templateName,
+				state,
+			) as ParsedTemplate.t;
+
+		const command = 'create ' + template.command.replace(
+			new RegExp(`^${template.template}`),
+			'<template>',
 		);
+
+		const builder = (yargs: CLIConfig) => {
+			addRequiredTemplatePositional(yargs, state, i18n);
+			template.options?.map(option =>
+				yargs.option(option.flag, {
+					alias: option.shortFlag,
+					describe: option.description,
+					type: option.type,
+					required: option.required,
+					default: option.defaultValue,
+					choices: option.choices,
+				})
+			);
+			template.positionals?.map(p =>
+				yargs.positional(p.placeholder, {
+					default: p.defaultValue,
+					describe: p.description,
+					type: p.type,
+					required: p.required,
+				})
+			);
+			return yargs;
+		};
+		return { command, builder };
+	}
+	return {
+		command: 'create <template>',
+		builder: (yargs: CLIConfig) => addRequiredTemplatePositional(yargs, state, i18n),
+	};
+};
 
 const exposeTemplates = (
 	cliConfig: CLIConfig,
-	_config: LoadedConfig.t,
+	config: LoadedConfig.t,
 	_env: EnvVars,
-	_parsedArgs: SanitizedArgs.t,
-	_i18n: i18n.t,
-	_state: EphemeralState.t,
-	_pluginLib: PluginLib,
-) =>
-	cliConfig.command(
-		'create <template>',
-		'Create an entity from a pre-existing template',
-		() => {
-			console.log('Configuring create template!');
-		},
-		() => {
-			console.log('Create template!');
-			Deno.exit(10);
-		},
-	)
-		.alias('create-tmpl', 'create')
-		.alias('create-template', 'create');
+	parsedArgs: SanitizedArgs.t,
+	i18n: i18n.t,
+	state: EphemeralState.t,
+	pluginLib: PluginLib,
+) => {
+	if (Object.keys(state.templates).length > 0) {
+		const { command, builder } = getTemplateCommandArgs(parsedArgs, state, i18n);
+
+		cliConfig.command(
+			command,
+			i18n.__('createDesc'),
+			builder,
+			(args: Arguments) =>
+				pipe(
+					SanitizedArgs.ofCreateTaskArgs(args),
+					chain((parsedArgs: SanitizedArgs.CreateTaskArgs) => {
+						// We need to determine first if the template is provided by more than one plugin, and if so,
+						// that the plugin option was provided to know which one should be targeted.
+						// We can then see if handling this template should be proxied to the plugin or have a shell command executed
+						const isComposite = has('template', state.templates[parsedArgs.template]);
+
+						if (isComposite) {
+							if (parsedArgs.plugin) {
+								const installedPlugin = config.plugins.find(plugin => plugin.name === parsedArgs.plugin);
+								if (installedPlugin) {
+									return handleTemplate(parsedArgs, config, installedPlugin, state, pluginLib, i18n);
+								}
+							}
+							return resolve(log(i18n.__('providedByMany')));
+						}
+
+						const installedPlugin = state.templates[parsedArgs.template] as InstalledPlugin.t;
+						return handleTemplate(parsedArgs, config, installedPlugin, state, pluginLib, i18n);
+					}),
+					forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+				),
+		);
+	}
+	return cliConfig;
+};
+
+const handleTemplate = (
+	parsedArgs: SanitizedArgs.CreateTaskArgs,
+	config: LoadedConfig.t,
+	plugin: InstalledPlugin.t,
+	state: EphemeralState.t,
+	pluginLib: PluginLib,
+	i18n: i18n.t,
+) => {
+	const template = getCanonicalTemplate(plugin.name, parsedArgs.template, state);
+	if (template) {
+		return template.handler === 'function'
+			? pipe(
+				pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)('proxyTemplate', template.encoding)({
+					...parsedArgs,
+					action: 'proxyTemplate',
+				}),
+				map(decoded => {
+					if (decoded) return renderPluginJsonRes(decoded);
+				}),
+			)
+			: pipe(
+				exec(
+					template.handler,
+					{ ...parsedArgs, config },
+					['json', 'application/json'].includes(template.encoding ?? 'none'),
+				),
+				map(([_, output, errOutput]) => {
+					if (errOutput.length > 0) console.error(errOutput);
+					if (output.length > 0) return renderPluginJsonRes(JSON.parse(output));
+				}),
+			);
+	}
+	return resolve(log(i18n.__('templateNotFound')));
+};
 
 const getPluginOption = (task: Task.t) => {
 	return task.options?.find(option => option.flag === 'plugin');
@@ -519,14 +747,14 @@ const exposeTasks = (
 							state,
 							i18n,
 							canonicalTask,
-							pluginLib.sendPluginActionRequest,
+							pluginLib,
 							config.plugins?.find((found: InstalledPlugin.t) => found.name === parsedArgs.plugin),
 						)
 						: retval;
 				}
 
 				// No plugin provider was specified (path #1)
-				return exposeTask(retval, config, env, parsedArgs, state, i18n, task, pluginLib.sendPluginActionRequest);
+				return exposeTask(retval, config, env, parsedArgs, state, i18n, task, pluginLib);
 			}
 
 			// Canonical task...
@@ -540,7 +768,7 @@ const exposeTasks = (
 					state,
 					i18n,
 					foundTask,
-					pluginLib.sendPluginActionRequest,
+					pluginLib,
 					implementation,
 				)
 				: retval;
@@ -556,7 +784,7 @@ const exposeTask = (
 	state: EphemeralState.t,
 	_i18n: i18n.t,
 	task: Task.t,
-	sendPluginActionRequest: SendPluginActionRequest,
+	pluginLib: PluginLib,
 	plugin?: InstalledPlugin.t,
 ) =>
 	pipe(
@@ -608,10 +836,13 @@ const exposeTask = (
 
 				const handler = task.handler === 'proxy' && plugin
 					? pipe(
-						sendPluginActionRequest(plugin)(task)({ ...inputArgs, task: task.task }),
+						pluginLib.sendPluginActionRequest(plugin)('proxy', task.encoding ?? PluginResponseEncoding.create('none'))({
+							...inputArgs,
+							task: task.task,
+						}),
 						chain(addTask(parsedArgs, task.task, plugin.name)),
 						map(res => {
-							const decoded = res as PluginJsonResponse | void;
+							const decoded = res as PluginJsonResponse.t | void;
 							if (decoded) return renderPluginJsonRes(decoded);
 						}),
 					)
@@ -621,10 +852,9 @@ const exposeTask = (
 							{ ...parsedArgs, ...inputArgs },
 							['json', 'application/json'].includes(task.encoding ?? 'none'),
 						),
-						map((res: string | number) => {
-							if (typeof (res) === 'string') {
-								return renderPluginJsonRes(JSON.parse(res));
-							}
+						map(([_, output, errOutput]) => {
+							if (errOutput.length > 0) console.error(errOutput);
+							if (output.length > 0) return renderPluginJsonRes(JSON.parse(output));
 						}),
 					);
 
@@ -642,17 +872,17 @@ const loadEphermeralState = (
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
 ): CLIConfig =>
-	[exposeTasks, exposeTemplates /*, addOperations*/].reduce(
+	[exposeTasks, exposeTemplates /* addOperations*/].reduce(
 		(cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
 		cliConfig,
 	);
 
-const renderPluginJsonRes = (decoded: PluginJsonResponse) => {
+const renderPluginJsonRes = (decoded: PluginJsonResponse.t) => {
 	switch (decoded.render) {
 		case 'table':
 			renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
 			break;
-		case 'string':
+		default:
 			log(decoded.data as string);
 			break;
 	}
@@ -694,7 +924,7 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
 		: {
 			...parsedArgs,
 			plugin: state.plugins.reduce(
-				(retval, pluginInfo: ParsedPluginInfo.t) =>
+				(retval, pluginInfo: PluginInfo.t) =>
 					pluginInfo.alias === retval
 						? pluginInfo.name
 						: retval,
@@ -730,7 +960,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 			map((cliConfig: CLIConfig) => cliConfig.help()),
 			chain(parseArgs),
 			chain(inputArgs => SanitizedArgs.of(inputArgs)),
-			map(showInvalidTask(cliConfig)),
+			chain(showInvalidTask(cliConfig)),
 		);
 
 const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
@@ -743,6 +973,14 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 		'listKnownTasks',
 		'provision',
 		'plan',
+		'opt-in',
+		'opt-out',
+		'create',
+		'add-contract',
+		'rm-contract',
+		'remove-contract',
+		'list-contracts',
+		'show-contracts',
 	].reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,
@@ -770,7 +1008,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 					cliConfig,
 					parseArgs,
 					chain(SanitizedArgs.of),
-					chain(initArgs => {
+					chain((initArgs: SanitizedArgs.t) => {
 						if (initArgs.debug) debugMode(true);
 
 						if (initArgs.version) {
@@ -783,13 +1021,30 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 						return initArgs._.includes('init')
 								|| initArgs._.includes('testFromVsCode')
 								|| initArgs._.includes('scaffold')
+								|| initArgs._.includes('opt-in')
+								|| initArgs._.includes('opt-out')
 							? taqResolve(initArgs)
 							: postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n);
 					}),
-					forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+					chain((initArgs: SanitizedArgs.t) =>
+						sendEvent(
+							initArgs._.join(),
+							getVersion(inputArgs),
+							false,
+						)
+					),
+					forkCatch(async (error: Error | TaqError.t) => {
+						await eager(sendEvent(inputArgs.join(), getVersion(inputArgs), true));
+						displayError(cliConfig)(error);
+					})(async (error: Error | TaqError.t) => {
+						await eager(sendEvent(inputArgs.join(), getVersion(inputArgs), true));
+						displayError(cliConfig)(error);
+					})(identity),
 				),
 		);
 	} catch (err) {
+		// Something went wrong that we didn't handle.
+		// TODO: Generate bug report with stack trace
 		console.error(err);
 	}
 };
@@ -797,14 +1052,14 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 export const showInvalidTask = (cli: CLIConfig) =>
 	(parsedArgs: SanitizedArgs.t) => {
 		if (executingBuiltInTask(parsedArgs) || cli.handled) {
-			return parsedArgs;
+			return taqResolve(parsedArgs);
 		}
 		const err: TaqError.t = {
 			kind: 'E_INVALID_TASK',
 			msg: `Taqueria isn't aware of this task. Perhaps you need to install a plugin first?`,
 			context: parsedArgs,
 		};
-		return displayError(cli)(err);
+		return reject(err);
 	};
 
 export const normalizeErr = (err: TaqError.t | TaqError.E_TaqError | Error) => {
@@ -821,7 +1076,7 @@ export const displayError = (cli: CLIConfig) =>
 	(err: Error | TaqError.t) => {
 		const inputArgs = (cli.parsed as unknown as { argv: Record<string, unknown> }).argv;
 
-		if (!inputArgs.fromVsCode) {
+		if (!inputArgs.fromVsCode && (isTaqError(err) && err.kind !== 'E_EXEC')) {
 			cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
 		}
 
@@ -845,13 +1100,19 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_PARSE_UNKNOWN' }, err => [14, err.msg])
 				.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
 				.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
+				.with({ kind: 'E_CONTRACT_REGISTERED' }, err => [21, err.msg])
+				.with({ kind: 'E_CONTRACT_NOT_REGISTERED' }, err => [22, err.msg])
+				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
+				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
+				.with({ kind: 'E_EXEC' }, err => [19, false])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 
 			const [exitCode, msg] = res;
 			if (inputArgs.debug) {
 				logAllErrors(err);
-			} else console.error(msg);
+			} else if (msg) console.error(msg);
+
 			Deno.exit(exitCode as number);
 		}
 	};

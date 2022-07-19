@@ -145,12 +145,14 @@ tests/coverage
 /taqueria-plugin-archetype/index.js.map
 /taqueria-plugin-tezos-client/index.js
 /taqueria-plugin-tezos-client/index.js.map
-/taqueria-state-js/index.js
-/taqueria-state-js/index.js.map
+/taqueria-state/index.js
+/taqueria-state/index.js.map
+/taqueria-state/*.d.ts
+/taqueria-state/node/*.d.ts
 /taqueria-plugin-jest/index.js.map
 /taqueria-plugin-jest/index.js
-/taqueria-plugin-contract-types/src/generator/*.js
-/taqueria-plugin-contract-types/src/generator/*.js.map 
+/taqueria-plugin-ipfs-pinata/index.js.map
+/taqueria-plugin-ipfs-pinata/index.js
 
 # VS Code Extension
 /taqueria-vscode-extension/out

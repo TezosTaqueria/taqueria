@@ -1,0 +1,85 @@
+---
+title: Environment Configuration
+---
+
+## Overview
+
+Taqueria Environments provide a powerful and flexible way to develop Tezos projects in multiple contexts. Environments can target one or more testnets or sandboxes and each sandbox has independent values for the initial storage for contracts
+
+The environment configuration is where you add the initial storage value that a smart contract will be originated with. 
+
+:::note
+To target an environment for a stateful task such as `taq originate`, add the `--env` flag with the name of the environment you would like to target. For example, to target an environment named `jakarta_env` for an origination, you would use the following command:
+```
+taq originate --env jakarta_env
+```
+:::
+
+## The Default Environment
+
+Taqueria generates a default environment for each project named `development`. This environment has the following properties:
+
+```
+"environment": {
+    "default": "development",
+    "development": {
+        "networks": [],
+        "sandboxes": [],
+        "storage": []
+    }
+```
+
+:::note
+Although Taqueria comes with this default environment, you will still need to add the initial storage values for each contract before using the environment
+:::
+
+## Adding a New Environment
+
+Environment configurations are added as key/value pairs to the main `environment` object using the format:
+
+```json
+environmentName : { environmentConfig }
+```
+
+Environment configurations have the following properties:
+
+- `networks`: An array of network names that the environment should be targeted for
+- `sandboxes`: An array of sandbox names that the environment should be targeted for
+- `storage`: An object containing a list of key/value pairs which specify the initial storage values for each contract
+
+### The `networks` Property
+
+The networks property holds a comma separated list of named networks. The networks referenced must be configured in the `network` property of `config.json`. You can add zero or more networks to an environment
+
+### The `sandboxes` Property
+
+The sandboxes property holds a comma separated list of named sandboxes. The sandboxes referenced must be configured in the `sandbox` property of `config.json`. You can add zero or more sandboxes to an environment
+
+### The `storage` Property
+
+:::caution
+You must declare initial storage values for each contract you are originating. Trying to originate a contract to an environment that does not have a storage value for that contract will result in an error
+:::
+
+The storage property is a key/value mapping, with the key being the name of the contract, and the value being the initial storage value
+
+The initial storage value may be specified as any JSON literal value, a string containing a Michelson expression, or a JSON-encoded Michelson expression
+
+Storage values use the following format:
+
+```json
+{
+    "contractName": ""
+}
+```
+
+
+```json
+
+## Taqueria State
+
+***coming soon***
+
+## Initial Storage Values
+
+***coming soon***

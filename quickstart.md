@@ -15,13 +15,11 @@ What you will accomplish:
 To successfully use Taqueria, you must ensure that:
 - The Taqueria CLI has been [installed](./installation.mdx) and is available in your `$PATH` 
 - Docker v0.8 or later is installed and currently running
-- Node.js v16.x or later
+- Node.js v16.3 or later
 
 ## Starting a Taqueria Project
 
-There are two things required to start using Taqueria on a project
-
-1. The project must be initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts`, `/artifacts`, and `/tests` have been created 
+To start using Taqueria on a project, the project directory must be initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts`, `/artifacts`, and `/tests` have been created 
 
 Taqueria provides the command `init` which will create a new directory with the correct structure and configuration. To create a new Taqueria project called `my-first-project`, run the command:
 ```shell
@@ -30,11 +28,6 @@ taq init my-first-project
 :::caution
 If a project has already been initialized, Taqueria will not re-initialize the project, but will still return a success message. This will be fixed in an upcoming release
 :::
-
-2. The project directory must be initialized as an NPM project as all current plugins implemented as NPM packages. To do this, run:
-```shell
-npm init -y
-```
 
 ## Working with Plugins
 
@@ -54,6 +47,7 @@ You can view the list of commands available in the current project context by ru
 | Taquito        | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate                       |
 | Contract Types | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code         |
 | Tezos Client   | `@taqueria/plugin-tezos-client`   | Interacts with a Tezos node, providing simulation and type checking |
+| Jest           | `@taqueria/plugin-jest`           | A Jest plugin for testing smart contracts                           |
 
 ## Compiling a LIGO Smart Contract
 

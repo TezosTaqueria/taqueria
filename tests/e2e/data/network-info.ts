@@ -1,4 +1,4 @@
 export const networkInfo = {
-    networkName: "ithacanet",
-    networkURL: "https://ithacanet.ecadinfra.com"
-}
+	networkName: 'ghostnet',
+	networkURL: 'https://rpc.ithacanet.teztnets.xyz',
+};

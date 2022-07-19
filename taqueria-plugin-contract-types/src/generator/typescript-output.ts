@@ -22,7 +22,15 @@ export type TypeUtilsData = {
 	importPath: string;
 };
 
-export const createTypescriptCodeGenerator = (options?: { mode?: 'types' | 'defaultValue' }) => {
+export const toTypescriptCode = (
+	storage: TypedStorage,
+	methods: TypedMethod[],
+	contractName: string,
+	parsedContract: unknown,
+	protocol: { name: string; key: string },
+	typeAliasData: TypeAliasData,
+	typeUtilsData: TypeUtilsData,
+): TypescriptCodeOutput => {
 	type TypeAlias = {
 		aliasType: string;
 		simpleTypeDefinition: string;
@@ -51,10 +59,6 @@ ${tabs(indent)}`;
 	};
 
 	const typeToCode = (t: TypedType, indent: number): string => {
-		if (options?.mode === 'defaultValue') {
-			return typeToCode_defaultValue(t, indent);
-		}
-
 		if (t.kind === `value`) {
 			// return `${t.typescriptType}`;
 
@@ -139,104 +143,13 @@ ${tabs(indent)}`;
 		throw new GenerateApiError(`Unknown type node`, { t });
 	};
 
-	const typeToCode_defaultValue = (t: TypedType, indent: number): string => {
-		if (t.kind === `value`) {
-			// return `${t.typescriptType}`;
-
-			const prim = `prim` in t.raw ? t.raw.prim : `unknown`;
-
-			// Strict mode
-			if (t.typescriptType === 'boolean') {
-				return `true`;
-			}
-			if (t.typescriptType === `string` && prim === `string`) {
-				return `'VALUE'`;
-			}
-			if (t.typescriptType === 'number') {
-				return `tas.${prim}('42')`;
-			}
-			if (t.typescriptType === 'Date') {
-				return `tas.timestamp(new Date())`;
-			}
-			if (
-				prim === 'address'
-				|| prim === 'contract'
-			) {
-				return `tas.${prim}('tz1ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456')`;
-			}
-			if (prim === 'bytes') {
-				return `tas.${prim}(char2Bytes('DATA'))`;
-			}
-			if (t.typescriptType === 'string') {
-				return `tas.${prim}('VALUE')`;
-			}
-			assertExhaustive(t.typescriptType, `Unknown value type`);
-
-			return prim;
-		}
-		if (t.kind === `array`) {
-			return `[${typeToCode(t.array.item, indent)}]`;
-		}
-		if (t.kind === `map`) {
-			const keyPrim = `prim` in t.map.key.raw ? t.map.key.raw.prim : `unknown`;
-			const isStringBasedKey = t.map.key.kind === 'value' && keyPrim === 'string';
-			if (isStringBasedKey) {
-				return `tas.${t.map.isBigMap ? 'bigMap' : 'map'}({ 
-${tabs(indent + 1)}${typeToCode(t.map.key, indent)}: ${typeToCode(t.map.value, indent)},
-${tabs(indent)}})`;
-			}
-
-			return `tas.${t.map.isBigMap ? 'bigMap' : 'map'}([{ 
-${tabs(indent + 1)}key: ${typeToCode(t.map.key, indent)}, 
-${tabs(indent + 1)}value: ${typeToCode(t.map.value, indent)},
-${tabs(indent)}}])`;
-		}
-		if (t.kind === `object`) {
-			const delimeter = options?.mode === 'defaultValue' ? ',' : `;`;
-			return `{${toIndentedItems(indent, {}, t.fields.map((a, i) => varToCode(a, i, indent + 1) + delimeter))}}`;
-		}
-		if (t.kind === `union`) {
-			const getUnionItem = (a: TypedVar, i: number) => {
-				const itemCode = `${varToCode(a, i, indent + 1)}`;
-
-				// Keep on single line if already on single line
-				if (!itemCode.includes(`\n`)) {
-					return `{ ${itemCode} }`;
-				}
-
-				// Indent if multi-line (and remake with extra indent)
-				return `{${toIndentedItems(indent + 1, {}, [`${varToCode(a, i, indent + 2)}`])}}`;
-			};
-
-			return `(${toIndentedItems(indent, { beforeItem: `| ` }, t.union.map(getUnionItem))})`;
-		}
-		if (t.kind === `unit`) {
-			return `tas.unit()`;
-		}
-		if (t.kind === `never`) {
-			return `never`;
-		}
-		if (t.kind === `unknown`) {
-			return `unknown`;
-		}
-
-		assertExhaustive(t, `Unknown type`);
-		throw new GenerateApiError(`Unknown type node`, { t });
-	};
-
 	const varToCode = (t: TypedVar, i: number, indent: number, numberVarNamePrefix = ''): string => {
-		return `${t.name ?? `${numberVarNamePrefix}${i}`}${
-			t.type.optional && options?.mode !== 'defaultValue' ? `?` : ``
-		}: ${typeToCode(t.type, indent)}`;
+		return `${t.name ?? `${numberVarNamePrefix}${i}`}${t.type.optional ? `?` : ``}: ${typeToCode(t.type, indent)}`;
 	};
 
 	const argsToCode = (args: TypedVar[], indent: number, asObject: boolean): string => {
 		if (args.length === 1) {
 			if (args[0].type.kind === `unit`) return ``;
-
-			if (options?.mode === 'defaultValue') {
-				return typeToCode(args[0].type, indent + 1);
-			}
 			return `${args[0].name ?? `param`}: ${typeToCode(args[0].type, indent + 1)}`;
 		}
 
@@ -244,49 +157,18 @@ ${tabs(indent)}}])`;
 			toIndentedItems(
 				indent,
 				{},
-				args.filter(x => x.name || x.type.kind !== `unit`).map((a, i) => {
-					if (!asObject && options?.mode === 'defaultValue') {
-						return typeToCode(a.type, indent + 1) + `,`;
-					}
-					return varToCode(a, i, indent + 1, asObject ? '' : '_') + `,`;
-				}),
+				args.filter(x => x.name || x.type.kind !== `unit`).map((a, i) =>
+					varToCode(a, i, indent + 1, asObject ? '' : '_') + `,`
+				),
 			)
 		}`;
 
 		if (asObject) {
-			if (options?.mode === 'defaultValue') {
-				return `{${result}}`;
-			}
 			return `params: {${result}}`;
 		}
 
 		return result;
 	};
-
-	return {
-		usedStrictTypes,
-		tabs,
-		toIndentedItems,
-		typeToCode,
-		argsToCode,
-	};
-};
-
-export const toTypescriptCode = (
-	storage: TypedStorage,
-	methods: TypedMethod[],
-	contractName: string,
-	parsedContract: unknown,
-	protocol: { name: string; key: string },
-	typeAliasData: TypeAliasData,
-	typeUtilsData: TypeUtilsData,
-): TypescriptCodeOutput => {
-	const {
-		usedStrictTypes,
-		toIndentedItems,
-		typeToCode,
-		argsToCode,
-	} = createTypescriptCodeGenerator();
 
 	const methodsToCode = (indent: number) => {
 		const methodFields = methods.map(x => {

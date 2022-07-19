@@ -26,7 +26,20 @@ const sidebars = {
         "getting-started/installation",
         "intro",
         "getting-started/quickstart",
-        "getting-started/networks"
+        
+      ],
+    },
+    {
+      type: "category",
+      label: "Configuration",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "config/networks",
+        "config/implicit-accounts",
+        "config/sandbox-config",
+        "config/environments"
       ],
     },
     {
@@ -40,20 +53,43 @@ const sidebars = {
         "plugins/plugin-flextesa",
         "plugins/plugin-archetype",
         "plugins/plugin-ligo",
-        "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
         "plugins/plugin-contract-types",
         "plugins/plugin-tezos-client",
+        "plugins/plugin-smartpy",
+        "plugins/plugin-jest",
       ],
     },
+    // {
+    //   type: "category",
+    //   label: "Taqueria Libraries",
+    //   className: "sidebarHeader",
+    //   collapsed: false,
+    //   collapsible: false,
+    //   items: [
+    //     "libraries/taqueria-state"
+    //   ],
+    // },
     {
       type: "category",
-      label: "Example App",
+      label: "Scaffolds",
       className: "sidebarHeader",
       collapsed: false,
       collapsible: false,
       items: [
-        "hello-tacos-tutorial"
+        "scaffolds/scaffold-basics",
+        "scaffolds/taco-shop",
+        "scaffolds/quickstart",
+      ],
+    },    
+    {
+      type: "category",
+      label: "Tutorials",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "tutorials/hello-tacos-tutorial"
       ],
     },
     {
@@ -64,6 +100,7 @@ const sidebars = {
       collapsible: false,
       items: [
         "taqueria-internals/architecture",
+        "data-collection-policy"
       ],
     },
     {
@@ -74,6 +111,7 @@ const sidebars = {
       collapsible: false,
       items: [
         "roadmap",
+        "release-notes",
         "taqueria-dev/contributions",
         "taqueria-dev/making-plugins",
         "taqueria-dev/pr-npm-packages"

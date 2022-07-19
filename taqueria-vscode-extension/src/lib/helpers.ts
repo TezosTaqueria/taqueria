@@ -1,9 +1,15 @@
-import { EphemeralState } from '@taqueria/protocol/EphemeralState';
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
+import { TaqError } from '@taqueria/protocol/TaqError';
+import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
-import { join } from 'path';
-import { path } from 'rambda';
+import path, { join, resolve } from 'path';
 import * as api from 'vscode';
+import { ContractTreeItem } from './gui/ContractsDataProvider';
+import { ContractsDataProvider } from './gui/ContractsDataProvider';
+import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
+import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
+import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
+import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvider';
 import * as Util from './pure';
 import { TaqVsxError } from './TaqVsxError';
 
@@ -11,9 +17,47 @@ export const COMMAND_PREFIX = 'taqueria.';
 
 export enum Commands {
 	init = 'taqueria.init',
+	scaffold = 'taqueria.scaffold',
 	install = 'taqueria.install',
 	uninstall = 'taqueria.uninstall',
+	optIn = 'taqueria.optIn',
+	optOut = 'taqueria.optOut',
+	originate = 'taqueria.originate',
 }
+
+export enum OutputLevels {
+	output,
+	fatal,
+	error,
+	warn,
+	info,
+	debug,
+	trace,
+}
+
+export type OutputFunction = (currentLogLevel: OutputLevels, log: string) => void;
+
+const outputLevelsOrder = [
+	OutputLevels.trace,
+	OutputLevels.debug,
+	OutputLevels.info,
+	OutputLevels.warn,
+	OutputLevels.error,
+	OutputLevels.fatal,
+	OutputLevels.output,
+];
+
+const shouldOutput = (currentLogLevel: OutputLevels, configuredLogLevel: OutputLevels) => {
+	const currentLogIndex = outputLevelsOrder.indexOf(currentLogLevel);
+	const configuredLogIndex = outputLevelsOrder.indexOf(configuredLogLevel);
+	return currentLogIndex >= configuredLogIndex;
+};
+
+export type Output = {
+	outputChannel: api.OutputChannel;
+	logLevel: OutputLevels;
+	logChannel: api.OutputChannel;
+};
 
 type VSCodeAPI = typeof api;
 
@@ -26,317 +70,832 @@ export const sanitizeDeps = (deps?: InjectedDependencies) =>
 		? deps
 		: { vscode: api };
 
-export const inject = (deps: InjectedDependencies) => {
-	const { vscode } = deps;
-
-	const exposeInitTask = async (
-		context: api.ExtensionContext,
-		output: api.OutputChannel,
-		i18n: i18n,
-		folders: readonly api.WorkspaceFolder[],
-	) => {
-		const exposeTask = exposeTaqTaskAsCommand(context, output, i18n);
-
-		// As the developer has no folder open, we must prompt
-		// them for a path they would like to taqify
-		if (folders.length === 0) {
-			addCommand(context)(Commands.init, () => {
-				return vscode.window.showOpenDialog({
-					canSelectFolders: true,
-					canSelectFiles: false,
-					openLabel: 'Select project folder',
-					title: "Select a project folder to taq'ify",
-					canSelectMany: false,
-				})
-					.then(uris =>
-						uris?.map(
-							uri =>
-								getTaqBinPath(i18n)
-									.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, undefined)(`init ${uri.path}`))
-									.then(_ => vscode.window.showInformationMessage("Project taq'fied!", uri.path))
-									.then(_ => vscode.workspace.updateWorkspaceFolders(0, undefined, { uri })),
-						)
-					)
-					.then(console.log) as Promise<void>;
-			});
-		} // The developer has one folder open. We can assume that
-		// is the folder they wish to taqify
-		else if (folders.length === 1) {
-			return exposeTask('taqueria.init', `init ${folders[0].uri.path}`, 'notify');
-		} // The developer has multiple folders in the their workspace.
-		// As can't really know which one to taqify without prompting them
-		else {
-			console.log('Coming soon!');
-		}
+export const showOutput = (output: Output) => {
+	return (data: string) => {
+		output.outputChannel.appendLine(data);
+		output.outputChannel.show();
 	};
+};
 
-	const getTaqifiedDirectories = (folders: readonly api.WorkspaceFolder[], i18n: i18n) => {
-		const processes = folders.map(folder => {
-			const taqifiedPath = join(folder.uri.path, '.taq');
-			return stat(taqifiedPath)
-				.then(_ => Util.makeDir(folder.uri.path, i18n))
-				.catch(_ => undefined);
+export const showLog = (output: Output) => {
+	return (currentOutputLevel: OutputLevels, data: string) => {
+		if (!shouldOutput(currentOutputLevel, output.logLevel)) {
+			return;
+		}
+		output.logChannel.appendLine(data);
+	};
+};
+
+export interface HasFileName {
+	fileName: string;
+}
+
+function mapAsync<T, U>(array: T[], callbackfn: (value: T, index: number, array: T[]) => Promise<U>): Promise<U[]> {
+	return Promise.all(array.map(callbackfn));
+}
+
+async function filterAsync<T>(
+	array: T[],
+	callbackfn: (value: T, index: number, array: T[]) => Promise<boolean>,
+): Promise<T[]> {
+	const filterMap = await mapAsync(array, callbackfn);
+	return array.filter((value, index) => filterMap[index]);
+}
+
+export class VsCodeHelper {
+	private constructor(
+		private context: api.ExtensionContext,
+		private vscode: VSCodeAPI,
+		private outputChannel: api.OutputChannel,
+		private output: Output,
+		private i18: i18n,
+		private folders: readonly api.WorkspaceFolder[],
+	) {}
+
+	static async construct(context: api.ExtensionContext, deps: InjectedDependencies) {
+		const vscode = deps.vscode;
+		const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
+		const logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
+		const outputChannel = vscode.window.createOutputChannel('Taqueria');
+		const logChannel = vscode.window.createOutputChannel('TaqueriaLogs');
+		const output = {
+			outputChannel,
+			logChannel,
+			logLevel,
+		};
+		showLog(output)(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
+
+		const i18n = await loadI18n();
+
+		const folders = vscode.workspace.workspaceFolders
+			? vscode.workspace.workspaceFolders
+			: [];
+
+		return new VsCodeHelper(context, vscode, outputChannel, output, i18n, folders);
+	}
+
+	get i18n() {
+		return this.i18;
+	}
+
+	getFolders() {
+		return this.folders;
+	}
+
+	getOutput() {
+		return showOutput(this.output);
+	}
+
+	getLog() {
+		return showLog(this.output);
+	}
+
+	showOutput(data: string) {
+		return showOutput(this.output)(data);
+	}
+
+	showLog(currentOutputLevel: OutputLevels, data: string) {
+		return showLog(this.output)(currentOutputLevel, data);
+	}
+
+	exposeInitTask() {
+		this.registerCommand(Commands.init, async () => {
+			const uri = await this.getFolderForInitOrScaffold('init');
+			if (uri === undefined) {
+				return;
+			}
+			await this.proxyToTaqAndShowOutput(`init ${uri.path}`, 'init', uri.path as Util.PathToDir, false);
+			try {
+				await this.proxyToTaq(``, uri.path as Util.PathToDir);
+			} catch {
+				// Ignored
+			}
+			await this.updateCommandStates(uri.path as Util.PathToDir);
+			this.vscode.workspace.updateWorkspaceFolders(0, undefined, { uri });
+		});
+	}
+
+	exposeScaffoldTask() {
+		this.registerCommand(Commands.scaffold, async () => {
+			const availableScaffolds: { name: string; url: string }[] = await this.getAvailableScaffolds();
+			const projectUri = await this.getFolderForInitOrScaffold('scaffold');
+			if (projectUri === undefined) {
+				return;
+			}
+			const scaffold = await this.promptForScaffoldSelection(
+				this.i18,
+				api.debug.activeDebugSession,
+				availableScaffolds.map(template => template.name),
+			);
+			if (scaffold === null) {
+				return;
+			}
+			const scaffoldUrl = availableScaffolds.find(template => template.name === scaffold)?.url;
+			if (scaffoldUrl === undefined) {
+				return;
+			}
+			const projectDir = await Util.makeDir(projectUri.path, this.i18);
+			await this.proxyToTaqAndShowOutput(`scaffold ${scaffoldUrl} ${projectDir}`, 'scaffold', projectDir, false);
+			await this.proxyToTaq(``, projectDir);
+			await this.updateCommandStates(projectDir);
+		});
+	}
+
+	async getTaqifiedDirectories() {
+		const taqified = await filterAsync([...this.folders], async folder => {
+			try {
+				const taqifiedPath = join(folder.uri.path, '.taq');
+				await stat(taqifiedPath);
+				return true;
+			} catch (e: unknown) {
+				return false;
+			}
 		});
 
-		return Promise.all(processes)
-			.then(results =>
-				results.reduce(
-					(paths: Util.PathToDir[], pathToDir) => {
-						return pathToDir
-							? [...paths, pathToDir]
-							: paths;
-					},
-					[],
-				)
-			);
-	};
+		return await mapAsync(taqified, folder => Util.makeDir(folder.uri.path, this.i18));
+	}
 
-	const promptForPluginSelection = (_i18n: i18n, debug: api.DebugSession | undefined, availablePlugins: string[]) =>
-		debug
-			? vscode.window.showQuickPick(availablePlugins, {
-				canPickMany: false,
-				ignoreFocusOut: false,
-				placeHolder: 'Plugin name',
-				title: 'Select a plugin',
-			})
-			: vscode.window.showOpenDialog({
-				canSelectFiles: false,
+	async getFolderForInitOrScaffold(
+		taskTitle: string,
+	) {
+		let uris: api.Uri[] | undefined = this.folders.map(folder => folder.uri);
+		if (uris.length === 0) {
+			uris = await this.vscode.window.showOpenDialog({
 				canSelectFolders: true,
+				canSelectFiles: false,
+				openLabel: 'Select project folder',
+				title: `Select a project folder to ${taskTitle} into`,
 				canSelectMany: false,
-				title: 'Select plugin folder',
-				openLabel: 'Select plugin',
-			}).then(val => val ? val[0].fsPath : '');
+			});
+			if (uris === undefined) {
+				return undefined;
+			}
+		}
 
-	const promptForTaqProject = (_i18n: i18n, availableProjects: readonly string[]) =>
-		vscode.window.showQuickPick(availableProjects, {
+		if (uris.length === 0) {
+			return undefined;
+		}
+		if (uris.length === 1) {
+			return uris[0];
+		} else {
+			this.vscode.window.showWarningMessage(
+				`Error: running ${taskTitle} with multiple open folders is not yet implemented.`,
+			);
+			return undefined;
+		}
+	}
+
+	async getFolderForTasksOnTaqifiedFolders(taskTitle: string) {
+		const taqifiedDirectories = await this.getTaqifiedDirectories();
+
+		if (taqifiedDirectories.length === 0) {
+			// The developer has no taqified workspace folders. As such,
+			// we cannot proceed
+			this.showError({
+				kind: 'E_NO_TAQUERIA_PROJECTS',
+				msg:
+					`You don't have any Taqueria projects. You'll need to taq'ify a project using \"Taqueria: Init\" and open the folder in VsCode before you can ${taskTitle}.`,
+			});
+			return undefined;
+		}
+
+		if (taqifiedDirectories.length === 1) {
+			// The developer has a single taqified workspace folder, so we know
+			// exactly where to install a plugin
+			return taqifiedDirectories[0];
+		}
+
+		// The developer has multiple taqified folders
+		const selectedDir = await this.promptForTaqProject(taqifiedDirectories);
+		if (!selectedDir) {
+			return undefined;
+		}
+		return await Util.makeDir(selectedDir, this.i18);
+	}
+
+	async getPathForPluginSource(pluginName: string) {
+		if (pluginName && process.env.InstallDevPlugins === 'true') {
+			const pathToTaq = await this.getTaqBinPath();
+			const taqFolder = path.dirname(pathToTaq);
+			const pluginFolder = pluginName.replace('@', '').replace('/', '-');
+			const pluginPath = path.join(taqFolder, pluginFolder);
+			return pluginPath;
+		}
+		return pluginName;
+	}
+
+	async promptForPluginInstallation(
+		projectDir: Util.PathToDir,
+	) {
+		const availablePlugins = await this.getAvailablePlugins();
+		const config = await Util.TaqifiedDir.create(projectDir, this.i18);
+		const availablePluginsNotInstalled = config.config?.plugins
+			? availablePlugins.filter(name => config.config.plugins?.findIndex(p => p.name === name) === -1)
+			: availablePlugins;
+		const pluginName = await this.vscode.window.showQuickPick(availablePluginsNotInstalled, {
+			canPickMany: false,
+			ignoreFocusOut: false,
+			placeHolder: 'Plugin name',
+			title: 'Select a plugin',
+		});
+		return pluginName;
+	}
+
+	async promptForPluginUninstall(
+		projectDir: Util.PathToDir,
+	) {
+		const config = await Util.TaqifiedDir.create(projectDir, this.i18);
+		if (!config.config || !config.config.plugins || !config.config.plugins.length) {
+			return undefined;
+		}
+		const pluginNames = config.config.plugins.map(plugin => plugin.name);
+		const selectedPluginName = await this.vscode.window.showQuickPick(pluginNames, {
+			canPickMany: false,
+			ignoreFocusOut: false,
+			placeHolder: 'Plugin name',
+			title: 'Select a plugin',
+		});
+		return selectedPluginName;
+	}
+
+	promptForScaffoldSelection(_i18n: i18n, _debug: api.DebugSession | undefined, availablePlugins: string[]) {
+		return this.vscode.window.showQuickPick(availablePlugins, {
+			canPickMany: false,
+			ignoreFocusOut: false,
+			placeHolder: 'Plugin name',
+			title: 'Select a plugin',
+		});
+	}
+
+	promptForTaqProject(availableProjects: readonly string[]) {
+		return this.vscode.window.showQuickPick(availableProjects, {
 			canPickMany: false,
 			ignoreFocusOut: false,
 			title: 'Select a project',
 			placeHolder: 'Directory',
 		});
+	}
 
-	const exposeInstallTask = async (
-		context: api.ExtensionContext,
-		output: api.OutputChannel,
-		folders: readonly api.WorkspaceFolder[],
-		i18n: i18n,
-	) => {
-		const exposeTask = exposeTaskAsCommand(context, output, i18n);
-		const availablePlugins = [
+	getWellKnownPlugins() {
+		return [
 			'@taqueria/plugin-ligo',
 			'@taqueria/plugin-smartpy',
 			'@taqueria/plugin-taquito',
 			'@taqueria/plugin-flextesa',
+			'@taqueria/plugin-archetype',
+			'@taqueria/plugin-contract-types',
+			'@taqueria/plugin-tezos-client',
+			'@taqueria/plugin-jest',
 		];
-		const proxyInstall = (pluginName: string, pathToTaq: Util.PathToTaq, i18n: i18n, projectDir?: Util.PathToDir) =>
-			Util.proxyToTaq(pathToTaq, i18n, projectDir)(`install ${pluginName}`)
-				.then(notify)
-				.catch(showError);
+	}
 
-		return exposeTask(Commands.install, (pathToTaq: Util.PathToTaq) =>
-			getTaqifiedDirectories(folders, i18n)
-				.then(results => {
-					// The developer has no taqified workspace folders. As such,
-					// we cannot install any plugins
-					if (results.length === 0) {
-						return addCommand(context)(Commands.install, () =>
-							showError({
-								kind: 'E_NO_TAQUERIA_PROJECTS',
-								msg:
-									"You don't have any Taqueria projects. You'll need to taq'ify a project using \"Taqueria: Init\" before you can install a plugin.",
-							}));
-					} // The developer has a single taqified workspace folder, so we know
-					// exactly where to install a plugin
-					else if (results.length === 1) {
-						const projectDir = results[0];
-						return promptForPluginSelection(i18n, api.debug.activeDebugSession, availablePlugins)
-							.then(pluginName => {
-								if (pluginName) {
-									return proxyInstall(pluginName, pathToTaq, i18n, projectDir);
-								}
-							});
-					} // The developer has multiple
-					else {
-						return promptForTaqProject(i18n, results)
-							.then(selectedDir => {
-								if (selectedDir) {
-									return Util.makeDir(selectedDir, i18n)
-										.then(projectDir =>
-											promptForPluginSelection(i18n, api.debug.activeDebugSession, availablePlugins)
-												.then(pluginName => {
-													if (pluginName) return proxyInstall(pluginName, pathToTaq, i18n, projectDir);
-												})
-										);
-								}
-							});
-					}
-				}));
-	};
+	async getAvailablePlugins() {
+		try {
+			const HOME_DIR = process.env.HOME;
+			if (HOME_DIR) {
+				const availablePluginsFile = join(HOME_DIR, 'taqueria-plugins.json');
+				const contents = await readFile(availablePluginsFile, { encoding: 'utf-8' });
+				const decoded = JSON.parse(contents);
+				return decoded as string[];
+			}
+		} catch {
+			// Ignore
+		}
+		return this.getWellKnownPlugins();
+	}
 
-	const taskNameToCmdId = (taskName: string) => 'taqueria.' + taskName.replace(/\s+/g, '_');
+	async getAvailableScaffolds() {
+		return [
+			{
+				name: 'Quick Start',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart',
+			},
+			{
+				name: 'Demo',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-demo',
+			},
+			{
+				name: 'Taco Shop',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-taco-shop',
+			},
+			{
+				name: 'Hello Tacos Tutorial',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-hello-tacos-tutorial',
+			},
+			{
+				name: 'NFT',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-nft',
+			},
+		];
+	}
 
-	const exposeTasksFromProject = (
-		context: api.ExtensionContext,
-		output: api.OutputChannel,
-		folders: readonly api.WorkspaceFolder[],
-		i18n: i18n,
-	) =>
-		(projectDir: Util.PathToDir) => {
-			getTaqBinPath(i18n)
-				.then(pathToTaq => Util.proxyToTaq(pathToTaq, i18n, projectDir)('list-known-tasks'))
-				.then(data => Util.decodeJson<EphemeralState>(data))
-				.then(state => {
-					// const cmdId = taskNameToCmdId(taskName)
-					return state;
+	async exposeInstallTask() {
+		this.registerCommand(Commands.install, async (pluginInfo?: PluginTreeItem | undefined) => {
+			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
+			if (projectDir === undefined) {
+				return;
+			}
+			let pluginName = pluginInfo?.label;
+			if (!pluginName) {
+				pluginName = await this.promptForPluginInstallation(projectDir);
+			}
+			if (!pluginName) {
+				return;
+			}
+			pluginName = await this.getPathForPluginSource(pluginName);
+			await this.proxyToTaqAndShowOutput(`install ${pluginName}`, 'install', projectDir, false);
+		});
+	}
+
+	async exposeUninstallTask() {
+		this.registerCommand(Commands.uninstall, async (pluginInfo?: PluginTreeItem | undefined) => {
+			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
+			if (projectDir === undefined) {
+				return;
+			}
+			let pluginName = pluginInfo?.label;
+			if (!pluginName) {
+				pluginName = await this.promptForPluginUninstall(projectDir);
+			}
+			if (!pluginName) {
+				return;
+			}
+			await this.proxyToTaqAndShowOutput(`uninstall ${pluginName}`, 'uninstall', projectDir, false);
+		});
+	}
+
+	getContractFileName(fileName: string) {
+		return fileName.replace(/\.[^/.]+$/, '') + '.tz';
+	}
+
+	async exposeOriginateTask() {
+		this.registerCommand(Commands.originate, async (arg?: ContractTreeItem | EnvironmentTreeItem | undefined) => {
+			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
+			if (projectDir === undefined) {
+				return;
+			}
+			let environmentName: string | undefined = undefined;
+			let fileName: string | undefined = undefined;
+			if (arg) {
+				if (arg instanceof EnvironmentTreeItem) {
+					environmentName = (arg as EnvironmentTreeItem).label;
+				}
+				if (arg instanceof ContractTreeItem) {
+					fileName = this.getContractFileName((arg as ContractTreeItem).fileName);
+				}
+			}
+			if (!environmentName) {
+				const config = await Util.TaqifiedDir.create(projectDir, this.i18);
+				const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
+				environmentName = await this.vscode.window.showQuickPick(environmentNames, {
+					canPickMany: false,
+					ignoreFocusOut: false,
+					placeHolder: 'Environment Name',
+					title: 'Select an environment',
 				});
-		};
-
-	const exposeTasksFromState = (
-		context: api.ExtensionContext,
-		output: api.OutputChannel,
-		folders: readonly api.WorkspaceFolder[],
-		i18n: i18n,
-	) =>
-		getTaqifiedDirectories(folders, i18n)
-			.then(projectDirs =>
-				Promise.all(
-					projectDirs.map(
-						// TODO: Reconcile the list of tasks that were exposed with the extension manifest file
-						// If there are changes to the manifest file, prompt to reload
-						exposeTasksFromProject(context, output, folders, i18n),
-					),
-				)
+				if (!environmentName) {
+					return;
+				}
+			}
+			await this.proxyToTaqAndShowOutput(
+				`originate -e ${environmentName} ${fileName ?? ''}`,
+				'originate',
+				projectDir,
+				true,
 			);
+		});
+	}
 
-	const getTaqBinPath = (i18n: i18n) => {
-		const providedPath = vscode.workspace.getConfiguration('taqueria').get('path', '');
-		return providedPath && (providedPath as string).length > 0
-			? Util.makePathToTaq(i18n)(providedPath)
-			: Util.findTaqBinary(i18n)
-				.then(Util.makePathToTaq(i18n));
-	};
+	taskNameToCmdId(taskName: string) {
+		return 'taqueria.' + taskName.replace(/\s+/g, '_');
+	}
 
-	const addCommand = (context: api.ExtensionContext) =>
-		(cmdId: string, handler: () => Promise<void>) => {
-			context.subscriptions.push(
-				vscode.commands.registerCommand(cmdId, handler),
-			);
-		};
+	async getTaqBinPath() {
+		let providedPath = this.vscode.workspace.getConfiguration('taqueria').get('path', '');
+		if (!providedPath || (providedPath as string).length === 0) {
+			providedPath = await Util.findTaqBinary(this.i18, this.getLog());
+		}
+		return Util.makePathToTaq(this.i18, this.getLog())(providedPath);
+	}
 
-	const showError = (err: TaqVsxError) => {
+	registerCommand(cmdId: string, callback: (...args: any[]) => any) {
+		this.context.subscriptions.push(
+			this.vscode.commands.registerCommand(cmdId, async (...args: any[]) => {
+				try {
+					const result = callback(...args);
+					if (result.then) {
+						await result;
+					}
+				} catch (e: any) {
+					this.notifyAndLogError(`Error while running ${cmdId}`, e);
+				}
+			}),
+		);
+	}
+
+	showError(err: TaqVsxError) {
 		Util.log('Error:')(err);
 		return (err.context
-			? vscode.window.showErrorMessage(err.msg, err.context)
-			: vscode.window.showErrorMessage(err.msg))
+			? this.vscode.window.showErrorMessage(err.msg, err.context)
+			: this.vscode.window.showErrorMessage(err.msg))
 			.then(_ => Promise.resolve()) as Promise<void>;
-	};
+	}
 
-	const notify = (msg: string) =>
-		vscode.window.showInformationMessage(msg)
+	notify(msg: string) {
+		return this.vscode.window.showInformationMessage(msg)
 			.then(_ => Promise.resolve()) as Promise<void>;
+	}
 
-	const showOutput = (output: api.OutputChannel) =>
-		(data: string) =>
-			Promise.resolve()
-				.then(_ => output.clear())
-				.then(_ => output.append(data))
-				.then(_ => output.show());
+	async workspaceHasTaqFolder() {
+		if (this.folders.length === 0) {
+			return false;
+		}
+		const folder = this.folders[0];
+		try {
+			await Util.makeDir(path.join(folder.uri.path, '.taq'), this.i18);
+			return true;
+		} catch (_: unknown) {
+			return false;
+		}
+	}
 
-	const getSandboxNames = (projectDir: Util.TaqifiedDir) =>
-		projectDir.config.sandbox
+	async notifyAndLogError(message: string, err: TaqVsxError | TaqError | Error | unknown) {
+		const hasTaqFolder = await this.workspaceHasTaqFolder();
+		if (hasTaqFolder) {
+			this.vscode.window.showErrorMessage(`${message}\nPlease check out the output window for diagnostics information`);
+		}
+		this.logAllNestedErrors(err, !hasTaqFolder);
+	}
+
+	logAllNestedErrors(err: TaqVsxError | TaqError | Error | unknown, suppressWindow?: boolean | undefined) {
+		const outputLevel = suppressWindow ? OutputLevels.debug : OutputLevels.error;
+		if (!err) {
+			return;
+		}
+		try {
+			if (!shouldOutput(outputLevel, this.output.logLevel)) {
+				return;
+			}
+			this.output.logChannel.appendLine(JSON.stringify(err, undefined, 4));
+			if (!suppressWindow) {
+				this.output.logChannel.show();
+			}
+		} catch {
+			try {
+				this.output.logChannel.appendLine(`unknown error occurred while trying to log an error.`);
+			} catch {
+				// at this point, we cannot do anything
+			}
+		}
+	}
+
+	exposeTypecheckCommand() {
+		this.registerCommand(COMMAND_PREFIX + 'typecheck', async (arg: SandboxTreeItem | ContractTreeItem | undefined) => {
+			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
+			if (projectDir === undefined) {
+				return;
+			}
+			let fileName: string | undefined = undefined;
+			let sandboxName: string | undefined = undefined;
+			if (arg) {
+				if (arg instanceof SandboxTreeItem) {
+					sandboxName = (arg as SandboxTreeItem).label;
+				}
+				if (arg instanceof ContractTreeItem) {
+					fileName = this.getContractFileName((arg as ContractTreeItem).fileName);
+				}
+			}
+			if (!sandboxName) {
+				const config = await Util.TaqifiedDir.create(projectDir, this.i18);
+				const sandboxNames = [...Object.keys(config?.config?.sandbox ?? {})];
+				if (sandboxNames.length === 1) {
+					sandboxName = sandboxNames[0];
+				} else {
+					sandboxName = await this.vscode.window.showQuickPick(sandboxNames, {
+						canPickMany: false,
+						ignoreFocusOut: false,
+						placeHolder: 'Sandbox Name',
+						title: 'Select a sandbox',
+					});
+					if (!sandboxName) {
+						return;
+					}
+				}
+			}
+			await this.proxyToTaqAndShowOutput(
+				`typecheck -s ${sandboxName} ${fileName ?? ''}`,
+				'typecheck',
+				projectDir,
+				true,
+			);
+		});
+	}
+
+	getSandboxNames(projectDir: Util.TaqifiedDir) {
+		return projectDir.config.sandbox
 			? Object.keys(projectDir.config.sandbox)
 			: [];
+	}
 
-	const exposeTaqTaskAsCommand = (
-		context: api.ExtensionContext,
-		output: api.OutputChannel,
-		i18n: i18n,
-		projectDir?: Util.PathToDir,
-	) =>
-		(cmdId: string, taskWithArgs: string, outputTo: 'output' | 'notify', otherNotification?: string) =>
-			exposeTaskAsCommand(context, output, i18n, projectDir)(
-				cmdId,
-				(pathToTaq: Util.PathToTaq) =>
-					Util.proxyToTaq(pathToTaq, i18n, projectDir)(taskWithArgs)
-						.then(stdout =>
-							outputTo === 'output'
-								? showOutput(output)(stdout)
-								: notify(stdout)
-						)
-						.then(_ => {
-							if (otherNotification) notify(otherNotification);
-						}),
-			);
-	const exposeTaskAsCommand = (
-		context: api.ExtensionContext,
-		output: api.OutputChannel,
-		i18n: i18n,
-		projectDir?: Util.PathToDir,
-	) =>
-		(cmdId: string, handler: ((pathToTaq: Util.PathToTaq) => Promise<void>)) =>
-			addCommand(context)(
-				cmdId,
-				() =>
-					getTaqBinPath(i18n)
-						.then(handler)
-						.catch(showError),
-			);
+	async proxyToTaqAndShowOutput(
+		taskWithArgs: string,
+		taskTitle: string,
+		projectDir: Util.PathToDir | undefined,
+		logStandardErrorToOutput: boolean | undefined,
+	) {
+		this.vscode.window.withProgress({
+			location: this.vscode.ProgressLocation.Notification,
+			cancellable: false,
+			title: `Taqueria is running ${taskTitle}`,
+		}, async progress => {
+			progress.report({ increment: 0 });
+			try {
+				const result = await this.proxyToTaq(taskWithArgs, projectDir);
+				if (result.executionError) {
+					this.logAllNestedErrors(result.executionError);
+				}
+				if (result.standardError) {
+					if (logStandardErrorToOutput) {
+						this.showOutput(result.standardError);
+					} else {
+						this.showLog(OutputLevels.warn, result.standardError);
+					}
+				}
+				if (result.standardOutput) {
+					this.showOutput(result.standardOutput);
+				}
+				if (result.executionError || result.standardError) {
+					this.vscode.window.showWarningMessage(
+						`Warnings while running ${taskTitle}. Please check the Taqueria Log window for diagnostics information.`,
+					);
+				} else {
+					this.vscode.window.showInformationMessage(`Successfully executed ${taskTitle}.`);
+				}
+			} catch (e: unknown) {
+				this.vscode.window.showErrorMessage(
+					`Error while running ${taskTitle}. Please check the Taqueria Log window for diagnostics information.`,
+				);
+				this.logAllNestedErrors(e);
+			}
+			progress.report({ increment: 100 });
+		});
+	}
 
-	const exposeSandboxTaskAsCommand = (
-		context: api.ExtensionContext,
-		output: api.OutputChannel,
-		i18n: i18n,
+	async proxyToTaq(taskWithArgs: string, projectDir?: Util.PathToDir | undefined) {
+		const pathToTaq = await this.getTaqBinPath();
+		if (projectDir) {
+			return await Util.execCmd(
+				`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`,
+				this.getLog(),
+				projectDir,
+			);
+		} else {
+			return await Util.execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`, this.getLog());
+		}
+	}
+
+	exposeTaqTaskAsCommandWithOptionalFileArgument(
+		cmdId: string,
+		taskWithArgs: string,
+		outputTo: 'output' | 'notify',
+		taskTitle: string,
+		projectDir?: Util.PathToDir,
+	) {
+		this.registerCommand(
+			cmdId,
+			async (item?: HasFileName | undefined) => {
+				const pathToTaq = await this.getTaqBinPath();
+				if (item) {
+					taskWithArgs = `${taskWithArgs} ${item.fileName}`;
+				}
+				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitle, projectDir, outputTo === 'output');
+			},
+		);
+	}
+
+	exposeTaqTaskAsCommand(
+		cmdId: string,
+		taskWithArgs: string,
+		outputTo: 'output' | 'notify',
+		taskTitle: string,
+		projectDir?: Util.PathToDir,
+	) {
+		this.registerCommand(
+			cmdId,
+			async () => {
+				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitle, projectDir, outputTo === 'output');
+			},
+		);
+	}
+
+	exposeTaskAsCommand(cmdId: string, handler: ((pathToTaq: Util.PathToTaq) => Promise<void>)) {
+		this.registerCommand(
+			cmdId,
+			async () => {
+				try {
+					const pathToTaq = await this.getTaqBinPath();
+					await handler(pathToTaq);
+				} catch (e: unknown) {
+					this.logAllNestedErrors(e);
+				}
+			},
+		);
+	}
+
+	async exposeSandboxTaskAsCommand(
+		cmdId: string,
+		taskName: string,
+		progressTitle: string,
+		outputTo: 'output' | 'notify',
 		projectDir: Util.PathToDir,
-	) =>
-		(cmdId: string, taskName: string, outputTo: 'output' | 'notify', otherNotification?: string) => {
-			const exposeTask = exposeTaskAsCommand(context, output, i18n, projectDir);
-			return exposeTask(
-				cmdId,
-				pathToTaq =>
-					Util.TaqifiedDir.create(projectDir, i18n)
-						.then(getSandboxNames)
-						.then(items =>
-							vscode.window.showQuickPick(items, {
-								canPickMany: false,
-								ignoreFocusOut: false,
-								placeHolder: 'Sandbox name',
-								title: 'Select a sandbox',
-							})
-						)
-						.then(sandboxName =>
-							(sandboxName
-								? Util.proxyToTaq(pathToTaq, i18n, projectDir)(`${taskName} ${sandboxName}`)
-									.then(stdout =>
-										outputTo === 'output'
-											? showOutput(output)(stdout)
-											: notify(stdout)
-									)
-									.then(_ => {
-										if (otherNotification) notify(otherNotification);
-									})
-								: Promise.resolve()) as Promise<void>
-						)
-						.catch(showError),
-			);
-		};
+		otherNotification?: string,
+	) {
+		this.registerCommand(cmdId, async (sandbox?: SandboxTreeItem | undefined) => {
+			let sandboxName = sandbox?.label;
+			if (!sandboxName) {
+				const taqifiedDir = await Util.TaqifiedDir.create(projectDir, this.i18);
+				const sandboxes = this.getSandboxNames(taqifiedDir);
+				sandboxName = await this.vscode.window.showQuickPick(sandboxes, {
+					canPickMany: false,
+					ignoreFocusOut: false,
+					placeHolder: 'Sandbox name',
+					title: 'Select a sandbox',
+				});
+			}
+			if (!sandboxName) {
+				return;
+			}
+			await this.proxyToTaqAndShowOutput(`${taskName} ${sandboxName}`, progressTitle, projectDir, false);
+		});
+	}
 
-	return {
-		exposeInitTask,
-		getTaqifiedDirectories,
-		promptForPluginSelection,
-		promptForTaqProject,
-		exposeInstallTask,
-		taskNameToCmdId,
-		exposeTasksFromProject,
-		exposeTasksFromState,
-		getTaqBinPath,
-		addCommand,
-		showError,
-		notify,
-		showOutput,
-		getSandboxNames,
-		exposeTaqTaskAsCommand,
-		exposeTaskAsCommand,
-		exposeSandboxTaskAsCommand,
-	};
-};
+	async updateCommandStates(projectDir?: Util.PathToDir | undefined) {
+		if (projectDir === undefined) {
+			this.showLog(OutputLevels.debug, 'No folder is open, enabling init and scaffold');
+			this.vscode.commands.executeCommand(
+				'setContext',
+				'@taqueria-state/enable-init-scaffold',
+				true,
+			);
+			return;
+		}
+		this.dataProviders.forEach(dataProvider => dataProvider.refresh());
+
+		this.showLog(OutputLevels.debug, 'Project config changed, updating command states...');
+		let taqFolderFound: boolean;
+		try {
+			await Util.makeDir(join(projectDir, '.taq'), this.i18);
+			this.showLog(OutputLevels.debug, 'Taq folder is found');
+			taqFolderFound = true;
+		} catch {
+			taqFolderFound = false;
+			this.showLog(OutputLevels.debug, 'Taq folder not found');
+		}
+		let enableAllCommands: boolean;
+		let config: Util.TaqifiedDir | null;
+		try {
+			config = await Util.TaqifiedDir.create(projectDir, this.i18);
+			enableAllCommands = false;
+		} catch (e: unknown) {
+			config = null;
+			enableAllCommands = taqFolderFound;
+			// We don't want to show messages to users when they are working with non-taqified folders (Except when output level is set to info or more verbose)
+			if (shouldOutput(OutputLevels.info, this.output.logLevel) || taqFolderFound) {
+				this.vscode.commands.executeCommand('setContext', '@taqueria-state/enable-all-commands', true);
+				this.showLog(OutputLevels.error, 'Error: Could not update command states:');
+				this.logAllNestedErrors(e);
+				if (taqFolderFound) {
+					this.showLog(
+						OutputLevels.warn,
+						'The Taqueria config for this project could not be loaded. All Taqueria commands will be temporarily enabled.\nPlease check for errors in the .taq/config.json file\n',
+					);
+				}
+			}
+		}
+		const availablePlugins = await this.getAvailablePlugins();
+		const availablePluginsNotInstalled = config?.config?.plugins
+			? availablePlugins.filter(name => config?.config.plugins?.findIndex(p => p.name === name) === -1)
+			: availablePlugins;
+		this.showLog(
+			OutputLevels.debug,
+			`@taqueria-state/enable-init-scaffold: ${enableAllCommands || !config?.config}`,
+		);
+		this.vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/enable-init-scaffold',
+			enableAllCommands || !config?.config,
+		);
+
+		this.showLog(
+			OutputLevels.debug,
+			`@taqueria-state/enable-install-uninstall: ${enableAllCommands || !!config?.config}`,
+		);
+		this.vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/enable-install-uninstall',
+			enableAllCommands || !!config?.config,
+		);
+
+		this.showLog(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config?.config}`);
+		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config?.config);
+
+		this.vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/installed-plugin-count',
+			enableAllCommands ? 1 : config?.config?.plugins?.length ?? 0,
+		);
+		this.vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/not-installed-plugin-count',
+			enableAllCommands ? 1 : availablePluginsNotInstalled.length,
+		);
+		const plugins = this.getWellKnownPlugins();
+		this.showLog(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
+		for (const plugin of plugins) {
+			const found = config?.config?.plugins?.find(item => item.name === plugin) !== undefined;
+			this.showLog(OutputLevels.debug, `plugins ${plugin}: ${found}`);
+			this.vscode.commands.executeCommand('setContext', plugin, enableAllCommands || found);
+		}
+	}
+
+	createWatcherIfNotExists(
+		projectDir: Util.PathToDir,
+		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher[]) => void,
+	) {
+		this.showLog(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
+		addConfigWatcherIfNotExists(projectDir, () => {
+			this.showLog(OutputLevels.info, `Adding watcher for directory ${projectDir}.`);
+			try {
+				this.updateCommandStates(projectDir);
+			} catch (error: any) {
+				this.logAllNestedErrors(error);
+			}
+			try {
+				const folderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq'));
+				const configWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+				const stateWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/state.json'));
+
+				const contractsFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts'));
+				const contractsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts/*'));
+
+				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
+				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates(projectDir));
+				folderWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates(projectDir));
+				folderWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates(projectDir));
+
+				configWatcher.onDidChange((e: api.Uri) => this.updateCommandStates(projectDir));
+				configWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates(projectDir));
+				configWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates(projectDir));
+
+				stateWatcher.onDidChange((e: api.Uri) => this.updateCommandStates(projectDir));
+				stateWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates(projectDir));
+				stateWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates(projectDir));
+
+				contractsFolderWatcher.onDidChange(_ => this.contractsDataProvider?.refresh());
+				contractsFolderWatcher.onDidCreate(_ => this.contractsDataProvider?.refresh());
+				contractsFolderWatcher.onDidDelete(_ => this.contractsDataProvider?.refresh());
+				contractsWatcher.onDidChange(_ => this.contractsDataProvider?.refresh());
+				contractsWatcher.onDidCreate(_ => this.contractsDataProvider?.refresh());
+				contractsWatcher.onDidDelete(_ => this.contractsDataProvider?.refresh());
+
+				return [folderWatcher, configWatcher, stateWatcher, contractsFolderWatcher, contractsWatcher];
+			} catch (error: unknown) {
+				throw {
+					kind: 'E_UnknownError',
+					msg: `Unexpected error occurred while trying to watch ${join(projectDir, '.taq/config.json')}`,
+					context: projectDir,
+					previous: error,
+				} as TaqVsxError;
+			}
+		});
+	}
+
+	private dataProviders: { refresh: () => void }[] = [];
+	private contractsDataProvider?: ContractsDataProvider;
+
+	registerDataProviders(workspaceFolder: string) {
+		const pluginsDataProvider = new PluginsDataProvider(workspaceFolder, this);
+		this.vscode.window.createTreeView('taqueria-plugins', {
+			treeDataProvider: pluginsDataProvider,
+		});
+		this.dataProviders.push(pluginsDataProvider);
+
+		const sandboxesDataProvider = new SandboxesDataProvider(workspaceFolder, this);
+		this.vscode.window.createTreeView('taqueria-sandboxes', {
+			treeDataProvider: sandboxesDataProvider,
+		});
+		this.dataProviders.push(sandboxesDataProvider);
+
+		const environmentsDataProvider = new EnvironmentsDataProvider(workspaceFolder, this);
+		this.vscode.window.createTreeView('taqueria-environments', {
+			treeDataProvider: environmentsDataProvider,
+		});
+		this.dataProviders.push(environmentsDataProvider);
+
+		this.contractsDataProvider = new ContractsDataProvider(workspaceFolder, this);
+		this.vscode.window.createTreeView('taqueria-contracts', {
+			treeDataProvider: this.contractsDataProvider,
+		});
+		this.dataProviders.push(this.contractsDataProvider);
+	}
+}
