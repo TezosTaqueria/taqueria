@@ -27,7 +27,7 @@ This tutorial is a work in progress. Future updates will include:
 ## Requirements
 
 - Taqueria v0.3.0 or later
-- Node.js v16.0 or later
+- Node.js v16.3 or later
 - Docker v0.9 or later
 
 ## Introduction
@@ -81,15 +81,8 @@ This creates the following directory structure and initializes the `config.json`
 - /tests - This folder contains the automated tests
 - /artifacts - This folder contains the compiled Michelson .tz contracts
 
-### Initializing the Project
-
-As Taqueria uses NPM packages for the SDK and plugins, you will need to initialize this project as a Node project by running:
-
-```shell
-npm init -y
-```
-
-With NPM initialized, you can now install dependencies by running:
+### Installing Dependencies for the Project
+With the project initialized, you can now install dependencies by running:
 
 ```shell
 npm install
@@ -130,9 +123,10 @@ To confirm this was successful, you can run the `taq` command and ensure you see
 
 Now that the project is initialized and some plugins are installed, you can deploy the contract to a local sandbox using Taqueria tasks
 
-To compile the ligo contract, run the following command:
+To register and compile the ligo contract, run the following commands:
 
 ```shell
+taq add-contract hello-tacos.mligo
 taq compile
 ```
 
@@ -149,6 +143,8 @@ This will start a Flextesa instance running on `http://localhost:20000` and will
 :::note
 This task will update the `config.json` file with the sandbox specific accounts in the `accounts` property of the `sandbox` object
 :::
+
+You will need to add storage for the contracts in the config.json file within the environment section. You can read more about it [here](/docs/config/environment)
 
 Once the sandbox is running, you can deploy the contract by running:
 
@@ -225,25 +221,27 @@ In Taqueria's .taq/config.json, sandbox acounts are instantited based on the acc
 "sandbox": {
   "local": {
     "accounts": {
-    "bob": {
-        "initialBalance": "3000000000",
-        "keys": {
-            "alias": "bob",
-            "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
-            "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
-            "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
-        }
-    },
-    "alice": {
-        "initialBalance": "2000000000",
-        "keys": {
-            "alias": "alice",
-            "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
-            "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-            "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
-        }
-    },
-    "rpcUrl": "http://localhost:20000"
+      "default": "bob",
+      "bob": {
+          "initialBalance": "3000000000",
+          "keys": {
+              "alias": "bob",
+              "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+              "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+              "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+          }
+      },
+      "alice": {
+          "initialBalance": "2000000000",
+          "keys": {
+              "alias": "alice",
+              "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+              "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+              "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+          }
+      },
+      "rpcUrl": "http://localhost:20000"
+    }
   }
 }
 ```
@@ -265,7 +263,7 @@ Taquito requires that the unencrypted key not have a prefix
 :::
 
 ```js
-signer = new InMemorySigner(alice.keys.secretKey.replace(/unencrypted:/, ''));
+signer = new InMemorySigner(alice.secretKey.replace(/unencrypted:/, ''));
 ```
 
 ### The Transfer operation
@@ -279,7 +277,7 @@ const op = await Tezos.contract.transfer({ to: bob.pk, amount: 1 });
 This also needs to reference the account in the local sandbox as seen here:
 
 ```js
-const op = await Tezos.contract.transfer({ to: bob.keys.publicKey, amount: 1 });
+const op = await Tezos.contract.transfer({ to: bob.publicKeyHash, amount: 1 });
 ```
 
 ## Using the Jest plugin
@@ -287,7 +285,7 @@ const op = await Tezos.contract.transfer({ to: bob.keys.publicKey, amount: 1 });
 The [Taqueria Jest plugin](/docs/plugins/plugin-jest) can be used to configure and run the tests. First you initialize the `tests` directory as a partition by running the command:
 
 ```shell
-taq test tests --init
+taq test --init
 ```
 
 Now that the `tests` directory is a partition, you can run the tests by running the command:
