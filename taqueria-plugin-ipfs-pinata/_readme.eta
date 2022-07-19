@@ -1,0 +1,77 @@
+<% if (it.output == "github") { %>
+# IPFS Pinata Plugin
+<% } %>
+
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
+
+The IPFS Pinata plugin provides a `publish` task to upload metadata, media, or other files to IPFS via Pinata
+
+## Requirements
+
+- Node.js v16.3 or later
+- Docker v0.8.6 or later
+
+## Installation
+
+To install the IPFS Pinata plugin on a Taqueria project, navigate to the project folder and run:
+```shell
+taq install @taqueria/plugin-ipfs-pinata
+```
+
+## Configuration
+
+No additional configuration is available
+
+## Usage
+
+The IPFS Pinata plugin 
+
+### Running the Compile Task
+
+The Archetype plugin's `taq compile` task can be run with or without arguments. The basic syntax for the task is `taq compile <file-name>`
+
+Running the `compile` task with no options will result in all source Archetype smart contracts in the `contracts` folder being compiled to Michelson files in the `artifacts` folder. If you speficy an optional filename, only Archetype contracts matching the specified filename in the `contracts` folder will be compiled
+
+
+### Options
+
+There are no additional options available for this plugin
+
+## Tasks
+
+### The `taq compile` Task
+
+The `compile` task is used for compiling Archetype smart contracts to Michelson and the task has the following structure:
+
+```shell
+taq compile [contractName]
+```
+
+The task takes a filename as an optional argument. If no filename is provided, Taqueria will compile all Archetype files in the `contracts` directory
+
+#### Task Properties
+
+|  attribute |  value                        | 
+|------------|:-----------------------------:|
+|  task      | 'compile'                     | 
+|  command   | 'compile [sourceFile]         | 
+|  aliases   | ['c', 'compile-archetype']    |  
+
+### The `create contract` Template
+
+The `create archetypeContract` task is used to create a new Archetype contract from a template. Running this task will create a new Archetype smart contract in the `contracts` directory and will register that contract with Taqueria
+    
+
+The structure of the template task is:
+
+```shell
+taq create ArchetypeContract <contractName>
+```
+
+The task takes a filename a required positional argument. The filename must end with `.arl`
+
+## Plugin Architecture
+
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
+
+Docker is used under the hood to provide a self contained environment for Archetype to prevent the need for it to be installed on the user's local machine
