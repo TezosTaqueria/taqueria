@@ -139,10 +139,15 @@ tests/coverage
 /taqueria-plugin-teztnets/index.js
 /taqueria-plugin-teztnets/index.js.map
 /taqueria-plugin-teztnets/.parcel-cache
-/taqueria-plugin-contract-types/index.js
-/taqueria-plugin-contract-types/index.js.map
-/taqueria-plugin-contract-types/src/cli-process.js
-/taqueria-plugin-contract-types/src/cli-process.js.map
+/taqueria-plugin-contract-types/*.js
+/taqueria-plugin-contract-types/*.map
+/taqueria-plugin-contract-types/*.cjs
+/taqueria-plugin-contract-types/*.mjs
+/taqueria-plugin-contract-types/*.d.ts
+/taqueria-plugin-contract-types/src/*.js
+/taqueria-plugin-contract-types/src/*.map
+/taqueria-plugin-contract-types/src/*.cjs
+/taqueria-plugin-contract-types/src/*.d.ts
 /taqueria-plugin-archetype/index.js
 /taqueria-plugin-archetype/index.js.map
 /taqueria-plugin-tezos-client/index.js
@@ -151,8 +156,11 @@ tests/coverage
 /taqueria-state/index.js.map
 /taqueria-state/*.d.ts
 /taqueria-state/node/*.d.ts
-/taqueria-plugin-jest/index.js.map
-/taqueria-plugin-jest/index.js
+/taqueria-plugin-jest/*.js
+/taqueria-plugin-jest/*.cjs
+/taqueria-plugin-jest/*.map
+/taqueria-plugin-jest/*.mjs
+/taqueria-plugin-jest/index.d.ts
 /taqueria-plugin-ipfs-pinata/index.js.map
 /taqueria-plugin-ipfs-pinata/index.js
 

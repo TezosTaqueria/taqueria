@@ -14,7 +14,9 @@ const { schemas: generatedSchemas, factory } = createType<RawInput, RawInput>({
 	unknownErrMsg: 'Something went wrong trying to parse the version number',
 });
 
-export type VersionNumber = z.infer<typeof generatedSchemas.schema>;
+export const internalSchema = generatedSchemas.schema;
+
+export type VersionNumber = z.infer<typeof internalSchema>;
 export type t = VersionNumber;
 export const { create, of, make } = factory;
 export const schemas = {

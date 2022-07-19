@@ -1,15 +1,11 @@
 {
 	"name": "@taqueria/plugin-contract-types",
 	"version": "0.8.7",
+	"main": "index.cjs",
+	"module": "index.js",
+	"source": "index.ts",
+	"type": "module",
 	"description": "",
-	"targets": {
-		"default": {
-			"source": "./index.ts",
-			"distDir": "./",
-			"context": "node",
-			"isLibrary": true
-		}
-	},
 	"scripts": {
 		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
 		"build": "npx tsc -noEmit && npx parcel build",
@@ -47,10 +43,22 @@
 		"bignumber.js": "^9.0.2",
 		"fast-glob": "^3.2.11"
 	},
+	"types": "index.esm.d.ts",
 	"jest": {
 		"transform": {
 			".(ts|tsx)": "ts-jest"
 		},
 		"testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$"
+	},
+	"tsup": {
+		"entry": ["index.ts", "src/cli-process.ts"],
+		"sourcemap": true,
+		"target": "node16",
+		"outDir": "./",
+		"dts": true,
+		"clean": false,
+		"skipNodeModulesBundle": true,
+		"platform": "node",
+		"format": ["cjs", "esm"]
 	}
 }
