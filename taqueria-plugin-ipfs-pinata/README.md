@@ -1,14 +1,11 @@
-<% if (it.output == "github") { %>
 # IPFS Pinata Plugin
-<% } %>
 
 This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
 
 The IPFS Pinata plugin provides a `publish` task to upload metadata, media, or other files to IPFS via Pinata
 
-<%~ it.noteOpenAdmonition %>
-In order to connect to Pinata, you will need to first create an account on Pinata, then add your JWT token to the project
-<%= it.closeAdmonition %>
+> ### :page_with_curl: Note
+> In order to connect to Pinata, you will need to first create an account on Pinata, then add your JWT token to the project
 
 
 ## Requirements
