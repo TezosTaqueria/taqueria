@@ -1,5 +1,6 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { TaqError } from '@taqueria/protocol/TaqError';
+import { spawn } from 'child_process';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import path, { join } from 'path';
@@ -347,8 +348,8 @@ export class VsCodeHelper {
 		return this.vscode.window.showQuickPick(availablePlugins, {
 			canPickMany: false,
 			ignoreFocusOut: false,
-			placeHolder: 'Plugin name',
-			title: 'Select a plugin',
+			placeHolder: 'Scaffold name',
+			title: 'Select a scaffold',
 		});
 	}
 
@@ -760,6 +761,7 @@ export class VsCodeHelper {
 				return;
 			}
 			await this.proxyToTaqAndShowOutput(`${taskName} ${sandboxName}`, taskTitles, projectDir, false);
+			this.sandboxesDataProvider?.refresh();
 		});
 	}
 
@@ -906,10 +908,14 @@ export class VsCodeHelper {
 
 	private dataProviders: { refresh: () => void }[] = [];
 	private contractsDataProvider?: ContractsDataProvider;
+	private sandboxesDataProvider?: SandboxesDataProvider;
 
 	registerDataProviders(workspaceFolder: string) {
 		this.registerDataProvider('taqueria-plugins', new PluginsDataProvider(workspaceFolder, this));
-		this.registerDataProvider('taqueria-sandboxes', new SandboxesDataProvider(workspaceFolder, this));
+		this.sandboxesDataProvider = this.registerDataProvider(
+			'taqueria-sandboxes',
+			new SandboxesDataProvider(workspaceFolder, this),
+		);
 		this.registerDataProvider('taqueria-environments', new EnvironmentsDataProvider(workspaceFolder, this));
 		this.contractsDataProvider = this.registerDataProvider(
 			'taqueria-contracts',
@@ -926,5 +932,20 @@ export class VsCodeHelper {
 		});
 		this.dataProviders.push(dataProvider);
 		return dataProvider;
+	}
+
+	listenToDockerEvents() {
+		const child = spawn(`docker`, [
+			`events`,
+			`--filter 'type=container'`,
+			`--filter 'event=stop'`,
+			`--filter 'event=start'`,
+			`--filter 'event=destroy'`,
+		], {
+			shell: true,
+		});
+		child.stdout.on('data', _data => {
+			this.sandboxesDataProvider?.refresh();
+		});
 	}
 }

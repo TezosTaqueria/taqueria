@@ -37,6 +37,7 @@ const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = 
 export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
 	const deps = sanitizeDeps(input);
 	const helper = await VsCodeHelper.construct(context, deps);
+	helper.listenToDockerEvents();
 
 	// Add built-in tasks for Taqueria
 	helper.exposeInitTask();
