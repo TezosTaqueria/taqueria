@@ -4,38 +4,20 @@ import styles from "./LogoGrid.module.css";
 
 const FeatureList = [
 	{
-		title: "Teams building with Taqueria",
+		title: "Use your favorite tools with Taqueria",
 		Svg: require("../../../static/img/taq_orange.svg").default,
 		images: [
 			{
-				Image: require("../../../static/img/image.png").default,
+				Image: require("../../../static/img/ligolang.png").default,
 			},
 			{
-				Image: require("../../../static/img/image.png").default,
+				Image: require("../../../static/img/archetype.png").default,
 			},
 			{
-				Image: require("../../../static/img/image.png").default,
+				Image: require("../../../static/img/smartpy.png").default,
 			},
 			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
+				Image: require("../../../static/img/taquito.png").default,
 			},
 		],
 	},

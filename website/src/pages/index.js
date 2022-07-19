@@ -15,12 +15,13 @@ export default function Home() {
 	return (
 		<Layout
 			title={`Hello from ${siteConfig.title}`}
-			description="A New Way to Build on Tezos"
+			description="A Better Way to Build on Tezos"
 		>
 			<main>
 				<Hero />
 				<Features />
 				<WhyTaqueria />
+				<LogoGrid />
 				<FooterTop />
 			</main>
 		</Layout>
