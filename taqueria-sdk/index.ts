@@ -26,7 +26,7 @@ import { dirname, join } from 'path';
 import { getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
 import { PluginSchema } from './types';
-import { Args, LikeAPromise, pluginDefiner, StdIO } from './types';
+import { LikeAPromise, pluginDefiner, StdIO } from './types';
 
 // @ts-ignore interop issue. Maybe find a different library later
 import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
@@ -137,22 +137,22 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 
 export const noop = () => {};
 
-const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> => {
+const parseArgs = <T extends RequestArgs.t>(unparsedArgs: string[]): LikeAPromise<T, TaqError> => {
 	if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
 		try {
 			const preprocessedArgs = preprocessArgs(unparsedArgs);
 			const argv = yargs(preprocessedArgs.slice(2)).argv;
 			const postprocessedArgs = postprocessArgs(argv);
 			const requestArgs = RequestArgs.from(postprocessedArgs);
-			return Promise.resolve(requestArgs);
+			return Promise.resolve(requestArgs as T);
 		} catch (previous) {
 			if (previous instanceof ZodError) {
 				return eager(
-					toFutureParseErr<RequestArgs.t>(previous, 'The plugin request arguments are invalid', unparsedArgs),
+					toFutureParseErr<T>(previous, 'The plugin request arguments are invalid', unparsedArgs),
 				);
 			}
 			return eager(
-				toFutureParseUnknownErr<RequestArgs.t>(
+				toFutureParseUnknownErr<T>(
 					previous,
 					'There was a problem trying to parse the plugin request arguments',
 					unparsedArgs,
@@ -164,12 +164,12 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> =>
 };
 
 // A hack to protect all hex from being messed by yargs
-const preprocessArgs = (args: Args): Args => {
+const preprocessArgs = (args: string[]): string[] => {
 	return args.map(arg => /^0x[0-9a-fA-F]+$/.test(arg) ? '___' + arg + '___' : arg);
 };
 
 // A hack to protect all hex from being messed by yargs
-const postprocessArgs = (args: Args): Record<string, unknown> => {
+const postprocessArgs = (args: string[]): Record<string, unknown> => {
 	const postprocessedArgs = Object.entries(args).map((
 		[key, val],
 	) => [
@@ -191,8 +191,13 @@ const postprocessArgs = (args: Args): Record<string, unknown> => {
 	return groupedArgs;
 };
 
-const parseSchema = (i18n: i18n, definer: pluginDefiner, defaultPluginName: string): PluginSchema.t => {
-	const inputSchema: PluginSchema.RawPluginSchema = definer(i18n);
+const parseSchema = <T extends RequestArgs.t>(
+	i18n: i18n,
+	definer: pluginDefiner,
+	defaultPluginName: string,
+	requestArgs: T,
+): PluginSchema.t => {
+	const inputSchema: PluginSchema.RawPluginSchema = definer(requestArgs, i18n);
 
 	const { proxy } = inputSchema;
 
@@ -207,11 +212,11 @@ const parseSchema = (i18n: i18n, definer: pluginDefiner, defaultPluginName: stri
 	};
 };
 
-const getResponse = (definer: pluginDefiner, defaultPluginName: string) =>
-	async (requestArgs: RequestArgs.t) => {
+const getResponse = <T extends RequestArgs.t>(definer: pluginDefiner, defaultPluginName: string) =>
+	async (requestArgs: T) => {
 		const { taqRun } = requestArgs;
 		const i18n = await load();
-		const schema = parseSchema(i18n, definer, defaultPluginName);
+		const schema = parseSchema(i18n, definer, defaultPluginName, requestArgs);
 		try {
 			switch (taqRun) {
 				case 'pluginInfo':
@@ -474,9 +479,9 @@ const getPackageName = () => {
 };
 
 export const Plugin = {
-	create: async (definer: pluginDefiner, unparsedArgs: Args) => {
+	create: async <Args extends RequestArgs.t>(definer: pluginDefiner, unparsedArgs: string[]) => {
 		const packageName = getPackageName();
-		return parseArgs(unparsedArgs)
+		return parseArgs<Args>(unparsedArgs)
 			.then(getResponse(definer, packageName))
 			.catch((err: unknown) => {
 				if (err) console.error(err);

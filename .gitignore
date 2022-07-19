@@ -141,6 +141,8 @@ tests/coverage
 /taqueria-plugin-teztnets/.parcel-cache
 /taqueria-plugin-contract-types/index.js
 /taqueria-plugin-contract-types/index.js.map
+/taqueria-plugin-contract-types/src/cli-process.js
+/taqueria-plugin-contract-types/src/cli-process.js.map
 /taqueria-plugin-archetype/index.js
 /taqueria-plugin-archetype/index.js.map
 /taqueria-plugin-tezos-client/index.js

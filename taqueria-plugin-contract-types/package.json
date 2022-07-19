@@ -4,7 +4,7 @@
 	"description": "",
 	"targets": {
 		"default": {
-			"source": "./index.ts",
+			"source": ["./index.ts", "./src/cli-process.ts"],
 			"distDir": "./",
 			"context": "node",
 			"isLibrary": true
