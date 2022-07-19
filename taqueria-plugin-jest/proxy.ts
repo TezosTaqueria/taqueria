@@ -1,4 +1,4 @@
-import { sendAsyncErr, sendAsyncRes, sendErr } from '@taqueria/node-sdk';
+import { noop, sendAsyncErr, sendAsyncRes } from '@taqueria/node-sdk';
 import { LoadedConfig, RequestArgs, SanitizedAbsPath, SanitizedPath } from '@taqueria/node-sdk/types';
 import { execa } from 'execa';
 import { mkdir, stat, writeFile } from 'fs/promises';
@@ -92,18 +92,16 @@ const ensurePartitionExists = (args: Opts) =>
 		);
 
 const execCmd = (cmd: string, args: string[]) => {
-	// console.log([cmd, ...args].join(' '))
-
 	const child = execa(cmd, args, {
-		reject: false,
-		buffer: false,
-		// encoding: null,
 		shell: true,
-		stdio: 'inherit',
+		reject: false,
 		env: { FORCE_COLOR: 'true' },
 	});
 
-	return child.then(_ => {});
+	child.stdout?.pipe(process.stdout);
+	child.stderr?.pipe(process.stderr);
+
+	return child;
 };
 
 export default async (args: RequestArgs.ProxyRequestArgs) => {
@@ -112,9 +110,13 @@ export default async (args: RequestArgs.ProxyRequestArgs) => {
 	return ensurePartitionExists(opts)
 		.then(configAbsPath => {
 			if (!opts.init) {
-				return opts.testPattern
+				const retval = opts.testPattern
 					? execCmd('npx', ['jest', '-c', configAbsPath, '--testPathPattern', opts.testPattern])
 					: execCmd('npx', ['jest', '-c', configAbsPath]);
+				return retval.then(child => {
+					if (child.exitCode === 0) return;
+					else process.exit(child.exitCode);
+				});
 			}
 
 			return sendAsyncRes('Initialized successfully.');

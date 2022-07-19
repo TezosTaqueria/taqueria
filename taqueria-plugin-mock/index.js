@@ -1,4 +1,9 @@
-const { Plugin, Task, Option, Operation, sendAsyncRes, sendAsyncJsonRes } = require('@taqueria/node-sdk');
+const { Plugin, Task, Option, PositionalArg, Operation, Template, sendAsyncRes, sendAsyncJsonRes, experimental } =
+	require(
+		'@taqueria/node-sdk',
+	);
+const { join } = require('path');
+const { writeFile } = require('fs/promises');
 
 const tableResponse = JSON.stringify({
 	render: 'table',
@@ -86,34 +91,104 @@ Plugin.create(i18n => ({
 			encoding: 'application/json',
 			handler: `echo '<% if (it.return == 'object') { %>${tableResponse}<% } else %><%= "pong" %>'`,
 		}),
+		Task.create({
+			task: 'testRegisterContract',
+			command: 'testRegisterContract <sourceFile>',
+			description: 'Tests handling a task that registers a contract',
+			encoding: 'application/json',
+			handler: 'proxy',
+		}),
 	],
-	operations: [
-		Operation.create({
-			operation: 'greeting',
-			command: 'greeting <firstName>',
-			description: 'Example output which produces an output',
-			handler: state => args => `Hello, ${args.FirstName}`,
+	templates: [
+		Template.create({
+			template: 'json',
+			command: 'json <filename>',
+			description: 'Creates a JSON artifact using proxy handler',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'filename',
+					type: 'string',
+					required: true,
+					description: 'The name of the filename to generate',
+				}),
+			],
+			options: [
+				Option.create({
+					shortFlag: 'g',
+					flag: 'greeting',
+					type: 'string',
+					description: 'Greeting to include in JSON file',
+				}),
+			],
+			handler: async requestArgs => {
+				await writeFile(
+					join(requestArgs.projectDir, requestArgs.config.artifactsDir, requestArgs.filename),
+					JSON.stringify({
+						greeting: `Hello, ${requestArgs.greeting ?? 'Tester'}!`,
+					}),
+					'utf8',
+				);
+				return sendAsyncJsonRes('Your wish is my command!');
+			},
+			encoding: 'json',
+		}),
+		Template.create({
+			template: 'text',
+			command: 'text <filename>',
+			description: 'Creates a textfile artifact using shell command',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'filename',
+					type: 'string',
+					required: true,
+					description: 'The name of the filename to generate',
+				}),
+			],
+			options: [
+				Option.create({
+					shortFlag: 'g',
+					flag: 'greeting',
+					type: 'string',
+					description: 'Greeting to include in text file',
+				}),
+			],
+			handler: `
+<%
+var greeting = it.greeting ?? "Tester!";
+var outputFile = it.joinPaths(it.projectDir, it.config.artifactsDir, it.filename);
+%>
+echo 'Hi there, <%= greeting %>!' ><%= outputFile %>
+`,
 		}),
 	],
 	proxy: parsedArgs => {
-		switch (parsedArgs.task) {
-			case 'proxy':
-			case 'ping':
-				return parsedArgs.error
-					? Promise.reject('error')
-					: sendAsyncRes('pong', false);
-				break;
-			case 'proxy-json':
-				return parsedArgs.error
-					? sendAsyncErr('error')
-					: sendAsyncJsonRes(
-						parsedArgs.return === 'object'
-							? [{ 'ping': 'pong' }]
-							: 'pong',
-					);
-				break;
-			default:
-				return sendAsyncErr('Non-expected task');
+		if (parsedArgs.task) {
+			switch (parsedArgs.task) {
+				case 'proxy':
+				case 'ping':
+					return parsedArgs.error
+						? Promise.reject('error')
+						: sendAsyncRes('pong', false);
+					break;
+				case 'proxy-json':
+					return parsedArgs.error
+						? sendAsyncErr('error')
+						: sendAsyncJsonRes(
+							parsedArgs.return === 'object'
+								? [{ 'ping': 'pong' }]
+								: 'pong',
+						);
+					break;
+				case 'testRegisterContract':
+					return experimental.registerContract(parsedArgs, parsedArgs.sourceFile);
+				default:
+					return sendAsyncErr('Non-expected task');
+			}
+		} else if (parsedArgs.template) {
+			switch (parsedArgs.template) {
+				case 'json':
+					return;
+			}
 		}
 	},
 }), process.argv);

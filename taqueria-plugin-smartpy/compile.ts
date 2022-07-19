@@ -1,8 +1,7 @@
-import { execCmd, sendAsyncJsonRes, sendErr } from '@taqueria/node-sdk';
-import { LikeAPromise, PluginResponse, RequestArgs, TaqError } from '@taqueria/node-sdk/types';
-import glob from 'fast-glob';
+import { execCmd, getContracts, sendAsyncJsonRes, sendErr } from '@taqueria/node-sdk';
+import { RequestArgs, TaqError } from '@taqueria/node-sdk/types';
 import { readFile } from 'fs/promises';
-import { basename, join } from 'path';
+import { join } from 'path';
 
 interface Opts extends RequestArgs.ProxyRequestArgs {
 	sourceFile?: string;
@@ -46,17 +45,12 @@ const compileContract = (opts: Opts) =>
 			.then((artifacts: string[]) => ({ contract: sourceFile, artifacts }));
 	};
 
-const compileAll = (opts: Opts): Promise<{ contract: string; artifacts: string[] }[]> => {
-	// TODO: Fetch list of files from SDK
-	return glob(
-		['**/*.py'],
-		{ cwd: opts.config.contractsDir, absolute: false },
-	)
+const compileAll = (opts: Opts): Promise<{ contract: string; artifacts: string[] }[]> =>
+	Promise.all(getContracts(/\.py$/, opts.config))
 		.then(entries => entries.map(compileContract(opts)))
 		.then(promises => Promise.all(promises));
-};
 
-export const compile = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
+export const compile = <T>(parsedArgs: Opts) => {
 	const p = parsedArgs.sourceFile
 		? compileContract(parsedArgs)(parsedArgs.sourceFile)
 			.then(data => [data])

@@ -16,17 +16,5 @@ Plugin.create(i18n => ({
 			encoding: 'json',
 		}),
 	],
-	checkRuntimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			report: [
-				{ name: 'SmartPy', path: 'SmartPy.sh', version: '>=0.8.4', kind: 'required', met: true },
-			],
-		}),
-	installRunTimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			output: 'Ligo was found in /usr/bin/ligo', // TODO this should use i18n
-		}),
 	proxy: compile,
 }), process.argv);

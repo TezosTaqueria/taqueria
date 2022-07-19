@@ -50,6 +50,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a Ligo syntax
                               to Michelson code       [aliases: c, compile-ligo]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -88,6 +89,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a SmartPy synt
                               ax to Michelson code [aliases: c, compile-smartpy]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -113,20 +115,6 @@ Options:
       --help        Show help                                          [boolean]
 `;
 
-export const helpContentsSmartpyTeapotSpecific = `taq teapot
-
-Have a cup of tea
-
-Options:
-      --version     Show version number                                [boolean]
-      --build       Display build information about the current version[boolean]
-  -p, --projectDir  Path to your project directory               [default: "./"]
-  -e, --env         Specify an environment configuration
-  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]  
-      --help        Show help                                          [boolean]
-  -g, --green       Make green tea instead                             [boolean]
-`;
-
 export const helpContentsLigoSmartpy: string = `taq <command>
 
 Commands:
@@ -137,6 +125,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile                 Provided by more than one plugin. The option --plu
                               gin is required.
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -175,6 +164,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile                 Provided by more than one plugin. The option --plu
                               gin is required.
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -214,6 +204,7 @@ Commands:
   taq compile [sourceFile]    Compile a smart contract written in a Archetype sy
                               ntax to Michelson code
                                                  [aliases: c, compile-archetype]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -249,6 +240,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq deploy [contract]       Deploy a smart contract to a particular environmen
                               t                             [aliases: originate]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -285,6 +277,7 @@ Commands:
   taq start sandbox [sandboxName]  Starts a flextesa sandbox    [aliases: start]
   taq stop sandbox [sandboxName]   Stops a flextesa sandbox      [aliases: stop]
   taq list accounts <sandboxName>  List the balances of all sandbox accounts
+  taq create <template>            Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -340,6 +333,7 @@ Commands:
   taq uninstall <pluginName>          Uninstall a plugin
   taq generate types [typescriptDir]  Generate types for a contract to be used w
                                       ith taquito       [aliases: gen, gentypes]
+  taq create <template>               Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]
@@ -398,6 +392,7 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq test [partition]        Setup a directory as a partition to run Jest tests
                                                                  [aliases: jest]
+  taq create <template>       Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]

@@ -167,6 +167,14 @@ export const readJsonFile = <T>(path: string) =>
 		chain(x => decodeJson<T>(x)),
 	);
 
+export const appendTextFile = (path: string) =>
+	(data: string): Future<TaqError.t, string> =>
+		attemptP(() =>
+			Deno.writeTextFile(path, data, {
+				append: true,
+			}).then(() => path)
+		);
+
 export const writeTextFile = (path: string) =>
 	(data: string): Future<TaqError.t, string> => attemptP(() => Deno.writeTextFile(path, data).then(() => path));
 
@@ -211,7 +219,7 @@ export const taqResolve = <T>(data: T): Future<TaqError.t, T> => resolve(data) a
 export const inject = (deps: UtilsDependencies) => {
 	const { stdout, stderr } = deps;
 
-	const log = (message: string) => {
+	const log = (message: unknown) => {
 		const encoder = new TextEncoder();
 		stdout.write(encoder.encode(`${message}\n`));
 	};
@@ -265,7 +273,7 @@ export const inject = (deps: UtilsDependencies) => {
 					context: { url, destinationPath },
 					previous,
 				})),
-				chain(status =>
+				chain(([status]) =>
 					status === 0
 						? resolve(destinationPath)
 						: reject<TaqError.t>({
@@ -282,7 +290,7 @@ export const inject = (deps: UtilsDependencies) => {
 		inputArgs: Record<string, unknown>,
 		bufferOutput = false,
 		cwd?: SanitizedAbsPath.t,
-	): Future<TaqError.t, number | string> =>
+	): Future<TaqError.t, [number, string, string]> =>
 		attemptP(async () => {
 			let command = cmdTemplate;
 			try {
@@ -304,8 +312,12 @@ export const inject = (deps: UtilsDependencies) => {
 				 * - env.get()
 				 * - i18n.__()
 				 */
-				const join = joinPaths;
-				const cmd = renderTemplate(cmdTemplate, { join, ...inputArgs });
+				const cmdArgs = {
+					join: joinPaths,
+					joinPaths,
+					...inputArgs,
+				};
+				const cmd = renderTemplate(cmdTemplate, cmdArgs);
 				command = cmd;
 			} catch (previous) {
 				throw {
@@ -323,8 +335,16 @@ export const inject = (deps: UtilsDependencies) => {
 				});
 
 				// Output for the subprocess' stderr should be copied to the parent stderr
-				await copy(process.stderr, stderr);
-				process.stderr.close();
+				const errOutput = await (async () => {
+					if (bufferOutput) {
+						const output = await process.stderrOutput();
+						const decoder = new TextDecoder();
+						return decoder.decode(output);
+					} else {
+						await copy(process.stderr, stderr);
+						process.stderr.close();
+					}
+				})();
 
 				// Get output. Buffer if desired
 				const output = await (async () => {
@@ -341,7 +361,7 @@ export const inject = (deps: UtilsDependencies) => {
 				// Wait for subprocess to exit
 				const status = await process.status();
 				Deno.close(process.rid);
-				return output ?? status.code;
+				return [status.code, output ?? '', errOutput ?? ''];
 			} catch (previous) {
 				throw {
 					kind: 'E_FORK',
@@ -376,6 +396,7 @@ export const inject = (deps: UtilsDependencies) => {
 		stderr,
 		eager,
 		taqResolve,
+		appendTextFile,
 		outputWarning,
 		outputError,
 		output,

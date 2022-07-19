@@ -179,7 +179,8 @@ Deno.test('execText() can execute a command without buffering', async () => {
 	stdErr.clear();
 
 	const retval = await toPromise(execText('echo foobar', {}));
-	assertEquals(retval, 0);
+	assert(Array.isArray(retval));
+	assertEquals(retval[0], 0);
 	assertEquals(stdout.toString(), 'foobar\n');
 	assertEquals(stderr.toString(), '');
 });
@@ -191,7 +192,8 @@ Deno.test('execText() handles errors correctly', async () => {
 	stdErr.clear();
 
 	const retval = await toPromise(execText('node -e "console.error(\'foobar\'); process.exit(-1)"', {}));
-	assertEquals(retval, 255);
+	assert(Array.isArray(retval));
+	assertEquals(retval[0], 255);
 	assertEquals(stdout.toString(), '');
 	assertEquals(stderr.toString(), 'foobar\n');
 });
@@ -203,7 +205,8 @@ Deno.test('execText() can parse ESJ templates', async () => {
 	stdErr.clear();
 
 	const retval = await toPromise(execText('echo <%= it.text%>', { text: 'foobar' }));
-	assertEquals(retval, 0);
+	assert(Array.isArray(retval));
+	assertEquals(retval[0], 0);
 	assertEquals(stdout.toString(), 'foobar\n');
 	assertEquals(stderr.toString(), '');
 });
@@ -215,7 +218,8 @@ Deno.test('execText() can buffer stdout', async () => {
 	stdErr.clear();
 
 	const retval = await toPromise(execText('echo <%= it.text%>', { text: 'foobar' }, true));
-	assertEquals(retval, 'foobar\n');
+	assert(Array.isArray(retval));
+	assertEquals(retval[1], 'foobar\n');
 	assertEquals(stdout.toString(), '');
 	assertEquals(stderr.toString(), '');
 });
@@ -228,7 +232,8 @@ Deno.test('execText() can execute in a different working directory', async () =>
 
 	const tmpAbspath = await toPromise(SanitizedAbsPath.make('/tmp'));
 	const retval = await toPromise(execText('pwd', {}, false, tmpAbspath));
-	assertEquals(retval, 0);
+	assert(Array.isArray(retval));
+	assertEquals(retval[0], 0);
 	assert(stdout.toString().includes('tmp'));
 	assertEquals(stderr.toString(), '');
 });

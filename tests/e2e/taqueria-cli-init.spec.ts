@@ -43,7 +43,7 @@ describe('E2E Testing for taqueria general functionality', () => {
 		}
 	});
 
-	test('Verify that to install a plugin all you need is a package.json file with {}', async () => {
+	test.skip('Verify that to install a plugin all you need is a package.json file with {}', async () => {
 		try {
 			await exec(`taq init ${taqueriaProjectPathNPMSuccess}`);
 			await exec(`echo "{}" > ${taqueriaProjectPathNPMSuccess}/package.json`);
