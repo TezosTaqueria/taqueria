@@ -7,9 +7,11 @@
 			"source": "./index.ts",
 			"distDir": "./",
 			"context": "node",
-			"isLibrary": true
+			"isLibrary": true,
+			"outputFormat": "esmodule"
 		}
 	},
+	"type": "module",
 	"scripts": {
 		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
 		"build": "npx tsc -noEmit && npx parcel build",
