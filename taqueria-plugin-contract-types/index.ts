@@ -1,6 +1,5 @@
 import { Option, Plugin, PositionalArg, Task } from '@taqueria/node-sdk';
 import { tasks } from './tasks';
-export { generateContractTypesProcessContractFiles } from './src/cli-process';
 
 Plugin.create(i18n => ({
 	alias: 'contract-types',
