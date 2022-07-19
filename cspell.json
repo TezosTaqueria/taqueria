@@ -30,6 +30,7 @@
 		"retval",
 		"typecheck",
 		"vsix",
-		"xvfb"
+		"xvfb",
+		"positionals"
 	]
 }

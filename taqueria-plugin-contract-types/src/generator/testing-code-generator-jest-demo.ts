@@ -60,8 +60,8 @@ const run = async () => {
 	for (const f of tzFiles) {
 		const contractFilePath = path.join(contractDirPath, f);
 		const outputFilePath = contractFilePath
-			.replace('/example/contracts/', '/example/tests/')
-			.replace(/\.tz$/, '.test.ts');
+			.replace('/example/contracts/', '/example/test-generation/')
+			.replace(/\.tz$/, '.jest-demo.ts');
 
 		console.log('Create Jest Test', { contractFilePath, outputFilePath });
 
