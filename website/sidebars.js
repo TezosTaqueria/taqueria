@@ -50,15 +50,15 @@ const sidebars = {
       collapsible: false,
       items: [
         "plugins/plugin-basics",
-        "plugins/plugin-flextesa",
         "plugins/plugin-archetype",
-        "plugins/plugin-ligo",
-        "plugins/plugin-taquito",
         "plugins/plugin-contract-types",
-        "plugins/plugin-tezos-client",
-        "plugins/plugin-smartpy",
+        "plugins/plugin-flextesa",
+        "plugins/plugin-ipfs-pinata",
         "plugins/plugin-jest",
-        "plugins/plugin-ipfs-pinata"
+        "plugins/plugin-ligo",
+        "plugins/plugin-smartpy",
+        "plugins/plugin-taquito",
+        "plugins/plugin-tezos-client",
       ],
     },
     // {
