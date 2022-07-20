@@ -68,7 +68,12 @@ const replaceRpcUrlInConfig = async (newPort: string, oldUrl: string, sandboxNam
 const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts) => {
 	const port = Url.toComponents(sandbox.rpcUrl).port;
 	const newPort = await getNewPortIfPortInUse(port);
-	if (newPort !== port) await replaceRpcUrlInConfig(newPort, sandbox.rpcUrl.toString(), sandboxName, opts);
+	if (newPort !== port) {
+		console.log(
+			`${port} is already in use, ${newPort} will be used for ${sandboxName} instead and .taq/config.json will be updated to reflect this.`,
+		);
+		await replaceRpcUrlInConfig(newPort, sandbox.rpcUrl.toString(), sandboxName, opts);
+	}
 	const ports = `-p ${newPort}:20000`;
 
 	const containerName = await getContainerName(sandboxName, opts);
