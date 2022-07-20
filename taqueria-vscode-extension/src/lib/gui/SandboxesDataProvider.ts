@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-import { OutputLevels, VsCodeHelper } from '../helpers';
+import { HasRefresh, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
+import { getRunningContainerNames } from '../pure';
 
-export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTreeItem> {
+export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTreeItem>, HasRefresh {
 	constructor(
 		private workspaceRoot: string,
 		private helper: VsCodeHelper,
@@ -13,30 +14,31 @@ export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTre
 	}
 
 	async getChildren(element?: SandboxTreeItem): Promise<SandboxTreeItem[]> {
-		let pathToDir: Util.PathToDir | null;
-		let config: Util.TaqifiedDir | null;
-		if (!this.workspaceRoot) {
-			pathToDir = null;
-			config = null;
-		} else {
-			try {
-				pathToDir = await Util.makeDir(this.workspaceRoot, this.helper.i18n);
-				config = await Util.TaqifiedDir.create(pathToDir, this.helper.i18n);
-			} catch (e: any) {
-				config = null;
-				await this.helper.notifyAndLogError('Error while loading config, sandboxes list will fail to populate', e);
-			}
-		}
-
 		if (element) {
 			return [];
 		}
+		const [{ config }, runningContainers] = await Promise.all([this.getConfig(), getRunningContainerNames()]);
 		if (!config?.config?.sandbox) {
 			return [];
 		}
-		const sandboxes = Object.entries(config.config.sandbox);
-		sandboxes.sort((a, b) => a[0].localeCompare(b[0]));
-		return sandboxes.map(sandbox => new SandboxTreeItem(sandbox[0], undefined, vscode.TreeItemCollapsibleState.None));
+		const environmentNames = this.getEnvironmentNames(config);
+
+		const getState = (sandBoxName: string) => {
+			if (runningContainers === undefined) {
+				return undefined;
+			}
+			for (const environmentName of environmentNames) {
+				if (runningContainers.findIndex(x => x === `taqueria-${environmentName}-${sandBoxName}`) >= 0) {
+					return true;
+				}
+			}
+			return false;
+		};
+		const sandboxNames = this.getSandboxNames(config);
+
+		return sandboxNames.map(sandboxName =>
+			new SandboxTreeItem(sandboxName, getState(sandboxName), vscode.TreeItemCollapsibleState.None)
+		);
 	}
 
 	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItem | undefined | null | void> = new vscode
@@ -45,6 +47,49 @@ export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTre
 	>();
 	readonly onDidChangeTreeData: vscode.Event<SandboxTreeItem | undefined | null | void> =
 		this._onDidChangeTreeData.event;
+
+	private async getConfig(): Promise<{ config: Util.TaqifiedDir | null; pathToDir: Util.PathToDir | null }> {
+		if (!this.workspaceRoot) {
+			return {
+				pathToDir: null,
+				config: null,
+			};
+		} else {
+			try {
+				const pathToDir = await Util.makeDir(this.workspaceRoot, this.helper.i18n);
+				const config = await Util.TaqifiedDir.create(pathToDir, this.helper.i18n);
+				return {
+					config,
+					pathToDir,
+				};
+			} catch (e: any) {
+				await this.helper.notifyAndLogError('Error while loading config, sandboxes list will fail to populate', e);
+				return {
+					pathToDir: null,
+					config: null,
+				};
+			}
+		}
+	}
+
+	private getEnvironmentNames(config: Util.TaqifiedDir): string[] {
+		if (!config?.config?.environment) {
+			return [];
+		}
+		const environments = Object.entries(config.config.environment);
+		const nonDefaultEnvironments = environments.filter(environment => environment[0] !== 'default');
+		nonDefaultEnvironments.sort((a, b) => a[0].localeCompare(b[0]));
+		return nonDefaultEnvironments.map(e => e[0]);
+	}
+
+	private getSandboxNames(config: Util.TaqifiedDir): string[] {
+		if (!config?.config?.sandbox) {
+			return [];
+		}
+		const sandboxes = Object.entries(config.config.sandbox);
+		sandboxes.sort((a, b) => a[0].localeCompare(b[0]));
+		return sandboxes.map(sandbox => sandbox[0]);
+	}
 
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
