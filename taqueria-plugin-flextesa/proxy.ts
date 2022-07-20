@@ -1,4 +1,15 @@
-import { execCmd, getArch, sendAsyncErr, sendAsyncRes, sendErr, sendJsonRes, sendRes } from '@taqueria/node-sdk';
+import {
+	execCmd,
+	getArch,
+	readJsonFile,
+	sendAsyncErr,
+	sendAsyncRes,
+	sendErr,
+	sendJsonRes,
+	sendRes,
+	stringToSHA256,
+	writeJsonFile,
+} from '@taqueria/node-sdk';
 import {
 	LikeAPromise,
 	Protocol,
@@ -7,9 +18,10 @@ import {
 	SandboxConfig,
 	StdIO,
 } from '@taqueria/node-sdk/types';
-import { SanitizedArgs, TaqError } from '@taqueria/protocol/taqueria-protocol-types';
+import { Config, SanitizedArgs, TaqError } from '@taqueria/protocol/taqueria-protocol-types';
 import retry from 'async-retry';
 import type { ExecException } from 'child_process';
+import { getPortPromise } from 'portfinder';
 
 const { Url } = Protocol;
 
@@ -19,31 +31,61 @@ interface Opts extends RequestArgs.ProxyRequestArgs {
 
 const getDockerImage = (opts: Opts) => `ghcr.io/ecadlabs/taqueria-flextesa:${opts.setVersion}-${opts.setBuild}`;
 
-const getContainerName = (sandboxName: string, parsedArgs: Opts) => {
-	return `taqueria-${parsedArgs.env}-${sandboxName}`;
+const getUniqueSandboxname = async (sandboxName: string, projectDir: string) => {
+	const hash = await stringToSHA256(projectDir);
+	return `${sandboxName}-${hash}`;
+};
+
+const getContainerName = async (sandboxName: string, parsedArgs: Opts) => {
+	const uniqueSandboxName = await getUniqueSandboxname(sandboxName, parsedArgs.projectDir);
+	return `taqueria-${parsedArgs.env}-${uniqueSandboxName}`;
+};
+
+const getNewPortIfPortInUse = async (port: string): Promise<string> => {
+	const newPort = await getPortPromise({ port: parseInt(port) });
+	return newPort.toString();
+};
+
+const replaceRpcUrlInConfig = async (newPort: string, oldUrl: string, sandboxName: string, opts: Opts) => {
+	const newUrl = oldUrl.replace(/:\d+/, ':' + newPort);
+	const config = await readJsonFile<Config.t>(opts.config.configFile);
+	const sandbox = config.sandbox;
+	const sandboxConfig = sandbox ? sandbox[sandboxName] : undefined;
+	if (sandboxConfig === undefined) return;
+	const updatedConfig = {
+		...config,
+		sandbox: {
+			...sandbox,
+			[sandboxName]: {
+				...(sandboxConfig as object),
+				rpcUrl: newUrl,
+			},
+		},
+	};
+	await writeJsonFile(opts.config.configFile)(updatedConfig);
 };
 
 const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts) => {
 	const port = Url.toComponents(sandbox.rpcUrl).port;
-	const containerName = getContainerName(sandboxName, opts);
+	const newPort = await getNewPortIfPortInUse(port);
+	if (newPort !== port) await replaceRpcUrlInConfig(newPort, sandbox.rpcUrl.toString(), sandboxName, opts);
+	const ports = `-p ${newPort}:20000`;
+
+	const containerName = await getContainerName(sandboxName, opts);
 	const arch = await getArch();
 	const image = getDockerImage(opts);
 	const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir;
 
-	const ports = opts.debug
-		? `-p ${port}:20000 -p 19229:9229`
-		: `-p ${port}:20000`;
-
 	return `docker run --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} node index.js --sandbox ${sandboxName}`;
 };
 
-const getConfigureCommand = (sandboxName: string, opts: Opts): string => {
-	const containerName = getContainerName(sandboxName, opts);
+const getConfigureCommand = async (sandboxName: string, opts: Opts): Promise<string> => {
+	const containerName = await getContainerName(sandboxName, opts);
 	return `docker exec ${containerName} node index.js --sandbox ${sandboxName} --configure`;
 };
 
-const getImportAccountsCommand = (sandboxName: string, opts: Opts): string => {
-	const containerName = getContainerName(sandboxName, opts);
+const getImportAccountsCommand = async (sandboxName: string, opts: Opts): Promise<string> => {
+	const containerName = await getContainerName(sandboxName, opts);
 	return `docker exec ${containerName} node index.js --sandbox ${sandboxName} --importAccounts`;
 };
 
@@ -85,7 +127,7 @@ const startInstance = (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts
 const configureTezosClient = (sandboxName: string, opts: Opts): Promise<StdIO> =>
 	retry(
 		() =>
-			Promise.resolve(getConfigureCommand(sandboxName, opts))
+			getConfigureCommand(sandboxName, opts)
 				.then(execCmd)
 				.then(({ stderr, stdout }) => {
 					if (stderr.length) return Promise.reject(stderr);
@@ -96,7 +138,7 @@ const configureTezosClient = (sandboxName: string, opts: Opts): Promise<StdIO> =
 const importAccounts = (sandboxName: string, opts: Opts): Promise<StdIO> =>
 	retry(
 		() =>
-			Promise.resolve(getImportAccountsCommand(sandboxName, opts))
+			getImportAccountsCommand(sandboxName, opts)
 				.then(execCmd)
 				.then(({ stderr, stdout }) => {
 					if (stderr.length) {
@@ -144,8 +186,8 @@ const startSandboxTask = (parsedArgs: Opts): LikeAPromise<void, TaqError.t> => {
 };
 
 const isSandboxRunning = (sandboxName: string, opts: Opts) => {
-	const containerName = getContainerName(sandboxName, opts);
-	return execCmd(`docker ps --filter name=${containerName} | grep -w ${containerName}`)
+	return getContainerName(sandboxName, opts)
+		.then(containerName => execCmd(`docker ps --filter name=${containerName} | grep -w ${containerName}`))
 		.then(_ => true)
 		.catch(_ => false);
 };
@@ -157,9 +199,8 @@ const getAccountBalances = (sandboxName: string, sandbox: SandboxConfig.t, opts:
 			if (accountName === 'default') return retval;
 
 			const getBalanceProcess = getArch()
-				.then(_ =>
-					`docker exec ${getContainerName(sandboxName, opts)} tezos-client get balance for ${accountName.trim()}`
-				)
+				.then(_ => getContainerName(sandboxName, opts))
+				.then(containerName => `docker exec ${containerName} tezos-client get balance for ${accountName.trim()}`)
 				.then(execCmd)
 				.then(({ stdout, stderr }) => {
 					if (stderr.length > 0) sendErr(stderr);
@@ -210,7 +251,7 @@ const stopSandboxTask = async (parsedArgs: Opts): Promise<void> => {
 		if (sandbox) {
 			if (doesUseFlextesa(sandbox)) {
 				return await isSandboxRunning(parsedArgs.sandboxName, parsedArgs)
-					? execCmd(`docker kill ${getContainerName(parsedArgs.sandboxName, parsedArgs)}`)
+					? execCmd(`docker kill ${await getContainerName(parsedArgs.sandboxName, parsedArgs)}`)
 						.then(_ => sendAsyncRes(`Stopped ${parsedArgs.sandboxName}.`))
 					: sendAsyncRes(`The ${parsedArgs.sandboxName} sandbox was not running.`);
 			}
