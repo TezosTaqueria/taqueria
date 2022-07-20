@@ -57,8 +57,7 @@ const sidebars = {
         "plugins/plugin-contract-types",
         "plugins/plugin-tezos-client",
         "plugins/plugin-smartpy",
-        "plugins/plugin-jest",
-        "plugins/plugin-ipfs-pinata"
+        "plugins/plugin-jest"
       ],
     },
     // {
