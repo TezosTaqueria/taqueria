@@ -76,11 +76,10 @@ export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTre
 		if (!config?.config?.environment) {
 			return [];
 		}
-		let environments = Object.entries(config.config.environment);
-		const defaultEnv = config.config.environment['default'];
-		environments = environments.filter(environment => environment[0] !== 'default');
-		environments.sort((a, b) => a[0].localeCompare(b[0]));
-		return environments.map(e => e[0]);
+		const environments = Object.entries(config.config.environment);
+		const nonDefaultEnvironments = environments.filter(environment => environment[0] !== 'default');
+		nonDefaultEnvironments.sort((a, b) => a[0].localeCompare(b[0]));
+		return nonDefaultEnvironments.map(e => e[0]);
 	}
 
 	private getSandboxNames(config: Util.TaqifiedDir): string[] {
