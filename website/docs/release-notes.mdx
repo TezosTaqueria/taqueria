@@ -26,10 +26,10 @@ title: Taqueria Releases
 
 - Taqueria now requires contracts to be registered in order to compile and originate them
 - For multi-file contracts, register the file that contains the `main` entrypoint
-- Contracts created using templates 'taq create contract <contractName>` are automatically registered
-- Contracts added to the project's `contracts` directory are registered using `taq add-contract <contractName>`
+- Contracts created using templates 'taq create contract < contractName >` are automatically registered
+- Contracts added to the project's `contracts` directory are registered using `taq add-contract < contractName >`
 - Taqueria now supports plugin templates which provide a means for plugins to create artifacts
-- Compiler plugins now come with a template to create a new contract which is automatically registered `taq create contract <contractName>`
+- Compiler plugins now come with a template to create a new contract which is automatically registered `taq create contract < contractName >`
 
 ## New Features
 
@@ -41,8 +41,8 @@ Taqueria now has a contract registry which provides support for multi-file contr
 
 There are two paths to register a contract:
 
-1. Add a Ligo or Archetype contract to the `contracts` directory, then run `taq add-contract <contractName>`. This will register the contract you have added to the `contracts` directory 
-2. Create a Ligo or Archetype contract from a template. Install a compiler plugin and then run `taq create contract <contractName>`. This will create a new contract in the `contracts` directory, and will register the contract
+1. Add a Ligo or Archetype contract to the `contracts` directory, then run `taq add-contract < contractName >`. This will register the contract you have added to the `contracts` directory 
+2. Create a Ligo or Archetype contract from a template. Install a compiler plugin and then run `taq create contract < contractName >`. This will create a new contract in the `contracts` directory, and will register the contract
 
 In order to view the contracts currently registered on a project, you can run:
 
@@ -58,11 +58,11 @@ If you are working with multi-file Ligo smart contracts, only register the files
 
 The contract registry adds three new tasks to Taqueria:
 
-| Command                        | Description
-|--------------------------------|-----------------------------------------------|
-| taq add-contract <sourceFile>  | Add a contract to the contract registry       |
-| taq rm-contract <contractName> | Remove a contract from the contract registry  |
-| taq list-contracts             | List registered contracts                     |
+| Command                          | Description
+|----------------------------------|-----------------------------------------------|
+| taq add-contract < sourceFile >  | Add a contract to the contract registry       |
+| taq rm-contract < contractName > | Remove a contract from the contract registry  |
+| taq list-contracts               | List registered contracts                     |
 
 ### Plugin Templates
 
@@ -72,7 +72,7 @@ Templates use the `taq create <templateName>` task and will appear in the help m
 
 #### Usage
 
-To use templates to create a new Ligo or Archetype contract, you will run the `taq create contract <contractName>` task
+To use templates to create a new Ligo or Archetype contract, you will run the `taq create contract` task
 
 For example, to create a new Ligo contract called `taco-shop` using the jsligo syntax, you would run:
 
@@ -88,7 +88,7 @@ pluginName: `@taqueria/plugin-ipfs-pinata`
 
 Included in this release is the first version of the Taqueria IPFS Pinata plugin. This plugin provides a `publish` task which uploads files from the specified directory to IPFS via Pinata
 
-The structure of the publish task is: `taq publish <path>`
+The structure of the publish task is: `taq publish < path >`
 
 The plugin takes a path as a positional argument and will publish the files from that directory to IPFS
 
@@ -102,7 +102,7 @@ taq install @taqueria/plugin-ipfs-pinata
 
 #### Use 
 
-To use this plugin, add a metadata or media file to a directory (`dirName`) inside your project, and then run `taq publish <dirName>`
+To use this plugin, add a metadata or media file to a directory inside your project, and then run `taq publish < path >` using the path to the directory containing the files you want to publish
 
 ### Taqueria Github Action
 
@@ -112,7 +112,7 @@ This action allows you to use Taqueria in your CI/CD pipeline so you can test, d
 
 The action can be found on the marketplace here
 
-For more information, VIEW THE DOCS or see a live example in the TACO-SHOP-SCAFFOLD REPO
+For more information, [read the documentation](/docs/features/github-action) or see a live example in the [Taco Shop Scaffold](https://github.com/ecadlabs/taqueria-scaffold-taco-shop/blob/main/.github/workflows/main.yml) project
 
 ## Migrating from Legacy Versions
 
@@ -120,7 +120,7 @@ This release of Taqueria introduces breaking changes to the way contracts are ma
 
 1. Ensure you are running Taqueria v0.8.0: `taq --version`
 2. Update Taqueria plugins to the latest version: `npm update && npm i`
-3. Add each contract you would like to compile or originate to the contract registry: `taq add-contract <contractName>`
+3. Add each contract you would like to compile or originate to the contract registry: `taq add-contract < contractName >`
 
 :::note
 If you are working with a multi-file Ligo contract, only register the file which contains the `main` entrypoint

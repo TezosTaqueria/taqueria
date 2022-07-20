@@ -4,8 +4,6 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 
 The IPFS Pinata plugin provides a `publish` task to upload metadata, media, or other files to IPFS via Pinata
 
-> ### :page_with_curl: Note
-> In order to connect to Pinata, you will need to first create an account on Pinata, then add your JWT token to the project
 
 
 ## Requirements
@@ -42,7 +40,7 @@ The IPFS Pinata plugin exposes a `publish` task which uploads one or more files 
 You will first need to create a new directory in your project and add any metadata or media files you would like to upload to it. Once you have a directory in your project with one or more files to upload, you can run:
 
 ```shell
-taq publish <path>
+taq publish < path >
 ```
 
 ## Tasks
@@ -52,16 +50,16 @@ taq publish <path>
 The `publish` task is used for compiling Archetype smart contracts to Michelson and the task has the following structure:
 
 ```shell
-taq publish <sourceDirectory>
+taq publish < sourceDirectory >
 ```
 
 #### Task Properties
 
-|  attribute |  value                        | 
-|------------|:-----------------------------:|
-|  task      | 'publish'                     | 
-|  command   | 'publish <path>               | 
-|  aliases   | N/A                           |  
+|  attribute |  value                          | 
+|------------|:-------------------------------:|
+|  task      | 'publish'                       | 
+|  command   | 'publish < path >               | 
+|  aliases   | N/A                             |  
 
 
 ## Plugin Architecture
