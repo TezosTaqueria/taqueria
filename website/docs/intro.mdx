@@ -30,6 +30,7 @@ Some of the things Taqueria can do for you include:
 - Generating TypeScript types from a Michelson contract with the [Contract Types](/docs/plugins/plugin-contract-types/) plugin
 - Typechecking Michelson contracts and simulating contract calls with the [Tezos Client](/docs/plugins/plugin-tezos-client/) plugin
 - Testing dapps and smart contracts with the [Jest](/docs/plugins/plugin-jest/) plugin
+- Publishing metadata and media files to IPFS with the [IPFS Pinata](/docs/plugins/plugin-ipfs-pinata/) plugin
 
 ## What is Taqueria?
 
@@ -41,6 +42,7 @@ Taqueria has a few major components:
  - A command line interface (CLI) you use in your terminal through a command named `taq`
  - A library of plugins that add tasks to Taqueria to do cool and useful things like compiling and originating smart contracts, and type generation
  - A VS Code Extension which provides the ability to run Taqueria tasks from the command palette
+ - A GitHub action so Taqueria can be used in your CI/CD workflows
 
 ## Basic Components
 
@@ -66,7 +68,6 @@ You can see what tasks are available to run in any given context by running `taq
 A Taqueria project is one that has been initialized by Taqueria using the `taq init` command. It will have the following directory structure created:
 - `/artifacts`: This is where Taqueria will store artifacts that it creates during the course of its execution
 - `/contracts`: This is where Taqueria will store smart contracts that it compiles
-- `/tests`: This is where Taqueria will store tests that it runs 
 - `./.taq`: This is where Taqueria will store its configuration
 
 :::note
@@ -88,6 +89,7 @@ Currently available plugins include:
 - Contract Types Generator
 - Tezos Client
 - Jest Test Runner
+- IPFS Pinata
 
 ### Taqueria SDK
 
