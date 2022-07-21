@@ -247,9 +247,33 @@
 				"title": "Setup directory as a partition to run Jest tests",
 				"shortTitle": "test",
 				"enablement": "@taqueria/plugin-jest"
+			},
+			{
+				"command": "taqueria.add_contract",
+				"category": "Taqueria",
+				"title": "Add contract to registry",
+				"shortTitle": "add",
+				"icon": "$(add)"
+			},
+			{
+				"command": "taqueria.rm_contract",
+				"category": "Taqueria",
+				"title": "Remove contract from registry",
+				"shortTitle": "remove",
+				"icon": "$(remove)"
 			}
 		],
 		"menus": {
+			"commandPalette": [
+				{
+					"command": "taqueria.add_contract",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.rm_contract",
+					"when": "false"
+				}
+			],
 			"view/item/context": [
 				{
 					"command": "taqueria.install",
@@ -278,17 +302,17 @@
 				},
 				{
 					"command": "taqueria.compile_smartpy",
-					"when": "view == taqueria-contracts && viewItem == smartpy",
+					"when": "view == taqueria-contracts && viewItem =~ /lang:smartpy/",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.compile_ligo",
-					"when": "view == taqueria-contracts && viewItem == ligo",
+					"when": "view == taqueria-contracts && viewItem =~ /lang:ligo/",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.compile_archetype",
-					"when": "view == taqueria-contracts && viewItem == archetype",
+					"when": "view == taqueria-contracts && viewItem =~ /lang:archetype/",
 					"group": "inline"
 				},
 				{
@@ -298,7 +322,17 @@
 				},
 				{
 					"command": "taqueria.typecheck",
-					"when": "view == taqueria-sandboxes && view != stopped",
+					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.add_contract",
+					"when": "view == taqueria-contracts && viewItem =~ /inRegistry:false/",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.rm_contract",
+					"when": "view == taqueria-contracts && viewItem =~ /inRegistry:true/",
 					"group": "inline"
 				}
 			]

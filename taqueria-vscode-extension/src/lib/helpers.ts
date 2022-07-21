@@ -706,6 +706,26 @@ export class VsCodeHelper {
 		}
 	}
 
+	exposeTaqTaskAsCommandWithFileArgument(
+		cmdId: string,
+		taskWithArgs: string,
+		outputTo: 'output' | 'notify',
+		taskTitles: TaskTitles,
+		projectDir?: Util.PathToDir,
+	) {
+		this.registerCommand(
+			cmdId,
+			async (item: HasFileName) => {
+				await this.proxyToTaqAndShowOutput(
+					`${taskWithArgs} ${item.fileName}`,
+					taskTitles,
+					projectDir,
+					outputTo === 'output',
+				);
+			},
+		);
+	}
+
 	exposeTaqTaskAsCommandWithOptionalFileArgument(
 		cmdId: string,
 		taskWithArgs: string,
@@ -716,11 +736,12 @@ export class VsCodeHelper {
 		this.registerCommand(
 			cmdId,
 			async (item?: HasFileName | undefined) => {
-				const pathToTaq = await this.getTaqBinPath();
-				if (item) {
-					taskWithArgs = `${taskWithArgs} ${item.fileName}`;
-				}
-				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitles, projectDir, outputTo === 'output');
+				await this.proxyToTaqAndShowOutput(
+					item ? `${taskWithArgs} ${item.fileName}` : taskWithArgs,
+					taskTitles,
+					projectDir,
+					outputTo === 'output',
+				);
 			},
 		);
 	}

@@ -97,6 +97,27 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 					},
 					projectDir,
 				);
+				helper.exposeTaqTaskAsCommandWithFileArgument(
+					COMMAND_PREFIX + 'add_contract',
+					'add-contract',
+					'output',
+					{
+						finishedTitle: `added contract to registry`,
+						progressTitle: `adding contract to registry`,
+					},
+					projectDir,
+				);
+				helper.exposeTaqTaskAsCommandWithFileArgument(
+					COMMAND_PREFIX + 'rm_contract',
+					'rm-contract',
+					'output',
+					{
+						finishedTitle: `removed contract from registry`,
+						progressTitle: `removing contract from registry`,
+					},
+					projectDir,
+				);
+
 				helper.exposeTaqTaskAsCommand(
 					COMMAND_PREFIX + 'generate_types',
 					'generate types',
