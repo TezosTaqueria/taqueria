@@ -1,4 +1,4 @@
-import { stringToSHA256 } from '@taqueria/node-sdk';
+import { toSHA256 } from '@taqueria/protocol/SHA256';
 import * as vscode from 'vscode';
 import { HasRefresh, mapAsync, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
@@ -94,7 +94,7 @@ export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTre
 	// taqueria-plugin-flextesa/proxy.ts. As suggested in https://github.com/ecadlabs/taqueria/issues/1030, we need to
 	// take care of this tech debt.
 	private async getUniqueSandboxName(sandboxName: string, projectDir: string) {
-		const hash = await stringToSHA256(projectDir);
+		const hash = await toSHA256(projectDir);
 		return `${sandboxName}-${hash}`;
 	}
 
