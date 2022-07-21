@@ -1,9 +1,10 @@
 {
 	"name": "taqueria-vscode",
-	"displayName": "taqueria",
-	"description": "A vscode plugin to make Tezos development easier with Taqueria!",
+	"displayName": "Taqueria",
+	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
 	"version": "0.8.7",
+	"preview": true,
 	"engines": {
 		"vscode": "^1.68.1",
 		"node": "^16.0.0"
@@ -41,7 +42,7 @@
 			}
 		}
 	},
-	"author": "ECAD Labs",
+	"author": "ECAD Labs Inc.",
 	"license": "Apache-2.0",
 	"icon": "images/taqueria-icon.png",
 	"repository": {
@@ -60,11 +61,21 @@
 		"deploy",
 		"originate",
 		"ecad",
-		"ecadlabs"
+		"ecadlabs",
+		"NFT",
+		"DeFi",
+		"blockchain",
+		"smart contract",
+		"Ligo",
+		"Michelson",
+		"SmartPy",
+		"Archetype"
 	],
 	"activationEvents": [
 		"onCommand:taqueria.init",
 		"onCommand:taqueria.scaffold",
+		"onCommand:taqueria.opt_in",
+		"onCommand:taqueria.opt_out",
 		"workspaceContains:.taq",
 		"onStartupFinished"
 	],

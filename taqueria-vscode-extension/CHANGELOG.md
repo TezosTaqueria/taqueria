@@ -1,5 +1,186 @@
 # Change Log
 
+# Taqueria v0.8.0   
+
+| Details     |               |
+| ----------- | ------------- |
+|Release Date | July 15, 2022 |
+|Release Type | Minor         |
+|Release Page | [v0.8.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.8.0) |
+
+## Summary of Impactful Changes
+
+- The VS Code Extension (VSCE) now has a GUI and significant UX improvements
+- Taqueria plugins can now expose templates and the comptiler plugins now have a `taq create contract` task
+- Taqueria now supports multi-file Ligo smart contracts
+- Contract registry: enables powerful functionality when working with contracts in Taqueria
+- IPFS Pinata Plugin - Upload and pin metadata or other files with the new `@taqueria/plugin-ipfs-pinata` plugin
+- Added missing functionality from the VSCE 
+- The initial storage values in `config.json` now support complex data types via object literals
+- Support for contract and token metadata
+- Taqueria now has a GitHub action for use in CI/CD Pipelines
+
+### Conceptual Changes to Note
+
+- Taqueria now requires contracts to be registered in order to compile and originate them
+- For multi-file contracts, register the file that contains the `main` entrypoint
+- Contracts created using templates 'taq create contract <contractName>` are automatically registered
+- Contracts added to the project's `contracts` directory are registered using `taq add-contract <contractName>`
+- Taqueria now supports plugin templates which provide a means for plugins to create artifacts
+- Compiler plugins now come with a template to create a new contract which is automatically registered `taq create contract <contractName>`
+
+## New Features
+
+### Contract Registry
+
+Taqueria now has a contract registry which provides support for multi-file contracts, and will support advanced state management features in the future
+
+***With this release, contracts now have to be registered in Taqueria in order to compile or originate them***
+
+There are two paths to register a contract:
+
+1. Add a Ligo or Archetype contract to the `contracts` directory, then run `taq add-contract <contractName>`. This will register the contract you have added to the `contracts` directory 
+2. Create a Ligo or Archetype contract from a template. Install a compiler plugin and then run `taq create contract <contractName>`. This will create a new contract in the `contracts` directory, and will register the contract
+
+In order to view the contracts currently registered on a project, you can run:
+
+```shell
+taq list-contracts
+```
+
+:::note
+If you are working with multi-file Ligo smart contracts, only register the files that contain the `main` entrypoint
+:::
+
+#### Contract Registry Tasks
+
+The contract registry adds three new tasks to Taqueria:
+
+| Command                        | Description
+|--------------------------------|-----------------------------------------------|
+| taq add-contract <sourceFile>  | Add a contract to the contract registry       |
+| taq rm-contract <contractName> | Remove a contract from the contract registry  |
+| taq list-contracts             | List registered contracts                     |
+
+### Plugin Templates
+
+Taqueria now provides plugin developers a way to expose templates to users. In this release, templates are used by the compiler plugins to provide an easy way to create and register a contract
+
+Templates use the `taq create <templateName>` task and will appear in the help menu once a supporting plugin is installed
+
+#### Usage
+
+To use templates to create a new Ligo or Archetype contract, you will run the `taq create contract <contractName>` task
+
+For example, to create a new Ligo contract called `taco-shop` using the jsligo syntax, you would run:
+
+```shell
+taq create contract taco-shop.jsligo
+```
+
+You will see the contract is created in the `contracts` directory and the contract has been added to the contract registry. You can confirm this by running `taq list-contracts`
+
+### New Plugin: `@taqueria/plugin-ipfs-pinata`
+
+pluginName: `@taqueria/plugin-ipfs-pinata`
+
+Included in this release is the first version of the Taqueria IPFS Pinata plugin. This plugin provides a `publish` task which uploads files from the specified directory to IPFS via Pinata
+
+The structure of the publish task is: `taq publish <path>`
+
+The plugin takes a path as a positional argument and will publish the files from that directory to IPFS
+
+#### Installation
+
+To install the IPFS Pinata plugin on a Taqueria project, run the following:
+
+```shell
+taq install @taqueria/plugin-ipfs-pinata
+```
+
+#### Use 
+
+To use this plugin, add a metadata or media file to a directory (`dirName`) inside your project, and then run `taq publish <dirName>`
+
+### Taqueria Github Action
+
+Taqueria now provides a GitHub action which has been published on the GitHub marketplace
+
+This action allows you to use Taqueria in your CI/CD pipeline so you can test, deploy, and maintain your projects in CI as you do locally
+
+The action can be found on the marketplace here
+
+For more information, VIEW THE DOCS or see a live example in the TACO-SHOP-SCAFFOLD REPO
+
+## Migrating from Legacy Versions
+
+This release of Taqueria introduces breaking changes to the way contracts are managed in Taqueria. To migrate existing projects, you will need to follow these steps:
+
+1. Ensure you are running Taqueria v0.8.0: `taq --version`
+2. Update Taqueria plugins to the latest version: `npm update && npm i`
+3. Add each contract you would like to compile or originate to the contract registry: `taq add-contract <contractName>`
+
+:::note
+If you are working with a multi-file Ligo contract, only register the file which contains the `main` entrypoint
+:::
+
+Once all your contract
+
+## Other Product Changes
+
+### Bugfixes
+
+- SDK's getContracts method not honoring regex pattern [#1011](https://github.com/ecadlabs/taqueria/issues/1011/)
+- Fix build pipeline: lock parcel to v2.6.1 [#1007](https://github.com/ecadlabs/taqueria/issues/1007/)
+- Fix scaffold verbosity by writing stdOut to `scaffold.log` file [#1001](https://github.com/ecadlabs/taqueria/issues/1001/)
+- Adjust jest plugin to return appropriate exit code [#995](https://github.com/ecadlabs/taqueria/issues/995/)
+- Updated tests to ensure sure npm package.json is available in all test projects [#899](https://github.com/ecadlabs/taqueria/issues/899/)
+- Enable all commands in the VSCE when config cannot be loaded [#955](https://github.com/ecadlabs/taqueria/issues/955/)
+- Fix `taq` runtime bug [#983](https://github.com/ecadlabs/taqueria/issues/983/)
+- Show error for all contracts that lack storage [#950](https://github.com/ecadlabs/taqueria/issues/950/)
+
+
+### Other Improvements
+
+- Compiler plugins refactored to use registered contracts [#981](https://github.com/ecadlabs/taqueria/issues/981/)
+- CI/CD now uses Deno package caching [#982](https://github.com/ecadlabs/taqueria/issues/982/)
+- Improvements to the `taq scaffold` task [#966](https://github.com/ecadlabs/taqueria/issues/966/) [#953](https://github.com/ecadlabs/taqueria/issues/953/)
+- Scaffolds now use a file `scaffold.json` to define a postInit script run during task execution [#993](https://github.com/ecadlabs/taqueria/issues/993/)
+- Added a contract template for Archetype [#984](https://github.com/ecadlabs/taqueria/issues/984/)
+- Refactor of automated tests: separate cli commands into separate files [#909](https://github.com/ecadlabs/taqueria/issues/909/)
+- Changed the partition's config file to use relative path #951 [#951](https://github.com/ecadlabs/taqueria/issues/951/)
+- Added tests for all Michelson data types [#919](https://github.com/ecadlabs/taqueria/issues/919/)
+- Update Taquito to v13 [#951](https://github.com/ecadlabs/taqueria/issues/951/)
+- The VLCE is now a `workspace` type project [#971](https://github.com/ecadlabs/taqueria/issues/971/)
+- Added the template construct [#946](https://github.com/ecadlabs/taqueria/issues/946/)
+- Added ability to register contracts [#908](https://github.com/ecadlabs/taqueria/issues/908/)
+
+# Taqueria v0.6.5   
+
+| Details     |               |
+| ----------- | ------------- |
+|Release Date | June 30, 2022 |
+|Release Type | Minor         |
+|Release Page | [v0.6.5](https://github.com/ecadlabs/taqueria/releases/tag/v0.6.5) |
+
+## Summary of Impactful Changes
+
+- The Taqueria VS Code Extension now dynamically shows and hides available tasks based on project context
+- Optional usage analytics added to the CLI
+- Added support for more plugins and supported tasks in the VS Code Extension
+
+## Bug Fixes 
+
+- Fixed a docker image permission issue 
+- Fixed the failing assertion when test project initialized
+- Fixed issue where config.json content would be trimmed
+
+## Other Improvements
+
+- Logging for the VS Code Extension
+- Support for provisioning stateful operations added under the hood
+- Migrated automated tests to use ghostnet
+
 # Taqueria v0.4.2   
 
 | Details     |               |
