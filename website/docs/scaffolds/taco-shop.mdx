@@ -71,18 +71,11 @@ let main (tacos_to_buy, available_tacos: tacos_to_buy * available_tacos): operat
     else ([]: operation list), abs(available_tacos - tacos_to_buy)
 ```
 
-### Testing
-
-:::note
-Coming soon with the Taqueria Jest plugin
-:::
-
 ### React Dapp
 
 The React dApp retrieves the number of available tacos from the smart contract and displays the value. It provides an interface for the user to buy tacos and looks like this:
 
 ![Hello Tacos Screenshot](/img/hello-tacos-screenshot.png)
-
 
 :::note
 In order for the React dApp to connect to the smart contract, the contract must be deployed to the testnet and the returned address of the contract must be added to the `/app/index.tsx` file. The scaffold comes pre-configured with the address of the deployed contract for demonstration purposes but it is recommended that you add your own faucet file, then re-deploy the contract and update the references to it in the project for your own use
@@ -172,6 +165,7 @@ function app() {
   const [connected, setConnected] = useState(false);
 ```
 
+
 ### Build and Start the React Dapp
 
 Now that the contract has been deployed and the address added to the dApp, you can build and start the React dApp
@@ -219,3 +213,19 @@ With your wallet connected, you can now interact with the contract entrypoint
 Click the `order` button and then authorize the transaction in Temple Wallet
 
 Once completed, you will see the value of `available_tacos` decrease by the number of tacos you ordered
+
+### Testing
+
+This scaffold comes with Jest tests in the `tests` folder which has been intitalized as a partition. The scaffold uses the `@taqueria/plugin-jest` plugin to run the tests
+
+To run the tests, first make sure you have started a local sandbox by running:
+
+```shell
+taq start sandbox local
+```
+
+Then, run the Jest tests in the `tests` directory with the following command:
+
+```shell
+taq test
+```
