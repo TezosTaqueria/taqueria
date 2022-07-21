@@ -854,7 +854,7 @@ const exposeTask = (
 						),
 						map(([_, output, errOutput]) => {
 							if (errOutput.length > 0) console.error(errOutput);
-							if (output.length > 0) return renderPluginJsonRes(JSON.parse(output),parsedArgs);
+							if (output.length > 0) return renderPluginJsonRes(JSON.parse(output), parsedArgs);
 						}),
 					);
 

@@ -16,6 +16,7 @@
 		"**/node_modules",
 		"**/*-lock.json",
 		"./website",
+		"./deno",
 		"taqueria-plugin-contract-types/example",
 		"taqueria-vscode-extension/src/test/suite/data"
 	],
