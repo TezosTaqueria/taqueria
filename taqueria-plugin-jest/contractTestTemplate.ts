@@ -42,7 +42,10 @@ const generateContractTypes = (parsedArgs: Opts) =>
 		typeAliasMode: 'file',
 	}).then(_ => parsedArgs);
 
-const getContractName = (parsedArgs: Opts) => parsedArgs.name ?? basename(parsedArgs.michelsonArtifact, '.tz');
+const getContractName = (parsedArgs: Opts) =>
+	parsedArgs.name
+		? parsedArgs.name.trim().replace(/\.ts$/, '')
+		: basename(parsedArgs.michelsonArtifact, '.tz');
 
 const generateTestSuite = (parsedArgs: Opts) => {
 	const michelsonAbspath = getMichelsonAbspath(parsedArgs);
