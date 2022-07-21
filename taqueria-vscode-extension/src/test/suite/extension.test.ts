@@ -30,6 +30,7 @@ const mockedMethods = {
 };
 vscodeMock = MockedObject.make(vscode, mockedMethods);
 
+
 describe('Extension Test Suite', async () => {
 	before(async () => {
 		const context: ExtensionContext = {
