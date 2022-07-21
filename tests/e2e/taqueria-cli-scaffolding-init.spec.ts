@@ -24,7 +24,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 			try {
 				await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true });
 			} catch {
-				// Ensure that this path doesn't already exist
+				// Ensure that this path doesn't already exist 
 			}
 
 			await exec('taq scaffold');
