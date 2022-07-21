@@ -334,6 +334,7 @@
 	},
 	"dependencies": {
 		"@taqueria/protocol": "^0.8.7",
+		"@taqueria/node-sdk": "^0.8.7",
 		"comment-json": "^4.1.1",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1"
