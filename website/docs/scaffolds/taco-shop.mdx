@@ -229,3 +229,20 @@ Then, run the Jest tests in the `tests` directory with the following command:
 ```shell
 taq test
 ```
+
+You should see the following output:
+
+```shell
+❯ taq test
+ PASS  tests/hello-tacos.test.js (13.954 s)
+  JavaScript tests for Hello Tacos contract
+    ✓ Should originate the Hello Tacos contract (3431 ms)
+    ✓ Should buy 15 tacos (5113 ms)
+    ✓ Should prevent buying tacos if unavailable (11 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        13.986 s
+Ran all test suites.
+```
