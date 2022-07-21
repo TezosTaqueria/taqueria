@@ -1,3 +1,4 @@
+export { normalizeContractName } from './contract-name';
 import { TypedMethod, TypedStorage } from './contract-parser';
 import { parseContractInterface } from './process';
 import { createTypescriptCodeGenerator } from './typescript-output';
