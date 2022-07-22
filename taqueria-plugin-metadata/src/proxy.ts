@@ -1,4 +1,4 @@
-import { sendAsyncErr, sendJsonRes, sendSetOutputMode } from '@taqueria/node-sdk';
+import { sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import fs from 'fs/promises';
 import path from 'path';
