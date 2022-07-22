@@ -103,6 +103,16 @@ export const sendRes = (msg: string, newline = true) => {
 		: process.stdout.write(msg) as unknown as void;
 };
 
+export const sendSetOutputMode = (mode: 'direct' | 'normal') => {
+	if (mode === 'direct') {
+		process.stdout.write('<MODE=DIRECT>');
+		process.stderr.write('<MODE=DIRECT>');
+	} else {
+		process.stdout.write('<MODE=NORMAL>');
+		process.stderr.write('<MODE=NORMAL>');
+	}
+};
+
 export const sendAsyncRes = (msg: string, newline = true): Promise<void> => Promise.resolve(sendRes(msg, newline));
 
 export const sendErr = (msg: string, newline = true) => {

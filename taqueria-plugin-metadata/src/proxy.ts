@@ -109,7 +109,10 @@ export default async (args: RequestArgs.ProxyRequestArgs): Promise<PluginRespons
 	const opts = args as Opts;
 
 	try {
+		sendSetOutputMode('direct');
 		const resultRaw = await execute(opts) as Record<string, unknown>;
+		sendSetOutputMode('normal');
+
 		// TODO: Fix deno parsing
 		// Without this, `data.reduce is not a function`
 		const result = ('data' in resultRaw) ? resultRaw.data : resultRaw;

@@ -19,7 +19,7 @@ Plugin.create(() => ({
 					type: 'string',
 				}),
 			],
-			encoding: 'none',
+			encoding: 'json',
 		}),
 	],
 	proxy,

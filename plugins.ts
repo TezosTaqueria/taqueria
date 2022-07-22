@@ -66,14 +66,20 @@ export const inject = (deps: PluginDeps) => {
 				let status = undefined;
 				try {
 					const process = Deno.run({ cmd, stdout: 'piped', stderr: 'piped' });
+					const stdOutOutputPromise = utils.readTextWithOutputModes(process.stdout, stdout);
+					const stdErrOutputPromise = utils.readTextWithOutputModes(process.stderr, stderr);
+					const [
+						stdOutOutput,
+						stdErrOutput,
+					] = await Promise.all([stdOutOutputPromise, stdErrOutputPromise]);
+
+					if (stdErrOutput) {
+						console.error(stdErrOutput);
+					}
 					status = await process.status();
-					const output = await process.output();
-					await copy(process.stderr, stderr);
-					const decoder = new TextDecoder();
-					process.stderr.close();
-					await process.status();
 					process.close();
-					const retval = await decoder.decode(output);
+
+					const retval = stdOutOutput;
 					return retval;
 				} catch (previous) {
 					throw {

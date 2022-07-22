@@ -16,6 +16,7 @@ import {
 } from 'fluture';
 import { join as _joinPaths } from 'https://deno.land/std@0.115.1/path/mod.ts';
 import { copy } from 'https://deno.land/std@0.128.0/streams/conversion.ts';
+import { iterateReader } from 'https://deno.land/std@0.149.0/streams/conversion.ts';
 import { render } from 'https://deno.land/x/eta@v1.12.3/mod.ts';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import * as jsonc from 'https://deno.land/x/jsonc@1/main.ts';
@@ -213,6 +214,83 @@ export const eager = toPromise;
 
 export const taqResolve = <T>(data: T): Future<TaqError.t, T> => resolve(data) as Future<TaqError.t, T>;
 
+export async function readTextWithOutputModes(
+	reader: Deno.Reader,
+	writer: Deno.Writer,
+) {
+	// console.log('readTextWithOutputModes START');
+
+	const encoder = new TextEncoder();
+	let outputText = '';
+
+	const appendText = (text: string, mode: 'direct' | 'normal') => {
+		// console.log('appendText', { text, mode });
+
+		if (mode === 'direct') {
+			writer.write(encoder.encode(text));
+			return;
+		}
+
+		outputText += text;
+	};
+
+	const decoder = new TextDecoder();
+	let buffer = '';
+	let mode = 'normal' as 'direct' | 'normal';
+
+	for await (const chunk of iterateReader(reader)) {
+		buffer += decoder.decode(chunk);
+
+		// console.log('buffer read', { buffer });
+
+		// The whole command should be available in a single iteration
+		// So the entire buffer can be consumed each iteration
+		while (buffer.length) {
+			// Handle text before a command
+			if (!buffer.startsWith('<')) {
+				const iPotentialCommand = buffer.indexOf('<');
+
+				if (iPotentialCommand < 0) {
+					// No potential command => append all buffer
+					appendText(buffer, mode);
+					buffer = '';
+					continue;
+				}
+
+				// Handle text before potential command
+				appendText(buffer.substring(0, iPotentialCommand), mode);
+				buffer = buffer.substring(iPotentialCommand);
+			}
+
+			// Handle commands
+			const COMMAND_MODE_DIRECT = '<MODE=DIRECT>';
+			const COMMAND_MODE_NORMAL = '<MODE=NORMAL>';
+
+			if (buffer.startsWith(COMMAND_MODE_DIRECT)) {
+				// console.log('readTextWithOutputModes - COMMAND_MODE_DIRECT');
+
+				mode = 'direct';
+				buffer = buffer.substring(COMMAND_MODE_DIRECT.length);
+				continue;
+			}
+			if (buffer.startsWith(COMMAND_MODE_NORMAL)) {
+				// console.log('readTextWithOutputModes - COMMAND_MODE_NORMAL');
+
+				mode = 'normal';
+				buffer = buffer.substring(COMMAND_MODE_NORMAL.length);
+				continue;
+			}
+
+			// If no command was found, then forward the buffer 1 character (to get past <)
+			// Since commands should always be available in a single read
+			appendText(buffer.substring(0, 1), mode);
+			buffer = buffer.substring(1);
+		}
+	}
+
+	return outputText;
+}
+
 // Exports a function to inject dependencies needed by this
 // utilities package
 export const inject = (deps: UtilsDependencies) => {
@@ -306,9 +384,9 @@ export const inject = (deps: UtilsDependencies) => {
 				// Output for the subprocess' stderr should be copied to the parent stderr
 				const errOutput = await (async () => {
 					if (bufferOutput) {
-						const output = await process.stderrOutput();
-						const decoder = new TextDecoder();
-						return decoder.decode(output);
+						const result = await readTextWithOutputModes(process.stderr, stderr);
+						process.stderr.close();
+						return result;
 					} else {
 						await copy(process.stderr, stderr);
 						process.stderr.close();
@@ -318,9 +396,9 @@ export const inject = (deps: UtilsDependencies) => {
 				// Get output. Buffer if desired
 				const output = await (async () => {
 					if (bufferOutput) {
-						const output = await process.output();
-						const decoder = new TextDecoder();
-						return decoder.decode(output);
+						const result = await readTextWithOutputModes(process.stdout, stdout);
+						process.stdout.close();
+						return result;
 					} else {
 						await copy(process.stdout, stdout);
 						process.stdout.close();
