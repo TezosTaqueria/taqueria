@@ -194,8 +194,7 @@ Deno.test('inject()', async t => {
 			await toPromise(execPluginJson(['echo', 'foobar']));
 		} catch (err) {
 			assert(err instanceof TaqError.E_TaqError);
-			assertEquals(err.kind, 'E_EXEC');
-			assertEquals((err.previous as TaqError.t).kind, 'E_INVALID_JSON');
+			assertEquals(err.kind, 'E_INVALID_JSON');
 		}
 
 		assertEquals(deps.stderr.toString(), '');
