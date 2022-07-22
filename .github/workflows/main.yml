@@ -49,14 +49,23 @@ jobs:
          - os: ubuntu-latest
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
+           cache_path: |
+            ./deno
+            ~/.cache/deno
            taqueria_bin: "taq"
          - os: windows-latest
            os_short: windows
            deno_target: "x86_64-pc-windows-msvc"
+           cache_path: |
+            ./deno
+            ~/AppData/Local/deno
            taqueria_bin: "taq.exe"
          - os: macOS-latest
            os_short: macos
            deno_target: "x86_64-apple-darwin"
+           cache_path: |
+            ./deno
+            ~/Library/Caches/deno
            taqueria_bin: "taq"
 
     outputs:
@@ -76,6 +85,11 @@ jobs:
         with:
           deno-version: v1.x
 
+      - uses: actions/cache@v3
+        with:
+          path: ${{ matrix.cache_path }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno-lock.json') }}
+
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
       ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
       - name: Build the binary for ${{ matrix.os }}
@@ -87,7 +101,7 @@ jobs:
         run: |
           BUILD=`git rev-parse --short "$GITHUB_SHA"`
           TAQ_VERSION="${TAQ_VERSION/\//-}"
-          deno compile -o taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt --target $DENO_TARGET index.ts --quickstart "`cat quickstart.md`" --setBuild "$BUILD" --setVersion "$TAQ_VERSION"
+          deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt --target $DENO_TARGET index.ts --quickstart "`cat quickstart.md`" --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
           ./"${{ matrix.taqueria_bin }}" init -p ./test_project
           if [ ! -f ./test_project/.taq/config.json ]; then
             echo "Project not initialized"
@@ -178,7 +192,7 @@ jobs:
 
   publish-tezos-client-plugin-to-npm:
      if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    #  needs: publish-sdk-to-npm
      uses: ./.github/workflows/npm-publish.yml
      with:
        dir: taqueria-plugin-tezos-client
@@ -191,6 +205,15 @@ jobs:
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-contract-types
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  
+  publish-ipfs-pinata-plugin-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    # needs: publish-sdk-to-npm
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-plugin-ipfs-pinata
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
@@ -272,15 +295,21 @@ jobs:
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
+          cache_path: |
+            ~/.deno
+            ~/.cache/deno
         - os: macos-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
+          cache_path: |
+            ~/.deno
+            ~/Library/Caches/deno
     needs: 
       - build-binaries
       - gather-info-for-e2e-tests
-    if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
+    if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' && !(startsWith(github.ref, 'refs/tags/v')) }}
 
     steps:
       - uses: actions/checkout@v2
@@ -292,6 +321,11 @@ jobs:
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "1.18.2"
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ matrix.cache_path }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno-lock.json') }}
 
       - name: download the binary from the build-binaries job and make it executable
         if: ${{ !github.event.pull_request.head.repo.fork }}
@@ -308,7 +342,7 @@ jobs:
         run: |
           COMMIT=`git rev-parse --short "$GITHUB_SHA"`
           TAQ_VERSION="${TAQ_VERSION/\//-}"
-          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env --allow-net index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION"
+          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env --allow-net index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
           [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]] 
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
@@ -325,7 +359,7 @@ jobs:
 
       - name: builds for testing
         run: |
-          npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy -w taqueria-flextesa-manager -w taqueria-plugin-contract-types -w taqueria-plugin-metadata -w taqueria-plugin-archetype -w taqueria-plugin-tezos-client -w taqueria-state -w taqueria-plugin-jest
+          npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy -w taqueria-flextesa-manager -w taqueria-plugin-contract-types -w taqueria-plugin-ipfs-pinata -w taqueria-plugin-metadata -w taqueria-plugin-archetype -w taqueria-plugin-tezos-client -w taqueria-state -w taqueria-plugin-jest
           npm run build-docker -w taqueria-flextesa-manager
 
       - name: Run unit tests
@@ -429,6 +463,7 @@ jobs:
             const sdk = readInfo("./taqueria-sdk/package.json")
             const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
             const contractTypes = readInfo("./taqueria-plugin-contract-types/package.json")
+            const ipfsPinata = readInfo("./taqueria-plugin-ipfs-pinata/package.json")
             const metadata = readInfo("./taqueria-plugin-metadata/package.json")
             const archetype = readInfo("./taqueria-plugin-archetype/package.json")
             const tezosClient = readInfo("./taqueria-plugin-tezos-client/package.json")
@@ -460,6 +495,7 @@ jobs:
                           taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
                           taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
                           taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
+                          taq install ${{ env.SCOPE }}/${ipfsPinata.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
                           taq install ${{ env.SCOPE }}/${metadata.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
                           taq install ${{ env.SCOPE }}/${archetype.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
                           taq install ${{ env.SCOPE }}/${tezosClient.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}

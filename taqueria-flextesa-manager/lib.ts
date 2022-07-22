@@ -24,7 +24,7 @@ export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
 			const config = (await lastConfig as SanitizedArgs.ParsedConfig);
 			const updatedConfig = { ...config } as SanitizedArgs.ParsedConfig;
 			const sandboxConfig = (updatedConfig.sandbox[parsedArgs.sandbox] as SandboxConfig.t);
-			const accounts = sandboxConfig.accounts ?? {};
+			const accounts = sandboxConfig.accounts ?? { default: accountName };
 			accounts[accountName] = accountDetails;
 			(updatedConfig.sandbox[parsedArgs.sandbox] as SandboxConfig.t).accounts = accounts;
 			return updatedConfig;

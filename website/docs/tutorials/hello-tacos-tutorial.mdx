@@ -1,0 +1,308 @@
+---
+title: Using Taqueria on an Existing Project
+---
+
+Taqueria can be added to existing Tezos projects. This tutorial will guide you through the process of adding Taqueria to an existing project called Hello Tacos
+
+The Hello Tacos starter, like most Tezos projects, requires the developer to install, manage, and run commands on a variety of frameworks and tools in order to accomplish things like compiling smart contracts, running tests, managing sandboxes, and originating contracts on the blockchain. Taqueria manages these tasks and tools for you, providing a simple interface to turbocharge your development process
+
+This tutorial will walk you through the steps of adding Taqueria to an existing project and using Taqueria plugins to compile, test, and deploy smart contracts to a local sandbox and testnet environments
+
+Things you will accomplish:
+- Add and initialize Taqueria on the project
+- Install Taqueria plugins for LIGO, Flextesa, and Taquito
+- Configure sandboxes, networks, and Environments
+- Refactor tests to use Taqueria's powerful tools
+- Use the Taqueria State API to link your smart contracts to your dApp 
+
+:::note 
+This tutorial is a work in progress. Future updates will include:
+- Native Taqueria testing (Taqueria Jest plugin)
+- Passing the deployed contract address to the React dApp via the State API
+- Deploying the contract using Taqueria operations
+- Targeting a specific network for contract deployment and testing (sandboxes and testnets)
+- Deploying the contract to mainnet
+:::
+
+## Requirements
+
+- Taqueria v0.3.0 or later
+- Node.js v16.0 or later
+- Docker v0.9 or later
+
+## Introduction
+
+Hello Tacos is a hello world type project that demonstrates a simple full stack Tezos dApp. The dApp is composed of a simple React app that interacts with a smart contract written in the LIGO language and uses Beacon Wallet to connect to browser based wallets. The smart contract stores a value for the number of available tacos and provides a function to buy tacos
+
+
+## Scaffolding the Starter Project
+
+The first step is to scaffold the Hello Tacos starter project using the `taq scaffold` task. Open up a terminal and run the following command:
+
+```shell
+taq scaffold https://github.com/ecadlabs/taqueria-scaffold-hello-tacos-tutorial hello-tacos
+```
+
+This will clone the project into a directory called `hello-tacos`. Change into that directory by running:
+
+```shell
+cd hello-tacos
+```
+
+## Exploring the project
+
+This starter project is a Tezos project that does not use Taqueria. The front end dApp is a React app which requires it's companion smart contract to be deployed to the blockchain, and the address of the originated contract to be hardcoded into the React app manually
+
+The project structure looks like this:
+- `/app` - This is the React dApp 
+- `/contracts` - This folder contains the LIGO smart contract
+- `/tests` - This folder contains the automated tests
+
+The workflow for a legacy Tezos project like this requires a significant amount of manual work to get sandboxes up and running, and to compile and originate the contract. Doing this would involve running shell commands such as:
+
+- `ligo compile-contract ./contract/hello-tacos.mligo main`
+- `docker run --rm --name hangzhou-sandbox --detach -p 20000:20000 tqtezos/flextesa:20211119 hangzbox start`
+
+Taqueria will take care of all of this for you with simple tasks and a centralized configuration!
+
+## Taq'ifying the Project
+
+To make the project a Taqueria project, run the following command from the root of the project:
+
+```shell
+taq init
+```
+
+This creates the following directory structure and initializes the `config.json` and ephemeral state for the project
+
+- /.taq - This hidden folder stores the Taqueria configuration and state
+- /app - This is the React dApp
+- /contracts - This folder contains the LIGO smart contracts
+- /tests - This folder contains the automated tests
+- /artifacts - This folder contains the compiled Michelson .tz contracts
+
+### Initializing the Project
+
+As Taqueria uses NPM packages for the SDK and plugins, you will need to initialize this project as a Node project by running:
+
+```shell
+npm init -y
+```
+
+With NPM initialized, you can now install dependencies by running:
+
+```shell
+npm install
+```
+
+### Installing Plugins
+
+This project requires the following plugins to be installed:
+
+- LIGO - Provides the compiler needed to compile the LIGO smart contract  
+- Flextesa - Provides a sandbox (Tezos node that runs on your machine) for testing
+- Taquito - Used to originate the smart contract on the sandbox or a testnet
+- Jest - Used to run the automated tests
+
+To install these plugins, run the following three commands:
+
+```shell
+taq install @taqueria/plugin-ligo
+```
+
+```shell
+taq install @taqueria/plugin-flextesa
+```
+
+```shell
+taq install @taqueria/plugin-taquito
+```
+
+```shell
+taq install @taqueria/plugin-jest
+```
+
+:::note
+To confirm this was successful, you can run the `taq` command and ensure you see the `compile`, `originate`, `test`, and `start sandbox` tasks listed
+:::
+
+## Deploying the Contract to a Sandbox
+
+The first step when working with contracts is to add them to the contract registry. This scaffold has one Ligo contract `hello-tacos.mligo`. To register the contract, run:
+
+```shell
+taq add-contract hello-tacos.mligo
+```
+
+This will add the contract to the registry which will allow Taqueria to compile, originate, and track the contract
+
+Next, compile and originate the contract to a local sandbox using Taqueria tasks
+
+To compile the ligo contract, run the following command:
+
+```shell
+taq compile
+```
+
+This will compile all registered contracts. The compiled contract will be stored in the `artifacts` directory
+
+Next, start up a Flextesa using the default configuration by running:
+
+```shell
+taq start sandbox local
+```
+
+This will start a Flextesa instance running on `http://localhost:20000` and will create the accounts defined in the `accounts` property of `config.json`
+
+:::note
+This task will update the `config.json` file with the sandbox specific accounts in the `accounts` property of the `sandbox` object
+:::
+
+Once the sandbox is running, you can deploy the contract by running:
+
+```Shell
+taq originate
+```
+
+This will originate the contract using the default environment which targets the sandbox named `local` that was started above
+
+Taqueria will output the address of the originated contract to the console as seen here:
+
+```shell
+┌────────────────┬──────────────────────────────────────┬─────────────┐
+│ Contract       │ Address                              │ Destination │
+├────────────────┼──────────────────────────────────────┼─────────────┤
+│ hello-tacos.tz │ KT1VAufHWYaxkXgBjdTtXE5fJMe2ieDWS4dp │ local       │
+└────────────────┴──────────────────────────────────────┴─────────────┘
+```
+
+Copy this address, then open the file `/app/src/App.tsx`
+
+On line 29, replace the address with the one you just copied as seen here:
+
+```js
+  const [contractAddress, setContractAddress] = useState(
+    "KT18izS1s5Hsv9tRaB8VjxdTU6MFpLviLCrS"
+  );
+```
+
+## Updating Tests to Use Taqueria
+
+The project has some Jest tests written in the `tests` folder. These tests can be refactored to use configuration values from Taqueria and the Taqueria Jest plugin to run the tests
+
+Open the `hello-tacos.test.js` file in the `tests` folder. You can see the tests reference hardcoded values:
+
+```js
+const contractCode = require("../contract/contract.json");
+
+describe("JavaScript tests for Hello Tacos contract", () => {
+  let Tezos;
+  let signer;
+  let helloTacosAddress;
+  const alice = {
+    sk: "edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq",
+    pk: "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"
+  };
+  const bob = {
+    sk: "edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt",
+    pk: "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6"
+  };
+  const rpcUrl = "http://localhost:20000";
+  ...
+```
+
+Import the Taqueria `config.json` file and assign the accounts and RPC URL to the relavent properties in the config file as shown here:
+
+```js
+const config = require('../.taq/config.json')
+
+describe("JavaScript tests for Hello Tacos contract", () => {
+  let Tezos;
+  let signer;
+  let helloTacosAddress;
+  const {alice} = config.sandbox.local.accounts
+  const {bob} = config.sandbox.local.accounts
+  const {rpcUrl} = config.sandbox.local
+  const originalNrOfTacos = 100;
+  ...
+```
+
+In Taqueria's .taq/config.json, sandbox acounts are instantited based on the accounts defined in the `accounts` property of `config.json`. Once a sandbox is started, the accounts are created and added to the `accounts` property of the `sandbox` property as seen here:
+
+```json
+"sandbox": {
+  "local": {
+    "accounts": {
+    "bob": {
+        "initialBalance": "3000000000",
+        "keys": {
+            "alias": "bob",
+            "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+            "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+            "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+        }
+    },
+    "alice": {
+        "initialBalance": "2000000000",
+        "keys": {
+            "alias": "alice",
+            "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+            "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+            "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+        }
+    },
+    "rpcUrl": "http://localhost:20000"
+  }
+}
+```
+
+As such, there are a few other references that need to be updated:
+
+### The Signer
+
+On line 18 you can see the `signer` variable is assigned the `alice` account. This is the account that will be used to sign the transaction
+
+```js
+signer = new InMemorySigner(alice.sk);
+```
+
+Change this to reference the secret key of the alice account as shown below:
+
+:::note
+Taquito requires that the unencrypted key not have a prefix
+:::
+
+```js
+signer = new InMemorySigner(alice.keys.secretKey.replace(/unencrypted:/, ''));
+```
+
+### The Transfer operation
+
+On line 20, you can see where the transfer operation is defined:
+
+```js
+const op = await Tezos.contract.transfer({ to: bob.pk, amount: 1 });
+```
+
+This also needs to reference the account in the local sandbox as seen here:
+
+```js
+const op = await Tezos.contract.transfer({ to: bob.keys.publicKey, amount: 1 });
+```
+
+## Using the Jest plugin
+
+The [Taqueria Jest plugin](/docs/plugins/plugin-jest) can be used to configure and run the tests. First you initialize the `tests` directory as a partition by running the command:
+
+```shell
+taq test tests --init
+```
+
+Now that the `tests` directory is a partition, you can run the tests by running the command:
+
+```shell
+taq test
+```
+
+You should see the tests run and pass
+

@@ -50,7 +50,10 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('Jest plugin creates default "tests" partition and jest config when running command with no arguments', async () => {
-		await exec(`taq test`, { cwd: `${taqueriaProjectPath}` });
+		try {
+			await exec(`taq test`, { cwd: `${taqueriaProjectPath}` });
+		} catch {
+		}
 		const directoryContents = await exec(`ls ${taqueriaProjectPath}`);
 		const taqContents = await exec(`ls ${taqueriaProjectPath}/.taq`);
 		const testsContents = await exec(`ls ${taqueriaProjectPath}/tests`);
@@ -151,11 +154,17 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('no tests present will result in an error', async () => {
-		const testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
+		const stdout = await (async () => {
+			try {
+				await exec('taq test', { cwd: taqueriaProjectPath });
+			} catch (err) {
+				const execErr = err as { stdout: '' };
+				return execErr.stdout;
+			}
+			return '';
+		})();
 
-		// NOTE, jest outputs this on stdout, hence why stdout is used here
-		// instead of stderr. This is NOT an issue with the plugin itself.
-		expect(testOutput.stdout).toContain('No tests found, exiting with code 1');
+		expect(stdout).toContain('No tests found, exiting with code 1');
 	});
 
 	test('global jest config matches reference config', async () => {

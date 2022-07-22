@@ -23,7 +23,7 @@ import { exec, ExecException } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
-import { get } from 'stack-trace';
+import { getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
 import { PluginSchema } from './types';
 import { Args, LikeAPromise, pluginDefiner, StdIO } from './types';
@@ -191,14 +191,14 @@ const postprocessArgs = (args: Args): Record<string, unknown> => {
 	return groupedArgs;
 };
 
-const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): PluginSchema.t => {
+const parseSchema = (i18n: i18n, definer: pluginDefiner, defaultPluginName: string): PluginSchema.t => {
 	const inputSchema: PluginSchema.RawPluginSchema = definer(i18n);
 
 	const { proxy } = inputSchema;
 
 	const pluginInfo = PluginSchema.create({
 		...inputSchema,
-		name: inputSchema.name ?? inferPluginName(),
+		name: inputSchema.name ?? defaultPluginName,
 	});
 
 	return {
@@ -207,11 +207,11 @@ const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => 
 	};
 };
 
-const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
+const getResponse = (definer: pluginDefiner, defaultPluginName: string) =>
 	async (requestArgs: RequestArgs.t) => {
 		const { taqRun } = requestArgs;
 		const i18n = await load();
-		const schema = parseSchema(i18n, definer, inferPluginName);
+		const schema = parseSchema(i18n, definer, defaultPluginName);
 		try {
 			switch (taqRun) {
 				case 'pluginInfo':
@@ -408,28 +408,15 @@ export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>
 		return undefined;
 	};
 
-const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
-	// The definer function can provide a name for the plugin in its schema, or it
-	// can omit it and we infer it from the package.json file.
-	// To do so, we need to get the directory for the plugin from the call stack
-	const pluginManifest = stack.reduce(
-		(retval: null | string, callsite) => {
-			const callerFile = callsite.getFileName()?.replace(/^file:\/\//, '');
-			return retval || (
-					callerFile.includes('taqueria-sdk')
-					|| callerFile.includes('taqueria-node-sdk')
-					|| callerFile.includes('@taqueria/node-sdk')
-				)
-				? retval
-				: join(dirname(callerFile), 'package.json');
-		},
-		null,
+export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
+	if (!config.contracts) return [];
+	return Object.values(config.contracts).reduce(
+		(retval: string[], contract) =>
+			regex.test(contract.sourceFile)
+				? [...retval, contract.sourceFile]
+				: retval,
+		[],
 	);
-
-	return () =>
-		!pluginManifest
-			? generateName().dashed
-			: getNameFromPluginManifest(pluginManifest);
 };
 
 const joinPaths = (...paths: string[]): string => paths.join('/');
@@ -470,11 +457,29 @@ const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): 
 	}
 };
 
+export const stringToSHA256 = (s: string) => SHA256.toSHA256(s);
+
+const getPackageName = () => {
+	const stack = getSync({
+		filter: (stackFrame => {
+			const filename = stackFrame.getFileName();
+			return !filename.includes('taqueria-sdk') && !filename.includes('@taqueria/node-sdk');
+		}),
+	});
+	const frame = stack.shift();
+	if (frame) {
+		const filename = frame.getFileName().replace(/^file:\/\//, '').replace(/^file:/, '');
+		const pluginManifest = join(dirname(filename), 'package.json');
+		return getNameFromPluginManifest(pluginManifest);
+	}
+	return generateName().dashed;
+};
+
 export const Plugin = {
-	create: (definer: pluginDefiner, unparsedArgs: Args) => {
-		const stack = get();
+	create: async (definer: pluginDefiner, unparsedArgs: Args) => {
+		const packageName = getPackageName();
 		return parseArgs(unparsedArgs)
-			.then(getResponse(definer, inferPluginName(stack)))
+			.then(getResponse(definer, packageName))
 			.catch((err: unknown) => {
 				if (err) console.error(err);
 				process.exit(1);
