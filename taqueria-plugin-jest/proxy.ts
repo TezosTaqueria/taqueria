@@ -1,12 +1,7 @@
 import { sendAsyncRes } from '@taqueria/node-sdk';
+import { RequestArgs } from '@taqueria/node-sdk/types';
 import { execa } from 'execa';
-import { CustomRequestArgs, ensurePartitionExists } from './common';
-
-interface Opts extends CustomRequestArgs {
-	readonly init: boolean;
-	readonly partition: string;
-	readonly testPattern: string;
-}
+import { CustomRequestArgs, ensureSelectedPartitionExists, toRequestArgs } from './common';
 
 const execCmd = (cmd: string, args: string[]) => {
 	const child = execa(cmd, args, {
@@ -20,13 +15,13 @@ const execCmd = (cmd: string, args: string[]) => {
 
 	return child;
 };
-
-export default async (args: Opts) => {
-	return ensurePartitionExists(args)
+export default async (args: RequestArgs.t) => {
+	const parsedArgs = toRequestArgs(args);
+	return ensureSelectedPartitionExists(parsedArgs, parsedArgs.init ? true : false)
 		.then(configAbsPath => {
-			if (!args.init) {
-				const retval = args.testPattern
-					? execCmd('npx', ['jest', '-c', configAbsPath, '--testPathPattern', args.testPattern])
+			if (!parsedArgs.init) {
+				const retval = parsedArgs.testPattern
+					? execCmd('npx', ['jest', '-c', configAbsPath, '--testPathPattern', parsedArgs.testPattern])
 					: execCmd('npx', ['jest', '-c', configAbsPath]);
 				return retval.then(child => {
 					if (child.exitCode === 0) return;

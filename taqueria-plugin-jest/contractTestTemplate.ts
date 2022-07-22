@@ -7,7 +7,7 @@ import {
 } from '@taqueria/plugin-contract-types/src/generator/testing-code-generator.js';
 import { readFile, stat, writeFile } from 'fs/promises';
 import { basename, dirname, join } from 'path';
-import { CustomRequestArgs, ensurePartitionExists, getPartitionAbspath, getTestsRootDir } from './common';
+import { CustomRequestArgs, ensureSelectedPartitionExists, getPartitionAbspath, getTestsRootDir } from './common';
 
 type Generator = ReturnType<typeof createTestingCodeGenerator>;
 
@@ -104,7 +104,7 @@ ${
 
 export default (parsedArgs: Opts) => {
 	return ensureMichelsonExists(parsedArgs)
-		.then(ensurePartitionExists)
+		.then(ensureSelectedPartitionExists)
 		.then(() => parsedArgs)
 		.then(generateContractTypes)
 		.then(generateTestSuite)

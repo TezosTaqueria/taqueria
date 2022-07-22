@@ -54,7 +54,7 @@ Plugin.create<CustomRequestArgs>(requestArgs => ({
 					flag: 'partition',
 					description: 'Partition to place generated test suite',
 					type: 'string',
-					defaultValue: toRequestArgs(requestArgs).config.jestTestsRootDir || 'tests',
+					defaultValue: toRequestArgs(requestArgs).config.jest.testsRootDir,
 				}),
 			],
 			description: 'Generate integration test for a contract',
