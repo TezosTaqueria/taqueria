@@ -51,7 +51,7 @@ const generateTestSuite = (parsedArgs: Opts) => {
 	const michelsonAbspath = getMichelsonAbspath(parsedArgs);
 	const contractName = getContractName(parsedArgs);
 	const partition = getPartition(parsedArgs);
-	const jestSuiteAbspath = join(partition, `${contractName}.ts`);
+	const jestSuiteAbspath = join(partition, `${contractName}.spec.ts`);
 
 	return readFile(michelsonAbspath, { encoding: 'utf-8' })
 		.then(contractSource => ({ contractSource, contractFormat: 'tz' as const }))
