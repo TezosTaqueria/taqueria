@@ -1,7 +1,8 @@
-import { sendAsyncErr, sendAsyncRes, sendErr, sendJsonRes } from '@taqueria/node-sdk';
-import { LoadedConfig, RequestArgs, SanitizedAbsPath } from '@taqueria/node-sdk/types';
+import { sendAsyncErr, sendJsonRes, sendSetOutputMode } from '@taqueria/node-sdk';
+import { RequestArgs } from '@taqueria/node-sdk/types';
 import fs from 'fs/promises';
 import path from 'path';
+import prompts from 'prompts';
 
 // TODO: What should this be, it was removed from the sdk
 type PluginResponse =
@@ -22,13 +23,57 @@ const createContractMetadata = async (contractName: undefined | string): Promise
 
 	const destFilePath = path.resolve(process.cwd(), `./artifacts/${contractName}.json`);
 	// Basic Tzip-16 contract metadata
+
+	const response = await prompts([
+		{
+			type: `text`,
+			name: `name`,
+			message: `Enter contract name`,
+			initial: contractName,
+		},
+		{
+			type: `text`,
+			name: `description`,
+			message: `Enter contract description`,
+			initial: '',
+		},
+		{
+			type: 'list',
+			name: 'authors',
+			message: 'Enter contract authors (comma separated)',
+			initial: '',
+			separator: ',',
+		},
+		{
+			type: 'text',
+			name: 'homepage',
+			message: 'Enter contract web url',
+			initial: '',
+		},
+		{
+			type: 'text',
+			name: 'license',
+			message: 'Enter contract license',
+			initial: 'ISC',
+		},
+		// TODO: errors - mapping of error codes to human readable error messages
+		// TODO: views - off-chain views
+		// TODO: select optional interfaces and answer additional prompts
+	]) as {
+		name: string;
+		description: string;
+		authors: string[];
+		license: string;
+		homepage: string;
+	};
+
 	const contractMetadata = {
+		name: response.name,
 		version: 'v1.0.0',
-		name: contractName,
-		description: 'This is a great project!',
-		authors: [
-			'ECAD Labs',
-		],
+		description: response.description,
+		authors: response.authors,
+		homepage: response.homepage,
+		license: response.license,
 		interfaces: [
 			'TZIP-016',
 		],
