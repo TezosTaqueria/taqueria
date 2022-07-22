@@ -129,16 +129,8 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 					projectDir,
 				);
 				helper.exposeTypecheckCommand();
-				helper.exposeTaqTaskAsCommand(
-					COMMAND_PREFIX + 'test',
-					'test',
-					'output',
-					{
-						finishedTitle: `setup tests`,
-						progressTitle: `setting up tests`,
-					},
-					projectDir,
-				);
+				helper.exposeTestSetupCommand(projectDir);
+				helper.exposeRunTestCommand(projectDir);
 
 				// Sandbox tasks
 				helper.exposeSandboxTaskAsCommand(

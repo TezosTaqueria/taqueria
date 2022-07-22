@@ -11,6 +11,7 @@ import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
 import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvider';
+import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
 import { TaqVsxError } from './TaqVsxError';
 
@@ -761,6 +762,52 @@ export class VsCodeHelper {
 		);
 	}
 
+	exposeTestSetupCommand(projectDir?: Util.PathToDir) {
+		this.registerCommand(
+			COMMAND_PREFIX + 'create_test_folder',
+			async () => {
+				const folders = await this.vscode.window.showOpenDialog({
+					canSelectFiles: false,
+					canSelectFolders: true,
+					canSelectMany: false,
+					openLabel: 'Select',
+					title: 'Select a Folder to setup as test',
+				});
+				if (!folders || folders.length !== 1) {
+					return;
+				}
+				const folder = folders[0].path.replace(projectDir + '/', '');
+				await this.proxyToTaqAndShowOutput(
+					`test --init ${folder}`,
+					{
+						finishedTitle: `Setup folder ${folder} as test`,
+						progressTitle: `Setting up folder ${folder} as test`,
+					},
+					projectDir,
+					false,
+				);
+			},
+		);
+	}
+
+	exposeRunTestCommand(projectDir?: Util.PathToDir) {
+		this.registerCommand(
+			COMMAND_PREFIX + 'run_tests',
+			async (item: TestTreeItem) => {
+				const folder = item.relativePath;
+				await this.proxyToTaqAndShowOutput(
+					`test ${folder}`,
+					{
+						finishedTitle: `Run tests from ${folder}`,
+						progressTitle: `Running tests from ${folder}`,
+					},
+					projectDir,
+					false,
+				);
+			},
+		);
+	}
+
 	async exposeSandboxTaskAsCommand(
 		cmdId: string,
 		taskName: string,
@@ -897,6 +944,7 @@ export class VsCodeHelper {
 
 				const contractsFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts'));
 				const contractsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts/*'));
+				const testsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '**/jest.config.js'));
 
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
 				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates(projectDir));
@@ -918,7 +966,11 @@ export class VsCodeHelper {
 				contractsWatcher.onDidCreate(_ => this.contractsDataProvider?.refresh());
 				contractsWatcher.onDidDelete(_ => this.contractsDataProvider?.refresh());
 
-				return [folderWatcher, configWatcher, stateWatcher, contractsFolderWatcher, contractsWatcher];
+				testsWatcher.onDidChange(_ => this.testDataProvider?.refresh());
+				testsWatcher.onDidCreate(_ => this.testDataProvider?.refresh());
+				testsWatcher.onDidDelete(_ => this.testDataProvider?.refresh());
+
+				return [folderWatcher, configWatcher, stateWatcher, contractsFolderWatcher, contractsWatcher, testsWatcher];
 			} catch (error: unknown) {
 				throw {
 					kind: 'E_UnknownError',
@@ -933,6 +985,7 @@ export class VsCodeHelper {
 	private dataProviders: { refresh: () => void }[] = [];
 	private contractsDataProvider?: ContractsDataProvider;
 	private sandboxesDataProvider?: SandboxesDataProvider;
+	private testDataProvider?: TestDataProvider;
 
 	registerDataProviders(workspaceFolder: string) {
 		this.registerDataProvider('taqueria-plugins', new PluginsDataProvider(workspaceFolder, this));
@@ -941,6 +994,7 @@ export class VsCodeHelper {
 			new SandboxesDataProvider(workspaceFolder, this),
 		);
 		this.registerDataProvider('taqueria-environments', new EnvironmentsDataProvider(workspaceFolder, this));
+		this.testDataProvider = this.registerDataProvider('taqueria-tests', new TestDataProvider(workspaceFolder, this));
 		this.contractsDataProvider = this.registerDataProvider(
 			'taqueria-contracts',
 			new ContractsDataProvider(workspaceFolder, this),
