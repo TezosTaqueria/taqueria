@@ -60,7 +60,7 @@ The LIGO `compile` task will accept the following optional parameters:
 
 ### The `create contract` Template
 
-The `create contract` task is used to create a new Archetype contract from a template. Running this task will create a new Archetype smart contract in the `contracts` directory and will register that contract with Taqueria
+The `create contract` task is used to create a new LIGO contract from a template. Running this task will create a new LIGO smart contract in the `contracts` directory and will register that contract with Taqueria
     
 ```shell
 taq create contract <contractName>
