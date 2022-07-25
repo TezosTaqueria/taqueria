@@ -43,11 +43,12 @@ You can view the list of commands available in the current project context by ru
 |----------------|------------------------------     |---------------------------------------------------------------------|
 | LIGO           | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language                     |
 | SmartPy        | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy contract language                        |
-| Flextesa       | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa                       | 
+| Flextesa       | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa                       |
 | Taquito        | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate                       |
 | Contract Types | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code         |
 | Tezos Client   | `@taqueria/plugin-tezos-client`   | Interacts with a Tezos node, providing simulation and type checking |
 | Jest           | `@taqueria/plugin-jest`           | A Jest plugin for testing smart contracts                           |
+| IPFS Pinata    | `@taqueria/plugin-ipfs-pinata`    | Uploads files to IPFS via Pinata                                    |
 
 ## Compiling a LIGO Smart Contract
 
