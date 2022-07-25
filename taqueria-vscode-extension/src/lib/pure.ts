@@ -4,7 +4,8 @@ import { i18n } from '@taqueria/protocol/i18n';
 import { exec, ExecException } from 'child_process';
 import { parse } from 'comment-json';
 import { readFile, stat } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
+import { reject } from 'rambda';
 import { Output, OutputFunction, OutputLevels } from './helpers';
 import { TaqVsxError } from './TaqVsxError';
 
@@ -177,6 +178,14 @@ export const makePathToTaq = (i18n: i18n, showOutput: OutputFunction) =>
 					previous,
 				})
 			);
+
+export const getRunningContainerNames = (): LikeAPromise<string[], TaqVsxError> =>
+	new Promise((resolve, reject) =>
+		exec(`docker ps --format '{{.Names}}'`, (_error, stdout, _stderr) => {
+			const containers = stdout.split('\n');
+			resolve(containers);
+		})
+	);
 
 export class TaqExecutionResult {
 	constructor(

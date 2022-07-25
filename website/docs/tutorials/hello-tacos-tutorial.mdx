@@ -121,7 +121,15 @@ To confirm this was successful, you can run the `taq` command and ensure you see
 
 ## Deploying the Contract to a Sandbox
 
-Now that the project is initialized and some plugins are installed, you can deploy the contract to a local sandbox using Taqueria tasks
+The first step when working with contracts is to add them to the contract registry. This scaffold has one Ligo contract `hello-tacos.mligo`. To register the contract, run:
+
+```shell
+taq add-contract hello-tacos.mligo
+```
+
+This will add the contract to the registry which will allow Taqueria to compile, originate, and track the contract
+
+Next, compile and originate the contract to a local sandbox using Taqueria tasks
 
 To register and compile the ligo contract, run the following commands:
 
@@ -130,7 +138,7 @@ taq add-contract hello-tacos.mligo
 taq compile
 ```
 
-The compiled contract will be stored in the `artifacts` directory
+This will compile all registered contracts. The compiled contract will be stored in the `artifacts` directory
 
 Next, start up a Flextesa using the default configuration by running:
 

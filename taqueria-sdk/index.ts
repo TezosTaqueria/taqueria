@@ -457,6 +457,8 @@ const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): 
 	}
 };
 
+export const stringToSHA256 = (s: string) => SHA256.toSHA256(s);
+
 const getPackageName = () => {
 	const stack = getSync({
 		filter: (stackFrame => {
