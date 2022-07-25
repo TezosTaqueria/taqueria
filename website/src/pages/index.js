@@ -14,7 +14,7 @@ export default function Home() {
 	const { siteConfig } = useDocusaurusContext();
 	return (
 		<Layout
-			title={`Hello from ${siteConfig.title}`}
+			title={`Taqueria`}
 			description="A Better Way to Build on Tezos"
 		>
 			<main>
