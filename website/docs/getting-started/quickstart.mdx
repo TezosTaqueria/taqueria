@@ -31,7 +31,7 @@ What you will accomplish:
 To successfully follow this guide, you must ensure that:
 - The Taqueria CLI has been [installed](./installation.mdx) and is available in your `$PATH` 
 - Docker 0.8 (or later) is installed and currently running
-- Node.js v16.x (or later) is installed
+- Node.js v16.3 (or later) is installed
 
 :::note
 The Taqueria VS Code Extension provides direct access to Taqueria tasks from the command palette. Under the hood, the VS Code Extension makes calls to the CLI, so you can be assured the behaviour of tasks will remain consistent regardless of whether they are executed from a terminal or the command palette. The steps in this guide are for using the Taqueria CLI, but you can also run the commands from the Taqueria extension via the VS Code command palette if you prefer
@@ -51,16 +51,16 @@ taq init my-first-project
 If a project has already been initialized, Taqueria will not re-initialize the project, but will still return a success message. This will be fixed in an upcoming release
 :::
 
-Next, the project directory must be initialized as an NPM project as all current plugins implemented as NPM packages. To do this, first change directories:
+After the project has been initialized you are ready to start working with Taqueria. Navigate to your project directory and we will explore working with plugins:
 ```shell
 cd my-first-project
 ```
 
 ## Working with Plugins
 
-Now that the project has been properly initialized, plugins can be installed to provide support for specific functionality such as compilation, smart contract origination, or sandbox environments
+Now that the project has been properly initialized, plugins can be installed to provide support for specific functionality such as compilation, smart contract origination, or running sandbox environments
 
-Plugins are installed using the `taq install` command which appears in the command list once a project is initialized. You can view the list of commands available in the current project contexts by running `taq --help` from the CLI:
+Plugins are installed using the `taq install` command which appears in the command list once a project is initialized. You can view the list of commands available in the current project context by running `taq --help` from the CLI:
 ```shell
 ❯ taq --help
 taq <command>
@@ -132,6 +132,20 @@ const main = ([action, store] : [parameter, storage]) : return_ => {
 }
 ```
 
+You need to now register the contract you want to compile with Taqueria so it knows what it can work with:
+```shell
+taq add-contract counter.jsligo
+```
+
+Taqueria will output that a contract has been added:
+```shell
+┌────────────────┬────────────────┬─────────────────┐
+│ Name           │ Source File    │ Last Known Hash │
+├────────────────┼────────────────┼─────────────────┤
+│ counter.jsligo │ counter.jsligo │ 980f8dfb        │
+└────────────────┴────────────────┴─────────────────┘
+```
+
 You can now compile this contract by running the following command from the project directory:
 ```shell
 taq compile
@@ -193,13 +207,13 @@ If successful, you will see a list of the accounts and balances specified in the
 ├─────────┼─────────┼──────────────────────────────────────┤
 │ bob     │ 3000 ꜩ  │ tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6 │
 ├─────────┼─────────┼──────────────────────────────────────┤
-│ alice   │ 2000 ꜩ  │ tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb │
+│ alice   │ 3000 ꜩ  │ tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb │
 ├─────────┼─────────┼──────────────────────────────────────┤
-│ john    │ 4000 ꜩ  │ tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6 │
+│ john    │ 3000 ꜩ  │ tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6 │
 ├─────────┼─────────┼──────────────────────────────────────┤
-│ jane    │ 5000 ꜩ  │ tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph │
+│ jane    │ 3000 ꜩ  │ tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph │
 ├─────────┼─────────┼──────────────────────────────────────┤
-│ joe     │ 1000 ꜩ  │ tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB │
+│ joe     │ 3000 ꜩ  │ tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB │
 └─────────┴─────────┴──────────────────────────────────────┘
 ```
 

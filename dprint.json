@@ -10,7 +10,8 @@
 	},
 	"includes": [
 		"**/*.{ts,tsx,js,jsx,cjs,mjs,json}",
-		".github/workflows/*"
+		".github/workflows/*",
+		"./website/src/pages/index.js"
 	],
 	"excludes": [
 		"**/node_modules",
