@@ -224,35 +224,41 @@ export const inject = (deps: UtilsDependencies) => {
 		stdout.write(encoder.encode(`${message}\n`));
 	};
 
-	const outputWarning = (message: string, appendNewline = true) => {
-		const encoder = new TextEncoder();
-		if (appendNewline) message += '\n';
-		stdout.write(encoder.encode(renderWarning(message)));
-	};
+	type Renderer = (message: unknown) => string;
 
-	const outputError = (message: string, appendNewline = true) => {
-		const encoder = new TextEncoder();
-		if (appendNewline) message += '\n';
-		stderr.write(encoder.encode(renderError(message)));
-	};
+	type Writer = (encoded: Uint8Array) => number;
 
-	const output = (message: string, appendNewline = true) => {
-		const encoder = new TextEncoder();
-		if (appendNewline) message += '\n';
-		stdout.write(encoder.encode(`${render(message)}`));
-	};
+	const encode = (msg: string) => new TextEncoder().encode(msg);
 
-	const renderWarning = (message: string) => {
-		return rgb24('WARNING: ' + message, { r: 255, g: 128, b: 0 });
-	};
+	const noop = () => {};
 
-	const renderError = (message: string) => {
-		return red(bold('ERROR: ' + message));
-	};
+	const writeRenderedMsg = (renderer: Renderer, writer: Writer) =>
+		(message: unknown, appendNewline = true) => {
+			if (appendNewline) message += '\n';
+			pipe(
+				message,
+				renderer,
+				encode,
+				writer,
+				noop,
+			);
+		};
 
-	const render = (message: string) => {
-		return message;
-	};
+	const renderMsg = (message: unknown) => String(message);
+
+	const renderWarning = (message: unknown) => rgb24('WARNING: ' + message, { r: 255, g: 128, b: 0 });
+
+	const renderError = (message: unknown) => red(bold('ERROR: ' + message));
+
+	const outWriteSync = (encoded: Uint8Array) => stdout.writeSync(encoded);
+
+	const errWriteSync = (encoded: Uint8Array) => stderr.writeSync(encoded);
+
+	const outputMsg = writeRenderedMsg(renderMsg, outWriteSync);
+
+	const outputWarning = writeRenderedMsg(renderWarning, errWriteSync);
+
+	const outputError = writeRenderedMsg(renderError, errWriteSync);
 
 	const logInput = <T>(message: string) =>
 		(input: T): T => {
@@ -397,11 +403,11 @@ export const inject = (deps: UtilsDependencies) => {
 		eager,
 		taqResolve,
 		appendTextFile,
-		outputWarning,
-		outputError,
-		output,
+		renderMsg,
 		renderWarning,
 		renderError,
-		render,
+		outputMsg,
+		outputWarning,
+		outputError,
 	};
 };

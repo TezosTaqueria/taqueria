@@ -62,6 +62,8 @@ const {
 	eager,
 	isTaqError,
 	taqResolve,
+	outputMsg,
+	outputError,
 	// logInput,
 	// debug
 } = utils.inject({
@@ -182,7 +184,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 					chain(({ projectDir, maxConcurrency, quickstart }: SanitizedArgs.t) => {
 						return initProject(projectDir, quickstart, maxConcurrency, i18n);
 					}),
-					forkCatch(console.error)(console.error)(console.log),
+					forkCatch(outputError)(outputError)(outputMsg),
 				),
 		)
 		.command(
@@ -192,7 +194,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() =>
 				pipe(
 					optInAnalytics(),
-					forkCatch(console.error)(console.error)(console.log),
+					forkCatch(outputError)(outputError)(outputMsg),
 				),
 		)
 		.command(
@@ -202,7 +204,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() =>
 				pipe(
 					optOutAnalytics(),
-					forkCatch(console.error)(console.error)(console.log),
+					forkCatch(outputError)(outputError)(outputMsg),
 				),
 		)
 		.option('fromVsCode', {
@@ -215,7 +217,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			'testFromVsCode',
 			false,
 			() => {},
-			() => log('OK'),
+			() => outputMsg('OK'),
 		)
 		.help(false);
 
@@ -242,7 +244,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 				pipe(
 					SanitizedArgs.ofScaffoldTaskArgs(args),
 					chain(scaffoldProject(i18n)),
-					forkCatch(displayError(cliConfig))(displayError(cliConfig))(console.log),
+					forkCatch(displayError(cliConfig))(displayError(cliConfig))(outputMsg),
 				),
 		);
 };
@@ -266,7 +268,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 					pipe(
 						SanitizedArgs.ofInstallTaskArgs(inputArgs),
 						chain(args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName)),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(console.log),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(outputMsg),
 					),
 			)
 			.alias('i', 'install')
@@ -284,7 +286,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 					pipe(
 						SanitizedArgs.ofUninstallTaskArgs(inputArgs),
 						chain(inputArgs => NPM.uninstallPlugin(parsedArgs.projectDir, i18n, inputArgs.pluginName)),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(console.log),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(outputMsg),
 					),
 			)
 			.alias('u', 'uninstall')
@@ -296,7 +298,7 @@ const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedA
 					pipe(
 						SanitizedArgs.of(inputArgs),
 						chain(listKnownTasks),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+						forkCatch(displayError(cliConfig))(displayError(cliConfig))(outputMsg),
 					),
 			)
 			.option('y', {
@@ -443,18 +445,18 @@ const scaffoldProject = (i18n: i18n.t) =>
 			const abspath = await eager(SanitizedAbsPath.make(scaffoldProjectDir));
 			const destDir = await eager(doesPathNotExistOrIsEmptyDir(abspath));
 
-			log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
+			outputMsg(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
 			await eager(gitClone(scaffoldUrl)(destDir));
 
-			log('\n Initializing Project...');
+			outputMsg('\n Initializing Project...');
 
 			const gitDir = await eager(SanitizedAbsPath.make(`${destDir}/.git`));
 			await eager(rm(gitDir));
-			log('    ✓ Remove Git directory');
+			outputMsg('    ✓ Remove Git directory');
 
 			const installOutput = await eager(exec(`npm install 2>&1`, {}, true, destDir));
 			await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(installOutput.toString()));
-			log('    ✓ Install plugins');
+			outputMsg('    ✓ Install plugins');
 
 			const initOutput = await eager(exec(`taq init 2>&1`, {}, true, destDir));
 			await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(initOutput.toString()));
@@ -482,12 +484,12 @@ const scaffoldProject = (i18n: i18n.t) =>
 					throw err;
 				}
 			}
-			log('    ✓ Run scaffold post-init script');
+			outputMsg('    ✓ Run scaffold post-init script');
 
 			// Remove injected quickstart file
 			const quickstartFile = await eager(SanitizedAbsPath.make(`${destDir}/quickstart.md`));
 			await eager(rm(quickstartFile));
-			log("    ✓ Project Taq'ified \n");
+			outputMsg("    ✓ Project Taq'ified \n");
 
 			return ('🌮 Project created successfully 🌮');
 
@@ -541,7 +543,7 @@ const addOperations = (
 				SanitizedArgs.ofProvisionTaskArgs(argv),
 				chain(inputArgs => addNewProvision(inputArgs, config, state)),
 				map(() => 'Added provision to .taq/provisions.json'),
-				forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+				forkCatch(displayError(cliConfig))(displayError(cliConfig))(outputMsg),
 			),
 	);
 // .command(
@@ -555,7 +557,7 @@ const addOperations = (
 // 			chain(SanitizedAbsPath.make),
 // 			chain(loadProvisions),
 // 			map(plan),
-// 			forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
+// 			forkCatch(displayError(cliConfig))(displayError(cliConfig))(outputMsg),
 // 		),
 // );
 
@@ -658,7 +660,7 @@ const exposeTemplates = (
 									return handleTemplate(parsedArgs, config, installedPlugin, state, pluginLib, i18n);
 								}
 							}
-							return resolve(log(i18n.__('providedByMany')));
+							return resolve(outputMsg(i18n.__('providedByMany')));
 						}
 
 						const installedPlugin = state.templates[parsedArgs.template] as InstalledPlugin.t;
@@ -698,12 +700,12 @@ const handleTemplate = (
 					['json', 'application/json'].includes(template.encoding ?? 'none'),
 				),
 				map(([_, output, errOutput]) => {
-					if (errOutput.length > 0) console.error(errOutput);
+					if (errOutput.length > 0) outputError(errOutput);
 					if (output.length > 0) return renderPluginJsonRes(JSON.parse(output));
 				}),
 			);
 	}
-	return resolve(log(i18n.__('templateNotFound')));
+	return resolve(outputMsg(i18n.__('templateNotFound')));
 };
 
 const getPluginOption = (task: Task.t) => {
@@ -830,7 +832,7 @@ const exposeTask = (
 			handler: (inputArgs: Record<string, unknown>) => {
 				cliConfig.handled = true;
 				if (Array.isArray(task.handler)) {
-					log('This is a composite task!');
+					outputMsg('This is a composite task!');
 					return;
 				}
 
@@ -853,7 +855,7 @@ const exposeTask = (
 							['json', 'application/json'].includes(task.encoding ?? 'none'),
 						),
 						map(([_, output, errOutput]) => {
-							if (errOutput.length > 0) console.error(errOutput);
+							if (errOutput.length > 0) outputError(errOutput);
 							if (output.length > 0) return renderPluginJsonRes(JSON.parse(output));
 						}),
 					);
@@ -883,7 +885,7 @@ const renderPluginJsonRes = (decoded: PluginJsonResponse.t) => {
 			renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
 			break;
 		default:
-			log(decoded.data as string);
+			outputMsg(decoded.data as string);
 			break;
 	}
 };
@@ -1012,10 +1014,10 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 						if (initArgs.debug) debugMode(true);
 
 						if (initArgs.version) {
-							log(initArgs.setVersion);
+							outputMsg(initArgs.setVersion);
 							return taqResolve(initArgs);
 						} else if (initArgs.build) {
-							log(initArgs.setBuild);
+							outputMsg(initArgs.setBuild);
 							return taqResolve(initArgs);
 						}
 						return initArgs._.includes('init')
@@ -1045,7 +1047,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 	} catch (err) {
 		// Something went wrong that we didn't handle.
 		// TODO: Generate bug report with stack trace
-		console.error(err);
+		outputError(err);
 	}
 };
 
@@ -1081,7 +1083,7 @@ export const displayError = (cli: CLIConfig) =>
 		}
 
 		if (!inputArgs.help) {
-			console.error(''); // empty line
+			outputMsg(''); // empty line
 			const res = match(normalizeErr(err))
 				.with({ kind: 'E_FORK' }, err => [125, err.msg])
 				.with({ kind: 'E_INVALID_CONFIG' }, err => [1, err.msg])
@@ -1111,14 +1113,14 @@ export const displayError = (cli: CLIConfig) =>
 			const [exitCode, msg] = res;
 			if (inputArgs.debug) {
 				logAllErrors(err);
-			} else if (msg) console.error(msg);
+			} else if (msg) outputError(msg);
 
 			Deno.exit(exitCode as number);
 		}
 	};
 
 const logAllErrors = (err: Error | TaqError.E_TaqError | TaqError.t | unknown) => {
-	console.error(err);
+	outputError(err);
 	if (isTaqError(err) && err.previous) logAllErrors(err.previous);
 };
 
