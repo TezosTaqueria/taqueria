@@ -1,4 +1,4 @@
-import { exec as execRaw } from 'child_process';
+import { exec as execRaw, spawn } from 'child_process';
 import fsPromises from 'fs/promises';
 import util from 'util';
 import { generateTestProject } from './utils/utils';
@@ -13,16 +13,26 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 	});
 
 	test('metadata plugin should create a contract metadata.json file', async () => {
-		const metadataRun = execRaw(`cd ${taqueriaProjectPath} && taq generate metadata hello-tacos`);
+		const taqProcess = spawn(`cd ${taqueriaProjectPath} && taq generate metadata hello-tacos`);
+
+		taqProcess.stdout.on('data', data => {
+			console.log(`stdout: "${data}"`);
+		});
 
 		// Answer prompts
-		const writeInput = (text: string) =>
-			util.promisify<void>(callback => {
-				metadataRun.stdin?.write(`${text}\n`, callback);
+		const writeInput = async (text: string) =>
+			await util.promisify<void>(callback => {
+				taqProcess.stdin.write(`${text}\n`, callback);
 			})();
 		await writeInput('test-name');
 		await writeInput('test-desc');
 		await writeInput('test-author1, test-author2');
+		await writeInput('test-url');
+		await writeInput('test-license');
+
+		await util.promisify(callback => {
+			taqProcess.on('close', callback);
+		})();
 
 		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/hello-tacos.json`, {
 			encoding: 'utf-8',
@@ -30,7 +40,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		expect(metadataFileContents).toMatch(/name.*hello-tacos/i);
 	});
 
-	// afterAll(async () => {
-	// 	await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-	// });
+	afterAll(async () => {
+		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+	});
 });
