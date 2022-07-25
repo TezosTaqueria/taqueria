@@ -4,38 +4,23 @@ import styles from "./LogoGrid.module.css";
 
 const FeatureList = [
 	{
-		title: "Teams building with Taqueria",
-		Svg: require("../../../static/img/taq_orange.svg").default,
+		title: "Use your favorite tools with Taqueria",
+		//Svg: require("../../../static/img/taq_orange.svg").default,
 		images: [
 			{
-				Image: require("../../../static/img/image.png").default,
+				Image: require("../../../static/img/ligolang.png").default,
 			},
 			{
-				Image: require("../../../static/img/image.png").default,
+				Image: require("../../../static/img/archetype.png").default,
 			},
 			{
-				Image: require("../../../static/img/image.png").default,
+				Image: require("../../../static/img/smartpy.png").default,
 			},
 			{
-				Image: require("../../../static/img/image.png").default,
+				Image: require("../../../static/img/taquito.png").default,
 			},
 			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
-			},
-			{
-				Image: require("../../../static/img/image.png").default,
+				Image: require("../../../static/img/pinata.png").default,
 			},
 		],
 	},
@@ -44,7 +29,7 @@ const FeatureList = [
 function Feature({ Svg, images, title }) {
 	return (
 		<div className={styles.wrapper}>
-			<Svg className={styles.featureSvg} />
+			
 			<div className={styles.logos}>
 				<h1 className={styles.headine}>{title}</h1>
 				<div className={styles.images}>
