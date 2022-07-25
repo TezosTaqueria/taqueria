@@ -13,7 +13,7 @@ title: Taco Shop
 
 ## Quickstart
 
-In a rush? You can follow the steps below to get up and running immediatley  
+In a rush? You can follow the steps below to get up and running immediately  
 
 ### Scaffold and Initialize the Project
 
@@ -98,27 +98,7 @@ This project is available as a Taqueria scaffold. To create a new project from t
 taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop taco-shop
 ```
 
-This will clone the Taco Shop scaffold project into a directory called `taco-shop`
-
-## Project Setup
-
-To set up the project, first change into the project directory:
-
-```shell
-cd hello-tacos
-```
-
-Next, initialize the project with Taqueria:
-
-```shell
-taq init
-```
-
-Then install the dependencies:
-
-```
-npm install
-```
+This will clone the Taco Shop scaffold project into a directory called `taco-shop` and set up the project for you
 
 ## Using the Project
 
@@ -134,6 +114,7 @@ The intended workflow for this project is as follows:
 ### Compile the Contract
 
 ```shell
+taq add-contract hello-tacos.mligo
 taq compile
 ```
 
@@ -141,10 +122,10 @@ This will compile the `/contracts/hello-tacos.mligo` contract to a file, `/artif
 
 ### Originate to the Testnet
 
-Run the following command to originate the contract to the ithacanet environment:
+Run the following command to originate the contract to the ghostnet testnet using the testing environment:
 
 ```shell
-taq originate -e ithacanet
+taq originate -e testing
 ```
 
 This should return the address of the contract on the testnet which looks like this:
@@ -152,7 +133,7 @@ This should return the address of the contract on the testnet which looks like t
 ┌────────────────┬──────────────────────────────────────┬────────────────┐
 │ Contract       │ Address                              │ Destination    │
 ├────────────────┼──────────────────────────────────────┼────────────────┤
-│ hello-tacos.tz │ KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3 │ ithaca_network │
+│ hello-tacos.tz │ KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3 │ ghostnet       │
 └────────────────┴──────────────────────────────────────┴────────────────┘
 ```
 
@@ -165,7 +146,7 @@ This scaffold comes with a pre-configured faucet file for the testnet which is s
 
 Now that the contract has been deployed, you need to insert the address of the contract into the `/app/index.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/index.tsx` file as shown here:
 
-```ts /app/src/app.tsx
+```ts /app/src/App.tsx
 function app() {
   const [rpcUrl, setRpcUrl] = useState("https://ithacanet.ecadinfra.com");
   const [contractAddress, setContractAddress] = useState(

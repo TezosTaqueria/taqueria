@@ -36,18 +36,18 @@ Inside the sandboxConfigObject, there are three static properties you can config
 
 The fields you can configure are:
 
-#### 'label'
+#### "label"
 An arbitrary string used to describe a particular configuration
 
-#### 'protocol'
+#### "protocol"
 
 A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
 
-#### 'rpcUrl'
+#### "rpcUrl"
 
-A string which corresponds to the local URL you would like the sandbox to run on. The default is `http://localhost:2000`
+A string which corresponds to the local URL you would like the sandbox to run on. The default is `http://localhost:20000`
 
-### Adding a Sandbox to a Taqueria Environment
+### Adding a Sandbox to a Taqueria Project Environment Configuration
 
 Once created, sandboxes can be added to environments by adding the `sandboxName` to the `sandboxes` list in the `environment` as shown here:
 ```json
@@ -80,7 +80,7 @@ Taqueria provides five default accounts in the default configuration:
     }
 ```
 
-When a sandbox is started, the implicit accounts defined in the configuration will be created on the sandbox and the `accounts` property will be populated with the account data as shown in this example:
+When a sandbox is started, the implicit accounts defined in the configuration will be created on the sandbox and the `accounts` property will be populated with the account data as shown here:
 
 ```json
     "sandbox": {
@@ -113,7 +113,7 @@ When a sandbox is started, the implicit accounts defined in the configuration wi
                 }
             },
             "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "rpcUrl": "http://localhost:20000"
         }
     },
