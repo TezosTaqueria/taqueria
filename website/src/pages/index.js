@@ -9,12 +9,12 @@ import Features from "../components/Features/Features";
 import WhyTaqueria from "../components/WhyTaqueria/WhyTaqueria";
 import LogoGrid from "../components/LogoGrid/LogoGrid";
 import FooterTop from "../components/FooterTop/FooterTop";
-//TODO: Add back <LogoGrid /> under WhyTaqueria when we have user logos
+
 export default function Home() {
 	const { siteConfig } = useDocusaurusContext();
 	return (
 		<Layout
-			title={`Taqueria`}
+			title={`Build on Tezos`}
 			description="A Better Way to Build on Tezos"
 		>
 			<main>
