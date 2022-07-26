@@ -773,7 +773,7 @@ export class VsCodeHelper {
 		);
 	}
 
-	exposeTestSetupCommand(projectDir?: Util.PathToDir) {
+	exposeTestSetupCommand(projectDir: Util.PathToDir) {
 		this.registerCommand(
 			COMMAND_PREFIX + 'create_test_folder',
 			async () => {
@@ -801,7 +801,7 @@ export class VsCodeHelper {
 		);
 	}
 
-	exposeRunTestCommand(projectDir?: Util.PathToDir) {
+	exposeRunTestCommand(projectDir: Util.PathToDir) {
 		this.registerCommand(
 			COMMAND_PREFIX + 'run_tests',
 			async (item: TestTreeItem) => {

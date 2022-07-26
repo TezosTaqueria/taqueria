@@ -1,6 +1,6 @@
 import * as Settings from '@taqueria/protocol/Settings';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import { attemptP, chain, chainRej, FutureInstance as Future, map, mapRej, resolve } from 'fluture';
+import { attemptP, chain, chainRej, FutureInstance as Future, map, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { getMachineId } from 'https://deno.land/x/machine_id@v0.3.0/mod.ts';
 import type { UsageAnalyticsDeps } from './taqueria-types.ts';
@@ -54,7 +54,7 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 					settingsContent.consent = option;
 					return settingsContent;
 				}),
-				mapRej(() => Settings.create({ consent: didUserChooseYes(input) ? 'opt_in' : 'opt_out' })),
+				chainRej(() => Settings.make({ consent: option === OPT_IN ? 'opt_in' : 'opt_out' })),
 				chain(writeJsonFile(settingsFilePath)),
 				map(() =>
 					option === OPT_IN
@@ -111,7 +111,6 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 		taqError: boolean,
 	): Future<TaqError.t, void> => {
 		const taq_ui = inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI';
-		if (taq_ui === 'VSCode') return resolve(noop()); // Disable for VSCode for now
 		return pipe(
 			allowTracking(),
 			chain((allowTracking: boolean) => {
