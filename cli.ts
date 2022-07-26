@@ -863,7 +863,7 @@ const exposeTask = (
 		}),
 	);
 
-const loadEphermeralState = (
+const loadEphemeralState = (
 	cliConfig: CLIConfig,
 	config: LoadedConfig.t,
 	env: EnvVars,
@@ -958,7 +958,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 						pipe(
 							resolvePluginName(parsedArgs, state),
 							(parsedArgs: SanitizedArgs.t) =>
-								loadEphermeralState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
+								loadEphemeralState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
 						)
 					),
 				);
