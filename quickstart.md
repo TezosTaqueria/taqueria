@@ -62,14 +62,15 @@ Commands:
 | Jest           | `@taqueria/plugin-jest`           | A Jest plugin for testing smart contracts                           |
 | IPFS Pinata    | `@taqueria/plugin-ipfs-pinata`    | Uploads files to IPFS via Pinata                                    |
 
-## Compiling a LIGO Smart Contract
+## Working with LIGO Smart Contracts
 
 To add support for the LIGO smart contract language, install the LIGO plugin by running:
 ```shell
 taq install @taqueria/plugin-ligo
 ```
-
-Once installed, the plugin provides the command `taq compile` which when run, will look for any LIGO files in the `/contracts` directory and compile them to Michelson `.tz` files in the `/artifacts` directory. The plugin also provides a template to easily create and register a Ligo contract using the `taq create contract task`
+Once installed the plugin provides a template to easily create and register a boilerplate LIGO contract using the `taq create contract` task
+If you already have contracts written and want to compile them you will just need to register them with the `taq add-contract <sourceFile>` task
+Finally the plugin provides the task `taq compile` which will look for any registered LIGO contracts in the `/contracts` directory and compile them to Michelson `.tz` files in the `/artifacts` directory
 
 To demonstrate this, create and register a new Ligo contract called `counter.jsligo` by running:
 
@@ -77,43 +78,51 @@ To demonstrate this, create and register a new Ligo contract called `counter.jsl
 taq create contract counter.jsligo
 ```
 
-This will create a new Ligo file called `counter.jsligo` and register it with Taqueria
+This will create a new Ligo file called `counter.jsligo`, populate it with a boilerplate contract and register it with Taqueria
 
 You can see that the contract has been registered by running:
 
 ```shell
 taq list-contracts
 ```
+Taqueria will output that a contract has been registered:
+```shell
+┌────────────────┬────────────────┬─────────────────┐
+│ Name           │ Source File    │ Last Known Hash │
+├────────────────┼────────────────┼─────────────────┤
+│ counter.jsligo │ counter.jsligo │ 5737454d        │
+└────────────────┴────────────────┴─────────────────┘
+```
 
 Open the created file `counter.jsligo` in the `/contracts` directory
 
-Then, insert the following JSLigo code and save the file:
+You should see the following:
 
 ```ligo title="/contracts/counter.jsligo"
 type storage = int;
 
 type parameter =
-| ["Increment", int]
+  ["Increment", int]
 | ["Decrement", int]
 | ["Reset"];
 
-type return_ = [list <operation>, storage];
+type ret = [list<operation>, storage];
 
-/* Two entrypoints */
+// Two entrypoints
+
 const add = ([store, delta] : [storage, int]) : storage => store + delta;
 const sub = ([store, delta] : [storage, int]) : storage => store - delta;
 
 /* Main access point that dispatches to the entrypoints according to
    the smart contract parameter. */
-const main = ([action, store] : [parameter, storage]) : return_ => {
- return [
-   (list([]) as list <operation>),    // No operations
-   (match (action, {
-    Increment: (n: int) => add ([store, n]),
-    Decrement: (n: int) => sub ([store, n]),
-    Reset:     ()  => 0}))
-  ]
-}
+
+const main = ([action, store] : [parameter, storage]) : ret => {
+ return [list([]) as list<operation>,    // No operations
+ match (action, {
+  Increment:(n: int) => add ([store, n]),
+  Decrement:(n: int) => sub ([store, n]),
+  Reset    :()  => 0})]
+};
 ```
 
 You can now compile this contract by running the following command from the project directory:
