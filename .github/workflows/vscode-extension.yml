@@ -59,7 +59,7 @@ jobs:
           node-version: 16
       
       - name: Install Dependencies
-        run: npm ci
+        run: npm ci && npm rebuild
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
