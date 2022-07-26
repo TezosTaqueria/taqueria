@@ -32,6 +32,7 @@
 		"Tezos",
 		"typecheck",
 		"vsix",
-		"xvfb"
+		"xvfb",
+		"positionals"
 	]
 }

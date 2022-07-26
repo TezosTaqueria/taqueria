@@ -15,7 +15,9 @@ const { schemas: generatedSchemas, factory } = createType<RawInput, RawInput>({
 	unknownErrMsg: 'Something went wrong when parsing the command',
 });
 
-export type Command = z.infer<typeof generatedSchemas.schema>;
+export const internalSchema = generatedSchemas.schema;
+
+export type Command = z.infer<typeof internalSchema>;
 export type t = Command;
 export const { create, make, of } = factory;
 export const schemas = {

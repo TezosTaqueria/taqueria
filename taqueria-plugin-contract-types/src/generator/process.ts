@@ -23,9 +23,11 @@ const parseContractWithMinimalProtocolLevel = (
 	const p = new M.Parser({ protocol: protocol.key });
 
 	try {
-		const contract = (format === 'tz'
-			? p.parseScript(contractScript)
-			: p.parseJSON(JSON.parse(contractScript))) as M.MichelsonContract;
+		const contract = (
+			format === 'tz'
+				? p.parseScript(contractScript)
+				: p.parseJSON(JSON.parse(contractScript))
+		) as M.MichelsonContract;
 		if (contract) {
 			return {
 				contract,
@@ -40,18 +42,10 @@ const parseContractWithMinimalProtocolLevel = (
 	return parseContractWithMinimalProtocolLevel(contractScript, format, contractLevelIndex + 1);
 };
 
-export const generateContractTypesFromMichelsonCode = (
+export const parseContractInterface = (
 	contractScript: string,
-	contractName: string,
 	format: 'tz' | 'json',
-	typeAliasData: TypeAliasData,
-	typeUtilsData: TypeUtilsData,
-): {
-	schemaOutput: SchemaOutput;
-	typescriptCodeOutput: TypescriptCodeOutput;
-	parsedContract: M.MichelsonContract;
-	minimalProtocol: string;
-} => {
+) => {
 	const p = new M.Parser({ protocol: M.Protocol.PsFLorena });
 
 	const { contract, protocol } = parseContractWithMinimalProtocolLevel(contractScript, format, 0);
@@ -65,6 +59,36 @@ export const generateContractTypesFromMichelsonCode = (
 
 	const parameterResult = contractParameter && parseContractParameter(contractParameter);
 	const methods = parameterResult?.methods ?? [];
+
+	return {
+		storage,
+		methods,
+		contract,
+		protocol,
+	};
+};
+
+export const generateContractTypesFromMichelsonCode = (
+	contractScript: string,
+	contractName: string,
+	format: 'tz' | 'json',
+	typeAliasData: TypeAliasData,
+	typeUtilsData: TypeUtilsData,
+): {
+	schemaOutput: SchemaOutput;
+	typescriptCodeOutput: TypescriptCodeOutput;
+	parsedContract: M.MichelsonContract;
+	minimalProtocol: string;
+} => {
+	const {
+		storage,
+		methods,
+		contract,
+		protocol,
+	} = parseContractInterface(
+		contractScript,
+		format,
+	);
 
 	// If there's only one entrypoint, then we call it "default"
 	if (methods.length === 1) methods[0].name = `default`;
