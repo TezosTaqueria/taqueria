@@ -7,14 +7,14 @@ type Storage = {
 };
 
 type Methods = {
-    update_token_metadata: (
+    default: (
         _0: nat,
         _1: bytes,
     ) => Promise<void>;
 };
 
 type MethodsObject = {
-    update_token_metadata: (params: {
+    default: (params: {
         0: nat,
         1: bytes,
     }) => Promise<void>;

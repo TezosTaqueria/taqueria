@@ -7,7 +7,7 @@ type Storage = {
 };
 
 type Methods = {
-    mint: (param: Array<{
+    default: (param: Array<{
             token_id: nat;
             ipfs_hash: bytes;
             owner: address;
@@ -15,7 +15,7 @@ type Methods = {
 };
 
 type MethodsObject = {
-    mint: (param: Array<{
+    default: (param: Array<{
             token_id: nat;
             ipfs_hash: bytes;
             owner: address;

@@ -159,7 +159,7 @@ const typecheckTask = async <T>(parsedArgs: Opts): Promise<void> => {
 		if (sandbox) {
 			if (doesUseFlextesa(sandbox)) {
 				return await isSandboxRunning(sandboxName, parsedArgs)
-					? typecheck(parsedArgs, sandboxName, sandbox).then(sendJsonRes)
+					? typecheck(parsedArgs, sandboxName, sandbox)
 					: sendAsyncErr(`The ${sandboxName} sandbox is not running.`);
 			}
 			return sendAsyncErr(`Cannot start ${sandboxName} as its configured to use the ${sandbox.plugin} plugin.`);
@@ -289,7 +289,7 @@ const simulateTask = async <T>(parsedArgs: Opts): Promise<void> => {
 		if (sandbox) {
 			if (doesUseFlextesa(sandbox)) {
 				return await isSandboxRunning(sandboxName, parsedArgs)
-					? simulate(parsedArgs, sandboxName, sandbox).then(sendJsonRes)
+					? simulate(parsedArgs, sandboxName, sandbox)
 					: sendAsyncErr(`The ${sandboxName} sandbox is not running.`);
 			}
 			return sendAsyncErr(`Cannot start ${sandboxName} as its configured to use the ${sandbox.plugin} plugin.`);
