@@ -199,14 +199,14 @@ jobs:
      secrets:
        NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-contract-types-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-contract-types
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  # publish-contract-types-plugin-to-npm:
+  #   if: ${{ !github.event.pull_request.head.repo.fork }}
+  #   # needs: publish-sdk-to-npm
+  #   uses: ./.github/workflows/npm-publish.yml
+  #   with:
+  #     dir: taqueria-plugin-contract-types
+  #   secrets:
+  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-ipfs-pinata-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
@@ -406,7 +406,7 @@ jobs:
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
-      - publish-contract-types-plugin-to-npm
+      # - publish-contract-types-plugin-to-npm
       - publish-archetype-plugin-to-npm
       - publish-tezos-client-plugin-to-npm
       - publish-state-plugin-to-npm
@@ -533,7 +533,7 @@ jobs:
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
-      - publish-contract-types-plugin-to-npm
+      # - publish-contract-types-plugin-to-npm
       - publish-archetype-plugin-to-npm
       - publish-tezos-client-plugin-to-npm
       - publish-state-plugin-to-npm

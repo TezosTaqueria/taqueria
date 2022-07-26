@@ -17,7 +17,8 @@
 		"build-and-watch-vscode": "npx chokidar \"*.ts\" \"taqueria-vscode-extension/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run compile -w taqueria-vscode-extension || npx play-sound beep.mp3\" --initial",
 		"prepare": "husky install",
 		"format": "dprint fmt",
-		"format:check": "dprint check"
+		"format:check": "dprint check",
+		"update-lock": "deno cache --import-map ./import_map.json --lock ./deno-lock.json --lock-write index.ts"
 	},
 	"repository": {
 		"type": "git",
@@ -51,7 +52,8 @@
 		"ts-jest": "^28.0.7",
 		"ts-node": "^10.8.0",
 		"tsup": "^6.1.3",
-		"typescript": "^4.7.4"
+		"typescript": "^4.7.4",
+		"with-staged": "^1.0.2"
 	},
 	"workspaces": [
 		"./taqueria*",
