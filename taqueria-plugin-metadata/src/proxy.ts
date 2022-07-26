@@ -76,6 +76,8 @@ const createContractMetadata = async (
 	if (!defaultValues && config.metadata) {
 		defaultValues = {
 			...config.metadata,
+			// use the contractName instead of the projectName as the name default
+			name: contractName,
 		};
 	}
 
@@ -146,17 +148,6 @@ const createContractMetadata = async (
 		],
 	};
 	await fs.writeFile(destFilePath, JSON.stringify(contractMetadata, null, 2));
-
-	// Update config for defaults
-	const updatedConfig = {
-		...config,
-		metadata: {
-			authors: contractMetadata.authors,
-			homepage: contractMetadata.homepage,
-			license: contractMetadata.license,
-		},
-	};
-	await writeJsonFile(config.configFile)(updatedConfig);
 
 	return {
 		render: 'table',
