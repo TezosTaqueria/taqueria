@@ -171,7 +171,7 @@ const createProjectMetadata = async (
 ): Promise<PluginResponse> => {
 	const defaultValues: Partial<ProjectMetadata> = config.metadata ?? {};
 
-	// Basic Tzip-16 contract metadata
+	// Common fields from Tzip-16
 	const response = await prompts([
 		{
 			type: `text`,
@@ -204,9 +204,6 @@ const createProjectMetadata = async (
 			message: 'Enter project license',
 			initial: defaultValues?.license ?? 'ISC',
 		},
-		// TODO: errors - mapping of error codes to human readable error messages
-		// TODO: views - off-chain views
-		// TODO: select optional interfaces and answer additional prompts
 	]) as {
 		name: string;
 		description: string;
@@ -223,7 +220,6 @@ const createProjectMetadata = async (
 		license: response.license,
 	};
 
-	// Update config for defaults
 	const updatedConfig = {
 		...config,
 		metadata: projectMetadata,
