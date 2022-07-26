@@ -80,4 +80,4 @@ The task takes a filename and a required positional argument. The filename must 
 
 This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
 
-Docker is used under the hood to provide a self contained environment for Archetype to prevent the need for it to be installed on the user's local machine.
+Docker is used under the hood to provide a self contained environment for Archetype to prevent the need for it to be installed on the user's local machine
