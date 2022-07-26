@@ -68,11 +68,11 @@ To add support for the LIGO smart contract language, install the LIGO plugin by 
 ```shell
 taq install @taqueria/plugin-ligo
 ```
-Once installed the plugin provides a template to easily create and register a boilerplate LIGO contract using the `taq create contract` task
+Once installed the plugin provides a template to easily create and register a boilerplate LIGO contract using the `taq create contract` task.
 
-If you already have contracts written and want to compile them you will just need to register them with the `taq add-contract <sourceFile>` task
+If you already have contracts written and want to compile them you will just need to register them with the `taq add-contract <sourceFile>` task.
 
-Finally the plugin provides the task `taq compile` which will look for any registered LIGO contracts in the `/contracts` directory and compile them to Michelson `.tz` files in the `/artifacts` directory
+Finally the plugin provides the task `taq compile` which will look for any registered LIGO contracts in the `/contracts` directory and compile them to Michelson `.tz` files in the `/artifacts` directory.
 
 To demonstrate this, create and register a new LIGO contract called `counter.jsligo` by running:
 
