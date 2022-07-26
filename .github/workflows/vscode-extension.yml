@@ -57,9 +57,12 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16
+
+      - name: Attempt to rebuild
+        run: npm rebuild | true
       
       - name: Install Dependencies
-        run: npm rebuild && npm ci
+        run: npm ci
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
