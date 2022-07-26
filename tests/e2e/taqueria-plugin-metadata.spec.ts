@@ -13,31 +13,60 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 	});
 
 	test('metadata plugin should create a contract metadata.json file', async () => {
-		const taqProcess = spawn(`cd ${taqueriaProjectPath} && taq generate metadata hello-tacos`);
+		await new Promise<void>((resolve, reject) => {
+			// const taqProcess = spawn(`cd ${taqueriaProjectPath} && taq generate metadata hello-tacos`);
+			const taqProcess = spawn(`taq`, `generate metadata hello-tacos`.split(' '), {
+				cwd: taqueriaProjectPath,
+			});
 
-		taqProcess.stdout.on('data', data => {
-			console.log(`stdout: "${data}"`);
+			taqProcess.stdin.setDefaultEncoding('utf-8');
+			const writeInput = async (text: string) => {
+				console.log(`stdin write`, { text });
+
+				taqProcess.stdin.cork();
+				taqProcess.stdin.write(`${text}\n`);
+				taqProcess.stdin.uncork();
+			};
+
+			taqProcess.on('close', data => {
+				console.log(`close`, { data });
+				resolve();
+			});
+			taqProcess.stderr.on('data', data => {
+				console.log(`stderr: ${data}`);
+			});
+
+			const outputResponses = [
+				['name', 'test-name'],
+				['description', 'test-description'],
+				['author', 'test-author'],
+				['url', 'test-url'],
+				['license', 'test-license'],
+			];
+			taqProcess.stdout.on('data', data => {
+				const dataText = `${data}`;
+				console.log(`stdout: ${dataText}`);
+
+				const dataTextLines = dataText.split('\n');
+				const dataTextLastLine = dataTextLines[dataTextLines.length - 1];
+
+				const response = outputResponses.find(x => dataTextLastLine.includes(x[0]));
+
+				if (response) {
+					writeInput(response[1]);
+					response[0] += '=USED';
+				}
+			});
 		});
-
-		// Answer prompts
-		const writeInput = async (text: string) =>
-			await util.promisify<void>(callback => {
-				taqProcess.stdin.write(`${text}\n`, callback);
-			})();
-		await writeInput('test-name');
-		await writeInput('test-desc');
-		await writeInput('test-author1, test-author2');
-		await writeInput('test-url');
-		await writeInput('test-license');
-
-		await util.promisify(callback => {
-			taqProcess.on('close', callback);
-		})();
 
 		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/hello-tacos.json`, {
 			encoding: 'utf-8',
 		});
-		expect(metadataFileContents).toMatch(/name.*hello-tacos/i);
+		expect(metadataFileContents).toMatch(/name.*test-name/i);
+		expect(metadataFileContents).toMatch(/description.*test-description/i);
+		expect(metadataFileContents).toMatch(/authors(.|\n)*test-author/i);
+		expect(metadataFileContents).toMatch(/homepage.*test-url/i);
+		expect(metadataFileContents).toMatch(/license.*test-license/i);
 	});
 
 	afterAll(async () => {
