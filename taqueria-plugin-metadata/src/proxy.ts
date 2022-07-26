@@ -1,4 +1,4 @@
-import { sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
+import { getContracts, sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import fs from 'fs/promises';
 import path from 'path';
@@ -16,22 +16,55 @@ interface Opts extends RequestArgs.ProxyRequestArgs {
 	readonly contractName?: string;
 }
 
-const createContractMetadata = async (contractName: undefined | string): Promise<PluginResponse> => {
+const createContractMetadata = async (
+	contractName: undefined | string,
+	contracts: undefined | string[],
+): Promise<PluginResponse> => {
 	if (!contractName) {
-		throw new Error(`contractName was not provided`);
+		if (contracts?.length) {
+			// Show contract options
+			// console.log('contracts', { contracts });
+
+			const result = contracts.length > 1
+				? await prompts([
+					{
+						type: `select`,
+						name: `contract`,
+						message: `Pick a contract`,
+						choices: contracts.map(x => ({ title: x, value: x })),
+					},
+				])
+				: await prompts([
+					{
+						type: `text`,
+						name: `contract`,
+						message: `Enter a contract name`,
+						initial: contracts[0],
+					},
+				]) as { contract: string };
+
+			contractName = result.contract;
+		}
+
+		if (!contractName) {
+			throw new Error(`contractName was not provided`);
+		}
 	}
 
 	const destFilePath = path.resolve(process.cwd(), `./artifacts/${contractName}.json`);
-	let existingJson = {} as Partial<typeof contractMetadata>;
+	let defaultValues = undefined as undefined | Partial<typeof contractMetadata>;
 
 	try {
 		const existingContent = await fs.readFile(destFilePath, { encoding: 'utf-8' });
-		existingJson = JSON.parse(existingContent);
+		defaultValues = JSON.parse(existingContent);
 
-		console.log('Existing Metadata:', existingJson);
+		console.log('Existing Metadata:', defaultValues);
 	} catch (err) {
 		// ignore missing file
-		existingJson = {};
+	}
+
+	if (!defaultValues) {
+		// Load other contracts for defaults
 	}
 
 	// Basic Tzip-16 contract metadata
@@ -40,32 +73,32 @@ const createContractMetadata = async (contractName: undefined | string): Promise
 			type: `text`,
 			name: `name`,
 			message: `Enter contract name`,
-			initial: existingJson.name ?? contractName,
+			initial: defaultValues?.name ?? contractName,
 		},
 		{
 			type: `text`,
 			name: `description`,
 			message: `Enter contract description`,
-			initial: existingJson.description ?? '',
+			initial: defaultValues?.description ?? '',
 		},
 		{
 			type: 'list',
 			name: 'authors',
 			message: 'Enter contract authors (comma separated)',
-			initial: existingJson.authors?.join(',') ?? '',
+			initial: defaultValues?.authors?.join(',') ?? '',
 			separator: ',',
 		},
 		{
 			type: 'text',
 			name: 'homepage',
 			message: 'Enter contract web url',
-			initial: existingJson.homepage ?? '',
+			initial: defaultValues?.homepage ?? '',
 		},
 		{
 			type: 'text',
 			name: 'license',
 			message: 'Enter contract license',
-			initial: existingJson.license ?? 'ISC',
+			initial: defaultValues?.license ?? 'ISC',
 		},
 		// TODO: errors - mapping of error codes to human readable error messages
 		// TODO: views - off-chain views
@@ -108,9 +141,11 @@ const execute = async (opts: Opts): Promise<PluginResponse> => {
 		config,
 	} = opts;
 
+	const contracts = Object.keys(config.contracts ?? {}).map(x => path.basename(x, path.extname(x)));
+
 	switch (task) {
 		case 'metadata':
-			return createContractMetadata(contractName);
+			return createContractMetadata(contractName, contracts);
 		default:
 			throw new Error(`${task} is not an understood task by the metadata plugin`);
 	}
