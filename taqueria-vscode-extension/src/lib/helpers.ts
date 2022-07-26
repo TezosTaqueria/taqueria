@@ -3,6 +3,7 @@ import { TaqError } from '@taqueria/protocol/TaqError';
 import { spawn } from 'child_process';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
+import os from 'os';
 import path, { join } from 'path';
 import * as api from 'vscode';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
@@ -38,6 +39,16 @@ export enum OutputLevels {
 }
 
 export type OutputFunction = (currentLogLevel: OutputLevels, log: string) => void;
+
+enum AnalyticsOptionState {
+	fileNotExists,
+	fileIsUnreadable,
+	fileIsCorrupt,
+	optionNotExists,
+	optionSetToInvalidValue,
+	optedIn,
+	optedOut,
+}
 
 const outputLevelsOrder = [
 	OutputLevels.trace,
@@ -1025,5 +1036,114 @@ export class VsCodeHelper {
 		child.stdout.on('data', _data => {
 			this.sandboxesDataProvider?.refresh();
 		});
+	}
+
+	async watchGlobalSettings() {
+		const settingsFilePath = this.getSettingsFilePath();
+		const folderWatcher = this.vscode.workspace.createFileSystemWatcher(settingsFilePath);
+		folderWatcher.onDidChange(async () => await this.handleAnalyticsOption());
+		folderWatcher.onDidCreate(async () => await this.handleAnalyticsOption());
+		folderWatcher.onDidDelete(async () => await this.handleAnalyticsOption());
+		await this.handleAnalyticsOption();
+	}
+
+	private getSettingsFilePath() {
+		const homeDir = os.homedir();
+		const settingsFilePath = path.join(homeDir, '.taq-settings', 'taq-settings.json');
+		return settingsFilePath;
+	}
+
+	private isHandlingAnalyticsConsent = false;
+
+	async handleAnalyticsOption(): Promise<true> {
+		if (this.isHandlingAnalyticsConsent) {
+			return true;
+		}
+		this.isHandlingAnalyticsConsent = true;
+		try {
+			const analyticsOptionState = await this.getAnalyticsOptionState();
+			switch (analyticsOptionState) {
+				case AnalyticsOptionState.fileIsCorrupt:
+				case AnalyticsOptionState.fileIsUnreadable:
+				case AnalyticsOptionState.optedIn:
+				case AnalyticsOptionState.optedOut:
+				case AnalyticsOptionState.optionSetToInvalidValue:
+					this.isHandlingAnalyticsConsent = false;
+					return true;
+				case AnalyticsOptionState.optionNotExists:
+				case AnalyticsOptionState.fileNotExists: {
+					const optIn = { title: `Yes, I'm in`, isCloseAffordance: false };
+					const optOut = { title: `No, I'm not interested`, isCloseAffordance: true };
+					const chosenOption = await this.vscode.window.showInformationMessage<api.MessageItem>(
+						'Do you want to help improve Taqueria by sharing anonymous usage statistics in accordance with the privacy policy?',
+						{
+							detail:
+								`The information will only include anonymous statistics of Taqueria's features, not personally identifiable information is sent to Taqueria team`,
+							modal: true,
+						},
+						optIn,
+						optOut,
+					);
+					if (chosenOption === optIn) {
+						await this.proxyToTaqAndShowOutput(
+							'opt-in',
+							{
+								finishedTitle: `opted in to analytics`,
+								progressTitle: `opting in to analytics`,
+							},
+							undefined,
+							true,
+						);
+					} else {
+						await this.proxyToTaqAndShowOutput(
+							'opt-out',
+							{
+								finishedTitle: `opted out from analytics`,
+								progressTitle: `opting out from analytics`,
+							},
+							undefined,
+							true,
+						);
+					}
+					this.isHandlingAnalyticsConsent = false;
+					return true;
+				}
+			}
+		} catch (e: unknown) {
+			this.logAllNestedErrors(e, true);
+			this.isHandlingAnalyticsConsent = false;
+			return true;
+		}
+	}
+
+	async getAnalyticsOptionState() {
+		const settingsFilePath = this.getSettingsFilePath();
+		try {
+			await stat(settingsFilePath);
+		} catch {
+			return AnalyticsOptionState.fileNotExists;
+		}
+		let text: string;
+		try {
+			text = await readFile(settingsFilePath, 'utf-8');
+		} catch {
+			return AnalyticsOptionState.fileIsUnreadable;
+		}
+		try {
+			const settings = JSON.parse(text);
+			if (!Object.hasOwn(settings, 'consent')) {
+				return AnalyticsOptionState.optionNotExists;
+			}
+			const value = settings['consent'];
+			if (value === 'opt_in') {
+				return AnalyticsOptionState.optedIn;
+			}
+			if (value === 'opt_out') {
+				return AnalyticsOptionState.optedOut;
+			}
+			return AnalyticsOptionState.optionSetToInvalidValue;
+		} catch {
+			return AnalyticsOptionState.fileIsCorrupt;
+		}
 	}
 }
