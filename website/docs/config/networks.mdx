@@ -32,13 +32,15 @@ To configure and use a Taqueria network, you will require the following:
 
 Taqueria will support all protocols available on the [teztnets.xyz](https://teztnets.xyz/) site. If you notice an issue with a recent protocol update, please report it as a bug [here](https://github.com/ecadlabs/taqueria/issues/new?assignees=&labels=bug%2Ctriage&template=bug_report.yml&title=%5BBug%5D%3A+) 
 
+Ghostnet should be the default testnet you use since it will automatically handle protocol upgrades as they happen
+
 ## Configuration
 
 :::note
 The network configuration for various protocols, as well as the faucet for each can be found at [teztnets.xyz](https://teztnets.xyz/).
 :::
 
-To configure a network for use, you will need to configure the network, and then add that network to an environment. To illustrate the configuration of a network, we will use [ghostnet](https://teztnets.xyz/ithaca-testnet/), a long running Tezos test network as an example in this document and will configure a network named `ithaca`, and an environment named `testing`
+To configure a network for use, you will need to configure the network, and then add that network to an environment. To illustrate the configuration of a network, we will use [ghostnet](https://teztnets.xyz/ithaca-testnet/), a long running Tezos test network as an example in this document and will configure a network named `ghostnet`, and an environment named `testing`
 
 Taqueria does not have a default network configured, so a freshly initialized project will have a `config.json` file that looks like this:
 ```json
@@ -85,7 +87,7 @@ Add the following entry ("testing": {...}) to the `network` property::
 {
    "network":{
       "ghostnet":{
-         "label":"Ghostnet Testnet",
+         "label":"Ghostnet Protocol Testnet",
          "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
          "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
          "faucet":{  }
@@ -93,7 +95,7 @@ Add the following entry ("testing": {...}) to the `network` property::
    }
 ```
 :::note
-The information for `rpcUrl` and`protocol` are taken from the [https://teztnets.xyz/ghostnet-about](https://teztnets.xyz/ghostnet-about) page
+The information for `rpcUrl` and`protocol` are taken from the page [https://teztnets.xyz/ghostnet-about](https://teztnets.xyz/ghostnet-about)
 :::
 
 ### Faucets 
@@ -108,7 +110,7 @@ Your `network` property should now look something like this:
 ```json
 {
    "network":{
-      "Ghostnet":{
+      "ghostnet":{
          "label":"Ghostnet Protocol Testnet",
          "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
          "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
@@ -161,7 +163,7 @@ To do this, find the `environment` property in your `config.json` file. By defau
     },
 ```
 
-Add a new environment named `testing`, and add the named network `ghost` to its `networks` array:
+Add a new environment named `testing`, and add the named network `ghostnet` to its `networks` array:
 ```json
     "environment": {
         "default": "development",
@@ -174,7 +176,7 @@ Add a new environment named `testing`, and add the named network `ghost` to its 
         },
         "testing": {
             "networks": [
-                "ithaca"
+                "ghostnet"
             ],
             "sandboxes": [
                 "local"
@@ -190,7 +192,7 @@ For additional information regarding Taqueria Environments, please see the docum
 
 ### Finished Configuration
 
-At this point, you should have a fully configured network named `ghostnet` which is configured to target [ghostnet](https://teztnets.xyz/ghostnet-about) using a faucet, and an environment named `ghostnet` which can be used to target the network from the CLI
+At this point, you should have a fully configured network named `ghostnet` which is configured to target [ghostnet](https://teztnets.xyz/ghostnet-about) using a faucet, and an environment named `testing` which can be used to target the network from the CLI
 
 Your `config.json` file should look something like this: 
 ```json
@@ -209,9 +211,9 @@ Your `config.json` file should look something like this:
             ],
             "storage": {}
         },
-        "ghostnet": {
+        "testing": {
             "networks": [
-                "ithaca"
+                "ghostnet"
             ],
             "sandboxes": [],
             "storage": {}
@@ -225,8 +227,8 @@ Your `config.json` file should look something like this:
         }
     },
     "network": {
-        "ithaca":{
-            "label":"Ghostnet Testnet",
+        "ghostnet":{
+            "label":"Ghostnet Protocol Testnet",
             "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
             "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "faucet":{
@@ -272,7 +274,7 @@ Your `config.json` file should look something like this:
 
 Taqueria uses [Environments](/docs/config/environments) to target a specific network or sandbox. An environment is a named collection of network configurations which can be passed to the CLI using the `--env` flag
 
-To target the `ghost` network we configured above using the `ghostnet` environment, simply run the following command:
+To target the `ghostnet` network we configured above using the `testing` environment, simply run the following command:
 ```shell
 taq originate --env testing
 ```
