@@ -406,7 +406,7 @@ jobs:
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
-      - publish-contract-types-plugin-to-npm
+      # - publish-contract-types-plugin-to-npm
       - publish-archetype-plugin-to-npm
       - publish-tezos-client-plugin-to-npm
       - publish-state-plugin-to-npm
@@ -533,7 +533,7 @@ jobs:
       - publish-smartpy-plugin-to-npm
       - publish-taquito-plugin-to-npm
       - publish-flextesa-plugin-to-npm
-      - publish-contract-types-plugin-to-npm
+      # - publish-contract-types-plugin-to-npm
       - publish-archetype-plugin-to-npm
       - publish-tezos-client-plugin-to-npm
       - publish-state-plugin-to-npm
