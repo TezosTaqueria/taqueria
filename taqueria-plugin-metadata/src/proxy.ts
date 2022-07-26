@@ -22,39 +22,50 @@ const createContractMetadata = async (contractName: undefined | string): Promise
 	}
 
 	const destFilePath = path.resolve(process.cwd(), `./artifacts/${contractName}.json`);
-	// Basic Tzip-16 contract metadata
+	let existingJson = {} as Partial<typeof contractMetadata>;
 
+	try {
+		const existingContent = await fs.readFile(destFilePath, { encoding: 'utf-8' });
+		existingJson = JSON.parse(existingContent);
+
+		console.log('Existing Metadata:', existingJson);
+	} catch (err) {
+		// ignore missing file
+		existingJson = {};
+	}
+
+	// Basic Tzip-16 contract metadata
 	const response = await prompts([
 		{
 			type: `text`,
 			name: `name`,
 			message: `Enter contract name`,
-			initial: contractName,
+			initial: existingJson.name ?? contractName,
 		},
 		{
 			type: `text`,
 			name: `description`,
 			message: `Enter contract description`,
-			initial: '',
+			initial: existingJson.description ?? '',
 		},
 		{
 			type: 'list',
 			name: 'authors',
 			message: 'Enter contract authors (comma separated)',
-			initial: '',
+			initial: existingJson.authors?.join(',') ?? '',
 			separator: ',',
 		},
 		{
 			type: 'text',
 			name: 'homepage',
 			message: 'Enter contract web url',
-			initial: '',
+			initial: existingJson.homepage ?? '',
 		},
 		{
 			type: 'text',
 			name: 'license',
 			message: 'Enter contract license',
-			initial: 'ISC',
+			initial: existingJson.license ?? 'ISC',
 		},
 		// TODO: errors - mapping of error codes to human readable error messages
 		// TODO: views - off-chain views

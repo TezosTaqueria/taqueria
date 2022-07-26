@@ -12,7 +12,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
 	});
 
-	test('metadata plugin should create a contract metadata.json file', async () => {
+	const runCliWithPrompts = async (outputResponses: string[][]) => {
 		await new Promise<void>((resolve, reject) => {
 			// const taqProcess = spawn(`cd ${taqueriaProjectPath} && taq generate metadata hello-tacos`);
 			const taqProcess = spawn(`taq`, `generate metadata hello-tacos`.split(' '), {
@@ -21,7 +21,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 
 			taqProcess.stdin.setDefaultEncoding('utf-8');
 			const writeInput = async (text: string) => {
-				console.log(`stdin write`, { text });
+				// console.log(`stdin write`, { text });
 
 				taqProcess.stdin.cork();
 				taqProcess.stdin.write(`${text}\n`);
@@ -29,23 +29,16 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 			};
 
 			taqProcess.on('close', data => {
-				console.log(`close`, { data });
+				// console.log(`close`, { data });
 				resolve();
 			});
 			taqProcess.stderr.on('data', data => {
-				console.log(`stderr: ${data}`);
+				// console.log(`stderr: ${data}`);
 			});
 
-			const outputResponses = [
-				['name', 'test-name'],
-				['description', 'test-description'],
-				['author', 'test-author'],
-				['url', 'test-url'],
-				['license', 'test-license'],
-			];
 			taqProcess.stdout.on('data', data => {
 				const dataText = `${data}`;
-				console.log(`stdout: ${dataText}`);
+				// console.log(`stdout: ${dataText}`);
 
 				const dataTextLines = dataText.split('\n');
 				const dataTextLastLine = dataTextLines[dataTextLines.length - 1];
@@ -58,6 +51,43 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 				}
 			});
 		});
+	};
+
+	test('metadata plugin should create a contract metadata.json file', async () => {
+		await runCliWithPrompts([
+			['name', 'test-name'],
+			['description', 'test-description'],
+			['author', 'test-author'],
+			['url', 'test-url'],
+			['license', 'test-license'],
+		]);
+
+		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/hello-tacos.json`, {
+			encoding: 'utf-8',
+		});
+		expect(metadataFileContents).toMatch(/name.*test-name/i);
+		expect(metadataFileContents).toMatch(/description.*test-description/i);
+		expect(metadataFileContents).toMatch(/authors(.|\n)*test-author/i);
+		expect(metadataFileContents).toMatch(/homepage.*test-url/i);
+		expect(metadataFileContents).toMatch(/license.*test-license/i);
+	});
+
+	test('metadata plugin should re-create a contract metadata.json using existing values', async () => {
+		await runCliWithPrompts([
+			['name', 'test-name'],
+			['description', 'test-description'],
+			['author', 'test-author'],
+			['url', 'test-url'],
+			['license', 'test-license'],
+		]);
+
+		await runCliWithPrompts([
+			['name', ''],
+			['description', ''],
+			['author', ''],
+			['url', ''],
+			['license', ''],
+		]);
 
 		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/hello-tacos.json`, {
 			encoding: 'utf-8',
