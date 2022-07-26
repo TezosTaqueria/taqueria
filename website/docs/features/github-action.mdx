@@ -32,6 +32,10 @@ The name of the Flextesa sandbox to use. A sandbox will only be created if this 
 
 The compile command used to compile the contracts
 
+### `contracts`
+
+A comma separated list of contracts to be added to the Taqueria project.
+
 ### `originate`
 
 When set to true, contracts will be originated to the environment defined with the `environment` variable (leave empty for default). This option makes use of the `taquito` plugin so please make sure to install it
@@ -52,40 +56,42 @@ You can also check out the quickstart guide for GitHub actions in the GitHub doc
 
 ## Example Usage
 
-### Single Step Action
+### Single step action
 ```yaml
 - name: taqueria tasks
-    uses: ecadlabs/taqueria-github-action@v0.1.2
+    uses: ecadlabs/taqueria-github-action@v0.2.2
     with:
         plugins: '@taqueria/plugin-ligo, @taqueria/plugin-flextesa, @taqueria/plugin-taquito'
+        contracts: 'counter.jsligo'
         compile_command: compile 
         sandbox_name: local
         originate: 'true'
         tests: 'true'
 ```
 
-### Multiple Step Action
+### Multiple step action
 ```yaml
 - name: compile contracts
-    uses: ecadlabs/taqueria-github-action@v0.1.2
+    uses: ecadlabs/taqueria-github-action@v0.2.2
     with:
         project_directory: 'example-projects/hello-tacos'
+        contracts: 'hello-tacos.mligo'
         compile_command: 'compile'
 
 - name: start local sandbox
-    uses: ecadlabs/taqueria-github-action@v0.1.2
+    uses: ecadlabs/taqueria-github-action@v0.2.2
     with:
         project_directory: 'example-projects/hello-tacos'
         sandbox_name: 'local'
 
 - name: originate contracts
-    uses: ecadlabs/taqueria-github-action@v0.1.2
+    uses: ecadlabs/taqueria-github-action@v0.2.2
     with:
         project_directory: 'example-projects/hello-tacos'
         originate: 'true'
 
-- name: run tests
-    uses: ecadlabs/taqueria-github-action@v0.1.2
+- name: originate contracts
+    uses: ecadlabs/taqueria-github-action@v0.2.2
     with:
         project_directory: 'example-projects/hello-tacos'
         tests: 'true'
