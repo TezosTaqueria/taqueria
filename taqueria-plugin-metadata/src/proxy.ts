@@ -52,19 +52,32 @@ const createContractMetadata = async (
 	}
 
 	const destFilePath = path.resolve(process.cwd(), `./artifacts/${contractName}.json`);
-	let defaultValues = undefined as undefined | Partial<typeof contractMetadata>;
 
-	try {
-		const existingContent = await fs.readFile(destFilePath, { encoding: 'utf-8' });
-		defaultValues = JSON.parse(existingContent);
+	const loadContractMetadata = async (otherContractName: string) => {
+		try {
+			const otherContractFilePath = path.resolve(process.cwd(), `./artifacts/${otherContractName}.json`);
+			const existingContent = await fs.readFile(otherContractFilePath, { encoding: 'utf-8' });
+			return JSON.parse(existingContent) as Partial<typeof contractMetadata>;
+		} catch (err) {
+			// ignore missing file
+			return undefined;
+		}
+	};
 
+	let defaultValues = await loadContractMetadata(contractName);
+	if (defaultValues) {
 		console.log('Existing Metadata:', defaultValues);
-	} catch (err) {
-		// ignore missing file
 	}
 
-	if (!defaultValues) {
+	if (!defaultValues && contracts?.length) {
 		// Load other contracts for defaults
+		const otherContractMetadata = (await Promise.all(contracts.map(async x => await loadContractMetadata(x))))
+			.filter(x => x).map(x => x!) ?? [];
+		defaultValues = {
+			authors: otherContractMetadata.map(x => x.authors).filter(x => x?.length)[0],
+			homepage: otherContractMetadata.map(x => x.homepage).filter(x => x?.length)[0],
+			license: otherContractMetadata.map(x => x.license).filter(x => x?.length)[0],
+		};
 	}
 
 	// Basic Tzip-16 contract metadata
