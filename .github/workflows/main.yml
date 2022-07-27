@@ -313,10 +313,10 @@ jobs:
         with:
           deno-version: "1.23.4"
 
-      # - uses: actions/cache@v3
-      #   with:
-      #     path: ${{ matrix.cache_path }}
-      #     key: ${{ runner.os }}-deno-${{ hashFiles('**/deno-lock.json') }}
+      - uses: actions/cache@v3
+        with:
+          path: ${{ matrix.cache_path }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno-lock.json') }}
 
       - name: download the binary from the build-binaries job and make it executable
         if: ${{ !github.event.pull_request.head.repo.fork }}
