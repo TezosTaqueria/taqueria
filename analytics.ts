@@ -45,26 +45,22 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 
 	const optInAnalytics = () => writeConsentValueToSettings(OPT_IN);
 	const optOutAnalytics = () => writeConsentValueToSettings(OPT_OUT);
+
 	const writeConsentValueToSettings = (option: Consent) => {
-		const input = prompt(option === OPT_IN ? optInConfirmationPrompt : optOutConfirmationPrompt);
-		if (didUserChooseYes(input)) {
-			return pipe(
-				readJsonFile<Settings.t>(settingsFilePath),
-				map((settingsContent: Settings.t) => {
-					settingsContent.consent = option;
-					return settingsContent;
-				}),
-				chainRej(() => Settings.make({ consent: option === OPT_IN ? 'opt_in' : 'opt_out' })),
-				chain(writeJsonFile(settingsFilePath)),
-				map(() =>
-					option === OPT_IN
-						? 'You have successfully opted-in to sharing anonymous usage analytics'
-						: 'You have successfully opted-out from sharing anonymous usage analytics'
-				),
-			);
-		} else {
-			return taqResolve('');
-		}
+		return pipe(
+			readJsonFile<Settings.t>(settingsFilePath),
+			map((settingsContent: Settings.t) => {
+				settingsContent.consent = option;
+				return settingsContent;
+			}),
+			chainRej(() => Settings.make({ consent: option === OPT_IN ? 'opt_in' : 'opt_out' })),
+			chain(writeJsonFile(settingsFilePath)),
+			map(() =>
+				option === OPT_IN
+					? 'You have successfully opted-in to sharing anonymous usage analytics'
+					: 'You have successfully opted-out from sharing anonymous usage analytics'
+			),
+		);
 	};
 
 	const isCIRun = () => env.get('CI') !== undefined;
