@@ -52,9 +52,7 @@ The `add-contract` task is used when importing an existing smart contract to you
 4. Originate the contract `taq originate example.arl`
 5. Update dApp
 6. Deploy dApp
-7. Tests
-8. Edit contract
-9. Repeat 3-8 till done with this contract
+7. Test
 
 ### Creating a Contract without Taqueria 
 
@@ -65,8 +63,20 @@ The `add-contract` task is used when importing an existing smart contract to you
 5. Originate the contract `taq originate example.mligo`
 6. Update dApp
 7. Deploy dApp
-8. Tests
-9. Repeat 3-8 till done with this contract
+8. Test
+
+### Taq'ifying a project
+
+1. Clone a project
+2. Add a smart contract from the project to the registry `taq add-contract router.py`
+3. Repeat 2 till each contract with a main entrypoint has been added to the registry
+4. Compile the contracts `taq compile`
+5. Originate the contracts `taq originate`
+6. Update dApp
+7. Deploy dApp
+8. Test
+
+
 
 ## Plugin Implementations
 
