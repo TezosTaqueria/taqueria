@@ -69,7 +69,7 @@ export const reference = {
 	'skipFilter': false,
 	'slowTestThreshold': 5,
 	'snapshotSerializers': [],
-	'testEnvironment': 'jest-environment-node',
+	'testEnvironment': 'node',
 	'testEnvironmentOptions': {},
 	'testFailureExitCode': 1,
 	'testLocationInResults': false,

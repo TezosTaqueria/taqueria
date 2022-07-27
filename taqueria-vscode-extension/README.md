@@ -18,14 +18,14 @@ Run Taqueria commands right in the VS Code Command Palette or Taqueria Side Bar 
 
 ### Requirements
 
-- Taqueria v0.1.8 or later must be [installed](https://taqueria.io/docs/getting-started/installation/) and available in your system's `#PATH`
+- Taqueria v0.8.0 or later must be [installed](https://taqueria.io/docs/getting-started/installation/) and available in your system's `#PATH`
 - Node.js v16 or later
 - Docker v0.8 or later
 
 ### Running Taqueria Commands using command pallet
 1. Open the VS Code command palette by pressing the keys `ctrl` + `shift` +`P` (in mac: `cmd` + `shift` +`P`) together
 2. Type `taq` to filter the list of commands to Taqueria
-3. Select a Taqueria command from the list to run it
+3. Select a Taqueria command from the list to run it.
 
 ### Running Taqueria Commands using Side Bar Panel
 1. Initialize, Scaffold, or open a Taqified folder in Vscode

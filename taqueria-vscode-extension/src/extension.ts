@@ -1,6 +1,5 @@
 import * as api from 'vscode';
-import { InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
-import { COMMAND_PREFIX } from './lib/helpers';
+import { COMMAND_PREFIX, InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
 import { makeDir } from './lib/pure';
 
 const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {

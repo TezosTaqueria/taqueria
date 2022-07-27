@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/taqueria",
-	"version": "0.8.4",
+	"version": "0.10.0",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -11,12 +11,14 @@
 		"build": "./bin/build.sh || npx play-sound beep.mp3",
 		"build-all": "./bin/build-all.sh",
 		"parse-readme-template": "ts-node ./parse-readme-template.ts",
-		"build-website": "npm run parse-readme-template && cd website && npm ci && npm run build",
+		"build-website": "npm run parse-readme-template && cd website && npm ci --legacy-peer-deps && npm run build",
+		"serve-website": "cd website && npm run serve",
 		"watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build || npx play-sound beep.mp3\" --initial",
 		"build-and-watch-vscode": "npx chokidar \"*.ts\" \"taqueria-vscode-extension/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run compile -w taqueria-vscode-extension || npx play-sound beep.mp3\" --initial",
 		"prepare": "husky install",
 		"format": "dprint fmt",
-		"format:check": "dprint check"
+		"format:check": "dprint check",
+		"update-lock": "deno cache --import-map ./import_map.json --lock ./deno-lock.json --lock-write index.ts"
 	},
 	"repository": {
 		"type": "git",
@@ -39,13 +41,19 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"devDependencies": {
+		"@parcel/packager-ts": "^2.6.1",
+		"@parcel/transformer-typescript-types": "^2.6.1",
 		"chokidar-cli": "^3.0.0",
 		"dprint": "^0.27.1",
 		"eta": "^1.12.3",
 		"husky": "^8.0.1",
 		"lint-staged": "^12.4.1",
 		"play-sound-cli": "^1.0.0",
-		"ts-node": "^10.8.0"
+		"ts-jest": "^28.0.7",
+		"ts-node": "^10.8.0",
+		"tsup": "^6.1.3",
+		"typescript": "^4.7.4",
+		"with-staged": "^1.0.2"
 	},
 	"workspaces": [
 		"./taqueria*",

@@ -13,7 +13,7 @@ taq install @taqueria/plugin-taquito
 
 ## Configuration
 
-The target networks, sandboxes, and environments are configured in the Taqueria project's `config.json` file. For additional information on configuring network, documentation can be found [here](https://taqueria.io/docs/getting-started/networks/)
+The target networks, sandboxes, and environments are configured in the Taqueria project's `config.json` file. For additional information on configuring network, documentation can be found [here](/docs/config/networks/)
 
 ## Usage
 
@@ -32,7 +32,7 @@ This will originate all '.tz' files in the `/artifacts` directory to the default
 To target a different environment, use the `--environment` flag with the named Taqueria environment you want to target :
 
 ```shell
-taq originate -e ithacanetEnv
+taq originate -e jakartanetEnv
 ```
 
 ## Plugin Architecture

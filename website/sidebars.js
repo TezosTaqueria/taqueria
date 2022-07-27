@@ -95,6 +95,16 @@ const sidebars = {
     },
     {
       type: "category",
+      label: "Features",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "features/github-action"
+      ],
+    }, 
+    {
+      type: "category",
       label: "Taqueria Internals",
       className: "sidebarHeader",
       collapsed: false,

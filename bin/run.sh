@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 BRANCH=`git branch --show-current`
 TAQ_VERSION="dev:$BRANCH"
 TIMESTAMP=`date +%s`
