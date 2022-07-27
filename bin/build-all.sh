@@ -1,4 +1,4 @@
-#!/usr/bin/env bash -e
+#!/usr/bin/env bash
 
 if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
     echo '**********************************************'
