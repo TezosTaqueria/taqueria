@@ -278,17 +278,17 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest,macos-latest]
+        os: [macos-latest]
         chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
         include:
-        - os: ubuntu-latest
-          url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
-          final-name: taq
-          make-executable-cmd: chmod +x
-          get-current-dir: echo "$(pwd)"
-          cache_path: |
-            ~/.deno
-            ~/.cache/deno
+        # - os: ubuntu-latest
+        #   url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
+        #   final-name: taq
+        #   make-executable-cmd: chmod +x
+        #   get-current-dir: echo "$(pwd)"
+        #   cache_path: |
+        #     ~/.deno
+        #     ~/.cache/deno
         - os: macos-latest
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
