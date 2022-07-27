@@ -38,7 +38,8 @@ const sidebars = {
       items: [
         "config/networks",
         "config/implicit-accounts",
-        "config/sandbox-config"
+        "config/sandbox-config",
+        "config/environments"
       ],
     },
     {
@@ -49,36 +50,59 @@ const sidebars = {
       collapsible: false,
       items: [
         "plugins/plugin-basics",
-        "plugins/plugin-flextesa",
         "plugins/plugin-archetype",
-        "plugins/plugin-ligo",
-        "plugins/plugin-taquito",
         "plugins/plugin-contract-types",
-        "plugins/plugin-tezos-client",
-        "plugins/plugin-smartpy",
+        "plugins/plugin-flextesa",
+        "plugins/plugin-ipfs-pinata",
         "plugins/plugin-jest",
-      ],
-    },
-    {
-      type: "category",
-      label: "Taqueria Libraries",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "libraries/taqueria-state"
+        "plugins/plugin-ligo",
+        "plugins/plugin-smartpy",
+        "plugins/plugin-taquito",
+        "plugins/plugin-tezos-client",
       ],
     },
     // {
     //   type: "category",
-    //   label: "Example App",
+    //   label: "Taqueria Libraries",
     //   className: "sidebarHeader",
     //   collapsed: false,
     //   collapsible: false,
     //   items: [
-    //     "hello-tacos-tutorial"
+    //     "libraries/taqueria-state"
     //   ],
     // },
+    {
+      type: "category",
+      label: "Scaffolds",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "scaffolds/scaffold-basics",
+        "scaffolds/taco-shop",
+        "scaffolds/quickstart",
+      ],
+    },    
+    {
+      type: "category",
+      label: "Tutorials",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "tutorials/hello-tacos-tutorial"
+      ],
+    },
+    {
+      type: "category",
+      label: "Features",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "features/github-action"
+      ],
+    }, 
     {
       type: "category",
       label: "Taqueria Internals",

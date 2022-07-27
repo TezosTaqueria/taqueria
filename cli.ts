@@ -54,6 +54,7 @@ const {
 	mkdir,
 	readJsonFile,
 	writeTextFile,
+	appendTextFile,
 	doesPathNotExistOrIsEmptyDir,
 	gitClone,
 	rm,
@@ -451,10 +452,12 @@ const scaffoldProject = (i18n: i18n.t) =>
 			await eager(rm(gitDir));
 			log('    ✓ Remove Git directory');
 
-			await eager(exec('npm install > /dev/null', {}, false, destDir));
+			const installOutput = await eager(exec(`npm install 2>&1`, {}, true, destDir));
+			await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(installOutput.toString()));
 			log('    ✓ Install plugins');
 
-			await eager(exec('taq init 2>&1 > /dev/null', {}, false, destDir));
+			const initOutput = await eager(exec(`taq init 2>&1`, {}, true, destDir));
+			await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(initOutput.toString()));
 
 			// Remove the scaffold.json file, if not exists
 			// If it doesn't exist, don't throw...
@@ -464,7 +467,8 @@ const scaffoldProject = (i18n: i18n.t) =>
 				if (
 					typeof scaffoldConfig === 'object' && Object.hasOwn(scaffoldConfig, 'postInit') && scaffoldConfig.postInit
 				) {
-					await eager(exec(scaffoldConfig.postInit!, {}, false, destDir));
+					const setupOutput = await eager(exec(`${scaffoldConfig.postInit!} 2>&1`, {}, true, destDir));
+					await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(setupOutput.toString()));
 				}
 			} catch (err) {
 				if (!isTaqError(err) || err.kind !== 'E_INVALID_PATH_DOES_NOT_EXIST') {
@@ -631,7 +635,7 @@ const exposeTemplates = (
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
 ) => {
-	if (state.templates) {
+	if (Object.keys(state.templates).length > 0) {
 		const { command, builder } = getTemplateCommandArgs(parsedArgs, state, i18n);
 
 		cliConfig.command(
@@ -684,7 +688,7 @@ const handleTemplate = (
 					action: 'proxyTemplate',
 				}),
 				map(decoded => {
-					if (decoded) return renderPluginJsonRes(decoded);
+					if (decoded) return renderPluginJsonRes(decoded, parsedArgs);
 				}),
 			)
 			: pipe(
@@ -693,10 +697,9 @@ const handleTemplate = (
 					{ ...parsedArgs, config },
 					['json', 'application/json'].includes(template.encoding ?? 'none'),
 				),
-				map((res: string | number) => {
-					if (typeof (res) === 'string') {
-						return renderPluginJsonRes(JSON.parse(res));
-					}
+				map(([_, output, errOutput]) => {
+					if (errOutput.length > 0) console.error(errOutput);
+					if (output.length > 0) return renderPluginJsonRes(JSON.parse(output), parsedArgs);
 				}),
 			);
 	}
@@ -840,7 +843,7 @@ const exposeTask = (
 						chain(addTask(parsedArgs, task.task, plugin.name)),
 						map(res => {
 							const decoded = res as PluginJsonResponse.t | void;
-							if (decoded) return renderPluginJsonRes(decoded);
+							if (decoded) return renderPluginJsonRes(decoded, parsedArgs);
 						}),
 					)
 					: pipe(
@@ -849,10 +852,9 @@ const exposeTask = (
 							{ ...parsedArgs, ...inputArgs },
 							['json', 'application/json'].includes(task.encoding ?? 'none'),
 						),
-						map((res: string | number) => {
-							if (typeof (res) === 'string') {
-								return renderPluginJsonRes(JSON.parse(res));
-							}
+						map(([_, output, errOutput]) => {
+							if (errOutput.length > 0) console.error(errOutput);
+							if (output.length > 0) return renderPluginJsonRes(JSON.parse(output), parsedArgs);
 						}),
 					);
 
@@ -875,7 +877,13 @@ const loadEphermeralState = (
 		cliConfig,
 	);
 
-const renderPluginJsonRes = (decoded: PluginJsonResponse.t) => {
+const renderPluginJsonRes = (decoded: PluginJsonResponse.t, parsedArgs: SanitizedArgs.t) => {
+	// do not render object/array ASCII table if the request comes from TVsCE
+	if (parsedArgs.fromVsCode) {
+		log(JSON.stringify(decoded.data));
+		return;
+	}
+
 	switch (decoded.render) {
 		case 'table':
 			renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);

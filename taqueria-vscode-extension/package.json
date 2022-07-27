@@ -1,16 +1,18 @@
 {
 	"name": "taqueria-vscode",
-	"displayName": "taqueria",
-	"description": "A vscode plugin to make Tezos development easier with Taqueria!",
+	"displayName": "Taqueria",
+	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
-	"version": "0.6.5",
+	"version": "0.10.0",
+	"preview": true,
 	"engines": {
 		"vscode": "^1.68.1",
 		"node": "^16.0.0"
 	},
 	"engineStrict": true,
 	"extensionKind": [
-		"workspace"
+		"workspace",
+		"ui"
 	],
 	"targets": {
 		"default": {
@@ -40,12 +42,12 @@
 			}
 		}
 	},
-	"author": "ECAD Labs",
+	"author": "ECAD Labs Inc.",
 	"license": "Apache-2.0",
 	"icon": "images/taqueria-icon.png",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ecadlabs/taqueria.git"
+		"url": "https://github.com/ecadlabs/taqueria.git"
 	},
 	"bugs": {
 		"url": "https://github.com/ecadlabs/taqueria/issues"
@@ -59,9 +61,21 @@
 		"deploy",
 		"originate",
 		"ecad",
-		"ecadlabs"
+		"ecadlabs",
+		"NFT",
+		"DeFi",
+		"blockchain",
+		"smart contract",
+		"Ligo",
+		"Michelson",
+		"SmartPy",
+		"Archetype"
 	],
 	"activationEvents": [
+		"onCommand:taqueria.init",
+		"onCommand:taqueria.scaffold",
+		"onCommand:taqueria.opt_in",
+		"onCommand:taqueria.opt_out",
 		"workspaceContains:.taq",
 		"onStartupFinished"
 	],
@@ -79,6 +93,39 @@
 					"description": "Specifies taqueria binary path"
 				}
 			}
+		},
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "taqueria",
+					"title": "Taqueria",
+					"icon": "images/taq-black.svg"
+				}
+			]
+		},
+		"views": {
+			"taqueria": [
+				{
+					"id": "taqueria-sandboxes",
+					"name": "Sandboxes",
+					"contextualTitle": "Sandboxes"
+				},
+				{
+					"id": "taqueria-plugins",
+					"name": "Plugins",
+					"contextualTitle": "Plugins"
+				},
+				{
+					"id": "taqueria-contracts",
+					"name": "Contracts",
+					"contextualTitle": "Contracts"
+				},
+				{
+					"id": "taqueria-environments",
+					"name": "Environments",
+					"contextualTitle": "Environments"
+				}
+			]
 		},
 		"commands": [
 			{
@@ -100,63 +147,72 @@
 				"category": "Taqueria",
 				"title": "Install Plugin",
 				"shortTitle": "install",
-				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/not-installed-plugin-count != 0"
+				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/not-installed-plugin-count != 0",
+				"icon": "$(cloud-download)"
 			},
 			{
 				"command": "taqueria.uninstall",
 				"category": "Taqueria",
 				"title": "Uninstall Plugin",
 				"shortTitle": "uninstall",
-				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/installed-plugin-count != 0"
+				"enablement": "@taqueria-state/enable-install-uninstall && @taqueria-state/installed-plugin-count != 0",
+				"icon": "$(close)"
 			},
 			{
 				"command": "taqueria.compile_smartpy",
 				"category": "Taqueria",
 				"title": "Compile (SmartPy)",
 				"shortTitle": "compile --plugin smartpy",
-				"enablement": "@taqueria/plugin-smartpy"
+				"enablement": "@taqueria/plugin-smartpy",
+				"icon": "images/smartpy.svg"
 			},
 			{
 				"command": "taqueria.compile_ligo",
 				"category": "Taqueria",
 				"title": "Compile (LIGO)",
 				"shortTitle": "compile --plugin ligo",
-				"enablement": "@taqueria/plugin-ligo"
+				"enablement": "@taqueria/plugin-ligo",
+				"icon": "images/ligo.svg"
 			},
 			{
 				"command": "taqueria.compile_archetype",
 				"category": "Taqueria",
 				"title": "Compile (Archetype)",
 				"shortTitle": "compile --plugin archetype",
-				"enablement": "@taqueria/plugin-archetype"
+				"enablement": "@taqueria/plugin-archetype",
+				"icon": "images/archetype.svg"
 			},
 			{
 				"command": "taqueria.start_sandbox",
 				"category": "Taqueria",
 				"title": "Start Sandbox",
 				"shortTitle": "start sandbox <name>",
-				"enablement": "@taqueria/plugin-flextesa"
+				"enablement": "@taqueria/plugin-flextesa",
+				"icon": "$(debug-start)"
 			},
 			{
 				"command": "taqueria.stop_sandbox",
 				"category": "Taqueria",
 				"title": "Stop Sandbox",
 				"shortTitle": "stop sandbox <name>",
-				"enablement": "@taqueria/plugin-flextesa"
+				"enablement": "@taqueria/plugin-flextesa",
+				"icon": "$(debug-stop)"
 			},
 			{
 				"command": "taqueria.list_accounts",
 				"category": "Taqueria",
 				"title": "List Sandbox Accounts",
 				"shortTitle": "list accounts <name>",
-				"enablement": "@taqueria/plugin-flextesa"
+				"enablement": "@taqueria/plugin-flextesa",
+				"icon": "$(list-unordered)"
 			},
 			{
 				"command": "taqueria.originate",
 				"category": "Taqueria",
 				"title": "Originate contracts",
 				"shortTitle": "originate",
-				"enablement": "@taqueria/plugin-taquito"
+				"enablement": "@taqueria/plugin-taquito",
+				"icon": "$(cloud-upload)"
 			},
 			{
 				"command": "taqueria.opt_in",
@@ -182,7 +238,8 @@
 				"category": "Taqueria",
 				"title": "Typecheck Michelson contracts",
 				"shortTitle": "typecheck",
-				"enablement": "@taqueria/plugin-tezos-client"
+				"enablement": "@taqueria/plugin-tezos-client",
+				"icon": "$(check)"
 			},
 			{
 				"command": "taqueria.test",
@@ -191,7 +248,61 @@
 				"shortTitle": "test",
 				"enablement": "@taqueria/plugin-jest"
 			}
-		]
+		],
+		"menus": {
+			"view/item/context": [
+				{
+					"command": "taqueria.install",
+					"when": "view == taqueria-plugins && viewItem == notInstalled",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.uninstall",
+					"when": "view == taqueria-plugins && viewItem == installed",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.start_sandbox",
+					"when": "view == taqueria-sandboxes && viewItem != running",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.stop_sandbox",
+					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.list_accounts",
+					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.compile_smartpy",
+					"when": "view == taqueria-contracts && viewItem == smartpy",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.compile_ligo",
+					"when": "view == taqueria-contracts && viewItem == ligo",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.compile_archetype",
+					"when": "view == taqueria-contracts && viewItem == archetype",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.originate",
+					"when": "view == taqueria-environments || view == taqueria-contracts",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.typecheck",
+					"when": "view == taqueria-sandboxes && view != stopped",
+					"group": "inline"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -217,12 +328,12 @@
 		"fs-extra": "^10.1.0",
 		"glob": "^7.2.0",
 		"mocha": "^9.2.1",
-		"parcel": "^2.6.0",
+		"parcel": "2.6.1",
 		"typescript": "4.7.2",
 		"vsce": "^2.6.4"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.6.2",
+		"@taqueria/protocol": "^0.10.0",
 		"comment-json": "^4.1.1",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1"

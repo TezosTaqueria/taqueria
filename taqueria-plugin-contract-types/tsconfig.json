@@ -9,5 +9,8 @@
 		"strict": true,
 		"skipLibCheck": true,
 		"outDir": "lib"
-	}
+	},
+	"exclude": [
+		"example"
+	]
 }

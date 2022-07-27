@@ -14,7 +14,6 @@ Commands:
   taq list-contracts                  List registered contracts
   taq generate types [typescriptDir]  Generate types for a contract to be used w
                                       ith taquito       [aliases: gen, gentypes]
-  taq create <template>               Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]

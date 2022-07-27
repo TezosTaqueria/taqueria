@@ -14,7 +14,9 @@ const { schemas: generatedSchemas, factory } = createType<RawInput, RawInput>({
 	unknownErrMsg: 'Something went wrong trying to parse the human readable identifier',
 });
 
-export type HumanReadableIdentifier = z.infer<typeof generatedSchemas.schema>;
+export const internalSchema = generatedSchemas.schema;
+
+export type HumanReadableIdentifier = z.infer<typeof internalSchema>;
 export type t = HumanReadableIdentifier;
 export const { create, of, make } = factory;
 

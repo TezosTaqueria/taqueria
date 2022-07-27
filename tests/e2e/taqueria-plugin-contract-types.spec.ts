@@ -80,7 +80,7 @@ describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 		await exec(`taq add-contract increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
-	test('Verify that taqueria contract types plugin can compile one contract and generate types', async () => {
+	test.skip('Verify that taqueria contract types plugin can compile one contract and generate types', async () => {
 		const pwdPromise = await exec(`pwd`);
 		const pwd = pwdPromise.stdout.trim();
 
@@ -110,7 +110,7 @@ describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 		expect(typesContents.stdout).toContain('type-utils.ts');
 	});
 
-	test('Verify that taqueria contract types plugin allows for different types folder specification', async () => {
+	test.skip('Verify that taqueria contract types plugin allows for different types folder specification', async () => {
 		const pwdPromise = await exec(`pwd`);
 		const pwd = pwdPromise.stdout.trim();
 		const folderName = 'otherFolder';
@@ -134,7 +134,7 @@ describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 		expect(typesContents.stdout).toContain('type-utils.ts');
 	});
 
-	test('Verify that taqueria contract types plugin can compile multiple contracts and generate types', async () => {
+	test.skip('Verify that taqueria contract types plugin can compile multiple contracts and generate types', async () => {
 		const pwdPromise = await exec(`pwd`);
 		const pwd = pwdPromise.stdout.trim();
 

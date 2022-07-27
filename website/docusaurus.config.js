@@ -179,7 +179,7 @@ const config = {
             items: [
               {
                 label: "Quick Start",
-                to: "/docs/getting-started/installation"
+                to: "/docs/getting-started/quickstart"
               },
               {
                 label: "Roadmap",

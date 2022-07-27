@@ -13,7 +13,8 @@
 			],
 			"preLaunchTask": "build-and-watch-vscode",
 			"env": {
-				"LogLevel": "warn"
+				"LogLevel": "warn",
+				"InstallDevPlugins": "false"
 			}
 		},
 		{
@@ -21,7 +22,7 @@
 			"name": "Launch CLI",
 			"type": "pwa-node",
 			"program": "${workspaceFolder}/index.ts",
-			"cwd": "/Users/jimmychenchen/Desktop/bugbug",
+			"cwd": "${workspaceFolder}", // If you want to run taq from a different location, set the address in this line
 			"runtimeExecutable": "deno",
 			"runtimeArgs": [
 				"run",
