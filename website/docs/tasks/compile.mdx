@@ -4,12 +4,11 @@ title: `compile`
 
 ## Overview
 
-Taq `compile` will c
+Taq `compile` is used to compile smart contracts to Michelson. It is implemeted by compiler plugins and can be used to compile one or more contracts in one or more languages / dialects
 
 :::note
-Contracts created from [Templates](/docs/features/templates) (`taq create contract example.mligo`) will automatically be added to the registry and this task will not be necessary
+Contracts must be added to the [Contract Registry](/docs/tasks/add-contract) (`taq add-contract example.mligo`) in order to be compiled
 :::
-
 
 ### Command
 
@@ -39,6 +38,9 @@ taq add-contract <path>
 | PascaLigo        | `.pligo`   |     
 | ReasonLigo       | `.rligo`   |
 
+### Multi-File Contracts
+
+When developing multi-file LIGO contracts, you only need to add the file that contains the `main` entrypoint for each multi-file smart contract. The other files will be automatically included during compilation
 
 ## Using in a Taqueria Workflow
 
