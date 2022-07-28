@@ -6,6 +6,11 @@ title: `init`
 
 Taq `install` is a core CLI task used to install [Taqueria plugins](/docs/plugins/plugin-basics)
 
+The install task does two things:
+
+1. It installs the plugin specified from NPM by addidng the package and dependencies to `node_modules` and `package.json`
+2. It adds the plugin to the Taqueria `config.json` file
+
 ## Plugin Implementations
 
 This task can be used to install the following plugins:
@@ -32,7 +37,7 @@ taq install <pluginName>
 
 | Task Name        | Command                             | Type                      | Description                                                  | 
 | ---------------- | ----------------------------------- | ------------------------- | ------------------------------------------------------------ |
-| `install`        | `taq generate types [pluginName]`   | Core CLI                  | Creates a Taqueria project (taq`ifies a directory)           |
+| `install`        | `taq install <pluginName>`          | Core CLI                  | Installs the given plugin                                    |
 
 ### Command-Line Arguments
 
