@@ -665,7 +665,7 @@ export class VsCodeHelper {
 			);
 			return;
 		}
-		this.vscode.window.withProgress({
+		await this.vscode.window.withProgress({
 			location: this.vscode.ProgressLocation.Notification,
 			cancellable: false,
 			title: `Taqueria is ${taskTitles.progressTitle}`,
