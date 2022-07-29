@@ -1,5 +1,5 @@
 ---
-title: `scaffold`
+title: scaffold
 ---
 
 ## Overview

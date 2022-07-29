@@ -1,5 +1,5 @@
 ---
-title: `simulate`
+title: simulate
 ---
 
 ## Overview

@@ -1,5 +1,5 @@
 ---
-title: `stop sandbox`
+title: stop sandbox
 ---
 
 ## Overview

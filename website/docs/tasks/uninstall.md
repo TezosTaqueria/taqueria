@@ -1,5 +1,5 @@
- ---
-title: `init`
+---
+ title: uninstall
 ---
 
 ## Overview

@@ -1,5 +1,5 @@
 ---
-title: `add-contract`
+title: add-contract
 ---
 
 ## Overview
@@ -10,6 +10,9 @@ Taq `add-contract` adds a smart contract file to the contract registry. This is 
 Contracts created from [Templates](/docs/features/templates) (`taq create contract example.mligo`) will automatically be added to the registry and this task will not be necessary
 :::
 
+## Plugin Implementations
+
+This task is part of the core CLI and is not implemented in any of the plugins
 
 ### Command
 
@@ -19,9 +22,9 @@ taq add-contract <path>
 
 ### Task Details
 
-| Task Name      | Command                       | Type           | Description                     | 
+| Task Name      | Command                       | Type           | Description                     |
 | -------------- | ----------------------------- | -------------- | ------------------------------- |
-| `add-contract` | `taq add-contract <path> `    | Taqueria Core  | Adds a contract to the registry |
+| `add-contract` | `taq add-contract <path>`     | Taqueria Core  | Adds a contract to the registry |
 
 ### Command-Line Arguments
 
@@ -33,12 +36,13 @@ taq add-contract <path>
 
 | Type             | Extension  |
 | ---------------- | ---------- |
-| Michelson        | `.tz`      |
-| JsLigo           | `jsligo`   |
+| Archetype        | `.arl`     |
 | CameLigo         | `.mligo`   |
-| PascaLigo        | `.pligo`   |     
+| JsLigo           | `jsligo`   |
+| Michelson        | `.tz`      |
+| PascaLigo        | `.pligo`   |
 | ReasonLigo       | `.rligo`   |
-
+| SmartPy          | `.py`      |
 
 ## Using in a Taqueria Workflow
 
@@ -76,8 +80,3 @@ The `add-contract` task is used when importing an existing smart contract to you
 7. Deploy dApp
 8. Test
 
-
-
-## Plugin Implementations
-
-This task is part of the core CLI and is not implemented in any of the plugins

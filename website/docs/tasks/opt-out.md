@@ -1,5 +1,5 @@
 ---
-title: `opt-out`
+title: opt-out
 ---
 
 ## Overview

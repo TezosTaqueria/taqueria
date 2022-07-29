@@ -109,7 +109,6 @@ const sidebars = {
         "scaffolds/scaffold-basics",
         "scaffolds/taco-shop",
         "scaffolds/quickstart",
-        "scaffolds/nft-scaffold",
       ],
     },    
     {

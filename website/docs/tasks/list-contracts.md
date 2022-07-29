@@ -1,5 +1,5 @@
 ---
-title: `list-contracts`
+title: list-contracts
 ---
 
 ## Overview
@@ -16,7 +16,7 @@ Contracts can be registered in one of two ways:
 :::
 
 ## Plugin Implementations
-                     |
+
 This task is implemented by the following plugins:
 
 | Plugin Name                            | Description                             |
@@ -40,4 +40,3 @@ taq list-contracts
 | Description                               | Command                               | Behaviour                                                                     |
 | ----------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------------- |
 | List the contracts registered on the project | `taq list-contracts`               | Lists all known contracts that have been registered                           |
-

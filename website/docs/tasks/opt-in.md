@@ -1,5 +1,5 @@
 ---
-title: `opt-in`
+title: opt-in
 ---
 
 ## Overview

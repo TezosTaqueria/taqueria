@@ -1,5 +1,5 @@
 ---
-title: `remove-contract`
+title: remove-contract
 ---
 
 ## Overview

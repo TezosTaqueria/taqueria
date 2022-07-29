@@ -1,5 +1,5 @@
 ---
-title: `list accounts`
+title: list accounts
 ---
 
 ## Overview

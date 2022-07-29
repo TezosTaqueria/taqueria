@@ -1,5 +1,5 @@
 ---
-title: `typecheck`
+title: typecheck
 ---
 
 ## Overview
