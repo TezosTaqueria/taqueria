@@ -19,7 +19,7 @@ type Config = Opts['config'];
 
 const createContractMetadata = async (
 	contractName: undefined | string,
-	config: Config & { configFile: string; metadata?: Partial<ProjectMetadata> },
+	config: Config,
 ): Promise<PluginResponse> => {
 	const contracts = Object.keys(config.contracts ?? {}).map(x => path.basename(x, path.extname(x)));
 
@@ -167,9 +167,9 @@ type ProjectMetadata = {
 	homepage: string;
 };
 const createProjectMetadata = async (
-	config: Config & { configFile: string; metadata?: Partial<ProjectMetadata> },
+	config: Config,
 ): Promise<PluginResponse> => {
-	const defaultValues: Partial<ProjectMetadata> = config.metadata ?? {};
+	const defaultValues = config.metadata;
 
 	// Common fields from Tzip-16
 	const response = await prompts([
