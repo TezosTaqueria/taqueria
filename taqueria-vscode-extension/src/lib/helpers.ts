@@ -3,6 +3,7 @@ import { TaqError } from '@taqueria/protocol/TaqError';
 import { spawn } from 'child_process';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
+import os from 'os';
 import path, { join } from 'path';
 import * as api from 'vscode';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
@@ -11,6 +12,7 @@ import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
 import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvider';
+import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
 import { TaqVsxError } from './TaqVsxError';
 
@@ -37,6 +39,16 @@ export enum OutputLevels {
 }
 
 export type OutputFunction = (currentLogLevel: OutputLevels, log: string) => void;
+
+enum AnalyticsOptionState {
+	fileNotExists,
+	fileIsUnreadable,
+	fileIsCorrupt,
+	optionNotExists,
+	optionSetToInvalidValue,
+	optedIn,
+	optedOut,
+}
 
 const outputLevelsOrder = [
 	OutputLevels.trace,
@@ -653,7 +665,7 @@ export class VsCodeHelper {
 			);
 			return;
 		}
-		this.vscode.window.withProgress({
+		await this.vscode.window.withProgress({
 			location: this.vscode.ProgressLocation.Notification,
 			cancellable: false,
 			title: `Taqueria is ${taskTitles.progressTitle}`,
@@ -706,6 +718,26 @@ export class VsCodeHelper {
 		}
 	}
 
+	exposeTaqTaskAsCommandWithFileArgument(
+		cmdId: string,
+		taskWithArgs: string,
+		outputTo: 'output' | 'notify',
+		taskTitles: TaskTitles,
+		projectDir?: Util.PathToDir,
+	) {
+		this.registerCommand(
+			cmdId,
+			async (item: HasFileName) => {
+				await this.proxyToTaqAndShowOutput(
+					`${taskWithArgs} ${item.fileName}`,
+					taskTitles,
+					projectDir,
+					outputTo === 'output',
+				);
+			},
+		);
+	}
+
 	exposeTaqTaskAsCommandWithOptionalFileArgument(
 		cmdId: string,
 		taskWithArgs: string,
@@ -716,11 +748,12 @@ export class VsCodeHelper {
 		this.registerCommand(
 			cmdId,
 			async (item?: HasFileName | undefined) => {
-				const pathToTaq = await this.getTaqBinPath();
-				if (item) {
-					taskWithArgs = `${taskWithArgs} ${item.fileName}`;
-				}
-				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitles, projectDir, outputTo === 'output');
+				await this.proxyToTaqAndShowOutput(
+					item ? `${taskWithArgs} ${item.fileName}` : taskWithArgs,
+					taskTitles,
+					projectDir,
+					outputTo === 'output',
+				);
 			},
 		);
 	}
@@ -736,6 +769,52 @@ export class VsCodeHelper {
 			cmdId,
 			async () => {
 				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitles, projectDir, outputTo === 'output');
+			},
+		);
+	}
+
+	exposeTestSetupCommand(projectDir: Util.PathToDir) {
+		this.registerCommand(
+			COMMAND_PREFIX + 'create_test_folder',
+			async () => {
+				const folders = await this.vscode.window.showOpenDialog({
+					canSelectFiles: false,
+					canSelectFolders: true,
+					canSelectMany: false,
+					openLabel: 'Select',
+					title: 'Select a Folder to setup as test',
+				});
+				if (!folders || folders.length !== 1) {
+					return;
+				}
+				const folder = folders[0].path.replace(projectDir + '/', '');
+				await this.proxyToTaqAndShowOutput(
+					`test --init ${folder}`,
+					{
+						finishedTitle: `Setup folder ${folder} as test`,
+						progressTitle: `Setting up folder ${folder} as test`,
+					},
+					projectDir,
+					false,
+				);
+			},
+		);
+	}
+
+	exposeRunTestCommand(projectDir: Util.PathToDir) {
+		this.registerCommand(
+			COMMAND_PREFIX + 'run_tests',
+			async (item: TestTreeItem) => {
+				const folder = item.relativePath;
+				await this.proxyToTaqAndShowOutput(
+					`test ${folder}`,
+					{
+						finishedTitle: `Run tests from ${folder}`,
+						progressTitle: `Running tests from ${folder}`,
+					},
+					projectDir,
+					false,
+				);
 			},
 		);
 	}
@@ -876,6 +955,7 @@ export class VsCodeHelper {
 
 				const contractsFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts'));
 				const contractsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts/*'));
+				const testsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '**/jest.config.js'));
 
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
 				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates(projectDir));
@@ -897,7 +977,11 @@ export class VsCodeHelper {
 				contractsWatcher.onDidCreate(_ => this.contractsDataProvider?.refresh());
 				contractsWatcher.onDidDelete(_ => this.contractsDataProvider?.refresh());
 
-				return [folderWatcher, configWatcher, stateWatcher, contractsFolderWatcher, contractsWatcher];
+				testsWatcher.onDidChange(_ => this.testDataProvider?.refresh());
+				testsWatcher.onDidCreate(_ => this.testDataProvider?.refresh());
+				testsWatcher.onDidDelete(_ => this.testDataProvider?.refresh());
+
+				return [folderWatcher, configWatcher, stateWatcher, contractsFolderWatcher, contractsWatcher, testsWatcher];
 			} catch (error: unknown) {
 				throw {
 					kind: 'E_UnknownError',
@@ -912,6 +996,7 @@ export class VsCodeHelper {
 	private dataProviders: { refresh: () => void }[] = [];
 	private contractsDataProvider?: ContractsDataProvider;
 	private sandboxesDataProvider?: SandboxesDataProvider;
+	private testDataProvider?: TestDataProvider;
 
 	registerDataProviders(workspaceFolder: string) {
 		this.registerDataProvider('taqueria-plugins', new PluginsDataProvider(workspaceFolder, this));
@@ -920,6 +1005,7 @@ export class VsCodeHelper {
 			new SandboxesDataProvider(workspaceFolder, this),
 		);
 		this.registerDataProvider('taqueria-environments', new EnvironmentsDataProvider(workspaceFolder, this));
+		this.testDataProvider = this.registerDataProvider('taqueria-tests', new TestDataProvider(workspaceFolder, this));
 		this.contractsDataProvider = this.registerDataProvider(
 			'taqueria-contracts',
 			new ContractsDataProvider(workspaceFolder, this),
@@ -950,5 +1036,114 @@ export class VsCodeHelper {
 		child.stdout.on('data', _data => {
 			this.sandboxesDataProvider?.refresh();
 		});
+	}
+
+	async watchGlobalSettings() {
+		const settingsFilePath = this.getSettingsFilePath();
+		const folderWatcher = this.vscode.workspace.createFileSystemWatcher(settingsFilePath);
+		folderWatcher.onDidChange(async () => await this.handleAnalyticsOption());
+		folderWatcher.onDidCreate(async () => await this.handleAnalyticsOption());
+		folderWatcher.onDidDelete(async () => await this.handleAnalyticsOption());
+		await this.handleAnalyticsOption();
+	}
+
+	private getSettingsFilePath() {
+		const homeDir = os.homedir();
+		const settingsFilePath = path.join(homeDir, '.taq-settings', 'taq-settings.json');
+		return settingsFilePath;
+	}
+
+	private isHandlingAnalyticsConsent = false;
+
+	async handleAnalyticsOption(): Promise<true> {
+		if (this.isHandlingAnalyticsConsent) {
+			return true;
+		}
+		this.isHandlingAnalyticsConsent = true;
+		try {
+			const analyticsOptionState = await this.getAnalyticsOptionState();
+			switch (analyticsOptionState) {
+				case AnalyticsOptionState.fileIsCorrupt:
+				case AnalyticsOptionState.fileIsUnreadable:
+				case AnalyticsOptionState.optedIn:
+				case AnalyticsOptionState.optedOut:
+				case AnalyticsOptionState.optionSetToInvalidValue:
+					this.isHandlingAnalyticsConsent = false;
+					return true;
+				case AnalyticsOptionState.optionNotExists:
+				case AnalyticsOptionState.fileNotExists: {
+					const optIn = { title: `Yes, I'm in`, isCloseAffordance: false };
+					const optOut = { title: `No, I'm not interested`, isCloseAffordance: true };
+					const chosenOption = await this.vscode.window.showInformationMessage<api.MessageItem>(
+						'Do you want to help improve Taqueria by sharing anonymous usage statistics in accordance with the privacy policy?',
+						{
+							detail:
+								`The information will only include anonymous statistics of Taqueria's features, not personally identifiable information is sent to Taqueria team`,
+							modal: true,
+						},
+						optIn,
+						optOut,
+					);
+					if (chosenOption === optIn) {
+						await this.proxyToTaqAndShowOutput(
+							'opt-in',
+							{
+								finishedTitle: `opted in to analytics`,
+								progressTitle: `opting in to analytics`,
+							},
+							undefined,
+							true,
+						);
+					} else {
+						await this.proxyToTaqAndShowOutput(
+							'opt-out',
+							{
+								finishedTitle: `opted out from analytics`,
+								progressTitle: `opting out from analytics`,
+							},
+							undefined,
+							true,
+						);
+					}
+					this.isHandlingAnalyticsConsent = false;
+					return true;
+				}
+			}
+		} catch (e: unknown) {
+			this.logAllNestedErrors(e, true);
+			this.isHandlingAnalyticsConsent = false;
+			return true;
+		}
+	}
+
+	async getAnalyticsOptionState() {
+		const settingsFilePath = this.getSettingsFilePath();
+		try {
+			await stat(settingsFilePath);
+		} catch {
+			return AnalyticsOptionState.fileNotExists;
+		}
+		let text: string;
+		try {
+			text = await readFile(settingsFilePath, 'utf-8');
+		} catch {
+			return AnalyticsOptionState.fileIsUnreadable;
+		}
+		try {
+			const settings = JSON.parse(text);
+			if (!Object.hasOwn(settings, 'consent')) {
+				return AnalyticsOptionState.optionNotExists;
+			}
+			const value = settings['consent'];
+			if (value === 'opt_in') {
+				return AnalyticsOptionState.optedIn;
+			}
+			if (value === 'opt_out') {
+				return AnalyticsOptionState.optedOut;
+			}
+			return AnalyticsOptionState.optionSetToInvalidValue;
+		} catch {
+			return AnalyticsOptionState.fileIsCorrupt;
+		}
 	}
 }

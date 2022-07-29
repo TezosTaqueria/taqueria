@@ -61,6 +61,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 			progressTitle: `opting out of analytics`,
 		},
 	);
+	// await helper.watchGlobalSettings();
 
 	const folders = helper.getFolders();
 	if (folders.length === 1) {
@@ -97,6 +98,27 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 					},
 					projectDir,
 				);
+				helper.exposeTaqTaskAsCommandWithFileArgument(
+					COMMAND_PREFIX + 'add_contract',
+					'add-contract',
+					'output',
+					{
+						finishedTitle: `added contract to registry`,
+						progressTitle: `adding contract to registry`,
+					},
+					projectDir,
+				);
+				helper.exposeTaqTaskAsCommandWithFileArgument(
+					COMMAND_PREFIX + 'rm_contract',
+					'rm-contract',
+					'output',
+					{
+						finishedTitle: `removed contract from registry`,
+						progressTitle: `removing contract from registry`,
+					},
+					projectDir,
+				);
+
 				helper.exposeTaqTaskAsCommand(
 					COMMAND_PREFIX + 'generate_types',
 					'generate types',
@@ -108,16 +130,8 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 					projectDir,
 				);
 				helper.exposeTypecheckCommand();
-				helper.exposeTaqTaskAsCommand(
-					COMMAND_PREFIX + 'test',
-					'test',
-					'output',
-					{
-						finishedTitle: `setup tests`,
-						progressTitle: `setting up tests`,
-					},
-					projectDir,
-				);
+				helper.exposeTestSetupCommand(projectDir);
+				helper.exposeRunTestCommand(projectDir);
 
 				// Sandbox tasks
 				helper.exposeSandboxTaskAsCommand(

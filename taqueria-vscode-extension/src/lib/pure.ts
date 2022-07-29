@@ -26,12 +26,10 @@ export type Json<T> = T;
 export class TaqifiedDir {
 	readonly dir: PathToDir;
 	readonly config: Config.t;
-	readonly state: EphemeralState;
 
-	protected constructor(dir: PathToDir, config: Config.t, state: EphemeralState) {
+	protected constructor(dir: PathToDir, config: Config.t) {
 		this.dir = dir;
 		this.config = config;
-		this.state = state;
 	}
 
 	/**
@@ -54,20 +52,7 @@ export class TaqifiedDir {
 							previous,
 						})
 					)
-					.then(config =>
-						makeFile(join(dotTaqDir, 'state.json'), i18n)
-							// TODO - validate state!
-							.then(pathToState => readJsonFile<EphemeralState>(i18n, data => (data as EphemeralState))(pathToState))
-							.then(state => new TaqifiedDir(dir, config, state))
-							.catch(previous =>
-								Promise.reject({
-									code: 'E_STATE_MISSING',
-									msg: 'The provided directory is taqified but missing a state file in .taq',
-									taqifiedDir: dir,
-									previous,
-								})
-							)
-					)
+					.then(config => new TaqifiedDir(dir, config))
 			)
 			.catch(previous =>
 				Promise.reject({
