@@ -1042,14 +1042,10 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 						)
 					),
 					forkCatch(async (error: Error | TaqError.t) => {
-						if (error instanceof Error || error.kind !== 'E_REQUEST_CONSENT_PROMPT_FROM_VSCODE') {
-							await eager(sendEvent(inputArgs.join(), getVersion(inputArgs), true));
-						}
+						await eager(sendEvent(inputArgs.join(), getVersion(inputArgs), true));
 						displayError(cliConfig)(error);
 					})(async (error: Error | TaqError.t) => {
-						if (error instanceof Error || error.kind !== 'E_REQUEST_CONSENT_PROMPT_FROM_VSCODE') {
-							await eager(sendEvent(inputArgs.join(), getVersion(inputArgs), true));
-						}
+						await eager(sendEvent(inputArgs.join(), getVersion(inputArgs), true));
 						displayError(cliConfig)(error);
 					})(identity),
 				),
@@ -1117,7 +1113,6 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_EXEC' }, err => [19, false])
-				.with({ kind: 'E_REQUEST_CONSENT_PROMPT_FROM_VSCODE' }, err => [20, err.msg])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 

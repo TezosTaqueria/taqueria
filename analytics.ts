@@ -84,13 +84,10 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 		|| inputArgs.includes('testFromVsCode');
 
 	const promptForConsent = (): Future<TaqError.t, string> => {
-		if (isNonTrackingRun() || inputArgs.includes('opt-in') || inputArgs.includes('opt-out')) {
+		if (
+			isNonTrackingRun() || inputArgs.includes('opt-in') || inputArgs.includes('opt-out') || getTaqUI() === 'VSCode'
+		) {
 			return taqResolve('');
-		} else if (getTaqUI() === 'VSCode') {
-			return reject({
-				kind: 'E_REQUEST_CONSENT_PROMPT_FROM_VSCODE',
-				msg: 'Request consent prompt from VSCode',
-			});
 		}
 		const input = prompt(consentPrompt);
 		return didUserChooseYes(input) ? optInAnalytics() : optOutAnalytics();
