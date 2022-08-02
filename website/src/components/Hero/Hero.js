@@ -5,7 +5,7 @@ import styles from "./Hero.module.css";
 
 const FeatureList = [
 	{
-		title: "A New Way to Build on Tezos",
+		title: "A Better Way to Build on Tezos",
 		Svg: require("../../../static/img/heroSVG.svg").default,
 		SvgTraiangle1: require("../../../static/img/triangle1.svg").default,
 		SvgTraiangle2: require("../../../static/img/triangle2.svg").default,

@@ -19,7 +19,7 @@ To successfully use Taqueria, you must ensure that:
 
 ## Starting a Taqueria Project
 
-To start using Taqueria on a project, the project directory must be initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts`, `/artifacts`, and `/tests` have been created 
+To start using Taqueria on a project, the project directory must be initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts` and `/artifacts` have been created 
 
 Taqueria provides the command `init` which will create a new directory with the correct structure and configuration. To create a new Taqueria project called `my-first-project`, run the command:
 ```shell
@@ -33,9 +33,21 @@ If a project has already been initialized, Taqueria will not re-initialize the p
 
 Now that the project has been properly initialized, plugins can be installed to provide support for specific functionality such as compilation, smart contract origination, or sandbox environments
 
-Plugins are installed using the `taq install [pluginName]` command (requires the project to be initialized). Once a plugin has been installed, it's tasks will become available in Taqueria
+Plugins are installed using the `taq install` command which appears in the command list once a project is initialized. You can view the list of commands available in the current project contexts by running `taq --help` from the CLI:
+```shell
+❯ taq --help
+taq <command>
 
-You can view the list of commands available in the current project context by running `taq` from the command line
+Commands:
+  taq init [projectDir]           Initialize a new project
+  taq opt-in                      Opt-in to sharing anonymous usage analytics
+  taq opt-out                     Opt-out of sharing anonymous usage analytics
+  taq install <pluginName>        Install a plugin
+  taq uninstall <pluginName>      Uninstall a plugin
+  taq add-contract <sourceFile>   Add a contract to the contract registry
+  taq rm-contract <contractName>  Remove a contract from the contract registry
+  taq list-contracts              List registered contracts
+```
 
 ### Available Plugins
 
@@ -43,47 +55,76 @@ You can view the list of commands available in the current project context by ru
 |----------------|------------------------------     |---------------------------------------------------------------------|
 | LIGO           | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language                     |
 | SmartPy        | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy contract language                        |
-| Flextesa       | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa                       | 
+| Flextesa       | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa                       |
 | Taquito        | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate                       |
 | Contract Types | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code         |
 | Tezos Client   | `@taqueria/plugin-tezos-client`   | Interacts with a Tezos node, providing simulation and type checking |
 | Jest           | `@taqueria/plugin-jest`           | A Jest plugin for testing smart contracts                           |
+| IPFS Pinata    | `@taqueria/plugin-ipfs-pinata`    | Uploads files to IPFS via Pinata                                    |
 
-## Compiling a LIGO Smart Contract
+## Working with LIGO Smart Contracts
 
 To add support for the LIGO smart contract language, install the LIGO plugin by running:
 ```shell
 taq install @taqueria/plugin-ligo
 ```
+Once installed the plugin provides a template to easily create and register a boilerplate LIGO contract using the `taq create contract` task.
 
-Once installed, the plugin provides the command `taq compile` which when run, will look for any LIGO files in the `/contracts` directory and compile them to Michelson `.tz` files in the `/artifacts` directory
+If you already have contracts written and want to compile them you will just need to register them with the `taq add-contract <sourceFile>` task.
 
-To demonstrate this, create a file called `counter.jsligo` in the `/contracts` directory and insert the following JSLigo code:
+Finally the plugin provides the task `taq compile` which will look for any registered LIGO contracts in the `/contracts` directory and compile them to Michelson `.tz` files in the `/artifacts` directory.
+
+To demonstrate this, create and register a new LIGO contract called `counter.jsligo` by running:
+
+```shell
+taq create contract counter.jsligo
+```
+
+This will create a new LIGO file called `counter.jsligo`, populate it with a boilerplate contract and register it with Taqueria
+
+You can see that the contract has been registered by running:
+
+```shell
+taq list-contracts
+```
+Taqueria will output that a contract has been registered:
+```shell
+┌────────────────┬────────────────┬─────────────────┐
+│ Name           │ Source File    │ Last Known Hash │
+├────────────────┼────────────────┼─────────────────┤
+│ counter.jsligo │ counter.jsligo │ 5737454d        │
+└────────────────┴────────────────┴─────────────────┘
+```
+
+Open the created file `counter.jsligo` in the `/contracts` directory
+
+You should see the following:
+
 ```ligo title="/contracts/counter.jsligo"
 type storage = int;
 
 type parameter =
-| ["Increment", int]
+  ["Increment", int]
 | ["Decrement", int]
 | ["Reset"];
 
-type return_ = [list <operation>, storage];
+type ret = [list<operation>, storage];
 
-/* Two entrypoints */
-let add = ([store, delta] : [storage, int]) : storage => store + delta;
-let sub = ([store, delta] : [storage, int]) : storage => store - delta;
+// Two entrypoints
+
+const add = ([store, delta] : [storage, int]) : storage => store + delta;
+const sub = ([store, delta] : [storage, int]) : storage => store - delta;
 
 /* Main access point that dispatches to the entrypoints according to
    the smart contract parameter. */
-let main = ([action, store] : [parameter, storage]) : return_ => {
- return [
-   (list([]) as list <operation>),    // No operations
-   (match (action, {
-    Increment: (n: int) => add ([store, n]),
-    Decrement: (n: int) => sub ([store, n]),
-    Reset:     ()  => 0}))
-  ]
-}
+
+const main = ([action, store] : [parameter, storage]) : ret => {
+ return [list([]) as list<operation>,    // No operations
+ match (action, {
+  Increment:(n: int) => add ([store, n]),
+  Decrement:(n: int) => sub ([store, n]),
+  Reset    :()  => 0})]
+};
 ```
 
 You can now compile this contract by running the following command from the project directory:

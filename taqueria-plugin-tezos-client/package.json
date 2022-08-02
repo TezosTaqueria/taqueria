@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-tezos-client",
-	"version": "0.8.1",
+	"version": "0.10.0",
 	"description": "A taqueria plugin for utilizing tezos-client",
 	"targets": {
 		"default": {
@@ -41,7 +41,7 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.8.1",
+		"@taqueria/node-sdk": "^0.10.0",
 		"fast-glob": "^3.2.7"
 	},
 	"devDependencies": {

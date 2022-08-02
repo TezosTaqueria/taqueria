@@ -4,7 +4,8 @@ import { i18n } from '@taqueria/protocol/i18n';
 import { exec, ExecException } from 'child_process';
 import { parse } from 'comment-json';
 import { readFile, stat } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
+import { reject } from 'rambda';
 import { Output, OutputFunction, OutputLevels } from './helpers';
 import { TaqVsxError } from './TaqVsxError';
 
@@ -25,12 +26,10 @@ export type Json<T> = T;
 export class TaqifiedDir {
 	readonly dir: PathToDir;
 	readonly config: Config.t;
-	readonly state: EphemeralState;
 
-	protected constructor(dir: PathToDir, config: Config.t, state: EphemeralState) {
+	protected constructor(dir: PathToDir, config: Config.t) {
 		this.dir = dir;
 		this.config = config;
-		this.state = state;
 	}
 
 	/**
@@ -53,20 +52,7 @@ export class TaqifiedDir {
 							previous,
 						})
 					)
-					.then(config =>
-						makeFile(join(dotTaqDir, 'state.json'), i18n)
-							// TODO - validate state!
-							.then(pathToState => readJsonFile<EphemeralState>(i18n, data => (data as EphemeralState))(pathToState))
-							.then(state => new TaqifiedDir(dir, config, state))
-							.catch(previous =>
-								Promise.reject({
-									code: 'E_STATE_MISSING',
-									msg: 'The provided directory is taqified but missing a state file in .taq',
-									taqifiedDir: dir,
-									previous,
-								})
-							)
-					)
+					.then(config => new TaqifiedDir(dir, config))
 			)
 			.catch(previous =>
 				Promise.reject({
@@ -177,6 +163,14 @@ export const makePathToTaq = (i18n: i18n, showOutput: OutputFunction) =>
 					previous,
 				})
 			);
+
+export const getRunningContainerNames = (): LikeAPromise<string[], TaqVsxError> =>
+	new Promise((resolve, reject) =>
+		exec(`docker ps --format '{{.Names}}'`, (_error, stdout, _stderr) => {
+			const containers = stdout.split('\n');
+			resolve(containers);
+		})
+	);
 
 export class TaqExecutionResult {
 	constructor(

@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
-import { OutputLevels, VsCodeHelper } from '../helpers';
+import { HasRefresh, OutputLevels, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
 
-export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeItem> {
+export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeItem>, HasRefresh {
 	constructor(
 		private workspaceRoot: string,
 		private helper: VsCodeHelper,

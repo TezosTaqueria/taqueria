@@ -31,7 +31,9 @@ export const toSHA256 = async (value: string) => {
 	return eager(factory.make(hashHex));
 };
 
-export type SHA256 = z.infer<typeof generatedSchemas.schema>;
+export const internalSchema = generatedSchemas.schema;
+
+export type SHA256 = z.infer<typeof internalSchema>;
 export type t = SHA256;
 export const { create, of, make } = factory;
 export const schemas = {
