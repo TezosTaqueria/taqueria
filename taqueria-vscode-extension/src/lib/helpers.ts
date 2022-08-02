@@ -12,9 +12,10 @@ import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
 import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvider';
+import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
-import { TaqVsxError } from './TaqVsxError';
+import { E_TaqVsxError, TaqVsxError } from './TaqVsxError';
 
 export const COMMAND_PREFIX = 'taqueria.';
 
@@ -105,6 +106,10 @@ export interface HasFileName {
 
 export interface HasRefresh {
 	refresh(): void;
+}
+
+function instanceOfHasRefresh(object: any): object is HasRefresh {
+	return 'refresh' in object;
 }
 
 export function mapAsync<T, U>(
@@ -209,22 +214,25 @@ export class VsCodeHelper {
 	}
 
 	exposeScaffoldTask() {
-		this.registerCommand(Commands.scaffold, async () => {
-			const availableScaffolds: { name: string; url: string }[] = await this.getAvailableScaffolds();
+		this.registerCommand(Commands.scaffold, async (scaffold?: ScaffoldTreeItem | undefined) => {
+			let scaffoldUrl = scaffold?.url;
+			if (!scaffoldUrl) {
+				const availableScaffolds: { name: string; url: string }[] = await this.getAvailableScaffolds();
+				const scaffoldName = await this.promptForScaffoldSelection(
+					this.i18,
+					api.debug.activeDebugSession,
+					availableScaffolds.map(template => template.name),
+				);
+				if (scaffold === null) {
+					return;
+				}
+				scaffoldUrl = availableScaffolds.find(template => template.name === scaffoldName)?.url;
+				if (scaffoldUrl === undefined) {
+					return;
+				}
+			}
 			const projectUri = await this.getFolderForInitOrScaffold('scaffold');
 			if (projectUri === undefined) {
-				return;
-			}
-			const scaffold = await this.promptForScaffoldSelection(
-				this.i18,
-				api.debug.activeDebugSession,
-				availableScaffolds.map(template => template.name),
-			);
-			if (scaffold === null) {
-				return;
-			}
-			const scaffoldUrl = availableScaffolds.find(template => template.name === scaffold)?.url;
-			if (scaffoldUrl === undefined) {
 				return;
 			}
 			const projectDir = await Util.makeDir(projectUri.path, this.i18);
@@ -239,6 +247,25 @@ export class VsCodeHelper {
 			);
 			await this.proxyToTaq(``, projectDir);
 			await this.updateCommandStates(projectDir);
+		});
+	}
+
+	getWorkspaceFolder(): api.Uri {
+		const workspaceFolder = this.vscode.workspace.workspaceFolders?.[0];
+		if (!workspaceFolder) {
+			throw {
+				kind: 'E_INVALID_DIR',
+				message: 'No workspace folder is opened.',
+			} as E_TaqVsxError;
+		}
+		return workspaceFolder.uri;
+	}
+
+	exposeRefreshCommand() {
+		this.registerCommand(COMMAND_PREFIX + 'refresh_command_states', async () => {
+			const workspaceFolder = this.getWorkspaceFolder();
+			const pathToDir = workspaceFolder.path as Util.PathToDir;
+			await this.updateCommandStates(pathToDir);
 		});
 	}
 
@@ -857,7 +884,10 @@ export class VsCodeHelper {
 			);
 			return;
 		}
-		this.dataProviders.forEach(dataProvider => dataProvider.refresh());
+		this.refreshDataProviders.forEach(dataProvider => dataProvider.refresh());
+
+		const isTaqReachable = await this.isTaqCliReachable();
+		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taq-cli-reachable', isTaqReachable);
 
 		this.showLog(OutputLevels.debug, 'Project config changed, updating command states...');
 		let taqFolderFound: boolean;
@@ -993,7 +1023,7 @@ export class VsCodeHelper {
 		});
 	}
 
-	private dataProviders: { refresh: () => void }[] = [];
+	private refreshDataProviders: { refresh: () => void }[] = [];
 	private contractsDataProvider?: ContractsDataProvider;
 	private sandboxesDataProvider?: SandboxesDataProvider;
 	private testDataProvider?: TestDataProvider;
@@ -1010,16 +1040,19 @@ export class VsCodeHelper {
 			'taqueria-contracts',
 			new ContractsDataProvider(workspaceFolder, this),
 		);
+		this.registerDataProvider('taqueria-scaffold', new ScaffoldsDataProvider(workspaceFolder, this));
 	}
 
-	private registerDataProvider<T extends api.TreeDataProvider<unknown> & HasRefresh>(
+	private registerDataProvider<T extends api.TreeDataProvider<unknown>>(
 		treeViewName: string,
 		dataProvider: T,
 	) {
 		this.vscode.window.createTreeView(treeViewName, {
 			treeDataProvider: dataProvider,
 		});
-		this.dataProviders.push(dataProvider);
+		if (instanceOfHasRefresh(dataProvider)) {
+			this.refreshDataProviders.push(dataProvider);
+		}
 		return dataProvider;
 	}
 
@@ -1144,6 +1177,16 @@ export class VsCodeHelper {
 			return AnalyticsOptionState.optionSetToInvalidValue;
 		} catch {
 			return AnalyticsOptionState.fileIsCorrupt;
+		}
+	}
+
+	async isTaqCliReachable() {
+		try {
+			const pathToTaq = await this.getTaqBinPath();
+			await Util.checkTaqBinary(pathToTaq, this.i18, this.getLog());
+			return true;
+		} catch {
+			return false;
 		}
 	}
 }

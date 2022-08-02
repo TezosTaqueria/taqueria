@@ -106,32 +106,65 @@
 		"views": {
 			"taqueria": [
 				{
+					"id": "taqueria-cli-check",
+					"name": "Checking CLI Reachability",
+					"contextualTitle": "Taqueria: Checking CLI Reachability",
+					"when": "!@taqueria-state/is-taq-cli-reachable"
+				},
+				{
+					"id": "taqueria-init",
+					"name": "Initialize a Project",
+					"contextualTitle": "Taqueria: Initialize a Project",
+					"when": "@taqueria-state/is-taq-cli-reachable && @taqueria-state/enable-init-scaffold"
+				},
+				{
+					"id": "taqueria-scaffold",
+					"name": "Scaffold a project",
+					"contextualTitle": "Taqueria: Scaffold a project",
+					"when": "@taqueria-state/is-taq-cli-reachable && @taqueria-state/enable-init-scaffold"
+				},
+				{
 					"id": "taqueria-plugins",
 					"name": "Plugins",
-					"contextualTitle": "Plugins"
+					"contextualTitle": "Taqueria: Plugins",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-contracts",
 					"name": "Contracts",
-					"contextualTitle": "Contracts"
+					"contextualTitle": "Taqueria: Contracts",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-sandboxes",
 					"name": "Sandboxes",
-					"contextualTitle": "Sandboxes"
+					"contextualTitle": "Taqueria: Sandboxes",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-environments",
 					"name": "Environments",
-					"contextualTitle": "Environments"
+					"contextualTitle": "Taqueria: Environments",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-tests",
 					"name": "Tests",
-					"contextualTitle": "Tests"
+					"contextualTitle": "Taqueria: Tests",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
 				}
 			]
 		},
+		"viewsWelcome": [
+			{
+				"view": "taqueria-cli-check",
+				"contents": "I'm unable to find your Taqueria cli (taq command).\nPlease follow instructions [here](https://taqueria.io/docs/getting-started/installation/) to install it, then click the button below:\n[Check again](command:taqueria.refresh_command_states)\nAlso, please make sure it is in your PATH.\nIf you change your PATH, you might need to restart VsCode to pick up the change."
+			},
+			{
+				"view": "taqueria-init",
+				"contents": "You can quickly create a project:\n[Initialize](command:taqueria.init)"
+			}
+		],
 		"commands": [
 			{
 				"command": "taqueria.init",
@@ -145,7 +178,14 @@
 				"category": "Taqueria",
 				"title": "Scaffold Project",
 				"shortTitle": "scaffold",
-				"enablement": "@taqueria-state/enable-init-scaffold"
+				"enablement": "@taqueria-state/enable-init-scaffold",
+				"icon": "$(unfold)"
+			},
+			{
+				"command": "taqueria.refresh_command_states",
+				"category": "Taqueria",
+				"title": "Refresh Command States",
+				"shortTitle": "refresh"
 			},
 			{
 				"command": "taqueria.install",
@@ -290,6 +330,10 @@
 				{
 					"command": "taqueria.run_tests",
 					"when": "false"
+				},
+				{
+					"command": "taqueria.refresh_command_states",
+					"when": "false"
 				}
 			],
 			"view/item/context": [
@@ -356,6 +400,11 @@
 				{
 					"command": "taqueria.run_tests",
 					"when": "view == taqueria-tests",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.scaffold",
+					"when": "view == taqueria-scaffold",
 					"group": "inline"
 				}
 			],

@@ -61,6 +61,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 			progressTitle: `opting out of analytics`,
 		},
 	);
+	helper.exposeRefreshCommand();
 	// await helper.watchGlobalSettings();
 
 	const folders = helper.getFolders();

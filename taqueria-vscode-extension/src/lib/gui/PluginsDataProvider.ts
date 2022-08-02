@@ -13,6 +13,10 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeIt
 	}
 
 	async getChildren(element?: PluginTreeItem): Promise<PluginTreeItem[]> {
+		if (element) {
+			return [];
+		}
+
 		let pathToDir: Util.PathToDir | null;
 		let config: Util.TaqifiedDir | null;
 		if (!this.workspaceRoot) {
@@ -28,9 +32,6 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeIt
 			}
 		}
 
-		if (element) {
-			return [];
-		}
 		const installedPlugins = config?.config?.plugins?.map(plugin => plugin.name) ?? [];
 		const availablePlugins = await this.helper.getAvailablePlugins();
 		const allPlugins = [...new Set(installedPlugins.concat(availablePlugins))];
