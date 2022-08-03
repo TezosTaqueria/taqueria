@@ -107,7 +107,7 @@
 			"taqueria": [
 				{
 					"id": "taqueria-cli-check",
-					"name": "Checking CLI Reachability",
+					"name": "System Check",
 					"contextualTitle": "Taqueria: Checking CLI Reachability",
 					"when": "!@taqueria-state/is-taq-cli-reachable"
 				},
@@ -119,7 +119,7 @@
 				},
 				{
 					"id": "taqueria-scaffold",
-					"name": "Scaffold a project",
+					"name": "Create a new project from an existing Scaffold",
 					"contextualTitle": "Taqueria: Scaffold a project",
 					"when": "@taqueria-state/is-taq-cli-reachable && @taqueria-state/enable-init-scaffold"
 				},
@@ -158,11 +158,11 @@
 		"viewsWelcome": [
 			{
 				"view": "taqueria-cli-check",
-				"contents": "I'm unable to find your Taqueria cli (taq command).\nPlease follow instructions [here](https://taqueria.io/docs/getting-started/installation/) to install it, then click the button below:\n[Check again](command:taqueria.refresh_command_states)\nAlso, please make sure it is in your PATH.\nIf you change your PATH, you might need to restart VsCode to pick up the change."
+				"contents": "Unable to find your Taqueria cli (taq command).\nPlease follow instructions [here](https://taqueria.io/docs/getting-started/installation/) to install it, then click the button below:\n[Check again](command:taqueria.refresh_command_states)\nAlso, please make sure it is in your PATH.\nIf you change your PATH, you might need to restart VsCode to pick up the change."
 			},
 			{
 				"view": "taqueria-init",
-				"contents": "You can quickly create a project:\n[Initialize](command:taqueria.init)"
+				"contents": "Initialize a new taqueria empty project structure\n[Initialize](command:taqueria.init)"
 			}
 		],
 		"commands": [
