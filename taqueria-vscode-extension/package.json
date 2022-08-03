@@ -447,6 +447,7 @@
 	},
 	"dependencies": {
 		"@taqueria/protocol": "^0.12.0",
+		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1"
