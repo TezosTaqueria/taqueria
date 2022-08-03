@@ -7,8 +7,8 @@ import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	implements vscode.TreeDataProvider<SandboxTreeItem>, HasRefresh
 {
-	constructor(workspaceRoot: string, helper: VsCodeHelper) {
-		super(workspaceRoot, helper);
+	constructor(helper: VsCodeHelper) {
+		super(helper);
 	}
 
 	getTreeItem(element: SandboxTreeItem): vscode.TreeItem {
