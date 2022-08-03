@@ -22,12 +22,6 @@ const {
 	toPromise,
 	stdout,
 	stderr,
-	outputWarning,
-	outputError,
-	outputMsg,
-	renderWarning,
-	renderError,
-	renderMsg,
 } = inject({
 	stderr: new MockWriter(),
 	stdout: new MockWriter(),
@@ -235,59 +229,5 @@ Deno.test('execText() can execute in a different working directory', async () =>
 	assert(Array.isArray(retval));
 	assertEquals(retval[0], 0);
 	assert(stdout.toString().includes('tmp'));
-	assertEquals(stderr.toString(), '');
-});
-
-Deno.test('renderWaring() will return message with WARNING: prefix in orange', () => {
-	const message = 'test';
-	assertEquals(renderWarning(message), `[38;2;255;128;0mWARNING: ${message}[39m`);
-});
-
-Deno.test('renderError() will return message with ERROR: prefix in bold and red', () => {
-	const message = 'test';
-	assertEquals(renderError(message), `[31m[1mERROR: ${message}[22m[39m`);
-});
-
-Deno.test('render() will return plain message', () => {
-	const message = 'test';
-	assertEquals(renderMsg(message), `${message}`);
-});
-
-Deno.test('outputWaring() will stdout message with prefix WARNING: in orange', () => {
-	const stdOut = (stdout as MockWriter);
-	const stdErr = (stderr as MockWriter);
-	stdOut.clear();
-	stdErr.clear();
-
-	const message = 'test';
-	const result = outputWarning(message);
-	assertEquals(result, undefined);
-	assertEquals(stdout.toString(), '');
-	assertEquals(stderr.toString(), `[38;2;255;128;0mWARNING: ${message}\n[39m`);
-});
-
-Deno.test('outputError() will stderr message with prefix ERROR: in bold and red', () => {
-	const stdOut = (stdout as MockWriter);
-	const stdErr = (stderr as MockWriter);
-	stdOut.clear();
-	stdErr.clear();
-
-	const message = 'test';
-	const result = outputError(message);
-	assertEquals(result, undefined);
-	assertEquals(stdout.toString(), '');
-	assertEquals(stderr.toString(), `[31m[1mERROR: ${message}\n[22m[39m`);
-});
-
-Deno.test('output() will stdout message', () => {
-	const stdOut = (stdout as MockWriter);
-	const stdErr = (stderr as MockWriter);
-	stdOut.clear();
-	stdErr.clear();
-
-	const message = 'test';
-	const result = outputMsg(message);
-	assertEquals(result, undefined);
-	assertEquals(stdout.toString(), `${message}\n`);
 	assertEquals(stderr.toString(), '');
 });

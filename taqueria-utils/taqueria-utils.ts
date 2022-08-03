@@ -15,7 +15,6 @@ import {
 	swap,
 } from 'fluture';
 import { join as _joinPaths } from 'https://deno.land/std@0.115.1/path/mod.ts';
-import { bold, red, rgb24 } from 'https://deno.land/std@0.123.0/fmt/colors.ts';
 import { copy } from 'https://deno.land/std@0.128.0/streams/conversion.ts';
 import { render } from 'https://deno.land/x/eta@v1.12.3/mod.ts';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
@@ -224,42 +223,6 @@ export const inject = (deps: UtilsDependencies) => {
 		stdout.write(encoder.encode(`${message}\n`));
 	};
 
-	type Renderer = (message: unknown) => string;
-
-	type Writer = (encoded: Uint8Array) => number;
-
-	const encode = (msg: string) => new TextEncoder().encode(msg);
-
-	const noop = () => {};
-
-	const writeRenderedMsg = (renderer: Renderer, writer: Writer) =>
-		(message: unknown, appendNewline = true) => {
-			if (appendNewline) message += '\n';
-			pipe(
-				message,
-				renderer,
-				encode,
-				writer,
-				noop,
-			);
-		};
-
-	const renderMsg = (message: unknown) => String(message);
-
-	const renderWarning = (message: unknown) => rgb24('WARNING: ' + message, { r: 255, g: 128, b: 0 });
-
-	const renderError = (message: unknown) => red(bold('ERROR: ' + message));
-
-	const outWriteSync = (encoded: Uint8Array) => stdout.writeSync(encoded);
-
-	const errWriteSync = (encoded: Uint8Array) => stderr.writeSync(encoded);
-
-	const outputMsg = writeRenderedMsg(renderMsg, outWriteSync);
-
-	const outputWarning = writeRenderedMsg(renderWarning, errWriteSync);
-
-	const outputError = writeRenderedMsg(renderError, errWriteSync);
-
 	const logInput = <T>(message: string) =>
 		(input: T): T => {
 			const encoder = new TextEncoder();
@@ -403,11 +366,5 @@ export const inject = (deps: UtilsDependencies) => {
 		eager,
 		taqResolve,
 		appendTextFile,
-		renderMsg,
-		renderWarning,
-		renderError,
-		outputMsg,
-		outputWarning,
-		outputError,
 	};
 };
