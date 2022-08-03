@@ -3,7 +3,7 @@ import * as vscode from 'vscode';
 import { HasRefresh, VsCodeHelper } from '../helpers';
 
 export class TestDataProvider implements vscode.TreeDataProvider<TestTreeItem>, HasRefresh {
-	constructor(private workspaceRoot: string, private helper: VsCodeHelper) {
+	constructor(private helper: VsCodeHelper) {
 	}
 
 	getTreeItem(element: TestTreeItem): vscode.TreeItem | Thenable<vscode.TreeItem> {
@@ -14,7 +14,15 @@ export class TestDataProvider implements vscode.TreeDataProvider<TestTreeItem>, 
 			return [];
 		}
 		const testConfigFiles = await vscode.workspace.findFiles('**/jest.config.js', '**/node_modules/**');
-		let testFolders = testConfigFiles.map(uri => path.dirname(uri.fsPath).replace(this.workspaceRoot + '/', ''));
+		const mainFolder = this.helper.getMainWorkspaceFolder();
+		if (!mainFolder) {
+			return [];
+		}
+		let mainFolderPath = mainFolder.fsPath;
+		if (!mainFolderPath.endsWith('/')) {
+			mainFolderPath = mainFolderPath + '/';
+		}
+		let testFolders = testConfigFiles.map(uri => path.dirname(uri.fsPath).replace(mainFolderPath, ''));
 		testFolders = testFolders.filter(x => x !== '.taq');
 		testFolders.sort();
 		return testFolders.map(folder => new TestTreeItem(folder));

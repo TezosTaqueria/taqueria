@@ -203,7 +203,7 @@ export const execCmd = (
 		}
 	});
 
-const checkTaqBinary = async (inputPath: PathToTaq, i18n: i18n, showOutput: OutputFunction) => {
+export const checkTaqBinary = async (inputPath: PathToTaq, i18n: i18n, showOutput: OutputFunction) => {
 	const result = await execCmd(`${inputPath} testFromVsCode`, showOutput);
 	return result.standardOutput;
 };

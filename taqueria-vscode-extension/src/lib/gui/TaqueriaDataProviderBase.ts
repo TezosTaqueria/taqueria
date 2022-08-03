@@ -3,19 +3,19 @@ import * as Util from '../pure';
 
 export class TaqueriaDataProviderBase {
 	constructor(
-		protected workspaceRoot: string,
 		protected helper: VsCodeHelper,
 	) {}
 
 	async getConfig(): Promise<{ config: Util.TaqifiedDir | null; pathToDir: Util.PathToDir | null }> {
-		if (!this.workspaceRoot) {
+		const mainFolder = this.helper.getMainWorkspaceFolder();
+		if (!mainFolder) {
 			return {
 				pathToDir: null,
 				config: null,
 			};
 		} else {
 			try {
-				const pathToDir = await Util.makeDir(this.workspaceRoot, this.helper.i18n);
+				const pathToDir = await Util.makeDir(mainFolder.fsPath, this.helper.i18n);
 				const config = await Util.TaqifiedDir.create(pathToDir, this.helper.i18n);
 				return {
 					config,
