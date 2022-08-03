@@ -3,7 +3,6 @@ import { VsCodeHelper } from '../helpers';
 
 export class ScaffoldsDataProvider implements vscode.TreeDataProvider<ScaffoldTreeItem> {
 	constructor(
-		private workspaceRoot: string,
 		private helper: VsCodeHelper,
 	) {}
 

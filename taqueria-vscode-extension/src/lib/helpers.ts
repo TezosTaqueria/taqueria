@@ -15,7 +15,7 @@ import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvi
 import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
-import { E_TaqVsxError, TaqVsxError } from './TaqVsxError';
+import { TaqVsxError } from './TaqVsxError';
 
 export const COMMAND_PREFIX = 'taqueria.';
 
@@ -136,10 +136,8 @@ export class VsCodeHelper {
 	private constructor(
 		private context: api.ExtensionContext,
 		private vscode: VSCodeAPI,
-		private outputChannel: api.OutputChannel,
 		private output: Output,
 		private i18: i18n,
-		private folders: readonly api.WorkspaceFolder[],
 	) {}
 
 	static async construct(context: api.ExtensionContext, deps: InjectedDependencies) {
@@ -157,11 +155,7 @@ export class VsCodeHelper {
 
 		const i18n = await loadI18n();
 
-		const folders = vscode.workspace.workspaceFolders
-			? vscode.workspace.workspaceFolders
-			: [];
-
-		return new VsCodeHelper(context, vscode, outputChannel, output, i18n, folders);
+		return new VsCodeHelper(context, vscode, output, i18n);
 	}
 
 	get i18n() {
@@ -169,7 +163,11 @@ export class VsCodeHelper {
 	}
 
 	getFolders() {
-		return this.folders;
+		const workspaceFolders = this.vscode.workspace.workspaceFolders;
+		if (!workspaceFolders) {
+			return [];
+		}
+		return workspaceFolders.map(x => x.uri);
 	}
 
 	getOutput() {
@@ -208,8 +206,10 @@ export class VsCodeHelper {
 			} catch {
 				// Ignored
 			}
-			await this.updateCommandStates(uri.path as Util.PathToDir);
-			this.vscode.workspace.updateWorkspaceFolders(0, undefined, { uri });
+			await this.updateCommandStates();
+			if (!this.getMainWorkspaceFolder()) {
+				await this.vscode.commands.executeCommand('vscode.openFolder', uri, false);
+			}
 		});
 	}
 
@@ -246,33 +246,31 @@ export class VsCodeHelper {
 				false,
 			);
 			await this.proxyToTaq(``, projectDir);
-			await this.updateCommandStates(projectDir);
+			await this.updateCommandStates();
+			if (!this.getMainWorkspaceFolder()) {
+				await this.vscode.commands.executeCommand('vscode.openFolder', projectUri, false);
+			}
 		});
 	}
 
-	getWorkspaceFolder(): api.Uri {
+	getMainWorkspaceFolder(): api.Uri | undefined {
 		const workspaceFolder = this.vscode.workspace.workspaceFolders?.[0];
 		if (!workspaceFolder) {
-			throw {
-				kind: 'E_INVALID_DIR',
-				message: 'No workspace folder is opened.',
-			} as E_TaqVsxError;
+			return undefined;
 		}
 		return workspaceFolder.uri;
 	}
 
 	exposeRefreshCommand() {
 		this.registerCommand(COMMAND_PREFIX + 'refresh_command_states', async () => {
-			const workspaceFolder = this.getWorkspaceFolder();
-			const pathToDir = workspaceFolder.path as Util.PathToDir;
-			await this.updateCommandStates(pathToDir);
+			await this.updateCommandStates();
 		});
 	}
 
 	async getTaqifiedDirectories() {
-		const taqified = await filterAsync([...this.folders], async folder => {
+		const taqified = await filterAsync([...this.getFolders()], async folder => {
 			try {
-				const taqifiedPath = join(folder.uri.path, '.taq');
+				const taqifiedPath = join(folder.path, '.taq');
 				await stat(taqifiedPath);
 				return true;
 			} catch (e: unknown) {
@@ -280,13 +278,13 @@ export class VsCodeHelper {
 			}
 		});
 
-		return await mapAsync(taqified, folder => Util.makeDir(folder.uri.path, this.i18));
+		return await mapAsync(taqified, folder => Util.makeDir(folder.path, this.i18));
 	}
 
 	async getFolderForInitOrScaffold(
 		taskTitle: string,
 	) {
-		let uris: api.Uri[] | undefined = this.folders.map(folder => folder.uri);
+		let uris: api.Uri[] | undefined = this.getFolders();
 		if (uris.length === 0) {
 			uris = await this.vscode.window.showOpenDialog({
 				canSelectFolders: true,
@@ -585,12 +583,13 @@ export class VsCodeHelper {
 	}
 
 	async workspaceHasTaqFolder() {
-		if (this.folders.length === 0) {
+		const folders = this.getFolders();
+		if (folders.length === 0) {
 			return false;
 		}
-		const folder = this.folders[0];
+		const folder = folders[0];
 		try {
-			await Util.makeDir(path.join(folder.uri.path, '.taq'), this.i18);
+			await Util.makeDir(path.join(folder.path, '.taq'), this.i18);
 			return true;
 		} catch (_: unknown) {
 			return false;
@@ -683,9 +682,13 @@ export class VsCodeHelper {
 	async proxyToTaqAndShowOutput(
 		taskWithArgs: string,
 		taskTitles: TaskTitles,
-		projectDir: Util.PathToDir | undefined,
+		projectDir: string | undefined,
 		logStandardErrorToOutput: boolean | undefined,
 	) {
+		if (!projectDir) {
+			const mainFolder = this.getMainWorkspaceFolder();
+			projectDir = mainFolder?.fsPath;
+		}
 		if (this._currentlyRunningTask !== undefined) {
 			this.vscode.window.showErrorMessage(
 				`Taqueria is currently busy ${this._currentlyRunningTask}. Please wait for it to finish before running another command.`,
@@ -732,13 +735,14 @@ export class VsCodeHelper {
 		});
 	}
 
-	async proxyToTaq(taskWithArgs: string, projectDir?: Util.PathToDir | undefined) {
+	async proxyToTaq(taskWithArgs: string, projectDir?: string | undefined) {
 		const pathToTaq = await this.getTaqBinPath();
+		const pathToDir = projectDir ? await Util.makeDir(projectDir, this.i18) : undefined;
 		if (projectDir) {
 			return await Util.execCmd(
 				`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`,
 				this.getLog(),
-				projectDir,
+				pathToDir,
 			);
 		} else {
 			return await Util.execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`, this.getLog());
@@ -750,7 +754,6 @@ export class VsCodeHelper {
 		taskWithArgs: string,
 		outputTo: 'output' | 'notify',
 		taskTitles: TaskTitles,
-		projectDir?: Util.PathToDir,
 	) {
 		this.registerCommand(
 			cmdId,
@@ -758,7 +761,7 @@ export class VsCodeHelper {
 				await this.proxyToTaqAndShowOutput(
 					`${taskWithArgs} ${item.fileName}`,
 					taskTitles,
-					projectDir,
+					undefined,
 					outputTo === 'output',
 				);
 			},
@@ -770,7 +773,6 @@ export class VsCodeHelper {
 		taskWithArgs: string,
 		outputTo: 'output' | 'notify',
 		taskTitles: TaskTitles,
-		projectDir?: Util.PathToDir,
 	) {
 		this.registerCommand(
 			cmdId,
@@ -778,7 +780,7 @@ export class VsCodeHelper {
 				await this.proxyToTaqAndShowOutput(
 					item ? `${taskWithArgs} ${item.fileName}` : taskWithArgs,
 					taskTitles,
-					projectDir,
+					undefined,
 					outputTo === 'output',
 				);
 			},
@@ -790,20 +792,23 @@ export class VsCodeHelper {
 		taskWithArgs: string,
 		outputTo: 'output' | 'notify',
 		taskTitles: TaskTitles,
-		projectDir?: Util.PathToDir,
 	) {
 		this.registerCommand(
 			cmdId,
 			async () => {
-				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitles, projectDir, outputTo === 'output');
+				await this.proxyToTaqAndShowOutput(taskWithArgs, taskTitles, undefined, outputTo === 'output');
 			},
 		);
 	}
 
-	exposeTestSetupCommand(projectDir: Util.PathToDir) {
+	exposeTestSetupCommand() {
 		this.registerCommand(
 			COMMAND_PREFIX + 'create_test_folder',
 			async () => {
+				const mainFolder = this.getMainWorkspaceFolder();
+				if (!mainFolder) {
+					return;
+				}
 				const folders = await this.vscode.window.showOpenDialog({
 					canSelectFiles: false,
 					canSelectFolders: true,
@@ -814,21 +819,21 @@ export class VsCodeHelper {
 				if (!folders || folders.length !== 1) {
 					return;
 				}
-				const folder = folders[0].path.replace(projectDir + '/', '');
+				const folder = folders[0].path.replace(mainFolder.fsPath + '/', '');
 				await this.proxyToTaqAndShowOutput(
 					`test --init ${folder}`,
 					{
 						finishedTitle: `Setup folder ${folder} as test`,
 						progressTitle: `Setting up folder ${folder} as test`,
 					},
-					projectDir,
+					undefined,
 					false,
 				);
 			},
 		);
 	}
 
-	exposeRunTestCommand(projectDir: Util.PathToDir) {
+	exposeRunTestCommand() {
 		this.registerCommand(
 			COMMAND_PREFIX + 'run_tests',
 			async (item: TestTreeItem) => {
@@ -839,7 +844,7 @@ export class VsCodeHelper {
 						finishedTitle: `Run tests from ${folder}`,
 						progressTitle: `Running tests from ${folder}`,
 					},
-					projectDir,
+					undefined,
 					false,
 				);
 			},
@@ -850,14 +855,15 @@ export class VsCodeHelper {
 		cmdId: string,
 		taskName: string,
 		taskTitles: TaskTitles,
-		outputTo: 'output' | 'notify',
-		projectDir: Util.PathToDir,
-		otherNotification?: string,
 	) {
 		this.registerCommand(cmdId, async (sandbox?: SandboxTreeItem | undefined) => {
 			let sandboxName = sandbox?.label;
 			if (!sandboxName) {
-				const taqifiedDir = await Util.TaqifiedDir.create(projectDir, this.i18);
+				const mainFolder = await this.getMainWorkspaceFolder();
+				if (!mainFolder) {
+					return;
+				}
+				const taqifiedDir = await Util.TaqifiedDir.create(mainFolder.fsPath as Util.PathToDir, this.i18);
 				const sandboxes = this.getSandboxNames(taqifiedDir);
 				sandboxName = await this.vscode.window.showQuickPick(sandboxes, {
 					canPickMany: false,
@@ -869,13 +875,17 @@ export class VsCodeHelper {
 			if (!sandboxName) {
 				return;
 			}
-			await this.proxyToTaqAndShowOutput(`${taskName} ${sandboxName}`, taskTitles, projectDir, false);
+			await this.proxyToTaqAndShowOutput(`${taskName} ${sandboxName}`, taskTitles, undefined, false);
 			this.sandboxesDataProvider?.refresh();
 		});
 	}
 
-	async updateCommandStates(projectDir?: Util.PathToDir | undefined) {
-		if (projectDir === undefined) {
+	async updateCommandStates() {
+		const isTaqReachable = await this.isTaqCliReachable();
+		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taq-cli-reachable', isTaqReachable);
+
+		const mainFolder = this.getMainWorkspaceFolder();
+		if (mainFolder === undefined) {
 			this.showLog(OutputLevels.debug, 'No folder is open, enabling init and scaffold');
 			this.vscode.commands.executeCommand(
 				'setContext',
@@ -886,13 +896,10 @@ export class VsCodeHelper {
 		}
 		this.refreshDataProviders.forEach(dataProvider => dataProvider.refresh());
 
-		const isTaqReachable = await this.isTaqCliReachable();
-		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taq-cli-reachable', isTaqReachable);
-
 		this.showLog(OutputLevels.debug, 'Project config changed, updating command states...');
 		let taqFolderFound: boolean;
 		try {
-			await Util.makeDir(join(projectDir, '.taq'), this.i18);
+			await Util.makeDir(join(mainFolder.path, '.taq'), this.i18);
 			this.showLog(OutputLevels.debug, 'Taq folder is found');
 			taqFolderFound = true;
 		} catch {
@@ -902,7 +909,7 @@ export class VsCodeHelper {
 		let enableAllCommands: boolean;
 		let config: Util.TaqifiedDir | null;
 		try {
-			config = await Util.TaqifiedDir.create(projectDir, this.i18);
+			config = await Util.TaqifiedDir.create(mainFolder.fsPath as Util.PathToDir, this.i18);
 			enableAllCommands = false;
 		} catch (e: unknown) {
 			config = null;
@@ -967,14 +974,14 @@ export class VsCodeHelper {
 	}
 
 	createWatcherIfNotExists(
-		projectDir: Util.PathToDir,
+		projectDir: string,
 		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher[]) => void,
 	) {
 		this.showLog(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
 		addConfigWatcherIfNotExists(projectDir, () => {
 			this.showLog(OutputLevels.info, `Adding watchers for directory ${projectDir}.`);
 			try {
-				this.updateCommandStates(projectDir);
+				this.updateCommandStates();
 			} catch (error: any) {
 				this.logAllNestedErrors(error);
 			}
@@ -988,17 +995,17 @@ export class VsCodeHelper {
 				const testsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '**/jest.config.js'));
 
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
-				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates(projectDir));
-				folderWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates(projectDir));
-				folderWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates(projectDir));
+				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
+				folderWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
+				folderWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates());
 
-				configWatcher.onDidChange((e: api.Uri) => this.updateCommandStates(projectDir));
-				configWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates(projectDir));
-				configWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates(projectDir));
+				configWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
+				configWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
+				configWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates());
 
-				stateWatcher.onDidChange((e: api.Uri) => this.updateCommandStates(projectDir));
-				stateWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates(projectDir));
-				stateWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates(projectDir));
+				stateWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
+				stateWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
+				stateWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates());
 
 				contractsFolderWatcher.onDidChange(_ => this.contractsDataProvider?.refresh());
 				contractsFolderWatcher.onDidCreate(_ => this.contractsDataProvider?.refresh());
@@ -1028,19 +1035,19 @@ export class VsCodeHelper {
 	private sandboxesDataProvider?: SandboxesDataProvider;
 	private testDataProvider?: TestDataProvider;
 
-	registerDataProviders(workspaceFolder: string) {
-		this.registerDataProvider('taqueria-plugins', new PluginsDataProvider(workspaceFolder, this));
+	registerDataProviders() {
+		this.registerDataProvider('taqueria-plugins', new PluginsDataProvider(this));
 		this.sandboxesDataProvider = this.registerDataProvider(
 			'taqueria-sandboxes',
-			new SandboxesDataProvider(workspaceFolder, this),
+			new SandboxesDataProvider(this),
 		);
-		this.registerDataProvider('taqueria-environments', new EnvironmentsDataProvider(workspaceFolder, this));
-		this.testDataProvider = this.registerDataProvider('taqueria-tests', new TestDataProvider(workspaceFolder, this));
+		this.registerDataProvider('taqueria-environments', new EnvironmentsDataProvider(this));
+		this.testDataProvider = this.registerDataProvider('taqueria-tests', new TestDataProvider(this));
 		this.contractsDataProvider = this.registerDataProvider(
 			'taqueria-contracts',
-			new ContractsDataProvider(workspaceFolder, this),
+			new ContractsDataProvider(this),
 		);
-		this.registerDataProvider('taqueria-scaffold', new ScaffoldsDataProvider(workspaceFolder, this));
+		this.registerDataProvider('taqueria-scaffold', new ScaffoldsDataProvider(this));
 	}
 
 	private registerDataProvider<T extends api.TreeDataProvider<unknown>>(
