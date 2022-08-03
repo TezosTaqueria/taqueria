@@ -6,8 +6,8 @@ import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 export class ContractsDataProvider extends TaqueriaDataProviderBase
 	implements vscode.TreeDataProvider<ContractTreeItem>, HasRefresh
 {
-	constructor(workspaceRoot: string, helper: VsCodeHelper) {
-		super(workspaceRoot, helper);
+	constructor(helper: VsCodeHelper) {
+		super(helper);
 	}
 
 	getTreeItem(element: ContractTreeItem): vscode.TreeItem {
