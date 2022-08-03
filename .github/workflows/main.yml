@@ -83,7 +83,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.x
+          deno-version: v1.23.4
 
       - uses: actions/cache@v3
         with:
@@ -251,7 +251,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 16.x
+          node-version: 16.16.x
       
       # This step currently attempts to put all test files found in the e2e folder into 4 equal sized buckets. The output is a list of lists 
       - id: set-test-chunks
@@ -306,12 +306,11 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 16.x
-          # Setting node version to 16.13.2 to enable integration tests to pass
+          node-version: 16.16.x
       
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: "1.18.2"
+          deno-version: 1.23.4
 
       - uses: actions/cache@v3
         with:
