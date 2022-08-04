@@ -12,7 +12,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 import isInternalUrl from "@docusaurus/isInternalUrl";
 import styles from "./styles.module.css";
 import ThemedImage from "@theme/ThemedImage";
-import IconExternalLink from "@theme/IconExternalLink";
+// import IconExternalLink from "@theme/IconExternalLink";
 import FooterForm from "../../components/FooterForm/FooterForm";
 
 function FooterLink({
@@ -42,7 +42,7 @@ function FooterLink({
 			{href && !isInternalUrl(href) ? (
 				<span>
 					{label}
-					<IconExternalLink />
+					{/* <IconExternalLink /> */}
 				</span>
 			) : (
 				label
