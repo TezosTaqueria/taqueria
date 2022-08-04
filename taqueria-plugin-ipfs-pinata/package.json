@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-ipfs-pinata",
-	"version": "0.10.0",
+	"version": "0.12.0",
 	"description": "A plugin for Taqueria providing ipfs publishing and pinning using the Pinata service",
 	"keywords": [
 		"taqueria",
@@ -33,7 +33,7 @@
 		"directory": "taqueria-plugin-ipfs-pinata"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.10.0",
+		"@taqueria/node-sdk": "^0.12.0",
 		"dotenv": "^16.0.0",
 		"form-data": "^4.0.0",
 		"ipfs-only-hash": "^4.0.0",
