@@ -442,17 +442,17 @@ describe.only('E2E Testing for taqueria flextesa plugin sandbox starts/stops', (
 		}
 	});
 
-	test.only('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name using the development environment', async () => {
+	test('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name using the development environment', async () => {
 		try {
 			// Setting up docker container name
 			dockerName = 'local';
 
 			// 1. Run sandbox start command
-			const sandboxStart = await exec(`taq start sandbox`, { cwd: `./${taqueriaProjectPath}` });
+			const sandboxStart = await exec(`taq start sandbox local`, { cwd: `./${taqueriaProjectPath}` });
 			console.log(sandboxStart);
 
 			// 2. Verify that sandbox has been started and taqueria returns proper message into console
-			expect(sandboxStart.stdout).toContain(`Started ${dockerName}.\nDone.\n`);
+			expect(sandboxStart.stdout).toContain(`Started ${dockerName}.`);
 
 			// 3. Verify that docker container has been started
 			const dockerContainerTest = await getContainerName(dockerName);
