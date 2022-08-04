@@ -27,7 +27,7 @@ This scaffold implements a simple full stack Tezos project. It has a React dApp 
 
 The React dApp uses Beacon Wallet to interact with Tezos wallets in the browser and once connected, will display the number of `available_tacos` stored on-chain in the smart contract. There is also a basic interface which allows the user to buy tacos by sending a transaction to the smart contract with the `number_of_tacos_to_buy` as a parameter
 
-The smart contract has been deployed to ithacanet at the address for demonstration purposes: `KT1KBBk3PXkKmGZn3K6FkktqyPRpEbzJoEPE`
+The smart contract has been deployed to ghostnet at the address for demonstration purposes: `KT18izS1s5Hsv9tRaB8VjxdTU6MFpLviLCrS`
 
 The project comes pre-configured with the following:
 
@@ -128,19 +128,19 @@ This will compile the `/contracts/hello-tacos.mligo` contract to a file, `/artif
 
 ### Originate to the Testnet
 
-Run the following command to originate the contract to the ithacanet environment:
+Run the following command to originate the contract to the ghostnet environment:
 
 ```shell
-taq originate -e ithacanet
+taq originate -e ghostnet
 ```
 
 This should return the address of the contract on the testnet which looks like this:
 ```shell
-┌────────────────┬──────────────────────────────────────┬────────────────┐
-│ Contract       │ Address                              │ Destination    │
-├────────────────┼──────────────────────────────────────┼────────────────┤
-│ hello-tacos.tz │ KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3 │ ithaca_network │
-└────────────────┴──────────────────────────────────────┴────────────────┘
+┌────────────────┬──────────────────────────────────────┬───────────────────┐
+│ Contract       │ Address                              │ Destination       │
+├────────────────┼──────────────────────────────────────┼───────────────────┤
+│ hello-tacos.tz │ KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3 │ ghostnet_network  │
+└────────────────┴──────────────────────────────────────┴───────────────────┘
 ```
 
 :::caution
@@ -154,7 +154,7 @@ Now that the contract has been deployed, you need to insert the address of the c
 
 ```ts /app/src/app.tsx
 function app() {
-  const [rpcUrl, setRpcUrl] = useState("https://ithacanet.ecadinfra.com");
+  const [rpcUrl, setRpcUrl] = useState("https://ghostnet.ecadinfra.com");
   const [contractAddress, setContractAddress] = useState(
     "KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3"
   );
