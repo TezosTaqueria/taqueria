@@ -1,4 +1,4 @@
-FROM oxheadalpha/flextesa:latest
+FROM oxheadalpha/flextesa:20220510
 RUN mkdir /app
 WORKDIR /app
 COPY index.js /app/

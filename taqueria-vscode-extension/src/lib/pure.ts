@@ -1,10 +1,11 @@
 import * as Config from '@taqueria/protocol/Config';
 import { EphemeralState } from '@taqueria/protocol/EphemeralState';
 import { i18n } from '@taqueria/protocol/i18n';
-import { exec } from 'child_process';
+import { exec, ExecException } from 'child_process';
 import { parse } from 'comment-json';
 import { readFile, stat } from 'fs/promises';
-import { join } from 'path';
+import { join, resolve } from 'path';
+import { reject } from 'rambda';
 import { Output, OutputFunction, OutputLevels } from './helpers';
 import { TaqVsxError } from './TaqVsxError';
 
@@ -25,12 +26,10 @@ export type Json<T> = T;
 export class TaqifiedDir {
 	readonly dir: PathToDir;
 	readonly config: Config.t;
-	readonly state: EphemeralState;
 
-	protected constructor(dir: PathToDir, config: Config.t, state: EphemeralState) {
+	protected constructor(dir: PathToDir, config: Config.t) {
 		this.dir = dir;
 		this.config = config;
-		this.state = state;
 	}
 
 	/**
@@ -53,20 +52,7 @@ export class TaqifiedDir {
 							previous,
 						})
 					)
-					.then(config =>
-						makeFile(join(dotTaqDir, 'state.json'), i18n)
-							// TODO - validate state!
-							.then(pathToState => readJsonFile<EphemeralState>(i18n, data => (data as EphemeralState))(pathToState))
-							.then(state => new TaqifiedDir(dir, config, state))
-							.catch(previous =>
-								Promise.reject({
-									code: 'E_STATE_MISSING',
-									msg: 'The provided directory is taqified but missing a state file in .taq',
-									taqifiedDir: dir,
-									previous,
-								})
-							)
-					)
+					.then(config => new TaqifiedDir(dir, config))
 			)
 			.catch(previous =>
 				Promise.reject({
@@ -162,7 +148,7 @@ export const makeDir = (dirPath: string, _i18n: i18n): LikeAPromise<PathToDir, T
 export const makePathToTaq = (i18n: i18n, showOutput: OutputFunction) =>
 	(inputPath: string): LikeAPromise<PathToTaq, TaqVsxError> =>
 		stat(inputPath)
-			.then(_ => proxyToTaq(inputPath as PathToTaq, i18n, showOutput)('testFromVsCode'))
+			.then(_ => checkTaqBinary(inputPath as PathToTaq, i18n, showOutput))
 			.then(
 				output =>
 					output.includes('OK')
@@ -178,6 +164,23 @@ export const makePathToTaq = (i18n: i18n, showOutput: OutputFunction) =>
 				})
 			);
 
+export const getRunningContainerNames = (): LikeAPromise<string[], TaqVsxError> =>
+	new Promise((resolve, reject) =>
+		exec(`docker ps --format '{{.Names}}'`, (_error, stdout, _stderr) => {
+			const containers = stdout.split('\n');
+			resolve(containers);
+		})
+	);
+
+export class TaqExecutionResult {
+	constructor(
+		public executionError: ExecException | null,
+		public standardOutput: string,
+		public standardError: string,
+	) {
+	}
+}
+
 /**
  * Executes a shell command
  * @param {string} cmd
@@ -185,66 +188,25 @@ export const makePathToTaq = (i18n: i18n, showOutput: OutputFunction) =>
  */
 export const execCmd = (
 	cmd: string,
-	showOutput: OutputFunction,
+	showLog: OutputFunction,
 	projectDir?: PathToDir,
-): LikeAPromise<string, TaqVsxError> =>
+): LikeAPromise<TaqExecutionResult, TaqVsxError> =>
 	new Promise((resolve, reject) => {
-		showOutput(OutputLevels.info, `Running command:\n${cmd}`);
+		showLog(OutputLevels.info, `Running command:\n${cmd}`);
 		if (isWindows()) reject({ code: 'E_WINDOWS', msg: 'Running in Windows without WSLv2 is currently not supported.' });
 		else {
 			const shellCommand = `sh -c "${projectDir ? 'cd ' + projectDir + ' && ' : ''}${cmd}"`;
-			showOutput(OutputLevels.debug, shellCommand);
-			exec(shellCommand, (previous, stdout, msg) => {
-				log('Executing command:')(cmd);
-				if (previous) {
-					reject({
-						code: 'E_EXEC',
-						msg: `An unexpected error occurred when trying to execute the command`,
-						previous,
-						cmd,
-					});
-				} else if (msg.length) reject({ code: 'E_EXEC', msg, cmd });
-				else resolve(stdout);
+			showLog(OutputLevels.debug, shellCommand);
+			exec(shellCommand, (executionError, standardOutput, standardError) => {
+				resolve(new TaqExecutionResult(executionError, standardOutput, standardError));
 			});
 		}
 	});
 
-/**
- * Proxies a command to the taq CLI
- * @todo Use i18n
- * @param {string} cmd
- * @param {I18N} _i18n
- * @returns {(taskWithArgs: string) => LikeAPromise<string, ProxyErr>}
- */
-export const proxyToTaq = (pathToTaq: PathToTaq, i18n: i18n, showOutput: OutputFunction, projectDir?: PathToDir) =>
-	(taskWithArgs: string): LikeAPromise<string, TaqVsxError> =>
-		(
-			projectDir
-				? execCmd(`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`, showOutput, projectDir)
-				: execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`, showOutput)
-		)
-			.catch(previous => {
-				if ('code' in previous) {
-					if (previous.code === 'E_EXEC') {
-						const { cmd, msg } = previous;
-
-						// The error message from the CLI might be JSON
-						// Try to parse it and if so, return its error information
-						return decodeJson(msg)
-							.catch(_ =>
-								msg.includes('EBADENGINE')
-									? 'Please install NodeJS v16.'
-									: msg
-							)
-							.then(err => {
-								if (typeof err === 'object') {
-									return Promise.reject(err);
-								} else return Promise.reject({ code: 'E_PROXY', msg: err, previous, cmd });
-							});
-					}
-				}
-				return Promise.reject({ code: 'E_PROXY', msg: 'There was a problem running taq.', previous });
-			});
+export const checkTaqBinary = async (inputPath: PathToTaq, i18n: i18n, showOutput: OutputFunction) => {
+	const result = await execCmd(`${inputPath} testFromVsCode`, showOutput);
+	return result.standardOutput;
+};
 
 export const readJsonFile = <T>(_i18n: i18n, make: (data: Record<string, unknown>) => T) =>
 	(pathToFile: PathToFile) =>
@@ -283,7 +245,17 @@ export const isWindows = () => process.platform.includes('win') && !process.plat
 
 export const findTaqBinary = (i18n: i18n, showOutput: OutputFunction): LikeAPromise<string, TaqVsxError> =>
 	execCmd('which taq', showOutput)
-		.then(path => path.trim())
+		.then(result => {
+			if (result.executionError) {
+				return Promise.reject({
+					code: 'E_TAQ_NOT_FOUND',
+					msg: 'Could not find taq in your path.',
+					previous: result.executionError,
+				});
+			} else {
+				return result.standardOutput.trim();
+			}
+		})
 		.catch(previous => Promise.reject({ code: 'E_TAQ_NOT_FOUND', msg: 'Could not find taq in your path.', previous }))
 		.then(makePathToTaq(i18n, showOutput));
 

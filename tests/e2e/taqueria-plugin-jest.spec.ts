@@ -3,6 +3,8 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
+import { readFile } from 'fs/promises';
+import { resolve } from 'path';
 import * as contents from './data/help-contents/jest-contents';
 import { reference } from './data/jest.config-reference';
 import { referenceCI } from './data/jest.config-reference-ci';
@@ -49,8 +51,16 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		}
 	});
 
+	test('Verify that the jest plugin exposes the associated options in the help menu for the template', async () => {
+		const result = await exec(`taq create contract-test --help`, { cwd: taqueriaProjectPath });
+		expect(result.stdout).toBe(contents.helpContentsContractTestTemplate);
+	});
+
 	test('Jest plugin creates default "tests" partition and jest config when running command with no arguments', async () => {
-		await exec(`taq test`, { cwd: `${taqueriaProjectPath}` });
+		try {
+			await exec(`taq test`, { cwd: `${taqueriaProjectPath}` });
+		} catch {
+		}
 		const directoryContents = await exec(`ls ${taqueriaProjectPath}`);
 		const taqContents = await exec(`ls ${taqueriaProjectPath}/.taq`);
 		const testsContents = await exec(`ls ${taqueriaProjectPath}/tests`);
@@ -151,11 +161,17 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('no tests present will result in an error', async () => {
-		const testOutput = await exec(`taq test -p ${taqueriaProjectPath}`);
+		const stdout = await (async () => {
+			try {
+				await exec('taq test', { cwd: taqueriaProjectPath });
+			} catch (err) {
+				const execErr = err as { stdout: '' };
+				return execErr.stdout;
+			}
+			return '';
+		})();
 
-		// NOTE, jest outputs this on stdout, hence why stdout is used here
-		// instead of stderr. This is NOT an issue with the plugin itself.
-		expect(testOutput.stdout).toContain('No tests found, exiting with code 1');
+		expect(stdout).toContain('No tests found, exiting with code 1');
 	});
 
 	test('global jest config matches reference config', async () => {
@@ -169,6 +185,22 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		} else {
 			expect(configContents).toMatchObject(reference);
 		}
+	});
+
+	test('Create an integration-test for a contract from test stubs', async () => {
+		await exec(`cp e2e/data/increment.tz ${taqueriaProjectPath}/artifacts/`);
+		const result = await exec('taq create contract-test increment.tz', { cwd: taqueriaProjectPath });
+		expect(result.stdout).toContain(`Test suite generated: ${resolve(taqueriaProjectPath)}/tests/increment.spec.ts`);
+
+		const files = await exec(`ls -1 ${taqueriaProjectPath}/tests/`);
+		expect(files.stdout.trim().split('\n')).toEqual([
+			'increment.spec.ts',
+			'jest.config.js',
+			'types',
+		]);
+
+		const specContents = await readFile(`${taqueriaProjectPath}/tests/increment.spec.ts`, { encoding: 'utf-8' });
+		expect(specContents).toBe(contents.incrementSpecContents);
 	});
 
 	afterAll(async () => {

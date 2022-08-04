@@ -1,5 +1,6 @@
-import { Option, Plugin, Task } from '@taqueria/node-sdk';
+import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
 import compile from './compile';
+import createContract from './createContract';
 
 Plugin.create(i18n => ({
 	schema: '1.0',
@@ -14,6 +15,21 @@ Plugin.create(i18n => ({
 			options: [],
 			handler: 'proxy',
 			encoding: 'json',
+		}),
+	],
+	templates: [
+		Template.create({
+			template: 'archetypeContract',
+			command: 'archetypeContract <sourceFileName>',
+			description: 'Create a Archetype contract with boilerplate code',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'sourceFileName',
+					type: 'string',
+					description: 'The name of the Archetype contract to generate',
+				}),
+			],
+			handler: createContract,
 		}),
 	],
 	proxy: compile,

@@ -65,10 +65,13 @@ describe('E2E Testing for taqueria archetype plugin', () => {
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
 
-			// 2. Run taq compile ${contractName}
+			// 2. Register the contract
+			await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
+
+			// 3. Run taq compile ${contractName}
 			await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
 
-			// 3. Verify that compiled michelson version has been generated
+			// 4. Verify that compiled michelson version has been generated
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
@@ -80,10 +83,13 @@ describe('E2E Testing for taqueria archetype plugin', () => {
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
 
-			// 2. Run taq compile ${contractName}
+			// 2. Register the contract
+			// await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
+
+			// 3. Run taq compile ${contractName}
 			await exec(`taq compile fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
 
-			// 3. Verify that compiled michelson version has been generated
+			// 4. Verify that compiled michelson version has been generated
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
@@ -96,10 +102,14 @@ describe('E2E Testing for taqueria archetype plugin', () => {
 			await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
 			await exec(`cp e2e/data/animal_tracking.arl ${taqueriaProjectPath}/contracts`);
 
-			// 2. Run taq compile ${contractName}
+			// 2. Register the contracts
+			// await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq add-contract animal_tracking.arl`, { cwd: `./${taqueriaProjectPath}` });
+
+			// 3. Run taq compile ${contractName}
 			await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
 
-			// 3. Verify that compiled michelson version for both contracts has been generated
+			// 4. Verify that compiled michelson version for both contracts has been generated
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/fa12.tz`);
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/animal_tracking.tz`);
 		} catch (error) {
