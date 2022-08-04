@@ -2,7 +2,7 @@ import { crayon } from 'crayon.js';
 import { pipe } from './pipe.ts';
 
 interface Writer {
-	write(p: Uint8Array): Promise<number | boolean>;
+	write(p: Uint8Array): Promise<number>;
 }
 
 interface UtilsDependencies {
