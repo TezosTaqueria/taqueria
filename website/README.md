@@ -10,20 +10,20 @@ The generated site is deployed to [http://taqueria.io](https://taqueria.io), but
 - Yarn v1.2 or later
 - Node.js v16 or later
 
-### Install dependencies
-```shell
-$ yarn
-```
-This command downloads the dependincies and plugins required by the site
+### Install dependencies and build the Site
+From the project root directory, run:
 
-### Build the Site
 ```shell
-$ yarn build
+$ npm run build-website
 ```
-This command runs a parser and pre-processor, then generates the static site content into the `build` directory
+
+This command runs `npm ci --legacy-peer-deps` as well as a parser and pre-processor, then generates the static site content into the `website/build` directory
 
 ### Launch the Site
+From the project root directory, run:
+
 ```shell
-$ yarn start
+$ npm run serve-website
 ```
+
 This command will serve the website on [localhost:3000](http://localhost:3000)

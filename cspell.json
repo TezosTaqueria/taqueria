@@ -1,6 +1,7 @@
 {
 	"words": [
 		"abspath",
+		"Affordance",
 		"autocrlf",
 		"dprint",
 		"EBADENGINE",
@@ -15,21 +16,24 @@
 		"mutez",
 		"oidc",
 		"outfile",
+		"Quickstart",
 		"rambda",
 		"READFILE",
 		"religo",
+		"retval",
 		"smartpy",
 		"taq'fied",
 		"taq'ified",
 		"taq'ify",
 		"taqified",
 		"taqify",
+		"Taqifying",
 		"Taqueria",
 		"taquito",
 		"Tezos",
-		"retval",
 		"typecheck",
 		"vsix",
-		"xvfb"
+		"xvfb",
+		"positionals"
 	]
 }

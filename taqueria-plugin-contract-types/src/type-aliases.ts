@@ -82,4 +82,5 @@ export const tas = {
 
 	// To number
 	number: (value: string | BigNumber) => Number(value + ''),
+	unit: () => true as unit,
 };

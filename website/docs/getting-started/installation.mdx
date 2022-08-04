@@ -40,11 +40,11 @@ The Taqueria CLI is required to use the VS Code extension and as such, must be i
 
 ### Taqueria CLI
 
-- Node.js v18.x or later
+- Node.js v16.3 or later
 - A compatable operating system:
   - MacOS
   - Linux
-  - Windows (via [WSL](https://docs.microsoft.com/en-us/windows/wsl/))
+  - Windows (via [WSL 2](https://docs.microsoft.com/en-us/windows/wsl/))
 - [Docker](https://www.docker.com/) v0.8 or later
 
 
@@ -123,7 +123,7 @@ sudo mv taq /usr/local/bin
 </TabItem>
 <TabItem value="win" label="Windows">
 
-Windows users will run the Linux version of Taqueria in Unbuntu using Windows Subsystem for Linux ([WSL 2](https://docs.microsoft.com/en-us/windows/wsl/install))
+Windows users will run the Linux version of Taqueria in Ubuntu using the Windows Subsystem for Linux ([WSL 2](https://docs.microsoft.com/en-us/windows/wsl/install))
 
 #### Requirements
 
@@ -131,7 +131,7 @@ You must be running Windows 10 version 2004 and higher, or Windows 11
 
 #### Install WSL 2
 
-1. Open a Power Shell or Windows Command Prompt and run:
+1. Open a Power Shell or Windows Command Prompt as an adminstrator and run:
   
   ```shell
   wsl --install
@@ -139,7 +139,7 @@ You must be running Windows 10 version 2004 and higher, or Windows 11
 
 2. Restart your machine
 
-3. Open the Ubuntu distribution using the Start menu
+3. Open the Ubuntu distribution using the Start if it doesn't start automatically after restarting
 
 4. Create a user name and password
 
@@ -147,11 +147,11 @@ You must be running Windows 10 version 2004 and higher, or Windows 11
 
 1. Download [Docker Desktop for Windows](https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe)
 
-2. Run the installer making sure to enable WSL 2 during the installation when prompted
+2. Run the installer making sure to enable WSL 2 during the installation if prompted
 
 3. Start Docker Desktop from the Windows Start menu
 
-4. From the Docker menu, navigate to `Settings > General` and select `Use WSL 2 based engine`
+4. From the Docker menu, navigate to `Settings > General` and select `Use WSL 2 based engine` if not already selected
 
 5. Click `Apply & Restart`
 
@@ -169,7 +169,7 @@ docker-desktop-data    Running         2
 docker-desktop         Running         2
 ```
 
-#### Install Node v18
+#### Install Node v16
 
 1. Update the `apt` package index:
 
@@ -183,7 +183,7 @@ sudo apt update
 sudo apt install curl git
 ```
 
-3. Download Node.js v18.x
+3. Download Node.js v16.x
 
 ```shell
 curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
@@ -192,16 +192,22 @@ curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 4. Install Node.js
 
 ```shell
-sudo apt install nodejs
+sudo apt-get install -y nodejs
 ```
 
-To confirm that Node v18.x has been installed properly, open a new WSL 2 terminal and run:
+5. (Optional) Install the node development tools
+
+```shell
+sudo apt-get install gcc g++ make
+```
+
+To confirm that Node v16.x has been installed properly, open a new WSL 2 terminal and run:
 
 ```shell
 node --version
 ```
 
-You should see `v18.1.0` or similar returned
+You should see `v16.16.0` or similar returned
 
 #### Install the Taqueria Binary
 
@@ -237,7 +243,7 @@ taq --version
 You should see the version of Taqueria installed output:
 
 ```shell
-v0.8.0
+v0.10.0
 ```
 
 If you see this, you have successfully installed the Taqueria CLI!
