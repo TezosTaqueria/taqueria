@@ -6,6 +6,7 @@ import {
 	sendAsyncJsonRes,
 	sendErr,
 	sendJsonRes,
+	stringToSHA256,
 } from '@taqueria/node-sdk';
 import type { Environment, LoadedConfig, RequestArgs, SandboxConfig } from '@taqueria/node-sdk/types';
 import retry from 'async-retry';
@@ -23,8 +24,8 @@ interface Opts extends RequestArgs.ProxyRequestArgs {
 }
 
 const isSandboxRunning = (sandboxName: string, opts: Opts) => {
-	const containerName = getContainerName(sandboxName, opts);
-	return execCmd(`docker ps --filter name=${containerName} | grep -w ${containerName}`)
+	return getContainerName(sandboxName, opts)
+		.then(containerName => execCmd(`docker ps --filter name=${containerName} | grep -w ${containerName}`))
 		.then(_ => true)
 		.catch(_ => false);
 };
@@ -40,8 +41,14 @@ const getDefaultSandboxName = (config: LoadedConfig.t) => {
 	return undefined;
 };
 
-const getContainerName = (sandboxName: string, parsedArgs: Opts) => {
-	return `taqueria-${parsedArgs.env}-${sandboxName}`;
+const getUniqueSandboxname = async (sandboxName: string, projectDir: string) => {
+	const hash = await stringToSHA256(projectDir);
+	return `${sandboxName}-${hash}`;
+};
+
+const getContainerName = async (sandboxName: string, parsedArgs: Opts) => {
+	const uniqueSandboxName = await getUniqueSandboxname(sandboxName, parsedArgs.projectDir);
+	return `taqueria-${parsedArgs.env}-${uniqueSandboxName}`;
 };
 
 const doesUseFlextesa = (sandbox: SandboxConfig.t) => !sandbox.plugin || sandbox.plugin === 'flextesa';
@@ -52,23 +59,29 @@ const getInputFilenameFromContractDir = (opts: Opts, sourceFile: string) =>
 const getInputFilenameFromArtifactsDir = (opts: Opts, sourceFile: string) =>
 	join('/project', opts.config.artifactsDir, sourceFile);
 
-const getCheckFileExistenceCommand = (sandboxName: string, sandbox: SandboxConfig.t, sourcePath: string, opts: Opts) =>
-	`docker exec ${getContainerName(sandboxName, opts)} ls ${sourcePath}`;
+const getCheckFileExistenceCommand = async (
+	sandboxName: string,
+	sandbox: SandboxConfig.t,
+	sourcePath: string,
+	opts: Opts,
+) => `docker exec ${await getContainerName(sandboxName, opts)} ls ${sourcePath}`;
 
 //////////// Typecheck task ////////////
 
-const getTypecheckCommand = (sandboxName: string, sandbox: SandboxConfig.t, sourcePath: string, opts: Opts) =>
-	`docker exec ${getContainerName(sandboxName, opts)} tezos-client typecheck script ${sourcePath}`;
+const getTypecheckCommand = async (sandboxName: string, sandbox: SandboxConfig.t, sourcePath: string, opts: Opts) =>
+	`docker exec ${await getContainerName(sandboxName, opts)} tezos-client typecheck script ${sourcePath}`;
 
 const typecheckContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfig.t) =>
 	async (sourceFile: string): Promise<{ contract: string; result: string }> => {
 		let sourcePath: string = getInputFilenameFromArtifactsDir(opts, sourceFile);
-		sourcePath = await execCmd(getCheckFileExistenceCommand(sandboxName, sandbox, sourcePath, opts))
+		sourcePath = await getCheckFileExistenceCommand(sandboxName, sandbox, sourcePath, opts)
+			.then(execCmd)
 			.then(() => sourcePath)
 			.catch(() => getInputFilenameFromContractDir(opts, sourceFile));
 
 		const typecheckContractHelper = () => {
-			return execCmd(getTypecheckCommand(sandboxName, sandbox, sourcePath, opts))
+			return getTypecheckCommand(sandboxName, sandbox, sourcePath, opts)
+				.then(execCmd)
 				.then(async ({ stderr }) => { // How should we output warnings?
 					if (stderr.length > 0) sendErr(`\n${stderr}`);
 					return {
@@ -86,7 +99,8 @@ const typecheckContract = (opts: Opts, sandboxName: string, sandbox: SandboxConf
 				});
 		};
 
-		return execCmd(getCheckFileExistenceCommand(sandboxName, sandbox, sourcePath, opts))
+		return getCheckFileExistenceCommand(sandboxName, sandbox, sourcePath, opts)
+			.then(execCmd)
 			.then(typecheckContractHelper)
 			.catch(err => {
 				sendErr(' ');
@@ -145,7 +159,7 @@ const typecheckTask = async <T>(parsedArgs: Opts): Promise<void> => {
 		if (sandbox) {
 			if (doesUseFlextesa(sandbox)) {
 				return await isSandboxRunning(sandboxName, parsedArgs)
-					? typecheck(parsedArgs, sandboxName, sandbox).then(sendJsonRes)
+					? typecheck(parsedArgs, sandboxName, sandbox)
 					: sendAsyncErr(`The ${sandboxName} sandbox is not running.`);
 			}
 			return sendAsyncErr(`Cannot start ${sandboxName} as its configured to use the ${sandbox.plugin} plugin.`);
@@ -175,14 +189,14 @@ const preprocessString = (value: string): string => {
 	return value;
 };
 
-const getSimulateCommand = (
+const getSimulateCommand = async (
 	opts: Opts,
 	sandboxName: string,
 	sandbox: SandboxConfig.t,
 	sourceFile: string,
 	sourcePath: string,
 ) => {
-	const containerName = getContainerName(sandboxName, opts);
+	const containerName = await getContainerName(sandboxName, opts);
 	const rawStorage = opts.storage ?? getStorageFromConfig(opts, sourceFile);
 	if (rawStorage === undefined) {
 		throw new Error('Error: Please specify a non-empty storage value in the CLI or in the config file.');
@@ -208,7 +222,8 @@ const trimTezosClientMenuIfPresent = (msg: string): string => {
 const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfig.t) =>
 	async (sourceFile: string): Promise<{ contract: string; result: string }> => {
 		let sourcePath: string = getInputFilenameFromArtifactsDir(opts, sourceFile);
-		sourcePath = await execCmd(getCheckFileExistenceCommand(sandboxName, sandbox, sourcePath, opts))
+		sourcePath = await getCheckFileExistenceCommand(sandboxName, sandbox, sourcePath, opts)
+			.then(execCmd)
 			.then(() => sourcePath)
 			.catch(err => {
 				if (opts.debug) sendErr(err);
@@ -217,8 +232,8 @@ const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfi
 
 		const simulateContractHelper = () => {
 			try {
-				const cmd = getSimulateCommand(opts, sandboxName, sandbox, sourceFile, sourcePath);
-				return execCmd(cmd)
+				return getSimulateCommand(opts, sandboxName, sandbox, sourceFile, sourcePath)
+					.then(execCmd)
 					.then(async ({ stdout, stderr }) => { // How should we output warnings?
 						if (stderr.length > 0) sendErr(`\n${stderr}`);
 						return {
@@ -244,7 +259,8 @@ const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfi
 			}
 		};
 
-		return execCmd(getCheckFileExistenceCommand(sandboxName, sandbox, sourcePath, opts))
+		return getCheckFileExistenceCommand(sandboxName, sandbox, sourcePath, opts)
+			.then(execCmd)
 			.then(simulateContractHelper)
 			.catch(err => {
 				sendErr(' ');
@@ -273,7 +289,7 @@ const simulateTask = async <T>(parsedArgs: Opts): Promise<void> => {
 		if (sandbox) {
 			if (doesUseFlextesa(sandbox)) {
 				return await isSandboxRunning(sandboxName, parsedArgs)
-					? simulate(parsedArgs, sandboxName, sandbox).then(sendJsonRes)
+					? simulate(parsedArgs, sandboxName, sandbox)
 					: sendAsyncErr(`The ${sandboxName} sandbox is not running.`);
 			}
 			return sendAsyncErr(`Cannot start ${sandboxName} as its configured to use the ${sandbox.plugin} plugin.`);

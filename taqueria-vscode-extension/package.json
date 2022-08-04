@@ -1,9 +1,10 @@
 {
 	"name": "taqueria-vscode",
-	"displayName": "taqueria",
-	"description": "A vscode plugin to make Tezos development easier with Taqueria!",
+	"displayName": "Taqueria",
+	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
-	"version": "0.8.7",
+	"version": "0.12.0",
+	"preview": true,
 	"engines": {
 		"vscode": "^1.68.1",
 		"node": "^16.0.0"
@@ -41,7 +42,7 @@
 			}
 		}
 	},
-	"author": "ECAD Labs",
+	"author": "ECAD Labs Inc.",
 	"license": "Apache-2.0",
 	"icon": "images/taqueria-icon.png",
 	"repository": {
@@ -60,11 +61,21 @@
 		"deploy",
 		"originate",
 		"ecad",
-		"ecadlabs"
+		"ecadlabs",
+		"NFT",
+		"DeFi",
+		"blockchain",
+		"smart contract",
+		"Ligo",
+		"Michelson",
+		"SmartPy",
+		"Archetype"
 	],
 	"activationEvents": [
 		"onCommand:taqueria.init",
 		"onCommand:taqueria.scaffold",
+		"onCommand:taqueria.opt_in",
+		"onCommand:taqueria.opt_out",
 		"workspaceContains:.taq",
 		"onStartupFinished"
 	],
@@ -95,27 +106,65 @@
 		"views": {
 			"taqueria": [
 				{
-					"id": "taqueria-sandboxes",
-					"name": "Sandboxes",
-					"contextualTitle": "Sandboxes"
+					"id": "taqueria-cli-check",
+					"name": "System Check",
+					"contextualTitle": "Taqueria: Checking CLI Reachability",
+					"when": "!@taqueria-state/is-taq-cli-reachable"
+				},
+				{
+					"id": "taqueria-init",
+					"name": "Initialize a Project",
+					"contextualTitle": "Taqueria: Initialize a Project",
+					"when": "@taqueria-state/is-taq-cli-reachable && @taqueria-state/enable-init-scaffold"
+				},
+				{
+					"id": "taqueria-scaffold",
+					"name": "Create a new project from an existing Scaffold",
+					"contextualTitle": "Taqueria: Scaffold a project",
+					"when": "@taqueria-state/is-taq-cli-reachable && @taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-plugins",
 					"name": "Plugins",
-					"contextualTitle": "Plugins"
+					"contextualTitle": "Taqueria: Plugins",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-contracts",
 					"name": "Contracts",
-					"contextualTitle": "Contracts"
+					"contextualTitle": "Taqueria: Contracts",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
+				},
+				{
+					"id": "taqueria-sandboxes",
+					"name": "Sandboxes",
+					"contextualTitle": "Taqueria: Sandboxes",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-environments",
 					"name": "Environments",
-					"contextualTitle": "Environments"
+					"contextualTitle": "Taqueria: Environments",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
+				},
+				{
+					"id": "taqueria-tests",
+					"name": "Tests",
+					"contextualTitle": "Taqueria: Tests",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
 				}
 			]
 		},
+		"viewsWelcome": [
+			{
+				"view": "taqueria-cli-check",
+				"contents": "Unable to find your Taqueria cli (taq command).\nPlease follow instructions [here](https://taqueria.io/docs/getting-started/installation/) to install it, then click the button below:\n[Check again](command:taqueria.refresh_command_states)\nAlso, please make sure it is in your PATH.\nIf you change your PATH, you might need to restart VsCode to pick up the change."
+			},
+			{
+				"view": "taqueria-init",
+				"contents": "Initialize a new taqueria empty project structure\n[Initialize](command:taqueria.init)"
+			}
+		],
 		"commands": [
 			{
 				"command": "taqueria.init",
@@ -129,7 +178,14 @@
 				"category": "Taqueria",
 				"title": "Scaffold Project",
 				"shortTitle": "scaffold",
-				"enablement": "@taqueria-state/enable-init-scaffold"
+				"enablement": "@taqueria-state/enable-init-scaffold",
+				"icon": "$(unfold)"
+			},
+			{
+				"command": "taqueria.refresh_command_states",
+				"category": "Taqueria",
+				"title": "Refresh Command States",
+				"shortTitle": "refresh"
 			},
 			{
 				"command": "taqueria.install",
@@ -231,14 +287,55 @@
 				"icon": "$(check)"
 			},
 			{
-				"command": "taqueria.test",
+				"command": "taqueria.create_test_folder",
 				"category": "Taqueria",
 				"title": "Setup directory as a partition to run Jest tests",
-				"shortTitle": "test",
-				"enablement": "@taqueria/plugin-jest"
+				"shortTitle": "setup test",
+				"enablement": "@taqueria/plugin-jest",
+				"icon": "$(add)"
+			},
+			{
+				"command": "taqueria.run_tests",
+				"category": "Taqueria",
+				"title": "Run tests",
+				"shortTitle": "run tests",
+				"enablement": "@taqueria/plugin-jest",
+				"icon": "$(run)"
+			},
+			{
+				"command": "taqueria.add_contract",
+				"category": "Taqueria",
+				"title": "Add contract to registry",
+				"shortTitle": "add",
+				"icon": "$(add)"
+			},
+			{
+				"command": "taqueria.rm_contract",
+				"category": "Taqueria",
+				"title": "Remove contract from registry",
+				"shortTitle": "remove",
+				"icon": "$(remove)"
 			}
 		],
 		"menus": {
+			"commandPalette": [
+				{
+					"command": "taqueria.add_contract",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.rm_contract",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.run_tests",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.refresh_command_states",
+					"when": "false"
+				}
+			],
 			"view/item/context": [
 				{
 					"command": "taqueria.install",
@@ -267,17 +364,17 @@
 				},
 				{
 					"command": "taqueria.compile_smartpy",
-					"when": "view == taqueria-contracts && viewItem == smartpy",
+					"when": "view == taqueria-contracts && viewItem =~ /lang:smartpy/",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.compile_ligo",
-					"when": "view == taqueria-contracts && viewItem == ligo",
+					"when": "view == taqueria-contracts && viewItem =~ /lang:ligo/",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.compile_archetype",
-					"when": "view == taqueria-contracts && viewItem == archetype",
+					"when": "view == taqueria-contracts && viewItem =~ /lang:archetype/",
 					"group": "inline"
 				},
 				{
@@ -287,8 +384,35 @@
 				},
 				{
 					"command": "taqueria.typecheck",
-					"when": "view == taqueria-sandboxes && view != stopped",
+					"when": "view == taqueria-sandboxes && viewItem != stopped",
 					"group": "inline"
+				},
+				{
+					"command": "taqueria.add_contract",
+					"when": "view == taqueria-contracts && viewItem =~ /inRegistry:false/",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.rm_contract",
+					"when": "view == taqueria-contracts && viewItem =~ /inRegistry:true/",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.run_tests",
+					"when": "view == taqueria-tests",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.scaffold",
+					"when": "view == taqueria-scaffold",
+					"group": "inline"
+				}
+			],
+			"view/title": [
+				{
+					"command": "taqueria.create_test_folder",
+					"when": "view == taqueria-tests",
+					"group": "navigation"
 				}
 			]
 		}
@@ -322,7 +446,7 @@
 		"vsce": "^2.6.4"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.8.7",
+		"@taqueria/protocol": "^0.12.0",
 		"comment-json": "^4.1.1",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1"

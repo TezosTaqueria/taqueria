@@ -697,7 +697,7 @@ const handleTemplate = (
 					action: 'proxyTemplate',
 				}),
 				map(decoded => {
-					if (decoded) return renderPluginJsonRes(decoded);
+					if (decoded) return renderPluginJsonRes(decoded, parsedArgs);
 				}),
 			)
 			: pipe(
@@ -708,7 +708,7 @@ const handleTemplate = (
 				),
 				map(([_, output, errOutput]) => {
 					if (errOutput.length > 0) renderError(errOutput);
-					if (output.length > 0) return renderPluginJsonRes(JSON.parse(output));
+					if (output.length > 0) return renderPluginJsonRes(JSON.parse(output), parsedArgs);
 				}),
 			);
 	}
@@ -852,7 +852,7 @@ const exposeTask = (
 						chain(addTask(parsedArgs, task.task, plugin.name)),
 						map(res => {
 							const decoded = res as PluginJsonResponse.t | void;
-							if (decoded) return renderPluginJsonRes(decoded);
+							if (decoded) return renderPluginJsonRes(decoded, parsedArgs);
 						}),
 					)
 					: pipe(
@@ -863,7 +863,7 @@ const exposeTask = (
 						),
 						map(([_, output, errOutput]) => {
 							if (errOutput.length > 0) renderError(errOutput);
-							if (output.length > 0) return renderPluginJsonRes(JSON.parse(output));
+							if (output.length > 0) return renderPluginJsonRes(JSON.parse(output), parsedArgs);
 						}),
 					);
 
@@ -872,7 +872,7 @@ const exposeTask = (
 		}),
 	);
 
-const loadEphermeralState = (
+const loadEphemeralState = (
 	cliConfig: CLIConfig,
 	config: LoadedConfig.t,
 	env: EnvVars,
@@ -886,7 +886,13 @@ const loadEphermeralState = (
 		cliConfig,
 	);
 
-const renderPluginJsonRes = (decoded: PluginJsonResponse.t) => {
+const renderPluginJsonRes = (decoded: PluginJsonResponse.t, parsedArgs: SanitizedArgs.t) => {
+	// do not render object/array ASCII table if the request comes from TVsCE
+	if (parsedArgs.fromVsCode) {
+		log(JSON.stringify(decoded.data));
+		return;
+	}
+
 	switch (decoded.render) {
 		case 'table':
 			renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
@@ -961,7 +967,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 						pipe(
 							resolvePluginName(parsedArgs, state),
 							(parsedArgs: SanitizedArgs.t) =>
-								loadEphermeralState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
+								loadEphemeralState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
 						)
 					),
 				);

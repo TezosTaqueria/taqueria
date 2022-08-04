@@ -22,20 +22,27 @@ import * as jsonc from 'https://deno.land/x/jsonc@1/main.ts';
 import memoizy from 'https://deno.land/x/memoizy@1.0.0/fp.ts';
 import { UtilsDependencies } from './taqueria-utils-types.ts';
 
-export const decodeJson = <T>(encoded: string): Future<TaqError.t, T> =>
-	attemptP(() => {
-		try {
-			const data = jsonc.parse(encoded);
-			return Promise.resolve(data as T);
-		} catch (err) {
-			throw ({
-				kind: 'E_INVALID_JSON',
-				msg: 'The provided JSON could not be decoded.',
-				previous: err,
-				context: encoded,
-			});
+export const decodeJson = <T>(encoded: string): Future<TaqError.t, T> => {
+	try {
+		const parseErrors: jsonc.ParseError[] = [];
+		const data = jsonc.parse(encoded, parseErrors, {
+			disallowComments: false,
+			allowTrailingComma: false,
+			allowEmptyContent: true,
+		});
+		if (parseErrors.length !== 0) {
+			throw new Error(`Syntax error at the ${parseErrors[0].offset}th character.`);
 		}
-	});
+		return taqResolve(data as T);
+	} catch (err) {
+		return reject({
+			kind: 'E_INVALID_JSON',
+			msg: 'The provided JSON could not be decoded.',
+			previous: err,
+			context: encoded,
+		});
+	}
+};
 
 export const debug = <T>(input: T) => {
 	// deno-lint-ignore no-debugger
