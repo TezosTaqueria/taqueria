@@ -14,7 +14,7 @@ const exec = utils.promisify(exec1);
 const taqueriaProjectPath = 'e2e/auto-test-taquito-flextesa-plugin';
 const contractRegex = new RegExp(/(KT1)+\w{33}?/);
 let environment: string;
-let dockerName: string = 'taquito-flextesa';
+let dockerName: string = 'local-taquito-flextesa';
 
 describe('E2E Testing for taqueria taquito plugin', () => {
 	beforeAll(async () => {
@@ -36,8 +36,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		// 1. Run taq deploy on a selected test network described in "test" environment
 		const deployCommand = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
-		console.log(deployCommand);
-		console.log(deployResponse);
 
 		// 2. Verify that contract has been originated on the network
 		expect(deployResponse).toContain('hello-tacos.tz');

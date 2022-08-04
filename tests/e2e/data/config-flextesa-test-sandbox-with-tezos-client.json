@@ -4,6 +4,10 @@
 		{
 			"name": "@taqueria/plugin-flextesa",
 			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-tezos-client",
+			"type": "npm"
 		}
 	],
 	"contractsDir": "contracts",
@@ -14,14 +18,9 @@
 		"development": {
 			"networks": [],
 			"sandboxes": [
-				"local"
-			],
-			"storage": {}
-		},
-		"testing": {
-			"networks": [],
-			"sandboxes": [
-				"test"
+				"local",
+				"test",
+				"local-tezos-client"
 			],
 			"storage": {}
 		}
@@ -33,6 +32,16 @@
 			"rpcUrl": "http://localhost:20000"
 		},
 		"test": {
+			"label": "Test Tezos Sandbox",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"rpcUrl": "http://localhost:20000"
+		},
+		"local-flextesa": {
+			"label": "Test Tezos Sandbox",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"rpcUrl": "http://localhost:20000"
+		},
+		"local-tezos-client": {
 			"label": "Test Tezos Sandbox",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
 			"rpcUrl": "http://localhost:20000"
