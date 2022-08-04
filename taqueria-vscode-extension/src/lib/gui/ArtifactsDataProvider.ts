@@ -1,12 +1,14 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { HasFileName, HasRefresh, VsCodeHelper } from '../helpers';
+import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 
-export class ArtifactsDataProvider implements vscode.TreeDataProvider<ArtifactTreeItem>, HasRefresh {
-	constructor(
-		private workspaceRoot: string,
-		private helper: VsCodeHelper,
-	) {}
+export class ArtifactsDataProvider extends TaqueriaDataProviderBase
+	implements vscode.TreeDataProvider<ArtifactTreeItem>, HasRefresh
+{
+	constructor(helper: VsCodeHelper) {
+		super(helper);
+	}
 
 	getTreeItem(element: ArtifactTreeItem): vscode.TreeItem {
 		return element;

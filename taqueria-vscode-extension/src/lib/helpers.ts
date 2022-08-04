@@ -1024,13 +1024,20 @@ export class VsCodeHelper {
 				artifactsWatcher.onDidChange(_ => this.artifactsDataProvider?.refresh());
 				artifactsWatcher.onDidCreate(_ => this.artifactsDataProvider?.refresh());
 				artifactsWatcher.onDidDelete(_ => this.artifactsDataProvider?.refresh());
-				
+
 				testsWatcher.onDidChange(_ => this.testDataProvider?.refresh());
 				testsWatcher.onDidCreate(_ => this.testDataProvider?.refresh());
 				testsWatcher.onDidDelete(_ => this.testDataProvider?.refresh());
 
-				return [folderWatcher, configWatcher, stateWatcher, contractsFolderWatcher, contractsWatcher, artifactsWatcher, testsWatcher];
-
+				return [
+					folderWatcher,
+					configWatcher,
+					stateWatcher,
+					contractsFolderWatcher,
+					contractsWatcher,
+					artifactsWatcher,
+					testsWatcher,
+				];
 			} catch (error: unknown) {
 				throw {
 					kind: 'E_UnknownError',
@@ -1062,7 +1069,7 @@ export class VsCodeHelper {
 		);
 		this.artifactsDataProvider = this.registerDataProvider(
 			'taqueria-artifacts',
-			new ArtifactsDataProvider(workspaceFolder, this),
+			new ArtifactsDataProvider(this),
 		);
 		this.registerDataProvider('taqueria-scaffold', new ScaffoldsDataProvider(this));
 	}
