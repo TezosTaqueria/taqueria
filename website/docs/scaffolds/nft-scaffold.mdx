@@ -19,32 +19,46 @@ The NFT-Scaffold project is currently in alpha. It is not ready for production u
 1. Scaffold the project by running:
 
 ```bash
-taq scaffold https://github.com/ecadlabs/taqueria-scaffold-quickstart quickstart-project 
+taq scaffold https://github.com/ecadlabs/taqueria-scaffold-nft nft-quickstart
 ```
 
-2. Create the file `./taqueria/.env
-
-3. Get your Pinata JWT token from your [Pinata account](https://app.pinata.cloud/signin)
-
-4. Add the token to the `.env` file you created:
+2. Change into the `/taqueria` directory inside the newly created project directory:
 
 ```shell
-pinataJwtToken=eyJhbGc...
+cd nft-quickstart/taqueria
 ```
 
-5. Start the Taqueria project by running the start script:
+3. Create the file `.env` inside the `/taqueria` directory
+
+```shell
+touch .env
+```
+
+4. Get your Pinata JWT token from your [Pinata account](https://app.pinata.cloud/signin)
+
+5. Add the token to the `.env` file you created:
+
+```shell
+echo "pinataJwtToken=eyJhbGc..." >> .env
+```
+
+6. Start the Taqueria project by running the start script:
 
 ```shell
 npm run start:taqueria:local
 ```
 
-6. Apply the Provisions
+:::note
+Taqueria's provisioning system is work-in-progress. However, the provisioning system prototype will closely resemble the version that will be shipped with Taqueria later this year
+:::
+
+7. Apply the Provisions
 
 ```shell
 npm run apply
 ```
 
-7. Start the dApp:
+8. Start the dApp:
 
 ```shell
 npm run start:app
@@ -69,7 +83,7 @@ Use the Dapp (served in your browser at [http://localhost:3000](http://localhost
         - The contract .ligo code
     - `taqueria/artifacts`
         - The compiled contract (*.tz file)
-    - `taqueria/typings`
+    - `taqueria/types`
         - The contract typescript typing
     - `taqueria/assets`
         - The NFT assets to upload
