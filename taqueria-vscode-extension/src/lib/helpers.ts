@@ -1035,6 +1035,7 @@ export class VsCodeHelper {
 					stateWatcher,
 					contractsFolderWatcher,
 					contractsWatcher,
+					artifactsFolderWatcher,
 					artifactsWatcher,
 					testsWatcher,
 				];
