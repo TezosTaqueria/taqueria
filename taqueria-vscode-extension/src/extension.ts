@@ -1,6 +1,6 @@
 import * as api from 'vscode';
 import { COMMAND_PREFIX, InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
-import { makeDir } from './lib/pure';
+import { makeDir, PathToDir } from './lib/pure';
 
 const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
 	const inMemoryState = {
@@ -61,108 +61,117 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 			progressTitle: `opting out of analytics`,
 		},
 	);
+	helper.exposeRefreshCommand();
+	// await helper.watchGlobalSettings();
 
 	const folders = helper.getFolders();
-	if (folders.length === 1) {
-		await makeDir(folders[0].uri.path, helper.i18n)
-			.then(projectDir => {
-				// Compilation tasks
-				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
-					COMMAND_PREFIX + 'compile_smartpy',
-					'--plugin smartpy compile',
-					'output',
-					{
-						finishedTitle: `compiled contract(s)`,
-						progressTitle: `compiling contract(s)`,
-					},
-					projectDir,
-				);
-				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
-					COMMAND_PREFIX + 'compile_ligo',
-					'--plugin ligo compile',
-					'output',
-					{
-						finishedTitle: `compiled contract(s)`,
-						progressTitle: `compiling contract(s)`,
-					},
-					projectDir,
-				);
-				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
-					COMMAND_PREFIX + 'compile_archetype',
-					'--plugin archetype compile',
-					'output',
-					{
-						finishedTitle: `compiled contract(s)`,
-						progressTitle: `compiling contract(s)`,
-					},
-					projectDir,
-				);
-				helper.exposeTaqTaskAsCommand(
-					COMMAND_PREFIX + 'generate_types',
-					'generate types',
-					'output',
-					{
-						finishedTitle: `generated types`,
-						progressTitle: `generating types`,
-					},
-					projectDir,
-				);
-				helper.exposeTypecheckCommand();
-				helper.exposeTaqTaskAsCommand(
-					COMMAND_PREFIX + 'test',
-					'test',
-					'output',
-					{
-						finishedTitle: `setup tests`,
-						progressTitle: `setting up tests`,
-					},
-					projectDir,
-				);
 
-				// Sandbox tasks
-				helper.exposeSandboxTaskAsCommand(
-					COMMAND_PREFIX + 'start_sandbox',
-					'start sandbox',
-					{
-						finishedTitle: `started sandbox`,
-						progressTitle: `starting sandbox`,
-					},
-					'notify',
-					projectDir,
-				);
-				helper.exposeSandboxTaskAsCommand(
-					COMMAND_PREFIX + 'stop_sandbox',
-					'stop sandbox',
-					{
-						finishedTitle: `stopped sandbox`,
-						progressTitle: `stopping sandbox`,
-					},
-					'notify',
-					projectDir,
-				);
-				helper.exposeSandboxTaskAsCommand(
-					COMMAND_PREFIX + 'list_accounts',
-					'list accounts',
-					{
-						finishedTitle: `listed sandbox accounts`,
-						progressTitle: `listing sandbox accounts`,
-					},
-					'output',
-					projectDir,
-				);
+	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
+		COMMAND_PREFIX + 'compile_smartpy',
+		'--plugin smartpy compile',
+		'output',
+		{
+			finishedTitle: `compiled contract(s)`,
+			progressTitle: `compiling contract(s)`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
+		COMMAND_PREFIX + 'compile_ligo',
+		'--plugin ligo compile',
+		'output',
+		{
+			finishedTitle: `compiled contract(s)`,
+			progressTitle: `compiling contract(s)`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
+		COMMAND_PREFIX + 'compile_archetype',
+		'--plugin archetype compile',
+		'output',
+		{
+			finishedTitle: `compiled contract(s)`,
+			progressTitle: `compiling contract(s)`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithFileArgument(
+		COMMAND_PREFIX + 'add_contract',
+		'add-contract',
+		'output',
+		{
+			finishedTitle: `added contract to registry`,
+			progressTitle: `adding contract to registry`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithFileArgument(
+		COMMAND_PREFIX + 'rm_contract',
+		'rm-contract',
+		'output',
+		{
+			finishedTitle: `removed contract from registry`,
+			progressTitle: `removing contract from registry`,
+		},
+	);
 
-				helper.exposeOriginateTask();
+	helper.exposeTaqTaskAsCommand(
+		COMMAND_PREFIX + 'generate_types',
+		'generate types',
+		'output',
+		{
+			finishedTitle: `generated types`,
+			progressTitle: `generating types`,
+		},
+	);
+	helper.exposeTypecheckCommand();
+	helper.exposeTestSetupCommand();
+	helper.exposeRunTestCommand();
 
-				try {
-					helper.createWatcherIfNotExists(projectDir, addConfigWatcherIfNotExists);
-				} catch (error: unknown) {
-					helper.logAllNestedErrors(error);
-				}
-			});
-		helper.registerDataProviders(folders[0].uri.fsPath);
-	} else if (folders.length === 0) {
-		helper.updateCommandStates();
-	}
+	// Sandbox tasks
+	helper.exposeSandboxTaskAsCommand(
+		COMMAND_PREFIX + 'start_sandbox',
+		'start sandbox',
+		{
+			finishedTitle: `started sandbox`,
+			progressTitle: `starting sandbox`,
+		},
+	);
+	helper.exposeSandboxTaskAsCommand(
+		COMMAND_PREFIX + 'stop_sandbox',
+		'stop sandbox',
+		{
+			finishedTitle: `stopped sandbox`,
+			progressTitle: `stopping sandbox`,
+		},
+	);
+	helper.exposeSandboxTaskAsCommand(
+		COMMAND_PREFIX + 'list_accounts',
+		'list accounts',
+		{
+			finishedTitle: `listed sandbox accounts`,
+			progressTitle: `listing sandbox accounts`,
+		},
+	);
+
+	helper.exposeOriginateTask();
+
+	deps.vscode.workspace.onDidChangeWorkspaceFolders(e => {
+		e.added.forEach(folder => {
+			try {
+				helper.createWatcherIfNotExists(folder.uri.fsPath, addConfigWatcherIfNotExists);
+			} catch (error: unknown) {
+				helper.logAllNestedErrors(error);
+			}
+		});
+	});
+
+	deps.vscode.workspace.workspaceFolders?.forEach(folder => {
+		try {
+			helper.createWatcherIfNotExists(folder.uri.fsPath, addConfigWatcherIfNotExists);
+		} catch (error: unknown) {
+			helper.logAllNestedErrors(error);
+		}
+	});
+	helper.registerDataProviders();
+	helper.updateCommandStates();
 }
 
 export function deactivate() {
