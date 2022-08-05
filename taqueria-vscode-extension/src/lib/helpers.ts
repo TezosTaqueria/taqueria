@@ -1,11 +1,14 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { TaqError } from '@taqueria/protocol/TaqError';
 import { spawn } from 'child_process';
+import Table from 'cli-table3';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import os from 'os';
 import path, { join } from 'path';
+import { uniq } from 'rambda';
 import * as api from 'vscode';
+import { ArtifactsDataProvider, ArtifactTreeItem } from './gui/ArtifactsDataProvider';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
 import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
@@ -267,6 +270,37 @@ export class VsCodeHelper {
 		});
 	}
 
+	tryFormattingAsTable(json: string): string {
+		let data: unknown = undefined;
+		try {
+			data = JSON.parse(json);
+		} catch {
+			return json;
+		}
+		const array: Record<string, any>[] = Array.isArray(data)
+			? data as Record<string, any>[]
+			: [data as Record<string, any>];
+		const keys = uniq(array.reduce((retval: string[], record) => [...retval, ...Object.keys(record)], []));
+
+		const rows = array.reduce(
+			(retval: (string[])[], record) => {
+				const row = keys.reduce(
+					(row: string[], key: string) => {
+						const value: string = record[key] ? record[key] : '';
+						return [...row, value];
+					},
+					[],
+				);
+				return [...retval, row];
+			},
+			[],
+		);
+
+		const table = new Table({ head: keys });
+		table.push(...rows);
+		return table.toString();
+	}
+
 	async getTaqifiedDirectories() {
 		const taqified = await filterAsync([...this.getFolders()], async folder => {
 			try {
@@ -506,12 +540,12 @@ export class VsCodeHelper {
 		});
 	}
 
-	getContractFileName(fileName: string) {
+	getArtifactFileNameFromContract(fileName: string) {
 		return fileName.replace(/\.[^/.]+$/, '') + '.tz';
 	}
 
 	async exposeOriginateTask() {
-		this.registerCommand(Commands.originate, async (arg?: ContractTreeItem | EnvironmentTreeItem | undefined) => {
+		this.registerCommand(Commands.originate, async (arg?: ArtifactTreeItem | EnvironmentTreeItem | undefined) => {
 			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
 			if (projectDir === undefined) {
 				return;
@@ -520,10 +554,10 @@ export class VsCodeHelper {
 			let fileName: string | undefined = undefined;
 			if (arg) {
 				if (arg instanceof EnvironmentTreeItem) {
-					environmentName = (arg as EnvironmentTreeItem).label;
+					environmentName = arg.label;
 				}
-				if (arg instanceof ContractTreeItem) {
-					fileName = this.getContractFileName((arg as ContractTreeItem).fileName);
+				if (arg instanceof ArtifactTreeItem) {
+					fileName = arg.fileName;
 				}
 			}
 			if (!environmentName) {
@@ -636,10 +670,10 @@ export class VsCodeHelper {
 			let sandboxName: string | undefined = undefined;
 			if (arg) {
 				if (arg instanceof SandboxTreeItem) {
-					sandboxName = (arg as SandboxTreeItem).label;
+					sandboxName = arg.label;
 				}
 				if (arg instanceof ContractTreeItem) {
-					fileName = this.getContractFileName((arg as ContractTreeItem).fileName);
+					fileName = this.getArtifactFileNameFromContract(arg.fileName);
 				}
 			}
 			if (!sandboxName) {
@@ -715,7 +749,7 @@ export class VsCodeHelper {
 					}
 				}
 				if (result.standardOutput) {
-					this.showOutput(result.standardOutput);
+					this.showOutput(this.tryFormattingAsTable(result.standardOutput));
 				}
 				if (result.executionError || result.standardError) {
 					this.vscode.window.showWarningMessage(
@@ -994,6 +1028,9 @@ export class VsCodeHelper {
 				const contractsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts/*'));
 				const testsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '**/jest.config.js'));
 
+				const artifactsFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'artifacts'));
+				const artifactsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'artifacts/*'));
+
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
 				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
 				folderWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
@@ -1014,11 +1051,27 @@ export class VsCodeHelper {
 				contractsWatcher.onDidCreate(_ => this.contractsDataProvider?.refresh());
 				contractsWatcher.onDidDelete(_ => this.contractsDataProvider?.refresh());
 
+				artifactsFolderWatcher.onDidChange(_ => this.artifactsDataProvider?.refresh());
+				artifactsFolderWatcher.onDidCreate(_ => this.artifactsDataProvider?.refresh());
+				artifactsFolderWatcher.onDidDelete(_ => this.artifactsDataProvider?.refresh());
+				artifactsWatcher.onDidChange(_ => this.artifactsDataProvider?.refresh());
+				artifactsWatcher.onDidCreate(_ => this.artifactsDataProvider?.refresh());
+				artifactsWatcher.onDidDelete(_ => this.artifactsDataProvider?.refresh());
+
 				testsWatcher.onDidChange(_ => this.testDataProvider?.refresh());
 				testsWatcher.onDidCreate(_ => this.testDataProvider?.refresh());
 				testsWatcher.onDidDelete(_ => this.testDataProvider?.refresh());
 
-				return [folderWatcher, configWatcher, stateWatcher, contractsFolderWatcher, contractsWatcher, testsWatcher];
+				return [
+					folderWatcher,
+					configWatcher,
+					stateWatcher,
+					contractsFolderWatcher,
+					contractsWatcher,
+					artifactsFolderWatcher,
+					artifactsWatcher,
+					testsWatcher,
+				];
 			} catch (error: unknown) {
 				throw {
 					kind: 'E_UnknownError',
@@ -1032,6 +1085,7 @@ export class VsCodeHelper {
 
 	private refreshDataProviders: { refresh: () => void }[] = [];
 	private contractsDataProvider?: ContractsDataProvider;
+	private artifactsDataProvider?: ArtifactsDataProvider;
 	private sandboxesDataProvider?: SandboxesDataProvider;
 	private testDataProvider?: TestDataProvider;
 
@@ -1046,6 +1100,10 @@ export class VsCodeHelper {
 		this.contractsDataProvider = this.registerDataProvider(
 			'taqueria-contracts',
 			new ContractsDataProvider(this),
+		);
+		this.artifactsDataProvider = this.registerDataProvider(
+			'taqueria-artifacts',
+			new ArtifactsDataProvider(this),
 		);
 		this.registerDataProvider('taqueria-scaffold', new ScaffoldsDataProvider(this));
 	}
