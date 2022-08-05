@@ -106,64 +106,86 @@
 		"views": {
 			"taqueria": [
 				{
-					"id": "taqueria-cli-check",
+					"id": "taqueria-system-check",
 					"name": "System Check",
-					"contextualTitle": "Taqueria: Checking CLI Reachability",
-					"when": "!@taqueria-state/is-taq-cli-reachable"
+					"contextualTitle": "Taqueria: Checking System Requirements",
+					"visibility": "collapsed"
 				},
 				{
 					"id": "taqueria-init",
 					"name": "Initialize a Project",
 					"contextualTitle": "Taqueria: Initialize a Project",
-					"when": "@taqueria-state/is-taq-cli-reachable && @taqueria-state/enable-init-scaffold"
+					"when": "@taqueria-state/system-check-passed && @taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-scaffold",
 					"name": "Create a new project from an existing Scaffold",
 					"contextualTitle": "Taqueria: Scaffold a project",
-					"when": "@taqueria-state/is-taq-cli-reachable && @taqueria-state/enable-init-scaffold"
+					"when": "@taqueria-state/system-check-passed && @taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-plugins",
 					"name": "Plugins",
 					"contextualTitle": "Taqueria: Plugins",
-					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-contracts",
 					"name": "Contracts",
 					"contextualTitle": "Taqueria: Contracts",
-					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-sandboxes",
 					"name": "Sandboxes",
 					"contextualTitle": "Taqueria: Sandboxes",
-					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-artifacts",
 					"name": "Artifacts",
-					"contextualTitle": "Artifacts"
+					"contextualTitle": "Artifacts",
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-environments",
 					"name": "Environments",
 					"contextualTitle": "Taqueria: Environments",
-					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-tests",
 					"name": "Tests",
 					"contextualTitle": "Taqueria: Tests",
-					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
 				}
 			]
 		},
 		"viewsWelcome": [
 			{
-				"view": "taqueria-cli-check",
-				"contents": "Unable to find your Taqueria cli (taq command).\nPlease follow instructions [here](https://taqueria.io/docs/getting-started/installation/) to install it, then click the button below:\n[Check again](command:taqueria.refresh_command_states)\nAlso, please make sure it is in your PATH.\nIf you change your PATH, you might need to restart VsCode to pick up the change."
+				"view": "taqueria-system-check",
+				"when": "@taqueria-state/is-taq-cli-reachable",
+				"contents": "✅ Taq CLI: Installed"
+			},
+			{
+				"view": "taqueria-system-check",
+				"when": "!@taqueria-state/is-taq-cli-reachable",
+				"contents": "❌ Taq CLI: Unable to find your Taqueria cli (taq command).\nPlease follow instructions [here](https://taqueria.io/docs/getting-started/installation/) to install it, then click the button below:\n[Check again](command:taqueria.refresh_command_states)\nAlso, please make sure it is in your PATH.\nIf you change your PATH, you might need to restart VsCode to pick up the change."
+			},
+			{
+				"view": "taqueria-system-check",
+				"when": "@taqueria-state/is-node-installed && @taqueria-state/node-version-meets-requirements",
+				"contents": "✅ NodeJs: Installed"
+			},
+			{
+				"view": "taqueria-system-check",
+				"when": "!@taqueria-state/is-node-installed",
+				"contents": "❌ NodeJs: Unable to find nodejs. You can find instructions to install node [here](https://nodejs.org/en/download/)."
+			},
+			{
+				"view": "taqueria-system-check",
+				"when": "@taqueria-state/is-node-installed && !@taqueria-state/node-version-meets-requirements",
+				"contents": "❌ NodeJs: Node version is not supported. Please update your node to be newer than 16.10.0. You can find instructions [here](https://nodejs.org/en/download/)."
 			},
 			{
 				"view": "taqueria-init",
@@ -443,6 +465,7 @@
 		"@types/mocha": "^5.2.6",
 		"@types/node": "^17.0.17",
 		"@types/promise-memoize": "^1.2.1",
+		"@types/semver": "^7.3.10",
 		"@types/vscode": "1.63.0",
 		"@typescript-eslint/eslint-plugin": "^5.9.1",
 		"@typescript-eslint/parser": "^5.9.1",
@@ -461,6 +484,7 @@
 		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
 		"promise-memoize": "^1.2.1",
-		"rambda": "^7.0.1"
+		"rambda": "^7.0.1",
+		"semver": "^7.3.7"
 	}
 }

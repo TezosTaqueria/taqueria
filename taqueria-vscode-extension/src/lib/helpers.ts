@@ -7,6 +7,7 @@ import { stat } from 'fs/promises';
 import os from 'os';
 import path, { join } from 'path';
 import { uniq } from 'rambda';
+import * as semver from 'semver';
 import * as api from 'vscode';
 import { ArtifactsDataProvider, ArtifactTreeItem } from './gui/ArtifactsDataProvider';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
@@ -16,11 +17,14 @@ import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
 import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvider';
 import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProvider';
+import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
 import { TaqVsxError } from './TaqVsxError';
 
 export const COMMAND_PREFIX = 'taqueria.';
+
+const minNodeVersion = '16.10.0';
 
 export enum Commands {
 	init = 'taqueria.init',
@@ -915,8 +919,52 @@ export class VsCodeHelper {
 	}
 
 	async updateCommandStates() {
-		const isTaqReachable = await this.isTaqCliReachable();
+		const [isTaqReachable, nodeVersion] = await Promise.all([
+			this.isTaqCliReachable(),
+			Util.getNodeVersion(this.getLog()),
+		]);
+
+		let nodeFound, isNodeVersionValid, nodeMeetsVersionRequirement: boolean;
+		if (!nodeVersion) {
+			nodeFound = false;
+			isNodeVersionValid = false;
+			nodeMeetsVersionRequirement = false;
+		} else {
+			nodeFound = true;
+			isNodeVersionValid = !!semver.valid(nodeVersion);
+			nodeMeetsVersionRequirement = semver.gt(nodeVersion, minNodeVersion);
+		}
+		const systemCheckPassed = isTaqReachable && nodeFound && isNodeVersionValid && nodeMeetsVersionRequirement;
+
 		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taq-cli-reachable', isTaqReachable);
+		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-node-installed', nodeFound);
+		this.vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/node-version-meets-requirements',
+			isNodeVersionValid && nodeMeetsVersionRequirement,
+		);
+		this.vscode.commands.executeCommand('setContext', '@taqueria-state/system-check-passed', systemCheckPassed);
+
+		if (this.systemCheckTreeView) {
+			this.systemCheckTreeView.title = `${systemCheckPassed ? '✅' : '❌'} System Check`;
+			let message = '';
+			if (isTaqReachable) {
+				message += `✅ Taq CLI: Installed \n`;
+			} else {
+				message += `❌ Taq CLI: Installed (or not in PATH) \n`;
+			}
+			if (!nodeFound) {
+				message += `❌ NodeJs: Not Found \n`;
+			} else if (!isNodeVersionValid) {
+				message += `❌ NodeJs: Invalid version ${nodeVersion} \n`;
+			} else if (!nodeMeetsVersionRequirement) {
+				message +=
+					`❌ NodeJs: Does not meet min version requirement: found: ${nodeVersion}, expected: ${minNodeVersion} \n`;
+			} else {
+				message += `✅ Taq CLI: Node ${nodeVersion} found \n`;
+			}
+			// this.systemCheckTreeView.message = message;
+		}
 
 		const mainFolder = this.getMainWorkspaceFolder();
 		if (mainFolder === undefined) {
@@ -1088,6 +1136,8 @@ export class VsCodeHelper {
 	private artifactsDataProvider?: ArtifactsDataProvider;
 	private sandboxesDataProvider?: SandboxesDataProvider;
 	private testDataProvider?: TestDataProvider;
+	private systemCheckDataProvider?: SystemCheckDataProvider;
+	private systemCheckTreeView?: api.TreeView<SystemCheckTreeItem>;
 
 	registerDataProviders() {
 		this.registerDataProvider('taqueria-plugins', new PluginsDataProvider(this));
@@ -1106,6 +1156,10 @@ export class VsCodeHelper {
 			new ArtifactsDataProvider(this),
 		);
 		this.registerDataProvider('taqueria-scaffold', new ScaffoldsDataProvider(this));
+		this.systemCheckDataProvider = this.registerDataProvider(
+			'taqueria-system-check',
+			new SystemCheckDataProvider(this),
+		);
 	}
 
 	private registerDataProvider<T extends api.TreeDataProvider<unknown>>(
@@ -1253,5 +1307,11 @@ export class VsCodeHelper {
 		} catch {
 			return false;
 		}
+	}
+
+	async createTreeViews() {
+		this.systemCheckTreeView = this.vscode.window.createTreeView<SystemCheckTreeItem>('taqueria-system-check', {
+			treeDataProvider: this.systemCheckDataProvider!,
+		});
 	}
 }
