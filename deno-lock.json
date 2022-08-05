@@ -21,6 +21,7 @@
   "https://cdn.skypack.dev/-/uuid@v8.3.2-XAQ9X05vJqvKpZccxFGc/dist=es2019,mode=imports/optimized/uuid.js": "2269db8209b0d0e0430b48430585ef0dfe4388c020b7d371643f318a3b795164",
   "https://cdn.skypack.dev/batching-toposort": "07874751202b18f6673b313b7f76e0439ee12dd5c2dbf8627e7dc5ab740dc2ad",
   "https://cdn.skypack.dev/retronid": "9d42bee088836bc28ec34b556953906361f354cdcd36b51612389f0b4d6f21a1",
+  "https://cdnjs.cloudflare.com/ajax/libs/rambda/7.1.0/rambda.esm.js": "aed59eb76f3001af0c972d1275964fab0b48cdc526a3ad290a9d0a1557ace3f9",
   "https://deno.land/std@0.113.0/fmt/colors.ts": "8368ddf2d48dfe413ffd04cdbb7ae6a1009cf0dccc9c7ff1d76259d9c61a0621",
   "https://deno.land/std@0.115.1/_util/assert.ts": "2f868145a042a11d5ad0a3c748dcf580add8a0dbc0e876eaa0026303a5488f58",
   "https://deno.land/std@0.115.1/_util/os.ts": "dfb186cc4e968c770ab6cc3288bd65f4871be03b93beecae57d657232ecffcac",
@@ -545,6 +546,5 @@
   "https://deno.land/x/zod@v3.14.4/mod.ts": "64e55237cb4410e17d968cd08975566059f27638ebb0b86048031b987ba251c4",
   "https://deno.land/x/zod@v3.14.4/types.ts": "7829a9fe28910b928e13de4b1b7ae72798ab09934daf69f3ef9d7ce52d0d5663",
   "https://esm.sh/ts-pattern@3.3.5": "13920cf5529bab1debc7df1be8bc57d914bf2d80cd81c452df8045af0da67f2d",
-  "https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts": "6368780ee65d9f034a23b7d525229947e02f141a16f1678f2b25735f391a2c6e",
-  "https://raw.githubusercontent.com/selfrefactor/rambda/master/dist/rambda.esm.js": "aed59eb76f3001af0c972d1275964fab0b48cdc526a3ad290a9d0a1557ace3f9"
+  "https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts": "6368780ee65d9f034a23b7d525229947e02f141a16f1678f2b25735f391a2c6e"
 }

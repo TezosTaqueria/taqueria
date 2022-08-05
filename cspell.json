@@ -1,6 +1,7 @@
 {
 	"words": [
 		"abspath",
+		"Affordance",
 		"autocrlf",
 		"dprint",
 		"EBADENGINE",
@@ -32,6 +33,7 @@
 		"Tezos",
 		"typecheck",
 		"vsix",
-		"xvfb"
+		"xvfb",
+		"positionals"
 	]
 }

@@ -10,12 +10,14 @@
 	},
 	"includes": [
 		"**/*.{ts,tsx,js,jsx,cjs,mjs,json}",
-		".github/workflows/*"
+		".github/workflows/*",
+		"./website/src/pages/index.js"
 	],
 	"excludes": [
 		"**/node_modules",
 		"**/*-lock.json",
 		"./website",
+		"./deno",
 		"taqueria-plugin-contract-types/example",
 		"taqueria-vscode-extension/src/test/suite/data"
 	],

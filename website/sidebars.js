@@ -81,6 +81,7 @@ const sidebars = {
         "scaffolds/scaffold-basics",
         "scaffolds/taco-shop",
         "scaffolds/quickstart",
+        "scaffolds/nft-scaffold",
       ],
     },    
     {
@@ -93,6 +94,16 @@ const sidebars = {
         "tutorials/hello-tacos-tutorial"
       ],
     },
+    {
+      type: "category",
+      label: "Features",
+      className: "sidebarHeader",
+      collapsed: false,
+      collapsible: false,
+      items: [
+        "features/github-action"
+      ],
+    }, 
     {
       type: "category",
       label: "Taqueria Internals",

@@ -46,11 +46,9 @@ export type PositiveInt = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 
 
 export type i18nMessage = string | { message: string; numOfArguments: PositiveInt };
 
-export type Args = string[];
-
 export interface StdIO {
 	stdout: string;
 	stderr: string;
 }
 
-export type pluginDefiner = ((i18n: i18n) => PluginSchema.RawPluginSchema);
+export type pluginDefiner = <T extends RequestArgs.t>(parsedArgs: T, i18n: i18n) => PluginSchema.RawPluginSchema;

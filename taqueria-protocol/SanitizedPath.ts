@@ -17,7 +17,9 @@ const { schemas: generatedSchemas, factory } = createType<RawInput, RawInput>({
 	unknownErrMsg: (value: unknown) => `Something went wrong trying to parse the filesystem path, ${value}`,
 });
 
-export type SanitizedPath = z.infer<typeof generatedSchemas.schema>;
+export const internalSchema = generatedSchemas.schema;
+
+export type SanitizedPath = z.infer<typeof internalSchema>;
 export type t = SanitizedPath;
 export const { create, of, make } = factory;
 export const schemas = {
