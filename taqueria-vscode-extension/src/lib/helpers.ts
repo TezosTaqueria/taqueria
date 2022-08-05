@@ -945,6 +945,10 @@ export class VsCodeHelper {
 		);
 		this.vscode.commands.executeCommand('setContext', '@taqueria-state/system-check-passed', systemCheckPassed);
 
+		if (systemCheckPassed) {
+			this.vscode.commands.executeCommand('workbench.actions.treeView.taqueria-system-check.collapseAll');
+		}
+
 		if (this.systemCheckTreeView) {
 			this.systemCheckTreeView.title = `${systemCheckPassed ? '✅' : '❌'} System Check`;
 			let message = '';
