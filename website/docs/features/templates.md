@@ -6,7 +6,7 @@ Taqueria plugins are able to define templates that can be used to generate proje
 
 ## Available Templates
 
-| Template           | \<template>          | Plugin                      | Command                      | Description                                                                                                        |
+| Template           | < template >         | Plugin                      | Command                       | Description                                                                                                        |
 |--------------------|----------------------|------------------------------|------------------------------|--------------------------------------------------------------------------------------------------------------------|
 | Ligo contract      | `contract`           | `@taqueria\plugin-ligo`      | `taq create contract <path>` | Instantiates a new Ligo contract at the provided `<path>` and registers the contract in the contract registry      |
 | Archetype contract | `archetypeContract`  | `@taqueria\plugin-archetype` | `taq create contract <path>` | Instantiates a new Archetype contract at the provided `<path>` and registers the contract in the contract registry |
