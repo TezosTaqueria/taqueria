@@ -144,7 +144,8 @@
 				{
 					"id": "taqueria-artifacts",
 					"name": "Artifacts",
-					"contextualTitle": "Artifacts"
+					"contextualTitle": "Taqueria: Artifacts",
+					"when": "@taqueria-state/is-taq-cli-reachable && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-environments",
