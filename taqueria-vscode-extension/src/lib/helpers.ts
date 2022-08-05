@@ -1,10 +1,12 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { TaqError } from '@taqueria/protocol/TaqError';
 import { spawn } from 'child_process';
+import Table from 'cli-table3';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import os from 'os';
 import path, { join } from 'path';
+import { uniq } from 'rambda';
 import * as api from 'vscode';
 import { ArtifactsDataProvider, ArtifactTreeItem } from './gui/ArtifactsDataProvider';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
@@ -266,6 +268,37 @@ export class VsCodeHelper {
 		this.registerCommand(COMMAND_PREFIX + 'refresh_command_states', async () => {
 			await this.updateCommandStates();
 		});
+	}
+
+	tryFormattingAsTable(json: string): string {
+		let data: unknown = undefined;
+		try {
+			data = JSON.parse(json);
+		} catch {
+			return json;
+		}
+		const array: Record<string, any>[] = Array.isArray(data)
+			? data as Record<string, any>[]
+			: [data as Record<string, any>];
+		const keys = uniq(array.reduce((retval: string[], record) => [...retval, ...Object.keys(record)], []));
+
+		const rows = array.reduce(
+			(retval: (string[])[], record) => {
+				const row = keys.reduce(
+					(row: string[], key: string) => {
+						const value: string = record[key] ? record[key] : '';
+						return [...row, value];
+					},
+					[],
+				);
+				return [...retval, row];
+			},
+			[],
+		);
+
+		const table = new Table({ head: keys });
+		table.push(...rows);
+		return table.toString();
 	}
 
 	async getTaqifiedDirectories() {
@@ -716,7 +749,7 @@ export class VsCodeHelper {
 					}
 				}
 				if (result.standardOutput) {
-					this.showOutput(result.standardOutput);
+					this.showOutput(this.tryFormattingAsTable(result.standardOutput));
 				}
 				if (result.executionError || result.standardError) {
 					this.vscode.window.showWarningMessage(
