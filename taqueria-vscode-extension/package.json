@@ -170,7 +170,7 @@
 			{
 				"view": "taqueria-system-check",
 				"when": "!@taqueria-state/is-taq-cli-reachable",
-				"contents": "❌ Taq CLI: Unable to find your Taqueria cli (taq command).\nPlease follow instructions [here](https://taqueria.io/docs/getting-started/installation/) to install it, then click the button below:\n[Check again](command:taqueria.refresh_command_states)\nAlso, please make sure it is in your PATH.\nIf you change your PATH, you might need to restart VsCode to pick up the change."
+				"contents": "❌ Taq CLI: Unable to find your Taqueria cli (taq command).\nPlease follow instructions [here](https://taqueria.io/docs/getting-started/installation/) to install it, then click the \"Check Again\" button.\nAlso, please make sure it is in your PATH.\nIf you change your PATH, you might need to restart VsCode to pick up the change."
 			},
 			{
 				"view": "taqueria-system-check",
@@ -186,6 +186,10 @@
 				"view": "taqueria-system-check",
 				"when": "@taqueria-state/is-node-installed && !@taqueria-state/node-version-meets-requirements",
 				"contents": "❌ NodeJs: Node version is not supported. Please update your node to be newer than 16.10.0. You can find instructions [here](https://nodejs.org/en/download/)."
+			},
+			{
+				"view": "taqueria-system-check",
+				"contents": "[Check Again](command:taqueria.refresh_command_states)"
 			},
 			{
 				"view": "taqueria-init",
