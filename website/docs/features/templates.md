@@ -18,7 +18,7 @@ To use a template, you first need to install the appropriate plugin, then use th
 The structure of the `create` task is:
 
 ```shell
-taq create \<template\> \<path\>
+taq create <template> <path>
 ```
 
 ### Positional Arguments
