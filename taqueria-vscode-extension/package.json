@@ -144,7 +144,7 @@
 				{
 					"id": "taqueria-artifacts",
 					"name": "Artifacts",
-					"contextualTitle": "Artifacts",
+					"contextualTitle": "Taqueria: Artifacts",
 					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
 				},
 				{
@@ -170,7 +170,7 @@
 			{
 				"view": "taqueria-system-check",
 				"when": "!@taqueria-state/is-taq-cli-reachable",
-				"contents": "❌ Taq CLI: Unable to find your Taqueria cli (taq command).\nPlease follow instructions [here](https://taqueria.io/docs/getting-started/installation/) to install it, then click the \"Check Again\" button.\nAlso, please make sure it is in your PATH.\nIf you change your PATH, you might need to restart VsCode to pick up the change."
+				"contents": "❌ Taq CLI: Unable to find the Taqueria CLI.\nThe Taqueria CLI is required to use this extension. Click [here](https://taqueria.io/docs/getting-started/installation/) for installation instructions, then click the \"Check Again\" button.\nThe Taqueria CLI must also be in your PATH. If you change your PATH, you might need to restart Visual Studio Code to register this change."
 			},
 			{
 				"view": "taqueria-system-check",
