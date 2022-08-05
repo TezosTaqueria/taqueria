@@ -21,7 +21,7 @@ const sidebars = {
       label: "Getting Started",
       className: "sidebarHeader",
       collapsed: false,
-      collapsible: false,
+      collapsible: true,
       items: [
         "getting-started/installation",
         "intro",
@@ -31,23 +31,23 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Configuration",
+      label: "Scaffolds",
       className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
+      collapsed: true,
+      collapsible: true,
       items: [
-        "config/networks",
-        "config/implicit-accounts",
-        "config/sandbox-config",
-        "config/environments"
+        "scaffolds/scaffold-basics",
+        "scaffolds/taco-shop",
+        "scaffolds/quickstart",
+        "scaffolds/nft-scaffold",
       ],
-    },
+    },   
     {
       type: "category",
       label: "Plugin Reference",
       className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
+      collapsed: true,
+      collapsible: true,
       items: [
         "plugins/plugin-basics",
         "plugins/plugin-archetype",
@@ -61,6 +61,58 @@ const sidebars = {
         "plugins/plugin-tezos-client",
       ],
     },
+    {
+      type: "category",
+      label: "Task Reference",
+      className: "sidebarHeader",
+      collapsed: true,
+      collapsible: true,
+      items: [
+        "tasks/add-contract",
+        "tasks/compile",
+        "tasks/generate-types",
+        "tasks/init",
+        "tasks/install",
+        "tasks/list-accounts",
+        "tasks/list-contracts",
+        "tasks/opt-in",
+        "tasks/opt-out",
+        "tasks/originate",
+        "tasks/publish",
+        "tasks/remove-contract",
+        "tasks/scaffold",
+        "tasks/simulate",
+        "tasks/start-sandbox",
+        "tasks/stop-sandbox",
+        "tasks/test",
+        "tasks/typecheck",
+        "tasks/uninstall"
+      ],
+    },
+    {
+      type: "category",
+      label: "Features",
+      className: "sidebarHeader",
+      collapsed: true,
+      collapsible: true,
+      items: [
+        "features/github-action",
+        "features/templates",
+      ],
+    },
+    {
+      type: "category",
+      label: "Configuration",
+      className: "sidebarHeader",
+      collapsed: true,
+      collapsible: true,
+      items: [
+        "config/networks",
+        "config/implicit-accounts",
+        "config/sandbox-config",
+        "config/environments"
+      ],
+    },
     // {
     //   type: "category",
     //   label: "Taqueria Libraries",
@@ -70,46 +122,23 @@ const sidebars = {
     //   items: [
     //     "libraries/taqueria-state"
     //   ],
-    // },
-    {
-      type: "category",
-      label: "Scaffolds",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "scaffolds/scaffold-basics",
-        "scaffolds/taco-shop",
-        "scaffolds/quickstart",
-        "scaffolds/nft-scaffold",
-      ],
-    },    
+    // }, 
     {
       type: "category",
       label: "Tutorials",
       className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
+      collapsed: true,
+      collapsible: true,
       items: [
         "tutorials/hello-tacos-tutorial"
       ],
     },
     {
       type: "category",
-      label: "Features",
-      className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
-      items: [
-        "features/github-action"
-      ],
-    }, 
-    {
-      type: "category",
       label: "Taqueria Internals",
       className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
+      collapsed: true,
+      collapsible: true,
       items: [
         "taqueria-internals/architecture",
         "data-collection-policy"
@@ -119,8 +148,8 @@ const sidebars = {
       type: "category",
       label: "Taqueria Development",
       className: "sidebarHeader",
-      collapsed: false,
-      collapsible: false,
+      collapsed: true,
+      collapsible: true,
       items: [
         "roadmap",
         "release-notes",
