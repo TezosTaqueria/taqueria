@@ -11,7 +11,7 @@ The Michelson contracts that will be processed are those in the `/artifacts` dir
 For each contract that is processed, two output files are created:
 
 - `<fileName>.types.ts` - This file contains a TypeScript definition for the contract, storage, and entrypoints and is what you will import into your TS dApp
-- `<fileName>".code.ts`  - This file contains the code that is used to interact with the contract, you will not need to import this file into your TS dApp
+- `<fileName>.code.ts`  - This file contains the code that is used to interact with the contract, you will not need to import this file into your TS dApp
 
 Additionally, there are two helper files that are created:
 

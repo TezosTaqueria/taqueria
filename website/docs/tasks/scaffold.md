@@ -8,9 +8,9 @@ Taq `scaffold` is a task used to retrieve and initialize a Taqueria scaffold. Sc
 
 When the scaffold task is run, Taqueria does several things:
 
-- Clones the scaffold repository 
+- Clones the scaffold repository
 - Removes the `.git` directory from the project
-- Taq`ifies the project and generates the cache by running `taq` and `taq init` 
+- Taq'ifies the project and generates the cache by running `taq` and `taq init`
 - Runs the setup script defined in `scaffold.json`. This will install dependencies and build the Taqueria project and dApp if there is one
 
 Once this is done, you can run `npm run start` from the appropriate directory to start the project and start interacting with the dApp and contracts
@@ -20,7 +20,7 @@ The scaffold task will accept any valid git repository for the `<url> parameter`
 :::
 
 ## Plugin Implementations
-                     |
+
 This task is implemented by the following plugins:
 
 | Plugin Name                            | Description                             |

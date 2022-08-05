@@ -38,7 +38,7 @@ taq add-contract <path>
 | ---------------- | ---------- |
 | Archetype        | `.arl`     |
 | CameLigo         | `.mligo`   |
-| JsLigo           | `jsligo`   |
+| JsLigo           | `.jsligo`  |
 | Michelson        | `.tz`      |
 | PascaLigo        | `.pligo`   |
 | ReasonLigo       | `.rligo`   |
@@ -53,7 +53,7 @@ The `add-contract` task is used when importing an existing smart contract to you
 1. Import a contract to your project `example.arl`
 2. Add the contract to the registry `taq add-contract example.arl`
 3. Compile the contract `taq compile example.arl`
-4. Originate the contract `taq originate example.arl`
+4. Originate the contract `taq originate example.tz`
 5. Update dApp
 6. Deploy dApp
 7. Test
@@ -64,7 +64,7 @@ The `add-contract` task is used when importing an existing smart contract to you
 2. Add the contract to the registry `taq add-contract example.mligo`
 3. Add or edit source code in contract file
 4. Compile the contract `taq compile example.mligo`
-5. Originate the contract `taq originate example.mligo`
+5. Originate the contract `taq originate example.tz`
 6. Update dApp
 7. Deploy dApp
 8. Test

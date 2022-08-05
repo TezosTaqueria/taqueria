@@ -7,7 +7,7 @@ title: start sandbox
 Taq `start sandbox` is used to start a Flextesa sandbox
 
 :::note
-Named sandboxes are configuredin `config.json`. Additional documentation about adding new named sandboxes can be found in the [sandbox configuration documentation](/docs/config/sandbox-config)
+Named sandboxes are configured in `config.json`. Additional documentation about adding new named sandboxes can be found in the [sandbox configuration documentation](/docs/config/sandbox-config)
 :::
 
 ## Plugin Implementations

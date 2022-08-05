@@ -14,9 +14,9 @@ taq remove-contract <path>
 
 ### Task Details
  
-| Task Name         | Command                       | Type           | Description                        | 
+| Task Name         | Command                       | Type           | Description                        |
 | ----------------- | ----------------------------- | -------------- | ---------------------------------- |
-| `remove-contract` | `taq remove-contract <path> ` | Taqueria Core  | Removes a contract to the registry |
+| `remove-contract` | `taq remove-contract <path>`  | Taqueria Core  | Removes a contract to the registry |
 
 ### Command-Line Arguments
 
@@ -29,9 +29,9 @@ taq remove-contract <path>
 | Type             | Extension  |
 | ---------------- | ---------- |
 | Michelson        | `.tz`      |
-| JsLigo           | `jsligo`   |
+| JsLigo           | `.jsligo`  |
 | CameLigo         | `.mligo`   |
-| PascaLigo        | `.pligo`   |     
+| PascaLigo        | `.pligo`   |
 | ReasonLigo       | `.rligo`   |
 
 ## Plugin Implementations

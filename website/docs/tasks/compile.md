@@ -30,9 +30,9 @@ taq compile <path>
 
 ### Task Details
 
-| Task Name      | Command                       | Type                | Description                                           | 
+| Task Name      | Command                       | Type                | Description                                           |
 | -------------- | ----------------------------- | ------------------- | ----------------------------------------------------- |
-| `compile`      | `taq compile [path]`          | Plugin - compilers  | Compiles one, multiple, or all contracts in a project |
+| `compile`      | `taq compile [path]`          | Plugin - compilers  | Compiles one, or all contracts in a project           |
 
 ### Command-Line Arguments
 
@@ -41,8 +41,8 @@ taq compile <path>
 | `<path>`     | No       | Path to one or more Ligo, SmartPy, or Archetype files  | `taq compile ./contracts/my-contract.jsligo`          |
 | `--plugin`   | No       | Compiles contracts using the compiler plugin specified | `taq compile --plugin archetype`                      |
 |  `-e`        | No       | The entry point that will be compiled                  | `taq compile ./contracts/test.mligo -e transferTo`    |
-|  `-s`        | No       | The syntax used in the contract                        | `taq compile -s jsligo`                               |      
-|  -i          | No       | Enable type inference                                  | `taq compile ./contracts/counter.mligo -i`            |  
+|  `-s`        | No       | The syntax used in the contract                        | `taq compile -s jsligo`                               |
+|  `-i`        | No       | Enable type inference                                  | `taq compile ./contracts/counter.mligo -i`            |  
 
 ### Usage
 
@@ -53,7 +53,11 @@ taq compile <path>
 | Compile Ligo contracts      | `taq compile --plugin ligo`        | Compiles Ligo contracts using the Ligo compiler                               |
 | Compile SmartPy contracts   | `taq compile --plugin smartpy`     | Compiles SmartPy contracts using the SmartPy compiler                         |
 | Compile Archetype contracts | `taq compile --plugin archetype`   | Compiles Archetype contracts using the Archetype compiler                     |
- 
+
+:::note
+The `--plugin` option is only available when multiple compiler plugins are installed on a project
+:::
+
 ### Supported Filetypes
 
 | Type             | Extension  |
@@ -61,7 +65,7 @@ taq compile <path>
 | Michelson        | `.tz`      |
 | JsLigo           | `.jsligo`  |
 | CameLigo         | `.mligo`   |
-| PascaLigo        | `.pligo`   |     
+| PascaLigo        | `.pligo`   |
 | ReasonLigo       | `.rligo`   |
 
 ### Multi-File Contracts
@@ -72,5 +76,8 @@ When developing multi-file LIGO contracts, you only need to add the file that co
 
 ## Using in a Taqueria Workflow
 
-The `compiile` task is used to produce Michelson code that can be deployed to a sandbox, testnet, or mainnet 
+The `compiile` task is used to produce Michelson code that can be deployed to a sandbox or testnet
 
+:::note
+Support for mainnet will be coming soon
+:::

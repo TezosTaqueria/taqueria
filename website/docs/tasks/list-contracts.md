@@ -7,9 +7,7 @@ title: list-contracts
 Taq `list-contracts` is used to list all contracts that exist in the project's contract registry
 
 :::note
-Contracts must be registered ( before they can be originated or compiled
-
-Contracts can be registered in one of two ways:
+Contracts must be registered before they can be originated or compiled. Contracts can be registered in one of two ways:
 
 1. Adding a file manually `taq add-contract <path>`
 2. Using a contract template `taq create contract test.mligo`

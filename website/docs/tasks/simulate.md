@@ -37,8 +37,7 @@ The `storage` parameter is mandatory, but can be omitted if the contract has an 
 
 ### Command-Line Arguments
 
-
-| Flag          |  Name       | Description                                  |   
+| Flag          |  Name       | Description                                  |
 |:-------------:|:------------|----------------------------------------------|
 |  -s           | sandboxName | The name of the sandbox to target            |
 |  --storage    | storage     | The initial storage value for the contract   |
@@ -46,9 +45,9 @@ The `storage` parameter is mandatory, but can be omitted if the contract has an 
 
 | Argument        | Required | Shortflag | Description                                            | Example Usage                                   |
 | --------------- | -------- | --------- | ------------------------------------------------ | ----------------------------------------------------- |
-| `<file>`        | Yes      |           | Path to the Michelson file to typecheck          | `taq simulate counter.tz 1`                           |
+| `<file>`        | Yes      |           | Path to the Michelson file to use                | `taq simulate counter.tz 1`                           |
 | `<inputData>`   | Yes      |           | Michelson encoded input parameters               | `taq simulate counter.tz 1`                           |
-| `--sandboxName` | No       | `-s`      | Path to the Michelson file to typecheck          | `taq simulate counter.tz 1 -s jakarta_sandbox`        |
+| `--sandboxName` | No       | `-s`      | Path to the Michelson file to use                | `taq simulate counter.tz 1 -s jakarta_sandbox`        |
 | `--storage`     | Yes      |           | The storage value to used for the simulation     | `taq simulate counter.tz 1 --storage`                 |
 | `--entryPoint`  | No       | `-e`      | The entrypoint to call in the smart contract     | `taq simulate counter.tz 1 --entryPoint increment`    |
 

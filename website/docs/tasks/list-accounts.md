@@ -4,7 +4,7 @@ title: list accounts
 
 ## Overview
 
-Taq `list accounts` is a task exposed by the [Flextesa plugin](/docs/plugins/plugin-basics) which lists the accounts and balances that exist 
+Taq `list accounts` is a task exposed by the [Flextesa plugin](/docs/plugins/plugin-flextesa) which lists the accounts and balances that exist
 
 :::note
 In order to use this plugin, you must first install the Flextesa plugin `taq install @taqueria/plugin-flextesa`, and have a sandbox started on the project `taq start sandbox <sandboxName>`
@@ -40,5 +40,4 @@ taq list accounts <sandboxName>
 
 | Description                               | Command                            | Behaviour                                                                     |
 | ----------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------- |
-| List accounts on the `<local>` sandbox    | `taq install <pluginName>`         | Lits the accounts on the default sandbox named local                          |
-
+| List accounts on the `<local>` sandbox    | `taq list accounts <sandboxName>`  | Lits the accounts on the default sandbox named local                          |
