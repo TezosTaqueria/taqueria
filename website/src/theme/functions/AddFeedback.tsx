@@ -86,7 +86,7 @@ class AddFeedback extends React.Component<IProps, IState> {
             <div className="alert alert--primary" role="alert">
               <div className="row">
                 <div className="col text--center">
-                  Please provide feedback on this article:
+                  Was this page helpful?
                   <button
                     className="button  margin--sm good"
                     onClick={() => this.handleSubmit(2)}
@@ -109,7 +109,7 @@ class AddFeedback extends React.Component<IProps, IState> {
                     className="btn button--outline button--primary margin--sm"
                     onClick={() => this.setState({ modal: true })}
                   >
-                    Leave detailed feedback
+                    
                   </button>
                 </div>
               </div>
@@ -119,7 +119,7 @@ class AddFeedback extends React.Component<IProps, IState> {
             <div className="card-demo">
               <div className="card">
                 <div className="card__header">
-                  <h3>Provide detailed feedback</h3>
+                  <h3>Feedback / Bug Report</h3>
                 </div>
                 <div className="card__body">
                   <div className="radio">
