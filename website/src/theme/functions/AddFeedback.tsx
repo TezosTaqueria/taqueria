@@ -119,7 +119,7 @@ class AddFeedback extends React.Component<IProps, IState> {
             <div className="card-demo">
               <div className="card">
                 <div className="card__header">
-                  <h3>Detailed Feedback</h3>
+                  <h3>Provide detailed feedback</h3>
                 </div>
                 <div className="card__body">
                   <div className="radio">
