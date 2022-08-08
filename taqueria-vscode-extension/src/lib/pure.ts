@@ -16,8 +16,6 @@ import { TaqVsxError } from './TaqVsxError';
 export interface LikeAPromise<Success, TaqError> extends Promise<Success> {
 }
 
-export type PathToTaq = string & { __kind__: 'PathToTaq' };
-
 export type PathToDir = string & { __kind__: 'PathToDir' };
 
 export type PathToFile = string & { __kind__: 'PathToFile' };
@@ -138,32 +136,6 @@ export const makeDir = (dirPath: string, _i18n: i18n): LikeAPromise<PathToDir, T
 			})
 		);
 
-/**
- * Makes a PathToTaq
- * Assures that the provided inputPath points to the taq binary
- * @param {string} inputPath
- * @param {I18N} _i18n
- * @returns {(inputPath:string) => LikeAPromise<PathToTaq, E_TAQ_NOT_FOUND>}
- */
-export const makePathToTaq = (i18n: i18n, showOutput: OutputFunction) =>
-	(inputPath: string): LikeAPromise<PathToTaq, TaqVsxError> =>
-		stat(inputPath)
-			.then(_ => checkTaqBinary(inputPath as PathToTaq, i18n, showOutput))
-			.then(
-				output =>
-					output.includes('OK')
-						? Promise.resolve(inputPath as PathToTaq)
-						: Promise.reject({ code: 'E_TAQ_NOT_FOUND', pathProvided: inputPath, msg: 'The path to taq is invalid' }),
-			)
-			.catch(previous =>
-				Promise.reject({
-					code: 'E_TAQ_NOT_FOUND',
-					pathProvided: inputPath,
-					msg: 'The path to taq is invalid',
-					previous,
-				})
-			);
-
 export const getRunningContainerNames = (): LikeAPromise<string[], TaqVsxError> =>
 	new Promise((resolve, reject) =>
 		exec(`docker ps --format '{{.Names}}'`, (_error, stdout, _stderr) => {
@@ -203,7 +175,7 @@ export const execCmd = (
 		}
 	});
 
-export const checkTaqBinary = async (inputPath: PathToTaq, i18n: i18n, showOutput: OutputFunction) => {
+export const checkTaqBinary = async (inputPath: string, i18n: i18n, showOutput: OutputFunction) => {
 	const result = await execCmd(`${inputPath} testFromVsCode`, showOutput);
 	return result.standardOutput;
 };
@@ -256,8 +228,7 @@ export const findTaqBinary = (i18n: i18n, showOutput: OutputFunction): LikeAProm
 				return result.standardOutput.trim();
 			}
 		})
-		.catch(previous => Promise.reject({ code: 'E_TAQ_NOT_FOUND', msg: 'Could not find taq in your path.', previous }))
-		.then(makePathToTaq(i18n, showOutput));
+		.catch(previous => Promise.reject({ code: 'E_TAQ_NOT_FOUND', msg: 'Could not find taq in your path.', previous }));
 
 export const makeState = (_i18n: i18n) =>
 	(input: Record<string, unknown>) => {

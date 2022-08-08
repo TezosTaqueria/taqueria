@@ -590,7 +590,7 @@ export class VsCodeHelper {
 		if (!providedPath || (providedPath as string).length === 0) {
 			providedPath = await Util.findTaqBinary(this.i18, this.getLog());
 		}
-		return Util.makePathToTaq(this.i18, this.getLog())(providedPath);
+		return providedPath;
 	}
 
 	registerCommand(cmdId: string, callback: (...args: any[]) => any) {
