@@ -1,12 +1,10 @@
 import * as Config from '@taqueria/protocol/Config';
-import { EphemeralState } from '@taqueria/protocol/EphemeralState';
 import { i18n } from '@taqueria/protocol/i18n';
 import { exec, ExecException } from 'child_process';
 import { parse } from 'comment-json';
 import { readFile, stat } from 'fs/promises';
-import { join, resolve } from 'path';
-import { reject } from 'rambda';
-import { Output, OutputFunction, OutputLevels } from './helpers';
+import { join } from 'path';
+import { OutputFunction, OutputLevels } from './helpers';
 import { TaqVsxError } from './TaqVsxError';
 
 /***********************************************************************/
@@ -59,25 +57,6 @@ export class TaqifiedDir {
 					code: 'E_NOT_TAQIFIED',
 					pathProvided: dir,
 					msg: "The given directory is not taqified as it's missing a .taq directory.",
-					previous,
-				})
-			);
-	}
-
-	/**
-	 * Makes a TaqifiedDir from a path to a directory
-	 * @param {string} inputDir
-	 * @param {I18N} i18n
-	 * @returns {LikeAPromise<TaqifiedDir, E_NOT_TAQIFIED|E_STATE_MISSING>}
-	 */
-	static createFromString(inputDir: string, i18n: i18n): LikeAPromise<TaqifiedDir, TaqVsxError> {
-		return makeDir(inputDir, i18n)
-			.then(dir => this.create(dir, i18n))
-			.catch(previous =>
-				Promise.reject({
-					code: 'E_NOT_TAQIFIED',
-					pathProvided: inputDir,
-					msg: 'The given path is not taqified, as its not an existing directory',
 					previous,
 				})
 			);
@@ -203,18 +182,6 @@ export const readJsonFile = <T>(_i18n: i18n, make: (data: Record<string, unknown
 				}
 			});
 
-export const decodeJson = <T>(data: string): LikeAPromise<Json<T>, TaqVsxError> => {
-	try {
-		const json = parse(data);
-		if (json) {
-			const obj = json as unknown as Json<T>;
-			return Promise.resolve(obj);
-		} else throw new Error('Could not parse JSON');
-	} catch (previous) {
-		return Promise.reject({ code: 'E_INVALID_JSON', data, msg: 'The provided data is invalid JSON', previous });
-	}
-};
-
 export const isWindows = () => process.platform.includes('win') && !process.platform.includes('darwin');
 
 export const findTaqBinary = (i18n: i18n, showOutput: OutputFunction): LikeAPromise<string, TaqVsxError> =>
@@ -231,12 +198,6 @@ export const findTaqBinary = (i18n: i18n, showOutput: OutputFunction): LikeAProm
 			}
 		})
 		.catch(previous => Promise.reject({ code: 'E_TAQ_NOT_FOUND', msg: 'Could not find taq in your path.', previous }));
-
-export const makeState = (_i18n: i18n) =>
-	(input: Record<string, unknown>) => {
-		// TODO: Validate input
-		return input as unknown as EphemeralState;
-	};
 
 export const log = <T>(heading: string) =>
 	(input: T): T => {

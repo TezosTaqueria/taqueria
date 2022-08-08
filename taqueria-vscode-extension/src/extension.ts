@@ -1,6 +1,5 @@
 import * as api from 'vscode';
 import { COMMAND_PREFIX, InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
-import { makeDir, PathToDir } from './lib/pure';
 
 const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
 	const inMemoryState = {
