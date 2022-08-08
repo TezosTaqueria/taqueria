@@ -16,6 +16,8 @@ import { TaqVsxError } from './TaqVsxError';
 export interface LikeAPromise<Success, TaqError> extends Promise<Success> {
 }
 
+export type PathToTaq = string & { __kind__: 'PathToTaq' };
+
 export type PathToDir = string & { __kind__: 'PathToDir' };
 
 export type PathToFile = string & { __kind__: 'PathToFile' };
@@ -175,7 +177,7 @@ export const execCmd = (
 		}
 	});
 
-export const checkTaqBinary = async (inputPath: string, i18n: i18n, showOutput: OutputFunction) => {
+export const checkTaqBinary = async (inputPath: PathToTaq, i18n: i18n, showOutput: OutputFunction) => {
 	const result = await execCmd(`${inputPath} testFromVsCode`, showOutput);
 	return result.standardOutput;
 };
