@@ -42,6 +42,14 @@ export enum OutputLevels {
 	trace,
 }
 
+interface HasToString {
+	toString(): string;
+}
+
+function instanceOfHasToString(object: any): object is HasToString {
+	return 'toString' in object;
+}
+
 export type OutputFunction = (currentLogLevel: OutputLevels, log: string) => void;
 
 enum AnalyticsOptionState {
@@ -647,13 +655,20 @@ export class VsCodeHelper {
 			if (!shouldOutput(outputLevel, this.output.logLevel)) {
 				return;
 			}
-			this.output.logChannel.appendLine(JSON.stringify(err, undefined, 4));
+			let text: string;
+			if (instanceOfHasToString(err)) {
+				text = err.toString();
+			} else {
+				text = JSON.stringify(err, undefined, 4);
+			}
+			this.output.logChannel.appendLine(text);
 			if (!suppressWindow) {
 				this.output.logChannel.show();
 			}
 		} catch {
 			try {
 				this.output.logChannel.appendLine(`unknown error occurred while trying to log an error.`);
+				this.output.logChannel.appendLine(`error object: ${err}`);
 			} catch {
 				// at this point, we cannot do anything
 			}
@@ -773,11 +788,8 @@ export class VsCodeHelper {
 
 	private fixOutput(output: string): string {
 		output = output.replaceAll('', '');
-		output = output.replaceAll('[31m', '');
-		output = output.replaceAll('[39m', '');
-		output = output.replaceAll('[22m', '');
-		output = output.replaceAll('[1m●', '');
-		output = output.replaceAll('[1m', '');
+		output = output.replaceAll(/\[\d+m/g, '');
+		output = output.replaceAll('●', '');
 		return output;
 	}
 
