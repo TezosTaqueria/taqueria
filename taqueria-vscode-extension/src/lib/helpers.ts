@@ -742,14 +742,16 @@ export class VsCodeHelper {
 					this.logAllNestedErrors(result.executionError);
 				}
 				if (result.standardError) {
+					const fixedError = this.fixOutput(result.standardError);
 					if (logStandardErrorToOutput) {
-						this.showOutput(result.standardError);
+						this.showOutput(fixedError);
 					} else {
-						this.showLog(OutputLevels.warn, result.standardError);
+						this.showLog(OutputLevels.warn, fixedError);
 					}
 				}
 				if (result.standardOutput) {
-					this.showOutput(this.tryFormattingAsTable(result.standardOutput));
+					const fixedOutput = this.fixOutput(result.standardOutput);
+					this.showOutput(this.tryFormattingAsTable(fixedOutput));
 				}
 				if (result.executionError || result.standardError) {
 					this.vscode.window.showWarningMessage(
@@ -767,6 +769,16 @@ export class VsCodeHelper {
 			progress.report({ increment: 100 });
 			this._currentlyRunningTask = undefined;
 		});
+	}
+
+	private fixOutput(output: string): string {
+		output = output.replaceAll('', '');
+		output = output.replaceAll('[31m', '');
+		output = output.replaceAll('[39m', '');
+		output = output.replaceAll('[22m', '');
+		output = output.replaceAll('[1m●', '');
+		output = output.replaceAll('[1m', '');
+		return output;
 	}
 
 	async proxyToTaq(taskWithArgs: string, projectDir?: string | undefined) {
