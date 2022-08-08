@@ -94,6 +94,13 @@ const config = {
         items: [
           {
             type: "doc",
+            docId: "release-notes",
+            label: "v0.12.0",
+            position: "right",
+            className: "header-link"
+          },
+          {
+            type: "doc",
             docId: "getting-started/installation",
             label: " Get Started",
             position: "right",
@@ -104,13 +111,6 @@ const config = {
             docId: "intro",
             position: "right",
             label: "Docs",
-            className: "header-link"
-          },
-          {
-            type: "doc",
-            docId: "release-notes",
-            label: "Release Notes",
-            position: "right",
             className: "header-link"
           },
           {
