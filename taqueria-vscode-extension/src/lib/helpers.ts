@@ -24,7 +24,7 @@ import { TaqVsxError } from './TaqVsxError';
 
 export const COMMAND_PREFIX = 'taqueria.';
 
-const minNodeVersion = '16.10.0';
+const minNodeVersion = '16.13.1';
 
 export enum Commands {
 	init = 'taqueria.init',

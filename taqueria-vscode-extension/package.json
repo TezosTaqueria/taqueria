@@ -175,7 +175,7 @@
 			{
 				"view": "taqueria-system-check",
 				"when": "@taqueria-state/is-node-installed && @taqueria-state/node-version-meets-requirements",
-				"contents": "✅ NodeJs: Installed"
+				"contents": "✅ Node.js: Installed"
 			},
 			{
 				"view": "taqueria-system-check",
@@ -185,7 +185,7 @@
 			{
 				"view": "taqueria-system-check",
 				"when": "@taqueria-state/is-node-installed && !@taqueria-state/node-version-meets-requirements",
-				"contents": "❌ NodeJs: Node version is not supported. Please update your node to be newer than 16.10.0. You can find instructions [here](https://nodejs.org/en/download/)."
+				"contents": "❌ NodeJs: Node version is not supported. Please update your node to be newer than 16.13.1. You can find instructions [here](https://nodejs.org/en/download/)."
 			},
 			{
 				"view": "taqueria-system-check",
