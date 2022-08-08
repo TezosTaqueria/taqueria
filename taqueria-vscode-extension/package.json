@@ -281,7 +281,8 @@
 				"category": "Taqueria",
 				"title": "Generate Types",
 				"shortTitle": "generate types",
-				"enablement": "@taqueria/plugin-contract-types"
+				"enablement": "@taqueria/plugin-contract-types",
+				"icon": "$(save-as)"
 			},
 			{
 				"command": "taqueria.typecheck",
@@ -417,6 +418,11 @@
 				{
 					"command": "taqueria.create_test_folder",
 					"when": "view == taqueria-tests",
+					"group": "navigation"
+				},
+				{
+					"command": "taqueria.generate_types",
+					"when": "view == taqueria-artifacts",
 					"group": "navigation"
 				}
 			]
