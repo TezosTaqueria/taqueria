@@ -161,6 +161,15 @@ export const checkTaqBinary = async (inputPath: PathToTaq, i18n: i18n, showOutpu
 	return result.standardOutput;
 };
 
+export const getNodeVersion = async (showOutput: OutputFunction) => {
+	const result = await execCmd(`node --version`, showOutput);
+	const version = result.standardOutput;
+	if (!version || !version.startsWith('v')) {
+		return version;
+	}
+	return version.substring(1).replace('\n', '');
+};
+
 export const readJsonFile = <T>(_i18n: i18n, make: (data: Record<string, unknown>) => T) =>
 	(pathToFile: PathToFile) =>
 		readFile(pathToFile, { encoding: 'utf-8' })
