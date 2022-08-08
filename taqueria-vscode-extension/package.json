@@ -310,14 +310,14 @@
 			{
 				"command": "taqueria.add_contract",
 				"category": "Taqueria",
-				"title": "Add contract to registry",
+				"title": " Add contract to registry",
 				"shortTitle": "add",
 				"icon": "$(add)"
 			},
 			{
 				"command": "taqueria.rm_contract",
 				"category": "Taqueria",
-				"title": "Remove contract from registry",
+				"title": " Remove contract from registry",
 				"shortTitle": "remove",
 				"icon": "$(remove)"
 			}
