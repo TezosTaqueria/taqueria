@@ -23,7 +23,7 @@ jobs:
           brew install docker
           brew install colima
           colima start
-      
+        
       - name: Check locations of stuff
         run: |
           ls -al ~/Library/Caches/Homebrew/
