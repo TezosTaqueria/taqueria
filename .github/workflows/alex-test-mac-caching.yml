@@ -1,0 +1,38 @@
+name: alex-cache
+
+on: push
+
+jobs:
+  cache-brew-stuff:
+    runs-on: macos-latest
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v2
+
+      - uses: actions/cache@v3
+          id: cache
+          with:
+            path: |
+              ~/Library/Caches/Homebrew/
+              /Library/Caches/Homebrew/
+            key: macos-homebrew-12345
+
+        - name: Install Dependencies
+          if: steps.cache.outputs.cache-hit != 'true'
+          run: |
+            brew install docker
+            brew install colima
+            colima start
+        
+        - name: Check locations of stuff
+          run: |
+            ls -al ~/Library/Caches/Homebrew/
+            ls -al /Library/Caches/Homebrew/
+
+
+
+
+
+
+
+
