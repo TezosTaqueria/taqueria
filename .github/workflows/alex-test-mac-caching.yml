@@ -17,17 +17,17 @@ jobs:
               /Library/Caches/Homebrew/
             key: macos-homebrew-12345
 
-        - name: Install Dependencies
-          if: steps.cache.outputs.cache-hit != 'true'
-          run: |
-            brew install docker
-            brew install colima
-            colima start
-        
-        - name: Check locations of stuff
-          run: |
-            ls -al ~/Library/Caches/Homebrew/
-            ls -al /Library/Caches/Homebrew/
+      - name: Install Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          brew install docker
+          brew install colima
+          colima start
+      
+      - name: Check locations of stuff
+        run: |
+          ls -al ~/Library/Caches/Homebrew/
+          ls -al /Library/Caches/Homebrew/
 
 
 
