@@ -14,7 +14,8 @@ jobs:
         with:
           path: |
             ~/Library/Caches/Homebrew/
-          key: macos-homebrew-12345
+            /usr/local/Cellar/
+          key: macos-homebrew-123456
 
       - name: Install Dependencies if no cache found
         # if: ${{ steps.cache.outputs.cache-hit }} != 'true'
