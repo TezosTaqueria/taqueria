@@ -16,12 +16,8 @@ jobs:
             ~/Library/Caches/Homebrew/
           key: macos-homebrew-12345
 
-      - name: Start colima if cache found
-        if: ${{ steps.cache.outputs.cache-hit }} = 'true'
-        run: colima start
-
       - name: Install Dependencies if no cache found
-        if: ${{ steps.cache.outputs.cache-hit }} != 'true'
+        # if: ${{ steps.cache.outputs.cache-hit }} != 'true'
         run: |
           brew install docker
           brew install colima
