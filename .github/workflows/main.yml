@@ -256,7 +256,7 @@ jobs:
       # This step currently attempts to put all test files found in the e2e folder into 4 equal sized buckets. The output is a list of lists 
       - id: set-test-chunks
         name: Set Chunks
-        run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -c '[_nwise(length / 4 | ceil)]')"
+        run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -c '[_nwise(length / 3 | ceil)]')"
       
       # This step just creates a list of numbers representing the different buckets of tests
       - id: set-test-chunk-ids
