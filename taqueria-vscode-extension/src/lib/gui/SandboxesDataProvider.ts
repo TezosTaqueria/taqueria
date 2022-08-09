@@ -1,14 +1,15 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
 import * as vscode from 'vscode';
 import { HasRefresh, mapAsync, VsCodeHelper } from '../helpers';
-import * as Util from '../pure';
 import { getRunningContainerNames } from '../pure';
+import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 
-export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTreeItem>, HasRefresh {
-	constructor(
-		private workspaceRoot: string,
-		private helper: VsCodeHelper,
-	) {}
+export class SandboxesDataProvider extends TaqueriaDataProviderBase
+	implements vscode.TreeDataProvider<SandboxTreeItem>, HasRefresh
+{
+	constructor(helper: VsCodeHelper) {
+		super(helper);
+	}
 
 	getTreeItem(element: SandboxTreeItem): vscode.TreeItem {
 		return element;
@@ -48,30 +49,6 @@ export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTre
 	readonly onDidChangeTreeData: vscode.Event<SandboxTreeItem | undefined | null | void> =
 		this._onDidChangeTreeData.event;
 
-	private async getConfig(): Promise<{ config: Util.TaqifiedDir | null; pathToDir: Util.PathToDir | null }> {
-		if (!this.workspaceRoot) {
-			return {
-				pathToDir: null,
-				config: null,
-			};
-		} else {
-			try {
-				const pathToDir = await Util.makeDir(this.workspaceRoot, this.helper.i18n);
-				const config = await Util.TaqifiedDir.create(pathToDir, this.helper.i18n);
-				return {
-					config,
-					pathToDir,
-				};
-			} catch (e: unknown) {
-				await this.helper.notifyAndLogError('Error while loading config, sandboxes list will fail to populate', e);
-				return {
-					pathToDir: null,
-					config: null,
-				};
-			}
-		}
-	}
-
 	async getSandboxState(
 		sandBoxName: string,
 		runningContainerNames: string[] | undefined,
@@ -103,29 +80,11 @@ export class SandboxesDataProvider implements vscode.TreeDataProvider<SandboxTre
 		return `taqueria-${environmentName}-${uniqueSandboxName}`;
 	}
 
-	private getEnvironmentNames(config: Util.TaqifiedDir): string[] {
-		if (!config?.config?.environment) {
-			return [];
-		}
-		const environments = Object.entries(config.config.environment);
-		const nonDefaultEnvironments = environments.filter(environment => environment[0] !== 'default');
-		nonDefaultEnvironments.sort((a, b) => a[0].localeCompare(b[0]));
-		return nonDefaultEnvironments.map(e => e[0]);
-	}
-
-	private getSandboxNames(config: Util.TaqifiedDir): string[] {
-		if (!config?.config?.sandbox) {
-			return [];
-		}
-		const sandboxes = Object.entries(config.config.sandbox);
-		sandboxes.sort((a, b) => a[0].localeCompare(b[0]));
-		return sandboxes.map(sandbox => sandbox[0]);
-	}
-
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
 	}
 }
+
 export class SandboxTreeItem extends vscode.TreeItem {
 	constructor(
 		public readonly label: string,
