@@ -18,14 +18,14 @@ jobs:
           key: macos-homebrew-123456
 
       - name: Install Dependencies if no cache found
-        if: ${{ steps.cache.outputs.cache-hit }} != 'true'
+        if: ${{ steps.cache.outputs.cache-hit }} != true
         run: |
           brew install docker
           brew install colima
           colima start
 
       - name: ink dependencies if cache found
-        if: ${{ steps.cache.outputs.cache-hit }} = 'true'
+        if: ${{ steps.cache.outputs.cache-hit }} = true
         run: |
           brew link docker
           brew link colima
