@@ -1081,7 +1081,7 @@ export class VsCodeHelper {
 				const testsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '**/jest.config.js'));
 
 				const artifactsFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'artifacts'));
-				const artifactsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'artifacts/*'));
+				const artifactsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'artifacts/**/*.tz'));
 
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
 				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
