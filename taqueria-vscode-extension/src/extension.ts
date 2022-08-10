@@ -1,7 +1,5 @@
 import * as api from 'vscode';
-import { InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
-import { COMMAND_PREFIX } from './lib/helpers';
-import { makeDir } from './lib/pure';
+import { COMMAND_PREFIX, InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
 
 const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
 	const inMemoryState = {
@@ -37,6 +35,7 @@ const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = 
 export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
 	const deps = sanitizeDeps(input);
 	const helper = await VsCodeHelper.construct(context, deps);
+	helper.listenToDockerEvents();
 
 	// Add built-in tasks for Taqueria
 	helper.exposeInitTask();
@@ -47,92 +46,133 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		COMMAND_PREFIX + 'opt_in',
 		'opt-in',
 		'output',
-		'Successfully opted in to analytics.',
+		{
+			finishedTitle: `opted in to analytics`,
+			progressTitle: `opting in to analytics`,
+		},
 	);
 	helper.exposeTaqTaskAsCommand(
 		COMMAND_PREFIX + 'opt_out',
 		'opt-out',
 		'output',
-		'Successfully opted out from analytics.',
+		{
+			finishedTitle: `opted out of analytics`,
+			progressTitle: `opting out of analytics`,
+		},
 	);
+	helper.exposeRefreshCommand();
+	// await helper.watchGlobalSettings();
 
 	const folders = helper.getFolders();
-	if (folders.length === 1) {
-		await makeDir(folders[0].uri.path, helper.i18n)
-			.then(projectDir => {
-				// Compilation tasks
-				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
-					COMMAND_PREFIX + 'compile_smartpy',
-					'--plugin smartpy compile',
-					'output',
-					'compile',
-					projectDir,
-				);
-				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
-					COMMAND_PREFIX + 'compile_ligo',
-					'--plugin ligo compile',
-					'output',
-					'compile',
-					projectDir,
-				);
-				helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
-					COMMAND_PREFIX + 'compile_archetype',
-					'--plugin archetype compile',
-					'output',
-					'compile',
-					projectDir,
-				);
-				helper.exposeTaqTaskAsCommand(
-					COMMAND_PREFIX + 'generate_types',
-					'generate types',
-					'output',
-					'Type generation successful.',
-					projectDir,
-				);
-				helper.exposeTypecheckCommand();
-				helper.exposeTaqTaskAsCommand(
-					COMMAND_PREFIX + 'test',
-					'test',
-					'output',
-					'Test setup successful.',
-					projectDir,
-				);
 
-				// Sandbox tasks
-				helper.exposeSandboxTaskAsCommand(
-					COMMAND_PREFIX + 'start_sandbox',
-					'start sandbox',
-					'Starting Sandbox',
-					'notify',
-					projectDir,
-				);
-				helper.exposeSandboxTaskAsCommand(
-					COMMAND_PREFIX + 'stop_sandbox',
-					'stop sandbox',
-					'Stopping Sandbox',
-					'notify',
-					projectDir,
-				);
-				helper.exposeSandboxTaskAsCommand(
-					COMMAND_PREFIX + 'list_accounts',
-					'list accounts',
-					'Listing Sandbox Accounts',
-					'output',
-					projectDir,
-				);
+	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
+		COMMAND_PREFIX + 'compile_smartpy',
+		'--plugin smartpy compile',
+		'output',
+		{
+			finishedTitle: `compiled contract(s)`,
+			progressTitle: `compiling contract(s)`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
+		COMMAND_PREFIX + 'compile_ligo',
+		'--plugin ligo compile',
+		'output',
+		{
+			finishedTitle: `compiled contract(s)`,
+			progressTitle: `compiling contract(s)`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
+		COMMAND_PREFIX + 'compile_archetype',
+		'--plugin archetype compile',
+		'output',
+		{
+			finishedTitle: `compiled contract(s)`,
+			progressTitle: `compiling contract(s)`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithFileArgument(
+		COMMAND_PREFIX + 'add_contract',
+		'add-contract',
+		'output',
+		{
+			finishedTitle: `added contract to registry`,
+			progressTitle: `adding contract to registry`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithFileArgument(
+		COMMAND_PREFIX + 'rm_contract',
+		'rm-contract',
+		'output',
+		{
+			finishedTitle: `removed contract from registry`,
+			progressTitle: `removing contract from registry`,
+		},
+	);
 
-				helper.exposeOriginateTask();
+	helper.exposeTaqTaskAsCommand(
+		COMMAND_PREFIX + 'generate_types',
+		'generate types',
+		'output',
+		{
+			finishedTitle: `generated types`,
+			progressTitle: `generating types`,
+		},
+	);
+	helper.exposeTypecheckCommand();
+	helper.exposeTestSetupCommand();
+	helper.exposeRunTestCommand();
 
-				try {
-					helper.createWatcherIfNotExists(projectDir, addConfigWatcherIfNotExists);
-				} catch (error: unknown) {
-					helper.logAllNestedErrors(error);
-				}
-			});
-		helper.registerDataProviders(folders[0].uri.fsPath);
-	} else if (folders.length === 0) {
-		helper.updateCommandStates();
-	}
+	// Sandbox tasks
+	helper.exposeSandboxTaskAsCommand(
+		COMMAND_PREFIX + 'start_sandbox',
+		'start sandbox',
+		{
+			finishedTitle: `started sandbox`,
+			progressTitle: `starting sandbox`,
+		},
+	);
+	helper.exposeSandboxTaskAsCommand(
+		COMMAND_PREFIX + 'stop_sandbox',
+		'stop sandbox',
+		{
+			finishedTitle: `stopped sandbox`,
+			progressTitle: `stopping sandbox`,
+		},
+	);
+	helper.exposeSandboxTaskAsCommand(
+		COMMAND_PREFIX + 'list_accounts',
+		'list accounts',
+		{
+			finishedTitle: `listed sandbox accounts`,
+			progressTitle: `listing sandbox accounts`,
+		},
+	);
+
+	helper.exposeOriginateTask();
+
+	helper.registerDataProviders();
+	helper.createTreeViews();
+
+	deps.vscode.workspace.onDidChangeWorkspaceFolders(e => {
+		e.added.forEach(folder => {
+			try {
+				helper.createWatcherIfNotExists(folder.uri.fsPath, addConfigWatcherIfNotExists);
+			} catch (error: unknown) {
+				helper.logAllNestedErrors(error);
+			}
+		});
+	});
+
+	deps.vscode.workspace.workspaceFolders?.forEach(folder => {
+		try {
+			helper.createWatcherIfNotExists(folder.uri.fsPath, addConfigWatcherIfNotExists);
+		} catch (error: unknown) {
+			helper.logAllNestedErrors(error);
+		}
+	});
+	helper.updateCommandStates();
 }
 
 export function deactivate() {

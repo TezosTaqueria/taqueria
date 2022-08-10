@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 WORKSPACE=$1
 INSTALL="$2"
 
