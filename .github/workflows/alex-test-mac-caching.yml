@@ -17,16 +17,17 @@ jobs:
             /usr/local/Cellar/
           key: macos-homebrew-123456
 
-      # - name: Install Dependencies if no cache found
-      #   if: ${{ steps.cache.outputs.cache-hit }} != true
-      #   run: |
-      #     brew install docker
-      #     brew install colima
-      #     colima start
-
-      - name: ink dependencies if cache found
-        if: ${{ steps.cache.outputs.cache-hit }} = true
+      - name: Install Dependencies if no cache found
+        if: ${{ !steps.cache.outputs.cache-hit }}
         run: |
+          brew install docker
+          brew install colima
+          colima start
+
+      - name: Link dependencies if cache found
+        if: ${{ steps.cache.outputs.cache-hit }}
+        run: |
+          export PATH=$PATH:/usr/local/Cellar/:~/Library/Caches/Homebrew/
           brew link docker
           brew link colima
           colima start
