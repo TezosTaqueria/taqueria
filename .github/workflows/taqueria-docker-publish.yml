@@ -1,18 +1,13 @@
-name: Docker Image CI
-
+name: Taqueria Docker image
 on:
   push:
     branches:
       - 'main'
-    paths:
-      - 'taqueria-flextesa-manager/*'
     tags:
       - 'v*'
   pull_request:
     branches:
       - 'main'
-    paths:
-      - 'taqueria-flextesa-manager/*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
@@ -22,7 +17,52 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  build-and-push:
+
+  binary-for-image:
+    name: Build taq binary
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
+    strategy:
+      fail-fast: true
+      matrix:
+       include:
+         - os: ubuntu-latest
+           os_short: ubuntu
+    env:
+      DENO_TARGET: x86_64-unknown-linux-gnu
+
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v2
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: "1.23.4"
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ./deno
+            ~/.cache/deno
+          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno-lock.json') }}
+
+      - name: Build the binary
+        id: build-bin
+        shell: bash
+        env:
+          TAQ_VERSION: ${{ github.ref_name }}
+          DENO_DIR: "./deno"
+        run: |
+          BUILD=`git rev-parse --short "$GITHUB_SHA"`
+          TAQ_VERSION="${TAQ_VERSION/\//-}"
+          deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt --target $DENO_TARGET index.ts --quickstart "`cat quickstart.md`" --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
+          ./taq init -p ./test_project
+
+  build-and-push-image:
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.head.repo.fork }}
     steps:
@@ -48,21 +88,13 @@ jobs:
         id: image-metadata
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/taqueria-flextesa
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/taqueria
           tags: |
             type=ref,event=branch
             type=ref,event=pr,suffix=-{{sha}}
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=${{ steps.vars.outputs.taq_version }}-${{ steps.vars.outputs.short_sha }}
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build package
-        run: | 
-          npm run build -w taqueria-sdk
-          npm run build -w taqueria-flextesa-manager
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
@@ -76,7 +108,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: ./taqueria-flextesa-manager
+          context: ./
           push: true
           platforms: linux/arm64/v8,linux/amd64
           tags: ${{ steps.image-metadata.outputs.tags }}
@@ -92,5 +124,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: 'The docker image has been published and is avaiable [here](https://github.com/ecadlabs/taqueria/pkgs/container/taqueria-flextesa). Look for the image with the tag `pr-${{ github.event.number }}-${{ steps.vars.outputs.short_sha }}`. The image is available for the following platforms: `linux/amd64` and `linux/arm64/v8`.' 
+              body: 'The `taqueria` docker image has been published and is avaiable [here](https://github.com/ecadlabs/taqueria/pkgs/container/taqueria). Look for the image with the tag `pr-${{ github.event.number }}-${{ steps.vars.outputs.short_sha }}`. The image is available for the following platforms: `linux/amd64` and `linux/arm64/v8`.' 
             })
