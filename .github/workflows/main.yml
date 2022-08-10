@@ -235,7 +235,7 @@ jobs:
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  gather-info-for-e2e-tests-and-build-flextesa:
+  gather-info-for-e2e-tests:
     runs-on: ubuntu-latest
     needs: 
       - build-binaries
