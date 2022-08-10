@@ -252,22 +252,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16.16.x
-          cache: 'npm'
-      
-      - name: download the binary from the build-binaries job and make it executable
-        if: ${{ !github.event.pull_request.head.repo.fork }}
-        run: |
-          curl --url ${{ needs.build-binaries.outputs.public-url-ubuntu }} -o taq -L
-          chmod +x taq
-          echo "$(pwd)" >> $GITHUB_PATH
-
-      - name: install dependencies
-        run: npm ci
-
-      - name: build flextesa-manager and upload image
-        run: |
-          npm run build -w taqueria-sdk
-          npm run build-all -w taqueria-flextesa-manager
 
       # This step currently attempts to put all test files found in the e2e folder into 4 equal sized buckets. The output is a list of lists 
       - id: set-test-chunks
