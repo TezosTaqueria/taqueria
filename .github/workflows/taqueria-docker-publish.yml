@@ -61,13 +61,7 @@ jobs:
           TAQ_VERSION="${TAQ_VERSION/\//-}"
           deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt --target $DENO_TARGET index.ts --quickstart "`cat quickstart.md`" --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
           ./taq init -p ./test_project
-          ls -ltra
 
-  build-and-push-image:
-    runs-on: ubuntu-latest
-    name: Build and publish taqueria image
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    steps:
       - name: Registry login
         uses: docker/login-action@v1
         with:
@@ -80,7 +74,6 @@ jobs:
           GITHUB_REF_NAME: ${{ github.ref_name }}
         id: "vars"
         run: |
-          ls -ltra
           echo "::set-output name=short_sha::$(git rev-parse --short $GITHUB_SHA)"
           echo "::set-output name=taq_version::`echo ${GITHUB_REF_NAME/\//-}`"
 
