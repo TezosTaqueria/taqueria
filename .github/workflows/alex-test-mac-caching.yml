@@ -27,7 +27,7 @@ jobs:
       - name: Link dependencies if cache found
         if: ${{ steps.cache.outputs.cache-hit }}
         run: |
-          brew install docker
+          brew link docker
           brew link colima
           brew tap-info --installed
           which limactl
