@@ -119,6 +119,10 @@ export interface HasFileName {
 	fileName: string;
 }
 
+function instanceOfHasFileName(object: any): object is HasFileName {
+	return 'fileName' in object;
+}
+
 export interface HasRefresh {
 	refresh(): void;
 }
@@ -557,44 +561,61 @@ export class VsCodeHelper {
 	}
 
 	async exposeOriginateTask() {
-		this.registerCommand(Commands.originate, async (arg?: ArtifactTreeItem | EnvironmentTreeItem | undefined) => {
-			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
-			if (projectDir === undefined) {
-				return;
-			}
-			let environmentName: string | undefined = undefined;
-			let fileName: string | undefined = undefined;
-			if (arg) {
-				if (arg instanceof EnvironmentTreeItem) {
-					environmentName = arg.label;
-				}
-				if (arg instanceof ArtifactTreeItem) {
-					fileName = arg.fileName;
-				}
-			}
-			if (!environmentName) {
-				const config = await Util.TaqifiedDir.create(projectDir, this.i18);
-				const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
-				environmentName = await this.vscode.window.showQuickPick(environmentNames, {
-					canPickMany: false,
-					ignoreFocusOut: false,
-					placeHolder: 'Environment Name',
-					title: 'Select an environment',
-				});
-				if (!environmentName) {
+		this.registerCommand(
+			Commands.originate,
+			async (arg?: ArtifactTreeItem | EnvironmentTreeItem | api.Uri | undefined) => {
+				const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
+				if (projectDir === undefined) {
 					return;
 				}
-			}
-			await this.proxyToTaqAndShowOutput(
-				`originate -e ${environmentName} ${fileName ?? ''}`,
-				{
-					finishedTitle: 'originated contracts',
-					progressTitle: 'originating contracts',
-				},
-				projectDir,
-				true,
-			);
-		});
+				let environmentName: string | undefined = undefined;
+				let fileName: string | undefined = undefined;
+				if (arg) {
+					if (arg instanceof EnvironmentTreeItem) {
+						environmentName = arg.label;
+					}
+					if (arg instanceof ArtifactTreeItem) {
+						fileName = arg.fileName;
+					}
+					if (arg instanceof api.Uri) {
+						fileName = await this.getRelativeFilePath(arg, 'artifacts');
+						if (!fileName) {
+							this.showLog(
+								OutputLevels.warn,
+								`Could not determine relative filename for ${arg.path}, canceling originate command.`,
+							);
+							return;
+						}
+					}
+				}
+				if (!environmentName) {
+					const config = await Util.TaqifiedDir.create(projectDir, this.i18);
+					const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
+					if (environmentNames.length === 1) {
+						environmentName = environmentNames[0];
+					} else {
+						environmentName = await this.vscode.window.showQuickPick(environmentNames, {
+							canPickMany: false,
+							ignoreFocusOut: false,
+							placeHolder: 'Environment Name',
+							title: 'Select an environment',
+						});
+						if (!environmentName) {
+							return;
+						}
+					}
+				}
+				await this.proxyToTaqAndShowOutput(
+					`originate -e ${environmentName} ${fileName ?? ''}`,
+					{
+						finishedTitle: 'originated contracts',
+						progressTitle: 'originating contracts',
+					},
+					projectDir,
+					true,
+				);
+			},
+		);
 	}
 
 	async getTaqBinPath() {
@@ -838,15 +859,42 @@ export class VsCodeHelper {
 	) {
 		this.registerCommand(
 			cmdId,
-			async (item?: HasFileName | undefined) => {
+			async (item?: HasFileName | api.Uri | undefined) => {
+				let fileName: string | undefined;
+				if (instanceOfHasFileName(item)) {
+					fileName = item.fileName;
+				} else if (item instanceof api.Uri) {
+					fileName = await this.getRelativeFilePath(item, 'contracts');
+					if (!fileName) {
+						this.showLog(
+							OutputLevels.warn,
+							`Could not determine relative filename for ${item.path}, canceling ${cmdId} command.`,
+						);
+						return;
+					}
+				}
+				this.showLog(OutputLevels.debug, `Running command ${cmdId} for ${fileName}`);
 				await this.proxyToTaqAndShowOutput(
-					item ? `${taskWithArgs} ${item.fileName}` : taskWithArgs,
+					item ? `${taskWithArgs} ${fileName}` : taskWithArgs,
 					taskTitles,
 					undefined,
 					outputTo === 'output',
 				);
 			},
 		);
+	}
+
+	private async getRelativeFilePath(uri: api.Uri, folder: 'contracts' | 'artifacts') {
+		let fileName = uri.path;
+		const mainFolder = this.getMainWorkspaceFolder();
+		if (!mainFolder) {
+			this.showLog(OutputLevels.warn, `No workspace is open, canceling command.`);
+			return undefined;
+		}
+		const config = await Util.TaqifiedDir.create(mainFolder.fsPath as Util.PathToDir, this.i18);
+		const dir = folder === 'contracts' ? config.config.contractsDir : config.config.artifactsDir ?? folder;
+		fileName = path.relative(path.join(mainFolder.path, dir), fileName);
+		return fileName;
 	}
 
 	exposeTaqTaskAsCommand(
