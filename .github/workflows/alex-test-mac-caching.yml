@@ -30,7 +30,6 @@ jobs:
           brew link docker
           brew link colima
           brew tap-info --installed
-          which limactl
           colima start
         
       - name: Check locations of stuff
