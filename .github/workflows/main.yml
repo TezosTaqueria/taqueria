@@ -253,7 +253,14 @@ jobs:
         with:
           node-version: 16.16.x
       
-      - name: build flextesa
+      - name: download the binary from the build-binaries job and make it executable
+        if: ${{ !github.event.pull_request.head.repo.fork }}
+        run: |
+          curl --url ${{ needs.build-binaries.outputs.public-url-ubuntu }} -o taq -L
+          chmod +x taq
+          echo "$(pwd)" >> $GITHUB_PATH
+
+      - name: build flextesa and upload image
         run: npm run build-docker -w taqueria-flextesa-manager
 
       # This step currently attempts to put all test files found in the e2e folder into 4 equal sized buckets. The output is a list of lists 
