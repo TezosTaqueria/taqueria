@@ -13,23 +13,23 @@ jobs:
         id: cache
         with:
           path: |
-            ~/Library/Caches/Homebrew/
             /usr/local/Cellar/
-          key: macos-homebrew-123456
+          key: macos-homebrew-1234567
 
       - name: Install Dependencies if no cache found
         if: ${{ !steps.cache.outputs.cache-hit }}
         run: |
           brew install docker
           brew install colima
+          brew tap-info --installed
           colima start
 
       - name: Link dependencies if cache found
         if: ${{ steps.cache.outputs.cache-hit }}
         run: |
-          export PATH=$PATH:/usr/local/Cellar/:~/Library/Caches/Homebrew/
           brew link docker
           brew link colima
+          brew tap-info --installed
           colima start
         
       - name: Check locations of stuff
