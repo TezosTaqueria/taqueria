@@ -55,6 +55,10 @@ jobs:
           TAQ_VERSION="${TAQ_VERSION/\//-}"
           deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt --target $DENO_TARGET index.ts --quickstart "`cat quickstart.md`" --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
           ./taq init -p ./test_project
+          if [ ! -f ./test_project/.taq/config.json ]; then
+            echo "Project not initialized"
+            exit 1
+          fi
 
       - name: Registry login
         uses: docker/login-action@v2
