@@ -21,9 +21,6 @@ jobs:
   binary-for-image:
     name: Build taq binary
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
     env:
       DENO_TARGET: x86_64-unknown-linux-gnu
