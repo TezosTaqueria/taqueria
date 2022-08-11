@@ -81,7 +81,7 @@ jobs:
         id: image-metadata
         uses: docker/metadata-action@v3
         with:
-          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/taqueria-docker
+          images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/taqueria
           tags: |
             type=ref,event=branch
             type=ref,event=pr,suffix=-{{sha}}
