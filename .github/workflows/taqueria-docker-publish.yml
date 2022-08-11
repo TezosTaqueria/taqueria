@@ -22,15 +22,9 @@ jobs:
     name: Build taq binary
     runs-on: ubuntu-latest
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: read
+      packages: write
     if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
-    strategy:
-      fail-fast: true
-      matrix:
-       include:
-         - os: ubuntu-latest
-           os_short: ubuntu
     env:
       DENO_TARGET: x86_64-unknown-linux-gnu
 
