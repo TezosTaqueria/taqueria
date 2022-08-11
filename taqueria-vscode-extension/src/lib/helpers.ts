@@ -298,7 +298,10 @@ export class VsCodeHelper {
 			(retval: (string[])[], record) => {
 				const row = keys.reduce(
 					(row: string[], key: string) => {
-						const value: string = record[key] ? record[key] : '';
+						let value = record[key] ? record[key] : '';
+						if (Array.isArray(value)) {
+							value = value.join('\n');
+						}
 						return [...row, value];
 					},
 					[],
@@ -761,7 +764,7 @@ export class VsCodeHelper {
 					this.logAllNestedErrors(result.executionError);
 				}
 				if (result.standardError) {
-					const fixedError = this.fixOutput(result.standardError);
+					const fixedError = this.fixOutput(result.standardError, true);
 					if (logStandardErrorToOutput) {
 						this.showOutput(fixedError);
 					} else {
@@ -769,8 +772,8 @@ export class VsCodeHelper {
 					}
 				}
 				if (result.standardOutput) {
-					const fixedOutput = this.fixOutput(result.standardOutput);
-					this.showOutput(this.tryFormattingAsTable(fixedOutput));
+					const fixedOutput = this.fixOutput(result.standardOutput, true);
+					this.showOutput(fixedOutput);
 				}
 				if (result.executionError || result.standardError) {
 					this.vscode.window.showWarningMessage(
@@ -790,7 +793,10 @@ export class VsCodeHelper {
 		});
 	}
 
-	private fixOutput(output: string): string {
+	private fixOutput(output: string, formatAsTable: boolean): string {
+		if (formatAsTable) {
+			output = this.tryFormattingAsTable(output);
+		}
 		output = output.replaceAll('', '');
 		output = output.replaceAll(/\[\d+m/g, '');
 		output = output.replaceAll('●', '');
