@@ -387,14 +387,21 @@ export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
 /**
  * Gets the initial storage for the contract
  */
-export const getInitialStorage = (parsedArgs: RequestArgs.t) =>
-	(contractFilename: string) => {
-		const env = getCurrentEnvironmentConfig(parsedArgs);
-
-		return env
-			? env.storage && env.storage[contractFilename]
-			: undefined;
-	};
+export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilename: string) => {
+	const env = getCurrentEnvironmentConfig(parsedArgs);
+	if (env && env.storage && env.storage[contractFilename]) {
+		const storageValue: string = env.storage[contractFilename];
+		const storagePath = joinPaths(parsedArgs.projectDir, parsedArgs.config.artifactsDir, 'storage', storageValue);
+		try {
+			const content = await readFile(storagePath, { encoding: 'utf-8' });
+			return content;
+		} catch (err) {
+			sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
+			return undefined;
+		}
+	}
+	return undefined;
+};
 
 /**
  * Gets the default account associated with a sandbox
