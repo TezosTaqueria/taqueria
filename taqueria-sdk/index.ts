@@ -390,8 +390,7 @@ export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
 export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilename: string) => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (env && env.storage && env.storage[contractFilename]) {
-		const storageValue: string = env.storage[contractFilename];
-		const storagePath = joinPaths(parsedArgs.projectDir, parsedArgs.config.artifactsDir, 'storage', storageValue);
+		const storagePath: string = env.storage[contractFilename];
 		try {
 			const content = await readFile(storagePath, { encoding: 'utf-8' });
 			return content;

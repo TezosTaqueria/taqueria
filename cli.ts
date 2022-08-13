@@ -412,7 +412,7 @@ const mkInitialDirectories = (projectDir: SanitizedAbsPath.t, maxConcurrency: nu
 	pipe(
 		getConfig(projectDir, i18n, true),
 		chain(({ artifactsDir, contractsDir, projectDir }: LoadedConfig.t) => {
-			const jobs = [artifactsDir, contractsDir, `${artifactsDir}/storage`].reduce(
+			const jobs = [artifactsDir, contractsDir].reduce(
 				(retval, abspath) => abspath ? [...retval, mkdir(joinPaths(projectDir, abspath))] : retval,
 				[] as Future<TaqError.TaqError, string>[],
 			);
