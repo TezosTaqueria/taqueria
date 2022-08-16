@@ -13,6 +13,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['taquito']);
+		await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}`);
 		// TODO: This can removed after this is resolved:
 		// https://github.com/ecadlabs/taqueria/issues/528
 		try {
@@ -284,6 +285,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
+		await exec(`cp e2e/data/string.storage ${taqueriaProjectPath}`);
 		await exec(
 			`cp e2e/data/config-taquito-test-environment-invalid-initial-storage-string.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
