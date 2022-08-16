@@ -65,7 +65,7 @@ const getValidContracts = async (parsedArgs: Opts) => {
 				sendErr(
 					`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
 						getCurrentEnvironment(parsedArgs)
-					}.storage["${filename}]\nThe value of the above JSON key should be the name of the file that contains the actual value of the storage, as a Michelson expression.\n`,
+					}.storage["${filename}"]\nThe value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.\n`,
 				);
 				return retval;
 			}
