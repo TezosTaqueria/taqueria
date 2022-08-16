@@ -425,16 +425,6 @@ jobs:
             const git_short_sha = "${{ github.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
 
-        # // Build the vscode-extension workflow comment
-        # const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
-        
-        # let vsCodeCommentBody = ''
-        # if (vsCodeWorkflowState.includes('success')) {
-        #   vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
-        # } else {
-        #   vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
-        # }
-
             function readInfo(filePath) {
               try {
                 const data = fs.readFileSync(filePath)
@@ -550,7 +540,6 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
           wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
           wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
-# wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
       - name: Release
         id: release
