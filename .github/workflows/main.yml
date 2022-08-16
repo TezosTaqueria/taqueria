@@ -382,15 +382,15 @@ jobs:
   #     - detect-changes
   #     - publish-state-plugin-to-npm
 
-    if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
-            github.event_name == 'release' || 
-            startsWith(github.ref, 'refs/tags/v')) &&
-            !github.event.pull_request.head.repo.fork }}
-    uses: ./.github/workflows/vscode-extension.yml
-    secrets:
-      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
-      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
-      VSCE_PAT: ${{ secrets.VSCE_PAT }} 
+    # if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
+    #         github.event_name == 'release' || 
+    #         startsWith(github.ref, 'refs/tags/v')) &&
+    #         !github.event.pull_request.head.repo.fork }}
+    # uses: ./.github/workflows/vscode-extension.yml
+    # secrets:
+    #   GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+    #   GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
+    #   VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
   pr-comment:
     runs-on: ubuntu-latest
