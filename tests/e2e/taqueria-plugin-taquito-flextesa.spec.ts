@@ -8,7 +8,7 @@ import {
 	storage_part4,
 	storage_part5,
 } from './data/all-types-storage-data';
-import { generateTestProject, getContainerName } from './utils/utils';
+import { generateTestProject, getContainerName, sleep } from './utils/utils';
 const exec = utils.promisify(exec1);
 
 const taqueriaProjectPath = 'e2e/auto-test-taquito-flextesa-plugin';
@@ -183,6 +183,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		if (dockerContainer !== '') {
 			try {
 				await exec(`docker stop ${dockerContainer}`);
+				await sleep(1000);
 			} catch {
 				// Ignore
 			}
@@ -190,7 +191,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		const dockerListStdout = await exec('docker ps -a');
 		if (dockerListStdout.stdout.includes(dockerContainer)) {
-			console.log(dockerListStdout)
+			console.log(dockerListStdout);
 			throw new Error('Container was not stopped properly');
 		}
 	});
