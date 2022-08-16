@@ -713,7 +713,7 @@ export class VsCodeHelper {
 			let sandboxName: string | undefined = undefined;
 			if (arg) {
 				if (arg instanceof SandboxTreeItem) {
-					sandboxName = arg.label;
+					sandboxName = arg.sandboxName;
 				}
 				if (arg instanceof ContractTreeItem) {
 					fileName = this.getArtifactFileNameFromContract(arg.fileName);
