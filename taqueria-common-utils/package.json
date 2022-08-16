@@ -1,0 +1,50 @@
+{
+	"name": "@taqueria/common-utils",
+	"version": "0.12.0",
+	"description": "A module of functions shared between both deno and node runtime",
+	"main": "common-utils.cjs",
+	"module": "common-utils.js",
+	"source": "common-utils.ts",
+	"type": "module",
+	"keywords": [
+		"taqueria",
+		"ecad",
+		"ecadlabs",
+		"tezos"
+	],
+	"scripts": {
+		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
+	},
+	"author": "ECAD Labs",
+	"license": "Apache-2.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/ecadlabs/taqueria.git",
+		"directory": "common-utils"
+	},
+	"devDependencies": {
+		"tsup": "^6.1.3",
+		"typescript": "4.7.2"
+	},
+	"types": "./common-utils.d.ts",
+	"tsup": {
+		"entry": [
+			"common-utils.ts"
+		],
+		"sourcemap": true,
+		"target": "node16",
+		"outDir": "./",
+		"dts": true,
+		"clean": false,
+		"skipNodeModulesBundle": true,
+		"platform": "node",
+		"format": [
+			"esm",
+			"cjs"
+		]
+	},
+	"dependencies": {
+		"@taqueria/pipe": "^0.12.0",
+		"crayon.js": "^3.3.2"
+	}
+}

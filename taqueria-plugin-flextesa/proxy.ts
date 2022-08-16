@@ -1,12 +1,11 @@
+import * as CommonUtils from '@taqueria/common-utils';
 import {
 	execCmd,
 	getArch,
 	readJsonFile,
 	sendAsyncErr,
 	sendAsyncRes,
-	sendErr,
 	sendJsonRes,
-	sendRes,
 	stringToSHA256,
 	writeJsonFile,
 } from '@taqueria/node-sdk';
@@ -22,6 +21,14 @@ import { Config, SanitizedArgs, TaqError } from '@taqueria/protocol/taqueria-pro
 import retry from 'async-retry';
 import type { ExecException } from 'child_process';
 import { getPortPromise } from 'portfinder';
+
+export const {
+	renderMsg,
+	renderErr,
+} = CommonUtils.inject({
+	stdout: process.stdout,
+	stderr: process.stderr,
+});
 
 const { Url } = Protocol;
 
@@ -118,12 +125,12 @@ const startInstance = (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts
 							return configureTezosClient(sandboxName, opts);
 						})
 						.then(({ stderr }) => {
-							if (stderr.length) sendErr(stderr);
+							if (stderr.length) renderErr(stderr);
 							console.log('Adding accounts...');
 							return importAccounts(sandboxName, opts);
 						})
 						.then(({ stderr }) => {
-							if (stderr.length) sendErr(stderr);
+							if (stderr.length) renderErr(stderr);
 							sendAsyncRes(`Started ${sandboxName}.`);
 						}),
 		);
@@ -208,7 +215,7 @@ const getAccountBalances = (sandboxName: string, sandbox: SandboxConfig.t, opts:
 				.then(containerName => `docker exec ${containerName} tezos-client get balance for ${accountName.trim()}`)
 				.then(execCmd)
 				.then(({ stdout, stderr }) => {
-					if (stderr.length > 0) sendErr(stderr);
+					if (stderr.length > 0) renderErr(stderr);
 					return {
 						account: accountName,
 						balance: stdout.trim(),
@@ -216,7 +223,7 @@ const getAccountBalances = (sandboxName: string, sandbox: SandboxConfig.t, opts:
 					};
 				})
 				.catch((err: ExecException) => {
-					sendErr(err.message);
+					renderErr(err.message);
 					return {
 						account: accountName,
 						balance: 'Error',

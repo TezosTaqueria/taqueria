@@ -1,4 +1,4 @@
-import { sendAsyncErr, sendAsyncRes, sendErr, sendJsonRes } from '@taqueria/node-sdk';
+import { sendAsyncErr, sendAsyncRes, sendJsonRes } from '@taqueria/node-sdk';
 import { LoadedConfig, RequestArgs, SanitizedAbsPath } from '@taqueria/node-sdk/types';
 import path from 'path';
 import { processFiles } from './file-processing';

@@ -1,3 +1,4 @@
+import * as CommonUtils from '@taqueria/common-utils';
 import {
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
@@ -8,7 +9,6 @@ import {
 	getSandboxAccountNames,
 	getSandboxConfig,
 	sendAsyncErr,
-	sendErr,
 	sendJsonRes,
 } from '@taqueria/node-sdk';
 import { Protocol, RequestArgs } from '@taqueria/node-sdk/types';
@@ -19,6 +19,14 @@ import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-o
 import glob from 'fast-glob';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+
+export const {
+	renderMsg,
+	renderErr,
+} = CommonUtils.inject({
+	stdout: process.stdout,
+	stderr: process.stderr,
+});
 
 interface Opts extends RequestArgs.t {
 	contract?: string;
@@ -62,7 +70,7 @@ const getValidContracts = async (parsedArgs: Opts) => {
 		(retval, filename) => {
 			const storage = getInitialStorage(parsedArgs)(filename);
 			if (storage === undefined || storage === null) {
-				sendErr(
+				renderErr(
 					`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
 						getCurrentEnvironment(parsedArgs)
 					}.storage."${filename}"\n`,
@@ -134,7 +142,7 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 		return await mapOpToContract(contracts, op, destination);
 	} catch (err) {
 		const error = (err as { message: string });
-		if (error.message) sendErr(error.message);
+		if (error.message) renderErr(error.message);
 		return undefined;
 	}
 };
@@ -160,10 +168,10 @@ const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.
 							})();
 
 							return [...retval, result];
-						} else sendErr(`Network ${networkName} requires a valid faucet in config.json.`);
-					} else sendErr(`Network "${networkName} is missing an RPC url in config.json."`);
+						} else renderErr(`Network ${networkName} requires a valid faucet in config.json.`);
+					} else renderErr(`Network "${networkName} is missing an RPC url in config.json."`);
 				} else {
-					sendErr(
+					renderErr(
 						`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json.`,
 					);
 				}
@@ -187,7 +195,7 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 							if (first) {
 								defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
 								// TODO: The error should be a warning, not an error. Descriptive string should not begin with 'Warning:'
-								sendErr(
+								renderErr(
 									`Warning: A default origination account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this origination.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
 								);
 							}
@@ -203,10 +211,10 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 							})();
 
 							return [...retval, result];
-						} else sendErr(`No accounts are available for the sandbox called ${sandboxName} to perform origination.`);
-					} else sendErr(`Sandbox "${sandboxName} is missing an RPC url in config.json."`);
+						} else renderErr(`No accounts are available for the sandbox called ${sandboxName} to perform origination.`);
+					} else renderErr(`Sandbox "${sandboxName} is missing an RPC url in config.json."`);
 				} else {
-					sendErr(
+					renderErr(
 						`The current environment is configured to use a sandbox called '${sandboxName}'; however, no sandbox of this name has been configured in .taq/config.json.`,
 					);
 				}
@@ -240,7 +248,7 @@ export const originate = <T>(parsedArgs: Opts) => {
 				[],
 			)
 		)
-		.then(results => results && results.length > 0 ? sendJsonRes(results) : sendErr(`No contracts originated.`));
+		.then(results => results && results.length > 0 ? sendJsonRes(results) : renderErr(`No contracts originated.`));
 };
 
 export default originate;

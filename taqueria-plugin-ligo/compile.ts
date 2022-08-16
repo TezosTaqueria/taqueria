@@ -1,6 +1,15 @@
-import { execCmd, getArch, getContracts, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
+import * as CommonUtils from '@taqueria/common-utils';
+import { execCmd, getArch, getContracts, sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import { basename, extname, join } from 'path';
+
+export const {
+	renderMsg,
+	renderErr,
+} = CommonUtils.inject({
+	stdout: process.stdout,
+	stderr: process.stderr,
+});
 
 interface Opts extends RequestArgs.t {
 	entrypoint?: string;
@@ -41,15 +50,15 @@ const compileContract = (opts: Opts) =>
 			.then(() => getCompileCommand(opts)(sourceFile))
 			.then(execCmd)
 			.then(({ stderr }) => { // How should we output warnings?
-				if (stderr.length > 0) sendErr(stderr);
+				if (stderr.length > 0) renderErr(stderr);
 				return {
 					contract: sourceFile,
 					artifact: getContractArtifactFilename(opts)(sourceFile),
 				};
 			})
 			.catch(err => {
-				sendErr(' ');
-				sendErr(err.message.split('\n').slice(1).join('\n'));
+				renderMsg(' ');
+				renderErr(err.message.split('\n').slice(1).join('\n'));
 				return Promise.resolve({
 					contract: sourceFile,
 					artifact: 'Not compiled',
@@ -72,7 +81,7 @@ export const compile = (parsedArgs: Opts) => {
 		: compileAll(parsedArgs)
 			.then(results => {
 				if (results.length === 0) {
-					sendErr('No contracts found to compile. Have you run "taq add-contract [sourceFile]" ?');
+					renderErr('No contracts found to compile. Have you run "taq add-contract [sourceFile]" ?');
 				}
 				return results;
 			});

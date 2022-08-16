@@ -10,6 +10,8 @@
 		"rambda": "https://cdnjs.cloudflare.com/ajax/libs/rambda/7.1.0/rambda.esm.js",
 		"memoizy": "https://deno.land/x/memoizy@1.0.0/mod.ts",
 		"@peculiar/webcrypto": "./taqueria-protocol/Crypto.ts",
+		"@taqueria/common-utils": "./taqueria-common-utils/common-utils.ts",
+		"@taqueria/pipe": "./taqueria-common-utils/taqueria-pipe/index.ts",
 		"@taqueria/protocol/TaqError": "./taqueria-protocol/TaqError.ts",
 		"@taqueria/protocol/Base": "./taqueria-protocol/Base.ts",
 		"@taqueria/protocol/url-join": "./taqueria-protocol/url-join.ts",

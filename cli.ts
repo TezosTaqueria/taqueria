@@ -1,3 +1,4 @@
+import * as CommonUtils from '@taqueria/common-utils';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import {
 	attemptP,
@@ -22,7 +23,6 @@ import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-type
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
 import * as Analytics from './analytics.ts';
-import * as CommonUtils from './common-utils/common-utils.ts';
 import { addContract, listContracts, removeContract } from './contracts.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
@@ -82,7 +82,7 @@ const {
 
 const {
 	renderMsg,
-	renderError,
+	renderErr,
 } = CommonUtils.inject({
 	stdout: Deno.stdout,
 	stderr: Deno.stderr,
@@ -191,7 +191,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 					chain(({ projectDir, maxConcurrency, quickstart }: SanitizedArgs.t) => {
 						return initProject(projectDir, quickstart, maxConcurrency, i18n);
 					}),
-					forkCatch(renderError)(renderError)(renderMsg),
+					forkCatch(renderErr)(renderErr)(renderMsg),
 				),
 		)
 		.command(
@@ -201,7 +201,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() =>
 				pipe(
 					optInAnalytics(),
-					forkCatch(renderError)(renderError)(renderMsg),
+					forkCatch(renderErr)(renderErr)(renderMsg),
 				),
 		)
 		.command(
@@ -211,7 +211,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			() =>
 				pipe(
 					optOutAnalytics(),
-					forkCatch(renderError)(renderError)(renderMsg),
+					forkCatch(renderErr)(renderErr)(renderMsg),
 				),
 		)
 		.option('fromVsCode', {
@@ -707,7 +707,7 @@ const handleTemplate = (
 					['json', 'application/json'].includes(template.encoding ?? 'none'),
 				),
 				map(([_, output, errOutput]) => {
-					if (errOutput.length > 0) renderError(errOutput);
+					if (errOutput.length > 0) renderErr(errOutput);
 					if (output.length > 0) return renderPluginJsonRes(JSON.parse(output), parsedArgs);
 				}),
 			);
@@ -862,7 +862,7 @@ const exposeTask = (
 							['json', 'application/json'].includes(task.encoding ?? 'none'),
 						),
 						map(([_, output, errOutput]) => {
-							if (errOutput.length > 0) renderError(errOutput);
+							if (errOutput.length > 0) renderErr(errOutput);
 							if (output.length > 0) return renderPluginJsonRes(JSON.parse(output), parsedArgs);
 						}),
 					);
@@ -1060,7 +1060,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 	} catch (err) {
 		// Something went wrong that we didn't handle.
 		// TODO: Generate bug report with stack trace
-		renderError(err);
+		renderErr(err);
 	}
 };
 
@@ -1126,14 +1126,14 @@ export const displayError = (cli: CLIConfig) =>
 			const [exitCode, msg] = res;
 			if (inputArgs.debug) {
 				logAllErrors(err);
-			} else if (msg) renderError(msg);
+			} else if (msg) renderErr(msg);
 
 			Deno.exit(exitCode as number);
 		}
 	};
 
 const logAllErrors = (err: Error | TaqError.E_TaqError | TaqError.t | unknown) => {
-	renderError(err);
+	renderErr(err);
 	if (isTaqError(err) && err.previous) logAllErrors(err.previous);
 };
 

@@ -1,7 +1,16 @@
-import { execCmd, getContracts, sendAsyncJsonRes, sendErr } from '@taqueria/node-sdk';
+import * as CommonUtils from '@taqueria/common-utils';
+import { execCmd, getContracts, sendAsyncJsonRes } from '@taqueria/node-sdk';
 import { RequestArgs, TaqError } from '@taqueria/node-sdk/types';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
+
+export const {
+	renderMsg,
+	renderErr,
+} = CommonUtils.inject({
+	stdout: process.stdout,
+	stderr: process.stderr,
+});
 
 interface Opts extends RequestArgs.ProxyRequestArgs {
 	sourceFile?: string;
@@ -26,7 +35,7 @@ const compileContract = (opts: Opts) =>
 		const sourceAbspath = join(opts.config.contractsDir, sourceFile);
 		return execCmd(getCompileCommand(opts)(sourceAbspath))
 			.then(async ({ stderr }) => { // How should we output warnings?
-				if (stderr.length > 0) sendErr(`\n${stderr}`);
+				if (stderr.length > 0) renderErr(`\n${stderr}`);
 
 				return {
 					contract: sourceFile,
@@ -34,8 +43,8 @@ const compileContract = (opts: Opts) =>
 				};
 			})
 			.catch(err => {
-				sendErr(' ');
-				sendErr(err.message.split('\n').slice(1).join('\n'));
+				renderMsg(' ');
+				renderErr(err.message.split('\n').slice(1).join('\n'));
 				return Promise.resolve({
 					contract: sourceFile,
 					artifact: 'Not compiled',
@@ -56,7 +65,7 @@ export const compile = <T>(parsedArgs: Opts) => {
 			.then(data => [data])
 		: compileAll(parsedArgs)
 			.then(results => {
-				if (results.length === 0) sendErr('No contracts found to compile.');
+				if (results.length === 0) renderErr('No contracts found to compile.');
 				return results;
 			});
 

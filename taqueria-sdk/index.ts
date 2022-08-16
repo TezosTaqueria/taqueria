@@ -35,6 +35,18 @@ import generateName from 'project-name-generator';
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 const yargs = require('yargs');
 
+import * as CommonUtils from '@taqueria/common-utils';
+
+export const {
+	pipe,
+	encode,
+	renderMsg,
+	renderErr,
+} = CommonUtils.inject({
+	stdout: process.stdout,
+	stderr: process.stderr,
+});
+
 export const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
 		mapRej((err: TaqError) => new E_TaqError(err))(f),
@@ -96,27 +108,36 @@ export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError> =>
 		}
 	});
 
-export const sendRes = (msg: string, newline = true) => {
-	if (!msg || msg.length === 0) return;
-	return newline
-		? console.log(msg)
-		: process.stdout.write(msg) as unknown as void;
+// export const sendRes = (msg: string, newline = true) => {
+// 	if (!msg || msg.length === 0) return;
+// 	return newline
+// 		? console.log(msg)
+// 		: process.stdout.write(msg) as unknown as void;
+// };
+
+export const sendAsyncRes = (msg: string, newline = true): Promise<void> => Promise.resolve(renderMsg(msg, newline));
+
+// export const sendErr = (msg: string, newline = true) => {
+// 	if (!msg || msg.length === 0) return;
+// 	return newline
+// 		? console.error(msg)
+// 		: process.stderr.write(msg) as unknown as void;
+// };
+
+export const sendAsyncErr = (msg: string, newline = true) => Promise.reject(renderErr(msg, newline)); // should this be Promise.reject?
+
+export const sendJson = (msg: unknown, newline = true) => renderMsg(JSON.stringify(msg), newline);
+
+export const sendJsonErr = (msg: unknown, newline = true) => {
+	if (newline) msg += '\n';
+	return pipe(
+		msg,
+		JSON.stringify,
+		encode,
+		process.stdout.write,
+		noop,
+	);
 };
-
-export const sendAsyncRes = (msg: string, newline = true): Promise<void> => Promise.resolve(sendRes(msg, newline));
-
-export const sendErr = (msg: string, newline = true) => {
-	if (!msg || msg.length === 0) return;
-	return newline
-		? console.error(msg)
-		: process.stderr.write(msg) as unknown as void;
-};
-
-export const sendAsyncErr = (msg: string, newline = true) => Promise.reject(sendErr(msg, newline)); // should this be Promise.reject?
-
-export const sendJson = (msg: unknown, newline = true) => sendRes(JSON.stringify(msg), newline);
-
-export const sendJsonErr = (msg: unknown, newline = true) => sendErr(JSON.stringify(msg), newline);
 
 export const sendAsyncJson = (msg: unknown, newline = true) => sendAsyncRes(JSON.stringify(msg), newline);
 

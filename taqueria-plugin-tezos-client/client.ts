@@ -1,10 +1,10 @@
+import * as CommonUtils from '@taqueria/common-utils';
 import {
 	execCmd,
 	getCurrentEnvironmentConfig,
 	getSandboxConfig,
 	sendAsyncErr,
 	sendAsyncJsonRes,
-	sendErr,
 	sendJsonRes,
 	stringToSHA256,
 } from '@taqueria/node-sdk';
@@ -13,6 +13,14 @@ import retry from 'async-retry';
 import type { ExecException } from 'child_process';
 import glob from 'fast-glob';
 import { join } from 'path';
+
+export const {
+	renderMsg,
+	renderErr,
+} = CommonUtils.inject({
+	stdout: process.stdout,
+	stderr: process.stderr,
+});
 
 interface Opts extends RequestArgs.ProxyRequestArgs {
 	sandboxName?: string;
@@ -83,15 +91,15 @@ const typecheckContract = (opts: Opts, sandboxName: string, sandbox: SandboxConf
 			return getTypecheckCommand(sandboxName, sandbox, sourcePath, opts)
 				.then(execCmd)
 				.then(async ({ stderr }) => { // How should we output warnings?
-					if (stderr.length > 0) sendErr(`\n${stderr}`);
+					if (stderr.length > 0) renderErr(`\n${stderr}`);
 					return {
 						contract: sourceFile,
 						result: 'Valid',
 					};
 				})
 				.catch(err => {
-					sendErr(' ');
-					sendErr(err.message.split('\n').slice(1).join('\n'));
+					renderMsg(' ');
+					renderErr(err.message.split('\n').slice(1).join('\n'));
 					return Promise.resolve({
 						contract: sourceFile,
 						result: 'Invalid',
@@ -103,8 +111,8 @@ const typecheckContract = (opts: Opts, sandboxName: string, sandbox: SandboxConf
 			.then(execCmd)
 			.then(typecheckContractHelper)
 			.catch(err => {
-				sendErr(' ');
-				sendErr(sourceFile + ': Does not exist\n');
+				renderMsg(' ');
+				renderErr(sourceFile + ': Does not exist\n');
 				return Promise.resolve({
 					contract: sourceFile,
 					result: 'N/A',
@@ -145,7 +153,7 @@ const typecheck = <T>(parsedArgs: Opts, sandboxName: string, sandbox: SandboxCon
 	} else {
 		p = typecheckAll(parsedArgs, sandboxName, sandbox)
 			.then(results => {
-				if (results.length === 0) sendErr('No contracts found to compile.');
+				if (results.length === 0) renderErr('No contracts found to compile.');
 				return results;
 			});
 	}
@@ -226,7 +234,7 @@ const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfi
 			.then(execCmd)
 			.then(() => sourcePath)
 			.catch(err => {
-				if (opts.debug) sendErr(err);
+				if (opts.debug) renderErr(err);
 				return getInputFilenameFromContractDir(opts, sourceFile);
 			});
 
@@ -235,7 +243,7 @@ const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfi
 				return getSimulateCommand(opts, sandboxName, sandbox, sourceFile, sourcePath)
 					.then(execCmd)
 					.then(async ({ stdout, stderr }) => { // How should we output warnings?
-						if (stderr.length > 0) sendErr(`\n${stderr}`);
+						if (stderr.length > 0) renderErr(`\n${stderr}`);
 						return {
 							contract: sourceFile,
 							result: stdout,
@@ -243,15 +251,15 @@ const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfi
 					})
 					.catch(err => {
 						const msg: string = trimTezosClientMenuIfPresent(err.message);
-						sendErr(msg.split('\n').slice(1).join('\n'));
+						renderErr(msg.split('\n').slice(1).join('\n'));
 						return Promise.resolve({
 							contract: sourceFile,
 							result: 'Invalid',
 						});
 					});
 			} catch (err) {
-				sendErr(' ');
-				sendErr((err as Error).message);
+				renderMsg(' ');
+				renderErr((err as Error).message);
 				return Promise.resolve({
 					contract: sourceFile,
 					result: 'Bad input or storage value',
@@ -263,9 +271,9 @@ const simulateContract = (opts: Opts, sandboxName: string, sandbox: SandboxConfi
 			.then(execCmd)
 			.then(simulateContractHelper)
 			.catch(err => {
-				sendErr(' ');
-				if (opts.debug) sendErr(err);
-				sendErr(sourceFile + ': Does not exist\n');
+				renderMsg(' ');
+				if (opts.debug) renderErr(err);
+				renderErr(sourceFile + ': Does not exist\n');
 				return Promise.resolve({
 					contract: sourceFile,
 					result: 'N/A',

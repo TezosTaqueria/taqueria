@@ -57,7 +57,8 @@
 	},
 	"workspaces": [
 		"./taqueria*",
-		"./tests"
+		"./tests",
+		"./taqueria-common-utils/taqueria*"
 	],
 	"lint-staged": {
 		"*.{ts,tsx,js,jsx,cjs,mjs,json}": "dprint fmt"
