@@ -39,8 +39,7 @@
 		"skipNodeModulesBundle": true,
 		"platform": "node",
 		"format": [
-			"esm",
-			"cjs"
+			"esm"
 		]
 	},
 	"dependencies": {

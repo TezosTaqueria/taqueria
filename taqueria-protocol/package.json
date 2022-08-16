@@ -5,7 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "echo 'Nothing to build.' && exit 0 "
+		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
 	},
 	"keywords": [
 		"taqueria",
@@ -36,6 +36,22 @@
 		"batching-toposort": "^1.2.0",
 		"fluture": "^14.0.0",
 		"remeda": "^0.0.34",
-		"zod": "^3.17.3"
+		"zod": "^3.17.3",
+		"rambda": "latest"
+	},
+	"tsup": {
+		"entry": [
+			"*.ts"
+		],
+		"sourcemap": true,
+		"target": "node16",
+		"outDir": "./",
+		"dts": true,
+		"clean": false,
+		"skipNodeModulesBundle": true,
+		"platform": "node",
+		"format": [
+			"esm"
+		]
 	}
 }
