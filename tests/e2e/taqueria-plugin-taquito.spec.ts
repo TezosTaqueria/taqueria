@@ -275,7 +275,10 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain(
-			'Michelson artifact hello-tacos.tz has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.test.storage."hello-tacos.tz"',
+			'Michelson artifact hello-tacos.tz has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.test.storage["hello-tacos.tz"]',
+		);
+		expect(stdoutDeploy.stderr).toContain(
+			'The value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.',
 		);
 	});
 
