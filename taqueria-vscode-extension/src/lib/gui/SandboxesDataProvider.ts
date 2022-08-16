@@ -1,21 +1,35 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
+import fetch from 'node-fetch';
 import * as vscode from 'vscode';
-import { HasRefresh, mapAsync, VsCodeHelper } from '../helpers';
+import { HasRefresh, mapAsync, OutputLevels, VsCodeHelper } from '../helpers';
 import { getRunningContainerNames } from '../pure';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 
 export class SandboxesDataProvider extends TaqueriaDataProviderBase
-	implements vscode.TreeDataProvider<SandboxTreeItem>, HasRefresh
+	implements vscode.TreeDataProvider<SandboxTreeItemBase>, HasRefresh
 {
 	constructor(helper: VsCodeHelper) {
 		super(helper);
 	}
 
-	getTreeItem(element: SandboxTreeItem): vscode.TreeItem {
+	getTreeItem(element: SandboxTreeItemBase): vscode.TreeItem {
 		return element;
 	}
 
-	async getChildren(element?: SandboxTreeItem): Promise<SandboxTreeItem[]> {
+	async getChildren(element?: SandboxTreeItemBase): Promise<SandboxTreeItemBase[]> {
+		if (element instanceof SandboxTreeItem) {
+			return await this.getSandboxChildren(element);
+		}
+		if (element instanceof SandboxChildrenTreeItem) {
+			switch (element.label) {
+				case 'Implicit Accounts':
+					return await this.getSandboxImplicitAccounts(element);
+				case 'Smart Contracts':
+					return await this.getSandboxSmartContracts(element);
+				default:
+					return [];
+			}
+		}
 		if (element) {
 			return [];
 		}
@@ -31,15 +45,48 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const sandboxNames = this.getSandboxNames(config);
 		const items = await mapAsync(
 			sandboxNames,
-			async (sandboxName: string) =>
-				new SandboxTreeItem(
+			async (sandboxName: string) => {
+				const { isRunning, environmentName, containerName } = await this.getSandboxState(
 					sandboxName,
-					await this.getSandboxState(sandboxName, runningContainers, environmentNames, pathToDir),
-					vscode.TreeItemCollapsibleState.None,
-				),
+					runningContainers,
+					environmentNames,
+					pathToDir,
+				);
+				return new SandboxTreeItem(sandboxName, environmentName, containerName, isRunning);
+			},
 		);
-
 		return items;
+	}
+
+	private async getSandboxChildren(element: SandboxTreeItem): Promise<SandboxChildrenTreeItem[]> {
+		return [
+			new SandboxChildrenTreeItem('Implicit Accounts', element),
+			new SandboxChildrenTreeItem('Smart Contracts', element),
+			new SandboxChildrenTreeItem('Operations', element),
+			new SandboxChildrenTreeItem('Non-Empty Blocks', element),
+		];
+	}
+
+	private async getSandboxImplicitAccounts(
+		_element: SandboxChildrenTreeItem,
+	): Promise<SandboxImplicitAccountTreeItem[]> {
+		const containerName = _element.parent.containerName;
+		if (!containerName) {
+			return [];
+		}
+		const response = await fetch('http://localhost:5000/v1/accounts?type.ne=contract');
+		const data = await response.json();
+		return (data as any[]).map(item => new SandboxImplicitAccountTreeItem(item.address));
+	}
+
+	private async getSandboxSmartContracts(_element: SandboxChildrenTreeItem): Promise<SandboxImplicitAccountTreeItem[]> {
+		const containerName = _element.parent.containerName;
+		if (!containerName) {
+			return [];
+		}
+		const response = await fetch('http://localhost:5000/v1/accounts?type=contract');
+		const data = await response.json();
+		return (data as any[]).map(item => new SandboxSmartContractTreeItem(item.address));
 	}
 
 	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItem | undefined | null | void> = new vscode
@@ -54,17 +101,19 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		runningContainerNames: string[] | undefined,
 		environmentNames: string[],
 		pathToDir: string,
-	) {
+	): Promise<
+		{ isRunning: boolean | undefined; environmentName: string | undefined; containerName: string | undefined }
+	> {
 		if (runningContainerNames === undefined) {
-			return undefined;
+			return { isRunning: undefined, environmentName: undefined, containerName: undefined };
 		}
 		for (const environmentName of environmentNames) {
 			const expectedContainerName = await this.getContainerName(sandBoxName, environmentName, pathToDir);
 			if (runningContainerNames.findIndex(x => x === expectedContainerName) >= 0) {
-				return true;
+				return { isRunning: true, environmentName, containerName: expectedContainerName };
 			}
 		}
-		return false;
+		return { isRunning: false, environmentName: undefined, containerName: undefined };
 	}
 
 	// TODO: The functions getUniqueSandboxName and getContainerName are duplicates of similarly named functions in
@@ -85,23 +134,63 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 }
 
-export class SandboxTreeItem extends vscode.TreeItem {
+export class SandboxTreeItemBase extends vscode.TreeItem {
 	constructor(
-		public readonly label: string,
-		private running: boolean | undefined,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+		label: string,
+		kind: 'sandbox' | 'sandboxChild' | 'implicitAccount' | 'smartContract',
+		collapsibleState: vscode.TreeItemCollapsibleState,
 	) {
 		super(label, collapsibleState);
+	}
+}
+
+export class SandboxTreeItem extends SandboxTreeItemBase {
+	constructor(
+		public readonly sandboxName: string,
+		public readonly environmentName: string | undefined,
+		public readonly containerName: string | undefined,
+		public running: boolean | undefined,
+	) {
+		super(
+			sandboxName,
+			'sandbox',
+			running ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
+		);
 		if (running === undefined) {
-			this.tooltip = this.label;
+			this.tooltip = sandboxName;
 			this.description = undefined;
 			this.iconPath = new vscode.ThemeIcon('question');
-			this.contextValue = 'unknown';
+			this.contextValue = 'sandbox:unknown';
 		} else {
-			this.tooltip = `${this.label}-${running ? 'running' : 'stopped'}`;
+			this.tooltip = `${sandboxName}-${running ? 'running' : 'stopped'}`;
 			this.description = running ? 'running' : 'stopped';
 			this.iconPath = new vscode.ThemeIcon(running ? 'vm-running' : 'vm-outline');
-			this.contextValue = running ? 'running' : 'stopped';
+			this.contextValue = running ? 'sandbox:running' : 'sandbox:stopped';
 		}
+	}
+}
+
+export class SandboxChildrenTreeItem extends SandboxTreeItemBase {
+	constructor(
+		public readonly label: string,
+		public readonly parent: SandboxTreeItem,
+	) {
+		super(label, 'sandboxChild', vscode.TreeItemCollapsibleState.Collapsed);
+	}
+}
+
+export class SandboxImplicitAccountTreeItem extends SandboxTreeItemBase {
+	constructor(
+		public readonly address: string,
+	) {
+		super(address, 'implicitAccount', vscode.TreeItemCollapsibleState.Collapsed);
+	}
+}
+
+export class SandboxSmartContractTreeItem extends SandboxTreeItemBase {
+	constructor(
+		public readonly address: string,
+	) {
+		super(address, 'smartContract', vscode.TreeItemCollapsibleState.Collapsed);
 	}
 }

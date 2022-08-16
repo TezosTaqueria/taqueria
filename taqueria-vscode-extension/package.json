@@ -423,17 +423,17 @@
 				},
 				{
 					"command": "taqueria.start_sandbox",
-					"when": "view == taqueria-sandboxes && viewItem != running",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!running)/",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.stop_sandbox",
-					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!stopped)/",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.list_accounts",
-					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!stopped)/",
 					"group": "inline"
 				},
 				{
@@ -458,7 +458,7 @@
 				},
 				{
 					"command": "taqueria.typecheck",
-					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!stopped)/",
 					"group": "inline"
 				},
 				{
@@ -529,6 +529,7 @@
 		"@taqueria/protocol": "^0.14.4",
 		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
+		"node-fetch": "^3.2.10",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1",
 		"semver": "^7.3.7"
