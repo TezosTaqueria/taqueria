@@ -15,7 +15,12 @@ import { ContractsDataProvider } from './gui/ContractsDataProvider';
 import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
-import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvider';
+import {
+	SandboxesDataProvider,
+	SandboxTreeItem,
+	SandboxTreeItemBase,
+	SmartContractEntrypointTreeItem,
+} from './gui/SandboxesDataProvider';
 import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProvider';
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
@@ -293,6 +298,10 @@ export class VsCodeHelper {
 		} catch {
 			return json;
 		}
+		return this.formatObjectOrArrayAsTable(data);
+	}
+
+	private formatObjectOrArrayAsTable(data: unknown) {
 		const array: Record<string, any>[] = Array.isArray(data)
 			? data as Record<string, any>[]
 			: [data as Record<string, any>];
@@ -514,7 +523,7 @@ export class VsCodeHelper {
 			if (projectDir === undefined) {
 				return;
 			}
-			let pluginName = pluginInfo?.label;
+			let pluginName = pluginInfo?.pluginName;
 			if (!pluginName) {
 				pluginName = await this.promptForPluginInstallation(projectDir);
 				if (!pluginName) {
@@ -540,7 +549,7 @@ export class VsCodeHelper {
 			if (projectDir === undefined) {
 				return;
 			}
-			let pluginName = pluginInfo?.label;
+			let pluginName = pluginInfo?.pluginName;
 			if (!pluginName) {
 				pluginName = await this.promptForPluginUninstall(projectDir);
 			}
@@ -575,7 +584,7 @@ export class VsCodeHelper {
 				let fileName: string | undefined = undefined;
 				if (arg) {
 					if (arg instanceof EnvironmentTreeItem) {
-						environmentName = arg.label;
+						environmentName = arg.environmentName;
 					}
 					if (arg instanceof ArtifactTreeItem) {
 						fileName = arg.fileName;
@@ -973,7 +982,7 @@ export class VsCodeHelper {
 		taskTitles: TaskTitles,
 	) {
 		this.registerCommand(cmdId, async (sandbox?: SandboxTreeItem | undefined) => {
-			let sandboxName = sandbox?.label;
+			let sandboxName = sandbox?.sandboxName;
 			if (!sandboxName) {
 				const mainFolder = await this.getMainWorkspaceFolder();
 				if (!mainFolder) {
@@ -1394,6 +1403,19 @@ export class VsCodeHelper {
 	async createTreeViews() {
 		this.systemCheckTreeView = this.vscode.window.createTreeView<SystemCheckTreeItem>('taqueria-system-check', {
 			treeDataProvider: this.systemCheckDataProvider!,
+		});
+	}
+
+	exposeRefreshSandBoxDataCommand() {
+		this.registerCommand('taqueria.refresh_sandbox_data', async (item: SandboxTreeItemBase) => {
+			this.sandboxesDataProvider?.refreshItem(item);
+		});
+	}
+
+	exposeShowEntrypointParametersCommand() {
+		this.registerCommand('taqueria.show_entrypoint_parameters', async (item: SmartContractEntrypointTreeItem) => {
+			const jsonParameters = item.jsonParameters;
+			this.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});
 	}
 }
