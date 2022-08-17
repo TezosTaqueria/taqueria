@@ -21,10 +21,10 @@ export class ScaffoldsDataProvider implements vscode.TreeDataProvider<ScaffoldTr
 
 export class ScaffoldTreeItem extends vscode.TreeItem {
 	constructor(
-		public readonly label: string,
+		public readonly scaffoldName: string,
 		public readonly url: string,
 	) {
-		super(label, vscode.TreeItemCollapsibleState.None);
+		super(scaffoldName, vscode.TreeItemCollapsibleState.None);
 		this.tooltip = url;
 		this.iconPath = new vscode.ThemeIcon('cloud-download');
 	}

@@ -1,4 +1,5 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
+import { SpawnSyncOptionsWithBufferEncoding } from 'child_process';
 import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 import { HasRefresh, mapAsync, OutputLevels, VsCodeHelper } from '../helpers';
@@ -18,14 +19,27 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 
 	async getChildren(element?: SandboxTreeItemBase): Promise<SandboxTreeItemBase[]> {
 		if (element instanceof SandboxTreeItem) {
-			return await this.getSandboxChildren(element);
+			return this.getSandboxChildren(element);
+		}
+		if (element instanceof SandboxSmartContractTreeItem) {
+			return this.getSmartContractChildren(element);
 		}
 		if (element instanceof SandboxChildrenTreeItem) {
-			switch (element.label) {
+			switch (element.kind) {
 				case 'Implicit Accounts':
 					return await this.getSandboxImplicitAccounts(element);
 				case 'Smart Contracts':
 					return await this.getSandboxSmartContracts(element);
+				default:
+					return [];
+			}
+		}
+		if (element instanceof SmartContractChildrenTreeItem) {
+			switch (element.kind) {
+				case 'Entrypoints':
+					return await this.getSmartContractEntrypoints(element);
+				case 'Operations':
+					return await this.getSmartContractOperations(element);
 				default:
 					return [];
 			}
@@ -58,12 +72,37 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		return items;
 	}
 
-	private async getSandboxChildren(element: SandboxTreeItem): Promise<SandboxChildrenTreeItem[]> {
+	async getSmartContractEntrypoints(
+		element: SmartContractChildrenTreeItem,
+	): Promise<SmartContractEntrypointTreeItem[]> {
+		const containerName = element.parent.containerName;
+		if (!containerName) {
+			return [];
+		}
+		const response = await fetch(`https://api.tzkt.io/v1/contracts/${element.parent.address}/entrypoints`);
+		const data = await response.json();
+		return (data as any[]).map(item =>
+			new SmartContractEntrypointTreeItem(item.name, item.jsonParameters, element.parent)
+		);
+	}
+
+	getSmartContractOperations(element: SmartContractChildrenTreeItem): Promise<SandboxTreeItemBase[]> {
+		throw new Error('Method not implemented.');
+	}
+
+	private getSandboxChildren(element: SandboxTreeItem): SandboxChildrenTreeItem[] {
 		return [
 			new SandboxChildrenTreeItem('Implicit Accounts', element),
 			new SandboxChildrenTreeItem('Smart Contracts', element),
 			new SandboxChildrenTreeItem('Operations', element),
 			new SandboxChildrenTreeItem('Non-Empty Blocks', element),
+		];
+	}
+
+	private getSmartContractChildren(element: SandboxSmartContractTreeItem): SmartContractChildrenTreeItem[] {
+		return [
+			new SmartContractChildrenTreeItem('Entrypoints', element),
+			new SmartContractChildrenTreeItem('Operations', element),
 		];
 	}
 
@@ -84,16 +123,16 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!containerName) {
 			return [];
 		}
-		const response = await fetch('http://localhost:5000/v1/accounts?type=contract');
+		const response = await fetch('http://localhost:5000/v1/contracts');
 		const data = await response.json();
-		return (data as any[]).map(item => new SandboxSmartContractTreeItem(item.address));
+		return (data as any[]).map(item => new SandboxSmartContractTreeItem(item.address, containerName));
 	}
 
-	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItem | undefined | null | void> = new vscode
+	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void> = new vscode
 		.EventEmitter<
 		SandboxTreeItem | undefined | null | void
 	>();
-	readonly onDidChangeTreeData: vscode.Event<SandboxTreeItem | undefined | null | void> =
+	readonly onDidChangeTreeData: vscode.Event<SandboxTreeItemBase | undefined | null | void> =
 		this._onDidChangeTreeData.event;
 
 	async getSandboxState(
@@ -129,6 +168,10 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		return `taqueria-${environmentName}-${uniqueSandboxName}`;
 	}
 
+	refreshItem(item: SandboxTreeItemBase): void {
+		this._onDidChangeTreeData.fire(item);
+	}
+
 	refresh(): void {
 		this._onDidChangeTreeData.fire();
 	}
@@ -137,7 +180,14 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 export class SandboxTreeItemBase extends vscode.TreeItem {
 	constructor(
 		label: string,
-		kind: 'sandbox' | 'sandboxChild' | 'implicitAccount' | 'smartContract',
+		kind:
+			| 'sandbox'
+			| 'sandboxChild'
+			| 'implicitAccount'
+			| 'smartContract'
+			| 'smartContractChild'
+			| 'smartContractEntryPoint'
+			| 'smartContractOperation',
 		collapsibleState: vscode.TreeItemCollapsibleState,
 	) {
 		super(label, collapsibleState);
@@ -172,10 +222,10 @@ export class SandboxTreeItem extends SandboxTreeItemBase {
 
 export class SandboxChildrenTreeItem extends SandboxTreeItemBase {
 	constructor(
-		public readonly label: string,
+		public readonly kind: 'Implicit Accounts' | 'Smart Contracts' | 'Operations' | 'Non-Empty Blocks',
 		public readonly parent: SandboxTreeItem,
 	) {
-		super(label, 'sandboxChild', vscode.TreeItemCollapsibleState.Collapsed);
+		super(kind, 'sandboxChild', vscode.TreeItemCollapsibleState.Collapsed);
 	}
 }
 
@@ -190,7 +240,28 @@ export class SandboxImplicitAccountTreeItem extends SandboxTreeItemBase {
 export class SandboxSmartContractTreeItem extends SandboxTreeItemBase {
 	constructor(
 		public readonly address: string,
+		public readonly containerName: string,
 	) {
 		super(address, 'smartContract', vscode.TreeItemCollapsibleState.Collapsed);
+	}
+}
+
+export class SmartContractChildrenTreeItem extends SandboxTreeItemBase {
+	constructor(
+		public kind: 'Operations' | 'Entrypoints',
+		public readonly parent: SandboxSmartContractTreeItem,
+	) {
+		super(kind, 'smartContractChild', vscode.TreeItemCollapsibleState.Collapsed);
+	}
+}
+
+export class SmartContractEntrypointTreeItem extends SandboxTreeItemBase {
+	constructor(
+		name: string,
+		public readonly jsonParameters: any | null,
+		public readonly parent: SandboxSmartContractTreeItem,
+	) {
+		super(name, 'smartContractEntryPoint', vscode.TreeItemCollapsibleState.None);
+		this.contextValue = 'entrypoint';
 	}
 }

@@ -347,6 +347,20 @@
 				"title": " Remove contract from registry",
 				"shortTitle": "remove",
 				"icon": "$(remove)"
+			},
+			{
+				"command": "taqueria.show_entrypoint_parameters",
+				"category": "Taqueria",
+				"title": "Parameters",
+				"shortTitle": "parameters",
+				"icon": "$(list-unordered)"
+			},
+			{
+				"command": "taqueria.refresh_sandbox_data",
+				"category": "Taqueria",
+				"title": "Refresh",
+				"shortTitle": "refresh",
+				"icon": "$(refresh)"
 			}
 		],
 		"menus": {
@@ -365,6 +379,14 @@
 				},
 				{
 					"command": "taqueria.refresh_command_states",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.show_entrypoint_parameters",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.refresh_sandbox_data",
 					"when": "false"
 				}
 			],
@@ -479,6 +501,16 @@
 				{
 					"command": "taqueria.scaffold",
 					"when": "view == taqueria-scaffold",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.show_entrypoint_parameters",
+					"when": "view == taqueria-sandboxes && viewItem == entrypoint",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.refresh_sandbox_data",
+					"when": "view == taqueria-sandboxes",
 					"group": "inline"
 				}
 			],
