@@ -13,42 +13,68 @@ body:
     id: what-happened
     attributes:
       label: What happened?
-      description: What went wrong?
-      placeholder: Tell us what you see!
-      value: "Details about what happened."
-    validations:
-      required: true
-  - type: textarea
-    id: what-should-happen
-    attributes:
-      label: What should have happened?
-      description: What did you expect to happen?
-      placeholder: 
-      value: "Details about what should have happened."
-    validations:
-      required: true
-  - type: textarea
-    id: steps
-    attributes:
-      label: Steps to reproduce the bug
-      description: Please provide the steps to reproduce the bug or error and provide relevant information about your setup. This helps diagnose issues that are only reproducible under certain conditions.
-      placeholder: 
-      value: "Steps to reproduce the error"
+      description: Also tell us, what did you expect to happen?
+      placeholder: Tell us what you see! Please include any relavent screenshots of images, and the steps to reproduce the bug
+      value: "Details about what happened"
     validations:
       required: true
   - type: textarea
     id: logs
     attributes:
       label: Relevant log output
-      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks
       render: shell
-  - type: textarea
-    id: images
+  - type: dropdown
+    id: user_impact
     attributes:
-      label: Screenshots and images
-      description: Please include any screenshots or images that are relevant to the bug report.
-      placeholder: 
-      value: "Screenshot and images"
+      label: How impactful is this bug?
+      description: Let us know how impactful this bug is to your workflow 
+      multiple: false
+      options:
+        - 🐜 Minor annoyance
+        - 🤔 Notable but managable
+        - 🤯 Major disruption
+        - 🚒 Showstopper 
+  - type: dropdown
+    id: os
+    attributes:
+      label: What operating system are you seeing the problem on?
+      multiple: false
+      options:
+        - Linux
+        - MacOS
+        - Windows -> WSL
+        - Windows -> VM
+  - type: dropdown
+    id: arch
+    attributes:
+      label: What system architecture are you running Taqueria on?
+      multiple: true
+      options:
+        - arm64 (M1 Macs)
+        - x64
+  - type: input
+    id: taq_version
+    attributes:
+      label: What version of Taqueria are you using?
+      description: Let us know what version you are using. You can find out by running `taq --version` in your terminal
+      placeholder: ex. v0.12.1
+    validations:
+      required: false
+  - type: input
+    id: node_version
+    attributes:
+      label: What version of Node.js are you using?
+      description: Let us know what version of node you are running. You can find out by running `node --version` in your terminal
+      placeholder: ex. v16.16.0
+    validations:
+      required: false
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
     validations:
       required: false
   - type: checkboxes
