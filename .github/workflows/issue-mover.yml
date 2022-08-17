@@ -12,7 +12,7 @@ jobs:
         with:
           project-url: https://github.com/orgs/ecadlabs/projects/9
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          labeled: dev
+          labeled: dev-task
   
   other-tasks:
     runs-on: ubuntu-latest
@@ -21,5 +21,5 @@ jobs:
         with:
           project-url: https://github.com/orgs/ecadlabs/projects/3
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          labeled: dev
+          labeled: dev-task
           label-operator: NOT
