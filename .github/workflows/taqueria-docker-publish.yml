@@ -1,13 +1,16 @@
 name: Taqueria Docker image
 on:
-  push:
-    branches:
-      - 'main'
-    tags:
-      - 'v*'
-  pull_request:
-    branches:
-      - 'main'
+  workflow_call:
+    inputs:
+      linux_binary_url:
+        type: string
+        required: true
+      macos_binary_url:
+        type: string
+        required: true
+    secrets:
+      GITHUB_TOKEN:
+        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
@@ -25,45 +28,17 @@ jobs:
       fail-fast: true
       matrix:
        include:
-         - deno_target: "x86_64-unknown-linux-gnu"
+         - binary: "${{ inputs.linux_binary_url }}"
            docker_platform: "linux/amd64"
-         - deno_target: "x86_64-apple-darwin"
+         - binary: "${{ inputs.macos_binary_url }}"
            docker_platform: "linux/arm64/v8"
-    if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
     env:
       DENO_TARGET: ${{ matrix.deno_target }}
 
     steps:
-      - name: Setup repo
-        uses: actions/checkout@v2
-
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: "1.23.4"
-
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ./deno
-            ~/.cache/deno
-          key: ${{ runner.os }}-deno-${{ hashFiles('**/deno-lock.json') }}
-
-      - name: Build the binary
-        id: build-bin
-        shell: bash
-        env:
-          TAQ_VERSION: ${{ github.ref_name }}
-          DENO_DIR: "./deno"
-        run: |
-          BUILD=`git rev-parse --short "$GITHUB_SHA"`
-          TAQ_VERSION="${TAQ_VERSION/\//-}"
-          deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt --target $DENO_TARGET index.ts --quickstart "`cat quickstart.md`" --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
-          ./taq init -p ./test_project
-          if [ ! -f ./test_project/.taq/config.json ]; then
-            echo "Project not initialized"
-            exit 1
-          fi
+      - name: Download the binary
+        run: wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
+          
 
       - name: Registry login
         uses: docker/login-action@v2
