@@ -3,6 +3,10 @@ name: issue-mover
 on:
   issues:
     types: [opened, reopened]
+  
+  pull_request:
+    branches:
+      - main
 
 jobs:
   dev-tasks:
