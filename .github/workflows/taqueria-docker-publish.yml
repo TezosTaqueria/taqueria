@@ -20,16 +20,14 @@ jobs:
 
   build-and-publish-image:
     name: Build and publish Taqeria Docker image
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
        include:
-         - os: ubuntu-latest
-           deno_target: "x86_64-unknown-linux-gnu"
+         - deno_target: "x86_64-unknown-linux-gnu"
            docker_platform: "linux/amd64"
-         - os: macOS-latest
-           deno_target: "x86_64-apple-darwin"
+         - deno_target: "x86_64-apple-darwin"
            docker_platform: "linux/arm64/v8"
     if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
     env:
