@@ -18,12 +18,22 @@ env:
 
 jobs:
 
-  binary-for-image:
-    name: Build taq binary
-    runs-on: ubuntu-latest
+  build-and-publish-image:
+    name: Build and publish Taqeria Docker image
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+       include:
+         - os: ubuntu-latest
+           deno_target: "x86_64-unknown-linux-gnu"
+           docker_platform: "linux/amd64"
+         - os: macOS-latest
+           deno_target: "x86_64-apple-darwin"
+           docker_platform: "linux/arm64/v8"
     if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
     env:
-      DENO_TARGET: x86_64-unknown-linux-gnu
+      DENO_TARGET: ${{ matrix.deno_target }}
 
     steps:
       - name: Setup repo
@@ -98,19 +108,19 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/arm64/v8,linux/amd64
+          platforms: ${{ matrix.docker_platform }}
           tags: ${{ steps.image-metadata.outputs.tags }}
           labels: ${{ steps.image-metadata.outputs.labels }}
 
-      - name: Comment on PR
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: 'The `taqueria` docker image has been published and is avaiable [here](https://github.com/ecadlabs/taqueria/pkgs/container/taqueria). Look for the image with the tag `pr-${{ github.event.number }}-${{ steps.vars.outputs.short_sha }}`. The image is available for the following platforms: `linux/amd64` and `linux/arm64/v8`.' 
-            })
+      # - name: Comment on PR
+      #   if: ${{ github.event_name == 'pull_request' }}
+      #   uses: actions/github-script@v3
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     script: |
+      #       github.issues.createComment({
+      #         issue_number: context.issue.number,
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         body: 'The `taqueria` docker image has been published and is avaiable [here](https://github.com/ecadlabs/taqueria/pkgs/container/taqueria). Look for the image with the tag `pr-${{ github.event.number }}-${{ steps.vars.outputs.short_sha }}`. The image is available for the following platforms: `linux/amd64` and `linux/arm64/v8`.' 
+      #       })
