@@ -14,7 +14,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           labeled: dev
   
-  dev-tasks:
+  other-tasks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/add-to-project@main
