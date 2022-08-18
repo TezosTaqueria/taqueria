@@ -392,13 +392,13 @@ jobs:
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
       VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
-  docker-image-build:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    needs: build-binaries
-    uses: ./.github/workflows/taqueria-docker-publish.yml
-    with:
-      linux_binary_url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
-      macos_binary_url: ${{ needs.build-binaries.outputs.public-url-macos }}
+  # docker-image-build:
+  #   if: ${{ !github.event.pull_request.head.repo.fork }}
+  #   needs: build-binaries
+  #   uses: ./.github/workflows/taqueria-docker-publish.yml
+  #   with:
+  #     linux_binary_url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
+  #     macos_binary_url: ${{ needs.build-binaries.outputs.public-url-macos }}
 
   pr-comment:
     runs-on: ubuntu-latest
