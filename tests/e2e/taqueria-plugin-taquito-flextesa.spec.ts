@@ -20,7 +20,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['taquito', 'flextesa']);
 		await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}`);
-		await exec(`cp e2e/data/allTypes.storage ${taqueriaProjectPath}`);
 		await exec(
 			`cp e2e/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
@@ -134,7 +133,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(contractOneHash).not.toEqual(contractTwoHash);
 	});
 
-	test.only('Verify that taqueria taquito plugin can deploy the all types contract to check storage of all michelson types', async () => {
+	test.skip('Verify that taqueria taquito plugin can deploy the all types contract to check storage of all michelson types', async () => {
 		environment = 'development';
 
 		await exec(`cp e2e/data/all-types.tz ${taqueriaProjectPath}/artifacts/`);
