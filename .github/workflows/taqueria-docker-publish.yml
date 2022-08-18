@@ -29,12 +29,10 @@ jobs:
            docker_platform: "linux/amd64"
          - binary: "${{ inputs.macos_binary_url }}"
            docker_platform: "linux/arm64/v8"
-    env:
-      DENO_TARGET: ${{ matrix.deno_target }}
 
     steps:
       - name: Download the binary
-        run: wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq
+        run: wget ${{ matrix.binary }} -O taq
           
 
       - name: Registry login
