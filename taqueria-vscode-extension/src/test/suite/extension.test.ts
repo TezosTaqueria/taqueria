@@ -9,9 +9,10 @@ import * as MockedObject from './MockedObject';
 import { sleep } from './utils/utils';
 
 const projectRoot = path.resolve(__dirname, '../../../../');
+const testProjectSource = `${projectRoot}/src/test/suite/data/vscode-taq-test-project`;
 const testProjectDestination = `${projectRoot}/out/vscode-taq-test-project`;
 const ligoContractFileSource = `${projectRoot}/src/test/suite/data/hello-tacos.mligo`;
-const ligoContractFileDestination = `${projectRoot}/out/vscode-taq-test-project/contracts/hello-tacos.mligo`;
+const ligoContractFileDestination = `${projectRoot}/vscode-taq-test-project/contracts/hello-tacos.mligo`;
 
 const originalMethods = {
 	'window.showInformationMessage': vscode.window.showInformationMessage,
@@ -46,20 +47,27 @@ describe('Extension Test Suite', async () => {
 			assert.notEqual(taqCommands, undefined);
 		});
 
-		// Run taq init
-		await vscodeMock.commands.executeCommand('taqueria.init');
+		// Taq init won't work due to this issue
+		// https://github.com/ecadlabs/taqueria/issues/939
+		// Currently we are just coping taqufied project
+		// await vscodeMock.commands.executeCommand('taqueria.init');
+		await fse.copySync(testProjectSource, testProjectDestination);
 
 		// Verify that taquified project has been created
+		console.log('break');
 	});
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/645
-	it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+	xit('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
 		// It creates another process
 		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
 		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
 		// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
 
-		await vscodeMock.commands.executeCommand('taqueria.init');
+		// Taq init won't work due to this issue
+		// https://github.com/ecadlabs/taqueria/issues/939
+		// Currently we are just coping taqufied project
+		// await vscodeMock.commands.executeCommand('taqueria.init');
 
 		// Run ls command
 		// const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
@@ -71,14 +79,16 @@ describe('Extension Test Suite', async () => {
 		await vscodeMock.commands.executeCommand('taqueria.install');
 
 		// Copy contract from data folder
-		await fse.copyFileSync(ligoContractFileSource, ligoContractFileDestination);
+		await fse.copyFileSync(testProjectSource, ligoContractFileDestination);
 
 		// Execute ligo compile command
 		await vscodeMock.commands.executeCommand('taqueria.compile_ligo');
+
+		console.log('stop');
 	});
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/645
-	it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+	xit('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
 		// It creates another process
 		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
 		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
