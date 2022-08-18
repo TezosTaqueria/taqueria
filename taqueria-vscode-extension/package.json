@@ -61,10 +61,7 @@
 		"ecad",
 		"ecadlabs"
 	],
-	"activationEvents": [
-		"workspaceContains:.taq",
-		"onStartupFinished"
-	],
+	"activationEvents": [],
 	"main": "./out/extension.js",
 	"contributes": {
 		"configuration": {
