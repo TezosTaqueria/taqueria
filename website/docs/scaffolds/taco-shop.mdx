@@ -13,13 +13,13 @@ title: Taco Shop
 
 ## Quickstart
 
-In a rush? You can follow the steps below to get up and running immediately  
+In a rush? You can follow the steps below to get up and running immediatley  
 
 ### Scaffold and Initialize the Project
 
 1. `taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop taco-shop`
 2. `cd taco-shop`
-3. `npm run setup`
+3. `npm run start`
 
 ## Overview
 
@@ -27,7 +27,7 @@ This scaffold implements a simple full stack Tezos project. It has a React dApp 
 
 The React dApp uses Beacon Wallet to interact with Tezos wallets in the browser and once connected, will display the number of `available_tacos` stored on-chain in the smart contract. There is also a basic interface which allows the user to buy tacos by sending a transaction to the smart contract with the `number_of_tacos_to_buy` as a parameter
 
-The smart contract has been deployed to ithacanet at the address for demonstration purposes: `KT1KBBk3PXkKmGZn3K6FkktqyPRpEbzJoEPE`
+The smart contract has been deployed to ghostnet at the address for demonstration purposes: `KT18izS1s5Hsv9tRaB8VjxdTU6MFpLviLCrS`
 
 The project comes pre-configured with the following:
 
@@ -71,18 +71,11 @@ let main (tacos_to_buy, available_tacos: tacos_to_buy * available_tacos): operat
     else ([]: operation list), abs(available_tacos - tacos_to_buy)
 ```
 
-### Testing
-
-:::note
-Coming soon with the Taqueria Jest plugin
-:::
-
 ### React Dapp
 
 The React dApp retrieves the number of available tacos from the smart contract and displays the value. It provides an interface for the user to buy tacos and looks like this:
 
 ![Hello Tacos Screenshot](/img/hello-tacos-screenshot.png)
-
 
 :::note
 In order for the React dApp to connect to the smart contract, the contract must be deployed to the testnet and the returned address of the contract must be added to the `/app/index.tsx` file. The scaffold comes pre-configured with the address of the deployed contract for demonstration purposes but it is recommended that you add your own faucet file, then re-deploy the contract and update the references to it in the project for your own use
@@ -98,7 +91,21 @@ This project is available as a Taqueria scaffold. To create a new project from t
 taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop taco-shop
 ```
 
-This will clone the Taco Shop scaffold project into a directory called `taco-shop` and set up the project for you
+This will clone the Taco Shop scaffold project into a directory called `taco-shop`
+
+## Project Startup
+
+To start the project, first change into the project directory:
+
+```shell
+cd hello-tacos
+```
+
+Then run the start script:
+
+```
+npm run start
+```
 
 ## Using the Project
 
@@ -114,7 +121,6 @@ The intended workflow for this project is as follows:
 ### Compile the Contract
 
 ```shell
-taq add-contract hello-tacos.mligo
 taq compile
 ```
 
@@ -122,19 +128,19 @@ This will compile the `/contracts/hello-tacos.mligo` contract to a file, `/artif
 
 ### Originate to the Testnet
 
-Run the following command to originate the contract to the ghostnet testnet using the testing environment:
+Run the following command to originate the contract to the ghostnet environment:
 
 ```shell
-taq originate -e testing
+taq originate -e ghostnet
 ```
 
 This should return the address of the contract on the testnet which looks like this:
 ```shell
-┌────────────────┬──────────────────────────────────────┬────────────────┐
-│ Contract       │ Address                              │ Destination    │
-├────────────────┼──────────────────────────────────────┼────────────────┤
-│ hello-tacos.tz │ KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3 │ ghostnet       │
-└────────────────┴──────────────────────────────────────┴────────────────┘
+┌────────────────┬──────────────────────────────────────┬───────────────────┐
+│ Contract       │ Address                              │ Destination       │
+├────────────────┼──────────────────────────────────────┼───────────────────┤
+│ hello-tacos.tz │ KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3 │ ghostnet_network  │
+└────────────────┴──────────────────────────────────────┴───────────────────┘
 ```
 
 :::caution
@@ -146,9 +152,9 @@ This scaffold comes with a pre-configured faucet file for the testnet which is s
 
 Now that the contract has been deployed, you need to insert the address of the contract into the `/app/index.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/index.tsx` file as shown here:
 
-```ts /app/src/App.tsx
+```ts /app/src/app.tsx
 function app() {
-  const [rpcUrl, setRpcUrl] = useState("https://ithacanet.ecadinfra.com");
+  const [rpcUrl, setRpcUrl] = useState("https://ghostnet.ecadinfra.com");
   const [contractAddress, setContractAddress] = useState(
     "KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3"
   );
@@ -158,6 +164,7 @@ function app() {
   const [Tezos, setTezos] = useState<TezosToolkit>();
   const [connected, setConnected] = useState(false);
 ```
+
 
 ### Build and Start the React Dapp
 
@@ -206,3 +213,36 @@ With your wallet connected, you can now interact with the contract entrypoint
 Click the `order` button and then authorize the transaction in Temple Wallet
 
 Once completed, you will see the value of `available_tacos` decrease by the number of tacos you ordered
+
+### Testing
+
+This scaffold comes with Jest tests in the `tests` folder which has been intitalized as a partition. The scaffold uses the `@taqueria/plugin-jest` plugin to run the tests
+
+To run the tests, first make sure you have started a local sandbox by running:
+
+```shell
+taq start sandbox local
+```
+
+Then, run the Jest tests in the `tests` directory with the following command:
+
+```shell
+taq test
+```
+
+You should see the following output:
+
+```shell
+❯ taq test
+ PASS  tests/hello-tacos.test.js (13.954 s)
+  JavaScript tests for Hello Tacos contract
+    ✓ Should originate the Hello Tacos contract (3431 ms)
+    ✓ Should buy 15 tacos (5113 ms)
+    ✓ Should prevent buying tacos if unavailable (11 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       3 passed, 3 total
+Snapshots:   0 total
+Time:        13.986 s
+Ran all test suites.
+```

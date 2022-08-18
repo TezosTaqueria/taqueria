@@ -24,13 +24,13 @@ No additional configuration is available
 
 The Archetype plugin exposes a `taq compile` task in Taqueria which can target one, or all the Archetype contracts in the `contracts` folder and compile them to Michelson `.tz` files output to the `artifacts` folder
 
-The Archetype plugin also exposes a contract template via the `taq create contract <contractName>` task. This task will create a new Archetype contract in the `contracts` directory, and will register the contract with Taqueria 
+The Archetype plugin also exposes a contract template via the `taq create archetypeContract <contractName>` task. This task will create a new Archetype contract in the `contracts` directory, insert archetype contract boilerplate, and register the contract with Taqueria
 
 ### Running the Compile Task
 
 The Archetype plugin's `taq compile` task can be run with or without arguments. The basic syntax for the task is `taq compile <file-name>`
 
-Running the `compile` task with no options will result in all source Archetype smart contracts in the `contracts` folder being compiled to Michelson files in the `artifacts` folder. If you speficy an optional filename, only Archetype contracts matching the specified filename in the `contracts` folder will be compiled
+Running the `compile` task with no options will result in all registered Archetype smart contracts in the `contracts` folder being compiled to Michelson files in the `artifacts` folder. If you specify an optional filename, only Archetype contracts matching the specified filename in the `contracts` folder will be compiled
 
 > ### :warning: CAUTION
 > The `compile` task can be implemented by more than one compiler plugin installed on a project (Archetype, LIGO, SmartPY). If this is the case, you must use the `--plugin Archetype` flag to specify a particular compiler. For example `taq compile --plugin archetype`
@@ -43,7 +43,7 @@ There are no additional options available for this plugin
 
 ### The `taq compile` Task
 
-The `compile` task is used for compiling Archetype smart contracts to Michelson and the task has the following structure:
+The `compile` task is used for compiling registered Archetype smart contracts to Michelson and the task has the following structure:
 
 ```shell
 taq compile [contractName]
@@ -59,23 +59,22 @@ The task takes a filename as an optional argument. If no filename is provided, T
 |  command   | 'compile [sourceFile]         | 
 |  aliases   | ['c', 'compile-archetype']    |  
 
-### The `create contract` Template
+### The `create archetypeContract` Task
 
-The `create contract` task is used to create a new Archetype contract from a template. Running this task will create a new Archetype smart contract in the `contracts` directory and will register that contract with Taqueria
+The `create archetypeContract` task is used to create a new Archetype contract from a template. Running this task will create a new Archetype smart contract in the `contracts` directory and will register that contract with Taqueria
     
 ```shell
-taq create contract <contractName>
+taq create archetypeContract <contractName>
 ```
 
-The task takes a filename a required positional argument. The filename must end with `.arl`
+The task takes a filename and a required positional argument. The filename must end with `.arl`
 
 #### Task Properties
 
-|  attribute |  value                        | 
-|------------|:-----------------------------:|
-|  task      | 'compile'                     | 
-|  command   | 'compile [sourceFile]         | 
-|  aliases   | ['c', 'compile-archetype']    |  
+|  attribute |  value                                         | 
+|------------|:----------------------------------------------:|
+|  task      | 'create archetypeContract'                     | 
+|  command   | 'create archetypeContract [sourceFile]         | 
 
 ## Plugin Architecture
 

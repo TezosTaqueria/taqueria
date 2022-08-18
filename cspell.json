@@ -1,6 +1,7 @@
 {
 	"words": [
 		"abspath",
+		"Affordance",
 		"autocrlf",
 		"dprint",
 		"EBADENGINE",
@@ -9,12 +10,14 @@
 		"esbuild",
 		"flextesa",
 		"fluture",
+		"gentypes",
 		"jsligo",
 		"ligo",
 		"mligo",
 		"mutez",
 		"oidc",
 		"outfile",
+		"positionals",
 		"Quickstart",
 		"rambda",
 		"READFILE",
@@ -32,7 +35,6 @@
 		"Tezos",
 		"typecheck",
 		"vsix",
-		"xvfb",
-		"positionals"
+		"xvfb"
 	]
 }
