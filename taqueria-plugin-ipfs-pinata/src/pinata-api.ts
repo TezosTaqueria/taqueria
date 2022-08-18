@@ -121,3 +121,28 @@ const checkIfFileIsPinned = async ({
 		ipfsHash,
 	};
 };
+
+export const pinHash = async ({
+	auth,
+	ipfsHash,
+}: {
+	auth: PinataAuth;
+	ipfsHash: string;
+}) => {
+	const response = await fetch(`https://api.pinata.cloud/pinning/pinByHash`, {
+		headers: {
+			Authorization: `Bearer ${auth.pinataJwtToken}`,
+		},
+		method: 'post',
+		body: JSON.stringify({
+			hashToPin: ipfsHash,
+		}),
+	});
+
+	if (!response.ok) {
+		throw new Error(`Failed to pin '${ipfsHash}' with pinata: ${response.statusText}`);
+	}
+
+	// Ok is the only response if successful
+	return;
+};
