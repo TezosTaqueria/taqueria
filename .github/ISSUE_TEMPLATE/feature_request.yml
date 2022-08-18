@@ -1,41 +1,32 @@
 name: Feature Request
 description: Request a new feature
 title: "[Feature]: "
-labels: ["feature", "triage"]
+labels: ["feature-request", "triage"]
 assignees:
-  - 
+  - hu3man
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this feature request!
   - type: textarea
+    id: problem_space
+    attributes:
+      label: The Why?
+      description: Please tell us about what problem this feature solves, or what value it adds
+      placeholder: ""
+      value: "Details about the problem your feature solves"
+    validations:
+      required: true
+  - type: textarea
     id: feature-desc
     attributes:
-      label: Describe the feature you would like
-      description: Please provide details about your feature request?
+      label: The What?
+      description: Please provide details about your feature request
       placeholder: Tell us what you would like Taqueria to do!
       value: "Details about the feature request"
     validations:
       required: true
-  - type: textarea
-    id: problem-solved
-    attributes:
-      label: Is this feature solving a problem? 
-      description: Please tell us about the use case or problem that this feature solves?
-      placeholder: 
-      value: "Details about the problem your feature solves"
-    validations:
-      required: true
-  - type: textarea
-    id: additional-details
-    attributes:
-      label: Please share any additional details you have? 
-      description: Please tell us about it
-      placeholder: 
-      value: "Details about the problem your feature solves"
-    validations:
-      required: false
   - type: checkboxes
     id: terms
     attributes:
