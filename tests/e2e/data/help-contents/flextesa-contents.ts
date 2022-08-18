@@ -12,7 +12,6 @@ Commands:
   taq start sandbox [sandboxName]  Starts a flextesa sandbox    [aliases: start]
   taq stop sandbox [sandboxName]   Stops a flextesa sandbox      [aliases: stop]
   taq list accounts <sandboxName>  List the balances of all sandbox accounts
-  taq create <template>            Create files from pre-existing templates
 
 Options:
       --version     Show version number                                [boolean]

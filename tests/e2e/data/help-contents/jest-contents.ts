@@ -42,3 +42,103 @@ Options:
   -i, --init         Initializes the partition for Jest                [boolean]
   -t, --testPattern  Run test files that match the provided pattern
 `;
+
+export const helpContentsContractTestTemplate = `taq create <template> <michelsonArtifact>
+
+Create files from pre-existing templates
+
+Positionals:
+  template           Name of the template to use
+                                  [string] [required] [choices: "contract-test"]
+  michelsonArtifact  Name of the michelson contract (artifact) to generate tests
+                      for                                    [string] [required]
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+  -e, --env         Specify an environment configuration
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
+      --help        Show help                                          [boolean]
+      --partition   Partition to place generated test suite
+                                                     [string] [default: "tests"]
+`;
+
+export const incrementSpecContents = `
+import { TezosToolkit } from '@taquito/taquito';
+import { char2Bytes } from '@taquito/utils';
+import { tas } from './types/type-aliases';
+import { IncrementContractType as ContractType } from './types/increment.types';
+import { IncrementCode as ContractCode } from './types/increment.code';
+
+describe('increment', () => {
+    const Tezos = new TezosToolkit('RPC_URL');
+    let contract: ContractType = undefined as unknown as ContractType;
+    beforeAll(async () => {
+        
+            const newContractOrigination = await Tezos.contract.originate<ContractType>({
+                code: ContractCode.code,
+                storage: tas.int('42'),
+            });
+            const newContractResult = await newContractOrigination.contract();
+            const newContractAddress = newContractResult.address;
+            contract = await Tezos.contract.at<ContractType>(newContractAddress);
+            
+    });
+
+
+    it('should call decrement', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
+        const decrementRequest = await contract.methodsObject.decrement(tas.int('42')).send();
+        await decrementRequest.confirmation(3);
+        
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
+    });
+
+    it('should call increment', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
+        const incrementRequest = await contract.methodsObject.increment(tas.int('42')).send();
+        await incrementRequest.confirmation(3);
+        
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
+    });
+
+    it('should call reset', async () => {
+        
+        const getStorageValue = async () => {
+            const storage = await contract.storage();
+            const value = storage;
+            return value;
+        };
+
+        const storageValueBefore = await getStorageValue();
+        
+        const resetRequest = await contract.methodsObject.reset().send();
+        await resetRequest.confirmation(3);
+        
+        const storageValueAfter = await getStorageValue();
+
+        expect(storageValueAfter).toBe('');
+    });
+);
+`;

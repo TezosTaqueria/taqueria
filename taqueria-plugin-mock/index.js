@@ -99,14 +99,6 @@ Plugin.create(i18n => ({
 			handler: 'proxy',
 		}),
 	],
-	operations: [
-		Operation.create({
-			operation: 'greeting',
-			command: 'greeting <firstName>',
-			description: 'Example output which produces an output',
-			handler: state => args => `Hello, ${args.FirstName}`,
-		}),
-	],
 	templates: [
 		Template.create({
 			template: 'json',

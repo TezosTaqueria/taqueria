@@ -26,7 +26,7 @@ const { schemas: generatedSchemas, factory } = createType<RawInput, Input>({
 	unknownErrMsg: 'Something went wrong trying to parse an alias',
 });
 
-export type Alias = z.infer<typeof generatedSchemas.schema>;
+export type Alias = z.infer<typeof internalSchema>;
 
 export type t = Alias;
 

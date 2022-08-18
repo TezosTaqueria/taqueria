@@ -23,10 +23,10 @@ import { exec, ExecException } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
-import { get } from 'stack-trace';
+import { getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
 import { PluginSchema } from './types';
-import { Args, LikeAPromise, pluginDefiner, StdIO } from './types';
+import { LikeAPromise, pluginDefiner, StdIO } from './types';
 
 // @ts-ignore interop issue. Maybe find a different library later
 import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
@@ -137,22 +137,22 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 
 export const noop = () => {};
 
-const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> => {
+const parseArgs = <T extends RequestArgs.t>(unparsedArgs: string[]): LikeAPromise<T, TaqError> => {
 	if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
 		try {
 			const preprocessedArgs = preprocessArgs(unparsedArgs);
 			const argv = yargs(preprocessedArgs.slice(2)).argv;
 			const postprocessedArgs = postprocessArgs(argv);
 			const requestArgs = RequestArgs.from(postprocessedArgs);
-			return Promise.resolve(requestArgs);
+			return Promise.resolve(requestArgs as T);
 		} catch (previous) {
 			if (previous instanceof ZodError) {
 				return eager(
-					toFutureParseErr<RequestArgs.t>(previous, 'The plugin request arguments are invalid', unparsedArgs),
+					toFutureParseErr<T>(previous, 'The plugin request arguments are invalid', unparsedArgs),
 				);
 			}
 			return eager(
-				toFutureParseUnknownErr<RequestArgs.t>(
+				toFutureParseUnknownErr<T>(
 					previous,
 					'There was a problem trying to parse the plugin request arguments',
 					unparsedArgs,
@@ -164,12 +164,12 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> =>
 };
 
 // A hack to protect all hex from being messed by yargs
-const preprocessArgs = (args: Args): Args => {
+const preprocessArgs = (args: string[]): string[] => {
 	return args.map(arg => /^0x[0-9a-fA-F]+$/.test(arg) ? '___' + arg + '___' : arg);
 };
 
 // A hack to protect all hex from being messed by yargs
-const postprocessArgs = (args: Args): Record<string, unknown> => {
+const postprocessArgs = (args: string[]): Record<string, unknown> => {
 	const postprocessedArgs = Object.entries(args).map((
 		[key, val],
 	) => [
@@ -191,14 +191,19 @@ const postprocessArgs = (args: Args): Record<string, unknown> => {
 	return groupedArgs;
 };
 
-const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): PluginSchema.t => {
-	const inputSchema: PluginSchema.RawPluginSchema = definer(i18n);
+const parseSchema = <T extends RequestArgs.t>(
+	i18n: i18n,
+	definer: pluginDefiner,
+	defaultPluginName: string,
+	requestArgs: T,
+): PluginSchema.t => {
+	const inputSchema: PluginSchema.RawPluginSchema = definer(requestArgs, i18n);
 
 	const { proxy } = inputSchema;
 
 	const pluginInfo = PluginSchema.create({
 		...inputSchema,
-		name: inputSchema.name ?? inferPluginName(),
+		name: inputSchema.name ?? defaultPluginName,
 	});
 
 	return {
@@ -207,11 +212,11 @@ const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => 
 	};
 };
 
-const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
-	async (requestArgs: RequestArgs.t) => {
+const getResponse = <T extends RequestArgs.t>(definer: pluginDefiner, defaultPluginName: string) =>
+	async (requestArgs: T) => {
 		const { taqRun } = requestArgs;
 		const i18n = await load();
-		const schema = parseSchema(i18n, definer, inferPluginName);
+		const schema = parseSchema(i18n, definer, defaultPluginName, requestArgs);
 		try {
 			switch (taqRun) {
 				case 'pluginInfo':
@@ -408,28 +413,15 @@ export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>
 		return undefined;
 	};
 
-const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
-	// The definer function can provide a name for the plugin in its schema, or it
-	// can omit it and we infer it from the package.json file.
-	// To do so, we need to get the directory for the plugin from the call stack
-	const pluginManifest = stack.reduce(
-		(retval: null | string, callsite) => {
-			const callerFile = callsite.getFileName()?.replace(/^file:\/\//, '');
-			return retval || (
-					callerFile.includes('taqueria-sdk')
-					|| callerFile.includes('taqueria-node-sdk')
-					|| callerFile.includes('@taqueria/node-sdk')
-				)
-				? retval
-				: join(dirname(callerFile), 'package.json');
-		},
-		null,
+export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
+	if (!config.contracts) return [];
+	return Object.values(config.contracts).reduce(
+		(retval: string[], contract) =>
+			regex.test(contract.sourceFile)
+				? [...retval, contract.sourceFile]
+				: retval,
+		[],
 	);
-
-	return () =>
-		!pluginManifest
-			? generateName().dashed
-			: getNameFromPluginManifest(pluginManifest);
 };
 
 const joinPaths = (...paths: string[]): string => paths.join('/');
@@ -470,11 +462,29 @@ const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): 
 	}
 };
 
+export const stringToSHA256 = (s: string) => SHA256.toSHA256(s);
+
+const getPackageName = () => {
+	const stack = getSync({
+		filter: (stackFrame => {
+			const filename = stackFrame.getFileName();
+			return !filename.includes('taqueria-sdk') && !filename.includes('@taqueria/node-sdk');
+		}),
+	});
+	const frame = stack.shift();
+	if (frame) {
+		const filename = frame.getFileName().replace(/^file:\/\//, '').replace(/^file:/, '');
+		const pluginManifest = join(dirname(filename), 'package.json');
+		return getNameFromPluginManifest(pluginManifest);
+	}
+	return generateName().dashed;
+};
+
 export const Plugin = {
-	create: (definer: pluginDefiner, unparsedArgs: Args) => {
-		const stack = get();
-		return parseArgs(unparsedArgs)
-			.then(getResponse(definer, inferPluginName(stack)))
+	create: async <Args extends RequestArgs.t>(definer: pluginDefiner, unparsedArgs: string[]) => {
+		const packageName = getPackageName();
+		return parseArgs<Args>(unparsedArgs)
+			.then(getResponse(definer, packageName))
 			.catch((err: unknown) => {
 				if (err) console.error(err);
 				process.exit(1);

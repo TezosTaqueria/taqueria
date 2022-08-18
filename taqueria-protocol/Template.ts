@@ -16,6 +16,7 @@ const handlerSchema = z.union([
 		PluginJsonResponse.schemas.internalSchema,
 		z.promise(
 			z.union([
+				z.promise(z.void()),
 				z.void(),
 				PluginJsonResponse.schemas.schema,
 				PluginJsonResponse.schemas.internalSchema,
