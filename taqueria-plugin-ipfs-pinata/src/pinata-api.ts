@@ -132,6 +132,7 @@ export const pinHash = async ({
 	const response = await fetch(`https://api.pinata.cloud/pinning/pinByHash`, {
 		headers: {
 			Authorization: `Bearer ${auth.pinataJwtToken}`,
+			'Content-Type': 'application/json',
 		},
 		method: 'post',
 		body: JSON.stringify({
