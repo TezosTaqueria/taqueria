@@ -225,10 +225,10 @@ Next, you need to configure some values for origination:
 - The initial storage for the smart contract 
 - The name of the sandbox to target (by default it is pre-configured to the sandbox named `local`)
 :::note
-As the default configuration comes with the sandbox named `local` preconfigured, simply provide a value for the initial storage in the `"storage"` property 
+As the default configuration comes with the sandbox named `local` preconfigured, simply provide a value for the initial storage, as a Michelson expression, in a file and reference that file in the `"storage"` property 
 :::
 
-To set these values in Taqueria, navigate to the file `./.taq/config.json` and locate the `"environment"` property. For the `counter.tz` contract, simply need to provide an integer value for the `counter.tz` file which looks like this:
+To set these values in Taqueria, navigate to the file `./.taq/config.json` and locate the `"environment"` property. For the `counter.tz` contract, simply need to provide a file path (absolute or relative to the root of the Taqueria project) that contains an integer value (e.g. `42`) for the `counter.tz` file which looks like this:
 ```
     "environment": {
         "default": "development",
@@ -238,7 +238,7 @@ To set these values in Taqueria, navigate to the file `./.taq/config.json` and l
                 "local"
             ],
             "storage": {
-                "counter.tz": 42
+                "counter.tz": "./artifacts/storage/counter_storage.tz"
             }
         }
     },
