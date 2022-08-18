@@ -1,10 +1,8 @@
-FROM --platform=$TARGETPLATFORM alpine
-FROM --platform=$TARGETPLATFORM node:16
+FROM alpine
+FROM node:16
 
-ARG TARGETPLATFORM
 
 RUN mkdir -m 777 deno
-RUN echo "I am building for $TARGETPLATFORM"
 ENV DENO_DIR=./deno
 
 COPY --from=docker:dind /usr/local/bin/docker /bin/docker
