@@ -8,9 +8,6 @@ on:
       macos_binary_url:
         type: string
         required: true
-    secrets:
-      GITHUB_TOKEN:
-        required: true
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}

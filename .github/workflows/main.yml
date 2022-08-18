@@ -396,8 +396,6 @@ jobs:
     if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: build-binaries
     uses: ./.github/workflows/taqueria-docker-publish.yml
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     with:
       linux_binary_url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
       macos_binary_url: ${{ needs.build-binaries.outputs.public-url-macos }}
