@@ -1,5 +1,6 @@
+ARG TARGETPLATFORM
 
-FROM --platform="$TARGETPLATFORM" alpine:3.16
+FROM --platform="$TARGETPLATFORM" alpine
 FROM --platform="$TARGETPLATFORM" node:16
 
 RUN mkdir -m 777 deno
