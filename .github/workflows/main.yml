@@ -62,7 +62,7 @@ jobs:
            taqueria_bin: "taq.exe"
          - os: macOS-latest
            os_short: macos
-           deno_target: "x86_64-apple-darwin"
+           deno_target: "aarch64-apple-darwin"
            cache_path: |
             ./deno
             ~/Library/Caches/deno
