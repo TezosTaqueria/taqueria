@@ -20,7 +20,9 @@ jobs:
     name: Add issue to project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@0.3.0
+        houston-add-pr-automation
+      - uses: actions/add-to-project@v0.3.0
+        main
         with:
           project-url: https://github.com/orgs/ecadlabs/projects/3
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
