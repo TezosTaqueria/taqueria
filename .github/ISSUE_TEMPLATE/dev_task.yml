@@ -1,6 +1,6 @@
 name: Dev Task
 description: Adds a dev-task to the Taqueria dev scrum board
-title: "[💻 Dev]: "
+title: "[🚧 Dev Ticket]: "
 labels: ["dev-task", "new"]
 assignees:
   - 
@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        This form is for Taqueria team members to add dev-tasks. For feature requests and product changes, please use the feature request form
+        🚧🚧🚧  Cool stuff under construction 🚧🚧🚧 
   - type: checkboxes
     id: status
     attributes: 

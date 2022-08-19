@@ -1,6 +1,6 @@
 name: Feature Request
 description: Request a new feature
-title: "[🚧 Feature]: "
+title: "[💡 Feature/Epic]: "
 labels: ["feature-request", "triage"]
 assignees:
   - 
@@ -8,21 +8,32 @@ body:
   - type: markdown
     attributes:
       value: |
-        This form creates a new Feature issue in the Taqueria inbox 
+        🌮 🌮 🌮  Taqueria Feature / Epic  🌮 🌮 🌮  
+  - type: checkboxes
+    id: status
+    attributes: 
+      label: status
+      description: Implementation Status
+      options:
+        - label: 🔬 Feature design
+        - label: 🧪 Testing plan
+        - label: 🔪 Ticket slicing
+        - label: 🚀 Dev implementation
+        - label: 🤖 Automated Tests s
+  - type: textarea
+    id: feature-desc
+    attributes:
+      label: Feature Description
+      description: Please provide details about how this would work
+      placeholder: Tell us what you would like Taqueria to do! Include as much detail as possible about how this would work and what the ux would be
+    validations:
+      required: true
   - type: textarea
     id: problem_space
     attributes:
       label: Problem or Use Case
       description: Please tell us about what problem this feature solves or what value it provides
       placeholder: "Tell us about the use case for this feature and why it's important"
-    validations:
-      required: true
-  - type: textarea
-    id: feature-desc
-    attributes:
-      label: Feature Description
-      description: Please provide details about how this would work
-      placeholder: Tell us what you would like Taqueria to do! Include as much detail as possible including acceptance criteria
     validations:
       required: true
   - type: input
@@ -33,17 +44,6 @@ body:
       placeholder: ex. https://productboard.com/xyz
     validations:
       required: false
-  - type: checkboxes
-    id: status
-    attributes: 
-      label: status
-      description: Implementation Status
-      options:
-        - label: 🔬 Feature design
-        - label: 🧪 Testing Plan
-        - label: 📚 Documentation
-        - label: 🚀 Dev Implementation
-        - label: 🤖 Automated Tests 
   - type: checkboxes
     id: terms
     attributes:
