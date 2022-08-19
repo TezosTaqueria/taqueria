@@ -15,7 +15,6 @@ body:
       label: Problem or Use Case
       description: Please tell us about what problem this feature solves or what value it provides
       placeholder: "Tell us about the use case for this feature and why it's important"
-      value: "Details about the problem your feature solves"
     validations:
       required: true
   - type: textarea
@@ -24,7 +23,6 @@ body:
       label: Feature Description
       description: Please provide details about how this would work
       placeholder: Tell us what you would like Taqueria to do! Include as much detail as possible
-      value: "Details about the feature"
     validations:
       required: true
   - type: input
