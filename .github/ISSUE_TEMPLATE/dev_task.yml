@@ -51,7 +51,7 @@ body:
   - type: input
     id: epic_link
     attributes:
-      label: Epic link
+      label: Feature (Epic) Link
       description: Link to the Epic or feature this task is related to
       placeholder: "ex. https://github.com/ecadlabs/taqueria/issues/123"
     validations:
@@ -59,7 +59,7 @@ body:
   - type: input
     id: pb_link
     attributes:
-      label: Epic link
+      label: Product Board Link
       description: Link to the Epic or feature this task is related to
       placeholder: "ex. https://productboard.com/"
     validations:

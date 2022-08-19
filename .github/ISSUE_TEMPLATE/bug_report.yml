@@ -82,7 +82,7 @@ body:
     id: contact
     attributes:
       label: Contact Details
-      description: If you would like to be followed up with about this, please provide a contact email?
+      description: If you would like to be followed up with about this, please provide a contact email
       placeholder: ex. email@example.com
     validations:
       required: false
