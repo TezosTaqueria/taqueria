@@ -13,7 +13,6 @@ body:
     id: pb_link
     attributes:
       label: Product Board Link
-      description: Link to the productboard feature this is related to
       placeholder: "ex. https://productboard.com/..."
     validations:
       required: false
