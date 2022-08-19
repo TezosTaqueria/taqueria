@@ -1,11 +1,15 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { TaqError } from '@taqueria/protocol/TaqError';
 import { spawn } from 'child_process';
+import Table from 'cli-table3';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import os from 'os';
 import path, { join } from 'path';
+import { uniq } from 'rambda';
+import * as semver from 'semver';
 import * as api from 'vscode';
+import { ArtifactsDataProvider, ArtifactTreeItem } from './gui/ArtifactsDataProvider';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
 import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
@@ -13,11 +17,14 @@ import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
 import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvider';
 import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProvider';
+import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
 import { TaqVsxError } from './TaqVsxError';
 
 export const COMMAND_PREFIX = 'taqueria.';
+
+const minNodeVersion = '16.13.1';
 
 export enum Commands {
 	init = 'taqueria.init',
@@ -37,6 +44,14 @@ export enum OutputLevels {
 	info,
 	debug,
 	trace,
+}
+
+interface HasToString {
+	toString(): string;
+}
+
+function instanceOfHasToString(object: any): object is HasToString {
+	return 'toString' in object;
 }
 
 export type OutputFunction = (currentLogLevel: OutputLevels, log: string) => void;
@@ -102,6 +117,10 @@ export const showLog = (output: Output) => {
 
 export interface HasFileName {
 	fileName: string;
+}
+
+function instanceOfHasFileName(object: any): object is HasFileName {
+	return 'fileName' in object;
 }
 
 export interface HasRefresh {
@@ -265,6 +284,40 @@ export class VsCodeHelper {
 		this.registerCommand(COMMAND_PREFIX + 'refresh_command_states', async () => {
 			await this.updateCommandStates();
 		});
+	}
+
+	tryFormattingAsTable(json: string): string {
+		let data: unknown = undefined;
+		try {
+			data = JSON.parse(json);
+		} catch {
+			return json;
+		}
+		const array: Record<string, any>[] = Array.isArray(data)
+			? data as Record<string, any>[]
+			: [data as Record<string, any>];
+		const keys = uniq(array.reduce((retval: string[], record) => [...retval, ...Object.keys(record)], []));
+
+		const rows = array.reduce(
+			(retval: (string[])[], record) => {
+				const row = keys.reduce(
+					(row: string[], key: string) => {
+						let value = record[key] ? record[key] : '';
+						if (Array.isArray(value)) {
+							value = value.join('\n');
+						}
+						return [...row, value];
+					},
+					[],
+				);
+				return [...retval, row];
+			},
+			[],
+		);
+
+		const table = new Table({ head: keys });
+		table.push(...rows);
+		return table.toString();
 	}
 
 	async getTaqifiedDirectories() {
@@ -506,49 +559,66 @@ export class VsCodeHelper {
 		});
 	}
 
-	getContractFileName(fileName: string) {
+	getArtifactFileNameFromContract(fileName: string) {
 		return fileName.replace(/\.[^/.]+$/, '') + '.tz';
 	}
 
 	async exposeOriginateTask() {
-		this.registerCommand(Commands.originate, async (arg?: ContractTreeItem | EnvironmentTreeItem | undefined) => {
-			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
-			if (projectDir === undefined) {
-				return;
-			}
-			let environmentName: string | undefined = undefined;
-			let fileName: string | undefined = undefined;
-			if (arg) {
-				if (arg instanceof EnvironmentTreeItem) {
-					environmentName = (arg as EnvironmentTreeItem).label;
-				}
-				if (arg instanceof ContractTreeItem) {
-					fileName = this.getContractFileName((arg as ContractTreeItem).fileName);
-				}
-			}
-			if (!environmentName) {
-				const config = await Util.TaqifiedDir.create(projectDir, this.i18);
-				const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
-				environmentName = await this.vscode.window.showQuickPick(environmentNames, {
-					canPickMany: false,
-					ignoreFocusOut: false,
-					placeHolder: 'Environment Name',
-					title: 'Select an environment',
-				});
-				if (!environmentName) {
+		this.registerCommand(
+			Commands.originate,
+			async (arg?: ArtifactTreeItem | EnvironmentTreeItem | api.Uri | undefined) => {
+				const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
+				if (projectDir === undefined) {
 					return;
 				}
-			}
-			await this.proxyToTaqAndShowOutput(
-				`originate -e ${environmentName} ${fileName ?? ''}`,
-				{
-					finishedTitle: 'originated contracts',
-					progressTitle: 'originating contracts',
-				},
-				projectDir,
-				true,
-			);
-		});
+				let environmentName: string | undefined = undefined;
+				let fileName: string | undefined = undefined;
+				if (arg) {
+					if (arg instanceof EnvironmentTreeItem) {
+						environmentName = arg.label;
+					}
+					if (arg instanceof ArtifactTreeItem) {
+						fileName = arg.fileName;
+					}
+					if (arg instanceof api.Uri) {
+						fileName = await this.getRelativeFilePath(arg, 'artifacts');
+						if (!fileName) {
+							this.showLog(
+								OutputLevels.warn,
+								`Could not determine relative filename for ${arg.path}, canceling originate command.`,
+							);
+							return;
+						}
+					}
+				}
+				if (!environmentName) {
+					const config = await Util.TaqifiedDir.create(projectDir, this.i18);
+					const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
+					if (environmentNames.length === 1) {
+						environmentName = environmentNames[0];
+					} else {
+						environmentName = await this.vscode.window.showQuickPick(environmentNames, {
+							canPickMany: false,
+							ignoreFocusOut: false,
+							placeHolder: 'Environment Name',
+							title: 'Select an environment',
+						});
+						if (!environmentName) {
+							return;
+						}
+					}
+				}
+				await this.proxyToTaqAndShowOutput(
+					`originate -e ${environmentName} ${fileName ?? ''}`,
+					{
+						finishedTitle: 'originated contracts',
+						progressTitle: 'originating contracts',
+					},
+					projectDir,
+					true,
+				);
+			},
+		);
 	}
 
 	async getTaqBinPath() {
@@ -556,7 +626,7 @@ export class VsCodeHelper {
 		if (!providedPath || (providedPath as string).length === 0) {
 			providedPath = await Util.findTaqBinary(this.i18, this.getLog());
 		}
-		return Util.makePathToTaq(this.i18, this.getLog())(providedPath);
+		return providedPath as Util.PathToTaq;
 	}
 
 	registerCommand(cmdId: string, callback: (...args: any[]) => any) {
@@ -613,13 +683,20 @@ export class VsCodeHelper {
 			if (!shouldOutput(outputLevel, this.output.logLevel)) {
 				return;
 			}
-			this.output.logChannel.appendLine(JSON.stringify(err, undefined, 4));
+			let text: string;
+			if (instanceOfHasToString(err)) {
+				text = err.toString();
+			} else {
+				text = JSON.stringify(err, undefined, 4);
+			}
+			this.output.logChannel.appendLine(text);
 			if (!suppressWindow) {
 				this.output.logChannel.show();
 			}
 		} catch {
 			try {
 				this.output.logChannel.appendLine(`unknown error occurred while trying to log an error.`);
+				this.output.logChannel.appendLine(`error object: ${err}`);
 			} catch {
 				// at this point, we cannot do anything
 			}
@@ -636,10 +713,10 @@ export class VsCodeHelper {
 			let sandboxName: string | undefined = undefined;
 			if (arg) {
 				if (arg instanceof SandboxTreeItem) {
-					sandboxName = (arg as SandboxTreeItem).label;
+					sandboxName = arg.label;
 				}
 				if (arg instanceof ContractTreeItem) {
-					fileName = this.getContractFileName((arg as ContractTreeItem).fileName);
+					fileName = this.getArtifactFileNameFromContract(arg.fileName);
 				}
 			}
 			if (!sandboxName) {
@@ -708,14 +785,16 @@ export class VsCodeHelper {
 					this.logAllNestedErrors(result.executionError);
 				}
 				if (result.standardError) {
+					const fixedError = this.fixOutput(result.standardError, true);
 					if (logStandardErrorToOutput) {
-						this.showOutput(result.standardError);
+						this.showOutput(fixedError);
 					} else {
-						this.showLog(OutputLevels.warn, result.standardError);
+						this.showLog(OutputLevels.warn, fixedError);
 					}
 				}
 				if (result.standardOutput) {
-					this.showOutput(result.standardOutput);
+					const fixedOutput = this.fixOutput(result.standardOutput, true);
+					this.showOutput(fixedOutput);
 				}
 				if (result.executionError || result.standardError) {
 					this.vscode.window.showWarningMessage(
@@ -733,6 +812,16 @@ export class VsCodeHelper {
 			progress.report({ increment: 100 });
 			this._currentlyRunningTask = undefined;
 		});
+	}
+
+	private fixOutput(output: string, formatAsTable: boolean): string {
+		if (formatAsTable) {
+			output = this.tryFormattingAsTable(output);
+		}
+		output = output.replaceAll('', '');
+		output = output.replaceAll(/\[\d+m/g, '');
+		output = output.replaceAll('●', '');
+		return output;
 	}
 
 	async proxyToTaq(taskWithArgs: string, projectDir?: string | undefined) {
@@ -776,15 +865,42 @@ export class VsCodeHelper {
 	) {
 		this.registerCommand(
 			cmdId,
-			async (item?: HasFileName | undefined) => {
+			async (item?: HasFileName | api.Uri | undefined) => {
+				let fileName: string | undefined;
+				if (instanceOfHasFileName(item)) {
+					fileName = item.fileName;
+				} else if (item instanceof api.Uri) {
+					fileName = await this.getRelativeFilePath(item, 'contracts');
+					if (!fileName) {
+						this.showLog(
+							OutputLevels.warn,
+							`Could not determine relative filename for ${item.path}, canceling ${cmdId} command.`,
+						);
+						return;
+					}
+				}
+				this.showLog(OutputLevels.debug, `Running command ${cmdId} for ${fileName}`);
 				await this.proxyToTaqAndShowOutput(
-					item ? `${taskWithArgs} ${item.fileName}` : taskWithArgs,
+					item ? `${taskWithArgs} ${fileName}` : taskWithArgs,
 					taskTitles,
 					undefined,
 					outputTo === 'output',
 				);
 			},
 		);
+	}
+
+	private async getRelativeFilePath(uri: api.Uri, folder: 'contracts' | 'artifacts') {
+		let fileName = uri.path;
+		const mainFolder = this.getMainWorkspaceFolder();
+		if (!mainFolder) {
+			this.showLog(OutputLevels.warn, `No workspace is open, canceling command.`);
+			return undefined;
+		}
+		const config = await Util.TaqifiedDir.create(mainFolder.fsPath as Util.PathToDir, this.i18);
+		const dir = folder === 'contracts' ? config.config.contractsDir : config.config.artifactsDir ?? folder;
+		fileName = path.relative(path.join(mainFolder.path, dir), fileName);
+		return fileName;
 	}
 
 	exposeTaqTaskAsCommand(
@@ -881,8 +997,56 @@ export class VsCodeHelper {
 	}
 
 	async updateCommandStates() {
-		const isTaqReachable = await this.isTaqCliReachable();
+		const [isTaqReachable, nodeVersion] = await Promise.all([
+			this.isTaqCliReachable(),
+			Util.getNodeVersion(this.getLog()),
+		]);
+
+		let nodeFound, isNodeVersionValid, nodeMeetsVersionRequirement: boolean;
+		if (!nodeVersion) {
+			nodeFound = false;
+			isNodeVersionValid = false;
+			nodeMeetsVersionRequirement = false;
+		} else {
+			nodeFound = true;
+			isNodeVersionValid = !!semver.valid(nodeVersion);
+			nodeMeetsVersionRequirement = semver.gt(nodeVersion, minNodeVersion);
+		}
+		const systemCheckPassed = isTaqReachable && nodeFound && isNodeVersionValid && nodeMeetsVersionRequirement;
+
 		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taq-cli-reachable', isTaqReachable);
+		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-node-installed', nodeFound);
+		this.vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria-state/node-version-meets-requirements',
+			isNodeVersionValid && nodeMeetsVersionRequirement,
+		);
+		this.vscode.commands.executeCommand('setContext', '@taqueria-state/system-check-passed', systemCheckPassed);
+
+		if (systemCheckPassed) {
+			this.vscode.commands.executeCommand('workbench.actions.treeView.taqueria-system-check.collapseAll');
+		}
+
+		if (this.systemCheckTreeView) {
+			this.systemCheckTreeView.title = `${systemCheckPassed ? '✅' : '❌'} System Check`;
+			let message = '';
+			if (isTaqReachable) {
+				message += `✅ Taq CLI: Installed \n`;
+			} else {
+				message += `❌ Taq CLI: Installed (or not in PATH) \n`;
+			}
+			if (!nodeFound) {
+				message += `❌ NodeJs: Not Found \n`;
+			} else if (!isNodeVersionValid) {
+				message += `❌ NodeJs: Invalid version ${nodeVersion} \n`;
+			} else if (!nodeMeetsVersionRequirement) {
+				message +=
+					`❌ NodeJs: Does not meet min version requirement: found: ${nodeVersion}, expected: ${minNodeVersion} \n`;
+			} else {
+				message += `✅ Taq CLI: Node ${nodeVersion} found \n`;
+			}
+			// this.systemCheckTreeView.message = message;
+		}
 
 		const mainFolder = this.getMainWorkspaceFolder();
 		if (mainFolder === undefined) {
@@ -994,6 +1158,9 @@ export class VsCodeHelper {
 				const contractsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts/*'));
 				const testsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '**/jest.config.js'));
 
+				const artifactsFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'artifacts'));
+				const artifactsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'artifacts/**/*.tz'));
+
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
 				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
 				folderWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
@@ -1014,11 +1181,27 @@ export class VsCodeHelper {
 				contractsWatcher.onDidCreate(_ => this.contractsDataProvider?.refresh());
 				contractsWatcher.onDidDelete(_ => this.contractsDataProvider?.refresh());
 
+				artifactsFolderWatcher.onDidChange(_ => this.artifactsDataProvider?.refresh());
+				artifactsFolderWatcher.onDidCreate(_ => this.artifactsDataProvider?.refresh());
+				artifactsFolderWatcher.onDidDelete(_ => this.artifactsDataProvider?.refresh());
+				artifactsWatcher.onDidChange(_ => this.artifactsDataProvider?.refresh());
+				artifactsWatcher.onDidCreate(_ => this.artifactsDataProvider?.refresh());
+				artifactsWatcher.onDidDelete(_ => this.artifactsDataProvider?.refresh());
+
 				testsWatcher.onDidChange(_ => this.testDataProvider?.refresh());
 				testsWatcher.onDidCreate(_ => this.testDataProvider?.refresh());
 				testsWatcher.onDidDelete(_ => this.testDataProvider?.refresh());
 
-				return [folderWatcher, configWatcher, stateWatcher, contractsFolderWatcher, contractsWatcher, testsWatcher];
+				return [
+					folderWatcher,
+					configWatcher,
+					stateWatcher,
+					contractsFolderWatcher,
+					contractsWatcher,
+					artifactsFolderWatcher,
+					artifactsWatcher,
+					testsWatcher,
+				];
 			} catch (error: unknown) {
 				throw {
 					kind: 'E_UnknownError',
@@ -1032,8 +1215,11 @@ export class VsCodeHelper {
 
 	private refreshDataProviders: { refresh: () => void }[] = [];
 	private contractsDataProvider?: ContractsDataProvider;
+	private artifactsDataProvider?: ArtifactsDataProvider;
 	private sandboxesDataProvider?: SandboxesDataProvider;
 	private testDataProvider?: TestDataProvider;
+	private systemCheckDataProvider?: SystemCheckDataProvider;
+	private systemCheckTreeView?: api.TreeView<SystemCheckTreeItem>;
 
 	registerDataProviders() {
 		this.registerDataProvider('taqueria-plugins', new PluginsDataProvider(this));
@@ -1047,7 +1233,15 @@ export class VsCodeHelper {
 			'taqueria-contracts',
 			new ContractsDataProvider(this),
 		);
+		this.artifactsDataProvider = this.registerDataProvider(
+			'taqueria-artifacts',
+			new ArtifactsDataProvider(this),
+		);
 		this.registerDataProvider('taqueria-scaffold', new ScaffoldsDataProvider(this));
+		this.systemCheckDataProvider = this.registerDataProvider(
+			'taqueria-system-check',
+			new SystemCheckDataProvider(this),
+		);
 	}
 
 	private registerDataProvider<T extends api.TreeDataProvider<unknown>>(
@@ -1195,5 +1389,11 @@ export class VsCodeHelper {
 		} catch {
 			return false;
 		}
+	}
+
+	async createTreeViews() {
+		this.systemCheckTreeView = this.vscode.window.createTreeView<SystemCheckTreeItem>('taqueria-system-check', {
+			treeDataProvider: this.systemCheckDataProvider!,
+		});
 	}
 }

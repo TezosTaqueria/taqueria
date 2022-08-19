@@ -57,29 +57,29 @@ const addOrigination = (parsedArgs: Opts, batch: Promise<WalletOperationBatch>) 
 		const contractData = await readFile(contractAbspath, 'utf-8');
 		return (await batch).withOrigination({
 			code: contractData,
-			storage: mapping.storage,
+			init: mapping.storage as any,
 		});
 	};
 
 const getValidContracts = async (parsedArgs: Opts) => {
 	const contracts = parsedArgs.contract
 		? [parsedArgs.contract]
-		: (await glob('**/*.tz', { cwd: parsedArgs.config.artifactsDir })) as string[];
+		: (await glob('*.tz', { cwd: parsedArgs.config.artifactsDir })) as string[];
 
 	return contracts.reduce(
-		(retval, filename) => {
-			const storage = getInitialStorage(parsedArgs)(filename);
+		async (retval, filename) => {
+			const storage = await getInitialStorage(parsedArgs, filename);
 			if (storage === undefined || storage === null) {
 				renderErr(
 					`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
 						getCurrentEnvironment(parsedArgs)
-					}.storage."${filename}"\n`,
+					}.storage["${filename}"]\nThe value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.\n`,
 				);
 				return retval;
 			}
-			return [...retval, { filename, storage }];
+			return [...(await retval), { filename, storage }];
 		},
-		[] as ContractStorageMapping[],
+		Promise.resolve([] as ContractStorageMapping[]),
 	);
 };
 
@@ -142,7 +142,19 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 		return await mapOpToContract(contracts, op, destination);
 	} catch (err) {
 		const error = (err as { message: string });
-		if (error.message) renderErr(error.message);
+		if (error.message) {
+			const msg = error.message;
+			if (/ENOTFOUND/.test(msg)) {
+				renderErr(msg + ' - The RPC URL may be invalid. Check your ./taq/config.json.');
+			} else if (/ECONNREFUSED/.test(msg)) {
+				renderErr(msg + ' - The RPC URL may be down or the sandbox is not running.');
+			} else {
+				renderErr(
+					msg
+						+ " - There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.",
+				);
+			}
+		}
 		return undefined;
 	}
 };

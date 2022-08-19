@@ -1,6 +1,5 @@
 import * as api from 'vscode';
 import { COMMAND_PREFIX, InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
-import { makeDir, PathToDir } from './lib/pure';
 
 const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
 	const inMemoryState = {
@@ -153,6 +152,9 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 
 	helper.exposeOriginateTask();
 
+	helper.registerDataProviders();
+	helper.createTreeViews();
+
 	deps.vscode.workspace.onDidChangeWorkspaceFolders(e => {
 		e.added.forEach(folder => {
 			try {
@@ -170,7 +172,6 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 			helper.logAllNestedErrors(error);
 		}
 	});
-	helper.registerDataProviders();
 	helper.updateCommandStates();
 }
 
