@@ -53,9 +53,9 @@ jobs:
         MINOR_VERSION: ${{ steps.get-version.outputs.minor }}
       run: |
         if [ $(( $MINOR_VERSION % 2 )) -eq 0 ]; then
-          echo "echo "::set-output name=result::even"
+          echo "::set-output name=result::even"
         else
-          echo "echo "::set-output name=result::odd"
+          echo "::set-output name=result::odd"
         fi
 
   build-binaries:
@@ -399,20 +399,20 @@ jobs:
   #       env:
   #         SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
-  vscode-extension-workflow:
-    needs: 
-      - detect-changes
-      - publish-state-plugin-to-npm
+  # vscode-extension-workflow:
+  #   needs: 
+  #     - detect-changes
+  #     - publish-state-plugin-to-npm
 
-    if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
-            github.event_name == 'release' || 
-            startsWith(github.ref, 'refs/tags/v')) &&
-            !github.event.pull_request.head.repo.fork }}
-    uses: ./.github/workflows/vscode-extension.yml
-    secrets:
-      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
-      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
-      VSCE_PAT: ${{ secrets.VSCE_PAT }} 
+  #   if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
+  #           github.event_name == 'release' || 
+  #           startsWith(github.ref, 'refs/tags/v')) &&
+  #           !github.event.pull_request.head.repo.fork }}
+  #   uses: ./.github/workflows/vscode-extension.yml
+  #   secrets:
+  #     GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+  #     GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
+  #     VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
   pr-comment:
     runs-on: ubuntu-latest
@@ -433,7 +433,7 @@ jobs:
       - publish-state-plugin-to-npm
       - publish-jest-plugin-to-npm
       # - run-tests
-      - vscode-extension-workflow
+      # - vscode-extension-workflow
     steps:
       - uses: actions/checkout@v2
 
@@ -446,16 +446,6 @@ jobs:
             const fs = require('fs');
             const git_short_sha = "${{ github.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
-
-            // Build the vscode-extension workflow comment
-            const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
-            
-            let vsCodeCommentBody = ''
-            if (vsCodeWorkflowState.includes('success')) {
-              vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
-            } else {
-              vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
-            }
 
             function readInfo(filePath) {
               try {
@@ -560,7 +550,7 @@ jobs:
       - publish-tezos-client-plugin-to-npm
       - publish-state-plugin-to-npm
       - publish-jest-plugin-to-npm
-      - vscode-extension-workflow
+      # - vscode-extension-workflow
     if: ${{ startsWith(github.ref, 'refs/tags/v') &&
             !github.event.pull_request.head.repo.fork }}
     steps:
@@ -573,7 +563,6 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
           wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
           wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
-          wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
       - name: Pre-release
         if: ${{ needs.detect-minor-version.outputs.minor-version == 'odd' }}
