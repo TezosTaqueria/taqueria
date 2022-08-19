@@ -43,14 +43,14 @@ jobs:
     outputs:
       minor-version: ${{ steps.outputs.check-minor-version.result }}
     steps:
-    - name: Tag version
-      id: version
-      uses: ncipollo/semantic-version-action@v1
+    - name: Get version
+    - id: get-version
+      uses: battila7/get-version-action@v2
 
     - name: Check minor version
       id: check-minor-version
       env:
-        MINOR_VERSION: ${{ steps.version.outputs.minor }}
+        MINOR_VERSION: ${{ steps.get-version.outputs.minor }}
       run: |
         if [ $(( $MINOR_VERSION % 2 )) -eq 0 ]; then
           echo "echo "::set-output name=result::even"
