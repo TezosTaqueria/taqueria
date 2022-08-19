@@ -1,6 +1,6 @@
 name: Feature Request
 description: Request a new feature
-title: "[🌮 Epic|Feature]: "
+title: "<🌄 Epic|Feature> "
 labels: ["feature-request", "triage"]
 assignees:
   - 
