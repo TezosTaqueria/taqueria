@@ -1,6 +1,6 @@
 name: Dev Task
 description: Adds a dev-task to the Taqueria dev scrum board
-title: "[🚧 Dev Ticket]: "
+title: "[🚧 Dev]: "
 labels: ["dev-task", "new"]
 assignees:
   - 
@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        # 🚧 🚧 🚧  <<<  Dev Task  >>>  🚧 🚧 🚧 
+        # 🚧 🚧 🚧   <<<   Dev Ticket   >>>   🚧 🚧 🚧 
 
   - type: input
     id: epic_link
