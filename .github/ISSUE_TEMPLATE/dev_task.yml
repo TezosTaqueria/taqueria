@@ -32,7 +32,7 @@ body:
     attributes:
       label: To Do
       description: A list of to do items for this ticket
-      placeholder: "- [ ] Make Taqueria awesome 😎 \n- [ ] Eat tacos 🌮 "
+      value: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
     validations:
       required: true
   - type: textarea
