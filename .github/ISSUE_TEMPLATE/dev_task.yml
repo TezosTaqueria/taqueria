@@ -24,7 +24,7 @@ body:
     attributes:
       label: Acceptance Criteria
       description: Requirements
-      value: "### Feature \n - [ ] \n \n ### Documentation \n - [ ] New feature docs \n - [ ] Refactor existing docs \n - [ ] Release notes \n - [ ] "
+      value: "### Feature \n- [ ] \n \n ### Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
     validations:
       required: true
   - type: textarea
@@ -32,7 +32,7 @@ body:
     attributes:
       label: To Do
       description: A list of to do items for this ticket
-      placeholder: "- [] Make Taqueria awesome 😎 \n - [ ] Eat tacos 🌮 "
+      placeholder: "- [ ] Make Taqueria awesome 😎 \n- [ ] Eat tacos 🌮 "
     validations:
       required: true
   - type: textarea
