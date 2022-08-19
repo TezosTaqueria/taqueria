@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## 🌮 🌮 🌮  Taqueria Feature / Epic  🌮 🌮 🌮  
+        ## 🌮 🌮 🌮  >>> Feature / Epic <<< 🌮 🌮 🌮  
   - type: input
     id: pb_link
     attributes:
@@ -33,6 +33,14 @@ body:
       label: To Do
       description: A list of to do items for this ticket
       value: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
+    validations:
+      required: true
+  - type: textarea
+    id: related_issues
+    attributes:
+      label: Related Issues
+      description: Links to related issues
+      value: "- [ ] Issue [#123](...) \n- [ ] Issue [#123](...) "
     validations:
       required: true
   - type: textarea
