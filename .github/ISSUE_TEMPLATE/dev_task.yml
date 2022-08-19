@@ -9,22 +9,6 @@ body:
     attributes:
       value: |
         This form is for Taqueria team members to add dev-tasks. For feature requests and product changes, please use the feature request form
-  - type: input
-    id: epic_link
-    attributes:
-      label: Epic link
-      description: Link to the Epic or feature this task is related to
-      placeholder: ex. https://github.com/ecadlabs/taqueria/issues/123
-    validations:
-      required: false
-  - type: input
-    id: pb_link
-    attributes:
-      label: Epic link
-      description: Link to the Epic or feature this task is related to
-      placeholder: ex. https://productboard.com/...
-    validations:
-      required: false
   - type: checkboxes
     id: status
     attributes: 
@@ -45,11 +29,41 @@ body:
     validations:
       required: true
   - type: textarea
+    id: to_do
+    attributes:
+      label: To Do
+      description: A list of to do items for this ticket
+      placeholder: "-[] Make Taqueria awesome 🌮 "
+    validations:
+      required: true
+  - type: textarea
     id: description
     attributes:
       label: Task Description
       description: "Describe what needs to be done"
       placeholder: "What to do"
+  - type: textarea
+    id: test_plan
+    attributes:
+      label: Test Plan
+      description: "Describe how this will be tested"
+      placeholder: "..."
+  - type: input
+    id: epic_link
+    attributes:
+      label: Epic link
+      description: Link to the Epic or feature this task is related to
+      placeholder: ex. https://github.com/ecadlabs/taqueria/issues/123
+    validations:
+      required: false
+  - type: input
+    id: pb_link
+    attributes:
+      label: Epic link
+      description: Link to the Epic or feature this task is related to
+      placeholder: ex. https://productboard.com/...
+    validations:
+      required: false
   - type: input
     id: estimate
     attributes:
