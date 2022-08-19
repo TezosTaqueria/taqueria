@@ -11,7 +11,11 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		await generateTestProject(taqueriaProjectPath, ['metadata']);
 		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos.mligo`);
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
-		await exec(`cd ${taqueriaProjectPath} && taq add-contract hello-tacos.mligo`);
+		await exec(`taq add-contract hello-tacos.mligo`, { cwd: taqueriaProjectPath });
+	});
+
+	beforeEach(async () => {
+		await exec(`rm -f *.json`, { cwd: `${taqueriaProjectPath}/artifacts` });
 	});
 
 	const runCliWithPrompts = async (tagArgs: string, outputResponses: string[][]) => {
@@ -44,10 +48,12 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 				const dataTextLines = dataText.split('\n');
 				const dataTextLastLine = dataTextLines[dataTextLines.length - 1];
 
+				// Find a match and write it
 				const response = outputResponses.find(x => dataTextLastLine.includes(x[0]));
 
 				if (response) {
 					writeInput(response[1]);
+					// Change the key so it won't match again
 					response[0] += '=USED';
 				}
 			});
@@ -120,6 +126,33 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		expect(metadataFileContents).toMatch(/license.*test-license/i);
 	});
 
+	test('metadata plugin should previous answers for defaults', async () => {
+		await runCliWithPrompts(`generate metadata hello-tacos`, [
+			['name', 'test-name'],
+			['description', 'test-description'],
+			['author', 'test-author'],
+			['url', 'test-url'],
+			['license', 'test-license'],
+		]);
+
+		await runCliWithPrompts(`generate metadata hello-tacos`, [
+			['name', 'test2-name'],
+			['description', 'test2-description'],
+			['author', ''],
+			['url', ''],
+			['license', ''],
+		]);
+
+		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/hello-tacos.json`, {
+			encoding: 'utf-8',
+		});
+		expect(metadataFileContents).toMatch(/name.*test2-name/i);
+		expect(metadataFileContents).toMatch(/description.*test2-description/i);
+		expect(metadataFileContents).toMatch(/authors(.|\n)*test-author/i);
+		expect(metadataFileContents).toMatch(/homepage.*test-url/i);
+		expect(metadataFileContents).toMatch(/license.*test-license/i);
+	});
+
 	test('metadata plugin should use other contracts for defaults', async () => {
 		await runCliWithPrompts(`generate metadata hello-tacos`, [
 			['name', 'test-name'],
@@ -145,6 +178,33 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		expect(metadataFileContents).toMatch(/authors(.|\n)*test-author/i);
 		expect(metadataFileContents).toMatch(/homepage.*test-url/i);
 		expect(metadataFileContents).toMatch(/license.*test-license/i);
+	});
+
+	test('metadata plugin should use project metadata for defaults', async () => {
+		await runCliWithPrompts(`generate-project-metadata`, [
+			['name', 'project-name'],
+			['description', 'project-description'],
+			['author', 'project-author'],
+			['url', 'project-url'],
+			['license', 'project-license'],
+		]);
+
+		await runCliWithPrompts(`generate metadata fake-contract`, [
+			['name', 'fake-name'],
+			['description', 'fake-description'],
+			['author', ''],
+			['url', ''],
+			['license', ''],
+		]);
+
+		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/fake-contract.json`, {
+			encoding: 'utf-8',
+		});
+		expect(metadataFileContents).toMatch(/name.*fake-name/i);
+		expect(metadataFileContents).toMatch(/description.*fake-description/i);
+		expect(metadataFileContents).toMatch(/authors(.|\n)*project-author/i);
+		expect(metadataFileContents).toMatch(/homepage.*project-url/i);
+		expect(metadataFileContents).toMatch(/license.*project-license/i);
 	});
 
 	afterAll(async () => {

@@ -1,4 +1,4 @@
-import { getContracts, sendAsyncErr, sendJsonRes, writeJsonFile } from '@taqueria/node-sdk';
+import { getContracts, sendAsyncErr, sendJsonRes, sendRes, writeJsonFile } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import fs from 'fs/promises';
 import path from 'path';
@@ -74,6 +74,7 @@ const createContractMetadata = async (
 
 	// Load project metadata for defaults
 	if (!defaultValues && config.metadata) {
+		console.log('Project Metadata:', defaultValues);
 		defaultValues = {
 			...config.metadata,
 			// use the contractName instead of the projectName as the name default
@@ -208,8 +209,8 @@ const createProjectMetadata = async (
 		name: string;
 		description: string;
 		authors: string[];
-		license: string;
 		homepage: string;
+		license: string;
 	};
 
 	const projectMetadata: ProjectMetadata = {
@@ -228,7 +229,7 @@ const createProjectMetadata = async (
 
 	return {
 		render: 'table',
-		data: Object.values(projectMetadata).map(([k, v]) => ({ key: k, value: v })),
+		data: Object.entries(projectMetadata).map(([k, v]) => ({ key: k, value: v })),
 	};
 };
 
@@ -238,6 +239,10 @@ const execute = async (opts: Opts): Promise<PluginResponse> => {
 		contractName,
 		config,
 	} = opts;
+
+	// TAQ BUG: If both tasks start with 'generate' then 'project-metadata' is always selected
+	// WORKAROUND: If the 2nd command is changed to generate-project-metadata, it works as expected
+	// console.log('execute', { task, contractName, metadata: config.metadata });
 
 	switch (task) {
 		case 'metadata':
@@ -254,6 +259,13 @@ export default async (args: RequestArgs.ProxyRequestArgs): Promise<PluginRespons
 
 	try {
 		const resultRaw = await execute(opts) as Record<string, unknown>;
+
+		const USE_TEXT_OUTPUT = true;
+		if (USE_TEXT_OUTPUT) {
+			const message = JSON.stringify(resultRaw.data, null, 2);
+			return sendRes(message);
+		}
+
 		// TODO: Fix deno parsing
 		// Without this, `data.reduce is not a function`
 		const result = ('data' in resultRaw) ? resultRaw.data : resultRaw;

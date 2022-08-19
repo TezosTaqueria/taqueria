@@ -23,7 +23,7 @@ Plugin.create(() => ({
 		}),
 		Task.create({
 			task: 'project-metadata',
-			command: 'generate project-metadata',
+			command: 'generate-project-metadata',
 			description: 'Create project metadata to be used as defaults for contracts.',
 			aliases: [],
 			handler: 'proxy',

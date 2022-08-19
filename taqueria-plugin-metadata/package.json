@@ -31,7 +31,8 @@
 		"directory": "taqueria-plugin-metadata"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.10.0",
+		"@taqueria/node-sdk": "^0.12.0",
+		"@taqueria/protocol": "file:../taqueria-protocol",
 		"prompts": "^2.4.2"
 	},
 	"devDependencies": {
