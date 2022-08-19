@@ -21,27 +21,27 @@ body:
     attributes: 
       label: Ticket Status
       options:
-        - label: 🔬 Feature Design
+        - label: 💡 Feature Design
         - label: 🧪 Testing Plan
         - label: 🔪 Ticket Slicing
-        - label: 🚀 Dev Implementation
-        - label: 🤖 Automated Tests
+        - label: 💻 Feature Complete
+        - label: 🚀 GTM
   - type: textarea
     id: to_do
     attributes:
       label: To Do
       description: A list of to do items for this ticket
-      value: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
+      placeholder: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
     validations:
-      required: true
+      required: false
   - type: textarea
     id: related_issues
     attributes:
       label: Related Issues
       description: Links to related issues
-      value: "- [ ] Issue [#123](...) \n- [ ] Issue [#123](...) "
+      placeholder: "- [ ] Issue [#123](...) \n- [ ] Issue [#123](...) "
     validations:
-      required: true
+      required: false
   - type: textarea
     id: feature-desc
     attributes:
