@@ -7,7 +7,7 @@ on:
 
 jobs:
   add-to-taqueria-dev-project:
-    name: Add dev-tasks to scrum board
+    name: Add issue to project
     runs-on: ubuntu-latest
     steps:
       - uses: actions/add-to-project@v0.3.0
@@ -17,12 +17,14 @@ jobs:
           labeled: dev-task
 
   add-to-inbox-project:
-    name: Add new issues to inbox triage project
+    name: Add issue to project
     runs-on: ubuntu-latest
     steps:
+        alex-pinning-issue-automation
       - uses: actions/add-to-project@v0.3.0
         with:
           project-url: https://github.com/orgs/ecadlabs/projects/3
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
           labeled: dev-task
           label-operator: NOT
+
