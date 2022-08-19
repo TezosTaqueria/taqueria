@@ -23,7 +23,6 @@
 		"directory": "common-utils"
 	},
 	"devDependencies": {
-		"tsup": "^6.1.3",
 		"typescript": "4.7.2"
 	},
 	"types": "./common-utils.d.ts",

@@ -1,15 +1,16 @@
 import createType, { Flatten } from '@taqueria/protocol/Base';
 import * as Provisioner from '@taqueria/protocol/Provisioner';
 import * as ProvisionerID from '@taqueria/protocol/ProvisionerID';
-import { partition, uniq } from 'rambda';
+import { memoizy } from 'memoizy';
+import { partitionArray, uniq } from 'rambda';
 import { z } from 'zod';
 
-const getInvalidIds = (provisions: (Provisioner.t | Provisioner.RawInput)[]) => {
+const getInvalidIds = memoizy((provisions: Provisioner.t[]) => {
 	const ids = provisions.map(p => p.id);
 	return provisions.reduce(
 		(retval, provision) => {
-			const depends_on = (provision.depends_on ?? []) as (ProvisionerID.t)[];
-			const invalid = partition(
+			const depends_on = provision.depends_on ?? [];
+			const invalid = partitionArray(
 				(id: ProvisionerID.t) => ids.includes(id),
 				depends_on,
 			).pop() as ProvisionerID.t[];
@@ -18,7 +19,7 @@ const getInvalidIds = (provisions: (Provisioner.t | Provisioner.RawInput)[]) => 
 		},
 		[] as ProvisionerID.t[],
 	);
-};
+});
 
 const rawSchema = z
 	.array(
@@ -35,7 +36,7 @@ const rawSchema = z
 	)
 	.describe('Provisions');
 
-export type RawInput = z.infer<typeof rawSchema>;
+type RawInput = z.infer<typeof rawSchema>;
 
 const internalSchema = z
 	.array(Provisioner.schemas.schema)

@@ -41,7 +41,7 @@ export const internalSchema = rawSchema.extend({
 	depends_on: z.array(ProvisionerID.schemas.schema).optional(),
 });
 
-export type RawInput = z.infer<typeof rawSchema>;
+type RawInput = z.infer<typeof rawSchema>;
 type Input = z.infer<typeof internalSchema>;
 
 export const { schemas: generatedSchemas, factory } = createType<RawInput, Input>({

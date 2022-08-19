@@ -16,6 +16,11 @@ if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
 
     echo ""
     echo '**********************************************'
+    echo "** Building common-utils"
+    npm run build --workspace=taqueria-common-utils
+
+    echo ""
+    echo '**********************************************'
     echo "** Building node-sdk"
     npm run build --workspace=taqueria-sdk
 
