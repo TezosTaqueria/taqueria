@@ -23,10 +23,11 @@ body:
       label: status
       description: Implementation Status
       options:
-        - label: 🔬 Feature design
-        - label: 🧪 Testing
+        - label: 🔬 R&D
+        - label: 🧪 Test Plan
+        - label: 🚀 Dev Implementation
+        - label: 🤖 Automated Tests
         - label: 📚 Documentation
-        - label: 🚀 Implementation
   - type: textarea
     id: ac
     attributes:

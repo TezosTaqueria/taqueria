@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        This form creates a new issue in the Taqueria inbox 
+        This form creates a new Feature issue in the Taqueria inbox 
   - type: textarea
     id: problem_space
     attributes:
@@ -33,6 +33,17 @@ body:
       placeholder: ex. https://productboard.com/xyz
     validations:
       required: false
+  - type: checkboxes
+    id: status
+    attributes: 
+      label: status
+      description: Implementation Status
+      options:
+        - label: 🔬 Feature design
+        - label: 🧪 Testing Plan
+        - label: 📚 Documentation
+        - label: 🚀 Dev Implementation
+        - label: 🤖 Automated Tests 
   - type: checkboxes
     id: terms
     attributes:
