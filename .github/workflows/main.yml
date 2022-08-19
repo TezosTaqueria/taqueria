@@ -444,6 +444,16 @@ jobs:
             const git_short_sha = "${{ github.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
 
+            // Build the vscode-extension workflow comment
+            const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
+            
+            let vsCodeCommentBody = ''
+            if (vsCodeWorkflowState.includes('success')) {
+              vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
+            } else {
+              vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
+            }
+
             function readInfo(filePath) {
               try {
                 const data = fs.readFileSync(filePath)
