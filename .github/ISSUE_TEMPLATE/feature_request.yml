@@ -22,7 +22,7 @@ body:
     attributes:
       label: Feature Description
       description: Please provide details about how this would work
-      placeholder: Tell us what you would like Taqueria to do! Include as much detail as possible
+      placeholder: Tell us what you would like Taqueria to do! Include as much detail as possible including acceptance criteria
     validations:
       required: true
   - type: input

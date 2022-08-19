@@ -1,6 +1,6 @@
 name: Dev Task
 description: Adds a dev-task to the Taqueria dev scrum board
-title: "[🔄 Dev]: "
+title: "[💻 Dev]: "
 labels: ["dev-task", "new"]
 assignees:
   - 
