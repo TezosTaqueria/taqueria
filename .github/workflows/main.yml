@@ -151,7 +151,7 @@ jobs:
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
   publish-protocol-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-protocol
@@ -159,7 +159,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-sdk-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-protocol-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -168,7 +168,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-ligo-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -177,7 +177,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
   
   publish-smartpy-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -186,7 +186,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-taquito-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -195,7 +195,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-flextesa-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -204,7 +204,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-archetype-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -213,7 +213,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-tezos-client-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -231,7 +231,7 @@ jobs:
   #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-ipfs-pinata-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -240,7 +240,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-jest-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
@@ -249,7 +249,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-state-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event_name == 'release' }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
