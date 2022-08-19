@@ -17,15 +17,14 @@ body:
     validations:
       required: false
   - type: checkboxes
-    id: status
+    id: tkt_status
     attributes: 
-      label: Ticket Status
+      label: Status
       options:
         - label: 💡 Feature Design
         - label: 🧪 Testing Plan
         - label: 🔪 Ticket Slicing
-        - label: 💻 Feature Complete
-        - label: 🚀 GTM
+        - label: 🥂 Feature Complete
   - type: textarea
     id: to_do
     attributes:
