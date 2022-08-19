@@ -50,7 +50,7 @@ jobs:
         run: npm run build -w $GIT_WORKSPACE
       
       - name: Publish for prerelease
-        if:  ${{ github.event.action != 'published' }}
+        if:  ${{ github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
         # TODO: Change tag back to 'latest' after tests
         run: |
           npm publish --workspace=$GIT_WORKSPACE --tag 'preview' --access public
