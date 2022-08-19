@@ -25,5 +25,5 @@ Please describe the testing strategy for this change
 - [ ] 📋 The test plan has been implemented
 - [ ] 🔧 New and existing unit tests pass locally and in CI
 - [ ] 💪 Myself and others have built this change and done manual testing
-- [ ] 📝 If relevant, you have written a first draft summary describing the change for inclusion in Release Notes
+- [ ] 📝 A first draft summary describing the change has been written for release notes
 - [ ] 📚 Corresponding changes have been made to documentation
