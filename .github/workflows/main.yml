@@ -519,7 +519,7 @@ jobs:
       - publish-tezos-client-plugin-to-npm
       - publish-state-plugin-to-npm
       - publish-jest-plugin-to-npm
-      - vscode-extension-workflowy
+      - vscode-extension-workflow
     if: ${{ startsWith(github.ref, 'refs/tags/v') &&
             !github.event.pull_request.head.repo.fork }}
     steps:
