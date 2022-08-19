@@ -18,8 +18,8 @@ body:
         - label: "🔬 R&D"
         # - label: "🧪 Test Plan"
         - label: "🚀 Dev Implementation"
-  #       - label: "🤖 Automated Tests"
-  #       - label: "📚 Documentation"
+        - label: "🤖 Automated Tests"
+        - label: "📚 Documentation"
   - type: textarea
     id: ac
     attributes:
@@ -68,7 +68,7 @@ body:
     id: estimate
     attributes:
       label: Sizing
-      description: How many days of work would this take to implement?
+      description: Estimate the time and effort required
       placeholder: "0"
   - type: checkboxes
     id: terms
