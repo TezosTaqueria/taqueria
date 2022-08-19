@@ -1,6 +1,6 @@
 name: Dev Task
 description: Adds a dev-task to the Taqueria dev scrum board
-title: "[]: "
+title: "[🔄 Dev]: "
 labels: ["dev-task", "new"]
 assignees:
   - 
@@ -11,6 +11,14 @@ body:
         This form is for Taqueria team members to add dev-tasks. For feature requests and product changes, please use the feature request form
   - type: input
     id: epic_link
+    attributes:
+      label: Epic link
+      description: Link to the Epic or feature this task is related to
+      placeholder: ex. https://github.com/ecadlabs/taqueria/issues/123
+    validations:
+      required: false
+  - type: input
+    id: pb_link
     attributes:
       label: Epic link
       description: Link to the Epic or feature this task is related to
