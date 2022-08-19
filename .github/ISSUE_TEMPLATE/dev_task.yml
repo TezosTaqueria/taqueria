@@ -32,7 +32,7 @@ body:
     attributes:
       label: To Do
       description: A list of to do items for this ticket
-      placeholder: "-[] Make Taqueria awesome 🌮 "
+      placeholder: "- [] Make Taqueria awesome 😎 \n - [ ] Eat tacos 🌮 "
     validations:
       required: true
   - type: textarea
@@ -47,6 +47,8 @@ body:
       label: Test Plan
       description: "Describe how this will be tested"
       placeholder: "Include manual and automated testing"
+    validations:
+      required: true
   - type: input
     id: epic_link
     attributes:
