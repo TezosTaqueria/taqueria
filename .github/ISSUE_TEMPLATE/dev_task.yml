@@ -25,7 +25,7 @@ body:
     attributes:
       label: Acceptance Criteria
       description: Requirements
-      placeholder: "-[]"
+      placeholder: "-[] "
     validations:
       required: true
   - type: textarea
@@ -47,13 +47,13 @@ body:
     attributes:
       label: Test Plan
       description: "Describe how this will be tested"
-      placeholder: "..."
+      placeholder: "Include manual and automated testing"
   - type: input
     id: epic_link
     attributes:
       label: Epic link
       description: Link to the Epic or feature this task is related to
-      placeholder: ex. https://github.com/ecadlabs/taqueria/issues/123
+      placeholder: "ex. https://github.com/ecadlabs/taqueria/issues/123"
     validations:
       required: false
   - type: input
@@ -61,7 +61,7 @@ body:
     attributes:
       label: Epic link
       description: Link to the Epic or feature this task is related to
-      placeholder: ex. https://productboard.com/...
+      placeholder: "ex. https://productboard.com/"
     validations:
       required: false
   - type: input
@@ -69,7 +69,7 @@ body:
     attributes:
       label: Estimate
       description: How many days of work would this take to implement?
-      placeholder: ""
+      placeholder: "0"
   - type: checkboxes
     id: terms
     attributes:
