@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        🌮 🌮 🌮  Taqueria Feature / Epic  🌮 🌮 🌮  
+        ## 🌮 🌮 🌮  Taqueria Feature / Epic  🌮 🌮 🌮  
   - type: checkboxes
     id: status
     attributes: 
