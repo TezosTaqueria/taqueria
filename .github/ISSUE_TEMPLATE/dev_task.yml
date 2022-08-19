@@ -24,7 +24,7 @@ body:
     attributes:
       label: Acceptance Criteria
       description: Requirements
-      value: "### Feature \n \n - [ ] \n - [ ] \n \n ###Documentation \n \n - [ ] New feature docs \n - [ ] Refactor existing docs \n - [ ] Release notes \n - [ ] "
+      value: "### Feature \n - [ ] \n - [ ] \n ###Documentation \n - [ ] New feature docs \n - [ ] Refactor existing docs \n - [ ] Release notes \n - [ ] "
     validations:
       required: true
   - type: textarea
