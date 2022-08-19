@@ -42,7 +42,7 @@ body:
       description: A list of to do items for this ticket
       value: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
     validations:
-      required: true
+      required: false
   - type: textarea
     id: description
     attributes:
@@ -56,7 +56,7 @@ body:
       description: "Describe how this will be tested"
       placeholder: "Include manual and automated testing"
     validations:
-      required: true
+      required: false
   - type: input
     id: estimate
     attributes:
