@@ -1,0 +1,19 @@
+name: Add new PR's to the scrum board
+
+on:
+  pull_request:
+    types:
+      - opened
+      - ready_for_review
+
+jobs:
+  add-pr-to-taqueria-dev-project:
+    name: Add issue to project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v0.3.0
+        with:
+          project-url: https://github.com/orgs/ecadlabs/projects/9
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+          column: 🚀  Current Sprint
+          name: Move PR's to current sprint
