@@ -565,14 +565,8 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
 
       - name: Pre-release
-        if: ${{ needs.detect-minor-version.outputs.minor-version == 'odd' }}
         id: pre-release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./release/*
-          draft: false
-          prerelease: true
+        run: echo "minor version ${{ needs.detect-minor-version.outputs.minor-version }}"
 
       - name: Full release
         if: ${{ needs.detect-minor-version.outputs.minor-version == 'even' }}
