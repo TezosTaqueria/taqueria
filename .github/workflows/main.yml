@@ -41,7 +41,7 @@ jobs:
     if: ${{ startsWith(github.ref, 'refs/tags/v') &&
             !github.event.pull_request.head.repo.fork }}
     outputs:
-      minor-version: ${{ steps.outputs.check-minor-version.result }}
+      minor-version: ${{ steps.check-minor-version.outputs.result }}
     steps:
     - name: Get version
       id: get-version
@@ -49,10 +49,8 @@ jobs:
 
     - name: Check minor version
       id: check-minor-version
-      env:
-        MINOR_VERSION: ${{ steps.get-version.outputs.minor }}
       run: |
-        if [ $(( $MINOR_VERSION % 2 )) -eq 0 ]; then
+        if [ $(( ${{ steps.get-version.outputs.minor }} % 2 )) -eq 0 ]; then
           echo "::set-output name=result::even"
         else
           echo "::set-output name=result::odd"
@@ -566,7 +564,12 @@ jobs:
 
       - name: Pre-release
         id: pre-release
-        run: echo "minor version ${{ needs.detect-minor-version.outputs.minor-version }}"
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./release/*
+          draft: false
+          prerelease: true
 
       - name: Full release
         if: ${{ needs.detect-minor-version.outputs.minor-version == 'even' }}
