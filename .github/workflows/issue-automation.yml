@@ -10,7 +10,7 @@ jobs:
     name: Add dev-tasks to scrum board
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@0.3.0
+      - uses: actions/add-to-project@v0.3.0
         with:
           project-url: https://github.com/orgs/ecadlabs/projects/9
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
@@ -20,7 +20,7 @@ jobs:
     name: Add new issues to inbox triage project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@0.3.0
+      - uses: actions/add-to-project@v0.3.0
         with:
           project-url: https://github.com/orgs/ecadlabs/projects/3
           github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
