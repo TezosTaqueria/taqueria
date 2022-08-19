@@ -74,7 +74,7 @@ const createContractMetadata = async (
 
 	// Load project metadata for defaults
 	if (!defaultValues && config.metadata) {
-		console.log('Project Metadata:', defaultValues);
+		// console.log('Project Metadata:', defaultValues);
 		defaultValues = {
 			...config.metadata,
 			// use the contractName instead of the projectName as the name default
