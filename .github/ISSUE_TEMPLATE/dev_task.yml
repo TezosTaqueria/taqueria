@@ -9,11 +9,11 @@ body:
     attributes:
       value: |
         # 🚧 🚧 🚧  <<<  Dev Task  >>>  🚧 🚧 🚧 
-        
+
   - type: input
     id: epic_link
     attributes:
-      label: Feature (Epic) Link
+      label: Feature Link
       description: Link to the Epic or feature this task is related to
       placeholder: "ex. https://github.com/ecadlabs/taqueria/issues/123"
     validations:
@@ -32,7 +32,6 @@ body:
     id: ac
     attributes:
       label: Acceptance Criteria
-      description: Requirements
       value: "### 🔍  Feature \n- [ ] \n \n ### 📚 Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
     validations:
       required: true
