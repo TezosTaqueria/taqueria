@@ -3,7 +3,7 @@ description: Request a new feature
 title: "[Feature]: "
 labels: ["feature-request", "triage"]
 assignees:
-  - hu3man
+  - 
 body:
   - type: markdown
     attributes:
@@ -14,7 +14,7 @@ body:
     attributes:
       label: The Why?
       description: Please tell us about what problem this feature solves, or what value it adds
-      placeholder: ""
+      placeholder: "..."
       value: "Details about the problem your feature solves"
     validations:
       required: true
@@ -27,6 +27,24 @@ body:
       value: "Details about the feature request"
     validations:
       required: true
+  - type: input
+    id: epic_link
+    attributes:
+      label: Epic link
+      description: Link to the Epic or feature this task is related to
+      placeholder: ex. https://productboard.com/...
+    validations:
+      required: false
+  - type: checkboxes
+    id: status
+    attributes: 
+      label: status
+      description: Feature Status
+      options:
+        - label: 🔬 Feature design
+        - label: 🧪 Testing
+        - label: 📚 Documentation
+        - label: 🚀 Ready to release
   - type: checkboxes
     id: terms
     attributes:

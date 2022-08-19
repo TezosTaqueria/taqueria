@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        Thanks for taking the time to fill out this bug report! 
   - type: textarea
     id: what-happened
     attributes:
@@ -28,7 +28,7 @@ body:
     id: user_impact
     attributes:
       label: How impactful is this bug?
-      description: Let us know how impactful this bug is to your workflow 
+      description: Let us know how impactful this bug is to you
       multiple: false
       options:
         - 🐜 Minor annoyance
@@ -52,11 +52,12 @@ body:
         - Linux
         - MacOS
         - Windows -> WSL
-        - Windows -> VM
+        - Windows -> Linux VM
   - type: dropdown
     id: arch
     attributes:
       label: What system architecture are you running Taqueria on?
+      description: You can find out by running `uname -m` in your terminal
       multiple: true
       options:
         - arm64 (M1 Macs)
@@ -65,7 +66,7 @@ body:
     id: taq_version
     attributes:
       label: What version of Taqueria are you using?
-      description: Let us know what version you are using. You can find out by running `taq --version` in your terminal
+      description: You can find out by running `taq --version` in your terminal
       placeholder: ex. v0.12.1
     validations:
       required: false
@@ -73,7 +74,7 @@ body:
     id: node_version
     attributes:
       label: What version of Node.js are you using?
-      description: Let us know what version of node you are running. You can find out by running `node --version` in your terminal
+      description: You can find out by running `node --version` in your terminal
       placeholder: ex. v16.16.0
     validations:
       required: false
