@@ -12,8 +12,7 @@ body:
   - type: checkboxes
     id: status
     attributes: 
-      label: status
-      description: Implementation Status
+      label: Ticket Status
       options:
         - label: 🔬 Feature design
         - label: 🧪 Testing plan
