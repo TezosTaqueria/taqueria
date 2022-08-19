@@ -576,7 +576,7 @@ jobs:
           wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
       - name: Pre-release
-        if: ${{ needs.detect-minor-version.outputs.minor-version == "odd" }}
+        if: ${{ needs.detect-minor-version.outputs.minor-version == 'odd' }}
         id: pre-release
         uses: softprops/action-gh-release@v1
         with:
@@ -586,7 +586,7 @@ jobs:
           prerelease: true
 
       - name: Full release
-        if: ${{ needs.detect-minor-version.outputs.minor-version == "even" }}
+        if: ${{ needs.detect-minor-version.outputs.minor-version == 'even' }}
         id: full-release
         uses: softprops/action-gh-release@v1
         with:
