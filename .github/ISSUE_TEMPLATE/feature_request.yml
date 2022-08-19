@@ -9,16 +9,32 @@ body:
     attributes:
       value: |
         ## 🌮 🌮 🌮  Taqueria Feature / Epic  🌮 🌮 🌮  
+  - type: input
+    id: pb_link
+    attributes:
+      label: Product Board Link
+      description: Link to the productboard feature this is related to
+      placeholder: "ex. https://productboard.com/..."
+    validations:
+      required: false
   - type: checkboxes
     id: status
     attributes: 
       label: Ticket Status
       options:
-        - label: 🔬 Feature design
-        - label: 🧪 Testing plan
-        - label: 🔪 Ticket slicing
-        - label: 🚀 Dev implementation
-        - label: 🤖 Automated Tests s
+        - label: 🔬 Feature Design
+        - label: 🧪 Testing Plan
+        - label: 🔪 Ticket Slicing
+        - label: 🚀 Dev Implementation
+        - label: 🤖 Automated Tests
+  - type: textarea
+    id: to_do
+    attributes:
+      label: To Do
+      description: A list of to do items for this ticket
+      value: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
+    validations:
+      required: true
   - type: textarea
     id: feature-desc
     attributes:
@@ -35,14 +51,20 @@ body:
       placeholder: "Tell us about the use case for this feature and why it's important"
     validations:
       required: true
-  - type: input
-    id: epic_link
+  - type: textarea
+    id: ac
     attributes:
-      label: Epic link
-      description: Link to the Epic or feature this task is related to
-      placeholder: ex. https://productboard.com/xyz
+      label: Acceptance Criteria
+      description: Requirements
+      value: "### Feature \n- [ ] \n \n ### Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
     validations:
-      required: false
+      required: true
+  - type: input
+    id: estimate
+    attributes:
+      label: Sizing
+      description: Estimate the time and effort required
+      placeholder: "0"
   - type: checkboxes
     id: terms
     attributes:
