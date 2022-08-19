@@ -67,7 +67,7 @@ body:
   - type: input
     id: estimate
     attributes:
-      label: Estimate
+      label: Sizing
       description: How many days of work would this take to implement?
       placeholder: "0"
   - type: checkboxes
