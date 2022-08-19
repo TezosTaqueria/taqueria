@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/taqueria",
-	"version": "0.13.1",
+	"version": "0.13.8",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -10,6 +10,7 @@
 		"test": "yarn",
 		"build": "./bin/build.sh || npx play-sound beep.mp3",
 		"build-all": "./bin/build-all.sh",
+		"deploy": "./bin/deploy.sh",
 		"parse-readme-template": "ts-node ./parse-readme-template.ts",
 		"build-website": "npm run parse-readme-template && cd website && npm ci --legacy-peer-deps && npm run build",
 		"serve-website": "cd website && npm run serve",
