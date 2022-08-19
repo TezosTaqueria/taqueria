@@ -1,0 +1,73 @@
+name: Dev Task
+description: Adds a dev-task to the Taqueria dev scrum board
+title: "[🚧 Dev Task]: "
+labels: ["dev-task", "new"]
+assignees:
+  - 
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # 🚧 🚧 🚧   <<<   Dev Task   >>>   🚧 🚧 🚧 
+
+  - type: input
+    id: epic_link
+    attributes:
+      label: Epic|Feature Link
+      description: Link to the Epic or feature this task is related to
+      placeholder: "ex. https://github.com/ecadlabs/taqueria/issues/123"
+    validations:
+      required: false
+  - type: checkboxes
+    id: status
+    attributes: 
+      label: Ticket Status
+      description: Track the completion of design and implementation requirements 
+      options:
+        - label: "🔬 Planning and Design"
+        - label: "💻 Dev Implementation"
+        - label: "🤖 Automated Tests"
+        - label: "📚 Documentation"
+  - type: textarea
+    id: ac
+    attributes:
+      label: Acceptance Criteria
+      value: "### 🔍  Feature \n- [ ] \n \n ### 📚 Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
+    validations:
+      required: false
+  - type: textarea
+    id: to_do
+    attributes:
+      label: To Do
+      description: A list of to do items for this ticket
+      value: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
+    validations:
+      required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: Task Description
+      description: "Describe what needs to be done"
+      placeholder: "What to do"
+  - type: textarea
+    id: test_plan
+    attributes:
+      label: Test Plan
+      description: "Describe how this will be tested"
+      placeholder: "Include manual and automated testing"
+    validations:
+      required: false
+  - type: input
+    id: estimate
+    attributes:
+      label: Sizing
+      description: Estimate the time and effort required
+      placeholder: "0"
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/ecadlabs/taqueria/blob/1d6476f92fce0f2f36cd268549aa15e6cbe770d3/code-of-conduct.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
