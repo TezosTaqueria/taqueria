@@ -34,7 +34,7 @@ body:
       label: Acceptance Criteria
       value: "### 🔍  Feature \n- [ ] \n \n ### 📚 Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
     validations:
-      required: true
+      required: false
   - type: textarea
     id: to_do
     attributes:
