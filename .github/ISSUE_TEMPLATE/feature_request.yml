@@ -54,7 +54,7 @@ body:
     attributes:
       label: Acceptance Criteria
       description: Requirements
-      value: "### 🔍  Feature \n- [ ] \n \n ### 📚 Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
+      placeholder: "### 🔍  Feature \n- [ ] Improve dApp dev workflow \n \n ### 📚 Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
     validations:
       required: false
   - type: textarea
