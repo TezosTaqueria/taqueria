@@ -12,7 +12,7 @@ body:
   - type: input
     id: pb_link
     attributes:
-      label: Product Board Lin
+      label: Product Board Link
       placeholder: "ex. https://productboard.com/..."
     validations:
       required: false
@@ -31,14 +31,6 @@ body:
       label: To Do
       description: A list of to do items for this ticket
       placeholder: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
-    validations:
-      required: false
-  - type: textarea
-    id: related_issues
-    attributes:
-      label: Related Issues
-      description: Links to related issues
-      placeholder: "- [ ] Issue [#123](...) \n- [ ] Issue [#123](...) "
     validations:
       required: false
   - type: textarea
@@ -63,6 +55,14 @@ body:
       label: Acceptance Criteria
       description: Requirements
       value: "### Feature \n- [ ] \n \n ### Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
+    validations:
+      required: false
+  - type: textarea
+    id: related_issues
+    attributes:
+      label: Related Issues and Subtasks
+      description: Links to related issues
+      placeholder: "- [ ] Issue [#123](...) \n- [ ] Issue [#123](...) "
     validations:
       required: false
   - type: input
