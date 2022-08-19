@@ -8,23 +8,23 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this feature request!
+        This form creates a new issue in the Taqueria inbox 
   - type: textarea
     id: problem_space
     attributes:
-      label: The Why?
-      description: Please tell us about what problem this feature solves, or what value it adds
-      placeholder: "..."
+      label: Problem or Use Case
+      description: Please tell us about what problem this feature solves or what value it provides
+      placeholder: "Tell us about the use case for this feature and why it's important"
       value: "Details about the problem your feature solves"
     validations:
       required: true
   - type: textarea
     id: feature-desc
     attributes:
-      label: The What?
-      description: Please provide details about your feature request
-      placeholder: Tell us what you would like Taqueria to do!
-      value: "Details about the feature request"
+      label: Feature Description
+      description: Please provide details about how this would work
+      placeholder: Tell us what you would like Taqueria to do! Include as much detail as possible
+      value: "Details about the feature"
     validations:
       required: true
   - type: input
@@ -32,19 +32,9 @@ body:
     attributes:
       label: Epic link
       description: Link to the Epic or feature this task is related to
-      placeholder: ex. https://productboard.com/...
+      placeholder: ex. https://productboard.com/xyz
     validations:
       required: false
-  - type: checkboxes
-    id: status
-    attributes: 
-      label: status
-      description: Feature Status
-      options:
-        - label: 🔬 Feature design
-        - label: 🧪 Testing
-        - label: 📚 Documentation
-        - label: 🚀 Ready to release
   - type: checkboxes
     id: terms
     attributes:
