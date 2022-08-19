@@ -12,7 +12,7 @@ body:
   - type: input
     id: pb_link
     attributes:
-      label: Product Board Link
+      label: Product Board Lin
       placeholder: "ex. https://productboard.com/..."
     validations:
       required: false
@@ -56,7 +56,7 @@ body:
       description: Please tell us about what problem this feature solves or what value it provides
       placeholder: "Tell us about the use case for this feature and why it's important"
     validations:
-      required: true
+      required: false
   - type: textarea
     id: ac
     attributes:
@@ -64,7 +64,7 @@ body:
       description: Requirements
       value: "### Feature \n- [ ] \n \n ### Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
     validations:
-      required: true
+      required: false
   - type: input
     id: estimate
     attributes:
