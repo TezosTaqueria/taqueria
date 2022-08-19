@@ -9,13 +9,13 @@ body:
     attributes:
       value: |
         This form is for Taqueria team members to add dev-tasks. For feature requests and product changes, please use the feature request form
-  # - type: checkboxes
-  #   id: status
-  #   attributes: 
-  #     label: Ticket Status
-  #     description: Track the completion of design and implementation requirements 
-  #     options:
-  #       - label: "🔬 R&D"
+  - type: checkboxes
+    id: status
+    attributes: 
+      label: Ticket Status
+      description: Track the completion of design and implementation requirements 
+      options:
+        - label: "🔬 R&D"
   #       - label: "🧪 Test Plan"
   #       - label: "🚀 Dev Implementation"
   #       - label: "🤖 Automated Tests"
