@@ -44,7 +44,7 @@ jobs:
       minor-version: ${{ steps.outputs.check-minor-version.result }}
     steps:
     - name: Get version
-    - id: get-version
+      id: get-version
       uses: battila7/get-version-action@v2
 
     - name: Check minor version
