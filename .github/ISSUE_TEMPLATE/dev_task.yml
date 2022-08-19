@@ -12,8 +12,8 @@ body:
   - type: checkboxes
     id: status
     attributes: 
-      label: status
-      description: Implementation Status
+      label: Ticket Status
+      description: Track the completion of design and implementation requirements 
       options:
         - label: 🔬 R&D
         - label: 🧪 Test Plan
