@@ -181,7 +181,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 	});
 
 	test('metadata plugin should use project metadata for defaults', async () => {
-		await runCliWithPrompts(`generate-project-metadata`, [
+		await runCliWithPrompts(`generate project-metadata`, [
 			['name', 'project-name'],
 			['description', 'project-description'],
 			['author', 'project-author'],
