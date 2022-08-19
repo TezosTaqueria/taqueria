@@ -8,7 +8,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        ## 🚧🚧🚧  Dev Task >>> Cool stuff under construction 🚧🚧🚧 
+        # 🚧 🚧 🚧  <<<  Dev Task  >>>  🚧 🚧 🚧 
+        
   - type: input
     id: epic_link
     attributes:
