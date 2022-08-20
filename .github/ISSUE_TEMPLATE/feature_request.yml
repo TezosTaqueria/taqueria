@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        # 🌮 🌮 🌮   <<<   Epic | Feature   >>>   🌮 🌮 🌮  
+        # 🌮 🌮 🌮   <><><>   Epic | Feature   <><><>   🌮 🌮 🌮  
   - type: input
     id: pb_link
     attributes:
@@ -19,7 +19,7 @@ body:
   - type: checkboxes
     id: tkt_status
     attributes: 
-      label: Status
+      label: 🚥 Status
       options:
         - label: 💡 Feature Design
         - label: 🧪 Testing Plan
@@ -28,7 +28,7 @@ body:
   - type: textarea
     id: to_do
     attributes:
-      label: To Do
+      label: ✅ To Do
       description: A list of to do items for this ticket
       placeholder: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
     validations:
@@ -36,7 +36,7 @@ body:
   - type: textarea
     id: feature-desc
     attributes:
-      label: Feature Description
+      label: 🧰 Feature Description
       description: Please provide details about how this would work
       placeholder: Tell us what you would like Taqueria to do! Include as much detail as possible about how this would work and what the ux would be
     validations:
@@ -44,7 +44,7 @@ body:
   - type: textarea
     id: problem_space
     attributes:
-      label: Problem or Use Case
+      label: 🚩 Problem or Use Case
       description: Please tell us about what problem this feature solves or what value it provides
       placeholder: "Tell us about the use case for this feature and why it's important"
     validations:
@@ -52,7 +52,7 @@ body:
   - type: textarea
     id: ac
     attributes:
-      label: Acceptance Criteria
+      label: 📋 Acceptance Criteria
       description: Requirements
       placeholder: "### 🔍  Feature \n- [ ] Improve dApp dev workflow \n \n ### 📚 Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
     validations:
@@ -60,7 +60,7 @@ body:
   - type: textarea
     id: related_issues
     attributes:
-      label: Related Issues and Subtasks
+      label: 🔗  Related Issues and Subtasks
       description: Links to related issues
       placeholder: "- [ ] Issue [#123](...) \n- [ ] Issue [#123](...) "
     validations:
@@ -68,7 +68,7 @@ body:
   - type: input
     id: estimate
     attributes:
-      label: Sizing
+      label: 🐘 Sizing
       description: Estimate the time and effort required
       placeholder: "0"
   - type: checkboxes

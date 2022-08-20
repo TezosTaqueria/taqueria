@@ -2,7 +2,7 @@
 
 ## 🧬 Description
 
-Please include a summary of the change and add the issue number this is related to above. Please also include relevant motivation and context for the change
+Please include a summary of the change. Please also include relevant motivation and context for the change
 (e.g. what was the existing behavior, why did it break, etc.)
 
 ## 🥇 Test plan
