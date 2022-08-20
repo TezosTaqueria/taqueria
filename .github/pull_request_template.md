@@ -1,25 +1,24 @@
-# Description
+# 🌮 Taqueria PR
 
-Fixes # (issue)
-
-------------------------------------------------------------------------------------------------------------------------------------------------------
-
-- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
-- [ ] ✨ New feature (non-breaking change which adds functionality)
-- [ ] 💣 Breaking change (fix or feature that would cause existing functionality to not work as expected)
-
-------------------------------------------------------------------------------------------------------------------------------------------------------
+## 🧬 Description
 
 Please include a summary of the change and add the issue number this is related to above. Please also include relevant motivation and context for the change
 (e.g. what was the existing behavior, why did it break, etc.)
 
-
-## Test plan
+## 🥇 Test plan
 
 Please describe the testing strategy for this change
 
+### Type of change
 
-## Pre-merge checklist
+- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
+- [ ] ✨ New feature (non-breaking change which adds functionality)
+- [ ] 💣 Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] 🐟 Small Fry (this is a small change that doesn't affect the functionality of the codebase)
+
+--------------------------------------------------------------------------------------------------------------------------------------
+
+## ✅  Pre-merge checklist
 
 - [ ] 🗣️ I have commented my code, particularly in hard-to-understand areas
 - [ ] 📋 The test plan has been implemented
