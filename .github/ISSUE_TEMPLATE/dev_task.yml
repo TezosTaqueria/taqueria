@@ -1,6 +1,6 @@
 name: Dev Task
 description: Adds a dev-task to the Taqueria dev scrum board
-title: "[🚧 Dev Task]: "
+title: "<🚧 DevTask> "
 labels: ["dev-task", "new"]
 assignees:
   - 
@@ -9,15 +9,6 @@ body:
     attributes:
       value: |
         # 🚧 🚧 🚧   <<<   Dev Task   >>>   🚧 🚧 🚧 
-
-  - type: input
-    id: epic_link
-    attributes:
-      label: Epic|Feature Link
-      description: Link to the Epic or feature this task is related to
-      placeholder: "ex. https://github.com/ecadlabs/taqueria/issues/123"
-    validations:
-      required: false
   - type: checkboxes
     id: status
     attributes: 
@@ -55,6 +46,14 @@ body:
       label: Test Plan
       description: "Describe how this will be tested"
       placeholder: "Include manual and automated testing"
+    validations:
+      required: false
+  - type: input
+    id: epic_link
+    attributes:
+      label: Epic|Feature Link
+      description: Link to the Epic or feature this task is related to
+      placeholder: "ex. https://github.com/ecadlabs/taqueria/issues/123"
     validations:
       required: false
   - type: input
