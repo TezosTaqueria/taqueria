@@ -2,7 +2,7 @@
 
 Fixes # (issue)
 
-## 🪂 Pre-merge checklist _(remove unnecessary items)_
+## 🪂 Pre-merge Checklist
 
 - [ ] 🐬 I have commented my code, particularly in hard-to-understand areas
 - [ ] 🦀 Automated tests have been written and added to this PR
