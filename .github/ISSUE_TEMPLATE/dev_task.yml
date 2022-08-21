@@ -21,7 +21,6 @@ body:
     id: status
     attributes: 
       label: 🚥 Status
-      description: Track the completion of design and implementation requirements 
       options:
         - label: "🔬 Planning and Design"
         - label: "💻 Dev Implementation"
