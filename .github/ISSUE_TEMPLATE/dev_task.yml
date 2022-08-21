@@ -1,7 +1,7 @@
 name: Dev Task
 description: Adds a dev-task to the Taqueria dev scrum board
 title: "<🚧 DevTask> "
-labels: ["dev-task", "new"]
+labels: ["dev-task"]
 assignees:
   - 
 body:
@@ -12,7 +12,7 @@ body:
   - type: checkboxes
     id: status
     attributes: 
-      label: 🚥 Ticket Status
+      label: 🚥 Status
       description: Track the completion of design and implementation requirements 
       options:
         - label: "🔬 Planning and Design"
