@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        # 🚧 🚧 🚧   <><><>   Dev Task   <><><>   🚧 🚧 🚧 
+        # 🚧 🚧 🚧   ◢▅◣◥▅◤◢▅◣   Dev Task   ◢▅◣◥▅◤◢▅◣   🚧 🚧 🚧 
 
         ## 🛑 Sanity Check: Does this really need it's own ticket?
   - type: input
