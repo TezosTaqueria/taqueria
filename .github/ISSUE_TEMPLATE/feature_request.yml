@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        # 🌮   ◢▅◣◥▅◤◢▅◣   Epic | Feature 	◢▅◣◥▅◤◢▅◣   🌮  
+        # 🌮   |-o-| [-o-] |-o-|   Epic | Feature 	|-o-| [-o-] |-o-|   🌮  
 
         ## 🛑 Sanity Check: Does this really need it's own ticket?
  
