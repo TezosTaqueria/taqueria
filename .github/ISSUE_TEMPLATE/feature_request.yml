@@ -1,14 +1,17 @@
 name: 🌮 Epic|Feature 
 description: Request a new feature
-title: "<🌮 Epic|Feature> "
-labels: ["feature-request"]
+title: "🌮 Feature<> "
+labels: ["feature", "triage"]
 assignees:
-  - 
+  - hu3man
 body:
   - type: markdown
     attributes:
       value: |
         # 🌮 🌮 🌮   <><><>   Epic | Feature   <><><>   🌮 🌮 🌮  
+
+        ## 🛑 Sanity Check: Does this really need it's own ticket?
+ 
   - type: input
     id: pb_link
     attributes:
@@ -50,6 +53,12 @@ body:
       placeholder: "Tell us about the use case for this feature and why it's important"
     validations:
       required: false
+  - type: textarea
+    id: scope
+    attributes:
+      label: 🔭 Scope
+      description: "Explicitly, what is in and out of scope for this ticket"
+      value: "🏎️ In Scope: \n - [ ] ... \n \n 🙅‍♂️ Out of Scope: \n - [ ] ... \n \n "
   - type: textarea
     id: ac
     attributes:
