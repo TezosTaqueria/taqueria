@@ -3,7 +3,7 @@ description: Adds a dev-task to the Taqueria dev scrum board
 title: "[🚧 Dev] ➾ "
 labels: ["dev-task"]
 assignees:
-  - hu3man
+  - 
 body:
   - type: markdown
     attributes:
@@ -26,9 +26,9 @@ body:
         - label: "🎯 Planning and Design"
         - label: "🏎️ Dev Implementation"
         - label: "🏁 Test Plan Executed"
-        - label: "🛩️ Documentation"
-        - label: "🏟️ Peer Review (demo)"
-        - label: "🏆 Validated"
+        - label: "🛩️ Documentation Ready"
+        - label: "🏟️ Peer Reviewed (demo)"
+        - label: "🏆 Validated and Accepted"
   - type: textarea
     id: to_do
     attributes:
