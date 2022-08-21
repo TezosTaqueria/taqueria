@@ -1,8 +1,8 @@
-# [🏗️ PR] ➾ TITLE_HERE
+# [🏗️ PR] ➾
 
 Fixes # (issue)
 
-## 🪂 Pre-merge Checklist
+## 🪂 Pre-Merge Checklist
 
 - [ ] 🐬 I have commented my code, particularly in hard-to-understand areas
 - [ ] 🦀 Automated tests have been written and added to this PR
@@ -20,7 +20,7 @@ Please include a summary of the change and add the issue number this is related 
 (e.g. what was the existing behavior, why did it break, etc.)
 
 
-## 🎢 Test plan
+## 🎢 Test Plan
 
 Please describe the testing strategy for this change
 
