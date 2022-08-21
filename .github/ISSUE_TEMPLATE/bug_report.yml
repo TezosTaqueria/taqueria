@@ -74,7 +74,7 @@ body:
   - type: input
     id: node_version
     attributes:
-      label: 📏 Node.js Version
+      label: 🌿 Node.js Version
       description: You can find out by running `node --version` in your terminal
       placeholder: ex. v16.16.0
     validations:
