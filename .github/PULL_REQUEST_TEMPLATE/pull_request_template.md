@@ -12,7 +12,7 @@ Fixes # (issue)
 - [ ] 🏄‍♂️ Myself and others have built this branch and done manual testing on the change
 - [ ] ⛵ A summary describing the change has been written for release notes
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------
 
 ## 🪁 Description
 
@@ -26,7 +26,7 @@ Please describe the testing strategy for this change
 
 ## 🛸 Type of Change
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------
 
 - [ ] 🐟 Minor change (non-breaking change of very limited scope)
 - [ ] 🦑 Bug fix (non-breaking change which fixes an issue)
@@ -34,4 +34,4 @@ Please describe the testing strategy for this change
 - [ ] 🌊 Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] 🐳 Major refactor (breaking changes and significant impact to the codebase)
 
-------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------
