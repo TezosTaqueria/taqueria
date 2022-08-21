@@ -24,10 +24,10 @@ body:
     attributes: 
       label: 🚥 Status
       options:
-        - label: "🔬 Planning and Design"
-        - label: "💻 Dev Implementation"
-        - label: "🤖 Automated Tests"
-        - label: "📚 Documentation"
+        - label: "🎯 Planning and Design"
+        - label: "🏎️ Dev Implementatio"
+        - label: "🏁 Test Plan Executed"
+        - label: "🏛️ Documentation Updated"
   - type: textarea
     id: to_do
     attributes:
