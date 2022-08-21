@@ -19,14 +19,13 @@ Fixes # (issue)
 Please include a summary of the change and add the issue number this is related to above. Please also include relevant motivation and context for the change
 (e.g. what was the existing behavior, why did it break, etc.)
 
-
 ## 🎢 Test Plan
 
 Please describe the testing strategy for this change
 
-## 🛸 Type of Change
-
 ----------------------------------------------------------------------------------------------------------------------------
+
+### 🛸 Type of Change
 
 - [ ] 🐟 Minor change (non-breaking change of very limited scope)
 - [ ] 🦑 Bug fix (non-breaking change which fixes an issue)
