@@ -24,9 +24,9 @@ body:
     attributes: 
       label: 🚥 Status
       options:
-        - label: 🔮 Feature Design
-        - label: ⚛ Architecture / Implementation Design
-        - label: 🚧 Under Construction
+        - label: 🔮 Product/Feature Design
+        - label: 🥼 Architecture/Implementation Planning
+        - label: 🏭 Under Construction
         - label: ⛳ Feature Complete
         - label: 🛫. GTM / Release
   - type: textarea
