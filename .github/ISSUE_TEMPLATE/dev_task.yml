@@ -60,7 +60,7 @@ body:
   - type: textarea
     id: test_plan
     attributes:
-      label: 🥇 Test Plan
+      label: 🎢 Test Plan
       description: "Describe how this will be tested"
       placeholder: "Include manual and automated testing"
   - type: input
