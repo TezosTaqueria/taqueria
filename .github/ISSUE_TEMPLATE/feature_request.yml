@@ -24,8 +24,8 @@ body:
     attributes: 
       label: 🚥 Status
       options:
-        - label: 📐 Feature Design
-        - label: 🤓 Architecture / Implementation Design
+        - label: 💭 Feature Design
+        - label: 📐 Architecture / Implementation Design
         - label: 🪚 Under Construction
         - label: ⛳ Feature Complete
         - label: 🥂 GTM / Release
