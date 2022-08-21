@@ -25,10 +25,10 @@ body:
       label: 🚥 Status
       options:
         - label: 🔮 Product/Feature Design
-        - label: 🥼 Architecture/Implementation Planning
-        - label: 🏭 Under Construction
+        - label: ✍🏻 Architecture/Implementation Planning
+        - label: 🏗️ Under Construction
         - label: ⛳ Feature Complete
-        - label: 🛫. GTM / Release
+        - label: ⛵ GTM / Release
   - type: textarea
     id: to_do
     attributes:
