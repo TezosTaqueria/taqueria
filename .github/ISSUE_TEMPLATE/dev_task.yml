@@ -27,7 +27,8 @@ body:
         - label: "🏎️ Dev Implementation"
         - label: "🏁 Test Plan Executed"
         - label: "🛩️ Documentation"
-        - label: "🏟️ Peer Review"
+        - label: "🏟️ Peer Review (demo)"
+        - label: "🏆 Validated"
   - type: textarea
     id: to_do
     attributes:
