@@ -26,7 +26,7 @@ body:
       options:
         - label: 📐 Feature Design
         - label: 🤓 Architecture / Implementation Design
-        - label: 🏗️ Under Construction
+        - label: 🪚 Under Construction
         - label: ⛳ Feature Complete
         - label: 🥂 GTM / Release
   - type: textarea
@@ -62,7 +62,7 @@ body:
   - type: textarea
     id: ac
     attributes:
-      label: 📋 Acceptance Criteria
+      label: ⚖️ Acceptance Criteria
       description: Define the definition of done for this feature
       value: "✨ Features: \n- [ ] ... \n \n 📚 Docs: \n- [ ] ... \n"
     validations:

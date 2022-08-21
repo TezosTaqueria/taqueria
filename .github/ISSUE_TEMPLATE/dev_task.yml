@@ -26,8 +26,8 @@ body:
         - label: "🎯 Planning and Design"
         - label: "🏎️ Dev Implementation"
         - label: "🏁 Test Plan Executed"
-        - label: "🏛️ Documentation"
-        - label: "🔎 Peer Review"
+        - label: "🛩️ Documentation"
+        - label: "🏟️ Peer Review"
   - type: textarea
     id: to_do
     attributes:
@@ -51,7 +51,7 @@ body:
   - type: textarea
     id: ac
     attributes:
-      label: 📋 Acceptance Criteria
+      label: ⚖️ Acceptance Criteria
       value: "✨ Features: \n- [ ] ... \n \n 📚 Documentation: \n- [ ] ... \n "
     validations:
       required: false
