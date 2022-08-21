@@ -24,11 +24,11 @@ body:
     attributes: 
       label: 🚥 Status
       options:
-        - label: 💭 Feature Design
-        - label: 📐 Architecture / Implementation Design
-        - label: 🏗️ Under Construction
+        - label: 🔮 Feature Design
+        - label: ⚛ Architecture / Implementation Design
+        - label: 🚧 Under Construction
         - label: ⛳ Feature Complete
-        - label: 🚀 GTM / Release
+        - label: 🛫. GTM / Release
   - type: textarea
     id: to_do
     attributes:
