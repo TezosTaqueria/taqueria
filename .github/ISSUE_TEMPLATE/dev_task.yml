@@ -9,6 +9,14 @@ body:
     attributes:
       value: |
         # 🚧 🚧 🚧   <><><>   Dev Task   <><><>   🚧 🚧 🚧 
+  - type: input
+    id: epic_link
+    attributes:
+      label: 🔗 Epic|Feature Link
+      description: Link to the Epic or feature this task is related to
+      placeholder: "ex. https://github.com/ecadlabs/taqueria/issues/123"
+    validations:
+      required: false
   - type: checkboxes
     id: status
     attributes: 
@@ -20,13 +28,6 @@ body:
         - label: "🤖 Automated Tests"
         - label: "📚 Documentation"
   - type: textarea
-    id: ac
-    attributes:
-      label: 📋 Acceptance Criteria
-      placeholder: "### 🔍  Feature \n- [ ] Add `make-tacos` task\n \n ### 📚 Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
-    validations:
-      required: false
-  - type: textarea
     id: to_do
     attributes:
       label: ✅ To Do
@@ -34,6 +35,12 @@ body:
       placeholder: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
     validations:
       required: false
+  - type: textarea
+    id: scope
+    attributes:
+      label: 🔭 Scope
+      description: "Explicitly, what is in and out of scope for this ticket"
+      placeholder: "🏎️ In Scope: \n - [ ] ... \n \n 🙅‍♂️ Out of Scope: \n - [ ] ... \n \n "
   - type: textarea
     id: description
     attributes:
@@ -48,12 +55,11 @@ body:
       placeholder: "Include manual and automated testing"
     validations:
       required: false
-  - type: input
-    id: epic_link
+  - type: textarea
+    id: ac
     attributes:
-      label: 🔗 Epic|Feature Link
-      description: Link to the Epic or feature this task is related to
-      placeholder: "ex. https://github.com/ecadlabs/taqueria/issues/123"
+      label: 📋 Acceptance Criteria
+      value: "### 🔍  Feature \n- [ ] Add `make-tacos` task\n \n ### 📚 Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
     validations:
       required: false
   - type: input
