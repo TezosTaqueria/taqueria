@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        # 🦋 🦋 🦋   ◢▅◣◥▅◤◢▅◣   Bug Report   ◢▅◣◥▅◤◢▅◣   🦋 🦋 🦋 
+        # ◢▅◣◥▅◤◢▅◣  🦋  Bug Report  🦋  ◢▅◣◥▅◤◢▅◣ 
 
         ### 🙏🏽 Thanks for taking the time to fill out this bug report! 
   - type: textarea

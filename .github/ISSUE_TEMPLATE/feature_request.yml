@@ -10,7 +10,7 @@ body:
       value: |
           # ◢▅◣◥▅◤◢▅◣  🌮  Epic | Feature  🌮 	◢▅◣◥▅◤◢▅◣    
 
-        ## 🛑 Sanity Check: Does this really need it's own ticket?
+          ## 🛑 Sanity Check: Does this really need it's own ticket?
  
   - type: input
     id: pb_link
