@@ -43,18 +43,18 @@ body:
       description: "Explicitly, what is in and out of scope for this ticket"
       value: "🏎️ In Scope: \n - [ ] ... \n \n 🙅‍♂️ Out of Scope: \n - [ ] ... \n \n "
   - type: textarea
+    id: description
+    attributes:
+      label: 🧰 Work Description
+      description: "Describe what needs to be done"
+      placeholder: "In as much detail as possible, explain the work to be done. Include any architecture or design notes and the sequencing of each thing that needs to be done"
+  - type: textarea
     id: ac
     attributes:
       label: 📋 Acceptance Criteria
       value: "✨ Features: \n- [ ] ... \n \n 📚 Documentation: \n- [ ] ... \n "
     validations:
       required: false
-  - type: textarea
-    id: description
-    attributes:
-      label: 🧰 Work Description
-      description: "Describe what needs to be done"
-      placeholder: "In as much detail as possible, explain the work to be done. Include any architecture or design notes and the sequencing of each thing that needs to be done"
   - type: textarea
     id: test_plan
     attributes:
