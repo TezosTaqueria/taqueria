@@ -52,7 +52,7 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: 🧰 Task Description
+      label: 🧰 Work Description
       description: "Describe what needs to be done"
       placeholder: "In as much detail as possible, explain the work to be done. Include any architecture or design notes and the sequencing of each thing that needs to be done"
   - type: textarea
