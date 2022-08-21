@@ -63,7 +63,7 @@ body:
     id: ac
     attributes:
       label: 📋 Acceptance Criteria
-      description: Requirements
+      description: Define the definition of done for this feature
       value: "✨ Features: \n- [ ] ... \n \n 📚 Docs: \n- [ ] ... \n"
     validations:
       required: false
@@ -71,7 +71,7 @@ body:
     id: related_issues
     attributes:
       label: 🔗  Related Issues and Subtasks
-      description: Links to related issues
+      description: Links to related issues on GitHub or Productboard
       placeholder: "- [ ] Issue [#123](...) \n- [ ] Issue [#123](...) "
     validations:
       required: false
