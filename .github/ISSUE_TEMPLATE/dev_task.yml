@@ -10,7 +10,7 @@ body:
       value: |
         # 🚧 🚧 🚧   <><><>   Dev Task   <><><>   🚧 🚧 🚧 
 
-        ## 🛑 Sanity Check: Does this task really need it's own ticket?
+        ## 🛑 Sanity Check: Does this really need it's own ticket?
   - type: input
     id: epic_link
     attributes:
@@ -22,12 +22,12 @@ body:
   - type: checkboxes
     id: status
     attributes: 
-      label: 🚥 Status
+      label: 🚥 Definition of Done
       options:
         - label: "🎯 Planning and Design"
-        - label: "🏎️ Dev Implementatio"
+        - label: "🏎️ Dev Implementation"
         - label: "🏁 Test Plan Executed"
-        - label: "🏛️ Documentation Updated"
+        - label: "🏛️ Documentation"
   - type: textarea
     id: to_do
     attributes:
@@ -43,24 +43,24 @@ body:
       description: "Explicitly, what is in and out of scope for this ticket"
       value: "🏎️ In Scope: \n - [ ] ... \n \n 🙅‍♂️ Out of Scope: \n - [ ] ... \n \n "
   - type: textarea
+    id: ac
+    attributes:
+      label: 📋 Acceptance Criteria
+      value: "✨ Features: \n- [ ] ... \n \n 📚 Documentation: \n- [ ] ... \n "
+    validations:
+      required: false
+  - type: textarea
     id: description
     attributes:
       label: 🧰 Task Description
       description: "Describe what needs to be done"
-      placeholder: "What to do"
+      placeholder: "In as much detail as possible, explain the work to be done. Include any architecture or design notes and the sequencing of each thing that needs to be done"
   - type: textarea
     id: test_plan
     attributes:
       label: 🥇 Test Plan
       description: "Describe how this will be tested"
       placeholder: "Include manual and automated testing"
-    validations:
-      required: false
-  - type: textarea
-    id: ac
-    attributes:
-      label: 📋 Acceptance Criteria
-      value: "### 🔍  Feature \n- [ ] Add `make-tacos` task\n \n ### 📚 Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
     validations:
       required: false
   - type: input
