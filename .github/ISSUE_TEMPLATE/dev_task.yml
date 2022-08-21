@@ -11,6 +11,7 @@ body:
         # ◢▅◣◥▅◤◢▅◣    🚧 🚧 🚧    Dev Task    🚧 🚧 🚧    ◢▅◣◥▅◤◢▅◣  
 
         ## 🛑 Sanity Check: Does this really need it's own ticket?
+
   - type: input
     id: epic_link
     attributes:
@@ -26,8 +27,8 @@ body:
         - label: "🎯 Planning and Design"
         - label: "🏎️ Dev Implementation"
         - label: "🏁 Test Plan Executed"
-        - label: "🛩️ Documentation Ready"
-        - label: "🏟️ Peer Reviewed (demo)"
+        - label: "🛩️ Documentation Updated"
+        - label: "🏟️ Peer / User Reviewed"
         - label: "🏆 Validated and Accepted"
   - type: textarea
     id: to_do
