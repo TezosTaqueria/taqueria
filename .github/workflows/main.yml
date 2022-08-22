@@ -128,26 +128,36 @@ jobs:
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  # publish-protocol-to-npm:
-  #   if: ${{ !github.event.pull_request.head.repo.fork }}
-  #   uses: ./.github/workflows/npm-publish.yml
-  #   with:
-  #     dir: taqueria-protocol
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-protocol-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-protocol
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  # publish-sdk-to-npm:
-  #   if: ${{ !github.event.pull_request.head.repo.fork }}
-  #   needs: publish-protocol-to-npm
-  #   uses: ./.github/workflows/npm-publish.yml
-  #   with:
-  #     dir: taqueria-sdk
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-common-utils-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-common-utils
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
+  publish-sdk-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    needs: 
+      - publish-protocol-to-npm
+      - publish-common-utils-to-npm
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-sdk
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-ligo-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-ligo
@@ -156,7 +166,7 @@ jobs:
   
   publish-smartpy-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-smartpy
@@ -165,7 +175,7 @@ jobs:
 
   publish-taquito-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-taquito
@@ -174,7 +184,7 @@ jobs:
 
   publish-flextesa-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-flextesa
@@ -183,7 +193,7 @@ jobs:
 
   publish-archetype-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-archetype
@@ -192,7 +202,7 @@ jobs:
 
   publish-tezos-client-plugin-to-npm:
      if: ${{ !github.event.pull_request.head.repo.fork }}
-    #  needs: publish-sdk-to-npm
+     needs: publish-sdk-to-npm
      uses: ./.github/workflows/npm-publish.yml
      with:
        dir: taqueria-plugin-tezos-client
@@ -210,7 +220,7 @@ jobs:
 
   publish-ipfs-pinata-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-ipfs-pinata
@@ -219,7 +229,7 @@ jobs:
 
   publish-jest-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-jest
@@ -228,19 +238,10 @@ jobs:
 
   publish-state-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-state
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
-
-  publish-common-utils-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-common-utils
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
