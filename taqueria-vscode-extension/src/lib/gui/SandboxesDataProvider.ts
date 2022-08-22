@@ -43,10 +43,13 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				case 'Entrypoints':
 					return await this.getSmartContractEntrypoints(element);
 				case 'Operations':
-					return await this.getSmartContractOperations(element);
+					return await this.getAccountOperations(element);
 				default:
 					return [];
 			}
+		}
+		if (element instanceof SandboxImplicitAccountTreeItem) {
+			return await this.getAccountOperations(element);
 		}
 		if (element) {
 			return [];
@@ -80,8 +83,25 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		this.sandboxTreeItems = items;
 		this.refreshLevelInterval = setInterval(async () => {
 			await this.updateSandboxInfo();
-		}, 1000);
+		}, 5000);
 		return items;
+	}
+
+	private async getAccountOperations(accountItem: SandboxImplicitAccountTreeItem | SmartContractChildrenTreeItem) {
+		const containerName = accountItem.parent.containerName;
+		const address = accountItem instanceof SandboxImplicitAccountTreeItem
+			? accountItem.address
+			: accountItem.parent.address;
+		const response = await fetch(`http://localhost:5000/v1/accounts/${address}/operations`);
+		const data = await response.json();
+		return (data as any[]).map(item =>
+			new OperationTreeItem(
+				item.type,
+				item.hash,
+				item,
+				accountItem instanceof SandboxImplicitAccountTreeItem ? accountItem : accountItem.parent,
+			)
+		);
 	}
 
 	async updateSandboxInfo(): Promise<void> {
@@ -122,10 +142,6 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		);
 	}
 
-	getSmartContractOperations(element: SmartContractChildrenTreeItem): Promise<SandboxTreeItemBase[]> {
-		throw new Error('Method not implemented.');
-	}
-
 	private async getSandboxChildren(element: SandboxTreeItem): Promise<SandboxChildrenTreeItem[]> {
 		const containerName = element.containerName;
 		const [accountCount, contractCount] = containerName
@@ -134,8 +150,8 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		return [
 			new SandboxChildrenTreeItem('Implicit Accounts', accountCount, element),
 			new SandboxChildrenTreeItem('Smart Contracts', contractCount, element),
-			new SandboxChildrenTreeItem('Operations', undefined, element),
-			new SandboxChildrenTreeItem('Non-Empty Blocks', undefined, element),
+			// new SandboxChildrenTreeItem('Operations', undefined, element),
+			// new SandboxChildrenTreeItem('Non-Empty Blocks', undefined, element),
 		];
 	}
 
@@ -167,10 +183,10 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 		const response = await fetch('http://localhost:5000/v1/accounts?type.ne=contract');
 		const data = await response.json();
-		return (data as any[]).map(item => new SandboxImplicitAccountTreeItem(item.address));
+		return (data as any[]).map(item => new SandboxImplicitAccountTreeItem(item.address, _element.parent));
 	}
 
-	private async getSandboxSmartContracts(_element: SandboxChildrenTreeItem): Promise<SandboxImplicitAccountTreeItem[]> {
+	private async getSandboxSmartContracts(_element: SandboxChildrenTreeItem): Promise<SandboxSmartContractTreeItem[]> {
 		const containerName = _element.parent.containerName;
 		if (!containerName) {
 			return [];
@@ -243,7 +259,7 @@ export class SandboxTreeItemBase extends vscode.TreeItem {
 			| 'smartContract'
 			| 'smartContractChild'
 			| 'smartContractEntryPoint'
-			| 'smartContractOperation',
+			| 'operation',
 		collapsibleState: vscode.TreeItemCollapsibleState,
 	) {
 		super(label, collapsibleState);
@@ -318,6 +334,7 @@ export class SandboxChildrenTreeItem extends SandboxTreeItemBase {
 export class SandboxImplicitAccountTreeItem extends SandboxTreeItemBase {
 	constructor(
 		public readonly address: string,
+		public readonly parent: SandboxTreeItem,
 	) {
 		super(address, 'implicitAccount', vscode.TreeItemCollapsibleState.Collapsed);
 	}
@@ -351,5 +368,18 @@ export class SmartContractEntrypointTreeItem extends SandboxTreeItemBase {
 	) {
 		super(name, 'smartContractEntryPoint', vscode.TreeItemCollapsibleState.None);
 		this.contextValue = 'entrypoint';
+	}
+}
+
+export class OperationTreeItem extends SandboxTreeItemBase {
+	constructor(
+		public readonly type: string,
+		public readonly hash: string,
+		public readonly operation: Object,
+		public readonly parent: SandboxSmartContractTreeItem | SandboxImplicitAccountTreeItem,
+	) {
+		super(type, 'operation', vscode.TreeItemCollapsibleState.None);
+		this.description = hash;
+		this.contextValue = 'operation';
 	}
 }

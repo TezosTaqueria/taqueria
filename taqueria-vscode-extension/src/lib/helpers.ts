@@ -16,6 +16,7 @@ import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
 import {
+	OperationTreeItem,
 	SandboxesDataProvider,
 	SandboxTreeItem,
 	SandboxTreeItemBase,
@@ -1415,6 +1416,13 @@ export class VsCodeHelper {
 	exposeShowEntrypointParametersCommand() {
 		this.registerCommand('taqueria.show_entrypoint_parameters', async (item: SmartContractEntrypointTreeItem) => {
 			const jsonParameters = item.jsonParameters;
+			this.showOutput(JSON.stringify(jsonParameters, null, 2));
+		});
+	}
+
+	exposeShowOperationDetailsCommand() {
+		this.registerCommand('taqueria.show_operation_details', async (item: OperationTreeItem) => {
+			const jsonParameters = item.operation;
 			this.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});
 	}
