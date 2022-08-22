@@ -1,5 +1,5 @@
 name: Dev Task
-description: Adds a dev-task to the Taqueria dev scrum board
+description: Tickets for engineering and dev
 title: "🚧 Dev ➾ "
 labels: ["dev-task"]
 assignees:
