@@ -63,6 +63,12 @@ body:
       label: 🎢 Test Plan
       description: "Describe how this will be tested"
       placeholder: "Include manual and automated testing"
+  - type: textarea
+    id: release_notes
+    attributes:
+      label: 🎆 Release Notes
+      description: "Describe the changes, any new features, and other must know facts for users"
+      placeholder: "This is how this awesome new feature works..."
   - type: input
     id: estimate
     attributes:
