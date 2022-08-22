@@ -63,8 +63,6 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	helper.exposeRefreshCommand();
 	// await helper.watchGlobalSettings();
 
-	const folders = helper.getFolders();
-
 	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
 		COMMAND_PREFIX + 'compile_smartpy',
 		'--plugin smartpy compile',
@@ -153,6 +151,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	helper.exposeOriginateTask();
 	helper.exposeRefreshSandBoxDataCommand();
 	helper.exposeShowEntrypointParametersCommand();
+	helper.exposeShowOperationDetailsCommand();
 
 	helper.registerDataProviders();
 	helper.createTreeViews();

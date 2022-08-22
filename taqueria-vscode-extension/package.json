@@ -361,6 +361,13 @@
 				"title": "Refresh",
 				"shortTitle": "refresh",
 				"icon": "$(refresh)"
+			},
+			{
+				"command": "taqueria.show_operation_details",
+				"category": "Taqueria",
+				"title": "Show Operation Details",
+				"shortTitle": "details",
+				"icon": "$(list-unordered)"
 			}
 		],
 		"menus": {
@@ -387,6 +394,10 @@
 				},
 				{
 					"command": "taqueria.refresh_sandbox_data",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.show_operation_details",
 					"when": "false"
 				}
 			],
@@ -511,6 +522,11 @@
 				{
 					"command": "taqueria.refresh_sandbox_data",
 					"when": "view == taqueria-sandboxes",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.show_operation_details",
+					"when": "view == taqueria-sandboxes && viewItem == operation",
 					"group": "inline"
 				}
 			],
