@@ -1,66 +1,78 @@
 name: Dev Task
-description: Adds a dev-task to the Taqueria dev scrum board
-title: "[🚧 Dev Task]: "
-labels: ["dev-task", "new"]
+description: Tickets for engineering and dev
+title: "🚧 Dev ➾ "
+labels: ["dev-task"]
 assignees:
   - 
 body:
   - type: markdown
     attributes:
       value: |
-        # 🚧 🚧 🚧   <<<   Dev Task   >>>   🚧 🚧 🚧 
+        # ◢▅◣◥▅◤◢▅◣    🚧 🚧 🚧    Dev Task    🚧 🚧 🚧    ◢▅◣◥▅◤◢▅◣  
+
+        ## 🛑 Sanity Check: Does this really need it's own ticket?
 
   - type: input
     id: epic_link
     attributes:
-      label: Epic|Feature Link
-      description: Link to the Epic or feature this task is related to
+      label: 🔗 Epic|Feature Link
       placeholder: "ex. https://github.com/ecadlabs/taqueria/issues/123"
     validations:
       required: false
   - type: checkboxes
     id: status
     attributes: 
-      label: Ticket Status
-      description: Track the completion of design and implementation requirements 
+      label: 🚥 Definition of Done
       options:
-        - label: "🔬 Planning and Design"
-        - label: "💻 Dev Implementation"
-        - label: "🤖 Automated Tests"
-        - label: "📚 Documentation"
-  - type: textarea
-    id: ac
-    attributes:
-      label: Acceptance Criteria
-      value: "### 🔍  Feature \n- [ ] \n \n ### 📚 Documentation \n- [ ] New feature docs \n- [ ] Refactor existing docs \n- [ ] Release notes \n- [ ] "
-    validations:
-      required: false
+        - label: "🎯 Planning and Design"
+        - label: "🏎️ Dev Implementation"
+        - label: "🏁 Test Plan Executed"
+        - label: "🛩️ Documentation Updated"
+        - label: "🏟️ Peer / User Reviewed"
+        - label: "🏆 Validated and Accepted"
   - type: textarea
     id: to_do
     attributes:
-      label: To Do
+      label: ✅ To Do
       description: A list of to do items for this ticket
-      value: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
+      placeholder: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
     validations:
       required: false
+  - type: textarea
+    id: scope
+    attributes:
+      label: 🔭 Scope
+      description: "Explicitly, what is in and out of scope for this ticket"
+      value: "🏎️ In Scope: \n - [ ] ... \n \n 🙅‍♂️ Out of Scope: \n - [ ] ... \n \n "
   - type: textarea
     id: description
     attributes:
-      label: Task Description
+      label: 🧰 Work Description
       description: "Describe what needs to be done"
-      placeholder: "What to do"
+      placeholder: "In as much detail as possible, explain the work to be done. Include any architecture or design notes and the sequencing of each thing that needs to be done"
+  - type: textarea
+    id: ac
+    attributes:
+      label: ⚖️ Acceptance Criteria
+      value: "✨ Features: \n- [ ] ... \n \n 📚 Documentation: \n- [ ] ... \n "
+    validations:
+      required: false
   - type: textarea
     id: test_plan
     attributes:
-      label: Test Plan
+      label: 🎢 Test Plan
       description: "Describe how this will be tested"
       placeholder: "Include manual and automated testing"
-    validations:
-      required: false
+  - type: textarea
+    id: release_notes
+    attributes:
+      label: 🎆 Release Notes
+      description: "Describe the changes, any new features, and other must know facts for users"
+      placeholder: "This is how this awesome new feature works..."
   - type: input
     id: estimate
     attributes:
-      label: Sizing
+      label: 🐘 Sizing
       description: Estimate the time and effort required
       placeholder: "0"
   - type: checkboxes
