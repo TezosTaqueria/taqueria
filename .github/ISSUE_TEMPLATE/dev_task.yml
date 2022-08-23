@@ -72,7 +72,7 @@ body:
   - type: input
     id: estimate
     attributes:
-      label: 🐘 Sizing
+      label: 🦄 Sizing
       description: Estimate the time and effort required
       placeholder: "0"
   - type: checkboxes
