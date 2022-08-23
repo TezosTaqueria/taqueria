@@ -1,4 +1,4 @@
-name: 🌮 Epic|Feature 
+name: 🌋 Epic|Feature 
 description: Product feature or epic 
 title: "🌋 E|F ➾ "
 labels: ["feature", "triage"]
@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-          # ◢▅◣◥▅◤◢▅◣   🏔️ 🌋 ⛰️   Epic | Feature   ⛰️ 🌋 🏔️ 	 ◢▅◣◥▅◤◢▅◣    
+          # ◢▅◣◥▅◤◢▅◣ 🏔️🌋⛰️ Epic|Feature ⛰️🌋🏔️ ◢▅◣◥▅◤◢▅◣    
 
           ## 🛑 Sanity Check: Does this really need it's own ticket?
  
@@ -58,7 +58,7 @@ body:
     attributes:
       label: 🔭 Scope
       description: "Explicitly, what is in and out of scope for this ticket"
-      value: "🏎️ In Scope: \n - [ ] ... \n \n 🙅‍♂️ Out of Scope: \n - [ ] ... \n \n "
+      value: "🏎️ In Scope: \n- ... \n \n 🙅‍♂️ Out of Scope: \n- ... \n \n "
   - type: textarea
     id: ac
     attributes:
@@ -78,7 +78,7 @@ body:
   - type: input
     id: estimate
     attributes:
-      label: 🐘 Sizing
+      label: 🦄 Sizing
       description: Estimate the time and effort required
       placeholder: "0"
   - type: checkboxes
