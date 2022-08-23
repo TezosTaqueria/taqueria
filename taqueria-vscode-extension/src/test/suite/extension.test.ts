@@ -41,39 +41,19 @@ describe('Extension Test Suite', async () => {
 		vscode.window.showInformationMessage('Start all tests.');
 	});
 
-	it('Verify that Taqueria Initiate will init new taquifed  project ', async () => {
+	it('Verify that Taqueria commands appears on the command palette ', async () => {
 		await vscode.commands.getCommands(true).then(allCommands => {
 			const taqCommands = allCommands.filter(command => command.toLowerCase().includes('taq'));
 			assert.notEqual(taqCommands, undefined);
 		});
-
-		// Taq init won't work due to this issue
-		// https://github.com/ecadlabs/taqueria/issues/939
-		// Currently we are just coping taqufied project
-		// await vscodeMock.commands.executeCommand('taqueria.init');
-		await fse.copySync(testProjectSource, testProjectDestination);
-
-		// Verify that taquified project has been created
-		console.log('break');
 	});
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/645
-	xit('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
-		// It creates another process
-		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
-		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
-		// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
+	it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+		fse.mkdirSync(testProjectDestination);
 
-		// Taq init won't work due to this issue
-		// https://github.com/ecadlabs/taqueria/issues/939
-		// Currently we are just coping taqufied project
-		// await vscodeMock.commands.executeCommand('taqueria.init');
+		await vscodeMock.commands.executeCommand('taqueria.init');
 
-		// Run ls command
-		// const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
-
-		// Need to find library to use contains or build it
-		// assert.notEqual(checkArtifact, undefined);
 		choosePlugin = '@taqueria/plugin-ligo';
 
 		await vscodeMock.commands.executeCommand('taqueria.install');
@@ -84,29 +64,19 @@ describe('Extension Test Suite', async () => {
 		// Execute ligo compile command
 		await vscodeMock.commands.executeCommand('taqueria.compile_ligo');
 
-		console.log('stop');
+		// Run ls command
+		const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
+
+		// Need to find library to use contains or build it
+		assert.notEqual(checkArtifact, undefined);
+
+		await fse.rmdir(testProjectDestination, { recursive: true });
 	});
 
-	// TODO: https://github.com/ecadlabs/taqueria/issues/645
-	xit('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
-		// It creates another process
-		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
-		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
-		// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
-		fse.rmdirSync(testProjectDestination, { recursive: true });
-
+	it('Verify that VS Code command Taqueria Compile will compile Archetype contract', async () => {
 		fse.mkdirSync(testProjectDestination);
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
-
-		// Run ls command
-		// const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
-
-		// Need to find library to use contains or build it
-		// assert.notEqual(checkArtifact, undefined);
-		choosePlugin = '@taqueria/plugin-flextesa';
-
-		await vscodeMock.commands.executeCommand('taqueria.install');
 
 		choosePlugin = '@taqueria/plugin-ligo';
 
@@ -114,6 +84,100 @@ describe('Extension Test Suite', async () => {
 
 		// Copy contract from data folder
 		await fse.copyFileSync(ligoContractFileSource, ligoContractFileDestination);
+
+		await vscodeMock.commands.executeCommand('taqueria.compile');
+
+		// Run ls command
+		const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
+
+		// Need to find library to use contains or build it
+		assert.notEqual(checkArtifact, undefined);
+
+		await fse.rmdir(testProjectDestination, { recursive: true });
+	});
+
+	it('Verify that Taqueria Jest plugin can be installed', async () => {
+		fse.mkdirSync(testProjectDestination);
+
+		await vscodeMock.commands.executeCommand('taqueria.init');
+
+		choosePlugin = '@taqueria/plugin-jest';
+
+		await vscodeMock.commands.executeCommand('taqueria.install');
+
+		// Run ls command
+		const checkArtifact = await exec(`ls ${testProjectDestination}\tests`);
+
+		// Need to find library to use contains or build it
+		assert.notEqual(checkArtifact, undefined);
+
+		await fse.rmdir(testProjectDestination, { recursive: true });
+	});
+
+	it('Verify that Taqueria Contract Types plugin can be installed', async () => {
+		fse.mkdirSync(testProjectDestination);
+
+		await vscodeMock.commands.executeCommand('taqueria.init');
+
+		choosePlugin = '@taqueria/plugin-contract-types';
+
+		await vscodeMock.commands.executeCommand('taqueria.install');
+
+		// Run ls command
+		const checkArtifact = await exec(`ls ${testProjectDestination}`);
+
+		// Need to find library to use contains or build it
+		assert.notEqual(checkArtifact, undefined);
+
+		await fse.rmdir(testProjectDestination, { recursive: true });
+	});
+
+	it('Verify that Taqueria Taquito plugin can be installed', async () => {
+		fse.mkdirSync(testProjectDestination);
+
+		await vscodeMock.commands.executeCommand('taqueria.init');
+
+		choosePlugin = '@taqueria/taquito';
+
+		await vscodeMock.commands.executeCommand('taqueria.install');
+
+		// Run ls command
+		const checkArtifact = await exec(`ls ${testProjectDestination}\tests`);
+
+		// Need to find library to use contains or build it
+		assert.notEqual(checkArtifact, undefined);
+
+		await fse.rmdir(testProjectDestination, { recursive: true });
+	});
+
+	it('Verify that Taqueria Tezos Client plugin can be installed', async () => {
+		fse.mkdirSync(testProjectDestination);
+
+		await vscodeMock.commands.executeCommand('taqueria.init');
+
+		choosePlugin = '@taqueria/tezos-client';
+
+		await vscodeMock.commands.executeCommand('taqueria.install');
+
+		await fse.rmdir(testProjectDestination, { recursive: true });
+	});
+
+	it('Verify that Taqueria SmartPy plugin can be installed', async () => {
+		fse.mkdirSync(testProjectDestination);
+
+		await vscodeMock.commands.executeCommand('taqueria.init');
+
+		choosePlugin = '@taqueria/smartpy';
+
+		await vscodeMock.commands.executeCommand('taqueria.install');
+
+		// Run ls command
+		const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
+
+		// Need to find library to use contains or build it
+		assert.notEqual(checkArtifact, undefined);
+
+		await fse.rmdir(testProjectDestination, { recursive: true });
 	});
 
 	after(async () => {
