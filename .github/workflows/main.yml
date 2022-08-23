@@ -35,7 +35,22 @@ jobs:
         filters: |
           vscode:
             - 'taqueria-vscode-extension/**'
-  
+
+  build-packages:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: "1.23.4"
+
+    - uses: actions/cache@v3
+      with:
+        path: ${{ matrix.cache_path }}
+        key: ${{ runner.os }}-deno-${{ hashFiles('**/deno-lock.json') }}
+
   build-binaries:
     permissions:
       contents: 'read'
