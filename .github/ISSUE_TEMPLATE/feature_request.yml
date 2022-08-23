@@ -58,7 +58,7 @@ body:
     attributes:
       label: 🔭 Scope
       description: "Explicitly, what is in and out of scope for this ticket"
-      value: "🏎️ In Scope: \n - [ ] ... \n \n 🙅‍♂️ Out of Scope: \n - [ ] ... \n \n "
+      value: "🏎️ In Scope: \n- ... \n \n 🙅‍♂️ Out of Scope: \n- ... \n \n "
   - type: textarea
     id: ac
     attributes:

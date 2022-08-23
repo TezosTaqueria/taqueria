@@ -1,4 +1,4 @@
-name: Dev Task
+name: 🚧 Dev Task
 description: Tickets for engineering and dev
 title: "🚧 Dev ➾ "
 labels: ["dev-task"]
@@ -43,7 +43,7 @@ body:
     attributes:
       label: 🔭 Scope
       description: "Explicitly, what is in and out of scope for this ticket"
-      value: "🏎️ In Scope: \n - [ ] ... \n \n 🙅‍♂️ Out of Scope: \n - [ ] ... \n \n "
+      value: "🏎️ In Scope: \n- ... \n \n 🙅‍♂️ Out of Scope: \n- ... \n \n "
   - type: textarea
     id: description
     attributes:
