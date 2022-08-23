@@ -420,15 +420,6 @@ jobs:
             !github.event.pull_request.head.repo.fork }}
     needs: 
       - build-binaries
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-      # - publish-contract-types-plugin-to-npm
-      - publish-archetype-plugin-to-npm
-      - publish-tezos-client-plugin-to-npm
-      - publish-state-plugin-to-npm
-      - publish-jest-plugin-to-npm
       - run-tests
       - vscode-extension-workflow
     steps:
@@ -553,9 +544,9 @@ jobs:
           draft: false
           prerelease: true
 
-      - name: Full release
+      - name: Final release
         if: ${{ needs.detect-minor-version.outputs.minor-version == 'even' }}
-        id: full-release
+        id: final-release
         uses: softprops/action-gh-release@v1
         with:
           files: |

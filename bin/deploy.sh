@@ -1,5 +1,6 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
+set -euo pipefail
+IFS=$'\n\t'
 
 # list of dependencies to be check
 dependencies=(
@@ -8,28 +9,13 @@ dependencies=(
 )
 
 packages=(
-    "taqueria-protocol"
-    "taqueria-sdk"
-    "taqueria-plugin-flextesa"
-    "taqueria-plugin-contract-types"
-    "taqueria-flextesa-manager"
-    "taqueria-plugin-ipfs-pinata"
-    "taqueria-plugin-jest"
-    "taqueria-plugin-smartpy"
-    "taqueria-vscode-extension"
-    "taqueria-plugin-ligo"
-    "taqueria-plugin-mock"
-    "taqueria-plugin-archetype"
-    "taqueria-state"
-    "taqueria-plugin-tezos-client"
-    "taqueria-plugin-taquito"
-    "taqueria-utils"
+    "taqueria-*"
 )
 
-echo "Runng \"npm version -ws $1\""
+echo "Running \"npm version -ws $1\""
 npm version -ws "$1"
 
-echo "Runng \"npm --no-git-tag-version version $1\""
+echo "Running \"npm --no-git-tag-version version $1\""
 npm version --no-git-tag-version "$1"
 
 echo "Updating dependencies..."
