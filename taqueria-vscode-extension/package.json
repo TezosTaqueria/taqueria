@@ -371,42 +371,42 @@
 			"explorer/context": [
 				{
 					"command": "taqueria.compile_smartpy",
-					"when": "resourceExtname == .py && resourceDirname =~ /^.*\/contracts$/",
+					"when": "resourceExtname == .py && resourceDirname =~ /^.*/contracts$/",
 					"group": "2_workspace"
 				},
 				{
 					"command": "taqueria.compile_smartpy",
-					"when": "resourceExtname == .ts && resourceDirname =~ /^.*\/contracts$/",
+					"when": "resourceExtname == .ts && resourceDirname =~ /^.*/contracts$/",
 					"group": "2_workspace"
 				},
 				{
 					"command": "taqueria.compile_ligo",
-					"when": "resourceExtname == .mligo && resourceDirname =~ /^.*\/contracts$/",
+					"when": "resourceExtname == .mligo && resourceDirname =~ /^.*/contracts$/",
 					"group": "2_workspace"
 				},
 				{
 					"command": "taqueria.compile_ligo",
-					"when": "resourceExtname == .ligo && resourceDirname =~ /^.*\/contracts$/",
+					"when": "resourceExtname == .ligo && resourceDirname =~ /^.*/contracts$/",
 					"group": "2_workspace"
 				},
 				{
 					"command": "taqueria.compile_ligo",
-					"when": "resourceExtname == .religo && resourceDirname =~ /^.*\/contracts$/",
+					"when": "resourceExtname == .religo && resourceDirname =~ /^.*/contracts$/",
 					"group": "2_workspace"
 				},
 				{
 					"command": "taqueria.compile_ligo",
-					"when": "resourceExtname == .jsligo && resourceDirname =~ /^.*\/contracts$/",
+					"when": "resourceExtname == .jsligo && resourceDirname =~ /^.*/contracts$/",
 					"group": "2_workspace"
 				},
 				{
 					"command": "taqueria.compile_archetype",
-					"when": "resourceExtname == .arl && resourceDirname =~ /^.*\/contracts$/",
+					"when": "resourceExtname == .arl && resourceDirname =~ /^.*/contracts$/",
 					"group": "2_workspace"
 				},
 				{
 					"command": "taqueria.originate",
-					"when": "resourceExtname == .tz && resourceDirname =~ /^.*\/artifacts(\/.*)*/",
+					"when": "resourceExtname == .tz && resourceDirname =~ /^.*/artifacts(/.*)*/",
 					"group": "2_workspace"
 				}
 			],
