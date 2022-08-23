@@ -1,4 +1,5 @@
 import {
+	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
 	getInitialStorage,
@@ -10,7 +11,7 @@ import {
 	sendErr,
 	sendJsonRes,
 } from '@taqueria/node-sdk';
-import { LikeAPromise, PluginResponse, Protocol, RequestArgs, TaqError } from '@taqueria/node-sdk/types';
+import { Protocol, RequestArgs } from '@taqueria/node-sdk/types';
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
@@ -48,22 +49,29 @@ const addOrigination = (parsedArgs: Opts, batch: Promise<WalletOperationBatch>) 
 		const contractData = await readFile(contractAbspath, 'utf-8');
 		return (await batch).withOrigination({
 			code: contractData,
-			storage: mapping.storage,
+			init: mapping.storage as any,
 		});
 	};
 
 const getValidContracts = async (parsedArgs: Opts) => {
 	const contracts = parsedArgs.contract
 		? [parsedArgs.contract]
-		: (await glob('**/*.tz', { cwd: parsedArgs.config.artifactsDir })) as string[];
+		: (await glob('*.tz', { cwd: parsedArgs.config.artifactsDir })) as string[];
 
 	return contracts.reduce(
-		(retval, filename) => {
-			const storage = getInitialStorage(parsedArgs)(filename);
-			if (storage === undefined || storage === null) throw (`No initial storage provided for ${filename}`);
-			return [...retval, { filename, storage }];
+		async (retval, filename) => {
+			const storage = await getInitialStorage(parsedArgs, filename);
+			if (storage === undefined || storage === null) {
+				sendErr(
+					`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
+						getCurrentEnvironment(parsedArgs)
+					}.storage["${filename}"]\nThe value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.\n`,
+				);
+				return retval;
+			}
+			return [...(await retval), { filename, storage }];
 		},
-		[] as ContractStorageMapping[],
+		Promise.resolve([] as ContractStorageMapping[]),
 	);
 };
 
@@ -108,6 +116,9 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
 
 const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: string) => {
 	const contracts = await getValidContracts(parsedArgs);
+	if (!contracts.length) {
+		return undefined;
+	}
 
 	const batch = await contracts.reduce(
 		(batch, contractMapping) =>
@@ -123,7 +134,19 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 		return await mapOpToContract(contracts, op, destination);
 	} catch (err) {
 		const error = (err as { message: string });
-		if (error.message) sendErr(error.message);
+		if (error.message) {
+			const msg = error.message;
+			if (/ENOTFOUND/.test(msg)) {
+				sendErr(msg + ' - The RPC URL may be invalid. Check your ./taq/config.json.');
+			} else if (/ECONNREFUSED/.test(msg)) {
+				sendErr(msg + ' - The RPC URL may be down or the sandbox is not running.');
+			} else {
+				sendErr(
+					msg
+						+ " - There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.",
+				);
+			}
+		}
 		return undefined;
 	}
 };
@@ -175,8 +198,9 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 							const first = getFirstAccountAlias(sandboxName, parsedArgs);
 							if (first) {
 								defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
+								// TODO: The error should be a warning, not an error. Descriptive string should not begin with 'Warning:'
 								sendErr(
-									`No default account has been configured for the sandbox called ${sandboxName}. Using the account called ${first} for origination.`,
+									`Warning: A default origination account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this origination.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
 								);
 							}
 						}
@@ -205,7 +229,7 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 		)
 		: [];
 
-export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
+export const originate = <T>(parsedArgs: Opts) => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 
 	if (!env) {

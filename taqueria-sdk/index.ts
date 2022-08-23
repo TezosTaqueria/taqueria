@@ -1,3 +1,5 @@
+import * as Config from '@taqueria/protocol/Config';
+import * as Contract from '@taqueria/protocol/Contract';
 import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
@@ -11,20 +13,23 @@ import * as PositionalArg from '@taqueria/protocol/PositionalArg';
 import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
+import * as SHA256 from '@taqueria/protocol/SHA256';
 import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import type { TaqError } from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
+import * as Template from '@taqueria/protocol/Template';
 import { exec, ExecException } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
-import { get } from 'stack-trace';
+import { getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
-import { InputSchema, Schema } from './types';
-import { Args, LikeAPromise, pluginDefiner, StdIO } from './types';
+import { PluginSchema } from './types';
+import { LikeAPromise, pluginDefiner, StdIO } from './types';
 
 // @ts-ignore interop issue. Maybe find a different library later
+import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
 import generateName from 'project-name-generator';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
@@ -132,22 +137,22 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 
 export const noop = () => {};
 
-const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> => {
+const parseArgs = <T extends RequestArgs.t>(unparsedArgs: string[]): LikeAPromise<T, TaqError> => {
 	if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
 		try {
 			const preprocessedArgs = preprocessArgs(unparsedArgs);
 			const argv = yargs(preprocessedArgs.slice(2)).argv;
 			const postprocessedArgs = postprocessArgs(argv);
 			const requestArgs = RequestArgs.from(postprocessedArgs);
-			return Promise.resolve(requestArgs);
+			return Promise.resolve(requestArgs as T);
 		} catch (previous) {
 			if (previous instanceof ZodError) {
 				return eager(
-					toFutureParseErr<RequestArgs.t>(previous, 'The plugin request arguments are invalid', unparsedArgs),
+					toFutureParseErr<T>(previous, 'The plugin request arguments are invalid', unparsedArgs),
 				);
 			}
 			return eager(
-				toFutureParseUnknownErr<RequestArgs.t>(
+				toFutureParseUnknownErr<T>(
 					previous,
 					'There was a problem trying to parse the plugin request arguments',
 					unparsedArgs,
@@ -159,12 +164,12 @@ const parseArgs = (unparsedArgs: Args): LikeAPromise<RequestArgs.t, TaqError> =>
 };
 
 // A hack to protect all hex from being messed by yargs
-const preprocessArgs = (args: Args): Args => {
+const preprocessArgs = (args: string[]): string[] => {
 	return args.map(arg => /^0x[0-9a-fA-F]+$/.test(arg) ? '___' + arg + '___' : arg);
 };
 
 // A hack to protect all hex from being messed by yargs
-const postprocessArgs = (args: Args): Record<string, unknown> => {
+const postprocessArgs = (args: string[]): Record<string, unknown> => {
 	const postprocessedArgs = Object.entries(args).map((
 		[key, val],
 	) => [
@@ -186,14 +191,19 @@ const postprocessArgs = (args: Args): Record<string, unknown> => {
 	return groupedArgs;
 };
 
-const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => string): Schema => {
-	const inputSchema: InputSchema = definer(i18n);
+const parseSchema = <T extends RequestArgs.t>(
+	i18n: i18n,
+	definer: pluginDefiner,
+	defaultPluginName: string,
+	requestArgs: T,
+): PluginSchema.t => {
+	const inputSchema: PluginSchema.RawPluginSchema = definer(requestArgs, i18n);
 
 	const { proxy } = inputSchema;
 
-	const pluginInfo = PluginInfo.create({
+	const pluginInfo = PluginSchema.create({
 		...inputSchema,
-		name: inputSchema.name ?? inferPluginName(),
+		name: inputSchema.name ?? defaultPluginName,
 	});
 
 	return {
@@ -202,16 +212,38 @@ const parseSchema = (i18n: i18n, definer: pluginDefiner, inferPluginName: () => 
 	};
 };
 
-const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
-	async (requestArgs: RequestArgs.t) => {
+const getResponse = <T extends RequestArgs.t>(definer: pluginDefiner, defaultPluginName: string) =>
+	async (requestArgs: T) => {
 		const { taqRun } = requestArgs;
 		const i18n = await load();
-		const schema = parseSchema(i18n, definer, inferPluginName);
+		const schema = parseSchema(i18n, definer, defaultPluginName, requestArgs);
 		try {
 			switch (taqRun) {
 				case 'pluginInfo':
 					const output = {
 						...schema,
+						templates: schema.templates
+							? schema.templates.map(
+								(template: Template.t) => {
+									const handler = typeof template.handler === 'function' ? 'function' : template.handler;
+									return {
+										...template,
+										handler,
+									};
+								},
+							)
+							: [],
+						tasks: schema.tasks
+							? schema.tasks.map(
+								(task: Task.t) => {
+									const handler = typeof task.handler === 'function' ? 'function' : task.handler;
+									return {
+										...task,
+										handler,
+									};
+								},
+							)
+							: [],
 						proxy: schema.proxy ? true : false,
 						checkRuntimeDependencies: schema.checkRuntimeDependencies ? true : false,
 						installRuntimeDependencies: schema.installRuntimeDependencies ? true : false,
@@ -232,6 +264,25 @@ const getResponse = (definer: pluginDefiner, inferPluginName: () => string) =>
 						message: i18n.__('proxyNotSupported'),
 						context: requestArgs,
 					});
+				case 'proxyTemplate': {
+					const proxyArgs = RequestArgs.createProxyTemplateRequestArgs(requestArgs);
+					const template = schema.templates?.find(tmpl => tmpl.template === proxyArgs.template);
+					if (template) {
+						if (typeof template.handler === 'function') {
+							return template.handler(proxyArgs);
+						}
+						return Promise.reject({
+							errCode: 'E_NOT_SUPPORTED',
+							message: i18n.__('proxyNotSupported'),
+							context: requestArgs,
+						});
+					}
+					return Promise.reject({
+						errCode: 'E_INVALID_TEMPLATE',
+						message: i18n.__('invalidTemplate'),
+						context: requestArgs,
+					});
+				}
 				case 'checkRuntimeDependencies':
 					return sendAsyncJson(
 						schema.checkRuntimeDependencies
@@ -336,14 +387,20 @@ export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
 /**
  * Gets the initial storage for the contract
  */
-export const getInitialStorage = (parsedArgs: RequestArgs.t) =>
-	(contractFilename: string) => {
-		const env = getCurrentEnvironmentConfig(parsedArgs);
-
-		return env
-			? env.storage && env.storage[contractFilename]
-			: undefined;
-	};
+export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilename: string) => {
+	const env = getCurrentEnvironmentConfig(parsedArgs);
+	if (env && env.storage && env.storage[contractFilename]) {
+		const storagePath: string = env.storage[contractFilename];
+		try {
+			const content = await readFile(storagePath, { encoding: 'utf-8' });
+			return content;
+		} catch (err) {
+			sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
+			return undefined;
+		}
+	}
+	return undefined;
+};
 
 /**
  * Gets the default account associated with a sandbox
@@ -362,35 +419,78 @@ export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>
 		return undefined;
 	};
 
-const inferPluginName = (stack: ReturnType<typeof get>): () => string => {
-	// The definer function can provide a name for the plugin in its schema, or it
-	// can omit it and we infer it from the package.json file.
-	// To do so, we need to get the directory for the plugin from the call stack
-	const pluginManifest = stack.reduce(
-		(retval: null | string, callsite) => {
-			const callerFile = callsite.getFileName()?.replace(/^file:\/\//, '');
-			return retval || (
-					callerFile.includes('taqueria-sdk')
-					|| callerFile.includes('taqueria-node-sdk')
-					|| callerFile.includes('@taqueria/node-sdk')
-				)
-				? retval
-				: join(dirname(callerFile), 'package.json');
-		},
-		null,
+export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
+	if (!config.contracts) return [];
+	return Object.values(config.contracts).reduce(
+		(retval: string[], contract) =>
+			regex.test(contract.sourceFile)
+				? [...retval, contract.sourceFile]
+				: retval,
+		[],
 	);
+};
 
-	return () =>
-		!pluginManifest
-			? generateName().dashed
-			: getNameFromPluginManifest(pluginManifest);
+const joinPaths = (...paths: string[]): string => paths.join('/');
+
+const newContract = async (sourceFile: string, parsedArgs: RequestArgs.t) => {
+	const contractPath = joinPaths(parsedArgs.projectDir, parsedArgs.config.contractsDir, sourceFile);
+	try {
+		const contents = await readFile(contractPath, { encoding: 'utf-8' });
+		const hash = await SHA256.toSHA256(contents);
+		return await eager(Contract.of({
+			sourceFile,
+			hash,
+		}));
+	} catch (err) {
+		await Promise.reject(`Could not read ${contractPath}`);
+	}
+};
+
+const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): Promise<void> => {
+	try {
+		const config = await readJsonFile<Config.t>(parsedArgs.config.configFile);
+		if (config.contracts && config.contracts[sourceFile]) {
+			await sendAsyncErr(`${sourceFile} has already been registered`);
+		} else {
+			const contract = await newContract(sourceFile, parsedArgs);
+			const contracts = config.contracts || {};
+			const updatedConfig = {
+				...config,
+				contracts: {
+					...contracts,
+					...Object.fromEntries([[sourceFile, contract]]),
+				},
+			};
+			await writeJsonFile(parsedArgs.config.configFile)(updatedConfig);
+		}
+	} catch (err) {
+		if (err) console.error('Error registering contract:', err);
+	}
+};
+
+export const stringToSHA256 = (s: string) => SHA256.toSHA256(s);
+
+const getPackageName = () => {
+	const stack = getSync({
+		filter: (stackFrame => {
+			const filename = stackFrame.getFileName();
+			return !filename.includes('taqueria-sdk') && !filename.includes('@taqueria/node-sdk');
+		}),
+	});
+	const frame = stack.shift();
+	if (frame) {
+		const filename = frame.getFileName().replace(/^file:\/\//, '').replace(/^file:/, '');
+		const pluginManifest = join(dirname(filename), 'package.json');
+		return getNameFromPluginManifest(pluginManifest);
+	}
+	return generateName().dashed;
 };
 
 export const Plugin = {
-	create: (definer: pluginDefiner, unparsedArgs: Args) => {
-		const stack = get();
-		return parseArgs(unparsedArgs)
-			.then(getResponse(definer, inferPluginName(stack)))
+	create: async <Args extends RequestArgs.t>(definer: pluginDefiner, unparsedArgs: string[]) => {
+		const packageName = getPackageName();
+		return parseArgs<Args>(unparsedArgs)
+			.then(getResponse(definer, packageName))
 			.catch((err: unknown) => {
 				if (err) console.error(err);
 				process.exit(1);
@@ -410,4 +510,9 @@ export {
 	SandboxAccountConfig,
 	SandboxConfig,
 	Task,
+	Template,
+};
+
+export const experimental = {
+	registerContract,
 };

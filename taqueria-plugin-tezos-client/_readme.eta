@@ -10,7 +10,7 @@ In future releases, this plugin will be extended to support more Tezos Client fe
 
 - Node.js v16 or later
 - Docker v0.8.2 or later
-- Taqueria v0.0.6 or later
+- Taqueria v0.8.0 or later
 - [Taqueria Flextesa plugin](../plugin-flextesa) v0.2.1 or later
 
 <%~ it.noteOpenAdmonition %>

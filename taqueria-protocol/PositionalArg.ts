@@ -13,19 +13,11 @@ export const rawSchema = z.object({
 		[z.literal('string'), z.literal('number'), z.literal('boolean')],
 		{ description: 'Positional Arg Datatype' },
 	).optional(),
+	required: z.boolean().optional(),
 }).describe('Positional Arg');
 
-const internalSchema = z.object({
+const internalSchema = rawSchema.extend({
 	placeholder: HumanReadableIdentifier.schemas.schema.describe('Positional Arg Placeholder'),
-	description: z.string({ description: 'Positional Arg Description' }).min(1),
-	defaultValue: z.union(
-		[z.string(), z.number(), z.boolean()],
-		{ description: 'Positional Arg Default Value' },
-	).optional(),
-	type: z.union(
-		[z.literal('string'), z.literal('number'), z.literal('boolean')],
-		{ description: 'Positional Arg Datatype' },
-	).optional(),
 }).describe('Positional Arg');
 
 type RawInput = z.infer<typeof rawSchema>;

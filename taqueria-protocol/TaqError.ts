@@ -19,8 +19,11 @@ export type ErrorType =
 	| 'E_PARSE'
 	| 'E_PARSE_UNKNOWN'
 	| 'E_INVALID_ARCH'
+	| 'E_CONTRACT_REGISTERED'
+	| 'E_CONTRACT_NOT_REGISTERED'
 	| 'E_NO_PROVISIONS'
-	| 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE';
+	| 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE'
+	| 'E_EXEC';
 
 export interface TaqError {
 	readonly kind: ErrorType;
