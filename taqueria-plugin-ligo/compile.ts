@@ -1,6 +1,5 @@
-import { execCmd, getArch, getContracts, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
+import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
-import { mapOperationsToPlugins } from '@taqueria/protocol/EphemeralState';
 import { readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 
@@ -41,8 +40,7 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 			};
 		})
 		.catch(err => {
-			sendErr(' ');
-			sendErr(err.message.split('\n').slice(1).join('\n'));
+			sendErr(err.message.replace(/Command failed.+?\n/, ''));
 			return Promise.resolve({
 				contract: sourceFile,
 				artifact: 'Not compiled',
@@ -85,8 +83,7 @@ const compileStorage = (parsedArgs: Opts, sourceFile: string) =>
 				};
 			})
 			.catch(err => {
-				sendErr(' ');
-				sendErr(err.message.split('\n').slice(1).join('\n'));
+				sendErr(err.message.replace(/Command failed.+?\n/, ''));
 				return Promise.resolve({
 					contract: sourceFile,
 					artifact: 'Not compiled',
@@ -110,7 +107,15 @@ const compileStorages = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 			storageNames
 				? Promise.all(storageNames.map(compileStorage(parsedArgs, sourceFile)))
 				: Promise.resolve([])
-		);
+		)
+		.catch(err => {
+			sendErr(' ');
+			sendErr(err.message);
+			return Promise.resolve([{
+				contract: sourceFile,
+				artifact: 'No storages compiled',
+			}]);
+		});
 
 // Get the contract name that the parameter file is associated with
 // e.g. If sourceFile is token.parameters.mligo, then it'll return token.mligo
@@ -148,8 +153,7 @@ const compileParameter = (parsedArgs: Opts, sourceFile: string) =>
 				};
 			})
 			.catch(err => {
-				sendErr(' ');
-				sendErr(err.message.split('\n').slice(1).join('\n'));
+				sendErr(err.message.replace(/Command failed.+?\n/, ''));
 				return Promise.resolve({
 					contract: sourceFile,
 					artifact: 'Not compiled',
@@ -173,7 +177,15 @@ const compileParameters = (parsedArgs: Opts, sourceFile: string): Promise<TableR
 			parameterNames
 				? Promise.all(parameterNames.map(compileParameter(parsedArgs, sourceFile)))
 				: Promise.resolve([])
-		);
+		)
+		.catch(err => {
+			sendErr(' ');
+			sendErr(err.message);
+			return Promise.resolve([{
+				contract: sourceFile,
+				artifact: 'No parameters compiled',
+			}]);
+		});
 
 const mergeArtifactsOutput = (sourceFile: string) =>
 	(tableRows: TableRow[]): TableRow[] => {
