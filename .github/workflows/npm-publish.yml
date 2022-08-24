@@ -32,6 +32,12 @@ jobs:
           registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
 
+      - name: restore common utils cache
+        uses: actions/cache@v3
+        with:
+          path: ./taqueria-common-utils
+          key: common-utils-${{ hashFiles('./taqueria-common-utils/package.json', './taqueria-common-utils/common-utils.ts') }}
+
       # If the package has a dependency on @taqueria/node-sdk or @taqueria/protocol and the dependency version matches the package version then install the "next" version tag.
       # - name: Install dependencies for a pre-release 
       #   if: ${{ github.event.release.prerelease }}
