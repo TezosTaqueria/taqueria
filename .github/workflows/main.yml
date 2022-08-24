@@ -37,6 +37,26 @@ jobs:
           vscode:
             - 'taqueria-vscode-extension/**'
 
+  detect-minor-version:
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/v') &&
+            !github.event.pull_request.head.repo.fork }}
+    outputs:
+      minor-version: ${{ steps.check-minor-version.outputs.result }}
+    steps:
+    - name: Get version
+      id: get-version
+      uses: battila7/get-version-action@v2
+
+    - name: Check minor version
+      id: check-minor-version
+      run: |
+        if [ $(( ${{ steps.get-version.outputs.minor }} % 2 )) -eq 0 ]; then
+          echo "::set-output name=result::even"
+        else
+          echo "::set-output name=result::odd"
+        fi
+
   build-and-cache-packages:
     runs-on: ubuntu-latest
     steps:
@@ -429,15 +449,6 @@ jobs:
             !github.event.pull_request.head.repo.fork }}
     needs: 
       - build-binaries
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-      # - publish-contract-types-plugin-to-npm
-      - publish-archetype-plugin-to-npm
-      - publish-tezos-client-plugin-to-npm
-      - publish-state-plugin-to-npm
-      - publish-jest-plugin-to-npm
       - run-tests
       - vscode-extension-workflow
     steps:
