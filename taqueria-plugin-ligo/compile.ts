@@ -163,24 +163,24 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile);
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
 
-	const storagesFilename = `${removeExt(sourceFile)}.storages${extractExt(sourceFile)}`;
-	const parametersFilename = `${removeExt(sourceFile)}.parameters${extractExt(sourceFile)}`;
-	const storageFilePath = `${parsedArgs.config.contractsDir}/${storagesFilename}`;
-	const parameterFilePath = `${parsedArgs.config.contractsDir}/${parametersFilename}`;
+	const storagesFile = `${removeExt(sourceFile)}.storages${extractExt(sourceFile)}`;
+	const parametersFile = `${removeExt(sourceFile)}.parameters${extractExt(sourceFile)}`;
+	const storageFilename = getInputFilename(parsedArgs, storagesFile);
+	const parameterFilename = getInputFilename(parsedArgs, parametersFile);
 
-	const storageCompileResult = await access(storageFilePath)
-		.then(() => compileExprs(parsedArgs, storagesFilename, 'storage'))
+	const storageCompileResult = await access(storageFilename)
+		.then(() => compileExprs(parsedArgs, storagesFile, 'storage'))
 		.catch(() =>
 			sendWarn(
-				`Note: storage file associated with "${sourceFile}" can't be found. You should create a file "${storagesFilename}" and define initial storage values as a list of LIGO variable definitions. e.g. "let STORAGE_NAME: storage = LIGO_EXPR" for CameLigo`,
+				`Note: storage file associated with "${sourceFile}" can't be found. You should create a file "${storagesFile}" and define initial storage values as a list of LIGO variable definitions. e.g. "let STORAGE_NAME: storage = LIGO_EXPR" for CameLigo`,
 			)
 		);
 
-	const parameterCompileResult = await access(parameterFilePath)
-		.then(() => compileExprs(parsedArgs, parametersFilename, 'parameter'))
+	const parameterCompileResult = await access(parameterFilename)
+		.then(() => compileExprs(parsedArgs, parametersFile, 'parameter'))
 		.catch(() =>
 			sendWarn(
-				`Note: parameter file associated with "${sourceFile}" can't be found. You should create a file "${parametersFilename}" and define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: parameter = LIGO_EXPR" for CameLigo`,
+				`Note: parameter file associated with "${sourceFile}" can't be found. You should create a file "${parametersFile}" and define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: parameter = LIGO_EXPR" for CameLigo`,
 			)
 		);
 
