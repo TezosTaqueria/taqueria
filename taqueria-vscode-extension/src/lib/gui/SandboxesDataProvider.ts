@@ -1,18 +1,26 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
-import { SpawnSyncOptionsWithBufferEncoding } from 'child_process';
 import { randomInt } from 'crypto';
 import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 import { HasRefresh, mapAsync, OutputLevels, VsCodeHelper } from '../helpers';
 import { getRunningContainerNames } from '../pure';
+import * as Util from '../pure';
+import { CachedSandboxState } from './CachedSandboxState';
+import { ObservableConfig } from './ObservableConfig';
+import { TzKtHead } from './SandboxModels';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 
 export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	implements vscode.TreeDataProvider<SandboxTreeItemBase>, HasRefresh
 {
-	constructor(helper: VsCodeHelper) {
+	constructor(
+		helper: VsCodeHelper,
+		private readonly observableConfig: ObservableConfig,
+	) {
 		super(helper);
 	}
+
+	private sandboxStates: Record<string, CachedSandboxState> = {};
 
 	refreshLevelInterval: NodeJS.Timer | undefined;
 	private sandboxTreeItems: SandboxTreeItem[] | undefined;
@@ -58,10 +66,11 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private async getSandboxItems() {
-		const [{ config, pathToDir }, runningContainers] = await Promise.all([
-			this.getConfig(),
-			getRunningContainerNames(),
-		]);
+		const runningContainers = await getRunningContainerNames();
+		const { config, pathToDir } = this.observableConfig.currentConfig;
+
+		await this.createSandboxStates(config, pathToDir);
+
 		if (!pathToDir || !config?.config?.sandbox) {
 			return [];
 		}
@@ -85,6 +94,37 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			await this.updateSandboxInfo();
 		}, 5000);
 		return items;
+	}
+
+	async createSandboxStates(config: Util.TaqifiedDir | undefined, projectDir: string | undefined) {
+		if (!config?.config?.sandbox || !projectDir) {
+			return;
+		}
+		for (let name of this.getSandboxNames(config)) {
+			if (this.sandboxStates[name]) {
+				continue;
+			}
+			const environmentName = this.getEnvironmentNames(config)[0];
+			try {
+				const cached = new CachedSandboxState(
+					this.helper,
+					name,
+					await this.getContainerName(name, environmentName, projectDir),
+				);
+				cached.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, name));
+				this.sandboxStates[name] = cached;
+			} catch (e: unknown) {
+				this.helper.notifyAndLogError('Error in signalR:', e);
+			}
+		}
+	}
+	onHeadFromTzKt(data: TzKtHead | undefined, sandboxName: string): void {
+		const treeItem = this.sandboxTreeItems?.find(item => item.sandboxName === sandboxName);
+		if (!treeItem) {
+			return;
+		}
+		treeItem.indexerLevel = data?.level;
+		this.refreshItem(treeItem);
 	}
 
 	private async getAccountOperations(accountItem: SandboxImplicitAccountTreeItem | SmartContractChildrenTreeItem) {
@@ -117,13 +157,6 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				this.helper.showLog(OutputLevels.warn, `${e}`);
 			}
 
-			try {
-				const tzKtHeadResponse = await fetch(`http://localhost:5000/v1/head`);
-				const tzKtHead = await tzKtHeadResponse.json();
-				sandbox.indexerLevel = (tzKtHead as any).level;
-			} catch (e: unknown) {
-				this.helper.showLog(OutputLevels.warn, `${e}`);
-			}
 			this.refreshItem(sandbox);
 		}
 	}

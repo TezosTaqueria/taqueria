@@ -14,6 +14,7 @@ import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
 import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
+import { ObservableConfig } from './gui/ObservableConfig';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
 import {
 	OperationTreeItem,
@@ -1147,6 +1148,22 @@ export class VsCodeHelper {
 		}
 	}
 
+	private _taqFolderWatcher: api.FileSystemWatcher | undefined;
+	private _configWatcher: api.FileSystemWatcher | undefined;
+	private _stateWatcher: api.FileSystemWatcher | undefined;
+
+	get taqFolderWatcher() {
+		return this._taqFolderWatcher;
+	}
+
+	get configWatcher() {
+		return this._configWatcher;
+	}
+
+	get stateWatcher() {
+		return this._stateWatcher;
+	}
+
 	createWatcherIfNotExists(
 		projectDir: string,
 		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher[]) => void,
@@ -1160,9 +1177,12 @@ export class VsCodeHelper {
 				this.logAllNestedErrors(error);
 			}
 			try {
-				const folderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq'));
+				const taqFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq'));
+				this._taqFolderWatcher = taqFolderWatcher;
 				const configWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+				this._configWatcher = configWatcher;
 				const stateWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/state.json'));
+				this._stateWatcher = stateWatcher;
 
 				const contractsFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts'));
 				const contractsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts/*'));
@@ -1172,9 +1192,9 @@ export class VsCodeHelper {
 				const artifactsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'artifacts/**/*.tz'));
 
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
-				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
-				folderWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
-				folderWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates());
+				taqFolderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
+				taqFolderWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
+				taqFolderWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates());
 
 				configWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
 				configWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
@@ -1203,7 +1223,7 @@ export class VsCodeHelper {
 				testsWatcher.onDidDelete(_ => this.testDataProvider?.refresh());
 
 				return [
-					folderWatcher,
+					taqFolderWatcher,
 					configWatcher,
 					stateWatcher,
 					contractsFolderWatcher,
@@ -1230,12 +1250,14 @@ export class VsCodeHelper {
 	private testDataProvider?: TestDataProvider;
 	private systemCheckDataProvider?: SystemCheckDataProvider;
 	private systemCheckTreeView?: api.TreeView<SystemCheckTreeItem>;
+	private observableConfig!: ObservableConfig;
 
-	registerDataProviders() {
+	async registerDataProviders() {
+		this.observableConfig = await ObservableConfig.create(this);
 		this.registerDataProvider('taqueria-plugins', new PluginsDataProvider(this));
 		this.sandboxesDataProvider = this.registerDataProvider(
 			'taqueria-sandboxes',
-			new SandboxesDataProvider(this),
+			new SandboxesDataProvider(this, this.observableConfig),
 		);
 		this.registerDataProvider('taqueria-environments', new EnvironmentsDataProvider(this));
 		this.testDataProvider = this.registerDataProvider('taqueria-tests', new TestDataProvider(this));
