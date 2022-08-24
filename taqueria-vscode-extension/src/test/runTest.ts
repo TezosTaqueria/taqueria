@@ -17,23 +17,23 @@ async function main() {
 
 		fse.mkdirSync(testProjectDestination);
 
-		const launchArgs = [`${testProjectDestination}/`, '--disable-extension'];
+		const launchArgs = [`${testProjectDestination}/`, '--disable-extensions'];
 
 		// One of the option to run tests for each file and create folder separately
 
 		// Download VS Code, unzip it and run the integration test
 		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs });
 
-		fse.rmdirSync(vsCodeUserData, { recursive: true });
-		// fse.rmdirSync(path.resolve(testProjectDestination), {recursive: true})
+		await fse.rm(vsCodeUserData, { recursive: true });
+		// await fse.rm(path.resolve(testProjectDestination), {recursive: true})
 	} catch (err) {
 		console.error('Failed to run tests');
 
 		if (fse.existsSync(vsCodeUserData)) {
-			fse.rmdirSync(vsCodeUserData, { recursive: true });
+			await fse.rm(vsCodeUserData, { recursive: true });
 		}
 		if (fse.existsSync(testProjectDestination)) {
-			fse.rmdirSync(testProjectDestination, { recursive: true });
+			await fse.rm(testProjectDestination, { recursive: true });
 		}
 		process.exit(1);
 	}

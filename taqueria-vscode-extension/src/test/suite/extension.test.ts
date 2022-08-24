@@ -50,7 +50,7 @@ describe('Extension Test Suite', async () => {
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/645
 	it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
-		fse.mkdirSync(testProjectDestination);
+		fse.mkdirSync(testProjectDestination, { recursive: true });
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
@@ -70,11 +70,11 @@ describe('Extension Test Suite', async () => {
 		// Need to find library to use contains or build it
 		assert.notEqual(checkArtifact, undefined);
 
-		await fse.rmdir(testProjectDestination, { recursive: true });
+		await fse.rm(testProjectDestination, { recursive: true });
 	});
 
 	it('Verify that VS Code command Taqueria Compile will compile Archetype contract', async () => {
-		fse.mkdirSync(testProjectDestination);
+		fse.mkdirSync(testProjectDestination, { recursive: true });
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
@@ -93,11 +93,11 @@ describe('Extension Test Suite', async () => {
 		// Need to find library to use contains or build it
 		assert.notEqual(checkArtifact, undefined);
 
-		await fse.rmdir(testProjectDestination, { recursive: true });
+		await fse.rm(testProjectDestination, { recursive: true });
 	});
 
 	it('Verify that Taqueria Jest plugin can be installed', async () => {
-		fse.mkdirSync(testProjectDestination);
+		fse.mkdirSync(testProjectDestination, { recursive: true });
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
@@ -111,11 +111,11 @@ describe('Extension Test Suite', async () => {
 		// Need to find library to use contains or build it
 		assert.notEqual(checkArtifact, undefined);
 
-		await fse.rmdir(testProjectDestination, { recursive: true });
+		await fse.rm(testProjectDestination, { recursive: true });
 	});
 
 	it('Verify that Taqueria Contract Types plugin can be installed', async () => {
-		fse.mkdirSync(testProjectDestination);
+		fse.mkdirSync(testProjectDestination, { recursive: true });
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
@@ -129,11 +129,11 @@ describe('Extension Test Suite', async () => {
 		// Need to find library to use contains or build it
 		assert.notEqual(checkArtifact, undefined);
 
-		await fse.rmdir(testProjectDestination, { recursive: true });
+		await fse.rm(testProjectDestination, { recursive: true });
 	});
 
 	it('Verify that Taqueria Taquito plugin can be installed', async () => {
-		fse.mkdirSync(testProjectDestination);
+		fse.mkdirSync(testProjectDestination, { recursive: true });
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
@@ -147,11 +147,11 @@ describe('Extension Test Suite', async () => {
 		// Need to find library to use contains or build it
 		assert.notEqual(checkArtifact, undefined);
 
-		await fse.rmdir(testProjectDestination, { recursive: true });
+		await fse.rm(testProjectDestination, { recursive: true });
 	});
 
 	it('Verify that Taqueria Tezos Client plugin can be installed', async () => {
-		fse.mkdirSync(testProjectDestination);
+		fse.mkdirSync(testProjectDestination, { recursive: true });
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
@@ -159,11 +159,11 @@ describe('Extension Test Suite', async () => {
 
 		await vscodeMock.commands.executeCommand('taqueria.install');
 
-		await fse.rmdir(testProjectDestination, { recursive: true });
+		await fse.rm(testProjectDestination, { recursive: true });
 	});
 
 	it('Verify that Taqueria SmartPy plugin can be installed', async () => {
-		fse.mkdirSync(testProjectDestination);
+		fse.mkdirSync(testProjectDestination, { recursive: true });
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
@@ -177,12 +177,16 @@ describe('Extension Test Suite', async () => {
 		// Need to find library to use contains or build it
 		assert.notEqual(checkArtifact, undefined);
 
-		await fse.rmdir(testProjectDestination, { recursive: true });
+		await fse.rm(testProjectDestination, { recursive: true });
 	});
 
 	after(async () => {
-		await fse.rmdir(testProjectDestination, { recursive: true });
+		try {
+			await fse.rm(testProjectDestination, { recursive: true });
+		} catch {
+			// ignored
+		}
 		// Uncomment for local development
-		// await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
+		// await fse.rm(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
 	});
 });
