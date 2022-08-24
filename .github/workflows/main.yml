@@ -35,7 +35,27 @@ jobs:
         filters: |
           vscode:
             - 'taqueria-vscode-extension/**'
-  
+
+  detect-minor-version:
+    runs-on: ubuntu-latest
+    if: ${{ startsWith(github.ref, 'refs/tags/v') &&
+            !github.event.pull_request.head.repo.fork }}
+    outputs:
+      minor-version: ${{ steps.check-minor-version.outputs.result }}
+    steps:
+    - name: Get version
+      id: get-version
+      uses: battila7/get-version-action@v2
+
+    - name: Check minor version
+      id: check-minor-version
+      run: |
+        if [ $(( ${{ steps.get-version.outputs.minor }} % 2 )) -eq 0 ]; then
+          echo "::set-output name=result::even"
+        else
+          echo "::set-output name=result::odd"
+        fi
+
   build-binaries:
     permissions:
       contents: 'read'
@@ -128,26 +148,26 @@ jobs:
         run: |
           echo "::set-output name=${{ matrix.os_short }}::https://storage.googleapis.com/taqueria-artifacts/${{ steps.upload-file.outputs.uploaded }}"
 
-  # publish-protocol-to-npm:
-  #   if: ${{ !github.event.pull_request.head.repo.fork }}
-  #   uses: ./.github/workflows/npm-publish.yml
-  #   with:
-  #     dir: taqueria-protocol
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-protocol-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-protocol
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  # publish-sdk-to-npm:
-  #   if: ${{ !github.event.pull_request.head.repo.fork }}
-  #   needs: publish-protocol-to-npm
-  #   uses: ./.github/workflows/npm-publish.yml
-  #   with:
-  #     dir: taqueria-sdk
-  #   secrets:
-  #     NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+  publish-sdk-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    needs: publish-protocol-to-npm
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-sdk
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-ligo-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-ligo
@@ -156,7 +176,7 @@ jobs:
   
   publish-smartpy-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-smartpy
@@ -165,7 +185,7 @@ jobs:
 
   publish-taquito-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-taquito
@@ -174,7 +194,7 @@ jobs:
 
   publish-flextesa-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-flextesa
@@ -183,7 +203,7 @@ jobs:
 
   publish-archetype-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-archetype
@@ -191,13 +211,13 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   publish-tezos-client-plugin-to-npm:
-     if: ${{ !github.event.pull_request.head.repo.fork }}
-    #  needs: publish-sdk-to-npm
-     uses: ./.github/workflows/npm-publish.yml
-     with:
-       dir: taqueria-plugin-tezos-client
-     secrets:
-       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    needs: publish-sdk-to-npm
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-plugin-tezos-client
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
   # publish-contract-types-plugin-to-npm:
   #   if: ${{ !github.event.pull_request.head.repo.fork }}
@@ -210,25 +230,16 @@ jobs:
 
   publish-ipfs-pinata-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-ipfs-pinata
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
-  publish-metadata-plugin-to-npm:
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
-    uses: ./.github/workflows/npm-publish.yml
-    with:
-      dir: taqueria-plugin-metadata
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
-
   publish-jest-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-jest
@@ -237,7 +248,7 @@ jobs:
 
   publish-state-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-state
@@ -310,7 +321,6 @@ jobs:
       - build-binaries
       - gather-info-for-e2e-tests
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' && !(startsWith(github.ref, 'refs/tags/v')) }}
-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -358,7 +368,7 @@ jobs:
 
       - name: build packages for testing
         run: |
-          npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy -w taqueria-flextesa-manager -w taqueria-plugin-contract-types -w taqueria-plugin-ipfs-pinata -w taqueria-plugin-metadata -w taqueria-plugin-archetype -w taqueria-plugin-tezos-client -w taqueria-state -w taqueria-plugin-jest
+          npm run build -w taqueria-sdk -w taqueria-plugin-flextesa -w taqueria-plugin-taquito -w taqueria-plugin-ligo -w taqueria-plugin-smartpy -w taqueria-flextesa-manager -w taqueria-plugin-contract-types -w taqueria-plugin-ipfs-pinata -w taqueria-plugin-archetype -w taqueria-plugin-tezos-client -w taqueria-state -w taqueria-plugin-jest
           npm run build-docker -w taqueria-flextesa-manager
 
       - name: Run unit tests
@@ -410,15 +420,6 @@ jobs:
             !github.event.pull_request.head.repo.fork }}
     needs: 
       - build-binaries
-      - publish-ligo-plugin-to-npm
-      - publish-smartpy-plugin-to-npm
-      - publish-taquito-plugin-to-npm
-      - publish-flextesa-plugin-to-npm
-      # - publish-contract-types-plugin-to-npm
-      - publish-archetype-plugin-to-npm
-      - publish-tezos-client-plugin-to-npm
-      - publish-state-plugin-to-npm
-      - publish-jest-plugin-to-npm
       - run-tests
       - vscode-extension-workflow
     steps:
@@ -456,18 +457,6 @@ jobs:
               }
             }
 
-            const ligo = readInfo("./taqueria-plugin-ligo/package.json")
-            const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
-            const taquito = readInfo("./taqueria-plugin-taquito/package.json")
-            const sdk = readInfo("./taqueria-sdk/package.json")
-            const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
-            const contractTypes = readInfo("./taqueria-plugin-contract-types/package.json")
-            const ipfsPinata = readInfo("./taqueria-plugin-ipfs-pinata/package.json")
-            const metadata = readInfo("./taqueria-plugin-metadata/package.json")
-            const archetype = readInfo("./taqueria-plugin-archetype/package.json")
-            const tezosClient = readInfo("./taqueria-plugin-tezos-client/package.json")
-            const stateJS = readInfo("./taqueria-state/package.json")
-
             let body = `
               <table>
                 <tr>
@@ -481,24 +470,6 @@ jobs:
                           <a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a><br>
                           <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
                           <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
-                      </p>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">npm Packages</th>
-                  <td>
-                      <p>
-                          npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
-                          taq install ${{ env.SCOPE }}/${ipfsPinata.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
-                          taq install ${{ env.SCOPE }}/${metadata.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
-                          taq install ${{ env.SCOPE }}/${archetype.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
-                          taq install ${{ env.SCOPE }}/${tezosClient.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
-                          taq install ${{ env.SCOPE }}/${stateJS.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
                       </p>
                   </td>
                 </tr>
@@ -538,6 +509,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs:
+      - detect-minor-version
       - build-binaries
       - publish-ligo-plugin-to-npm
       - publish-smartpy-plugin-to-npm
@@ -563,8 +535,18 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
           wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
-      - name: Release
-        id: release
+      - name: Pre-release
+        id: pre-release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ./release/*
+          draft: false
+          prerelease: true
+
+      - name: Final release
+        if: ${{ needs.detect-minor-version.outputs.minor-version == 'even' }}
+        id: final-release
         uses: softprops/action-gh-release@v1
         with:
           files: |
