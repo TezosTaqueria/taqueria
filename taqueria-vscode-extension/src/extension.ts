@@ -153,7 +153,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	helper.exposeShowEntrypointParametersCommand();
 	helper.exposeShowOperationDetailsCommand();
 
-	helper.registerDataProviders();
+	await helper.registerDataProviders();
 	helper.createTreeViews();
 
 	deps.vscode.workspace.onDidChangeWorkspaceFolders(e => {
