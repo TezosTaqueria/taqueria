@@ -48,7 +48,7 @@ jobs:
         deno-version: "1.23.4"
 
     - name: Build common-utils
-      runs: echo "Tests" && npm run build -w taqueria-common-utils
+      run: echo "Tests" && npm run build -w taqueria-common-utils
 
     - uses: actions/cache@v3
       with:
