@@ -165,10 +165,10 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 
 	const storagesFile = `${removeExt(sourceFile)}.storages${extractExt(sourceFile)}`;
 	const parametersFile = `${removeExt(sourceFile)}.parameters${extractExt(sourceFile)}`;
-	const storageFilename = getInputFilename(parsedArgs, storagesFile);
-	const parameterFilename = getInputFilename(parsedArgs, parametersFile);
+	const storagesFilename = getInputFilename(parsedArgs, storagesFile);
+	const parametersFilename = getInputFilename(parsedArgs, parametersFile);
 
-	const storageCompileResult = await access(storageFilename)
+	const storageCompileResult = await access(storagesFilename)
 		.then(() => compileExprs(parsedArgs, storagesFile, 'storage'))
 		.catch(() =>
 			sendWarn(
@@ -176,7 +176,7 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 			)
 		);
 
-	const parameterCompileResult = await access(parameterFilename)
+	const parameterCompileResult = await access(parametersFilename)
 		.then(() => compileExprs(parsedArgs, parametersFile, 'parameter'))
 		.catch(() =>
 			sendWarn(
