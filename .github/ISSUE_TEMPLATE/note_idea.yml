@@ -15,7 +15,7 @@ body:
   - type: input
     id: title
     attributes:
-      label: 💡 Title / Topic 
+      label: 🔮 Title / Topic 
       description: Provide a concise and descriptive title
   - type: textarea
     id: 
