@@ -1,7 +1,7 @@
-import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
+import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import { access, readFile, writeFile } from 'fs/promises';
-import { basename, extname, join, parse } from 'path';
+import { basename, extname, join } from 'path';
 
 interface Opts extends RequestArgs.t {
 	sourceFile: string;
@@ -15,10 +15,25 @@ const COMPILE_ERR_MSG: string = 'Not compiled';
 
 const isStorageKind = (exprKind: ExprKind): boolean => exprKind === 'storage' || exprKind === 'default_storage';
 
+const isLIGOFile = (sourceFile: string): boolean => /.+\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
+
 const isStoragesFile = (sourceFile: string): boolean => /.+\.storages\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
 
 const isParametersFile = (sourceFile: string): boolean =>
 	/.+\.parameters\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
+
+const isContractFile = (sourceFile: string): boolean =>
+	isLIGOFile(sourceFile) && !isStoragesFile(sourceFile) && !isParametersFile(sourceFile);
+
+const extractExt = (path: string): string => {
+	const matchResult = path.match(/\.(ligo|religo|mligo|jsligo)$/);
+	return matchResult ? matchResult[0] : '';
+};
+
+const removeExt = (path: string): string => {
+	const extRegex = new RegExp(extractExt(path));
+	return path.replace(extRegex, '');
+};
 
 const getInputFilename = (parsedArgs: Opts, sourceFile: string): string =>
 	join(parsedArgs.config.contractsDir, sourceFile);
@@ -75,7 +90,7 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 		.then(() => getCompileContractCmd(parsedArgs, sourceFile))
 		.then(execCmd)
 		.then(({ stderr }) => {
-			if (stderr.length > 0) sendErr(stderr);
+			if (stderr.length > 0) sendWarn(stderr);
 			return {
 				contract: sourceFile,
 				artifact: getOutputFilename(parsedArgs, sourceFile),
@@ -96,7 +111,7 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 			.then(() => getCompileExprCmd(parsedArgs, sourceFile, exprKind, exprName))
 			.then(execCmd)
 			.then(({ stderr }) => {
-				if (stderr.length > 0) sendErr(stderr);
+				if (stderr.length > 0) sendWarn(stderr);
 				return {
 					contract: sourceFile,
 					artifact: getOutputExprFileName(parsedArgs, sourceFile, exprKind, exprName),
@@ -146,26 +161,26 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 
 const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFile: string) => {
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile);
+	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
 
-	const parsedPath = parse(sourceFile);
-	const storagesFilename = `${parsedPath.name}.storages${parsedPath.ext}`;
-	const parametersFilename = `${parsedPath.name}.parameters${parsedPath.ext}`;
+	const storagesFilename = `${removeExt(sourceFile)}.storages${extractExt(sourceFile)}`;
+	const parametersFilename = `${removeExt(sourceFile)}.parameters${extractExt(sourceFile)}`;
 	const storageFilePath = `${parsedArgs.config.contractsDir}/${storagesFilename}`;
 	const parameterFilePath = `${parsedArgs.config.contractsDir}/${parametersFilename}`;
 
 	const storageCompileResult = await access(storageFilePath)
 		.then(() => compileExprs(parsedArgs, storagesFilename, 'storage'))
 		.catch(() =>
-			console.error(
-				`Note: storage file associated with ${sourceFile} can't be found. You should create a file named ${storagesFilename} in the same directory as ${sourceFile} and define initial storage values as a list of LIGO variable definitions. e.g. "let STORAGE_NAME: storage = LIGO_EXPR" for mligo`,
+			sendWarn(
+				`Note: storage file associated with "${sourceFile}" can't be found. You should create a file "${storagesFilename}" and define initial storage values as a list of LIGO variable definitions. e.g. "let STORAGE_NAME: storage = LIGO_EXPR" for CameLigo`,
 			)
 		);
 
 	const parameterCompileResult = await access(parameterFilePath)
 		.then(() => compileExprs(parsedArgs, parametersFilename, 'parameter'))
 		.catch(() =>
-			console.error(
-				`Note: parameter file associated with ${sourceFile} can't be found. You should create a file named ${parametersFilename} in the same directory as ${sourceFile} and define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: parameter = LIGO_EXPR" for mligo`,
+			sendWarn(
+				`Note: parameter file associated with "${sourceFile}" can't be found. You should create a file "${parametersFilename}" and define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: parameter = LIGO_EXPR" for CameLigo`,
 			)
 		);
 
@@ -213,7 +228,12 @@ export const compile = (parsedArgs: Opts) => {
 	try {
 		if (isStoragesFile(sourceFile)) return compileExprs(parsedArgs, sourceFile, 'storage').then(sendJsonRes);
 		if (isParametersFile(sourceFile)) return compileExprs(parsedArgs, sourceFile, 'parameter').then(sendJsonRes);
-		return compileContractWithStorageAndParameter(parsedArgs, sourceFile).then(sendJsonRes);
+		if (isContractFile(sourceFile)) {
+			return compileContractWithStorageAndParameter(parsedArgs, sourceFile).then(sendJsonRes);
+		}
+		return sendAsyncErr(
+			`${sourceFile} doesn't have a valid LIGO extension ('.ligo', '.religo', '.mligo' or '.jsligo')`,
+		);
 	} catch (err: any) {
 		return sendAsyncErr(err, false);
 	}
