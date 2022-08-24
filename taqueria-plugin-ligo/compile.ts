@@ -1,7 +1,7 @@
 import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
-import { readFile, writeFile } from 'fs/promises';
-import { basename, extname, join } from 'path';
+import { access, readFile, writeFile } from 'fs/promises';
+import { basename, extname, join, parse } from 'path';
 
 interface Opts extends RequestArgs.t {
 	sourceFile: string;
@@ -10,6 +10,8 @@ interface Opts extends RequestArgs.t {
 type TableRow = { contract: string; artifact: string };
 
 type ExprKind = 'storage' | 'default_storage' | 'parameter';
+
+const COMPILE_ERR_MSG: string = 'Not compiled';
 
 const isStorageKind = (exprKind: ExprKind): boolean => exprKind === 'storage' || exprKind === 'default_storage';
 
@@ -34,7 +36,7 @@ const getContractNameForExpr = (sourceFile: string, exprKind: ExprKind): string 
 			? sourceFile.match(/.+(?=\.storages\.(ligo|religo|mligo|jsligo))/)!.join('.')
 			: sourceFile.match(/.+(?=\.parameters\.(ligo|religo|mligo|jsligo))/)!.join('.');
 	} catch (err) {
-		throw new Error('Something went wrong internally when dealing with filename format');
+		throw new Error(`Something went wrong internally when dealing with filename format: ${err}`);
 	}
 };
 
@@ -80,11 +82,12 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 			};
 		})
 		.catch(err => {
+			sendErr(`\n=== For ${sourceFile} ===`);
 			sendErr(err.message.replace(/Command failed.+?\n/, ''));
-			return Promise.resolve({
+			return {
 				contract: sourceFile,
-				artifact: 'Not compiled',
-			});
+				artifact: COMPILE_ERR_MSG,
+			};
 		});
 
 const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =>
@@ -100,11 +103,12 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 				};
 			})
 			.catch(err => {
+				sendErr(`\n=== For ${sourceFile} ===`);
 				sendErr(err.message.replace(/Command failed.+?\n/, ''));
-				return Promise.resolve({
+				return {
 					contract: sourceFile,
-					artifact: 'Not compiled',
-				});
+					artifact: COMPILE_ERR_MSG,
+				};
 			});
 
 const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind): Promise<TableRow[]> =>
@@ -121,7 +125,7 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 		})
 		.then(data => data.match(/(?<=\s*(let|const)\s+)[a-zA-Z0-9_]+/g))
 		.then(exprNames => {
-			if (!exprNames) return Promise.resolve([]);
+			if (!exprNames) return [];
 			const firstExprName = exprNames.slice(0, 1)[0];
 			const restExprNames = exprNames.slice(1, exprNames.length);
 			const firstExprKind = isStorageKind(exprKind) ? 'default_storage' : 'parameter';
@@ -131,17 +135,70 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 			return Promise.all([firstExprResult].concat(restExprResults));
 		})
 		.catch(err => {
+			sendErr(`\n=== For ${sourceFile} ===`);
 			sendErr(err.message);
-			return Promise.resolve([{
+			return [{
 				contract: sourceFile,
 				artifact: `No ${isStorageKind(exprKind) ? 'storages' : 'parameters'} compiled`,
-			}]);
-		});
+			}];
+		})
+		.then(mergeArtifactsOutput(sourceFile));
 
+const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFile: string) => {
+	const contractCompileResult = await compileContract(parsedArgs, sourceFile);
+
+	const parsedPath = parse(sourceFile);
+	const storagesFilename = `${parsedPath.name}.storages${parsedPath.ext}`;
+	const parametersFilename = `${parsedPath.name}.parameters${parsedPath.ext}`;
+	const storageFilePath = `${parsedArgs.config.contractsDir}/${storagesFilename}`;
+	const parameterFilePath = `${parsedArgs.config.contractsDir}/${parametersFilename}`;
+
+	const storageCompileResult = await access(storageFilePath)
+		.then(() => compileExprs(parsedArgs, storagesFilename, 'storage'))
+		.catch(() =>
+			console.error(
+				`Note: storage file associated with ${sourceFile} can't be found. You should create a file named ${storagesFilename} in the same directory as ${sourceFile} and define initial storage values as a list of LIGO variable definitions, where the first one will be taken as the default for origination. e.g. "let STORAGE_NAME: storage = LIGO_EXPR" for mligo`,
+			)
+		);
+
+	const parameterCompileResult = await access(parameterFilePath)
+		.then(() => compileExprs(parsedArgs, parametersFilename, 'parameter'))
+		.catch(() =>
+			console.error(
+				`Note parameter file associated with ${sourceFile} can't be found. You should create a file named ${parametersFilename} in the same directory as ${sourceFile} and define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: parameter = LIGO_EXPR" for mligo`,
+			)
+		);
+
+	let compileResults: TableRow[] = [contractCompileResult];
+	if (storageCompileResult) compileResults = compileResults.concat(storageCompileResult);
+	if (parameterCompileResult) compileResults = compileResults.concat(parameterCompileResult);
+	return compileResults;
+};
+
+/*
+Compiling storage/parameter file amounts to compiling multiple expressions in that file,
+resulting in multiple rows with the same file name but different artifact names.
+This will merge these rows into one row with just one mention of the file name.
+e.g.
+┌──────────────────────┬─────────────────────────────────────────────┐
+│ Contract             │ Artifact                                    │
+├──────────────────────┼─────────────────────────────────────────────┤
+│ hello.storages.mligo │ artifacts/hello.default_storage.storage1.tz │
+├──────────────────────┼─────────────────────────────────────────────┤
+│ hello.storages.mligo │ artifacts/hello.storage.storage2.tz         │
+└──────────────────────┴─────────────────────────────────────────────┘
+								versus
+┌──────────────────────┬─────────────────────────────────────────────┐
+│ Contract             │ Artifact                                    │
+├──────────────────────┼─────────────────────────────────────────────┤
+│ hello.storages.mligo │ artifacts/hello.default_storage.storage1.tz │
+│                      │ artifacts/hello.storage.storage2.tz         │
+└──────────────────────┴─────────────────────────────────────────────┘
+*/
 const mergeArtifactsOutput = (sourceFile: string) =>
 	(tableRows: TableRow[]): TableRow[] => {
 		const artifactsOutput = tableRows.reduce(
-			(acc: string, row: TableRow) => row.artifact === 'Not compiled' ? acc : `${acc}${row.artifact}\n`,
+			(acc: string, row: TableRow) => row.artifact === COMPILE_ERR_MSG ? acc : `${acc}${row.artifact}\n`,
 			'',
 		);
 		return [{
@@ -153,15 +210,13 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 export const compile = (parsedArgs: Opts) => {
 	const sourceFile = parsedArgs.sourceFile;
 	if (!sourceFile) return sendAsyncErr('No source file specified.');
-	let p: Promise<TableRow[]>;
-	if (isStoragesFile(sourceFile)) {
-		p = compileExprs(parsedArgs, sourceFile, 'storage').then(mergeArtifactsOutput(sourceFile));
-	} else if (isParametersFile(sourceFile)) {
-		p = compileExprs(parsedArgs, sourceFile, 'parameter').then(mergeArtifactsOutput(sourceFile));
-	} else {
-		p = compileContract(parsedArgs, sourceFile).then(result => [result]);
+	try {
+		if (isStoragesFile(sourceFile)) return compileExprs(parsedArgs, sourceFile, 'storage').then(sendJsonRes);
+		if (isParametersFile(sourceFile)) return compileExprs(parsedArgs, sourceFile, 'parameter').then(sendJsonRes);
+		return compileContractWithStorageAndParameter(parsedArgs, sourceFile).then(sendJsonRes);
+	} catch (err: any) {
+		return sendAsyncErr(err, false);
 	}
-	return p.then(sendJsonRes).catch(err => sendAsyncErr(err, false));
 };
 
 export default compile;
