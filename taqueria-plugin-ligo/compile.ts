@@ -157,7 +157,7 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 		.then(() => compileExprs(parsedArgs, storagesFilename, 'storage'))
 		.catch(() =>
 			console.error(
-				`Note: storage file associated with ${sourceFile} can't be found. You should create a file named ${storagesFilename} in the same directory as ${sourceFile} and define initial storage values as a list of LIGO variable definitions, where the first one will be taken as the default for origination. e.g. "let STORAGE_NAME: storage = LIGO_EXPR" for mligo`,
+				`Note: storage file associated with ${sourceFile} can't be found. You should create a file named ${storagesFilename} in the same directory as ${sourceFile} and define initial storage values as a list of LIGO variable definitions. e.g. "let STORAGE_NAME: storage = LIGO_EXPR" for mligo`,
 			)
 		);
 
@@ -165,7 +165,7 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 		.then(() => compileExprs(parsedArgs, parametersFilename, 'parameter'))
 		.catch(() =>
 			console.error(
-				`Note parameter file associated with ${sourceFile} can't be found. You should create a file named ${parametersFilename} in the same directory as ${sourceFile} and define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: parameter = LIGO_EXPR" for mligo`,
+				`Note: parameter file associated with ${sourceFile} can't be found. You should create a file named ${parametersFilename} in the same directory as ${sourceFile} and define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: parameter = LIGO_EXPR" for mligo`,
 			)
 		);
 
