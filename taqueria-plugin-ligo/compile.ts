@@ -9,7 +9,9 @@ interface Opts extends RequestArgs.t {
 
 type TableRow = { contract: string; artifact: string };
 
-type ExprKind = 'storage' | 'parameter';
+type ExprKind = 'storage' | 'default_storage' | 'parameter';
+
+const isStorageKind = (exprKind: ExprKind): boolean => exprKind === 'storage' || exprKind === 'default_storage';
 
 const isStoragesFile = (sourceFile: string): boolean => /.+\.storages\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
 
@@ -26,10 +28,15 @@ const getOutputFilename = (parsedArgs: Opts, sourceFile: string): string => {
 
 // Get the contract name that the storage/parameter file is associated with
 // e.g. If sourceFile is token.storages.mligo, then it'll return token.mligo
-const getContractNameForExpr = (sourceFile: string, exprKind: ExprKind): string =>
-	exprKind === 'storage'
-		? sourceFile.match(/.+(?=\.storages\.(ligo|religo|mligo|jsligo))/)!.join('.')
-		: sourceFile.match(/.+(?=\.parameters\.(ligo|religo|mligo|jsligo))/)!.join('.');
+const getContractNameForExpr = (sourceFile: string, exprKind: ExprKind): string => {
+	try {
+		return isStorageKind(exprKind)
+			? sourceFile.match(/.+(?=\.storages\.(ligo|religo|mligo|jsligo))/)!.join('.')
+			: sourceFile.match(/.+(?=\.parameters\.(ligo|religo|mligo|jsligo))/)!.join('.');
+	} catch (err) {
+		throw new Error('Something went wrong internally when dealing with filename format');
+	}
+};
 
 // If sourceFile is token.storages.mligo, then it'll return token.storage.{storageName}.tz
 const getOutputExprFileName = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind, exprName: string): string => {
@@ -52,8 +59,9 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 const getCompileExprCmd = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind, exprName: string): string => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
+	const compilerType = isStorageKind(exprKind) ? 'storage' : 'parameter';
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:next compile ${exprKind}`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:next compile ${compilerType}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputExprFileName(parsedArgs, sourceFile, exprKind, exprName)}`;
 	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile}`;
@@ -112,16 +120,21 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 			return data;
 		})
 		.then(data => data.match(/(?<=\s*(let|const)\s+)[a-zA-Z0-9_]+/g))
-		.then(exprNames =>
-			exprNames
-				? Promise.all(exprNames.map(compileExpr(parsedArgs, sourceFile, exprKind)))
-				: Promise.resolve([])
-		)
+		.then(exprNames => {
+			if (!exprNames) return Promise.resolve([]);
+			const firstExprName = exprNames.slice(0, 1)[0];
+			const restExprNames = exprNames.slice(1, exprNames.length);
+			const firstExprKind = isStorageKind(exprKind) ? 'default_storage' : 'parameter';
+			const restExprKind = isStorageKind(exprKind) ? 'storage' : 'parameter';
+			const firstExprResult = compileExpr(parsedArgs, sourceFile, firstExprKind)(firstExprName);
+			const restExprResults = restExprNames.map(compileExpr(parsedArgs, sourceFile, restExprKind));
+			return Promise.all([firstExprResult].concat(restExprResults));
+		})
 		.catch(err => {
 			sendErr(err.message);
 			return Promise.resolve([{
 				contract: sourceFile,
-				artifact: `No ${exprKind === 'storage' ? 'storages' : 'parameters'} compiled`,
+				artifact: `No ${isStorageKind(exprKind) ? 'storages' : 'parameters'} compiled`,
 			}]);
 		});
 
@@ -139,6 +152,7 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 
 export const compile = (parsedArgs: Opts) => {
 	const sourceFile = parsedArgs.sourceFile;
+	if (!sourceFile) return sendAsyncErr('No source file specified.');
 	let p: Promise<TableRow[]>;
 	if (isStoragesFile(sourceFile)) {
 		p = compileExprs(parsedArgs, sourceFile, 'storage').then(mergeArtifactsOutput(sourceFile));
