@@ -225,18 +225,16 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 export const compile = (parsedArgs: Opts) => {
 	const sourceFile = parsedArgs.sourceFile;
 	if (!sourceFile) return sendAsyncErr('No source file specified.');
-	try {
-		if (isStoragesFile(sourceFile)) return compileExprs(parsedArgs, sourceFile, 'storage').then(sendJsonRes);
-		if (isParametersFile(sourceFile)) return compileExprs(parsedArgs, sourceFile, 'parameter').then(sendJsonRes);
-		if (isContractFile(sourceFile)) {
-			return compileContractWithStorageAndParameter(parsedArgs, sourceFile).then(sendJsonRes);
-		}
+	let p: Promise<TableRow[]>;
+	if (isStoragesFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'storage');
+	else if (isParametersFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'parameter');
+	else if (isContractFile(sourceFile)) p = compileContractWithStorageAndParameter(parsedArgs, sourceFile);
+	else {
 		return sendAsyncErr(
 			`${sourceFile} doesn't have a valid LIGO extension ('.ligo', '.religo', '.mligo' or '.jsligo')`,
 		);
-	} catch (err: any) {
-		return sendAsyncErr(err, false);
 	}
+	return p.then(sendJsonRes).catch(err => sendAsyncErr(err, false));
 };
 
 export default compile;
