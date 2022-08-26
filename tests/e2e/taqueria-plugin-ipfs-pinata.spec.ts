@@ -7,6 +7,22 @@ import * as contents from './data/help-contents/pinata-contents';
 
 const taqueriaProjectPath = 'e2e/auto-test-ipfs-pinata-plugin';
 
+let JWT: string;
+
+async function configureForTests() {
+	if (process.env.pinataJwtToken) {
+		JWT = process.env.pinataJwtToken;
+		await exec(`unset pinataJwtToken`);
+		await exec(`echo "pinataJwtToken=${JWT}" > ${taqueriaProjectPath}/.env`);
+		console.log(await exec(`cat ${taqueriaProjectPath}/.env`));
+	}
+	if (process.env.UNLIMITED_PINATA_TOKEN) {
+		JWT = process.env.UNLIMITED_PINATA_TOKEN;
+		await exec(`echo "pinataJwtToken=${JWT}" > ${taqueriaProjectPath}/.env`);
+		console.log(await exec(`cat ${taqueriaProjectPath}/.env`));
+	}
+}
+
 describe('e2e testing for the IPFS Pinata plugin with no JWT', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['ipfs-pinata']);
@@ -54,18 +70,20 @@ describe('E2E Testing for the taqueria ipfs pinata plugin', () => {
 		await generateTestProject(taqueriaProjectPath, ['ipfs-pinata']);
 		// TODO: This can removed after this is resolved:
 		// https://github.com/ecadlabs/taqueria/issues/528
+
+		await configureForTests();
+		console.log(await exec(`ls -al ${taqueriaProjectPath}`));
 		try {
 			await exec(`taq -p ${taqueriaProjectPath}`);
 		} catch (_) {}
 
 		await exec(`cp -r e2e/data/ipfs ${taqueriaProjectPath}/ipfs`);
 
-		// console.log(await exec(`stat ${taqueriaProjectPath}/.env`))
 		// if ((await exec(`stat ${taqueriaProjectPath}/.env`)).stderr.includes("No such file or directory")) {
 		// 	console.log("NO .env file found for Pinata JWT, exiting tests and you should add that for these to work")
 		// 	process.exit(1);
 		// }
-		await exec(`cp e2e/data/.env ${taqueriaProjectPath}/.env`);
+		// await exec(`cp e2e/data/.env ${taqueriaProjectPath}/.env`);
 	});
 
 	test('ipfs pinata plugin should warn if no file specified for publish', async () => {
@@ -75,7 +93,7 @@ describe('E2E Testing for the taqueria ipfs pinata plugin', () => {
 
 	test('ipfs pinata plugin should warn if no filehash specified for pin', async () => {
 		const publishRun = await exec(`taq pin`, { cwd: taqueriaProjectPath });
-		expect(publishRun.stderr).toBe('ipfs hash was not \n');
+		expect(publishRun.stderr).toBe('ipfs hash was not provided\n');
 	});
 
 	test('publish a single file to ipfs and get back the expected cid', async () => {
