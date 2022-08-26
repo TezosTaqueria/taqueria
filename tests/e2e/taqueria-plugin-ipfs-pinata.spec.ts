@@ -7,15 +7,16 @@ import * as contents from './data/help-contents/pinata-contents';
 
 const taqueriaProjectPath = 'e2e/auto-test-ipfs-pinata-plugin';
 
-let JWT: string;
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+// IF RUNNING LOCALLY MAKE SURE YOU ADD A .env FILE WITH YOUR PINATA JWT
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+let JWT: string;
 async function configureForTests() {
 	if (process.env.pinataJwtToken) {
 		JWT = process.env.pinataJwtToken;
 		await exec(`unset pinataJwtToken`);
-		console.log(await exec(`env`));
 		await exec(`echo "pinataJwtToken=${JWT}" > ${taqueriaProjectPath}/.env`);
-		console.log(await exec(`cat ${taqueriaProjectPath}/.env`));
 	}
 	if (process.env.UNLIMITED_PINATA_TOKEN) {
 		JWT = process.env.UNLIMITED_PINATA_TOKEN;
@@ -73,12 +74,13 @@ describe('E2E Testing for the taqueria ipfs pinata plugin', () => {
 		// https://github.com/ecadlabs/taqueria/issues/528
 
 		await configureForTests();
-		console.log(await exec(`ls -al ${taqueriaProjectPath}`));
+
 		try {
 			await exec(`taq -p ${taqueriaProjectPath}`);
 		} catch (_) {}
 
 		await exec(`cp -r e2e/data/ipfs ${taqueriaProjectPath}/ipfs`);
+		await exec(`cp ../.env ${taqueriaProjectPath}/.env`);
 
 		// if ((await exec(`stat ${taqueriaProjectPath}/.env`)).stderr.includes("No such file or directory")) {
 		// 	console.log("NO .env file found for Pinata JWT, exiting tests and you should add that for these to work")
