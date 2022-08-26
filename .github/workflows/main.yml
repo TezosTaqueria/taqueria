@@ -300,7 +300,7 @@ jobs:
             ~/Library/Caches/deno
     
     env:
-      UNLIMITED_PINATA_TOKEN: ${{ $secrets.PINATA_JWT_TOKEN }}
+      UNLIMITED_PINATA_TOKEN: ${{ secrets.PINATA_JWT_TOKEN }}
 
     needs: 
       - build-binaries
