@@ -6,7 +6,7 @@ import { OutputLevels, VsCodeHelper } from '../helpers';
 import { TzKtHead } from './SandboxModels';
 
 export class CachedSandboxState {
-	connection: signalR.HubConnection;
+	// connection: signalR.HubConnection;
 	sandboxHead = new rxjs.BehaviorSubject<rpc.BlockHeaderResponse | undefined>(undefined);
 	indexerHead = new rxjs.BehaviorSubject<TzKtHead | undefined>(undefined);
 	taquito = new TezosToolkit(this.sandboxBaseAddress);
@@ -16,16 +16,16 @@ export class CachedSandboxState {
 		private readonly sandboxName: string,
 		private readonly containerName: string,
 	) {
-		this.connection = new signalR.HubConnectionBuilder()
-			.withUrl(`${this.tzKtBaseAddress}/v1/events`)
-			.configureLogging(signalR.LogLevel.Information)
-			.build();
+		// this.connection = new signalR.HubConnectionBuilder()
+		// 	.withUrl(`${this.tzKtBaseAddress}/v1/events`)
+		// 	.configureLogging(signalR.LogLevel.Information)
+		// 	.build();
 
-		this.connection.onclose(async () => {
-			await this.startConnection();
-		});
+		// this.connection.onclose(async () => {
+		// 	await this.startConnection();
+		// });
 
-		this.connection.on('head', data => this.onHeadFromTzKt(data));
+		// this.connection.on('head', data => this.onHeadFromTzKt(data));
 	}
 
 	private onHeadFromTzKt(data: TzKtHead): void {
@@ -43,16 +43,16 @@ export class CachedSandboxState {
 		return `http://127.0.0.1:20000`;
 	}
 
-	async startConnection() {
-		try {
-			await this.connection.start();
-			await this.connection.invoke('SubscribeToHead');
-			console.log('SignalR Connected.');
-		} catch (err) {
-			console.log(err);
-			setTimeout(() => {
-				this.startConnection();
-			}, 5000);
-		}
-	}
+	// async startConnection() {
+	// 	try {
+	// 		await this.connection.start();
+	// 		await this.connection.invoke('SubscribeToHead');
+	// 		console.log('SignalR Connected.');
+	// 	} catch (err) {
+	// 		console.log(err);
+	// 		setTimeout(() => {
+	// 			this.startConnection();
+	// 		}, 5000);
+	// 	}
+	// }
 }
