@@ -13,6 +13,7 @@ async function configureForTests() {
 	if (process.env.pinataJwtToken) {
 		JWT = process.env.pinataJwtToken;
 		await exec(`unset pinataJwtToken`);
+		console.log(await exec(`env`));
 		await exec(`echo "pinataJwtToken=${JWT}" > ${taqueriaProjectPath}/.env`);
 		console.log(await exec(`cat ${taqueriaProjectPath}/.env`));
 	}
