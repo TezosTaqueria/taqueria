@@ -170,19 +170,19 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 
 	const storageCompileResult = await access(storagesFilename)
 		.then(() => compileExprs(parsedArgs, storagesFile, 'storage'))
-		.catch(() =>
-			sendWarn(
-				`Note: storage file associated with "${sourceFile}" can't be found. You should create a file "${storagesFile}" and define initial storage values as a list of LIGO variable definitions. e.g. "let STORAGE_NAME: storage = LIGO_EXPR" for CameLigo`,
-			)
-		);
+		.catch(() => {
+			// sendWarn(
+			// 	`Note: storage file associated with "${sourceFile}" can't be found. You should create a file "${storagesFile}" and define initial storage values as a list of LIGO variable definitions. e.g. "let STORAGE_NAME: storage = LIGO_EXPR" for CameLigo`,
+			// )
+		});
 
 	const parameterCompileResult = await access(parametersFilename)
 		.then(() => compileExprs(parsedArgs, parametersFile, 'parameter'))
-		.catch(() =>
-			sendWarn(
-				`Note: parameter file associated with "${sourceFile}" can't be found. You should create a file "${parametersFile}" and define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: parameter = LIGO_EXPR" for CameLigo`,
-			)
-		);
+		.catch(() => {
+			// sendWarn(
+			// 	`Note: parameter file associated with "${sourceFile}" can't be found. You should create a file "${parametersFile}" and define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: parameter = LIGO_EXPR" for CameLigo`,
+			// )
+		});
 
 	let compileResults: TableRow[] = [contractCompileResult];
 	if (storageCompileResult) compileResults = compileResults.concat(storageCompileResult);
@@ -222,7 +222,7 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 		}];
 	};
 
-export const compile = (parsedArgs: Opts) => {
+export const compile = (parsedArgs: Opts): Promise<void> => {
 	const sourceFile = parsedArgs.sourceFile;
 	if (!sourceFile) return sendAsyncErr('No source file specified.');
 	let p: Promise<TableRow[]>;

@@ -1,6 +1,6 @@
 import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
-import compile from './compile';
 import createContract from './createContract';
+import ligo from './ligo';
 
 Plugin.create(i18n => ({
 	schema: '1.0',
@@ -11,7 +11,8 @@ Plugin.create(i18n => ({
 			task: 'compile',
 			command: 'compile [sourceFile]',
 			aliases: ['c', 'compile-ligo'],
-			description: 'Compile a smart contract written in a Ligo syntax to Michelson code',
+			description:
+				'Compile a smart contract written in a LIGO syntax to Michelson code, along with its associated storages and parameters files if they are found',
 			handler: 'proxy',
 			encoding: 'json',
 		}),
@@ -39,5 +40,5 @@ Plugin.create(i18n => ({
 			handler: createContract,
 		}),
 	],
-	proxy: compile,
+	proxy: ligo,
 }), process.argv);
