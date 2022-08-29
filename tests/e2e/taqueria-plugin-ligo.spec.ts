@@ -66,11 +66,11 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 
 			// 2. Register the contracts
-			await exec(`taq add-contract hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
+			console.log(await exec(`taq add-contract hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` }));
 
 			// 3. Run taq compile ${contractName}
-			await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
-
+			console.log(await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` }));
+			console.log(await exec(`ls -al ./${taqueriaProjectPath}/artifacts/`));
 			// 4. Verify that compiled michelson version has been generated
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
 		} catch (error) {
