@@ -1,8 +1,10 @@
-# 🏗️ PR ➾
+# Add to Title: (feature) 🏗️ PR ➾   OR (fix)  🛠️ PR ➾
 
 Fixes # (issue)
 
 ## 🪂 Pre-Merge Checklist
+
+> Remove unnecessary items
 
 - [ ] 🐬 I have commented my code, particularly in hard-to-understand areas
 - [ ] 🦀 Automated tests have been written and added to this PR
