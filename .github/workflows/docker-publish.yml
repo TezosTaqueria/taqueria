@@ -4,15 +4,11 @@ on:
   push:
     branches:
       - 'main'
-    paths:
-      - 'taqueria-flextesa-manager/*'
     tags:
       - 'v*'
   pull_request:
     branches:
       - 'main'
-    paths:
-      - 'taqueria-flextesa-manager/*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}-${{ github.ref != 'refs/heads/main' || github.run_number }}
