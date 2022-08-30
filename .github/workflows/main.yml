@@ -221,7 +221,7 @@ jobs:
 
   publish-contract-types-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-contract-types
