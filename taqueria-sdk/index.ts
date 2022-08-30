@@ -112,6 +112,13 @@ export const sendErr = (msg: string, newline = true) => {
 		: process.stderr.write(msg) as unknown as void;
 };
 
+export const sendWarn = (msg: string, newline = true) => {
+	if (!msg || msg.length === 0) return;
+	return newline
+		? console.warn(msg)
+		: process.stderr.write(msg) as unknown as void;
+};
+
 export const sendAsyncErr = (msg: string, newline = true) => Promise.reject(sendErr(msg, newline)); // should this be Promise.reject?
 
 export const sendJson = (msg: unknown, newline = true) => sendRes(JSON.stringify(msg), newline);
@@ -387,14 +394,20 @@ export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
 /**
  * Gets the initial storage for the contract
  */
-export const getInitialStorage = (parsedArgs: RequestArgs.t) =>
-	(contractFilename: string) => {
-		const env = getCurrentEnvironmentConfig(parsedArgs);
-
-		return env
-			? env.storage && env.storage[contractFilename]
-			: undefined;
-	};
+export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilename: string) => {
+	const env = getCurrentEnvironmentConfig(parsedArgs);
+	if (env && env.storage && env.storage[contractFilename]) {
+		const storagePath: string = env.storage[contractFilename];
+		try {
+			const content = await readFile(storagePath, { encoding: 'utf-8' });
+			return content;
+		} catch (err) {
+			sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
+			return undefined;
+		}
+	}
+	return undefined;
+};
 
 /**
  * Gets the default account associated with a sandbox

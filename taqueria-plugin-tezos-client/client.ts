@@ -1,6 +1,7 @@
 import {
 	execCmd,
 	getCurrentEnvironmentConfig,
+	getInitialStorage,
 	getSandboxConfig,
 	sendAsyncErr,
 	sendAsyncJsonRes,
@@ -170,14 +171,6 @@ const typecheckTask = async <T>(parsedArgs: Opts): Promise<void> => {
 
 //////////// Simulate task ////////////
 
-const getStorageFromConfig = (opts: Opts, sourceFile: string) => {
-	const envConfig = getCurrentEnvironmentConfig(opts);
-	if (envConfig && envConfig.storage) {
-		return envConfig.storage[sourceFile];
-	}
-	return undefined;
-};
-
 // This is needed mostly due to the fact that execCmd() wraps the command in double quotes
 const preprocessString = (value: string): string => {
 	// 1. if the string contains escaped double quotes, escape them further
@@ -197,7 +190,7 @@ const getSimulateCommand = async (
 	sourcePath: string,
 ) => {
 	const containerName = await getContainerName(sandboxName, opts);
-	const rawStorage = opts.storage ?? getStorageFromConfig(opts, sourceFile);
+	const rawStorage = opts.storage ?? await getInitialStorage(opts, sourceFile);
 	if (rawStorage === undefined) {
 		throw new Error('Error: Please specify a non-empty storage value in the CLI or in the config file.');
 	}
