@@ -80,7 +80,7 @@ describe('E2E Testing for the taqueria ipfs pinata plugin', () => {
 		} catch (_) {}
 
 		await exec(`cp -r e2e/data/ipfs ${taqueriaProjectPath}/ipfs`);
-		await exec(`cp ../.env ${taqueriaProjectPath}/.env`);
+		// await exec(`cp ../.env ${taqueriaProjectPath}/.env`);
 
 		// if ((await exec(`stat ${taqueriaProjectPath}/.env`)).stderr.includes("No such file or directory")) {
 		// 	console.log("NO .env file found for Pinata JWT, exiting tests and you should add that for these to work")
