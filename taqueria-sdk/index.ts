@@ -112,6 +112,13 @@ export const sendErr = (msg: string, newline = true) => {
 		: process.stderr.write(msg) as unknown as void;
 };
 
+export const sendWarn = (msg: string, newline = true) => {
+	if (!msg || msg.length === 0) return;
+	return newline
+		? console.warn(msg)
+		: process.stderr.write(msg) as unknown as void;
+};
+
 export const sendAsyncErr = (msg: string, newline = true) => Promise.reject(sendErr(msg, newline)); // should this be Promise.reject?
 
 export const sendJson = (msg: unknown, newline = true) => sendRes(JSON.stringify(msg), newline);
