@@ -55,7 +55,8 @@ describe('e2e testing for the IPFS Pinata plugin with no JWT', () => {
 		expect(publishRun.stderr).toMatch(/jwt *token.*not *found/i);
 	});
 
-	test('ipfs pinata plugin should warn for pin if no env jwt token exists', async () => {
+	// Skipping this test until issue https://github.com/ecadlabs/taqueria/issues/1188 is resolved
+	test.skip('ipfs pinata plugin should warn for pin if no env jwt token exists', async () => {
 		const publishRun = await exec(`taq pin QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5`, {
 			cwd: taqueriaProjectPath,
 		});
@@ -94,7 +95,8 @@ describe('E2E Testing for the taqueria ipfs pinata plugin', () => {
 		expect(publishRun.stderr).toBe('path was not provided\n');
 	});
 
-	test('ipfs pinata plugin should warn if no filehash specified for pin', async () => {
+	// Skipping this test until issue https://github.com/ecadlabs/taqueria/issues/1188 is resolved
+	test.skip('ipfs pinata plugin should warn if no filehash specified for pin', async () => {
 		const publishRun = await exec(`taq pin`, { cwd: taqueriaProjectPath });
 		expect(publishRun.stderr).toBe('ipfs hash was not provided\n');
 	});
