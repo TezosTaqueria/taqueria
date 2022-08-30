@@ -43,7 +43,8 @@ Options:
 export const ligoNoContracts = `No contracts found to compile. Have you run "taq add-contract [sourceFile]" ?
 `;
 
-export const ligoNoContractSource = `taq compile <sourceFile>
+export const ligoNoContractSource = `
+taq compile <sourceFile>
 
 Compile a smart contract written in a LIGO syntax to Michelson code, along with
 its associated storages and parameters files if they are found
