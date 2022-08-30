@@ -1,4 +1,4 @@
-# Add to Title: (feature) 🏗️ PR ➾   OR (fix)  🛠️ PR ➾
+# Title Prefixes:  🏗️ PR ➾    🛠️ PR ➾
 
 Fixes # (issue)
 
