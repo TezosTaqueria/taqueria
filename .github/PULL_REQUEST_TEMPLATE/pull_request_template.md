@@ -1,10 +1,5 @@
 # 🏗️ PR ➾    |      🛠️ PR ➾
 
-> Title prefixes - Add to title and delete here
-
- 🏗️ PR ➾ 
- 🛠️ PR ➾ 
-
 Fixes # (issue)
 
 ## 🪂 Pre-Merge Checklist
