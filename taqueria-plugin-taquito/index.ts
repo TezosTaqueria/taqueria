@@ -8,12 +8,18 @@ Plugin.create(_i18n => ({
 	tasks: [
 		Task.create({
 			task: 'deploy',
-			command: 'deploy [contract]',
+			command: 'deploy <contract>',
 			description: 'Deploy a smart contract to a particular environment',
 			options: [
 				Option.create({
 					flag: 'alias',
 					description: "Alias used to refer to the deployed contract's address",
+					required: false,
+				}),
+				Option.create({
+					flag: 'storage',
+					description:
+						'Name of the storage file that contains the storage value as a Michelson expression, in the artifacts directory, used for originating a contract',
 					required: false,
 				}),
 			],

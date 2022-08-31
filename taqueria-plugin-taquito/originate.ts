@@ -7,9 +7,11 @@ import {
 	getSandboxAccountConfig,
 	getSandboxAccountNames,
 	getSandboxConfig,
+	newGetInitialStorage,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
+	sendRes,
 	updateAddressAlias,
 } from '@taqueria/node-sdk';
 import { Protocol, RequestArgs } from '@taqueria/node-sdk/types';
@@ -22,7 +24,8 @@ import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 
 interface Opts extends RequestArgs.t {
-	contract?: string;
+	contract: string;
+	storage: string;
 	alias?: string;
 }
 
@@ -56,20 +59,30 @@ const addOrigination = (parsedArgs: Opts, batch: Promise<WalletOperationBatch>) 
 		});
 	};
 
+const getDefaultStorageFilename = (contractName: string): string => {
+	const baseFilename = basename(contractName, extname(contractName));
+	const extFilename = extname(contractName);
+	const defaultStorage = `${baseFilename}.default_storage${extFilename}`;
+	return defaultStorage;
+};
+
+// TODO: temporary quick solution. May refactor this to only deal with one contract later
 const getValidContracts = async (parsedArgs: Opts) => {
-	const contracts = parsedArgs.contract
-		? [parsedArgs.contract]
-		: (await glob('*.tz', { cwd: parsedArgs.config.artifactsDir })) as string[];
+	const contracts = [parsedArgs.contract];
+	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(contracts[0]);
 
 	return contracts.reduce(
 		async (retval, filename) => {
-			const storage = await getInitialStorage(parsedArgs, filename);
+			const storage = await newGetInitialStorage(parsedArgs, storageFilename);
 			if (storage === undefined || storage === null) {
 				sendErr(
-					`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
-						getCurrentEnvironment(parsedArgs)
-					}.storage["${filename}"]\nThe value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.\n`,
+					`The storage ${storageFilename} cannot be found in artifacts. You may also specify the storage with --storage STORAGE_FILE_NAME to point to a storage file (contains the storage value as a Michelson expression) in artifacts and we'll use that for originating ${filename}`,
 				);
+				// sendErr(
+				// 	`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
+				// 		getCurrentEnvironment(parsedArgs)
+				// 	}.storage["${filename}"]\nThe value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.\n`,
+				// );
 				return retval;
 			}
 			return [...(await retval), { filename, storage }];
