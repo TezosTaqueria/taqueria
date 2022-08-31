@@ -1,0 +1,103 @@
+<% if (it.output == "github") { %>
+# Taqueria Metadata Plugin
+<% } %>
+
+Taqueria Metadata plugin allows to create json file with next metadata related to the contract:
+|  name       		| description                           |   
+|:------------------|---------------------------------------|
+| name 		  		| Name of the contract	 				|
+| version     		| Version of the contract       		|    
+| description      	| Description of the contract 		    |  
+| authors      		| List of authors		                |   
+| homepage      	| Homepage associated with the contract |   
+| license       	| Type of license e. g. ISC, MIT		|    
+| interfaces      	| List of interfaces 	               	|    
+
+It also allows to generate a project specific metadata that can be used as defaults for each 
+contract:
+
+Once it has been generated this part will be added under:
+
+`.taq/config.json`
+
+
+    "metadata": {
+        "name": "string",
+        "projectDescription": "string",
+        "authors": [
+            "string",
+            "string"
+        ],
+        "homepage": "url",
+        "license": "string"
+    }
+
+## Requirements
+
+- Taqueria v0.13.0 or later
+- Node.js v16.3 or later
+
+## Installation
+
+To install the metadata plugin on a Taqueria project, navigate to the project folder and run:
+```shell
+taq install @taqueria/plugin-metadata
+```
+
+## Configuration
+
+There is no configuration required  to run the plugin
+
+## Usage
+
+- Generate/update a metadata file for a contract. Prompt the user for standard metadata fields, providing default values. If metadata already exists for a contract, it will use existing values as the default prompt values.
+	- If contractName is not provided, it will prompt for contractName allowing the selection of a taq registered contracts (if no contracts in the registry it will output `contractName was not provided`)
+- For a new contract metadata, it will find other contracts metadata and use those for the default values for common fields like authors, license, homepage this eliminates an extra step to define/register project metadata, but project metadata will be used as a priority if available
+- Generate Project metadata
+	- Add the project metadata to .taq config.json
+	- Add the project metadata schema
+
+Summary of priority for default values:
+- 1st Priority: Previous Values
+- 2nd Priority: Project Values
+- 3rd Priority: Existing Contract Metadata Values
+- 4th Priority: Other Contract Values
+
+## Tasks
+
+### `taq generate metadata [contractName]`
+
+The `generate metadata` task is using to generate metadata for a contract. The contract may not exists.
+
+### `taq generate project metadata`
+
+The `generate project metadata` task is using to generate metadata for a project and add it to `config.json` file
+
+<%~ it.cautionOpenAdmonition %>
+The `compile` task can be implemented by more than one compiler plugin installed on a project (LIGO, Archetype, SmartPY). If this is the case, you must use the `--plugin ligo` flag to specify a particular compiler
+<%= it.closeAdmonition %>
+
+#### Options
+
+The metadata `generate metadata` task will accept the following required parameters:
+
+|  name        | description                           								|   
+|:-------------|--------------------------------------------------------------------|
+| contractName | The contract name (it can be an existing one or not existing one) 	|
+
+
+#### Task Properties
+
+|  attribute |  value                        		   | 
+|------------|:---------------------------------------:|
+|  task   	 | 'generate'         					   | 
+|  command   | 'generate metadata [sourceFile]'        | 
+|  command   | 'generate project metadata' 			   | 
+|  aliases   | N/A 			   | 
+
+
+
+## Plugin Architecture
+
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
+...
