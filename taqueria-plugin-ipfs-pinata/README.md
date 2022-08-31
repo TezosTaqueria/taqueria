@@ -4,7 +4,7 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 
 The IPFS Pinata plugin provides a `publish` task to upload metadata, media, or other files to IPFS via Pinata
 
-The IPFS Pinata plugin also provides a `pin` task to link any existing files on IPFS to your pinata account
+The IPFS Pinata plugin also provides a `pin` task to link any existing files on Pinata to your Pinata account
 
 
 
@@ -47,7 +47,7 @@ taq publish < path >
 
 The IPFS Pinata plugin exposes a `pin` task which links files already existing on Pinata to your Pinata account
 
-You will need to find the CID for a file on pinata then use that to pin the file to your account that is linked with the JWT you're using
+You will need to find the CID for a file on Pinata then use that to pin the file to your account that is linked with the JWT you're using
 
 ```shell
 taq pin < hash >
