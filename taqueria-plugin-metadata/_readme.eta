@@ -69,9 +69,9 @@ Summary of priority for default values:
 
 The `generate metadata` task is using to generate metadata for a contract. The contract may not exists.
 
-### `taq generate project metadata`
+### `taq generate-project-metadata`
 
-The `generate project metadata` task is using to generate metadata for a project and add it to `config.json` file
+The `generate-project-metadata` task is using to generate metadata for a project and add it to `config.json` file
 
 <%~ it.cautionOpenAdmonition %>
 The `compile` task can be implemented by more than one compiler plugin installed on a project (LIGO, Archetype, SmartPY). If this is the case, you must use the `--plugin ligo` flag to specify a particular compiler
@@ -92,8 +92,8 @@ The metadata `generate metadata` task will accept the following required paramet
 |------------|:---------------------------------------:|
 |  task   	 | 'generate'         					   | 
 |  command   | 'generate metadata [sourceFile]'        | 
-|  command   | 'generate project metadata' 			   | 
-|  aliases   | N/A 			   | 
+|  command   | 'generate-project-metadata` 			   |
+|  aliases   | N/A 			                           |
 
 
 
