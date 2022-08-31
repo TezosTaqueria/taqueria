@@ -1,4 +1,4 @@
-import { Plugin, Task } from '@taqueria/node-sdk';
+import { Option, Plugin, Task } from '@taqueria/node-sdk';
 import originate from './originate';
 
 Plugin.create(_i18n => ({
@@ -10,7 +10,13 @@ Plugin.create(_i18n => ({
 			task: 'deploy',
 			command: 'deploy [contract]',
 			description: 'Deploy a smart contract to a particular environment',
-			options: [],
+			options: [
+				Option.create({
+					flag: 'alias',
+					description: "Alias used to refer to the deployed contract's address",
+					required: false,
+				}),
+			],
 			aliases: ['originate'],
 			handler: 'proxy',
 			encoding: 'application/json',

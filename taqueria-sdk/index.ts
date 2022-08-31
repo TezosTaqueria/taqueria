@@ -410,6 +410,26 @@ export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilen
 };
 
 /**
+ * Update the alias of an address for the current environment
+ */
+export const updateAddressAlias = async (parsedArgs: RequestArgs.t, alias: string, address: string): Promise<void> => {
+	const env = getCurrentEnvironmentConfig(parsedArgs);
+	if (!env) return;
+	if (!env.aliases) {
+		env.aliases = { [alias]: { address } };
+	} else if (!env.aliases[alias]) {
+		env.aliases[alias] = { address };
+	} else {
+		env.aliases[alias].address = address;
+	}
+	try {
+		await writeJsonFile('./.taq/config.json')(parsedArgs.config);
+	} catch (err) {
+		sendErr(`Could not write to ./.taq/config.json\n`);
+	}
+};
+
+/**
  * Gets the default account associated with a sandbox
  */
 export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>

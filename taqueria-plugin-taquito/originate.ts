@@ -10,6 +10,7 @@ import {
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
+	updateAddressAlias,
 } from '@taqueria/node-sdk';
 import { Protocol, RequestArgs } from '@taqueria/node-sdk/types';
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
@@ -18,10 +19,11 @@ import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import glob from 'fast-glob';
 import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { basename, extname, join } from 'path';
 
 interface Opts extends RequestArgs.t {
 	contract?: string;
+	alias?: string;
 }
 
 interface ContractStorageMapping {
@@ -32,6 +34,7 @@ interface ContractStorageMapping {
 interface OriginationResult {
 	contract: string;
 	address: string;
+	alias: string;
 	destination: string;
 }
 
@@ -75,7 +78,12 @@ const getValidContracts = async (parsedArgs: Opts) => {
 	);
 };
 
-const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWalletOperation, destination: string) => {
+const mapOpToContract = async (
+	parsedArgs: Opts,
+	contracts: ContractStorageMapping[],
+	op: BatchWalletOperation,
+	destination: string,
+) => {
 	const results = await op.operationResults();
 
 	return contracts.reduce(
@@ -91,11 +99,15 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
 					? result.metadata.operation_result.originated_contracts.join(',')
 					: 'Error';
 
+				const alias = parsedArgs.alias ?? basename(contract.filename, extname(contract.filename));
+				if (address !== 'Error') updateAddressAlias(parsedArgs, alias, address);
+
 				return [
 					...retval,
 					{
 						contract: contract.filename,
 						address,
+						alias: address !== 'Error' ? alias : 'N/A',
 						destination,
 					},
 				];
@@ -106,6 +118,7 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
 				{
 					contract: contract.filename,
 					address: 'Error',
+					alias: 'N/A',
 					destination,
 				},
 			];
@@ -131,7 +144,7 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 	try {
 		const op = await batch.send();
 		const confirmed = await op.confirmation();
-		return await mapOpToContract(contracts, op, destination);
+		return await mapOpToContract(parsedArgs, contracts, op, destination);
 	} catch (err) {
 		const error = (err as { message: string });
 		if (error.message) {
