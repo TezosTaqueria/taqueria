@@ -1,7 +1,7 @@
-import * as signalR from '@microsoft/signalr';
 import * as rpc from '@taquito/rpc';
 import { TezosToolkit } from '@taquito/taquito';
 import * as rxjs from 'rxjs';
+import * as signalR from '../../signalr';
 import { OutputLevels, VsCodeHelper } from '../helpers';
 import { TzKtHead } from './SandboxModels';
 
