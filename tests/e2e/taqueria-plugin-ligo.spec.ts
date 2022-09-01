@@ -37,7 +37,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
-	test.skip('Verify that the ligo plugin aliases expose the correct info in the help menu', async () => {
+	test('Verify that the ligo plugin aliases expose the correct info in the help menu', async () => {
 		try {
 			const ligoAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`);
 			expect(ligoAliasCHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
