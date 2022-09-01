@@ -4,6 +4,7 @@ import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
+import * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
 import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
@@ -352,6 +353,12 @@ export const getCurrentEnvironmentConfig = (parsedArgs: RequestArgs.t) => {
 };
 
 /**
+ * Gets the configuration for the project metadata
+ */
+export const getMetadataConfig = (parsedArgs: RequestArgs.t) =>
+	() => (parsedArgs.config.metadata ?? undefined) as Protocol.MetadataConfig.t | undefined;
+
+/**
  * Gets the configuration for the named network
  */
 export const getNetworkConfig = (parsedArgs: RequestArgs.t) =>
@@ -543,6 +550,7 @@ export const Plugin = {
 export {
 	Environment,
 	LoadedConfig,
+	MetadataConfig,
 	NetworkConfig,
 	Operation,
 	Option,
