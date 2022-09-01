@@ -23,7 +23,7 @@ Options:
 Taqueria is currently in BETA. You've been warned. :)
 `;
 
-export const helpContentsTaquitoPluginSpecific = `taq deploy [contract]
+export const helpContentsTaquitoPluginSpecific = `taq deploy <contract>
 
 Deploy a smart contract to a particular environment
 

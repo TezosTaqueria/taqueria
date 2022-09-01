@@ -76,7 +76,9 @@ const getValidContracts = async (parsedArgs: Opts) => {
 			const storage = await newGetInitialStorage(parsedArgs, storageFilename);
 			if (storage === undefined || storage === null) {
 				sendErr(
-					`❌ No initial storage file was found for ${filename}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${storageFilename}" in the artifacts directory\nYou can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option\n`,
+					`❌ No initial storage file was found for ${filename}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
+						getDefaultStorageFilename(contracts[0])
+					}" in the artifacts directory\nYou can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option\n`,
 				);
 				// sendErr(
 				// 	`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
