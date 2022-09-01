@@ -1,6 +1,6 @@
 import * as Settings from '@taqueria/protocol/Settings';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import { attemptP, chain, chainRej, FutureInstance as Future, map, mapRej, resolve } from 'fluture';
+import { attemptP, chain, chainRej, FutureInstance as Future, map, reject } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { getMachineId } from 'https://deno.land/x/machine_id@v0.3.0/mod.ts';
 import type { UsageAnalyticsDeps } from './taqueria-types.ts';
@@ -68,10 +68,14 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 					return taqResolve('');
 				}
 			}),
-			mapRej(() =>
-				option === OPT_IN
-					? 'The command "taq opt-in" is ignored as this might be the first time running Taqueria...'
-					: 'The command "taq opt-out" is ignored as this might be the first time running Taqueria...'
+			chainRej(previous =>
+				reject(TaqError.create({
+					kind: 'E_INVALID_TASK',
+					previous,
+					msg: option === OPT_IN
+						?'The command "taq opt-in" is ignored as this might be the first time running Taqueria...'
+						: 'The command "taq opt-out" is ignored as this might be the first time running Taqueria...'
+				}))				
 			),
 		);
 
@@ -119,12 +123,12 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 		taqError: boolean,
 	): Future<TaqError.t, void> => {
 		const taq_ui = inputArgs.includes('--fromVsCode') ? 'VSCode' : 'CLI';
-		if (taq_ui === 'VSCode') return resolve(noop()); // Disable for VSCode for now
+		if (taq_ui === 'VSCode') return taqResolve(noop()); // Disable for VSCode for now
 		return pipe(
 			allowTracking(),
 			chain((allowTracking: boolean) => {
 				if (!allowTracking) {
-					return resolve(noop());
+					return taqResolve(noop());
 				}
 
 				const measurement_id = 'G-8LSQ6J7P0Q';
