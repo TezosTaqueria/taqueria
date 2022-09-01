@@ -1,6 +1,4 @@
-<% if (it.output == "github") { %>
 # Taqueria Metadata Plugin
-<% } %>
 
 Taqueria Metadata plugin allows to create json file with next metadata related to the contract:
 
@@ -83,9 +81,8 @@ The `generate-project-metadata` task is using to generate metadata for a project
 taq generate-project-metadata
 ```
 
-<%~ it.cautionOpenAdmonition %>
-The `compile` task can be implemented by more than one compiler plugin installed on a project (LIGO, Archetype, SmartPY). If this is the case, you must use the `--plugin ligo` flag to specify a particular compiler
-<%= it.closeAdmonition %>
+> ### :warning: CAUTION
+> The `compile` task can be implemented by more than one compiler plugin installed on a project (LIGO, Archetype, SmartPY). If this is the case, you must use the `--plugin ligo` flag to specify a particular compiler
 
 #### Options
 
