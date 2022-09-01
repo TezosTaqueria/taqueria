@@ -69,7 +69,7 @@ describe.skip('E2E Testing for taqueria contract types plugin only', () => {
 	});
 });
 
-describe('E2E Testing for taqueria contract types plugin with ligo', () => {
+describe.skip('E2E Testing for taqueria contract types plugin with ligo', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo', 'contract-types']);
 		// TODO: This can removed after this is resolved:
