@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - 893-ipfs-pinata-pin-task
 
   push:
     tags:
