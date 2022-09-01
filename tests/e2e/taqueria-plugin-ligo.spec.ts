@@ -68,7 +68,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 			await exec(`taq add-contract hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 3. Run taq compile ${contractName}
-			const noContractSource = await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			// 4. Verify that taqueria outputs an error message
 			expect(String(error)).toContain(contents.ligoNoContractSource);
