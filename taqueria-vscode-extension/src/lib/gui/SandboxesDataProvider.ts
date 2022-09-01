@@ -1,3 +1,4 @@
+import { Protocol } from '@taqueria/node-sdk/types';
 import { toSHA256 } from '@taqueria/protocol/SHA256';
 import { randomInt } from 'crypto';
 import fetch from 'node-fetch';
@@ -9,6 +10,8 @@ import { CachedSandboxState } from './CachedSandboxState';
 import { ObservableConfig } from './ObservableConfig';
 import { TzKtHead } from './SandboxModels';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
+
+const { Url } = Protocol;
 
 export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	implements vscode.TreeDataProvider<SandboxTreeItemBase>, HasRefresh
@@ -110,6 +113,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 					this.helper,
 					name,
 					await this.getContainerName(name, environmentName, projectDir),
+					this.observableConfig,
 				);
 				await cached.startConnection();
 				cached.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, name));
@@ -133,7 +137,13 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const address = accountItem instanceof SandboxImplicitAccountTreeItem
 			? accountItem.address
 			: accountItem.parent.address;
-		const response = await fetch(`http://localhost:5000/v1/accounts/${address}/operations`);
+		const tzktBaseUrl = this.sandboxStates[accountItem.parent.sandboxName]?.getTzKtBaseUrl(
+			accountItem.parent.sandboxName,
+		);
+		if (!tzktBaseUrl) {
+			return [];
+		}
+		const response = await fetch(`${tzktBaseUrl}/v1/accounts/${address}/operations`);
 		const data = await response.json();
 		return (data as any[]).map(item =>
 			new OperationTreeItem(
@@ -151,21 +161,17 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 		for (const sandbox of this.sandboxTreeItems) {
 			try {
-				const sandBoxHeadResponse = await fetch(`http://127.0.0.1:20000/chains/main/blocks/head`);
+				const sandboxBaseUrl = this.sandboxStates[sandbox.sandboxName]?.getSandboxBaseUrl(sandbox.sandboxName);
+				if (!sandboxBaseUrl) {
+					sandbox.sandboxLevel = undefined;
+					continue;
+				}
+				const sandBoxHeadResponse = await fetch(`${sandboxBaseUrl}/chains/main/blocks/head`);
 				const sandboxHead = await sandBoxHeadResponse.json();
 				sandbox.sandboxLevel = (sandboxHead as any).header.level;
 			} catch (e: unknown) {
 				this.helper.showLog(OutputLevels.warn, `${e}`);
 			}
-
-			// try {
-			// 	const tzKtHeadResponse = await fetch(`http://localhost:5000/v1/head`);
-			// 	const tzKtHead = await tzKtHeadResponse.json();
-			// 	sandbox.indexerLevel = (tzKtHead as any).level;
-			// } catch (e: unknown) {
-			// 	this.helper.showLog(OutputLevels.warn, `${e}`);
-			// }
-
 			this.refreshItem(sandbox);
 		}
 	}
@@ -177,7 +183,11 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!containerName) {
 			return [];
 		}
-		const response = await fetch(`http://localhost:5000/v1/contracts/${element.parent.address}/entrypoints`);
+		const tzktBaseUrl = this.sandboxStates[element.parent.sandboxName]?.getTzKtBaseUrl(element.parent.sandboxName);
+		if (!tzktBaseUrl) {
+			return [];
+		}
+		const response = await fetch(`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints`);
 		const data = await response.json();
 		return (data as any[]).map(item =>
 			new SmartContractEntrypointTreeItem(item.name, item.jsonParameters, element.parent)
@@ -185,10 +195,10 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private async getSandboxChildren(element: SandboxTreeItem): Promise<SandboxChildrenTreeItem[]> {
-		const containerName = element.containerName;
-		const [accountCount, contractCount] = containerName
-			? await Promise.all([this.getAccountCount(containerName), this.getContractCount(containerName)])
-			: [undefined, undefined];
+		const [accountCount, contractCount] = await Promise.all([
+			this.getAccountCount(element),
+			this.getContractCount(element),
+		]);
 		return [
 			new SandboxChildrenTreeItem('Implicit Accounts', accountCount, element),
 			new SandboxChildrenTreeItem('Smart Contracts', contractCount, element),
@@ -197,14 +207,22 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		];
 	}
 
-	private async getAccountCount(containerName: string): Promise<number> {
-		const response = await fetch('http://localhost:5000/v1/accounts/count?type.ne=contract');
+	private async getAccountCount(element: SandboxTreeItem): Promise<number | undefined> {
+		const tzktBaseUrl = this.sandboxStates[element.sandboxName]?.getTzKtBaseUrl(element.sandboxName);
+		if (!tzktBaseUrl) {
+			return undefined;
+		}
+		const response = await fetch(`${tzktBaseUrl}/v1/accounts/count?type.ne=contract`);
 		const data = await response.json();
 		return data as number;
 	}
 
-	private async getContractCount(containerName: string): Promise<number> {
-		const response = await fetch('http://localhost:5000/v1/contracts/count');
+	private async getContractCount(element: SandboxTreeItem): Promise<number | undefined> {
+		const tzktBaseUrl = this.sandboxStates[element.sandboxName]?.getTzKtBaseUrl(element.sandboxName);
+		if (!tzktBaseUrl) {
+			return undefined;
+		}
+		const response = await fetch(`${tzktBaseUrl}/v1/contracts/count`);
 		const data = await response.json();
 		return data as number;
 	}
@@ -217,26 +235,33 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private async getSandboxImplicitAccounts(
-		_element: SandboxChildrenTreeItem,
+		element: SandboxChildrenTreeItem,
 	): Promise<SandboxImplicitAccountTreeItem[]> {
-		const containerName = _element.parent.containerName;
-		if (!containerName) {
+		const tzktBaseUrl = this.sandboxStates[element.parent.sandboxName]?.getTzKtBaseUrl(element.parent.sandboxName);
+		if (!tzktBaseUrl) {
 			return [];
 		}
-		const response = await fetch('http://localhost:5000/v1/accounts?type.ne=contract');
+		const response = await fetch(`${tzktBaseUrl}/v1/accounts?type.ne=contract`);
+		tzktBaseUrl;
 		const data = await response.json();
-		return (data as any[]).map(item => new SandboxImplicitAccountTreeItem(item.address, _element.parent));
+		return (data as any[]).map(item => new SandboxImplicitAccountTreeItem(item.address, element.parent));
 	}
 
-	private async getSandboxSmartContracts(_element: SandboxChildrenTreeItem): Promise<SandboxSmartContractTreeItem[]> {
-		const containerName = _element.parent.containerName;
+	private async getSandboxSmartContracts(element: SandboxChildrenTreeItem): Promise<SandboxSmartContractTreeItem[]> {
+		const containerName = element.parent.containerName;
 		if (!containerName) {
 			return [];
 		}
-		const response = await fetch(`http://localhost:5000/v1/contracts?limit=1000&rnd=${randomInt(1000000000)}`);
+		const tzktBaseUrl = this.sandboxStates[element.parent.sandboxName]?.getTzKtBaseUrl(element.parent.sandboxName);
+		if (!tzktBaseUrl) {
+			return [];
+		}
+		const response = await fetch(`${tzktBaseUrl}/v1/contracts?limit=1000&rnd=${randomInt(1000000000)}`);
 		const data = await response.json();
 
-		return (data as any[]).map(item => new SandboxSmartContractTreeItem(item.address, item.type, containerName));
+		return (data as any[]).map(item =>
+			new SandboxSmartContractTreeItem(item.address, item.type, containerName, element.parent.sandboxName)
+		);
 	}
 
 	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void> = new vscode
@@ -387,6 +412,7 @@ export class SandboxSmartContractTreeItem extends SandboxTreeItemBase {
 		public readonly address: string,
 		public type: string,
 		public readonly containerName: string,
+		public readonly sandboxName: string,
 	) {
 		super(type, 'smartContract', vscode.TreeItemCollapsibleState.Collapsed);
 		this.description = address;

@@ -578,6 +578,7 @@
 		"@taqueria/protocol": "^0.14.4",
 		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
+		"eventsource": "^2.0.2",
 		"node-fetch": "^3.2.10",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1",
