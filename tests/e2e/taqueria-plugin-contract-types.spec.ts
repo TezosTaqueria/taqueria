@@ -15,7 +15,7 @@ describe('E2E Testing for taqueria contract types plugin only', () => {
 		// https://github.com/ecadlabs/taqueria/issues/528
 		try {
 			await exec(`taq -p ${taqueriaProjectPath}`);
-		} catch (_) { }
+		} catch (_) {}
 	});
 
 	test('Verify that the contract types plugin exposes the associated commands in the help menu', async () => {
@@ -74,7 +74,7 @@ describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 		// https://github.com/ecadlabs/taqueria/issues/528
 		try {
 			await exec(`taq -p ${taqueriaProjectPath}`);
-		} catch (_) { }
+		} catch (_) {}
 
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
 		await exec(`taq add-contract increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
@@ -207,10 +207,12 @@ describe('E2E Testing for taqueria contract types plugin: Generate Example Contr
 		// https://github.com/ecadlabs/taqueria/issues/528
 		try {
 			await exec(`taq -p ${taqueriaProjectPath}`);
-		} catch (_) { }
+		} catch (_) {}
 
-		await exec(`cp -rT ../taqueria-plugin-contract-types/example/contracts/ ${taqueriaProjectPath}/artifacts`);
-		await exec(`cp -rT ../taqueria-plugin-contract-types/example/types-file/ ${taqueriaProjectPath}/types-expected`);
+		await exec(`cp -r ../taqueria-plugin-contract-types/example/contracts/* ${taqueriaProjectPath}/artifacts`);
+		console.log(await exec(`ls ${taqueriaProjectPath}/artifacts`));
+		await exec(`cp -r ../taqueria-plugin-contract-types/example/types-file/ ${taqueriaProjectPath}/types-expected`);
+		console.log(await exec(`ls ${taqueriaProjectPath}/types-expected`));
 
 		await exec(`taq generate types`, { cwd: `./${taqueriaProjectPath}` });
 	});
@@ -218,12 +220,16 @@ describe('E2E Testing for taqueria contract types plugin: Generate Example Contr
 	const testContractTypeGeneration = async (
 		contractFileName: string,
 	) => {
+		const expectedRaw = await fsPromises.readFile(
+			`${taqueriaProjectPath}/types-expected/${contractFileName}.types.ts`,
+			{ encoding: 'utf-8' },
+		);
+		const actualRaw = await fsPromises.readFile(`${taqueriaProjectPath}/types/${contractFileName}.types.ts`, {
+			encoding: 'utf-8',
+		});
 
-		const expectedRaw = await fsPromises.readFile(`${taqueriaProjectPath}/types-expected/${contractFileName}.types.ts`, { encoding: 'utf-8' });
-		const actualRaw = await fsPromises.readFile(`${taqueriaProjectPath}/types/${contractFileName}.types.ts`, { encoding: 'utf-8' });
-
-		const expected = expectedRaw; //.replace(/\s+/g, ' ');
-		const actual = actualRaw; //.replace(/\s+/g, ' ');
+		const expected = expectedRaw; // .replace(/\s+/g, ' ');
+		const actual = actualRaw; // .replace(/\s+/g, ' ');
 
 		expect(expected).toEqual(actual);
 	};
