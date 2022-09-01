@@ -9,7 +9,7 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
-  taq deploy [contract]           Deploy a smart contract to a particular enviro
+  taq deploy <contract>           Deploy a smart contract to a particular enviro
                                   nment                     [aliases: originate]
 
 Options:
@@ -34,6 +34,10 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
+      --alias       Alias used to refer to the deployed contract's address
+      --storage     Name of the storage file that contains the storage value as
+                    a Michelson expression, in the artifacts directory, used for
+                     originating a contract
 `;
 
 export const originateSingleOutput = (address: string) =>

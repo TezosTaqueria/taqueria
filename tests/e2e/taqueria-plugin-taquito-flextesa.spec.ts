@@ -35,7 +35,9 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
 		// 1. Run taq deploy on a selected test network described in "test" environment
-		const deployCommand = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
+		const deployCommand = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 		// 2. Verify that contract has been originated on the network

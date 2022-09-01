@@ -59,7 +59,9 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 2. Run taq deploy on a selected test network described in "test" environment
 
-		const deployCommand = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
+		const deployCommand = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 		// 3. Verify that contract has been originated on the network
@@ -175,11 +177,12 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	test('Verify that taqueria taquito plugin will show proper error when environment does not exists', async () => {
 		try {
+			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 			// Environment test does not exist on default config.json
 			environment = 'tes';
 
 			// 1. Run taq deploy on a network described in "test" environment
-			await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq deploy hello-tacos.tz -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			// 2. Verify that proper error is displayed in the console
 			expect(error).toContain('There is no environment called tes in your config.json.');
@@ -199,7 +202,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
 			// 2. Run taq deploy on a network described in "test" environment
-			await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq deploy hello-tacos.tz -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
 			expect(error).toContain('E_INVALID_PLUGIN_RESPONSE');
 			// throw new Error (`error: ${error}`);
@@ -218,7 +221,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
 
 		// 2. Run taq deploy on a network described in "test" environment
-		const stdoutDeploy = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
+		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain('HttpRequestFailed: Request to https://invalid.test/chains/main/blocks/');
@@ -236,7 +239,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 
 		// 2. Run taq deploy on a network described in "test" environment
-		const stdoutDeploy = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
+		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain('Error: Unsupported key type');
@@ -254,7 +257,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 
 		// 2. Run taq deploy on a network described in "test" environment
-		const stdoutDeploy = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
+		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain('Error: Unsupported key type');
@@ -271,7 +274,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 
 		// 2. Run taq deploy on a network described in "test" environment
-		const stdoutDeploy = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
+		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain(
@@ -294,7 +297,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 
 		// 2. Run taq deploy on a network described in "test" environment
-		const stdoutDeploy = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
+		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain(
