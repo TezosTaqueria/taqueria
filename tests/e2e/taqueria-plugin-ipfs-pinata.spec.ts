@@ -22,6 +22,10 @@ async function configureForTests() {
 		JWT = process.env.UNLIMITED_PINATA_TOKEN;
 		await exec(`echo "pinataJwtToken=${JWT}" > ${taqueriaProjectPath}/.env`);
 		console.log(await exec(`cat ${taqueriaProjectPath}/.env`));
+	} else {
+		// The .env file should be in the root directory of the taqueria project
+		// this just makes sure it gets into the test directory for use
+		await exec(`cp ../.env ${taqueriaProjectPath}/.env`);
 	}
 }
 
@@ -81,13 +85,6 @@ describe('E2E Testing for the taqueria ipfs pinata plugin', () => {
 		} catch (_) {}
 
 		await exec(`cp -r e2e/data/ipfs ${taqueriaProjectPath}/ipfs`);
-		// await exec(`cp ../.env ${taqueriaProjectPath}/.env`);
-
-		// if ((await exec(`stat ${taqueriaProjectPath}/.env`)).stderr.includes("No such file or directory")) {
-		// 	console.log("NO .env file found for Pinata JWT, exiting tests and you should add that for these to work")
-		// 	process.exit(1);
-		// }
-		// await exec(`cp e2e/data/.env ${taqueriaProjectPath}/.env`);
 	});
 
 	test('ipfs pinata plugin should warn if no file specified for publish', async () => {
