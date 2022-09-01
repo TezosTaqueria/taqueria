@@ -29,7 +29,7 @@ describe('E2E Testing for taqueria contract types plugin only', () => {
 		}
 	});
 
-	test('Verify that the contract types plugin exposes the associated options in the help menu', async () => {
+	test.skip('Verify that the contract types plugin exposes the associated options in the help menu', async () => {
 		try {
 			const generateTypesHelpContents = await exec(`taq generate types --help --projectDir=${taqueriaProjectPath}`);
 			expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsContractTypesPluginSpecific);
