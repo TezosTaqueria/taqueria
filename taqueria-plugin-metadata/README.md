@@ -90,7 +90,10 @@ The metadata `generate metadata` task will accept the following required paramet
 
 ### `taq generate-project-metadata`
 
-The `generate-project-metadata` task collects project-level metadata fields which are added to `config.json`. Once generated, these values will be used as defaults when running `taq create metadata < contractName >`
+The `generate-project-metadata` task collects project-level metadata fields which are added to `config.json`. Once generated, these values will be used as defaults when generating contract metadata
+
+
+#### Command Structure
 
 ```shell
 taq generate-project-metadata
