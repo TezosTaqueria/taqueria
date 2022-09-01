@@ -8,9 +8,7 @@ const exec = util.promisify(exec1);
 
 const taqueriaProjectPath = 'e2e/auto-test-contract-types-plugin';
 
-// const itif = (condition) => condition ? it : it.skip;
-
-describe.skip('E2E Testing for taqueria contract types plugin only', () => {
+describe('E2E Testing for taqueria contract types plugin only', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['contract-types']);
 		// TODO: This can removed after this is resolved:
@@ -20,7 +18,7 @@ describe.skip('E2E Testing for taqueria contract types plugin only', () => {
 		} catch (_) {}
 	});
 
-	test.skip('Verify that the contract types plugin exposes the associated commands in the help menu', async () => {
+	test('Verify that the contract types plugin exposes the associated commands in the help menu', async () => {
 		try {
 			const generateTypesHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsContractTypesPlugin);
@@ -29,7 +27,7 @@ describe.skip('E2E Testing for taqueria contract types plugin only', () => {
 		}
 	});
 
-	test.skip('Verify that the contract types plugin exposes the associated options in the help menu', async () => {
+	test('Verify that the contract types plugin exposes the associated options in the help menu', async () => {
 		try {
 			const generateTypesHelpContents = await exec(`taq generate types --help --projectDir=${taqueriaProjectPath}`);
 			expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsContractTypesPluginSpecific);
@@ -38,7 +36,7 @@ describe.skip('E2E Testing for taqueria contract types plugin only', () => {
 		}
 	});
 
-	test.skip('Verify that the contract types plugin exposes the associated aliases in the help menu', async () => {
+	test('Verify that the contract types plugin exposes the associated aliases in the help menu', async () => {
 		try {
 			const generateTypesHelpContentsGen = await exec(`taq gen --help --projectDir=${taqueriaProjectPath}`);
 			expect(generateTypesHelpContentsGen.stdout).toBe(contents.helpContentsContractTypesPluginSpecific);
@@ -69,7 +67,7 @@ describe.skip('E2E Testing for taqueria contract types plugin only', () => {
 	});
 });
 
-describe.skip('E2E Testing for taqueria contract types plugin with ligo', () => {
+describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo', 'contract-types']);
 		// TODO: This can removed after this is resolved:
@@ -164,7 +162,7 @@ describe.skip('E2E Testing for taqueria contract types plugin with ligo', () => 
 		expect(generateTypesOutput.stdout).toContain(`hello-tacos.tz: Types generated`);
 	});
 
-	test.skip(
+	test(
 		'Verify that users can properly use the generated types (involves origination to a testnet and calling an entrypoint, which will take a while)',
 		async () => {
 			await exec(`cp e2e/data/timelock.tz ${taqueriaProjectPath}/artifacts`);
