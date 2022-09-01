@@ -111,6 +111,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 					name,
 					await this.getContainerName(name, environmentName, projectDir),
 				);
+				await cached.startConnection();
 				cached.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, name));
 				this.sandboxStates[name] = cached;
 			} catch (e: unknown) {
@@ -157,13 +158,13 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				this.helper.showLog(OutputLevels.warn, `${e}`);
 			}
 
-			try {
-				const tzKtHeadResponse = await fetch(`http://localhost:5000/v1/head`);
-				const tzKtHead = await tzKtHeadResponse.json();
-				sandbox.indexerLevel = (tzKtHead as any).level;
-			} catch (e: unknown) {
-				this.helper.showLog(OutputLevels.warn, `${e}`);
-			}
+			// try {
+			// 	const tzKtHeadResponse = await fetch(`http://localhost:5000/v1/head`);
+			// 	const tzKtHead = await tzKtHeadResponse.json();
+			// 	sandbox.indexerLevel = (tzKtHead as any).level;
+			// } catch (e: unknown) {
+			// 	this.helper.showLog(OutputLevels.warn, `${e}`);
+			// }
 
 			this.refreshItem(sandbox);
 		}
