@@ -4,6 +4,7 @@ import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
+import * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
 import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
@@ -109,6 +110,13 @@ export const sendErr = (msg: string, newline = true) => {
 	if (!msg || msg.length === 0) return;
 	return newline
 		? console.error(msg)
+		: process.stderr.write(msg) as unknown as void;
+};
+
+export const sendWarn = (msg: string, newline = true) => {
+	if (!msg || msg.length === 0) return;
+	return newline
+		? console.warn(msg)
 		: process.stderr.write(msg) as unknown as void;
 };
 
@@ -344,6 +352,12 @@ export const getCurrentEnvironmentConfig = (parsedArgs: RequestArgs.t) => {
 };
 
 /**
+ * Gets the configuration for the project metadata
+ */
+export const getMetadataConfig = (parsedArgs: RequestArgs.t) =>
+	() => (parsedArgs.config.metadata ?? undefined) as Protocol.MetadataConfig.t | undefined;
+
+/**
  * Gets the configuration for the named network
  */
 export const getNetworkConfig = (parsedArgs: RequestArgs.t) =>
@@ -387,14 +401,20 @@ export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
 /**
  * Gets the initial storage for the contract
  */
-export const getInitialStorage = (parsedArgs: RequestArgs.t) =>
-	(contractFilename: string) => {
-		const env = getCurrentEnvironmentConfig(parsedArgs);
-
-		return env
-			? env.storage && env.storage[contractFilename]
-			: undefined;
-	};
+export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilename: string) => {
+	const env = getCurrentEnvironmentConfig(parsedArgs);
+	if (env && env.storage && env.storage[contractFilename]) {
+		const storagePath: string = env.storage[contractFilename];
+		try {
+			const content = await readFile(storagePath, { encoding: 'utf-8' });
+			return content;
+		} catch (err) {
+			sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
+			return undefined;
+		}
+	}
+	return undefined;
+};
 
 /**
  * Gets the default account associated with a sandbox
@@ -495,6 +515,7 @@ export const Plugin = {
 export {
 	Environment,
 	LoadedConfig,
+	MetadataConfig,
 	NetworkConfig,
 	Operation,
 	Option,

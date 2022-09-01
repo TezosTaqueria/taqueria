@@ -45,6 +45,14 @@ export async function getContainerName(dockerName: string): Promise<string> {
 	return dockerContainerName;
 }
 
+export async function getContainerID(dockerName: string): Promise<string> {
+	const [_dockerContainerHeader, dockerContainerInfo] =
+		(await exec(`docker ps --filter "name=taqueria-development-${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
+	const containerInfoArray = dockerContainerInfo.split('   ');
+	const dockerContainerID = containerInfoArray[0];
+	return dockerContainerID;
+}
+
 // The solution was taken from this source:
 // https://stackoverflow.com/questions/26165725/nodejs-check-file-exists-if-not-wait-till-it-exist
 // It is pull&wait mechanism and it is async by nature, because
