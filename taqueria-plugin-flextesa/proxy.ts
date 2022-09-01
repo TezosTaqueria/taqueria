@@ -35,12 +35,12 @@ const getDockerImage = (opts: Opts) => `ghcr.io/ecadlabs/taqueria-flextesa:${opt
 
 export const getUniqueSandboxName = async (sandboxName: string, projectDir: string) => {
 	const hash = await stringToSHA256(projectDir);
-	return `${sandboxName}-${hash}`;
+	return `${sandboxName.substring(0, 10)}-${hash.substring(0, 5)}`;
 };
 
 export const getContainerName = async (sandboxName: string, parsedArgs: Opts) => {
 	const uniqueSandboxName = await getUniqueSandboxName(sandboxName, parsedArgs.projectDir);
-	return `taqueria-${parsedArgs.env}-${uniqueSandboxName}`;
+	return `taq-flextesa-${uniqueSandboxName}`;
 };
 
 export const getNewPortIfPortInUse = async (port: number): Promise<number> => {

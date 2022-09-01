@@ -270,12 +270,12 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	// take care of this tech debt.
 	private async getUniqueSandboxName(sandboxName: string, projectDir: string) {
 		const hash = await toSHA256(projectDir);
-		return `${sandboxName}-${hash}`;
+		return `${sandboxName.substring(0, 10)}-${hash.substring(0, 5)}`;
 	}
 
 	async getContainerName(sandboxName: string, environmentName: string, projectDir: string) {
 		const uniqueSandboxName = await this.getUniqueSandboxName(sandboxName, projectDir);
-		return `taqueria-${environmentName}-${uniqueSandboxName}`;
+		return `taq-flextesa-${uniqueSandboxName}`;
 	}
 
 	refreshItem(item: SandboxTreeItemBase): void {

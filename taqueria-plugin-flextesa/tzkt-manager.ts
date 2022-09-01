@@ -14,9 +14,9 @@ const getTzKtDockerImages = (opts: Opts) => ({
 export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: Opts) => {
 	const uniqueSandboxName = await getUniqueSandboxName(sandboxName, parsedArgs.projectDir);
 	return {
-		postgres: `taqueria-${parsedArgs.env}-pg-${uniqueSandboxName}`,
-		sync: `taqueria-${parsedArgs.env}-tzkt-sync-${uniqueSandboxName}`,
-		api: `taqueria-${parsedArgs.env}-tzkt-api-${uniqueSandboxName}`,
+		postgres: `taq-postgres-${uniqueSandboxName}`,
+		sync: `taq-tzkt-sync-${uniqueSandboxName}`,
+		api: `taq-tzkt-api-${uniqueSandboxName}`,
 	};
 };
 
@@ -24,14 +24,12 @@ const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: Sandbo
 	const sandboxPort = Url.toComponents(sandbox.rpcUrl).port;
 	const containerNames = await getTzKtContainerNames(sandboxName, opts);
 	const sandboxContainerName = await getContainerName(sandboxName, opts);
+	const connectionStringEnv =
+		`ConnectionStrings__DefaultConnection="host=${containerNames.postgres};port=5432;database=sandbox_data;username=tzkt;password=${sandboxName};"`;
 	return {
 		postgres: `--env POSTGRES_PASSWORD=${sandboxName} --env POSTGRES_USER=tzkt`,
-		sync: `--env ConnectionStrings__DefaultConnection="host=${containerNames.postgres};port=${
-			sandbox.tzkt?.postgresqlPort ?? 5432
-		};database=sandbox_data;username=tzkt;password=${sandboxName};" --env TezosNode__Endpoint="http://${sandboxContainerName}:${sandboxPort}/"`,
-		api: `--env ConnectionStrings__DefaultConnection="host=${containerNames.postgres};port=${
-			sandbox.tzkt?.postgresqlPort ?? 5432
-		};database=sandbox_data;username=tzkt;password=${sandboxName};"`,
+		sync: `--env ${connectionStringEnv} --env TezosNode__Endpoint="http://${sandboxContainerName}:${sandboxPort}/"`,
+		api: `--env ${connectionStringEnv} --env Kestrel__Endpoints__Http__Url="http://*:5000"`,
 	};
 };
 
