@@ -164,7 +164,7 @@ describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 		expect(generateTypesOutput.stdout).toContain(`hello-tacos.tz: Types generated`);
 	});
 
-	test(
+	test.skip(
 		'Verify that users can properly use the generated types (involves origination to a testnet and calling an entrypoint, which will take a while)',
 		async () => {
 			await exec(`cp e2e/data/timelock.tz ${taqueriaProjectPath}/artifacts`);
