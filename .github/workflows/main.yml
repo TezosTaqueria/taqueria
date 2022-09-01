@@ -141,7 +141,7 @@ jobs:
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
           path: "taq.${{ matrix.deno_target }}"
-          destination: "taqueria-artifacts/${{ github.ref }}"
+          destination: "taqueria-artifacts/${{ github.ref_name }}"
 
       - name: Set public url
         id: public-url
@@ -485,6 +485,10 @@ jobs:
                 <tr>
                   <th scope="row">VSCode Extension VSIX</th>
                   <td>${vsCodeCommentBody}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Test Status</th>
+                  <td>"${{ needs.run-tests.result }}"</td>
                 </tr>
               </table>
             `;
