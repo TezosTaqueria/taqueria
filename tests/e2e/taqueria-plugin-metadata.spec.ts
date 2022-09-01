@@ -61,7 +61,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 	};
 
 	test('metadata plugin should create a contract metadata.json file', async () => {
-		await runCliWithPrompts(`generate metadata hello-tacos`, [
+		await runCliWithPrompts(`generate-metadata hello-tacos`, [
 			['name', 'test-name'],
 			['description', 'test-description'],
 			['author', 'test-author'],
@@ -80,7 +80,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 	});
 
 	test('metadata plugin should re-create a contract metadata.json using existing values', async () => {
-		await runCliWithPrompts(`generate metadata hello-tacos`, [
+		await runCliWithPrompts(`generate-metadata hello-tacos`, [
 			['name', 'test-name'],
 			['description', 'test-description'],
 			['author', 'test-author'],
@@ -88,7 +88,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 			['license', 'test-license'],
 		]);
 
-		await runCliWithPrompts(`generate metadata hello-tacos`, [
+		await runCliWithPrompts(`generate-metadata hello-tacos`, [
 			['name', ''],
 			['description', ''],
 			['author', ''],
@@ -107,7 +107,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 	});
 
 	test('metadata plugin should ask for contract name if not provided', async () => {
-		await runCliWithPrompts(`generate metadata`, [
+		await runCliWithPrompts(`generate-metadata`, [
 			['contract', 'hello-tacos'],
 			['name', 'test-name'],
 			['description', 'test-description'],
@@ -127,7 +127,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 	});
 
 	test('metadata plugin should previous answers for defaults', async () => {
-		await runCliWithPrompts(`generate metadata hello-tacos`, [
+		await runCliWithPrompts(`generate-metadata hello-tacos`, [
 			['name', 'test-name'],
 			['description', 'test-description'],
 			['author', 'test-author'],
@@ -135,7 +135,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 			['license', 'test-license'],
 		]);
 
-		await runCliWithPrompts(`generate metadata hello-tacos`, [
+		await runCliWithPrompts(`generate-metadata hello-tacos`, [
 			['name', 'test2-name'],
 			['description', 'test2-description'],
 			['author', ''],
@@ -154,7 +154,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 	});
 
 	test('metadata plugin should use other contracts for defaults', async () => {
-		await runCliWithPrompts(`generate metadata hello-tacos`, [
+		await runCliWithPrompts(`generate-metadata hello-tacos`, [
 			['name', 'test-name'],
 			['description', 'test-description'],
 			['author', 'test-author'],
@@ -162,7 +162,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 			['license', 'test-license'],
 		]);
 
-		await runCliWithPrompts(`generate metadata fake-contract`, [
+		await runCliWithPrompts(`generate-metadata fake-contract`, [
 			['name', 'fake-name'],
 			['description', 'fake-description'],
 			['author', ''],
@@ -189,7 +189,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 			['license', 'project-license'],
 		]);
 
-		await runCliWithPrompts(`generate metadata fake-contract`, [
+		await runCliWithPrompts(`generate-metadata fake-contract`, [
 			['name', 'fake-name'],
 			['description', 'fake-description'],
 			['author', ''],
