@@ -31,5 +31,5 @@ for package in "${packages[@]}"; do
 done
 echo "Updating dependencies...done"
 
-echo "Ruuning \"npm update\" to ensure the package-lock.json is up to date"
-npm update
+# echo "Ruuning \"npm update\" to ensure the package-lock.json is up to date"
+# npm update
