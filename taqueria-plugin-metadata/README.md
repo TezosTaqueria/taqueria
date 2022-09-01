@@ -40,9 +40,7 @@ The plugin exposes two tasks:
 - `taq generate metadata < contractName >` - Generates `TZIP-16` compliant metadata for a contract in JSON format 
 - `taq generate-project-metadata` - Generates project level metadata that is written to `config.json`
 
-Contract metadata is output into a JSON file in the `./artifacts` directory
-
-Project metadata is added to `.taq/config.json` as seen here:
+Contract metadata is output into a JSON file in the `./artifacts` directory, while project metadata is added to `.taq/config.json` as seen here:
 
 ```json
     "metadata": {
@@ -61,7 +59,7 @@ Project metadata is added to `.taq/config.json` as seen here:
 
 ### `taq generate metadata [contractName]`
 
-The `generate metadata` task is using to generate metadata for a contract
+The `generate metadata` task starts an interactive interface that collects the relavent fields via CLI prompts and outputs a `TZIP-16` compliant metadata file in JSON format
 
 > ### :page_with_curl: Note
 > The contract may, or may not exist yet
@@ -87,17 +85,28 @@ The metadata `generate metadata` task will accept the following required paramet
 |------------|:---------------------------------------:|
 |  task   	 | 'generate metadata'         			   |
 |  command   | 'generate metadata [sourceFile]'        | 
-|  command   | 'generate-project-metadata` 			   |
-|  aliases   | N/A 			                           |
+|  aliases   |  N/A  		                           |
 
 
 ### `taq generate-project-metadata`
 
-The `generate-project-metadata` task is using to generate metadata for a project and add it to `config.json` file. Once generated, these values will be used as defaults when running `taq create metadata < contractName >` 
+The `generate-project-metadata` task collects project-level metadata fields which are added to `config.json`. Once generated, these values will be used as defaults when running `taq create metadata < contractName >`
 
 ```shell
 taq generate-project-metadata
 ```
+
+#### Options
+
+The `generate-project-metadata` task not not have any additional parameters or options
+
+#### Task Properties
+
+|  attribute |  value                        		   | 
+|:----------:|:---------------------------------------:|
+|  task   	 | 'generate-project-metadata'             |
+|  command   | 'taq generate-project-metadata'         | 
+|  aliases   |  N/A 			                       |
 
 ## Behaviour
 
