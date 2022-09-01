@@ -239,7 +239,7 @@ jobs:
 
   publish-metadata-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
-    # needs: publish-sdk-to-npm
+    needs: publish-sdk-to-npm
     uses: ./.github/workflows/npm-publish.yml
     with:
       dir: taqueria-plugin-metadata
@@ -466,18 +466,6 @@ jobs:
               }
             }
 
-            const ligo = readInfo("./taqueria-plugin-ligo/package.json")
-            const smartpy = readInfo("./taqueria-plugin-smartpy/package.json")
-            const taquito = readInfo("./taqueria-plugin-taquito/package.json")
-            const sdk = readInfo("./taqueria-sdk/package.json")
-            const flextesa = readInfo("./taqueria-plugin-flextesa/package.json")
-            const contractTypes = readInfo("./taqueria-plugin-contract-types/package.json")
-            const ipfsPinata = readInfo("./taqueria-plugin-ipfs-pinata/package.json")
-            const metadata = readInfo("./taqueria-plugin-metadata/package.json")
-            const archetype = readInfo("./taqueria-plugin-archetype/package.json")
-            const tezosClient = readInfo("./taqueria-plugin-tezos-client/package.json")
-            const stateJS = readInfo("./taqueria-state/package.json")
-
             let body = `
               <table>
                 <tr>
@@ -491,24 +479,6 @@ jobs:
                           <a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a><br>
                           <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
                           <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
-                      </p>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">npm Packages</th>
-                  <td>
-                      <p>
-                          npm install ${{ env.SCOPE }}/${sdk.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${ligo.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${smartpy.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${taquito.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${flextesa.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br>
-                          taq install ${{ env.SCOPE }}/${contractTypes.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
-                          taq install ${{ env.SCOPE }}/${ipfsPinata.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
-                          taq install ${{ env.SCOPE }}/${metadata.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}<br/>
-                          taq install ${{ env.SCOPE }}/${archetype.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
-                          taq install ${{ env.SCOPE }}/${tezosClient.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
-                          taq install ${{ env.SCOPE }}/${stateJS.name}@0.0.0-pr-${{ github.event.number }}-${git_short_sha}
                       </p>
                   </td>
                 </tr>
