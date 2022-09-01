@@ -10,7 +10,7 @@ const taqueriaProjectPath = 'e2e/auto-test-contract-types-plugin';
 
 // const itif = (condition) => condition ? it : it.skip;
 
-describe('E2E Testing for taqueria contract types plugin only', () => {
+describe.skip('E2E Testing for taqueria contract types plugin only', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['contract-types']);
 		// TODO: This can removed after this is resolved:
