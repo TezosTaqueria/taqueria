@@ -209,8 +209,8 @@ describe('E2E Testing for taqueria contract types plugin: Generate Example Contr
 			await exec(`taq -p ${taqueriaProjectPath}`);
 		} catch (_) {}
 
-		await exec(`cp -rT ../taqueria-plugin-contract-types/example/contracts/ ${taqueriaProjectPath}/artifacts`);
-		await exec(`cp -rT ../taqueria-plugin-contract-types/example/types-file/ ${taqueriaProjectPath}/types-expected`);
+		await exec(`cp -r ../taqueria-plugin-contract-types/example/contracts/* ${taqueriaProjectPath}/artifacts`);
+		await exec(`cp -r ../taqueria-plugin-contract-types/example/types-file/ ${taqueriaProjectPath}/types-expected`);
 
 		await exec(`taq generate types`, { cwd: `./${taqueriaProjectPath}` });
 	});
