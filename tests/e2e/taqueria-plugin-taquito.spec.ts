@@ -13,6 +13,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['taquito']);
+		await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}`);
 		// TODO: This can removed after this is resolved:
 		// https://github.com/ecadlabs/taqueria/issues/528
 		try {
@@ -274,7 +275,10 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain(
-			'Michelson artifact hello-tacos.tz has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.test.storage."hello-tacos.tz"',
+			'Michelson artifact hello-tacos.tz has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.test.storage["hello-tacos.tz"]',
+		);
+		expect(stdoutDeploy.stderr).toContain(
+			'The value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.',
 		);
 	});
 
@@ -284,6 +288,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
+		await exec(`cp e2e/data/string.storage ${taqueriaProjectPath}`);
 		await exec(
 			`cp e2e/data/config-taquito-test-environment-invalid-initial-storage-string.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
@@ -292,7 +297,9 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const stdoutDeploy = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
 
 		// 3. Verify that proper error displays in the console
-		expect(stdoutDeploy.stderr).toContain('Value is not a number: abc');
+		expect(stdoutDeploy.stderr).toContain(
+			"(permanent) proto.013-PtJakart.michelson_v1.invalid_expression_kind - There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.",
+		);
 	});
 
 	// Remove all files from artifacts folder without removing folder itself

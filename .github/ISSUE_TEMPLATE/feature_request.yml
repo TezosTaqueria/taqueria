@@ -1,41 +1,86 @@
-name: Feature Request
-description: Request a new feature
-title: "[Feature]: "
+name: 🌋 Epic|Feature 
+description: Product feature or epic 
+title: "🌋 E|F ➾ "
 labels: ["feature", "triage"]
 assignees:
-  - 
+  - hu3man
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this feature request!
+          # ◢▅◣◥▅◤◢▅◣🏔️🌋⛰️ Epic|Feature ⛰️🌋🏔️◢▅◣◥▅◤◢▅◣
+
+          ## 🛑 Sanity Check: Does this really need it's own ticket?
+ 
+  - type: input
+    id: pb_link
+    attributes:
+      label: Product Board Link
+      placeholder: "ex. https://productboard.com/..."
+    validations:
+      required: false
+  - type: checkboxes
+    id: tkt_status
+    attributes: 
+      label: 🚥 Status
+      options:
+        - label: 🔮 Product/Feature Design
+        - label: ✍🏻 Architecture/Implementation Planning
+        - label: 🏗️ Under Construction
+        - label: ⛳ Feature Complete
+        - label: ⛵ GTM / Release
+  - type: textarea
+    id: to_do
+    attributes:
+      label: ✅ To Do
+      description: A list of to do items for this ticket
+      placeholder: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
+    validations:
+      required: false
   - type: textarea
     id: feature-desc
     attributes:
-      label: Describe the feature you would like
-      description: Please provide details about your feature request?
-      placeholder: Tell us what you would like Taqueria to do!
-      value: "Details about the feature request"
+      label: 📐 Feature Description
+      description: Please provide details about how this would work
+      placeholder: Tell us what you would like Taqueria to do! Include as much detail as possible about how this would work and what the ux would be
     validations:
       required: true
   - type: textarea
-    id: problem-solved
+    id: problem_space
     attributes:
-      label: Is this feature solving a problem? 
-      description: Please tell us about the use case or problem that this feature solves?
-      placeholder: 
-      value: "Details about the problem your feature solves"
-    validations:
-      required: true
-  - type: textarea
-    id: additional-details
-    attributes:
-      label: Please share any additional details you have? 
-      description: Please tell us about it
-      placeholder: 
-      value: "Details about the problem your feature solves"
+      label: 🚩 Problem or Use Case
+      description: Please tell us about what problem this feature solves or what value it provides
+      placeholder: "Tell us about the use case for this feature and why it's important"
     validations:
       required: false
+  - type: textarea
+    id: scope
+    attributes:
+      label: 🔭 Scope
+      description: "Explicitly, what is in and out of scope for this ticket"
+      value: "🏎️ In Scope: \n- ... \n \n 🙅‍♂️ Out of Scope: \n- ... \n \n "
+  - type: textarea
+    id: ac
+    attributes:
+      label: ⚖️ Acceptance Criteria
+      description: Define the definition of done for this feature
+      value: "✨ Features: \n- [ ] ... \n \n 📚 Docs: \n- [ ] ... \n"
+    validations:
+      required: false
+  - type: textarea
+    id: related_issues
+    attributes:
+      label: 🔗  Related Issues and Subtasks
+      description: Links to related issues on GitHub or Productboard
+      placeholder: "- [ ] Issue [#123](...) \n- [ ] Issue [#123](...) "
+    validations:
+      required: false
+  - type: input
+    id: estimate
+    attributes:
+      label: 🦄 Sizing
+      description: Estimate the time and effort required
+      placeholder: "0"
   - type: checkboxes
     id: terms
     attributes:
