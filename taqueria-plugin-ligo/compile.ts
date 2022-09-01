@@ -58,7 +58,9 @@ const getContractNameForExpr = (sourceFile: string, exprKind: ExprKind): string 
 // If sourceFile is token.storages.mligo, then it'll return token.storage.{storageName}.tz
 const getOutputExprFileName = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind, exprName: string): string => {
 	const contractName = basename(getContractNameForExpr(sourceFile, exprKind), extname(sourceFile));
-	const outputFile = `${contractName}.${exprKind}.${exprName}.tz`;
+	const outputFile = exprKind === 'default_storage'
+		? `${contractName}.default_storage.tz`
+		: `${contractName}.${exprKind}.${exprName}.tz`;
 	return join(parsedArgs.config.artifactsDir, `${outputFile}`);
 };
 
