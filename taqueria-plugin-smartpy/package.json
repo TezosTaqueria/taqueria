@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-smartpy",
-	"version": "0.13.0",
+	"version": "0.13.11",
 	"description": "A taqueria plugin for compiling SmartPy smart contracts",
 	"targets": {
 		"default": {
