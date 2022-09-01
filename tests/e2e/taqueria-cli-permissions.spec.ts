@@ -52,7 +52,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		// even if the logic being tested is failing
 	});
 
-	test('testing that ligo artifacts will have the correct permissions', async () => {
+	test.skip('testing that ligo artifacts will have the correct permissions', async () => {
 		await exec(`taq compile --plugin ligo increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
 		const fileUser = await exec(`${userStatCommand} ${taqueriaProjectPath}/artifacts/increment.tz`);
 		const fileGroup = await exec(`${groupStatCommand} ${taqueriaProjectPath}/artifacts/increment.tz`);
@@ -132,11 +132,11 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
-	afterAll(async () => {
-		try {
-			fsPromises.rm(taqueriaProjectPath, { recursive: true });
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
+	// afterAll(async () => {
+	// 	try {
+	// 		fsPromises.rm(taqueriaProjectPath, { recursive: true });
+	// 	} catch (error) {
+	// 		throw new Error(`error: ${error}`);
+	// 	}
+	// });
 });
