@@ -69,7 +69,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 			await exec(`taq add-contract hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 3. Run taq compile ${contractName}
-			await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq compile hello-tacos.mligo`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 4. Verify that compiled michelson version has been generated
 			await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/hello-tacos.tz`);

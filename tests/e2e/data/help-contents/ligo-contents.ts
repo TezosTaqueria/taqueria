@@ -9,9 +9,10 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
-  taq compile [sourceFile]        Compile a smart contract written in a Ligo syn
-                                  tax to Michelson code
-                                                      [aliases: c, compile-ligo]
+  taq compile [sourceFile]        Compile a smart contract written in a LIGO syn
+                                  tax to Michelson code, along with its associat
+                                  ed storages and parameters files if they are f
+                                  ound                [aliases: c, compile-ligo]
   taq create <template>           Create files from pre-existing templates
 
 Options:
@@ -27,7 +28,8 @@ Taqueria is currently in BETA. You've been warned. :)
 
 export const helpContentsLigoPluginSpecific = `taq compile [sourceFile]
 
-Compile a smart contract written in a Ligo syntax to Michelson code
+Compile a smart contract written in a LIGO syntax to Michelson code, along with
+its associated storages and parameters files if they are found
 
 Options:
       --version     Show version number                                [boolean]
@@ -36,13 +38,9 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-  -e, --entrypoint  The entry point that will be compiled
-  -s, --syntax      The syntax used in the contract
-  -i, --infer       Enable type inference
 `;
 
-export const ligoNoContracts = `No contracts found to compile. Have you run "taq add-contract [sourceFile]" ?
-`;
+export const ligoNoContracts = `No source file specified.`;
 
 export const compileNonExistent = `┌────────────┬──────────────┐
 │ Contract   │ Artifact     │
