@@ -36,10 +36,10 @@ The metadata fields collected are:
 | license       	| Type of license e. g. ISC, MIT		|
 | interfaces      	| List of interfaces 	               	|
 
-To save time in multi-contract projects, `taq generate-project-metadata` can be run. This will collect project level metadata fields which are then provided as the default values for each subsequent invocation of `taq generate metadata < contractName >`
+To save time in multi-contract projects, `taq generate-project-metadata` can be run. This will collect project level metadata fields which are then provided as the default values for each subsequent invocation of `taq generate-metadata < contractName >`
 
 The plugin exposes two tasks:
-- `taq generate metadata < contractName >` - Generates `TZIP-16` compliant metadata for a contract in JSON format 
+- `taq generate-metadata < contractName >` - Generates `TZIP-16` compliant metadata for a contract in JSON format 
 - `taq generate-project-metadata` - Generates project level metadata that is written to `config.json`
 
 Contract metadata is output into a JSON file in the `./artifacts` directory, while project metadata is added to `.taq/config.json` as seen here:
@@ -59,9 +59,9 @@ Contract metadata is output into a JSON file in the `./artifacts` directory, whi
 
 ## Tasks
 
-### `taq generate metadata [contractName]`
+### `taq generate-metadata [contractName]`
 
-The `generate metadata` task starts an interactive interface that collects the relavent fields via CLI prompts and outputs a `TZIP-16` compliant metadata file in JSON format
+The `generate-metadata` task starts an interactive interface that collects the relavent fields via CLI prompts and outputs a `TZIP-16` compliant metadata file in JSON format
 
 <%~ it.noteOpenAdmonition %>
 The contract may, or may not exist yet
@@ -70,12 +70,12 @@ The contract may, or may not exist yet
 #### Command Structure
 
 ```shell
-taq generate metadata < sourceFile >
+taq generate-metadata < sourceFile >
 ```
 
 #### Options
 
-The metadata `generate metadata` task will accept the following required parameters:
+The metadata `generate-metadata` task will accept the following required parameters:
 
 |  name        | description                           								|   
 |:-------------|--------------------------------------------------------------------|
@@ -86,8 +86,8 @@ The metadata `generate metadata` task will accept the following required paramet
 
 |  attribute |  value                        		   | 
 |------------|:---------------------------------------:|
-|  task   	 | 'generate metadata'         			   |
-|  command   | 'generate metadata [sourceFile]'        | 
+|  task   	 | 'generate-metadata'         			   |
+|  command   | 'generate-metadata [sourceFile]'        | 
 |  aliases   |  N/A  		                           |
 
 

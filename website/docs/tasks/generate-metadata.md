@@ -1,11 +1,11 @@
 ---
-title: generate metadata
+title: generate-metadata
 ---
 
 ## Overview
 
-Taq `generate metadata` task is using to generate metadata for a contract.
-Taq `generate-project-metadata` task is using to generate metadata for a project and add it to `config.json` file
+Taq `generate-metadata` task is using to generate-metadata for a contract.
+Taq `generate-project-metadata` task is using to generate-metadata for a project and add it to `config.json` file
 
 
 ### Command
@@ -22,12 +22,12 @@ taq generate-project-metadata
  
 | Task Name                   | Command                         | Type              | Description                     | 
 |-----------------------------|---------------------------------|-------------------|---------------------------------|
-| `generate metadata`         | `taq generate <contractName>`   | Plugin - Metadata | Generate metadata for a contact |
+| `generate-metadata`         | `taq generate <contractName>`   | Plugin - Metadata | Generate metadata for a contact |
 | `generate project metadata` | `taq generate-project-metadata` | Plugin - Metadata | Generate metadata for a project |
 
 ### Command-Line Arguments
 
 | Argument         | Required | Description                         | Example Usage                       |
 |------------------| -------- |-------------------------------------|-------------------------------------|
-| `<contractName>` | Yes      | Conctan Name to generate metadata   | `taq generate metadata incement.tz` |
+| `<contractName>` | Yes      | Conctan Name to generate-metadata   | `taq generate-metadata incement.tz` |
 

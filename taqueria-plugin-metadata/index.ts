@@ -8,7 +8,7 @@ Plugin.create(() => ({
 	tasks: [
 		Task.create({
 			task: 'metadata',
-			command: 'generate metadata [contractName]',
+			command: 'generate-metadata [contractName]',
 			description: 'Create contract metadata.',
 			aliases: [],
 			handler: 'proxy',
