@@ -48,7 +48,7 @@ describe('E2E Testing for taqueria contract types plugin only', () => {
 		}
 	});
 
-	test.skip('Verify that contract types plugin only outputs typeScriptDir and does not create types dir when no contracts exist', async () => {
+	test('Verify that contract types plugin only outputs typeScriptDir and does not create types dir when no contracts exist', async () => {
 		const generateTypesOutput = await exec(`taq generate types`, { cwd: `${taqueriaProjectPath}` });
 		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
 
