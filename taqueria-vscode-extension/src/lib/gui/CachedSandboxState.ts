@@ -5,7 +5,7 @@ import * as rxjs from 'rxjs';
 import * as signalR from '../../signalr';
 import { OutputLevels, VsCodeHelper } from '../helpers';
 import { ObservableConfig } from './ObservableConfig';
-import { TzKtHead } from './SandboxModels';
+import { SandboxModel, TzKtHead } from './SandboxDataModels';
 
 const { Url } = Protocol;
 
@@ -17,6 +17,8 @@ export class CachedSandboxState {
 	private _currentSandboxBaseUrl: string | undefined;
 	private _currentTzKtBaseAddress: string | undefined;
 
+	public sandBoxModel: SandboxModel;
+
 	constructor(
 		private readonly helper: VsCodeHelper,
 		private readonly sandboxName: string,
@@ -24,6 +26,15 @@ export class CachedSandboxState {
 		private readonly observableConfig: ObservableConfig,
 	) {
 		this.observableConfig.configObservable.subscribe(_configInfo => this.updateConfig());
+		this.sandBoxModel = {
+			sandboxName: sandboxName,
+			flextesaContainerName: containerName,
+			indexerLevel: undefined,
+			sandBoxLevel: undefined,
+			implicitAccounts: [],
+			sandboxState: undefined,
+			smartContracts: [],
+		};
 	}
 	updateConfig(): void {
 		this.updateSandboxBaseUrl();

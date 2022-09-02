@@ -22,3 +22,18 @@ export type TzKtHead = {
 	quoteEth: number;
 	quoteGbp: number;
 };
+
+export type SandboxModel = {
+	sandboxName: string;
+	flextesaContainerName: string;
+	sandboxState: 'Running' | 'Stopped' | undefined;
+	sandBoxLevel: number | undefined;
+	indexerLevel: number | undefined;
+
+	implicitAccounts: ImplicitAccountModel[];
+	smartContracts: SmartContractModel[];
+};
+
+export type ImplicitAccountModel = {};
+
+export type SmartContractModel = {};

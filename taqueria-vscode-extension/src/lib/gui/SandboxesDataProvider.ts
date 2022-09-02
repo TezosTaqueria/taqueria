@@ -1,5 +1,4 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
-import { randomInt } from 'crypto';
 import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 import { HasRefresh, mapAsync, OutputLevels, VsCodeHelper } from '../helpers';
@@ -7,7 +6,7 @@ import { getRunningContainerNames } from '../pure';
 import * as Util from '../pure';
 import { CachedSandboxState } from './CachedSandboxState';
 import { ObservableConfig } from './ObservableConfig';
-import { TzKtHead } from './SandboxModels';
+import { TzKtHead } from './SandboxDataModels';
 import {
 	OperationTreeItem,
 	SandboxChildrenTreeItem,
@@ -126,7 +125,8 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				cached.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, name));
 				this.sandboxStates[name] = cached;
 			} catch (e: unknown) {
-				this.helper.notifyAndLogError('Error in signalR:', e);
+				this.helper.showLog(OutputLevels.debug, 'Error in signalR:');
+				this.helper.logAllNestedErrors(e);
 			}
 		}
 	}
@@ -263,7 +263,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
-		const response = await fetch(`${tzktBaseUrl}/v1/contracts?limit=1000&rnd=${randomInt(1000000000)}`);
+		const response = await fetch(`${tzktBaseUrl}/v1/contracts?limit=1000`);
 		const data = await response.json();
 
 		return (data as any[]).map(item =>

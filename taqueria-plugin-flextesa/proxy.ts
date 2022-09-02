@@ -307,8 +307,9 @@ const stopSandboxTask = async (parsedArgs: Opts): Promise<void> => {
 						.then(_ => sendAsyncRes(`Stopped ${parsedArgs.sandboxName}.`))
 					: sendAsyncRes(`The ${parsedArgs.sandboxName} sandbox was not running.`);
 				await stopTzKtContainers(parsedArgs.sandboxName, sandbox, parsedArgs);
+				return;
 			}
-			return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`);
+			return sendAsyncErr(`Cannot stop ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`);
 		}
 		return sendAsyncErr(`There is no sandbox configuration with the name ${parsedArgs.sandboxName}.`);
 	}
