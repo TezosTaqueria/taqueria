@@ -5,6 +5,7 @@ import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
+import { cwd } from 'process';
 import * as contents from './data/help-contents/jest-contents';
 import { reference } from './data/jest.config-reference';
 import { referenceCI } from './data/jest.config-reference-ci';
@@ -17,11 +18,27 @@ const taqueriaProjectPath = 'e2e/auto-test-jest-plugin';
 describe('E2E Testing for the taqueria jest plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['jest']);
+
+		// Pack the jest plugin
+		const taqRoot = resolve(`${__dirname}/../../`);
+		await exec('npm pack -w taqueria-plugin-jest', { cwd: taqRoot });
+
+		// Uninstall the npm package for the current version of the jest plugin
+		await exec('npm uninstall -D @taqueria/plugin-jest', { cwd: taqueriaProjectPath });
+
+		// Install the packed plugin in our project
+		await exec(`npm i -D ${taqRoot}/taqueria-plugin-jest*.tgz`, { cwd: taqueriaProjectPath });
+		await exec(`rm ${taqRoot}/taqueria-plugin-jest*.tgz`);
+
 		// TODO: This can removed after this is resolved:
 		// https://github.com/ecadlabs/taqueria/issues/528
 		try {
 			await exec(`taq -p ${taqueriaProjectPath}`);
 		} catch (_) {}
+	});
+
+	test('Regression: #1098, Assure that ts-jest installs correctly', async () => {
+		await fsPromises.stat(`${taqueriaProjectPath}/node_modules/.bin/ts-jest`);
 	});
 
 	test('Verify that the jest plugin exposes the associated commands in the help menu', async () => {

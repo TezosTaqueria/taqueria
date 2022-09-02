@@ -141,7 +141,7 @@ jobs:
         uses: 'google-github-actions/upload-cloud-storage@v0'
         with:
           path: "taq.${{ matrix.deno_target }}"
-          destination: "taqueria-artifacts/${{ github.ref }}/${{ github.sha }}"
+          destination: "taqueria-artifacts/${{ github.ref }}"
 
       - name: Set public url
         id: public-url
@@ -326,7 +326,11 @@ jobs:
           cache_path: |
             ~/.deno
             ~/Library/Caches/deno
-    needs: 
+
+    env:
+      UNLIMITED_PINATA_TOKEN: ${{ secrets.PINATA_JWT_TOKEN }}
+
+    needs:
       - build-binaries
       - gather-info-for-e2e-tests
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' && !(startsWith(github.ref, 'refs/tags/v')) }}
@@ -429,7 +433,6 @@ jobs:
             !github.event.pull_request.head.repo.fork }}
     needs: 
       - build-binaries
-      - run-tests
       - vscode-extension-workflow
     steps:
       - uses: actions/checkout@v2
