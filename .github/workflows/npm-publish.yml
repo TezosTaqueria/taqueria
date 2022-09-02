@@ -53,7 +53,7 @@ jobs:
         if:  ${{ github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
         # TODO: Change tag back to 'latest' after tests
         run: |
-          npm publish --workspace=$GIT_WORKSPACE --tag 'preview' --access public
+          npm publish --workspace=$GIT_WORKSPACE --tag 'next' --access public
       
       - name: Publish for official release
         if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
