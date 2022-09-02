@@ -153,7 +153,6 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	helper.exposeShowEntrypointParametersCommand();
 	helper.exposeShowOperationDetailsCommand();
 
-	await helper.registerDataProviders();
 	helper.createTreeViews();
 
 	deps.vscode.workspace.onDidChangeWorkspaceFolders(e => {
@@ -173,6 +172,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 			helper.logAllNestedErrors(error);
 		}
 	});
+	await helper.registerDataProviders();
 	helper.updateCommandStates();
 }
 

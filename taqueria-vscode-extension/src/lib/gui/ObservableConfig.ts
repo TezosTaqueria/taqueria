@@ -1,5 +1,5 @@
 import * as rxjs from 'rxjs';
-import { VsCodeHelper } from '../helpers';
+import { OutputLevels, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
 
 export type ConfigInfo = {
@@ -21,12 +21,16 @@ export class ObservableConfig {
 	private set currentConfig(value: ConfigInfo) {
 		this._currentConfig = value;
 		this.configObservable.next(value);
+		this.helper.showLog(OutputLevels.debug, 'New config is loaded');
 	}
 
 	private constructor(private helper: VsCodeHelper) {
 		const projectDir = helper.getMainWorkspaceFolder();
 		if (!projectDir) {
 			return;
+		}
+		if (!this.helper.taqFolderWatcher || !this.helper.configWatcher || !this.helper.stateWatcher) {
+			this.helper.showLog(OutputLevels.warn, "Helper's watchers are not yet created");
 		}
 		this.helper.taqFolderWatcher?.onDidChange(async () => this.loadConfig());
 		this.helper.taqFolderWatcher?.onDidCreate(async () => this.loadConfig());

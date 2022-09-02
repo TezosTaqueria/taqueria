@@ -22,7 +22,6 @@ export class SandboxTreeItem extends SandboxTreeItemBase {
 	private _indexerLevel: number | undefined;
 	constructor(
 		public readonly sandboxName: string,
-		public readonly environmentName: string | undefined,
 		public readonly containerName: string | undefined,
 		public running: boolean | undefined,
 	) {
@@ -85,21 +84,25 @@ export class SandboxChildrenTreeItem extends SandboxTreeItemBase {
 export class SandboxImplicitAccountTreeItem extends SandboxTreeItemBase {
 	constructor(
 		public readonly address: string,
+		public readonly alias: string | undefined,
 		public readonly parent: SandboxTreeItem,
 	) {
-		super(address, 'implicitAccount', vscode.TreeItemCollapsibleState.Collapsed);
+		super(alias ?? address, 'implicitAccount', vscode.TreeItemCollapsibleState.Collapsed);
+		this.tooltip = address;
 	}
 }
 
 export class SandboxSmartContractTreeItem extends SandboxTreeItemBase {
 	constructor(
 		public readonly address: string,
+		public readonly alias: string | undefined,
 		public type: string,
 		public readonly containerName: string,
 		public readonly sandboxName: string,
 	) {
 		super(type, 'smartContract', vscode.TreeItemCollapsibleState.Collapsed);
-		this.description = address;
+		this.description = alias ?? address;
+		this.tooltip = address;
 	}
 }
 

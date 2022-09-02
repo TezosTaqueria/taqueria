@@ -1061,7 +1061,7 @@ export class VsCodeHelper {
 
 		const mainFolder = this.getMainWorkspaceFolder();
 		if (mainFolder === undefined) {
-			this.showLog(OutputLevels.debug, 'No folder is open, enabling init and scaffold');
+			this.showLog(OutputLevels.trace, 'No folder is open, enabling init and scaffold');
 			this.vscode.commands.executeCommand(
 				'setContext',
 				'@taqueria-state/enable-init-scaffold',
@@ -1071,15 +1071,15 @@ export class VsCodeHelper {
 		}
 		this.refreshDataProviders.forEach(dataProvider => dataProvider.refresh());
 
-		this.showLog(OutputLevels.debug, 'Project config changed, updating command states...');
+		this.showLog(OutputLevels.trace, 'Project config changed, updating command states...');
 		let taqFolderFound: boolean;
 		try {
 			await Util.makeDir(join(mainFolder.path, '.taq'), this.i18);
-			this.showLog(OutputLevels.debug, 'Taq folder is found');
+			this.showLog(OutputLevels.trace, 'Taq folder is found');
 			taqFolderFound = true;
 		} catch {
 			taqFolderFound = false;
-			this.showLog(OutputLevels.debug, 'Taq folder not found');
+			this.showLog(OutputLevels.trace, 'Taq folder not found');
 		}
 		let enableAllCommands: boolean;
 		let config: Util.TaqifiedDir | null;
@@ -1107,7 +1107,7 @@ export class VsCodeHelper {
 			? availablePlugins.filter(name => config?.config.plugins?.findIndex(p => p.name === name) === -1)
 			: availablePlugins;
 		this.showLog(
-			OutputLevels.debug,
+			OutputLevels.trace,
 			`@taqueria-state/enable-init-scaffold: ${enableAllCommands || !config?.config}`,
 		);
 		this.vscode.commands.executeCommand(
@@ -1117,7 +1117,7 @@ export class VsCodeHelper {
 		);
 
 		this.showLog(
-			OutputLevels.debug,
+			OutputLevels.trace,
 			`@taqueria-state/enable-install-uninstall: ${enableAllCommands || !!config?.config}`,
 		);
 		this.vscode.commands.executeCommand(
@@ -1126,7 +1126,7 @@ export class VsCodeHelper {
 			enableAllCommands || !!config?.config,
 		);
 
-		this.showLog(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config?.config}`);
+		this.showLog(OutputLevels.trace, `@taqueria-state/is-taqified: ${!!config?.config}`);
 		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config?.config);
 
 		this.vscode.commands.executeCommand(
@@ -1140,10 +1140,10 @@ export class VsCodeHelper {
 			enableAllCommands ? 1 : availablePluginsNotInstalled.length,
 		);
 		const plugins = this.getWellKnownPlugins();
-		this.showLog(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
+		this.showLog(OutputLevels.trace, `Known plugins: ${JSON.stringify(plugins)}`);
 		for (const plugin of plugins) {
 			const found = config?.config?.plugins?.find(item => item.name === plugin) !== undefined;
-			this.showLog(OutputLevels.debug, `plugins ${plugin}: ${found}`);
+			this.showLog(OutputLevels.trace, `plugins ${plugin}: ${found}`);
 			this.vscode.commands.executeCommand('setContext', plugin, enableAllCommands || found);
 		}
 	}

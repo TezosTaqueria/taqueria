@@ -25,7 +25,7 @@ export class CachedSandboxState {
 		private readonly containerName: string,
 		private readonly observableConfig: ObservableConfig,
 	) {
-		this.observableConfig.configObservable.subscribe(_configInfo => this.updateConfig());
+		this.observableConfig.configObservable.subscribe(async _configInfo => await this.updateConfig());
 		this.sandBoxModel = {
 			sandboxName: sandboxName,
 			flextesaContainerName: containerName,
@@ -36,14 +36,22 @@ export class CachedSandboxState {
 			smartContracts: [],
 		};
 	}
-	updateConfig(): void {
+	async updateConfig(): Promise<void> {
 		this.updateSandboxBaseUrl();
-		this.updateTzKtBaseUrl();
+		await this.updateTzKtBaseUrl();
 	}
-	updateTzKtBaseUrl() {
+	async updateTzKtBaseUrl() {
 		const tzKtBaseAddress = this.getTzKtBaseUrl(this.sandboxName);
 		if (this._currentTzKtBaseAddress === tzKtBaseAddress) {
 			return;
+		}
+		this.helper.showLog(
+			OutputLevels.debug,
+			`TzKt address changed from ${this._currentTzKtBaseAddress} to ${tzKtBaseAddress}`,
+		);
+		this._currentTzKtBaseAddress = tzKtBaseAddress;
+		if (this.connection) {
+			await this.connection.stop();
 		}
 		this.connection = new signalR.HubConnectionBuilder()
 			.withUrl(`${tzKtBaseAddress}/v1/events`, {
@@ -65,6 +73,7 @@ export class CachedSandboxState {
 		if (sandboxBaseUrl === this._currentSandboxBaseUrl) {
 			return;
 		}
+		this._currentSandboxBaseUrl = sandboxBaseUrl;
 		if (!sandboxBaseUrl) {
 			this.taquito = undefined;
 			return;

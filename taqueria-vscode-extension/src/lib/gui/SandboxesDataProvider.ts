@@ -89,13 +89,12 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const items = await mapAsync(
 			sandboxNames,
 			async (sandboxName: string) => {
-				const { isRunning, environmentName, containerName } = await this.getSandboxState(
+				const { isRunning, containerName } = await this.getSandboxState(
 					sandboxName,
 					runningContainers,
-					environmentNames,
 					pathToDir,
 				);
-				return new SandboxTreeItem(sandboxName, environmentName, containerName, isRunning);
+				return new SandboxTreeItem(sandboxName, containerName, isRunning);
 			},
 		);
 		this.sandboxTreeItems = items;
@@ -113,12 +112,11 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			if (this.sandboxStates[name]) {
 				continue;
 			}
-			const environmentName = this.getEnvironmentNames(config)[0];
 			try {
 				const cached = new CachedSandboxState(
 					this.helper,
 					name,
-					await this.getContainerName(name, environmentName, projectDir),
+					await this.getContainerName(name, projectDir),
 					this.observableConfig,
 				);
 				await cached.startConnection();
@@ -130,6 +128,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			}
 		}
 	}
+
 	onHeadFromTzKt(data: TzKtHead | undefined, sandboxName: string): void {
 		const treeItem = this.sandboxTreeItems?.find(item => item.sandboxName === sandboxName);
 		if (!treeItem) {
@@ -140,7 +139,6 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private async getAccountOperations(accountItem: SandboxImplicitAccountTreeItem | SmartContractChildrenTreeItem) {
-		const containerName = accountItem.parent.containerName;
 		const address = accountItem instanceof SandboxImplicitAccountTreeItem
 			? accountItem.address
 			: accountItem.parent.address;
@@ -251,7 +249,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const response = await fetch(`${tzktBaseUrl}/v1/accounts?type.ne=contract`);
 		tzktBaseUrl;
 		const data = await response.json();
-		return (data as any[]).map(item => new SandboxImplicitAccountTreeItem(item.address, element.parent));
+		return (data as any[]).map(item => new SandboxImplicitAccountTreeItem(item.address, undefined, element.parent));
 	}
 
 	private async getSandboxSmartContracts(element: SandboxChildrenTreeItem): Promise<SandboxSmartContractTreeItem[]> {
@@ -267,7 +265,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const data = await response.json();
 
 		return (data as any[]).map(item =>
-			new SandboxSmartContractTreeItem(item.address, item.type, containerName, element.parent.sandboxName)
+			new SandboxSmartContractTreeItem(item.address, undefined, item.type, containerName, element.parent.sandboxName)
 		);
 	}
 
@@ -281,21 +279,18 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	async getSandboxState(
 		sandBoxName: string,
 		runningContainerNames: string[] | undefined,
-		environmentNames: string[],
 		pathToDir: string,
 	): Promise<
-		{ isRunning: boolean | undefined; environmentName: string | undefined; containerName: string | undefined }
+		{ isRunning: boolean | undefined; containerName: string | undefined }
 	> {
 		if (runningContainerNames === undefined) {
-			return { isRunning: undefined, environmentName: undefined, containerName: undefined };
+			return { isRunning: undefined, containerName: undefined };
 		}
-		for (const environmentName of environmentNames) {
-			const expectedContainerName = await this.getContainerName(sandBoxName, environmentName, pathToDir);
-			if (runningContainerNames.findIndex(x => x === expectedContainerName) >= 0) {
-				return { isRunning: true, environmentName, containerName: expectedContainerName };
-			}
+		const expectedContainerName = await this.getContainerName(sandBoxName, pathToDir);
+		if (runningContainerNames.findIndex(x => x === expectedContainerName) >= 0) {
+			return { isRunning: true, containerName: expectedContainerName };
 		}
-		return { isRunning: false, environmentName: undefined, containerName: undefined };
+		return { isRunning: false, containerName: undefined };
 	}
 
 	// TODO: The functions getUniqueSandboxName and getContainerName are duplicates of similarly named functions in
@@ -306,7 +301,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		return `${sandboxName.substring(0, 10)}-${hash.substring(0, 5)}`;
 	}
 
-	async getContainerName(sandboxName: string, environmentName: string, projectDir: string) {
+	async getContainerName(sandboxName: string, projectDir: string) {
 		const uniqueSandboxName = await this.getUniqueSandboxName(sandboxName, projectDir);
 		return `taq-flextesa-${uniqueSandboxName}`;
 	}
