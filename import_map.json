@@ -21,6 +21,7 @@
 		"@taqueria/protocol/Verb": "./taqueria-protocol/Verb.ts",
 		"@taqueria/protocol/SingleChar": "./taqueria-protocol/SingleChar.ts",
 		"@taqueria/protocol/InstalledPlugin": "./taqueria-protocol/InstalledPlugin.ts",
+		"@taqueria/protocol/MetadataConfig": "./taqueria-protocol/MetadataConfig.ts",
 		"@taqueria/protocol/NetworkConfig": "./taqueria-protocol/NetworkConfig.ts",
 		"@taqueria/protocol/SandboxConfig": "./taqueria-protocol/SandboxConfig.ts",
 		"@taqueria/protocol/Environment": "./taqueria-protocol/Environment.ts",

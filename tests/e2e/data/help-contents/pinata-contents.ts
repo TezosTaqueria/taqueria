@@ -1,4 +1,4 @@
-export const helpContentsLigoPlugin: string = `taq <command>
+export const helpContentsIPFSPinataPlugin: string = `taq <command>
 
 Commands:
   taq init [projectDir]           Initialize a new project
@@ -9,11 +9,10 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
-  taq compile <sourceFile>        Compile a smart contract written in a LIGO syn
-                                  tax to Michelson code, along with its associat
-                                  ed storages and parameters files if they are f
-                                  ound                [aliases: c, compile-ligo]
-  taq create <template>           Create files from pre-existing templates
+  taq publish [path]              Upload and pin files using your pinata account
+                                  .
+  taq pin [hash]                  Pin a file already on ipfs with your pinata ac
+                                  count.
 
 Options:
       --version     Show version number                                [boolean]
@@ -26,28 +25,12 @@ Options:
 Taqueria is currently in BETA. You've been warned. :)
 `;
 
-export const helpContentsLigoPluginSpecific = `taq compile <sourceFile>
+export const helpContentsIPFSPinataPluginPublish: string = `taq publish [path]
 
-Compile a smart contract written in a LIGO syntax to Michelson code, along with
-its associated storages and parameters files if they are found
+Upload and pin files using your pinata account.
 
-Options:
-      --version     Show version number                                [boolean]
-      --build       Display build information about the current version[boolean]
-  -p, --projectDir  Path to your project directory               [default: "./"]
-  -e, --env         Specify an environment configuration
-  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
-      --help        Show help                                          [boolean]
-`;
-
-export const ligoNoContracts = `No contracts found to compile. Have you run "taq add-contract [sourceFile]" ?
-`;
-
-export const ligoNoContractSource = `
-taq compile <sourceFile>
-
-Compile a smart contract written in a LIGO syntax to Michelson code, along with
-its associated storages and parameters files if they are found
+Positionals:
+  path  Directory or file path to publish                               [string]
 
 Options:
       --version     Show version number                                [boolean]
@@ -56,20 +39,21 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-
-Not enough non-option arguments: got 0, need at least 1
 `;
 
-export const compileNonExistent = `┌────────────┬──────────────┐
-│ Contract   │ Artifact     │
-├────────────┼──────────────┤
-│ test.mligo │ Not compiled │
-└────────────┴──────────────┘
-`;
+export const helpContentsIPFSPinataPluginPin: string = `taq pin [hash]
 
-export const compileInvalid = `┌────────────────────────┬──────────────┐
-│ Contract               │ Artifact     │
-├────────────────────────┼──────────────┤
-│ invalid-contract.mligo │ Not compiled │
-└────────────────────────┴──────────────┘
+Pin a file already on ipfs with your pinata account.
+
+Positionals:
+  hash  Ipfs hash of the file or directory that is already on the ipfs network.
+                                                                        [string]
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+  -e, --env         Specify an environment configuration
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
+      --help        Show help                                          [boolean]
 `;
