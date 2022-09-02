@@ -19,12 +19,15 @@ let dockerName: string = 'local';
 describe('E2E Testing for taqueria taquito plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['taquito', 'flextesa']);
-		await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}`);
 		await exec(
 			`cp e2e/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
 
 		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+	});
+
+	beforeEach(async () => {
+		await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}/artifacts/`);
 	});
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
@@ -35,7 +38,9 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
 		// 1. Run taq deploy on a selected test network described in "test" environment
-		const deployCommand = await exec(`taq deploy -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
+		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 		// 2. Verify that contract has been originated on the network
@@ -62,7 +67,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
 			// 1. Run taq deploy ${contractName} on a selected test network described in "test" environment
-			const deployCommand = await exec(`taq deploy hello-tacos.tz -e ${environment}`, {
+			const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
 				cwd: `./${taqueriaProjectPath}`,
 			});
 			const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
@@ -87,7 +92,8 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
-	test('Verify that taqueria taquito plugin can deploy multiple contracts using deploy command', async () => {
+	// Skipped because the deploy task will only deploy one contract at a time for now
+	test.skip('Verify that taqueria taquito plugin can deploy multiple contracts using deploy command', async () => {
 		environment = 'development';
 		const contract1 = 'hello-tacos.tz';
 		const contract2 = 'increment.tz';

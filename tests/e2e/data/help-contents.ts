@@ -238,7 +238,7 @@ Commands:
   taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
-  taq deploy [contract]       Deploy a smart contract to a particular environmen
+  taq deploy <contract>       Deploy a smart contract to a particular environmen
                               t                             [aliases: originate]
   taq create <template>       Create files from pre-existing templates
 
@@ -253,7 +253,7 @@ Options:
 Taqueria is currently in BETA. You've been warned. :)
 `;
 
-export const helpContentsTaquitoPluginSpecific = `taq deploy [contract]
+export const helpContentsTaquitoPluginSpecific = `taq deploy <contract>
 
 Deploy a smart contract to a particular environment
 

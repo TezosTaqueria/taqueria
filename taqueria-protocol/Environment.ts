@@ -15,6 +15,10 @@ export const rawSchema = z.object({
 		{ description: 'Environment storage' },
 	)
 		.optional(),
+	aliases: z.record(
+		z.any({ description: 'Environment address alias' }),
+		{ description: 'Environment alias' },
+	).optional(),
 }).describe('Environment Config');
 
 type RawInput = z.infer<typeof rawSchema>;
