@@ -16,13 +16,13 @@ import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { ObservableConfig } from './gui/ObservableConfig';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
+import { SandboxesDataProvider } from './gui/SandboxesDataProvider';
 import {
 	OperationTreeItem,
-	SandboxesDataProvider,
 	SandboxTreeItem,
 	SandboxTreeItemBase,
 	SmartContractEntrypointTreeItem,
-} from './gui/SandboxesDataProvider';
+} from './gui/SandboxTreeItemTypes';
 import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProvider';
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
