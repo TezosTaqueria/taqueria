@@ -76,6 +76,7 @@ const imposeTaskLimits = (tasks: Record<string, PersistentState.PersistedTask>) 
 					takeLast(5),
 				)
 			),
+		allItems => allItems.sort((a, b) => a[1].time - b[1].time),
 		Object.fromEntries,
 	);
 
