@@ -87,8 +87,8 @@ export class SandboxImplicitAccountTreeItem extends SandboxTreeItemBase {
 		public readonly alias: string | undefined,
 		public readonly parent: SandboxTreeItem,
 	) {
-		super(alias ?? address, 'implicitAccount', vscode.TreeItemCollapsibleState.Collapsed);
-		this.tooltip = address;
+		super(alias ?? '', 'implicitAccount', vscode.TreeItemCollapsibleState.Collapsed);
+		this.description = address;
 	}
 }
 
@@ -100,9 +100,8 @@ export class SandboxSmartContractTreeItem extends SandboxTreeItemBase {
 		public readonly containerName: string,
 		public readonly sandboxName: string,
 	) {
-		super(type, 'smartContract', vscode.TreeItemCollapsibleState.Collapsed);
-		this.description = alias ?? address;
-		this.tooltip = address;
+		super(`${alias ? alias + ':' : ''}${type}`, 'smartContract', vscode.TreeItemCollapsibleState.Collapsed);
+		this.description = address;
 	}
 }
 

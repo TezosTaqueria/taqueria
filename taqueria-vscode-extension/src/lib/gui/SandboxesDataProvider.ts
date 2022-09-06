@@ -229,7 +229,10 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 		const response = await fetch(`${tzktBaseUrl}/v1/contracts/count`);
 		const data = await response.json();
-		return data as number;
+		// This assumes that the built-in contracts always exist on the chain. If not, the count will be off.
+		// The fix is to check existence of each of them
+		const ignoredContractCount = SandboxesDataProvider.builtInContracts.length;
+		return data as number - ignoredContractCount;
 	}
 
 	private getSmartContractChildren(element: SandboxSmartContractTreeItem): SmartContractChildrenTreeItem[] {
@@ -249,7 +252,16 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const response = await fetch(`${tzktBaseUrl}/v1/accounts?type.ne=contract`);
 		tzktBaseUrl;
 		const data = await response.json();
-		return (data as any[]).map(item => new SandboxImplicitAccountTreeItem(item.address, undefined, element.parent));
+		const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
+		const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
+			? []
+			: Object.keys(sandbox.accounts)?.map(key => ({ key, value: sandbox.accounts?.[key] }));
+		return (data as any[]).map(item => {
+			const alias = aliases.find(a =>
+				!!a.value && (typeof a.value === 'string' ? a.value === item.address : a.value.publicKeyHash === item.address)
+			);
+			return new SandboxImplicitAccountTreeItem(item.address, alias?.key ?? undefined, element.parent);
+		});
 	}
 
 	private async getSandboxSmartContracts(element: SandboxChildrenTreeItem): Promise<SandboxSmartContractTreeItem[]> {
@@ -262,11 +274,37 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return [];
 		}
 		const response = await fetch(`${tzktBaseUrl}/v1/contracts?limit=1000`);
-		const data = await response.json();
+		const data = this.filterOutBuiltInContracts(await response.json() as any[]);
 
-		return (data as any[]).map(item =>
-			new SandboxSmartContractTreeItem(item.address, undefined, item.type, containerName, element.parent.sandboxName)
-		);
+		const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
+		const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
+			? []
+			: Object.keys(sandbox.accounts)?.map(key => ({ key, value: sandbox.accounts?.[key] }));
+
+		return data.map(item => {
+			const alias = aliases.find(a =>
+				!!a.value && (typeof a.value === 'string' ? a.value === item.address : a.value.publicKeyHash === item.address)
+			);
+			return new SandboxSmartContractTreeItem(
+				item.address,
+				alias?.key ?? undefined,
+				item.type,
+				containerName,
+				element.parent.sandboxName,
+			);
+		});
+	}
+
+	static builtInContracts = [
+		'KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5',
+		'KT1AafHA1C1vk959wvHWBispY9Y2f3fxBUUo',
+		'KT1VqarPDicMFn1ejmQqqshUkUXTCTXwmkCN',
+	];
+
+	private filterOutBuiltInContracts(
+		data: { address: string; type: string; kind: string }[],
+	): { address: string; type: string; kind: string }[] {
+		return data.filter(item => SandboxesDataProvider.builtInContracts.indexOf(item.address) === -1);
 	}
 
 	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void> = new vscode
