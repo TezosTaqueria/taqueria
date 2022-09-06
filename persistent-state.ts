@@ -68,7 +68,7 @@ const imposeTaskLimits = (tasks: Record<string, PersistentState.PersistedTask>) 
 		pairs => groupBy(([_, task]: [string, PersistentState.PersistedTask]) => `${task.plugin}/${task.task}`, pairs),
 		groups => groups as Record<string, [string, PersistentState.PersistedTask][]>,
 		groups =>
-			Object.entries(groups).map(([_, persistedTasks]) =>
+			Object.entries(groups).flatMap(([_, persistedTasks]) =>
 				pipe(
 					persistedTasks.sort((a, b) => a[1].time - b[1].time),
 					// TODO: Keeping the last 5 runs of a task may not be sufficient for the provising system
