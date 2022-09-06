@@ -32,17 +32,6 @@ jobs:
           registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
 
-      # If the package has a dependency on @taqueria/node-sdk or @taqueria/protocol and the dependency version matches the package version then install the "next" version tag.
-      # - name: Install dependencies for a pre-release 
-      #   if: ${{ github.event.release.prerelease }}
-      #   run: |
-      #     if jq --exit-status '.version as $version | .dependencies."@taqueria/node-sdk"|ltrimstr("^") == $version' "$GIT_WORKSPACE/package.json"; then 
-      #       npm install @taqueria/node-sdk@next --workspace "$GIT_WORKSPACE" --save;
-      #     fi
-      #     if jq --exit-status '.version as $version | .dependencies."@taqueria/protocol"|ltrimstr("^") == $version' "$GIT_WORKSPACE/package.json"; then 
-      #       npm install @taqueria/protocol@next --workspace "$GIT_WORKSPACE" --save;
-      #     fi
-
       - name: Install any dependencies
         run: npm ci
 
@@ -50,8 +39,7 @@ jobs:
         run: npm run build -w $GIT_WORKSPACE
       
       - name: Publish for prerelease
-        if:  ${{ github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
-        # TODO: Change tag back to 'latest' after tests
+        if:  ${{ github.event.release.prerelease && github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
         run: |
           npm publish --workspace=$GIT_WORKSPACE --tag 'next' --access public
       
