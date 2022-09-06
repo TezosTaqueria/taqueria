@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { SandboxState } from './CachedSandboxState';
 
 export class SandboxTreeItemBase extends vscode.TreeItem {
 	constructor(
@@ -23,23 +24,23 @@ export class SandboxTreeItem extends SandboxTreeItemBase {
 	constructor(
 		public readonly sandboxName: string,
 		public readonly containerName: string | undefined,
-		public running: boolean | undefined,
+		public state: SandboxState,
 	) {
 		super(
 			sandboxName,
 			'sandbox',
-			running ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
+			state ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None,
 		);
-		if (running === undefined) {
+		if (state === 'unknown') {
 			this.tooltip = sandboxName;
 			this.description = undefined;
 			this.iconPath = new vscode.ThemeIcon('question');
 			this.contextValue = 'sandbox:unknown';
 		} else {
-			this.tooltip = `${sandboxName}-${running ? 'running' : 'stopped'}`;
-			this.description = running ? 'running' : 'stopped';
-			this.iconPath = new vscode.ThemeIcon(running ? 'vm-running' : 'vm-outline');
-			this.contextValue = running ? 'sandbox:running' : 'sandbox:stopped';
+			this.tooltip = `${sandboxName}-${state}`;
+			this.description = state;
+			this.iconPath = new vscode.ThemeIcon(state === 'running' ? 'vm-running' : 'vm-outline');
+			this.contextValue = state === 'running' ? 'sandbox:running' : 'sandbox:stopped';
 		}
 	}
 
@@ -62,9 +63,9 @@ export class SandboxTreeItem extends SandboxTreeItemBase {
 	}
 
 	setDescription() {
-		this.description = this.running === undefined
+		this.description = this.state === undefined
 			? ''
-			: `${this.running ? 'running' : 'stopped'} ${this._sandboxLevel ?? ''} ${
+			: `${this.state ? 'running' : 'stopped'} ${this._sandboxLevel ?? ''} ${
 				this._indexerLevel ? 'Indexer: ' + this._indexerLevel : ''
 			}`;
 	}

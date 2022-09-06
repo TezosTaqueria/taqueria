@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { HasRefresh, mapAsync, OutputLevels, VsCodeHelper } from '../helpers';
 import { getRunningContainerNames } from '../pure';
 import * as Util from '../pure';
-import { CachedSandboxState } from './CachedSandboxState';
+import { CachedSandboxState, SandboxState } from './CachedSandboxState';
 import { ObservableConfig } from './ObservableConfig';
 import { TzKtHead } from './SandboxDataModels';
 import {
@@ -78,7 +78,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const runningContainers = await getRunningContainerNames();
 		const { config, pathToDir } = this.observableConfig.currentConfig;
 
-		await this.createSandboxStates(config, pathToDir);
+		await this.createSandboxStates(config, pathToDir, runningContainers);
 
 		if (!pathToDir || !config?.config?.sandbox) {
 			return [];
@@ -89,12 +89,16 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const items = await mapAsync(
 			sandboxNames,
 			async (sandboxName: string) => {
-				const { isRunning, containerName } = await this.getSandboxState(
+				const { state, containerName } = await this.getSandboxState(
 					sandboxName,
 					runningContainers,
 					pathToDir,
 				);
-				return new SandboxTreeItem(sandboxName, containerName, isRunning);
+				const cached = this.sandboxStates[sandboxName];
+				if (cached) {
+					await cached.setState(state);
+				}
+				return new SandboxTreeItem(sandboxName, containerName, state);
 			},
 		);
 		this.sandboxTreeItems = items;
@@ -104,7 +108,11 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		return items;
 	}
 
-	async createSandboxStates(config: Util.TaqifiedDir | undefined, projectDir: string | undefined) {
+	async createSandboxStates(
+		config: Util.TaqifiedDir | undefined,
+		projectDir: string | undefined,
+		runningContainerNames: string[] | undefined,
+	) {
 		if (!config?.config?.sandbox || !projectDir) {
 			return;
 		}
@@ -113,13 +121,17 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				continue;
 			}
 			try {
+				const { state, containerName } = await this.getSandboxState(name, runningContainerNames, projectDir);
 				const cached = new CachedSandboxState(
 					this.helper,
 					name,
 					await this.getContainerName(name, projectDir),
 					this.observableConfig,
+					state,
 				);
-				await cached.startConnection();
+				if (state === 'running') {
+					await cached.startConnection();
+				}
 				cached.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, name));
 				this.sandboxStates[name] = cached;
 			} catch (e: unknown) {
@@ -165,6 +177,10 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return;
 		}
 		for (const sandbox of this.sandboxTreeItems) {
+			const cached = this.sandboxStates[sandbox.sandboxName];
+			if (cached.state !== 'running') {
+				continue;
+			}
 			try {
 				const sandboxBaseUrl = this.sandboxStates[sandbox.sandboxName]?.getSandboxBaseUrl(sandbox.sandboxName);
 				if (!sandboxBaseUrl) {
@@ -200,6 +216,10 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private async getSandboxChildren(element: SandboxTreeItem): Promise<SandboxChildrenTreeItem[]> {
+		const cached = this.sandboxStates[element.sandboxName];
+		if (!cached || cached.state !== 'running') {
+			return [];
+		}
 		const [accountCount, contractCount] = await Promise.all([
 			this.getAccountCount(element),
 			this.getContractCount(element),
@@ -319,16 +339,16 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		runningContainerNames: string[] | undefined,
 		pathToDir: string,
 	): Promise<
-		{ isRunning: boolean | undefined; containerName: string | undefined }
+		{ state: SandboxState; containerName: string | undefined }
 	> {
 		if (runningContainerNames === undefined) {
-			return { isRunning: undefined, containerName: undefined };
+			return { state: 'unknown', containerName: undefined };
 		}
 		const expectedContainerName = await this.getContainerName(sandBoxName, pathToDir);
 		if (runningContainerNames.findIndex(x => x === expectedContainerName) >= 0) {
-			return { isRunning: true, containerName: expectedContainerName };
+			return { state: 'running', containerName: expectedContainerName };
 		}
-		return { isRunning: false, containerName: undefined };
+		return { state: 'stopped', containerName: undefined };
 	}
 
 	// TODO: The functions getUniqueSandboxName and getContainerName are duplicates of similarly named functions in

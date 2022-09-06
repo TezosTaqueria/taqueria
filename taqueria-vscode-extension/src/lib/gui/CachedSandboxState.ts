@@ -9,6 +9,8 @@ import { SandboxModel, TzKtHead } from './SandboxDataModels';
 
 const { Url } = Protocol;
 
+export type SandboxState = 'running' | 'stopped' | 'unknown';
+
 export class CachedSandboxState {
 	connection: signalR.HubConnection | undefined;
 	sandboxHead = new rxjs.BehaviorSubject<rpc.BlockHeaderResponse | undefined>(undefined);
@@ -16,6 +18,23 @@ export class CachedSandboxState {
 	taquito: TezosToolkit | undefined;
 	private _currentSandboxBaseUrl: string | undefined;
 	private _currentTzKtBaseAddress: string | undefined;
+	private _state: SandboxState;
+
+	async setState(value: SandboxState) {
+		if (this._state === value) {
+			return;
+		}
+		this._state = value;
+		if (value === 'running') {
+			await this.startConnection();
+		} else {
+			this.connection?.stop();
+		}
+	}
+
+	get state() {
+		return this._state;
+	}
 
 	public sandBoxModel: SandboxModel;
 
@@ -24,6 +43,7 @@ export class CachedSandboxState {
 		private readonly sandboxName: string,
 		private readonly containerName: string,
 		private readonly observableConfig: ObservableConfig,
+		state: SandboxState,
 	) {
 		this.observableConfig.configObservable.subscribe(async _configInfo => await this.updateConfig());
 		this.sandBoxModel = {
@@ -35,6 +55,7 @@ export class CachedSandboxState {
 			sandboxState: undefined,
 			smartContracts: [],
 		};
+		this._state = state;
 	}
 	async updateConfig(): Promise<void> {
 		this.updateSandboxBaseUrl();

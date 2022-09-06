@@ -1,4 +1,9 @@
 {
+	"ignorePaths": [
+		"schema.prisma",
+		"**/*.ts.snap",
+		"**/node_modules/**/*.*"
+	],
 	"words": [
 		"abspath",
 		"Affordance",
@@ -43,5 +48,9 @@
 		"tzkt",
 		"vsix",
 		"xvfb"
+	],
+	"ignoreRegExpList": [
+		"KT1[a-zA-Z0-9]{33}",
+		"tz[1-3][a-zA-Z0-9]{33}"
 	]
 }
