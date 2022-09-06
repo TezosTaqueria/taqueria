@@ -49,7 +49,7 @@ export const save = (parsedArgs: SanitizedArgs.t) =>
 			map(_ => updatedState),
 		);
 
-export const newTaskEntry = (task: Verb.t, plugin: string, output: unknown) => {
+const newTaskEntry = (task: Verb.t, plugin: string, output: unknown) => {
 	const id = toTaskId(task, plugin);
 	const taskEntry: Record<string, PersistentState.PersistedTask> = {};
 	taskEntry[id] = {
@@ -62,23 +62,19 @@ export const newTaskEntry = (task: Verb.t, plugin: string, output: unknown) => {
 	return taskEntry;
 };
 
-export const imposeTaskLimits = (tasks: Record<string, PersistentState.PersistedTask>) =>
+const imposeTaskLimits = (tasks: Record<string, PersistentState.PersistedTask>) =>
 	pipe(
 		Object.entries(tasks),
 		pairs => groupBy(([_, task]: [string, PersistentState.PersistedTask]) => `${task.plugin}/${task.task}`, pairs),
 		groups => groups as Record<string, [string, PersistentState.PersistedTask][]>,
 		groups =>
-			Object.entries(groups).reduce(
-				(retval: [string, PersistentState.PersistedTask][], [_, persistedTasks]) =>
-					pipe(
-						persistedTasks.sort((a, b) => {
-							if (a[1].time < b[1].time) return -1;
-							else if (a[1].time > b[1].time) return 1;
-							return 0;
-						}),
-						takeLast(5),
-					),
-				[],
+			Object.entries(groups).map(([_, persistedTasks]) =>
+				pipe(
+					persistedTasks.sort((a, b) => a[1].time - b[1].time),
+					// TODO: Keeping the last 5 runs of a task may not be sufficient for the provising system
+					// i.e. every ipfs publish task output would be required no matter how many folders were published or how many times it was published
+					takeLast(5),
+				)
 			),
 		Object.fromEntries,
 	);
