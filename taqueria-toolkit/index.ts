@@ -36,12 +36,12 @@ import * as Environment from '@taqueria/protocol/Environment';
 // 	}
 // };
 
-const sendErr = (msg: string, newline = true) => {
-	if (!msg || msg.length === 0) return;
-	return newline
-		? console.error(msg)
-		: process.stderr.write(msg) as unknown as void;
-};
+// const sendErr = (msg: string, newline = true) => {
+// 	if (!msg || msg.length === 0) return;
+// 	return newline
+// 		? console.error(msg)
+// 		: process.stderr.write(msg) as unknown as void;
+// };
 
 // const getConfigJSON = async (): Promise<Config.t> => {
 // 	const projectAbspath = await getProjectAbsPath();
