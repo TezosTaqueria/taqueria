@@ -87,8 +87,8 @@ If you prefer to build the Taqueria binary and plugins locally, follow the steps
 
 #### Requirements
 
-- [Deno](https://deno.land/) v1.21.0 or later
-- [NodeJS](https://nodejs.org/en/) v16 or later
+- [Deno](https://deno.land/) v1.23.4
+- [NodeJS](https://nodejs.org/en/) v16.16.0 or later
 - [Docker](https://www.docker.com/) v0.9 or later
 
 #### Run Build Script
