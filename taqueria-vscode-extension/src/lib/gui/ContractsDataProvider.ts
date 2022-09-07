@@ -61,20 +61,16 @@ export const extensions: Record<string, ContractLanguage> = {
 };
 
 export class ContractTreeItem extends vscode.TreeItem implements HasFileName {
-	fileName: string;
-
 	constructor(
-		public label: string,
+		public readonly fileName: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		language: ContractLanguage | undefined,
 		public isInRegistry: boolean,
 	) {
-		const displayLabel = `${isInRegistry ? '✅' : '❎'} ${label}`;
+		const displayLabel = `${isInRegistry ? '✅' : '❎'} ${fileName}`;
 		super(displayLabel, collapsibleState);
-		this.label = displayLabel;
 		this.tooltip = `${isInRegistry ? 'In Registry' : 'Not In Registry'} (${language ?? ''})`;
 		this.iconPath = path.join(__filename, '..', '..', '..', '..', 'images', `${language}.svg`);
 		this.contextValue = `lang:${language},inRegistry:${isInRegistry}`;
-		this.fileName = label;
 	}
 }

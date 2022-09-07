@@ -59,13 +59,13 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeIt
 }
 export class PluginTreeItem extends vscode.TreeItem {
 	constructor(
-		public readonly label: string,
+		public readonly pluginName: string,
 		private installed: boolean,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		private version: string | undefined,
 	) {
-		super(label, collapsibleState);
-		this.tooltip = version === undefined ? `${this.label}` : `${this.label}-${this.version}`;
+		super(pluginName, collapsibleState);
+		this.tooltip = version === undefined ? `${pluginName}` : `${pluginName}-${this.version}`;
 		this.description = this.version;
 		this.iconPath = new vscode.ThemeIcon(installed ? 'check' : 'cloud-download');
 		this.contextValue = installed ? 'installed' : 'notInstalled';
