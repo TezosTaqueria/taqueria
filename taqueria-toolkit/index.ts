@@ -56,7 +56,7 @@ const getCurrentEnv = (config: Config.t): Environment.t | undefined => {
 		: undefined;
 };
 
-export const getAliasAddress = (config: any, alias: string): string => {
+export const getAliasAddress = (config: Config.t, alias: string): string => {
 	const currentEnv = getCurrentEnv(config);
 	if (currentEnv?.aliases?.[alias]?.address) return currentEnv.aliases[alias].address;
 	alert(`Address for alias, ${alias}, is missing. Please deploy a contract with such alias`);
