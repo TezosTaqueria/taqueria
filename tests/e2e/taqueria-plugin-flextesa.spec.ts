@@ -6,7 +6,7 @@ const exec = util.promisify(exec1);
 import * as flexContents from './data/help-contents/flextesa-contents';
 
 const taqueriaProjectPath = 'e2e/auto-test-flextesa-plugin';
-let dockerName: string;
+let sandboxName: string;
 
 // TODO: to be moved into a different spec file when the tezos-client plugin no longer depends on the flextesa plugin.
 // If I move it now, testing won't work.
@@ -86,26 +86,26 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 	test('Verify that taqueria flextesa plugin can start and stop a default sandbox without specifying name', async () => {
 		try {
 			// Setting up docker container name
-			dockerName = 'local';
+			sandboxName = 'local';
 
 			// 1. Run sandbox start command
 			const sandboxStart = await exec(`taq start sandbox`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 2. Verify that sandbox has been started and taqueria returns proper message into console
-			expect(sandboxStart.stdout).toContain(`Started ${dockerName}.`);
+			expect(sandboxStart.stdout).toContain(`Started ${sandboxName}.`);
 			expect(sandboxStart.stdout).toContain(`Done.`);
 
 			// 3. Verify that docker container has been started
-			const dockerContainerTest = await getContainerName(dockerName);
-			expect(dockerContainerTest).toContain(`taq-flextesa-${dockerName}`);
-			const dockerContainerID = await getContainerID(dockerName);
+			const dockerContainerTest = await getContainerName(sandboxName);
+			expect(dockerContainerTest).toContain(`taq-flextesa-${sandboxName}`);
+			const dockerContainerID = await getContainerID(sandboxName);
 
 			// 5.  Run stop command and verify the output
-			const sandboxStop = await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			const sandboxStop = await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 5. Verify that taqueria returns proper message into console
-			expect(sandboxStop.stdout).toContain(`Stopped ${dockerName}.\n`);
-			const dockerContainerStopID = await getContainerID(dockerName);
+			expect(sandboxStop.stdout).toContain(`Stopped ${sandboxName}.\n`);
+			const dockerContainerStopID = await getContainerID(sandboxName);
 			expect(dockerContainerStopID).not.toContain(dockerContainerID);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
@@ -115,25 +115,25 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 	test('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
 		try {
 			// Setting up docker container name
-			dockerName = 'test';
+			sandboxName = 'test';
 
 			// 1. Run sandbox start command
 			await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);
-			const sandboxStart = await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			const sandboxStart = await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 2. Verify that sandbox has been started and taqueria returns proper message into console
-			expect(sandboxStart.stdout).toContain(`Started ${dockerName}.`);
+			expect(sandboxStart.stdout).toContain(`Started ${sandboxName}.`);
 
 			// 3. Verify that docker container has been started
-			const dockerContainerTest = await getContainerName(dockerName);
-			expect(dockerContainerTest).toContain(`${dockerName}`);
+			const dockerContainerTest = await getContainerName(sandboxName);
+			expect(dockerContainerTest).toContain(`${sandboxName}`);
 
 			// 5.  Run stop command and verify the output
-			const sandboxStop = await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			const sandboxStop = await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 5. Verify that taqueria returns proper message into console
-			expect(sandboxStop.stdout).toContain(`Stopped ${dockerName}.`);
-			const dockerContainerStopTest = await getContainerName(dockerName);
+			expect(sandboxStop.stdout).toContain(`Stopped ${sandboxName}.`);
+			const dockerContainerStopTest = await getContainerName(sandboxName);
 			expect(dockerContainerStopTest).toBe('');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
@@ -162,13 +162,13 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 
 	test('Verify that taqueria flextesa plugin will return "Already running." if sandbox has started" if user tries to call start sandbox twice', async () => {
 		try {
-			dockerName = 'local';
+			sandboxName = 'local';
 
 			// 1. Run sandbox start command
-			await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 2.  Run start command second time and verify the output
-			const sandboxStart = await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			const sandboxStart = await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 			expect(sandboxStart.stdout).toEqual('Already running.\n');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
@@ -181,7 +181,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 	test.skip('Verify that taqueria flextesa plugin can retrieve data from updated config after restart', async () => {
 		try {
 			// Setting up docker container name
-			dockerName = 'local';
+			sandboxName = 'local';
 
 			// 1. Start sandbox
 
@@ -202,7 +202,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 	// Clean up process to stop container if it was not stopped properly during the test
 	afterEach(async () => {
 		try {
-			await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 		} catch {}
 	});
 
