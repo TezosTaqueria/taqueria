@@ -121,6 +121,9 @@ tests/coverage
 /taqueria-sdk/index.esm.js.map
 /taqueria-sdk/types.esm.js
 /taqueria-sdk/types.esm.js.map
+/taqueria-sdk/*.mjs
+/taqueria-sdk/*.mjs.map
+/taqueria-sdk/*.d.ts
 /taqueria-plugin-smartpy/index.js
 /taqueria-plugin-smartpy/index.js.map
 /taqueria-plugin-ligo/index.js
