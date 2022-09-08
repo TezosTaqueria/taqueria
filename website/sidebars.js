@@ -115,16 +115,16 @@ const sidebars = {
         "config/environments"
       ],
     },
-    // {
-    //   type: "category",
-    //   label: "Taqueria Libraries",
-    //   className: "sidebarHeader",
-    //   collapsed: false,
-    //   collapsible: false,
-    //   items: [
-    //     "libraries/taqueria-state"
-    //   ],
-    // }, 
+    {
+      type: "category",
+      label: "Taqueria Libraries",
+      className: "sidebarHeader",
+      collapsed: true,
+      collapsible: true,
+      items: [
+        "libraries/toolkit"
+      ],
+    }, 
     {
       type: "category",
       label: "Tutorials",
