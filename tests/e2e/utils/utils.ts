@@ -39,7 +39,7 @@ export const generateTestProject = async (
 
 export async function getContainerName(dockerName: string): Promise<string> {
 	const [_dockerContainerHeader, dockerContainerInfo] =
-		(await exec(`docker ps --filter "name=taqueria-development-${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
+		(await exec(`docker ps --filter "name=taq-flextesa-${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
 	const containerInfoArray = dockerContainerInfo.split('   ');
 	const dockerContainerName = containerInfoArray[containerInfoArray.length - 1];
 	return dockerContainerName;
@@ -47,7 +47,7 @@ export async function getContainerName(dockerName: string): Promise<string> {
 
 export async function getContainerID(dockerName: string): Promise<string> {
 	const [_dockerContainerHeader, dockerContainerInfo] =
-		(await exec(`docker ps --filter "name=taqueria-development-${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
+		(await exec(`docker ps --filter "name=taq-flextesa-${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
 	const containerInfoArray = dockerContainerInfo.split('   ');
 	const dockerContainerID = containerInfoArray[0];
 	return dockerContainerID;
