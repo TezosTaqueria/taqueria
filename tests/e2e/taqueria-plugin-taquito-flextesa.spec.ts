@@ -185,22 +185,22 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
 	afterAll(async () => {
+		await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 
 		const dockerContainer = await getContainerName(dockerName);
 		if (dockerContainer !== '') {
 			try {
 				await exec(`docker stop ${dockerContainer}`);
-				await sleep(1000);
+				await sleep(3000);
+				const dockerListStdout = await exec('docker ps -a');
+				if (dockerListStdout.stdout.includes(dockerContainer)) {
+					// console.log(dockerListStdout);
+					throw new Error();
+				}
 			} catch {
-				// Ignore
+				throw new Error('Container was not stopped properly');
 			}
-		}
-
-		const dockerListStdout = await exec('docker ps -a');
-		if (dockerListStdout.stdout.includes(dockerContainer)) {
-			console.log(dockerListStdout);
-			throw new Error('Container was not stopped properly');
 		}
 	});
 });
