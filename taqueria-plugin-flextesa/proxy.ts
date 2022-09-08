@@ -117,30 +117,24 @@ const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts)
 		return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`);
 	}
 
-	return isSandboxRunning(sandboxName, opts)
-		.then(
-			running =>
-				running
-					? sendAsyncRes('Already running.')
-					: getStartCommand(sandboxName, sandbox, opts)
-						.then(cmd => {
-							console.log('Booting sandbox...');
-							return execCmd(cmd);
-						})
-						.then(() => {
-							console.log('Configuring sandbox...');
-							return configureTezosClient(sandboxName, opts);
-						})
-						.then(({ stderr }) => {
-							if (stderr.length) sendErr(stderr);
-							console.log('Adding accounts...');
-							return importAccounts(sandboxName, opts);
-						})
-						.then(({ stderr }) => {
-							if (stderr.length) sendErr(stderr);
-							sendAsyncRes(`Started ${sandboxName}.`);
-						}),
-		);
+	return getStartCommand(sandboxName, sandbox, opts)
+		.then(cmd => {
+			console.log('Booting sandbox...');
+			return execCmd(cmd);
+		})
+		.then(() => {
+			console.log('Configuring sandbox...');
+			return configureTezosClient(sandboxName, opts);
+		})
+		.then(({ stderr }) => {
+			if (stderr.length) sendErr(stderr);
+			console.log('Adding accounts...');
+			return importAccounts(sandboxName, opts);
+		})
+		.then(({ stderr }) => {
+			if (stderr.length) sendErr(stderr);
+			sendAsyncRes(`Started ${sandboxName}.`);
+		});
 };
 
 const startContainer = async (container: { name: string; command: string }): Promise<void> => {
@@ -161,7 +155,14 @@ const startInstance = async (sandboxName: string, sandbox: SandboxConfig.t, opts
 		`docker network ls | grep 'sandbox_${sandboxName}_net' > /dev/null || docker network create --driver bridge sandbox_${sandboxName}_net`,
 	);
 
+	const isRunning = await isSandboxRunning(sandboxName, opts);
+	if (isRunning) {
+		await sendAsyncRes('Already running.');
+		return;
+	}
+
 	await startSandbox(sandboxName, sandbox, opts);
+
 	if (sandbox.tzkt?.disableAutostartWithSandbox === true) {
 		return;
 	}
