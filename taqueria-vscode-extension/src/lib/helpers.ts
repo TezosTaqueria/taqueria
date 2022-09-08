@@ -578,8 +578,8 @@ export class VsCodeHelper {
 		this.registerCommand(
 			Commands.originate,
 			async (arg?: ArtifactTreeItem | EnvironmentTreeItem | api.Uri | undefined) => {
-				const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
-				if (projectDir === undefined) {
+				const { config, pathToDir } = this.observableConfig.currentConfig;
+				if (!config || !pathToDir) {
 					return;
 				}
 				let environmentName: string | undefined = undefined;
@@ -603,7 +603,6 @@ export class VsCodeHelper {
 					}
 				}
 				if (!environmentName) {
-					const config = await Util.TaqifiedDir.create(projectDir, this.i18);
 					const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
 					if (environmentNames.length === 1) {
 						environmentName = environmentNames[0];
@@ -619,13 +618,32 @@ export class VsCodeHelper {
 						}
 					}
 				}
+				if (!fileName) {
+					const artifactsFolder = path.join(pathToDir, config.config?.artifactsDir ?? 'artifacts');
+					const artifactsFolderUri = api.Uri.file(artifactsFolder);
+					const file = await this.vscode.window.showOpenDialog({
+						canSelectFiles: true,
+						canSelectFolders: false,
+						canSelectMany: false,
+						defaultUri: artifactsFolderUri,
+						openLabel: 'Originate',
+						title: 'Select contract to originate',
+						filters: {
+							'Contract Files': ['*.tz'],
+						},
+					});
+					if (!file) {
+						return;
+					}
+					fileName = path.relative(artifactsFolder, file[0].path);
+				}
 				await this.proxyToTaqAndShowOutput(
 					`originate -e ${environmentName} ${fileName ?? ''}`,
 					{
 						finishedTitle: 'originated contracts',
 						progressTitle: 'originating contracts',
 					},
-					projectDir,
+					pathToDir,
 					true,
 				);
 			},
