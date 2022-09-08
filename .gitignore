@@ -156,6 +156,9 @@ tests/coverage
 /taqueria-state/index.js.map
 /taqueria-state/*.d.ts
 /taqueria-state/node/*.d.ts
+/taqueria-toolkit/index.js
+/taqueria-toolkit/index.js.map
+/taqueria-toolkit/*.d.ts
 /taqueria-plugin-jest/*.js
 /taqueria-plugin-jest/*.cjs
 /taqueria-plugin-jest/*.map
