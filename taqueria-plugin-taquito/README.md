@@ -13,35 +13,32 @@ taq install @taqueria/plugin-taquito
 
 The target networks, sandboxes, and environments are configured in the Taqueria project's `config.json` file. For additional information on configuring network, documentation can be found [here](/docs/config/networks/)
 
-## Usage
-
-###  The `taq originate` task
-
-The Taquito plugin exposes an `taq originate` task in Taqueria which will originate the specified Michelson contract to a Taqueria environment
+##  The `taq originate` task
 
 Basic usage is:
 
 ```shell
-taq originate
+taq originate <filename>
 ```
 
-This will originate all '.tz' files in the `/artifacts` directory to the default environment (the sandbox named `local`)
+### Basic description
 
-To target a different environment, use the `--environment` flag with the named Taqueria environment you want to target :
+The Taquito plugin exposes an `taq originate` task in Taqueria which will originate the specified Michelson contract to a Taqueria environment.
 
-```shell
-taq originate -e jakartanetEnv
-```
+This will originate a Michelson `.tz` file in the `/artifacts` directory to the default environment (the sandbox named `local`).
+
+By default, the storage value used for origination will live in a file named `CONTRACT.default.storage.tz`, in `/artifacts`, where `CONTRACT` is the name of the contract to originate. If it can't find it, it'll not originate the contract. Alternatively, you can explicitly specify a storage file with the `--storage` option described below.
+
+After origination, an alias will be created to refer to the originated contract's address in `config.json`, in the targeted environment. By default, the name of the alias will be the name of the contract, without the `.tz` extension. If this alias already exists in the environment you're originating the contract to, then the address will be overriden with the new address. As such, the alias will always refer to the address of the latest origination of the contract. This facilitates hot reloading when doing dApp development.
+
+### Options
+
+- To target a different environment, use the `--environment` flag with the named Taqueria environment you want to target. E.g. `taq originate filename -e jakartanetEnv`.
+
+- To originate a contract with a specific storage value, use the `--storage` flag and supply the name of the storage file that contains the storage value. E.g. `taq originate filename --storage someStorage.tz`
+
+- To provide an alias for the originated contract explicitly, use the `--alias` flag and supply a name.
 
 ## Plugin Architecture
 
 This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
-
-The plugin provides a single task `originate`, used for originating Michelson contracts to a Tezos network:
-
-|  attribute |  value                   | 
-|------------|:-------------------------|
-|  task      | 'deploy'                 | 
-|  command   | 'deploy [contract]`      | 
-|  aliases   | ['originate']            |  
-
