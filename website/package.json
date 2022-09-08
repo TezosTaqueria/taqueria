@@ -27,6 +27,7 @@
     "@taquito/taquito": "^13.0.1",
     "@typeform/embed": "^1.35.1",
     "clsx": "^1.1.1",
+    "docusaurus-plugin-image-zoom": "^0.1.1",
     "docusaurus-plugin-sass": "^0.2.2",
     "file-loader": "^6.2.0",
     "html-react-parser": "^1.4.5",

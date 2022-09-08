@@ -41,7 +41,17 @@ const sidebars = {
         "scaffolds/quickstart",
         "scaffolds/nft-scaffold",
       ],
-    },   
+    },
+    {
+      type: "category",
+      label: "VS Code Extension",
+      className: "sidebarHeader",
+      collapsed: true,
+      collapsible: true,
+      items: [
+        "vs-code-extension/overview",
+      ],
+    },
     {
       type: "category",
       label: "Plugin Reference",
