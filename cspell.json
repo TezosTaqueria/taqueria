@@ -1,4 +1,9 @@
 {
+	"ignorePaths": [
+		"schema.prisma",
+		"**/*.ts.snap",
+		"**/node_modules/**/*.*"
+	],
 	"words": [
 		"abspath",
 		"Affordance",
@@ -7,22 +12,27 @@
 		"EBADENGINE",
 		"ecad",
 		"ecadlabs",
+		"Entrypoints",
 		"esbuild",
+		"execa",
 		"flextesa",
 		"fluture",
 		"gentypes",
 		"jsligo",
 		"ligo",
+		"Mininet",
 		"mligo",
 		"mutez",
 		"oidc",
 		"outfile",
+		"portfinder",
 		"positionals",
 		"Quickstart",
 		"rambda",
 		"READFILE",
 		"religo",
 		"retval",
+		"signalr",
 		"smartpy",
 		"taq'fied",
 		"taq'ified",
@@ -33,8 +43,14 @@
 		"Taqueria",
 		"taquito",
 		"Tezos",
+		"tsbuildinfo",
 		"typecheck",
+		"tzkt",
 		"vsix",
 		"xvfb"
+	],
+	"ignoreRegExpList": [
+		"KT1[a-zA-Z0-9]{33}",
+		"tz[1-3][a-zA-Z0-9]{33}"
 	]
 }

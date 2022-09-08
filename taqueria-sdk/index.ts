@@ -65,6 +65,19 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 		});
 	});
 
+export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, ExecException> =>
+	new Promise((resolve, reject) => {
+		exec(cmd, (err, stdout, stderr) => {
+			if (err) reject(err);
+			else {
+				resolve({
+					stdout,
+					stderr,
+				});
+			}
+		});
+	});
+
 export const getArch = (): LikeAPromise<string, TaqError> => {
 	switch (process.arch) {
 		case 'arm64':

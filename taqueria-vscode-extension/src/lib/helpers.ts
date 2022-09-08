@@ -14,8 +14,15 @@ import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
 import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
+import { ObservableConfig } from './gui/ObservableConfig';
 import { PluginsDataProvider, PluginTreeItem } from './gui/PluginsDataProvider';
-import { SandboxesDataProvider, SandboxTreeItem } from './gui/SandboxesDataProvider';
+import { SandboxesDataProvider } from './gui/SandboxesDataProvider';
+import {
+	OperationTreeItem,
+	SandboxTreeItem,
+	SandboxTreeItemBase,
+	SmartContractEntrypointTreeItem,
+} from './gui/SandboxTreeItemTypes';
 import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProvider';
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
@@ -293,6 +300,10 @@ export class VsCodeHelper {
 		} catch {
 			return json;
 		}
+		return this.formatObjectOrArrayAsTable(data);
+	}
+
+	private formatObjectOrArrayAsTable(data: unknown) {
 		const array: Record<string, any>[] = Array.isArray(data)
 			? data as Record<string, any>[]
 			: [data as Record<string, any>];
@@ -514,7 +525,7 @@ export class VsCodeHelper {
 			if (projectDir === undefined) {
 				return;
 			}
-			let pluginName = pluginInfo?.label;
+			let pluginName = pluginInfo?.pluginName;
 			if (!pluginName) {
 				pluginName = await this.promptForPluginInstallation(projectDir);
 				if (!pluginName) {
@@ -540,7 +551,7 @@ export class VsCodeHelper {
 			if (projectDir === undefined) {
 				return;
 			}
-			let pluginName = pluginInfo?.label;
+			let pluginName = pluginInfo?.pluginName;
 			if (!pluginName) {
 				pluginName = await this.promptForPluginUninstall(projectDir);
 			}
@@ -575,7 +586,7 @@ export class VsCodeHelper {
 				let fileName: string | undefined = undefined;
 				if (arg) {
 					if (arg instanceof EnvironmentTreeItem) {
-						environmentName = arg.label;
+						environmentName = arg.environmentName;
 					}
 					if (arg instanceof ArtifactTreeItem) {
 						fileName = arg.fileName;
@@ -713,7 +724,7 @@ export class VsCodeHelper {
 			let sandboxName: string | undefined = undefined;
 			if (arg) {
 				if (arg instanceof SandboxTreeItem) {
-					sandboxName = arg.label;
+					sandboxName = arg.sandboxName;
 				}
 				if (arg instanceof ContractTreeItem) {
 					fileName = this.getArtifactFileNameFromContract(arg.fileName);
@@ -973,7 +984,7 @@ export class VsCodeHelper {
 		taskTitles: TaskTitles,
 	) {
 		this.registerCommand(cmdId, async (sandbox?: SandboxTreeItem | undefined) => {
-			let sandboxName = sandbox?.label;
+			let sandboxName = sandbox?.sandboxName;
 			if (!sandboxName) {
 				const mainFolder = await this.getMainWorkspaceFolder();
 				if (!mainFolder) {
@@ -1050,7 +1061,7 @@ export class VsCodeHelper {
 
 		const mainFolder = this.getMainWorkspaceFolder();
 		if (mainFolder === undefined) {
-			this.showLog(OutputLevels.debug, 'No folder is open, enabling init and scaffold');
+			this.showLog(OutputLevels.trace, 'No folder is open, enabling init and scaffold');
 			this.vscode.commands.executeCommand(
 				'setContext',
 				'@taqueria-state/enable-init-scaffold',
@@ -1060,15 +1071,15 @@ export class VsCodeHelper {
 		}
 		this.refreshDataProviders.forEach(dataProvider => dataProvider.refresh());
 
-		this.showLog(OutputLevels.debug, 'Project config changed, updating command states...');
+		this.showLog(OutputLevels.trace, 'Project config changed, updating command states...');
 		let taqFolderFound: boolean;
 		try {
 			await Util.makeDir(join(mainFolder.path, '.taq'), this.i18);
-			this.showLog(OutputLevels.debug, 'Taq folder is found');
+			this.showLog(OutputLevels.trace, 'Taq folder is found');
 			taqFolderFound = true;
 		} catch {
 			taqFolderFound = false;
-			this.showLog(OutputLevels.debug, 'Taq folder not found');
+			this.showLog(OutputLevels.trace, 'Taq folder not found');
 		}
 		let enableAllCommands: boolean;
 		let config: Util.TaqifiedDir | null;
@@ -1096,7 +1107,7 @@ export class VsCodeHelper {
 			? availablePlugins.filter(name => config?.config.plugins?.findIndex(p => p.name === name) === -1)
 			: availablePlugins;
 		this.showLog(
-			OutputLevels.debug,
+			OutputLevels.trace,
 			`@taqueria-state/enable-init-scaffold: ${enableAllCommands || !config?.config}`,
 		);
 		this.vscode.commands.executeCommand(
@@ -1106,7 +1117,7 @@ export class VsCodeHelper {
 		);
 
 		this.showLog(
-			OutputLevels.debug,
+			OutputLevels.trace,
 			`@taqueria-state/enable-install-uninstall: ${enableAllCommands || !!config?.config}`,
 		);
 		this.vscode.commands.executeCommand(
@@ -1115,7 +1126,7 @@ export class VsCodeHelper {
 			enableAllCommands || !!config?.config,
 		);
 
-		this.showLog(OutputLevels.debug, `@taqueria-state/is-taqified: ${!!config?.config}`);
+		this.showLog(OutputLevels.trace, `@taqueria-state/is-taqified: ${!!config?.config}`);
 		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config?.config);
 
 		this.vscode.commands.executeCommand(
@@ -1129,12 +1140,28 @@ export class VsCodeHelper {
 			enableAllCommands ? 1 : availablePluginsNotInstalled.length,
 		);
 		const plugins = this.getWellKnownPlugins();
-		this.showLog(OutputLevels.debug, `Known plugins: ${JSON.stringify(plugins)}`);
+		this.showLog(OutputLevels.trace, `Known plugins: ${JSON.stringify(plugins)}`);
 		for (const plugin of plugins) {
 			const found = config?.config?.plugins?.find(item => item.name === plugin) !== undefined;
-			this.showLog(OutputLevels.debug, `plugins ${plugin}: ${found}`);
+			this.showLog(OutputLevels.trace, `plugins ${plugin}: ${found}`);
 			this.vscode.commands.executeCommand('setContext', plugin, enableAllCommands || found);
 		}
+	}
+
+	private _taqFolderWatcher: api.FileSystemWatcher | undefined;
+	private _configWatcher: api.FileSystemWatcher | undefined;
+	private _stateWatcher: api.FileSystemWatcher | undefined;
+
+	get taqFolderWatcher() {
+		return this._taqFolderWatcher;
+	}
+
+	get configWatcher() {
+		return this._configWatcher;
+	}
+
+	get stateWatcher() {
+		return this._stateWatcher;
 	}
 
 	createWatcherIfNotExists(
@@ -1150,9 +1177,12 @@ export class VsCodeHelper {
 				this.logAllNestedErrors(error);
 			}
 			try {
-				const folderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq'));
+				const taqFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq'));
+				this._taqFolderWatcher = taqFolderWatcher;
 				const configWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+				this._configWatcher = configWatcher;
 				const stateWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/state.json'));
+				this._stateWatcher = stateWatcher;
 
 				const contractsFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts'));
 				const contractsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'contracts/*'));
@@ -1162,9 +1192,9 @@ export class VsCodeHelper {
 				const artifactsWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, 'artifacts/**/*.tz'));
 
 				// TODO: Is passing these arguments to the callback of a long lived watcher prevent GC? Are these short lived objects?
-				folderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
-				folderWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
-				folderWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates());
+				taqFolderWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
+				taqFolderWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
+				taqFolderWatcher.onDidDelete((e: api.Uri) => this.updateCommandStates());
 
 				configWatcher.onDidChange((e: api.Uri) => this.updateCommandStates());
 				configWatcher.onDidCreate((e: api.Uri) => this.updateCommandStates());
@@ -1193,7 +1223,7 @@ export class VsCodeHelper {
 				testsWatcher.onDidDelete(_ => this.testDataProvider?.refresh());
 
 				return [
-					folderWatcher,
+					taqFolderWatcher,
 					configWatcher,
 					stateWatcher,
 					contractsFolderWatcher,
@@ -1220,12 +1250,14 @@ export class VsCodeHelper {
 	private testDataProvider?: TestDataProvider;
 	private systemCheckDataProvider?: SystemCheckDataProvider;
 	private systemCheckTreeView?: api.TreeView<SystemCheckTreeItem>;
+	private observableConfig!: ObservableConfig;
 
-	registerDataProviders() {
+	async registerDataProviders() {
+		this.observableConfig = await ObservableConfig.create(this);
 		this.registerDataProvider('taqueria-plugins', new PluginsDataProvider(this));
 		this.sandboxesDataProvider = this.registerDataProvider(
 			'taqueria-sandboxes',
-			new SandboxesDataProvider(this),
+			new SandboxesDataProvider(this, this.observableConfig),
 		);
 		this.registerDataProvider('taqueria-environments', new EnvironmentsDataProvider(this));
 		this.testDataProvider = this.registerDataProvider('taqueria-tests', new TestDataProvider(this));
@@ -1394,6 +1426,26 @@ export class VsCodeHelper {
 	async createTreeViews() {
 		this.systemCheckTreeView = this.vscode.window.createTreeView<SystemCheckTreeItem>('taqueria-system-check', {
 			treeDataProvider: this.systemCheckDataProvider!,
+		});
+	}
+
+	exposeRefreshSandBoxDataCommand() {
+		this.registerCommand('taqueria.refresh_sandbox_data', async (item: SandboxTreeItemBase) => {
+			this.sandboxesDataProvider?.refreshItem(item);
+		});
+	}
+
+	exposeShowEntrypointParametersCommand() {
+		this.registerCommand('taqueria.show_entrypoint_parameters', async (item: SmartContractEntrypointTreeItem) => {
+			const jsonParameters = item.jsonParameters;
+			this.showOutput(JSON.stringify(jsonParameters, null, 2));
+		});
+	}
+
+	exposeShowOperationDetailsCommand() {
+		this.registerCommand('taqueria.show_operation_details', async (item: OperationTreeItem) => {
+			const jsonParameters = item.operation;
+			this.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});
 	}
 }

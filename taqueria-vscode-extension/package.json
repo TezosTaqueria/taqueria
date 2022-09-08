@@ -347,6 +347,27 @@
 				"title": " Remove contract from registry",
 				"shortTitle": "remove",
 				"icon": "$(remove)"
+			},
+			{
+				"command": "taqueria.show_entrypoint_parameters",
+				"category": "Taqueria",
+				"title": "Parameters",
+				"shortTitle": "parameters",
+				"icon": "$(list-unordered)"
+			},
+			{
+				"command": "taqueria.refresh_sandbox_data",
+				"category": "Taqueria",
+				"title": "Refresh",
+				"shortTitle": "refresh",
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "taqueria.show_operation_details",
+				"category": "Taqueria",
+				"title": "Show Operation Details",
+				"shortTitle": "details",
+				"icon": "$(list-unordered)"
 			}
 		],
 		"menus": {
@@ -365,6 +386,18 @@
 				},
 				{
 					"command": "taqueria.refresh_command_states",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.show_entrypoint_parameters",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.refresh_sandbox_data",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.show_operation_details",
 					"when": "false"
 				}
 			],
@@ -423,17 +456,17 @@
 				},
 				{
 					"command": "taqueria.start_sandbox",
-					"when": "view == taqueria-sandboxes && viewItem != running",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!running)/",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.stop_sandbox",
-					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!stopped)/",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.list_accounts",
-					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!stopped)/",
 					"group": "inline"
 				},
 				{
@@ -458,7 +491,7 @@
 				},
 				{
 					"command": "taqueria.typecheck",
-					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!stopped)/",
 					"group": "inline"
 				},
 				{
@@ -479,6 +512,21 @@
 				{
 					"command": "taqueria.scaffold",
 					"when": "view == taqueria-scaffold",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.show_entrypoint_parameters",
+					"when": "view == taqueria-sandboxes && viewItem == entrypoint",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.refresh_sandbox_data",
+					"when": "view == taqueria-sandboxes",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.show_operation_details",
+					"when": "view == taqueria-sandboxes && viewItem == operation",
 					"group": "inline"
 				}
 			],
@@ -526,11 +574,15 @@
 		"vsce": "^2.6.4"
 	},
 	"dependencies": {
+		"@microsoft/signalr": "^6.0.8",
 		"@taqueria/protocol": "^0.14.4",
 		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
+		"eventsource": "^2.0.2",
+		"node-fetch": "^3.2.10",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1",
+		"rxjs": "^7.5.6",
 		"semver": "^7.3.7"
 	}
 }
