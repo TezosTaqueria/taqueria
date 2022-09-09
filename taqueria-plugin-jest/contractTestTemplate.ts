@@ -77,11 +77,19 @@ const toJest = (contractName: string) =>
 import { TezosToolkit } from '@taquito/taquito';
 import { char2Bytes } from '@taquito/utils';
 import { tas } from './types/type-aliases';
+import { InMemorySigner, importKey } from '@taquito/signer';
 import { ${normalizeContractName(contractName)}ContractType as ContractType } from './types/${contractName}.types';
 import { ${normalizeContractName(contractName)}Code as ContractCode } from './types/${contractName}.code';
 
+jest.setTimeout(20000)
+
 describe('${contractName}', () => {
-    const Tezos = new TezosToolkit('RPC_URL');
+	const config = require('../.taq/config.json')
+    const Tezos = new TezosToolkit(config.sandbox.local.rpcUrl);
+	const key = config.sandbox.local.accounts.bob.secretKey.replace('unencrypted:', '')
+	Tezos.setProvider({
+		signer: new InMemorySigner(key),
+	  });
     let contract: ContractType = undefined as unknown as ContractType;
     beforeAll(async () => {
         ${generator.generateOrigination({ formatting: { indent: 3 } }).code}
@@ -95,7 +103,7 @@ ${
         ${x.methodCall.code}
         const storageValueAfter = await ${x.storageAccess.getStorageValueFunctionName}();
 
-        expect(storageValueAfter).toBe('');
+        expect(storageValueAfter.toString()).toBe('');
     });
 `).join('')
 		}});
