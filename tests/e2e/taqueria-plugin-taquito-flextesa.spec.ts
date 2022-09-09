@@ -194,7 +194,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// Comment if need to debug
 	afterAll(async () => {
 		const dockerContainer = await getContainerName(dockerName);
-
 		try {
 			await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (e: unknown) {
