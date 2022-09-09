@@ -29,15 +29,18 @@
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.14.4",
 		"@taqueria/plugin-contract-types": "^0.14.4",
+		"@taquito/taquito": "^13.0.1",
+		"@taquito/utils": "^13.0.1",
 		"async-retry": "^1.3.3",
+		"bignumber.js": "^9.1.0",
 		"execa": "^6.1.0",
 		"fast-glob": "^3.2.7",
 		"jest-config": "^28.1.0",
-		"ts-jest": "^28.0.8"
+		"ts-jest": "^28.0.8",
+		"@types/jest": "^27.5.2"
 	},
 	"devDependencies": {
 		"@types/async-retry": "^1.3.3",
-		"@types/jest": "^27.5.1",
 		"tsup": "^6.1.3",
 		"typescript": "4.7.2"
 	},

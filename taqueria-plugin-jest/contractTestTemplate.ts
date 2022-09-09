@@ -98,7 +98,7 @@ ${
         expect(storageValueAfter).toBe('');
     });
 `).join('')
-		});
+		}});
 `;
 	};
 
