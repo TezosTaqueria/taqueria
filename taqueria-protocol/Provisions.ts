@@ -1,7 +1,7 @@
 import createType, { Flatten } from '@taqueria/protocol/Base';
 import * as Provisioner from '@taqueria/protocol/Provisioner';
 import * as ProvisionerID from '@taqueria/protocol/ProvisionerID';
-import { partition, uniq } from 'rambda';
+import { partitionArray, uniq } from 'rambda';
 import { memoize } from 'rambdax';
 import { z } from 'zod';
 
@@ -11,7 +11,7 @@ const getInvalidIds = memoize(
 		return provisions.reduce(
 			(retval, provision) => {
 				const depends_on = (provision.depends_on ?? []) as unknown as ProvisionerID.t[];
-				const invalid = partition(
+				const invalid = partitionArray(
 					(id: ProvisionerID.t) => ids.includes(id),
 					depends_on,
 				).pop() as ProvisionerID.t[];

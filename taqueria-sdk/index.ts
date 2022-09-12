@@ -4,6 +4,7 @@ import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
+import * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
 import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
@@ -31,6 +32,7 @@ import { LikeAPromise, pluginDefiner, StdIO } from './types';
 // @ts-ignore interop issue. Maybe find a different library later
 import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
 import generateName from 'project-name-generator';
+import { parsed } from 'yargs';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 const yargs = require('yargs');
@@ -53,6 +55,19 @@ export const readJsonFile = <T>(filename: string): Promise<T> =>
 export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 	new Promise((resolve, reject) => {
 		exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
+			if (err) reject(err);
+			else {
+				resolve({
+					stdout,
+					stderr,
+				});
+			}
+		});
+	});
+
+export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, ExecException> =>
+	new Promise((resolve, reject) => {
+		exec(cmd, (err, stdout, stderr) => {
 			if (err) reject(err);
 			else {
 				resolve({
@@ -351,6 +366,12 @@ export const getCurrentEnvironmentConfig = (parsedArgs: RequestArgs.t) => {
 };
 
 /**
+ * Gets the configuration for the project metadata
+ */
+export const getMetadataConfig = (parsedArgs: RequestArgs.t) =>
+	() => (parsedArgs.config.metadata ?? undefined) as Protocol.MetadataConfig.t | undefined;
+
+/**
  * Gets the configuration for the named network
  */
 export const getNetworkConfig = (parsedArgs: RequestArgs.t) =>
@@ -392,7 +413,7 @@ export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
 		};
 
 /**
- * Gets the initial storage for the contract
+ * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
  */
 export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilename: string) => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
@@ -407,6 +428,40 @@ export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilen
 		}
 	}
 	return undefined;
+};
+
+/**
+ * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
+ */
+export const newGetInitialStorage = async (parsedArgs: RequestArgs.t, storageFilename: string) => {
+	const storagePath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, storageFilename);
+	try {
+		const content = await readFile(storagePath, { encoding: 'utf-8' });
+		return content;
+	} catch (err) {
+		sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
+		return undefined;
+	}
+};
+
+/**
+ * Update the alias of an address for the current environment
+ */
+export const updateAddressAlias = async (parsedArgs: RequestArgs.t, alias: string, address: string): Promise<void> => {
+	const env = getCurrentEnvironmentConfig(parsedArgs);
+	if (!env) return;
+	if (!env.aliases) {
+		env.aliases = { [alias]: { address } };
+	} else if (!env.aliases[alias]) {
+		env.aliases[alias] = { address };
+	} else {
+		env.aliases[alias].address = address;
+	}
+	try {
+		await writeJsonFile('./.taq/config.json')(parsedArgs.config);
+	} catch (err) {
+		sendErr(`Could not write to ./.taq/config.json\n`);
+	}
 };
 
 /**
@@ -509,6 +564,7 @@ export const Plugin = {
 export {
 	Environment,
 	LoadedConfig,
+	MetadataConfig,
 	NetworkConfig,
 	Operation,
 	Option,

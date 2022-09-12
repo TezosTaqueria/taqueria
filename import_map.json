@@ -21,6 +21,7 @@
 		"@taqueria/protocol/Verb": "./taqueria-protocol/Verb.ts",
 		"@taqueria/protocol/SingleChar": "./taqueria-protocol/SingleChar.ts",
 		"@taqueria/protocol/InstalledPlugin": "./taqueria-protocol/InstalledPlugin.ts",
+		"@taqueria/protocol/MetadataConfig": "./taqueria-protocol/MetadataConfig.ts",
 		"@taqueria/protocol/NetworkConfig": "./taqueria-protocol/NetworkConfig.ts",
 		"@taqueria/protocol/SandboxConfig": "./taqueria-protocol/SandboxConfig.ts",
 		"@taqueria/protocol/Environment": "./taqueria-protocol/Environment.ts",
@@ -61,6 +62,8 @@
 		"@taqueria/protocol/PluginDependenciesResponse": "./taqueria-protocol/PluginDependenciesResponse.ts",
 		"@taqueria/protocol/PluginResponseEncoding": "./taqueria-protocol/PluginResponseEncoding.ts",
 		"@taqueria/protocol/Contract": "./taqueria-protocol/Contract.ts",
-		"@taqueria/protocol/ScaffoldConfig": "./taqueria-protocol/ScaffoldConfig.ts"
+		"@taqueria/protocol/ScaffoldConfig": "./taqueria-protocol/ScaffoldConfig.ts",
+		"@taqueria/protocol/tzkt-config": "./taqueria-protocol/tzkt-config.ts",
+		"@taqueria/protocol/taqueria-protocol-types": "/taqueria-protocol/taqueria-protocol-types.ts"
 	}
 }

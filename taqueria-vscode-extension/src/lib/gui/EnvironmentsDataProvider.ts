@@ -56,12 +56,12 @@ export class EnvironmentsDataProvider implements vscode.TreeDataProvider<Environ
 }
 export class EnvironmentTreeItem extends vscode.TreeItem {
 	constructor(
-		public readonly label: string,
+		public readonly environmentName: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		isDefault: boolean,
 	) {
-		super(label, collapsibleState);
-		this.tooltip = isDefault ? `${this.label} (default)` : `${this.label}`;
+		super(environmentName, collapsibleState);
+		this.tooltip = isDefault ? `${environmentName} (default)` : `${environmentName}`;
 		this.iconPath = new vscode.ThemeIcon(isDefault ? 'pass-filled' : 'server-environment');
 		this.contextValue = isDefault ? 'default' : 'non-default';
 	}

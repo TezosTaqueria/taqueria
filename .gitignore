@@ -163,6 +163,9 @@ tests/coverage
 /taqueria-state/index.js.map
 /taqueria-state/*.d.ts
 /taqueria-state/node/*.d.ts
+/taqueria-toolkit/index.js
+/taqueria-toolkit/index.js.map
+/taqueria-toolkit/*.d.ts
 /taqueria-plugin-jest/*.js
 /taqueria-plugin-jest/*.cjs
 /taqueria-plugin-jest/*.map
@@ -170,6 +173,8 @@ tests/coverage
 /taqueria-plugin-jest/index.d.ts
 /taqueria-plugin-ipfs-pinata/index.js.map
 /taqueria-plugin-ipfs-pinata/index.js
+/taqueria-plugin-metadata/index.js.map
+/taqueria-plugin-metadata/index.js
 
 # VS Code Extension
 /taqueria-vscode-extension/out
@@ -179,3 +184,5 @@ tests/coverage
 /taqueria-vscode-extension/config.json
 website/docs/glossary.md
 website/yarn.lock
+taqueria-plugin-metadata/index.js
+taqueria-plugin-metadata/index.js.map

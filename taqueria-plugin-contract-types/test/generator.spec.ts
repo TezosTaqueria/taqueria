@@ -70,7 +70,6 @@ describe('Generate Example Contracts', () => {
 		await testContractTypeGeneration('subsubdir/example-contract-0', 'tz', 'simple');
 	});
 
-
 	// it(`Generate Types - All`, async () => {
 	//     const allExampleContracts = (await fs.readdir(`${exampleDir}/contracts/`)).filter(f=>f.endsWith('.tz') || f.endsWith('.json'));
 

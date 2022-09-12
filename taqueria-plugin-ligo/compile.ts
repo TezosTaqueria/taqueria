@@ -58,7 +58,9 @@ const getContractNameForExpr = (sourceFile: string, exprKind: ExprKind): string 
 // If sourceFile is token.storages.mligo, then it'll return token.storage.{storageName}.tz
 const getOutputExprFileName = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind, exprName: string): string => {
 	const contractName = basename(getContractNameForExpr(sourceFile, exprKind), extname(sourceFile));
-	const outputFile = `${contractName}.${exprKind}.${exprName}.tz`;
+	const outputFile = exprKind === 'default_storage'
+		? `${contractName}.default_storage.tz`
+		: `${contractName}.${exprKind}.${exprName}.tz`;
 	return join(parsedArgs.config.artifactsDir, `${outputFile}`);
 };
 
@@ -66,7 +68,7 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:next compile contract`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ligolang/ligo:next compile contract`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputFilename(parsedArgs, sourceFile)}`;
 	const cmd = `${baseCmd} ${inputFile} ${outputFile}`;
@@ -78,7 +80,7 @@ const getCompileExprCmd = (parsedArgs: Opts, sourceFile: string, exprKind: ExprK
 	if (!projectDir) throw `No project directory provided`;
 	const compilerType = isStorageKind(exprKind) ? 'storage' : 'parameter';
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project ligolang/ligo:next compile ${compilerType}`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ligolang/ligo:next compile ${compilerType}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputExprFileName(parsedArgs, sourceFile, exprKind, exprName)}`;
 	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile}`;

@@ -41,7 +41,17 @@ const sidebars = {
         "scaffolds/quickstart",
         "scaffolds/nft-scaffold",
       ],
-    },   
+    },
+    {
+      type: "category",
+      label: "VS Code Extension",
+      className: "sidebarHeader",
+      collapsed: true,
+      collapsible: true,
+      items: [
+        "vs-code-extension/overview",
+      ],
+    },
     {
       type: "category",
       label: "Plugin Reference",
@@ -54,6 +64,7 @@ const sidebars = {
         "plugins/plugin-contract-types",
         "plugins/plugin-flextesa",
         "plugins/plugin-ipfs-pinata",
+        "plugins/plugin-metadata",
         "plugins/plugin-jest",
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
@@ -79,6 +90,7 @@ const sidebars = {
         "tasks/opt-out",
         "tasks/originate",
         "tasks/publish",
+        "tasks/generate-metadata",
         "tasks/remove-contract",
         "tasks/scaffold",
         "tasks/simulate",
@@ -113,16 +125,16 @@ const sidebars = {
         "config/environments"
       ],
     },
-    // {
-    //   type: "category",
-    //   label: "Taqueria Libraries",
-    //   className: "sidebarHeader",
-    //   collapsed: false,
-    //   collapsible: false,
-    //   items: [
-    //     "libraries/taqueria-state"
-    //   ],
-    // }, 
+    {
+      type: "category",
+      label: "Taqueria Libraries",
+      className: "sidebarHeader",
+      collapsed: true,
+      collapsible: true,
+      items: [
+        "libraries/toolkit"
+      ],
+    }, 
     {
       type: "category",
       label: "Tutorials",

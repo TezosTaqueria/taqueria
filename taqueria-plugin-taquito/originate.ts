@@ -7,9 +7,12 @@ import {
 	getSandboxAccountConfig,
 	getSandboxAccountNames,
 	getSandboxConfig,
+	newGetInitialStorage,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
+	sendRes,
+	updateAddressAlias,
 } from '@taqueria/node-sdk';
 import { Protocol, RequestArgs } from '@taqueria/node-sdk/types';
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
@@ -18,10 +21,12 @@ import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import glob from 'fast-glob';
 import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { basename, extname, join } from 'path';
 
 interface Opts extends RequestArgs.t {
-	contract?: string;
+	contract: string;
+	storage: string;
+	alias?: string;
 }
 
 interface ContractStorageMapping {
@@ -32,6 +37,7 @@ interface ContractStorageMapping {
 interface OriginationResult {
 	contract: string;
 	address: string;
+	alias: string;
 	destination: string;
 }
 
@@ -53,20 +59,32 @@ const addOrigination = (parsedArgs: Opts, batch: Promise<WalletOperationBatch>) 
 		});
 	};
 
+const getDefaultStorageFilename = (contractName: string): string => {
+	const baseFilename = basename(contractName, extname(contractName));
+	const extFilename = extname(contractName);
+	const defaultStorage = `${baseFilename}.default_storage${extFilename}`;
+	return defaultStorage;
+};
+
+// TODO: temporary quick solution. May refactor this to only deal with one contract later
 const getValidContracts = async (parsedArgs: Opts) => {
-	const contracts = parsedArgs.contract
-		? [parsedArgs.contract]
-		: (await glob('*.tz', { cwd: parsedArgs.config.artifactsDir })) as string[];
+	const contracts = [parsedArgs.contract];
+	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(contracts[0]);
 
 	return contracts.reduce(
 		async (retval, filename) => {
-			const storage = await getInitialStorage(parsedArgs, filename);
+			const storage = await newGetInitialStorage(parsedArgs, storageFilename);
 			if (storage === undefined || storage === null) {
 				sendErr(
-					`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
-						getCurrentEnvironment(parsedArgs)
-					}.storage["${filename}"]\nThe value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.\n`,
+					`❌ No initial storage file was found for ${filename}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
+						getDefaultStorageFilename(contracts[0])
+					}" in the artifacts directory\nYou can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option\n`,
 				);
+				// sendErr(
+				// 	`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
+				// 		getCurrentEnvironment(parsedArgs)
+				// 	}.storage["${filename}"]\nThe value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.\n`,
+				// );
 				return retval;
 			}
 			return [...(await retval), { filename, storage }];
@@ -75,7 +93,12 @@ const getValidContracts = async (parsedArgs: Opts) => {
 	);
 };
 
-const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWalletOperation, destination: string) => {
+const mapOpToContract = async (
+	parsedArgs: Opts,
+	contracts: ContractStorageMapping[],
+	op: BatchWalletOperation,
+	destination: string,
+) => {
 	const results = await op.operationResults();
 
 	return contracts.reduce(
@@ -91,11 +114,15 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
 					? result.metadata.operation_result.originated_contracts.join(',')
 					: 'Error';
 
+				const alias = parsedArgs.alias ?? basename(contract.filename, extname(contract.filename));
+				if (address !== 'Error') updateAddressAlias(parsedArgs, alias, address);
+
 				return [
 					...retval,
 					{
 						contract: contract.filename,
 						address,
+						alias: address !== 'Error' ? alias : 'N/A',
 						destination,
 					},
 				];
@@ -106,6 +133,7 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
 				{
 					contract: contract.filename,
 					address: 'Error',
+					alias: 'N/A',
 					destination,
 				},
 			];
@@ -131,7 +159,7 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 	try {
 		const op = await batch.send();
 		const confirmed = await op.confirmation();
-		return await mapOpToContract(contracts, op, destination);
+		return await mapOpToContract(parsedArgs, contracts, op, destination);
 	} catch (err) {
 		const error = (err as { message: string });
 		if (error.message) {
