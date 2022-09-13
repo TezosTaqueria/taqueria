@@ -31,6 +31,16 @@
 	"devDependencies": {
 		"typescript": "^4.7.2"
 	},
+	"exports": {
+		"./*": {
+			"import": "./*.mjs",
+			"default": "./*.js"
+		},
+		"./*.js": {
+			"import": "./*.mjs",
+			"default": "./*.js"
+		}
+	},
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
 		"batching-toposort": "^1.2.0",
@@ -42,7 +52,7 @@
 	},
 	"tsup": {
 		"entry": [
-			"[!d]+.ts"
+			"[!.]+.ts"
 		],
 		"sourcemap": true,
 		"target": "node16",
