@@ -68,11 +68,19 @@ export const incrementSpecContents = `
 import { TezosToolkit } from '@taquito/taquito';
 import { char2Bytes } from '@taquito/utils';
 import { tas } from './types/type-aliases';
+import { InMemorySigner, importKey } from '@taquito/signer';
 import { IncrementContractType as ContractType } from './types/increment.types';
 import { IncrementCode as ContractCode } from './types/increment.code';
 
+jest.setTimeout(20000)
+
 describe('increment', () => {
-    const Tezos = new TezosToolkit('RPC_URL');
+	const config = require('../.taq/config.json')
+    const Tezos = new TezosToolkit(config.sandbox.local.rpcUrl);
+	const key = config.sandbox.local.accounts.bob.secretKey.replace('unencrypted:', '')
+	Tezos.setProvider({
+		signer: new InMemorySigner(key),
+	  });
     let contract: ContractType = undefined as unknown as ContractType;
     beforeAll(async () => {
         
@@ -102,7 +110,7 @@ describe('increment', () => {
         
         const storageValueAfter = await getStorageValue();
 
-        expect(storageValueAfter).toBe('');
+        expect(storageValueAfter.toString()).toBe('');
     });
 
     it('should call increment', async () => {
@@ -120,7 +128,7 @@ describe('increment', () => {
         
         const storageValueAfter = await getStorageValue();
 
-        expect(storageValueAfter).toBe('');
+        expect(storageValueAfter.toString()).toBe('');
     });
 
     it('should call reset', async () => {
@@ -138,7 +146,7 @@ describe('increment', () => {
         
         const storageValueAfter = await getStorageValue();
 
-        expect(storageValueAfter).toBe('');
+        expect(storageValueAfter.toString()).toBe('');
     });
-);
+});
 `;
