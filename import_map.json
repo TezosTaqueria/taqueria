@@ -7,7 +7,7 @@
 		"i18next": "https://deno.land/x/i18next@v21.6.14/index.js",
 		"fluture": "https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js",
 		"rambda": "https://cdn.skypack.dev/rambda@7.2.1",
-		"rambdax": "https://raw.githubusercontent.com/selfrefactor/rambdax/master/dist/rambdax.esm.js",
+		"rambdax": "https://cdn.skypack.dev/rambdax@8.1.0",
 		"@peculiar/webcrypto": "./taqueria-protocol/Crypto.ts",
 		"@taqueria/protocol/TaqError": "./taqueria-protocol/TaqError.ts",
 		"@taqueria/protocol/Base": "./taqueria-protocol/Base.ts",
