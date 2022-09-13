@@ -62,6 +62,7 @@ jobs:
       - name: Build package
         run: | 
           npm run build -w taqueria-sdk
+          npm run build -w taqueria-protocol
           npm run build -w taqueria-flextesa-manager
 
       - name: Set up QEMU
