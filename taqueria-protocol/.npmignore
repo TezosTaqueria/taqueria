@@ -1,0 +1,4 @@
+*.ts
+plugin-schema.json
+tsconfig.json
+!*.d.ts

@@ -536,7 +536,8 @@ const getPackageName = () => {
 	const stack = getSync({
 		filter: (stackFrame => {
 			const filename = stackFrame.getFileName();
-			return !filename.includes('taqueria-sdk') && !filename.includes('@taqueria/node-sdk');
+			return !filename.includes('taqueria-sdk') && !filename.includes('@taqueria/node-sdk')
+				&& !filename.includes('stacktrace-js');
 		}),
 	});
 	const frame = stack.shift();
