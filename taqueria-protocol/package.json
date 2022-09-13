@@ -37,11 +37,12 @@
 		"fluture": "^14.0.0",
 		"rambda": "^7.2.1",
 		"rambdax": "^8.1.0",
+		"tsup": "^6.2.3",
 		"zod": "^3.17.3"
 	},
 	"tsup": {
 		"entry": [
-			"*.ts"
+			"[!d]+.ts"
 		],
 		"sourcemap": true,
 		"target": "node16",
