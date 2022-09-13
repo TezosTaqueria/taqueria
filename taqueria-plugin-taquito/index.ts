@@ -1,5 +1,5 @@
 import { Option, Plugin, Task } from '@taqueria/node-sdk';
-import originate from './originate';
+import taquito from './taquito';
 
 Plugin.create(_i18n => ({
 	alias: 'taquito',
@@ -27,6 +27,32 @@ Plugin.create(_i18n => ({
 			handler: 'proxy',
 			encoding: 'application/json',
 		}),
+		Task.create({
+			task: 'transfer',
+			command: 'transfer <src_alias> <dst_alias>',
+			description: 'Transfer/call a smart contract deployed to a particular environment',
+			options: [
+				Option.create({
+					flag: 'amount',
+					description: 'Amount of Tez to transfer',
+					required: false,
+				}),
+				Option.create({
+					flag: 'param',
+					description: 'Parameter to invoke the smart contract',
+					required: false,
+				}),
+				Option.create({
+					flag: 'entrypoint',
+					description:
+						'You may explicitly specify an entrypoint to make the parameter value shorter (without having to specify Left Right Left Left Right...)',
+					required: false,
+				}),
+			],
+			aliases: ['call'],
+			handler: 'proxy',
+			encoding: 'application/json',
+		}),
 	],
-	proxy: originate,
+	proxy: taquito,
 }), process.argv);
