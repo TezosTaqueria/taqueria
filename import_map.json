@@ -6,8 +6,8 @@
 		"ts-pattern": "https://esm.sh/ts-pattern@3.3.5",
 		"i18next": "https://deno.land/x/i18next@v21.6.14/index.js",
 		"fluture": "https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js",
-		"rambda": "https://cdnjs.cloudflare.com/ajax/libs/rambda/7.1.0/rambda.esm.js",
-		"memoizy": "https://deno.land/x/memoizy@1.0.0/mod.ts",
+		"rambda": "https://cdn.skypack.dev/rambda@7.2.1",
+		"rambdax": "https://cdn.skypack.dev/rambdax@8.1.0",
 		"@peculiar/webcrypto": "./taqueria-protocol/Crypto.ts",
 		"@taqueria/protocol/TaqError": "./taqueria-protocol/TaqError.ts",
 		"@taqueria/protocol/Base": "./taqueria-protocol/Base.ts",
@@ -62,6 +62,8 @@
 		"@taqueria/protocol/PluginDependenciesResponse": "./taqueria-protocol/PluginDependenciesResponse.ts",
 		"@taqueria/protocol/PluginResponseEncoding": "./taqueria-protocol/PluginResponseEncoding.ts",
 		"@taqueria/protocol/Contract": "./taqueria-protocol/Contract.ts",
-		"@taqueria/protocol/ScaffoldConfig": "./taqueria-protocol/ScaffoldConfig.ts"
+		"@taqueria/protocol/ScaffoldConfig": "./taqueria-protocol/ScaffoldConfig.ts",
+		"@taqueria/protocol/tzkt-config": "./taqueria-protocol/tzkt-config.ts",
+		"@taqueria/protocol/taqueria-protocol-types": "/taqueria-protocol/taqueria-protocol-types.ts"
 	}
 }

@@ -113,6 +113,10 @@ node_modules
 /taqueria
 /taq
 tests/coverage
+/taqueria-protocol/*.mjs
+/taqueria-protocol/*.map
+/taqueria-protocol/*.d.ts
+/taqueria-protocol/*.js
 /taqueria-sdk/index.js
 /taqueria-sdk/index.js.map
 /taqueria-sdk/types.js
@@ -121,6 +125,9 @@ tests/coverage
 /taqueria-sdk/index.esm.js.map
 /taqueria-sdk/types.esm.js
 /taqueria-sdk/types.esm.js.map
+/taqueria-sdk/*.mjs
+/taqueria-sdk/*.mjs.map
+/taqueria-sdk/*.d.ts
 /taqueria-plugin-smartpy/index.js
 /taqueria-plugin-smartpy/index.js.map
 /taqueria-plugin-ligo/index.js
@@ -156,6 +163,9 @@ tests/coverage
 /taqueria-state/index.js.map
 /taqueria-state/*.d.ts
 /taqueria-state/node/*.d.ts
+/taqueria-toolkit/index.js
+/taqueria-toolkit/index.js.map
+/taqueria-toolkit/*.d.ts
 /taqueria-plugin-jest/*.js
 /taqueria-plugin-jest/*.cjs
 /taqueria-plugin-jest/*.map

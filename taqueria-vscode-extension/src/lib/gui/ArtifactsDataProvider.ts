@@ -46,14 +46,11 @@ export class ArtifactsDataProvider extends TaqueriaDataProviderBase
 }
 
 export class ArtifactTreeItem extends vscode.TreeItem implements HasFileName {
-	fileName: string;
-
 	constructor(
-		readonly label: string,
+		public readonly fileName: string,
 		readonly collapsibleState: vscode.TreeItemCollapsibleState,
 	) {
-		super(label, collapsibleState);
-		this.tooltip = `${label}`;
-		this.fileName = label;
+		super(fileName, collapsibleState);
+		this.tooltip = `${fileName}`;
 	}
 }

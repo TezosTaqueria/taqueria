@@ -1,26 +1,17 @@
 {
 	"name": "@taqueria/node-sdk",
-	"version": "0.14.2",
+	"version": "0.14.4",
 	"description": "A TypeScript SDK for NodeJS used for Taqueria plugin development.",
 	"main": "./index.js",
 	"source": "./index.ts",
-	"module": "./index.esm.js",
+	"module": "./index.mjs",
 	"exports": {
 		".": "./index.js",
 		"./types": "./types.js"
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "npx tsc -noEmit && npm run build-cjs && npm run build-esm-index && npm run build-esm-types",
-		"build-cjs": "npx esbuild --bundle index.ts types.ts --outdir=. --platform=node --sourcemap",
-		"build-esm-index": "npx esbuild --bundle index.ts --outfile=index.esm.js --platform=node --format=esm --sourcemap",
-		"build-esm-types": "npx esbuild --bundle types.ts --outfile=types.esm.js --platform=node --format=esm --sourcemap"
-	},
-	"targets": {
-		"main": {
-			"context": "node",
-			"isLibrary": true
-		}
+		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
 	},
 	"keywords": [
 		"taqueria",
@@ -43,7 +34,7 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/protocol": "^0.14.2",
+		"@taqueria/protocol": "^0.14.4",
 		"i18next": "^21.8.4",
 		"project-name-generator": "^2.1.9",
 		"rambda": "^7.1.4",
@@ -60,5 +51,22 @@
 		"@types/yargs": "^17.0.7",
 		"esbuild": "^0.14.39",
 		"typescript": "^4.7.2"
+	},
+	"tsup": {
+		"entry": [
+			"index.ts",
+			"types.ts"
+		],
+		"sourcemap": true,
+		"target": "node16",
+		"outDir": "./",
+		"dts": true,
+		"clean": false,
+		"skipNodeModulesBundle": true,
+		"platform": "node",
+		"format": [
+			"esm",
+			"cjs"
+		]
 	}
 }

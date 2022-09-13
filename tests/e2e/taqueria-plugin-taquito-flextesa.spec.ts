@@ -185,17 +185,18 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
 	afterAll(async () => {
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-
 		const dockerContainer = await getContainerName(dockerName);
-		if (dockerContainer !== '') {
-			try {
-				await exec(`docker stop ${dockerContainer}`);
-				await sleep(1000);
-			} catch {
-				// Ignore
-			}
+
+		try {
+			await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+		} catch (e: unknown) {
+			console.log(
+				'Could not stop sandbox. This can affect next tests. This happened in taqueria-plugin-taquito-flextesa.spec.ts',
+			);
+			console.log(e);
 		}
+
+		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 
 		const dockerListStdout = await exec('docker ps -a');
 		if (dockerListStdout.stdout.includes(dockerContainer)) {

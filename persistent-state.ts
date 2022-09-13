@@ -3,7 +3,7 @@ import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Timestamp from '@taqueria/protocol/Timestamp';
 import * as Verb from '@taqueria/protocol/Verb';
-import { chain, chainRej, map, reject, resolve } from 'fluture';
+import { chain, chainRej, FutureInstance as Future, map, reject, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { groupBy, takeLast } from 'rambda';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
@@ -39,7 +39,7 @@ export const load = memoize((parsedArgs: SanitizedArgs.t) =>
 		),
 		chain(PersistentState.of),
 	)
-);
+) as (parsedArgs: SanitizedArgs.t) => Future<TaqError.t, PersistentState.t>;
 
 export const save = (parsedArgs: SanitizedArgs.t) =>
 	(updatedState: PersistentState.t) =>

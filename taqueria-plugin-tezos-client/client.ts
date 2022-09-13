@@ -42,14 +42,14 @@ const getDefaultSandboxName = (config: LoadedConfig.t) => {
 	return undefined;
 };
 
-const getUniqueSandboxname = async (sandboxName: string, projectDir: string) => {
+const getUniqueSandboxName = async (sandboxName: string, projectDir: string) => {
 	const hash = await stringToSHA256(projectDir);
-	return `${sandboxName}-${hash}`;
+	return `${sandboxName.substring(0, 10)}-${hash.substring(0, 5)}`;
 };
 
 const getContainerName = async (sandboxName: string, parsedArgs: Opts) => {
-	const uniqueSandboxName = await getUniqueSandboxname(sandboxName, parsedArgs.projectDir);
-	return `taqueria-${parsedArgs.env}-${uniqueSandboxName}`;
+	const uniqueSandboxName = await getUniqueSandboxName(sandboxName, parsedArgs.projectDir);
+	return `taq-flextesa-${uniqueSandboxName}`;
 };
 
 const doesUseFlextesa = (sandbox: SandboxConfig.t) => !sandbox.plugin || sandbox.plugin === 'flextesa';

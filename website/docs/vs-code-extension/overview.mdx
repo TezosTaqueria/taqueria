@@ -1,0 +1,110 @@
+---
+title: VS Code Extension Overview
+---
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+<!-- 
+Content Type: VS Code Extension Overview
+
+Purpose: To get a developer more information about VS Code extension functionality
+
+Goal: To onboard as many devs as possible by translating their interest into them actually developing on Taqueria using VS Code Extension
+
+Questions:
+- What is the Taqueria VS Code Extention and what it does?
+- What are the major features Taqueria VS Code extention has?
+-->
+
+## Installation
+
+More details on how to isntall Taqueria VS Code Extension can be found [here](/docs/getting-started/installation.mdx)
+
+## Overview
+
+The extension consist if next items:
+
+1. Health-check section
+2. Create new Taqueria project section
+3. Scaffold project section
+
+<img alt="VS Code extension intro" src={useBaseUrl('/img/vs-code/taqueria-vs-code-intro.png')} />
+
+:::note
+The Taqueria VS Code Extension provides direct access to Taqueria tasks from the command palette. Under the hood, the VS Code Extension makes calls to the CLI, so you can be assured the behaviour of tasks will remain consistent regardless of whether they are executed from a terminal or the command palette. The steps in this guide are for using the Taqueria CLI, but you can also run the commands from the Taqueria extension via the VS Code command palette if you prefer
+:::
+
+## Starting a Taqueria Project
+
+After new project created or the extension is opened on existing taqueria project it will show up next sections:
+- [Plugins](#plugins-section)
+- [Contracts](#contracts-section)
+- [Artifacts](#artifacts-section)
+- [Sandboxes](#sandboxes-section)
+- [Environments](#environments-section)
+- [Tests](#tests-section)
+
+<img alt="VS Code extension project sections" src={useBaseUrl('/img/vs-code/taqueria-vs-code-project-sections.png')} />
+
+### Each section can be hidden and unhidden. More details can be found on the picture
+
+<img alt="VS Code extension hide and un-hide" src={useBaseUrl('/img/vs-code/taqueria-vs-code-hide-unhide-sections.png')} />
+
+
+## Plugins Section
+
+Plugins section allows to install and uninstall plugins to the project.
+1. Install/Uninstall icon allows to add/remove plugin to the project
+2. Indicator displays that plugin is not installed
+3. Indicator displays that plugins has been installed to the project
+
+<img alt="VS Code extension Plugins section" src={useBaseUrl('/img/vs-code/taqueria-vs-code-plugins-section.png')} />
+
+## Contracts Section
+
+Contracts section allows to see all contracts in `Contracts` folder. It also allows to add/remove contract to the contract registry and also compile contract if compile plugin installed.
+Each compiler has it is own icon e. g. Archetype, SmartPy, LIGO
+1. Add/Remove contract to/from contract registry
+2. Compile contract to Michelson format
+
+<img alt="VS Code extension Contracts section" src={useBaseUrl('/img/vs-code/taqueria-vs-code-contracts-section.png')} />
+
+## Artifacts Section
+
+Artifacts section allows to see compiled contracts and other files into `Artifacts` folder. It also allows to deploy a contract to an environment
+Additionally it allows to generate types for all contracts/storages located into the folder
+1. Generate types for all .tz files in the `Artifacts` folder
+2. Deploy a contract to an environment
+
+<img alt="VS Code extension Artifacts section" src={useBaseUrl('/img/vs-code/taqueria-vs-code-artifacts-section.png')} />
+
+If there are multiple environments created into `config.json` Taqueria VS Code extention will pop-up dialog box to select an environment.
+
+<img alt="VS Code extension select environment" src={useBaseUrl('/img/vs-code/taqueria-vs-code-select-environment-option.png')} />
+
+## Sandboxes Section
+
+Sandboxes section allows to interact with sandbox and also provides details about contracts/accounts deployed to this sandbox (if it is running)
+1. Start sandbox (inactive if sandbox is running)
+2. Stop sandbox (inactive if sandbox is not running)
+3. Reload sandbox to reset it to default state
+4. List accounts deployed to the sandbox. The output will include only named accounts (Total number of accounts will be less than in the sandbox, because there are three service accounts).
+5. Arrow that can be expand to see each account details in the real-time
+6. Arrow that can be expand to see each deployed contract details in the real-time
+
+<img alt="VS Code extension Sandboxes section" src={useBaseUrl('/img/vs-code/taqueria-vs-code-sandboxes-section.png')} />
+
+## Environments Section
+
+Environments section allows to see how many different environments this project has.
+It also allows to see if it is a sandbox environment only or it has some test network configuration.
+1. List of the environments
+
+<img alt="VS Code extension Environments section" src={useBaseUrl('/img/vs-code/taqueria-vs-code-environments-section.png')} />
+
+## Tests Section
+
+Tests section allows to create set of tests grouped by name and also run them
+1. Create set of tests
+2. Run set of tests
+
+<img alt="VS Code extension Tests section" src={useBaseUrl('/img/vs-code/taqueria-vs-code-tests-section.png')} />
