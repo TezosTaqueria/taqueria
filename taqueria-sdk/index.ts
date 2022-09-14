@@ -450,8 +450,7 @@ export const getParameter = async (parsedArgs: RequestArgs.t, paramFilename: str
 		const content = await readFile(paramPath, { encoding: 'utf-8' });
 		return content;
 	} catch (err) {
-		sendErr(`Could not read ${paramPath}. Maybe it doesn't exist. "Unit" will be used as the parameter instead.\n`);
-		return 'Unit';
+		return sendAsyncErr(`Could not read ${paramPath}. Maybe it doesn't exist.`);
 	}
 };
 
