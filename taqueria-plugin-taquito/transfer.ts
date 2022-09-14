@@ -12,7 +12,7 @@ import {
 	sendJsonRes,
 } from '@taqueria/node-sdk';
 import { Environment, RequestArgs } from '@taqueria/node-sdk/types';
-import { Parser } from '@taquito/michel-codec';
+import { Expr, Parser } from '@taquito/michel-codec';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit } from '@taquito/taquito';
 
@@ -103,7 +103,7 @@ const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: Tezo
 	const contract = parsedArgs.contract;
 	return {
 		contractAlias: isContractAddress(contract) ? 'N/A' : contract,
-		contractAddress: isContractAddress(contract) ? contract : await getAddressOfAlias(parsedArgs, env, contract),
+		contractAddress: isContractAddress(contract) ? contract : await getAddressOfAlias(env, contract),
 		tezTransfer: parsedArgs.tez ?? '0',
 		parameter: parsedArgs.param ? await getParameter(parsedArgs, parsedArgs.param) : 'Unit',
 		entrypoint: parsedArgs.entrypoint ?? 'default',
@@ -111,18 +111,18 @@ const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: Tezo
 	};
 };
 
-const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow) => {
+const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow): Promise<string> => {
 	return tezos.contract
 		.transfer({
 			to: contractInfo.contractAddress,
 			amount: parseFloat(contractInfo.tezTransfer),
 			parameter: {
 				entrypoint: contractInfo.entrypoint,
-				value: new Parser().parseMichelineExpression(contractInfo.parameter) as any,
+				value: new Parser().parseMichelineExpression(contractInfo.parameter) as Expr,
 			},
 		})
 		.then(op => op.confirmation().then(() => op.hash))
-		.catch(err => Promise.reject(sendErr(`Error during transfer operation:\n${err} ${JSON.stringify(err, null, 2)}`)));
+		.catch(err => sendAsyncErr(`Error during transfer operation:\n${err} ${JSON.stringify(err, null, 2)}`));
 };
 
 export const transfer = async (parsedArgs: Opts): Promise<void> => {

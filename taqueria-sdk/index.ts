@@ -476,11 +476,16 @@ export const updateAddressAlias = async (parsedArgs: RequestArgs.t, alias: strin
 };
 
 export const getAddressOfAlias = async (
-	parsedArgs: RequestArgs.t,
 	env: Environment.t,
 	alias: string,
 ): Promise<string> => {
-	return env.aliases?.[alias]?.address;
+	const address = env.aliases?.[alias]?.address;
+	if (!address) {
+		return sendAsyncErr(
+			`Address for alias "${alias}" is not present in the config.json. Make sure to deploy a contract with such alias.`,
+		);
+	}
+	return address;
 };
 
 /**
