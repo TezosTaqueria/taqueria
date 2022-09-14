@@ -134,7 +134,7 @@ export const transfer = async (parsedArgs: Opts): Promise<void> => {
 		await performTransferOp(tezos, contractInfo);
 		return sendJsonRes([contractInfo]);
 	} catch {
-		return sendAsyncErr('No operations performed');
+		return sendAsyncErr('No operations performed.');
 	}
 };
 
