@@ -444,6 +444,17 @@ export const newGetInitialStorage = async (parsedArgs: RequestArgs.t, storageFil
 	}
 };
 
+export const getParameter = async (parsedArgs: RequestArgs.t, paramFilename: string): Promise<string> => {
+	const paramPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, paramFilename);
+	try {
+		const content = await readFile(paramPath, { encoding: 'utf-8' });
+		return content;
+	} catch (err) {
+		sendErr(`Could not read ${paramPath}. Maybe it doesn't exist. "Unit" will be used as the parameter instead.\n`);
+		return 'Unit';
+	}
+};
+
 /**
  * Update the alias of an address for the current environment
  */
@@ -462,6 +473,14 @@ export const updateAddressAlias = async (parsedArgs: RequestArgs.t, alias: strin
 	} catch (err) {
 		sendErr(`Could not write to ./.taq/config.json\n`);
 	}
+};
+
+export const getAddressOfAlias = async (
+	parsedArgs: RequestArgs.t,
+	env: Environment.t,
+	alias: string,
+): Promise<string> => {
+	return env.aliases?.[alias]?.address;
 };
 
 /**

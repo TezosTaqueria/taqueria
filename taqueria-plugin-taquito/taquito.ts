@@ -5,15 +5,14 @@ import transfer from './transfer';
 
 interface Opts extends RequestArgs.ProxyRequestArgs {
 	// from originate.ts
-	contract: string;
 	storage: string;
 	alias?: string;
 	// from transfer.ts
-	src_alias: string;
-	dst_alias: string;
-	amount?: number;
+	tez?: string;
 	param?: string;
 	entrypoint?: string;
+	// from originate.ts and transfer.ts
+	contract: string;
 }
 
 export const taquito = (parsedArgs: Opts): Promise<void> => {

@@ -1,43 +1,26 @@
-/*
-This is a temporary solution based on originate.ts
-and both will be refactored after we've redesigned the config file.
-*/
-
 import {
-	getCurrentEnvironment,
+	getAddressOfAlias,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
-	getInitialStorage,
 	getNetworkConfig,
+	getParameter,
 	getSandboxAccountConfig,
 	getSandboxAccountNames,
 	getSandboxConfig,
-	newGetInitialStorage,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
-	sendRes,
-	updateAddressAlias,
 } from '@taqueria/node-sdk';
-import { Protocol, RequestArgs } from '@taqueria/node-sdk/types';
+import { Environment, RequestArgs } from '@taqueria/node-sdk/types';
+import { Parser } from '@taquito/michel-codec';
 import { importKey, InMemorySigner } from '@taquito/signer';
-import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
-import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
-import glob from 'fast-glob';
-import { readFile } from 'fs/promises';
-import { basename, extname, join } from 'path';
+import { TezosToolkit } from '@taquito/taquito';
 
 interface Opts extends RequestArgs.t {
-	src_alias: string;
-	dst_alias: string;
-	amount?: number;
+	contract: string;
+	tez?: string;
 	param?: string;
 	entrypoint?: string;
-}
-
-interface ContractParameterMapping {
-	filename: string;
-	parameter?: any;
 }
 
 type TableRow = {
@@ -54,241 +37,105 @@ const getFirstAccountAlias = (sandboxName: string, opts: Opts) => {
 	return aliases.shift();
 };
 
-const getContractAbspath = (contractFilename: string, parsedArgs: Opts) =>
-	join(parsedArgs.config.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`);
-
-const addOperation = (parsedArgs: Opts, batch: Promise<WalletOperationBatch>) =>
-	async (mapping: ContractParameterMapping) => {
-		const contractAbspath = getContractAbspath(mapping.filename, parsedArgs);
-		const contractData = await readFile(contractAbspath, 'utf-8');
-		return (await batch).withTransfer({
-			code: contractData,
-			init: mapping.parameter as any,
-		});
-	};
-
-const getDefaultStorageFilename = (contractName: string): string => {
-	const baseFilename = basename(contractName, extname(contractName));
-	const extFilename = extname(contractName);
-	const defaultStorage = `${baseFilename}.default_storage${extFilename}`;
-	return defaultStorage;
-};
-
-// TODO: temporary quick solution. May refactor this to only deal with one contract later
-const getValidContracts = async (parsedArgs: Opts) => {
-	const contracts = [parsedArgs.contract];
-	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(contracts[0]);
-
-	return contracts.reduce(
-		async (retval, filename) => {
-			const storage = await newGetInitialStorage(parsedArgs, storageFilename);
-			if (storage === undefined || storage === null) {
-				sendErr(
-					`❌ No initial storage file was found for ${filename}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
-						getDefaultStorageFilename(contracts[0])
-					}" in the artifacts directory\nYou can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option\n`,
-				);
-				// sendErr(
-				// 	`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
-				// 		getCurrentEnvironment(parsedArgs)
-				// 	}.storage["${filename}"]\nThe value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.\n`,
-				// );
-				return retval;
-			}
-			return [...(await retval), { filename, storage }];
-		},
-		Promise.resolve([] as ContractParameterMapping[]),
-	);
-};
-
-const mapOpToContract = async (
-	parsedArgs: Opts,
-	contracts: ContractParameterMapping[],
-	op: BatchWalletOperation,
-	destination: string,
-) => {
-	const results = await op.operationResults();
-
-	return contracts.reduce(
-		(retval, contract) => {
-			// If initial storage was provided for the contract
-			// then we submitted an operation to originate that contract
-			if (contract.storage) {
-				// WARNING - using side effect here.
-				// For each iteration of reduce, results array is being modified-in-place.
-				// TODO: Adjust to use recursion to avoid side-effect.
-				const result = results.shift() as OperationContentsAndResultOrigination;
-				const address = result && result.metadata.operation_result.originated_contracts
-					? result.metadata.operation_result.originated_contracts.join(',')
-					: 'Error';
-
-				const alias = parsedArgs.alias ?? basename(contract.filename, extname(contract.filename));
-				if (address !== 'Error') updateAddressAlias(parsedArgs, alias, address);
-
-				return [
-					...retval,
-					{
-						contract: contract.filename,
-						address,
-						alias: address !== 'Error' ? alias : 'N/A',
-						destination,
-					},
-				];
-			}
-
-			return [
-				...retval,
-				{
-					contract: contract.filename,
-					address: 'Error',
-					alias: 'N/A',
-					destination,
-				},
-			];
-		},
-		[] as TableRow[],
-	);
-};
-
-const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: string) => {
-	const contracts = await getValidContracts(parsedArgs);
-	if (!contracts.length) {
-		return undefined;
+const configureToolKitWithSandbox = async (parsedArgs: Opts, sandboxName: string): Promise<TezosToolkit> => {
+	const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
+	if (!sandbox) {
+		return sendAsyncErr(
+			`The current environment is configured to use a sandbox called '${sandboxName}'; however, no sandbox of this name has been configured in .taq/config.json.`,
+		);
 	}
 
-	const batch = await contracts.reduce(
-		(batch, contractMapping) =>
-			contractMapping.storage
-				? addOperation(parsedArgs, batch)(contractMapping)
-				: batch,
-		Promise.resolve(tezos.wallet.batch()),
-	);
-
-	try {
-		const op = await batch.send();
-		const confirmed = await op.confirmation();
-		return await mapOpToContract(parsedArgs, contracts, op, destination);
-	} catch (err) {
-		const error = (err as { message: string });
-		if (error.message) {
-			const msg = error.message;
-			if (/ENOTFOUND/.test(msg)) {
-				sendErr(msg + ' - The RPC URL may be invalid. Check your ./taq/config.json.');
-			} else if (/ECONNREFUSED/.test(msg)) {
-				sendErr(msg + ' - The RPC URL may be down or the sandbox is not running.');
-			} else {
-				sendErr(
-					msg
-						+ " - There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.",
-				);
-			}
+	let defaultAccount = getDefaultAccount(parsedArgs)(sandboxName);
+	if (!defaultAccount) {
+		const first = getFirstAccountAlias(sandboxName, parsedArgs);
+		if (first) {
+			defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
+			sendErr(
+				`Warning: A default account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this operation.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
+			);
 		}
-		return undefined;
 	}
+	if (!defaultAccount) {
+		return sendAsyncErr(`No accounts are available for the sandbox called ${sandboxName} to perform the operation.`);
+	}
+
+	const tezos = new TezosToolkit(sandbox.rpcUrl as string);
+	tezos.setProvider({
+		signer: new InMemorySigner((defaultAccount.secretKey as string).replace(/^unencrypted:/, '')),
+	});
+	return tezos;
 };
 
-const transferToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.t) =>
-	currentEnv.networks
-		? currentEnv.networks.reduce(
-			(retval, networkName) => {
-				const network = getNetworkConfig(parsedArgs)(networkName);
-				if (network) {
-					if (network.rpcUrl) {
-						if (network.faucet) {
-							const result = (async () => {
-								const tezos = new TezosToolkit(network.rpcUrl as string);
-								await importKey(
-									tezos,
-									network.faucet.email,
-									network.faucet.password,
-									network.faucet.mnemonic.join(' '),
-									network.faucet.activation_code,
-								);
-								return await createBatch(parsedArgs, tezos, networkName);
-							})();
-
-							return [...retval, result];
-						} else sendErr(`Network ${networkName} requires a valid faucet in config.json.`);
-					} else sendErr(`Network "${networkName} is missing an RPC url in config.json."`);
-				} else {
-					sendErr(
-						`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json.`,
-					);
-				}
-
-				return retval;
-			},
-			[] as Promise<TableRow[] | undefined>[],
-		)
-		: [];
-
-const transferToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment.t) =>
-	currentEnv.sandboxes
-		? currentEnv.sandboxes.reduce(
-			(retval, sandboxName) => {
-				const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
-				if (sandbox) {
-					if (sandbox.rpcUrl) {
-						let defaultAccount = getDefaultAccount(parsedArgs)(sandboxName);
-						if (!defaultAccount) {
-							const first = getFirstAccountAlias(sandboxName, parsedArgs);
-							if (first) {
-								defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
-								// TODO: The error should be a warning, not an error. Descriptive string should not begin with 'Warning:'
-								sendErr(
-									`Warning: A default account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this operation.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
-								);
-							}
-						}
-						if (defaultAccount) {
-							const secretKey = defaultAccount.secretKey;
-							const result = (async () => {
-								const tezos = new TezosToolkit(sandbox.rpcUrl as string);
-								tezos.setProvider({
-									signer: new InMemorySigner(secretKey.replace(/^unencrypted:/, '')),
-								});
-								return await createBatch(parsedArgs, tezos, sandboxName);
-							})();
-
-							return [...retval, result];
-						} else sendErr(`No accounts are available for the sandbox called ${sandboxName} to perform operation.`);
-					} else sendErr(`Sandbox "${sandboxName} is missing an RPC url in config.json."`);
-				} else {
-					sendErr(
-						`The current environment is configured to use a sandbox called '${sandboxName}'; however, no sandbox of this name has been configured in .taq/config.json.`,
-					);
-				}
-
-				return retval;
-			},
-			[] as Promise<TableRow[] | undefined>[],
-		)
-		: [];
-
-export const transfer = <T>(parsedArgs: Opts) => {
-	const env = getCurrentEnvironmentConfig(parsedArgs);
-
-	if (!env) {
-		return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
+const configureToolKitWithNetwork = async (parsedArgs: Opts, networkName: string): Promise<TezosToolkit> => {
+	const network = getNetworkConfig(parsedArgs)(networkName);
+	if (!network) {
+		return sendAsyncErr(
+			`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json.`,
+		);
 	}
 
-	const jobs = [
-		...transferToNetworks(parsedArgs, env),
-		...transferToSandboxes(parsedArgs, env),
-	];
+	const faucet = network.faucet;
+	if (!faucet) return sendAsyncErr(`Network ${networkName} requires a valid faucet in config.json.`);
 
-	return Promise.all(jobs)
-		.then(jobs =>
-			jobs.reduce(
-				(retval, operations) => {
-					return operations
-						? [...retval as TableRow[], ...operations]
-						: retval;
-				},
-				[],
-			)
-		)
-		.then(results => results && results.length > 0 ? sendJsonRes(results) : sendErr(`No contracts called.`));
+	const tezos = new TezosToolkit(network.rpcUrl as string);
+	await importKey(
+		tezos,
+		network.faucet.email,
+		network.faucet.password,
+		network.faucet.mnemonic.join(' '),
+		network.faucet.activation_code,
+	);
+	return tezos;
+};
+
+const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<TezosToolkit> => {
+	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
+	if (env.sandboxes?.length === 1 && env.networks?.length === 1) return sendAsyncErr(targetConstraintErrMsg);
+	if (env.sandboxes?.length === 1) return configureToolKitWithSandbox(parsedArgs, env.sandboxes[0]);
+	if (env.networks?.length === 1) return configureToolKitWithNetwork(parsedArgs, env.networks[0]);
+	return sendAsyncErr(targetConstraintErrMsg);
+};
+
+const isContractAddress = (contract: string): boolean =>
+	contract.startsWith('tz1') || contract.startsWith('tz2') || contract.startsWith('tz3') || contract.startsWith('KT1');
+
+const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: TezosToolkit): Promise<TableRow> => {
+	const contract = parsedArgs.contract;
+	return {
+		contractAlias: isContractAddress(contract) ? 'N/A' : contract,
+		contractAddress: isContractAddress(contract) ? contract : await getAddressOfAlias(parsedArgs, env, contract),
+		tezTransfer: parsedArgs.tez ?? '0',
+		parameter: parsedArgs.param ? await getParameter(parsedArgs, parsedArgs.param) : 'Unit',
+		entrypoint: parsedArgs.entrypoint ?? 'default',
+		destination: tezos.rpc.getRpcUrl(),
+	};
+};
+
+const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow) => {
+	return tezos.contract
+		.transfer({
+			to: contractInfo.contractAddress,
+			amount: parseFloat(contractInfo.tezTransfer),
+			parameter: {
+				entrypoint: contractInfo.entrypoint,
+				value: new Parser().parseMichelineExpression(contractInfo.parameter) as any,
+			},
+		})
+		.then(op => op.confirmation().then(() => op.hash))
+		.catch(err => Promise.reject(sendErr(`Error during transfer operation:\n${err} ${JSON.stringify(err, null, 2)}`)));
+};
+
+export const transfer = async (parsedArgs: Opts): Promise<void> => {
+	const env = getCurrentEnvironmentConfig(parsedArgs);
+	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
+	try {
+		const tezos = await configureTezosToolKit(parsedArgs, env);
+		const contractInfo = await getContractInfo(parsedArgs, env, tezos);
+		await performTransferOp(tezos, contractInfo);
+		return sendJsonRes([contractInfo]);
+	} catch {
+		return sendAsyncErr('No operations performed');
+	}
 };
 
 export default transfer;

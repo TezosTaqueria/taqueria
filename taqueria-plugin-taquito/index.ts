@@ -29,11 +29,11 @@ Plugin.create(_i18n => ({
 		}),
 		Task.create({
 			task: 'transfer',
-			command: 'transfer <src_alias> <dst_alias>',
+			command: 'transfer <contract>',
 			description: 'Transfer/call a smart contract deployed to a particular environment',
 			options: [
 				Option.create({
-					flag: 'amount',
+					flag: 'tez',
 					description: 'Amount of Tez to transfer',
 					required: false,
 				}),
