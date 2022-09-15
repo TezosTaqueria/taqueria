@@ -78,7 +78,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/737
 	test('Verify that taq scaffold returns an error with a bogus URL', async () => {
-		const scaffoldURL = 'https://github.com/microsoft/supersecretproject.git';
+		const scaffoldURL = 'https://github.com/ecadlabs/supersecretproject.git';
 		try {
 			const scaffoldError = await exec(`taq scaffold ${scaffoldURL}`);
 		} catch (error: any) {
