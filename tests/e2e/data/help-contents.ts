@@ -240,6 +240,8 @@ Commands:
   taq uninstall <pluginName>  Uninstall a plugin
   taq deploy <contract>       Deploy a smart contract to a particular environmen
                               t                             [aliases: originate]
+  taq transfer <contract>     Transfer/call a smart contract deployed to a
+                              particular environment        [aliases: call]
   taq create <template>       Create files from pre-existing templates
 
 Options:

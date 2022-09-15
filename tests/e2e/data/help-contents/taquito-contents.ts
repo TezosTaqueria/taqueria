@@ -11,6 +11,8 @@ Commands:
   taq list-contracts              List registered contracts
   taq deploy <contract>           Deploy a smart contract to a particular enviro
                                   nment                     [aliases: originate]
+  taq transfer <contract>         Transfer/call a smart contract deployed to a
+                                  particular environment        [aliases: call]
 
 Options:
       --version     Show version number                                [boolean]
