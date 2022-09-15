@@ -126,7 +126,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		}
 	});
 
-	test.only('Verify that taq scaffold quickstart project cannot be injected into an existing directory', async () => {
+	test('Verify that taq scaffold quickstart project cannot be injected into an existing directory', async () => {
 		const alternateDirectory = 'alt-directory';
 
 		try {
