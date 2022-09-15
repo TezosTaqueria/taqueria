@@ -48,8 +48,10 @@ Commands:
   taq opt-out                 Opt-out of sharing anonymous usage analytics
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
-  taq compile [sourceFile]    Compile a smart contract written in a Ligo syntax
-                              to Michelson code
+  taq compile <sourceFile>    Compile a smart contract written in a LIGO sy
+                              ntax to Michelson code, along with its associ
+                              ated storages and parameters files if they ar
+                              e found            [aliases: c, compile-ligo]
   taq create <template>       Create files from pre-existing templates
 
 Options:
@@ -63,7 +65,7 @@ Options:
 Taqueria is currently in BETA. You've been warned. :)
 `;
 
-export const helpContentsLigoPluginSpecific = `taq compile [sourceFile]
+export const helpContentsLigoPluginSpecific = `taq compile <sourceFile>
 
 Compile a smart contract written in a Ligo syntax to Michelson code
 
@@ -74,9 +76,6 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
-  -e, --entrypoint  The entry point that will be compiled
-  -s, --syntax      The syntax used in the contract
-  -i, --infer       Enable type inference
 `;
 
 export const helpContentsSmartpyPlugin: string = `taq <command>

@@ -30,7 +30,8 @@ Plugin.create(_i18n => ({
 		Task.create({
 			task: 'transfer',
 			command: 'transfer <contract>',
-			description: 'Transfer/call a smart contract deployed to a particular environment',
+			description:
+				'Transfer/call an implicit account or a smart contract (specified via its alias or address) deployed to a particular environment',
 			options: [
 				Option.create({
 					flag: 'tez',
@@ -45,7 +46,7 @@ Plugin.create(_i18n => ({
 				Option.create({
 					flag: 'entrypoint',
 					description:
-						'You may explicitly specify an entrypoint to make the parameter value shorter (without having to specify Left Right Left Left Right...)',
+						'You may explicitly specify an entrypoint to make the parameter value shorter, without having to specify a chain of (Left (Right ... 14 ...))',
 					required: false,
 				}),
 			],

@@ -12,7 +12,7 @@ Commands:
   taq compile <sourceFile>        Compile a smart contract written in a LIGO syn
                                   tax to Michelson code, along with its associat
                                   ed storages and parameters files if they are f
-                                  ound
+                                  ound                [aliases: c, compile-ligo]
   taq create <template>           Create files from pre-existing templates
 
 Options:
