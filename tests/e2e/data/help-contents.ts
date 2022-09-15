@@ -49,7 +49,7 @@ Commands:
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a Ligo syntax
-                              to Michelson code       [aliases: c, compile-ligo]
+                              to Michelson code
   taq create <template>       Create files from pre-existing templates
 
 Options:
