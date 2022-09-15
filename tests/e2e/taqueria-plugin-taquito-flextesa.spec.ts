@@ -41,7 +41,9 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
+		console.log(deployCommand);
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
+		console.log(deployResponse);
 
 		// 2. Verify that contract has been originated on the network
 		expect(deployResponse).toContain('hello-tacos.tz');
