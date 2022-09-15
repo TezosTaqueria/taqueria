@@ -13,6 +13,7 @@ import { notNullish } from './GeneralHelperFunctions';
 import { ArtifactsDataProvider } from './gui/ArtifactsDataProvider';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
+import { MichelineEditor } from './gui/data-editors/MichelineEditor';
 import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { ObservableConfig } from './gui/ObservableConfig';
@@ -1584,6 +1585,19 @@ export class VsCodeHelper {
 		this.registerCommand('show_operation_details', async (item: OperationTreeItem) => {
 			const jsonParameters = item.operation;
 			this.showOutput(JSON.stringify(jsonParameters, null, 2));
+		});
+	}
+
+	exposeInvokeEntrypointCommand() {
+		this.registerCommand('taqueria.invoke_entrypoint', async (item: SmartContractEntrypointTreeItem) => {
+			const jsonParameters = item.jsonParameters;
+			const panel = this.vscode.window.createWebviewPanel(
+				'entrypointParameter',
+				'Entrypoint Parameter',
+				this.vscode.ViewColumn.One,
+				{},
+			);
+			panel.webview.html = MichelineEditor.getEditorHtml(jsonParameters);
 		});
 	}
 
