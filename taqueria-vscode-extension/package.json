@@ -368,6 +368,13 @@
 				"title": "Show Operation Details",
 				"shortTitle": "details",
 				"icon": "$(list-unordered)"
+			},
+			{
+				"command": "taqueria.invoke_entrypoint",
+				"category": "Taqueria",
+				"title": "Invoke Entrypoint",
+				"shortTitle": "invoke",
+				"icon": "$(call-outgoing)"
 			}
 		],
 		"menus": {
@@ -516,6 +523,11 @@
 				},
 				{
 					"command": "taqueria.show_entrypoint_parameters",
+					"when": "view == taqueria-sandboxes && viewItem == entrypoint",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.invoke_entrypoint",
 					"when": "view == taqueria-sandboxes && viewItem == entrypoint",
 					"group": "inline"
 				},

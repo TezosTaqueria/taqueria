@@ -152,6 +152,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	helper.exposeRefreshSandBoxDataCommand();
 	helper.exposeShowEntrypointParametersCommand();
 	helper.exposeShowOperationDetailsCommand();
+	helper.exposeInvokeEntrypointCommand();
 
 	helper.createTreeViews();
 

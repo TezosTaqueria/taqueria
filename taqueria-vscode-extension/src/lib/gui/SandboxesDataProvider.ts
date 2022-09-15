@@ -324,7 +324,8 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	private filterOutBuiltInContracts(
 		data: { address: string; type: string; kind: string }[],
 	): { address: string; type: string; kind: string }[] {
-		return data.filter(item => SandboxesDataProvider.builtInContracts.indexOf(item.address) === -1);
+		return data;
+		// return data.filter(item => SandboxesDataProvider.builtInContracts.indexOf(item.address) === -1);
 	}
 
 	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void> = new vscode
