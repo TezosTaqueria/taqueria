@@ -25,6 +25,7 @@ What you will accomplish:
 - Compile the LIGO smart contract
 - Start a local Flextesa sandbox 
 - Originate the compiled smart contract to the sandbox
+- Interact with the smart contract deployed to the sandbox
 
 ## Requirements
 
@@ -85,7 +86,7 @@ To add support for the LIGO smart contract language, install the LIGO plugin by 
 taq install @taqueria/plugin-ligo
 ```
 
-Copy the following 3 code snippets, with the names suggested at the top, to the `/contracts` folder of your Taqueria project.
+Copy the following 3 code snippets, with the names suggested at the top of each code snippets, to the `/contracts` folder of your Taqueria project.
 
 ```ligo title="counter.mligo"
 type storage = int
@@ -121,6 +122,10 @@ let another_count: storage = 23 + 18 - 1
 ```ligo title="counter.parameters.mligo"
 let increment_by_3: parameter = Increment 3
 ```
+
+:::caution
+Make sure you name it `counter.storages.mligo` and not `counter.storage.mligo` (note the extra `s`).
+:::
 
 You can now compile this contract, along with its storage and parameter values, by simply running the following command from the root of the project directory:
 ```shell
@@ -221,6 +226,25 @@ This will originate `counter.tz` in the `/artifacts` directory to the sandbox an
 └────────────┴──────────────────────────────────────┴─────────┴─────────────┘
 ```
 
+### Interacting with a deployed Contract with Taquito
+
+With the sandbox still running, the last step is to interact with the contract you just deployed. You may use its alias or its address directly.
+
+To do that, run:
+```shell
+taq transfer counter --param counter.parameter.increment_by_3.tz
+```
+
+This will call the counter contract's entrypoint `increment` and will increment the storage by `3`. The output will look something like this:
+```
+┌────────────────┬──────────────────────────────────────┬──────────────┬───────────────────┬────────────┬────────────────────────┐
+│ Contract Alias │ Contract Address                     │ Tez Transfer │ Parameter         │ Entrypoint │ Destination            │
+├────────────────┼──────────────────────────────────────┼──────────────┼───────────────────┼────────────┼────────────────────────┤
+│ counter        │ KT1Ayz8qos7G4U3Jucp6QWoM7ayhbShNXcat │ 0            │ (Left (Right 3 )) │ default    │ http://localhost:20000 │
+│                │                                      │              │                   │            │                        │
+└────────────────┴──────────────────────────────────────┴──────────────┴───────────────────┴────────────┴────────────────────────┘
+```
+
 ## Finishing Up
 
 Congratulations! At this point, you have run through the basic usage of Taqueria including:
@@ -230,5 +254,6 @@ Congratulations! At this point, you have run through the basic usage of Taqueria
 - Compiling a LIGO smart contract.
 - Starting and querying a local Flextesa sandbox.
 - Originating a compiled smart contract to the sandbox.
+- Interacting with a smart contract deployed to the sandbox.
 
 For more details on the usage of specific Taqueria tasks, you can refer to the plugin documentation which contains additional context, configuration, and usage of the many Taqueria tasks; or continue on with the getting started guides.
