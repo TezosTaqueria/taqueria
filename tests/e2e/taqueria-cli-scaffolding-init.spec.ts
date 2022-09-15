@@ -79,20 +79,12 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	// TODO: https://github.com/ecadlabs/taqueria/issues/737
 	test('Verify that taq scaffold returns an error with a bogus URL', async () => {
 		const scaffoldURL = 'https://github.com/microsoft/supersecretproject.git';
-		const scaffoldError = await exec(`taq scaffold ${scaffoldURL}`);
-		console.log(scaffoldError);
-		expect(scaffoldError.stderr).toContain(`remote: Repository not found.`);
-		expect(scaffoldError.stderr).toContain(`repository '${scaffoldURL}/' not found`);
-		// try {
-		// 	const scaffoldError = await exec(`taq scaffold ${scaffoldURL}`);
-		// 	console.log(scaffoldError)
-		// 	expect(scaffoldError.stderr).toContain(`remote: Repository not found.`);
-		// 	expect(scaffoldError.stderr).toContain(`repository '${scaffoldURL}/' not found`);
-		// } catch (error) {
-		// 	// console.log(error)
-		// 	// expect(JSON.stringify(error)).toContain(`remote: Repository not found.`);
-		// 	// expect(JSON.stringify(error)).toContain(`repository '${scaffoldURL}/' not found`);
-		// }
+		try {
+			const scaffoldError = await exec(`taq scaffold ${scaffoldURL}`);
+		} catch (error: any) {
+			expect(error.toString()).toContain(`remote: Repository not found.`);
+			expect(error.toString()).toContain(`repository '${scaffoldURL}/' not found`);
+		}
 	});
 
 	// Remove scaffold directory after test completes
