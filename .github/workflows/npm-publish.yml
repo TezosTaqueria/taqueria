@@ -36,7 +36,7 @@ jobs:
         run: npm ci
 
       - name: Build package
-        run: npm run build -w $GIT_WORKSPACE
+        run: npm run build -w taqueria-protocol -w $GIT_WORKSPACE
       
       - name: Publish for prerelease
         if:  ${{ github.event.release.prerelease && github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}

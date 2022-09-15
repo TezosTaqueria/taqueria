@@ -1,11 +1,11 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.14.4",
+	"version": "0.18.0",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "echo 'Nothing to build.' && exit 0 "
+		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
 	},
 	"keywords": [
 		"taqueria",
@@ -31,11 +31,39 @@
 	"devDependencies": {
 		"typescript": "^4.7.2"
 	},
+	"exports": {
+		"./*": {
+			"import": "./*.mjs",
+			"default": "./*.js"
+		},
+		"./*.js": {
+			"import": "./*.mjs",
+			"default": "./*.js"
+		}
+	},
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
 		"batching-toposort": "^1.2.0",
 		"fluture": "^14.0.0",
-		"remeda": "^0.0.34",
+		"rambda": "^7.2.1",
+		"rambdax": "^8.1.0",
+		"tsup": "^6.2.3",
 		"zod": "^3.17.3"
+	},
+	"tsup": {
+		"entry": [
+			"[!.]+.ts"
+		],
+		"sourcemap": true,
+		"target": "node16",
+		"outDir": "./",
+		"dts": true,
+		"clean": false,
+		"skipNodeModulesBundle": true,
+		"platform": "node",
+		"format": [
+			"esm",
+			"cjs"
+		]
 	}
 }
