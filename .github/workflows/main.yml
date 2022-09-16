@@ -391,10 +391,7 @@ jobs:
         run: npm run test:integration -w tests
 
       - name: Run e2e tests
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          npm run test:e2e -w tests ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
+        run: npm run test:e2e -w tests ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
   

@@ -80,6 +80,12 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	test('Verify that taq scaffold returns an error with a bogus URL', async () => {
 		const scaffoldURL = 'https://github.com/ecadlabs/supersecretproject.git';
 		try {
+			console.log(process.env);
+			if (process.env.CI === 'true') {
+				await exec(`git config user.name github-actions`);
+				await exec(`git config user.email github-actions@github.com`);
+			}
+
 			const scaffoldError = await exec(`taq scaffold ${scaffoldURL}`);
 		} catch (error: any) {
 			expect(error.toString()).toContain(`remote: Repository not found.`);
@@ -107,8 +113,6 @@ describe('E2E Testing for taqueria scaffolding initialization in other directory
 			expect(scaffoldDirContents.stdout).toContain('node_modules');
 			expect(scaffoldDirContents.stdout).toContain('scaffold.log');
 			expect(scaffoldDirContents.stdout).toContain('package.json');
-
-			await fsPromises.rm(`./${alternateDirectory}`, { recursive: true, force: true });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
@@ -123,6 +127,10 @@ describe('E2E Testing for taqueria scaffolding initialization in other directory
 		} catch (error) {
 			expect(JSON.stringify(error)).toContain('Path already exists');
 		}
+	});
+
+	// Remove scaffold directory after test completes
+	afterEach(async () => {
 		await fsPromises.rm(`./${alternateDirectory}`, { recursive: true, force: true });
 	});
 });
