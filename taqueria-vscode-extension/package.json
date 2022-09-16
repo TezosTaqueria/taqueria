@@ -633,7 +633,7 @@
 		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
 		"eventsource": "^2.0.2",
-		"node-fetch": "^3.2.10",
+		"node-fetch-commonjs": "^3.1.1",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1",
 		"rxjs": "^7.5.6",
