@@ -87,7 +87,8 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 				await exec(`git config user.email github-actions@github.com`);
 			}
 
-			const scaffoldError = await exec(`taq scaffold ${scaffoldURL}`);
+			// const scaffoldError = await exec(`taq scaffold ${scaffoldURL}`);
+			const scaffoldError = await exec(`taq scaffold https://github.com/ecadlabs/supersecretproject.git`);
 		} catch (error: any) {
 			expect(error.toString()).toContain(`remote: Repository not found.`);
 			expect(error.toString()).toContain(`repository '${scaffoldURL}/' not found`);
