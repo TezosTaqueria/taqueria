@@ -82,6 +82,8 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		try {
 			console.log(process.env);
 			if (process.env.CI === 'true') {
+				console.log('Got here and looking good');
+				console.log(await exec('git'));
 				await exec(`git config user.name github-actions`);
 				await exec(`git config user.email github-actions@github.com`);
 			}
