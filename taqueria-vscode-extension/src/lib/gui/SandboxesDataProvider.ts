@@ -1,5 +1,4 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
-import fetch from 'node-fetch';
 import * as vscode from 'vscode';
 import { HasRefresh, mapAsync, OutputLevels, VsCodeHelper } from '../helpers';
 import { getRunningContainerNames } from '../pure';
@@ -18,6 +17,10 @@ import {
 	SmartContractEntrypointTreeItem,
 } from './SandboxTreeItemTypes';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
+
+// workaround for ESM modules issue in VSCode
+const fetch: typeof import('node-fetch').default = (...args) =>
+	import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	implements vscode.TreeDataProvider<SandboxTreeItemBase>, HasRefresh
