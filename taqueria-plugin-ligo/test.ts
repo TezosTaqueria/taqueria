@@ -45,7 +45,7 @@ const testContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =
 
 export const test = (parsedArgs: Opts): Promise<void> => {
 	const sourceFile = parsedArgs.sourceFile;
-	return testContract(parsedArgs, sourceFile).then(results => [results]).then(sendJsonRes).catch(err =>
+	return testContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
 		sendAsyncErr(err, false)
 	);
 };

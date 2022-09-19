@@ -13,6 +13,7 @@ Commands:
                                   tax to Michelson code, along with its associat
                                   ed storages and parameters files if they are f
                                   ound                [aliases: c, compile-ligo]
+  taq test <sourceFile>           Test a smart contract written in LIGO
   taq create <template>           Create files from pre-existing templates
 
 Options:
