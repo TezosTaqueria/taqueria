@@ -468,14 +468,16 @@ export class VsCodeHelper {
 
 	getWellKnownPlugins() {
 		return [
-			'@taqueria/plugin-ligo',
-			'@taqueria/plugin-smartpy',
-			'@taqueria/plugin-taquito',
-			'@taqueria/plugin-flextesa',
 			'@taqueria/plugin-archetype',
 			'@taqueria/plugin-contract-types',
-			'@taqueria/plugin-tezos-client',
+			'@taqueria/plugin-flextesa',
+			'@taqueria/plugin-ipfs-pinata',
 			'@taqueria/plugin-jest',
+			'@taqueria/plugin-ligo',
+			'@taqueria/plugin-metadata',
+			'@taqueria/plugin-smartpy',
+			'@taqueria/plugin-taquito',
+			'@taqueria/plugin-tezos-client',
 		];
 	}
 
