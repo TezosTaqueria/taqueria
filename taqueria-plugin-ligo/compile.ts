@@ -161,7 +161,7 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 		})
 		.then(mergeArtifactsOutput(sourceFile));
 
-const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFile: string) => {
+const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile);
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
 
@@ -226,7 +226,6 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 
 export const compile = (parsedArgs: Opts): Promise<void> => {
 	const sourceFile = parsedArgs.sourceFile;
-	if (!sourceFile) return sendAsyncErr('No source file specified.');
 	let p: Promise<TableRow[]>;
 	if (isStoragesFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'storage');
 	else if (isParametersFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'parameter');
