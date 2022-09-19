@@ -1,7 +1,6 @@
 import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
-import { access, readFile, writeFile } from 'fs/promises';
-import { basename, extname, join } from 'path';
+import { join } from 'path';
 
 interface Opts extends RequestArgs.t {
 	sourceFile: string;
