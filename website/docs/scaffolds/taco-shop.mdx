@@ -200,15 +200,17 @@ This scaffold comes with a pre-configured faucet file for the testnet which is s
 :::
 
 
-### Insert the Contract Address
+### Insert the Contract Address (Optional)
 
-Now that the contract has been deployed, you need to insert the address of the contract into the `/app/index.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/index.tsx` file as shown here:
+There is a way to point dApp to a hardcoded contract.
+To do so you need to insert the address of the contract into the `/app/App.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/index.tsx` file as shown here:
 
 ```ts /app/src/app.tsx
 function app() {
   const [rpcUrl, setRpcUrl] = useState("https://ghostnet.ecadinfra.com");
   const [contractAddress, setContractAddress] = useState(
-    "KT1EHAXNQ1oeh2ZNTkvvcU6PfzQvGPLsgJx3"
+      "KT1CPASSW7rstFQw6vENBkXmG6mJNsDMauTP"
+      // getAliasAddress(config, "hello-tacos")
   );
   const [contractStorage, setContractStorage] = useState<number | undefined>(
     undefined
@@ -216,6 +218,8 @@ function app() {
   const [Tezos, setTezos] = useState<TezosToolkit>();
   const [connected, setConnected] = useState(false);
 ```
+
+You should now be able to access the Taco Shop dApp at [http://localhost:3000](http://localhost:3000/)
 
 
 ### Build and Start the React Dapp
@@ -226,12 +230,6 @@ Change into the `/app` directory:
 
 ```shell
 cd app
-```
-
-Install dependencies:
-
-```shell
-npm install
 ```
 
 Build the React dApp:
@@ -247,6 +245,10 @@ npm run start
 ```
 
 You should now be able to access the Taco Shop dApp at [http://localhost:3000](http://localhost:3000/)
+
+### Hot Reload Contract Address 
+
+By default, page refresh updates the page UI to point to the address of the new deployment.
 
 ### Connect to Temple Wallet
 
@@ -280,21 +282,4 @@ Then, run the Jest tests in the `tests` directory with the following command:
 
 ```shell
 taq test
-```
-
-You should see the following output:
-
-```shell
-❯ taq test
- PASS  tests/hello-tacos.test.js (13.954 s)
-  JavaScript tests for Hello Tacos contract
-    ✓ Should originate the Hello Tacos contract (3431 ms)
-    ✓ Should buy 15 tacos (5113 ms)
-    ✓ Should prevent buying tacos if unavailable (11 ms)
-
-Test Suites: 1 passed, 1 total
-Tests:       3 passed, 3 total
-Snapshots:   0 total
-Time:        13.986 s
-Ran all test suites.
 ```
