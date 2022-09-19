@@ -2,13 +2,13 @@
 title: Taco Shop
 ---
 
-| Scaffold Details                             |         
-|--------------------|-------------------------|
-| Complexity         | Beginner                |
-| Automated Tests    | Yes                     |
-| Installed Plugins  | LIGO, Taquito, Flextesa |
-| Frontend Dapp      | Yes                     |
-| Wallet Integration | Yes                     |
+| Scaffold Details   |                               |
+|--------------------|-------------------------------|
+| Complexity         | Beginner                      |
+| Automated Tests    | Yes                           |
+| Installed Plugins  | LIGO, Taquito, Flextesa, Jest |
+| Frontend Dapp      | Yes                           |
+| Wallet Integration | Yes                           |
 
 
 ## Quickstart
@@ -18,8 +18,9 @@ In a rush? You can follow the steps below to get up and running immediatley
 ### Scaffold and Initialize the Project
 
 1. `taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop taco-shop`
-2. `cd taco-shop`
-3. `npm run start`
+1. `cd taco-shop`
+1. `npm run setup`
+1. `npm run start:app`
 
 ## Overview
 
@@ -27,27 +28,62 @@ This scaffold implements a simple full stack Tezos project. It has a React dApp 
 
 The React dApp uses Beacon Wallet to interact with Tezos wallets in the browser and once connected, will display the number of `available_tacos` stored on-chain in the smart contract. There is also a basic interface which allows the user to buy tacos by sending a transaction to the smart contract with the `number_of_tacos_to_buy` as a parameter
 
-The smart contract has been deployed to ghostnet at the address for demonstration purposes: `KT18izS1s5Hsv9tRaB8VjxdTU6MFpLviLCrS`
+The smart contract has been deployed to ghostnet at the address for demonstration purposes: `KT1KBBk3PXkKmGZn3K6FkktqyPRpEbzJoEPE`
 
 The project comes pre-configured with the following:
 
 - Plugins: LIGO, Flextesa, Taquito, Jest
-- A LIGO smart contract `hello-tacos.mligo`  
+- A LIGO multi-file smart contract: `hello-tacos.mligo`, `_buy.mligo`, `_make.mligo`, `_schema.mligo` 
 - A network configuration for the Ghostnet testnet
-- A faucet file to fund operations on the testnet
-- An environment named `testing`
-- Jest tests for the smart contract
+- An environment named `ghostnet` with faucet to fund operations on the testnet
+- Native Taqueria testing (Taqueria Jest plugin)
+
+***Coming soon***
+
+- Passing the deployed contract address to the React dApp via the State API
+- Deploying the contract using Taqueria operations
+- Targeting a specific network for contract deployment and testing (sandboxes and testnets)
+- Deploying the contract to mainnet
 
 ## Requirements
 
-- Taqueria v0.6.5 or later
+- Taqueria v0.16.0 or later
 - Docker v0.9 or later
 - Node.js v16 or later
 - Beacon or Kukai Wallet
 - A funded testnet account
-- A [faucet file](https://teztnets.xyz)   
+- A [faucet file](https://teztnets.xyz)
+
+## Using the Project
+
+The intended workflow for this project is as follows:
+
+1. Compile the LIGO multi-file source code
+2. Originate the smart contract to the testnet
+3. Insert the returned contract address into the React dApp
+4. Build and start the React dApp
+5. Connect to Temple wallet
+6. Buy tacos!
 
 ## Project Overview
+
+### Scaffold the Project
+
+This project is available as a Taqueria scaffold. To create a new project from this scaffold, run the following command:
+
+```shell
+taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop taco-shop
+```
+
+This will clone the Taco Shop scaffold project into a directory called `taco-shop`
+
+### Project Setup
+
+To work on the project you need to get into the project directory:
+
+```shell
+cd taco-shop
+```
 
 ### Project Structure
 
@@ -83,16 +119,6 @@ In order for the React dApp to connect to the smart contract, the contract must 
 This will be fixed in the future when contract addresses will be passed via the State API dynamically
 :::
 
-## Scaffold the Project
-
-This project is available as a Taqueria scaffold. To create a new project from this scaffold, run the following command:
-
-```shell
-taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop taco-shop
-```
-
-This will clone the Taco Shop scaffold project into a directory called `taco-shop`
-
 ## Project Startup
 
 To start the project, first change into the project directory:
@@ -106,17 +132,6 @@ Then run the start script:
 ```
 npm run start
 ```
-
-## Using the Project
-
-The intended workflow for this project is as follows:
-
-1. Compile the LIGO source code
-2. Originate the smart contract to the testnet
-3. Insert the returned contract address into the React dApp
-4. Build and start the React dApp
-5. Connect to Temple wallet
-6. Buy tacos!
 
 ### Compile the Contract
 
