@@ -329,6 +329,7 @@ jobs:
 
     env:
       UNLIMITED_PINATA_TOKEN: ${{ secrets.PINATA_JWT_TOKEN }}
+      SCAFFOLDING_PAT: ${{ secrets.SCAFFOLDING_PAT }}
 
     needs:
       - build-binaries
