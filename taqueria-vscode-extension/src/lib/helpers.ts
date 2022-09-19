@@ -475,7 +475,6 @@ export class VsCodeHelper {
 			'@taqueria/plugin-jest',
 			'@taqueria/plugin-ligo',
 			'@taqueria/plugin-metadata',
-			'@taqueria/plugin-mock',
 			'@taqueria/plugin-smartpy',
 			'@taqueria/plugin-taquito',
 			'@taqueria/plugin-tezos-client',
