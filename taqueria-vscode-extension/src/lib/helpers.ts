@@ -631,7 +631,7 @@ export class VsCodeHelper {
 						openLabel: 'Originate',
 						title: 'Select contract to originate',
 						filters: {
-							'Contract Files': ['*.tz'],
+							'Contract Files': ['tz'],
 						},
 					});
 					if (!file) {
