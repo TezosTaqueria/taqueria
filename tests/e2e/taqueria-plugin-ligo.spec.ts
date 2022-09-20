@@ -19,7 +19,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		} catch (_) {}
 	});
 
-	test.skip('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
+	test('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
 		try {
 			const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPlugin);
@@ -28,7 +28,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
-	test.skip('Verify that the ligo plugin exposes the associated options in the help menu', async () => {
+	test('Verify that the ligo plugin exposes the associated options in the help menu', async () => {
 		try {
 			const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
 			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
@@ -37,7 +37,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
-	test.skip('Verify that the ligo plugin aliases expose the correct info in the help menu', async () => {
+	test('Verify that the ligo plugin aliases expose the correct info in the help menu', async () => {
 		try {
 			const ligoAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`);
 			expect(ligoAliasCHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
@@ -51,7 +51,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
-	test.skip('Verify that taqueria ligo plugin outputs no contracts message if no contracts exist', async () => {
+	test('Verify that taqueria ligo plugin outputs no contracts message if no contracts exist', async () => {
 		try {
 			await exec(`taq compile`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (error) {
@@ -59,7 +59,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
-	test.skip('Verify that taqueria ligo plugin throw an error message if contract name is not specified', async () => {
+	test('Verify that taqueria ligo plugin throw an error message if contract name is not specified', async () => {
 		try {
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
@@ -75,7 +75,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
-	test.skip('Verify that taqueria ligo plugin can compile one contract using compile [sourceFile] command', async () => {
+	test('Verify that taqueria ligo plugin can compile one contract using compile [sourceFile] command', async () => {
 		try {
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
@@ -114,7 +114,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
-	test.skip('Verify that taqueria ligo plugin will display proper message if user tries to compile contract that does not exist', async () => {
+	test('Verify that taqueria ligo plugin will display proper message if user tries to compile contract that does not exist', async () => {
 		try {
 			// 1. Run taq compile ${contractName} for contract that does not exist
 			const { stdout, stderr } = await exec(`taq compile test.mligo`, { cwd: `./${taqueriaProjectPath}` });
@@ -129,7 +129,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
-	test.skip('Verify that taqueria ligo plugin emits error and yet displays table if contract is invalid', async () => {
+	test('Verify that taqueria ligo plugin emits error and yet displays table if contract is invalid', async () => {
 		try {
 			await exec(`cp e2e/data/invalid-contract.mligo ${taqueriaProjectPath}/contracts`);
 			await exec(`taq add-contract invalid-contract.mligo`, { cwd: `./${taqueriaProjectPath}` });
@@ -143,41 +143,41 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
-	// TODO:
 	test('Verify that taqueria ligo plugin can run ligo test using taq test <sourceFile> command', async () => {
 		try {
 			// 1. Copy contract  and tests files from data folder to taqueria project folder
-			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 			await exec(`cp e2e/data/hello-tacos-tests.mligo ${taqueriaProjectPath}/contracts`);
 
 			// 2. Run taq test ${testFileName}
 			const { stdout, stderr } = await exec(`taq test hello-tacos-tests.mligo`, { cwd: `./${taqueriaProjectPath}` });
-			console.log(stdout);
+			expect(stdout).toContain('All tests passed');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
 	});
 
-	// TODO:
 	test('Verify that taqueria ligo plugin will output proper error message running taq test <sourceFile> command against invalid test file', async () => {
 		try {
 			// 1. Copy contract  and tests files from data folder to taqueria project folder
-			await exec(`cp e2e/data/hello-tacos--invalid-tests.mligo ${taqueriaProjectPath}/contracts`);
+			await exec(`cp e2e/data/hello-tacos-invalid-tests.mligo ${taqueriaProjectPath}/contracts`);
 
 			// 2. Run taq test ${testFileName}
 			// const output =   await exec(`taq test hello-tacos-invalid-tests.mligo`, { cwd: `./${taqueriaProjectPath}` });
-			console.log(await exec(`taq test hello-tacos-invalid-tests.mligo`, { cwd: `./${taqueriaProjectPath}` }));
+			const { stdout, stderr } = await exec(`taq test hello-tacos-invalid-tests.mligo`, {
+				cwd: `./${taqueriaProjectPath}`,
+			});
+			expect(stdout).toContain('Some tests failed :(');
+			expect(stderr).toContain('Variable "initial_storage" not found.');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
 	});
 
-	// TODO:
 	test('Verify that taqueria ligo plugin will output proper error message running taq test <sourceFile> command against non-existing file', async () => {
 		try {
 			// 1. Run taq test ${testFileName} against file that does not exist
-			const { stdout, stderr } = await exec(`taq test hello-tacos-tests.mligo`, { cwd: `./${taqueriaProjectPath}` });
-			console.log(stderr);
+			const { stdout, stderr } = await exec(`taq test hello-tacos-test.mligo`, { cwd: `./${taqueriaProjectPath}` });
+			expect(stderr).toContain('contracts/hello-tacos-test.mligo: No such file or directory');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
