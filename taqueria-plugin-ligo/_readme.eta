@@ -59,6 +59,73 @@ Make sure you name it `hello.storages.mligo` and not `hello.storage.mligo` (note
 
 None for now.
 
+## The `taq test` Task
+
+Basic usage is:
+
+```shell
+taq test <filename>
+```
+
+### Basic description
+This task tests the LIGO source code and ouputs a result suggesting a failure or success. Normally you'd have a contract file and a separate test file that includes the contract's code, both within the `/contracts` directory.
+
+For example, refer to the following 2 code snippets:
+```ligo title="counter.mligo"
+type storage = int
+
+type parameter =
+  Increment of int
+| Decrement of int
+| Reset
+
+type return = operation list * storage
+
+// Two entrypoints
+
+let add (store, delta : storage * int) : storage = store + delta
+let sub (store, delta : storage * int) : storage = store - delta
+
+(* Main access point that dispatches to the entrypoints according to
+   the smart contract parameter. *)
+
+let main (action, store : parameter * storage) : return =
+ ([] : operation list),    // No operations
+ (match action with
+   Increment (n) -> add (store, n)
+ | Decrement (n) -> sub (store, n)
+ | Reset         -> 0)
+```
+
+```ligo title="testCounter.mligo"
+#include "counter.mligo"
+
+let initial_storage = 42
+
+let test_initial_storage =
+ let (taddr, _, _) = Test.originate main initial_storage 0tez in
+ assert (Test.get_storage taddr = initial_storage)
+
+let test_increment =
+ let (taddr, _, _) = Test.originate main initial_storage 0tez in
+ let contr = Test.to_contract taddr in
+ let _ = Test.transfer_to_contract_exn contr (Increment 1) 1mutez in
+ assert (Test.get_storage taddr = initial_storage + 1)
+```
+
+By running `taq test testCounter.mligo`, you should get the following:
+```
+┌───────────────────┬──────────────────────────────────────────────┐
+│ Contract          │ Test Results                                 │
+├───────────────────┼──────────────────────────────────────────────┤
+│ testCounter.mligo │ Everything at the top-level was executed.    │
+│                   │ - test_initial_storage exited with value (). │
+│                   │ - test_increment exited with value ().       │
+│                   │                                              │
+│                   │ 🎉 All tests passed 🎉                        │
+└───────────────────┴──────────────────────────────────────────────┘
+```
+
 ## Template creation
 The LIGO plugin also exposes a contract template via the `taq create contract <contractName>` task. This task will create a new LIGO contract in the `contracts` directory, insert some boilerplate LIGO contract code and will register the contract with Taqueria
 
