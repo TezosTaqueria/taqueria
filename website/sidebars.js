@@ -138,16 +138,6 @@ const sidebars = {
     }, 
     {
       type: "category",
-      label: "Tutorials",
-      className: "sidebarHeader",
-      collapsed: true,
-      collapsible: true,
-      items: [
-        "tutorials/hello-tacos-tutorial"
-      ],
-    },
-    {
-      type: "category",
       label: "Taqueria Internals",
       className: "sidebarHeader",
       collapsed: true,
