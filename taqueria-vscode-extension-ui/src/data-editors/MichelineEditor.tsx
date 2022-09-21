@@ -1,33 +1,9 @@
-import { useState } from 'react';
-import { useCss, usePageTitle } from '../hooks';
+import React, { useState } from 'react';
+import { usePageTitle } from '../hooks';
+import './MichelineEditor.css';
 
 export const MichelineEditor = ({ michelineJsonObj }: { michelineJsonObj: unknown }) => {
 	usePageTitle('Micheline Editor');
-	useCss(`
-body.vscode-light {
-    color: black;
-}
-
-body.vscode-dark {
-    color: white;
-}
-
-body.vscode-high-contrast {
-    color: red;
-}
-
-.editorDiv {
-    border: 1px solid;
-    border-color: var(--vscode-editorWidget-resizeBorder);
-    margin: 5px;
-    padding: 5px;
-    display: table-cell;
-    vertical-align: top;
-}
-.valueTitle {
-    vertical-align: top;
-}
-    `);
 
 	const [jsonObj, setJsonObj] = useState(michelineJsonObj);
 

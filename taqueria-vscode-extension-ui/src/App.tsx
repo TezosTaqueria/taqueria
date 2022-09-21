@@ -1,3 +1,4 @@
+import React from 'react';
 import { MichelineEditor } from './data-editors/MichelineEditor';
 
 export const App = () => {
