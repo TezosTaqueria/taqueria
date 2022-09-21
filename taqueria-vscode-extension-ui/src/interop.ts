@@ -19,15 +19,20 @@ export const createVscodeWebUiHtml = <TSubscriptions>({
 }: {
 	/** panel.webview: from vscode.window.createWebviewPanel(...) */
 	webview: {
-		postMessage: (eventData: unknown) => void;
-		onDidReceiveMessage: (messageData: unknown, _: undefined, subscriptions: TSubscriptions) => void;
+		postMessage: (eventData: unknown) => PromiseLike<boolean>;
+		onDidReceiveMessage: () => void;
 	};
 	/** context: vscode.ExtensionContext */
 	context: { subscriptions: TSubscriptions };
 	interop: InteropMessageInterface;
 }) => {
 	// Handle messages from webview to vscode
-	webview.onDidReceiveMessage(
+	const onDidReceiveMessage = webview.onDidReceiveMessage as (
+		messageData: unknown,
+		_: undefined,
+		subscriptions: TSubscriptions,
+	) => void;
+	onDidReceiveMessage(
 		(messageData: unknown) => {
 			const onMessage = interop.onMessage as (messageData: unknown) => void;
 			onMessage(messageData);
@@ -36,7 +41,7 @@ export const createVscodeWebUiHtml = <TSubscriptions>({
 		context.subscriptions,
 	);
 
-	const indexHtml = webUiIndexHtml.replace(
+	const html = webUiIndexHtml.replace(
 		`</body>`,
 		`
     <script>
@@ -59,7 +64,7 @@ export const createVscodeWebUiHtml = <TSubscriptions>({
 	);
 
 	return {
-		indexHtml,
+		html,
 	};
 };
 
