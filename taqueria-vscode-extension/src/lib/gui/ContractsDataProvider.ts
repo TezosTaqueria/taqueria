@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { HasFileName, HasRefresh, VsCodeHelper } from '../helpers';
+import { HasFileName, HasRefresh, SmartContractCompiler, smartContractLanguages, VsCodeHelper } from '../helpers';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 
 export class ContractsDataProvider extends TaqueriaDataProviderBase
@@ -23,7 +23,8 @@ export class ContractsDataProvider extends TaqueriaDataProviderBase
 			new ContractTreeItem(
 				path.basename(uri.path),
 				vscode.TreeItemCollapsibleState.None,
-				extensions[path.extname(uri.path).toLowerCase()],
+				smartContractLanguages.find(info => info.fileExtensions.indexOf(path.extname(uri.path).toLowerCase()) !== -1)
+					?.compilerName,
 				config.config?.config?.contracts?.[path.basename(uri.path)] !== undefined,
 			)
 		);
@@ -42,35 +43,17 @@ export class ContractsDataProvider extends TaqueriaDataProviderBase
 	}
 }
 
-export enum ContractLanguage {
-	Ligo = 'ligo',
-	Smartpy = 'smartpy',
-	Archetype = 'archetype',
-}
-
-export const extensions: Record<string, ContractLanguage> = {
-	'.mligo': ContractLanguage.Ligo,
-	'.ligo': ContractLanguage.Ligo,
-	'.religo': ContractLanguage.Ligo,
-	'.jsligo': ContractLanguage.Ligo,
-
-	'.py': ContractLanguage.Smartpy,
-	'.ts': ContractLanguage.Smartpy,
-
-	'.arl': ContractLanguage.Archetype,
-};
-
 export class ContractTreeItem extends vscode.TreeItem implements HasFileName {
 	constructor(
 		public readonly fileName: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		language: ContractLanguage | undefined,
+		language: SmartContractCompiler | undefined,
 		public isInRegistry: boolean,
 	) {
 		const displayLabel = `${isInRegistry ? '✅' : '❎'} ${fileName}`;
 		super(displayLabel, collapsibleState);
-		this.tooltip = `${isInRegistry ? 'In Registry' : 'Not In Registry'} (${language ?? ''})`;
+		this.tooltip = language ?? '';
 		this.iconPath = path.join(__filename, '..', '..', '..', '..', 'images', `${language}.svg`);
-		this.contextValue = `lang:${language},inRegistry:${isInRegistry}`;
+		this.contextValue = language;
 	}
 }

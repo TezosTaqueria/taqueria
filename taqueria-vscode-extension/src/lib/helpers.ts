@@ -1,5 +1,6 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { TaqError } from '@taqueria/protocol/TaqError';
+import { Config } from '@taqueria/protocol/taqueria-protocol-types';
 import { spawn } from 'child_process';
 import Table from 'cli-table3';
 import { readFile } from 'fs/promises';
@@ -34,14 +35,60 @@ export const COMMAND_PREFIX = 'taqueria.';
 const minNodeVersion = '16.13.1';
 
 export enum Commands {
-	init = 'taqueria.init',
-	scaffold = 'taqueria.scaffold',
-	install = 'taqueria.install',
-	uninstall = 'taqueria.uninstall',
-	optIn = 'taqueria.optIn',
-	optOut = 'taqueria.optOut',
-	originate = 'taqueria.originate',
+	init = 'init',
+	scaffold = 'scaffold',
+	install = 'install',
+	uninstall = 'uninstall',
+	optIn = 'optIn',
+	optOut = 'optOut',
+	originate = 'originate',
 }
+
+export type SmartContractLanguageInfo = {
+	fileExtensions: string[];
+	pluginName: string;
+	compilerName: SmartContractCompiler;
+};
+
+export type SmartContractCompiler = 'ligo' | 'archetype' | 'smartpy';
+
+export const smartContractLanguages: SmartContractLanguageInfo[] = [
+	{
+		fileExtensions: ['.mligo'],
+		pluginName: '@taqueria/plugin-ligo',
+		compilerName: 'ligo',
+	},
+	{
+		fileExtensions: ['.ligo'],
+		pluginName: '@taqueria/plugin-ligo',
+		compilerName: 'ligo',
+	},
+	{
+		fileExtensions: ['.religo'],
+		pluginName: '@taqueria/plugin-ligo',
+		compilerName: 'ligo',
+	},
+	{
+		fileExtensions: ['.jsligo'],
+		pluginName: '@taqueria/plugin-ligo',
+		compilerName: 'ligo',
+	},
+	{
+		fileExtensions: ['.py'],
+		pluginName: '@taqueria/plugin-smartpy',
+		compilerName: 'smartpy',
+	},
+	{
+		fileExtensions: ['.ts'],
+		pluginName: '@taqueria/plugin-smartpy',
+		compilerName: 'smartpy',
+	},
+	{
+		fileExtensions: ['.arl'],
+		pluginName: '@taqueria/plugin-archetype',
+		compilerName: 'archetype',
+	},
+];
 
 export enum OutputLevels {
 	output,
@@ -288,7 +335,7 @@ export class VsCodeHelper {
 	}
 
 	exposeRefreshCommand() {
-		this.registerCommand(COMMAND_PREFIX + 'refresh_command_states', async () => {
+		this.registerCommand('refresh_command_states', async () => {
 			await this.updateCommandStates();
 		});
 	}
@@ -481,6 +528,14 @@ export class VsCodeHelper {
 		];
 	}
 
+	private getCompilerPlugins() {
+		return [
+			'@taqueria/plugin-archetype',
+			'@taqueria/plugin-ligo',
+			'@taqueria/plugin-smartpy',
+		];
+	}
+
 	async getAvailablePlugins() {
 		try {
 			const HOME_DIR = process.env.HOME;
@@ -662,7 +717,7 @@ export class VsCodeHelper {
 
 	registerCommand(cmdId: string, callback: (...args: any[]) => any) {
 		this.context.subscriptions.push(
-			this.vscode.commands.registerCommand(cmdId, async (...args: any[]) => {
+			this.vscode.commands.registerCommand(COMMAND_PREFIX + cmdId, async (...args: any[]) => {
 				try {
 					const result = callback(...args);
 					if (result.then) {
@@ -735,7 +790,7 @@ export class VsCodeHelper {
 	}
 
 	exposeTypecheckCommand() {
-		this.registerCommand(COMMAND_PREFIX + 'typecheck', async (arg: SandboxTreeItem | ContractTreeItem | undefined) => {
+		this.registerCommand('typecheck', async (arg: SandboxTreeItem | ContractTreeItem | undefined) => {
 			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
 			if (projectDir === undefined) {
 				return;
@@ -888,37 +943,110 @@ export class VsCodeHelper {
 		);
 	}
 
-	exposeTaqTaskAsCommandWithOptionalFileArgument(
+	exposeCompileCommand(
 		cmdId: string,
-		taskWithArgs: string,
-		outputTo: 'output' | 'notify',
-		taskTitles: TaskTitles,
+		fileSelectionBehavior: 'getFromCommand' | 'currentFile' | 'openDialog',
+		compilerPlugin?: string,
 	) {
 		this.registerCommand(
 			cmdId,
 			async (item?: HasFileName | api.Uri | undefined) => {
+				const { config, pathToDir } = this.observableConfig.currentConfig;
+				if (!config || !pathToDir) {
+					this.showLog(
+						OutputLevels.warn,
+						`Could not determine current project folder.`,
+					);
+					return;
+				}
+				const contractsFolder = path.join(pathToDir, config.config.contractsDir ?? 'contracts');
 				let fileName: string | undefined;
-				if (instanceOfHasFileName(item)) {
-					fileName = item.fileName;
-				} else if (item instanceof api.Uri) {
-					fileName = await this.getRelativeFilePath(item, 'contracts');
-					if (!fileName) {
+				if (fileSelectionBehavior === 'getFromCommand') {
+					if (instanceOfHasFileName(item)) {
+						fileName = item.fileName;
+					} else if (item instanceof api.Uri) {
+						fileName = path.relative(contractsFolder, item.path);
+						if (!fileName) {
+							this.showLog(
+								OutputLevels.warn,
+								`Could not determine relative filename for ${item.path}, canceling ${cmdId} command.`,
+							);
+							return;
+						}
+					} else {
 						this.showLog(
 							OutputLevels.warn,
-							`Could not determine relative filename for ${item.path}, canceling ${cmdId} command.`,
+							`File to be compiled was not passed to command or could not determine relative filename for ${
+								JSON.stringify(item, null, 2)
+							}, canceling ${cmdId} command.`,
 						);
 						return;
 					}
+				} else if (fileSelectionBehavior === 'currentFile') {
+					let absoluteFilePath = this.vscode.window.activeTextEditor?.document.uri.path;
+					if (!absoluteFilePath) {
+						this.showLog(
+							OutputLevels.warn,
+							`No file is open in the text editor.`,
+						);
+						return;
+					}
+					fileName = path.relative(contractsFolder, absoluteFilePath);
+				} else if (fileSelectionBehavior === 'openDialog') {
+					const fileNames = await this.vscode.window.showOpenDialog({
+						canSelectFiles: true,
+						canSelectFolders: false,
+						canSelectMany: false,
+						defaultUri: api.Uri.file(contractsFolder),
+						filters: {
+							'All Supported Contracts': this.getSupportedSmartContractExtensions(config).map(extension =>
+								extension.replace('.', '')
+							),
+							'All Files': ['*'],
+						},
+						openLabel: 'Compile',
+						title: 'Select a smart contract file to compile',
+					});
+					if (!fileNames) {
+						this.showLog(
+							OutputLevels.debug,
+							`The user canceled out of compile process.`,
+						);
+						return;
+					}
+					fileName = path.relative(contractsFolder, fileNames[0].path);
+				} else {
+					this.showLog(
+						OutputLevels.warn,
+						`Unknown file mode for compile command.`,
+					);
+					return;
+				}
+				if (!fileName) {
+					this.showLog(
+						OutputLevels.warn,
+						`Could not determine file to compile.`,
+					);
+					return;
 				}
 				this.showLog(OutputLevels.debug, `Running command ${cmdId} for ${fileName}`);
+				const taskWithArgs = `--plugin ${compilerPlugin ?? this.getCompilePluginForFile(fileName)} compile`;
 				await this.proxyToTaqAndShowOutput(
-					item ? `${taskWithArgs} ${fileName}` : taskWithArgs,
-					taskTitles,
+					`${taskWithArgs} ${fileName}`,
+					{
+						finishedTitle: `compiled contract ${fileName}`,
+						progressTitle: `compiling contract ${fileName}`,
+					},
 					undefined,
-					outputTo === 'output',
+					true,
 				);
 			},
 		);
+	}
+
+	getCompilePluginForFile(fileName: string): string | undefined {
+		const extension = path.extname(fileName);
+		return smartContractLanguages.find(lang => lang.fileExtensions.indexOf(extension) !== -1)?.pluginName;
 	}
 
 	private async getRelativeFilePath(uri: api.Uri, folder: 'contracts' | 'artifacts') {
@@ -982,7 +1110,7 @@ export class VsCodeHelper {
 
 	exposeRunTestCommand() {
 		this.registerCommand(
-			COMMAND_PREFIX + 'run_tests',
+			'run_tests',
 			async (item: TestTreeItem) => {
 				const folder = item.relativePath;
 				await this.proxyToTaqAndShowOutput(
@@ -1166,6 +1294,31 @@ export class VsCodeHelper {
 			this.showLog(OutputLevels.trace, `plugins ${plugin}: ${found}`);
 			this.vscode.commands.executeCommand('setContext', plugin, enableAllCommands || found);
 		}
+		const installedCompilers = this.getCompilerPlugins().filter(compiler =>
+			config?.config?.plugins?.find(plugin => plugin.name === compiler) !== undefined
+		)
+			.map(pluginName => pluginName.replace('@taqueria/plugin-', ''));
+		this.vscode.commands.executeCommand('setContext', '@taqueria/plugin-any-compiler', installedCompilers.length !== 0);
+		const supportedFileExtensions = this.getSupportedSmartContractExtensions(config);
+		this.vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria/supported-smart-contract-extensions',
+			supportedFileExtensions,
+		);
+		this.showLog(OutputLevels.debug, `Supported extensions: ${JSON.stringify(supportedFileExtensions)}`);
+	}
+
+	private getSupportedSmartContractExtensions(config: Util.TaqifiedDir | null | undefined) {
+		return [
+			...new Set(
+				smartContractLanguages.filter(l => VsCodeHelper.isPluginInstalled(config, l.pluginName))
+					.flatMap(l => l.fileExtensions),
+			),
+		];
+	}
+
+	private static isPluginInstalled(config: Util.TaqifiedDir | null | undefined, pluginName: string) {
+		return (config?.config?.plugins?.findIndex(p => p.name === pluginName) ?? -1) !== -1;
 	}
 
 	private _taqFolderWatcher: api.FileSystemWatcher | undefined;
@@ -1450,20 +1603,20 @@ export class VsCodeHelper {
 	}
 
 	exposeRefreshSandBoxDataCommand() {
-		this.registerCommand('taqueria.refresh_sandbox_data', async (item: SandboxTreeItemBase) => {
+		this.registerCommand('refresh_sandbox_data', async (item: SandboxTreeItemBase) => {
 			this.sandboxesDataProvider?.refreshItem(item);
 		});
 	}
 
 	exposeShowEntrypointParametersCommand() {
-		this.registerCommand('taqueria.show_entrypoint_parameters', async (item: SmartContractEntrypointTreeItem) => {
+		this.registerCommand('show_entrypoint_parameters', async (item: SmartContractEntrypointTreeItem) => {
 			const jsonParameters = item.jsonParameters;
 			this.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});
 	}
 
 	exposeShowOperationDetailsCommand() {
-		this.registerCommand('taqueria.show_operation_details', async (item: OperationTreeItem) => {
+		this.registerCommand('show_operation_details', async (item: OperationTreeItem) => {
 			const jsonParameters = item.operation;
 			this.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});

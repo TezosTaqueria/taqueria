@@ -43,7 +43,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	await helper.exposeInstallTask();
 	await helper.exposeUninstallTask();
 	helper.exposeTaqTaskAsCommand(
-		COMMAND_PREFIX + 'opt_in',
+		'opt_in',
 		'opt-in',
 		'output',
 		{
@@ -52,7 +52,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		},
 	);
 	helper.exposeTaqTaskAsCommand(
-		COMMAND_PREFIX + 'opt_out',
+		'opt_out',
 		'opt-out',
 		'output',
 		{
@@ -63,35 +63,13 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	helper.exposeRefreshCommand();
 	// await helper.watchGlobalSettings();
 
-	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
-		COMMAND_PREFIX + 'compile_smartpy',
-		'--plugin smartpy compile',
-		'output',
-		{
-			finishedTitle: `compiled contract(s)`,
-			progressTitle: `compiling contract(s)`,
-		},
-	);
-	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
-		COMMAND_PREFIX + 'compile_ligo',
-		'--plugin ligo compile',
-		'output',
-		{
-			finishedTitle: `compiled contract(s)`,
-			progressTitle: `compiling contract(s)`,
-		},
-	);
-	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
-		COMMAND_PREFIX + 'compile_archetype',
-		'--plugin archetype compile',
-		'output',
-		{
-			finishedTitle: `compiled contract(s)`,
-			progressTitle: `compiling contract(s)`,
-		},
-	);
+	helper.exposeCompileCommand('compile_smartpy', 'getFromCommand', 'smartpy');
+	helper.exposeCompileCommand('compile_ligo', 'getFromCommand', 'ligo');
+	helper.exposeCompileCommand('compile_archetype', 'getFromCommand', 'archetype');
+	helper.exposeCompileCommand('compile_pick_file', 'openDialog', undefined);
+	helper.exposeCompileCommand('compile_current_file', 'currentFile', undefined);
 	helper.exposeTaqTaskAsCommandWithFileArgument(
-		COMMAND_PREFIX + 'add_contract',
+		'add_contract',
 		'add-contract',
 		'output',
 		{
@@ -100,7 +78,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		},
 	);
 	helper.exposeTaqTaskAsCommandWithFileArgument(
-		COMMAND_PREFIX + 'rm_contract',
+		'rm_contract',
 		'rm-contract',
 		'output',
 		{
@@ -110,7 +88,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	);
 
 	helper.exposeTaqTaskAsCommand(
-		COMMAND_PREFIX + 'generate_types',
+		'generate_types',
 		'generate types',
 		'output',
 		{
@@ -124,7 +102,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 
 	// Sandbox tasks
 	helper.exposeSandboxTaskAsCommand(
-		COMMAND_PREFIX + 'start_sandbox',
+		'start_sandbox',
 		'start sandbox',
 		{
 			finishedTitle: `started sandbox`,
@@ -132,7 +110,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		},
 	);
 	helper.exposeSandboxTaskAsCommand(
-		COMMAND_PREFIX + 'stop_sandbox',
+		'stop_sandbox',
 		'stop sandbox',
 		{
 			finishedTitle: `stopped sandbox`,
@@ -140,7 +118,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		},
 	);
 	helper.exposeSandboxTaskAsCommand(
-		COMMAND_PREFIX + 'list_accounts',
+		'list_accounts',
 		'list accounts',
 		{
 			finishedTitle: `listed sandbox accounts`,
