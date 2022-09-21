@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -36,12 +36,22 @@ describe('Extension Test Suite', async () => {
 		const context: ExtensionContext = {
 			subscriptions: [],
 		} as any;
+
+		const packageJsonPath = path.join(projectRoot, 'package.json');
+		const packageJsonContents = await fse.readFile(packageJsonPath, 'utf-8');
+		const activationEventsRemoved = packageJsonContents.replace(
+			/\"activationEvents\": \[(.|\n)*?\]/,
+			'"activationEvents": []',
+		);
+		await fse.writeFile(packageJsonPath, activationEventsRemoved);
+
+		await fse.mkdir(testProjectDestination);
 		await taqueriaExtension.activate(context, { vscode: vscodeMock });
 
 		vscode.window.showInformationMessage('Start all tests.');
 	});
 
-	it('Verify that Taqueria Initiate will init new taquifed  project ', async () => {
+	xit('Verify that Taqueria Initiate will init new taquifed  project ', async () => {
 		await vscode.commands.getCommands(true).then(allCommands => {
 			const taqCommands = allCommands.filter(command => command.toLowerCase().includes('taq'));
 			assert.notEqual(taqCommands, undefined);
@@ -88,7 +98,7 @@ describe('Extension Test Suite', async () => {
 	});
 
 	// TODO: https://github.com/ecadlabs/taqueria/issues/645
-	xit('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+	it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
 		// It creates another process
 		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
 		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
@@ -118,6 +128,7 @@ describe('Extension Test Suite', async () => {
 
 	after(async () => {
 		await fse.rmdir(testProjectDestination, { recursive: true });
+		execSync('git reset --hard');
 		// Uncomment for local development
 		// await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
 	});
