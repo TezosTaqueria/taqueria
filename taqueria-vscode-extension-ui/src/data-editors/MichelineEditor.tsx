@@ -3,14 +3,17 @@ import { usePageTitle } from '../hooks';
 import './MichelineEditor.css';
 
 export const MichelineEditor = (
-	{ michelineJsonObj, onChange }: { michelineJsonObj: unknown; onChange: (michelineJsonObj: unknown) => void },
+	{ input, onMessage }: {
+		input: { michelineJsonObj: unknown };
+		onMessage: (data: { michelineJsonObj: unknown }) => void;
+	},
 ) => {
 	usePageTitle('Micheline Editor');
 
-	const [jsonObj, setJsonObj] = useState(michelineJsonObj);
+	const [jsonObj, setJsonObj] = useState(input.michelineJsonObj);
 	const changeJsonObj = (v: unknown) => {
 		setJsonObj(v);
-		onChange(v);
+		onMessage({ michelineJsonObj: v });
 	};
 
 	return (

@@ -1,41 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { MichelineEditor } from './data-editors/MichelineEditor';
+import { InteropMessageInterface } from './interop';
 
-type GlobalDependencies = {
-	view: 'MichelineEditor';
-	michelineJsonObj: unknown;
-	onChange: (michelineJsonObj: unknown) => void;
-};
 const state = {
-	globalDependencies: undefined as undefined | GlobalDependencies,
-	onChangeCallback: (x: GlobalDependencies) => {/* empty */},
+	globalDependencies: undefined as undefined | InteropMessageInterface,
+	onChangeCallback: (x: InteropMessageInterface) => {/* empty */},
 };
 
-/** setGlobalDependencies
- *
- * After this script has loaded, call `window.setGlobalDependencies`
- * to control the view and pass required data and set callbacks.
- *
- * Example:
- *
- * ```
- * window.setGlobalDependencies({
- * 	view: 'MichelineEditor',
- * 	michelineJsonObj: { 'prim': 'pair', 'args': [{ 'string': 'hello' }, { 'int': '42' }] },
- * 	onChange: (x) => {
- * 		// Process the changed json
- *      // (this will occur immediately after every edit, so debounce if needed)
- * 		handleMichelineJsonChanged(x);
- * 	},
- * })
- * ```
- */
-const setGlobalDependencies = (x: GlobalDependencies) => {
+const setGlobalInteropMessageInterface = (x: InteropMessageInterface) => {
 	state.globalDependencies = x;
 	state.onChangeCallback(x);
 };
 const w = window as unknown as Record<string, unknown>;
-w.setGlobalDependencies = setGlobalDependencies;
+w.setGlobalInteropMessageInterface = setGlobalInteropMessageInterface;
 
 export const App = () => {
 	const [deps, setDeps] = useState(state.globalDependencies);
@@ -64,10 +41,12 @@ const DefaultView = () => {
 
 		// Simulate loading
 		setTimeout(() => {
-			setGlobalDependencies({
+			setGlobalInteropMessageInterface({
 				view: 'MichelineEditor',
-				michelineJsonObj: { 'prim': 'pair', 'args': [{ 'string': 'hello' }, { 'int': '42' }] },
-				onChange: x => {
+				input: {
+					michelineJsonObj: { 'prim': 'pair', 'args': [{ 'string': 'hello' }, { 'int': '42' }] },
+				},
+				onMessage: x => {
 					console.log('Data was changed', { x });
 				},
 			});

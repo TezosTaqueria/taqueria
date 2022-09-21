@@ -6,6 +6,8 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build",
+		"postbuild": "npm run package",
+		"package": "node ./scripts/package-for-extension.js",
 		"preview": "vite preview"
 	},
 	"dependencies": {
