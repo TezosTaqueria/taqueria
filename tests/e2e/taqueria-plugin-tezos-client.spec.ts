@@ -17,6 +17,7 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 		);
 		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 		await sleep(2500);
+		console.log(await exec(`docker ps -a`))
 	});
 
 	test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
