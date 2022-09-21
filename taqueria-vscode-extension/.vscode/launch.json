@@ -32,7 +32,7 @@
 				"--disable-extensions"
 			],
 			"outFiles": ["${workspaceFolder}/out/**/*.js"],
-			"preLaunchTask": "npm: create-compile",
+			"preLaunchTask": "npm: pretest",
 			"env": {
 				"LogLevel": "debug"
 			}
