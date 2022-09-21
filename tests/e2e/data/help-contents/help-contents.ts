@@ -54,6 +54,7 @@ Commands:
   taq list-contracts              List registered contracts
   taq compile                     Provided by more than one plugin. The option -
                                   -plugin is required.
+  taq test <sourceFile>           Test a smart contract written in LIGO
   taq create <template>           Create files from pre-existing templates
 
 Options:
@@ -96,6 +97,7 @@ Commands:
   taq list-contracts              List registered contracts
   taq compile                     Provided by more than one plugin. The option -
                                   -plugin is required.
+  taq test <sourceFile>           Test a smart contract written in LIGO
   taq create <template>           Create files from pre-existing templates
 
 Options:

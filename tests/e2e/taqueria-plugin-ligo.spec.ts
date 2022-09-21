@@ -143,6 +143,46 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
+	test('Verify that taqueria ligo plugin can run ligo test using taq test <sourceFile> command', async () => {
+		try {
+			// 1. Copy contract  and tests files from data folder to taqueria project folder
+			await exec(`cp e2e/data/hello-tacos-tests.mligo ${taqueriaProjectPath}/contracts`);
+
+			// 2. Run taq test ${testFileName}
+			const { stdout, stderr } = await exec(`taq test hello-tacos-tests.mligo`, { cwd: `./${taqueriaProjectPath}` });
+			expect(stdout).toContain('All tests passed');
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that taqueria ligo plugin will output proper error message running taq test <sourceFile> command against invalid test file', async () => {
+		try {
+			// 1. Copy contract  and tests files from data folder to taqueria project folder
+			await exec(`cp e2e/data/hello-tacos-invalid-tests.mligo ${taqueriaProjectPath}/contracts`);
+
+			// 2. Run taq test ${testFileName}
+			// const output =   await exec(`taq test hello-tacos-invalid-tests.mligo`, { cwd: `./${taqueriaProjectPath}` });
+			const { stdout, stderr } = await exec(`taq test hello-tacos-invalid-tests.mligo`, {
+				cwd: `./${taqueriaProjectPath}`,
+			});
+			expect(stdout).toContain('Some tests failed :(');
+			expect(stderr).toContain('Variable "initial_storage" not found.');
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that taqueria ligo plugin will output proper error message running taq test <sourceFile> command against non-existing file', async () => {
+		try {
+			// 1. Run taq test ${testFileName} against file that does not exist
+			const { stdout, stderr } = await exec(`taq test hello-tacos-test.mligo`, { cwd: `./${taqueriaProjectPath}` });
+			expect(stderr).toContain('contracts/hello-tacos-test.mligo: No such file or directory');
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
 	test.skip('Verify that the LIGO contract template is instantiated with the right content and registered', async () => {
 		try {
 			await exec(`taq create contract counter.mligo`, { cwd: `./${taqueriaProjectPath}` });

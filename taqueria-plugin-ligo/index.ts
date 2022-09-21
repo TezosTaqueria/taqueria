@@ -16,6 +16,13 @@ Plugin.create(i18n => ({
 			handler: 'proxy',
 			encoding: 'json',
 		}),
+		Task.create({
+			task: 'test',
+			command: 'test <sourceFile>',
+			description: 'Test a smart contract written in LIGO',
+			handler: 'proxy',
+			encoding: 'json',
+		}),
 	],
 	templates: [
 		Template.create({
