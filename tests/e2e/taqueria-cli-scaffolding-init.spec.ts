@@ -80,14 +80,13 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	test('Verify that taq scaffold returns an error with a bogus URL', async () => {
 		const scaffoldURL = 'https://github.com/ecadlabs/taqueria-scaffold-taco-shopzzz.git';
 		try {
-			console.log(process.env);
 			if (process.env.CI === 'true') {
-				const scaffoldError = await exec(
+				await exec(
 					`taq scaffold https://alexzbusko:${process.env.SCAFFOLDING_PAT}@github.com/ecadlabs/taqueria-scaffold-taco-shopzzz.git`,
 				);
 			}
 
-			const scaffoldError = await exec(`taq scaffold ${scaffoldURL}`);
+			await exec(`taq scaffold ${scaffoldURL}`);
 		} catch (error: any) {
 			expect(error.toString()).toContain(`remote: Repository not found.`);
 			expect(error.toString()).toContain(`repository '${scaffoldURL}/' not found`);
