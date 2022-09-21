@@ -2,10 +2,16 @@ import React, { useState } from 'react';
 import { usePageTitle } from '../hooks';
 import './MichelineEditor.css';
 
-export const MichelineEditor = ({ michelineJsonObj }: { michelineJsonObj: unknown }) => {
+export const MichelineEditor = (
+	{ michelineJsonObj, onChange }: { michelineJsonObj: unknown; onChange: (michelineJsonObj: unknown) => void },
+) => {
 	usePageTitle('Micheline Editor');
 
 	const [jsonObj, setJsonObj] = useState(michelineJsonObj);
+	const changeJsonObj = (v: unknown) => {
+		setJsonObj(v);
+		onChange(v);
+	};
 
 	return (
 		<div className='editorDiv'>
@@ -16,7 +22,7 @@ export const MichelineEditor = ({ michelineJsonObj }: { michelineJsonObj: unknow
 							Parameter:
 						</td>
 						<td>
-							<DataNodeView dataNode={jsonObj} onChange={setJsonObj} />
+							<DataNodeView dataNode={jsonObj} onChange={changeJsonObj} />
 						</td>
 					</tr>
 				</tbody>
