@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useCss } from '../hooks';
+import { useCss, usePageTitle } from '../hooks';
 
 export const MichelineEditor = ({ michelineJsonObj }: { michelineJsonObj: unknown }) => {
+	usePageTitle('Micheline Editor');
 	useCss(`
 body.vscode-light {
     color: black;

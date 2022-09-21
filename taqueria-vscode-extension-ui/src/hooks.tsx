@@ -14,3 +14,9 @@ export const useCss = (css: string) => {
 		};
 	}, []);
 };
+
+export const usePageTitle = (title: string) => {
+	useLayoutEffect(() => {
+		document.title = title;
+	}, []);
+};
