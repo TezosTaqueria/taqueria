@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useCss } from '../hooks';
 
-export const MichelineEditor = ({ jsonParameters }: { jsonParameters: unknown }) => {
+export const MichelineEditor = ({ michelineJsonObj }: { michelineJsonObj: unknown }) => {
 	useCss(`
 body.vscode-light {
     color: black;
@@ -28,120 +28,70 @@ body.vscode-high-contrast {
 }
     `);
 
-	return (
-		<div className='editorDiv'>
-			<table>
-				<tr>
-					<td className='valueTitle'>
-						Parameter:
-					</td>
-					<td>
-						<MichelineEditorItemView dataType={jsonParameters} />
-					</td>
-				</tr>
-			</table>
-		</div>
-	);
-};
+	const [jsonObj, setJsonObj] = useState(michelineJsonObj);
 
-const MichelineEditorItemView = ({ dataType }: { dataType: unknown }) => {
-	if (typeof dataType !== 'object') {
-		return <input type='text' />;
-	}
 	return (
 		<div className='editorDiv'>
 			<table>
-				{Object.entries(dataType as object).map(([key, value]) => (
-					<tr key={key}>
+				<tbody>
+					<tr>
 						<td className='valueTitle'>
-							{key.substring(0, key.indexOf(':'))}:
+							Parameter:
 						</td>
 						<td>
-							<MichelineEditorItemView dataType={value} />
+							<DataNodeView dataNode={jsonObj} onChange={setJsonObj} />
 						</td>
 					</tr>
-				))}
+				</tbody>
+			</table>
+			<div>
+				<h3>Preview</h3>
+				<div style={{ whiteSpace: 'pre-wrap' }}>
+					{JSON.stringify(jsonObj, null, 2)}
+				</div>
+			</div>
+		</div>
+	);
+};
+
+const DataNodeView = ({ dataNode: dataNode, onChange }: { dataNode: unknown; onChange: (value: unknown) => void }) => {
+	if (dataNode == null || typeof dataNode !== 'object') {
+		return <DataEditor value={`${dataNode}`} onChange={onChange} />;
+	}
+	const dataRecord = dataNode as Record<string, unknown>;
+	return (
+		<div className='editorDiv'>
+			<table>
+				<tbody>
+					{Object.entries(dataRecord).map(([key, value]) => (
+						<tr key={key}>
+							<td className='valueTitle'>
+								{key}:
+							</td>
+							<td>
+								<DataNodeView
+									dataNode={value}
+									onChange={x => {
+										// console.log(`Changed ${key}`, { key, old: value, new: x });
+
+										// TODO: Cast to appropriate type (bool, number)
+										onChange({ ...dataRecord, [key]: x });
+									}}
+								/>
+							</td>
+						</tr>
+					))}
+				</tbody>
 			</table>
 		</div>
 	);
 };
 
-// import { keys, values } from 'rambda';
-
-// export class MichelineEditor {
-// 	static getEditorHtml(jsonParameters: any): string {
-// 		return `<!DOCTYPE html>
-//         <html lang="en">
-//         <head>
-//             <style>
-//             body.vscode-light {
-//                 color: black;
-//               }
-
-//               body.vscode-dark {
-//                 color: white;
-//               }
-
-//               body.vscode-high-contrast {
-//                 color: red;
-//               }
-
-//             .editorDiv {
-//                 border: 1px solid;
-//                 border-color: var(--vscode-editorWidget-resizeBorder);
-//                 margin: 5px;
-//                 padding: 5px;
-//                 display: table-cell;
-//                 vertical-align: top;
-//             }
-//             .valueTitle {
-//                 vertical-align: top;
-//             }
-//             </style>
-//             <meta charset="UTF-8">
-//             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//             <title>Cat Coding</title>
-//         </head>
-
-//         <body>
-//             <div class="editorDiv">
-//                 <table>
-//                     <tr>
-//                         <td class="valueTitle">
-//                             Parameter:
-//                         </td>
-//                         <td>
-//                             ${MichelineEditor.getEditor(jsonParameters)}
-//                         </td>
-//                     </tr>
-//                 </table>
-//             </div>
-//         </body>
-//         </html>`;
-// 	}
-
-// 	private static getEditor(dataType: unknown): string {
-// 		if (typeof dataType === 'object') {
-// 			const editors = `<div class="editorDiv">
-//                 <table>
-//                     <tr>
-//                         ${
-// 				Object.entries(dataType as object).map(([key, value]) => `
-//                             <td class="valueTitle">
-//                                 ${key.substring(0, key.indexOf(':'))}:
-//                             </td>
-//                             <td>
-//                                 ${MichelineEditor.getEditor(value)}`).join(`
-//                     </tr>
-//                     <tr>`)
-// 			}
-//                     </tr>
-//                 </table>
-//             </div>
-//             `;
-// 			return editors;
-// 		} else {
-// 			return `<input type=text>`;
-// 		}
-// 	}
-// }
+const DataEditor = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
+	const [currentValue, setCurrentValue] = useState(value);
+	const changeValue = (v: string) => {
+		setCurrentValue(v);
+		onChange(v);
+	};
+	return <input type='text' value={`${currentValue}`} onChange={e => changeValue(e.target.value)} />;
+};
