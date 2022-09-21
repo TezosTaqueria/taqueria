@@ -6,15 +6,33 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [
+				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceFolder}/taqueria-vscode-extension"
 			],
 			"outFiles": [
-				"${workspaceFolder}/taqueria-vscode-extension/out/*.js"
+				"${workspaceFolder}/taqueria-vscode-extension/out/**/*.js"
 			],
 			"preLaunchTask": "build-and-watch-vscode",
 			"env": {
 				"LogLevel": "warn",
 				"InstallDevPlugins": "false"
+			}
+		},
+		{
+			"name": "Run Extension Tests",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"${env:HOME}/TVsCE_e2e/vscode-taq-test-project/",
+				"--extensionDevelopmentPath=${workspaceFolder}/taqueria-vscode-extension",
+				"--extensionTestsPath=${workspaceFolder}/taqueria-vscode-extension/out/test/suite/index",
+				"--disable-extensions"
+			],
+			"outFiles": ["${workspaceFolder}/taqueria-vscode-extension/out/**/*.js"],
+			"preLaunchTask": "npm: pretest",
+			"env": {
+				"LogLevel": "debug"
 			}
 		},
 		{

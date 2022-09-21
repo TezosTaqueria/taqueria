@@ -153,8 +153,6 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	helper.exposeShowEntrypointParametersCommand();
 	helper.exposeShowOperationDetailsCommand();
 
-	helper.createTreeViews();
-
 	deps.vscode.workspace.onDidChangeWorkspaceFolders(e => {
 		e.added.forEach(folder => {
 			try {
@@ -173,6 +171,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		}
 	});
 	await helper.registerDataProviders();
+	helper.createTreeViews();
 	helper.updateCommandStates();
 }
 

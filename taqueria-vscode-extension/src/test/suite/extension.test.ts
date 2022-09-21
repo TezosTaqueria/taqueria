@@ -8,11 +8,13 @@ import * as taqueriaExtension from '../../extension';
 import * as MockedObject from './MockedObject';
 import { sleep } from './utils/utils';
 
-const projectRoot = path.resolve(__dirname, '../../../../');
-const testProjectSource = `${projectRoot}/src/test/suite/data/vscode-taq-test-project`;
-const testProjectDestination = `${projectRoot}/out/vscode-taq-test-project`;
-const ligoContractFileSource = `${projectRoot}/src/test/suite/data/hello-tacos.mligo`;
-const ligoContractFileDestination = `${projectRoot}/vscode-taq-test-project/contracts/hello-tacos.mligo`;
+const sourceFilesRoot = path.resolve(__dirname, '../../../../');
+const testProjectRoot = '~/TVsCE_e2e';
+const testProjectSource = `${sourceFilesRoot}/src/test/suite/data/vscode-taq-test-project`;
+const ligoContractFileSource = `${sourceFilesRoot}/src/test/suite/data/hello-tacos.mligo`;
+
+const testProjectDestination = `${testProjectRoot}/out/vscode-taq-test-project`;
+const ligoContractFileDestination = `${testProjectRoot}/vscode-taq-test-project/contracts/hello-tacos.mligo`;
 
 const originalMethods = {
 	'window.showInformationMessage': vscode.window.showInformationMessage,
@@ -30,6 +32,8 @@ const mockedMethods = {
 	) => Promise.resolve([choosePlugin]),
 };
 vscodeMock = MockedObject.make(vscode, mockedMethods);
+let originalPackageJsonContents: string;
+const packageJsonPath = path.join(sourceFilesRoot, 'package.json');
 
 describe('Extension Test Suite', async () => {
 	before(async () => {
@@ -37,15 +41,14 @@ describe('Extension Test Suite', async () => {
 			subscriptions: [],
 		} as any;
 
-		const packageJsonPath = path.join(projectRoot, 'package.json');
-		const packageJsonContents = await fse.readFile(packageJsonPath, 'utf-8');
-		const activationEventsRemoved = packageJsonContents.replace(
+		originalPackageJsonContents = await fse.readFile(packageJsonPath, 'utf-8');
+		const activationEventsRemoved = originalPackageJsonContents.replace(
 			/\"activationEvents\": \[(.|\n)*?\]/,
 			'"activationEvents": []',
 		);
 		await fse.writeFile(packageJsonPath, activationEventsRemoved);
 
-		await fse.mkdir(testProjectDestination);
+		await fse.mkdir(testProjectDestination, { recursive: true });
 		await taqueriaExtension.activate(context, { vscode: vscodeMock });
 
 		vscode.window.showInformationMessage('Start all tests.');
@@ -61,7 +64,7 @@ describe('Extension Test Suite', async () => {
 		// https://github.com/ecadlabs/taqueria/issues/939
 		// Currently we are just coping taqufied project
 		// await vscodeMock.commands.executeCommand('taqueria.init');
-		await fse.copySync(testProjectSource, testProjectDestination);
+		await fse.copy(testProjectSource, testProjectDestination);
 
 		// Verify that taquified project has been created
 		console.log('break');
@@ -89,7 +92,7 @@ describe('Extension Test Suite', async () => {
 		await vscodeMock.commands.executeCommand('taqueria.install');
 
 		// Copy contract from data folder
-		await fse.copyFileSync(testProjectSource, ligoContractFileDestination);
+		await fse.copyFile(testProjectSource, ligoContractFileDestination);
 
 		// Execute ligo compile command
 		await vscodeMock.commands.executeCommand('taqueria.compile_ligo');
@@ -103,9 +106,9 @@ describe('Extension Test Suite', async () => {
 		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
 		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
 		// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
-		fse.rmdirSync(testProjectDestination, { recursive: true });
+		await fse.rm(testProjectDestination, { recursive: true });
 
-		fse.mkdirSync(testProjectDestination);
+		await fse.mkdir(testProjectDestination, { recursive: true });
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
@@ -123,12 +126,12 @@ describe('Extension Test Suite', async () => {
 		await vscodeMock.commands.executeCommand('taqueria.install');
 
 		// Copy contract from data folder
-		await fse.copyFileSync(ligoContractFileSource, ligoContractFileDestination);
+		await fse.copyFile(ligoContractFileSource, ligoContractFileDestination);
 	});
 
 	after(async () => {
-		await fse.rmdir(testProjectDestination, { recursive: true });
-		execSync('git reset --hard');
+		await fse.rm(testProjectDestination, { recursive: true });
+		await fse.writeFile(packageJsonPath, originalPackageJsonContents);
 		// Uncomment for local development
 		// await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
 	});
