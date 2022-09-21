@@ -12,7 +12,6 @@ import * as api from 'vscode';
 import { ArtifactsDataProvider, ArtifactTreeItem } from './gui/ArtifactsDataProvider';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
-import { MichelineEditor } from './gui/data-editors/MichelineEditor';
 import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
 import { EnvironmentsDataProvider } from './gui/EnvironmentsDataProvider';
 import { ObservableConfig } from './gui/ObservableConfig';
@@ -27,6 +26,7 @@ import {
 import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProvider';
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
+import { createVscodeWebUiHtml } from './gui/web/WebUI';
 import * as Util from './pure';
 import { TaqVsxError } from './TaqVsxError';
 
@@ -1475,9 +1475,23 @@ export class VsCodeHelper {
 				'entrypointParameter',
 				'Entrypoint Parameter',
 				this.vscode.ViewColumn.One,
-				{},
+				{
+					enableScripts: true,
+				},
 			);
-			panel.webview.html = MichelineEditor.getEditorHtml(jsonParameters);
+			const result = createVscodeWebUiHtml({
+				webview: panel.webview,
+				subscriptions: this.context.subscriptions,
+				interop: {
+					view: 'MichelineEditor',
+					input: {
+						michelineJsonObj: jsonParameters,
+					},
+					onMessage: x => {
+					},
+				},
+			});
+			panel.webview.html = result.html;
 		});
 	}
 }

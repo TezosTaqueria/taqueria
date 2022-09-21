@@ -12,33 +12,45 @@ export type InteropMessageInterface =
 		onMessage: (data: { michelineJsonObj: unknown }) => void;
 	};
 
-export const createVscodeWebUiHtml = <TSubscriptions>({
+export const createVscodeWebUiHtml = ({
 	webview,
-	context,
+	subscriptions,
 	interop,
 }: {
 	/** panel.webview: from vscode.window.createWebviewPanel(...) */
 	webview: {
-		postMessage: (eventData: unknown) => PromiseLike<boolean>;
-		onDidReceiveMessage: () => void;
+		postMessage: unknown;
+		onDidReceiveMessage: unknown;
 	};
-	/** context: vscode.ExtensionContext */
-	context: { subscriptions: TSubscriptions };
+	/** context.subscriptions: from vscode.ExtensionContext */
+	subscriptions: unknown;
 	interop: InteropMessageInterface;
 }) => {
+	const LOAD_INPUT = `INTEROP_LOAD_INPUT`;
+	const INIT_UI = `INTEROP_INIT_UI`;
+	const load = () => {
+		const postMessage = webview.postMessage as (input: unknown) => void;
+		postMessage(INIT_UI);
+	};
+
 	// Handle messages from webview to vscode
 	const onDidReceiveMessage = webview.onDidReceiveMessage as (
 		messageData: unknown,
 		_: undefined,
-		subscriptions: TSubscriptions,
+		subscriptions: unknown,
 	) => void;
 	onDidReceiveMessage(
 		(messageData: unknown) => {
+			if (messageData === LOAD_INPUT) {
+				load();
+				return;
+			}
+
 			const onMessage = interop.onMessage as (messageData: unknown) => void;
 			onMessage(messageData);
 		},
 		undefined,
-		context.subscriptions,
+		subscriptions,
 	);
 
 	const html = webUiIndexHtml.replace(
@@ -53,12 +65,20 @@ export const createVscodeWebUiHtml = <TSubscriptions>({
 
         // postMessage args
         const message = event.data; 
-        setGlobalInteropMessageInterface({
-            ...${JSON.stringify({ view: interop.view, input: interop.input })},
-            onMessage: (data) => vscode.postMessage(data),
-        });
+        console.log('Received message', { message });
+
+        if(message === '${INIT_UI}'){
+            setGlobalInteropMessageInterface({
+                ...${JSON.stringify({ view: interop.view, input: interop.input })},
+                onMessage: (data) => vscode.postMessage(data),
+            });
+        }
     });
-}())
+
+    // Ready to receive input
+    console.log('Ready to receive input');
+    vscode.postMessage('${LOAD_INPUT}');
+}());
     </script>
 </body>`,
 	);
