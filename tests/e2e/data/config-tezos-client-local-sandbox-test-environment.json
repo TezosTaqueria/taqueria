@@ -16,7 +16,7 @@
 	"sandbox": {
 		"local-tezos-client": {
 			"label": "Local Tezos Sandbox",
-			"rpcUrl": "http://localhost:20130",
+			"rpcUrl": "http://localhost:20000",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
 		}
 	},
