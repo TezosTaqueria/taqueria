@@ -14,6 +14,8 @@ const plugins: string[] = [
 	'taqueria-plugin-smartpy',
 	'taqueria-plugin-taquito',
 	'taqueria-plugin-tezos-client',
+	`taqueria-plugin-ipfs-pinata`,
+	`taqueria-plugin-metadata`,
 ];
 
 // typed list of github variables with their values

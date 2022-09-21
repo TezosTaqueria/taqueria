@@ -15,6 +15,7 @@ Some helpful things to know:
 - Accounts and balances are pre-configured per-sandbox and do not persist their state
 - Accounts and balances will be re-initialized each time they are started
 - Sandboxes can be added to Taqueria environments and then targeted from the CLI using the `--env [envName]` option 
+- Contracts must be registered in the Taqueria contract registry prior to originating
 
 ## Requirements
 
@@ -59,7 +60,7 @@ This example shows the configuration for the default sandbox named `local`:
     "sandbox": {
         "local": {
             "label": "Local Tezos Sandbox",
-            "protocol": "PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "rpcUrl": "http://localhost:20000"
         }
 ```
@@ -97,7 +98,7 @@ When this sandbox is started, the implicit accounts defined in the configuration
                 }
             },
             "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
             "rpcUrl": "http://localhost:20000"
         }
     },
@@ -142,8 +143,8 @@ An arbitrary string used to describe a particular configuration
 A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
 
 Currently availble protocols are:
-- Hangzhou `PtHangz2aRngywmSRGGvrcTyMbbdpWdpFKuS4uMWxg2RaH9i1qx`
-- Ithaca   `Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A`
+- Jakarta     `PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY`
+- Kathmandu   `PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg`
 
 #### 'rpcUrl'
 

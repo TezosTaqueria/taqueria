@@ -6,6 +6,8 @@ import path from 'path';
 import util from 'util';
 const exec = util.promisify(exec1);
 
+export const sleep = (ms: number) => new Promise((resolve, reject) => setTimeout(resolve, ms));
+
 export const generateTestProject = async (
 	projectPath: string,
 	packageNames: string[] = [],
@@ -36,9 +38,19 @@ export const generateTestProject = async (
 };
 
 export async function getContainerName(dockerName: string): Promise<string> {
-	const [_dockerContainerHeader, dockerContainerName] =
-		(await exec(`docker ps --filter "name=taqueria-development-${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
+	const [_dockerContainerHeader, dockerContainerInfo] =
+		(await exec(`docker ps --filter "name=taq-flextesa-${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
+	const containerInfoArray = dockerContainerInfo.split('   ');
+	const dockerContainerName = containerInfoArray[containerInfoArray.length - 1];
 	return dockerContainerName;
+}
+
+export async function getContainerID(dockerName: string): Promise<string> {
+	const [_dockerContainerHeader, dockerContainerInfo] =
+		(await exec(`docker ps --filter "name=taq-flextesa-${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
+	const containerInfoArray = dockerContainerInfo.split('   ');
+	const dockerContainerID = containerInfoArray[0];
+	return dockerContainerID;
 }
 
 // The solution was taken from this source:

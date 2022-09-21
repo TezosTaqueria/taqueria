@@ -1,4 +1,5 @@
 import {
+	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
 	getInitialStorage,
@@ -6,21 +7,26 @@ import {
 	getSandboxAccountConfig,
 	getSandboxAccountNames,
 	getSandboxConfig,
+	newGetInitialStorage,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
+	sendRes,
+	updateAddressAlias,
 } from '@taqueria/node-sdk';
-import { LikeAPromise, PluginResponse, Protocol, RequestArgs, TaqError } from '@taqueria/node-sdk/types';
+import { Protocol, RequestArgs } from '@taqueria/node-sdk/types';
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import glob from 'fast-glob';
 import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { basename, extname, join } from 'path';
 
 interface Opts extends RequestArgs.t {
-	contract?: string;
+	contract: string;
+	storage: string;
+	alias?: string;
 }
 
 interface ContractStorageMapping {
@@ -31,6 +37,7 @@ interface ContractStorageMapping {
 interface OriginationResult {
 	contract: string;
 	address: string;
+	alias: string;
 	destination: string;
 }
 
@@ -48,26 +55,50 @@ const addOrigination = (parsedArgs: Opts, batch: Promise<WalletOperationBatch>) 
 		const contractData = await readFile(contractAbspath, 'utf-8');
 		return (await batch).withOrigination({
 			code: contractData,
-			storage: mapping.storage,
+			init: mapping.storage as any,
 		});
 	};
 
+const getDefaultStorageFilename = (contractName: string): string => {
+	const baseFilename = basename(contractName, extname(contractName));
+	const extFilename = extname(contractName);
+	const defaultStorage = `${baseFilename}.default_storage${extFilename}`;
+	return defaultStorage;
+};
+
+// TODO: temporary quick solution. May refactor this to only deal with one contract later
 const getValidContracts = async (parsedArgs: Opts) => {
-	const contracts = parsedArgs.contract
-		? [parsedArgs.contract]
-		: (await glob('**/*.tz', { cwd: parsedArgs.config.artifactsDir })) as string[];
+	const contracts = [parsedArgs.contract];
+	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(contracts[0]);
 
 	return contracts.reduce(
-		(retval, filename) => {
-			const storage = getInitialStorage(parsedArgs)(filename);
-			if (storage === undefined || storage === null) throw (`No initial storage provided for ${filename}`);
-			return [...retval, { filename, storage }];
+		async (retval, filename) => {
+			const storage = await newGetInitialStorage(parsedArgs, storageFilename);
+			if (storage === undefined || storage === null) {
+				sendErr(
+					`❌ No initial storage file was found for ${filename}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
+						getDefaultStorageFilename(contracts[0])
+					}" in the artifacts directory\nYou can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option\n`,
+				);
+				// sendErr(
+				// 	`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
+				// 		getCurrentEnvironment(parsedArgs)
+				// 	}.storage["${filename}"]\nThe value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.\n`,
+				// );
+				return retval;
+			}
+			return [...(await retval), { filename, storage }];
 		},
-		[] as ContractStorageMapping[],
+		Promise.resolve([] as ContractStorageMapping[]),
 	);
 };
 
-const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWalletOperation, destination: string) => {
+const mapOpToContract = async (
+	parsedArgs: Opts,
+	contracts: ContractStorageMapping[],
+	op: BatchWalletOperation,
+	destination: string,
+) => {
 	const results = await op.operationResults();
 
 	return contracts.reduce(
@@ -83,11 +114,15 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
 					? result.metadata.operation_result.originated_contracts.join(',')
 					: 'Error';
 
+				const alias = parsedArgs.alias ?? basename(contract.filename, extname(contract.filename));
+				if (address !== 'Error') updateAddressAlias(parsedArgs, alias, address);
+
 				return [
 					...retval,
 					{
 						contract: contract.filename,
 						address,
+						alias: address !== 'Error' ? alias : 'N/A',
 						destination,
 					},
 				];
@@ -98,6 +133,7 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
 				{
 					contract: contract.filename,
 					address: 'Error',
+					alias: 'N/A',
 					destination,
 				},
 			];
@@ -108,6 +144,9 @@ const mapOpToContract = async (contracts: ContractStorageMapping[], op: BatchWal
 
 const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: string) => {
 	const contracts = await getValidContracts(parsedArgs);
+	if (!contracts.length) {
+		return undefined;
+	}
 
 	const batch = await contracts.reduce(
 		(batch, contractMapping) =>
@@ -120,10 +159,22 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 	try {
 		const op = await batch.send();
 		const confirmed = await op.confirmation();
-		return await mapOpToContract(contracts, op, destination);
+		return await mapOpToContract(parsedArgs, contracts, op, destination);
 	} catch (err) {
 		const error = (err as { message: string });
-		if (error.message) sendErr(error.message);
+		if (error.message) {
+			const msg = error.message;
+			if (/ENOTFOUND/.test(msg)) {
+				sendErr(msg + ' - The RPC URL may be invalid. Check your ./taq/config.json.');
+			} else if (/ECONNREFUSED/.test(msg)) {
+				sendErr(msg + ' - The RPC URL may be down or the sandbox is not running.');
+			} else {
+				sendErr(
+					msg
+						+ " - There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.",
+				);
+			}
+		}
 		return undefined;
 	}
 };
@@ -175,8 +226,9 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 							const first = getFirstAccountAlias(sandboxName, parsedArgs);
 							if (first) {
 								defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
+								// TODO: The error should be a warning, not an error. Descriptive string should not begin with 'Warning:'
 								sendErr(
-									`No default account has been configured for the sandbox called ${sandboxName}. Using the account called ${first} for origination.`,
+									`Warning: A default origination account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this origination.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
 								);
 							}
 						}
@@ -205,7 +257,7 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 		)
 		: [];
 
-export const originate = <T>(parsedArgs: Opts): LikeAPromise<PluginResponse, TaqError.t> => {
+export const originate = <T>(parsedArgs: Opts) => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 
 	if (!env) {

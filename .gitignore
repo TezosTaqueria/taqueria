@@ -113,6 +113,10 @@ node_modules
 /taqueria
 /taq
 tests/coverage
+/taqueria-protocol/*.mjs
+/taqueria-protocol/*.map
+/taqueria-protocol/*.d.ts
+/taqueria-protocol/*.js
 /taqueria-sdk/index.js
 /taqueria-sdk/index.js.map
 /taqueria-sdk/types.js
@@ -121,6 +125,9 @@ tests/coverage
 /taqueria-sdk/index.esm.js.map
 /taqueria-sdk/types.esm.js
 /taqueria-sdk/types.esm.js.map
+/taqueria-sdk/*.mjs
+/taqueria-sdk/*.mjs.map
+/taqueria-sdk/*.d.ts
 /taqueria-plugin-smartpy/index.js
 /taqueria-plugin-smartpy/index.js.map
 /taqueria-plugin-ligo/index.js
@@ -139,8 +146,15 @@ tests/coverage
 /taqueria-plugin-teztnets/index.js
 /taqueria-plugin-teztnets/index.js.map
 /taqueria-plugin-teztnets/.parcel-cache
-/taqueria-plugin-contract-types/index.js
-/taqueria-plugin-contract-types/index.js.map
+/taqueria-plugin-contract-types/*.js
+/taqueria-plugin-contract-types/*.map
+/taqueria-plugin-contract-types/*.cjs
+/taqueria-plugin-contract-types/*.mjs
+/taqueria-plugin-contract-types/*.d.ts
+/taqueria-plugin-contract-types/**/*.js
+/taqueria-plugin-contract-types/**/*.map
+/taqueria-plugin-contract-types/**/*.cjs
+/taqueria-plugin-contract-types/**/*.d.ts
 /taqueria-plugin-archetype/index.js
 /taqueria-plugin-archetype/index.js.map
 /taqueria-plugin-tezos-client/index.js
@@ -149,8 +163,18 @@ tests/coverage
 /taqueria-state/index.js.map
 /taqueria-state/*.d.ts
 /taqueria-state/node/*.d.ts
-/taqueria-plugin-jest/index.js.map
-/taqueria-plugin-jest/index.js
+/taqueria-toolkit/index.js
+/taqueria-toolkit/index.js.map
+/taqueria-toolkit/*.d.ts
+/taqueria-plugin-jest/*.js
+/taqueria-plugin-jest/*.cjs
+/taqueria-plugin-jest/*.map
+/taqueria-plugin-jest/*.mjs
+/taqueria-plugin-jest/index.d.ts
+/taqueria-plugin-ipfs-pinata/index.js.map
+/taqueria-plugin-ipfs-pinata/index.js
+/taqueria-plugin-metadata/index.js.map
+/taqueria-plugin-metadata/index.js
 
 # VS Code Extension
 /taqueria-vscode-extension/out
@@ -160,3 +184,5 @@ tests/coverage
 /taqueria-vscode-extension/config.json
 website/docs/glossary.md
 website/yarn.lock
+taqueria-plugin-metadata/index.js
+taqueria-plugin-metadata/index.js.map

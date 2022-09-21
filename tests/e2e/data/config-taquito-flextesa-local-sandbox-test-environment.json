@@ -20,9 +20,17 @@
 			"sandboxes": [
 				"local"
 			],
+			"accounts": {
+				"bob": "3_000_000_000",
+				"alice": "3_000_000_000",
+				"john": "3_000_000_000",
+				"jane": "3_000_000_000",
+				"joe": "3_000_000_000"
+			},
 			"storage": {
-				"hello-tacos.tz": "1",
-				"increment.tz": "2"
+				"hello-tacos.tz": "anyContract.storage",
+				"increment.tz": "anyContract.storage",
+				"all-types.tz": "allTypes.storage"
 			}
 		}
 	},
@@ -33,5 +41,12 @@
 			"rpcUrl": "http://localhost:20000"
 		}
 	},
-	"network": {}
+	"network": {},
+	"accounts": {
+		"bob": "3_000_000_000",
+		"alice": "3_000_000_000",
+		"john": "3_000_000_000",
+		"jane": "3_000_000_000",
+		"joe": "3_000_000_000"
+	}
 }

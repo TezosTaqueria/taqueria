@@ -1,25 +1,23 @@
-import loadI18n, { i18n } from '@taqueria/protocol/i18n';
-import path from 'path';
 import * as api from 'vscode';
-import { inject, InjectedDependencies, OutputLevels, sanitizeDeps } from './lib/helpers';
-import { COMMAND_PREFIX } from './lib/helpers';
-import { makeDir } from './lib/pure';
+import { COMMAND_PREFIX, InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
 
 const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
 	const inMemoryState = {
-		configWatchers: new Map<string, api.FileSystemWatcher>(),
+		configWatchers: new Map<string, api.FileSystemWatcher[]>(),
 	};
 
 	const clearConfigWatchers = () => {
-		for (const watcher of inMemoryState.configWatchers.values()) {
-			watcher.dispose();
+		for (const watcherList of inMemoryState.configWatchers.values()) {
+			for (const watcher of watcherList) {
+				watcher.dispose();
+			}
 		}
 		inMemoryState.configWatchers.clear();
 	};
 
 	const getConfigWatchers = () => inMemoryState.configWatchers.values();
 
-	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher) => {
+	const addConfigWatcherIfNotExists = (folder: string, factory: () => api.FileSystemWatcher[]) => {
 		if (inMemoryState.configWatchers.has(folder)) {
 			return;
 		}
@@ -36,128 +34,146 @@ const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = 
 
 export async function activate(context: api.ExtensionContext, input?: InjectedDependencies) {
 	const deps = sanitizeDeps(input);
-	const { vscode } = deps;
-	const {
-		exposeInitTask,
-		exposeScaffoldTask,
-		exposeInstallTask,
-		exposeUninstallTask,
-		exposeOriginateTask,
-		exposeTaqTaskAsCommand,
-		exposeSandboxTaskAsCommand,
-		createWatcherIfNotExists,
-		showOutput,
-		logAllNestedErrors,
-	} = inject(deps);
-
-	const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
-	const logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
-	const outputChannel = vscode.window.createOutputChannel('Taqueria');
-	const output = {
-		outputChannel,
-		logLevel,
-	};
-	showOutput(output)(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
-
-	const i18n: i18n = await loadI18n();
-
-	const folders = vscode.workspace.workspaceFolders
-		? vscode.workspace.workspaceFolders
-		: [];
+	const helper = await VsCodeHelper.construct(context, deps);
+	helper.listenToDockerEvents();
 
 	// Add built-in tasks for Taqueria
-	await exposeInitTask(context, output, i18n, folders);
-	await exposeScaffoldTask(context, output, folders, i18n);
-	await exposeInstallTask(context, output, folders, i18n);
-	await exposeUninstallTask(context, output, folders, i18n);
-	exposeTaqTaskAsCommand(context, output, i18n)(
+	helper.exposeInitTask();
+	helper.exposeScaffoldTask();
+	await helper.exposeInstallTask();
+	await helper.exposeUninstallTask();
+	helper.exposeTaqTaskAsCommand(
 		COMMAND_PREFIX + 'opt_in',
 		'opt-in',
 		'output',
-		'Successfully opted in to analytics.',
+		{
+			finishedTitle: `opted in to analytics`,
+			progressTitle: `opting in to analytics`,
+		},
 	);
-	exposeTaqTaskAsCommand(context, output, i18n)(
+	helper.exposeTaqTaskAsCommand(
 		COMMAND_PREFIX + 'opt_out',
 		'opt-out',
 		'output',
-		'Successfully opted out from analytics.',
+		{
+			finishedTitle: `opted out of analytics`,
+			progressTitle: `opting out of analytics`,
+		},
 	);
-	// await exposeTasksFromState (context, output, folders, i18n)
+	helper.exposeRefreshCommand();
+	// await helper.watchGlobalSettings();
 
-	// Temporary - hard coded list of tasks we know we need to support
-	// Caveats:
-	// 1) We're only supporting a project with a single workspace folder open
-	// 2) We're displaying all known tasks from our first-party list of plugins.
-	// Third-party plugins aren't exposed via the VS Code interface
-	if (folders.length === 1) {
-		await makeDir(folders[0].uri.path, i18n)
-			.then(projectDir => {
-				const exposeTaqTask = exposeTaqTaskAsCommand(context, output, i18n, projectDir);
-				const exposeSandboxTask = exposeSandboxTaskAsCommand(context, output, i18n, projectDir);
+	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
+		COMMAND_PREFIX + 'compile_smartpy',
+		'--plugin smartpy compile',
+		'output',
+		{
+			finishedTitle: `compiled contract(s)`,
+			progressTitle: `compiling contract(s)`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
+		COMMAND_PREFIX + 'compile_ligo',
+		'--plugin ligo compile',
+		'output',
+		{
+			finishedTitle: `compiled contract(s)`,
+			progressTitle: `compiling contract(s)`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithOptionalFileArgument(
+		COMMAND_PREFIX + 'compile_archetype',
+		'--plugin archetype compile',
+		'output',
+		{
+			finishedTitle: `compiled contract(s)`,
+			progressTitle: `compiling contract(s)`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithFileArgument(
+		COMMAND_PREFIX + 'add_contract',
+		'add-contract',
+		'output',
+		{
+			finishedTitle: `added contract to registry`,
+			progressTitle: `adding contract to registry`,
+		},
+	);
+	helper.exposeTaqTaskAsCommandWithFileArgument(
+		COMMAND_PREFIX + 'rm_contract',
+		'rm-contract',
+		'output',
+		{
+			finishedTitle: `removed contract from registry`,
+			progressTitle: `removing contract from registry`,
+		},
+	);
 
-				// Compilation tasks
-				exposeTaqTask(
-					COMMAND_PREFIX + 'compile_smartpy',
-					'--plugin smartpy compile',
-					'output',
-					'Compilation successful.',
-				);
-				exposeTaqTask(COMMAND_PREFIX + 'compile_ligo', '--plugin ligo compile', 'output', 'Compilation successful.');
-				exposeTaqTask(
-					COMMAND_PREFIX + 'compile_archetype',
-					'--plugin archetype compile',
-					'output',
-					'Compilation successful.',
-				);
-				exposeTaqTask(
-					COMMAND_PREFIX + 'generate_types',
-					'generate types',
-					'output',
-					'Type generation successful.',
-				);
-				exposeTaqTask(
-					COMMAND_PREFIX + 'typecheck',
-					'typecheck',
-					'output',
-					'Type generation successful.',
-				);
-				exposeTaqTask(
-					COMMAND_PREFIX + 'test',
-					'test',
-					'output',
-					'Test setup successful.',
-				);
+	helper.exposeTaqTaskAsCommand(
+		COMMAND_PREFIX + 'generate_types',
+		'generate types',
+		'output',
+		{
+			finishedTitle: `generated types`,
+			progressTitle: `generating types`,
+		},
+	);
+	helper.exposeTypecheckCommand();
+	helper.exposeTestSetupCommand();
+	helper.exposeRunTestCommand();
 
-				// Sandbox tasks
-				exposeSandboxTask(COMMAND_PREFIX + 'start_sandbox', 'start sandbox', 'notify');
-				exposeSandboxTask(COMMAND_PREFIX + 'stop_sandbox', 'stop sandbox', 'notify');
-				exposeSandboxTask(COMMAND_PREFIX + 'list_accounts', 'list accounts', 'output');
+	// Sandbox tasks
+	helper.exposeSandboxTaskAsCommand(
+		COMMAND_PREFIX + 'start_sandbox',
+		'start sandbox',
+		{
+			finishedTitle: `started sandbox`,
+			progressTitle: `starting sandbox`,
+		},
+	);
+	helper.exposeSandboxTaskAsCommand(
+		COMMAND_PREFIX + 'stop_sandbox',
+		'stop sandbox',
+		{
+			finishedTitle: `stopped sandbox`,
+			progressTitle: `stopping sandbox`,
+		},
+	);
+	helper.exposeSandboxTaskAsCommand(
+		COMMAND_PREFIX + 'list_accounts',
+		'list accounts',
+		{
+			finishedTitle: `listed sandbox accounts`,
+			progressTitle: `listing sandbox accounts`,
+		},
+	);
 
-				exposeOriginateTask(context, output, folders, i18n);
+	helper.exposeOriginateTask();
+	helper.exposeRefreshSandBoxDataCommand();
+	helper.exposeShowEntrypointParametersCommand();
+	helper.exposeShowOperationDetailsCommand();
 
-				try {
-					createWatcherIfNotExists(context, output, i18n, projectDir, addConfigWatcherIfNotExists);
-				} catch (error: unknown) {
-					logAllNestedErrors(error, output);
-				}
-			});
-	}
+	helper.createTreeViews();
 
-	// If the developer changes their workspace folders,
-	// then the list of taqified projects might have changed,
-	// and therefore the list of tasks we're aware of might
-	// have changed as well. We're best to reload.
-	// 	vscode.workspace.onDidChangeWorkspaceFolders(_ => {
-	// 		vscode.window.showWarningMessage("As the list of projects has changed, Taqueria will need to reload.")
-	// 		.then(_ => vscode.window.showQuickPick(["yes", "no"], {
-	// 			canPickMany: false,
-	// 			placeHolder: "Reload now?",
-	// 			title: "Reload this window?"
-	// 		}))
-	// 		.then(input => {
-	// 			if (input) return vscode.commands.executeCommand("workbench.action.reloadWindow")
-	// 		})
-	// 	})
+	deps.vscode.workspace.onDidChangeWorkspaceFolders(e => {
+		e.added.forEach(folder => {
+			try {
+				helper.createWatcherIfNotExists(folder.uri.fsPath, addConfigWatcherIfNotExists);
+			} catch (error: unknown) {
+				helper.logAllNestedErrors(error);
+			}
+		});
+	});
+
+	deps.vscode.workspace.workspaceFolders?.forEach(folder => {
+		try {
+			helper.createWatcherIfNotExists(folder.uri.fsPath, addConfigWatcherIfNotExists);
+		} catch (error: unknown) {
+			helper.logAllNestedErrors(error);
+		}
+	});
+	await helper.registerDataProviders();
+	helper.updateCommandStates();
 }
 
 export function deactivate() {

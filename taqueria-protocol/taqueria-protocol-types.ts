@@ -1,108 +1,36 @@
-import * as Alias from '@taqueria/protocol/Alias';
-import * as Config from '@taqueria/protocol/Config';
-import * as EconomicalProtocolHash from '@taqueria/protocol/EconomicalProtocolHash';
-import * as Environment from '@taqueria/protocol/Environment';
-import * as EphemeralState from '@taqueria/protocol/EphemeralState';
-import * as HumanReadableIdentifier from '@taqueria/protocol/HumanReadableIdentifier';
-import * as i18n from '@taqueria/protocol/i18n';
-import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
-import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
-import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
-import * as Operation from '@taqueria/protocol/Operation';
-import * as Option from '@taqueria/protocol/Option';
-import * as ParsedOperation from '@taqueria/protocol/ParsedOperation';
-import * as ParsedPluginInfo from '@taqueria/protocol/ParsedPluginInfo';
-import * as PersistentState from '@taqueria/protocol/PersistentState';
-import * as PluginInfo from '@taqueria/protocol/PluginInfo';
-import * as PositionalArg from '@taqueria/protocol/PositionalArg';
-import * as RequestArgs from '@taqueria/protocol/RequestArgs';
-import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
-import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
-import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
-import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
-import * as SanitizedPath from '@taqueria/protocol/SanitizedPath';
-import * as SHA256 from '@taqueria/protocol/SHA256';
-import * as TaqError from '@taqueria/protocol/TaqError';
-import * as Task from '@taqueria/protocol/Task';
-import * as Url from '@taqueria/protocol/Url';
-import * as Verb from '@taqueria/protocol/Verb';
-import * as VersionNumber from '@taqueria/protocol/VersionNumber';
-export interface RuntimeDependency {
-	readonly name: string;
-	readonly path: string;
-	readonly version: string;
-	readonly kind: 'required' | 'optional';
-}
-
-export type PluginActionName =
-	| 'checkRuntimeDependencies'
-	| 'installRuntimeDependencies'
-	| 'proxy'
-	| 'pluginInfo'
-	| string;
-
-export type PluginProxyAction = Task.t;
-
-export type PluginAction = 'checkRuntimeDependencies' | 'installRuntimeDependencies' | 'pluginInfo' | PluginProxyAction;
-
-export interface RuntimeDependencyReport extends RuntimeDependency {
-	readonly met: boolean;
-}
-
-export interface CheckRuntimeDependenciesResponse {
-	readonly report: RuntimeDependencyReport[];
-}
-
-export interface InstallRuntimeDependenciesResponse {
-	readonly report: RuntimeDependencyReport[];
-}
-
-export type PluginActionNotSupportedResponse = {
-	readonly status: 'notSupported';
-	readonly msg: string;
-};
-
-export interface PluginJsonResponse {
-	readonly data?: unknown;
-	readonly render?: 'none' | 'string' | 'table';
-}
-
-export type PluginResponse =
-	| PluginJsonResponse
-	| CheckRuntimeDependenciesResponse
-	| InstallRuntimeDependenciesResponse
-	| PluginInfo.t
-	| PluginActionNotSupportedResponse
-	| void;
-
-export {
-	Alias,
-	Config,
-	EconomicalProtocolHash,
-	Environment,
-	EphemeralState,
-	HumanReadableIdentifier,
-	i18n,
-	InstalledPlugin,
-	LoadedConfig,
-	NetworkConfig,
-	Operation,
-	Option,
-	ParsedOperation,
-	ParsedPluginInfo,
-	PersistentState,
-	PluginInfo,
-	PositionalArg,
-	RequestArgs,
-	SandboxAccountConfig,
-	SandboxConfig,
-	SanitizedAbsPath,
-	SanitizedArgs,
-	SanitizedPath,
-	SHA256,
-	TaqError,
-	Task,
-	Url,
-	Verb,
-	VersionNumber,
-};
+export * as Alias from '@taqueria/protocol/Alias';
+export * as Config from '@taqueria/protocol/Config';
+export * as EconomicalProtocolHash from '@taqueria/protocol/EconomicalProtocolHash';
+export * as Environment from '@taqueria/protocol/Environment';
+export * as EphemeralState from '@taqueria/protocol/EphemeralState';
+export * as HumanReadableIdentifier from '@taqueria/protocol/HumanReadableIdentifier';
+export * as i18n from '@taqueria/protocol/i18n';
+export * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
+export * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
+export * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
+export * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
+export * as Operation from '@taqueria/protocol/Operation';
+export * as Option from '@taqueria/protocol/Option';
+export * as ParsedOperation from '@taqueria/protocol/ParsedOperation';
+export * as ParsedTemplate from '@taqueria/protocol/ParsedTemplate';
+export * as PersistentState from '@taqueria/protocol/PersistentState';
+export * as PluginActionName from '@taqueria/protocol/PluginActionName';
+export * as PluginInfo from '@taqueria/protocol/PluginInfo';
+export * as PluginJsonResponse from '@taqueria/protocol/PluginJsonResponse';
+export * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
+export * as PluginSchema from '@taqueria/protocol/PluginSchema';
+export * as PositionalArg from '@taqueria/protocol/PositionalArg';
+export * as RequestArgs from '@taqueria/protocol/RequestArgs';
+export * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
+export * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
+export * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
+export * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
+export * as SanitizedPath from '@taqueria/protocol/SanitizedPath';
+export * as ScaffoldConfig from '@taqueria/protocol/ScaffoldConfig';
+export * as SHA256 from '@taqueria/protocol/SHA256';
+export * as TaqError from '@taqueria/protocol/TaqError';
+export * as Task from '@taqueria/protocol/Task';
+export * as Template from '@taqueria/protocol/Template';
+export * as Url from '@taqueria/protocol/Url';
+export * as Verb from '@taqueria/protocol/Verb';
+export * as VersionNumber from '@taqueria/protocol/VersionNumber';

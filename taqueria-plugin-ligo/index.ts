@@ -1,5 +1,6 @@
-import { Option, Plugin, Task } from '@taqueria/node-sdk';
-import compile from './compile';
+import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
+import createContract from './createContract';
+import ligo from './ligo';
 
 Plugin.create(i18n => ({
 	schema: '1.0',
@@ -8,41 +9,43 @@ Plugin.create(i18n => ({
 	tasks: [
 		Task.create({
 			task: 'compile',
-			command: 'compile [sourceFile]',
+			command: 'compile <sourceFile>',
 			aliases: ['c', 'compile-ligo'],
-			description: 'Compile a smart contract written in a Ligo syntax to Michelson code',
-			options: [
-				Option.create({
-					shortFlag: 'e',
-					flag: 'entrypoint',
-					description: 'The entry point that will be compiled',
-				}),
-				Option.create({
-					shortFlag: 's',
-					flag: 'syntax',
-					description: 'The syntax used in the contract',
-				}),
-				Option.create({
-					shortFlag: 'i',
-					flag: 'infer',
-					description: 'Enable type inference',
-				}),
-			],
+			description:
+				'Compile a smart contract written in a LIGO syntax to Michelson code, along with its associated storages and parameters files if they are found',
+			handler: 'proxy',
+			encoding: 'json',
+		}),
+		Task.create({
+			task: 'test',
+			command: 'test <sourceFile>',
+			description: 'Test a smart contract written in LIGO',
 			handler: 'proxy',
 			encoding: 'json',
 		}),
 	],
-	checkRuntimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			report: [
-				{ name: 'LIGO', path: 'ligo', version: '>=0.27.0', kind: 'required', met: true },
+	templates: [
+		Template.create({
+			template: 'contract',
+			command: 'contract <sourceFileName>',
+			description: 'Create a LIGO contract with boilerplate code',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'sourceFileName',
+					type: 'string',
+					description: 'The name of the LIGO contract to generate',
+				}),
 			],
+			options: [
+				Option.create({
+					shortFlag: 's',
+					flag: 'syntax',
+					type: 'string',
+					description: 'The syntax used in the contract',
+				}),
+			],
+			handler: createContract,
 		}),
-	installRunTimeDependencies: () =>
-		Promise.resolve({
-			status: 'success',
-			output: 'LIGO was found in /usr/bin/ligo', // TODO this should use i18n
-		}),
-	proxy: compile,
+	],
+	proxy: ligo,
 }), process.argv);

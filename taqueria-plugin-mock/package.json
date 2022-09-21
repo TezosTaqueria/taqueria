@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-mock",
-	"version": "0.6.5",
+	"version": "0.18.0",
 	"description": "A plugin used to test Taqueria",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
@@ -22,6 +22,6 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.6.2"
+		"@taqueria/node-sdk": "^0.18.0"
 	}
 }

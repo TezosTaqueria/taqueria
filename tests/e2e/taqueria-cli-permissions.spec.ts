@@ -31,6 +31,11 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
 		await exec(`cp e2e/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
 
+		// Register the contracts
+		await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
+		await exec(`taq add-contract increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
+		await exec(`taq add-contract hello-tacos.py`, { cwd: `./${taqueriaProjectPath}` });
+
 		if (operatingSystem == `Linux`) {
 			userGroup = (await exec(`id -g -n ${username}`)).stdout.trim();
 		}
@@ -48,7 +53,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 	});
 
 	test('testing that ligo artifacts will have the correct permissions', async () => {
-		await exec(`taq compile --plugin ligo`, { cwd: `./${taqueriaProjectPath}` });
+		await exec(`taq compile --plugin ligo increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
 		const fileUser = await exec(`${userStatCommand} ${taqueriaProjectPath}/artifacts/increment.tz`);
 		const fileGroup = await exec(`${groupStatCommand} ${taqueriaProjectPath}/artifacts/increment.tz`);
 
@@ -97,7 +102,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 	});
 
 	test('testing that type generation artifacts will have the correct permissions', async () => {
-		await exec(`taq compile --plugin ligo`, { cwd: `./${taqueriaProjectPath}` });
+		await exec(`taq compile --plugin ligo increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
 		await exec(`taq generate types`, { cwd: `./${taqueriaProjectPath}` });
 
 		const incrementCodeUser = await exec(`${userStatCommand} ${taqueriaProjectPath}/types/increment.code.ts`);

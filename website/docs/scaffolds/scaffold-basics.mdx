@@ -1,0 +1,45 @@
+---
+title: Scaffold Basics
+---
+
+Taqueria provides support for scaffold projects. These projects offer a quick and easy way to clone and launch Taqueria projects that can be used for learning or as a starting point for your own projects
+
+Scaffolds are Taqueria projects that come with Taqueria already installed and configured. They can be accessed directly in Taqueria with the `taq scaffold` task which clones, initializes, and sets-up the project with a single command. Some scaffolds are full stack projects, while others are focused on smart contract development
+
+## The `taq scaffold` task
+
+Scaffolding is done through the `taq scaffold` task 
+
+:::note
+This task is hidden when the current working directory is already a Taqueria project
+:::
+
+The structure of the task is:
+
+```shell
+taq scaffold <scaffoldUrl> [destinationDir]
+```
+
+## Building and Starting Scaffolds
+
+During the scaffolding process, a setup script is run. This will install the required dependencies and set-up the project. To run the setup script manually, change into the project directory and run:
+
+```shell
+npm run setup
+```
+
+To start the project, run:
+
+```shell
+npm run setup
+```
+
+## Available scaffolds
+
+The following scaffolds are currently available:
+
+| Name                         | URL                                                      | Description                                            |
+|------------------------------|----------------------------------------------------------|--------------------------------------------------------|
+| taqueria-scaffold-quickstart | https://github.com/ecadlabs/taqueria-scaffold-quickstart | Full stack dApp with the counter contract              |
+| taqueria-scaffold-taco-shop  | https://github.com/ecadlabs/taqueria-scaffold-taco-shop  | Full stack dApp with a simple contract to sell tacos   |
+| taqueria-scaffold-nft        | https://github.com/ecadlabs/taqueria-scaffold-nft        | A Taqueria project for developing NFT                  |
