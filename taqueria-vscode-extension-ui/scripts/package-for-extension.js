@@ -10,10 +10,10 @@ export const run = async () => {
 	const interopContent = await fs.readFile(sourceInteropFilePath, { encoding: `utf-8` });
 	const tsIndexHtml = `
 // DO NOT EDIT - THIS FILE IS GENERATED 
-${interopContent.replace(`{{WEB_UI_INDEX_HTML}}`, indexHtmlContent.replace(/`/g, '\\`'))}
+${interopContent.replace(`\`{{WEB_UI_INDEX_HTML}}\``, JSON.stringify(indexHtmlContent))}
 `.trim();
 
-	await fs.mkdir(path.dirname(destDirPath));
+	await fs.mkdir(path.dirname(destDirPath), { recursive: true });
 	await fs.writeFile(destDirPath, tsIndexHtml);
 };
 
