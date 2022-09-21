@@ -8,10 +8,10 @@ const state = {
 	logs: [] as { message: string; data?: unknown }[],
 };
 
-const log = (message: string, data?: unknown) => {
-	state.logs.push({ message, data });
-};
-console.log = log;
+// const log = (message: string, data?: unknown) => {
+// 	state.logs.push({ message, data });
+// };
+// console.log = log;
 
 const setGlobalInteropMessageInterface = (x: InteropMessageInterface) => {
 	state.interop = x;
@@ -78,7 +78,7 @@ const DefaultView = () => {
 			return;
 		}
 
-		// Simulate loading
+		// Simulate loading during development
 		setTimeout(() => {
 			setGlobalInteropMessageInterface({
 				view: 'MichelineEditor',

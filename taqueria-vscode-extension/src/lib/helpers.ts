@@ -1488,6 +1488,7 @@ export class VsCodeHelper {
 						michelineJsonObj: jsonParameters,
 					},
 					onMessage: x => {
+						console.log('vscode-TAQ: entrypointParameter: onMessage', { x });
 					},
 				},
 			});
