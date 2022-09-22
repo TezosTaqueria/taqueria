@@ -6,7 +6,7 @@ import * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 import * as Tz from '@taqueria/protocol/Tz';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 
 export const pluginsRawSchema = z.preprocess(
 	val => val ?? [],
@@ -26,22 +26,14 @@ export const pluginsInternalSchema = z.preprocess(
 
 const networkMap = z
 	.record(
-		z.union([
-			NetworkConfig.schemas.schema,
-			z.string({ description: 'config.network' })
-				.nonempty('Default network must reference the name of an  existing network configuration.'),
-		]),
+		NetworkConfig.schemas.schema,
 		{ description: 'Network configurations' },
 	)
 	.optional();
 
 const sandboxMap = z
 	.record(
-		z.union([
-			SandboxConfig.schemas.schema,
-			z.string({ description: 'config.sandbox' })
-				.min(1, 'Default sandbox must reference the name of an existing sandbox configuration.'),
-		]),
+		SandboxConfig.schemas.schema,
 		{ description: 'Sandbox configurations' },
 	)
 	.optional();
@@ -108,22 +100,10 @@ export const internalSchema = commonSchema.extend({
 export const rawSchema = commonSchema.extend({
 	plugins: pluginsRawSchema.optional(),
 	network: z
-		.record(
-			z.union([
-				NetworkConfig.rawSchema,
-				z.string({ description: 'config.network' })
-					.min(1, 'Default network must reference the name of an  existing network configuration.'),
-			]),
-		)
+		.record(NetworkConfig.rawSchema)
 		.optional(),
 	sandbox: z
-		.record(
-			z.union([
-				SandboxConfig.rawSchema,
-				z.string({ description: 'config.sandbox' })
-					.min(1, 'Default sandbox must reference the name of an existing sandbox configuration.'),
-			]),
-		)
+		.record(SandboxConfig.rawSchema)
 		.optional(),
 	environment: z
 		.record(
@@ -149,7 +129,20 @@ type Input = z.infer<typeof internalSchema>;
 export const { schemas: generatedSchemas, factory } = createType<RawInput, Input>({
 	rawSchema,
 	internalSchema,
-	parseErrMsg: (value: unknown) => `${value} is not a configuration`,
+	parseErrMsg: (_value, previous) => {
+		if (previous instanceof ZodError) {
+			const msgs: string[] = previous.errors.reduce(
+				(retval, issue) => {
+					const path = issue.path.join(' → ');
+					const msg = `⨯ ${path}: ${issue.message}`;
+					return [...retval, msg];
+				},
+				[`Your .taq/config.json file is invalid:`],
+			);
+			return msgs.join('\n') + '\n';
+		}
+		return `Your .taq/config.json file is invalid.`;
+	},
 	unknownErrMsg: 'Something went wrong trying to parse your configuration',
 });
 
