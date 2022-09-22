@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MichelineEditor } from './data-editors/MichelineEditor';
-import { InteropMessageInterface } from './interop';
+import { InteropMessageInterface } from './interopTypes';
 
 const state = {
 	interop: undefined as undefined | InteropMessageInterface,

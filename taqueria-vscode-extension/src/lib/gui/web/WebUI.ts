@@ -1,4 +1,5 @@
 // DO NOT EDIT - THIS FILE IS GENERATED
+
 export type InteropMessageInterface =
 	| {
 		view: 'None';
