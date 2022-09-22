@@ -10,6 +10,7 @@ import path, { join } from 'path';
 import { uniq } from 'rambda';
 import * as semver from 'semver';
 import * as api from 'vscode';
+import { sleep } from '../test/suite/utils/utils';
 import { ArtifactsDataProvider, ArtifactTreeItem } from './gui/ArtifactsDataProvider';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
@@ -29,6 +30,7 @@ import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckD
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
 import { getLanguageInfoForFileName, getSupportedSmartContractExtensions } from './SmartContractLanguageInfo';
+import downloadAndInstallTaqCLI from './TaqInstaller';
 import { TaqVsxError } from './TaqVsxError';
 
 export const COMMAND_PREFIX = 'taqueria.';
@@ -296,8 +298,30 @@ export class VsCodeHelper {
 
 	exposeInstallTaqCliCommand() {
 		this.registerCommand(COMMAND_PREFIX + 'install_taq_cli', async () => {
-			this.vscode.window.showInformationMessage('WIP: install taq cli');
-			// TODO: heavy machinery to implement here
+			await this.vscode.window.withProgress({
+				location: this.vscode.ProgressLocation.Notification,
+				cancellable: false,
+				title: `Installing Taq CLI...`,
+			}, async progress => {
+				progress.report({ increment: 0 });
+				try {
+					const hasInstalled = await downloadAndInstallTaqCLI();
+					if (hasInstalled) {
+						this.vscode.window.showInformationMessage(`Successfully installed Taq CLI.`);
+					} else {
+						this.vscode.window.showWarningMessage(
+							`Some issues occurred while installing Taq CLI. Please check the Taqueria Log window for diagnostics information.`,
+						);
+					}
+				} catch (e: unknown) {
+					this.vscode.window.showErrorMessage(
+						`Error while installing Taq CLI. Please check the Taqueria Log window for diagnostics information.`,
+					);
+					this.logAllNestedErrors(e);
+				} finally {
+					progress.report({ increment: 100 });
+				}
+			});
 		});
 	}
 
