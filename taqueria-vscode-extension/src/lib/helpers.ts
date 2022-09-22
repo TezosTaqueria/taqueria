@@ -29,6 +29,7 @@ import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProv
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
+import { execCmd } from './pure';
 import { getLanguageInfoForFileName, getSupportedSmartContractExtensions } from './SmartContractLanguageInfo';
 import downloadAndInstallTaqCLI from './TaqInstaller';
 import { TaqVsxError } from './TaqVsxError';
@@ -305,7 +306,7 @@ export class VsCodeHelper {
 			}, async progress => {
 				progress.report({ increment: 0 });
 				try {
-					const hasInstalled = await downloadAndInstallTaqCLI();
+					const hasInstalled = await this.downloadAndInstallTaqCLI();
 					if (hasInstalled) {
 						this.vscode.window.showInformationMessage(`Successfully installed Taq CLI.`);
 					} else {
@@ -1587,5 +1588,60 @@ export class VsCodeHelper {
 			const jsonParameters = item.operation;
 			this.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});
+	}
+
+	/**
+	 * @returns true if installed successfully, false is not installed
+	 */
+	async downloadAndInstallTaqCLI(): Promise<boolean> {
+		// 1. Detect platform
+		switch (process.platform) {
+			case 'linux':
+				return this.performDownloadingAndInstallTaqCLI('https://taqueria.io/get/linux/taq');
+			case 'darwin':
+				return this.performDownloadingAndInstallTaqCLI('https://taqueria.io/get/macos/taq');
+			default:
+				this.showLog(OutputLevels.warn, `Taqueria CLI is not supported on ${process.platform}`);
+				return false;
+		}
+	}
+
+	private async performDownloadingAndInstallTaqCLI(taqDownloadUrl: string): Promise<boolean> {
+		// 2. Download binary
+		const { executionError: curlError } = await execCmd(`curl -LO ${taqDownloadUrl}`, this.getLog());
+		if (curlError) {
+			this.showLog(OutputLevels.error, `Failed to download Taqueria CLI: ${curlError}`);
+			return false;
+		}
+		this.showLog(OutputLevels.debug, `Taqueria CLI downloaded successfully`);
+
+		// 3. Chmod +x
+		const { executionError: chmodError } = await execCmd(`chmod +x taq`, this.getLog());
+		if (chmodError) {
+			this.showLog(OutputLevels.error, `Failed to make Taqueria CLI executable: ${chmodError}`);
+			return false;
+		}
+		this.showLog(OutputLevels.debug, `Taqueria CLI made executable successfully`);
+
+		// 4. Move to usr bin
+		const { executionError: moveError } = await execCmd(`sudo mv taq /usr/local/bin`, this.getLog());
+		if (moveError) {
+			this.showLog(OutputLevels.error, `Failed to move Taqueria CLI to /usr/local/bin: ${moveError}`);
+			return false;
+		}
+		this.showLog(OutputLevels.debug, `Taqueria CLI moved to /usr/local/bin successfully`);
+
+		// 5. Check if taq is reachable
+		const { executionError: checkError } = await execCmd(`taq --version`, this.getLog());
+		if (checkError) {
+			this.showLog(OutputLevels.error, `Failed to check Taqueria CLI: ${checkError}`);
+			return false;
+		}
+		this.showLog(OutputLevels.info, `Taqueria CLI installed successfully`);
+
+		// 6. Catch no sudo permission and prompt for password
+		// TODO: try-catch
+
+		return true;
 	}
 }
