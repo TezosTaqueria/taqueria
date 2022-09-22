@@ -134,7 +134,7 @@ export const { schemas: generatedSchemas, factory } = createType<RawInput, Input
 			const msgs: string[] = previous.errors.reduce(
 				(retval, issue) => {
 					const path = issue.path.join(' → ');
-					const msg = `⨯ ${path}: ${issue.message}`;
+					const msg = `  ${path}: ${issue.message}`;
 					return [...retval, msg];
 				},
 				[`Your .taq/config.json file is invalid:`],
