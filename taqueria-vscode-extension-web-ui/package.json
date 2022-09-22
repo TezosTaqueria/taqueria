@@ -1,5 +1,5 @@
 {
-	"name": "taqueria-vscode-extension-ui",
+	"name": "taqueria-vscode-extension-web-ui",
 	"private": true,
 	"version": "0.0.0",
 	"type": "module",
