@@ -294,6 +294,13 @@ export class VsCodeHelper {
 		});
 	}
 
+	exposeInstallTaqCliCommand() {
+		this.registerCommand(COMMAND_PREFIX + 'install_taq_cli', async () => {
+			this.vscode.window.showInformationMessage('WIP: install taq cli');
+			// TODO: heavy machinery to implement here
+		});
+	}
+
 	tryFormattingAsTable(json: string): string {
 		let data: unknown = undefined;
 		try {
