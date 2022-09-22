@@ -1,7 +1,7 @@
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import util from 'util';
-import { generateTestProject, getContainerName } from './utils/utils';
+import { generateTestProject, sleep } from './utils/utils';
 const exec = util.promisify(exec1);
 import * as contents from './data/help-contents/typechecker-simulator-contents';
 
@@ -16,6 +16,7 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 			`cp e2e/data/config-tezos-client-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
 		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+		await sleep(2500);
 	});
 
 	test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {

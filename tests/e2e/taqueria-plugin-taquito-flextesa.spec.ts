@@ -41,7 +41,9 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
+		console.log(deployCommand);
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
+		console.log(deployResponse);
 
 		// 2. Verify that contract has been originated on the network
 		expect(deployResponse).toContain('hello-tacos.tz');
@@ -51,8 +53,12 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(contractHash).toMatch(contractRegex);
 
 		// 3. Verify that contract has been originated to the network and contains storage
+		const configContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		);
+		const port = configContents.sandbox.local.rpcUrl;
 		const contractFromSandbox = await exec(
-			`curl http://localhost:20000/chains/main/blocks/head/context/contracts/${contractHash}`,
+			`curl ${port}/chains/main/blocks/head/context/contracts/${contractHash}`,
 		);
 		expect(contractFromSandbox.stdout).toContain('"balance":"0"');
 		expect(contractFromSandbox.stdout).toContain('"storage":{"int":"12"}');
@@ -80,8 +86,12 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			expect(contractHash).toMatch(contractRegex);
 
 			// 3. Verify that contract has been originated to the network
+			const configContents = JSON.parse(
+				await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+			);
+			const port = configContents.sandbox.local.rpcUrl;
 			const contractFromSandbox = await exec(
-				`curl http://localhost:20000/chains/main/blocks/head/context/contracts/${contractHash}`,
+				`curl ${port}/chains/main/blocks/head/context/contracts/${contractHash}`,
 			);
 			expect(contractFromSandbox.stdout).toContain('"balance":"0"');
 			expect(contractFromSandbox.stdout).toContain('"storage":{"int":"12"}');
@@ -186,7 +196,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// Comment if need to debug
 	afterAll(async () => {
 		const dockerContainer = await getContainerName(dockerName);
-
 		try {
 			await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (e: unknown) {

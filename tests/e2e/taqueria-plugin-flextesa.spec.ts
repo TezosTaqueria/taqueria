@@ -1,7 +1,7 @@
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import util from 'util';
-import { generateTestProject, getContainerID, getContainerName } from './utils/utils';
+import { generateTestProject, getContainerID, getContainerName, sleep } from './utils/utils';
 const exec = util.promisify(exec1);
 import * as flexContents from './data/help-contents/flextesa-contents';
 
@@ -102,6 +102,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 
 			// 5.  Run stop command and verify the output
 			const sandboxStop = await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+			await sleep(2500);
 
 			// 5. Verify that taqueria returns proper message into console
 			expect(sandboxStop.stdout).toContain(`Stopped ${sandboxName}.\n`);
