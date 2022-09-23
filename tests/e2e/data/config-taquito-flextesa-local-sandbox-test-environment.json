@@ -38,7 +38,12 @@
 		"local": {
 			"label": "Local Ithaca Tezos Sandbox",
 			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
-			"rpcUrl": "http://localhost:20040"
+			"rpcUrl": "http://localhost:20040",
+			"tzkt": {
+				"disableAutostartWithSandbox": false,
+				"postgresqlPort": 5442,
+				"apiPort": 5010
+			}
 		}
 	},
 	"network": {},
