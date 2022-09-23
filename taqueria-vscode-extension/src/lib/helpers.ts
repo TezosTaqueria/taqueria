@@ -1,5 +1,6 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { TaqError } from '@taqueria/protocol/TaqError';
+import { Config } from '@taqueria/protocol/taqueria-protocol-types';
 import { spawn } from 'child_process';
 import Table from 'cli-table3';
 import { readFile } from 'fs/promises';
@@ -27,6 +28,7 @@ import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProv
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
+import { getLanguageInfoForFileName, getSupportedSmartContractExtensions } from './SmartContractLanguageInfo';
 import { TaqVsxError } from './TaqVsxError';
 
 export const COMMAND_PREFIX = 'taqueria.';
@@ -34,13 +36,12 @@ export const COMMAND_PREFIX = 'taqueria.';
 const minNodeVersion = '16.13.1';
 
 export enum Commands {
-	init = 'taqueria.init',
-	scaffold = 'taqueria.scaffold',
-	install = 'taqueria.install',
-	uninstall = 'taqueria.uninstall',
-	optIn = 'taqueria.optIn',
-	optOut = 'taqueria.optOut',
-	originate = 'taqueria.originate',
+	init = 'init',
+	scaffold = 'scaffold',
+	install = 'install',
+	uninstall = 'uninstall',
+	optIn = 'optIn',
+	optOut = 'optOut',
 }
 
 export enum OutputLevels {
@@ -288,7 +289,7 @@ export class VsCodeHelper {
 	}
 
 	exposeRefreshCommand() {
-		this.registerCommand(COMMAND_PREFIX + 'refresh_command_states', async () => {
+		this.registerCommand('refresh_command_states', async () => {
 			await this.updateCommandStates();
 		});
 	}
@@ -481,6 +482,14 @@ export class VsCodeHelper {
 		];
 	}
 
+	private getCompilerPlugins() {
+		return [
+			'@taqueria/plugin-archetype',
+			'@taqueria/plugin-ligo',
+			'@taqueria/plugin-smartpy',
+		];
+	}
+
 	async getAvailablePlugins() {
 		try {
 			const HOME_DIR = process.env.HOME;
@@ -576,33 +585,18 @@ export class VsCodeHelper {
 		return fileName.replace(/\.[^/.]+$/, '') + '.tz';
 	}
 
-	async exposeOriginateTask() {
+	async exposeOriginateTask(cmdId: string, fileSelectionBehavior: 'getFromCommand' | 'currentFile' | 'openDialog') {
 		this.registerCommand(
-			Commands.originate,
-			async (arg?: ArtifactTreeItem | EnvironmentTreeItem | api.Uri | undefined) => {
+			cmdId,
+			async (arg?: HasFileName | EnvironmentTreeItem | api.Uri | undefined) => {
 				const { config, pathToDir } = this.observableConfig.currentConfig;
 				if (!config || !pathToDir) {
 					return;
 				}
+				const artifactsFolder = path.join(pathToDir, config.config.artifactsDir ?? 'artifacts');
 				let environmentName: string | undefined = undefined;
-				let fileName: string | undefined = undefined;
-				if (arg) {
-					if (arg instanceof EnvironmentTreeItem) {
-						environmentName = arg.environmentName;
-					}
-					if (arg instanceof ArtifactTreeItem) {
-						fileName = arg.fileName;
-					}
-					if (arg instanceof api.Uri) {
-						fileName = await this.getRelativeFilePath(arg, 'artifacts');
-						if (!fileName) {
-							this.showLog(
-								OutputLevels.warn,
-								`Could not determine relative filename for ${arg.path}, canceling originate command.`,
-							);
-							return;
-						}
-					}
+				if (arg && arg instanceof EnvironmentTreeItem) {
+					environmentName = arg.environmentName;
 				}
 				if (!environmentName) {
 					const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
@@ -620,24 +614,16 @@ export class VsCodeHelper {
 						}
 					}
 				}
+				const fileName = await this.getFileNameForOriginateOrCompile(
+					cmdId,
+					fileSelectionBehavior,
+					artifactsFolder,
+					config,
+					'originate',
+					arg instanceof EnvironmentTreeItem ? undefined : arg,
+				);
 				if (!fileName) {
-					const artifactsFolder = path.join(pathToDir, config.config?.artifactsDir ?? 'artifacts');
-					const artifactsFolderUri = api.Uri.file(artifactsFolder);
-					const file = await this.vscode.window.showOpenDialog({
-						canSelectFiles: true,
-						canSelectFolders: false,
-						canSelectMany: false,
-						defaultUri: artifactsFolderUri,
-						openLabel: 'Originate',
-						title: 'Select contract to originate',
-						filters: {
-							'Contract Files': ['*.tz'],
-						},
-					});
-					if (!file) {
-						return;
-					}
-					fileName = path.relative(artifactsFolder, file[0].path);
+					return;
 				}
 				await this.proxyToTaqAndShowOutput(
 					`originate -e ${environmentName} ${fileName ?? ''}`,
@@ -662,7 +648,7 @@ export class VsCodeHelper {
 
 	registerCommand(cmdId: string, callback: (...args: any[]) => any) {
 		this.context.subscriptions.push(
-			this.vscode.commands.registerCommand(cmdId, async (...args: any[]) => {
+			this.vscode.commands.registerCommand(COMMAND_PREFIX + cmdId, async (...args: any[]) => {
 				try {
 					const result = callback(...args);
 					if (result.then) {
@@ -735,7 +721,7 @@ export class VsCodeHelper {
 	}
 
 	exposeTypecheckCommand() {
-		this.registerCommand(COMMAND_PREFIX + 'typecheck', async (arg: SandboxTreeItem | ContractTreeItem | undefined) => {
+		this.registerCommand('typecheck', async (arg: SandboxTreeItem | ContractTreeItem | undefined) => {
 			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
 			if (projectDir === undefined) {
 				return;
@@ -888,37 +874,118 @@ export class VsCodeHelper {
 		);
 	}
 
-	exposeTaqTaskAsCommandWithOptionalFileArgument(
+	exposeCompileCommand(
 		cmdId: string,
-		taskWithArgs: string,
-		outputTo: 'output' | 'notify',
-		taskTitles: TaskTitles,
+		fileSelectionBehavior: 'getFromCommand' | 'currentFile' | 'openDialog',
+		compilerPlugin?: string,
 	) {
 		this.registerCommand(
 			cmdId,
 			async (item?: HasFileName | api.Uri | undefined) => {
-				let fileName: string | undefined;
-				if (instanceOfHasFileName(item)) {
-					fileName = item.fileName;
-				} else if (item instanceof api.Uri) {
-					fileName = await this.getRelativeFilePath(item, 'contracts');
-					if (!fileName) {
-						this.showLog(
-							OutputLevels.warn,
-							`Could not determine relative filename for ${item.path}, canceling ${cmdId} command.`,
-						);
-						return;
-					}
+				const { config, pathToDir } = this.observableConfig.currentConfig;
+				if (!config || !pathToDir) {
+					this.showLog(
+						OutputLevels.warn,
+						`Could not determine current project folder.`,
+					);
+					return;
+				}
+				const contractsFolder = path.join(pathToDir, config.config.contractsDir ?? 'contracts');
+				const fileName = await this.getFileNameForOriginateOrCompile(
+					cmdId,
+					fileSelectionBehavior,
+					contractsFolder,
+					config,
+					'compile',
+					item,
+				);
+				if (!fileName) {
+					return;
 				}
 				this.showLog(OutputLevels.debug, `Running command ${cmdId} for ${fileName}`);
+				const taskWithArgs = `--plugin ${compilerPlugin ?? getLanguageInfoForFileName(fileName)?.compilerName} compile`;
 				await this.proxyToTaqAndShowOutput(
-					item ? `${taskWithArgs} ${fileName}` : taskWithArgs,
-					taskTitles,
+					`${taskWithArgs} ${fileName}`,
+					{
+						finishedTitle: `compiled contract ${fileName}`,
+						progressTitle: `compiling contract ${fileName}`,
+					},
 					undefined,
-					outputTo === 'output',
+					true,
 				);
 			},
 		);
+	}
+
+	async getFileNameForOriginateOrCompile(
+		cmdId: string,
+		fileSelectionBehavior: 'getFromCommand' | 'currentFile' | 'openDialog',
+		expectedContractsOrArtifactsFolder: string,
+		config: Util.TaqifiedDir,
+		commandTitle: 'compile' | 'originate',
+		item?: HasFileName | api.Uri | undefined,
+	) {
+		if (fileSelectionBehavior === 'getFromCommand') {
+			if (instanceOfHasFileName(item)) {
+				return item.fileName;
+			} else if (item instanceof api.Uri) {
+				const fileName = path.relative(expectedContractsOrArtifactsFolder, item.path);
+				if (!fileName) {
+					this.showLog(
+						OutputLevels.warn,
+						`Could not determine relative filename for ${item.path}, canceling ${cmdId} command.`,
+					);
+				}
+				return fileName;
+			} else {
+				this.showLog(
+					OutputLevels.warn,
+					`File to be ${commandTitle}d was not passed to command or could not determine relative filename for ${
+						JSON.stringify(item, null, 2)
+					}, canceling ${cmdId} command.`,
+				);
+				return;
+			}
+		} else if (fileSelectionBehavior === 'currentFile') {
+			let absoluteFilePath = this.vscode.window.activeTextEditor?.document.uri.path;
+			if (!absoluteFilePath) {
+				this.showLog(
+					OutputLevels.warn,
+					`No file is open in the text editor.`,
+				);
+				return;
+			}
+			return path.relative(expectedContractsOrArtifactsFolder, absoluteFilePath);
+		} else if (fileSelectionBehavior === 'openDialog') {
+			const fileNames = await this.vscode.window.showOpenDialog({
+				canSelectFiles: true,
+				canSelectFolders: false,
+				canSelectMany: false,
+				defaultUri: api.Uri.file(expectedContractsOrArtifactsFolder),
+				filters: {
+					'All Supported Contracts': commandTitle === 'originate'
+						? ['tz']
+						: getSupportedSmartContractExtensions(config).map(extension => extension.replace('.', '')),
+					'All Files': ['*'],
+				},
+				openLabel: commandTitle,
+				title: `Select a smart contract file to ${commandTitle}`,
+			});
+			if (!fileNames) {
+				this.showLog(
+					OutputLevels.debug,
+					`The user canceled out of ${commandTitle} process.`,
+				);
+				return;
+			}
+			return path.relative(expectedContractsOrArtifactsFolder, fileNames[0].path);
+		} else {
+			this.showLog(
+				OutputLevels.warn,
+				`Unknown file mode for ${commandTitle} command.`,
+			);
+			return;
+		}
 	}
 
 	private async getRelativeFilePath(uri: api.Uri, folder: 'contracts' | 'artifacts') {
@@ -982,7 +1049,7 @@ export class VsCodeHelper {
 
 	exposeRunTestCommand() {
 		this.registerCommand(
-			COMMAND_PREFIX + 'run_tests',
+			'run_tests',
 			async (item: TestTreeItem) => {
 				const folder = item.relativePath;
 				await this.proxyToTaqAndShowOutput(
@@ -1166,6 +1233,22 @@ export class VsCodeHelper {
 			this.showLog(OutputLevels.trace, `plugins ${plugin}: ${found}`);
 			this.vscode.commands.executeCommand('setContext', plugin, enableAllCommands || found);
 		}
+		const installedCompilers = this.getCompilerPlugins().filter(compiler =>
+			config?.config?.plugins?.find(plugin => plugin.name === compiler) !== undefined
+		)
+			.map(pluginName => pluginName.replace('@taqueria/plugin-', ''));
+		this.vscode.commands.executeCommand('setContext', '@taqueria/plugin-any-compiler', installedCompilers.length !== 0);
+		const supportedFileExtensions = getSupportedSmartContractExtensions(config);
+		this.vscode.commands.executeCommand(
+			'setContext',
+			'@taqueria/supported-smart-contract-extensions',
+			supportedFileExtensions,
+		);
+		this.showLog(OutputLevels.debug, `Supported extensions: ${JSON.stringify(supportedFileExtensions)}`);
+	}
+
+	public static isPluginInstalled(config: Util.TaqifiedDir | null | undefined, pluginName: string) {
+		return (config?.config?.plugins?.findIndex(p => p.name === pluginName) ?? -1) !== -1;
 	}
 
 	private _taqFolderWatcher: api.FileSystemWatcher | undefined;
@@ -1450,20 +1533,20 @@ export class VsCodeHelper {
 	}
 
 	exposeRefreshSandBoxDataCommand() {
-		this.registerCommand('taqueria.refresh_sandbox_data', async (item: SandboxTreeItemBase) => {
+		this.registerCommand('refresh_sandbox_data', async (item: SandboxTreeItemBase) => {
 			this.sandboxesDataProvider?.refreshItem(item);
 		});
 	}
 
 	exposeShowEntrypointParametersCommand() {
-		this.registerCommand('taqueria.show_entrypoint_parameters', async (item: SmartContractEntrypointTreeItem) => {
+		this.registerCommand('show_entrypoint_parameters', async (item: SmartContractEntrypointTreeItem) => {
 			const jsonParameters = item.jsonParameters;
 			this.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});
 	}
 
 	exposeShowOperationDetailsCommand() {
-		this.registerCommand('taqueria.show_operation_details', async (item: OperationTreeItem) => {
+		this.registerCommand('show_operation_details', async (item: OperationTreeItem) => {
 			const jsonParameters = item.operation;
 			this.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});

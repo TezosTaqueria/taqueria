@@ -2,7 +2,7 @@ import { Protocol } from '@taqueria/node-sdk/types';
 import * as rpc from '@taquito/rpc';
 import { TezosToolkit } from '@taquito/taquito';
 import * as rxjs from 'rxjs';
-import * as signalR from '../../signalr';
+import * as signalR from '../../../signalr';
 import { OutputLevels, VsCodeHelper } from '../helpers';
 import { ObservableConfig } from './ObservableConfig';
 import { SandboxModel, TzKtHead } from './SandboxDataModels';
