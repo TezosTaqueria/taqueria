@@ -36,11 +36,12 @@ export const smartContractLanguages: SmartContractLanguageInfo[] = [
 		pluginName: '@taqueria/plugin-smartpy',
 		compilerName: 'smartpy',
 	},
-	{
-		fileExtensions: ['.ts'],
-		pluginName: '@taqueria/plugin-smartpy',
-		compilerName: 'smartpy',
-	},
+	// We do not support this flavour yet
+	// {
+	// 	fileExtensions: ['.ts'],
+	// 	pluginName: '@taqueria/plugin-smartpy',
+	// 	compilerName: 'smartpy',
+	// },
 	{
 		fileExtensions: ['.arl'],
 		pluginName: '@taqueria/plugin-archetype',
