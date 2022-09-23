@@ -28,6 +28,7 @@ import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProv
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
+import { getLanguageInfoForFileName, getSupportedSmartContractExtensions } from './SmartContractLanguageInfo';
 import { TaqVsxError } from './TaqVsxError';
 
 export const COMMAND_PREFIX = 'taqueria.';
@@ -43,52 +44,6 @@ export enum Commands {
 	optOut = 'optOut',
 	originate = 'originate',
 }
-
-export type SmartContractLanguageInfo = {
-	fileExtensions: string[];
-	pluginName: string;
-	compilerName: SmartContractCompiler;
-};
-
-export type SmartContractCompiler = 'ligo' | 'archetype' | 'smartpy';
-
-export const smartContractLanguages: SmartContractLanguageInfo[] = [
-	{
-		fileExtensions: ['.mligo'],
-		pluginName: '@taqueria/plugin-ligo',
-		compilerName: 'ligo',
-	},
-	{
-		fileExtensions: ['.ligo'],
-		pluginName: '@taqueria/plugin-ligo',
-		compilerName: 'ligo',
-	},
-	{
-		fileExtensions: ['.religo'],
-		pluginName: '@taqueria/plugin-ligo',
-		compilerName: 'ligo',
-	},
-	{
-		fileExtensions: ['.jsligo'],
-		pluginName: '@taqueria/plugin-ligo',
-		compilerName: 'ligo',
-	},
-	{
-		fileExtensions: ['.py'],
-		pluginName: '@taqueria/plugin-smartpy',
-		compilerName: 'smartpy',
-	},
-	{
-		fileExtensions: ['.ts'],
-		pluginName: '@taqueria/plugin-smartpy',
-		compilerName: 'smartpy',
-	},
-	{
-		fileExtensions: ['.arl'],
-		pluginName: '@taqueria/plugin-archetype',
-		compilerName: 'archetype',
-	},
-];
 
 export enum OutputLevels {
 	output,
@@ -999,7 +954,7 @@ export class VsCodeHelper {
 						canSelectMany: false,
 						defaultUri: api.Uri.file(contractsFolder),
 						filters: {
-							'All Supported Contracts': this.getSupportedSmartContractExtensions(config).map(extension =>
+							'All Supported Contracts': getSupportedSmartContractExtensions(config).map(extension =>
 								extension.replace('.', '')
 							),
 							'All Files': ['*'],
@@ -1030,7 +985,7 @@ export class VsCodeHelper {
 					return;
 				}
 				this.showLog(OutputLevels.debug, `Running command ${cmdId} for ${fileName}`);
-				const taskWithArgs = `--plugin ${compilerPlugin ?? this.getCompilePluginForFile(fileName)} compile`;
+				const taskWithArgs = `--plugin ${compilerPlugin ?? getLanguageInfoForFileName(fileName)?.compilerName} compile`;
 				await this.proxyToTaqAndShowOutput(
 					`${taskWithArgs} ${fileName}`,
 					{
@@ -1042,11 +997,6 @@ export class VsCodeHelper {
 				);
 			},
 		);
-	}
-
-	getCompilePluginForFile(fileName: string): string | undefined {
-		const extension = path.extname(fileName);
-		return smartContractLanguages.find(lang => lang.fileExtensions.indexOf(extension) !== -1)?.pluginName;
 	}
 
 	private async getRelativeFilePath(uri: api.Uri, folder: 'contracts' | 'artifacts') {
@@ -1299,7 +1249,7 @@ export class VsCodeHelper {
 		)
 			.map(pluginName => pluginName.replace('@taqueria/plugin-', ''));
 		this.vscode.commands.executeCommand('setContext', '@taqueria/plugin-any-compiler', installedCompilers.length !== 0);
-		const supportedFileExtensions = this.getSupportedSmartContractExtensions(config);
+		const supportedFileExtensions = getSupportedSmartContractExtensions(config);
 		this.vscode.commands.executeCommand(
 			'setContext',
 			'@taqueria/supported-smart-contract-extensions',
@@ -1308,16 +1258,7 @@ export class VsCodeHelper {
 		this.showLog(OutputLevels.debug, `Supported extensions: ${JSON.stringify(supportedFileExtensions)}`);
 	}
 
-	private getSupportedSmartContractExtensions(config: Util.TaqifiedDir | null | undefined) {
-		return [
-			...new Set(
-				smartContractLanguages.filter(l => VsCodeHelper.isPluginInstalled(config, l.pluginName))
-					.flatMap(l => l.fileExtensions),
-			),
-		];
-	}
-
-	private static isPluginInstalled(config: Util.TaqifiedDir | null | undefined, pluginName: string) {
+	public static isPluginInstalled(config: Util.TaqifiedDir | null | undefined, pluginName: string) {
 		return (config?.config?.plugins?.findIndex(p => p.name === pluginName) ?? -1) !== -1;
 	}
 

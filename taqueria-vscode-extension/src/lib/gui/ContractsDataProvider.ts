@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { HasFileName, HasRefresh, SmartContractCompiler, smartContractLanguages, VsCodeHelper } from '../helpers';
+import { HasFileName, HasRefresh, VsCodeHelper } from '../helpers';
+import { getLanguageInfoForFileName, SmartContractCompiler } from '../SmartContractLanguageInfo';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 
 export class ContractsDataProvider extends TaqueriaDataProviderBase
@@ -23,8 +24,7 @@ export class ContractsDataProvider extends TaqueriaDataProviderBase
 			new ContractTreeItem(
 				path.basename(uri.path),
 				vscode.TreeItemCollapsibleState.None,
-				smartContractLanguages.find(info => info.fileExtensions.indexOf(path.extname(uri.path).toLowerCase()) !== -1)
-					?.compilerName,
+				getLanguageInfoForFileName(uri.path)?.compilerName,
 				config.config?.config?.contracts?.[path.basename(uri.path)] !== undefined,
 			)
 		);
