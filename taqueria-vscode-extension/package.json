@@ -79,7 +79,7 @@
 		"workspaceContains:.taq",
 		"onStartupFinished"
 	],
-	"main": "./out/extension.js",
+	"main": "./out/main.js",
 	"contributes": {
 		"configuration": {
 			"title": "Taqueria",
@@ -598,10 +598,12 @@
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "npx tsc -noEmit && parcel build --no-cache --no-optimize --no-scope-hoist --detailed-report 2>&1",
-		"watch": "parcel watch --no-cache --detailed-report",
-		"pretest": "npm run compile",
+		"vscode:prepublish": "npm run compile:base -- --minify",
+		"compile:base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+		"compile": "npx tsc -noEmit && npm run compile:base -- --sourcemap",
+		"compile:watch": "npm run compile:base -- --sourcemap --watch",
+		"compile:test": "tsc -p tsconfig.test.json",
+		"pretest": "npm run compile:test",
 		"lint": "eslint src --ext ts",
 		"test": "node ./out/test/runTest.js"
 	},
@@ -617,12 +619,11 @@
 		"@typescript-eslint/eslint-plugin": "^5.9.1",
 		"@typescript-eslint/parser": "^5.9.1",
 		"@vscode/test-electron": "^2.1.2",
-		"esbuild": "^0.14.15",
+		"esbuild": "^0.14.54",
 		"eslint": "^8.6.0",
 		"fs-extra": "^10.1.0",
 		"glob": "^7.2.0",
 		"mocha": "^9.2.1",
-		"parcel": "2.6.1",
 		"typescript": "4.7.2",
 		"vsce": "^2.6.4"
 	},
@@ -632,7 +633,7 @@
 		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
 		"eventsource": "^2.0.2",
-		"node-fetch": "^3.2.10",
+		"node-fetch-commonjs": "^3.1.1",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1",
 		"rxjs": "^7.5.6",
