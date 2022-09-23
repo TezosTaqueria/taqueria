@@ -1,5 +1,5 @@
 import * as api from 'vscode';
-import { COMMAND_PREFIX, InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
+import { InjectedDependencies, sanitizeDeps, VsCodeHelper } from './lib/helpers';
 
 const { clearConfigWatchers, getConfigWatchers, addConfigWatcherIfNotExists } = (() => {
 	const inMemoryState = {
@@ -126,7 +126,9 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		},
 	);
 
-	helper.exposeOriginateTask();
+	helper.exposeOriginateTask('originate', 'getFromCommand');
+	helper.exposeOriginateTask('originate_current_file', 'currentFile');
+	helper.exposeOriginateTask('originate_pick_file', 'openDialog');
 	helper.exposeRefreshSandBoxDataCommand();
 	helper.exposeShowEntrypointParametersCommand();
 	helper.exposeShowOperationDetailsCommand();

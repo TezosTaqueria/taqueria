@@ -301,8 +301,24 @@
 			{
 				"command": "taqueria.originate",
 				"category": "Taqueria",
-				"title": "Originate contracts",
+				"title": "Originate",
 				"shortTitle": "originate",
+				"enablement": "@taqueria/plugin-taquito",
+				"icon": "$(cloud-upload)"
+			},
+			{
+				"command": "taqueria.originate_current_file",
+				"category": "Taqueria",
+				"title": "Originate Current Contract",
+				"shortTitle": "originate current contract",
+				"enablement": "@taqueria/plugin-taquito && resourceExtname == .tz",
+				"icon": "$(cloud-upload)"
+			},
+			{
+				"command": "taqueria.originate_pick_file",
+				"category": "Taqueria",
+				"title": "Originate (pick a contract)",
+				"shortTitle": "originate (pick a contract)",
 				"enablement": "@taqueria/plugin-taquito",
 				"icon": "$(cloud-upload)"
 			},
@@ -427,6 +443,10 @@
 				{
 					"command": "taqueria.compile_ligo",
 					"when": "false"
+				},
+				{
+					"command": "taqueria.originate",
+					"when": "false"
 				}
 			],
 			"explorer/context": [
@@ -514,7 +534,12 @@
 				},
 				{
 					"command": "taqueria.originate",
-					"when": "view == taqueria-environments || view == taqueria-artifacts",
+					"when": "view == taqueria-artifacts",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.originate_pick_file",
+					"when": "view == taqueria-environments",
 					"group": "inline"
 				},
 				{
