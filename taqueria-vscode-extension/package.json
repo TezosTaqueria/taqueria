@@ -550,7 +550,7 @@
 		"watch": "parcel watch --no-cache --detailed-report",
 		"pretest": "npm run compile",
 		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
+		"test": "mkdir -p ~/TVsCE_e2e/vscode-taq-test-project && node ./out/test/runTest.js"
 	},
 	"devDependencies": {
 		"@taquito/taquito": "^13.0.1",

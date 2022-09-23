@@ -2,7 +2,8 @@ import { runTests } from '@vscode/test-electron';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 
-const testProjectDestination = path.resolve(__dirname, '../../out/vscode-taq-ligo-plugin-test-project');
+const homedir = require('os').homedir();
+const testProjectDestination = path.resolve(homedir, 'TVsCE_e2e/vscode-taq-test-project/');
 const vsCodeUserData = path.resolve(__dirname, '../../.vscode-test/user-data');
 
 async function main() {
@@ -15,17 +16,12 @@ async function main() {
 		// Passed to --extensionTestsPath
 		const extensionTestsPath = path.resolve(__dirname, '../../out/test/suite/index');
 
-		fse.mkdirSync(testProjectDestination);
-
-		const launchArgs = [`${testProjectDestination}/`, '--disable-extension'];
-
-		// One of the option to run tests for each file and create folder separately
+		const launchArgs = [`${testProjectDestination}/`, '--disable-extension=true'];
 
 		// Download VS Code, unzip it and run the integration test
 		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs });
 
-		fse.rmdirSync(vsCodeUserData, { recursive: true });
-		// fse.rmdirSync(path.resolve(testProjectDestination), {recursive: true})
+		// fse.rmdirSync(vsCodeUserData, { recursive: true });
 	} catch (err) {
 		console.error('Failed to run tests');
 
@@ -37,6 +33,8 @@ async function main() {
 		}
 		process.exit(1);
 	}
+
+	process.exit(0);
 }
 
 main();
