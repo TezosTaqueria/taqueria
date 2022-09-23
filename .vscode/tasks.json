@@ -17,10 +17,10 @@
 					"background": {
 						"activeOnStart": true,
 						"endsPattern": {
-							"regexp": "out/extension.js"
+							"regexp": "Done in"
 						},
 						"beginsPattern": {
-							"regexp": "compile"
+							"regexp": "analytics"
 						}
 					},
 					"pattern": {
