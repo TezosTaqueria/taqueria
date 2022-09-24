@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/toolkit",
-	"version": "0.18.0",
+	"version": "0.19.0",
 	"description": "A TypeScript library for NodeJS to work with Taqueria projects",
 	"main": "./index.js",
 	"source": "./index.ts",
