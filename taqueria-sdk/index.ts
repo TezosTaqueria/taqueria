@@ -433,7 +433,10 @@ export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilen
 /**
  * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
  */
-export const newGetInitialStorage = async (parsedArgs: RequestArgs.t, storageFilename: string) => {
+export const newGetInitialStorage = async (
+	parsedArgs: RequestArgs.t,
+	storageFilename: string,
+): Promise<string | undefined> => {
 	const storagePath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, storageFilename);
 	try {
 		const content = await readFile(storagePath, { encoding: 'utf-8' });

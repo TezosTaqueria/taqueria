@@ -40,7 +40,8 @@ Plugin.create(_i18n => ({
 				}),
 				Option.create({
 					flag: 'param',
-					description: 'Parameter to invoke the smart contract',
+					description:
+						'Name of the parameter file that contains the parameter value as a Michelson expression, in the artifacts directory, used for invoking a deployed contract',
 					required: false,
 				}),
 				Option.create({
