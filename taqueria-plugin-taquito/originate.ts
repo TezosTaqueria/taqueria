@@ -165,19 +165,63 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 		if (error.message) {
 			const msg = error.message;
 			if (/ENOTFOUND/.test(msg)) {
-				sendErr(msg + ' - The RPC URL may be invalid. Check your ./taq/config.json.');
+				sendErr('The RPC URL may be invalid. Check your ./taq/config.json.\n');
+				sendErr(msg);
 			} else if (/ECONNREFUSED/.test(msg)) {
-				sendErr(msg + ' - The RPC URL may be down or the sandbox is not running.');
+				sendErr('The RPC URL may be down or the sandbox is not running.\n');
+				sendErr(msg);
+			} else if (/empty_implicit_contract/) {
+				sendErr(
+					'Your account does not have sufficient funds to perform this operation. If targeting a testnet you may get funds from a faucet at https://teztnets.xyz/.\n',
+				);
+				sendErr(msg);
 			} else {
 				sendErr(
-					msg
-						+ " - There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.",
+					"There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.\n",
 				);
+				sendErr(msg);
 			}
 		}
 		return undefined;
 	}
 };
+
+/**
+ * @description Import a key to sign operation with the side-effect of setting the Tezos instance to use the InMemorySigner provider
+ *
+ * @param toolkit The toolkit instance to attach a signer
+ * @param privateKeyOrEmail Key to load in memory
+ * @param passphrase If the key is encrypted passphrase to decrypt it
+ * @param mnemonic Faucet mnemonic
+ * @param secret Faucet secret
+ */
+export async function importFaucet(
+	toolkit: TezosToolkit,
+	privateKeyOrEmail?: string,
+	passphrase?: string,
+	mnemonic?: string,
+	secret?: string,
+) {
+	if (privateKeyOrEmail && passphrase && mnemonic && secret) {
+		return await importKey(toolkit, privateKeyOrEmail, passphrase, mnemonic, secret);
+	} else if (mnemonic) {
+		const signer = InMemorySigner.fromFundraiser(privateKeyOrEmail ?? '', passphrase ?? '', mnemonic);
+		toolkit.setProvider({ signer });
+		const pkh = await signer.publicKeyHash();
+		let op;
+		try {
+			op = await toolkit.tz.activate(pkh, secret ?? '');
+			if (op) {
+				await op.confirmation();
+			}
+		} catch (ex: any) {
+		}
+	} else if (privateKeyOrEmail) {
+		// Fallback to regular import
+		const signer = await InMemorySigner.fromSecretKey(privateKeyOrEmail, passphrase);
+		toolkit.setProvider({ signer });
+	}
+}
 
 const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.t) =>
 	currentEnv.networks
@@ -189,7 +233,7 @@ const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.
 						if (network.faucet) {
 							const result = (async () => {
 								const tezos = new TezosToolkit(network.rpcUrl as string);
-								await importKey(
+								await importFaucet(
 									tezos,
 									network.faucet.email,
 									network.faucet.password,
