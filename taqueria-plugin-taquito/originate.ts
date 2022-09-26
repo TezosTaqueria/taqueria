@@ -170,7 +170,7 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 			} else if (/ECONNREFUSED/.test(msg)) {
 				sendErr('The RPC URL may be down or the sandbox is not running.\n');
 				sendErr(msg);
-			} else if (/empty_implicit_contract/) {
+			} else if (/empty_implicit_contract/.test(msg)) {
 				sendErr(
 					'Your account does not have sufficient funds to perform this operation. If targeting a testnet you may get funds from a faucet at https://teztnets.xyz/.\n',
 				);
