@@ -7,7 +7,7 @@ import * as taqueriaExtension from '../../extension';
 import * as MockedObject from './MockedObject';
 import { sleep } from './utils/utils';
 
-const projectRoot = path.resolve(__dirname, '../../../../');
+const projectRoot = path.resolve(__dirname, '../../../');
 const testProjectDestination = `${projectRoot}/out/vscode-taq-test-project`;
 const testProjectSource = `${projectRoot}/src/test/suite/data/vscode-taq-test-project`;
 
