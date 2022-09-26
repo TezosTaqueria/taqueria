@@ -19,7 +19,7 @@ interface Opts extends RequestArgs.t {
 
 type TableRow = { contract: string; result: string };
 
-const FLEXTESA_IMAGE = 'oxheadalpha/flextesa:rc-20220915-arm64';
+const FLEXTESA_IMAGE = 'oxheadalpha/flextesa:20220510';
 
 const getInputFilename = (opts: Opts, sourceFile: string) => join('/project', opts.config.artifactsDir, sourceFile);
 
@@ -70,7 +70,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const processedParam = preprocessString(param);
 
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project ${FLEXTESA_IMAGE}`;
-	const globalOptions = '--endpoint https://kathmandunet.ecadinfra.com';
+	const globalOptions = '--endpoint https://jakartanet.ecadinfra.com';
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
 
