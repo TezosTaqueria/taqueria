@@ -1,5 +1,5 @@
 import { sendAsyncErr } from '@taqueria/node-sdk';
-import type { RequestArgs } from '@taqueria/node-sdk/types';
+import { RequestArgs } from '@taqueria/node-sdk/types';
 import simulate from './simulate';
 import typecheck from './typecheck';
 

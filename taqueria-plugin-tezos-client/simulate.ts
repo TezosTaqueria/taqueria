@@ -56,10 +56,12 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const storage = (await newGetInitialStorage(parsedArgs, storageFilename))?.trim();
 
 	if (storage === undefined) {
-		return sendAsyncErr(
-			`❌ No initial storage file was found for ${sourceFile}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
-				getDefaultStorageFilename(sourceFile)
-			}" in the artifacts directory\nYou can also manually pass a storage file to the simulate task using the --storage STORAGE_FILE_NAME option\n`,
+		return Promise.reject(
+			new Error(
+				`❌ No initial storage file was found for ${sourceFile}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
+					getDefaultStorageFilename(sourceFile)
+				}" in the artifacts directory\nYou can also manually pass a storage file to the simulate task using the --storage STORAGE_FILE_NAME option\n`,
+			),
 		);
 	}
 
@@ -85,35 +87,26 @@ const trimTezosClientMenuIfPresent = (msg: string): string => {
 
 const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
 	execCmd(getCheckFileExistenceCommand(parsedArgs, sourceFile))
-		.then(() => {
-			try {
-				return getSimulateCmd(parsedArgs, sourceFile)
-					.then(execCmd)
-					.then(({ stdout, stderr }) => {
-						if (stderr.length > 0) sendWarn(`\n${stderr}`);
-						return {
-							contract: sourceFile,
-							result: stdout,
-						};
-					})
-					.catch(err => {
-						sendErr(`\n=== For ${sourceFile} ===`);
-						const msg: string = trimTezosClientMenuIfPresent(err.message);
-						sendErr(msg.replace(/Command failed.+?\n/, ''));
-						return {
-							contract: sourceFile,
-							result: 'Invalid',
-						};
-					});
-			} catch (err: any) {
-				sendErr(`\n=== For ${sourceFile} ===`);
-				sendErr(err.message.replace(/Command failed.+?\n/, ''));
-				return {
-					contract: sourceFile,
-					result: 'Bad parameter or storage value',
-				};
-			}
-		})
+		.then(() =>
+			getSimulateCmd(parsedArgs, sourceFile)
+				.then(execCmd)
+				.then(({ stdout, stderr }) => {
+					if (stderr.length > 0) sendWarn(`\n${stderr}`);
+					return {
+						contract: sourceFile,
+						result: stdout,
+					};
+				})
+				.catch(err => {
+					sendErr(`\n=== For ${sourceFile} ===`);
+					const msg: string = trimTezosClientMenuIfPresent(err.message);
+					sendErr(msg.replace(/Command failed.+?\n/, ''));
+					return {
+						contract: sourceFile,
+						result: 'Invalid',
+					};
+				})
+		)
 		.catch(err => {
 			sendErr(`\n=== For ${sourceFile} ===`);
 			sendErr(err.message.replace(/Command failed.+?\n/, ''));
