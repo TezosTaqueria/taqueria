@@ -5,12 +5,12 @@ import typecheck from './typecheck';
 
 interface Opts extends RequestArgs.ProxyRequestArgs {
 	sourceFile: string;
-	param: string;
 	storage?: string;
+	param: string;
 	entrypoint?: string;
 }
 
-export const client = <T>(parsedArgs: Opts): Promise<void> => {
+export const client = (parsedArgs: Opts): Promise<void> => {
 	switch (parsedArgs.task) {
 		case 'typecheck':
 			return typecheck(parsedArgs);

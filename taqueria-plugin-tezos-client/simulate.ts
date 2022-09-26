@@ -12,8 +12,8 @@ import { basename, extname, join } from 'path';
 
 interface Opts extends RequestArgs.t {
 	sourceFile: string;
-	param: string;
 	storage?: string;
+	param: string;
 	entrypoint?: string;
 }
 
