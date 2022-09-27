@@ -15,7 +15,7 @@ const commonSchema = z.object({
 	amount: z.string({ description: 'Faucet Amount' }).refine(
 		val => val.length === 0 || /^\d+$/.test(val),
 		'Amount, if present, must be numeric',
-	),
+	).optional(),
 	activation_code: z.string({ description: 'Faucet Activation Code' }).optional(),
 });
 
