@@ -385,7 +385,7 @@ The default configuration for Taqueria projects includes five pre-defined accoun
     "sandbox": {
         "local": {
             "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
             "rpcUrl": "http://localhost:20000"
         }
     },
@@ -421,7 +421,7 @@ These accounts will be created and funded automatically when a sandbox starts. A
                 }
             },
             "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
             "rpcUrl": "http://localhost:20000"
         }
     },
@@ -454,7 +454,7 @@ To set a default account for a sandbox, you must now define it explicitly in the
                 }
             },
             "label": "Local Tezos Sandbox",
-            "protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
             "rpcUrl": "http://localhost:20000"
         }
     },
