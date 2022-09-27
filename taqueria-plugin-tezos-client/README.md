@@ -2,6 +2,9 @@
 
 The Tezos Client plugin provides tasks to analyze contracts including type checking and simulating of Michelson (`.tz`) smart contracts. They both execute against a protocol (currently jakarta). We'll enable a `--protocol` flag in the future to allow users to specify a protocol to use.
 
+> ### :page_with_curl: Note
+> This plugin no longer relies on the Flextesa plugin.
+
 ## Requirements
 
 - Node.js v16 or later
@@ -37,7 +40,7 @@ This task runs a Michelson file in `/artifacts` as a simulation and ouputs a res
 
 ### Options
 
-- By default, the storage file it will use to simulate the contract is CONTRACT.default_storage.tz where CONTRACT is the name of the contract. If you wish to specify another storage file, in `/artifacts`, use the `--storage` flag.
+- By default, the storage file it will use to simulate the contract is CONTRACT.default_storage.tz where CONTRACT is the name of the contract. If you wish to specify another storage file in `/artifacts`, use the `--storage` flag.
 
 - The `--param` flag is mandatory and you must supply the filename, in `/artifacts`, that contains the actual parameter value.
 
