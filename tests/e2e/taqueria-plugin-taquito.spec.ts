@@ -65,6 +65,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
+		console.log(deployCommand);
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 		// 3. Verify that contract has been originated on the network
@@ -318,7 +319,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain(
-			"There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.",
+			"(permanent) proto.014-PtKathma.michelson_v1.invalid_expression_kind - There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.",
 		);
 	});
 

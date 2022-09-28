@@ -16,8 +16,13 @@
 	"sandbox": {
 		"local-tezos-client": {
 			"label": "Local Tezos Sandbox",
-			"rpcUrl": "http://localhost:20000",
-			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
+			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+			"rpcUrl": "http://localhost:20660",
+			"tzkt": {
+				"disableAutostartWithSandbox": false,
+				"postgresqlPort": 5432,
+				"apiPort": 5000
+			}
 		}
 	},
 	"environment": {
