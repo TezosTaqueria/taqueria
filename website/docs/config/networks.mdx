@@ -62,7 +62,7 @@ Taqueria does not have a default network configured, so a freshly initialized pr
     "sandbox": {
         "local": {
             "label": "Local Tezos Sandbox",
-            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
             "rpcUrl": "http://localhost:20000"
         }
     },
@@ -88,7 +88,7 @@ Add the following entry ("ghostnet": {...}) to the `network` property::
       "ghostnet":{
          "label":"Ghostnet Protocol Testnet",
          "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
-         "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+         "protocol":"PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
          "faucet":{
             "pkh": "",
             "mnemonic":  "",
@@ -126,7 +126,7 @@ Your network configuration should now look like the following:
       "ghostnet":{
          "label":"Ghostnet Protocol Testnet",
          "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
-         "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+         "protocol":"PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
          "faucet":{
             "pkh": "tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok",
 		    "mnemonic": "dice must lawsuit remain december shed scorpion member loud subject mixture fan trust beauty crush",
@@ -219,30 +219,31 @@ Your `config.json` file should look something like this:
     "sandbox": {
         "local": {
             "label": "Local Tezos Sandbox",
-            "protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
             "rpcUrl": "http://localhost:20000"
         }
     },
     "network": {
         "ghostnet": {
-        "label": "ghostnet",
-        "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
-        "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
-        "faucet": {
-            "pkh": "tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok",
-            "mnemonic":  "dice must lawsuit remain december shed scorpion member loud subject mixture fan trust beauty crush",
-            "email": "",
-            "password": "",
-            "amount": "",
-            "activation_code": ""
+            "label": "Ghostnet Protocol Testnet",
+            "rpcUrl": "https://rpc.ghostnet.teztnets.xyz",
+            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
+            "faucet": {
+                "pkh": "tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok",
+                "mnemonic": "dice must lawsuit remain december shed scorpion member loud subject mixture fan trust beauty crush",
+                "email": "",
+                "password": "",
+                "amount": "",
+                "activation_code": ""
+            },
+            "accounts": {
+                "bob": "3_000_000_000",
+                "alice": "3_000_000_000",
+                "john": "3_000_000_000",
+                "jane": "3_000_000_000",
+                "joe": "3_000_000_000"
+            }
         }
-    },
-    "accounts": {
-        "bob": "3_000_000_000",
-        "alice": "3_000_000_000",
-        "john": "3_000_000_000",
-        "jane": "3_000_000_000",
-        "joe": "3_000_000_000"
     }
 }
 ```
