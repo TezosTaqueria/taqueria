@@ -93,7 +93,6 @@ jobs:
 
   publish-marketplace:
     name: Publish VSCode Extension
-    if: ${{ github.event.action == 'published' }}
     needs:
       - test-build
     runs-on: ubuntu-latest
@@ -112,7 +111,7 @@ jobs:
 
       # Separate steps for prerelease and release workflows
       - name: Publish as pre-release
-        if: ${{ github.event.action != 'published' }}
+        if: ${{ github.event.action != 'published'}}
         uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}
@@ -122,7 +121,7 @@ jobs:
           preRelease: true
 
       - name: Publish as official release
-        if: ${{ !github.event.release.prerelease }}
+        if: ${{ github.event.action == 'published' && !github.event.release.prerelease }}
         uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}
