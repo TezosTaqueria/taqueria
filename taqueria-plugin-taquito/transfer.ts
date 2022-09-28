@@ -80,7 +80,7 @@ const configureToolKitWithNetwork = async (parsedArgs: Opts, networkName: string
 	const tezos = new TezosToolkit(network.rpcUrl as string);
 	await importKey(
 		tezos,
-		network.faucet.email,
+		network.faucet.email ?? '',
 		network.faucet.password,
 		network.faucet.mnemonic.join(' '),
 		network.faucet.activation_code,
