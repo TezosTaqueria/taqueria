@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-mock",
-	"version": "0.19.6",
+	"version": "0.19.7",
 	"description": "A plugin used to test Taqueria",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
