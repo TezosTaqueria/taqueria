@@ -25,8 +25,7 @@ Currently Taqueria only supports testnets. Support for mainnet will be added in 
 To configure and use a Taqueria network, you will require the following:
 
 1. Configuration details for the network you wish to target (Can be found at [teztnets.xyz](https://teztnets.xyz/))
-2. A faucet key for the network you wish to target (Also found at [teztnets.xyz](https://teztnets.xyz/))
-3. The [Taquito plugin](../plugins/plugin-taquito.mdx/) (Used for originating to a network)
+2. The [Taquito plugin](../plugins/plugin-taquito.mdx/) (Used for originating to a network)
 
 ### Supported Protocols
 
@@ -82,31 +81,7 @@ Taqueria does not have a default network configured, so a freshly initialized pr
 
 The first step is to add a named network configuration to your `config.json` file
 
-Add the following entry ("testing": {...}) to the `network` property::
-```json
-{
-   "network":{
-      "ghostnet":{
-         "label":"Ghostnet Protocol Testnet",
-         "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
-         "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
-         "faucet":{  }
-      }
-   }
-```
-:::note
-The information for `rpcUrl` and`protocol` are taken from the page [https://teztnets.xyz/ghostnet-about](https://teztnets.xyz/ghostnet-about)
-:::
-
-### Faucets 
-
-In order to interact with the network, you will need some Tez in an account. The way this is done on Tezos is to provide a faucet key. The faucet key provides Tez on a particular testnet, which can then be used to interact with the network
-
-To get your own unique faucet key for testing, visit [https://teztnets.xyz/ghostnet-faucet](https://teztnets.xyz/ghostnet-faucet), and complete the captcha validation. Once this is done, you will see the faucet key shown as a JSON object
-
-To add the faucet key to your Taqueria project, simply copy and paste the JSON object into the `faucet` field of the network configuration shown above
-
-Your `network` property should now look something like this:
+Add the following entry ("ghostnet": {...}) to the `network` property::
 ```json
 {
    "network":{
@@ -115,35 +90,57 @@ Your `network` property should now look something like this:
          "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
          "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
          "faucet":{
-            "key": {
-	            "pkh": "tz1cEqJmGnzcGDa9cyj437RmLL5GYPiawiUc",
-                "mnemonic": [
-                    "other",
-                    "nerve",
-                    "awkward",
-                    "jaguar",
-                    "anchor",
-                    "conduct",
-                    "drill",
-                    "upon",
-                    "roof",
-                    "planet",
-                    "glass",
-                    "among",
-                    "turkey",
-                    "also",
-                    "urban"
-                ],
-                "email": "kgwzskbc.tootktlz@teztnets.xyz",
-                "password": "JTMMX6FPNM",
-                "amount": "2006437205",
-                "activation_code": "50fe648444288c8dd1fe1e976ca26160536fda94"
-            }
-         }
+            "pkh": "",
+            "mnemonic":  "",
+            "email": "",
+            "password": "",
+            "amount": "",
+            "activation_code": ""
+        }
       }
    }
-}
 ```
+
+The above provides a configuration for a testnet called _ghostnet_, a long-lived network that is kept up-to-date with the latest protocol revisions, and is a safe default for most projects.
+
+:::note
+The information for `rpcUrl` and`protocol` are taken from the page [https://teztnets.xyz/ghostnet-about](https://teztnets.xyz/ghostnet-about)
+:::
+
+### Faucets 
+
+In order to interact with the testnet, you will need an account funded with some Tez.
+
+:::note
+We're working on an improved workflow for funding testnet accounts. For now, please follow the steps below.
+:::
+
+1. Go [here](https://resilience-me.github.io/Tezos-paper-wallet/) and click _Generate_.
+2. From step #2, copy the Public Key and set as the value for "pkh" in the faucet configuration.
+3. From step #2, copy the Private Key (which is actually a mnemonic seed phrase) and set as the value for "mnemonic" in the faucet configuration.
+
+Your network configuration should now look like the following:
+```json
+{
+   "network":{
+      "ghostnet":{
+         "label":"Ghostnet Protocol Testnet",
+         "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
+         "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+         "faucet":{
+            "pkh": "tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok",
+		    "mnemonic": "dice must lawsuit remain december shed scorpion member loud subject mixture fan trust beauty crush",
+            "email": "",
+            "password": "",
+            "amount": "",
+            "activation_code": ""
+        }
+      }
+   }
+```
+4. Go to teztnets.xyz, click on the link for the faucet of the desired testnet, and then request to have funds sent to your public key hash address (which would be tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok in your example above).
+
+![Request Tez from Faucet](/img/fund-using-faucet.png)
 
 ### Environment Configuration
 
@@ -227,38 +224,18 @@ Your `config.json` file should look something like this:
         }
     },
     "network": {
-        "ghostnet":{
-            "label":"Ghostnet Protocol Testnet",
-            "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
-            "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
-            "faucet":{
-               "key": {
-                   "pkh": "tz1cEqJmGnzcGDa9cyj437RmLL5GYPiawiUc",
-                   "mnemonic": [
-                       "other",
-                       "nerve",
-                       "awkward",
-                       "jaguar",
-                       "anchor",
-                       "conduct",
-                       "drill",
-                       "upon",
-                       "roof",
-                       "planet",
-                       "glass",
-                       "among",
-                       "turkey",
-                       "also",
-                       "urban"
-                   ],
-                   "email": "kgwzskbc.tootktlz@teztnets.xyz",
-                   "password": "JTMMX6FPNM",
-                   "amount": "2006437205",
-                   "activation_code": "50fe648444288c8dd1fe1e976ca26160536fda94"
-               }
-            }
-         }
-      }
+        "ghostnet": {
+        "label": "ghostnet",
+        "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
+        "protocol":"PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+        "faucet": {
+            "pkh": "tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok",
+            "mnemonic":  "dice must lawsuit remain december shed scorpion member loud subject mixture fan trust beauty crush",
+            "email": "",
+            "password": "",
+            "amount": "",
+            "activation_code": ""
+        }
     },
     "accounts": {
         "bob": "3_000_000_000",
