@@ -17,8 +17,9 @@ title: Taqueria Releases
 - `@taqueria/plugin-ligo` now provides a `test` task used for running native Ligo tests
 - The VScE has added support for `@taqueria/plugin-metadata`
 - Improvements to the sandbox visualization in the VScE
+- The Ligo plugin's `taq compile` task now requires an explicit file name to be provided: `taq compile test.jsligo`
 
-### Breaking Change
+### ⚠️ Breaking Change
 
 Teztnets.xyz no longer supports faucet files for testnet accounts which is a breaking change for Taqueria users. This release includes an interim solution in which users can generate and fund an account via the new Teztnets faucet, and manually configure
 
@@ -53,7 +54,7 @@ Your network configuration should now look like the following:
 
 ## New Features
 
-### Call entrypoints on a deployed contract: `taq transfer` / `taq call`
+### ✅ Call entrypoints on a deployed contract: `taq transfer` / `taq call`
 
 The Taquito plugin now exposes a `taq transfer`` (or `taq call``) task in Taqueria which will call the specified Michelson contract deployed to a Taqueria environment (default environment is one with sandbox named local)
 
@@ -67,12 +68,12 @@ taq transfer <contract alias or address>
 
 Examples:
 
-- `taq call counter --param counter.parameter.param1.tz` will call a smart contract aliased as counter in the default environment with the parameter contained in that `.tz`` file, transferring `0`` tez
+- `taq call counter --param counter.parameter.param1.tz` will call a smart contract aliased as counter in the default environment with the parameter contained in that `.tz` file, transferring `0` tez
 - `taq transfer tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb --tez 20` will transfer 20 tez to that address, which is some implicit account
 
 Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-taquito/#the-taq-transfer-task)
 
-### Run Ligo native tests: `taq test`
+### ✅ Run Ligo native tests: `taq test`
 
 This task tests the LIGO source code and ouputs a result suggesting a failure or success. Normally you'd have a contract file and a separate test file that includes the contract's code, both within the /contracts directory
 
@@ -84,11 +85,13 @@ taq test <filename>
 
 Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-ligo/#the-taq-test-task)
 
-## Other Product Changes
+## ✅ Other Product Changes
 
+- The default `config.json` provided by `taq init` now uses the K protocol by default
 - Improvements to the Taqueria CI/CD pipeline
-
-
+- Improved error messaging when a value in `config.json` was invalid
+- Fixed issues with automated tests and decreased run time 
+- Documentation improvements
 
 ### Pull Requests
 
