@@ -165,6 +165,15 @@ jobs:
     secrets:
       NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
 
+  publish-toolkit-to-npm:
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    needs: publish-protocol-to-npm
+    uses: ./.github/workflows/npm-publish.yml
+    with:
+      dir: taqueria-toolkit
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }}
+
   publish-ligo-plugin-to-npm:
     if: ${{ !github.event.pull_request.head.repo.fork }}
     needs: publish-sdk-to-npm
