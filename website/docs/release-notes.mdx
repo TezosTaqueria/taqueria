@@ -17,7 +17,7 @@ title: Taqueria Releases
 - `@taqueria/plugin-ligo` now provides a `test` task used for running native Ligo tests
 - The VScE has added support for `@taqueria/plugin-metadata`
 - Improvements to the sandbox visualization in the VScE
-- The Ligo plugin's `taq compile` task now requires an explicit file name to be provided: `taq compile test.jsligo`
+- The Ligo plugin's `taq compile <fileName>` task now requires an explicit file name to be provided: `taq compile test.jsligo`
 
 ### ⚠️ Breaking Change
 
@@ -26,6 +26,8 @@ Teztnets.xyz no longer supports faucet files for testnet accounts which is a bre
 :::note
 We're working on an improved workflow for funding testnet accounts and will be deprecating and removing faucets from Taqueria
 :::
+
+Follow these steps to fund and configure a testnet account:
 
 1. Go [here](https://resilience-me.github.io/Tezos-paper-wallet/) and click _Generate_
 2. From step #2, copy the Public Key and set as the value for "pkh" in the faucet configuration
@@ -85,7 +87,7 @@ taq test <filename>
 
 Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-ligo/#the-taq-test-task)
 
-## ✅ Other Product Changes
+## Other Product Changes
 
 - The default `config.json` provided by `taq init` now uses the K protocol by default
 - Improvements to the Taqueria CI/CD pipeline
@@ -113,7 +115,7 @@ Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-l
 * 1042 - Relax faucet validation and display error hints by @mweichert in [#1262](https://github.com/ecadlabs/taqueria/pull/1262)
 * 🏗️ PR ➾ Prerelease 0.19.0 and GH wf improvements by @hu3man in [#1271](https://github.com/ecadlabs/taqueria/pull/1271)
 
-**Full Changelog**: [https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.0)](https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.0)
+**Full Changelog**: [https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.0](https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.0)
 
 
 # Taqueria v0.8.0   
