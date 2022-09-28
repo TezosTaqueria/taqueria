@@ -8,6 +8,8 @@ on:
   push:
     tags:
       - v*
+    branches:
+      - 1287-workflows-on-push-to-main
 
   release:
     types: [published]
