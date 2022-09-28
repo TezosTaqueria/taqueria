@@ -1,0 +1,59 @@
+{
+	"language": "en",
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-taquito",
+			"type": "npm"
+		}
+	],
+	"contractsDir": "contracts",
+	"testsDir": "tests",
+	"artifactsDir": "artifacts",
+	"environment": {
+		"default": "development",
+		"development": {
+			"networks": [],
+			"sandboxes": [
+				"local"
+			],
+			"storage": {}
+		},
+		"test": {
+			"networks": ["ghostnet"],
+			"sandboxes": [],
+			"storage": {
+				"hello-tacos.tz": "anyContract.storage",
+				"increment.tz": "anyContract.storage"
+			}
+		}
+	},
+	"sandbox": {
+		"local": {
+			"label": "Local Tezos Sandbox",
+			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+			"rpcUrl": "http://localhost:20120"
+		}
+	},
+	"network": {
+		"ghostnet": {
+			"label": "ghostnet",
+			"rpcUrl": "https://rpc.ithacanet.teztnets.xyz",
+			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+			"faucet": {
+				"pkh": "tz1ge3zb6kC5iUZcXsjxiwwtU5MwP37T6m1z",
+				"mnemonic": "donor own people unusual congress meadow diesel table orient table craft donate album sound club",
+				"email": "",
+				"password": "",
+				"amount": "",
+				"activation_code": ""
+			}
+		}
+	},
+	"accounts": {
+		"bob": "3000000000",
+		"alice": "2000000000",
+		"john": "4000000000",
+		"jane": "5000000000",
+		"joe": "1000000000"
+	}
+}
