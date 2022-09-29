@@ -9,7 +9,7 @@ on:
     tags:
       - v*
     branches:
-      - 1287-workflows-on-push-to-main
+      - main
 
   release:
     types: [published]
