@@ -71,14 +71,7 @@
 		"SmartPy",
 		"Archetype"
 	],
-	"activationEvents": [
-		"onCommand:taqueria.init",
-		"onCommand:taqueria.scaffold",
-		"onCommand:taqueria.opt_in",
-		"onCommand:taqueria.opt_out",
-		"workspaceContains:.taq",
-		"onStartupFinished"
-	],
+	"activationEvents": [],
 	"main": "./out/main.js",
 	"contributes": {
 		"configuration": {
