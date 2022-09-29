@@ -13,7 +13,7 @@ export const rawSchema = z.object({
 		z.any({ description: 'Accounts' }),
 		{ description: 'Accounts' },
 	).optional(),
-	faucet: Faucet.rawSchema.describe('Network Faucet'),
+	faucet: Faucet.rawSchema.describe('Network Faucet').optional(),
 }).describe('Network Config');
 
 const internalSchema = z.object({
@@ -24,7 +24,7 @@ const internalSchema = z.object({
 		z.any({ description: 'Accounts' }),
 		{ description: 'Accounts' },
 	).optional(),
-	faucet: Faucet.schemas.schema.describe('Network Faucet'),
+	faucet: Faucet.schemas.schema.describe('Network Faucet').optional(),
 }).describe('Network Config');
 
 type RawInput = z.infer<typeof rawSchema>;
