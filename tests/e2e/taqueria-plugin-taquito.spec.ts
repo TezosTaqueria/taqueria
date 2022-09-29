@@ -322,7 +322,8 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 	});
 
-	test('Verify that partial faucets can be provided', async () => {
+	// To be deleted or updated because of the new funding mechanism for accounts
+	test.skip('Verify that partial faucets can be provided', async () => {
 		// Environment test does not exist on default config.json
 		environment = 'test';
 
@@ -344,7 +345,8 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 	});
 
-	test('Verify that partial faucets can be provided, using a single string as a mnemonic seed', async () => {
+	// To be deleted or updated because of the new funding mechanism for accounts
+	test.skip('Verify that partial faucets can be provided, using a single string as a mnemonic seed', async () => {
 		// Environment test does not exist on default config.json
 		environment = 'test';
 
