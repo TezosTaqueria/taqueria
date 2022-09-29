@@ -2,6 +2,122 @@
 title: Taqueria Releases
 ---
 
+# Taqueria v0.20.0   
+
+| Details     |               |
+| ----------- | ------------- |
+|Release Date | Sept 28, 2022 |
+|Release Type | Minor         |
+|Release Page | [v0.20.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.20.0) |
+
+## Summary of Impactful Changes
+
+- Significant improvements to the Ligo development workflow
+- `@taqueria/plugin-taquito` now has a `transfer` task which allows interaction with deployed contracts
+- `@taqueria/plugin-ligo` now provides a `test` task used for running native Ligo tests
+- The VScE has added support for `@taqueria/plugin-metadata`
+- Improvements to the sandbox visualization in the VScE
+- The Ligo plugin's `taq compile <fileName>` task now requires an explicit file name to be provided: `taq compile hello-tacos.jsligo`
+
+### ⚠️ Breaking Change
+
+Teztnets.xyz no longer supports faucet files for testnet accounts which is a breaking change for Taqueria users. This release includes an interim solution in which users can generate and fund an account via the new Teztnets faucet, and manually configure
+
+:::note
+We're working on an improved workflow for funding testnet accounts and will be deprecating and removing faucet files from Taqueria
+:::
+
+Follow these steps to fund and configure a testnet account:
+
+1. Go [here](https://resilience-me.github.io/Tezos-paper-wallet/) and click _Generate_
+2. From step #2, copy the Public Key and set as the value for "pkh" in the faucet configuration
+3. From step #2, copy the Private Key (which is actually a mnemonic seed phrase) and set as the value for "mnemonic" in the faucet configuration
+
+Your network configuration should now look like the following:
+```json
+{
+   "network":{
+      "ghostnet":{
+         "label":"Ghostnet Protocol Testnet",
+         "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
+         "protocol":"PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
+         "faucet":{
+            "pkh": "tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok",
+		    "mnemonic": "dice must lawsuit remain december shed scorpion member loud subject mixture fan trust beauty crush",
+            "email": "",
+            "password": "",
+            "amount": "",
+            "activation_code": ""
+        }
+      }
+   }
+```
+4. Go to teztnets.xyz, click on the link for the faucet of the desired testnet, and then request to have funds sent to your public key hash address (which would be _tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok_ in your example above)
+
+## New Features
+
+### ✅ Call entrypoints on a deployed contract: `taq transfer` / `taq call`
+
+The Taquito plugin now exposes a `taq transfer` (or `taq call`) task in Taqueria which will call the specified Michelson contract deployed to a Taqueria environment (default environment is one with sandbox named local)
+
+This allows interactions from implicit accounts to implicit or smart contract accounts
+
+Basic usage is:
+
+```shell
+taq transfer <contract alias or address>
+```
+
+Examples:
+
+- `taq call counter --param counter.parameter.param1.tz` will call a smart contract aliased as counter in the default environment with the parameter contained in that `.tz` file, transferring `0` tez
+- `taq transfer tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb --tez 20` will transfer 20 tez to that address, which is some implicit account
+
+Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-taquito/#the-taq-transfer-task)
+
+### ✅ Run Ligo native tests: `taq test`
+
+This task tests the LIGO source code and ouputs a result suggesting a failure or success. Normally you'd have a contract file and a separate test file that includes the contract's code, both within the /contracts directory
+
+Basic usage is:
+
+```shell
+taq test <filename>
+```
+
+Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-ligo/#the-taq-test-task)
+
+## Other Product Changes
+
+- The default `config.json` provided by `taq init` now uses the K protocol by default
+- Improvements to the Taqueria CI/CD pipeline
+- Improved error messaging when a value in `config.json` was invalid
+- Fixed issues with automated tests and decreased run time 
+- Documentation improvements
+
+### Pull Requests
+
+* New Taquito plugin task called `transfer` to enable interaction with deployed contracts by @jchenche in [#1245](https://github.com/ecadlabs/taqueria/pull/1245)
+* Adding links to scaffold projects in the table by @sinapsist in [#1252](https://github.com/ecadlabs/taqueria/pull/1252)
+* add mock and metadata plugins by @AlirezaHaghshenas in [#1251](https://github.com/ecadlabs/taqueria/pull/1251)
+* updating quickstart section and a few other places by @alexzbusko in [#1250](https://github.com/ecadlabs/taqueria/pull/1250)
+* Add test task for ligo plugin by @jchenche in [#1255](https://github.com/ecadlabs/taqueria/pull/1255)
+* removed tutorial from sidebar and website. Also removed legacy hello-… by @alexzbusko in [#1256](https://github.com/ecadlabs/taqueria/pull/1256)
+* run tests in parallel by @AlirezaHaghshenas in [#1232](https://github.com/ecadlabs/taqueria/pull/1232)
+* 🏗️ PR ➾Update default sandbox protocol to Jakarta by @hu3man in [#1264](https://github.com/ecadlabs/taqueria/pull/1264)
+* Fix originate and compile commands in command pallet by @AlirezaHaghshenas in [#1258](https://github.com/ecadlabs/taqueria/pull/1258)
+* Use esbuild to bundle TVsCE instead of Parcel by @MichalLytek in [#1235](https://github.com/ecadlabs/taqueria/pull/1235)
+* updated test configs to use specific ports for tzkt instances by @alexzbusko in [#1266](https://github.com/ecadlabs/taqueria/pull/1266)
+* Fix build issues for taqueria-protocol on node v16.16.0+ by @mweichert in [#1243](https://github.com/ecadlabs/taqueria/pull/1243)
+* Transfer call e2e tests by @sinapsist in [#1263](https://github.com/ecadlabs/taqueria/pull/1263)
+* 🏗️ PR ➾ Update default protocol to K by @hu3man in [#1269](https://github.com/ecadlabs/taqueria/pull/1269)
+* 🏗️ PR ➾ Refactor Tezos-client (decoupled from the flextesa plugin) and updated typecheck and simulate by @jchenche in [#1272](https://github.com/ecadlabs/taqueria/pull/1272)
+* 1042 - Relax faucet validation and display error hints by @mweichert in [#1262](https://github.com/ecadlabs/taqueria/pull/1262)
+* 🏗️ PR ➾ Prerelease 0.19.0 and GH wf improvements by @hu3man in [#1271](https://github.com/ecadlabs/taqueria/pull/1271)
+
+**Full Changelog**: [https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.0](https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.0)
+
+
 # Taqueria v0.8.0   
 
 | Details     |               |
