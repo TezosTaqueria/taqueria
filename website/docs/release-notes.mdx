@@ -17,7 +17,7 @@ title: Taqueria Releases
 - `@taqueria/plugin-ligo` now provides a `test` task used for running native Ligo tests
 - The VScE has added support for `@taqueria/plugin-metadata`
 - Improvements to the sandbox visualization in the VScE
-- The Ligo plugin's `taq compile <fileName>` task now requires an explicit file name to be provided: `taq compile test.jsligo`
+- The Ligo plugin's `taq compile <fileName>` task now requires an explicit file name to be provided: `taq compile hello-tacos.jsligo`
 
 ### ⚠️ Breaking Change
 
@@ -58,7 +58,7 @@ Your network configuration should now look like the following:
 
 ### ✅ Call entrypoints on a deployed contract: `taq transfer` / `taq call`
 
-The Taquito plugin now exposes a `taq transfer`` (or `taq call``) task in Taqueria which will call the specified Michelson contract deployed to a Taqueria environment (default environment is one with sandbox named local)
+The Taquito plugin now exposes a `taq transfer` (or `taq call`) task in Taqueria which will call the specified Michelson contract deployed to a Taqueria environment (default environment is one with sandbox named local)
 
 This allows interactions from implicit accounts to implicit or smart contract accounts
 
