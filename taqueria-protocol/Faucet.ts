@@ -2,29 +2,44 @@ import createType, { Flatten } from '@taqueria/protocol/Base';
 import * as PublicKeyHash from '@taqueria/protocol/PublicKeyHash';
 import { z } from 'zod';
 
-export const rawSchema = z.object({
-	pkh: z.string({ description: 'Faucet Public Key Hash' }).min(1),
-	mnemonic: z.array(
-		z.string({ description: 'Faucet Mnemonic Word' }).min(1),
-		{ description: 'Faucet Mnemonic' },
+const commonSchema = z.object({
+	mnemonic: z.preprocess(
+		arg => typeof arg === 'string' ? arg.split(' ') : arg,
+		z.array(
+			z.string({ description: 'Faucet Mnemonic Word' }).min(1).regex(/^[a-z]{2,}$/),
+			{ description: 'Faucet Mnemonic' },
+		),
 	),
-	email: z.string({ description: 'Faucet E-mail' }).regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
-	password: z.string({ description: 'Faucet Password' }).min(1),
-	amount: z.string({ description: 'Faucet Account' }).min(1).regex(/^\d+$/),
-	activation_code: z.string({ description: 'Faucet Activation Code' }).min(1),
+	email: z.string({ description: 'Faucet E-mail' }).regex(/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/).optional(),
+	password: z.string({ description: 'Faucet Password' }).optional(),
+	amount: z.string({ description: 'Faucet Amount' }).refine(
+		val => val.length === 0 || /^\d+$/.test(val),
+		'Amount, if present, must be numeric',
+	).optional(),
+	activation_code: z.string({ description: 'Faucet Activation Code' }).optional(),
+});
+
+export const rawSchema = commonSchema.extend({
+	pkh: z.string({ description: 'Faucet Public Key Hash' }).min(1),
 }).describe('Faucet');
 
-const internalSchema = z.object({
-	pkh: PublicKeyHash.schemas.schema,
-	mnemonic: z.array(
-		z.string({ description: 'Faucet Mnemonic Word' }).nonempty().regex(/^[a-z]{2,}$/),
-		{ description: 'Faucet Mnemonic' },
-	),
-	email: z.string({ description: 'Faucet E-mail' }).regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
-	password: z.string({ description: 'Faucet Password' }).nonempty(),
-	amount: z.string({ description: 'Faucet Account' }).nonempty().regex(/^\d+$/),
-	activation_code: z.string({ description: 'Faucet Activation Code' }).nonempty(),
-}).describe('Faucet');
+const internalSchema = z.preprocess(
+	input => {
+		const defaults = {
+			pkh: '',
+			mnemonic: [],
+			email: '',
+			password: '',
+			activation_code: '',
+		};
+		return typeof input === 'object'
+			? { ...defaults, ...input }
+			: defaults;
+	},
+	commonSchema.extend({
+		pkh: PublicKeyHash.schemas.schema,
+	}),
+).describe('Faucet');
 
 type RawInput = z.infer<typeof rawSchema>;
 type Input = z.infer<typeof internalSchema>;
