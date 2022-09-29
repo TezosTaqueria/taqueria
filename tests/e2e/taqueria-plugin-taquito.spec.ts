@@ -62,17 +62,17 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 2. Run taq deploy on a selected test network described in "test" environment
 
-		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+		const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
-		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 		// 3. Verify that contract has been originated on the network
-		expect(deployResponse).toContain('hello-tacos.tz');
-		expect(deployResponse).toContain(networkInfo.networkName);
-		const contractHash = deployResponse.split('│')[2].trim();
+		expect(stdout).toContain('hello-tacos.tz');
+		expect(stdout).toContain(networkInfo.networkName);
 
-		expect(contractHash).toMatch(contractRegex);
+		const result = stdout.match(/(KT1)+\w{33}?/);
+		expect(result).not.toBe(null);
+		const contractHash = (result as RegExpMatchArray)[0];
 
 		// 4. Verify that contract has been originated to the network
 		expect(
@@ -97,17 +97,17 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 			// 2. Run taq deploy ${contractName} on a selected test network described in "test" environment
 
-			const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+			const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
 				cwd: `./${taqueriaProjectPath}`,
 			});
-			const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
-			// 3. Get the KT address from the output
-			expect(deployResponse).toContain('hello-tacos.tz');
-			expect(deployResponse).toContain(networkInfo.networkName);
-			const contractHash = deployResponse.split('│')[2].trim();
+			// 3. Verify that contract has been originated on the network
+			expect(stdout).toContain('hello-tacos.tz');
+			expect(stdout).toContain(networkInfo.networkName);
 
-			expect(contractHash).toMatch(contractRegex);
+			const result = stdout.match(/(KT1)+\w{33}?/);
+			expect(result).not.toBe(null);
+			const contractHash = (result as RegExpMatchArray)[0];
 
 			// 4. Verify that contract has been originated to the network
 			expect(
