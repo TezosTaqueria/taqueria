@@ -29,6 +29,11 @@ import { ZodError } from 'zod';
 import { PluginSchema } from './types';
 import { LikeAPromise, pluginDefiner, StdIO } from './types';
 
+import { importKey } from '@taquito/signer';
+import { TezosToolkit } from '@taquito/taquito';
+import { b58cencode, Prefix, prefix } from '@taquito/utils';
+import crypto from 'crypto';
+
 // @ts-ignore interop issue. Maybe find a different library later
 import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
 import generateName from 'project-name-generator';
@@ -488,6 +493,43 @@ export const getAddressOfAlias = async (
 		);
 	}
 	return address;
+};
+
+const createAddress = async (network: NetworkConfig.t): Promise<TezosToolkit> => {
+	const tezos = new TezosToolkit(network.rpcUrl as string);
+	const keyBytes = Buffer.alloc(32);
+	crypto.randomFillSync(keyBytes);
+	const key = b58cencode(new Uint8Array(keyBytes), prefix[Prefix.P2SK]);
+	await importKey(tezos, key);
+	return tezos;
+};
+
+// Temporary solution before the environment refactor
+export const getAccountPrivateKey = async (
+	parsedArgs: RequestArgs.t,
+	network: NetworkConfig.t,
+	account: string,
+): Promise<string> => {
+	if (!network.accounts) network.accounts = {};
+	if (!network.accounts[account]) {
+		const tezos = await createAddress(network);
+		const publicKey = await tezos.signer.publicKey();
+		const publicKeyHash = await tezos.signer.publicKeyHash();
+		const privateKey = await tezos.signer.secretKey();
+		if (!privateKey) return sendAsyncErr('The private key must exist after creating it');
+		network.accounts[account] = { publicKey, publicKeyHash, privateKey };
+		try {
+			await writeJsonFile('./.taq/config.json')(parsedArgs.config);
+		} catch (err) {
+			return sendAsyncErr(`Could not write to ./.taq/config.json\n`);
+		}
+		return sendAsyncErr(
+			`A keypair with public key hash ${
+				network.accounts[account].publicKeyHash
+			} was generated for you. Go to https://teztnets.xyz and click "Faucet" of the desired protocol to fund it.`,
+		);
+	}
+	return network.accounts[account].privateKey;
 };
 
 /**

@@ -1,4 +1,5 @@
 import {
+	getAccountPrivateKey,
 	getAddressOfAlias,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
@@ -74,17 +75,9 @@ const configureToolKitWithNetwork = async (parsedArgs: Opts, networkName: string
 		);
 	}
 
-	const faucet = network.faucet;
-	if (!faucet) return sendAsyncErr(`Network ${networkName} requires a valid faucet in config.json.`);
-
 	const tezos = new TezosToolkit(network.rpcUrl as string);
-	await importKey(
-		tezos,
-		network.faucet.email,
-		network.faucet.password,
-		network.faucet.mnemonic.join(' '),
-		network.faucet.activation_code,
-	);
+	const key = await getAccountPrivateKey(parsedArgs, network, 'taqRootAccount');
+	await importKey(tezos, key);
 	return tezos;
 };
 
@@ -122,7 +115,20 @@ const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow): Promise
 			},
 		})
 		.then(op => op.confirmation().then(() => op.hash))
-		.catch(err => sendAsyncErr(`Error during transfer operation:\n${err} ${JSON.stringify(err, null, 2)}`));
+		.catch(err => {
+			if (err instanceof Error) {
+				if (/empty_implicit_contract/.test(err.message)) {
+					const result = (err.message).match(/(?<="implicit":")tz[^"]+(?=")/);
+					const publicKeyHash = result ? result[0] : undefined;
+					if (publicKeyHash) {
+						return sendAsyncErr(
+							`${publicKeyHash} possibly has no funds. Go to https://teztnets.xyz and click "Faucet" of the desired protocol to fund it. Note that you might need to wait for a few seconds for the network to register the funds.`,
+						);
+					}
+				}
+			}
+			return sendAsyncErr(`Error during transfer operation:\n${err} ${JSON.stringify(err, null, 2)}`);
+		});
 };
 
 export const transfer = async (parsedArgs: Opts): Promise<void> => {
