@@ -1,15 +1,12 @@
----
-title: Taco Shop
----
+# Taco Shop
 
-| Scaffold Details                                                             |
-|--------------------|---------------------------------------------------------|
-| Complexity         | Beginner                                                |
-| Automated Tests    | Yes                                                     |
-| Installed Plugins  | LIGO, Taquito, Flextesa, Jest                           |
-| Frontend Dapp      | Yes                                                     |
-| Wallet Integration | Yes                                                     |
-| Repository         | https://github.com/ecadlabs/taqueria-scaffold-taco-shop |
+| Scaffold Details   |                               |
+|--------------------|-------------------------------|
+| Complexity         | Beginner                      |
+| Automated Tests    | Yes                           |
+| Installed Plugins  | LIGO, Taquito, Flextesa, Jest |
+| Frontend Dapp      | Yes                           |
+| Wallet Integration | Yes                           |
 
 ## Quickstart
 
@@ -33,7 +30,7 @@ The smart contract has been deployed to ghostnet at the address for demonstratio
 The project comes pre-configured with the following:
 
 - Plugins: LIGO, Flextesa, Taquito, Jest
-- A LIGO multi-file smart contract: `hello-tacos.mligo`, `_buy.mligo`, `_make.mligo`, `_schema.mligo` 
+- A LIGO multi-file smart contract: `hello-tacos.mligo`, `_buy.mligo`, `_make.mligo`, `_schema.mligo`
 - A network configuration for the Ghostnet testnet
 - An environment named `ghostnet` with faucet to fund operations on the testnet
 - Native Taqueria testing (Taqueria Jest plugin)
@@ -161,13 +158,10 @@ let storage: storage = {
 
 The React dApp retrieves the number of available tacos from the smart contract and displays the value. It provides an interface for the user to buy tacos and looks like this:
 
-![Hello Tacos Screenshot](/img/hello-tacos-screenshot.png)
+![Hello Tacos Screenshot](hello-tacos-screenshot.png)
 
-:::note
-In order for the React dApp to connect to the smart contract, the contract must be deployed to the testnet and the returned address of the contract must be added to the `/app/index.tsx` file. The scaffold comes pre-configured with the address of the deployed contract for demonstration purposes but it is recommended that you add your own faucet file, then re-deploy the contract and update the references to it in the project for your own use
-
-This will be fixed in the future when contract addresses will be passed via the State API dynamically
-:::
+> In order for the React dApp to connect to the smart contract, the contract must be deployed to the testnet and the returned address of the contract must be added to the `/app/index.tsx` file. The scaffold comes pre-configured with the address of the deployed contract for demonstration purposes but it is recommended that you add your own faucet file, then re-deploy the contract and update the references to it in the project for your own use
+> This will be fixed in the future when contract addresses will be passed via the State API dynamically
 
 ### Compile the Contract
 
@@ -195,8 +189,7 @@ This should return the address of the contract on the testnet which looks like t
 └────────────────┴──────────────────────────────────────┴────────────────┘────────────────┘
 ```
 
-:::caution
-This scaffold comes with a pre-configured faucet file for the testnet which is shared by all users and can cause issues. It is recommended that you replace the faucet file in the project's `config.json` file with your own which you can get from the [Teztnets Faucet](https://teztnets.xyz/). Further information about network configuration can be found [here](/docs/config/networks)
+> This scaffold comes with a pre-configured faucet file for the testnet which is shared by all users and can cause issues. It is recommended that you replace the faucet file in the project's `config.json` file with your own which you can get from the [Teztnets Faucet](https://teztnets.xyz/). Further information about network configuration can be found [here](https://taqueria.io/docs/config/networks/)
 :::
 
 ### Build and Start the React Dapp
