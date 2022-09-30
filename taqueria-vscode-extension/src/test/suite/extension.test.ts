@@ -46,13 +46,10 @@ function getNextOpenDialogUri() {
 }
 
 let choosePlugin: string = '@taqueria/plugin-smartpy';
+
 const mockedMethods = {
 	'window.showInformationMessage': (msg: string) => Promise.resolve(console.log(msg)),
-	'window.showQuickPick': (
-		_availablePlugins: readonly string[] | Thenable<readonly string[]>,
-		_options: QuickPickOptions & { canPickMany: true },
-		cancellationToken: CancellationToken,
-	) => Promise.resolve([choosePlugin]),
+	'window.showQuickPick': () => Promise.resolve([choosePlugin]),
 	'window.showOpenDialog': () => {
 		return Promise.resolve([Uri.file(getNextOpenDialogUri())]);
 	},
