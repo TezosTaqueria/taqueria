@@ -880,7 +880,7 @@ export class VsCodeHelper {
 			return await Util.execCmd(
 				`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`,
 				this.getLog(),
-				pathToDir,
+				{ projectDir: pathToDir },
 			);
 		} else {
 			return await Util.execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`, this.getLog());
@@ -1608,30 +1608,52 @@ export class VsCodeHelper {
 
 	private async performDownloadingAndInstallTaqCLI(taqDownloadUrl: string): Promise<boolean> {
 		// 2. Download binary
-		const { executionError: curlError } = await execCmd(`curl -LO ${taqDownloadUrl}`, this.getLog());
+		const { executionError: curlError } = await execCmd(
+			`curl -LO ${taqDownloadUrl}`,
+			this.getLog(),
+		);
+		this.showLog(OutputLevels.debug, `Downloading Taqueria CLI...`);
 		if (curlError) {
 			this.showLog(OutputLevels.error, `Failed to download Taqueria CLI: ${curlError}`);
 			return false;
 		}
-		this.showLog(OutputLevels.debug, `Taqueria CLI downloaded successfully`);
+		this.showLog(OutputLevels.info, `Taqueria CLI downloaded successfully`);
 
-		// 3. Chmod +x
+		// 3. Make Taqueria CLI executable
 		const { executionError: chmodError } = await execCmd(`chmod +x taq`, this.getLog());
 		if (chmodError) {
 			this.showLog(OutputLevels.error, `Failed to make Taqueria CLI executable: ${chmodError}`);
 			return false;
 		}
-		this.showLog(OutputLevels.debug, `Taqueria CLI made executable successfully`);
+		this.showLog(OutputLevels.info, `Taqueria CLI made executable successfully`);
 
-		// 4. Move to usr bin
-		const { executionError: moveError } = await execCmd(`sudo mv taq /usr/local/bin`, this.getLog());
+		// 4. Ask for sudo password
+		const sudoPassword = await this.vscode.window.showInputBox({
+			password: true,
+			title: 'Enter your sudo password',
+			prompt: 'Sudo password is required in order to install Taq CLI',
+		});
+		if (!sudoPassword) {
+			this.showLog(
+				OutputLevels.error,
+				`Sudo password is required in order to move Taq CLI binary to /usr/local/bin directory`,
+			);
+			return false;
+		}
+
+		// 5. Move to usr bin
+		const { executionError: moveError } = await execCmd(
+			`mv taq /usr/local/bin`,
+			this.getLog(),
+			{ sudoPassword },
+		);
 		if (moveError) {
 			this.showLog(OutputLevels.error, `Failed to move Taqueria CLI to /usr/local/bin: ${moveError}`);
 			return false;
 		}
-		this.showLog(OutputLevels.debug, `Taqueria CLI moved to /usr/local/bin successfully`);
+		this.showLog(OutputLevels.info, `Taqueria CLI moved to /usr/local/bin successfully`);
 
-		// 5. Check if taq is reachable
+		// 6. Check if taq is reachable
 		const { executionError: checkError } = await execCmd(`taq --version`, this.getLog());
 		if (checkError) {
 			this.showLog(OutputLevels.error, `Failed to check Taqueria CLI: ${checkError}`);
@@ -1639,9 +1661,8 @@ export class VsCodeHelper {
 		}
 		this.showLog(OutputLevels.info, `Taqueria CLI installed successfully`);
 
-		// 6. Catch no sudo permission and prompt for password
-		// TODO: try-catch
-
+		// 7. Refresh side panel UI
+		await this.updateCommandStates();
 		return true;
 	}
 }

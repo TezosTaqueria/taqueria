@@ -142,15 +142,21 @@ export class TaqExecutionResult {
 export const execCmd = (
 	cmd: string,
 	showLog: OutputFunction,
-	projectDir?: PathToDir,
+	{ projectDir, sudoPassword }: { projectDir?: PathToDir; sudoPassword?: string } = {},
 ): LikeAPromise<TaqExecutionResult, TaqVsxError> =>
 	new Promise((resolve, reject) => {
 		showLog(OutputLevels.info, `Running command:\n${cmd}`);
 		if (isWindows()) reject({ code: 'E_WINDOWS', msg: 'Running in Windows without WSLv2 is currently not supported.' });
 		else {
-			const shellCommand = `sh -c "${projectDir ? 'cd ' + projectDir + ' && ' : ''}${cmd}"`;
+			let shellCommand = `sh -c "${projectDir ? 'cd ' + projectDir + ' && ' : ''}${cmd}"`;
+			if (sudoPassword) {
+				shellCommand = `echo '${sudoPassword}' | sudo -kS ${shellCommand}`;
+			}
 			showLog(OutputLevels.debug, shellCommand);
 			exec(shellCommand, (executionError, standardOutput, standardError) => {
+				if (sudoPassword) {
+					standardError = standardError.replace(/\[sudo\] password for .+: /g, '');
+				}
 				resolve(new TaqExecutionResult(executionError, standardOutput, standardError));
 			});
 		}
