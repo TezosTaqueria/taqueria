@@ -48,8 +48,6 @@ const mockedMethods = {
 	},
 };
 vscodeMock = MockedObject.make(vscode, mockedMethods);
-let originalPackageJsonContents: string;
-const packageJsonPath = path.join(sourceFilesRoot, 'package.json');
 
 describe('Extension Test Suite', async () => {
 	before(async () => {
@@ -57,12 +55,6 @@ describe('Extension Test Suite', async () => {
 			subscriptions: [],
 		} as any;
 
-		originalPackageJsonContents = await fse.readFile(packageJsonPath, 'utf-8');
-		const activationEventsRemoved = originalPackageJsonContents.replace(
-			/\"activationEvents\": \[(.|\n)*?\]/,
-			'"activationEvents": []',
-		);
-		await fse.writeFile(packageJsonPath, activationEventsRemoved);
 		await taqueriaExtension.activate(context, { vscode: vscodeMock });
 
 		vscode.window.showInformationMessage('Start all tests.');
@@ -150,7 +142,6 @@ describe('Extension Test Suite', async () => {
 
 	after(async () => {
 		// await fse.rm(testProjectRoot, { recursive: true });
-		await fse.writeFile(packageJsonPath, originalPackageJsonContents);
 		// Uncomment for local development
 		// await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
 	});
