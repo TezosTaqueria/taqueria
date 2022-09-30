@@ -886,7 +886,7 @@ export class VsCodeHelper {
 				if (!config || !pathToDir) {
 					this.showLog(
 						OutputLevels.warn,
-						`Could not determine current project folder.`,
+						`Could not determine current project folder: ${JSON.stringify({ config, pathToDir }, null, 2)}`,
 					);
 					return;
 				}
@@ -1095,6 +1095,7 @@ export class VsCodeHelper {
 	}
 
 	async updateCommandStates() {
+		await this.observableConfig.loadConfig();
 		const [isTaqReachable, nodeVersion] = await Promise.all([
 			this.isTaqCliReachable(),
 			Util.getNodeVersion(this.getLog()),
@@ -1122,7 +1123,11 @@ export class VsCodeHelper {
 		this.vscode.commands.executeCommand('setContext', '@taqueria-state/system-check-passed', systemCheckPassed);
 
 		if (systemCheckPassed) {
-			this.vscode.commands.executeCommand('workbench.actions.treeView.taqueria-system-check.collapseAll');
+			try {
+				await this.vscode.commands.executeCommand('workbench.actions.treeView.taqueria-system-check.collapseAll');
+			} catch {
+				// ignored;
+			}
 		}
 
 		if (this.systemCheckTreeView) {
@@ -1275,11 +1280,6 @@ export class VsCodeHelper {
 		addConfigWatcherIfNotExists(projectDir, () => {
 			this.showLog(OutputLevels.info, `Adding watchers for directory ${projectDir}.`);
 			try {
-				this.updateCommandStates();
-			} catch (error: any) {
-				this.logAllNestedErrors(error);
-			}
-			try {
 				const taqFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq'));
 				this._taqFolderWatcher = taqFolderWatcher;
 				const configWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
@@ -1324,6 +1324,12 @@ export class VsCodeHelper {
 				testsWatcher.onDidChange(_ => this.testDataProvider?.refresh());
 				testsWatcher.onDidCreate(_ => this.testDataProvider?.refresh());
 				testsWatcher.onDidDelete(_ => this.testDataProvider?.refresh());
+
+				try {
+					this.updateCommandStates();
+				} catch (error: any) {
+					this.logAllNestedErrors(error);
+				}
 
 				return [
 					taqFolderWatcher,

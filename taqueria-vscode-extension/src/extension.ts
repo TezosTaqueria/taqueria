@@ -133,16 +133,18 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 	helper.exposeShowEntrypointParametersCommand();
 	helper.exposeShowOperationDetailsCommand();
 
-	deps.vscode.workspace.onDidChangeWorkspaceFolders(e => {
-		e.added.forEach(folder => {
+	await helper.registerDataProviders();
+	helper.createTreeViews();
+
+	deps.vscode.workspace.onDidChangeWorkspaceFolders(async e => {
+		for (const folder of e.added) {
 			try {
 				helper.createWatcherIfNotExists(folder.uri.fsPath, addConfigWatcherIfNotExists);
 			} catch (error: unknown) {
 				helper.logAllNestedErrors(error);
 			}
-		});
+		}
 	});
-
 	deps.vscode.workspace.workspaceFolders?.forEach(folder => {
 		try {
 			helper.createWatcherIfNotExists(folder.uri.fsPath, addConfigWatcherIfNotExists);
@@ -150,9 +152,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 			helper.logAllNestedErrors(error);
 		}
 	});
-	await helper.registerDataProviders();
-	helper.createTreeViews();
-	helper.updateCommandStates();
+	await helper.updateCommandStates();
 }
 
 export function deactivate() {

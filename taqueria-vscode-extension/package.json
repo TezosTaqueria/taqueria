@@ -598,7 +598,7 @@
 		"compile:test": "tsc -p tsconfig.test.json",
 		"pretest": "npm run compile:test",
 		"lint": "eslint src --ext ts",
-		"test": "mkdir -p ~/TVsCE_e2e/vscode-taq-test-project && node ./out/test/runTest.js"
+		"test": "npm run pretest && mkdir -p ~/TVsCE_e2e/vscode-taq-test-project && node ./out/test/runTest.js"
 	},
 	"devDependencies": {
 		"@taquito/taquito": "^13.0.1",

@@ -9,21 +9,24 @@ import * as MockedObject from './MockedObject';
 import { sleep } from './utils/utils';
 
 const homedir = require('os').homedir();
-const sourceFilesRoot = path.resolve(__dirname, '../../../../');
+const sourceFilesRoot = path.resolve(__dirname, '../../../');
 const testProjectRoot = path.resolve(homedir, 'TVsCE_e2e');
-const testProjectSource = `${sourceFilesRoot}/src/test/suite/data/vscode-taq-test-project`;
-const ligoContractFileSource = `${sourceFilesRoot}/src/test/suite/data/hello-tacos.mligo`;
+const testProjectSource = `${sourceFilesRoot}/src/test/suite/data`;
+const ligoContractFileSource = `${testProjectSource}/hello-tacos.mligo`;
 
 const testProjectDestination = `${testProjectRoot}/vscode-taq-test-project`;
-const ligoContractFileDestination = `${testProjectRoot}/vscode-taq-test-project/contracts/hello-tacos.mligo`;
+const ligoContractFileDestination = `${testProjectDestination}/contracts/hello-tacos.mligo`;
 
 const originalMethods = {
 	'window.showInformationMessage': vscode.window.showInformationMessage,
 	'window.showQuickPick': vscode.window.showQuickPick,
 };
 
-let output: OutputChannel;
 let vscodeMock: typeof vscode;
+let mockedReturnValues = {
+	openDialogMockValues: [`${ligoContractFileDestination}`],
+	openDialogMockIndex: 0,
+};
 let choosePlugin: string = '@taqueria/plugin-smartpy';
 const mockedMethods = {
 	'window.showInformationMessage': (msg: string) => Promise.resolve(console.log(msg)),
@@ -32,7 +35,17 @@ const mockedMethods = {
 		_options: QuickPickOptions & { canPickMany: true },
 		cancellationToken: CancellationToken,
 	) => Promise.resolve([choosePlugin]),
-	'window.createOutputChannel': (name: string, languageId?: string) => Promise.resolve(output),
+	'window.showOpenDialog': () => {
+		if (
+			!mockedReturnValues.openDialogMockValues
+			|| mockedReturnValues.openDialogMockIndex >= mockedReturnValues.openDialogMockValues.length
+		) {
+			throw new Error('We have already used all mocked values.');
+		}
+		const mockedValue = mockedReturnValues.openDialogMockValues[mockedReturnValues.openDialogMockIndex];
+		mockedReturnValues.openDialogMockIndex++;
+		return Promise.resolve([Uri.file(mockedValue)]);
+	},
 };
 vscodeMock = MockedObject.make(vscode, mockedMethods);
 let originalPackageJsonContents: string;
@@ -55,14 +68,47 @@ describe('Extension Test Suite', async () => {
 		vscode.window.showInformationMessage('Start all tests.');
 	});
 
-	it('Verify that Taqueria commands present in the command pallete list ', async () => {
+	it('Verify that Taqueria commands present in the command pallet list ', async () => {
 		await vscode.commands.getCommands(true).then(allCommands => {
 			const taqCommands = allCommands.filter(command => command.toLowerCase().includes('taq'));
 			assert.notEqual(taqCommands, undefined);
 		});
 	});
 
-	it('Verify that VS Code commands Taqueria Sandbox can start sandbox to get list of accounts and also can stop sandbox', async () => {
+	xit(
+		'Verify that VS Code commands Taqueria Sandbox can start sandbox to get list of accounts and also can stop sandbox',
+		async () => {
+			// It creates another process
+			// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
+			// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
+			// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
+
+			await fse.rm(testProjectDestination, { recursive: true });
+			await fse.mkdir(testProjectDestination, { recursive: true });
+
+			await vscodeMock.commands.executeCommand('taqueria.init');
+
+			// Run ls command
+			// const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
+
+			// Need to find library to use contains or build it
+			// assert.notEqual(checkArtifact, undefined);
+			choosePlugin = '@taqueria/plugin-flextesa';
+
+			await vscodeMock.commands.executeCommand('taqueria.install');
+
+			choosePlugin = '@taqueria/plugin-ligo';
+
+			await vscodeMock.commands.executeCommand('taqueria.install');
+
+			// Copy contract from data folder
+			await fse.copyFile(ligoContractFileSource, ligoContractFileDestination);
+
+			await vscodeMock.commands.executeCommand('taqueria.compile');
+		},
+	);
+
+	it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
 		// It creates another process
 		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
 		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
@@ -76,35 +122,9 @@ describe('Extension Test Suite', async () => {
 		// Run ls command
 		// const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
 
-		// Need to find library to use contains or build it
-		// assert.notEqual(checkArtifact, undefined);
-		choosePlugin = '@taqueria/plugin-flextesa';
-
-		await vscodeMock.commands.executeCommand('taqueria.install');
-
 		choosePlugin = '@taqueria/plugin-ligo';
 
 		await vscodeMock.commands.executeCommand('taqueria.install');
-
-		// Copy contract from data folder
-		await fse.copyFile(ligoContractFileSource, ligoContractFileDestination);
-
-		await vscodeMock.commands.executeCommand('taqueria.compile');
-	});
-
-	xit('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
-		// It creates another process
-		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
-		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
-		// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
-
-		await fse.rm(testProjectDestination, { recursive: true });
-		await fse.mkdir(testProjectDestination, { recursive: true });
-
-		await vscodeMock.commands.executeCommand('taqueria.init');
-
-		// Run ls command
-		// const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
 
 		// Need to find library to use contains or build it
 		// assert.notEqual(checkArtifact, undefined);
@@ -112,14 +132,20 @@ describe('Extension Test Suite', async () => {
 
 		await vscodeMock.commands.executeCommand('taqueria.install');
 
-		choosePlugin = '@taqueria/plugin-ligo';
-
-		await vscodeMock.commands.executeCommand('taqueria.install');
+		// await vscodeMock.commands.executeCommand('taqueria.refresh_command_states');
 
 		// Copy contract from data folder
 		await fse.copyFile(ligoContractFileSource, ligoContractFileDestination);
 
-		await vscodeMock.commands.executeCommand('taqueria.compile');
+		await vscodeMock.commands.executeCommand('taqueria.compile_pick_file');
+
+		assert.doesNotThrow(() => {
+			const compileResult = fse.readFileSync(`${testProjectDestination}/artifacts/hello-tacos.tz`, {
+				encoding: 'utf-8',
+			});
+			const expectedResult = fse.readFileSync(`${testProjectSource}/hello-tacos-expected.tz`, { encoding: 'utf-8' });
+			assert.equal(compileResult, expectedResult);
+		}, 'The compile command has not created the expected artifacts');
 	});
 
 	after(async () => {
