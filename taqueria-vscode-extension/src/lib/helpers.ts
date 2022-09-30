@@ -1608,7 +1608,7 @@ export class VsCodeHelper {
 	private async performDownloadingAndInstallTaqCLI(taqDownloadUrl: string): Promise<boolean> {
 		// 2. Download binary
 		const { executionError: curlError } = await execCmd(
-			`curl -LO ${taqDownloadUrl}`,
+			`curl -s ${taqDownloadUrl} -o /tmp/taq -L`,
 			this.getLog(),
 		);
 		this.showLog(OutputLevels.debug, `Downloading Taqueria CLI...`);
@@ -1619,7 +1619,7 @@ export class VsCodeHelper {
 		this.showLog(OutputLevels.info, `Taqueria CLI downloaded successfully`);
 
 		// 3. Make Taqueria CLI executable
-		const { executionError: chmodError } = await execCmd(`chmod +x taq`, this.getLog());
+		const { executionError: chmodError } = await execCmd(`chmod +x /tmp/taq`, this.getLog());
 		if (chmodError) {
 			this.showLog(OutputLevels.error, `Failed to make Taqueria CLI executable: ${chmodError}`);
 			return false;
@@ -1642,7 +1642,7 @@ export class VsCodeHelper {
 
 		// 5. Move to usr bin
 		const { executionError: moveError } = await execCmd(
-			`mv taq /usr/local/bin`,
+			`mv /tmp/taq /usr/local/bin`,
 			this.getLog(),
 			{ sudoPassword },
 		);
