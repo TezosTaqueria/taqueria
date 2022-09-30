@@ -2,13 +2,13 @@
 title: Taqueria Releases
 ---
 
-# Taqueria v0.20.0   
+# Taqueria v0.20.2  
 
 | Details     |               |
 | ----------- | ------------- |
-|Release Date | Sept 28, 2022 |
+|Release Date | Sept 29, 2022 |
 |Release Type | Minor         |
-|Release Page | [v0.20.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.20.0) |
+|Release Page | [v0.20.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.20.2) |
 
 ## Summary of Impactful Changes
 
@@ -87,6 +87,16 @@ taq test <filename>
 
 Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-ligo/#the-taq-test-task)
 
+## Migrating from Legacy Versions
+
+You can update your existing projects to use Taqueria v0.20.2 plugins using the following command:
+
+```shell
+plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 1 taq uninstall && echo $plugins | xargs -n 1 taq install
+```
+
+Note, this does require the `jq` cli tool to be installed ('brew install jq')
+
 ## Other Product Changes
 
 - The default `config.json` provided by `taq init` now uses the K protocol by default
@@ -94,6 +104,7 @@ Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-l
 - Improved error messaging when a value in `config.json` was invalid
 - Fixed issues with automated tests and decreased run time 
 - Documentation improvements
+- Scaffolds updated to use Taqueria v0.20.2
 
 ### Pull Requests
 
@@ -115,7 +126,7 @@ Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-l
 * 1042 - Relax faucet validation and display error hints by @mweichert in [#1262](https://github.com/ecadlabs/taqueria/pull/1262)
 * 🏗️ PR ➾ Prerelease 0.19.0 and GH wf improvements by @hu3man in [#1271](https://github.com/ecadlabs/taqueria/pull/1271)
 
-**Full Changelog**: [https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.0](https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.0)
+**Full Changelog**: [https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.2](https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.2)
 
 
 # Taqueria v0.8.0   
