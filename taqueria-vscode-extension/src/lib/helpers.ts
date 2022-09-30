@@ -31,7 +31,6 @@ import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
 import { execCmd } from './pure';
 import { getLanguageInfoForFileName, getSupportedSmartContractExtensions } from './SmartContractLanguageInfo';
-import downloadAndInstallTaqCLI from './TaqInstaller';
 import { TaqVsxError } from './TaqVsxError';
 
 export const COMMAND_PREFIX = 'taqueria.';
@@ -298,7 +297,7 @@ export class VsCodeHelper {
 	}
 
 	exposeInstallTaqCliCommand() {
-		this.registerCommand(COMMAND_PREFIX + 'install_taq_cli', async () => {
+		this.registerCommand('install_taq_cli', async () => {
 			await this.vscode.window.withProgress({
 				location: this.vscode.ProgressLocation.Notification,
 				cancellable: false,
