@@ -87,6 +87,16 @@ taq test <filename>
 
 Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-ligo/#the-taq-test-task)
 
+## Migrating from Legacy Versions
+
+You can update your existing projects to use Taqueria v0.20.2 plugins using the following command:
+
+```shell
+plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 1 taq uninstall && echo $plugins | xargs -n 1 taq install
+```
+
+Note, this does require the `jq` cli tool to be installed ('brew install jq')
+
 ## Other Product Changes
 
 - The default `config.json` provided by `taq init` now uses the K protocol by default
@@ -94,6 +104,7 @@ Full documentation can be found [here](https://taqueria.io/docs/plugins/plugin-l
 - Improved error messaging when a value in `config.json` was invalid
 - Fixed issues with automated tests and decreased run time 
 - Documentation improvements
+- Scaffolds updated to use Taqueria v0.20.2
 
 ### Pull Requests
 
