@@ -33,7 +33,7 @@ The smart contract has been deployed to ghostnet at the address for demonstratio
 The project comes pre-configured with the following:
 
 - Plugins: LIGO, Flextesa, Taquito, Jest
-- A LIGO multi-file smart contract: `hello-tacos.mligo`, `_buy.mligo`, `_make.mligo`, `_schema.mligo` 
+- A LIGO multi-file smart contract: `hello-tacos.mligo`, `_buy.mligo`, `_make.mligo`, `_schema.mligo`
 - A network configuration for the Ghostnet testnet
 - An environment named `ghostnet` with faucet to fund operations on the testnet
 - Native Taqueria testing (Taqueria Jest plugin)
@@ -51,8 +51,8 @@ The project comes pre-configured with the following:
 - Docker v0.9 or later
 - Node.js v16 or later
 - Beacon or Kukai Wallet
-- A funded testnet account
-- A [faucet file](https://teztnets.xyz)
+- A funded testnet account (instructions [here](https://taqueria.io/docs/config/networks/#faucets))
+
 
 ## Using the Project
 
@@ -246,9 +246,6 @@ function app() {
   const [connected, setConnected] = useState(false);
 ```
 
-You should now be able to access the Taco Shop dApp at [http://localhost:3000](http://localhost:3000/)
-
-
 ### Connect to Temple Wallet
 
 Open a browser and navigate to [http://localhost:3000](http://localhost:3000/)
@@ -259,7 +256,7 @@ Click on the `Connect wallet` button in the top right corner of the page and sel
 
 Provide your credentials for the wallet, select a funded account, and click `connect`
 
-### Buy Tacos
+### Buy Tacos using the dapp
 
 With your wallet connected, you can now interact with the contract entrypoint
 
@@ -267,8 +264,10 @@ Click the `order` button and then authorize the transaction in Temple Wallet
 
 Once completed, you will see the value of `available_tacos` decrease by the number of tacos you ordered
 
+### Make Tacos using the taq call command
 
-Alternatively, you could buy tacos with the Taq CLI by executing `taq call hello-tacos.tz --param hello-tacos.parameter.buySomeTacos.tz`
+You can call contract entrypoints, such as the "make" entrypoint with the Taq CLI by executing `taq call hello-tacos --param hello-tacos.parameter.buySomeTacos.tz -e testing`
+
 
 ## Testing
 
