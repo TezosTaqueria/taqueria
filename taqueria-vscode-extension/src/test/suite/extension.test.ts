@@ -24,9 +24,27 @@ const originalMethods = {
 
 let vscodeMock: typeof vscode;
 let mockedReturnValues = {
-	openDialogMockValues: [`${ligoContractFileDestination}`],
+	openDialogMockValues: [''],
 	openDialogMockIndex: 0,
 };
+
+function setOpenDialogMocks(...mockedPaths: string[]) {
+	mockedReturnValues.openDialogMockValues = mockedPaths;
+	mockedReturnValues.openDialogMockIndex = 0;
+}
+
+function getNextOpenDialogUri() {
+	if (
+		!mockedReturnValues.openDialogMockValues
+		|| mockedReturnValues.openDialogMockIndex >= mockedReturnValues.openDialogMockValues.length
+	) {
+		throw new Error('We have already used all mocked values.');
+	}
+	const mockedValue = mockedReturnValues.openDialogMockValues[mockedReturnValues.openDialogMockIndex];
+	mockedReturnValues.openDialogMockIndex++;
+	return mockedValue;
+}
+
 let choosePlugin: string = '@taqueria/plugin-smartpy';
 const mockedMethods = {
 	'window.showInformationMessage': (msg: string) => Promise.resolve(console.log(msg)),
@@ -36,15 +54,7 @@ const mockedMethods = {
 		cancellationToken: CancellationToken,
 	) => Promise.resolve([choosePlugin]),
 	'window.showOpenDialog': () => {
-		if (
-			!mockedReturnValues.openDialogMockValues
-			|| mockedReturnValues.openDialogMockIndex >= mockedReturnValues.openDialogMockValues.length
-		) {
-			throw new Error('We have already used all mocked values.');
-		}
-		const mockedValue = mockedReturnValues.openDialogMockValues[mockedReturnValues.openDialogMockIndex];
-		mockedReturnValues.openDialogMockIndex++;
-		return Promise.resolve([Uri.file(mockedValue)]);
+		return Promise.resolve([Uri.file(getNextOpenDialogUri())]);
 	},
 };
 vscodeMock = MockedObject.make(vscode, mockedMethods);
@@ -105,6 +115,8 @@ describe('Extension Test Suite', async () => {
 		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
 		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
 		// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
+
+		setOpenDialogMocks(`${ligoContractFileDestination}`);
 
 		await fse.rm(testProjectDestination, { recursive: true });
 		await fse.mkdir(testProjectDestination, { recursive: true });
