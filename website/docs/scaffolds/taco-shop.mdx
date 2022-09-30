@@ -33,7 +33,7 @@ The smart contract has been deployed to ghostnet at the address for demonstratio
 The project comes pre-configured with the following:
 
 - Plugins: LIGO, Flextesa, Taquito, Jest
-- A LIGO multi-file smart contract: `hello-tacos.mligo`, `_buy.mligo`, `_make.mligo`, `_schema.mligo` 
+- A LIGO multi-file smart contract: `hello-tacos.mligo`, `_buy.mligo`, `_make.mligo`, `_schema.mligo`
 - A network configuration for the Ghostnet testnet
 - An environment named `ghostnet` with faucet to fund operations on the testnet
 - Native Taqueria testing (Taqueria Jest plugin)
@@ -51,8 +51,8 @@ The project comes pre-configured with the following:
 - Docker v0.9 or later
 - Node.js v16 or later
 - Beacon or Kukai Wallet
-- A funded testnet account
-- A [faucet file](https://teztnets.xyz)
+- A funded testnet account (instructions [here](https://taqueria.io/docs/config/networks/#faucets))
+
 
 ## Using the Project
 
@@ -245,9 +245,6 @@ function app() {
   const [Tezos, setTezos] = useState<TezosToolkit>();
   const [connected, setConnected] = useState(false);
 ```
-
-You should now be able to access the Taco Shop dApp at [http://localhost:3000](http://localhost:3000/)
-
 
 ### Connect to Temple Wallet
 
