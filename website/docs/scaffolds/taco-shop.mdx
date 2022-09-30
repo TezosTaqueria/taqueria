@@ -256,7 +256,7 @@ Click on the `Connect wallet` button in the top right corner of the page and sel
 
 Provide your credentials for the wallet, select a funded account, and click `connect`
 
-### Buy Tacos
+### Buy Tacos using the dapp
 
 With your wallet connected, you can now interact with the contract entrypoint
 
@@ -264,8 +264,10 @@ Click the `order` button and then authorize the transaction in Temple Wallet
 
 Once completed, you will see the value of `available_tacos` decrease by the number of tacos you ordered
 
+### Make Tacos using the taq call command
 
-Alternatively, you could buy tacos with the Taq CLI by executing `taq call hello-tacos.tz --param hello-tacos.parameter.buySomeTacos.tz`
+You can call contract entrypoints, such as the "make" entrypoint with the Taq CLI by executing `taq call hello-tacos --param hello-tacos.parameter.buySomeTacos.tz -e testing`
+
 
 ## Testing
 
