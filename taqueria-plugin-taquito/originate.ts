@@ -165,7 +165,7 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 		if (error.message) {
 			const msg = error.message;
 			if (/ENOTFOUND/.test(msg)) {
-				sendErr('The RPC URL may be invalid. Check your ./taq/config.json.\n');
+				sendErr('The RPC URL may be invalid. Check your ./.taq/config.json.\n');
 				sendErr(msg);
 			} else if (/ECONNREFUSED/.test(msg)) {
 				sendErr('The RPC URL may be down or the sandbox is not running.\n');
