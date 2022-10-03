@@ -71,7 +71,14 @@
 		"SmartPy",
 		"Archetype"
 	],
-	"activationEvents": [],
+	"activationEvents": [
+		"onCommand:taqueria.init",
+		"onCommand:taqueria.scaffold",
+		"onCommand:taqueria.opt_in",
+		"onCommand:taqueria.opt_out",
+		"workspaceContains:.taq",
+		"onStartupFinished"
+	],
 	"main": "./out/main.js",
 	"contributes": {
 		"configuration": {
@@ -598,7 +605,7 @@
 		"compile:test": "tsc -p tsconfig.test.json",
 		"pretest": "npm run compile:test",
 		"lint": "eslint src --ext ts",
-		"test": "npm run pretest && mkdir -p ~/TVsCE_e2e/vscode-taq-test-project && node ./out/test/runTest.js"
+		"test": "./bin/run-tests.sh"
 	},
 	"devDependencies": {
 		"@taquito/taquito": "^13.0.1",

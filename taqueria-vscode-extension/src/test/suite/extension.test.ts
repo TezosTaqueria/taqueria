@@ -1,12 +1,10 @@
 import assert from 'assert';
-import { exec, execSync } from 'child_process';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { CancellationToken, ExtensionContext, OutputChannel, QuickPickOptions, Uri, workspace } from 'vscode';
+import { ExtensionContext, Uri } from 'vscode';
 import * as taqueriaExtension from '../../extension';
 import * as MockedObject from './MockedObject';
-import { sleep } from './utils/utils';
 
 const homedir = require('os').homedir();
 const sourceFilesRoot = path.resolve(__dirname, '../../../');
@@ -74,39 +72,6 @@ describe('Extension Test Suite', async () => {
 		});
 	});
 
-	xit(
-		'Verify that VS Code commands Taqueria Sandbox can start sandbox to get list of accounts and also can stop sandbox',
-		async () => {
-			// It creates another process
-			// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
-			// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
-			// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
-
-			await fse.rm(testProjectDestination, { recursive: true });
-			await fse.mkdir(testProjectDestination, { recursive: true });
-
-			await vscodeMock.commands.executeCommand('taqueria.init');
-
-			// Run ls command
-			// const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
-
-			// Need to find library to use contains or build it
-			// assert.notEqual(checkArtifact, undefined);
-			choosePlugin = '@taqueria/plugin-flextesa';
-
-			await vscodeMock.commands.executeCommand('taqueria.install');
-
-			choosePlugin = '@taqueria/plugin-ligo';
-
-			await vscodeMock.commands.executeCommand('taqueria.install');
-
-			// Copy contract from data folder
-			await fse.copyFile(ligoContractFileSource, ligoContractFileDestination);
-
-			await vscodeMock.commands.executeCommand('taqueria.compile');
-		},
-	);
-
 	it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
 		// It creates another process
 		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
@@ -120,15 +85,10 @@ describe('Extension Test Suite', async () => {
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
-		// Run ls command
-		// const checkArtifact = await exec(`ls ${testProjectDestination}\artifacts`);
-
 		choosePlugin = '@taqueria/plugin-ligo';
 
 		await vscodeMock.commands.executeCommand('taqueria.install');
 
-		// Need to find library to use contains or build it
-		// assert.notEqual(checkArtifact, undefined);
 		choosePlugin = '@taqueria/plugin-flextesa';
 
 		await vscodeMock.commands.executeCommand('taqueria.install');
