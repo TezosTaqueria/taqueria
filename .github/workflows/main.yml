@@ -82,6 +82,9 @@ jobs:
 
   run-a-test:
     runs-on: ubuntu-latest
+    needs:
+      - build-and-cache-node-modules
+
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
@@ -90,10 +93,10 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./node_modules
-          key: cache-node-modules-${{ hashFiles('./package-lock.json') }}
+          key: cache-node-modules-new-${{ hashFiles('./package-lock.json') }}
 
       - name: Run integration tests
-        run: npm run test:integration -w tests  
+        run: ls -ltr ./node_modules/@taqueria/node-sdk
 
 #   build-binaries:
 #     permissions:
