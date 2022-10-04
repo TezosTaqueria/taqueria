@@ -53,12 +53,12 @@ jobs:
 
       - name: Compile packages
         run: npm run build-all
+
+      - name: update run-tests.sh to make it executable
+        run: chmod +x ./taqueria-vscode-extension/bin/run-tests.sh
       
       - name: Compile TS
         run: npm run compile:test --workspace ${{ env.GIT_WORKSPACE }}
-
-      - name: Run Unit Tests on Linux
-        run: ls -l ./taqueria-vscode-extension/src/test/suite/data/
       
       - name: Run Unit Tests on Linux
         run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
