@@ -312,113 +312,113 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
-  vscode-extension-workflow:
-    needs: 
-      - detect-changes
-      - publish-state-plugin-to-npm
+  # vscode-extension-workflow:
+  #   needs: 
+  #     - detect-changes
+  #     - publish-state-plugin-to-npm
 
-    if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
-            github.event_name == 'release' || 
-            startsWith(github.ref, 'refs/tags/v')) &&
-            !github.event.pull_request.head.repo.fork }}
-    uses: ./.github/workflows/vscode-extension.yml
-    secrets:
-      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
-      GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
-      VSCE_PAT: ${{ secrets.VSCE_PAT }} 
+  #   if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
+  #           github.event_name == 'release' || 
+  #           startsWith(github.ref, 'refs/tags/v')) &&
+  #           !github.event.pull_request.head.repo.fork }}
+  #   uses: ./.github/workflows/vscode-extension.yml
+  #   secrets:
+  #     GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+  #     GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
+  #     VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
-  pr-comment:
-    runs-on: ubuntu-latest
-    # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
-    if: ${{ always() &&
-            !(contains(needs.*.result, 'failure')) && 
-            github.event_name == 'pull_request' &&
-            !github.event.pull_request.head.repo.fork }}
-    needs: 
-      - build-binaries
-      - vscode-extension-workflow
-    steps:
-      - uses: actions/checkout@v2
+  # pr-comment:
+  #   runs-on: ubuntu-latest
+  #   # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
+  #   if: ${{ always() &&
+  #           !(contains(needs.*.result, 'failure')) && 
+  #           github.event_name == 'pull_request' &&
+  #           !github.event.pull_request.head.repo.fork }}
+  #   needs: 
+  #     - build-binaries
+  #     - vscode-extension-workflow
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: create pr comment
-        uses: actions/github-script@v5
-        id: pr-comment
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const fs = require('fs');
-            const git_short_sha = "${{ github.sha }}".substring(0, 8)
-            const git_tag = "${{ github.ref }}".split('tags/')[1];
+  #     - name: create pr comment
+  #       uses: actions/github-script@v5
+  #       id: pr-comment
+  #       with:
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         script: |
+  #           const fs = require('fs');
+  #           const git_short_sha = "${{ github.sha }}".substring(0, 8)
+  #           const git_tag = "${{ github.ref }}".split('tags/')[1];
 
-            // Build the vscode-extension workflow comment
-            const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
+  #           // Build the vscode-extension workflow comment
+  #           const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
             
-            let vsCodeCommentBody = ''
-            if (vsCodeWorkflowState.includes('success')) {
-              vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
-            } else {
-              vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
-            }
+  #           let vsCodeCommentBody = ''
+  #           if (vsCodeWorkflowState.includes('success')) {
+  #             vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
+  #           } else {
+  #             vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
+  #           }
 
-            function readInfo(filePath) {
-              try {
-                const data = fs.readFileSync(filePath)
-                const JSONdata = JSON.parse(data.toString())
-                const name = JSONdata.name.split("/")[1]
-                const version = JSONdata.version
-                return { name, version }
-              } catch (error) {
-                console.error(`Got an error trying to read the file: ${error.message}`)
-              }
-            }
+  #           function readInfo(filePath) {
+  #             try {
+  #               const data = fs.readFileSync(filePath)
+  #               const JSONdata = JSON.parse(data.toString())
+  #               const name = JSONdata.name.split("/")[1]
+  #               const version = JSONdata.version
+  #               return { name, version }
+  #             } catch (error) {
+  #               console.error(`Got an error trying to read the file: ${error.message}`)
+  #             }
+  #           }
 
-            let body = `
-              <table>
-                <tr>
-                  <th scope="row">Latest Commit</th>
-                  <td>${git_short_sha}</td>
-                </tr>
-                <tr>
-                  <th scope="row">Taq Binaries</th>
-                  <td>
-                      <p>
-                          <a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a><br>
-                          <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
-                          <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
-                      </p>
-                  </td>
-                </tr>
-                <tr>
-                  <th scope="row">VSCode Extension VSIX</th>
-                  <td>${vsCodeCommentBody}</td>
-                </tr>
-              </table>
-            `;
+  #           let body = `
+  #             <table>
+  #               <tr>
+  #                 <th scope="row">Latest Commit</th>
+  #                 <td>${git_short_sha}</td>
+  #               </tr>
+  #               <tr>
+  #                 <th scope="row">Taq Binaries</th>
+  #                 <td>
+  #                     <p>
+  #                         <a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a><br>
+  #                         <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
+  #                         <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
+  #                     </p>
+  #                 </td>
+  #               </tr>
+  #               <tr>
+  #                 <th scope="row">VSCode Extension VSIX</th>
+  #                 <td>${vsCodeCommentBody}</td>
+  #               </tr>
+  #             </table>
+  #           `;
 
 
-            const {data: comments} = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            })
+  #           const {data: comments} = await github.rest.issues.listComments({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             issue_number: context.issue.number,
+  #           })
 
-            const botComment = comments.find(comment => comment.user.id === 41898282)                                                                       
+  #           const botComment = comments.find(comment => comment.user.id === 41898282)                                                                       
 
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body
-              })
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body
-              })
-            }
+  #           if (botComment) {
+  #             await github.rest.issues.updateComment({
+  #               owner: context.repo.owner,
+  #               repo: context.repo.repo,
+  #               comment_id: botComment.id,
+  #               body: body
+  #             })
+  #           } else {
+  #             await github.rest.issues.createComment({
+  #               owner: context.repo.owner,
+  #               repo: context.repo.repo,
+  #               issue_number: context.issue.number,
+  #               body: body
+  #             })
+  #           }
 
   release:
     name: Release
@@ -426,7 +426,7 @@ jobs:
     needs:
       - detect-minor-version
       - build-binaries
-      - vscode-extension-workflow
+      # - vscode-extension-workflow
     if: ${{ startsWith(github.ref, 'refs/tags/v') &&
             !github.event.pull_request.head.repo.fork }}
     steps:
@@ -439,7 +439,7 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
           wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
           wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
-          wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
+# wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
       - name: Pre-release
         if: ${{ needs.detect-minor-version.outputs.minor-version == 'odd' }}
