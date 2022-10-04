@@ -79,7 +79,7 @@ jobs:
       - name: Build all
         run: |
           pwd
-          echo "/hom/gino" >> $GITHUB_PATH
+          export PATH="$PATH:$(pwd)"
           echo "$PATH"
           npm run build-all
           ls -ltr ./node_modules/@taqueria/node-sdk/
