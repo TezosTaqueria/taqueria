@@ -78,7 +78,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ./node_modules
-          key: cache-node-modules-new-${{ github.run_id }}-${{ hashFiles('./package-lock.json') }}
+          key: cache-node-modules-new-${{ hashFiles('./package-lock.json') }}
 
   run-a-test:
     runs-on: ubuntu-latest
