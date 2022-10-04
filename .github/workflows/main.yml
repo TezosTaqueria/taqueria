@@ -81,6 +81,7 @@ jobs:
           key: cache-node-modules-${{ github.run_id }}-${{ hashFiles('./package-lock.json') }}
 
   run-a-test:
+    runs-on: ubuntu-latest
     steps:
       - name: Setup repo
         uses: actions/checkout@v2
