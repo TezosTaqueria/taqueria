@@ -15,6 +15,14 @@ title: The NFT Scaffold Project
 The NFT-Scaffold project is currently in alpha. It is not ready for production use and will be undergoing frequent updates as we work to implement Taqueria State and other features that have not yet been released
 :::
 
+## Requirements
+
+- Taqueria v0.16.0 or later
+- Docker v0.9 or later
+- Node.js v16 or later
+- Temple Wallet (can be found [here](https://templewallet.com/))
+- A funded testnet account (instructions [here](https://taqueria.io/docs/config/networks/#faucets))
+
 ## Project Setup 
 
 1. Scaffold the project by running:
@@ -43,7 +51,13 @@ touch .env
 echo "pinataJwtToken=eyJhbGc..." >> .env
 ```
 
-6. Start the Taqueria project by running the start script:
+6. Go up a directory to start the local Taqueria project
+
+```shell
+cd ..
+```
+
+7. Start the Taqueria project by running the start script:
 
 ```shell
 npm run start:taqueria:local
