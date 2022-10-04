@@ -140,12 +140,6 @@ jobs:
           path: "**/node_modules"
           key: cache-node-modules-${{ github.run_id }}
 
-      - name: List
-        run: |
-          ls -ltr ./node_modules/@taqueria/node-sdk/
-          ls -ltr ./taqueria-sdk/
-          npm list -ws
-
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
       ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
       - name: Build the binary for ${{ matrix.os }}
