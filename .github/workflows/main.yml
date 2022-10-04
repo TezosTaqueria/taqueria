@@ -260,6 +260,11 @@ jobs:
           ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
           ${{ matrix.get-current-dir }} >> $GITHUB_PATH
 
+      - name: check node_modules
+        run: |
+          ls -ltr ./node_modules | grep @taque
+          exit 1
+
       - name: build binary and make executable
         if: ${{ github.event.pull_request.head.repo.fork }}
         env:
