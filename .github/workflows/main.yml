@@ -84,7 +84,10 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         with:
-          path: "./node_modules/@taqueria/node-sdk/*"
+          path: |
+            "./node_modules/**/*"
+            "~/.npm"
+            "./taq"
           key: cache-node-modules-${{ github.run_id }}
 
       - name: List
@@ -137,7 +140,10 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         with:
-          path: "./node_modules/@taqueria/node-sdk/*"
+          path: |
+            "./node_modules/**/*"
+            "~/.npm"
+            "./taq"
           key: cache-node-modules-${{ github.run_id }}
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
@@ -262,7 +268,10 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         with:
-          path: "./node_modules/@taqueria/node-sdk/*"
+          path: |
+            "./node_modules/**/*"
+            "~/.npm"
+            "./taq"
           key: cache-node-modules-${{ github.run_id }}
 
       - name: List
