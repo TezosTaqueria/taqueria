@@ -111,8 +111,8 @@ describe('Extension Test Suite', async () => {
 
 		setOpenDialogMocks(`${ligoContractFileDestination}`);
 
-		await fse.rm(testProjectDestination, { recursive: true });
-		await fse.mkdir(testProjectDestination, { recursive: true });
+		// await fse.rm(testProjectDestination, { recursive: true });
+		// await fse.mkdir(testProjectDestination, { recursive: true });
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
