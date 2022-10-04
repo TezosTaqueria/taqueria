@@ -88,6 +88,8 @@ jobs:
       id-token: 'write'
     runs-on: ${{ matrix.os }}
     if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
+    needs:
+      - build-and-cache-node-modules
     strategy:
       fail-fast: true
       matrix:
