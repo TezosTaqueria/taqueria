@@ -5,6 +5,7 @@
 	"publisher": "ecadlabs",
 	"version": "0.20.2",
 	"preview": true,
+	"private": true,
 	"engines": {
 		"vscode": "^1.68.1",
 		"node": "^16.0.0"
