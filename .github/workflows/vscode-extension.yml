@@ -56,6 +56,9 @@ jobs:
       
       - name: Compile TS
         run: npm run compile:test --workspace ${{ env.GIT_WORKSPACE }}
+
+      - name: Run Unit Tests on Linux
+        run: ls -l ./taqueria-vscode-extension/src/test/suite/data/hello-tacos.mligo
       
       - name: Run Unit Tests on Linux
         run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
