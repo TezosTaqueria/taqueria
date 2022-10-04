@@ -78,6 +78,7 @@ jobs:
 
       - name: Build all
         run: |
+          pwd
           echo "$(pwd)" >> $GITHUB_PATH
           echo "$PATH"
           npm run build-all
