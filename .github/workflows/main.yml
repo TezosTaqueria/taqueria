@@ -78,6 +78,7 @@ jobs:
 
       - name: Build all
         run: |
+          echo "$(pwd)" >> $GITHUB_PATH
           npm run build-all
           ls -ltr ./node_modules/@taqueria/node-sdk/
 
