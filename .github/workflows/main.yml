@@ -84,7 +84,7 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         with:
-          path: ../**/node_modules/
+          path: "**/node_modules"
           key: cache-node-modules-${{ github.run_id }}
 
   build-binaries:
@@ -132,7 +132,7 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         with:
-          path: ../**/node_modules/
+          path: "**/node_modules"
           key: cache-node-modules-${{ github.run_id }}
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
@@ -227,14 +227,14 @@ jobs:
           cache_path: |
             ~/.deno
             ~/.cache/deno
-        # - os: macos-latest
-        #   url: ${{ needs.build-binaries.outputs.public-url-macos }}
-        #   final-name: taq
-        #   make-executable-cmd: chmod +x
-        #   get-current-dir: echo "$(pwd)"
-        #   cache_path: |
-        #     ~/.deno
-        #     ~/Library/Caches/deno
+        - os: macos-latest
+          url: ${{ needs.build-binaries.outputs.public-url-macos }}
+          final-name: taq
+          make-executable-cmd: chmod +x
+          get-current-dir: echo "$(pwd)"
+          cache_path: |
+            ~/.deno
+            ~/Library/Caches/deno
 
     env:
       UNLIMITED_PINATA_TOKEN: ${{ secrets.PINATA_JWT_TOKEN }}
@@ -257,7 +257,7 @@ jobs:
       - name: Cache node modules
         uses: actions/cache@v3
         with:
-          path: ../**/node_modules/
+          path: "**/node_modules"
           key: cache-node-modules-${{ github.run_id }}
 
       - name: download the binary from the build-binaries job and make it executable
