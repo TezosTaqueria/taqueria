@@ -18,6 +18,7 @@ const ligoContractFileDestination = `${testProjectDestination}/contracts/hello-t
 const originalMethods = {
 	'window.showInformationMessage': vscode.window.showInformationMessage,
 	'window.showQuickPick': vscode.window.showQuickPick,
+	'window.showOpenDialog': vscode.window.showOpenDialog,
 };
 
 let vscodeMock: typeof vscode;
@@ -43,7 +44,7 @@ function getNextOpenDialogUri() {
 	return mockedValue;
 }
 
-let choosePlugin: string = '@taqueria/plugin-smartpy';
+let choosePlugin: string = '@taqueria/plugin-ligo';
 
 const mockedMethods = {
 	'window.showInformationMessage': (msg: string) => Promise.resolve(console.log(msg)),
@@ -66,9 +67,39 @@ describe('Extension Test Suite', async () => {
 	});
 
 	it('Verify that Taqueria commands present in the command pallet list ', async () => {
-		await vscode.commands.getCommands(true).then(allCommands => {
-			const taqCommands = allCommands.filter(command => command.toLowerCase().includes('taq'));
-			assert.notEqual(taqCommands, undefined);
+		const taqCommandsList = [
+			'taqueria.init',
+			'taqueria.scaffold',
+			'taqueria.install',
+			'taqueria.uninstall',
+			'taqueria.opt_in',
+			'taqueria.opt_out',
+			'taqueria.refresh_command_states',
+			'taqueria.compile_smartpy',
+			'taqueria.compile_ligo',
+			'taqueria.compile_archetype',
+			'taqueria.compile_pick_file',
+			'taqueria.compile_current_file',
+			'taqueria.add_contract',
+			'taqueria.rm_contract',
+			'taqueria.generate_types',
+			'taqueria.typecheck',
+			'taqueria.taqueria.create_test_folder',
+			'taqueria.run_tests',
+			'taqueria.start_sandbox',
+			'taqueria.stop_sandbox',
+			'taqueria.list_accounts',
+			'taqueria.originate',
+			'taqueria.originate_current_file',
+			'taqueria.originate_pick_file',
+			'taqueria.refresh_sandbox_data',
+			'taqueria.show_entrypoint_parameters',
+			'taqueria.show_operation_details',
+		];
+		const allCommands = await vscode.commands.getCommands(true);
+		const taqCommands = allCommands.filter(command => command.toLowerCase().includes('taqueria.'));
+		taqCommandsList.forEach(command => {
+			assert.equal(taqCommands.includes(command), true);
 		});
 	});
 
@@ -89,10 +120,7 @@ describe('Extension Test Suite', async () => {
 
 		await vscodeMock.commands.executeCommand('taqueria.install');
 
-		choosePlugin = '@taqueria/plugin-flextesa';
-
-		await vscodeMock.commands.executeCommand('taqueria.install');
-
+		// Example if we need to force to refresh command state
 		// await vscodeMock.commands.executeCommand('taqueria.refresh_command_states');
 
 		// Copy contract from data folder

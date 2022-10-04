@@ -1,4 +1,3 @@
-import { execSync } from 'child_process';
 import * as rxjs from 'rxjs';
 import { OutputLevels, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';

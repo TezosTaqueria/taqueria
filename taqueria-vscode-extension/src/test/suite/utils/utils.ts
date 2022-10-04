@@ -6,8 +6,6 @@ export function sleep(ms: number): Promise<void> {
 }
 
 export async function checkFolderExistsWithTimeout(filePath: string) {
-	// return new Promise<void>(async function (resolve, reject): Promise<void> {
-
 	try {
 		const dir = filePath;
 
