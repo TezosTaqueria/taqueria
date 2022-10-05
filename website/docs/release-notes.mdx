@@ -21,10 +21,10 @@ title: Taqueria Releases
 
 #### ⚠️ Breaking Change
 
-Teztnets.xyz no longer supports faucet files for testnet accounts which is a breaking change for Taqueria users. This release includes an interim solution in which users can generate and fund an account via the new Teztnets faucet, and manually configure
+[Teztnets.xyz](https://teztnets.xyz) no longer provides json faucet files for testnet accounts which is a breaking change for Taqueria users. Taqueria v0.20.2 includes an interim solution in which users can generate and fund an account via the new Teztnets faucet, and manually configure
 
 :::note
-We're working on an improved workflow for funding testnet accounts and will be deprecating and removing faucet files from Taqueria
+We're working on an improved workflow for funding testnet accounts and will be deprecating and removing faucet files from Taqueria in a future release
 :::
 
 Follow these steps to fund and configure a testnet account:
@@ -52,9 +52,25 @@ Your network configuration should now look like the following:
       }
    }
 ```
+
 4. Go to teztnets.xyz, click on the link for the faucet of the desired testnet, and then request to have funds sent to your public key hash address (which would be _tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok_ in your example above)
 
-### New Features
+
+:::caution Update plugins on existing Taqueria projects
+
+Taqueria projects built have plugins installed within the project. If your project was created with an earlier version of Taquiera, you you must update your project's plugins.
+
+Copy and paste this command to make sure your project's plugins are using the latest taqueria plugins. (you must have the [jq](https://stedolan.github.io/jq/) utility installed):
+
+```sh
+plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 1 taq uninstall && echo $plugins | xargs -n 1 taq install
+```
+
+_Note: A built in `taq update plugins` feature is planned for a future release_
+:::
+
+
+## New Features
 
 #### ✅ Call entrypoints on a deployed contract: `taq transfer` / `taq call`
 
