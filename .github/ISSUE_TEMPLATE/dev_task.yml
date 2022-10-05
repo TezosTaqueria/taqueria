@@ -25,12 +25,9 @@ body:
       label: 🚥 Definition of Done
       options:
         - label: "🎯 Planning and Design"
-        - label: "🏎️ Dev Implementation"
-        - label: "🛩️ Documentation Updated"
-        - label: "🏟️ Peer / User Reviewed"
-        - label: "🏁 Test Plan Validated"
+        - label: "🏎️ Dev Implementation (PR merged)"
         - label: "✍️ Release Notes Added"
-        - label: "🏆 Product Approved"
+        - label: "🏆 Product Acceptance"
   - type: textarea
     id: to_do
     attributes:
