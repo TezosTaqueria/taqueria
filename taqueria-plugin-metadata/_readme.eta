@@ -87,7 +87,7 @@ The metadata `generate-metadata` task will accept the following required paramet
 |  attribute |  value                        		   | 
 |------------|:---------------------------------------:|
 |  task   	 | 'generate-metadata'         			   |
-|  command   | 'generate-metadata <contractName>'      | 
+|  command   | 'generate-metadata < contractName >'    | 
 |  aliases   |  N/A  		                           |
 
 

@@ -57,7 +57,7 @@ The task takes a filename as a required argument. If no filename is provided, Ta
 |  attribute |  value                        | 
 |------------|:-----------------------------:|
 |  task      | 'compile'                     | 
-|  command   | 'compile <contractName>'      | 
+|  command   | 'compile < contractName >'    | 
 |  aliases   | ['c', 'compile-archetype']    |  
 
 ### The `create archetypeContract` Task
@@ -75,7 +75,7 @@ The task takes a filename and a required positional argument. The filename must 
 |  attribute |  value                                         | 
 |------------|:----------------------------------------------:|
 |  task      | 'create archetypeContract'                     | 
-|  command   | 'create archetypeContract <contractName>'      | 
+|  command   | 'create archetypeContract < contractName >'    | 
 
 ## Plugin Architecture
 

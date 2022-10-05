@@ -71,7 +71,7 @@ taq publish <sourceDirectory>
 |  attribute |  value                          | 
 |------------|:-------------------------------:|
 |  task      | 'publish'                       | 
-|  command   | 'publish <path>'                | 
+|  command   | 'publish < sourceDirectory >'   | 
 |  aliases   | N/A                             |  
 
 ### The `taq pin` Task
@@ -87,7 +87,7 @@ taq pin < hash >
 |  attribute |  value                          | 
 |------------|:-------------------------------:|
 |  task      | 'pin'                           | 
-|  command   | 'pin <hash>'                    | 
+|  command   | 'pin < fileHash >'              | 
 |  aliases   | N/A                             |  
 
 
