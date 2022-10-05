@@ -177,7 +177,9 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 				if (!publicKeyHash) sendErr(msg);
 				else {
 					sendErr(
-						`The account ${publicKeyHash} for the target environment may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+						`The account ${publicKeyHash} for the target environment, "${
+							getCurrentEnvironment(parsedArgs)
+						}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
 					);
 				}
 			} else {
