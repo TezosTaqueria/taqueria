@@ -22,7 +22,7 @@ There is no configuration required  to run the plugin
 
 ## Usage
 
-The Metadata plugin provides an interactive CLI interface that collects basic contract metadata fields as outlined in `TZIP-16` specification, and generates a compliant JSON file that can be uploaded to IPFS
+The Metadata plugin provides an interactive CLI interface that collects basic contract metadata fields as outlined in `TZIP-16` [specification](https://gitlab.com/tezos/tzip/-/blob/master/proposals/tzip-16/tzip-16.md), and generates a compliant JSON file that can be uploaded to IPFS
 
 The metadata fields collected are:
 
@@ -36,13 +36,13 @@ The metadata fields collected are:
 | license       	| Type of license e. g. ISC, MIT		|
 | interfaces      	| List of interfaces 	               	|
 
-To save time in multi-contract projects, `taq generate-project-metadata` can be run. This will collect project level metadata fields which are then provided as the default values for each subsequent invocation of `taq generate-metadata < contractName >`
+To save time in multi-contract projects, `taq generate-project-metadata` can be run. This will collect project level metadata fields which are then provided as the default values for each subsequent invocation of `taq generate-metadata <contractName>`
 
 The plugin exposes two tasks:
-- `taq generate-metadata < contractName >` - Generates `TZIP-16` compliant metadata for a contract in JSON format 
-- `taq generate-project-metadata` - Generates project level metadata that is written to `config.json`
+- `taq generate-metadata <contractName>` - Generates `TZIP-16` compliant metadata for a contract in JSON format 
+- `taq generate-project-metadata` - Generates project level metadata that is written to `.taq/config.json`
 
-Contract metadata is output into a JSON file in the `./artifacts` directory, while project metadata is added to `.taq/config.json` as seen here:
+Contract metadata is output into a JSON file in the `artifacts` directory, while project metadata is added to `.taq/config.json` as seen here:
 
 ```json
     "metadata": {
@@ -59,7 +59,7 @@ Contract metadata is output into a JSON file in the `./artifacts` directory, whi
 
 ## Tasks
 
-### `taq generate-metadata [contractName]`
+### `taq generate-metadata <contractName>`
 
 The `generate-metadata` task starts an interactive interface that collects the relavent fields via CLI prompts and outputs a `TZIP-16` compliant metadata file in JSON format
 
@@ -70,7 +70,7 @@ The contract may, or may not exist yet
 #### Command Structure
 
 ```shell
-taq generate-metadata < sourceFile >
+taq generate-metadata <contractName>
 ```
 
 #### Options
@@ -79,7 +79,7 @@ The metadata `generate-metadata` task will accept the following required paramet
 
 |  name        | description                           								|   
 |:-------------|--------------------------------------------------------------------|
-| contractName | The contract name (the contract may exist, or not exist)       	|
+| contractName | The contract name (the contract may exist, or may not exist)     	|
 
 
 #### Task Properties
@@ -87,7 +87,7 @@ The metadata `generate-metadata` task will accept the following required paramet
 |  attribute |  value                        		   | 
 |------------|:---------------------------------------:|
 |  task   	 | 'generate-metadata'         			   |
-|  command   | 'generate-metadata [sourceFile]'        | 
+|  command   | 'generate-metadata <contractName>'      | 
 |  aliases   |  N/A  		                           |
 
 
@@ -111,7 +111,7 @@ The `generate-project-metadata` task not not have any additional parameters or o
 |  attribute |  value                        		   | 
 |:----------:|:---------------------------------------:|
 |  task   	 | 'generate-project-metadata'             |
-|  command   | 'taq generate-project-metadata'         | 
+|  command   | 'generate-project-metadata'             | 
 |  aliases   |  N/A 			                       |
 
 ## Behaviour
@@ -127,7 +127,7 @@ The user flow for each task is outlined below
 
 ### Generating project metadata
 
-- Add the project metadata to .taq config.json
+- Add the project metadata to `.taq/config.json`
 - Add the project metadata schema
 
 ### Default Value Priority
@@ -140,6 +140,6 @@ Summary of priority for default values:
 
 ## Plugin Architecture
 
-This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
 
 

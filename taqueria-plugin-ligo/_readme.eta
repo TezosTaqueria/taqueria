@@ -22,7 +22,7 @@ taq install @taqueria/plugin-ligo
 Basic usage is:
 
 ```shell
-taq compile <filename>
+taq compile <contractName>
 ```
 
 <%~ it.cautionOpenAdmonition %>
@@ -30,7 +30,7 @@ The `compile` task can be implemented by more than one compiler plugin installed
 <%= it.closeAdmonition %>
 
 ### Basic description
-The LIGO plugin exposes a `compile` task in Taqueria which can target one LIGO contract in the `contracts` folder and compile them to a Michelson `.tz` file output to the `/artifacts` folder.
+The LIGO plugin exposes a `compile` task in Taqueria which can target one LIGO contract in the `contracts` folder and compile them to a Michelson `.tz` file output to the `artifacts` folder.
 
 ### A frictionless smart contract development workflow
 Our LIGO plugin introduces a smart contract development workflow by means of two simple file naming formats.
@@ -64,11 +64,11 @@ None for now.
 Basic usage is:
 
 ```shell
-taq test <filename>
+taq test <fileName>
 ```
 
 ### Basic description
-This task tests the LIGO source code and ouputs a result suggesting a failure or success. Normally you'd have a contract file and a separate test file that includes the contract's code, both within the `/contracts` directory.
+This task tests the LIGO source code and reports either a failure or success. Normally you'd have a contract file and a separate test file that includes the contract's code, both within the `contracts` directory.
 
 For example, refer to the following 2 code snippets:
 ```ligo title="counter.mligo"
@@ -122,16 +122,16 @@ By running `taq test testCounter.mligo`, you should get the following:
 │                   │ - test_initial_storage exited with value (). │
 │                   │ - test_increment exited with value ().       │
 │                   │                                              │
-│                   │ 🎉 All tests passed 🎉                        │
+│                   │ 🎉 All tests passed 🎉                      │
 └───────────────────┴──────────────────────────────────────────────┘
 ```
 
 ## Template creation
-The LIGO plugin also exposes a contract template via the `taq create contract <contractName>` task. This task will create a new LIGO contract in the `contracts` directory, insert some boilerplate LIGO contract code and will register the contract with Taqueria
+The LIGO plugin also exposes a contract template via the `taq create contract <contractName>` task. This task will create a new LIGO contract in the `contracts` directory and insert some boilerplate LIGO contract code
 
 ### The `create contract` Template
 
-The `create contract` task is used to create a new LIGO contract from a template. Running this task will create a new LIGO smart contract in the `contracts` directory, insert boilerplate contract code and will register that contract with Taqueria
+The `create contract` task is used to create a new LIGO contract from a template. Running this task will create a new LIGO smart contract in the `contracts` directory and insert boilerplate contract code
     
 ```shell
 taq create contract <contractName>
@@ -141,6 +141,6 @@ The `create contract` task takes a filename a required positional argument. The 
 
 ## Plugin Architecture
 
-This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
 
-Docker is used under the hood to provide a self contained environment for Archetype to prevent the need for it to be installed on the user's local machine
+Docker is used under the hood to provide a self contained environment for LIGO to prevent the need for it to be installed on the user's local machine

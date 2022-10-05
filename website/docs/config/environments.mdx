@@ -9,9 +9,9 @@ Taqueria Environments provide a powerful and flexible way to develop Tezos proje
 The environment configuration is where you add the initial storage value that a smart contract will be originated with. 
 
 :::note
-To target an environment for a stateful task such as `taq originate`, add the `--env` flag with the name of the environment you would like to target. For example, to target an environment named `jakarta_env` for an origination, you would use the following command:
+To target an environment for a stateful task such as `taq originate`, add the `--env` flag with the name of the environment you would like to target. For example, to target an environment named `kathmandu_env` for an origination, you would use the following command:
 ```
-taq originate --env jakarta_env
+taq originate --env kathmandu_env
 ```
 :::
 
@@ -19,19 +19,17 @@ taq originate --env jakarta_env
 
 Taqueria generates a default environment for each project named `development`. This environment has the following properties:
 
-```
+```json
 "environment": {
     "default": "development",
     "development": {
         "networks": [],
-        "sandboxes": [],
+        "sandboxes": [
+            "local"
+        ],
         "storage": []
     }
 ```
-
-:::note
-Although Taqueria comes with this default environment, you will still need to add the initial storage values for each contract before using the environment
-:::
 
 ## Adding a New Environment
 
@@ -58,20 +56,8 @@ The sandboxes property holds a comma separated list of named sandboxes. The sand
 ### The `storage` Property
 
 :::caution
-You must declare initial storage values for each contract you are originating. Trying to originate a contract to an environment that does not have a storage value for that contract will result in an error
+The storage property in the `config.json` file will be deprecated in the future. For each contract you want to originate you will need to specify a storages file. You can learn about how to do this [here](/docs/plugins/taqueria-taquito)
 :::
-
-The storage property is a key/value mapping, with the key being the name of the contract, and the value being the initial storage value
-
-The initial storage value may be specified as any JSON literal value, a string containing a Michelson expression, or a JSON-encoded Michelson expression
-
-Storage values use the following format:
-
-```json
-{
-    "contractName": ""
-}
-```
 
 
 ```json
