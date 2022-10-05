@@ -1,8 +1,6 @@
-## 🪂 Pre-Merge Checklist
+## 🪂 Pre-Merge Checklist (Definition of Done)
 
-### Definition of Done
-
-#### Required
+### ✅ Required
 
 - [ ] 🐬 I have commented my code, particularly in hard-to-understand areas
 - [ ] 🦀 Automated tests have been written and added to this PR
@@ -14,9 +12,11 @@
 - [ ] 👷 Required updates to scaffolds have been made
 - [ ] ⛵ A summary describing the change has been written for release notes
 
-#### Not-Required
+### 🙅 Not-Required
 
-- [ ] ...
+> (drag items from above to this list to remove from requirements)
+
+- [ ] 🛑 ... 
 
 ----------------------------------------------------------------------------------------------------------------------------
 
