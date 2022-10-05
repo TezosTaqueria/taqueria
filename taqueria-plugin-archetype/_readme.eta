@@ -30,7 +30,7 @@ The Archetype plugin also exposes a contract template via the `taq create archet
 
 The Archetype plugin's `taq compile` task must be run with arguments. The basic syntax for the task is `taq compile <contractName>`
 
-Running the `compile` task with no arguments will result in no Archetype smart contracts being compiled to Michelson files in the `artifacts` folder. 
+Running the `compile` task with no arguments will result in no Archetype smart contracts being compiled to Michelson files in the `artifacts` folder
 
 <%~ it.cautionOpenAdmonition %>
 The `compile` task can be implemented by more than one compiler plugin installed on a project (Archetype, LIGO, SmartPy). If this is the case, you must use the `--plugin archetype` flag to specify a particular compiler. For example `taq compile --plugin archetype`

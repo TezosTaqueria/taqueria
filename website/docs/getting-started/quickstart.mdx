@@ -61,7 +61,7 @@ cd my-first-project
 
 Now that the project has been properly initialized, plugins can be installed to provide support for specific functionality such as compilation, smart contract origination, or running sandbox environments
 
-Plugins are installed using the `taq install` command which appears in the command list once a project is initialized. You can view the list of commands available in the current project context by running `taq --help` from the CLI. It should lookk something like this:
+Plugins are installed using the `taq install` command which appears in the command list once a project is initialized. You can view the list of commands available in the current project context by running `taq --help` from the CLI. It should look something like this:
 ```shell
 ❯ taq --help
 taq <command>
@@ -83,7 +83,7 @@ To add support for the LIGO smart contract language, install the LIGO plugin by 
 taq install @taqueria/plugin-ligo
 ```
 
-Copy the following 3 code snippets, with the names suggested at the top of each code snippets, to the `contracts` folder of your Taqueria project.
+Copy the following 3 code snippets, with the names suggested at the top of each code snippets, to the `contracts` folder of your Taqueria project
 
 ```ligo title="counter.mligo"
 type storage = int
@@ -121,7 +121,7 @@ let increment_by_3: parameter = Increment 3
 ```
 
 :::caution
-Make sure you name it `counter.storages.mligo` and not `counter.storage.mligo` (note the extra `s`).
+Make sure you name it `counter.storages.mligo` and not `counter.storage.mligo` (note the extra `s`)
 :::
 
 You can now compile this contract, along with its storage and parameter values, by simply running the following command from the root of the project directory:
@@ -225,7 +225,7 @@ This will originate `counter.tz` in the `artifacts` directory to the sandbox and
 
 ### Interacting with a deployed Contract with Taquito
 
-With the sandbox still running, the last step is to interact with the contract you just deployed to your sandbox. You may use its alias or its address directly.
+With the sandbox still running, the last step is to interact with the contract you just deployed to your sandbox. You may use its alias or its address directly
 
 To do that, run:
 ```shell
@@ -245,12 +245,12 @@ This will call the counter contract's entrypoint `increment` and will increment 
 ## Finishing Up
 
 Congratulations! At this point, you have run through the basic usage of Taqueria including:
-- Initializing a new Taqueria project.
-- Installing plugins for LIGO, Flextesa, and Taquito.
-- Creating a new LIGO contract, along with its associated storages and parameters files.
-- Compiling a LIGO smart contract.
-- Starting and querying a local Flextesa sandbox.
-- Originating a compiled smart contract to the sandbox.
-- Interacting with a smart contract deployed to the sandbox.
+- Initializing a new Taqueria project
+- Installing plugins for LIGO, Flextesa, and Taquito
+- Creating a new LIGO contract, along with its associated storages and parameters files
+- Compiling a LIGO smart contract
+- Starting and querying a local Flextesa sandbox
+- Originating a compiled smart contract to the sandbox
+- Interacting with a smart contract deployed to the sandbox
 
-For more details on the usage of specific Taqueria tasks, you can refer to the plugin documentation which contains additional context, configuration, and usage of the many Taqueria tasks; or continue on with the getting started guides.
+For more details on the usage of specific Taqueria tasks, you can refer to the plugin documentation which contains additional context, configuration, and usage of the many Taqueria tasks; or continue on with the getting started guides
