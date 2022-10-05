@@ -168,22 +168,22 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 		if (error.message) {
 			const msg = error.message;
 			if (/ENOTFOUND/.test(msg)) {
-				sendErr(msg + ' - The RPC URL may be invalid. Check your ./taq/config.json.\n');
+				sendErr(msg + ' - The RPC URL may be invalid. Check ./taq/config.json.\n');
 			} else if (/ECONNREFUSED/.test(msg)) {
 				sendErr(msg + ' - The RPC URL may be down or the sandbox is not running.');
 			} else if (/empty_implicit_contract/.test(msg)) {
 				const result = msg.match(/(?<="implicit":")tz[^"]+(?=")/);
-				const publicKeyHash = result ? result[0] : '';
-				if (publicKeyHash === '') sendErr(msg);
+				const publicKeyHash = result ? result[0] : undefined;
+				if (!publicKeyHash) sendErr(msg);
 				else {
 					sendErr(
-						`${publicKeyHash} possibly has no funds. Go to https://teztnets.xyz and click "Faucet" of the desired protocol to fund it. Note that you might need to wait for a few seconds for the network to register the funds.`,
+						`The account ${publicKeyHash} for the target environment may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
 					);
 				}
 			} else {
 				sendErr(
 					msg
-						+ " - There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.\n",
+						+ " - There was a problem communicating with the chain. Check the RPC URL of the network or sandbox you're targeting in config.json.\n",
 				);
 			}
 		}

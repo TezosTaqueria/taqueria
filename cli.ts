@@ -939,7 +939,7 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
 		};
 
 const renderFaucetWarning = (config: LoadedConfig.t) => {
-	log('Warning: the faucet field in network configs is currently ignored and will be deprecated');
+	log('Warning: the faucet field in network configs has been deprecated and will be ignored');
 	return config;
 };
 
