@@ -14,9 +14,7 @@
 
 ### 🙅 Not-Required
 
-> (drag items from above to this list to remove from requirements)
-
-- [ ] 🛑 ... 
+- [ ] 🛑 (drag items from above to this list to remove from requirements)
 
 ----------------------------------------------------------------------------------------------------------------------------
 
@@ -36,6 +34,7 @@ Please describe the testing strategy and plan for this PR
 - [ ] 🧹 Chore ➾
 - [ ] 🛠️ Fix ➾
 - [ ] ✨ Feature ➾
+- [ ] 🏗️ Refactor ➾
 - [ ] 🚀 Release ➾
 
 ----------------------------------------------------------------------------------------------------------------------------
