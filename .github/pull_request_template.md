@@ -1,5 +1,3 @@
-# Taqueria
-
 ## 🪂 Pre-Merge Checklist (Definition of Done)
 
 ### ✅ Required for Merging
@@ -7,7 +5,6 @@
 - [ ] 🏄‍♂️ Myself and others have built this branch and done manual testing on the change
 - [ ] 🏖️ New and existing unit tests pass locally and in CI
 - [ ] 🔱 The test plan has been implemented and verified by an SDET
-
 - [ ] 🐬 I have commented my code, particularly in hard-to-understand areas
 - [ ] 🦀 Automated tests have been written and added to this PR
 - [ ] ⛵ Documentation is added/updated for the release version 
