@@ -48,7 +48,7 @@ export const defaultConfig: Config.t = Config.create({
 	network: {
 		ghostnet: {
 			label: 'ghostnet',
-			rpcUrl: 'https://rpc.ghostnet.teztnets.xyz',
+			rpcUrl: 'https://ghostnet.ecadinfra.com',
 		},
 	},
 	// defaultTasks: {
