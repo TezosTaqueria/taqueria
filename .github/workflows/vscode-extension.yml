@@ -54,6 +54,11 @@ jobs:
       - name: Compile packages
         run: npm run build-all
 
+      - name: Make taq binary globally visible
+        run: |
+          which taq
+          echo ${GITHUB_WORKSPACE} >> $GITHUB_PATH
+
       - name: update run-tests.sh to make it executable
         run: chmod +x ./taqueria-vscode-extension/bin/run-tests.sh
       
