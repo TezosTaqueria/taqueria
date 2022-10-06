@@ -1,6 +1,7 @@
 import React from 'react';
 import { BoolEditor } from './BoolEditor';
 import { ListEditor } from './ListEditor';
+import { MapEditor } from './MapEditor';
 import { OptionEditor } from './OptionEditor';
 import { PairEditor } from './PairEditor';
 import { PrimitiveEditor } from './PrimitiveEditor';
@@ -33,7 +34,9 @@ const getEditor = (
 		case 'option':
 			return <OptionEditor dataType={dataType} value={value} onChange={onChange} />;
 		case 'pair':
-			return <PairEditor dataType={dataType} onChange={onChange} />;
+			return <PairEditor value={value} dataType={dataType} onChange={onChange} />;
+		case 'map':
+			return <MapEditor value={value} dataType={dataType} onChange={onChange} />;
 	}
 };
 

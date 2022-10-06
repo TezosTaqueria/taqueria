@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { DataEditorNode } from './DataEditorNode';
 
 export const MapEditor = (
-	{ dataType, value, onChange }: { dataType: unknown; value: unknown[]; onChange: (value: unknown[]) => void },
+	{ dataType, value, onChange }: { dataType: any; value: any[]; onChange: (value: any[]) => void },
 ) => {
 	let initialValue;
 	if (value === undefined || value === null || !Array.isArray(value)) {
@@ -11,11 +11,11 @@ export const MapEditor = (
 		initialValue = value;
 	}
 	const [currentValue, setCurrentValue] = useState(initialValue);
-	const changeValue = (index: number, key: unknown, v: unknown) => {
+	const changeValue = (index: number, key: any, v: any) => {
 		const newValue = currentValue.slice();
 		newValue[index] = {
 			key,
-			value,
+			v,
 		};
 		setCurrentValue(newValue);
 		onChange(newValue);
@@ -34,14 +34,14 @@ export const MapEditor = (
 						<tr key={index}>
 							<td>
 								<DataEditorNode
-									dataType={(dataType as any[])[0]}
+									dataType={(dataType.args as any[])[0]}
 									value={key}
 									onChange={v => changeValue(index, v, value)}
 								/>
 							</td>
 							<td>
 								<DataEditorNode
-									dataType={(dataType as any[])[0]}
+									dataType={(dataType.args as any[])[1]}
 									value={value}
 									onChange={v => changeValue(index, key, v)}
 								/>
