@@ -130,6 +130,12 @@ describe('Extension Test Suite', async () => {
 		// Example if we need to force to refresh command state
 		// await vscodeMock.commands.executeCommand('taqueria.refresh_command_states');
 
+		const outputBeforeCopy = await execSync(`ls -l ${testProjectDestination}/contracts/`);
+		console.log('Output destination' + outputBeforeCopy);
+
+		const outputBeforeCopySource = await execSync(`ls -l ${testProjectSource}`);
+		console.log('Output Source' + outputBeforeCopySource);
+
 		// Copy contract from data folder
 		await fse.copyFile(ligoContractFileSource, ligoContractFileDestination);
 
