@@ -1,16 +1,19 @@
+# Taqueria
+
 ## 🪂 Pre-Merge Checklist (Definition of Done)
 
-### ✅ Required
+### ✅ Required for Merging
+
+- [ ] 🏄‍♂️ Myself and others have built this branch and done manual testing on the change
+- [ ] 🏖️ New and existing unit tests pass locally and in CI
+- [ ] 🔱 The test plan has been implemented and verified by an SDET
 
 - [ ] 🐬 I have commented my code, particularly in hard-to-understand areas
 - [ ] 🦀 Automated tests have been written and added to this PR
+- [ ] ⛵ Documentation is added/updated for the release version 
 - [ ] 🤿 Corresponding changes have been made to all documentation
-- [ ] 🏖️ New and existing unit tests pass locally and in CI
-- [ ] 🔱 The test plan has been implemented and verified by an SDET
-- [ ] 🏄‍♂️ Myself and others have built this branch and done manual testing on the change
 - [ ] 🖥 Required changes to the VScE have been made
 - [ ] 👷 Required updates to scaffolds have been made
-- [ ] ⛵ A summary describing the change has been written for release notes
 
 ### 🙅 Not-Required
 
