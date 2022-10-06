@@ -1,4 +1,5 @@
 import assert from 'assert';
+import { execSync } from 'child_process';
 import * as fse from 'fs-extra';
 import * as path from 'path';
 import * as vscode from 'vscode';
@@ -110,6 +111,12 @@ describe('Extension Test Suite', async () => {
 		// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
 
 		setOpenDialogMocks(`${ligoContractFileDestination}`);
+
+		const output = await execSync(`ls -l ${testProjectRoot}`);
+		console.log('Output ' + output);
+
+		const outputRoot = await execSync('ls -l ./');
+		console.log('Output ' + outputRoot);
 
 		// await fse.rm(testProjectDestination, { recursive: true });
 		// await fse.mkdir(testProjectDestination, { recursive: true });
