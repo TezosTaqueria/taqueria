@@ -133,7 +133,7 @@ describe('Extension Test Suite', async () => {
 		const outputBefore = await execSync(`ls -l ${testProjectDestination}`);
 		console.log('Output destination root' + outputBefore);
 
-		const outputTaq = await execSync(`taq which`);
+		const outputTaq = await execSync(`which taq`);
 		console.log('Output taq' + outputTaq);
 
 		const outputBeforeCopy = await execSync(`ls -l ${testProjectDestination}/contracts/`);
