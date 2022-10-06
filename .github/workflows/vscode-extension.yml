@@ -57,7 +57,9 @@ jobs:
         run: npm ci
 
       - name: Compile packages
-        run: npm run build-all
+        run: |
+          echo "$(pwd)" >> $GITHUB_PATH
+          npm run build-all
 
       - name: Make taq binary globally visible
         run: |
@@ -71,7 +73,8 @@ jobs:
         run: npm run compile:test --workspace ${{ env.GIT_WORKSPACE }}
       
       - name: Run Unit Tests on Linux
-        run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
+        run: |
+          xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
 
       - name: Package VSCode Extension
         id: packageExtension
