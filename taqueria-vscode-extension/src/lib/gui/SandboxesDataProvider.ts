@@ -208,10 +208,19 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
-		const response = await fetch(`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints`);
+		const response = await fetch(
+			`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints?micheline=true&michelson=true`,
+		);
 		const data = await response.json();
+		this.helper.showLog(OutputLevels.warn, JSON.stringify(data, null, 2));
 		return (data as any[]).map(item =>
-			new SmartContractEntrypointTreeItem(item.name, item.jsonParameters, element.parent)
+			new SmartContractEntrypointTreeItem(
+				item.name,
+				item.jsonParameters,
+				item.michelineParameters,
+				item.michelsonParameters,
+				element.parent,
+			)
 		);
 	}
 

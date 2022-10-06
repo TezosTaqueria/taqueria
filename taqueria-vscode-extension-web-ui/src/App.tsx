@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { AllEditors } from './AllEditors';
 import { MichelineEditor } from './data-editors/MichelineEditor';
 import { InteropMessageInterface } from './interopTypes';
 
@@ -42,6 +43,9 @@ export const App = () => {
 };
 
 const EditorSelector = ({ deps }: { deps: undefined | InteropMessageInterface }) => {
+	if (deps?.view === 'AllEditors') {
+		return <AllEditors />;
+	}
 	if (deps?.view === 'MichelineEditor') {
 		return <MichelineEditor {...deps} />;
 	}
@@ -81,10 +85,8 @@ const DefaultView = () => {
 		// Simulate loading during development
 		setTimeout(() => {
 			setGlobalInteropMessageInterface({
-				view: 'MichelineEditor',
-				input: {
-					michelineJsonObj: { 'prim': 'pair', 'args': [{ 'string': 'hello' }, { 'int': '42' }] },
-				},
+				view: 'AllEditors',
+				input: {},
 				onMessage: x => {
 					console.log('Data was changed', { x });
 				},

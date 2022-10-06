@@ -1,83 +1,50 @@
 import React, { useState } from 'react';
 import { usePageTitle } from '../hooks';
+import { DataEditorNode } from './DataEditorNode';
+import { ListEditor } from './ListEditor';
 import './MichelineEditor.css';
+import { PairEditor } from './PairEditor';
+import { PrimitiveEditor } from './PrimitiveEditor';
+
+export type MichelineEditorMessageHandler = (data: { userData: unknown }) => void;
 
 export const MichelineEditor = (
-	{ input, onMessage }: {
-		input: { michelineJsonObj: unknown };
-		onMessage: (data: { michelineJsonObj: unknown }) => void;
+	{ input: { dataType, value }, onMessage }: {
+		input: { dataType: any; value: any };
+		onMessage: MichelineEditorMessageHandler;
 	},
 ) => {
-	usePageTitle('Micheline Editor');
-
-	const [jsonObj, setJsonObj] = useState(input.michelineJsonObj);
-	const changeJsonObj = (v: unknown) => {
-		setJsonObj(v);
-		onMessage({ michelineJsonObj: v });
+	const [currentValue, setValue] = useState(value);
+	const handleChange = (v: unknown) => {
+		setValue(v as any);
+		onMessage({ userData: v });
 	};
 
 	return (
 		<div className='editorDiv'>
-			<table>
+			<table border={1}>
 				<tbody>
 					<tr>
-						<td className='valueTitle'>
-							Parameter:
+						<td colSpan={2}>
+							<DataEditorNode dataType={dataType} value={currentValue} onChange={handleChange} />
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<h3>Type</h3>
+							<div style={{ whiteSpace: 'pre-wrap' }}>
+								{JSON.stringify(dataType, null, 2)}
+							</div>
 						</td>
 						<td>
-							<DataNodeView dataNode={jsonObj} onChange={changeJsonObj} />
+							<h3>Preview</h3>
+							<div style={{ whiteSpace: 'pre-wrap' }}>
+								{JSON.stringify(currentValue, null, 2)}
+							</div>
 						</td>
 					</tr>
 				</tbody>
 			</table>
-			<div>
-				<h3>Preview</h3>
-				<div style={{ whiteSpace: 'pre-wrap' }}>
-					{JSON.stringify(jsonObj, null, 2)}
-				</div>
-			</div>
 		</div>
 	);
-};
-
-const DataNodeView = ({ dataNode: dataNode, onChange }: { dataNode: unknown; onChange: (value: unknown) => void }) => {
-	if (dataNode == null || typeof dataNode !== 'object') {
-		return <DataEditor value={`${dataNode}`} onChange={onChange} />;
-	}
-	const dataRecord = dataNode as Record<string, unknown>;
-	return (
-		<div className='editorDiv'>
-			<table>
-				<tbody>
-					{Object.entries(dataRecord).map(([key, value]) => (
-						<tr key={key}>
-							<td className='valueTitle'>
-								{key}:
-							</td>
-							<td>
-								<DataNodeView
-									dataNode={value}
-									onChange={x => {
-										// console.log(`Changed ${key}`, { key, old: value, new: x });
-
-										// TODO: Cast to appropriate type (bool, number)
-										onChange({ ...dataRecord, [key]: x });
-									}}
-								/>
-							</td>
-						</tr>
-					))}
-				</tbody>
-			</table>
-		</div>
-	);
-};
-
-const DataEditor = ({ value, onChange }: { value: string; onChange: (value: string) => void }) => {
-	const [currentValue, setCurrentValue] = useState(value);
-	const changeValue = (v: string) => {
-		setCurrentValue(v);
-		onChange(v);
-	};
-	return <input type='text' value={`${currentValue}`} onChange={e => changeValue(e.target.value)} />;
 };

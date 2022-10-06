@@ -1,3 +1,5 @@
+import { MichelineEditorMessageHandler } from './data-editors/MichelineEditor';
+
 export type InteropMessageInterface =
 	| {
 		view: 'None';
@@ -7,7 +9,12 @@ export type InteropMessageInterface =
 	| {
 		view: 'MichelineEditor';
 		input: {
-			michelineJsonObj: unknown;
+			dataType: unknown;
 		};
-		onMessage: (data: { michelineJsonObj: unknown }) => void;
+		onMessage: MichelineEditorMessageHandler;
+	}
+	| {
+		view: 'AllEditors';
+		input: {};
+		onMessage: MichelineEditorMessageHandler;
 	};

@@ -1,0 +1,12 @@
+.allEditors {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: top;
+    gap: 10px;
+    row-gap: 10px;
+}
+
+.singleEditor {
+
+}

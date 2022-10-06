@@ -9,9 +9,9 @@ export type InteropMessageInterface =
 	| {
 		view: 'MichelineEditor';
 		input: {
-			michelineJsonObj: unknown;
+			dataType: unknown;
 		};
-		onMessage: (data: { michelineJsonObj: unknown }) => void;
+		onMessage: (data: { userData: unknown }) => void;
 	};
 
 export const createVscodeWebUiHtml = ({

@@ -1576,8 +1576,9 @@ export class VsCodeHelper {
 
 	exposeShowEntrypointParametersCommand() {
 		this.registerCommand('show_entrypoint_parameters', async (item: SmartContractEntrypointTreeItem) => {
-			const jsonParameters = item.jsonParameters;
-			this.showOutput(JSON.stringify(jsonParameters, null, 2));
+			// this.showOutput(JSON.stringify(item.jsonParameters, null, 2));
+			this.showOutput(JSON.stringify(item.michelineParameters, null, 2));
+			// this.showOutput(JSON.stringify(item.michelsonParameters, null, 2));
 		});
 	}
 
@@ -1589,7 +1590,7 @@ export class VsCodeHelper {
 	}
 
 	exposeInvokeEntrypointCommand() {
-		this.registerCommand('taqueria.invoke_entrypoint', async (item: SmartContractEntrypointTreeItem) => {
+		this.registerCommand('invoke_entrypoint', async (item: SmartContractEntrypointTreeItem) => {
 			const jsonParameters = item.jsonParameters;
 			const panel = this.vscode.window.createWebviewPanel(
 				'entrypointParameter',
@@ -1605,7 +1606,7 @@ export class VsCodeHelper {
 				interop: {
 					view: 'MichelineEditor',
 					input: {
-						michelineJsonObj: jsonParameters,
+						dataType: jsonParameters,
 					},
 					onMessage: x => {
 						console.log('vscode-TAQ: entrypointParameter: onMessage', { x });
