@@ -45,6 +45,11 @@ jobs:
         with:
           node-version: 16.16.x
 
+      - name: Install Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: "1.23.4"
+
       - name: Attempt to rebuild
         run: npm rebuild | true
       
@@ -57,7 +62,7 @@ jobs:
       - name: Make taq binary globally visible
         run: |
           which taq
-          echo ${GITHUB_WORKSPACE} >> $GITHUB_PATH
+          echo $(which taq) >> $GITHUB_PATH
 
       - name: update run-tests.sh to make it executable
         run: chmod +x ./taqueria-vscode-extension/bin/run-tests.sh
