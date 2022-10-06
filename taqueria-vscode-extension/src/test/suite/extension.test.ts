@@ -130,6 +130,12 @@ describe('Extension Test Suite', async () => {
 		// Example if we need to force to refresh command state
 		// await vscodeMock.commands.executeCommand('taqueria.refresh_command_states');
 
+		const outputBefore = await execSync(`ls -l ${testProjectDestination}`);
+		console.log('Output destination root' + outputBefore);
+
+		const outputTaq = await execSync(`taq which`);
+		console.log('Output taq' + outputTaq);
+
 		const outputBeforeCopy = await execSync(`ls -l ${testProjectDestination}/contracts/`);
 		console.log('Output destination' + outputBeforeCopy);
 
