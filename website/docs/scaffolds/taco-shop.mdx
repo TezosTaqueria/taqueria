@@ -13,7 +13,7 @@ title: Taco Shop
 
 ## Quickstart
 
-In a rush? You can follow the steps below to get up and running immediatley  
+In a rush? You can follow the steps below to get up and running immediatley:
 
 ### Scaffold and Initialize the Project
 
@@ -33,7 +33,7 @@ The smart contract has been deployed to ghostnet at the address for demonstratio
 The project comes pre-configured with the following:
 
 - Plugins: LIGO, Flextesa, Taquito, Jest
-- A LIGO multi-file smart contract: `hello-tacos.mligo`, `_buy.mligo`, `_make.mligo`, `_schema.mligo` 
+- A LIGO multi-file smart contract: `hello-tacos.mligo`, `_buy.mligo`, `_make.mligo`, `_schema.mligo`
 - A network configuration for the Ghostnet testnet
 - An environment named `ghostnet` with faucet to fund operations on the testnet
 - Native Taqueria testing (Taqueria Jest plugin)
@@ -51,8 +51,8 @@ The project comes pre-configured with the following:
 - Docker v0.9 or later
 - Node.js v16 or later
 - Beacon or Kukai Wallet
-- A funded testnet account
-- A [faucet file](https://teztnets.xyz)
+- A funded testnet account (instructions [here](https://taqueria.io/docs/config/networks/#faucets))
+
 
 ## Using the Project
 
@@ -89,7 +89,7 @@ cd taco-shop
 
 - `/.taq` - This hidden folder stores the Taqueria configuration and state
 - `/app` - This is the React dApp 
-- `/contracts` - This folder contains the LIGO smart contracts
+- `/contracts` - This folder contains the multiple file LIGO smart contract
 - `/tests` - This folder contains the automated tests
 - `/artifacts` - This folder contains the compiled Michelson `.tz` contracts
 
@@ -250,6 +250,25 @@ You should now be able to access the Taco Shop dApp at [http://localhost:3000](h
 
 By default, page refresh updates the page UI to point to the address of the new deployment.
 
+### Insert the Contract Address (Optional)
+
+There is a way to point dApp to a hardcoded contract.
+To do so you need to insert the address of the contract into the `/app/App.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/index.tsx` file as shown here:
+
+```ts /app/src/app.tsx
+function app() {
+  const [rpcUrl, setRpcUrl] = useState("https://ghostnet.ecadinfra.com");
+  const [contractAddress, setContractAddress] = useState(
+      "KT1CPASSW7rstFQw6vENBkXmG6mJNsDMauTP"
+      // getAliasAddress(config, "hello-tacos")
+  );
+  const [contractStorage, setContractStorage] = useState<number | undefined>(
+    undefined
+  );
+  const [Tezos, setTezos] = useState<TezosToolkit>();
+  const [connected, setConnected] = useState(false);
+```
+
 ### Connect to Temple Wallet
 
 Open a browser and navigate to [http://localhost:3000](http://localhost:3000/)
@@ -260,7 +279,7 @@ Click on the `Connect wallet` button in the top right corner of the page and sel
 
 Provide your credentials for the wallet, select a funded account, and click `connect`
 
-### Buy Tacos
+### Buy Tacos using the dapp
 
 With your wallet connected, you can now interact with the contract entrypoint
 
@@ -268,7 +287,12 @@ Click the `order` button and then authorize the transaction in Temple Wallet
 
 Once completed, you will see the value of `available_tacos` decrease by the number of tacos you ordered
 
-### Testing
+### Make Tacos using the taq call command
+
+You can call contract entrypoints, such as the "make" entrypoint with the Taq CLI by executing `taq call hello-tacos --param hello-tacos.parameter.buySomeTacos.tz -e testing`
+
+
+## Testing
 
 This scaffold comes with Jest tests in the `tests` folder which has been initalized as a partition. The scaffold uses the `@taqueria/plugin-jest` plugin to run the tests
 
