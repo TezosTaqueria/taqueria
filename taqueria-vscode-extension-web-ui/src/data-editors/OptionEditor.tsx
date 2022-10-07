@@ -1,23 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DataEditorNode } from './DataEditorNode';
 
 export const OptionEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
 ) => {
-	const [currentValue, setCurrentValue] = useState(value);
+	if (value === null || value === undefined || typeof value !== 'object') {
+		value = {
+			'prim': 'None',
+		};
+	}
 	const changeValue = (v: any) => {
-		setCurrentValue(v);
-		onChange(v);
+		onChange({
+			'prim': 'Some',
+			'args': [v],
+		});
+	};
+	const setOption = (hasValue: boolean) => {
+		if (hasValue) {
+			onChange({
+				'prim': 'Some',
+				'args': [null],
+			});
+		} else {
+			onChange({
+				'prim': 'None',
+			});
+		}
 	};
 	return (
 		<div>
 			<input
 				type='checkbox'
-				checked={currentValue !== undefined}
-				onChange={e => changeValue(e.target.checked ? null : undefined)}
+				checked={value.prim !== 'None'}
+				onChange={e => setOption(e.target.checked)}
 			/>
-			{currentValue !== undefined && (
-				<DataEditorNode dataType={dataType.args[0]} value={currentValue} onChange={changeValue} />
+			{value.prim !== 'None' && (
+				<DataEditorNode
+					dataType={dataType.args[0]}
+					value={value.args[0]}
+					onChange={v => changeValue(v)}
+				/>
 			)}
 		</div>
 	);

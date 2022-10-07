@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DataEditorNode } from './DataEditorNode';
 
 export const PairEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
 ) => {
-	if (value === undefined || value === null || !Array.isArray(value)) {
-		value = [];
+	if (value === undefined || value === null || typeof value !== 'object') {
+		value = {
+			'prim': 'pair',
+			'args': [],
+		};
 	}
-	const [currentValue, setCurrentValue] = useState(value);
 	const changeValue = (index: number, v: any) => {
-		const newValue = currentValue.slice();
-		newValue[index] = v;
-		setCurrentValue(newValue);
+		const newValue = {
+			'prim': 'pair',
+			'args': value.args.slice(),
+		};
+		newValue.args[index] = v;
 		onChange(newValue);
 	};
 	const dataRecord = dataType as Record<string, any>;
@@ -25,7 +29,7 @@ export const PairEditor = (
 							<td>
 								<DataEditorNode
 									dataType={item}
-									value={null}
+									value={value.args[index]}
 									onChange={x => {
 										changeValue(index, x);
 									}}

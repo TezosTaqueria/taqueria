@@ -1,23 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DataEditorNode } from './DataEditorNode';
 
 export const MapEditor = (
-	{ dataType, value, onChange }: { dataType: any; value: any[]; onChange: (value: any[]) => void },
+	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
 ) => {
-	let initialValue;
-	if (value === undefined || value === null || !Array.isArray(value)) {
-		initialValue = [];
-	} else {
-		initialValue = value;
+	if (value === undefined || value === null || typeof value !== 'object') {
+		value = [];
 	}
-	const [currentValue, setCurrentValue] = useState(initialValue);
 	const changeValue = (index: number, key: any, v: any) => {
-		const newValue = currentValue.slice();
+		const newValue = value.slice();
 		newValue[index] = {
-			key,
-			v,
+			'prim': 'Elt',
+			args: [
+				key,
+				v,
+			],
 		};
-		setCurrentValue(newValue);
 		onChange(newValue);
 	};
 	return (
@@ -30,27 +28,27 @@ export const MapEditor = (
 					</tr>
 				</thead>
 				<tbody>
-					{(currentValue as any[]).map(({ key, value }, index) => (
+					{(value as any[]).map((elt, index) => (
 						<tr key={index}>
 							<td>
 								<DataEditorNode
 									dataType={(dataType.args as any[])[0]}
-									value={key}
-									onChange={v => changeValue(index, v, value)}
+									value={elt.args[0]}
+									onChange={v => changeValue(index, v, elt.args[1])}
 								/>
 							</td>
 							<td>
 								<DataEditorNode
 									dataType={(dataType.args as any[])[1]}
-									value={value}
-									onChange={v => changeValue(index, key, v)}
+									value={elt.args[1]}
+									onChange={v => changeValue(index, elt.args[0], v)}
 								/>
 							</td>
 						</tr>
 					))}
 					<tr>
 						<td>
-							<button onClick={() => changeValue(currentValue.length, null, null)}>+</button>
+							<button onClick={() => changeValue(value.args.length, null, null)}>+</button>
 						</td>
 						<td>
 						</td>

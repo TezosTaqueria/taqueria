@@ -1,12 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 export const PrimitiveEditor = (
-	{ dataType, value, onChange }: { dataType: string; value: string; onChange: (value: string) => void },
+	{ dataType, value, onChange }: {
+		dataType: string;
+		value: Record<string, any>;
+		onChange: (value: Record<string, any>) => void;
+	},
 ) => {
-	const [currentValue, setCurrentValue] = useState(value);
-	const changeValue = (v: string) => {
-		setCurrentValue(v);
-		onChange(v);
+	if (value === null || value === undefined || typeof value !== 'object') {
+		value = {};
+	}
+	const fieldName = dataType === 'int' || dataType === 'nat' ? 'int' : 'string';
+	const changeValue = (v: string | number) => {
+		const newValue: Record<string, any> = {};
+		if (fieldName === 'int' && typeof v === 'string') {
+			const num = parseInt(v, 10);
+			if (num.toString() === v) {
+				v = num;
+			}
+		}
+		newValue[fieldName] = v;
+		onChange(newValue);
 	};
-	return <input type='text' value={currentValue} onChange={e => changeValue(e.target.value)} />;
+	return <input type='text' value={value[fieldName]} onChange={e => changeValue(e.target.value)} />;
 };

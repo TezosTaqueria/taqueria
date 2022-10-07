@@ -66,14 +66,3 @@ const getEditor = (
 			);
 	}
 };
-
-const processDataType = (parentDataType: any) => {
-	const fields = Object.entries(parentDataType).map(([key, value]) => ({
-		key,
-		value,
-	}));
-
-	if (fields.length === 1) {
-		const { key: fieldKey, value: dataType } = fields[0];
-	}
-};

@@ -1,182 +1,342 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './AllEditors.css';
 import { MichelineEditor, MichelineEditorMessageHandler } from './data-editors/MichelineEditor';
 import { usePageTitle } from './hooks';
 
 const allTypes = [
 	{
-		'prim': 'list',
-		'annots': [
-			'%listOfPairStringInt',
-		],
-		'args': [
+		type: {
+			'prim': 'bool',
+			'annots': [
+				'%simpleBool',
+			],
+		},
+		value: {
+			'string': 'true',
+		},
+	},
+	{
+		type: {
+			'prim': 'bytes',
+			'annots': [
+				'%simpleBytes',
+			],
+		},
+		value: {
+			'string': '0x82374897239847238974892374',
+		},
+	},
+	{
+		type: {
+			'prim': 'int',
+			'annots': [
+				'%simpleInt',
+			],
+		},
+		value: {
+			'int': 42,
+		},
+	},
+	{
+		type: {
+			'prim': 'nat',
+			'annots': [
+				'%simpleNat',
+			],
+		},
+		value: {
+			int: '42',
+		},
+	},
+	{
+		type: {
+			'prim': 'string',
+			'annots': [
+				'%simpleString',
+			],
+		},
+		value: {
+			'string': 'Hello World',
+		},
+	},
+	{
+		type: {
+			'prim': 'unit',
+			'annots': [
+				'%simpleUnit',
+			],
+		},
+		value: {},
+	},
+	{
+		type: {
+			'prim': 'list',
+			'annots': [
+				'%listOfPairStringInt',
+			],
+			'args': [
+				{
+					'prim': 'pair',
+					'args': [
+						{
+							'prim': 'string',
+						},
+						{
+							'prim': 'int',
+						},
+					],
+				},
+			],
+		},
+		value: [
 			{
-				'prim': 'pair',
-				'args': [
+				prim: 'pair',
+				args: [{
+					'string': 'Hello',
+				}, {
+					'int': 42,
+				}],
+			},
+			{
+				prim: 'pair',
+				args: [{
+					'string': 'World',
+				}, {
+					'int': 84,
+				}],
+			},
+		],
+	},
+	{
+		type: {
+			'prim': 'list',
+			'annots': [
+				'%listOfStrings',
+			],
+			'args': [
+				{
+					'prim': 'string',
+				},
+			],
+		},
+		value: [
+			{
+				string: 'Hello',
+			},
+			{
+				string: 'World',
+			},
+		],
+	},
+	{
+		type: {
+			'prim': 'map',
+			'annots': [
+				'%mapStringInt',
+			],
+			'args': [
+				{
+					'prim': 'string',
+				},
+				{
+					'prim': 'int',
+				},
+			],
+		},
+		value: [
+			{
+				'prim': 'Elt',
+				args: [
 					{
-						'prim': 'string',
+						'string': 'Hello',
 					},
 					{
-						'prim': 'int',
+						'int': 42,
+					},
+				],
+			},
+			{
+				'prim': 'Elt',
+				args: [
+					{
+						'string': 'World',
+					},
+					{
+						'int': 43,
 					},
 				],
 			},
 		],
 	},
 	{
-		'prim': 'list',
-		'annots': [
-			'%listOfStrings',
-		],
-		'args': [
-			{
-				'prim': 'string',
-			},
-		],
+		type: {
+			'prim': 'option',
+			'annots': [
+				'%optionOfInt',
+			],
+			'args': [
+				{
+					'prim': 'int',
+				},
+			],
+		},
+		value: {
+			'prim': 'some',
+			args: [{
+				'int': 34,
+			}],
+		},
 	},
 	{
-		'prim': 'map',
-		'annots': [
-			'%mapStringInt',
-		],
-		'args': [
-			{
-				'prim': 'string',
-			},
-			{
-				'prim': 'int',
-			},
-		],
+		type: {
+			'prim': 'pair',
+			'annots': [
+				'%pairOfIntString',
+			],
+			'args': [
+				{
+					'prim': 'int',
+				},
+				{
+					'prim': 'string',
+				},
+			],
+		},
+		value: {
+			'prim': 'pair',
+			'args': [
+				{
+					'int': 42,
+				},
+				{
+					'string': 'Hello',
+				},
+			],
+		},
 	},
 	{
-		'prim': 'option',
-		'annots': [
-			'%optionOfInt',
-		],
-		'args': [
-			{
-				'prim': 'int',
-			},
-		],
+		type: {
+			'prim': 'pair',
+			'annots': [
+				'%pairOfIntStringStringInt',
+			],
+			'args': [
+				{
+					'prim': 'pair',
+					'args': [
+						{
+							'prim': 'int',
+						},
+						{
+							'prim': 'string',
+						},
+						{
+							'prim': 'string',
+						},
+						{
+							'prim': 'int',
+						},
+					],
+				},
+			],
+		},
+		value: {
+			'prim': 'pair',
+			'args': [
+				{
+					'prim': 'pair',
+					'args': [
+						{
+							'int': 42,
+						},
+						{
+							'string': 'Hello',
+						},
+						{
+							'string': 'World',
+						},
+						{
+							'int': 43,
+						},
+					],
+				},
+			],
+		},
 	},
 	{
-		'prim': 'pair',
-		'annots': [
-			'%pairOfIntString',
-		],
-		'args': [
-			{
-				'prim': 'int',
-			},
-			{
-				'prim': 'string',
-			},
-		],
-	},
-	{
-		'prim': 'pair',
-		'annots': [
-			'%pairOfIntStringStringInt',
-		],
-		'args': [
-			{
-				'prim': 'pair',
-				'args': [
+		type: {
+			'prim': 'pair',
+			'annots': [
+				'%pairOfListStringListOptionInt',
+			],
+			'args': [
+				{
+					'prim': 'list',
+					'args': [
+						{
+							'prim': 'string',
+						},
+					],
+				},
+				{
+					'prim': 'list',
+					'args': [
+						{
+							'prim': 'option',
+							'args': [
+								{
+									'prim': 'int',
+								},
+							],
+						},
+					],
+				},
+			],
+		},
+		value: {
+			'prim': 'pair',
+			'args': [
+				[
 					{
-						'prim': 'int',
+						'string': 'Hello',
 					},
 					{
-						'prim': 'string',
+						'string': 'World',
 					},
 				],
-			},
-			{
-				'prim': 'pair',
-				'args': [
+				[
 					{
-						'prim': 'string',
+						'prim': 'None',
 					},
 					{
-						'prim': 'int',
-					},
-				],
-			},
-		],
-	},
-	{
-		'prim': 'pair',
-		'annots': [
-			'%pairOfListStringListOptionInt',
-		],
-		'args': [
-			{
-				'prim': 'list',
-				'args': [
-					{
-						'prim': 'string',
+						'prim': 'Some',
+						'args': [{
+							'int': 12,
+						}],
 					},
 				],
+			],
+		},
+	},
+	{
+		type: {
+			'prim': 'set',
+			'annots': [
+				'%setOfString',
+			],
+			'args': [
+				{
+					'prim': 'string',
+				},
+			],
+		},
+		value: [
+			{
+				'string': 'Hello',
 			},
 			{
-				'prim': 'list',
-				'args': [
-					{
-						'prim': 'option',
-						'args': [
-							{
-								'prim': 'int',
-							},
-						],
-					},
-				],
+				'string': 'World',
 			},
-		],
-	},
-	{
-		'prim': 'set',
-		'annots': [
-			'%setOfString',
-		],
-		'args': [
-			{
-				'prim': 'string',
-			},
-		],
-	},
-	{
-		'prim': 'bool',
-		'annots': [
-			'%simpleBool',
-		],
-	},
-	{
-		'prim': 'bytes',
-		'annots': [
-			'%simpleBytes',
-		],
-	},
-	{
-		'prim': 'int',
-		'annots': [
-			'%simpleInt',
-		],
-	},
-	{
-		'prim': 'nat',
-		'annots': [
-			'%simpleNat',
-		],
-	},
-	{
-		'prim': 'string',
-		'annots': [
-			'%simpleString',
-		],
-	},
-	{
-		'prim': 'unit',
-		'annots': [
-			'%simpleUnit',
 		],
 	},
 ];
@@ -189,9 +349,9 @@ export const AllEditors = () => {
 	};
 	return (
 		<div className='allEditors'>
-			{allTypes.map((dataType, index) => (
+			{allTypes.map((item, index) => (
 				<div key={index} className='singleEditor'>
-					<MichelineEditor input={{ dataType: dataType, value: null }} onMessage={handleMessage} />
+					<MichelineEditor input={{ dataType: item.type, value: item.value }} onMessage={handleMessage} />
 				</div>
 			))}
 		</div>

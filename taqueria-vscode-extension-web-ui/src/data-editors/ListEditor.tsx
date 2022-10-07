@@ -1,24 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { DataEditorNode } from './DataEditorNode';
 
 export const ListEditor = (
-	{ dataType, value, onChange }: { dataType: any; value: any[]; onChange: (value: any[]) => void },
+	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
 ) => {
 	if (value === undefined || value === null || !Array.isArray(value)) {
 		value = [];
 	}
-	const [currentValue, setCurrentValue] = useState(value);
 	const changeValue = (index: number, v: any) => {
-		const newValue = currentValue.slice();
+		const newValue = value.slice();
 		newValue[index] = v;
-		setCurrentValue(newValue);
 		onChange(newValue);
 	};
 	return (
 		<div className='editorDiv'>
 			<table>
 				<tbody>
-					{currentValue.map((item, index) => (
+					{(value as any[]).map((item, index) => (
 						<tr key={index}>
 							<td className='valueTitle'>{index}:</td>
 							<td>
@@ -32,7 +30,7 @@ export const ListEditor = (
 					))}
 					<tr>
 						<td>
-							<button onClick={() => changeValue(currentValue.length, null)}>+</button>
+							<button onClick={() => changeValue(value.length, null)}>+</button>
 						</td>
 						<td>
 						</td>
