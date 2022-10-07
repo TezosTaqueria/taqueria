@@ -1,3 +1,4 @@
+import fetch from 'node-fetch'
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import util from 'util';
@@ -175,6 +176,11 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 			throw new Error(`error: ${error}`);
 		}
 	});
+
+	test.only('Verify that Taqueria accepts any origin and does not emit any CORS related errors', async () => {
+		const res = await fetch("http:/localhost:20000")
+		expect(res.ok).toBe(true)
+	})
 
 	// TODO: Currently it cannot be done until this issue has been resolved
 	// Issue to implement test: https://github.com/ecadlabs/taqueria/issues/366
