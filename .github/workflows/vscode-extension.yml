@@ -63,7 +63,6 @@ jobs:
 
       - name: Make taq binary globally visible
         run: |
-          which taq
           echo $(which taq) >> $GITHUB_PATH
 
       - name: update run-tests.sh to make it executable

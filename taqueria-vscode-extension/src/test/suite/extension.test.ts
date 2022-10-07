@@ -110,41 +110,21 @@ describe('Extension Test Suite', async () => {
 		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
 		// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
 
-		setOpenDialogMocks(`${ligoContractFileDestination}`);
-
-		const output = await execSync(`ls -l ${testProjectRoot}`);
-		console.log('Output ' + output);
-
-		const outputRoot = await execSync('ls -l ./');
-		console.log('Output ' + outputRoot);
-
-		// await fse.rm(testProjectDestination, { recursive: true });
-		// await fse.mkdir(testProjectDestination, { recursive: true });
+		await fse.rm(testProjectDestination, { recursive: true });
+		await fse.mkdir(testProjectDestination, { recursive: true });
 
 		await vscodeMock.commands.executeCommand('taqueria.init');
 
 		choosePlugin = '@taqueria/plugin-ligo';
-
 		await vscodeMock.commands.executeCommand('taqueria.install');
 
 		// Example if we need to force to refresh command state
 		// await vscodeMock.commands.executeCommand('taqueria.refresh_command_states');
 
-		const outputBefore = await execSync(`ls -l ${testProjectDestination}`);
-		console.log('Output destination root' + outputBefore);
-
-		const outputTaq = await execSync(`which taq`);
-		console.log('Output taq' + outputTaq);
-
-		const outputBeforeCopy = await execSync(`ls -l ${testProjectDestination}/contracts/`);
-		console.log('Output destination' + outputBeforeCopy);
-
-		const outputBeforeCopySource = await execSync(`ls -l ${testProjectSource}`);
-		console.log('Output Source' + outputBeforeCopySource);
-
 		// Copy contract from data folder
 		await fse.copyFile(ligoContractFileSource, ligoContractFileDestination);
 
+		setOpenDialogMocks(`${ligoContractFileDestination}`);
 		await vscodeMock.commands.executeCommand('taqueria.compile_pick_file');
 
 		assert.doesNotThrow(() => {
@@ -157,8 +137,7 @@ describe('Extension Test Suite', async () => {
 	});
 
 	after(async () => {
-		// await fse.rm(testProjectRoot, { recursive: true });
-		// Uncomment for local development
+		// Uncomment for local development if there is an issue with the path length
 		// await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
 	});
 });
