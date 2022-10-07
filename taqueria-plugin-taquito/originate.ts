@@ -1,4 +1,5 @@
 import {
+	getAccountPrivateKey,
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
@@ -100,6 +101,8 @@ const mapOpToContract = async (
 	destination: string,
 ) => {
 	const results = await op.operationResults();
+	const originationResults = results.filter(result => result.kind === 'origination')
+		.map(result => result as OperationContentsAndResultOrigination);
 
 	return contracts.reduce(
 		(retval, contract) => {
@@ -109,7 +112,7 @@ const mapOpToContract = async (
 				// WARNING - using side effect here.
 				// For each iteration of reduce, results array is being modified-in-place.
 				// TODO: Adjust to use recursion to avoid side-effect.
-				const result = results.shift() as OperationContentsAndResultOrigination;
+				const result = originationResults.shift();
 				const address = result && result.metadata.operation_result.originated_contracts
 					? result.metadata.operation_result.originated_contracts.join(',')
 					: 'Error';
@@ -171,10 +174,16 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 				sendErr('The RPC URL may be down or the sandbox is not running.\n');
 				sendErr(msg);
 			} else if (/empty_implicit_contract/.test(msg)) {
-				sendErr(
-					'Your account does not have sufficient funds to perform this operation. If targeting a testnet you may get funds from a faucet at https://teztnets.xyz/.\n',
-				);
-				sendErr(msg);
+				const result = msg.match(/(?<="implicit":")tz[^"]+(?=")/);
+				const publicKeyHash = result ? result[0] : undefined;
+				if (!publicKeyHash) sendErr(msg);
+				else {
+					sendErr(
+						`The account ${publicKeyHash} for the target environment, "${
+							getCurrentEnvironment(parsedArgs)
+						}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+					);
+				}
 			} else {
 				sendErr(
 					"There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.\n",
@@ -230,22 +239,15 @@ const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.
 				const network = getNetworkConfig(parsedArgs)(networkName);
 				if (network) {
 					if (network.rpcUrl) {
-						if (network.faucet) {
-							const result = (async () => {
-								const tezos = new TezosToolkit(network.rpcUrl as string);
-								await importFaucet(
-									tezos,
-									network.faucet.email,
-									network.faucet.password,
-									network.faucet.mnemonic.join(' '),
-									network.faucet.activation_code,
-								);
-								return await createBatch(parsedArgs, tezos, networkName);
-							})();
+						const result = (async () => {
+							const tezos = new TezosToolkit(network.rpcUrl as string);
+							const key = await getAccountPrivateKey(parsedArgs, network, 'taqRootAccount');
+							await importKey(tezos, key);
+							return await createBatch(parsedArgs, tezos, networkName);
+						})();
 
-							return [...retval, result];
-						} else sendErr(`Network ${networkName} requires a valid faucet in config.json.`);
-					} else sendErr(`Network "${networkName} is missing an RPC url in config.json."`);
+						return [...retval, result];
+					} else sendErr(`Network "${networkName}" is missing an RPC url in config.json.`);
 				} else {
 					sendErr(
 						`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json.`,
