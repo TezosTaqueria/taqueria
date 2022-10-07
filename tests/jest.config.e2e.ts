@@ -81,6 +81,7 @@ export default {
 		'jsx',
 		'ts',
 		'tsx',
+		'mts',
 		'json',
 		'node',
 	],
@@ -98,7 +99,20 @@ export default {
 	// notifyMode: "failure-change",
 
 	// A preset that is used as a base for Jest's configuration
-	preset: 'ts-jest',
+	preset: 'ts-jest/presets/default-esm', // or other ESM presets
+	moduleNameMapper: {
+		'^(\\.{1,2}/.*)\\.js$': '$1',
+	},
+	transform: {
+		// '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
+		// '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
+		'^.+\\.tsx?$': [
+			'ts-jest',
+			{
+				useESM: true,
+			},
+		],
+	},
 
 	// Run tests from one or more projects
 	// projects: undefined,
@@ -151,9 +165,9 @@ export default {
 	// testLocationInResults: false,
 
 	// The glob patterns Jest uses to detect test files
-	testMatch: [
-		'**/e2e/?(*.)+(spec|test).[tj]s?(x)',
-	],
+	// testMatch: [
+	// 	'**/e2e/?(*.)+(spec|test).m?[tj]s?(x)',
+	// ],
 
 	// An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
 	testPathIgnorePatterns: [
@@ -161,7 +175,9 @@ export default {
 	],
 
 	// The regexp pattern or array of patterns that Jest uses to detect test files
-	// testRegex: [],
+	testRegex: [
+		/e2e\/.*(spec|test)/,
+	],
 
 	// This option allows the use of a custom results processor
 	// testResultsProcessor: undefined,
