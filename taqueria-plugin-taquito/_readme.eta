@@ -4,6 +4,11 @@
 
 The Taquito plugin provides stateful tasks to originate and interact with smart contracts in Tezos sandboxes or testnets
 
+## Requirements
+
+- Taqueria v0.20.2 or later
+- Node.js v16.17.1 or later
+
 ## Installation
 
 To install the Taquito plugin on a Taqueria project, navigate to the project folder and run:

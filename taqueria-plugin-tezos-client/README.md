@@ -7,9 +7,9 @@ The Tezos Client plugin provides tasks to analyze contracts including type check
 
 ## Requirements
 
-- Node.js v16 or later
-- Docker v0.8.2 or later
-- Taqueria v0.8.0 or later
+- Taqueria v0.20.2 or later
+- Node.js v16.17.1 or later
+- Docker v20.10.12 or later
 
 ## Installation
 

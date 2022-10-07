@@ -6,7 +6,7 @@ The SmartPy plugin provides a task to compile SmartPy smart contracts to Michels
 
 The SmartPy plugin requires: 
 - SmartPy v0.8.4 or later to be installed [locally](https://smartpy.io/docs/cli/#installation)
-- Node.js v16.3 or later
+- Node.js v16.17.1 or later
 
 ## Installation
 
