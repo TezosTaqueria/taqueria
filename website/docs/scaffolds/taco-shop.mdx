@@ -199,6 +199,29 @@ This should return the address of the contract on the testnet which looks like t
 This scaffold comes with a pre-configured faucet file for the testnet which is shared by all users and can cause issues. It is recommended that you replace the faucet file in the project's `config.json` file with your own which you can get from the [Teztnets Faucet](https://teztnets.xyz/). Further information about network configuration can be found [here](/docs/config/networks)
 :::
 
+
+### Insert the Contract Address (Optional)
+
+There is a way to point dApp to a hardcoded contract.
+To do so you need to insert the address of the contract into the `/app/App.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/index.tsx` file as shown here:
+
+```ts /app/src/app.tsx
+function app() {
+  const [rpcUrl, setRpcUrl] = useState("https://ghostnet.ecadinfra.com");
+  const [contractAddress, setContractAddress] = useState(
+      "KT1CPASSW7rstFQw6vENBkXmG6mJNsDMauTP"
+      // getAliasAddress(config, "hello-tacos")
+  );
+  const [contractStorage, setContractStorage] = useState<number | undefined>(
+    undefined
+  );
+  const [Tezos, setTezos] = useState<TezosToolkit>();
+  const [connected, setConnected] = useState(false);
+```
+
+You should now be able to access the Taco Shop dApp at [http://localhost:3000](http://localhost:3000/)
+
+
 ### Build and Start the React Dapp
 
 Now that the contract has been deployed and the address added to the dApp, you can build and start the React dApp
