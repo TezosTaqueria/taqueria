@@ -16,6 +16,7 @@
 		"serve-website": "cd website && npm run serve",
 		"watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build || npx play-sound beep.mp3\" --initial",
 		"build-and-watch-vscode": "npx chokidar \"*.ts\" \"taqueria-vscode-extension/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run compile -w taqueria-vscode-extension || npx play-sound beep.mp3\" --initial",
+		"pretest": "mkdir -p ~/TVsCE_e2e/vscode-taq-test-project && npm run compile -w taqueria-vscode-extension",
 		"prepare": "husky install",
 		"format": "dprint fmt",
 		"format:check": "dprint check",
