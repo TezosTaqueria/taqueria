@@ -60,20 +60,12 @@ jobs:
         run: |
           echo "$(pwd)" >> $GITHUB_PATH
           npm run build-all
-
-      - name: Make taq binary globally visible
-        run: |
-          echo $(which taq) >> $GITHUB_PATH
-
-      - name: update run-tests.sh to make it executable
-        run: chmod +x ./taqueria-vscode-extension/bin/run-tests.sh
       
       - name: Compile TS
         run: npm run compile:test --workspace ${{ env.GIT_WORKSPACE }}
       
       - name: Run Unit Tests on Linux
-        run: |
-          xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
+        run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
 
       - name: Package VSCode Extension
         id: packageExtension
