@@ -75,7 +75,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 
 	test('Jest plugin creates default "tests" partition and jest config when running command with no arguments', async () => {
 		try {
-			console.log(await exec(`taq test`, { cwd: `${taqueriaProjectPath}` }));
+			await exec(`taq test`, { cwd: `${taqueriaProjectPath}` });
 		} catch {
 		}
 		const directoryContents = await exec(`ls ${taqueriaProjectPath}`);

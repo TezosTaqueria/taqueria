@@ -8,7 +8,7 @@ import { z } from 'zod';
 export const rawSchema = z.object({
 	label: HumanReadableIdentifier.rawSchema,
 	rpcUrl: Url.rawSchema,
-	protocol: EconomicalProtocolHash.rawSchema.optional(),
+	protocol: EconomicalProtocolHash.rawSchema,
 	accounts: z.record(
 		z.any({ description: 'Accounts' }),
 		{ description: 'Accounts' },
@@ -19,7 +19,7 @@ export const rawSchema = z.object({
 const internalSchema = z.object({
 	label: HumanReadableIdentifier.schemas.schema.describe('Network Label'),
 	rpcUrl: Url.schemas.schema.describe('Network RPC Url'),
-	protocol: EconomicalProtocolHash.schemas.schema.describe('Network Protocol Hash').optional(),
+	protocol: EconomicalProtocolHash.schemas.schema.describe('Network Protocol Hash'),
 	accounts: z.record(
 		z.any({ description: 'Accounts' }),
 		{ description: 'Accounts' },
