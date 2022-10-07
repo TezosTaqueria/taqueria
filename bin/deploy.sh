@@ -8,8 +8,8 @@ dependencies=(
     "@taqueria/node-sdk"
 )
 
-echo "Running \"npm version -ws $1\""
-npm version -ws "$1"
+# echo "Running \"npm version -ws $1\""
+# npm version -ws "$1"
 
 echo "Running \"npm --no-git-tag-version version $1\""
 npm version --no-git-tag-version "$1"
