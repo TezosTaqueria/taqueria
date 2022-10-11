@@ -170,7 +170,7 @@
 			{
 				"view": "taqueria-system-check",
 				"when": "!@taqueria-state/is-taq-cli-reachable",
-				"contents": "❌ Taq CLI: Unable to find the Taqueria CLI.\nThe Taqueria CLI is required to use this extension. Click [here](https://taqueria.io/docs/getting-started/installation/) for installation instructions, then click the \"Check Again\" button. You can also try out automatic install mechanism by clicking the button below:\n[Install Taq CLI](command:taqueria.install_taq_cli)\nThe Taqueria CLI must also be in your PATH. If you change your PATH, you might need to restart Visual Studio Code to register this change."
+				"contents": "❌ Taq CLI: Your system does not have the taq command installed.\nYou must download the taq program and put it in your system, Click [here](https://taqueria.io/docs/getting-started/installation/) for installation instructions.\nIf you prefer, the Taqueria extension can install it for you, to do this, please click the button below, you will be prompted for your password.:\n[Install Taq CLI](command:taqueria.install_taq_cli)\nAfter taqueria is installed, please click the \"Check Again\" button."
 			},
 			{
 				"view": "taqueria-system-check",
