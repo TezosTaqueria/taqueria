@@ -508,24 +508,12 @@ export class VsCodeHelper {
 	async getAvailableScaffolds() {
 		return [
 			{
-				name: 'Quick Start',
-				url: 'https://github.com/ecadlabs/taqueria-scaffold-quickstart',
-			},
-			{
-				name: 'Demo',
-				url: 'https://github.com/ecadlabs/taqueria-scaffold-demo',
+				name: 'NFT',
+				url: 'https://github.com/ecadlabs/taqueria-scaffold-nft',
 			},
 			{
 				name: 'Taco Shop',
 				url: 'https://github.com/ecadlabs/taqueria-scaffold-taco-shop',
-			},
-			{
-				name: 'Hello Tacos Tutorial',
-				url: 'https://github.com/ecadlabs/taqueria-scaffold-hello-tacos-tutorial',
-			},
-			{
-				name: 'NFT',
-				url: 'https://github.com/ecadlabs/taqueria-scaffold-nft',
 			},
 		];
 	}
