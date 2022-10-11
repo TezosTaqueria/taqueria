@@ -65,7 +65,7 @@ const configureToolKitWithSandbox = (parsedArgs: Opts, sandboxName: string): Pro
 	tezos.setProvider({
 		signer: new InMemorySigner((defaultAccount.secretKey as string).replace(/^unencrypted:/, '')),
 	});
-	return tezos;
+	return Promise.resolve(tezos);
 };
 
 const configureToolKitWithNetwork = async (parsedArgs: Opts, networkName: string): Promise<TezosToolkit> => {
