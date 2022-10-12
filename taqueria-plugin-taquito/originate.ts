@@ -186,7 +186,7 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 				}
 			} else {
 				sendErr(
-					"There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.\n",
+					"There was a problem communicating with the chain. Please check the RPC URL of the network or sandbox you're targeting.\n",
 				);
 				sendErr(msg);
 			}
