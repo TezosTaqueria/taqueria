@@ -1,7 +1,9 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import { TaqError } from '@taqueria/protocol/TaqError';
+import { Config } from '@taqueria/protocol/taqueria-protocol-types';
 import { spawn } from 'child_process';
 import Table from 'cli-table3';
+import fs from 'fs';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import os from 'os';
@@ -617,19 +619,9 @@ export class VsCodeHelper {
 					environmentName = arg.environmentName;
 				}
 				if (!environmentName) {
-					const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
-					if (environmentNames.length === 1) {
-						environmentName = environmentNames[0];
-					} else {
-						environmentName = await this.vscode.window.showQuickPick(environmentNames, {
-							canPickMany: false,
-							ignoreFocusOut: false,
-							placeHolder: 'Environment Name',
-							title: 'Select an environment',
-						});
-						if (!environmentName) {
-							return;
-						}
+					environmentName = await this.getEnvironment(config);
+					if (!environmentName) {
+						return;
 					}
 				}
 				const fileName = await this.getFileNameForOperationsOnContracts(
@@ -654,6 +646,25 @@ export class VsCodeHelper {
 				);
 			},
 		);
+	}
+
+	async getEnvironment(config: Util.TaqifiedDir) {
+		const environmentNames = [
+			...Object.keys(config.config?.environment ?? {}),
+		].filter(x => x !== 'default');
+		if (environmentNames.length === 1) {
+			return environmentNames[0];
+		}
+		const environmentName = await this.vscode.window.showQuickPick(
+			environmentNames,
+			{
+				canPickMany: false,
+				ignoreFocusOut: false,
+				placeHolder: 'Environment Name',
+				title: 'Select an environment',
+			},
+		);
+		return environmentName;
 	}
 
 	async getTaqBinPath() {
@@ -1590,31 +1601,64 @@ export class VsCodeHelper {
 	}
 
 	exposeInvokeEntrypointCommand() {
-		this.registerCommand('invoke_entrypoint', async (item: SmartContractEntrypointTreeItem) => {
-			const jsonParameters = item.jsonParameters;
-			const panel = this.vscode.window.createWebviewPanel(
-				'entrypointParameter',
-				'Entrypoint Parameter',
-				this.vscode.ViewColumn.One,
-				{
-					enableScripts: true,
-				},
-			);
-			const result = createVscodeWebUiHtml({
-				webview: panel.webview,
-				subscriptions: this.context.subscriptions,
-				interop: {
-					view: 'MichelineEditor',
-					input: {
-						dataType: jsonParameters,
+		this.registerCommand(
+			'invoke_entrypoint',
+			async (item: SmartContractEntrypointTreeItem) => {
+				const michelineParameters = item.michelineParameters;
+				const panel = this.vscode.window.createWebviewPanel(
+					'entrypointParameter',
+					'Entrypoint Parameter',
+					this.vscode.ViewColumn.One,
+					{
+						enableScripts: true,
 					},
-					onMessage: x => {
-						console.log('vscode-TAQ: entrypointParameter: onMessage', { x });
+				);
+				const result = createVscodeWebUiHtml({
+					webview: panel.webview,
+					subscriptions: this.context.subscriptions,
+					interop: {
+						view: 'MichelineEditor',
+						input: {
+							dataType: michelineParameters,
+							actionTitle: 'Invoke Entrypoint',
+						},
+						onMessage: async x => {
+							if (x.kind === 'action') {
+								const fileName = 'invoke_temp_file.tz';
+								fs.writeFileSync(
+									path.join(
+										this.observableConfig.currentConfig.pathToDir!,
+										`artifacts/${fileName}`,
+									),
+									x.micheline || '',
+								);
+								const config = this.observableConfig.currentConfig.config;
+								if (!config) {
+									this.showLog(
+										OutputLevels.error,
+										'Unexpected: Current config is empty',
+									);
+									return;
+								}
+								const environmentName = await this.getEnvironment(config);
+								await this.proxyToTaqAndShowOutput(
+									`call ${
+										item.parent.alias ?? item.parent.address
+									} --entrypoint ${item.name} --param ${fileName} --env ${environmentName}`,
+									{
+										finishedTitle: `invoked entrypoint ${item.name}`,
+										progressTitle: `invoking entrypoint ${item.name}`,
+									},
+									this.observableConfig.currentConfig.pathToDir,
+									false,
+								);
+							}
+						},
 					},
-				},
-			});
-			panel.webview.html = result.html;
-		});
+				});
+				panel.webview.html = result.html;
+			},
+		);
 	}
 
 	/**

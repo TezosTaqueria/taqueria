@@ -87,9 +87,6 @@ const DefaultView = () => {
 			setGlobalInteropMessageInterface({
 				view: 'AllEditors',
 				input: {},
-				onMessage: x => {
-					console.log('Data was changed', { x });
-				},
 			});
 		}, 250);
 	}, []);

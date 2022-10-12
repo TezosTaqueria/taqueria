@@ -1,7 +1,8 @@
 import React from 'react';
 import './AllEditors.css';
-import { MichelineEditor, MichelineEditorMessageHandler } from './data-editors/MichelineEditor';
+import { MichelineEditor } from './data-editors/MichelineEditor';
 import { usePageTitle } from './hooks';
+import { MichelineEditorMessageHandler } from './interopTypes';
 
 const allTypes = [
 	{
@@ -34,7 +35,7 @@ const allTypes = [
 			],
 		},
 		value: {
-			'int': 42,
+			'int': '42',
 		},
 	},
 	{
@@ -94,7 +95,7 @@ const allTypes = [
 				args: [{
 					'string': 'Hello',
 				}, {
-					'int': 42,
+					'int': '42',
 				}],
 			},
 			{
@@ -102,7 +103,7 @@ const allTypes = [
 				args: [{
 					'string': 'World',
 				}, {
-					'int': 84,
+					'int': '84',
 				}],
 			},
 		],
@@ -151,7 +152,7 @@ const allTypes = [
 						'string': 'Hello',
 					},
 					{
-						'int': 42,
+						'int': '42',
 					},
 				],
 			},
@@ -162,7 +163,7 @@ const allTypes = [
 						'string': 'World',
 					},
 					{
-						'int': 43,
+						'int': '43',
 					},
 				],
 			},
@@ -183,7 +184,7 @@ const allTypes = [
 		value: {
 			'prim': 'some',
 			args: [{
-				'int': 34,
+				'int': '34',
 			}],
 		},
 	},
@@ -206,7 +207,7 @@ const allTypes = [
 			'prim': 'pair',
 			'args': [
 				{
-					'int': 42,
+					'int': '42',
 				},
 				{
 					'string': 'Hello',
@@ -247,7 +248,7 @@ const allTypes = [
 					'prim': 'pair',
 					'args': [
 						{
-							'int': 42,
+							'int': '42',
 						},
 						{
 							'string': 'Hello',
@@ -256,7 +257,7 @@ const allTypes = [
 							'string': 'World',
 						},
 						{
-							'int': 43,
+							'int': '43',
 						},
 					],
 				},
@@ -311,7 +312,7 @@ const allTypes = [
 					{
 						'prim': 'Some',
 						'args': [{
-							'int': 12,
+							'int': '12',
 						}],
 					},
 				],
@@ -345,7 +346,7 @@ export const AllEditors = () => {
 	usePageTitle('Test Editors for many Data Types');
 
 	const handleMessage: MichelineEditorMessageHandler = data => {
-		console.log('Data was changed', { data });
+		console.log(data);
 	};
 	return (
 		<div className='allEditors'>

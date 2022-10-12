@@ -11,6 +11,8 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@taquito/michel-codec": "^14.0.0",
+		"@taquito/michelson-encoder": "^14.0.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0"
 	},

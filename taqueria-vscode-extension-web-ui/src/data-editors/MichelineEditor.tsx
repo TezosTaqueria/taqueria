@@ -1,23 +1,38 @@
+import { emitMicheline, Parser } from '@taquito/michel-codec';
 import React, { useState } from 'react';
-import { usePageTitle } from '../hooks';
+import { MichelineEditorMessageHandler } from '../interopTypes';
 import { DataEditorNode } from './DataEditorNode';
-import { ListEditor } from './ListEditor';
 import './MichelineEditor.css';
-import { PairEditor } from './PairEditor';
-import { PrimitiveEditor } from './PrimitiveEditor';
 
-export type MichelineEditorMessageHandler = (data: { userData: unknown }) => void;
+const parser = new Parser();
 
 export const MichelineEditor = (
-	{ input: { dataType, value }, onMessage }: {
-		input: { dataType: any; value: any };
+	{ input: { dataType, value, actionTitle }, onMessage }: {
+		input: { dataType: any; value?: any; actionTitle?: string };
 		onMessage: MichelineEditorMessageHandler;
 	},
 ) => {
 	const [currentValue, setValue] = useState(value);
 	const handleChange = (v: unknown) => {
 		setValue(v as any);
-		onMessage({ userData: v });
+		let micheline = getMicheline(v);
+		onMessage({ kind: 'change', michelineJson: v, micheline });
+	};
+
+	const handleClick = () => {
+		let micheline = getMicheline(currentValue);
+		onMessage?.({ kind: 'action', michelineJson: currentValue, micheline });
+	};
+
+	const getMicheline = (v: unknown) => {
+		let michelson: string | undefined = undefined;
+		try {
+			const expression = parser.parseJSON(v as object);
+			michelson = emitMicheline(expression);
+			return michelson;
+		} catch (e: any) {
+			return `${e}`;
+		}
 	};
 
 	return (
@@ -25,7 +40,7 @@ export const MichelineEditor = (
 			<table border={1}>
 				<tbody>
 					<tr>
-						<td colSpan={2}>
+						<td colSpan={3}>
 							<DataEditorNode dataType={dataType} value={currentValue} onChange={handleChange} />
 						</td>
 					</tr>
@@ -37,14 +52,22 @@ export const MichelineEditor = (
 							</div>
 						</td>
 						<td>
-							<h3>Preview</h3>
+							<h3>Json</h3>
 							<div style={{ whiteSpace: 'pre-wrap' }}>
 								{JSON.stringify(currentValue, null, 2)}
+							</div>
+						</td>
+						<td>
+							<h3>Micheline</h3>
+							<div style={{ whiteSpace: 'pre-wrap' }}>
+								{getMicheline(currentValue)}
 							</div>
 						</td>
 					</tr>
 				</tbody>
 			</table>
+			{actionTitle
+				&& <button onClick={handleClick}>{actionTitle}</button>}
 		</div>
 	);
 };

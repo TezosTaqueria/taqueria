@@ -212,7 +212,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints?micheline=true&michelson=true`,
 		);
 		const data = await response.json();
-		this.helper.showLog(OutputLevels.warn, JSON.stringify(data, null, 2));
+		this.helper.showLog(OutputLevels.trace, JSON.stringify(data, null, 2));
 		return (data as any[]).map(item =>
 			new SmartContractEntrypointTreeItem(
 				item.name,
@@ -333,8 +333,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	private filterOutBuiltInContracts(
 		data: { address: string; type: string; kind: string }[],
 	): { address: string; type: string; kind: string }[] {
-		return data;
-		// return data.filter(item => SandboxesDataProvider.builtInContracts.indexOf(item.address) === -1);
+		return data.filter(item => SandboxesDataProvider.builtInContracts.indexOf(item.address) === -1);
 	}
 
 	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void> = new vscode

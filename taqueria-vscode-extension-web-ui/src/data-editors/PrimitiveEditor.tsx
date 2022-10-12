@@ -13,12 +13,12 @@ export const PrimitiveEditor = (
 	const fieldName = dataType === 'int' || dataType === 'nat' ? 'int' : 'string';
 	const changeValue = (v: string | number) => {
 		const newValue: Record<string, any> = {};
-		if (fieldName === 'int' && typeof v === 'string') {
-			const num = parseInt(v, 10);
-			if (num.toString() === v) {
-				v = num;
-			}
-		}
+		// if (fieldName === 'int' && typeof v === 'string') {
+		// 	const num = parseInt(v, 10);
+		// 	if (num.toString() === v) {
+		// 		v = num;
+		// 	}
+		// }
 		newValue[fieldName] = v;
 		onChange(newValue);
 	};

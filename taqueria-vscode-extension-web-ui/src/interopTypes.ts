@@ -1,20 +1,27 @@
-import { MichelineEditorMessageHandler } from './data-editors/MichelineEditor';
+export type MichelineEditorMessageInput = {
+	kind: 'change' | 'action';
+	michelineJson: unknown;
+	micheline: string | undefined;
+};
+
+export type MichelineEditorMessageHandler = (
+	data: MichelineEditorMessageInput,
+) => void;
 
 export type InteropMessageInterface =
 	| {
 		view: 'None';
 		input: {};
-		onMessage: (data: {}) => void;
 	}
 	| {
 		view: 'MichelineEditor';
 		input: {
-			dataType: unknown;
+			dataType: any;
+			actionTitle?: string;
 		};
 		onMessage: MichelineEditorMessageHandler;
 	}
 	| {
 		view: 'AllEditors';
 		input: {};
-		onMessage: MichelineEditorMessageHandler;
 	};

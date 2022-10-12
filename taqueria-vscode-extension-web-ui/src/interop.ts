@@ -1,4 +1,4 @@
-import { InteropMessageInterface } from './interopTypes';
+import { InteropMessageInterface, MichelineEditorMessageHandler, MichelineEditorMessageInput } from './interopTypes';
 
 export const createVscodeWebUiHtml = ({
 	webview,
@@ -44,10 +44,12 @@ export const createVscodeWebUiHtml = ({
 				return;
 			}
 
-			console.log('vscode-TAQ: onDidReceiveMessage - Calling onMessage', { messageData });
-			const onMessage = interop.onMessage as (messageData: unknown) => void;
-			onMessage(messageData);
-			console.log('vscode-TAQ: onDidReceiveMessage - Called onMessage - DONE', { messageData });
+			if (interop.view === 'MichelineEditor') {
+				console.log('vscode-TAQ: onDidReceiveMessage - Calling onMessage', { messageData });
+				const onMessage = interop.onMessage as MichelineEditorMessageHandler;
+				onMessage(messageData as MichelineEditorMessageInput);
+				console.log('vscode-TAQ: onDidReceiveMessage - Called onMessage - DONE', { messageData });
+			}
 		},
 		undefined,
 		subscriptions,
