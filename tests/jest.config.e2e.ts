@@ -81,7 +81,6 @@ export default {
 		'jsx',
 		'ts',
 		'tsx',
-		'mts',
 		'json',
 		'node',
 	],
@@ -99,20 +98,7 @@ export default {
 	// notifyMode: "failure-change",
 
 	// A preset that is used as a base for Jest's configuration
-	preset: 'ts-jest/presets/default-esm', // or other ESM presets
-	moduleNameMapper: {
-		'^(\\.{1,2}/.*)\\.js$': '$1',
-	},
-	transform: {
-		// '^.+\\.[tj]sx?$' to process js/ts with `ts-jest`
-		// '^.+\\.m?[tj]sx?$' to process js/ts/mjs/mts with `ts-jest`
-		'^.+\\.tsx?$': [
-			'ts-jest',
-			{
-				useESM: true,
-			},
-		],
-	},
+	preset: 'ts-jest',
 
 	// Run tests from one or more projects
 	// projects: undefined,
@@ -165,9 +151,9 @@ export default {
 	// testLocationInResults: false,
 
 	// The glob patterns Jest uses to detect test files
-	// testMatch: [
-	// 	'**/e2e/?(*.)+(spec|test).m?[tj]s?(x)',
-	// ],
+	testMatch: [
+		'**/e2e/?(*.)+(spec|test).[tj]s?(x)',
+	],
 
 	// An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
 	testPathIgnorePatterns: [
@@ -175,9 +161,7 @@ export default {
 	],
 
 	// The regexp pattern or array of patterns that Jest uses to detect test files
-	testRegex: [
-		/e2e\/.*(spec|test)/,
-	],
+	// testRegex: [],
 
 	// This option allows the use of a custom results processor
 	// testResultsProcessor: undefined,
@@ -201,7 +185,7 @@ export default {
 	// ],
 
 	// Changing default timeout from 5000 to 30000 for tests
-	testTimeout: 300000,
+	testTimeout: 180000,
 	// An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
 	// unmockedModulePathPatterns: undefined,
 

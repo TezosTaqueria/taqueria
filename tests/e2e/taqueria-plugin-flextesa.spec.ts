@@ -1,5 +1,4 @@
-import fetch from 'node-fetch'
-import { exec as exec1 } from 'child_process';
+import { ChildProcess, exec as exec1, spawn } from 'child_process';
 import fsPromises from 'fs/promises';
 import util from 'util';
 import { generateTestProject, getContainerID, getContainerName, sleep } from './utils/utils';
@@ -8,6 +7,10 @@ import * as flexContents from './data/help-contents/flextesa-contents';
 
 const taqueriaProjectPath = 'e2e/auto-test-flextesa-plugin';
 let sandboxName: string;
+
+// List of child processes that will need to be cleanup after test case finishes
+// These processes will be killed in the afterAll() hook
+const processes: ChildProcess[] = [];
 
 // TODO: to be moved into a different spec file when the tezos-client plugin no longer depends on the flextesa plugin.
 // If I move it now, testing won't work.
@@ -177,10 +180,29 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		}
 	});
 
-	test.only('Verify that Taqueria accepts any origin and does not emit any CORS related errors', async () => {
-		const res = await fetch("http:/localhost:20000")
-		expect(res.ok).toBe(true)
-	})
+	test('Verify that Taqueria accepts any origin and does not emit any CORS related errors', async () => {
+		// Start web server for preflight request
+		const p = await spawn('npx', ['ws'], {
+			// detached: true,
+			shell: true,
+		});
+		processes.push(p); // store process for cleanup
+
+		// Stop the sandbox
+		await exec(`taq start sandbox local`, { cwd: `./${taqueriaProjectPath}` });
+
+		// Give the sandbox some time to bake the genesis block
+		await new Promise((resolve, _) => setTimeout(() => resolve(null), 2000));
+
+		// Connect to the sandbox using a different origin (CORS test)
+		const { stdout } = await exec('curl -i -H "Origin: http://localhost:8080" http://localhost:20000/version');
+
+		// Stop the sandbox when done
+		await exec(`taq stop sandbox local`, { cwd: `./${taqueriaProjectPath}` });
+
+		// Assert that the connection to the sandbox via different origin was successful
+		expect(stdout).toContain('HTTP/1.1 200 OK');
+	});
 
 	// TODO: Currently it cannot be done until this issue has been resolved
 	// Issue to implement test: https://github.com/ecadlabs/taqueria/issues/366
@@ -217,6 +239,10 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 	// Comment if need to debug
 	afterAll(async () => {
 		try {
+			// Clean up any processes created during testing
+			processes.map(child => child.kill());
+
+			// Clean up test projects
 			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
