@@ -5,7 +5,6 @@ import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
-import { cwd } from 'process';
 import * as contents from './data/help-contents/jest-contents';
 import { reference } from './data/jest.config-reference';
 import { referenceCI } from './data/jest.config-reference-ci';
@@ -207,6 +206,14 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	afterAll(async () => {
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+		// If TAQ_TEST_CLEAN is set to 0, then don't remove
+		// the test project directory. Useful for debugging locally
+		if (process.env.TAQ_TEST_CLEAN !== '0') {
+			// Give time for tests to finish
+			await new Promise((resolve, _) => setTimeout(() => resolve(null), 1000));
+
+			// Cleanup the test directory
+			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+		}
 	});
 });
