@@ -606,7 +606,7 @@
 		"compile:test": "tsc -p tsconfig.test.json",
 		"pretest": "npm run compile:test",
 		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
+		"test": "./bin/run-tests.sh"
 	},
 	"devDependencies": {
 		"@taquito/taquito": "^13.0.1",

@@ -15,6 +15,7 @@
 		"Entrypoints",
 		"esbuild",
 		"execa",
+		"FAILWITH",
 		"flextesa",
 		"fluture",
 		"gentypes",
@@ -47,6 +48,7 @@
 		"tsbuildinfo",
 		"typecheck",
 		"tzkt",
+		"UNPAIR",
 		"vsix",
 		"xvfb"
 	],

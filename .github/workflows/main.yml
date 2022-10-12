@@ -175,34 +175,34 @@ jobs:
 
   gather-info-for-e2e-tests:
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - build-binaries
-    
+
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
-    
+
     outputs:
       test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
       test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
       test-chunks-formatted: ${{ steps['format-test-chunks'].outputs['test-chunks-formatted'] }}
-    
+
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: 16.16.x
 
-      # This step currently attempts to put all test files found in the e2e folder into 4 equal sized buckets. The output is a list of lists 
+      # This step currently attempts to put all test files found in the e2e folder into 4 equal sized buckets. The output is a list of lists
       - id: set-test-chunks
         name: Set Chunks
         run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -c '[_nwise(length / 2 | ceil)]')"
-      
+
       # This step just creates a list of numbers representing the different buckets of tests
       - id: set-test-chunk-ids
         name: Set Chunk IDs
         run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -c 'to_entries | map(.key)')"
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
-      
+
       # This step will take in the buckets of tests and format the names to remove the absolute path part leaving only the name we care about
       - id: format-test-chunks
         name: Format Chunks
@@ -250,7 +250,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16.16.x
-      
+
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "1.23.4"
@@ -277,7 +277,7 @@ jobs:
           COMMIT=`git rev-parse --short "$GITHUB_SHA"`
           TAQ_VERSION="${TAQ_VERSION/\//-}"
           deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env --allow-net index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
-          [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]] 
+          [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]]
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
 
@@ -301,7 +301,7 @@ jobs:
         run: npm run test:e2e -w tests ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
-  
+
   report-e2e-status:
     needs: run-tests
     if:  ${{ failure() && github.event_name != 'release' }}
