@@ -24,7 +24,7 @@ taq compile <contractName>
 ```
 
 > ### :warning: CAUTION
-> The `compile` task can be implemented by more than one compiler plugin installed on a project (LIGO, Archetype, SmartPy). If this is the case, you must use the `--plugin ligo` flag to specify a particular compiler
+> The `compile` task is implemented by more than one compiler plugin (LIGO, Archetype, SmartPy). If more than one of these plugins are installed on a project, you need to use the `--plugin ligo` flag to specify a particular compiler
 
 ### Basic description
 The LIGO plugin exposes a `compile` task in Taqueria which can target one LIGO contract in the `contracts` folder and compile them to a Michelson `.tz` file output to the `artifacts` folder

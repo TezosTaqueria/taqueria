@@ -8,13 +8,12 @@ This plugin provides the ability to easily configure and run Flextesa sandbox in
  
 ## Overview
 
-With the Flextesa plugin you configure various sandboxes for use in Taqueria that you can start, stop, and query from the CLI
+With the Flextesa plugin you configure various sandboxes for use in Taqueria that you can start, stop, and query from the CLI and Visual Studio Code extension
 
 
 Some helpful things to know:
 - Multiple sandboxes can be configured and run concurrently
 - You can configure the Tezos `protocol` for each sandbox to test against current, and future network upgrades
-- Accounts and balances are pre-configured per-sandbox and do not persist their state
 - Accounts and balances will be initialized each time a sandbox is started
 - Sandboxes can be added to Taqueria environments and then targeted from the CLI using the `--env [envName]` option 
 
@@ -39,7 +38,7 @@ Once installed, you can confirm functionality by runing the command `taq start s
 
 The Flextesa plugin allows you to start, stop, and query the sandboxes configured in `.taq/config.json` from the CLI
 
-The following commands are available from the CLI or the VS Code Command palette:
+The following commands are available from the CLI:
 - `taq start sandbox [sandboxName]`
 - `taq stop sandbox [sandboxName]`
 - `taq list accounts [sandboxName]`
@@ -145,7 +144,7 @@ An arbitrary string used to describe a particular configuration
 
 A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
 
-Currently availble protocols are:
+Current available protocols:
 - Kathmandu   `PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg`
 
 #### 'rpcUrl'
