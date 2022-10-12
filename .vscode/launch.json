@@ -6,10 +6,11 @@
 			"type": "extensionHost",
 			"request": "launch",
 			"args": [
+				"--disable-extensions",
 				"--extensionDevelopmentPath=${workspaceFolder}/taqueria-vscode-extension"
 			],
 			"outFiles": [
-				"${workspaceFolder}/taqueria-vscode-extension/out/*.js"
+				"${workspaceFolder}/taqueria-vscode-extension/out/**/*.js"
 			],
 			"preLaunchTask": "build-and-watch-vscode",
 			"env": {
@@ -18,34 +19,21 @@
 			}
 		},
 		{
+			"name": "Run Extension Tests",
+			"type": "extensionHost",
 			"request": "launch",
-			"name": "Launch CLI",
-			"type": "pwa-node",
-			"program": "${workspaceFolder}/index.ts",
-			"cwd": "${workspaceFolder}", // If you want to run taq from a different location, set the address in this line
-			"runtimeExecutable": "deno",
-			"runtimeArgs": [
-				"run",
-				"--inspect-brk",
-				"--allow-run",
-				"--allow-write",
-				"--allow-read",
-				"--allow-env",
-				"--allow-net",
-				"--import-map",
-				"${workspaceFolder}/import_map.json"
-			],
+			"runtimeExecutable": "${execPath}",
 			"args": [
-				"--quickstart",
-				"Dummy text",
-				"--setBuild",
-				"Dummy-build",
-				"--setVersion",
-				"Dummy-version",
-				"uninstall",
-				"../../taqueria/taqueria-plugin-flextesa"
+				"${env:HOME}/TVsCE_e2e/vscode-taq-test-project/",
+				"--extensionDevelopmentPath=${workspaceFolder}/taqueria-vscode-extension",
+				"--extensionTestsPath=${workspaceFolder}/taqueria-vscode-extension/out/test/suite/index",
+				"--disable-extensions"
 			],
-			"attachSimplePort": 9229
+			"outFiles": ["${workspaceFolder}/taqueria-vscode-extension/out/**/*.js"],
+			"preLaunchTask": "npm: pretest",
+			"env": {
+				"LogLevel": "debug"
+			}
 		}
 	]
 }
