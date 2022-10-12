@@ -319,6 +319,8 @@ jobs:
 
   build-and-publish-npm-packages:
     runs-on: ubuntu-latest
+    needs:
+      - run-tests
     permissions:
       packages: write
       contents: read
