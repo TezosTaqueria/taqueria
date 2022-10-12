@@ -61,6 +61,7 @@ export async function activate(context: api.ExtensionContext, input?: InjectedDe
 		},
 	);
 	helper.exposeRefreshCommand();
+	helper.exposeInstallTaqCliCommand();
 	// await helper.watchGlobalSettings();
 
 	helper.exposeCompileCommand('compile_smartpy', 'getFromCommand', 'smartpy');
