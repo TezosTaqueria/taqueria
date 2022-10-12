@@ -168,9 +168,11 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 		if (error.message) {
 			const msg = error.message;
 			if (/ENOTFOUND/.test(msg)) {
-				sendErr(msg + ' - The RPC URL may be invalid. Check ./taq/config.json.\n');
+				sendErr('The RPC URL may be invalid. Check your ./.taq/config.json.\n');
+				sendErr(msg);
 			} else if (/ECONNREFUSED/.test(msg)) {
-				sendErr(msg + ' - The RPC URL may be down or the sandbox is not running.');
+				sendErr('The RPC URL may be down or the sandbox is not running.\n');
+				sendErr(msg);
 			} else if (/empty_implicit_contract/.test(msg)) {
 				const result = msg.match(/(?<="implicit":")tz[^"]+(?=")/);
 				const publicKeyHash = result ? result[0] : undefined;
@@ -184,9 +186,9 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 				}
 			} else {
 				sendErr(
-					msg
-						+ " - There was a problem communicating with the chain. Check the RPC URL of the network or sandbox you're targeting in config.json.\n",
+					"There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.\n",
 				);
+				sendErr(msg);
 			}
 		}
 		return undefined;
