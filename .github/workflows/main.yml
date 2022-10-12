@@ -16,6 +16,7 @@ on:
 
 env:
   SCOPE: '@taqueria'
+  NPM_REGISTRY: 'https://registry.npmjs.org/'
 
 concurrency:
   group: ${{ github.ref_name || github.ref }}
@@ -30,7 +31,7 @@ jobs:
     outputs:
       vscode: ${{ steps.filter.outputs.vscode }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: dorny/paths-filter@v2
       id: filter
       with:
@@ -61,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
          
       - uses: actions/setup-node@v3
         with: 
@@ -122,7 +123,7 @@ jobs:
 
     steps:
       - name: Setup repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
@@ -186,8 +187,8 @@ jobs:
       test-chunks-formatted: ${{ steps['format-test-chunks'].outputs['test-chunks-formatted'] }}
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.16.x
 
@@ -246,8 +247,8 @@ jobs:
       - gather-info-for-e2e-tests
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' && !(startsWith(github.ref, 'refs/tags/v')) }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.16.x
 
@@ -316,6 +317,45 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.E2E_MONITORING_SLACK }} # required
 
+  build-and-publish-npm-packages:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    env: 
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with: 
+          registry-url: ${{ env.NPM_REGISTRY }}
+          scope: "${{ env.SCOPE }}"
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules/**
+          key: cache-node-modules-${{ github.run_id }}
+
+      - name: Publish for PR
+        if:  ${{ github.event_name == 'pull_request' }}
+        run: |
+          npm publish --workspaces --tag 'preview' --access public --dry-run --no-private
+                
+      - name: Publish for prerelease
+        if:  ${{ github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          npm publish --workspaces --tag 'next' --access public
+      
+      - name: Publish for official release
+        if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
+        run: |
+          npm publish --workspaces --tag 'latest' --access public
+
+    if: ${{ !github.event.pull_request.head.repo.fork }}
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPMJS_PAT }} 
+  
   vscode-extension-workflow:
     needs: 
       - detect-changes
@@ -342,7 +382,7 @@ jobs:
       - build-binaries
       - vscode-extension-workflow
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: create pr comment
         uses: actions/github-script@v5
@@ -430,11 +470,11 @@ jobs:
     needs:
       - detect-minor-version
       - build-binaries
-      # - vscode-extension-workflow
+      - vscode-extension-workflow
     if: ${{ startsWith(github.ref, 'refs/tags/v') &&
             !github.event.pull_request.head.repo.fork }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Download binaries 
         id: download-binaries 
@@ -443,7 +483,7 @@ jobs:
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
           wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
           wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
-# wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
+          wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
       - name: Pre-release
         if: ${{ needs.detect-minor-version.outputs.minor-version == 'odd' }}

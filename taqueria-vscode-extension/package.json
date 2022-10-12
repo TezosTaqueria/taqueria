@@ -4,7 +4,6 @@
 	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
 	"version": "0.20.2",
-	"preview": true,
 	"private": true,
 	"engines": {
 		"vscode": "^1.68.1",
