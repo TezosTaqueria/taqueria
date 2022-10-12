@@ -61,6 +61,7 @@ jobs:
 
       - name: Add working dir to PATH
         run: |
+          npm ci
           echo "$(pwd)" >> $GITHUB_PATH
       
       - name: Compile TS
