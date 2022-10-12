@@ -10,6 +10,7 @@ import path, { join } from 'path';
 import { uniq } from 'rambda';
 import * as semver from 'semver';
 import * as api from 'vscode';
+import { sleep } from '../test/suite/utils/utils';
 import { ArtifactsDataProvider, ArtifactTreeItem } from './gui/ArtifactsDataProvider';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
@@ -28,6 +29,7 @@ import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProv
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import * as Util from './pure';
+import { execCmd } from './pure';
 import { getLanguageInfoForFileName, getSupportedSmartContractExtensions } from './SmartContractLanguageInfo';
 import { TaqVsxError } from './TaqVsxError';
 
@@ -291,6 +293,35 @@ export class VsCodeHelper {
 	exposeRefreshCommand() {
 		this.registerCommand('refresh_command_states', async () => {
 			await this.updateCommandStates();
+		});
+	}
+
+	exposeInstallTaqCliCommand() {
+		this.registerCommand('install_taq_cli', async () => {
+			await this.vscode.window.withProgress({
+				location: this.vscode.ProgressLocation.Notification,
+				cancellable: false,
+				title: `Installing Taq CLI...`,
+			}, async progress => {
+				progress.report({ increment: 0 });
+				try {
+					const hasInstalled = await this.downloadAndInstallTaqCLI();
+					if (hasInstalled) {
+						this.vscode.window.showInformationMessage(`Successfully installed Taq CLI.`);
+					} else {
+						this.vscode.window.showWarningMessage(
+							`Some issues occurred while installing Taq CLI. Please check the Taqueria Log window for diagnostics information.`,
+						);
+					}
+				} catch (e: unknown) {
+					this.vscode.window.showErrorMessage(
+						`Error while installing Taq CLI. Please check the Taqueria Log window for diagnostics information.`,
+					);
+					this.logAllNestedErrors(e);
+				} finally {
+					progress.report({ increment: 100 });
+				}
+			});
 		});
 	}
 
@@ -848,7 +879,7 @@ export class VsCodeHelper {
 			return await Util.execCmd(
 				`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`,
 				this.getLog(),
-				pathToDir,
+				{ projectDir: pathToDir },
 			);
 		} else {
 			return await Util.execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`, this.getLog());
@@ -1556,5 +1587,81 @@ export class VsCodeHelper {
 			const jsonParameters = item.operation;
 			this.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});
+	}
+
+	/**
+	 * @returns true if installed successfully, false is not installed
+	 */
+	async downloadAndInstallTaqCLI(): Promise<boolean> {
+		// 1. Detect platform
+		switch (process.platform) {
+			case 'linux':
+				return this.performDownloadingAndInstallTaqCLI('https://taqueria.io/get/linux/taq');
+			case 'darwin':
+				return this.performDownloadingAndInstallTaqCLI('https://taqueria.io/get/macos/taq');
+			default:
+				this.showLog(OutputLevels.warn, `Taqueria CLI is not supported on ${process.platform}`);
+				return false;
+		}
+	}
+
+	private async performDownloadingAndInstallTaqCLI(taqDownloadUrl: string): Promise<boolean> {
+		// 2. Download binary
+		const { executionError: curlError } = await execCmd(
+			`curl -s ${taqDownloadUrl} -o /tmp/taq -L`,
+			this.getLog(),
+		);
+		this.showLog(OutputLevels.debug, `Downloading Taqueria CLI...`);
+		if (curlError) {
+			this.showLog(OutputLevels.error, `Failed to download Taqueria CLI: ${curlError}`);
+			return false;
+		}
+		this.showLog(OutputLevels.info, `Taqueria CLI downloaded successfully`);
+
+		// 3. Make Taqueria CLI executable
+		const { executionError: chmodError } = await execCmd(`chmod +x /tmp/taq`, this.getLog());
+		if (chmodError) {
+			this.showLog(OutputLevels.error, `Failed to make Taqueria CLI executable: ${chmodError}`);
+			return false;
+		}
+		this.showLog(OutputLevels.info, `Taqueria CLI made executable successfully`);
+
+		// 4. Ask for sudo password
+		const sudoPassword = await this.vscode.window.showInputBox({
+			password: true,
+			title: 'Enter your sudo password',
+			prompt: 'Sudo password is required in order to install Taq CLI',
+		});
+		if (!sudoPassword) {
+			this.showLog(
+				OutputLevels.error,
+				`Sudo password is required in order to move Taq CLI binary to /usr/local/bin directory`,
+			);
+			return false;
+		}
+
+		// 5. Move to usr bin
+		const { executionError: moveError } = await execCmd(
+			`mv /tmp/taq /usr/local/bin`,
+			this.getLog(),
+			{ sudoPassword },
+		);
+		if (moveError) {
+			this.showLog(OutputLevels.error, `Failed to move Taqueria CLI to /usr/local/bin: ${moveError}`);
+			return false;
+		}
+		this.showLog(OutputLevels.info, `Taqueria CLI moved to /usr/local/bin successfully`);
+
+		// 6. Check if taq is reachable
+		const { executionError: checkError } = await execCmd(`taq --version`, this.getLog());
+		if (checkError) {
+			this.showLog(OutputLevels.error, `Failed to check Taqueria CLI: ${checkError}`);
+			return false;
+		}
+		this.showLog(OutputLevels.info, `Taqueria CLI installed successfully`);
+
+		// 7. Refresh side panel UI
+		await this.updateCommandStates();
+		return true;
 	}
 }
