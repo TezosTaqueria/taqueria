@@ -18,20 +18,6 @@ const taqueriaProjectPath = 'e2e/auto-test-jest-plugin';
 describe('E2E Testing for the taqueria jest plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['jest']);
-
-		// Pack the jest plugin
-		const taqRoot = resolve(`${__dirname}/../../`);
-		await exec('npm pack -w taqueria-plugin-jest', { cwd: taqRoot });
-
-		// Uninstall the npm package for the current version of the jest plugin
-		await exec('npm uninstall -D @taqueria/plugin-jest', { cwd: taqueriaProjectPath });
-
-		// Install the packed plugin in our project
-		await exec(`npm i -D ${taqRoot}/taqueria-plugin-jest*.tgz`, { cwd: taqueriaProjectPath });
-		await exec(`rm ${taqRoot}/taqueria-plugin-jest*.tgz`);
-
-		// TODO: This can removed after this is resolved:
-		// https://github.com/ecadlabs/taqueria/issues/528
 		try {
 			await exec(`taq -p ${taqueriaProjectPath}`);
 		} catch (_) {}
