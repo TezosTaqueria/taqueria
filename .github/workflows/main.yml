@@ -355,7 +355,7 @@ jobs:
   vscode-extension-workflow:
     needs: 
       - detect-changes
-      - publish-state-plugin-to-npm
+      - build-and-publish-npm-packages
 
     if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
             github.event_name == 'release' || 
