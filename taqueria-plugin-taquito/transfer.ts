@@ -94,7 +94,7 @@ const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: Tezo
 };
 
 const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow, parsedArgs: Opts): Promise<string> => {
-	return tezos.contract
+	return tezos.wallet
 		.transfer({
 			to: contractInfo.contractAddress,
 			amount: parseFloat(contractInfo.tezTransfer),
@@ -103,7 +103,8 @@ const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow, parsedAr
 				value: new Parser().parseMichelineExpression(contractInfo.parameter) as Expr,
 			},
 		})
-		.then(op => op.confirmation().then(() => op.hash))
+		.send()
+		.then(op => op.confirmation().then(() => op.opHash))
 		.catch(err => {
 			if (err instanceof Error) {
 				if (/empty_implicit_contract/.test(err.message)) {
