@@ -7,23 +7,16 @@ import {
 	getNetworkConfig,
 	getParameter,
 	getSandboxAccountConfig,
-	getSandboxAccountNames,
 	getSandboxConfig,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
 } from '@taqueria/node-sdk';
-import { Environment, RequestArgs } from '@taqueria/node-sdk/types';
+import { Environment } from '@taqueria/node-sdk/types';
 import { Expr, Parser } from '@taquito/michel-codec';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit } from '@taquito/taquito';
-
-interface Opts extends RequestArgs.t {
-	contract: string;
-	tez?: string;
-	param?: string;
-	entrypoint?: string;
-}
+import { getFirstAccountAlias, TransferOpts as Opts } from './common';
 
 type TableRow = {
 	contractAlias: string;
@@ -32,11 +25,6 @@ type TableRow = {
 	parameter: string;
 	entrypoint: string;
 	destination: string;
-};
-
-const getFirstAccountAlias = (sandboxName: string, opts: Opts) => {
-	const aliases = getSandboxAccountNames(opts)(sandboxName);
-	return aliases.shift();
 };
 
 const configureToolKitWithSandbox = async (parsedArgs: Opts, sandboxName: string): Promise<TezosToolkit> => {

@@ -3,32 +3,23 @@ import {
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
-	getInitialStorage,
 	getNetworkConfig,
 	getSandboxAccountConfig,
-	getSandboxAccountNames,
 	getSandboxConfig,
 	newGetInitialStorage,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
-	sendRes,
 	updateAddressAlias,
 } from '@taqueria/node-sdk';
-import { Protocol, RequestArgs } from '@taqueria/node-sdk/types';
+import { Protocol } from '@taqueria/node-sdk/types';
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
-import glob from 'fast-glob';
 import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-
-interface Opts extends RequestArgs.t {
-	contract: string;
-	storage: string;
-	alias?: string;
-}
+import { getFirstAccountAlias, OriginateOpts as Opts } from './common';
 
 interface ContractStorageMapping {
 	filename: string;
@@ -41,11 +32,6 @@ interface OriginationResult {
 	alias: string;
 	destination: string;
 }
-
-const getFirstAccountAlias = (sandboxName: string, opts: Opts) => {
-	const aliases = getSandboxAccountNames(opts)(sandboxName);
-	return aliases.shift();
-};
 
 const getContractAbspath = (contractFilename: string, parsedArgs: Opts) =>
 	join(parsedArgs.config.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`);
@@ -301,7 +287,7 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 		)
 		: [];
 
-export const originate = <T>(parsedArgs: Opts) => {
+export const originate = (parsedArgs: Opts) => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 
 	if (!env) {
