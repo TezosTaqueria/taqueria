@@ -128,11 +128,7 @@ Sandbox configurations are added as key/value pairs to the main `sandbox` object
 sandboxName : { sandboxConfigObject }
 ```
 
-Inside the `sandboxConfigObject`, there are four properties you can configure:
-
-#### 'accounts'
-
-A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3_000_000_000'}`
+Inside the `sandboxConfigObject`, there are three properties you can configure:
 
 #### 'label'
 An arbitrary string used to describe a particular configuration
@@ -142,11 +138,14 @@ An arbitrary string used to describe a particular configuration
 A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
 
 Current available protocols:
-- Kathmandu   `PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg`
+- Kathmandu   `PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg` as of Oct 2022
 
 #### 'rpcUrl'
 
 A string which corresponds to the local URL you would like the sandbox to run on
+
+> ### :page_with_curl: Note
+> In addition to the fields above, when a sandbox is first started, a list of accounts specific to the sandbox configuration will be generated and appended to the sandboxConfigObject. These accounts will respect the declared balances from the accounts field in the root of your config.json
 
 ### Adding a Sandbox to a Taqueria Environment
 
