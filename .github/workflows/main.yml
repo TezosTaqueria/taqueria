@@ -350,11 +350,7 @@ jobs:
       - name: Publish for official release
         if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
         run: |
-          npm publish --workspaces --tag 'latest' --access public
-
-    if: ${{ !github.event.pull_request.head.repo.fork }}
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPMJS_PAT }} 
+          npm publish --workspaces --tag 'latest' --access public 
   
   vscode-extension-workflow:
     needs: 
