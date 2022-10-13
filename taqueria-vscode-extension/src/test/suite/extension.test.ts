@@ -103,37 +103,37 @@ describe('Extension Test Suite', async () => {
 		});
 	});
 
-	it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
-		// It creates another process
-		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
-		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
-		// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
+	// it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+	// 	// It creates another process
+	// 	// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
+	// 	// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
+	// 	// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
 
-		await fse.rm(testProjectDestination, { recursive: true });
-		await fse.mkdir(testProjectDestination, { recursive: true });
+	// 	await fse.rm(testProjectDestination, { recursive: true });
+	// 	await fse.mkdir(testProjectDestination, { recursive: true });
 
-		await vscodeMock.commands.executeCommand('taqueria.init');
+	// 	await vscodeMock.commands.executeCommand('taqueria.init');
 
-		choosePlugin = '@taqueria/plugin-ligo';
-		await vscodeMock.commands.executeCommand('taqueria.install');
+	// 	choosePlugin = '@taqueria/plugin-ligo';
+	// 	await vscodeMock.commands.executeCommand('taqueria.install');
 
-		// Example if we need to force to refresh command state
-		// await vscodeMock.commands.executeCommand('taqueria.refresh_command_states');
+	// 	// Example if we need to force to refresh command state
+	// 	// await vscodeMock.commands.executeCommand('taqueria.refresh_command_states');
 
-		// Copy contract from data folder
-		await fse.copyFile(ligoContractFileSource, ligoContractFileDestination);
+	// 	// Copy contract from data folder
+	// 	await fse.copyFile(ligoContractFileSource, ligoContractFileDestination);
 
-		setOpenDialogMocks(`${ligoContractFileDestination}`);
-		await vscodeMock.commands.executeCommand('taqueria.compile_pick_file');
+	// 	setOpenDialogMocks(`${ligoContractFileDestination}`);
+	// 	await vscodeMock.commands.executeCommand('taqueria.compile_pick_file');
 
-		assert.doesNotThrow(() => {
-			const compileResult = fse.readFileSync(`${testProjectDestination}/artifacts/hello-tacos.tz`, {
-				encoding: 'utf-8',
-			});
-			const expectedResult = fse.readFileSync(`${testProjectSource}/hello-tacos-expected.tz`, { encoding: 'utf-8' });
-			assert.equal(compileResult, expectedResult);
-		}, 'The compile command has not created the expected artifacts');
-	});
+	// 	assert.doesNotThrow(() => {
+	// 		const compileResult = fse.readFileSync(`${testProjectDestination}/artifacts/hello-tacos.tz`, {
+	// 			encoding: 'utf-8',
+	// 		});
+	// 		const expectedResult = fse.readFileSync(`${testProjectSource}/hello-tacos-expected.tz`, { encoding: 'utf-8' });
+	// 		assert.equal(compileResult, expectedResult);
+	// 	}, 'The compile command has not created the expected artifacts');
+	// });
 
 	after(async () => {
 		// Uncomment for local development if there is an issue with the path length
