@@ -23,6 +23,17 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('Regression: #1098, Assure that ts-jest installs correctly', async () => {
+		// NOTE:
+		// The generateTestProject is executed once per test suite run via the
+		// beforeAll hook.
+		//
+		// generateTestProject installs a local version of the plugin via symlink
+		// (a side-effect of how NPM works when installing a plugin from a local
+		// directory)
+		//
+		// Thus, we need to install the plugin in such a way that doesn't result
+		// in NPM installing via symlink. Pack to the rescue!
+
 		// Pack the jest plugin
 		const taqRoot = resolve(`${__dirname}/../../`);
 		await exec('npm pack -w taqueria-plugin-jest', { cwd: taqRoot });
@@ -35,6 +46,10 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		await exec(`rm ${taqRoot}/taqueria-plugin-jest*.tgz`);
 
 		await fsPromises.stat(`${taqueriaProjectPath}/node_modules/.bin/ts-jest`);
+
+		// Revert to the local non-packed version of the jest plugin
+		await exec('npm uninstall -D @taqueria/plugin-jest', { cwd: taqueriaProjectPath });
+		await exec(`npm install -D ${taqRoot}/taqueria-plugin-jest`, { cwd: taqueriaProjectPath });
 	});
 
 	test('Verify that the jest plugin exposes the associated commands in the help menu', async () => {
