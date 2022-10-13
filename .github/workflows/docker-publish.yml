@@ -28,8 +28,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
-        with:
-          cache: 'npm'
 
       - name: Registry login
         uses: docker/login-action@v1
@@ -58,11 +56,14 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=${{ steps.vars.outputs.taq_version }}-${{ steps.vars.outputs.short_sha }}
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build package
+        run: | 
+          npm run build -w taqueria-sdk
+          npm run build -w taqueria-protocol
+          npm run build -w taqueria-flextesa-manager
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master
