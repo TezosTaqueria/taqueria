@@ -58,35 +58,6 @@ jobs:
         else
           echo "::set-output name=result::odd"
         fi
-  build-and-cache-node-modules:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup repo
-        uses: actions/checkout@v3
-         
-      - uses: actions/setup-node@v3
-        with: 
-          registry-url: ${{ env.NPM_REGISTRY }}
-          scope: "${{ env.SCOPE }}"
-
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: "1.23.4"
-
-      - name: Install any dependencies
-        run: npm ci
-
-      - name: Build all
-        run: |
-          export PATH="$PATH:$(pwd)"
-          npm run build-all
-
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
 
   build-binaries:
     permissions:
@@ -185,6 +156,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.16.x
+          cache: 'npm'
 
       # This step currently attempts to put all test files found in the e2e folder into 4 equal sized buckets. The output is a list of lists
       - id: set-test-chunks
@@ -244,16 +216,16 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.16.x
+          cache: 'npm'
 
       - uses: denoland/setup-deno@v1
         with:
           deno-version: "1.23.4"
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      - name: Build all
+        run: |
+          export PATH="$PATH:$(pwd)"
+          npm run build-all
 
       - name: download the binary from the build-binaries job and make it executable
         if: ${{ !github.event.pull_request.head.repo.fork }}
@@ -325,12 +297,12 @@ jobs:
         with: 
           registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
+          cache: 'npm'
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      - name: Build all
+        run: |
+          export PATH="$PATH:$(pwd)"
+          npm run build-all
 
       - name: Publish for PR
         if:  ${{ github.event_name == 'pull_request' }}

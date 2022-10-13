@@ -37,13 +37,13 @@ jobs:
       vsixPath: ${{ steps.packageExtension.outputs.vsixPath }}
       vsixGcsUrl: ${{ steps.publicUrl.outputs.vsixGcsUrl }}
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       
-      - name: Install Node
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.16.x
+          cache: 'npm'
+
 
       - name: Install Deno
         uses: denoland/setup-deno@v1
@@ -53,11 +53,10 @@ jobs:
       - name: Attempt to rebuild
         run: npm rebuild | true
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      - name: Build all
+        run: |
+          export PATH="$PATH:$(pwd)"
+          npm run build-all
       
       - name: Compile TS
         run: npm run compile:test --workspace ${{ env.GIT_WORKSPACE }}
@@ -103,16 +102,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.16.x
+          cache: 'npm'
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      - name: Build all
+        run: |
+          export PATH="$PATH:$(pwd)"
+          npm run build-all
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
