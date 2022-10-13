@@ -7,7 +7,7 @@ export const PrimitiveEditor = (
 		onChange: (value: Record<string, any>) => void;
 	},
 ) => {
-	const fieldName = dataType === 'int' || dataType === 'nat' ? 'int' : 'string';
+	const fieldName = getFieldName();
 	const changeValue = (v: string) => {
 		const newValue: Record<string, any> = {};
 		newValue[fieldName] = v;
@@ -20,4 +20,16 @@ export const PrimitiveEditor = (
 		};
 	}
 	return <input type='text' value={value[fieldName]} onChange={e => changeValue(e.target.value)} />;
+
+	function getFieldName() {
+		switch (dataType) {
+			case 'int':
+			case 'nat':
+				return 'int';
+			case 'bytes':
+				return 'bytes';
+			default:
+				return 'string';
+		}
+	}
 };

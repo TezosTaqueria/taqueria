@@ -21,6 +21,11 @@ const getEditor = (
 	const prim = dataType.prim;
 	switch (prim) {
 		case 'unit':
+			if (!value || typeof value !== 'object' || value.prim !== 'Unit') {
+				onChange({
+					'prim': 'Unit',
+				});
+			}
 			return null;
 		case 'string':
 		case 'nat':
