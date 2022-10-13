@@ -25,10 +25,7 @@ export const defaultConfig: Config.t = Config.create({
 		development: {
 			networks: [],
 			sandboxes: ['local'],
-		},
-		testing: {
-			networks: ['ghostnet'],
-			sandboxes: [],
+			storage: {},
 		},
 	},
 	sandbox: {
@@ -45,13 +42,7 @@ export const defaultConfig: Config.t = Config.create({
 		jane: '3_000_000_000',
 		joe: '3_000_000_000',
 	},
-	network: {
-		ghostnet: {
-			label: 'ghostnet',
-			rpcUrl: 'https://ghostnet.ecadinfra.com',
-			protocol: 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg'
-		},
-	},
+	network: {},
 	// defaultTasks: {
 	//     compile: {
 	//         plugin: "taqueria-plugin-ligo",
