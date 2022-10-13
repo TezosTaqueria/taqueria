@@ -7,6 +7,7 @@ import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
 const taqueriaProjectPath = './e2e/auto-test-cli';
+const taqueriaProjectPathNPM = './e2e/auto-test-cli-NPM';
 
 describe('E2E Testing for taqueria CLI,', () => {
 	beforeAll(async () => {
@@ -151,5 +152,31 @@ describe('E2E Testing for taqueria CLI,', () => {
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
+	});
+});
+
+describe('Help testing for plugins installed from NPM,', () => {
+	beforeAll(async () => {
+		await generateTestProject(taqueriaProjectPathNPM, [
+			'ligo',
+			'archetype',
+			'contract-types',
+			'flextesa',
+			'ipfs-pinata',
+			'jest',
+			'metadata',
+			'smartpy',
+			'taquito',
+			'tezos-client',
+		], false);
+	});
+
+	test('Verify that the taq command returns the correct information', async () => {
+		const output = await exec('taq');
+		expect(output.stdout).toBe(contents.helpContentsAllPlugin);
+	});
+
+	afterAll(() => {
+		fsPromises.rm(taqueriaProjectPathNPM, { recursive: true });
 	});
 });
