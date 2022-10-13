@@ -58,10 +58,11 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=${{ steps.vars.outputs.taq_version }}-${{ steps.vars.outputs.short_sha }}
 
-      - name: Build all
-        run: |
-          export PATH="$PATH:$(pwd)"
-          npm run build-all
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules/**
+          key: cache-node-modules-${{ github.run_id }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master

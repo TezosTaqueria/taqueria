@@ -58,6 +58,33 @@ jobs:
         else
           echo "::set-output name=result::odd"
         fi
+  build-and-cache-node-modules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v3
+         
+      - uses: actions/setup-node@v3
+        with: 
+          registry-url: ${{ env.NPM_REGISTRY }}
+          scope: "${{ env.SCOPE }}"
+          cache: 'npm'
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: "1.23.4"
+
+      - name: Build all
+        run: |
+          export PATH="$PATH:$(pwd)"
+          npm run build-all
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules/**
+          key: cache-node-modules-${{ github.run_id }}
 
   build-binaries:
     permissions:
@@ -65,6 +92,8 @@ jobs:
       id-token: 'write'
     runs-on: ${{ matrix.os }}
     if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
+    needs:
+      - build-and-cache-node-modules
     strategy:
       fail-fast: true
       matrix:
@@ -220,10 +249,18 @@ jobs:
         with:
           deno-version: "1.23.4"
 
-      - name: Build all
+      - name: setup-docker
+        if: runner.os == 'macOS'
         run: |
-          export PATH="$PATH:$(pwd)"
-          npm run build-all
+          brew install docker
+          brew install colima
+          colima start
+
+      # - name: Cache node modules
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ./node_modules/**
+      #     key: cache-node-modules-${{ github.run_id }}
 
       - name: download the binary from the build-binaries job and make it executable
         if: ${{ !github.event.pull_request.head.repo.fork }}
@@ -244,16 +281,6 @@ jobs:
           [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]]
           chmod +x taq
           echo "$(pwd)" >> $GITHUB_PATH
-
-      - name: install dependencies
-        run: npm ci
-
-      - name: setup-docker
-        if: runner.os == 'macOS'
-        run: |
-          brew install docker
-          brew install colima
-          colima start
 
       - name: Run unit tests
         run: npm run test:unit -w tests
@@ -297,10 +324,11 @@ jobs:
           scope: "${{ env.SCOPE }}"
           cache: 'npm'
 
-      - name: Build all
-        run: |
-          export PATH="$PATH:$(pwd)"
-          npm run build-all
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules/**
+          key: cache-node-modules-${{ github.run_id }}
 
       - name: Publish for PR
         if:  ${{ github.event_name == 'pull_request' }}

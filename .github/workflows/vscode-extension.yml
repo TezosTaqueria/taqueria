@@ -53,10 +53,11 @@ jobs:
       - name: Attempt to rebuild
         run: npm rebuild | true
 
-      - name: Build all
-        run: |
-          export PATH="$PATH:$(pwd)"
-          npm run build-all
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules/**
+          key: cache-node-modules-${{ github.run_id }}
       
       - name: Compile TS
         run: npm run compile:test --workspace ${{ env.GIT_WORKSPACE }}
@@ -108,10 +109,11 @@ jobs:
           node-version: 16.16.x
           cache: 'npm'
 
-      - name: Build all
-        run: |
-          export PATH="$PATH:$(pwd)"
-          npm run build-all
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules/**
+          key: cache-node-modules-${{ github.run_id }}
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
