@@ -13,7 +13,7 @@ const allTypes = [
 			],
 		},
 		value: {
-			'string': 'true',
+			'prim': 'True',
 		},
 	},
 	{
@@ -67,7 +67,9 @@ const allTypes = [
 				'%simpleUnit',
 			],
 		},
-		value: {},
+		value: {
+			prim: 'Unit',
+		},
 	},
 	{
 		type: {
@@ -91,7 +93,7 @@ const allTypes = [
 		},
 		value: [
 			{
-				prim: 'pair',
+				prim: 'Pair',
 				args: [{
 					'string': 'Hello',
 				}, {
@@ -99,7 +101,7 @@ const allTypes = [
 				}],
 			},
 			{
-				prim: 'pair',
+				prim: 'Pair',
 				args: [{
 					'string': 'World',
 				}, {
@@ -204,7 +206,7 @@ const allTypes = [
 			],
 		},
 		value: {
-			'prim': 'pair',
+			'prim': 'Pair',
 			'args': [
 				{
 					'int': '42',
@@ -242,10 +244,10 @@ const allTypes = [
 			],
 		},
 		value: {
-			'prim': 'pair',
+			'prim': 'Pair',
 			'args': [
 				{
-					'prim': 'pair',
+					'prim': 'Pair',
 					'args': [
 						{
 							'int': '42',
@@ -295,7 +297,7 @@ const allTypes = [
 			],
 		},
 		value: {
-			'prim': 'pair',
+			'prim': 'Pair',
 			'args': [
 				[
 					{

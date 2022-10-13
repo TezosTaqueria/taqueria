@@ -4,7 +4,7 @@ import { DataEditorNode } from './DataEditorNode';
 export const MapEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
 ) => {
-	if (value === undefined || value === null || typeof value !== 'object') {
+	if (value === undefined || value === null || !Array.isArray(value)) {
 		value = [];
 		onChange(value);
 	}
@@ -49,7 +49,7 @@ export const MapEditor = (
 					))}
 					<tr>
 						<td>
-							<button onClick={() => changeValue(value.args.length, null, null)}>+</button>
+							<button onClick={() => changeValue(value.length, null, null)}>+</button>
 						</td>
 						<td>
 						</td>
