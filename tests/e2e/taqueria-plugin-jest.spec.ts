@@ -23,6 +23,17 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	test('Regression: #1098, Assure that ts-jest installs correctly', async () => {
+		// Pack the jest plugin
+		const taqRoot = resolve(`${__dirname}/../../`);
+		await exec('npm pack -w taqueria-plugin-jest', { cwd: taqRoot });
+
+		// Uninstall the npm package for the current version of the jest plugin
+		await exec('npm uninstall -D @taqueria/plugin-jest', { cwd: taqueriaProjectPath });
+
+		// Install the packed plugin in our project
+		await exec(`npm i -D ${taqRoot}/taqueria-plugin-jest*.tgz`, { cwd: taqueriaProjectPath });
+		await exec(`rm ${taqRoot}/taqueria-plugin-jest*.tgz`);
+
 		await fsPromises.stat(`${taqueriaProjectPath}/node_modules/.bin/ts-jest`);
 	});
 
@@ -209,9 +220,6 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		// If TAQ_TEST_CLEAN is set to 0, then don't remove
 		// the test project directory. Useful for debugging locally
 		if (process.env.TAQ_TEST_CLEAN !== '0') {
-			// Give time for tests to finish
-			await new Promise((resolve, _) => setTimeout(() => resolve(null), 1000));
-
 			// Cleanup the test directory
 			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		}
