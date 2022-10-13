@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-metadata",
-	"version": "0.20.2",
+	"version": "0.21.13",
 	"description": "A plugin for Taqueria providing metadata creation and validation.",
 	"keywords": [
 		"taqueria",
@@ -31,8 +31,8 @@
 		"directory": "taqueria-plugin-metadata"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.20.2",
-		"@taqueria/protocol": "^0.20.2",
+		"@taqueria/node-sdk": "^0.21.13",
+		"@taqueria/protocol": "^0.21.13",
 		"prompts": "^2.4.2"
 	},
 	"devDependencies": {
