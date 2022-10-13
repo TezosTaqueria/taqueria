@@ -21,6 +21,14 @@ The default Taqueria `config.json` provides 5 accounts as shown here:
         "default": "development",
         "development": {
             "networks": [],
+            "sandboxes": [
+                "local"
+            ]
+        },
+        "testing": {
+            "networks": [
+                "ghostnet"
+            ],
             "sandboxes": []
         }
     },
@@ -31,7 +39,12 @@ The default Taqueria `config.json` provides 5 accounts as shown here:
             "rpcUrl": "http://localhost:20000"
         }
     },
-    "network": {},
+    "network": {
+        "ghostnet": {
+            "label": "ghostnet",
+            "rpcUrl": "https://ghostnet.ecadinfra.com"
+        }
+    },
     "accounts": {
         "bob": "3_000_000_000",
         "alice": "3_000_000_000",
@@ -60,10 +73,13 @@ These accounts will be created and funded automatically when a sandbox starts. A
             "networks": [],
             "sandboxes": [
                 "local"
+            ]
+        },
+        "testing": {
+            "networks": [
+                "ghostnet"
             ],
-            "storage": {
-                "example.tz": 42
-            }
+            "sandboxes": []
         }
     },
     "sandbox": {
@@ -85,7 +101,12 @@ These accounts will be created and funded automatically when a sandbox starts. A
             "rpcUrl": "http://localhost:20000"
         }
     },
-    "network": {},
+    "network": {
+        "ghostnet": {
+            "label": "ghostnet",
+            "rpcUrl": "https://ghostnet.ecadinfra.com"
+        }
+    },
     "accounts": {
         "bob": "3_000_000_000",
         "alice": "3_000_000_000"
