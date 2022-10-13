@@ -39,7 +39,7 @@ const getFirstAccountAlias = (sandboxName: string, opts: Opts) => {
 	return aliases.shift();
 };
 
-const configureToolKitWithSandbox = (parsedArgs: Opts, sandboxName: string): Promise<TezosToolkit> => {
+const configureToolKitWithSandbox = async (parsedArgs: Opts, sandboxName: string): Promise<TezosToolkit> => {
 	const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
 	if (!sandbox) {
 		return sendAsyncErr(
@@ -65,7 +65,7 @@ const configureToolKitWithSandbox = (parsedArgs: Opts, sandboxName: string): Pro
 	tezos.setProvider({
 		signer: new InMemorySigner((defaultAccount.secretKey as string).replace(/^unencrypted:/, '')),
 	});
-	return Promise.resolve(tezos);
+	return tezos;
 };
 
 const configureToolKitWithNetwork = async (parsedArgs: Opts, networkName: string): Promise<TezosToolkit> => {
