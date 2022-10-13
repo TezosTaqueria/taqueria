@@ -4,20 +4,21 @@ import { DataEditorNode } from './DataEditorNode';
 export const PairEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
 ) => {
-	if (value === undefined || value === null || typeof value !== 'object') {
-		value = {
-			'prim': 'pair',
-			'args': [],
-		};
-	}
 	const changeValue = (index: number, v: any) => {
 		const newValue = {
-			'prim': 'pair',
+			'prim': 'Pair',
 			'args': value.args.slice(),
 		};
 		newValue.args[index] = v;
 		onChange(newValue);
 	};
+	if (value === undefined || value === null || typeof value !== 'object') {
+		value = {
+			'prim': 'Pair',
+			'args': [],
+		};
+		onChange(value);
+	}
 	const dataRecord = dataType as Record<string, any>;
 	return (
 		<div className='editorDiv'>

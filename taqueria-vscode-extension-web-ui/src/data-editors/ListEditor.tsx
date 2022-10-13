@@ -6,6 +6,7 @@ export const ListEditor = (
 ) => {
 	if (value === undefined || value === null || !Array.isArray(value)) {
 		value = [];
+		onChange(value);
 	}
 	const changeValue = (index: number, v: any) => {
 		const newValue = value.slice();

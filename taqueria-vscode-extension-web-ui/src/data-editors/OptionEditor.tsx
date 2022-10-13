@@ -4,17 +4,18 @@ import { DataEditorNode } from './DataEditorNode';
 export const OptionEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
 ) => {
-	if (value === null || value === undefined || typeof value !== 'object') {
-		value = {
-			'prim': 'None',
-		};
-	}
 	const changeValue = (v: any) => {
 		onChange({
 			'prim': 'Some',
 			'args': [v],
 		});
 	};
+	if (value === null || value === undefined || typeof value !== 'object') {
+		value = {
+			'prim': 'None',
+		};
+		changeValue(value);
+	}
 	const setOption = (hasValue: boolean) => {
 		if (hasValue) {
 			onChange({

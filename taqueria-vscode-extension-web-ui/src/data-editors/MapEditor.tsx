@@ -6,6 +6,7 @@ export const MapEditor = (
 ) => {
 	if (value === undefined || value === null || typeof value !== 'object') {
 		value = [];
+		onChange(value);
 	}
 	const changeValue = (index: number, key: any, v: any) => {
 		const newValue = value.slice();

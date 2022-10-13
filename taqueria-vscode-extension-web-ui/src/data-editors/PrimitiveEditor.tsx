@@ -7,11 +7,8 @@ export const PrimitiveEditor = (
 		onChange: (value: Record<string, any>) => void;
 	},
 ) => {
-	if (value === null || value === undefined || typeof value !== 'object') {
-		value = {};
-	}
 	const fieldName = dataType === 'int' || dataType === 'nat' ? 'int' : 'string';
-	const changeValue = (v: string | number) => {
+	const changeValue = (v: string) => {
 		const newValue: Record<string, any> = {};
 		// if (fieldName === 'int' && typeof v === 'string') {
 		// 	const num = parseInt(v, 10);
@@ -22,5 +19,8 @@ export const PrimitiveEditor = (
 		newValue[fieldName] = v;
 		onChange(newValue);
 	};
+	if (value === null || value === undefined || typeof value !== 'object') {
+		changeValue('');
+	}
 	return <input type='text' value={value[fieldName]} onChange={e => changeValue(e.target.value)} />;
 };
