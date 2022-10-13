@@ -8,245 +8,60 @@ This document details the configuration and use of Tezos testnets. If you are lo
 
 ## Introduction
 
-Taqueria provides support to interact with Tezos networks in a simplified and streamlined manner. Taqueria provides a centralized configuration for testnets (including faucet keys) which can then be targeted by Taqueria commands through the use of Taqueria environments
+Taqueria provides support to interact with Tezos networks in a simplified and streamlined manner. Taqueria provides a centralized configuration for testnets which can then be targeted by Taqueria commands through the use of Taqueria environments
 
-To work with Taqueria networks, these are the basic steps you need to take:
-1. Add a network configuration to the Taqueria `.taq/config.json` file
-2. Add a faucet key
-3. Add the created network to an environment
-4. Target the network in Taqueria by passing the environment name to the CLI command (ie. `taq originate --env testing`)
+### The Default Network Configuration
 
-## Requirements
+Named network configurations are stored as key/value pairs in the `network` property using the network name as the key
+
+This example shows the configuration for the default network named `ghostnet` that's already setup for you:
+
+```json
+"network": {
+    "ghostnet": {
+        "label": "ghostnet",
+        "rpcUrl": "https://ghostnet.ecadinfra.com"
+    }
+},
+```
+
+We also have the corresponding environment, called `testing`, that targets the above network setup for you and it looks like the following:
+```json
+"testing": {
+    "networks": [
+        "ghostnet"
+    ],
+    "sandboxes": []
+}
+```
+
+To use this network, simply include `--env testing` after each taq command.
+
+### Adding a new network configuration
+
+You may manually add another network configuration following the format of the default network. For example:
+```
+"network": {
+    "ghostnet": {
+        "label": "ghostnet",
+        "rpcUrl": "https://ghostnet.ecadinfra.com"
+    },
+    "customnet": {
+        "label": "customnet",
+        "rpcUrl": <url of the network>
+    }
+},
+```
+
+Then create a new environment (you may follow the format of the environment called `testing` above) and add this target to that environment
+
+## Supported Protocols
+
+Taqueria will support all protocols available on the [teztnets.xyz](https://teztnets.xyz/) site. If you notice an issue with a recent protocol update, please report it as a bug [here](https://github.com/ecadlabs/taqueria/issues/new?assignees=&labels=bug%2Ctriage&template=bug_report.yml&title=%5BBug%5D%3A+)
 
 :::note
 Currently Taqueria only supports testnets. Support for mainnet will be added in a future release
 :::
-
-To configure and use a Taqueria network, you will require the following:
-
-1. Configuration details for the network you wish to target (Can be found at [teztnets.xyz](https://teztnets.xyz/))
-2. The [Taquito plugin](../plugins/plugin-taquito.mdx/) (Used for originating to a network)
-
-### Supported Protocols
-
-Taqueria will support all protocols available on the [teztnets.xyz](https://teztnets.xyz/) site. If you notice an issue with a recent protocol update, please report it as a bug [here](https://github.com/ecadlabs/taqueria/issues/new?assignees=&labels=bug%2Ctriage&template=bug_report.yml&title=%5BBug%5D%3A+) 
-
-Ghostnet should be the default testnet you use since it will automatically handle protocol upgrades as they happen
-
-## Configuration
-
-:::note
-The network configuration for various protocols, as well as the faucet for each can be found at [teztnets.xyz](https://teztnets.xyz/).
-:::
-
-To configure a network for use, you will need to configure the network, and then add that network to an environment. To illustrate the configuration of a network, we will use [ghostnet](https://teztnets.xyz/ithaca-testnet/), a long running Tezos test network as an example in this document and will configure a network named `ghostnet`, and an environment named `testing`
-
-Taqueria does not have a default network configured, so a freshly initialized project will have a `config.json` file that looks like this:
-```json
-{
-    "language": "en",
-    "plugins": [],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {}
-        }
-    },
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-            "rpcUrl": "http://localhost:20000"
-        }
-    },
-    "network": {},
-    "accounts": {
-        "bob": "3_000_000_000",
-        "alice": "3_000_000_000",
-        "john": "3_000_000_000",
-        "jane": "3_000_000_000",
-        "joe": "3_000_000_000"
-    }
-}
-```
-
-### Network Configuration
-
-The first step is to add a named network configuration to your `config.json` file
-
-Add the following entry ("ghostnet": {...}) to the `network` property::
-```json
-{
-   "network":{
-      "ghostnet":{
-         "label":"Ghostnet Protocol Testnet",
-         "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
-         "protocol":"PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-         "faucet":{
-            "pkh": "",
-            "mnemonic":  "",
-            "email": "",
-            "password": "",
-            "amount": "",
-            "activation_code": ""
-        }
-      }
-   }
-```
-
-The above provides a configuration for a testnet called _ghostnet_, a long-lived network that is kept up-to-date with the latest protocol revisions, and is a safe default for most projects.
-
-:::note
-The information for `rpcUrl` and`protocol` are taken from the page [https://teztnets.xyz/ghostnet-about](https://teztnets.xyz/ghostnet-about)
-:::
-
-### Faucets 
-
-In order to interact with the testnet, you will need an account funded with some Tez.
-
-:::note
-We're working on an improved workflow for funding testnet accounts. For now, please follow the steps below.
-:::
-
-1. Go [here](https://resilience-me.github.io/Tezos-paper-wallet/) and click _Generate_.
-2. From step #2, copy the Public Key and set as the value for "pkh" in the faucet configuration.
-3. From step #2, copy the Private Key (which is actually a mnemonic seed phrase) and set as the value for "mnemonic" in the faucet configuration.
-
-Your network configuration should now look like the following:
-```json
-{
-   "network":{
-      "ghostnet":{
-         "label":"Ghostnet Protocol Testnet",
-         "rpcUrl":"https://rpc.ghostnet.teztnets.xyz",
-         "protocol":"PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-         "faucet":{
-            "pkh": "tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok",
-		    "mnemonic": "dice must lawsuit remain december shed scorpion member loud subject mixture fan trust beauty crush",
-            "email": "",
-            "password": "",
-            "amount": "",
-            "activation_code": ""
-        }
-      }
-   }
-```
-4. Go to teztnets.xyz, click on the link for the faucet of the desired testnet, and then request to have funds sent to your public key hash address (which would be _tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok_ in your example above).
-
-![Request Tez from Faucet](/img/fund-using-faucet.png)
-
-### Environment Configuration
-
-The final step in configuration is to add the network to an environment. In this example, we will create a new environment named `testing` which will contain the `ghost` network
-
-To do this, find the `environment` property in your `config.json` file. By default it will look something like this:
-```json
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {}
-        },
-    },
-```
-
-Add a new environment named `testing`, and add the named network `ghostnet` to its `networks` array:
-```json
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {}
-        },
-        "testing": {
-            "networks": [
-                "ghostnet"
-            ],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {}
-        }
-    },
-```
-
-:::note
-For additional information regarding Taqueria Environments, please see the documentation [here](/docs/config/environments.mdx/)
-:::
-
-### Finished Configuration
-
-At this point, you should have a fully configured network named `ghostnet` which is configured to target [ghostnet](https://teztnets.xyz/ghostnet-about) using a faucet, and an environment named `testing` which can be used to target the network from the CLI
-
-Your `config.json` file should look something like this: 
-```json
-{
-    "language": "en",
-    "plugins": [],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {}
-        },
-        "testing": {
-            "networks": [
-                "ghostnet"
-            ],
-            "sandboxes": [],
-            "storage": {}
-        }
-    },
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-            "rpcUrl": "http://localhost:20000"
-        }
-    },
-    "network": {
-        "ghostnet": {
-            "label": "Ghostnet Protocol Testnet",
-            "rpcUrl": "https://rpc.ghostnet.teztnets.xyz",
-            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-            "faucet": {
-                "pkh": "tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok",
-                "mnemonic": "dice must lawsuit remain december shed scorpion member loud subject mixture fan trust beauty crush",
-                "email": "",
-                "password": "",
-                "amount": "",
-                "activation_code": ""
-            },
-            "accounts": {
-                "bob": "3_000_000_000",
-                "alice": "3_000_000_000",
-                "john": "3_000_000_000",
-                "jane": "3_000_000_000",
-                "joe": "3_000_000_000"
-            }
-        }
-    }
-}
-```
 
 ## Targeting a Network
 
@@ -256,7 +71,3 @@ To target the `ghostnet` network we configured above using the `testing` environ
 ```shell
 taq originate --env testing
 ```
-
-
-
-
