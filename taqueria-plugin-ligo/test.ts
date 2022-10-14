@@ -15,7 +15,7 @@ const getTestContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ligolang/ligo:next run test`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ligolang/ligo:stable run test`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const cmd = `${baseCmd} ${inputFile}`;
 	return cmd;
