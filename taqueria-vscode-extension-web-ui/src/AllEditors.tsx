@@ -354,7 +354,10 @@ export const AllEditors = () => {
 		<div className='allEditors'>
 			{allTypes.map((item, index) => (
 				<div key={index} className='singleEditor'>
-					<MichelineEditor input={{ dataType: item.type, value: item.value }} onMessage={handleMessage} />
+					<MichelineEditor
+						input={{ dataType: item.type, value: item.value, showDiagnostics: true }}
+						onMessage={handleMessage}
+					/>
 				</div>
 			))}
 		</div>

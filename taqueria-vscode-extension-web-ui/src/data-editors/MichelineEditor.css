@@ -11,12 +11,14 @@ body.vscode-high-contrast {
 }
 
 .editorDiv {
-    border: 1px solid;
-    border-color: var(--vscode-editorWidget-resizeBorder);
     margin: 5px;
     padding: 5px;
     display: table-cell;
     vertical-align: top;
+}
+.showDiag {
+    border: 1px solid;
+    border-color: var(--vscode-editorWidget-resizeBorder);
 }
 .valueTitle {
     vertical-align: top;

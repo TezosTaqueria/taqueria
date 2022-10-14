@@ -26,7 +26,9 @@ export const PairEditor = (
 				<tbody>
 					{(dataType.args as any[]).map((item, index) => (
 						<tr key={index}>
-							<td className='valueTitle'>{(item.annots as string[])?.map(x => x.substring(1)).join(' ')}:</td>
+							<td className='valueTitle'>
+								{(item.annots as string[])?.map(x => x.substring(1)).join(' ') ?? item.prim}:
+							</td>
 							<td>
 								<DataEditorNode
 									dataType={item}
