@@ -118,12 +118,13 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 	});
 
 	test('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
+		await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);
+
 		try {
 			// Setting up docker container name
 			sandboxName = 'test';
 
 			// 1. Run sandbox start command
-			await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);
 			const sandboxStart = await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 2. Verify that sandbox has been started and taqueria returns proper message into console
@@ -192,10 +193,16 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		await exec(`taq start sandbox local`, { cwd: `./${taqueriaProjectPath}` });
 
 		// Give the sandbox some time to bake the genesis block
-		await new Promise((resolve, _) => setTimeout(() => resolve(null), 2000));
+		await sleep(2000);
+
+		// Get the port that the sandbox is running on
+		const configContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		);
+		const port = configContents.sandbox.local.rpcUrl;
 
 		// Connect to the sandbox using a different origin (CORS test)
-		const { stdout } = await exec('curl -i -H "Origin: http://localhost:8080" http://localhost:20000/version');
+		const { stdout } = await exec(`curl -i -H "Origin: http://localhost:8080" ${port}/version`);
 
 		// Stop the sandbox when done
 		await exec(`taq stop sandbox local`, { cwd: `./${taqueriaProjectPath}` });
