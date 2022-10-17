@@ -355,7 +355,7 @@ export const AllEditors = () => {
 			{allTypes.map((item, index) => (
 				<div key={index} className='singleEditor'>
 					<MichelineEditor
-						input={{ dataType: item.type, value: item.value, showDiagnostics: true }}
+						input={{ dataType: item.type, value: { value: item.value, originalFormat: 'json' }, showDiagnostics: true }}
 						onMessage={handleMessage}
 					/>
 				</div>

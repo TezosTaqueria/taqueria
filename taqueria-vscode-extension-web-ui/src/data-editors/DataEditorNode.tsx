@@ -7,7 +7,7 @@ import { PairEditor } from './PairEditor';
 import { PrimitiveEditor } from './PrimitiveEditor';
 
 export const DataEditorNode = (
-	{ dataType, onChange, value }: { dataType: any; value: any; onChange: (value: any) => void },
+	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
 ) => (
 	<div>
 		{(dataType.annots as string[])?.map(x => x.substring(1)).join(' ')}
@@ -16,8 +16,9 @@ export const DataEditorNode = (
 );
 
 const getEditor = (
-	{ dataType, onChange, value }: { dataType: any; value: any; onChange: (value: any) => void },
+	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
 ) => {
+	console.log(value);
 	const prim = dataType.prim;
 	switch (prim) {
 		case 'unit':

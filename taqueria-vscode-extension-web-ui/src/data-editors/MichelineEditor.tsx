@@ -6,9 +6,60 @@ import './MichelineEditor.css';
 
 const parser = new Parser();
 
+export type OriginalFormat = 'micheline' | 'json';
+
+export type MichelineValue = {
+	originalFormat: 'micheline';
+	value: string;
+} | {
+	originalFormat: 'json';
+	value: object;
+};
+
+const json2Micheline = (v: object) => {
+	let michelson: string | undefined = undefined;
+	try {
+		const expression = parser.parseJSON(v);
+		michelson = emitMicheline(expression);
+		return michelson;
+	} catch (e: any) {
+		return `${e}`;
+	}
+};
+
+const micheline2Json = (v: string) => {
+	let json: object | undefined | null = undefined;
+	try {
+		json = parser.parseMichelineExpression(v);
+		return json;
+	} catch (e: any) {
+		return undefined;
+	}
+};
+
+export const getMicheline = (value: MichelineValue | undefined) => {
+	if (!value) {
+		return undefined;
+	}
+	if (value.originalFormat === 'micheline') {
+		return value.value;
+	}
+	return json2Micheline(value.value);
+};
+
+export const getJson = (value: MichelineValue | undefined) => {
+	if (!value) {
+		return undefined;
+	}
+	if (value.originalFormat === 'json') {
+		return value.value;
+	}
+	return micheline2Json(value.value);
+};
+
 export const MichelineEditor = (
 	{ input: { dataType, value, actionTitle, showDiagnostics }, onMessage }: {
-		input: { dataType: any; value?: any; actionTitle?: string; showDiagnostics?: boolean };
+		input: { dataType: any; value?: MichelineValue; actionTitle?: string; showDiagnostics?: boolean };
 		onMessage: MichelineEditorMessageHandler;
 	},
 ) => {
@@ -17,13 +68,16 @@ export const MichelineEditor = (
 		showDiagnostics: showDiagnostics ?? false,
 	});
 
-	const handleChange = (v: unknown) => {
+	const handleChange = (v: MichelineValue) => {
 		setState({
-			value: v as any,
+			value: v,
 			showDiagnostics: currentState.showDiagnostics,
 		});
-		let micheline = getMicheline(v);
-		onMessage({ kind: 'change', michelineJson: v, micheline });
+		onMessage({
+			kind: 'change',
+			micheline: getMicheline(currentState.value),
+			michelineJson: getJson(currentState.value),
+		});
 	};
 
 	const toggleDiagnostics = () => {
@@ -34,19 +88,11 @@ export const MichelineEditor = (
 	};
 
 	const handleClick = () => {
-		let micheline = getMicheline(currentState.value);
-		onMessage?.({ kind: 'action', michelineJson: currentState.value, micheline });
-	};
-
-	const getMicheline = (v: unknown) => {
-		let michelson: string | undefined = undefined;
-		try {
-			const expression = parser.parseJSON(v as object);
-			michelson = emitMicheline(expression);
-			return michelson;
-		} catch (e: any) {
-			return `${e}`;
-		}
+		onMessage?.({
+			kind: 'action',
+			micheline: getMicheline(currentState.value),
+			michelineJson: getJson(currentState.value),
+		});
 	};
 
 	return (
@@ -55,7 +101,11 @@ export const MichelineEditor = (
 				<tbody>
 					<tr>
 						<td colSpan={3}>
-							<DataEditorNode dataType={dataType} value={currentState.value} onChange={handleChange} />
+							<DataEditorNode
+								dataType={dataType}
+								value={getJson(currentState.value)}
+								onChange={v => handleChange({ value: v, originalFormat: 'json' })}
+							/>
 						</td>
 					</tr>
 					{currentState.showDiagnostics
@@ -76,7 +126,10 @@ export const MichelineEditor = (
 								<td>
 									<h3>Micheline</h3>
 									<div style={{ whiteSpace: 'pre-wrap' }}>
-										{getMicheline(currentState.value)}
+										<textarea
+											value={getMicheline(currentState.value)}
+											onChange={e => handleChange({ value: e.target.value, originalFormat: 'micheline' })}
+										/>
 									</div>
 								</td>
 							</tr>
