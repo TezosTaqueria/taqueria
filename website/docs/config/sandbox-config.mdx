@@ -2,7 +2,7 @@
 title: Sandbox Configuration
 ---
 
-Taqueria provides a centralized configuration for sandboxes. Named sandbox configurations are defined in the `./.taq/config.json` file for each project
+Taqueria provides a centralized configuration for sandboxes. Named sandbox configurations are defined in the `.taq/config.json` file for each project
 
 :::note
 These sandbox configurations are used by sandbox plugins. At this time, Taqueria supports the Flextesa sandbox with the [Taqueria Flextesa Plugin](/docs/plugins/plugin-flextesa)
@@ -32,7 +32,7 @@ Sandbox configurations are added as key/value pairs to the main `sandbox` object
 sandboxName : { sandboxConfig }
 ```
 
-Inside the sandboxConfigObject, there are three static properties you can configure, and the `accounts` property which is automatically populated when you start up a sandbox
+Inside the sandboxConfig object, there are three static properties you can configure, and the `accounts` property which is automatically populated when you start up a sandbox
 
 The fields you can configure are:
 
@@ -58,7 +58,8 @@ Once created, sandboxes can be added to environments by adding the `sandboxName`
             sandboxes: [
                 'local',
                 'myCustomSandbox'
-            ]
+            ],
+            storage: {},
         },
     },
 ```
@@ -85,30 +86,36 @@ When a sandbox is started, the implicit accounts defined in the configuration wi
     "sandbox": {
         "local": {
             "accounts": {
+                "default": "bob",
                 "bob": {
                     "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
                     "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
-                    "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+                    "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt",
+                    "alias": "bob"
                 },
                 "alice": {
                     "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
                     "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-                    "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+                    "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq",
+                    "alias": "alice"
                 },
                 "john": {
                     "encryptedKey": "edpktt6t2ENhxiQqun6bXPPWC6tFVvNPTDRh1gEPGX4BgDgbDnmGzP",
                     "publicKeyHash": "tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6",
-                    "secretKey": "unencrypted:edsk3Un2KRUUoWZufi914HQem96ejVFnkyD8GXRPUSkgqy5etsYXEN"
+                    "secretKey": "unencrypted:edsk3Un2KRUUoWZufi914HQem96ejVFnkyD8GXRPUSkgqy5etsYXEN",
+                    "alias": "john"
                 },
                 "jane": {
                     "encryptedKey": "edpkvS6TDSWcqqj3EJi3NRrCMyN7oNw1B3Hp37R19tMThqM8YNhAuS",
                     "publicKeyHash": "tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph",
-                    "secretKey": "unencrypted:edsk3UkdS1UBfTBkMAoFxmfdmUHmCdNhTzDJ1cSJuZhU1b6k6fZZoQ"
+                    "secretKey": "unencrypted:edsk3UkdS1UBfTBkMAoFxmfdmUHmCdNhTzDJ1cSJuZhU1b6k6fZZoQ",
+                    "alias": "jane"
                 },
                 "joe": {
                     "encryptedKey": "edpkuT1QYPYbLLQz9dXhQS33ncsixxeGHbNGmntPTR4VBbWmskHPrV",
                     "publicKeyHash": "tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB",
-                    "secretKey": "unencrypted:edsk3Un2FU9Zeb4KEoATWdpAqcX5JArMUj2ew8S4SuzhPRDmGoqNx2"
+                    "secretKey": "unencrypted:edsk3Un2FU9Zeb4KEoATWdpAqcX5JArMUj2ew8S4SuzhPRDmGoqNx2",
+                    "alias": "joe"
                 }
             },
             "label": "Local Tezos Sandbox",
