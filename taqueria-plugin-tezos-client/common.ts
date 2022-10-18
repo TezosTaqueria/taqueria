@@ -12,14 +12,15 @@ export interface SimulateOpts extends RequestArgs.ProxyRequestArgs {
 	entrypoint?: string;
 }
 
-// To be used for the main entrypoint to the plugin
+// To be used for the main entrypoint of the plugin
 export type IntersectionOpts = TypeCheckOpts & SimulateOpts;
 
 // To be used for common functions in this file
 type UnionOpts = TypeCheckOpts | SimulateOpts;
 
-export const FLEXTESA_IMAGE = 'oxheadalpha/flextesa:20220510';
-export const GLOBAL_OPTIONS = '--endpoint https://jakartanet.ecadinfra.com';
+export const FLEXTESA_IMAGE = 'oxheadalpha/flextesa:rc-20220915-arm64';
+export const GLOBAL_OPTIONS =
+	'--endpoint https://ghostnet.ecadinfra.com --protocol PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg';
 
 export const trimTezosClientMenuIfPresent = (msg: string): string => {
 	return msg.replace(/Usage:(.|\n)+/, '');
