@@ -82,17 +82,19 @@ jobs:
           echo "$(pwd)"
           echo "$(pwd)" >> $GITHUB_PATH
           BUILD=`git rev-parse --short "$GITHUB_SHA"`
+          echo "Show branch"
+          git branch --show-current
           TAQ_VERSION="${TAQ_VERSION/\//-}"
           npm run build-all
           taq --version 
           taq --build 
           echo "Done testing"
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      # - name: Cache node modules
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ./node_modules/**
+      #     key: cache-node-modules-${{ github.run_id }}
 
   # build-binaries:
   #   permissions:
