@@ -37,5 +37,5 @@ taq opt-out
 
 | Description                               | Command                            | Behaviour                                                                     |
 | ----------------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------- |
-| Opt-out of sharing usage analytics        | `taq opt-out`                      | Enables usage analytics sharing in all Taqueria projects                      |
+| Opt-out of sharing usage analytics        | `taq opt-out`                      | Disables usage analytics sharing in all Taqueria projects                      |
 

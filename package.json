@@ -58,6 +58,12 @@
 		"with-staged": "^1.0.2"
 	},
 	"workspaces": [
+		"./taqueria-protocol",
+		"./taqueria-sdk",
+		"./taqueria-state",
+		"./taqueria-toolkit",
+		"./taqueria-utils",
+		"./taqueria-plugin*",
 		"./taqueria*",
 		"./tests"
 	],

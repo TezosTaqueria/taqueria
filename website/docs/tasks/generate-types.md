@@ -4,9 +4,9 @@ title: generate types
 
 ## Overview
 
-Taq `generate types` is used to generate TypeScript types from the Michelson smart contracts in your project. These generated types can then be used in your dApp to interact with the smart contracts using type safety
+Taq `generate types` task is used to generate and export TypeScript types from compiled Michelson smart contracts. These generated types then work with your IDE and Taquito, providing type safety and an improved code authoring experience
 
-The Michelson contracts that will be processed are those in the `/artifacts` directory. The default output directory will be a `/types` directory in the same directory as the `/artifacts` directory
+The Michelson contracts that will be processed are those in the `artifacts` folder. The default output folder will be a `types` folder in the same folder as the `artifacts` folder
 
 For each contract that is processed, two output files are created:
 
@@ -33,7 +33,7 @@ This task is implemented by the following plugins:
 ### Command
 
 ```shell
-taq generate types
+taq generate types [path]
 ```
 
 ### Task Details
@@ -47,7 +47,7 @@ taq generate types
 | Argument          | Required | Description                                            | Example Usage                                         |
 | ----------------- | -------- | ------------------------------------------------------ | ----------------------------------------------------- |
 | `[path]`          | No       | Path to one or more Michelson contracts to process     | `taq generate types ./contracts/my-contract.jsligo`   |
-| `[typeOutputDir]` | No       | The output directory for the `.ts` files generated     | `taq generate types --typeOutputDir ../app/types`     |
+| `[typeOutputDir]` | No       | The output folder for the `.ts` files generated     | `taq generate types --typeOutputDir ../app/types`     |
 
 ### Aliases
 
@@ -60,7 +60,7 @@ The following aliases are interchangable with `generate types`
 
 | Description                       | Command                            | Behaviour                                                                     |
 | --------------------------------- | ---------------------------------- | ----------------------------------------------------------------------------- |
-| Generate types for all contracts  | `taq generate types`               | Generates types for each Michelson file in the `/artifacts` directory         |
+| Generate types for all contracts  | `taq generate types`               | Generates types for each Michelson file in the `/artifacts` folder         |
 | Generate types for one contract   | `taq generate types [path]`        | Generates types for the contract at the given path                            |
 
 ### Supported Filetypes
