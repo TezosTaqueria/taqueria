@@ -81,6 +81,8 @@ jobs:
           export PATH="$PATH:$(pwd)"
           echo "$(pwd)"
           echo "$(pwd)" >> $GITHUB_PATH
+          BUILD=`git rev-parse --short "$GITHUB_SHA"`
+          TAQ_VERSION="${TAQ_VERSION/\//-}"
           npm run build-all
           taq --version 
           taq --build 
