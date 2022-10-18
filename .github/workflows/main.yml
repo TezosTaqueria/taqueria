@@ -335,6 +335,7 @@ jobs:
       - name: Publish for PR
         if:  ${{ github.event_name == 'pull_request' }}
         run: |
+          export HUSKY=0
           SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-8)
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           BRANCH_NAME=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
