@@ -78,6 +78,7 @@ jobs:
       - name: Build all
         run: |
           echo "Testing build all"
+          export PATH="$PATH:$(pwd)"
           echo "$(pwd)"
           echo "$(pwd)" >> $GITHUB_PATH
           npm run build-all
