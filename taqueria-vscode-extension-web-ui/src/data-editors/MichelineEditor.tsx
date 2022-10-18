@@ -57,15 +57,17 @@ export const getJson = (value: MichelineValue | undefined) => {
 	return micheline2Json(value.value);
 };
 
-export const getFriendlyDataType = (dataType: any) => {
+export const getFriendlyDataType = (dataType: any): string => {
 	if (!dataType || typeof dataType != 'object' || !dataType.prim) {
 		return `Error: ${JSON.stringify(dataType)}`;
 	}
+	let friendlyDataType: string;
 	switch (dataType.prim) {
 		case 'list':
 		case 'set':
 		case 'option':
-			return `${dataType.prim} of ${getFriendlyDataType(dataType.args[0])}`;
+			friendlyDataType = `${dataType.prim} of ${getFriendlyDataType(dataType.args[0])}`;
+			break;
 		case 'unit':
 			return 'unit';
 		case 'string':
@@ -73,7 +75,6 @@ export const getFriendlyDataType = (dataType: any) => {
 		case 'int':
 		case 'bytes':
 		case 'timestamp':
-		// TODO: investigate each Domain-Specific type and make sure it's working fine
 		case 'mutez':
 		case 'address':
 		case 'key':
@@ -90,15 +91,24 @@ export const getFriendlyDataType = (dataType: any) => {
 		case 'chest_key':
 		case 'tx_rollup_l2_address':
 		case 'bool':
-			return dataType.prim;
+			friendlyDataType = dataType.prim;
+			break;
 		case 'pair':
-			return `${dataType.prim} of ${dataType.args.map(x => getFriendlyDataType(x)).join(', ')}`;
+			friendlyDataType = `${dataType.prim} of ${(dataType.args as any[]).map(x => getFriendlyDataType(x)).join(', ')}`;
+			break;
 		case 'map':
 		case 'big_map':
-			return `${dataType.prim} from ${getFriendlyDataType(dataType.args[0])} to ${
+			friendlyDataType = `${dataType.prim} from ${getFriendlyDataType(dataType.args[0])} to ${
 				getFriendlyDataType(dataType.args[1])
 			}`;
+			break;
+		default:
+			return `Error: ${JSON.stringify(dataType)}`;
 	}
+	if (dataType.annots && dataType.annots.length) {
+		return `${(dataType.annots as string[]).map(x => x?.substring(1)).join(' ')} (${friendlyDataType})`;
+	}
+	return friendlyDataType;
 };
 
 export const MichelineEditor = (

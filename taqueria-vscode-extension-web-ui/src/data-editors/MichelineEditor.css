@@ -23,12 +23,12 @@ body.vscode-high-contrast {
 .valueTitle {
     vertical-align: middle;
 }
-.bottonContainer {
+.buttonContainer {
     padding: 0;
     border-spacing: 0;
     border: 0;
 }
-.bottonContainer button {
+.buttonContainer button {
     /* border: 1px; */
     padding: 0;
     margin: 0;

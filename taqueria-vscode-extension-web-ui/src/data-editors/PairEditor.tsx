@@ -1,5 +1,6 @@
 import React from 'react';
 import { DataEditorNode } from './DataEditorNode';
+import { getFriendlyDataType } from './MichelineEditor';
 
 export const PairEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
@@ -27,10 +28,11 @@ export const PairEditor = (
 					{(dataType.args as any[]).map((item, index) => (
 						<tr key={index}>
 							<td className='valueTitle'>
-								{(item.annots as string[])?.map(x => x.substring(1)).join(' ') ?? item.prim}:
+								{getFriendlyDataType(item)}
 							</td>
 							<td>
 								<DataEditorNode
+									hideDataType={true}
 									dataType={item}
 									value={value.args[index]}
 									onChange={x => {

@@ -39,25 +39,27 @@ export const ListEditor = (
 	};
 	return (
 		<div className='editorDiv'>
-			<span>{getFriendlyDataType(dataType)}</span>
 			<table>
 				{value.map((item, index) => [
 					<tbody key={index}>
 						<tr>
-							<td className='valueTitle' rowSpan={3}>{index}:</td>
-							<td className='bottonContainer'>
+							<td className='valueTitle'>{index}:</td>
+							<td className='buttonContainer'>
 							</td>
-							<td rowSpan={3}>
+							<td>
 								<DataEditorNode
+									hideDataType={true}
 									dataType={dataType.args[0]}
 									value={item}
 									onChange={v => changeValue(index, v)}
 								/>
 							</td>
-							<td className='bottonContainer'>
-								<button onClick={() => moveUp(index)} disabled={index === 0}>🔼</button>
+							<td className='buttonContainer'>
+								{dataType.prim === 'list'
+									&& <button onClick={() => moveUp(index)} disabled={index === 0}>🔼</button>}
 								<button onClick={() => remove(index)}>❌</button>
-								<button onClick={() => moveDown(index)} disabled={index === value.length - 1}>🔽</button>
+								{dataType.prim === 'list'
+									&& <button onClick={() => moveDown(index)} disabled={index === value.length - 1}>🔽</button>}
 							</td>
 						</tr>
 					</tbody>,

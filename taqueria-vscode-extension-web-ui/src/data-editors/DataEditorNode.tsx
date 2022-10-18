@@ -2,15 +2,21 @@ import React from 'react';
 import { BoolEditor } from './BoolEditor';
 import { ListEditor } from './ListEditor';
 import { MapEditor } from './MapEditor';
+import { getFriendlyDataType } from './MichelineEditor';
 import { OptionEditor } from './OptionEditor';
 import { PairEditor } from './PairEditor';
 import { PrimitiveEditor } from './PrimitiveEditor';
 
 export const DataEditorNode = (
-	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
+	{ dataType, value, onChange, hideDataType }: {
+		dataType: any;
+		value: any;
+		onChange: (value: any) => void;
+		hideDataType?: boolean | undefined;
+	},
 ) => (
 	<div>
-		{(dataType.annots as string[])?.map(x => x.substring(1)).join(' ')}
+		{hideDataType !== true && `${getFriendlyDataType(dataType)}`}
 		{getEditor({ dataType, onChange, value })}
 	</div>
 );
