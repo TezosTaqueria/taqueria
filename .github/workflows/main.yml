@@ -317,6 +317,7 @@ jobs:
       contents: read
     env: 
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      VERDACCIO_TOKEN: ${{ secrets.ECADINFRA_NPM_AUTH_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -334,7 +335,15 @@ jobs:
       - name: Publish for PR
         if:  ${{ github.event_name == 'pull_request' }}
         run: |
-          npm publish --workspaces --tag 'preview' --access public --dry-run --no-private
+          SHORT_SHA=$(${GITHUB_SHA} | cut -c1-8)
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          BRANCH_NAME=$($GITHUB_REF | cut -d'/' -f 3)
+          TARGET_VERSION="${PACKAGE_VERSION}-${SHORT_SHA}-${BRANCH_NAME}"
+          npx lerna version "${TARGET_VERSION}" --no-push --no-git-tag-version --yes
+          echo ${VERDACCIO_TOKEN} >> ~/.npmrc
+          git config user.email "actions@github.com" && git config user.name "Github Actions"
+          git add -A && git commit -m "commit for lerna"
+          npx lerna publish --dist-tag edge from-package --yes --registry https://npm.ecadinfra.com
                 
       - name: Publish for prerelease
         if:  ${{ github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
