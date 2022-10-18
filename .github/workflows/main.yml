@@ -77,7 +77,8 @@ jobs:
 
       - name: Build all
         run: |
-          export PATH="$PATH:$(pwd)"
+          echo "$(pwd)"
+          echo "$(pwd)" >> $GITHUB_PATH
           npm run build-all
 
       - name: Cache node modules
