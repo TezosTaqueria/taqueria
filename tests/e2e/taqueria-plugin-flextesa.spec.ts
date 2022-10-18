@@ -161,12 +161,35 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		}
 	});
 
+	test('Verify that taqueria flextesa plugin will return "Already running." if sandbox has started" if user tries to call start sandbox twice', async () => {
+		try {
+			sandboxName = 'local';
+
+			// 1. Run sandbox start command
+			await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+
+			// 2.  Run start command second time and verify the output
+			const sandboxStart = await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+			expect(sandboxStart.stdout).toEqual('Already running.\n');
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
 	test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
+		sandboxName = 'local';
+		await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+
 		const accounts = await exec(`taq list accounts ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 		expect(accounts.stdout).toContain('bob');
+
+		await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
 	test('Verify that taqueria can return JSON when request for list of accounts from a sandbox is made by TVsCE', async () => {
+		sandboxName = 'local';
+		await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+
 		const accounts = await exec(`taq list accounts ${sandboxName} --fromVsCode`, { cwd: `./${taqueriaProjectPath}` });
 		expect(accounts.stdout).toEqual(
 			JSON.stringify([
@@ -197,21 +220,8 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 				},
 			]) + '\n',
 		);
-	});
 
-	test('Verify that taqueria flextesa plugin will return "Already running." if sandbox has started" if user tries to call start sandbox twice', async () => {
-		try {
-			sandboxName = 'local';
-
-			// 1. Run sandbox start command
-			await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
-
-			// 2.  Run start command second time and verify the output
-			const sandboxStart = await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
-			expect(sandboxStart.stdout).toEqual('Already running.\n');
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
 	// TODO: Currently it cannot be done until this issue has been resolved
