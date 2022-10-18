@@ -310,12 +310,9 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 		}
 	});
 
-	// Clean up process to stop container if it was not stopped properly during the test
-	// And
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
 	afterAll(async () => {
-		await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 	});
 });
