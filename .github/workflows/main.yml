@@ -341,9 +341,12 @@ jobs:
           BRANCH_NAME=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
           TARGET_VERSION="${PACKAGE_VERSION}-${SHORT_SHA}-${BRANCH_NAME}"
           npx lerna version "${TARGET_VERSION}" --no-push --no-git-tag-version --yes
+          echo "Token"
           echo ${VERDACCIO_TOKEN} >> ~/.npmrc
+          echo "Git config"
           git config user.email "actions@github.com" && git config user.name "Github Actions"
-        # git add -A && git commit -m "commit for lerna"
+          echo "Add and commit"
+          HUSKY=0 git add -A && HUSKY=0 git commit -m "commit for lerna"
         # npx lerna publish --dist-tag edge from-package --yes --registry https://npm.ecadinfra.com
                 
       - name: Publish for prerelease
