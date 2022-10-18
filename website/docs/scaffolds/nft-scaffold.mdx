@@ -35,7 +35,8 @@ In a rush? You can follow the steps below to get up and running immediatley:
 
 ## Overview
 
-Mostly Rick/someone else knowledgeable about this should write this section
+The NFT scaffold provides a minimal contract and react Dapp for publishing and viewing unique NFTs. 
+This would be a good beginning point for an artist who wants to sell unique artpieces on their own website. 
 
 ## Requirements
 
@@ -47,11 +48,22 @@ Mostly Rick/someone else knowledgeable about this should write this section
 
 ## Using the Project
 
-# Rick/someone else to define what the intended workflow is
+### Adding Artwork Assets
 
-The intended workflow for this project is as follows:
+To add artwork and minting it's token:
 
-1. 
+1. Add the artwork asset file (image, video, etc) to the assets directory
+    - /taqueria/assets
+    - Make sure to name the asset file with the next token id: 
+    - i.e. `0042.jpg`
+1. Add a thumbnail image for the nft to the same assets directory
+    - use the filename with the same token id with `.thumb`
+    - the thumbnail image does not need to be the same file type as the main asset
+    - i.e. `0042.thumb.png`
+1. Publish the artwork asset to ipfs and mint the nft to the contract by running the provisioner
+    - `npm run apply`
+1. Run the Dapp and the new nft should now be visible in the NFT List
+
 
 ## Project Overview
 
@@ -141,7 +153,8 @@ Use the Dapp (served in your browser at [http://localhost:3000](http://localhost
 
 ### React Dapp
 
-SECTION SHOULD HAVE INFO ON REACT DAPP AND I DON'T KNOW WHAT TO PUT HERE
+The react Dapp allows browsing the NFTs that have been minted to the contract. 
+This is a minimal react project and needs to be extended to support marketplace features like selling or browsing owned NFTs.
 
 ### Build and Start the React Dapp
 
