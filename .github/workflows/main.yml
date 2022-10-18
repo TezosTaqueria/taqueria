@@ -81,14 +81,15 @@ jobs:
         run: |
           export PATH="$PATH:$(pwd)"
           TAQ_VERSION="${TAQ_VERSION/\//-}"
-          BUILD=$(git rev-parse --short "$GITHUB_SHA")
-          DENO_DIR=./deno deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --quickstart "$(cat quickstart.md)" --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
-          npm install 
-          npm run build --workspaces --if-present --include-workspace-root
-          npm run build-docker --workspaces --if-present
-          taq --version 
-          taq --build 
-          echo "Done testing"
+          echo "The value of version is $TAQ_VERSION"
+        # BUILD=$(git rev-parse --short "$GITHUB_SHA")
+        # DENO_DIR=./deno deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --quickstart "$(cat quickstart.md)" --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
+        # npm install 
+        # npm run build --workspaces --if-present --include-workspace-root
+        # npm run build-docker --workspaces --if-present
+        # taq --version 
+        # taq --build 
+        # echo "Done testing"
 
       # - name: Cache node modules
       #   uses: actions/cache@v3
