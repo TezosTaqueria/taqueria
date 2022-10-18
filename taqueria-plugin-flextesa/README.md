@@ -6,21 +6,20 @@ This plugin provides the ability to easily configure and run Flextesa sandbox in
  
 ## Overview
 
-With the Flextesa plugin you configure various sandboxes for use in Taqueria that you can start, stop, and query from the CLI or VS Code command palette
+With the Flextesa plugin you configure various sandboxes for use in Taqueria that you can start, stop, and query from the CLI and Visual Studio Code extension
 
 
 Some helpful things to know:
 - Multiple sandboxes can be configured and run concurrently
 - You can configure the Tezos `protocol` for each sandbox to test against current, and future network upgrades
-- Accounts and balances are pre-configured per-sandbox and do not persist their state
-- Accounts and balances will be re-initialized each time they are started
+- Accounts and balances will be initialized each time a sandbox is started
 - Sandboxes can be added to Taqueria environments and then targeted from the CLI using the `--env [envName]` option 
-- Contracts must be registered in the Taqueria contract registry prior to originating
 
 ## Requirements
 
-- Node.js v16.3 or later
-- Docker v0.8.4 or later
+- Taqueria v0.20.2 or later
+- Node.js v16.17.1 or later
+- Docker v20.10.12 or later
 
 ## Installation
 
@@ -35,9 +34,9 @@ Once installed, you can confirm functionality by runing the command `taq start s
 
 ## CLI Commands
 
-The Flextesa plugin allows you to start, stop, and query the sandboxes configured in `./.taq/config.json` from the CLI
+The Flextesa plugin allows you to start, stop, and query the sandboxes configured in `.taq/config.json` from the CLI
 
-The following commands are available from the CLI or the VS Code Command palette:
+The following commands are available from the CLI:
 - `taq start sandbox [sandboxName]`
 - `taq stop sandbox [sandboxName]`
 - `taq list accounts [sandboxName]`
@@ -47,7 +46,7 @@ The following commands are available from the CLI or the VS Code Command palette
 
 ## Plugin Configuration
 
-Configuration is done in the project's `./.taq/config.json` file. Here you can configure additonal sandboxes
+Configuration is done in the project's `.taq/config.json` file. Here you can configure additonal sandboxes
 
 
 ### The Default Sandbox Configuration
@@ -129,11 +128,7 @@ Sandbox configurations are added as key/value pairs to the main `sandbox` object
 sandboxName : { sandboxConfigObject }
 ```
 
-Inside the sandboxConfigObject, there are four properties you can configure:
-
-#### 'accounts'
-
-A list of accounts and balances to provision at startup of the Flextesa image and a default value. Accounts are added as key/value pairs following the pattern `accountName : { initialBalance: '3000000000'}`
+Inside the `sandboxConfigObject`, there are three properties you can configure:
 
 #### 'label'
 An arbitrary string used to describe a particular configuration
@@ -142,13 +137,15 @@ An arbitrary string used to describe a particular configuration
 
 A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
 
-Currently availble protocols are:
-- Jakarta     `PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY`
-- Kathmandu   `PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg`
+Current available protocols:
+- Kathmandu   `PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg` as of Oct 2022
 
 #### 'rpcUrl'
 
 A string which corresponds to the local URL you would like the sandbox to run on
+
+> ### :page_with_curl: Note
+> In addition to the fields above, when a sandbox is first started, a list of accounts specific to the sandbox configuration will be generated and appended to the sandboxConfigObject. These accounts will respect the declared balances from the accounts field in the root of your config.json
 
 ### Adding a Sandbox to a Taqueria Environment
 
@@ -166,10 +163,6 @@ Once created, sandboxes can be added to environments by adding the `sandboxName`
         },
     },
 ```
-
-## Plugin Architecture
-
-This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
 
 ### Flextesa Plugin Task Registry
 
@@ -197,3 +190,7 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |  task      | 'list accounts'                | 
 |  command   | 'list accounts [sandboxName]'  | 
 |  aliases   | [ ]                            |  
+
+## Plugin Architecture
+
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM

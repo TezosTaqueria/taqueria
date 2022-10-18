@@ -12,7 +12,8 @@ Benefits of using generated types:
 
 ## Requirements
 
-- Node JS v16.3 or later
+- Taqueria v0.20.2 or later
+- Node JS v16.17.1 or later
 - Taquito v11.2 or later (optional)
 
 ## Installation
@@ -24,13 +25,13 @@ taq install @taqueria/plugin-contract-types
 
 ## Configuration
 
-This plugin will look for Michelson files according to the `artifactsDir` configured in `./.taq/config.json`. By default, this value is `/artifacts` but can be changed as needed
+This plugin will look for Michelson files according to the `artifactsDir` configured in `.taq/config.json`. By default, this value is `artifacts` but can be changed as needed
 
 ## Usage
 
 The plugin provides a single command to Taqueria: `taq generate types`
 
-This will look for `.tz` files in the `/artifacts` directory and will generate a series of related `.ts` files in the `/types` directory. These files export type definitions for each method which can then be used by Taquito and your IDE
+This will look for `.tz` files in the `artifacts` directory and will generate a series of related `.ts` files in the `/types` directory (default folder created to store the generated files). These files export type definitions for each method which can then be used by Taquito and your IDE
 
 ### The `generate types` Command
 
@@ -65,7 +66,7 @@ The `generate types` command will accept the following optional parameters:
 The generated TS types can be used in a Taquito project which provides an improved developing experience, and simplifies the way types are provided to Taquito method calls. Some examples of how these changes are put into use are detailed below  
 
 > ### :page_with_curl: Note
-> You can view the full example in the `example-usage.ts` file on Github: [taqueria/taqueria-plugin-contract-types/example](https://github.com/ecadlabs/taqueria/blob/main/taqueria-plugin-contract-types/example/example-usage.ts)
+> You can view the full example in the `example-usage.ts` file on Github: [example-usage.ts](https://github.com/ecadlabs/taqueria/blob/main/taqueria-plugin-contract-types/example/example-usage.ts)
 
 ### Calling the `.at` Method of a Contract
 
@@ -123,3 +124,7 @@ Now, the contract type provides the default storage type:
 const contract = await Tezos.contract.at<TestContract>(`KT123...`);
 const storage = await contract.storage();
 ```
+
+## Plugin Architecture
+
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
