@@ -1,33 +1,21 @@
 import { execCmd, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
-import { join } from 'path';
-
-interface Opts extends RequestArgs.t {
-	sourceFile: string;
-}
+import {
+	FLEXTESA_IMAGE,
+	getCheckFileExistenceCommand,
+	getInputFilename,
+	GLOBAL_OPTIONS,
+	trimTezosClientMenuIfPresent,
+	TypeCheckOpts as Opts,
+} from './common';
 
 type TableRow = { contract: string; result: string };
-
-const FLEXTESA_IMAGE = 'oxheadalpha/flextesa:20220510';
-
-const getInputFilename = (opts: Opts, sourceFile: string) => join('/project', opts.config.artifactsDir, sourceFile);
-
-const getCheckFileExistenceCommand = (parsedArgs: Opts, sourceFile: string): string => {
-	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
-	if (!projectDir) throw `No project directory provided`;
-	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project ${FLEXTESA_IMAGE} ls`;
-	const inputFile = getInputFilename(parsedArgs, sourceFile);
-	const cmd = `${baseCmd} ${inputFile}`;
-	return cmd;
-};
 
 const getTypecheckCmd = (parsedArgs: Opts, sourceFile: string): string => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project ${FLEXTESA_IMAGE}`;
-	const globalOptions = '--endpoint https://jakartanet.ecadinfra.com';
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
-	const cmd = `${baseCmd} tezos-client ${globalOptions} typecheck script ${inputFile}`;
+	const cmd = `${baseCmd} tezos-client ${GLOBAL_OPTIONS} typecheck script ${inputFile}`;
 	return cmd;
 };
 
@@ -44,7 +32,8 @@ const typecheckContract = (parsedArgs: Opts, sourceFile: string): Promise<TableR
 				})
 				.catch(err => {
 					sendErr(`\n=== For ${sourceFile} ===`);
-					sendErr(err.message.replace(/Command failed.+?\n/, ''));
+					const msg: string = trimTezosClientMenuIfPresent(err.message);
+					sendErr(msg.replace(/Command failed.+?\n/, ''));
 					return {
 						contract: sourceFile,
 						result: 'Invalid',
