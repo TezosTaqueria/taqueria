@@ -347,7 +347,7 @@ jobs:
           git config user.email "actions@github.com" && git config user.name "Github Actions"
           echo "Add and commit"
           HUSKY=0 git add -A && HUSKY=0 git commit -m "commit for lerna"
-          npx lerna publish --dist-tag edge from-package --yes --registry https://npm.ecadinfra.com
+          HUSKY=0 npx lerna publish --dist-tag edge from-package --yes --registry https://npm.ecadinfra.com
                 
       - name: Publish for prerelease
         if:  ${{ github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
