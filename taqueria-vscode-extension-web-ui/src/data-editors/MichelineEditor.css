@@ -21,5 +21,15 @@ body.vscode-high-contrast {
     border-color: var(--vscode-editorWidget-resizeBorder);
 }
 .valueTitle {
-    vertical-align: top;
+    vertical-align: middle;
+}
+.bottonContainer {
+    padding: 0;
+    border-spacing: 0;
+    border: 0;
+}
+.bottonContainer button {
+    /* border: 1px; */
+    padding: 0;
+    margin: 0;
 }
