@@ -19,9 +19,8 @@ export type IntersectionOpts = TypeCheckOpts & SimulateOpts;
 // To be used for common functions in this file
 type UnionOpts = TypeCheckOpts | SimulateOpts;
 
-export const FLEXTESA_IMAGE = 'oxheadalpha/flextesa:rc-20220915-arm64';
-export const GLOBAL_OPTIONS =
-	'--endpoint https://ghostnet.ecadinfra.com --protocol PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg';
+const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://ghostnet.ecadinfra.com';
+export const GLOBAL_OPTIONS = `--endpoint ${ENDPOINT}`;
 
 export const trimTezosClientMenuIfPresent = (msg: string): string => {
 	return msg.replace(/Usage:(.|\n)+/, '');

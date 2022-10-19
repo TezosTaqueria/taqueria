@@ -11,7 +11,6 @@ import {
 } from '@taqueria/node-sdk';
 import { basename, extname } from 'path';
 import {
-	FLEXTESA_IMAGE,
 	getCheckFileExistenceCommand,
 	getInputFilename,
 	GLOBAL_OPTIONS,

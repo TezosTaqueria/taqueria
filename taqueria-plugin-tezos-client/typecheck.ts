@@ -8,7 +8,6 @@ import {
 	sendWarn,
 } from '@taqueria/node-sdk';
 import {
-	FLEXTESA_IMAGE,
 	getCheckFileExistenceCommand,
 	getInputFilename,
 	GLOBAL_OPTIONS,
