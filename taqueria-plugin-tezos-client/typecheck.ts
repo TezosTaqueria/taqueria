@@ -1,4 +1,12 @@
-import { execCmd, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import {
+	execCmd,
+	getArch,
+	getLatestFlextesaImage,
+	sendAsyncErr,
+	sendErr,
+	sendJsonRes,
+	sendWarn,
+} from '@taqueria/node-sdk';
 import {
 	FLEXTESA_IMAGE,
 	getCheckFileExistenceCommand,
@@ -10,19 +18,23 @@ import {
 
 type TableRow = { contract: string; result: string };
 
-const getTypecheckCmd = (parsedArgs: Opts, sourceFile: string): string => {
+const getTypecheckCmd = async (parsedArgs: Opts, sourceFile: string): Promise<string> => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
-	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project ${FLEXTESA_IMAGE}`;
+	const arch = await getArch();
+	const flextesaImage = await getLatestFlextesaImage(arch);
+	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const cmd = `${baseCmd} tezos-client ${GLOBAL_OPTIONS} typecheck script ${inputFile}`;
 	return cmd;
 };
 
 const typecheckContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
-	execCmd(getCheckFileExistenceCommand(parsedArgs, sourceFile))
+	getCheckFileExistenceCommand(parsedArgs, sourceFile)
+		.then(execCmd)
 		.then(() =>
-			execCmd(getTypecheckCmd(parsedArgs, sourceFile))
+			getTypecheckCmd(parsedArgs, sourceFile)
+				.then(execCmd)
 				.then(({ stderr }) => {
 					if (stderr.length > 0) sendWarn(stderr);
 					return {

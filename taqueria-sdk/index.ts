@@ -83,7 +83,7 @@ export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, Exe
 		});
 	});
 
-export const getArch = (): LikeAPromise<string, TaqError> => {
+export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError> => {
 	switch (process.arch) {
 		case 'arm64':
 			return Promise.resolve('linux/arm64/v8');
@@ -98,6 +98,13 @@ export const getArch = (): LikeAPromise<string, TaqError> => {
 				context: process.arch,
 			});
 	}
+};
+
+export const getLatestFlextesaImage = async (arch: 'linux/arm64/v8' | 'linux/amd64'): Promise<string> => {
+	return 'linux/arm64/v8' ? 'oxheadalpha/flextesa:rc-20220915-arm64' : 'oxheadalpha/flextesa:20220715';
+	// const response = await fetch('https://registry.hub.docker.com/v2/repositories/oxheadalpha/flextesa/tags');
+	// const data = await response.json();
+	// console.error(data);
 };
 
 export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError> =>

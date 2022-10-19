@@ -1,5 +1,7 @@
 import {
 	execCmd,
+	getArch,
+	getLatestFlextesaImage,
 	getParameter,
 	newGetInitialStorage,
 	sendAsyncErr,
@@ -58,7 +60,9 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const processedStorage = preprocessString(storage);
 	const processedParam = preprocessString(param);
 
-	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project ${FLEXTESA_IMAGE}`;
+	const arch = await getArch();
+	const flextesaImage = await getLatestFlextesaImage(arch);
+	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
 
@@ -68,7 +72,8 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 };
 
 const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
-	execCmd(getCheckFileExistenceCommand(parsedArgs, sourceFile))
+	getCheckFileExistenceCommand(parsedArgs, sourceFile)
+		.then(execCmd)
 		.then(() =>
 			getSimulateCmd(parsedArgs, sourceFile)
 				.then(execCmd)
