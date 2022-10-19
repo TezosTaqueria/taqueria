@@ -1,12 +1,4 @@
-import {
-	execCmd,
-	getArch,
-	getLatestFlextesaImage,
-	sendAsyncErr,
-	sendErr,
-	sendJsonRes,
-	sendWarn,
-} from '@taqueria/node-sdk';
+import { execCmd, getArch, getFlextesaImage, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import {
 	getCheckFileExistenceCommand,
 	getInputFilename,
@@ -21,7 +13,7 @@ const getTypecheckCmd = async (parsedArgs: Opts, sourceFile: string): Promise<st
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const arch = await getArch();
-	const flextesaImage = await getLatestFlextesaImage(arch);
+	const flextesaImage = await getFlextesaImage(arch);
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const cmd = `${baseCmd} tezos-client ${GLOBAL_OPTIONS} typecheck script ${inputFile}`;

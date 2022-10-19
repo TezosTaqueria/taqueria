@@ -1,4 +1,4 @@
-import { getArch, getLatestFlextesaImage } from '@taqueria/node-sdk';
+import { getArch, getFlextesaImage } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import { join } from 'path';
 
@@ -33,7 +33,7 @@ export const getCheckFileExistenceCommand = async (parsedArgs: UnionOpts, source
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const arch = await getArch();
-	const flextesaImage = await getLatestFlextesaImage(arch);
+	const flextesaImage = await getFlextesaImage(arch);
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage} ls`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const cmd = `${baseCmd} ${inputFile}`;
