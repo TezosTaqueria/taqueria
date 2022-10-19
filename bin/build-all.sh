@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
+if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
     echo '******* BUILDING ALL TAQUERIA PACKAGES *******'
     echo '**********************************************'
@@ -11,32 +11,8 @@ if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
 
     echo ""
     echo '**********************************************'
-    echo "** Building taqueria-protocol"
-    npm run build --workspace=taqueria-protocol
-
-    echo ""
-    echo '**********************************************'
-    echo "** Building node-sdk"
-    npm run build --workspace=taqueria-sdk
-
-    echo ""
-    echo '**********************************************'
-    echo "** Building taqueria-state"
-    npm run build --workspace=taqueria-state
-
-    echo ""
-    echo '**********************************************'
-    echo "** Building taqueria-toolkit"
-    npm run build --workspace=taqueria-toolkit
-
-    for dir in `ls -1d *plugin*`; do
-        if [ -d $dir ]; then
-            echo ""
-            echo '**********************************************'
-            echo "** Building ${dir}"
-            ./bin/build-plugin.sh $dir
-        fi
-    done
+    echo "** Building packages"
+    npm run build --workspaces --if-present
 
     echo ""
     echo '**********************************************'
@@ -45,9 +21,8 @@ if [ "$0" == "./bin/build-all.sh" -a -f index.ts ]; then
 
     echo ""
     echo '**********************************************'
-    echo "** Building docker image"
-    npm run build -w taqueria-flextesa-manager
-    npm run build-docker -w taqueria-flextesa-manager
+    echo "** Building docker images"
+    npm run build-docker --workspaces --if-present
 
     echo ""
     echo '**********************************************'

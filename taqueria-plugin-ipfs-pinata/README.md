@@ -1,19 +1,18 @@
 # IPFS Pinata Plugin
 
-This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
-
 The IPFS Pinata plugin provides a `publish` task to upload metadata, media, or other files to IPFS via Pinata
 
 The IPFS Pinata plugin also provides a `pin` task to link any existing files on Pinata to your Pinata account
 
 
-
+ 
 ## Requirements
 
-- Node.js v16.3 or later
-- Docker v0.8.6 or later
+- Taqueria v0.20.2 or later
+- Node.js v16.17.1 or later
+- Docker v20.10.12 or later
 - A [Pinata](https://app.pinata.cloud) account
-- A Pinata JWT Token added to the project
+- A Pinata JWT Token added to a `.env` file in the project folder
 
 ## Installation
 
@@ -39,10 +38,10 @@ pinataJwtToken=eyJhbGc...
 
 The IPFS Pinata plugin exposes a `publish` task which uploads one or more files to IPFS via Pinata, and stores the results in Taqueria State
 
-You will first need to create a new directory in your project and add any metadata or media files you would like to upload to it. Once you have a directory in your project with one or more files to upload, you can run:
+You will first need to create a new directory in your project and add any metadata or media files you would like to upload to Pinata. Once you have a directory in your project with one or more files to upload, you can run:
 
 ```shell
-taq publish < path >
+taq publish <pathToFile>
 ```
 
 The IPFS Pinata plugin exposes a `pin` task which links files already existing on Pinata to your Pinata account
@@ -50,7 +49,7 @@ The IPFS Pinata plugin exposes a `pin` task which links files already existing o
 You will need to find the CID for a file on Pinata then use that to pin the file to your account that is linked with the JWT you're using
 
 ```shell
-taq pin < hash >
+taq pin <fileHash>
 ```
 
 ## Tasks
@@ -60,7 +59,7 @@ taq pin < hash >
 The `publish` task is used for uploading files/directories of files to IPFS and the task has the following structure:
 
 ```shell
-taq publish < sourceDirectory >
+taq publish <sourceDirectory>
 ```
 
 #### Task Properties
@@ -68,7 +67,7 @@ taq publish < sourceDirectory >
 |  attribute |  value                          | 
 |------------|:-------------------------------:|
 |  task      | 'publish'                       | 
-|  command   | 'publish < path >               | 
+|  command   | 'publish < sourceDirectory >'   | 
 |  aliases   | N/A                             |  
 
 ### The `taq pin` Task
@@ -84,10 +83,10 @@ taq pin < hash >
 |  attribute |  value                          | 
 |------------|:-------------------------------:|
 |  task      | 'pin'                           | 
-|  command   | 'pin < hash >                   | 
+|  command   | 'pin < fileHash >'              | 
 |  aliases   | N/A                             |  
 
 
 ## Plugin Architecture
 
-This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM

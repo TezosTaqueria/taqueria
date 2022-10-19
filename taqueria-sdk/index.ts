@@ -36,6 +36,7 @@ import crypto from 'crypto';
 
 // @ts-ignore interop issue. Maybe find a different library later
 import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
+import fetch from 'node-fetch';
 import generateName from 'project-name-generator';
 import { parsed } from 'yargs';
 
@@ -83,7 +84,7 @@ export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, Exe
 		});
 	});
 
-export const getArch = (): LikeAPromise<string, TaqError> => {
+export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError> => {
 	switch (process.arch) {
 		case 'arm64':
 			return Promise.resolve('linux/arm64/v8');
@@ -98,6 +99,19 @@ export const getArch = (): LikeAPromise<string, TaqError> => {
 				context: process.arch,
 			});
 	}
+};
+
+export const getLatestFlextesaImage = async (arch: 'linux/arm64/v8' | 'linux/amd64'): Promise<string> => {
+	const response = await fetch('https://registry.hub.docker.com/v2/repositories/oxheadalpha/flextesa/tags');
+	const data = await response.json();
+	const tags = data.results;
+	for (const tag of tags) {
+		if (tag.name === 'latest') continue;
+		for (const image of tag.images) {
+			if (arch.includes(image.architecture)) return `oxheadalpha/flextesa:${tag.name}`;
+		}
+	}
+	return Promise.reject(new Error(`No flextesa image found for the platform of this device, which is ${arch}`));
 };
 
 export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError> =>
