@@ -101,18 +101,8 @@ export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqErr
 	}
 };
 
-export const getLatestFlextesaImage = async (arch: 'linux/arm64/v8' | 'linux/amd64'): Promise<string> => {
-	const response = await fetch('https://registry.hub.docker.com/v2/repositories/oxheadalpha/flextesa/tags');
-	const data = await response.json();
-	const tags = data.results;
-	for (const tag of tags) {
-		if (tag.name === 'latest') continue;
-		for (const image of tag.images) {
-			if (arch.includes(image.architecture)) return `oxheadalpha/flextesa:${tag.name}`;
-		}
-	}
-	return Promise.reject(new Error(`No flextesa image found for the platform of this device, which is ${arch}`));
-};
+export const getFlextesaImage = (arch: 'linux/arm64/v8' | 'linux/amd64'): string =>
+	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:rc-20220915-arm64' : 'oxheadalpha/flextesa:20220715';
 
 export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError> =>
 	new Promise((resolve, reject) => {

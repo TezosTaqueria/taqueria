@@ -1,7 +1,7 @@
 import {
 	execCmd,
 	getArch,
-	getLatestFlextesaImage,
+	getFlextesaImage,
 	getParameter,
 	newGetInitialStorage,
 	sendAsyncErr,
@@ -60,7 +60,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const processedParam = preprocessString(param);
 
 	const arch = await getArch();
-	const flextesaImage = await getLatestFlextesaImage(arch);
+	const flextesaImage = await getFlextesaImage(arch);
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
