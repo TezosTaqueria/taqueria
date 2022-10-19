@@ -3,16 +3,16 @@ title: Testnet Configuration
 ---
 
 :::note
-This document details the configuration and use of Tezos testnets. If you are looking for information on running or originating to a sandbox, please see the Flextesa documentation [here](../plugins/plugin-flextesa.mdx/)
+This document details the configuration and use of Tezos testnets. If you are looking for information on running or originating to a sandbox, please see the Flextesa documentation [here](docs/plugins/plugin-flextesa)
 :::
 
 ## Introduction
 
-Taqueria provides support to interact with Tezos networks in a simplified and streamlined manner. Taqueria provides a centralized configuration for testnets (including faucet keys) which can then be targeted by Taqueria commands through the use of Taqueria environments
+Taqueria provides support to interact with Tezos networks in a simplified and streamlined manner. Taqueria provides a centralized configuration for testnets (including faucet information) which can then be targeted by Taqueria commands through the use of Taqueria environments
 
 To work with Taqueria networks, these are the basic steps you need to take:
 1. Add a network configuration to the Taqueria `.taq/config.json` file
-2. Add a faucet key
+2. Add a faucet key (please see the faucets section [below](/docs/config/networks/#Faucets))
 3. Add the created network to an environment
 4. Target the network in Taqueria by passing the environment name to the CLI command (ie. `taq originate --env testing`)
 
@@ -39,7 +39,7 @@ Ghostnet should be the default testnet you use since it will automatically handl
 The network configuration for various protocols, as well as the faucet for each can be found at [teztnets.xyz](https://teztnets.xyz/).
 :::
 
-To configure a network for use, you will need to configure the network, and then add that network to an environment. To illustrate the configuration of a network, we will use [ghostnet](https://teztnets.xyz/ithaca-testnet/), a long running Tezos test network as an example in this document and will configure a network named `ghostnet`, and an environment named `testing`
+To configure a network for use, you will need to configure the network, and then add that network to an environment. To illustrate the configuration of a network, we will use [ghostnet](https://teztnets.xyz/ghostnet-about), a long running Tezos test network as an example in this document and will configure a network named `ghostnet`, and an environment named `testing`
 
 Taqueria does not have a default network configured, so a freshly initialized project will have a `config.json` file that looks like this:
 ```json
@@ -138,13 +138,13 @@ Your network configuration should now look like the following:
       }
    }
 ```
-4. Go to teztnets.xyz, click on the link for the faucet of the desired testnet, and then request to have funds sent to your public key hash address (which would be _tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok_ in your example above).
+4. Go to the ghostnet [faucet](https://faucet.ghostnet.teztnets.xyz/), click on the link for the faucet of the desired testnet, and then request to have funds sent to your public key hash address (which would be _tz1SrwfccRGEM74T8GLXVzPZAaVk7WjoMPok_ in your example above).
 
 ![Request Tez from Faucet](/img/fund-using-faucet.png)
 
 ### Environment Configuration
 
-The final step in configuration is to add the network to an environment. In this example, we will create a new environment named `testing` which will contain the `ghost` network
+The final step in configuration is to add the network to an environment. In this example, we will create a new environment named `testing` which will contain the `ghostnet` network
 
 To do this, find the `environment` property in your `config.json` file. By default it will look something like this:
 ```json
@@ -184,7 +184,7 @@ Add a new environment named `testing`, and add the named network `ghostnet` to i
 ```
 
 :::note
-For additional information regarding Taqueria Environments, please see the documentation [here](/docs/config/environments.mdx/)
+For additional information regarding Taqueria Environments, please see the documentation [here](/docs/config/environments/)
 :::
 
 ### Finished Configuration
@@ -212,7 +212,9 @@ Your `config.json` file should look something like this:
             "networks": [
                 "ghostnet"
             ],
-            "sandboxes": [],
+            "sandboxes": [
+                "local"
+            ],
             "storage": {}
         }
     },
@@ -254,7 +256,7 @@ Taqueria uses [Environments](/docs/config/environments) to target a specific net
 
 To target the `ghostnet` network we configured above using the `testing` environment, simply run the following command:
 ```shell
-taq originate --env testing
+taq originate <contractName> --env testing
 ```
 
 
