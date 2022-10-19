@@ -31,18 +31,18 @@ What you will accomplish:
 
 To successfully follow this guide, you must ensure that:
 - The Taqueria CLI has been [installed](./installation.mdx) and is available in your `$PATH` 
-- Docker 0.8 (or later) is installed and currently running
-- Node.js v16.3 (or later) is installed
+- Docker v20.10.12 (or later) is installed and currently running
+- Node.js v16.17.1 (or later) is installed
 
 :::note
-The Taqueria VS Code Extension provides direct access to Taqueria tasks from the command palette. Under the hood, the VS Code Extension makes calls to the CLI, so you can be assured the behaviour of tasks will remain consistent regardless of whether they are executed from a terminal or the command palette. The steps in this guide are for using the Taqueria CLI, but you can also run the commands from the Taqueria extension via the VS Code command palette if you prefer
+The Taqueria VS Code Extension provides direct access to Taqueria tasks. Under the hood, the VS Code Extension makes calls to the CLI, so you can be assured the behaviour of tasks will remain consistent regardless of whether they are executed from a terminal or the command palette. The steps in this guide are for using the Taqueria CLI, but you can also run the commands from the Taqueria extension via the VS Code command palette if you prefer
 :::
 
 ## Starting a Taqueria Project
 
 There are two things required to start using Taqueria on a project
 
-First, the project must have been initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts` and `/artifacts` have been created 
+First, the project must have been initialized by Taqueria. This process creates a hidden directory `.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `contracts` and `artifacts` have been created 
 
 Taqueria provides the command `init` which will create a new directory with the correct structure and configuration. To create a new Taqueria project called `my-first-project`, run the command:
 ```shell
@@ -61,7 +61,7 @@ cd my-first-project
 
 Now that the project has been properly initialized, plugins can be installed to provide support for specific functionality such as compilation, smart contract origination, or running sandbox environments
 
-Plugins are installed using the `taq install` command which appears in the command list once a project is initialized. You can view the list of commands available in the current project context by running `taq --help` from the CLI:
+Plugins are installed using the `taq install` command which appears in the command list once a project is initialized. You can view the list of commands available in the current project context by running `taq --help` from the CLI. It should look something like this:
 ```shell
 ❯ taq --help
 taq <command>
@@ -72,9 +72,6 @@ Commands:
   taq opt-out                     Opt-out of sharing anonymous usage analytics
   taq install <pluginName>        Install a plugin
   taq uninstall <pluginName>      Uninstall a plugin
-  taq add-contract <sourceFile>   Add a contract to the contract registry
-  taq rm-contract <contractName>  Remove a contract from the contract registry
-  taq list-contracts              List registered contracts
 ```
 
 Once a plugin has been installed, you will see the additional commands provided by the plugin added to the list
@@ -86,7 +83,7 @@ To add support for the LIGO smart contract language, install the LIGO plugin by 
 taq install @taqueria/plugin-ligo
 ```
 
-Copy the following 3 code snippets, with the names suggested at the top of each code snippets, to the `/contracts` folder of your Taqueria project.
+Copy the following 3 code snippets, with the names suggested at the top of each code snippets, to the `contracts` folder of your Taqueria project
 
 ```ligo title="counter.mligo"
 type storage = int
@@ -124,7 +121,7 @@ let increment_by_3: parameter = Increment 3
 ```
 
 :::caution
-Make sure you name it `counter.storages.mligo` and not `counter.storage.mligo` (note the extra `s`).
+Make sure you name it `counter.storages.mligo` and not `counter.storage.mligo` (note the extra `s`)
 :::
 
 You can now compile this contract, along with its storage and parameter values, by simply running the following command from the root of the project directory:
@@ -147,7 +144,7 @@ Taqueria will then output the following, and the artifacts created:
 └──────────────────────────┴───────────────────────────────────────────────┘
 ```
 
-If you open this file (`/artifacts/counter.tz`), you can view the raw Michelson code which will later be originated to the sandbox:
+If you open this file (`artifacts/counter.tz`), you can view the raw Michelson code which will later be originated to the sandbox:
 ```
 { parameter (or (or (int %decrement) (int %increment)) (unit %reset)) ;
   storage int ;
@@ -171,7 +168,7 @@ Once installed, the plugin provides three commands to start, stop, and query a s
 - `taq list accounts [sandboxName]`
 
 :::note
-Sandboxes are configured in the project's Taqueria configuration file (`./.taq/config.json`). Each named sandbox configuration can then be called from the CLI.
+Sandboxes are configured in the project's Taqueria configuration file (`.taq/config.json`). Each named sandbox configuration can then be called from the CLI.
 By default, every Taqueria project comes pre-configured with a sandbox named `local`
 :::
 
@@ -217,7 +214,7 @@ Now you can originate the contract by running:
 taq originate counter.tz
 ```
 
-This will originate `counter.tz` in the `/artifacts` directory to the sandbox and return the on-chain address of the originated contract. This will look something like this:
+This will originate `counter.tz` in the `artifacts` directory to the sandbox and return the on-chain address of the originated contract. This will look something like this:
 ```
 ┌────────────┬──────────────────────────────────────┬─────────┬─────────────┐
 │ Contract   │ Address                              │ Alias   │ Destination │
@@ -228,7 +225,7 @@ This will originate `counter.tz` in the `/artifacts` directory to the sandbox an
 
 ### Interacting with a deployed Contract with Taquito
 
-With the sandbox still running, the last step is to interact with the contract you just deployed. You may use its alias or its address directly.
+With the sandbox still running, the last step is to interact with the contract you just deployed to your sandbox. You may use its alias or its address directly
 
 To do that, run:
 ```shell
@@ -248,12 +245,12 @@ This will call the counter contract's entrypoint `increment` and will increment 
 ## Finishing Up
 
 Congratulations! At this point, you have run through the basic usage of Taqueria including:
-- Initializing a new Taqueria project.
-- Installing plugins for LIGO, Flextesa, and Taquito.
-- Creating a new LIGO contract, along with its associated storages and parameters files.
-- Compiling a LIGO smart contract.
-- Starting and querying a local Flextesa sandbox.
-- Originating a compiled smart contract to the sandbox.
-- Interacting with a smart contract deployed to the sandbox.
+- Initializing a new Taqueria project
+- Installing plugins for LIGO, Flextesa, and Taquito
+- Creating a new LIGO contract, along with its associated storages and parameters files
+- Compiling a LIGO smart contract
+- Starting and querying a local Flextesa sandbox
+- Originating a compiled smart contract to the sandbox
+- Interacting with a smart contract deployed to the sandbox
 
-For more details on the usage of specific Taqueria tasks, you can refer to the plugin documentation which contains additional context, configuration, and usage of the many Taqueria tasks; or continue on with the getting started guides.
+For more details on the usage of specific Taqueria tasks, you can refer to the plugin documentation which contains additional context, configuration, and usage of the many Taqueria tasks; or continue on with the getting started guides

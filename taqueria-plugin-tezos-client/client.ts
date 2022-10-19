@@ -1,14 +1,7 @@
 import { sendAsyncErr } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { IntersectionOpts as Opts } from './common';
 import simulate from './simulate';
 import typecheck from './typecheck';
-
-interface Opts extends RequestArgs.ProxyRequestArgs {
-	sourceFile: string;
-	storage?: string;
-	param: string;
-	entrypoint?: string;
-}
 
 export const client = (parsedArgs: Opts): Promise<void> => {
 	switch (parsedArgs.task) {

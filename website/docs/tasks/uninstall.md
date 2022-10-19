@@ -25,6 +25,7 @@ This task can be used to uninstall the following plugins:
 | [Contract Types](/docs/plugins/plugin-contract-types/) | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code             |
 | [Flextesa](/docs/plugins/plugin-flextesa/)             | `@taqueria/plugin-flextesa`       | A Tezos sandbox (testnet) that runs locally on your machine             | 
 | [IPFS Pinata](/docs/plugins/plugin-ipfs-pinata/)       | `@taqueria/plugin-ipfs-pinata`    | Publishes metadata or media files to IPFS via Pinata                    |
+| [Metadata](/docs/plugins/plugin-metadata/)             | `@taqueria/plugin-metadata`       | Create JSON files containing TZIP-16 compliant metadata for a smart contract    |
 | [Jest](/docs/plugins/plugin-jest/)                     | `@taqueria/plugin-jest`           | Provides support for Jest testing                                       |
 | [LIGO](/docs/plugins/plugin-ligo/)                     | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language                         |
 | [SmartPy](/docs/plugins/plugin-smartpy/)               | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy smart contract language                      |

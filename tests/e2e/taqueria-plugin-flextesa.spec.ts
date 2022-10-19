@@ -176,6 +176,54 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		}
 	});
 
+	test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
+		sandboxName = 'local';
+		await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+
+		const accounts = await exec(`taq list accounts ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+		expect(accounts.stdout).toContain('bob');
+
+		await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+	});
+
+	test('Verify that taqueria can return JSON when request for list of accounts from a sandbox is made by TVsCE', async () => {
+		sandboxName = 'local';
+		await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+
+		const accounts = await exec(`taq list accounts ${sandboxName} --fromVsCode`, { cwd: `./${taqueriaProjectPath}` });
+		expect(accounts.stdout).toEqual(
+			JSON.stringify([
+				{
+					account: 'bob',
+					balance: '3000 ꜩ',
+					address: 'tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6',
+				},
+				{
+					account: 'alice',
+					balance: '3000 ꜩ',
+					address: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
+				},
+				{
+					account: 'john',
+					balance: '3000 ꜩ',
+					address: 'tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6',
+				},
+				{
+					account: 'jane',
+					balance: '3000 ꜩ',
+					address: 'tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph',
+				},
+				{
+					account: 'joe',
+					balance: '3000 ꜩ',
+					address: 'tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB',
+				},
+			]) + '\n',
+		);
+
+		await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+	});
+
 	// TODO: Currently it cannot be done until this issue has been resolved
 	// Issue to implement test: https://github.com/ecadlabs/taqueria/issues/366
 	// Related developer issue: https://github.com/ecadlabs/taqueria/issues/243
