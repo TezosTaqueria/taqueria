@@ -130,6 +130,7 @@ Once all your contract
 
 ### Bugfixes
 
+- Applications can interact with the Flextesa sandbox without CORS issues (https://github.com/ecadlabs/taqueria/issues/1046)
 - SDK's getContracts method not honoring regex pattern [#1011](https://github.com/ecadlabs/taqueria/issues/1011/)
 - Fix build pipeline: lock parcel to v2.6.1 [#1007](https://github.com/ecadlabs/taqueria/issues/1007/)
 - Fix scaffold verbosity by writing stdOut to `scaffold.log` file [#1001](https://github.com/ecadlabs/taqueria/issues/1001/)
