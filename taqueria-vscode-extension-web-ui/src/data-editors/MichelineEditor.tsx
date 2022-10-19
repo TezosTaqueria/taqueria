@@ -174,7 +174,7 @@ export const MichelineEditor = (
 								<td>
 									<h3>Json</h3>
 									<div style={{ whiteSpace: 'pre-wrap' }}>
-										{JSON.stringify(currentState.value, null, 2)}
+										{JSON.stringify(currentState.value?.value, null, 2)}
 									</div>
 								</td>
 								<td>
