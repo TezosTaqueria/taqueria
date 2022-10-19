@@ -343,13 +343,9 @@ jobs:
           TARGET_VERSION="${PACKAGE_VERSION}-${SHORT_SHA}-${BRANCH_NAME}"
           npx lerna version "${TARGET_VERSION}" --no-push --no-git-tag-version --yes
           echo ${VERDACCIO_TOKEN} >> ~/.npmrc
-          npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY
-        # echo "Token"
-        # echo "Git config"
-        # git config user.email "actions@github.com" && git config user.name "Github Actions"
-        # echo "Add and commit"
-        # HUSKY=0 git add -A && HUSKY=0 git commit -m "commit for lerna"
-        # HUSKY=0 npx lerna publish --dist-tag edge from-package --yes --registry https://npm.ecadinfra.com
+          HUSKY=0 git add -A && HUSKY=0 git commit -m "commit for lerna"
+          HUSKY=0 npx lerna publish --dist-tag edge from-package --yes --registry https://npm.ecadinfra.com
+        # npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRYgithub.com" && git config user.name "Github Actions"
           
                 
       - name: Publish for prerelease
