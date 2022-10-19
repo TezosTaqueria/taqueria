@@ -1,6 +1,7 @@
 {
 	"name": "@taqueria/flextesa-manager",
 	"version": "0.20.2",
+	"private": true,
 	"description": "Provides an interface and abstraction over a flextesa mininet",
 	"main": "index.js",
 	"scripts": {

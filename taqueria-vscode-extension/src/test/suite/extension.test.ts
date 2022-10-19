@@ -5,103 +5,138 @@ import * as vscode from 'vscode';
 import { ExtensionContext, Uri } from 'vscode';
 import * as taqueriaExtension from '../../extension';
 import * as MockedObject from './MockedObject';
-import { sleep } from './utils/utils';
 
-const projectRoot = path.resolve(__dirname, '../../../');
-const testProjectDestination = `${projectRoot}/out/vscode-taq-test-project`;
-const testProjectSource = `${projectRoot}/src/test/suite/data/vscode-taq-test-project`;
+const homedir = require('os').homedir();
+const sourceFilesRoot = path.resolve(__dirname, '../../../');
+const testProjectRoot = path.resolve(homedir, 'TVsCE_e2e');
+const testProjectSource = `${sourceFilesRoot}/src/test/suite/data`;
+const ligoContractFileSource = `${testProjectSource}/hello-tacos.mligo`;
 
-describe('Extension Test Suite', () => {
+const testProjectDestination = `${testProjectRoot}/vscode-taq-test-project`;
+const ligoContractFileDestination = `${testProjectDestination}/contracts/hello-tacos.mligo`;
+
+const originalMethods = {
+	'window.showInformationMessage': vscode.window.showInformationMessage,
+	'window.showQuickPick': vscode.window.showQuickPick,
+	'window.showOpenDialog': vscode.window.showOpenDialog,
+};
+
+let vscodeMock: typeof vscode;
+let mockedReturnValues = {
+	openDialogMockValues: [''],
+	openDialogMockIndex: 0,
+};
+
+function setOpenDialogMocks(...mockedPaths: string[]) {
+	mockedReturnValues.openDialogMockValues = mockedPaths;
+	mockedReturnValues.openDialogMockIndex = 0;
+}
+
+function getNextOpenDialogUri() {
+	if (
+		!mockedReturnValues.openDialogMockValues
+		|| mockedReturnValues.openDialogMockIndex >= mockedReturnValues.openDialogMockValues.length
+	) {
+		throw new Error('We have already used all mocked values.');
+	}
+	const mockedValue = mockedReturnValues.openDialogMockValues[mockedReturnValues.openDialogMockIndex];
+	mockedReturnValues.openDialogMockIndex++;
+	return mockedValue;
+}
+
+let choosePlugin: string = '@taqueria/plugin-ligo';
+
+const mockedMethods = {
+	'window.showInformationMessage': (msg: string) => Promise.resolve(console.log(msg)),
+	'window.showQuickPick': () => Promise.resolve([choosePlugin]),
+	'window.showOpenDialog': () => {
+		return Promise.resolve([Uri.file(getNextOpenDialogUri())]);
+	},
+};
+vscodeMock = MockedObject.make(vscode, mockedMethods);
+
+describe('Extension Test Suite', async () => {
 	before(async () => {
 		const context: ExtensionContext = {
 			subscriptions: [],
 		} as any;
-		await taqueriaExtension.activate(context, {
-			vscode: MockedObject.make(vscode, {
-				'window.showInformationMessage': (msg: string) => Promise.resolve(console.log(msg)),
-			}),
-		});
-		await fse.copy(testProjectSource, testProjectDestination);
+
+		await taqueriaExtension.activate(context, { vscode: vscodeMock });
 
 		vscode.window.showInformationMessage('Start all tests.');
 	});
 
-	it('Verify that Taqueria Initiate will init new taquifed  project ', async () => {
-		await vscode.commands.getCommands(true).then(allCommands => {
-			const taqCommands = allCommands.filter(command => command.toLowerCase().includes('taq'));
-			assert.notEqual(taqCommands, undefined);
+	it('Verify that Taqueria commands present in the command pallet list ', async () => {
+		const taqCommandsList = [
+			'taqueria.init',
+			'taqueria.scaffold',
+			'taqueria.install',
+			'taqueria.uninstall',
+			'taqueria.opt_in',
+			'taqueria.opt_out',
+			'taqueria.refresh_command_states',
+			'taqueria.compile_smartpy',
+			'taqueria.compile_ligo',
+			'taqueria.compile_archetype',
+			'taqueria.compile_pick_file',
+			'taqueria.compile_current_file',
+			'taqueria.add_contract',
+			'taqueria.rm_contract',
+			'taqueria.generate_types',
+			'taqueria.typecheck',
+			'taqueria.taqueria.create_test_folder',
+			'taqueria.run_tests',
+			'taqueria.start_sandbox',
+			'taqueria.stop_sandbox',
+			'taqueria.list_accounts',
+			'taqueria.originate',
+			'taqueria.originate_current_file',
+			'taqueria.originate_pick_file',
+			'taqueria.refresh_sandbox_data',
+			'taqueria.show_entrypoint_parameters',
+			'taqueria.show_operation_details',
+		];
+		const allCommands = await vscode.commands.getCommands(true);
+		const taqCommands = allCommands.filter(command => command.toLowerCase().includes('taqueria.'));
+		taqCommandsList.forEach(command => {
+			assert.equal(taqCommands.includes(command), true);
 		});
-
-		// TODO: Need to figure out if it is possible to interact with showDialogBox
-		//      If no this test cannot be automated
-		//      I tried to use RobotJS, but it has an issue to work with parser properly
-		//      Even if I exclude it it keeps asking to rebuild it due to an old version of npm
-		//      https://stackoverflow.com/questions/46384591/node-was-compiled-against-a-different-node-js-version-using-node-module-versio
-
-		// await vscode.commands.executeCommand("taqueria.init").then( ()=>{
-		// });
-
-		// Example how to use sleep to stop VS Code for a moment
-		// await sleep(60000);
 	});
 
-	// TODO: https://github.com/ecadlabs/taqueria/issues/605
-	it.skip('Verify that VS Code command Taqueria Scaffold will scaffold a project', async () => {
-		// Open taquified project in workspace under testProjectDestination
+	it('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
+		// It creates another process
+		// https://stackoverflow.com/questions/51385812/is-there-a-way-to-open-a-workspace-from-an-extension-in-vs-code
+		// await vscodeMock.commands.executeCommand('vscode.openFolder', vscode.Uri.parse(testProjectDestination));
+		// await workspace.updateWorkspaceFolders(0, 1, { uri: Uri.parse()});
 
-		// Run taqueria scaffold command
-		await vscode.commands.executeCommand('taqueria.scaffold');
-	});
+		await fse.rm(testProjectDestination, { recursive: true });
+		await fse.mkdir(testProjectDestination, { recursive: true });
 
-	// TODO: https://github.com/ecadlabs/taqueria/issues/686
-	it.skip('Verify that VS Code command Taqueria Start Sandbox starts flextesa sandbox', async () => {
-		// Install plugin
-		await vscode.commands.executeCommand('taqueria.install @taqueria/plugin-flextesa');
+		await vscodeMock.commands.executeCommand('taqueria.init');
 
-		// Verify that
-		await vscode.commands.executeCommand('taqueria.start_sandbox local');
-	});
+		choosePlugin = '@taqueria/plugin-ligo';
+		await vscodeMock.commands.executeCommand('taqueria.install');
 
-	// TODO: https://github.com/ecadlabs/taqueria/issues/686
-	it.skip('Verify that VS Code command Taqueria List Accounts display accounts on running sandbox', async () => {
-		await vscode.commands.executeCommand('taqueria.list_accounts local');
-	});
+		// Example if we need to force to refresh command state
+		// await vscodeMock.commands.executeCommand('taqueria.refresh_command_states');
 
-	// TODO: https://github.com/ecadlabs/taqueria/issues/686
-	it.skip('Verify that VS Code command Taqueria Stop Sandbox stops flextesa sandbox', async () => {
-		await vscode.commands.executeCommand('taqueria.stop_sandbox local');
-	});
+		// Copy contract from data folder
+		await fse.copyFile(ligoContractFileSource, ligoContractFileDestination);
 
-	// TODO: https://github.com/ecadlabs/taqueria/issues/645
-	it.skip('Verify that VS Code command Taqueria Compile Ligo will compile Ligo contract', async () => {
-		// Install plugin
-		await vscode.commands.executeCommand('taqueria.install @taqueria/plugin-ligo');
+		setOpenDialogMocks(`${ligoContractFileDestination}`);
+		await vscodeMock.commands.executeCommand('taqueria.compile_pick_file');
 
-		await vscode.commands.executeCommand('taqueria.compile_ligo');
-
-		// In last test or after all block
-		// vscode.commands.executeCommand("workbench.action.closeActiveEditor");
-	});
-
-	// TODO: https://github.com/ecadlabs/taqueria/issues/687
-	it.skip('Verify that VS Code command Taqueria Compile SmartPy will compile SmartPy contract', async () => {
-		// Install plugin
-		await vscode.commands.executeCommand('taqueria.install @taqueria/plugin-smartpy');
-
-		await vscode.commands.executeCommand('taqueria.compile_smartpy');
-	});
-
-	// TODO: https://github.com/ecadlabs/taqueria/issues/688
-	it.skip('Verify that VS Code command Taqueria Deploy Contract will deploy contract to a test network', async () => {
-		// Install plugin
-		await vscode.commands.executeCommand('taqueria.install @taqueria/plugin-smartpy');
-
-		await vscode.commands.executeCommand('taqueria.deploy');
+		assert.doesNotThrow(() => {
+			const compileResult = fse.readFileSync(`${testProjectDestination}/artifacts/hello-tacos.tz`, {
+				encoding: 'utf-8',
+			});
+			const expectedResult = fse.readFileSync(`${testProjectSource}/hello-tacos-expected.tz`, { encoding: 'utf-8' });
+			assert.equal(compileResult, expectedResult);
+		}, 'The compile command has not created the expected artifacts');
 	});
 
 	after(async () => {
-		await fse.rmdir(testProjectDestination, { recursive: true });
-		// Uncomment for local development
+		// Uncomment for local development if there is an issue with the path length
 		// await fse.rmdir(`${projectRoot}/.vscode-test/user-data/`, {recursive: true})
 	});
 });

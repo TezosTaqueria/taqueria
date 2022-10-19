@@ -4,7 +4,7 @@
 	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
 	"version": "0.20.2",
-	"preview": true,
+	"private": true,
 	"engines": {
 		"vscode": "^1.68.1",
 		"node": "^16.0.0"
@@ -170,7 +170,7 @@
 			{
 				"view": "taqueria-system-check",
 				"when": "!@taqueria-state/is-taq-cli-reachable",
-				"contents": "❌ Taq CLI: Unable to find the Taqueria CLI.\nThe Taqueria CLI is required to use this extension. Click [here](https://taqueria.io/docs/getting-started/installation/) for installation instructions, then click the \"Check Again\" button.\nThe Taqueria CLI must also be in your PATH. If you change your PATH, you might need to restart Visual Studio Code to register this change."
+				"contents": "❌ Taq CLI:\nYour system does not have the taq command installed.\nYou must download the taq program and put it in your system. Click [here](https://taqueria.io/docs/getting-started/installation/) for installation instructions.\nIf you prefer, the Taqueria extension can install it for you. To do this, please click the button below, you will be prompted for your password\n[Install Taq CLI](command:taqueria.install_taq_cli)\nAfter taq command is installed, please click the \"Check Again\" button."
 			},
 			{
 				"view": "taqueria-system-check",
@@ -605,7 +605,7 @@
 		"compile:test": "tsc -p tsconfig.test.json",
 		"pretest": "npm run compile:test",
 		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
+		"test": "./bin/run-tests.sh"
 	},
 	"devDependencies": {
 		"@taquito/taquito": "^13.0.1",
