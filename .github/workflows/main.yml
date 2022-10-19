@@ -358,7 +358,7 @@ jobs:
         if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
         run: |
           npm publish --workspaces --tag 'latest' --access public 
-  
+  # Add
   # vscode-extension-workflow:
   #   needs: 
   #     - detect-changes
