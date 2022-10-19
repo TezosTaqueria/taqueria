@@ -14,9 +14,9 @@ export interface TransferOpts extends RequestArgs.ProxyRequestArgs {
 	entrypoint?: string;
 }
 
-export type IntersectionOpts = OriginateOpts & TransferOpts;
+export type IntersectionOpts = OriginateOpts & TransferOpts; // To be used for the main entrypoint of the plugin
 
-type UnionOpts = OriginateOpts | TransferOpts;
+type UnionOpts = OriginateOpts | TransferOpts; // To be used for common functions in this file
 
 export const getFirstAccountAlias = (sandboxName: string, opts: UnionOpts) => {
 	const aliases = getSandboxAccountNames(opts)(sandboxName);
