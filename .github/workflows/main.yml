@@ -282,8 +282,11 @@ jobs:
   #         chmod +x taq
   #         echo "$(pwd)" >> $GITHUB_PATH
 
-  #     - name: Run unit tests
-  #       run: npm run test:unit -w tests
+      # - name: Build docker image
+      #   run: npm run build-docker --workspaces --if-present
+
+      # - name: Run unit tests
+      #   run: npm run test:unit -w tests
 
   #     - name: Run integration tests
   #       run: npm run test:integration -w tests
