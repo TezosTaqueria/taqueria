@@ -313,8 +313,7 @@ jobs:
   publish-npm-packages:
     runs-on: ubuntu-latest
     needs:
-      - run-tests
-    if: ${{ always() && !(contains(needs.*.result, 'failure')) }}
+      - build-and-cache-node-modules
     permissions:
       packages: write
       contents: read
