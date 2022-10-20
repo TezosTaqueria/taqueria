@@ -320,6 +320,8 @@ jobs:
       SCOPE: '@taqueria'
       NPM_REGISTRY: https://registry.npmjs.org/
       PRIVATE_NPM_REGISTRY: https://npm.ecadinfra.com
+    outputs:
+      pr-version: ${{ steps.publish-package.outputs.pr-version }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -335,17 +337,18 @@ jobs:
 
       - name: Publish for PR
         if:  ${{ github.event_name == 'pull_request' }}
+        id: publish-package
         run: |
           export HUSKY=0
           echo ${VERDACCIO_TOKEN} >> ~/.npmrc
           SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-8)
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           BRANCH_NAME=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
-          TARGET_VERSION="${PACKAGE_VERSION}-${SHORT_SHA}-${BRANCH_NAME}"
-          npx lerna version "${TARGET_VERSION}" --no-push --no-git-tag-version --yes
+          PR_VERSION="${PACKAGE_VERSION}-${BRANCH_NAME}.${SHORT_SHA}"
+          run: echo "::set-output name=pr-version::$PR_VERSION"
+          npx lerna version "${PR_VERSION}" --no-push --no-git-tag-version --yes
           npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY
-          
-                
+
       - name: Publish for prerelease
         if:  ${{ github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
         run: |
@@ -371,99 +374,90 @@ jobs:
   #     GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
   #     VSCE_PAT: ${{ secrets.VSCE_PAT }} 
 
-  # pr-comment:
-  #   runs-on: ubuntu-latest
-  #   # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
-  #   if: ${{ always() &&
-  #           !(contains(needs.*.result, 'failure')) && 
-  #           github.event_name == 'pull_request' &&
-  #           !github.event.pull_request.head.repo.fork }}
-  #   needs: 
-  #     - build-binaries
-  #     - publish-npm-packages
-  #     - vscode-extension-workflow
-  #   steps:
-  #     - uses: actions/checkout@v3
+  pr-comment:
+    runs-on: ubuntu-latest
+    # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
+    if: ${{ always() &&
+            !(contains(needs.*.result, 'failure')) && 
+            github.event_name == 'pull_request' &&
+            !github.event.pull_request.head.repo.fork }}
+    needs: 
+      # - build-binaries
+      - publish-npm-packages
+      # - vscode-extension-workflow
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - name: create pr comment
-  #       uses: actions/github-script@v5
-  #       id: pr-comment
-  #       with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         script: |
-  #           const fs = require('fs');
-  #           const git_short_sha = "${{ github.sha }}".substring(0, 8)
-  #           const git_tag = "${{ github.ref }}".split('tags/')[1];
+      - name: Get packages with lerna
+        run: npx lerna ls >> ./packages
 
-  #           // Build the vscode-extension workflow comment
-  #           const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
+      - name: create pr comment
+        uses: actions/github-script@v5
+        id: pr-comment
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const git_short_sha = "${{ github.sha }}".substring(0, 8)
+            const git_tag = "${{ github.ref }}".split('tags/')[1];
+
+            // Build the vscode-extension workflow comment
+            const vsCodeWorkflowState = "${{ needs.vscode-extension-workflow.result }}"
             
-  #           let vsCodeCommentBody = ''
-  #           if (vsCodeWorkflowState.includes('success')) {
-  #             vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
-  #           } else {
-  #             vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
-  #           }
+            let vsCodeCommentBody = ''
+            if (vsCodeWorkflowState.includes('success')) {
+              vsCodeCommentBody = `<p><a href="${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}">${{ needs.vscode-extension-workflow.outputs.artifactFilename }}</a></p>`;
+            } else {
+              vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
+            }
 
-  #           function readInfo(filePath) {
-  #             try {
-  #               const data = fs.readFileSync(filePath)
-  #               const JSONdata = JSON.parse(data.toString())
-  #               const name = JSONdata.name.split("/")[1]
-  #               const version = JSONdata.version
-  #               return { name, version }
-  #             } catch (error) {
-  #               console.error(`Got an error trying to read the file: ${error.message}`)
-  #             }
-  #           }
+            const packages = fs.readFileSync('packages', 'utf-8');
 
-  #           let body = `
-  #             <table>
-  #               <tr>
-  #                 <th scope="row">Latest Commit</th>
-  #                 <td>${git_short_sha}</td>
-  #               </tr>
-  #               <tr>
-  #                 <th scope="row">Taq Binaries</th>
-  #                 <td>
-  #                     <p>
-  #                         <a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a><br>
-  #                         <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
-  #                         <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
-  #                     </p>
-  #                 </td>
-  #               </tr>
-  #               <tr>
-  #                 <th scope="row">VSCode Extension VSIX</th>
-  #                 <td>${vsCodeCommentBody}</td>
-  #               </tr>
-  #             </table>
-  #           `;
+            let packagesBody = ''
+
+            packages.split(/\r?\n/).forEach(package =>  {
+                packagesBody = packagesBody.concat(`npm i ${package}-${{ needs.publish-npm-packages.outputs.pr-version }}\n`);
+            });
+
+            let body = `
+              <table>
+                <tr>
+                  <th scope="row">Latest Commit</th>
+                  <td>${git_short_sha}</td>
+                </tr>
+                <tr>
+                  <th scope="row">npm Packages</th>
+                  <td>
+                      <p>${packagesBody}</p>
+                  </td>
+                </tr>
+              </table>
+            `;
 
 
-  #           const {data: comments} = await github.rest.issues.listComments({
-  #             owner: context.repo.owner,
-  #             repo: context.repo.repo,
-  #             issue_number: context.issue.number,
-  #           })
+            const {data: comments} = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            })
 
-  #           const botComment = comments.find(comment => comment.user.id === 41898282)                                                                       
+            const botComment = comments.find(comment => comment.user.id === 41898282)                                                                       
 
-  #           if (botComment) {
-  #             await github.rest.issues.updateComment({
-  #               owner: context.repo.owner,
-  #               repo: context.repo.repo,
-  #               comment_id: botComment.id,
-  #               body: body
-  #             })
-  #           } else {
-  #             await github.rest.issues.createComment({
-  #               owner: context.repo.owner,
-  #               repo: context.repo.repo,
-  #               issue_number: context.issue.number,
-  #               body: body
-  #             })
-  #           }
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              })
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              })
+            }
 
   # release:
   #   name: Release
