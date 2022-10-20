@@ -289,6 +289,16 @@ jobs:
         run: npm run test:e2e -w tests ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
         env:
           CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
+      
+      - name: upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: ${{ matrix.os }}-${{ matrix.chunk-ids }}-artifacts
+          path: |
+            ./tests/*
+            ./taqueria-plugin-jest/*
+          retention-days: 1
 
   report-e2e-status:
     needs: run-tests
