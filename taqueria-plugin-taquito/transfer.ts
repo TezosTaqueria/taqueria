@@ -123,7 +123,7 @@ const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow, parsedAr
 		});
 };
 
-export const transfer = async (parsedArgs: Opts): Promise<void> => {
+const transfer = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
 	try {
