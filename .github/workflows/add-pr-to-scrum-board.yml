@@ -6,14 +6,21 @@ on:
       - opened
       - ready_for_review
 
-jobs:
   add-pr-to-taqueria-dev-project:
-    name: Add issue to project
+    name: Add PR to project
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/add-to-project@v0.3.0
-        with:
-          project-url: https://github.com/orgs/ecadlabs/projects/9
-          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
-          column: 🚀  Current Sprint
-          name: Move PR's to current sprint
+    - name: New PR
+      if: ${{ !github.event.pull_request.ready_for_review }}
+      uses: konradpabjan/actions-add-new-issue-to-column@v1.1
+      with:
+        action-token: "${{ secrets.ADD_TO_PROJECT_PAT }}"
+        project-url: "https://github.com/orgs/ecadlabs/projects/9"
+        column-name: "🚀  Current Sprint"
+    - name: PR Ready for review
+      if: ${{ github.event.pull_request.ready_for_review }}
+      uses: konradpabjan/actions-add-new-issue-to-column@v1.1
+      with:
+        action-token: "${{ secrets.ADD_TO_PROJECT_PAT }}"
+        project-url: "https://github.com/orgs/ecadlabs/projects/9"
+        column-name: "👀 In review"
