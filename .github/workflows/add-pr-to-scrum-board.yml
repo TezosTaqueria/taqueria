@@ -1,11 +1,10 @@
-name: Add new PR's to the scrum board
-
+name: "Add new PR's to the scrum board"
 on:
   pull_request:
     types:
       - opened
       - ready_for_review
-
+jobs:
   add-pr-to-taqueria-dev-project:
     name: Add PR to project
     runs-on: ubuntu-latest
