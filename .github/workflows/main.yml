@@ -61,7 +61,7 @@ jobs:
         uses: actions/checkout@v3
          
       - uses: actions/setup-node@v3
-        with:
+        with: 
           cache: 'npm'
 
       - name: Setup Deno
@@ -319,10 +319,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with: 
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
-
-      - run: npm ci
+          cache: 'npm'
 
       - name: Cache node modules
         uses: actions/cache@v3
