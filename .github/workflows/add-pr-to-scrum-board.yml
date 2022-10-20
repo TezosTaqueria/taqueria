@@ -1,9 +1,8 @@
-name: Add new PR's to the scrum board
+name: Add Ready to Review PR's to the scrum board
 
 on:
   pull_request:
     types:
-      - opened
       - ready_for_review
 
 jobs:
