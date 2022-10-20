@@ -172,7 +172,9 @@ describe('Help testing for plugins installed from NPM,', () => {
 	});
 
 	test('Verify that the taq command returns the correct information', async () => {
-		const output = await exec('taq');
+		const output = await exec(`taq`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
 		expect(output.stdout).toBe(contents.helpContentsAllPlugin);
 	});
 
