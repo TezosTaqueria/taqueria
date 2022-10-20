@@ -1,11 +1,7 @@
 import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
 import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-
-interface Opts extends RequestArgs.t {
-	sourceFile: string;
-}
+import { CompileOpts as Opts, getInputFilename, LIGO_DOCKER_IMAGE } from './common';
 
 type TableRow = { contract: string; artifact: string };
 
@@ -34,9 +30,6 @@ const removeExt = (path: string): string => {
 	const extRegex = new RegExp(extractExt(path));
 	return path.replace(extRegex, '');
 };
-
-const getInputFilename = (parsedArgs: Opts, sourceFile: string): string =>
-	join(parsedArgs.config.contractsDir, sourceFile);
 
 const getOutputFilename = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
@@ -68,7 +61,7 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ligolang/ligo:stable compile contract`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${LIGO_DOCKER_IMAGE} compile contract`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputFilename(parsedArgs, sourceFile)}`;
 	const cmd = `${baseCmd} ${inputFile} ${outputFile}`;
@@ -80,7 +73,7 @@ const getCompileExprCmd = (parsedArgs: Opts, sourceFile: string, exprKind: ExprK
 	if (!projectDir) throw `No project directory provided`;
 	const compilerType = isStorageKind(exprKind) ? 'storage' : 'parameter';
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ligolang/ligo:stable compile ${compilerType}`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${LIGO_DOCKER_IMAGE} compile ${compilerType}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputExprFileName(parsedArgs, sourceFile, exprKind, exprName)}`;
 	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile}`;
@@ -224,7 +217,7 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 		}];
 	};
 
-export const compile = (parsedArgs: Opts): Promise<void> => {
+const compile = (parsedArgs: Opts): Promise<void> => {
 	const sourceFile = parsedArgs.sourceFile;
 	let p: Promise<TableRow[]>;
 	if (isStoragesFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'storage');

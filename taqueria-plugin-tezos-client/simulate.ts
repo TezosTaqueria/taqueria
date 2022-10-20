@@ -102,7 +102,7 @@ const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRo
 			};
 		});
 
-export const simulate = (parsedArgs: Opts): Promise<void> => {
+const simulate = (parsedArgs: Opts): Promise<void> => {
 	const sourceFile = parsedArgs.sourceFile;
 	return simulateContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
 		sendAsyncErr(err, false)
