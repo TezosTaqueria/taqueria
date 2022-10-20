@@ -6,6 +6,79 @@ title: Taqueria Releases
 
 | Details     |               |
 | ----------- | ------------- |
+|Release Date | Oct XX, 2022  |
+|Release Type | Minor         |
+|Release Page | [v0.22.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.22.0) |
+
+### Summary of Impactful Changes
+
+ADD_TO_THIS_LIST
+
+- Awesome new feature 1
+- Plugin improvement X
+
+#### ⚠️ Breaking Change
+
+Describe any breaking changes here!
+
+### New Features
+
+#### ADD_NEW_FEATURE_TITLE_HERE
+
+Describe new feature 1 here 
+
+#### ADD_NEW_FEATURE_TITLE_HERE
+
+Describe new feature 2 here
+
+### Other Product Changes
+
+ADD_TO_THIS_LIST:
+
+- The default `config.json` provided by `taq init` now uses the K protocol by default
+
+### Migrating from Legacy Versions
+
+You can update your existing projects to use Taqueria v0.22.0 plugins using the following command:
+
+```shell
+plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 1 taq uninstall && echo $plugins | xargs -n 1 taq install
+```
+
+### Pull Requests
+
+* 🚀 PR ➾ Release Taqueria v0.20.0 by @hu3man in https://github.com/ecadlabs/taqueria/pull/1290
+* 🏗️ PR ➾ Update package versions for 0.20.2 release by @hu3man in https://github.com/ecadlabs/taqueria/pull/1299
+* docs: Make plugin update instructions more prominent by @jevonearth in https://github.com/ecadlabs/taqueria/pull/1300
+* docs: sync web docs with README from taco-shop scaffold by @jevonearth in https://github.com/ecadlabs/taqueria/pull/1302
+* Docs: taco-shop minor edits and fix taq call example by @jevonearth in https://github.com/ecadlabs/taqueria/pull/1303
+* chore: unlist the quickstart scaffold as it is being retired by @jevonearth in https://github.com/ecadlabs/taqueria/pull/1304
+* refactor(ci): Workflows run for push to main by @GImbrailo in https://github.com/ecadlabs/taqueria/pull/1298
+* chore: remove docs husky hook by @GImbrailo in https://github.com/ecadlabs/taqueria/pull/1308
+* 🏗️ ➾ Add historical release notes to website by @hu3man in https://github.com/ecadlabs/taqueria/pull/1313
+* 🏗️ ➾ Improve templates by @hu3man in https://github.com/ecadlabs/taqueria/pull/1324
+* Update mechanism for funding accounts by @jchenche in https://github.com/ecadlabs/taqueria/pull/1295
+* updated test to now accept main as a taqueria build version by @alexzbusko in https://github.com/ecadlabs/taqueria/pull/1334
+* Houston improve templates by @hu3man in https://github.com/ecadlabs/taqueria/pull/1336
+* ✨ Feature ➾ Improve PR and Issue Templates by @hu3man in https://github.com/ecadlabs/taqueria/pull/1337
+* Vs code cli testing by @sinapsist in https://github.com/ecadlabs/taqueria/pull/1309
+* Install Taqueria from VS Code Extension by @MichalLytek in https://github.com/ecadlabs/taqueria/pull/1261
+* remove deprecated scaffolds by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1352
+* Add ghostnet as a pre-configured testnet by @jchenche in https://github.com/ecadlabs/taqueria/pull/1316
+* Revert "Add ghostnet as a pre-configured testnet" by @GImbrailo in https://github.com/ecadlabs/taqueria/pull/1363
+* 1209 docusaurus website changes by @alexzbusko in https://github.com/ecadlabs/taqueria/pull/1312
+* refactor(ci): publish workflows by @GImbrailo in https://github.com/ecadlabs/taqueria/pull/1310
+* fix(ci): added docker build before tests by @GImbrailo in https://github.com/ecadlabs/taqueria/pull/1385
+* 🛠️ Fix (#1375) ➾ Update Protocol Target for Typecheck and Simulate Tasks to Kathmandu by @jchenche in https://github.com/ecadlabs/taqueria/pull/1384
+* ✨ New feature => Add Ghostnet Configuration and `testing` Environment to Default `config.json`  by @hu3man in https://github.com/ecadlabs/taqueria/pull/1364
+* fix(ci): changed publish job to need build-and-cache-node-modules by @GImbrailo in https://github.com/ecadlabs/taqueria/pull/1388
+
+**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.20.2...v0.21.18
+
+## Taqueria v0.20.2  
+
+| Details     |               |
+| ----------- | ------------- |
 |Release Date | Sept 29, 2022 |
 |Release Type | Minor         |
 |Release Page | [v0.20.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.20.2) |
