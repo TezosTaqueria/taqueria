@@ -345,7 +345,7 @@ jobs:
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           BRANCH_NAME=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
           PR_VERSION="${PACKAGE_VERSION}-${BRANCH_NAME}.${SHORT_SHA}"
-          run: echo "::set-output name=pr-version::$PR_VERSION"
+          echo "::set-output name=pr-version::$PR_VERSION"
           npx lerna version "${PR_VERSION}" --no-push --no-git-tag-version --yes
           npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY
 
