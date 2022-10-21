@@ -210,7 +210,7 @@ export const MichelineEditor = (
 				</tbody>
 			</table>
 			{actionTitle
-				&& <button onClick={handleClick}>{actionTitle}</button>}
+				&& <button disabled={validationResult.state !== 'Valid'} onClick={handleClick}>{actionTitle}</button>}
 			<button onClick={toggleDiagnostics}>Toggle Diagnostics</button>
 		</div>
 	);
