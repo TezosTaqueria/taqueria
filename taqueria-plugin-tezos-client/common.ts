@@ -13,10 +13,8 @@ export interface SimulateOpts extends RequestArgs.ProxyRequestArgs {
 	entrypoint?: string;
 }
 
-// To be used for the main entrypoint of the plugin
 export type IntersectionOpts = TypeCheckOpts & SimulateOpts;
 
-// To be used for common functions in this file
 type UnionOpts = TypeCheckOpts | SimulateOpts;
 
 const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://ghostnet.ecadinfra.com';
