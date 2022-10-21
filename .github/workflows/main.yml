@@ -341,7 +341,7 @@ jobs:
         run: |
           export HUSKY=0
           echo ${VERDACCIO_TOKEN} >> ~/.npmrc
-          SHORT_SHA=$(echo ${GITHUB_SHA} | cut -c1-8)
+          SHORT_SHA=$(echo ${{ github.event.pull_request.head.sha }} | cut -c1-8)
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           BRANCH_NAME=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
           PR_VERSION="${PACKAGE_VERSION}-${BRANCH_NAME}.${SHORT_SHA}"
@@ -398,7 +398,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
-            const git_short_sha = "${{ github.sha }}".substring(0, 8)
+            const git_short_sha = "${{ github.event.pull_request.head.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
 
             // Build the vscode-extension workflow comment
@@ -413,10 +413,10 @@ jobs:
 
             const packages = fs.readFileSync('packages', 'utf-8');
 
-            let packagesBody = ''
+            let packagesBody = ""
 
             packages.split(/\r?\n/).forEach(package =>  {
-                packagesBody = packagesBody.concat(`npm i ${package}-${{ needs.publish-npm-packages.outputs.pr-version }}\n`);
+                packagesBody = packagesBody.concat(`npm i ${package}-${{ needs.publish-npm-packages.outputs.pr-version }} --registry https://npm.ecadinfra.com \n`);
             });
 
             let body = `
