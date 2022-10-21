@@ -1,0 +1,14 @@
+@taqueria/plugin-archetype
+@taqueria/plugin-contract-types
+@taqueria/plugin-flextesa
+@taqueria/plugin-ipfs-pinata
+@taqueria/plugin-jest
+@taqueria/plugin-ligo
+@taqueria/plugin-metadata
+@taqueria/plugin-smartpy
+@taqueria/plugin-taquito
+@taqueria/plugin-tezos-client
+@taqueria/protocol
+@taqueria/node-sdk
+@taqueria/state
+@taqueria/toolkit

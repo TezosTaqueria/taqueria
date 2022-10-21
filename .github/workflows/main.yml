@@ -419,7 +419,7 @@ jobs:
                 packagesBody = packagesBody.concat(`npm i ${package}-${{ needs.publish-npm-packages.outputs.pr-version }} --registry https://npm.ecadinfra.com \n`);
             });
 
-            let body = `
+            const body = `
               <table>
                 <tr>
                   <th scope="row">Latest Commit</th>
@@ -428,7 +428,9 @@ jobs:
                 <tr>
                   <th scope="row">npm Packages</th>
                   <td>
-                      <p>${packagesBody}</p>
+                      <p>
+                        ${packagesBody}
+                      </p>
                   </td>
                 </tr>
               </table>
