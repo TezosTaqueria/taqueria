@@ -92,16 +92,19 @@ const fund = async (parsedArgs: Opts): Promise<void> => {
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
 	try {
 		const tezos = await configureTezosToolKit(parsedArgs, env);
+
 		const instantiatedAccounts = getInstantiatedAccounts(parsedArgs, env);
 		if (!instantiatedAccounts || instantiatedAccounts.length === 0) {
 			return sendAsyncErr(`There are no instantiated accounts in the current environment, "${parsedArgs.env}".`);
 		}
+
 		const accountsInfos = await getAccountsInfos(parsedArgs, tezos, instantiatedAccounts);
 		if (accountsInfos.length === 0) {
 			return sendJsonRes(
 				`All instantiated accounts in the current environment, "${parsedArgs.env}", are funded up to or beyond the declared amount.`,
 			);
 		}
+
 		const opHash = await performTransferOps(tezos, accountsInfos, getCurrentEnvironment(parsedArgs));
 		return sendJsonRes(simplifyAccountInfos(accountsInfos, opHash));
 	} catch {
