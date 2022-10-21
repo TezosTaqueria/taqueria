@@ -416,10 +416,10 @@ jobs:
             let packagesBody = ""
 
             packages.split(/\r?\n/).forEach(package =>  {
-                packagesBody = packagesBody.concat(`npm i ${package}-${{ needs.publish-npm-packages.outputs.pr-version }} --registry https://npm.ecadinfra.com \n`);
+                packagesBody = packagesBody.concat(`npm i ${package}-${{ needs.publish-npm-packages.outputs.pr-version }} --registry https://npm.ecadinfra.com<br>`);
             });
 
-            const body = `
+            let body = `
               <table>
                 <tr>
                   <th scope="row">Latest Commit</th>
@@ -428,9 +428,7 @@ jobs:
                 <tr>
                   <th scope="row">npm Packages</th>
                   <td>
-                      <p>
-                        ${packagesBody}
-                      </p>
+                      <p>${packagesBody}</p>
                   </td>
                 </tr>
               </table>
