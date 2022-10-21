@@ -19,7 +19,7 @@ import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-import { getFirstAccountAlias, OriginateOpts as Opts } from './common';
+import { getFirstAccountAlias, OriginateOpts as Opts, TAQ_ROOT_ACCOUNT } from './common';
 
 interface ContractStorageMapping {
 	filename: string;
@@ -188,7 +188,7 @@ const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.
 					if (network.rpcUrl) {
 						const result = (async () => {
 							const tezos = new TezosToolkit(network.rpcUrl as string);
-							const key = await getAccountPrivateKey(parsedArgs, network, 'taqRootAccount');
+							const key = await getAccountPrivateKey(parsedArgs, network, TAQ_ROOT_ACCOUNT);
 							await importKey(tezos, key);
 							return await createBatch(parsedArgs, tezos, networkName);
 						})();

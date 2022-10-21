@@ -16,7 +16,7 @@ import { Environment } from '@taqueria/node-sdk/types';
 import { Expr, Parser } from '@taquito/michel-codec';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
-import { getFirstAccountAlias, TransferOpts as Opts } from './common';
+import { getFirstAccountAlias, TAQ_ROOT_ACCOUNT, TransferOpts as Opts } from './common';
 
 export type TableRow = {
 	contractAlias: string;
@@ -65,7 +65,7 @@ export const configureToolKitWithNetwork = async (parsedArgs: Opts, networkName:
 	}
 
 	const tezos = new TezosToolkit(network.rpcUrl as string);
-	const key = await getAccountPrivateKey(parsedArgs, network, 'taqRootAccount');
+	const key = await getAccountPrivateKey(parsedArgs, network, TAQ_ROOT_ACCOUNT);
 	await importKey(tezos, key);
 	return tezos;
 };

@@ -8,7 +8,7 @@ import {
 } from '@taqueria/node-sdk';
 import { Environment } from '@taqueria/node-sdk/types';
 import { TezosToolkit } from '@taquito/taquito';
-import { TransferOpts as Opts } from './common';
+import { TAQ_ROOT_ACCOUNT, TransferOpts as Opts } from './common';
 import { configureToolKitWithNetwork, performTransferOps, TableRow } from './transfer';
 
 const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<TezosToolkit> => {
@@ -26,7 +26,7 @@ const getInstantiatedAccounts = (parsedArgs: Opts, env: Environment.t): [string,
 	return instantiatedAccounts
 		? Object.entries(instantiatedAccounts).filter((instantiatedAccount: [string, any]) => {
 			const alias = instantiatedAccount[0];
-			return alias !== 'taqRootAccount';
+			return alias !== TAQ_ROOT_ACCOUNT;
 		})
 		: undefined;
 };

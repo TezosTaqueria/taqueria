@@ -20,6 +20,8 @@ export type IntersectionOpts = OriginateOpts & TransferOpts;
 // To be used for common functions in this file
 type UnionOpts = OriginateOpts | TransferOpts;
 
+export const TAQ_ROOT_ACCOUNT = 'taqRootAccount';
+
 export const getFirstAccountAlias = (sandboxName: string, opts: UnionOpts) => {
 	const aliases = getSandboxAccountNames(opts)(sandboxName);
 	return aliases.shift();
