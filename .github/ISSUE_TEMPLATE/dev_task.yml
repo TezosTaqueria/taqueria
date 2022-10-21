@@ -25,15 +25,15 @@ body:
       label: 🚥 Definition of Done
       options:
         - label: "🎯 Planning and Design"
-        - label: "🏎️ Dev Implementation (PR merged)"
-        - label: "✍️ Release Notes Added"
+        - label: "🏎️ Dev Implementation Complete"
+        - label: "♾️ PR Merged"
         - label: "🏆 Product Acceptance"
   - type: textarea
     id: to_do
     attributes:
       label: ✅ To Do
       description: A list of to do items (and drivers) for this ticket
-      placeholder: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
+      placeholder: "- [ ] 😎  Make Taqueria awesome (@person1) \n- [ ] 🌮  Eat tacos (@person2)"
     validations:
       required: false
   - type: textarea
@@ -59,7 +59,7 @@ body:
     id: estimate
     attributes:
       label: 🦄 Sizing
-      description: Estimate the time and effort required in days of effort using Fibonacci numbers (1,)
+      description: Estimate the time and effort required in days of effort using Fibonacci sequence numbers (1,)
       placeholder: "0"
   - type: checkboxes
     id: terms
