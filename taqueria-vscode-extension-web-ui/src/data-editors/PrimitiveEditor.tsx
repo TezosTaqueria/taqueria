@@ -1,4 +1,6 @@
 import React from 'react';
+import { MichelineValue as ValidationMichelineValue, TypePrim, validate } from './MichelineValidator';
+import { ValidationResultDisplay } from './ValidationResultDisplay';
 
 export const PrimitiveEditor = (
 	{ dataType, value, onChange }: {
@@ -19,7 +21,13 @@ export const PrimitiveEditor = (
 			[fieldName]: '',
 		};
 	}
-	return <input type='text' value={value[fieldName]} onChange={e => changeValue(e.target.value)} />;
+	const validationResult = validate({ prim: dataType as TypePrim }, value as ValidationMichelineValue);
+	return (
+		<div>
+			<input type='text' value={value[fieldName]} onChange={e => changeValue(e.target.value)} />
+			<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={false} />
+		</div>
+	);
 
 	function getFieldName() {
 		switch (dataType) {

@@ -13,7 +13,10 @@ export const PairEditor = (
 		newValue.args[index] = v;
 		onChange(newValue);
 	};
-	if (value === undefined || value === null || typeof value !== 'object') {
+	if (
+		value === undefined || value === null || typeof value !== 'object' || value.prim !== 'Pair' || !value.args
+		|| !Array.isArray(value.args)
+	) {
 		value = {
 			'prim': 'Pair',
 			'args': [],

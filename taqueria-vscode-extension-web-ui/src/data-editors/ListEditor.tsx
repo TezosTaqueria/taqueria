@@ -1,6 +1,7 @@
 import React from 'react';
 import { DataEditorNode } from './DataEditorNode';
-import { getFriendlyDataType } from './MichelineEditor';
+import { compare, validate } from './MichelineValidator';
+import { ValidationResultDisplay } from './ValidationResultDisplay';
 
 export const ListEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any[]; onChange: (value: any) => void },
@@ -37,6 +38,12 @@ export const ListEditor = (
 		newValue.splice(index, 1);
 		onChange(newValue);
 	};
+	const sort = () => {
+		const newValue = value.slice();
+		(newValue as any[]).sort((a, b) => -compare(dataType.args[0], a, b));
+		onChange(newValue);
+	};
+	const validationResult = validate(dataType, value);
 	return (
 		<div className='editorDiv'>
 			<table>
@@ -44,8 +51,6 @@ export const ListEditor = (
 					<tbody key={index}>
 						<tr>
 							<td className='valueTitle'>{index}:</td>
-							<td className='buttonContainer'>
-							</td>
 							<td>
 								<DataEditorNode
 									hideDataType={true}
@@ -64,8 +69,16 @@ export const ListEditor = (
 						</tr>
 					</tbody>,
 				])}
+				<tr>
+					<td>
+						<button onClick={() => changeValue(value.length, {})}>➕</button>
+						{dataType.prim === 'set' && <button onClick={() => sort()}>Sort</button>}
+					</td>
+					<td>
+						<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={true} />
+					</td>
+				</tr>
 			</table>
-			<button onClick={() => changeValue(value.length, null)}>➕</button>
 		</div>
 	);
 };

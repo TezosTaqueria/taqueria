@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { MichelineEditorMessageHandler } from '../interopTypes';
 import { DataEditorNode } from './DataEditorNode';
 import './MichelineEditor.css';
+import { MichelineValue as ValidationMichelineValue, validate } from './MichelineValidator';
+import { ValidationResultDisplay } from './ValidationResultDisplay';
 
 const parser = new Parser();
 
@@ -149,6 +151,7 @@ export const MichelineEditor = (
 		});
 	};
 
+	const validationResult = validate(dataType, getJson(currentState.value) as ValidationMichelineValue);
 	return (
 		<div className={currentState.showDiagnostics ? 'editorDiv showDiag' : 'editorDiv'}>
 			<table border={currentState.showDiagnostics ? 1 : 0}>
@@ -162,31 +165,47 @@ export const MichelineEditor = (
 							/>
 						</td>
 					</tr>
+					<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={false} />
 					{currentState.showDiagnostics
 						&& (
-							<tr>
-								<td>
-									<h3>Type</h3>
-									<div style={{ whiteSpace: 'pre-wrap' }}>
-										{JSON.stringify(dataType, null, 2)}
-									</div>
-								</td>
-								<td>
-									<h3>Json</h3>
-									<div style={{ whiteSpace: 'pre-wrap' }}>
-										{JSON.stringify(currentState.value?.value, null, 2)}
-									</div>
-								</td>
-								<td>
-									<h3>Micheline</h3>
-									<div style={{ whiteSpace: 'pre-wrap' }}>
-										<textarea
-											value={getMicheline(currentState.value)}
-											onChange={e => handleChange({ value: e.target.value, originalFormat: 'micheline' })}
-										/>
-									</div>
-								</td>
-							</tr>
+							<tbody>
+								<tr>
+									<td>
+										<h3>Type</h3>
+										<div style={{ whiteSpace: 'pre-wrap' }}>
+											{JSON.stringify(dataType, null, 2)}
+										</div>
+									</td>
+									<td>
+										<h3>Json</h3>
+										<div style={{ whiteSpace: 'pre-wrap' }}>
+											{JSON.stringify(currentState.value?.value, null, 2)}
+										</div>
+									</td>
+									<td>
+										<h3>Micheline</h3>
+										<div style={{ whiteSpace: 'pre-wrap' }}>
+											<textarea
+												value={getMicheline(currentState.value)}
+												onChange={e => handleChange({ value: e.target.value, originalFormat: 'micheline' })}
+											/>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<span
+										style={{
+											'color': validationResult.state === 'Valid'
+												? 'green'
+												: validationResult.state === 'ImmediateError'
+												? 'red'
+												: 'orange',
+										}}
+									>
+										{JSON.stringify(validationResult, null, 2)}
+									</span>
+								</tr>
+							</tbody>
 						)}
 				</tbody>
 			</table>

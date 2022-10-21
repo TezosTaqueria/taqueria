@@ -1,6 +1,8 @@
 import React from 'react';
 import { DataEditorNode } from './DataEditorNode';
 import { getFriendlyDataType } from './MichelineEditor';
+import { compare, validate } from './MichelineValidator';
+import { ValidationResultDisplay } from './ValidationResultDisplay';
 
 export const MapEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
@@ -25,6 +27,12 @@ export const MapEditor = (
 		newValue.splice(index, 1);
 		onChange(newValue);
 	};
+	const sort = () => {
+		const newValue = value.slice();
+		(newValue as any[]).sort((a, b) => -compare(dataType.args[0], a.args[0], b.args[0]));
+		onChange(newValue);
+	};
+	const validationResult = validate(dataType, value);
 	return (
 		<div className='editorDiv'>
 			<table>
@@ -59,8 +67,16 @@ export const MapEditor = (
 						</tr>
 					</tbody>
 				))}
+				<tr>
+					<td>
+						<button onClick={() => changeValue(value.length, null, null)}>+</button>
+						<button onClick={() => sort()}>Sort</button>
+					</td>
+					<td>
+						<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={true} />
+					</td>
+				</tr>
 			</table>
-			<button onClick={() => changeValue(value.length, null, null)}>+</button>
 		</div>
 	);
 };

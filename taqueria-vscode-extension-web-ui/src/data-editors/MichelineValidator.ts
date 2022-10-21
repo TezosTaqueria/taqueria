@@ -7,7 +7,7 @@ type ValidationSuccess = {
 type ValidationFailure = {
 	state: 'ImmediateError' | 'DeferredError';
 	messages: string[];
-	errorShouldBeShownAtThisLevel?: boolean | undefined;
+	hideErrorAtThisLevel?: boolean | undefined;
 	innerErrors?: ValidationFailure[];
 };
 
@@ -118,15 +118,16 @@ export const validate = (
 		case 'list':
 			return validateList(dataType, value);
 		case 'set':
-		case 'option':
 			const listResult = validateList(dataType, value);
 			if (listResult.state !== 'Valid') {
 				return listResult;
 			}
 			return itemsAreSortedAndUnique(dataType, value);
+		case 'option':
+			return validateOption(dataType, value);
 		case 'unit':
 		case 'string':
-			return { state: 'Valid' };
+			return validState;
 		case 'int':
 			return isValidNumber(dataType, value);
 		case 'nat':
@@ -149,7 +150,7 @@ export const validate = (
 		case 'chest':
 		case 'chest_key':
 		case 'tx_rollup_l2_address':
-			return { state: 'Valid' };
+			return validState;
 		case 'bool':
 			return validateBool(dataType, value);
 		case 'pair':
@@ -160,12 +161,30 @@ export const validate = (
 	}
 };
 
+const validateOption = (dataType: MichelineDataType, value?: MichelineValue | undefined): MichelineValidationResult => {
+	if (!isValueObject(value, 'prim')) {
+		return {
+			state: 'ImmediateError' as const,
+			messages: [`Wrong value shape for ${dataType.prim}`],
+		};
+	}
+	if (value.prim === 'None') {
+		return validState;
+	}
+	if (value.prim === 'Some') {
+		return validate(dataType.args![0], value.args![0]);
+	}
+	return {
+		state: 'ImmediateError' as const,
+		messages: [`Wrong prim ${value.prim} for ${dataType.prim}`],
+	};
+};
+
 const validateBool = (dataType: MichelineDataType, value?: MichelineValue | undefined): MichelineValidationResult => {
 	if (!isValueObject(value, 'prim')) {
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`Wrong value shape for ${dataType.prim}`],
-			errorShouldBeShownAtThisLevel: true,
 		};
 	}
 	return value.prim === 'True' || value.prim === 'False'
@@ -178,7 +197,6 @@ const validateList = (dataType: MichelineDataType, value?: MichelineValue | unde
 		return {
 			state: 'ImmediateError',
 			messages: [`Wrong value shape for ${dataType.prim}`],
-			errorShouldBeShownAtThisLevel: true,
 		};
 	}
 	const itemErrors = value.map(v => validate(dataType.args![0], v))
@@ -198,7 +216,7 @@ const aggregateChildErrors = (
 	return {
 		state: firstImmediateErrorIndex === -1 ? 'DeferredError' : 'ImmediateError',
 		messages: ['Validation Errors in items'],
-		errorShouldBeShownAtThisLevel: false,
+		hideErrorAtThisLevel: true,
 		innerErrors: itemErrors,
 	};
 };
@@ -211,7 +229,6 @@ const itemsAreSortedAndUnique = (
 		return {
 			state: 'ImmediateError',
 			messages: [`Wrong value shape for ${dataType.prim}`],
-			errorShouldBeShownAtThisLevel: true,
 		};
 	}
 	if (value.length <= 1) {
@@ -222,7 +239,6 @@ const itemsAreSortedAndUnique = (
 			return {
 				state: 'DeferredError',
 				messages: [`Items in a ${dataType.prim} should be sorted and unique`],
-				errorShouldBeShownAtThisLevel: true,
 			};
 		}
 	}
@@ -234,7 +250,6 @@ const isValidNumber = (dataType: MichelineDataType, value?: MichelineValue | und
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`Wrong value shape for ${dataType.prim}`],
-			errorShouldBeShownAtThisLevel: true,
 		};
 	}
 	if (!value.int || !value.int.length) {
@@ -243,8 +258,8 @@ const isValidNumber = (dataType: MichelineDataType, value?: MichelineValue | und
 			messages: [`No value is entered for the ${dataType.prim} field`],
 		};
 	}
-	const regex = dataType.prim === 'int' ? /^\d+$/ : /-?^\d+$/;
-	if (regex!.test(value.int)) {
+	const regex = dataType.prim === 'nat' ? /^\d+$/ : /^-?\d+$/;
+	if (!regex.test(value.int)) {
 		return {
 			state: 'ImmediateError',
 			messages: [`Invalid value ${value.int} for ${dataType.prim}`],
@@ -258,7 +273,6 @@ const isValidPair = (dataType: MichelineDataType, value?: MichelineValue | undef
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`Wrong value shape for ${dataType.prim}`],
-			errorShouldBeShownAtThisLevel: true,
 		};
 	}
 	const itemErrors = dataType.args!.map((type, index) => validate(type, value.args?.[index]))
@@ -271,18 +285,14 @@ const isValidMap = (dataType: MichelineDataType, value?: MichelineValue | undefi
 		return {
 			state: 'ImmediateError',
 			messages: [`Wrong value shape for ${dataType.prim}`],
-			errorShouldBeShownAtThisLevel: true,
 		};
 	}
 	let itemErrors: ValidationFailure[] = [];
-	let previousItem: any = undefined;
-	let hasUniquaAndSortError = false;
 	for (const item of value) {
 		if (!isValueObject(item, 'prim') || !item.args || item.args.length != 2) {
 			itemErrors.push({
 				state: 'ImmediateError',
 				messages: [`Value item does not have a good shape for an item of ${getFriendlyDataType(dataType)}`],
-				errorShouldBeShownAtThisLevel: true,
 			});
 			continue;
 		}
@@ -295,32 +305,30 @@ const isValidMap = (dataType: MichelineDataType, value?: MichelineValue | undefi
 		if (valueResult.state !== 'Valid') {
 			itemErrors.push(valueResult);
 		}
+	}
+	if (itemErrors.length) {
+		return aggregateChildErrors(dataType, value, itemErrors);
+	}
 
-		if (keyResult.state !== 'Valid' || valueResult.state !== 'Valid') {
-			continue;
-		}
-
-		if (previousItem && !hasUniquaAndSortError) {
-			const keyComparison = compare(dataType.args![0], previousItem.args[0], item.args[0]);
+	let previousItem: any = undefined;
+	for (const item of value) {
+		if (previousItem) {
+			const keyComparison = compare(dataType.args![0], previousItem.args[0], (item as any).args[0]);
 			if (keyComparison < 0) {
-				itemErrors.push({
+				return {
 					state: 'DeferredError',
 					messages: ['Map keys are not sorted properly'],
-					errorShouldBeShownAtThisLevel: true,
-				});
-				hasUniquaAndSortError = true;
+				};
 			} else if (keyComparison === 0) {
-				itemErrors.push({
+				return {
 					state: 'DeferredError',
 					messages: ['Map keys are not unique'],
-					errorShouldBeShownAtThisLevel: true,
-				});
-				hasUniquaAndSortError = true;
+				};
 			}
 		}
 		previousItem = item;
 	}
-	return aggregateChildErrors(dataType, value, itemErrors);
+	return validState;
 };
 
 const isValidBytes = (dataType: MichelineDataType, value?: MichelineValue | undefined): MichelineValidationResult => {
@@ -328,35 +336,31 @@ const isValidBytes = (dataType: MichelineDataType, value?: MichelineValue | unde
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`Wrong value shape for ${dataType.prim}`],
-			errorShouldBeShownAtThisLevel: true,
 		};
 	}
 	if (!value.bytes || !value.bytes.length) {
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`Bytes value should is empty`],
-			errorShouldBeShownAtThisLevel: true,
 		};
 	}
 	if (!/^[0-9a-fA-F]+$/.test(value.bytes!)) {
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`A bytes value should only have 0-9, a-z and/or A-Z characters`],
-			errorShouldBeShownAtThisLevel: true,
 		};
 	}
 	if (value.bytes?.length % 2 !== 0) {
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`A bytes value should have an even number of hexadecimal characters`],
-			errorShouldBeShownAtThisLevel: true,
 		};
 	}
 	return validState;
 };
 
 // returns 1 if value2 is greater than value1, 0 if they are equal, and -1 if value2 is less than value1
-const compare = (dataType: MichelineDataType, value1: MichelineValue, value2: MichelineValue): number => {
+export const compare = (dataType: MichelineDataType, value1: MichelineValue, value2: MichelineValue): number => {
 	'strung'.localeCompare;
 	switch (dataType.prim) {
 		case 'unit':
