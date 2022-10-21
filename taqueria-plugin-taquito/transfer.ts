@@ -104,8 +104,8 @@ const createBatchForTransfer = (tezos: TezosToolkit, contractInfos: TableRow[]):
 			},
 		}), tezos.wallet.batch());
 
-export const performTransferOps = (tezos: TezosToolkit, contractInfos: TableRow[], env: string): Promise<string> => {
-	return createBatchForTransfer(tezos, contractInfos).send()
+export const performTransferOps = (tezos: TezosToolkit, contractInfos: TableRow[], env: string): Promise<string> =>
+	createBatchForTransfer(tezos, contractInfos).send()
 		.then(op => op.confirmation().then(() => op.opHash))
 		.catch(err => {
 			if (err instanceof Error) {
@@ -121,7 +121,6 @@ export const performTransferOps = (tezos: TezosToolkit, contractInfos: TableRow[
 			}
 			return sendAsyncErr(`Error during transfer operation:\n${err} ${JSON.stringify(err, null, 2)}`);
 		});
-};
 
 const transfer = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
@@ -129,7 +128,7 @@ const transfer = async (parsedArgs: Opts): Promise<void> => {
 	try {
 		const tezos = await configureTezosToolKit(parsedArgs, env);
 		const contractInfo = await getContractInfo(parsedArgs, env, tezos);
-		await performTransferOps(tezos, [contractInfo], getCurrentEnvironment(parsedArgs));
+		const opHash = await performTransferOps(tezos, [contractInfo], getCurrentEnvironment(parsedArgs));
 		return sendJsonRes([contractInfo]);
 	} catch {
 		return sendAsyncErr('No operations performed.');

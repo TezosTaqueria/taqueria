@@ -31,39 +31,50 @@ const getInstantiatedAccounts = (parsedArgs: Opts, env: Environment.t): [string,
 		: undefined;
 };
 
-const getAccountsInfos = (parsedArgs: Opts, instantiatedAccounts: [string, any][]): TableRow[] => {
+const getAccountsInfos = async (
+	parsedArgs: Opts,
+	tezos: TezosToolkit,
+	instantiatedAccounts: [string, any][],
+): Promise<TableRow[]> => {
 	const declaredAccounts = Object.entries(parsedArgs.config.accounts).reduce(
 		(acc, declaredAccount) => {
 			const name = declaredAccount[0];
 			const tez = declaredAccount[1];
 			return {
 				...acc,
-				[name]: typeof tez === 'number' ? tez.toString() : tez,
+				[name]: typeof tez === 'string' ? parseFloat(tez) : tez,
 			};
 		},
 		{} as any,
 	);
 
-	return instantiatedAccounts
-		.map((instantiatedAccount: [string, any]) => {
+	return Promise.all(instantiatedAccounts
+		.map(async (instantiatedAccount: [string, any]) => {
 			const alias = instantiatedAccount[0];
 			const aliasInfos = instantiatedAccount[1];
-			const declaredTez = declaredAccounts[alias] as string;
+
+			const declaredTez: number | undefined = declaredAccounts[alias];
+			const currentBalanceInMutez = await tezos.tz.getBalance(aliasInfos.publicKeyHash);
+			const currentBalanceInTez = currentBalanceInMutez.toNumber() / 1000000;
+			const amountToFill = declaredTez ? Math.max(declaredTez - currentBalanceInTez, 0) : 0;
+
 			if (!declaredTez) {
 				sendWarn(
-					`Warning: ${alias} is instantiated in the target environment but not declared in the root level "accounts" field of ./.taq/config.json so ${alias} will not be funded as we don't have a declared tez amount set there for ${alias}`,
+					`Warning: ${alias} is instantiated in the target environment but not declared in the root level "accounts" field of ./.taq/config.json so ${alias} will not be funded as we don't have a declared tez amount set there for ${alias}\n`,
 				);
 			}
+
 			return {
 				contractAlias: alias,
 				contractAddress: aliasInfos.publicKeyHash,
-				tezTransfer: declaredTez ?? '0',
+				tezTransfer: amountToFill.toString(),
 				parameter: 'Unit',
 				entrypoint: 'default',
 				destination: '',
 			};
-		})
-		.filter(accountInfo => accountInfo.tezTransfer !== '0');
+		}))
+		.then(accountInfo => accountInfo.filter(accountInfo => accountInfo.tezTransfer !== '0'))
+		.catch(err => sendAsyncErr(`Something went wrong while extracting account information - ${err}`));
 };
 
 const simplifyAccountInfos = (accountInfos: TableRow[], opHash: string) =>
@@ -71,7 +82,7 @@ const simplifyAccountInfos = (accountInfos: TableRow[], opHash: string) =>
 		return {
 			accountAlias: accountInfo.contractAlias,
 			accountAddress: accountInfo.contractAddress,
-			tezFunded: accountInfo.tezTransfer,
+			tezTransfer: accountInfo.tezTransfer,
 			operationHash: opHash,
 		};
 	});
@@ -82,10 +93,15 @@ const fund = async (parsedArgs: Opts): Promise<void> => {
 	try {
 		const tezos = await configureTezosToolKit(parsedArgs, env);
 		const instantiatedAccounts = getInstantiatedAccounts(parsedArgs, env);
-		if (!instantiatedAccounts) {
-			return sendAsyncErr(`There are no instantiated accounts in the "${parsedArgs.env}" environment`);
+		if (!instantiatedAccounts || instantiatedAccounts.length === 0) {
+			return sendAsyncErr(`There are no instantiated accounts in the current environment, "${parsedArgs.env}".`);
 		}
-		const accountsInfos = getAccountsInfos(parsedArgs, instantiatedAccounts);
+		const accountsInfos = await getAccountsInfos(parsedArgs, tezos, instantiatedAccounts);
+		if (accountsInfos.length === 0) {
+			return sendJsonRes(
+				`All instantiated accounts in the current environment, "${parsedArgs.env}", are funded up to or beyond the declared amount.`,
+			);
+		}
 		const opHash = await performTransferOps(tezos, accountsInfos, getCurrentEnvironment(parsedArgs));
 		return sendJsonRes(simplifyAccountInfos(accountsInfos, opHash));
 	} catch {

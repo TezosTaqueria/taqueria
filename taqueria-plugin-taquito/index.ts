@@ -58,7 +58,7 @@ Plugin.create(_i18n => ({
 		Task.create({
 			task: 'fund',
 			command: 'fund',
-			description: 'Fund all the instantiated accounts with the desired amount in the target environment',
+			description: 'Fund all the instantiated accounts up to the desired/declared amount in a target environment',
 			handler: 'proxy',
 			encoding: 'application/json',
 		}),
