@@ -15,10 +15,10 @@ import {
 import { Environment } from '@taqueria/node-sdk/types';
 import { Expr, Parser } from '@taquito/michel-codec';
 import { importKey, InMemorySigner } from '@taquito/signer';
-import { TezosToolkit } from '@taquito/taquito';
+import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { getFirstAccountAlias, TransferOpts as Opts } from './common';
 
-type TableRow = {
+export type TableRow = {
 	contractAlias: string;
 	contractAddress: string;
 	tezTransfer: string;
@@ -56,7 +56,7 @@ const configureToolKitWithSandbox = async (parsedArgs: Opts, sandboxName: string
 	return tezos;
 };
 
-const configureToolKitWithNetwork = async (parsedArgs: Opts, networkName: string): Promise<TezosToolkit> => {
+export const configureToolKitWithNetwork = async (parsedArgs: Opts, networkName: string): Promise<TezosToolkit> => {
 	const network = getNetworkConfig(parsedArgs)(networkName);
 	if (!network) {
 		return sendAsyncErr(
@@ -93,17 +93,19 @@ const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: Tezo
 	};
 };
 
-const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow, parsedArgs: Opts): Promise<string> => {
-	return tezos.wallet
-		.transfer({
+const createBatchForTransfer = (tezos: TezosToolkit, contractInfos: TableRow[]): WalletOperationBatch =>
+	contractInfos.reduce((acc, contractInfo) =>
+		acc.withTransfer({
 			to: contractInfo.contractAddress,
 			amount: parseFloat(contractInfo.tezTransfer),
 			parameter: {
 				entrypoint: contractInfo.entrypoint,
 				value: new Parser().parseMichelineExpression(contractInfo.parameter) as Expr,
 			},
-		})
-		.send()
+		}), tezos.wallet.batch());
+
+export const performTransferOps = (tezos: TezosToolkit, contractInfos: TableRow[], env: string): Promise<string> => {
+	return createBatchForTransfer(tezos, contractInfos).send()
 		.then(op => op.confirmation().then(() => op.opHash))
 		.catch(err => {
 			if (err instanceof Error) {
@@ -112,9 +114,7 @@ const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow, parsedAr
 					const publicKeyHash = result ? result[0] : undefined;
 					if (publicKeyHash) {
 						return sendAsyncErr(
-							`The account ${publicKeyHash} for the target environment, "${
-								getCurrentEnvironment(parsedArgs)
-							}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+							`The account ${publicKeyHash} for the target environment, "${env}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
 						);
 					}
 				}
@@ -129,7 +129,7 @@ const transfer = async (parsedArgs: Opts): Promise<void> => {
 	try {
 		const tezos = await configureTezosToolKit(parsedArgs, env);
 		const contractInfo = await getContractInfo(parsedArgs, env, tezos);
-		await performTransferOp(tezos, contractInfo, parsedArgs);
+		await performTransferOps(tezos, [contractInfo], getCurrentEnvironment(parsedArgs));
 		return sendJsonRes([contractInfo]);
 	} catch {
 		return sendAsyncErr('No operations performed.');

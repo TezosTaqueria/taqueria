@@ -55,6 +55,13 @@ Plugin.create(_i18n => ({
 			handler: 'proxy',
 			encoding: 'application/json',
 		}),
+		Task.create({
+			task: 'fund',
+			command: 'fund',
+			description: 'Fund all the instantiated accounts with the desired amount in the target environment',
+			handler: 'proxy',
+			encoding: 'application/json',
+		}),
 	],
 	proxy: taquito,
 }), process.argv);
