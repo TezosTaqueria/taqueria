@@ -10,7 +10,7 @@ body:
       value: |
           # ◢▅◣◥▅◤◢▅◣🏔️🌋⛰️ Epic|Feature ⛰️🌋🏔️◢▅◣◥▅◤◢▅◣
 
-          ## 🛑 Sanity Check: Does this really need it's own ticket?
+          ## 🛑 Sanity Check: Does this really need its own ticket?
  
   - type: input
     id: pb_link
@@ -33,8 +33,8 @@ body:
     id: to_do
     attributes:
       label: ✅ To Do
-      description: A list of to do items for this ticket
-      placeholder: "- [ ] 😎  Make Taqueria awesome \n- [ ] 🌮  Eat tacos "
+      description: A list of to-do items for this ticket with drivers
+      placeholder: "- [ ] 😎  Make Taqueria awesome (@person1) \n- [ ] 🌮  Eat tacos (@person2)"
     validations:
       required: false
   - type: textarea
@@ -54,12 +54,6 @@ body:
     validations:
       required: false
   - type: textarea
-    id: scope
-    attributes:
-      label: 🔭 Scope
-      description: "Explicitly, what is in and out of scope for this ticket"
-      value: "🏎️ In Scope: \n- ... \n \n 🙅‍♂️ Out of Scope: \n- ... \n \n "
-  - type: textarea
     id: ac
     attributes:
       label: ⚖️ Acceptance Criteria
@@ -67,6 +61,12 @@ body:
       value: "✨ Features: \n- [ ] ... \n \n 📚 Docs: \n- [ ] ... \n"
     validations:
       required: false
+  - type: textarea
+    id: scope
+    attributes:
+      label: 🔭 Scope
+      description: "Explicitly, what is in and out of scope for this ticket"
+      value: "🏎️ In Scope: \n- ... \n \n 🙅‍♂️ Out of Scope: \n- ... \n \n "
   - type: textarea
     id: related_issues
     attributes:
@@ -79,7 +79,7 @@ body:
     id: estimate
     attributes:
       label: 🦄 Sizing
-      description: Estimate the time and effort required
+      description: Estimate the time and effort required in days (Fibonacci sequence)
       placeholder: "0"
   - type: checkboxes
     id: terms
@@ -89,3 +89,4 @@ body:
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true
+

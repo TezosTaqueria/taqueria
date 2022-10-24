@@ -3,7 +3,7 @@ import { IntersectionOpts as Opts } from './common';
 import simulate from './simulate';
 import typecheck from './typecheck';
 
-export const client = (parsedArgs: Opts): Promise<void> => {
+const client = (parsedArgs: Opts): Promise<void> => {
 	switch (parsedArgs.task) {
 		case 'typecheck':
 			return typecheck(parsedArgs);
