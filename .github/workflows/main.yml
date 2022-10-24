@@ -14,10 +14,6 @@ on:
   release:
     types: [published]
 
-env:
-  SCOPE: '@taqueria'
-  NPM_REGISTRY: 'https://registry.npmjs.org/'
-
 concurrency:
   group: ${{ github.ref_name || github.ref }}
   cancel-in-progress: true
@@ -66,8 +62,6 @@ jobs:
          
       - uses: actions/setup-node@v3
         with: 
-          registry-url: ${{ env.NPM_REGISTRY }}
-          scope: "${{ env.SCOPE }}"
           cache: 'npm'
 
       - name: Setup Deno
