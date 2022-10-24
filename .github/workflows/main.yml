@@ -360,7 +360,6 @@ jobs:
 
   vscode-extension-workflow:
     needs: 
-      - detect-changes
       - publish-npm-packages
 
     if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
