@@ -318,7 +318,7 @@ jobs:
       packages: write
       contents: read
     env: 
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
