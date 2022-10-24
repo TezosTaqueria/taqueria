@@ -157,22 +157,27 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 describe('Help testing for plugins installed from NPM,', () => {
 	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPathNPM, [
-			'ligo',
-			'archetype',
-			'contract-types',
-			'flextesa',
-			'ipfs-pinata',
-			'jest',
-			'metadata',
-			'smartpy',
-			'taquito',
-			'tezos-client',
-		], false);
+		await generateTestProject(
+			taqueriaProjectPathNPM,
+			[
+				'ligo',
+				'archetype',
+				'contract-types',
+				'flextesa',
+				'ipfs-pinata',
+				'jest',
+				'metadata',
+				'smartpy',
+				'taquito',
+				'tezos-client',
+			],
+			false,
+			true,
+		);
 	});
 
-	test('Verify that the taq command returns the correct information', async () => {
-		const output = await exec(`taq`, {
+	test.only('Verify that the taq command returns the correct information', async () => {
+		const output = await exec(`taq --help`, {
 			cwd: `./${taqueriaProjectPathNPM}`,
 		});
 		expect(output.stdout).toBe(contents.helpContentsAllPlugin);

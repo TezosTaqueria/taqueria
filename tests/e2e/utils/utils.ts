@@ -12,6 +12,7 @@ export const generateTestProject = async (
 	projectPath: string,
 	packageNames: string[] = [],
 	localPackages: boolean = true,
+	next: boolean = false,
 ) => {
 	const targetDir = path.join('/tmp', projectPath);
 
@@ -34,7 +35,7 @@ export const generateTestProject = async (
 
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
 
-	await installDependencies(projectPath, packageNames, localPackages);
+	await installDependencies(projectPath, packageNames, localPackages, next);
 };
 
 export async function getContainerName(dockerName: string): Promise<string> {
@@ -92,6 +93,7 @@ export async function installDependencies(
 	projectPath: string,
 	packageNames: string[],
 	localPackages: boolean = true,
+	next: boolean = false,
 ) {
 	if (packageNames.length > 0) {
 		for (const packageName of packageNames) {
@@ -101,6 +103,8 @@ export async function installDependencies(
 						cwd: `./${projectPath}`,
 						encoding: 'utf8',
 					});
+				} else if (next) {
+					execSync(`taq install @taqueria/plugin-${packageName}@next`, { cwd: `./${projectPath}` });
 				} else {
 					execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
 				}
