@@ -313,6 +313,8 @@ jobs:
       contents: read
     env: 
       NODE_AUTH_TOKEN: ${{ secrets.NPMJS_PAT }}
+      SCOPE: '@taqueria'
+      NPM_REGISTRY: https://registry.npmjs.org/
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
