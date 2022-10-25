@@ -1,34 +1,29 @@
 import {
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
-	getNetworkConfig,
 	sendAsyncErr,
 	sendJsonRes,
 	sendWarn,
 } from '@taqueria/node-sdk';
 import { Environment } from '@taqueria/node-sdk/types';
 import { TezosToolkit } from '@taquito/taquito';
-import { configureToolKitWithNetwork, FundOpts as Opts, getDeclaredAccounts, TAQ_ROOT_ACCOUNT } from './common';
+import {
+	configureToolKitWithNetwork,
+	FundOpts as Opts,
+	getDeclaredAccounts,
+	getInstantiatedAccounts,
+	getNetworkWithChecks,
+} from './common';
 import { performTransferOps, TableRow } from './transfer';
 
 const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<TezosToolkit> => {
 	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
 	if (env.sandboxes?.length === 1 && env.networks?.length === 1) return sendAsyncErr(targetConstraintErrMsg);
-	if (env.sandboxes?.length === 1) return sendAsyncErr('taq fund cannot be executed in a sandbox environment');
+	if (env.sandboxes?.length === 1) {
+		return sendAsyncErr(`taq ${parsedArgs.task} cannot be executed in a sandbox environment`);
+	}
 	if (env.networks?.length === 1) return configureToolKitWithNetwork(parsedArgs, env.networks[0]);
 	return sendAsyncErr(targetConstraintErrMsg);
-};
-
-const getInstantiatedAccounts = (parsedArgs: Opts, env: Environment.t): [string, any][] | undefined => {
-	const networkName = env.networks[0];
-	const network = getNetworkConfig(parsedArgs)(networkName);
-	const instantiatedAccounts = network?.accounts;
-	return instantiatedAccounts
-		? Object.entries(instantiatedAccounts).filter((instantiatedAccount: [string, any]) => {
-			const alias = instantiatedAccount[0];
-			return alias !== TAQ_ROOT_ACCOUNT;
-		})
-		: undefined;
 };
 
 const getAccountsInfos = (
@@ -78,20 +73,15 @@ const fund = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
 	try {
+		const networkConfig = await getNetworkWithChecks(parsedArgs, env);
 		const tezos = await configureTezosToolKit(parsedArgs, env);
-
-		const instantiatedAccounts = getInstantiatedAccounts(parsedArgs, env);
-		if (!instantiatedAccounts || instantiatedAccounts.length === 0) {
-			return sendAsyncErr(`There are no instantiated accounts in the current environment, "${parsedArgs.env}".`);
-		}
-
+		const instantiatedAccounts = getInstantiatedAccounts(networkConfig);
 		const accountsInfos = await getAccountsInfos(parsedArgs, tezos, instantiatedAccounts);
 		if (accountsInfos.length === 0) {
 			return sendJsonRes(
 				`All instantiated accounts in the current environment, "${parsedArgs.env}", are funded up to or beyond the declared amount.`,
 			);
 		}
-
 		const opHash = await performTransferOps(tezos, accountsInfos, getCurrentEnvironment(parsedArgs));
 		return sendJsonRes(simplifyAccountInfos(accountsInfos, opHash));
 	} catch {

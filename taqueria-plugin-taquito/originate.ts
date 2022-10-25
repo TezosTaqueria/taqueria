@@ -10,6 +10,7 @@ import {
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
+	TAQ_ROOT_ACCOUNT,
 	updateAddressAlias,
 } from '@taqueria/node-sdk';
 import { Protocol } from '@taqueria/node-sdk/types';
@@ -19,7 +20,7 @@ import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-import { getFirstAccountAlias, OriginateOpts as Opts, TAQ_ROOT_ACCOUNT } from './common';
+import { getFirstAccountAlias, OriginateOpts as Opts } from './common';
 
 interface ContractStorageMapping {
 	filename: string;
