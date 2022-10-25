@@ -1,22 +1,15 @@
 import {
-	getAccountPrivateKey,
 	getAddressOfAlias,
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
-	getDefaultAccount,
-	getNetworkConfig,
 	getParameter,
-	getSandboxAccountConfig,
-	getSandboxConfig,
 	sendAsyncErr,
-	sendErr,
 	sendJsonRes,
 } from '@taqueria/node-sdk';
 import { Environment } from '@taqueria/node-sdk/types';
 import { Expr, Parser } from '@taquito/michel-codec';
-import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
-import { getFirstAccountAlias, TAQ_ROOT_ACCOUNT, TransferOpts as Opts } from './common';
+import { configureToolKitWithNetwork, configureToolKitWithSandbox, TransferOpts as Opts } from './common';
 
 export type TableRow = {
 	contractAlias: string;
@@ -27,48 +20,8 @@ export type TableRow = {
 	destination: string;
 };
 
-const configureToolKitWithSandbox = async (parsedArgs: Opts, sandboxName: string): Promise<TezosToolkit> => {
-	const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
-	if (!sandbox) {
-		return sendAsyncErr(
-			`The current environment is configured to use a sandbox called '${sandboxName}'; however, no sandbox of this name has been configured in .taq/config.json.`,
-		);
-	}
-
-	let defaultAccount = getDefaultAccount(parsedArgs)(sandboxName);
-	if (!defaultAccount) {
-		const first = getFirstAccountAlias(sandboxName, parsedArgs);
-		if (first) {
-			defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
-			sendErr(
-				`Warning: A default account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this operation.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
-			);
-		}
-	}
-	if (!defaultAccount) {
-		return sendAsyncErr(`No accounts are available for the sandbox called ${sandboxName} to perform the operation.`);
-	}
-
-	const tezos = new TezosToolkit(sandbox.rpcUrl as string);
-	tezos.setProvider({
-		signer: new InMemorySigner((defaultAccount.secretKey as string).replace(/^unencrypted:/, '')),
-	});
-	return tezos;
-};
-
-export const configureToolKitWithNetwork = async (parsedArgs: Opts, networkName: string): Promise<TezosToolkit> => {
-	const network = getNetworkConfig(parsedArgs)(networkName);
-	if (!network) {
-		return sendAsyncErr(
-			`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json.`,
-		);
-	}
-
-	const tezos = new TezosToolkit(network.rpcUrl as string);
-	const key = await getAccountPrivateKey(parsedArgs, network, TAQ_ROOT_ACCOUNT);
-	await importKey(tezos, key);
-	return tezos;
-};
+const isContractAddress = (contract: string): boolean =>
+	contract.startsWith('tz1') || contract.startsWith('tz2') || contract.startsWith('tz3') || contract.startsWith('KT1');
 
 const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<TezosToolkit> => {
 	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
@@ -77,9 +30,6 @@ const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<Te
 	if (env.networks?.length === 1) return configureToolKitWithNetwork(parsedArgs, env.networks[0]);
 	return sendAsyncErr(targetConstraintErrMsg);
 };
-
-const isContractAddress = (contract: string): boolean =>
-	contract.startsWith('tz1') || contract.startsWith('tz2') || contract.startsWith('tz3') || contract.startsWith('KT1');
 
 const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: TezosToolkit): Promise<TableRow> => {
 	const contract = parsedArgs.contract;

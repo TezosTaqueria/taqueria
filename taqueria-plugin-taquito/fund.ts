@@ -8,8 +8,8 @@ import {
 } from '@taqueria/node-sdk';
 import { Environment } from '@taqueria/node-sdk/types';
 import { TezosToolkit } from '@taquito/taquito';
-import { TAQ_ROOT_ACCOUNT, TransferOpts as Opts } from './common';
-import { configureToolKitWithNetwork, performTransferOps, TableRow } from './transfer';
+import { configureToolKitWithNetwork, FundOpts as Opts, TAQ_ROOT_ACCOUNT } from './common';
+import { performTransferOps, TableRow } from './transfer';
 
 const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<TezosToolkit> => {
 	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
@@ -31,7 +31,7 @@ const getInstantiatedAccounts = (parsedArgs: Opts, env: Environment.t): [string,
 		: undefined;
 };
 
-const getAccountsInfos = async (
+const getAccountsInfos = (
 	parsedArgs: Opts,
 	tezos: TezosToolkit,
 	instantiatedAccounts: [string, any][],

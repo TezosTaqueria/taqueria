@@ -62,6 +62,14 @@ Plugin.create(_i18n => ({
 			handler: 'proxy',
 			encoding: 'application/json',
 		}),
+		Task.create({
+			task: 'instantiate-account',
+			command: 'instantiate-account',
+			description:
+				'Instantiate all accounts declared in the "accounts" field at the root level of the config file to a target environment',
+			handler: 'proxy',
+			encoding: 'application/json',
+		}),
 	],
 	proxy: taquito,
 }), process.argv);
