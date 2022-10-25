@@ -36,7 +36,9 @@ Taqueria has implemented support for using Beacon Wallet on a Flextesa sandbox w
 Here are the summary of required steps necessary to connect your dapp to a local sandbox:
 
 1) Start the sandbox
+
 2) In your dapp:
+
 ```typescript
 // Import your taqueria config.json file so that we can dynamically
 // determine the the sandbox label & RPC url
@@ -61,6 +63,7 @@ wallet.requestPermissions({
         rpcUrl: taqConfig.sandbox.local.rpcUrl
       }
 ```
+
 3) Use `taq transfer` to transfer funds from Bob to your wallet address.
 
 You can retrieve your public key hash using
