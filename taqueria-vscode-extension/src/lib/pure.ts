@@ -209,7 +209,11 @@ export const findTaqBinary = (i18n: i18n, showOutput: OutputFunction): LikeAProm
 					previous: result.executionError,
 				});
 			} else {
-				return result.standardOutput.trim();
+				const path = result.standardOutput.trim();
+				if (path.length === 0) {
+					return Promise.reject({ code: 'E_TAQ_NOT_FOUND', msg: 'Could not find taq in your path.' });
+				}
+				return path.split('\n')[0];
 			}
 		})
 		.catch(previous => Promise.reject({ code: 'E_TAQ_NOT_FOUND', msg: 'Could not find taq in your path.', previous }));

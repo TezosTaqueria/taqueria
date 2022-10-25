@@ -11,50 +11,7 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 	dockerName = 'local-tezos-client';
 
 	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath, ['tezos-client', 'flextesa']);
-		await exec(
-			`cp e2e/data/config-tezos-client-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
-		);
-		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-		await sleep(2500);
-	});
-
-	test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
-		const accounts = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-		expect(accounts.stdout).toContain('bob');
-	});
-
-	test('Verify that taqueria can return JSON when request for list of accounts from a sandbox is made by TVsCE', async () => {
-		const accounts = await exec(`taq list accounts ${dockerName} --fromVsCode`, { cwd: `./${taqueriaProjectPath}` });
-		expect(accounts.stdout).toEqual(
-			JSON.stringify([
-				{
-					account: 'bob',
-					balance: '3000 ꜩ',
-					address: 'tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6',
-				},
-				{
-					account: 'alice',
-					balance: '3000 ꜩ',
-					address: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
-				},
-				{
-					account: 'john',
-					balance: '3000 ꜩ',
-					address: 'tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6',
-				},
-				{
-					account: 'jane',
-					balance: '3000 ꜩ',
-					address: 'tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph',
-				},
-				{
-					account: 'joe',
-					balance: '3000 ꜩ',
-					address: 'tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB',
-				},
-			]) + '\n',
-		);
+		await generateTestProject(taqueriaProjectPath, ['tezos-client']);
 	});
 
 	// Disable typecheck all for now
@@ -353,12 +310,9 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 		}
 	});
 
-	// Clean up process to stop container if it was not stopped properly during the test
-	// And
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
 	afterAll(async () => {
-		await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 	});
 });

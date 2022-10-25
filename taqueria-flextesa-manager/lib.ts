@@ -55,10 +55,10 @@ export const startMininet = (parsedArgs: SanitizedArgs.t) => {
 		detached: false,
 		shell: true,
 		all: true,
+		env: {
+			flextesa_node_cors_origin: '*',
+		},
 	});
-
-	// .all.pipe(process.stderr);
-	// return run(cmdArgs.join(' '))
 };
 
 export const importAccounts = (opts: SanitizedArgs.t) => {

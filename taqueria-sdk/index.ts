@@ -36,6 +36,7 @@ import crypto from 'crypto';
 
 // @ts-ignore interop issue. Maybe find a different library later
 import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
+import fetch from 'node-fetch';
 import generateName from 'project-name-generator';
 import { parsed } from 'yargs';
 
@@ -83,7 +84,7 @@ export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, Exe
 		});
 	});
 
-export const getArch = (): LikeAPromise<string, TaqError> => {
+export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError> => {
 	switch (process.arch) {
 		case 'arm64':
 			return Promise.resolve('linux/arm64/v8');
@@ -99,6 +100,9 @@ export const getArch = (): LikeAPromise<string, TaqError> => {
 			});
 	}
 };
+
+export const getFlextesaImage = (arch: 'linux/arm64/v8' | 'linux/amd64'): string =>
+	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:rc-20220915-arm64' : 'oxheadalpha/flextesa:20220715';
 
 export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError> =>
 	new Promise((resolve, reject) => {

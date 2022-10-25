@@ -11,6 +11,16 @@ body:
         # ◢▅◣◥▅◤◢▅◣ 🐛💫🦋 Bug Report 🦋💫🐛 ◢▅◣◥▅◤◢▅◣ 
 
         ### 🙏🏽 Thanks for taking the time to fill out this bug report! 
+  - type: checkboxes
+    id: status
+    attributes: 
+      label: 🚥 Status (Internal Taqueria Team Use Only)
+      options:
+        - label: "🔬 Investigated and Verified"
+        - label: "⚗️ Solution Identified and Designed "
+        - label: "🧫 Dev Implementation of Fix"
+        - label: "🧪 Fix Tested and Validated"
+        - label: "🏆 PR Merged"
   - type: textarea
     id: what-happened
     attributes:

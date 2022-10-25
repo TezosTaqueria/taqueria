@@ -1,5 +1,7 @@
 import {
 	execCmd,
+	getArch,
+	getFlextesaImage,
 	getParameter,
 	newGetInitialStorage,
 	sendAsyncErr,
@@ -7,30 +9,16 @@ import {
 	sendJsonRes,
 	sendWarn,
 } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
-import { basename, extname, join } from 'path';
-
-interface Opts extends RequestArgs.t {
-	sourceFile: string;
-	storage?: string;
-	param: string;
-	entrypoint?: string;
-}
+import { basename, extname } from 'path';
+import {
+	getCheckFileExistenceCommand,
+	getInputFilename,
+	GLOBAL_OPTIONS,
+	SimulateOpts as Opts,
+	trimTezosClientMenuIfPresent,
+} from './common';
 
 type TableRow = { contract: string; result: string };
-
-const FLEXTESA_IMAGE = 'oxheadalpha/flextesa:20220510';
-
-const getInputFilename = (opts: Opts, sourceFile: string) => join('/project', opts.config.artifactsDir, sourceFile);
-
-const getCheckFileExistenceCommand = (parsedArgs: Opts, sourceFile: string): string => {
-	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
-	if (!projectDir) throw `No project directory provided`;
-	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project ${FLEXTESA_IMAGE} ls`;
-	const inputFile = getInputFilename(parsedArgs, sourceFile);
-	const cmd = `${baseCmd} ${inputFile}`;
-	return cmd;
-};
 
 // This is needed mostly due to the fact that execCmd() wraps the command in double quotes
 const preprocessString = (value: string): string => {
@@ -71,22 +59,20 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const processedStorage = preprocessString(storage);
 	const processedParam = preprocessString(param);
 
-	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project ${FLEXTESA_IMAGE}`;
-	const globalOptions = '--endpoint https://jakartanet.ecadinfra.com';
+	const arch = await getArch();
+	const flextesaImage = await getFlextesaImage(arch);
+	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
 
 	const cmd =
-		`${baseCmd} tezos-client ${globalOptions} run script ${inputFile} on storage \'${processedStorage}\' and input \'${processedParam}\' ${entrypoint}`;
+		`${baseCmd} tezos-client ${GLOBAL_OPTIONS} run script ${inputFile} on storage \'${processedStorage}\' and input \'${processedParam}\' ${entrypoint}`;
 	return cmd;
 };
 
-const trimTezosClientMenuIfPresent = (msg: string): string => {
-	return msg.replace(/Usage:(.|\n)+/, '');
-};
-
 const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
-	execCmd(getCheckFileExistenceCommand(parsedArgs, sourceFile))
+	getCheckFileExistenceCommand(parsedArgs, sourceFile)
+		.then(execCmd)
 		.then(() =>
 			getSimulateCmd(parsedArgs, sourceFile)
 				.then(execCmd)
@@ -116,7 +102,7 @@ const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRo
 			};
 		});
 
-export const simulate = (parsedArgs: Opts): Promise<void> => {
+const simulate = (parsedArgs: Opts): Promise<void> => {
 	const sourceFile = parsedArgs.sourceFile;
 	return simulateContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
 		sendAsyncErr(err, false)
