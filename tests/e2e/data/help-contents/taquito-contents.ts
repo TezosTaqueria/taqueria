@@ -15,6 +15,11 @@ Commands:
                                   ontract (specified via its alias or address) d
                                   eployed to a particular environment
                                                                  [aliases: call]
+  taq fund                        Fund all the instantiated accounts up to the d
+                                  esired/declared amount in a target environment
+  taq instantiate-account         Instantiate all accounts declared in the "acco
+                                  unts" field at the root level of the config fi
+                                  le to a target environment
 
 Options:
       --version     Show version number                                [boolean]
