@@ -1544,8 +1544,8 @@ export class VsCodeHelper {
 	async isTaqCliReachable() {
 		try {
 			const pathToTaq = await this.getTaqBinPath();
-			await Util.checkTaqBinary(pathToTaq, this.i18, this.getLog());
-			return true;
+			const checkResult = await Util.checkTaqBinary(pathToTaq, this.i18, this.getLog());
+			return checkResult.indexOf('OK') !== -1;
 		} catch {
 			return false;
 		}
