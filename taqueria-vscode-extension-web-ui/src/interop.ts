@@ -59,8 +59,8 @@ export const createVscodeWebUiHtml = ({
 		`</body>`,
 		`
     <script>
+    const vscodeApi = acquireVsCodeApi();
 (function() {
-    const vscode = acquireVsCodeApi();
 
     // Handle postMessage
     window.addEventListener('message', event => {
@@ -75,7 +75,7 @@ export const createVscodeWebUiHtml = ({
             console.log('WebView: Received message - calling setGlobalInteropMessageInterface', { message });
             setGlobalInteropMessageInterface({
                 ...${JSON.stringify({ view: interop.view, input: interop.input })},
-                onMessage: (data) => vscode.postMessage(data),
+                onMessage: (data) => vscodeApi.postMessage(data),
             });
             console.log('WebView: Received message - called setGlobalInteropMessageInterface - DONE', { message });
         }
@@ -83,8 +83,8 @@ export const createVscodeWebUiHtml = ({
 
     // Ready to receive input
     console.log('WebView: Ready to receive input');
-    vscode.postMessage('${LOAD_INPUT}');
-    console.log('WebView: Ready to receive input - Called vscode.postMessage(LOAD_INPUT) - DONE');
+    vscodeApi.postMessage('${LOAD_INPUT}');
+    console.log('WebView: Ready to receive input - Called vscodeApi.postMessage(LOAD_INPUT) - DONE');
 }());
     </script>
 </body>`,

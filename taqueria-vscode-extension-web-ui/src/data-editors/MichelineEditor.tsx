@@ -1,5 +1,6 @@
 import { emitMicheline, Parser } from '@taquito/michel-codec';
 import React, { useState } from 'react';
+import { WebviewApi } from 'vscode-webview';
 import { MichelineEditorMessageHandler } from '../interopTypes';
 import { DataEditorNode } from './DataEditorNode';
 import './MichelineEditor.css';
@@ -114,14 +115,19 @@ export const getFriendlyDataType = (dataType: any): string => {
 	return friendlyDataType;
 };
 
+declare const vscodeApi: WebviewApi<any>;
+
 export const MichelineEditor = (
 	{ input: { dataType, value, actionTitle, showDiagnostics }, onMessage }: {
 		input: { dataType: any; value?: MichelineValue; actionTitle?: string; showDiagnostics?: boolean };
 		onMessage: MichelineEditorMessageHandler;
 	},
 ) => {
+	const previousState = vscodeApi.getState() as MichelineValue | undefined;
+	console.log(`Prev State: ${JSON.stringify(previousState)}`);
+
 	const [currentState, setState] = useState({
-		value,
+		value: previousState ?? value,
 		showDiagnostics: showDiagnostics ?? false,
 	});
 
@@ -135,6 +141,7 @@ export const MichelineEditor = (
 			micheline: getMicheline(currentState.value),
 			michelineJson: getJson(currentState.value),
 		});
+		vscodeApi.setState(v);
 	};
 
 	const toggleDiagnostics = () => {
