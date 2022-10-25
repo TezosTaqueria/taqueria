@@ -1,6 +1,7 @@
 import React from 'react';
 import { MichelineValue as ValidationMichelineValue, TypePrim, validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
+import { VSCodeTextField } from './VsCodeWebViewUIToolkitWrappers';
 
 export const PrimitiveEditor = (
 	{ dataType, value, onChange }: {
@@ -15,7 +16,7 @@ export const PrimitiveEditor = (
 		newValue[fieldName] = v;
 		onChange(newValue);
 	};
-	if (value === null || value === undefined || typeof value !== 'object') {
+	if (value === null || value === undefined || typeof value !== 'object' || !Object.hasOwn(value, fieldName)) {
 		changeValue('');
 		value = {
 			[fieldName]: '',
@@ -23,8 +24,12 @@ export const PrimitiveEditor = (
 	}
 	const validationResult = validate({ prim: dataType as TypePrim }, value as ValidationMichelineValue);
 	return (
-		<div>
-			<input type='text' value={value[fieldName]} onChange={e => changeValue(e.target.value)} />
+		<div style={{ verticalAlign: 'middle', display: 'table-cell' }}>
+			<VSCodeTextField
+				type='text'
+				value={value[fieldName]}
+				onInput={e => changeValue((e.target as HTMLInputElement).value)}
+			/>
 			<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={false} />
 		</div>
 	);

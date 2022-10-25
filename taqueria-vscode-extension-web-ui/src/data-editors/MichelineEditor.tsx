@@ -5,6 +5,7 @@ import { DataEditorNode } from './DataEditorNode';
 import './MichelineEditor.css';
 import { MichelineValue as ValidationMichelineValue, validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
+import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 
 const parser = new Parser();
 
@@ -158,9 +159,15 @@ export const MichelineEditor = (
 				<tbody>
 					<tr>
 						<td colSpan={3}>
+							<h3>{getFriendlyDataType(dataType)}</h3>
+						</td>
+					</tr>
+					<tr>
+						<td colSpan={3}>
 							<DataEditorNode
 								dataType={dataType}
 								value={getJson(currentState.value)}
+								hideDataType={true}
 								onChange={v => handleChange({ value: v, originalFormat: 'json' })}
 							/>
 						</td>
@@ -210,8 +217,13 @@ export const MichelineEditor = (
 				</tbody>
 			</table>
 			{actionTitle
-				&& <button disabled={validationResult.state !== 'Valid'} onClick={handleClick}>{actionTitle}</button>}
-			<button onClick={toggleDiagnostics}>Toggle Diagnostics</button>
+				&& (
+					<VSCodeButton appearance='primary' disabled={validationResult.state !== 'Valid'} onClick={handleClick}>
+						{actionTitle}
+					</VSCodeButton>
+				)}
+			&nbsp;
+			<VSCodeButton appearance='secondary' onClick={toggleDiagnostics}>Toggle Diagnostics</VSCodeButton>
 		</div>
 	);
 };

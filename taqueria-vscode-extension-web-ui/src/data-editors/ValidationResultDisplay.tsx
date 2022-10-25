@@ -11,8 +11,14 @@ export const ValidationResultDisplay = (
 		return null;
 	}
 	return (
-		<span style={{ color: props.validationResult.state === 'ImmediateError' ? 'red' : 'orange' }}>
-			{props.validationResult.messages.join('<br/>')}
-		</span>
+		<h4
+			style={{
+				color: props.validationResult.state === 'ImmediateError' ? 'red' : 'orange',
+				display: 'inline',
+				verticalAlign: 'super',
+			}}
+		>
+			&nbsp; {props.validationResult.messages.join('<br/>')}
+		</h4>
 	);
 };

@@ -15,10 +15,18 @@ export const DataEditorNode = (
 		hideDataType?: boolean | undefined;
 	},
 ) => (
-	<div>
-		{hideDataType !== true && `${getFriendlyDataType(dataType)}`}
-		{getEditor({ dataType, onChange, value })}
-	</div>
+	<table>
+		<tr>
+			{hideDataType !== true && (
+				<td>
+					<h4 style={{ display: 'inline' }}>{getFriendlyDataType(dataType)}</h4>
+				</td>
+			)}
+			<td>
+				{getEditor({ dataType, onChange, value })}
+			</td>
+		</tr>
+	</table>
 );
 
 const getEditor = (

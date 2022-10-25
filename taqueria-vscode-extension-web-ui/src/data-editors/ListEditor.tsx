@@ -2,6 +2,7 @@ import React from 'react';
 import { DataEditorNode } from './DataEditorNode';
 import { compare, validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
+import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 
 export const ListEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any[]; onChange: (value: any) => void },
@@ -47,9 +48,35 @@ export const ListEditor = (
 	return (
 		<div className='editorDiv'>
 			<table>
+				{value.length === 0 && (
+					<tr>
+						<td>
+							<h4>The List is empty. Please click on + button to add items to the List.</h4>
+						</td>
+					</tr>
+				)}
 				{value.map((item, index) => [
 					<tbody key={index}>
 						<tr>
+							<td className='buttonContainer'>
+								{dataType.prim === 'list'
+									&& (
+										<VSCodeButton appearance='icon' onClick={() => moveUp(index)} disabled={index === 0}>
+											<span className='codicon codicon-chevron-up'>⮝</span>
+										</VSCodeButton>
+									)}
+								<VSCodeButton appearance='icon' onClick={() => remove(index)}>✘</VSCodeButton>
+								{dataType.prim === 'list'
+									&& (
+										<VSCodeButton
+											appearance='icon'
+											onClick={() => moveDown(index)}
+											disabled={index === value.length - 1}
+										>
+											⮟
+										</VSCodeButton>
+									)}
+							</td>
 							<td className='valueTitle'>{index}:</td>
 							<td>
 								<DataEditorNode
@@ -59,18 +86,11 @@ export const ListEditor = (
 									onChange={v => changeValue(index, v)}
 								/>
 							</td>
-							<td className='buttonContainer'>
-								{dataType.prim === 'list'
-									&& <button onClick={() => moveUp(index)} disabled={index === 0}>🔼</button>}
-								<button onClick={() => remove(index)}>❌</button>
-								{dataType.prim === 'list'
-									&& <button onClick={() => moveDown(index)} disabled={index === value.length - 1}>🔽</button>}
-							</td>
 						</tr>
 					</tbody>,
 				])}
 				<tr>
-					<td>
+					<td colSpan={2}>
 						<button onClick={() => changeValue(value.length, {})}>➕</button>
 						{dataType.prim === 'set' && <button onClick={() => sort()}>Sort</button>}
 					</td>

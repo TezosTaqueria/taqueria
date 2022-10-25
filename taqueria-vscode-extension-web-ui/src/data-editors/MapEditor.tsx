@@ -3,6 +3,7 @@ import { DataEditorNode } from './DataEditorNode';
 import { getFriendlyDataType } from './MichelineEditor';
 import { compare, validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
+import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 
 export const MapEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
@@ -37,14 +38,30 @@ export const MapEditor = (
 		<div className='editorDiv'>
 			<table>
 				<thead>
-					<tr>
-						<td>Key: {getFriendlyDataType((dataType.args as any[])[0])}</td>
-						<td>Value: {getFriendlyDataType((dataType.args as any[])[0])}</td>
-					</tr>
+					{(value as any[]).length
+						? (
+							<tr>
+								<td>&nbsp;</td>
+								<td>Key: {getFriendlyDataType((dataType.args as any[])[0])}</td>
+								<td>Value: {getFriendlyDataType((dataType.args as any[])[1])}</td>
+							</tr>
+						)
+						: (
+							<tr>
+								<td>&nbsp;</td>
+								<td>
+									<h4>The Map is empty. Please click on + button to add entries to the Map.</h4>
+								</td>
+								<td>&nbsp;</td>
+							</tr>
+						)}
 				</thead>
 				{(value as any[]).map((elt, index) => (
 					<tbody key={index}>
 						<tr>
+							<td className='buttonContainer'>
+								<VSCodeButton appearance='icon' onClick={() => remove(index)}>✘</VSCodeButton>
+							</td>
 							<td>
 								<DataEditorNode
 									hideDataType={true}
@@ -61,16 +78,15 @@ export const MapEditor = (
 									onChange={v => changeValue(index, elt.args[0], v)}
 								/>
 							</td>
-							<td className='buttonContainer'>
-								<button onClick={() => remove(index)}>❌</button>
-							</td>
 						</tr>
 					</tbody>
 				))}
 				<tr>
+					<td>&nbsp;</td>
 					<td>
-						<button onClick={() => changeValue(value.length, null, null)}>+</button>
-						<button onClick={() => sort()}>Sort</button>
+						<VSCodeButton appearance='icon' onClick={() => changeValue(value.length, null, null)}>➕</VSCodeButton>
+						&nbsp;
+						<VSCodeButton appearance='secondary' onClick={() => sort()}>Sort</VSCodeButton>
 					</td>
 					<td>
 						<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={true} />

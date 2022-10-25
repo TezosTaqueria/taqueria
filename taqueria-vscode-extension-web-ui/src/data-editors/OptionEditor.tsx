@@ -1,5 +1,6 @@
 import React from 'react';
 import { DataEditorNode } from './DataEditorNode';
+import { VSCodeCheckbox } from './VsCodeWebViewUIToolkitWrappers';
 
 export const OptionEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
@@ -10,7 +11,10 @@ export const OptionEditor = (
 			'args': [v],
 		});
 	};
-	if (value === null || value === undefined || typeof value !== 'object') {
+	if (
+		value === null || value === undefined || typeof value !== 'object'
+		|| (value.prim !== 'None' && value.prim !== 'Some')
+	) {
 		value = {
 			'prim': 'None',
 		};
@@ -29,19 +33,25 @@ export const OptionEditor = (
 		}
 	};
 	return (
-		<div>
-			<input
-				type='checkbox'
-				checked={value.prim !== 'None'}
-				onChange={e => setOption(e.target.checked)}
-			/>
-			{value.prim !== 'None' && (
-				<DataEditorNode
-					dataType={dataType.args[0]}
-					value={value.args[0]}
-					onChange={v => changeValue(v)}
-				/>
-			)}
-		</div>
+		<table>
+			<tr>
+				<td>
+					<VSCodeCheckbox
+						checked={value.prim !== 'None'}
+						onClick={e => setOption((e.target as HTMLInputElement).checked)}
+					/>{' '}
+					<h4 style={{ display: 'inline', verticalAlign: 'super' }}>{value.prim}</h4>
+				</td>
+				<td>
+					{value.prim !== 'None' && (
+						<DataEditorNode
+							dataType={dataType.args[0]}
+							value={value.args[0]}
+							onChange={v => changeValue(v)}
+						/>
+					)}
+				</td>
+			</tr>
+		</table>
 	);
 };

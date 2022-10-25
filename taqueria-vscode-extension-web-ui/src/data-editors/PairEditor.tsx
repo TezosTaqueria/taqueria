@@ -31,7 +31,7 @@ export const PairEditor = (
 					{(dataType.args as any[]).map((item, index) => (
 						<tr key={index}>
 							<td className='valueTitle'>
-								{getFriendlyDataType(item)}
+								<h4>{getFriendlyDataType(item)}</h4>
 							</td>
 							<td>
 								<DataEditorNode
