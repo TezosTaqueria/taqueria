@@ -1607,7 +1607,7 @@ export class VsCodeHelper {
 				const michelineParameters = item.michelineParameters;
 				const panel = this.vscode.window.createWebviewPanel(
 					'entrypointParameter',
-					'Entrypoint Parameter',
+					`Editing ${item.name} parameters`,
 					this.vscode.ViewColumn.One,
 					{
 						enableScripts: true,
