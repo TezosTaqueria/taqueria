@@ -1,4 +1,4 @@
-# 🌮🌮🌮 Taqueria PR 🌮🌮🌮
+# 🌮 Taqueria PR
 
 ## 🪁 Description
 
