@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"test": "yarn",
-		"bootstrap": "npx lerna bootstrap",
+		"bootstrap": "lerna bootstrap --force-local",
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh || npx play-sound beep.mp3",
 		"build:docker": "lerna run build-docker",
