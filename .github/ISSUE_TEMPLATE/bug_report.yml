@@ -34,7 +34,7 @@ body:
     attributes:
       label: 🆘 Steps to Reproduce?
       description: Also tell us, what did you expect to happen?
-      placeholder: 1) \n 2) \n 3) \n 4) \n 5)
+      placeholder: 1) \n2) \n3) \n4) \n5)
     validations:
       required: true
   - type: textarea
