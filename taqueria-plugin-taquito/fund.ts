@@ -8,7 +8,7 @@ import {
 } from '@taqueria/node-sdk';
 import { Environment } from '@taqueria/node-sdk/types';
 import { TezosToolkit } from '@taquito/taquito';
-import { configureToolKitWithNetwork, FundOpts as Opts, TAQ_ROOT_ACCOUNT } from './common';
+import { configureToolKitWithNetwork, FundOpts as Opts, getDeclaredAccounts, TAQ_ROOT_ACCOUNT } from './common';
 import { performTransferOps, TableRow } from './transfer';
 
 const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<TezosToolkit> => {
@@ -35,25 +35,13 @@ const getAccountsInfos = (
 	parsedArgs: Opts,
 	tezos: TezosToolkit,
 	instantiatedAccounts: [string, any][],
-): Promise<TableRow[]> => {
-	const declaredAccounts = Object.entries(parsedArgs.config.accounts).reduce(
-		(acc, declaredAccount) => {
-			const name = declaredAccount[0];
-			const tez = declaredAccount[1];
-			return {
-				...acc,
-				[name]: typeof tez === 'string' ? parseFloat(tez) : tez,
-			};
-		},
-		{} as any,
-	);
-
-	return Promise.all(instantiatedAccounts
+): Promise<TableRow[]> =>
+	Promise.all(instantiatedAccounts
 		.map(async (instantiatedAccount: [string, any]) => {
 			const alias = instantiatedAccount[0];
 			const aliasInfos = instantiatedAccount[1];
 
-			const declaredTez: number | undefined = declaredAccounts[alias];
+			const declaredTez: number | undefined = getDeclaredAccounts(parsedArgs)[alias];
 			const currentBalanceInMutez = await tezos.tz.getBalance(aliasInfos.publicKeyHash);
 			const currentBalanceInTez = currentBalanceInMutez.toNumber() / 1000000;
 			const amountToFill = declaredTez ? Math.max(declaredTez - currentBalanceInTez, 0) : 0;
@@ -75,7 +63,6 @@ const getAccountsInfos = (
 		}))
 		.then(accountInfo => accountInfo.filter(accountInfo => accountInfo.tezTransfer !== '0'))
 		.catch(err => sendAsyncErr(`Something went wrong while extracting account information - ${err}`));
-};
 
 const simplifyAccountInfos = (accountInfos: TableRow[], opHash: string) =>
 	accountInfos.map(accountInfo => {

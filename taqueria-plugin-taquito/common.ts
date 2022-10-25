@@ -92,3 +92,16 @@ export const configureToolKitWithNetwork = async (
 	await importKey(tezos, key);
 	return tezos;
 };
+
+export const getDeclaredAccounts = (parsedArgs: UnionOpts) =>
+	Object.entries(parsedArgs.config.accounts).reduce(
+		(acc, declaredAccount) => {
+			const name: string = declaredAccount[0];
+			const tez: string | number = declaredAccount[1];
+			return {
+				...acc,
+				[name]: typeof tez === 'string' ? parseFloat(tez) : tez,
+			};
+		},
+		{} as any,
+	);
