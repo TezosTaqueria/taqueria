@@ -30,6 +30,14 @@ body:
     validations:
       required: true
   - type: textarea
+    id: str
+    attributes:
+      label: 🆘 Steps to Reproduce?
+      description: Also tell us, what did you expect to happen?
+      placeholder: 1) \n2) \n3) \n4) \n5)
+    validations:
+      required: true
+  - type: textarea
     id: logs
     attributes:
       label: 🪵 Relevant log output
