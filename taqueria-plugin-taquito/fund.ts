@@ -65,7 +65,7 @@ const simplifyAccountInfos = (accountInfos: TableRow[], opHash: string) =>
 		return {
 			accountAlias: accountInfo.contractAlias,
 			accountAddress: accountInfo.contractAddress,
-			mutezTransfer: accountInfo.mutezTransfer,
+			mutezFunded: accountInfo.mutezTransfer,
 			operationHash: opHash,
 		};
 	});
