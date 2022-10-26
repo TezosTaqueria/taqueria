@@ -313,13 +313,16 @@ jobs:
       contents: read
     env: 
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      VERDACCIO_TOKEN: ${{ secrets.ECADINFRA_NPM_AUTH_TOKEN }}
       SCOPE: '@taqueria'
-      NPM_REGISTRY: 'https://registry.npmjs.org/'
+      NPM_REGISTRY: https://registry.npmjs.org/
+      PRIVATE_NPM_REGISTRY: https://npm.ecadinfra.com
+    outputs:
+      pr-version: ${{ steps.publish-package.outputs.pr-version }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with: 
-          registry-url: ${{ env.NPM_REGISTRY }}
           scope: "${{ env.SCOPE }}"
           cache: 'npm'
 
@@ -331,9 +334,18 @@ jobs:
 
       - name: Publish for PR
         if:  ${{ github.event_name == 'pull_request' }}
+        id: publish-package
         run: |
-          npm publish --workspaces --tag 'preview' --access public --dry-run --no-private
-                
+          export HUSKY=0
+          echo ${VERDACCIO_TOKEN} >> ~/.npmrc
+          SHORT_SHA=$(echo ${{ github.event.pull_request.head.sha }} | cut -c1-8)
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          BRANCH_NAME=$(echo ${GITHUB_REF} | cut -d'/' -f 3)
+          PR_VERSION="${PACKAGE_VERSION}-${BRANCH_NAME}.${SHORT_SHA}"
+          echo "::set-output name=pr-version::$PR_VERSION"
+          npx lerna version "${PR_VERSION}" --no-push --no-git-tag-version --yes
+          npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY
+
       - name: Publish for prerelease
         if:  ${{ github.event.release.prerelease && github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
         run: |
@@ -343,16 +355,11 @@ jobs:
         if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
         run: |
           npm publish --workspaces --tag 'latest' --access public
-  
+
   vscode-extension-workflow:
     needs: 
-      - detect-changes
       - publish-npm-packages
-
-    if: ${{ (needs.detect-changes.outputs.vscode == 'true' || 
-            github.event_name == 'release' || 
-            startsWith(github.ref, 'refs/tags/v')) &&
-            !github.event.pull_request.head.repo.fork }}
+    if: ${{ !github.event.pull_request.head.repo.fork }}
     uses: ./.github/workflows/vscode-extension.yml
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
@@ -373,6 +380,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Get packages with lerna
+        run: npx lerna ls >> ./packages
+
       - name: create pr comment
         uses: actions/github-script@v5
         id: pr-comment
@@ -380,7 +390,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
-            const git_short_sha = "${{ github.sha }}".substring(0, 8)
+            const git_short_sha = "${{ github.event.pull_request.head.sha }}".substring(0, 8)
             const git_tag = "${{ github.ref }}".split('tags/')[1];
 
             // Build the vscode-extension workflow comment
@@ -393,17 +403,13 @@ jobs:
               vsCodeCommentBody = `Build ${{ needs.vscode-extension-workflow.result }}`;
             }
 
-            function readInfo(filePath) {
-              try {
-                const data = fs.readFileSync(filePath)
-                const JSONdata = JSON.parse(data.toString())
-                const name = JSONdata.name.split("/")[1]
-                const version = JSONdata.version
-                return { name, version }
-              } catch (error) {
-                console.error(`Got an error trying to read the file: ${error.message}`)
-              }
-            }
+            const packages = fs.readFileSync('packages', 'utf-8');
+
+            let packagesBody = ""
+
+            packages.split(/\r?\n/).forEach(package =>  {
+                packagesBody = packagesBody.concat(`npm i ${package}@${{ needs.publish-npm-packages.outputs.pr-version }} --registry https://npm.ecadinfra.com<br>`);
+            });
 
             let body = `
               <table>
@@ -419,6 +425,12 @@ jobs:
                           <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
                           <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
                       </p>
+                  </td>
+                </tr>
+                <tr>
+                  <th scope="row">npm Packages</th>
+                  <td>
+                      <p>${packagesBody}</p>
                   </td>
                 </tr>
                 <tr>
