@@ -39,8 +39,8 @@ Plugin.create(_i18n => ({
 				'Transfer/call an implicit account or a smart contract (specified via its alias or address) deployed to a particular environment',
 			options: [
 				Option.create({
-					flag: 'tez',
-					description: 'Amount of Tez to transfer',
+					flag: 'mutez',
+					description: 'Amount of Mutez to transfer',
 					required: false,
 				}),
 				Option.create({

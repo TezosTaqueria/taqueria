@@ -37,12 +37,11 @@ const getAccountsInfos = (
 				const alias = instantiatedAccount[0];
 				const aliasInfos = instantiatedAccount[1];
 
-				const declaredTez: number | undefined = getDeclaredAccounts(parsedArgs)[alias];
-				const currentBalanceInMutez = await tezos.tz.getBalance(aliasInfos.publicKeyHash);
-				const currentBalanceInTez = currentBalanceInMutez.toNumber() / 1000000;
-				const amountToFill = declaredTez ? Math.max(declaredTez - currentBalanceInTez, 0) : 0;
+				const declaredMutez: number | undefined = getDeclaredAccounts(parsedArgs)[alias];
+				const currentBalanceInMutez = (await tezos.tz.getBalance(aliasInfos.publicKeyHash)).toNumber();
+				const amountToFillInMutez = declaredMutez ? Math.max(declaredMutez - currentBalanceInMutez, 0) : 0;
 
-				if (!declaredTez) {
+				if (!declaredMutez) {
 					sendWarn(
 						`Warning: ${alias} is instantiated in the target environment but not declared in the root level "accounts" field of ./.taq/config.json so ${alias} will not be funded as we don't have a declared tez amount set there for ${alias}\n`,
 					);
@@ -51,14 +50,14 @@ const getAccountsInfos = (
 				return {
 					contractAlias: alias,
 					contractAddress: aliasInfos.publicKeyHash,
-					tezTransfer: amountToFill.toString(),
+					mutezTransfer: amountToFillInMutez.toString(),
 					parameter: 'Unit',
 					entrypoint: 'default',
 					destination: '',
 				};
 			}),
 	)
-		.then(accountInfo => accountInfo.filter(accountInfo => accountInfo.tezTransfer !== '0'))
+		.then(accountInfo => accountInfo.filter(accountInfo => accountInfo.mutezTransfer !== '0'))
 		.catch(err => sendAsyncErr(`Something went wrong while extracting account information - ${err}`));
 
 const simplifyAccountInfos = (accountInfos: TableRow[], opHash: string) =>
@@ -66,7 +65,7 @@ const simplifyAccountInfos = (accountInfos: TableRow[], opHash: string) =>
 		return {
 			accountAlias: accountInfo.contractAlias,
 			accountAddress: accountInfo.contractAddress,
-			tezTransfer: accountInfo.tezTransfer,
+			mutezTransfer: accountInfo.mutezTransfer,
 			operationHash: opHash,
 		};
 	});

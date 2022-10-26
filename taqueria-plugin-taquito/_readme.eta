@@ -64,7 +64,7 @@ This allows interactions from implicit accounts to implicit or smart contract ac
 
 - To target a different environment, use the `--env` flag with the named Taqueria environment you want to target
 
-- By default, the amount of tez sent is `0`. Use the `--tez` flag to specify an amount you want
+- By default, the amount of mutez sent is `0`. Use the `--mutez` flag to specify an amount you want
 
 - By default, the parameter is `Unit`. Use the `--param` flag to specify a filename, in `artifacts`, that contains the content of the parameter for the transfer/call
 
@@ -72,9 +72,9 @@ This allows interactions from implicit accounts to implicit or smart contract ac
 
 ### Examples
 
-`taq transfer counter --param counter.parameter.param1.tz` will call a smart contract aliased as `counter` in the default environment with the parameter contained in that `.tz` file, transferring `0` tez
+`taq transfer counter --param counter.parameter.param1.tz` will call a smart contract aliased as `counter` in the default environment with the parameter contained in that `.tz` file, transferring `0` mutez
 
-`taq transfer tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb --tez 20` will transfer `20` tez to that address, which is some implicit account
+`taq transfer tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb --mutez 20` will transfer `20` mutez to that address, which is some implicit account
 
 <%~ it.noteOpenAdmonition %>
 `transfer` and `call` are exactly the same task. They are synonyms

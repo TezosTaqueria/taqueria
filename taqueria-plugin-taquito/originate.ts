@@ -10,7 +10,7 @@ import {
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
-	TAQ_ROOT_ACCOUNT,
+	TAQ_OPERATOR_ACCOUNT,
 	updateAddressAlias,
 } from '@taqueria/node-sdk';
 import { Protocol } from '@taqueria/node-sdk/types';
@@ -189,7 +189,7 @@ const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.
 					if (network.rpcUrl) {
 						const result = (async () => {
 							const tezos = new TezosToolkit(network.rpcUrl as string);
-							const key = await getAccountPrivateKey(parsedArgs, network, TAQ_ROOT_ACCOUNT);
+							const key = await getAccountPrivateKey(parsedArgs, network, TAQ_OPERATOR_ACCOUNT);
 							await importKey(tezos, key);
 							return await createBatch(parsedArgs, tezos, networkName);
 						})();

@@ -43,7 +43,7 @@ import { parsed } from 'yargs';
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 const yargs = require('yargs');
 
-export const TAQ_ROOT_ACCOUNT = 'taqRootAccount';
+export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
 
 export const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
@@ -532,7 +532,7 @@ export const getAccountPrivateKey = async (
 			return sendAsyncErr(`Could not write to ./.taq/config.json\n`);
 		}
 
-		if (account === TAQ_ROOT_ACCOUNT) {
+		if (account === TAQ_OPERATOR_ACCOUNT) {
 			return sendAsyncErr(
 				`A keypair with public key hash ${
 					network.accounts[account].publicKeyHash

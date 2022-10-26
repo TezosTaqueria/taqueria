@@ -118,7 +118,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
 			// 3. Call transfer to transfer
-			await exec(`taq transfer ${addressArray[1]} --tez 1000`, { cwd: `./${taqueriaProjectPath}` });
+			await exec(`taq transfer ${addressArray[1]} --tez 1000000000`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 4. Verify transfer results
 			const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
@@ -140,7 +140,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
 			// 3. Call transfer to transfer
-			const transferResult = await exec(`taq transfer ${addressArray[1]} --tez 5000`, {
+			const transferResult = await exec(`taq transfer ${addressArray[1]} --mutez 5000000000`, {
 				cwd: `./${taqueriaProjectPath}`,
 			});
 

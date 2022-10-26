@@ -7,7 +7,7 @@ import {
 	getSandboxConfig,
 	sendAsyncErr,
 	sendErr,
-	TAQ_ROOT_ACCOUNT,
+	TAQ_OPERATOR_ACCOUNT,
 } from '@taqueria/node-sdk';
 import { Environment, NetworkConfig, RequestArgs, SandboxAccountConfig, SandboxConfig } from '@taqueria/node-sdk/types';
 import { importKey, InMemorySigner } from '@taquito/signer';
@@ -22,7 +22,7 @@ export interface OriginateOpts extends RequestArgs.ProxyRequestArgs {
 
 export interface TransferOpts extends RequestArgs.ProxyRequestArgs {
 	contract: string;
-	tez?: string;
+	mutez?: string;
 	param?: string;
 	entrypoint?: string;
 	sender?: string;
@@ -41,8 +41,8 @@ export type IntersectionOpts = OriginateOpts & TransferOpts & InstantiateAccount
 type UnionOpts = OriginateOpts | TransferOpts | InstantiateAccountOpts | FundOpts;
 
 export const getFirstAccountAlias = (sandboxName: string, opts: UnionOpts) => {
-	const aliases = getSandboxAccountNames(opts)(sandboxName);
-	return aliases.shift();
+	const [first, ..._] = getSandboxAccountNames(opts)(sandboxName);
+	return first;
 };
 
 export const configureToolKitWithSandbox = async (
@@ -104,7 +104,7 @@ export const configureToolKitWithNetwork = async (
 	}
 
 	let account: string;
-	if (sender && sender !== TAQ_ROOT_ACCOUNT) {
+	if (sender && sender !== TAQ_OPERATOR_ACCOUNT) {
 		const accounts = getNetworkInstantiatedAccounts(network);
 		if (accounts.hasOwnProperty(sender)) {
 			account = sender;
@@ -114,7 +114,7 @@ export const configureToolKitWithNetwork = async (
 			);
 		}
 	} else {
-		account = TAQ_ROOT_ACCOUNT;
+		account = TAQ_OPERATOR_ACCOUNT;
 	}
 
 	const tezos = new TezosToolkit(network.rpcUrl as string);
@@ -126,11 +126,11 @@ export const configureToolKitWithNetwork = async (
 export const getDeclaredAccounts = (parsedArgs: UnionOpts): Record<string, number> =>
 	Object.entries(parsedArgs.config.accounts).reduce(
 		(acc, declaredAccount) => {
-			const name: string = declaredAccount[0];
-			const tez: string | number = declaredAccount[1];
+			const alias: string = declaredAccount[0];
+			const mutez: string | number = declaredAccount[1];
 			return {
 				...acc,
-				[name]: typeof tez === 'string' ? parseFloat(tez) : tez,
+				[alias]: typeof mutez === 'string' ? parseFloat(mutez) : mutez,
 			};
 		},
 		{} as Record<string, number>,
@@ -140,12 +140,12 @@ export const getSandboxInstantiatedAccounts = (sandbox: SandboxConfig.t): Record
 	(sandbox?.accounts)
 		? Object.entries(sandbox.accounts).reduce(
 			(acc, instantiatedAccount) => {
-				const name: string = instantiatedAccount[0];
+				const alias: string = instantiatedAccount[0];
 				const keys = instantiatedAccount[1] as SandboxAccountConfig.t;
-				return name !== 'default'
+				return alias !== 'default'
 					? {
 						...acc,
-						[name]: keys,
+						[alias]: keys,
 					}
 					: acc;
 			},
@@ -157,12 +157,12 @@ export const getNetworkInstantiatedAccounts = (network: NetworkConfig.t): Record
 	(network?.accounts)
 		? Object.entries(network.accounts).reduce(
 			(acc, instantiatedAccount) => {
-				const name: string = instantiatedAccount[0];
+				const alias: string = instantiatedAccount[0];
 				const keys = instantiatedAccount[1];
-				return name !== TAQ_ROOT_ACCOUNT
+				return alias !== TAQ_OPERATOR_ACCOUNT
 					? {
 						...acc,
-						[name]: keys,
+						[alias]: keys,
 					}
 					: acc;
 			},

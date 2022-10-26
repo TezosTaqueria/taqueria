@@ -12,16 +12,16 @@ const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
 	try {
 		const networkConfig = await getNetworkWithChecks(parsedArgs, env);
-		const declaredAccountNames = Object.keys(getDeclaredAccounts(parsedArgs));
+		const declaredAccountAliases = Object.keys(getDeclaredAccounts(parsedArgs));
 		const instantiatedAccounts = getNetworkInstantiatedAccounts(networkConfig);
 		let accountsInstantiated = [];
-		for (const declaredAccountName of declaredAccountNames) {
-			if (!instantiatedAccounts.hasOwnProperty(declaredAccountName)) {
-				await generateAccountKeys(parsedArgs, networkConfig, declaredAccountName);
-				accountsInstantiated.push(declaredAccountName);
+		for (const declaredAccountAlias of declaredAccountAliases) {
+			if (!instantiatedAccounts.hasOwnProperty(declaredAccountAlias)) {
+				await generateAccountKeys(parsedArgs, networkConfig, declaredAccountAlias);
+				accountsInstantiated.push(declaredAccountAlias);
 			} else {
 				sendWarn(
-					`Note: ${declaredAccountName} is already instantiated in the current environment, "${parsedArgs.env}".`,
+					`Note: ${declaredAccountAlias} is already instantiated in the current environment, "${parsedArgs.env}".`,
 				);
 			}
 		}

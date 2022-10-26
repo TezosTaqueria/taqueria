@@ -14,7 +14,7 @@ import { configureToolKitWithNetwork, configureToolKitWithSandbox, TransferOpts 
 export type TableRow = {
 	contractAlias: string;
 	contractAddress: string;
-	tezTransfer: string;
+	mutezTransfer: string;
 	parameter: string;
 	entrypoint: string;
 	destination: string;
@@ -36,7 +36,7 @@ const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: Tezo
 	return {
 		contractAlias: isContractAddress(contract) ? 'N/A' : contract,
 		contractAddress: isContractAddress(contract) ? contract : await getAddressOfAlias(env, contract),
-		tezTransfer: parsedArgs.tez ?? '0',
+		mutezTransfer: parsedArgs.mutez ?? '0',
 		parameter: parsedArgs.param ? await getParameter(parsedArgs, parsedArgs.param) : 'Unit',
 		entrypoint: parsedArgs.entrypoint ?? 'default',
 		destination: tezos.rpc.getRpcUrl(),
@@ -47,11 +47,12 @@ const createBatchForTransfer = (tezos: TezosToolkit, contractInfos: TableRow[]):
 	contractInfos.reduce((acc, contractInfo) =>
 		acc.withTransfer({
 			to: contractInfo.contractAddress,
-			amount: parseFloat(contractInfo.tezTransfer),
+			amount: parseInt(contractInfo.mutezTransfer),
 			parameter: {
 				entrypoint: contractInfo.entrypoint,
 				value: new Parser().parseMichelineExpression(contractInfo.parameter) as Expr,
 			},
+			mutez: true,
 		}), tezos.wallet.batch());
 
 export const performTransferOps = (tezos: TezosToolkit, contractInfos: TableRow[], env: string): Promise<string> =>
