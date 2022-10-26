@@ -54,11 +54,11 @@ jobs:
     - name: Is a prerelease
       if: ${{ needs.detect-prerelease.outputs.prerelease }}
       run: |
-        This is a prerelease with version preid ${{ needs.detect-prerelease.outputs.prerelease }}
+        echo "This is a prerelease with version preid ${{ needs.detect-prerelease.outputs.prerelease }}"
     - name: Is not a prerelease
       if: ${{ !needs.detect-prerelease.outputs.prerelease }}
       run: |
-        This is a full release
+        echo "This is a full release"
 
   # build-and-cache-node-modules:
   #   runs-on: ubuntu-latest
