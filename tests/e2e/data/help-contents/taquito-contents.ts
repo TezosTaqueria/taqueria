@@ -47,6 +47,8 @@ Options:
       --storage     Name of the storage file that contains the storage value as
                     a Michelson expression, in the artifacts directory, used for
                      originating a contract
+      --sender      Name of an instantiated account to use as the sender of the
+                    originate operation
 `;
 
 export const originateSingleOutput = (address: string) =>

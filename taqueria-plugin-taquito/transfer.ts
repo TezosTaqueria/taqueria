@@ -23,11 +23,11 @@ export type TableRow = {
 const isContractAddress = (contract: string): boolean =>
 	contract.startsWith('tz1') || contract.startsWith('tz2') || contract.startsWith('tz3') || contract.startsWith('KT1');
 
-const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<TezosToolkit> => {
+const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t, sender?: string): Promise<TezosToolkit> => {
 	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
 	if (env.sandboxes?.length === 1 && env.networks?.length === 1) return sendAsyncErr(targetConstraintErrMsg);
-	if (env.sandboxes?.length === 1) return configureToolKitWithSandbox(parsedArgs, env.sandboxes[0]);
-	if (env.networks?.length === 1) return configureToolKitWithNetwork(parsedArgs, env.networks[0]);
+	if (env.sandboxes?.length === 1) return configureToolKitWithSandbox(parsedArgs, env.sandboxes[0], sender);
+	if (env.networks?.length === 1) return configureToolKitWithNetwork(parsedArgs, env.networks[0], sender);
 	return sendAsyncErr(targetConstraintErrMsg);
 };
 
@@ -76,7 +76,7 @@ const transfer = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
 	try {
-		const tezos = await configureTezosToolKit(parsedArgs, env);
+		const tezos = await configureTezosToolKit(parsedArgs, env, parsedArgs.sender);
 		const contractInfo = await getContractInfo(parsedArgs, env, tezos);
 		const opHash = await performTransferOps(tezos, [contractInfo], getCurrentEnvironment(parsedArgs));
 		return sendJsonRes([contractInfo]);

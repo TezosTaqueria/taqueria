@@ -22,6 +22,11 @@ Plugin.create(_i18n => ({
 						'Name of the storage file that contains the storage value as a Michelson expression, in the artifacts directory, used for originating a contract',
 					required: false,
 				}),
+				Option.create({
+					flag: 'sender',
+					description: 'Name of an instantiated account to use as the sender of the originate operation',
+					required: false,
+				}),
 			],
 			aliases: ['originate'],
 			handler: 'proxy',
@@ -48,6 +53,11 @@ Plugin.create(_i18n => ({
 					flag: 'entrypoint',
 					description:
 						'You may explicitly specify an entrypoint to make the parameter value shorter, without having to specify a chain of (Left (Right ... 14 ...))',
+					required: false,
+				}),
+				Option.create({
+					flag: 'sender',
+					description: 'Name of an instantiated account to use as the sender of the transfer operation',
 					required: false,
 				}),
 			],

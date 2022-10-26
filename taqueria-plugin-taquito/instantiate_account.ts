@@ -2,7 +2,7 @@ import { getCurrentEnvironmentConfig, sendAsyncErr, sendJsonRes, sendWarn } from
 import {
 	generateAccountKeys,
 	getDeclaredAccounts,
-	getInstantiatedAccounts,
+	getNetworkInstantiatedAccounts,
 	getNetworkWithChecks,
 	InstantiateAccountOpts as Opts,
 } from './common';
@@ -13,12 +13,10 @@ const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 	try {
 		const networkConfig = await getNetworkWithChecks(parsedArgs, env);
 		const declaredAccountNames = Object.keys(getDeclaredAccounts(parsedArgs));
-		const instantiatedAccountNames = getInstantiatedAccounts(networkConfig).map(instantiatedAccounts =>
-			instantiatedAccounts[0]
-		);
+		const instantiatedAccounts = getNetworkInstantiatedAccounts(networkConfig);
 		let accountsInstantiated = [];
 		for (const declaredAccountName of declaredAccountNames) {
-			if (!instantiatedAccountNames.includes(declaredAccountName)) {
+			if (!instantiatedAccounts.hasOwnProperty(declaredAccountName)) {
 				await generateAccountKeys(parsedArgs, networkConfig, declaredAccountName);
 				accountsInstantiated.push(declaredAccountName);
 			} else {
@@ -33,6 +31,8 @@ const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 					accountsInstantiated.join(', ')
 				}.\nPlease execute "taq fund" targeting the same environment to fund these accounts.`,
 			);
+		} else {
+			return sendJsonRes(`No accounts were instantiated.`);
 		}
 	} catch {
 		return sendAsyncErr('No operations performed.');

@@ -9,7 +9,7 @@ import {
 	sendErr,
 	TAQ_ROOT_ACCOUNT,
 } from '@taqueria/node-sdk';
-import { Environment, NetworkConfig, RequestArgs } from '@taqueria/node-sdk/types';
+import { Environment, NetworkConfig, RequestArgs, SandboxAccountConfig, SandboxConfig } from '@taqueria/node-sdk/types';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit } from '@taquito/taquito';
 
@@ -17,6 +17,7 @@ export interface OriginateOpts extends RequestArgs.ProxyRequestArgs {
 	contract: string;
 	storage: string;
 	alias?: string;
+	sender?: string;
 }
 
 export interface TransferOpts extends RequestArgs.ProxyRequestArgs {
@@ -24,6 +25,7 @@ export interface TransferOpts extends RequestArgs.ProxyRequestArgs {
 	tez?: string;
 	param?: string;
 	entrypoint?: string;
+	sender?: string;
 }
 
 export interface InstantiateAccountOpts extends RequestArgs.ProxyRequestArgs {
@@ -46,6 +48,7 @@ export const getFirstAccountAlias = (sandboxName: string, opts: UnionOpts) => {
 export const configureToolKitWithSandbox = async (
 	parsedArgs: UnionOpts,
 	sandboxName: string,
+	sender?: string,
 ): Promise<TezosToolkit> => {
 	const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
 	if (!sandbox) {
@@ -78,6 +81,7 @@ export const configureToolKitWithSandbox = async (
 export const configureToolKitWithNetwork = async (
 	parsedArgs: UnionOpts,
 	networkName: string,
+	sender?: string,
 ): Promise<TezosToolkit> => {
 	const network = getNetworkConfig(parsedArgs)(networkName);
 	if (!network) {
@@ -92,7 +96,7 @@ export const configureToolKitWithNetwork = async (
 	return tezos;
 };
 
-export const getDeclaredAccounts = (parsedArgs: UnionOpts) =>
+export const getDeclaredAccounts = (parsedArgs: UnionOpts): Record<string, number> =>
 	Object.entries(parsedArgs.config.accounts).reduce(
 		(acc, declaredAccount) => {
 			const name: string = declaredAccount[0];
@@ -102,18 +106,42 @@ export const getDeclaredAccounts = (parsedArgs: UnionOpts) =>
 				[name]: typeof tez === 'string' ? parseFloat(tez) : tez,
 			};
 		},
-		{} as any,
+		{} as Record<string, number>,
 	);
 
-export const getInstantiatedAccounts = (network: NetworkConfig.t): [string, any][] => {
-	const accounts = network?.accounts;
-	return accounts
-		? Object.entries(accounts).filter((instantiatedAccount: [string, any]) => {
-			const alias = instantiatedAccount[0];
-			return alias !== TAQ_ROOT_ACCOUNT;
-		})
-		: [];
-};
+export const getSandboxInstantiatedAccounts = (sandbox: SandboxConfig.t): Record<string, SandboxAccountConfig.t> =>
+	(sandbox?.accounts)
+		? Object.entries(sandbox.accounts).reduce(
+			(acc, instantiatedAccount) => {
+				const name: string = instantiatedAccount[0];
+				const keys = instantiatedAccount[1] as SandboxAccountConfig.t;
+				return name !== 'default'
+					? {
+						...acc,
+						[name]: keys,
+					}
+					: acc;
+			},
+			{},
+		)
+		: {};
+
+export const getNetworkInstantiatedAccounts = (network: NetworkConfig.t): Record<string, any> =>
+	(network?.accounts)
+		? Object.entries(network.accounts).reduce(
+			(acc, instantiatedAccount) => {
+				const name: string = instantiatedAccount[0];
+				const keys = instantiatedAccount[1];
+				return name !== TAQ_ROOT_ACCOUNT
+					? {
+						...acc,
+						[name]: keys,
+					}
+					: acc;
+			},
+			{},
+		)
+		: {};
 
 export const getNetworkWithChecks = (parsedArgs: UnionOpts, env: Environment.t): Promise<NetworkConfig.t> => {
 	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';

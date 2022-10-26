@@ -11,7 +11,7 @@ import {
 	configureToolKitWithNetwork,
 	FundOpts as Opts,
 	getDeclaredAccounts,
-	getInstantiatedAccounts,
+	getNetworkInstantiatedAccounts,
 	getNetworkWithChecks,
 } from './common';
 import { performTransferOps, TableRow } from './transfer';
@@ -29,33 +29,35 @@ const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<Te
 const getAccountsInfos = (
 	parsedArgs: Opts,
 	tezos: TezosToolkit,
-	instantiatedAccounts: [string, any][],
+	instantiatedAccounts: Record<string, any>,
 ): Promise<TableRow[]> =>
-	Promise.all(instantiatedAccounts
-		.map(async (instantiatedAccount: [string, any]) => {
-			const alias = instantiatedAccount[0];
-			const aliasInfos = instantiatedAccount[1];
+	Promise.all(
+		Object.entries(instantiatedAccounts)
+			.map(async (instantiatedAccount: [string, any]) => {
+				const alias = instantiatedAccount[0];
+				const aliasInfos = instantiatedAccount[1];
 
-			const declaredTez: number | undefined = getDeclaredAccounts(parsedArgs)[alias];
-			const currentBalanceInMutez = await tezos.tz.getBalance(aliasInfos.publicKeyHash);
-			const currentBalanceInTez = currentBalanceInMutez.toNumber() / 1000000;
-			const amountToFill = declaredTez ? Math.max(declaredTez - currentBalanceInTez, 0) : 0;
+				const declaredTez: number | undefined = getDeclaredAccounts(parsedArgs)[alias];
+				const currentBalanceInMutez = await tezos.tz.getBalance(aliasInfos.publicKeyHash);
+				const currentBalanceInTez = currentBalanceInMutez.toNumber() / 1000000;
+				const amountToFill = declaredTez ? Math.max(declaredTez - currentBalanceInTez, 0) : 0;
 
-			if (!declaredTez) {
-				sendWarn(
-					`Warning: ${alias} is instantiated in the target environment but not declared in the root level "accounts" field of ./.taq/config.json so ${alias} will not be funded as we don't have a declared tez amount set there for ${alias}\n`,
-				);
-			}
+				if (!declaredTez) {
+					sendWarn(
+						`Warning: ${alias} is instantiated in the target environment but not declared in the root level "accounts" field of ./.taq/config.json so ${alias} will not be funded as we don't have a declared tez amount set there for ${alias}\n`,
+					);
+				}
 
-			return {
-				contractAlias: alias,
-				contractAddress: aliasInfos.publicKeyHash,
-				tezTransfer: amountToFill.toString(),
-				parameter: 'Unit',
-				entrypoint: 'default',
-				destination: '',
-			};
-		}))
+				return {
+					contractAlias: alias,
+					contractAddress: aliasInfos.publicKeyHash,
+					tezTransfer: amountToFill.toString(),
+					parameter: 'Unit',
+					entrypoint: 'default',
+					destination: '',
+				};
+			}),
+	)
 		.then(accountInfo => accountInfo.filter(accountInfo => accountInfo.tezTransfer !== '0'))
 		.catch(err => sendAsyncErr(`Something went wrong while extracting account information - ${err}`));
 
@@ -75,7 +77,7 @@ const fund = async (parsedArgs: Opts): Promise<void> => {
 	try {
 		const networkConfig = await getNetworkWithChecks(parsedArgs, env);
 		const tezos = await configureTezosToolKit(parsedArgs, env);
-		const instantiatedAccounts = getInstantiatedAccounts(networkConfig);
+		const instantiatedAccounts = getNetworkInstantiatedAccounts(networkConfig);
 		const accountsInfos = await getAccountsInfos(parsedArgs, tezos, instantiatedAccounts);
 		if (accountsInfos.length === 0) {
 			return sendJsonRes(
