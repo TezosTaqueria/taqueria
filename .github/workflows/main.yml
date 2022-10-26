@@ -14,10 +14,6 @@ on:
   release:
     types: [published]
 
-env:
-  SCOPE: '@taqueria'
-  NPM_REGISTRY: 'https://registry.npmjs.org/'
-
 concurrency:
   group: ${{ github.ref_name || github.ref }}
   cancel-in-progress: true
@@ -66,8 +62,6 @@ jobs:
          
       - uses: actions/setup-node@v3
         with: 
-          registry-url: ${{ env.NPM_REGISTRY }}
-          scope: "${{ env.SCOPE }}"
           cache: 'npm'
 
       - name: Setup Deno
@@ -319,6 +313,8 @@ jobs:
       contents: read
     env: 
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      SCOPE: '@taqueria'
+      NPM_REGISTRY: 'https://registry.npmjs.org/'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -339,14 +335,14 @@ jobs:
           npm publish --workspaces --tag 'preview' --access public --dry-run --no-private
                 
       - name: Publish for prerelease
-        if:  ${{ github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
+        if:  ${{ github.event.release.prerelease && github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
         run: |
           npm publish --workspaces --tag 'next' --access public
       
       - name: Publish for official release
         if: ${{ !github.event.release.prerelease && github.event.action == 'published' }}
         run: |
-          npm publish --workspaces --tag 'latest' --access public 
+          npm publish --workspaces --tag 'latest' --access public
   
   vscode-extension-workflow:
     needs: 
