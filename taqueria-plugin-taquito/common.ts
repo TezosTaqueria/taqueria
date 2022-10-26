@@ -90,8 +90,22 @@ export const configureToolKitWithNetwork = async (
 		);
 	}
 
+	let account: string;
+	if (sender && sender !== TAQ_ROOT_ACCOUNT) {
+		const accounts = getNetworkInstantiatedAccounts(network);
+		if (accounts.hasOwnProperty(sender)) {
+			account = sender;
+		} else {
+			return sendAsyncErr(
+				`${sender} is not an account instantiated in the current environment. Check .taq/config.json`,
+			);
+		}
+	} else {
+		account = TAQ_ROOT_ACCOUNT;
+	}
+
 	const tezos = new TezosToolkit(network.rpcUrl as string);
-	const key = await getAccountPrivateKey(parsedArgs, network, TAQ_ROOT_ACCOUNT);
+	const key = await getAccountPrivateKey(parsedArgs, network, account);
 	await importKey(tezos, key);
 	return tezos;
 };
