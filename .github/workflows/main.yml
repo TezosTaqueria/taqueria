@@ -202,7 +202,7 @@ jobs:
     name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
         chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
