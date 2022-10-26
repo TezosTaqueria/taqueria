@@ -12,7 +12,7 @@ Benefits of using generated types:
 
 ## Requirements
 
-- Taqueria v0.20.2 or later
+- Taqueria v0.22.2 or later
 - Node JS v16.17.1 or later
 - Taquito v11.2 or later (optional)
 
