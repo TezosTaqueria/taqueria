@@ -6,6 +6,125 @@ title: Taqueria Releases
 
 | Details     |               |
 | ----------- | ------------- |
+|Release Date | Oct 25, 2022  |
+|Release Type | Minor         |
+|Release Page | [v0.22.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.22.2) |
+
+### Summary of Impactful Changes
+
+- A new and streamlined funding mechanism for Teztnet accounts has been implemented
+- The default config for a new project now comes pre-configured with an environment named `testing` that targets Ghostnet
+- The Taqueria CLI binary can now be installed directly from the VsCE
+- Taqueria now allows developers to use Beacon wallet on a Flextesa sandbox
+
+### New Features
+
+#### Streamlined Account Funding Mechanism
+
+Taqueria now makes it easier than ever to fund testnet accounts. Under the hood, Taqueria now has a `root account` for each environment. This root account has a keypair generated implicitly and when an operation is submited to a testnet environment, Taqueria will check to see if the account is funded. If not, you will be provided the PHK of the root account, and a link to the new Teztnets faucet. Simply copy/paste the PKH into the faucet, and click on `Request 2001tz`
+
+Funding of the root account only needs to be done once, making the overall funding experience much more streamlined than the legacy faucet file method
+
+:::note
+In future releases, a task will be added which can fund each of the declared accounts automatically using the root account. This way you only need to visit the faucet site once for the root account
+:::
+
+#### Support for Beacon Wallet on Flextesa Sandbox
+
+Taqueria has implemented support for using Beacon Wallet on a Flextesa sandbox without running into CORS issues
+
+Here are the summary of required steps necessary to connect your dapp to a local sandbox:
+
+1) Start the sandbox
+
+2) In your dapp:
+
+```typescript
+// Import your taqueria config.json file so that we can dynamically
+// determine the the sandbox label & RPC url
+import taqConfig from "taq/config.json"
+
+// Use Taquito and the Beacon SDK to add the sandbox network to your wallet
+import { TezosToolkit } from "@taquito/taquito";
+import { BeaconWallet } from "@taquito/beacon-wallet"
+
+const Tezos = new TezosToolkit(taqConfig.sandbox.local.rpcUrl);
+
+const wallet = new BeaconWallet({
+  name: "Beacon/Sandbox Test"
+});
+
+Tezos.setWalletProvider(wallet)
+
+wallet.requestPermissions({
+      network: {
+        type: 'custom' as NetworkType,
+        name: taqConfig.sandbox.local.label,
+        rpcUrl: taqConfig.sandbox.local.rpcUrl
+      }
+```
+
+3) Use `taq transfer` to transfer funds from Bob to your wallet address.
+
+You can retrieve your public key hash using
+```typescript
+const current = await wallet.client.getActiveAccount()
+console.log(current)
+```
+
+A demonstration dApp has been created to showcase how this works: [https://github.com/ecadlabs/taqueria-beacon-sandbox](https://github.com/ecadlabs/taqueria-beacon-sandbox)
+
+### Other Product Changes
+
+- The default `config.json` provided by `taq init` now uses the K protocol by default
+- Typecheck and Simulate tasks now target protocol K by default
+- The Ligo plugin now uses a fixed stable of version of the Ligo CLI rather than @next/@stable
+
+### Migrating from Legacy Versions
+
+You can update your existing projects to use Taqueria v0.22.2 plugins using the following command:
+
+```shell
+plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 1 taq uninstall && echo $plugins | xargs -n 1 taq install
+```
+
+### Pull Requests
+
+- docs: Make plugin update instructions more prominent by @jevonearth in [#1300](https://github.com/ecadlabs/taqueria/pull/1300)
+- docs: sync web docs with README from taco-shop scaffold by @jevonearth in [#1302](https://github.com/ecadlabs/taqueria/pull/1302)
+- Docs: taco-shop minor edits and fix taq call example by @jevonearth in [#1303](https://github.com/ecadlabs/taqueria/pull/1303)
+- chore: unlist the quickstart scaffold as it is being retired by @jevonearth in [#1304](https://github.com/ecadlabs/taqueria/pull/1304)
+- refactor(ci): Workflows run for push to main by @GImbrailo in [#1298](https://github.com/ecadlabs/taqueria/pull/1298)
+- chore: remove docs husky hook by @GImbrailo in [#1308](https://github.com/ecadlabs/taqueria/pull/1308)
+- 🏗️ ➾ Add historical release notes to website by @hu3man in [#1313](https://github.com/ecadlabs/taqueria/pull/1313)
+- Improve templates by @hu3man in [#1324](https://github.com/ecadlabs/taqueria/pull/1324)
+- Update mechanism for funding accounts by @jchenche in [#1295](https://github.com/ecadlabs/taqueria/pull/1295)
+- updated test to now accept main as a taqueria build version by @alexzbusko in [#1334](https://github.com/ecadlabs/taqueria/pull/1334)
+- Improve templates by @hu3man in [#1336](https://github.com/ecadlabs/taqueria/pull/1336)
+- ✨ Feature ➾ Improve PR and Issue Templates by @hu3man in [#1337](https://github.com/ecadlabs/taqueria/pull/1337)
+- Vs code cli testing by @sinapsist in [#1309](https://github.com/ecadlabs/taqueria/pull/1309)
+- Install Taqueria from VS Code Extension by @MichalLytek in [#1261](https://github.com/ecadlabs/taqueria/pull/1261)
+- remove deprecated scaffolds by @AlirezaHaghshenas in [#1352](https://github.com/ecadlabs/taqueria/pull/1352)
+- 1209 docusaurus website changes by @alexzbusko in [#1312](https://github.com/ecadlabs/taqueria/pull/1312)
+- refactor(ci): publish workflows by @GImbrailo in [#1310](https://github.com/ecadlabs/taqueria/pull/1310)
+- fix(ci): added docker build before tests by @GImbrailo in [#1385](https://github.com/ecadlabs/taqueria/pull/1385)
+- 🛠️ Fix (#1375) ➾ Update Protocol Target for Typecheck and Simulate Tasks to Kathmandu by @jchenche in [#1384](https://github.com/ecadlabs/taqueria/pull/1384)
+- ✨ New feature => Add Ghostnet Configuration and `testing` Environment to Default `config.json`  by @hu3man in [#1364](https://github.com/ecadlabs/taqueria/pull/1364)
+- fix(ci): changed publish job to need build-and-cache-node-modules by @GImbrailo in [#1388](https://github.com/ecadlabs/taqueria/pull/1388)
+- Fixes #1046, ensures that flextesa works without CORS issues by @mweichert in [#1296](https://github.com/ecadlabs/taqueria/pull/1296)
+- Change ligo from next to stable version by @jchenche in [#1373](https://github.com/ecadlabs/taqueria/pull/1373)
+- 🏗️ Refactor ➾ Improve Issue & PR Templates and Automation by @hu3man in [#1395](https://github.com/ecadlabs/taqueria/pull/1395)
+- 🧹 Chore ➾ Update Docusaurus to v0.2.1 by @hu3man in [#1392](https://github.com/ecadlabs/taqueria/pull/1392)
+- fix taq installation detection by @AlirezaHaghshenas in [#1409](https://github.com/ecadlabs/taqueria/pull/1409)
+- 🚀 PR ➾ Release Taqueria v0.22.0 by @hu3man in [#1393](https://github.com/ecadlabs/taqueria/pull/1393)
+- 🚀 Release ➾ Taqueria v0.22.1 by @hu3man in [#1413](https://github.com/ecadlabs/taqueria/pull/1413)
+
+**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.20.2...v0.22.2
+
+## Taqueria v0.20.2  
+
+| Details     |               |
+| ----------- | ------------- |
 |Release Date | Sept 29, 2022 |
 |Release Type | Minor         |
 |Release Page | [v0.20.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.20.2) |

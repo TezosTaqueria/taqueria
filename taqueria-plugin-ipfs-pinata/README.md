@@ -8,7 +8,7 @@ The IPFS Pinata plugin also provides a `pin` task to link any existing files on 
  
 ## Requirements
 
-- Taqueria v0.20.2 or later
+- Taqueria v0.22.2 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
 - A [Pinata](https://app.pinata.cloud) account
