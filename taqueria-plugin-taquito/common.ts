@@ -57,23 +57,36 @@ export const configureToolKitWithSandbox = async (
 		);
 	}
 
-	let defaultAccount = getDefaultAccount(parsedArgs)(sandboxName);
-	if (!defaultAccount) {
-		const first = getFirstAccountAlias(sandboxName, parsedArgs);
-		if (first) {
-			defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
-			sendErr(
-				`Warning: A default account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this operation.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
+	let accountKey: string;
+	if (sender && sender !== 'default') {
+		const accounts = getSandboxInstantiatedAccounts(sandbox);
+		if (accounts.hasOwnProperty(sender)) {
+			accountKey = accounts[sender].secretKey;
+		} else {
+			return sendAsyncErr(
+				`${sender} is not an account instantiated in the current environment. Check .taq/config.json`,
 			);
 		}
-	}
-	if (!defaultAccount) {
-		return sendAsyncErr(`No accounts are available for the sandbox called ${sandboxName} to perform the operation.`);
+	} else {
+		let defaultAccount = getDefaultAccount(parsedArgs)(sandboxName);
+		if (!defaultAccount) {
+			const first = getFirstAccountAlias(sandboxName, parsedArgs);
+			if (first) {
+				defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
+				sendErr(
+					`Warning: A default account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this operation.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
+				);
+			}
+		}
+		if (!defaultAccount) {
+			return sendAsyncErr(`No accounts are available for the sandbox called ${sandboxName} to perform the operation.`);
+		}
+		accountKey = defaultAccount.secretKey;
 	}
 
 	const tezos = new TezosToolkit(sandbox.rpcUrl as string);
 	tezos.setProvider({
-		signer: new InMemorySigner((defaultAccount.secretKey as string).replace(/^unencrypted:/, '')),
+		signer: new InMemorySigner(accountKey.replace(/^unencrypted:/, '')),
 	});
 	return tezos;
 };
