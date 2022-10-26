@@ -9,7 +9,7 @@ import {
 import { Environment } from '@taqueria/node-sdk/types';
 import { Expr, Parser } from '@taquito/michel-codec';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
-import { configureToolKitWithNetwork, configureToolKitWithSandbox, TransferOpts as Opts } from './common';
+import { configureTezosToolKit, TransferOpts as Opts } from './common';
 
 export type TableRow = {
 	contractAlias: string;
@@ -22,14 +22,6 @@ export type TableRow = {
 
 const isContractAddress = (contract: string): boolean =>
 	contract.startsWith('tz1') || contract.startsWith('tz2') || contract.startsWith('tz3') || contract.startsWith('KT1');
-
-const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t, sender?: string): Promise<TezosToolkit> => {
-	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
-	if (env.sandboxes?.length === 1 && env.networks?.length === 1) return sendAsyncErr(targetConstraintErrMsg);
-	if (env.sandboxes?.length === 1) return configureToolKitWithSandbox(parsedArgs, env.sandboxes[0], sender);
-	if (env.networks?.length === 1) return configureToolKitWithNetwork(parsedArgs, env.networks[0], sender);
-	return sendAsyncErr(targetConstraintErrMsg);
-};
 
 const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: TezosToolkit): Promise<TableRow> => {
 	const contract = parsedArgs.contract;

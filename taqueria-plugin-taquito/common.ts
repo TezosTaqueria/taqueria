@@ -45,6 +45,18 @@ export const getFirstAccountAlias = (sandboxName: string, opts: UnionOpts) => {
 	return first;
 };
 
+export const configureTezosToolKit = (
+	parsedArgs: UnionOpts,
+	env: Environment.t,
+	sender?: string,
+): Promise<TezosToolkit> => {
+	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
+	if (env.sandboxes?.length === 1 && env.networks?.length === 1) return sendAsyncErr(targetConstraintErrMsg);
+	if (env.sandboxes?.length === 1) return configureToolKitWithSandbox(parsedArgs, env.sandboxes[0], sender);
+	if (env.networks?.length === 1) return configureToolKitWithNetwork(parsedArgs, env.networks[0], sender);
+	return sendAsyncErr(targetConstraintErrMsg);
+};
+
 export const configureToolKitWithSandbox = async (
 	parsedArgs: UnionOpts,
 	sandboxName: string,

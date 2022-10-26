@@ -1,9 +1,11 @@
 import {
 	getAccountPrivateKey,
+	getAddressOfAlias,
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
 	getNetworkConfig,
+	getParameter,
 	getSandboxAccountConfig,
 	getSandboxConfig,
 	newGetInitialStorage,
@@ -13,14 +15,14 @@ import {
 	TAQ_OPERATOR_ACCOUNT,
 	updateAddressAlias,
 } from '@taqueria/node-sdk';
-import { Protocol } from '@taqueria/node-sdk/types';
+import { Environment, Protocol } from '@taqueria/node-sdk/types';
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-import { getFirstAccountAlias, OriginateOpts as Opts } from './common';
+import { configureTezosToolKit, getFirstAccountAlias, OriginateOpts as Opts } from './common';
 
 interface ContractStorageMapping {
 	filename: string;
