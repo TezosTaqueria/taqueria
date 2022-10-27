@@ -56,9 +56,9 @@ jobs:
       run: |
         export PATH="$PATH:$(pwd)"
         npx lerna bootstrap 
-        npm build:packages 
-        npm build:binary 
-        npm build:docker
+        npm run build:packages 
+        npm run build:binary 
+        npm run build:docker
 
     - name: cache node modules
       uses: actions/cache@v3
