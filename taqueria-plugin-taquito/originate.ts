@@ -110,16 +110,16 @@ export const performOriginateOps = async (
 	}
 };
 
-const prepContractInfoForDisplay = (
+const prepContractInfoForDisplay = async (
 	parsedArgs: Opts,
 	tezos: TezosToolkit,
 	contractInfo: ContractInfo,
 	originationResults: OperationContentsAndResultOrigination[],
-): TableRow => {
-	const result = originationResults.length === 1 ? originationResults[0] : undefined; // length should be 1 if we are batching operations
+): Promise<TableRow> => {
+	const result = originationResults.length === 1 ? originationResults[0] : undefined; // length should be 1 since we are batching operations
 	const address = result?.metadata?.operation_result?.originated_contracts?.join(',');
 	const alias = parsedArgs.alias ?? basename(contractInfo.contract, extname(contractInfo.contract));
-	if (address) updateAddressAlias(parsedArgs, alias, address);
+	if (address) await updateAddressAlias(parsedArgs, alias, address);
 	return {
 		contract: contractInfo.contract,
 		address: address ?? 'Something went wrong during origination',
@@ -138,7 +138,12 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 
 		const originationResults = await performOriginateOps(parsedArgs, tezos, [contractInfo]);
 
-		const contractInfoForDisplay = prepContractInfoForDisplay(parsedArgs, tezos, contractInfo, originationResults);
+		const contractInfoForDisplay = await prepContractInfoForDisplay(
+			parsedArgs,
+			tezos,
+			contractInfo,
+			originationResults,
+		);
 		return sendJsonRes([contractInfoForDisplay]);
 	} catch {
 		return sendAsyncErr('No operations performed.');

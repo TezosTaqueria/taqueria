@@ -50,12 +50,3 @@ Options:
       --sender      Name of an instantiated account to use as the sender of the
                     originate operation
 `;
-
-export const originateSingleOutput = (address: string) =>
-	`
-┌────────────────┬──────────────────────────────────────┬─────────────┐
-│ Contract       │ Address                              │ Destination │
-├────────────────┼──────────────────────────────────────┼─────────────┤
-│ hello-tacos.tz │ KT1N4bZh884qhirEsmPge6y8a9mRfhEoMGaX │ hangzhounet │
-└────────────────┴──────────────────────────────────────┴─────────────┘
-`.replace('KT1N4bZh884qhirEsmPge6y8a9mRfhEoMGaX', address).trimStart();

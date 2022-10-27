@@ -34,7 +34,7 @@
 	"network": {
 		"ghostnet": {
 			"label": "ghostnet",
-			"rpcUrl": "https://rpc.ithacanet.teztnets.xyz",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
 			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
 			"accounts": {
 				"taqOperatorAccount": {
