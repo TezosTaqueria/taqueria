@@ -291,7 +291,7 @@ jobs:
   publish-npm-packages:
     runs-on: ubuntu-latest
     needs:
-      - build-and-cache-node-modules
+      - workflow-setup
     permissions:
       packages: write
       contents: read
