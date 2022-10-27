@@ -21,7 +21,7 @@ concurrency:
 jobs:
   # When we use reusable we lose the ability to to filter out the workflow for changes to certain paths.
   # This job creates boolean outputs based on path filters. These outputs can then be used as job conditions
-  worklfow-setup:
+  workflow-setup:
     name: Initial workflow checks
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.head.repo.fork }}
@@ -71,7 +71,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
     needs:
-      - worklfow-setup
+      - workflow-setup
     strategy:
       fail-fast: false
       matrix:
@@ -453,7 +453,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs:
-      - worklfow-setup
+      - workflow-setup
       - build-binaries
       - publish-npm-packages
       - vscode-extension-workflow
@@ -472,7 +472,7 @@ jobs:
           wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
       - name: Pre-release
-        if: ${{ needs.worklfow-setup.outputs.prerelease }}
+        if: ${{ needs.workflow-setup.outputs.prerelease }}
         id: pre-release
         uses: softprops/action-gh-release@v1
         with:
@@ -482,7 +482,7 @@ jobs:
           prerelease: true
 
       - name: Final release
-        if: ${{ !needs.worklfow-setup.outputs.prerelease }}
+        if: ${{ !needs.workflow-setup.outputs.prerelease }}
         id: final-release
         uses: softprops/action-gh-release@v1
         with:
