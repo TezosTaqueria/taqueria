@@ -1,5 +1,5 @@
 import React from 'react';
-import { MichelineValidationResult } from './MichelineValidator';
+import { MichelineValidationResult } from '../Helpers';
 
 export const ValidationResultDisplay = (
 	props: { validationResult: MichelineValidationResult; hideSublevelErrors: boolean },

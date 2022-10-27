@@ -1,17 +1,18 @@
 import React from 'react';
+import { isObject } from '../Helpers';
 
 export const BoolEditor = (
-	{ value, onChange }: { value: Record<string, any>; onChange: (value: Record<string, any>) => void },
+	{ value, onChange }: { value: any; onChange: (value: { prim: 'True' | 'False' }) => void },
 ) => {
-	if (value === null || value === undefined || typeof value !== 'object') {
+	if (!isObject(value) && !['False', 'True'].includes(value.prim)) {
 		value = {
 			'prim': 'False',
 		};
 		onChange(value);
 	}
 	const changeValue = (v: boolean) => {
-		const newValue: Record<string, any> = {
-			'prim': v ? 'True' : 'False',
+		const newValue = {
+			prim: v ? ('True' as const) : ('False' as const),
 		};
 		onChange(newValue);
 	};

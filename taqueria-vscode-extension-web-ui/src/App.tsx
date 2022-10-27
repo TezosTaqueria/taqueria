@@ -9,6 +9,12 @@ const state = {
 	logs: [] as { message: string; data?: unknown }[],
 };
 
+declare global {
+	interface Window {
+		setGlobalInteropMessageInterface: (x: InteropMessageInterface) => void;
+	}
+}
+
 // const log = (message: string, data?: unknown) => {
 // 	state.logs.push({ message, data });
 // };
@@ -18,8 +24,7 @@ const setGlobalInteropMessageInterface = (x: InteropMessageInterface) => {
 	state.interop = x;
 	state.onChangeCallback(x);
 };
-const w = window as unknown as Record<string, unknown>;
-w.setGlobalInteropMessageInterface = setGlobalInteropMessageInterface;
+window.setGlobalInteropMessageInterface = setGlobalInteropMessageInterface;
 
 export const App = () => {
 	const [deps, setDeps] = useState(state.interop);

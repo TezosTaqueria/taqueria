@@ -4,7 +4,7 @@ import { MichelineEditor } from './data-editors/MichelineEditor';
 import { usePageTitle } from './hooks';
 import { MichelineEditorMessageHandler } from './interopTypes';
 
-const allTypes = [
+const typesForTestingEditor = [
 	{
 		type: {
 			'prim': 'bool',
@@ -352,7 +352,7 @@ export const AllEditors = () => {
 	};
 	return (
 		<div className='allEditors'>
-			{allTypes.map((item, index) => (
+			{typesForTestingEditor.map((item, index) => (
 				<div key={index} className='singleEditor'>
 					<MichelineEditor
 						input={{

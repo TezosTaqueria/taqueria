@@ -7,7 +7,7 @@ import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 export const ListEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any[]; onChange: (value: any) => void },
 ) => {
-	if (value === undefined || value === null || !Array.isArray(value)) {
+	if (!Array.isArray(value)) {
 		value = [];
 		onChange(value);
 	}

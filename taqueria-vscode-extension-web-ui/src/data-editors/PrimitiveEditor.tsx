@@ -1,5 +1,6 @@
 import React from 'react';
-import { MichelineValue as ValidationMichelineValue, TypePrim, validate } from './MichelineValidator';
+import { MichelineValue as ValidationMichelineValue, TypePrim } from '../Helpers';
+import { validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
 import { VSCodeTextField } from './VsCodeWebViewUIToolkitWrappers';
 

@@ -1,10 +1,11 @@
 import { emitMicheline, Parser } from '@taquito/michel-codec';
 import React, { useState } from 'react';
 import { WebviewApi } from 'vscode-webview';
+import { isObject, MichelineValue as ValidationMichelineValue } from '../Helpers';
 import { MichelineEditorMessageHandler } from '../interopTypes';
 import { DataEditorNode } from './DataEditorNode';
 import './MichelineEditor.css';
-import { MichelineValue as ValidationMichelineValue, validate } from './MichelineValidator';
+import { validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
 import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 
@@ -22,23 +23,15 @@ export type MichelineValue = {
 
 const json2Micheline = (v: object) => {
 	let michelson: string | undefined = undefined;
-	try {
-		const expression = parser.parseJSON(v);
-		michelson = emitMicheline(expression);
-		return michelson;
-	} catch (e: any) {
-		return `${e}`;
-	}
+	const expression = parser.parseJSON(v);
+	michelson = emitMicheline(expression);
+	return michelson;
 };
 
 const micheline2Json = (v: string) => {
 	let json: object | undefined | null = undefined;
-	try {
-		json = parser.parseMichelineExpression(v);
-		return json;
-	} catch (e: any) {
-		return undefined;
-	}
+	json = parser.parseMichelineExpression(v);
+	return json;
 };
 
 export const getMicheline = (value: MichelineValue | undefined) => {
@@ -62,7 +55,7 @@ export const getJson = (value: MichelineValue | undefined) => {
 };
 
 export const getFriendlyDataType = (dataType: any): string => {
-	if (!dataType || typeof dataType != 'object' || !dataType.prim) {
+	if (!isObject(dataType) || !dataType.prim) {
 		return `Error: ${JSON.stringify(dataType)}`;
 	}
 	let friendlyDataType: string;
@@ -124,7 +117,6 @@ export const MichelineEditor = (
 	},
 ) => {
 	const previousState = vscodeApi.getState() as MichelineValue | undefined;
-	console.log(`Prev State: ${JSON.stringify(previousState)}`);
 
 	const [currentState, setState] = useState({
 		value: previousState ?? value,

@@ -1,4 +1,5 @@
 import React from 'react';
+import { isObject } from '../Helpers';
 import { BoolEditor } from './BoolEditor';
 import { ListEditor } from './ListEditor';
 import { MapEditor } from './MapEditor';
@@ -32,11 +33,10 @@ export const DataEditorNode = (
 const getEditor = (
 	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
 ) => {
-	console.log(value);
 	const prim = dataType.prim;
 	switch (prim) {
 		case 'unit':
-			if (!value || typeof value !== 'object' || value.prim !== 'Unit') {
+			if (!isObject(value) || value.prim !== 'Unit') {
 				onChange({
 					'prim': 'Unit',
 				});

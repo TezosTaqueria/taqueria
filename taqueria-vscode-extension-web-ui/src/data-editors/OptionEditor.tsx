@@ -1,4 +1,5 @@
 import React from 'react';
+import { isObject } from '../Helpers';
 import { DataEditorNode } from './DataEditorNode';
 import { VSCodeCheckbox } from './VsCodeWebViewUIToolkitWrappers';
 
@@ -11,10 +12,7 @@ export const OptionEditor = (
 			'args': [v],
 		});
 	};
-	if (
-		value === null || value === undefined || typeof value !== 'object'
-		|| (value.prim !== 'None' && value.prim !== 'Some')
-	) {
+	if (!isObject(value) || !['None', 'Some'].includes(value.prim)) {
 		value = {
 			'prim': 'None',
 		};
