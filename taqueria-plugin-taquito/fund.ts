@@ -14,7 +14,13 @@ import {
 	getNetworkInstantiatedAccounts,
 	getNetworkWithChecks,
 } from './common';
-import { performTransferOps, TableRow } from './transfer';
+import { ContractInfo, performTransferOps } from './transfer';
+
+type TableRow = {
+	accountAlias: string;
+	accountAddress: string;
+	mutezFunded: string;
+};
 
 const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<TezosToolkit> => {
 	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
@@ -26,19 +32,19 @@ const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<Te
 	return sendAsyncErr(targetConstraintErrMsg);
 };
 
-const getAccountsInfos = (
+const getAccountsInfo = (
 	parsedArgs: Opts,
 	tezos: TezosToolkit,
 	instantiatedAccounts: Record<string, any>,
-): Promise<TableRow[]> =>
+): Promise<ContractInfo[]> =>
 	Promise.all(
 		Object.entries(instantiatedAccounts)
 			.map(async (instantiatedAccount: [string, any]) => {
 				const alias = instantiatedAccount[0];
-				const aliasInfos = instantiatedAccount[1];
+				const aliasInfo = instantiatedAccount[1];
 
 				const declaredMutez: number | undefined = getDeclaredAccounts(parsedArgs)[alias];
-				const currentBalanceInMutez = (await tezos.tz.getBalance(aliasInfos.publicKeyHash)).toNumber();
+				const currentBalanceInMutez = (await tezos.tz.getBalance(aliasInfo.publicKeyHash)).toNumber();
 				const amountToFillInMutez = declaredMutez ? Math.max(declaredMutez - currentBalanceInMutez, 0) : 0;
 
 				if (!declaredMutez) {
@@ -49,24 +55,22 @@ const getAccountsInfos = (
 
 				return {
 					contractAlias: alias,
-					contractAddress: aliasInfos.publicKeyHash,
-					mutezTransfer: amountToFillInMutez.toString(),
+					contractAddress: aliasInfo.publicKeyHash,
 					parameter: 'Unit',
 					entrypoint: 'default',
-					destination: '',
+					mutezTransfer: amountToFillInMutez.toString(),
 				};
 			}),
 	)
-		.then(accountInfo => accountInfo.filter(accountInfo => accountInfo.mutezTransfer !== '0'))
+		.then(accountsInfo => accountsInfo.filter(accountInfo => accountInfo.mutezTransfer !== '0'))
 		.catch(err => sendAsyncErr(`Something went wrong while extracting account information - ${err}`));
 
-const simplifyAccountInfos = (accountInfos: TableRow[], opHash: string) =>
-	accountInfos.map(accountInfo => {
+const formatAccountsInfoForDisplay = (accountsInfo: ContractInfo[]): TableRow[] =>
+	accountsInfo.map(accountInfo => {
 		return {
 			accountAlias: accountInfo.contractAlias,
 			accountAddress: accountInfo.contractAddress,
 			mutezFunded: accountInfo.mutezTransfer,
-			operationHash: opHash,
 		};
 	});
 
@@ -77,14 +81,18 @@ const fund = async (parsedArgs: Opts): Promise<void> => {
 		const networkConfig = await getNetworkWithChecks(parsedArgs, env);
 		const tezos = await configureTezosToolKit(parsedArgs, env);
 		const instantiatedAccounts = getNetworkInstantiatedAccounts(networkConfig);
-		const accountsInfos = await getAccountsInfos(parsedArgs, tezos, instantiatedAccounts);
-		if (accountsInfos.length === 0) {
+
+		const accountsInfo = await getAccountsInfo(parsedArgs, tezos, instantiatedAccounts);
+		if (accountsInfo.length === 0) {
 			return sendJsonRes(
 				`All instantiated accounts in the current environment, "${parsedArgs.env}", are funded up to or beyond the declared amount.`,
 			);
 		}
-		const opHash = await performTransferOps(tezos, accountsInfos, getCurrentEnvironment(parsedArgs));
-		return sendJsonRes(simplifyAccountInfos(accountsInfos, opHash));
+
+		await performTransferOps(tezos, getCurrentEnvironment(parsedArgs), accountsInfo);
+
+		const accountsInfoForDisplay = formatAccountsInfoForDisplay(accountsInfo);
+		return sendJsonRes(accountsInfoForDisplay);
 	} catch {
 		return sendAsyncErr('No operations performed.');
 	}

@@ -14,6 +14,7 @@ const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 		const networkConfig = await getNetworkWithChecks(parsedArgs, env);
 		const declaredAccountAliases = Object.keys(getDeclaredAccounts(parsedArgs));
 		const instantiatedAccounts = getNetworkInstantiatedAccounts(networkConfig);
+
 		let accountsInstantiated = [];
 		for (const declaredAccountAlias of declaredAccountAliases) {
 			if (!instantiatedAccounts.hasOwnProperty(declaredAccountAlias)) {
@@ -25,6 +26,7 @@ const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 				);
 			}
 		}
+
 		if (accountsInstantiated.length !== 0) {
 			return sendJsonRes(
 				`Accounts instantiated: ${

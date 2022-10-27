@@ -11,32 +11,50 @@ import { Expr, Parser } from '@taquito/michel-codec';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { configureTezosToolKit, TransferOpts as Opts } from './common';
 
-export type TableRow = {
+export type ContractInfo = {
 	contractAlias: string;
 	contractAddress: string;
-	mutezTransfer: string;
 	parameter: string;
 	entrypoint: string;
+	mutezTransfer: string;
+};
+
+type TableRow = {
+	contractAlias: string;
+	contractAddress: string;
+	parameter: string;
+	entrypoint: string;
+	mutezTransfer: string;
 	destination: string;
 };
 
 const isContractAddress = (contract: string): boolean =>
 	contract.startsWith('tz1') || contract.startsWith('tz2') || contract.startsWith('tz3') || contract.startsWith('KT1');
 
-const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: TezosToolkit): Promise<TableRow> => {
+const getContractInfo = async (parsedArgs: Opts, env: Environment.t): Promise<ContractInfo> => {
 	const contract = parsedArgs.contract;
 	return {
 		contractAlias: isContractAddress(contract) ? 'N/A' : contract,
 		contractAddress: isContractAddress(contract) ? contract : await getAddressOfAlias(env, contract),
-		mutezTransfer: parsedArgs.mutez ?? '0',
 		parameter: parsedArgs.param ? await getParameter(parsedArgs, parsedArgs.param) : 'Unit',
 		entrypoint: parsedArgs.entrypoint ?? 'default',
+		mutezTransfer: parsedArgs.mutez ?? '0',
+	};
+};
+
+const formatContractInfoForDisplay = (tezos: TezosToolkit, contractInfo: ContractInfo): TableRow => {
+	return {
+		contractAlias: contractInfo.contractAlias,
+		contractAddress: contractInfo.contractAddress,
+		parameter: contractInfo.parameter,
+		entrypoint: contractInfo.entrypoint,
+		mutezTransfer: contractInfo.mutezTransfer,
 		destination: tezos.rpc.getRpcUrl(),
 	};
 };
 
-const createBatchForTransfer = (tezos: TezosToolkit, contractInfos: TableRow[]): WalletOperationBatch =>
-	contractInfos.reduce((acc, contractInfo) =>
+const createBatchForTransfer = (tezos: TezosToolkit, contractsInfo: ContractInfo[]): WalletOperationBatch =>
+	contractsInfo.reduce((acc, contractInfo) =>
 		acc.withTransfer({
 			to: contractInfo.contractAddress,
 			amount: parseInt(contractInfo.mutezTransfer),
@@ -47,8 +65,8 @@ const createBatchForTransfer = (tezos: TezosToolkit, contractInfos: TableRow[]):
 			mutez: true,
 		}), tezos.wallet.batch());
 
-export const performTransferOps = (tezos: TezosToolkit, contractInfos: TableRow[], env: string): Promise<string> =>
-	createBatchForTransfer(tezos, contractInfos).send()
+export const performTransferOps = (tezos: TezosToolkit, env: string, contractsInfo: ContractInfo[]): Promise<string> =>
+	createBatchForTransfer(tezos, contractsInfo).send()
 		.then(op => op.confirmation().then(() => op.opHash))
 		.catch(err => {
 			if (err instanceof Error) {
@@ -70,9 +88,13 @@ const transfer = async (parsedArgs: Opts): Promise<void> => {
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
 	try {
 		const tezos = await configureTezosToolKit(parsedArgs, env, parsedArgs.sender);
-		const contractInfo = await getContractInfo(parsedArgs, env, tezos);
-		const opHash = await performTransferOps(tezos, [contractInfo], getCurrentEnvironment(parsedArgs));
-		return sendJsonRes([contractInfo]);
+
+		const contractInfo = await getContractInfo(parsedArgs, env);
+
+		await performTransferOps(tezos, getCurrentEnvironment(parsedArgs), [contractInfo]);
+
+		const contractInfoForDisplay = formatContractInfoForDisplay(tezos, contractInfo);
+		return sendJsonRes([contractInfoForDisplay]);
 	} catch {
 		return sendAsyncErr('No operations performed.');
 	}
