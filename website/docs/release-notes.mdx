@@ -15,13 +15,13 @@ title: Taqueria Releases
 - A new and streamlined funding mechanism for Teztnet accounts has been implemented
 - The default config for a new project now comes pre-configured with an environment named `testing` that targets Ghostnet
 - The Taqueria CLI binary can now be installed directly from the VsCE
-- Taqueria now allows developers to use Beacon wallet on a Flextesa sandbox
+- Taqueria now allows developers to use Beacon Wallet on a Flextesa sandbox
 
 ### New Features
 
 #### Streamlined Account Funding Mechanism
 
-Taqueria now makes it easier than ever to fund testnet accounts. Under the hood, Taqueria now has a `root account` for each environment. This root account has a keypair generated implicitly and when an operation is submited to a testnet environment, Taqueria will check to see if the account is funded. If not, you will be provided the PHK of the root account, and a link to the new Teztnets faucet. Simply copy/paste the PKH into the faucet, and click on `Request 2001tz`
+Taqueria now makes it easier than ever to fund testnet accounts. Under the hood, Taqueria now has a `root account` for each environment. This root account has a keypair generated implicitly and when an operation is submitted to a testnet environment, Taqueria will check to see if the account is funded. If not, you will be provided the PHK of the root account, and a link to the new Teztnets faucet. Simply copy/paste the PKH into the faucet, and click on `Request 2001tz`
 
 Funding of the root account only needs to be done once, making the overall funding experience much more streamlined than the legacy faucet file method
 
@@ -41,7 +41,7 @@ Here are the summary of required steps necessary to connect your dapp to a local
 
 ```typescript
 // Import your taqueria config.json file so that we can dynamically
-// determine the the sandbox label & RPC url
+// determine the sandbox label & RPC url
 import taqConfig from "taq/config.json"
 
 // Use Taquito and the Beacon SDK to add the sandbox network to your wallet
@@ -78,7 +78,7 @@ A demonstration dApp has been created to showcase how this works: [https://githu
 
 - The default `config.json` provided by `taq init` now uses the K protocol by default
 - Typecheck and Simulate tasks now target protocol K by default
-- The Ligo plugin now uses a fixed stable of version of the Ligo CLI rather than @next/@stable
+- The Ligo plugin now uses a fixed stable version of the Ligo CLI rather than @next/@stable
 
 ### Migrating from Legacy Versions
 
