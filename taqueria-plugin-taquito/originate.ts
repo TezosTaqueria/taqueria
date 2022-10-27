@@ -8,6 +8,7 @@ import {
 } from '@taqueria/node-sdk';
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
+import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import { configureTezosToolKit, OriginateOpts as Opts } from './common';
@@ -47,7 +48,7 @@ const getContractInfo = async (parsedArgs: Opts): Promise<ContractInfo> => {
 		return sendAsyncErr(
 			`❌ No initial storage file was found for ${contract}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
 				getDefaultStorageFilename(contract)
-			}" in the artifacts directory\nYou can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option\n`,
+			}" in the artifacts directory\nYou can also manually pass a storage file to the originate task using the --storage STORAGE_FILE_NAME option\n`,
 		);
 	}
 
@@ -69,16 +70,12 @@ export const performOriginateOps = async (
 	parsedArgs: Opts,
 	tezos: TezosToolkit,
 	contractsInfo: ContractInfo[],
-): Promise<OperationContentsAndResultOrigination[]> => {
+): Promise<BatchWalletOperation> => {
 	const batch = createBatchForOriginate(tezos, contractsInfo);
 	try {
 		const op = await batch.send();
 		await op.confirmation();
-		const results = await op.operationResults();
-		const originationResults = results.filter(result => result.kind === 'origination').map(result =>
-			result as OperationContentsAndResultOrigination
-		);
-		return originationResults;
+		return op;
 	} catch (err) {
 		const error = (err as { message: string });
 		if (error.message) {
@@ -95,7 +92,7 @@ export const performOriginateOps = async (
 					return sendAsyncErr(
 						`The account ${publicKeyHash} for the target environment, "${
 							getCurrentEnvironment(parsedArgs)
-						}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+						}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
 					);
 				}
 			} else {
@@ -114,9 +111,13 @@ const prepContractInfoForDisplay = async (
 	parsedArgs: Opts,
 	tezos: TezosToolkit,
 	contractInfo: ContractInfo,
-	originationResults: OperationContentsAndResultOrigination[],
+	op: BatchWalletOperation,
 ): Promise<TableRow> => {
-	const result = originationResults.length === 1 ? originationResults[0] : undefined; // length should be 1 since we are batching operations
+	const operationResults = await op.operationResults();
+	const originationResults = operationResults.filter(result => result.kind === 'origination').map(result =>
+		result as OperationContentsAndResultOrigination
+	);
+	const result = originationResults.length === 1 ? originationResults[0] : undefined; // length should be 1 since we are batching originate operations into one
 	const address = result?.metadata?.operation_result?.originated_contracts?.join(',');
 	const alias = parsedArgs.alias ?? basename(contractInfo.contract, extname(contractInfo.contract));
 	if (address) await updateAddressAlias(parsedArgs, alias, address);
@@ -136,14 +137,9 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 
 		const contractInfo = await getContractInfo(parsedArgs);
 
-		const originationResults = await performOriginateOps(parsedArgs, tezos, [contractInfo]);
+		const op = await performOriginateOps(parsedArgs, tezos, [contractInfo]);
 
-		const contractInfoForDisplay = await prepContractInfoForDisplay(
-			parsedArgs,
-			tezos,
-			contractInfo,
-			originationResults,
-		);
+		const contractInfoForDisplay = await prepContractInfoForDisplay(parsedArgs, tezos, contractInfo, op);
 		return sendJsonRes([contractInfoForDisplay]);
 	} catch {
 		return sendAsyncErr('No operations performed.');
