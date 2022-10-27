@@ -5,14 +5,13 @@ import {
 	sendJsonRes,
 	sendWarn,
 } from '@taqueria/node-sdk';
-import { Environment } from '@taqueria/node-sdk/types';
 import { TezosToolkit } from '@taquito/taquito';
 import {
 	configureToolKitWithNetwork,
 	FundOpts as Opts,
 	getDeclaredAccounts,
+	getEnvTypeAndNodeConfig,
 	getNetworkInstantiatedAccounts,
-	getNetworkWithChecks,
 } from './common';
 import { ContractInfo, performTransferOps } from './transfer';
 
@@ -20,16 +19,6 @@ type TableRow = {
 	accountAlias: string;
 	accountAddress: string;
 	mutezFunded: string;
-};
-
-const configureTezosToolKit = (parsedArgs: Opts, env: Environment.t): Promise<TezosToolkit> => {
-	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
-	if (env.sandboxes?.length === 1 && env.networks?.length === 1) return sendAsyncErr(targetConstraintErrMsg);
-	if (env.sandboxes?.length === 1) {
-		return sendAsyncErr(`taq ${parsedArgs.task} cannot be executed in a sandbox environment`);
-	}
-	if (env.networks?.length === 1) return configureToolKitWithNetwork(parsedArgs, env.networks[0]);
-	return sendAsyncErr(targetConstraintErrMsg);
 };
 
 const getAccountsInfo = (
@@ -58,11 +47,11 @@ const getAccountsInfo = (
 					contractAddress: aliasInfo.publicKeyHash,
 					parameter: 'Unit',
 					entrypoint: 'default',
-					mutezTransfer: amountToFillInMutez.toString(),
+					mutezTransfer: parseInt(amountToFillInMutez.toString()),
 				};
 			}),
 	)
-		.then(accountsInfo => accountsInfo.filter(accountInfo => accountInfo.mutezTransfer !== '0'))
+		.then(accountsInfo => accountsInfo.filter(accountInfo => accountInfo.mutezTransfer !== 0))
 		.catch(err => sendAsyncErr(`Something went wrong while extracting account information - ${err}`));
 
 const prepAccountsInfoForDisplay = (accountsInfo: ContractInfo[]): TableRow[] =>
@@ -70,7 +59,7 @@ const prepAccountsInfoForDisplay = (accountsInfo: ContractInfo[]): TableRow[] =>
 		return {
 			accountAlias: accountInfo.contractAlias,
 			accountAddress: accountInfo.contractAddress,
-			mutezFunded: accountInfo.mutezTransfer,
+			mutezFunded: accountInfo.mutezTransfer.toString(),
 		};
 	});
 
@@ -78,9 +67,11 @@ const fund = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
 	try {
-		const networkConfig = await getNetworkWithChecks(parsedArgs, env);
-		const tezos = await configureTezosToolKit(parsedArgs, env);
-		const instantiatedAccounts = getNetworkInstantiatedAccounts(networkConfig);
+		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
+		if (envType !== 'Network') return sendAsyncErr('taq fund can only be executed in a network environment');
+		const tezos = await configureToolKitWithNetwork(parsedArgs, nodeConfig);
+
+		const instantiatedAccounts = getNetworkInstantiatedAccounts(nodeConfig);
 
 		const accountsInfo = await getAccountsInfo(parsedArgs, tezos, instantiatedAccounts);
 		if (accountsInfo.length === 0) {

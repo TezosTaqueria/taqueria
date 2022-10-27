@@ -1,12 +1,9 @@
 import {
 	getAccountPrivateKey,
-	getDefaultAccount,
+	getDefaultSandboxAccount,
 	getNetworkConfig,
-	getSandboxAccountConfig,
-	getSandboxAccountNames,
 	getSandboxConfig,
 	sendAsyncErr,
-	sendErr,
 	TAQ_OPERATOR_ACCOUNT,
 } from '@taqueria/node-sdk';
 import { Environment, NetworkConfig, RequestArgs, SandboxAccountConfig, SandboxConfig } from '@taqueria/node-sdk/types';
@@ -18,6 +15,7 @@ export interface OriginateOpts extends RequestArgs.ProxyRequestArgs {
 	storage: string;
 	alias?: string;
 	sender?: string;
+	mutez?: string;
 }
 
 export interface TransferOpts extends RequestArgs.ProxyRequestArgs {
@@ -40,35 +38,36 @@ export type IntersectionOpts = OriginateOpts & TransferOpts & InstantiateAccount
 // To be used for common functions in this file
 type UnionOpts = OriginateOpts | TransferOpts | InstantiateAccountOpts | FundOpts;
 
-export const getFirstAccountAlias = (sandboxName: string, opts: UnionOpts) => {
-	const [first, ..._] = getSandboxAccountNames(opts)(sandboxName);
-	return first;
-};
-
-export const configureTezosToolKit = (
+export const getEnvTypeAndNodeConfig = (
 	parsedArgs: UnionOpts,
 	env: Environment.t,
-	sender?: string,
-): Promise<TezosToolkit> => {
-	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
-	if (env.sandboxes?.length === 1 && env.networks?.length === 1) return sendAsyncErr(targetConstraintErrMsg);
-	if (env.sandboxes?.length === 1) return configureToolKitWithSandbox(parsedArgs, env.sandboxes[0], sender);
-	if (env.networks?.length === 1) return configureToolKitWithNetwork(parsedArgs, env.networks[0], sender);
+): Promise<['Network', NetworkConfig.t] | ['Sandbox', SandboxConfig.t]> => {
+	const targetConstraintErrMsg = 'Each environment can only have one target, be it a network or a sandbox';
+	if (env.networks?.length === 1 && env.sandboxes?.length === 1) return sendAsyncErr(targetConstraintErrMsg);
+	if (env.networks?.length === 1) {
+		const networkName = env.networks[0];
+		const network = getNetworkConfig(parsedArgs)(networkName);
+		if (!network) {
+			return sendAsyncErr(
+				`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json.`,
+			);
+		}
+		return Promise.resolve(['Network', network]);
+	}
+	if (env.sandboxes?.length === 1) {
+		const sandboxName = env.sandboxes[0];
+		const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
+		if (!sandbox) {
+			return sendAsyncErr(
+				`The current environment is configured to use a sandbox called '${sandboxName}'; however, no sandbox of this name has been configured in .taq/config.json.`,
+			);
+		}
+		return Promise.resolve(['Sandbox', sandbox]);
+	}
 	return sendAsyncErr(targetConstraintErrMsg);
 };
 
-export const configureToolKitWithSandbox = async (
-	parsedArgs: UnionOpts,
-	sandboxName: string,
-	sender?: string,
-): Promise<TezosToolkit> => {
-	const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
-	if (!sandbox) {
-		return sendAsyncErr(
-			`The current environment is configured to use a sandbox called '${sandboxName}'; however, no sandbox of this name has been configured in .taq/config.json.`,
-		);
-	}
-
+export const configureToolKitWithSandbox = async (sandbox: SandboxConfig.t, sender?: string): Promise<TezosToolkit> => {
 	let accountKey: string;
 	if (sender && sender !== 'default') {
 		const accounts = getSandboxInstantiatedAccounts(sandbox);
@@ -80,41 +79,25 @@ export const configureToolKitWithSandbox = async (
 			);
 		}
 	} else {
-		let defaultAccount = getDefaultAccount(parsedArgs)(sandboxName);
+		const defaultAccount = getDefaultSandboxAccount(sandbox);
 		if (!defaultAccount) {
-			const first = getFirstAccountAlias(sandboxName, parsedArgs);
-			if (first) {
-				defaultAccount = getSandboxAccountConfig(parsedArgs)(sandboxName)(first);
-				sendErr(
-					`Warning: A default account has not been specified for sandbox ${sandboxName}. Taqueria will use the account ${first} for this operation.\nA default account can be specified in .taq/config.json at JSON path: sandbox.${sandboxName}.accounts.default\n`,
-				);
-			}
-		}
-		if (!defaultAccount) {
-			return sendAsyncErr(`No accounts are available for the sandbox called ${sandboxName} to perform the operation.`);
+			return sendAsyncErr(
+				`No default account is specified in the sandbox to perform the operation. Please use the --sender flag to explicitly specify the account to use as the sender of the operation`,
+			);
 		}
 		accountKey = defaultAccount.secretKey;
 	}
 
 	const tezos = new TezosToolkit(sandbox.rpcUrl as string);
-	tezos.setProvider({
-		signer: new InMemorySigner(accountKey.replace(/^unencrypted:/, '')),
-	});
+	tezos.setProvider({ signer: new InMemorySigner(accountKey.replace(/^unencrypted:/, '')) });
 	return tezos;
 };
 
 export const configureToolKitWithNetwork = async (
 	parsedArgs: UnionOpts,
-	networkName: string,
+	network: NetworkConfig.t,
 	sender?: string,
 ): Promise<TezosToolkit> => {
-	const network = getNetworkConfig(parsedArgs)(networkName);
-	if (!network) {
-		return sendAsyncErr(
-			`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json.`,
-		);
-	}
-
 	let account: string;
 	if (sender && sender !== TAQ_OPERATOR_ACCOUNT) {
 		const accounts = getNetworkInstantiatedAccounts(network);
@@ -153,7 +136,7 @@ export const getSandboxInstantiatedAccounts = (sandbox: SandboxConfig.t): Record
 		? Object.entries(sandbox.accounts).reduce(
 			(acc, instantiatedAccount) => {
 				const alias: string = instantiatedAccount[0];
-				const keys = instantiatedAccount[1] as SandboxAccountConfig.t;
+				const keys = instantiatedAccount[1];
 				return alias !== 'default'
 					? {
 						...acc,
@@ -166,7 +149,7 @@ export const getSandboxInstantiatedAccounts = (sandbox: SandboxConfig.t): Record
 		: {};
 
 export const getNetworkInstantiatedAccounts = (network: NetworkConfig.t): Record<string, any> =>
-	(network?.accounts)
+	network.accounts
 		? Object.entries(network.accounts).reduce(
 			(acc, instantiatedAccount) => {
 				const alias: string = instantiatedAccount[0];
@@ -181,25 +164,6 @@ export const getNetworkInstantiatedAccounts = (network: NetworkConfig.t): Record
 			{},
 		)
 		: {};
-
-export const getNetworkWithChecks = (parsedArgs: UnionOpts, env: Environment.t): Promise<NetworkConfig.t> => {
-	const targetConstraintErrMsg = 'Each environment can only have one target, be it a sandbox or a network';
-	if (env.sandboxes?.length === 1 && env.networks?.length === 1) return sendAsyncErr(targetConstraintErrMsg);
-	if (env.sandboxes?.length === 1) {
-		return sendAsyncErr(`taq ${parsedArgs.task} cannot be executed in a sandbox environment`);
-	}
-	if (env.networks?.length === 1) {
-		const networkName = env.networks[0];
-		const network = getNetworkConfig(parsedArgs)(networkName);
-		if (!network) {
-			return sendAsyncErr(
-				`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json.`,
-			);
-		}
-		return Promise.resolve(network);
-	}
-	return sendAsyncErr(targetConstraintErrMsg);
-};
 
 export const generateAccountKeys = async (
 	parsedArgs: UnionOpts,

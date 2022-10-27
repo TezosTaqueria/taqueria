@@ -49,4 +49,5 @@ Options:
                      originating a contract
       --sender      Name of an instantiated account to use as the sender of the
                     originate operation
+      --mutez       Amount of Mutez to transfer
 `;

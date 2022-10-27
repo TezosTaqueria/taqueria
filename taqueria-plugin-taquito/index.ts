@@ -27,6 +27,11 @@ Plugin.create(_i18n => ({
 					description: 'Name of an instantiated account to use as the sender of the originate operation',
 					required: false,
 				}),
+				Option.create({
+					flag: 'mutez',
+					description: 'Amount of Mutez to transfer',
+					required: false,
+				}),
 			],
 			aliases: ['originate'],
 			handler: 'proxy',

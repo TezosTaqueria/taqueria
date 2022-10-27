@@ -11,18 +11,26 @@ import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-import { configureTezosToolKit, handleOpsError, OriginateOpts as Opts } from './common';
+import {
+	configureToolKitWithNetwork,
+	configureToolKitWithSandbox,
+	getEnvTypeAndNodeConfig,
+	handleOpsError,
+	OriginateOpts as Opts,
+} from './common';
 
 type ContractInfo = {
 	contract: string;
 	code: string;
 	initStorage: string;
+	mutezTransfer: number;
 };
 
 type TableRow = {
 	contract: string;
 	address: string;
 	alias: string;
+	balanceInMutez: string;
 	destination: string;
 };
 
@@ -56,6 +64,7 @@ const getContractInfo = async (parsedArgs: Opts): Promise<ContractInfo> => {
 		contract,
 		code: contractCode,
 		initStorage: contractInitStorage,
+		mutezTransfer: parseInt(parsedArgs.mutez ?? '0'),
 	};
 };
 
@@ -64,6 +73,8 @@ const createBatchForOriginate = (tezos: TezosToolkit, contractsInfo: ContractInf
 		acc.withOrigination({
 			code: contractInfo.code,
 			init: contractInfo.initStorage,
+			balance: contractInfo.mutezTransfer.toString(),
+			mutez: true,
 		}), tezos.wallet.batch());
 
 export const performOriginateOps = async (
@@ -99,6 +110,7 @@ const prepContractInfoForDisplay = async (
 		contract: contractInfo.contract,
 		address: address ?? 'Something went wrong during origination',
 		alias: address ? alias : 'N/A',
+		balanceInMutez: contractInfo.mutezTransfer.toString(),
 		destination: tezos.rpc.getRpcUrl(),
 	};
 };
@@ -107,7 +119,10 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
 	try {
-		const tezos = await configureTezosToolKit(parsedArgs, env, parsedArgs.sender);
+		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
+		const tezos = await (envType === 'Network'
+			? configureToolKitWithNetwork(parsedArgs, nodeConfig, parsedArgs.sender)
+			: configureToolKitWithSandbox(nodeConfig, parsedArgs.sender));
 
 		const contractInfo = await getContractInfo(parsedArgs);
 

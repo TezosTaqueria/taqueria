@@ -2,8 +2,8 @@ import { getCurrentEnvironmentConfig, sendAsyncErr, sendJsonRes, sendWarn } from
 import {
 	generateAccountKeys,
 	getDeclaredAccounts,
+	getEnvTypeAndNodeConfig,
 	getNetworkInstantiatedAccounts,
-	getNetworkWithChecks,
 	InstantiateAccountOpts as Opts,
 } from './common';
 
@@ -11,14 +11,18 @@ const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
 	try {
-		const networkConfig = await getNetworkWithChecks(parsedArgs, env);
+		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
+		if (envType !== 'Network') {
+			return sendAsyncErr('taq instantiate-account can only be executed in a network environment');
+		}
+
 		const declaredAccountAliases = Object.keys(getDeclaredAccounts(parsedArgs));
-		const instantiatedAccounts = getNetworkInstantiatedAccounts(networkConfig);
+		const instantiatedAccounts = getNetworkInstantiatedAccounts(nodeConfig);
 
 		let accountsInstantiated = [];
 		for (const declaredAccountAlias of declaredAccountAliases) {
 			if (!instantiatedAccounts.hasOwnProperty(declaredAccountAlias)) {
-				await generateAccountKeys(parsedArgs, networkConfig, declaredAccountAlias);
+				await generateAccountKeys(parsedArgs, nodeConfig, declaredAccountAlias);
 				accountsInstantiated.push(declaredAccountAlias);
 			} else {
 				sendWarn(

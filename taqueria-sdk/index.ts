@@ -411,17 +411,13 @@ export const getSandboxAccountNames = (parsedArgs: RequestArgs.t) =>
 /**
  * Gets the account config for the named account of the given sandbox
  */
-export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
-	(sandboxName: string) =>
-		(accountName: string) => {
-			const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
-
-			if (sandbox && sandbox.accounts) {
-				const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>;
-				return accounts[accountName];
-			}
-			return undefined;
-		};
+export const getSandboxAccountConfig = (sandbox: SandboxConfig.t, accountName: string) => {
+	if (sandbox.accounts) {
+		const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>;
+		return accounts[accountName];
+	}
+	return undefined;
+};
 
 /**
  * Gets the initial storage for the contract associated with the given storage file
@@ -532,19 +528,12 @@ export const getAccountPrivateKey = async (
 /**
  * Gets the default account associated with a sandbox
  */
-export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>
-	(sandboxName: string) => {
-		const sandboxConfig = getSandboxConfig(parsedArgs)(sandboxName);
-		if (sandboxConfig) {
-			const accounts = sandboxConfig.accounts ?? {};
-			const defaultAccount = accounts['default'] as string | undefined;
-			if (defaultAccount) {
-				return getSandboxAccountConfig(parsedArgs)(sandboxName)(defaultAccount);
-			}
-		}
-
-		return undefined;
-	};
+export const getDefaultSandboxAccount = (sandbox: SandboxConfig.t) => {
+	const accounts = sandbox.accounts ?? {};
+	const defaultAccount = accounts['default'] as string | undefined;
+	if (defaultAccount) return getSandboxAccountConfig(sandbox, defaultAccount);
+	return undefined;
+};
 
 export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
 	if (!config.contracts) return [];
