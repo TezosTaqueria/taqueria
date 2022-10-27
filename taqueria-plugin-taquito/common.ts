@@ -210,3 +210,21 @@ export const generateAccountKeys = async (
 	const key = await getAccountPrivateKey(parsedArgs, network, account);
 	await importKey(tezos, key);
 };
+
+export const handleOpsError = (err: unknown, env: string): Promise<never> => {
+	if (err instanceof Error) {
+		const msg = err.message;
+		if (/ENOTFOUND/.test(msg)) return sendAsyncErr('The RPC URL may be invalid. Check ./.taq/config.json.');
+		if (/ECONNREFUSED/.test(msg)) return sendAsyncErr('The RPC URL may be down or the sandbox is not running.');
+		if (/empty_implicit_contract/.test(msg)) {
+			const result = msg.match(/(?<="implicit":")tz[^"]+(?=")/);
+			const publicKeyHash = result ? result[0] : undefined;
+			if (publicKeyHash) {
+				return sendAsyncErr(
+					`The account ${publicKeyHash} for the target environment, "${env}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+				);
+			}
+		}
+	}
+	return sendAsyncErr(`Error while performing operation:\n${err} ${JSON.stringify(err, null, 2)}`);
+};

@@ -11,7 +11,7 @@ import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-import { configureTezosToolKit, OriginateOpts as Opts } from './common';
+import { configureTezosToolKit, handleOpsError, OriginateOpts as Opts } from './common';
 
 type ContractInfo = {
 	contract: string;
@@ -67,8 +67,8 @@ const createBatchForOriginate = (tezos: TezosToolkit, contractsInfo: ContractInf
 		}), tezos.wallet.batch());
 
 export const performOriginateOps = async (
-	parsedArgs: Opts,
 	tezos: TezosToolkit,
+	env: string,
 	contractsInfo: ContractInfo[],
 ): Promise<BatchWalletOperation> => {
 	const batch = createBatchForOriginate(tezos, contractsInfo);
@@ -77,33 +77,7 @@ export const performOriginateOps = async (
 		await op.confirmation();
 		return op;
 	} catch (err) {
-		const error = (err as { message: string });
-		if (error.message) {
-			const msg = error.message;
-			if (/ENOTFOUND/.test(msg)) {
-				return sendAsyncErr(msg + ' - The RPC URL may be invalid. Check ./.taq/config.json.\n');
-			} else if (/ECONNREFUSED/.test(msg)) {
-				return sendAsyncErr(msg + ' - The RPC URL may be down or the sandbox is not running.');
-			} else if (/empty_implicit_contract/.test(msg)) {
-				const result = msg.match(/(?<="implicit":")tz[^"]+(?=")/);
-				const publicKeyHash = result ? result[0] : undefined;
-				if (!publicKeyHash) return sendAsyncErr(msg);
-				else {
-					return sendAsyncErr(
-						`The account ${publicKeyHash} for the target environment, "${
-							getCurrentEnvironment(parsedArgs)
-						}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
-					);
-				}
-			} else {
-				return sendAsyncErr(
-					msg
-						+ " - There was a problem communicating with the chain. Check the RPC URL of the network or sandbox you're targeting in config.json.\n",
-				);
-			}
-		} else {
-			return sendAsyncErr(`Error during originate operation:\n${err} ${JSON.stringify(err, null, 2)}`);
-		}
+		return handleOpsError(err, env);
 	}
 };
 
@@ -137,7 +111,7 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 
 		const contractInfo = await getContractInfo(parsedArgs);
 
-		const op = await performOriginateOps(parsedArgs, tezos, [contractInfo]);
+		const op = await performOriginateOps(tezos, getCurrentEnvironment(parsedArgs), [contractInfo]);
 
 		const contractInfoForDisplay = await prepContractInfoForDisplay(parsedArgs, tezos, contractInfo, op);
 		return sendJsonRes([contractInfoForDisplay]);

@@ -145,7 +145,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			});
 
 			// 4. Verify that taqueria throw an error for transfer
-			expect(transferResult.stderr).toContain('Error during transfer operation');
+			expect(transferResult.stderr).toContain('Error while performing operation');
 			expect(transferResult.stderr).toContain('TezosOperationError: (temporary) proto.alpha.contract.balance_too_low');
 			expect(transferResult.stderr).toContain('No operations performed');
 		} catch (error) {

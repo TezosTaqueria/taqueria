@@ -9,7 +9,8 @@ import {
 import { Environment } from '@taqueria/node-sdk/types';
 import { Expr, Parser } from '@taquito/michel-codec';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
-import { configureTezosToolKit, TransferOpts as Opts } from './common';
+import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
+import { configureTezosToolKit, handleOpsError, TransferOpts as Opts } from './common';
 
 export type ContractInfo = {
 	contractAlias: string;
@@ -54,23 +55,20 @@ const createBatchForTransfer = (tezos: TezosToolkit, contractsInfo: ContractInfo
 			mutez: true,
 		}), tezos.wallet.batch());
 
-export const performTransferOps = (tezos: TezosToolkit, env: string, contractsInfo: ContractInfo[]): Promise<string> =>
-	createBatchForTransfer(tezos, contractsInfo).send()
-		.then(op => op.confirmation().then(() => op.opHash))
-		.catch(err => {
-			if (err instanceof Error) {
-				if (/empty_implicit_contract/.test(err.message)) {
-					const result = (err.message).match(/(?<="implicit":")tz[^"]+(?=")/);
-					const publicKeyHash = result ? result[0] : undefined;
-					if (publicKeyHash) {
-						return sendAsyncErr(
-							`The account ${publicKeyHash} for the target environment, "${env}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
-						);
-					}
-				}
-			}
-			return sendAsyncErr(`Error during transfer operation:\n${err} ${JSON.stringify(err, null, 2)}`);
-		});
+export const performTransferOps = async (
+	tezos: TezosToolkit,
+	env: string,
+	contractsInfo: ContractInfo[],
+): Promise<BatchWalletOperation> => {
+	const batch = createBatchForTransfer(tezos, contractsInfo);
+	try {
+		const op = await batch.send();
+		await op.confirmation();
+		return op;
+	} catch (err) {
+		return handleOpsError(err, env);
+	}
+};
 
 const prepContractInfoForDisplay = (tezos: TezosToolkit, contractInfo: ContractInfo): TableRow => {
 	return {
