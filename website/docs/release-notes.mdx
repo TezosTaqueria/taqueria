@@ -82,6 +82,29 @@ A demonstration dApp has been created to showcase how this works: [https://githu
 
 ### Migrating from Legacy Versions
 
+To upgrade, you must downloade Taqueria v0.22.2 binary, replacing the legacy version
+
+This can be done by following these steps:
+
+1) Change into the installation directory
+
+```shell
+cd /usr/local/bin
+```
+
+2) Remove the existing `taq` binary
+
+```shell
+rm taq
+```
+
+3) Download the appropriate Taqueria v0.22.2 binary for your operating system
+
+```shell
+curl -LO https://taqueria.io/get/macos/taq
+curl -LO https://taqueria.io/get/linux/taq
+```
+
 You can update your existing projects to use Taqueria v0.22.2 plugins using the following command:
 
 ```shell
