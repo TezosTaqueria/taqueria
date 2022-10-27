@@ -42,17 +42,6 @@ const getContractInfo = async (parsedArgs: Opts, env: Environment.t): Promise<Co
 	};
 };
 
-const formatContractInfoForDisplay = (tezos: TezosToolkit, contractInfo: ContractInfo): TableRow => {
-	return {
-		contractAlias: contractInfo.contractAlias,
-		contractAddress: contractInfo.contractAddress,
-		parameter: contractInfo.parameter,
-		entrypoint: contractInfo.entrypoint,
-		mutezTransfer: contractInfo.mutezTransfer,
-		destination: tezos.rpc.getRpcUrl(),
-	};
-};
-
 const createBatchForTransfer = (tezos: TezosToolkit, contractsInfo: ContractInfo[]): WalletOperationBatch =>
 	contractsInfo.reduce((acc, contractInfo) =>
 		acc.withTransfer({
@@ -83,6 +72,17 @@ export const performTransferOps = (tezos: TezosToolkit, env: string, contractsIn
 			return sendAsyncErr(`Error during transfer operation:\n${err} ${JSON.stringify(err, null, 2)}`);
 		});
 
+const prepContractInfoForDisplay = (tezos: TezosToolkit, contractInfo: ContractInfo): TableRow => {
+	return {
+		contractAlias: contractInfo.contractAlias,
+		contractAddress: contractInfo.contractAddress,
+		parameter: contractInfo.parameter,
+		entrypoint: contractInfo.entrypoint,
+		mutezTransfer: contractInfo.mutezTransfer,
+		destination: tezos.rpc.getRpcUrl(),
+	};
+};
+
 const transfer = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
@@ -93,7 +93,7 @@ const transfer = async (parsedArgs: Opts): Promise<void> => {
 
 		await performTransferOps(tezos, getCurrentEnvironment(parsedArgs), [contractInfo]);
 
-		const contractInfoForDisplay = formatContractInfoForDisplay(tezos, contractInfo);
+		const contractInfoForDisplay = prepContractInfoForDisplay(tezos, contractInfo);
 		return sendJsonRes([contractInfoForDisplay]);
 	} catch {
 		return sendAsyncErr('No operations performed.');

@@ -424,27 +424,9 @@ export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
 		};
 
 /**
- * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
+ * Gets the initial storage for the contract associated with the given storage file
  */
-export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilename: string) => {
-	const env = getCurrentEnvironmentConfig(parsedArgs);
-	if (env && env.storage && env.storage[contractFilename]) {
-		const storagePath: string = env.storage[contractFilename];
-		try {
-			const content = await readFile(storagePath, { encoding: 'utf-8' });
-			return content;
-		} catch (err) {
-			sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
-			return undefined;
-		}
-	}
-	return undefined;
-};
-
-/**
- * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
- */
-export const newGetInitialStorage = async (
+export const getInitialStorage = async (
 	parsedArgs: RequestArgs.t,
 	storageFilename: string,
 ): Promise<string | undefined> => {
@@ -458,6 +440,9 @@ export const newGetInitialStorage = async (
 	}
 };
 
+/**
+ * Gets the parameter for the contract associated with the given parameter file
+ */
 export const getParameter = async (parsedArgs: RequestArgs.t, paramFilename: string): Promise<string> => {
 	const paramPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, paramFilename);
 	try {
@@ -510,7 +495,7 @@ const createAddress = async (network: NetworkConfig.t): Promise<TezosToolkit> =>
 	return tezos;
 };
 
-// Temporary solution before the environment refactor
+// TODO: This is a temporary solution before the environment refactor. Might be removed after this refactor
 export const getAccountPrivateKey = async (
 	parsedArgs: RequestArgs.t,
 	network: NetworkConfig.t,

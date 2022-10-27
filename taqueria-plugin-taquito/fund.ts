@@ -65,7 +65,7 @@ const getAccountsInfo = (
 		.then(accountsInfo => accountsInfo.filter(accountInfo => accountInfo.mutezTransfer !== '0'))
 		.catch(err => sendAsyncErr(`Something went wrong while extracting account information - ${err}`));
 
-const formatAccountsInfoForDisplay = (accountsInfo: ContractInfo[]): TableRow[] =>
+const prepAccountsInfoForDisplay = (accountsInfo: ContractInfo[]): TableRow[] =>
 	accountsInfo.map(accountInfo => {
 		return {
 			accountAlias: accountInfo.contractAlias,
@@ -91,7 +91,7 @@ const fund = async (parsedArgs: Opts): Promise<void> => {
 
 		await performTransferOps(tezos, getCurrentEnvironment(parsedArgs), accountsInfo);
 
-		const accountsInfoForDisplay = formatAccountsInfoForDisplay(accountsInfo);
+		const accountsInfoForDisplay = prepAccountsInfoForDisplay(accountsInfo);
 		return sendJsonRes(accountsInfoForDisplay);
 	} catch {
 		return sendAsyncErr('No operations performed.');
