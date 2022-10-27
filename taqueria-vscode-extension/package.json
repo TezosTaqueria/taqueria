@@ -3,7 +3,7 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
-	"version": "0.20.2",
+	"version": "0.22.2",
 	"private": true,
 	"engines": {
 		"vscode": "^1.68.1",
@@ -345,7 +345,7 @@
 			{
 				"command": "taqueria.typecheck",
 				"category": "Taqueria",
-				"title": "Typecheck Michelson contracts",
+				"title": "Typecheck Artifact",
 				"shortTitle": "typecheck",
 				"enablement": "@taqueria/plugin-tezos-client",
 				"icon": "$(check)"
@@ -538,6 +538,11 @@
 					"group": "inline"
 				},
 				{
+					"command": "taqueria.typecheck",
+					"when": "view == taqueria-artifacts",
+					"group": "inline"
+				},
+				{
 					"command": "taqueria.originate_pick_file",
 					"when": "view == taqueria-environments",
 					"group": "inline"
@@ -629,7 +634,7 @@
 	},
 	"dependencies": {
 		"@microsoft/signalr": "^6.0.8",
-		"@taqueria/protocol": "^0.20.2",
+		"@taqueria/protocol": "^0.22.2",
 		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
 		"eventsource": "^2.0.2",

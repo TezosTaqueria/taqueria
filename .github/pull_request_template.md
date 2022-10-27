@@ -1,4 +1,4 @@
-# 🌮🌮🌮 Taqueria PR 🌮🌮🌮
+# 🌮 Taqueria PR
 
 ## 🪁 Description
 
@@ -27,7 +27,7 @@ _(e.g. what was the existing behaviour, why did it break, etc.)_
 
 ## 🎢 Test Plan
 
-_Please describe the testing strategy and plan for this PR_
+_Please describe the testing strategy and plan for this PR. Keep this lightweight and anticipate any testing challenges_
 
 ## 🛸 Type of Change
 
