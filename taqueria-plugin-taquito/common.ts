@@ -67,7 +67,7 @@ export const getEnvTypeAndNodeConfig = (
 	return sendAsyncErr(targetConstraintErrMsg);
 };
 
-export const configureToolKitWithSandbox = async (sandbox: SandboxConfig.t, sender?: string): Promise<TezosToolkit> => {
+export const configureToolKitForSandbox = async (sandbox: SandboxConfig.t, sender?: string): Promise<TezosToolkit> => {
 	let accountKey: string;
 	if (sender && sender !== 'default') {
 		const accounts = getSandboxInstantiatedAccounts(sandbox);
@@ -93,7 +93,7 @@ export const configureToolKitWithSandbox = async (sandbox: SandboxConfig.t, send
 	return tezos;
 };
 
-export const configureToolKitWithNetwork = async (
+export const configureToolKitForNetwork = async (
 	parsedArgs: UnionOpts,
 	network: NetworkConfig.t,
 	sender?: string,

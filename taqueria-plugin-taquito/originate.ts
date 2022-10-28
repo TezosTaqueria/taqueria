@@ -12,8 +12,8 @@ import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-o
 import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import {
-	configureToolKitWithNetwork,
-	configureToolKitWithSandbox,
+	configureToolKitForNetwork,
+	configureToolKitForSandbox,
 	getEnvTypeAndNodeConfig,
 	handleOpsError,
 	OriginateOpts as Opts,
@@ -99,13 +99,17 @@ const prepContractInfoForDisplay = async (
 	op: BatchWalletOperation,
 ): Promise<TableRow> => {
 	const operationResults = await op.operationResults();
-	const originationResults = operationResults.filter(result => result.kind === 'origination').map(result =>
-		result as OperationContentsAndResultOrigination
-	);
-	const result = originationResults.length === 1 ? originationResults[0] : undefined; // length should be 1 since we are batching originate operations into one
+	const originationResults = operationResults
+		.filter(result => result.kind === 'origination')
+		.map(result => result as OperationContentsAndResultOrigination);
+
+	// Length should be 1 since we are batching originate operations into one
+	const result = originationResults.length === 1 ? originationResults[0] : undefined;
 	const address = result?.metadata?.operation_result?.originated_contracts?.join(',');
+
 	const alias = parsedArgs.alias ?? basename(contractInfo.contract, extname(contractInfo.contract));
 	if (address) await updateAddressAlias(parsedArgs, alias, address);
+
 	return {
 		contract: contractInfo.contract,
 		address: address ?? 'Something went wrong during origination',
@@ -121,8 +125,8 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 	try {
 		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
 		const tezos = await (envType === 'Network'
-			? configureToolKitWithNetwork(parsedArgs, nodeConfig, parsedArgs.sender)
-			: configureToolKitWithSandbox(nodeConfig, parsedArgs.sender));
+			? configureToolKitForNetwork(parsedArgs, nodeConfig, parsedArgs.sender)
+			: configureToolKitForSandbox(nodeConfig, parsedArgs.sender));
 
 		const contractInfo = await getContractInfo(parsedArgs);
 

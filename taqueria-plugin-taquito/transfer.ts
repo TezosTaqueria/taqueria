@@ -11,8 +11,8 @@ import { Expr, Parser } from '@taquito/michel-codec';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
 import {
-	configureToolKitWithNetwork,
-	configureToolKitWithSandbox,
+	configureToolKitForNetwork,
+	configureToolKitForSandbox,
 	getEnvTypeAndNodeConfig,
 	handleOpsError,
 	TransferOpts as Opts,
@@ -93,8 +93,8 @@ const transfer = async (parsedArgs: Opts): Promise<void> => {
 	try {
 		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
 		const tezos = await (envType === 'Network'
-			? configureToolKitWithNetwork(parsedArgs, nodeConfig, parsedArgs.sender)
-			: configureToolKitWithSandbox(nodeConfig, parsedArgs.sender));
+			? configureToolKitForNetwork(parsedArgs, nodeConfig, parsedArgs.sender)
+			: configureToolKitForSandbox(nodeConfig, parsedArgs.sender));
 
 		const contractInfo = await getContractInfo(parsedArgs, env);
 

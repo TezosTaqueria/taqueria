@@ -7,7 +7,7 @@ import {
 } from '@taqueria/node-sdk';
 import { TezosToolkit } from '@taquito/taquito';
 import {
-	configureToolKitWithNetwork,
+	configureToolKitForNetwork,
 	FundOpts as Opts,
 	getDeclaredAccounts,
 	getEnvTypeAndNodeConfig,
@@ -69,7 +69,7 @@ const fund = async (parsedArgs: Opts): Promise<void> => {
 	try {
 		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
 		if (envType !== 'Network') return sendAsyncErr('taq fund can only be executed in a network environment');
-		const tezos = await configureToolKitWithNetwork(parsedArgs, nodeConfig);
+		const tezos = await configureToolKitForNetwork(parsedArgs, nodeConfig);
 
 		const instantiatedAccounts = getNetworkInstantiatedAccounts(nodeConfig);
 
