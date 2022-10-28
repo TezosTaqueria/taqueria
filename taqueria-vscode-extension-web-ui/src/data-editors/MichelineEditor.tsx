@@ -1,8 +1,9 @@
 import { emitMicheline, Parser } from '@taquito/michel-codec';
 import React, { useState } from 'react';
 import { WebviewApi } from 'vscode-webview';
-import { isObject, MichelineValue as ValidationMichelineValue } from '../Helpers';
+import { isObject } from '../Helpers';
 import { MichelineEditorMessageHandler } from '../interopTypes';
+import { MichelineValue } from '../MichelineValue';
 import { DataEditorNode } from './DataEditorNode';
 import './MichelineEditor.css';
 import { validate } from './MichelineValidator';
@@ -13,7 +14,7 @@ const parser = new Parser();
 
 export type OriginalFormat = 'micheline' | 'json';
 
-export type MichelineValue = {
+export type MichelineValueContainer = {
 	originalFormat: 'micheline';
 	value: string;
 } | {
@@ -34,7 +35,7 @@ const micheline2Json = (v: string) => {
 	return json;
 };
 
-export const getMicheline = (value: MichelineValue | undefined) => {
+export const getMicheline = (value: MichelineValueContainer | undefined) => {
 	if (!value) {
 		return undefined;
 	}
@@ -44,7 +45,7 @@ export const getMicheline = (value: MichelineValue | undefined) => {
 	return json2Micheline(value.value);
 };
 
-export const getJson = (value: MichelineValue | undefined) => {
+export const getJson = (value: MichelineValueContainer | undefined) => {
 	if (!value) {
 		return undefined;
 	}
@@ -112,18 +113,18 @@ declare const vscodeApi: WebviewApi<any>;
 
 export const MichelineEditor = (
 	{ input: { dataType, value, actionTitle, showDiagnostics }, onMessage }: {
-		input: { dataType: any; value?: MichelineValue; actionTitle?: string; showDiagnostics?: boolean };
+		input: { dataType: any; value?: MichelineValueContainer; actionTitle?: string; showDiagnostics?: boolean };
 		onMessage: MichelineEditorMessageHandler;
 	},
 ) => {
-	const previousState = vscodeApi.getState() as MichelineValue | undefined;
+	const previousState: MichelineValueContainer | undefined = vscodeApi.getState();
 
 	const [currentState, setState] = useState({
 		value: previousState ?? value,
 		showDiagnostics: showDiagnostics ?? false,
 	});
 
-	const handleChange = (v: MichelineValue) => {
+	const handleChange = (v: MichelineValueContainer) => {
 		setState({
 			value: v,
 			showDiagnostics: currentState.showDiagnostics,
@@ -151,7 +152,7 @@ export const MichelineEditor = (
 		});
 	};
 
-	const validationResult = validate(dataType, getJson(currentState.value) as ValidationMichelineValue);
+	const validationResult = validate(dataType, getJson(currentState.value) as MichelineValue);
 	return (
 		<div className={currentState.showDiagnostics ? 'editorDiv showDiag' : 'editorDiv'}>
 			<table border={currentState.showDiagnostics ? 1 : 0}>

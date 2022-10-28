@@ -1,20 +1,23 @@
 import React from 'react';
-import { isObject } from '../Helpers';
+import { hasPrim, isObject } from '../Helpers';
+import { MichelineBoolValue } from '../MichelineValue';
 
 export const BoolEditor = (
-	{ value, onChange }: { value: any; onChange: (value: { prim: 'True' | 'False' }) => void },
+	{ value, onChange }: { value: unknown; onChange: (value: MichelineBoolValue) => void },
 ) => {
-	if (!isObject(value) && !['False', 'True'].includes(value.prim)) {
-		value = {
-			'prim': 'False',
+	if (!isObject(value) || !hasPrim(value) || !['False', 'True'].includes(value.prim)) {
+		const newValue = {
+			'prim': 'False' as const,
 		};
-		onChange(value);
+		value = newValue;
+		onChange(newValue);
 	}
+	const boolValue = value as MichelineBoolValue;
 	const changeValue = (v: boolean) => {
 		const newValue = {
 			prim: v ? ('True' as const) : ('False' as const),
 		};
 		onChange(newValue);
 	};
-	return <input type='checkBox' checked={value['prim'] === 'True'} onChange={e => changeValue(e.target.checked)} />;
+	return <input type='checkBox' checked={boolValue.prim === 'True'} onChange={e => changeValue(e.target.checked)} />;
 };

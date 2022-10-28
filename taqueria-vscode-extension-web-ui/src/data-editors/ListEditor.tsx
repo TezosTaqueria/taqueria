@@ -1,18 +1,22 @@
 import React from 'react';
+import { MichelineDataType } from '../MichelineDataType';
+import { MichelineMapItem } from '../MichelineValue';
 import { DataEditorNode } from './DataEditorNode';
 import { compare, validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
 import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 
 export const ListEditor = (
-	{ dataType, value, onChange }: { dataType: any; value: any[]; onChange: (value: any) => void },
+	{ dataType, value, onChange }: { dataType: MichelineDataType; value: unknown; onChange: (value: any) => void },
 ) => {
 	if (!Array.isArray(value)) {
 		value = [];
 		onChange(value);
 	}
-	const changeValue = (index: number, v: any) => {
-		const newValue = value.slice();
+	const arrayValue = value as MichelineMapItem[];
+
+	const changeValue = (index: number, v: MichelineMapItem) => {
+		const newValue = arrayValue.slice();
 		newValue[index] = v;
 		onChange(newValue);
 	};
@@ -20,42 +24,42 @@ export const ListEditor = (
 		if (index <= 0) {
 			return;
 		}
-		const newValue = value.slice();
-		newValue[index - 1] = value[index];
-		newValue[index] = value[index - 1];
+		const newValue = arrayValue.slice();
+		newValue[index - 1] = arrayValue[index];
+		newValue[index] = arrayValue[index - 1];
 		onChange(newValue);
 	};
 	const moveDown = (index: number) => {
-		if (index >= value.length - 1) {
+		if (index >= arrayValue.length - 1) {
 			return;
 		}
-		const newValue = value.slice();
-		newValue[index + 1] = value[index];
-		newValue[index] = value[index + 1];
+		const newValue = arrayValue.slice();
+		newValue[index + 1] = arrayValue[index];
+		newValue[index] = arrayValue[index + 1];
 		onChange(newValue);
 	};
 	const remove = (index: number) => {
-		const newValue = value.slice();
+		const newValue = arrayValue.slice();
 		newValue.splice(index, 1);
 		onChange(newValue);
 	};
 	const sort = () => {
-		const newValue = value.slice();
-		(newValue as any[]).sort((a, b) => -compare(dataType.args[0], a, b));
+		const newValue = arrayValue.slice();
+		(newValue as any[]).sort((a, b) => compare(dataType.args![0], a, b));
 		onChange(newValue);
 	};
-	const validationResult = validate(dataType, value);
+	const validationResult = validate(dataType, arrayValue);
 	return (
 		<div className='editorDiv'>
 			<table>
-				{value.length === 0 && (
+				{arrayValue.length === 0 && (
 					<tr>
 						<td>
 							<h4>The List is empty. Please click on + button to add items to the List.</h4>
 						</td>
 					</tr>
 				)}
-				{value.map((item, index) => [
+				{arrayValue.map((item, index) => [
 					<tbody key={index}>
 						<tr>
 							<td className='buttonContainer'>
@@ -71,7 +75,7 @@ export const ListEditor = (
 										<VSCodeButton
 											appearance='icon'
 											onClick={() => moveDown(index)}
-											disabled={index === value.length - 1}
+											disabled={index === arrayValue.length - 1}
 										>
 											⮟
 										</VSCodeButton>
@@ -81,7 +85,7 @@ export const ListEditor = (
 							<td>
 								<DataEditorNode
 									hideDataType={true}
-									dataType={dataType.args[0]}
+									dataType={dataType.args![0]}
 									value={item}
 									onChange={v => changeValue(index, v)}
 								/>
@@ -91,7 +95,7 @@ export const ListEditor = (
 				])}
 				<tr>
 					<td colSpan={2}>
-						<button onClick={() => changeValue(value.length, {})}>➕</button>
+						<button onClick={() => changeValue(arrayValue.length, { prim: 'Elt', args: [] })}>➕</button>
 						{dataType.prim === 'set' && <button onClick={() => sort()}>Sort</button>}
 					</td>
 					<td>

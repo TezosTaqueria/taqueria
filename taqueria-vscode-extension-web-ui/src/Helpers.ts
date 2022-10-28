@@ -1,3 +1,5 @@
+import { MichelineValue, MichelineValueObject } from './MichelineValue';
+
 export const isNullish = (item: unknown) => {
 	return item === undefined || item === null;
 };
@@ -16,6 +18,28 @@ export function isObject(maybeObject: unknown): maybeObject is Object {
 	return typeof maybeObject === 'object';
 }
 
+export function hasPrim(obj: Object, ...possiblePrimValues: string[]): obj is { prim: string } {
+	if (!Object.hasOwn(obj, 'prim')) {
+		return false;
+	}
+	if (typeof (obj as { prim: unknown }).prim !== 'string') {
+		return false;
+	}
+	if (possiblePrimValues && possiblePrimValues.length) {
+		if (!possiblePrimValues.includes((obj as { prim: string }).prim)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+export function hasArgs(obj: Object): obj is { args: MichelineValue[] } {
+	if (!Object.hasOwn(obj, 'args')) {
+		return false;
+	}
+	return Array.isArray((obj as { args: unknown[] }).args);
+}
+
 export type ValidationSuccess = {
 	state: 'Valid';
 };
@@ -32,84 +56,6 @@ export type MichelineValidationResult = ValidationSuccess | ValidationFailure;
 export function isError(result: MichelineValidationResult): result is ValidationFailure {
 	return result.state !== 'Valid';
 }
-
-export type TypePrim =
-	| 'list'
-	| 'set'
-	| 'option'
-	| 'unit'
-	| 'string'
-	| 'nat'
-	| 'int'
-	| 'bytes'
-	| 'timestamp'
-	| 'mutez'
-	| 'address'
-	| 'key'
-	| 'key_hash'
-	| 'signature'
-	| 'chain_id'
-	| 'bls12_381_g1'
-	| 'bls12_381_g2'
-	| 'bls12_381_fr'
-	| 'sapling_transaction ms'
-	| 'sapling_state ms'
-	| 'ticket'
-	| 'chest'
-	| 'chest_key'
-	| 'tx_rollup_l2_address'
-	| 'bool'
-	| 'pair'
-	| 'map'
-	| 'big_map';
-
-export type ValuePrim =
-	| 'List'
-	| 'Set'
-	| 'Option'
-	| 'Unit'
-	| 'String'
-	| 'Nat'
-	| 'Int'
-	| 'Bytes'
-	| 'Timestamp'
-	| 'Mutez'
-	| 'Address'
-	| 'Key'
-	| 'Key_hash'
-	| 'Signature'
-	| 'Chain_id'
-	| 'Bls12_381_g1'
-	| 'Bls12_381_g2'
-	| 'Bls12_381_fr'
-	| 'Sapling_transaction ms'
-	| 'Sapling_state ms'
-	| 'Ticket'
-	| 'Chest'
-	| 'Chest_key'
-	| 'Tx_rollup_l2_address'
-	| 'True'
-	| 'False'
-	| 'Pair'
-	| 'Map'
-	| 'Big_map'
-	| 'None'
-	| 'Some';
-
-export type MichelineDataType = {
-	prim: TypePrim;
-	args?: MichelineDataType[];
-};
-
-export type MichelineValueObject = {
-	prim: ValuePrim;
-	args?: MichelineValue[] | undefined;
-	string?: string | undefined;
-	int?: string | undefined;
-	bytes?: string | undefined;
-};
-
-export type MichelineValue = MichelineValueObject | MichelineValue[];
 
 export function isValueObject(
 	value: MichelineValue | undefined,

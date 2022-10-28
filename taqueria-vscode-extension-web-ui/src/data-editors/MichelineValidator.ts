@@ -1,14 +1,23 @@
 import {
+	hasArgs,
+	hasPrim,
 	isError,
 	isValueArray,
 	isValueObject,
-	MichelineDataType,
 	MichelineValidationResult,
-	MichelineValue,
-	MichelineValueObject,
 	ValidationFailure,
 	validState,
 } from '../Helpers';
+import { MichelineDataType } from '../MichelineDataType';
+import {
+	MichelineBoolValue,
+	MichelineMapValue,
+	MichelineNumberValue,
+	MichelineOptionValue,
+	MichelinePairValue,
+	MichelineValue,
+	MichelineValueObject,
+} from '../MichelineValue';
 import { getFriendlyDataType } from './MichelineEditor';
 
 export const validate = (
@@ -62,32 +71,28 @@ export const validate = (
 	}
 };
 
-const validateOption = (dataType: MichelineDataType, value?: MichelineValue | undefined): MichelineValidationResult => {
-	if (!isValueObject(value, 'prim')) {
+const validateOption = (dataType: MichelineDataType, v?: MichelineValue | undefined): MichelineValidationResult => {
+	if (!isValueObject(v, 'prim') || !hasPrim(v) || !['None', 'Some'].includes(v.prim)) {
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`Wrong value shape for ${dataType.prim}`],
 		};
 	}
+	const value = v as MichelineOptionValue;
 	if (value.prim === 'None') {
 		return validState;
 	}
-	if (value.prim === 'Some') {
-		return validate(dataType.args![0], value.args![0]);
-	}
-	return {
-		state: 'ImmediateError' as const,
-		messages: [`Wrong prim ${value.prim} for ${dataType.prim}`],
-	};
+	return validate(dataType.args![0], value.args[0]);
 };
 
-const validateBool = (dataType: MichelineDataType, value?: MichelineValue | undefined): MichelineValidationResult => {
-	if (!isValueObject(value, 'prim')) {
+const validateBool = (dataType: MichelineDataType, v?: MichelineValue | undefined): MichelineValidationResult => {
+	if (!isValueObject(v, 'prim') || !hasPrim(v)) {
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`Wrong value shape for ${dataType.prim}`],
 		};
 	}
+	const value = v as MichelineBoolValue;
 	return value.prim === 'True' || value.prim === 'False'
 		? validState
 		: { state: 'ImmediateError', 'messages': [`Not a valid bool value.`] };
@@ -136,7 +141,7 @@ const itemsAreSortedAndUnique = (
 		return validState;
 	}
 	for (let i = 1; i < value?.length; i++) {
-		if (compare(dataType.args![0], value[i - 1], value[i]) <= 0) {
+		if (compare(dataType.args![0], value[i], value[i - 1]) <= 0) {
 			return {
 				state: 'DeferredError',
 				messages: [`Items in a ${dataType.prim} should be sorted and unique`],
@@ -146,13 +151,14 @@ const itemsAreSortedAndUnique = (
 	return validState;
 };
 
-const isValidNumber = (dataType: MichelineDataType, value?: MichelineValue | undefined): MichelineValidationResult => {
-	if (!isValueObject(value, 'int')) {
+const isValidNumber = (dataType: MichelineDataType, v?: MichelineValue | undefined): MichelineValidationResult => {
+	if (!isValueObject(v, 'int')) {
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`Wrong value shape for ${dataType.prim}`],
 		};
 	}
+	const value = v as MichelineNumberValue;
 	if (!value.int || !value.int.length) {
 		return {
 			state: 'ImmediateError',
@@ -169,28 +175,32 @@ const isValidNumber = (dataType: MichelineDataType, value?: MichelineValue | und
 	return validState;
 };
 
-const isValidPair = (dataType: MichelineDataType, value?: MichelineValue | undefined): MichelineValidationResult => {
-	if (!isValueObject(value, 'prim')) {
+const isValidPair = (dataType: MichelineDataType, v?: MichelineValue | undefined): MichelineValidationResult => {
+	if (!isValueObject(v, 'prim') || !hasPrim(v, 'Pair') || !hasArgs(v)) {
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`Wrong value shape for ${dataType.prim}`],
 		};
 	}
-	const itemErrors = dataType.args!.map((type, index) => validate(type, value.args?.[index]))
+	const value = v as MichelinePairValue;
+	const itemErrors = dataType.args!.map((type, index) => validate(type, value.args[index]))
 		.filter(isError);
 	return aggregateChildErrors(dataType, value, itemErrors);
 };
 
-const isValidMap = (dataType: MichelineDataType, value?: MichelineValue | undefined): MichelineValidationResult => {
-	if (!isValueArray(value)) {
+const isValidMap = (dataType: MichelineDataType, v?: MichelineValue | undefined): MichelineValidationResult => {
+	if (!isValueArray(v) || !hasPrim(v, 'Map') || !hasArgs(v)) {
 		return {
 			state: 'ImmediateError',
 			messages: [`Wrong value shape for ${dataType.prim}`],
 		};
 	}
+	const value = v as MichelineValue[];
 	let itemErrors: ValidationFailure[] = [];
 	for (const item of value) {
-		if (!isValueObject(item, 'prim') || !item.args || item.args.length != 2) {
+		if (
+			!isValueObject(item, 'prim') || !hasPrim(item, 'Elt') || !hasArgs(item) || !item.args || item.args.length != 2
+		) {
 			itemErrors.push({
 				state: 'ImmediateError',
 				messages: [`Value item does not have a good shape for an item of ${getFriendlyDataType(dataType)}`],
@@ -211,10 +221,12 @@ const isValidMap = (dataType: MichelineDataType, value?: MichelineValue | undefi
 		return aggregateChildErrors(dataType, value, itemErrors);
 	}
 
-	let previousItem: any = undefined;
-	for (const item of value) {
+	const mapValue = value as { args: MichelineValue[] }[];
+
+	let previousItem: { args: MichelineValue[] } | undefined = undefined;
+	for (const item of mapValue) {
 		if (previousItem) {
-			const keyComparison = compare(dataType.args![0], previousItem.args[0], (item as any).args[0]);
+			const keyComparison = compare(dataType.args![0], item.args[0], previousItem.args[0]);
 			if (keyComparison < 0) {
 				return {
 					state: 'DeferredError',
@@ -232,13 +244,14 @@ const isValidMap = (dataType: MichelineDataType, value?: MichelineValue | undefi
 	return validState;
 };
 
-const isValidBytes = (dataType: MichelineDataType, value?: MichelineValue | undefined): MichelineValidationResult => {
-	if (!isValueObject(value, 'bytes')) {
+const isValidBytes = (dataType: MichelineDataType, v?: MichelineValue | undefined): MichelineValidationResult => {
+	if (!isValueObject(v, 'bytes')) {
 		return {
 			state: 'ImmediateError' as const,
 			messages: [`Wrong value shape for ${dataType.prim}`],
 		};
 	}
+	const value = v as { bytes: string };
 	if (!value.bytes || !value.bytes.length) {
 		return {
 			state: 'ImmediateError' as const,
@@ -261,7 +274,7 @@ const isValidBytes = (dataType: MichelineDataType, value?: MichelineValue | unde
 };
 
 // returns 1 if value2 is greater than value1, 0 if they are equal, and -1 if value2 is less than value1
-export const compare = (dataType: MichelineDataType, value1: MichelineValue, value2: MichelineValue): number => {
+export const compare = (dataType: MichelineDataType, value2: MichelineValue, value1: MichelineValue): number => {
 	'strung'.localeCompare;
 	switch (dataType.prim) {
 		case 'unit':
@@ -278,12 +291,12 @@ export const compare = (dataType: MichelineDataType, value1: MichelineValue, val
 			return i2 > i1 ? 1 : i2 < i1 ? -1 : 0;
 		case 'list':
 		case 'set':
-			return compareList(dataType, value1 as MichelineValue[], value2 as MichelineValue[]);
+			return compareList(dataType, value2 as MichelineValue[], value1 as MichelineValue[]);
 		case 'map':
 		case 'big_map':
-			return compareMap(dataType, value1 as MichelineValueObject, value2 as MichelineValueObject);
+			return compareMap(dataType, value2 as MichelineMapValue, value1 as MichelineMapValue);
 		case 'option':
-			return compareOption(dataType, value1 as MichelineValueObject, value2 as MichelineValueObject);
+			return compareOption(dataType, value2 as MichelineOptionValue, value1 as MichelineOptionValue);
 		case 'timestamp':
 		case 'mutez':
 		case 'address':
@@ -304,9 +317,9 @@ export const compare = (dataType: MichelineDataType, value1: MichelineValue, val
 			const t2 = (value2 as { string: string }).string;
 			return t2 > t1 ? 1 : t2 < t1 ? -1 : 0;
 		case 'bool':
-			return compareBool(dataType, value1 as MichelineValueObject, value2 as MichelineValueObject);
+			return compareBool(dataType, value2 as MichelineBoolValue, value1 as MichelineBoolValue);
 		case 'pair':
-			return comparePair(dataType, value1 as MichelineValueObject, value2 as MichelineValueObject);
+			return comparePair(dataType, value2 as MichelinePairValue, value1 as MichelinePairValue);
 		default:
 			throw new Error(`Comparison is not implemented for ${dataType.prim} yet.`); // TODO: Complete the implementation
 	}
@@ -314,27 +327,27 @@ export const compare = (dataType: MichelineDataType, value1: MichelineValue, val
 
 function compareOption(
 	dataType: MichelineDataType,
-	value1: MichelineValueObject,
-	value2: MichelineValueObject,
+	value2: MichelineOptionValue,
+	value1: MichelineOptionValue,
 ): number {
-	if (value1.prim === 'None' && value2.prim === 'None') {
-		return 0;
-	}
 	if (value1.prim === 'None') {
+		if (value2.prim === 'None') {
+			return 0;
+		}
 		return 1;
 	}
-	if (value1.prim === 'Some') {
+	if (value2.prim === 'None') {
 		return -1;
 	}
-	return compare(dataType.args![0], value1.args![0], value2.args![0]);
+	return compare(dataType.args![0], value2.args[0], value1.args[0]);
 }
 
-function compareList(dataType: MichelineDataType, value1: MichelineValue[], value2: MichelineValue[]): number {
+function compareList(dataType: MichelineDataType, value2: MichelineValue[], value1: MichelineValue[]): number {
 	const l1 = value1.length;
 	const l2 = value2.length;
 	const commonElementCount = Math.min(l1, l2);
 	for (let i = 0; i < commonElementCount; i++) {
-		const result = compare(dataType.args![0], value1[i], value2[i]);
+		const result = compare(dataType.args![0], value2[i], value1[i]);
 		if (result !== 0) {
 			return result;
 		}
@@ -342,16 +355,16 @@ function compareList(dataType: MichelineDataType, value1: MichelineValue[], valu
 	return l2 > l1 ? 1 : l2 < l1 ? -1 : 0;
 }
 
-function compareBool(dataType: MichelineDataType, value1: MichelineValueObject, value2: MichelineValueObject): number {
+function compareBool(dataType: MichelineDataType, value2: MichelineBoolValue, value1: MichelineBoolValue): number {
 	return value2.prim > value1.prim ? 1 : value2.prim < value1.prim ? -1 : 0;
 }
 
-function comparePair(dataType: MichelineDataType, value1: MichelineValueObject, value2: MichelineValueObject): number {
-	const l1 = value1.args!.length;
-	const l2 = value2.args!.length;
+function comparePair(dataType: MichelineDataType, value2: MichelinePairValue, value1: MichelinePairValue): number {
+	const l1 = value1.args.length;
+	const l2 = value2.args.length;
 	const commonElementCount = Math.min(l1, l2);
 	for (let i = 0; i < commonElementCount; i++) {
-		const result = compare(dataType.args![i], value1.args![i], value2.args![i]);
+		const result = compare(dataType.args![i], value2.args[i], value1.args[i]);
 		if (result !== 0) {
 			return result;
 		}
@@ -359,15 +372,15 @@ function comparePair(dataType: MichelineDataType, value1: MichelineValueObject, 
 	return l2 > l1 ? 1 : l2 < l1 ? -1 : 0;
 }
 
-function compareMap(dataType: MichelineDataType, value1: MichelineValueObject, value2: MichelineValueObject): number {
-	const l1 = value1.args!.length;
-	const l2 = value2.args!.length;
+function compareMap(dataType: MichelineDataType, value2: MichelineMapValue, value1: MichelineMapValue): number {
+	const l1 = value1.length;
+	const l2 = value2.length;
 	const commonElementCount = Math.min(l1, l2);
 	for (let i = 0; i < commonElementCount; i++) {
 		const result = compare(
 			dataType.args![0],
-			(value1.args![i] as MichelineValueObject).args![0],
-			(value2.args![i] as MichelineValueObject).args![0],
+			value2[i].args[0],
+			value1[i].args[0],
 		);
 		if (result !== 0) {
 			return result;

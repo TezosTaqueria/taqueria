@@ -30,7 +30,7 @@ export const MapEditor = (
 	};
 	const sort = () => {
 		const newValue = value.slice();
-		(newValue as any[]).sort((a, b) => -compare(dataType.args[0], a.args[0], b.args[0]));
+		(newValue as any[]).sort((a, b) => compare(dataType.args[0], a.args[0], b.args[0]));
 		onChange(newValue);
 	};
 	const validationResult = validate(dataType, value);
