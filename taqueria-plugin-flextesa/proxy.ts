@@ -138,7 +138,7 @@ const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts)
 };
 
 const startContainer = async (container: { name: string; command: string }): Promise<void> => {
-	console.log(`Staring ${container.name}`);
+	console.log(`Starting ${container.name}`);
 	try {
 		const result = await execCommandWithoutWrapping(container.command);
 		if (result.stderr) {
