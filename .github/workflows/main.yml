@@ -243,11 +243,10 @@ jobs:
         with:
           deno-version: "1.23.4"
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      - name: Build all
+        run: |
+          export PATH="$PATH:$(pwd)"
+          npm run build-all
 
       - name: download the binary from the build-binaries job and make it executable
         if: ${{ !github.event.pull_request.head.repo.fork }}
