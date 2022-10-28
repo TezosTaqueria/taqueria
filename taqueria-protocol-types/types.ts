@@ -1,22 +1,20 @@
 // ---- Simple Types & Type Fragments ----
 
-// Updating
-
 /** @pattern ^[A-Za-z]$ */
-export type SingleChar = string & { readonly __kind: SingleChar };
+export type SingleChar = string;
 
 /** @pattern ^[A-Za-z\-\ ]+ */
-export type Verb = string & { readonly __kind: Verb };
+export type Verb = string;
 
-export type Alias = (Verb | SingleChar) & { readonly __kind: Alias };
+export type Alias = (Verb | SingleChar);
 
 /** @pattern ^[A-Za-z]+[A-Za-z0-9-_ ]*$ */
-export type HumanReadableIdentifier = string & { readonly __kind: HumanReadableIdentifier };
+export type HumanReadableIdentifier = string;
 
-export type SanitizedAbsPath = string & { readonly __kind: SanitizedAbsPath };
+export type SanitizedAbsPath = string;
 
 /** @pattern ^(\.\.|\.\/|\/) */
-export type SanitizedPath = string & { readonly __kind: SanitizedPath };
+export type SanitizedPath = string;
 
 export type Settings = {
 	consent: 'opt_in' | 'opt_out';
@@ -24,7 +22,7 @@ export type Settings = {
 
 // ---- CLI Types ----
 
-// export type SanitizedArgs = string & { readonly __kind: SanitizedArgs; }
+// export type SanitizedArgs = string
 
 // TODO: Option
 // TODO: PositionalArg
@@ -32,7 +30,7 @@ export type Settings = {
 // ---- Plugin Definition Types ----
 
 /** interpreted using yargs @pattern ^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$ */
-export type Command = string & { readonly __kind: Command };
+export type Command = string;
 
 export type InstalledPlugin = {
 	type: 'npm' | 'binary' | 'deno';
@@ -64,13 +62,13 @@ export type PluginActionName =
 // ---- Hash Types ----
 
 /** @pattern ^P[A-Za-z0-9]{50}$ */
-export type EconomicalPrototypeHash = string & { readonly __kind: EconomicalPrototypeHash };
+export type EconomicalPrototypeHash = string;
 
 /** @pattern ^tz1[A-Za-z0-9]{33}$ */
-export type PublicKeyHash = string & { readonly __kind: PublicKeyHash };
+export type PublicKeyHash = string;
 
 /** @pattern ^[A-Fa-f0-9]{64}$ */
-export type SHA256 = string & { readonly __kind: SHA256 };
+export type SHA256 = string;
 
 // ---- Contract Objects ----
 
