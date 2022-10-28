@@ -234,12 +234,12 @@ taq transfer counter --param counter.parameter.increment_by_3.tz
 
 This will call the counter contract's entrypoint `increment` and will increment the storage by `3`. The output will look something like this:
 ```
-┌────────────────┬──────────────────────────────────────┬──────────────┬───────────────────┬────────────┬────────────────────────┐
-│ Contract Alias │ Contract Address                     │ Tez Transfer │ Parameter         │ Entrypoint │ Destination            │
-├────────────────┼──────────────────────────────────────┼──────────────┼───────────────────┼────────────┼────────────────────────┤
-│ counter        │ KT1Ayz8qos7G4U3Jucp6QWoM7ayhbShNXcat │ 0            │ (Left (Right 3 )) │ default    │ http://localhost:20000 │
-│                │                                      │              │                   │            │                        │
-└────────────────┴──────────────────────────────────────┴──────────────┴───────────────────┴────────────┴────────────────────────┘
+┌────────────────┬──────────────────────────────────────┬────────────────┬───────────────────┬────────────┬────────────────────────┐
+│ Contract Alias │ Contract Address                     │ Mutez Transfer │ Parameter         │ Entrypoint │ Destination            │
+├────────────────┼──────────────────────────────────────┼────────────────┼───────────────────┼────────────┼────────────────────────┤
+│ counter        │ KT1Ayz8qos7G4U3Jucp6QWoM7ayhbShNXcat │ 0              │ (Left (Right 3 )) │ default    │ http://localhost:20000 │
+│                │                                      │                │                   │            │                        │
+└────────────────┴──────────────────────────────────────┴────────────────┴───────────────────┴────────────┴────────────────────────┘
 ```
 
 ## Finishing Up

@@ -18,6 +18,9 @@ taq install @taqueria/plugin-taquito
 
 The target networks, sandboxes, and environments are configured in the Taqueria project's `config.json` file. For additional information on configuring network, documentation can be found [here](/docs/config/networks/)
 
+> ### :page_with_curl: Note
+> Network environments have the notion of Taqueria Operator Account. This account is meant to be used internally and it is generated for you if it doesn't already exist. Instructions on how to fund the account is provided by the `taq` binary when the account is first generated
+
 ##  The `taq originate` task
 
 Basic usage is:
@@ -40,9 +43,13 @@ After origination, an alias will be created to refer to the originated contract'
 
 - To target a different environment, use the `--env` flag with the named Taqueria environment you want to target. E.g. `taq originate filename -env kathmandunetEnv`
 
+- By default, the amount of mutez sent is `0`. Use the `--mutez` flag to specify an amount you want
+
 - To originate a contract with a specific storage value, use the `--storage` flag and supply the name of the storage file that contains the storage value. E.g. `taq originate contractName --storage someStorage.tz`
 
 - To provide an alias for the originated contract explicitly, use the `--alias` flag and supply a name
+
+- By default, it uses the Taqueria Operator Account to do the operation, but you may override it with an account of your choice by providing the `--sender` flag. E.g. `--sender alice`
 
 ##  The `taq transfer` task
 
@@ -62,20 +69,46 @@ This allows interactions from implicit accounts to implicit or smart contract ac
 
 - To target a different environment, use the `--env` flag with the named Taqueria environment you want to target
 
-- By default, the amount of tez sent is `0`. Use the `--tez` flag to specify an amount you want
+- By default, the amount of mutez sent is `0`. Use the `--mutez` flag to specify an amount you want
 
 - By default, the parameter is `Unit`. Use the `--param` flag to specify a filename, in `artifacts`, that contains the content of the parameter for the transfer/call
 
 - By default, the entrypoint is `default`, which points to no specific annotated entrypoint. Use `--entrypoint` to specify an annotated entrypoint to call. E.g. if the parameter type of a Michelson contract is `(or (or (int %decrement) (int %increment)) (unit %reset))`, then there are two ways to call the `increment` entrypoint, with parameter `(Left (Right 14))` or with parameter `14` if your command contains `--entrypoint increment`
 
+- By default, it uses the Taqueria Operator Account to do the operation, but you may override it with an account of your choice by providing the `--sender` flag. E.g. `--sender alice`
+
 ### Examples
 
-`taq transfer counter --param counter.parameter.param1.tz` will call a smart contract aliased as `counter` in the default environment with the parameter contained in that `.tz` file, transferring `0` tez
+`taq transfer counter --param counter.parameter.param1.tz` will call a smart contract aliased as `counter` in the default environment with the parameter contained in that `.tz` file, transferring `0` mutez
 
-`taq transfer tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb --tez 20` will transfer `20` tez to that address, which is some implicit account
+`taq transfer tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb --mutez 20` will transfer `20` mutez to that address, which is some implicit account
 
 > ### :page_with_curl: Note
 > `transfer` and `call` are exactly the same task. They are synonyms
+
+##  The `taq instantiate-account` task
+
+Basic usage is:
+
+```shell
+taq instantiate-account
+```
+
+### Basic description
+
+It instantiates all accounts in the `accounts` field at the root level of `.taq/config.json` (referred as "declared accounts") to a target environment. The accounts instantiated are referred as "instantiated accounts". E.g. `taq instantiate-account --env testing`
+
+##  The `taq fund` task
+
+Basic usage is:
+
+```shell
+taq fund
+```
+
+### Basic description
+
+It funds all the instantiated accounts in a target environment up to the amount declared in the `accounts` field at the root level of `.taq/config.json` where the funder is the Taqueria Operator Account in that environment. E.g. `taq fund --env testing`
 
 ## Plugin Architecture
 

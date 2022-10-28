@@ -15,6 +15,11 @@ Commands:
                                   ontract (specified via its alias or address) d
                                   eployed to a particular environment
                                                                  [aliases: call]
+  taq fund                        Fund all the instantiated accounts up to the d
+                                  esired/declared amount in a target environment
+  taq instantiate-account         Instantiate all accounts declared in the "acco
+                                  unts" field at the root level of the config fi
+                                  le to a target environment
 
 Options:
       --version     Show version number                                [boolean]
@@ -42,13 +47,7 @@ Options:
       --storage     Name of the storage file that contains the storage value as
                     a Michelson expression, in the artifacts directory, used for
                      originating a contract
+      --sender      Name of an instantiated account to use as the sender of the
+                    originate operation
+      --mutez       Amount of Mutez to transfer
 `;
-
-export const originateSingleOutput = (address: string) =>
-	`
-┌────────────────┬──────────────────────────────────────┬─────────────┐
-│ Contract       │ Address                              │ Destination │
-├────────────────┼──────────────────────────────────────┼─────────────┤
-│ hello-tacos.tz │ KT1N4bZh884qhirEsmPge6y8a9mRfhEoMGaX │ hangzhounet │
-└────────────────┴──────────────────────────────────────┴─────────────┘
-`.replace('KT1N4bZh884qhirEsmPge6y8a9mRfhEoMGaX', address).trimStart();
