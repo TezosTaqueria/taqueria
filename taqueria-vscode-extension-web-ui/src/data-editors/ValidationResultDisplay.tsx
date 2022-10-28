@@ -2,23 +2,26 @@ import React from 'react';
 import { MichelineValidationResult } from '../Helpers';
 
 export const ValidationResultDisplay = (
-	props: { validationResult: MichelineValidationResult; hideSublevelErrors: boolean },
+	{ validationResult, hideSublevelErrors }: {
+		validationResult: MichelineValidationResult;
+		hideSublevelErrors: boolean;
+	},
 ) => {
 	if (
-		props.validationResult.state === 'Valid'
-		|| (props.hideSublevelErrors && props.validationResult.hideErrorAtThisLevel)
+		validationResult.state === 'Valid'
+		|| (hideSublevelErrors && validationResult.hideErrorAtThisLevel)
 	) {
 		return null;
 	}
 	return (
 		<h4
 			style={{
-				color: props.validationResult.state === 'ImmediateError' ? 'red' : 'orange',
+				color: validationResult.state === 'ImmediateError' ? 'red' : 'orange',
 				display: 'inline',
 				verticalAlign: 'super',
 			}}
 		>
-			&nbsp; {props.validationResult.messages.join('<br/>')}
+			&nbsp; {validationResult.messages.join('<br/>')}
 		</h4>
 	);
 };
