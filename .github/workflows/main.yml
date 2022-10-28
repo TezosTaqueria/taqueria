@@ -327,7 +327,7 @@ jobs:
           cache_path: |
             ~/.deno
             ~/.cache/deno
-        - os: macos-latest
+        - os: ecad-macmini
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
           make-executable-cmd: chmod +x
