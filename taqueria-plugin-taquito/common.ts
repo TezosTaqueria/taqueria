@@ -49,7 +49,7 @@ export const getEnvTypeAndNodeConfig = (
 		const network = getNetworkConfig(parsedArgs)(networkName);
 		if (!network) {
 			return sendAsyncErr(
-				`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json.`,
+				`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json`,
 			);
 		}
 		return Promise.resolve(['Network', network]);
@@ -59,7 +59,7 @@ export const getEnvTypeAndNodeConfig = (
 		const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
 		if (!sandbox) {
 			return sendAsyncErr(
-				`The current environment is configured to use a sandbox called '${sandboxName}'; however, no sandbox of this name has been configured in .taq/config.json.`,
+				`The current environment is configured to use a sandbox called '${sandboxName}'; however, no sandbox of this name has been configured in .taq/config.json`,
 			);
 		}
 		return Promise.resolve(['Sandbox', sandbox]);

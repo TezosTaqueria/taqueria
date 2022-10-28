@@ -135,7 +135,7 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 		const contractInfoForDisplay = await prepContractInfoForDisplay(parsedArgs, tezos, contractInfo, op);
 		return sendJsonRes([contractInfoForDisplay]);
 	} catch {
-		return sendAsyncErr('No operations performed.');
+		return sendAsyncErr('No operations performed');
 	}
 };
 

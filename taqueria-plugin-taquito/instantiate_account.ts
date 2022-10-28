@@ -35,13 +35,13 @@ const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 			return sendJsonRes(
 				`Accounts instantiated: ${
 					accountsInstantiated.join(', ')
-				}.\nPlease execute "taq fund" targeting the same environment to fund these accounts.`,
+				}.\nPlease execute "taq fund" targeting the same environment to fund these accounts`,
 			);
 		} else {
-			return sendJsonRes(`No accounts were instantiated.`);
+			return sendJsonRes(`No accounts were instantiated`);
 		}
 	} catch {
-		return sendAsyncErr('No operations performed.');
+		return sendAsyncErr('No operations performed');
 	}
 };
 

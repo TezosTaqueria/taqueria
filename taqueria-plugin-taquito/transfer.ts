@@ -103,7 +103,7 @@ const transfer = async (parsedArgs: Opts): Promise<void> => {
 		const contractInfoForDisplay = prepContractInfoForDisplay(tezos, contractInfo);
 		return sendJsonRes([contractInfoForDisplay]);
 	} catch {
-		return sendAsyncErr('No operations performed.');
+		return sendAsyncErr('No operations performed');
 	}
 };
 

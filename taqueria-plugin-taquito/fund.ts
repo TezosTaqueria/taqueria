@@ -38,7 +38,7 @@ const getAccountsInfo = (
 
 				if (!declaredMutez) {
 					sendWarn(
-						`Warning: ${alias} is instantiated in the target environment but not declared in the root level "accounts" field of ./.taq/config.json so ${alias} will not be funded as we don't have a declared tez amount set there for ${alias}\n`,
+						`Warning: ${alias} is instantiated in the target environment but not declared in the root level "accounts" field of ./.taq/config.json so ${alias} will not be funded as you don't have a declared tez amount set there for ${alias}\n`,
 					);
 				}
 
@@ -76,7 +76,7 @@ const fund = async (parsedArgs: Opts): Promise<void> => {
 		const accountsInfo = await getAccountsInfo(parsedArgs, tezos, instantiatedAccounts);
 		if (accountsInfo.length === 0) {
 			return sendJsonRes(
-				`All instantiated accounts in the current environment, "${parsedArgs.env}", are funded up to or beyond the declared amount.`,
+				`All instantiated accounts in the current environment, "${parsedArgs.env}", are funded up to or beyond the declared amount`,
 			);
 		}
 
@@ -85,7 +85,7 @@ const fund = async (parsedArgs: Opts): Promise<void> => {
 		const accountsInfoForDisplay = prepAccountsInfoForDisplay(accountsInfo);
 		return sendJsonRes(accountsInfoForDisplay);
 	} catch {
-		return sendAsyncErr('No operations performed.');
+		return sendAsyncErr('No operations performed');
 	}
 };
 
