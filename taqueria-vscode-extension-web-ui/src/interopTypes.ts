@@ -1,7 +1,9 @@
 export type MichelineEditorMessageInput = {
 	kind: 'change' | 'action';
-	michelineJson: unknown;
-	micheline: string | undefined;
+	michelineJson?: unknown;
+	micheline?: string | undefined;
+	isValid: boolean;
+	error?: unknown;
 };
 
 export type MichelineEditorMessageHandler = (

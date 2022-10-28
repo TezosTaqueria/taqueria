@@ -1,7 +1,6 @@
 export type ValuePrim =
 	| 'Option'
 	| 'Unit'
-	| 'Bytes'
 	| 'Timestamp'
 	| 'Mutez'
 	| 'Address'
@@ -49,6 +48,10 @@ export type MichelineMapItem = {
 	args: MichelineValue[];
 };
 
+export type MichelineBytesValue = {
+	bytes: string;
+};
+
 export type MichelineMapValue = MichelineMapItem[];
 
 export type MichelineOtherValueObject = {
@@ -62,6 +65,7 @@ export type MichelineOtherValueObject = {
 export type MichelineValueObject =
 	| MichelineOtherValueObject
 	| MichelineBoolValue
+	| MichelineBytesValue
 	| MichelineNumberValue
 	| MichelineStringValue
 	| MichelineOptionValue

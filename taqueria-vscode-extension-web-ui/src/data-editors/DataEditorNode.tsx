@@ -1,5 +1,6 @@
 import React from 'react';
-import { isObject } from '../Helpers';
+import { hasPrim, isObject } from '../Helpers';
+import { MichelineDataType } from '../MichelineDataType';
 import { BoolEditor } from './BoolEditor';
 import { ListEditor } from './ListEditor';
 import { MapEditor } from './MapEditor';
@@ -10,33 +11,35 @@ import { PrimitiveEditor } from './PrimitiveEditor';
 
 export const DataEditorNode = (
 	{ dataType, value, onChange, hideDataType }: {
-		dataType: any;
-		value: any;
-		onChange: (value: any) => void;
+		dataType: MichelineDataType;
+		value: unknown;
+		onChange: (value: unknown) => void;
 		hideDataType?: boolean | undefined;
 	},
 ) => (
 	<table>
-		<tr>
-			{hideDataType !== true && (
+		<tbody>
+			<tr>
+				{hideDataType !== true && (
+					<td>
+						<h4 style={{ display: 'inline' }}>{getFriendlyDataType(dataType)}</h4>
+					</td>
+				)}
 				<td>
-					<h4 style={{ display: 'inline' }}>{getFriendlyDataType(dataType)}</h4>
+					{getEditor({ dataType, onChange, value })}
 				</td>
-			)}
-			<td>
-				{getEditor({ dataType, onChange, value })}
-			</td>
-		</tr>
+			</tr>
+		</tbody>
 	</table>
 );
 
 const getEditor = (
-	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
+	{ dataType, value, onChange }: { dataType: MichelineDataType; value: unknown; onChange: (value: unknown) => void },
 ) => {
 	const prim = dataType.prim;
 	switch (prim) {
 		case 'unit':
-			if (!isObject(value) || value.prim !== 'Unit') {
+			if (!isObject(value) || !hasPrim(value, 'Unit')) {
 				onChange({
 					'prim': 'Unit',
 				});
@@ -68,7 +71,7 @@ const getEditor = (
 			return <BoolEditor value={value} onChange={onChange} />;
 		case 'list':
 		case 'set':
-			return <ListEditor dataType={dataType} value={value as any[]} onChange={onChange} />;
+			return <ListEditor dataType={dataType} value={value} onChange={onChange} />;
 		case 'option':
 			return <OptionEditor dataType={dataType} value={value} onChange={onChange} />;
 		case 'pair':
@@ -79,7 +82,7 @@ const getEditor = (
 		default:
 			return (
 				<span>
-					The editor for {dataType.prim}{' '}
+					The editor for {JSON.stringify(dataType)}{' '}
 					is not implemented yet, please contract the taqueria team at github.com/ecadlabs/taqueria to report this
 					issue.
 				</span>

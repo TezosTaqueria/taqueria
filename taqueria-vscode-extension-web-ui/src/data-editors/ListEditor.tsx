@@ -1,23 +1,27 @@
 import React from 'react';
-import { MichelineDataType } from '../MichelineDataType';
-import { MichelineMapItem } from '../MichelineValue';
+import { MichelineDataTypeWithArgs } from '../MichelineDataType';
+import { MichelineValue } from '../MichelineValue';
 import { DataEditorNode } from './DataEditorNode';
 import { compare, validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
 import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 
 export const ListEditor = (
-	{ dataType, value, onChange }: { dataType: MichelineDataType; value: unknown; onChange: (value: any) => void },
+	{ dataType, value, onChange }: {
+		dataType: MichelineDataTypeWithArgs;
+		value: unknown;
+		onChange: (value: unknown) => void;
+	},
 ) => {
 	if (!Array.isArray(value)) {
 		value = [];
 		onChange(value);
 	}
-	const arrayValue = value as MichelineMapItem[];
+	const arrayValue = value as MichelineValue[];
 
-	const changeValue = (index: number, v: MichelineMapItem) => {
+	const changeValue = (index: number, v: unknown) => {
 		const newValue = arrayValue.slice();
-		newValue[index] = v;
+		newValue[index] = v as MichelineValue;
 		onChange(newValue);
 	};
 	const moveUp = (index: number) => {
@@ -45,7 +49,7 @@ export const ListEditor = (
 	};
 	const sort = () => {
 		const newValue = arrayValue.slice();
-		(newValue as any[]).sort((a, b) => compare(dataType.args![0], a, b));
+		newValue.sort((a, b) => compare(dataType.args[0], a, b));
 		onChange(newValue);
 	};
 	const validationResult = validate(dataType, arrayValue);
@@ -53,11 +57,13 @@ export const ListEditor = (
 		<div className='editorDiv'>
 			<table>
 				{arrayValue.length === 0 && (
-					<tr>
-						<td>
-							<h4>The List is empty. Please click on + button to add items to the List.</h4>
-						</td>
-					</tr>
+					<tbody>
+						<tr>
+							<td>
+								<h4>The List is empty. Please click on + button to add items to the List.</h4>
+							</td>
+						</tr>
+					</tbody>
 				)}
 				{arrayValue.map((item, index) => [
 					<tbody key={index}>
@@ -85,7 +91,7 @@ export const ListEditor = (
 							<td>
 								<DataEditorNode
 									hideDataType={true}
-									dataType={dataType.args![0]}
+									dataType={dataType.args[0]}
 									value={item}
 									onChange={v => changeValue(index, v)}
 								/>
@@ -93,15 +99,17 @@ export const ListEditor = (
 						</tr>
 					</tbody>,
 				])}
-				<tr>
-					<td colSpan={2}>
-						<button onClick={() => changeValue(arrayValue.length, { prim: 'Elt', args: [] })}>➕</button>
-						{dataType.prim === 'set' && <button onClick={() => sort()}>Sort</button>}
-					</td>
-					<td>
-						<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={true} />
-					</td>
-				</tr>
+				<tbody>
+					<tr>
+						<td colSpan={2}>
+							<button onClick={() => changeValue(arrayValue.length, {})}>➕</button>
+							{dataType.prim === 'set' && <button onClick={() => sort()}>Sort</button>}
+						</td>
+						<td>
+							<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={true} />
+						</td>
+					</tr>
+				</tbody>
 			</table>
 		</div>
 	);

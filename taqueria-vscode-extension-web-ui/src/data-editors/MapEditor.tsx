@@ -1,4 +1,6 @@
 import React from 'react';
+import { MichelineDataTypeWithArgs } from '../MichelineDataType';
+import { MichelineMapValue, MichelineValue } from '../MichelineValue';
 import { DataEditorNode } from './DataEditorNode';
 import { getFriendlyDataType } from './MichelineEditor';
 import { compare, validate } from './MichelineValidator';
@@ -6,44 +8,49 @@ import { ValidationResultDisplay } from './ValidationResultDisplay';
 import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 
 export const MapEditor = (
-	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
+	{ dataType, value, onChange }: {
+		dataType: MichelineDataTypeWithArgs;
+		value: unknown;
+		onChange: (value: unknown) => void;
+	},
 ) => {
-	if (value === undefined || value === null || !Array.isArray(value)) {
+	if (!Array.isArray(value)) {
 		value = [];
 		onChange(value);
 	}
-	const changeValue = (index: number, key: any, v: any) => {
-		const newValue = value.slice();
+	const mapValue = value as MichelineMapValue;
+	const changeValue = (index: number, key: unknown, v: unknown) => {
+		const newValue = mapValue.slice();
 		newValue[index] = {
 			'prim': 'Elt',
 			args: [
-				key,
-				v,
+				key as MichelineValue,
+				v as MichelineValue,
 			],
 		};
 		onChange(newValue);
 	};
 	const remove = (index: number) => {
-		const newValue = value.slice();
+		const newValue = mapValue.slice();
 		newValue.splice(index, 1);
 		onChange(newValue);
 	};
 	const sort = () => {
-		const newValue = value.slice();
-		(newValue as any[]).sort((a, b) => compare(dataType.args[0], a.args[0], b.args[0]));
+		const newValue = mapValue.slice();
+		newValue.sort((a, b) => compare(dataType.args[0], a.args[0], b.args[0]));
 		onChange(newValue);
 	};
-	const validationResult = validate(dataType, value);
+	const validationResult = validate(dataType, mapValue);
 	return (
 		<div className='editorDiv'>
 			<table>
 				<thead>
-					{(value as any[]).length
+					{mapValue.length
 						? (
 							<tr>
 								<td>&nbsp;</td>
-								<td>Key: {getFriendlyDataType((dataType.args as any[])[0])}</td>
-								<td>Value: {getFriendlyDataType((dataType.args as any[])[1])}</td>
+								<td>Key: {getFriendlyDataType(dataType.args[0])}</td>
+								<td>Value: {getFriendlyDataType(dataType.args[1])}</td>
 							</tr>
 						)
 						: (
@@ -56,7 +63,7 @@ export const MapEditor = (
 							</tr>
 						)}
 				</thead>
-				{(value as any[]).map((elt, index) => (
+				{mapValue.map((elt, index) => (
 					<tbody key={index}>
 						<tr>
 							<td className='buttonContainer'>
@@ -65,7 +72,7 @@ export const MapEditor = (
 							<td>
 								<DataEditorNode
 									hideDataType={true}
-									dataType={(dataType.args as any[])[0]}
+									dataType={dataType.args[0]}
 									value={elt.args[0]}
 									onChange={v => changeValue(index, v, elt.args[1])}
 								/>
@@ -73,7 +80,7 @@ export const MapEditor = (
 							<td>
 								<DataEditorNode
 									hideDataType={true}
-									dataType={(dataType.args as any[])[1]}
+									dataType={dataType.args[1]}
 									value={elt.args[1]}
 									onChange={v => changeValue(index, elt.args[0], v)}
 								/>
@@ -81,17 +88,19 @@ export const MapEditor = (
 						</tr>
 					</tbody>
 				))}
-				<tr>
-					<td>&nbsp;</td>
-					<td>
-						<VSCodeButton appearance='icon' onClick={() => changeValue(value.length, null, null)}>➕</VSCodeButton>
-						&nbsp;
-						<VSCodeButton appearance='secondary' onClick={() => sort()}>Sort</VSCodeButton>
-					</td>
-					<td>
-						<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={true} />
-					</td>
-				</tr>
+				<tbody>
+					<tr>
+						<td>&nbsp;</td>
+						<td>
+							<VSCodeButton appearance='icon' onClick={() => changeValue(mapValue.length, {}, {})}>➕</VSCodeButton>
+							&nbsp;
+							<VSCodeButton appearance='secondary' onClick={() => sort()}>Sort</VSCodeButton>
+						</td>
+						<td>
+							<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={true} />
+						</td>
+					</tr>
+				</tbody>
 			</table>
 		</div>
 	);

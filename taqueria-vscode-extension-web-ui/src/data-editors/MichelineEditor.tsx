@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { WebviewApi } from 'vscode-webview';
 import { isObject } from '../Helpers';
 import { MichelineEditorMessageHandler } from '../interopTypes';
+import { MichelineDataType } from '../MichelineDataType';
 import { MichelineValue } from '../MichelineValue';
 import { DataEditorNode } from './DataEditorNode';
 import './MichelineEditor.css';
@@ -55,7 +56,7 @@ export const getJson = (value: MichelineValueContainer | undefined) => {
 	return micheline2Json(value.value);
 };
 
-export const getFriendlyDataType = (dataType: any): string => {
+export const getFriendlyDataType = (dataType: MichelineDataType): string => {
 	if (!isObject(dataType) || !dataType.prim) {
 		return `Error: ${JSON.stringify(dataType)}`;
 	}
@@ -64,7 +65,7 @@ export const getFriendlyDataType = (dataType: any): string => {
 		case 'list':
 		case 'set':
 		case 'option':
-			friendlyDataType = `${dataType.prim} of ${getFriendlyDataType(dataType.args[0])}`;
+			friendlyDataType = `${dataType.prim} of ${getFriendlyDataType(dataType.args![0])}`;
 			break;
 		case 'unit':
 			return 'unit';
@@ -92,7 +93,7 @@ export const getFriendlyDataType = (dataType: any): string => {
 			friendlyDataType = dataType.prim;
 			break;
 		case 'pair':
-			friendlyDataType = `${dataType.prim} of ${(dataType.args as any[]).map(x => getFriendlyDataType(x)).join(', ')}`;
+			friendlyDataType = `${dataType.prim} of ${dataType.args.map(x => getFriendlyDataType(x)).join(', ')}`;
 			break;
 		case 'map':
 		case 'big_map':
@@ -113,11 +114,21 @@ declare const vscodeApi: WebviewApi<any>;
 
 export const MichelineEditor = (
 	{ input: { dataType, value, actionTitle, showDiagnostics }, onMessage }: {
-		input: { dataType: any; value?: MichelineValueContainer; actionTitle?: string; showDiagnostics?: boolean };
+		input: {
+			dataType: MichelineDataType;
+			value?: MichelineValueContainer;
+			actionTitle?: string;
+			showDiagnostics?: boolean;
+		};
 		onMessage: MichelineEditorMessageHandler;
 	},
 ) => {
-	const previousState: MichelineValueContainer | undefined = vscodeApi.getState();
+	let previousState: MichelineValueContainer | undefined;
+	try {
+		previousState = vscodeApi?.getState();
+	} catch {
+		previousState = undefined;
+	}
 
 	const [currentState, setState] = useState({
 		value: previousState ?? value,
@@ -129,12 +140,25 @@ export const MichelineEditor = (
 			value: v,
 			showDiagnostics: currentState.showDiagnostics,
 		});
-		onMessage({
-			kind: 'change',
-			micheline: getMicheline(currentState.value),
-			michelineJson: getJson(currentState.value),
-		});
-		vscodeApi.setState(v);
+		try {
+			onMessage({
+				kind: 'change',
+				micheline: getMicheline(v),
+				michelineJson: getJson(v),
+				isValid: true,
+			});
+		} catch (error: unknown) {
+			onMessage({
+				kind: 'change',
+				isValid: false,
+				error,
+			});
+		}
+		try {
+			vscodeApi.setState(v);
+		} catch {
+			// ignore
+		}
 	};
 
 	const toggleDiagnostics = () => {
@@ -145,14 +169,34 @@ export const MichelineEditor = (
 	};
 
 	const handleClick = () => {
-		onMessage?.({
-			kind: 'action',
-			micheline: getMicheline(currentState.value),
-			michelineJson: getJson(currentState.value),
-		});
+		try {
+			onMessage?.({
+				kind: 'action',
+				micheline: getMicheline(currentState.value),
+				michelineJson: getJson(currentState.value),
+				isValid: true,
+			});
+		} catch (error: unknown) {
+			// ignore
+		}
 	};
 
 	const validationResult = validate(dataType, getJson(currentState.value) as MichelineValue);
+
+	let json: object | null | undefined;
+	try {
+		json = getJson(currentState.value);
+	} catch {
+		json = undefined;
+	}
+
+	let micheline: string | undefined;
+	try {
+		micheline = getMicheline(currentState.value);
+	} catch (e) {
+		micheline = `${e}`;
+	}
+
 	return (
 		<div className={currentState.showDiagnostics ? 'editorDiv showDiag' : 'editorDiv'}>
 			<table border={currentState.showDiagnostics ? 1 : 0}>
@@ -166,40 +210,46 @@ export const MichelineEditor = (
 						<td colSpan={3}>
 							<DataEditorNode
 								dataType={dataType}
-								value={getJson(currentState.value)}
+								value={json}
 								hideDataType={true}
-								onChange={v => handleChange({ value: v, originalFormat: 'json' })}
+								onChange={v => handleChange({ value: v as MichelineValue, originalFormat: 'json' })}
 							/>
 						</td>
 					</tr>
-					<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={false} />
-					{currentState.showDiagnostics
-						&& (
-							<tbody>
-								<tr>
-									<td>
-										<h3>Type</h3>
-										<div style={{ whiteSpace: 'pre-wrap' }}>
-											{JSON.stringify(dataType, null, 2)}
-										</div>
-									</td>
-									<td>
-										<h3>Json</h3>
-										<div style={{ whiteSpace: 'pre-wrap' }}>
-											{JSON.stringify(currentState.value?.value, null, 2)}
-										</div>
-									</td>
-									<td>
-										<h3>Micheline</h3>
-										<div style={{ whiteSpace: 'pre-wrap' }}>
-											<textarea
-												value={getMicheline(currentState.value)}
-												onChange={e => handleChange({ value: e.target.value, originalFormat: 'micheline' })}
-											/>
-										</div>
-									</td>
-								</tr>
-								<tr>
+					<tr>
+						<td colSpan={3}>
+							<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={false} />
+						</td>
+					</tr>
+				</tbody>
+				{currentState.showDiagnostics
+					&& (
+						<tbody>
+							<tr>
+								<td>
+									<h3>Type</h3>
+									<div style={{ whiteSpace: 'pre-wrap' }}>
+										{JSON.stringify(dataType, null, 2)}
+									</div>
+								</td>
+								<td>
+									<h3>Json</h3>
+									<div style={{ whiteSpace: 'pre-wrap' }}>
+										{JSON.stringify(json, null, 2)}
+									</div>
+								</td>
+								<td>
+									<h3>Micheline</h3>
+									<div style={{ whiteSpace: 'pre-wrap' }}>
+										<textarea
+											value={micheline}
+											onChange={e => handleChange({ value: e.target.value, originalFormat: 'micheline' })}
+										/>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
 									<span
 										style={{
 											'color': validationResult.state === 'Valid'
@@ -211,10 +261,10 @@ export const MichelineEditor = (
 									>
 										{JSON.stringify(validationResult, null, 2)}
 									</span>
-								</tr>
-							</tbody>
-						)}
-				</tbody>
+								</td>
+							</tr>
+						</tbody>
+					)}
 			</table>
 			{actionTitle
 				&& (

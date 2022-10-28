@@ -1,6 +1,7 @@
 import React from 'react';
-import { TypePrim } from '../MichelineDataType';
-import { MichelineValue as ValidationMichelineValue } from '../MichelineValue';
+import { isObject } from '../Helpers';
+import { TypesWithoutArgs } from '../MichelineDataType';
+import { MichelineValue, MichelineValueObject } from '../MichelineValue';
 import { validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
 import { VSCodeTextField } from './VsCodeWebViewUIToolkitWrappers';
@@ -8,35 +9,36 @@ import { VSCodeTextField } from './VsCodeWebViewUIToolkitWrappers';
 export const PrimitiveEditor = (
 	{ dataType, value, onChange }: {
 		dataType: string;
-		value: Record<string, any>;
-		onChange: (value: Record<string, any>) => void;
+		value: unknown;
+		onChange: (value: MichelineValueObject) => void;
 	},
 ) => {
 	const fieldName = getFieldName();
 	const changeValue = (v: string) => {
-		const newValue: Record<string, any> = {};
-		newValue[fieldName] = v;
-		onChange(newValue);
+		const newValue = {
+			[fieldName]: v,
+		};
+		onChange(newValue as MichelineValueObject);
 	};
-	if (value === null || value === undefined || typeof value !== 'object' || !Object.hasOwn(value, fieldName)) {
+	if (!isObject(value) || !Object.hasOwn(value, fieldName)) {
 		changeValue('');
 		value = {
 			[fieldName]: '',
 		};
 	}
-	const validationResult = validate({ prim: dataType as TypePrim }, value as ValidationMichelineValue);
+	const validationResult = validate({ prim: dataType as TypesWithoutArgs }, value as MichelineValue);
 	return (
 		<div style={{ verticalAlign: 'middle', display: 'table-cell' }}>
 			<VSCodeTextField
 				type='text'
-				value={value[fieldName]}
+				value={(value as Record<string, string>)[fieldName]}
 				onInput={e => changeValue((e.target as HTMLInputElement).value)}
 			/>
 			<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={false} />
 		</div>
 	);
 
-	function getFieldName() {
+	function getFieldName(): 'int' | 'bytes' | 'string' {
 		switch (dataType) {
 			case 'int':
 			case 'nat':

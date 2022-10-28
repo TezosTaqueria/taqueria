@@ -1,21 +1,19 @@
 import React from 'react';
+import { hasArgs, hasPrim, isObject } from '../Helpers';
+import { MichelineDataTypeWithArgs } from '../MichelineDataType';
+import { MichelinePairValue, MichelineValue } from '../MichelineValue';
 import { DataEditorNode } from './DataEditorNode';
 import { getFriendlyDataType } from './MichelineEditor';
 
 export const PairEditor = (
-	{ dataType, value, onChange }: { dataType: any; value: any; onChange: (value: any) => void },
+	{ dataType, value, onChange }: {
+		dataType: MichelineDataTypeWithArgs;
+		value: unknown;
+		onChange: (value: unknown) => void;
+	},
 ) => {
-	const changeValue = (index: number, v: any) => {
-		const newValue = {
-			'prim': 'Pair',
-			'args': value.args.slice(),
-		};
-		newValue.args[index] = v;
-		onChange(newValue);
-	};
 	if (
-		value === undefined || value === null || typeof value !== 'object' || value.prim !== 'Pair' || !value.args
-		|| !Array.isArray(value.args)
+		!isObject(value) || !hasPrim(value, 'Pair') || !hasArgs(value)
 	) {
 		value = {
 			'prim': 'Pair',
@@ -23,12 +21,20 @@ export const PairEditor = (
 		};
 		onChange(value);
 	}
-	const dataRecord = dataType as Record<string, any>;
+	const pairValue = value as MichelinePairValue;
+	const changeValue = (index: number, v: unknown) => {
+		const newValue = {
+			'prim': 'Pair',
+			'args': pairValue.args.slice(),
+		};
+		newValue.args[index] = v as MichelineValue;
+		onChange(newValue);
+	};
 	return (
 		<div className='editorDiv'>
 			<table>
 				<tbody>
-					{(dataType.args as any[]).map((item, index) => (
+					{dataType.args.map((item, index) => (
 						<tr key={index}>
 							<td className='valueTitle'>
 								<h4>{getFriendlyDataType(item)}</h4>
@@ -37,7 +43,7 @@ export const PairEditor = (
 								<DataEditorNode
 									hideDataType={true}
 									dataType={item}
-									value={value.args[index]}
+									value={pairValue.args[index]}
 									onChange={x => {
 										changeValue(index, x);
 									}}

@@ -3,8 +3,13 @@ import './AllEditors.css';
 import { MichelineEditor } from './data-editors/MichelineEditor';
 import { usePageTitle } from './hooks';
 import { MichelineEditorMessageHandler } from './interopTypes';
+import { MichelineDataType } from './MichelineDataType';
+import { MichelineValue } from './MichelineValue';
 
-const typesForTestingEditor = [
+const typesForTestingEditor: {
+	type: MichelineDataType;
+	value: MichelineValue;
+}[] = [
 	{
 		type: {
 			'prim': 'bool',

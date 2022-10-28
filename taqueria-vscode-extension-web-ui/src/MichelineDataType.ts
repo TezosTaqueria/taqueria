@@ -1,7 +1,12 @@
-export type TypePrim =
+export type TypesWithArgs =
 	| 'list'
 	| 'set'
 	| 'option'
+	| 'pair'
+	| 'map'
+	| 'big_map';
+
+export type TypesWithoutArgs =
 	| 'unit'
 	| 'string'
 	| 'nat'
@@ -23,12 +28,17 @@ export type TypePrim =
 	| 'chest'
 	| 'chest_key'
 	| 'tx_rollup_l2_address'
-	| 'bool'
-	| 'pair'
-	| 'map'
-	| 'big_map';
+	| 'bool';
 
-export type MichelineDataType = {
-	prim: TypePrim;
-	args?: MichelineDataType[];
+export type MichelineDataTypeWithoutArgs = {
+	prim: TypesWithoutArgs;
+	annots?: string[] | undefined;
 };
+
+export type MichelineDataTypeWithArgs = {
+	prim: TypesWithArgs;
+	args: MichelineDataType[];
+	annots?: string[] | undefined;
+};
+
+export type MichelineDataType = MichelineDataTypeWithoutArgs | MichelineDataTypeWithArgs;
