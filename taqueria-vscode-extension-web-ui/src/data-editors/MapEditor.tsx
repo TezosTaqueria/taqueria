@@ -14,11 +14,7 @@ export const MapEditor = (
 		onChange: (value: unknown) => void;
 	},
 ) => {
-	if (!Array.isArray(value)) {
-		value = [];
-		onChange(value);
-	}
-	const mapValue = value as MichelineMapValue;
+	const mapValue = coerceAndCastValue(value);
 	const changeValue = (index: number, key: unknown, v: unknown) => {
 		const newValue = mapValue.slice();
 		newValue[index] = {
@@ -104,4 +100,13 @@ export const MapEditor = (
 			</table>
 		</div>
 	);
+
+	function coerceAndCastValue(value: unknown): MichelineMapValue {
+		if (!Array.isArray(value)) {
+			const newValue: MichelineMapValue = [];
+			onChange(newValue);
+			return newValue;
+		}
+		return value as MichelineMapValue;
+	}
 };

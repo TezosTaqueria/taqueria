@@ -13,11 +13,7 @@ export const ListEditor = (
 		onChange: (value: unknown) => void;
 	},
 ) => {
-	if (!Array.isArray(value)) {
-		value = [];
-		onChange(value);
-	}
-	const arrayValue = value as MichelineValue[];
+	const arrayValue = coerceAndCastValue(value);
 
 	const changeValue = (index: number, v: unknown) => {
 		const newValue = arrayValue.slice();
@@ -113,4 +109,13 @@ export const ListEditor = (
 			</table>
 		</div>
 	);
+
+	function coerceAndCastValue(value: unknown): MichelineValue[] {
+		if (!Array.isArray(value)) {
+			const newValue: MichelineValue[] = [];
+			onChange(newValue);
+			return newValue;
+		}
+		return value as MichelineValue[];
+	}
 };

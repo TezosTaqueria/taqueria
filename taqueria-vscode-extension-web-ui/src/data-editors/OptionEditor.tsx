@@ -18,13 +18,7 @@ export const OptionEditor = (
 			'args': [v],
 		});
 	};
-	if (!isObject(value) || !hasPrim(value, 'None', 'Some')) {
-		value = {
-			'prim': 'None',
-		};
-		changeValue(value);
-	}
-	const optionValue = value as MichelineOptionValue;
+	const optionValue = coerceAndCastValue(value);
 	const setOption = (hasValue: boolean) => {
 		if (hasValue) {
 			onChange({
@@ -61,4 +55,15 @@ export const OptionEditor = (
 			</tbody>
 		</table>
 	);
+
+	function coerceAndCastValue(value: unknown): MichelineOptionValue {
+		if (!isObject(value) || !hasPrim(value, 'None', 'Some')) {
+			const newValue = {
+				'prim': 'None' as const,
+			};
+			changeValue(newValue);
+			return newValue;
+		}
+		return value as MichelineOptionValue;
+	}
 };

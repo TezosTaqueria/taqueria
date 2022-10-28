@@ -20,23 +20,28 @@ export const PrimitiveEditor = (
 		};
 		onChange(newValue as MichelineValueObject);
 	};
-	if (!isObject(value) || !Object.hasOwn(value, fieldName)) {
-		changeValue('');
-		value = {
-			[fieldName]: '',
-		};
-	}
-	const validationResult = validate({ prim: dataType as TypesWithoutArgs }, value as MichelineValue);
+	const primitiveValue = coerceAndCastValue(value);
+	const validationResult = validate({ prim: dataType as TypesWithoutArgs }, primitiveValue);
 	return (
 		<div style={{ verticalAlign: 'middle', display: 'table-cell' }}>
 			<VSCodeTextField
 				type='text'
-				value={(value as Record<string, string>)[fieldName]}
+				value={(primitiveValue as Record<string, string>)[fieldName]}
 				onInput={e => changeValue((e.target as HTMLInputElement).value)}
 			/>
 			<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={false} />
 		</div>
 	);
+
+	function coerceAndCastValue(value: unknown): MichelineValue {
+		if (!isObject(value) || !Object.hasOwn(value, fieldName)) {
+			changeValue('');
+			return {
+				[fieldName]: '',
+			} as MichelineValue;
+		}
+		return value as MichelineValue;
+	}
 
 	function getFieldName(): 'int' | 'bytes' | 'string' {
 		switch (dataType) {

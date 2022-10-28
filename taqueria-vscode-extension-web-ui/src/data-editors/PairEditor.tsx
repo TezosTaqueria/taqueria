@@ -12,16 +12,7 @@ export const PairEditor = (
 		onChange: (value: unknown) => void;
 	},
 ) => {
-	if (
-		!isObject(value) || !hasPrim(value, 'Pair') || !hasArgs(value)
-	) {
-		value = {
-			'prim': 'Pair',
-			'args': [],
-		};
-		onChange(value);
-	}
-	const pairValue = value as MichelinePairValue;
+	const pairValue = coerceAndCastValue(value);
 	const changeValue = (index: number, v: unknown) => {
 		const newValue = {
 			'prim': 'Pair',
@@ -55,4 +46,16 @@ export const PairEditor = (
 			</table>
 		</div>
 	);
+
+	function coerceAndCastValue(value: unknown): MichelinePairValue {
+		if (!isObject(value) || !hasPrim(value, 'Pair') || !hasArgs(value)) {
+			const newValue = {
+				'prim': 'Pair' as const,
+				'args': [],
+			};
+			onChange(newValue);
+			return newValue;
+		}
+		return value as MichelinePairValue;
+	}
 };
