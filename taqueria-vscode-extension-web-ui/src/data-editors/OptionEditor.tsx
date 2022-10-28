@@ -9,10 +9,10 @@ export const OptionEditor = (
 	{ dataType, value, onChange }: {
 		dataType: MichelineDataTypeWithArgs;
 		value: unknown;
-		onChange: (value: any) => void;
+		onChange: (value: unknown) => void;
 	},
 ) => {
-	const changeValue = (v: any) => {
+	const changeValue = (v: unknown) => {
 		onChange({
 			'prim': 'Some',
 			'args': [v],
