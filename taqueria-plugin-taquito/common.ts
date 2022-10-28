@@ -178,8 +178,8 @@ export const generateAccountKeys = async (
 export const handleOpsError = (err: unknown, env: string): Promise<never> => {
 	if (err instanceof Error) {
 		const msg = err.message;
-		if (/ENOTFOUND/.test(msg)) return sendAsyncErr('The RPC URL may be invalid. Check ./.taq/config.json.');
-		if (/ECONNREFUSED/.test(msg)) return sendAsyncErr('The RPC URL may be down or the sandbox is not running.');
+		if (/ENOTFOUND/.test(msg)) return sendAsyncErr('The RPC URL may be invalid. Check ./.taq/config.json');
+		if (/ECONNREFUSED/.test(msg)) return sendAsyncErr('The RPC URL may be down or the sandbox is not running');
 		if (/empty_implicit_contract/.test(msg)) {
 			const result = msg.match(/(?<="implicit":")tz[^"]+(?=")/);
 			const publicKeyHash = result ? result[0] : undefined;

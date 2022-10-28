@@ -9,7 +9,7 @@ import {
 
 const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
-	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
+	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	try {
 		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
 		if (envType !== 'Network') {
@@ -26,7 +26,7 @@ const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 				accountsInstantiated.push(declaredAccountAlias);
 			} else {
 				sendWarn(
-					`Note: ${declaredAccountAlias} is already instantiated in the current environment, "${parsedArgs.env}".`,
+					`Note: ${declaredAccountAlias} is already instantiated in the current environment, "${parsedArgs.env}"`,
 				);
 			}
 		}

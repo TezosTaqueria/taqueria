@@ -65,7 +65,7 @@ const prepAccountsInfoForDisplay = (accountsInfo: ContractInfo[]): TableRow[] =>
 
 const fund = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
-	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
+	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	try {
 		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
 		if (envType !== 'Network') return sendAsyncErr('taq fund can only be executed in a network environment');

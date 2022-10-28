@@ -89,7 +89,7 @@ const prepContractInfoForDisplay = (tezos: TezosToolkit, contractInfo: ContractI
 
 const transfer = async (parsedArgs: Opts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
-	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json.`);
+	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	try {
 		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
 		const tezos = await (envType === 'Network'
