@@ -38,7 +38,9 @@ const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 				}.\nPlease execute "taq fund" targeting the same environment to fund these accounts`,
 			);
 		} else {
-			return sendJsonRes(`No accounts were instantiated`);
+			return sendJsonRes(
+				`No accounts were instantiated because they were all instantiated in the target environment already`,
+			);
 		}
 	} catch {
 		return sendAsyncErr('No operations performed');
