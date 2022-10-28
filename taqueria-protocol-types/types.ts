@@ -1,5 +1,7 @@
 // ---- Simple Types & Type Fragments ----
 
+// Updating
+
 /** @pattern ^[A-Za-z]$ */
 export type SingleChar = string & { readonly __kind: SingleChar };
 
