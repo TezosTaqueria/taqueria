@@ -24,6 +24,7 @@ export class ArtifactsDataProvider extends TaqueriaDataProviderBase
 		const config = await Util.TaqifiedDir.create(mainFolder.path as Util.PathToDir, this.helper.i18n);
 		const artifactsFolder = config.config.artifactsDir ?? 'artifacts';
 		const artifacts = await vscode.workspace.findFiles(`${artifactsFolder}/**/*.tz`, '**/node_modules/**');
+		artifacts.sort();
 		const treeItems = artifacts.map(uri =>
 			new ArtifactTreeItem(
 				mainFolder ? path.relative(path.join(mainFolder.path, artifactsFolder), uri.path) : path.basename(uri.path),

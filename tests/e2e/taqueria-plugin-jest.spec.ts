@@ -5,7 +5,6 @@ import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
-import { cwd } from 'process';
 import * as contents from './data/help-contents/jest-contents';
 import { reference } from './data/jest.config-reference';
 import { referenceCI } from './data/jest.config-reference-ci';
@@ -18,6 +17,22 @@ const taqueriaProjectPath = 'e2e/auto-test-jest-plugin';
 describe('E2E Testing for the taqueria jest plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['jest']);
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+	});
+
+	test('Regression: #1098, Assure that ts-jest installs correctly', async () => {
+		// NOTE:
+		// The generateTestProject is executed once per test suite run via the
+		// beforeAll hook.
+		//
+		// generateTestProject installs a local version of the plugin via symlink
+		// (a side-effect of how NPM works when installing a plugin from a local
+		// directory)
+		//
+		// Thus, we need to install the plugin in such a way that doesn't result
+		// in NPM installing via symlink. Pack to the rescue!
 
 		// Pack the jest plugin
 		const taqRoot = resolve(`${__dirname}/../../`);
@@ -30,15 +45,11 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 		await exec(`npm i -D ${taqRoot}/taqueria-plugin-jest*.tgz`, { cwd: taqueriaProjectPath });
 		await exec(`rm ${taqRoot}/taqueria-plugin-jest*.tgz`);
 
-		// TODO: This can removed after this is resolved:
-		// https://github.com/ecadlabs/taqueria/issues/528
-		try {
-			await exec(`taq -p ${taqueriaProjectPath}`);
-		} catch (_) {}
-	});
-
-	test('Regression: #1098, Assure that ts-jest installs correctly', async () => {
 		await fsPromises.stat(`${taqueriaProjectPath}/node_modules/.bin/ts-jest`);
+
+		// Revert to the local non-packed version of the jest plugin
+		await exec('npm uninstall -D @taqueria/plugin-jest', { cwd: taqueriaProjectPath });
+		await exec(`npm install -D ${taqRoot}/taqueria-plugin-jest`, { cwd: taqueriaProjectPath });
 	});
 
 	test('Verify that the jest plugin exposes the associated commands in the help menu', async () => {
@@ -221,6 +232,11 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 	});
 
 	afterAll(async () => {
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+		// If TAQ_TEST_CLEAN is set to 0, then don't remove
+		// the test project directory. Useful for debugging locally
+		if (process.env.TAQ_TEST_CLEAN !== '0') {
+			// Cleanup the test directory
+			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+		}
 	});
 });

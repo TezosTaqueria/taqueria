@@ -8,48 +8,40 @@ Plugin.create(i18n => ({
 	tasks: [
 		Task.create({
 			task: 'typecheck',
-			command: 'typecheck [sourceFiles...]',
+			command: 'typecheck <sourceFile>',
 			aliases: ['tc'],
-			description: 'Typecheck Michelson contracts',
-			options: [
-				Option.create({
-					shortFlag: 's',
-					flag: 'sandboxName',
-					description: 'The name of the sandbox to use',
-					required: false,
-				}),
-			],
+			description: 'Typecheck a Michelson contract',
 			handler: 'proxy',
 			positionals: [
 				PositionalArg.create({
-					placeholder: 'sourceFiles',
-					description: 'The names of the Michelson contracts you wish to typecheck, separated by space',
+					placeholder: 'sourceFile',
+					description: 'The name of the Michelson contract you wish to typecheck',
 				}),
 			],
 			encoding: 'json',
 		}),
 		Task.create({
 			task: 'simulate',
-			command: 'simulate <sourceFile> <input>',
+			command: 'simulate <sourceFile>',
 			aliases: ['sim'],
-			description: 'Run Michelson contracts as a simulation',
+			description: 'Run a Michelson contract as a simulation',
 			options: [
 				Option.create({
 					flag: 'storage',
 					description:
-						'The initial storage used to run the script. The value is a Michelson expression, wrapped in single quotes if specified in the CLI, wrapped in double quotes instead if specified in config.json',
+						'Name of the storage file that contains the storage value as a Michelson expression, in the artifacts directory, used for originating a contract',
 					required: false,
 				}),
 				Option.create({
-					shortFlag: 's',
-					flag: 'sandboxName',
-					description: 'The name of the sandbox to use',
-					required: false,
+					flag: 'param',
+					description:
+						'Name of the parameter file that contains the parameter value as a Michelson expression, in the artifacts directory, used for invoking a deployed contract',
+					required: true,
 				}),
 				Option.create({
 					flag: 'entrypoint',
 					description:
-						'This makes contract invocation easier by specifying the annotation of an entrypoint (if it exists)',
+						'You may explicitly specify an entrypoint to make the parameter value shorter, without having to specify a chain of (Left (Right ... 14 ...))',
 					required: false,
 				}),
 			],
@@ -58,10 +50,6 @@ Plugin.create(i18n => ({
 				PositionalArg.create({
 					placeholder: 'sourceFile',
 					description: 'The name of the Michelson contract you wish to simulate',
-				}),
-				PositionalArg.create({
-					placeholder: 'input',
-					description: 'The input used to run the script. The value is a Michelson expression wrapped in single quotes',
 				}),
 			],
 			encoding: 'json',

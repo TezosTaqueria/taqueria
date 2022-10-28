@@ -1,4 +1,5 @@
 import {
+	getAccountPrivateKey,
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
@@ -100,6 +101,8 @@ const mapOpToContract = async (
 	destination: string,
 ) => {
 	const results = await op.operationResults();
+	const originationResults = results.filter(result => result.kind === 'origination')
+		.map(result => result as OperationContentsAndResultOrigination);
 
 	return contracts.reduce(
 		(retval, contract) => {
@@ -109,7 +112,7 @@ const mapOpToContract = async (
 				// WARNING - using side effect here.
 				// For each iteration of reduce, results array is being modified-in-place.
 				// TODO: Adjust to use recursion to avoid side-effect.
-				const result = results.shift() as OperationContentsAndResultOrigination;
+				const result = originationResults.shift();
 				const address = result && result.metadata.operation_result.originated_contracts
 					? result.metadata.operation_result.originated_contracts.join(',')
 					: 'Error';
@@ -165,19 +168,67 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 		if (error.message) {
 			const msg = error.message;
 			if (/ENOTFOUND/.test(msg)) {
-				sendErr(msg + ' - The RPC URL may be invalid. Check your ./taq/config.json.');
+				sendErr(msg + ' - The RPC URL may be invalid. Check ./taq/config.json.\n');
 			} else if (/ECONNREFUSED/.test(msg)) {
 				sendErr(msg + ' - The RPC URL may be down or the sandbox is not running.');
+			} else if (/empty_implicit_contract/.test(msg)) {
+				const result = msg.match(/(?<="implicit":")tz[^"]+(?=")/);
+				const publicKeyHash = result ? result[0] : undefined;
+				if (!publicKeyHash) sendErr(msg);
+				else {
+					sendErr(
+						`The account ${publicKeyHash} for the target environment, "${
+							getCurrentEnvironment(parsedArgs)
+						}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+					);
+				}
 			} else {
 				sendErr(
 					msg
-						+ " - There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.",
+						+ " - There was a problem communicating with the chain. Check the RPC URL of the network or sandbox you're targeting in config.json.\n",
 				);
 			}
 		}
 		return undefined;
 	}
 };
+
+/**
+ * @description Import a key to sign operation with the side-effect of setting the Tezos instance to use the InMemorySigner provider
+ *
+ * @param toolkit The toolkit instance to attach a signer
+ * @param privateKeyOrEmail Key to load in memory
+ * @param passphrase If the key is encrypted passphrase to decrypt it
+ * @param mnemonic Faucet mnemonic
+ * @param secret Faucet secret
+ */
+export async function importFaucet(
+	toolkit: TezosToolkit,
+	privateKeyOrEmail?: string,
+	passphrase?: string,
+	mnemonic?: string,
+	secret?: string,
+) {
+	if (privateKeyOrEmail && passphrase && mnemonic && secret) {
+		return await importKey(toolkit, privateKeyOrEmail, passphrase, mnemonic, secret);
+	} else if (mnemonic) {
+		const signer = InMemorySigner.fromFundraiser(privateKeyOrEmail ?? '', passphrase ?? '', mnemonic);
+		toolkit.setProvider({ signer });
+		const pkh = await signer.publicKeyHash();
+		let op;
+		try {
+			op = await toolkit.tz.activate(pkh, secret ?? '');
+			if (op) {
+				await op.confirmation();
+			}
+		} catch (ex: any) {
+		}
+	} else if (privateKeyOrEmail) {
+		// Fallback to regular import
+		const signer = await InMemorySigner.fromSecretKey(privateKeyOrEmail, passphrase);
+		toolkit.setProvider({ signer });
+	}
+}
 
 const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.t) =>
 	currentEnv.networks
@@ -186,22 +237,15 @@ const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.
 				const network = getNetworkConfig(parsedArgs)(networkName);
 				if (network) {
 					if (network.rpcUrl) {
-						if (network.faucet) {
-							const result = (async () => {
-								const tezos = new TezosToolkit(network.rpcUrl as string);
-								await importKey(
-									tezos,
-									network.faucet.email,
-									network.faucet.password,
-									network.faucet.mnemonic.join(' '),
-									network.faucet.activation_code,
-								);
-								return await createBatch(parsedArgs, tezos, networkName);
-							})();
+						const result = (async () => {
+							const tezos = new TezosToolkit(network.rpcUrl as string);
+							const key = await getAccountPrivateKey(parsedArgs, network, 'taqRootAccount');
+							await importKey(tezos, key);
+							return await createBatch(parsedArgs, tezos, networkName);
+						})();
 
-							return [...retval, result];
-						} else sendErr(`Network ${networkName} requires a valid faucet in config.json.`);
-					} else sendErr(`Network "${networkName} is missing an RPC url in config.json."`);
+						return [...retval, result];
+					} else sendErr(`Network "${networkName}" is missing an RPC url in config.json.`);
 				} else {
 					sendErr(
 						`The current environment is configured to use a network called '${networkName}'; however, no network of this name has been configured in .taq/config.json.`,

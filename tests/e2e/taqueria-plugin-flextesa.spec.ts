@@ -1,12 +1,16 @@
-import { exec as exec1 } from 'child_process';
+import { ChildProcess, exec as exec1, spawn } from 'child_process';
 import fsPromises from 'fs/promises';
 import util from 'util';
-import { generateTestProject, getContainerID, getContainerName } from './utils/utils';
+import { generateTestProject, getContainerID, getContainerName, sleep } from './utils/utils';
 const exec = util.promisify(exec1);
 import * as flexContents from './data/help-contents/flextesa-contents';
 
 const taqueriaProjectPath = 'e2e/auto-test-flextesa-plugin';
 let sandboxName: string;
+
+// List of child processes that will need to be cleanup after test case finishes
+// These processes will be killed in the afterAll() hook
+const processes: ChildProcess[] = [];
 
 // TODO: to be moved into a different spec file when the tezos-client plugin no longer depends on the flextesa plugin.
 // If I move it now, testing won't work.
@@ -102,6 +106,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 
 			// 5.  Run stop command and verify the output
 			const sandboxStop = await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+			await sleep(2500);
 
 			// 5. Verify that taqueria returns proper message into console
 			expect(sandboxStop.stdout).toContain(`Stopped ${sandboxName}.\n`);
@@ -113,12 +118,13 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 	});
 
 	test('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
+		await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);
+
 		try {
 			// Setting up docker container name
 			sandboxName = 'test';
 
 			// 1. Run sandbox start command
-			await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);
 			const sandboxStart = await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 2. Verify that sandbox has been started and taqueria returns proper message into console
@@ -175,6 +181,84 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		}
 	});
 
+	test('Verify that Taqueria accepts any origin and does not emit any CORS related errors', async () => {
+		// Start web server for preflight request
+		const p = await spawn('npx', ['ws'], {
+			// detached: true,
+			shell: true,
+		});
+		processes.push(p); // store process for cleanup
+
+		// Stop the sandbox
+		await exec(`taq start sandbox local`, { cwd: `./${taqueriaProjectPath}` });
+
+		// Give the sandbox some time to bake the genesis block
+		await sleep(2000);
+
+		// Get the port that the sandbox is running on
+		const configContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		);
+		const port = configContents.sandbox.local.rpcUrl;
+
+		// Connect to the sandbox using a different origin (CORS test)
+		const { stdout } = await exec(`curl -i -H "Origin: http://localhost:8080" ${port}/version`);
+
+		// Stop the sandbox when done
+		await exec(`taq stop sandbox local`, { cwd: `./${taqueriaProjectPath}` });
+
+		// Assert that the connection to the sandbox via different origin was successful
+		expect(stdout).toContain('HTTP/1.1 200 OK');
+	});
+
+	test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
+		sandboxName = 'local';
+		await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+
+		const accounts = await exec(`taq list accounts ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+		expect(accounts.stdout).toContain('bob');
+
+		await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+	});
+
+	test('Verify that taqueria can return JSON when request for list of accounts from a sandbox is made by TVsCE', async () => {
+		sandboxName = 'local';
+		await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+
+		const accounts = await exec(`taq list accounts ${sandboxName} --fromVsCode`, { cwd: `./${taqueriaProjectPath}` });
+		expect(accounts.stdout).toEqual(
+			JSON.stringify([
+				{
+					account: 'bob',
+					balance: '3000 ꜩ',
+					address: 'tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6',
+				},
+				{
+					account: 'alice',
+					balance: '3000 ꜩ',
+					address: 'tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb',
+				},
+				{
+					account: 'john',
+					balance: '3000 ꜩ',
+					address: 'tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6',
+				},
+				{
+					account: 'jane',
+					balance: '3000 ꜩ',
+					address: 'tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph',
+				},
+				{
+					account: 'joe',
+					balance: '3000 ꜩ',
+					address: 'tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB',
+				},
+			]) + '\n',
+		);
+
+		await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+	});
+
 	// TODO: Currently it cannot be done until this issue has been resolved
 	// Issue to implement test: https://github.com/ecadlabs/taqueria/issues/366
 	// Related developer issue: https://github.com/ecadlabs/taqueria/issues/243
@@ -210,6 +294,10 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 	// Comment if need to debug
 	afterAll(async () => {
 		try {
+			// Clean up any processes created during testing
+			processes.map(child => child.kill());
+
+			// Clean up test projects
 			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		} catch (error) {
 			throw new Error(`error: ${error}`);

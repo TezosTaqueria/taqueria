@@ -62,17 +62,17 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 2. Run taq deploy on a selected test network described in "test" environment
 
-		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+		const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
-		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 		// 3. Verify that contract has been originated on the network
-		expect(deployResponse).toContain('hello-tacos.tz');
-		expect(deployResponse).toContain(networkInfo.networkName);
-		const contractHash = deployResponse.split('│')[2].trim();
+		expect(stdout).toContain('hello-tacos.tz');
+		expect(stdout).toContain(networkInfo.networkName);
 
-		expect(contractHash).toMatch(contractRegex);
+		const result = stdout.match(/(KT1)+\w{33}?/);
+		expect(result).not.toBe(null);
+		const contractHash = (result as RegExpMatchArray)[0];
 
 		// 4. Verify that contract has been originated to the network
 		expect(
@@ -97,17 +97,17 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 			// 2. Run taq deploy ${contractName} on a selected test network described in "test" environment
 
-			const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+			const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
 				cwd: `./${taqueriaProjectPath}`,
 			});
-			const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
-			// 3. Get the KT address from the output
-			expect(deployResponse).toContain('hello-tacos.tz');
-			expect(deployResponse).toContain(networkInfo.networkName);
-			const contractHash = deployResponse.split('│')[2].trim();
+			// 3. Verify that contract has been originated on the network
+			expect(stdout).toContain('hello-tacos.tz');
+			expect(stdout).toContain(networkInfo.networkName);
 
-			expect(contractHash).toMatch(contractRegex);
+			const result = stdout.match(/(KT1)+\w{33}?/);
+			expect(result).not.toBe(null);
+			const contractHash = (result as RegExpMatchArray)[0];
 
 			// 4. Verify that contract has been originated to the network
 			expect(
@@ -318,7 +318,53 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain(
-			"There was a problem communicating with the chain. Perhaps review your RPC URL of the network or sandbox you're targeting.",
+			"There was a problem communicating with the chain. Check the RPC URL of the network or sandbox you're targeting in config.json",
+		);
+	});
+
+	// To be deleted or updated because of the new funding mechanism for accounts
+	test.skip('Verify that partial faucets can be provided', async () => {
+		// Environment test does not exist on default config.json
+		environment = 'test';
+
+		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
+		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
+		await exec(`cp e2e/data/string.storage ${taqueriaProjectPath}/artifacts/`);
+		await exec(
+			`cp e2e/data/config-taquito-test-environment-partial-faucet.json ${taqueriaProjectPath}/.taq/config.json`,
+		);
+
+		// 2. Run taq deploy on a network described in "test" environment
+		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz --storage string.storage -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		// 3. Verify that proper error displays in the console
+		expect(stdoutDeploy.stderr).toContain(
+			'Your account does not have sufficient funds to perform this operation',
+		);
+	});
+
+	// To be deleted or updated because of the new funding mechanism for accounts
+	test.skip('Verify that partial faucets can be provided, using a single string as a mnemonic seed', async () => {
+		// Environment test does not exist on default config.json
+		environment = 'test';
+
+		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
+		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
+		await exec(`cp e2e/data/string.storage ${taqueriaProjectPath}/artifacts/`);
+		await exec(
+			`cp e2e/data/config-taquito-test-environment-partial-faucet-string-mnemonic.json ${taqueriaProjectPath}/.taq/config.json`,
+		);
+
+		// 2. Run taq deploy on a network described in "test" environment
+		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz --storage string.storage -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		// 3. Verify that proper error displays in the console
+		expect(stdoutDeploy.stderr).toContain(
+			'Your account does not have sufficient funds to perform this operation',
 		);
 	});
 

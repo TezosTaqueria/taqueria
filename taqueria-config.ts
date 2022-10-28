@@ -25,13 +25,16 @@ export const defaultConfig: Config.t = Config.create({
 		development: {
 			networks: [],
 			sandboxes: ['local'],
-			storage: {},
+		},
+		testing: {
+			networks: ['ghostnet'],
+			sandboxes: [],
 		},
 	},
 	sandbox: {
 		local: {
 			label: 'Local Tezos Sandbox',
-			protocol: 'Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A',
+			protocol: 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg',
 			rpcUrl: 'http://localhost:20000',
 		},
 	},
@@ -42,7 +45,13 @@ export const defaultConfig: Config.t = Config.create({
 		jane: '3_000_000_000',
 		joe: '3_000_000_000',
 	},
-	network: {},
+	network: {
+		ghostnet: {
+			label: 'ghostnet',
+			rpcUrl: 'https://ghostnet.ecadinfra.com',
+			protocol: 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg'
+		},
+	},
 	// defaultTasks: {
 	//     compile: {
 	//         plugin: "taqueria-plugin-ligo",

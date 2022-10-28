@@ -37,25 +37,33 @@ jobs:
       vsixPath: ${{ steps.packageExtension.outputs.vsixPath }}
       vsixGcsUrl: ${{ steps.publicUrl.outputs.vsixGcsUrl }}
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       
-      - name: Install Node
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.16.x
+          cache: 'npm'
+
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: "1.23.4"
 
       - name: Attempt to rebuild
         run: npm rebuild | true
-      
-      - name: Install Dependencies
-        run: npm ci
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules/**
+          key: cache-node-modules-${{ github.run_id }}
       
       - name: Compile TS
-        run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
+        run: npm run compile:test --workspace ${{ env.GIT_WORKSPACE }}
       
-      - name: Run Unit Tests on Linux
-        run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
+      # - name: Run Unit Tests on Linux
+      #   run: xvfb-run -a npm test --workspace ${{ env.GIT_WORKSPACE }}
 
       - name: Package VSCode Extension
         id: packageExtension
@@ -90,26 +98,29 @@ jobs:
 
   publish-marketplace:
     name: Publish VSCode Extension
-    if: ${{ github.event.action == 'published' }}
     needs:
       - test-build
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.16.x
+          cache: 'npm'
 
-      - name: Install Dependencies
-        run: npm ci
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ./node_modules/**
+          key: cache-node-modules-${{ github.run_id }}
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
 
       # Separate steps for prerelease and release workflows
       - name: Publish as pre-release
-        if: ${{ github.event.release.prerelease }}
+        if: ${{ github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
         uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}
@@ -119,7 +130,7 @@ jobs:
           preRelease: true
 
       - name: Publish as official release
-        if: ${{ !github.event.release.prerelease }}
+        if: ${{ github.event.action == 'published' && !github.event.release.prerelease }}
         uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}

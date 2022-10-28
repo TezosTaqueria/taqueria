@@ -31,7 +31,7 @@
 		"local": {
 			"label": "Local Tezos Sandbox",
 			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
-			"rpcUrl": "http://localhost:20000"
+			"rpcUrl": "http://localhost:20110"
 		}
 	},
 	"network": {
@@ -39,6 +39,13 @@
 			"label": "ghostnet",
 			"rpcUrl": "https://rpc.ithacanet.teztnets.xyz",
 			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+			"accounts": {
+				"taqRootAccount": {
+					"publicKey": "p2pk666TYDPwRzgE2emHyTM4RSLbypvhHwhk6RwEtasA5arSBgf6bAq",
+					"publicKeyHash": "tz3P5zrUYGJnryVfZ5JFeLMMojdjQFGLUFiK",
+					"privateKey": "p2sk2sF7GEUMB11cmzpLBpXh7F1Asru5sNCneUjWDMqxpoCZA3DLNf"
+				}
+			},
 			"faucet": {
 				"pkh": "tz1gFhXGGK4Ui6UwD92djr61XhwukFYgtwmF",
 				"mnemonic": [

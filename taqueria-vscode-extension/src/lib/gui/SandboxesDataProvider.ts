@@ -1,5 +1,5 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
-import fetch from 'node-fetch';
+import fetch from 'node-fetch-commonjs';
 import * as vscode from 'vscode';
 import { HasRefresh, mapAsync, OutputLevels, VsCodeHelper } from '../helpers';
 import { getRunningContainerNames } from '../pure';

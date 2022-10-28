@@ -1,36 +1,39 @@
-# 🏗️ PR ➾
-
-Fixes # (issue)
-
-## 🪂 Pre-Merge Checklist
-
-- [ ] 🐬 I have commented my code, particularly in hard-to-understand areas
-- [ ] 🦀 Automated tests have been written and added to this PR
-- [ ] 🤿 Corresponding changes have been made to all documentation
-- [ ] 🏖️ New and existing unit tests pass locally and in CI
-- [ ] 🔱 The test plan has been implemented and verified by an SDET
-- [ ] 🏄‍♂️ Myself and others have built this branch and done manual testing on the change
-- [ ] ⛵ A summary describing the change has been written for release notes
-
-----------------------------------------------------------------------------------------------------------------------------
+# 🌮🌮🌮 Taqueria PR 🌮🌮🌮
 
 ## 🪁 Description
 
-Please include a summary of the change and add the issue number this is related to above. Please also include relevant motivation and context for the change
-(e.g. what was the existing behavior, why did it break, etc.)
+_Explain it to me like I'm 5! Keep this short and descriptive_
+
+## 🪂 Pre-Merge Checklist (Definition of Done)
+
+🚦 Required to merge:
+
+- [ ] ⛱️ I have completed this PR template in full and updated the title appropriately
+- [ ] ⛵ My code builds cleanly, and I have manually tested the changes
+- [ ] 🏄‍♂️ Another team member has built this branch and done manual testing on the change
+- [ ] 🏖️ New and existing unit tests pass locally and in CI
+- [ ] 🔱 The test plan has been implemented and verified by an SDET
+- [ ] 🦀 Automated tests have been written and added to this PR
+- [ ] 🐬 I have commented my code, particularly in hard-to-understand areas
+- [ ] 🤿 Corresponding changes have been made to all documentation
+- [ ] 🐚 Required changes to the VScE have been made
+- [ ] 🪸 Required updates to scaffolds have been made
+- [ ] 🚢 The release checklist has been completed
+
+## 🛩️ Summary of Changes
+
+_Please include a summary of the changes to the codebase._ _Please also include relevant motivation and context for the change_
+_(e.g. what was the existing behaviour, why did it break, etc.)_
 
 ## 🎢 Test Plan
 
-Please describe the testing strategy for this change
+_Please describe the testing strategy and plan for this PR_
 
-----------------------------------------------------------------------------------------------------------------------------
+## 🛸 Type of Change
 
-### 🛸 Type of Change
-
-- [ ] 🐟 Minor change (non-breaking change of very limited scope)
-- [ ] 🦑 Bug fix (non-breaking change which fixes an issue)
-- [ ] ✨ New feature (non-breaking change which adds functionality)
-- [ ] 🌊 Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] 🐳 Major refactor (breaking changes and significant impact to the codebase)
-
-----------------------------------------------------------------------------------------------------------------------------
+- [ ] 🧽 Chore ➾
+- [ ] 🛠️ Fix ➾
+- [ ] ✨ Feature ➾
+- [ ] 👷 Refactor ➾
+- [ ] 🧪 Pre-Release ➾
+- [ ] 🚀 Release ➾

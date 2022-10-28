@@ -28,7 +28,7 @@
 		"local": {
 			"label": "Local Tezos Sandbox",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-			"rpcUrl": "http://localhost:20000"
+			"rpcUrl": "http://localhost:20050"
 		}
 	},
 	"network": {
@@ -36,6 +36,13 @@
 			"label": "ithacanet",
 			"rpcUrl": "https://invalid.test",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"accounts": {
+				"taqRootAccount": {
+					"publicKey": "p2pk666TYDPwRzgE2emHyTM4RSLbypvhHwhk6RwEtasA5arSBgf6bAq",
+					"publicKeyHash": "tz3P5zrUYGJnryVfZ5JFeLMMojdjQFGLUFiK",
+					"privateKey": "p2sk2sF7GEUMB11cmzpLBpXh7F1Asru5sNCneUjWDMqxpoCZA3DLNf"
+				}
+			},
 			"faucet": {
 				"pkh": "tz1c2fnjgqPLLpi868v1JEEkTCSpvGCHwAB4",
 				"mnemonic": [

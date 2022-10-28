@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/taqueria",
-	"version": "0.18.0",
+	"version": "0.20.2",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -16,6 +16,7 @@
 		"serve-website": "cd website && npm run serve",
 		"watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build || npx play-sound beep.mp3\" --initial",
 		"build-and-watch-vscode": "npx chokidar \"*.ts\" \"taqueria-vscode-extension/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run compile -w taqueria-vscode-extension || npx play-sound beep.mp3\" --initial",
+		"pretest": "mkdir -p ~/TVsCE_e2e/vscode-taq-test-project && npm run compile -w taqueria-vscode-extension",
 		"prepare": "husky install",
 		"format": "dprint fmt",
 		"format:check": "dprint check",
@@ -57,10 +58,25 @@
 		"with-staged": "^1.0.2"
 	},
 	"workspaces": [
+		"./taqueria-protocol",
+		"./taqueria-sdk",
+		"./taqueria-state",
+		"./taqueria-toolkit",
+		"./taqueria-utils",
+		"./taqueria-plugin*",
 		"./taqueria*",
 		"./tests"
 	],
 	"lint-staged": {
 		"*.{ts,tsx,js,jsx,cjs,mjs,json}": "dprint fmt"
+	},
+	"dependencies": {
+		"@docusaurus-terminology/parser": "^1.3.0",
+		"@docusaurus-terminology/term": "^1.0.0",
+		"@docusaurus/core": "^2.1.0",
+		"@docusaurus/plugin-google-analytics": "^2.1.0",
+		"@docusaurus/plugin-google-gtag": "^2.1.0",
+		"@docusaurus/plugin-sitemap": "^2.1.0",
+		"@docusaurus/preset-classic": "^2.1.0"
 	}
 }

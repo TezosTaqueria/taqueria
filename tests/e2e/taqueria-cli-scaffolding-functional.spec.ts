@@ -3,11 +3,11 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 const exec = util.promisify(exec1);
 
-const scaffoldDirName = `taqueria-taco-shop`;
+const scaffoldDirName = `taqueria-taco-shop-functional`;
 
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	beforeAll(async () => {
-		await exec('taq scaffold');
+		await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${scaffoldDirName}`);
 		await exec(`cd ${scaffoldDirName} && npm run setup`);
 	});
 

@@ -17,10 +17,10 @@
 					"background": {
 						"activeOnStart": true,
 						"endsPattern": {
-							"regexp": "out/extension.js"
+							"regexp": "Done in"
 						},
 						"beginsPattern": {
-							"regexp": "compile"
+							"regexp": "analytics"
 						}
 					},
 					"pattern": {
@@ -41,6 +41,14 @@
 				"kind": "build",
 				"isDefault": true
 			}
+		},
+		{
+			"type": "npm",
+			"script": "pretest",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: pretest",
+			"detail": "compile project before running tests"
 		}
 	]
 }

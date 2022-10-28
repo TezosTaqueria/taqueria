@@ -1,11 +1,11 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.18.0",
+	"version": "0.20.2",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
+		"build": "npx tsc --emitDeclarationOnly -p ./tsconfig.json && npx tsup"
 	},
 	"keywords": [
 		"taqueria",
@@ -57,7 +57,7 @@
 		"sourcemap": true,
 		"target": "node16",
 		"outDir": "./",
-		"dts": true,
+		"dts": false,
 		"clean": false,
 		"skipNodeModulesBundle": true,
 		"platform": "node",

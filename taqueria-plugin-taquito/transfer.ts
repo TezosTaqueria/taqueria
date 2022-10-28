@@ -1,5 +1,7 @@
 import {
+	getAccountPrivateKey,
 	getAddressOfAlias,
+	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
 	getDefaultAccount,
 	getNetworkConfig,
@@ -74,17 +76,9 @@ const configureToolKitWithNetwork = async (parsedArgs: Opts, networkName: string
 		);
 	}
 
-	const faucet = network.faucet;
-	if (!faucet) return sendAsyncErr(`Network ${networkName} requires a valid faucet in config.json.`);
-
 	const tezos = new TezosToolkit(network.rpcUrl as string);
-	await importKey(
-		tezos,
-		network.faucet.email,
-		network.faucet.password,
-		network.faucet.mnemonic.join(' '),
-		network.faucet.activation_code,
-	);
+	const key = await getAccountPrivateKey(parsedArgs, network, 'taqRootAccount');
+	await importKey(tezos, key);
 	return tezos;
 };
 
@@ -111,7 +105,7 @@ const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: Tezo
 	};
 };
 
-const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow): Promise<string> => {
+const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow, parsedArgs: Opts): Promise<string> => {
 	return tezos.contract
 		.transfer({
 			to: contractInfo.contractAddress,
@@ -122,7 +116,22 @@ const performTransferOp = (tezos: TezosToolkit, contractInfo: TableRow): Promise
 			},
 		})
 		.then(op => op.confirmation().then(() => op.hash))
-		.catch(err => sendAsyncErr(`Error during transfer operation:\n${err} ${JSON.stringify(err, null, 2)}`));
+		.catch(err => {
+			if (err instanceof Error) {
+				if (/empty_implicit_contract/.test(err.message)) {
+					const result = (err.message).match(/(?<="implicit":")tz[^"]+(?=")/);
+					const publicKeyHash = result ? result[0] : undefined;
+					if (publicKeyHash) {
+						return sendAsyncErr(
+							`The account ${publicKeyHash} for the target environment, "${
+								getCurrentEnvironment(parsedArgs)
+							}", may not be funded\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+						);
+					}
+				}
+			}
+			return sendAsyncErr(`Error during transfer operation:\n${err} ${JSON.stringify(err, null, 2)}`);
+		});
 };
 
 export const transfer = async (parsedArgs: Opts): Promise<void> => {
@@ -131,7 +140,7 @@ export const transfer = async (parsedArgs: Opts): Promise<void> => {
 	try {
 		const tezos = await configureTezosToolKit(parsedArgs, env);
 		const contractInfo = await getContractInfo(parsedArgs, env, tezos);
-		await performTransferOp(tezos, contractInfo);
+		await performTransferOp(tezos, contractInfo, parsedArgs);
 		return sendJsonRes([contractInfo]);
 	} catch {
 		return sendAsyncErr('No operations performed.');

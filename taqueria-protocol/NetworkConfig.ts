@@ -9,14 +9,22 @@ export const rawSchema = z.object({
 	label: HumanReadableIdentifier.rawSchema,
 	rpcUrl: Url.rawSchema,
 	protocol: EconomicalProtocolHash.rawSchema,
-	faucet: Faucet.rawSchema.describe('Network Faucet'),
+	accounts: z.record(
+		z.any({ description: 'Accounts' }),
+		{ description: 'Accounts' },
+	).optional(),
+	faucet: Faucet.rawSchema.describe('Network Faucet').optional(),
 }).describe('Network Config');
 
 const internalSchema = z.object({
 	label: HumanReadableIdentifier.schemas.schema.describe('Network Label'),
 	rpcUrl: Url.schemas.schema.describe('Network RPC Url'),
 	protocol: EconomicalProtocolHash.schemas.schema.describe('Network Protocol Hash'),
-	faucet: Faucet.schemas.schema.describe('Network Faucet'),
+	accounts: z.record(
+		z.any({ description: 'Accounts' }),
+		{ description: 'Accounts' },
+	).optional(),
+	faucet: Faucet.schemas.schema.describe('Network Faucet').optional(),
 }).describe('Network Config');
 
 type RawInput = z.infer<typeof rawSchema>;
