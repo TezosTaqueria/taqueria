@@ -2,6 +2,7 @@
 	"name": "@taqueria/plugin-mock",
 	"version": "0.22.2",
 	"description": "A plugin used to test Taqueria",
+	"private": true,
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "echo 'Nothing to build.'"

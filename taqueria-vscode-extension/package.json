@@ -345,7 +345,7 @@
 			{
 				"command": "taqueria.typecheck",
 				"category": "Taqueria",
-				"title": "Typecheck Michelson contracts",
+				"title": "Typecheck Artifact",
 				"shortTitle": "typecheck",
 				"enablement": "@taqueria/plugin-tezos-client",
 				"icon": "$(check)"
@@ -534,6 +534,11 @@
 				},
 				{
 					"command": "taqueria.originate",
+					"when": "view == taqueria-artifacts",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.typecheck",
 					"when": "view == taqueria-artifacts",
 					"group": "inline"
 				},
