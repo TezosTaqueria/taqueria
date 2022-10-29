@@ -130,6 +130,20 @@ export type PluginSchema = {
 	installRuntimeDependencies?: (args: RequestArgs) => Promise<PluginDependenciesResponse>;
 };
 
+export type Task = {
+	task: Verb;
+	command: Command;
+	aliases?: Alias[];
+	/** @minLength 3 */
+	description?: string;
+	example?: string;
+	hidden?: boolean;
+	encoding?: PluginResponseEncoding;
+	handler: 'proxy' | NonEmptyString;
+	options?: Option[];
+	positionals?: PositionalArg[];
+};
+
 // ---- Process Interop ----
 
 export type RuntimeDependency = {
@@ -206,36 +220,11 @@ export type Faucet = {
 	activation_code: string;
 };
 
-// ---- Project State ----
-
-export type Config = TODO_CONVERT_TYPE;
-export type LoadedConfig = TODO_CONVERT_TYPE;
-export type MetadataConfig = TODO_CONVERT_TYPE;
-export type NetworkConfig = TODO_CONVERT_TYPE;
-export type SandboxAccountConfig = TODO_CONVERT_TYPE;
-export type SandboxConfig = TODO_CONVERT_TYPE;
-export type ScaffoldConfig = TODO_CONVERT_TYPE;
-
-export type Environment = TODO_CONVERT_TYPE;
-
-export type EphemeralState = TODO_CONVERT_TYPE;
-export type PersistentState = TODO_CONVERT_TYPE;
-
-export type Provisioner = TODO_CONVERT_TYPE;
-export type ProvisionerID = TODO_CONVERT_TYPE;
-export type Provisions = TODO_CONVERT_TYPE;
-
 // ---- Internal ----
 
-export type ParsedConfig = TODO_CONVERT_TYPE;
-// export type ParsedConfig = Omit<Config, 'sandbox'> & {
-// 	sandbox: Record<string, SandboxConfig | NonEmptyString>;
-// };
-
-// ---- Unsorted ----
-
 export type TaqError = TODO_CONVERT_TYPE;
-export type Task = TODO_CONVERT_TYPE;
+
+// ---- External ----
 
 export type TzKtConfig = {
 	/** Do not start TzKt when sandbox starts */
@@ -251,3 +240,27 @@ export type TzKtConfig = {
 	 */
 	apiPort?: number;
 };
+
+// ---- Project Files ----
+
+export type Config = TODO_CONVERT_TYPE;
+export type LoadedConfig = TODO_CONVERT_TYPE;
+export type MetadataConfig = TODO_CONVERT_TYPE;
+export type NetworkConfig = TODO_CONVERT_TYPE;
+export type SandboxAccountConfig = TODO_CONVERT_TYPE;
+export type SandboxConfig = TODO_CONVERT_TYPE;
+export type ScaffoldConfig = TODO_CONVERT_TYPE;
+
+export type ParsedConfig = TODO_CONVERT_TYPE;
+// export type ParsedConfig = Omit<Config, 'sandbox'> & {
+// 	sandbox: Record<string, SandboxConfig | NonEmptyString>;
+// };
+
+export type Environment = TODO_CONVERT_TYPE;
+
+export type EphemeralState = TODO_CONVERT_TYPE;
+export type PersistentState = TODO_CONVERT_TYPE;
+
+export type Provisioner = TODO_CONVERT_TYPE;
+export type ProvisionerID = TODO_CONVERT_TYPE;
+export type Provisions = TODO_CONVERT_TYPE;

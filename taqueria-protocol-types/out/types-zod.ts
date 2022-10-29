@@ -131,6 +131,14 @@ export const faucetSchema = z.object({
 	activation_code: z.string(),
 });
 
+export const taqErrorSchema = todoConvertTypeSchema;
+
+export const tzKtConfigSchema = z.object({
+	disableAutostartWithSandbox: z.boolean().optional(),
+	postgresqlPort: z.number().optional().default(5432),
+	apiPort: z.number().optional().default(5000),
+});
+
 export const configSchema = todoConvertTypeSchema;
 
 export const loadedConfigSchema = todoConvertTypeSchema;
@@ -145,6 +153,8 @@ export const sandboxConfigSchema = todoConvertTypeSchema;
 
 export const scaffoldConfigSchema = todoConvertTypeSchema;
 
+export const parsedConfigSchema = todoConvertTypeSchema;
+
 export const environmentSchema = todoConvertTypeSchema;
 
 export const ephemeralStateSchema = todoConvertTypeSchema;
@@ -157,16 +167,17 @@ export const provisionerIDSchema = todoConvertTypeSchema;
 
 export const provisionsSchema = todoConvertTypeSchema;
 
-export const parsedConfigSchema = todoConvertTypeSchema;
-
-export const taqErrorSchema = todoConvertTypeSchema;
-
-export const taskSchema = todoConvertTypeSchema;
-
-export const tzKtConfigSchema = z.object({
-	disableAutostartWithSandbox: z.boolean().optional(),
-	postgresqlPort: z.number().optional().default(5432),
-	apiPort: z.number().optional().default(5000),
+export const taskSchema = z.object({
+	task: verbSchema,
+	command: commandSchema,
+	aliases: z.array(aliasSchema).optional(),
+	description: z.string().min(3).optional(),
+	example: z.string().optional(),
+	hidden: z.boolean().optional(),
+	encoding: pluginResponseEncodingSchema.optional(),
+	handler: z.union([z.literal('proxy'), nonEmptyStringSchema]),
+	options: z.array(optionSchema).optional(),
+	positionals: z.array(positionalArgSchema).optional(),
 });
 
 export const sanitizedArgsSchema = z.object({
