@@ -243,6 +243,72 @@ export type TzKtConfig = {
 
 // ---- Project Files ----
 
+export type Environment = {
+	/**
+	 * @minLength 1 Must reference the name of an existing network configuration
+	 */
+	networks: NonEmptyString[];
+	/**
+	 * @minLength 1 Must reference the name of an existing sandbox configuration
+	 */
+	sandboxes: NonEmptyString[];
+	storage?: Record<string, unknown>;
+	aliases?: Record<string, unknown>;
+};
+
+export type EphemeralState = {
+	build: string;
+	configHash: string;
+
+	// Note: these were changed from a union(either type) to intersection(both types): i.e. InstalledPlugin | Task is not correct
+
+	/** Task/Plugin Mapping */
+	tasks: Record<string, InstalledPlugin & Task>;
+	/** Operation/Plugin Mapping */
+	operations: Record<string, InstalledPlugin & ParsedOperation>;
+	/** Templates/Plugin Mapping */
+	templates: Record<string, InstalledPlugin & ParsedTemplate>;
+
+	plugins: PluginInfo[];
+};
+
+export type PersistentState = {
+	operations: Record<string, PersistedOperation>;
+	tasks: Record<string, PersistedTask>;
+};
+
+export type PersistedTask = {
+	task: Verb;
+	plugin: NonEmptyString;
+	time: Timestamp;
+	output?: unknown;
+};
+
+export type PersistedOperation = {
+	hash: SHA256;
+	time: Timestamp;
+	output?: unknown;
+};
+
+/**
+ * @minLength 1
+ * @pattern ^[A-Za-z0-9]+[A-Za-z0-9-_]+\.[A-Za-z0-9]+[A-Za-z0-9-_]+\.[A-Za-z0-9]+[A-Za-z0-9-_]+$
+ */
+export type ProvisionerID = string;
+
+export type Provisioner = {
+	id: ProvisionerID;
+	plugin: NonEmptyString;
+	operation: NonEmptyString | 'custom';
+	command?: string;
+	label?: string;
+	depends_on?: ProvisionerID[];
+};
+
+export type Provisions = Provisioner[];
+
+// ---- Project Files: Config ----
+
 export type Config = TODO_CONVERT_TYPE;
 export type LoadedConfig = TODO_CONVERT_TYPE;
 export type MetadataConfig = TODO_CONVERT_TYPE;
@@ -255,12 +321,3 @@ export type ParsedConfig = TODO_CONVERT_TYPE;
 // export type ParsedConfig = Omit<Config, 'sandbox'> & {
 // 	sandbox: Record<string, SandboxConfig | NonEmptyString>;
 // };
-
-export type Environment = TODO_CONVERT_TYPE;
-
-export type EphemeralState = TODO_CONVERT_TYPE;
-export type PersistentState = TODO_CONVERT_TYPE;
-
-export type Provisioner = TODO_CONVERT_TYPE;
-export type ProvisionerID = TODO_CONVERT_TYPE;
-export type Provisions = TODO_CONVERT_TYPE;

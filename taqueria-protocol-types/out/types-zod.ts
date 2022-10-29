@@ -139,6 +139,48 @@ export const tzKtConfigSchema = z.object({
 	apiPort: z.number().optional().default(5000),
 });
 
+export const environmentSchema = z.object({
+	networks: z
+		.array(nonEmptyStringSchema)
+		.min(1, 'Must reference the name of an existing network configuration'),
+	sandboxes: z
+		.array(nonEmptyStringSchema)
+		.min(1, 'Must reference the name of an existing sandbox configuration'),
+	storage: z.record(z.unknown()).optional(),
+	aliases: z.record(z.unknown()).optional(),
+});
+
+export const persistedTaskSchema = z.object({
+	task: verbSchema,
+	plugin: nonEmptyStringSchema,
+	time: timestampSchema,
+	output: z.unknown().optional(),
+});
+
+export const persistedOperationSchema = z.object({
+	hash: sha256Schema,
+	time: timestampSchema,
+	output: z.unknown().optional(),
+});
+
+export const provisionerIDSchema = z
+	.string()
+	.min(1)
+	.regex(
+		/^[A-Za-z0-9]+[A-Za-z0-9-_]+\.[A-Za-z0-9]+[A-Za-z0-9-_]+\.[A-Za-z0-9]+[A-Za-z0-9-_]+$/,
+	);
+
+export const provisionerSchema = z.object({
+	id: provisionerIDSchema,
+	plugin: nonEmptyStringSchema,
+	operation: z.union([nonEmptyStringSchema, z.literal('custom')]),
+	command: z.string().optional(),
+	label: z.string().optional(),
+	depends_on: z.array(provisionerIDSchema).optional(),
+});
+
+export const provisionsSchema = z.array(provisionerSchema);
+
 export const configSchema = todoConvertTypeSchema;
 
 export const loadedConfigSchema = todoConvertTypeSchema;
@@ -154,18 +196,6 @@ export const sandboxConfigSchema = todoConvertTypeSchema;
 export const scaffoldConfigSchema = todoConvertTypeSchema;
 
 export const parsedConfigSchema = todoConvertTypeSchema;
-
-export const environmentSchema = todoConvertTypeSchema;
-
-export const ephemeralStateSchema = todoConvertTypeSchema;
-
-export const persistentStateSchema = todoConvertTypeSchema;
-
-export const provisionerSchema = todoConvertTypeSchema;
-
-export const provisionerIDSchema = todoConvertTypeSchema;
-
-export const provisionsSchema = todoConvertTypeSchema;
 
 export const taskSchema = z.object({
 	task: verbSchema,
@@ -194,6 +224,11 @@ export const requestArgsSchema = sanitizedArgsSchema.omit({ config: true }).and(
 		config: loadedConfigSchema,
 	}),
 );
+
+export const persistentStateSchema = z.object({
+	operations: z.record(persistedOperationSchema),
+	tasks: z.record(persistedTaskSchema),
+});
 
 export const operationSchema = z.object({
 	operation: verbSchema,
@@ -277,4 +312,13 @@ export const pluginSchemaSchema = z.object({
 		.args(requestArgsSchema)
 		.returns(z.promise(pluginDependenciesResponseSchema))
 		.optional(),
+});
+
+export const ephemeralStateSchema = z.object({
+	build: z.string(),
+	configHash: z.string(),
+	tasks: z.record(installedPluginSchema.and(taskSchema)),
+	operations: z.record(installedPluginSchema.and(parsedOperationSchema)),
+	templates: z.record(installedPluginSchema.and(parsedTemplateSchema)),
+	plugins: z.array(pluginInfoSchema),
 });
