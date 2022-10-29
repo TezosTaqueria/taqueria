@@ -309,7 +309,34 @@ export type Provisions = Provisioner[];
 
 // ---- Project Files: Config ----
 
-export type Config = TODO_CONVERT_TYPE;
+/** @minLength 1 Default environment must reference the name of an existing environment.*/
+type EnvironmentName = NonEmptyString;
+
+export type Config = {
+	/** @default en */
+	language?: 'en' | 'fr';
+	plugins?: InstalledPlugin[];
+
+	/**
+	 * @default contracts
+	 * @minLength 1
+	 */
+	contractsDir?: string;
+
+	/**
+	 * @default artifacts
+	 * @minLength 1
+	 */
+	artifactsDir?: string;
+
+	network?: Record<string, NetworkConfig>;
+	sandbox?: Record<string, SandboxConfig>;
+	environment?: Record<string, Environment | EnvironmentName>;
+	accounts?: Record<string, Tz | number>;
+	contracts?: Record<string, Contract>;
+	metadata?: MetadataConfig;
+};
+
 export type LoadedConfig = TODO_CONVERT_TYPE;
 export type MetadataConfig = TODO_CONVERT_TYPE;
 export type NetworkConfig = TODO_CONVERT_TYPE;
@@ -317,7 +344,6 @@ export type SandboxAccountConfig = TODO_CONVERT_TYPE;
 export type SandboxConfig = TODO_CONVERT_TYPE;
 export type ScaffoldConfig = TODO_CONVERT_TYPE;
 
-export type ParsedConfig = TODO_CONVERT_TYPE;
-// export type ParsedConfig = Omit<Config, 'sandbox'> & {
-// 	sandbox: Record<string, SandboxConfig | NonEmptyString>;
-// };
+export type ParsedConfig = Omit<Config, 'sandbox'> & {
+	sandbox: Record<string, SandboxConfig | NonEmptyString>;
+};

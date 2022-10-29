@@ -181,7 +181,10 @@ export const provisionerSchema = z.object({
 
 export const provisionsSchema = z.array(provisionerSchema);
 
-export const configSchema = todoConvertTypeSchema;
+const environmentNameSchema = nonEmptyStringSchema.min(
+	1,
+	'Default environment must reference the name of an existing environment.',
+);
 
 export const loadedConfigSchema = todoConvertTypeSchema;
 
@@ -195,8 +198,6 @@ export const sandboxConfigSchema = todoConvertTypeSchema;
 
 export const scaffoldConfigSchema = todoConvertTypeSchema;
 
-export const parsedConfigSchema = todoConvertTypeSchema;
-
 export const taskSchema = z.object({
 	task: verbSchema,
 	command: commandSchema,
@@ -209,6 +210,35 @@ export const taskSchema = z.object({
 	options: z.array(optionSchema).optional(),
 	positionals: z.array(positionalArgSchema).optional(),
 });
+
+export const persistentStateSchema = z.object({
+	operations: z.record(persistedOperationSchema),
+	tasks: z.record(persistedTaskSchema),
+});
+
+export const configSchema = z.object({
+	language: z
+		.union([z.literal('en'), z.literal('fr')])
+		.optional()
+		.default('en'),
+	plugins: z.array(installedPluginSchema).optional(),
+	contractsDir: z.string().min(1).optional().default('contracts'),
+	artifactsDir: z.string().min(1).optional().default('artifacts'),
+	network: z.record(networkConfigSchema).optional(),
+	sandbox: z.record(sandboxConfigSchema).optional(),
+	environment: z
+		.record(z.union([environmentSchema, environmentNameSchema]))
+		.optional(),
+	accounts: z.record(z.union([tzSchema, z.number()])).optional(),
+	contracts: z.record(contractSchema).optional(),
+	metadata: metadataConfigSchema.optional(),
+});
+
+export const parsedConfigSchema = configSchema.omit({ sandbox: true }).and(
+	z.object({
+		sandbox: z.record(z.union([sandboxConfigSchema, nonEmptyStringSchema])),
+	}),
+);
 
 export const sanitizedArgsSchema = z.object({
 	configAbsPath: nonEmptyStringSchema,
@@ -224,11 +254,6 @@ export const requestArgsSchema = sanitizedArgsSchema.omit({ config: true }).and(
 		config: loadedConfigSchema,
 	}),
 );
-
-export const persistentStateSchema = z.object({
-	operations: z.record(persistedOperationSchema),
-	tasks: z.record(persistedTaskSchema),
-});
 
 export const operationSchema = z.object({
 	operation: verbSchema,
