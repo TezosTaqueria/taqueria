@@ -86,7 +86,7 @@ export const pluginJsonResponseSchema = z.object({
 	data: z.unknown().optional(),
 	render: z
 		.union([z.literal('none'), z.literal('table'), z.literal('string')])
-		.optional(),
+		.default('none'),
 });
 
 export const pluginProxyResponseSchema = z.union([
@@ -111,7 +111,9 @@ export const pluginActionNameSchema = z.union([
 
 export const economicalPrototypeHashSchema = z
 	.string()
-	.regex(/^P[A-Za-z0-9]{50}$/);
+	.regex(
+		/^P[A-Za-z0-9]{50}$ this is an invalid hash for an economical protocol/,
+	);
 
 export const publicKeyHashSchema = z.string().regex(/^tz1[A-Za-z0-9]{33}$/);
 
@@ -135,8 +137,8 @@ export const taqErrorSchema = todoConvertTypeSchema;
 
 export const tzKtConfigSchema = z.object({
 	disableAutostartWithSandbox: z.boolean().optional(),
-	postgresqlPort: z.number().optional().default(5432),
-	apiPort: z.number().optional().default(5000),
+	postgresqlPort: z.number().default(5432),
+	apiPort: z.number().default(5000),
 });
 
 export const environmentSchema = z.object({
@@ -188,15 +190,41 @@ const environmentNameSchema = nonEmptyStringSchema.min(
 
 export const loadedConfigSchema = todoConvertTypeSchema;
 
-export const metadataConfigSchema = todoConvertTypeSchema;
+export const metadataConfigSchema = z.object({
+	name: z.string().optional(),
+	projectDescription: z.string().optional(),
+	authors: z.array(z.string()).optional(),
+	license: z.string().optional(),
+	homepage: z.string().optional(),
+});
 
-export const networkConfigSchema = todoConvertTypeSchema;
+export const networkConfigSchema = z.object({
+	label: humanReadableIdentifierSchema,
+	rpcUrl: urlSchema,
+	protocol: economicalPrototypeHashSchema,
+	accounts: z.record(z.unknown()),
+	faucet: faucetSchema.optional(),
+});
 
-export const sandboxAccountConfigSchema = todoConvertTypeSchema;
+export const sandboxAccountConfigSchema = z.object({
+	encryptedKey: nonEmptyStringSchema,
+	publicKeyHash: publicKeyHashSchema,
+	secretKey: nonEmptyStringSchema,
+});
 
-export const sandboxConfigSchema = todoConvertTypeSchema;
+export const sandboxConfigSchema = z.object({
+	label: nonEmptyStringSchema,
+	rpcUrl: urlSchema,
+	protocol: economicalPrototypeHashSchema,
+	attributes: z.union([z.string(), z.number(), z.boolean()]).optional(),
+	plugin: verbSchema.optional(),
+	accounts: z.record(sandboxAccountConfigSchema).optional(),
+	tzkt: tzKtConfigSchema.optional(),
+});
 
-export const scaffoldConfigSchema = todoConvertTypeSchema;
+export const scaffoldConfigSchema = z.object({
+	postInit: z.string().optional(),
+});
 
 export const taskSchema = z.object({
 	task: verbSchema,
@@ -217,13 +245,10 @@ export const persistentStateSchema = z.object({
 });
 
 export const configSchema = z.object({
-	language: z
-		.union([z.literal('en'), z.literal('fr')])
-		.optional()
-		.default('en'),
+	language: z.union([z.literal('en'), z.literal('fr')]).default('en'),
 	plugins: z.array(installedPluginSchema).optional(),
-	contractsDir: z.string().min(1).optional().default('contracts'),
-	artifactsDir: z.string().min(1).optional().default('artifacts'),
+	contractsDir: z.string().min(1).default('contracts'),
+	artifactsDir: z.string().min(1).default('artifacts'),
 	network: z.record(networkConfigSchema).optional(),
 	sandbox: z.record(sandboxConfigSchema).optional(),
 	environment: z
@@ -297,10 +322,9 @@ export const templateSchema = z.object({
 	encoding: pluginResponseEncodingSchema.optional(),
 });
 
-export const parsedTemplateSchema = templateSchema.and(
+export const parsedTemplateSchema = templateSchema.omit({ handler: true }).and(
 	z.object({
 		handler: z.string(),
-		encoding: pluginResponseEncodingSchema.optional(),
 	}),
 );
 

@@ -102,9 +102,8 @@ type TemplateHandler =
 		| Promise<Promise<void>>
 		| Promise<PluginJsonResponse>);
 
-export type ParsedTemplate = Template & {
+export type ParsedTemplate = Omit<Template, 'handler'> & {
 	handler: string;
-	encoding?: PluginResponseEncoding;
 };
 
 export type PluginInfo = {
@@ -163,7 +162,9 @@ export type PluginDependenciesResponse = {
 
 export type PluginJsonResponse = {
 	data?: unknown;
-	render?: 'none' | 'table' | 'string';
+
+	/** @default none */
+	render: 'none' | 'table' | 'string';
 };
 
 export type PluginProxyResponse = void | PluginJsonResponse;
@@ -193,7 +194,7 @@ export type RequestArgs = Omit<SanitizedArgs, 'config'> & {
 
 // ---- Hash Types ----
 
-/** @pattern ^P[A-Za-z0-9]{50}$ */
+/** @pattern ^P[A-Za-z0-9]{50}$ this is an invalid hash for an economical protocol*/
 export type EconomicalPrototypeHash = string;
 
 /** @pattern ^tz1[A-Za-z0-9]{33}$ */
@@ -233,12 +234,12 @@ export type TzKtConfig = {
 	/** Port number for postgresql container
 	 * @default 5432
 	 */
-	postgresqlPort?: number;
+	postgresqlPort: number;
 
 	/** Port number for TzKt API
 	 * @default 5000
 	 */
-	apiPort?: number;
+	apiPort: number;
 };
 
 // ---- Project Files ----
@@ -314,20 +315,21 @@ type EnvironmentName = NonEmptyString;
 
 export type Config = {
 	/** @default en */
-	language?: 'en' | 'fr';
+	language: 'en' | 'fr';
+
 	plugins?: InstalledPlugin[];
 
 	/**
 	 * @default contracts
 	 * @minLength 1
 	 */
-	contractsDir?: string;
+	contractsDir: string;
 
 	/**
 	 * @default artifacts
 	 * @minLength 1
 	 */
-	artifactsDir?: string;
+	artifactsDir: string;
 
 	network?: Record<string, NetworkConfig>;
 	sandbox?: Record<string, SandboxConfig>;
@@ -337,12 +339,55 @@ export type Config = {
 	metadata?: MetadataConfig;
 };
 
+// TODO: This seems to contain a circular type reference which breaks ts-to-zod
 export type LoadedConfig = TODO_CONVERT_TYPE;
-export type MetadataConfig = TODO_CONVERT_TYPE;
-export type NetworkConfig = TODO_CONVERT_TYPE;
-export type SandboxAccountConfig = TODO_CONVERT_TYPE;
-export type SandboxConfig = TODO_CONVERT_TYPE;
-export type ScaffoldConfig = TODO_CONVERT_TYPE;
+// export type LoadedConfig = Config & {
+// 	// projectDir: SanitizedAbsPath;
+// 	// configFile: SanitizedAbsPath;
+// 	hash: SHA256;
+// };
+
+export type MetadataConfig = {
+	name?: string;
+	projectDescription?: string;
+	authors?: string[];
+	license?: string;
+	homepage?: string;
+};
+
+export type NetworkConfig = {
+	label: HumanReadableIdentifier;
+	rpcUrl: Url;
+	protocol: EconomicalPrototypeHash;
+	accounts: Record<string, unknown>;
+	faucet?: Faucet;
+};
+
+export type SandboxAccountConfig = {
+	encryptedKey: NonEmptyString;
+	publicKeyHash: PublicKeyHash;
+	secretKey: NonEmptyString;
+};
+
+export type SandboxConfig = {
+	label: NonEmptyString;
+	rpcUrl: Url;
+	protocol: EconomicalPrototypeHash;
+	attributes?: string | number | boolean;
+	plugin?: Verb;
+
+	// TODO: This causes a type conflict between record and is not supported
+	// accounts?: {
+	// 	default: NonEmptyString;
+	// } & Record<string, SandboxAccountConfig>;
+	accounts?: Record<string, SandboxAccountConfig>;
+
+	tzkt?: TzKtConfig;
+};
+
+export type ScaffoldConfig = {
+	postInit?: string;
+};
 
 export type ParsedConfig = Omit<Config, 'sandbox'> & {
 	sandbox: Record<string, SandboxConfig | NonEmptyString>;
