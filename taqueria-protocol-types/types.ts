@@ -1,5 +1,3 @@
-type TODO_CONVERT_TYPE = { notDoneYet: true };
-
 // ---- Simple Types & Type Fragments ----
 
 /** @minLength 1 */
@@ -221,25 +219,23 @@ export type Faucet = {
 	activation_code: string;
 };
 
-// ---- Internal ----
-
-export type TaqError = TODO_CONVERT_TYPE;
-
 // ---- External ----
+
+/** Port number for postgresql container
+ * @default 5432
+ */
+type TzKtConfigPostgresqlPort = number;
+
+/** Port number for TzKt API
+ * @default 5000
+ */
+type TzKtConfigApiPort = number;
 
 export type TzKtConfig = {
 	/** Do not start TzKt when sandbox starts */
 	disableAutostartWithSandbox?: boolean;
-
-	/** Port number for postgresql container
-	 * @default 5432
-	 */
-	postgresqlPort: number;
-
-	/** Port number for TzKt API
-	 * @default 5000
-	 */
-	apiPort: number;
+	postgresqlPort?: TzKtConfigPostgresqlPort;
+	apiPort?: TzKtConfigApiPort;
 };
 
 // ---- Project Files ----
@@ -313,23 +309,26 @@ export type Provisions = Provisioner[];
 /** @minLength 1 Default environment must reference the name of an existing environment.*/
 type EnvironmentName = NonEmptyString;
 
+/** @default en */
+export type HumanLanguange = 'en' | 'fr';
+
+/**
+ * @default contracts
+ * @minLength 1
+ */
+export type ContractsDir = string;
+
+/**
+ * @default artifacts
+ * @minLength 1
+ */
+export type ArtifactsDir = string;
+
 export type Config = {
-	/** @default en */
-	language: 'en' | 'fr';
-
+	language?: HumanLanguange;
 	plugins?: InstalledPlugin[];
-
-	/**
-	 * @default contracts
-	 * @minLength 1
-	 */
-	contractsDir: string;
-
-	/**
-	 * @default artifacts
-	 * @minLength 1
-	 */
-	artifactsDir: string;
+	contractsDir?: ContractsDir;
+	artifactsDir?: ArtifactsDir;
 
 	network?: Record<string, NetworkConfig>;
 	sandbox?: Record<string, SandboxConfig>;
@@ -339,13 +338,12 @@ export type Config = {
 	metadata?: MetadataConfig;
 };
 
-// TODO: This seems to contain a circular type reference which breaks ts-to-zod
-export type LoadedConfig = TODO_CONVERT_TYPE;
-// export type LoadedConfig = Config & {
-// 	// projectDir: SanitizedAbsPath;
-// 	// configFile: SanitizedAbsPath;
-// 	hash: SHA256;
-// };
+// TODO: sandbox breaks ts-to-zod
+export type LoadedConfig = Config & {
+	projectDir: SanitizedAbsPath;
+	configFile: SanitizedAbsPath;
+	hash: SHA256;
+};
 
 export type MetadataConfig = {
 	name?: string;
@@ -376,11 +374,11 @@ export type SandboxConfig = {
 	attributes?: string | number | boolean;
 	plugin?: Verb;
 
-	// TODO: This causes a type conflict between record and is not supported
+	// TODO: This causes a type conflict and is not supported
 	// accounts?: {
 	// 	default: NonEmptyString;
 	// } & Record<string, SandboxAccountConfig>;
-	accounts?: Record<string, SandboxAccountConfig>;
+	accounts?: Record<string, SandboxAccountConfig | NonEmptyString>;
 
 	tzkt?: TzKtConfig;
 };
