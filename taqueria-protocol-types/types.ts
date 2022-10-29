@@ -316,19 +316,19 @@ export type HumanLanguange = 'en' | 'fr';
  * @default contracts
  * @minLength 1
  */
-export type ContractsDir = string;
+export type ConfigContractsDir = string;
 
 /**
  * @default artifacts
  * @minLength 1
  */
-export type ArtifactsDir = string;
+export type ConfigArtifactsDir = string;
 
 export type Config = {
 	language?: HumanLanguange;
 	plugins?: InstalledPlugin[];
-	contractsDir?: ContractsDir;
-	artifactsDir?: ArtifactsDir;
+	contractsDir?: ConfigContractsDir;
+	artifactsDir?: ConfigArtifactsDir;
 
 	network?: Record<string, NetworkConfig>;
 	sandbox?: Record<string, SandboxConfig>;

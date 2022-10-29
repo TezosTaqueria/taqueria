@@ -190,9 +190,9 @@ export const humanLanguangeSchema = z
 	.union([z.literal('en'), z.literal('fr')])
 	.default('en');
 
-export const contractsDirSchema = z.string().min(1).default('contracts');
+export const configContractsDirSchema = z.string().min(1).default('contracts');
 
-export const artifactsDirSchema = z.string().min(1).default('artifacts');
+export const configArtifactsDirSchema = z.string().min(1).default('artifacts');
 
 export const metadataConfigSchema = z.object({
 	name: z.string().optional(),
@@ -253,8 +253,8 @@ export const persistentStateSchema = z.object({
 export const configSchema = z.object({
 	language: humanLanguangeSchema.optional(),
 	plugins: z.array(installedPluginSchema).optional(),
-	contractsDir: contractsDirSchema.optional(),
-	artifactsDir: artifactsDirSchema.optional(),
+	contractsDir: configContractsDirSchema.optional(),
+	artifactsDir: configArtifactsDirSchema.optional(),
 	network: z.record(networkConfigSchema).optional(),
 	sandbox: z.record(sandboxConfigSchema).optional(),
 	environment: z
