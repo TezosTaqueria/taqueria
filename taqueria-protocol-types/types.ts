@@ -1,4 +1,4 @@
-type TODO = { notDoneYet: true };
+type TODO_CONVERT_TYPE = { notDoneYet: true };
 
 // ---- Simple Types & Type Fragments ----
 
@@ -25,12 +25,26 @@ export type Settings = {
 	consent: 'opt_in' | 'opt_out';
 };
 
+/** @min 1651846877 */
+export type Timestamp = number;
+
+/**
+ * @minLength 1
+ * @pattern ^\d([\d_]+\d)?$ */
+export type Tz = string;
+
+/**
+ * @minLength 1
+ * @pattern ^\d+\.\d+(\.\d+)*$ */
+export type VersionNumber = string;
+
+/** @format url */
+export type Url = string;
+
 // ---- Plugin Definition Types ----
 
 /** interpreted using yargs @pattern ^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$ */
 export type Command = string;
-
-// export type SanitizedArgs = string
 
 export type Option = {
 	shortFlag?: SingleChar;
@@ -56,13 +70,6 @@ export type InstalledPlugin = {
 	name: string;
 };
 
-export type PluginActionName =
-	| 'proxy'
-	| 'pluginInfo'
-	| 'checkRuntimeDependencies'
-	| 'installRuntimeDependencies'
-	| 'proxyTemplate';
-
 export type Operation = {
 	operation: Verb;
 	command: Command;
@@ -83,7 +90,7 @@ export type Template = {
 	options?: Option;
 	positionals?: PositionalArg;
 	handler: TemplateHandler;
-	encoding: PluginResponseEncoding;
+	encoding?: PluginResponseEncoding;
 };
 
 type TemplateHandler =
@@ -97,24 +104,78 @@ type TemplateHandler =
 
 export type ParsedTemplate = Template & {
 	handler: string;
-	encoding: PluginResponseEncoding;
+	encoding?: PluginResponseEncoding;
 };
 
-// TODO: PluginInfo
-// TODO: PluginSchema
+export type PluginInfo = {
+	name: NonEmptyString;
+	version: VersionNumber;
+	schema: VersionNumber;
+	alias: Alias;
+	tasks?: Task[];
+	operations?: ParsedOperation[];
+	templates?: ParsedTemplate[];
+};
+
+export type PluginSchema = {
+	name?: Alias;
+	version: VersionNumber;
+	schema: VersionNumber;
+	alias: Alias;
+	tasks?: Task[];
+	operations?: Operation[];
+	templates?: Template[];
+	proxy?: (args: RequestArgs) => Promise<PluginProxyResponse>;
+	checkRuntimeDependencies?: (args: RequestArgs) => Promise<PluginDependenciesResponse>;
+	installRuntimeDependencies?: (args: RequestArgs) => Promise<PluginDependenciesResponse>;
+};
 
 // ---- Process Interop ----
 
-// TODO: PluginDependenciesResponse
-// TODO: PluginJsonResponse
-export type PluginJsonResponse = TODO;
+export type RuntimeDependency = {
+	name: string;
+	path: string;
+	version: string;
+	kind: 'required' | 'optional';
+};
 
-// TODO: PluginProxyResponse
-// TODO: PluginResponseEncoding
-export type PluginResponseEncoding = TODO;
+export type RuntimeDependencyReport = RuntimeDependency & {
+	met: boolean;
+};
 
-// TODO: RequestArgs
-export type RequestArgs = TODO;
+export type PluginDependenciesResponse = {
+	report: RuntimeDependencyReport[];
+};
+
+export type PluginJsonResponse = {
+	data?: unknown;
+	render?: 'none' | 'table' | 'string';
+};
+
+export type PluginProxyResponse = void | PluginJsonResponse;
+
+export type PluginResponseEncoding = undefined | 'none' | 'json' | 'application/json';
+
+export type SanitizedArgs = {
+	configAbsPath: NonEmptyString;
+	sandbox: NonEmptyString;
+	configure?: boolean;
+	importAccounts?: boolean;
+	config: ParsedConfig;
+};
+
+export type PluginActionName =
+	| 'proxy'
+	| 'pluginInfo'
+	| 'checkRuntimeDependencies'
+	| 'installRuntimeDependencies'
+	| 'proxyTemplate';
+
+export type RequestArgs = Omit<SanitizedArgs, 'config'> & {
+	taqRun: PluginActionName;
+	// TODO: JSON.parse if string
+	config: LoadedConfig;
+};
 
 // ---- Hash Types ----
 
@@ -147,32 +208,46 @@ export type Faucet = {
 
 // ---- Project State ----
 
-// TODO: Config
-// TODO: LoadedConfig
-// TODO: MetadataConfig
-// TODO: NetworkConfig
-// TODO: SandboxAccountConfig
-// TODO: SandboxConfig
-// TODO: ScaffoldConfig
+export type Config = TODO_CONVERT_TYPE;
+export type LoadedConfig = TODO_CONVERT_TYPE;
+export type MetadataConfig = TODO_CONVERT_TYPE;
+export type NetworkConfig = TODO_CONVERT_TYPE;
+export type SandboxAccountConfig = TODO_CONVERT_TYPE;
+export type SandboxConfig = TODO_CONVERT_TYPE;
+export type ScaffoldConfig = TODO_CONVERT_TYPE;
 
-// TODO: Environment
+export type Environment = TODO_CONVERT_TYPE;
 
-// TODO: EphemeralState
-// TODO: PersistentState
-export type PersistentState = TODO;
+export type EphemeralState = TODO_CONVERT_TYPE;
+export type PersistentState = TODO_CONVERT_TYPE;
 
-// TODO: Provisioner
-// TODO: ProvisionerID
-// TODO: Provisions
+export type Provisioner = TODO_CONVERT_TYPE;
+export type ProvisionerID = TODO_CONVERT_TYPE;
+export type Provisions = TODO_CONVERT_TYPE;
+
+// ---- Internal ----
+
+export type ParsedConfig = TODO_CONVERT_TYPE;
+// export type ParsedConfig = Omit<Config, 'sandbox'> & {
+// 	sandbox: Record<string, SandboxConfig | NonEmptyString>;
+// };
 
 // ---- Unsorted ----
 
-// TODO: TaqError
-// TODO: Task
-// TODO: Template
-// TODO: Timestamp
-// TODO: Tz
-// TODO: TzKtConfig
-// TODO: Url
-// TODO: Verb
-// TODO: VersionNumber
+export type TaqError = TODO_CONVERT_TYPE;
+export type Task = TODO_CONVERT_TYPE;
+
+export type TzKtConfig = {
+	/** Do not start TzKt when sandbox starts */
+	disableAutostartWithSandbox?: boolean;
+
+	/** Port number for postgresql container
+	 * @default 5432
+	 */
+	postgresqlPort?: number;
+
+	/** Port number for TzKt API
+	 * @default 5000
+	 */
+	apiPort?: number;
+};
