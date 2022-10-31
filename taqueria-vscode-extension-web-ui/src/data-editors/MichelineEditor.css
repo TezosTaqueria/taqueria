@@ -1,0 +1,45 @@
+body.vscode-light {
+    color: black;
+}
+
+body.vscode-dark {
+    color: white;
+}
+
+body.vscode-high-contrast {
+    color: red;
+}
+
+.editorDiv {
+    margin: 5px;
+    padding: 5px;
+    display: table-cell;
+    vertical-align: top;
+}
+.showDiag {
+    border: 1px solid;
+    border-color: var(--vscode-editorWidget-resizeBorder);
+}
+.valueTitle {
+    vertical-align: middle;
+}
+.buttonContainer {
+    padding: 0;
+    border-spacing: 0;
+    border: 0;
+}
+.buttonContainer button {
+    /* border: 1px; */
+    padding: 0;
+    margin: 0;
+}
+h4 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: inline;
+}
+h3 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    display: inline;
+}

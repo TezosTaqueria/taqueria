@@ -43,6 +43,8 @@ import { parsed } from 'yargs';
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 const yargs = require('yargs');
 
+export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
+
 export const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
 		mapRej((err: TaqError) => new E_TaqError(err))(f),
@@ -409,40 +411,18 @@ export const getSandboxAccountNames = (parsedArgs: RequestArgs.t) =>
 /**
  * Gets the account config for the named account of the given sandbox
  */
-export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
-	(sandboxName: string) =>
-		(accountName: string) => {
-			const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
-
-			if (sandbox && sandbox.accounts) {
-				const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>;
-				return accounts[accountName];
-			}
-			return undefined;
-		};
-
-/**
- * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
- */
-export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilename: string) => {
-	const env = getCurrentEnvironmentConfig(parsedArgs);
-	if (env && env.storage && env.storage[contractFilename]) {
-		const storagePath: string = env.storage[contractFilename];
-		try {
-			const content = await readFile(storagePath, { encoding: 'utf-8' });
-			return content;
-		} catch (err) {
-			sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
-			return undefined;
-		}
+export const getSandboxAccountConfig = (sandbox: SandboxConfig.t, accountName: string) => {
+	if (sandbox.accounts) {
+		const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>;
+		return accounts[accountName];
 	}
 	return undefined;
 };
 
 /**
- * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
+ * Gets the initial storage for the contract associated with the given storage file
  */
-export const newGetInitialStorage = async (
+export const getInitialStorage = async (
 	parsedArgs: RequestArgs.t,
 	storageFilename: string,
 ): Promise<string | undefined> => {
@@ -456,6 +436,9 @@ export const newGetInitialStorage = async (
 	}
 };
 
+/**
+ * Gets the parameter for the contract associated with the given parameter file
+ */
 export const getParameter = async (parsedArgs: RequestArgs.t, paramFilename: string): Promise<string> => {
 	const paramPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, paramFilename);
 	try {
@@ -508,13 +491,14 @@ const createAddress = async (network: NetworkConfig.t): Promise<TezosToolkit> =>
 	return tezos;
 };
 
-// Temporary solution before the environment refactor
+// TODO: This is a temporary solution before the environment refactor. Might be removed after this refactor
 export const getAccountPrivateKey = async (
 	parsedArgs: RequestArgs.t,
 	network: NetworkConfig.t,
 	account: string,
 ): Promise<string> => {
 	if (!network.accounts) network.accounts = {};
+
 	if (!network.accounts[account]) {
 		const tezos = await createAddress(network);
 		const publicKey = await tezos.signer.publicKey();
@@ -522,36 +506,34 @@ export const getAccountPrivateKey = async (
 		const privateKey = await tezos.signer.secretKey();
 		if (!privateKey) return sendAsyncErr('The private key must exist after creating it');
 		network.accounts[account] = { publicKey, publicKeyHash, privateKey };
+
 		try {
 			await writeJsonFile('./.taq/config.json')(parsedArgs.config);
 		} catch (err) {
 			return sendAsyncErr(`Could not write to ./.taq/config.json\n`);
 		}
-		return sendAsyncErr(
-			`A keypair with public key hash ${
-				network.accounts[account].publicKeyHash
-			} was generated for you.\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
-		);
+
+		if (account === TAQ_OPERATOR_ACCOUNT) {
+			return sendAsyncErr(
+				`A keypair with public key hash ${
+					network.accounts[account].publicKeyHash
+				} was generated for you.\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+			);
+		}
 	}
+
 	return network.accounts[account].privateKey;
 };
 
 /**
  * Gets the default account associated with a sandbox
  */
-export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>
-	(sandboxName: string) => {
-		const sandboxConfig = getSandboxConfig(parsedArgs)(sandboxName);
-		if (sandboxConfig) {
-			const accounts = sandboxConfig.accounts ?? {};
-			const defaultAccount = accounts['default'] as string | undefined;
-			if (defaultAccount) {
-				return getSandboxAccountConfig(parsedArgs)(sandboxName)(defaultAccount);
-			}
-		}
-
-		return undefined;
-	};
+export const getDefaultSandboxAccount = (sandbox: SandboxConfig.t) => {
+	const accounts = sandbox.accounts ?? {};
+	const defaultAccount = accounts['default'] as string | undefined;
+	if (defaultAccount) return getSandboxAccountConfig(sandbox, defaultAccount);
+	return undefined;
+};
 
 export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
 	if (!config.contracts) return [];

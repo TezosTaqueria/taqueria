@@ -1,13 +1,9 @@
 import { sendAsyncErr } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { IntersectionOpts as Opts } from './common';
 import compile from './compile';
-import { test } from './test';
+import test from './test';
 
-interface Opts extends RequestArgs.ProxyRequestArgs {
-	sourceFile: string;
-}
-
-export const ligo = (parsedArgs: Opts): Promise<void> => {
+const ligo = (parsedArgs: Opts): Promise<void> => {
 	switch (parsedArgs.task) {
 		case 'compile':
 			return compile(parsedArgs);

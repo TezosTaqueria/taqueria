@@ -3,6 +3,7 @@ import { TaqError } from '@taqueria/protocol/TaqError';
 import { Config } from '@taqueria/protocol/taqueria-protocol-types';
 import { spawn } from 'child_process';
 import Table from 'cli-table3';
+import fs from 'fs';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
 import os from 'os';
@@ -10,8 +11,8 @@ import path, { join } from 'path';
 import { uniq } from 'rambda';
 import * as semver from 'semver';
 import * as api from 'vscode';
-import { sleep } from '../test/suite/utils/utils';
-import { ArtifactsDataProvider, ArtifactTreeItem } from './gui/ArtifactsDataProvider';
+import { notNullish } from './GeneralHelperFunctions';
+import { ArtifactsDataProvider } from './gui/ArtifactsDataProvider';
 import { ContractTreeItem } from './gui/ContractsDataProvider';
 import { ContractsDataProvider } from './gui/ContractsDataProvider';
 import { EnvironmentTreeItem } from './gui/EnvironmentsDataProvider';
@@ -28,6 +29,7 @@ import {
 import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProvider';
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
+import { createVscodeWebUiHtml } from './gui/web/WebUI';
 import * as Util from './pure';
 import { execCmd } from './pure';
 import { getLanguageInfoForFileName, getSupportedSmartContractExtensions } from './SmartContractLanguageInfo';
@@ -61,7 +63,7 @@ interface HasToString {
 }
 
 function instanceOfHasToString(object: any): object is HasToString {
-	return 'toString' in object;
+	return notNullish(object) && 'toString' in object;
 }
 
 export type OutputFunction = (currentLogLevel: OutputLevels, log: string) => void;
@@ -130,7 +132,7 @@ export interface HasFileName {
 }
 
 function instanceOfHasFileName(object: any): object is HasFileName {
-	return 'fileName' in object;
+	return notNullish(object) && 'fileName' in object;
 }
 
 export interface HasRefresh {
@@ -138,7 +140,7 @@ export interface HasRefresh {
 }
 
 function instanceOfHasRefresh(object: any): object is HasRefresh {
-	return 'refresh' in object;
+	return notNullish(object) && 'refresh' in object;
 }
 
 export function mapAsync<T, U>(
@@ -612,33 +614,22 @@ export class VsCodeHelper {
 				if (!config || !pathToDir) {
 					return;
 				}
-				const artifactsFolder = path.join(pathToDir, config.config.artifactsDir ?? 'artifacts');
 				let environmentName: string | undefined = undefined;
 				if (arg && arg instanceof EnvironmentTreeItem) {
 					environmentName = arg.environmentName;
 				}
 				if (!environmentName) {
-					const environmentNames = [...Object.keys(config.config?.environment ?? {})].filter(x => x !== 'default');
-					if (environmentNames.length === 1) {
-						environmentName = environmentNames[0];
-					} else {
-						environmentName = await this.vscode.window.showQuickPick(environmentNames, {
-							canPickMany: false,
-							ignoreFocusOut: false,
-							placeHolder: 'Environment Name',
-							title: 'Select an environment',
-						});
-						if (!environmentName) {
-							return;
-						}
+					environmentName = await this.getEnvironment(config);
+					if (!environmentName) {
+						return;
 					}
 				}
-				const fileName = await this.getFileNameForOriginateOrCompile(
+				const fileName = await this.getFileNameForOperationsOnContracts(
 					cmdId,
 					fileSelectionBehavior,
-					artifactsFolder,
 					config,
 					'originate',
+					'artifacts',
 					arg instanceof EnvironmentTreeItem ? undefined : arg,
 				);
 				if (!fileName) {
@@ -655,6 +646,25 @@ export class VsCodeHelper {
 				);
 			},
 		);
+	}
+
+	async getEnvironment(config: Util.TaqifiedDir) {
+		const environmentNames = [
+			...Object.keys(config.config?.environment ?? {}),
+		].filter(x => x !== 'default');
+		if (environmentNames.length === 1) {
+			return environmentNames[0];
+		}
+		const environmentName = await this.vscode.window.showQuickPick(
+			environmentNames,
+			{
+				canPickMany: false,
+				ignoreFocusOut: false,
+				placeHolder: 'Environment Name',
+				title: 'Select an environment',
+			},
+		);
+		return environmentName;
 	}
 
 	async getTaqBinPath() {
@@ -741,22 +751,18 @@ export class VsCodeHelper {
 
 	exposeTypecheckCommand() {
 		this.registerCommand('typecheck', async (arg: SandboxTreeItem | ContractTreeItem | undefined) => {
-			const projectDir = await this.getFolderForTasksOnTaqifiedFolders('install');
-			if (projectDir === undefined) {
+			const { config, pathToDir } = this.observableConfig.currentConfig;
+			if (!config || !pathToDir) {
 				return;
 			}
-			let fileName: string | undefined = undefined;
 			let sandboxName: string | undefined = undefined;
 			if (arg) {
 				if (arg instanceof SandboxTreeItem) {
 					sandboxName = arg.sandboxName;
 				}
-				if (arg instanceof ContractTreeItem) {
-					fileName = this.getArtifactFileNameFromContract(arg.fileName);
-				}
 			}
 			if (!sandboxName) {
-				const config = await Util.TaqifiedDir.create(projectDir, this.i18);
+				const config = await Util.TaqifiedDir.create(pathToDir, this.i18);
 				const sandboxNames = [...Object.keys(config?.config?.sandbox ?? {})];
 				if (sandboxNames.length === 1) {
 					sandboxName = sandboxNames[0];
@@ -772,13 +778,24 @@ export class VsCodeHelper {
 					}
 				}
 			}
+			const fileName = await this.getFileNameForOperationsOnContracts(
+				'typecheck',
+				'getFromCommandOrOpenDialog',
+				config,
+				'Typecheck',
+				'artifacts',
+				instanceOfHasFileName(arg) ? arg : undefined,
+			);
+			if (!fileName) {
+				return;
+			}
 			await this.proxyToTaqAndShowOutput(
 				`typecheck -s ${sandboxName} ${fileName ?? ''}`,
 				{
 					finishedTitle: 'checked contract types',
 					progressTitle: 'checking types',
 				},
-				projectDir,
+				pathToDir,
 				true,
 			);
 		});
@@ -909,13 +926,12 @@ export class VsCodeHelper {
 					);
 					return;
 				}
-				const contractsFolder = path.join(pathToDir, config.config.contractsDir ?? 'contracts');
-				const fileName = await this.getFileNameForOriginateOrCompile(
+				const fileName = await this.getFileNameForOperationsOnContracts(
 					cmdId,
 					fileSelectionBehavior,
-					contractsFolder,
 					config,
 					'compile',
+					'contracts',
 					item,
 				);
 				if (!fileName) {
@@ -936,15 +952,20 @@ export class VsCodeHelper {
 		);
 	}
 
-	async getFileNameForOriginateOrCompile(
+	async getFileNameForOperationsOnContracts(
 		cmdId: string,
-		fileSelectionBehavior: 'getFromCommand' | 'currentFile' | 'openDialog',
-		expectedContractsOrArtifactsFolder: string,
+		fileSelectionBehavior: 'getFromCommand' | 'currentFile' | 'openDialog' | 'getFromCommandOrOpenDialog',
 		config: Util.TaqifiedDir,
-		commandTitle: 'compile' | 'originate',
+		commandTitle: string,
+		fileTypes: 'contracts' | 'artifacts',
 		item?: HasFileName | api.Uri | undefined,
-	) {
-		if (fileSelectionBehavior === 'getFromCommand') {
+	): Promise<string | undefined> {
+		const folderRelativePath = fileTypes === 'contracts'
+			? (config.config.contractsDir ?? 'contracts')
+			: (config.config.artifactsDir ?? 'artifacts');
+		const expectedContractsOrArtifactsFolder = path.join(config.dir, folderRelativePath);
+
+		if (fileSelectionBehavior === 'getFromCommand' || fileSelectionBehavior === 'getFromCommandOrOpenDialog') {
 			if (instanceOfHasFileName(item)) {
 				return item.fileName;
 			} else if (item instanceof api.Uri) {
@@ -956,7 +977,7 @@ export class VsCodeHelper {
 					);
 				}
 				return fileName;
-			} else {
+			} else if (fileSelectionBehavior === 'getFromCommand') {
 				this.showLog(
 					OutputLevels.warn,
 					`File to be ${commandTitle}d was not passed to command or could not determine relative filename for ${
@@ -965,7 +986,8 @@ export class VsCodeHelper {
 				);
 				return;
 			}
-		} else if (fileSelectionBehavior === 'currentFile') {
+		}
+		if (fileSelectionBehavior === 'currentFile') {
 			let absoluteFilePath = this.vscode.window.activeTextEditor?.document.uri.path;
 			if (!absoluteFilePath) {
 				this.showLog(
@@ -975,14 +997,15 @@ export class VsCodeHelper {
 				return;
 			}
 			return path.relative(expectedContractsOrArtifactsFolder, absoluteFilePath);
-		} else if (fileSelectionBehavior === 'openDialog') {
+		}
+		if (fileSelectionBehavior === 'openDialog' || fileSelectionBehavior === 'getFromCommandOrOpenDialog') {
 			const fileNames = await this.vscode.window.showOpenDialog({
 				canSelectFiles: true,
 				canSelectFolders: false,
 				canSelectMany: false,
 				defaultUri: api.Uri.file(expectedContractsOrArtifactsFolder),
 				filters: {
-					'All Supported Contracts': commandTitle === 'originate'
+					'All Supported Contracts': fileTypes === 'artifacts'
 						? ['tz']
 						: getSupportedSmartContractExtensions(config).map(extension => extension.replace('.', '')),
 					'All Files': ['*'],
@@ -998,13 +1021,12 @@ export class VsCodeHelper {
 				return;
 			}
 			return path.relative(expectedContractsOrArtifactsFolder, fileNames[0].path);
-		} else {
-			this.showLog(
-				OutputLevels.warn,
-				`Unknown file mode for ${commandTitle} command.`,
-			);
-			return;
 		}
+		this.showLog(
+			OutputLevels.warn,
+			`Unknown file mode for ${commandTitle} command.`,
+		);
+		return;
 	}
 
 	private async getRelativeFilePath(uri: api.Uri, folder: 'contracts' | 'artifacts') {
@@ -1544,8 +1566,8 @@ export class VsCodeHelper {
 	async isTaqCliReachable() {
 		try {
 			const pathToTaq = await this.getTaqBinPath();
-			await Util.checkTaqBinary(pathToTaq, this.i18, this.getLog());
-			return true;
+			const checkResult = await Util.checkTaqBinary(pathToTaq, this.i18, this.getLog());
+			return checkResult.indexOf('OK') !== -1;
 		} catch {
 			return false;
 		}
@@ -1565,8 +1587,9 @@ export class VsCodeHelper {
 
 	exposeShowEntrypointParametersCommand() {
 		this.registerCommand('show_entrypoint_parameters', async (item: SmartContractEntrypointTreeItem) => {
-			const jsonParameters = item.jsonParameters;
-			this.showOutput(JSON.stringify(jsonParameters, null, 2));
+			// this.showOutput(JSON.stringify(item.jsonParameters, null, 2));
+			this.showOutput(JSON.stringify(item.michelineParameters, null, 2));
+			// this.showOutput(JSON.stringify(item.michelsonParameters, null, 2));
 		});
 	}
 
@@ -1575,6 +1598,67 @@ export class VsCodeHelper {
 			const jsonParameters = item.operation;
 			this.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});
+	}
+
+	exposeInvokeEntrypointCommand() {
+		this.registerCommand(
+			'invoke_entrypoint',
+			async (item: SmartContractEntrypointTreeItem) => {
+				const michelineParameters = item.michelineParameters;
+				const panel = this.vscode.window.createWebviewPanel(
+					'entrypointParameter',
+					`Editing ${item.name} parameters`,
+					this.vscode.ViewColumn.One,
+					{
+						enableScripts: true,
+					},
+				);
+				const result = createVscodeWebUiHtml({
+					webview: panel.webview,
+					subscriptions: this.context.subscriptions,
+					interop: {
+						view: 'MichelineEditor',
+						input: {
+							dataType: michelineParameters,
+							actionTitle: 'Invoke Entrypoint',
+						},
+						onMessage: async x => {
+							if (x.kind === 'action') {
+								const fileName = 'invoke_temp_file.tz';
+								fs.writeFileSync(
+									path.join(
+										this.observableConfig.currentConfig.pathToDir!,
+										`artifacts/${fileName}`,
+									),
+									x.micheline || '',
+								);
+								const config = this.observableConfig.currentConfig.config;
+								if (!config) {
+									this.showLog(
+										OutputLevels.error,
+										'Unexpected: Current config is empty',
+									);
+									return;
+								}
+								const environmentName = await this.getEnvironment(config);
+								await this.proxyToTaqAndShowOutput(
+									`call ${
+										item.parent.alias ?? item.parent.address
+									} --entrypoint ${item.name} --param ${fileName} --env ${environmentName}`,
+									{
+										finishedTitle: `invoked entrypoint ${item.name}`,
+										progressTitle: `invoking entrypoint ${item.name}`,
+									},
+									this.observableConfig.currentConfig.pathToDir,
+									false,
+								);
+							}
+						},
+					},
+				});
+				panel.webview.html = result.html;
+			},
+		);
 	}
 
 	/**

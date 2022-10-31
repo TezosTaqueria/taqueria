@@ -1,28 +1,20 @@
 import { sendAsyncErr } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { IntersectionOpts as Opts } from './common';
+import fund from './fund';
+import instantiate_account from './instantiate_account';
 import originate from './originate';
 import transfer from './transfer';
 
-interface Opts extends RequestArgs.ProxyRequestArgs {
-	// from originate.ts
-	storage: string;
-	alias?: string;
-	// from transfer.ts
-	tez?: string;
-	param?: string;
-	entrypoint?: string;
-	// from originate.ts and transfer.ts
-	contract: string;
-}
-
 export const taquito = (parsedArgs: Opts): Promise<void> => {
 	switch (parsedArgs.task) {
-		case 'originate':
 		case 'deploy':
 			return originate(parsedArgs);
 		case 'transfer':
-		case 'call':
 			return transfer(parsedArgs);
+		case 'instantiate-account':
+			return instantiate_account(parsedArgs);
+		case 'fund':
+			return fund(parsedArgs);
 		default:
 			return sendAsyncErr(`${parsedArgs.task} is not an understood task by the Taquito plugin`);
 	}
