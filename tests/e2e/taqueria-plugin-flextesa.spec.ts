@@ -184,7 +184,6 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 	test('Verify that Taqueria accepts any origin and does not emit any CORS related errors', async () => {
 		// Start web server for preflight request
 		const p = await spawn('npx', ['ws'], {
-			// detached: true,
 			shell: true,
 		});
 		processes.push(p); // store process for cleanup
