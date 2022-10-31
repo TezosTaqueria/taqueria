@@ -102,7 +102,6 @@ jobs:
 
   publish-marketplace:
     name: Publish VSCode Extension
-    if: ${{ github.event_name != 'pull_request' }}
     needs:
       - test-build
     runs-on: ubuntu-latest
