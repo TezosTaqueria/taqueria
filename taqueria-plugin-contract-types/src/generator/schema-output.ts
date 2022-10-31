@@ -36,6 +36,7 @@ export const toSchema = (methods: TypedMethod[], storage: TypedStorage): SchemaO
 			?? (t.kind === `object` && t.fields ? getSchemaObjectType(t.fields) : null)
 			?? (t.kind === `unit` ? `unit` : null)
 			?? (t.kind === `never` ? `never` : null)
+			?? (t.kind === 'lambda' ? ['lambda', getSchemaType(t.lambda.arg), getSchemaType(t.lambda.ret)] : null)
 			?? `${t.raw as unknown as string}`;
 	};
 
