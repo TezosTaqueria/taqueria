@@ -248,29 +248,6 @@ jobs:
           export PATH="$PATH:$(pwd)"
           npm run build-all
 
-      - name: download the binary from the build-binaries job and make it executable
-        if: ${{ !github.event.pull_request.head.repo.fork }}
-        run: |
-          curl --url ${{ matrix.url }} -o ${{ matrix.final-name }} -L
-          ${{ matrix.make-executable-cmd }} ${{ matrix.final-name }}
-          ${{ matrix.get-current-dir }} >> $GITHUB_PATH
-
-      - name: build binary and make executable
-        if: ${{ github.event.pull_request.head.repo.fork }}
-        env:
-          TAQ_VERSION: ${{ github.ref_name }}
-          DENO_DIR: "./deno"
-        run: |
-          COMMIT=`git rev-parse --short "$GITHUB_SHA"`
-          TAQ_VERSION="${TAQ_VERSION/\//-}"
-          deno compile --output taq --target $DENO_TARGET --allow-run --allow-write --allow-read --allow-env --allow-net index.ts --quickstart "`cat quickstart.md`" --setBuild "$COMMIT" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
-          [[ $(./taq init -p ./test_project) == "Project taq'ified!" ]]
-          chmod +x taq
-          echo "$(pwd)" >> $GITHUB_PATH
-
-      - name: Build docker image
-        run: npm run build-docker --workspaces --if-present
-
       - name: Run unit tests
         run: npm run test:unit -w tests
 
