@@ -5,6 +5,7 @@ on:
     inputs:
       prerelease:
         required: false
+        type: string
     secrets:
       GCP_PROJECT:
         required: true
