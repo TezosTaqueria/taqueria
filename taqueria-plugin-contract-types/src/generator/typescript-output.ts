@@ -107,7 +107,7 @@ ${tabs(indent)}`;
 			return `${typeAlias.aliasType}<${typeToCode(t.map.key, indent)}, ${typeToCode(t.map.value, indent)}>`;
 		}
 		if (t.kind === `lambda`) {
-			return `(${typeToCode(t.lambda.arg, indent)}) => ${typeToCode(t.lambda.ret, indent)}`;
+			return `(arg: ${typeToCode(t.lambda.arg, indent)}) => ${typeToCode(t.lambda.ret, indent)}`;
 		}
 		if (t.kind === `object`) {
 			return `{${toIndentedItems(indent, {}, t.fields.map((a, i) => varToCode(a, i, indent + 1) + `;`))}}`;
