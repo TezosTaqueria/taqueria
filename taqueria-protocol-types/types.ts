@@ -47,7 +47,7 @@ export type Url = string;
 /** interpreted using yargs @pattern ^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$ */
 export type Command = string;
 
-export interface Option {
+export type Option = {
 	shortFlag?: SingleChar;
 	flag: Verb;
 	description: NonEmptyString;
@@ -56,33 +56,33 @@ export interface Option {
 	required?: boolean;
 	boolean?: boolean;
 	choices?: NonEmptyString[];
-}
+};
 
-export interface PositionalArg {
+export type PositionalArg = {
 	placeholder: HumanReadableIdentifier;
 	description: NonEmptyString;
 	defaultValue?: string | number | boolean;
 	type?: 'string' | 'number' | 'boolean';
 	required?: boolean;
-}
+};
 
-export interface InstalledPlugin {
+export type InstalledPlugin = {
 	type: 'npm' | 'binary' | 'deno';
 	name: NonEmptyString;
-}
+};
 
-export interface Operation {
+export type Operation = {
 	operation: Verb;
 	command: Command;
 	description?: NonEmptyString;
 	positionals?: PositionalArg[];
 	options?: Option[];
 	handler?: (args: PersistentState) => (args: RequestArgs) => void;
-}
+};
 
 export type ParsedOperation = Omit<Operation, 'handler'>;
 
-export interface Template {
+export type Template = {
 	template: Verb;
 	command: Command;
 	/** @minLength 4 */
@@ -92,7 +92,7 @@ export interface Template {
 	positionals?: PositionalArg;
 	handler: TemplateHandler;
 	encoding?: PluginResponseEncoding;
-}
+};
 
 type TemplateHandler =
 	| NonEmptyString // TODO: should this be Verb?
@@ -107,28 +107,28 @@ export type ParsedTemplate = Omit<Template, 'handler'> & {
 	handler: string;
 };
 
-export interface PluginSchemaBase {
+export type PluginSchemaBase = {
 	name: Alias;
 	version: VersionNumber;
 	schema: VersionNumber;
 	alias: Alias;
 	tasks?: Task[];
-}
+};
 
-export interface PluginInfo extends PluginSchemaBase {
+export type PluginInfo = PluginSchemaBase & {
 	operations?: ParsedOperation[];
 	templates?: ParsedTemplate[];
-}
+};
 
-export interface PluginSchema extends PluginSchemaBase {
+export type PluginSchema = PluginSchemaBase & {
 	operations?: Operation[];
 	templates?: Template[];
 	proxy?: (args: RequestArgs) => Promise<PluginProxyResponse>;
 	checkRuntimeDependencies?: (args: RequestArgs) => Promise<PluginDependenciesResponse>;
 	installRuntimeDependencies?: (args: RequestArgs) => Promise<PluginDependenciesResponse>;
-}
+};
 
-export interface Task {
+export type Task = {
 	task: Verb;
 	command: Command;
 	aliases?: Alias[];
@@ -140,43 +140,43 @@ export interface Task {
 	handler: 'proxy' | NonEmptyString;
 	options?: Option[];
 	positionals?: PositionalArg[];
-}
+};
 
 // ---- Process Interop ----
 
-export interface RuntimeDependency {
+export type RuntimeDependency = {
 	name: HumanReadableIdentifier;
 	path: string;
 	version: string;
 	kind: 'required' | 'optional';
-}
+};
 
-export interface RuntimeDependencyReport extends RuntimeDependency {
+export type RuntimeDependencyReport = RuntimeDependency & {
 	met: boolean;
-}
+};
 
-export interface PluginDependenciesResponse {
+export type PluginDependenciesResponse = {
 	report: RuntimeDependencyReport[];
-}
+};
 
-export interface PluginJsonResponse {
+export type PluginJsonResponse = {
 	data?: unknown;
 
 	/** @default none */
 	render: 'none' | 'table' | 'string';
-}
+};
 
 export type PluginProxyResponse = void | PluginJsonResponse;
 
 export type PluginResponseEncoding = undefined | 'none' | 'json' | 'application/json';
 
-export interface SanitizedArgs {
+export type SanitizedArgs = {
 	configAbsPath: NonEmptyString;
 	sandbox: NonEmptyString;
 	configure?: boolean;
 	importAccounts?: boolean;
 	config: ParsedConfig;
-}
+};
 
 export type PluginActionName =
 	| 'proxy'
@@ -204,10 +204,10 @@ export type SHA256 = string;
 
 // ---- Contract Objects ----
 
-export interface Contract {
+export type Contract = {
 	sourceFile: NonEmptyString;
 	hash: SHA256;
-}
+};
 
 export type Faucet = {
 	pkh: PublicKeyHash;
