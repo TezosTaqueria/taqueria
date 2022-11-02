@@ -21,7 +21,7 @@ export const settingsSchema = z.object({
 	consent: z.union([z.literal('opt_in'), z.literal('opt_out')]),
 });
 
-export const timestampSchema = z.number();
+export const timestampSchema = z.number().min(1651846877);
 
 export const tzSchema = z
 	.string()
@@ -42,27 +42,31 @@ export const optionSchema = z.object({
 	flag: verbSchema,
 	description: nonEmptyStringSchema,
 	defaultValue: z.union([z.string(), z.number(), z.boolean()]).optional(),
-	type: z.union([z.string(), z.number(), z.boolean()]).optional(),
+	type: z
+		.union([z.literal('string'), z.literal('number'), z.literal('boolean')])
+		.optional(),
 	required: z.boolean().optional(),
 	boolean: z.boolean().optional(),
-	choices: z.array(z.string()).optional(),
+	choices: z.array(nonEmptyStringSchema).optional(),
 });
 
 export const positionalArgSchema = z.object({
 	placeholder: humanReadableIdentifierSchema,
 	description: nonEmptyStringSchema,
 	defaultValue: z.union([z.string(), z.number(), z.boolean()]).optional(),
-	type: z.union([z.string(), z.number(), z.boolean()]).optional(),
+	type: z
+		.union([z.literal('string'), z.literal('number'), z.literal('boolean')])
+		.optional(),
 	required: z.boolean().optional(),
 });
 
 export const installedPluginSchema = z.object({
 	type: z.union([z.literal('npm'), z.literal('binary'), z.literal('deno')]),
-	name: z.string(),
+	name: nonEmptyStringSchema,
 });
 
 export const runtimeDependencySchema = z.object({
-	name: z.string(),
+	name: humanReadableIdentifierSchema,
 	path: z.string(),
 	version: z.string(),
 	kind: z.union([z.literal('required'), z.literal('optional')]),
@@ -107,16 +111,14 @@ export const pluginActionNameSchema = z.union([
 
 export const economicalPrototypeHashSchema = z
 	.string()
-	.regex(
-		/^P[A-Za-z0-9]{50}$ this is an invalid hash for an economical protocol/,
-	);
+	.regex(/^P[A-Za-z0-9]{50}$ this is a valid hash for an economical protocol/);
 
 export const publicKeyHashSchema = z.string().regex(/^tz1[A-Za-z0-9]{33}$/);
 
 export const sha256Schema = z.string().regex(/^[A-Fa-f0-9]{64}$/);
 
 export const contractSchema = z.object({
-	sourceFile: z.string(),
+	sourceFile: nonEmptyStringSchema,
 	hash: sha256Schema,
 });
 
@@ -186,7 +188,7 @@ const environmentNameSchema = nonEmptyStringSchema.min(
 	'Default environment must reference the name of an existing environment.',
 );
 
-export const humanLanguangeSchema = z
+export const humanLanguageSchema = z
 	.union([z.literal('en'), z.literal('fr')])
 	.default('en');
 
@@ -236,8 +238,8 @@ export const taskSchema = z.object({
 	task: verbSchema,
 	command: commandSchema,
 	aliases: z.array(aliasSchema).optional(),
-	description: z.string().min(3).optional(),
-	example: z.string().optional(),
+	description: nonEmptyStringSchema.min(3).optional(),
+	example: nonEmptyStringSchema.optional(),
 	hidden: z.boolean().optional(),
 	encoding: pluginResponseEncodingSchema.optional(),
 	handler: z.union([z.literal('proxy'), nonEmptyStringSchema]),
@@ -251,7 +253,7 @@ export const persistentStateSchema = z.object({
 });
 
 export const configSchema = z.object({
-	language: humanLanguangeSchema.optional(),
+	language: humanLanguageSchema.optional(),
 	plugins: z.array(installedPluginSchema).optional(),
 	contractsDir: configContractsDirSchema.optional(),
 	artifactsDir: configArtifactsDirSchema.optional(),
@@ -260,7 +262,7 @@ export const configSchema = z.object({
 	environment: z
 		.record(z.union([environmentSchema, environmentNameSchema]))
 		.optional(),
-	accounts: z.record(z.union([tzSchema, z.number()])).optional(),
+	accounts: z.record(tzSchema).optional(),
 	contracts: z.record(contractSchema).optional(),
 	metadata: metadataConfigSchema.optional(),
 });
@@ -278,6 +280,14 @@ export const parsedConfigSchema = configSchema.omit({ sandbox: true }).and(
 		sandbox: z.record(z.union([sandboxConfigSchema, nonEmptyStringSchema])),
 	}),
 );
+
+export const pluginSchemaBaseSchema = z.object({
+	name: aliasSchema,
+	version: versionNumberSchema,
+	schema: versionNumberSchema,
+	alias: aliasSchema,
+	tasks: z.array(taskSchema).optional(),
+});
 
 export const sanitizedArgsSchema = z.object({
 	configAbsPath: nonEmptyStringSchema,
@@ -297,7 +307,7 @@ export const requestArgsSchema = sanitizedArgsSchema.omit({ config: true }).and(
 export const operationSchema = z.object({
 	operation: verbSchema,
 	command: commandSchema,
-	description: z.string().optional(),
+	description: nonEmptyStringSchema.optional(),
 	positionals: z.array(positionalArgSchema).optional(),
 	options: z.array(optionSchema).optional(),
 	handler: z
@@ -328,7 +338,7 @@ const templateHandlerSchema = z.union([
 export const templateSchema = z.object({
 	template: verbSchema,
 	command: commandSchema,
-	description: z.string().min(4),
+	description: nonEmptyStringSchema.min(4),
 	hidden: z.boolean().optional(),
 	options: optionSchema.optional(),
 	positionals: positionalArgSchema.optional(),
@@ -342,40 +352,34 @@ export const parsedTemplateSchema = templateSchema.omit({ handler: true }).and(
 	}),
 );
 
-export const pluginInfoSchema = z.object({
-	name: nonEmptyStringSchema,
-	version: versionNumberSchema,
-	schema: versionNumberSchema,
-	alias: aliasSchema,
-	tasks: z.array(taskSchema).optional(),
-	operations: z.array(parsedOperationSchema).optional(),
-	templates: z.array(parsedTemplateSchema).optional(),
-});
+export const pluginInfoSchema = pluginSchemaBaseSchema.and(
+	z.object({
+		operations: z.array(parsedOperationSchema).optional(),
+		templates: z.array(parsedTemplateSchema).optional(),
+	}),
+);
 
-export const pluginSchemaSchema = z.object({
-	name: aliasSchema.optional(),
-	version: versionNumberSchema,
-	schema: versionNumberSchema,
-	alias: aliasSchema,
-	tasks: z.array(taskSchema).optional(),
-	operations: z.array(operationSchema).optional(),
-	templates: z.array(templateSchema).optional(),
-	proxy: z
-		.function()
-		.args(requestArgsSchema)
-		.returns(z.promise(pluginProxyResponseSchema))
-		.optional(),
-	checkRuntimeDependencies: z
-		.function()
-		.args(requestArgsSchema)
-		.returns(z.promise(pluginDependenciesResponseSchema))
-		.optional(),
-	installRuntimeDependencies: z
-		.function()
-		.args(requestArgsSchema)
-		.returns(z.promise(pluginDependenciesResponseSchema))
-		.optional(),
-});
+export const pluginSchemaSchema = pluginSchemaBaseSchema.and(
+	z.object({
+		operations: z.array(operationSchema).optional(),
+		templates: z.array(templateSchema).optional(),
+		proxy: z
+			.function()
+			.args(requestArgsSchema)
+			.returns(z.promise(pluginProxyResponseSchema))
+			.optional(),
+		checkRuntimeDependencies: z
+			.function()
+			.args(requestArgsSchema)
+			.returns(z.promise(pluginDependenciesResponseSchema))
+			.optional(),
+		installRuntimeDependencies: z
+			.function()
+			.args(requestArgsSchema)
+			.returns(z.promise(pluginDependenciesResponseSchema))
+			.optional(),
+	}),
+);
 
 export const ephemeralStateSchema = z.object({
 	build: z.string(),

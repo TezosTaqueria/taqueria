@@ -24,7 +24,7 @@ export type Settings = {
 };
 
 /**
- * @minimum 10
+ * @minimum 1651846877
  * @integer
  */
 export type Timestamp = number;
@@ -332,7 +332,12 @@ export type Config = {
 	artifactsDir?: ConfigArtifactsDir;
 	network?: Record<string, NetworkConfig>;
 	sandbox?: Record<string, SandboxConfig>;
-	environment?: Record<string, Environment> & { 'default': EnvironmentName };
+
+	// TODO: This causes a type conflict and is not supported
+	// accounts?: {
+	// 	default: EnvironmentName;
+	// } & Record<string, Environment>;
+	environment?: Record<string, Environment | EnvironmentName>;
 	accounts?: Record<string, Tz>;
 	contracts?: Record<string, Contract>;
 	metadata?: MetadataConfig;
