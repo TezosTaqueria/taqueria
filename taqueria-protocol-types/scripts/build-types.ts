@@ -17,14 +17,31 @@ export const buildTypes = async (typesFilePath: string, outTypesStrictFilePath: 
 ${generationWarning}
 ${
 		typeCode.replace(
-			/^export type ([A-Za-z0-9_]+) =/gm,
-			`
-export type $1 = { __type: $1 } & $1Raw;
-type $1Raw =
-`.trim(),
+			/^export type ([A-Za-z0-9_]+) =((?:.|\n){10})/gm,
+			(m, typeName, nextText) => {
+				const nextTextTrimmed = nextText.trim();
+
+				// Object types
+				if (nextTextTrimmed.startsWith(`{`)) {
+					return `export type ${typeName} = { __type: ${typeName} } &${nextText}`;
+				}
+
+				// simple types
+				if (
+					nextTextTrimmed.startsWith(`string`)
+					|| nextTextTrimmed.startsWith(`number`)
+					|| nextTextTrimmed.startsWith(`boolean`)
+				) {
+					return `export type ${typeName} = { __type: ${typeName} } &${nextText}`;
+				}
+
+				// Else - Use a wrapper type
+				return `export type ${typeName} = { __type: ${typeName} } & ${typeName}Raw
+type ${typeName}Raw =${nextText}`;
+			},
 		)
 	}
-    `;
+    `.trimStart();
 	await fs.writeFile(outTypesStrictFilePath, typeCodeStrict);
 
 	for (const typeName of typeNames) {
@@ -50,7 +67,7 @@ export const from = (input: unknown): ${typeNameStrict} => {
     return ${typeNameSchema}.parse(input) as ${typeNameStrict};
 }
 
-export const create = (input: ${typeNameRaw} | ${typeNameStrict}): ${typeNameStrict} => from(input);
+export const create = (input: ${typeNameRaw}): ${typeNameStrict} => from(input);
 
 export const of = (input: unknown): FutureInstance<TaqError, ${typeNameStrict}> => {
     try {

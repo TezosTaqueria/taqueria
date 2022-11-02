@@ -4,64 +4,51 @@
 // ---- Simple Types & Type Fragments ----
 
 /** @minLength 1 */
-export type NonEmptyString = { __type: NonEmptyString } & NonEmptyStringRaw;
-type NonEmptyStringRaw = string;
+export type NonEmptyString = { __type: NonEmptyString } & string;
 
 /** @pattern ^[A-Za-z]$ */
-export type SingleChar = { __type: SingleChar } & SingleCharRaw;
-type SingleCharRaw = string;
+export type SingleChar = { __type: SingleChar } & string;
 
 /** @pattern ^[A-Za-z\-\ ]+ */
-export type Verb = { __type: Verb } & VerbRaw;
-type VerbRaw = string;
+export type Verb = { __type: Verb } & string;
 
 export type Alias = { __type: Alias } & AliasRaw;
 type AliasRaw = (Verb | SingleChar);
 
 /** @pattern ^[A-Za-z]+[A-Za-z0-9-_ ]*$ */
-export type HumanReadableIdentifier = { __type: HumanReadableIdentifier } & HumanReadableIdentifierRaw;
-type HumanReadableIdentifierRaw = string;
+export type HumanReadableIdentifier = { __type: HumanReadableIdentifier } & string;
 
-export type SanitizedAbsPath = { __type: SanitizedAbsPath } & SanitizedAbsPathRaw;
-type SanitizedAbsPathRaw = string;
+export type SanitizedAbsPath = { __type: SanitizedAbsPath } & string;
 
 /** @pattern ^(\.\.|\.\/|\/) */
-export type SanitizedPath = { __type: SanitizedPath } & SanitizedPathRaw;
-type SanitizedPathRaw = string;
+export type SanitizedPath = { __type: SanitizedPath } & string;
 
-export type Settings = { __type: Settings } & SettingsRaw;
-type SettingsRaw = {
+export type Settings = { __type: Settings } & {
 	consent: 'opt_in' | 'opt_out';
 };
 
 /** @min 1651846877 */
-export type Timestamp = { __type: Timestamp } & TimestampRaw;
-type TimestampRaw = number;
+export type Timestamp = { __type: Timestamp } & number;
 
 /**
  * @minLength 1
  * @pattern ^\d([\d_]+\d)?$ */
-export type Tz = { __type: Tz } & TzRaw;
-type TzRaw = string;
+export type Tz = { __type: Tz } & string;
 
 /**
  * @minLength 1
  * @pattern ^\d+\.\d+(\.\d+)*$ */
-export type VersionNumber = { __type: VersionNumber } & VersionNumberRaw;
-type VersionNumberRaw = string;
+export type VersionNumber = { __type: VersionNumber } & string;
 
 /** @format url */
-export type Url = { __type: Url } & UrlRaw;
-type UrlRaw = string;
+export type Url = { __type: Url } & string;
 
 // ---- Plugin Definition Types ----
 
 /** interpreted using yargs @pattern ^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$ */
-export type Command = { __type: Command } & CommandRaw;
-type CommandRaw = string;
+export type Command = { __type: Command } & string;
 
-export type Option = { __type: Option } & OptionRaw;
-type OptionRaw = {
+export type Option = { __type: Option } & {
 	shortFlag?: SingleChar;
 	flag: Verb;
 	description: NonEmptyString;
@@ -72,8 +59,7 @@ type OptionRaw = {
 	choices?: string[];
 };
 
-export type PositionalArg = { __type: PositionalArg } & PositionalArgRaw;
-type PositionalArgRaw = {
+export type PositionalArg = { __type: PositionalArg } & {
 	placeholder: HumanReadableIdentifier;
 	description: NonEmptyString;
 	defaultValue?: string | number | boolean;
@@ -81,14 +67,12 @@ type PositionalArgRaw = {
 	required?: boolean;
 };
 
-export type InstalledPlugin = { __type: InstalledPlugin } & InstalledPluginRaw;
-type InstalledPluginRaw = {
+export type InstalledPlugin = { __type: InstalledPlugin } & {
 	type: 'npm' | 'binary' | 'deno';
 	name: string;
 };
 
-export type Operation = { __type: Operation } & OperationRaw;
-type OperationRaw = {
+export type Operation = { __type: Operation } & {
 	operation: Verb;
 	command: Command;
 	description?: string;
@@ -100,8 +84,7 @@ type OperationRaw = {
 export type ParsedOperation = { __type: ParsedOperation } & ParsedOperationRaw;
 type ParsedOperationRaw = Omit<Operation, 'handler'>;
 
-export type Template = { __type: Template } & TemplateRaw;
-type TemplateRaw = {
+export type Template = { __type: Template } & {
 	template: Verb;
 	command: Command;
 	/** @minLength 4 */
@@ -127,8 +110,7 @@ type ParsedTemplateRaw = Omit<Template, 'handler'> & {
 	handler: string;
 };
 
-export type PluginInfo = { __type: PluginInfo } & PluginInfoRaw;
-type PluginInfoRaw = {
+export type PluginInfo = { __type: PluginInfo } & {
 	name: NonEmptyString;
 	version: VersionNumber;
 	schema: VersionNumber;
@@ -138,8 +120,7 @@ type PluginInfoRaw = {
 	templates?: ParsedTemplate[];
 };
 
-export type PluginSchema = { __type: PluginSchema } & PluginSchemaRaw;
-type PluginSchemaRaw = {
+export type PluginSchema = { __type: PluginSchema } & {
 	name?: Alias;
 	version: VersionNumber;
 	schema: VersionNumber;
@@ -152,8 +133,7 @@ type PluginSchemaRaw = {
 	installRuntimeDependencies?: (args: RequestArgs) => Promise<PluginDependenciesResponse>;
 };
 
-export type Task = { __type: Task } & TaskRaw;
-type TaskRaw = {
+export type Task = { __type: Task } & {
 	task: Verb;
 	command: Command;
 	aliases?: Alias[];
@@ -169,8 +149,7 @@ type TaskRaw = {
 
 // ---- Process Interop ----
 
-export type RuntimeDependency = { __type: RuntimeDependency } & RuntimeDependencyRaw;
-type RuntimeDependencyRaw = {
+export type RuntimeDependency = { __type: RuntimeDependency } & {
 	name: string;
 	path: string;
 	version: string;
@@ -182,13 +161,11 @@ type RuntimeDependencyReportRaw = RuntimeDependency & {
 	met: boolean;
 };
 
-export type PluginDependenciesResponse = { __type: PluginDependenciesResponse } & PluginDependenciesResponseRaw;
-type PluginDependenciesResponseRaw = {
+export type PluginDependenciesResponse = { __type: PluginDependenciesResponse } & {
 	report: RuntimeDependencyReport[];
 };
 
-export type PluginJsonResponse = { __type: PluginJsonResponse } & PluginJsonResponseRaw;
-type PluginJsonResponseRaw = {
+export type PluginJsonResponse = { __type: PluginJsonResponse } & {
 	data?: unknown;
 
 	/** @default none */
@@ -201,8 +178,7 @@ type PluginProxyResponseRaw = void | PluginJsonResponse;
 export type PluginResponseEncoding = { __type: PluginResponseEncoding } & PluginResponseEncodingRaw;
 type PluginResponseEncodingRaw = undefined | 'none' | 'json' | 'application/json';
 
-export type SanitizedArgs = { __type: SanitizedArgs } & SanitizedArgsRaw;
-type SanitizedArgsRaw = {
+export type SanitizedArgs = { __type: SanitizedArgs } & {
 	configAbsPath: NonEmptyString;
 	sandbox: NonEmptyString;
 	configure?: boolean;
@@ -228,27 +204,22 @@ type RequestArgsRaw = Omit<SanitizedArgs, 'config'> & {
 // ---- Hash Types ----
 
 /** @pattern ^P[A-Za-z0-9]{50}$ this is an invalid hash for an economical protocol*/
-export type EconomicalPrototypeHash = { __type: EconomicalPrototypeHash } & EconomicalPrototypeHashRaw;
-type EconomicalPrototypeHashRaw = string;
+export type EconomicalPrototypeHash = { __type: EconomicalPrototypeHash } & string;
 
 /** @pattern ^tz1[A-Za-z0-9]{33}$ */
-export type PublicKeyHash = { __type: PublicKeyHash } & PublicKeyHashRaw;
-type PublicKeyHashRaw = string;
+export type PublicKeyHash = { __type: PublicKeyHash } & string;
 
 /** @pattern ^[A-Fa-f0-9]{64}$ */
-export type SHA256 = { __type: SHA256 } & SHA256Raw;
-type SHA256Raw = string;
+export type SHA256 = { __type: SHA256 } & string;
 
 // ---- Contract Objects ----
 
-export type Contract = { __type: Contract } & ContractRaw;
-type ContractRaw = {
+export type Contract = { __type: Contract } & {
 	sourceFile: string;
 	hash: SHA256;
 };
 
-export type Faucet = { __type: Faucet } & FaucetRaw;
-type FaucetRaw = {
+export type Faucet = { __type: Faucet } & {
 	pkh: PublicKeyHash;
 	mnemonic: string[];
 	/** @format email */
@@ -271,8 +242,7 @@ type TzKtConfigPostgresqlPort = number;
  */
 type TzKtConfigApiPort = number;
 
-export type TzKtConfig = { __type: TzKtConfig } & TzKtConfigRaw;
-type TzKtConfigRaw = {
+export type TzKtConfig = { __type: TzKtConfig } & {
 	/** Do not start TzKt when sandbox starts */
 	disableAutostartWithSandbox?: boolean;
 	postgresqlPort?: TzKtConfigPostgresqlPort;
@@ -281,8 +251,7 @@ type TzKtConfigRaw = {
 
 // ---- Project Files ----
 
-export type Environment = { __type: Environment } & EnvironmentRaw;
-type EnvironmentRaw = {
+export type Environment = { __type: Environment } & {
 	/**
 	 * @minLength 1 Must reference the name of an existing network configuration
 	 */
@@ -295,8 +264,7 @@ type EnvironmentRaw = {
 	aliases?: Record<string, unknown>;
 };
 
-export type EphemeralState = { __type: EphemeralState } & EphemeralStateRaw;
-type EphemeralStateRaw = {
+export type EphemeralState = { __type: EphemeralState } & {
 	build: string;
 	configHash: string;
 
@@ -312,22 +280,19 @@ type EphemeralStateRaw = {
 	plugins: PluginInfo[];
 };
 
-export type PersistentState = { __type: PersistentState } & PersistentStateRaw;
-type PersistentStateRaw = {
+export type PersistentState = { __type: PersistentState } & {
 	operations: Record<string, PersistedOperation>;
 	tasks: Record<string, PersistedTask>;
 };
 
-export type PersistedTask = { __type: PersistedTask } & PersistedTaskRaw;
-type PersistedTaskRaw = {
+export type PersistedTask = { __type: PersistedTask } & {
 	task: Verb;
 	plugin: NonEmptyString;
 	time: Timestamp;
 	output?: unknown;
 };
 
-export type PersistedOperation = { __type: PersistedOperation } & PersistedOperationRaw;
-type PersistedOperationRaw = {
+export type PersistedOperation = { __type: PersistedOperation } & {
 	hash: SHA256;
 	time: Timestamp;
 	output?: unknown;
@@ -337,11 +302,9 @@ type PersistedOperationRaw = {
  * @minLength 1
  * @pattern ^[A-Za-z0-9]+[A-Za-z0-9-_]+\.[A-Za-z0-9]+[A-Za-z0-9-_]+\.[A-Za-z0-9]+[A-Za-z0-9-_]+$
  */
-export type ProvisionerID = { __type: ProvisionerID } & ProvisionerIDRaw;
-type ProvisionerIDRaw = string;
+export type ProvisionerID = { __type: ProvisionerID } & string;
 
-export type Provisioner = { __type: Provisioner } & ProvisionerRaw;
-type ProvisionerRaw = {
+export type Provisioner = { __type: Provisioner } & {
 	id: ProvisionerID;
 	plugin: NonEmptyString;
 	operation: NonEmptyString | 'custom';
@@ -366,18 +329,15 @@ type HumanLanguangeRaw = 'en' | 'fr';
  * @default contracts
  * @minLength 1
  */
-export type ConfigContractsDir = { __type: ConfigContractsDir } & ConfigContractsDirRaw;
-type ConfigContractsDirRaw = string;
+export type ConfigContractsDir = { __type: ConfigContractsDir } & string;
 
 /**
  * @default artifacts
  * @minLength 1
  */
-export type ConfigArtifactsDir = { __type: ConfigArtifactsDir } & ConfigArtifactsDirRaw;
-type ConfigArtifactsDirRaw = string;
+export type ConfigArtifactsDir = { __type: ConfigArtifactsDir } & string;
 
-export type Config = { __type: Config } & ConfigRaw;
-type ConfigRaw = {
+export type Config = { __type: Config } & {
 	language?: HumanLanguange;
 	plugins?: InstalledPlugin[];
 	contractsDir?: ConfigContractsDir;
@@ -399,8 +359,7 @@ type LoadedConfigRaw = Config & {
 	hash: SHA256;
 };
 
-export type MetadataConfig = { __type: MetadataConfig } & MetadataConfigRaw;
-type MetadataConfigRaw = {
+export type MetadataConfig = { __type: MetadataConfig } & {
 	name?: string;
 	projectDescription?: string;
 	authors?: string[];
@@ -408,8 +367,7 @@ type MetadataConfigRaw = {
 	homepage?: string;
 };
 
-export type NetworkConfig = { __type: NetworkConfig } & NetworkConfigRaw;
-type NetworkConfigRaw = {
+export type NetworkConfig = { __type: NetworkConfig } & {
 	label: HumanReadableIdentifier;
 	rpcUrl: Url;
 	protocol: EconomicalPrototypeHash;
@@ -417,15 +375,13 @@ type NetworkConfigRaw = {
 	faucet?: Faucet;
 };
 
-export type SandboxAccountConfig = { __type: SandboxAccountConfig } & SandboxAccountConfigRaw;
-type SandboxAccountConfigRaw = {
+export type SandboxAccountConfig = { __type: SandboxAccountConfig } & {
 	encryptedKey: NonEmptyString;
 	publicKeyHash: PublicKeyHash;
 	secretKey: NonEmptyString;
 };
 
-export type SandboxConfig = { __type: SandboxConfig } & SandboxConfigRaw;
-type SandboxConfigRaw = {
+export type SandboxConfig = { __type: SandboxConfig } & {
 	label: NonEmptyString;
 	rpcUrl: Url;
 	protocol: EconomicalPrototypeHash;
@@ -441,8 +397,7 @@ type SandboxConfigRaw = {
 	tzkt?: TzKtConfig;
 };
 
-export type ScaffoldConfig = { __type: ScaffoldConfig } & ScaffoldConfigRaw;
-type ScaffoldConfigRaw = {
+export type ScaffoldConfig = { __type: ScaffoldConfig } & {
 	postInit?: string;
 };
 

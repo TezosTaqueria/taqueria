@@ -17,7 +17,7 @@ export const from = (input: unknown): AliasStrict => {
 	return aliasSchema.parse(input) as AliasStrict;
 };
 
-export const create = (input: Alias | AliasStrict): AliasStrict => from(input);
+export const create = (input: Alias): AliasStrict => from(input);
 
 export const of = (input: unknown): FutureInstance<TaqError, AliasStrict> => {
 	try {
