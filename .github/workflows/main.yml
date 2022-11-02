@@ -336,12 +336,12 @@ jobs:
       - name: Publish for prerelease
         if: ${{ needs.workflow-setup.outputs.prerelease && github.event.release.prerelease && startsWith(github.ref, 'refs/tags/v') }}
         run: |
-          npm publish --workspaces --tag 'next' --access public --registry $PRIVATE_NPM_REGISTRY
+          npm publish --workspaces --tag 'next' --access public --registry
       
       - name: Publish for official release
         if: ${{ !needs.workflow-setup.outputs.prerelease && !github.event.release.prerelease && github.event.action == 'published' }}
         run: |
-          npm publish --workspaces --tag 'latest' --access public --registry $PRIVATE_NPM_REGISTRY
+          npm publish --workspaces --tag 'latest' --access public --registry
 
   vscode-extension-workflow:
     needs: 
