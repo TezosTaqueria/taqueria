@@ -3,35 +3,58 @@ import path from 'path';
 
 const toCamelCase = (name: string) => `${name[0].toLocaleLowerCase()}${name.substring(1)}`;
 
-export const buildTypes = async (typesFilePath: string, outDirPath: string) => {
+export const buildTypes = async (typesFilePath: string, outTypesStrictFilePath: string, outDirPath: string) => {
 	const typeCode = await fs.readFile(typesFilePath, { encoding: `utf-8` });
 	const typeNames = [...typeCode.matchAll(/^export type ([A-Za-z0-9_]+) =/gm)].map(x => x[1]);
 	console.log(`typeNames`, { typeNames });
 
-	for (const typeName of typeNames) {
-		const content = `
+	const generationWarning = `
 // Generated file: Do not edit 
 // generated from @taqueria-protocol-types
-// import { ${typeName}, ${toCamelCase(typeName)}Schema, parsingErrorMessages } from '@taqueria-protocol-types';
-import { ${typeName} } from '../../types';
+    `.trimStart();
+
+	const typeCodeStrict = `
+${generationWarning}
+${
+		typeCode.replace(
+			/^export type ([A-Za-z0-9_]+) =/gm,
+			`
+export type $1 = { __type: $1 } & $1Raw;
+type $1Raw =
+`.trim(),
+		)
+	}
+    `;
+	await fs.writeFile(outTypesStrictFilePath, typeCodeStrict);
+
+	for (const typeName of typeNames) {
+		const typeNameRaw = `${typeName}`;
+		const typeNameStrict = `${typeName}Strict`;
+		const typeNameSchema = `${toCamelCase(typeName)}Schema`;
+
+		const content = `
+${generationWarning}
+// import { ${typeNameRaw}, ${typeNameSchema}, parsingErrorMessages } from '@taqueria-protocol-types';
+import { ${typeNameRaw} } from '../../types';
+import { ${typeNameRaw} as ${typeNameStrict} } from '../../../${outTypesStrictFilePath.replace(`.ts`, ``)}';
 import { parsingErrorMessages } from '../../helpers';
-import { ${toCamelCase(typeName)}Schema } from '../types-zod';
+import { ${typeNameSchema} } from '../types-zod';
 import { TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import { FutureInstance, resolve } from 'fluture';
 import { ZodError } from 'zod';
 
-type ${typeName}Strict = ${typeName} & { __type: '${typeName}' };
-const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('${typeName}');
+// type ${typeNameStrict} = ${typeNameRaw} & { __type: '${typeNameRaw}' };
+const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('${typeNameRaw}');
 
-export const from = (input: unknown): ${typeName}Strict => {
-    return ${toCamelCase(typeName)}Schema.parse(input) as ${typeName}Strict;
+export const from = (input: unknown): ${typeNameStrict} => {
+    return ${typeNameSchema}.parse(input) as ${typeNameStrict};
 }
 
-export const create = (input: ${typeName} | ${typeName}Strict): ${typeName}Strict => from(input);
+export const create = (input: ${typeNameRaw} | ${typeNameStrict}): ${typeNameStrict} => from(input);
 
-export const of = (input: unknown): FutureInstance<TaqError, ${typeName}Strict> => {
+export const of = (input: unknown): FutureInstance<TaqError, ${typeNameStrict}> => {
     try {
-        return resolve(${toCamelCase(typeName)}Schema.parse(input) as ${typeName}Strict);
+        return resolve(${typeNameSchema}.parse(input) as ${typeNameStrict});
     } catch (previous) {
 
         const parseMsg = parseErrMsg(input, previous);
@@ -45,11 +68,15 @@ export const of = (input: unknown): FutureInstance<TaqError, ${typeName}Strict> 
     }
 }
 
-export const make = (input: ${typeName}Strict): FutureInstance<TaqError, ${typeName}Strict> => of(input);
+export const make = (input: ${typeNameStrict}): FutureInstance<TaqError, ${typeNameStrict}> => of(input);
 
         `;
 		await fs.writeFile(path.join(outDirPath, `${typeName}.ts`), content);
 	}
 };
 
-buildTypes(`taqueria-protocol-types/types.ts`, `taqueria-protocol-types/out/typelist`).catch(console.error);
+buildTypes(
+	`taqueria-protocol-types/types.ts`,
+	`taqueria-protocol-types/out/types-strict.ts`,
+	`taqueria-protocol-types/out/examples`,
+).catch(console.error);
