@@ -525,6 +525,9 @@ export const getAccountPrivateKey = async (
 	return network.accounts[account].privateKey;
 };
 
+export const getDockerImage = (defaultImageName: string, envVarName: string) =>
+	process.env[envVarName] ?? defaultImageName;
+
 /**
  * Gets the default account associated with a sandbox
  */
