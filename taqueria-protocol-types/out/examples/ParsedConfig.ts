@@ -1,0 +1,37 @@
+// Generated file: Do not edit
+// generated from @taqueria-protocol-types
+
+// import { ParsedConfig, parsedConfigSchema, parsingErrorMessages } from '@taqueria-protocol-types';
+import { TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
+import { FutureInstance, resolve } from 'fluture';
+import { ZodError } from 'zod';
+import { ParsedConfig as ParsedConfigStrict } from '../../../taqueria-protocol-types/out/types-strict';
+import { parsingErrorMessages } from '../../helpers';
+import { ParsedConfig } from '../../types';
+import { parsedConfigSchema } from '../types-zod';
+
+// type ParsedConfigStrict = ParsedConfig & { __type: 'ParsedConfig' };
+const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('ParsedConfig');
+
+export const from = (input: unknown): ParsedConfigStrict => {
+	return parsedConfigSchema.parse(input) as ParsedConfigStrict;
+};
+
+export const create = (input: ParsedConfig): ParsedConfigStrict => from(input);
+
+export const of = (input: unknown): FutureInstance<TaqError, ParsedConfigStrict> => {
+	try {
+		return resolve(parsedConfigSchema.parse(input) as ParsedConfigStrict);
+	} catch (previous) {
+		const parseMsg = parseErrMsg(input, previous);
+
+		const unknownMsg = unknownErrMsg(input);
+
+		if (previous instanceof ZodError) {
+			return toFutureParseErr(previous, parseMsg, input);
+		}
+		return toFutureParseUnknownErr(previous, unknownMsg, input);
+	}
+};
+
+export const make = (input: ParsedConfigStrict): FutureInstance<TaqError, ParsedConfigStrict> => of(input);
