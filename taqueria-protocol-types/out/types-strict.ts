@@ -27,7 +27,10 @@ export type Settings = { __type: Settings } & {
 	consent: 'opt_in' | 'opt_out';
 };
 
-/** @min 1651846877 */
+/**
+ * @minimum 1651846877
+ * @integer
+ */
 export type Timestamp = { __type: Timestamp } & number;
 
 /**
@@ -53,29 +56,29 @@ export type Option = { __type: Option } & {
 	flag: Verb;
 	description: NonEmptyString;
 	defaultValue?: string | number | boolean;
-	type?: string | number | boolean;
+	type?: 'string' | 'number' | 'boolean';
 	required?: boolean;
 	boolean?: boolean;
-	choices?: string[];
+	choices?: NonEmptyString[];
 };
 
 export type PositionalArg = { __type: PositionalArg } & {
 	placeholder: HumanReadableIdentifier;
 	description: NonEmptyString;
 	defaultValue?: string | number | boolean;
-	type?: string | number | boolean;
+	type?: 'string' | 'number' | 'boolean';
 	required?: boolean;
 };
 
 export type InstalledPlugin = { __type: InstalledPlugin } & {
 	type: 'npm' | 'binary' | 'deno';
-	name: string;
+	name: NonEmptyString;
 };
 
 export type Operation = { __type: Operation } & {
 	operation: Verb;
 	command: Command;
-	description?: string;
+	description?: NonEmptyString;
 	positionals?: PositionalArg[];
 	options?: Option[];
 	handler?: (args: PersistentState) => (args: RequestArgs) => void;
@@ -88,7 +91,7 @@ export type Template = { __type: Template } & {
 	template: Verb;
 	command: Command;
 	/** @minLength 4 */
-	description: string;
+	description: NonEmptyString;
 	hidden?: boolean;
 	options?: Option;
 	positionals?: PositionalArg;
@@ -110,22 +113,22 @@ type ParsedTemplateRaw = Omit<Template, 'handler'> & {
 	handler: string;
 };
 
-export type PluginInfo = { __type: PluginInfo } & {
-	name: NonEmptyString;
+export type PluginSchemaBase = { __type: PluginSchemaBase } & {
+	name: Alias;
 	version: VersionNumber;
 	schema: VersionNumber;
 	alias: Alias;
 	tasks?: Task[];
+};
+
+export type PluginInfo = { __type: PluginInfo } & PluginInfoRaw;
+type PluginInfoRaw = PluginSchemaBase & {
 	operations?: ParsedOperation[];
 	templates?: ParsedTemplate[];
 };
 
-export type PluginSchema = { __type: PluginSchema } & {
-	name?: Alias;
-	version: VersionNumber;
-	schema: VersionNumber;
-	alias: Alias;
-	tasks?: Task[];
+export type PluginSchema = { __type: PluginSchema } & PluginSchemaRaw;
+type PluginSchemaRaw = PluginSchemaBase & {
 	operations?: Operation[];
 	templates?: Template[];
 	proxy?: (args: RequestArgs) => Promise<PluginProxyResponse>;
@@ -138,8 +141,8 @@ export type Task = { __type: Task } & {
 	command: Command;
 	aliases?: Alias[];
 	/** @minLength 3 */
-	description?: string;
-	example?: string;
+	description?: NonEmptyString;
+	example?: NonEmptyString;
 	hidden?: boolean;
 	encoding?: PluginResponseEncoding;
 	handler: 'proxy' | NonEmptyString;
@@ -150,7 +153,7 @@ export type Task = { __type: Task } & {
 // ---- Process Interop ----
 
 export type RuntimeDependency = { __type: RuntimeDependency } & {
-	name: string;
+	name: HumanReadableIdentifier;
 	path: string;
 	version: string;
 	kind: 'required' | 'optional';
@@ -203,7 +206,7 @@ type RequestArgsRaw = Omit<SanitizedArgs, 'config'> & {
 
 // ---- Hash Types ----
 
-/** @pattern ^P[A-Za-z0-9]{50}$ this is an invalid hash for an economical protocol*/
+/** @pattern ^P[A-Za-z0-9]{50}$ this is a valid hash for an economical protocol*/
 export type EconomicalPrototypeHash = { __type: EconomicalPrototypeHash } & string;
 
 /** @pattern ^tz1[A-Za-z0-9]{33}$ */
@@ -215,7 +218,7 @@ export type SHA256 = { __type: SHA256 } & string;
 // ---- Contract Objects ----
 
 export type Contract = { __type: Contract } & {
-	sourceFile: string;
+	sourceFile: NonEmptyString;
 	hash: SHA256;
 };
 
@@ -322,8 +325,8 @@ type ProvisionsRaw = Provisioner[];
 type EnvironmentName = NonEmptyString;
 
 /** @default en */
-export type HumanLanguange = { __type: HumanLanguange } & HumanLanguangeRaw;
-type HumanLanguangeRaw = 'en' | 'fr';
+export type HumanLanguage = { __type: HumanLanguage } & HumanLanguageRaw;
+type HumanLanguageRaw = 'en' | 'fr';
 
 /**
  * @default contracts
@@ -338,15 +341,19 @@ export type ConfigContractsDir = { __type: ConfigContractsDir } & string;
 export type ConfigArtifactsDir = { __type: ConfigArtifactsDir } & string;
 
 export type Config = { __type: Config } & {
-	language?: HumanLanguange;
+	language?: HumanLanguage;
 	plugins?: InstalledPlugin[];
 	contractsDir?: ConfigContractsDir;
 	artifactsDir?: ConfigArtifactsDir;
-
 	network?: Record<string, NetworkConfig>;
 	sandbox?: Record<string, SandboxConfig>;
+
+	// TODO: This causes a type conflict and is not supported
+	// accounts?: {
+	// 	default: EnvironmentName;
+	// } & Record<string, Environment>;
 	environment?: Record<string, Environment | EnvironmentName>;
-	accounts?: Record<string, Tz | number>;
+	accounts?: Record<string, Tz>;
 	contracts?: Record<string, Contract>;
 	metadata?: MetadataConfig;
 };
