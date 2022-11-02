@@ -23,7 +23,10 @@ export type Settings = {
 	consent: 'opt_in' | 'opt_out';
 };
 
-/** @min 1651846877 */
+/**
+ * @minimum 10
+ * @integer
+ */
 export type Timestamp = number;
 
 /**
@@ -44,52 +47,52 @@ export type Url = string;
 /** interpreted using yargs @pattern ^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$ */
 export type Command = string;
 
-export type Option = {
+export interface Option {
 	shortFlag?: SingleChar;
 	flag: Verb;
 	description: NonEmptyString;
 	defaultValue?: string | number | boolean;
-	type?: string | number | boolean;
+	type?: 'string' | 'number' | 'boolean';
 	required?: boolean;
 	boolean?: boolean;
-	choices?: string[];
-};
+	choices?: NonEmptyString[];
+}
 
-export type PositionalArg = {
+export interface PositionalArg {
 	placeholder: HumanReadableIdentifier;
 	description: NonEmptyString;
 	defaultValue?: string | number | boolean;
-	type?: string | number | boolean;
+	type?: 'string' | 'number' | 'boolean';
 	required?: boolean;
-};
+}
 
-export type InstalledPlugin = {
+export interface InstalledPlugin {
 	type: 'npm' | 'binary' | 'deno';
-	name: string;
-};
+	name: NonEmptyString;
+}
 
-export type Operation = {
+export interface Operation {
 	operation: Verb;
 	command: Command;
-	description?: string;
+	description?: NonEmptyString;
 	positionals?: PositionalArg[];
 	options?: Option[];
 	handler?: (args: PersistentState) => (args: RequestArgs) => void;
-};
+}
 
 export type ParsedOperation = Omit<Operation, 'handler'>;
 
-export type Template = {
+export interface Template {
 	template: Verb;
 	command: Command;
 	/** @minLength 4 */
-	description: string;
+	description: NonEmptyString;
 	hidden?: boolean;
 	options?: Option;
 	positionals?: PositionalArg;
 	handler: TemplateHandler;
 	encoding?: PluginResponseEncoding;
-};
+}
 
 type TemplateHandler =
 	| NonEmptyString // TODO: should this be Verb?
@@ -104,78 +107,76 @@ export type ParsedTemplate = Omit<Template, 'handler'> & {
 	handler: string;
 };
 
-export type PluginInfo = {
-	name: NonEmptyString;
+export interface PluginSchemaBase {
+	name: Alias;
 	version: VersionNumber;
 	schema: VersionNumber;
 	alias: Alias;
 	tasks?: Task[];
+}
+
+export interface PluginInfo extends PluginSchemaBase {
 	operations?: ParsedOperation[];
 	templates?: ParsedTemplate[];
-};
+}
 
-export type PluginSchema = {
-	name?: Alias;
-	version: VersionNumber;
-	schema: VersionNumber;
-	alias: Alias;
-	tasks?: Task[];
+export interface PluginSchema extends PluginSchemaBase {
 	operations?: Operation[];
 	templates?: Template[];
 	proxy?: (args: RequestArgs) => Promise<PluginProxyResponse>;
 	checkRuntimeDependencies?: (args: RequestArgs) => Promise<PluginDependenciesResponse>;
 	installRuntimeDependencies?: (args: RequestArgs) => Promise<PluginDependenciesResponse>;
-};
+}
 
-export type Task = {
+export interface Task {
 	task: Verb;
 	command: Command;
 	aliases?: Alias[];
 	/** @minLength 3 */
-	description?: string;
-	example?: string;
+	description?: NonEmptyString;
+	example?: NonEmptyString;
 	hidden?: boolean;
 	encoding?: PluginResponseEncoding;
 	handler: 'proxy' | NonEmptyString;
 	options?: Option[];
 	positionals?: PositionalArg[];
-};
+}
 
 // ---- Process Interop ----
 
-export type RuntimeDependency = {
-	name: string;
+export interface RuntimeDependency {
+	name: HumanReadableIdentifier;
 	path: string;
 	version: string;
 	kind: 'required' | 'optional';
-};
+}
 
-export type RuntimeDependencyReport = RuntimeDependency & {
+export interface RuntimeDependencyReport extends RuntimeDependency {
 	met: boolean;
-};
+}
 
-export type PluginDependenciesResponse = {
+export interface PluginDependenciesResponse {
 	report: RuntimeDependencyReport[];
-};
+}
 
-export type PluginJsonResponse = {
+export interface PluginJsonResponse {
 	data?: unknown;
 
 	/** @default none */
 	render: 'none' | 'table' | 'string';
-};
+}
 
 export type PluginProxyResponse = void | PluginJsonResponse;
 
 export type PluginResponseEncoding = undefined | 'none' | 'json' | 'application/json';
 
-export type SanitizedArgs = {
+export interface SanitizedArgs {
 	configAbsPath: NonEmptyString;
 	sandbox: NonEmptyString;
 	configure?: boolean;
 	importAccounts?: boolean;
 	config: ParsedConfig;
-};
+}
 
 export type PluginActionName =
 	| 'proxy'
@@ -192,7 +193,7 @@ export type RequestArgs = Omit<SanitizedArgs, 'config'> & {
 
 // ---- Hash Types ----
 
-/** @pattern ^P[A-Za-z0-9]{50}$ this is an invalid hash for an economical protocol*/
+/** @pattern ^P[A-Za-z0-9]{50}$ this is a valid hash for an economical protocol*/
 export type EconomicalPrototypeHash = string;
 
 /** @pattern ^tz1[A-Za-z0-9]{33}$ */
@@ -203,10 +204,10 @@ export type SHA256 = string;
 
 // ---- Contract Objects ----
 
-export type Contract = {
-	sourceFile: string;
+export interface Contract {
+	sourceFile: NonEmptyString;
 	hash: SHA256;
-};
+}
 
 export type Faucet = {
 	pkh: PublicKeyHash;
@@ -310,7 +311,7 @@ export type Provisions = Provisioner[];
 type EnvironmentName = NonEmptyString;
 
 /** @default en */
-export type HumanLanguange = 'en' | 'fr';
+export type HumanLanguage = 'en' | 'fr';
 
 /**
  * @default contracts
@@ -325,15 +326,14 @@ export type ConfigContractsDir = string;
 export type ConfigArtifactsDir = string;
 
 export type Config = {
-	language?: HumanLanguange;
+	language?: HumanLanguage;
 	plugins?: InstalledPlugin[];
 	contractsDir?: ConfigContractsDir;
 	artifactsDir?: ConfigArtifactsDir;
-
 	network?: Record<string, NetworkConfig>;
 	sandbox?: Record<string, SandboxConfig>;
-	environment?: Record<string, Environment | EnvironmentName>;
-	accounts?: Record<string, Tz | number>;
+	environment?: Record<string, Environment> & { 'default': EnvironmentName };
+	accounts?: Record<string, Tz>;
 	contracts?: Record<string, Contract>;
 	metadata?: MetadataConfig;
 };
