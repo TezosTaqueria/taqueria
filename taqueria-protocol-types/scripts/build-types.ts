@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-const toCamelCase = (name: string) => `${name[0].toLocaleLowerCase()}${name.substring(1)}`;
+const toCamelCase = (name: string) => name.replace(/^([A-Z]+)/, m => m.toLocaleLowerCase());
 
 export const buildTypes = async (typesFilePath: string, outTypesStrictFilePath: string, outDirPath: string) => {
 	const typeCode = await fs.readFile(typesFilePath, { encoding: `utf-8` });
@@ -16,30 +16,26 @@ export const buildTypes = async (typesFilePath: string, outTypesStrictFilePath: 
 	const typeCodeStrict = `
 ${generationWarning}
 ${
-		typeCode.replace(
-			/^export type ([A-Za-z0-9_]+) =((?:.|\n){10})/gm,
-			(m, typeName, nextText) => {
-				const nextTextTrimmed = nextText.trim();
+		typeCode.replace(/^export type ([A-Za-z0-9_]+) =((?:.|\n){10})/gm, (_, typeName: string, nextText: string) => {
+			const nextTextTrimmed = nextText.trim();
 
-				// Object types
-				if (nextTextTrimmed.startsWith(`{`)) {
-					return `export type ${typeName} = { __type: ${typeName} } &${nextText}`;
-				}
+			// Object types
+			if (nextTextTrimmed.startsWith(`{`)) {
+				return `export type ${typeName} = { __type: ${typeName} } &${nextText}`;
+			}
 
-				// simple types
-				if (
-					nextTextTrimmed.startsWith(`string`)
-					|| nextTextTrimmed.startsWith(`number`)
-					|| nextTextTrimmed.startsWith(`boolean`)
-				) {
-					return `export type ${typeName} = { __type: ${typeName} } &${nextText}`;
-				}
+			// simple types
+			if (
+				nextTextTrimmed.startsWith(`string`)
+				|| nextTextTrimmed.startsWith(`number`)
+				|| nextTextTrimmed.startsWith(`boolean`)
+			) {
+				return `export type ${typeName} = { __type: ${typeName} } &${nextText}`;
+			}
 
-				// Else - Use a wrapper type
-				return `export type ${typeName} = { __type: ${typeName} } & ${typeName}Raw
-type ${typeName}Raw =${nextText}`;
-			},
-		)
+			// Else - Use a wrapper type
+			return `export type ${typeName} = { __type: ${typeName} } & ${typeName}Raw;\ntype ${typeName}Raw =${nextText}`;
+		})
 	}
     `.trimStart();
 	await fs.writeFile(outTypesStrictFilePath, typeCodeStrict);
