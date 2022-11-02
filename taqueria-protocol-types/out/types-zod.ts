@@ -188,7 +188,7 @@ const environmentNameSchema = nonEmptyStringSchema.min(
 	'Default environment must reference the name of an existing environment.',
 );
 
-export const humanLanguageSchema = z
+const humanLanguageSchema = z
 	.union([z.literal('en'), z.literal('fr')])
 	.default('en');
 
@@ -281,7 +281,7 @@ export const parsedConfigSchema = configSchema.omit({ sandbox: true }).and(
 	}),
 );
 
-export const pluginSchemaBaseSchema = z.object({
+const pluginSchemaBaseSchema = z.object({
 	name: aliasSchema,
 	version: versionNumberSchema,
 	schema: versionNumberSchema,

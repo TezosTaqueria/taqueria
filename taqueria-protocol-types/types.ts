@@ -107,7 +107,7 @@ export type ParsedTemplate = Omit<Template, 'handler'> & {
 	handler: string;
 };
 
-export type PluginSchemaBase = {
+type PluginSchemaBase = {
 	name: Alias;
 	version: VersionNumber;
 	schema: VersionNumber;
@@ -311,7 +311,7 @@ export type Provisions = Provisioner[];
 type EnvironmentName = NonEmptyString;
 
 /** @default en */
-export type HumanLanguage = 'en' | 'fr';
+type HumanLanguage = 'en' | 'fr';
 
 /**
  * @default contracts

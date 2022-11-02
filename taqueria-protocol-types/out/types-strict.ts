@@ -113,7 +113,7 @@ type ParsedTemplateRaw = Omit<Template, 'handler'> & {
 	handler: string;
 };
 
-export type PluginSchemaBase = { __type: PluginSchemaBase } & {
+type PluginSchemaBase = {
 	name: Alias;
 	version: VersionNumber;
 	schema: VersionNumber;
@@ -325,8 +325,7 @@ type ProvisionsRaw = Provisioner[];
 type EnvironmentName = NonEmptyString;
 
 /** @default en */
-export type HumanLanguage = { __type: HumanLanguage } & HumanLanguageRaw;
-type HumanLanguageRaw = 'en' | 'fr';
+type HumanLanguage = 'en' | 'fr';
 
 /**
  * @default contracts
