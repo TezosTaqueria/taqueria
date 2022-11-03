@@ -93,7 +93,8 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 		})
 		.catch(err => {
 			sendErr(`\n=== For ${sourceFile} ===`);
-			sendErr(err.message.replace(/Command failed.+?\n/, ''));
+			sendErr(err.toString());
+			if (err.message) sendErr(err.message.replace(/Command failed.+?\n/, ''));
 			return {
 				contract: sourceFile,
 				artifact: COMPILE_ERR_MSG,

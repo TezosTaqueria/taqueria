@@ -28,7 +28,6 @@ Plugin.create(i18n => ({
 			command: 'get-image',
 			description: 'Gets the name of the image to be used',
 			handler: 'proxy',
-			encoding: 'json',
 			hidden: true,
 		}),
 	],

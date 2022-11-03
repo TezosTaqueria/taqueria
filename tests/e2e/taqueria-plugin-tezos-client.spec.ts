@@ -86,6 +86,26 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 		}
 	});
 
+	test('Verify that a different version of the tezos client image can be used', async () => {
+		const imageName = 'oxheadalpha/flextesa:20221026';
+
+		const result = await exec(`TAQ_TEZOS_CLIENT_IMAGE=${imageName} taq get-image --plugin tezos-client`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		expect(result.stdout.trim()).toBe(imageName);
+
+		// 1. Copy contract from data folder to taqueria project folder
+		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`);
+
+		// 2. Run taq typecheck
+		const { stdout, stderr } = await exec(`taq typecheck hello-tacos.tz`, { cwd: `./${taqueriaProjectPath}` });
+
+		// 3. Verify that it's well-typed and contains no errors
+		expect(stdout).toBe(contents.oneRowTable);
+		expect(stderr).toBe('');
+	});
+
 	test('Verify that taqueria typechecker task will display proper message if user tries to typecheck contract that does not exist', async () => {
 		try {
 			// 1. Run taq typecheck ${contractName} for contract that does not exist
