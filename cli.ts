@@ -791,7 +791,7 @@ const exposeTask = (
 		cliConfig.command({
 			command: task.command,
 			aliases: task.aliases,
-			description: task.description,
+			description: task.hidden ? null : task.description,
 			example: task.example,
 			builder: (cliConfig: CLIConfig) => {
 				if (task.options) {
