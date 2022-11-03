@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: scaffoldConfigSchema,
 	schema: scaffoldConfigSchema.transform(val => val as ScaffoldConfigStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = ScaffoldConfigStrict;

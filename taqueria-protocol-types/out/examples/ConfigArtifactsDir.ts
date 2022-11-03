@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: configArtifactsDirSchema,
 	schema: configArtifactsDirSchema.transform(val => val as ConfigArtifactsDirStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = ConfigArtifactsDirStrict;

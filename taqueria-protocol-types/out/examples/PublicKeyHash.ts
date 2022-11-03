@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: publicKeyHashSchema,
 	schema: publicKeyHashSchema.transform(val => val as PublicKeyHashStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = PublicKeyHashStrict;

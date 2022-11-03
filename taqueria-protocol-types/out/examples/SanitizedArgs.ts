@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: sanitizedArgsSchema,
 	schema: sanitizedArgsSchema.transform(val => val as SanitizedArgsStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = SanitizedArgsStrict;

@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: verbSchema,
 	schema: verbSchema.transform(val => val as VerbStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = VerbStrict;

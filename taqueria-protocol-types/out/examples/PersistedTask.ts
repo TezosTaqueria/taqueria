@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: persistedTaskSchema,
 	schema: persistedTaskSchema.transform(val => val as PersistedTaskStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = PersistedTaskStrict;

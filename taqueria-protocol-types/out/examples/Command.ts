@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: commandSchema,
 	schema: commandSchema.transform(val => val as CommandStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = CommandStrict;

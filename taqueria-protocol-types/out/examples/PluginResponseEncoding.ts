@@ -42,5 +42,7 @@ export const schemas = {
 	rawSchema: pluginResponseEncodingSchema,
 	schema: pluginResponseEncodingSchema.transform(val => val as PluginResponseEncodingStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = PluginResponseEncodingStrict;

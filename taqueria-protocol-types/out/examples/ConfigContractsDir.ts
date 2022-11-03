@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: configContractsDirSchema,
 	schema: configContractsDirSchema.transform(val => val as ConfigContractsDirStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = ConfigContractsDirStrict;

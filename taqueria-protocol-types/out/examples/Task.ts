@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: taskSchema,
 	schema: taskSchema.transform(val => val as TaskStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = TaskStrict;

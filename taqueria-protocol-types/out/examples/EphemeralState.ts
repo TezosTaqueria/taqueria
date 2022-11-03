@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: ephemeralStateSchema,
 	schema: ephemeralStateSchema.transform(val => val as EphemeralStateStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = EphemeralStateStrict;

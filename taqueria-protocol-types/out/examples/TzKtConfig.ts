@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: tzKtConfigSchema,
 	schema: tzKtConfigSchema.transform(val => val as TzKtConfigStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = TzKtConfigStrict;

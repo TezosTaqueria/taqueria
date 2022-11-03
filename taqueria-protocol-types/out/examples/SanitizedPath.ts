@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: sanitizedPathSchema,
 	schema: sanitizedPathSchema.transform(val => val as SanitizedPathStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = SanitizedPathStrict;

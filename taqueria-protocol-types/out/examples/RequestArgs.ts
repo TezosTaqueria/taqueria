@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: requestArgsSchema,
 	schema: requestArgsSchema.transform(val => val as RequestArgsStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = RequestArgsStrict;

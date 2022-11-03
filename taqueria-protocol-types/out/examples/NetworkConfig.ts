@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: networkConfigSchema,
 	schema: networkConfigSchema.transform(val => val as NetworkConfigStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = NetworkConfigStrict;

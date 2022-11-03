@@ -42,5 +42,7 @@ export const schemas = {
 	rawSchema: runtimeDependencyReportSchema,
 	schema: runtimeDependencyReportSchema.transform(val => val as RuntimeDependencyReportStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = RuntimeDependencyReportStrict;

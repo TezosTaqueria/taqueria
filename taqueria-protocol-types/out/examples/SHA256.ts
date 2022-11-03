@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: sha256Schema,
 	schema: sha256Schema.transform(val => val as SHA256Strict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = SHA256Strict;

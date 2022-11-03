@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: provisionsSchema,
 	schema: provisionsSchema.transform(val => val as ProvisionsStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = ProvisionsStrict;

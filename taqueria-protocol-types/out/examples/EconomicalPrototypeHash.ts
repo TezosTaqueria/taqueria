@@ -42,5 +42,7 @@ export const schemas = {
 	rawSchema: economicalPrototypeHashSchema,
 	schema: economicalPrototypeHashSchema.transform(val => val as EconomicalPrototypeHashStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = EconomicalPrototypeHashStrict;

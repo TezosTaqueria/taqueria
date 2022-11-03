@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: templateSchema,
 	schema: templateSchema.transform(val => val as TemplateStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = TemplateStrict;

@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: positionalArgSchema,
 	schema: positionalArgSchema.transform(val => val as PositionalArgStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = PositionalArgStrict;

@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: pluginInfoSchema,
 	schema: pluginInfoSchema.transform(val => val as PluginInfoStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = PluginInfoStrict;

@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: singleCharSchema,
 	schema: singleCharSchema.transform(val => val as SingleCharStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = SingleCharStrict;

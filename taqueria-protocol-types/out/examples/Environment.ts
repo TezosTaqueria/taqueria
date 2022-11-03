@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: environmentSchema,
 	schema: environmentSchema.transform(val => val as EnvironmentStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = EnvironmentStrict;

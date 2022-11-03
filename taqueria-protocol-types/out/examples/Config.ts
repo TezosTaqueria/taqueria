@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: configSchema,
 	schema: configSchema.transform(val => val as ConfigStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = ConfigStrict;

@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: installedPluginSchema,
 	schema: installedPluginSchema.transform(val => val as InstalledPluginStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = InstalledPluginStrict;

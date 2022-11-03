@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: timestampSchema,
 	schema: timestampSchema.transform(val => val as TimestampStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = TimestampStrict;

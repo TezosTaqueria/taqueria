@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: persistentStateSchema,
 	schema: persistentStateSchema.transform(val => val as PersistentStateStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = PersistentStateStrict;

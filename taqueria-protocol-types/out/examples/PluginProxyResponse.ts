@@ -42,5 +42,7 @@ export const schemas = {
 	rawSchema: pluginProxyResponseSchema,
 	schema: pluginProxyResponseSchema.transform(val => val as PluginProxyResponseStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = PluginProxyResponseStrict;

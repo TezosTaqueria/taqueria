@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: metadataConfigSchema,
 	schema: metadataConfigSchema.transform(val => val as MetadataConfigStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = MetadataConfigStrict;

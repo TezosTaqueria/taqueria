@@ -43,5 +43,7 @@ export const schemas = {
 	rawSchema: pluginDependenciesResponseSchema,
 	schema: pluginDependenciesResponseSchema.transform(val => val as PluginDependenciesResponseStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = PluginDependenciesResponseStrict;

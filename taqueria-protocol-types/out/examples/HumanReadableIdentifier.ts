@@ -42,5 +42,7 @@ export const schemas = {
 	rawSchema: humanReadableIdentifierSchema,
 	schema: humanReadableIdentifierSchema.transform(val => val as HumanReadableIdentifierStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = HumanReadableIdentifierStrict;

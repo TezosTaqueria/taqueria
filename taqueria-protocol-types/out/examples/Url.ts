@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: urlSchema,
 	schema: urlSchema.transform(val => val as UrlStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = UrlStrict;

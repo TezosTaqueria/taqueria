@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: contractSchema,
 	schema: contractSchema.transform(val => val as ContractStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = ContractStrict;

@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: pluginJsonResponseSchema,
 	schema: pluginJsonResponseSchema.transform(val => val as PluginJsonResponseStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = PluginJsonResponseStrict;

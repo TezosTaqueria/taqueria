@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: parsedOperationSchema,
 	schema: parsedOperationSchema.transform(val => val as ParsedOperationStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = ParsedOperationStrict;

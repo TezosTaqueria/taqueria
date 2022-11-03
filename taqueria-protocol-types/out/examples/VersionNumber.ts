@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: versionNumberSchema,
 	schema: versionNumberSchema.transform(val => val as VersionNumberStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = VersionNumberStrict;

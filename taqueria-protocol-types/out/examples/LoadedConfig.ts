@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: loadedConfigSchema,
 	schema: loadedConfigSchema.transform(val => val as LoadedConfigStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = LoadedConfigStrict;

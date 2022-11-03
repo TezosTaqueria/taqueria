@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: aliasSchema,
 	schema: aliasSchema.transform(val => val as AliasStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = AliasStrict;

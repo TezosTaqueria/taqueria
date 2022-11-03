@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: tzSchema,
 	schema: tzSchema.transform(val => val as TzStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = TzStrict;

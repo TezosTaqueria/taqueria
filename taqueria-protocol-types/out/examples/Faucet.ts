@@ -41,5 +41,7 @@ export const schemas = {
 	rawSchema: faucetSchema,
 	schema: faucetSchema.transform(val => val as FaucetStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = FaucetStrict;

@@ -42,5 +42,7 @@ export const schemas = {
 	rawSchema: sandboxAccountConfigSchema,
 	schema: sandboxAccountConfigSchema.transform(val => val as SandboxAccountConfigStrict),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = SandboxAccountConfigStrict;
