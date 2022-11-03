@@ -3,7 +3,11 @@ import path from 'path';
 
 const toCamelCase = (name: string) => name.replace(/^([A-Z]+)/, m => m.toLocaleLowerCase());
 
-export const buildTypes = async (typesFilePath: string, outTypesStrictFilePath: string, outDirPath: string) => {
+export const buildTypes = async (packagePath: string) => {
+	const typesFilePath = path.join(packagePath, `types.ts`);
+	const outTypesStrictFilePath = path.join(packagePath, `out/types-strict.ts`);
+	const outDirPath = path.join(packagePath, `out/types`);
+
 	const typeCode = await fs.readFile(typesFilePath, { encoding: `utf-8` });
 	const typeNames = [...typeCode.matchAll(/^export type ([A-Za-z0-9_]+) =/gm)].map(x => x[1]);
 	console.log(`typeNames`, { typeNames });
@@ -47,14 +51,13 @@ ${
 
 		const content = `
 ${generationWarning}
-// import { ${typeNameRaw}, ${typeNameSchema}, parsingErrorMessages } from '@taqueria-protocol-types';
 import { TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import { FutureInstance, resolve } from 'fluture';
 import { ZodError } from 'zod';
-import { ${typeNameRaw} as ${typeNameStrict} } from '../../../${outTypesStrictFilePath.replace(`.ts`, ``)}';
-import { parsingErrorMessages } from '../../helpers';
-import { ${typeNameRaw} } from '../../types';
-import { ${typeNameSchema} } from '../types-zod';
+import { parsingErrorMessages } from '@taqueria/protocol-types/helpers';
+import { ${typeNameRaw} } from '@taqueria/protocol-types/types';
+import { ${typeNameNominal} as ${typeNameStrict} } from '@taqueria/protocol-types/out/types-strict';
+import { ${typeNameSchema} } from '@taqueria/protocol-types/out/types-zod';
 
 export type { ${typeNameStrict} as ${typeNameNominal} };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('${typeNameRaw}');
@@ -97,7 +100,5 @@ export type t = ${typeNameStrict};
 };
 
 buildTypes(
-	`taqueria-protocol-types/types.ts`,
-	`taqueria-protocol-types/out/types-strict.ts`,
-	`taqueria-protocol-types/out/examples`,
+	`taqueria-protocol-types`,
 ).catch(console.error);

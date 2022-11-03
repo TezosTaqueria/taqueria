@@ -1,1 +1,1 @@
-export * as Alias from './out/examples/Alias';
+export * as Alias from './out/types/Alias';
