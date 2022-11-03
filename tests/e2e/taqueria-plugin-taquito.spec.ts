@@ -130,6 +130,14 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		}
 	});
 
+	test('Verify that taqueria taquito plugin will show an error when running the taq fund command in a non-network environment', async () => {
+		const result = await exec(`taq fund`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		expect(result.stderr).toBe('taq fund can only be executed in a network environment\n');
+	});
+
 	test('Verify that taqueria taquito plugin will create a funding account using the taq fund command', async () => {
 		environment = 'funds';
 
@@ -154,6 +162,33 @@ To fund this account:
 No operations performed
 `,
 		);
+	});
+
+	test('Verify that taqueria taquito plugin will error when trying to fund maxed out accounts', async () => {
+		environment = 'test';
+
+		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
+
+		const result = await exec(`taq fund -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		expect(result.stdout).toContain(
+			'All instantiated accounts in the current environment, "test", are funded up to or beyond the declared amount',
+		);
+	});
+
+	test.only('Verify that taqueria taquito plugin can instantiate accounts on a network', async () => {
+		environment = 'test';
+
+		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
+
+		const result = await exec(`taq instantiate-account -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		expect(result.stdout).toBe(`Accounts instantiated: bob, alice, john, jane, joe.
+Please execute "taq fund" targeting the same environment to fund these accounts\n`);
 	});
 
 	test('Verify that taqueria taquito plugin will show proper error when environment does not exists', async () => {

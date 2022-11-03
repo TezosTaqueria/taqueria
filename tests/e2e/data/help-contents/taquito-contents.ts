@@ -89,8 +89,7 @@ Options:
       --help        Show help                                          [boolean]
 `;
 
-export const helpContentsTaquitoPluginInstantiateAccountSpecific = `
-taq instantiate-account
+export const helpContentsTaquitoPluginInstantiateAccountSpecific = `taq instantiate-account
 
 Instantiate all accounts declared in the "accounts" field at the root level of t
 he config file to a target environment
