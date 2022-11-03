@@ -74,3 +74,32 @@ Options:
       --sender      Name of an instantiated account to use as the sender of the
                     transfer operation
 `;
+
+export const helpContentsTaquitoPluginFundSpecific = `taq fund
+
+Fund all the instantiated accounts up to the desired/declared amount in a target
+ environment
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+  -e, --env         Specify an environment configuration
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
+      --help        Show help                                          [boolean]
+`;
+
+export const helpContentsTaquitoPluginInstantiateAccountSpecific = `
+taq instantiate-account
+
+Instantiate all accounts declared in the "accounts" field at the root level of t
+he config file to a target environment
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+  -e, --env         Specify an environment configuration
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
+      --help        Show help                                          [boolean]
+`;
