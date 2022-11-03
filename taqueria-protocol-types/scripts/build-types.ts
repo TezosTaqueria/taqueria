@@ -36,32 +36,32 @@ ${
 			// Else - Use a wrapper type
 			return `export type ${typeName} = { __type: ${typeName} } & ${typeName}Raw;\ntype ${typeName}Raw =${nextText}`;
 		})
-	}
-    `.trimStart();
+	}`.trimStart();
 	await fs.writeFile(outTypesStrictFilePath, typeCodeStrict);
 
 	for (const typeName of typeNames) {
 		const typeNameRaw = `${typeName}`;
+		const typeNameNominal = `${typeName}`;
 		const typeNameStrict = `${typeName}Strict`;
 		const typeNameSchema = `${toCamelCase(typeName)}Schema`;
 
 		const content = `
 ${generationWarning}
 // import { ${typeNameRaw}, ${typeNameSchema}, parsingErrorMessages } from '@taqueria-protocol-types';
-import { ${typeNameRaw} } from '../../types';
-import { ${typeNameRaw} as ${typeNameStrict} } from '../../../${outTypesStrictFilePath.replace(`.ts`, ``)}';
-import { parsingErrorMessages } from '../../helpers';
-import { ${typeNameSchema} } from '../types-zod';
 import { TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import { FutureInstance, resolve } from 'fluture';
 import { ZodError } from 'zod';
+import { ${typeNameRaw} as ${typeNameStrict} } from '../../../${outTypesStrictFilePath.replace(`.ts`, ``)}';
+import { parsingErrorMessages } from '../../helpers';
+import { ${typeNameRaw} } from '../../types';
+import { ${typeNameSchema} } from '../types-zod';
 
-// type ${typeNameStrict} = ${typeNameRaw} & { __type: '${typeNameRaw}' };
+export type { ${typeNameStrict} as ${typeNameNominal} };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('${typeNameRaw}');
 
 export const from = (input: unknown): ${typeNameStrict} => {
     return ${typeNameSchema}.parse(input) as ${typeNameStrict};
-}
+};
 
 export const create = (input: ${typeNameRaw}): ${typeNameStrict} => from(input);
 
@@ -69,7 +69,6 @@ export const of = (input: unknown): FutureInstance<TaqError, ${typeNameStrict}> 
     try {
         return resolve(${typeNameSchema}.parse(input) as ${typeNameStrict});
     } catch (previous) {
-
         const parseMsg = parseErrMsg(input, previous);
 
         const unknownMsg = unknownErrMsg(input);
@@ -79,11 +78,18 @@ export const of = (input: unknown): FutureInstance<TaqError, ${typeNameStrict}> 
         }
         return toFutureParseUnknownErr(previous, unknownMsg, input);
     }
-}
+};
 
 export const make = (input: ${typeNameStrict}): FutureInstance<TaqError, ${typeNameStrict}> => of(input);
 
-        `;
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: ${typeNameSchema},
+	schema: ${typeNameSchema}.transform(val => val as ${typeNameStrict}),
+};
+
+export type t = ${typeNameStrict};
+        `.trimStart();
 		await fs.writeFile(path.join(outDirPath, `${typeName}.ts`), content);
 	}
 };
