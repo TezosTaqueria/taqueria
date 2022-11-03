@@ -4,7 +4,7 @@ The Taquito plugin provides stateful tasks to originate and interact with smart 
 
 ## Requirements
 
-- Taqueria v0.22.2 or later
+- Taqueria v0.24.0 or later
 - Node.js v16.17.1 or later
 
 ## Installation
