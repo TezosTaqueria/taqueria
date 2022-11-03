@@ -334,7 +334,7 @@ jobs:
           npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY
 
       - name: Publish for prerelease
-        if: ${{ needs.workflow-setup.outputs.prerelease && github.event.release.prerelease && startsWith(github.ref, 'refs/tags/v') }}
+        if: ${{ needs.workflow-setup.outputs.prerelease }}
         run: |
           echo ${NODE_AUTH_TOKEN} >> ~/.npmrc
           npm publish --workspaces --tag 'next' --access public --registry $NPM_REGISTRY

@@ -124,7 +124,7 @@ jobs:
 
       # Separate steps for prerelease and release workflows
       - name: Publish as pre-release
-        if: ${{ inputs.prerelease && github.event.release.prerelease && startsWith(github.ref, 'refs/tags/v') }}
+        if: ${{ inputs.prerelease }}
         uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}
