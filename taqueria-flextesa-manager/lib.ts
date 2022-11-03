@@ -15,7 +15,7 @@ interface Failure {
 	context: unknown;
 }
 
-export const configureTezosClient = () => run(`tezos-client --endpoint http://localhost:20000 config update`);
+export const configureTezosClient = () => run(`octez-client --endpoint http://localhost:20000 config update`);
 
 export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
 	Object.entries(parsedArgs.config.accounts).reduce(
@@ -72,7 +72,7 @@ export const importAccounts = (opts: SanitizedArgs.t) => {
 			return [
 				...retval,
 				run(
-					`tezos-client --protocol ${protocol} import secret key ${accountName} ${account.secretKey} --force | tee /tmp/import-key.log`,
+					`octez-client --protocol ${protocol} import secret key ${accountName} ${account.secretKey} --force | tee /tmp/import-key.log`,
 				),
 			];
 		},
