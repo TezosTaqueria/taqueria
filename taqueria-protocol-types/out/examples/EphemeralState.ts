@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { EphemeralState } from '../../types';
 import { ephemeralStateSchema } from '../types-zod';
 
-// type EphemeralStateStrict = EphemeralState & { __type: 'EphemeralState' };
+export type { EphemeralStateStrict as EphemeralState };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('EphemeralState');
 
 export const from = (input: unknown): EphemeralStateStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, EphemeralStateStric
 };
 
 export const make = (input: EphemeralStateStrict): FutureInstance<TaqError, EphemeralStateStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: ephemeralStateSchema,
+	schema: ephemeralStateSchema.transform(val => val as EphemeralStateStrict),
+};
+
+export type t = EphemeralStateStrict;

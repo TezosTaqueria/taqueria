@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Config } from '../../types';
 import { configSchema } from '../types-zod';
 
-// type ConfigStrict = Config & { __type: 'Config' };
+export type { ConfigStrict as Config };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Config');
 
 export const from = (input: unknown): ConfigStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, ConfigStrict> => {
 };
 
 export const make = (input: ConfigStrict): FutureInstance<TaqError, ConfigStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: configSchema,
+	schema: configSchema.transform(val => val as ConfigStrict),
+};
+
+export type t = ConfigStrict;

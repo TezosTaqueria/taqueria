@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { RequestArgs } from '../../types';
 import { requestArgsSchema } from '../types-zod';
 
-// type RequestArgsStrict = RequestArgs & { __type: 'RequestArgs' };
+export type { RequestArgsStrict as RequestArgs };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('RequestArgs');
 
 export const from = (input: unknown): RequestArgsStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, RequestArgsStrict> 
 };
 
 export const make = (input: RequestArgsStrict): FutureInstance<TaqError, RequestArgsStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: requestArgsSchema,
+	schema: requestArgsSchema.transform(val => val as RequestArgsStrict),
+};
+
+export type t = RequestArgsStrict;

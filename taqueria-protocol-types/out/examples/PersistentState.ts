@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { PersistentState } from '../../types';
 import { persistentStateSchema } from '../types-zod';
 
-// type PersistentStateStrict = PersistentState & { __type: 'PersistentState' };
+export type { PersistentStateStrict as PersistentState };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('PersistentState');
 
 export const from = (input: unknown): PersistentStateStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, PersistentStateStri
 };
 
 export const make = (input: PersistentStateStrict): FutureInstance<TaqError, PersistentStateStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: persistentStateSchema,
+	schema: persistentStateSchema.transform(val => val as PersistentStateStrict),
+};
+
+export type t = PersistentStateStrict;

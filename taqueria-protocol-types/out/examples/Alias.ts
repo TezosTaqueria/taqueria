@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Alias } from '../../types';
 import { aliasSchema } from '../types-zod';
 
-// type AliasStrict = Alias & { __type: 'Alias' };
+export type { AliasStrict as Alias };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Alias');
 
 export const from = (input: unknown): AliasStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, AliasStrict> => {
 };
 
 export const make = (input: AliasStrict): FutureInstance<TaqError, AliasStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: aliasSchema,
+	schema: aliasSchema.transform(val => val as AliasStrict),
+};
+
+export type t = AliasStrict;

@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { InstalledPlugin } from '../../types';
 import { installedPluginSchema } from '../types-zod';
 
-// type InstalledPluginStrict = InstalledPlugin & { __type: 'InstalledPlugin' };
+export type { InstalledPluginStrict as InstalledPlugin };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('InstalledPlugin');
 
 export const from = (input: unknown): InstalledPluginStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, InstalledPluginStri
 };
 
 export const make = (input: InstalledPluginStrict): FutureInstance<TaqError, InstalledPluginStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: installedPluginSchema,
+	schema: installedPluginSchema.transform(val => val as InstalledPluginStrict),
+};
+
+export type t = InstalledPluginStrict;

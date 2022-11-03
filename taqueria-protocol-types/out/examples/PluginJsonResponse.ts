@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { PluginJsonResponse } from '../../types';
 import { pluginJsonResponseSchema } from '../types-zod';
 
-// type PluginJsonResponseStrict = PluginJsonResponse & { __type: 'PluginJsonResponse' };
+export type { PluginJsonResponseStrict as PluginJsonResponse };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('PluginJsonResponse');
 
 export const from = (input: unknown): PluginJsonResponseStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, PluginJsonResponseS
 };
 
 export const make = (input: PluginJsonResponseStrict): FutureInstance<TaqError, PluginJsonResponseStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: pluginJsonResponseSchema,
+	schema: pluginJsonResponseSchema.transform(val => val as PluginJsonResponseStrict),
+};
+
+export type t = PluginJsonResponseStrict;

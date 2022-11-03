@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { SanitizedArgs } from '../../types';
 import { sanitizedArgsSchema } from '../types-zod';
 
-// type SanitizedArgsStrict = SanitizedArgs & { __type: 'SanitizedArgs' };
+export type { SanitizedArgsStrict as SanitizedArgs };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('SanitizedArgs');
 
 export const from = (input: unknown): SanitizedArgsStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, SanitizedArgsStrict
 };
 
 export const make = (input: SanitizedArgsStrict): FutureInstance<TaqError, SanitizedArgsStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: sanitizedArgsSchema,
+	schema: sanitizedArgsSchema.transform(val => val as SanitizedArgsStrict),
+};
+
+export type t = SanitizedArgsStrict;

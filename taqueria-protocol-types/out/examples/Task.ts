@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Task } from '../../types';
 import { taskSchema } from '../types-zod';
 
-// type TaskStrict = Task & { __type: 'Task' };
+export type { TaskStrict as Task };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Task');
 
 export const from = (input: unknown): TaskStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, TaskStrict> => {
 };
 
 export const make = (input: TaskStrict): FutureInstance<TaqError, TaskStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: taskSchema,
+	schema: taskSchema.transform(val => val as TaskStrict),
+};
+
+export type t = TaskStrict;

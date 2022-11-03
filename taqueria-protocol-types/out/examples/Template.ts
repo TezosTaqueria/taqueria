@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Template } from '../../types';
 import { templateSchema } from '../types-zod';
 
-// type TemplateStrict = Template & { __type: 'Template' };
+export type { TemplateStrict as Template };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Template');
 
 export const from = (input: unknown): TemplateStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, TemplateStrict> => 
 };
 
 export const make = (input: TemplateStrict): FutureInstance<TaqError, TemplateStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: templateSchema,
+	schema: templateSchema.transform(val => val as TemplateStrict),
+};
+
+export type t = TemplateStrict;

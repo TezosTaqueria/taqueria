@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { PersistedTask } from '../../types';
 import { persistedTaskSchema } from '../types-zod';
 
-// type PersistedTaskStrict = PersistedTask & { __type: 'PersistedTask' };
+export type { PersistedTaskStrict as PersistedTask };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('PersistedTask');
 
 export const from = (input: unknown): PersistedTaskStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, PersistedTaskStrict
 };
 
 export const make = (input: PersistedTaskStrict): FutureInstance<TaqError, PersistedTaskStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: persistedTaskSchema,
+	schema: persistedTaskSchema.transform(val => val as PersistedTaskStrict),
+};
+
+export type t = PersistedTaskStrict;

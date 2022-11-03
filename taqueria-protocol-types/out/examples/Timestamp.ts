@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Timestamp } from '../../types';
 import { timestampSchema } from '../types-zod';
 
-// type TimestampStrict = Timestamp & { __type: 'Timestamp' };
+export type { TimestampStrict as Timestamp };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Timestamp');
 
 export const from = (input: unknown): TimestampStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, TimestampStrict> =>
 };
 
 export const make = (input: TimestampStrict): FutureInstance<TaqError, TimestampStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: timestampSchema,
+	schema: timestampSchema.transform(val => val as TimestampStrict),
+};
+
+export type t = TimestampStrict;

@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { PublicKeyHash } from '../../types';
 import { publicKeyHashSchema } from '../types-zod';
 
-// type PublicKeyHashStrict = PublicKeyHash & { __type: 'PublicKeyHash' };
+export type { PublicKeyHashStrict as PublicKeyHash };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('PublicKeyHash');
 
 export const from = (input: unknown): PublicKeyHashStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, PublicKeyHashStrict
 };
 
 export const make = (input: PublicKeyHashStrict): FutureInstance<TaqError, PublicKeyHashStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: publicKeyHashSchema,
+	schema: publicKeyHashSchema.transform(val => val as PublicKeyHashStrict),
+};
+
+export type t = PublicKeyHashStrict;

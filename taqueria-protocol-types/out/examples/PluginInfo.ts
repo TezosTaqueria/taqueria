@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { PluginInfo } from '../../types';
 import { pluginInfoSchema } from '../types-zod';
 
-// type PluginInfoStrict = PluginInfo & { __type: 'PluginInfo' };
+export type { PluginInfoStrict as PluginInfo };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('PluginInfo');
 
 export const from = (input: unknown): PluginInfoStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, PluginInfoStrict> =
 };
 
 export const make = (input: PluginInfoStrict): FutureInstance<TaqError, PluginInfoStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: pluginInfoSchema,
+	schema: pluginInfoSchema.transform(val => val as PluginInfoStrict),
+};
+
+export type t = PluginInfoStrict;

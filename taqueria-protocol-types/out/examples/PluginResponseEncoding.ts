@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { PluginResponseEncoding } from '../../types';
 import { pluginResponseEncodingSchema } from '../types-zod';
 
-// type PluginResponseEncodingStrict = PluginResponseEncoding & { __type: 'PluginResponseEncoding' };
+export type { PluginResponseEncodingStrict as PluginResponseEncoding };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('PluginResponseEncoding');
 
 export const from = (input: unknown): PluginResponseEncodingStrict => {
@@ -36,3 +36,11 @@ export const of = (input: unknown): FutureInstance<TaqError, PluginResponseEncod
 
 export const make = (input: PluginResponseEncodingStrict): FutureInstance<TaqError, PluginResponseEncodingStrict> =>
 	of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: pluginResponseEncodingSchema,
+	schema: pluginResponseEncodingSchema.transform(val => val as PluginResponseEncodingStrict),
+};
+
+export type t = PluginResponseEncodingStrict;

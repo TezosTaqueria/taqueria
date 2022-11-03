@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Operation } from '../../types';
 import { operationSchema } from '../types-zod';
 
-// type OperationStrict = Operation & { __type: 'Operation' };
+export type { OperationStrict as Operation };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Operation');
 
 export const from = (input: unknown): OperationStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, OperationStrict> =>
 };
 
 export const make = (input: OperationStrict): FutureInstance<TaqError, OperationStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: operationSchema,
+	schema: operationSchema.transform(val => val as OperationStrict),
+};
+
+export type t = OperationStrict;

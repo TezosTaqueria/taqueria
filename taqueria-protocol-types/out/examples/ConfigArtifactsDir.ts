@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { ConfigArtifactsDir } from '../../types';
 import { configArtifactsDirSchema } from '../types-zod';
 
-// type ConfigArtifactsDirStrict = ConfigArtifactsDir & { __type: 'ConfigArtifactsDir' };
+export type { ConfigArtifactsDirStrict as ConfigArtifactsDir };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('ConfigArtifactsDir');
 
 export const from = (input: unknown): ConfigArtifactsDirStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, ConfigArtifactsDirS
 };
 
 export const make = (input: ConfigArtifactsDirStrict): FutureInstance<TaqError, ConfigArtifactsDirStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: configArtifactsDirSchema,
+	schema: configArtifactsDirSchema.transform(val => val as ConfigArtifactsDirStrict),
+};
+
+export type t = ConfigArtifactsDirStrict;

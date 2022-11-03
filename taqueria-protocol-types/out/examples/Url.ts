@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Url } from '../../types';
 import { urlSchema } from '../types-zod';
 
-// type UrlStrict = Url & { __type: 'Url' };
+export type { UrlStrict as Url };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Url');
 
 export const from = (input: unknown): UrlStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, UrlStrict> => {
 };
 
 export const make = (input: UrlStrict): FutureInstance<TaqError, UrlStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: urlSchema,
+	schema: urlSchema.transform(val => val as UrlStrict),
+};
+
+export type t = UrlStrict;

@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { EconomicalPrototypeHash } from '../../types';
 import { economicalPrototypeHashSchema } from '../types-zod';
 
-// type EconomicalPrototypeHashStrict = EconomicalPrototypeHash & { __type: 'EconomicalPrototypeHash' };
+export type { EconomicalPrototypeHashStrict as EconomicalPrototypeHash };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('EconomicalPrototypeHash');
 
 export const from = (input: unknown): EconomicalPrototypeHashStrict => {
@@ -36,3 +36,11 @@ export const of = (input: unknown): FutureInstance<TaqError, EconomicalPrototype
 
 export const make = (input: EconomicalPrototypeHashStrict): FutureInstance<TaqError, EconomicalPrototypeHashStrict> =>
 	of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: economicalPrototypeHashSchema,
+	schema: economicalPrototypeHashSchema.transform(val => val as EconomicalPrototypeHashStrict),
+};
+
+export type t = EconomicalPrototypeHashStrict;

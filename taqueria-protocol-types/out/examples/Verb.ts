@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Verb } from '../../types';
 import { verbSchema } from '../types-zod';
 
-// type VerbStrict = Verb & { __type: 'Verb' };
+export type { VerbStrict as Verb };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Verb');
 
 export const from = (input: unknown): VerbStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, VerbStrict> => {
 };
 
 export const make = (input: VerbStrict): FutureInstance<TaqError, VerbStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: verbSchema,
+	schema: verbSchema.transform(val => val as VerbStrict),
+};
+
+export type t = VerbStrict;

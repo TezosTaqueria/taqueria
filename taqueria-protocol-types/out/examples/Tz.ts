@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Tz } from '../../types';
 import { tzSchema } from '../types-zod';
 
-// type TzStrict = Tz & { __type: 'Tz' };
+export type { TzStrict as Tz };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Tz');
 
 export const from = (input: unknown): TzStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, TzStrict> => {
 };
 
 export const make = (input: TzStrict): FutureInstance<TaqError, TzStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: tzSchema,
+	schema: tzSchema.transform(val => val as TzStrict),
+};
+
+export type t = TzStrict;

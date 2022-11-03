@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { SingleChar } from '../../types';
 import { singleCharSchema } from '../types-zod';
 
-// type SingleCharStrict = SingleChar & { __type: 'SingleChar' };
+export type { SingleCharStrict as SingleChar };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('SingleChar');
 
 export const from = (input: unknown): SingleCharStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, SingleCharStrict> =
 };
 
 export const make = (input: SingleCharStrict): FutureInstance<TaqError, SingleCharStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: singleCharSchema,
+	schema: singleCharSchema.transform(val => val as SingleCharStrict),
+};
+
+export type t = SingleCharStrict;

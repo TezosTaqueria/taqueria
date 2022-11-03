@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Environment } from '../../types';
 import { environmentSchema } from '../types-zod';
 
-// type EnvironmentStrict = Environment & { __type: 'Environment' };
+export type { EnvironmentStrict as Environment };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Environment');
 
 export const from = (input: unknown): EnvironmentStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, EnvironmentStrict> 
 };
 
 export const make = (input: EnvironmentStrict): FutureInstance<TaqError, EnvironmentStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: environmentSchema,
+	schema: environmentSchema.transform(val => val as EnvironmentStrict),
+};
+
+export type t = EnvironmentStrict;

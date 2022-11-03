@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { NetworkConfig } from '../../types';
 import { networkConfigSchema } from '../types-zod';
 
-// type NetworkConfigStrict = NetworkConfig & { __type: 'NetworkConfig' };
+export type { NetworkConfigStrict as NetworkConfig };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('NetworkConfig');
 
 export const from = (input: unknown): NetworkConfigStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, NetworkConfigStrict
 };
 
 export const make = (input: NetworkConfigStrict): FutureInstance<TaqError, NetworkConfigStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: networkConfigSchema,
+	schema: networkConfigSchema.transform(val => val as NetworkConfigStrict),
+};
+
+export type t = NetworkConfigStrict;

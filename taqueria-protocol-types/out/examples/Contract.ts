@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Contract } from '../../types';
 import { contractSchema } from '../types-zod';
 
-// type ContractStrict = Contract & { __type: 'Contract' };
+export type { ContractStrict as Contract };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Contract');
 
 export const from = (input: unknown): ContractStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, ContractStrict> => 
 };
 
 export const make = (input: ContractStrict): FutureInstance<TaqError, ContractStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: contractSchema,
+	schema: contractSchema.transform(val => val as ContractStrict),
+};
+
+export type t = ContractStrict;

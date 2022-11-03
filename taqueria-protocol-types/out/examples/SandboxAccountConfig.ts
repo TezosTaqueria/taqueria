@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { SandboxAccountConfig } from '../../types';
 import { sandboxAccountConfigSchema } from '../types-zod';
 
-// type SandboxAccountConfigStrict = SandboxAccountConfig & { __type: 'SandboxAccountConfig' };
+export type { SandboxAccountConfigStrict as SandboxAccountConfig };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('SandboxAccountConfig');
 
 export const from = (input: unknown): SandboxAccountConfigStrict => {
@@ -36,3 +36,11 @@ export const of = (input: unknown): FutureInstance<TaqError, SandboxAccountConfi
 
 export const make = (input: SandboxAccountConfigStrict): FutureInstance<TaqError, SandboxAccountConfigStrict> =>
 	of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: sandboxAccountConfigSchema,
+	schema: sandboxAccountConfigSchema.transform(val => val as SandboxAccountConfigStrict),
+};
+
+export type t = SandboxAccountConfigStrict;

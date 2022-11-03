@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { PluginDependenciesResponse } from '../../types';
 import { pluginDependenciesResponseSchema } from '../types-zod';
 
-// type PluginDependenciesResponseStrict = PluginDependenciesResponse & { __type: 'PluginDependenciesResponse' };
+export type { PluginDependenciesResponseStrict as PluginDependenciesResponse };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('PluginDependenciesResponse');
 
 export const from = (input: unknown): PluginDependenciesResponseStrict => {
@@ -37,3 +37,11 @@ export const of = (input: unknown): FutureInstance<TaqError, PluginDependenciesR
 export const make = (
 	input: PluginDependenciesResponseStrict,
 ): FutureInstance<TaqError, PluginDependenciesResponseStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: pluginDependenciesResponseSchema,
+	schema: pluginDependenciesResponseSchema.transform(val => val as PluginDependenciesResponseStrict),
+};
+
+export type t = PluginDependenciesResponseStrict;

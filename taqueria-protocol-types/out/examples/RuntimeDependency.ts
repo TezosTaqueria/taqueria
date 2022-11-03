@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { RuntimeDependency } from '../../types';
 import { runtimeDependencySchema } from '../types-zod';
 
-// type RuntimeDependencyStrict = RuntimeDependency & { __type: 'RuntimeDependency' };
+export type { RuntimeDependencyStrict as RuntimeDependency };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('RuntimeDependency');
 
 export const from = (input: unknown): RuntimeDependencyStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, RuntimeDependencySt
 };
 
 export const make = (input: RuntimeDependencyStrict): FutureInstance<TaqError, RuntimeDependencyStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: runtimeDependencySchema,
+	schema: runtimeDependencySchema.transform(val => val as RuntimeDependencyStrict),
+};
+
+export type t = RuntimeDependencyStrict;

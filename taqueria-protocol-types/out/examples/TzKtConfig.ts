@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { TzKtConfig } from '../../types';
 import { tzKtConfigSchema } from '../types-zod';
 
-// type TzKtConfigStrict = TzKtConfig & { __type: 'TzKtConfig' };
+export type { TzKtConfigStrict as TzKtConfig };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('TzKtConfig');
 
 export const from = (input: unknown): TzKtConfigStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, TzKtConfigStrict> =
 };
 
 export const make = (input: TzKtConfigStrict): FutureInstance<TaqError, TzKtConfigStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: tzKtConfigSchema,
+	schema: tzKtConfigSchema.transform(val => val as TzKtConfigStrict),
+};
+
+export type t = TzKtConfigStrict;

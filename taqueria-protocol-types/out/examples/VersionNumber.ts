@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { VersionNumber } from '../../types';
 import { versionNumberSchema } from '../types-zod';
 
-// type VersionNumberStrict = VersionNumber & { __type: 'VersionNumber' };
+export type { VersionNumberStrict as VersionNumber };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('VersionNumber');
 
 export const from = (input: unknown): VersionNumberStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, VersionNumberStrict
 };
 
 export const make = (input: VersionNumberStrict): FutureInstance<TaqError, VersionNumberStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: versionNumberSchema,
+	schema: versionNumberSchema.transform(val => val as VersionNumberStrict),
+};
+
+export type t = VersionNumberStrict;

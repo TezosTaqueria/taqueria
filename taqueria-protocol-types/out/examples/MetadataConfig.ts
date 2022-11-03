@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { MetadataConfig } from '../../types';
 import { metadataConfigSchema } from '../types-zod';
 
-// type MetadataConfigStrict = MetadataConfig & { __type: 'MetadataConfig' };
+export type { MetadataConfigStrict as MetadataConfig };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('MetadataConfig');
 
 export const from = (input: unknown): MetadataConfigStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, MetadataConfigStric
 };
 
 export const make = (input: MetadataConfigStrict): FutureInstance<TaqError, MetadataConfigStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: metadataConfigSchema,
+	schema: metadataConfigSchema.transform(val => val as MetadataConfigStrict),
+};
+
+export type t = MetadataConfigStrict;

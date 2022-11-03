@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { HumanReadableIdentifier } from '../../types';
 import { humanReadableIdentifierSchema } from '../types-zod';
 
-// type HumanReadableIdentifierStrict = HumanReadableIdentifier & { __type: 'HumanReadableIdentifier' };
+export type { HumanReadableIdentifierStrict as HumanReadableIdentifier };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('HumanReadableIdentifier');
 
 export const from = (input: unknown): HumanReadableIdentifierStrict => {
@@ -36,3 +36,11 @@ export const of = (input: unknown): FutureInstance<TaqError, HumanReadableIdenti
 
 export const make = (input: HumanReadableIdentifierStrict): FutureInstance<TaqError, HumanReadableIdentifierStrict> =>
 	of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: humanReadableIdentifierSchema,
+	schema: humanReadableIdentifierSchema.transform(val => val as HumanReadableIdentifierStrict),
+};
+
+export type t = HumanReadableIdentifierStrict;

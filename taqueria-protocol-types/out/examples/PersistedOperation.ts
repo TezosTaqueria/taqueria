@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { PersistedOperation } from '../../types';
 import { persistedOperationSchema } from '../types-zod';
 
-// type PersistedOperationStrict = PersistedOperation & { __type: 'PersistedOperation' };
+export type { PersistedOperationStrict as PersistedOperation };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('PersistedOperation');
 
 export const from = (input: unknown): PersistedOperationStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, PersistedOperationS
 };
 
 export const make = (input: PersistedOperationStrict): FutureInstance<TaqError, PersistedOperationStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: persistedOperationSchema,
+	schema: persistedOperationSchema.transform(val => val as PersistedOperationStrict),
+};
+
+export type t = PersistedOperationStrict;

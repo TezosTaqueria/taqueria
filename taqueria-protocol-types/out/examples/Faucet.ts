@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Faucet } from '../../types';
 import { faucetSchema } from '../types-zod';
 
-// type FaucetStrict = Faucet & { __type: 'Faucet' };
+export type { FaucetStrict as Faucet };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Faucet');
 
 export const from = (input: unknown): FaucetStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, FaucetStrict> => {
 };
 
 export const make = (input: FaucetStrict): FutureInstance<TaqError, FaucetStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: faucetSchema,
+	schema: faucetSchema.transform(val => val as FaucetStrict),
+};
+
+export type t = FaucetStrict;

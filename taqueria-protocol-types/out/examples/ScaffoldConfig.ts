@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { ScaffoldConfig } from '../../types';
 import { scaffoldConfigSchema } from '../types-zod';
 
-// type ScaffoldConfigStrict = ScaffoldConfig & { __type: 'ScaffoldConfig' };
+export type { ScaffoldConfigStrict as ScaffoldConfig };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('ScaffoldConfig');
 
 export const from = (input: unknown): ScaffoldConfigStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, ScaffoldConfigStric
 };
 
 export const make = (input: ScaffoldConfigStrict): FutureInstance<TaqError, ScaffoldConfigStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: scaffoldConfigSchema,
+	schema: scaffoldConfigSchema.transform(val => val as ScaffoldConfigStrict),
+};
+
+export type t = ScaffoldConfigStrict;

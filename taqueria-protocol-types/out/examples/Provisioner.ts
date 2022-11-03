@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Provisioner } from '../../types';
 import { provisionerSchema } from '../types-zod';
 
-// type ProvisionerStrict = Provisioner & { __type: 'Provisioner' };
+export type { ProvisionerStrict as Provisioner };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Provisioner');
 
 export const from = (input: unknown): ProvisionerStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, ProvisionerStrict> 
 };
 
 export const make = (input: ProvisionerStrict): FutureInstance<TaqError, ProvisionerStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: provisionerSchema,
+	schema: provisionerSchema.transform(val => val as ProvisionerStrict),
+};
+
+export type t = ProvisionerStrict;

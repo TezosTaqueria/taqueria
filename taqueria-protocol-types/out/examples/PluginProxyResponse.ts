@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { PluginProxyResponse } from '../../types';
 import { pluginProxyResponseSchema } from '../types-zod';
 
-// type PluginProxyResponseStrict = PluginProxyResponse & { __type: 'PluginProxyResponse' };
+export type { PluginProxyResponseStrict as PluginProxyResponse };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('PluginProxyResponse');
 
 export const from = (input: unknown): PluginProxyResponseStrict => {
@@ -36,3 +36,11 @@ export const of = (input: unknown): FutureInstance<TaqError, PluginProxyResponse
 
 export const make = (input: PluginProxyResponseStrict): FutureInstance<TaqError, PluginProxyResponseStrict> =>
 	of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: pluginProxyResponseSchema,
+	schema: pluginProxyResponseSchema.transform(val => val as PluginProxyResponseStrict),
+};
+
+export type t = PluginProxyResponseStrict;

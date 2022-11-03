@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { SandboxConfig } from '../../types';
 import { sandboxConfigSchema } from '../types-zod';
 
-// type SandboxConfigStrict = SandboxConfig & { __type: 'SandboxConfig' };
+export type { SandboxConfigStrict as SandboxConfig };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('SandboxConfig');
 
 export const from = (input: unknown): SandboxConfigStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, SandboxConfigStrict
 };
 
 export const make = (input: SandboxConfigStrict): FutureInstance<TaqError, SandboxConfigStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: sandboxConfigSchema,
+	schema: sandboxConfigSchema.transform(val => val as SandboxConfigStrict),
+};
+
+export type t = SandboxConfigStrict;

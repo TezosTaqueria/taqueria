@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { PositionalArg } from '../../types';
 import { positionalArgSchema } from '../types-zod';
 
-// type PositionalArgStrict = PositionalArg & { __type: 'PositionalArg' };
+export type { PositionalArgStrict as PositionalArg };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('PositionalArg');
 
 export const from = (input: unknown): PositionalArgStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, PositionalArgStrict
 };
 
 export const make = (input: PositionalArgStrict): FutureInstance<TaqError, PositionalArgStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: positionalArgSchema,
+	schema: positionalArgSchema.transform(val => val as PositionalArgStrict),
+};
+
+export type t = PositionalArgStrict;

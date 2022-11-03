@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { ConfigContractsDir } from '../../types';
 import { configContractsDirSchema } from '../types-zod';
 
-// type ConfigContractsDirStrict = ConfigContractsDir & { __type: 'ConfigContractsDir' };
+export type { ConfigContractsDirStrict as ConfigContractsDir };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('ConfigContractsDir');
 
 export const from = (input: unknown): ConfigContractsDirStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, ConfigContractsDirS
 };
 
 export const make = (input: ConfigContractsDirStrict): FutureInstance<TaqError, ConfigContractsDirStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: configContractsDirSchema,
+	schema: configContractsDirSchema.transform(val => val as ConfigContractsDirStrict),
+};
+
+export type t = ConfigContractsDirStrict;

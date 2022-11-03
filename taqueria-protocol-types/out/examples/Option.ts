@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Option } from '../../types';
 import { optionSchema } from '../types-zod';
 
-// type OptionStrict = Option & { __type: 'Option' };
+export type { OptionStrict as Option };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Option');
 
 export const from = (input: unknown): OptionStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, OptionStrict> => {
 };
 
 export const make = (input: OptionStrict): FutureInstance<TaqError, OptionStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: optionSchema,
+	schema: optionSchema.transform(val => val as OptionStrict),
+};
+
+export type t = OptionStrict;

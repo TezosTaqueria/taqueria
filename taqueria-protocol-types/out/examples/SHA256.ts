@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { SHA256 } from '../../types';
 import { sha256Schema } from '../types-zod';
 
-// type SHA256Strict = SHA256 & { __type: 'SHA256' };
+export type { SHA256Strict as SHA256 };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('SHA256');
 
 export const from = (input: unknown): SHA256Strict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, SHA256Strict> => {
 };
 
 export const make = (input: SHA256Strict): FutureInstance<TaqError, SHA256Strict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: sha256Schema,
+	schema: sha256Schema.transform(val => val as SHA256Strict),
+};
+
+export type t = SHA256Strict;

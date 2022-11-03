@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { NonEmptyString } from '../../types';
 import { nonEmptyStringSchema } from '../types-zod';
 
-// type NonEmptyStringStrict = NonEmptyString & { __type: 'NonEmptyString' };
+export type { NonEmptyStringStrict as NonEmptyString };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('NonEmptyString');
 
 export const from = (input: unknown): NonEmptyStringStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, NonEmptyStringStric
 };
 
 export const make = (input: NonEmptyStringStrict): FutureInstance<TaqError, NonEmptyStringStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: nonEmptyStringSchema,
+	schema: nonEmptyStringSchema.transform(val => val as NonEmptyStringStrict),
+};
+
+export type t = NonEmptyStringStrict;

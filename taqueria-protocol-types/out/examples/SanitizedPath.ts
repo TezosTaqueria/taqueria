@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { SanitizedPath } from '../../types';
 import { sanitizedPathSchema } from '../types-zod';
 
-// type SanitizedPathStrict = SanitizedPath & { __type: 'SanitizedPath' };
+export type { SanitizedPathStrict as SanitizedPath };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('SanitizedPath');
 
 export const from = (input: unknown): SanitizedPathStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, SanitizedPathStrict
 };
 
 export const make = (input: SanitizedPathStrict): FutureInstance<TaqError, SanitizedPathStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: sanitizedPathSchema,
+	schema: sanitizedPathSchema.transform(val => val as SanitizedPathStrict),
+};
+
+export type t = SanitizedPathStrict;

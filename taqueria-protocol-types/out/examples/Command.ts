@@ -10,7 +10,7 @@ import { parsingErrorMessages } from '../../helpers';
 import { Command } from '../../types';
 import { commandSchema } from '../types-zod';
 
-// type CommandStrict = Command & { __type: 'Command' };
+export type { CommandStrict as Command };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('Command');
 
 export const from = (input: unknown): CommandStrict => {
@@ -35,3 +35,11 @@ export const of = (input: unknown): FutureInstance<TaqError, CommandStrict> => {
 };
 
 export const make = (input: CommandStrict): FutureInstance<TaqError, CommandStrict> => of(input);
+
+// TEMP: for interoperation with old protocol types during transition
+export const schemas = {
+	rawSchema: commandSchema,
+	schema: commandSchema.transform(val => val as CommandStrict),
+};
+
+export type t = CommandStrict;
