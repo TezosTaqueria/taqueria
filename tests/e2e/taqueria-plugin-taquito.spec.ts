@@ -25,30 +25,28 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	});
 
 	test('Verify that the taquito plugin exposes the associated commands in the help menu', async () => {
-		try {
-			const taquitoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
-			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPlugin);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		const taquitoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+		expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPlugin);
 	});
 
-	test('Verify that the taquito plugin exposes the associated options in the help menu', async () => {
-		try {
-			const taquitoHelpContents = await exec(`taq deploy --help --projectDir=${taqueriaProjectPath}`);
-			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+	test('Verify that the taquito plugin exposes the associated options for deploy in the help menu', async () => {
+		const taquitoHelpContents = await exec(`taq deploy --help --projectDir=${taqueriaProjectPath}`);
+		expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
 	});
 
-	test('Verify that the taquito plugin aliases expose the correct info in the help menu', async () => {
-		try {
-			const taquitoHelpContents = await exec(`taq originate --help --projectDir=${taqueriaProjectPath}`);
-			expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+	test('Verify that the taquito plugin deploy alias exposes the correct info in the help menu', async () => {
+		const taquitoHelpContents = await exec(`taq originate --help --projectDir=${taqueriaProjectPath}`);
+		expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
+	});
+
+	test('Verify that the taquito plugin transfer task expose the correct info in the help menu', async () => {
+		const taquitoHelpContents = await exec(`taq transfer --help --projectDir=${taqueriaProjectPath}`);
+		expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginTransferSpecific);
+	});
+
+	test('Verify that the taquito plugin transfer alias exposes the correct info in the help menu', async () => {
+		const taquitoHelpContents = await exec(`taq call --help --projectDir=${taqueriaProjectPath}`);
+		expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginTransferSpecific);
 	});
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically

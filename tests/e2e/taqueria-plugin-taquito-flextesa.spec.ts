@@ -129,6 +129,27 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		}
 	});
 
+	test('Verify that taqueria taquito plugin cant transfer amount of tezos using transfer command from one account to another', async () => {
+		try {
+			// 1. Setting up environment name
+			environment = 'development';
+
+			// 2. Get Bob's and Alice's account addresses
+			const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			const addressArray = itemArrayInTable(addressRegex, initialContractList);
+
+			// 3. Call transfer to transfer
+			await exec(`taq transfer ${addressArray[1]} --mutez 1000000000`, { cwd: `./${taqueriaProjectPath}` });
+
+			// 4. Verify transfer results
+			const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			const amountArray = itemArrayInTable(amountRegex, resultContractList);
+			expect(amountArray[1]).toEqual('4000 ꜩ');
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
 	test('Verify that taqueria taquito plugin can transfer amount of tezos using transfer command from one account to another if account does not enough tezos', async () => {
 		try {
 			// 1. Setting up environment name
