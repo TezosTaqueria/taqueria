@@ -65,6 +65,10 @@
 		"@taqueria/protocol/ScaffoldConfig": "./taqueria-protocol/ScaffoldConfig.ts",
 		"@taqueria/protocol/tzkt-config": "./taqueria-protocol/tzkt-config.ts",
 		"@taqueria/protocol/taqueria-protocol-types": "/taqueria-protocol/taqueria-protocol-types.ts",
-		"@taqueria/protocol-types/out/examples/Alias": "./taqueria-protocol-types/out/examples/Alias.ts"
+		"@taqueria/protocol-types/helpers": "./taqueria-protocol-types/helpers.ts",
+		"@taqueria/protocol-types/types": "./taqueria-protocol-types/types.ts",
+		"@taqueria/protocol-types/out/types-strict": "./taqueria-protocol-types/out/types-strict.ts",
+		"@taqueria/protocol-types/out/types-zod": "./taqueria-protocol-types/out/types-zod.ts",
+		"@taqueria/protocol-types/out/types/Alias": "./taqueria-protocol-types/out/types/Alias.ts"
 	}
 }
