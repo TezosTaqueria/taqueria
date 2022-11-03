@@ -1,6 +1,6 @@
-import * as Alias from './out/examples/Alias';
-import * as PluginSchema from './out/examples/PluginSchema';
-import * as VersionNumber from './out/examples/VersionNumber';
+import * as Alias from './out/types/Alias';
+import * as PluginSchema from './out/types/PluginSchema';
+import * as VersionNumber from './out/types/VersionNumber';
 
 // To try in vscode:
 // - Hover over the var names and fields (this should show the nominal type names)

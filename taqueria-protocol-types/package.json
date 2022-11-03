@@ -39,6 +39,14 @@
 		"./*.js": {
 			"import": "./*.mjs",
 			"default": "./*.js"
+		},
+		"./out/*": {
+			"import": "./*.mjs",
+			"default": "./*.js"
+		},
+		"./out/examples/*": {
+			"import": "./*.mjs",
+			"default": "./*.js"
 		}
 	},
 	"dependencies": {
