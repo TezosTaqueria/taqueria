@@ -87,6 +87,8 @@ export const schemas = {
 	rawSchema: ${typeNameSchema},
 	schema: ${typeNameSchema}.transform(val => val as ${typeNameStrict}),
 };
+export const rawSchema = schemas.rawSchema;
+export const internalSchema = schemas.schema;
 
 export type t = ${typeNameStrict};
         `.trimStart();
