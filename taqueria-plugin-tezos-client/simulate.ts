@@ -66,7 +66,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
 
 	const cmd =
-		`${baseCmd} tezos-client ${GLOBAL_OPTIONS} run script ${inputFile} on storage \'${processedStorage}\' and input \'${processedParam}\' ${entrypoint}`;
+		`${baseCmd} octez-client ${GLOBAL_OPTIONS} run script ${inputFile} on storage \'${processedStorage}\' and input \'${processedParam}\' ${entrypoint}`;
 	return cmd;
 };
 

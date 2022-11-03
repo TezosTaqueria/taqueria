@@ -17,7 +17,7 @@ const getTypecheckCmd = async (parsedArgs: Opts, sourceFile: string): Promise<st
 	const flextesaImage = DOCKER_IMAGE;
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
-	const cmd = `${baseCmd} tezos-client ${GLOBAL_OPTIONS} typecheck script ${inputFile}`;
+	const cmd = `${baseCmd} octez-client ${GLOBAL_OPTIONS} typecheck script ${inputFile}`;
 	return cmd;
 };
 
