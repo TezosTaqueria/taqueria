@@ -646,7 +646,7 @@
 	},
 	"dependencies": {
 		"@microsoft/signalr": "^6.0.8",
-		"@taqueria/protocol": "^0.23.0-rc.1",
+		"@taqueria/protocol": "^0.23.0-rc.2",
 		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
 		"eventsource": "^2.0.2",
