@@ -104,7 +104,7 @@ export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqErr
 };
 
 export const getFlextesaImage = (arch: 'linux/arm64/v8' | 'linux/amd64'): string =>
-	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:rc-20220915-arm64' : 'oxheadalpha/flextesa:20220715';
+	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:20221026' : 'oxheadalpha/flextesa:20221026';
 
 export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError> =>
 	new Promise((resolve, reject) => {

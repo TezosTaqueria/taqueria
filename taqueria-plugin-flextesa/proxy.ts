@@ -253,7 +253,7 @@ const getAccountBalances = (sandboxName: string, sandbox: SandboxConfig.t, opts:
 
 			const getBalanceProcess = getArch()
 				.then(_ => getContainerName(sandboxName, opts))
-				.then(containerName => `docker exec ${containerName} tezos-client get balance for ${accountName.trim()}`)
+				.then(containerName => `docker exec ${containerName} octez-client get balance for ${accountName.trim()}`)
 				.then(execCmd)
 				.then(({ stdout, stderr }) => {
 					if (stderr.length > 0) sendErr(stderr);
