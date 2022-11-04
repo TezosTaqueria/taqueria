@@ -1,12 +1,11 @@
 import { Protocol, writeJsonFile } from '@taqueria/node-sdk';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
+import { Config, SandboxAccountConfig } from '@taqueria/protocol/taqueria-protocol-types';
 import { exec } from 'child_process';
 import { execa } from 'execa';
 import yargs, { parse } from 'yargs';
 import * as SandboxAccount from './SandboxAccount';
 import * as SanitizedArgs from './SanitizedArgs';
-
-import { Config, SandboxAccountConfig } from '@taqueria/protocol/taqueria-protocol-types';
 
 const PROTOCOL_IDENTIFIER = 'PtKathmankSp';
 const PROTOCOL_NAME = 'Kathmandu';
