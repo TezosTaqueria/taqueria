@@ -117,7 +117,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		}
 	});
 
-	test('Verify that taqueria taquito plugin cant transfer amount of tezos using transfer command from one account to another', async () => {
+	test('Verify that taqueria taquito plugin cant transfer 0 tez using transfer command from one account to another', async () => {
 		try {
 			// 1. Setting up environment name
 			environment = 'development';
@@ -132,6 +132,31 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			expect(transferResult.stderr).toContain('Error while performing operation');
 			expect(transferResult.stderr).toContain('empty_transaction');
 			expect(transferResult.stderr).toContain('No operations performed');
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	test('Verify that taqueria taquito plugin cant transfer from non-instantiated account to another', async () => {
+		try {
+			// 1. Setting up environment name
+			environment = 'development';
+
+			// 2. Get Bob's and Alice's account addresses
+			const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+			const addressArray = itemArrayInTable(addressRegex, initialContractList);
+
+			// 3. Call transfer to transfer
+			const transferResult = await exec(
+				`taq transfer ${addressArray[1]} --mutez 1000000000 --sender ${addressArray[3]}`,
+				{ cwd: `./${taqueriaProjectPath}` },
+			);
+
+			console.log(transferResult);
+			expect(transferResult.stderr).toContain(
+				`${addressArray[3]} is not an account instantiated in the current environment. Check .taq/config.json`,
+			);
+			expect(transferResult.stderr).toContain(`No operations performed`);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}

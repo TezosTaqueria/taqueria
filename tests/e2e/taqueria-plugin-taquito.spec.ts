@@ -229,6 +229,31 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		expect(amountFundedArray).toStrictEqual(configTezAmounts);
 	});
 
+	test.skip('Verify that taqueria taquito plugin will can send from one instantiated account to another', async () => {
+		environment = 'test';
+
+		await exec(`cp e2e/data/config-taquito-test-environment-low-tez.json ${taqueriaProjectPath}/.taq/config.json`);
+
+		const accountResult = await exec(`taq instantiate-account -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		const configContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		);
+		const configTezAmounts = Object.values(configContents.accounts);
+
+		expect(accountResult.stdout).toBe(`Accounts instantiated: bob, alice, john, jane, joe.
+Please execute "taq fund" targeting the same environment to fund these accounts\n`);
+
+		const fundResult = await exec(`taq fund -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		const amountFundedArray = itemArrayInTable(/[0-9]{7,}/g, fundResult);
+		expect(amountFundedArray).toStrictEqual(configTezAmounts);
+	});
+
 	test('Verify that taqueria taquito plugin will show proper error when environment does not exists', async () => {
 		try {
 			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
