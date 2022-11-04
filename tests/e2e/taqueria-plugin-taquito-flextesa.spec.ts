@@ -127,12 +127,11 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
 			// 3. Call transfer to transfer
-			await exec(`taq transfer ${addressArray[1]} --mutez 1000000000`, { cwd: `./${taqueriaProjectPath}` });
+			const transferResult = await exec(`taq transfer ${addressArray[1]}`, { cwd: `./${taqueriaProjectPath}` });
 
-			// 4. Verify transfer results
-			const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-			const amountArray = itemArrayInTable(amountRegex, resultContractList);
-			expect(amountArray[1]).toEqual('4000 ꜩ');
+			expect(transferResult.stderr).toContain('Error while performing operation');
+			expect(transferResult.stderr).toContain('empty_transaction');
+			expect(transferResult.stderr).toContain('No operations performed');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
