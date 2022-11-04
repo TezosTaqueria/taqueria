@@ -2,6 +2,10 @@ name: VSCode Extension
 
 on:
   workflow_call:
+    inputs:
+      prerelease:
+        required: false
+        type: string
     secrets:
       GCP_PROJECT:
         required: true
@@ -98,7 +102,6 @@ jobs:
 
   publish-marketplace:
     name: Publish VSCode Extension
-    if: ${{ github.event_name != 'pull_request' }}
     needs:
       - test-build
     runs-on: ubuntu-latest
@@ -121,7 +124,7 @@ jobs:
 
       # Separate steps for prerelease and release workflows
       - name: Publish as pre-release
-        if: ${{ github.event.release.prerelease }}
+        if: ${{ inputs.prerelease }}
         uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}
@@ -131,7 +134,7 @@ jobs:
           preRelease: true
 
       - name: Publish as official release
-        if: ${{ !github.event.release.prerelease }}
+        if: ${{ !inputs.prerelease && !github.event.release.prerelease && github.event.action == 'published' }}
         uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}
