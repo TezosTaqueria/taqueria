@@ -8,6 +8,9 @@ import * as SanitizedArgs from './SanitizedArgs';
 
 import { Config, SandboxAccountConfig } from '@taqueria/protocol/taqueria-protocol-types';
 
+const protocolIdentifier = 'PtKathmankSp';
+const protocolName = 'Kathmandu';
+
 type Args = ReturnType<typeof yargs> & { config: string; configure: boolean; importAccounts: boolean; sandbox: string };
 
 interface Failure {
@@ -47,7 +50,7 @@ export const startMininet = (parsedArgs: SanitizedArgs.t) => {
 		...getBootstrapFlags(parsedArgs),
 		'--until-level 200_000_000',
 		// TODO: Find a way of mapping protocol hash to protocol kind
-		`--protocol-kind "Kathmandu"`,
+		`--protocol-kind "${protocolName}"`,
 	];
 
 	return execa('flextesa', cmdArgs, {
@@ -68,11 +71,10 @@ export const importAccounts = (opts: SanitizedArgs.t) => {
 			if (accountName === 'default') return retval;
 			const account = accountDetails as SandboxAccountConfig.t;
 			// const protocol = getSandboxProtocol(opts)
-			const protocol = 'PtKathmankSp';
 			return [
 				...retval,
 				run(
-					`octez-client --protocol ${protocol} import secret key ${accountName} ${account.secretKey} --force | tee /tmp/import-key.log`,
+					`octez-client --protocol ${protocolIdentifier} import secret key ${accountName} ${account.secretKey} --force | tee /tmp/import-key.log`,
 				),
 			];
 		},
