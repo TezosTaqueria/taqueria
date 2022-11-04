@@ -47,7 +47,7 @@ export const startMininet = (parsedArgs: SanitizedArgs.t) => {
 		...getBootstrapFlags(parsedArgs),
 		'--until-level 200_000_000',
 		// TODO: Find a way of mapping protocol hash to protocol kind
-		`--protocol-kind "Alpha"`,
+		`--protocol-kind "Kathmandu"`,
 	];
 
 	return execa('flextesa', cmdArgs, {
@@ -68,7 +68,7 @@ export const importAccounts = (opts: SanitizedArgs.t) => {
 			if (accountName === 'default') return retval;
 			const account = accountDetails as SandboxAccountConfig.t;
 			// const protocol = getSandboxProtocol(opts)
-			const protocol = 'ProtoALphaAL';
+			const protocol = 'PtKathmankSp';
 			return [
 				...retval,
 				run(
