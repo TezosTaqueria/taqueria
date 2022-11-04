@@ -20,15 +20,6 @@ import {
 
 type TableRow = { contract: string; result: string };
 
-// This is needed mostly due to the fact that execCmd() wraps the command in double quotes
-const preprocessString = (value: string): string => {
-	// 1. if the string contains escaped double quotes, escape them further
-	value = value.replace(/\\"/g, '\\\\\\"');
-	// 2. if the string contains unescaped double quotes, escape them
-	value = value.replace(/(?<!\\)"/g, '\\"');
-	return value;
-};
-
 const getDefaultStorageFilename = (contractName: string): string => {
 	const baseFilename = basename(contractName, extname(contractName));
 	const extFilename = extname(contractName);
@@ -56,9 +47,6 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const paramFilename = parsedArgs.param;
 	const param = (await getParameter(parsedArgs, paramFilename)).trim();
 
-	const processedStorage = preprocessString(storage);
-	const processedParam = preprocessString(param);
-
 	const arch = await getArch();
 	const flextesaImage = await getFlextesaImage(arch);
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
@@ -66,7 +54,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
 
 	const cmd =
-		`${baseCmd} octez-client ${GLOBAL_OPTIONS} run script ${inputFile} on storage \'${processedStorage}\' and input \'${processedParam}\' ${entrypoint}`;
+		`${baseCmd} octez-client ${GLOBAL_OPTIONS} run script ${inputFile} on storage \'${storage}\' and input \'${param}\' ${entrypoint}`;
 	return cmd;
 };
 
