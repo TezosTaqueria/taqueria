@@ -1,15 +1,8 @@
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import utils from 'util';
-import {
-	storage_part1,
-	storage_part2,
-	storage_part3,
-	storage_part4,
-	storage_part5,
-} from './data/all-types-storage-data';
 import { transferOutput } from './data/help-contents/taquito-flextesa-content';
-import { generateTestProject, getContainerName } from './utils/utils';
+import { generateTestProject, getContainerName, itemArrayInTable } from './utils/utils';
 const exec = utils.promisify(exec1);
 
 const taqueriaProjectPath = 'e2e/auto-test-taquito-flextesa-plugin';
@@ -18,11 +11,6 @@ let environment: string;
 let dockerName: string = 'local';
 const addressRegex = /tz1[A-Za-z0-9]{7,}/g;
 const amountRegex = /[0-9]{4,} ꜩ/g;
-
-const itemArrayInTable = (regex: RegExp, inputTable: { stdout: string; stderr: string }) => {
-	const matchArray = [...inputTable.stdout.matchAll(regex)];
-	return Array.from(matchArray, item => item[0]);
-};
 
 describe('E2E Testing for taqueria taquito plugin', () => {
 	beforeAll(async () => {

@@ -3,7 +3,7 @@ import fsPromises from 'fs/promises';
 import utils from 'util';
 import * as contents from './data/help-contents/taquito-contents';
 import { networkInfo } from './data/network-info';
-import { checkContractExistsOnNetwork, generateTestProject } from './utils/utils';
+import { checkContractExistsOnNetwork, generateTestProject, itemArrayInTable } from './utils/utils';
 const exec = utils.promisify(exec1);
 
 describe('E2E Testing for taqueria taquito plugin', () => {
@@ -178,7 +178,7 @@ No operations performed
 		);
 	});
 
-	test.only('Verify that taqueria taquito plugin can instantiate accounts on a network', async () => {
+	test('Verify that taqueria taquito plugin can instantiate accounts on a network once', async () => {
 		environment = 'test';
 
 		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
@@ -189,6 +189,44 @@ No operations performed
 
 		expect(result.stdout).toBe(`Accounts instantiated: bob, alice, john, jane, joe.
 Please execute "taq fund" targeting the same environment to fund these accounts\n`);
+
+		const result2 = await exec(`taq instantiate-account -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		expect(result2.stdout).toBe(
+			`No accounts were instantiated because they were all instantiated in the target environment already\n`,
+		);
+		expect(result2.stderr).toBe(`Note: bob is already instantiated in the current environment, "test"
+Note: alice is already instantiated in the current environment, "test"
+Note: john is already instantiated in the current environment, "test"
+Note: jane is already instantiated in the current environment, "test"
+Note: joe is already instantiated in the current environment, "test"\n`);
+	});
+
+	test('Verify that taqueria taquito plugin will fund instantiated accounts on a network', async () => {
+		environment = 'test';
+
+		await exec(`cp e2e/data/config-taquito-test-environment-low-tez.json ${taqueriaProjectPath}/.taq/config.json`);
+
+		const accountResult = await exec(`taq instantiate-account -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		const configContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		);
+		const configTezAmounts = Object.values(configContents.accounts);
+
+		expect(accountResult.stdout).toBe(`Accounts instantiated: bob, alice, john, jane, joe.
+Please execute "taq fund" targeting the same environment to fund these accounts\n`);
+
+		const fundResult = await exec(`taq fund -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		const amountFundedArray = itemArrayInTable(/[0-9]{7,}/g, fundResult);
+		expect(amountFundedArray).toStrictEqual(configTezAmounts);
 	});
 
 	test('Verify that taqueria taquito plugin will show proper error when environment does not exists', async () => {
