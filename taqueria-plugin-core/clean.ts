@@ -1,14 +1,16 @@
-import { execCmd, getCurrentEnvironmentConfig, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { execCmd, getCurrentEnvironmentConfig, sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 
 const ECAD_FLEXTESA_IMAGE = 'ghcr.io/ecadlabs/taqueria-flextesa';
+const FLEXTESA_IMAGE = 'oxheadalpha/flextesa';
 const LIGO_IMAGE = 'ligolang/ligo';
+const ARCHETYPE_IMAGE = 'completium/archetype';
+const ECAD_TZKT_IMAGE = 'alirezahaghshenas/tzkt';
 
-const getDockerDeleteCmd = (): string => {
-	const images = [ECAD_FLEXTESA_IMAGE, LIGO_IMAGE];
+const getTaqueriaDockerImageIds = (): string => {
+	const images = [ECAD_FLEXTESA_IMAGE, FLEXTESA_IMAGE, LIGO_IMAGE, ARCHETYPE_IMAGE, ECAD_TZKT_IMAGE];
 	const imageFilters = images.reduce((acc, image) => `${acc} --filter "reference=${image}"`, '');
-	const cmd = `docker rmi --force $(docker images --quiet ${imageFilters} | uniq)`;
-	console.error('JCC:', cmd);
+	const cmd = `docker images --quiet ${imageFilters} | uniq`;
 	return cmd;
 };
 
@@ -21,7 +23,11 @@ const clean = (parsedArgs: RequestArgs.ProxyRequestArgs): Promise<void> => {
 				.catch(_ => Promise.reject(new Error('No state files exist in the .taq/ folder')))
 		)
 		.then(_ =>
-			execCmd(getDockerDeleteCmd())
+			execCmd(getTaqueriaDockerImageIds())
+				.then(results => {
+					const images = results.stdout.replace(/\s/g, ' ');
+					if (images) return execCmd(`docker rmi --force ${images}`);
+				})
 				.catch(_ =>
 					Promise.reject(
 						new Error(
@@ -30,7 +36,7 @@ const clean = (parsedArgs: RequestArgs.ProxyRequestArgs): Promise<void> => {
 					)
 				)
 		)
-		.then(_ => sendJsonRes('Taqueria-related states and docker images cleaned 🧽'))
+		.then(_ => sendJsonRes('All Taqueria-related states and docker images cleaned 🧽'))
 		.catch(err => sendAsyncErr(`Error occurred during cleaning: ${err.message}`));
 };
 
