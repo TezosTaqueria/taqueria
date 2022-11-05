@@ -1,8 +1,8 @@
 import { sendAsyncErr } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
 import clean from './clean';
+import { IntersectionOpts as Opts } from './common';
 
-export const core = (parsedArgs: RequestArgs.ProxyRequestArgs): Promise<void> => {
+export const core = (parsedArgs: Opts): Promise<void> => {
 	switch (parsedArgs.task) {
 		case 'clean':
 			return clean(parsedArgs);
