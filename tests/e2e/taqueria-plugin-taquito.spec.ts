@@ -8,7 +8,6 @@ import {
 	checkContractExistsOnNetwork,
 	generateTestProject,
 	itemArrayInTable,
-	sleep,
 } from './utils/utils';
 const exec = utils.promisify(exec1);
 
@@ -184,7 +183,7 @@ No operations performed
 		);
 	});
 
-	test('Verify that taqueria taquito plugin can instantiate accounts on a network once', async () => {
+	test('Verify that taqueria taquito plugin can only instantiate accounts on a network once', async () => {
 		environment = 'test';
 
 		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
@@ -248,7 +247,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		expect(accountResult.stdout).toBe(`Accounts instantiated: bob, alice, john, jane, joe.
 Please execute "taq fund" targeting the same environment to fund these accounts\n`);
 
-		const fundResult = await exec(`taq fund -e ${environment}`, {
+		await exec(`taq fund -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
 
