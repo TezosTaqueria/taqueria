@@ -33,7 +33,7 @@ export const of = (input: unknown): FutureInstance<TaqError, TzKtConfigStrict> =
 	}
 };
 
-export const make = (input: TzKtConfigStrict): FutureInstance<TaqError, TzKtConfigStrict> => of(input);
+export const make = (input: Omit<TzKtConfigStrict, '__type'>): FutureInstance<TaqError, TzKtConfigStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +41,6 @@ export const schemas = {
 	schema: tzKtConfigSchema.transform(val => val as TzKtConfigStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = tzKtConfigSchema;
 
 export type t = TzKtConfigStrict;

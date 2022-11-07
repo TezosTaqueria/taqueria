@@ -4,20 +4,20 @@
 export type NonEmptyString = string;
 
 /** @pattern ^[A-Za-z]$ */
-export type SingleChar = string;
+export type SingleChar = NonEmptyString;
 
 /** @pattern ^[A-Za-z\-\ ]+ */
-export type Verb = string;
+export type Verb = NonEmptyString;
 
 export type Alias = (Verb | SingleChar);
 
 /** @pattern ^[A-Za-z]+[A-Za-z0-9-_ ]*$ */
-export type HumanReadableIdentifier = string;
+export type HumanReadableIdentifier = NonEmptyString;
 
-export type SanitizedAbsPath = string;
+export type SanitizedAbsPath = NonEmptyString;
 
 /** @pattern ^(\.\.|\.\/|\/) */
-export type SanitizedPath = string;
+export type SanitizedPath = NonEmptyString;
 
 export type Settings = {
 	consent: 'opt_in' | 'opt_out';
@@ -32,20 +32,20 @@ export type Timestamp = number;
 /**
  * @minLength 1
  * @pattern ^\d([\d_]+\d)?$ */
-export type Tz = string;
+export type Tz = NonEmptyString;
 
 /**
  * @minLength 1
  * @pattern ^\d+\.\d+(\.\d+)*$ */
-export type VersionNumber = string;
+export type VersionNumber = NonEmptyString;
 
 /** @format url */
-export type Url = string;
+export type Url = NonEmptyString;
 
 // ---- Plugin Definition Types ----
 
 /** interpreted using yargs @pattern ^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$ */
-export type Command = string;
+export type Command = NonEmptyString;
 
 export type Option = {
 	shortFlag?: SingleChar;
@@ -88,10 +88,10 @@ export type Template = {
 	/** @minLength 4 */
 	description: NonEmptyString;
 	hidden?: boolean;
-	options?: Option;
-	positionals?: PositionalArg;
+	options?: Option[];
+	positionals?: PositionalArg[];
 	handler: TemplateHandler;
-	encoding?: PluginResponseEncoding;
+	encoding: PluginResponseEncoding;
 };
 
 type TemplateHandler =
@@ -168,14 +168,26 @@ export type PluginJsonResponse = {
 
 export type PluginProxyResponse = void | PluginJsonResponse;
 
-export type PluginResponseEncoding = undefined | 'none' | 'json' | 'application/json';
+/** @default none */
+export type PluginResponseEncoding = 'none' | 'json' | 'application/json';
 
 export type SanitizedArgs = {
-	configAbsPath: NonEmptyString;
-	sandbox: NonEmptyString;
-	configure?: boolean;
-	importAccounts?: boolean;
-	config: ParsedConfig;
+	_: NonEmptyString[];
+	projectDir: SanitizedPath;
+	maxConcurrency: number;
+	debug: boolean;
+	disableState: boolean;
+	logPluginRequests: boolean;
+	fromVsCode: boolean;
+	version: boolean;
+	build: boolean;
+	help: boolean;
+	yes: boolean;
+	plugin: NonEmptyString;
+	env: NonEmptyString;
+	quickstart: NonEmptyString;
+	setBuild: NonEmptyString;
+	setVersion: NonEmptyString;
 };
 
 export type PluginActionName =
@@ -185,16 +197,24 @@ export type PluginActionName =
 	| 'installRuntimeDependencies'
 	| 'proxyTemplate';
 
-export type RequestArgs = Omit<SanitizedArgs, 'config'> & {
+export type RequestArgs = SanitizedArgs & {
 	taqRun: PluginActionName;
 	// TODO: JSON.parse if string
 	config: LoadedConfig;
 };
 
+export type ProxyTaskArgs = RequestArgs & {
+	task: NonEmptyString;
+};
+
+export type ProxyTemplateArgs = RequestArgs & {
+	template: NonEmptyString;
+};
+
 // ---- Hash Types ----
 
 /** @pattern ^P[A-Za-z0-9]{50}$ this is a valid hash for an economical protocol*/
-export type EconomicalPrototypeHash = string;
+export type EconomicalProtocolHash = string;
 
 /** @pattern ^tz1[A-Za-z0-9]{33}$ */
 export type PublicKeyHash = string;
@@ -250,8 +270,8 @@ export type Environment = {
 	 * @minLength 1 Must reference the name of an existing sandbox configuration
 	 */
 	sandboxes: NonEmptyString[];
-	storage?: Record<string, unknown>;
-	aliases?: Record<string, unknown>;
+	storage?: Record<string, NonEmptyString>;
+	aliases?: Record<string, Record<string, NonEmptyString>>;
 };
 
 export type EphemeralState = {
@@ -361,8 +381,8 @@ export type MetadataConfig = {
 export type NetworkConfig = {
 	label: HumanReadableIdentifier;
 	rpcUrl: Url;
-	protocol: EconomicalPrototypeHash;
-	accounts: Record<string, unknown>;
+	protocol: EconomicalProtocolHash;
+	accounts?: Record<string, Record<string, unknown>>;
 	faucet?: Faucet;
 };
 
@@ -375,7 +395,7 @@ export type SandboxAccountConfig = {
 export type SandboxConfig = {
 	label: NonEmptyString;
 	rpcUrl: Url;
-	protocol: EconomicalPrototypeHash;
+	protocol: EconomicalProtocolHash;
 	attributes?: string | number | boolean;
 	plugin?: Verb;
 

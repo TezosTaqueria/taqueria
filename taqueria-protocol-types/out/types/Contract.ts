@@ -33,7 +33,7 @@ export const of = (input: unknown): FutureInstance<TaqError, ContractStrict> => 
 	}
 };
 
-export const make = (input: ContractStrict): FutureInstance<TaqError, ContractStrict> => of(input);
+export const make = (input: Omit<ContractStrict, '__type'>): FutureInstance<TaqError, ContractStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +41,6 @@ export const schemas = {
 	schema: contractSchema.transform(val => val as ContractStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = contractSchema;
 
 export type t = ContractStrict;

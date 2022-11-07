@@ -7,21 +7,26 @@
 export type NonEmptyString = { __type: NonEmptyString } & string;
 
 /** @pattern ^[A-Za-z]$ */
-export type SingleChar = { __type: SingleChar } & string;
+export type SingleChar = { __type: SingleChar } & SingleCharRaw;
+type SingleCharRaw = NonEmptyString;
 
 /** @pattern ^[A-Za-z\-\ ]+ */
-export type Verb = { __type: Verb } & string;
+export type Verb = { __type: Verb } & VerbRaw;
+type VerbRaw = NonEmptyString;
 
 export type Alias = { __type: Alias } & AliasRaw;
 type AliasRaw = (Verb | SingleChar);
 
 /** @pattern ^[A-Za-z]+[A-Za-z0-9-_ ]*$ */
-export type HumanReadableIdentifier = { __type: HumanReadableIdentifier } & string;
+export type HumanReadableIdentifier = { __type: HumanReadableIdentifier } & HumanReadableIdentifierRaw;
+type HumanReadableIdentifierRaw = NonEmptyString;
 
-export type SanitizedAbsPath = { __type: SanitizedAbsPath } & string;
+export type SanitizedAbsPath = { __type: SanitizedAbsPath } & SanitizedAbsPathRaw;
+type SanitizedAbsPathRaw = NonEmptyString;
 
 /** @pattern ^(\.\.|\.\/|\/) */
-export type SanitizedPath = { __type: SanitizedPath } & string;
+export type SanitizedPath = { __type: SanitizedPath } & SanitizedPathRaw;
+type SanitizedPathRaw = NonEmptyString;
 
 export type Settings = { __type: Settings } & {
 	consent: 'opt_in' | 'opt_out';
@@ -36,20 +41,24 @@ export type Timestamp = { __type: Timestamp } & number;
 /**
  * @minLength 1
  * @pattern ^\d([\d_]+\d)?$ */
-export type Tz = { __type: Tz } & string;
+export type Tz = { __type: Tz } & TzRaw;
+type TzRaw = NonEmptyString;
 
 /**
  * @minLength 1
  * @pattern ^\d+\.\d+(\.\d+)*$ */
-export type VersionNumber = { __type: VersionNumber } & string;
+export type VersionNumber = { __type: VersionNumber } & VersionNumberRaw;
+type VersionNumberRaw = NonEmptyString;
 
 /** @format url */
-export type Url = { __type: Url } & string;
+export type Url = { __type: Url } & UrlRaw;
+type UrlRaw = NonEmptyString;
 
 // ---- Plugin Definition Types ----
 
 /** interpreted using yargs @pattern ^([A-Za-z-_ ]+ ?)((\[.+\] ?)|(\<.+\>) ?)*$ */
-export type Command = { __type: Command } & string;
+export type Command = { __type: Command } & CommandRaw;
+type CommandRaw = NonEmptyString;
 
 export type Option = { __type: Option } & {
 	shortFlag?: SingleChar;
@@ -93,10 +102,10 @@ export type Template = { __type: Template } & {
 	/** @minLength 4 */
 	description: NonEmptyString;
 	hidden?: boolean;
-	options?: Option;
-	positionals?: PositionalArg;
+	options?: Option[];
+	positionals?: PositionalArg[];
 	handler: TemplateHandler;
-	encoding?: PluginResponseEncoding;
+	encoding: PluginResponseEncoding;
 };
 
 type TemplateHandler =
@@ -178,15 +187,27 @@ export type PluginJsonResponse = { __type: PluginJsonResponse } & {
 export type PluginProxyResponse = { __type: PluginProxyResponse } & PluginProxyResponseRaw;
 type PluginProxyResponseRaw = void | PluginJsonResponse;
 
+/** @default none */
 export type PluginResponseEncoding = { __type: PluginResponseEncoding } & PluginResponseEncodingRaw;
-type PluginResponseEncodingRaw = undefined | 'none' | 'json' | 'application/json';
+type PluginResponseEncodingRaw = 'none' | 'json' | 'application/json';
 
 export type SanitizedArgs = { __type: SanitizedArgs } & {
-	configAbsPath: NonEmptyString;
-	sandbox: NonEmptyString;
-	configure?: boolean;
-	importAccounts?: boolean;
-	config: ParsedConfig;
+	_: NonEmptyString[];
+	projectDir: SanitizedPath;
+	maxConcurrency: number;
+	debug: boolean;
+	disableState: boolean;
+	logPluginRequests: boolean;
+	fromVsCode: boolean;
+	version: boolean;
+	build: boolean;
+	help: boolean;
+	yes: boolean;
+	plugin: NonEmptyString;
+	env: NonEmptyString;
+	quickstart: NonEmptyString;
+	setBuild: NonEmptyString;
+	setVersion: NonEmptyString;
 };
 
 export type PluginActionName = { __type: PluginActionName } & PluginActionNameRaw;
@@ -198,16 +219,26 @@ type PluginActionNameRaw =
 	| 'proxyTemplate';
 
 export type RequestArgs = { __type: RequestArgs } & RequestArgsRaw;
-type RequestArgsRaw = Omit<SanitizedArgs, 'config'> & {
+type RequestArgsRaw = SanitizedArgs & {
 	taqRun: PluginActionName;
 	// TODO: JSON.parse if string
 	config: LoadedConfig;
 };
 
+export type ProxyTaskArgs = { __type: ProxyTaskArgs } & ProxyTaskArgsRaw;
+type ProxyTaskArgsRaw = RequestArgs & {
+	task: NonEmptyString;
+};
+
+export type ProxyTemplateArgs = { __type: ProxyTemplateArgs } & ProxyTemplateArgsRaw;
+type ProxyTemplateArgsRaw = RequestArgs & {
+	template: NonEmptyString;
+};
+
 // ---- Hash Types ----
 
 /** @pattern ^P[A-Za-z0-9]{50}$ this is a valid hash for an economical protocol*/
-export type EconomicalPrototypeHash = { __type: EconomicalPrototypeHash } & string;
+export type EconomicalProtocolHash = { __type: EconomicalProtocolHash } & string;
 
 /** @pattern ^tz1[A-Za-z0-9]{33}$ */
 export type PublicKeyHash = { __type: PublicKeyHash } & string;
@@ -263,8 +294,8 @@ export type Environment = { __type: Environment } & {
 	 * @minLength 1 Must reference the name of an existing sandbox configuration
 	 */
 	sandboxes: NonEmptyString[];
-	storage?: Record<string, unknown>;
-	aliases?: Record<string, unknown>;
+	storage?: Record<string, NonEmptyString>;
+	aliases?: Record<string, Record<string, NonEmptyString>>;
 };
 
 export type EphemeralState = { __type: EphemeralState } & {
@@ -376,8 +407,8 @@ export type MetadataConfig = { __type: MetadataConfig } & {
 export type NetworkConfig = { __type: NetworkConfig } & {
 	label: HumanReadableIdentifier;
 	rpcUrl: Url;
-	protocol: EconomicalPrototypeHash;
-	accounts: Record<string, unknown>;
+	protocol: EconomicalProtocolHash;
+	accounts?: Record<string, Record<string, unknown>>;
 	faucet?: Faucet;
 };
 
@@ -390,7 +421,7 @@ export type SandboxAccountConfig = { __type: SandboxAccountConfig } & {
 export type SandboxConfig = { __type: SandboxConfig } & {
 	label: NonEmptyString;
 	rpcUrl: Url;
-	protocol: EconomicalPrototypeHash;
+	protocol: EconomicalProtocolHash;
 	attributes?: string | number | boolean;
 	plugin?: Verb;
 

@@ -33,7 +33,9 @@ export const of = (input: unknown): FutureInstance<TaqError, RuntimeDependencySt
 	}
 };
 
-export const make = (input: RuntimeDependencyStrict): FutureInstance<TaqError, RuntimeDependencyStrict> => of(input);
+export const make = (
+	input: Omit<RuntimeDependencyStrict, '__type'>,
+): FutureInstance<TaqError, RuntimeDependencyStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +43,6 @@ export const schemas = {
 	schema: runtimeDependencySchema.transform(val => val as RuntimeDependencyStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = runtimeDependencySchema;
 
 export type t = RuntimeDependencyStrict;

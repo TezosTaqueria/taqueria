@@ -33,7 +33,7 @@ export const of = (input: unknown): FutureInstance<TaqError, OptionStrict> => {
 	}
 };
 
-export const make = (input: OptionStrict): FutureInstance<TaqError, OptionStrict> => of(input);
+export const make = (input: Omit<OptionStrict, '__type'>): FutureInstance<TaqError, OptionStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +41,6 @@ export const schemas = {
 	schema: optionSchema.transform(val => val as OptionStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = optionSchema;
 
 export type t = OptionStrict;

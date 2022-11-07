@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, LoadedConfigStrict>
 	}
 };
 
-export const make = (input: LoadedConfigStrict): FutureInstance<TaqError, LoadedConfigStrict> => of(input);
+export const make = (input: Omit<LoadedConfigStrict, '__type'>): FutureInstance<TaqError, LoadedConfigStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: loadedConfigSchema.transform(val => val as LoadedConfigStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = loadedConfigSchema;
 
 export type t = LoadedConfigStrict;

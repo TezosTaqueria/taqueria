@@ -33,8 +33,9 @@ export const of = (input: unknown): FutureInstance<TaqError, SandboxAccountConfi
 	}
 };
 
-export const make = (input: SandboxAccountConfigStrict): FutureInstance<TaqError, SandboxAccountConfigStrict> =>
-	of(input);
+export const make = (
+	input: Omit<SandboxAccountConfigStrict, '__type'>,
+): FutureInstance<TaqError, SandboxAccountConfigStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -42,6 +43,6 @@ export const schemas = {
 	schema: sandboxAccountConfigSchema.transform(val => val as SandboxAccountConfigStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = sandboxAccountConfigSchema;
 
 export type t = SandboxAccountConfigStrict;

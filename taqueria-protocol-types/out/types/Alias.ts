@@ -33,7 +33,7 @@ export const of = (input: unknown): FutureInstance<TaqError, AliasStrict> => {
 	}
 };
 
-export const make = (input: AliasStrict): FutureInstance<TaqError, AliasStrict> => of(input);
+export const make = (input: Omit<AliasStrict, '__type'>): FutureInstance<TaqError, AliasStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +41,6 @@ export const schemas = {
 	schema: aliasSchema.transform(val => val as AliasStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = aliasSchema;
 
 export type t = AliasStrict;

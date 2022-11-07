@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, PublicKeyHashStrict
 	}
 };
 
-export const make = (input: PublicKeyHashStrict): FutureInstance<TaqError, PublicKeyHashStrict> => of(input);
+export const make = (input: Omit<PublicKeyHashStrict, '__type'>): FutureInstance<TaqError, PublicKeyHashStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: publicKeyHashSchema.transform(val => val as PublicKeyHashStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = publicKeyHashSchema;
 
 export type t = PublicKeyHashStrict;

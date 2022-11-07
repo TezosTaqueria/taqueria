@@ -33,8 +33,9 @@ export const of = (input: unknown): FutureInstance<TaqError, HumanReadableIdenti
 	}
 };
 
-export const make = (input: HumanReadableIdentifierStrict): FutureInstance<TaqError, HumanReadableIdentifierStrict> =>
-	of(input);
+export const make = (
+	input: Omit<HumanReadableIdentifierStrict, '__type'>,
+): FutureInstance<TaqError, HumanReadableIdentifierStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -42,6 +43,6 @@ export const schemas = {
 	schema: humanReadableIdentifierSchema.transform(val => val as HumanReadableIdentifierStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = humanReadableIdentifierSchema;
 
 export type t = HumanReadableIdentifierStrict;

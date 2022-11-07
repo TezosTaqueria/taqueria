@@ -33,7 +33,7 @@ export const of = (input: unknown): FutureInstance<TaqError, SHA256Strict> => {
 	}
 };
 
-export const make = (input: SHA256Strict): FutureInstance<TaqError, SHA256Strict> => of(input);
+export const make = (input: Omit<SHA256Strict, '__type'>): FutureInstance<TaqError, SHA256Strict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +41,6 @@ export const schemas = {
 	schema: sha256Schema.transform(val => val as SHA256Strict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = sha256Schema;
 
 export type t = SHA256Strict;

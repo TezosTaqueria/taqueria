@@ -33,7 +33,7 @@ export const of = (input: unknown): FutureInstance<TaqError, FaucetStrict> => {
 	}
 };
 
-export const make = (input: FaucetStrict): FutureInstance<TaqError, FaucetStrict> => of(input);
+export const make = (input: Omit<FaucetStrict, '__type'>): FutureInstance<TaqError, FaucetStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +41,6 @@ export const schemas = {
 	schema: faucetSchema.transform(val => val as FaucetStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = faucetSchema;
 
 export type t = FaucetStrict;

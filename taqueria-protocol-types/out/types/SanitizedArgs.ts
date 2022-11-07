@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, SanitizedArgsStrict
 	}
 };
 
-export const make = (input: SanitizedArgsStrict): FutureInstance<TaqError, SanitizedArgsStrict> => of(input);
+export const make = (input: Omit<SanitizedArgsStrict, '__type'>): FutureInstance<TaqError, SanitizedArgsStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: sanitizedArgsSchema.transform(val => val as SanitizedArgsStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = sanitizedArgsSchema;
 
 export type t = SanitizedArgsStrict;

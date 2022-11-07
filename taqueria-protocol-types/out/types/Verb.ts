@@ -33,7 +33,7 @@ export const of = (input: unknown): FutureInstance<TaqError, VerbStrict> => {
 	}
 };
 
-export const make = (input: VerbStrict): FutureInstance<TaqError, VerbStrict> => of(input);
+export const make = (input: Omit<VerbStrict, '__type'>): FutureInstance<TaqError, VerbStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +41,6 @@ export const schemas = {
 	schema: verbSchema.transform(val => val as VerbStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = verbSchema;
 
 export type t = VerbStrict;

@@ -33,7 +33,7 @@ export const of = (input: unknown): FutureInstance<TaqError, TimestampStrict> =>
 	}
 };
 
-export const make = (input: TimestampStrict): FutureInstance<TaqError, TimestampStrict> => of(input);
+export const make = (input: Omit<TimestampStrict, '__type'>): FutureInstance<TaqError, TimestampStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +41,6 @@ export const schemas = {
 	schema: timestampSchema.transform(val => val as TimestampStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = timestampSchema;
 
 export type t = TimestampStrict;

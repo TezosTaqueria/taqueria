@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, PersistentStateStri
 	}
 };
 
-export const make = (input: PersistentStateStrict): FutureInstance<TaqError, PersistentStateStrict> => of(input);
+export const make = (input: Omit<PersistentStateStrict, '__type'>): FutureInstance<TaqError, PersistentStateStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: persistentStateSchema.transform(val => val as PersistentStateStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = persistentStateSchema;
 
 export type t = PersistentStateStrict;

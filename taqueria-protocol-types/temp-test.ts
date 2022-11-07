@@ -15,7 +15,6 @@ const pluginCreateResult = PluginSchema.create({
 });
 
 const pluginMakeResult = PluginSchema.make({
-	__type: undefined as unknown as ReturnType<typeof PluginSchema.create>,
 	name: Alias.create(``),
 	version: VersionNumber.create(``),
 	schema: VersionNumber.create(``),

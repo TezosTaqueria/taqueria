@@ -4,13 +4,14 @@ import * as Operation from '@taqueria/protocol/Operation';
 import * as PluginDependenciesResponse from '@taqueria/protocol/PluginDependenciesResponse';
 import * as PluginInfo from '@taqueria/protocol/PluginInfo';
 import * as PluginProxyResponse from '@taqueria/protocol/PluginProxyResponse';
+import * as ProxyTemplateArgs from '@taqueria/protocol/ProxyTemplateArgs';
 import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as Template from '@taqueria/protocol/Template';
 import { z } from 'zod';
 
 const proxyFnSchema = z
 	.function()
-	.args(RequestArgs.proxySchemas.schema)
+	.args(ProxyTemplateArgs.schemas.schema)
 	.returns(z.promise(PluginProxyResponse.schemas.schema));
 
 const runtimeDependenciesFn = z

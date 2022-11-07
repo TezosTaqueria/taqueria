@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, PluginSchemaStrict>
 	}
 };
 
-export const make = (input: PluginSchemaStrict): FutureInstance<TaqError, PluginSchemaStrict> => of(input);
+export const make = (input: Omit<PluginSchemaStrict, '__type'>): FutureInstance<TaqError, PluginSchemaStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: pluginSchemaSchema.transform(val => val as PluginSchemaStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = pluginSchemaSchema;
 
 export type t = PluginSchemaStrict;

@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, NonEmptyStringStric
 	}
 };
 
-export const make = (input: NonEmptyStringStrict): FutureInstance<TaqError, NonEmptyStringStrict> => of(input);
+export const make = (input: Omit<NonEmptyStringStrict, '__type'>): FutureInstance<TaqError, NonEmptyStringStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: nonEmptyStringSchema.transform(val => val as NonEmptyStringStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = nonEmptyStringSchema;
 
 export type t = NonEmptyStringStrict;

@@ -186,3 +186,7 @@ website/docs/glossary.md
 website/yarn.lock
 taqueria-plugin-metadata/index.js
 taqueria-plugin-metadata/index.js.map
+taqueria-protocol-types/**/*.js
+taqueria-protocol-types/**/*.map
+taqueria-protocol-types/**/*.d.ts
+taqueria-protocol-types/**/*.mjs

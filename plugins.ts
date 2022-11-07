@@ -1,8 +1,9 @@
 // First-party dependencies
+import * as PluginActionName from '@taqueria/protocol/PluginActionName';
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import type { InstalledPlugin, PluginActionName } from './taqueria-protocol/taqueria-protocol-types.ts';
+import type { InstalledPlugin } from './taqueria-protocol/taqueria-protocol-types.ts';
 import { EphemeralState, PluginInfo, SanitizedArgs } from './taqueria-protocol/taqueria-protocol-types.ts';
 import type { PluginDeps, PluginRequestArgs } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
@@ -185,7 +186,8 @@ export const inject = (deps: PluginDeps) => {
 	// retrievePluginInfo: InstalledPlugin -> Future<TaqError, PluginInfo>
 	const retrievePluginInfo = (plugin: InstalledPlugin.t) =>
 		pipe(
-			sendPluginActionRequest(plugin)('pluginInfo', PluginResponseEncoding.create('json'))({}),
+			PluginActionName.make('pluginInfo'),
+			chain(action => sendPluginActionRequest(plugin)(action, PluginResponseEncoding.create('json'))({})),
 			chain(unvalidatedData =>
 				pipe(
 					PluginInfo.of(unvalidatedData),
@@ -259,17 +261,17 @@ export const inject = (deps: PluginDeps) => {
 						configHash: config.hash,
 						plugins: pluginInfo,
 						tasks: await eager(EphemeralState.mapTasksToPlugins(
-							await eager(LoadedConfig.toConfig(config)),
+							await eager(LoadedConfig.make(config)),
 							pluginInfo,
 							i18n,
 						)),
 						operations: await eager(EphemeralState.mapOperationsToPlugins(
-							await eager(LoadedConfig.toConfig(config)),
+							await eager(LoadedConfig.make(config)),
 							pluginInfo,
 							i18n,
 						)),
 						templates: await eager(EphemeralState.mapTemplatesToPlugins(
-							await eager(LoadedConfig.toConfig(config)),
+							await eager(LoadedConfig.make(config)),
 							pluginInfo,
 							i18n,
 						)),

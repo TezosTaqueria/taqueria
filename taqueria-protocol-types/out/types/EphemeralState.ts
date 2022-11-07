@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, EphemeralStateStric
 	}
 };
 
-export const make = (input: EphemeralStateStrict): FutureInstance<TaqError, EphemeralStateStrict> => of(input);
+export const make = (input: Omit<EphemeralStateStrict, '__type'>): FutureInstance<TaqError, EphemeralStateStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: ephemeralStateSchema.transform(val => val as EphemeralStateStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = ephemeralStateSchema;
 
 export type t = EphemeralStateStrict;

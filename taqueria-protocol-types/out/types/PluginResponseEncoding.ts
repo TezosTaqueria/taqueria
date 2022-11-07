@@ -33,8 +33,9 @@ export const of = (input: unknown): FutureInstance<TaqError, PluginResponseEncod
 	}
 };
 
-export const make = (input: PluginResponseEncodingStrict): FutureInstance<TaqError, PluginResponseEncodingStrict> =>
-	of(input);
+export const make = (
+	input: Omit<PluginResponseEncodingStrict, '__type'>,
+): FutureInstance<TaqError, PluginResponseEncodingStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -42,6 +43,6 @@ export const schemas = {
 	schema: pluginResponseEncodingSchema.transform(val => val as PluginResponseEncodingStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = pluginResponseEncodingSchema;
 
 export type t = PluginResponseEncodingStrict;

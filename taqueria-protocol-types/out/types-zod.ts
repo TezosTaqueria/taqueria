@@ -3,19 +3,21 @@ import { z } from 'zod';
 
 export const nonEmptyStringSchema = z.string().min(1);
 
-export const singleCharSchema = z.string().regex(/^[A-Za-z]$/);
+export const singleCharSchema = nonEmptyStringSchema.regex(/^[A-Za-z]$/);
 
-export const verbSchema = z.string().regex(/^[A-Za-z\-\ ]+/);
+export const verbSchema = nonEmptyStringSchema.regex(/^[A-Za-z\-\ ]+/);
 
 export const aliasSchema = z.union([verbSchema, singleCharSchema]);
 
-export const humanReadableIdentifierSchema = z
-	.string()
-	.regex(/^[A-Za-z]+[A-Za-z0-9-_ ]*$/);
+export const humanReadableIdentifierSchema = nonEmptyStringSchema.regex(
+	/^[A-Za-z]+[A-Za-z0-9-_ ]*$/,
+);
 
-export const sanitizedAbsPathSchema = z.string();
+export const sanitizedAbsPathSchema = nonEmptyStringSchema;
 
-export const sanitizedPathSchema = z.string().regex(/^(\.\.|\.\/|\/)/);
+export const sanitizedPathSchema = nonEmptyStringSchema.regex(
+	/^(\.\.|\.\/|\/)/,
+);
 
 export const settingsSchema = z.object({
 	consent: z.union([z.literal('opt_in'), z.literal('opt_out')]),
@@ -23,19 +25,15 @@ export const settingsSchema = z.object({
 
 export const timestampSchema = z.number().min(1651846877);
 
-export const tzSchema = z
-	.string()
-	.min(1)
-	.regex(/^\d([\d_]+\d)?$/);
+export const tzSchema = nonEmptyStringSchema.min(1).regex(/^\d([\d_]+\d)?$/);
 
-export const versionNumberSchema = z
-	.string()
+export const versionNumberSchema = nonEmptyStringSchema
 	.min(1)
 	.regex(/^\d+\.\d+(\.\d+)*$/);
 
-export const urlSchema = z.string().url();
+export const urlSchema = nonEmptyStringSchema.url();
 
-export const commandSchema = z.string();
+export const commandSchema = nonEmptyStringSchema;
 
 export const optionSchema = z.object({
 	shortFlag: singleCharSchema.optional(),
@@ -72,10 +70,10 @@ export const runtimeDependencySchema = z.object({
 	kind: z.union([z.literal('required'), z.literal('optional')]),
 });
 
-export const runtimeDependencyReportSchema = runtimeDependencySchema.and(
-	z.object({
+export const runtimeDependencyReportSchema = runtimeDependencySchema.extend(
+	{
 		met: z.boolean(),
-	}),
+	},
 );
 
 export const pluginDependenciesResponseSchema = z.object({
@@ -94,12 +92,28 @@ export const pluginProxyResponseSchema = z.union([
 	pluginJsonResponseSchema,
 ]);
 
-export const pluginResponseEncodingSchema = z.union([
-	z.undefined(),
-	z.literal('none'),
-	z.literal('json'),
-	z.literal('application/json'),
-]);
+export const pluginResponseEncodingSchema = z
+	.union([z.literal('none'), z.literal('json'), z.literal('application/json')])
+	.default('none');
+
+export const sanitizedArgsSchema = z.object({
+	_: z.array(nonEmptyStringSchema),
+	projectDir: sanitizedPathSchema,
+	maxConcurrency: z.number(),
+	debug: z.boolean(),
+	disableState: z.boolean(),
+	logPluginRequests: z.boolean(),
+	fromVsCode: z.boolean(),
+	version: z.boolean(),
+	build: z.boolean(),
+	help: z.boolean(),
+	yes: z.boolean(),
+	plugin: nonEmptyStringSchema,
+	env: nonEmptyStringSchema,
+	quickstart: nonEmptyStringSchema,
+	setBuild: nonEmptyStringSchema,
+	setVersion: nonEmptyStringSchema,
+});
 
 export const pluginActionNameSchema = z.union([
 	z.literal('proxy'),
@@ -109,7 +123,7 @@ export const pluginActionNameSchema = z.union([
 	z.literal('proxyTemplate'),
 ]);
 
-export const economicalPrototypeHashSchema = z
+export const economicalProtocolHashSchema = z
 	.string()
 	.regex(/^P[A-Za-z0-9]{50}$ this is a valid hash for an economical protocol/);
 
@@ -148,8 +162,8 @@ export const environmentSchema = z.object({
 	sandboxes: z
 		.array(nonEmptyStringSchema)
 		.min(1, 'Must reference the name of an existing sandbox configuration'),
-	storage: z.record(z.unknown()).optional(),
-	aliases: z.record(z.unknown()).optional(),
+	storage: z.record(nonEmptyStringSchema).optional(),
+	aliases: z.record(nonEmptyStringSchema).optional(),
 });
 
 export const persistedTaskSchema = z.object({
@@ -207,8 +221,8 @@ export const metadataConfigSchema = z.object({
 export const networkConfigSchema = z.object({
 	label: humanReadableIdentifierSchema,
 	rpcUrl: urlSchema,
-	protocol: economicalPrototypeHashSchema,
-	accounts: z.record(z.unknown()),
+	protocol: economicalProtocolHashSchema,
+	accounts: z.record(z.unknown()).optional(),
 	faucet: faucetSchema.optional(),
 });
 
@@ -221,7 +235,7 @@ export const sandboxAccountConfigSchema = z.object({
 export const sandboxConfigSchema = z.object({
 	label: nonEmptyStringSchema,
 	rpcUrl: urlSchema,
-	protocol: economicalPrototypeHashSchema,
+	protocol: economicalProtocolHashSchema,
 	attributes: z.union([z.string(), z.number(), z.boolean()]).optional(),
 	plugin: verbSchema.optional(),
 	accounts: z
@@ -267,18 +281,18 @@ export const configSchema = z.object({
 	metadata: metadataConfigSchema.optional(),
 });
 
-export const loadedConfigSchema = configSchema.and(
-	z.object({
+export const loadedConfigSchema = configSchema.extend(
+	{
 		projectDir: sanitizedAbsPathSchema,
 		configFile: sanitizedAbsPathSchema,
 		hash: sha256Schema,
-	}),
+	},
 );
 
-export const parsedConfigSchema = configSchema.omit({ sandbox: true }).and(
-	z.object({
+export const parsedConfigSchema = configSchema.omit({ sandbox: true }).extend(
+	{
 		sandbox: z.record(z.union([sandboxConfigSchema, nonEmptyStringSchema])),
-	}),
+	},
 );
 
 const pluginSchemaBaseSchema = z.object({
@@ -289,19 +303,23 @@ const pluginSchemaBaseSchema = z.object({
 	tasks: z.array(taskSchema).optional(),
 });
 
-export const sanitizedArgsSchema = z.object({
-	configAbsPath: nonEmptyStringSchema,
-	sandbox: nonEmptyStringSchema,
-	configure: z.boolean().optional(),
-	importAccounts: z.boolean().optional(),
-	config: parsedConfigSchema,
-});
-
-export const requestArgsSchema = sanitizedArgsSchema.omit({ config: true }).and(
-	z.object({
+export const requestArgsSchema = sanitizedArgsSchema.extend(
+	{
 		taqRun: pluginActionNameSchema,
 		config: loadedConfigSchema,
-	}),
+	},
+);
+
+export const proxyTaskArgsSchema = requestArgsSchema.extend(
+	{
+		task: nonEmptyStringSchema,
+	},
+);
+
+export const proxyTemplateArgsSchema = requestArgsSchema.extend(
+	{
+		template: nonEmptyStringSchema,
+	},
 );
 
 export const operationSchema = z.object({
@@ -340,27 +358,27 @@ export const templateSchema = z.object({
 	command: commandSchema,
 	description: nonEmptyStringSchema.min(4),
 	hidden: z.boolean().optional(),
-	options: optionSchema.optional(),
-	positionals: positionalArgSchema.optional(),
+	options: z.array(optionSchema).optional(),
+	positionals: z.array(positionalArgSchema).optional(),
 	handler: templateHandlerSchema,
-	encoding: pluginResponseEncodingSchema.optional(),
+	encoding: pluginResponseEncodingSchema,
 });
 
-export const parsedTemplateSchema = templateSchema.omit({ handler: true }).and(
-	z.object({
+export const parsedTemplateSchema = templateSchema.omit({ handler: true }).extend(
+	{
 		handler: z.string(),
-	}),
+	},
 );
 
-export const pluginInfoSchema = pluginSchemaBaseSchema.and(
-	z.object({
+export const pluginInfoSchema = pluginSchemaBaseSchema.extend(
+	{
 		operations: z.array(parsedOperationSchema).optional(),
 		templates: z.array(parsedTemplateSchema).optional(),
-	}),
+	},
 );
 
-export const pluginSchemaSchema = pluginSchemaBaseSchema.and(
-	z.object({
+export const pluginSchemaSchema = pluginSchemaBaseSchema.extend(
+	{
 		operations: z.array(operationSchema).optional(),
 		templates: z.array(templateSchema).optional(),
 		proxy: z
@@ -378,7 +396,7 @@ export const pluginSchemaSchema = pluginSchemaBaseSchema.and(
 			.args(requestArgsSchema)
 			.returns(z.promise(pluginDependenciesResponseSchema))
 			.optional(),
-	}),
+	},
 );
 
 export const ephemeralStateSchema = z.object({

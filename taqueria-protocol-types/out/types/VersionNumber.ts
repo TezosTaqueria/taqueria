@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, VersionNumberStrict
 	}
 };
 
-export const make = (input: VersionNumberStrict): FutureInstance<TaqError, VersionNumberStrict> => of(input);
+export const make = (input: Omit<VersionNumberStrict, '__type'>): FutureInstance<TaqError, VersionNumberStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: versionNumberSchema.transform(val => val as VersionNumberStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = versionNumberSchema;
 
 export type t = VersionNumberStrict;

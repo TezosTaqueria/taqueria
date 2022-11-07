@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, SanitizedAbsPathStr
 	}
 };
 
-export const make = (input: SanitizedAbsPathStrict): FutureInstance<TaqError, SanitizedAbsPathStrict> => of(input);
+export const make = (input: Omit<SanitizedAbsPathStrict, '__type'>): FutureInstance<TaqError, SanitizedAbsPathStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: sanitizedAbsPathSchema.transform(val => val as SanitizedAbsPathStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = sanitizedAbsPathSchema;
 
 export type t = SanitizedAbsPathStrict;

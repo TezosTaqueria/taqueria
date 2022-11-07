@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, MetadataConfigStric
 	}
 };
 
-export const make = (input: MetadataConfigStrict): FutureInstance<TaqError, MetadataConfigStrict> => of(input);
+export const make = (input: Omit<MetadataConfigStrict, '__type'>): FutureInstance<TaqError, MetadataConfigStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: metadataConfigSchema.transform(val => val as MetadataConfigStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = metadataConfigSchema;
 
 export type t = MetadataConfigStrict;

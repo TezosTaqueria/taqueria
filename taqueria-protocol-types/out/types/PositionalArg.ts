@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, PositionalArgStrict
 	}
 };
 
-export const make = (input: PositionalArgStrict): FutureInstance<TaqError, PositionalArgStrict> => of(input);
+export const make = (input: Omit<PositionalArgStrict, '__type'>): FutureInstance<TaqError, PositionalArgStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: positionalArgSchema.transform(val => val as PositionalArgStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = positionalArgSchema;
 
 export type t = PositionalArgStrict;

@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, ScaffoldConfigStric
 	}
 };
 
-export const make = (input: ScaffoldConfigStrict): FutureInstance<TaqError, ScaffoldConfigStrict> => of(input);
+export const make = (input: Omit<ScaffoldConfigStrict, '__type'>): FutureInstance<TaqError, ScaffoldConfigStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: scaffoldConfigSchema.transform(val => val as ScaffoldConfigStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = scaffoldConfigSchema;
 
 export type t = ScaffoldConfigStrict;

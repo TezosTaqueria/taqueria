@@ -33,7 +33,8 @@ export const of = (input: unknown): FutureInstance<TaqError, NetworkConfigStrict
 	}
 };
 
-export const make = (input: NetworkConfigStrict): FutureInstance<TaqError, NetworkConfigStrict> => of(input);
+export const make = (input: Omit<NetworkConfigStrict, '__type'>): FutureInstance<TaqError, NetworkConfigStrict> =>
+	of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +42,6 @@ export const schemas = {
 	schema: networkConfigSchema.transform(val => val as NetworkConfigStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = networkConfigSchema;
 
 export type t = NetworkConfigStrict;

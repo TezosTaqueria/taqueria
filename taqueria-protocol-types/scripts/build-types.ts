@@ -83,7 +83,7 @@ export const of = (input: unknown): FutureInstance<TaqError, ${typeNameStrict}> 
     }
 };
 
-export const make = (input: ${typeNameStrict}): FutureInstance<TaqError, ${typeNameStrict}> => of(input);
+export const make = (input: Omit<${typeNameStrict}, '__type'>): FutureInstance<TaqError, ${typeNameStrict}> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -91,7 +91,7 @@ export const schemas = {
 	schema: ${typeNameSchema}.transform(val => val as ${typeNameStrict}),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = ${typeNameSchema};
 
 export type t = ${typeNameStrict};
         `.trimStart();

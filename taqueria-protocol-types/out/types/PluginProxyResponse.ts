@@ -33,8 +33,9 @@ export const of = (input: unknown): FutureInstance<TaqError, PluginProxyResponse
 	}
 };
 
-export const make = (input: PluginProxyResponseStrict): FutureInstance<TaqError, PluginProxyResponseStrict> =>
-	of(input);
+export const make = (
+	input: Omit<PluginProxyResponseStrict, '__type'>,
+): FutureInstance<TaqError, PluginProxyResponseStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -42,6 +43,6 @@ export const schemas = {
 	schema: pluginProxyResponseSchema.transform(val => val as PluginProxyResponseStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = pluginProxyResponseSchema;
 
 export type t = PluginProxyResponseStrict;

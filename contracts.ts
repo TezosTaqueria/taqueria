@@ -38,7 +38,7 @@ const newContract = (sourceFile: string, projectDir: SanitiziedAbsPath.t, contra
 export const addContract = (parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18n.t) =>
 	pipe(
 		getConfig(parsedArgs.projectDir, i18n),
-		chain(LoadedConfig.toConfig),
+		chain(LoadedConfig.make),
 		chain(config =>
 			isContractRegistered(parsedArgs.contractName, config)
 				? reject(TaqError.create({
@@ -47,7 +47,7 @@ export const addContract = (parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18
 					msg: `${parsedArgs.contractName} has already been registered`,
 				}))
 				: pipe(
-					newContract(parsedArgs.sourceFile, parsedArgs.projectDir, config.contractsDir),
+					newContract(parsedArgs.sourceFile, parsedArgs.projectDir, config.contractsDir ?? 'contracts'),
 					map(contract => {
 						const contracts = config.contracts || {};
 						return {
@@ -67,7 +67,7 @@ export const addContract = (parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18
 export const removeContract = (parsedArgs: SanitizedArgs.RemoveContractArgs, i18n: i18n.t) =>
 	pipe(
 		getConfig(parsedArgs.projectDir, i18n),
-		chain(LoadedConfig.toConfig),
+		chain(LoadedConfig.make),
 		chain(config => {
 			if (!isContractRegistered(parsedArgs.contractName, config)) {
 				return reject(TaqError.create({

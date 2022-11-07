@@ -1,3 +1,4 @@
+import * as PluginActionName from '@taqueria/protocol/PluginActionName';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import {
 	attemptP,
@@ -653,7 +654,7 @@ const exposeTemplates = (
 
 						if (isComposite) {
 							if (parsedArgs.plugin) {
-								const installedPlugin = config.plugins.find(plugin => plugin.name === parsedArgs.plugin);
+								const installedPlugin = config.plugins?.find(plugin => plugin.name === parsedArgs.plugin);
 								if (installedPlugin) {
 									return handleTemplate(parsedArgs, config, installedPlugin, state, pluginLib, i18n);
 								}
@@ -683,10 +684,13 @@ const handleTemplate = (
 	if (template) {
 		return template.handler === 'function'
 			? pipe(
-				pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)('proxyTemplate', template.encoding)({
-					...parsedArgs,
-					action: 'proxyTemplate',
-				}),
+				PluginActionName.make('proxyTemplate'),
+				chain(action =>
+					pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)(action, template.encoding)({
+						...parsedArgs,
+						action: 'proxyTemplate',
+					})
+				),
 				map(decoded => {
 					if (decoded) return renderPluginJsonRes(decoded, parsedArgs);
 				}),
@@ -836,10 +840,15 @@ const exposeTask = (
 
 				const handler = task.handler === 'proxy' && plugin
 					? pipe(
-						pluginLib.sendPluginActionRequest(plugin)('proxy', task.encoding ?? PluginResponseEncoding.create('none'))({
-							...inputArgs,
-							task: task.task,
-						}),
+						PluginActionName.make('proxy'),
+						chain(action =>
+							pluginLib.sendPluginActionRequest(plugin)(action, task.encoding ?? PluginResponseEncoding.create('none'))(
+								{
+									...inputArgs,
+									task: task.task,
+								},
+							)
+						),
 						chain(addTask(parsedArgs, task.task, plugin.name)),
 						map(res => {
 							const decoded = res as PluginJsonResponse.t | void;

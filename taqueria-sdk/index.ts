@@ -1,4 +1,6 @@
 import * as Config from '@taqueria/protocol/Config';
+import * as ConfigArtifactsDir from '@taqueria/protocol/ConfigArtifactsDir';
+import * as ConfigContractsDir from '@taqueria/protocol/ConfigContractsDir';
 import * as Contract from '@taqueria/protocol/Contract';
 import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
@@ -8,9 +10,12 @@ import * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
 import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
+import * as ParsedPluginInfo from '@taqueria/protocol/ParsedPluginInfo';
 import * as PersistentState from '@taqueria/protocol/PersistentState';
 import * as PluginInfo from '@taqueria/protocol/PluginInfo';
 import * as PositionalArg from '@taqueria/protocol/PositionalArg';
+import * as ProxyTaskArgs from '@taqueria/protocol/ProxyTaskArgs';
+import * as ProxyTemplateArgs from '@taqueria/protocol/ProxyTemplateArgs';
 import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
@@ -35,6 +40,7 @@ import { b58cencode, Prefix, prefix } from '@taquito/utils';
 import crypto from 'crypto';
 
 // @ts-ignore interop issue. Maybe find a different library later
+import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
 import fetch from 'node-fetch';
 import generateName from 'project-name-generator';
@@ -227,7 +233,7 @@ const parseSchema = <T extends RequestArgs.t>(
 	definer: pluginDefiner,
 	defaultPluginName: string,
 	requestArgs: T,
-): PluginSchema.t => {
+): ParsedPluginInfo.t => {
 	const inputSchema: PluginSchema.RawPluginSchema = definer(requestArgs, i18n);
 
 	const { proxy } = inputSchema;
@@ -240,7 +246,7 @@ const parseSchema = <T extends RequestArgs.t>(
 	return {
 		...pluginInfo,
 		proxy,
-	};
+	} as ParsedPluginInfo.t;
 };
 
 const getResponse = <T extends RequestArgs.t>(definer: pluginDefiner, defaultPluginName: string) =>
@@ -282,7 +288,7 @@ const getResponse = <T extends RequestArgs.t>(definer: pluginDefiner, defaultPlu
 					return sendAsyncJson(output);
 				case 'proxy':
 					if (schema.proxy) {
-						const retval = schema.proxy(RequestArgs.createProxyRequestArgs(requestArgs));
+						const retval = await schema.proxy(ProxyTaskArgs.from(requestArgs));
 						if (retval) return retval;
 						return Promise.reject({
 							errCode: 'E_PROXY',
@@ -296,7 +302,7 @@ const getResponse = <T extends RequestArgs.t>(definer: pluginDefiner, defaultPlu
 						context: requestArgs,
 					});
 				case 'proxyTemplate': {
-					const proxyArgs = RequestArgs.createProxyTemplateRequestArgs(requestArgs);
+					const proxyArgs = ProxyTemplateArgs.from(requestArgs);
 					const template = schema.templates?.find(tmpl => tmpl.template === proxyArgs.template);
 					if (template) {
 						if (typeof template.handler === 'function') {
@@ -317,13 +323,13 @@ const getResponse = <T extends RequestArgs.t>(definer: pluginDefiner, defaultPlu
 				case 'checkRuntimeDependencies':
 					return sendAsyncJson(
 						schema.checkRuntimeDependencies
-							? schema.checkRuntimeDependencies(i18n, requestArgs)
+							? schema.checkRuntimeDependencies(requestArgs)
 							: Promise.resolve({ report: [] }),
 					);
 				case 'installRuntimeDependencies':
 					return sendAsyncJson(
 						schema.installRuntimeDependencies
-							? schema.installRuntimeDependencies(i18n, requestArgs)
+							? schema.installRuntimeDependencies(requestArgs)
 							: Promise.resolve({ report: [] }),
 					);
 				default:
@@ -446,7 +452,11 @@ export const newGetInitialStorage = async (
 	parsedArgs: RequestArgs.t,
 	storageFilename: string,
 ): Promise<string | undefined> => {
-	const storagePath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, storageFilename);
+	const storagePath = join(
+		parsedArgs.config.projectDir,
+		parsedArgs.config.artifactsDir ?? 'artifacts',
+		storageFilename,
+	);
 	try {
 		const content = await readFile(storagePath, { encoding: 'utf-8' });
 		return content;
@@ -457,7 +467,7 @@ export const newGetInitialStorage = async (
 };
 
 export const getParameter = async (parsedArgs: RequestArgs.t, paramFilename: string): Promise<string> => {
-	const paramPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, paramFilename);
+	const paramPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir ?? 'artifacts', paramFilename);
 	try {
 		const content = await readFile(paramPath, { encoding: 'utf-8' });
 		return content;
@@ -469,7 +479,11 @@ export const getParameter = async (parsedArgs: RequestArgs.t, paramFilename: str
 /**
  * Update the alias of an address for the current environment
  */
-export const updateAddressAlias = async (parsedArgs: RequestArgs.t, alias: string, address: string): Promise<void> => {
+export const updateAddressAlias = async (
+	parsedArgs: RequestArgs.t,
+	alias: string,
+	address: NonEmptyString.t,
+): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return;
 	if (!env.aliases) {
@@ -533,7 +547,7 @@ export const getAccountPrivateKey = async (
 			} was generated for you.\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
 		);
 	}
-	return network.accounts[account].privateKey;
+	return network.accounts[account].privateKey as string;
 };
 
 /**
@@ -567,7 +581,7 @@ export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
 const joinPaths = (...paths: string[]): string => paths.join('/');
 
 const newContract = async (sourceFile: string, parsedArgs: RequestArgs.t) => {
-	const contractPath = joinPaths(parsedArgs.projectDir, parsedArgs.config.contractsDir, sourceFile);
+	const contractPath = joinPaths(parsedArgs.projectDir, parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
 	try {
 		const contents = await readFile(contractPath, { encoding: 'utf-8' });
 		const hash = await SHA256.toSHA256(contents);

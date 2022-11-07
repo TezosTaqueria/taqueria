@@ -33,7 +33,9 @@ export const of = (input: unknown): FutureInstance<TaqError, ConfigContractsDirS
 	}
 };
 
-export const make = (input: ConfigContractsDirStrict): FutureInstance<TaqError, ConfigContractsDirStrict> => of(input);
+export const make = (
+	input: Omit<ConfigContractsDirStrict, '__type'>,
+): FutureInstance<TaqError, ConfigContractsDirStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +43,6 @@ export const schemas = {
 	schema: configContractsDirSchema.transform(val => val as ConfigContractsDirStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = configContractsDirSchema;
 
 export type t = ConfigContractsDirStrict;

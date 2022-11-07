@@ -1,6 +1,7 @@
 import type { i18n } from '@taqueria/protocol/i18n';
 import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
+import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { chain, chainRej, map, mapRej } from 'fluture';
@@ -77,12 +78,16 @@ const addToPluginList = (pluginName: NpmPluginName, loadedConfig: LoadedConfig.t
 		chain((manifest: { name: string }) => {
 			const allPlugins = loadedConfig.plugins ?? [];
 			const existingPlugins = allPlugins.filter(plugin => plugin.name != manifest.name);
-
-			return InstalledPlugin.make({ name: manifest.name, type: 'npm' })
-				.pipe(map(installedPlugin => [...existingPlugins, installedPlugin]));
+			return NonEmptyString.make(manifest.name)
+				.pipe(
+					chain(name => InstalledPlugin.make({ name, type: 'npm' })),
+				)
+				.pipe(
+					map(installedPlugin => [...existingPlugins, installedPlugin]),
+				);
 		}),
 		chain(plugins =>
-			LoadedConfig.toConfig({
+			LoadedConfig.make({
 				...loadedConfig,
 				plugins,
 			})
@@ -116,10 +121,10 @@ export const uninstallPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plug
 		chain(() => getConfig(projectDir, i18n, false)),
 		chain((config: LoadedConfig.t) => {
 			const pluginName = getPluginName(plugin);
-			const plugins = config.plugins.filter(plugin => plugin.name != pluginName);
+			const plugins = config.plugins?.filter(plugin => plugin.name != pluginName.toString());
 
 			return pipe(
-				LoadedConfig.toConfig({
+				LoadedConfig.make({
 					...config,
 					plugins,
 				}),

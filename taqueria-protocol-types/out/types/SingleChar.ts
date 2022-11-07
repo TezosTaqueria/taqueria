@@ -33,7 +33,7 @@ export const of = (input: unknown): FutureInstance<TaqError, SingleCharStrict> =
 	}
 };
 
-export const make = (input: SingleCharStrict): FutureInstance<TaqError, SingleCharStrict> => of(input);
+export const make = (input: Omit<SingleCharStrict, '__type'>): FutureInstance<TaqError, SingleCharStrict> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
@@ -41,6 +41,6 @@ export const schemas = {
 	schema: singleCharSchema.transform(val => val as SingleCharStrict),
 };
 export const rawSchema = schemas.rawSchema;
-export const internalSchema = schemas.schema;
+export const internalSchema = singleCharSchema;
 
 export type t = SingleCharStrict;
