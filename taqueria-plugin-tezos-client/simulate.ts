@@ -20,6 +20,15 @@ import {
 
 type TableRow = { contract: string; result: string };
 
+// This is needed mostly due to the fact that execCmd() wraps the command in double quotes
+const preprocessString = (value: string): string => {
+	// 1. if the string contains escaped double quotes, escape them further
+	value = value.replace(/\\"/g, '\\\\\\"');
+	// 2. if the string contains unescaped double quotes, escape them
+	value = value.replace(/(?<!\\)"/g, '\\"');
+	return value;
+};
+
 const getDefaultStorageFilename = (contractName: string): string => {
 	const baseFilename = basename(contractName, extname(contractName));
 	const extFilename = extname(contractName);
