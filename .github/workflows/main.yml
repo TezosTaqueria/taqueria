@@ -237,6 +237,8 @@ jobs:
 
       - name: Build all
         run: |
+          BUILD=`git rev-parse --short "$GITHUB_SHA"`
+          TAQ_VERSION="${TAQ_VERSION/\//-}"
           npx lerna bootstrap 
           npm run build:packages 
           npm run build:binary 
@@ -299,6 +301,8 @@ jobs:
 
       - name: Build all
         run: |
+          BUILD=`git rev-parse --short "$GITHUB_SHA"`
+          TAQ_VERSION="${TAQ_VERSION/\//-}"
           npx lerna bootstrap 
           npm run build:packages 
           npm run build:binary 
