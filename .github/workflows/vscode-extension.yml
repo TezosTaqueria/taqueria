@@ -57,11 +57,13 @@ jobs:
       - name: Attempt to rebuild
         run: npm rebuild | true
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      - name: Build all
+        run: |
+          export PATH="$PATH:$(pwd)"
+          npx lerna bootstrap 
+          npm run build:packages 
+          npm run build:binary 
+          npm run build:docker
       
       - name: Compile TS
         run: npm run compile:test --workspace ${{ env.GIT_WORKSPACE }}
