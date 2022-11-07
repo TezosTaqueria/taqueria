@@ -1,7 +1,7 @@
 import { exec as exec1 } from 'child_process';
-import type { ExecException } from 'child_process';
 import fsPromises from 'fs/promises';
 import util from 'util';
+import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
 const taqueriaProjectPath = './e2e/auto-test';
@@ -11,9 +11,8 @@ const taqueriaProjectPathNPMFull = './e2e/auto-test-npm-full';
 describe('E2E Testing for taqueria general functionality', () => {
 	test('Verify that taq init creates test folder', async () => {
 		try {
-			const projectInit = await exec(`taq init ${taqueriaProjectPath}`);
-			// console.log(projectInit.stdout)
-			// expect(projectInit.stdout.trim()).toEqual("Project taq'ified!");
+			const projectInit = await generateTestProject(taqueriaProjectPath);
+			expect(projectInit.stdout.trim()).toEqual("Project taq'ified!");
 
 			const taquifiedDirContents = await fsPromises.readdir(taqueriaProjectPath);
 			expect(taquifiedDirContents).toContain('artifacts');
