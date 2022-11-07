@@ -3,7 +3,13 @@ import fsPromises from 'fs/promises';
 import utils from 'util';
 import * as contents from './data/help-contents/taquito-contents';
 import { networkInfo } from './data/network-info';
-import { checkContractExistsOnNetwork, generateTestProject, itemArrayInTable } from './utils/utils';
+import {
+	checkContractBalanceOnNetwork,
+	checkContractExistsOnNetwork,
+	generateTestProject,
+	itemArrayInTable,
+	sleep,
+} from './utils/utils';
 const exec = utils.promisify(exec1);
 
 describe('E2E Testing for taqueria taquito plugin', () => {
@@ -229,19 +235,15 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		expect(amountFundedArray).toStrictEqual(configTezAmounts);
 	});
 
-	test.skip('Verify that taqueria taquito plugin will can send from one instantiated account to another', async () => {
+	test('Verify that taqueria taquito plugin will can send from one instantiated account to another', async () => {
 		environment = 'test';
+		const transferAmountMutez = 1000000;
 
 		await exec(`cp e2e/data/config-taquito-test-environment-low-tez.json ${taqueriaProjectPath}/.taq/config.json`);
 
 		const accountResult = await exec(`taq instantiate-account -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
-
-		const configContents = JSON.parse(
-			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
-		);
-		const configTezAmounts = Object.values(configContents.accounts);
 
 		expect(accountResult.stdout).toBe(`Accounts instantiated: bob, alice, john, jane, joe.
 Please execute "taq fund" targeting the same environment to fund these accounts\n`);
@@ -250,8 +252,21 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 			cwd: `./${taqueriaProjectPath}`,
 		});
 
-		const amountFundedArray = itemArrayInTable(/[0-9]{7,}/g, fundResult);
-		expect(amountFundedArray).toStrictEqual(configTezAmounts);
+		const configContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		);
+		const configAlicePKH = configContents.network.ghostnet.accounts.alice.publicKeyHash;
+		const configAliceAmount = configContents.accounts.alice;
+
+		await exec(`taq transfer ${configAlicePKH} --mutez ${transferAmountMutez} --sender bob -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		const finalTezValue = Number(configAliceAmount) + transferAmountMutez;
+		const networkContractInfo = checkContractBalanceOnNetwork(configAlicePKH, networkInfo.networkURL);
+		await networkContractInfo.then(info => {
+			expect(info).toStrictEqual([finalTezValue]);
+		});
 	});
 
 	test('Verify that taqueria taquito plugin will show proper error when environment does not exists', async () => {

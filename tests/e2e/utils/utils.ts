@@ -93,6 +93,15 @@ export async function checkContractExistsOnNetwork(contractAddress: string, netw
 	}
 }
 
+export async function checkContractBalanceOnNetwork(
+	contractAddress: string,
+	networkNodeURL: string,
+): Promise<number[] | null> {
+	const tezos = new TezosToolkit(networkNodeURL);
+	const balance = await tezos.tz.getBalance(contractAddress);
+	return balance.c;
+}
+
 export async function installDependencies(
 	projectPath: string,
 	packageNames: string[],
