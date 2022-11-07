@@ -57,9 +57,12 @@ jobs:
       - name: Attempt to rebuild
         run: npm rebuild | true
 
+          
+      - name: Add working dir to PATH
+        run: echo "$(pwd)" >> $GITHUB_PATH
+
       - name: Build all
         run: |
-          export PATH="$PATH:$(pwd)"
           npx lerna bootstrap 
           npm run build:packages 
           npm run build:binary 

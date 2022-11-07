@@ -230,9 +230,11 @@ jobs:
         with:
           deno-version: "1.23.4"
 
+      - name: Add working dir to PATH
+        run: echo "$(pwd)" >> $GITHUB_PATH
+
       - name: Build all
         run: |
-          export PATH="$PATH:$(pwd)"
           npx lerna bootstrap 
           npm run build:packages 
           npm run build:binary 
@@ -285,9 +287,11 @@ jobs:
           scope: "${{ env.SCOPE }}"
           cache: 'npm'
 
+      - name: Add working dir to PATH
+        run: echo "$(pwd)" >> $GITHUB_PATH
+
       - name: Build all
         run: |
-          export PATH="$PATH:$(pwd)"
           npx lerna bootstrap 
           npm run build:packages 
           npm run build:binary 
