@@ -14,29 +14,31 @@ const getTaqueriaDockerImageIds = (): string => {
 	return cmd;
 };
 
+const removeStates = () =>
+	execCmd('rm .taq/*state*.json')
+		.catch(() => Promise.reject(new Error('No state files exist in the .taq/ folder')));
+
+const removeImages = () =>
+	execCmd(getTaqueriaDockerImageIds())
+		.then(results => {
+			const images = results.stdout.replace(/\s/g, ' ');
+			if (images) return execCmd(`docker rmi --force ${images}`);
+		})
+		.catch(() =>
+			Promise.reject(
+				new Error(
+					'Unable to clean all docker images properly. Maybe you need to delete all Taqueria-related containers first',
+				),
+			)
+		);
+
 const clean = (parsedArgs: RequestArgs.ProxyRequestArgs): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	return Promise.resolve()
-		.then(_ =>
-			execCmd('rm .taq/*state*.json')
-				.catch(_ => Promise.reject(new Error('No state files exist in the .taq/ folder')))
-		)
-		.then(_ =>
-			execCmd(getTaqueriaDockerImageIds())
-				.then(results => {
-					const images = results.stdout.replace(/\s/g, ' ');
-					if (images) return execCmd(`docker rmi --force ${images}`);
-				})
-				.catch(_ =>
-					Promise.reject(
-						new Error(
-							'Unable to clean all docker images properly. Maybe you need to delete all Taqueria-related containers first',
-						),
-					)
-				)
-		)
-		.then(_ => sendJsonRes('All Taqueria-related states and docker images cleaned 🧽'))
+		.then(removeStates)
+		.then(removeImages)
+		.then(() => sendJsonRes('All Taqueria-related states and docker images cleaned 🧽'))
 		.catch(err => sendAsyncErr(`Error occurred during cleaning: ${err.message}`));
 };
 
