@@ -74,11 +74,11 @@ jobs:
           export PATH="$PATH:$(pwd)"
           npm run build-all
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      # - name: Cache node modules
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ./node_modules/**
+      #     key: cache-node-modules-${{ github.run_id }}
 
   build-binaries:
     permissions:
@@ -295,11 +295,15 @@ jobs:
           scope: "${{ env.SCOPE }}"
           cache: 'npm'
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      - name: NPM build
+        run: |
+          npm run build-all
+
+      # - name: Cache node modules
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ./node_modules/**
+      #     key: cache-node-modules-${{ github.run_id }}
 
       - name: Publish for PR
         if:  ${{ github.event_name == 'pull_request' }}
