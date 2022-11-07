@@ -2,8 +2,8 @@ import {
 	execCmd,
 	getArch,
 	getFlextesaImage,
+	getInitialStorage,
 	getParameter,
-	newGetInitialStorage,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
@@ -41,7 +41,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	if (!projectDir) throw `No project directory provided`;
 
 	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(sourceFile);
-	const storage = (await newGetInitialStorage(parsedArgs, storageFilename))?.trim();
+	const storage = (await getInitialStorage(parsedArgs, storageFilename))?.trim();
 
 	if (storage === undefined) {
 		return Promise.reject(
@@ -66,7 +66,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
 
 	const cmd =
-		`${baseCmd} tezos-client ${GLOBAL_OPTIONS} run script ${inputFile} on storage \'${processedStorage}\' and input \'${processedParam}\' ${entrypoint}`;
+		`${baseCmd} octez-client ${GLOBAL_OPTIONS} run script ${inputFile} on storage \'${processedStorage}\' and input \'${processedParam}\' ${entrypoint}`;
 	return cmd;
 };
 

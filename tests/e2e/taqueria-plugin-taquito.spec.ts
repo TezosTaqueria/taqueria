@@ -296,7 +296,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			'Storage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "hello-tacos.default_storage.tz" in the artifacts directory',
 		);
 		expect(stdoutDeploy.stderr).toContain(
-			'You can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option',
+			'You can also manually pass a storage file to the originate task using the --storage STORAGE_FILE_NAME option',
 		);
 	});
 
@@ -318,7 +318,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain(
-			"There was a problem communicating with the chain. Check the RPC URL of the network or sandbox you're targeting in config.json",
+			'Error while performing operation',
 		);
 	});
 

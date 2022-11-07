@@ -117,8 +117,10 @@ export class SmartContractChildrenTreeItem extends SandboxTreeItemBase {
 
 export class SmartContractEntrypointTreeItem extends SandboxTreeItemBase {
 	constructor(
-		name: string,
+		public readonly name: string,
 		public readonly jsonParameters: any | null,
+		public readonly michelineParameters: any | null,
+		public readonly michelsonParameters: any | null,
 		public readonly parent: SandboxSmartContractTreeItem,
 	) {
 		super(name, 'smartContractEntryPoint', vscode.TreeItemCollapsibleState.None);
