@@ -17,7 +17,7 @@ on:
 concurrency:
   group: ${{ github.ref_name || github.ref }}
   cancel-in-progress: true
-  
+
 env:
   TAQ_VERSION: ${{ github.ref_name }}
 
@@ -117,6 +117,7 @@ jobs:
       - name: Build the binary for ${{ matrix.os }}
         id: build-bin
         shell: bash
+        env:
           DENO_DIR: "./deno"
         run: |
           BUILD=`git rev-parse --short "$GITHUB_SHA"`
