@@ -43,6 +43,7 @@
 	},
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
+		"@taqueria/protocol-types": "^0.20.2",
 		"batching-toposort": "^1.2.0",
 		"fluture": "^14.0.0",
 		"rambda": "^7.2.1",

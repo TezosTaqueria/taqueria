@@ -163,7 +163,7 @@ export const environmentSchema = z.object({
 		.array(nonEmptyStringSchema)
 		.min(1, 'Must reference the name of an existing sandbox configuration'),
 	storage: z.record(nonEmptyStringSchema).optional(),
-	aliases: z.record(nonEmptyStringSchema).optional(),
+	aliases: z.record(z.record(nonEmptyStringSchema)).optional(),
 });
 
 export const persistedTaskSchema = z.object({
@@ -222,7 +222,7 @@ export const networkConfigSchema = z.object({
 	label: humanReadableIdentifierSchema,
 	rpcUrl: urlSchema,
 	protocol: economicalProtocolHashSchema,
-	accounts: z.record(z.unknown()).optional(),
+	accounts: z.record(z.record(z.unknown())).optional(),
 	faucet: faucetSchema.optional(),
 });
 

@@ -142,7 +142,10 @@ tests/coverage
 /taqueria-plugin-flextesa/index.js
 /taqueria-plugin-flextesa/index.js.map
 /taqueria-plugin-flextesa/.parcel-cache
-/taqueria-flextesa-manager/index.js
+/taqueria-flextesa-manager/*.map
+/taqueria-flextesa-manager/*.js
+/taqueria-flextesa-manager/*.d.ts
+/taqueria-flextesa-manager/*.mjs
 /taqueria-plugin-teztnets/index.js
 /taqueria-plugin-teztnets/index.js.map
 /taqueria-plugin-teztnets/.parcel-cache

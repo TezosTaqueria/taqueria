@@ -1,12 +1,11 @@
 import { Protocol, writeJsonFile } from '@taqueria/node-sdk';
+import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 import { exec } from 'child_process';
 import { execa } from 'execa';
 import yargs, { parse } from 'yargs';
 import * as SandboxAccount from './SandboxAccount';
 import * as SanitizedArgs from './SanitizedArgs';
-
-import { Config, SandboxAccountConfig } from '@taqueria/protocol/taqueria-protocol-types';
 
 type Args = ReturnType<typeof yargs> & { config: string; configure: boolean; importAccounts: boolean; sandbox: string };
 
@@ -18,13 +17,13 @@ interface Failure {
 export const configureTezosClient = () => run(`tezos-client --endpoint http://localhost:20000 config update`);
 
 export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
-	Object.entries(parsedArgs.config.accounts).reduce(
-		async (lastConfig, [accountName, initialBalance]) => {
+	Object.entries(parsedArgs.config.accounts || {}).reduce(
+		async (lastConfig, [accountName, _initialBalance]) => {
 			const accountDetails = await addAccount(accountName);
 			const config = (await lastConfig as SanitizedArgs.ParsedConfig);
 			const updatedConfig = { ...config } as SanitizedArgs.ParsedConfig;
 			const sandboxConfig = (updatedConfig.sandbox[parsedArgs.sandbox] as SandboxConfig.t);
-			const accounts = sandboxConfig.accounts ?? { default: accountName };
+			const accounts = sandboxConfig.accounts ?? SandboxAccountConfig.from({ default: accountName });
 			accounts[accountName] = accountDetails;
 			(updatedConfig.sandbox[parsedArgs.sandbox] as SandboxConfig.t).accounts = accounts;
 			return updatedConfig;
@@ -109,7 +108,7 @@ const getBootstrapFlags = (parsedArgs: SanitizedArgs.t) => {
 		(retval, [accountName, accountDetails]) => {
 			if (typeof accountDetails === 'string') return retval;
 			const account = accountDetails as SandboxAccountConfig.t;
-			const initialBalance = parsedArgs.config.accounts[accountName];
+			const initialBalance = parsedArgs.config.accounts![accountName];
 			return [
 				...retval,
 				`--add-bootstrap-account="${accountName},${account.encryptedKey},${account.publicKeyHash},${account.secretKey}@${initialBalance}"`,

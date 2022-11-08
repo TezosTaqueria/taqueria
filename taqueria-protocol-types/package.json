@@ -60,7 +60,8 @@
 	},
 	"tsup": {
 		"entry": [
-			"[!.]+.ts"
+			"[!.]+.ts",
+			"out/types/*.ts"
 		],
 		"sourcemap": true,
 		"target": "node16",
