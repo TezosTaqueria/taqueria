@@ -35,6 +35,7 @@
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
 		"@taqueria/protocol": "^0.20.2",
+		"@taqueria/protocol-types": "^0.20.2",
 		"@taquito/signer": "^13.0.1",
 		"@taquito/taquito": "^13.0.1",
 		"@taquito/utils": "^13.0.1",

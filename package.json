@@ -60,6 +60,7 @@
 		"with-staged": "^1.0.2"
 	},
 	"workspaces": [
+		"./taqueria-protocol-types",
 		"./taqueria-protocol",
 		"./taqueria-sdk",
 		"./taqueria-state",

@@ -2,20 +2,20 @@ import { execCmd, getContracts, sendAsyncErr, sendErr, sendJsonRes } from '@taqu
 import { RequestArgs, TaqError } from '@taqueria/node-sdk/types';
 import { basename, extname, join } from 'path';
 
-interface Opts extends RequestArgs.t {
+interface Opts extends RequestArgs {
 	sourceFile?: string;
 }
 
 const getInputFilename = (opts: Opts) =>
 	(sourceFile: string) => {
 		const inputFile = basename(sourceFile, extname(sourceFile));
-		return join(opts.config.contractsDir, `${inputFile}.arl`);
+		return join(opts.config.contractsDir ?? 'contracts', `${inputFile}.arl`);
 	};
 
 const getContractArtifactFilename = (opts: Opts) =>
 	(sourceFile: string) => {
 		const outFile = basename(sourceFile, extname(sourceFile));
-		return join(opts.config.artifactsDir, `${outFile}.tz`);
+		return join(opts.config.artifactsDir ?? 'contracts', `${outFile}.tz`);
 	};
 
 const getCompileCommand = (opts: Opts) =>

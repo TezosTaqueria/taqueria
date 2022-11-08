@@ -1,9 +1,8 @@
-import { experimental, sendAsyncErr } from '@taqueria/node-sdk';
-import * as RequestArgs from '@taqueria/protocol/RequestArgs';
+import { experimental, RequestArgs, sendAsyncErr } from '@taqueria/node-sdk';
 import { writeFile } from 'fs/promises';
 import { arl_template } from './archetype_template';
 
-interface Opts extends RequestArgs.t {
+interface Opts extends RequestArgs {
 	sourceFileName?: string;
 }
 
@@ -17,12 +16,12 @@ const validateExtension = async (contractName: string) => {
 	return sendAsyncErr(`"${contractName}" doesn't have extension "arl".`);
 };
 
-const createContract = (arg: Opts) => {
-	const contractName = arg.sourceFileName as string;
-	const contractsDir = `${arg.config.projectDir}/${arg.config.contractsDir}`;
+const createContract = (args: Opts) => {
+	const contractName = args.sourceFileName as string;
+	const contractsDir = `${args.config.projectDir}/${args.config.contractsDir}`;
 	return validateExtension(contractName)
 		.then(_ => writeFile(`${contractsDir}/${contractName}`, arl_template))
-		.then(_ => registerContract(arg, contractName));
+		.then(_ => registerContract(args, contractName));
 };
 
 export default createContract;

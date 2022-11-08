@@ -105,16 +105,13 @@ export type Template = { __type: Template } & {
 	options?: Option[];
 	positionals?: PositionalArg[];
 	handler: TemplateHandler;
-	encoding: PluginResponseEncoding;
+	encoding?: PluginResponseEncoding;
 };
 
 type TemplateHandler =
 	| NonEmptyString // TODO: should this be Verb?
 	| ((args: RequestArgs) =>
-		| void
 		| PluginJsonResponse
-		| Promise<void>
-		| Promise<Promise<void>>
 		| Promise<PluginJsonResponse>);
 
 export type ParsedTemplate = { __type: ParsedTemplate } & ParsedTemplateRaw;
@@ -177,12 +174,14 @@ export type PluginDependenciesResponse = { __type: PluginDependenciesResponse } 
 	report: RuntimeDependencyReport[];
 };
 
-export type PluginJsonResponse = { __type: PluginJsonResponse } & {
-	data?: unknown;
+export type PluginJsonResponse =
+	| { __type: PluginJsonResponse } & {
+		data?: unknown;
 
-	/** @default none */
-	render: 'none' | 'table' | 'string';
-};
+		/** @default none */
+		render: 'none' | 'table' | 'string';
+	}
+	| void;
 
 export type PluginProxyResponse = { __type: PluginProxyResponse } & PluginProxyResponseRaw;
 type PluginProxyResponseRaw = void | PluginJsonResponse;

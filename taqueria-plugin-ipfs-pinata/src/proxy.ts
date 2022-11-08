@@ -1,5 +1,6 @@
 import { sendAsyncErr, sendAsyncRes, sendErr, sendJsonRes } from '@taqueria/node-sdk';
-import { LoadedConfig, RequestArgs, SanitizedAbsPath } from '@taqueria/node-sdk/types';
+import { RequestArgs } from '@taqueria/node-sdk';
+import { LoadedConfig, SanitizedAbsPath } from '@taqueria/node-sdk/types';
 import path from 'path';
 import { processFiles } from './file-processing';
 import { PinataAuth, pinHash, publishFileToIpfs } from './pinata-api';
@@ -17,9 +18,10 @@ type PluginResponse =
 		data: unknown[];
 	};
 
-interface Opts extends RequestArgs.ProxyRequestArgs {
+interface Opts extends RequestArgs {
 	readonly path?: string;
 	readonly hash?: string;
+	readonly task?: string;
 }
 
 const publishToIpfs = async (fileOrDirPath: undefined | string, auth: PinataAuth): Promise<PluginResponse> => {
@@ -125,7 +127,7 @@ const execute = async (opts: Opts): Promise<PluginResponse> => {
 	}
 };
 
-export default async (args: RequestArgs.ProxyRequestArgs): Promise<PluginResponse> => {
+export default async (args: RequestArgs): Promise<PluginResponse> => {
 	const opts = args as Opts;
 
 	try {

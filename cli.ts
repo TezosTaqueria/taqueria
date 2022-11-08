@@ -686,7 +686,7 @@ const handleTemplate = (
 			? pipe(
 				PluginActionName.make('proxyTemplate'),
 				chain(action =>
-					pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)(action, template.encoding)({
+					pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)(action, template.encoding ?? 'none')({
 						...parsedArgs,
 						action: 'proxyTemplate',
 					})

@@ -1,3 +1,9 @@
+export * from '@taqueria/protocol-types/types';
+import { RequestArgs } from '@taqueria/node-sdk';
+import * as Strict from '@taqueria/protocol-types/out/types-strict';
+import * as NonStrict from '@taqueria/protocol-types/types';
+export { Option, PositionalArg, Task, Template } from '@taqueria/protocol-types';
+export * as Protocol from '@taqueria/protocol-types/out/types-strict';
 import * as Config from '@taqueria/protocol/Config';
 import * as ConfigArtifactsDir from '@taqueria/protocol/ConfigArtifactsDir';
 import * as ConfigContractsDir from '@taqueria/protocol/ConfigContractsDir';
@@ -12,17 +18,14 @@ import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
 import * as ParsedPluginInfo from '@taqueria/protocol/ParsedPluginInfo';
 import * as PersistentState from '@taqueria/protocol/PersistentState';
-import * as PluginInfo from '@taqueria/protocol/PluginInfo';
 import * as PositionalArg from '@taqueria/protocol/PositionalArg';
 import * as ProxyTaskArgs from '@taqueria/protocol/ProxyTaskArgs';
 import * as ProxyTemplateArgs from '@taqueria/protocol/ProxyTemplateArgs';
-import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 import * as SHA256 from '@taqueria/protocol/SHA256';
 import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import type { TaqError } from '@taqueria/protocol/TaqError';
-import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
 import * as Template from '@taqueria/protocol/Template';
 import { exec, ExecException } from 'child_process';
@@ -174,13 +177,13 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 
 export const noop = () => {};
 
-const parseArgs = <T extends RequestArgs.t>(unparsedArgs: string[]): LikeAPromise<T, TaqError> => {
+const parseArgs = <T extends RequestArgs>(unparsedArgs: string[]): LikeAPromise<T, TaqError> => {
 	if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
 		try {
 			const preprocessedArgs = preprocessArgs(unparsedArgs);
 			const argv = yargs(preprocessedArgs.slice(2)).argv;
 			const postprocessedArgs = postprocessArgs(argv);
-			const requestArgs = RequestArgs.from(postprocessedArgs);
+			const requestArgs = postprocessedArgs;
 			return Promise.resolve(requestArgs as T);
 		} catch (previous) {
 			if (previous instanceof ZodError) {
@@ -228,7 +231,7 @@ const postprocessArgs = (args: string[]): Record<string, unknown> => {
 	return groupedArgs;
 };
 
-const parseSchema = <T extends RequestArgs.t>(
+const parseSchema = <T extends RequestArgs>(
 	i18n: i18n,
 	definer: pluginDefiner,
 	defaultPluginName: string,
@@ -238,18 +241,14 @@ const parseSchema = <T extends RequestArgs.t>(
 
 	const { proxy } = inputSchema;
 
-	const pluginInfo = PluginSchema.create({
+	return PluginSchema.create({
 		...inputSchema,
 		name: inputSchema.name ?? defaultPluginName,
-	});
-
-	return {
-		...pluginInfo,
 		proxy,
-	} as ParsedPluginInfo.t;
+	}) as ParsedPluginInfo.t;
 };
 
-const getResponse = <T extends RequestArgs.t>(definer: pluginDefiner, defaultPluginName: string) =>
+const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPluginName: string) =>
 	async (requestArgs: T) => {
 		const { taqRun } = requestArgs;
 		const i18n = await load();
@@ -320,18 +319,18 @@ const getResponse = <T extends RequestArgs.t>(definer: pluginDefiner, defaultPlu
 						context: requestArgs,
 					});
 				}
-				case 'checkRuntimeDependencies':
-					return sendAsyncJson(
-						schema.checkRuntimeDependencies
-							? schema.checkRuntimeDependencies(requestArgs)
-							: Promise.resolve({ report: [] }),
-					);
-				case 'installRuntimeDependencies':
-					return sendAsyncJson(
-						schema.installRuntimeDependencies
-							? schema.installRuntimeDependencies(requestArgs)
-							: Promise.resolve({ report: [] }),
-					);
+				// case 'checkRuntimeDependencies':
+				// 	return sendAsyncJson(
+				// 		schema.checkRuntimeDependencies
+				// 			? schema.checkRuntimeDependencies(requestArgs)
+				// 			: Promise.resolve({ report: [] }),
+				// 	);
+				// case 'installRuntimeDependencies':
+				// 	return sendAsyncJson(
+				// 		schema.installRuntimeDependencies
+				// 			? schema.installRuntimeDependencies(requestArgs)
+				// 			: Promise.resolve({ report: [] }),
+				// 	);
 				default:
 					return Promise.reject({
 						errCode: 'E_NOT_SUPPORTED',
@@ -359,7 +358,7 @@ const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
 /**
  * Gets the name of the current environment
  */
-export const getCurrentEnvironment = (parsedArgs: RequestArgs.t): string => {
+export const getCurrentEnvironment = (parsedArgs: RequestArgs): string => {
 	return parsedArgs.env
 		? (parsedArgs.env as string)
 		: (
@@ -372,38 +371,37 @@ export const getCurrentEnvironment = (parsedArgs: RequestArgs.t): string => {
 /**
  * Gets the configuration for the current environment, if one is configured
  */
-export const getCurrentEnvironmentConfig = (parsedArgs: RequestArgs.t) => {
+export const getCurrentEnvironmentConfig = (parsedArgs: RequestArgs) => {
 	const currentEnv = getCurrentEnvironment(parsedArgs);
 
 	return parsedArgs.config.environment && parsedArgs.config.environment[currentEnv]
-		? parsedArgs.config.environment[currentEnv] as Protocol.Environment.t | undefined
+		? parsedArgs.config.environment[currentEnv] as Environment.t | undefined
 		: undefined;
 };
 
 /**
  * Gets the configuration for the project metadata
  */
-export const getMetadataConfig = (parsedArgs: RequestArgs.t) =>
-	() => (parsedArgs.config.metadata ?? undefined) as Protocol.MetadataConfig.t | undefined;
+export const getMetadataConfig = (parsedArgs: RequestArgs) =>
+	() => (parsedArgs.config.metadata ?? undefined) as MetadataConfig.t | undefined;
 
 /**
  * Gets the configuration for the named network
  */
-export const getNetworkConfig = (parsedArgs: RequestArgs.t) =>
-	(networkName: string) =>
-		(parsedArgs.config.network![networkName] ?? undefined) as Protocol.NetworkConfig.t | undefined;
+export const getNetworkConfig = (parsedArgs: RequestArgs) =>
+	(networkName: string) => (parsedArgs.config.network![networkName] ?? undefined) as NetworkConfig.t | undefined;
 
 /**
  * Gets the configuration for the named sandbox
  */
-export const getSandboxConfig = (parsedArgs: RequestArgs.t) =>
-	(sandboxName: string): Protocol.SandboxConfig.t | undefined =>
-		(parsedArgs.config.sandbox![sandboxName] ?? undefined) as Protocol.SandboxConfig.t | undefined;
+export const getSandboxConfig = (parsedArgs: RequestArgs) =>
+	(sandboxName: string): SandboxConfig.t | undefined =>
+		(parsedArgs.config.sandbox![sandboxName] ?? undefined) as SandboxConfig.t | undefined;
 
 /**
  * Gets the name of accounts for the given sandbox
  */
-export const getSandboxAccountNames = (parsedArgs: RequestArgs.t) =>
+export const getSandboxAccountNames = (parsedArgs: RequestArgs) =>
 	(sandboxName: string) => {
 		const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
 
@@ -415,13 +413,13 @@ export const getSandboxAccountNames = (parsedArgs: RequestArgs.t) =>
 /**
  * Gets the account config for the named account of the given sandbox
  */
-export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
+export const getSandboxAccountConfig = (parsedArgs: RequestArgs) =>
 	(sandboxName: string) =>
 		(accountName: string) => {
 			const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
 
 			if (sandbox && sandbox.accounts) {
-				const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>;
+				const accounts = sandbox.accounts as Record<string, SandboxAccountConfig.t>;
 				return accounts[accountName];
 			}
 			return undefined;
@@ -430,7 +428,7 @@ export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
 /**
  * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
  */
-export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilename: string) => {
+export const getInitialStorage = async (parsedArgs: RequestArgs, contractFilename: string) => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (env && env.storage && env.storage[contractFilename]) {
 		const storagePath: string = env.storage[contractFilename];
@@ -449,7 +447,7 @@ export const getInitialStorage = async (parsedArgs: RequestArgs.t, contractFilen
  * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
  */
 export const newGetInitialStorage = async (
-	parsedArgs: RequestArgs.t,
+	parsedArgs: RequestArgs,
 	storageFilename: string,
 ): Promise<string | undefined> => {
 	const storagePath = join(
@@ -466,7 +464,7 @@ export const newGetInitialStorage = async (
 	}
 };
 
-export const getParameter = async (parsedArgs: RequestArgs.t, paramFilename: string): Promise<string> => {
+export const getParameter = async (parsedArgs: RequestArgs, paramFilename: string): Promise<string> => {
 	const paramPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir ?? 'artifacts', paramFilename);
 	try {
 		const content = await readFile(paramPath, { encoding: 'utf-8' });
@@ -480,7 +478,7 @@ export const getParameter = async (parsedArgs: RequestArgs.t, paramFilename: str
  * Update the alias of an address for the current environment
  */
 export const updateAddressAlias = async (
-	parsedArgs: RequestArgs.t,
+	parsedArgs: RequestArgs,
 	alias: string,
 	address: NonEmptyString.t,
 ): Promise<void> => {
@@ -524,7 +522,7 @@ const createAddress = async (network: NetworkConfig.t): Promise<TezosToolkit> =>
 
 // Temporary solution before the environment refactor
 export const getAccountPrivateKey = async (
-	parsedArgs: RequestArgs.t,
+	parsedArgs: RequestArgs,
 	network: NetworkConfig.t,
 	account: string,
 ): Promise<string> => {
@@ -553,7 +551,7 @@ export const getAccountPrivateKey = async (
 /**
  * Gets the default account associated with a sandbox
  */
-export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>
+export const getDefaultAccount = (parsedArgs: RequestArgs) =>
 	(sandboxName: string) => {
 		const sandboxConfig = getSandboxConfig(parsedArgs)(sandboxName);
 		if (sandboxConfig) {
@@ -567,7 +565,7 @@ export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>
 		return undefined;
 	};
 
-export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
+export const getContracts = (regex: RegExp, config: NonStrict.LoadedConfig) => {
 	if (!config.contracts) return [];
 	return Object.values(config.contracts).reduce(
 		(retval: string[], contract) =>
@@ -580,7 +578,7 @@ export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
 
 const joinPaths = (...paths: string[]): string => paths.join('/');
 
-const newContract = async (sourceFile: string, parsedArgs: RequestArgs.t) => {
+const newContract = async (sourceFile: string, parsedArgs: RequestArgs) => {
 	const contractPath = joinPaths(parsedArgs.projectDir, parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
 	try {
 		const contents = await readFile(contractPath, { encoding: 'utf-8' });
@@ -594,7 +592,7 @@ const newContract = async (sourceFile: string, parsedArgs: RequestArgs.t) => {
 	}
 };
 
-const registerContract = async (parsedArgs: RequestArgs.t, sourceFile: string): Promise<void> => {
+const registerContract = async (parsedArgs: RequestArgs, sourceFile: string): Promise<void> => {
 	try {
 		const config = await readJsonFile<Config.t>(parsedArgs.config.configFile);
 		if (config.contracts && config.contracts[sourceFile]) {
@@ -636,7 +634,7 @@ const getPackageName = () => {
 };
 
 export const Plugin = {
-	create: async <Args extends RequestArgs.t>(definer: pluginDefiner, unparsedArgs: string[]) => {
+	create: async <Args extends RequestArgs>(definer: pluginDefiner, unparsedArgs: string[]) => {
 		const packageName = getPackageName();
 		return parseArgs<Args>(unparsedArgs)
 			.then(getResponse(definer, packageName))
@@ -645,22 +643,6 @@ export const Plugin = {
 				process.exit(1);
 			});
 	},
-};
-
-export {
-	Environment,
-	LoadedConfig,
-	MetadataConfig,
-	NetworkConfig,
-	Operation,
-	Option,
-	PersistentState,
-	PositionalArg,
-	Protocol,
-	SandboxAccountConfig,
-	SandboxConfig,
-	Task,
-	Template,
 };
 
 export const experimental = {

@@ -1,5 +1,5 @@
 // import { normalizeContractName } from '@taqueria/plugin-contract-types/src/generator/contract-name';
-import { sendAsyncRes } from '@taqueria/node-sdk';
+import { RequestArgs, sendAsyncErr, sendAsyncRes } from '@taqueria/node-sdk';
 import { generateContractTypesProcessContractFiles } from '@taqueria/plugin-contract-types/src/cli-process.js';
 import {
 	createTestingCodeGenerator,
@@ -12,12 +12,13 @@ import { CustomRequestArgs, ensureSelectedPartitionExists, getPartitionAbspath, 
 type Generator = ReturnType<typeof createTestingCodeGenerator>;
 
 interface Opts extends CustomRequestArgs {
-	readonly michelsonArtifact: string;
+	readonly michelsonArtifact?: string;
 	readonly partition?: string;
 	readonly name?: string;
 }
 
-const getMichelsonAbspath = (parsedArgs: Opts) => join(parsedArgs.config.artifactsDir, parsedArgs.michelsonArtifact);
+const getMichelsonAbspath = (parsedArgs: Opts) =>
+	join(parsedArgs.config.artifactsDir ?? 'artifacts', parsedArgs.michelsonArtifact!);
 
 const ensureMichelsonExists = (parsedArgs: Opts) => {
 	const abspath = getMichelsonAbspath(parsedArgs);
@@ -35,7 +36,7 @@ const getTypesOutputAbspath = (parsedArgs: Opts) => join(getPartition(parsedArgs
 
 const generateContractTypes = (parsedArgs: Opts) =>
 	generateContractTypesProcessContractFiles({
-		inputTzContractDirectory: parsedArgs.config.artifactsDir,
+		inputTzContractDirectory: parsedArgs.config.artifactsDir ?? 'artifacts',
 		inputFiles: [getMichelsonAbspath(parsedArgs)],
 		outputTypescriptDirectory: getTypesOutputAbspath(parsedArgs),
 		format: 'tz',
@@ -45,7 +46,7 @@ const generateContractTypes = (parsedArgs: Opts) =>
 const getContractName = (parsedArgs: Opts) =>
 	parsedArgs.name
 		? parsedArgs.name.trim().replace(/\.ts$/, '')
-		: basename(parsedArgs.michelsonArtifact, '.tz');
+		: basename(parsedArgs.michelsonArtifact!, '.tz');
 
 const generateTestSuite = (parsedArgs: Opts) => {
 	const michelsonAbspath = getMichelsonAbspath(parsedArgs);
@@ -110,11 +111,14 @@ ${
 `;
 	};
 
-export default (parsedArgs: Opts) => {
-	return ensureMichelsonExists(parsedArgs)
-		.then(ensureSelectedPartitionExists)
-		.then(() => parsedArgs)
-		.then(generateContractTypes)
-		.then(generateTestSuite)
-		.then(outFile => sendAsyncRes(`Test suite generated: ${outFile}`));
+export default (args: RequestArgs) => {
+	const parsedArgs = args as Opts;
+	parsedArgs.michelsonArtifact
+		? ensureMichelsonExists(parsedArgs)
+			.then(ensureSelectedPartitionExists)
+			.then(() => parsedArgs)
+			.then(generateContractTypes)
+			.then(generateTestSuite)
+			.then((outFile: string) => sendAsyncRes(`Test suite generated: ${outFile}`))
+		: sendAsyncErr(`No michelson artifact provided`);
 };

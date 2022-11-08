@@ -1,3 +1,4 @@
+import { RequestArgs } from '@taqueria/protocol-types/types';
 import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
@@ -9,7 +10,6 @@ import * as PersistentState from '@taqueria/protocol/PersistentState';
 import * as PluginInfo from '@taqueria/protocol/PluginInfo';
 import * as PluginSchema from '@taqueria/protocol/PluginSchema';
 import * as PositionalArg from '@taqueria/protocol/PositionalArg';
-import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
@@ -31,7 +31,6 @@ export {
 	PluginSchema,
 	PositionalArg,
 	Protocol,
-	RequestArgs,
 	SandboxAccountConfig,
 	SandboxConfig,
 	SanitizedAbsPath,
@@ -40,6 +39,8 @@ export {
 	Task,
 	Template,
 };
+
+export type { RequestArgs };
 
 export interface LikeAPromise<Success, TaqError> extends Promise<Success> {
 }
@@ -53,4 +54,4 @@ export interface StdIO {
 	stderr: string;
 }
 
-export type pluginDefiner = <T extends RequestArgs.t>(parsedArgs: T, i18n: i18n) => PluginSchema.RawPluginSchema;
+export type pluginDefiner = <T extends RequestArgs>(parsedArgs: T, i18n: i18n) => PluginSchema.RawPluginSchema;

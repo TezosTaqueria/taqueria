@@ -1,23 +1,13 @@
+import { PluginProxyResponse } from '@taqueria/protocol-types/types';
+import { RequestArgs } from '@taqueria/protocol-types/types';
 import * as Alias from '@taqueria/protocol/Alias';
 import createType from '@taqueria/protocol/Base';
 import * as Operation from '@taqueria/protocol/Operation';
 import * as PluginDependenciesResponse from '@taqueria/protocol/PluginDependenciesResponse';
 import * as PluginInfo from '@taqueria/protocol/PluginInfo';
-import * as PluginProxyResponse from '@taqueria/protocol/PluginProxyResponse';
 import * as ProxyTemplateArgs from '@taqueria/protocol/ProxyTemplateArgs';
-import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as Template from '@taqueria/protocol/Template';
 import { z } from 'zod';
-
-const proxyFnSchema = z
-	.function()
-	.args(ProxyTemplateArgs.schemas.schema)
-	.returns(z.promise(PluginProxyResponse.schemas.schema));
-
-const runtimeDependenciesFn = z
-	.function()
-	.args(RequestArgs.schemas.schema)
-	.returns(z.promise(PluginDependenciesResponse.schemas.schema));
 
 const internalSchema = PluginInfo.internalSchema.extend({
 	operations: z.preprocess(
@@ -34,9 +24,6 @@ const internalSchema = PluginInfo.internalSchema.extend({
 			Template.schemas.schema,
 		).optional(),
 	),
-	proxy: proxyFnSchema.optional(),
-	checkRuntimeDependencies: runtimeDependenciesFn.optional(),
-	installRuntimeDependencies: runtimeDependenciesFn.optional(),
 }).describe('ParsedPluginInfo');
 
 export const rawSchema = PluginInfo.rawSchema.extend({
@@ -55,14 +42,13 @@ export const rawSchema = PluginInfo.rawSchema.extend({
 			Template.schemas.schema,
 		).optional(),
 	),
-	proxy: proxyFnSchema.optional(),
-	checkRuntimeDependencies: runtimeDependenciesFn.optional(),
-	installRuntimeDependencies: runtimeDependenciesFn.optional(),
 }).describe('ParsedPluginInfo');
 
 type Input = z.infer<typeof internalSchema>;
 
-export type RawPluginSchema = z.infer<typeof rawSchema>;
+export type RawPluginSchema = z.infer<typeof rawSchema> & {
+	proxy: (args: RequestArgs) => PluginProxyResponse | Promise<PluginProxyResponse>;
+};
 
 export const { schemas: generatedSchemas, factory } = createType<RawPluginSchema, Input>({
 	rawSchema,

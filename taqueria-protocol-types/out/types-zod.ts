@@ -80,12 +80,15 @@ export const pluginDependenciesResponseSchema = z.object({
 	report: z.array(runtimeDependencyReportSchema),
 });
 
-export const pluginJsonResponseSchema = z.object({
-	data: z.unknown().optional(),
-	render: z
-		.union([z.literal('none'), z.literal('table'), z.literal('string')])
-		.default('none'),
-});
+export const pluginJsonResponseSchema = z.union([
+	z.object({
+		data: z.unknown().optional(),
+		render: z
+			.union([z.literal('none'), z.literal('table'), z.literal('string')])
+			.default('none'),
+	}),
+	z.void(),
+]);
 
 export const pluginProxyResponseSchema = z.union([
 	z.void(),
@@ -343,13 +346,7 @@ const templateHandlerSchema = z.union([
 		.function()
 		.args(requestArgsSchema)
 		.returns(
-			z.union([
-				z.void(),
-				pluginJsonResponseSchema,
-				z.promise(z.void()),
-				z.promise(z.promise(z.void())),
-				z.promise(pluginJsonResponseSchema),
-			]),
+			z.union([pluginJsonResponseSchema, z.promise(pluginJsonResponseSchema)]),
 		),
 ]);
 
@@ -361,7 +358,7 @@ export const templateSchema = z.object({
 	options: z.array(optionSchema).optional(),
 	positionals: z.array(positionalArgSchema).optional(),
 	handler: templateHandlerSchema,
-	encoding: pluginResponseEncodingSchema,
+	encoding: pluginResponseEncodingSchema.optional(),
 });
 
 export const parsedTemplateSchema = templateSchema.omit({ handler: true }).extend(

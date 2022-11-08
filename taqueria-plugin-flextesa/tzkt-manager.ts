@@ -1,6 +1,6 @@
 import { getArch, SandboxConfig } from '@taqueria/node-sdk';
+import { Config } from '@taqueria/node-sdk';
 import { Protocol } from '@taqueria/node-sdk/types';
-import { Config } from '@taqueria/protocol/taqueria-protocol-types';
 import { getContainerName, getNewPortIfPortInUse, getUniqueSandboxName, Opts, updateConfig } from './proxy';
 
 const { Url } = Protocol;
@@ -20,8 +20,8 @@ export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: Opt
 	};
 };
 
-const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts) => {
-	const sandboxPort = Url.toComponents(sandbox.rpcUrl).port;
+const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: SandboxConfig, opts: Opts) => {
+	const sandboxPort = new URL(sandbox.rpcUrl).port;
 	const containerNames = await getTzKtContainerNames(sandboxName, opts);
 	const sandboxContainerName = await getContainerName(sandboxName, opts);
 	const connectionStringEnv =
@@ -33,7 +33,7 @@ const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: Sandbo
 	};
 };
 
-export const getTzKtStartCommands = async (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts) => {
+export const getTzKtStartCommands = async (sandboxName: string, sandbox: SandboxConfig, opts: Opts) => {
 	const pgPort = sandbox.tzkt?.postgresqlPort ?? 5432;
 	const newPGPort = await getNewPortIfPortInUse(pgPort);
 
@@ -51,7 +51,7 @@ export const getTzKtStartCommands = async (sandboxName: string, sandbox: Sandbox
 				`${apiPort} is already in use, ${newAPIPort} will be used for TzKt API in ${sandboxName} instead and .taq/config.json will be updated to reflect this.`,
 			);
 		}
-		await updateConfig(opts, (config: Config.t) => {
+		await updateConfig(opts, (config: Config) => {
 			const sandbox = config.sandbox?.[sandboxName];
 			if (typeof sandbox === 'string' || sandbox === undefined) {
 				return undefined;
@@ -61,7 +61,7 @@ export const getTzKtStartCommands = async (sandboxName: string, sandbox: Sandbox
 				apiPort: 5000,
 				postgresqlPort: 5432,
 			};
-			const updatedConfig: Config.t = {
+			const updatedConfig: Config = {
 				...config,
 				sandbox: {
 					...config.sandbox,

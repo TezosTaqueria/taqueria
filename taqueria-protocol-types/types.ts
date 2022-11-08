@@ -91,16 +91,13 @@ export type Template = {
 	options?: Option[];
 	positionals?: PositionalArg[];
 	handler: TemplateHandler;
-	encoding: PluginResponseEncoding;
+	encoding?: PluginResponseEncoding;
 };
 
 type TemplateHandler =
 	| NonEmptyString // TODO: should this be Verb?
 	| ((args: RequestArgs) =>
-		| void
 		| PluginJsonResponse
-		| Promise<void>
-		| Promise<Promise<void>>
 		| Promise<PluginJsonResponse>);
 
 export type ParsedTemplate = Omit<Template, 'handler'> & {
@@ -164,7 +161,7 @@ export type PluginJsonResponse = {
 
 	/** @default none */
 	render: 'none' | 'table' | 'string';
-};
+} | void;
 
 export type PluginProxyResponse = void | PluginJsonResponse;
 

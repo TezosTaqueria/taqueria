@@ -1,30 +1,31 @@
 import { noop, sendAsyncErr, sendAsyncRes } from '@taqueria/node-sdk';
-import { LoadedConfig, RequestArgs, SanitizedAbsPath, SanitizedPath } from '@taqueria/node-sdk/types';
+import { RequestArgs } from '@taqueria/node-sdk';
+import { LoadedConfig, SanitizedAbsPath, SanitizedPath } from '@taqueria/node-sdk/types';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import { defaults } from 'jest-config';
 import { join, relative } from 'path';
-import * as JestConfig from './config';
+import JestConfig from './config';
 
 export type DefaultConfig = typeof defaults;
 
-export interface CustomRequestArgs extends RequestArgs.t {
-	config: JestConfig.t;
+export interface CustomRequestArgs extends RequestArgs {
+	config: JestConfig;
 	partition?: string;
 	init?: string;
 	testPattern?: string;
 }
 
-export const toRequestArgs = (args: RequestArgs.t): CustomRequestArgs => {
+export const toRequestArgs = (args: RequestArgs): CustomRequestArgs => {
 	const config = {
+		...args.config,
 		jest: {
 			testsRootDir: 'tests',
 		},
-		...args.config,
 	};
 
 	return {
 		...args,
-		config: JestConfig.create(config),
+		config,
 	};
 };
 
@@ -49,7 +50,7 @@ export const getRootConfigAbspath = (projectDir: SanitizedAbsPath.t) =>
 		join(projectDir, '.taq', 'jest.config.js'),
 	);
 
-export const getTestsRootDir = (config: JestConfig.t) => {
+export const getTestsRootDir = (config: JestConfig) => {
 	return config.jest.testsRootDir;
 };
 
@@ -103,13 +104,13 @@ export const ensureSelectedPartitionExists = (args: CustomRequestArgs, forceCrea
 	args.partition
 		? ensurePartitionExists(
 			SanitizedAbsPath.create(join(args.projectDir, args.partition)),
-			args.projectDir,
+			SanitizedPath.create(args.projectDir),
 			forceCreate,
 		)
 		: ensurePartitionExists(
 			SanitizedAbsPath.create(
 				join(args.projectDir, getTestsRootDir(args.config)),
 			),
-			args.projectDir,
+			SanitizedPath.create(args.projectDir),
 			forceCreate,
 		);
