@@ -1,9 +1,9 @@
 import { experimental, sendAsyncErr } from '@taqueria/node-sdk';
-import * as RequestArgs from '@taqueria/protocol/RequestArgs';
+import { RequestArgs } from '@taqueria/node-sdk';
 import { writeFile } from 'fs/promises';
 import { jsligo_template, mligo_template, pascaligo_template, religo_template } from './ligo_templates';
 
-interface Opts extends RequestArgs.t {
+interface Opts extends RequestArgs {
 	sourceFileName?: string;
 	syntax?: string;
 }

@@ -13,13 +13,14 @@ import {
 	sendErr,
 	sendJsonRes,
 } from '@taqueria/node-sdk';
-import { Environment, RequestArgs } from '@taqueria/node-sdk/types';
+import { RequestArgs } from '@taqueria/node-sdk';
+import { Environment } from '@taqueria/node-sdk/types';
 import { Expr, Parser } from '@taquito/michel-codec';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit } from '@taquito/taquito';
 
-interface Opts extends RequestArgs.t {
-	contract: string;
+interface Opts extends RequestArgs {
+	contract?: string;
 	tez?: string;
 	param?: string;
 	entrypoint?: string;
@@ -95,6 +96,7 @@ const isContractAddress = (contract: string): boolean =>
 
 const getContractInfo = async (parsedArgs: Opts, env: Environment.t, tezos: TezosToolkit): Promise<TableRow> => {
 	const contract = parsedArgs.contract;
+	if (!contract) throw `No contract specified`;
 	return {
 		contractAlias: isContractAddress(contract) ? 'N/A' : contract,
 		contractAddress: isContractAddress(contract) ? contract : await getAddressOfAlias(env, contract),

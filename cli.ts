@@ -686,7 +686,10 @@ const handleTemplate = (
 			? pipe(
 				PluginActionName.make('proxyTemplate'),
 				chain(action =>
-					pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)(action, template.encoding ?? 'none')({
+					pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)(
+						action,
+						template.encoding ?? PluginResponseEncoding.create('none'),
+					)({
 						...parsedArgs,
 						action: 'proxyTemplate',
 					})
@@ -889,17 +892,19 @@ const loadEphemeralState = (
 const renderPluginJsonRes = (decoded: PluginJsonResponse.t, parsedArgs: SanitizedArgs.t) => {
 	// do not render object/array ASCII table if the request comes from TVsCE
 	if (parsedArgs.fromVsCode) {
-		log(JSON.stringify(decoded.data));
+		if (typeof decoded === 'object') log(JSON.stringify(decoded.data));
 		return;
 	}
 
-	switch (decoded.render) {
-		case 'table':
-			renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
-			break;
-		default:
-			log(decoded.data as string);
-			break;
+	if (typeof decoded === 'object') {
+		switch (decoded.render) {
+			case 'table':
+				renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
+				break;
+			default:
+				log(decoded.data as string);
+				break;
+		}
 	}
 };
 

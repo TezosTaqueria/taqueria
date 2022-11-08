@@ -1,9 +1,9 @@
-import { execCmd, getContracts, sendAsyncJsonRes, sendErr } from '@taqueria/node-sdk';
-import { RequestArgs, TaqError } from '@taqueria/node-sdk/types';
+import { execCmd, getContracts, RequestArgs, sendAsyncJsonRes, sendErr } from '@taqueria/node-sdk';
+import { TaqError } from '@taqueria/node-sdk/types';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
-interface Opts extends RequestArgs.ProxyRequestArgs {
+interface Opts extends RequestArgs {
 	sourceFile?: string;
 }
 
@@ -19,11 +19,12 @@ const getArtifacts = (sourceAbspath: string) => {
 };
 
 const getCompileCommand = (opts: Opts) =>
-	(sourceAbspath: string) => `~/smartpy-cli/SmartPy.sh compile ${sourceAbspath} ${opts.config.artifactsDir}`;
+	(sourceAbspath: string) =>
+		`~/smartpy-cli/SmartPy.sh compile ${sourceAbspath} ${opts.config.artifactsDir ?? 'artifacts'}`;
 
 const compileContract = (opts: Opts) =>
 	(sourceFile: string) => {
-		const sourceAbspath = join(opts.config.contractsDir, sourceFile);
+		const sourceAbspath = join(opts.config.contractsDir ?? 'contracts', sourceFile);
 		return execCmd(getCompileCommand(opts)(sourceAbspath))
 			.then(async ({ stderr }) => { // How should we output warnings?
 				if (stderr.length > 0) sendErr(`\n${stderr}`);

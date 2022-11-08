@@ -15,7 +15,7 @@ import {
 	sendRes,
 	updateAddressAlias,
 } from '@taqueria/node-sdk';
-import { Protocol, RequestArgs } from '@taqueria/node-sdk/types';
+import { NonEmptyString, Protocol, RequestArgs } from '@taqueria/node-sdk';
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
@@ -24,9 +24,9 @@ import glob from 'fast-glob';
 import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 
-interface Opts extends RequestArgs.t {
-	contract: string;
-	storage: string;
+interface Opts extends RequestArgs {
+	contract?: string;
+	storage?: string;
 	alias?: string;
 }
 
@@ -48,7 +48,10 @@ const getFirstAccountAlias = (sandboxName: string, opts: Opts) => {
 };
 
 const getContractAbspath = (contractFilename: string, parsedArgs: Opts) =>
-	join(parsedArgs.config.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`);
+	join(
+		parsedArgs.config.artifactsDir ?? 'artifacts',
+		/\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`,
+	);
 
 const addOrigination = (parsedArgs: Opts, batch: Promise<WalletOperationBatch>) =>
 	async (mapping: ContractStorageMapping) => {
@@ -67,31 +70,23 @@ const getDefaultStorageFilename = (contractName: string): string => {
 	return defaultStorage;
 };
 
-// TODO: temporary quick solution. May refactor this to only deal with one contract later
 const getValidContracts = async (parsedArgs: Opts) => {
-	const contracts = [parsedArgs.contract];
-	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(contracts[0]);
+	const storageFilename = parsedArgs.contract
+		? getDefaultStorageFilename(parsedArgs.contract)
+		: null;
 
-	return contracts.reduce(
-		async (retval, filename) => {
-			const storage = await newGetInitialStorage(parsedArgs, storageFilename);
-			if (storage === undefined || storage === null) {
-				sendErr(
-					`❌ No initial storage file was found for ${filename}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
-						getDefaultStorageFilename(contracts[0])
-					}" in the artifacts directory\nYou can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option\n`,
-				);
-				// sendErr(
-				// 	`Michelson artifact ${filename} has no initial storage specified for the target environment.\nStorage is expected to be specified in .taq/config.json at JSON path: environment.${
-				// 		getCurrentEnvironment(parsedArgs)
-				// 	}.storage["${filename}"]\nThe value of the above JSON key should be the name of the file (absolute path or relative path with respect to the root of the Taqueria project) that contains the actual value of the storage, as a Michelson expression.\n`,
-				// );
-				return retval;
-			}
-			return [...(await retval), { filename, storage }];
-		},
-		Promise.resolve([] as ContractStorageMapping[]),
-	);
+	if (storageFilename) {
+		const storage = await newGetInitialStorage(parsedArgs, storageFilename);
+		if (storage === undefined || storage === null) {
+			sendErr(
+				`❌ No initial storage file was found for ${storageFilename}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${storageFilename}" in the artifacts directory\nYou can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option\n`,
+			);
+
+			return [{ filename: storageFilename, storage }];
+		}
+	}
+
+	return Promise.resolve([]);
 };
 
 const mapOpToContract = async (
@@ -118,7 +113,7 @@ const mapOpToContract = async (
 					: 'Error';
 
 				const alias = parsedArgs.alias ?? basename(contract.filename, extname(contract.filename));
-				if (address !== 'Error') updateAddressAlias(parsedArgs, alias, address);
+				if (address !== 'Error') updateAddressAlias(parsedArgs, alias, NonEmptyString.create(address));
 
 				return [
 					...retval,
@@ -230,7 +225,7 @@ export async function importFaucet(
 	}
 }
 
-const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.t) =>
+const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment) =>
 	currentEnv.networks
 		? currentEnv.networks.reduce(
 			(retval, networkName) => {
@@ -258,7 +253,7 @@ const originateToNetworks = (parsedArgs: Opts, currentEnv: Protocol.Environment.
 		)
 		: [];
 
-const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment.t) =>
+const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment) =>
 	currentEnv.sandboxes
 		? currentEnv.sandboxes.reduce(
 			(retval, sandboxName) => {
@@ -301,7 +296,7 @@ const originateToSandboxes = (parsedArgs: Opts, currentEnv: Protocol.Environment
 		)
 		: [];
 
-export const originate = <T>(parsedArgs: Opts) => {
+export const originate = (parsedArgs: Opts) => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 
 	if (!env) {

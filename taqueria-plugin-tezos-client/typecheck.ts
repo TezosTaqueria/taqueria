@@ -53,7 +53,7 @@ const typecheckContract = (parsedArgs: Opts, sourceFile: string): Promise<TableR
 		});
 
 const typecheck = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = parsedArgs.sourceFile;
+	const sourceFile = parsedArgs.sourceFile!;
 	return typecheckContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
 		sendAsyncErr(err, false)
 	);

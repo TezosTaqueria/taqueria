@@ -33,7 +33,7 @@ const removeExt = (path: string): string => {
 
 const getOutputFilename = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
-	return join(parsedArgs.config.artifactsDir, `${outputFile}.tz`);
+	return join(parsedArgs.config.artifactsDir ?? 'artifacts', `${outputFile}.tz`);
 };
 
 // Get the contract name that the storage/parameter file is associated with
@@ -54,7 +54,7 @@ const getOutputExprFileName = (parsedArgs: Opts, sourceFile: string, exprKind: E
 	const outputFile = exprKind === 'default_storage'
 		? `${contractName}.default_storage.tz`
 		: `${contractName}.${exprKind}.${exprName}.tz`;
-	return join(parsedArgs.config.artifactsDir, `${outputFile}`);
+	return join(parsedArgs.config.artifactsDir ?? 'artifacts', `${outputFile}`);
 };
 
 const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
@@ -218,7 +218,7 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 	};
 
 const compile = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = parsedArgs.sourceFile;
+	const sourceFile = parsedArgs.sourceFile!;
 	let p: Promise<TableRow[]>;
 	if (isStoragesFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'storage');
 	else if (isParametersFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'parameter');

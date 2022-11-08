@@ -1,18 +1,19 @@
 import { sendAsyncErr } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { RequestArgs } from '@taqueria/node-sdk';
 import originate from './originate';
 import transfer from './transfer';
 
-interface Opts extends RequestArgs.ProxyRequestArgs {
+interface Opts extends RequestArgs {
 	// from originate.ts
-	storage: string;
+	storage?: string;
 	alias?: string;
 	// from transfer.ts
 	tez?: string;
 	param?: string;
 	entrypoint?: string;
 	// from originate.ts and transfer.ts
-	contract: string;
+	contract?: string;
+	task?: string;
 }
 
 export const taquito = (parsedArgs: Opts): Promise<void> => {

@@ -2,7 +2,7 @@ export * from '@taqueria/protocol-types/types';
 import { RequestArgs } from '@taqueria/node-sdk';
 import * as Strict from '@taqueria/protocol-types/out/types-strict';
 import * as NonStrict from '@taqueria/protocol-types/types';
-export { Option, PositionalArg, Task, Template } from '@taqueria/protocol-types';
+export { NonEmptyString, Option, PositionalArg, Task, Template } from '@taqueria/protocol-types';
 export * as Protocol from '@taqueria/protocol-types/out/types-strict';
 import * as Config from '@taqueria/protocol/Config';
 import * as ConfigArtifactsDir from '@taqueria/protocol/ConfigArtifactsDir';
@@ -448,12 +448,12 @@ export const getInitialStorage = async (parsedArgs: RequestArgs, contractFilenam
  */
 export const newGetInitialStorage = async (
 	parsedArgs: RequestArgs,
-	storageFilename: string,
+	storageFilename: string | undefined,
 ): Promise<string | undefined> => {
 	const storagePath = join(
 		parsedArgs.config.projectDir,
 		parsedArgs.config.artifactsDir ?? 'artifacts',
-		storageFilename,
+		storageFilename ?? '',
 	);
 	try {
 		const content = await readFile(storagePath, { encoding: 'utf-8' });

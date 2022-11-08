@@ -53,7 +53,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 		);
 	}
 
-	const paramFilename = parsedArgs.param;
+	const paramFilename = parsedArgs.param!;
 	const param = (await getParameter(parsedArgs, paramFilename)).trim();
 
 	const processedStorage = preprocessString(storage);
@@ -103,7 +103,7 @@ const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRo
 		});
 
 const simulate = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = parsedArgs.sourceFile;
+	const sourceFile = parsedArgs.sourceFile!;
 	return simulateContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
 		sendAsyncErr(err, false)
 	);

@@ -1,5 +1,4 @@
-import { getContracts, sendAsyncErr, sendJsonRes, sendRes, writeJsonFile } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { getContracts, RequestArgs, sendAsyncErr, sendJsonRes, sendRes, writeJsonFile } from '@taqueria/node-sdk';
 import fs from 'fs/promises';
 import path from 'path';
 import prompts from 'prompts';
@@ -12,8 +11,9 @@ type PluginResponse =
 		data: unknown[];
 	};
 
-interface Opts extends RequestArgs.ProxyRequestArgs {
+interface Opts extends RequestArgs {
 	readonly contractName?: string;
+	readonly task?: string;
 }
 type Config = Opts['config'];
 
@@ -254,7 +254,7 @@ const execute = async (opts: Opts): Promise<PluginResponse> => {
 	}
 };
 
-export default async (args: RequestArgs.ProxyRequestArgs): Promise<PluginResponse> => {
+export default async (args: RequestArgs): Promise<PluginResponse> => {
 	const opts = args as Opts;
 
 	try {

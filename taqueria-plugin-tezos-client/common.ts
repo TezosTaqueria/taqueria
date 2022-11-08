@@ -1,15 +1,16 @@
 import { getArch, getFlextesaImage } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { RequestArgs } from '@taqueria/node-sdk';
 import { join } from 'path';
 
-export interface TypeCheckOpts extends RequestArgs.ProxyRequestArgs {
-	sourceFile: string;
+export interface TypeCheckOpts extends RequestArgs {
+	sourceFile?: string;
+	task?: string;
 }
 
-export interface SimulateOpts extends RequestArgs.ProxyRequestArgs {
-	sourceFile: string;
+export interface SimulateOpts extends RequestArgs {
+	sourceFile?: string;
 	storage?: string;
-	param: string;
+	param?: string;
 	entrypoint?: string;
 }
 
@@ -25,7 +26,7 @@ export const trimTezosClientMenuIfPresent = (msg: string): string => {
 };
 
 export const getInputFilename = (opts: UnionOpts, sourceFile: string) =>
-	join('/project', opts.config.artifactsDir, sourceFile);
+	join('/project', opts.config.artifactsDir ?? 'artifacts', sourceFile);
 
 export const getCheckFileExistenceCommand = async (parsedArgs: UnionOpts, sourceFile: string): Promise<string> => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
