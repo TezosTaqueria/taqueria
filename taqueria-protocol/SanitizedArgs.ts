@@ -44,7 +44,7 @@ export const rawSchema = z.object({
 		val => Boolean(val),
 		z.boolean().optional(),
 	),
-	plugin: NonEmptyString.schemas.schema,
+	plugin: NonEmptyString.schemas.schema.optional(),
 	env: z.union([z.literal('production'), z.literal('testing'), z.literal('development'), z.string().nonempty()])
 		.default('development'),
 	quickstart: z.string().min(1).optional(),

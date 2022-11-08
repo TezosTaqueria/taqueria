@@ -126,9 +126,7 @@ export const pluginActionNameSchema = z.union([
 	z.literal('proxyTemplate'),
 ]);
 
-export const economicalProtocolHashSchema = z
-	.string()
-	.regex(/^P[A-Za-z0-9]{50}$ this is a valid hash for an economical protocol/);
+export const economicalProtocolHashSchema = z.string();
 
 export const publicKeyHashSchema = z.string().regex(/^tz1[A-Za-z0-9]{33}$/);
 
@@ -159,12 +157,8 @@ export const tzKtConfigSchema = z.object({
 });
 
 export const environmentSchema = z.object({
-	networks: z
-		.array(nonEmptyStringSchema)
-		.min(1, 'Must reference the name of an existing network configuration'),
-	sandboxes: z
-		.array(nonEmptyStringSchema)
-		.min(1, 'Must reference the name of an existing sandbox configuration'),
+	networks: z.array(nonEmptyStringSchema),
+	sandboxes: z.array(nonEmptyStringSchema),
 	storage: z.record(nonEmptyStringSchema).optional(),
 	aliases: z.record(z.record(nonEmptyStringSchema)).optional(),
 });

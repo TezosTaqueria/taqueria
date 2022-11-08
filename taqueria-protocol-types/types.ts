@@ -210,7 +210,7 @@ export type ProxyTemplateArgs = RequestArgs & {
 
 // ---- Hash Types ----
 
-/** @pattern ^P[A-Za-z0-9]{50}$ this is a valid hash for an economical protocol*/
+/** @min 1 */
 export type EconomicalProtocolHash = string;
 
 /** @pattern ^tz1[A-Za-z0-9]{33}$ */
@@ -259,13 +259,7 @@ export type TzKtConfig = {
 // ---- Project Files ----
 
 export type Environment = {
-	/**
-	 * @minLength 1 Must reference the name of an existing network configuration
-	 */
 	networks: NonEmptyString[];
-	/**
-	 * @minLength 1 Must reference the name of an existing sandbox configuration
-	 */
 	sandboxes: NonEmptyString[];
 	storage?: Record<string, NonEmptyString>;
 	aliases?: Record<string, Record<string, NonEmptyString>>;
