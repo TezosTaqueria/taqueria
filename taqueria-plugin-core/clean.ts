@@ -7,7 +7,7 @@ const LIGO_IMAGE = 'ligolang/ligo';
 const ARCHETYPE_IMAGE = 'completium/archetype';
 const ECAD_TZKT_IMAGE = 'alirezahaghshenas/tzkt';
 
-const getTaqueriaDockerImageIds = (): string => {
+const getDockerImageIdsCmd = (): string => {
 	const images = [ECAD_FLEXTESA_IMAGE, FLEXTESA_IMAGE, LIGO_IMAGE, ARCHETYPE_IMAGE, ECAD_TZKT_IMAGE];
 	const imageFilters = images.reduce((acc, image) => `${acc} --filter "reference=${image}"`, '');
 	const cmd = `docker images --quiet ${imageFilters} | uniq`;
@@ -19,7 +19,7 @@ const removeStates = () =>
 		.catch(() => Promise.reject(new Error('No state files exist in the .taq/ folder')));
 
 const removeImages = () =>
-	execCmd(getTaqueriaDockerImageIds())
+	execCmd(getDockerImageIdsCmd())
 		.then(results => {
 			const images = results.stdout.replace(/\s/g, ' ');
 			if (images) return execCmd(`docker rmi --force ${images}`);
