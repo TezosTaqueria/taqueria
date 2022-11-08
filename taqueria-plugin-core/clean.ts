@@ -16,7 +16,7 @@ const getDockerImageIdsCmd = (): string => {
 
 const removeStates = () =>
 	execCmd('rm .taq/*state*.json')
-		.catch(() => Promise.reject(new Error('No state files exist in the .taq/ folder')));
+		.catch(() => {}); // just ignore and resolve it
 
 const removeImages = () =>
 	execCmd(getDockerImageIdsCmd())
