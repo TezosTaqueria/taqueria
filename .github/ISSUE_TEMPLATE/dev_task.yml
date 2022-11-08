@@ -29,6 +29,14 @@ body:
         - label: "♾️ PR Merged"
         - label: "🏆 Product Acceptance"
   - type: textarea
+    id: work_description
+    attributes:
+      label: 🧰 Work Description
+      description: Describe what work needs to be done 
+      placeholder: "In as much detail as possible, describe the work that needs to be done and include any architecture/design choices and the underlying motivation for this ticket"
+    validations:
+      required: false
+  - type: textarea
     id: to_do
     attributes:
       label: ✅ To Do
