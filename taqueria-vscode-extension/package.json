@@ -3,7 +3,7 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
-	"version": "0.23.1-rc.1",
+	"version": "0.23.1",
 	"private": true,
 	"engines": {
 		"vscode": "^1.68.1",
