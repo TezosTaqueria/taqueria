@@ -81,7 +81,7 @@ export type Operation = { __type: Operation } & {
 	description?: NonEmptyString;
 	positionals?: PositionalArg[];
 	options?: Option[];
-	handler?: (args: PersistentState) => (args: RequestArgs) => void;
+	handler?: (args: Omit<PersistentState, '__type'>) => (args: Omit<RequestArgs, '__type'>) => void;
 };
 
 export type ParsedOperation = { __type: ParsedOperation } & ParsedOperationRaw;
@@ -101,7 +101,7 @@ export type Template = { __type: Template } & {
 
 type TemplateHandler =
 	| NonEmptyString // TODO: should this be Verb?
-	| ((args: RequestArgs) =>
+	| ((args: Omit<RequestArgs, '__type'>) =>
 		| void
 		| PluginJsonResponse
 		| Promise<void>
@@ -131,9 +131,9 @@ export type PluginSchema = { __type: PluginSchema } & PluginSchemaRaw;
 type PluginSchemaRaw = PluginSchemaBase & {
 	operations?: Operation[];
 	templates?: Template[];
-	proxy?: (args: RequestArgs) => Promise<PluginProxyResponse>;
-	checkRuntimeDependencies?: (args: RequestArgs) => Promise<PluginDependenciesResponse>;
-	installRuntimeDependencies?: (args: RequestArgs) => Promise<PluginDependenciesResponse>;
+	proxy?: (args: Omit<RequestArgs, '__type'>) => Promise<PluginProxyResponse>;
+	checkRuntimeDependencies?: (args: Omit<RequestArgs, '__type'>) => Promise<PluginDependenciesResponse>;
+	installRuntimeDependencies?: (args: Omit<RequestArgs, '__type'>) => Promise<PluginDependenciesResponse>;
 };
 
 export type Task = { __type: Task } & {

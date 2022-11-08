@@ -20,26 +20,39 @@ export const buildTypes = async (packagePath: string) => {
 	const typeCodeStrict = `
 ${generationWarning}
 ${
-		typeCode.replace(/^export type ([A-Za-z0-9_]+) =((?:.|\n){10})/gm, (_, typeName: string, nextText: string) => {
-			const nextTextTrimmed = nextText.trim();
+		typeCode
+			// Add strict types
+			.replace(/^export type ([A-Za-z0-9_]+) =((?:.|\n){10})/gm, (_, typeName: string, nextText: string) => {
+				const nextTextTrimmed = nextText.trim();
 
-			// Object types
-			if (nextTextTrimmed.startsWith(`{`)) {
-				return `export type ${typeName} = { __type: ${typeName} } &${nextText}`;
-			}
+				// Object types
+				if (nextTextTrimmed.startsWith(`{`)) {
+					return `export type ${typeName} = { __type: ${typeName} } &${nextText}`;
+				}
 
-			// simple types
-			if (
-				nextTextTrimmed.startsWith(`string`)
-				|| nextTextTrimmed.startsWith(`number`)
-				|| nextTextTrimmed.startsWith(`boolean`)
-			) {
-				return `export type ${typeName} = { __type: ${typeName} } &${nextText}`;
-			}
+				// simple types
+				if (
+					nextTextTrimmed.startsWith(`string`)
+					|| nextTextTrimmed.startsWith(`number`)
+					|| nextTextTrimmed.startsWith(`boolean`)
+				) {
+					return `export type ${typeName} = { __type: ${typeName} } &${nextText}`;
+				}
 
-			// Else - Use a wrapper type
-			return `export type ${typeName} = { __type: ${typeName} } & ${typeName}Raw;\ntype ${typeName}Raw =${nextText}`;
-		})
+				// Else - Use a wrapper type
+				return `export type ${typeName} = { __type: ${typeName} } & ${typeName}Raw;\ntype ${typeName}Raw =${nextText}`;
+			})
+			// Always allow non-strict function parameters
+			// from: (args: RequestArgs) =>
+			// to:   (args: Omit<RequestArgs, '__type'>) =>
+			.replace(/\(([A-Za-z0-9_]+: [A-Za-z0-9_]+(?:, [A-Za-z0-9_]+: [A-Za-z0-9_]+)*)\) =>/g, (_, argsList: string) => {
+				const args = argsList.split(',')
+					.map(x => {
+						const parts = x.split(':');
+						return `${parts[0].trim()}: Omit<${parts[1].trim()}, '__type'>`;
+					});
+				return `(${args.join(', ')}) =>`;
+			})
 	}`.trimStart();
 	await fs.writeFile(outTypesStrictFilePath, typeCodeStrict);
 
@@ -83,7 +96,7 @@ export const of = (input: unknown): FutureInstance<TaqError, ${typeNameStrict}> 
     }
 };
 
-export const make = (input: ${typeNameStrict}): FutureInstance<TaqError, ${typeNameStrict}> => of(input);
+export const make = (input: Omit<${typeNameStrict}, '__type'>): FutureInstance<TaqError, ${typeNameStrict}> => of(input);
 
 // TEMP: for interoperation with old protocol types during transition
 export const schemas = {
