@@ -69,15 +69,23 @@ Deno.test('inject()', async t => {
 		const result = toPluginArguments(requestArgs, config);
 
 		assertEquals(result, [
+			'--_',
+			"'init'",
 			'--projectDir',
 			"'/tmp/test-project'",
 			'--maxConcurrency',
 			10,
 			'--debug',
 			false,
+			'--disableState',
+			false,
 			'--logPluginRequests',
 			true,
 			'--fromVsCode',
+			false,
+			'--version',
+			false,
+			'--build',
 			false,
 			'--help',
 			false,
