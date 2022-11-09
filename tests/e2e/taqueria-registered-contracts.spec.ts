@@ -29,6 +29,12 @@ describe('E2E for Registered Contracts', () => {
 		await generateTestProject(taqueriaProjectPath);
 		await sleep(1000);
 
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+
 		const config = await readFile(configFile, { encoding: 'utf-8' });
 		configFileContents = JSON.stringify(config);
 	});

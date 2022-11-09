@@ -53,6 +53,7 @@ Commands:
 
 | name           |  pluginName                       |  description                                                        |
 |----------------|------------------------------     |---------------------------------------------------------------------|
+| Core           | `@taqueria/plugin-core`           | Contains core utility tasks provided by Taqueria                    |
 | LIGO           | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language                     |
 | SmartPy        | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy contract language                        |
 | Flextesa       | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa                       |
