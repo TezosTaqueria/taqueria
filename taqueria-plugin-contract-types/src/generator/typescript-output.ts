@@ -106,6 +106,15 @@ ${tabs(indent)}`;
 
 			return `${typeAlias.aliasType}<${typeToCode(t.map.key, indent)}, ${typeToCode(t.map.value, indent)}>`;
 		}
+		if (t.kind === `lambda`) {
+			const typeAlias: TypeAlias = {
+				aliasType: 'Instruction',
+				simpleTypeDefinition: `type Instruction = MichelsonInstruction;`,
+				simpleTypeImports: [{ name: 'MichelsonInstruction', isDefault: false, from: '@taquito/michel-codec' }],
+			};
+			addTypeAlias(typeAlias);
+			return `Instruction[]`;
+		}
 		if (t.kind === `object`) {
 			return `{${toIndentedItems(indent, {}, t.fields.map((a, i) => varToCode(a, i, indent + 1) + `;`))}}`;
 		}
@@ -222,6 +231,9 @@ ${tabs(indent)}}])`;
 		}
 		if (t.kind === `unknown`) {
 			return `unknown`;
+		}
+		if (t.kind === 'lambda') {
+			throw new GenerateApiError(`Don't know how to generate default value for lambda`, { t });
 		}
 
 		assertExhaustive(t, `Unknown type`);

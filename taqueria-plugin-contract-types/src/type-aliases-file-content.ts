@@ -1,7 +1,10 @@
 // This is required for copying the type aliases to a local file
 export const typeAliasesFileContent = `
 import { BigNumber } from 'bignumber.js';
+import { MichelsonInstruction } from '@taquito/michel-codec';
 import { MichelsonMap } from '@taquito/taquito';
+
+export type Instruction = MichelsonInstruction;
 
 export type unit = (true | undefined) & { __type: 'unit' };
 
