@@ -2,7 +2,7 @@ import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import utils from 'util';
 import { transferOutput } from './data/help-contents/taquito-flextesa-content';
-import { generateTestProject, getContainerName, itemArrayInTable } from './utils/utils';
+import { generateTestProject, getContainerName, itemArrayInTable, sleep } from './utils/utils';
 const exec = utils.promisify(exec1);
 
 const taqueriaProjectPath = 'e2e/auto-test-taquito-flextesa-plugin';
@@ -105,6 +105,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 			// 3. Call transfer to transfer
 			await exec(`taq transfer ${addressArray[1]} --mutez 1000000000`, { cwd: `./${taqueriaProjectPath}` });
+			sleep(2500);
 
 			// 4. Verify transfer results
 			const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
