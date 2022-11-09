@@ -1,5 +1,8 @@
+import { MichelsonInstruction } from '@taquito/michel-codec';
 import { MichelsonMap } from '@taquito/taquito';
 import { BigNumber } from 'bignumber.js';
+
+export type Instruction = MichelsonInstruction;
 
 export type unit = (true | undefined) & { __type: 'unit' };
 
