@@ -15,8 +15,9 @@ export const generateTestProject = async (
 ) => {
 	const targetDir = path.join('/tmp', projectPath);
 
+	let projectInit;
 	try {
-		await exec(`taq init ${targetDir}`);
+		projectInit = await exec(`taq init ${targetDir}`);
 	} catch (error) {
 		throw new Error(`error: ${error}`);
 	}
@@ -35,6 +36,8 @@ export const generateTestProject = async (
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
 
 	await installDependencies(projectPath, packageNames, localPackages);
+
+	return projectInit;
 };
 
 export async function getContainerName(dockerName: string): Promise<string> {
@@ -107,22 +110,20 @@ export async function installDependencies(
 	packageNames: string[],
 	localPackages: boolean = true,
 ) {
-	if (packageNames.length > 0) {
-		for (const packageName of packageNames) {
-			try {
-				if (localPackages) {
-					execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
-						cwd: `./${projectPath}`,
-						encoding: 'utf8',
-					});
-				} else {
-					execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
-				}
-			} catch (error) {
-				throw new Error(`error: ${error}`);
+	for (const packageName of packageNames) {
+		try {
+			if (localPackages) {
+				execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
+					cwd: `./${projectPath}`,
+					encoding: 'utf8',
+				});
+			} else {
+				execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
 			}
-
-			await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/@taqueria/plugin-${packageName}/index.js`);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
 		}
+
+		await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/@taqueria/plugin-${packageName}/index.js`);
 	}
 }
