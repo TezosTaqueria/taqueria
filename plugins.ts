@@ -163,7 +163,7 @@ export const inject = (deps: PluginDeps) => {
 					"'" + JSON.stringify(config) + "'",
 					'--envVars',
 					"'" + JSON.stringify(env) + "'",
-					...toPluginArguments(requestArgs),
+					...toPluginArguments(requestArgs, config),
 				];
 
 				const shellCmd = ['sh', '-c', cmd.join(' ')];
@@ -217,7 +217,7 @@ export const inject = (deps: PluginDeps) => {
 	// This function returns a list of positional arguments
 	// which includes all dependencies and the individual request args
 	// toPluginArguments: Record<string, unknown> -> PluginRequestArgs
-	const toPluginArguments = (requestArgs: Record<string, unknown>): PluginRequestArgs => {
+	const toPluginArguments = (requestArgs: Record<string, unknown>, config: LoadedConfig.t): PluginRequestArgs => {
 		// For each argument passed in via the CLI, send it as an argument to the
 		// plugin call as well. Plugins can use this information for additional context
 		// about invocation
@@ -226,13 +226,12 @@ export const inject = (deps: PluginDeps) => {
 				const omit = [
 					'$0',
 					'quickstart',
-					'version',
-					'build',
 					'scaffoldUrl',
 					'scaffoldProjectDir',
-					'disableState',
-					'_',
 				];
+
+				// If env is missing, then set it to the default environment of the config
+				if (key === 'env' && !val) val = config.environment?.default ?? 'development';
 
 				// A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command. This same hack is used to prevent yargs from turning 0x00 into 0
 				// Refer to https://github.com/yargs/yargs-parser/issues/201

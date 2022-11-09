@@ -111,7 +111,7 @@ export const sanitizedArgsSchema = z.object({
 	build: z.boolean(),
 	help: z.boolean(),
 	yes: z.boolean(),
-	plugin: nonEmptyStringSchema,
+	plugin: nonEmptyStringSchema.optional(),
 	env: nonEmptyStringSchema,
 	quickstart: nonEmptyStringSchema,
 	setBuild: nonEmptyStringSchema,
@@ -293,19 +293,21 @@ export const parsedConfigSchema = configSchema.omit({ sandbox: true }).extend(
 );
 
 const pluginSchemaBaseSchema = z.object({
-	name: aliasSchema,
+	name: nonEmptyStringSchema,
 	version: versionNumberSchema,
 	schema: versionNumberSchema,
 	alias: aliasSchema,
 	tasks: z.array(taskSchema).optional(),
 });
 
-export const requestArgsSchema = sanitizedArgsSchema.extend(
-	{
-		taqRun: pluginActionNameSchema,
-		config: loadedConfigSchema,
-	},
-);
+export const requestArgsSchema = sanitizedArgsSchema
+	.omit({ quickstart: true })
+	.extend(
+		{
+			taqRun: pluginActionNameSchema,
+			config: loadedConfigSchema,
+		},
+	);
 
 export const proxyTaskArgsSchema = requestArgsSchema.extend(
 	{

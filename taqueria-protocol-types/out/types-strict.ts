@@ -120,7 +120,7 @@ type ParsedTemplateRaw = Omit<Template, 'handler'> & {
 };
 
 type PluginSchemaBase = {
-	name: Alias;
+	name: NonEmptyString;
 	version: VersionNumber;
 	schema: VersionNumber;
 	alias: Alias;
@@ -189,7 +189,6 @@ type PluginProxyResponseRaw = void | PluginJsonResponse;
 /** @default none */
 export type PluginResponseEncoding = { __type: PluginResponseEncoding } & PluginResponseEncodingRaw;
 type PluginResponseEncodingRaw = 'none' | 'json' | 'application/json';
-
 export type SanitizedArgs = { __type: SanitizedArgs } & {
 	_: NonEmptyString[];
 	projectDir: SanitizedPath;
@@ -202,7 +201,7 @@ export type SanitizedArgs = { __type: SanitizedArgs } & {
 	build: boolean;
 	help: boolean;
 	yes: boolean;
-	plugin: NonEmptyString;
+	plugin?: NonEmptyString;
 	env: NonEmptyString;
 	quickstart: NonEmptyString;
 	setBuild: NonEmptyString;
@@ -218,12 +217,11 @@ type PluginActionNameRaw =
 	| 'proxyTemplate';
 
 export type RequestArgs = { __type: RequestArgs } & RequestArgsRaw;
-type RequestArgsRaw = SanitizedArgs & {
+type RequestArgsRaw = Omit<SanitizedArgs, 'quickstart'> & {
 	taqRun: PluginActionName;
 	// TODO: JSON.parse if string
 	config: LoadedConfig;
 };
-
 export type ProxyTaskArgs = { __type: ProxyTaskArgs } & ProxyTaskArgsRaw;
 type ProxyTaskArgsRaw = RequestArgs & {
 	task: NonEmptyString;

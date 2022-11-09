@@ -59,7 +59,7 @@ const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[
 		)
 		.then(promises => Promise.all(promises));
 
-const compile = <T>(parsedArgs: Opts) => {
+const compile = (parsedArgs: Opts) => {
 	const p = parsedArgs.sourceFile
 		? compileContract(parsedArgs)(parsedArgs.sourceFile)
 			.then(result => [result])

@@ -16,7 +16,6 @@ import * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
 import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
-import * as ParsedPluginInfo from '@taqueria/protocol/ParsedPluginInfo';
 import * as PersistentState from '@taqueria/protocol/PersistentState';
 import * as PositionalArg from '@taqueria/protocol/PositionalArg';
 import * as ProxyTaskArgs from '@taqueria/protocol/ProxyTaskArgs';
@@ -236,20 +235,21 @@ const parseSchema = <T extends RequestArgs>(
 	definer: pluginDefiner,
 	defaultPluginName: string,
 	requestArgs: T,
-): ParsedPluginInfo.t => {
+): PluginSchema.t => {
 	const inputSchema: PluginSchema.RawPluginSchema = definer(requestArgs, i18n);
 
 	const { proxy } = inputSchema;
 
 	return PluginSchema.create({
 		...inputSchema,
-		name: inputSchema.name ?? defaultPluginName,
+		name: inputSchema.name ? inputSchema.name : defaultPluginName,
 		proxy,
-	}) as ParsedPluginInfo.t;
+	}) as PluginSchema.t;
 };
 
 const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPluginName: string) =>
 	async (requestArgs: T) => {
+		debugger;
 		const { taqRun } = requestArgs;
 		const i18n = await load();
 		const schema = parseSchema(i18n, definer, defaultPluginName, requestArgs);
@@ -280,14 +280,29 @@ const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPlugi
 								},
 							)
 							: [],
-						proxy: schema.proxy ? true : false,
+						proxy: true,
 						checkRuntimeDependencies: schema.checkRuntimeDependencies ? true : false,
 						installRuntimeDependencies: schema.installRuntimeDependencies ? true : false,
 					};
 					return sendAsyncJson(output);
 				case 'proxy':
 					if (schema.proxy) {
-						const retval = await schema.proxy(ProxyTaskArgs.from(requestArgs));
+						const proxyArgs = Object.entries(requestArgs).reduce(
+							(retval, [key, value]) => {
+								if (typeof value === 'string') {
+									if (value === 'true') value = true;
+									else if (value === 'false') value = false;
+									else if (key === 'config') value = JSON.parse(value);
+								}
+
+								return {
+									...retval,
+									...Object.fromEntries([[key, value]]),
+								};
+							},
+							{},
+						);
+						const retval = await schema.proxy(ProxyTaskArgs.from(proxyArgs));
 						if (retval) return retval;
 						return Promise.reject({
 							errCode: 'E_PROXY',
@@ -624,6 +639,7 @@ const getPackageName = () => {
 				&& !filename.includes('stacktrace-js');
 		}),
 	});
+
 	const frame = stack.shift();
 	if (frame) {
 		const filename = frame.getFileName().replace(/^file:\/\//, '').replace(/^file:/, '');

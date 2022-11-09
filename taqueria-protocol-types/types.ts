@@ -105,7 +105,7 @@ export type ParsedTemplate = Omit<Template, 'handler'> & {
 };
 
 type PluginSchemaBase = {
-	name: Alias;
+	name: NonEmptyString;
 	version: VersionNumber;
 	schema: VersionNumber;
 	alias: Alias;
@@ -167,7 +167,6 @@ export type PluginProxyResponse = void | PluginJsonResponse;
 
 /** @default none */
 export type PluginResponseEncoding = 'none' | 'json' | 'application/json';
-
 export type SanitizedArgs = {
 	_: NonEmptyString[];
 	projectDir: SanitizedPath;
@@ -180,7 +179,7 @@ export type SanitizedArgs = {
 	build: boolean;
 	help: boolean;
 	yes: boolean;
-	plugin: NonEmptyString;
+	plugin?: NonEmptyString;
 	env: NonEmptyString;
 	quickstart: NonEmptyString;
 	setBuild: NonEmptyString;
@@ -194,12 +193,11 @@ export type PluginActionName =
 	| 'installRuntimeDependencies'
 	| 'proxyTemplate';
 
-export type RequestArgs = SanitizedArgs & {
+export type RequestArgs = Omit<SanitizedArgs, 'quickstart'> & {
 	taqRun: PluginActionName;
 	// TODO: JSON.parse if string
 	config: LoadedConfig;
 };
-
 export type ProxyTaskArgs = RequestArgs & {
 	task: NonEmptyString;
 };
