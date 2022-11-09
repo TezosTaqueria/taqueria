@@ -7,6 +7,7 @@ const docsDir = path.join(__dirname, 'website', 'docs', 'plugins');
 
 // new plugins or document directories can be added to this list
 const plugins: string[] = [
+	'taqueria-plugin-core',
 	'taqueria-plugin-archetype',
 	'taqueria-plugin-contract-types',
 	'taqueria-plugin-flextesa',
