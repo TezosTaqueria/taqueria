@@ -215,7 +215,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			cwd: `./${taqueriaProjectPath}`,
 		});
 
-		console.log(stdoutDeploy);
 		// 3. Verify that proper error displays in the console
 		expect(stdoutDeploy.stderr).toContain('Error while performing operation');
 		expect(stdoutDeploy.stderr).toContain('michelson_v1.invalid_expression_kind');

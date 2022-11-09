@@ -259,30 +259,6 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
-	// TODO: Currently it cannot be done until this issue has been resolved
-	// Issue to implement test: https://github.com/ecadlabs/taqueria/issues/366
-	// Related developer issue: https://github.com/ecadlabs/taqueria/issues/243
-	test.skip('Verify that taqueria flextesa plugin can retrieve data from updated config after restart', async () => {
-		try {
-			// Setting up docker container name
-			sandboxName = 'local';
-
-			// 1. Start sandbox
-
-			// 2. Check balance
-
-			// 3. Stop sandbox
-
-			// 4. Update config
-
-			// 5. start sandbox again
-
-			// 6. Check balance again and see that it changed
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
-
 	// Clean up process to stop container if it was not stopped properly during the test
 	afterEach(async () => {
 		try {

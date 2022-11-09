@@ -43,7 +43,7 @@ describe('E2E Testing for taqueria general functionality', () => {
 		}
 	});
 
-	test.skip('Verify that to install a plugin all you need is a package.json file with {}', async () => {
+	test.only('Verify that to install a plugin all you need is a package.json file with {}', async () => {
 		try {
 			await exec(`taq init ${taqueriaProjectPathNPMSuccess}`);
 			await exec(`echo "{}" > ${taqueriaProjectPathNPMSuccess}/package.json`);
@@ -61,43 +61,6 @@ describe('E2E Testing for taqueria general functionality', () => {
 			expect(JSON.parse(packageContents.stdout)).toEqual(fileContentsBare);
 
 			await fsPromises.rm(`${taqueriaProjectPathNPMSuccess}`, { recursive: true });
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
-
-	test.skip('Verify plugin install with full npm initialization', async () => {
-		try {
-			await exec(`taq init ${taqueriaProjectPathNPMFull}`);
-			await exec(`npm init -y`, { cwd: `./${taqueriaProjectPathNPMFull}` });
-			await exec(`npm init -y && taq install @taqueria/plugin-ligo -p ./${taqueriaProjectPathNPMFull}`);
-
-			const ligoPackageContents = await exec(`cat ../taqueria-plugin-ligo/package.json`);
-			const ligoVersion = JSON.parse(ligoPackageContents.stdout).version;
-			const packageContentsFull = await exec(`cd ${taqueriaProjectPathNPMFull} && cat package.json`);
-
-			const fileContentsFull = {
-				'name': 'auto-test-npm-full',
-				'version': '1.0.0',
-				'description': '',
-				'main': 'index.js',
-				'directories': {
-					'test': 'tests',
-				},
-				'scripts': {
-					'test': 'echo "Error: no test specified" && exit 1',
-				},
-				'keywords': [],
-				'author': '',
-				'license': 'ISC',
-				'devDependencies': {
-					'@taqueria/plugin-ligo': `^${ligoVersion}`,
-				},
-			};
-
-			expect(JSON.parse(packageContentsFull.stdout)).toEqual(fileContentsFull);
-
-			await fsPromises.rm(`${taqueriaProjectPathNPMFull}`, { recursive: true });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
