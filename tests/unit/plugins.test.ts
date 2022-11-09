@@ -55,11 +55,18 @@ Deno.test('inject()', async t => {
 	assert(typeof pluginLib.getState === 'function');
 	assert(typeof pluginLib.sendPluginActionRequest === 'function');
 
-	await t.step('toPluginArguments() returns an array suitable for invoking a plugin task', () => {
+	await t.step('toPluginArguments() returns an array suitable for invoking a plugin task', async () => {
 		const { toPluginArguments } = pluginLib.__TEST__;
 		const requestArgs = { foo: 'bar', bar: 'foo' };
 
-		const result = toPluginArguments(requestArgs);
+		const taqDir = await toPromise(SanitizedAbsPath.make(`${projectDir}/.taq`));
+		const config = await toPromise(toLoadedConfig(
+			'config.json',
+			taqDir,
+			defaultConfig,
+		));
+
+		const result = toPluginArguments(requestArgs, config);
 
 		assertEquals(result, [
 			'--projectDir',

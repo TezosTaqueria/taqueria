@@ -116,7 +116,7 @@ export const sanitizedArgsSchema = z.object({
 	quickstart: nonEmptyStringSchema,
 	setBuild: nonEmptyStringSchema,
 	setVersion: nonEmptyStringSchema,
-});
+}).passthrough();
 
 export const pluginActionNameSchema = z.union([
 	z.literal('proxy'),
@@ -307,19 +307,19 @@ export const requestArgsSchema = sanitizedArgsSchema
 			taqRun: pluginActionNameSchema,
 			config: loadedConfigSchema,
 		},
-	);
+	).passthrough();
 
 export const proxyTaskArgsSchema = requestArgsSchema.extend(
 	{
 		task: nonEmptyStringSchema,
 	},
-);
+).passthrough();
 
 export const proxyTemplateArgsSchema = requestArgsSchema.extend(
 	{
 		template: nonEmptyStringSchema,
 	},
-);
+).passthrough();
 
 export const operationSchema = z.object({
 	operation: verbSchema,

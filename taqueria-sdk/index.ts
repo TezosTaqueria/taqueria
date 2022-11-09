@@ -247,6 +247,30 @@ const parseSchema = <T extends RequestArgs>(
 	}) as PluginSchema.t;
 };
 
+const toProxableArgs = <T>(requestArgs: RequestArgs, from: (input: unknown) => T) => {
+	const retval = Object.entries(requestArgs).reduce(
+		(retval, [key, value]) => {
+			if (typeof value === 'string') {
+				if (value === 'true') value = true;
+				else if (value === 'false') value = false;
+				else if (key === 'config') value = JSON.parse(value);
+			}
+
+			const proxyArgs = {
+				...retval,
+				...Object.fromEntries([[key, value]]),
+			};
+
+			return proxyArgs;
+		},
+		{},
+	);
+
+	debugger;
+
+	return from(retval);
+};
+
 const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPluginName: string) =>
 	async (requestArgs: T) => {
 		debugger;
@@ -255,7 +279,7 @@ const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPlugi
 		const schema = parseSchema(i18n, definer, defaultPluginName, requestArgs);
 		try {
 			switch (taqRun) {
-				case 'pluginInfo':
+				case 'pluginInfo': {
 					const output = {
 						...schema,
 						templates: schema.templates
@@ -285,30 +309,10 @@ const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPlugi
 						installRuntimeDependencies: schema.installRuntimeDependencies ? true : false,
 					};
 					return sendAsyncJson(output);
+				}
 				case 'proxy':
 					if (schema.proxy) {
-						const proxyArgs = Object.entries(requestArgs).reduce(
-							(retval, [key, value]) => {
-								if (typeof value === 'string') {
-									if (value === 'true') value = true;
-									else if (value === 'false') value = false;
-									else if (key === 'config') value = JSON.parse(value);
-								}
-
-								return {
-									...retval,
-									...Object.fromEntries([[key, value]]),
-								};
-							},
-							{},
-						);
-						const retval = await schema.proxy(ProxyTaskArgs.from(proxyArgs));
-						if (retval) return retval;
-						return Promise.reject({
-							errCode: 'E_PROXY',
-							message: "The plugin's proxy method must return a promise.",
-							context: retval,
-						});
+						return await schema.proxy(toProxableArgs(requestArgs, ProxyTaskArgs.from.bind(ProxyTaskArgs)));
 					}
 					return Promise.reject({
 						errCode: 'E_NOT_SUPPORTED',
@@ -316,7 +320,7 @@ const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPlugi
 						context: requestArgs,
 					});
 				case 'proxyTemplate': {
-					const proxyArgs = ProxyTemplateArgs.from(requestArgs);
+					const proxyArgs = toProxableArgs(requestArgs, ProxyTemplateArgs.from.bind(ProxyTemplateArgs));
 					const template = schema.templates?.find(tmpl => tmpl.template === proxyArgs.template);
 					if (template) {
 						if (typeof template.handler === 'function') {
