@@ -1,31 +1,22 @@
-import { execCmd, getArch, sendAsyncErr, sendErr, sendRes, sendWarn } from '@taqueria/node-sdk';
-import { writeFile } from 'fs/promises';
+import { getArch, sendAsyncErr, sendErr, sendRes, sendWarn, spawnCmd } from '@taqueria/node-sdk';
 import { LIGO_DOCKER_IMAGE, LigoOpts as Opts } from './common';
 
-const MAX_OUTPUT_LIMIT = 50000;
-
-const getArbitraryLigoCmd = (parsedArgs: Opts, cmd: string): string => {
+const getArbitraryLigoCmd = (parsedArgs: Opts, cmd: string): [string, string[], { [key: string]: string }] => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
-	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${LIGO_DOCKER_IMAGE}`;
-	return `${baseCmd} ${cmd}`;
+	const binary = 'docker';
+	const baseArgs = ['run', '--rm', '-v', `${projectDir}:/project`, '-w', '/project', `${LIGO_DOCKER_IMAGE}`];
+	const args = baseArgs.concat(cmd.split(' '));
+	const envVars = { 'DOCKER_DEFAULT_PLATFORM': 'linux/amd64' };
+	return [binary, args, envVars];
 };
 
 const runArbitraryLigoCmd = (parsedArgs: Opts, cmd: string): Promise<string> =>
 	getArch()
 		.then(() => getArbitraryLigoCmd(parsedArgs, cmd))
-		.then(execCmd)
+		.then(spawnCmd)
 		.then(async ({ stdout, stderr }) => {
 			if (stderr.length > 0) sendWarn(stderr);
-			if (stdout.length >= MAX_OUTPUT_LIMIT) {
-				const outputFile = './ligo.output';
-				sendWarn(
-					`The output of the underlying LIGO binary is too big so we are dumping it to "${outputFile}" instead of displaying it here in the console`,
-				);
-				await writeFile(outputFile, stdout, { encoding: 'utf8' });
-				return '';
-			}
 			return stdout;
 		})
 		.catch(err => {
