@@ -109,6 +109,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			// 4. Verify transfer results
 			const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 			await sleep(2500);
+			console.log(resultContractList);
 			const amountArray = itemArrayInTable(amountRegex, resultContractList);
 			console.log(amountArray);
 			expect(amountArray[1]).toEqual('4000 ꜩ');
