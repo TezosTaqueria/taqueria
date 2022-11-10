@@ -1,13 +1,4 @@
-import {
-	CmdArgEnv,
-	getArch,
-	getFlextesaImage,
-	sendAsyncErr,
-	sendErr,
-	sendRes,
-	sendWarn,
-	spawnCmd,
-} from '@taqueria/node-sdk';
+import { CmdArgEnv, getArch, getFlextesaImage, sendAsyncErr, sendRes, spawnCmd } from '@taqueria/node-sdk';
 import { ClientOpts as Opts } from './common';
 
 const getArbitraryClientCmd = async (
@@ -42,8 +33,12 @@ const getArbitraryClientCmd = async (
 const runArbitraryClientCmd = (parsedArgs: Opts, cmd: string): Promise<string> =>
 	getArbitraryClientCmd(parsedArgs, cmd)
 		.then(spawnCmd)
-		.then(() => `Command "${cmd}" ran successfully by octez-client`)
-		.catch(() => `Command "${cmd}" didn't run successfully by octez-client`);
+		.then(code =>
+			code !== null && code === 0
+				? `Command "${cmd}" ran successfully by octez-client`
+				: `Command "${cmd}" failed. Please check your command`
+		)
+		.catch(err => sendAsyncErr(`An internal error has occurred: ${err.message}`));
 
 const client = (parsedArgs: Opts): Promise<void> => {
 	const args = parsedArgs.command;

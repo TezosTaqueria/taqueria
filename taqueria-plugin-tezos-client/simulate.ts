@@ -1,8 +1,9 @@
 import {
+	addTzExtensionIfMissing,
 	execCmd,
 	getArch,
+	getContractContent,
 	getFlextesaImage,
-	getInitialStorage,
 	getParameter,
 	sendAsyncErr,
 	sendErr,
@@ -41,7 +42,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	if (!projectDir) throw `No project directory provided`;
 
 	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(sourceFile);
-	const storage = (await getInitialStorage(parsedArgs, storageFilename))?.trim();
+	const storage = (await getContractContent(parsedArgs, storageFilename))?.trim();
 
 	if (storage === undefined) {
 		return Promise.reject(
@@ -100,7 +101,7 @@ const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRo
 		});
 
 const simulate = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = parsedArgs.sourceFile;
+	const sourceFile = addTzExtensionIfMissing(parsedArgs.sourceFile);
 	return simulateContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
 		sendAsyncErr(err, false)
 	);

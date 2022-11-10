@@ -75,16 +75,14 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 		});
 	});
 
-export const spawnCmd = (fullCmd: CmdArgEnv) =>
+export const spawnCmd = (fullCmd: CmdArgEnv): Promise<number | null> =>
 	new Promise((resolve, reject) => {
 		const cmd = fullCmd[0];
 		const args = fullCmd[1];
 		const envVars = fullCmd[2];
 		const child = spawn(cmd, args, { env: { ...process.env, ...envVars }, stdio: 'inherit' });
-		child.on('close', code => {
-			if (code === 0) resolve('');
-			reject();
-		});
+		child.on('close', resolve);
+		child.on('error', reject);
 	});
 
 export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError> => {
@@ -420,19 +418,20 @@ export const getSandboxAccountConfig = (sandbox: SandboxConfig.t, accountName: s
 	return undefined;
 };
 
-/**
- * Gets the initial storage for the contract associated with the given storage file
- */
-export const getInitialStorage = async (
+export const addTzExtensionIfMissing = (contractFilename: string) =>
+	/\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`;
+
+export const getContractContent = async (
 	parsedArgs: RequestArgs.t,
-	storageFilename: string,
+	contractFilename: string,
 ): Promise<string | undefined> => {
-	const storagePath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, storageFilename);
+	const contractWithTzExtension = addTzExtensionIfMissing(contractFilename);
+	const contractPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, contractWithTzExtension);
 	try {
-		const content = await readFile(storagePath, { encoding: 'utf-8' });
+		const content = await readFile(contractPath, { encoding: 'utf-8' });
 		return content;
 	} catch (err) {
-		sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
+		sendErr(`Could not read ${contractPath}. Maybe it doesn't exist.\n`);
 		return undefined;
 	}
 };
