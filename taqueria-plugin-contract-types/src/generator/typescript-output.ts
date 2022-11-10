@@ -40,13 +40,13 @@ export const createTypescriptCodeGenerator = (options?: { mode?: 'types' | 'defa
 	const tabs = (indent: number) => Array(indent).fill(`    `).join(``);
 	const toIndentedItems = (
 		indent: number,
-		delimeters: { afterItem?: string; beforeItem?: string },
+		delimiters: { afterItem?: string; beforeItem?: string },
 		items: string[],
 	) => {
 		return `
 ${tabs(indent + 1)}${
-			items.join(`${delimeters.afterItem ?? ``}
-${tabs(indent + 1)}${delimeters.beforeItem ?? ``}`)
+			items.join(`${delimiters.afterItem ?? ``}
+${tabs(indent + 1)}${delimiters.beforeItem ?? ``}`)
 		}
 ${tabs(indent)}`;
 	};
@@ -205,8 +205,8 @@ ${tabs(indent + 1)}value: ${typeToCode(t.map.value, indent)},
 ${tabs(indent)}}])`;
 		}
 		if (t.kind === `object`) {
-			const delimeter = options?.mode === 'defaultValue' ? ',' : `;`;
-			return `{${toIndentedItems(indent, {}, t.fields.map((a, i) => varToCode(a, i, indent + 1) + delimeter))}}`;
+			const delimiter = options?.mode === 'defaultValue' ? ',' : `;`;
+			return `{${toIndentedItems(indent, {}, t.fields.map((a, i) => varToCode(a, i, indent + 1) + delimiter))}}`;
 		}
 		if (t.kind === `union`) {
 			const getUnionItem = (a: TypedVar, i: number) => {
@@ -233,7 +233,7 @@ ${tabs(indent)}}])`;
 			return `unknown`;
 		}
 		if (t.kind === 'lambda') {
-			throw new GenerateApiError(`Don't know how to generate default value for lambda`, { t });
+			return `tas.lambda(${t.lambda.arg}, ${t.lambda.ret})`;
 		}
 
 		assertExhaustive(t, `Unknown type`);

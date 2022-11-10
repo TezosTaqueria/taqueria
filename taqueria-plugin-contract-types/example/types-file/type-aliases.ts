@@ -63,6 +63,10 @@ function subtract<T extends BigNumber>(a: T, b: T): T {
     return a.minus(b) as T;
 }
 
+function createLambdaTypeTas(argType: unknown, retType: unknown): MichelsonInstruction[] {
+    return [];
+}
+
 /** tas: Tezos 'as' casting for strict types */
 export const tas = {
     address: createStringTypeTas<address>(),
@@ -83,6 +87,8 @@ export const tas = {
     // Operations
     add,
     subtract,
+    
+    lambda: createLambdaTypeTas,
 
     // To number
     number: (value: string | BigNumber) => Number(value + ''),
