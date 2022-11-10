@@ -56,6 +56,11 @@ export async function getContainerID(dockerName: string): Promise<string> {
 	return dockerContainerID;
 }
 
+export function itemArrayInTable(regex: RegExp, inputTable: { stdout: string; stderr: string }): string[] {
+	const matchArray = [...inputTable.stdout.matchAll(regex)];
+	return Array.from(matchArray, item => item[0]);
+}
+
 // The solution was taken from this source:
 // https://stackoverflow.com/questions/26165725/nodejs-check-file-exists-if-not-wait-till-it-exist
 // It is pull&wait mechanism and it is async by nature, because
@@ -89,6 +94,15 @@ export async function checkContractExistsOnNetwork(contractAddress: string, netw
 	} catch (error) {
 		return error;
 	}
+}
+
+export async function checkContractBalanceOnNetwork(
+	contractAddress: string,
+	networkNodeURL: string,
+): Promise<number[] | null> {
+	const tezos = new TezosToolkit(networkNodeURL);
+	const balance = await tezos.tz.getBalance(contractAddress);
+	return balance.c;
 }
 
 export async function installDependencies(
