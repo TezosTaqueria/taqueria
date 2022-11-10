@@ -1,20 +1,20 @@
 
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
-import { address, Instruction } from './type-aliases';
+import { Instruction, int } from './type-aliases';
 
 type Storage = {
-    feedbackFunction: Instruction[];
-    someAddress: address;
+    currentValue: int;
+    modifyValue: Instruction[];
 };
 
 type Methods = {
-    makeACall: (param: address) => Promise<void>;
-    updateFeedbackFunction: (param: Instruction[]) => Promise<void>;
+    callModifyValue: () => Promise<void>;
+    updateModifyValueFunction: (param: Instruction[]) => Promise<void>;
 };
 
 type MethodsObject = {
-    makeACall: (param: address) => Promise<void>;
-    updateFeedbackFunction: (param: Instruction[]) => Promise<void>;
+    callModifyValue: () => Promise<void>;
+    updateModifyValueFunction: (param: Instruction[]) => Promise<void>;
 };
 
 type contractTypes = { methods: Methods, methodsObject: MethodsObject, storage: Storage, code: { __type: 'ExampleLambdaCode', protocol: string, code: object[] } };
