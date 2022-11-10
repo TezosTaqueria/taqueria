@@ -61,37 +61,33 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
 	test('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
-		try {
-			environment = 'development';
+		environment = 'development';
 
-			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
-			// 1. Run taq deploy ${contractName} on a selected test network described in "test" environment
-			const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
-				cwd: `./${taqueriaProjectPath}`,
-			});
-			const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
+		// 1. Run taq deploy ${contractName} on a selected test network described in "test" environment
+		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
-			// 2. Get the KT address from the output
-			expect(deployResponse).toContain('hello-tacos.tz');
-			expect(deployResponse).toContain(dockerName);
-			const contractHash = deployResponse.split('│')[2].trim();
+		// 2. Get the KT address from the output
+		expect(deployResponse).toContain('hello-tacos.tz');
+		expect(deployResponse).toContain(dockerName);
+		const contractHash = deployResponse.split('│')[2].trim();
 
-			expect(contractHash).toMatch(contractRegex);
+		expect(contractHash).toMatch(contractRegex);
 
-			// 3. Verify that contract has been originated to the network
-			const configContents = JSON.parse(
-				await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
-			);
-			const port = configContents.sandbox.local.rpcUrl;
-			const contractFromSandbox = await exec(
-				`curl ${port}/chains/main/blocks/head/context/contracts/${contractHash}`,
-			);
-			expect(contractFromSandbox.stdout).toContain('"balance":"0"');
-			expect(contractFromSandbox.stdout).toContain('"storage":{"int":"12"}');
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		// 3. Verify that contract has been originated to the network
+		const configContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		);
+		const port = configContents.sandbox.local.rpcUrl;
+		const contractFromSandbox = await exec(
+			`curl ${port}/chains/main/blocks/head/context/contracts/${contractHash}`,
+		);
+		expect(contractFromSandbox.stdout).toContain('"balance":"0"');
+		expect(contractFromSandbox.stdout).toContain('"storage":{"int":"12"}');
 	});
 
 	test('Verify that taqueria taquito plugin can transfer amount of tezos using transfer command from one account to another', async () => {
