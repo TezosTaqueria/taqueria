@@ -20,7 +20,11 @@
 		},
 		"test": {
 			"networks": ["ghostnet"],
-			"sandboxes": []
+			"sandboxes": [],
+			"storage": {
+				"hello-tacos.tz": "anyContract.storage",
+				"increment.tz": "anyContract.storage"
+			}
 		},
 		"funds": {
 			"networks": ["fundnet"],
@@ -55,10 +59,10 @@
 		}
 	},
 	"accounts": {
-		"bob": "3000000",
+		"bob": "2000000",
 		"alice": "2000000",
-		"john": "4000000",
-		"jane": "5000000",
-		"joe": "1000000"
+		"john": "2000000",
+		"jane": "2000000",
+		"joe": "2000000"
 	}
 }
