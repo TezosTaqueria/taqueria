@@ -132,7 +132,7 @@ taq ligo --command <command to pass to the underlying LIGO binary>
 Wrap the value for the `--command` flag with quotes.
 
 > ### :page_with_curl: Note
-> This task allows you to run arbitrary LIGO native commands. Note that they might not benefit from the abstractions provided by Taqueria
+> This task allows you to run arbitrary LIGO native commands, but they might not benefit from the abstractions provided by Taqueria
 
 ## Template creation
 The LIGO plugin also exposes a contract template via the `taq create contract <contractName>` task. This task will create a new LIGO contract in the `contracts` directory and insert some boilerplate LIGO contract code

@@ -2,9 +2,6 @@
 
 The Tezos Client plugin provides tasks to analyze contracts including type checking and simulating of Michelson (`.tz`) smart contracts. They both execute against a protocol (currently kathmandu). We'll enable a `--protocol` flag in the future to allow users to specify a protocol to use
 
-> ### :page_with_curl: Note
-> This plugin no longer relies on the Flextesa plugin.
-
 ## Requirements
 
 - Taqueria v0.22.2 or later
@@ -57,7 +54,7 @@ taq client --command <command to pass to the underlying octez-client binary>
 Wrap the value for the `--command` flag with quotes.
 
 > ### :page_with_curl: Note
-> This task allows you to run arbitrary octez-client native commands. Note that they might not benefit from the abstractions provided by Taqueria
+> This task allows you to run arbitrary octez-client native commands, but they might not benefit from the abstractions provided by Taqueria
 
 ## Plugin Architecture
 
