@@ -59,6 +59,7 @@ const sidebars = {
       collapsible: true,
       items: [
         "plugins/plugin-basics",
+        "plugins/plugin-core",
         "plugins/plugin-archetype",
         "plugins/plugin-contract-types",
         "plugins/plugin-flextesa",

@@ -434,6 +434,7 @@ const initProject = (
 				: resolve(projectDir)
 		),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
+		chain(_ => exec('taq install @taqueria/plugin-core 2>&1 > /dev/null', {}, false, projectDir)),
 		map(_ => i18n.__('bootstrapMsg')),
 	);
 

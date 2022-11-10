@@ -502,6 +502,7 @@ export class VsCodeHelper {
 
 	getWellKnownPlugins() {
 		return [
+			'@taqueria/plugin-core',
 			'@taqueria/plugin-archetype',
 			'@taqueria/plugin-contract-types',
 			'@taqueria/plugin-flextesa',
