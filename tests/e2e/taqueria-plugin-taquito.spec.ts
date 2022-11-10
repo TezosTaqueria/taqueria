@@ -100,39 +100,35 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
 	test('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
-		try {
-			environment = 'test';
+		environment = 'test';
 
-			// 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
-			await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
-			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
-			await exec(`cp e2e/data/increment.tz ${taqueriaProjectPath}/artifacts/`);
+		// 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
+		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
+		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp e2e/data/increment.tz ${taqueriaProjectPath}/artifacts/`);
 
-			// 2. Run taq deploy ${contractName} on a selected test network described in "test" environment
+		// 2. Run taq deploy ${contractName} on a selected test network described in "test" environment
 
-			const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
-				cwd: `./${taqueriaProjectPath}`,
-			});
+		const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
 
-			// 3. Verify that contract has been originated on the network
-			expect(stdout).toContain('hello-tacos.tz');
-			expect(stdout).toContain(networkInfo.networkName);
+		// 3. Verify that contract has been originated on the network
+		expect(stdout).toContain('hello-tacos.tz');
+		expect(stdout).toContain(networkInfo.networkName);
 
-			const result = stdout.match(/(KT1)+\w{33}?/);
-			expect(result).not.toBe(null);
-			const contractHash = (result as RegExpMatchArray)[0];
+		const result = stdout.match(/(KT1)+\w{33}?/);
+		expect(result).not.toBe(null);
+		const contractHash = (result as RegExpMatchArray)[0];
 
-			// 4. Verify that contract has been originated to the network
-			expect(
-				await checkContractExistsOnNetwork(
-					contractHash,
-					networkInfo.networkURL,
-				),
-			)
-				.toBe(contractHash);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		// 4. Verify that contract has been originated to the network
+		expect(
+			await checkContractExistsOnNetwork(
+				contractHash,
+				networkInfo.networkURL,
+			),
+		)
+			.toBe(contractHash);
 	});
 
 	test('Verify that taqueria taquito plugin will show an error when running the taq fund command in a non-network environment', async () => {
