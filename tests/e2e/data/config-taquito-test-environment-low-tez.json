@@ -22,8 +22,8 @@
 			"networks": ["ghostnet"],
 			"sandboxes": [],
 			"storage": {
-				"hello-tacos.tz": "anyContract.storage",
-				"increment.tz": "anyContract.storage"
+				"hello-tacos.tz": "anyContract.storage.tz",
+				"increment.tz": "anyContract.storage.tz"
 			}
 		},
 		"funds": {
