@@ -16,7 +16,8 @@ title: Taqueria Releases
 - VsCE has a Micheline editor which allows users to easily provide values needed for calling endpoints
 - A `taq instantiate-accounts` task has been added which creates instances of declared accounts in a target environment
 - A `taq fund` task has been added which funds each of the instantiated accounts from the `taqueria operator` account
-- An optional flag has been added to `taq originate` and `taq call` to specify an account to use 
+- An optional flag has been added to `taq originate` and `taq call` to specify an account to use
+- Arbitrary commands can now be run by the underlying binary (LIGO and Octez-client) from the Taq CLI 
 
 ### New Features
 
@@ -35,6 +36,38 @@ The value for amount specified with `--tez` has been changed to  `--mutez` for `
 #### Call Endpoints on Deployed Contracts via VsCE UI
 
 The Taqueria VsCE now allows users to easily call endpoints on contracts deployed to a sandbox. Once deployed, contracts will appear in the Flextesa browser. You can now expand each contract in the browser which will show a list of entrypoints for a particular contract. Each of these entrypoints can be called using the icon on the right. Clicking on this icon will open a Micheline editor in a new page. The Micheline editor provides a UI to enter the parameters required for the entrypoint call in plain text, and will parse the input into valid Michelson which is then used to call the entrypoint
+
+#### Execute Arbitrary Commands from Taq CLI
+
+##### The `taq ligo` Task
+
+Basic usage is:
+
+```shell
+taq ligo --command <command to pass to the underlying LIGO binary>
+```
+
+Wrap the value for the `--command` flag with quotes.
+
+:::caution
+This task allows you to run arbitrary LIGO native commands, but they might not benefit from the abstractions provided by Taqueria
+:::caution
+
+#### The `taq client` Task
+
+##### The `taq client` task
+
+Basic usage is:
+
+```shell
+taq client --command <command to pass to the underlying octez-client binary>
+```
+
+Wrap the value for the `--command` flag with quotes.
+
+:::caution
+This task allows you to run arbitrary octez-client native commands, but they might not benefit from the abstractions provided by Taqueria
+:::
 
 ### Bug Fixes
 
