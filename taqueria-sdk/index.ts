@@ -73,11 +73,11 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 		});
 	});
 
-export const spawnCmd = (fullCmd: [string, string[], { [key: string]: string }]): Promise<StdIO> => {
-	const cmd = fullCmd[0];
-	const args = fullCmd[1];
-	const envVars = fullCmd[2];
-	return new Promise((resolve, reject) => {
+export const spawnCmd = (fullCmd: [string, string[], { [key: string]: string }]): Promise<StdIO> =>
+	new Promise((resolve, reject) => {
+		const cmd = fullCmd[0];
+		const args = fullCmd[1];
+		const envVars = fullCmd[2];
 		const child = spawnSync(cmd, args, { env: { ...process.env, ...envVars } });
 		if (child.error) reject(child.error);
 		else {
@@ -87,7 +87,6 @@ export const spawnCmd = (fullCmd: [string, string[], { [key: string]: string }])
 			});
 		}
 	});
-};
 
 export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError> => {
 	switch (process.arch) {

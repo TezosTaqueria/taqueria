@@ -18,11 +18,12 @@ const getArbitraryClientCmd = async (
 		'-w',
 		'/project',
 		'--platform',
-		`${arch}`,
-		`${flextesaImage}`,
+		arch,
+		flextesaImage,
 		'octez-client',
 	];
-	const args = baseArgs.concat(cmd.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg));
+	const processedCmd = cmd.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg => arg);
+	const args = baseArgs.concat(processedCmd);
 	const envVars = {};
 	return [binary, args, envVars];
 };
@@ -30,7 +31,7 @@ const getArbitraryClientCmd = async (
 const runArbitraryClientCmd = (parsedArgs: Opts, cmd: string): Promise<string> =>
 	getArbitraryClientCmd(parsedArgs, cmd)
 		.then(spawnCmd)
-		.then(async ({ stdout, stderr }) => {
+		.then(({ stdout, stderr }) => {
 			if (stderr.length > 0) sendWarn(stderr);
 			return stdout;
 		})
@@ -39,7 +40,7 @@ const runArbitraryClientCmd = (parsedArgs: Opts, cmd: string): Promise<string> =
 			return '';
 		});
 
-const client = async (parsedArgs: Opts): Promise<void> => {
+const client = (parsedArgs: Opts): Promise<void> => {
 	const cmd = parsedArgs.command;
 	return runArbitraryClientCmd(parsedArgs, cmd).then(sendRes).catch(err => sendAsyncErr(err, false));
 };
