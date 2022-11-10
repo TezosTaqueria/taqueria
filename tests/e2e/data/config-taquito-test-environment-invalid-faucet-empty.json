@@ -15,8 +15,7 @@
 			"networks": [],
 			"sandboxes": [
 				"local"
-			],
-			"storage": {}
+			]
 		},
 		"test": {
 			"networks": ["ithacanet"],

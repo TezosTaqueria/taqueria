@@ -20,11 +20,7 @@
 		},
 		"test": {
 			"networks": ["ghostnet"],
-			"sandboxes": [],
-			"storage": {
-				"hello-tacos.tz": "anyContract.storage",
-				"increment.tz": "anyContract.storage"
-			}
+			"sandboxes": []
 		}
 	},
 	"sandbox": {

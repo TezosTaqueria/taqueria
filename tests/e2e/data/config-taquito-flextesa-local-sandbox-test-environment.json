@@ -26,11 +26,6 @@
 				"john": "3_000_000_000",
 				"jane": "3_000_000_000",
 				"joe": "3_000_000_000"
-			},
-			"storage": {
-				"hello-tacos.tz": "anyContract.storage",
-				"increment.tz": "anyContract.storage",
-				"all-types.tz": "allTypes.storage"
 			}
 		}
 	},
