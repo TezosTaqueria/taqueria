@@ -70,14 +70,15 @@ export const getPartitionAbspath = (partitionDir: string) => SanitizedAbsPath.cr
 export const getPartitionConfigAbspath = (partitionDir: string) =>
 	SanitizedAbsPath.create(join(partitionDir, 'jest.config.js'));
 
-export const initPartition = (partitionDir: SanitizedAbsPath.t, projectDir: SanitizedAbsPath.t) =>
-	writeFile(
+export const initPartition = (partitionDir: SanitizedAbsPath.t, projectDir: SanitizedAbsPath.t) => {
+	return writeFile(
 		getPartitionConfigAbspath(partitionDir),
 		toPartitionCfg(
-			SanitizedPath.create(relative(partitionDir, partitionDir)),
+			SanitizedPath.create('./'),
 			SanitizedPath.create(relative(partitionDir, getRootConfigAbspath(projectDir))),
 		),
 	);
+};
 
 export const ensurePartitionExists = async (
 	partitionDir: SanitizedAbsPath.t,

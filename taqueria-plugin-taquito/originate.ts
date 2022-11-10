@@ -49,6 +49,7 @@ const getFirstAccountAlias = (sandboxName: string, opts: Opts) => {
 
 const getContractAbspath = (contractFilename: string, parsedArgs: Opts) =>
 	join(
+		parsedArgs.projectDir,
 		parsedArgs.config.artifactsDir ?? 'artifacts',
 		/\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`,
 	);
@@ -70,20 +71,27 @@ const getDefaultStorageFilename = (contractName: string): string => {
 	return defaultStorage;
 };
 
+const getStorageFile = (parsedArgs: Opts) =>
+	parsedArgs.storage
+		? parsedArgs.storage // join(parsedArgs.projectDir, (parsedArgs.config.artifactsDir ?? 'artifacts'), parsedArgs.storage )
+		: (
+			parsedArgs.contract
+				? getDefaultStorageFilename(parsedArgs.contract)
+				: null
+		);
+
 const getValidContracts = async (parsedArgs: Opts) => {
-	const storageFilename = parsedArgs.contract
-		? getDefaultStorageFilename(parsedArgs.contract)
-		: null;
+	const storageFilename = getStorageFile(parsedArgs);
 
 	if (storageFilename) {
 		const storage = await newGetInitialStorage(parsedArgs, storageFilename);
 		if (storage === undefined || storage === null) {
 			sendErr(
-				`❌ No initial storage file was found for ${storageFilename}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${storageFilename}" in the artifacts directory\nYou can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option\n`,
+				`❌ No initial storage file was found for ${parsedArgs
+					.contract!}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${storageFilename}" in the artifacts directory\nYou can also manually pass a storage file to the deploy task using the --storage STORAGE_FILE_NAME option\n`,
 			);
-
-			return [{ filename: storageFilename, storage }];
 		}
+		return [{ filename: parsedArgs.contract!, storage }];
 	}
 
 	return Promise.resolve([]);
@@ -145,7 +153,6 @@ const createBatch = async (parsedArgs: Opts, tezos: TezosToolkit, destination: s
 	if (!contracts.length) {
 		return undefined;
 	}
-
 	const batch = await contracts.reduce(
 		(batch, contractMapping) =>
 			contractMapping.storage

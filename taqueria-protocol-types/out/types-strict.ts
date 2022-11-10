@@ -24,7 +24,6 @@ type HumanReadableIdentifierRaw = NonEmptyString;
 export type SanitizedAbsPath = { __type: SanitizedAbsPath } & SanitizedAbsPathRaw;
 type SanitizedAbsPathRaw = NonEmptyString;
 
-/** @pattern ^(\.\.|\.\/|\/) */
 export type SanitizedPath = { __type: SanitizedPath } & SanitizedPathRaw;
 type SanitizedPathRaw = NonEmptyString;
 

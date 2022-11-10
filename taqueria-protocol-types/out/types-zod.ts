@@ -15,9 +15,7 @@ export const humanReadableIdentifierSchema = nonEmptyStringSchema.regex(
 
 export const sanitizedAbsPathSchema = nonEmptyStringSchema;
 
-export const sanitizedPathSchema = nonEmptyStringSchema.regex(
-	/^(\.\.|\.\/|\/)/,
-);
+export const sanitizedPathSchema = nonEmptyStringSchema;
 
 export const settingsSchema = z.object({
 	consent: z.union([z.literal('opt_in'), z.literal('opt_out')]),

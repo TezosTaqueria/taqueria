@@ -37,7 +37,6 @@ const toPassthroughSchemas = (fileContents: string) =>
 				...'Schema',
 			].join('');
 
-			debugger;
 			const searchFor = RegExp(`(const ${schemaName}[^;]+)`, 'msg');
 			const replaceWith = '$1.passthrough()';
 			return retval.replaceAll(searchFor, replaceWith);

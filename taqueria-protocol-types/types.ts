@@ -16,7 +16,6 @@ export type HumanReadableIdentifier = NonEmptyString;
 
 export type SanitizedAbsPath = NonEmptyString;
 
-/** @pattern ^(\.\.|\.\/|\/) */
 export type SanitizedPath = NonEmptyString;
 
 export type Settings = {
