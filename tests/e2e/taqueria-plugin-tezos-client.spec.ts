@@ -121,11 +121,11 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 		// 1. Copy contract from data folder to taqueria project folder
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`);
 		await exec(`cp e2e/data/integerParameter10.tz ${taqueriaProjectPath}/artifacts`);
-		await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts`);
+		await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}/artifacts`);
 
 		// 2. Run taq simulate hello-tacos.tz
 		const { stdout, stderr } = await exec(
-			`taq simulate hello-tacos.tz --param integerParameter10.tz --storage anyContract.storage.tz`,
+			`taq simulate hello-tacos.tz --param integerParameter10.tz --storage anyContract.storage`,
 			{
 				cwd: `./${taqueriaProjectPath}`,
 			},
@@ -139,11 +139,11 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 	test('Verify that taqueria simulator task will display proper message if user tries to simulate contract that does not exist', async () => {
 		try {
 			await exec(`cp e2e/data/integerParameter10.tz ${taqueriaProjectPath}/artifacts`);
-			await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts`);
+			await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}/artifacts`);
 
 			// 1. Run taq simulate ${contractName} for contract that does not exist
 			const { stdout, stderr } = await exec(
-				`taq simulate test.tz --param integerParameter10.tz --storage anyContract.storage.tz`,
+				`taq simulate test.tz --param integerParameter10.tz --storage anyContract.storage`,
 				{
 					cwd: `./${taqueriaProjectPath}`,
 				},
@@ -162,11 +162,11 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`);
 			await exec(`cp e2e/data/integerParameter15.tz ${taqueriaProjectPath}/artifacts`);
-			await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts`);
+			await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}/artifacts`);
 
 			// 2. Run taq simulate hello-tacos.tz
 			const { stdout, stderr } = await exec(
-				`taq simulate hello-tacos.tz --param integerParameter15.tz --storage anyContract.storage.tz`,
+				`taq simulate hello-tacos.tz --param integerParameter15.tz --storage anyContract.storage`,
 				{
 					cwd: `./${taqueriaProjectPath}`,
 				},
@@ -185,11 +185,11 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`);
 			await exec(`cp e2e/data/stringParameter.tz ${taqueriaProjectPath}/artifacts`);
-			await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts`);
+			await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}/artifacts`);
 
 			// 2. Run taq simulate hello-tacos.tz
 			const { stdout, stderr } = await exec(
-				`taq simulate hello-tacos.tz --param stringParameter.tz --storage anyContract.storage.tz`,
+				`taq simulate hello-tacos.tz --param stringParameter.tz --storage anyContract.storage`,
 				{
 					cwd: `./${taqueriaProjectPath}`,
 				},
@@ -208,11 +208,11 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`);
 			await exec(`cp e2e/data/listParameter.tz ${taqueriaProjectPath}/artifacts`);
-			await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts`);
+			await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}/artifacts`);
 
 			// 2. Run taq simulate hello-tacos.tz
 			const { stdout, stderr } = await exec(
-				`taq simulate hello-tacos.tz --param listParameter.tz --storage anyContract.storage.tz`,
+				`taq simulate hello-tacos.tz --param listParameter.tz --storage anyContract.storage`,
 				{
 					cwd: `./${taqueriaProjectPath}`,
 				},
@@ -231,11 +231,11 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts`);
 			await exec(`cp e2e/data/mapParameter.tz ${taqueriaProjectPath}/artifacts`);
-			await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts`);
+			await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}/artifacts`);
 
 			// 2. Run taq simulate hello-tacos.tz
 			const { stdout, stderr } = await exec(
-				`taq simulate hello-tacos.tz --param mapParameter.tz --storage anyContract.storage.tz`,
+				`taq simulate hello-tacos.tz --param mapParameter.tz --storage anyContract.storage`,
 				{ cwd: `./${taqueriaProjectPath}` },
 			);
 
@@ -266,11 +266,11 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 		// 1. Copy contract from data folder to taqueria project folder
 		await exec(`cp e2e/data/increment.tz ${taqueriaProjectPath}/artifacts`);
 		await exec(`cp e2e/data/incrementBy3.tz ${taqueriaProjectPath}/artifacts`);
-		await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts`);
+		await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}/artifacts`);
 
 		// 2. Run taq simulate
 		const { stdout, stderr } = await exec(
-			`taq simulate increment.tz --param incrementBy3.tz --storage anyContract.storage.tz`,
+			`taq simulate increment.tz --param incrementBy3.tz --storage anyContract.storage`,
 			{
 				cwd: `./${taqueriaProjectPath}`,
 			},
@@ -284,11 +284,11 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 		// 1. Copy contract from data folder to taqueria project folder
 		await exec(`cp e2e/data/increment.tz ${taqueriaProjectPath}/artifacts`);
 		await exec(`cp e2e/data/integerParameter10.tz ${taqueriaProjectPath}/artifacts`);
-		await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts`);
+		await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}/artifacts`);
 
 		// 2. Run taq simulate
 		const { stdout, stderr } = await exec(
-			`taq simulate increment.tz --param integerParameter10.tz --storage anyContract.storage.tz --entrypoint increment`,
+			`taq simulate increment.tz --param integerParameter10.tz --storage anyContract.storage --entrypoint increment`,
 			{
 				cwd: `./${taqueriaProjectPath}`,
 			},
