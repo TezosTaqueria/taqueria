@@ -29,7 +29,7 @@ You can now use the `taq instantiate-account` task to instantiate declared accou
 
 Additionally, users can now specify the sender of operations via the `--sender` flag for `taq originate` and `taq call`
 
-:::note
+:::warning
 The value for amount specified with `--tez` has been changed to  `--mutez` for `taq transfer` to allow more granular amount and give origination the ability to specify an initial balance for the originated contract
 :::
 
@@ -71,6 +71,7 @@ This task allows you to run arbitrary octez-client native commands, but they mig
 
 ### Bug Fixes
 
+- Fixed a bug in `@taqueria/plugin-contract-types` where there was no `lambda` type for export
 - Fixed a bug where Taqueria would disregard the environment set as default in `config.json`
 
 ### Other Product Changes
@@ -81,7 +82,6 @@ This task allows you to run arbitrary octez-client native commands, but they mig
 - NFT scaffold documentation improved for clarity
 - References to `tezos-client` have been refactored to `octez-client` to support Octez 15
 - When specifying an amount of tez to send via `taq call` or `taq originate`, the units are now mutez rather than tez
-
 
 ### Migrating from Legacy Versions
 
