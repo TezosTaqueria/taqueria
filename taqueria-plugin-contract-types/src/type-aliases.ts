@@ -1,8 +1,8 @@
-import { MichelsonInstruction } from '@taquito/michel-codec';
+import { assertMichelsonInstruction, Expr, MichelsonCode } from '@taquito/michel-codec';
 import { MichelsonMap } from '@taquito/taquito';
 import { BigNumber } from 'bignumber.js';
 
-export type Instruction = MichelsonInstruction;
+export type Instruction = MichelsonCode;
 
 export type unit = (true | undefined) & { __type: 'unit' };
 
@@ -62,6 +62,11 @@ function subtract<T extends BigNumber>(a: T, b: T): T {
 	return a.minus(b) as T;
 }
 
+function createLambdaTypeTas(expr: Expr): MichelsonCode {
+	assertMichelsonInstruction(expr);
+	return expr as MichelsonCode;
+}
+
 /** tas: Tezos 'as' casting for strict types */
 export const tas = {
 	address: createStringTypeTas<address>(),
@@ -82,6 +87,8 @@ export const tas = {
 	// Operations
 	add,
 	subtract,
+
+	lambda: createLambdaTypeTas,
 
 	// To number
 	number: (value: string | BigNumber) => Number(value + ''),

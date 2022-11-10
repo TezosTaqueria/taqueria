@@ -233,7 +233,7 @@ ${tabs(indent)}}])`;
 			return `unknown`;
 		}
 		if (t.kind === 'lambda') {
-			return `tas.lambda(${t.lambda.arg}, ${t.lambda.ret})`;
+			return `tas.lambda([])`;
 		}
 
 		assertExhaustive(t, `Unknown type`);
