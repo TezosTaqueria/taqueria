@@ -15,8 +15,7 @@
 			"networks": [],
 			"sandboxes": [
 				"local"
-			],
-			"storage": {}
+			]
 		},
 		"test": {
 			"networks": ["ghostnet"],
@@ -24,8 +23,7 @@
 		},
 		"funds": {
 			"networks": ["fundnet"],
-			"sandboxes": [],
-			"storage": {}
+			"sandboxes": []
 		}
 	},
 	"sandbox": {

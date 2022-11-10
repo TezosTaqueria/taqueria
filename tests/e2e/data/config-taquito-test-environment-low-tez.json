@@ -15,21 +15,15 @@
 			"networks": [],
 			"sandboxes": [
 				"local"
-			],
-			"storage": {}
+			]
 		},
 		"test": {
 			"networks": ["ghostnet"],
-			"sandboxes": [],
-			"storage": {
-				"hello-tacos.tz": "anyContract.storage.tz",
-				"increment.tz": "anyContract.storage.tz"
-			}
+			"sandboxes": []
 		},
 		"funds": {
 			"networks": ["fundnet"],
-			"sandboxes": [],
-			"storage": {}
+			"sandboxes": []
 		}
 	},
 	"sandbox": {

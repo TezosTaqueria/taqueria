@@ -19,8 +19,7 @@
 		},
 		"test": {
 			"networks": ["ghostnet"],
-			"sandboxes": [],
-			"storage": {}
+			"sandboxes": []
 		}
 	},
 	"sandbox": {

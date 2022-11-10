@@ -19,8 +19,7 @@
 		},
 		"test": {
 			"networks": ["ithacanet"],
-			"sandboxes": [],
-			"storage": { "hello-tacos.tz": "100" }
+			"sandboxes": []
 		}
 	},
 	"sandbox": {
