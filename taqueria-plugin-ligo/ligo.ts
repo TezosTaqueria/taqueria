@@ -1,17 +1,29 @@
-import { sendAsyncErr } from '@taqueria/node-sdk';
-import { IntersectionOpts as Opts } from './common';
-import compile from './compile';
-import test from './test';
+import { CmdArgEnv, getArch, sendAsyncErr, sendErr, sendRes, sendWarn, spawnCmd } from '@taqueria/node-sdk';
+import { LIGO_DOCKER_IMAGE, LigoOpts as Opts } from './common';
+
+const getArbitraryLigoCmd = (parsedArgs: Opts, userArgs: string): CmdArgEnv => {
+	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
+	if (!projectDir) throw `No project directory provided`;
+	const binary = 'docker';
+	const baseArgs = ['run', '--rm', '-v', `${projectDir}:/project`, '-w', '/project', LIGO_DOCKER_IMAGE];
+	const processedUserArgs = userArgs.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg =>
+		arg
+	);
+	const args = baseArgs.concat(processedUserArgs);
+	const envVars = { 'DOCKER_DEFAULT_PLATFORM': 'linux/amd64' };
+	return [binary, args, envVars];
+};
+
+const runArbitraryLigoCmd = (parsedArgs: Opts, cmd: string): Promise<string> =>
+	getArch()
+		.then(() => getArbitraryLigoCmd(parsedArgs, cmd))
+		.then(spawnCmd)
+		.then(() => `Command "${cmd}" ran successfully by LIGO`)
+		.catch(() => `Command "${cmd}" didn't run successfully by LIGO`);
 
 const ligo = (parsedArgs: Opts): Promise<void> => {
-	switch (parsedArgs.task) {
-		case 'compile':
-			return compile(parsedArgs);
-		case 'test':
-			return test(parsedArgs);
-		default:
-			return sendAsyncErr(`${parsedArgs.task} is not an understood task by the LIGO plugin`);
-	}
+	const args = parsedArgs.command;
+	return runArbitraryLigoCmd(parsedArgs, args).then(sendRes).catch(err => sendAsyncErr(err, false));
 };
 
 export default ligo;

@@ -2,6 +2,10 @@ import { getArch, getFlextesaImage } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import { join } from 'path';
 
+export interface ClientOpts extends RequestArgs.ProxyRequestArgs {
+	command: string;
+}
+
 export interface TypeCheckOpts extends RequestArgs.ProxyRequestArgs {
 	sourceFile: string;
 }
@@ -13,11 +17,9 @@ export interface SimulateOpts extends RequestArgs.ProxyRequestArgs {
 	entrypoint?: string;
 }
 
-// To be used for the main entrypoint of the plugin
-export type IntersectionOpts = TypeCheckOpts & SimulateOpts;
+export type IntersectionOpts = ClientOpts & TypeCheckOpts & SimulateOpts;
 
-// To be used for common functions in this file
-type UnionOpts = TypeCheckOpts | SimulateOpts;
+type UnionOpts = ClientOpts | TypeCheckOpts | SimulateOpts;
 
 const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://ghostnet.ecadinfra.com';
 export const GLOBAL_OPTIONS = `--endpoint ${ENDPOINT}`;

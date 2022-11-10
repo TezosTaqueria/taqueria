@@ -20,7 +20,7 @@ import type { TaqError } from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
 import * as Template from '@taqueria/protocol/Template';
-import { exec, ExecException } from 'child_process';
+import { exec, ExecException, spawn, spawnSync } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
@@ -44,6 +44,8 @@ import { parsed } from 'yargs';
 const yargs = require('yargs');
 
 export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
+
+export type CmdArgEnv = [string, string[], { [key: string]: string }];
 
 export const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
@@ -70,6 +72,18 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 					stderr,
 				});
 			}
+		});
+	});
+
+export const spawnCmd = (fullCmd: CmdArgEnv) =>
+	new Promise((resolve, reject) => {
+		const cmd = fullCmd[0];
+		const args = fullCmd[1];
+		const envVars = fullCmd[2];
+		const child = spawn(cmd, args, { env: { ...process.env, ...envVars }, stdio: 'inherit' });
+		child.on('close', code => {
+			if (code === 0) resolve('');
+			reject();
 		});
 	});
 
