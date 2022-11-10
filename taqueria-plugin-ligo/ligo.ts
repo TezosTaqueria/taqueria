@@ -18,18 +18,12 @@ const runArbitraryLigoCmd = (parsedArgs: Opts, cmd: string): Promise<string> =>
 	getArch()
 		.then(() => getArbitraryLigoCmd(parsedArgs, cmd))
 		.then(spawnCmd)
-		.then(({ stdout, stderr }) => {
-			if (stderr.length > 0) sendWarn(stderr);
-			return stdout;
-		})
-		.catch(err => {
-			sendErr(err.message.replace(/Command failed.+?\n/, ''));
-			return '';
-		});
+		.then(() => `Command "${cmd}" ran successfully by LIGO`)
+		.catch(() => `Command "${cmd}" didn't run successfully by LIGO`);
 
 const ligo = (parsedArgs: Opts): Promise<void> => {
-	const cmd = parsedArgs.command;
-	return runArbitraryLigoCmd(parsedArgs, cmd).then(sendRes).catch(err => sendAsyncErr(err, false));
+	const args = parsedArgs.command;
+	return runArbitraryLigoCmd(parsedArgs, args).then(sendRes).catch(err => sendAsyncErr(err, false));
 };
 
 export default ligo;

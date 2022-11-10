@@ -20,7 +20,7 @@ import type { TaqError } from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
 import * as Template from '@taqueria/protocol/Template';
-import { exec, ExecException, spawnSync } from 'child_process';
+import { exec, ExecException, spawn, spawnSync } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
@@ -75,19 +75,16 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 		});
 	});
 
-export const spawnCmd = (fullCmd: CmdArgEnv): Promise<StdIO> =>
+export const spawnCmd = (fullCmd: CmdArgEnv) =>
 	new Promise((resolve, reject) => {
 		const cmd = fullCmd[0];
 		const args = fullCmd[1];
 		const envVars = fullCmd[2];
-		const child = spawnSync(cmd, args, { env: { ...process.env, ...envVars } });
-		if (child.error) reject(child.error);
-		else {
-			resolve({
-				stdout: child.stdout ? child.stdout.toString() : '',
-				stderr: child.stderr ? child.stderr.toString() : '',
-			});
-		}
+		const child = spawn(cmd, args, { env: { ...process.env, ...envVars }, stdio: 'inherit' });
+		child.on('close', code => {
+			if (code === 0) resolve('');
+			reject();
+		});
 	});
 
 export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError> => {

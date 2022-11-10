@@ -49,6 +49,20 @@ This task runs a Michelson file in `artifacts` as a simulation and ouputs a resu
 
 - By default, the entrypoint is `default`, which points to no specific annotated entrypoint. Use `--entrypoint` to specify an annotated entrypoint to call. E.g. if the parameter type of a Michelson contract is `(or (or (int %decrement) (int %increment)) (unit %reset))`, then there are two ways to call the `increment` entrypoint, with parameter `(Left (Right 14))` or with parameter `14` if your command contains `--entrypoint increment`
 
+## The `taq client` task
+
+Basic usage is:
+
+```shell
+taq client --command <command to pass to the underlying octez-client binary>
+```
+
+Wrap the value for the `--command` flag with quotes.
+
+<%~ it.noteOpenAdmonition %>
+This task allows you to run arbitrary octez-client native commands, but they might not benefit from the abstractions provided by Taqueria
+<%= it.closeAdmonition %>
+
 ## Plugin Architecture
 
 This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM

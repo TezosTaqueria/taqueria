@@ -10,13 +10,13 @@ Plugin.create(i18n => ({
 			task: 'client',
 			command: 'client',
 			description:
-				'This task allows you to run arbitrary Octez Client native commands. Note that they might not benefit from the abstractions provided by Taqueria',
+				'This task allows you to run arbitrary octez-client native commands. Note that they might not benefit from the abstractions provided by Taqueria',
 			options: [
 				Option.create({
 					shortFlag: 'c',
 					flag: 'command',
 					type: 'string',
-					description: 'The command to be passed to the underlying Octez Client binary, wrapped in quotes',
+					description: 'The command to be passed to the underlying octez-client binary, wrapped in quotes',
 					required: true,
 				}),
 			],

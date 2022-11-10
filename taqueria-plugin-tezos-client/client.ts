@@ -42,18 +42,12 @@ const getArbitraryClientCmd = async (
 const runArbitraryClientCmd = (parsedArgs: Opts, cmd: string): Promise<string> =>
 	getArbitraryClientCmd(parsedArgs, cmd)
 		.then(spawnCmd)
-		.then(({ stdout, stderr }) => {
-			if (stderr.length > 0) sendWarn(stderr);
-			return stdout;
-		})
-		.catch(err => {
-			sendErr(err.message.replace(/Command failed.+?\n/, ''));
-			return '';
-		});
+		.then(() => `Command "${cmd}" ran successfully by octez-client`)
+		.catch(() => `Command "${cmd}" didn't run successfully by octez-client`);
 
 const client = (parsedArgs: Opts): Promise<void> => {
-	const cmd = parsedArgs.command;
-	return runArbitraryClientCmd(parsedArgs, cmd).then(sendRes).catch(err => sendAsyncErr(err, false));
+	const args = parsedArgs.command;
+	return runArbitraryClientCmd(parsedArgs, args).then(sendRes).catch(err => sendAsyncErr(err, false));
 };
 
 export default client;
