@@ -1,10 +1,19 @@
-import { getArch, getFlextesaImage, sendAsyncErr, sendErr, sendRes, sendWarn, spawnCmd } from '@taqueria/node-sdk';
+import {
+	CmdArgEnv,
+	getArch,
+	getFlextesaImage,
+	sendAsyncErr,
+	sendErr,
+	sendRes,
+	sendWarn,
+	spawnCmd,
+} from '@taqueria/node-sdk';
 import { ClientOpts as Opts } from './common';
 
 const getArbitraryClientCmd = async (
 	parsedArgs: Opts,
-	cmd: string,
-): Promise<[string, string[], { [key: string]: string }]> => {
+	userArgs: string,
+): Promise<CmdArgEnv> => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const arch = await getArch();
@@ -22,8 +31,10 @@ const getArbitraryClientCmd = async (
 		flextesaImage,
 		'octez-client',
 	];
-	const processedCmd = cmd.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg => arg);
-	const args = baseArgs.concat(processedCmd);
+	const processedUserArgs = userArgs.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg =>
+		arg
+	);
+	const args = baseArgs.concat(processedUserArgs);
 	const envVars = {};
 	return [binary, args, envVars];
 };

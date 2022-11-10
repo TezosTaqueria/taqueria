@@ -1,13 +1,15 @@
-import { getArch, sendAsyncErr, sendErr, sendRes, sendWarn, spawnCmd } from '@taqueria/node-sdk';
+import { CmdArgEnv, getArch, sendAsyncErr, sendErr, sendRes, sendWarn, spawnCmd } from '@taqueria/node-sdk';
 import { LIGO_DOCKER_IMAGE, LigoOpts as Opts } from './common';
 
-const getArbitraryLigoCmd = (parsedArgs: Opts, cmd: string): [string, string[], { [key: string]: string }] => {
+const getArbitraryLigoCmd = (parsedArgs: Opts, userArgs: string): CmdArgEnv => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const binary = 'docker';
 	const baseArgs = ['run', '--rm', '-v', `${projectDir}:/project`, '-w', '/project', LIGO_DOCKER_IMAGE];
-	const processedCmd = cmd.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg => arg);
-	const args = baseArgs.concat(processedCmd);
+	const processedUserArgs = userArgs.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg =>
+		arg
+	);
+	const args = baseArgs.concat(processedUserArgs);
 	const envVars = { 'DOCKER_DEFAULT_PLATFORM': 'linux/amd64' };
 	return [binary, args, envVars];
 };

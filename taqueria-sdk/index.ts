@@ -45,6 +45,8 @@ const yargs = require('yargs');
 
 export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
 
+export type CmdArgEnv = [string, string[], { [key: string]: string }];
+
 export const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
 		mapRej((err: TaqError) => new E_TaqError(err))(f),
@@ -73,7 +75,7 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 		});
 	});
 
-export const spawnCmd = (fullCmd: [string, string[], { [key: string]: string }]): Promise<StdIO> =>
+export const spawnCmd = (fullCmd: CmdArgEnv): Promise<StdIO> =>
 	new Promise((resolve, reject) => {
 		const cmd = fullCmd[0];
 		const args = fullCmd[1];
