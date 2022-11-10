@@ -30,7 +30,7 @@ import * as Template from '@taqueria/protocol/Template';
 import { exec, ExecException } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
-import { dirname, join } from 'path';
+import { dirname, join, resolve as resolvePath } from 'path';
 import { getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
 import { PluginSchema } from './types';
@@ -250,7 +250,8 @@ const parseSchema = <T extends RequestArgs>(
 const toProxableArgs = <T>(requestArgs: RequestArgs, from: (input: unknown) => T) => {
 	const retval = Object.entries(requestArgs).reduce(
 		(retval, [key, value]) => {
-			if (typeof value === 'string') {
+			if (key === 'projectDir') value = resolvePath(value.toString());
+			else if (typeof value === 'string') {
 				if (value === 'true') value = true;
 				else if (value === 'false') value = false;
 				else if (key === 'config') value = JSON.parse(value);
@@ -266,14 +267,11 @@ const toProxableArgs = <T>(requestArgs: RequestArgs, from: (input: unknown) => T
 		{},
 	);
 
-	debugger;
-
 	return from(retval);
 };
 
 const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPluginName: string) =>
 	async (requestArgs: T) => {
-		debugger;
 		const { taqRun } = requestArgs;
 		const i18n = await load();
 		const schema = parseSchema(i18n, definer, defaultPluginName, requestArgs);
@@ -312,7 +310,7 @@ const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPlugi
 				}
 				case 'proxy':
 					if (schema.proxy) {
-						return await schema.proxy(toProxableArgs(requestArgs, ProxyTaskArgs.from.bind(ProxyTaskArgs)));
+						return schema.proxy(toProxableArgs(requestArgs, ProxyTaskArgs.from.bind(ProxyTaskArgs)));
 					}
 					return Promise.reject({
 						errCode: 'E_NOT_SUPPORTED',

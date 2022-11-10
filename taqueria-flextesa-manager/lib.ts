@@ -19,11 +19,12 @@ export const configureTezosClient = () => run(`tezos-client --endpoint http://lo
 export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
 	Object.entries(parsedArgs.config.accounts || {}).reduce(
 		async (lastConfig, [accountName, _initialBalance]) => {
+			if (accountName === 'default') return lastConfig;
 			const accountDetails = await addAccount(accountName);
 			const config = (await lastConfig as SanitizedArgs.ParsedConfig);
 			const updatedConfig = { ...config } as SanitizedArgs.ParsedConfig;
 			const sandboxConfig = (updatedConfig.sandbox[parsedArgs.sandbox] as SandboxConfig.t);
-			const accounts = sandboxConfig.accounts ?? SandboxAccountConfig.from({ default: accountName });
+			const accounts = sandboxConfig.accounts ?? {};
 			accounts[accountName] = accountDetails;
 			(updatedConfig.sandbox[parsedArgs.sandbox] as SandboxConfig.t).accounts = accounts;
 			return updatedConfig;

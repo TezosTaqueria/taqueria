@@ -94,6 +94,7 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 };
 
 const getConfigureCommand = async (sandboxName: string, opts: Opts): Promise<string> => {
+	debugger;
 	const containerName = await getContainerName(sandboxName, opts);
 	return `docker exec ${containerName} node index.js --sandbox ${sandboxName} --configure`;
 };
