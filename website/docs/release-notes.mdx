@@ -12,6 +12,7 @@ title: Taqueria Releases
 
 ### Summary of Impactful Changes
 
+- A new plugin `@taqueria/plugin-core` has been added. It provides a task `taq clean` which removes stale docker images
 - VsCE now has a UI to execute entrypoints on contracts deployed on a Flextesa sandbox
 - VsCE has a Micheline editor which allows users to easily provide values needed for calling endpoints
 - A `taq instantiate-accounts` task has been added which creates instances of declared accounts in a target environment
@@ -69,6 +70,30 @@ Wrap the value for the `--command` flag with quotes.
 This task allows you to run arbitrary octez-client native commands, but they might not benefit from the abstractions provided by Taqueria
 :::
 
+#### The `taq clean` Task `@taqueria/plugin-core`
+
+:::note
+As of Taqueria v0.24.0, this plugin will be installed when `taq init` or `taq scaffold` is called
+:::
+
+##### Installation
+
+For legacy projects, `@taqueria/plugin-core` can be installed by running:
+
+```shell
+taq install @taqueria/plugin-core
+```
+
+##### Basic Usage
+
+```shell
+taq clean
+```
+
+##### Basic Description
+
+This task will delete all Taqueria-related states and docker images
+
 ### Bug Fixes
 
 - Fixed a bug in `@taqueria/plugin-contract-types` where there was no `lambda` type for export
@@ -109,12 +134,11 @@ sudo curl -LO https://taqueria.io/get/linux/taq
 ```
 
 :::warning
-The Flextesa plugin can hang or crash if old docker images exist on your machine. Run the following command to remove legacy images from your system
+The Flextesa plugin can hang or crash if old docker images exist on your machine. Install the new `@taqueria/plugin-core` plugin on the project, then run the following command to remove legacy images from your system
 
 ```shell
-docker rmi $(docker images -a -q)
+taq clean
 ```
-
 :::
 
 You can update your existing projects to use Taqueria v0.24.0 plugins using the following command:
