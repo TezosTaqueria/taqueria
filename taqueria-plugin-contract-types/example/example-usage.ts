@@ -1,6 +1,7 @@
 import { ContractStorageType, DefaultContractType, OpKind, OriginateParams, ParamsWithKind, TezosToolkit } from '@taquito/taquito';
 import { ExampleContract1ContractType as TestContract, ExampleContract1WalletType as TestWallet } from './types-file/example-contract-1.types';
 import { ExampleContract2ContractType as TestContract2, ExampleContract2WalletType as TestWallet2  } from './types-file/example-contract-2.types';
+import { ExampleLambdaContractType  } from './types-file/example-lambda.types';
 import { nat, tas } from './types-file/type-aliases';
 
 export const exampleTypedMethods_existingContract = async () => {
@@ -408,3 +409,20 @@ export const exampleBatchOrigination_Wallet = async () => {
 
     await batchOperation.send();
 };
+
+export const exampleLambda = async () => {
+    const Tezos = new TezosToolkit(`https://YOUR_PREFERRED_RPC_URL`)
+    const contract = await Tezos.contract.at<ExampleLambdaContractType>(`tz123`);
+    const initialValue = (await contract.storage()).currentValue.toNumber();
+    let result = await contract.methods.updateModifyValueFunction([{ "prim": "PUSH", "args": [{ "prim": "int" }, { "int": "1" }] }, { "prim": "ADD" }]).send();
+    await result.confirmation();
+    result = await contract.methods.callModifyValue().send();
+    await result.confirmation();
+    const newValue = (await contract.storage()).currentValue.toNumber(); // At this point, it should be initialValue + 1
+
+    result = await contract.methods.updateModifyValueFunction([{ "prim": "PUSH", "args": [{ "prim": "int" }, { "int": "-1" }] }, { "prim": "ADD" }]).send();
+    await result.confirmation();
+    result = await contract.methods.callModifyValue().send();
+    await result.confirmation();
+    const finalValue = (await contract.storage()).currentValue.toNumber(); // At this point, it should be newValue -
+}
