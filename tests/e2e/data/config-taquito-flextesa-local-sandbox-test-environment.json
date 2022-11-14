@@ -2,6 +2,10 @@
 	"language": "en",
 	"plugins": [
 		{
+			"name": "@taqueria/plugin-core",
+			"type": "npm"
+		},
+		{
 			"name": "@taqueria/plugin-taquito",
 			"type": "npm"
 		},
@@ -11,7 +15,6 @@
 		}
 	],
 	"contractsDir": "contracts",
-	"testsDir": "tests",
 	"artifactsDir": "artifacts",
 	"environment": {
 		"default": "development",
@@ -19,21 +22,14 @@
 			"networks": [],
 			"sandboxes": [
 				"local"
-			],
-			"accounts": {
-				"bob": "3_000_000_000",
-				"alice": "3_000_000_000",
-				"john": "3_000_000_000",
-				"jane": "3_000_000_000",
-				"joe": "3_000_000_000"
-			}
+			]
 		}
 	},
 	"sandbox": {
 		"local": {
-			"label": "Local Ithaca Tezos Sandbox",
-			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+			"label": "Local Tezos Sandbox",
 			"rpcUrl": "http://localhost:20040",
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
 			"tzkt": {
 				"disableAutostartWithSandbox": false,
 				"postgresqlPort": 5442,
