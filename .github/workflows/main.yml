@@ -67,6 +67,7 @@ jobs:
       #   with:
       #     path: ./node_modules/**
       #     key: cache-node-modules-${{ github.run_id }}
+      # COMMENT FOR TESTS
 
   build-binaries:
     name: Build Taqueria binaries
