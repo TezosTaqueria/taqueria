@@ -67,7 +67,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
 	test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
-		environment = 'test';
+		environment = 'testing';
 
 		// 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
@@ -100,7 +100,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
 	test('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
-		environment = 'test';
+		environment = 'testing';
 
 		// 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
@@ -166,7 +166,7 @@ No operations performed
 	});
 
 	test('Verify that taqueria taquito plugin will error when trying to fund maxed out accounts', async () => {
-		environment = 'test';
+		environment = 'testing';
 
 		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
 
@@ -180,7 +180,7 @@ No operations performed
 	});
 
 	test('Verify that taqueria taquito plugin can only instantiate accounts on a network once', async () => {
-		environment = 'test';
+		environment = 'testing';
 
 		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
 
@@ -206,7 +206,7 @@ Note: joe is already instantiated in the current environment, "test"\n`);
 	});
 
 	test('Verify that taqueria taquito plugin will fund instantiated accounts on a network', async () => {
-		environment = 'test';
+		environment = 'testing';
 
 		await exec(`cp e2e/data/config-taquito-test-environment-low-tez.json ${taqueriaProjectPath}/.taq/config.json`);
 
@@ -231,7 +231,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 	});
 
 	test('Verify that taqueria taquito plugin will can send from one instantiated account to another', async () => {
-		environment = 'test';
+		environment = 'testing';
 		const transferAmountMutez = 1000000;
 
 		await exec(`cp e2e/data/config-taquito-test-environment-low-tez.json ${taqueriaProjectPath}/.taq/config.json`);
@@ -343,7 +343,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 
 	test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> initial storage is not a number', async () => {
 		// Environment test does not exist on default config.json
-		environment = 'test';
+		environment = 'testing';
 
 		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
