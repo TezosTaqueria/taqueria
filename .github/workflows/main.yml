@@ -55,7 +55,6 @@ jobs:
     - name: Build all
       run: |
         export PATH="$PATH:$(pwd)"
-        npm config list registry
         npx lerna bootstrap 
         npm run build:packages 
         npm run build:binary 
