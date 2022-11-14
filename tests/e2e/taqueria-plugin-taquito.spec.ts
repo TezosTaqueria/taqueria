@@ -282,7 +282,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 
 	test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> invalid network name in the environment', async () => {
 		// Environment test does not exist on default config.json
-		environment = 'test';
+		environment = 'testing';
 
 		// 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
 		await exec(
@@ -296,7 +296,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		});
 
 		expect(badNameDeploy.stderr).toContain(
-			"The current environment is configured to use a network called 'ithaca'; however, no network of this name has been configured in .taq/config.json",
+			"The current environment is configured to use a network called 'ghost'; however, no network of this name has been configured in .taq/config.json",
 		);
 		expect(badNameDeploy.stderr).toContain('No operations performed');
 	});
