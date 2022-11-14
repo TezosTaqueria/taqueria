@@ -2,12 +2,15 @@
 	"language": "en",
 	"plugins": [
 		{
+			"name": "@taqueria/plugin-core",
+			"type": "npm"
+		},
+		{
 			"name": "@taqueria/plugin-taquito",
 			"type": "npm"
 		}
 	],
 	"contractsDir": "contracts",
-	"testsDir": "tests",
 	"artifactsDir": "artifacts",
 	"environment": {
 		"default": "development",
