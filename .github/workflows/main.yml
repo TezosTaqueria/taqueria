@@ -33,7 +33,7 @@ jobs:
 
     - uses: actions/setup-node@v3
       with: 
-        node-version: 16.16.x
+        node-version: 16.17.x
         cache: 'npm'
 
     - name: check for VSCode changes
