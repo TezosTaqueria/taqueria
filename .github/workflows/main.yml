@@ -290,7 +290,7 @@ jobs:
         with: 
           scope: "${{ env.SCOPE }}"
           cache: "npm"
-          node-version: "18.12.0"
+          node-version: "18.4.0"
 
       - name: Setup Deno
         uses: denoland/setup-deno@v1
