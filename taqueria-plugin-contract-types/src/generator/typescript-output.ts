@@ -324,7 +324,7 @@ export const toTypescriptCode = (
 	};
 
 	const storageToCode = (indent: number) => {
-		const storageTypeCode = `type Storage = ${typeToCode(storage.storage, indent)};`;
+		const storageTypeCode = `export type Storage = ${typeToCode(storage.storage, indent)};`;
 		return storageTypeCode;
 	};
 

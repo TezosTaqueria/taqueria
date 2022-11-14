@@ -2,7 +2,7 @@
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
 import { address, MMap, mutez, nat, timestamp } from './type-aliases';
 
-type Storage = {
+export type Storage = {
     transfers: Array<(
         {
             xtz_transfer_type: {
