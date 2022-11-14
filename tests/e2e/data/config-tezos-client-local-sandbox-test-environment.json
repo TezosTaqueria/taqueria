@@ -31,8 +31,7 @@
 			"networks": [],
 			"sandboxes": [
 				"local-tezos-client"
-			],
-			"storage": {}
+			]
 		}
 	},
 	"accounts": {

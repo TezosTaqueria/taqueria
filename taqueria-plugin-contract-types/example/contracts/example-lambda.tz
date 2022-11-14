@@ -1,0 +1,29 @@
+{ parameter (or (unit %callModifyValue) (lambda %updateModifyValueFunction int int)) ;
+  storage (pair (int %currentValue) (lambda %modifyValue int int)) ;
+  code { UNPAIR ;
+         SWAP ;
+         UNPAIR ;
+         DIG 2 ;
+         IF_LEFT { DROP ; DUP 2 ; SWAP ; EXEC ; SWAP } { DIG 2 ; DROP } ;
+         SWAP ;
+         PAIR ;
+         NIL operation ;
+         PAIR } ;
+  view "getView"
+       string
+       int
+       { UNPAIR ;
+         PUSH string "checkFunction" ;
+         DUP 2 ;
+         COMPARE ;
+         EQ ;
+         IF { DROP ; DUP ; CAR ; SWAP ; CDR ; SWAP ; EXEC }
+            { SWAP ;
+              DROP ;
+              PUSH string " not found on this contract" ;
+              SWAP ;
+              PUSH string "View " ;
+              CONCAT ;
+              CONCAT ;
+              FAILWITH } } }
+

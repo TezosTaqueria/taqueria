@@ -40,13 +40,13 @@ export const createTypescriptCodeGenerator = (options?: { mode?: 'types' | 'defa
 	const tabs = (indent: number) => Array(indent).fill(`    `).join(``);
 	const toIndentedItems = (
 		indent: number,
-		delimeters: { afterItem?: string; beforeItem?: string },
+		delimiters: { afterItem?: string; beforeItem?: string },
 		items: string[],
 	) => {
 		return `
 ${tabs(indent + 1)}${
-			items.join(`${delimeters.afterItem ?? ``}
-${tabs(indent + 1)}${delimeters.beforeItem ?? ``}`)
+			items.join(`${delimiters.afterItem ?? ``}
+${tabs(indent + 1)}${delimiters.beforeItem ?? ``}`)
 		}
 ${tabs(indent)}`;
 	};
@@ -105,6 +105,15 @@ ${tabs(indent)}`;
 			addTypeAlias(typeAlias);
 
 			return `${typeAlias.aliasType}<${typeToCode(t.map.key, indent)}, ${typeToCode(t.map.value, indent)}>`;
+		}
+		if (t.kind === `lambda`) {
+			const typeAlias: TypeAlias = {
+				aliasType: 'Instruction',
+				simpleTypeDefinition: `type Instruction = MichelsonInstruction;`,
+				simpleTypeImports: [{ name: 'MichelsonInstruction', isDefault: false, from: '@taquito/michel-codec' }],
+			};
+			addTypeAlias(typeAlias);
+			return `Instruction[]`;
 		}
 		if (t.kind === `object`) {
 			return `{${toIndentedItems(indent, {}, t.fields.map((a, i) => varToCode(a, i, indent + 1) + `;`))}}`;
@@ -196,8 +205,8 @@ ${tabs(indent + 1)}value: ${typeToCode(t.map.value, indent)},
 ${tabs(indent)}}])`;
 		}
 		if (t.kind === `object`) {
-			const delimeter = options?.mode === 'defaultValue' ? ',' : `;`;
-			return `{${toIndentedItems(indent, {}, t.fields.map((a, i) => varToCode(a, i, indent + 1) + delimeter))}}`;
+			const delimiter = options?.mode === 'defaultValue' ? ',' : `;`;
+			return `{${toIndentedItems(indent, {}, t.fields.map((a, i) => varToCode(a, i, indent + 1) + delimiter))}}`;
 		}
 		if (t.kind === `union`) {
 			const getUnionItem = (a: TypedVar, i: number) => {
@@ -222,6 +231,9 @@ ${tabs(indent)}}])`;
 		}
 		if (t.kind === `unknown`) {
 			return `unknown`;
+		}
+		if (t.kind === 'lambda') {
+			return `tas.lambda([])`;
 		}
 
 		assertExhaustive(t, `Unknown type`);
@@ -312,7 +324,7 @@ export const toTypescriptCode = (
 	};
 
 	const storageToCode = (indent: number) => {
-		const storageTypeCode = `type Storage = ${typeToCode(storage.storage, indent)};`;
+		const storageTypeCode = `export type Storage = ${typeToCode(storage.storage, indent)};`;
 		return storageTypeCode;
 	};
 
