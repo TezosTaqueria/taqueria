@@ -97,6 +97,8 @@ export const pluginResponseEncodingSchema = z
 	.union([z.literal('none'), z.literal('json'), z.literal('application/json')])
 	.default('none');
 
+export const buildNumberSchema = z.number();
+
 export const sanitizedArgsSchema = z.object({
 	_: z.array(nonEmptyStringSchema),
 	projectDir: sanitizedPathSchema,
@@ -112,7 +114,7 @@ export const sanitizedArgsSchema = z.object({
 	plugin: nonEmptyStringSchema.optional(),
 	env: nonEmptyStringSchema,
 	quickstart: nonEmptyStringSchema,
-	setBuild: nonEmptyStringSchema,
+	setBuild: z.union([nonEmptyStringSchema, buildNumberSchema]),
 	setVersion: nonEmptyStringSchema,
 }).passthrough();
 

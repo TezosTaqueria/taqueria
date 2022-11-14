@@ -188,7 +188,13 @@ type PluginProxyResponseRaw = void | PluginJsonResponse;
 /** @default none */
 export type PluginResponseEncoding = { __type: PluginResponseEncoding } & PluginResponseEncodingRaw;
 type PluginResponseEncodingRaw = 'none' | 'json' | 'application/json';
-export type SanitizedArgs = { __type: SanitizedArgs } & {
+
+/**
+ * @min 100
+ */
+export type BuildNumber = { __type: BuildNumber } & number;
+
+export type SanitizedArgs = {
 	_: NonEmptyString[];
 	projectDir: SanitizedPath;
 	maxConcurrency: number;
@@ -203,7 +209,7 @@ export type SanitizedArgs = { __type: SanitizedArgs } & {
 	plugin?: NonEmptyString;
 	env: NonEmptyString;
 	quickstart: NonEmptyString;
-	setBuild: NonEmptyString;
+	setBuild: NonEmptyString | BuildNumber;
 	setVersion: NonEmptyString;
 };
 

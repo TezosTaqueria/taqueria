@@ -166,6 +166,12 @@ export type PluginProxyResponse = void | PluginJsonResponse;
 
 /** @default none */
 export type PluginResponseEncoding = 'none' | 'json' | 'application/json';
+
+/**
+ * @min 100
+ */
+export type BuildNumber = number;
+
 export type SanitizedArgs = {
 	_: NonEmptyString[];
 	projectDir: SanitizedPath;
@@ -181,7 +187,7 @@ export type SanitizedArgs = {
 	plugin?: NonEmptyString;
 	env: NonEmptyString;
 	quickstart: NonEmptyString;
-	setBuild: NonEmptyString;
+	setBuild: NonEmptyString | BuildNumber;
 	setVersion: NonEmptyString;
 };
 
