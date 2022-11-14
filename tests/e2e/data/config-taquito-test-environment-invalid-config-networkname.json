@@ -15,13 +15,11 @@
 			"networks": [],
 			"sandboxes": [
 				"local"
-			],
-			"storage": {}
+			]
 		},
 		"test": {
 			"networks": ["ithaca"],
-			"sandboxes": [],
-			"storage": { "hello-tacos.tz": "100" }
+			"sandboxes": []
 		}
 	},
 	"sandbox": {

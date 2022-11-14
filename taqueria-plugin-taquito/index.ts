@@ -1,5 +1,5 @@
 import { Option, Plugin, Task } from '@taqueria/node-sdk';
-import taquito from './taquito';
+import main from './main';
 
 Plugin.create(_i18n => ({
 	alias: 'taquito',
@@ -86,5 +86,5 @@ Plugin.create(_i18n => ({
 			encoding: 'application/json',
 		}),
 	],
-	proxy: taquito,
+	proxy: main,
 }), process.argv);

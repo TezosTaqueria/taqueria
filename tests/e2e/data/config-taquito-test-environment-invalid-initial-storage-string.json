@@ -15,13 +15,11 @@
 			"networks": [],
 			"sandboxes": [
 				"local"
-			],
-			"storage": {}
+			]
 		},
 		"test": {
 			"networks": ["ghostnet"],
-			"sandboxes": [],
-			"storage": { "hello-tacos.tz": "string.storage" }
+			"sandboxes": []
 		}
 	},
 	"sandbox": {

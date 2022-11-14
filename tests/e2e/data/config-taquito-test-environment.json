@@ -15,16 +15,15 @@
 			"networks": [],
 			"sandboxes": [
 				"local"
-			],
-			"storage": {}
+			]
 		},
 		"test": {
 			"networks": ["ghostnet"],
-			"sandboxes": [],
-			"storage": {
-				"hello-tacos.tz": "anyContract.storage",
-				"increment.tz": "anyContract.storage"
-			}
+			"sandboxes": []
+		},
+		"funds": {
+			"networks": ["fundnet"],
+			"sandboxes": []
 		}
 	},
 	"sandbox": {
@@ -45,38 +44,19 @@
 					"publicKeyHash": "tz3P5zrUYGJnryVfZ5JFeLMMojdjQFGLUFiK",
 					"privateKey": "p2sk2sF7GEUMB11cmzpLBpXh7F1Asru5sNCneUjWDMqxpoCZA3DLNf"
 				}
-			},
-			"faucet": {
-				"pkh": "tz1ge3zb6kC5iUZcXsjxiwwtU5MwP37T6m1z",
-				"mnemonic": [
-					"donor",
-					"own",
-					"people",
-					"unusual",
-					"congress",
-					"meadow",
-					"diesel",
-					"table",
-					"orient",
-					"table",
-					"craft",
-					"donate",
-					"album",
-					"sound",
-					"club"
-				],
-				"email": "garexkby.gwzlnccc@teztnets.xyz",
-				"password": "PMH8QE4pc5",
-				"amount": "101486787943",
-				"activation_code": "40d3b8396baf3fbcbb19d0c77bf38d8b184bb875"
 			}
+		},
+		"fundnet": {
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
+			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY"
 		}
 	},
 	"accounts": {
-		"bob": "3000000000",
-		"alice": "2000000000",
-		"john": "4000000000",
-		"jane": "5000000000",
-		"joe": "1000000000"
+		"bob": "3000000",
+		"alice": "2000000",
+		"john": "4000000",
+		"jane": "5000000",
+		"joe": "1000000"
 	}
 }

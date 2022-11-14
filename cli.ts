@@ -434,6 +434,7 @@ const initProject = (
 				: resolve(projectDir)
 		),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
+		chain(_ => exec('taq install @taqueria/plugin-core 2>&1 > /dev/null', {}, false, projectDir)),
 		map(_ => i18n.__('bootstrapMsg')),
 	);
 
@@ -938,40 +939,10 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
 			),
 		};
 
-const renderFaucetWarning = (config: LoadedConfig.t) => {
-	log('Warning: the faucet field in network configs has been deprecated and will be ignored');
-	return config;
-};
-
-const isUserInvokingTask = (parsedArgs: SanitizedArgs.t) => (taskName: string) => parsedArgs._.includes(taskName);
-
-const doesConfigIncludeFaucet = (config: LoadedConfig.t) => {
-	return config.network
-		? Object.values(config.network).reduce(
-			(acc, network) => acc || (typeof network !== 'string' && has('faucet', network)),
-			false,
-		)
-		: false;
-};
-
-const maybeWarnAboutFaucets = (parsedArgs: SanitizedArgs.t) =>
-	(config: LoadedConfig.t) => {
-		const isRelevantTask = isUserInvokingTask(parsedArgs);
-		return doesConfigIncludeFaucet(config) && (
-				isRelevantTask('originate')
-				|| isRelevantTask('deploy')
-				|| isRelevantTask('transfer')
-				|| isRelevantTask('call')
-			)
-			? renderFaucetWarning(config)
-			: config;
-	};
-
 const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 	(cliConfig: CLIConfig) =>
 		pipe(
 			getConfig(parsedArgs.projectDir, i18n, false),
-			map(maybeWarnAboutFaucets(parsedArgs)),
 			chain((config: LoadedConfig.t) => {
 				const pluginLib = inject({
 					parsedArgs,
