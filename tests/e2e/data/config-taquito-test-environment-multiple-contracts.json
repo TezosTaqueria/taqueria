@@ -20,17 +20,13 @@
 		"test": {
 			"networks": ["ghostnet"],
 			"sandboxes": []
-		},
-		"funds": {
-			"networks": ["fundnet"],
-			"sandboxes": []
 		}
 	},
 	"sandbox": {
 		"local": {
 			"label": "Local Tezos Sandbox",
 			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
-			"rpcUrl": "http://localhost:20120"
+			"rpcUrl": "http://localhost:20110"
 		}
 	},
 	"network": {
@@ -44,19 +40,38 @@
 					"publicKeyHash": "tz3P5zrUYGJnryVfZ5JFeLMMojdjQFGLUFiK",
 					"privateKey": "p2sk2sF7GEUMB11cmzpLBpXh7F1Asru5sNCneUjWDMqxpoCZA3DLNf"
 				}
+			},
+			"faucet": {
+				"pkh": "tz1gFhXGGK4Ui6UwD92djr61XhwukFYgtwmF",
+				"mnemonic": [
+					"jeans",
+					"meadow",
+					"door",
+					"apology",
+					"unfair",
+					"device",
+					"water",
+					"eternal",
+					"slow",
+					"hockey",
+					"sadness",
+					"wagon",
+					"hold",
+					"aim",
+					"during"
+				],
+				"email": "ykvlizei.xfkvqfnw@teztnets.xyz",
+				"password": "sXsuHFWSit",
+				"amount": "319967537732",
+				"activation_code": "2489771b09855087e55ce506b9a3d7f119d94517"
 			}
-		},
-		"fundnet": {
-			"label": "ghostnet",
-			"rpcUrl": "https://ghostnet.ecadinfra.com",
-			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY"
 		}
 	},
 	"accounts": {
-		"bob": "3000000",
-		"alice": "2000000",
-		"john": "4000000",
-		"jane": "5000000",
-		"joe": "1000000"
+		"bob": "3000000000",
+		"alice": "2000000000",
+		"john": "4000000000",
+		"jane": "5000000000",
+		"joe": "1000000000"
 	}
 }

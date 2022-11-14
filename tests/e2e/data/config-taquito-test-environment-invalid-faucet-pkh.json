@@ -26,13 +26,13 @@
 		"local": {
 			"label": "Local Tezos Sandbox",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-			"rpcUrl": "http://localhost:20050"
+			"rpcUrl": "http://localhost:20080"
 		}
 	},
 	"network": {
 		"ithacanet": {
 			"label": "ithacanet",
-			"rpcUrl": "https://invalid.test",
+			"rpcUrl": "https://ithacanet.ecadinfra.com",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
 			"accounts": {
 				"taqOperatorAccount": {
@@ -42,28 +42,28 @@
 				}
 			},
 			"faucet": {
-				"pkh": "tz1c2fnjgqPLLpi868v1JEEkTCSpvGCHwAB4",
+				"pkh": "invalid_pkh",
 				"mnemonic": [
-					"cute",
-					"will",
-					"core",
-					"industry",
-					"much",
+					"throw",
+					"cactus",
+					"romance",
+					"lake",
+					"step",
+					"floor",
+					"limit",
+					"shallow",
+					"leader",
+					"pride",
+					"thrive",
+					"void",
 					"carbon",
-					"piano",
-					"truth",
-					"grunt",
-					"twist",
-					"wage",
-					"marble",
-					"profit",
-					"text",
-					"cradle"
+					"wreck",
+					"retreat"
 				],
-				"email": "koylsfnp.nhwyqepc@teztnets.xyz",
-				"password": "uFP1Ep650w",
-				"amount": "166703139463",
-				"activation_code": "409bcde89e7946e51b7c19da994d0997276e676f"
+				"email": "tskwglte.mscstjny@teztnets.xyz",
+				"password": "fvzAbTJ7Uz",
+				"amount": "8780051082",
+				"activation_code": "07739888a2615d5176505c900f411dcf7990073d"
 			}
 		}
 	},

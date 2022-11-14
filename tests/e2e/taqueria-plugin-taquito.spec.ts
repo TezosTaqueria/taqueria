@@ -26,7 +26,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	});
 
 	beforeEach(async () => {
-		await exec(`cp e2e/data/anyContract.storage ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
 	});
 
 	test('Verify that the taquito plugin exposes the associated commands in the help menu', async () => {
@@ -75,7 +75,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 2. Run taq deploy on a selected test network described in "test" environment
 
-		const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+		const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
 
@@ -109,7 +109,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 2. Run taq deploy ${contractName} on a selected test network described in "test" environment
 
-		const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+		const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
 
@@ -271,7 +271,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 			environment = 'tes';
 
 			// 1. Run taq deploy on a network described in "test" environment
-			await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+			await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 				cwd: `./${taqueriaProjectPath}`,
 			});
 		} catch (error) {
@@ -347,13 +347,13 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 
 		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
-		await exec(`cp e2e/data/string.storage ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp e2e/data/string.storage.tz ${taqueriaProjectPath}/artifacts/`);
 		await exec(
 			`cp e2e/data/config-taquito-test-environment-invalid-initial-storage-string.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
 
 		// 2. Run taq deploy on a network described in "test" environment
-		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz --storage string.storage -e ${environment}`, {
+		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz --storage string.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
 

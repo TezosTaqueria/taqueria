@@ -313,6 +313,9 @@ describe('E2E Testing for taqueria contract types plugin: Generate Example Contr
 	it('Generate Types 01B - subsubdir', async () => {
 		await testContractTypeGeneration('subdir/subsubdir/example-contract-0');
 	});
+	it('Generate lambda', async () => {
+		await testContractTypeGeneration('example-lambda');
+	});
 
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug

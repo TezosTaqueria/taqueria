@@ -18,45 +18,44 @@
 			]
 		},
 		"test": {
-			"networks": ["ghostnet"],
-			"sandboxes": []
-		},
-		"funds": {
-			"networks": ["fundnet"],
+			"networks": ["ithacanet"],
 			"sandboxes": []
 		}
 	},
 	"sandbox": {
 		"local": {
 			"label": "Local Tezos Sandbox",
-			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
-			"rpcUrl": "http://localhost:20120"
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"rpcUrl": "http://localhost:20070"
 		}
 	},
 	"network": {
-		"ghostnet": {
-			"label": "ghostnet",
-			"rpcUrl": "https://ghostnet.ecadinfra.com",
-			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+		"ithacanet": {
+			"label": "ithacanet",
+			"rpcUrl": "https://ithacanet.ecadinfra.com",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
 			"accounts": {
 				"taqOperatorAccount": {
 					"publicKey": "p2pk666TYDPwRzgE2emHyTM4RSLbypvhHwhk6RwEtasA5arSBgf6bAq",
 					"publicKeyHash": "tz3P5zrUYGJnryVfZ5JFeLMMojdjQFGLUFiK",
 					"privateKey": "p2sk2sF7GEUMB11cmzpLBpXh7F1Asru5sNCneUjWDMqxpoCZA3DLNf"
 				}
+			},
+			"faucet": {
+				"pkh": "",
+				"mnemonic": [],
+				"email": "",
+				"password": "",
+				"amount": "",
+				"activation_code": ""
 			}
-		},
-		"fundnet": {
-			"label": "ghostnet",
-			"rpcUrl": "https://ghostnet.ecadinfra.com",
-			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY"
 		}
 	},
 	"accounts": {
-		"bob": "3000000",
-		"alice": "2000000",
-		"john": "4000000",
-		"jane": "5000000",
-		"joe": "1000000"
+		"bob": "3000000000",
+		"alice": "2000000000",
+		"john": "4000000000",
+		"jane": "5000000000",
+		"joe": "1000000000"
 	}
 }

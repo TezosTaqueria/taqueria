@@ -23,30 +23,18 @@
 		"local": {
 			"label": "Local Tezos Sandbox",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-			"rpcUrl": "http://localhost:20010",
+			"rpcUrl": "http://localhost:20030",
 			"tzkt": {
 				"disableAutostartWithSandbox": false,
-				"postgresqlPort": 5462,
-				"apiPort": 5030
-			}
-		},
-		"test": {
-			"label": "Test Tezos Sandbox",
-			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-			"rpcUrl": "http://localhost:20020",
-			"tzkt": {
-				"disableAutostartWithSandbox": false,
-				"postgresqlPort": 5472,
-				"apiPort": 5040
+				"postgresqlPort": 5452,
+				"apiPort": 5020
 			}
 		}
 	},
 	"network": {},
 	"accounts": {
-		"bob": "3_000_000_000",
-		"alice": "3_000_000_000",
-		"john": "3_000_000_000",
-		"jane": "3_000_000_000",
-		"joe": "3_000_000_000"
+		"ken": "1",
+		"alice": "1000000000",
+		"john": "2000000000"
 	}
 }
