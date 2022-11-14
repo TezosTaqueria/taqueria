@@ -303,7 +303,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 
 	test('Verify that taqueria taquito plugin will show proper error when faucet is wrong -> network url is wrong', async () => {
 		// Environment test does not exist on default config.json
-		environment = 'test';
+		environment = 'testing';
 
 		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
 		await exec(
@@ -323,7 +323,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 
 	test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> initial storage is not provided', async () => {
 		// Environment test does not exist on default config.json
-		environment = 'test';
+		environment = 'testing';
 
 		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
