@@ -2,7 +2,7 @@
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
 import { address, bytes, nat } from './type-aliases';
 
-type Storage = {
+export type Storage = {
     total_supply: nat;
 };
 

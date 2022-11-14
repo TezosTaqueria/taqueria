@@ -1,12 +1,29 @@
 import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
 import createContract from './createContract';
-import ligo from './ligo';
+import main from './main';
 
 Plugin.create(i18n => ({
 	schema: '1.0',
 	version: '0.1',
 	alias: 'ligo',
 	tasks: [
+		Task.create({
+			task: 'ligo',
+			command: 'ligo',
+			description:
+				'This task allows you to run arbitrary LIGO native commands. Note that they might not benefit from the abstractions provided by Taqueria',
+			options: [
+				Option.create({
+					shortFlag: 'c',
+					flag: 'command',
+					type: 'string',
+					description: 'The command to be passed to the underlying LIGO binary, wrapped in quotes',
+					required: true,
+				}),
+			],
+			handler: 'proxy',
+			encoding: 'none',
+		}),
 		Task.create({
 			task: 'compile',
 			command: 'compile <sourceFile>',
@@ -47,5 +64,5 @@ Plugin.create(i18n => ({
 			handler: createContract,
 		}),
 	],
-	proxy: ligo,
+	proxy: main,
 }), process.argv);

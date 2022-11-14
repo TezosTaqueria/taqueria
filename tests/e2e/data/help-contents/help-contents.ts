@@ -54,6 +54,9 @@ Commands:
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
   taq clean                       Clean all the Taqueria-related docker images
+  taq ligo                        This task allows you to run arbitrary LIGO nat
+                                  ive commands. Note that they might not benefit
+                                   from the abstractions provided by Taqueria
   taq compile                     Provided by more than one plugin. The option -
                                   -plugin is required.
   taq test <sourceFile>           Test a smart contract written in LIGO
@@ -98,6 +101,9 @@ Commands:
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
   taq clean                       Clean all the Taqueria-related docker images
+  taq ligo                        This task allows you to run arbitrary LIGO nat
+                                  ive commands. Note that they might not benefit
+                                   from the abstractions provided by Taqueria
   taq compile                     Provided by more than one plugin. The option -
                                   -plugin is required.
   taq test <sourceFile>           Test a smart contract written in LIGO

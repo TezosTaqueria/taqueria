@@ -43,6 +43,9 @@ export type TypedType =
 		} | {
 			kind: 'map';
 			map: { key: TypedType; value: TypedType; isBigMap: boolean };
+		} | {
+			kind: 'lambda';
+			lambda: { arg: TypedType; ret: TypedType };
 		}
 	);
 
@@ -326,11 +329,29 @@ const visitType = (node: MType, options?: { ignorePairName?: boolean }): TypedTy
 		};
 	}
 
+	if (node.prim === `lambda`) {
+		if (node.args.length !== 2) {
+			throw new GenerateApiError(`lambda does not have 2 args`, { node, args: node.args });
+		}
+
+		const argType = visitType(node.args[0]);
+		const retType = visitType(node.args[1]);
+		if (!argType || !retType) {
+			throw new GenerateApiError(`lambda is missing arg or return`, { node, args: node.args, argType, retType });
+		}
+
+		return {
+			kind: `lambda`,
+			raw: node,
+			lambda: {
+				arg: argType,
+				ret: retType,
+			},
+		};
+	}
+
 	// misc?
-	if (
-		node.prim === `lambda`
-		|| node.prim === `operation`
-	) {
+	if (node.prim === `operation`) {
 		return {
 			kind: `value`,
 			raw: node,
