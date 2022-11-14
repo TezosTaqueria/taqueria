@@ -20,7 +20,7 @@
 				"local"
 			]
 		},
-		"test": {
+		"testing": {
 			"networks": ["ghostnet"],
 			"sandboxes": []
 		}
@@ -28,7 +28,7 @@
 	"sandbox": {
 		"local": {
 			"label": "Local Tezos Sandbox",
-			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
 			"rpcUrl": "http://localhost:20090"
 		}
 	},
@@ -36,45 +36,21 @@
 		"ghostnet": {
 			"label": "ghostnet",
 			"rpcUrl": "https://ghostnet.ecadinfra.com",
-			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
 			"accounts": {
 				"taqOperatorAccount": {
 					"publicKey": "p2pk666TYDPwRzgE2emHyTM4RSLbypvhHwhk6RwEtasA5arSBgf6bAq",
 					"publicKeyHash": "tz3P5zrUYGJnryVfZ5JFeLMMojdjQFGLUFiK",
 					"privateKey": "p2sk2sF7GEUMB11cmzpLBpXh7F1Asru5sNCneUjWDMqxpoCZA3DLNf"
 				}
-			},
-			"faucet": {
-				"pkh": "tz1Qjvu8xaRgTjQmHBBDHaM1HGomCTYBgLZJ",
-				"mnemonic": [
-					"away",
-					"virus",
-					"stand",
-					"kingdom",
-					"sorry",
-					"absurd",
-					"close",
-					"found",
-					"warrior",
-					"icon",
-					"nominee",
-					"theme",
-					"enough",
-					"kiss",
-					"double"
-				],
-				"email": "mpyuqqza.jqszvrsy@teztnets.xyz",
-				"password": "9OvRmgifTP",
-				"amount": "17415095578",
-				"activation_code": "8e54d45a59d21089fc60c6d4e94ecf4ecc44c417"
 			}
 		}
 	},
 	"accounts": {
-		"bob": "3000000000",
-		"alice": "2000000000",
-		"john": "4000000000",
-		"jane": "5000000000",
-		"joe": "1000000000"
+		"bob": "3_000_000_000",
+		"alice": "3_000_000_000",
+		"john": "3_000_000_000",
+		"jane": "3_000_000_000",
+		"joe": "3_000_000_000"
 	}
 }
