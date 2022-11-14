@@ -53,6 +53,9 @@ jobs:
       with:
         deno-version: "1.23.4"
 
+    - name: cleaning before setup
+      run: npm rebuild 
+      
     - name: Build all
       run: |
         export PATH="$PATH:$(pwd)"
