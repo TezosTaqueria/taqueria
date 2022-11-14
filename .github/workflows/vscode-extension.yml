@@ -46,7 +46,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.16.x
-          cache: 'npm'
+          cache: "npm"
 
 
       - name: Install Deno
@@ -111,7 +111,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16.16.x
-          cache: 'npm'
+          cache: "npm"
 
       - name: Cache node modules
         uses: actions/cache@v3
