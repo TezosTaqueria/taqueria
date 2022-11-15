@@ -175,7 +175,7 @@ No operations performed
 		});
 
 		expect(result.stdout).toContain(
-			'All instantiated accounts in the current environment, "test", are funded up to or beyond the declared amount',
+			'All instantiated accounts in the current environment, "testing", are funded up to or beyond the declared amount',
 		);
 	});
 
@@ -198,11 +198,11 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		expect(result2.stdout).toBe(
 			`No accounts were instantiated because they were all instantiated in the target environment already\n`,
 		);
-		expect(result2.stderr).toBe(`Note: bob is already instantiated in the current environment, "test"
-Note: alice is already instantiated in the current environment, "test"
-Note: john is already instantiated in the current environment, "test"
-Note: jane is already instantiated in the current environment, "test"
-Note: joe is already instantiated in the current environment, "test"\n`);
+		expect(result2.stderr).toBe(`Note: bob is already instantiated in the current environment, "testing"
+Note: alice is already instantiated in the current environment, "testing"
+Note: john is already instantiated in the current environment, "testing"
+Note: jane is already instantiated in the current environment, "testing"
+Note: joe is already instantiated in the current environment, "testing"\n`);
 	});
 
 	test('Verify that taqueria taquito plugin will fund instantiated accounts on a network', async () => {
