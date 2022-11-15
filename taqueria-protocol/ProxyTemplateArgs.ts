@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/ProxyTemplateArgs';
+export * from '@taqueria/protocol/types/out/types/ProxyTemplateArgs';

@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/Template';
+export * from '@taqueria/protocol/types/out/types/Template';

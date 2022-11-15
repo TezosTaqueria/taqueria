@@ -15,7 +15,7 @@ export const buildTypes = async (packagePath: string) => {
 
 	const generationWarning = `
 // Generated file: Do not edit 
-// generated from @taqueria-protocol-types
+// generated from @taqueria-protocol/types
     `.trimStart();
 
 	const typeCodeStrict = `
@@ -55,10 +55,10 @@ ${generationWarning}
 import { TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import { FutureInstance, resolve } from 'fluture';
 import { ZodError } from 'zod';
-import { parsingErrorMessages } from '@taqueria/protocol-types/helpers';
-import { ${typeNameRaw} } from '@taqueria/protocol-types/types';
-import { ${typeNameNominal} as ${typeNameStrict} } from '@taqueria/protocol-types/out/types-strict';
-import { ${typeNameSchema} } from '@taqueria/protocol-types/out/types-zod';
+import { parsingErrorMessages } from '@taqueria/protocol/types/helpers';
+import { ${typeNameRaw} } from '@taqueria/protocol/types/types';
+import { ${typeNameNominal} as ${typeNameStrict} } from '@taqueria/protocol/types/out/types-strict';
+import { ${typeNameSchema} } from '@taqueria/protocol/types/out/types-zod';
 
 export type { ${typeNameStrict} as ${typeNameNominal} };
 const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('${typeNameRaw}');
@@ -101,5 +101,5 @@ export type t = ${typeNameStrict};
 };
 
 buildTypes(
-	`taqueria-protocol-types`,
+	`taqueria-protocol/types`,
 ).catch(console.error);

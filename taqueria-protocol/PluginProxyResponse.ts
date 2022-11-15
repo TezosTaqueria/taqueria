@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/PluginProxyResponse';
+export * from '@taqueria/protocol/types/out/types/PluginProxyResponse';

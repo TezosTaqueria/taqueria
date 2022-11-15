@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/Verb';
+export * from '@taqueria/protocol/types/out/types/Verb';

@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/PluginJsonResponse';
+export * from '@taqueria/protocol/types/out/types/PluginJsonResponse';

@@ -1,9 +1,9 @@
-export * from '@taqueria/protocol-types/types';
+export * from '@taqueria/protocol/types/types';
 import { RequestArgs } from '@taqueria/node-sdk';
-import * as Strict from '@taqueria/protocol-types/out/types-strict';
-import * as NonStrict from '@taqueria/protocol-types/types';
-export { NonEmptyString, Option, PositionalArg, Task, Template } from '@taqueria/protocol-types';
-export * as Protocol from '@taqueria/protocol-types/out/types-strict';
+import * as Strict from '@taqueria/protocol/types/out/types-strict';
+import * as NonStrict from '@taqueria/protocol/types/types';
+export { NonEmptyString, Option, PositionalArg, Task, Template } from '@taqueria/protocol/types';
+export * as Protocol from '@taqueria/protocol/types/out/types-strict';
 import * as Config from '@taqueria/protocol/Config';
 import * as ConfigArtifactsDir from '@taqueria/protocol/ConfigArtifactsDir';
 import * as ConfigContractsDir from '@taqueria/protocol/ConfigContractsDir';

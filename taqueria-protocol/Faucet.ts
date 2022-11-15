@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/Faucet';
+export * from '@taqueria/protocol/types/out/types/Faucet';

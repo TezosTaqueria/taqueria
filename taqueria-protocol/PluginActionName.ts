@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/PluginActionName';
+export * from '@taqueria/protocol/types/out/types/PluginActionName';

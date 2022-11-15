@@ -1,8 +1,8 @@
-import { Url } from '@taqueria/protocol-types';
 import createType from '@taqueria/protocol/Base';
 import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
+import { Url } from '@taqueria/protocol/types';
 import { z } from 'zod';
 
 export const rawSchema = z.object({

@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/NonEmptyString';
+export * from '@taqueria/protocol/types/out/types/NonEmptyString';
