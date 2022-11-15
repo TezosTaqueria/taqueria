@@ -7,6 +7,7 @@ export const buildTypes = async (packagePath: string) => {
 	const typesFilePath = path.join(packagePath, `types.ts`);
 	const outTypesStrictFilePath = path.join(packagePath, `out/types-strict.ts`);
 	const outDirPath = path.join(packagePath, `out/types`);
+	await fs.mkdir(outDirPath, { recursive: true });
 
 	const typeCode = await fs.readFile(typesFilePath, { encoding: `utf-8` });
 	const typeNames = [...typeCode.matchAll(/^export type ([A-Za-z0-9_]+) =/gm)].map(x => x[1]);
