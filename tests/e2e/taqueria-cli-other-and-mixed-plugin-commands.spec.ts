@@ -11,6 +11,11 @@ const taqueriaProjectPath = './e2e/auto-test-cli';
 describe('E2E Testing for taqueria CLI,', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
 	});
 
 	test('Verify that taq --help gives the help menu for a non-initialized project', async () => {

@@ -51,6 +51,7 @@ A basic workflow in Taqueria is:
 
 | name         |  pluginName                       |  description                                                |
 |--------------|------------------------------     |-------------------------------------------------------------|
+| Core         | `@taqueria/plugin-core`           | Contains core utility tasks provided by Taqueria            |
 | LIGO         | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language             |
 | SmartPy      | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy contract language                |
 | Archetype    | `@taqueria/plugin-archetype`      | A compiler for the Archetype contract language              |

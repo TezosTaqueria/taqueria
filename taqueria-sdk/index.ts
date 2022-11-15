@@ -20,7 +20,7 @@ import type { TaqError } from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
 import * as Template from '@taqueria/protocol/Template';
-import { exec, ExecException } from 'child_process';
+import { exec, ExecException, spawn, spawnSync } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
@@ -45,6 +45,8 @@ const yargs = require('yargs');
 
 export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
 
+export type CmdArgEnv = [string, string[], { [key: string]: string }];
+
 export const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
 		mapRej((err: TaqError) => new E_TaqError(err))(f),
@@ -62,7 +64,7 @@ export const readJsonFile = <T>(filename: string): Promise<T> =>
 
 export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 	new Promise((resolve, reject) => {
-		exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
+		exec(cmd, (err, stdout, stderr) => {
 			if (err) reject(err);
 			else {
 				resolve({
@@ -73,17 +75,14 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 		});
 	});
 
-export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, ExecException> =>
+export const spawnCmd = (fullCmd: CmdArgEnv): Promise<number | null> =>
 	new Promise((resolve, reject) => {
-		exec(cmd, (err, stdout, stderr) => {
-			if (err) reject(err);
-			else {
-				resolve({
-					stdout,
-					stderr,
-				});
-			}
-		});
+		const cmd = fullCmd[0];
+		const args = fullCmd[1];
+		const envVars = fullCmd[2];
+		const child = spawn(cmd, args, { env: { ...process.env, ...envVars }, stdio: 'inherit' });
+		child.on('close', resolve);
+		child.on('error', reject);
 	});
 
 export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError> => {
@@ -419,19 +418,20 @@ export const getSandboxAccountConfig = (sandbox: SandboxConfig.t, accountName: s
 	return undefined;
 };
 
-/**
- * Gets the initial storage for the contract associated with the given storage file
- */
-export const getInitialStorage = async (
+export const addTzExtensionIfMissing = (contractFilename: string) =>
+	/\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`;
+
+export const getContractContent = async (
 	parsedArgs: RequestArgs.t,
-	storageFilename: string,
+	contractFilename: string,
 ): Promise<string | undefined> => {
-	const storagePath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, storageFilename);
+	const contractWithTzExtension = addTzExtensionIfMissing(contractFilename);
+	const contractPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, contractWithTzExtension);
 	try {
-		const content = await readFile(storagePath, { encoding: 'utf-8' });
+		const content = await readFile(contractPath, { encoding: 'utf-8' });
 		return content;
 	} catch (err) {
-		sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
+		sendErr(`Could not read ${contractPath}. Maybe it doesn't exist.\n`);
 		return undefined;
 	}
 };

@@ -1,6 +1,5 @@
 import {
 	execCmd,
-	execCommandWithoutWrapping,
 	getArch,
 	readJsonFile,
 	sendAsyncErr,
@@ -140,7 +139,7 @@ const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts)
 const startContainer = async (container: { name: string; command: string }): Promise<void> => {
 	console.log(`Starting ${container.name}`);
 	try {
-		const result = await execCommandWithoutWrapping(container.command);
+		const result = await execCmd(container.command);
 		if (result.stderr) {
 			console.error(result.stderr);
 		}
@@ -151,7 +150,7 @@ const startContainer = async (container: { name: string; command: string }): Pro
 };
 
 const startInstance = async (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts): Promise<void> => {
-	await execCommandWithoutWrapping(
+	await execCmd(
 		`docker network ls | grep 'sandbox_${sandboxName}_net' > /dev/null || docker network create --driver bridge sandbox_${sandboxName}_net`,
 	);
 
@@ -322,7 +321,7 @@ const stopTzKtContainers = async (sandboxName: string, sandbox: SandboxConfig.t,
 	const containersToStop = [containerNames.api, containerNames.sync, containerNames.postgres];
 	for (const container of containersToStop) {
 		try {
-			const result = await execCommandWithoutWrapping(`docker stop ${container}`);
+			const result = await execCmd(`docker stop ${container}`);
 			if (result.stderr) {
 				console.error(result.stderr);
 			}
