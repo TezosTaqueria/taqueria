@@ -33,7 +33,7 @@
 		"local": {
 			"label": "Local Tezos Sandbox",
 			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-			"rpcUrl": "http://localhost:20120"
+			"rpcUrl": "http://localhost:20060"
 		}
 	},
 	"network": {

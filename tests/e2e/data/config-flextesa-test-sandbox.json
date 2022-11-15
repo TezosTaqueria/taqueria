@@ -26,21 +26,21 @@
 		"local": {
 			"label": "Local Tezos Sandbox",
 			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-			"rpcUrl": "http://localhost:20010",
+			"rpcUrl": "http://localhost:20000",
 			"tzkt": {
 				"disableAutostartWithSandbox": false,
-				"postgresqlPort": 5462,
-				"apiPort": 5030
+				"postgresqlPort":5432,
+				"apiPort": 5000
 			}
 		},
 		"test": {
 			"label": "Test Tezos Sandbox",
 			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-			"rpcUrl": "http://localhost:20020",
+			"rpcUrl": "http://localhost:20010",
 			"tzkt": {
 				"disableAutostartWithSandbox": false,
-				"postgresqlPort": 5472,
-				"apiPort": 5040
+				"postgresqlPort": 5442,
+				"apiPort": 5010
 			}
 		}
 	},
