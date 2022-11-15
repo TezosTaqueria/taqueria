@@ -39,6 +39,23 @@
 		"./*.js": {
 			"import": "./*.mjs",
 			"default": "./*.js"
+		},
+		"./types": "./types/index.js",
+		"./types/*": {
+			"import": "./types/*.mjs",
+			"default": "./types/*.js"
+		},
+		"./types/*.js": {
+			"import": "./types/*.mjs",
+			"default": "./types/*.js"
+		},
+		"./types/out/*": {
+			"import": "./types/out/*.mjs",
+			"default": "./types/out/*.js"
+		},
+		"./types/out/types/*": {
+			"import": "./types/out/types/*.mjs",
+			"default": "./types/out/types/*.js"
 		}
 	},
 	"dependencies": {
@@ -52,7 +69,10 @@
 	},
 	"tsup": {
 		"entry": [
-			"[!.]+.ts"
+			"[!.]+.ts",
+			"types/[!.]+.ts",
+			"types/out/types/*.ts",
+			"types/out/*.ts"
 		],
 		"sourcemap": true,
 		"target": "node16",
