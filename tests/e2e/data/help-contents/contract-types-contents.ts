@@ -12,6 +12,8 @@ Commands:
   taq rm-contract <contractName>      Remove a contract from the contract regist
                                       ry
   taq list-contracts                  List registered contracts
+  taq clean                           Clean all the Taqueria-related docker imag
+                                      es
   taq generate types [typescriptDir]  Generate types for a contract to be used w
                                       ith taquito       [aliases: gen, gentypes]
 

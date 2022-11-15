@@ -9,6 +9,7 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
+  taq clean                       Clean all the Taqueria-related docker images
   taq publish [path]              Upload and pin files using your pinata account
                                   .
   taq pin [hash]                  Pin a file already on ipfs with your pinata ac

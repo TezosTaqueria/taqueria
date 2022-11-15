@@ -49,6 +49,7 @@ export const utilizingContractTypes = async () => {
 		code: TimelockCode.code,
 		storage: tas.bytes('00'),
 	});
+	await originationResult.confirmation();
 	const contract = await originationResult.contract();
 	const initialStorage = await contract.storage();
 	const op = await contract.methods.default(chest_key, chest).send();

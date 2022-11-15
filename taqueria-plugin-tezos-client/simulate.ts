@@ -1,7 +1,8 @@
 import {
+	addTzExtensionIfMissing,
 	execCmd,
 	getArch,
-	getInitialStorage,
+	getContractContent,
 	getParameter,
 	sendAsyncErr,
 	sendErr,
@@ -41,7 +42,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	if (!projectDir) throw `No project directory provided`;
 
 	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(sourceFile);
-	const storage = (await getInitialStorage(parsedArgs, storageFilename))?.trim();
+	const storage = (await getContractContent(parsedArgs, storageFilename))?.trim();
 
 	if (storage === undefined) {
 		return Promise.reject(
@@ -56,9 +57,6 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const paramFilename = parsedArgs.param;
 	const param = (await getParameter(parsedArgs, paramFilename)).trim();
 
-	const processedStorage = preprocessString(storage);
-	const processedParam = preprocessString(param);
-
 	const arch = await getArch();
 	const flextesaImage = DOCKER_IMAGE;
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
@@ -66,7 +64,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
 
 	const cmd =
-		`${baseCmd} octez-client ${GLOBAL_OPTIONS} run script ${inputFile} on storage \'${processedStorage}\' and input \'${processedParam}\' ${entrypoint}`;
+		`${baseCmd} octez-client ${GLOBAL_OPTIONS} run script ${inputFile} on storage \'${storage}\' and input \'${param}\' ${entrypoint}`;
 	return cmd;
 };
 
@@ -103,7 +101,7 @@ const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRo
 		});
 
 const simulate = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = parsedArgs.sourceFile;
+	const sourceFile = addTzExtensionIfMissing(parsedArgs.sourceFile);
 	return simulateContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
 		sendAsyncErr(err, false)
 	);

@@ -5,7 +5,7 @@ import instantiate_account from './instantiate_account';
 import originate from './originate';
 import transfer from './transfer';
 
-export const taquito = (parsedArgs: Opts): Promise<void> => {
+export const main = (parsedArgs: Opts): Promise<void> => {
 	switch (parsedArgs.task) {
 		case 'deploy':
 			return originate(parsedArgs);
@@ -20,4 +20,4 @@ export const taquito = (parsedArgs: Opts): Promise<void> => {
 	}
 };
 
-export default taquito;
+export default main;

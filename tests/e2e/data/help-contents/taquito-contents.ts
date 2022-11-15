@@ -9,6 +9,7 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
+  taq clean                       Clean all the Taqueria-related docker images
   taq deploy <contract>           Deploy a smart contract to a particular enviro
                                   nment                     [aliases: originate]
   taq transfer <contract>         Transfer/call an implicit account or a smart c
@@ -50,4 +51,55 @@ Options:
       --sender      Name of an instantiated account to use as the sender of the
                     originate operation
       --mutez       Amount of Mutez to transfer
+`;
+
+export const helpContentsTaquitoPluginTransferSpecific = `taq transfer <contract>
+
+Transfer/call an implicit account or a smart contract (specified via its alias o
+r address) deployed to a particular environment
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+  -e, --env         Specify an environment configuration
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
+      --help        Show help                                          [boolean]
+      --mutez       Amount of Mutez to transfer
+      --param       Name of the parameter file that contains the parameter value
+                     as a Michelson expression, in the artifacts directory, used
+                     for invoking a deployed contract
+      --entrypoint  You may explicitly specify an entrypoint to make the paramet
+                    er value shorter, without having to specify a chain of (Left
+                     (Right ... 14 ...))
+      --sender      Name of an instantiated account to use as the sender of the
+                    transfer operation
+`;
+
+export const helpContentsTaquitoPluginFundSpecific = `taq fund
+
+Fund all the instantiated accounts up to the desired/declared amount in a target
+ environment
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+  -e, --env         Specify an environment configuration
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
+      --help        Show help                                          [boolean]
+`;
+
+export const helpContentsTaquitoPluginInstantiateAccountSpecific = `taq instantiate-account
+
+Instantiate all accounts declared in the "accounts" field at the root level of t
+he config file to a target environment
+
+Options:
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
+  -p, --projectDir  Path to your project directory               [default: "./"]
+  -e, --env         Specify an environment configuration
+  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
+      --help        Show help                                          [boolean]
 `;

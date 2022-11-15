@@ -15,8 +15,9 @@ export const generateTestProject = async (
 ) => {
 	const targetDir = path.join('/tmp', projectPath);
 
+	let projectInit;
 	try {
-		await exec(`taq init ${targetDir}`);
+		projectInit = await exec(`taq init ${targetDir}`);
 	} catch (error) {
 		throw new Error(`error: ${error}`);
 	}
@@ -35,6 +36,8 @@ export const generateTestProject = async (
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
 
 	await installDependencies(projectPath, packageNames, localPackages);
+
+	return projectInit;
 };
 
 export async function getContainerName(dockerName: string): Promise<string> {
@@ -58,6 +61,11 @@ export async function getContainerID(dockerName: string): Promise<string> {
 	const containerInfoArray = dockerContainerInfo.split('   ');
 	const dockerContainerID = containerInfoArray[0];
 	return dockerContainerID;
+}
+
+export function itemArrayInTable(regex: RegExp, inputTable: { stdout: string; stderr: string }): string[] {
+	const matchArray = [...inputTable.stdout.matchAll(regex)];
+	return Array.from(matchArray, item => item[0]);
 }
 
 // The solution was taken from this source:
@@ -95,27 +103,34 @@ export async function checkContractExistsOnNetwork(contractAddress: string, netw
 	}
 }
 
+export async function checkContractBalanceOnNetwork(
+	contractAddress: string,
+	networkNodeURL: string,
+): Promise<number[] | null> {
+	const tezos = new TezosToolkit(networkNodeURL);
+	const balance = await tezos.tz.getBalance(contractAddress);
+	return balance.c;
+}
+
 export async function installDependencies(
 	projectPath: string,
 	packageNames: string[],
 	localPackages: boolean = true,
 ) {
-	if (packageNames.length > 0) {
-		for (const packageName of packageNames) {
-			try {
-				if (localPackages) {
-					execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
-						cwd: `./${projectPath}`,
-						encoding: 'utf8',
-					});
-				} else {
-					execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
-				}
-			} catch (error) {
-				throw new Error(`error: ${error}`);
+	for (const packageName of packageNames) {
+		try {
+			if (localPackages) {
+				execSync(`taq install ../../../taqueria-plugin-${packageName}`, {
+					cwd: `./${projectPath}`,
+					encoding: 'utf8',
+				});
+			} else {
+				execSync(`taq install @taqueria/plugin-${packageName}`, { cwd: `./${projectPath}` });
 			}
-
-			await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/@taqueria/plugin-${packageName}/index.js`);
+		} catch (error) {
+			throw new Error(`error: ${error}`);
 		}
+
+		await checkFolderExistsWithTimeout(`./${projectPath}/node_modules/@taqueria/plugin-${packageName}/index.js`);
 	}
 }

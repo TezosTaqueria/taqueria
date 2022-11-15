@@ -124,9 +124,9 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 
 const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind): Promise<TableRow[]> =>
 	readFile(getInputFilename(parsedArgs, sourceFile), 'utf8')
-		.then(data => {
+		.then(async data => {
 			if (!data.includes('#include')) {
-				writeFile(
+				await writeFile(
 					getInputFilename(parsedArgs, sourceFile),
 					`#include "${getContractNameForExpr(sourceFile, exprKind)}"\n` + data,
 					'utf8',

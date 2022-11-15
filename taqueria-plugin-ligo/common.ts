@@ -2,6 +2,10 @@ import { getDockerImage } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import { join } from 'path';
 
+export interface LigoOpts extends RequestArgs.ProxyRequestArgs {
+	command: string;
+}
+
 export interface CompileOpts extends RequestArgs.ProxyRequestArgs {
 	sourceFile: string;
 }
@@ -10,9 +14,9 @@ export interface TestOpts extends RequestArgs.ProxyRequestArgs {
 	sourceFile: string;
 }
 
-export type IntersectionOpts = CompileOpts & TestOpts;
+export type IntersectionOpts = LigoOpts & CompileOpts & TestOpts;
 
-type UnionOpts = CompileOpts | TestOpts;
+type UnionOpts = LigoOpts | CompileOpts | TestOpts;
 
 // Points to the latest stable version. Needs to update this as part of our release process
 export const LIGO_DOCKER_IMAGE = getDockerImage('ligolang/ligo:0.51.0', 'TAQ_LIGO_IMAGE');

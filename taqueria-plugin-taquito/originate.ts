@@ -1,8 +1,10 @@
 import {
+	addTzExtensionIfMissing,
+	getContractContent,
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
-	getInitialStorage,
 	sendAsyncErr,
+	sendErr,
 	sendJsonRes,
 	updateAddressAlias,
 } from '@taqueria/node-sdk';
@@ -46,16 +48,20 @@ const getDefaultStorageFilename = (contractName: string): string => {
 
 const getContractInfo = async (parsedArgs: Opts): Promise<ContractInfo> => {
 	const contract = parsedArgs.contract;
+	const contractWithTzExtension = addTzExtensionIfMissing(contract);
+	const contractCode = await getContractContent(parsedArgs, contractWithTzExtension);
+	if (contractCode === undefined) {
+		return sendAsyncErr(
+			`Please generate ${contractWithTzExtension} with one of the compilers (LIGO, SmartPy, Archetype) or write it manually and put it under /${parsedArgs.config.artifactsDir}\n`,
+		);
+	}
 
-	const contractPath = getContractPath(parsedArgs, contract);
-	const contractCode = await readFile(contractPath, 'utf-8');
-
-	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(contract);
-	const contractInitStorage = await getInitialStorage(parsedArgs, storageFilename);
+	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(contractWithTzExtension);
+	const contractInitStorage = await getContractContent(parsedArgs, storageFilename);
 	if (contractInitStorage === undefined) {
 		return sendAsyncErr(
-			`❌ No initial storage file was found for ${contract}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
-				getDefaultStorageFilename(contract)
+			`❌ No initial storage file was found for ${contractWithTzExtension}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
+				getDefaultStorageFilename(contractWithTzExtension)
 			}" in the artifacts directory\nYou can also manually pass a storage file to the originate task using the --storage STORAGE_FILE_NAME option\n`,
 		);
 	}
