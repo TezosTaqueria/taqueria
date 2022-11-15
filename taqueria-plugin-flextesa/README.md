@@ -17,7 +17,7 @@ Some helpful things to know:
 
 ## Requirements
 
-- Taqueria v0.24.0 or later
+- Taqueria v0.24.1 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
 

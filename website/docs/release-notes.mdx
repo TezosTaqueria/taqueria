@@ -2,13 +2,13 @@
 title: Taqueria Releases
 ---
 
-## Taqueria v0.24.0  
+## Taqueria v0.24.1  
 
 | Details     |               |
 | ----------- | ------------- |
 |Release Date | Nov 15, 2022  |
 |Release Type | Minor         |
-|Release Page | [v0.24.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.24.0) |
+|Release Page | [v0.24.1](https://github.com/ecadlabs/taqueria/releases/tag/v0.24.1) |
 
 ### Summary of Impactful Changes
 
@@ -73,7 +73,7 @@ This task allows you to run arbitrary octez-client native commands, but they mig
 #### The `taq clean` Task `@taqueria/plugin-core`
 
 :::note
-As of Taqueria v0.24.0, this plugin will be installed when `taq init` or `taq scaffold` is called
+As of Taqueria v0.24.1, this plugin will be installed when `taq init` or `taq scaffold` is called
 :::
 
 ##### Installation
@@ -110,7 +110,7 @@ This task will delete all Taqueria-related states and docker images
 
 ### Migrating from Legacy Versions
 
-To upgrade, you must download Taqueria v0.24.0 binary, replacing the legacy version
+To upgrade, you must download Taqueria v0.24.1 binary, replacing the legacy version
 
 This can be done by following these steps:
 
@@ -126,7 +126,7 @@ sudo cd /usr/local/bin
 sudo rm taq
 ```
 
-3) Download the appropriate Taqueria v0.24.0 binary for your operating system
+3) Download the appropriate Taqueria v0.24.1 binary for your operating system
 
 ```shell
 sudo curl -LO https://taqueria.io/get/macos/taq
@@ -141,7 +141,7 @@ taq clean
 ```
 :::
 
-You can update your existing projects to use Taqueria v0.24.0 plugins using the following command:
+You can update your existing projects to use Taqueria v0.24.1 plugins using the following command:
 
 ```shell
 plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 1 taq uninstall && echo $plugins | xargs -n 1 taq install
