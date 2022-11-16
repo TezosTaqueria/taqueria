@@ -2,7 +2,7 @@
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
 import { Instruction, int } from './type-aliases';
 
-type Storage = {
+export type Storage = {
     currentValue: int;
     modifyValue: Instruction[];
 };
