@@ -91,7 +91,7 @@ jobs:
            os_short: windows
            deno_target: "x86_64-pc-windows-msvc"
            taqueria_bin: "taq.exe"
-         - os: macOS-latest
+         - os: ecad-macmini
            os_short: macos
            deno_target: "x86_64-apple-darwin"
            taqueria_bin: "taq"
