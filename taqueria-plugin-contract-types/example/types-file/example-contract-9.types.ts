@@ -2,7 +2,7 @@
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
 import { address, BigMap, MMap, nat } from './type-aliases';
 
-type Storage = {
+export type Storage = {
     0: BigMap<address, {
         0: nat;
         1: MMap<address, nat>;

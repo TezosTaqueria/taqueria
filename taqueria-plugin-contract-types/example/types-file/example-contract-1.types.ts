@@ -2,7 +2,7 @@
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
 import { address, BigMap, int, mutez, nat, timestamp } from './type-aliases';
 
-type Storage = {
+export type Storage = {
     pauseable_admin?: {
         admin: address;
         paused: boolean;

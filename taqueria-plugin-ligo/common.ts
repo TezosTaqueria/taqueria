@@ -19,7 +19,7 @@ export type IntersectionOpts = LigoOpts & CompileOpts & TestOpts;
 type UnionOpts = LigoOpts | CompileOpts | TestOpts;
 
 // Points to the latest stable version. Needs to update this as part of our release process
-export const LIGO_DOCKER_IMAGE = getDockerImage('ligolang/ligo:0.51.0', 'TAQ_LIGO_IMAGE');
+export const LIGO_DOCKER_IMAGE = getDockerImage('ligolang/ligo:0.55.0', 'TAQ_LIGO_IMAGE');
 
 export const getInputFilename = (parsedArgs: UnionOpts, sourceFile: string): string =>
 	join(parsedArgs.config.contractsDir, sourceFile);

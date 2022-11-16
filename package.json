@@ -45,8 +45,6 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"devDependencies": {
-		"@parcel/packager-ts": "^2.6.1",
-		"@parcel/transformer-typescript-types": "^2.6.1",
 		"chokidar-cli": "^3.0.0",
 		"dprint": "^0.27.1",
 		"eta": "^1.12.3",
