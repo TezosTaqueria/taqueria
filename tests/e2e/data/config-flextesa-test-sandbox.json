@@ -26,7 +26,7 @@
 		"local": {
 			"label": "Local Tezos Sandbox",
 			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-			"rpcUrl": "http://localhost:20000",
+			"rpcUrl": "http://localhost:20020",
 			"tzkt": {
 				"disableAutostartWithSandbox": false,
 				"postgresqlPort":5432,
