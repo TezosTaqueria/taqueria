@@ -168,7 +168,7 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 		.then(() => compileExprs(parsedArgs, storageListFile, 'storage'))
 		.catch(() => {
 			sendWarn(
-				`Note: storage file associated with "${sourceFile}" can't be found, so we just created "${storageListFile}" for you. Use this file to define initial storage values as a list of LIGO variable definitions, the first of which will be considered the default storage. e.g. "let STORAGE_NAME: STORAGE_TYPE = LIGO_EXPR" for CameLigo syntax\n`,
+				`Note: storage file associated with "${sourceFile}" can't be found, so "${storageListFile}" has been created for you. Use this file to define initial storage values as a list of LIGO variable definitions, the first of which will be considered the default storage. e.g. "let STORAGE_NAME: STORAGE_TYPE = LIGO_EXPR" for CameLigo syntax\n`,
 			);
 			writeFile(storageListFilename, `#include "${sourceFile}"\n`, 'utf8');
 		});
@@ -177,7 +177,7 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 		.then(() => compileExprs(parsedArgs, parameterListFile, 'parameter'))
 		.catch(() => {
 			sendWarn(
-				`Note: parameter file associated with "${sourceFile}" can't be found, so we just created "${parameterListFile}" for you. Use this file to define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: PARAMETER_TYPE = LIGO_EXPR" for CameLigo syntax\n`,
+				`Note: parameter file associated with "${sourceFile}" can't be found, so "${parameterListFile}" has been created for you. Use this file to define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: PARAMETER_TYPE = LIGO_EXPR" for CameLigo syntax\n`,
 			);
 			writeFile(parameterListFilename, `#include "${sourceFile}"\n`, 'utf8');
 		});
