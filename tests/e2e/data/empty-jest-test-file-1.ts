@@ -7,3 +7,5 @@ describe('dummy test for jest plugin testing', () => {
 		}
 	});
 });
+
+export {}
