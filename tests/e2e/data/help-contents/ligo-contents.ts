@@ -15,8 +15,8 @@ Commands:
                                    from the abstractions provided by Taqueria
   taq compile <sourceFile>        Compile a smart contract written in a LIGO syn
                                   tax to Michelson code, along with its associat
-                                  ed storage/parameter list files if th
-                                  ey are found        [aliases: c, compile-ligo]
+                                  ed storage/parameter list files if they are fo
+                                  und                 [aliases: c, compile-ligo]
   taq test <sourceFile>           Test a smart contract written in LIGO
   taq create <template>           Create files from pre-existing templates
 
