@@ -14,10 +14,10 @@ const isStorageKind = (exprKind: ExprKind): boolean => exprKind === 'storage' ||
 const isLIGOFile = (sourceFile: string): boolean => /.+\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
 
 const isStorageListFile = (sourceFile: string): boolean =>
-	/.+\.storageList\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
+	/.+\.(storageList|storages)\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
 
 const isParameterListFile = (sourceFile: string): boolean =>
-	/.+\.parameterList\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
+	/.+\.(parameterList|parameters)\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
 
 const isContractFile = (sourceFile: string): boolean =>
 	isLIGOFile(sourceFile) && !isStorageListFile(sourceFile) && !isParameterListFile(sourceFile);
@@ -42,8 +42,8 @@ const getOutputFilename = (parsedArgs: Opts, sourceFile: string): string => {
 const getContractNameForExpr = (sourceFile: string, exprKind: ExprKind): string => {
 	try {
 		return isStorageKind(exprKind)
-			? sourceFile.match(/.+(?=\.storageList\.(ligo|religo|mligo|jsligo))/)!.join('.')
-			: sourceFile.match(/.+(?=\.parameterList\.(ligo|religo|mligo|jsligo))/)!.join('.');
+			? sourceFile.match(/.+(?=\.(?:storageList|storages)\.(ligo|religo|mligo|jsligo))/)!.join('.')
+			: sourceFile.match(/.+(?=\.(?:parameterList|parameters)\.(ligo|religo|mligo|jsligo))/)!.join('.');
 	} catch (err) {
 		throw new Error(`Something went wrong internally when dealing with filename format: ${err}`);
 	}
@@ -155,17 +155,39 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 		})
 		.then(mergeArtifactsOutput(sourceFile));
 
+// TODO: Just for backwards compatibility. Can be deleted in the future.
+const tryLegacyStorageNamingConvention = (parsedArgs: Opts, sourceFile: string) => {
+	const storageListFile = `${removeExt(sourceFile)}.storages${extractExt(sourceFile)}`;
+	const storageListFilename = getInputFilename(parsedArgs, storageListFile);
+	return access(storageListFilename).then(() => {
+		sendWarn(
+			`Warning: The naming convention of "<CONTRACT>.storages.<EXTENSION>" is deprecated and renamed to "<CONTRACT>.storageList.<EXTENSION>". Please adjust your storage file names accordingly\n`,
+		);
+		return compileExprs(parsedArgs, storageListFile, 'storage');
+	});
+};
+
+// TODO: Just for backwards compatibility. Can be deleted in the future.
+const tryLegacyParameterNamingConvention = (parsedArgs: Opts, sourceFile: string) => {
+	const parameterListFile = `${removeExt(sourceFile)}.parameters${extractExt(sourceFile)}`;
+	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
+	return access(parameterListFilename).then(() => {
+		sendWarn(
+			`Warning: The naming convention of "<CONTRACT>.parameters.<EXTENSION>" is deprecated and renamed to "<CONTRACT>.parameterList.<EXTENSION>". Please adjust parameter file names accordingly\n`,
+		);
+		return compileExprs(parsedArgs, parameterListFile, 'parameter');
+	});
+};
+
 const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile);
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
 
 	const storageListFile = `${removeExt(sourceFile)}.storageList${extractExt(sourceFile)}`;
-	const parameterListFile = `${removeExt(sourceFile)}.parameterList${extractExt(sourceFile)}`;
 	const storageListFilename = getInputFilename(parsedArgs, storageListFile);
-	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
-
 	const storageCompileResult = await access(storageListFilename)
 		.then(() => compileExprs(parsedArgs, storageListFile, 'storage'))
+		.catch(() => tryLegacyStorageNamingConvention(parsedArgs, sourceFile))
 		.catch(() => {
 			sendWarn(
 				`Note: storage file associated with "${sourceFile}" can't be found, so "${storageListFile}" has been created for you. Use this file to define initial storage values as a list of LIGO variable definitions, the first of which will be considered the default storage. e.g. "let STORAGE_NAME: STORAGE_TYPE = LIGO_EXPR" for CameLigo syntax\n`,
@@ -173,8 +195,11 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 			writeFile(storageListFilename, `#include "${sourceFile}"\n`, 'utf8');
 		});
 
+	const parameterListFile = `${removeExt(sourceFile)}.parameterList${extractExt(sourceFile)}`;
+	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
 	const parameterCompileResult = await access(parameterListFilename)
 		.then(() => compileExprs(parsedArgs, parameterListFile, 'parameter'))
+		.catch(() => tryLegacyParameterNamingConvention(parsedArgs, sourceFile))
 		.catch(() => {
 			sendWarn(
 				`Note: parameter file associated with "${sourceFile}" can't be found, so "${parameterListFile}" has been created for you. Use this file to define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: PARAMETER_TYPE = LIGO_EXPR" for CameLigo syntax\n`,
