@@ -1,3 +1,6 @@
+import createType from '@taqueria/protocol/Base';
+import type { i18n } from '@taqueria/protocol/i18n';
+import { E_TaqError, TaqError } from '@taqueria/protocol/TaqError';
 import {
 	Command,
 	Config,
@@ -10,10 +13,7 @@ import {
 	PluginResponseEncoding,
 	Task,
 	Verb,
-} from '@taqueria/protocol-types';
-import createType from '@taqueria/protocol/Base';
-import type { i18n } from '@taqueria/protocol/i18n';
-import { E_TaqError, TaqError } from '@taqueria/protocol/TaqError';
+} from '@taqueria/protocol/types';
 import { attemptP, FutureInstance as Future, mapRej, promise } from 'fluture';
 import { z } from 'zod';
 

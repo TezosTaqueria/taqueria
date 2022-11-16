@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/Alias';
+export * from '@taqueria/protocol/types/out/types/Alias';

@@ -1,10 +1,10 @@
-import { RequestArgs } from '@taqueria/protocol-types/types';
-import { PluginDependenciesResponse, PluginProxyResponse } from '@taqueria/protocol-types/types';
 import * as Alias from '@taqueria/protocol/Alias';
 import createType from '@taqueria/protocol/Base';
 import * as Operation from '@taqueria/protocol/Operation';
 import * as PluginInfo from '@taqueria/protocol/PluginInfo';
 import * as Template from '@taqueria/protocol/Template';
+import { RequestArgs } from '@taqueria/protocol/types/types';
+import { PluginDependenciesResponse, PluginProxyResponse } from '@taqueria/protocol/types/types';
 import { z } from 'zod';
 
 const internalSchema = PluginInfo.internalSchema.extend({

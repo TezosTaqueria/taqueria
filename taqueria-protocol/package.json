@@ -39,11 +39,27 @@
 		"./*.js": {
 			"import": "./*.mjs",
 			"default": "./*.js"
+		},
+		"./types": "./types/index.js",
+		"./types/*": {
+			"import": "./types/*.mjs",
+			"default": "./types/*.js"
+		},
+		"./types/*.js": {
+			"import": "./types/*.mjs",
+			"default": "./types/*.js"
+		},
+		"./types/out/*": {
+			"import": "./types/out/*.mjs",
+			"default": "./types/out/*.js"
+		},
+		"./types/out/types/*": {
+			"import": "./types/out/types/*.mjs",
+			"default": "./types/out/types/*.js"
 		}
 	},
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.4.0",
-		"@taqueria/protocol-types": "^0.20.2",
 		"batching-toposort": "^1.2.0",
 		"fluture": "^14.0.0",
 		"rambda": "^7.2.1",
@@ -53,7 +69,10 @@
 	},
 	"tsup": {
 		"entry": [
-			"[!.]+.ts"
+			"[!.]+.ts",
+			"types/[!.]+.ts",
+			"types/out/types/*.ts",
+			"types/out/*.ts"
 		],
 		"sourcemap": true,
 		"target": "node16",

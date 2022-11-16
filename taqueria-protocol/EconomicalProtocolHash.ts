@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/EconomicalProtocolHash';
+export * from '@taqueria/protocol/types/out/types/EconomicalProtocolHash';

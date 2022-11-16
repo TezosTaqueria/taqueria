@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/NetworkConfig';
+export * from '@taqueria/protocol/types/out/types/NetworkConfig';
