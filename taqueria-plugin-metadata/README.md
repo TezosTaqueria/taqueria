@@ -4,7 +4,7 @@ The Taqueria Metadata plugin provides an easy way to create a json file containi
 
 ## Requirements
 
-- Taqueria v0.22.2 or later
+- Taqueria v0.24.1 or later
 - Node.js v16.17.1 or later
 
 ## Installation
