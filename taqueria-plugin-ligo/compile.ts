@@ -173,7 +173,7 @@ const tryLegacyParameterNamingConvention = (parsedArgs: Opts, sourceFile: string
 	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
 	return access(parameterListFilename).then(() => {
 		sendWarn(
-			`Warning: The naming convention of "<CONTRACT>.parameters.<EXTENSION>" is deprecated and renamed to "<CONTRACT>.parameterList.<EXTENSION>". Please adjust parameter file names accordingly\n`,
+			`Warning: The naming convention of "<CONTRACT>.parameters.<EXTENSION>" is deprecated and renamed to "<CONTRACT>.parameterList.<EXTENSION>". Please adjust your parameter file names accordingly\n`,
 		);
 		return compileExprs(parsedArgs, parameterListFile, 'parameter');
 	});
