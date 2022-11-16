@@ -62,13 +62,18 @@ Commands:
 | Tezos Client   | `@taqueria/plugin-tezos-client`   | Interacts with a Tezos node, providing simulation and type checking |
 | Jest           | `@taqueria/plugin-jest`           | A Jest plugin for testing smart contracts                           |
 | IPFS Pinata    | `@taqueria/plugin-ipfs-pinata`    | Uploads files to IPFS via Pinata                                    |
+| Metadata       | `@taqueria/plugin-metadata`       | Generates tzip compliant contract metadata                          |
+| CORE           | `@taqueria/plugin-core`           | Contains helper methods and internal tasks                          |
+
 
 ## Working with LIGO Smart Contracts
 
 To add support for the LIGO smart contract language, install the LIGO plugin by running:
+
 ```shell
 taq install @taqueria/plugin-ligo
 ```
+
 Once installed the plugin provides a template to easily create and register a boilerplate LIGO contract using the `taq create contract` task.
 
 If you already have contracts written and want to compile them you will just need to register them with the `taq add-contract <sourceFile>` task.
@@ -88,7 +93,9 @@ You can see that the contract has been registered by running:
 ```shell
 taq list-contracts
 ```
+
 Taqueria will output that a contract has been registered:
+
 ```shell
 ┌────────────────┬────────────────┬─────────────────┐
 │ Name           │ Source File    │ Last Known Hash │
@@ -129,11 +136,13 @@ const main = ([action, store] : [parameter, storage]) : ret => {
 ```
 
 You can now compile this contract by running the following command from the project directory:
+
 ```shell
 taq compile
 ```
 
 Taqueria will then output a list of contracts compiled, and the artifacts created:
+
 ```shell
 ❯ taq compile                     
 ┌────────────────┬──────────────────────┐
@@ -144,6 +153,7 @@ Taqueria will then output a list of contracts compiled, and the artifacts create
 ```
 
 If you open this file (`/artifacts/counter.tz`), you can view the raw Michelson code which will later be originated to the sandbox:
+
 ```
 { parameter (or (or (int %decrement) (int %increment)) (unit %reset)) ;
   storage int ;
@@ -156,11 +166,13 @@ If you open this file (`/artifacts/counter.tz`), you can view the raw Michelson 
 ### Starting a Flextesa Sandbox
 
 The next step is to install the Flextesa plugin which provides a local Tezos sandbox network:
+
 ```shell
 taq install @taqueria/plugin-flextesa
 ```
 
 Once installed, the plugin provides three commands to start, stop, and query a sandbox:
+
 - `taq start sandbox [sandboxName]`
 - `taq stop sandbox [sandboxName]`
 - `taq list accounts [sandboxName]`
@@ -171,17 +183,20 @@ By default, every Taqueria project comes pre-configured with a sandbox named `lo
 :::
 
 Start up the sandbox named `local` by running:
+
 ```shell
 taq start sandbox local
 ```
 
 To confirm the sandbox is running, query the sandbox for the account information:
+
 ```shell
 taq list accounts local
 ```
 
 If successful, you will see a list of the accounts and balances specified in the `config.json` file that have been created on the Tezos blockchain in the sandbox:
-```
+
+```shell
 ❯ taq list accounts local
 ┌─────────┬─────────┬──────────────────────────────────────┐
 │ Account │ Balance │ Address                              │
@@ -203,19 +218,23 @@ If successful, you will see a list of the accounts and balances specified in the
 With a sandbox now running, the next step is to originate the `counter.tz` file to the sandbox network using the Taquito plugin
 
 First, install the plugin:
+
 ```shell
 taq install @taqueria/plugin-taquito
 ```
 
 Next, you need to configure some values for origination:
+
 - The initial storage for the smart contract 
 - The name of the sandbox to target (by default it is pre-configured to the sandbox named `local`)
+
 :::note
-As the default configuration comes with the sandbox named `local` preconfigured, simply provide a value for the initial storage in the `"storage"` property 
+As the default configuration comes with the sandbox named `local` preconfigured, simply provide a value for the initial storage in the `"storage"` property
 :::
 
 To set these values in Taqueria, navigate to the file `./.taq/config.json` and locate the `"environment"` property. For the `counter.tz` contract, simply need to provide an integer value for the `counter.tz` file which looks like this:
-```
+
+```json
     "environment": {
         "default": "development",
         "development": {
@@ -231,11 +250,13 @@ To set these values in Taqueria, navigate to the file `./.taq/config.json` and l
 ```
 
 Now you can originate the contract by running:
+
 ```shell
 taq originate
 ```
 
 This will originate all contracts in the `/artifacts` directory to the sandbox and return the on-chain addresses for the originated contracts. This will look something like this:
+
 ```shell
 ┌────────────┬──────────────────────────────────────┬─────────────┐
 │ Contract   │ Address                              │ Destination │
