@@ -3,7 +3,7 @@ import { RequestArgs } from '@taqueria/node-sdk/types';
 import { join } from 'path';
 
 export const getFlextesaImage = (arch: 'linux/arm64/v8' | 'linux/amd64'): string =>
-	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:rc-20220915-arm64' : 'oxheadalpha/flextesa:20220715';
+	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:20221026' : 'oxheadalpha/flextesa:20221026';
 
 export const DOCKER_IMAGE = getDockerImage(getFlextesaImage(getArchSync()), 'TAQ_TEZOS_CLIENT_IMAGE');
 export interface ClientOpts extends RequestArgs.ProxyRequestArgs {

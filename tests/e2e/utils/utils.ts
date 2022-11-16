@@ -1,5 +1,4 @@
 import { TezosToolkit } from '@taquito/taquito';
-import retry from 'async-retry';
 import { exec as exec1, execSync } from 'child_process';
 import fsPromises from 'fs/promises';
 import path from 'path';
@@ -72,24 +71,16 @@ export function itemArrayInTable(regex: RegExp, inputTable: { stdout: string; st
 // https://stackoverflow.com/questions/26165725/nodejs-check-file-exists-if-not-wait-till-it-exist
 // It is pull&wait mechanism and it is async by nature, because
 // there is no fs.watch sync solution
-export async function checkFolderExistsWithTimeout(filePath: string) {
-	// return new Promise<void>(async function (resolve, reject): Promise<void> {
-
-	try {
-		const dir = filePath;
-
-		await retry(
-			async () => {
-				const watcher = await fsPromises.stat(dir);
-				return (watcher.birthtime !== undefined);
-			},
-			{
-				retries: 10,
-				maxTimeout: 1000,
-			},
-		);
-	} catch (error) {
-		throw new Error(`error: ${error}`);
+export async function checkFolderExistsWithTimeout(filePath: string, attempts = 0) {
+	while (true) {
+		try {
+			const dir = filePath;
+			const watcher = await fsPromises.stat(dir);
+			break;
+		} catch (e) {
+			if (attempts < 5) await sleep(1000);
+			else throw e;
+		}
 	}
 }
 
