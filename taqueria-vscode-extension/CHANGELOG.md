@@ -1,5 +1,82 @@
 # Change Log
 
+## Taqueria v0.24.2  
+
+| Details     |               |
+| ----------- | ------------- |
+|Release Date | Nov 17, 2022  |
+|Release Type | Minor         |
+|Release Page | [v0.24.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.24.2) |
+
+### Summary of Impactful Changes
+
+- Ligo storage and parameter files are now created by default (ignored during compilation if they remain empty)
+- The naming convention for Storage and Parameter Ligo source files now includes `storageList` and `parameterList`
+- The version of Ligo used in the Ligo plugin has been downgraded to `v0.54.1` due to instability in `v0.55.0`
+- A mechanism to override the docker images used by plugins via `.env` variables has been added
+
+### New Features
+
+#### Override Docker Images Used by Plugins
+
+Taqueria now provides the means to override the docker images used by Taqueria plugins via `.env` variables
+
+The available constants you can set in `./env` are:
+
+- TAQ_FLEXTESA_IMAGE environment variable to override the default image for the flextesa plugin
+- TAQ_ARCHETYPE_IMAGE environment variable to override the default image for the archetype plugin
+- TAQ_LIGO_IMAGE environment variable to override the default image for the ligo plugin
+- TAQ_TEZOS_CLIENT_IMAGE environment variable to override the default image for the tezos client plugin
+
+### Bug Fixes
+
+- Tests now use compliant TS modules
+
+### Other Product Changes
+
+- A `quickstart.md` file is no longer created on `taq init`
+- 
+
+### Migrating from Legacy Versions
+
+To upgrade, you must download Taqueria v0.24.2 binary, replacing the legacy version
+
+This can be done by following these steps:
+
+1) Change into the installation directory
+
+```shell
+sudo cd /usr/local/bin
+```
+
+2) Remove the existing `taq` binary
+
+```shell
+sudo rm taq
+```
+
+3) Download the appropriate Taqueria v0.24.2 binary for your operating system
+
+```shell
+sudo curl -LO https://taqueria.io/get/macos/taq
+sudo curl -LO https://taqueria.io/get/linux/taq
+```
+
+:::warning
+The Flextesa plugin can hang or crash if old docker images exist on your machine. Install the new `@taqueria/plugin-core` plugin on the project, then run the following command to remove legacy images from your system
+
+```shell
+taq clean
+```
+
+:::
+
+You can update your existing projects to use Taqueria v0.24.2 plugins using the following command:
+
+```shell
+plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 1 taq uninstall && echo $plugins | xargs -n 1 taq install
+```
+
 ## Taqueria v0.24.1  
 
 | Details     |               |
