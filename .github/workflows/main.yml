@@ -68,7 +68,6 @@ jobs:
       #   with:
       #     path: ./node_modules/**
       #     key: cache-node-modules-${{ github.run_id }}
-      # COMMENT FOR TESTS
 
   build-binaries:
     name: Build Taqueria binaries
@@ -189,12 +188,13 @@ jobs:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
   run-tests:
-    name: OS ${{ matrix.os }} tests
+    name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, ecad-macmini]
+        chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
         include:
         - os: ubuntu-latest
           url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
@@ -237,16 +237,16 @@ jobs:
           npm run build:packages 
           deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
           npm run build:docker
-# Comment to run tests
 
       - name: Run unit tests
         run: npm run test:unit -w tests
 
       - name: Run integration tests
         run: npm run test:integration -w tests
-
       - name: Run e2e tests
-        run: npm run test:e2e -w tests
+        run: npm run test:e2e -w tests ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
+        env:
+          CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
 
   report-e2e-status:
     needs: run-tests
