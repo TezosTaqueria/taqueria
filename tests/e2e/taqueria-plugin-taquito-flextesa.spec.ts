@@ -20,6 +20,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 
 		console.log(await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` }));
+		await sleep(10000)
 		console.log(await exec(`docker ps -a --no-trunc`))
 	});
 
