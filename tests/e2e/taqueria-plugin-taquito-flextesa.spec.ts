@@ -1,7 +1,6 @@
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import utils from 'util';
-import { ConsoleLogger } from '../../taqueria-vscode-extension/signalr/dist/esm/Utils';
 import { transferOutput } from './data/help-contents/taquito-flextesa-content';
 import { generateTestProject, getContainerName, itemArrayInTable, sleep } from './utils/utils';
 const exec = utils.promisify(exec1);
@@ -21,7 +20,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 
 		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-		console.log(await exec(`docker ps -a`))
+		console.log(await exec(`docker ps -a --no-trunc`))
 	});
 
 	beforeEach(async () => {
@@ -98,7 +97,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			environment = 'development';
 
 			// 2. Get Bob's and Alice's account addresses
-			console.log(await exec(`docker ps -a`))
+			console.log(await exec(`docker ps -a --no-trunc`))
 			const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 			const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
