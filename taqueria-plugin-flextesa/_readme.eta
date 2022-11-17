@@ -34,6 +34,10 @@ taq install @taqueria/plugin-flextesa
 
 Once installed, you can confirm functionality by runing the command `taq start sandbox` which will start a sandbox with the default `local` configuration
 
+<%~ it.noteOpenAdmonition %>
+You can override the Flextesa version used by the plugin by creating the environment variable `TAQ_FLEXTESA_IMAGE` and setting it to your desired Flextesa Docker image
+<%= it.closeAdmonition %>
+
 ## CLI Commands
 
 The Flextesa plugin allows you to start, stop, and query the sandboxes configured in `.taq/config.json` from the CLI

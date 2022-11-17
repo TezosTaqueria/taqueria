@@ -21,7 +21,7 @@
 
 Taqueria now provides the means to override the docker images used by Taqueria plugins via `.env` variables
 
-The available constants you can set in `./env` are:
+The available constants you can set in a `./.env` file are:
 
 - TAQ_FLEXTESA_IMAGE environment variable to override the default image for the flextesa plugin
 - TAQ_ARCHETYPE_IMAGE environment variable to override the default image for the archetype plugin

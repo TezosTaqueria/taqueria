@@ -17,6 +17,10 @@ To install the Archetype plugin on a Taqueria project, navigate to the project f
 taq install @taqueria/plugin-archetype
 ```
 
+<%~ it.noteOpenAdmonition %>
+You can override the Archetype version used by the plugin by creating the environment variable `TAQ_ARCHETYPE_IMAGE` and setting it to your desired Ligo Docker image
+<%= it.closeAdmonition %>
+
 ## Configuration
 
 No additional configuration is available
