@@ -13,7 +13,7 @@ title: Taqueria Releases
 ### Summary of Impactful Changes
 
 - Ligo storage and parameter files are now created by default (ignored during compilation if they remain empty)
-- The naming convention for Storage and Parameter Ligo source files now includes `storageList` and `parameterList`
+- The new naming convention for LIGO contract storage and parameter files is `<CONTRACT_NAME>.storageList.<EXTENSION>` and `<CONTRACT_NAME>.parameterList.<EXTENSION>` (`<CONTRACT_NAME>.storages.<EXTENSION>` and `<CONTRACT_NAME>.parameters.<EXTENSION>` will still be supported)
 - The version of Ligo used in the Ligo plugin has been downgraded to `v0.54.1` due to instability in `v0.55.0`
 - A mechanism to override the docker images used by plugins via `.env` variables has been added
 
