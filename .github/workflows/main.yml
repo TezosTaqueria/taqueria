@@ -189,30 +189,22 @@ jobs:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
   run-tests:
-    name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
+    name: OS ${{ matrix.os }} tests
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
       matrix:
         os: [ubuntu-latest, ecad-macmini]
-        chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
         include:
         - os: ubuntu-latest
           url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
-          cache_path: |
-            ~/.deno
-            ~/.cache/deno
         - os: ecad-macmini
           url: ${{ needs.build-binaries.outputs.public-url-macos }}
           final-name: taq
           make-executable-cmd: chmod +x
           get-current-dir: echo "$(pwd)"
-          cache_path: |
-            ~/.deno
-            ~/Library/Caches/deno
 
     env:
       UNLIMITED_PINATA_TOKEN: ${{ secrets.PINATA_JWT_TOKEN }}
@@ -253,9 +245,7 @@ jobs:
         run: npm run test:integration -w tests
 
       - name: Run e2e tests
-        run: npm run test:e2e -w tests ${{ fromJSON(env.CHUNKS)[matrix.chunk-ids] }}
-        env:
-          CHUNKS: ${{ needs.gather-info-for-e2e-tests.outputs['test-chunks-formatted'] }}
+        run: npm run test:e2e -w tests
 
   report-e2e-status:
     needs: run-tests
