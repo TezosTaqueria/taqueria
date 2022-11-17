@@ -37,6 +37,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
+		console.log(deployCommand);
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 		// 2. Verify that contract has been originated on the network
@@ -201,6 +202,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 				cwd: `./${taqueriaProjectPath}`,
 			});
+			console.log(deployCommand);
 			const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 			// 5. Get the KT address from the output
