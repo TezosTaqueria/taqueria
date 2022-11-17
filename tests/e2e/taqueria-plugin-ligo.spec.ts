@@ -162,6 +162,26 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
+	test('Verify that a different version of the LIGO image can be used', async () => {
+		const imageName = 'ligolang/ligo:0.54.1';
+
+		const result = await exec(`TAQ_LIGO_IMAGE=${imageName} taq get-image --plugin ligo`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		expect(result.stdout.trim()).toBe(imageName);
+
+		// 1. Copy contract from data folder to taqueria project folder
+		const contractName = 'hello-custom-image.mligo';
+		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/${contractName}`);
+
+		// 2. Run taq compile ${contractName}
+		await exec(`taq compile ${contractName}`, { cwd: `./${taqueriaProjectPath}` });
+
+		// 3. Verify that compiled michelson version has been generated
+		await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/${contractName.replace('mligo', 'tz')}`);
+	});
+
 	test('Verify that the LIGO contract template is instantiated with the right content and registered', async () => {
 		try {
 			await exec(`taq create contract counter.mligo`, { cwd: `./${taqueriaProjectPath}` });

@@ -17,7 +17,6 @@ describe('E2E Testing for taqueria general functionality', () => {
 			const taquifiedDirContents = await fsPromises.readdir(taqueriaProjectPath);
 			expect(taquifiedDirContents).toContain('artifacts');
 			expect(taquifiedDirContents).toContain('contracts');
-			expect(taquifiedDirContents).toContain('quickstart.md');
 
 			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		} catch (error) {

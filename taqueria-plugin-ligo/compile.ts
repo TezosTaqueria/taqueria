@@ -13,13 +13,14 @@ const isStorageKind = (exprKind: ExprKind): boolean => exprKind === 'storage' ||
 
 const isLIGOFile = (sourceFile: string): boolean => /.+\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
 
-const isStoragesFile = (sourceFile: string): boolean => /.+\.storages\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
+const isStorageListFile = (sourceFile: string): boolean =>
+	/.+\.(storageList|storages)\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
 
-const isParametersFile = (sourceFile: string): boolean =>
-	/.+\.parameters\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
+const isParameterListFile = (sourceFile: string): boolean =>
+	/.+\.(parameterList|parameters)\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
 
 const isContractFile = (sourceFile: string): boolean =>
-	isLIGOFile(sourceFile) && !isStoragesFile(sourceFile) && !isParametersFile(sourceFile);
+	isLIGOFile(sourceFile) && !isStorageListFile(sourceFile) && !isParameterListFile(sourceFile);
 
 const extractExt = (path: string): string => {
 	const matchResult = path.match(/\.(ligo|religo|mligo|jsligo)$/);
@@ -37,18 +38,18 @@ const getOutputFilename = (parsedArgs: Opts, sourceFile: string): string => {
 };
 
 // Get the contract name that the storage/parameter file is associated with
-// e.g. If sourceFile is token.storages.mligo, then it'll return token.mligo
+// e.g. If sourceFile is token.storageList.mligo, then it'll return token.mligo
 const getContractNameForExpr = (sourceFile: string, exprKind: ExprKind): string => {
 	try {
 		return isStorageKind(exprKind)
-			? sourceFile.match(/.+(?=\.storages\.(ligo|religo|mligo|jsligo))/)!.join('.')
-			: sourceFile.match(/.+(?=\.parameters\.(ligo|religo|mligo|jsligo))/)!.join('.');
+			? sourceFile.match(/.+(?=\.(?:storageList|storages)\.(ligo|religo|mligo|jsligo))/)!.join('.')
+			: sourceFile.match(/.+(?=\.(?:parameterList|parameters)\.(ligo|religo|mligo|jsligo))/)!.join('.');
 	} catch (err) {
 		throw new Error(`Something went wrong internally when dealing with filename format: ${err}`);
 	}
 };
 
-// If sourceFile is token.storages.mligo, then it'll return token.storage.{storageName}.tz
+// If sourceFile is token.storageList.mligo, then it'll return token.storage.{storageName}.tz
 const getOutputExprFileName = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind, exprName: string): string => {
 	const contractName = basename(getContractNameForExpr(sourceFile, exprKind), extname(sourceFile));
 	const outputFile = exprKind === 'default_storage'
@@ -93,7 +94,7 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 		})
 		.catch(err => {
 			sendErr(`\n=== For ${sourceFile} ===`);
-			sendErr(err.message.replace(/Command failed.+?\n/, ''));
+			if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
 			return {
 				contract: sourceFile,
 				artifact: COMPILE_ERR_MSG,
@@ -114,7 +115,7 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 			})
 			.catch(err => {
 				sendErr(`\n=== For ${sourceFile} ===`);
-				sendErr(err.message.replace(/Command failed.+?\n/, ''));
+				if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
 				return {
 					contract: sourceFile,
 					artifact: COMPILE_ERR_MSG,
@@ -146,37 +147,64 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 		})
 		.catch(err => {
 			sendErr(`\n=== For ${sourceFile} ===`);
-			sendErr(err.message);
+			if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
 			return [{
 				contract: sourceFile,
-				artifact: `No ${isStorageKind(exprKind) ? 'storages' : 'parameters'} compiled`,
+				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} values compiled`,
 			}];
 		})
 		.then(mergeArtifactsOutput(sourceFile));
+
+// TODO: Just for backwards compatibility. Can be deleted in the future.
+const tryLegacyStorageNamingConvention = (parsedArgs: Opts, sourceFile: string) => {
+	const storageListFile = `${removeExt(sourceFile)}.storages${extractExt(sourceFile)}`;
+	const storageListFilename = getInputFilename(parsedArgs, storageListFile);
+	return access(storageListFilename).then(() => {
+		sendWarn(
+			`Warning: The naming convention of "<CONTRACT>.storages.<EXTENSION>" is deprecated and renamed to "<CONTRACT>.storageList.<EXTENSION>". Please adjust your storage file names accordingly\n`,
+		);
+		return compileExprs(parsedArgs, storageListFile, 'storage');
+	});
+};
+
+// TODO: Just for backwards compatibility. Can be deleted in the future.
+const tryLegacyParameterNamingConvention = (parsedArgs: Opts, sourceFile: string) => {
+	const parameterListFile = `${removeExt(sourceFile)}.parameters${extractExt(sourceFile)}`;
+	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
+	return access(parameterListFilename).then(() => {
+		sendWarn(
+			`Warning: The naming convention of "<CONTRACT>.parameters.<EXTENSION>" is deprecated and renamed to "<CONTRACT>.parameterList.<EXTENSION>". Please adjust your parameter file names accordingly\n`,
+		);
+		return compileExprs(parsedArgs, parameterListFile, 'parameter');
+	});
+};
 
 const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile);
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
 
-	const storagesFile = `${removeExt(sourceFile)}.storages${extractExt(sourceFile)}`;
-	const parametersFile = `${removeExt(sourceFile)}.parameters${extractExt(sourceFile)}`;
-	const storagesFilename = getInputFilename(parsedArgs, storagesFile);
-	const parametersFilename = getInputFilename(parsedArgs, parametersFile);
-
-	const storageCompileResult = await access(storagesFilename)
-		.then(() => compileExprs(parsedArgs, storagesFile, 'storage'))
+	const storageListFile = `${removeExt(sourceFile)}.storageList${extractExt(sourceFile)}`;
+	const storageListFilename = getInputFilename(parsedArgs, storageListFile);
+	const storageCompileResult = await access(storageListFilename)
+		.then(() => compileExprs(parsedArgs, storageListFile, 'storage'))
+		.catch(() => tryLegacyStorageNamingConvention(parsedArgs, sourceFile))
 		.catch(() => {
-			// sendWarn(
-			// 	`Note: storage file associated with "${sourceFile}" can't be found. You should create a file "${storagesFile}" and define initial storage values as a list of LIGO variable definitions. e.g. "let STORAGE_NAME: storage = LIGO_EXPR" for CameLigo`,
-			// )
+			sendWarn(
+				`Note: storage file associated with "${sourceFile}" can't be found, so "${storageListFile}" has been created for you. Use this file to define initial storage values as a list of LIGO variable definitions, the first of which will be considered the default storage. e.g. "let STORAGE_NAME: STORAGE_TYPE = LIGO_EXPR" for CameLigo syntax\n`,
+			);
+			writeFile(storageListFilename, `#include "${sourceFile}"\n`, 'utf8');
 		});
 
-	const parameterCompileResult = await access(parametersFilename)
-		.then(() => compileExprs(parsedArgs, parametersFile, 'parameter'))
+	const parameterListFile = `${removeExt(sourceFile)}.parameterList${extractExt(sourceFile)}`;
+	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
+	const parameterCompileResult = await access(parameterListFilename)
+		.then(() => compileExprs(parsedArgs, parameterListFile, 'parameter'))
+		.catch(() => tryLegacyParameterNamingConvention(parsedArgs, sourceFile))
 		.catch(() => {
-			// sendWarn(
-			// 	`Note: parameter file associated with "${sourceFile}" can't be found. You should create a file "${parametersFile}" and define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: parameter = LIGO_EXPR" for CameLigo`,
-			// )
+			sendWarn(
+				`Note: parameter file associated with "${sourceFile}" can't be found, so "${parameterListFile}" has been created for you. Use this file to define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: PARAMETER_TYPE = LIGO_EXPR" for CameLigo syntax\n`,
+			);
+			writeFile(parameterListFilename, `#include "${sourceFile}"\n`, 'utf8');
 		});
 
 	let compileResults: TableRow[] = [contractCompileResult];
@@ -190,20 +218,20 @@ Compiling storage/parameter file amounts to compiling multiple expressions in th
 resulting in multiple rows with the same file name but different artifact names.
 This will merge these rows into one row with just one mention of the file name.
 e.g.
-┌──────────────────────┬─────────────────────────────────────────────┐
-│ Contract             │ Artifact                                    │
-├──────────────────────┼─────────────────────────────────────────────┤
-│ hello.storages.mligo │ artifacts/hello.default_storage.storage1.tz │
-├──────────────────────┼─────────────────────────────────────────────┤
-│ hello.storages.mligo │ artifacts/hello.storage.storage2.tz         │
-└──────────────────────┴─────────────────────────────────────────────┘
+┌─────────────────────────┬─────────────────────────────────────────────┐
+│ Contract                │ Artifact                                    │
+├─────────────────────────┼─────────────────────────────────────────────┤
+│ hello.storageList.mligo │ artifacts/hello.default_storage.storage1.tz │
+├─────────────────────────┼─────────────────────────────────────────────┤
+│ hello.storageList.mligo │ artifacts/hello.storage.storage2.tz         │
+└─────────────────────────┴─────────────────────────────────────────────┘
 								versus
-┌──────────────────────┬─────────────────────────────────────────────┐
-│ Contract             │ Artifact                                    │
-├──────────────────────┼─────────────────────────────────────────────┤
-│ hello.storages.mligo │ artifacts/hello.default_storage.storage1.tz │
-│                      │ artifacts/hello.storage.storage2.tz         │
-└──────────────────────┴─────────────────────────────────────────────┘
+┌─────────────────────────┬─────────────────────────────────────────────┐
+│ Contract                │ Artifact                                    │
+├─────────────────────────┼─────────────────────────────────────────────┤
+│ hello.storageList.mligo │ artifacts/hello.default_storage.storage1.tz │
+│                         │ artifacts/hello.storage.storage2.tz         │
+└─────────────────────────┴─────────────────────────────────────────────┘
 */
 const mergeArtifactsOutput = (sourceFile: string) =>
 	(tableRows: TableRow[]): TableRow[] => {
@@ -220,8 +248,8 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 const compile = (parsedArgs: Opts): Promise<void> => {
 	const sourceFile = parsedArgs.sourceFile;
 	let p: Promise<TableRow[]>;
-	if (isStoragesFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'storage');
-	else if (isParametersFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'parameter');
+	if (isStorageListFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'storage');
+	else if (isParameterListFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'parameter');
 	else if (isContractFile(sourceFile)) p = compileContractWithStorageAndParameter(parsedArgs, sourceFile);
 	else {
 		return sendAsyncErr(
