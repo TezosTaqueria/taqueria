@@ -223,7 +223,6 @@ export const inject = (deps: PluginDeps) => {
 			(retval: (string | number | boolean)[], [key, val]) => {
 				const omit = [
 					'$0',
-					'quickstart',
 					'version',
 					'build',
 					'scaffoldUrl',
