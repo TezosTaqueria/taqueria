@@ -24,7 +24,6 @@ Deno.test('inject()', async t => {
 		logPluginRequests: true,
 		maxConcurrency: 10,
 		projectDir,
-		quickstart: 'Foo',
 		setBuild: 'foo/bar',
 		setVersion: '1.0.0',
 		version: false,
