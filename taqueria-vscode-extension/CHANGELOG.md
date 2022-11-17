@@ -77,6 +77,24 @@ You can update your existing projects to use Taqueria v0.24.2 plugins using the 
 plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 1 taq uninstall && echo $plugins | xargs -n 1 taq install
 ```
 
+### Pull Requests
+
+- 🚀 Release ➾ Taqueria v0.24.1 by @hu3man in [#1447](https://github.com/ecadlabs/taqueria/pull/1447)
+- Updating tests to become modules for TS requirement by @alexzbusko in [#1500](https://github.com/ecadlabs/taqueria/pull/1500)
+- 🛠️ Fix ➾ Update Taqueria.io Documentation by @hu3man in https://github.com/ecadlabs/taqueria/pull/1496
+- 🧽 Chore ➾ Bump loader-utils from 2.0.2 to 2.0.4 in /website by @dependabot in [#1497](https://github.com/ecadlabs/taqueria/pull/1497)
+- 👷 Refactor ➾ Updates to Docusaurus Docs by @hu3man in [#1506](https://github.com/ecadlabs/taqueria/pull/1506)
+- 🧽 Chore ➾ Update Docusaurus to `v2.2.0` by @hu3man in [#1505](https://github.com/ecadlabs/taqueria/pull/1505)
+- 🛠️ Fix ➾ Do Not Create the `quickstart.md` File on New Taqueria Projects by @jchenche in [#1491](https://github.com/ecadlabs/taqueria/pull/1491)
+- ✨ Feature ➾ Rename `<CONTRACT>.storages.mligo` to `<CONTRACT>.storageList.mligo` and similarly for the parameter part by @jchenche in [#1507](https://github.com/ecadlabs/taqueria/pull/1507)
+- ✨ Feature ➾ Allow docker images to be overwritten via environment variable (#1425) by @mweichert in [#1445](https://github.com/ecadlabs/taqueria/pull/1445)
+
+## New Contributors
+
+- @dependabot made their first contribution in [#1497](https://github.com/ecadlabs/taqueria/pull/1497)
+
+**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.24.1...v0.24.2
+
 ## Taqueria v0.24.1  
 
 | Details     |               |
