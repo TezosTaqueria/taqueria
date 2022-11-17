@@ -16,7 +16,7 @@ import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 import * as SHA256 from '@taqueria/protocol/SHA256';
 import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
-import type { TaqError } from '@taqueria/protocol/TaqError';
+import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
 import * as Template from '@taqueria/protocol/Template';
@@ -47,9 +47,9 @@ export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
 
 export type CmdArgEnv = [string, string[], { [key: string]: string }];
 
-export const eager = <T>(f: Future<TaqError, T>) =>
+export const eager = <T>(f: Future<TaqError.t, T>) =>
 	promise(
-		mapRej((err: TaqError) => new E_TaqError(err))(f),
+		mapRej((err: TaqError.t) => new E_TaqError(err))(f),
 	);
 
 export const writeJsonFile = <T>(filename: string) =>
@@ -85,33 +85,39 @@ export const spawnCmd = (fullCmd: CmdArgEnv): Promise<number | null> =>
 		child.on('error', reject);
 	});
 
-export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError> => {
+export const getArchSync = (): 'linux/arm64/v8' | 'linux/amd64' => {
 	switch (process.arch) {
 		case 'arm64':
-			return Promise.resolve('linux/arm64/v8');
+			return 'linux/arm64/v8';
 		// @ts-ignore: x32 is valid for some versions of NodeJS
 		case 'x32':
 		case 'x64':
-			return Promise.resolve('linux/amd64');
+			return 'linux/amd64';
 		default:
-			return Promise.reject({
-				errCode: 'E_INVALID_ARCH',
-				errMsg: `We do not know how to handle the ${process.arch} architecture`,
-				context: process.arch,
+			throw TaqError.create({
+				kind: 'E_INVALID_ARCH',
+				msg: `The ${process.arch} architecture is not supported at this time.`,
 			});
 	}
 };
 
-export const getFlextesaImage = (arch: 'linux/arm64/v8' | 'linux/amd64'): string =>
-	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:20221026' : 'oxheadalpha/flextesa:20221026';
+export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError.t> =>
+	new Promise((resolve, reject) => {
+		try {
+			const arch = getArchSync();
+			resolve(arch);
+		} catch (e) {
+			reject(e);
+		}
+	});
 
-export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError> =>
+export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError.t> =>
 	new Promise((resolve, reject) => {
 		try {
 			const json = JSON.parse(input);
 			resolve(json);
 		} catch (previous) {
-			const taqErr: TaqError = {
+			const taqErr: TaqError.t = {
 				kind: 'E_INVALID_JSON',
 				msg: `Invalid JSON: ${input}`,
 				previous,
@@ -169,7 +175,7 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 
 export const noop = () => {};
 
-const parseArgs = <T extends RequestArgs.t>(unparsedArgs: string[]): LikeAPromise<T, TaqError> => {
+const parseArgs = <T extends RequestArgs.t>(unparsedArgs: string[]): LikeAPromise<T, TaqError.t> => {
 	if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
 		try {
 			const preprocessedArgs = preprocessArgs(unparsedArgs);

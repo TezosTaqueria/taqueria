@@ -1,8 +1,19 @@
-import { execCmd, getContracts, sendAsyncErr, sendErr, sendJsonRes } from '@taqueria/node-sdk';
+import {
+	execCmd,
+	getContracts,
+	getDockerImage,
+	sendAsyncErr,
+	sendAsyncRes,
+	sendErr,
+	sendJsonRes,
+} from '@taqueria/node-sdk';
 import { RequestArgs, TaqError } from '@taqueria/node-sdk/types';
 import { basename, extname, join } from 'path';
+import { match } from 'ts-pattern';
 
-interface Opts extends RequestArgs.t {
+const DOCKER_IMAGE = getDockerImage('completium/archetype:1.2.12', 'TAQ_ARCHETYPE_IMAGE');
+
+interface Opts extends RequestArgs.ProxyRequestArgs {
 	sourceFile?: string;
 }
 
@@ -23,7 +34,7 @@ const getCompileCommand = (opts: Opts) =>
 		const { projectDir } = opts;
 		const inputFile = getInputFilename(opts)(sourceFile);
 		const baseCommand =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -u $(id -u):$(id -g) -w /project completium/archetype:1.2.12 ${inputFile}`;
+			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -u $(id -u):$(id -g) -w /project ${DOCKER_IMAGE} ${inputFile}`;
 		const outFile = `-o ${getContractArtifactFilename(opts)(sourceFile)}`;
 		const cmd = `${baseCommand} ${outFile}`;
 		return cmd;
@@ -59,19 +70,22 @@ const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[
 		)
 		.then(promises => Promise.all(promises));
 
-const compile = <T>(parsedArgs: Opts) => {
-	const p = parsedArgs.sourceFile
-		? compileContract(parsedArgs)(parsedArgs.sourceFile)
-			.then(result => [result])
-		: compileAll(parsedArgs)
-			.then(results => {
-				if (results.length === 0) sendErr('No contracts found to compile.');
-				return results;
-			});
+const compile = <T>(parsedArgs: Opts) =>
+	match(parsedArgs)
+		.when(opts => opts.task === 'get-image', () => sendAsyncRes(DOCKER_IMAGE))
+		.otherwise(() => {
+			const p = parsedArgs.sourceFile
+				? compileContract(parsedArgs)(parsedArgs.sourceFile)
+					.then(result => [result])
+				: compileAll(parsedArgs)
+					.then(results => {
+						if (results.length === 0) sendErr('No contracts found to compile.');
+						return results;
+					});
 
-	return p
-		.then(sendJsonRes)
-		.catch(err => sendAsyncErr(err, false));
-};
+			return p
+				.then(sendJsonRes)
+				.catch(err => sendAsyncErr(err, false));
+		});
 
 export default compile;

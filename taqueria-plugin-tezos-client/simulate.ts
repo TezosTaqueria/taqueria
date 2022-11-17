@@ -3,7 +3,6 @@ import {
 	execCmd,
 	getArch,
 	getContractContent,
-	getFlextesaImage,
 	getParameter,
 	sendAsyncErr,
 	sendErr,
@@ -12,6 +11,7 @@ import {
 } from '@taqueria/node-sdk';
 import { basename, extname } from 'path';
 import {
+	DOCKER_IMAGE,
 	getCheckFileExistenceCommand,
 	getInputFilename,
 	GLOBAL_OPTIONS,
@@ -58,7 +58,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 	const param = (await getParameter(parsedArgs, paramFilename)).trim();
 
 	const arch = await getArch();
-	const flextesaImage = await getFlextesaImage(arch);
+	const flextesaImage = DOCKER_IMAGE;
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
