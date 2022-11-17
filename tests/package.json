@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/tests",
-	"version": "0.23.11-rc",
+	"version": "0.23.14-rc",
 	"private": true,
 	"description": "This is Taqueria testing project includes unit, integration and e2e tests",
 	"main": "index.js",
