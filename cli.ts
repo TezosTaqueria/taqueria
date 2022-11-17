@@ -153,8 +153,6 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 		})
 		.boolean('debug')
 		.hide('debug')
-		.option('quickstart')
-		.hide('quickstart')
 		.option('p', {
 			alias: 'projectDir',
 			default: './',
@@ -179,8 +177,8 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			(args: Record<string, unknown>) =>
 				pipe(
 					SanitizedArgs.of(args),
-					chain(({ projectDir, maxConcurrency, quickstart }: SanitizedArgs.t) => {
-						return initProject(projectDir, quickstart, maxConcurrency, i18n);
+					chain(({ projectDir, maxConcurrency }: SanitizedArgs.t) => {
+						return initProject(projectDir, maxConcurrency, i18n);
 					}),
 					forkCatch(console.error)(console.error)(console.log),
 				),
@@ -422,17 +420,11 @@ const mkInitialDirectories = (projectDir: SanitizedAbsPath.t, maxConcurrency: nu
 
 const initProject = (
 	projectDir: SanitizedAbsPath.t,
-	quickstart: string | undefined,
 	maxConcurrency: number,
 	i18n: i18n.t,
 ) =>
 	pipe(
 		mkInitialDirectories(projectDir, maxConcurrency, i18n),
-		chain(_ =>
-			quickstart && quickstart.length > 0
-				? writeTextFile(joinPaths(projectDir, 'quickstart.md'))(quickstart)
-				: resolve(projectDir)
-		),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
 		chain(_ => exec('taq install @taqueria/plugin-core 2>&1 > /dev/null', {}, false, projectDir)),
 		map(_ => i18n.__('bootstrapMsg')),
@@ -485,9 +477,6 @@ const scaffoldProject = (i18n: i18n.t) =>
 			}
 			log('    ✓ Run scaffold post-init script');
 
-			// Remove injected quickstart file
-			const quickstartFile = await eager(SanitizedAbsPath.make(`${destDir}/quickstart.md`));
-			await eager(rm(quickstartFile));
 			log("    ✓ Project Taq'ified \n");
 
 			return ('🌮 Project created successfully 🌮');
