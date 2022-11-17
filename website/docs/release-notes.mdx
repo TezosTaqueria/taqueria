@@ -23,7 +23,7 @@ title: Taqueria Releases
 
 Taqueria now provides the means to override the docker images used by Taqueria plugins via `.env` variables
 
-The available constants you can set in `./env` are:
+The available constants you can set in a `./.env` file are:
 
 - TAQ_FLEXTESA_IMAGE environment variable to override the default image for the flextesa plugin
 - TAQ_ARCHETYPE_IMAGE environment variable to override the default image for the archetype plugin
@@ -37,7 +37,6 @@ The available constants you can set in `./env` are:
 ### Other Product Changes
 
 - A `quickstart.md` file is no longer created on `taq init`
-- 
 
 ### Migrating from Legacy Versions
 
@@ -80,7 +79,20 @@ plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 
 
 ### Pull Requests
 
+- 🚀 Release ➾ Taqueria v0.24.1 by @hu3man in [#1447](https://github.com/ecadlabs/taqueria/pull/1447)
+- Updating tests to become modules for TS requirement by @alexzbusko in [#1500](https://github.com/ecadlabs/taqueria/pull/1500)
+- 🛠️ Fix ➾ Update Taqueria.io Documentation by @hu3man in https://github.com/ecadlabs/taqueria/pull/1496
+- 🧽 Chore ➾ Bump loader-utils from 2.0.2 to 2.0.4 in /website by @dependabot in [#1497](https://github.com/ecadlabs/taqueria/pull/1497)
+- 👷 Refactor ➾ Updates to Docusaurus Docs by @hu3man in [#1506](https://github.com/ecadlabs/taqueria/pull/1506)
+- 🧽 Chore ➾ Update Docusaurus to `v2.2.0` by @hu3man in [#1505](https://github.com/ecadlabs/taqueria/pull/1505)
+- 🛠️ Fix ➾ Do Not Create the `quickstart.md` File on New Taqueria Projects by @jchenche in [#1491](https://github.com/ecadlabs/taqueria/pull/1491)
+- ✨ Feature ➾ Rename `<CONTRACT>.storages.mligo` to `<CONTRACT>.storageList.mligo` and similarly for the parameter part by @jchenche in [#1507](https://github.com/ecadlabs/taqueria/pull/1507)
+- ✨ Feature ➾ Allow docker images to be overwritten via environment variable (#1425) by @mweichert in [#1445](https://github.com/ecadlabs/taqueria/pull/1445)
 
+## New Contributors
+- @dependabot made their first contribution in [#1497](https://github.com/ecadlabs/taqueria/pull/1497)
+
+**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.24.1...v0.24.2
 
 ## Taqueria v0.24.1  
 
