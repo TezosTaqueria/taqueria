@@ -11,17 +11,17 @@
 ### Summary of Impactful Changes
 
 - Ligo storage and parameter files are now created by default (ignored during compilation if they remain empty)
-- The naming convention for Storage and Parameter Ligo source files now includes `storageList` and `parameterList`
+- The new naming convention for LIGO contract storage and parameter files is `<CONTRACT_NAME>.storageList.<EXTENSION>` and `<CONTRACT_NAME>.parameterList.<EXTENSION>` (`<CONTRACT_NAME>.storages.<EXTENSION>` and `<CONTRACT_NAME>.parameters.<EXTENSION>` will still be supported)
 - The version of Ligo used in the Ligo plugin has been downgraded to `v0.54.1` due to instability in `v0.55.0`
-- A mechanism to override the docker images used by plugins via `.env` variables has been added
+- A mechanism to override the docker images used by plugins via environment variables has been added
 
 ### New Features
 
 #### Override Docker Images Used by Plugins
 
-Taqueria now provides the means to override the docker images used by Taqueria plugins via `.env` variables
+Taqueria now provides the means to override the docker images used by Taqueria plugins via setting environment variables in your shell or CI/CD 
 
-The available constants you can set in a `./.env` file are:
+The available constants you can set to override are:
 
 - TAQ_FLEXTESA_IMAGE environment variable to override the default image for the flextesa plugin
 - TAQ_ARCHETYPE_IMAGE environment variable to override the default image for the archetype plugin
@@ -32,10 +32,13 @@ The available constants you can set in a `./.env` file are:
 
 - Tests now use compliant TS modules
 
+### Deprecations and Breaking Changes
+
+- The use of `<CONTRACT_NAME>.storages.<EXTENSION>` and `<CONTRACT_NAME>.parameters.<EXTENSION>` are now deprecated and will be removed in the future
+
 ### Other Product Changes
 
 - A `quickstart.md` file is no longer created on `taq init`
-- 
 
 ### Migrating from Legacy Versions
 
@@ -68,7 +71,6 @@ The Flextesa plugin can hang or crash if old docker images exist on your machine
 ```shell
 taq clean
 ```
-
 :::
 
 You can update your existing projects to use Taqueria v0.24.2 plugins using the following command:
