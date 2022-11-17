@@ -1,7 +1,11 @@
-import { getArch, getFlextesaImage } from '@taqueria/node-sdk';
+import { getArchSync, getDockerImage } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import { join } from 'path';
 
+export const getFlextesaImage = (arch: 'linux/arm64/v8' | 'linux/amd64'): string =>
+	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:20221026' : 'oxheadalpha/flextesa:20221026';
+
+export const DOCKER_IMAGE = getDockerImage(getFlextesaImage(getArchSync()), 'TAQ_TEZOS_CLIENT_IMAGE');
 export interface ClientOpts extends RequestArgs.ProxyRequestArgs {
 	command: string;
 }
@@ -34,9 +38,8 @@ export const getInputFilename = (opts: UnionOpts, sourceFile: string) =>
 export const getCheckFileExistenceCommand = async (parsedArgs: UnionOpts, sourceFile: string): Promise<string> => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
-	const arch = await getArch();
-	const flextesaImage = await getFlextesaImage(arch);
-	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage} ls`;
+	const arch = getArchSync();
+	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${DOCKER_IMAGE} ls`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const cmd = `${baseCmd} ${inputFile}`;
 	return cmd;

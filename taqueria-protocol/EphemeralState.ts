@@ -159,14 +159,14 @@ export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], 
 				!pluginInfo.tasks
 					? Promise.resolve({} as TaskToPluginMap)
 					: await pluginInfo.tasks.reduce(
-						async (retval, { task }) => {
+						async (retval, { task, hidden }) => {
 							if (isComposite(task, taskCounts)) {
 								const command = await eager(Command.make(task));
 								const compositeTask = await eager(Task.make({
 									task,
 									command,
 									description: i18n.__('providedByMany'),
-									hidden: false,
+									hidden,
 									options: [
 										await eager(Option.make({
 											flag: await eager(Verb.make('plugin')),
@@ -241,7 +241,7 @@ export const mapTemplatesToPlugins = (config: Config.t, pluginInfo: PluginInfo.t
 				!pluginInfo.templates
 					? Promise.resolve({} as TemplateToPluginMap)
 					: await pluginInfo.templates!.reduce(
-						async (retval, { template }) => {
+						async (retval, { template, hidden }) => {
 							if (isComposite(template, tmplCounts)) {
 								const command = await eager(Command.make(template));
 								const compositeTmpl = await eager(ParsedTemplate.make({

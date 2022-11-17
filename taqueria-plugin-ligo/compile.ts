@@ -94,7 +94,7 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 		})
 		.catch(err => {
 			sendErr(`\n=== For ${sourceFile} ===`);
-			sendErr(err.message.replace(/Command failed.+?\n/, ''));
+			if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
 			return {
 				contract: sourceFile,
 				artifact: COMPILE_ERR_MSG,
@@ -115,7 +115,7 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 			})
 			.catch(err => {
 				sendErr(`\n=== For ${sourceFile} ===`);
-				sendErr(err.message.replace(/Command failed.+?\n/, ''));
+				if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
 				return {
 					contract: sourceFile,
 					artifact: COMPILE_ERR_MSG,
@@ -147,7 +147,7 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 		})
 		.catch(err => {
 			sendErr(`\n=== For ${sourceFile} ===`);
-			sendErr(err.message);
+			if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
 			return [{
 				contract: sourceFile,
 				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} values compiled`,
