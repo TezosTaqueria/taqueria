@@ -19,7 +19,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			`cp e2e/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
 
-		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+		console.log(await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` }));
 		console.log(await exec(`docker ps -a --no-trunc`))
 	});
 
