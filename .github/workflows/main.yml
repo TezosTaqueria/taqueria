@@ -51,24 +51,6 @@ jobs:
       id: get-version
       uses: battila7/get-version-action@v2
 
-    # - name: Setup Deno
-    #   uses: denoland/setup-deno@v1
-    #   with:
-    #     deno-version: "1.23.4"
-
-    # - name: Build all
-    #   run: |
-    #     npx lerna bootstrap 
-    #     npm run build:packages 
-    #     npm run build:binary 
-    #     npm run build:docker
-
-      # - name: Cache node modules
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ./node_modules/**
-      #     key: cache-node-modules-${{ github.run_id }}
-
   build-binaries:
     name: Build Taqueria binaries
     permissions:
@@ -301,12 +283,6 @@ jobs:
           npm run build:packages 
           deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --quickstart "`cat quickstart.md`" --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
           npm run build:docker
-
-      # - name: Cache node modules
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: ./node_modules/**
-      #     key: cache-node-modules-${{ github.run_id }}
 
       - name: Publish for PR
         if:  ${{ github.event_name == 'pull_request' }}
