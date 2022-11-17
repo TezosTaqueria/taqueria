@@ -45,7 +45,6 @@ export const rawSchema = z.object({
 	),
 	plugin: z.string().min(1).optional(),
 	env: z.string().optional(),
-	quickstart: z.string().min(1).optional(),
 	setBuild: z.preprocess(
 		val => String(val),
 		z.string().min(3),

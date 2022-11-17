@@ -59,7 +59,7 @@ You can also check out the quickstart guide for GitHub actions in the GitHub doc
 ### Single step action
 ```yaml
 - name: taqueria tasks
-    uses: ecadlabs/taqueria-github-action@v0.8.0
+    uses: ecadlabs/taqueria-github-action@v0.11.0
     with:
         plugins: '@taqueria/plugin-ligo, @taqueria/plugin-flextesa, @taqueria/plugin-taquito'
         contracts: 'counter.jsligo'
@@ -72,26 +72,26 @@ You can also check out the quickstart guide for GitHub actions in the GitHub doc
 ### Multiple step action
 ```yaml
 - name: compile contracts
-    uses: ecadlabs/taqueria-github-action@v0.8.0
+    uses: ecadlabs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         contracts: 'hello-tacos.mligo'
         compile_command: 'compile'
 
 - name: start local sandbox
-    uses: ecadlabs/taqueria-github-action@v0.8.0
+    uses: ecadlabs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         sandbox_name: 'local'
 
 - name: originate contracts
-    uses: ecadlabs/taqueria-github-action@v0.8.0
+    uses: ecadlabs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         originate: 'true'
 
 - name: originate contracts
-    uses: ecadlabs/taqueria-github-action@v0.8.0
+    uses: ecadlabs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         tests: 'true'
