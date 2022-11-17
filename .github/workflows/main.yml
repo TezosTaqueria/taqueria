@@ -192,6 +192,7 @@ jobs:
     name: OS ${{ matrix.os }} tests
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, ecad-macmini]
         include:
