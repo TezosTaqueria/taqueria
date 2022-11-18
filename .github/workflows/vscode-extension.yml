@@ -115,6 +115,14 @@ jobs:
         with:
           node-version: lts/gallium
           cache: "npm"
+
+      - name: Add working dir to PATH
+        run: echo "$(pwd)" >> $GITHUB_PATH
+
+      - name: Build all
+        run: |
+          npx lerna bootstrap --force-local
+          npm run build:packages
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
