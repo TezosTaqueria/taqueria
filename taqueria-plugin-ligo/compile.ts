@@ -1,7 +1,7 @@
-import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-import { CompileOpts as Opts, getInputFilename, LIGO_DOCKER_IMAGE } from './common';
+import { CompileOpts as Opts, emitExternalError, getInputFilename, getLigoDockerImage } from './common';
 
 type TableRow = { contract: string; artifact: string };
 
@@ -62,7 +62,7 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${LIGO_DOCKER_IMAGE} compile contract`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile contract`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputFilename(parsedArgs, sourceFile)}`;
 	const cmd = `${baseCmd} ${inputFile} ${outputFile}`;
@@ -74,7 +74,7 @@ const getCompileExprCmd = (parsedArgs: Opts, sourceFile: string, exprKind: ExprK
 	if (!projectDir) throw `No project directory provided`;
 	const compilerType = isStorageKind(exprKind) ? 'storage' : 'parameter';
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${LIGO_DOCKER_IMAGE} compile ${compilerType}`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile ${compilerType}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputExprFileName(parsedArgs, sourceFile, exprKind, exprName)}`;
 	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile}`;
@@ -93,8 +93,7 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 			};
 		})
 		.catch(err => {
-			sendErr(`\n=== For ${sourceFile} ===`);
-			if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
+			emitExternalError(err, sourceFile);
 			return {
 				contract: sourceFile,
 				artifact: COMPILE_ERR_MSG,
@@ -114,8 +113,7 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 				};
 			})
 			.catch(err => {
-				sendErr(`\n=== For ${sourceFile} ===`);
-				if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
+				emitExternalError(err, sourceFile);
 				return {
 					contract: sourceFile,
 					artifact: COMPILE_ERR_MSG,
@@ -146,8 +144,7 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 			return Promise.all([firstExprResult].concat(restExprResults));
 		})
 		.catch(err => {
-			sendErr(`\n=== For ${sourceFile} ===`);
-			if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
+			emitExternalError(err, sourceFile);
 			return [{
 				contract: sourceFile,
 				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} values compiled`,
