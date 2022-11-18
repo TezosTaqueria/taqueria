@@ -25,9 +25,11 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	});
 
 	test('Verify that scaffold project can start and stop taqueria locally', async () => {
+		console.log(await exec(`docker ps -a --no-trunc`))
 		const startResults = await exec(`taq start sandbox local-scaffold`, { cwd: `${scaffoldDirName}` });
 		expect(startResults.stdout).toContain('Started local-scaffold.');
 
+		console.log(await exec(`docker ps -a --no-trunc`))
 		const stopResults = await exec(`taq stop sandbox local-scaffold`, { cwd: `${scaffoldDirName}` });
 		expect(stopResults.stdout).toContain('Stopped local-scaffold.');
 	});
