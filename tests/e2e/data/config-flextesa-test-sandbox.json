@@ -18,7 +18,8 @@
 			"networks": [],
 			"sandboxes": [
 				"local",
-				"test"
+				"test",
+				"local-image-override"
 			]
 		}
 	},
@@ -37,6 +38,16 @@
 			"label": "Test Tezos Sandbox",
 			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
 			"rpcUrl": "http://localhost:20010",
+			"tzkt": {
+				"disableAutostartWithSandbox": false,
+				"postgresqlPort": 5442,
+				"apiPort": 5010
+			}
+		},
+		"local-image-override": {
+			"label": "Test Tezos Sandbox",
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
+			"rpcUrl": "http://localhost:20100",
 			"tzkt": {
 				"disableAutostartWithSandbox": false,
 				"postgresqlPort": 5442,
