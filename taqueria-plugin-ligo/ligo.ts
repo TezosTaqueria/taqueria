@@ -1,11 +1,11 @@
 import { CmdArgEnv, getArch, sendAsyncErr, sendRes, spawnCmd } from '@taqueria/node-sdk';
-import { LIGO_DOCKER_IMAGE, LigoOpts as Opts } from './common';
+import { getLigoDockerImage, LigoOpts as Opts } from './common';
 
 const getArbitraryLigoCmd = (parsedArgs: Opts, userArgs: string): CmdArgEnv => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const binary = 'docker';
-	const baseArgs = ['run', '--rm', '-v', `${projectDir}:/project`, '-w', '/project', LIGO_DOCKER_IMAGE];
+	const baseArgs = ['run', '--rm', '-v', `${projectDir}:/project`, '-w', '/project', getLigoDockerImage()];
 	const processedUserArgs = userArgs.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg =>
 		arg
 	);
