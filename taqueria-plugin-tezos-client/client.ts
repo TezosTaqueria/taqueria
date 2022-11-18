@@ -1,5 +1,5 @@
 import { CmdArgEnv, getArch, sendAsyncErr, sendRes, spawnCmd } from '@taqueria/node-sdk';
-import { ClientOpts as Opts, DOCKER_IMAGE } from './common';
+import { ClientOpts as Opts, getClientDockerImage } from './common';
 
 const getArbitraryClientCmd = async (
 	parsedArgs: Opts,
@@ -8,7 +8,7 @@ const getArbitraryClientCmd = async (
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const arch = await getArch();
-	const flextesaImage = DOCKER_IMAGE;
+	const flextesaImage = getClientDockerImage();
 	const binary = 'docker';
 	const baseArgs = [
 		'run',
