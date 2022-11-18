@@ -19,7 +19,7 @@
 			"sandboxes": [
 				"local",
 				"test",
-				"local-image-override"
+				"override"
 			]
 		}
 	},
@@ -44,14 +44,14 @@
 				"apiPort": 5010
 			}
 		},
-		"local-image-override": {
+		"override": {
 			"label": "Test Tezos Sandbox",
 			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
 			"rpcUrl": "http://localhost:20100",
 			"tzkt": {
 				"disableAutostartWithSandbox": false,
-				"postgresqlPort": 5442,
-				"apiPort": 5010
+				"postgresqlPort": 5532,
+				"apiPort": 5100
 			}
 		}
 	},

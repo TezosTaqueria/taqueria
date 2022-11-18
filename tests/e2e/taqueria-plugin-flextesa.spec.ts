@@ -148,9 +148,11 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		}
 	});
 
-	test('Verify that an environment variable can override the flextesa docker image', async () => {
-		sandboxName = 'local-image-override';
+	test.only('Verify that an environment variable can override the flextesa docker image', async () => {
+		sandboxName = 'override';
 		const imageName = 'ghcr.io/ecadlabs/taqueria-flextesa:1429-merge-1ccbcc8';
+
+		await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);
 
 		const sandboxStart = await exec(`TAQ_FLEXTESA_IMAGE=${imageName} taq start sandbox ${sandboxName}`, {
 			cwd: `./${taqueriaProjectPath}`,
@@ -161,7 +163,6 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 
 		// 2. Verify that sandbox has been started and taqueria returns proper message into console
 		expect(sandboxStart.stdout).toContain(`Started ${sandboxName}.`);
-		expect(sandboxStart.stdout).toContain(`Done.`);
 
 		// 3. Verify that docker container has been started
 		const dockerContainerTest = await getContainerName(sandboxName);
