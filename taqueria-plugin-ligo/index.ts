@@ -29,7 +29,7 @@ Plugin.create(i18n => ({
 			command: 'compile <sourceFile>',
 			aliases: ['c', 'compile-ligo'],
 			description:
-				'Compile a smart contract written in a LIGO syntax to Michelson code, along with its associated storage/parameter list files if they are found',
+				'Compile a smart contract written in a LIGO syntax to Michelson code, along with its associated storages and parameters files if they are found',
 			handler: 'proxy',
 			encoding: 'json',
 		}),
