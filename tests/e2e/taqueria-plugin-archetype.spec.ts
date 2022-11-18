@@ -134,6 +134,25 @@ describe('E2E Testing for taqueria archetype plugin', () => {
 		}
 	});
 
+	test('Verify that a different version of the Archetype image can be used', async () => {
+		const imageName = 'completium/archetype:1.3.5';
+		const result = await exec(`TAQ_ARCHETYPE_IMAGE=${imageName} taq get-image --plugin archetype`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		expect(result.stdout.trim()).toBe(imageName);
+
+		// 1. Copy contract from data folder to taqueria project folder
+		const contractName = 'arch-1.3.5-example.arl';
+		await exec(`cp e2e/data/${contractName} ${taqueriaProjectPath}/contracts/`);
+
+		// 3. Run taq compile ${contractName}
+		await exec(`taq compile ${contractName}`, { cwd: `./${taqueriaProjectPath}` });
+
+		// 4. Verify that compiled michelson version has been generated
+		await checkFolderExistsWithTimeout(`./${taqueriaProjectPath}/artifacts/${contractName.replace('arl', 'tz')}`);
+	});
+
 	test('Verify that taqueria archetype plugin requires the plugin argument when other compile plugins installed', async () => {
 		// 1. Copy contract from data folder to taqueria project folder
 		await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);

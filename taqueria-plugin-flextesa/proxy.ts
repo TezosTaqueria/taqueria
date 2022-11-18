@@ -1,6 +1,7 @@
 import {
 	execCmd,
 	getArch,
+	getDockerImage,
 	readJsonFile,
 	sendAsyncErr,
 	sendAsyncRes,
@@ -30,7 +31,7 @@ export interface Opts extends RequestArgs.ProxyRequestArgs {
 	sandboxName?: string;
 }
 
-const getDockerImage = (opts: Opts) => `ghcr.io/ecadlabs/taqueria-flextesa:${opts.setVersion}-${opts.setBuild}`;
+const getDefaultDockerImage = (opts: Opts) => `ghcr.io/ecadlabs/taqueria-flextesa:${opts.setVersion}-${opts.setBuild}`;
 
 export const getUniqueSandboxName = async (sandboxName: string, projectDir: string) => {
 	const hash = await stringToSHA256(projectDir);
@@ -91,7 +92,7 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 
 	const containerName = await getContainerName(sandboxName, opts);
 	const arch = await getArch();
-	const image = getDockerImage(opts);
+	const image = getDockerImage(getDefaultDockerImage(opts), 'TAQ_FLEXTESA_IMAGE');
 	const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir;
 
 	return `docker run --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} node index.js --sandbox ${sandboxName}`;

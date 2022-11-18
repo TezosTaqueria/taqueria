@@ -40,6 +40,13 @@ Plugin.create(i18n => ({
 			handler: 'proxy',
 			encoding: 'json',
 		}),
+		Task.create({
+			task: 'get-image',
+			command: 'get-image',
+			description: 'Gets the name of the image to be used',
+			handler: 'proxy',
+			hidden: true,
+		}),
 	],
 	templates: [
 		Template.create({
