@@ -99,7 +99,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 			// 2. Get Bob's and Alice's account addresses
 			console.log(await exec(`docker ps -a --no-trunc`))
-			console.log(await exec(`sudo lsof -i -P | grep LISTEN`))
 			const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 			const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
