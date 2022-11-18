@@ -54,7 +54,9 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		expect(await getContainerImage(sandboxName)).toBe(imageName);
 
 		// 4.  Run stop command and verify the output
-		const sandboxStop = await exec(`taq stop sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
+		const sandboxStop = await exec(`TAQ_ECAD_FLEXTESA_IMAGE=${imageName} taq stop sandbox ${sandboxName}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
 		await sleep(2500);
 	});
 
