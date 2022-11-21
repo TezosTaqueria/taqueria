@@ -1,14 +1,13 @@
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import utils from 'util';
-import { transferOutput } from './data/help-contents/taquito-flextesa-content';
 import { generateTestProject, getContainerName, checkContractBalanceOnNetwork, itemArrayInTable, sleep } from './utils/utils';
 const exec = utils.promisify(exec1);
 
 const taqueriaProjectPath = 'e2e/auto-test-taquito-flextesa-plugin';
 const contractRegex = new RegExp(/(KT1)+\w{33}?/);
 let environment: string;
-let dockerName: string = 'local';
+let dockerName: string = 'local-tf';
 const addressRegex = /tz1[A-Za-z0-9]{7,}/g;
 const amountRegex = /[0-9]{4,} ꜩ/g;
 
