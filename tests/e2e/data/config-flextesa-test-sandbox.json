@@ -16,8 +16,7 @@
 			"sandboxes": [
 				"local",
 				"test"
-			],
-			"storage": {}
+			]
 		}
 	},
 	"sandbox": {

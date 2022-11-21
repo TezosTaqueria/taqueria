@@ -15,13 +15,11 @@
 			"networks": [],
 			"sandboxes": [
 				"local"
-			],
-			"storage": {}
+			]
 		},
 		"test": {
 			"networks": ["ithaca"],
-			"sandboxes": [],
-			"storage": { "hello-tacos.tz": "100" }
+			"sandboxes": []
 		}
 	},
 	"sandbox": {
@@ -37,7 +35,7 @@
 			"rpcUrl": "https://ithacanet.ecadinfra.com",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
 			"accounts": {
-				"taqRootAccount": {
+				"taqOperatorAccount": {
 					"publicKey": "p2pk666TYDPwRzgE2emHyTM4RSLbypvhHwhk6RwEtasA5arSBgf6bAq",
 					"publicKeyHash": "tz3P5zrUYGJnryVfZ5JFeLMMojdjQFGLUFiK",
 					"privateKey": "p2sk2sF7GEUMB11cmzpLBpXh7F1Asru5sNCneUjWDMqxpoCZA3DLNf"

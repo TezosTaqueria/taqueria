@@ -1,6 +1,6 @@
 import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
 import createContract from './createContract';
-import ligo from './ligo';
+import main from './main';
 
 Plugin.create(i18n => ({
 	schema: '1.0',
@@ -8,11 +8,28 @@ Plugin.create(i18n => ({
 	alias: 'ligo',
 	tasks: [
 		Task.create({
+			task: 'ligo',
+			command: 'ligo',
+			description:
+				'This task allows you to run arbitrary LIGO native commands. Note that they might not benefit from the abstractions provided by Taqueria',
+			options: [
+				Option.create({
+					shortFlag: 'c',
+					flag: 'command',
+					type: 'string',
+					description: 'The command to be passed to the underlying LIGO binary, wrapped in quotes',
+					required: true,
+				}),
+			],
+			handler: 'proxy',
+			encoding: 'none',
+		}),
+		Task.create({
 			task: 'compile',
 			command: 'compile <sourceFile>',
 			aliases: ['c', 'compile-ligo'],
 			description:
-				'Compile a smart contract written in a LIGO syntax to Michelson code, along with its associated storages and parameters files if they are found',
+				'Compile a smart contract written in a LIGO syntax to Michelson code, along with its associated storage/parameter list files if they are found',
 			handler: 'proxy',
 			encoding: 'json',
 		}),
@@ -22,6 +39,13 @@ Plugin.create(i18n => ({
 			description: 'Test a smart contract written in LIGO',
 			handler: 'proxy',
 			encoding: 'json',
+		}),
+		Task.create({
+			task: 'get-image',
+			command: 'get-image',
+			description: 'Gets the name of the image to be used',
+			handler: 'proxy',
+			hidden: true,
 		}),
 	],
 	templates: [
@@ -47,5 +71,5 @@ Plugin.create(i18n => ({
 			handler: createContract,
 		}),
 	],
-	proxy: ligo,
+	proxy: main,
 }), process.argv);

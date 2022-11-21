@@ -4,7 +4,7 @@ The Archetype plugin provides a task to compile Archetype smart contracts (`.arl
 
 ## Requirements
 
-- Taqueria v0.20.2 or later
+- Taqueria v0.24.1 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
 

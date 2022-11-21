@@ -15,29 +15,77 @@ title: The NFT Scaffold Project
 The NFT-Scaffold project is currently in alpha. It is not ready for production use and will be undergoing frequent updates as we work to implement Taqueria State and other features that have not yet been released
 :::
 
+## Quickstart
+
+In a rush? You can follow the steps below to get up and running immediatley:
+
+### Scaffold and Initialize the Project
+
+1. `taq scaffold https://github.com/ecadlabs/taqueria-scaffold-nft nft-scaffold`
+1. `cd nft-scaffold`
+1. `npm run setup`
+1. `cd taqueria`
+1. `touch .env`
+1. Get your Pinata JWT token from your [Pinata account](https://app.pinata.cloud/signin)
+1. Insert the JWT from Pinata into the .env file `echo "pinataJwtToken=eyJhbGc..." >> .env`
+1. `cd ..`
+1. `npm run start:taqueria:local`
+1. `npm run apply`
+1. `npm run start:app`
+
+## Overview
+
+The NFT scaffold provides a minimal contract and react Dapp for publishing and viewing unique NFTs. 
+This would be a good beginning point for an artist who wants to sell unique artpieces on their own website. 
+
 ## Requirements
 
-- Taqueria v0.20.2 or later
+- Taqueria v0.24.1 or later
 - Docker v20.10.12 or later
 - Node.js v16.17.1 or later
 - Temple Wallet (can be found [here](https://templewallet.com/))
 - A funded testnet account (instructions [here](https://taqueria.io/docs/config/networks/#faucets))
 
-## Project Setup 
+## Using the Project
 
-1. Scaffold the project by running:
+### Adding Artwork Assets
 
-```bash
-taq scaffold https://github.com/ecadlabs/taqueria-scaffold-nft nft-quickstart
-```
+To add artwork and minting it's token:
 
-2. Change into the `/taqueria` directory inside the newly created project directory:
+1. Add the artwork asset file (image, video, etc) to the assets directory
+    - /taqueria/assets
+    - Make sure to name the asset file with the next token id: 
+    - i.e. `0042.jpg`
+1. Add a thumbnail image for the nft to the same assets directory
+    - use the filename with the same token id with `.thumb`
+    - the thumbnail image does not need to be the same file type as the main asset
+    - i.e. `0042.thumb.png`
+1. Publish the artwork asset to ipfs and mint the nft to the contract by running the provisioner
+    - `npm run apply`
+1. Run the Dapp and the new nft should now be visible in the NFT List
+
+
+## Project Overview
+
+### Scaffold the Project
+
+This project is available as a Taqueria scaffold. To create a new project from this scaffold, run the following command:
 
 ```shell
-cd nft-quickstart/taqueria
+taq scaffold https://github.com/ecadlabs/taqueria-scaffold-nft nft-scaffold
 ```
 
-3. Create the file `.env` inside the `/taqueria` directory
+This will clone the NFT scaffold project into a directory called `nft-scaffold`
+
+### Project Setup 
+
+1. Change into the `/taqueria` directory inside the newly created project directory:
+
+```shell
+cd nft-scaffold/taqueria
+```
+
+1. Create the file `.env` inside the `/taqueria` directory
 
 ```shell
 touch .env
@@ -103,3 +151,37 @@ Use the Dapp (served in your browser at [http://localhost:3000](http://localhost
     - `taqueria/assets`
         - The NFT assets to upload
 
+### React Dapp
+
+The react Dapp allows browsing the NFTs that have been minted to the contract. 
+This is a minimal react project and needs to be extended to support marketplace features like selling or browsing owned NFTs.
+
+### Build and Start the React Dapp
+
+Change into the `/app` directory:
+
+```shell
+cd app
+```
+
+Build the React dApp:
+
+```shell
+npm run build
+```
+
+Start and serve the dApp:
+
+```shell 
+npm run start
+```
+
+You should now be able to access the NFT scaffold dApp at [http://localhost:3000](http://localhost:3000/)
+
+### Connect to Temple Wallet
+
+Open a browser and navigate to [http://localhost:3000](http://localhost:3000/)
+
+Click on the `Connect wallet` button in the top right corner of the page and select `Temple Wallet`
+
+Provide your credentials for the wallet, select a funded account, and click `connect`

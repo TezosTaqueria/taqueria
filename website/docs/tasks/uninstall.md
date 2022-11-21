@@ -21,6 +21,7 @@ This task can be used to uninstall the following plugins:
 
 | Name                                                   |  `<pluginName>`                   |  Description                                                            |
 |--------------------------------------------------------|-----------------------------------|-------------------------------------------------------------------------|
+| [Core](/docs/plugins/plugin-core/)                     | `@taqueria/plugin-core`           | Contains core utility tasks provided by Taqueria |
 | [Archetype](/docs/plugins/plugin-archetype/)           | `@taqueria/plugin-archetype`      | A compiler for the Archetype smart contract language                    |
 | [Contract Types](/docs/plugins/plugin-contract-types/) | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code             |
 | [Flextesa](/docs/plugins/plugin-flextesa/)             | `@taqueria/plugin-flextesa`       | A Tezos sandbox (testnet) that runs locally on your machine             | 

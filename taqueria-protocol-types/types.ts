@@ -84,7 +84,6 @@ export type ParsedOperation = Omit<Operation, 'handler'>;
 export type Template = {
 	template: Verb;
 	command: Command;
-	/** @minLength 4 */
 	description: NonEmptyString;
 	hidden?: boolean;
 	options?: Option[];
@@ -97,7 +96,8 @@ type TemplateHandler =
 	| NonEmptyString // TODO: should this be Verb?
 	| ((args: RequestArgs) =>
 		| PluginJsonResponse
-		| Promise<PluginJsonResponse>);
+		| Promise<PluginJsonResponse>)
+	| Promise<void>;
 
 export type ParsedTemplate = Omit<Template, 'handler'> & {
 	handler: string;
@@ -203,6 +203,7 @@ export type RequestArgs = Omit<SanitizedArgs, 'quickstart'> & {
 	// TODO: JSON.parse if string
 	config: LoadedConfig;
 };
+
 export type ProxyTaskArgs = RequestArgs & {
 	task: NonEmptyString;
 };

@@ -2,12 +2,9 @@
 
 The Tezos Client plugin provides tasks to analyze contracts including type checking and simulating of Michelson (`.tz`) smart contracts. They both execute against a protocol (currently kathmandu). We'll enable a `--protocol` flag in the future to allow users to specify a protocol to use
 
-> ### :page_with_curl: Note
-> This plugin no longer relies on the Flextesa plugin.
-
 ## Requirements
 
-- Taqueria v0.20.2 or later
+- Taqueria v0.24.1 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
 
@@ -45,6 +42,19 @@ This task runs a Michelson file in `artifacts` as a simulation and ouputs a resu
 - The `--param` flag is mandatory and you must supply the filename, in `artifacts`, that contains the actual parameter value
 
 - By default, the entrypoint is `default`, which points to no specific annotated entrypoint. Use `--entrypoint` to specify an annotated entrypoint to call. E.g. if the parameter type of a Michelson contract is `(or (or (int %decrement) (int %increment)) (unit %reset))`, then there are two ways to call the `increment` entrypoint, with parameter `(Left (Right 14))` or with parameter `14` if your command contains `--entrypoint increment`
+
+## The `taq client` task
+
+Basic usage is:
+
+```shell
+taq client --command <command to pass to the underlying octez-client binary>
+```
+
+Wrap the value for the `--command` flag with quotes.
+
+> ### :page_with_curl: Note
+> This task allows you to run arbitrary octez-client native commands, but they might not benefit from the abstractions provided by Taqueria
 
 ## Plugin Architecture
 

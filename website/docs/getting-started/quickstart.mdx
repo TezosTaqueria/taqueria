@@ -21,7 +21,7 @@ This quickstart guide will teach you the fundamentals of using Taqueria in 10 mi
 What you will accomplish:
 - Initialize a new Taqueria project
 - Install plugins for LIGO, Flextesa, and Taquito
-- Creating a new LIGO contract, along with its associated storages and parameters files.
+- Creating a new LIGO contract, along with its associated storage list and parameter list files.
 - Compile the LIGO smart contract
 - Start a local Flextesa sandbox 
 - Originate the compiled smart contract to the sandbox
@@ -111,18 +111,14 @@ let main (action, store : parameter * storage) : return =
  | Reset         -> 0)
 ```
 
-```ligo title="counter.storages.mligo"
+```ligo title="counter.storageList.mligo"
 let initial_count: storage = 42
 let another_count: storage = 23 + 18 - 1
 ```
 
-```ligo title="counter.parameters.mligo"
+```ligo title="counter.parameterList.mligo"
 let increment_by_3: parameter = Increment 3
 ```
-
-:::caution
-Make sure you name it `counter.storages.mligo` and not `counter.storage.mligo` (note the extra `s`)
-:::
 
 You can now compile this contract, along with its storage and parameter values, by simply running the following command from the root of the project directory:
 ```shell
@@ -132,16 +128,16 @@ taq compile counter.mligo
 Taqueria will then output the following, and the artifacts created:
 ```shell
 ❯ taq compile counter.mligo                     
-┌──────────────────────────┬───────────────────────────────────────────────┐
-│ Contract                 │ Artifact                                      │
-├──────────────────────────┼───────────────────────────────────────────────┤
-│ counter.mligo            │ artifacts/counter.tz                          │
-├──────────────────────────┼───────────────────────────────────────────────┤
-│ counter.storages.mligo   │ artifacts/counter.default_storage.tz          │
-│                          │ artifacts/counter.storage.another_count.tz    │
-├──────────────────────────┼───────────────────────────────────────────────┤
-│ counter.parameters.mligo │ artifacts/counter.parameter.increment_by_3.tz │
-└──────────────────────────┴───────────────────────────────────────────────┘
+┌────────────────────────────────┬───────────────────────────────────────────────┐
+│ Contract                       │ Artifact                                      │
+├────────────────────────────────┼───────────────────────────────────────────────┤
+│ counter.mligo                  │ artifacts/counter.tz                          │
+├────────────────────────────────┼───────────────────────────────────────────────┤
+│ counter.storageList.mligo      │ artifacts/counter.default_storage.tz          │
+│                                │ artifacts/counter.storage.another_count.tz    │
+├────────────────────────────────┼───────────────────────────────────────────────┤
+│ counter.parameterList.mligo    │ artifacts/counter.parameter.increment_by_3.tz │
+└────────────────────────────────┴───────────────────────────────────────────────┘
 ```
 
 If you open this file (`artifacts/counter.tz`), you can view the raw Michelson code which will later be originated to the sandbox:
@@ -234,12 +230,12 @@ taq transfer counter --param counter.parameter.increment_by_3.tz
 
 This will call the counter contract's entrypoint `increment` and will increment the storage by `3`. The output will look something like this:
 ```
-┌────────────────┬──────────────────────────────────────┬──────────────┬───────────────────┬────────────┬────────────────────────┐
-│ Contract Alias │ Contract Address                     │ Tez Transfer │ Parameter         │ Entrypoint │ Destination            │
-├────────────────┼──────────────────────────────────────┼──────────────┼───────────────────┼────────────┼────────────────────────┤
-│ counter        │ KT1Ayz8qos7G4U3Jucp6QWoM7ayhbShNXcat │ 0            │ (Left (Right 3 )) │ default    │ http://localhost:20000 │
-│                │                                      │              │                   │            │                        │
-└────────────────┴──────────────────────────────────────┴──────────────┴───────────────────┴────────────┴────────────────────────┘
+┌────────────────┬──────────────────────────────────────┬────────────────┬───────────────────┬────────────┬────────────────────────┐
+│ Contract Alias │ Contract Address                     │ Mutez Transfer │ Parameter         │ Entrypoint │ Destination            │
+├────────────────┼──────────────────────────────────────┼────────────────┼───────────────────┼────────────┼────────────────────────┤
+│ counter        │ KT1Ayz8qos7G4U3Jucp6QWoM7ayhbShNXcat │ 0              │ (Left (Right 3 )) │ default    │ http://localhost:20000 │
+│                │                                      │                │                   │            │                        │
+└────────────────┴──────────────────────────────────────┴────────────────┴───────────────────┴────────────┴────────────────────────┘
 ```
 
 ## Finishing Up
@@ -247,7 +243,7 @@ This will call the counter contract's entrypoint `increment` and will increment 
 Congratulations! At this point, you have run through the basic usage of Taqueria including:
 - Initializing a new Taqueria project
 - Installing plugins for LIGO, Flextesa, and Taquito
-- Creating a new LIGO contract, along with its associated storages and parameters files
+- Creating a new LIGO contract, along with its associated storage list and parameter list files
 - Compiling a LIGO smart contract
 - Starting and querying a local Flextesa sandbox
 - Originating a compiled smart contract to the sandbox

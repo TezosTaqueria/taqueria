@@ -29,6 +29,14 @@ body:
         - label: "♾️ PR Merged"
         - label: "🏆 Product Acceptance"
   - type: textarea
+    id: work_description
+    attributes:
+      label: 🧰 Work Description
+      description: Describe what work needs to be done 
+      placeholder: "In as much detail as possible, describe the work that needs to be done and include any architecture/design choices and the underlying motivation for this ticket"
+    validations:
+      required: false
+  - type: textarea
     id: to_do
     attributes:
       label: ✅ To Do
@@ -40,7 +48,7 @@ body:
     id: ac
     attributes:
       label: ⚖️ Acceptance Criteria
-      value: "✨ Functional: \n- [ ] ... \n \n 📐 Non-Functional: \n- [ ] ... \n "
+      value: "✨ Functional: \n- [ ] \n- [ ] "
     validations:
       required: true
   - type: textarea
@@ -49,18 +57,6 @@ body:
       label: 🔭 Scope
       description: "Explicitly, what is out of scope for this ticket"
       value: "🙅‍♂️ Out of Scope: \n- ... \n \n "
-  - type: textarea
-    id: description
-    attributes:
-      label: 🧰 Work Description
-      description: "Describe what needs to be done"
-      placeholder: "In as much detail as possible, explain the work to be done. Include any architecture or design notes and the sequencing of each thing that needs to be done"
-  - type: input
-    id: estimate
-    attributes:
-      label: 🦄 Sizing
-      description: Estimate the time and effort required in days of effort using Fibonacci sequence numbers (1,)
-      placeholder: "0"
   - type: checkboxes
     id: terms
     attributes:

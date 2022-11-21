@@ -49,18 +49,9 @@ export const defaultConfig: Config.t = Config.create({
 		ghostnet: {
 			label: 'ghostnet',
 			rpcUrl: 'https://ghostnet.ecadinfra.com',
-			protocol: 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg'
+			protocol: 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg',
 		},
 	},
-	// defaultTasks: {
-	//     compile: {
-	//         plugin: "taqueria-plugin-ligo",
-	//         options: {
-	//             "-s": "jsligo",
-	//             "-o": "%contractsDir%/%filename%.tz"
-	//         }
-	//     }
-	// }
 });
 
 export const getDefaultMaxConcurrency = () => 10;

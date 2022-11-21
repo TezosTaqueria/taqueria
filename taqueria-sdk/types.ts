@@ -1,4 +1,4 @@
-import { RequestArgs } from '@taqueria/protocol-types/types';
+import { ProxyTaskArgs, RequestArgs } from '@taqueria/protocol-types/types';
 import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
@@ -40,7 +40,7 @@ export {
 	Template,
 };
 
-export type { RequestArgs };
+export type { ProxyTaskArgs, RequestArgs };
 
 export interface LikeAPromise<Success, TaqError> extends Promise<Success> {
 }

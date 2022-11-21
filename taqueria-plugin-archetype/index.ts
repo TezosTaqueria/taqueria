@@ -1,4 +1,4 @@
-import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
+import { Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
 import compile from './compile';
 import createContract from './createContract';
 
@@ -15,6 +15,13 @@ Plugin.create(i18n => ({
 			options: [],
 			handler: 'proxy',
 			encoding: 'json',
+		}),
+		Task.create({
+			task: 'get-image',
+			command: 'get-image',
+			description: 'Gets the name of the image to be used',
+			handler: 'proxy',
+			hidden: true,
 		}),
 	],
 	templates: [

@@ -1,7 +1,7 @@
 import {
 	execCmd,
-	execCommandWithoutWrapping,
 	getArch,
+	getDockerImage,
 	readJsonFile,
 	sendAsyncErr,
 	sendAsyncRes,
@@ -26,7 +26,7 @@ export interface Opts extends RequestArgs {
 	task?: string;
 }
 
-const getDockerImage = (opts: Opts) => `ghcr.io/ecadlabs/taqueria-flextesa:${opts.setVersion}-${opts.setBuild}`;
+const getDefaultDockerImage = (opts: Opts) => `ghcr.io/ecadlabs/taqueria-flextesa:${opts.setVersion}-${opts.setBuild}`;
 
 export const getUniqueSandboxName = async (sandboxName: string, projectDir: string) => {
 	const hash = await stringToSHA256(projectDir);
@@ -87,7 +87,7 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 
 	const containerName = await getContainerName(sandboxName, opts);
 	const arch = await getArch();
-	const image = getDockerImage(opts);
+	const image = getDockerImage(getDefaultDockerImage(opts), 'TAQ_FLEXTESA_IMAGE');
 	const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir;
 
 	return `docker run --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} node index.js --sandbox ${sandboxName}`;
@@ -133,9 +133,9 @@ const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts)
 };
 
 const startContainer = async (container: { name: string; command: string }): Promise<void> => {
-	console.log(`Staring ${container.name}`);
+	console.log(`Starting ${container.name}`);
 	try {
-		const result = await execCommandWithoutWrapping(container.command);
+		const result = await execCmd(container.command);
 		if (result.stderr) {
 			console.error(result.stderr);
 		}
@@ -146,7 +146,7 @@ const startContainer = async (container: { name: string; command: string }): Pro
 };
 
 const startInstance = async (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts): Promise<void> => {
-	await execCommandWithoutWrapping(
+	await execCmd(
 		`docker network ls | grep 'sandbox_${sandboxName}_net' > /dev/null || docker network create --driver bridge sandbox_${sandboxName}_net`,
 	);
 
@@ -248,7 +248,7 @@ const getAccountBalances = (sandboxName: string, sandbox: SandboxConfig.t, opts:
 
 			const getBalanceProcess = getArch()
 				.then(_ => getContainerName(sandboxName, opts))
-				.then(containerName => `docker exec ${containerName} tezos-client get balance for ${accountName.trim()}`)
+				.then(containerName => `docker exec ${containerName} octez-client get balance for ${accountName.trim()}`)
 				.then(execCmd)
 				.then(({ stdout, stderr }) => {
 					if (stderr.length > 0) sendErr(stderr);
@@ -317,7 +317,7 @@ const stopTzKtContainers = async (sandboxName: string, sandbox: SandboxConfig.t,
 	const containersToStop = [containerNames.api, containerNames.sync, containerNames.postgres];
 	for (const container of containersToStop) {
 		try {
-			const result = await execCommandWithoutWrapping(`docker stop ${container}`);
+			const result = await execCmd(`docker stop ${container}`);
 			if (result.stderr) {
 				console.error(result.stderr);
 			}

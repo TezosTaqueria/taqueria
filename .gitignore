@@ -102,7 +102,7 @@ dist
 
 # TernJS port file
 .tern-port
-
+v
 # Project specific
 .DS_Store
 node_modules
@@ -113,6 +113,8 @@ node_modules
 /taqueria
 /taq
 tests/coverage
+/taqueria-protocol-types/out
+/taqueria-protocol/out
 /taqueria-protocol/*.mjs
 /taqueria-protocol/*.map
 /taqueria-protocol/*.d.ts
@@ -128,6 +130,8 @@ tests/coverage
 /taqueria-sdk/*.mjs
 /taqueria-sdk/*.mjs.map
 /taqueria-sdk/*.d.ts
+/taqueria-plugin-core/index.js
+/taqueria-plugin-core/index.js.map
 /taqueria-plugin-smartpy/index.js
 /taqueria-plugin-smartpy/index.js.map
 /taqueria-plugin-ligo/index.js

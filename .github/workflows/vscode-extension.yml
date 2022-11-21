@@ -2,6 +2,10 @@ name: VSCode Extension
 
 on:
   workflow_call:
+    inputs:
+      prerelease:
+        required: false
+        type: string
     secrets:
       GCP_PROJECT:
         required: true
@@ -41,8 +45,8 @@ jobs:
       
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.16.x
-          cache: 'npm'
+          node-version: lts/gallium
+          cache: "npm"
 
 
       - name: Install Deno
@@ -106,8 +110,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16.16.x
-          cache: 'npm'
+          node-version: lts/gallium
+          cache: "npm"
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -120,7 +124,7 @@ jobs:
 
       # Separate steps for prerelease and release workflows
       - name: Publish as pre-release
-        if: ${{ github.event.action != 'published' && startsWith(github.ref, 'refs/tags/v') }}
+        if: ${{ inputs.prerelease }}
         uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}
@@ -130,7 +134,7 @@ jobs:
           preRelease: true
 
       - name: Publish as official release
-        if: ${{ github.event.action == 'published' && !github.event.release.prerelease }}
+        if: ${{ !inputs.prerelease && !github.event.release.prerelease && github.event.action == 'published' }}
         uses: HaaLeo/publish-vscode-extension@v1.0.4
         with:
           pat: ${{ secrets.VSCE_PAT }}

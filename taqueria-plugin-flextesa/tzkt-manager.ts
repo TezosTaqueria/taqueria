@@ -7,8 +7,8 @@ const { Url } = Protocol;
 
 const getTzKtDockerImages = (opts: Opts) => ({
 	postgres: `postgres:14.5-alpine`,
-	sync: `alirezahaghshenas/tzkt:sync-1.9.4`,
-	api: `alirezahaghshenas/tzkt:api-1.9.4`,
+	sync: `alirezahaghshenas/tzkt:sync-1.10.3`,
+	api: `alirezahaghshenas/tzkt:api-1.10.3`,
 });
 
 export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: Opts) => {

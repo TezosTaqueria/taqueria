@@ -1,6 +1,7 @@
 export * as Alias from '@taqueria/protocol-types/out/types/Alias';
 export * as Command from '@taqueria/protocol-types/out/types/Command';
 export * as Config from '@taqueria/protocol-types/out/types/Config';
+export * as Contract from '@taqueria/protocol-types/out/types/Contract';
 export * as EconomicalProtocolHash from '@taqueria/protocol-types/out/types/EconomicalProtocolHash';
 export * as Environment from '@taqueria/protocol-types/out/types/Environment';
 export * as Faucet from '@taqueria/protocol-types/out/types/Faucet';
@@ -26,7 +27,10 @@ export * as PositionalArg from '@taqueria/protocol-types/out/types/PositionalArg
 export * as Provisioner from '@taqueria/protocol-types/out/types/Provisioner';
 export * as ProvisionerID from '@taqueria/protocol-types/out/types/ProvisionerID';
 export * as Provisions from '@taqueria/protocol-types/out/types/Provisions';
+export * as ProxyTaskArgs from '@taqueria/protocol-types/out/types/ProxyTaskArgs';
+export * as ProxyTemplateArgs from '@taqueria/protocol-types/out/types/ProxyTemplateArgs';
 export * as PublicKeyHash from '@taqueria/protocol-types/out/types/PublicKeyHash';
+export * as RequestArgs from '@taqueria/protocol-types/out/types/RequestArgs';
 export * as SandboxAccountConfig from '@taqueria/protocol-types/out/types/SandboxAccountConfig';
 export * as SandboxConfig from '@taqueria/protocol-types/out/types/SandboxConfig';
 export * as SanitizedAbsPath from '@taqueria/protocol-types/out/types/SanitizedAbsPath';

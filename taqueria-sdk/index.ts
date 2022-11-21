@@ -1,55 +1,47 @@
 export * from '@taqueria/protocol-types/types';
-import { RequestArgs } from '@taqueria/node-sdk';
-import * as Strict from '@taqueria/protocol-types/out/types-strict';
+import * as Protocol from '@taqueria/protocol-types';
+export {
+	Config,
+	EconomicalProtocolHash,
+	Environment,
+	Faucet,
+	LoadedConfig,
+	NetworkConfig,
+	NonEmptyString,
+	Option,
+	PositionalArg,
+	ProxyTaskArgs,
+	ProxyTemplateArgs,
+	RequestArgs,
+	Task,
+} from '@taqueria/protocol-types';
+export * as Template from '@taqueria/protocol/Template';
+export { Protocol };
 import * as NonStrict from '@taqueria/protocol-types/types';
-export { NonEmptyString, Option, PositionalArg, Task, Template } from '@taqueria/protocol-types';
-export * as Protocol from '@taqueria/protocol-types/out/types-strict';
-import * as Config from '@taqueria/protocol/Config';
-import * as ConfigArtifactsDir from '@taqueria/protocol/ConfigArtifactsDir';
-import * as ConfigContractsDir from '@taqueria/protocol/ConfigContractsDir';
-import * as Contract from '@taqueria/protocol/Contract';
-import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
-import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
-import * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
-import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
-import * as Operation from '@taqueria/protocol/Operation';
-import * as Option from '@taqueria/protocol/Option';
-import * as PersistentState from '@taqueria/protocol/PersistentState';
-import * as PositionalArg from '@taqueria/protocol/PositionalArg';
-import * as ProxyTaskArgs from '@taqueria/protocol/ProxyTaskArgs';
-import * as ProxyTemplateArgs from '@taqueria/protocol/ProxyTemplateArgs';
-import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
-import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 import * as SHA256 from '@taqueria/protocol/SHA256';
 import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import type { TaqError } from '@taqueria/protocol/TaqError';
-import * as Task from '@taqueria/protocol/Task';
-import * as Template from '@taqueria/protocol/Template';
-import { exec, ExecException } from 'child_process';
+import { exec, ExecException, spawn } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join, resolve as resolvePath } from 'path';
 import { getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
-import { PluginSchema } from './types';
-import { LikeAPromise, pluginDefiner, StdIO } from './types';
+import { LikeAPromise, pluginDefiner, PluginSchema, StdIO } from './types';
 
 import { importKey } from '@taquito/signer';
 import { TezosToolkit } from '@taquito/taquito';
 import { b58cencode, Prefix, prefix } from '@taquito/utils';
 import crypto from 'crypto';
-
-// @ts-ignore interop issue. Maybe find a different library later
-import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
-import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
-import fetch from 'node-fetch';
 import generateName from 'project-name-generator';
-import { parsed } from 'yargs';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 const yargs = require('yargs');
+export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
+
+export type CmdArgEnv = [string, string[], { [key: string]: string }];
 
 export const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
@@ -92,25 +84,43 @@ export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, Exe
 		});
 	});
 
-export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError> => {
+export const spawnCmd = (fullCmd: CmdArgEnv): Promise<number | null> =>
+	new Promise((resolve, reject) => {
+		const cmd = fullCmd[0];
+		const args = fullCmd[1];
+		const envVars = fullCmd[2];
+		const child = spawn(cmd, args, { env: { ...process.env, ...envVars }, stdio: 'inherit' });
+		child.on('close', resolve);
+		child.on('error', reject);
+	});
+
+export const getArchSync = (): 'linux/arm64/v8' | 'linux/amd64' => {
 	switch (process.arch) {
 		case 'arm64':
-			return Promise.resolve('linux/arm64/v8');
+			return 'linux/arm64/v8';
 		// @ts-ignore: x32 is valid for some versions of NodeJS
 		case 'x32':
 		case 'x64':
-			return Promise.resolve('linux/amd64');
+			return 'linux/amd64';
 		default:
-			return Promise.reject({
-				errCode: 'E_INVALID_ARCH',
-				errMsg: `We do not know how to handle the ${process.arch} architecture`,
+			const err: TaqError = ({
+				kind: 'E_INVALID_ARCH',
+				msg: `The ${process.arch} architecture is not supported at this time.`,
 				context: process.arch,
 			});
+			throw err;
 	}
 };
 
-export const getFlextesaImage = (arch: 'linux/arm64/v8' | 'linux/amd64'): string =>
-	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:rc-20220915-arm64' : 'oxheadalpha/flextesa:20220715';
+export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError> =>
+	new Promise((resolve, reject) => {
+		try {
+			const arch = getArchSync();
+			resolve(arch);
+		} catch (e) {
+			reject(e);
+		}
+	});
 
 export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError> =>
 	new Promise((resolve, reject) => {
@@ -176,13 +186,13 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 
 export const noop = () => {};
 
-const parseArgs = <T extends RequestArgs>(unparsedArgs: string[]): LikeAPromise<T, TaqError> => {
+const parseArgs = <T extends Protocol.RequestArgs.t>(unparsedArgs: string[]): LikeAPromise<T, TaqError> => {
 	if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
 		try {
 			const preprocessedArgs = preprocessArgs(unparsedArgs);
 			const argv = yargs(preprocessedArgs.slice(2)).argv;
 			const postprocessedArgs = postprocessArgs(argv);
-			const requestArgs = postprocessedArgs;
+			const requestArgs = Protocol.RequestArgs.from(postprocessedArgs);
 			return Promise.resolve(requestArgs as T);
 		} catch (previous) {
 			if (previous instanceof ZodError) {
@@ -230,7 +240,7 @@ const postprocessArgs = (args: string[]): Record<string, unknown> => {
 	return groupedArgs;
 };
 
-const parseSchema = <T extends RequestArgs>(
+const parseSchema = <T extends Protocol.RequestArgs.t>(
 	i18n: i18n,
 	definer: pluginDefiner,
 	defaultPluginName: string,
@@ -240,17 +250,21 @@ const parseSchema = <T extends RequestArgs>(
 
 	const { proxy } = inputSchema;
 
-	return PluginSchema.create({
+	const pluginInfo = PluginSchema.create({
 		...inputSchema,
-		name: inputSchema.name ? inputSchema.name : defaultPluginName,
+		name: inputSchema.name ?? defaultPluginName,
+	});
+
+	return {
+		...pluginInfo,
 		proxy,
-	}) as PluginSchema.t;
+	};
 };
 
-const toProxableArgs = <T>(requestArgs: RequestArgs, from: (input: unknown) => T) => {
+const toProxableArgs = <T>(requestArgs: Protocol.RequestArgs.t, from: (input: unknown) => T) => {
 	const retval = Object.entries(requestArgs).reduce(
 		(retval, [key, value]) => {
-			if (key === 'projectDir') value = resolvePath(value.toString());
+			if (key === 'projectDir') value = resolvePath(value.toString()) as Protocol.NonEmptyString.t;
 			else if (typeof value === 'string') {
 				if (value === 'true') value = true;
 				else if (value === 'false') value = false;
@@ -270,7 +284,7 @@ const toProxableArgs = <T>(requestArgs: RequestArgs, from: (input: unknown) => T
 	return from(retval);
 };
 
-const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPluginName: string) =>
+const getResponse = <T extends Protocol.RequestArgs.t>(definer: pluginDefiner, defaultPluginName: string) =>
 	async (requestArgs: T) => {
 		const { taqRun } = requestArgs;
 		const i18n = await load();
@@ -282,7 +296,7 @@ const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPlugi
 						...schema,
 						templates: schema.templates
 							? schema.templates.map(
-								(template: Template.t) => {
+								(template: Protocol.Template.t) => {
 									const handler = typeof template.handler === 'function' ? 'function' : template.handler;
 									return {
 										...template,
@@ -293,7 +307,7 @@ const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPlugi
 							: [],
 						tasks: schema.tasks
 							? schema.tasks.map(
-								(task: Task.t) => {
+								(task: Protocol.Task.t) => {
 									const handler = typeof task.handler === 'function' ? 'function' : task.handler;
 									return {
 										...task,
@@ -310,7 +324,7 @@ const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPlugi
 				}
 				case 'proxy':
 					if (schema.proxy) {
-						return schema.proxy(toProxableArgs(requestArgs, ProxyTaskArgs.from.bind(ProxyTaskArgs)));
+						return schema.proxy(toProxableArgs(requestArgs, Protocol.ProxyTaskArgs.from.bind(Protocol.ProxyTaskArgs)));
 					}
 					return Promise.reject({
 						errCode: 'E_NOT_SUPPORTED',
@@ -318,7 +332,10 @@ const getResponse = <T extends RequestArgs>(definer: pluginDefiner, defaultPlugi
 						context: requestArgs,
 					});
 				case 'proxyTemplate': {
-					const proxyArgs = toProxableArgs(requestArgs, ProxyTemplateArgs.from.bind(ProxyTemplateArgs));
+					const proxyArgs = toProxableArgs(
+						requestArgs,
+						Protocol.ProxyTemplateArgs.from.bind(Protocol.ProxyTemplateArgs),
+					);
 					const template = schema.templates?.find(tmpl => tmpl.template === proxyArgs.template);
 					if (template) {
 						if (typeof template.handler === 'function') {
@@ -375,7 +392,7 @@ const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
 /**
  * Gets the name of the current environment
  */
-export const getCurrentEnvironment = (parsedArgs: RequestArgs): string => {
+export const getCurrentEnvironment = (parsedArgs: Protocol.RequestArgs.t): string => {
 	return parsedArgs.env
 		? (parsedArgs.env as string)
 		: (
@@ -386,39 +403,43 @@ export const getCurrentEnvironment = (parsedArgs: RequestArgs): string => {
 };
 
 /**
+ * Gets the name of the current environment
+ */
+/**
  * Gets the configuration for the current environment, if one is configured
  */
-export const getCurrentEnvironmentConfig = (parsedArgs: RequestArgs) => {
+export const getCurrentEnvironmentConfig = (parsedArgs: Protocol.RequestArgs.t) => {
 	const currentEnv = getCurrentEnvironment(parsedArgs);
 
 	return parsedArgs.config.environment && parsedArgs.config.environment[currentEnv]
-		? parsedArgs.config.environment[currentEnv] as Environment.t | undefined
+		? parsedArgs.config.environment[currentEnv] as Protocol.Environment.t | undefined
 		: undefined;
 };
 
 /**
  * Gets the configuration for the project metadata
  */
-export const getMetadataConfig = (parsedArgs: RequestArgs) =>
-	() => (parsedArgs.config.metadata ?? undefined) as MetadataConfig.t | undefined;
+export const getMetadataConfig = (parsedArgs: Protocol.RequestArgs.t) =>
+	() => (parsedArgs.config.metadata ?? undefined) as Protocol.MetadataConfig.t | undefined;
 
 /**
  * Gets the configuration for the named network
  */
-export const getNetworkConfig = (parsedArgs: RequestArgs) =>
-	(networkName: string) => (parsedArgs.config.network![networkName] ?? undefined) as NetworkConfig.t | undefined;
+export const getNetworkConfig = (parsedArgs: Protocol.RequestArgs.t) =>
+	(networkName: string) =>
+		(parsedArgs.config.network![networkName] ?? undefined) as Protocol.NetworkConfig.t | undefined;
 
 /**
  * Gets the configuration for the named sandbox
  */
-export const getSandboxConfig = (parsedArgs: RequestArgs) =>
-	(sandboxName: string): SandboxConfig.t | undefined =>
-		(parsedArgs.config.sandbox![sandboxName] ?? undefined) as SandboxConfig.t | undefined;
+export const getSandboxConfig = (parsedArgs: Protocol.RequestArgs.t) =>
+	(sandboxName: string): Protocol.SandboxConfig.t | undefined =>
+		(parsedArgs.config.sandbox![sandboxName] ?? undefined) as Protocol.SandboxConfig.t | undefined;
 
 /**
  * Gets the name of accounts for the given sandbox
  */
-export const getSandboxAccountNames = (parsedArgs: RequestArgs) =>
+export const getSandboxAccountNames = (parsedArgs: Protocol.RequestArgs.t) =>
 	(sandboxName: string) => {
 		const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
 
@@ -430,58 +451,40 @@ export const getSandboxAccountNames = (parsedArgs: RequestArgs) =>
 /**
  * Gets the account config for the named account of the given sandbox
  */
-export const getSandboxAccountConfig = (parsedArgs: RequestArgs) =>
-	(sandboxName: string) =>
-		(accountName: string) => {
-			const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
-
-			if (sandbox && sandbox.accounts) {
-				const accounts = sandbox.accounts as Record<string, SandboxAccountConfig.t>;
-				return accounts[accountName];
-			}
-			return undefined;
-		};
-
-/**
- * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
- */
-export const getInitialStorage = async (parsedArgs: RequestArgs, contractFilename: string) => {
-	const env = getCurrentEnvironmentConfig(parsedArgs);
-	if (env && env.storage && env.storage[contractFilename]) {
-		const storagePath: string = env.storage[contractFilename];
-		try {
-			const content = await readFile(storagePath, { encoding: 'utf-8' });
-			return content;
-		} catch (err) {
-			sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
-			return undefined;
-		}
+export const getSandboxAccountConfig = (sandbox: Protocol.SandboxConfig.t, accountName: string) => {
+	if (sandbox.accounts) {
+		const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>;
+		return accounts[accountName];
 	}
 	return undefined;
 };
 
-/**
- * Gets the initial storage for the contract. TODO: replace all calls to this function with newGetInitialStorage
- */
-export const newGetInitialStorage = async (
-	parsedArgs: RequestArgs,
-	storageFilename: string | undefined,
+export const addTzExtensionIfMissing = (contractFilename: string) =>
+	/\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`;
+
+export const getArtifactsDir = (parsedArgs: Protocol.RequestArgs.t) => parsedArgs.config.artifactsDir ?? 'artifacts';
+
+export const getContractsDir = (parsedArgs: Protocol.RequestArgs.t) => parsedArgs.config.contractsDir ?? 'contracts';
+
+export const getContractContent = async (
+	parsedArgs: Protocol.RequestArgs.t,
+	contractFilename: string,
 ): Promise<string | undefined> => {
-	const storagePath = join(
-		parsedArgs.config.projectDir,
-		parsedArgs.config.artifactsDir ?? 'artifacts',
-		storageFilename ?? '',
-	);
+	const contractWithTzExtension = addTzExtensionIfMissing(contractFilename);
+	const contractPath = join(parsedArgs.config.projectDir, getArtifactsDir(parsedArgs), contractWithTzExtension);
 	try {
-		const content = await readFile(storagePath, { encoding: 'utf-8' });
+		const content = await readFile(contractPath, { encoding: 'utf-8' });
 		return content;
 	} catch (err) {
-		sendErr(`Could not read ${storagePath}. Maybe it doesn't exist.\n`);
+		sendErr(`Could not read ${contractPath}. Maybe it doesn't exist.\n`);
 		return undefined;
 	}
 };
 
-export const getParameter = async (parsedArgs: RequestArgs, paramFilename: string): Promise<string> => {
+/**
+ * Gets the parameter for the contract associated with the given parameter file
+ */
+export const getParameter = async (parsedArgs: Protocol.RequestArgs.t, paramFilename: string): Promise<string> => {
 	const paramPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir ?? 'artifacts', paramFilename);
 	try {
 		const content = await readFile(paramPath, { encoding: 'utf-8' });
@@ -494,10 +497,13 @@ export const getParameter = async (parsedArgs: RequestArgs, paramFilename: strin
 /**
  * Update the alias of an address for the current environment
  */
+/**
+ * Update the alias of an address for the current environment
+ */
 export const updateAddressAlias = async (
-	parsedArgs: RequestArgs,
+	parsedArgs: Protocol.RequestArgs.t,
 	alias: string,
-	address: NonEmptyString.t,
+	address: Protocol.NonEmptyString.t,
 ): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return;
@@ -516,7 +522,7 @@ export const updateAddressAlias = async (
 };
 
 export const getAddressOfAlias = async (
-	env: Environment.t,
+	env: Protocol.Environment.t,
 	alias: string,
 ): Promise<string> => {
 	const address = env.aliases?.[alias]?.address;
@@ -528,7 +534,7 @@ export const getAddressOfAlias = async (
 	return address;
 };
 
-const createAddress = async (network: NetworkConfig.t): Promise<TezosToolkit> => {
+const createAddress = async (network: Protocol.NetworkConfig.t): Promise<TezosToolkit> => {
 	const tezos = new TezosToolkit(network.rpcUrl as string);
 	const keyBytes = Buffer.alloc(32);
 	crypto.randomFillSync(keyBytes);
@@ -537,10 +543,11 @@ const createAddress = async (network: NetworkConfig.t): Promise<TezosToolkit> =>
 	return tezos;
 };
 
+// TODO: This is a temporary solution before the environment refactor. Might be removed after this refactor
 // Temporary solution before the environment refactor
 export const getAccountPrivateKey = async (
-	parsedArgs: RequestArgs,
-	network: NetworkConfig.t,
+	parsedArgs: Protocol.RequestArgs.t,
+	network: Protocol.NetworkConfig.t,
 	account: string,
 ): Promise<string> => {
 	if (!network.accounts) network.accounts = {};
@@ -565,24 +572,20 @@ export const getAccountPrivateKey = async (
 	return network.accounts[account].privateKey as string;
 };
 
+export const getDockerImage = (defaultImageName: string, envVarName: string) =>
+	process.env[envVarName] ?? defaultImageName;
+
 /**
  * Gets the default account associated with a sandbox
  */
-export const getDefaultAccount = (parsedArgs: RequestArgs) =>
-	(sandboxName: string) => {
-		const sandboxConfig = getSandboxConfig(parsedArgs)(sandboxName);
-		if (sandboxConfig) {
-			const accounts = sandboxConfig.accounts ?? {};
-			const defaultAccount = accounts['default'] as string | undefined;
-			if (defaultAccount) {
-				return getSandboxAccountConfig(parsedArgs)(sandboxName)(defaultAccount);
-			}
-		}
+export const getDefaultSandboxAccount = (sandbox: Protocol.SandboxConfig.t) => {
+	const accounts = sandbox.accounts ?? {};
+	const defaultAccount = accounts['default'] as string | undefined;
+	if (defaultAccount) return getSandboxAccountConfig(sandbox, defaultAccount);
+	return undefined;
+};
 
-		return undefined;
-	};
-
-export const getContracts = (regex: RegExp, config: NonStrict.LoadedConfig) => {
+export const getContracts = (regex: RegExp, config: Protocol.LoadedConfig.t) => {
 	if (!config.contracts) return [];
 	return Object.values(config.contracts).reduce(
 		(retval: string[], contract) =>
@@ -595,12 +598,12 @@ export const getContracts = (regex: RegExp, config: NonStrict.LoadedConfig) => {
 
 const joinPaths = (...paths: string[]): string => paths.join('/');
 
-const newContract = async (sourceFile: string, parsedArgs: RequestArgs) => {
-	const contractPath = joinPaths(parsedArgs.projectDir, parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
+const newContract = async (sourceFile: string, parsedArgs: Protocol.RequestArgs.t) => {
+	const contractPath = joinPaths(parsedArgs.projectDir, getContractsDir(parsedArgs), sourceFile);
 	try {
 		const contents = await readFile(contractPath, { encoding: 'utf-8' });
 		const hash = await SHA256.toSHA256(contents);
-		return await eager(Contract.of({
+		return await eager(Protocol.Contract.of({
 			sourceFile,
 			hash,
 		}));
@@ -609,9 +612,9 @@ const newContract = async (sourceFile: string, parsedArgs: RequestArgs) => {
 	}
 };
 
-const registerContract = async (parsedArgs: RequestArgs, sourceFile: string): Promise<void> => {
+const registerContract = async (parsedArgs: Protocol.RequestArgs.t, sourceFile: string): Promise<void> => {
 	try {
-		const config = await readJsonFile<Config.t>(parsedArgs.config.configFile);
+		const config = await readJsonFile<Protocol.Config.t>(parsedArgs.config.configFile);
 		if (config.contracts && config.contracts[sourceFile]) {
 			await sendAsyncErr(`${sourceFile} has already been registered`);
 		} else {
@@ -641,7 +644,6 @@ const getPackageName = () => {
 				&& !filename.includes('stacktrace-js');
 		}),
 	});
-
 	const frame = stack.shift();
 	if (frame) {
 		const filename = frame.getFileName().replace(/^file:\/\//, '').replace(/^file:/, '');
@@ -652,7 +654,7 @@ const getPackageName = () => {
 };
 
 export const Plugin = {
-	create: async <Args extends RequestArgs>(definer: pluginDefiner, unparsedArgs: string[]) => {
+	create: async <Args extends Protocol.RequestArgs.t>(definer: pluginDefiner, unparsedArgs: string[]) => {
 		const packageName = getPackageName();
 		return parseArgs<Args>(unparsedArgs)
 			.then(getResponse(definer, packageName))

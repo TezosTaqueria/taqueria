@@ -1,4 +1,4 @@
-import { RequestArgs } from '@taqueria/protocol-types/types';
+import { RequestArgs } from '@taqueria/protocol-types';
 import { PluginDependenciesResponse, PluginProxyResponse } from '@taqueria/protocol-types/types';
 import * as Alias from '@taqueria/protocol/Alias';
 import createType from '@taqueria/protocol/Base';
@@ -43,15 +43,19 @@ export const rawSchema = PluginInfo.rawSchema.extend({
 }).passthrough().describe('ParsedPluginInfo');
 
 type Input = z.infer<typeof internalSchema> & {
-	proxy: (args: RequestArgs) => PluginProxyResponse | Promise<PluginProxyResponse> | Promise<void> | void;
-	checkRuntimeDependencies?: (args: RequestArgs) => PluginDependenciesResponse;
-	installRuntimeDependencies?: (args: RequestArgs) => PluginDependenciesResponse;
+	proxy: <T extends RequestArgs.t>(
+		args: T,
+	) => PluginProxyResponse | Promise<PluginProxyResponse> | Promise<void> | void;
+	checkRuntimeDependencies?: <T extends RequestArgs.t>(args: T) => PluginDependenciesResponse;
+	installRuntimeDependencies?: <T extends RequestArgs.t>(args: T) => PluginDependenciesResponse;
 };
 
 export type RawPluginSchema = z.infer<typeof rawSchema> & {
-	proxy: (args: RequestArgs) => PluginProxyResponse | Promise<PluginProxyResponse> | Promise<void> | void;
-	checkRuntimeDependencies?: (args: RequestArgs) => PluginDependenciesResponse;
-	installRuntimeDependencies?: (args: RequestArgs) => PluginDependenciesResponse;
+	proxy: <T extends RequestArgs.t>(
+		args: T,
+	) => PluginProxyResponse | Promise<PluginProxyResponse> | Promise<void> | void;
+	checkRuntimeDependencies?: <T extends RequestArgs.t>(args: T) => PluginDependenciesResponse;
+	installRuntimeDependencies?: <T extends RequestArgs.t>(args: T) => PluginDependenciesResponse;
 };
 
 export const { schemas: generatedSchemas, factory } = createType<RawPluginSchema, Input>({
@@ -65,7 +69,6 @@ export const { schemas: generatedSchemas, factory } = createType<RawPluginSchema
 export type ParsedPluginInfo = z.infer<typeof generatedSchemas.schema>;
 export type t = ParsedPluginInfo;
 export const { create, of, make } = factory;
-
 export const schemas = {
 	...generatedSchemas,
 	schema: generatedSchemas.schema.transform(val => val as ParsedPluginInfo),

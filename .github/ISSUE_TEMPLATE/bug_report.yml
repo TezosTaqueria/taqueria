@@ -3,7 +3,7 @@ description: File a bug report
 title: "🐛 Bug ➾ "
 labels: ["bug", "triage"]
 assignees:
-  - sinapsist
+  - alexzbusko
 body:
   - type: markdown
     attributes:
@@ -27,6 +27,14 @@ body:
       label: 🆘 What happened?
       description: Also tell us, what did you expect to happen?
       placeholder: Tell us what you see! Please include any relavent screenshots of images, and the steps to reproduce the bug
+    validations:
+      required: true
+  - type: textarea
+    id: str
+    attributes:
+      label: 🆘 Steps to Reproduce?
+      description: Also tell us, what did you expect to happen?
+      placeholder: 1) \n2) \n3) \n4) \n5)
     validations:
       required: true
   - type: textarea

@@ -154,8 +154,6 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 		})
 		.boolean('debug')
 		.hide('debug')
-		.option('quickstart')
-		.hide('quickstart')
 		.option('p', {
 			alias: 'projectDir',
 			default: './',
@@ -180,8 +178,8 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			(args: Record<string, unknown>) =>
 				pipe(
 					SanitizedArgs.of(args),
-					chain(({ projectDir, maxConcurrency, quickstart }: SanitizedArgs.t) => {
-						return initProject(projectDir, quickstart, maxConcurrency, i18n);
+					chain(({ projectDir, maxConcurrency }: SanitizedArgs.t) => {
+						return initProject(projectDir, maxConcurrency, i18n);
 					}),
 					forkCatch(console.error)(console.error)(console.log),
 				),
@@ -423,18 +421,13 @@ const mkInitialDirectories = (projectDir: SanitizedAbsPath.t, maxConcurrency: nu
 
 const initProject = (
 	projectDir: SanitizedAbsPath.t,
-	quickstart: string | undefined,
 	maxConcurrency: number,
 	i18n: i18n.t,
 ) =>
 	pipe(
 		mkInitialDirectories(projectDir, maxConcurrency, i18n),
-		chain(_ =>
-			quickstart && quickstart.length > 0
-				? writeTextFile(joinPaths(projectDir, 'quickstart.md'))(quickstart)
-				: resolve(projectDir)
-		),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
+		chain(_ => exec('taq install @taqueria/plugin-core 2>&1 > /dev/null', {}, false, projectDir)),
 		map(_ => i18n.__('bootstrapMsg')),
 	);
 
@@ -485,9 +478,6 @@ const scaffoldProject = (i18n: i18n.t) =>
 			}
 			log('    ✓ Run scaffold post-init script');
 
-			// Remove injected quickstart file
-			const quickstartFile = await eager(SanitizedAbsPath.make(`${destDir}/quickstart.md`));
-			await eager(rm(quickstartFile));
 			log("    ✓ Project Taq'ified \n");
 
 			return ('🌮 Project created successfully 🌮');
@@ -798,7 +788,8 @@ const exposeTask = (
 		cliConfig.command({
 			command: task.command,
 			aliases: task.aliases,
-			description: task.description,
+			hidden: task.hidden,
+			description: task.hidden ? null : task.description,
 			example: task.example,
 			builder: (cliConfig: CLIConfig) => {
 				if (task.options) {
@@ -952,40 +943,10 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
 			),
 		};
 
-const renderFaucetWarning = (config: LoadedConfig.t) => {
-	log('Warning: the faucet field in network configs has been deprecated and will be ignored');
-	return config;
-};
-
-const isUserInvokingTask = (parsedArgs: SanitizedArgs.t) => (taskName: string) => parsedArgs._.includes(taskName);
-
-const doesConfigIncludeFaucet = (config: LoadedConfig.t) => {
-	return config.network
-		? Object.values(config.network).reduce(
-			(acc, network) => acc || (typeof network !== 'string' && has('faucet', network)),
-			false,
-		)
-		: false;
-};
-
-const maybeWarnAboutFaucets = (parsedArgs: SanitizedArgs.t) =>
-	(config: LoadedConfig.t) => {
-		const isRelevantTask = isUserInvokingTask(parsedArgs);
-		return doesConfigIncludeFaucet(config) && (
-				isRelevantTask('originate')
-				|| isRelevantTask('deploy')
-				|| isRelevantTask('transfer')
-				|| isRelevantTask('call')
-			)
-			? renderFaucetWarning(config)
-			: config;
-	};
-
 const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 	(cliConfig: CLIConfig) =>
 		pipe(
 			getConfig(parsedArgs.projectDir, i18n, false),
-			map(maybeWarnAboutFaucets(parsedArgs)),
 			chain((config: LoadedConfig.t) => {
 				const pluginLib = inject({
 					parsedArgs,

@@ -9,10 +9,14 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
+  taq clean                       Clean all the Taqueria-related docker images
+  taq ligo                        This task allows you to run arbitrary LIGO nat
+                                  ive commands. Note that they might not benefit
+                                   from the abstractions provided by Taqueria
   taq compile <sourceFile>        Compile a smart contract written in a LIGO syn
                                   tax to Michelson code, along with its associat
-                                  ed storages and parameters files if they are f
-                                  ound                [aliases: c, compile-ligo]
+                                  ed storage/parameter list files if they are fo
+                                  und                 [aliases: c, compile-ligo]
   taq test <sourceFile>           Test a smart contract written in LIGO
   taq create <template>           Create files from pre-existing templates
 
@@ -30,7 +34,7 @@ Taqueria is currently in BETA. You've been warned. :)
 export const helpContentsLigoPluginSpecific = `taq compile <sourceFile>
 
 Compile a smart contract written in a LIGO syntax to Michelson code, along with
-its associated storages and parameters files if they are found
+its associated storage/parameter list files if they are found
 
 Options:
       --version     Show version number                                [boolean]
@@ -48,7 +52,7 @@ export const ligoNoContractSource = `
 taq compile <sourceFile>
 
 Compile a smart contract written in a LIGO syntax to Michelson code, along with
-its associated storages and parameters files if they are found
+its associated storage/parameter list files if they are found
 
 Options:
       --version     Show version number                                [boolean]

@@ -1,11 +1,28 @@
 import { Option, Plugin, PositionalArg, Task } from '@taqueria/node-sdk';
-import client from './client';
+import main from './main';
 
 Plugin.create(i18n => ({
 	alias: 'tezos-client',
 	schema: '1.0',
 	version: '0.1',
 	tasks: [
+		Task.create({
+			task: 'client',
+			command: 'client',
+			description:
+				'This task allows you to run arbitrary octez-client native commands. Note that they might not benefit from the abstractions provided by Taqueria',
+			options: [
+				Option.create({
+					shortFlag: 'c',
+					flag: 'command',
+					type: 'string',
+					description: 'The command to be passed to the underlying octez-client binary, wrapped in quotes',
+					required: true,
+				}),
+			],
+			handler: 'proxy',
+			encoding: 'none',
+		}),
 		Task.create({
 			task: 'typecheck',
 			command: 'typecheck <sourceFile>',
@@ -54,6 +71,13 @@ Plugin.create(i18n => ({
 			],
 			encoding: 'json',
 		}),
+		Task.create({
+			task: 'get-image',
+			command: 'get-image',
+			description: 'Gets the name of the image to be used',
+			handler: 'proxy',
+			hidden: true,
+		}),
 	],
-	proxy: client,
+	proxy: main,
 }), process.argv);
