@@ -13,7 +13,7 @@ const amountRegex = /[0-9]{4,} ꜩ/g;
 
 describe('E2E Testing for taqueria taquito plugin', () => {
 	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath, ['taquito', 'flextesa']);
+		console.log(await generateTestProject(taqueriaProjectPath, ['taquito', 'flextesa']));
 		await exec(
 			`cp e2e/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
