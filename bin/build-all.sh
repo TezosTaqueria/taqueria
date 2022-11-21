@@ -1,9 +1,16 @@
 #!/usr/bin/env bash
+set -e # exiting on error
 
 if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
     echo '******* BUILDING ALL TAQUERIA PACKAGES *******'
     echo '**********************************************'
+
+    echo ""
+    echo '**********************************************'
+    echo "** Checking Dependencies"
+    docker ps
+
     echo ""
     echo '**********************************************'
     echo "** Installing NPM dependencies"
@@ -12,13 +19,13 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
 
     echo ""
     echo '**********************************************'
-    echo "** Building packages"
-    npm run build:packages
+    echo "** Building taqueria"
+    npm run build:binary
 
     echo ""
     echo '**********************************************'
-    echo "** Building taqueria"
-    npm run build:binary
+    echo "** Building packages"
+    npm run build:packages
 
     echo ""
     echo '**********************************************'
