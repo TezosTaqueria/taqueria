@@ -8,7 +8,7 @@ const scaffoldDirName = `taqueria-taco-shop-functional`;
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	beforeAll(async () => {
 		await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${scaffoldDirName}`);
-		console.log(await exec(`cd ${scaffoldDirName} && npm run setup`));
+		await exec(`cd ${scaffoldDirName} && npm run setup`);
 	});
 
 	test('Verify that scaffold project is set up after running setup', async () => {
@@ -25,11 +25,9 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	});
 
 	test('Verify that scaffold project can start and stop taqueria locally', async () => {
-		console.log(await exec(`docker ps -a --no-trunc`))
 		const startResults = await exec(`taq start sandbox local-scaffold`, { cwd: `${scaffoldDirName}` });
 		expect(startResults.stdout).toContain('Started local-scaffold.');
 
-		console.log(await exec(`docker ps -a --no-trunc`))
 		const stopResults = await exec(`taq stop sandbox local-scaffold`, { cwd: `${scaffoldDirName}` });
 		expect(stopResults.stdout).toContain('Stopped local-scaffold.');
 	});

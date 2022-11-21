@@ -18,8 +18,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			`cp e2e/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
 
-		console.log(await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` }));
-		console.log(await exec(`docker ps -a --no-trunc`))
+		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
 	beforeEach(async () => {
@@ -95,7 +94,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			environment = 'development';
 
 			// 2. Get Bob's and Alice's account addresses
-			console.log(await exec(`docker ps -a --no-trunc`))
 			const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 			const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
@@ -104,14 +102,11 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 				cwd: `./${taqueriaProjectPath}`,
 			});
 			await sleep(5000);
-			console.log(transferResults);
 
 			// 4. Verify transfer results
 			const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 			await sleep(2500);
-			console.log(resultContractList);
 			const amountArray = itemArrayInTable(amountRegex, resultContractList);
-			console.log(amountArray);
 			expect(amountArray[1]).toEqual('4000 ꜩ');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
