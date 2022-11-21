@@ -3,7 +3,7 @@ import { LikeAPromise, TaqError } from '@taqueria/node-sdk/types';
 import glob from 'fast-glob';
 import { join } from 'path';
 import { generateContractTypesProcessContractFiles } from './src/cli-process';
-interface Opts extends RequestArgs {
+interface Opts extends RequestArgs.t {
 	// TODO: Document these
 	typescriptDir?: string;
 	typeAliasMode?: 'local' | 'file' | 'library' | 'simple';

@@ -1,6 +1,5 @@
-import { noop, sendAsyncErr, sendAsyncRes } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk';
-import { LoadedConfig, SanitizedAbsPath, SanitizedPath } from '@taqueria/node-sdk/types';
+import { noop, RequestArgs, sendAsyncErr, sendAsyncRes } from '@taqueria/node-sdk';
+import { SanitizedAbsPath, SanitizedPath } from '@taqueria/node-sdk/types';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import { defaults } from 'jest-config';
 import { join, relative } from 'path';
@@ -8,14 +7,14 @@ import JestConfig from './config';
 
 export type DefaultConfig = typeof defaults;
 
-export interface CustomRequestArgs extends RequestArgs {
+export interface CustomRequestArgs extends RequestArgs.t {
 	config: JestConfig;
 	partition?: string;
 	init?: string;
 	testPattern?: string;
 }
 
-export const toRequestArgs = (args: RequestArgs): CustomRequestArgs => {
+export const toRequestArgs = (args: RequestArgs.t): CustomRequestArgs => {
 	const config = {
 		...args.config,
 		jest: {

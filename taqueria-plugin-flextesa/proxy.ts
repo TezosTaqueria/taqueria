@@ -13,6 +13,7 @@ import {
 } from '@taqueria/node-sdk';
 import { Config, RequestArgs } from '@taqueria/node-sdk';
 import { Protocol, SandboxAccountConfig, SandboxConfig, StdIO } from '@taqueria/node-sdk/types';
+import { Config as RawConfig } from '@taqueria/protocol-types/types';
 import { SanitizedArgs, TaqError } from '@taqueria/protocol/taqueria-protocol-types';
 import retry from 'async-retry';
 import type { ExecException } from 'child_process';
@@ -21,7 +22,7 @@ import { getTzKtContainerNames, getTzKtStartCommands } from './tzkt-manager';
 
 const { Url } = Protocol;
 
-export interface Opts extends RequestArgs {
+export interface Opts extends RequestArgs.t {
 	sandboxName?: string;
 	task?: string;
 }
@@ -44,14 +45,14 @@ export const getNewPortIfPortInUse = async (port: number): Promise<number> => {
 };
 
 const replaceRpcUrlInConfig = async (newPort: string, oldUrl: string, sandboxName: string, opts: Opts) => {
-	await updateConfig(opts, (config: Config) => {
+	await updateConfig(opts, (config: RawConfig) => {
 		const newUrl = oldUrl.replace(/:\d+/, ':' + newPort) as Protocol.Url.t;
 		const sandbox = config.sandbox;
 		const sandboxConfig = sandbox ? sandbox[sandboxName] : undefined;
 		if (typeof sandboxConfig === 'string' || sandboxConfig === undefined) {
 			return;
 		}
-		const updatedConfig: Config = {
+		const updatedConfig: RawConfig = {
 			...config,
 			sandbox: {
 				...sandbox,
@@ -65,12 +66,13 @@ const replaceRpcUrlInConfig = async (newPort: string, oldUrl: string, sandboxNam
 	});
 };
 
-export const updateConfig = async (opts: Opts, update: (config: Config) => Config | undefined) => {
-	const config = await readJsonFile<Config>(opts.config.configFile);
+export const updateConfig = async (opts: Opts, update: (config: RawConfig) => RawConfig | undefined) => {
+	const config = await readJsonFile<RawConfig>(opts.config.configFile);
 	const updatedConfig = update(config);
 	if (!updatedConfig) {
 		return;
 	}
+
 	await writeJsonFile(opts.config.configFile)(updatedConfig);
 };
 

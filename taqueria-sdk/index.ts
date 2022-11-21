@@ -192,7 +192,8 @@ const parseArgs = <T extends Protocol.RequestArgs.t>(unparsedArgs: string[]): Li
 			const preprocessedArgs = preprocessArgs(unparsedArgs);
 			const argv = yargs(preprocessedArgs.slice(2)).argv;
 			const postprocessedArgs = postprocessArgs(argv);
-			const requestArgs = Protocol.RequestArgs.from(postprocessedArgs);
+			const formattedArgs = formatArgs(postprocessedArgs);
+			const requestArgs = Protocol.RequestArgs.from(formattedArgs);
 			return Promise.resolve(requestArgs as T);
 		} catch (previous) {
 			if (previous instanceof ZodError) {
@@ -217,8 +218,25 @@ const preprocessArgs = (args: string[]): string[] => {
 	return args.map(arg => /^0x[0-9a-fA-F]+$/.test(arg) ? '___' + arg + '___' : arg);
 };
 
+const formatArgs = (args: Record<string, string>) => {
+	const entries = Object.entries(args).map(
+		([key, value]) => {
+			if (key === 'config') return [key, JSON.parse(value)];
+			if (value === 'false' || value === 'true') return [key, Boolean(value)];
+			return [key, value];
+		},
+	);
+
+	const formatted = Object.fromEntries(entries);
+
+	return {
+		...formatted,
+		env: formatted.env ?? formatted.config.env,
+	} as Record<string, unknown>;
+};
+
 // A hack to protect all hex from being messed by yargs
-const postprocessArgs = (args: string[]): Record<string, unknown> => {
+const postprocessArgs = (args: string[]): Record<string, string> => {
 	const postprocessedArgs = Object.entries(args).map((
 		[key, val],
 	) => [

@@ -18,7 +18,7 @@ import {
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit } from '@taquito/taquito';
 
-export type OriginateOpts = ProxyTaskArgs & {
+export type OriginateOpts = ProxyTaskArgs.t & {
 	contract: string;
 	storage: string;
 	alias?: string;
@@ -26,7 +26,7 @@ export type OriginateOpts = ProxyTaskArgs & {
 	mutez?: string;
 };
 
-export type TransferOpts = ProxyTaskArgs & {
+export type TransferOpts = ProxyTaskArgs.t & {
 	contract: string;
 	mutez?: string;
 	param?: string;
@@ -34,9 +34,9 @@ export type TransferOpts = ProxyTaskArgs & {
 	sender?: string;
 };
 
-export type InstantiateAccountOpts = ProxyTaskArgs;
+export type InstantiateAccountOpts = ProxyTaskArgs.t;
 
-export type FundOpts = ProxyTaskArgs;
+export type FundOpts = ProxyTaskArgs.t;
 
 // To be used for the main entrypoint of the plugin
 export type IntersectionOpts = OriginateOpts & TransferOpts & InstantiateAccountOpts & FundOpts;

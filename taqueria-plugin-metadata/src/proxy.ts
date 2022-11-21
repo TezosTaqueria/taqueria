@@ -11,7 +11,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import prompts from 'prompts';
 
-interface Opts extends RequestArgs {
+interface Opts extends RequestArgs.t {
 	readonly contractName?: string;
 	readonly task?: string;
 }
@@ -254,7 +254,7 @@ const execute = async (opts: Opts): Promise<PluginProxyResponse> => {
 	}
 };
 
-export default async (args: RequestArgs): Promise<PluginProxyResponse> => {
+export default async (args: RequestArgs.t): Promise<PluginProxyResponse> => {
 	const opts = args as Opts;
 
 	try {

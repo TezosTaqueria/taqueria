@@ -2,15 +2,15 @@ import { getDockerImage } from '@taqueria/node-sdk';
 import { ProxyTaskArgs, RequestArgs } from '@taqueria/node-sdk/types';
 import { join } from 'path';
 
-export interface LigoOpts extends ProxyTaskArgs {
+export interface LigoOpts extends ProxyTaskArgs.t {
 	command: string;
 }
 
-export interface CompileOpts extends ProxyTaskArgs {
+export interface CompileOpts extends ProxyTaskArgs.t {
 	sourceFile: string;
 }
 
-export interface TestOpts extends RequestArgs {
+export interface TestOpts extends RequestArgs.t {
 	task?: string;
 	sourceFile?: string;
 }

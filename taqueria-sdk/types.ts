@@ -1,4 +1,4 @@
-import { ProxyTaskArgs, RequestArgs } from '@taqueria/protocol-types/types';
+import { ProxyTaskArgs, RequestArgs } from '@taqueria/protocol-types';
 import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
@@ -54,4 +54,4 @@ export interface StdIO {
 	stderr: string;
 }
 
-export type pluginDefiner = <T extends RequestArgs>(parsedArgs: T, i18n: i18n) => PluginSchema.RawPluginSchema;
+export type pluginDefiner = <T extends RequestArgs.t>(parsedArgs: T, i18n: i18n) => PluginSchema.RawPluginSchema;

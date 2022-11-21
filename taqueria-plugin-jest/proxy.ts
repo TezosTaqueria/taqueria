@@ -15,7 +15,7 @@ const execCmd = (cmd: string, args: string[]) => {
 
 	return child;
 };
-export default async (args: RequestArgs) => {
+export default async (args: RequestArgs.t) => {
 	const parsedArgs = toRequestArgs(args);
 	return ensureSelectedPartitionExists(parsedArgs, parsedArgs.init ? true : false)
 		.then(configAbsPath => {

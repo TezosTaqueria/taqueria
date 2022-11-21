@@ -18,7 +18,7 @@ type PluginResponse =
 		data: unknown[];
 	};
 
-interface Opts extends RequestArgs {
+interface Opts extends RequestArgs.t {
 	readonly path?: string;
 	readonly hash?: string;
 	readonly task?: string;
@@ -104,7 +104,6 @@ const execute = async (opts: Opts): Promise<PluginResponse> => {
 		task,
 		path,
 		hash,
-		config,
 	} = opts;
 
 	const auth: PinataAuth = {
@@ -127,7 +126,7 @@ const execute = async (opts: Opts): Promise<PluginResponse> => {
 	}
 };
 
-export default async (args: RequestArgs): Promise<PluginResponse> => {
+export default async (args: RequestArgs.t): Promise<PluginResponse> => {
 	const opts = args as Opts;
 
 	try {

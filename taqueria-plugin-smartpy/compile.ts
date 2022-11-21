@@ -3,7 +3,7 @@ import { TaqError } from '@taqueria/node-sdk/types';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
 
-interface Opts extends RequestArgs {
+interface Opts extends RequestArgs.t {
 	sourceFile?: string;
 }
 

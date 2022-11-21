@@ -1,6 +1,7 @@
 import { getArch, SandboxConfig } from '@taqueria/node-sdk';
 import { Config } from '@taqueria/node-sdk';
 import { Protocol } from '@taqueria/node-sdk/types';
+import { Config as RawConfig } from '@taqueria/protocol-types/types';
 import { getContainerName, getNewPortIfPortInUse, getUniqueSandboxName, Opts, updateConfig } from './proxy';
 
 const { Url } = Protocol;
@@ -51,7 +52,7 @@ export const getTzKtStartCommands = async (sandboxName: string, sandbox: Sandbox
 				`${apiPort} is already in use, ${newAPIPort} will be used for TzKt API in ${sandboxName} instead and .taq/config.json will be updated to reflect this.`,
 			);
 		}
-		await updateConfig(opts, (config: Config) => {
+		await updateConfig(opts, (config: RawConfig) => {
 			const sandbox = config.sandbox?.[sandboxName];
 			if (typeof sandbox === 'string' || sandbox === undefined) {
 				return undefined;
@@ -61,7 +62,7 @@ export const getTzKtStartCommands = async (sandboxName: string, sandbox: Sandbox
 				apiPort: 5000,
 				postgresqlPort: 5432,
 			};
-			const updatedConfig: Config = {
+			const updatedConfig: RawConfig = {
 				...config,
 				sandbox: {
 					...config.sandbox,

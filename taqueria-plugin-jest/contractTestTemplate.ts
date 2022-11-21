@@ -111,7 +111,7 @@ ${
 `;
 	};
 
-export default (args: RequestArgs) => {
+export default (args: RequestArgs.t) => {
 	const parsedArgs = args as Opts;
 	parsedArgs.michelsonArtifact
 		? ensureMichelsonExists(parsedArgs)
