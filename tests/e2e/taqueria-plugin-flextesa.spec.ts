@@ -154,11 +154,11 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 
 		await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);
 
-		const sandboxStart = await exec(`TAQ_FLEXTESA_IMAGE=${imageName} taq start sandbox ${sandboxName}`, {
+		const sandboxStart = await exec(`TAQ_ECAD_FLEXTESA_IMAGE=${imageName} taq start sandbox ${sandboxName}`, {
 			cwd: `./${taqueriaProjectPath}`,
 			// Cannot use the env property as it replaces the environment, which
 			// contains the PATH for how to find the `taq` binary
-			// env: {'TAQ_FLEXTESA_IMAGE': imageName}
+			// env: {'TAQ_ECAD_FLEXTESA_IMAGE': imageName}
 		});
 
 		// 2. Verify that sandbox has been started and taqueria returns proper message into console
