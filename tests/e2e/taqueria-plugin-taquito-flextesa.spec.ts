@@ -7,7 +7,7 @@ const exec = utils.promisify(exec1);
 const taqueriaProjectPath = 'e2e/auto-test-taquito-flextesa-plugin';
 const contractRegex = new RegExp(/(KT1)+\w{33}?/);
 let environment: string;
-let dockerName: string = 'local-tf';
+let dockerName: string = 'localTF';
 const addressRegex = /tz1[A-Za-z0-9]{7,}/g;
 const amountRegex = /[0-9]{4,} ꜩ/g;
 
@@ -42,7 +42,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 2. Verify that contract has been originated on the network
 		expect(deployResponse).toContain('hello-tacos.tz');
-		expect(deployResponse).toContain(dockerName);
 		const contractHash = deployResponse.split('│')[2].trim();
 
 		expect(contractHash).toMatch(contractRegex);
@@ -51,7 +50,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const configContents = JSON.parse(
 			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
 		);
-		const port = configContents.sandbox.local.rpcUrl;
+		const port = configContents.sandbox.localTF.rpcUrl;
 		const contractFromSandbox = await exec(
 			`curl ${port}/chains/main/blocks/head/context/contracts/${contractHash}`,
 		);
@@ -74,7 +73,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 2. Get the KT address from the output
 		expect(deployResponse).toContain('hello-tacos.tz');
-		expect(deployResponse).toContain(dockerName);
 		const contractHash = deployResponse.split('│')[2].trim();
 
 		expect(contractHash).toMatch(contractRegex);
@@ -83,7 +81,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const configContents = JSON.parse(
 			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
 		);
-		const port = configContents.sandbox.local.rpcUrl;
+		const port = configContents.sandbox.localTF.rpcUrl;
 		const contractFromSandbox = await exec(
 			`curl ${port}/chains/main/blocks/head/context/contracts/${contractHash}`,
 		);
@@ -216,7 +214,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const configContents = JSON.parse(
 			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
 		);
-		const localURL = configContents.sandbox.local.rpcUrl;
+		const localURL = configContents.sandbox.localTF.rpcUrl;
 		const beforeAmount = checkContractBalanceOnNetwork(contractHash, localURL)
 
 		// 6. Call taq call command to transfer 0 tez from account to the contract

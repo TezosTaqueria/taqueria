@@ -21,12 +21,12 @@
 		"development": {
 			"networks": [],
 			"sandboxes": [
-				"local-tf"
+				"localTF"
 			]
 		}
 	},
 	"sandbox": {
-		"local-tf": {
+		"localTF": {
 			"label": "Local Tezos Sandbox",
 			"rpcUrl": "http://localhost:20000",
 			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
