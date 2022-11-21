@@ -98,7 +98,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
 			// 3. Call transfer to transfer
-			const transferResults = await exec(`taq transfer ${addressArray[1]} --mutez 1000000000`, {
+			await exec(`taq transfer ${addressArray[1]} --mutez 1000000000`, {
 				cwd: `./${taqueriaProjectPath}`,
 			});
 			await sleep(5000);
