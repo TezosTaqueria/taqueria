@@ -7,8 +7,8 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo ""
     echo '**********************************************'
     echo "** Installing NPM dependencies"
-    npm clean-install
-    npm run bootstrap -- --force-local
+    npm ci
+    npm run bootstrap
 
     echo ""
     echo '**********************************************'
