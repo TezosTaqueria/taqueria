@@ -16,7 +16,7 @@ const validateExtension = async (contractName: string) => {
 	return sendAsyncErr(`"${contractName}" doesn't have extension "arl".`);
 };
 
-const createContract = (args: RequestArgs.t) => {
+const createContract = (args: Opts) => {
 	const contractName = args.sourceFileName as string;
 	const contractsDir = `${args.config.projectDir}/${args.config.contractsDir}`;
 	return validateExtension(contractName)
