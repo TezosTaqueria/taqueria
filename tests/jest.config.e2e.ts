@@ -1,7 +1,25 @@
+import fs from 'fs';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
  */
+
+function checkEnvFile(): boolean {
+	const fileName = `../.env`;
+	if (!fs.existsSync(fileName)) {
+		return false;
+	}
+	const contents = fs.readFileSync(fileName, 'utf8');
+	return contents.includes('pinataJwtToken=');
+}
+
+if (!process.env.pinataJwtToken && !checkEnvFile()) {
+	console.log('E2E tests need the environment variable pinataJwtToken to be set to a valid pinata jst token.');
+	console.log(
+		'You can set that environment variable, or add a .env file in taqueria project root that sets the variable.',
+	);
+	throw new Error('E2E tests need the environment variable pinataJwtToken to be set to a valid pinata jst token');
+}
 
 export default {
 	// All imported modules in your tests should be mocked automatically
