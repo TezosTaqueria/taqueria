@@ -256,11 +256,5 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			console.log(e);
 		}
 		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-
-		const dockerListStdout = await exec('docker ps -a');
-		if (dockerListStdout.stdout.includes(dockerContainer)) {
-			console.log(dockerListStdout);
-			throw new Error('Container was not stopped properly');
-		}
 	});
 });
