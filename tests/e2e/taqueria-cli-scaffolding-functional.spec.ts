@@ -8,7 +8,9 @@ const scaffoldDirName = `e2e/auto-test-taco-shop-functional`;
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	beforeAll(async () => {
 		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true, force: true });
-		await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${scaffoldDirName}`);
+		console.log(
+			await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${scaffoldDirName}`),
+		);
 		// return await exec(`cd ${scaffoldDirName} && npm run setup`);
 	});
 

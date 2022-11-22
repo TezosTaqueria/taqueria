@@ -64,7 +64,7 @@ const {
 	eager,
 	isTaqError,
 	taqResolve,
-	// logInput,
+	logInput,
 	// debug
 } = utils.inject({
 	stdout: Deno.stdout,
@@ -426,10 +426,12 @@ const initProject = (
 		map(_ => i18n.__('bootstrapMsg')),
 	);
 
-const runScaffoldPostInit = (scaffoldDir: SanitizedAbsPath.t) => {
+const runScaffoldPostInit = (scaffoldDir: SanitizedAbsPath.t): Future<TaqError.t, SanitizedAbsPath.t> => {
 	const scaffoldConfigAbspath = SanitizedAbsPath.create(`${scaffoldDir}/scaffold.json`);
 	return pipe(
 		readJsonFile<ScaffoldConfig.t>(scaffoldConfigAbspath),
+		map(logInput('Scaffold Config')),
+		coalesce(_ => ({}) as ScaffoldConfig.t)(identity),
 		chain(scaffoldConfig =>
 			typeof scaffoldConfig === 'object' && scaffoldConfig.postInit
 				? pipe(
@@ -445,7 +447,6 @@ const runScaffoldPostInit = (scaffoldDir: SanitizedAbsPath.t) => {
 				)
 				: taqResolve(scaffoldConfigAbspath)
 		),
-		coalesce(_ => scaffoldConfigAbspath)(_ => scaffoldConfigAbspath),
 	);
 };
 
