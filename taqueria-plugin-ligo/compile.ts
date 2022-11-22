@@ -1,7 +1,7 @@
-import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-import { CompileOpts as Opts, getInputFilename, LIGO_DOCKER_IMAGE } from './common';
+import { CompileOpts as Opts, emitExternalError, getInputFilename, getLigoDockerImage } from './common';
 
 type TableRow = { contract: string; artifact: string };
 
@@ -62,7 +62,7 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${LIGO_DOCKER_IMAGE} compile contract`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile contract`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputFilename(parsedArgs, sourceFile)}`;
 	const cmd = `${baseCmd} ${inputFile} ${outputFile}`;
@@ -74,7 +74,7 @@ const getCompileExprCmd = (parsedArgs: Opts, sourceFile: string, exprKind: ExprK
 	if (!projectDir) throw `No project directory provided`;
 	const compilerType = isStorageKind(exprKind) ? 'storage' : 'parameter';
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${LIGO_DOCKER_IMAGE} compile ${compilerType}`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile ${compilerType}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputExprFileName(parsedArgs, sourceFile, exprKind, exprName)}`;
 	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile}`;
@@ -93,8 +93,7 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 			};
 		})
 		.catch(err => {
-			sendErr(`\n=== For ${sourceFile} ===`);
-			if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
+			emitExternalError(err, sourceFile);
 			return {
 				contract: sourceFile,
 				artifact: COMPILE_ERR_MSG,
@@ -114,8 +113,7 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 				};
 			})
 			.catch(err => {
-				sendErr(`\n=== For ${sourceFile} ===`);
-				if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
+				emitExternalError(err, sourceFile);
 				return {
 					contract: sourceFile,
 					artifact: COMPILE_ERR_MSG,
@@ -124,17 +122,7 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 
 const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind): Promise<TableRow[]> =>
 	readFile(getInputFilename(parsedArgs, sourceFile), 'utf8')
-		.then(async data => {
-			if (!data.includes('#include')) {
-				await writeFile(
-					getInputFilename(parsedArgs, sourceFile),
-					`#include "${getContractNameForExpr(sourceFile, exprKind)}"\n` + data,
-					'utf8',
-				);
-			}
-			return data;
-		})
-		.then(data => data.match(/(?<=\s*(let|const)\s+)[a-zA-Z0-9_]+/g))
+		.then(data => data.match(/(?<=\n\s*(let|const)\s+)[a-zA-Z0-9_]+/g))
 		.then(exprNames => {
 			if (!exprNames) return [];
 			const firstExprName = exprNames.slice(0, 1)[0];
@@ -146,8 +134,7 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 			return Promise.all([firstExprResult].concat(restExprResults));
 		})
 		.catch(err => {
-			sendErr(`\n=== For ${sourceFile} ===`);
-			if (err.message) sendErr(err.message.toString().replace(/Command failed.+?\n/, ''));
+			emitExternalError(err, sourceFile);
 			return [{
 				contract: sourceFile,
 				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} values compiled`,
@@ -179,6 +166,37 @@ const tryLegacyParameterNamingConvention = (parsedArgs: Opts, sourceFile: string
 	});
 };
 
+const initContentForStorage = (sourceFile: string): string => {
+	const linkToContract = `#include "${sourceFile}"\n\n`;
+
+	const instruction =
+		'// Define your initial storage values as a list of LIGO variable definitions,\n// the first of which will be considered the default value to be used for origination later on\n';
+
+	const ext = extractExt(sourceFile);
+	let syntax = '';
+	if (ext === '.ligo') syntax = '// E.g. const aStorageValue : aStorageType = 10;\n\n';
+	else if (ext === '.religo') syntax = '// E.g. let aStorageValue : aStorageType = 10;\n\n';
+	else if (ext === '.mligo') syntax = '// E.g. let aStorageValue : aStorageType = 10\n\n';
+	else if (ext === '.jsligo') syntax = '// E.g. const aStorageValue : aStorageType = 10;\n\n';
+
+	return linkToContract + instruction + syntax;
+};
+
+const initContentForParameter = (sourceFile: string): string => {
+	const linkToContract = `#include "${sourceFile}"\n\n`;
+
+	const instruction = '// Define your parameter values as a list of LIGO variable definitions\n';
+
+	const ext = extractExt(sourceFile);
+	let syntax = '';
+	if (ext === '.ligo') syntax = '// E.g. const aParameterValue : aParameterType = Increment(1);\n\n';
+	else if (ext === '.religo') syntax = '// E.g. let aParameterValue : aParameterType = (Increment (1));\n\n';
+	else if (ext === '.mligo') syntax = '// E.g. let aParameterValue : aParameterType = Increment 1\n\n';
+	else if (ext === '.jsligo') syntax = '// E.g. const aParameterValue : aParameterType = (Increment (1));\n\n';
+
+	return linkToContract + instruction + syntax;
+};
+
 const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile);
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
@@ -190,9 +208,9 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 		.catch(() => tryLegacyStorageNamingConvention(parsedArgs, sourceFile))
 		.catch(() => {
 			sendWarn(
-				`Note: storage file associated with "${sourceFile}" can't be found, so "${storageListFile}" has been created for you. Use this file to define initial storage values as a list of LIGO variable definitions, the first of which will be considered the default storage. e.g. "let STORAGE_NAME: STORAGE_TYPE = LIGO_EXPR" for CameLigo syntax\n`,
+				`Note: storage file associated with "${sourceFile}" can't be found, so "${storageListFile}" has been created for you. Use this file to define all initial storage values for this contract\n`,
 			);
-			writeFile(storageListFilename, `#include "${sourceFile}"\n`, 'utf8');
+			writeFile(storageListFilename, initContentForStorage(sourceFile), 'utf8');
 		});
 
 	const parameterListFile = `${removeExt(sourceFile)}.parameterList${extractExt(sourceFile)}`;
@@ -202,9 +220,9 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 		.catch(() => tryLegacyParameterNamingConvention(parsedArgs, sourceFile))
 		.catch(() => {
 			sendWarn(
-				`Note: parameter file associated with "${sourceFile}" can't be found, so "${parameterListFile}" has been created for you. Use this file to define parameter values as a list of LIGO variable definitions. e.g. "let PARAMETER_NAME: PARAMETER_TYPE = LIGO_EXPR" for CameLigo syntax\n`,
+				`Note: parameter file associated with "${sourceFile}" can't be found, so "${parameterListFile}" has been created for you. Use this file to define all parameter values for this contract\n`,
 			);
-			writeFile(parameterListFilename, `#include "${sourceFile}"\n`, 'utf8');
+			writeFile(parameterListFilename, initContentForParameter(sourceFile), 'utf8');
 		});
 
 	let compileResults: TableRow[] = [contractCompileResult];

@@ -37,6 +37,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
+		console.log(deployCommand);
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 		// 2. Verify that contract has been originated on the network
@@ -201,6 +202,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 				cwd: `./${taqueriaProjectPath}`,
 			});
+			console.log(deployCommand);
 			const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 			// 5. Get the KT address from the output
@@ -250,11 +252,5 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			console.log(e);
 		}
 		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-
-		const dockerListStdout = await exec('docker ps -a');
-		if (dockerListStdout.stdout.includes(dockerContainer)) {
-			console.log(dockerListStdout);
-			throw new Error('Container was not stopped properly');
-		}
 	});
 });

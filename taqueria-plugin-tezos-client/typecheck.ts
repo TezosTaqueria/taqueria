@@ -8,8 +8,8 @@ import {
 	sendWarn,
 } from '@taqueria/node-sdk';
 import {
-	DOCKER_IMAGE,
 	getCheckFileExistenceCommand,
+	getClientDockerImage,
 	getInputFilename,
 	GLOBAL_OPTIONS,
 	trimTezosClientMenuIfPresent,
@@ -22,7 +22,7 @@ const getTypecheckCmd = async (parsedArgs: Opts, sourceFile: string): Promise<st
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const arch = await getArch();
-	const flextesaImage = DOCKER_IMAGE;
+	const flextesaImage = getClientDockerImage();
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const cmd = `${baseCmd} octez-client ${GLOBAL_OPTIONS} typecheck script ${inputFile}`;
