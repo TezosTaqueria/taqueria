@@ -33,7 +33,8 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		} catch (_) {}
 	});
 
-	test('Verify that an environment variable can override the flextesa docker image', async () => {
+	// TODO: may add it add later
+	test.skip('Verify that an environment variable can override the flextesa docker image', async () => {
 		sandboxName = 'local';
 		const imageName = 'ghcr.io/ecadlabs/taqueria-flextesa:1429-merge-1ccbcc8';
 
