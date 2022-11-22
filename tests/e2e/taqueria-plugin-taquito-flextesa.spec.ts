@@ -14,6 +14,7 @@ const amountRegex = /[0-9]{4,} ꜩ/g;
 
 describe('E2E Testing for taqueria taquito plugin', () => {
 	beforeAll(async () => {
+		await fsPromises.rm(taqueriaProjectPath, { recursive: true, force: true });
 		await generateTestProject(taqueriaProjectPath, ['taquito', 'flextesa']);
 		await exec(
 			`cp e2e/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
@@ -37,7 +38,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
-		console.log(deployCommand);
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 		// 2. Verify that contract has been originated on the network
@@ -92,150 +92,125 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	});
 
 	test('Verify that taqueria taquito plugin can transfer amount of tezos using transfer command from one account to another', async () => {
-		try {
-			// 1. Setting up environment name
-			environment = 'development';
+		// 1. Setting up environment name
+		environment = 'development';
 
-			// 2. Get Bob's and Alice's account addresses
-			const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-			const addressArray = itemArrayInTable(addressRegex, initialContractList);
+		// 2. Get Bob's and Alice's account addresses
+		const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+		const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
-			// 3. Call transfer to transfer
-			await exec(`taq transfer ${addressArray[1]} --mutez 1000000000`, { cwd: `./${taqueriaProjectPath}` });
-			sleep(2500);
+		// 3. Call transfer to transfer
+		await exec(`taq transfer ${addressArray[1]} --mutez 1000000000`, { cwd: `./${taqueriaProjectPath}` });
+		await sleep(2500);
 
-			// 4. Verify transfer results
-			const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-			const amountArray = itemArrayInTable(amountRegex, resultContractList);
-			expect(amountArray[1]).toEqual('4000 ꜩ');
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		// 4. Verify transfer results
+		const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+		const amountArray = itemArrayInTable(amountRegex, resultContractList);
+		expect(amountArray[1]).toEqual('4000 ꜩ');
 	});
 
 	test('Verify that taqueria taquito plugin cant transfer 0 tez using transfer command from one account to another', async () => {
-		try {
-			// 1. Setting up environment name
-			environment = 'development';
+		// 1. Setting up environment name
+		environment = 'development';
 
-			// 2. Get Bob's and Alice's account addresses
-			const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-			const addressArray = itemArrayInTable(addressRegex, initialContractList);
+		// 2. Get Bob's and Alice's account addresses
+		const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+		const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
-			// 3. Call transfer to transfer
-			const transferResult = await exec(`taq transfer ${addressArray[1]} --mutez 0`, {
-				cwd: `./${taqueriaProjectPath}`,
-			});
+		// 3. Call transfer to transfer
+		const transferResult = await exec(`taq transfer ${addressArray[1]} --mutez 0`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
 
-			expect(transferResult.stderr).toContain('Error while performing operation');
-			expect(transferResult.stderr).toContain('empty_transaction');
-			expect(transferResult.stderr).toContain('No operations performed');
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		expect(transferResult.stderr).toContain('Error while performing operation');
+		expect(transferResult.stderr).toContain('empty_transaction');
+		expect(transferResult.stderr).toContain('No operations performed');
 	});
 
 	test('Verify that taqueria taquito plugin cant transfer from non-instantiated account to another', async () => {
-		try {
-			// 1. Setting up environment name
-			environment = 'development';
+		// 1. Setting up environment name
+		environment = 'development';
 
-			// 2. Get Bob's and Alice's account addresses
-			const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-			const addressArray = itemArrayInTable(addressRegex, initialContractList);
+		// 2. Get Bob's and Alice's account addresses
+		const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+		const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
-			// 3. Call transfer to transfer
-			const transferResult = await exec(
-				`taq transfer ${addressArray[1]} --mutez 1000000000 --sender ${addressArray[3]}`,
-				{ cwd: `./${taqueriaProjectPath}` },
-			);
+		// 3. Call transfer to transfer
+		const transferResult = await exec(
+			`taq transfer ${addressArray[1]} --mutez 1000000000 --sender ${addressArray[3]}`,
+			{ cwd: `./${taqueriaProjectPath}` },
+		);
 
-			expect(transferResult.stderr).toContain(
-				`${addressArray[3]} is not an account instantiated in the current environment. Check .taq/config.json`,
-			);
-			expect(transferResult.stderr).toContain(`No operations performed`);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		expect(transferResult.stderr).toContain(
+			`${addressArray[3]} is not an account instantiated in the current environment. Check .taq/config.json`,
+		);
+		expect(transferResult.stderr).toContain(`No operations performed`);
 	});
 
 	test('Verify that taqueria taquito plugin can transfer amount of tezos using transfer command from one account to another if account does not enough tezos', async () => {
-		try {
-			// 1. Setting up environment name
-			environment = 'development';
+		// 1. Setting up environment name
+		environment = 'development';
 
-			// 2. Get Bob's and Alice's account addresses
-			const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+		// 2. Get Bob's and Alice's account addresses
+		const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 
-			const addressArray = itemArrayInTable(addressRegex, initialContractList);
+		const addressArray = itemArrayInTable(addressRegex, initialContractList);
 
-			// 3. Call transfer to transfer
-			const transferResult = await exec(`taq transfer ${addressArray[1]} --mutez 5000000000`, {
-				cwd: `./${taqueriaProjectPath}`,
-			});
+		// 3. Call transfer to transfer
+		const transferResult = await exec(`taq transfer ${addressArray[1]} --mutez 5000000000`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
 
-			// 4. Verify that taqueria throw an error for transfer
-			expect(transferResult.stderr).toContain('Error while performing operation');
-			expect(transferResult.stderr).toContain('balance_too_low');
-			expect(transferResult.stderr).toContain('No operations performed');
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		// 4. Verify that taqueria throw an error for transfer
+		expect(transferResult.stderr).toContain('Error while performing operation');
+		expect(transferResult.stderr).toContain('balance_too_low');
+		expect(transferResult.stderr).toContain('No operations performed');
 	});
 
 	test('Verify that taqueria taquito plugin can transfer amount of tezos using call command from an account to a contract with using parameters file', async () => {
-		try {
-			// 1. Setting up environment name
-			environment = 'development';
+		// 1. Setting up environment name
+		environment = 'development';
 
-			// 2. Copy contract and parameters files in contract directory
-			await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
-			await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
-			await exec(`cp e2e/data/hello-tacos.parameter.decrement_by_1.tz ${taqueriaProjectPath}/artifacts/`);
+		// 2. Copy contract and parameters files in contract directory
+		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp e2e/data/hello-tacos.parameter.decrement_by_1.tz ${taqueriaProjectPath}/artifacts/`);
 
-			// 3. Get default (Bob's) account initial amount
-			const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-			const addressArray = itemArrayInTable(addressRegex, initialContractList);
-			const initAmountArray = itemArrayInTable(amountRegex, initialContractList);
+		// 3. Get default (Bob's) account initial amount
+		const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+		const addressArray = itemArrayInTable(addressRegex, initialContractList);
+		const initAmountArray = itemArrayInTable(amountRegex, initialContractList);
 
-			// 4. Run taq deploy ${contractName} on a selected test network described in "test" environment
-			const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
-				cwd: `./${taqueriaProjectPath}`,
-			});
-			console.log(deployCommand);
-			const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
+		// 4. Run taq deploy ${contractName} on a selected test network described in "test" environment
+		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
-			// 5. Get the KT address from the output
-			const contractHash = deployResponse.split('│')[2].trim();
+		// 5. Get the KT address from the output
+		const contractHash = deployResponse.split('│')[2].trim();
 
-			// 6. Call taq call command to transfer 0 tez from account to the contract
-			const transferResult = await exec(`taq call ${contractHash} --param hello-tacos.parameter.decrement_by_1.tz`, {
-				cwd: `./${taqueriaProjectPath}`,
-			});
+		// 6. Call taq call command to transfer 0 tez from account to the contract
+		const transferResult = await exec(`taq call ${contractHash} --param hello-tacos.parameter.decrement_by_1.tz`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
 
-			// 7. Verify output result
-			expect(transferResult.stdout).toEqual(transferOutput(contractHash));
+		// 7. Verify output result
+		expect(transferResult.stdout).toEqual(transferOutput(contractHash));
 
-			// 8. Verify that amount was not charged
-			const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-			const resultAmountArray = itemArrayInTable(amountRegex, resultContractList);
+		// 8. Verify that amount was not charged
+		const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+		const resultAmountArray = itemArrayInTable(amountRegex, resultContractList);
 
-			// TODO: issue with an amount
-			// expect(resultAmountArray[0]).toEqual(initAmountArray[0]);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		// TODO: issue with an amount
+		// expect(resultAmountArray[0]).toEqual(initAmountArray[0]);
 	});
 
 	// Remove all files from artifacts folder without removing folder itself
 	afterEach(async () => {
-		try {
-			const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
-			for (const file of files) {
-				await fsPromises.rm(`${taqueriaProjectPath}/artifacts/${file}`);
-			}
-		} catch (error) {
-			throw new Error(`error: ${error}`);
+		const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
+		for (const file of files) {
+			await fsPromises.rm(`${taqueriaProjectPath}/artifacts/${file}`);
 		}
 	});
 
@@ -252,11 +227,5 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			console.log(e);
 		}
 		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-
-		const dockerListStdout = await exec('docker ps -a');
-		if (dockerListStdout.stdout.includes(dockerContainer)) {
-			console.log(dockerListStdout);
-			throw new Error('Container was not stopped properly');
-		}
 	});
 });
