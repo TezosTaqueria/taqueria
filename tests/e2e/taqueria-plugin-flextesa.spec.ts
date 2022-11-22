@@ -1,7 +1,14 @@
 import { ChildProcess, exec as exec1, spawn } from 'child_process';
 import fsPromises from 'fs/promises';
 import util from 'util';
-import { generateTestProject, getContainerID, getContainerImage, getContainerImages, getContainerName, sleep } from './utils/utils';
+import {
+	generateTestProject,
+	getContainerID,
+	getContainerImage,
+	getContainerImages,
+	getContainerName,
+	sleep,
+} from './utils/utils';
 const exec = util.promisify(exec1);
 import * as flexContents from './data/help-contents/flextesa-contents';
 
@@ -31,6 +38,34 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		try {
 			await exec(`taq -p ${taqueriaProjectPath}`);
 		} catch (_) {}
+	});
+
+	// TODO: may add it add later
+	test.skip('Verify that an environment variable can override the flextesa docker image', async () => {
+		sandboxName = 'local';
+		const imageName = 'ghcr.io/ecadlabs/taqueria-flextesa:1429-merge-1ccbcc8';
+
+		const sandboxStart = await exec(`TAQ_ECAD_FLEXTESA_IMAGE=${imageName} taq start sandbox`, {
+			cwd: `./${taqueriaProjectPath}`,
+			// Cannot use the env property as it replaces the environment, which
+			// contains the PATH for how to find the `taq` binary
+			// env: {'TAQ_FLEXTESA_IMAGE': imageName}
+		});
+
+		// 2. Verify that sandbox has been started and taqueria returns proper message into console
+		expect(sandboxStart.stdout).toContain(`Started ${sandboxName}.`);
+		expect(sandboxStart.stdout).toContain(`Done.`);
+
+		// 3. Verify that docker container has been started
+		const dockerContainerTest = await getContainerName(sandboxName);
+		expect(dockerContainerTest).toContain(`taq-flextesa-${sandboxName}`);
+		expect(await getContainerImage(sandboxName)).toBe(imageName);
+
+		// 4.  Run stop command and verify the output
+		const sandboxStop = await exec(`TAQ_ECAD_FLEXTESA_IMAGE=${imageName} taq stop sandbox ${sandboxName}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+		await sleep(2500);
 	});
 
 	test('Verify that the flextesa plugin exposes the associated commands in the help menu', async () => {
