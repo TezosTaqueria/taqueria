@@ -191,3 +191,4 @@ taqueria-plugin-metadata/index.js.map
 
 # Temp taq projects created from e2e test execution
 tests/e2e/auto-test-*
+tests/scrap

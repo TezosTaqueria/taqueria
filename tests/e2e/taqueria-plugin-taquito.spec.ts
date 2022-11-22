@@ -12,7 +12,7 @@ import {
 const exec = utils.promisify(exec1);
 
 describe('E2E Testing for taqueria taquito plugin', () => {
-	const taqueriaProjectPath = 'e2e/auto-test-taquito-plugin';
+	const taqueriaProjectPath = 'scrap/auto-test-taquito-plugin';
 	const contractRegex = new RegExp(/(KT1)+\w{33}?/);
 	let environment: string;
 

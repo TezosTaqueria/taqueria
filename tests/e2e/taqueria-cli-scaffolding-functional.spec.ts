@@ -3,7 +3,7 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 const exec = util.promisify(exec1);
 
-const scaffoldDirName = `e2e/auto-test-taco-shop-functional`;
+const scaffoldDirName = `./scrap/auto-test-taco-shop-functional`;
 
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	beforeAll(async () => {

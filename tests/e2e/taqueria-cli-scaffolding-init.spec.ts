@@ -4,7 +4,7 @@ import util from 'util';
 const exec = util.promisify(exec1);
 
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
-	const scaffoldDirName = `taqueria-taco-shop`;
+	const scaffoldDirName = `./scrap/taqueria-taco-shop`;
 
 	test('Verify that taq scaffold will create a baseline scaffold of the taco shop project', async () => {
 		// the URL for the default scaffold project is https://github.com/ecadlabs/taqueria-scaffold-taco-shop
@@ -76,7 +76,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 });
 
 describe('E2E Testing for taqueria scaffolding initialization in other directory,', () => {
-	const alternateDirectory = 'alt-directory';
+	const alternateDirectory = 'scrap/alt-directory';
 	test('Verify that taq scaffold quickstart project can be installed in a specific directory', async () => {
 		try {
 			await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${alternateDirectory}`);

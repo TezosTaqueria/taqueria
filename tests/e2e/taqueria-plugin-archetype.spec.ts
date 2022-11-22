@@ -6,7 +6,7 @@ import { checkFolderExistsWithTimeout, generateTestProject } from './utils/utils
 const exec = utils.promisify(exec1);
 import * as contents from './data/help-contents/archetype-contents';
 
-const taqueriaProjectPath = 'e2e/auto-test-archetype-plugin';
+const taqueriaProjectPath = './scrap/auto-test-archetype-plugin';
 
 describe('E2E Testing for taqueria archetype plugin', () => {
 	beforeAll(async () => {
