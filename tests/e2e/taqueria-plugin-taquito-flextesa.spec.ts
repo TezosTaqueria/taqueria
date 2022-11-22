@@ -44,7 +44,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
-		console.log(deployCommand);
 		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
 
 		// 2. Verify that contract has been originated on the network
@@ -223,13 +222,9 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
 	afterAll(async () => {
-		const dockerContainer = await getContainerName(dockerName);
 		try {
 			await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 		} catch (e: unknown) {
-			console.log(
-				'Could not stop sandbox. This can affect next tests. This happened in taqueria-plugin-taquito-flextesa.spec.ts',
-			);
 			console.log(e);
 		}
 		await fsPromises.rm(taqueriaProjectPath, { recursive: true });

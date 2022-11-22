@@ -10,9 +10,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true, force: true });
 
 		// Please leave this console log intact. Its useful to see _when_ there is a failure.
-		console.log(
-			await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${scaffoldDirName}`),
-		);
+		await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${scaffoldDirName}`);
 	});
 
 	test('Verify that scaffold project is set up after running setup', async () => {

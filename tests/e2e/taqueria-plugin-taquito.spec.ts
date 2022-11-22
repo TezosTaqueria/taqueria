@@ -78,7 +78,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
-		console.log(deployCommand);
 
 		// 3. Verify that contract has been originated on the network
 		expect(deployCommand.stdout).toContain('hello-tacos.tz');
@@ -113,7 +112,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
-		console.log(deployCommand);
 
 		// 3. Verify that contract has been originated on the network
 		expect(deployCommand.stdout).toContain('hello-tacos.tz');
@@ -227,10 +225,8 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		const fundResult = await exec(`taq fund -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
-		console.log(fundResult);
 
 		const amountFundedArray = itemArrayInTable(/[0-9]{7,}/g, fundResult);
-		console.log(amountFundedArray);
 		expect(amountFundedArray).toStrictEqual(configTezAmounts);
 	});
 
