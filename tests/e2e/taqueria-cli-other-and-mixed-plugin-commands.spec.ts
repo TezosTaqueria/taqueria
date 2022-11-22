@@ -11,6 +11,11 @@ const taqueriaProjectPath = './e2e/auto-test-cli';
 describe('E2E Testing for taqueria CLI,', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
 	});
 
 	test('Verify that taq --help gives the help menu for a non-initialized project', async () => {
@@ -35,7 +40,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 		const version = execSync('taq --version');
 		try {
 			expect(version.toString('utf8').trim()).toMatch(
-				/^((v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)|(dev-[\w-]+)|(\d+)-[\w-]+)$/,
+				/^((v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)|(dev-[\w-]+)|main?|(\d+)-[\w-]+)$/,
 			);
 		} catch (error) {
 			throw new Error(`error: ${error}`);

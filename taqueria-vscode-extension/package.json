@@ -3,8 +3,8 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
-	"version": "0.10.0",
-	"preview": true,
+	"version": "0.24.1",
+	"private": true,
 	"engines": {
 		"vscode": "^1.68.1",
 		"node": "^16.0.0"
@@ -79,7 +79,7 @@
 		"workspaceContains:.taq",
 		"onStartupFinished"
 	],
-	"main": "./out/extension.js",
+	"main": "./out/main.js",
 	"contributes": {
 		"configuration": {
 			"title": "Taqueria",
@@ -106,27 +106,96 @@
 		"views": {
 			"taqueria": [
 				{
-					"id": "taqueria-sandboxes",
-					"name": "Sandboxes",
-					"contextualTitle": "Sandboxes"
+					"id": "taqueria-system-check",
+					"name": "System Check",
+					"contextualTitle": "Taqueria: Checking System Requirements",
+					"visibility": "collapsed"
+				},
+				{
+					"id": "taqueria-init",
+					"name": "Initialize a Project",
+					"contextualTitle": "Taqueria: Initialize a Project",
+					"when": "@taqueria-state/system-check-passed && @taqueria-state/enable-init-scaffold"
+				},
+				{
+					"id": "taqueria-scaffold",
+					"name": "Create a new project from an existing Scaffold",
+					"contextualTitle": "Taqueria: Scaffold a project",
+					"when": "@taqueria-state/system-check-passed && @taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-plugins",
 					"name": "Plugins",
-					"contextualTitle": "Plugins"
+					"contextualTitle": "Taqueria: Plugins",
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-contracts",
 					"name": "Contracts",
-					"contextualTitle": "Contracts"
+					"contextualTitle": "Taqueria: Contracts",
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
+				},
+				{
+					"id": "taqueria-sandboxes",
+					"name": "Sandboxes",
+					"contextualTitle": "Taqueria: Sandboxes",
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
+				},
+				{
+					"id": "taqueria-artifacts",
+					"name": "Artifacts",
+					"contextualTitle": "Taqueria: Artifacts",
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
 				},
 				{
 					"id": "taqueria-environments",
 					"name": "Environments",
-					"contextualTitle": "Environments"
+					"contextualTitle": "Taqueria: Environments",
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
+				},
+				{
+					"id": "taqueria-tests",
+					"name": "Tests",
+					"contextualTitle": "Taqueria: Tests",
+					"when": "@taqueria-state/system-check-passed && !@taqueria-state/enable-init-scaffold"
 				}
 			]
 		},
+		"viewsWelcome": [
+			{
+				"view": "taqueria-system-check",
+				"when": "@taqueria-state/is-taq-cli-reachable",
+				"contents": "✅ Taq CLI: Installed"
+			},
+			{
+				"view": "taqueria-system-check",
+				"when": "!@taqueria-state/is-taq-cli-reachable",
+				"contents": "❌ Taq CLI:\nYour system does not have the taq command installed.\nYou must download the taq program and put it in your system. Click [here](https://taqueria.io/docs/getting-started/installation/) for installation instructions.\nIf you prefer, the Taqueria extension can install it for you. To do this, please click the button below, you will be prompted for your password\n[Install Taq CLI](command:taqueria.install_taq_cli)\nAfter taq command is installed, please click the \"Check Again\" button."
+			},
+			{
+				"view": "taqueria-system-check",
+				"when": "@taqueria-state/is-node-installed && @taqueria-state/node-version-meets-requirements",
+				"contents": "✅ Node.js: Installed"
+			},
+			{
+				"view": "taqueria-system-check",
+				"when": "!@taqueria-state/is-node-installed",
+				"contents": "❌ NodeJs: Unable to find nodejs. You can find instructions to install node [here](https://nodejs.org/en/download/)."
+			},
+			{
+				"view": "taqueria-system-check",
+				"when": "@taqueria-state/is-node-installed && !@taqueria-state/node-version-meets-requirements",
+				"contents": "❌ NodeJs: Node version is not supported. Please update your node to be newer than 16.13.1. You can find instructions [here](https://nodejs.org/en/download/)."
+			},
+			{
+				"view": "taqueria-system-check",
+				"contents": "[Check Again](command:taqueria.refresh_command_states)"
+			},
+			{
+				"view": "taqueria-init",
+				"contents": "Initialize a new taqueria empty project structure\n[Initialize](command:taqueria.init)"
+			}
+		],
 		"commands": [
 			{
 				"command": "taqueria.init",
@@ -140,7 +209,14 @@
 				"category": "Taqueria",
 				"title": "Scaffold Project",
 				"shortTitle": "scaffold",
-				"enablement": "@taqueria-state/enable-init-scaffold"
+				"enablement": "@taqueria-state/enable-init-scaffold",
+				"icon": "$(unfold)"
+			},
+			{
+				"command": "taqueria.refresh_command_states",
+				"category": "Taqueria",
+				"title": "Refresh Command States",
+				"shortTitle": "refresh"
 			},
 			{
 				"command": "taqueria.install",
@@ -159,26 +235,42 @@
 				"icon": "$(close)"
 			},
 			{
+				"command": "taqueria.compile_current_file",
+				"category": "Taqueria",
+				"title": "Compile Current File",
+				"shortTitle": "compile current file",
+				"enablement": "resourceExtname in @taqueria/supported-smart-contract-extensions",
+				"icon": "$(combine)"
+			},
+			{
+				"command": "taqueria.compile_pick_file",
+				"category": "Taqueria",
+				"title": "Compile (Pick File)",
+				"shortTitle": "compile pick file",
+				"enablement": "@taqueria/plugin-any-compiler",
+				"icon": "$(combine)"
+			},
+			{
 				"command": "taqueria.compile_smartpy",
 				"category": "Taqueria",
-				"title": "Compile (SmartPy)",
-				"shortTitle": "compile --plugin smartpy",
+				"title": "Compile",
+				"shortTitle": "compile",
 				"enablement": "@taqueria/plugin-smartpy",
 				"icon": "images/smartpy.svg"
 			},
 			{
 				"command": "taqueria.compile_ligo",
 				"category": "Taqueria",
-				"title": "Compile (LIGO)",
-				"shortTitle": "compile --plugin ligo",
+				"title": "Compile",
+				"shortTitle": "compile",
 				"enablement": "@taqueria/plugin-ligo",
 				"icon": "images/ligo.svg"
 			},
 			{
 				"command": "taqueria.compile_archetype",
 				"category": "Taqueria",
-				"title": "Compile (Archetype)",
-				"shortTitle": "compile --plugin archetype",
+				"title": "Compile",
+				"shortTitle": "compile",
 				"enablement": "@taqueria/plugin-archetype",
 				"icon": "images/archetype.svg"
 			},
@@ -209,8 +301,24 @@
 			{
 				"command": "taqueria.originate",
 				"category": "Taqueria",
-				"title": "Originate contracts",
+				"title": "Originate",
 				"shortTitle": "originate",
+				"enablement": "@taqueria/plugin-taquito",
+				"icon": "$(cloud-upload)"
+			},
+			{
+				"command": "taqueria.originate_current_file",
+				"category": "Taqueria",
+				"title": "Originate Current Contract",
+				"shortTitle": "originate current contract",
+				"enablement": "@taqueria/plugin-taquito && resourceExtname == .tz",
+				"icon": "$(cloud-upload)"
+			},
+			{
+				"command": "taqueria.originate_pick_file",
+				"category": "Taqueria",
+				"title": "Originate (pick a contract)",
+				"shortTitle": "originate (pick a contract)",
 				"enablement": "@taqueria/plugin-taquito",
 				"icon": "$(cloud-upload)"
 			},
@@ -231,25 +339,165 @@
 				"category": "Taqueria",
 				"title": "Generate Types",
 				"shortTitle": "generate types",
-				"enablement": "@taqueria/plugin-contract-types"
+				"enablement": "@taqueria/plugin-contract-types",
+				"icon": "$(save-as)"
 			},
 			{
 				"command": "taqueria.typecheck",
 				"category": "Taqueria",
-				"title": "Typecheck Michelson contracts",
+				"title": "Typecheck Artifact",
 				"shortTitle": "typecheck",
 				"enablement": "@taqueria/plugin-tezos-client",
 				"icon": "$(check)"
 			},
 			{
-				"command": "taqueria.test",
+				"command": "taqueria.create_test_folder",
 				"category": "Taqueria",
 				"title": "Setup directory as a partition to run Jest tests",
-				"shortTitle": "test",
-				"enablement": "@taqueria/plugin-jest"
+				"shortTitle": "setup test",
+				"enablement": "@taqueria/plugin-jest",
+				"icon": "$(add)"
+			},
+			{
+				"command": "taqueria.run_tests",
+				"category": "Taqueria",
+				"title": "Run tests",
+				"shortTitle": "run tests",
+				"enablement": "@taqueria/plugin-jest",
+				"icon": "$(run)"
+			},
+			{
+				"command": "taqueria.add_contract",
+				"category": "Taqueria",
+				"title": " Add contract to registry",
+				"shortTitle": "add",
+				"icon": "$(add)"
+			},
+			{
+				"command": "taqueria.rm_contract",
+				"category": "Taqueria",
+				"title": " Remove contract from registry",
+				"shortTitle": "remove",
+				"icon": "$(remove)"
+			},
+			{
+				"command": "taqueria.show_entrypoint_parameters",
+				"category": "Taqueria",
+				"title": "Parameters",
+				"shortTitle": "parameters",
+				"icon": "$(list-unordered)"
+			},
+			{
+				"command": "taqueria.refresh_sandbox_data",
+				"category": "Taqueria",
+				"title": "Refresh",
+				"shortTitle": "refresh",
+				"icon": "$(refresh)"
+			},
+			{
+				"command": "taqueria.show_operation_details",
+				"category": "Taqueria",
+				"title": "Show Operation Details",
+				"shortTitle": "details",
+				"icon": "$(list-unordered)"
+			},
+			{
+				"command": "taqueria.invoke_entrypoint",
+				"category": "Taqueria",
+				"title": "Invoke Entrypoint",
+				"shortTitle": "invoke",
+				"icon": "$(call-outgoing)"
 			}
 		],
 		"menus": {
+			"commandPalette": [
+				{
+					"command": "taqueria.add_contract",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.rm_contract",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.run_tests",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.refresh_command_states",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.show_entrypoint_parameters",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.refresh_sandbox_data",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.show_operation_details",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.compile_archetype",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.compile_smartpy",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.compile_ligo",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.originate",
+					"when": "false"
+				}
+			],
+			"explorer/context": [
+				{
+					"command": "taqueria.compile_smartpy",
+					"when": "resourceExtname == .py && resourceDirname =~ /^.*/contracts$/",
+					"group": "2_workspace"
+				},
+				{
+					"command": "taqueria.compile_smartpy",
+					"when": "resourceExtname == .ts && resourceDirname =~ /^.*/contracts$/",
+					"group": "2_workspace"
+				},
+				{
+					"command": "taqueria.compile_ligo",
+					"when": "resourceExtname == .mligo && resourceDirname =~ /^.*/contracts$/",
+					"group": "2_workspace"
+				},
+				{
+					"command": "taqueria.compile_ligo",
+					"when": "resourceExtname == .ligo && resourceDirname =~ /^.*/contracts$/",
+					"group": "2_workspace"
+				},
+				{
+					"command": "taqueria.compile_ligo",
+					"when": "resourceExtname == .religo && resourceDirname =~ /^.*/contracts$/",
+					"group": "2_workspace"
+				},
+				{
+					"command": "taqueria.compile_ligo",
+					"when": "resourceExtname == .jsligo && resourceDirname =~ /^.*/contracts$/",
+					"group": "2_workspace"
+				},
+				{
+					"command": "taqueria.compile_archetype",
+					"when": "resourceExtname == .arl && resourceDirname =~ /^.*/contracts$/",
+					"group": "2_workspace"
+				},
+				{
+					"command": "taqueria.originate",
+					"when": "resourceExtname == .tz && resourceDirname =~ /^.*/artifacts(/.*)*/",
+					"group": "2_workspace"
+				}
+			],
 			"view/item/context": [
 				{
 					"command": "taqueria.install",
@@ -263,17 +511,17 @@
 				},
 				{
 					"command": "taqueria.start_sandbox",
-					"when": "view == taqueria-sandboxes && viewItem != running",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!running)/",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.stop_sandbox",
-					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!stopped)/",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.list_accounts",
-					"when": "view == taqueria-sandboxes && viewItem != stopped",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!stopped)/",
 					"group": "inline"
 				},
 				{
@@ -293,24 +541,88 @@
 				},
 				{
 					"command": "taqueria.originate",
-					"when": "view == taqueria-environments || view == taqueria-contracts",
+					"when": "view == taqueria-artifacts",
 					"group": "inline"
 				},
 				{
 					"command": "taqueria.typecheck",
-					"when": "view == taqueria-sandboxes && view != stopped",
+					"when": "view == taqueria-artifacts",
 					"group": "inline"
+				},
+				{
+					"command": "taqueria.originate_pick_file",
+					"when": "view == taqueria-environments",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.typecheck",
+					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!stopped)/",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.add_contract",
+					"when": "view == taqueria-contracts && viewItem =~ /inRegistry:false/",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.rm_contract",
+					"when": "view == taqueria-contracts && viewItem =~ /inRegistry:true/",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.run_tests",
+					"when": "view == taqueria-tests",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.scaffold",
+					"when": "view == taqueria-scaffold",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.show_entrypoint_parameters",
+					"when": "view == taqueria-sandboxes && viewItem == entrypoint",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.invoke_entrypoint",
+					"when": "view == taqueria-sandboxes && viewItem == entrypoint",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.refresh_sandbox_data",
+					"when": "view == taqueria-sandboxes",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.show_operation_details",
+					"when": "view == taqueria-sandboxes && viewItem == operation",
+					"group": "inline"
+				}
+			],
+			"view/title": [
+				{
+					"command": "taqueria.create_test_folder",
+					"when": "view == taqueria-tests",
+					"group": "navigation"
+				},
+				{
+					"command": "taqueria.generate_types",
+					"when": "view == taqueria-artifacts",
+					"group": "navigation"
 				}
 			]
 		}
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "npx tsc -noEmit && parcel build --no-cache --no-optimize --no-scope-hoist --detailed-report 2>&1",
-		"watch": "parcel watch --no-cache --detailed-report",
-		"pretest": "npm run compile",
+		"vscode:prepublish": "npm run compile:base -- --minify",
+		"compile:base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+		"compile": "npx tsc -noEmit && npm run compile:base -- --sourcemap",
+		"compile:watch": "npm run compile:base -- --sourcemap --watch",
+		"compile:test": "tsc -p tsconfig.test.json",
+		"pretest": "npm run compile:test",
 		"lint": "eslint src --ext ts",
-		"test": "node ./out/test/runTest.js"
+		"test": "./bin/run-tests.sh"
 	},
 	"devDependencies": {
 		"@taquito/taquito": "^13.0.1",
@@ -319,23 +631,29 @@
 		"@types/mocha": "^5.2.6",
 		"@types/node": "^17.0.17",
 		"@types/promise-memoize": "^1.2.1",
+		"@types/semver": "^7.3.10",
 		"@types/vscode": "1.63.0",
 		"@typescript-eslint/eslint-plugin": "^5.9.1",
 		"@typescript-eslint/parser": "^5.9.1",
 		"@vscode/test-electron": "^2.1.2",
-		"esbuild": "^0.14.15",
+		"esbuild": "^0.14.54",
 		"eslint": "^8.6.0",
 		"fs-extra": "^10.1.0",
 		"glob": "^7.2.0",
 		"mocha": "^9.2.1",
-		"parcel": "2.6.1",
 		"typescript": "4.7.2",
 		"vsce": "^2.6.4"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.10.0",
+		"@microsoft/signalr": "^6.0.8",
+		"@taqueria/protocol": "^0.24.1",
+		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
+		"eventsource": "^2.0.2",
+		"node-fetch-commonjs": "^3.1.1",
 		"promise-memoize": "^1.2.1",
-		"rambda": "^7.0.1"
+		"rambda": "^7.0.1",
+		"rxjs": "^7.5.6",
+		"semver": "^7.3.7"
 	}
 }

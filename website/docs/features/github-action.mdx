@@ -2,7 +2,7 @@
 title: Taqueria GitHub Action
 ---
 
-Taqueria has a GitHub action that helps simplify and standardize the use of in GitHub workflows. The action provides a Taqueria environment in a Docker container that can be used to run Taqueria commands in automated tests and CI/CD pipelines 
+Taqueria has a GitHub action that helps simplify and standardize the use of GitHub actions. The action provides a Taqueria environment in a Docker container that can be used to run Taqueria commands for automated tests and in CI/CD pipelines 
 
 You can find the action on the GitHub Marketplace [here](https://github.com/marketplace/actions/taqueria-actions)
 
@@ -26,7 +26,7 @@ A comma separated list of plugins to install
 
 ### `sandbox_name`
 
-The name of the Flextesa sandbox to use. A sandbox will only be created if this input is specified. When running the sandbox, the action will automatically change the value of `rpcUrl` for the sandbox in `config.json`. This is to enable origination to the local sandbox in CI
+The name of the Flextesa sandbox to use. A sandbox will only be created if this input is specified. When running the sandbox, the action will automatically change the value of `rpcUrl` for the sandbox in `.taq/config.json`. This is to enable origination to the local sandbox in CI
 
 ### `compile_command`
 
@@ -59,7 +59,7 @@ You can also check out the quickstart guide for GitHub actions in the GitHub doc
 ### Single step action
 ```yaml
 - name: taqueria tasks
-    uses: ecadlabs/taqueria-github-action@v0.2.2
+    uses: ecadlabs/taqueria-github-action@v0.11.0
     with:
         plugins: '@taqueria/plugin-ligo, @taqueria/plugin-flextesa, @taqueria/plugin-taquito'
         contracts: 'counter.jsligo'
@@ -72,26 +72,26 @@ You can also check out the quickstart guide for GitHub actions in the GitHub doc
 ### Multiple step action
 ```yaml
 - name: compile contracts
-    uses: ecadlabs/taqueria-github-action@v0.2.2
+    uses: ecadlabs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         contracts: 'hello-tacos.mligo'
         compile_command: 'compile'
 
 - name: start local sandbox
-    uses: ecadlabs/taqueria-github-action@v0.2.2
+    uses: ecadlabs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         sandbox_name: 'local'
 
 - name: originate contracts
-    uses: ecadlabs/taqueria-github-action@v0.2.2
+    uses: ecadlabs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         originate: 'true'
 
 - name: originate contracts
-    uses: ecadlabs/taqueria-github-action@v0.2.2
+    uses: ecadlabs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         tests: 'true'

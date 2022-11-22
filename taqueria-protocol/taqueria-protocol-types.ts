@@ -7,6 +7,7 @@ export * as HumanReadableIdentifier from '@taqueria/protocol/HumanReadableIdenti
 export * as i18n from '@taqueria/protocol/i18n';
 export * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
 export * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
+export * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
 export * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
 export * as Operation from '@taqueria/protocol/Operation';
 export * as Option from '@taqueria/protocol/Option';

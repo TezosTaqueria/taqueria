@@ -1,13 +1,13 @@
 {
 	"name": "@taqueria/tests",
-	"version": "0.10.0",
+	"version": "0.24.1",
 	"private": true,
 	"description": "This is Taqueria testing project includes unit, integration and e2e tests",
 	"main": "index.js",
 	"scripts": {
-		"test:unit": "npm run test:unit:deno",
+		"test:unit": "npm run test:unit:deno && npm run test:unit:jest",
 		"test:unit:deno": "TEST=true deno test unit/ --allow-all --unstable --import-map ../import_map.json",
-		"test:unit:jest": "TEST=true jest --config jest.config.unit.ts --coverage --no-cache",
+		"test:unit:jest": "TEST=true jest --config jest.config.unit.ts --no-cache",
 		"test:unit:deno:debug": "TEST=true deno test unit/ --allow-all --unstable --inspect-brk",
 		"test:unit:deno:with-coverage": "TEST=true deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
 		"test:unit:selected": "TEST=true deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",

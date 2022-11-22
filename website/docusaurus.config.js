@@ -10,6 +10,7 @@ const config = {
   plugins: [
     "docusaurus-plugin-sass",
     "@docusaurus-terminology/parser",
+    require.resolve('docusaurus-plugin-image-zoom'),
     webpackPlugin
   ],
   title: "Taqueria - Developer Tooling for Tezos",
@@ -109,7 +110,7 @@ const config = {
           {
             type: "doc",
             docId: "release-notes",
-            label: "Release Notes",
+            label: "v0.24.1",
             position: "right",
             className: "header-link"
           },
@@ -218,6 +219,15 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme
+      },
+      zoom: {
+        selector: '.markdown img',
+        background: {
+          light: 'rgb(255, 255, 255)',
+          dark: 'rgb(50, 50, 50)'
+        },
+        // options you can specify via https://github.com/francoischalifour/medium-zoom#usage
+        config: {}
       }
     })
 };

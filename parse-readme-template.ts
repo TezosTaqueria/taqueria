@@ -7,6 +7,7 @@ const docsDir = path.join(__dirname, 'website', 'docs', 'plugins');
 
 // new plugins or document directories can be added to this list
 const plugins: string[] = [
+	'taqueria-plugin-core',
 	'taqueria-plugin-archetype',
 	'taqueria-plugin-contract-types',
 	'taqueria-plugin-flextesa',
@@ -15,6 +16,7 @@ const plugins: string[] = [
 	'taqueria-plugin-taquito',
 	'taqueria-plugin-tezos-client',
 	`taqueria-plugin-ipfs-pinata`,
+	`taqueria-plugin-metadata`,
 ];
 
 // typed list of github variables with their values

@@ -2,6 +2,7 @@ import createType from '@taqueria/protocol/Base';
 import * as EconomicalProtocolHash from '@taqueria/protocol/EconomicalProtocolHash';
 import * as HumanReadableIdentifier from '@taqueria/protocol/HumanReadableIdentifier';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
+import * as TzKt from '@taqueria/protocol/tzkt-config';
 import * as Url from '@taqueria/protocol/Url';
 import * as Verb from '@taqueria/protocol/Verb';
 import { z } from 'zod';
@@ -29,6 +30,7 @@ export const rawSchema = z.object({
 		z.object({ default: z.string().min(1) }),
 		z.record(SandboxAccountConfig.rawSchema),
 	], { description: 'Sandbox Accounts' }).optional(),
+	tzkt: TzKt.rawSchema.describe('TzKt config').optional(),
 });
 
 const internalSchema = z.object({
@@ -41,6 +43,7 @@ const internalSchema = z.object({
 	).optional(),
 	plugin: Verb.schemas.schema.describe('Sandbox Plugin').optional(),
 	accounts: accountMapSchema.optional(),
+	tzkt: TzKt.rawSchema.describe('TzKt config').optional(),
 }, { description: 'Sandbox Configuration' });
 
 type RawInput = z.infer<typeof rawSchema>;

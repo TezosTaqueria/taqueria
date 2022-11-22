@@ -1,0 +1,35 @@
+name: 💭 Notes and Ideas (Backburner)
+description: Intended for small, low-priority items which will be routed to the `💭 Notes and Ideas (Backburner)` project
+title: "💭 Idea ➾ "
+labels: ["stasis", "ideas", "triage"]
+assignees:
+  - 
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # ◢▅◣◥▅◤◢▅◣ ✏️🔮💭 Note | Idea ✏️🔮💭 ◢▅◣◥▅◤◢▅◣ 
+
+        ### Thanks for the input! Please help give some extra context to the ticket by adding one or more labels to the created issue
+
+  - type: input
+    id: title
+    attributes:
+      label: 🔮 Title / Topic 
+      description: Provide a concise and descriptive title
+  - type: textarea
+    id: 
+    attributes:
+      label: 💭 Details
+      description: Let us know what's on your mind!
+      placeholder: Features, reminders, notes, thoughts, or other random things go here...
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/ecadlabs/taqueria/blob/1d6476f92fce0f2f36cd268549aa15e6cbe770d3/code-of-conduct.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

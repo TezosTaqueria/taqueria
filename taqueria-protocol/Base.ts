@@ -4,7 +4,7 @@ import { z, ZodError, ZodSchema } from 'zod';
 
 type Future<L, R> = FutureInstance<L, R>;
 
-type ErrMsg = string | ((value: unknown) => string);
+type ErrMsg = string | ((value: unknown, previous?: unknown) => string);
 
 interface CreateSchemaParams {
 	rawSchema: ZodSchema;
@@ -69,7 +69,7 @@ export const createType = <R, I>(params: CreateTypeParams) => {
 		} catch (previous) {
 			const parseMsg = typeof parseErrMsg === 'string'
 				? parseErrMsg
-				: parseErrMsg(input);
+				: parseErrMsg(input, previous);
 
 			const unknownMsg = typeof unknownErrMsg === 'string'
 				? unknownErrMsg

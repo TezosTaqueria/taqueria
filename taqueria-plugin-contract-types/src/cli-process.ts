@@ -106,8 +106,17 @@ export const generateContractTypesProcessContractFiles = async ({
 
 			const {
 				schemaOutput,
-				typescriptCodeOutput: { typesFileContent, contractCodeFileContent },
+				typescriptCodeOutput: { typesFileContent: typesFileContentRaw, contractCodeFileContent },
 			} = generateContractTypesFromMichelsonCode(michelsonCode, contractTypeName, format, typeAliasData, typeUtilsData);
+
+			// Correct relative paths for nested contracts
+			const nestedDirDepth = fileRelativePath.replace(/^.?\/?/, '').split('/').length - 1;
+			const typesFileContent = nestedDirDepth <= 0
+				? typesFileContentRaw
+				: typesFileContentRaw.replace(
+					/from '\.\//g,
+					`from '${[...new Array(nestedDirDepth)].map(() => '../').join('')}`,
+				);
 
 			// Write output (ensure dir exists)
 			await fs.mkdir(path.dirname(typesOutputFilePath), { recursive: true });

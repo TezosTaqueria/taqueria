@@ -11,7 +11,7 @@ export const oneRowTableSimulateResult = `
 │ Contract       │ Result             │
 ├────────────────┼────────────────────┤
 │ hello-tacos.tz │ storage            │
-│                │   3                │
+│                │   2                │
 │                │ emitted operations │
 │                │                    │
 │                │ big_map diff       │

@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
-import { HasRefresh, OutputLevels, VsCodeHelper } from '../helpers';
+import { HasRefresh, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
 
 export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeItem>, HasRefresh {
 	constructor(
-		private workspaceRoot: string,
 		private helper: VsCodeHelper,
 	) {}
 
@@ -13,14 +12,19 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeIt
 	}
 
 	async getChildren(element?: PluginTreeItem): Promise<PluginTreeItem[]> {
+		if (element) {
+			return [];
+		}
+
 		let pathToDir: Util.PathToDir | null;
 		let config: Util.TaqifiedDir | null;
-		if (!this.workspaceRoot) {
+		const mainFolder = this.helper.getMainWorkspaceFolder();
+		if (!mainFolder) {
 			pathToDir = null;
 			config = null;
 		} else {
 			try {
-				pathToDir = await Util.makeDir(this.workspaceRoot, this.helper.i18n);
+				pathToDir = await Util.makeDir(mainFolder.fsPath, this.helper.i18n);
 				config = await Util.TaqifiedDir.create(pathToDir, this.helper.i18n);
 			} catch (e: any) {
 				config = null;
@@ -28,9 +32,6 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeIt
 			}
 		}
 
-		if (element) {
-			return [];
-		}
 		const installedPlugins = config?.config?.plugins?.map(plugin => plugin.name) ?? [];
 		const availablePlugins = await this.helper.getAvailablePlugins();
 		const allPlugins = [...new Set(installedPlugins.concat(availablePlugins))];
@@ -58,13 +59,13 @@ export class PluginsDataProvider implements vscode.TreeDataProvider<PluginTreeIt
 }
 export class PluginTreeItem extends vscode.TreeItem {
 	constructor(
-		public readonly label: string,
+		public readonly pluginName: string,
 		private installed: boolean,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		private version: string | undefined,
 	) {
-		super(label, collapsibleState);
-		this.tooltip = version === undefined ? `${this.label}` : `${this.label}-${this.version}`;
+		super(pluginName, collapsibleState);
+		this.tooltip = version === undefined ? `${pluginName}` : `${pluginName}-${this.version}`;
 		this.description = this.version;
 		this.iconPath = new vscode.ThemeIcon(installed ? 'check' : 'cloud-download');
 		this.contextValue = installed ? 'installed' : 'notInstalled';

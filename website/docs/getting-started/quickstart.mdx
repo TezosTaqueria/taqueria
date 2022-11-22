@@ -21,27 +21,28 @@ This quickstart guide will teach you the fundamentals of using Taqueria in 10 mi
 What you will accomplish:
 - Initialize a new Taqueria project
 - Install plugins for LIGO, Flextesa, and Taquito
-- Create a new Ligo contract from a template and register it
-- Compile the Ligo smart contract
+- Creating a new LIGO contract, along with its associated storage list and parameter list files.
+- Compile the LIGO smart contract
 - Start a local Flextesa sandbox 
 - Originate the compiled smart contract to the sandbox
+- Interact with the smart contract deployed to the sandbox
 
 ## Requirements
 
 To successfully follow this guide, you must ensure that:
 - The Taqueria CLI has been [installed](./installation.mdx) and is available in your `$PATH` 
-- Docker 0.8 (or later) is installed and currently running
-- Node.js v16.3 (or later) is installed
+- Docker v20.10.12 (or later) is installed and currently running
+- Node.js v16.17.1 (or later) is installed
 
 :::note
-The Taqueria VS Code Extension provides direct access to Taqueria tasks from the command palette. Under the hood, the VS Code Extension makes calls to the CLI, so you can be assured the behaviour of tasks will remain consistent regardless of whether they are executed from a terminal or the command palette. The steps in this guide are for using the Taqueria CLI, but you can also run the commands from the Taqueria extension via the VS Code command palette if you prefer
+The Taqueria VS Code Extension provides direct access to Taqueria tasks. Under the hood, the VS Code Extension makes calls to the CLI, so you can be assured the behaviour of tasks will remain consistent regardless of whether they are executed from a terminal or the command palette. The steps in this guide are for using the Taqueria CLI, but you can also run the commands from the Taqueria extension via the VS Code command palette if you prefer
 :::
 
 ## Starting a Taqueria Project
 
 There are two things required to start using Taqueria on a project
 
-First, the project must have been initialized by Taqueria. This process creates a hidden directory `./.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `/contracts` and `/artifacts` have been created 
+First, the project must have been initialized by Taqueria. This process creates a hidden directory `.taq` inside the project directory that contains the configuration and state files required by Taqueria, and ensures the required directories `contracts` and `artifacts` have been created 
 
 Taqueria provides the command `init` which will create a new directory with the correct structure and configuration. To create a new Taqueria project called `my-first-project`, run the command:
 ```shell
@@ -60,7 +61,7 @@ cd my-first-project
 
 Now that the project has been properly initialized, plugins can be installed to provide support for specific functionality such as compilation, smart contract origination, or running sandbox environments
 
-Plugins are installed using the `taq install` command which appears in the command list once a project is initialized. You can view the list of commands available in the current project context by running `taq --help` from the CLI:
+Plugins are installed using the `taq install` command which appears in the command list once a project is initialized. You can view the list of commands available in the current project context by running `taq --help` from the CLI. It should look something like this:
 ```shell
 ❯ taq --help
 taq <command>
@@ -71,9 +72,6 @@ Commands:
   taq opt-out                     Opt-out of sharing anonymous usage analytics
   taq install <pluginName>        Install a plugin
   taq uninstall <pluginName>      Uninstall a plugin
-  taq add-contract <sourceFile>   Add a contract to the contract registry
-  taq rm-contract <contractName>  Remove a contract from the contract registry
-  taq list-contracts              List registered contracts
 ```
 
 Once a plugin has been installed, you will see the additional commands provided by the plugin added to the list
@@ -84,79 +82,65 @@ To add support for the LIGO smart contract language, install the LIGO plugin by 
 ```shell
 taq install @taqueria/plugin-ligo
 ```
-Once installed the plugin provides a template to easily create and register a boilerplate LIGO contract using the `taq create contract` task
-If you already have contracts written and want to compile them you will just need to register them with the `taq add-contract <sourceFile>` task
-Finally the plugin provides the task `taq compile` which will look for any registered LIGO contracts in the `/contracts` directory and compile them to Michelson `.tz` files in the `/artifacts` directory
 
-To demonstrate this, create and register a new Ligo contract called `counter.jsligo` by running:
+Copy the following 3 code snippets, with the names suggested at the top of each code snippets, to the `contracts` folder of your Taqueria project
 
-```shell
-taq create contract counter.jsligo
-```
-
-This will create a new Ligo file called `counter.jsligo`, populate it with a boilerplate contract and register it with Taqueria
-
-You can see that the contract has been registered by running:
-
-```shell
-taq list-contracts
-```
-Taqueria will output that a contract has been registered:
-```shell
-┌────────────────┬────────────────┬─────────────────┐
-│ Name           │ Source File    │ Last Known Hash │
-├────────────────┼────────────────┼─────────────────┤
-│ counter.jsligo │ counter.jsligo │ 5737454d        │
-└────────────────┴────────────────┴─────────────────┘
-```
-
-Open the created file `counter.jsligo` in the `/contracts` directory
-
-You should see the following:
-
-```ligo title="/contracts/counter.jsligo"
-type storage = int;
+```ligo title="counter.mligo"
+type storage = int
 
 type parameter =
-  ["Increment", int]
-| ["Decrement", int]
-| ["Reset"];
+  Increment of int
+| Decrement of int
+| Reset
 
-type ret = [list<operation>, storage];
+type return = operation list * storage
 
 // Two entrypoints
 
-const add = ([store, delta] : [storage, int]) : storage => store + delta;
-const sub = ([store, delta] : [storage, int]) : storage => store - delta;
+let add (store, delta : storage * int) : storage = store + delta
+let sub (store, delta : storage * int) : storage = store - delta
 
-/* Main access point that dispatches to the entrypoints according to
-   the smart contract parameter. */
+(* Main access point that dispatches to the entrypoints according to
+   the smart contract parameter. *)
 
-const main = ([action, store] : [parameter, storage]) : ret => {
- return [list([]) as list<operation>,    // No operations
- match (action, {
-  Increment:(n: int) => add ([store, n]),
-  Decrement:(n: int) => sub ([store, n]),
-  Reset    :()  => 0})]
-};
+let main (action, store : parameter * storage) : return =
+ ([] : operation list),    // No operations
+ (match action with
+   Increment (n) -> add (store, n)
+ | Decrement (n) -> sub (store, n)
+ | Reset         -> 0)
 ```
 
-You can now compile this contract by running the following command from the project directory:
+```ligo title="counter.storageList.mligo"
+let initial_count: storage = 42
+let another_count: storage = 23 + 18 - 1
+```
+
+```ligo title="counter.parameterList.mligo"
+let increment_by_3: parameter = Increment 3
+```
+
+You can now compile this contract, along with its storage and parameter values, by simply running the following command from the root of the project directory:
 ```shell
-taq compile
+taq compile counter.mligo
 ```
 
-Taqueria will then output a list of contracts compiled, and the artifacts created:
+Taqueria will then output the following, and the artifacts created:
 ```shell
-❯ taq compile                     
-┌────────────────┬──────────────────────┐
-│ Contract       │ Artifact             │
-├────────────────┼──────────────────────┤
-│ counter.jsligo │ artifacts/counter.tz │
-└────────────────┴──────────────────────┘
+❯ taq compile counter.mligo                     
+┌────────────────────────────────┬───────────────────────────────────────────────┐
+│ Contract                       │ Artifact                                      │
+├────────────────────────────────┼───────────────────────────────────────────────┤
+│ counter.mligo                  │ artifacts/counter.tz                          │
+├────────────────────────────────┼───────────────────────────────────────────────┤
+│ counter.storageList.mligo      │ artifacts/counter.default_storage.tz          │
+│                                │ artifacts/counter.storage.another_count.tz    │
+├────────────────────────────────┼───────────────────────────────────────────────┤
+│ counter.parameterList.mligo    │ artifacts/counter.parameter.increment_by_3.tz │
+└────────────────────────────────┴───────────────────────────────────────────────┘
 ```
 
-If you open this file (`/artifacts/counter.tz`), you can view the raw Michelson code which will later be originated to the sandbox:
+If you open this file (`artifacts/counter.tz`), you can view the raw Michelson code which will later be originated to the sandbox:
 ```
 { parameter (or (or (int %decrement) (int %increment)) (unit %reset)) ;
   storage int ;
@@ -180,7 +164,7 @@ Once installed, the plugin provides three commands to start, stop, and query a s
 - `taq list accounts [sandboxName]`
 
 :::note
-Sandboxes are configured in the project's Taqueria configuration file (`./.taq/config.json`). Each named sandbox configuration can then be called from the CLI.
+Sandboxes are configured in the project's Taqueria configuration file (`.taq/config.json`). Each named sandbox configuration can then be called from the CLI.
 By default, every Taqueria project comes pre-configured with a sandbox named `local`
 :::
 
@@ -221,41 +205,37 @@ First, install the plugin:
 taq install @taqueria/plugin-taquito
 ```
 
-Next, you need to configure some values for origination:
-- The initial storage for the smart contract 
-- The name of the sandbox to target (by default it is pre-configured to the sandbox named `local`)
-:::note
-As the default configuration comes with the sandbox named `local` preconfigured, simply provide a value for the initial storage in the `"storage"` property 
-:::
-
-To set these values in Taqueria, navigate to the file `./.taq/config.json` and locate the `"environment"` property. For the `counter.tz` contract, simply need to provide an integer value for the `counter.tz` file which looks like this:
-```
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ],
-            "storage": {
-                "counter.tz": 42
-            }
-        }
-    },
-```
-
 Now you can originate the contract by running:
 ```shell
-taq originate
+taq originate counter.tz
 ```
 
-This will originate all contracts in the `/artifacts` directory to the sandbox and return the on-chain addresses of the originated contracts. This will look something like this:
+This will originate `counter.tz` in the `artifacts` directory to the sandbox and return the on-chain address of the originated contract. This will look something like this:
 ```
-┌────────────┬──────────────────────────────────────┬─────────────┐
-│ Contract   │ Address                              │ Destination │
-├────────────┼──────────────────────────────────────┼─────────────┤
-│ counter.tz │ KT1Ayz8qos7G4U3Jucp6QWoM7ayhbShNXcat │ local       │
-└────────────┴──────────────────────────────────────┴─────────────┘
+┌────────────┬──────────────────────────────────────┬─────────┬─────────────┐
+│ Contract   │ Address                              │ Alias   │ Destination │
+├────────────┼──────────────────────────────────────┼─────────┼─────────────┤
+│ counter.tz │ KT1Ayz8qos7G4U3Jucp6QWoM7ayhbShNXcat │ counter │ local       │
+└────────────┴──────────────────────────────────────┴─────────┴─────────────┘
+```
+
+### Interacting with a deployed Contract with Taquito
+
+With the sandbox still running, the last step is to interact with the contract you just deployed to your sandbox. You may use its alias or its address directly
+
+To do that, run:
+```shell
+taq transfer counter --param counter.parameter.increment_by_3.tz
+```
+
+This will call the counter contract's entrypoint `increment` and will increment the storage by `3`. The output will look something like this:
+```
+┌────────────────┬──────────────────────────────────────┬────────────────┬───────────────────┬────────────┬────────────────────────┐
+│ Contract Alias │ Contract Address                     │ Mutez Transfer │ Parameter         │ Entrypoint │ Destination            │
+├────────────────┼──────────────────────────────────────┼────────────────┼───────────────────┼────────────┼────────────────────────┤
+│ counter        │ KT1Ayz8qos7G4U3Jucp6QWoM7ayhbShNXcat │ 0              │ (Left (Right 3 )) │ default    │ http://localhost:20000 │
+│                │                                      │                │                   │            │                        │
+└────────────────┴──────────────────────────────────────┴────────────────┴───────────────────┴────────────┴────────────────────────┘
 ```
 
 ## Finishing Up
@@ -263,9 +243,10 @@ This will originate all contracts in the `/artifacts` directory to the sandbox a
 Congratulations! At this point, you have run through the basic usage of Taqueria including:
 - Initializing a new Taqueria project
 - Installing plugins for LIGO, Flextesa, and Taquito
-- Creating a new Ligo contract from a template and registering it
+- Creating a new LIGO contract, along with its associated storage list and parameter list files
 - Compiling a LIGO smart contract
-- Starting and querying a local Flextesa sandbox 
+- Starting and querying a local Flextesa sandbox
 - Originating a compiled smart contract to the sandbox
+- Interacting with a smart contract deployed to the sandbox
 
 For more details on the usage of specific Taqueria tasks, you can refer to the plugin documentation which contains additional context, configuration, and usage of the many Taqueria tasks; or continue on with the getting started guides

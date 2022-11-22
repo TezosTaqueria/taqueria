@@ -2,7 +2,7 @@ import { sendAsyncErr, sendAsyncRes, sendErr, sendJsonRes } from '@taqueria/node
 import { LoadedConfig, RequestArgs, SanitizedAbsPath } from '@taqueria/node-sdk/types';
 import path from 'path';
 import { processFiles } from './file-processing';
-import { PinataAuth, publishFileToIpfs } from './pinata-api';
+import { PinataAuth, pinHash, publishFileToIpfs } from './pinata-api';
 import { createProcessBackoffController } from './utils';
 
 // Load .env for jwt token
@@ -89,8 +89,12 @@ const pinToIpfs = async (hash: undefined | string, auth: PinataAuth): Promise<Pl
 		throw new Error(`ipfs hash was not provided`);
 	}
 
-	// TODO: Implement pinning
-	throw new Error('pinToIpfs: Not Implemented');
+	await pinHash({ ipfsHash: hash, auth });
+
+	return {
+		render: 'table',
+		data: [{ ipfsHash: hash }],
+	};
 };
 
 const execute = async (opts: Opts): Promise<PluginResponse> => {

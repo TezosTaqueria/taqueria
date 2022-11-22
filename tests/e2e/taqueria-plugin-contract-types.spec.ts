@@ -75,16 +75,18 @@ describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 		try {
 			await exec(`taq -p ${taqueriaProjectPath}`);
 		} catch (_) {}
+
+		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
+		await exec(`taq add-contract increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
-	test.skip('Verify that taqueria contract types plugin can compile one contract and generate types', async () => {
+	test('Verify that taqueria contract types plugin can compile one contract and generate types', async () => {
 		const pwdPromise = await exec(`pwd`);
 		const pwd = pwdPromise.stdout.trim();
 
-		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq compile`, { cwd: `${taqueriaProjectPath}` });
+		await exec(`taq compile increment.jsligo`, { cwd: `${taqueriaProjectPath}` });
 
-		const generateTypesOutput = await exec(`taq generate types`, { cwd: `${taqueriaProjectPath}` });
+		const generateTypesOutput = await exec(`taq generate types types`, { cwd: `${taqueriaProjectPath}` });
 		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
 
 		expect(generateTypesOutput.stdout).toContain(
@@ -108,41 +110,15 @@ describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 		expect(typesContents.stdout).toContain('type-utils.ts');
 	});
 
-	test.skip('Verify that taqueria contract types plugin allows for different types folder specification', async () => {
-		const pwdPromise = await exec(`pwd`);
-		const pwd = pwdPromise.stdout.trim();
-		const folderName = 'otherFolder';
-
-		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq compile`, { cwd: `${taqueriaProjectPath}` });
-
-		const generateTypesOutput = await exec(`taq generate types ${folderName}`, { cwd: `${taqueriaProjectPath}` });
-		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: '${folderName}' }`);
-
-		expect(generateTypesOutput.stdout).toContain(
-			`Generating Types: ${pwd}/${taqueriaProjectPath}/artifacts => ${pwd}/${taqueriaProjectPath}/${folderName}`,
-		);
-
-		const dirContents = await exec(`ls ${taqueriaProjectPath}`);
-		expect(dirContents.stdout).toContain(`${folderName}`);
-
-		const typesContents = await exec(`ls ${taqueriaProjectPath}/${folderName}`);
-		expect(typesContents.stdout).toContain('increment.code.ts');
-		expect(typesContents.stdout).toContain('increment.types.ts');
-		expect(typesContents.stdout).toContain('type-aliases.ts');
-		expect(typesContents.stdout).toContain('type-utils.ts');
-	});
-
-	test.skip('Verify that taqueria contract types plugin can compile multiple contracts and generate types', async () => {
+	test('Verify that taqueria contract types plugin can compile one contract and generate using the gentypes alias', async () => {
 		const pwdPromise = await exec(`pwd`);
 		const pwd = pwdPromise.stdout.trim();
 
-		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
-		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq compile`, { cwd: `${taqueriaProjectPath}` });
+		await exec(`taq compile increment.jsligo`, { cwd: `${taqueriaProjectPath}` });
 
-		const generateTypesOutput = await exec(`taq generate types`, { cwd: `${taqueriaProjectPath}` });
+		const generateTypesOutput = await exec(`taq gentypes types`, { cwd: `${taqueriaProjectPath}` });
 		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
+
 		expect(generateTypesOutput.stdout).toContain(
 			`Generating Types: ${pwd}/${taqueriaProjectPath}/artifacts => ${pwd}/${taqueriaProjectPath}/types`,
 		);
@@ -150,14 +126,107 @@ describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 		expect(generateTypesOutput.stdout).toContain(
 			`Contracts Found: \n\t- ${pwd}/${taqueriaProjectPath}/artifacts/increment.tz`,
 		);
+
+		expect(generateTypesOutput.stdout).toContain(`Processing /increment.tz...`);
+		expect(generateTypesOutput.stdout).toContain(`increment.tz: Types generated`);
+
+		const dirContents = await exec(`ls ${taqueriaProjectPath}`);
+		expect(dirContents.stdout).toContain('types');
+
+		const typesContents = await exec(`ls ${taqueriaProjectPath}/types`);
+		expect(typesContents.stdout).toContain('increment.code.ts');
+		expect(typesContents.stdout).toContain('increment.types.ts');
+		expect(typesContents.stdout).toContain('type-aliases.ts');
+		expect(typesContents.stdout).toContain('type-utils.ts');
+	});
+
+	test('Verify that taqueria contract types plugin can compile one contract and generate using the gen alias', async () => {
+		const pwdPromise = await exec(`pwd`);
+		const pwd = pwdPromise.stdout.trim();
+
+		await exec(`taq compile increment.jsligo`, { cwd: `${taqueriaProjectPath}` });
+
+		const generateTypesOutput = await exec(`taq gen types`, { cwd: `${taqueriaProjectPath}` });
+		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
+
 		expect(generateTypesOutput.stdout).toContain(
-			`Contracts Found: \n\t- ${pwd}/${taqueriaProjectPath}/artifacts/hello-tacos.tz`,
+			`Generating Types: ${pwd}/${taqueriaProjectPath}/artifacts => ${pwd}/${taqueriaProjectPath}/types`,
+		);
+
+		expect(generateTypesOutput.stdout).toContain(
+			`Contracts Found: \n\t- ${pwd}/${taqueriaProjectPath}/artifacts/increment.tz`,
 		);
 
 		expect(generateTypesOutput.stdout).toContain(`Processing /increment.tz...`);
-		expect(generateTypesOutput.stdout).toContain(`Processing /hello-tacos.tz...`);
 		expect(generateTypesOutput.stdout).toContain(`increment.tz: Types generated`);
-		expect(generateTypesOutput.stdout).toContain(`hello-tacos.tz: Types generated`);
+
+		const dirContents = await exec(`ls ${taqueriaProjectPath}`);
+		expect(dirContents.stdout).toContain('types');
+
+		const typesContents = await exec(`ls ${taqueriaProjectPath}/types`);
+		expect(typesContents.stdout).toContain('increment.code.ts');
+		expect(typesContents.stdout).toContain('increment.types.ts');
+		expect(typesContents.stdout).toContain('type-aliases.ts');
+		expect(typesContents.stdout).toContain('type-utils.ts');
+	});
+
+	test('Verify that taqueria contract types plugin can compile one contract and generate using the "file" type alias mode', async () => {
+		const pwdPromise = await exec(`pwd`);
+		const pwd = pwdPromise.stdout.trim();
+
+		await exec(`taq compile increment.jsligo`, { cwd: `${taqueriaProjectPath}` });
+
+		const generateTypesOutput = await exec(`taq generate types -t "file"`, { cwd: `${taqueriaProjectPath}` });
+		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
+
+		expect(generateTypesOutput.stdout).toContain(
+			`Generating Types: ${pwd}/${taqueriaProjectPath}/artifacts => ${pwd}/${taqueriaProjectPath}/types`,
+		);
+
+		expect(generateTypesOutput.stdout).toContain(
+			`Contracts Found: \n\t- ${pwd}/${taqueriaProjectPath}/artifacts/increment.tz`,
+		);
+
+		expect(generateTypesOutput.stdout).toContain(`Processing /increment.tz...`);
+		expect(generateTypesOutput.stdout).toContain(`increment.tz: Types generated`);
+
+		const dirContents = await exec(`ls ${taqueriaProjectPath}`);
+		expect(dirContents.stdout).toContain('types');
+
+		const typesContents = await exec(`ls ${taqueriaProjectPath}/types`);
+		expect(typesContents.stdout).toContain('increment.code.ts');
+		expect(typesContents.stdout).toContain('increment.types.ts');
+		expect(typesContents.stdout).toContain('type-aliases.ts');
+		expect(typesContents.stdout).toContain('type-utils.ts');
+	});
+
+	test('Verify that taqueria contract types plugin can compile one contract and generate using the "simple" type alias mode', async () => {
+		const pwdPromise = await exec(`pwd`);
+		const pwd = pwdPromise.stdout.trim();
+
+		await exec(`taq compile increment.jsligo`, { cwd: `${taqueriaProjectPath}` });
+
+		const generateTypesOutput = await exec(`taq generate types -t "file"`, { cwd: `${taqueriaProjectPath}` });
+		expect(generateTypesOutput.stdout).toContain(`generateTypes { typescriptDir: 'types' }`);
+
+		expect(generateTypesOutput.stdout).toContain(
+			`Generating Types: ${pwd}/${taqueriaProjectPath}/artifacts => ${pwd}/${taqueriaProjectPath}/types`,
+		);
+
+		expect(generateTypesOutput.stdout).toContain(
+			`Contracts Found: \n\t- ${pwd}/${taqueriaProjectPath}/artifacts/increment.tz`,
+		);
+
+		expect(generateTypesOutput.stdout).toContain(`Processing /increment.tz...`);
+		expect(generateTypesOutput.stdout).toContain(`increment.tz: Types generated`);
+
+		const dirContents = await exec(`ls ${taqueriaProjectPath}`);
+		expect(dirContents.stdout).toContain('types');
+
+		const typesContents = await exec(`ls ${taqueriaProjectPath}/types`);
+		expect(typesContents.stdout).toContain('increment.code.ts');
+		expect(typesContents.stdout).toContain('type-aliases.ts');
+		expect(typesContents.stdout).toContain('type-utils.ts');
 	});
 
 	test(
@@ -185,6 +254,68 @@ describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
+	});
+
+	// Clean up process to remove taquified project folder
+	// Comment if need to debug
+	afterAll(async () => {
+		try {
+			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+});
+
+describe('E2E Testing for taqueria contract types plugin: Generate Example Contracts', () => {
+	beforeAll(async () => {
+		await generateTestProject(taqueriaProjectPath, ['contract-types']);
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
+		try {
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
+
+		await exec(`cp -r ../taqueria-plugin-contract-types/example/contracts/* ${taqueriaProjectPath}/artifacts`);
+		await exec(`cp -r ../taqueria-plugin-contract-types/example/types-file/ ${taqueriaProjectPath}/types-expected`);
+
+		await exec(`taq generate types`, { cwd: `./${taqueriaProjectPath}` });
+	});
+
+	const testContractTypeGeneration = async (
+		contractFileName: string,
+	) => {
+		const expectedRaw = await fsPromises.readFile(
+			`${taqueriaProjectPath}/types-expected/${contractFileName}.types.ts`,
+			{ encoding: 'utf-8' },
+		);
+		const actualRaw = await fsPromises.readFile(`${taqueriaProjectPath}/types/${contractFileName}.types.ts`, {
+			encoding: 'utf-8',
+		});
+
+		const expected = expectedRaw; // .replace(/\s+/g, ' ');
+		const actual = actualRaw; // .replace(/\s+/g, ' ');
+
+		expect(expected).toEqual(actual);
+	};
+
+	it('Generate Types 01 - tz library', async () => {
+		await testContractTypeGeneration('example-contract-1');
+	});
+	it('Generate Types 02 - tz library', async () => {
+		await testContractTypeGeneration('example-contract-2');
+	});
+	it('Generate Types 04 - newer protocol', async () => {
+		await testContractTypeGeneration('example-contract-4');
+	});
+	it('Generate Types 01A - subdir', async () => {
+		await testContractTypeGeneration('subdir/example-contract-0');
+	});
+	it('Generate Types 01B - subsubdir', async () => {
+		await testContractTypeGeneration('subdir/subsubdir/example-contract-0');
+	});
+	it('Generate lambda', async () => {
+		await testContractTypeGeneration('example-lambda');
 	});
 
 	// Clean up process to remove taquified project folder

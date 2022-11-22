@@ -1,12 +1,14 @@
 import { Protocol, writeJsonFile } from '@taqueria/node-sdk';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
+import { Config, SandboxAccountConfig } from '@taqueria/protocol/taqueria-protocol-types';
 import { exec } from 'child_process';
 import { execa } from 'execa';
 import yargs, { parse } from 'yargs';
 import * as SandboxAccount from './SandboxAccount';
 import * as SanitizedArgs from './SanitizedArgs';
 
-import { Config, SandboxAccountConfig } from '@taqueria/protocol/taqueria-protocol-types';
+const PROTOCOL_IDENTIFIER = 'PtKathmankSp';
+const PROTOCOL_NAME = 'Kathmandu';
 
 type Args = ReturnType<typeof yargs> & { config: string; configure: boolean; importAccounts: boolean; sandbox: string };
 
@@ -15,7 +17,7 @@ interface Failure {
 	context: unknown;
 }
 
-export const configureTezosClient = () => run(`tezos-client --endpoint http://localhost:20000 config update`);
+export const configureTezosClient = () => run(`octez-client --endpoint http://localhost:20000 config update`);
 
 export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
 	Object.entries(parsedArgs.config.accounts).reduce(
@@ -47,7 +49,7 @@ export const startMininet = (parsedArgs: SanitizedArgs.t) => {
 		...getBootstrapFlags(parsedArgs),
 		'--until-level 200_000_000',
 		// TODO: Find a way of mapping protocol hash to protocol kind
-		`--protocol-kind "Alpha"`,
+		`--protocol-kind "${PROTOCOL_NAME}"`,
 	];
 
 	return execa('flextesa', cmdArgs, {
@@ -55,10 +57,10 @@ export const startMininet = (parsedArgs: SanitizedArgs.t) => {
 		detached: false,
 		shell: true,
 		all: true,
+		env: {
+			flextesa_node_cors_origin: '*',
+		},
 	});
-
-	// .all.pipe(process.stderr);
-	// return run(cmdArgs.join(' '))
 };
 
 export const importAccounts = (opts: SanitizedArgs.t) => {
@@ -68,11 +70,10 @@ export const importAccounts = (opts: SanitizedArgs.t) => {
 			if (accountName === 'default') return retval;
 			const account = accountDetails as SandboxAccountConfig.t;
 			// const protocol = getSandboxProtocol(opts)
-			const protocol = 'ProtoALphaAL';
 			return [
 				...retval,
 				run(
-					`tezos-client --protocol ${protocol} import secret key ${accountName} ${account.secretKey} --force | tee /tmp/import-key.log`,
+					`octez-client --protocol ${PROTOCOL_IDENTIFIER} import secret key ${accountName} ${account.secretKey} --force | tee /tmp/import-key.log`,
 				),
 			];
 		},

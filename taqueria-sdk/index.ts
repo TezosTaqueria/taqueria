@@ -4,6 +4,7 @@ import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
+import * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
 import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
@@ -15,11 +16,11 @@ import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 import * as SHA256 from '@taqueria/protocol/SHA256';
 import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
-import type { TaqError } from '@taqueria/protocol/TaqError';
+import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
 import * as Template from '@taqueria/protocol/Template';
-import { exec, ExecException } from 'child_process';
+import { exec, ExecException, spawn, spawnSync } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
@@ -28,16 +29,27 @@ import { ZodError } from 'zod';
 import { PluginSchema } from './types';
 import { LikeAPromise, pluginDefiner, StdIO } from './types';
 
+import { importKey } from '@taquito/signer';
+import { TezosToolkit } from '@taquito/taquito';
+import { b58cencode, Prefix, prefix } from '@taquito/utils';
+import crypto from 'crypto';
+
 // @ts-ignore interop issue. Maybe find a different library later
 import { templateRawSchema } from '@taqueria/protocol/SanitizedArgs';
+import fetch from 'node-fetch';
 import generateName from 'project-name-generator';
+import { parsed } from 'yargs';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 const yargs = require('yargs');
 
-export const eager = <T>(f: Future<TaqError, T>) =>
+export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
+
+export type CmdArgEnv = [string, string[], { [key: string]: string }];
+
+export const eager = <T>(f: Future<TaqError.t, T>) =>
 	promise(
-		mapRej((err: TaqError) => new E_TaqError(err))(f),
+		mapRej((err: TaqError.t) => new E_TaqError(err))(f),
 	);
 
 export const writeJsonFile = <T>(filename: string) =>
@@ -52,7 +64,7 @@ export const readJsonFile = <T>(filename: string): Promise<T> =>
 
 export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 	new Promise((resolve, reject) => {
-		exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
+		exec(cmd, (err, stdout, stderr) => {
 			if (err) reject(err);
 			else {
 				resolve({
@@ -63,30 +75,49 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 		});
 	});
 
-export const getArch = (): LikeAPromise<string, TaqError> => {
+export const spawnCmd = (fullCmd: CmdArgEnv): Promise<number | null> =>
+	new Promise((resolve, reject) => {
+		const cmd = fullCmd[0];
+		const args = fullCmd[1];
+		const envVars = fullCmd[2];
+		const child = spawn(cmd, args, { env: { ...process.env, ...envVars }, stdio: 'inherit' });
+		child.on('close', resolve);
+		child.on('error', reject);
+	});
+
+export const getArchSync = (): 'linux/arm64/v8' | 'linux/amd64' => {
 	switch (process.arch) {
 		case 'arm64':
-			return Promise.resolve('linux/arm64/v8');
+			return 'linux/arm64/v8';
 		// @ts-ignore: x32 is valid for some versions of NodeJS
 		case 'x32':
 		case 'x64':
-			return Promise.resolve('linux/amd64');
+			return 'linux/amd64';
 		default:
-			return Promise.reject({
-				errCode: 'E_INVALID_ARCH',
-				errMsg: `We do not know how to handle the ${process.arch} architecture`,
-				context: process.arch,
+			throw TaqError.create({
+				kind: 'E_INVALID_ARCH',
+				msg: `The ${process.arch} architecture is not supported at this time.`,
 			});
 	}
 };
 
-export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError> =>
+export const getArch = (): LikeAPromise<'linux/arm64/v8' | 'linux/amd64', TaqError.t> =>
+	new Promise((resolve, reject) => {
+		try {
+			const arch = getArchSync();
+			resolve(arch);
+		} catch (e) {
+			reject(e);
+		}
+	});
+
+export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError.t> =>
 	new Promise((resolve, reject) => {
 		try {
 			const json = JSON.parse(input);
 			resolve(json);
 		} catch (previous) {
-			const taqErr: TaqError = {
+			const taqErr: TaqError.t = {
 				kind: 'E_INVALID_JSON',
 				msg: `Invalid JSON: ${input}`,
 				previous,
@@ -109,6 +140,13 @@ export const sendErr = (msg: string, newline = true) => {
 	if (!msg || msg.length === 0) return;
 	return newline
 		? console.error(msg)
+		: process.stderr.write(msg) as unknown as void;
+};
+
+export const sendWarn = (msg: string, newline = true) => {
+	if (!msg || msg.length === 0) return;
+	return newline
+		? console.warn(msg)
 		: process.stderr.write(msg) as unknown as void;
 };
 
@@ -137,7 +175,7 @@ export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data
 
 export const noop = () => {};
 
-const parseArgs = <T extends RequestArgs.t>(unparsedArgs: string[]): LikeAPromise<T, TaqError> => {
+const parseArgs = <T extends RequestArgs.t>(unparsedArgs: string[]): LikeAPromise<T, TaqError.t> => {
 	if (unparsedArgs && Array.isArray(unparsedArgs) && unparsedArgs.length >= 2) {
 		try {
 			const preprocessedArgs = preprocessArgs(unparsedArgs);
@@ -344,6 +382,12 @@ export const getCurrentEnvironmentConfig = (parsedArgs: RequestArgs.t) => {
 };
 
 /**
+ * Gets the configuration for the project metadata
+ */
+export const getMetadataConfig = (parsedArgs: RequestArgs.t) =>
+	() => (parsedArgs.config.metadata ?? undefined) as Protocol.MetadataConfig.t | undefined;
+
+/**
  * Gets the configuration for the named network
  */
 export const getNetworkConfig = (parsedArgs: RequestArgs.t) =>
@@ -372,46 +416,133 @@ export const getSandboxAccountNames = (parsedArgs: RequestArgs.t) =>
 /**
  * Gets the account config for the named account of the given sandbox
  */
-export const getSandboxAccountConfig = (parsedArgs: RequestArgs.t) =>
-	(sandboxName: string) =>
-		(accountName: string) => {
-			const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
+export const getSandboxAccountConfig = (sandbox: SandboxConfig.t, accountName: string) => {
+	if (sandbox.accounts) {
+		const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>;
+		return accounts[accountName];
+	}
+	return undefined;
+};
 
-			if (sandbox && sandbox.accounts) {
-				const accounts = sandbox.accounts as Record<string, Protocol.SandboxAccountConfig.t>;
-				return accounts[accountName];
-			}
-			return undefined;
-		};
+export const addTzExtensionIfMissing = (contractFilename: string) =>
+	/\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`;
+
+export const getContractContent = async (
+	parsedArgs: RequestArgs.t,
+	contractFilename: string,
+): Promise<string | undefined> => {
+	const contractWithTzExtension = addTzExtensionIfMissing(contractFilename);
+	const contractPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, contractWithTzExtension);
+	try {
+		const content = await readFile(contractPath, { encoding: 'utf-8' });
+		return content;
+	} catch (err) {
+		sendErr(`Could not read ${contractPath}. Maybe it doesn't exist.\n`);
+		return undefined;
+	}
+};
 
 /**
- * Gets the initial storage for the contract
+ * Gets the parameter for the contract associated with the given parameter file
  */
-export const getInitialStorage = (parsedArgs: RequestArgs.t) =>
-	(contractFilename: string) => {
-		const env = getCurrentEnvironmentConfig(parsedArgs);
+export const getParameter = async (parsedArgs: RequestArgs.t, paramFilename: string): Promise<string> => {
+	const paramPath = join(parsedArgs.config.projectDir, parsedArgs.config.artifactsDir, paramFilename);
+	try {
+		const content = await readFile(paramPath, { encoding: 'utf-8' });
+		return content;
+	} catch (err) {
+		return sendAsyncErr(`Could not read ${paramPath}. Maybe it doesn't exist.`);
+	}
+};
 
-		return env
-			? env.storage && env.storage[contractFilename]
-			: undefined;
-	};
+/**
+ * Update the alias of an address for the current environment
+ */
+export const updateAddressAlias = async (parsedArgs: RequestArgs.t, alias: string, address: string): Promise<void> => {
+	const env = getCurrentEnvironmentConfig(parsedArgs);
+	if (!env) return;
+	if (!env.aliases) {
+		env.aliases = { [alias]: { address } };
+	} else if (!env.aliases[alias]) {
+		env.aliases[alias] = { address };
+	} else {
+		env.aliases[alias].address = address;
+	}
+	try {
+		await writeJsonFile('./.taq/config.json')(parsedArgs.config);
+	} catch (err) {
+		sendErr(`Could not write to ./.taq/config.json\n`);
+	}
+};
+
+export const getAddressOfAlias = async (
+	env: Environment.t,
+	alias: string,
+): Promise<string> => {
+	const address = env.aliases?.[alias]?.address;
+	if (!address) {
+		return sendAsyncErr(
+			`Address for alias "${alias}" is not present in the config.json. Make sure to deploy a contract with such alias.`,
+		);
+	}
+	return address;
+};
+
+const createAddress = async (network: NetworkConfig.t): Promise<TezosToolkit> => {
+	const tezos = new TezosToolkit(network.rpcUrl as string);
+	const keyBytes = Buffer.alloc(32);
+	crypto.randomFillSync(keyBytes);
+	const key = b58cencode(new Uint8Array(keyBytes), prefix[Prefix.P2SK]);
+	await importKey(tezos, key);
+	return tezos;
+};
+
+// TODO: This is a temporary solution before the environment refactor. Might be removed after this refactor
+export const getAccountPrivateKey = async (
+	parsedArgs: RequestArgs.t,
+	network: NetworkConfig.t,
+	account: string,
+): Promise<string> => {
+	if (!network.accounts) network.accounts = {};
+
+	if (!network.accounts[account]) {
+		const tezos = await createAddress(network);
+		const publicKey = await tezos.signer.publicKey();
+		const publicKeyHash = await tezos.signer.publicKeyHash();
+		const privateKey = await tezos.signer.secretKey();
+		if (!privateKey) return sendAsyncErr('The private key must exist after creating it');
+		network.accounts[account] = { publicKey, publicKeyHash, privateKey };
+
+		try {
+			await writeJsonFile('./.taq/config.json')(parsedArgs.config);
+		} catch (err) {
+			return sendAsyncErr(`Could not write to ./.taq/config.json\n`);
+		}
+
+		if (account === TAQ_OPERATOR_ACCOUNT) {
+			return sendAsyncErr(
+				`A keypair with public key hash ${
+					network.accounts[account].publicKeyHash
+				} was generated for you.\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+			);
+		}
+	}
+
+	return network.accounts[account].privateKey;
+};
+
+export const getDockerImage = (defaultImageName: string, envVarName: string): string =>
+	process.env[envVarName] ?? defaultImageName;
 
 /**
  * Gets the default account associated with a sandbox
  */
-export const getDefaultAccount = (parsedArgs: RequestArgs.t) =>
-	(sandboxName: string) => {
-		const sandboxConfig = getSandboxConfig(parsedArgs)(sandboxName);
-		if (sandboxConfig) {
-			const accounts = sandboxConfig.accounts ?? {};
-			const defaultAccount = accounts['default'] as string | undefined;
-			if (defaultAccount) {
-				return getSandboxAccountConfig(parsedArgs)(sandboxName)(defaultAccount);
-			}
-		}
-
-		return undefined;
-	};
+export const getDefaultSandboxAccount = (sandbox: SandboxConfig.t) => {
+	const accounts = sandbox.accounts ?? {};
+	const defaultAccount = accounts['default'] as string | undefined;
+	if (defaultAccount) return getSandboxAccountConfig(sandbox, defaultAccount);
+	return undefined;
+};
 
 export const getContracts = (regex: RegExp, config: LoadedConfig.t) => {
 	if (!config.contracts) return [];
@@ -468,7 +599,8 @@ const getPackageName = () => {
 	const stack = getSync({
 		filter: (stackFrame => {
 			const filename = stackFrame.getFileName();
-			return !filename.includes('taqueria-sdk') && !filename.includes('@taqueria/node-sdk');
+			return !filename.includes('taqueria-sdk') && !filename.includes('@taqueria/node-sdk')
+				&& !filename.includes('stacktrace-js');
 		}),
 	});
 	const frame = stack.shift();
@@ -495,6 +627,7 @@ export const Plugin = {
 export {
 	Environment,
 	LoadedConfig,
+	MetadataConfig,
 	NetworkConfig,
 	Operation,
 	Option,

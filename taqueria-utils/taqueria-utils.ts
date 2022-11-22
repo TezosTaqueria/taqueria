@@ -19,7 +19,7 @@ import { copy } from 'https://deno.land/std@0.128.0/streams/conversion.ts';
 import { render } from 'https://deno.land/x/eta@v1.12.3/mod.ts';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import * as jsonc from 'https://deno.land/x/jsonc@1/main.ts';
-import memoizy from 'https://deno.land/x/memoizy@1.0.0/fp.ts';
+import { memoize as memoizeIt } from 'rambdax';
 import { UtilsDependencies } from './taqueria-utils-types.ts';
 
 export const decodeJson = <T>(encoded: string): Future<TaqError.t, T> => {
@@ -202,8 +202,6 @@ export const isTaqError = (err: unknown): err is TaqError.t => {
 	return (err as TaqError.t).kind !== undefined;
 };
 
-export const memoize = memoizy({});
-
 export const joinPaths = _joinPaths;
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string =>
@@ -363,7 +361,7 @@ export const inject = (deps: UtilsDependencies) => {
 		writeTextFile,
 		writeJsonFile,
 		isTaqError,
-		memoize,
+		memoize: memoizeIt,
 		joinPaths,
 		renderTemplate,
 		execText,

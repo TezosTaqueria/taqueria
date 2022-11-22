@@ -5,7 +5,7 @@ import { TimelockContractType } from './timelock.types';
 import { chest, chest_key, tas } from './type-aliases';
 
 export const utilizingContractTypes = async () => {
-	const Tezos = new TezosToolkit('https://rpc.ithacanet.teztnets.xyz');
+	const Tezos = new TezosToolkit('https://ghostnet.ecadinfra.com');
 	const FAUCET_KEY = {
 		'pkh': 'tz1USDW6CgSTXJWvQjC1ivsPjXE8Y9wbfANM',
 		'mnemonic': [
@@ -49,6 +49,7 @@ export const utilizingContractTypes = async () => {
 		code: TimelockCode.code,
 		storage: tas.bytes('00'),
 	});
+	await originationResult.confirmation();
 	const contract = await originationResult.contract();
 	const initialStorage = await contract.storage();
 	const op = await contract.methods.default(chest_key, chest).send();

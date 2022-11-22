@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/taqueria",
-	"version": "0.10.0",
+	"version": "0.22.2",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -8,13 +8,17 @@
 	},
 	"scripts": {
 		"test": "yarn",
-		"build": "./bin/build.sh || npx play-sound beep.mp3",
+		"bootstrap": "lerna bootstrap --force-local",
 		"build-all": "./bin/build-all.sh",
+		"build:binary": "./bin/build.sh",
+		"build:docker": "lerna run build-docker",
+		"build:packages": "lerna run build",
+		"deploy": "lerna version --no-push --no-git-tag-version --no-private",
 		"parse-readme-template": "ts-node ./parse-readme-template.ts",
 		"build-website": "npm run parse-readme-template && cd website && npm ci --legacy-peer-deps && npm run build",
 		"serve-website": "cd website && npm run serve",
-		"watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build || npx play-sound beep.mp3\" --initial",
-		"build-and-watch-vscode": "npx chokidar \"*.ts\" \"taqueria-vscode-extension/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run compile -w taqueria-vscode-extension || npx play-sound beep.mp3\" --initial",
+		"watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build\" --initial",
+		"build-and-watch-vscode": "npx chokidar \"*.ts\" \"taqueria-vscode-extension/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run compile -w taqueria-vscode-extension\" --initial",
 		"prepare": "husky install",
 		"format": "dprint fmt",
 		"format:check": "dprint check",
@@ -41,14 +45,12 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"devDependencies": {
-		"@parcel/packager-ts": "^2.6.1",
-		"@parcel/transformer-typescript-types": "^2.6.1",
 		"chokidar-cli": "^3.0.0",
 		"dprint": "^0.27.1",
 		"eta": "^1.12.3",
 		"husky": "^8.0.1",
+		"lerna": "^6.0.1",
 		"lint-staged": "^12.4.1",
-		"play-sound-cli": "^1.0.0",
 		"ts-jest": "^28.0.7",
 		"ts-node": "^10.8.0",
 		"tsup": "^6.1.3",
@@ -56,10 +58,26 @@
 		"with-staged": "^1.0.2"
 	},
 	"workspaces": [
-		"./taqueria*",
+		"./taqueria-protocol",
+		"./taqueria-sdk",
+		"./taqueria-state",
+		"./taqueria-toolkit",
+		"./taqueria-utils",
+		"./taqueria-flextesa-manager",
+		"./taqueria-vscode-extension",
+		"./taqueria-plugin*",
 		"./tests"
 	],
 	"lint-staged": {
 		"*.{ts,tsx,js,jsx,cjs,mjs,json}": "dprint fmt"
+	},
+	"dependencies": {
+		"@docusaurus-terminology/parser": "^1.3.0",
+		"@docusaurus-terminology/term": "^1.0.0",
+		"@docusaurus/core": "^2.1.0",
+		"@docusaurus/plugin-google-analytics": "^2.1.0",
+		"@docusaurus/plugin-google-gtag": "^2.1.0",
+		"@docusaurus/plugin-sitemap": "^2.1.0",
+		"@docusaurus/preset-classic": "^2.1.0"
 	}
 }

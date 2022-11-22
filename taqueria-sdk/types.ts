@@ -1,6 +1,7 @@
 import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
+import * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
 import * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
 import * as Operation from '@taqueria/protocol/Operation';
 import * as Option from '@taqueria/protocol/Option';
@@ -22,6 +23,7 @@ import { z } from 'zod';
 export {
 	Environment,
 	LoadedConfig,
+	MetadataConfig,
 	NetworkConfig,
 	Operation,
 	Option,

@@ -3,7 +3,7 @@ import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Timestamp from '@taqueria/protocol/Timestamp';
 import * as Verb from '@taqueria/protocol/Verb';
-import { chain, chainRej, map, reject, resolve } from 'fluture';
+import { chain, chainRej, FutureInstance as Future, map, reject, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { groupBy, takeLast } from 'rambda';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
@@ -39,7 +39,7 @@ export const load = memoize((parsedArgs: SanitizedArgs.t) =>
 		),
 		chain(PersistentState.of),
 	)
-);
+) as (parsedArgs: SanitizedArgs.t) => Future<TaqError.t, PersistentState.t>;
 
 export const save = (parsedArgs: SanitizedArgs.t) =>
 	(updatedState: PersistentState.t) =>
@@ -49,7 +49,7 @@ export const save = (parsedArgs: SanitizedArgs.t) =>
 			map(_ => updatedState),
 		);
 
-export const newTaskEntry = (task: Verb.t, plugin: string, output: unknown) => {
+const newTaskEntry = (task: Verb.t, plugin: string, output: unknown) => {
 	const id = toTaskId(task, plugin);
 	const taskEntry: Record<string, PersistentState.PersistedTask> = {};
 	taskEntry[id] = {
@@ -62,24 +62,21 @@ export const newTaskEntry = (task: Verb.t, plugin: string, output: unknown) => {
 	return taskEntry;
 };
 
-export const imposeTaskLimits = (tasks: Record<string, PersistentState.PersistedTask>) =>
+const imposeTaskLimits = (tasks: Record<string, PersistentState.PersistedTask>) =>
 	pipe(
 		Object.entries(tasks),
 		pairs => groupBy(([_, task]: [string, PersistentState.PersistedTask]) => `${task.plugin}/${task.task}`, pairs),
 		groups => groups as Record<string, [string, PersistentState.PersistedTask][]>,
 		groups =>
-			Object.entries(groups).reduce(
-				(retval: [string, PersistentState.PersistedTask][], [_, persistedTasks]) =>
-					pipe(
-						persistedTasks.sort((a, b) => {
-							if (a[1].time < b[1].time) return -1;
-							else if (a[1].time > b[1].time) return 1;
-							return 0;
-						}),
-						takeLast(5),
-					),
-				[],
+			Object.entries(groups).flatMap(([_, persistedTasks]) =>
+				pipe(
+					persistedTasks.sort((a, b) => a[1].time - b[1].time),
+					// TODO: Keeping the last 5 runs of a task may not be sufficient for the provising system
+					// i.e. every ipfs publish task output would be required no matter how many folders were published or how many times it was published
+					takeLast(5),
+				)
 			),
+		allItems => allItems.sort((a, b) => a[1].time - b[1].time),
 		Object.fromEntries,
 	);
 

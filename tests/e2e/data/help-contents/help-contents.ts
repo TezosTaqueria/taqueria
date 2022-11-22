@@ -29,6 +29,7 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
+  taq clean                       Clean all the Taqueria-related docker images
 
 Options:
       --version     Show version number                                [boolean]
@@ -52,8 +53,13 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
+  taq clean                       Clean all the Taqueria-related docker images
+  taq ligo                        This task allows you to run arbitrary LIGO nat
+                                  ive commands. Note that they might not benefit
+                                   from the abstractions provided by Taqueria
   taq compile                     Provided by more than one plugin. The option -
                                   -plugin is required.
+  taq test <sourceFile>           Test a smart contract written in LIGO
   taq create <template>           Create files from pre-existing templates
 
 Options:
@@ -94,8 +100,13 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
+  taq clean                       Clean all the Taqueria-related docker images
+  taq ligo                        This task allows you to run arbitrary LIGO nat
+                                  ive commands. Note that they might not benefit
+                                   from the abstractions provided by Taqueria
   taq compile                     Provided by more than one plugin. The option -
                                   -plugin is required.
+  taq test <sourceFile>           Test a smart contract written in LIGO
   taq create <template>           Create files from pre-existing templates
 
 Options:

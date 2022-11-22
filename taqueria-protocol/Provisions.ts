@@ -1,25 +1,28 @@
 import createType, { Flatten } from '@taqueria/protocol/Base';
 import * as Provisioner from '@taqueria/protocol/Provisioner';
 import * as ProvisionerID from '@taqueria/protocol/ProvisionerID';
-import { memoizy } from 'memoizy';
-import { partitionArray, uniq } from 'rambda';
+import { uniq } from 'rambda';
+import { memoize, partition } from 'rambdax';
 import { z } from 'zod';
 
-const getInvalidIds = memoizy((provisions: Provisioner.t[]) => {
-	const ids = provisions.map(p => p.id);
-	return provisions.reduce(
-		(retval, provision) => {
-			const depends_on = provision.depends_on ?? [];
-			const invalid = partitionArray(
-				(id: ProvisionerID.t) => ids.includes(id),
-				depends_on,
-			).pop() as ProvisionerID.t[];
+const getInvalidIds = memoize(
+	(provisions: (Provisioner.t | Provisioner.Input | Provisioner.RawInput)[]): ProvisionerID.t[] => {
+		const ids = provisions.map(p => p.id);
+		return provisions.reduce(
+			(retval, provision) => {
+				const depends_on = (provision.depends_on ?? []) as unknown as ProvisionerID.t[];
+				const results = partition(
+					(id: ProvisionerID.t) => ids.includes(id),
+					depends_on,
+				) as unknown[][];
+				const invalid = results.pop() as ProvisionerID.t[];
 
-			return uniq([...retval, ...invalid]);
-		},
-		[] as ProvisionerID.t[],
-	);
-});
+				return uniq([...retval, ...invalid]);
+			},
+			[] as ProvisionerID.t[],
+		);
+	},
+);
 
 const rawSchema = z
 	.array(

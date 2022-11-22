@@ -1,6 +1,6 @@
 import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
-import compile from './compile';
 import createContract from './createContract';
+import main from './main';
 
 Plugin.create(i18n => ({
 	schema: '1.0',
@@ -8,29 +8,44 @@ Plugin.create(i18n => ({
 	alias: 'ligo',
 	tasks: [
 		Task.create({
-			task: 'compile',
-			command: 'compile [sourceFile]',
-			aliases: ['c', 'compile-ligo'],
-			description: 'Compile a smart contract written in a Ligo syntax to Michelson code',
+			task: 'ligo',
+			command: 'ligo',
+			description:
+				'This task allows you to run arbitrary LIGO native commands. Note that they might not benefit from the abstractions provided by Taqueria',
 			options: [
 				Option.create({
-					shortFlag: 'e',
-					flag: 'entrypoint',
-					description: 'The entry point that will be compiled',
-				}),
-				Option.create({
-					shortFlag: 's',
-					flag: 'syntax',
-					description: 'The syntax used in the contract',
-				}),
-				Option.create({
-					shortFlag: 'i',
-					flag: 'infer',
-					description: 'Enable type inference',
+					shortFlag: 'c',
+					flag: 'command',
+					type: 'string',
+					description: 'The command to be passed to the underlying LIGO binary, wrapped in quotes',
+					required: true,
 				}),
 			],
 			handler: 'proxy',
+			encoding: 'none',
+		}),
+		Task.create({
+			task: 'compile',
+			command: 'compile <sourceFile>',
+			aliases: ['c', 'compile-ligo'],
+			description:
+				'Compile a smart contract written in a LIGO syntax to Michelson code, along with its associated storage/parameter list files if they are found',
+			handler: 'proxy',
 			encoding: 'json',
+		}),
+		Task.create({
+			task: 'test',
+			command: 'test <sourceFile>',
+			description: 'Test a smart contract written in LIGO',
+			handler: 'proxy',
+			encoding: 'json',
+		}),
+		Task.create({
+			task: 'get-image',
+			command: 'get-image',
+			description: 'Gets the name of the image to be used',
+			handler: 'proxy',
+			hidden: true,
 		}),
 	],
 	templates: [
@@ -56,5 +71,5 @@ Plugin.create(i18n => ({
 			handler: createContract,
 		}),
 	],
-	proxy: compile,
+	proxy: main,
 }), process.argv);

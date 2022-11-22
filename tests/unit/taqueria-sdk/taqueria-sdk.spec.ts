@@ -1,4 +1,4 @@
-import { getArch, readJsonFile, writeJsonFile } from '@taqueria/node-sdk';
+import { getArch, getDockerImage, readJsonFile, writeJsonFile } from '@taqueria/node-sdk';
 import * as fs from 'fs';
 
 const jsonObject = {
@@ -23,5 +23,15 @@ describe('Integration tests using taqueria-mock-plugin', () => {
 		const platforms = ['linux/amd64', 'linux/arm64/v8'];
 		const result = await getArch();
 		expect(platforms).toContain(result);
+	});
+
+	test('Verify that getDockerImage evaluates environment variables as it should', () => {
+		const imageName = 'foobar';
+		const envVarValue = 'FOOBAR';
+		const envVarName = 'TAQ_FOOBAR';
+		expect(getDockerImage(imageName, envVarName)).toBe(imageName);
+
+		process.env[envVarName] = envVarValue;
+		expect(getDockerImage(imageName, envVarName)).toBe(envVarValue);
 	});
 });

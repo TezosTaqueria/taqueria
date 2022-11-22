@@ -21,21 +21,20 @@ Plugin.create(() => ({
 			],
 			encoding: 'json',
 		}),
-		// Pinning Not Implemented Yet
-		// Task.create({
-		// 	task: 'pin',
-		// 	command: 'pin [hash]',
-		// 	description: 'Pin a file already on ipfs with your pinata account.',
-		// 	aliases: [],
-		// 	handler: 'proxy',
-		// 	positionals: [
-		// 		PositionalArg.create({
-		// 			placeholder: 'hash',
-		// 			description: 'Ipfs hash of the file or directory that is already on the ipfs network.',
-		// 			type: 'string',
-		// 		}),
-		// 	]
-		// }),
+		Task.create({
+			task: 'pin',
+			command: 'pin [hash]',
+			description: 'Pin a file already on ipfs with your pinata account.',
+			aliases: [],
+			handler: 'proxy',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'hash',
+					description: 'Ipfs hash of the file or directory that is already on the ipfs network.',
+					type: 'string',
+				}),
+			],
+		}),
 	],
 	proxy,
 }), process.argv);

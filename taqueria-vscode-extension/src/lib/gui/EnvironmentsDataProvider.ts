@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
-import { HasRefresh, OutputLevels, VsCodeHelper } from '../helpers';
+import { HasRefresh, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
 
 export class EnvironmentsDataProvider implements vscode.TreeDataProvider<EnvironmentTreeItem>, HasRefresh {
 	constructor(
-		private workspaceRoot: string,
 		private helper: VsCodeHelper,
 	) {}
 
@@ -15,12 +14,13 @@ export class EnvironmentsDataProvider implements vscode.TreeDataProvider<Environ
 	async getChildren(element?: EnvironmentTreeItem): Promise<EnvironmentTreeItem[]> {
 		let pathToDir: Util.PathToDir | null;
 		let config: Util.TaqifiedDir | null;
-		if (!this.workspaceRoot) {
+		const mainFolder = this.helper.getMainWorkspaceFolder();
+		if (!mainFolder) {
 			pathToDir = null;
 			config = null;
 		} else {
 			try {
-				pathToDir = await Util.makeDir(this.workspaceRoot, this.helper.i18n);
+				pathToDir = await Util.makeDir(mainFolder.fsPath, this.helper.i18n);
 				config = await Util.TaqifiedDir.create(pathToDir, this.helper.i18n);
 			} catch (e: any) {
 				config = null;
@@ -56,12 +56,12 @@ export class EnvironmentsDataProvider implements vscode.TreeDataProvider<Environ
 }
 export class EnvironmentTreeItem extends vscode.TreeItem {
 	constructor(
-		public readonly label: string,
+		public readonly environmentName: string,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		isDefault: boolean,
 	) {
-		super(label, collapsibleState);
-		this.tooltip = isDefault ? `${this.label} (default)` : `${this.label}`;
+		super(environmentName, collapsibleState);
+		this.tooltip = isDefault ? `${environmentName} (default)` : `${environmentName}`;
 		this.iconPath = new vscode.ThemeIcon(isDefault ? 'pass-filled' : 'server-environment');
 		this.contextValue = isDefault ? 'default' : 'non-default';
 	}

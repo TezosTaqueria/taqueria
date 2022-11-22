@@ -1,0 +1,67 @@
+name: 🚧 Dev Task
+description: Tickets for engineering and dev
+title: "🚧 Dev ➾ "
+labels: ["dev-task"]
+assignees:
+  - 
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # ◢▅◣◥▅◤◢▅◣ 🚧🚧🚧 Dev Task 🚧🚧🚧  ◢▅◣◥▅◤◢▅◣  
+
+        ## 🛑 Sanity Check: Does this really need it's own ticket?
+
+  - type: input
+    id: epic_link
+    attributes:
+      label: 🔗 Epic|Feature Link
+      placeholder: "ex. https://github.com/ecadlabs/taqueria/issues/123"
+    validations:
+      required: false
+  - type: checkboxes
+    id: status
+    attributes: 
+      label: 🚥 Definition of Done
+      options:
+        - label: "🎯 Planning and Design"
+        - label: "🏎️ Dev Implementation Complete"
+        - label: "♾️ PR Merged"
+        - label: "🏆 Product Acceptance"
+  - type: textarea
+    id: work_description
+    attributes:
+      label: 🧰 Work Description
+      description: Describe what work needs to be done 
+      placeholder: "In as much detail as possible, describe the work that needs to be done and include any architecture/design choices and the underlying motivation for this ticket"
+    validations:
+      required: false
+  - type: textarea
+    id: to_do
+    attributes:
+      label: ✅ To Do
+      description: A list of to do items (and drivers) for this ticket
+      placeholder: "- [ ] 😎  Make Taqueria awesome (@person1) \n- [ ] 🌮  Eat tacos (@person2)"
+    validations:
+      required: false
+  - type: textarea
+    id: ac
+    attributes:
+      label: ⚖️ Acceptance Criteria
+      value: "✨ Functional: \n- [ ] \n- [ ] "
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: 🔭 Scope
+      description: "Explicitly, what is out of scope for this ticket"
+      value: "🙅‍♂️ Out of Scope: \n- ... \n \n "
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/ecadlabs/taqueria/blob/1d6476f92fce0f2f36cd268549aa15e6cbe770d3/code-of-conduct.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
