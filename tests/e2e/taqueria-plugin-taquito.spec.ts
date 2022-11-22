@@ -78,7 +78,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
-		console.log(deployCommand)
+		console.log(deployCommand);
 
 		// 3. Verify that contract has been originated on the network
 		expect(deployCommand.stdout).toContain('hello-tacos.tz');
@@ -110,15 +110,16 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 2. Run taq deploy ${contractName} on a selected test network described in "test" environment
 
-		const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
+		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
+		console.log(deployCommand);
 
 		// 3. Verify that contract has been originated on the network
-		expect(stdout).toContain('hello-tacos.tz');
-		expect(stdout).toContain(networkInfo.networkName);
+		expect(deployCommand.stdout).toContain('hello-tacos.tz');
+		expect(deployCommand.stdout).toContain(networkInfo.networkName);
 
-		const result = stdout.match(/(KT1)+\w{33}?/);
+		const result = deployCommand.stdout.match(/(KT1)+\w{33}?/);
 		expect(result).not.toBe(null);
 		const contractHash = (result as RegExpMatchArray)[0];
 
@@ -226,10 +227,10 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		const fundResult = await exec(`taq fund -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
-		console.log(fundResult)
+		console.log(fundResult);
 
 		const amountFundedArray = itemArrayInTable(/[0-9]{7,}/g, fundResult);
-		console.log(amountFundedArray)
+		console.log(amountFundedArray);
 		expect(amountFundedArray).toStrictEqual(configTezAmounts);
 	});
 
