@@ -4,9 +4,9 @@ import util from 'util';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
-const taqueriaProjectPath = './e2e/auto-test';
-const taqueriaProjectPathNPMSuccess = './e2e/auto-test-npm-success';
-const taqueriaProjectPathNPMFull = './e2e/auto-test-npm-full';
+const taqueriaProjectPath = './scrap/auto-test';
+const taqueriaProjectPathNPMSuccess = './scrap/auto-test-npm-success';
+const taqueriaProjectPathNPMFull = './scrap/auto-test-npm-full';
 
 describe('E2E Testing for taqueria general functionality', () => {
 	test('Verify that taq init creates test folder', async () => {

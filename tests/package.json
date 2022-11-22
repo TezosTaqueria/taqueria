@@ -5,14 +5,14 @@
 	"description": "This is Taqueria testing project includes unit, integration and e2e tests",
 	"main": "index.js",
 	"scripts": {
-		"test:unit": "npm run test:unit:deno && npm run test:unit:jest",
-		"test:unit:deno": "TEST=true deno test unit/ --allow-all --unstable --import-map ../import_map.json",
-		"test:unit:jest": "TEST=true jest --config jest.config.unit.ts --no-cache",
-		"test:unit:deno:debug": "TEST=true deno test unit/ --allow-all --unstable --inspect-brk",
-		"test:unit:deno:with-coverage": "TEST=true deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
-		"test:unit:selected": "TEST=true deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",
-		"test:integration": "TEST=true jest --config jest.config.integration.ts --no-cache",
-		"test:e2e": "TEST=true jest --config jest.config.e2e.ts"
+		"test:unit": "./bin/beforeAllTests.sh && npm run test:unit:deno && npm run test:unit:jest",
+		"test:unit:deno": "./bin/beforeAllTests.sh && TEST=true deno test unit/ --allow-all --unstable --import-map ../import_map.json",
+		"test:unit:jest": "./bin/beforeAllTests.sh && TEST=true jest --config jest.config.unit.ts --no-cache",
+		"test:unit:deno:debug": "./bin/beforeAllTests.sh && TEST=true deno test unit/ --allow-all --unstable --inspect-brk",
+		"test:unit:deno:with-coverage": "./bin/beforeAllTests.sh && TEST=true deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
+		"test:unit:selected": "./bin/beforeAllTests.sh && TEST=true deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",
+		"test:integration": "./bin/beforeAllTests.sh && TEST=true jest --config jest.config.integration.ts --no-cache",
+		"test:e2e": "./bin/beforeAllTests.sh && TEST=true jest --config jest.config.e2e.ts"
 	},
 	"repository": {
 		"type": "git",

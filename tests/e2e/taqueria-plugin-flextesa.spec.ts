@@ -5,7 +5,7 @@ import { generateTestProject, getContainerID, getContainerImage, getContainerNam
 const exec = util.promisify(exec1);
 import * as flexContents from './data/help-contents/flextesa-contents';
 
-const taqueriaProjectPath = 'e2e/auto-test-flextesa-plugin';
+const taqueriaProjectPath = './scrap/auto-test-flextesa-plugin';
 let sandboxName: string;
 
 // List of child processes that will need to be cleanup after test case finishes

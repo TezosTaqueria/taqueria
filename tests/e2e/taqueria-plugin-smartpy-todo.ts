@@ -6,7 +6,7 @@ import * as contents from './data/help-contents/smartpy-contents';
 import { checkFolderExistsWithTimeout, generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
-const taqueriaProjectPath = 'e2e/auto-test-smartpy-plugin';
+const taqueriaProjectPath = 'scrap/auto-test-smartpy-plugin';
 
 describe('E2E Testing for taqueria SmartPy plugin', () => {
 	beforeAll(async () => {
