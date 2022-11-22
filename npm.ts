@@ -3,7 +3,7 @@ import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import { chain, chainRej, map, mapRej } from 'fluture';
+import { chain, chainRej, FutureInstance as Future, map, mapRej } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { getConfig } from './taqueria-config.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
@@ -90,7 +90,7 @@ const addToPluginList = (pluginName: NpmPluginName, loadedConfig: LoadedConfig.t
 		chain(writeJsonFile(loadedConfig.configFile)),
 	);
 
-export const installPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string) =>
+export const installPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string): Future<TaqError.t, string> =>
 	pipe(
 		requireNPM(projectDir, i18n),
 		chain(_ => exec('npm install -D <%= it.plugin %>', { plugin }, false, projectDir)),
