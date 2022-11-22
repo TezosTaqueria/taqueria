@@ -14,11 +14,11 @@ function checkEnvFile(): boolean {
 }
 
 if (!process.env.pinataJwtToken && !checkEnvFile()) {
-	console.log('E2E tests need the environment variable pinataJwtToken to be set to a valid pinata jst token.');
+	console.log('E2E tests need the environment variable pinataJwtToken to be set to a valid pinata jwt token.');
 	console.log(
 		'You can set that environment variable, or add a .env file in taqueria project root that sets the variable.',
 	);
-	throw new Error('E2E tests need the environment variable pinataJwtToken to be set to a valid pinata jst token');
+	throw new Error('E2E tests need the environment variable pinataJwtToken to be set to a valid pinata jwt token');
 }
 
 export default {
