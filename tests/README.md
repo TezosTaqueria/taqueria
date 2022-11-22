@@ -19,6 +19,9 @@ $ npm install -w taqueria-plugin-mock
 $ npm install -w tests
 ```
 
+### Building Taqueria for Testing:
+A few things need to be built for the tests to run correctly since they make use of Taqueria internal functionality. This is all handled with a single command `npm run build-all`. Once this is command completes you will be able to run the tests that make sure Taqueria is working the way we expect it to work.
+
 ### Running the Tests:
 - The tests should be run from the taqueria root folder by calling the test run script with the workspace specified: `npm run test:{unit|integration|e2e} -w tests`
     - If you're going to be running the unit tests then you will need deno installed on your system
