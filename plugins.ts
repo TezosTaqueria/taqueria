@@ -241,6 +241,7 @@ export const inject = (deps: PluginDeps) => {
 				if (omit.includes(key) || key.indexOf('-') >= 0 || val === undefined) return retval;
 				// Pass numbers and bools as is
 				else if (typeof val === 'boolean' || typeof val === 'number') return [...retval, '--' + key, val];
+				else if (key === '_') return [...retval, key, `'${val}'`];
 				else return [...retval, '--' + key, `'${val}'`];
 			},
 			[],
