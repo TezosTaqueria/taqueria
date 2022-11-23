@@ -173,7 +173,7 @@ export type PluginResponseEncoding = 'none' | 'json' | 'application/json';
 export type BuildNumber = number;
 
 export type SanitizedArgs = {
-	_: NonEmptyString[];
+	_: string[];
 	projectDir: SanitizedPath;
 	maxConcurrency: number;
 	debug: boolean;
