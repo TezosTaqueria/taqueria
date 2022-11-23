@@ -67,7 +67,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
 	test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
-		environment = 'test';
+		environment = 'testing';
 
 		// 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
@@ -75,15 +75,15 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 2. Run taq deploy on a selected test network described in "test" environment
 
-		const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
+		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
 
 		// 3. Verify that contract has been originated on the network
-		expect(stdout).toContain('hello-tacos.tz');
-		expect(stdout).toContain(networkInfo.networkName);
+		expect(deployCommand.stdout).toContain('hello-tacos.tz');
+		expect(deployCommand.stdout).toContain(networkInfo.networkName);
 
-		const result = stdout.match(/(KT1)+\w{33}?/);
+		const result = deployCommand.stdout.match(/(KT1)+\w{33}?/);
 		expect(result).not.toBe(null);
 		const contractHash = (result as RegExpMatchArray)[0];
 
@@ -100,7 +100,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
 	test('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
-		environment = 'test';
+		environment = 'testing';
 
 		// 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
@@ -109,15 +109,15 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// 2. Run taq deploy ${contractName} on a selected test network described in "test" environment
 
-		const { stdout } = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
+		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
 
 		// 3. Verify that contract has been originated on the network
-		expect(stdout).toContain('hello-tacos.tz');
-		expect(stdout).toContain(networkInfo.networkName);
+		expect(deployCommand.stdout).toContain('hello-tacos.tz');
+		expect(deployCommand.stdout).toContain(networkInfo.networkName);
 
-		const result = stdout.match(/(KT1)+\w{33}?/);
+		const result = deployCommand.stdout.match(/(KT1)+\w{33}?/);
 		expect(result).not.toBe(null);
 		const contractHash = (result as RegExpMatchArray)[0];
 
@@ -166,7 +166,7 @@ No operations performed
 	});
 
 	test('Verify that taqueria taquito plugin will error when trying to fund maxed out accounts', async () => {
-		environment = 'test';
+		environment = 'testing';
 
 		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
 
@@ -175,12 +175,12 @@ No operations performed
 		});
 
 		expect(result.stdout).toContain(
-			'All instantiated accounts in the current environment, "test", are funded up to or beyond the declared amount',
+			'All instantiated accounts in the current environment, "testing", are funded up to or beyond the declared amount',
 		);
 	});
 
 	test('Verify that taqueria taquito plugin can only instantiate accounts on a network once', async () => {
-		environment = 'test';
+		environment = 'testing';
 
 		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
 
@@ -198,15 +198,15 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		expect(result2.stdout).toBe(
 			`No accounts were instantiated because they were all instantiated in the target environment already\n`,
 		);
-		expect(result2.stderr).toBe(`Note: bob is already instantiated in the current environment, "test"
-Note: alice is already instantiated in the current environment, "test"
-Note: john is already instantiated in the current environment, "test"
-Note: jane is already instantiated in the current environment, "test"
-Note: joe is already instantiated in the current environment, "test"\n`);
+		expect(result2.stderr).toBe(`Note: bob is already instantiated in the current environment, "testing"
+Note: alice is already instantiated in the current environment, "testing"
+Note: john is already instantiated in the current environment, "testing"
+Note: jane is already instantiated in the current environment, "testing"
+Note: joe is already instantiated in the current environment, "testing"\n`);
 	});
 
 	test('Verify that taqueria taquito plugin will fund instantiated accounts on a network', async () => {
-		environment = 'test';
+		environment = 'testing';
 
 		await exec(`cp e2e/data/config-taquito-test-environment-low-tez.json ${taqueriaProjectPath}/.taq/config.json`);
 
@@ -231,7 +231,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 	});
 
 	test('Verify that taqueria taquito plugin will can send from one instantiated account to another', async () => {
-		environment = 'test';
+		environment = 'testing';
 		const transferAmountMutez = 1000000;
 
 		await exec(`cp e2e/data/config-taquito-test-environment-low-tez.json ${taqueriaProjectPath}/.taq/config.json`);
@@ -280,15 +280,53 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		}
 	});
 
+	test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> invalid network name in the environment', async () => {
+		// Environment test does not exist on default config.json
+		environment = 'testing';
+
+		// 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
+		await exec(
+			`cp e2e/data/config-taquito-test-environment-invalid-config-networkname.json ${taqueriaProjectPath}/.taq/config.json`,
+		);
+		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+
+		// 2. Run taq deploy on a network described in "test" environment
+		const badNameDeploy = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		expect(badNameDeploy.stderr).toContain(
+			"The current environment is configured to use a network called 'ghost'; however, no network of this name has been configured in .taq/config.json",
+		);
+		expect(badNameDeploy.stderr).toContain('No operations performed');
+	});
+
+	test('Verify that taqueria taquito plugin will show proper error when faucet is wrong -> network url is wrong', async () => {
+		// Environment test does not exist on default config.json
+		environment = 'testing';
+
+		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
+		await exec(
+			`cp e2e/data/config-taquito-test-environment-invalid-config-network-url.json ${taqueriaProjectPath}/.taq/config.json`,
+		);
+		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
+
+		// 2. Run taq deploy on a network described in "test" environment
+		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage -e ${environment}`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
+
+		// 3. Verify that proper error displays in the console
+		expect(stdoutDeploy.stderr).toContain('The RPC URL may be invalid. Check ./.taq/config.json');
+		expect(stdoutDeploy.stderr).toContain('No operations performed');
+	});
+
 	test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> initial storage is not provided', async () => {
 		// Environment test does not exist on default config.json
-		environment = 'test';
+		environment = 'testing';
 
 		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
-		await exec(
-			`cp e2e/data/config-taquito-test-environment-invalid-initial-storage.json ${taqueriaProjectPath}/.taq/config.json`,
-		);
 
 		// 2. Run taq deploy on a network described in "test" environment
 		const stdoutDeploy = await exec(`taq deploy hello-tacos.tz -e ${environment}`, { cwd: `./${taqueriaProjectPath}` });
@@ -305,7 +343,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 
 	test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> initial storage is not a number', async () => {
 		// Environment test does not exist on default config.json
-		environment = 'test';
+		environment = 'testing';
 
 		// 1. Copy config.json and two michelson contracts from data folder to artifacts folder under taqueria project
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
@@ -320,9 +358,9 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		});
 
 		// 3. Verify that proper error displays in the console
-		expect(stdoutDeploy.stderr).toContain(
-			'Error while performing operation',
-		);
+		expect(stdoutDeploy.stderr).toContain('Error while performing operation');
+		expect(stdoutDeploy.stderr).toContain('michelson_v1.invalid_expression_kind');
+		expect(stdoutDeploy.stderr).toContain('No operations performed');
 	});
 
 	// Remove all files from artifacts folder without removing folder itself

@@ -54,6 +54,13 @@ export async function getContainerImage(dockerName: string): Promise<string> {
 	return dockerContainerInfo[1] ?? null;
 }
 
+export async function getContainerImages(dockerName: string): Promise<RegExpMatchArray | null> {
+	const dockerContainerInfo =
+		(await exec(`docker ps -a --filter "name=taq-flextesa-${dockerName}" --no-trunc`)).stdout;
+	const dockerContainerImages = dockerContainerInfo.match(/ghcr.io\/ecadlabs\/taqueria-flextesa:[0-9,a-z,-]+/g)
+	return dockerContainerImages
+}
+
 export async function getContainerID(dockerName: string): Promise<string> {
 	const [_dockerContainerHeader, dockerContainerInfo] =
 		(await exec(`docker ps --filter "name=taq-flextesa-${dockerName}" --no-trunc`)).stdout.split(/\r?\n/);
