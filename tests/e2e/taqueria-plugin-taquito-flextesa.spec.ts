@@ -193,14 +193,14 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
 		);
 		const localURL = configContents.sandbox.localTF.rpcUrl;
-		const beforeAmount = checkContractBalanceOnNetwork(contractHash, localURL);
+		const beforeAmount = await checkContractBalanceOnNetwork(contractHash, localURL);
 
 		// 6. Call taq call command to transfer 0 tez from account to the contract
 		await exec(`taq call ${contractHash} --param hello-tacos.parameter.decrement_by_1.tz`, {
 			cwd: `./${taqueriaProjectPath}`,
 		});
 
-		const afterAmount = checkContractBalanceOnNetwork(contractHash, localURL);
+		const afterAmount = await checkContractBalanceOnNetwork(contractHash, localURL);
 
 		// 8. Verify that amount was not charged
 		expect(beforeAmount).toStrictEqual(afterAmount);
