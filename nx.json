@@ -5,7 +5,6 @@
 			"options": {
 				"cacheableOperations": [
 					"build-package",
-					"build-docker",
 					"build",
 					"test:unit",
 					"test:integration",
@@ -18,11 +17,6 @@
 		"build-package": {
 			"dependsOn": [
 				"^build-package"
-			]
-		},
-		"build-docker": {
-			"dependsOn": [
-				"^build-docker"
 			]
 		},
 		"build": {
