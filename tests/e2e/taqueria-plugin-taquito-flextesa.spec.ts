@@ -180,11 +180,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
 		await exec(`cp e2e/data/hello-tacos.parameter.decrement_by_1.tz ${taqueriaProjectPath}/artifacts/`);
 
-		// 3. Get default (Bob's) account initial amount
-		const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-		const addressArray = itemArrayInTable(addressRegex, initialContractList);
-		const initAmountArray = itemArrayInTable(amountRegex, initialContractList);
-
 		// 4. Run taq deploy ${contractName} on a selected test network described in "test" environment
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
