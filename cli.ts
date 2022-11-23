@@ -5,9 +5,11 @@ import {
 	bimap,
 	chain,
 	chainRej,
+	coalesce,
 	debugMode,
 	forkCatch,
 	FutureInstance as Future,
+	go,
 	map,
 	mapRej,
 	parallel,
@@ -62,7 +64,7 @@ const {
 	eager,
 	isTaqError,
 	taqResolve,
-	// logInput,
+	logInput,
 	// debug
 } = utils.inject({
 	stdout: Deno.stdout,
@@ -236,12 +238,6 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 						default: './taqueria-taco-shop',
 					});
 			},
-			(args: Record<string, unknown>) =>
-				pipe(
-					SanitizedArgs.ofScaffoldTaskArgs(args),
-					chain(scaffoldProject(i18n)),
-					forkCatch(displayError(cliConfig))(displayError(cliConfig))(console.log),
-				),
 		);
 };
 
@@ -430,59 +426,61 @@ const initProject = (
 		map(_ => i18n.__('bootstrapMsg')),
 	);
 
+const runScaffoldPostInit = (scaffoldDir: SanitizedAbsPath.t): Future<TaqError.t, SanitizedAbsPath.t> => {
+	const scaffoldConfigAbspath = SanitizedAbsPath.create(`${scaffoldDir}/scaffold.json`);
+	return pipe(
+		readJsonFile<ScaffoldConfig.t>(scaffoldConfigAbspath),
+		map(logInput('Scaffold Config')),
+		coalesce(_ => ({}) as ScaffoldConfig.t)(identity),
+		chain(scaffoldConfig =>
+			typeof scaffoldConfig === 'object' && scaffoldConfig.postInit
+				? pipe(
+					exec(`${scaffoldConfig.postInit!} 2>&1`, {}, true, scaffoldDir),
+					map(JSON.stringify),
+					chain(appendTextFile(joinPaths(scaffoldDir, 'scaffold.log'))),
+					chain(_ =>
+						pipe(
+							rm(scaffoldConfigAbspath),
+							coalesce(_ => scaffoldConfigAbspath)(_ => scaffoldConfigAbspath),
+						)
+					),
+				)
+				: taqResolve(scaffoldConfigAbspath)
+		),
+	);
+};
+
 const scaffoldProject = (i18n: i18n.t) =>
 	({ scaffoldUrl, scaffoldProjectDir, maxConcurrency }: SanitizedArgs.ScaffoldTaskArgs) =>
-		attemptP<TaqError.t, string>(async () => {
-			const abspath = await eager(SanitizedAbsPath.make(scaffoldProjectDir));
-			const destDir = await eager(doesPathNotExistOrIsEmptyDir(abspath));
+		go(
+			function*() {
+				const abspath = yield SanitizedAbsPath.make(scaffoldProjectDir);
+				const destDir = yield doesPathNotExistOrIsEmptyDir(abspath);
 
-			log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
-			await eager(gitClone(scaffoldUrl)(destDir));
+				log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
+				yield gitClone(scaffoldUrl)(destDir);
 
-			log('\n Initializing Project...');
+				log('\n Initializing Project...');
 
-			const gitDir = await eager(SanitizedAbsPath.make(`${destDir}/.git`));
-			await eager(rm(gitDir));
-			log('    ✓ Remove Git directory');
+				const gitDir = yield SanitizedAbsPath.make(`${destDir}/.git`);
+				yield rm(gitDir);
+				log('    ✓ Remove Git directory');
 
-			const installOutput = await eager(exec(`npm install 2>&1`, {}, true, destDir));
-			await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(installOutput.toString()));
-			log('    ✓ Install plugins');
+				const installOutput = yield exec(`npm install 2>&1`, {}, true, destDir);
+				yield appendTextFile(joinPaths(destDir, 'scaffold.log'))(installOutput.toString());
+				log('    ✓ Install plugins');
 
-			const initOutput = await eager(exec(`taq init 2>&1`, {}, true, destDir));
-			await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(initOutput.toString()));
+				const initOutput = yield exec(`taq init 2>&1`, {}, true, destDir);
+				yield appendTextFile(joinPaths(destDir, 'scaffold.log'))(initOutput.toString());
 
-			// Remove the scaffold.json file, if not exists
-			// If it doesn't exist, don't throw...
-			const scaffoldConfigAbspath = await eager(SanitizedAbsPath.make(`${destDir}/scaffold.json`));
-			try {
-				const scaffoldConfig = await eager(readJsonFile<ScaffoldConfig.t>(scaffoldConfigAbspath));
-				if (
-					typeof scaffoldConfig === 'object' && Object.hasOwn(scaffoldConfig, 'postInit') && scaffoldConfig.postInit
-				) {
-					const setupOutput = await eager(exec(`${scaffoldConfig.postInit!} 2>&1`, {}, true, destDir));
-					await eager(appendTextFile(joinPaths(destDir, 'scaffold.log'))(setupOutput.toString()));
-				}
-			} catch (err) {
-				if (!isTaqError(err) || err.kind !== 'E_INVALID_PATH_DOES_NOT_EXIST') {
-					throw err;
-				}
-			}
-			try {
-				await eager(rm(scaffoldConfigAbspath));
-			} catch (err) {
-				if (!isTaqError(err) || err.kind !== 'E_INVALID_PATH_DOES_NOT_EXIST') {
-					throw err;
-				}
-			}
-			log('    ✓ Run scaffold post-init script');
+				yield runScaffoldPostInit(abspath);
+				log('    ✓ Run scaffold post-init script');
 
-			log("    ✓ Project Taq'ified \n");
+				log("    ✓ Project Taq'ified \n");
 
-			return ('🌮 Project created successfully 🌮');
-
-			// return i18n.__("scaffoldDoneMsg")
-		});
+				return ('🌮 Project created successfully 🌮');
+			},
+		);
 
 const getCanonicalTask = (pluginName: string, taskName: string, state: EphemeralState.t) =>
 	state.plugins.reduce(
@@ -1014,16 +1012,22 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 						} else if (initArgs.build) {
 							log(initArgs.setBuild);
 							return taqResolve(initArgs);
+						} else if (initArgs._.includes('scaffold')) {
+							return pipe(
+								SanitizedArgs.ofScaffoldTaskArgs(initArgs),
+								chain(scaffoldProject(i18n)),
+								map(_ => initArgs),
+							);
 						}
+
 						return initArgs._.includes('init')
 								|| initArgs._.includes('testFromVsCode')
-								|| initArgs._.includes('scaffold')
 								|| initArgs._.includes('opt-in')
 								|| initArgs._.includes('opt-out')
 							? taqResolve(initArgs)
 							: postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n);
 					}),
-					chain((initArgs: SanitizedArgs.t) =>
+					chain(initArgs =>
 						sendEvent(
 							initArgs._.join(),
 							getVersion(inputArgs),
