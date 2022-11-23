@@ -137,7 +137,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		// 3. Verify that docker container has been started
 		const dockerContainerTest = await getContainerName(sandboxName);
 		expect(dockerContainerTest).toContain(`taq-flextesa-${sandboxName}`);
-		const dockerContainerID = await getContainerID(sandboxName);
+
 		const dockerImageName = await getContainerImage(sandboxName);
 		expect(dockerImageName).toContain('ghcr.io/ecadlabs/taqueria-flextesa');
 
