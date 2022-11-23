@@ -218,6 +218,15 @@ const preprocessArgs = (args: string[]): string[] => {
 	return args.map(arg => /^0x[0-9a-fA-F]+$/.test(arg) ? '___' + arg + '___' : arg);
 };
 
+export const getSelectedEnvironment = (
+	args: { env: string | undefined; config: { environment: Record<string, unknown> } },
+) =>
+	args.env
+		? args.env
+		: (
+			args.config.environment['default'] ?? 'development'
+		);
+
 const formatArgs = (args: Record<string, string>) => {
 	const entries = Object.entries(args).map(
 		([key, value]) => {
@@ -231,7 +240,7 @@ const formatArgs = (args: Record<string, string>) => {
 
 	return {
 		...formatted,
-		env: formatted.env ?? formatted.config.env,
+		env: getSelectedEnvironment(formatted),
 	} as Record<string, unknown>;
 };
 
