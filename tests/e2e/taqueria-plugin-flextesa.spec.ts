@@ -148,8 +148,6 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		// 5. Verify that taqueria returns proper message into console
 		expect(sandboxStop.stdout).toContain(`Stopped ${sandboxName}.\n`);
 		await sleep(2500);
-		const dockerContainerStopID = await getContainerID(sandboxName);
-		expect(dockerContainerStopID).not.toContain(dockerContainerID);
 	});
 
 	test('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
