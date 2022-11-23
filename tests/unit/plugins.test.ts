@@ -68,7 +68,7 @@ Deno.test('inject()', async t => {
 		const result = toPluginArguments(requestArgs, config);
 
 		assertEquals(result, [
-			'--_',
+			'_',
 			"'init'",
 			'--projectDir',
 			"'/tmp/test-project'",
