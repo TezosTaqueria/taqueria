@@ -197,3 +197,6 @@ taqueria-protocol-types/**/*.js
 taqueria-protocol-types/**/*.map
 taqueria-protocol-types/**/*.d.ts
 taqueria-protocol-types/**/*.mjs
+
+# Temp taq projects created from e2e test execution
+tests/e2e/auto-test-*

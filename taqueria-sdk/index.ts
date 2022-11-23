@@ -599,7 +599,7 @@ export const getAccountPrivateKey = async (
 	return network.accounts[account].privateKey as string;
 };
 
-export const getDockerImage = (defaultImageName: string, envVarName: string) =>
+export const getDockerImage = (defaultImageName: string, envVarName: string): string =>
 	process.env[envVarName] ?? defaultImageName;
 
 /**

@@ -3,12 +3,16 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 const exec = util.promisify(exec1);
 
-const scaffoldDirName = `taqueria-taco-shop-functional`;
+const scaffoldDirName = `e2e/auto-test-taco-shop-functional`;
 
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	beforeAll(async () => {
-		await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${scaffoldDirName}`);
-		await exec(`cd ${scaffoldDirName} && npm run setup`);
+		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true, force: true });
+
+		// Please leave this console log intact. Its useful to see _when_ there is a failure.
+		console.log(
+			await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${scaffoldDirName}`),
+		);
 	});
 
 	test('Verify that scaffold project is set up after running setup', async () => {
@@ -25,11 +29,11 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	});
 
 	test('Verify that scaffold project can start and stop taqueria locally', async () => {
-		const startResults = await exec(`taq start sandbox local`, { cwd: `${scaffoldDirName}` });
-		expect(startResults.stdout).toContain('Started local.');
+		const startResults = await exec(`taq start sandbox local-scaffold`, { cwd: `${scaffoldDirName}` });
+		expect(startResults.stdout).toContain('Started local-scaffold.');
 
-		const stopResults = await exec(`taq stop sandbox local`, { cwd: `${scaffoldDirName}` });
-		expect(stopResults.stdout).toContain('Stopped local.');
+		const stopResults = await exec(`taq stop sandbox local-scaffold`, { cwd: `${scaffoldDirName}` });
+		expect(stopResults.stdout).toContain('Stopped local-scaffold.');
 	});
 
 	afterAll(async () => {

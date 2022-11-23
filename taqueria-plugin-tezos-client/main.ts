@@ -1,6 +1,6 @@
 import { RequestArgs, sendAsyncErr, sendAsyncRes } from '@taqueria/node-sdk';
 import client from './client';
-import { DOCKER_IMAGE, IntersectionOpts as Opts } from './common';
+import { getClientDockerImage, IntersectionOpts as Opts } from './common';
 import simulate from './simulate';
 import typecheck from './typecheck';
 
@@ -14,7 +14,7 @@ const main = (parsedArgs: RequestArgs.t): Promise<void> => {
 		case 'simulate':
 			return simulate(unsafeOpts);
 		case 'get-image':
-			return sendAsyncRes(DOCKER_IMAGE);
+			return sendAsyncRes(getClientDockerImage());
 		default:
 			return sendAsyncErr(`${unsafeOpts.task} is not an understood task by the Tezos-client plugin`);
 	}

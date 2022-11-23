@@ -12,7 +12,12 @@ import {
 import { basename, extname, join } from 'path';
 import { match } from 'ts-pattern';
 
-const DOCKER_IMAGE = getDockerImage('completium/archetype:1.2.12', 'TAQ_ARCHETYPE_IMAGE');
+// Should point to the latest stable version, so it needs to be updated as part of our release process.
+const ARCHETYPE_DEFAULT_IMAGE = 'completium/archetype:1.2.12';
+
+const ARCHETYPE_IMAGE_ENV_VAR = 'TAQ_ARCHETYPE_IMAGE';
+
+export const getArchetypeDockerImage = (): string => getDockerImage(ARCHETYPE_DEFAULT_IMAGE, ARCHETYPE_IMAGE_ENV_VAR);
 
 interface Opts extends ProxyTaskArgs.t {
 	sourceFile?: string;
@@ -35,7 +40,7 @@ const getCompileCommand = (opts: Opts) =>
 		const { projectDir } = opts;
 		const inputFile = getInputFilename(opts)(sourceFile);
 		const baseCommand =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -u $(id -u):$(id -g) -w /project ${DOCKER_IMAGE} ${inputFile}`;
+			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -u $(id -u):$(id -g) -w /project ${getArchetypeDockerImage()} ${inputFile}`;
 		const outFile = `-o ${getContractArtifactFilename(opts)(sourceFile)}`;
 		const cmd = `${baseCommand} ${outFile}`;
 		return cmd;
@@ -74,7 +79,7 @@ const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[
 const compile = (parsedArgs: RequestArgs.t) => {
 	const unsafeOpts = parsedArgs as unknown as Opts;
 	return match(unsafeOpts)
-		.when(unsafeOpts => unsafeOpts.task === 'get-image', () => sendAsyncRes(DOCKER_IMAGE))
+		.when(unsafeOpts => unsafeOpts.task === 'get-image', () => sendAsyncRes(getArchetypeDockerImage()))
 		.otherwise(() => {
 			const p = unsafeOpts.sourceFile
 				? compileContract(unsafeOpts)(unsafeOpts.sourceFile)

@@ -1,5 +1,5 @@
-import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
-import { getInputFilename, LIGO_DOCKER_IMAGE, TestOpts as Opts } from './common';
+import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { emitExternalError, getInputFilename, getLigoDockerImage, TestOpts as Opts } from './common';
 
 type TableRow = { contract: string; testResults: string };
 
@@ -7,7 +7,7 @@ const getTestContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const baseCmd =
-		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${LIGO_DOCKER_IMAGE} run test`;
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} run test`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const cmd = `${baseCmd} ${inputFile}`;
 	return cmd;
@@ -26,8 +26,7 @@ const testContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =
 			};
 		})
 		.catch(err => {
-			sendErr(`\n=== For ${sourceFile} ===`);
-			sendErr(err.message.replace(/Command failed.+?\n/, ''));
+			emitExternalError(err, sourceFile);
 			return {
 				contract: sourceFile,
 				testResults: 'Some tests failed :(',

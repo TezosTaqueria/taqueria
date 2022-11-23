@@ -7,7 +7,6 @@ import {
 	sendAsyncRes,
 	sendErr,
 	sendJsonRes,
-	sendRes,
 	stringToSHA256,
 	writeJsonFile,
 } from '@taqueria/node-sdk';
@@ -26,6 +25,8 @@ export interface Opts extends RequestArgs.t {
 	sandboxName?: string;
 	task?: string;
 }
+
+const ECAD_FLEXTESA_IMAGE_ENV_VAR = 'TAQ_ECAD_FLEXTESA_IMAGE';
 
 const getDefaultDockerImage = (opts: Opts) => `ghcr.io/ecadlabs/taqueria-flextesa:${opts.setVersion}-${opts.setBuild}`;
 
@@ -89,7 +90,7 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 
 	const containerName = await getContainerName(sandboxName, opts);
 	const arch = await getArch();
-	const image = getDockerImage(getDefaultDockerImage(opts), 'TAQ_FLEXTESA_IMAGE');
+	const image = getDockerImage(getDefaultDockerImage(opts), ECAD_FLEXTESA_IMAGE_ENV_VAR);
 	const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir;
 
 	return `docker run --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} node index.js --sandbox ${sandboxName}`;

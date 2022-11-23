@@ -57,11 +57,13 @@ jobs:
       - name: Attempt to rebuild
         run: npm rebuild | true
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      - name: Add working dir to PATH
+        run: echo "$(pwd)" >> $GITHUB_PATH
+
+      - name: Build all
+        run: |
+          npx lerna bootstrap --force-local
+          npm run build:packages
       
       - name: Compile TS
         run: npm run compile:test --workspace ${{ env.GIT_WORKSPACE }}
@@ -102,6 +104,7 @@ jobs:
 
   publish-marketplace:
     name: Publish VSCode Extension
+    if: ${{ github.event_name != 'pull_request' }}
     needs:
       - test-build
     runs-on: ubuntu-latest
@@ -113,11 +116,13 @@ jobs:
           node-version: lts/gallium
           cache: "npm"
 
-      - name: Cache node modules
-        uses: actions/cache@v3
-        with:
-          path: ./node_modules/**
-          key: cache-node-modules-${{ github.run_id }}
+      - name: Add working dir to PATH
+        run: echo "$(pwd)" >> $GITHUB_PATH
+
+      - name: Build all
+        run: |
+          npx lerna bootstrap --force-local
+          npm run build:packages
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}
