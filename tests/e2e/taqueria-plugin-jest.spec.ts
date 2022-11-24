@@ -9,7 +9,7 @@ import * as contents from './data/help-contents/jest-contents';
 import { reference } from './data/jest.config-reference';
 import { referenceCI } from './data/jest.config-reference-ci';
 
-const taqueriaProjectPath = './scrap/auto-test-jest-plugin';
+const taqueriaProjectPath = 'scrap/auto-test-jest-plugin';
 
 // Jest currently outputs to stderr by default and an open issue exists for it here:
 // https://github.com/facebook/jest/issues/11925. Once that is fixed we can update these tests

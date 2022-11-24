@@ -7,7 +7,7 @@ import * as contents from './data/help-contents/ligo-contents';
 import { checkFolderExistsWithTimeout, generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
-const taqueriaProjectPath = './scrap/auto-test-ligo-plugin';
+const taqueriaProjectPath = 'scrap/auto-test-ligo-plugin';
 
 describe('E2E Testing for taqueria ligo plugin', () => {
 	beforeAll(async () => {
