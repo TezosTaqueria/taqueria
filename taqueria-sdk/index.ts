@@ -60,7 +60,9 @@ export const readJsonFile = <T>(filename: string): Promise<T> =>
 
 export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
 	new Promise((resolve, reject) => {
-		exec(`sh -c "${cmd}"`, (err, stdout, stderr) => {
+		// Escape quotes in the command, given that we're wrapping in quotes
+		const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
+		exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
 			if (err) reject(err);
 			else {
 				resolve({

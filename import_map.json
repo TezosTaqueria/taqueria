@@ -8,7 +8,7 @@
 		"fluture": "https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js",
 		"rambda": "https://cdn.skypack.dev/rambda@7.2.1",
 		"rambdax": "https://cdn.skypack.dev/rambdax@8.1.0",
-		"@peculiar/webcrypto": "./taqueria-protocol/Crypto.ts",
+		"@peculiar/webcrypto": "./taqueria-protocol/SHA256.ts",
 		"@taqueria/protocol/TaqError": "./taqueria-protocol/TaqError.ts",
 		"@taqueria/protocol/Base": "./taqueria-protocol/Base.ts",
 		"@taqueria/protocol/NonEmptyString": "./taqueria-protocol-types/out/types/NonEmptyString.ts",
@@ -124,6 +124,7 @@
 		"@taqueria/protocol-types/helpers": "./taqueria-protocol-types/helpers.ts",
 		"@taqueria/protocol-types/out/types-strict": "./taqueria-protocol-types/out/types-strict.ts",
 		"@taqueria/protocol-types/out/types-zod": "./taqueria-protocol-types/out/types-zod.ts",
+		"@taqueria/protocol-types/Crypto": "./taqueria-protocol/Crypto.ts",
 		"@taqueria/protocol-types/types": "./taqueria-protocol-types/types.ts"
 	}
 }
