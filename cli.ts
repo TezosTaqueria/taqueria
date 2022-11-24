@@ -431,7 +431,6 @@ const runScaffoldPostInit = (scaffoldDir: SanitizedAbsPath.t): Future<TaqError.t
 	const scaffoldConfigAbspath = SanitizedAbsPath.create(`${scaffoldDir}/scaffold.json`);
 	return pipe(
 		readJsonFile<ScaffoldConfig.t>(scaffoldConfigAbspath),
-		map(logInput('Scaffold Config')),
 		coalesce(_ => ({}) as ScaffoldConfig.t)(identity),
 		chain(scaffoldConfig =>
 			typeof scaffoldConfig === 'object' && scaffoldConfig.postInit
@@ -455,8 +454,8 @@ const scaffoldProject = (i18n: i18n.t) =>
 	({ scaffoldUrl, scaffoldProjectDir, maxConcurrency }: SanitizedArgs.ScaffoldTaskArgs) =>
 		go(
 			function*() {
-				const abspath = yield SanitizedAbsPath.make(scaffoldProjectDir);
-				const destDir = yield doesPathNotExistOrIsEmptyDir(abspath);
+				const abspath: SanitizedAbsPath.t = yield SanitizedAbsPath.make(scaffoldProjectDir);
+				const destDir: SanitizedAbsPath.t = yield doesPathNotExistOrIsEmptyDir(abspath);
 
 				log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
 				yield gitClone(scaffoldUrl)(destDir);

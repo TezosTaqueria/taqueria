@@ -169,7 +169,7 @@ export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], 
 									task,
 									command,
 									description: await eager(NonEmptyString.make(i18n.__('providedByMany'))),
-									hidden: false,
+									hidden,
 									options: [
 										await eager(Option.make({
 											flag: await eager(Verb.make('plugin')),
