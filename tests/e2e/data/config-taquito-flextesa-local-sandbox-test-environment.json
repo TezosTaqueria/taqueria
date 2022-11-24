@@ -32,7 +32,7 @@
 			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
 			"tzkt": {
 				"disableAutostartWithSandbox": false,
-				"postgresqlPort":5492,
+				"postgresqlPort": 5492,
 				"apiPort": 5090
 			}
 		}
