@@ -30,6 +30,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 	test('Verify that taq --help gives the help menu for an initialized project', async () => {
 		try {
 			const output = await exec(`taq --help -p ${taqueriaProjectPath}`);
+			await exec(`cp -r ${taqueriaProjectPath} ${taqueriaProjectPath}-backup`);
 			expect(output.stdout).toBe(contents.helpContentsForProject);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
@@ -86,24 +87,20 @@ describe('E2E Testing for taqueria CLI,', () => {
 	});
 
 	test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
+		await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);
+		await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`);
+
+		// TODO: This can removed after this is resolved:
+		// https://github.com/ecadlabs/taqueria/issues/528
 		try {
-			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);
-			await exec(`taq install ../../../taqueria-plugin-smartpy -p ${taqueriaProjectPath}`);
+			await exec(`taq -p ${taqueriaProjectPath}`);
+		} catch (_) {}
 
-			// TODO: This can removed after this is resolved:
-			// https://github.com/ecadlabs/taqueria/issues/528
-			try {
-				await exec(`taq -p ${taqueriaProjectPath}`);
-			} catch (_) {}
+		const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+		expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoSmartpy);
 
-			const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
-			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoSmartpy);
-
-			await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
-			await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
+		await exec(`taq uninstall @taqueria/plugin-smartpy -p ${taqueriaProjectPath}`);
 	});
 
 	test('Verify that ligo and archetype expose the plugin choice option in the help menu', async () => {
