@@ -6,7 +6,7 @@ import * as contents from './data/help-contents/contract-types-contents';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
-const taqueriaProjectPath = './scrap/auto-test-contract-types-plugin';
+const taqueriaProjectPath = 'scrap/auto-test-contract-types-plugin';
 
 describe('E2E Testing for taqueria contract types plugin only', () => {
 	beforeAll(async () => {
