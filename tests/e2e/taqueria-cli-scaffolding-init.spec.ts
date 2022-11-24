@@ -3,6 +3,8 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 const exec = util.promisify(exec1);
 
+jest.setTimeout(400000);
+
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	const scaffoldDirName = `taqueria-taco-shop`;
 

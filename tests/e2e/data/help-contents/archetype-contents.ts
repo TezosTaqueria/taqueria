@@ -9,10 +9,10 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
-  taq clean                       Clean all the Taqueria-related docker images
   taq compile [sourceFile]        Compile a smart contract written in a Archetyp
                                   e syntax to Michelson code
                                                  [aliases: c, compile-archetype]
+  taq clean                       Clean all the Taqueria-related docker images
   taq create <template>           Create files from pre-existing templates
 
 Options:
