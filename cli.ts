@@ -430,7 +430,6 @@ const runScaffoldPostInit = (scaffoldDir: SanitizedAbsPath.t): Future<TaqError.t
 	const scaffoldConfigAbspath = SanitizedAbsPath.create(`${scaffoldDir}/scaffold.json`);
 	return pipe(
 		readJsonFile<ScaffoldConfig.t>(scaffoldConfigAbspath),
-		map(logInput('Scaffold Config')),
 		coalesce(_ => ({}) as ScaffoldConfig.t)(identity),
 		chain(scaffoldConfig =>
 			typeof scaffoldConfig === 'object' && scaffoldConfig.postInit
