@@ -110,7 +110,7 @@ const config = {
           {
             type: "doc",
             docId: "release-notes",
-            label: "v0.24.1",
+            label: "v0.24.2",
             position: "right",
             className: "header-link"
           },

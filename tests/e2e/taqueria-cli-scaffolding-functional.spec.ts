@@ -3,12 +3,14 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 const exec = util.promisify(exec1);
 
-const scaffoldDirName = `taqueria-taco-shop-functional`;
+const scaffoldDirName = `e2e/auto-test-taco-shop-functional`;
 
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	beforeAll(async () => {
+		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true, force: true });
+
+		// Please leave this console log intact. Its useful to see _when_ there is a failure.
 		await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${scaffoldDirName}`);
-		await exec(`cd ${scaffoldDirName} && npm run setup`);
 	});
 
 	test('Verify that scaffold project is set up after running setup', async () => {

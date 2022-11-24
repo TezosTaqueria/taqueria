@@ -26,24 +26,19 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 
 			taqProcess.stdin.setDefaultEncoding('utf-8');
 			const writeInput = async (text: string) => {
-				// console.log(`stdin write`, { text });
-
 				taqProcess.stdin.cork();
 				taqProcess.stdin.write(`${text}\n`);
 				taqProcess.stdin.uncork();
 			};
 
 			taqProcess.on('close', data => {
-				// console.log(`close`, { data });
 				resolve();
 			});
 			taqProcess.stderr.on('data', data => {
-				// console.log(`stderr: ${data}`);
 			});
 
 			taqProcess.stdout.on('data', data => {
 				const dataText = `${data}`;
-				// console.log(`stdout: ${dataText}`);
 
 				const dataTextLines = dataText.split('\n');
 				const dataTextLastLine = dataTextLines[dataTextLines.length - 1];

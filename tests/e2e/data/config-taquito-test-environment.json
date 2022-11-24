@@ -2,12 +2,15 @@
 	"language": "en",
 	"plugins": [
 		{
+			"name": "@taqueria/plugin-core",
+			"type": "npm"
+		},
+		{
 			"name": "@taqueria/plugin-taquito",
 			"type": "npm"
 		}
 	],
 	"contractsDir": "contracts",
-	"testsDir": "tests",
 	"artifactsDir": "artifacts",
 	"environment": {
 		"default": "development",
@@ -17,7 +20,7 @@
 				"local"
 			]
 		},
-		"test": {
+		"testing": {
 			"networks": ["ghostnet"],
 			"sandboxes": []
 		},
@@ -29,15 +32,15 @@
 	"sandbox": {
 		"local": {
 			"label": "Local Tezos Sandbox",
-			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
-			"rpcUrl": "http://localhost:20120"
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
+			"rpcUrl": "http://localhost:20070"
 		}
 	},
 	"network": {
 		"ghostnet": {
 			"label": "ghostnet",
 			"rpcUrl": "https://ghostnet.ecadinfra.com",
-			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY",
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
 			"accounts": {
 				"taqOperatorAccount": {
 					"publicKey": "p2pk666TYDPwRzgE2emHyTM4RSLbypvhHwhk6RwEtasA5arSBgf6bAq",
@@ -49,7 +52,7 @@
 		"fundnet": {
 			"label": "ghostnet",
 			"rpcUrl": "https://ghostnet.ecadinfra.com",
-			"protocol": "PtJakart2xVj7pYXJBXrqHgd82rdkLey5ZeeGwDgPp9rhQUbSqY"
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg"
 		}
 	},
 	"accounts": {
