@@ -5,7 +5,7 @@ import { generateTestProject, sleep } from './utils/utils';
 const exec = util.promisify(exec1);
 import * as contents from './data/help-contents/typechecker-simulator-contents';
 
-const taqueriaProjectPath = 'e2e/auto-test-tezos-client-plugin';
+const taqueriaProjectPath = 'scrap/auto-test-tezos-client-plugin';
 let dockerName: string;
 describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-client plugin', () => {
 	dockerName = 'local-tezos-client';

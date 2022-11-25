@@ -6,7 +6,7 @@ import * as contents from './data/help-contents/help-contents';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
-const taqueriaProjectPath = './e2e/auto-test-cli';
+const taqueriaProjectPath = './scrap/auto-test-cli';
 
 describe('E2E Testing for taqueria CLI,', () => {
 	beforeAll(async () => {
