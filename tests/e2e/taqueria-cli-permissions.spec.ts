@@ -134,7 +134,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 	// Comment if need to debug
 	afterAll(async () => {
 		try {
-			fsPromises.rm(taqueriaProjectPath, { recursive: true });
+			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}

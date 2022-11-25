@@ -3,6 +3,16 @@ import path from 'path';
 
 const toCamelCase = (name: string) => name.replace(/^([A-Z]+)/, m => m.toLocaleLowerCase());
 
+const toErrorMsg = (typeName: string) => {
+	switch (typeName) {
+		case 'Config':
+		case 'LoadedConfig':
+			return 'Your .taq/config.json is invalid:';
+		default:
+			return `${typeName} is invalid:`;
+	}
+};
+
 export const buildTypes = async (packagePath: string) => {
 	const typesFilePath = path.join(packagePath, `types.ts`);
 	const outTypesStrictFilePath = path.join(packagePath, `out/types-strict.ts`);
@@ -51,36 +61,46 @@ ${
 
 		const content = `
 ${generationWarning}
-import { TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
-import { FutureInstance, resolve } from 'fluture';
+import { TaqError, toFutureParseErr, toFutureParseUnknownErr, toParseErr, toParseUnknownErr } from '@taqueria/protocol-types/TaqError';
+import { FutureInstance, resolve, reject } from 'fluture';
 import { ZodError } from 'zod';
-import { parsingErrorMessages } from '@taqueria/protocol-types/helpers';
 import { ${typeNameRaw} } from '@taqueria/protocol-types/types';
 import { ${typeNameNominal} as ${typeNameStrict} } from '@taqueria/protocol-types/out/types-strict';
 import { ${typeNameSchema} } from '@taqueria/protocol-types/out/types-zod';
 
 export type { ${typeNameStrict} as ${typeNameNominal} };
-const { parseErrMsg, unknownErrMsg } = parsingErrorMessages('${typeNameRaw}');
 
 export const from = (input: unknown): ${typeNameStrict} => {
-    return ${typeNameSchema}.parse(input) as ${typeNameStrict};
+	try {
+		return ${typeNameSchema}.parse(input) as ${typeNameStrict};
+	}
+	catch (previous: unknown) {
+		if (previous instanceof ZodError) {
+			const msgs: string[] = previous.errors.reduce(
+				(retval, issue) => {
+					const path = issue.path.join(' → ');
+					const msg = path + ': ' + issue.message;
+					return [...retval, msg];
+				},
+				["${toErrorMsg(typeName)}"],
+			);
+			const validationErr = msgs.join('\\n') + '\\n';
+			throw toParseErr(previous, validationErr);
+		}
+		throw toParseUnknownErr(previous, "There was a problem trying to parse a ${typeName}.")
+	}
+    
 };
 
 export const create = (input: ${typeNameRaw}): ${typeNameStrict} => from(input);
 
 export const of = (input: unknown): FutureInstance<TaqError, ${typeNameStrict}> => {
-    try {
-        return resolve(${typeNameSchema}.parse(input) as ${typeNameStrict});
-    } catch (previous) {
-        const parseMsg = parseErrMsg(input, previous);
-
-        const unknownMsg = unknownErrMsg(input);
-
-        if (previous instanceof ZodError) {
-            return toFutureParseErr(previous, parseMsg, input);
-        }
-        return toFutureParseUnknownErr(previous, unknownMsg, input);
-    }
+	try {
+		return resolve(from(input))
+	}
+	catch (err){
+		return reject(err) as FutureInstance<TaqError, never>
+	}
 };
 
 export const make = (input: Omit<${typeNameStrict}, '__type'>): FutureInstance<TaqError, ${typeNameStrict}> => of(input);
