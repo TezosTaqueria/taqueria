@@ -16,6 +16,9 @@ type UnionOpts = CompileOpts | TestOpts;
 
 const SMARTPY_ARTIFACTS_DIR = '.smartpy';
 
+export const addPyExtensionIfMissing = (sourceFile: string): string =>
+	/\.py$/.test(sourceFile) ? sourceFile : `${sourceFile}.py`;
+
 const extractExt = (path: string): string => {
 	const matchResult = path.match(/\.py$/);
 	return matchResult ? matchResult[0] : '';
@@ -29,7 +32,7 @@ const removeExt = (path: string): string => {
 export const getInputFilename = (parsedArgs: UnionOpts, sourceFile: string): string =>
 	join(parsedArgs.config.contractsDir, sourceFile);
 
-export const getCompilationTargetsDirName = (parsedArgs: UnionOpts, sourceFile: string): string =>
+export const getCompilationTargetsDirname = (parsedArgs: UnionOpts, sourceFile: string): string =>
 	join(parsedArgs.config.artifactsDir, SMARTPY_ARTIFACTS_DIR, removeExt(sourceFile));
 
 export const emitExternalError = (err: unknown, sourceFile: string): void => {
