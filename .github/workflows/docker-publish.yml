@@ -63,7 +63,8 @@ jobs:
         run: npm ci
 
       - name: Build package
-        run: | 
+        run: |
+          npm run build-types 
           npm run build -w taqueria-sdk
           npm run build -w taqueria-protocol
           npm run build -w taqueria-flextesa-manager
