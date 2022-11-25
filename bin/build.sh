@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-BRANCH=`git branch --show-current`
-COMMIT=`git rev-parse --short HEAD`
-TAQ_VERSION="dev-$BRANCH"
-TIMESTAMP=`date +%s`
-BUILD="$COMMIT"
-
+source ./bin/set-vars.sh
 
 if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
     HAS_DENO=`which deno`
