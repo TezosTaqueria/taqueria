@@ -1,11 +1,15 @@
-import { execCmd, getContracts, sendAsyncJsonRes, sendErr } from '@taqueria/node-sdk';
-import { RequestArgs, TaqError } from '@taqueria/node-sdk/types';
+import { execCmd, getArch, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { RequestArgs } from '@taqueria/node-sdk/types';
 import { readFile } from 'fs/promises';
-import { join } from 'path';
+import { basename, extname, join } from 'path';
+
+type TableRow = { contract: string; artifact: string };
 
 interface Opts extends RequestArgs.ProxyRequestArgs {
-	sourceFile?: string;
+	sourceFile: string;
 }
+
+const COMPILE_ERR_MSG: string = 'Not compiled';
 
 const getArtifacts = (sourceAbspath: string) => {
 	return readFile(sourceAbspath, { encoding: 'utf-8' })
@@ -18,49 +22,51 @@ const getArtifacts = (sourceAbspath: string) => {
 		});
 };
 
-const getCompileCommand = (opts: Opts) =>
-	(sourceAbspath: string) => `~/smartpy-cli/SmartPy.sh compile ${sourceAbspath} ${opts.config.artifactsDir}`;
+export const emitExternalError = (err: unknown, sourceFile: string): void => {
+	sendErr(`\n=== Error messages for ${sourceFile} ===`);
+	err instanceof Error ? sendErr(err.message.replace(/Command failed.+?\n/, '')) : sendErr(err as any);
+	sendErr(`\n===`);
+};
 
-const compileContract = (opts: Opts) =>
-	(sourceFile: string) => {
-		const sourceAbspath = join(opts.config.contractsDir, sourceFile);
-		return execCmd(getCompileCommand(opts)(sourceAbspath))
-			.then(async ({ stderr }) => { // How should we output warnings?
-				if (stderr.length > 0) sendErr(`\n${stderr}`);
+export const getInputFilename = (parsedArgs: Opts, sourceFile: string): string => {
+	return join(parsedArgs.config.contractsDir, sourceFile);
+};
 
-				return {
-					contract: sourceFile,
-					artifact: await getArtifacts(sourceAbspath),
-				};
-			})
-			.catch(err => {
-				sendErr(' ');
-				sendErr(err.message.split('\n').slice(1).join('\n'));
-				return Promise.resolve({
-					contract: sourceFile,
-					artifact: 'Not compiled',
-				});
-			})
-			.then(() => getArtifacts(sourceAbspath))
-			.then((artifacts: string[]) => ({ contract: sourceFile, artifacts }));
-	};
+const getOutputFilename = (parsedArgs: Opts, sourceFile: string): string => {
+	const outputFile = basename(sourceFile, extname(sourceFile));
+	return join(parsedArgs.config.artifactsDir, `${outputFile}.tz`);
+};
 
-const compileAll = (opts: Opts): Promise<{ contract: string; artifacts: string[] }[]> =>
-	Promise.all(getContracts(/\.py$/, opts.config))
-		.then(entries => entries.map(compileContract(opts)))
-		.then(promises => Promise.all(promises));
+const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
+	return `~/smartpy-cli/SmartPy.sh compile ${
+		getInputFilename(parsedArgs, sourceFile)
+	} ${parsedArgs.config.artifactsDir}`;
+};
 
-export const compile = <T>(parsedArgs: Opts) => {
-	const p = parsedArgs.sourceFile
-		? compileContract(parsedArgs)(parsedArgs.sourceFile)
-			.then(data => [data])
-		: compileAll(parsedArgs)
-			.then(results => {
-				if (results.length === 0) sendErr('No contracts found to compile.');
-				return results;
-			});
+const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> => {
+	return getArch()
+		.then(() => getCompileContractCmd(parsedArgs, sourceFile))
+		.then(execCmd)
+		.then(async ({ stderr }) => {
+			if (stderr.length > 0) sendWarn(stderr);
+			return {
+				contract: sourceFile,
+				artifact: getOutputFilename(parsedArgs, sourceFile),
+			};
+		})
+		.catch(err => {
+			emitExternalError(err, sourceFile);
+			return {
+				contract: sourceFile,
+				artifact: COMPILE_ERR_MSG,
+			};
+		});
+};
 
-	return p.then(sendAsyncJsonRes);
+const compile = (parsedArgs: Opts): Promise<void> => {
+	const sourceFile = parsedArgs.sourceFile;
+	let p: Promise<TableRow[]> = compileContract(parsedArgs, sourceFile).then(result => [result]);
+	return p.then(sendJsonRes).catch(err => sendAsyncErr(err, false));
 };
 
 export default compile;

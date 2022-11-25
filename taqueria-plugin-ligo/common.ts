@@ -29,6 +29,7 @@ export const getInputFilename = (parsedArgs: UnionOpts, sourceFile: string): str
 	join(parsedArgs.config.contractsDir, sourceFile);
 
 export const emitExternalError = (err: unknown, sourceFile: string): void => {
-	sendErr(`\n=== For ${sourceFile} ===`);
+	sendErr(`\n=== Error messages for ${sourceFile} ===`);
 	err instanceof Error ? sendErr(err.message.replace(/Command failed.+?\n/, '')) : sendErr(err as any);
+	sendErr(`\n===`);
 };
