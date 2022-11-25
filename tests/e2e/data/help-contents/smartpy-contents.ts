@@ -7,7 +7,10 @@ Commands:
   taq install <pluginName>    Install a plugin
   taq uninstall <pluginName>  Uninstall a plugin
   taq compile [sourceFile]    Compile a smart contract written in a SmartPy synt
-                              ax to Michelson code [aliases: c, compile-smartpy]
+                              ax to Michelson code, along with its associated st
+                              orage values, per compilation targets, and some ex
+                              pressions per expression compilation targets
+                                                   [aliases: c, compile-smartpy]
 
 Options:
       --version     Show version number                                [boolean]
@@ -22,7 +25,7 @@ Taqueria is currently in BETA. You've been warned. :)
 
 export const helpContentsSmartpyPluginSpecific = `taq compile [sourceFile]
 
-Compile a smart contract written in a SmartPy syntax to Michelson code
+Compile a smart contract written in a SmartPy syntax to Michelson code, along with its associated storage values, per compilation targets, and some expressions per expression compilation targets
 
 Options:
       --version     Show version number                                [boolean]
