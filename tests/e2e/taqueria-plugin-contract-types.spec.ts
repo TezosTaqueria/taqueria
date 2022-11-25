@@ -77,7 +77,6 @@ describe('E2E Testing for taqueria contract types plugin with ligo', () => {
 		} catch (_) {}
 
 		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq add-contract increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
 	test('Verify that taqueria contract types plugin can compile one contract and generate types', async () => {

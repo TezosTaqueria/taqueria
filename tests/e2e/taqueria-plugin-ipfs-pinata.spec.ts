@@ -21,7 +21,7 @@ async function configureForTests() {
 	if (process.env.UNLIMITED_PINATA_TOKEN) {
 		JWT = process.env.UNLIMITED_PINATA_TOKEN;
 		await exec(`echo "pinataJwtToken=${JWT}" > ${taqueriaProjectPath}/.env`);
-		console.log(await exec(`cat ${taqueriaProjectPath}/.env`));
+		await exec(`cat ${taqueriaProjectPath}/.env`);
 	} else {
 		// The .env file should be in the root directory of the taqueria project
 		// this just makes sure it gets into the test directory for use

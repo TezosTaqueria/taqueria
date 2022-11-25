@@ -36,30 +36,6 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		}
 	});
 
-	test.skip('Verify that taq scaffold quickstart project has the correct md5 checksum', async () => {
-		const tarFileName = 'taq-quickstart.tar';
-		try {
-			try {
-				await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true, force: true });
-			} catch {
-				// Ensure that this path doesn't already exist
-			}
-
-			await exec('taq scaffold');
-			await fsPromises.rm(`./${scaffoldDirName}/.git`, { recursive: true });
-			await exec(`tar -cf ${tarFileName} ${scaffoldDirName} --mtime=2020-01-30`);
-
-			const tarMD5Sum = await exec(`md5sum ${tarFileName}`);
-			const md5sum = tarMD5Sum.stdout.split(' ')[0];
-			expect(md5sum).toBe('e82c12f68cc2e3fc90dd842d994bdcc7');
-
-			await fsPromises.rm(`./${scaffoldDirName}`, { recursive: true });
-			await fsPromises.rm(`./${tarFileName}`);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
-
 	test('Verify that taq scaffold can use the URL parameter to clone a different scaffold into the project', async () => {
 		try {
 			await exec('taq scaffold https://github.com/ecadlabs/taqueria-scaffold-nft.git');
