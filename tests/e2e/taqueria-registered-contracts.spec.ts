@@ -7,7 +7,7 @@ import * as contents from './data/help-contents/register-contracts-contents';
 import { generateTestProject, sleep } from './utils/utils';
 const exec = util.promisify(exec1);
 
-const taqueriaProjectPath = 'e2e/auto-test-registered-contracts';
+const taqueriaProjectPath = 'scrap/auto-test-registered-contracts';
 const configFile = join(taqueriaProjectPath, '.taq', 'config.json');
 let configFileContents: string;
 

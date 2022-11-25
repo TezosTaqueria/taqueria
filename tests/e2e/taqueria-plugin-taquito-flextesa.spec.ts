@@ -10,7 +10,7 @@ import {
 } from './utils/utils';
 const exec = utils.promisify(exec1);
 
-const taqueriaProjectPath = 'e2e/auto-test-taquito-flextesa-plugin';
+const taqueriaProjectPath = 'scrap/auto-test-taquito-flextesa-plugin';
 const contractRegex = new RegExp(/(KT1)+\w{33}?/);
 let environment: string;
 let dockerName: string = 'localTF';

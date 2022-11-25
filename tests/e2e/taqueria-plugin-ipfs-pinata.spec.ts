@@ -5,7 +5,7 @@ import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 import * as contents from './data/help-contents/pinata-contents';
 
-const taqueriaProjectPath = 'e2e/auto-test-ipfs-pinata-plugin';
+const taqueriaProjectPath = 'scrap/auto-test-ipfs-pinata-plugin';
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 // IF RUNNING LOCALLY MAKE SURE YOU ADD A .env FILE WITH YOUR PINATA JWT

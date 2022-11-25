@@ -200,3 +200,4 @@ taqueria-protocol-types/**/*.mjs
 
 # Temp taq projects created from e2e test execution
 tests/e2e/auto-test-*
+tests/scrap
