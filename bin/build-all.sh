@@ -19,6 +19,11 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
 
     echo ""
     echo '**********************************************'
+    echo "** Generating Types"
+    npm run build-types
+
+    echo ""
+    echo '**********************************************'
     echo "** Building taqueria"
     npm run build:binary
 
