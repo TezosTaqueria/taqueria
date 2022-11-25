@@ -54,53 +54,102 @@ const outputStorageFilename = (
 	return join(parsedArgs.config.artifactsDir, storageName);
 };
 
+const outputExprFilename = (parsedArgs: Opts, sourceFile: string, compilationTargetName: string): string => {
+	const outputFile = basename(sourceFile, extname(sourceFile));
+	const exprName = `${outputFile}.expression.${compilationTargetName}.tz`;
+	return join(parsedArgs.config.artifactsDir, exprName);
+};
+
 const getSmartPyArtifactDirname = (parsedArgs: Opts, sourceFile: string): string =>
 	join(parsedArgs.config.artifactsDir, SMARTPY_ARTIFACTS_DIR, removeExt(sourceFile));
 
-const getCompilationTargetNames = (parsedArgs: Opts, sourceFile: string): Promise<string[]> =>
+const getCompilationTargetNames = (
+	parsedArgs: Opts,
+	sourceFile: string,
+): Promise<{ compTargetsNames: string[]; exprCompTargetsNames: string[] }> =>
 	readFile(getInputFilename(parsedArgs, sourceFile), 'utf8')
-		.then(data => data.match(/(?<=add_compilation_target\s*\(\s*['"])[^'"]+(?=['"])/g) ?? []);
+		.then(data => {
+			const compTargetsNames = data.match(/(?<=add_compilation_target\s*\(\s*['"])[^'"]+(?=['"])/g) ?? [];
+			const exprCompTargetsNames = data.match(/(?<=add_expression_compilation_target\s*\(\s*['"])[^'"]+(?=['"])/g)
+				?? [];
+			return { compTargetsNames, exprCompTargetsNames };
+		});
 
 const copyRelevantArtifactForCompTargets = (parsedArgs: Opts, sourceFile: string) =>
-	async (compilationTargetNames: string[]): Promise<string> => {
-		if (compilationTargetNames.length === 0) return 'No compilation targets defined';
-		const firstCompTargetName = compilationTargetNames.slice(0, 1)[0];
-		const restCompTargetNames = compilationTargetNames.slice(1, compilationTargetNames.length);
+	async (
+		{ compTargetsNames, exprCompTargetsNames }: { compTargetsNames: string[]; exprCompTargetsNames: string[] },
+	): Promise<string> => {
+		const copyArtifactsForFirstCompTarget = async () => {
+			if (compTargetsNames.length === 0) return [];
+			const firstCompTargetName = compTargetsNames.slice(0, 1)[0];
 
-		const dstContractPath = getOutputContractFilename(parsedArgs, sourceFile);
-		await copyFile(
-			join(
-				getSmartPyArtifactDirname(parsedArgs, sourceFile),
-				firstCompTargetName,
-				'step_000_cont_0_contract.tz',
-			),
-			dstContractPath,
-		);
-
-		const defaultDstStoragePath = outputStorageFilename(parsedArgs, sourceFile, firstCompTargetName, true);
-		await copyFile(
-			join(
-				getSmartPyArtifactDirname(parsedArgs, sourceFile),
-				firstCompTargetName,
-				'step_000_cont_0_storage.tz',
-			),
-			defaultDstStoragePath,
-		);
-
-		const dstStoragePaths = await Promise.all(restCompTargetNames.map(async compTargetName => {
-			const dstStoragePath = outputStorageFilename(parsedArgs, sourceFile, compTargetName, false);
+			const dstContractPath = getOutputContractFilename(parsedArgs, sourceFile);
 			await copyFile(
 				join(
 					getSmartPyArtifactDirname(parsedArgs, sourceFile),
-					compTargetName,
+					firstCompTargetName,
+					'step_000_cont_0_contract.tz',
+				),
+				dstContractPath,
+			);
+
+			const dstDefaultStoragePath = outputStorageFilename(parsedArgs, sourceFile, firstCompTargetName, true);
+			await copyFile(
+				join(
+					getSmartPyArtifactDirname(parsedArgs, sourceFile),
+					firstCompTargetName,
 					'step_000_cont_0_storage.tz',
 				),
-				dstStoragePath,
+				dstDefaultStoragePath,
 			);
-			return dstStoragePath;
-		}));
 
-		return [dstContractPath, defaultDstStoragePath].concat(dstStoragePaths).join('\n');
+			return [dstContractPath, dstDefaultStoragePath];
+		};
+
+		const copyArtifactsForRestCompTargets = async () => {
+			if (compTargetsNames.length === 0) return [];
+			const restCompTargetNames = compTargetsNames.slice(1, compTargetsNames.length);
+
+			const dstStoragePaths = await Promise.all(restCompTargetNames.map(async compTargetName => {
+				const dstStoragePath = outputStorageFilename(parsedArgs, sourceFile, compTargetName, false);
+				await copyFile(
+					join(
+						getSmartPyArtifactDirname(parsedArgs, sourceFile),
+						compTargetName,
+						'step_000_cont_0_storage.tz',
+					),
+					dstStoragePath,
+				);
+				return dstStoragePath;
+			}));
+
+			return dstStoragePaths;
+		};
+
+		const copyArtifactsForExprCompTargets = async () => {
+			if (exprCompTargetsNames.length === 0) return [];
+
+			const dstStoragePaths = await Promise.all(exprCompTargetsNames.map(async exprCompTargetName => {
+				const dstStoragePath = outputExprFilename(parsedArgs, sourceFile, exprCompTargetName);
+				await copyFile(
+					join(
+						getSmartPyArtifactDirname(parsedArgs, sourceFile),
+						exprCompTargetName,
+						'step_000_expression.tz',
+					),
+					dstStoragePath,
+				);
+				return dstStoragePath;
+			}));
+
+			return dstStoragePaths;
+		};
+
+		if (compTargetsNames.length === 0 && exprCompTargetsNames.length === 0) return 'No compilation targets defined';
+		const dstContractAndDefaultStoragePaths = await copyArtifactsForFirstCompTarget();
+		const dstStoragePaths = await copyArtifactsForRestCompTargets();
+		const dstExpressionPaths = await copyArtifactsForExprCompTargets();
+		return dstContractAndDefaultStoragePaths.concat(dstStoragePaths).concat(dstExpressionPaths).join('\n');
 	};
 
 const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
