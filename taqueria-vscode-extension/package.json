@@ -615,6 +615,21 @@
 		},
 		"languages": [
 			{
+				"id": "michelson",
+				"aliases": [
+					"Michelson",
+					"michelson"
+				],
+				"extensions": [
+					".tz"
+				],
+				"icon": {
+					"light": "syntaxes/michelson/black-logo.png",
+					"dark": "syntaxes/michelson/white-logo.png"
+				},
+				"configuration": "./syntaxes/michelson/configuration.json"
+			},
+			{
 				"id": "ligo",
 				"aliases": [
 					"PascaLIGO"
@@ -673,6 +688,11 @@
 			}
 		],
 		"grammars": [
+			{
+				"language": "michelson",
+				"scopeName": "source.michelson",
+				"path": "./syntaxes/michelson/tmLanguage.json"
+			},
 			{
 				"language": "ligo",
 				"scopeName": "source.ligo",
