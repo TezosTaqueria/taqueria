@@ -29,7 +29,7 @@ const removeExt = (path: string): string => {
 export const getInputFilename = (parsedArgs: UnionOpts, sourceFile: string): string =>
 	join(parsedArgs.config.contractsDir, sourceFile);
 
-export const getSmartPyArtifactDirname = (parsedArgs: UnionOpts, sourceFile: string): string =>
+export const getCompilationTargetsDirName = (parsedArgs: UnionOpts, sourceFile: string): string =>
 	join(parsedArgs.config.artifactsDir, SMARTPY_ARTIFACTS_DIR, removeExt(sourceFile));
 
 export const emitExternalError = (err: unknown, sourceFile: string): void => {

@@ -1,10 +1,10 @@
 import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
-import { emitExternalError, getInputFilename, getSmartPyArtifactDirname, TestOpts as Opts } from './common';
+import { emitExternalError, getCompilationTargetsDirName, getInputFilename, TestOpts as Opts } from './common';
 
 type TableRow = { contract: string; testResults: string };
 
 const getTestContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
-	const outputDir = getSmartPyArtifactDirname(parsedArgs, sourceFile);
+	const outputDir = getCompilationTargetsDirName(parsedArgs, sourceFile);
 	return `~/smartpy-cli/SmartPy.sh test ${getInputFilename(parsedArgs, sourceFile)} ${outputDir}`;
 };
 
@@ -22,9 +22,10 @@ const testContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =
 		})
 		.catch(err => {
 			emitExternalError(err, sourceFile);
+			const outputDir = getCompilationTargetsDirName(parsedArgs, sourceFile);
 			return {
 				contract: sourceFile,
-				testResults: 'Some tests failed :(',
+				testResults: `Some tests failed :(\nInspect the log files inside the test subfolders of\n"${outputDir}"`,
 			};
 		});
 

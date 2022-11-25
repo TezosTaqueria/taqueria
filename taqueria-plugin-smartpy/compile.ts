@@ -1,7 +1,7 @@
 import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { copyFile, readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-import { CompileOpts as Opts, emitExternalError, getInputFilename, getSmartPyArtifactDirname } from './common';
+import { CompileOpts as Opts, emitExternalError, getCompilationTargetsDirName, getInputFilename } from './common';
 
 type TableRow = { contract: string; artifact: string };
 
@@ -56,7 +56,7 @@ const copyArtifactsForFirstCompTarget = async (
 	const dstContractPath = getOutputContractFilename(parsedArgs, sourceFile);
 	await copyFile(
 		join(
-			getSmartPyArtifactDirname(parsedArgs, sourceFile),
+			getCompilationTargetsDirName(parsedArgs, sourceFile),
 			firstCompTargetName,
 			'step_000_cont_0_contract.tz',
 		),
@@ -66,7 +66,7 @@ const copyArtifactsForFirstCompTarget = async (
 	const dstDefaultStoragePath = getOutputStorageFilename(parsedArgs, sourceFile, firstCompTargetName, true);
 	await copyFile(
 		join(
-			getSmartPyArtifactDirname(parsedArgs, sourceFile),
+			getCompilationTargetsDirName(parsedArgs, sourceFile),
 			firstCompTargetName,
 			'step_000_cont_0_storage.tz',
 		),
@@ -88,7 +88,7 @@ const copyArtifactsForRestCompTargets = async (
 		const dstStoragePath = getOutputStorageFilename(parsedArgs, sourceFile, compTargetName, false);
 		await copyFile(
 			join(
-				getSmartPyArtifactDirname(parsedArgs, sourceFile),
+				getCompilationTargetsDirName(parsedArgs, sourceFile),
 				compTargetName,
 				'step_000_cont_0_storage.tz',
 			),
@@ -111,7 +111,7 @@ const copyArtifactsForExprCompTargets = async (
 		const dstStoragePath = getOutputExprFilename(parsedArgs, sourceFile, exprCompTargetName);
 		await copyFile(
 			join(
-				getSmartPyArtifactDirname(parsedArgs, sourceFile),
+				getCompilationTargetsDirName(parsedArgs, sourceFile),
 				exprCompTargetName,
 				'step_000_expression.tz',
 			),
@@ -151,7 +151,7 @@ const copyRelevantArtifactForCompTargets = (parsedArgs: Opts, sourceFile: string
 	};
 
 const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
-	const outputDir = getSmartPyArtifactDirname(parsedArgs, sourceFile);
+	const outputDir = getCompilationTargetsDirName(parsedArgs, sourceFile);
 	return `~/smartpy-cli/SmartPy.sh compile ${getInputFilename(parsedArgs, sourceFile)} ${outputDir}`;
 };
 
