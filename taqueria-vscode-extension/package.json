@@ -624,8 +624,8 @@
 					".tz"
 				],
 				"icon": {
-					"light": "syntaxes/michelson/black-logo.png",
-					"dark": "syntaxes/michelson/white-logo.png"
+					"light": "syntaxes/michelson/logo.png",
+					"dark": "syntaxes/michelson/logo.png"
 				},
 				"configuration": "./syntaxes/michelson/configuration.json"
 			},
