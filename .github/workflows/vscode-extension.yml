@@ -63,6 +63,7 @@ jobs:
       - name: Build all
         run: |
           npx lerna bootstrap --force-local
+          npm run build-types
           npm run build:packages
       
       - name: Compile TS
