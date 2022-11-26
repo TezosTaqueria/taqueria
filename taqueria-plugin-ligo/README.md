@@ -1,6 +1,6 @@
 # Taqueria LIGO Plugin
 
-The LIGO plugin provides a task to compile LIGO smart contracts to Michelson `.tz` files
+The LIGO plugin provides tasks to work with LIGO smart contracts such as compiling and testing
 
 ## Requirements
 

@@ -1,39 +1,58 @@
 # Taqueria SmartPy Plugin
 
-The SmartPy plugin provides a task to compile SmartPy smart contracts to Michelson `.tz` files
+The SmartPy plugin provides tasks to work with SmartPy smart contracts such as compiling and testing
 
 ## Requirements
 
-The SmartPy plugin requires: 
-- SmartPy v0.8.4 or later to be installed [locally](https://smartpy.io/docs/cli/#installation)
+- Taqueria v0.24.2 or later
 - Node.js v16.17.1 or later
+- Docker v20.10.12 or later
 
 ## Installation
 
 To install the SmartPy plugin on a Taqueria project, navigate to the project folder and run:
+
 ```shell
 taq install @taqueria/plugin-smartpy
 ```
 
-## Usage
+## The `taq compile` Task
 
-The SmartPy plugin's `taq compile` task must be run with arguments. The basic syntax for the command is: 
+Basic usage is:
+
 ```shell
 taq compile <contractName>
 ```
 
-Running the `compile` task with no options will result in no SmartPy smart contracts in the `contracts` folder being compiled to Michelson files in the `artifacts` folder. If you speficy an optional filename, only SmartPy contracts matching the specified filename in the `contracts` folder will be compiled
+> ### :warning: CAUTION
+> The `compile` task is implemented by more than one compiler plugin (SmartPy, Archetype, SmartPy). If more than one of these plugins are installed on a project, you need to use the `--plugin smartpy` flag to specify a particular compiler
 
-> ### :page_with_curl: Note
-> The `compile` task is implemented by more than one compiler plugin installed on a project (LIGO, Archetype, SmartPy). If more than one of these plugins are installed on a project, you need to use the `--plugin smartpy` flag to specify a particular compiler
+### Basic description
+The SmartPy plugin exposes a `compile` task in Taqueria which can target one SmartPy contract in the `contracts` folder and compile it to a Michelson `.tz` file output to the `artifacts` folder
 
-The plugin provides a `compile` task used for compiling SmartPy smart contracts to Michelson
+### A frictionless smart contract development workflow
+We provide a smooth SmartPy workflow for our SmartPy plugin by making it easier to get started and maintain the contracts. You can get started by simply performing `taq compile my_contract.py` then `taq deploy my_contract.tz` (or `taq deploy my_contract.tz --env testing` to deploy to ghostnet) and now you've deployed a contract originally written in SmartPy
 
-|  attribute |  value                   | 
-|------------|:------------------------:|
-|  task      | 'compile'                | 
-|  command   | 'compile [sourceFile]    | 
-|  aliases   | ['c', 'compile-smartpy'] |        
+To benefit from this workflow, users will have to define all compilation and expression compilation targets in their main SmartPy contract file and the `compile` task will compile them all and copy the relevant artifacts (contract, storage, and expression files) to the `artifacts` folder. All other artifacts will be stored under `artifacts/.smartpy`
+
+Compilation targets in SmartPy produce both the contract and its storage Michelson files. We will name them using the following naming convention: `<CONTRACT_NAME>.storage.<COMPILATION_TARGET_NAME>.tz`. But the first of these is special and will be called: `<CONTRACT_NAME>.default_storage.tz` (the `deploy` task of the Taquito plugin will deem this as the default initial storage value)
+
+Expression compilation targets in SmartPy produce only the expression Michelson files (can be useful as parameter values used to invoke entrypoints with the `transfer` task of the Taquito plugin). We will name these generated `.tz` files using the following naming convention: `<CONTRACT_NAME>.expression.<COMPILATION_TARGET_NAME>.tz`
+
+### Options
+
+None for now
+
+## The `taq test` Task
+
+Basic usage is:
+
+```shell
+taq test <fileName>
+```
+
+### Basic description
+This task tests the SmartPy source code and reports either a failure or success
 
 ## Plugin Architecture
 

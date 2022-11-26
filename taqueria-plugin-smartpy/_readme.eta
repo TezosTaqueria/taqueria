@@ -2,7 +2,7 @@
 # Taqueria SmartPy Plugin
 <% } %>
 
-The SmartPy plugin provides a task to compile SmartPy smart contracts to Michelson `.tz` files
+The SmartPy plugin provides tasks to work with SmartPy smart contracts such as compiling and testing
 
 ## Requirements
 
@@ -31,12 +31,16 @@ The `compile` task is implemented by more than one compiler plugin (SmartPy, Arc
 <%= it.closeAdmonition %>
 
 ### Basic description
-The SmartPy plugin exposes a `compile` task in Taqueria which can target one SmartPy contract in the `contracts` folder and compile them to a Michelson `.tz` file output to the `artifacts` folder
+The SmartPy plugin exposes a `compile` task in Taqueria which can target one SmartPy contract in the `contracts` folder and compile it to a Michelson `.tz` file output to the `artifacts` folder
 
 ### A frictionless smart contract development workflow
-Our SmartPy plugin introduces a smart contract development workflow by means of two simple file naming formats
+We provide a smooth SmartPy workflow for our SmartPy plugin by making it easier to get started and maintain the contracts. You can get started by simply performing `taq compile my_contract.py` then `taq deploy my_contract.tz` (or `taq deploy my_contract.tz --env testing` to deploy to ghostnet) and now you've deployed a contract originally written in SmartPy
 
-TODO
+To benefit from this workflow, users will have to define all compilation and expression compilation targets in their main SmartPy contract file and the `compile` task will compile them all and copy the relevant artifacts (contract, storage, and expression files) to the `artifacts` folder. All other artifacts will be stored under `artifacts/.smartpy`
+
+Compilation targets in SmartPy produce both the contract and its storage Michelson files. We will name them using the following naming convention: `<CONTRACT_NAME>.storage.<COMPILATION_TARGET_NAME>.tz`. But the first of these is special and will be called: `<CONTRACT_NAME>.default_storage.tz` (the `deploy` task of the Taquito plugin will deem this as the default initial storage value)
+
+Expression compilation targets in SmartPy produce only the expression Michelson files (can be useful as parameter values used to invoke entrypoints with the `transfer` task of the Taquito plugin). We will name these generated `.tz` files using the following naming convention: `<CONTRACT_NAME>.expression.<COMPILATION_TARGET_NAME>.tz`
 
 ### Options
 
@@ -52,8 +56,6 @@ taq test <fileName>
 
 ### Basic description
 This task tests the SmartPy source code and reports either a failure or success
-
-TODO
 
 ## Plugin Architecture
 
