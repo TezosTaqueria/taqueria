@@ -4,7 +4,8 @@ import { exec, ExecException } from 'child_process';
 import { parse } from 'comment-json';
 import { readFile, stat } from 'fs/promises';
 import { join } from 'path';
-import { OutputFunction, OutputLevels } from './helpers';
+import { OutputFunction } from './helpers';
+import { OutputLevels } from './LogHelper';
 import { TaqVsxError } from './TaqVsxError';
 
 /***********************************************************************/
