@@ -9,7 +9,7 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo ""
     echo '**********************************************'
     echo "** Checking Dependencies"
-    docker ps
+    docker ps > /dev/null
 
     echo ""
     echo '**********************************************'
@@ -19,13 +19,13 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
 
     echo ""
     echo '**********************************************'
-    echo "** Building taqueria"
-    npm run build:binary
+    echo "** Building packages"
+    npm run build:packages
 
     echo ""
     echo '**********************************************'
-    echo "** Building packages"
-    npm run build:packages
+    echo "** Building taqueria"
+    npm run build:binary
 
     echo ""
     echo '**********************************************'
