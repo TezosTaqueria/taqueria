@@ -1,7 +1,8 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
 import fetch from 'node-fetch-commonjs';
 import * as vscode from 'vscode';
-import { HasRefresh, mapAsync, OutputLevels, VsCodeHelper } from '../helpers';
+import { HasRefresh, mapAsync, VsCodeHelper } from '../helpers';
+import { OutputLevels } from '../LogHelper';
 import { getRunningContainerNames } from '../pure';
 import * as Util from '../pure';
 import { CachedSandboxState, SandboxState } from './CachedSandboxState';
@@ -135,7 +136,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				cached.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, name));
 				this.sandboxStates[name] = cached;
 			} catch (e: unknown) {
-				this.helper.showLog(OutputLevels.debug, 'Error in signalR:');
+				this.helper.logHelper.showLog(OutputLevels.debug, 'Error in signalR:');
 				this.helper.logAllNestedErrors(e);
 			}
 		}
@@ -191,7 +192,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				const sandboxHead = await sandBoxHeadResponse.json();
 				sandbox.sandboxLevel = (sandboxHead as any).header.level;
 			} catch (e: unknown) {
-				this.helper.showLog(OutputLevels.warn, `${e}`);
+				this.helper.logHelper.showLog(OutputLevels.warn, `${e}`);
 			}
 			this.refreshItem(sandbox);
 		}
@@ -212,7 +213,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints?micheline=true&michelson=true`,
 		);
 		const data = await response.json();
-		this.helper.showLog(OutputLevels.trace, JSON.stringify(data, null, 2));
+		this.helper.logHelper.showLog(OutputLevels.trace, JSON.stringify(data, null, 2));
 		return (data as any[]).map(item =>
 			new SmartContractEntrypointTreeItem(
 				item.name,
