@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e # exiting on error
 
-if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
+if [ "$0" == "bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
     echo '******* BUILDING ALL TAQUERIA PACKAGES *******'
     echo '**********************************************'
@@ -37,6 +37,6 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo "** Builds complete!"
 
 else
-    echo "Usage: ./bin/build-all.sh"
+    echo "Usage: bash bin/build-all.sh"
     echo "(please run from within project root)"
 fi

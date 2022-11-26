@@ -9,8 +9,8 @@
 	"scripts": {
 		"test": "yarn",
 		"bootstrap": "lerna bootstrap --force-local",
-		"build-all": "./bin/build-all.sh",
-		"build:binary": "./bin/build.sh",
+		"build-all": "bash bin/build-all.sh",
+		"build:binary": "bash bin/build.sh",
 		"build:docker": "lerna run build-docker",
 		"build:packages": "lerna run build",
 		"deploy": "lerna version --no-push --no-git-tag-version --no-private",
