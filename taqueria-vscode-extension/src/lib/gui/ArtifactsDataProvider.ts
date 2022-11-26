@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { HasFileName, HasRefresh, OutputLevels, VsCodeHelper } from '../helpers';
-import { TaqifiedDir } from '../pure';
+import { HasFileName, HasRefresh, VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 
