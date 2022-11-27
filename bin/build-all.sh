@@ -9,7 +9,7 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo ""
     echo '**********************************************'
     echo "** Checking Dependencies"
-    docker ps > /dev/null
+    docker ps
 
     echo ""
     echo '**********************************************'
