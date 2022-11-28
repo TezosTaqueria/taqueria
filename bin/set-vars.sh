@@ -12,3 +12,5 @@ if [ -z "$GITHUB_SHA"]; then
 else
     BUILD="${GITHUB_SHA:0:8}"
 fi
+
+echo "In place 1: $TAQ_VERSION and $BUILD"
