@@ -96,7 +96,7 @@ jobs:
 
       - name: Delete node-gyp cache
         id: delete-node-gyp-cache
-        run: rmdir /s /q %LocalAppData%/node-gyp/Cache
+        run: Remove-Item -Recurse -Force %LocalAppData%/node-gyp/Cache
         if: ${{ matrix.os_short == 'windows' }}
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
