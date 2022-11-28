@@ -213,12 +213,17 @@ jobs:
 
       - name: Build all
         run: |
-          BUILD=`git rev-parse --short HEAD`
+          git rev-parse --short "$GITHUB_SHA"
+          BUILD=`git rev-parse --short "$GITHUB_SHA"`
           TAQ_VERSION="${TAQ_VERSION/\//-}"
+          echo build=${BUILD}
+          echo taq_version=${TAQ_VERSION}
           npx lerna bootstrap 
           npm run build:packages 
           deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
           npm run build:docker
+          echo build=${BUILD}
+          echo taq_version=${TAQ_VERSION}
 
       - name: Run unit tests
         run: npm run test:unit -w tests
