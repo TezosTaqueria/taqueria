@@ -1,0 +1,19 @@
+name: 'Build Binaries'
+
+on:
+  push:
+    branches:
+      - 'refactor_github_workflows'
+
+jobs:
+  build-binaries:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v3
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: '1.23.4'
+      - name: DEBUG
+        run: |
+          source bin/set-vars.sh; env
+    
