@@ -12,7 +12,7 @@
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
 		"build:docker": "lerna run build-docker",
-		"build:docker:debug": "lerna run build-docker-debug",
+		"build:docker:debug": "npm run -w @taqueria/flextesa-manager build-docker-debug",
 		"build:packages": "lerna run build",
 		"deploy": "lerna version --no-push --no-git-tag-version --no-private",
 		"parse-readme-template": "ts-node ./parse-readme-template.ts",
