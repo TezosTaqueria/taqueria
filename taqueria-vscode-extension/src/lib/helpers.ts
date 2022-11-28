@@ -1,4 +1,5 @@
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
+import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import { TaqError } from '@taqueria/protocol/TaqError';
 import { Config } from '@taqueria/protocol/taqueria-protocol-types';
 import { spawn } from 'child_process';
@@ -513,7 +514,7 @@ export class VsCodeHelper {
 			'@taqueria/plugin-smartpy',
 			'@taqueria/plugin-taquito',
 			'@taqueria/plugin-tezos-client',
-		];
+		].map(NonEmptyString.create);
 	}
 
 	private getCompilerPlugins() {
@@ -530,8 +531,8 @@ export class VsCodeHelper {
 			if (HOME_DIR) {
 				const availablePluginsFile = join(HOME_DIR, 'taqueria-plugins.json');
 				const contents = await readFile(availablePluginsFile, { encoding: 'utf-8' });
-				const decoded = JSON.parse(contents);
-				return decoded as string[];
+				const decoded = JSON.parse(contents) as string[];
+				return decoded.map(NonEmptyString.create);
 			}
 		} catch {
 			// Ignore
@@ -1038,7 +1039,9 @@ export class VsCodeHelper {
 			return undefined;
 		}
 		const config = await Util.TaqifiedDir.create(mainFolder.fsPath as Util.PathToDir, this.i18);
-		const dir = folder === 'contracts' ? config.config.contractsDir : config.config.artifactsDir ?? folder;
+		const dir = folder === 'contracts'
+			? (config.config.contractsDir ?? 'contracts')
+			: config.config.artifactsDir ?? folder;
 		fileName = path.relative(path.join(mainFolder.path, dir), fileName);
 		return fileName;
 	}
