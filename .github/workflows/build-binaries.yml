@@ -35,4 +35,5 @@ jobs:
         run: |
           TAQUERIA_BRANCH_INLINE=$(git rev-parse --abbrev-ref HEAD)
           TAQUERIA_COMMIT_INLINE=$(git rev-parse --short HEAD)
-          env
+          echo "Debug env variable TAQUERIA_BRANCH_INLINE: ${TAQUERIA_BRANCH_INLINE}"
+          echo "Debug env variable TAQUERIA_COMMIT_INLINE: ${TAQUERIA_COMMIT_INLINE}"
