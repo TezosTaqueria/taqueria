@@ -31,6 +31,7 @@ jobs:
         with:
           deno-version: '1.23.4'
       - name: DEBUG
+        shell: bash
         run: |
           TAQUERIA_BRANCH_INLINE=$(git rev-parse --abbrev-ref HEAD)
           TAQUERIA_COMMIT_INLINE=$(git rev-parse --short HEAD)
