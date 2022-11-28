@@ -7,7 +7,24 @@ on:
 
 jobs:
   build-binaries:
-    runs-on: 'ubuntu-latest'
+    strategy:
+      fail-fast: false
+      matrix:
+       include:
+         - os: ubuntu-latest
+           os_short: ubuntu
+           deno_target: "x86_64-unknown-linux-gnu"
+           taqueria_bin: "taq"
+         - os: windows-latest
+           os_short: windows
+           deno_target: "x86_64-pc-windows-msvc"
+           taqueria_bin: "taq.exe"
+         - os: macOS-latest
+           os_short: macos
+           deno_target: "x86_64-apple-darwin"
+           taqueria_bin: "taq"
+
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - uses: denoland/setup-deno@v1
@@ -15,5 +32,6 @@ jobs:
           deno-version: '1.23.4'
       - name: DEBUG
         run: |
-          source bin/set-vars.sh; env
-    
+          TAQUERIA_BRANCH_INLINE=$(git rev-parse --abbrev-ref HEAD)
+          TAQUERIA_COMMIT_INLINE=$(git rev-parse --short HEAD)
+          env
