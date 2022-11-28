@@ -22,6 +22,13 @@ env:
   TAQ_VERSION: ${{ github.ref_name }}
 
 jobs:
+  ssh:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+
   # When we use reusable we lose the ability to to filter out the workflow for changes to certain paths.
   # This job creates boolean outputs based on path filters. These outputs can then be used as job conditions
   workflow-setup:
