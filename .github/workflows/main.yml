@@ -261,11 +261,6 @@ jobs:
           node-version: lts/gallium
           cache: "npm"
 
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: "1.23.4"
-
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
 
