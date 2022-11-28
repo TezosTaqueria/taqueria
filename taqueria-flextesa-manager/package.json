@@ -7,7 +7,7 @@
 	"scripts": {
 		"build-package": "npx tsc -noEmit && npx esbuild --platform=node --bundle index.ts --outdir=.",
 		"build-docker": "npm config set script-shell $(which bash); source ../bin/set-vars.sh; docker build . -t \"ghcr.io/ecadlabs/taqueria-flextesa:${TAQ_VERSION}-${BUILD}\"",
-		"build-docker-debug": "npm config set script-shell $(which bash); ls; source ../bin/set-vars.sh; echo \"Environment variable from NPM script: TAQUERIA_COMMIT ${TAQUERIA_COMMIT}\"; echo \"Environment variable from NPM script: TAQUERIA_BRANCH: ${TAQUERIA_BRANCH}\"",
+		"build-docker-debug": "npm config set script-shell $(which bash); ls ../bin; source ../bin/set-vars.sh; echo \"Environment variable from NPM script: TAQUERIA_VERSION ${TAQ_VERSION}\"; echo \"Environment variable from NPM script: BUILD: ${BUILD}\"",
 		"build": "npm run build-package",
 		"build-all": "npm run build-package && npm run build-docker"
 	},
