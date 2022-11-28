@@ -29,6 +29,7 @@ docker exec [sandboxName] node index.js --sandbox [sandboxName] --configure
 
 ---
 
+
 To add all accounts configured in .taq/config.json, run:
 ```
 docker exec [sandboxName] node index.js --sandbox [sandboxName] --importAccounts
