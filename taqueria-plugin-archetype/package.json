@@ -45,7 +45,7 @@
 		"ts-pattern": "^3.3.3"
 	},
 	"devDependencies": {
-		"parcel": "2.6.1",
+		"parcel": "^2.8.0",
 		"typescript": "^4.7.2"
 	}
 }
