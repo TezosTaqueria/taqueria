@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-BRANCH=`git branch --show-current`
-COMMIT=`git rev-parse --short HEAD`
-TAQ_VERSION="dev-$BRANCH"
+TAQUERIA_BRANCH=`git branch --show-current`
+TAQUERIA_COMMIT=`git rev-parse --short HEAD`
+TAQ_VERSION="dev-$TAQUERIA_BRANCH"
 TIMESTAMP=`date +%s`
-BUILD="$COMMIT"
+BUILD="$TAQUERIA_COMMIT"
