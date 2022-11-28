@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 BRANCH=`git branch --show-current`
 COMMIT=`git rev-parse --short HEAD`
-TAQ_VERSION="dev-$BRANCH"
+if [  -z "$TAQ_VERSION" ]; then
+    TAQ_VERSION="dev-$BRANCH"
+fi
 TIMESTAMP=`date +%s`
-BUILD="$COMMIT"
+if [  -z "$BUILD" ]; then
+    BUILD="$COMMIT"
+fi
