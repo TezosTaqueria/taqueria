@@ -379,15 +379,6 @@ export type ConfigFileV2 = {
 	/** Declared accounts */
 	accounts?: Record<string, {
 		balance: CurrencyAmmountV2;
-
-		/** account types provided by plugins
-		 *
-		 * Examples: in-memory (default), teztnet, mainnet
-		 *
-		 * annotations provides plugin specific config data
-		 */
-		defaultAccountType?: string;
-		defaultConfigData?: Record<string, unknown>;
 	}>;
 
 	/** Environments
