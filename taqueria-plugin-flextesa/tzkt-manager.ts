@@ -1,7 +1,7 @@
 import { getArch, SandboxConfig } from '@taqueria/node-sdk';
 import { Config } from '@taqueria/node-sdk';
 import { Protocol } from '@taqueria/node-sdk/types';
-import { Config as RawConfig } from '@taqueria/protocol-types/types';
+import { Config as RawConfig } from '@taqueria/protocol/types';
 import { getContainerName, getNewPortIfPortInUse, getUniqueSandboxName, Opts, updateConfig } from './proxy';
 
 const { Url } = Protocol;

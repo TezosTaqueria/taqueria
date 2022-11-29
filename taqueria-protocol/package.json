@@ -63,7 +63,7 @@
 	},
 	"tsup": {
 		"entry": [
-			"types.ts",
+			"[!.]+.ts",
 			"out/types/*.ts",
 			"out/*.ts"
 		],

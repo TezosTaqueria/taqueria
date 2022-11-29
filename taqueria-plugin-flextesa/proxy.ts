@@ -12,8 +12,8 @@ import {
 } from '@taqueria/node-sdk';
 import { Config, RequestArgs } from '@taqueria/node-sdk';
 import { Protocol, SandboxAccountConfig, SandboxConfig, StdIO } from '@taqueria/node-sdk/types';
-import { Config as RawConfig } from '@taqueria/protocol-types/types';
 import { SanitizedArgs, TaqError } from '@taqueria/protocol/taqueria-protocol-types';
+import { Config as RawConfig } from '@taqueria/protocol/types';
 import retry from 'async-retry';
 import type { ExecException } from 'child_process';
 import { getPortPromise } from 'portfinder';
