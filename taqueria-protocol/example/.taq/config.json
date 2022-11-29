@@ -68,20 +68,16 @@
 					"publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6"
 				},
 				"alice": {
-					"accountType": "beacon",
-					"publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"
+					"accountType": "in-memory"
 				},
 				"john": {
-					"accountType": "beacon",
-					"publicKeyHash": "tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6"
+					"accountType": "in-memory"
 				},
 				"jane": {
-					"accountType": "beacon",
-					"publicKeyHash": "tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph"
+					"accountType": "in-memory"
 				},
 				"joe": {
-					"accountType": "beacon",
-					"publicKeyHash": "tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB"
+					"accountType": "in-memory"
 				}
 			}
 		}
