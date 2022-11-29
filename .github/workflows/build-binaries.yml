@@ -43,7 +43,12 @@ jobs:
           echo "Debug env variable TAQUERIA_BRANCH_INLINE: ${TAQUERIA_BRANCH_INLINE}"
           echo "Debug env variable TAQUERIA_COMMIT_INLINE: ${TAQUERIA_COMMIT_INLINE}"
 
+          npm config get script-shell
+
           npm run build:docker:debug
+
+          echo "Environment variable from NPM script: BUILD: ${BUILD}"
+          echo "Environment variable from NPM script: TAQUERIA_VERSION ${TAQ_VERSION}"
 
       - name: Build all
         run: |
