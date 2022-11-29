@@ -1,4 +1,5 @@
 import { ProxyTaskArgs, RequestArgs } from '@taqueria/protocol';
+import * as Protocol from '@taqueria/protocol';
 import * as Environment from '@taqueria/protocol/Environment';
 import type { i18n } from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
@@ -15,11 +16,8 @@ import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as SanitizedPath from '@taqueria/protocol/SanitizedPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import * as Protocol from '@taqueria/protocol/taqueria-protocol-types';
 import * as Task from '@taqueria/protocol/Task';
 import * as Template from '@taqueria/protocol/Template';
-import { P } from 'ts-pattern';
-import { z } from 'zod';
 export {
 	Environment,
 	LoadedConfig,
