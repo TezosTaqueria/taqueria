@@ -1,6 +1,6 @@
-import { NonEmptyString, PluginJsonResponse, RequestArgs } from '@taqueria/protocol-types';
-import { Template } from '@taqueria/protocol-types/types';
+import { NonEmptyString, PluginJsonResponse, RequestArgs } from '@taqueria/protocol';
 import { create as createTemplate } from '@taqueria/protocol/out/types/Template';
+import { Template } from '@taqueria/protocol/types';
 export * from '@taqueria/protocol/out/types/Template';
 
 type TemplateHandler =

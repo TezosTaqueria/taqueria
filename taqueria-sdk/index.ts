@@ -1,5 +1,5 @@
-export * from '@taqueria/protocol-types/types';
-import * as Protocol from '@taqueria/protocol-types';
+export * from '@taqueria/protocol/types';
+import * as Protocol from '@taqueria/protocol';
 export {
 	Config,
 	EconomicalProtocolHash,
@@ -14,15 +14,15 @@ export {
 	ProxyTemplateArgs,
 	RequestArgs,
 	Task,
-} from '@taqueria/protocol-types';
+} from '@taqueria/protocol';
 export * as Template from '@taqueria/protocol/Template';
 export { Protocol };
-import * as NonStrict from '@taqueria/protocol-types/types';
 import type { i18n } from '@taqueria/protocol/i18n';
 import load from '@taqueria/protocol/i18n';
 import * as SHA256 from '@taqueria/protocol/SHA256';
 import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import type { TaqError } from '@taqueria/protocol/TaqError';
+import * as NonStrict from '@taqueria/protocol/types';
 import { exec, ExecException, spawn } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
