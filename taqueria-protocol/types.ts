@@ -358,6 +358,136 @@ export type Config = {
 	metadata?: MetadataConfig;
 };
 
+export type CurrencyAmmountV2 = {
+	ammount: string;
+	units: string;
+};
+
+export type ConfigFileV2 = {
+	version: `v2`;
+	language?: HumanLanguage;
+	metadata?: MetadataConfig;
+	artifactsDir?: ConfigArtifactsDir;
+	contractsDir?: ConfigContractsDir;
+
+	// network?: Record<string, NetworkConfig>;
+	// sandbox?: Record<string, SandboxConfig>;
+
+	// environment?: Record<string, Environment | EnvironmentName>;
+	// accounts?: Record<string, Tz>;
+
+	/** Declared accounts */
+	accounts?: Record<string, {
+		balance: CurrencyAmmountV2;
+
+		/** account types provided by plugins
+		 *
+		 * Examples: in-memory (default), teztnet, mainnet
+		 *
+		 * annotations provides plugin specific config data
+		 */
+		defaultAccountType?: string;
+		defaultConfigData?: Record<string, unknown>;
+	}>;
+
+	/** Environments
+	 *
+	 * An environment represents a unique context on a network with its own account instances and contracts.
+	 *
+	 * The environment implementation is provided by a plugin which enables network control, account management, and contract interaction.
+	 *
+	 * Example environment types:
+	 *
+	 * - a sandbox running locally (using flextesa and taquito plugin)
+	 * - teztnets.xyz (using taquito plugin)
+	 * - mainnet (using taquito plugin with a custom rpcUrl)
+	 *
+	 * The environment implementation also implements the account types that are supported by that environmentType:
+	 *
+	 * - flextesa
+	 *   - in-memory signer
+	 * - mainnet
+	 *   - beacon wallet
+	 *   - multi-sig
+	 *
+	 * Using the above as an example, the flextesa sandbox only needs an in-memory signer since it generates it's own accounts,
+	 * but mainnet might support something like a beacon wallet or a multi-sig account.
+	 */
+	environments?: Record<string, {
+		/** environment types provided by plugins
+		 *
+		 * Examples: flextesa, teztnet, mainnet
+		 *
+		 * annotations provides plugin specific data like rpcUrl
+		 */
+		environmentType?: string;
+		configData?: Record<string, unknown>;
+
+		/** Account overrides for this environment */
+		accounts?: Record<string, {
+			key: string;
+			accountType?: string;
+			configData?: Record<string, unknown>;
+		}>;
+	}>;
+
+	contracts?: Record<string, Contract>;
+	plugins?: InstalledPlugin[];
+};
+
+/** Account instance data
+ *
+ * Specific to project/dev/enviroment (not stored in repo)
+ *
+ * This is for account state that is generated.
+ *
+ * accounts.[environment].json
+ */
+export type AccountsFileV2 = {
+	accounts?: Record<string, {
+		key: string;
+		state?: Record<string, unknown>;
+	}>;
+};
+
+// export type AccountTypePluginV2 = {
+// 	// create: (configData?: Record<string, unknown>) => void;
+// 	// transfer: (destination: string, amount: CurrencyAmmountV2) => void;
+// 	// sign: (transaction: string) => void;
+// };
+
+/** An environment type combines network, account, and contract management */
+export type EnvironmentTypePluginV2 = {
+	/** Ensure environment is ready for use */
+	start: (environmentName: string) => void;
+
+	/** Dispose local resources used by environment */
+	stop: (environmentName: string) => void;
+
+	/** Instantiate and fund declared accounts for this environment */
+	setupAccounts: (environmentName: string) => void;
+
+	// /** Tranfer funds between declared accounts */
+	// transferFunds: (sourceAccountName: string, destinationAccountName: string, amount: CurrencyAmmountV2) => void;
+
+	/** Deploy contract with a declared account */
+	deployContract: (
+		environmentName: string,
+		executingAccountName: string,
+		contractName: string,
+		storage: unknown,
+	) => void;
+
+	/** Call contract entrypoint with a declared account */
+	callContract: (
+		environmentName: string,
+		executingAccountName: string,
+		contractName: string,
+		entrypointName: string,
+		param: unknown,
+	) => void;
+};
+
 // TODO: sandbox breaks ts-to-zod
 export type LoadedConfig = Config & {
 	projectDir: SanitizedAbsPath;
