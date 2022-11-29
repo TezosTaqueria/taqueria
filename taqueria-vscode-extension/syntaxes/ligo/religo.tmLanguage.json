@@ -1,0 +1,206 @@
+{
+	"foldingStartMarker": "{",
+	"foldingStopMarker": "}",
+	"name": "ReasonLIGO",
+	"scopeName": "source.religo",
+	"fileTypes": ["religo"],
+	"patterns": [
+		{ "include": "#string" },
+		{ "include": "#block_comment" },
+		{ "include": "#line_comment" },
+		{ "include": "#uppercaseidentifier" },
+		{ "include": "#attribute" },
+		{ "include": "#macro" },
+		{ "include": "#letbinding" },
+		{ "include": "#typedefinition" },
+		{ "include": "#typeannotation" },
+		{ "include": "#controlkeywords" },
+		{ "include": "#moduledeclaration" },
+		{ "include": "#numericliterals" },
+		{ "include": "#operators" },
+		{ "include": "#recordorblock" }
+	],
+	"repository": {
+		"string": {
+			"name": "string.quoted.double.religo",
+			"begin": "\\\"",
+			"end": "\\\"",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": []
+		},
+		"block_comment": {
+			"name": "comment.block.religo",
+			"begin": "/\\*",
+			"end": "\\*\\/",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [{ "include": "#block_comment" }]
+		},
+		"line_comment": {
+			"name": "comment.block.religo",
+			"begin": "\\/\\/",
+			"end": "$",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": []
+		},
+		"attribute": {
+			"name": "keyword.control.attribute.religo",
+			"match": "\\[@.*\\]",
+			"captures": {}
+		},
+		"macro": {
+			"name": "meta.preprocessor.religo",
+			"match": "^\\#[a-zA-Z]+",
+			"captures": {}
+		},
+		"controlkeywords": {
+			"name": "keyword.control.religo",
+			"match": "\\b(switch|if|else|assert|failwith)\\b",
+			"captures": {}
+		},
+		"moduledeclaration": {
+			"match": "\\b(module)\\b",
+			"captures": { "1": { "name": "keyword.other.religo" } }
+		},
+		"letbinding": {
+			"match": "\\b(let)\\b\\s*(\\brec\\b|)\\s*\\b([a-zA-Z$_][a-zA-Z0-9$_]*)\\b",
+			"captures": {
+				"3": { "name": "entity.name.function.religo" },
+				"2": { "name": "storage.modifier.religo" },
+				"1": { "name": "keyword.other.religo" }
+			}
+		},
+		"numericliterals": {
+			"name": "constant.numeric.religo",
+			"match": "(\\+|\\-)?[0-9]+(n|tz|tez|mutez|)\\b",
+			"captures": {}
+		},
+		"operators": {
+			"name": "keyword.operator.religo",
+			"match": "\\b(\\-|\\+|mod|land|lor|lxor|lsl|lsr|&&|\\|\\||>|!=|<=|=>|<|>)\\b",
+			"captures": {}
+		},
+		"comma": { "match": "(,)", "captures": {} },
+		"uppercaseidentifier": {
+			"match": "\\b([A-Z][a-zA-Z0-9_$]*)\\b",
+			"captures": { "1": { "name": "entity.name.type.religo" } }
+		},
+		"lowercaseidentifier": {
+			"match": "\\b([a-z$_][a-zA-Z0-9$_]*)\\b",
+			"captures": { "1": { "name": "variable.religo" } }
+		},
+		"recordorblock": {
+			"begin": "({)",
+			"end": "(})",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#recordfield" },
+				{ "include": "#comma" },
+				{ "include": "$self" }
+			]
+		},
+		"recordfield": {
+			"begin": "\\b([a-zA-Z$_][a-zA-Z0-9$_]*)\\b\\s*(:)",
+			"end": "(?=,|})",
+			"beginCaptures": { "2": { "name": "keyword.operator.religo" } },
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "$self" }
+			]
+		},
+		"typedefinition": {
+			"begin": "\\b(type)\\b",
+			"end": "(?=\\b(type|module|let)\\b|;|}|^#|\\[@)",
+			"beginCaptures": { "1": { "name": "keyword.other.religo" } },
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#uppercaseidentifier" },
+				{ "include": "#typeoperator" },
+				{ "include": "#typename" },
+				{ "include": "#typevar" },
+				{ "include": "#typeparentheses" },
+				{ "include": "#typeint" },
+				{ "include": "#typeproduct" },
+				{ "include": "#string" }
+			]
+		},
+		"typeannotation": {
+			"begin": "(:)",
+			"end": "(?=\\)|}|=|,|=>)",
+			"beginCaptures": { "1": { "name": "keyword.operator.religo" } },
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#uppercaseidentifier" },
+				{ "include": "#typeoperator" },
+				{ "include": "#typename" },
+				{ "include": "#typevar" },
+				{ "include": "#typeparentheses" },
+				{ "include": "#typeint" },
+				{ "include": "#typeproduct" },
+				{ "include": "#string" }
+			]
+		},
+		"typeoperator": {
+			"name": "keyword.operator.religo",
+			"match": "(=>|\\.|\\|)",
+			"captures": {}
+		},
+		"typename": {
+			"name": "entity.name.type.religo",
+			"match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
+			"captures": {}
+		},
+		"typevar": {
+			"name": "variable.other.type.religo",
+			"match": "'\\b([a-z_][a-zA-Z0-9_]*)\\b",
+			"captures": {}
+		},
+		"typeparentheses": {
+			"begin": "(\\()",
+			"end": "(\\))",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#uppercaseidentifier" },
+				{ "include": "#typeoperator" },
+				{ "include": "#typename" },
+				{ "include": "#typevar" },
+				{ "include": "#typeparentheses" },
+				{ "include": "#typeint" },
+				{ "include": "#typeproduct" },
+				{ "include": "#string" }
+			]
+		},
+		"typeint": {
+			"name": "constant.numeric.religo",
+			"match": "\\b([0-9]+)\\b",
+			"captures": {}
+		},
+		"typeproduct": {
+			"begin": "({)",
+			"end": "(})",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#uppercaseidentifier" },
+				{ "include": "#typeannotation" },
+				{ "include": "#comma" }
+			]
+		}
+	}
+}
