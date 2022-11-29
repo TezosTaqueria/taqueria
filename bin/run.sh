@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
-BRANCH=`git branch --show-current`
-TAQ_VERSION="dev:$BRANCH"
-TIMESTAMP=`date +%s`
-BUILD="${BRANCH}-${TIMESTAMP}"
+source ./bin/set-vars.sh
+
 BIN_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]:-$0}"; )" &> /dev/null && pwd 2> /dev/null; )";
 PROJ_DIR="${BIN_DIR}/.."
 
