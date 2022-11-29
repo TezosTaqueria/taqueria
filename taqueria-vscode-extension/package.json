@@ -612,7 +612,108 @@
 					"group": "navigation"
 				}
 			]
-		}
+		},
+		"languages": [
+			{
+				"id": "michelson",
+				"aliases": [
+					"Michelson",
+					"michelson"
+				],
+				"extensions": [
+					".tz"
+				],
+				"icon": {
+					"light": "syntaxes/michelson/logo.png",
+					"dark": "syntaxes/michelson/logo.png"
+				},
+				"configuration": "./syntaxes/michelson/configuration.json"
+			},
+			{
+				"id": "ligo",
+				"aliases": [
+					"PascaLIGO"
+				],
+				"extensions": [
+					".ligo",
+					".pligo"
+				],
+				"icon": {
+					"light": "syntaxes/ligo/logo.png",
+					"dark": "syntaxes/ligo/logo.png"
+				},
+				"configuration": "./syntaxes/ligo/ligo.configuration.json"
+			},
+			{
+				"id": "mligo",
+				"aliases": [
+					"CameLIGO"
+				],
+				"extensions": [
+					".mligo"
+				],
+				"icon": {
+					"light": "syntaxes/ligo/logo.png",
+					"dark": "syntaxes/ligo/logo.png"
+				},
+				"configuration": "./syntaxes/ligo/mligo.configuration.json"
+			},
+			{
+				"id": "religo",
+				"aliases": [
+					"ReasonLIGO"
+				],
+				"extensions": [
+					".religo"
+				],
+				"icon": {
+					"light": "syntaxes/ligo/logo.png",
+					"dark": "syntaxes/ligo/logo.png"
+				},
+				"configuration": "./syntaxes/ligo/religo.configuration.json"
+			},
+			{
+				"id": "jsligo",
+				"aliases": [
+					"JsLIGO"
+				],
+				"extensions": [
+					".jsligo"
+				],
+				"icon": {
+					"light": "syntaxes/ligo/logo.png",
+					"dark": "syntaxes/ligo/logo.png"
+				},
+				"configuration": "./syntaxes/ligo/jsligo.configuration.json"
+			}
+		],
+		"grammars": [
+			{
+				"language": "michelson",
+				"scopeName": "source.michelson",
+				"path": "./syntaxes/michelson/tmLanguage.json"
+			},
+			{
+				"language": "ligo",
+				"scopeName": "source.ligo",
+				"path": "./syntaxes/ligo/ligo.tmLanguage.json"
+			},
+			{
+				"language": "mligo",
+				"scopeName": "source.mligo",
+				"path": "./syntaxes/ligo/mligo.tmLanguage.json"
+			},
+			{
+				"language": "religo",
+				"scopeName": "source.religo",
+				"path": "./syntaxes/ligo/religo.tmLanguage.json"
+			},
+			{
+				"language": "jsligo",
+				"scopeName": "source.jsligo",
+				"path": "./syntaxes/ligo/jsligo.tmLanguage.json"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile:base -- --minify",

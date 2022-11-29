@@ -2,7 +2,7 @@ import { execSync, spawnSync } from 'child_process';
 import { readFile, rm } from 'fs/promises';
 import { join } from 'path';
 import { generateTestProject } from '../e2e/utils/utils';
-const testProjectPath = 'integration/auto-test-integration';
+const testProjectPath = 'scrap/auto-test-integration';
 
 const tableOutput = `
 ┌──────┐

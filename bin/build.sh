@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-BRANCH=`git branch --show-current`
-COMMIT=`git rev-parse --short HEAD`
-TAQ_VERSION="dev-$BRANCH"
-TIMESTAMP=`date +%s`
-BUILD="$COMMIT"
-
+source ./bin/set-vars.sh
 
 if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
     HAS_DENO=`which deno`
@@ -12,7 +7,12 @@ if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
         echo "Please install deno before attempting to build."
         echo "Run: curl -fsSL https://deno.land/install.sh | sh"
     else
-        DENO_DIR=./deno deno compile -o taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
+        if [  -z "$DENO_TARGET" ]; then
+            TARGET_ARG=""
+        else
+            TARGET_ARG="--target $DENO_TARGET"
+        fi
+        DENO_DIR=./deno deno compile -o taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json $TARGET_ARG
     fi
 else
     echo "Usage: ./bin/build.sh"

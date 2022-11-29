@@ -4,7 +4,7 @@ import util from 'util';
 import { generateTestProject } from './utils/utils';
 const exec = util.promisify(execRaw);
 
-const taqueriaProjectPath = 'e2e/auto-test-metadata-plugin';
+const taqueriaProjectPath = 'scrap/auto-test-metadata-plugin';
 
 describe('E2E Testing for the taqueria metadata plugin', () => {
 	beforeAll(async () => {
