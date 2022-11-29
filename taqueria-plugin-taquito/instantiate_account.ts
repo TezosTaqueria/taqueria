@@ -7,6 +7,7 @@ import {
 } from './common';
 
 const instantiate_account = async (parsedArgs: RequestArgs.t): Promise<void> => {
+	debugger;
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	try {
@@ -41,8 +42,9 @@ const instantiate_account = async (parsedArgs: RequestArgs.t): Promise<void> => 
 				`No accounts were instantiated because they were all instantiated in the target environment already`,
 			);
 		}
-	} catch {
-		return sendAsyncErr('No operations performed');
+	} catch (err) {
+		await sendAsyncErr('No operations performed');
+		if (parsedArgs.debug) await sendAsyncErr(String(err));
 	}
 };
 

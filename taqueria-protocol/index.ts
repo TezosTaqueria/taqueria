@@ -9,6 +9,7 @@ export * as HumanReadableIdentifier from '@taqueria/protocol/HumanReadableIdenti
 export * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
 export * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
 export * as MetadataConfig from '@taqueria/protocol/MetadataConfig';
+export * as NetworkAccountConfig from '@taqueria/protocol/NetworkAccountConfig';
 export * as NetworkConfig from '@taqueria/protocol/NetworkConfig';
 export * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 export * as Operation from '@taqueria/protocol/Operation';
@@ -44,10 +45,10 @@ export * as Verb from '@taqueria/protocol/Verb';
 export * as VersionNumber from '@taqueria/protocol/VersionNumber';
 
 // Non-generated exports MUST go here:
+export * as EphemeralState from '@taqueria/protocol/EphemeralState';
 export * as i18n from '@taqueria/protocol/i18n';
+export * as PersistentState from '@taqueria/protocol/PersistentState';
 export * as PluginInfo from '@taqueria/protocol/PluginInfo';
 export * as PluginSchema from '@taqueria/protocol/PluginSchema';
 export * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 export * as SHA256 from '@taqueria/protocol/SHA256';
-export * as EphemeralState from '@taqueria/protocol/EphemeralState';
-export * as PersistentState from '@taqueria/protocol/PersistentState';

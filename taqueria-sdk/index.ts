@@ -576,29 +576,35 @@ const createAddress = async (network: Protocol.NetworkConfig.t): Promise<TezosTo
 // Temporary solution before the environment refactor
 export const getAccountPrivateKey = async (
 	parsedArgs: Protocol.RequestArgs.t,
-	network: Protocol.NetworkConfig.t,
+	network: Protocol.NetworkConfig.t | NonStrict.NetworkConfig,
 	account: string,
 ): Promise<string> => {
 	if (!network.accounts) network.accounts = {};
+
 	if (!network.accounts[account]) {
-		const tezos = await createAddress(network);
-		const publicKey = await tezos.signer.publicKey();
-		const publicKeyHash = await tezos.signer.publicKeyHash();
-		const privateKey = await tezos.signer.secretKey();
+		const tezos = await createAddress(Protocol.NetworkConfig.create(network));
+		const publicKey = Protocol.NonEmptyString.create(await tezos.signer.publicKey());
+		const publicKeyHash = Protocol.PublicKeyHash.create(await tezos.signer.publicKeyHash());
+		const privateKey = Protocol.NonEmptyString.create(await tezos.signer.secretKey() ?? '');
 		if (!privateKey) return sendAsyncErr('The private key must exist after creating it');
-		network.accounts[account] = { publicKey, publicKeyHash, privateKey };
+		network.accounts[account] = Protocol.NetworkAccountConfig.create({ publicKey, publicKeyHash, privateKey });
+
 		try {
 			await writeJsonFile('./.taq/config.json')(parsedArgs.config);
 		} catch (err) {
 			return sendAsyncErr(`Could not write to ./.taq/config.json\n`);
 		}
-		return sendAsyncErr(
-			`A keypair with public key hash ${
-				network.accounts[account].publicKeyHash
-			} was generated for you.\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the 'wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
-		);
+
+		if (account === TAQ_OPERATOR_ACCOUNT) {
+			return sendAsyncErr(
+				`A keypair with public key hash ${
+					network.accounts[account].publicKeyHash
+				} was generated for you.\nTo fund this account:\n1. Go to https://teztnets.xyz and click "Faucet" of the target testnet\n2. Copy and paste the above key into the wallet address field\n3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)`,
+			);
+		}
 	}
-	return network.accounts[account].privateKey as string;
+
+	return network.accounts[account].privateKey;
 };
 
 export const getDockerImage = (defaultImageName: string, envVarName: string): string =>

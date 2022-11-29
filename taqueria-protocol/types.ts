@@ -217,7 +217,7 @@ export type ProxyTemplateArgs = RequestArgs & {
 /** @min 1 */
 export type EconomicalProtocolHash = string;
 
-/** @pattern ^tz1[A-Za-z0-9]{33}$ */
+/** @pattern ^tz\d[A-Za-z0-9]{33}$ */
 export type PublicKeyHash = string;
 
 /** @pattern ^[A-Fa-f0-9]{64}$ */
@@ -377,8 +377,14 @@ export type NetworkConfig = {
 	label: HumanReadableIdentifier;
 	rpcUrl: Url;
 	protocol: EconomicalProtocolHash;
-	accounts?: Record<string, Record<string, unknown>>;
+	accounts?: Record<string, NetworkAccountConfig>;
 	faucet?: Faucet;
+};
+
+export type NetworkAccountConfig = {
+	publicKey: NonEmptyString;
+	publicKeyHash: PublicKeyHash;
+	privateKey: NonEmptyString; /** TODO: Should this be secretKey: @see {SandboxAccountConfig} */
 };
 
 export type SandboxAccountConfig = {
