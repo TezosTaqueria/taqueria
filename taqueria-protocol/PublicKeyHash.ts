@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/PublicKeyHash';
+export * from '@taqueria/protocol/out/types/PublicKeyHash';

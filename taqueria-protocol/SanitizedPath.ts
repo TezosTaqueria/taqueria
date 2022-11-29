@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/SanitizedPath';
+export * from '@taqueria/protocol/out/types/SanitizedPath';

@@ -1,4 +1,4 @@
-import { Url } from '@taqueria/protocol-types';
+import { Url } from '@taqueria/protocol';
 import createType from '@taqueria/protocol/Base';
 import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';

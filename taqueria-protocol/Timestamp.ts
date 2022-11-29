@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/Timestamp';
+export * from '@taqueria/protocol/out/types/Timestamp';

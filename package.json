@@ -9,8 +9,8 @@
 	"scripts": {
 		"test": "yarn",
 		"bootstrap": "lerna bootstrap --force-local",
+		"build-types": "npm run build-types -w taqueria-protocol",
 		"build-all": "./bin/build-all.sh",
-		"build-types": "npx ts-to-zod taqueria-protocol-types/types.ts taqueria-protocol-types/out/types-zod.ts && npx ts-node taqueria-protocol-types/scripts/post-ts-to-zod.ts && npx ts-node taqueria-protocol-types/scripts/build-types.ts",
 		"build:binary": "./bin/build.sh",
 		"build:docker": "lerna run build-docker",
 		"build:packages": "lerna run build",
@@ -60,7 +60,6 @@
 		"with-staged": "^1.0.2"
 	},
 	"workspaces": [
-		"./taqueria-protocol-types",
 		"./taqueria-protocol",
 		"./taqueria-sdk",
 		"./taqueria-state",

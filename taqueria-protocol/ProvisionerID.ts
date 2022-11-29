@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/ProvisionerID';
+export * from '@taqueria/protocol/out/types/ProvisionerID';

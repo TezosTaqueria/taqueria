@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/Environment';
+export * from '@taqueria/protocol/out/types/Environment';

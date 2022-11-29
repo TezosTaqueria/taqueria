@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/MetadataConfig';
+export * from '@taqueria/protocol/out/types/MetadataConfig';

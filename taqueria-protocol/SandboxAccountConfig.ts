@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/SandboxAccountConfig';
+export * from '@taqueria/protocol/out/types/SandboxAccountConfig';

@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/LoadedConfig';
+export * from '@taqueria/protocol/out/types/LoadedConfig';

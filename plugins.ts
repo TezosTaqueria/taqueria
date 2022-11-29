@@ -1,10 +1,10 @@
 // First-party dependencies
+import type { InstalledPlugin } from '@taqueria/protocol';
+import { EphemeralState, PluginInfo, SanitizedArgs } from '@taqueria/protocol';
 import * as PluginActionName from '@taqueria/protocol/PluginActionName';
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import type { InstalledPlugin } from './taqueria-protocol/taqueria-protocol-types.ts';
-import { EphemeralState, PluginInfo, SanitizedArgs } from './taqueria-protocol/taqueria-protocol-types.ts';
 import type { PluginDeps, PluginRequestArgs } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';

@@ -62,12 +62,12 @@ ${
 
 		const content = `
 ${generationWarning}
-import { TaqError, toFutureParseErr, toFutureParseUnknownErr, toParseErr, toParseUnknownErr } from '@taqueria/protocol-types/TaqError';
+import { TaqError, toFutureParseErr, toFutureParseUnknownErr, toParseErr, toParseUnknownErr } from '@taqueria/protocol/TaqError';
 import { FutureInstance, resolve, reject } from 'fluture';
 import { ZodError } from 'zod';
-import { ${typeNameRaw} } from '@taqueria/protocol-types/types';
-import { ${typeNameNominal} as ${typeNameStrict} } from '@taqueria/protocol-types/out/types-strict';
-import { ${typeNameSchema} } from '@taqueria/protocol-types/out/types-zod';
+import { ${typeNameRaw} } from '@taqueria/protocol/types';
+import { ${typeNameNominal} as ${typeNameStrict} } from '@taqueria/protocol/out/types-strict';
+import { ${typeNameSchema} } from '@taqueria/protocol/out/types-zod';
 
 export type { ${typeNameStrict} as ${typeNameNominal} };
 
@@ -121,5 +121,5 @@ export type t = ${typeNameStrict};
 };
 
 buildTypes(
-	`taqueria-protocol-types`,
+	path.resolve(__dirname, '../'),
 ).catch(console.error);

@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/ProxyTaskArgs';
+export * from '@taqueria/protocol/out/types/ProxyTaskArgs';

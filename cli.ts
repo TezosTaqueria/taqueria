@@ -1,3 +1,18 @@
+import {
+	EphemeralState,
+	i18n,
+	InstalledPlugin,
+	Option,
+	ParsedTemplate,
+	PluginInfo,
+	PluginJsonResponse,
+	PluginResponseEncoding,
+	PositionalArg,
+	SanitizedAbsPath,
+	SanitizedArgs,
+	ScaffoldConfig,
+	Task,
+} from '@taqueria/protocol';
 import * as PluginActionName from '@taqueria/protocol/PluginActionName';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import {
@@ -31,21 +46,6 @@ import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
 import { addNewProvision, apply, loadProvisions, plan } from './provisions.ts';
 import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
-import {
-	EphemeralState,
-	i18n,
-	InstalledPlugin,
-	Option,
-	ParsedTemplate,
-	PluginInfo,
-	PluginJsonResponse,
-	PluginResponseEncoding,
-	PositionalArg,
-	SanitizedAbsPath,
-	SanitizedArgs,
-	ScaffoldConfig,
-	Task,
-} from './taqueria-protocol/taqueria-protocol-types.ts';
 import type { CLIConfig, DenoArgs, EnvKey, EnvVars } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';

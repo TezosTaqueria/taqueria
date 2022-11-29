@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/HumanReadableIdentifier';
+export * from '@taqueria/protocol/out/types/HumanReadableIdentifier';

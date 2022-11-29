@@ -1,7 +1,7 @@
 import { NonEmptyString, PluginJsonResponse, RequestArgs } from '@taqueria/protocol-types';
-import { create as createTemplate } from '@taqueria/protocol-types/out/types/Template';
 import { Template } from '@taqueria/protocol-types/types';
-export * from '@taqueria/protocol-types/out/types/Template';
+import { create as createTemplate } from '@taqueria/protocol/out/types/Template';
+export * from '@taqueria/protocol/out/types/Template';
 
 type TemplateHandler =
 	| NonEmptyString.t // TODO: should this be Verb?

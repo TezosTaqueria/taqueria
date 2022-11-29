@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/ScaffoldConfig';
+export * from '@taqueria/protocol/out/types/ScaffoldConfig';

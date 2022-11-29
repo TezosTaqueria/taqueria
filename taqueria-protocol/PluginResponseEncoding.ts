@@ -1,1 +1,1 @@
-export * from '@taqueria/protocol-types/out/types/PluginResponseEncoding';
+export * from '@taqueria/protocol/out/types/PluginResponseEncoding';

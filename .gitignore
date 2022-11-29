@@ -113,7 +113,7 @@ node_modules
 /taqueria
 /taq
 tests/coverage
-/taqueria-protocol-types/out
+/taqueria-protocol/out
 /taqueria-protocol/out
 /taqueria-protocol/*.mjs
 /taqueria-protocol/*.map
@@ -193,10 +193,10 @@ website/docs/glossary.md
 website/yarn.lock
 taqueria-plugin-metadata/index.js
 taqueria-plugin-metadata/index.js.map
-taqueria-protocol-types/**/*.js
-taqueria-protocol-types/**/*.map
-taqueria-protocol-types/**/*.d.ts
-taqueria-protocol-types/**/*.mjs
+taqueria-protocol/**/*.js
+taqueria-protocol/**/*.map
+taqueria-protocol/**/*.d.ts
+taqueria-protocol/**/*.mjs
 
 # Temp taq projects created from e2e test execution
 tests/e2e/auto-test-*
