@@ -6,7 +6,7 @@
 	"main": "index.js",
 	"scripts": {
 		"build-package": "npx tsc -noEmit && npx esbuild --platform=node --bundle index.ts --outdir=.",
-		"build-docker": "npm config set script-shell $(which bash); pwd; source ../bin/set-vars.sh; echo \"In place 3: $TAQ_VERSION and $BUILD\"; docker build . -t \"ghcr.io/ecadlabs/taqueria-flextesa:${TAQ_VERSION}-${BUILD}\"",
+		"build-docker": "echo \"bash is: $(which bash)\"; npm config set script-shell $(which bash); pwd; source ../bin/set-vars.sh; echo \"In place 3: $TAQ_VERSION and $BUILD\"; docker build . -t \"ghcr.io/ecadlabs/taqueria-flextesa:${TAQ_VERSION}-${BUILD}\"",
 		"build": "npm run build-package",
 		"build-all": "npm run build-package && npm run build-docker"
 	},
