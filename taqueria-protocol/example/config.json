@@ -1,0 +1,121 @@
+{
+	"language": "en",
+	"contractsDir": "contracts",
+	"artifactsDir": "artifacts",
+	"accounts": {
+		"bob": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "tez"
+			}
+		},
+		"alice": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "tez"
+			}
+		},
+		"john": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "tez"
+			}
+		},
+		"jane": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "tez"
+			}
+		},
+		"joe": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "tez"
+			}
+		}
+	},
+	"environment": {
+		"sandbox": {
+			"environmentType": "flextesa",
+			"configData": {
+				"label": "Local Tezos Sandbox",
+				"rpcUrl": "http://localhost:20000",
+				"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
+			},
+			"accounts": {
+				"bob": {
+					"accountType": "in-memory"
+				},
+				"alice": {
+					"accountType": "in-memory"
+				},
+				"john": {
+					"accountType": "in-memory"
+				},
+				"jane": {
+					"accountType": "in-memory"
+				},
+				"joe": {
+					"accountType": "in-memory"
+				}
+			}
+		},
+		"testnet": {
+			"environmentType": "teztnets-xyz",
+			"accounts": {
+				"bob": {
+					"accountType": "beacon",
+					"publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6"
+				},
+				"alice": {
+					"accountType": "beacon",
+					"publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb"
+				},
+				"john": {
+					"accountType": "beacon",
+					"publicKeyHash": "tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6"
+				},
+				"jane": {
+					"accountType": "beacon",
+					"publicKeyHash": "tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph"
+				},
+				"joe": {
+					"accountType": "beacon",
+					"publicKeyHash": "tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB"
+				}
+			}
+		}
+	},
+	"contracts": {
+		"./main.mligo": {
+			"sourceFile": "./main.mligo",
+			"hash": "1bbbe139820ef1e5223dee5e35b57480ed3b59e97170c9c252304f1d5c7b983e"
+		}
+	},
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-ligo",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-taquito",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-flextesa",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-contract-types",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-ipfs-pinata",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-jest",
+			"type": "npm"
+		}
+	]
+}

@@ -416,7 +416,6 @@ export type ConfigFileV2 = {
 
 		/** Account overrides for this environment */
 		accounts?: Record<string, {
-			key: string;
 			accountType?: string;
 			configData?: Record<string, unknown>;
 		}>;
