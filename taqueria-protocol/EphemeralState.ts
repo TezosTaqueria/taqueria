@@ -16,6 +16,7 @@ import type { i18n } from '@taqueria/protocol/i18n';
 import { E_TaqError, TaqError } from '@taqueria/protocol/TaqError';
 import { attemptP, FutureInstance as Future, mapRej, promise } from 'fluture';
 import { z } from 'zod';
+debugger;
 
 const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
