@@ -18,9 +18,6 @@ concurrency:
   group: ${{ github.ref_name || github.ref }}
   cancel-in-progress: true
 
-env:
-  TAQ_VERSION: ${{ github.ref_name }}
-
 jobs:
   # When we use reusable we lose the ability to to filter out the workflow for changes to certain paths.
   # This job creates boolean outputs based on path filters. These outputs can then be used as job conditions
@@ -113,7 +110,7 @@ jobs:
           npm ci
           npm run build-types
           npm run build -w taqueria-protocol
-          deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt --target $DENO_TARGET index.ts --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
+          ./bin/build.sh
           ./"${{ matrix.taqueria_bin }}" init -p ./test_project
           if [ ! -f ./test_project/.taq/config.json ]; then
             echo "Project not initialized"
@@ -226,9 +223,8 @@ jobs:
           TAQ_VERSION="${TAQ_VERSION/\//-}"
           npx lerna bootstrap
           npm run build-types
-
           npm run build:packages 
-          deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
+          ./bin/build.sh
           npm run build:docker
 
       - name: Run unit tests
@@ -288,13 +284,9 @@ jobs:
 
       - name: Build all
         run: |
-          BUILD=`git rev-parse --short "$GITHUB_SHA"`
-          TAQ_VERSION="${TAQ_VERSION/\//-}"
           npx lerna bootstrap 
           npm run build-types
           npm run build:packages 
-          deno compile --output taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --quickstart "`cat quickstart.md`" --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json
-          npm run build:docker
 
       - name: Publish for PR
         if:  ${{ github.event_name == 'pull_request' }}
