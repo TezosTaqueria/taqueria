@@ -99,7 +99,7 @@ jobs:
         env:
           DENO_DIR: "./deno"
         run: |
-          npm run build:binary
+          ./bin/build.sh
           ./"${{ matrix.taqueria_bin }}" init -p ./test_project
           if [ ! -f ./test_project/.taq/config.json ]; then
             echo "Project not initialized"
