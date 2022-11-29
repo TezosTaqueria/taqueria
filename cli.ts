@@ -2,6 +2,7 @@ import {
 	EphemeralState,
 	i18n,
 	InstalledPlugin,
+	NonEmptyString,
 	Option,
 	ParsedTemplate,
 	PluginInfo,
@@ -933,10 +934,10 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
 			...parsedArgs,
 			plugin: state.plugins.reduce(
 				(retval, pluginInfo: PluginInfo.t) =>
-					pluginInfo.alias === retval
-						? pluginInfo.name
+					pluginInfo.alias.toString() === retval.toString()
+						? NonEmptyString.create(pluginInfo.name)
 						: retval,
-				parsedArgs.plugin,
+				parsedArgs.plugin!,
 			),
 		};
 

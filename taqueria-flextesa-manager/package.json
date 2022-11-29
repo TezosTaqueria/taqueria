@@ -6,7 +6,7 @@
 	"main": "index.js",
 	"scripts": {
 		"build-package": "npx tsc -p ./tsconfig.json && npx esbuild --platform=node --bundle index.ts --outdir=.",
-		"build-docker": "npm config set script-shell $(which bash); source ../bin/set-vars.sh; docker build . -t \"ghcr.io/ecadlabs/taqueria-flextesa:${TAQ_VERSION}-${BUILD}\"",
+		"build-docker": "../bin/build-docker.sh",
 		"build": "npm run build-package",
 		"build-all": "npm run build-package && npm run build-docker"
 	},
