@@ -210,7 +210,7 @@ jobs:
         run: |
           npx lerna bootstrap 
           npm run build:packages 
-          npm run build:binary
+          ./bin/build.sh
           npm run build:docker
 
       - name: Run unit tests
