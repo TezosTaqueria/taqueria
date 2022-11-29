@@ -18,10 +18,6 @@ concurrency:
   group: ${{ github.ref_name || github.ref }}
   cancel-in-progress: true
 
-defaults:
-  run:
-    shell: bash
-
 env:
   TAQ_VERSION: ${{ github.ref_name }}
 
