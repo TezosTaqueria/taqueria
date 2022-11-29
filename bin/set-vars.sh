@@ -7,10 +7,8 @@ else
     TAQ_VERSION="${GITHUB_REF##*/}"
 fi
 TIMESTAMP=`date +%s`
-if [ -z "$GITHUB_SHA"]; then
+if [  -z "$GITHUB_SHA" ]; then
     BUILD="$COMMIT"
 else
     BUILD="${GITHUB_SHA:0:8}"
 fi
-
-echo "In place 1: $TAQ_VERSION and $BUILD"

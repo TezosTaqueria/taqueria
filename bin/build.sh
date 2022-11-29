@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 source ./bin/set-vars.sh
 
-echo "In place 2: $TAQ_VERSION and $BUILD"
-
 if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
     HAS_DENO=`which deno`
     if [  -z "$HAS_DENO" ]; then
