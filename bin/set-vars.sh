@@ -7,6 +7,4 @@ else
     TAQ_VERSION="${GITHUB_REF_NAME//\//-}"
 fi
 TIMESTAMP=`date +%s`
-if [  -z "$BUILD" ]; then
-    BUILD="$COMMIT"
-fi
+BUILD="$COMMIT"
