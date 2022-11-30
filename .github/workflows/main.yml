@@ -208,7 +208,6 @@ jobs:
 
       - name: Build all
         run: |
-          npx lerna bootstrap 
           npm run build:packages 
           ./bin/build.sh
           npm run build:docker
@@ -270,7 +269,6 @@ jobs:
 
       - name: Build all
         run: |
-          npx lerna bootstrap 
           npm run build:packages 
 
       - name: Publish for PR

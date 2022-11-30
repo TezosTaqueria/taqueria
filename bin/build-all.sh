@@ -15,7 +15,6 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
     echo "** Installing NPM dependencies"
     npm ci
-    npm run bootstrap
 
     echo ""
     echo '**********************************************'
