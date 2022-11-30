@@ -1,4 +1,3 @@
-debugger;
 import type { i18n } from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';

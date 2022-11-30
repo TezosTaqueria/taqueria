@@ -7,7 +7,6 @@ import {
 } from './common';
 
 const instantiate_account = async (parsedArgs: RequestArgs.t): Promise<void> => {
-	debugger;
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	try {
