@@ -76,7 +76,7 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 	test('Verify that taqueria SmartPy plugin will display proper message if user tries to compile contract that does not exist', async () => {
 		try {
 			// 1. Run taq compile ${contractName} for contract that does not exist
-			const { stdout, stderr } = await exec(`taq compile test.py`, { cwd: `./${taqueriaProjectPath}` });
+			const { stdout } = await exec(`taq compile test.py`, { cwd: `./${taqueriaProjectPath}` });
 
 			// 2. Verify that output includes next messages:
 			expect(stdout).toContain('Not compiled');
@@ -87,7 +87,7 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 
 	test('Verify that taqueria SmartPy plugin can run SmartPy test using taq test <sourceFile> command', async () => {
 		try {
-			// 1. Copy contract  and tests files from data folder to taqueria project folder
+			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
 
 			// 2. Run taq test ${testFileName}
@@ -100,14 +100,14 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 
 	test('Verify that taqueria SmartPy plugin will output proper error message running taq test <sourceFile> command against invalid test file', async () => {
 		try {
-			// 1. Copy contract  and tests files from data folder to taqueria project folder
-			await exec(`cp e2e/data/hello-tacos-invalid-tests.py ${taqueriaProjectPath}/contracts`);
+			// 1. Copy contract from data folder to taqueria project folder
+			await exec(`cp e2e/data/hello-tacos-failed-tests.py ${taqueriaProjectPath}/contracts`);
 
 			// 2. Run taq test ${testFileName}
-			const { stdout, stderr } = await exec(`taq test hello-tacos-invalid-tests.py`, {
+			const { stdout } = await exec(`taq test hello-tacos-failed-tests.py`, {
 				cwd: `./${taqueriaProjectPath}`,
 			});
-			expect(stdout).toContain('Some tests failed :(');
+			expect(stdout).toContain('Some tests failed');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
