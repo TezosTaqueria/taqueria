@@ -206,9 +206,10 @@ jobs:
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
 
+      - run: npm ci
+
       - name: Build all
         run: |
-          npx lerna bootstrap 
           npm run build:packages 
           ./bin/build.sh
           npm run build:docker
@@ -268,9 +269,10 @@ jobs:
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
 
+      - run: npm ci
+
       - name: Build all
         run: |
-          npx lerna bootstrap 
           npm run build:packages 
 
       - name: Publish for PR
