@@ -13,9 +13,12 @@ type TableRow = { contract: string; artifact: string };
 
 const COMPILE_ERR_MSG: string = 'Not compiled';
 
+const isOutputFormatJSON = (parsedArgs: Opts): boolean => parsedArgs.json;
+
 const getOutputContractFilename = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
-	return join(parsedArgs.config.artifactsDir, `${outputFile}.tz`);
+	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
+	return join(parsedArgs.config.artifactsDir, `${outputFile}${ext}`);
 };
 
 const getOutputStorageFilename = (
@@ -25,15 +28,17 @@ const getOutputStorageFilename = (
 	isDefaultStorage: boolean,
 ): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
+	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
 	const storageName = isDefaultStorage
-		? `${outputFile}.default_storage.tz`
-		: `${outputFile}.storage.${compilationTargetName}.tz`;
+		? `${outputFile}.default_storage${ext}`
+		: `${outputFile}.storage.${compilationTargetName}${ext}`;
 	return join(parsedArgs.config.artifactsDir, storageName);
 };
 
 const getOutputExprFilename = (parsedArgs: Opts, sourceFile: string, compilationTargetName: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
-	const exprName = `${outputFile}.expression.${compilationTargetName}.tz`;
+	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
+	const exprName = `${outputFile}.expression.${compilationTargetName}${ext}`;
 	return join(parsedArgs.config.artifactsDir, exprName);
 };
 
@@ -60,7 +65,7 @@ const copyArtifactsForFirstCompTarget = async (
 		join(
 			getCompilationTargetsDirname(parsedArgs, sourceFile),
 			firstCompTargetName,
-			'step_000_cont_0_contract.tz',
+			isOutputFormatJSON(parsedArgs) ? 'step_000_cont_0_contract.json' : 'step_000_cont_0_contract.tz',
 		),
 		dstContractPath,
 	);
@@ -70,7 +75,7 @@ const copyArtifactsForFirstCompTarget = async (
 		join(
 			getCompilationTargetsDirname(parsedArgs, sourceFile),
 			firstCompTargetName,
-			'step_000_cont_0_storage.tz',
+			isOutputFormatJSON(parsedArgs) ? 'step_000_cont_0_storage.json' : 'step_000_cont_0_storage.tz',
 		),
 		dstDefaultStoragePath,
 	);
@@ -92,7 +97,7 @@ const copyArtifactsForRestCompTargets = async (
 			join(
 				getCompilationTargetsDirname(parsedArgs, sourceFile),
 				compTargetName,
-				'step_000_cont_0_storage.tz',
+				isOutputFormatJSON(parsedArgs) ? 'step_000_cont_0_storage.json' : 'step_000_cont_0_storage.tz',
 			),
 			dstStoragePath,
 		);
@@ -115,7 +120,7 @@ const copyArtifactsForExprCompTargets = async (
 			join(
 				getCompilationTargetsDirname(parsedArgs, sourceFile),
 				compTargetName,
-				'step_000_expression.tz',
+				isOutputFormatJSON(parsedArgs) ? 'step_000_expression.json' : 'step_000_expression.tz',
 			),
 			dstExprPath,
 		);
@@ -154,7 +159,8 @@ const copyRelevantArtifactsForCompTargets = (parsedArgs: Opts, sourceFile: strin
 
 const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputDir = getCompilationTargetsDirname(parsedArgs, sourceFile);
-	return `~/smartpy-cli/SmartPy.sh compile ${getInputFilename(parsedArgs, sourceFile)} ${outputDir}`;
+	const booleanFlags = ' --html --purge ';
+	return `~/smartpy-cli/SmartPy.sh compile ${getInputFilename(parsedArgs, sourceFile)} ${outputDir} ${booleanFlags}`;
 };
 
 const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>

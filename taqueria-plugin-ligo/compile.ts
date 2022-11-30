@@ -32,9 +32,12 @@ const removeExt = (path: string): string => {
 	return path.replace(extRegex, '');
 };
 
+const isOutputFormatJSON = (parsedArgs: Opts): boolean => parsedArgs.json;
+
 const getOutputContractFilename = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
-	return join(parsedArgs.config.artifactsDir, `${outputFile}.tz`);
+	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
+	return join(parsedArgs.config.artifactsDir, `${outputFile}${ext}`);
 };
 
 // Get the contract name that the storage/parameter file is associated with
@@ -52,9 +55,10 @@ const getContractNameForExpr = (sourceFile: string, exprKind: ExprKind): string 
 // If sourceFile is token.storageList.mligo, then it'll return token.storage.{storageName}.tz
 const getOutputExprFilename = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind, exprName: string): string => {
 	const contractName = basename(getContractNameForExpr(sourceFile, exprKind), extname(sourceFile));
+	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
 	const outputFile = exprKind === 'default_storage'
-		? `${contractName}.default_storage.tz`
-		: `${contractName}.${exprKind}.${exprName}.tz`;
+		? `${contractName}.default_storage${ext}`
+		: `${contractName}.${exprKind}.${exprName}${ext}`;
 	return join(parsedArgs.config.artifactsDir, `${outputFile}`);
 };
 
@@ -65,7 +69,8 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile contract`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputContractFilename(parsedArgs, sourceFile)}`;
-	const cmd = `${baseCmd} ${inputFile} ${outputFile}`;
+	const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
+	const cmd = `${baseCmd} ${inputFile} ${outputFile} ${flags}`;
 	return cmd;
 };
 
@@ -77,7 +82,8 @@ const getCompileExprCmd = (parsedArgs: Opts, sourceFile: string, exprKind: ExprK
 		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile ${compilerType}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputExprFilename(parsedArgs, sourceFile, exprKind, exprName)}`;
-	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile}`;
+	const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
+	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile} ${flags}`;
 	return cmd;
 };
 

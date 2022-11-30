@@ -44,7 +44,7 @@ Expression compilation targets in SmartPy produce only the expression Michelson 
 
 ### Options
 
-None for now
+The `--json` flag will make the task emit JSON-encoded Michelson instead of pure Michelson `.tz`
 
 ## The `taq test` Task
 

@@ -11,7 +11,8 @@ type TableRow = { contract: string; testResults: string };
 
 const getTestContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputDir = getCompilationTargetsDirname(parsedArgs, sourceFile);
-	return `~/smartpy-cli/SmartPy.sh test ${getInputFilename(parsedArgs, sourceFile)} ${outputDir}`;
+	const booleanFlags = ' --html --purge ';
+	return `~/smartpy-cli/SmartPy.sh test ${getInputFilename(parsedArgs, sourceFile)} ${outputDir} ${booleanFlags}`;
 };
 
 const testContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>

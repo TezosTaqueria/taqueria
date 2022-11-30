@@ -4,6 +4,7 @@ import { join } from 'path';
 
 export interface CompileOpts extends RequestArgs.ProxyRequestArgs {
 	sourceFile: string;
+	json: boolean;
 }
 
 export interface TestOpts extends RequestArgs.ProxyRequestArgs {

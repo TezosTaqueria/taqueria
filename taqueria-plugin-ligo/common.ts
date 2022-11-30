@@ -8,6 +8,7 @@ export interface LigoOpts extends RequestArgs.ProxyRequestArgs {
 
 export interface CompileOpts extends RequestArgs.ProxyRequestArgs {
 	sourceFile: string;
+	json: boolean;
 }
 
 export interface TestOpts extends RequestArgs.ProxyRequestArgs {
