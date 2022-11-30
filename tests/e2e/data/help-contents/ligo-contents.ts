@@ -43,6 +43,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
+      --json        Emit JSON-encoded Michelson                        [boolean]
 `;
 
 export const ligoNoContracts = `No contracts found to compile. Have you run "taq add-contract [sourceFile]" ?
@@ -61,6 +62,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
+      --json        Emit JSON-encoded Michelson                        [boolean]
 
 Not enough non-option arguments: got 0, need at least 1
 `;

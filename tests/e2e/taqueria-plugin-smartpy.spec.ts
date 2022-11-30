@@ -1,5 +1,4 @@
 import { exec as exec1 } from 'child_process';
-import { createHash } from 'crypto';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import util from 'util';
