@@ -1,4 +1,5 @@
 import { writeJsonFile } from '@taqueria/node-sdk';
+import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
 import { exec } from 'child_process';
@@ -27,7 +28,7 @@ export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
 			const config = (await lastConfig as SanitizedArgs.ParsedConfig);
 			const updatedConfig = { ...config } as SanitizedArgs.ParsedConfig;
 			const sandboxConfig = (updatedConfig.sandbox[parsedArgs.sandbox] as SandboxConfig.t);
-			const accounts = sandboxConfig.accounts ?? {};
+			const accounts = sandboxConfig.accounts ?? { default: NonEmptyString.create(accountName) };
 			accounts[accountName] = accountDetails;
 			(updatedConfig.sandbox[parsedArgs.sandbox] as SandboxConfig.t).accounts = accounts;
 			return updatedConfig;

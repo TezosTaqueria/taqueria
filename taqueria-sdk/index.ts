@@ -612,6 +612,7 @@ export const getDockerImage = (defaultImageName: string, envVarName: string): st
 
 /**
  * Gets the default account associated with a sandbox
+ * TODO: Replace with Taq Operator Account
  */
 export const getDefaultSandboxAccount = (sandbox: Protocol.SandboxConfig.t) => {
 	const accounts = sandbox.accounts ?? {};
