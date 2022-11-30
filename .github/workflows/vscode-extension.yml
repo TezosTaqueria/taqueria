@@ -60,6 +60,8 @@ jobs:
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
 
+      - run: npm ci
+
       - name: Build all
         run: |
           npm run build:packages
@@ -117,6 +119,8 @@ jobs:
 
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
+      
+      - run: npm ci
 
       - name: Build all
         run: |
