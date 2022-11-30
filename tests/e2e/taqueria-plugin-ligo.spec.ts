@@ -19,6 +19,28 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		} catch (_) {}
 	});
 
+	// Remove all files from artifacts folder without removing folder itself
+	afterEach(async () => {
+		try {
+			const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
+			for (const file of files) {
+				await fsPromises.rm(path.join(`${taqueriaProjectPath}/artifacts/`, file));
+			}
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
+	// Clean up process to remove taquified project folder
+	// Comment if need to debug
+	afterAll(async () => {
+		try {
+			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+		} catch (error) {
+			throw new Error(`error: ${error}`);
+		}
+	});
+
 	test('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
 		try {
 			const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
@@ -212,28 +234,6 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 					'sourceFile': 'invalid-contract.mligo',
 				},
 			});
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
-
-	// Remove all files from artifacts folder without removing folder itself
-	afterEach(async () => {
-		try {
-			const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
-			for (const file of files) {
-				await fsPromises.rm(path.join(`${taqueriaProjectPath}/artifacts/`, file));
-			}
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
-
-	// Clean up process to remove taquified project folder
-	// Comment if need to debug
-	afterAll(async () => {
-		try {
-			fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
