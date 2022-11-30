@@ -1,4 +1,4 @@
-import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { execCmd, getArch, getArtifactsDir, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import { CompileOpts as Opts, emitExternalError, getInputFilename, getLigoDockerImage } from './common';
@@ -32,9 +32,12 @@ const removeExt = (path: string): string => {
 	return path.replace(extRegex, '');
 };
 
-const getOutputFilename = (parsedArgs: Opts, sourceFile: string): string => {
+const isOutputFormatJSON = (parsedArgs: Opts): boolean => parsedArgs.json;
+
+const getOutputContractFilename = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
-	return join(parsedArgs.config.artifactsDir ?? 'artifacts', `${outputFile}.tz`);
+	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
+	return join(getArtifactsDir(parsedArgs), `${outputFile}${ext}`);
 };
 
 // Get the contract name that the storage/parameter file is associated with
@@ -50,12 +53,13 @@ const getContractNameForExpr = (sourceFile: string, exprKind: ExprKind): string 
 };
 
 // If sourceFile is token.storageList.mligo, then it'll return token.storage.{storageName}.tz
-const getOutputExprFileName = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind, exprName: string): string => {
+const getOutputExprFilename = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind, exprName: string): string => {
 	const contractName = basename(getContractNameForExpr(sourceFile, exprKind), extname(sourceFile));
+	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
 	const outputFile = exprKind === 'default_storage'
-		? `${contractName}.default_storage.tz`
-		: `${contractName}.${exprKind}.${exprName}.tz`;
-	return join(parsedArgs.config.artifactsDir ?? 'artifacts', `${outputFile}`);
+		? `${contractName}.default_storage${ext}`
+		: `${contractName}.${exprKind}.${exprName}${ext}`;
+	return join(getArtifactsDir(parsedArgs), `${outputFile}`);
 };
 
 const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
@@ -64,8 +68,9 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 	const baseCmd =
 		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile contract`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
-	const outputFile = `-o ${getOutputFilename(parsedArgs, sourceFile)}`;
-	const cmd = `${baseCmd} ${inputFile} ${outputFile}`;
+	const outputFile = `-o ${getOutputContractFilename(parsedArgs, sourceFile)}`;
+	const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
+	const cmd = `${baseCmd} ${inputFile} ${outputFile} ${flags}`;
 	return cmd;
 };
 
@@ -76,8 +81,9 @@ const getCompileExprCmd = (parsedArgs: Opts, sourceFile: string, exprKind: ExprK
 	const baseCmd =
 		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile ${compilerType}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
-	const outputFile = `-o ${getOutputExprFileName(parsedArgs, sourceFile, exprKind, exprName)}`;
-	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile}`;
+	const outputFile = `-o ${getOutputExprFilename(parsedArgs, sourceFile, exprKind, exprName)}`;
+	const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
+	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile} ${flags}`;
 	return cmd;
 };
 
@@ -89,7 +95,7 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 			if (stderr.length > 0) sendWarn(stderr);
 			return {
 				contract: sourceFile,
-				artifact: getOutputFilename(parsedArgs, sourceFile),
+				artifact: getOutputContractFilename(parsedArgs, sourceFile),
 			};
 		})
 		.catch(err => {
@@ -109,7 +115,7 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 				if (stderr.length > 0) sendWarn(stderr);
 				return {
 					contract: sourceFile,
-					artifact: getOutputExprFileName(parsedArgs, sourceFile, exprKind, exprName),
+					artifact: getOutputExprFilename(parsedArgs, sourceFile, exprKind, exprName),
 				};
 			})
 			.catch(err => {
@@ -120,11 +126,14 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 				};
 			});
 
-const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind): Promise<TableRow[]> =>
+const getExprNames = (parsedArgs: Opts, sourceFile: string): Promise<string[]> =>
 	readFile(getInputFilename(parsedArgs, sourceFile), 'utf8')
-		.then(data => data.match(/(?<=\n\s*(let|const)\s+)[a-zA-Z0-9_]+/g))
+		.then(data => data.match(/(?<=\n\s*(let|const)\s+)[a-zA-Z0-9_]+/g) ?? []);
+
+const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind): Promise<TableRow[]> =>
+	getExprNames(parsedArgs, sourceFile)
 		.then(exprNames => {
-			if (!exprNames) return [];
+			if (exprNames.length === 0) return [];
 			const firstExprName = exprNames.slice(0, 1)[0];
 			const restExprNames = exprNames.slice(1, exprNames.length);
 			const firstExprKind = isStorageKind(exprKind) ? 'default_storage' : 'parameter';

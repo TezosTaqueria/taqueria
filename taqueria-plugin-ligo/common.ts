@@ -8,6 +8,7 @@ export interface LigoOpts extends ProxyTaskArgs.t {
 
 export interface CompileOpts extends ProxyTaskArgs.t {
 	sourceFile: string;
+	json: boolean;
 }
 
 export interface TestOpts extends RequestArgs.t {
@@ -30,6 +31,7 @@ export const getInputFilename = (parsedArgs: UnionOpts, sourceFile: string): str
 	join(parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
 
 export const emitExternalError = (err: unknown, sourceFile: string): void => {
-	sendErr(`\n=== For ${sourceFile} ===`);
+	sendErr(`\n=== Error messages for ${sourceFile} ===`);
 	err instanceof Error ? sendErr(err.message.replace(/Command failed.+?\n/, '')) : sendErr(err as any);
+	sendErr(`\n===`);
 };
