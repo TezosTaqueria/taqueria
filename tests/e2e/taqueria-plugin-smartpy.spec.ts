@@ -39,7 +39,7 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 		}
 	});
 
-	test('Verify that the smartpy plugin exposes the associated commands in the help menu', async () => {
+	test('Verify that the SmartPy plugin exposes the associated commands in the help menu', async () => {
 		try {
 			const { stdout } = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(stdout).toContain('taq compile <sourceFile>');
@@ -48,7 +48,7 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 		}
 	});
 
-	test('Verify that the compile task of the smartpy plugin exposes the associated options in the help menu', async () => {
+	test('Verify that the compile task of the SmartPy plugin exposes the associated options in the help menu', async () => {
 		try {
 			const { stdout } = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
 			expect(stdout).toContain('--json');
@@ -57,7 +57,7 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 		}
 	});
 
-	test('Verify that taqueria smartpy plugin can compile one contract using taq compile <sourceFile> command', async () => {
+	test('Verify that taqueria SmartPy plugin can compile one contract using taq compile <sourceFile> command', async () => {
 		try {
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
@@ -73,7 +73,7 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 		}
 	});
 
-	test('Verify that taqueria smartpy plugin will display proper message if user tries to compile contract that does not exist', async () => {
+	test('Verify that taqueria SmartPy plugin will display proper message if user tries to compile contract that does not exist', async () => {
 		try {
 			// 1. Run taq compile ${contractName} for contract that does not exist
 			const { stdout, stderr } = await exec(`taq compile test.py`, { cwd: `./${taqueriaProjectPath}` });
@@ -85,7 +85,7 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 		}
 	});
 
-	test('Verify that taqueria ligo plugin can run ligo test using taq test <sourceFile> command', async () => {
+	test('Verify that taqueria SmartPy plugin can run SmartPy test using taq test <sourceFile> command', async () => {
 		try {
 			// 1. Copy contract  and tests files from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
@@ -98,13 +98,13 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 		}
 	});
 
-	test('Verify that taqueria ligo plugin will output proper error message running taq test <sourceFile> command against invalid test file', async () => {
+	test('Verify that taqueria SmartPy plugin will output proper error message running taq test <sourceFile> command against invalid test file', async () => {
 		try {
 			// 1. Copy contract  and tests files from data folder to taqueria project folder
-			await exec(`cp e2e/data/hello-tacos-invalid-tests.mligo ${taqueriaProjectPath}/contracts`);
+			await exec(`cp e2e/data/hello-tacos-invalid-tests.py ${taqueriaProjectPath}/contracts`);
 
 			// 2. Run taq test ${testFileName}
-			const { stdout, stderr } = await exec(`taq test hello-tacos-invalid-tests.mligo`, {
+			const { stdout, stderr } = await exec(`taq test hello-tacos-invalid-tests.py`, {
 				cwd: `./${taqueriaProjectPath}`,
 			});
 			expect(stdout).toContain('Some tests failed :(');
