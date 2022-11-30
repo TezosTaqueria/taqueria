@@ -97,7 +97,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		}
 	});
 
-	test('Verify that taqueria ligo plugin can compile one contract using compile [sourceFile] command', async () => {
+	test('Verify that taqueria ligo plugin can compile one contract using compile <sourceFile> command', async () => {
 		try {
 			// 1. Copy contract from data folder to taqueria project folder
 			await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
