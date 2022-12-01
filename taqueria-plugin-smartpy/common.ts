@@ -18,8 +18,13 @@ type UnionOpts = CompileOpts | TestOpts;
 
 const SMARTPY_ARTIFACTS_DIR = '.smartpy';
 
+// Should point to the latest version, so it needs to be updated as part of our release process.
+// Currently this points to v0.15.0
+const SMARTPY_LATEST_INSTALLER =
+	'https://smartpy.io/releases/20221026-28e8c18e46035c353804eb5fd725573c5d434e8a/cli/install.sh';
+
 const SMARTPY_INSTALL_CMD =
-	'curl -s https://smartpy.io/cli/install.sh > ~/SmartPyCliInstaller.sh; bash ~/SmartPyCliInstaller.sh --yes; rm ~/SmartPyCliInstaller.sh';
+	`curl -s ${SMARTPY_LATEST_INSTALLER} > ~/SmartPyCliInstaller.sh; bash ~/SmartPyCliInstaller.sh --yes; rm ~/SmartPyCliInstaller.sh`;
 
 export const addPyExtensionIfMissing = (sourceFile: string): string =>
 	/\.py$/.test(sourceFile) ? sourceFile : `${sourceFile}.py`;
