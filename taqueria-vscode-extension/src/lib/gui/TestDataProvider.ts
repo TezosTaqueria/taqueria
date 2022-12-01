@@ -13,6 +13,11 @@ export class TestDataProvider implements vscode.TreeDataProvider<TestTreeItem>, 
 		if (element) {
 			return [];
 		}
+		const testFolders = await this.findTestFolders();
+		return testFolders.map(folder => new TestTreeItem(folder));
+	}
+
+	async findTestFolders(): Promise<string[]> {
 		const testConfigFiles = await vscode.workspace.findFiles('**/jest.config.js', '**/node_modules/**');
 		const mainFolder = this.helper.getMainWorkspaceFolder();
 		if (!mainFolder) {
@@ -25,7 +30,7 @@ export class TestDataProvider implements vscode.TreeDataProvider<TestTreeItem>, 
 		let testFolders = testConfigFiles.map(uri => path.dirname(uri.fsPath).replace(mainFolderPath, ''));
 		testFolders = testFolders.filter(x => x !== '.taq');
 		testFolders.sort();
-		return testFolders.map(folder => new TestTreeItem(folder));
+		return testFolders;
 	}
 
 	private _onDidChangeTreeData: vscode.EventEmitter<TestTreeItem | undefined | null | void> = new vscode.EventEmitter<
