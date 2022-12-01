@@ -15,6 +15,9 @@ To install the Tezos Client plugin on a Taqueria project, navigate to the projec
 taq install @taqueria/plugin-tezos-client
 ```
 
+> ### :page_with_curl: Note
+> You can override the Tezos-Client version used by the plugin by creating the environment variable `TAQ_TEZOS_CLIENT_IMAGE` and setting it to your desired Tezos-Client Docker image
+
 ## The `taq typecheck` task
 
 Basic usage is:

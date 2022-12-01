@@ -59,7 +59,8 @@ Commands:
                                    from the abstractions provided by Taqueria
   taq compile                     Provided by more than one plugin. The option -
                                   -plugin is required.
-  taq test <sourceFile>           Test a smart contract written in LIGO
+  taq test                        Provided by more than one plugin. The option -
+                                  -plugin is required.
   taq create <template>           Create files from pre-existing templates
 
 Options:
