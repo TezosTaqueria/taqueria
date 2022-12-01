@@ -243,12 +243,28 @@
 				"icon": "$(combine)"
 			},
 			{
+				"command": "taqueria.generate_test_stub_current_file",
+				"category": "Taqueria",
+				"title": "Generate Test Stub For Current File",
+				"shortTitle": "generate test stub for current file",
+				"enablement": "@taqueria/plugin-jest && resourceExtname == .tz",
+				"icon": "$(beaker)"
+			},
+			{
 				"command": "taqueria.compile_pick_file",
 				"category": "Taqueria",
 				"title": "Compile (Pick File)",
 				"shortTitle": "compile pick file",
 				"enablement": "@taqueria/plugin-any-compiler",
 				"icon": "$(combine)"
+			},
+			{
+				"command": "taqueria.generate_test_stub_pick_file",
+				"category": "Taqueria",
+				"title": "Generate Test Stub (Pick File)",
+				"shortTitle": "generate test stub pick file",
+				"enablement": "@taqueria/plugin-jest && @taqueria/plugin-any-compiler",
+				"icon": "$(beaker)"
 			},
 			{
 				"command": "taqueria.compile_smartpy",
@@ -367,6 +383,14 @@
 				"icon": "$(run)"
 			},
 			{
+				"command": "taqueria.generate_test_stub",
+				"category": "Taqueria",
+				"title": "Generate Test Stub",
+				"shortTitle": "generate test stub",
+				"enablement": "@taqueria/plugin-jest",
+				"icon": "$(beaker)"
+			},
+			{
 				"command": "taqueria.add_contract",
 				"category": "Taqueria",
 				"title": " Add contract to registry",
@@ -441,6 +465,10 @@
 				},
 				{
 					"command": "taqueria.compile_archetype",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.generate_test_stub",
 					"when": "false"
 				},
 				{
@@ -546,6 +574,11 @@
 				},
 				{
 					"command": "taqueria.typecheck",
+					"when": "view == taqueria-artifacts",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.generate_test_stub",
 					"when": "view == taqueria-artifacts",
 					"group": "inline"
 				},
