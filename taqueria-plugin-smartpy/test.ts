@@ -4,6 +4,8 @@ import {
 	emitExternalError,
 	getCompilationTargetsDirname,
 	getInputFilename,
+	getSmartPyCli,
+	installSmartPyCliIfNotExist,
 	TestOpts as Opts,
 } from './common';
 
@@ -12,11 +14,12 @@ type TableRow = { contract: string; testResults: string };
 const getTestContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputDir = getCompilationTargetsDirname(parsedArgs, sourceFile);
 	const booleanFlags = ' --html --purge ';
-	return `~/smartpy-cli/SmartPy.sh test ${getInputFilename(parsedArgs, sourceFile)} ${outputDir} ${booleanFlags}`;
+	return `${getSmartPyCli()} test ${getInputFilename(parsedArgs, sourceFile)} ${outputDir} ${booleanFlags}`;
 };
 
 const testContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
 	getArch()
+		.then(() => installSmartPyCliIfNotExist())
 		.then(() => getTestContractCmd(parsedArgs, sourceFile))
 		.then(execCmd)
 		.then(({ stdout, stderr }) => {
