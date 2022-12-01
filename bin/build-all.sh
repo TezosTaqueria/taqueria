@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e # exiting on error
 
 if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
