@@ -233,6 +233,11 @@ export class VsCodeHelper {
 		this.exposeOriginateTask('originate', 'getFromCommand');
 		this.exposeOriginateTask('originate_current_file', 'currentFile');
 		this.exposeOriginateTask('originate_pick_file', 'openDialog');
+
+		this.exposeGenerateTestStubTask('generate_test_stub', 'getFromCommand');
+		this.exposeGenerateTestStubTask('generate_test_stub_current_file', 'currentFile');
+		this.exposeGenerateTestStubTask('generate_test_stub_pick_file', 'openDialog');
+
 		this.exposeRefreshSandBoxDataCommand();
 		this.exposeShowEntrypointParametersCommand();
 		this.exposeShowOperationDetailsCommand();
@@ -692,7 +697,7 @@ export class VsCodeHelper {
 					return;
 				}
 				await this.proxyToTaqAndShowOutput(
-					`originate -e ${environmentName} ${fileName ?? ''}`,
+					`originate -e ${environmentName} ${fileName}`,
 					{
 						finishedTitle: 'originated contracts',
 						progressTitle: 'originating contracts',
@@ -702,6 +707,63 @@ export class VsCodeHelper {
 				);
 			},
 		);
+	}
+
+	async exposeGenerateTestStubTask(
+		cmdId: string,
+		fileSelectionBehavior: 'getFromCommand' | 'currentFile' | 'openDialog',
+	) {
+		this.registerCommand(
+			cmdId,
+			async (arg?: HasFileName | EnvironmentTreeItem | api.Uri | undefined) => {
+				const { config, pathToDir } = this.observableConfig.currentConfig;
+				if (!config || !pathToDir) {
+					return;
+				}
+				const fileName = await this.getFileNameForOperationsOnContracts(
+					cmdId,
+					fileSelectionBehavior,
+					config,
+					'originate',
+					'artifacts',
+					arg instanceof EnvironmentTreeItem ? undefined : arg,
+				);
+				if (!fileName) {
+					return;
+				}
+				const testFolder = await this.getTestFolder();
+				if (!testFolder) {
+					return;
+				}
+				await this.proxyToTaqAndShowOutput(
+					`create contract-test ${fileName} --partition ${testFolder}`,
+					{
+						finishedTitle: 'originated contracts',
+						progressTitle: 'originating contracts',
+					},
+					pathToDir,
+					true,
+				);
+			},
+		);
+	}
+
+	async getTestFolder(): Promise<string | undefined> {
+		const testFolders = await this.testDataProvider?.findTestFolders();
+		if (!testFolders || testFolders.length === 0) {
+			this.logHelper.showOutput(
+				"Could not find a test partition. Maybe running the command 'Create Test Folder' Can fix this.",
+			);
+			return undefined;
+		}
+		if (testFolders.length === 1) {
+			return testFolders[0];
+		}
+		const testFolder = await this.vscode.window.showQuickPick(testFolders, {
+			canPickMany: false,
+			title: 'Please choose the test partition',
+		});
+		return testFolder;
 	}
 
 	async getEnvironment(config: Util.TaqifiedDir) {
@@ -1116,7 +1178,7 @@ export class VsCodeHelper {
 
 	exposeTestSetupCommand() {
 		this.registerCommand(
-			COMMAND_PREFIX + 'create_test_folder',
+			'create_test_folder',
 			async () => {
 				const mainFolder = this.getMainWorkspaceFolder();
 				if (!mainFolder) {
@@ -1128,13 +1190,14 @@ export class VsCodeHelper {
 					canSelectMany: false,
 					openLabel: 'Select',
 					title: 'Select a Folder to setup as test',
+					defaultUri: mainFolder,
 				});
 				if (!folders || folders.length !== 1) {
 					return;
 				}
 				const folder = folders[0].path.replace(mainFolder.fsPath + '/', '');
 				await this.proxyToTaqAndShowOutput(
-					`test --init ${folder}`,
+					`--plugin @taqueria/plugin-jest test --init ${folder}`,
 					{
 						finishedTitle: `Setup folder ${folder} as test`,
 						progressTitle: `Setting up folder ${folder} as test`,
@@ -1152,7 +1215,7 @@ export class VsCodeHelper {
 			async (item: TestTreeItem) => {
 				const folder = item.relativePath;
 				await this.proxyToTaqAndShowOutput(
-					`test ${folder}`,
+					`--plugin @taqueria/plugin-jest test ${folder}`,
 					{
 						finishedTitle: `Run tests from ${folder}`,
 						progressTitle: `Running tests from ${folder}`,
