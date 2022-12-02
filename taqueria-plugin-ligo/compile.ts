@@ -287,3 +287,7 @@ const compile = (parsedArgs: Opts): Promise<void> => {
 };
 
 export default compile;
+export const ___TEST___ = {
+	getContractNameForExpr,
+	getOutputExprFilename,
+};
