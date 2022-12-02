@@ -1,10 +1,8 @@
 import { exec as exec1 } from 'child_process';
-import { createHash } from 'crypto';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import util from 'util';
-import * as contents from './data/help-contents/ligo-contents';
-import { checkFolderExistsWithTimeout, generateTestProject } from './utils/utils';
+import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
 const taqueriaProjectPath = 'scrap/auto-test-multi-test-plugins';

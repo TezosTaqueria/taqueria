@@ -2,7 +2,7 @@
 # Taqueria LIGO Plugin
 <% } %>
 
-The LIGO plugin provides a task to compile LIGO smart contracts to Michelson `.tz` files
+The LIGO plugin provides tasks to work with LIGO smart contracts such as compiling and testing
 
 ## Requirements
 
@@ -58,7 +58,7 @@ Lastly, `taq compile hello.mligo` will compile `hello.mligo` and emit `hello.tz`
 
 ### Options
 
-None for now
+The `--json` flag will make the task emit JSON-encoded Michelson instead of pure Michelson `.tz`
 
 ## The `taq test` Task
 

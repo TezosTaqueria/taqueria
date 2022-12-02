@@ -60,9 +60,10 @@ jobs:
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
 
+      - run: npm ci
+
       - name: Build all
         run: |
-          npx lerna bootstrap --force-local
           npm run build:packages
       
       - name: Compile TS
@@ -118,10 +119,11 @@ jobs:
 
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
+      
+      - run: npm ci
 
       - name: Build all
         run: |
-          npx lerna bootstrap --force-local
           npm run build:packages
       
       - name: Compile TS
