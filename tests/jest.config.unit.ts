@@ -85,7 +85,6 @@ export default {
 		'tsx',
 		'json',
 		'node',
-		'mts',
 	],
 
 	// A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
@@ -129,7 +128,7 @@ export default {
 		'<rootDir>/taqueria-sdk',
 		'<rootDir>/tests/unit/taqueria-sdk',
 		'<rootDir>/taqueria-plugin-ligo',
-		'<rootDir>/tests/unit/ligo-plugin-tests',
+		// '<rootDir>/tests/unit/ligo-plugin-tests',
 	],
 
 	// Allows you to use a custom runner instead of Jest's default test runner

@@ -1,7 +1,6 @@
-import { ___TEST___ } from '../../../taqueria-plugin-ligo/compile';
+import { ___TEST___, ExprKind } from '../../../taqueria-plugin-ligo/compile';
 
 describe('testing Ligo compile.ts getContractNameForExpr', () => {
-	type ExprKind = 'storage' | 'default_storage' | 'parameter';
 	const { getContractNameForExpr } = ___TEST___;
 
 	test('verify get contract name for storage type', () => {
