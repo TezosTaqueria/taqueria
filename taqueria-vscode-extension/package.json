@@ -239,7 +239,7 @@
 				"category": "Taqueria",
 				"title": "Compile Current File",
 				"shortTitle": "compile current file",
-				"enablement": "resourceExtname in @taqueria/supported-smart-contract-extensions",
+				"enablement": "resourceExtname in @taqueria/supported-smart-contract-extensions && editorFocus",
 				"icon": "$(combine)"
 			},
 			{

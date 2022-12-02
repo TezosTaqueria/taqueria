@@ -1105,6 +1105,15 @@ export class VsCodeHelper {
 			}
 		}
 		if (fileSelectionBehavior === 'currentFile') {
+			let viewColumn = this.vscode.window.activeTextEditor?.viewColumn;
+			if (!viewColumn) {
+				this.logHelper.showLog(
+					OutputLevels.warn,
+					`Focused window is not a text editor.`,
+				);
+				return;
+			}
+
 			let absoluteFilePath = this.vscode.window.activeTextEditor?.document.uri.path;
 			if (!absoluteFilePath) {
 				this.logHelper.showLog(
