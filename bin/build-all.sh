@@ -20,6 +20,8 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     fi
     echo "** Dependency checks passed"
 
+    set -e # exiting on error
+
     echo ""
     echo '**********************************************'
     echo "** Installing NPM dependencies"
