@@ -5,7 +5,7 @@ import { CompileOpts as Opts, emitExternalError, getInputFilename, getLigoDocker
 
 type TableRow = { contract: string; artifact: string };
 
-type ExprKind = 'storage' | 'default_storage' | 'parameter';
+export type ExprKind = 'storage' | 'default_storage' | 'parameter';
 
 const COMPILE_ERR_MSG: string = 'Not compiled';
 
