@@ -2,10 +2,12 @@ import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import path from 'path';
 import utils from 'util';
-import { generateTestProject, sleep } from './utils/utils';
+import { generateTestProject, waitFor } from './utils/utils';
 const exec = utils.promisify(exec1);
 
 const taqueriaProjectPath = 'scrap/auto-test-persistent-state';
+
+jest.setTimeout(400000);
 
 describe('Test CLI Persistent State', () => {
 	beforeEach(() => fsPromises.rm(taqueriaProjectPath, { force: true, recursive: true }));
@@ -14,32 +16,48 @@ describe('Test CLI Persistent State', () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo']);
 		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 		await exec(`taq compile hello-tacos.mligo`, { cwd: taqueriaProjectPath });
-		expect(fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'development-state.json'))).resolves.not.toBeFalsy();
+		const result = await waitFor(
+			() => fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'development-state.json')),
+		);
+
+		return expect(result).toBeTruthy();
 	});
 
 	test('Ensure that state file is named after a valid environment when there is no default in the config', async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo']);
-		await exec(`cp e2e/data/config-without-default-environment.json ${taqueriaProjectPath}/contracts`);
+		await exec(`cp e2e/data/config-without-default-environment.json ${taqueriaProjectPath}/.taq/config.json`);
 		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 		await exec(`taq compile hello-tacos.mligo`, { cwd: taqueriaProjectPath });
-		expect(fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'development-state.json'))).resolves.not.toBeFalsy();
+		const result = await waitFor(
+			() => fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'development-state.json')),
+		);
+
+		expect(result).toBeTruthy();
 	});
 
 	test('Ensure that state file is named after testing environment when the default in the config is set to testing', async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo']);
-		await exec(`cp e2e/data/config-without-default-environment-testing.json ${taqueriaProjectPath}/contracts`);
+		await exec(`cp e2e/data/config-default-environment-testing.json ${taqueriaProjectPath}/.taq/config.json`);
 		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 		await exec(`taq compile hello-tacos.mligo`, { cwd: taqueriaProjectPath });
-		expect(fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'testing-state.json'))).resolves.not.toBeFalsy();
+
+		const result = await waitFor(
+			() => fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'testing-state.json')),
+		);
+
+		expect(result).toBeTruthy();
 	});
 
 	test('Ensure that state file is named after testing environment when the env is specified using the CLI', async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo']);
 		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
 		await exec(`taq compile -e testing hello-tacos.mligo`, { cwd: taqueriaProjectPath });
-		await sleep(2000); // for some reason this is needed to give time for the testing-state.json file to be created
-		await exec(`ls -l ${taqueriaProjectPath}/.taq`);
-		expect(fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'testing-state.json'))).resolves.not.toBeFalsy();
+
+		const result = await waitFor(
+			() => fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'testing-state.json')),
+		);
+
+		expect(result).toBeTruthy();
 	});
 
 	afterAll(() => fsPromises.rm(taqueriaProjectPath, { force: true, recursive: true }));
