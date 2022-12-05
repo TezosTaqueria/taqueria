@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e # exiting on error
 
 if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
@@ -9,7 +8,19 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo ""
     echo '**********************************************'
     echo "** Checking Dependencies"
-    docker ps > /dev/null
+    (
+        set -e
+        docker ps > /dev/null
+        echo "✅ Docker is installed, running, and the user has permission."
+    )
+    errorCode=$?
+    if [ $errorCode -ne 0 ]; then
+        echo "❌ Docker is not installed, not running, or the user needs permission."
+        exit $errorCode
+    fi
+    echo "** Dependency checks passed"
+
+    set -e # exiting on error
 
     echo ""
     echo '**********************************************'

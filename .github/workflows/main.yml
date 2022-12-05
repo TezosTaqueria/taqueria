@@ -129,7 +129,7 @@ jobs:
   gather-info-for-e2e-tests:
     runs-on: ubuntu-latest
     needs:
-      - build-binaries
+      - workflow-setup
 
     if: ${{ always() && !(contains(needs.*.result, 'failure')) && github.event_name != 'release' }}
 
@@ -189,7 +189,6 @@ jobs:
       SCAFFOLDING_PAT: ${{ secrets.SCAFFOLDING_PAT }}
 
     needs:
-      - build-binaries
       - gather-info-for-e2e-tests
     if: ${{ github.event_name != 'release' && !(startsWith(github.ref, 'refs/tags/v')) }}
     steps:
@@ -260,11 +259,6 @@ jobs:
           scope: "${{ env.SCOPE }}"
           node-version: lts/gallium
           cache: "npm"
-
-      - name: Setup Deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: "1.23.4"
 
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
