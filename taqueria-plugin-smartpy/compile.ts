@@ -7,6 +7,8 @@ import {
 	emitExternalError,
 	getCompilationTargetsDirname,
 	getInputFilename,
+	getSmartPyCli,
+	installSmartPyCliIfNotExist,
 } from './common';
 
 type TableRow = { contract: string; artifact: string };
@@ -160,11 +162,12 @@ const copyRelevantArtifactsForCompTargets = (parsedArgs: Opts, sourceFile: strin
 const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputDir = getCompilationTargetsDirname(parsedArgs, sourceFile);
 	const booleanFlags = ' --html --purge ';
-	return `~/smartpy-cli/SmartPy.sh compile ${getInputFilename(parsedArgs, sourceFile)} ${outputDir} ${booleanFlags}`;
+	return `${getSmartPyCli()} compile ${getInputFilename(parsedArgs, sourceFile)} ${outputDir} ${booleanFlags}`;
 };
 
 const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
 	getArch()
+		.then(() => installSmartPyCliIfNotExist())
 		.then(() => getCompileContractCmd(parsedArgs, sourceFile))
 		.then(execCmd)
 		.then(({ stderr }) => {

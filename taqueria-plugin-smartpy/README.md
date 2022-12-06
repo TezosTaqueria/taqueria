@@ -7,6 +7,7 @@ The SmartPy plugin provides tasks to work with SmartPy smart contracts such as c
 - Taqueria v0.24.2 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
+- Python 3 and pdoc
 
 ## Installation
 

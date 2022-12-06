@@ -31,7 +31,7 @@ const ECAD_FLEXTESA_IMAGE_ENV_VAR = 'TAQ_ECAD_FLEXTESA_IMAGE';
 const getDefaultDockerImage = (opts: Opts) => `ghcr.io/ecadlabs/taqueria-flextesa:${opts.setVersion}-${opts.setBuild}`;
 
 export const getUniqueSandboxName = async (sandboxName: string, projectDir: string) => {
-	const hash = await stringToSHA256(projectDir);
+	const hash = await stringToSHA256(sandboxName + projectDir);
 	return `${sandboxName.substring(0, 10)}-${hash.substring(0, 5)}`;
 };
 

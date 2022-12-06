@@ -43,6 +43,7 @@ describe('E2E Testing for taqueria SmartPy plugin', () => {
 		try {
 			const { stdout } = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(stdout).toContain('taq compile <sourceFile>');
+			expect(stdout).toContain('taq test <sourceFile>');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}

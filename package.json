@@ -8,7 +8,6 @@
 	},
 	"scripts": {
 		"test": "yarn",
-		"bootstrap": "lerna bootstrap --force-local",
 		"build-types": "npm run build-types -w taqueria-protocol",
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
