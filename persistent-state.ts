@@ -20,7 +20,9 @@ const {
 	stderr: Deno.stderr,
 });
 
-const toTaskId = (task: Verb.t, plugin: string) => `${plugin}.${task}.${Timestamp.now()}`;
+const currentTime = () => Timestamp.create(Date.now());
+
+const toTaskId = (task: Verb.t, plugin: string) => `${plugin}.${task}.${currentTime()}`;
 
 export const getStateAbspath = (parsedArgs: SanitizedArgs.t) =>
 	joinPaths(
@@ -56,7 +58,7 @@ const newTaskEntry = (task: Verb.t, plugin: string, output: unknown) => {
 		plugin,
 		task,
 		output: typeof output === 'object' ? Object(output).data : null,
-		time: Timestamp.now(),
+		time: currentTime(),
 	};
 
 	return taskEntry;

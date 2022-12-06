@@ -1,4 +1,4 @@
-import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { execCmd, getArch, getArtifactsDir, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { copyFile, readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import {
@@ -20,7 +20,7 @@ const isOutputFormatJSON = (parsedArgs: Opts): boolean => parsedArgs.json;
 const getOutputContractFilename = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
 	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
-	return join(parsedArgs.config.artifactsDir, `${outputFile}${ext}`);
+	return join(getArtifactsDir(parsedArgs), `${outputFile}${ext}`);
 };
 
 const getOutputStorageFilename = (
@@ -34,14 +34,14 @@ const getOutputStorageFilename = (
 	const storageName = isDefaultStorage
 		? `${outputFile}.default_storage${ext}`
 		: `${outputFile}.storage.${compilationTargetName}${ext}`;
-	return join(parsedArgs.config.artifactsDir, storageName);
+	return join(getArtifactsDir(parsedArgs), storageName);
 };
 
 const getOutputExprFilename = (parsedArgs: Opts, sourceFile: string, compilationTargetName: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
 	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
 	const exprName = `${outputFile}.expression.${compilationTargetName}${ext}`;
-	return join(parsedArgs.config.artifactsDir, exprName);
+	return join(getArtifactsDir(parsedArgs), exprName);
 };
 
 const getCompilationTargetNames = (

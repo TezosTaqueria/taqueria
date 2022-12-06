@@ -37,7 +37,7 @@
 	},
 	"devDependencies": {
 		"@types/prompts": "^2.0.14",
-		"parcel": "^2.6.0",
+		"parcel": "^2.8.0",
 		"typescript": "4.7.2"
 	}
 }

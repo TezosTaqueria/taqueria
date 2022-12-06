@@ -1,3 +1,20 @@
+import {
+	EphemeralState,
+	i18n,
+	InstalledPlugin,
+	NonEmptyString,
+	Option,
+	ParsedTemplate,
+	PluginInfo,
+	PluginJsonResponse,
+	PluginResponseEncoding,
+	PositionalArg,
+	SanitizedAbsPath,
+	SanitizedArgs,
+	ScaffoldConfig,
+	Task,
+} from '@taqueria/protocol';
+import * as PluginActionName from '@taqueria/protocol/PluginActionName';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import {
 	attemptP,
@@ -30,21 +47,6 @@ import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
 import { addNewProvision, apply, loadProvisions, plan } from './provisions.ts';
 import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
-import {
-	EphemeralState,
-	i18n,
-	InstalledPlugin,
-	Option,
-	ParsedTemplate,
-	PluginInfo,
-	PluginJsonResponse,
-	PluginResponseEncoding,
-	PositionalArg,
-	SanitizedAbsPath,
-	SanitizedArgs,
-	ScaffoldConfig,
-	Task,
-} from './taqueria-protocol/taqueria-protocol-types.ts';
 import type { CLIConfig, DenoArgs, EnvKey, EnvVars } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
@@ -453,8 +455,8 @@ const scaffoldProject = (i18n: i18n.t) =>
 	({ scaffoldUrl, scaffoldProjectDir, maxConcurrency }: SanitizedArgs.ScaffoldTaskArgs) =>
 		go(
 			function*() {
-				const abspath = yield SanitizedAbsPath.make(scaffoldProjectDir);
-				const destDir = yield doesPathNotExistOrIsEmptyDir(abspath);
+				const abspath: SanitizedAbsPath.t = yield SanitizedAbsPath.make(scaffoldProjectDir);
+				const destDir: SanitizedAbsPath.t = yield doesPathNotExistOrIsEmptyDir(abspath);
 
 				log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
 				yield gitClone(scaffoldUrl)(destDir);
@@ -640,7 +642,7 @@ const exposeTemplates = (
 
 						if (isComposite) {
 							if (parsedArgs.plugin) {
-								const installedPlugin = config.plugins.find(plugin => plugin.name === parsedArgs.plugin);
+								const installedPlugin = config.plugins?.find(plugin => plugin.name === parsedArgs.plugin);
 								if (installedPlugin) {
 									return handleTemplate(parsedArgs, config, installedPlugin, state, pluginLib, i18n);
 								}
@@ -670,10 +672,16 @@ const handleTemplate = (
 	if (template) {
 		return template.handler === 'function'
 			? pipe(
-				pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)('proxyTemplate', template.encoding)({
-					...parsedArgs,
-					action: 'proxyTemplate',
-				}),
+				PluginActionName.make('proxyTemplate'),
+				chain(action =>
+					pluginLib.sendPluginActionRequest<PluginJsonResponse.t>(plugin)(
+						action,
+						template.encoding ?? PluginResponseEncoding.create('none'),
+					)({
+						...parsedArgs,
+						action: 'proxyTemplate',
+					})
+				),
 				map(decoded => {
 					if (decoded) return renderPluginJsonRes(decoded, parsedArgs);
 				}),
@@ -824,10 +832,15 @@ const exposeTask = (
 
 				const handler = task.handler === 'proxy' && plugin
 					? pipe(
-						pluginLib.sendPluginActionRequest(plugin)('proxy', task.encoding ?? PluginResponseEncoding.create('none'))({
-							...inputArgs,
-							task: task.task,
-						}),
+						PluginActionName.make('proxy'),
+						chain(action =>
+							pluginLib.sendPluginActionRequest(plugin)(action, task.encoding ?? PluginResponseEncoding.create('none'))(
+								{
+									...inputArgs,
+									task: task.task,
+								},
+							)
+						),
 						chain(addTask(parsedArgs, task.task, plugin.name)),
 						map(res => {
 							const decoded = res as PluginJsonResponse.t | void;
@@ -868,17 +881,19 @@ const loadEphemeralState = (
 const renderPluginJsonRes = (decoded: PluginJsonResponse.t, parsedArgs: SanitizedArgs.t) => {
 	// do not render object/array ASCII table if the request comes from TVsCE
 	if (parsedArgs.fromVsCode) {
-		log(JSON.stringify(decoded.data));
+		if (typeof decoded === 'object') log(JSON.stringify(decoded.data));
 		return;
 	}
 
-	switch (decoded.render) {
-		case 'table':
-			renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
-			break;
-		default:
-			log(decoded.data as string);
-			break;
+	if (typeof decoded === 'object') {
+		switch (decoded.render) {
+			case 'table':
+				renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
+				break;
+			default:
+				log(decoded.data as string);
+				break;
+		}
 	}
 };
 
@@ -919,10 +934,10 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
 			...parsedArgs,
 			plugin: state.plugins.reduce(
 				(retval, pluginInfo: PluginInfo.t) =>
-					pluginInfo.alias === retval
-						? pluginInfo.name
+					pluginInfo.alias.toString() === retval.toString()
+						? NonEmptyString.create(pluginInfo.name)
 						: retval,
-				parsedArgs.plugin,
+				parsedArgs.plugin!,
 			),
 		};
 

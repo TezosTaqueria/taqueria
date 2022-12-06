@@ -1,6 +1,7 @@
 import type { i18n } from '@taqueria/protocol/i18n';
 import loadI18n from '@taqueria/protocol/i18n';
 import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
+import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
@@ -53,22 +54,37 @@ Deno.test('inject()', async t => {
 	assert(typeof pluginLib.getState === 'function');
 	assert(typeof pluginLib.sendPluginActionRequest === 'function');
 
-	await t.step('toPluginArguments() returns an array suitable for invoking a plugin task', () => {
+	await t.step('toPluginArguments() returns an array suitable for invoking a plugin task', async () => {
 		const { toPluginArguments } = pluginLib.__TEST__;
 		const requestArgs = { foo: 'bar', bar: 'foo' };
 
-		const result = toPluginArguments(requestArgs);
+		const taqDir = await toPromise(SanitizedAbsPath.make(`${projectDir}/.taq`));
+		const config = await toPromise(toLoadedConfig(
+			'config.json',
+			taqDir,
+			defaultConfig,
+		));
+
+		const result = toPluginArguments(requestArgs, config);
 
 		assertEquals(result, [
+			'_',
+			"'init'",
 			'--projectDir',
 			"'/tmp/test-project'",
 			'--maxConcurrency',
 			10,
 			'--debug',
 			false,
+			'--disableState',
+			false,
 			'--logPluginRequests',
 			true,
 			'--fromVsCode',
+			false,
+			'--version',
+			false,
+			'--build',
 			false,
 			'--help',
 			false,
@@ -207,38 +223,11 @@ Deno.test('inject()', async t => {
 	await t.step('getPluginExe() returns the correct command to invoke an NPM script', async () => {
 		const { getPluginExe } = pluginLib.__TEST__;
 		const installedPlugin = await toPromise(InstalledPlugin.make({
-			name: '@taqueria/plugin-ligo',
+			name: NonEmptyString.create('@taqueria/plugin-ligo'),
 			type: 'npm',
 		}));
 
 		const output = getPluginExe(installedPlugin);
 		assertEquals(output, ['node', '/tmp/test-project/node_modules/@taqueria/plugin-ligo/index.js']);
-	});
-
-	// TODO: Move this test to e2e. Its not really a unit test.
-	// See https://github.com/ecadlabs/taqueria/issues/507
-	return;
-	await t.step('logPluginRequests() outputs the call to a plugin', async () => {
-		const { toPluginArguments, logPluginRequest } = pluginLib.__TEST__;
-
-		const plugin = await toPromise(InstalledPlugin.make({
-			name: '@taqueria/plugin-ligo',
-			type: 'npm',
-		}));
-		const pluginArgs = toPluginArguments({});
-
-		const expected = [
-			'*** START Call to @taqueria/plugin-ligo ***',
-			'node index.js \\',
-			...pluginArgs.slice(0, -1).map(item => `${item} \\`),
-			`${pluginArgs.slice(-1)}`,
-			'*** END of call to @taqueria/plugin-ligo ***\n',
-		].join('\n');
-
-		deps.stdout.clear();
-		await toPromise(logPluginRequest(plugin)(['node index.js', ...pluginArgs]));
-
-		const actual = deps.stdout.toString();
-		assertEquals(actual, expected);
 	});
 });

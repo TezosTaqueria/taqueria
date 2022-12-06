@@ -1,9 +1,10 @@
 // First-party dependencies
+import type { InstalledPlugin } from '@taqueria/protocol';
+import { EphemeralState, PluginInfo, SanitizedArgs } from '@taqueria/protocol';
+import * as PluginActionName from '@taqueria/protocol/PluginActionName';
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import type { InstalledPlugin, PluginActionName } from './taqueria-protocol/taqueria-protocol-types.ts';
-import { EphemeralState, PluginInfo, SanitizedArgs } from './taqueria-protocol/taqueria-protocol-types.ts';
 import type { PluginDeps, PluginRequestArgs } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
@@ -162,7 +163,7 @@ export const inject = (deps: PluginDeps) => {
 					"'" + JSON.stringify(config) + "'",
 					'--envVars',
 					"'" + JSON.stringify(env) + "'",
-					...toPluginArguments(requestArgs),
+					...toPluginArguments(requestArgs, config),
 				];
 
 				const shellCmd = ['sh', '-c', cmd.join(' ')];
@@ -185,7 +186,8 @@ export const inject = (deps: PluginDeps) => {
 	// retrievePluginInfo: InstalledPlugin -> Future<TaqError, PluginInfo>
 	const retrievePluginInfo = (plugin: InstalledPlugin.t) =>
 		pipe(
-			sendPluginActionRequest(plugin)('pluginInfo', PluginResponseEncoding.create('json'))({}),
+			PluginActionName.make('pluginInfo'),
+			chain(action => sendPluginActionRequest(plugin)(action, PluginResponseEncoding.create('json'))({})),
 			chain(unvalidatedData =>
 				pipe(
 					PluginInfo.of(unvalidatedData),
@@ -215,7 +217,7 @@ export const inject = (deps: PluginDeps) => {
 	// This function returns a list of positional arguments
 	// which includes all dependencies and the individual request args
 	// toPluginArguments: Record<string, unknown> -> PluginRequestArgs
-	const toPluginArguments = (requestArgs: Record<string, unknown>): PluginRequestArgs => {
+	const toPluginArguments = (requestArgs: Record<string, unknown>, config: LoadedConfig.t): PluginRequestArgs => {
 		// For each argument passed in via the CLI, send it as an argument to the
 		// plugin call as well. Plugins can use this information for additional context
 		// about invocation
@@ -223,13 +225,13 @@ export const inject = (deps: PluginDeps) => {
 			(retval: (string | number | boolean)[], [key, val]) => {
 				const omit = [
 					'$0',
-					'version',
-					'build',
+					'quickstart',
 					'scaffoldUrl',
 					'scaffoldProjectDir',
-					'disableState',
-					'_',
 				];
+
+				// If env is missing, then set it to the default environment of the config
+				if (key === 'env' && !val) val = config.environment?.default ?? 'development';
 
 				// A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command. This same hack is used to prevent yargs from turning 0x00 into 0
 				// Refer to https://github.com/yargs/yargs-parser/issues/201
@@ -239,6 +241,7 @@ export const inject = (deps: PluginDeps) => {
 				if (omit.includes(key) || key.indexOf('-') >= 0 || val === undefined) return retval;
 				// Pass numbers and bools as is
 				else if (typeof val === 'boolean' || typeof val === 'number') return [...retval, '--' + key, val];
+				else if (key === '_') return [...retval, key, `'${val}'`];
 				else return [...retval, '--' + key, `'${val}'`];
 			},
 			[],
@@ -258,17 +261,17 @@ export const inject = (deps: PluginDeps) => {
 						configHash: config.hash,
 						plugins: pluginInfo,
 						tasks: await eager(EphemeralState.mapTasksToPlugins(
-							await eager(LoadedConfig.toConfig(config)),
+							await eager(LoadedConfig.make(config)),
 							pluginInfo,
 							i18n,
 						)),
 						operations: await eager(EphemeralState.mapOperationsToPlugins(
-							await eager(LoadedConfig.toConfig(config)),
+							await eager(LoadedConfig.make(config)),
 							pluginInfo,
 							i18n,
 						)),
 						templates: await eager(EphemeralState.mapTemplatesToPlugins(
-							await eager(LoadedConfig.toConfig(config)),
+							await eager(LoadedConfig.make(config)),
 							pluginInfo,
 							i18n,
 						)),

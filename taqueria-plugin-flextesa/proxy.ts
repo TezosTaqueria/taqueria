@@ -10,15 +10,10 @@ import {
 	stringToSHA256,
 	writeJsonFile,
 } from '@taqueria/node-sdk';
-import {
-	LikeAPromise,
-	Protocol,
-	RequestArgs,
-	SandboxAccountConfig,
-	SandboxConfig,
-	StdIO,
-} from '@taqueria/node-sdk/types';
-import { Config, TaqError } from '@taqueria/protocol/taqueria-protocol-types';
+import { Config, RequestArgs } from '@taqueria/node-sdk';
+import { Protocol, SandboxAccountConfig, SandboxConfig, StdIO } from '@taqueria/node-sdk/types';
+import { SanitizedArgs, TaqError } from '@taqueria/protocol/taqueria-protocol-types';
+import { Config as RawConfig } from '@taqueria/protocol/types';
 import retry from 'async-retry';
 import type { ExecException } from 'child_process';
 import { getPortPromise } from 'portfinder';
@@ -26,8 +21,9 @@ import { getTzKtContainerNames, getTzKtStartCommands } from './tzkt-manager';
 
 const { Url } = Protocol;
 
-export interface Opts extends RequestArgs.ProxyRequestArgs {
+export interface Opts extends RequestArgs.t {
 	sandboxName?: string;
+	task?: string;
 }
 
 const ECAD_FLEXTESA_IMAGE_ENV_VAR = 'TAQ_ECAD_FLEXTESA_IMAGE';
@@ -50,14 +46,14 @@ export const getNewPortIfPortInUse = async (port: number): Promise<number> => {
 };
 
 const replaceRpcUrlInConfig = async (newPort: string, oldUrl: string, sandboxName: string, opts: Opts) => {
-	await updateConfig(opts, (config: Config.t) => {
+	await updateConfig(opts, (config: RawConfig) => {
 		const newUrl = oldUrl.replace(/:\d+/, ':' + newPort) as Protocol.Url.t;
 		const sandbox = config.sandbox;
 		const sandboxConfig = sandbox ? sandbox[sandboxName] : undefined;
 		if (typeof sandboxConfig === 'string' || sandboxConfig === undefined) {
 			return;
 		}
-		const updatedConfig: Config.t = {
+		const updatedConfig: RawConfig = {
 			...config,
 			sandbox: {
 				...sandbox,
@@ -71,17 +67,18 @@ const replaceRpcUrlInConfig = async (newPort: string, oldUrl: string, sandboxNam
 	});
 };
 
-export const updateConfig = async (opts: Opts, update: (config: Config.t) => Config.t | undefined) => {
-	const config = await readJsonFile<Config.t>(opts.config.configFile);
+export const updateConfig = async (opts: Opts, update: (config: RawConfig) => RawConfig | undefined) => {
+	const config = await readJsonFile<RawConfig>(opts.config.configFile);
 	const updatedConfig = update(config);
 	if (!updatedConfig) {
 		return;
 	}
+
 	await writeJsonFile(opts.config.configFile)(updatedConfig);
 };
 
 const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts) => {
-	const port = Url.toComponents(sandbox.rpcUrl).port;
+	const port = new URL(sandbox.rpcUrl).port;
 	const newPort = (await getNewPortIfPortInUse(parseInt(port))).toString();
 	if (newPort !== port) {
 		console.log(
@@ -229,7 +226,7 @@ const getSandbox = ({ sandboxName, config }: Opts) => {
 	return undefined;
 };
 
-const startSandboxTask = (parsedArgs: Opts): LikeAPromise<void, TaqError.t> => {
+const startSandboxTask = (parsedArgs: Opts): Promise<void> => {
 	if (parsedArgs.sandboxName) {
 		const sandbox = getSandbox(parsedArgs);
 		return sandbox
@@ -334,7 +331,7 @@ const stopTzKtContainers = async (sandboxName: string, sandbox: SandboxConfig.t,
 	}
 };
 
-export const proxy = <T>(parsedArgs: Opts): LikeAPromise<void, TaqError.t> => {
+export const proxy = (parsedArgs: Opts): Promise<void> => {
 	switch (parsedArgs.task) {
 		case 'list accounts':
 			return listAccountsTask(parsedArgs);

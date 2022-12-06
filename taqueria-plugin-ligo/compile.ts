@@ -1,4 +1,4 @@
-import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { execCmd, getArch, getArtifactsDir, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import { CompileOpts as Opts, emitExternalError, getInputFilename, getLigoDockerImage } from './common';
@@ -37,7 +37,7 @@ const isOutputFormatJSON = (parsedArgs: Opts): boolean => parsedArgs.json;
 const getOutputContractFilename = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
 	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
-	return join(parsedArgs.config.artifactsDir, `${outputFile}${ext}`);
+	return join(getArtifactsDir(parsedArgs), `${outputFile}${ext}`);
 };
 
 // Get the contract name that the storage/parameter file is associated with
@@ -59,7 +59,7 @@ const getOutputExprFilename = (parsedArgs: Opts, sourceFile: string, exprKind: E
 	const outputFile = exprKind === 'default_storage'
 		? `${contractName}.default_storage${ext}`
 		: `${contractName}.${exprKind}.${exprName}${ext}`;
-	return join(parsedArgs.config.artifactsDir, `${outputFile}`);
+	return join(getArtifactsDir(parsedArgs), `${outputFile}`);
 };
 
 const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
@@ -273,7 +273,7 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 	};
 
 const compile = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = parsedArgs.sourceFile;
+	const sourceFile = parsedArgs.sourceFile!;
 	let p: Promise<TableRow[]>;
 	if (isStorageListFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'storage');
 	else if (isParameterListFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'parameter');

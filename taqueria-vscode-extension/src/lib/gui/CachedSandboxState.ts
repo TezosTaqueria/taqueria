@@ -133,7 +133,7 @@ export class CachedSandboxState {
 		if (!sandbox || typeof sandbox === 'string') {
 			return undefined;
 		}
-		let port = Url.toComponents(sandbox.rpcUrl).port;
+		let port = new URL(sandbox.rpcUrl).port;
 		if (!port) {
 			port = '80';
 		}

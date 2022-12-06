@@ -1,6 +1,7 @@
-import { Protocol, writeJsonFile } from '@taqueria/node-sdk';
+import { writeJsonFile } from '@taqueria/node-sdk';
+import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
+import * as SandboxAccountConfig from '@taqueria/protocol/SandboxAccountConfig';
 import * as SandboxConfig from '@taqueria/protocol/SandboxConfig';
-import { Config, SandboxAccountConfig } from '@taqueria/protocol/taqueria-protocol-types';
 import { exec } from 'child_process';
 import { execa } from 'execa';
 import yargs, { parse } from 'yargs';
@@ -20,13 +21,14 @@ interface Failure {
 export const configureTezosClient = () => run(`octez-client --endpoint http://localhost:20000 config update`);
 
 export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
-	Object.entries(parsedArgs.config.accounts).reduce(
-		async (lastConfig, [accountName, initialBalance]) => {
+	Object.entries(parsedArgs.config.accounts || {}).reduce(
+		async (lastConfig, [accountName, _initialBalance]) => {
+			if (accountName === 'default') return lastConfig;
 			const accountDetails = await addAccount(accountName);
 			const config = (await lastConfig as SanitizedArgs.ParsedConfig);
 			const updatedConfig = { ...config } as SanitizedArgs.ParsedConfig;
 			const sandboxConfig = (updatedConfig.sandbox[parsedArgs.sandbox] as SandboxConfig.t);
-			const accounts = sandboxConfig.accounts ?? { default: accountName };
+			const accounts = sandboxConfig.accounts ?? { default: NonEmptyString.create(accountName) };
 			accounts[accountName] = accountDetails;
 			(updatedConfig.sandbox[parsedArgs.sandbox] as SandboxConfig.t).accounts = accounts;
 			return updatedConfig;
@@ -110,7 +112,7 @@ const getBootstrapFlags = (parsedArgs: SanitizedArgs.t) => {
 		(retval, [accountName, accountDetails]) => {
 			if (typeof accountDetails === 'string') return retval;
 			const account = accountDetails as SandboxAccountConfig.t;
-			const initialBalance = parsedArgs.config.accounts[accountName];
+			const initialBalance = parsedArgs.config.accounts![accountName];
 			return [
 				...retval,
 				`--add-bootstrap-account="${accountName},${account.encryptedKey},${account.publicKeyHash},${account.secretKey}@${initialBalance}"`,

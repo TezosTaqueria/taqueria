@@ -1,22 +1,11 @@
+import { RequestArgs } from '@taqueria/protocol';
 import * as Alias from '@taqueria/protocol/Alias';
 import createType from '@taqueria/protocol/Base';
 import * as Operation from '@taqueria/protocol/Operation';
-import * as PluginDependenciesResponse from '@taqueria/protocol/PluginDependenciesResponse';
 import * as PluginInfo from '@taqueria/protocol/PluginInfo';
-import * as PluginProxyResponse from '@taqueria/protocol/PluginProxyResponse';
-import * as RequestArgs from '@taqueria/protocol/RequestArgs';
 import * as Template from '@taqueria/protocol/Template';
+import { PluginDependenciesResponse, PluginProxyResponse } from '@taqueria/protocol/types';
 import { z } from 'zod';
-
-const proxyFnSchema = z
-	.function()
-	.args(RequestArgs.proxySchemas.schema)
-	.returns(z.promise(PluginProxyResponse.schemas.schema));
-
-const runtimeDependenciesFn = z
-	.function()
-	.args(RequestArgs.schemas.schema)
-	.returns(z.promise(PluginDependenciesResponse.schemas.schema));
 
 const internalSchema = PluginInfo.internalSchema.extend({
 	operations: z.preprocess(
@@ -33,10 +22,7 @@ const internalSchema = PluginInfo.internalSchema.extend({
 			Template.schemas.schema,
 		).optional(),
 	),
-	proxy: proxyFnSchema.optional(),
-	checkRuntimeDependencies: runtimeDependenciesFn.optional(),
-	installRuntimeDependencies: runtimeDependenciesFn.optional(),
-}).describe('ParsedPluginInfo');
+}).passthrough().describe('ParsedPluginInfo');
 
 export const rawSchema = PluginInfo.rawSchema.extend({
 	name: Alias.rawSchema.optional(),
@@ -54,14 +40,23 @@ export const rawSchema = PluginInfo.rawSchema.extend({
 			Template.schemas.schema,
 		).optional(),
 	),
-	proxy: proxyFnSchema.optional(),
-	checkRuntimeDependencies: runtimeDependenciesFn.optional(),
-	installRuntimeDependencies: runtimeDependenciesFn.optional(),
-}).describe('ParsedPluginInfo');
+}).passthrough().describe('ParsedPluginInfo');
 
-type Input = z.infer<typeof internalSchema>;
+type Input = z.infer<typeof internalSchema> & {
+	proxy: <T extends RequestArgs.t>(
+		args: T,
+	) => PluginProxyResponse | Promise<PluginProxyResponse> | Promise<void> | void;
+	checkRuntimeDependencies?: <T extends RequestArgs.t>(args: T) => PluginDependenciesResponse;
+	installRuntimeDependencies?: <T extends RequestArgs.t>(args: T) => PluginDependenciesResponse;
+};
 
-export type RawPluginSchema = z.infer<typeof rawSchema>;
+export type RawPluginSchema = z.infer<typeof rawSchema> & {
+	proxy: <T extends RequestArgs.t>(
+		args: T,
+	) => PluginProxyResponse | Promise<PluginProxyResponse> | Promise<void> | void;
+	checkRuntimeDependencies?: <T extends RequestArgs.t>(args: T) => PluginDependenciesResponse;
+	installRuntimeDependencies?: <T extends RequestArgs.t>(args: T) => PluginDependenciesResponse;
+};
 
 export const { schemas: generatedSchemas, factory } = createType<RawPluginSchema, Input>({
 	rawSchema,
@@ -74,7 +69,6 @@ export const { schemas: generatedSchemas, factory } = createType<RawPluginSchema
 export type ParsedPluginInfo = z.infer<typeof generatedSchemas.schema>;
 export type t = ParsedPluginInfo;
 export const { create, of, make } = factory;
-
 export const schemas = {
 	...generatedSchemas,
 	schema: generatedSchemas.schema.transform(val => val as ParsedPluginInfo),

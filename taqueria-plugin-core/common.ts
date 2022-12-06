@@ -1,6 +1,6 @@
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { ProxyTaskArgs } from '@taqueria/node-sdk';
 
-export interface CleanOpts extends RequestArgs.ProxyRequestArgs {
+export interface CleanOpts extends ProxyTaskArgs.t {
 }
 
 // To be used for the main entrypoint of the plugin

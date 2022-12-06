@@ -6,7 +6,7 @@
 		"outDir": "out",
 		"lib": [
 			"ESNext",
-			"es2020"
+			"ES2021.String"
 		],
 		"sourceMap": true,
 		"rootDir": "src",

@@ -9,7 +9,6 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
-  taq clean                       Clean all the Taqueria-related docker images
   taq deploy <contract>           Deploy a smart contract to a particular enviro
                                   nment                     [aliases: originate]
   taq transfer <contract>         Transfer/call an implicit account or a smart c
@@ -21,6 +20,7 @@ Commands:
   taq instantiate-account         Instantiate all accounts declared in the "acco
                                   unts" field at the root level of the config fi
                                   le to a target environment
+  taq clean                       Clean all the Taqueria-related docker images
 
 Options:
       --version     Show version number                                [boolean]

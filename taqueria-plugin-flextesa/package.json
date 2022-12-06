@@ -44,7 +44,7 @@
 	},
 	"devDependencies": {
 		"@types/async-retry": "^1.4.4",
-		"parcel": "2.6.1",
+		"parcel": "^2.8.0",
 		"typescript": "^4.7.2"
 	}
 }

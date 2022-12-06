@@ -2,6 +2,9 @@
 	"compilerOptions": {
 		"target": "ES2021",
 		"module": "CommonJS",
+		"lib": [
+			"ES2021.String"
+		], /* Specify a set of bundled library declaration files that describe the target runtime environment. */
 		"declaration": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,

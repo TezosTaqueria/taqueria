@@ -1,5 +1,4 @@
-import { execCmd, getCurrentEnvironmentConfig, sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { execCmd, getCurrentEnvironmentConfig, RequestArgs, sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
 
 const ECAD_FLEXTESA_IMAGE = 'ghcr.io/ecadlabs/taqueria-flextesa';
 const FLEXTESA_IMAGE = 'oxheadalpha/flextesa';
@@ -32,7 +31,7 @@ const removeImages = () =>
 			)
 		);
 
-const clean = (parsedArgs: RequestArgs.ProxyRequestArgs): Promise<void> => {
+const clean = (parsedArgs: RequestArgs.t): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	return Promise.resolve()

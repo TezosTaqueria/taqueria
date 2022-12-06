@@ -35,6 +35,7 @@ const testContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =
 
 const test = (parsedArgs: Opts): Promise<void> => {
 	const sourceFile = parsedArgs.sourceFile;
+	if (!sourceFile) return sendAsyncErr(`No source file provided`);
 	return testContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
 		sendAsyncErr(err, false)
 	);

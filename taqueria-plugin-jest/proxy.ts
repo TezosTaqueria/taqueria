@@ -1,5 +1,5 @@
 import { sendAsyncRes } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { RequestArgs } from '@taqueria/node-sdk';
 import { execa } from 'execa';
 import { CustomRequestArgs, ensureSelectedPartitionExists, toRequestArgs } from './common';
 

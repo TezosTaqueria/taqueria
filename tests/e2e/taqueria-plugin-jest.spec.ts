@@ -110,6 +110,7 @@ describe('E2E Testing for the taqueria jest plugin', () => {
 
 		await exec(`taq test -i ${directory}`, { cwd: `${taqueriaProjectPath}` });
 		const pwd = await exec(`pwd`);
+		await exec(`cp -r ${taqueriaProjectPath} /tmp`);
 		const pwdFormatted = pwd.stdout.replace(/(\r\n|\n|\r)/gm, '');
 		const localConfigContents = await exec(`cat ${pwdFormatted}/${taqueriaProjectPath}/${directory}/jest.config.js`);
 

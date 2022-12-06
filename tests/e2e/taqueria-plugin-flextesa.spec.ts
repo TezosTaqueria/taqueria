@@ -152,6 +152,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 
 	test('Verify that taqueria flextesa plugin can start and stop a custom name sandbox', async () => {
 		await exec(`cp e2e/data/config-flextesa-test-sandbox.json ${taqueriaProjectPath}/.taq/config.json`);
+		await exec(`cp -r ${taqueriaProjectPath} ${taqueriaProjectPath}-backup`);
 
 		// Setting up docker container name
 		sandboxName = 'test';

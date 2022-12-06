@@ -9,9 +9,9 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
-  taq clean                       Clean all the Taqueria-related docker images
   taq test [partition]            Setup a directory as a partition to run Jest t
                                   ests                           [aliases: jest]
+  taq clean                       Clean all the Taqueria-related docker images
   taq create <template>           Create files from pre-existing templates
 
 Options:

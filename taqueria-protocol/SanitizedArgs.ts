@@ -1,7 +1,8 @@
+import { Url } from '@taqueria/protocol';
 import createType from '@taqueria/protocol/Base';
+import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
-import * as Url from '@taqueria/protocol/Url';
 import { z } from 'zod';
 
 export const rawSchema = z.object({
@@ -43,8 +44,9 @@ export const rawSchema = z.object({
 		val => Boolean(val),
 		z.boolean().optional(),
 	),
-	plugin: z.string().min(1).optional(),
+	plugin: NonEmptyString.schemas.schema.optional(),
 	env: z.string().optional(),
+	quickstart: z.string().min(1).optional(),
 	setBuild: z.preprocess(
 		val => String(val),
 		z.string().min(3),

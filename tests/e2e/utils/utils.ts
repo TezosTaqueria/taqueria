@@ -33,8 +33,8 @@ export const generateTestProject = async (
 	await exec(`mv ${targetDir} ./${projectPath}`, { encoding: 'utf8' });
 
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
-
-	await installDependencies(projectPath, packageNames, localPackages);
+	await exec('npm uninstall @taqueria/plugin-core');
+	await installDependencies(projectPath, [...packageNames, 'core'], localPackages);
 
 	return projectInit;
 };

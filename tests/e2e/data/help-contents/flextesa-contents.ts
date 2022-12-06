@@ -9,10 +9,10 @@ Commands:
   taq add-contract <sourceFile>    Add a contract to the contract registry
   taq rm-contract <contractName>   Remove a contract from the contract registry
   taq list-contracts               List registered contracts
-  taq clean                        Clean all the Taqueria-related docker images
   taq start sandbox [sandboxName]  Starts a flextesa sandbox    [aliases: start]
   taq stop sandbox [sandboxName]   Stops a flextesa sandbox      [aliases: stop]
   taq list accounts <sandboxName>  List the balances of all sandbox accounts
+  taq clean                        Clean all the Taqueria-related docker images
 
 Options:
       --version     Show version number                                [boolean]

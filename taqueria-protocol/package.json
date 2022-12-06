@@ -5,7 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "npx tsc --emitDeclarationOnly -p ./tsconfig.json && npx tsup"
+		"build": "npx tsc --emitDeclarationOnly -p ./tsconfig.json && npx tsup",
+		"build-types": "npx ts-to-zod types.ts out/types-zod.ts && npx ts-node scripts/post-ts-to-zod.ts && npx ts-node scripts/build-types.ts"
 	},
 	"keywords": [
 		"taqueria",
@@ -29,14 +30,25 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"devDependencies": {
-		"typescript": "^4.7.2"
+		"ts-to-zod": "^1.13.1",
+		"typescript": "^4.7.2",
+		"tsup": "^6.2.3"
 	},
 	"exports": {
+		".": "./index.js",
 		"./*": {
 			"import": "./*.mjs",
 			"default": "./*.js"
 		},
 		"./*.js": {
+			"import": "./*.mjs",
+			"default": "./*.js"
+		},
+		"./out/**/*": {
+			"import": "./*.mjs",
+			"default": "./*.js"
+		},
+		"./out/examples/*": {
 			"import": "./*.mjs",
 			"default": "./*.js"
 		}
@@ -47,12 +59,13 @@
 		"fluture": "^14.0.0",
 		"rambda": "^7.2.1",
 		"rambdax": "^8.1.0",
-		"tsup": "^6.2.3",
 		"zod": "^3.17.3"
 	},
 	"tsup": {
 		"entry": [
-			"[!.]+.ts"
+			"[!.]+.ts",
+			"out/types/*.ts",
+			"out/*.ts"
 		],
 		"sourcemap": true,
 		"target": "node16",

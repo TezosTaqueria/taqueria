@@ -1,26 +1,26 @@
-import { getContracts, sendAsyncErr, sendJsonRes, sendRes, writeJsonFile } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import {
+	getContracts,
+	PluginProxyResponse,
+	RequestArgs,
+	sendAsyncErr,
+	sendJsonRes,
+	sendRes,
+	writeJsonFile,
+} from '@taqueria/node-sdk';
 import fs from 'fs/promises';
 import path from 'path';
 import prompts from 'prompts';
 
-// TODO: What should this be, it was removed from the sdk
-type PluginResponse =
-	| void
-	| {
-		render: 'table';
-		data: unknown[];
-	};
-
-interface Opts extends RequestArgs.ProxyRequestArgs {
+interface Opts extends RequestArgs.t {
 	readonly contractName?: string;
+	readonly task?: string;
 }
 type Config = Opts['config'];
 
 const createContractMetadata = async (
 	contractName: undefined | string,
 	config: Config,
-): Promise<PluginResponse> => {
+): Promise<PluginProxyResponse> => {
 	const contracts = Object.keys(config.contracts ?? {}).map(x => path.basename(x, path.extname(x)));
 
 	if (!contractName) {
@@ -169,7 +169,7 @@ type ProjectMetadata = {
 };
 const createProjectMetadata = async (
 	config: Config,
-): Promise<PluginResponse> => {
+): Promise<PluginProxyResponse> => {
 	const defaultValues = config.metadata;
 
 	// Common fields from Tzip-16
@@ -233,7 +233,7 @@ const createProjectMetadata = async (
 	};
 };
 
-const execute = async (opts: Opts): Promise<PluginResponse> => {
+const execute = async (opts: Opts): Promise<PluginProxyResponse> => {
 	const {
 		task,
 		contractName,
@@ -254,7 +254,7 @@ const execute = async (opts: Opts): Promise<PluginResponse> => {
 	}
 };
 
-export default async (args: RequestArgs.ProxyRequestArgs): Promise<PluginResponse> => {
+export default async (args: RequestArgs.t): Promise<PluginProxyResponse> => {
 	const opts = args as Opts;
 
 	try {

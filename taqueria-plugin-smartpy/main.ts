@@ -1,16 +1,17 @@
-import { sendAsyncErr } from '@taqueria/node-sdk';
+import { RequestArgs, sendAsyncErr } from '@taqueria/node-sdk';
 import { IntersectionOpts as Opts } from './common';
 import compile from './compile';
 import test from './test';
 
-const main = (parsedArgs: Opts): Promise<void> => {
-	switch (parsedArgs.task) {
+const main = (parsedArgs: RequestArgs.t): Promise<void> => {
+	const unsafeArgs = parsedArgs as Opts;
+	switch (unsafeArgs.task) {
 		case 'compile':
-			return compile(parsedArgs);
+			return compile(unsafeArgs);
 		case 'test':
-			return test(parsedArgs);
+			return test(unsafeArgs);
 		default:
-			return sendAsyncErr(`${parsedArgs.task} is not an understood task by the SmartPy plugin`);
+			return sendAsyncErr(`${unsafeArgs.task} is not an understood task by the SmartPy plugin`);
 	}
 };
 

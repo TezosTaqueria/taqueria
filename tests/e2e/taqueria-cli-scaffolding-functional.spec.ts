@@ -5,12 +5,17 @@ const exec = util.promisify(exec1);
 
 const scaffoldDirName = `scrap/auto-test-taco-shop-functional`;
 
+// This test suite does two time-consuming things:
+// - Scaffolds a project
+// - Starts and stops a sandbox
+jest.setTimeout(400000);
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
+	// See https://jestjs.io/docs/api#beforeallfn-timeout
+	// According to the link above, when using async/await, we don't need the beforeAll hook.
 	beforeAll(async () => {
 		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true, force: true });
 		await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${scaffoldDirName}`);
 	});
-
 	test('Verify that scaffold project is set up after running setup', async () => {
 		const appContents = await exec(`ls ${scaffoldDirName}/app`);
 		const taqContents = await exec(`ls ${scaffoldDirName}`);
@@ -33,6 +38,6 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	});
 
 	afterAll(async () => {
-		await fsPromises.rm(`${scaffoldDirName}`, { recursive: true });
+		return await fsPromises.rm(`${scaffoldDirName}`, { recursive: true });
 	});
 });

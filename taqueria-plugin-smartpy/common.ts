@@ -1,14 +1,15 @@
-import { execCmd, sendErr, sendWarn } from '@taqueria/node-sdk';
+import { execCmd, getArtifactsDir, getContractsDir, sendErr, sendWarn } from '@taqueria/node-sdk';
+import { ProxyTaskArgs } from '@taqueria/node-sdk/types';
 import { RequestArgs } from '@taqueria/node-sdk/types';
 import { access } from 'fs/promises';
 import { join } from 'path';
 
-export interface CompileOpts extends RequestArgs.ProxyRequestArgs {
+export interface CompileOpts extends ProxyTaskArgs.t {
 	sourceFile: string;
 	json: boolean;
 }
 
-export interface TestOpts extends RequestArgs.ProxyRequestArgs {
+export interface TestOpts extends ProxyTaskArgs.t {
 	sourceFile: string;
 }
 
@@ -42,10 +43,10 @@ const removeExt = (path: string): string => {
 export const getSmartPyCli = (): string => `${process.env.HOME}/smartpy-cli/SmartPy.sh`;
 
 export const getInputFilename = (parsedArgs: UnionOpts, sourceFile: string): string =>
-	join(parsedArgs.config.contractsDir, sourceFile);
+	join(getContractsDir(parsedArgs), sourceFile);
 
 export const getCompilationTargetsDirname = (parsedArgs: UnionOpts, sourceFile: string): string =>
-	join(parsedArgs.config.artifactsDir, SMARTPY_ARTIFACTS_DIR, removeExt(sourceFile));
+	join(getArtifactsDir(parsedArgs), SMARTPY_ARTIFACTS_DIR, removeExt(sourceFile));
 
 export const installSmartPyCliIfNotExist = () =>
 	access(getSmartPyCli())

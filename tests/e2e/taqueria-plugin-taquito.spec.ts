@@ -154,14 +154,8 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		const configPKH = configContents.network.fundnet.accounts.taqOperatorAccount.publicKeyHash;
 
-		expect(result.stderr).toContain(
-			`A keypair with public key hash ${configPKH} was generated for you.
-To fund this account:
-1. Go to https://teztnets.xyz and click "Faucet" of the target testnet
-2. Copy and paste the above key into the wallet address field
-3. Request some Tez (Note that you might need to wait for a few seconds for the network to register the funds)
-No operations performed
-`,
+		expect(result.stderr.replace(/tz3\S+/, 'tz3__address__')).toEqual(
+			await fsPromises.readFile('e2e/data/taquito-funding-instructions.txt', 'utf-8'),
 		);
 	});
 
