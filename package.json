@@ -8,7 +8,6 @@
 	},
 	"scripts": {
 		"test": "yarn",
-		"bootstrap": "lerna bootstrap --force-local",
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
 		"build:docker": "lerna run build-docker",

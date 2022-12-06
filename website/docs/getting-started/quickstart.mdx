@@ -112,11 +112,13 @@ let main (action, store : parameter * storage) : return =
 ```
 
 ```ligo title="counter.storageList.mligo"
+#include "counter.mligo"
 let initial_count: storage = 42
 let another_count: storage = 23 + 18 - 1
 ```
 
 ```ligo title="counter.parameterList.mligo"
+#include "counter.mligo"
 let increment_by_3: parameter = Increment 3
 ```
 
