@@ -3,7 +3,8 @@ import * as rpc from '@taquito/rpc';
 import { TezosToolkit } from '@taquito/taquito';
 import * as rxjs from 'rxjs';
 import * as signalR from '../../../signalr';
-import { OutputLevels, VsCodeHelper } from '../helpers';
+import { VsCodeHelper } from '../helpers';
+import { OutputLevels } from '../LogHelper';
 import { ObservableConfig } from './ObservableConfig';
 import { SandboxModel, TzKtHead } from './SandboxDataModels';
 
@@ -66,7 +67,7 @@ export class CachedSandboxState {
 		if (this._currentTzKtBaseAddress === tzKtBaseAddress) {
 			return;
 		}
-		this.helper.showLog(
+		this.helper.logHelper.showLog(
 			OutputLevels.debug,
 			`TzKt address changed from ${this._currentTzKtBaseAddress} to ${tzKtBaseAddress}`,
 		);
@@ -103,7 +104,7 @@ export class CachedSandboxState {
 	}
 
 	private onHeadFromTzKt(data: { type: number; data: TzKtHead }): void {
-		this.helper.showLog(OutputLevels.debug, JSON.stringify(data));
+		this.helper.logHelper.showLog(OutputLevels.debug, JSON.stringify(data));
 		if (data.type === 1) {
 			this.headFromTzKt.next(data.data);
 		}
@@ -118,9 +119,9 @@ export class CachedSandboxState {
 		try {
 			await this.connection.start();
 			await this.connection.invoke('SubscribeToHead');
-			this.helper.showLog(OutputLevels.debug, 'SignalR Connected');
+			this.helper.logHelper.showLog(OutputLevels.debug, 'SignalR Connected');
 		} catch (err) {
-			this.helper.showLog(OutputLevels.debug, 'Error while connecting SignalR');
+			this.helper.logHelper.showLog(OutputLevels.debug, 'Error while connecting SignalR');
 			this.helper.logAllNestedErrors(err, true);
 			setTimeout(() => {
 				this.startConnection();
