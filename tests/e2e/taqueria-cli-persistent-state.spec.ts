@@ -7,8 +7,6 @@ const exec = utils.promisify(exec1);
 
 const taqueriaProjectPath = 'scrap/auto-test-persistent-state';
 
-jest.setTimeout(400000);
-
 describe('Test CLI Persistent State', () => {
 	beforeEach(() => fsPromises.rm(taqueriaProjectPath, { force: true, recursive: true }));
 
