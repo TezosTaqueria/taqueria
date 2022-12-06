@@ -765,7 +765,7 @@ const exposeTasks = (
 
 const exposeTask = (
 	cliConfig: CLIConfig,
-	_config: LoadedConfig.t,
+	config: LoadedConfig.t,
 	_env: EnvVars,
 	parsedArgs: SanitizedArgs.t,
 	state: EphemeralState.t,
@@ -828,7 +828,7 @@ const exposeTask = (
 							...inputArgs,
 							task: task.task,
 						}),
-						chain(addTask(parsedArgs, task.task, plugin.name)),
+						chain(addTask(parsedArgs, config, task.task, plugin.name)),
 						map(res => {
 							const decoded = res as PluginJsonResponse.t | void;
 							if (decoded) return renderPluginJsonRes(decoded, parsedArgs);

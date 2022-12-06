@@ -45,8 +45,7 @@ const environmentMap = z
 			z.string().min(1, 'Default environment must reference the name of an existing environment.'),
 		]),
 		{ description: 'Environment configurations' },
-	)
-	.optional();
+	);
 
 const accountsMap = z.preprocess(
 	(val: unknown) =>
