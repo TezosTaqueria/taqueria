@@ -416,6 +416,11 @@ const mkInitialDirectories = (projectDir: SanitizedAbsPath.t, maxConcurrency: nu
 		}),
 	);
 
+const createGitIgnoreFile = (projectDir: SanitizedAbsPath.t): Future<TaqError.TaqError, string> => {
+	const toIgnore = ['.DS_Store', 'artifacts', '.taq/*-state.json', 'node_modules/'];
+	return writeTextFile(`${projectDir}/.gitignore`)(toIgnore.join('\n'));
+};
+
 const initProject = (
 	projectDir: SanitizedAbsPath.t,
 	maxConcurrency: number,
@@ -425,6 +430,7 @@ const initProject = (
 		mkInitialDirectories(projectDir, maxConcurrency, i18n),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
 		chain(_ => exec('taq install @taqueria/plugin-core 2>&1 > /dev/null', {}, false, projectDir)),
+		map(_ => createGitIgnoreFile(projectDir)),
 		map(_ => i18n.__('bootstrapMsg')),
 	);
 
