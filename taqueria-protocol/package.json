@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.24.2",
+	"version": "0.25.0-alpha",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -31,8 +31,8 @@
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"devDependencies": {
 		"ts-to-zod": "^1.13.1",
-		"typescript": "^4.7.2",
-		"tsup": "^6.2.3"
+		"tsup": "^6.2.3",
+		"typescript": "^4.7.2"
 	},
 	"exports": {
 		".": "./index.js",
