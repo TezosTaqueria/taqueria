@@ -18,6 +18,19 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
         echo "❌ Docker is not installed, not running, or the user needs permission."
         exit $errorCode
     fi
+    if [ -n `which deno || ""` ]; then
+        deno --version | grep 1.23 >/dev/null
+        errorCode=$?
+        if [ $errorCode -ne 0 ]; then
+            echo "❌ Deno is installed, but not using v1.23.x. Please use Deno v1.23.x."
+            exit $errorCode
+        else
+            echo "✅ Deno is installed, and running v1.23.x"
+        fi
+    else
+        echo "❌ Deno is not installed."
+        echo -2
+    fi
     echo "** Dependency checks passed"
 
     set -e # exiting on error
