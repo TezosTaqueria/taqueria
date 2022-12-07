@@ -430,7 +430,7 @@ const initProject = (
 		mkInitialDirectories(projectDir, maxConcurrency, i18n),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
 		chain(_ => exec('taq install @taqueria/plugin-core 2>&1 > /dev/null', {}, false, projectDir)),
-		map(_ => createGitIgnoreFile(projectDir)),
+		chain(_ => createGitIgnoreFile(projectDir)),
 		map(_ => i18n.__('bootstrapMsg')),
 	);
 
@@ -779,7 +779,7 @@ const exposeTasks = (
 
 const exposeTask = (
 	cliConfig: CLIConfig,
-	_config: LoadedConfig.t,
+	config: LoadedConfig.t,
 	_env: EnvVars,
 	parsedArgs: SanitizedArgs.t,
 	state: EphemeralState.t,
@@ -847,7 +847,7 @@ const exposeTask = (
 								},
 							)
 						),
-						chain(addTask(parsedArgs, task.task, plugin.name)),
+						chain(addTask(parsedArgs, config, task.task, plugin.name)),
 						map(res => {
 							const decoded = res as PluginJsonResponse.t | void;
 							if (decoded) return renderPluginJsonRes(decoded, parsedArgs);

@@ -352,7 +352,7 @@ export type Config = {
 	// accounts?: {
 	// 	default: EnvironmentName;
 	// } & Record<string, Environment>;
-	environment?: Record<string, Environment | EnvironmentName>;
+	environment: Record<string, Environment | EnvironmentName>;
 	accounts?: Record<string, Tz>;
 	contracts?: Record<string, Contract>;
 	metadata?: MetadataConfig;
