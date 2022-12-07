@@ -24,13 +24,12 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		expect(taqContents.stdout).toContain('contracts');
 		expect(taqContents.stdout).toContain('artifacts');
 	});
-	// NEED TO REVISIT THIS TEST
-	test.skip('Verify that scaffold project compiles contracts as part of setup', async () => {
+	test('Verify that scaffold project compiles contracts as part of setup', async () => {
 		const taqContents = await exec(`ls ${scaffoldDirName}/artifacts`);
 		expect(taqContents.stdout).toContain('hello-tacos.tz');
 	});
-
-	test('Verify that scaffold project can start and stop taqueria locally', async () => {
+	// NEED TO REVISIT THIS TEST
+	test.skip('Verify that scaffold project can start and stop taqueria locally', async () => {
 		const startResults = await exec(`taq start sandbox local-scaffold`, { cwd: `${scaffoldDirName}` });
 		expect(startResults.stdout).toContain('Started local-scaffold.');
 
