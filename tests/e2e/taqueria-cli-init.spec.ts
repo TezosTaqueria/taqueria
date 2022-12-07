@@ -1,7 +1,4 @@
-import CLITestingLibary from '@gmrchk/cli-testing-library';
-
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
-import { spawn } from 'child_process';
 
 describe('E2E Testing for taqueria general functionality', () => {
 	test('Verify that taq init creates the correct directory structure', async () => {
