@@ -624,7 +624,7 @@
 				},
 				{
 					"command": "taqueria.refresh_sandbox_data",
-					"when": "view == taqueria-sandboxes",
+					"when": "false",
 					"group": "inline"
 				},
 				{

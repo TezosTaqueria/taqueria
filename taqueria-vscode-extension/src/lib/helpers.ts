@@ -1727,7 +1727,19 @@ export class VsCodeHelper {
 	exposeInvokeEntrypointCommand() {
 		this.registerCommand(
 			'invoke_entrypoint',
-			async (item: SmartContractEntrypointTreeItem) => {
+			async (treeViewItem?: SmartContractEntrypointTreeItem) => {
+				const item = {
+					michelineParameters: treeViewItem?.michelineParameters,
+					name: treeViewItem?.name,
+					parent: {
+						alias: treeViewItem?.parent?.alias,
+						address: treeViewItem?.parent?.address,
+					},
+				};
+				if (!item.michelineParameters || !(item.parent.address ?? item.parent.alias)) {
+					// The Item has been refreshed
+					return;
+				}
 				const michelineParameters = item.michelineParameters;
 				const panel = this.vscode.window.createWebviewPanel(
 					'entrypointParameter',
