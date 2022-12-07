@@ -248,9 +248,14 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return undefined;
 		}
-		const response = await fetch(`${tzktBaseUrl}/v1/accounts/count?type.ne=contract`);
-		const data = await response.json();
-		return data as number;
+		try {
+			const response = await fetch(`${tzktBaseUrl}/v1/accounts/count?type.ne=contract`);
+			const data = await response.json();
+			return data as number;
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return undefined;
+		}
 	}
 
 	private async getContractCount(element: SandboxTreeItem): Promise<number | undefined> {
@@ -258,12 +263,17 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return undefined;
 		}
-		const response = await fetch(`${tzktBaseUrl}/v1/contracts/count`);
-		const data = await response.json();
-		// This assumes that the built-in contracts always exist on the chain. If not, the count will be off.
-		// The fix is to check existence of each of them
-		const ignoredContractCount = SandboxesDataProvider.builtInContracts.length;
-		return data as number - ignoredContractCount;
+		try {
+			const response = await fetch(`${tzktBaseUrl}/v1/contracts/count`);
+			const data = await response.json();
+			// This assumes that the built-in contracts always exist on the chain. If not, the count will be off.
+			// The fix is to check existence of each of them
+			const ignoredContractCount = SandboxesDataProvider.builtInContracts.length;
+			return data as number - ignoredContractCount;
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return undefined;
+		}
 	}
 
 	private getSmartContractChildren(element: SandboxSmartContractTreeItem): SmartContractChildrenTreeItem[] {
