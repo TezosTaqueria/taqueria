@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 import { VsCodeHelper } from '../helpers';
 import * as Util from '../pure';
 
@@ -6,12 +7,15 @@ export class TaqueriaDataProviderBase {
 		protected helper: VsCodeHelper,
 	) {}
 
-	async getConfig(): Promise<{ config: Util.TaqifiedDir | null; pathToDir: Util.PathToDir | null }> {
+	async getConfig(): Promise<
+		{ config: Util.TaqifiedDir | null; pathToDir: Util.PathToDir | null; mainFolder: vscode.Uri | undefined }
+	> {
 		const mainFolder = this.helper.getMainWorkspaceFolder();
 		if (!mainFolder) {
 			return {
 				pathToDir: null,
 				config: null,
+				mainFolder,
 			};
 		} else {
 			try {
@@ -20,12 +24,14 @@ export class TaqueriaDataProviderBase {
 				return {
 					config,
 					pathToDir,
+					mainFolder,
 				};
 			} catch (e: any) {
 				await this.helper.notifyAndLogError('Error while loading config, sandboxes list will fail to populate', e);
 				return {
 					pathToDir: null,
 					config: null,
+					mainFolder,
 				};
 			}
 		}
