@@ -1,5 +1,6 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
 import fetch from 'node-fetch-commonjs';
+import path from 'path';
 import * as vscode from 'vscode';
 import { HasRefresh, mapAsync, VsCodeHelper } from '../helpers';
 import { OutputLevels } from '../LogHelper';
@@ -365,7 +366,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	// taqueria-plugin-flextesa/proxy.ts. As suggested in https://github.com/ecadlabs/taqueria/issues/1030, we need to
 	// take care of this tech debt.
 	private async getUniqueSandboxName(sandboxName: string, projectDir: string) {
-		const hash = await toSHA256(projectDir);
+		const hash = await toSHA256(sandboxName + projectDir);
 		return `${sandboxName.substring(0, 10)}-${hash.substring(0, 5)}`;
 	}
 
