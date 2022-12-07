@@ -50,6 +50,7 @@ import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
 import type { CLIConfig, DenoArgs, EnvKey, EnvVars } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
+import {createRegistry} from "./internal-tasks.ts"
 
 // Get utils
 const {
@@ -86,6 +87,9 @@ const {
 // Add alias
 const exec = execText;
 type PluginLib = ReturnType<typeof inject>;
+
+// Create new internal task registry
+const internalTasks = createRegistry()
 
 /**
  * Parsing arguments is done in two different stages.
@@ -979,24 +983,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 		);
 
 const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
-	[
-		'init',
-		'install',
-		'uninstall',
-		'testFromVsCode',
-		'list-known-tasks',
-		'listKnownTasks',
-		'provision',
-		'plan',
-		'opt-in',
-		'opt-out',
-		'create',
-		'add-contract',
-		'rm-contract',
-		'remove-contract',
-		'list-contracts',
-		'show-contracts',
-	].reduce(
+	internalTasks.getInternalTaskNames().reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,
 	);
@@ -1025,6 +1012,9 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 					chain(SanitizedArgs.of),
 					chain((initArgs: SanitizedArgs.t) => {
 						if (initArgs.debug) debugMode(true);
+						console.log(initArgs)
+						Deno.exit(-1)
+
 
 						if (initArgs.version) {
 							log(initArgs.setVersion);
