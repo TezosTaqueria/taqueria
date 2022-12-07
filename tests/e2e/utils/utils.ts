@@ -90,6 +90,23 @@ export async function checkFolderExistsWithTimeout(filePath: string, attempts = 
 	}
 }
 
+export async function waitFor<T>(fn: () => Promise<T>, opts = { timeout: 10000, interval: 100 }) {
+	let elapsed = 0;
+	let lastErr = undefined;
+	const timeout = opts.timeout ?? 1000;
+	const interval = opts.interval ?? 100;
+
+	while (elapsed < timeout) {
+		try {
+			return await fn();
+		} catch (err) {
+			lastErr = err;
+			await sleep(interval);
+		}
+	}
+	throw lastErr;
+}
+
 export async function checkContractExistsOnNetwork(contractAddress: string, networkNodeURL: string) {
 	const tezos = new TezosToolkit(networkNodeURL);
 	try {
