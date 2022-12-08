@@ -86,6 +86,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 		} catch (_) {}
 
 		const ligoHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
+		await exec(`cp -r ${taqueriaProjectPath} ${taqueriaProjectPath}-backup`);
 		expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoSmartpy);
 
 		await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
@@ -113,29 +114,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 		}
 	});
 
-	test('Verify that ligo and archetype expose the plugin choice option for compile in the help menu', async () => {
-		try {
-			await exec(`taq install ../../../taqueria-plugin-ligo -p ${taqueriaProjectPath}`);
-			await exec(`taq install ../../../taqueria-plugin-archetype -p ${taqueriaProjectPath}`);
-
-			// TODO: This can removed after this is resolved:
-			// https://github.com/ecadlabs/taqueria/issues/528
-			try {
-				await exec(`taq -p ${taqueriaProjectPath}`);
-			} catch (_) {}
-
-			const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
-			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoArchetypeSpecific);
-
-			await exec(`taq uninstall @taqueria/plugin-ligo -p ${taqueriaProjectPath}`);
-			await exec(`taq uninstall @taqueria/plugin-archetype -p ${taqueriaProjectPath}`);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
-
 	test('Verify that friendly error messages are displayed when config is invalid', async () => {
-		await exec(`cp -r ${taqueriaProjectPath} ${taqueriaProjectPath}-backup`);
 		await exec(`sed -i -e "s/\\"contracts\\"/123/" ${taqueriaProjectPath}/.taq/config.json`);
 		const { stderr } = await exec('taq || true', { cwd: taqueriaProjectPath });
 		expect(stderr).toContain(`Your .taq/config.json is invalid:\ncontractsDir: Expected string, received number`);

@@ -324,7 +324,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	return globalTasks.configure(commonCLI(env, args, i18n));
 };
 
-const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, i18n: i18n.t) => {
+const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: EnvVars, i18n: i18n.t) => {
 	// Add "install" task to install plugins
 	internalTasks.registerTask({
 		taskName: NonEmptyString.create('install'),
@@ -348,6 +348,8 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, i18n: i
 				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
 				chain(args => NPM.installPlugin(config, parsedArgs.projectDir, i18n, args.pluginName)),
 				map(log),
+				chain(() => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
+				chain(_ => taqResolve<void>()),
 			),
 	});
 
@@ -1078,34 +1080,40 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
 			),
 		};
 
+const loadPlugins = (
+	previousCliConfig: CLIConfig,
+	config: LoadedConfig.t,
+	env: EnvVars,
+	parsedArgs: SanitizedArgs.t,
+	i18n: i18n.t,
+) => {
+	const pluginLib = inject({
+		parsedArgs,
+		i18n,
+		env,
+		config,
+		stderr: Deno.stderr,
+		stdout: Deno.stdout,
+	});
+
+	const cliConfig = loadInternalTasks(previousCliConfig, config, env, i18n);
+
+	return pipe(
+		pluginLib.getState(),
+		map((state: EphemeralState.t) =>
+			pipe(
+				resolvePluginName(parsedArgs, state),
+				(parsedArgs: SanitizedArgs.t) => loadEphemeralState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
+			)
+		),
+	);
+};
+
 const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 	(previousCLIConfig: CLIConfig) =>
 		pipe(
 			getConfig(parsedArgs.projectDir, i18n, false),
-			chain((config: LoadedConfig.t) => {
-				debugger;
-				const pluginLib = inject({
-					parsedArgs,
-					i18n,
-					env,
-					config,
-					stderr: Deno.stderr,
-					stdout: Deno.stdout,
-				});
-
-				const cliConfig = loadInternalTasks(previousCLIConfig, config, i18n);
-
-				return pipe(
-					pluginLib.getState(),
-					map((state: EphemeralState.t) =>
-						pipe(
-							resolvePluginName(parsedArgs, state),
-							(parsedArgs: SanitizedArgs.t) =>
-								loadEphemeralState(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
-						)
-					),
-				);
-			}),
+			chain((config: LoadedConfig.t) => loadPlugins(previousCLIConfig, config, env, parsedArgs, i18n)),
 			map((cliConfig: CLIConfig) => cliConfig.help()),
 			chain(parseArgs),
 			chain(inputArgs => SanitizedArgs.of(inputArgs)),
