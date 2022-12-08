@@ -122,5 +122,5 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
-	// afterAll(() => fsPromises.rm(taqueriaProjectPath, { recursive: true }));
+	afterAll(() => fsPromises.rm(taqueriaProjectPath, { recursive: true }));
 });
