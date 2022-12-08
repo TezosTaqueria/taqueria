@@ -9,17 +9,11 @@ const exec = util.promisify(exec1);
 const taqueriaProjectPath = './scrap/auto-test-cli';
 
 describe('E2E Testing for taqueria CLI,', () => {
-	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath);
-	});
+	beforeAll(() => generateTestProject(taqueriaProjectPath));
 
 	test('Verify that taq --help gives the help menu for a non-initialized project', async () => {
-		try {
-			const output = await exec('taq --help');
-			expect(output.stdout).toBe(contents.helpContentsNoProject);
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		const output = await exec('taq --help');
+		expect(output.stdout).toBe(contents.helpContentsNoProject);
 	});
 
 	test('Verify that taq --help gives the help menu for an initialized project', async () => {
@@ -149,11 +143,5 @@ describe('E2E Testing for taqueria CLI,', () => {
 
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
-	afterAll(async () => {
-		try {
-			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
+	// afterAll(() => fsPromises.rm(taqueriaProjectPath, { recursive: true }));
 });

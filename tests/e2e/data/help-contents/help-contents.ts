@@ -2,18 +2,18 @@ export const helpContentsNoProject: string = `taq [command]
 
 Commands:
   taq init [projectDir]                     Initialize a new project
+  taq scaffold [scaffoldUrl] [scaffoldProj  Generate a new project using pre-mad
+  ectDir]                                   e scaffold
   taq opt-in                                Opt-in to sharing anonymous usage an
                                             alytics
   taq opt-out                               Opt-out of sharing anonymous usage a
                                             nalytics
-  taq scaffold [scaffoldUrl] [scaffoldProj  Generate a new project using pre-mad
-  ectDir]                                   e scaffold
 
 Options:
-      --version     Show version number                                [boolean]
-      --build       Display build information about the current version[boolean]
   -p, --projectDir  Path to your project directory               [default: "./"]
   -e, --env         Specify an environment configuration
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
 
 Taqueria is currently in BETA. You've been warned. :)
 `;
