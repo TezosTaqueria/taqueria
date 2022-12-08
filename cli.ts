@@ -42,6 +42,7 @@ import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
 import * as Analytics from './analytics.ts';
 import { addContract, listContracts, removeContract } from './contracts.ts';
+import { createRegistry } from './internal-tasks.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -50,7 +51,6 @@ import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
 import type { CLIConfig, DenoArgs, EnvKey, EnvVars } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
-import {createRegistry} from "./internal-tasks.ts"
 
 // Get utils
 const {
@@ -89,7 +89,7 @@ const exec = execText;
 type PluginLib = ReturnType<typeof inject>;
 
 // Create new internal task registry
-const internalTasks = createRegistry()
+const internalTasks = createRegistry();
 
 /**
  * Parsing arguments is done in two different stages.
@@ -125,7 +125,6 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			type: 'string',
 		})
 		.hide('setVersion')
-		.version(getVersion(args))
 		.option('disableState', {
 			describe: i18n.__('disableStateDesc'),
 			default: getFromEnv('TAQ_DISABLE_STATE', false, env),
@@ -145,10 +144,6 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			type: 'string',
 		})
 		.hide('setBuild')
-		.option('build', {
-			describe: i18n.__('buildDesc'),
-			type: 'boolean',
-		})
 		.option('maxConcurrency', {
 			describe: i18n.__('maxConcurrencyDesc'),
 			default: getFromEnv('TAQ_MAX_CONCURRENCY', getDefaultMaxConcurrency(), env),
@@ -171,196 +166,319 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			alias: 'e',
 			describe: i18n.__('envDesc'),
 		})
-		.epilogue(i18n.__('betaWarning'))
-		.command(
-			'init [projectDir]',
-			i18n.__('initDesc'),
-			(yargs: Arguments) => {
-				yargs.positional('projectDir', {
-					describe: i18n.__('initPathDesc'),
-					type: 'string',
-					default: getFromEnv('TAQ_PROJECT_DIR', '.', env),
-				});
-			},
-			(args: Record<string, unknown>) =>
-				pipe(
-					SanitizedArgs.of(args),
-					chain(({ projectDir, maxConcurrency }: SanitizedArgs.t) => {
-						return initProject(projectDir, maxConcurrency, i18n);
-					}),
-					forkCatch(console.error)(console.error)(console.log),
-				),
-		)
-		.command(
-			'opt-in',
-			i18n.__('optInDesc'),
-			() => {},
-			() =>
-				pipe(
-					optInAnalytics(),
-					forkCatch(console.error)(console.error)(console.log),
-				),
-		)
-		.command(
-			'opt-out',
-			i18n.__('optOutDesc'),
-			() => {},
-			() =>
-				pipe(
-					optOutAnalytics(),
-					forkCatch(console.error)(console.error)(console.log),
-				),
-		)
+		.option('y', {
+			describe: i18n.__('yesOptionDesc'),
+			alias: 'yes',
+			default: false,
+			boolean: true,
+		})
 		.option('fromVsCode', {
 			describe: i18n.__('fromVsCodeDesc'),
 			default: false,
 			boolean: true,
 		})
-		.hide('fromVsCode')
-		.command(
-			'testFromVsCode',
-			false,
-			() => {},
-			() => log('OK'),
-		)
+		.epilogue(i18n.__('betaWarning'))
 		.help(false);
 
 const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
-	const cliConfig = commonCLI(env, args, i18n).help(false);
-	return cliConfig
-		.command(
-			'scaffold [scaffoldUrl] [scaffoldProjectDir]',
-			i18n.__('scaffoldDesc'),
-			(yargs: Arguments) => {
-				yargs
-					.positional('scaffoldUrl', {
-						describe: i18n.__('scaffoldUrlDesc'),
-						type: 'string',
-						default: 'https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git',
-					})
-					.positional('scaffoldProjectDir', {
-						type: 'string',
-						describe: i18n.__('scaffoldProjectDirDesc'),
-						default: './taqueria-taco-shop',
-					});
-			},
-		);
+	// Add "install" task to install plugins
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('install'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'install <pluginName>',
+					i18n.__('installDesc'),
+					(yargs: Arguments) => {
+						yargs.positional('pluginName', {
+							describe: i18n.__('pluginNameDesc'),
+							type: 'string',
+							required: true,
+						});
+					},
+				)
+				.alias('install', 'i'),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
+				chain(args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName)),
+				map(log),
+			),
+	});
+
+	// Add "uninstall" task
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('uninstall'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'uninstall <pluginName>',
+					i18n.__('uninstallDesc'),
+					(yargs: Arguments) => {
+						yargs.positional('pluginName', {
+							describe: i18n.__('pluginNameDesc'),
+							type: 'string',
+							required: true,
+						});
+					},
+				)
+				.alias('u', 'uninstall'),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				SanitizedArgs.ofUninstallTaskArgs(parsedArgs),
+				chain(parsedArgs => NPM.uninstallPlugin(parsedArgs.projectDir, i18n, parsedArgs.pluginName)),
+				map(log),
+			),
+	});
+
+	// Add "scaffold" task to scaffold full projects
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('scaffold'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'scaffold [scaffoldUrl] [scaffoldProjectDir]',
+					i18n.__('scaffoldDesc'),
+					(yargs: Arguments) => {
+						yargs
+							.positional('scaffoldUrl', {
+								describe: i18n.__('scaffoldUrlDesc'),
+								type: 'string',
+								default: 'https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git',
+							})
+							.positional('scaffoldProjectDir', {
+								type: 'string',
+								describe: i18n.__('scaffoldProjectDirDesc'),
+								default: './taqueria-taco-shop',
+							});
+					},
+				),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				SanitizedArgs.ofScaffoldTaskArgs(parsedArgs),
+				chain(scaffoldProject(i18n)),
+				map(log),
+			),
+	});
+
+	// Add a hidden task "list-known-tasks" task to show all known tasks
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('list-known-tasks'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'list-known-tasks',
+					false, // hide
+					() => {},
+				),
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				parsedArgs,
+				listKnownTasks,
+				map(log),
+			),
+	});
+
+	// Add "init" task used to initialize a new project
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('init'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'init [projectDir]',
+					i18n.__('initDesc'),
+					(yargs: Arguments) => {
+						yargs.positional('projectDir', {
+							describe: i18n.__('initPathDesc'),
+							type: 'string',
+							default: getFromEnv('TAQ_PROJECT_DIR', '.', env),
+						});
+					},
+				),
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				parsedArgs,
+				({ projectDir, maxConcurrency }) => initProject(projectDir, maxConcurrency, i18n),
+				map(log),
+			),
+	});
+
+	// Add "add-contract" task used to add/register a known contract
+	// TODO: Remove?
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('add-contract'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'add-contract <sourceFile>',
+					i18n.__('addContractDesc'),
+					(yargs: Arguments) => {
+						yargs.positional('sourceFile', {
+							describe: i18n.__('addSourceFileDesc'),
+							type: 'string',
+							required: true,
+						});
+
+						yargs.option('contractName', {
+							alias: ['name', 'n'],
+							type: 'string',
+						});
+					},
+				),
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				SanitizedArgs.ofAddContractArgs(parsedArgs),
+				chain(args => addContract(args, i18n)),
+				map(renderTable),
+			),
+	});
+
+	// Add "rm-contract" task to remove (unregister) a known contract
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('rm-contract'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'rm-contract <contractName>',
+					i18n.__('removeContractDesc'),
+					(yargs: Arguments) => {
+						yargs.positional('contractName', {
+							describe: i18n.__('removeContractNameDesc'),
+							type: 'string',
+							required: true,
+						});
+					},
+				)
+				.alias('remove-contract', 'rm-contract'),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				SanitizedArgs.ofRemoveContractsArgs(parsedArgs),
+				chain(args => removeContract(args, i18n)),
+				map(renderTable),
+			),
+	});
+
+	// Add "list-contracts" task to show a list of all known (registered) contracts
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('list-contract'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'list-contracts',
+					i18n.__('listContractsDesc'),
+					() => {},
+				)
+				.alias('show-contracts', 'list-contracts'),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				SanitizedArgs.of(parsedArgs),
+				chain(args => listContracts(args, i18n)),
+				map(renderTable),
+			),
+	});
+
+	// Add "opt-in" task to opt-in to to analytics tracking
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('opt-in'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'opt-in',
+					i18n.__('optInDesc'),
+					() => {},
+				),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				parsedArgs,
+				optInAnalytics,
+				map(log),
+			),
+	});
+
+	// Add "opt-out" task to opt-out of analytics tracking
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('opt-out'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'opt-out',
+					i18n.__('optOutDesc'),
+					() => {},
+				),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				parsedArgs,
+				optOutAnalytics,
+				map(log),
+			),
+	});
+
+	// Add a task for vscode to learn more about the CLI
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('fromVsCode'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.hide('fromVsCode')
+				.command(
+					'testFromVsCode',
+					false,
+					() => {},
+				),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				log('OK'),
+				taqResolve,
+			),
+	});
+
+	// Add "--build" command to show the build version
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('build'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.option('build', {
+					describe: i18n.__('buildDesc'),
+					type: 'boolean',
+				}),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				log(parsedArgs.setBuild),
+				taqResolve,
+			),
+
+		isRunning: (parsedArgs: SanitizedArgs.t) => parsedArgs.build ? true : false,
+	});
+
+	// Add "--version" command to show the CLI version number
+	internalTasks.addInternalTask({
+		taskName: NonEmptyString.create('version'),
+		configure: (cliConfig: CLIConfig) => cliConfig.version(getVersion(args)),
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				log(parsedArgs.setVersion),
+				taqResolve,
+			),
+		isRunning: (parsedArgs: SanitizedArgs.t) => parsedArgs.version ? true : false,
+	});
+
+	return internalTasks.configure(commonCLI(env, args, i18n));
 };
+
+const demandCommand = (cliConfig: CLIConfig) => cliConfig.demandCommand(1) as CLIConfig;
 
 const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 	pipe(
-		commonCLI(env, args, i18n)
-			.command(
-				'install <pluginName>',
-				i18n.__('installDesc'),
-				(yargs: Arguments) => {
-					yargs.positional('pluginName', {
-						describe: i18n.__('pluginNameDesc'),
-						type: 'string',
-						required: true,
-					});
-				},
-				// TODO: This function assumes that there is only one type of plugin available to install,
-				// a plugin distributed and installable via NPM. This should support other means of distribution
-				(inputArgs: Record<string, unknown>) =>
-					pipe(
-						SanitizedArgs.ofInstallTaskArgs(inputArgs),
-						chain(args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName)),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(console.log),
-					),
-			)
-			.alias('i', 'install')
-			.command(
-				'uninstall <pluginName>',
-				i18n.__('uninstallDesc'),
-				(yargs: Arguments) => {
-					yargs.positional('pluginName', {
-						describe: i18n.__('pluginNameDesc'),
-						type: 'string',
-						required: true,
-					});
-				},
-				(inputArgs: Record<string, unknown>) =>
-					pipe(
-						SanitizedArgs.ofUninstallTaskArgs(inputArgs),
-						chain(inputArgs => NPM.uninstallPlugin(parsedArgs.projectDir, i18n, inputArgs.pluginName)),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(console.log),
-					),
-			)
-			.alias('u', 'uninstall')
-			.command(
-				'list-known-tasks',
-				false, // hide
-				() => {},
-				(inputArgs: Record<string, unknown>) =>
-					pipe(
-						SanitizedArgs.of(inputArgs),
-						chain(listKnownTasks),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(log),
-					),
-			)
-			.option('y', {
-				describe: i18n.__('yesOptionDesc'),
-				alias: 'yes',
-				default: false,
-				boolean: true,
-			})
-			.command(
-				'add-contract <sourceFile>',
-				i18n.__('addContractDesc'),
-				(yargs: Arguments) => {
-					yargs.positional('sourceFile', {
-						describe: i18n.__('addSourceFileDesc'),
-						type: 'string',
-						required: true,
-					});
-
-					yargs.option('contractName', {
-						alias: ['name', 'n'],
-						type: 'string',
-					});
-				},
-				(inputArgs: Record<string, unknown>) =>
-					pipe(
-						SanitizedArgs.ofAddContractArgs(inputArgs),
-						chain(args => addContract(args, i18n)),
-						map(renderTable),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
-					),
-			)
-			.command(
-				'rm-contract <contractName>',
-				i18n.__('removeContractDesc'),
-				(yargs: Arguments) => {
-					yargs.positional('contractName', {
-						describe: i18n.__('removeContractNameDesc'),
-						type: 'string',
-						required: true,
-					});
-				},
-				(inputArgs: Record<string, unknown>) =>
-					pipe(
-						SanitizedArgs.ofRemoveContractsArgs(inputArgs),
-						chain(args => removeContract(args, i18n)),
-						map(renderTable),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
-					),
-			)
-			.alias('remove-contract', 'rm-contract')
-			.command(
-				'list-contracts',
-				i18n.__('listContractsDesc'),
-				() => {},
-				(inputArgs: Record<string, unknown>) =>
-					pipe(
-						SanitizedArgs.of(inputArgs),
-						chain(args => listContracts(args, i18n)),
-						map(renderTable),
-						forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
-					),
-			)
-			.alias('show-contracts', 'list-contracts')
-			.demandCommand(),
+		cliConfig,
+		demandCommand,
 		extendCLI(env, parsedArgs, i18n),
 	);
 
@@ -1012,29 +1130,8 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 					chain(SanitizedArgs.of),
 					chain((initArgs: SanitizedArgs.t) => {
 						if (initArgs.debug) debugMode(true);
-						console.log(initArgs)
-						Deno.exit(-1)
-
-
-						if (initArgs.version) {
-							log(initArgs.setVersion);
-							return taqResolve(initArgs);
-						} else if (initArgs.build) {
-							log(initArgs.setBuild);
-							return taqResolve(initArgs);
-						} else if (initArgs._.includes('scaffold')) {
-							return pipe(
-								SanitizedArgs.ofScaffoldTaskArgs(initArgs),
-								chain(scaffoldProject(i18n)),
-								map(_ => initArgs),
-							);
-						}
-
-						return initArgs._.includes('init')
-								|| initArgs._.includes('testFromVsCode')
-								|| initArgs._.includes('opt-in')
-								|| initArgs._.includes('opt-out')
-							? taqResolve(initArgs)
+						return internalTasks.isInternalTask(initArgs)
+							? internalTasks.handle(initArgs)
 							: postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n);
 					}),
 					chain(initArgs =>
@@ -1064,7 +1161,11 @@ export const showInvalidTask = (cli: CLIConfig) =>
 	(parsedArgs: SanitizedArgs.t) => {
 		if (executingBuiltInTask(parsedArgs) || cli.handled) {
 			return taqResolve(parsedArgs);
+		} else if (parsedArgs._.length == 0) {
+			cli.showHelp();
+			return taqResolve(parsedArgs);
 		}
+
 		const err: TaqError.t = {
 			kind: 'E_INVALID_TASK',
 			msg: `Taqueria isn't aware of this task. Perhaps you need to install a plugin first?`,
@@ -1116,6 +1217,7 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_EXEC' }, err => [19, false])
+				.with({ kind: 'E_OPT_IN_WARNING' }, err => [20, err.msg])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 
