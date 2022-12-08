@@ -1,19 +1,29 @@
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
+import { ExecException } from 'child_process';
+import { exec as exec1, execSync } from 'child_process';
+import fsPromises from 'fs/promises';
+import util from 'util';
+import * as contents from './data/help-contents/help-contents';
+import { generateTestProject } from './utils/utils';
+const exec = util.promisify(exec1);
 
 describe('E2E Testing for taqueria CLI,', () => {
+	const taqueriaProjectPath = 'auto-test-cli';
+
 	test('Verify that taq --help gives the help menu for a non-initialized project', async () => {
-		const { execute, cleanup } = await prepareEnvironment();
-		const { code } = await execute('taq', '--help');
-		expect(code).toBe(0);
-		expect.arrayContaining(['taq scaffold ']);
+		const { spawn, cleanup } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', '--help');
+		await waitForText('taq scaffold');
 		await cleanup();
 	});
 
 	test('Verify that taq --help gives the help menu for an initialized project', async () => {
-		const { execute, cleanup } = await prepareEnvironment();
-		const { code } = await execute('taq', '--help -p auto-test-cli');
+		const { spawn, execute, cleanup } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout, code } = await execute('taq', '--help -p test-project');
+		expect(stdout).toContain('taq [command]');
 		expect(code).toBe(0);
-		expect.arrayContaining(['taq install <pluginName> ']);
 		await cleanup();
 	});
 
@@ -36,31 +46,20 @@ describe('E2E Testing for taqueria CLI,', () => {
 	});
 
 	test('Verify that trying a command that is not available returns an error', async () => {
-		const { execute, cleanup } = await prepareEnvironment();
-		const { code } = await execute('taq', 'compile -p foobar');
+		const { execute, spawn, cleanup } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { code } = await execute('taq', 'compile sourcefile.ligo');
 		expect(code).toBe(1);
-		expect.arrayContaining(["Taqueria isn't aware of this task. Perhaps you need to install a plugin first?"]);
 		await cleanup();
 	});
 
 	test('Verify that trying to install a package that does not exist returns an error', async () => {
-		const { execute, cleanup } = await prepareEnvironment();
+		const { execute, cleanup, spawn } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
 		const { code } = await execute('taq', 'install acoupleofecadhamburgers -p foobar');
 		expect(code).toBe(1);
-		expect.arrayContaining(['Could not read.*acoupleofecadhamburgers']);
-		await cleanup();
-	});
-
-	test('Verify that ligo and smartpy expose the plugin choice option for compile in the help menu', async () => {
-		const { execute, cleanup } = await prepareEnvironment();
-		const { code } = await execute('taq', 'install ../../../taqueria-plugin-ligo -p foobar');
-		await execute('taq', 'install ../../../taqueria-plugin-smartpy -p foobar');
-		await execute('taq', '--help --projectDir=foobar');
-		expect(code).toBe(1);
-		expect.arrayContaining(['taq ligo ']);
-		const {} = await execute('taq', 'uninstall @taqueria/plugin-ligo -p foobar');
-		const {} = await execute('taq', 'uninstall @taqueria/plugin-smartpy -p foobar');
-
 		await cleanup();
 	});
 });
