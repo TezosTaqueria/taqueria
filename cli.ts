@@ -423,6 +423,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 			pipe(
 				SanitizedArgs.ofAddContractArgs(parsedArgs),
 				chain(args => addContract(config, args, i18n)),
+				chain(_ => listContracts(config, parsedArgs, i18n)),
 				map(renderTable),
 			),
 	});
@@ -449,6 +450,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 			pipe(
 				SanitizedArgs.ofRemoveContractsArgs(parsedArgs),
 				chain(args => removeContract(config, args, i18n)),
+				chain(_ => listContracts(config, parsedArgs, i18n)),
 				map(renderTable),
 			),
 	});

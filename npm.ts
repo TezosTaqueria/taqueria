@@ -104,7 +104,7 @@ export const installPlugin = (
 	pipe(
 		requireNPM(projectDir, i18n),
 		chain(_ => exec('npm install -D <%= it.plugin %>', { plugin }, false, projectDir)),
-		chain(result => {
+		chain(() => {
 			// The plugin name could look like this: @taqueria/plugin-ligo@1.2.3
 			// We need to trim @1.2.3 from the end
 			const pluginName = getPluginName(plugin);

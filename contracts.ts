@@ -35,51 +35,44 @@ const newContract = (sourceFile: string, projectDir: SanitiziedAbsPath.t, contra
 		),
 	);
 
-export const addContract = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18n.t) =>
-	pipe(
-		() =>
-			isContractRegistered(parsedArgs.contractName, config)
-				? reject(TaqError.create({
-					kind: 'E_CONTRACT_REGISTERED',
-					context: parsedArgs,
-					msg: `${parsedArgs.contractName} has already been registered`,
-				}))
-				: pipe(
-					newContract(parsedArgs.sourceFile, parsedArgs.projectDir, config.contractsDir ?? 'contracts'),
-					map(contract => {
-						const contracts = config.contracts || {};
-						return {
-							...config,
-							contracts: {
-								...contracts,
-								...Object.fromEntries([[parsedArgs.contractName, contract]]),
-							},
-						};
-					}),
-					chain(writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))),
-				),
-		_ => listContracts(config, parsedArgs, i18n),
-	);
+export const addContract = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18n.t) => {
+	return isContractRegistered(parsedArgs.contractName, config)
+		? reject(TaqError.create({
+			kind: 'E_CONTRACT_REGISTERED',
+			context: parsedArgs,
+			msg: `${parsedArgs.contractName} has already been registered`,
+		}))
+		: pipe(
+			newContract(parsedArgs.sourceFile, parsedArgs.projectDir, config.contractsDir ?? 'contracts'),
+			map(contract => {
+				const contracts = config.contracts || {};
+				return {
+					...config,
+					contracts: {
+						...contracts,
+						...Object.fromEntries([[parsedArgs.contractName, contract]]),
+					},
+				};
+			}),
+			chain(writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))),
+		);
+};
 
-export const removeContract = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.RemoveContractArgs, i18n: i18n.t) =>
-	pipe(
-		() => {
-			if (!isContractRegistered(parsedArgs.contractName, config)) {
-				return reject(TaqError.create({
-					kind: 'E_CONTRACT_NOT_REGISTERED',
-					context: parsedArgs,
-					msg: `${parsedArgs.contractName} is not a registered contract`,
-				}));
-			}
+export const removeContract = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.RemoveContractArgs, i18n: i18n.t) => {
+	if (!isContractRegistered(parsedArgs.contractName, config)) {
+		return reject(TaqError.create({
+			kind: 'E_CONTRACT_NOT_REGISTERED',
+			context: parsedArgs,
+			msg: `${parsedArgs.contractName} is not a registered contract`,
+		}));
+	}
 
-			const updatedConfig = {
-				...config,
-				contracts: omit([parsedArgs.contractName], config.contracts),
-			};
-			return writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))(updatedConfig);
-		},
-		_ => listContracts(config, parsedArgs, i18n),
-	);
+	const updatedConfig = {
+		...config,
+		contracts: omit([parsedArgs.contractName], config.contracts),
+	};
+	return writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))(updatedConfig);
+};
 
 export const listContracts = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 	pipe(
