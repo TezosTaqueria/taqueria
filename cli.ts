@@ -67,7 +67,7 @@ const {
 	eager,
 	isTaqError,
 	taqResolve,
-	logInput,
+	// logInput,
 	// debug
 } = utils.inject({
 	stdout: Deno.stdout,
@@ -169,12 +169,6 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 			alias: 'e',
 			describe: i18n.__('envDesc'),
 		})
-		.option('y', {
-			describe: i18n.__('yesOptionDesc'),
-			alias: 'yes',
-			default: false,
-			boolean: true,
-		})
 		.option('fromVsCode', {
 			describe: i18n.__('fromVsCodeDesc'),
 			default: false,
@@ -184,6 +178,30 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 		.help(false);
 
 const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
+	// Add "init" task used to initialize a new project
+	globalTasks.registerTask({
+		taskName: NonEmptyString.create('init'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'init [projectDir]',
+					i18n.__('initDesc'),
+					(yargs: Arguments) => {
+						yargs.positional('projectDir', {
+							describe: i18n.__('initPathDesc'),
+							type: 'string',
+							default: getFromEnv('TAQ_PROJECT_DIR', '.', env),
+						});
+					},
+				),
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				parsedArgs,
+				({ projectDir, maxConcurrency }) => initProject(projectDir, maxConcurrency, i18n),
+				map(log),
+			),
+	});
+
 	// Add "scaffold" task to scaffold full projects
 	globalTasks.registerTask({
 		taskName: NonEmptyString.create('scaffold'),
@@ -211,30 +229,6 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 			pipe(
 				SanitizedArgs.ofScaffoldTaskArgs(parsedArgs),
 				chain(scaffoldProject(i18n)),
-				map(log),
-			),
-	});
-
-	// Add "init" task used to initialize a new project
-	globalTasks.registerTask({
-		taskName: NonEmptyString.create('init'),
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.command(
-					'init [projectDir]',
-					i18n.__('initDesc'),
-					(yargs: Arguments) => {
-						yargs.positional('projectDir', {
-							describe: i18n.__('initPathDesc'),
-							type: 'string',
-							default: getFromEnv('TAQ_PROJECT_DIR', '.', env),
-						});
-					},
-				),
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				parsedArgs,
-				({ projectDir, maxConcurrency }) => initProject(projectDir, maxConcurrency, i18n),
 				map(log),
 			),
 	});
@@ -296,6 +290,18 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 			),
 	});
 
+	// Add "--version" command to show the CLI version number
+	globalTasks.registerTask({
+		taskName: NonEmptyString.create('version'),
+		configure: (cliConfig: CLIConfig) => cliConfig.version(getVersion(args)),
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				log(parsedArgs.setVersion),
+				taqResolve,
+			),
+		isRunning: (parsedArgs: SanitizedArgs.t) => parsedArgs.version ? true : false,
+	});
+
 	// Add "--build" command to show the build version
 	globalTasks.registerTask({
 		taskName: NonEmptyString.create('build'),
@@ -313,18 +319,6 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 			),
 
 		isRunning: (parsedArgs: SanitizedArgs.t) => parsedArgs.build ? true : false,
-	});
-
-	// Add "--version" command to show the CLI version number
-	globalTasks.registerTask({
-		taskName: NonEmptyString.create('version'),
-		configure: (cliConfig: CLIConfig) => cliConfig.version(getVersion(args)),
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				log(parsedArgs.setVersion),
-				taqResolve,
-			),
-		isRunning: (parsedArgs: SanitizedArgs.t) => parsedArgs.version ? true : false,
 	});
 
 	return globalTasks.configure(commonCLI(env, args, i18n));
@@ -352,7 +346,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, i18n: i
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
-				chain(args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName)),
+				chain(args => NPM.installPlugin(config, parsedArgs.projectDir, i18n, args.pluginName)),
 				map(log),
 			),
 	});
@@ -378,7 +372,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, i18n: i
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofUninstallTaskArgs(parsedArgs),
-				chain(parsedArgs => NPM.uninstallPlugin(parsedArgs.projectDir, i18n, parsedArgs.pluginName)),
+				chain(parsedArgs => NPM.uninstallPlugin(config, parsedArgs.projectDir, i18n, parsedArgs.pluginName)),
 				map(log),
 			),
 	});
@@ -426,7 +420,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, i18n: i
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofAddContractArgs(parsedArgs),
-				chain(args => addContract(args, i18n)),
+				chain(args => addContract(config, args, i18n)),
 				map(renderTable),
 			),
 	});
@@ -452,7 +446,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, i18n: i
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofRemoveContractsArgs(parsedArgs),
-				chain(args => removeContract(args, i18n)),
+				chain(args => removeContract(config, args, i18n)),
 				map(renderTable),
 			),
 	});
@@ -472,12 +466,20 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, i18n: i
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.of(parsedArgs),
-				chain(args => listContracts(args, i18n)),
+				chain(args => listContracts(config, args, i18n)),
 				map(renderTable),
 			),
 	});
 
-	return internalTasks.configure(cliConfig);
+	return internalTasks.configure(cliConfig)
+		// TODO: Discuss with team. I think this should be a global option, and it was originally,
+		// but it was later moved.
+		.option('y', {
+			describe: i18n.__('yesOptionDesc'),
+			alias: 'yes',
+			default: false,
+			boolean: true,
+		});
 };
 
 const demandCommand = (cliConfig: CLIConfig) => cliConfig.demandCommand(1) as CLIConfig;
@@ -1107,7 +1109,11 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 			map((cliConfig: CLIConfig) => cliConfig.help()),
 			chain(parseArgs),
 			chain(inputArgs => SanitizedArgs.of(inputArgs)),
-			chain(showInvalidTask(previousCLIConfig)),
+			chain(parsedArgs =>
+				internalTasks.isTaskRunning(parsedArgs)
+					? internalTasks.handle(parsedArgs)
+					: showInvalidTask(previousCLIConfig)(parsedArgs)
+			),
 		);
 
 const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>

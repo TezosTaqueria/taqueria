@@ -10,7 +10,7 @@ import { attemptP, chain, map, reject, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { has, isEmpty, omit, toPairs } from 'rambda';
 import { getConfig } from './taqueria-config.ts';
-import { joinPaths, readTextFile, writeJsonFile } from './taqueria-utils/taqueria-utils.ts';
+import { joinPaths, readTextFile, taqResolve, writeJsonFile } from './taqueria-utils/taqueria-utils.ts';
 
 type contractRow = {
 	'Name': string;
@@ -35,11 +35,9 @@ const newContract = (sourceFile: string, projectDir: SanitiziedAbsPath.t, contra
 		),
 	);
 
-export const addContract = (parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18n.t) =>
+export const addContract = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18n.t) =>
 	pipe(
-		getConfig(parsedArgs.projectDir, i18n),
-		chain(LoadedConfig.make),
-		chain(config =>
+		() =>
 			isContractRegistered(parsedArgs.contractName, config)
 				? reject(TaqError.create({
 					kind: 'E_CONTRACT_REGISTERED',
@@ -59,16 +57,13 @@ export const addContract = (parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18
 						};
 					}),
 					chain(writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))),
-				)
-		),
-		chain(_ => listContracts(parsedArgs, i18n)),
+				),
+		_ => listContracts(config, parsedArgs, i18n),
 	);
 
-export const removeContract = (parsedArgs: SanitizedArgs.RemoveContractArgs, i18n: i18n.t) =>
+export const removeContract = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.RemoveContractArgs, i18n: i18n.t) =>
 	pipe(
-		getConfig(parsedArgs.projectDir, i18n),
-		chain(LoadedConfig.make),
-		chain(config => {
+		() => {
 			if (!isContractRegistered(parsedArgs.contractName, config)) {
 				return reject(TaqError.create({
 					kind: 'E_CONTRACT_NOT_REGISTERED',
@@ -82,23 +77,21 @@ export const removeContract = (parsedArgs: SanitizedArgs.RemoveContractArgs, i18
 				contracts: omit([parsedArgs.contractName], config.contracts),
 			};
 			return writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))(updatedConfig);
-		}),
-		chain(_ => listContracts(parsedArgs, i18n)),
+		},
+		_ => listContracts(config, parsedArgs, i18n),
 	);
 
-export const listContracts = (parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
+export const listContracts = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 	pipe(
-		getConfig(parsedArgs.projectDir, i18n),
-		map(config =>
-			!hasContracts(config)
-				? [{ contract: i18n.__('noContractsRegistered') }]
-				: toPairs(config.contracts).reduce(
-					(retval: contractRow[], [key, val]) => [
-						...retval,
-						{ 'Name': key, 'Source file': val.sourceFile, 'Last Known Hash': val.hash.slice(0, 8) },
-					],
-					[],
-				)
-		),
-		map(rows => rows as Record<string, string>[]),
+		!hasContracts(config)
+			? [{ contract: i18n.__('noContractsRegistered') }]
+			: toPairs(config.contracts).reduce(
+				(retval: contractRow[], [key, val]) => [
+					...retval,
+					{ 'Name': key, 'Source file': val.sourceFile, 'Last Known Hash': val.hash.slice(0, 8) },
+				],
+				[],
+			),
+		rows => rows as Record<string, string>[],
+		taqResolve,
 	);
