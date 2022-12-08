@@ -14,7 +14,7 @@ const {
 	stderr: Deno.stderr,
 });
 
-type InternalTask = {
+type RegisteredTask = {
 	// Task as displayed in the CLI
 	taskName: NonEmptyString.t;
 
@@ -27,7 +27,7 @@ type InternalTask = {
 	isRunning: (args: SanitizedArgs.t) => boolean;
 };
 
-type InternalTaskArgs = {
+type RegisterTaskArgs = {
 	taskName: NonEmptyString.t;
 
 	// A method to configure the task, by adding it to yargs
@@ -40,20 +40,26 @@ type InternalTaskArgs = {
 };
 
 export function createRegistry() {
-	const tasks: InternalTask[] = [];
+	const tasks: RegisteredTask[] = [];
 
-	const addInternalTask = (taskArgs: InternalTaskArgs) => {
-		const isRunning = (parsedArgs: SanitizedArgs.t) => parsedArgs._.includes(taskArgs.taskName);
+	const registerTask = (taskArgs: RegisterTaskArgs) => {
+		// Default isRunning() function should a task not provide one
+		const isRunning = (parsedArgs: SanitizedArgs.t) => parsedArgs._.includes(taskArgs.taskName) && !parsedArgs.help;
+
+		// Create a registered task, using the default isRunning function above if one wasn't provided
 		const task = taskArgs.isRunning ? { isRunning: taskArgs.isRunning, ...taskArgs } : { isRunning, ...taskArgs };
-		tasks.push(task);
+
+		// Add the task to the list of registered tasks, if it wasn't already been registered
+		if (!tasks.find(t => t.taskName === task.taskName)) tasks.push(task);
+
 		return task;
 	};
 
-	const getInternalTasks = () => {
+	const getTasks = () => {
 		return [...tasks];
 	};
 
-	const getInternalTaskNames = () => {
+	const getTaskNames = () => {
 		return tasks.map(t => t.taskName);
 	};
 
@@ -71,8 +77,8 @@ export function createRegistry() {
 			([_, result]) => map(() => parsedArgs)(result),
 		);
 
-	const isInternalTask = (parsedArgs: SanitizedArgs.t) =>
-		tasks.reduce(
+	const isTaskRunning = (parsedArgs: SanitizedArgs.t) =>
+		parsedArgs.help ? false : tasks.reduce(
 			(retval, task) => retval || task.isRunning(parsedArgs),
 			false,
 		);
@@ -84,10 +90,10 @@ export function createRegistry() {
 		);
 
 	return {
-		addInternalTask,
-		getInternalTasks,
-		getInternalTaskNames,
-		isInternalTask,
+		registerTask,
+		getTasks,
+		getTaskNames,
+		isTaskRunning,
 		handle,
 		configure,
 	};

@@ -42,7 +42,6 @@ import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
 import * as Analytics from './analytics.ts';
 import { addContract, listContracts, removeContract } from './contracts.ts';
-import { createRegistry } from './internal-tasks.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -51,6 +50,7 @@ import { getConfig, getDefaultMaxConcurrency } from './taqueria-config.ts';
 import type { CLIConfig, DenoArgs, EnvKey, EnvVars } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
+import { createRegistry } from './task-registry.ts';
 
 // Get utils
 const {
@@ -88,7 +88,10 @@ const {
 const exec = execText;
 type PluginLib = ReturnType<typeof inject>;
 
-// Create new internal task registry
+// Registry of tasks that are internal and available regardless of whether executed in the context of a Taqueria project
+const globalTasks = createRegistry();
+
+// Registry of tasks that are internal and only available when executed in the context of a Taqueria project
 const internalTasks = createRegistry();
 
 /**
@@ -181,60 +184,8 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 		.help(false);
 
 const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
-	// Add "install" task to install plugins
-	internalTasks.addInternalTask({
-		taskName: NonEmptyString.create('install'),
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.command(
-					'install <pluginName>',
-					i18n.__('installDesc'),
-					(yargs: Arguments) => {
-						yargs.positional('pluginName', {
-							describe: i18n.__('pluginNameDesc'),
-							type: 'string',
-							required: true,
-						});
-					},
-				)
-				.alias('install', 'i'),
-
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
-				chain(args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName)),
-				map(log),
-			),
-	});
-
-	// Add "uninstall" task
-	internalTasks.addInternalTask({
-		taskName: NonEmptyString.create('uninstall'),
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.command(
-					'uninstall <pluginName>',
-					i18n.__('uninstallDesc'),
-					(yargs: Arguments) => {
-						yargs.positional('pluginName', {
-							describe: i18n.__('pluginNameDesc'),
-							type: 'string',
-							required: true,
-						});
-					},
-				)
-				.alias('u', 'uninstall'),
-
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				SanitizedArgs.ofUninstallTaskArgs(parsedArgs),
-				chain(parsedArgs => NPM.uninstallPlugin(parsedArgs.projectDir, i18n, parsedArgs.pluginName)),
-				map(log),
-			),
-	});
-
 	// Add "scaffold" task to scaffold full projects
-	internalTasks.addInternalTask({
+	globalTasks.registerTask({
 		taskName: NonEmptyString.create('scaffold'),
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
@@ -264,26 +215,8 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 			),
 	});
 
-	// Add a hidden task "list-known-tasks" task to show all known tasks
-	internalTasks.addInternalTask({
-		taskName: NonEmptyString.create('list-known-tasks'),
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.command(
-					'list-known-tasks',
-					false, // hide
-					() => {},
-				),
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				parsedArgs,
-				listKnownTasks,
-				map(log),
-			),
-	});
-
 	// Add "init" task used to initialize a new project
-	internalTasks.addInternalTask({
+	globalTasks.registerTask({
 		taskName: NonEmptyString.create('init'),
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
@@ -306,9 +239,171 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 			),
 	});
 
+	// Add "opt-in" task to opt-in to to analytics tracking
+	globalTasks.registerTask({
+		taskName: NonEmptyString.create('opt-in'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'opt-in',
+					i18n.__('optInDesc'),
+					() => {},
+				),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				parsedArgs,
+				optInAnalytics,
+				map(log),
+			),
+	});
+
+	// Add "opt-out" task to opt-out of analytics tracking
+	globalTasks.registerTask({
+		taskName: NonEmptyString.create('opt-out'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'opt-out',
+					i18n.__('optOutDesc'),
+					() => {},
+				),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				parsedArgs,
+				optOutAnalytics,
+				map(log),
+			),
+	});
+
+	// Add a task for vscode to learn more about the CLI
+	globalTasks.registerTask({
+		taskName: NonEmptyString.create('fromVsCode'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.hide('fromVsCode')
+				.command(
+					'testFromVsCode',
+					false,
+					() => {},
+				),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				log('OK'),
+				taqResolve,
+			),
+	});
+
+	// Add "--build" command to show the build version
+	globalTasks.registerTask({
+		taskName: NonEmptyString.create('build'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.option('build', {
+					describe: i18n.__('buildDesc'),
+					type: 'boolean',
+				}),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				log(parsedArgs.setBuild),
+				taqResolve,
+			),
+
+		isRunning: (parsedArgs: SanitizedArgs.t) => parsedArgs.build ? true : false,
+	});
+
+	// Add "--version" command to show the CLI version number
+	globalTasks.registerTask({
+		taskName: NonEmptyString.create('version'),
+		configure: (cliConfig: CLIConfig) => cliConfig.version(getVersion(args)),
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				log(parsedArgs.setVersion),
+				taqResolve,
+			),
+		isRunning: (parsedArgs: SanitizedArgs.t) => parsedArgs.version ? true : false,
+	});
+
+	return globalTasks.configure(commonCLI(env, args, i18n));
+};
+
+const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, i18n: i18n.t) => {
+	// Add "install" task to install plugins
+	internalTasks.registerTask({
+		taskName: NonEmptyString.create('install'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'install <pluginName>',
+					i18n.__('installDesc'),
+					(yargs: Arguments) => {
+						yargs.positional('pluginName', {
+							describe: i18n.__('pluginNameDesc'),
+							type: 'string',
+							required: true,
+						});
+					},
+				)
+				.alias('install', 'i'),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
+				chain(args => NPM.installPlugin(parsedArgs.projectDir, i18n, args.pluginName)),
+				map(log),
+			),
+	});
+
+	// Add "uninstall" task
+	internalTasks.registerTask({
+		taskName: NonEmptyString.create('uninstall'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'uninstall <pluginName>',
+					i18n.__('uninstallDesc'),
+					(yargs: Arguments) => {
+						yargs.positional('pluginName', {
+							describe: i18n.__('pluginNameDesc'),
+							type: 'string',
+							required: true,
+						});
+					},
+				)
+				.alias('u', 'uninstall'),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				SanitizedArgs.ofUninstallTaskArgs(parsedArgs),
+				chain(parsedArgs => NPM.uninstallPlugin(parsedArgs.projectDir, i18n, parsedArgs.pluginName)),
+				map(log),
+			),
+	});
+
+	// Add a hidden task "list-known-tasks" task to show all known tasks
+	internalTasks.registerTask({
+		taskName: NonEmptyString.create('list-known-tasks'),
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'list-known-tasks',
+					false, // hide
+					() => {},
+				),
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				parsedArgs,
+				listKnownTasks,
+				map(log),
+			),
+	});
+
 	// Add "add-contract" task used to add/register a known contract
 	// TODO: Remove?
-	internalTasks.addInternalTask({
+	internalTasks.registerTask({
 		taskName: NonEmptyString.create('add-contract'),
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
@@ -337,7 +432,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	});
 
 	// Add "rm-contract" task to remove (unregister) a known contract
-	internalTasks.addInternalTask({
+	internalTasks.registerTask({
 		taskName: NonEmptyString.create('rm-contract'),
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
@@ -363,7 +458,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	});
 
 	// Add "list-contracts" task to show a list of all known (registered) contracts
-	internalTasks.addInternalTask({
+	internalTasks.registerTask({
 		taskName: NonEmptyString.create('list-contract'),
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
@@ -382,102 +477,14 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 			),
 	});
 
-	// Add "opt-in" task to opt-in to to analytics tracking
-	internalTasks.addInternalTask({
-		taskName: NonEmptyString.create('opt-in'),
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.command(
-					'opt-in',
-					i18n.__('optInDesc'),
-					() => {},
-				),
-
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				parsedArgs,
-				optInAnalytics,
-				map(log),
-			),
-	});
-
-	// Add "opt-out" task to opt-out of analytics tracking
-	internalTasks.addInternalTask({
-		taskName: NonEmptyString.create('opt-out'),
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.command(
-					'opt-out',
-					i18n.__('optOutDesc'),
-					() => {},
-				),
-
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				parsedArgs,
-				optOutAnalytics,
-				map(log),
-			),
-	});
-
-	// Add a task for vscode to learn more about the CLI
-	internalTasks.addInternalTask({
-		taskName: NonEmptyString.create('fromVsCode'),
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.hide('fromVsCode')
-				.command(
-					'testFromVsCode',
-					false,
-					() => {},
-				),
-
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				log('OK'),
-				taqResolve,
-			),
-	});
-
-	// Add "--build" command to show the build version
-	internalTasks.addInternalTask({
-		taskName: NonEmptyString.create('build'),
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.option('build', {
-					describe: i18n.__('buildDesc'),
-					type: 'boolean',
-				}),
-
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				log(parsedArgs.setBuild),
-				taqResolve,
-			),
-
-		isRunning: (parsedArgs: SanitizedArgs.t) => parsedArgs.build ? true : false,
-	});
-
-	// Add "--version" command to show the CLI version number
-	internalTasks.addInternalTask({
-		taskName: NonEmptyString.create('version'),
-		configure: (cliConfig: CLIConfig) => cliConfig.version(getVersion(args)),
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				log(parsedArgs.setVersion),
-				taqResolve,
-			),
-		isRunning: (parsedArgs: SanitizedArgs.t) => parsedArgs.version ? true : false,
-	});
-
-	return internalTasks.configure(commonCLI(env, args, i18n));
+	return internalTasks.configure(cliConfig);
 };
 
 const demandCommand = (cliConfig: CLIConfig) => cliConfig.demandCommand(1) as CLIConfig;
 
-const postInitCLI = (cliConfig: CLIConfig, env: EnvVars, args: DenoArgs, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
+const postInitCLI = (env: EnvVars, args: DenoArgs, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 	pipe(
-		cliConfig,
+		initCLI(env, args, i18n),
 		demandCommand,
 		extendCLI(env, parsedArgs, i18n),
 	);
@@ -1070,10 +1077,11 @@ const resolvePluginName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t)
 		};
 
 const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
-	(cliConfig: CLIConfig) =>
+	(previousCLIConfig: CLIConfig) =>
 		pipe(
 			getConfig(parsedArgs.projectDir, i18n, false),
 			chain((config: LoadedConfig.t) => {
+				debugger;
 				const pluginLib = inject({
 					parsedArgs,
 					i18n,
@@ -1082,6 +1090,8 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 					stderr: Deno.stderr,
 					stdout: Deno.stdout,
 				});
+
+				const cliConfig = loadInternalTasks(previousCLIConfig, config, i18n);
 
 				return pipe(
 					pluginLib.getState(),
@@ -1097,11 +1107,11 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 			map((cliConfig: CLIConfig) => cliConfig.help()),
 			chain(parseArgs),
 			chain(inputArgs => SanitizedArgs.of(inputArgs)),
-			chain(showInvalidTask(cliConfig)),
+			chain(showInvalidTask(previousCLIConfig)),
 		);
 
 const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
-	internalTasks.getInternalTaskNames().reduce(
+	[...globalTasks.getTaskNames(), ...internalTasks.getTaskNames()].reduce(
 		(retval, builtinTaskName: string) => retval || inputArgs._.includes(builtinTaskName),
 		false,
 	);
@@ -1129,10 +1139,11 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 					parseArgs,
 					chain(SanitizedArgs.of),
 					chain((initArgs: SanitizedArgs.t) => {
+						debugger;
 						if (initArgs.debug) debugMode(true);
-						return internalTasks.isInternalTask(initArgs)
-							? internalTasks.handle(initArgs)
-							: postInitCLI(cliConfig, env, processedInputArgs, initArgs, i18n);
+						return globalTasks.isTaskRunning(initArgs)
+							? globalTasks.handle(initArgs)
+							: postInitCLI(env, processedInputArgs, initArgs, i18n);
 					}),
 					chain(initArgs =>
 						sendEvent(
