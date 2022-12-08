@@ -125,6 +125,7 @@ jobs:
 
       - name: Build all
         run: |
+          npm run build-types
           npm run build:packages
       
       - name: Compile TS
