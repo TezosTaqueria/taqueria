@@ -262,13 +262,6 @@ export type TzKtConfig = {
 
 // ---- Project Files ----
 
-export type Environment = {
-	networks: NonEmptyString[];
-	sandboxes: NonEmptyString[];
-	storage?: Record<string, NonEmptyString>;
-	aliases?: Record<string, Record<string, NonEmptyString>>;
-};
-
 export type EphemeralState = {
 	build: string;
 	configHash: string;
@@ -322,6 +315,37 @@ export type Provisions = Provisioner[];
 
 // ---- Project Files: Config ----
 
+export type Environment = {
+	networks: NonEmptyString[];
+	sandboxes: NonEmptyString[];
+	storage?: Record<string, NonEmptyString>;
+	aliases?: Record<string, Record<string, NonEmptyString>>;
+};
+
+export type ConfigEnvironmentFileV2 = {
+	/** environment types provided by plugins
+	 *
+	 * Examples: flextesa, teztnet, mainnet
+	 *
+	 * annotations provides plugin specific data like rpcUrl
+	 */
+	type?: string;
+
+	/** Account overrides for this environment */
+	accounts?: Record<string, {
+		type?: string;
+	}>;
+
+	/** Account overrides for this environment */
+	contracts?: Record<string, {
+		type?: string;
+		options?: Record<string, unknown>;
+	}>;
+	// Other fields may exist, but they are not type checked here
+	// It is expected that this will be cast to a more specific type
+	// by the plugin to access the additional fields
+};
+
 /** @minLength 1 Default environment must reference the name of an existing environment.*/
 type EnvironmentName = NonEmptyString;
 
@@ -340,7 +364,41 @@ export type ConfigContractsDir = string;
  */
 export type ConfigArtifactsDir = string;
 
+export type ConfigAccount = {
+	balance: CurrencyAmountV2;
+};
+
+// Incrementally Convert from ConfigFileV1 to ConfigFileV2
+// 1. A wrapper will load/save the ConfigFileV2 and convert it to this Config runtime type (which is initially the same as ConfigFileV1)
+// 2. This type will be modified incrementally as the implementation uses the new type structure
+// - The new schema definitions will be used immediately in the file system
+// - Current implementation works the same
+// - This decouples the schema change from implementation changes and unblocks the development team
 export type Config = {
+	// same
+	language?: HumanLanguage;
+	metadata?: MetadataConfig;
+	artifactsDir?: ConfigArtifactsDir;
+	contractsDir?: ConfigContractsDir;
+	contracts?: Record<string, Contract>;
+	plugins?: InstalledPlugin[];
+
+	// to change
+	accounts?: Record<string, Tz>;
+	// accounts?: Record<string, ConfigAccount>;
+
+	// to change
+	environment?: Record<string, Environment | EnvironmentName>;
+	// environments?: Record<string, ConfigFileEnvironmentV2>;
+
+	// to remove
+	network?: Record<string, NetworkConfig>;
+	// to remove
+	sandbox?: Record<string, SandboxConfig>;
+};
+
+// This is the original Config and is retained to support auto migration of files
+export type ConfigFileV1 = {
 	language?: HumanLanguage;
 	plugins?: InstalledPlugin[];
 	contractsDir?: ConfigContractsDir;
@@ -352,10 +410,99 @@ export type Config = {
 	// accounts?: {
 	// 	default: EnvironmentName;
 	// } & Record<string, Environment>;
-	environment: Record<string, Environment | EnvironmentName>;
+	environment?: Record<string, Environment | EnvironmentName>;
 	accounts?: Record<string, Tz>;
 	contracts?: Record<string, Contract>;
 	metadata?: MetadataConfig;
+};
+
+export type CurrencyAmountV2 = {
+	amount: string;
+	units: string;
+};
+
+export type ConfigFileV2 = {
+	// version?: `v2`;
+	language?: HumanLanguage;
+	metadata?: MetadataConfig;
+	artifactsDir?: ConfigArtifactsDir;
+	contractsDir?: ConfigContractsDir;
+
+	// network?: Record<string, NetworkConfig>;
+	// sandbox?: Record<string, SandboxConfig>;
+
+	// environment?: Record<string, Environment | EnvironmentName>;
+	// accounts?: Record<string, Tz>;
+
+	/** Declared accounts */
+	accounts?: Record<string, ConfigAccount>;
+
+	contracts?: Record<string, Contract>;
+
+	/** Environments
+	 *
+	 * An environment represents a unique context on a network with its own account instances and contracts.
+	 *
+	 * The environment implementation is provided by a plugin which enables network control, account management, and contract interaction.
+	 *
+	 * Example environment types:
+	 *
+	 * - a sandbox running locally (using flextesa and taquito plugin)
+	 * - teztnets.xyz (using taquito plugin)
+	 * - mainnet (using taquito plugin with a custom rpcUrl)
+	 *
+	 * The environment implementation also implements the account types that are supported by that environmentType:
+	 *
+	 * - flextesa
+	 *   - in-memory signer
+	 * - mainnet
+	 *   - beacon wallet
+	 *   - multi-sig
+	 *
+	 * Using the above as an example, the flextesa sandbox only needs an in-memory signer since it generates it's own accounts,
+	 * but mainnet might support something like a beacon wallet or a multi-sig account.
+	 */
+	environments?: Record<string, ConfigEnvironmentFileV2>;
+
+	plugins?: InstalledPlugin[];
+};
+
+// export type AccountTypePluginV2 = {
+// 	// create: (configData?: Record<string, unknown>) => void;
+// 	// transfer: (destination: string, amount: CurrencyAmountV2) => void;
+// 	// sign: (transaction: string) => void;
+// };
+
+/** An environment type combines network, account, and contract management */
+export type EnvironmentTypePluginV2 = {
+	/** Ensure environment is ready for use */
+	start: (environmentName: string) => void;
+
+	/** Dispose local resources used by environment */
+	stop: (environmentName: string) => void;
+
+	/** Instantiate and fund declared accounts for this environment */
+	setupAccounts: (environmentName: string) => void;
+
+	// /** Tranfer funds between declared accounts */
+	// transferFunds: (sourceAccountName: string, destinationAccountName: string, amount: CurrencyAmountV2) => void;
+
+	/** Deploy contract with a declared account */
+	deployContract: (
+		environmentName: string,
+		executingAccountName: string,
+		contractName: string,
+		storage: unknown,
+	) => void;
+
+	/** Call contract entrypoint with a declared account */
+	callContract: (
+		environmentName: string,
+		executingAccountName: string,
+		contractName: string,
+		entrypointName: string,
+		param: unknown,
+	) => void;
 };
 
 // TODO: sandbox breaks ts-to-zod

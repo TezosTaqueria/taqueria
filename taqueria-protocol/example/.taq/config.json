@@ -1,0 +1,154 @@
+{
+	// Defined order of config fields
+	"language": "en",
+	"artifactsDir": "artifacts",
+	"contractsDir": "contracts",
+	// Declared accounts supports units now
+	"accounts": {
+		"bob": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			},
+			// Do we want to support simple strings like '3_000_000_000 mutez' instead of requiring an object
+			"balanceSimple": "3_000_000_000 mutez"
+		},
+		"alice": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"john": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"jane": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"joe": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		}
+	},
+	"contracts": {
+		"./main.mligo": {
+			"sourceFile": "./main.mligo",
+			"hash": "1bbbe139820ef1e5223dee5e35b57480ed3b59e97170c9c252304f1d5c7b983e"
+		}
+	},
+	// network, sandbox, environment combined into environment
+	// each environment gets merged with config.local.[env].json
+	// which holds dev specific settings (like generated in-memory accounts)
+	"environment": {
+		"sandbox": {
+			"type": "flextesa",
+			// All fields except type and accounts are specific for the type
+			"label": "Local Tezos Sandbox",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
+			// account types can default to in-memory
+			// "accounts": {
+			// 	"bob": {
+			// 		"type": "in-memory"
+			// 	},
+			// 	"alice": {
+			// 		"type": "in-memory"
+			// 	},
+			// 	"john": {
+			// 		"type": "in-memory"
+			// 	},
+			// 	"jane": {
+			// 		"type": "in-memory"
+			// 	},
+			// 	"joe": {
+			// 		"type": "in-memory"
+			// 	}
+			// }
+		},
+		"sandbox2": {
+			"type": "flextesa",
+			// All fields except type and accounts are specific for the type
+			"label": "Local Tezos Sandbox",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
+			// account types can default to in-memory
+		},
+		"testnet1": {
+			"type": "teznets",
+			// simple environment type options
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnetbet.ecadinfrastructure.com",
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
+			// account settings for this environment
+			"accounts": {
+				// example non in-memory account type (depends on what is supported by the environment type)
+				"bob": {
+					"type": "beacon",
+					"publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6"
+				}
+			}
+		},
+		"testnet2": {
+			"type": "rpc",
+			// simple environment type options
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnetbet.ecadinfrastructure.com",
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
+			// account settings for this environment
+			"accounts": {
+				// example non in-memory account type (depends on what is supported by the environment type)
+				"bob": {
+					"type": "beacon",
+					"publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6"
+				}
+			}
+		},
+		"mainnet": {
+			"type": "simple",
+			// simple environment type options
+			"label": "mainnet",
+			"rpcUrl": "https://mainnet.ecadinfrastructure.com",
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
+			// account settings for this environment
+			"accounts": {
+				// It is possible to override the operator account
+				"_operator": {
+					"type": "beacon",
+					"publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6"
+				}
+			}
+		}
+	},
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-ligo",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-taquito",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-flextesa",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-contract-types",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-ipfs-pinata",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-jest",
+			"type": "npm"
+		}
+	]
+}

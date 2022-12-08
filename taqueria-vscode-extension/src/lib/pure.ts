@@ -1,5 +1,6 @@
 import * as Config from '@taqueria/protocol/Config';
 import { i18n } from '@taqueria/protocol/i18n';
+import { readJsonFileInterceptConfig } from '@taqueria/protocol/types-config-files';
 import { exec, ExecException } from 'child_process';
 import { parse } from 'comment-json';
 import { readFile, stat } from 'fs/promises';
@@ -177,8 +178,8 @@ export const getNodeVersion = async (showOutput: OutputFunction) => {
 	return version.substring(1).replace('\n', '');
 };
 
-export const readJsonFile = <T>(_i18n: i18n, make: (data: Record<string, unknown>) => T) =>
-	(pathToFile: PathToFile) =>
+const readJsonFileInner = (_i18n: i18n, make: (data: Record<string, unknown>) => unknown) =>
+	<T>(pathToFile: PathToFile) =>
 		readFile(pathToFile, { encoding: 'utf-8' })
 			.then(data => {
 				try {
@@ -197,6 +198,11 @@ export const readJsonFile = <T>(_i18n: i18n, make: (data: Record<string, unknown
 					});
 				}
 			});
+export const readJsonFile = <T>(_i18n: i18n, make: (data: Record<string, unknown>) => T) => {
+	return readJsonFileInterceptConfig(
+		(x: string) => readJsonFileInner(_i18n, make)(x as PathToFile),
+	) as (pathToFile: PathToFile) => Promise<T>;
+};
 
 export const isWindows = () => process.platform.includes('win') && !process.platform.includes('darwin');
 

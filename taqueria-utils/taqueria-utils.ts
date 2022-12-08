@@ -1,5 +1,6 @@
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
+import { readJsonFileInterceptConfig, writeJsonFileInterceptConfig } from '@taqueria/protocol/types-config-files';
 import * as Url from '@taqueria/protocol/Url';
 import {
 	alt,
@@ -167,11 +168,18 @@ export const readTextFile = (path: string): Future<TaqError.t, string> =>
 			);
 	});
 
-export const readJsonFile = <T>(path: string) =>
+const readJsonFileInner = <T>(path: string): Future<TaqError.TaqError, T> =>
 	pipe(
 		readTextFile(path),
 		chain(x => decodeJson<T>(x)),
 	);
+
+export const readJsonFile = <T>(path: string): Future<TaqError.TaqError, T> =>
+	attemptP(() => {
+		return readJsonFileInterceptConfig(async x => {
+			return await toPromise(readJsonFileInner(x));
+		})(path);
+	});
 
 export const appendTextFile = (path: string) =>
 	(data: string): Future<TaqError.t, string> =>
@@ -184,7 +192,7 @@ export const appendTextFile = (path: string) =>
 export const writeTextFile = (path: string) =>
 	(data: string): Future<TaqError.t, string> => attemptP(() => Deno.writeTextFile(path, data).then(() => path));
 
-export const writeJsonFile = <T>(path: string) =>
+const writeJsonFileInner = <T>(path: string) =>
 	(data: T) =>
 		pipe(
 			JSON.stringify(data),
@@ -197,6 +205,13 @@ export const writeJsonFile = <T>(path: string) =>
 				),
 			writeTextFile(path),
 		);
+export const writeJsonFile = <T>(path: string) =>
+	(data: T): Future<TaqError.t, string> =>
+		attemptP(() => {
+			return writeJsonFileInterceptConfig(path => {
+				return toPromise(writeJsonFileInner<T>(path)(data));
+			})(path)(data);
+		});
 
 export const isTaqError = (err: unknown): err is TaqError.t => {
 	return (err as TaqError.t).kind !== undefined;
