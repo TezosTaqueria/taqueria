@@ -156,9 +156,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const address = accountItem instanceof SandboxImplicitAccountTreeItem
 			? accountItem.address
 			: accountItem.parent.address;
-		const tzktBaseUrl = this.sandboxStates[accountItem.parent.sandboxName]?.getTzKtBaseUrl(
-			accountItem.parent.sandboxName,
-		);
+		const tzktBaseUrl = this.getTzKtBaseUrl(accountItem.parent.sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
@@ -207,7 +205,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!containerName) {
 			return [];
 		}
-		const tzktBaseUrl = this.sandboxStates[element.parent.sandboxName]?.getTzKtBaseUrl(element.parent.sandboxName);
+		const tzktBaseUrl = this.getTzKtBaseUrl(element.parent.sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
@@ -246,7 +244,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private async getAccountCount(element: SandboxTreeItem): Promise<number | undefined> {
-		const tzktBaseUrl = this.sandboxStates[element.sandboxName]?.getTzKtBaseUrl(element.sandboxName);
+		const tzktBaseUrl = this.getTzKtBaseUrl(element.sandboxName);
 		if (!tzktBaseUrl) {
 			return undefined;
 		}
@@ -262,7 +260,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private async getContractCount(element: SandboxTreeItem): Promise<number | undefined> {
-		const tzktBaseUrl = this.sandboxStates[element.sandboxName]?.getTzKtBaseUrl(element.sandboxName);
+		const tzktBaseUrl = this.getTzKtBaseUrl(element.sandboxName);
 		if (!tzktBaseUrl) {
 			return undefined;
 		}
@@ -290,7 +288,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	private async getSandboxImplicitAccounts(
 		element: SandboxChildrenTreeItem,
 	): Promise<SandboxImplicitAccountTreeItem[]> {
-		const tzktBaseUrl = this.sandboxStates[element.parent.sandboxName]?.getTzKtBaseUrl(element.parent.sandboxName);
+		const tzktBaseUrl = this.getTzKtBaseUrl(element.parent.sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
@@ -315,7 +313,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!containerName) {
 			return [];
 		}
-		const tzktBaseUrl = this.sandboxStates[element.parent.sandboxName]?.getTzKtBaseUrl(element.parent.sandboxName);
+		const tzktBaseUrl = this.getTzKtBaseUrl(element.parent.sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
@@ -400,5 +398,9 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			clearInterval(this.refreshLevelInterval);
 		}
 		this._onDidChangeTreeData.fire();
+	}
+
+	private async getTzKtBaseUrl(sandboxName: string): Promise<string | undefined> {
+		return this.sandboxStates[sandboxName]?.getTzKtBaseUrl(sandboxName);
 	}
 }
