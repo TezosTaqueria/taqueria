@@ -1168,7 +1168,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 				chainRej(err =>
 					pipe(
 						sendEvent(inputArgs.join(), getVersion(inputArgs), true),
-						map(_ => err),
+						chain(_ => reject(err)),
 					)
 				),
 				forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
