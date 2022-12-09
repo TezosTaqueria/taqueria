@@ -322,29 +322,6 @@ export type Environment = {
 	aliases?: Record<string, Record<string, NonEmptyString>>;
 };
 
-export type ConfigEnvironmentFileV2 = {
-	/** environment types provided by plugins
-	 *
-	 * Examples: flextesa, teztnet, mainnet
-	 *
-	 * annotations provides plugin specific data like rpcUrl
-	 */
-	type?: string;
-
-	/** Account overrides for this environment */
-	accounts?: Record<string, {
-		type?: string;
-	}>;
-
-	/** Contract deployment data for this environment */
-	contracts?: Record<string, {
-		address?: string;
-	}>;
-	// Other fields may exist, but they are not type checked here
-	// It is expected that this will be cast to a more specific type
-	// by the plugin to access the additional fields
-};
-
 /** @minLength 1 Default environment must reference the name of an existing environment.*/
 type EnvironmentName = NonEmptyString;
 
@@ -469,42 +446,27 @@ export type ConfigFileV2 = {
 	plugins?: InstalledPlugin[];
 };
 
-// export type AccountTypePluginV2 = {
-// 	// create: (configData?: Record<string, unknown>) => void;
-// 	// transfer: (destination: string, amount: CurrencyAmountV2) => void;
-// 	// sign: (transaction: string) => void;
-// };
+export type ConfigEnvironmentFileV2 = {
+	/** environment types provided by plugins
+	 *
+	 * Examples: flextesa, teztnet, mainnet
+	 *
+	 * annotations provides plugin specific data like rpcUrl
+	 */
+	type?: string;
 
-/** An environment type combines network, account, and contract management */
-export type EnvironmentTypePluginV2 = {
-	/** Ensure environment is ready for use */
-	start: (environmentName: string) => void;
+	/** Account overrides for this environment */
+	accounts?: Record<string, {
+		type?: string;
+	}>;
 
-	/** Dispose local resources used by environment */
-	stop: (environmentName: string) => void;
-
-	/** Instantiate and fund declared accounts for this environment */
-	setupAccounts: (environmentName: string) => void;
-
-	// /** Tranfer funds between declared accounts */
-	// transferFunds: (sourceAccountName: string, destinationAccountName: string, amount: CurrencyAmountV2) => void;
-
-	/** Deploy contract with a declared account */
-	deployContract: (
-		environmentName: string,
-		executingAccountName: string,
-		contractName: string,
-		storage: unknown,
-	) => void;
-
-	/** Call contract entrypoint with a declared account */
-	callContract: (
-		environmentName: string,
-		executingAccountName: string,
-		contractName: string,
-		entrypointName: string,
-		param: unknown,
-	) => void;
+	/** Contract deployment data for this environment */
+	contracts?: Record<string, {
+		address?: string;
+	}>;
+	// Other fields may exist, but they are not type checked here
+	// It is expected that this will be cast to a more specific type
+	// by the plugin to access the additional fields
 };
 
 // TODO: sandbox breaks ts-to-zod
