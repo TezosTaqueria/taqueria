@@ -19,21 +19,6 @@ describe('Integration tests using taqueria-mock-plugin', () => {
 		expect(result).toEqual(jsonObject);
 	});
 
-	// test('Verify that readJsonFile can read config.json V1', async () => {
-	// 	const result = await readJsonFile('./unit/taqueria-sdk/data/v1/.taq/config.json');
-	// 	const expected = JSON.parse(
-	// 		await fs.promises.readFile('./unit/taqueria-sdk/data/runtime/config.json', { encoding: `utf-8` }));
-	// 	expect(result).toEqual(expected);
-	// });
-
-	test('Verify that readJsonFile can read config.json V2', async () => {
-		const result = await readJsonFile('./unit/taqueria-sdk/data/v2/.taq/config.json');
-		const expected = JSON.parse(
-			await fs.promises.readFile('./unit/taqueria-sdk/data/runtime/config.json', { encoding: `utf-8` }),
-		);
-		expect(result).toEqual(expected);
-	});
-
 	test('Verify that writeJsonFile can write config.json V2', async () => {
 		const config = JSON.parse(
 			await fs.promises.readFile('./unit/taqueria-sdk/data/runtime/config.json', { encoding: `utf-8` }),
@@ -49,6 +34,22 @@ describe('Integration tests using taqueria-mock-plugin', () => {
 		);
 
 		expect(actual).toEqual(expected);
+	});
+
+	test('Verify that readJsonFile can read config.json V2', async () => {
+		const result = await readJsonFile('./unit/taqueria-sdk/data/v2/.taq/config.json');
+		const expected = JSON.parse(
+			await fs.promises.readFile('./unit/taqueria-sdk/data/runtime/config.json', { encoding: `utf-8` }),
+		);
+		expect(result).toEqual(expected);
+	});
+
+	test('Verify that readJsonFile can read config.json V1 (auto migrate)', async () => {
+		const result = await readJsonFile('./unit/taqueria-sdk/data/v1/.taq/config.json');
+		const expected = JSON.parse(
+			await fs.promises.readFile('./unit/taqueria-sdk/data/runtime/config.json', { encoding: `utf-8` }),
+		);
+		expect(result).toEqual(expected);
 	});
 
 	test('Verify that getArch returns the proper version', async () => {

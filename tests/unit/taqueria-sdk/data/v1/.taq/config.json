@@ -38,9 +38,6 @@
 			"label": "Local Tezos Sandbox",
 			"rpcUrl": "http://localhost:21000",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
-		},
-		"storage": {
-			"value": 42
 		}
 	},
 	"environment": {
@@ -50,7 +47,9 @@
 			"sandboxes": [
 				"local-scaffold"
 			],
-			"storage": {}
+			"storage": {
+				"value": 42
+			}
 		},
 		"testing": {
 			"networks": [

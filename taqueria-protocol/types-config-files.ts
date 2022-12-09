@@ -49,20 +49,57 @@ const writeConfigFile = (writeJsonFile: (filePath: string) => (data: unknown) =>
 			return await writeJsonFile(configFilePath)(configFileV2);
 		};
 
-// Migrate FileV1 to FileV2
+const removeUndefinedFields = <T>(x: T): T => {
+	return JSON.parse(JSON.stringify(x)) as T;
+};
+
+/** Migrate FileV1 to FileV2
+ *
+ * NOTE: Although this is nearly identical to transformConfigToConfigFileV2
+ * This function should be sealed while the transformConfigToConfigFileV2
+ * will change interatively to become move like V2
+ */
 const transformConfigFileV1ToConfigFileV2 = (configFileV1: ConfigFileV1): ConfigFileV2 => {
+	const config = configFileV1;
 	const configFileV2: ConfigFileV2 = {
-		...configFileV1,
 		version: `v2`,
-		accounts: !configFileV1.accounts
+		language: config.language,
+		metadata: config.metadata,
+		artifactsDir: config.artifactsDir,
+		contractsDir: config.contractsDir,
+		accounts: !config.accounts
 			? undefined
 			: Object.fromEntries(
-				Object.entries(configFileV1.accounts)
+				Object.entries(config.accounts)
 					.map(([k, v]) => [k, { balance: { amount: v, units: `mutez` } }]),
 			),
+		contracts: config.contracts,
+		environmentDefault: config.environment?.default as string,
+		environments: Object.fromEntries(
+			Object.entries(config.environment ?? {})
+				.filter(([k, v]) => k !== `default`)
+				.map(([k, v]) => [k, v] as [string, Environment])
+				.map(([k, v]) => [k, {
+					// Known fields
+					type: v.sandboxes.length ? `flextesa` : `simple`,
+					// Fields from the first sandbox or network (there should be only 1)
+					...[
+						...v.sandboxes.map(k => config.sandbox?.[k]),
+						...v.networks.map(k => config.network?.[k]),
+					][0] as {},
+					// Unknown fields
+					...((() => {
+						const vClone = { ...v } as Partial<typeof v>;
+						delete vClone.networks;
+						delete vClone.sandboxes;
+						return vClone;
+					})()),
+				}]),
+		),
+		plugins: config.plugins,
 	};
 
-	return configFileV2;
+	return removeUndefinedFields(configFileV2);
 };
 
 // Object to FileV2
@@ -105,7 +142,7 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileV2 => {
 		plugins: config.plugins,
 	};
 
-	return configFileV2;
+	return removeUndefinedFields(configFileV2);
 };
 
 // FileV2 to Object
@@ -171,5 +208,6 @@ const transformConfigFileV2ToConfig = (configFileV2: ConfigFileV2): Config => {
 			protocol: x.value.protocol ?? ``,
 		}])),
 	};
-	return config;
+
+	return removeUndefinedFields(config);
 };
