@@ -87,7 +87,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ env.DENO_VERSION }}
+          deno-version: "${{ env.DENO_VERSION }}"
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
       ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
@@ -198,7 +198,7 @@ jobs:
 
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{ env.DENO_VERSION }}
+          deno-version: "${{ env.DENO_VERSION }}"
 
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
@@ -301,7 +301,7 @@ jobs:
     uses: ./.github/workflows/vscode-extension.yml
     with:
       prerelease: ${{ needs.workflow-setup.outputs.prerelease }}
-      deno-version: ${{ env.DENO_VERSION }}
+      deno-version: "${{ env.DENO_VERSION }}"
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
