@@ -94,6 +94,9 @@ const globalTasks = createRegistry();
 // Registry of tasks that are internal and only available when executed in the context of a Taqueria project
 const internalTasks = createRegistry();
 
+// Registry of tasks that are provided by plugins
+const pluginTasks = createRegistry();
+
 /**
  * Parsing arguments is done in two different stages.
  *
@@ -757,7 +760,6 @@ const getTemplateCommandArgs = (parsedArgs: SanitizedArgs.t, state: EphemeralSta
 };
 
 const exposeTemplates = (
-	cliConfig: CLIConfig,
 	config: LoadedConfig.t,
 	_env: EnvVars,
 	parsedArgs: SanitizedArgs.t,
@@ -766,15 +768,17 @@ const exposeTemplates = (
 	pluginLib: PluginLib,
 ) => {
 	if (Object.keys(state.templates).length > 0) {
-		const { command, builder } = getTemplateCommandArgs(parsedArgs, state, i18n);
-
-		cliConfig.command(
-			command,
-			i18n.__('createDesc'),
-			builder,
-			(args: Arguments) =>
+		pluginTasks.registerTask({
+			taskName: NonEmptyString.create('create'),
+			configure: (cliConfig: CLIConfig) =>
+				cliConfig
+					.command({
+						description: i18n.__('createDesc'),
+						...getTemplateCommandArgs(parsedArgs, state, i18n),
+					}),
+			handler: (parsedArgs: SanitizedArgs.t) =>
 				pipe(
-					SanitizedArgs.ofCreateTaskArgs(args),
+					SanitizedArgs.ofCreateTaskArgs(parsedArgs),
 					chain((parsedArgs: SanitizedArgs.CreateTaskArgs) => {
 						// We need to determine first if the template is provided by more than one plugin, and if so,
 						// that the plugin option was provided to know which one should be targeted.
@@ -794,11 +798,9 @@ const exposeTemplates = (
 						const installedPlugin = state.templates[parsedArgs.template] as InstalledPlugin.t;
 						return handleTemplate(parsedArgs, config, installedPlugin, state, pluginLib, i18n);
 					}),
-					forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
 				),
-		);
+		});
 	}
-	return cliConfig;
 };
 
 const handleTemplate = (
@@ -847,16 +849,15 @@ const getPluginOption = (task: Task.t) => {
 };
 
 const exposeTasks = (
-	cliConfig: CLIConfig,
 	config: LoadedConfig.t,
 	env: EnvVars,
 	parsedArgs: SanitizedArgs.t,
 	i18n: i18n.t,
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
-) =>
-	Object.entries(state.tasks).reduce(
-		(retval: CLIConfig, pair: [string, InstalledPlugin.t | Task.t]) => {
+) => {
+	Object.entries(state.tasks).map(
+		(pair: [string, InstalledPlugin.t | Task.t]) => {
 			const [taskName, implementation] = pair;
 
 			// Composite task...
@@ -874,136 +875,120 @@ const exposeTasks = (
 				// Was a plugin provider specified? (path #2 above)
 				if (parsedArgs.plugin && getPluginOption(task)?.choices?.includes(parsedArgs.plugin)) {
 					const canonicalTask = getCanonicalTask(parsedArgs.plugin, taskName, state);
-					return canonicalTask
-						? exposeTask(
-							retval,
+					if (canonicalTask) {
+						return addPluginTask(
 							config,
-							env,
-							parsedArgs,
-							state,
-							i18n,
 							canonicalTask,
 							pluginLib,
 							config.plugins?.find((found: InstalledPlugin.t) => found.name === parsedArgs.plugin),
-						)
-						: retval;
+						);
+					}
 				}
 
 				// No plugin provider was specified (path #1)
-				return exposeTask(retval, config, env, parsedArgs, state, i18n, task, pluginLib);
+				return addPluginTask(config, task, pluginLib);
 			}
 
 			// Canonical task...
 			const foundTask = getCanonicalTask(implementation.name, taskName, state);
-			return foundTask
-				? exposeTask(
-					retval,
-					config,
-					env,
-					parsedArgs,
-					state,
-					i18n,
-					foundTask,
-					pluginLib,
-					implementation,
-				)
-				: retval;
+			if (foundTask) addPluginTask(config, foundTask, pluginLib, implementation);
 		},
-		cliConfig,
 	);
+};
 
-const exposeTask = (
-	cliConfig: CLIConfig,
-	config: LoadedConfig.t,
-	_env: EnvVars,
+const createPluginTaskHandler = (
 	parsedArgs: SanitizedArgs.t,
-	state: EphemeralState.t,
-	_i18n: i18n.t,
+	config: LoadedConfig.t,
 	task: Task.t,
 	pluginLib: PluginLib,
 	plugin?: InstalledPlugin.t,
-) =>
-	pipe(
-		cliConfig.command({
-			command: task.command,
-			aliases: task.aliases,
-			hidden: task.hidden,
-			description: task.hidden ? null : task.description,
-			example: task.example,
-			builder: (cliConfig: CLIConfig) => {
-				if (task.options) {
-					task.options.reduce(
-						(cli: CLIConfig, option: Option.t) => {
-							const optionSettings: Record<string, unknown> = {
-								alias: option.shortFlag ? option.shortFlag : undefined,
-								default: option.defaultValue,
-								demandOption: option.required,
-								describe: option.description,
-							};
+) => {
+	return task.handler === 'proxy' && plugin
+		? pipe(
+			PluginActionName.make('proxy'),
+			chain(action =>
+				pluginLib.sendPluginActionRequest(plugin)(action, task.encoding ?? PluginResponseEncoding.create('none'))(
+					{
+						...parsedArgs,
+						task: task.task,
+					},
+				)
+			),
+			chain(addTask(parsedArgs, config, task.task, plugin.name)),
+			map(res => {
+				const decoded = res as PluginJsonResponse.t | void;
+				if (decoded) return renderPluginJsonRes(decoded, parsedArgs);
+			}),
+		)
+		: pipe(
+			exec(
+				task.handler,
+				parsedArgs,
+				['json', 'application/json'].includes(task.encoding ?? 'none'),
+			),
+			map(([_, output, errOutput]) => {
+				if (errOutput.length > 0) console.error(errOutput);
+				if (output.length > 0) return renderPluginJsonRes(JSON.parse(output), parsedArgs);
+			}),
+		);
+};
 
-							if (option.choices && option.choices.length) optionSettings.choices = option.choices;
-							if (option.boolean) optionSettings['boolean'] = true;
-							return cli.option(option.flag, optionSettings);
-						},
-						cliConfig,
-					);
-				}
+const addPluginTask = (config: LoadedConfig.t, task: Task.t, pluginLib: PluginLib, plugin?: InstalledPlugin.t) => {
+	pluginTasks.registerTask({
+		taskName: task.task,
 
-				if (task.positionals) {
-					task.positionals.reduce(
-						(cli: CLIConfig, positional: PositionalArg.t) => {
-							const positionalSettings = {
-								describe: positional.description,
-								type: positional.type,
-								default: positional.defaultValue,
-							};
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command({
+					command: task.command,
+					aliases: task.aliases,
+					hidden: task.hidden,
+					description: task.hidden ? null : task.description,
+					example: task.example,
+					builder: (cliConfig: CLIConfig) => {
+						if (task.options) {
+							task.options.reduce(
+								(cli: CLIConfig, option: Option.t) => {
+									const optionSettings: Record<string, unknown> = {
+										alias: option.shortFlag ? option.shortFlag : undefined,
+										default: option.defaultValue,
+										demandOption: option.required,
+										describe: option.description,
+									};
 
-							return cli.positional(positional.placeholder, positionalSettings);
-						},
-						cliConfig,
-					);
-				}
-			},
-			handler: (inputArgs: Record<string, unknown>) => {
-				cliConfig.handled = true;
-				if (Array.isArray(task.handler)) {
-					log('This is a composite task!');
-					return;
-				}
-
-				const handler = task.handler === 'proxy' && plugin
-					? pipe(
-						PluginActionName.make('proxy'),
-						chain(action =>
-							pluginLib.sendPluginActionRequest(plugin)(action, task.encoding ?? PluginResponseEncoding.create('none'))(
-								{
-									...inputArgs,
-									task: task.task,
+									if (option.choices && option.choices.length) optionSettings.choices = option.choices;
+									if (option.boolean) optionSettings['boolean'] = true;
+									return cli.option(option.flag, optionSettings);
 								},
-							)
-						),
-						chain(addTask(parsedArgs, config, task.task, plugin.name)),
-						map(res => {
-							const decoded = res as PluginJsonResponse.t | void;
-							if (decoded) return renderPluginJsonRes(decoded, parsedArgs);
-						}),
-					)
-					: pipe(
-						exec(
-							task.handler,
-							{ ...parsedArgs, ...inputArgs },
-							['json', 'application/json'].includes(task.encoding ?? 'none'),
-						),
-						map(([_, output, errOutput]) => {
-							if (errOutput.length > 0) console.error(errOutput);
-							if (output.length > 0) return renderPluginJsonRes(JSON.parse(output), parsedArgs);
-						}),
-					);
+								cliConfig,
+							);
+						}
 
-				forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity)(handler);
-			},
-		}),
-	);
+						if (task.positionals) {
+							task.positionals.reduce(
+								(cli: CLIConfig, positional: PositionalArg.t) => {
+									const positionalSettings = {
+										describe: positional.description,
+										type: positional.type,
+										default: positional.defaultValue,
+									};
+
+									return cli.positional(positional.placeholder, positionalSettings);
+								},
+								cliConfig,
+							);
+						}
+					},
+				}),
+
+		handler: (parsedArgs: SanitizedArgs.t) => {
+			if (Array.isArray(task.handler)) {
+				return taqResolve(log('This is a composite task!'));
+			}
+			return createPluginTaskHandler(parsedArgs, config, task, pluginLib, plugin);
+		},
+	});
+};
 
 const loadEphemeralState = (
 	cliConfig: CLIConfig,
@@ -1013,11 +998,10 @@ const loadEphemeralState = (
 	i18n: i18n.t,
 	state: EphemeralState.t,
 	pluginLib: PluginLib,
-): CLIConfig =>
-	[exposeTasks, exposeTemplates /* addOperations*/].reduce(
-		(cliConfig: CLIConfig, fn) => fn(cliConfig, config, env, parsedArgs, i18n, state, pluginLib),
-		cliConfig,
-	);
+): CLIConfig => {
+	[exposeTasks, exposeTemplates /* addOperations*/].map(fn => fn(config, env, parsedArgs, i18n, state, pluginLib));
+	return pluginTasks.configure(cliConfig);
+};
 
 const renderPluginJsonRes = (decoded: PluginJsonResponse.t, parsedArgs: SanitizedArgs.t) => {
 	// do not render object/array ASCII table if the request comes from TVsCE
@@ -1119,11 +1103,11 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 			map((cliConfig: CLIConfig) => cliConfig.help()),
 			chain(parseArgs),
 			chain(inputArgs => SanitizedArgs.of(inputArgs)),
-			chain(parsedArgs =>
-				internalTasks.isTaskRunning(parsedArgs)
-					? internalTasks.handle(parsedArgs)
-					: showInvalidTask(previousCLIConfig)(parsedArgs)
-			),
+			chain(parsedArgs => {
+				if (internalTasks.isTaskRunning(parsedArgs)) return internalTasks.handle(parsedArgs);
+				else if (pluginTasks.isTaskRunning(parsedArgs)) return pluginTasks.handle(parsedArgs);
+				return showInvalidTask(previousCLIConfig)(parsedArgs);
+			}),
 		);
 
 const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
@@ -1143,45 +1127,38 @@ const preprocessArgs = (inputArgs: DenoArgs): DenoArgs => {
 };
 
 export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
-	try {
-		const processedInputArgs = preprocessArgs(inputArgs);
+	const processedInputArgs = preprocessArgs(inputArgs);
 
-		// Parse the args required for core built-in tasks
-		return pipe(
-			initCLI(env, processedInputArgs, i18n),
-			(cliConfig: CLIConfig) =>
-				pipe(
-					cliConfig,
-					parseArgs,
-					chain(SanitizedArgs.of),
-					chain((initArgs: SanitizedArgs.t) => {
-						debugger;
-						if (initArgs.debug) debugMode(true);
-						return globalTasks.isTaskRunning(initArgs)
-							? globalTasks.handle(initArgs)
-							: postInitCLI(env, processedInputArgs, initArgs, i18n);
-					}),
-					chain(initArgs =>
-						sendEvent(
-							initArgs._.join(),
-							getVersion(inputArgs),
-							false,
-						)
-					),
-					forkCatch(async (error: Error | TaqError.t) => {
-						await eager(sendEvent(inputArgs.join(), getVersion(inputArgs), true));
-						displayError(cliConfig)(error);
-					})(async (error: Error | TaqError.t) => {
-						await eager(sendEvent(inputArgs.join(), getVersion(inputArgs), true));
-						displayError(cliConfig)(error);
-					})(identity),
+	// Parse the args required for core built-in tasks
+	return pipe(
+		initCLI(env, processedInputArgs, i18n),
+		(cliConfig: CLIConfig) =>
+			pipe(
+				cliConfig,
+				parseArgs,
+				chain(SanitizedArgs.of),
+				chain((initArgs: SanitizedArgs.t) => {
+					if (initArgs.debug) debugMode(true);
+					return globalTasks.isTaskRunning(initArgs)
+						? globalTasks.handle(initArgs)
+						: postInitCLI(env, processedInputArgs, initArgs, i18n);
+				}),
+				chain(initArgs =>
+					sendEvent(
+						initArgs._.join(),
+						getVersion(inputArgs),
+						false,
+					)
 				),
-		);
-	} catch (err) {
-		// Something went wrong that we didn't handle.
-		// TODO: Generate bug report with stack trace
-		console.error(err);
-	}
+				chainRej(err =>
+					pipe(
+						sendEvent(inputArgs.join(), getVersion(inputArgs), true),
+						map(_ => err),
+					)
+				),
+				forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
+			),
+	);
 };
 
 export const showInvalidTask = (cli: CLIConfig) =>
@@ -1213,6 +1190,7 @@ export const normalizeErr = (err: TaqError.t | TaqError.E_TaqError | Error) => {
 
 export const displayError = (cli: CLIConfig) =>
 	(err: Error | TaqError.t) => {
+		debugger;
 		const inputArgs = (cli.parsed as unknown as { argv: Record<string, unknown> }).argv;
 
 		if (!inputArgs.fromVsCode && (isTaqError(err) && err.kind !== 'E_EXEC')) {

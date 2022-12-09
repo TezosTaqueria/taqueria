@@ -21,7 +21,6 @@ describe('E2E Testing for taqueria contract types plugin only', () => {
 	test('Verify that the contract types plugin exposes the associated commands in the help menu', async () => {
 		try {
 			const generateTypesHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
-			await fsPromises.writeFile('/tmp/help.txt', generateTypesHelpContents.stdout, { encoding: 'utf-8' });
 			expect(generateTypesHelpContents.stdout).toBe(contents.helpContentsContractTypesPlugin);
 		} catch (error) {
 			throw new Error(`error: ${error}`);

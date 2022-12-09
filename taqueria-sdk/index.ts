@@ -690,14 +690,19 @@ const getPackageName = () => {
 };
 
 export const Plugin = {
-	create: async <Args extends Protocol.RequestArgs.t>(definer: pluginDefiner, unparsedArgs: string[]) => {
-		const packageName = getPackageName();
-		return parseArgs<Args>(unparsedArgs)
-			.then(getResponse(definer, packageName))
-			.catch((err: unknown) => {
-				if (err) console.error(err);
-				process.exit(1);
-			});
+	create: <Args extends Protocol.RequestArgs.t>(definer: pluginDefiner, unparsedArgs: string[]) => {
+		try {
+			const packageName = getPackageName();
+			return parseArgs<Args>(unparsedArgs)
+				.then(getResponse(definer, packageName))
+				.catch((err: unknown) => {
+					if (err) console.error(err);
+					process.exit(1);
+				});
+		} catch (err) {
+			if (err) console.error(err);
+			process.exit(1);
+		}
 	},
 };
 

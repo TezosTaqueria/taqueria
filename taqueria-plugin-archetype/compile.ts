@@ -68,7 +68,7 @@ const compileContract = (opts: Opts) =>
 
 const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[]> => {
 	const contracts = getContracts(/\.arl$/, opts.config);
-	return Promise.all(contracts, opts.config)
+	return Promise.all(contracts)
 		.then(entries => entries.map(compileContract(opts)))
 		.then(processes =>
 			processes.length > 0
