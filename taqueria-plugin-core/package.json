@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-core",
-	"version": "0.24.2",
+	"version": "0.25.11-rc",
 	"description": "A taqueria plugin for core tasks",
 	"targets": {
 		"default": {
