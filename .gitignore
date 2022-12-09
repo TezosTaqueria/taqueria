@@ -234,3 +234,4 @@ taqueria-protocol/**/*.mjs
 # Temp taq projects created from e2e test execution
 tests/e2e/auto-test-*
 tests/scrap
+tests/unit/taqueria-sdk/temp

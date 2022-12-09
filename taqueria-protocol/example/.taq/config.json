@@ -1,5 +1,6 @@
 {
 	// Defined order of config fields
+	"version": "v2",
 	"language": "en",
 	"artifactsDir": "artifacts",
 	"contractsDir": "contracts",
@@ -47,7 +48,8 @@
 	// network, sandbox, environment combined into environment
 	// each environment gets merged with config.local.[env].json
 	// which holds dev specific settings (like generated in-memory accounts)
-	"environment": {
+	"environmentDefault": "sandbox",
+	"environments": {
 		"sandbox": {
 			"type": "flextesa",
 			// All fields except type and accounts are specific for the type

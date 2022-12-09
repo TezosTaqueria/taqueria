@@ -336,10 +336,9 @@ export type ConfigEnvironmentFileV2 = {
 		type?: string;
 	}>;
 
-	/** Account overrides for this environment */
+	/** Contract deployment data for this environment */
 	contracts?: Record<string, {
-		type?: string;
-		options?: Record<string, unknown>;
+		address?: string;
 	}>;
 	// Other fields may exist, but they are not type checked here
 	// It is expected that this will be cast to a more specific type
@@ -388,7 +387,7 @@ export type Config = {
 	// accounts?: Record<string, ConfigAccount>;
 
 	// to change
-	environment?: Record<string, Environment | EnvironmentName>;
+	environment: Record<string, Environment | EnvironmentName>;
 	// environments?: Record<string, ConfigFileEnvironmentV2>;
 
 	// to remove
@@ -421,23 +420,26 @@ export type CurrencyAmountV2 = {
 	units: string;
 };
 
+/**
+ * Workaround: zod won`t support VersionV2 = `v2`
+ * @pattern ^v2$
+ */
+type VersionV2 = string;
+
 export type ConfigFileV2 = {
-	// version?: `v2`;
+	version: VersionV2;
 	language?: HumanLanguage;
 	metadata?: MetadataConfig;
 	artifactsDir?: ConfigArtifactsDir;
 	contractsDir?: ConfigContractsDir;
 
-	// network?: Record<string, NetworkConfig>;
-	// sandbox?: Record<string, SandboxConfig>;
-
-	// environment?: Record<string, Environment | EnvironmentName>;
-	// accounts?: Record<string, Tz>;
-
 	/** Declared accounts */
 	accounts?: Record<string, ConfigAccount>;
 
 	contracts?: Record<string, Contract>;
+
+	/** The default environment key */
+	environmentDefault?: EnvironmentName;
 
 	/** Environments
 	 *

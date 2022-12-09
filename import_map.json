@@ -126,6 +126,7 @@
 		"@taqueria/protocol/helpers": "./taqueria-protocol/helpers.ts",
 		"@taqueria/protocol/out/types-strict": "./taqueria-protocol/out/types-strict.ts",
 		"@taqueria/protocol/out/types-zod": "./taqueria-protocol/out/types-zod.ts",
-		"@taqueria/protocol/types": "./taqueria-protocol/types.ts"
+		"@taqueria/protocol/types": "./taqueria-protocol/types.ts",
+		"@taqueria/protocol/types-config-files": "./taqueria-protocol/types-config-files.ts"
 	}
 }

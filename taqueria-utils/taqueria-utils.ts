@@ -192,8 +192,8 @@ export const appendTextFile = (path: string) =>
 export const writeTextFile = (path: string) =>
 	(data: string): Future<TaqError.t, string> => attemptP(() => Deno.writeTextFile(path, data).then(() => path));
 
-const writeJsonFileInner = <T>(path: string) =>
-	(data: T) =>
+const writeJsonFileInner = (path: string) =>
+	(data: unknown): Future<TaqError.t, string> =>
 		pipe(
 			JSON.stringify(data),
 			jsonStr =>
@@ -208,9 +208,11 @@ const writeJsonFileInner = <T>(path: string) =>
 export const writeJsonFile = <T>(path: string) =>
 	(data: T): Future<TaqError.t, string> =>
 		attemptP(() => {
-			return writeJsonFileInterceptConfig(path => {
-				return toPromise(writeJsonFileInner<T>(path)(data));
-			})(path)(data);
+			return writeJsonFileInterceptConfig(p =>
+				d => {
+					return toPromise(writeJsonFileInner(p)(d));
+				}
+			)(path)(data);
 		});
 
 export const isTaqError = (err: unknown): err is TaqError.t => {
@@ -222,7 +224,7 @@ export const joinPaths = _joinPaths;
 export const renderTemplate = (template: string, values: Record<string, unknown>): string =>
 	render(template, values) as string;
 
-export const toPromise = <T>(f: Future<TaqError.t, T>) =>
+export const toPromise = <T>(f: Future<TaqError.t, T>): Promise<T> =>
 	pipe(
 		f,
 		mapRej(taqErr => new TaqError.E_TaqError(taqErr)),
