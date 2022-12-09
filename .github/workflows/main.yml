@@ -301,7 +301,7 @@ jobs:
     uses: ./.github/workflows/vscode-extension.yml
     with:
       prerelease: ${{ needs.workflow-setup.outputs.prerelease }}
-      deno-version: "${{ env.DENO_VERSION }}"
+      deno-version: ${{ env.DENO_VERSION }}
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
