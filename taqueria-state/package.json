@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/state",
-	"version": "0.25.4-alpha",
+	"version": "0.25.6-alpha",
 	"description": "A TypeScript library for NodeJS and Deno to work with Taqueria projects",
 	"main": "./index.js",
 	"source": "./node/index.ts",
@@ -41,7 +41,7 @@
 		"typescript": "^4.7.2"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.25.4-alpha",
+		"@taqueria/protocol": "^0.25.6-alpha",
 		"rambda": "^7.1.4"
 	}
 }
