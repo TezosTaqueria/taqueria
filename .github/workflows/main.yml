@@ -54,7 +54,6 @@ jobs:
       contents: 'read'
       id-token: 'write'
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.continue-on-error }}
     if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
     needs:
       - workflow-setup
@@ -70,7 +69,6 @@ jobs:
            os_short: macos
            deno_target: "x86_64-apple-darwin"
            taqueria_bin: "taq"
-           continue-on-error: false
 
     outputs:
       public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
