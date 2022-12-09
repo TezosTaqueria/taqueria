@@ -124,7 +124,15 @@ const transformConfigFileV2ToConfig = (configFileV2: ConfigFileV2): Config => {
 	const sandboxEnvironments = environments.filter(x => x.value.type === `flextesa`);
 
 	const config: Config = {
-		...configFileV2,
+		// Common fields
+		...((() => {
+			const vClone = { ...configFileV2 } as Partial<typeof configFileV2>;
+			delete vClone.version;
+			delete vClone.environmentDefault;
+			delete vClone.environments;
+			return vClone;
+		})()),
+		// Transformed fields
 		accounts: !configFileV2.accounts
 			? undefined
 			: Object.fromEntries(
@@ -152,13 +160,13 @@ const transformConfigFileV2ToConfig = (configFileV2: ConfigFileV2): Config => {
 				],
 			}])),
 		},
-		network: Object.fromEntries(simpleEnvironments.map(x => [x.key, {
-			label: `${x.key}-network`,
+		network: Object.fromEntries(simpleEnvironments.map(x => [`${x.key}-network`, {
+			label: x.value.label ?? ``,
 			rpcUrl: x.value.rpcUrl ?? ``,
 			protocol: x.value.protocol ?? ``,
 		}])),
-		sandbox: Object.fromEntries(sandboxEnvironments.map(x => [x.key, {
-			label: `${x.key}-sandbox`,
+		sandbox: Object.fromEntries(sandboxEnvironments.map(x => [`${x.key}-sandbox`, {
+			label: x.value.label ?? ``,
 			rpcUrl: x.value.rpcUrl ?? ``,
 			protocol: x.value.protocol ?? ``,
 		}])),
