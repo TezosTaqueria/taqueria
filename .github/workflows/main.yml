@@ -297,7 +297,7 @@ jobs:
     needs: 
       - workflow-setup
       - publish-npm-packages
-    if: ${{ !github.event.pull_request.head.repo.fork }}
+    # if: ${{ !github.event.pull_request.head.repo.fork }}
     uses: ./.github/workflows/vscode-extension.yml
     with:
       prerelease: ${{ needs.workflow-setup.outputs.prerelease }}
