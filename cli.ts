@@ -52,6 +52,10 @@ import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
 import { createRegistry } from './task-registry.ts';
 
+const getCliArgs = () => {
+	return [...Deno.args];
+};
+
 // Get utils
 const {
 	execText,
@@ -80,7 +84,7 @@ const {
 	sendEvent,
 } = Analytics.inject({
 	env: Deno.env,
-	inputArgs: Deno.args,
+	inputArgs: getCliArgs(),
 	build: Deno.build,
 });
 
@@ -511,16 +515,17 @@ const postInitCLI = (env: EnvVars, args: DenoArgs, parsedArgs: SanitizedArgs.t, 
 		extendCLI(env, parsedArgs, i18n),
 	);
 
-const parseArgs = (cliConfig: CLIConfig): Future<TaqError.t, Record<string, unknown>> =>
-	pipe(
-		attemptP<Error, Record<string, unknown>>(() => cliConfig.parseAsync()),
-		mapRej<Error, TaqError.t>(previous => ({
-			kind: 'E_INVALID_ARGS',
-			msg: 'Invalid arguments were provided and could not be parsed',
-			context: cliConfig,
-			previous,
-		})),
-	);
+const parseArgs = (cliArgs: string[]) =>
+	(cliConfig: CLIConfig): Future<TaqError.t, Record<string, unknown>> =>
+		pipe(
+			attemptP<Error, Record<string, unknown>>(() => cliConfig.parseAsync(cliArgs)),
+			mapRej<Error, TaqError.t>(previous => ({
+				kind: 'E_INVALID_ARGS',
+				msg: 'Invalid arguments were provided and could not be parsed',
+				context: cliConfig,
+				previous,
+			})),
+		);
 
 const listKnownTasks = (parsedArgs: SanitizedArgs.t) =>
 	pipe(
@@ -707,7 +712,7 @@ const addOperations = (
 
 const getTemplateName = (parsedArgs: SanitizedArgs.t, state: EphemeralState.t) => {
 	if (parsedArgs._.length >= 2 && parsedArgs._[0] === 'create') {
-		const templateName = last(parsedArgs._.slice(0, 2));
+		const templateName = last([...parsedArgs._].slice(0, 2));
 		return templateName && state.templates[templateName]
 			? templateName
 			: undefined;
@@ -1116,8 +1121,8 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 			getConfig(parsedArgs.projectDir, i18n, false),
 			chain((config: LoadedConfig.t) => loadPlugins(previousCLIConfig, config, env, parsedArgs, i18n)),
 			map((cliConfig: CLIConfig) => cliConfig.help()),
-			chain(parseArgs),
-			chain(inputArgs => SanitizedArgs.of(inputArgs)),
+			chain(parseArgs(getCliArgs())),
+			chain(inputArgs => SanitizedArgs.of({ ...inputArgs, _: parsedArgs._ })),
 			chain(parsedArgs => {
 				if (internalTasks.isTaskRunning(parsedArgs)) return internalTasks.handle(parsedArgs);
 				else if (pluginTasks.isTaskRunning(parsedArgs)) return pluginTasks.handle(parsedArgs);
@@ -1150,7 +1155,7 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 		(cliConfig: CLIConfig) =>
 			pipe(
 				cliConfig,
-				parseArgs,
+				parseArgs(getCliArgs()),
 				chain(SanitizedArgs.of),
 				chain((initArgs: SanitizedArgs.t) => {
 					if (initArgs.debug) debugMode(true);
