@@ -52,8 +52,8 @@ export function createRegistry() {
 		// Default isRunning() function should a task not provide one
 		const isRunning = (parsedArgs: SanitizedArgs.t) =>
 			!parsedArgs.help && (
-				parsedArgs._.includes(taskArgs.taskName) || taskArgs.aliases.reduce(
-					(retval, alias) => retval || parsedArgs._.includes(alias),
+				parsedArgs._.join(' ').includes(taskArgs.taskName) || taskArgs.aliases.reduce(
+					(retval, alias) => retval || parsedArgs._.join(' ').includes(alias),
 					false,
 				)
 			);
