@@ -301,13 +301,13 @@ jobs:
           npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY
  
       - name: Publish for Alpha prerelease
-        if: ${{ startsWith(needs.workflow-setup.outputs.prerelease, "alpha" }}
+        if: ${{ startsWith(needs.workflow-setup.outputs.prerelease, 'alpha' }}
         run: |
           echo ${NODE_AUTH_TOKEN} >> ~/.npmrc
           npm publish --workspaces --tag 'preview' --access public --registry $NPM_REGISTRY
 
       - name: Publish for RC release
-        if: ${{ startsWith(needs.workflow-setup.outputs.prerelease, "rc" }}
+        if: ${{ startsWith(needs.workflow-setup.outputs.prerelease, 'rc' }}
         run: |
           echo ${NODE_AUTH_TOKEN} >> ~/.npmrc
           npm publish  --workspaces --tag 'next' --access public --registry $NPM_REGISTRY
