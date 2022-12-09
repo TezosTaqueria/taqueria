@@ -184,6 +184,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	// Add "init" task used to initialize a new project
 	globalTasks.registerTask({
 		taskName: NonEmptyString.create('init'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -208,6 +209,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	// Add "scaffold" task to scaffold full projects
 	globalTasks.registerTask({
 		taskName: NonEmptyString.create('scaffold'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -239,6 +241,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	// Add "opt-in" task to opt-in to to analytics tracking
 	globalTasks.registerTask({
 		taskName: NonEmptyString.create('opt-in'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -258,6 +261,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	// Add "opt-out" task to opt-out of analytics tracking
 	globalTasks.registerTask({
 		taskName: NonEmptyString.create('opt-out'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -277,6 +281,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	// Add a task for vscode to learn more about the CLI
 	globalTasks.registerTask({
 		taskName: NonEmptyString.create('fromVsCode'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.hide('fromVsCode')
@@ -296,6 +301,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	// Add "--version" command to show the CLI version number
 	globalTasks.registerTask({
 		taskName: NonEmptyString.create('version'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) => cliConfig.version(getVersion(args)),
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
@@ -308,6 +314,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	// Add "--build" command to show the build version
 	globalTasks.registerTask({
 		taskName: NonEmptyString.create('build'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.option('build', {
@@ -331,6 +338,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 	// Add "install" task to install plugins
 	internalTasks.registerTask({
 		taskName: NonEmptyString.create('install'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -359,6 +367,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 	// Add "uninstall" task
 	internalTasks.registerTask({
 		taskName: NonEmptyString.create('uninstall'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -385,6 +394,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 	// Add a hidden task "list-known-tasks" task to show all known tasks
 	internalTasks.registerTask({
 		taskName: NonEmptyString.create('list-known-tasks'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -404,6 +414,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 	// TODO: Remove?
 	internalTasks.registerTask({
 		taskName: NonEmptyString.create('add-contract'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -434,6 +445,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 	// Add "rm-contract" task to remove (unregister) a known contract
 	internalTasks.registerTask({
 		taskName: NonEmptyString.create('rm-contract'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -461,6 +473,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 	// Add "list-contracts" task to show a list of all known (registered) contracts
 	internalTasks.registerTask({
 		taskName: NonEmptyString.create('list-contract'),
+		aliases: [],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -770,6 +783,7 @@ const exposeTemplates = (
 	if (Object.keys(state.templates).length > 0) {
 		pluginTasks.registerTask({
 			taskName: NonEmptyString.create('create'),
+			aliases: [],
 			configure: (cliConfig: CLIConfig) =>
 				cliConfig
 					.command({
@@ -936,6 +950,7 @@ const createPluginTaskHandler = (
 const addPluginTask = (config: LoadedConfig.t, task: Task.t, pluginLib: PluginLib, plugin?: InstalledPlugin.t) => {
 	pluginTasks.registerTask({
 		taskName: task.task,
+		aliases: task.aliases ?? [],
 
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig

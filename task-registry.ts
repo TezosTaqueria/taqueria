@@ -18,6 +18,9 @@ type RegisteredTask = {
 	// Task as displayed in the CLI
 	taskName: NonEmptyString.t;
 
+	// List of aliases
+	aliases: NonEmptyString.t[];
+
 	// A method to configure the task, by adding it to yargs
 	configure: (yargs: CLIConfig) => CLIConfig;
 
@@ -29,6 +32,9 @@ type RegisteredTask = {
 
 type RegisterTaskArgs = {
 	taskName: NonEmptyString.t;
+
+	// List of aliases
+	aliases: NonEmptyString.t[];
 
 	// A method to configure the task, by adding it to yargs
 	configure: (yargs: CLIConfig) => CLIConfig;
@@ -44,7 +50,13 @@ export function createRegistry() {
 
 	const registerTask = (taskArgs: RegisterTaskArgs) => {
 		// Default isRunning() function should a task not provide one
-		const isRunning = (parsedArgs: SanitizedArgs.t) => parsedArgs._.includes(taskArgs.taskName) && !parsedArgs.help;
+		const isRunning = (parsedArgs: SanitizedArgs.t) =>
+			!parsedArgs.help && (
+				parsedArgs._.includes(taskArgs.taskName) || taskArgs.aliases.reduce(
+					(retval, alias) => retval || parsedArgs._.includes(alias),
+					false,
+				)
+			);
 
 		// Create a registered task, using the default isRunning function above if one wasn't provided
 		const task = taskArgs.isRunning ? { isRunning: taskArgs.isRunning, ...taskArgs } : { isRunning, ...taskArgs };
