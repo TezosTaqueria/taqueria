@@ -18,6 +18,9 @@ concurrency:
   group: ${{ github.ref_name || github.ref }}
   cancel-in-progress: true
 
+env:
+  DENO_VERSION: '1.23.1'
+
 jobs:
   # When we use reusable we lose the ability to to filter out the workflow for changes to certain paths.
   # This job creates boolean outputs based on path filters. These outputs can then be used as job conditions
@@ -84,7 +87,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: "1.23.4"
+          deno-version: "${{ env.DENO_VERSION }}"
 
       ## This job will compile the binary for the target OS. The binary is then tested by initializing a project called "test_project"
       ## If the initialization command output is equal to "Project taq'ified!" we know that the binary works for the given os, else the command exits with status code 1.
@@ -195,7 +198,7 @@ jobs:
 
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: "1.23.4"
+          deno-version: "${{ env.DENO_VERSION }}"
 
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
@@ -289,15 +292,25 @@ jobs:
         run: |
           echo ${NODE_AUTH_TOKEN} >> ~/.npmrc
           npm publish --workspaces --tag 'latest' --access public --registry $NPM_REGISTRY
-
+  
+  # Workaround for exposing env context to reusable workflows
+  # TODO: Refactor once https://github.com/orgs/community/discussions/26671 is resolved
+  expose-env-vars:
+    runs-on: ubuntu-latest
+    outputs:
+      deno_version: ${{ env.DENO_VERSION }}
+    steps:
+      - run: echo "Exposing env.DENO_VERSION for reusable workflow"
   vscode-extension-workflow:
     needs: 
       - workflow-setup
       - publish-npm-packages
+      - expose-env-vars
     if: ${{ !github.event.pull_request.head.repo.fork }}
     uses: ./.github/workflows/vscode-extension.yml
     with:
       prerelease: ${{ needs.workflow-setup.outputs.prerelease }}
+      deno-version: ${{ needs.vscode-extension.outputs.deno_version }}
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
