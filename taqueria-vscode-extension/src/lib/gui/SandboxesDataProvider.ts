@@ -162,6 +162,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
+		// TODO: query filter - only operations from config.json ???
 		const response = await fetch(`${tzktBaseUrl}/v1/accounts/${address}/operations`);
 		const data = await response.json();
 		return (data as any[]).map(item =>
@@ -210,6 +211,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
+		// TODO: query filter - only entrypoints ... ???
 		const response = await fetch(
 			`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints?micheline=true&michelson=true`,
 		);
@@ -249,6 +251,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return undefined;
 		}
 		try {
+			// TODO: query filter - only accounts from config.json
 			const response = await fetch(`${tzktBaseUrl}/v1/accounts/count?type.ne=contract`);
 			const data = await response.json();
 			return data as number;
@@ -264,6 +267,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return undefined;
 		}
 		try {
+			// TODO: query filter - only contracts from config.json
 			const response = await fetch(`${tzktBaseUrl}/v1/contracts/count`);
 			const data = await response.json();
 			// This assumes that the built-in contracts always exist on the chain. If not, the count will be off.
@@ -290,6 +294,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
+		// TODO: query filter - only accounts from config.json
 		const response = await fetch(`${tzktBaseUrl}/v1/accounts?type.ne=contract`);
 		tzktBaseUrl;
 		const data = await response.json();
@@ -314,6 +319,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
+		// TODO: query filter - only contracts from config.json
 		const response = await fetch(`${tzktBaseUrl}/v1/contracts?limit=1000`);
 		const data = this.filterOutBuiltInContracts(await response.json() as any[]);
 
