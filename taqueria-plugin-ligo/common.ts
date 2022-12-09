@@ -20,7 +20,7 @@ export type IntersectionOpts = LigoOpts & CompileOpts & TestOpts;
 type UnionOpts = LigoOpts | CompileOpts | TestOpts;
 
 // Should point to the latest stable version, so it needs to be updated as part of our release process.
-const LIGO_DEFAULT_IMAGE = 'ligolang/ligo:0.54.1';
+const LIGO_DEFAULT_IMAGE = 'ligolang/ligo:0.57.0';
 
 const LIGO_IMAGE_ENV_VAR = 'TAQ_LIGO_IMAGE';
 
