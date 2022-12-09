@@ -1,15 +1,11 @@
 import { getArch, SandboxConfig } from '@taqueria/node-sdk';
-import { Config } from '@taqueria/node-sdk';
-import { Protocol } from '@taqueria/node-sdk/types';
 import { Config as RawConfig } from '@taqueria/protocol/types';
 import { getContainerName, getNewPortIfPortInUse, getUniqueSandboxName, Opts, updateConfig } from './proxy';
 
-const { Url } = Protocol;
-
 const getTzKtDockerImages = (opts: Opts) => ({
 	postgres: `postgres:14.5-alpine`,
-	sync: `alirezahaghshenas/tzkt:sync-1.10.3`,
-	api: `alirezahaghshenas/tzkt:api-1.10.3`,
+	sync: `ecadlabs/tzkt-sync:1.8.3-taqueria`,
+	api: `ecadlabs/tzkt-api:1.8.3-taqueria`,
 });
 
 export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: Opts) => {
@@ -22,7 +18,6 @@ export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: Opt
 };
 
 const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: SandboxConfig, opts: Opts) => {
-	const sandboxPort = new URL(sandbox.rpcUrl).port;
 	const containerNames = await getTzKtContainerNames(sandboxName, opts);
 	const sandboxContainerName = await getContainerName(sandboxName, opts);
 	const connectionStringEnv =
