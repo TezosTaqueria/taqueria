@@ -1215,7 +1215,6 @@ export const normalizeErr = (err: TaqError.t | TaqError.E_TaqError | Error) => {
 
 export const displayError = (cli: CLIConfig) =>
 	(err: Error | TaqError.t) => {
-		debugger;
 		const inputArgs = (cli.parsed as unknown as { argv: Record<string, unknown> }).argv;
 
 		if (!inputArgs.fromVsCode && (isTaqError(err) && err.kind !== 'E_EXEC')) {

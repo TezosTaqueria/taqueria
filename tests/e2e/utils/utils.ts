@@ -12,7 +12,6 @@ export const generateTestProject = async (
 	packageNames: string[] = [],
 	localPackages: boolean = true,
 ) => {
-	debugger;
 	const targetDir = path.join('/tmp', projectPath);
 
 	const projectInit = await exec(`taq init ${targetDir}`);
