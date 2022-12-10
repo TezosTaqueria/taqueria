@@ -2,6 +2,7 @@ import { NonEmptyString, SanitizedArgs } from '@taqueria/protocol';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { FutureInstance as Future, map } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
+import { equals } from 'rambda';
 import type { CLIConfig } from './taqueria-types.ts';
 import { inject } from './taqueria-utils/taqueria-utils.ts';
 
@@ -45,6 +46,11 @@ type RegisterTaskArgs = {
 	isRunning?: (args: SanitizedArgs.t) => boolean;
 };
 
+function startsWithSlice(arr: (string | number)[], slice: string[]) {
+	const otherSlice = arr.slice(0, slice.length);
+	return equals(otherSlice, slice) as boolean;
+}
+
 export function createRegistry() {
 	const tasks: RegisteredTask[] = [];
 
@@ -52,8 +58,8 @@ export function createRegistry() {
 		// Default isRunning() function should a task not provide one
 		const isRunning = (parsedArgs: SanitizedArgs.t) =>
 			!parsedArgs.help && (
-				parsedArgs._.join(' ').includes(taskArgs.taskName) || taskArgs.aliases.reduce(
-					(retval, alias) => retval || parsedArgs._.join(' ').includes(alias),
+				startsWithSlice(parsedArgs._, taskArgs.taskName.split(' ')) || taskArgs.aliases.reduce(
+					(retval, alias) => retval || startsWithSlice(parsedArgs._, alias.split(' ')),
 					false,
 				)
 			);

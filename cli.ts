@@ -1122,6 +1122,11 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 			chain((config: LoadedConfig.t) => loadPlugins(previousCLIConfig, config, env, parsedArgs, i18n)),
 			map((cliConfig: CLIConfig) => cliConfig.help()),
 			chain(parseArgs(getCliArgs())),
+			// TODO: In the chain call below, we're copying the version of the '_' property from
+			// the original parsedArgs to the new parsedArgs as created from the parseArgs() function above.
+			//
+			// For some reason, the original parsedArgs is getting mutated by yargs in the second parseArgs() call.
+			// I'll be coming back to see what is going on here.
 			chain(inputArgs => SanitizedArgs.of({ ...inputArgs, _: parsedArgs._ })),
 			chain(parsedArgs => {
 				if (internalTasks.isTaskRunning(parsedArgs)) return internalTasks.handle(parsedArgs);
