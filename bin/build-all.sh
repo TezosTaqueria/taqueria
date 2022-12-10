@@ -29,7 +29,7 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
         fi
     else
         echo "❌ Deno is not installed."
-        echo -2
+        exit -2
     fi
     echo "** Dependency checks passed"
 
