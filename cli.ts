@@ -342,7 +342,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 	// Add "install" task to install plugins
 	internalTasks.registerTask({
 		taskName: NonEmptyString.create('install'),
-		aliases: [],
+		aliases: [NonEmptyString.create('i')],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -371,7 +371,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 	// Add "uninstall" task
 	internalTasks.registerTask({
 		taskName: NonEmptyString.create('uninstall'),
-		aliases: [],
+		aliases: [NonEmptyString.create('u')],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -449,7 +449,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 	// Add "rm-contract" task to remove (unregister) a known contract
 	internalTasks.registerTask({
 		taskName: NonEmptyString.create('rm-contract'),
-		aliases: [],
+		aliases: [NonEmptyString.create('remove-contract')],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
@@ -476,8 +476,8 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 
 	// Add "list-contracts" task to show a list of all known (registered) contracts
 	internalTasks.registerTask({
-		taskName: NonEmptyString.create('list-contract'),
-		aliases: [],
+		taskName: NonEmptyString.create('list-contracts'),
+		aliases: [NonEmptyString.create('show-contracts')],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
