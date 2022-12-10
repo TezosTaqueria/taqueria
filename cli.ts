@@ -1127,6 +1127,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 			//
 			// For some reason, the original parsedArgs is getting mutated by yargs in the second parseArgs() call.
 			// I'll be coming back to see what is going on here.
+			// https://github.com/ecadlabs/taqueria/issues/1614
 			chain(inputArgs => SanitizedArgs.of({ ...inputArgs, _: parsedArgs._ })),
 			chain(parsedArgs => {
 				if (internalTasks.isTaskRunning(parsedArgs)) return internalTasks.handle(parsedArgs);
