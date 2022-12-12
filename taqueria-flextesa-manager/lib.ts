@@ -38,15 +38,37 @@ export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
 		.then(writeConfigFile(parsedArgs.configAbsPath))
 		.then(config => ({ ...parsedArgs, config }) as SanitizedArgs.t);
 
+export const getFlextesaAnnotations = (parsedArgs: SanitizedArgs.t) => {
+	const sandboxConfig = getSandboxConfig(parsedArgs);
+	return sandboxConfig.annotations ?? {
+		baking: 'enabled',
+		block_time: 5,
+	};
+};
+
+export const getBakingFlags = (parsedArgs: SanitizedArgs.t) => {
+	const bakingConfig = getFlextesaAnnotations(parsedArgs);
+	switch (bakingConfig.baking) {
+		case 'disabled':
+		case 'auto':
+			return ['--no-baking'];
+		case 'enabled':
+		default:
+			return [
+				`--time-between-blocks ${bakingConfig.block_time}`,
+				'--number-of-b 1',
+			];
+	}
+};
+
 export const startMininet = (parsedArgs: SanitizedArgs.t) => {
 	const cmdArgs: string[] = [
 		'mini-network',
 		'--root /tmp/mini-box',
 		'--size 1',
-		'--number-of-b 1',
 		'--set-history-mode N000:archive',
 		'--time-b 5',
-		// '--remove-default-bootstrap-accounts',
+		...getBakingFlags(parsedArgs),
 		...getNoDaemonFlags(parsedArgs),
 		...getBootstrapFlags(parsedArgs),
 		'--until-level 200_000_000',
@@ -136,7 +158,10 @@ const getNoDaemonFlags = (parsedArgs: SanitizedArgs.t) => {
 	);
 };
 
-const getSandboxProtocol = (parsedArgs: SanitizedArgs.t) => {
-	const sandboxConfig = parsedArgs.config.sandbox[parsedArgs.sandbox] as SandboxConfig.t;
+export const getSandboxConfig = (parsedArgs: SanitizedArgs.t) =>
+	parsedArgs.config.sandbox[parsedArgs.sandbox] as SandboxConfig.t;
+
+export const getSandboxProtocol = (parsedArgs: SanitizedArgs.t) => {
+	const sandboxConfig = getSandboxConfig(parsedArgs);
 	return sandboxConfig.protocol;
 };

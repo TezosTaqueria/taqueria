@@ -407,6 +407,7 @@ export type SandboxConfig = {
 	accounts?: Record<string, SandboxAccountConfig | NonEmptyString>;
 
 	tzkt?: TzKtConfig;
+	annotations?: Record<string, unknown>;
 };
 
 export type ScaffoldConfig = {
