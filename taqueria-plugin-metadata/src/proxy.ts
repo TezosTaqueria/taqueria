@@ -169,9 +169,9 @@ type ProjectMetadata = {
 	homepage: string;
 };
 const createProjectMetadata = async (
-	config: LoadedConfig.t,
+	loadedConfig: LoadedConfig.t,
 ): Promise<PluginProxyResponse> => {
-	const defaultValues = config.metadata;
+	const defaultValues = loadedConfig.metadata;
 
 	// Common fields from Tzip-16
 	const response = await prompts([
@@ -223,10 +223,10 @@ const createProjectMetadata = async (
 	};
 
 	const updatedConfig = {
-		...Config.create(config), // config is actually LoadedConfig
+		...Config.create(loadedConfig), // config is actually LoadedConfig
 		metadata: projectMetadata,
 	};
-	await writeJsonFile(config.configFile)(updatedConfig);
+	await writeJsonFile(loadedConfig.configFile)(updatedConfig);
 
 	return {
 		render: 'table',
