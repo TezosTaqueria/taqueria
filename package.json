@@ -77,6 +77,7 @@
 		"@docusaurus/plugin-google-analytics": "^2.1.0",
 		"@docusaurus/plugin-google-gtag": "^2.1.0",
 		"@docusaurus/plugin-sitemap": "^2.1.0",
-		"@docusaurus/preset-classic": "^2.1.0"
+		"@docusaurus/preset-classic": "^2.1.0",
+		"@gmrchk/cli-testing-library": "^0.1.2"
 	}
 }
