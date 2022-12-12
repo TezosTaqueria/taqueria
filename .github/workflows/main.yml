@@ -96,6 +96,7 @@ jobs:
         shell: bash
         env:
           DENO_DIR: "./deno"
+          GOOGLE_ANALYTICS_TOKEN: ${{ secrets.GOOGLE_ANALYTICS_TOKEN }}
         run: |
           ./bin/build.sh
           ./"${{ matrix.taqueria_bin }}" init -p ./test_project
