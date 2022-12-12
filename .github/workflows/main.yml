@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+      - prerelease*
 
   push:
     tags:
@@ -17,6 +18,9 @@ on:
 concurrency:
   group: ${{ github.ref_name || github.ref }}
   cancel-in-progress: true
+
+env:
+  DENO_VERSION: '1.23.1'
 
 jobs:
   # When we use reusable we lose the ability to to filter out the workflow for changes to certain paths.
@@ -54,7 +58,6 @@ jobs:
       contents: 'read'
       id-token: 'write'
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.continue-on-error }}
     if: ${{ github.event_name != 'release' && !github.event.pull_request.head.repo.fork }}
     needs:
       - workflow-setup
@@ -66,21 +69,13 @@ jobs:
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
            taqueria_bin: "taq"
-           continue-on-error: false
-         - os: windows-latest
-           os_short: windows
-           deno_target: "x86_64-pc-windows-msvc"
-           taqueria_bin: "taq.exe"
-           continue-on-error: true
          - os: macOS-latest
            os_short: macos
            deno_target: "x86_64-apple-darwin"
            taqueria_bin: "taq"
-           continue-on-error: false
 
     outputs:
       public-url-ubuntu: ${{ steps.public-url.outputs.ubuntu }}
-      public-url-windows: ${{ steps.public-url.outputs.windows }}
       public-url-macos: ${{ steps.public-url.outputs.macos }}
 
     env:
@@ -93,7 +88,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: "1.23.4"
+          deno-version: "${{ env.DENO_VERSION }}"
 
       # - name: Delete node-gyp cache
       #   id: delete-node-gyp-cache
@@ -215,7 +210,7 @@ jobs:
 
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: "1.23.4"
+          deno-version: "${{ env.DENO_VERSION }}"
 
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
@@ -301,13 +296,13 @@ jobs:
           npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY
  
       - name: Publish for Alpha prerelease
-        if: ${{ startsWith(needs.workflow-setup.outputs.prerelease, "alpha" }}
+        if: ${{ startsWith(needs.workflow-setup.outputs.prerelease, 'alpha') }}
         run: |
           echo ${NODE_AUTH_TOKEN} >> ~/.npmrc
           npm publish --workspaces --tag 'preview' --access public --registry $NPM_REGISTRY
 
       - name: Publish for RC release
-        if: ${{ startsWith(needs.workflow-setup.outputs.prerelease, "rc" }}
+        if: ${{ startsWith(needs.workflow-setup.outputs.prerelease, 'rc') }}
         run: |
           echo ${NODE_AUTH_TOKEN} >> ~/.npmrc
           npm publish  --workspaces --tag 'next' --access public --registry $NPM_REGISTRY
@@ -317,15 +312,25 @@ jobs:
         run: |
           echo ${NODE_AUTH_TOKEN} >> ~/.npmrc
           npm publish --workspaces --tag 'latest' --access public --registry $NPM_REGISTRY
-
+  
+  # Workaround for exposing env context to reusable workflows
+  # TODO: Refactor once https://github.com/orgs/community/discussions/26671 is resolved
+  expose-env-vars:
+    runs-on: ubuntu-latest
+    outputs:
+      deno_version: ${{ env.DENO_VERSION }}
+    steps:
+      - run: echo "Exposing env.DENO_VERSION for reusable workflow"
   vscode-extension-workflow:
     needs: 
       - workflow-setup
       - publish-npm-packages
+      - expose-env-vars
     if: ${{ !github.event.pull_request.head.repo.fork }}
     uses: ./.github/workflows/vscode-extension.yml
     with:
       prerelease: ${{ needs.workflow-setup.outputs.prerelease }}
+      deno-version: ${{ needs.vscode-extension.outputs.deno_version }}
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
@@ -388,7 +393,6 @@ jobs:
                       <p>
                           <a href="${{ needs.build-binaries.outputs.public-url-ubuntu }}">Linux</a><br>
                           <a href="${{ needs.build-binaries.outputs.public-url-macos }}">MacOS</a><br>
-                          <a href="${{ needs.build-binaries.outputs.public-url-windows }}">Windows</a>
                       </p>
                   </td>
                 </tr>
@@ -448,7 +452,6 @@ jobs:
         run: |
           mkdir release && cd release
           wget ${{ needs.build-binaries.outputs.public-url-ubuntu }} -O taq-linux
-          wget ${{ needs.build-binaries.outputs.public-url-windows }} -O taq-windows.exe
           wget ${{ needs.build-binaries.outputs.public-url-macos }} -O taq-macos
           wget ${{ needs.vscode-extension-workflow.outputs.vsixGcsUrl }}
 
