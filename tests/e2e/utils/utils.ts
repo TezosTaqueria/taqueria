@@ -12,7 +12,6 @@ export const generateTestProject = async (
 	packageNames: string[] = [],
 	localPackages: boolean = true,
 ) => {
-	debugger;
 	const targetDir = path.join('/tmp', projectPath);
 
 	const projectInit = await exec(`taq init ${targetDir}`);
@@ -127,5 +126,4 @@ export async function installDependencies(
 
 		await checkFolderExistsWithTimeout(`${projectPath}/node_modules/@taqueria/plugin-${packageName}/index.js`);
 	}
-	return;
 }
