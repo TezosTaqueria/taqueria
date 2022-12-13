@@ -1,24 +1,32 @@
 export const helpContentsJestPlugin = `taq <command>
 
 Commands:
-  taq init [projectDir]           Initialize a new project
-  taq opt-in                      Opt-in to sharing anonymous usage analytics
-  taq opt-out                     Opt-out of sharing anonymous usage analytics
-  taq install <pluginName>        Install a plugin
-  taq uninstall <pluginName>      Uninstall a plugin
-  taq add-contract <sourceFile>   Add a contract to the contract registry
-  taq rm-contract <contractName>  Remove a contract from the contract registry
-  taq list-contracts              List registered contracts
-  taq test [partition]            Setup a directory as a partition to run Jest t
-                                  ests                           [aliases: jest]
-  taq clean                       Clean all the Taqueria-related docker images
-  taq create <template>           Create files from pre-existing templates
+  taq init [projectDir]                     Initialize a new project
+  taq scaffold [scaffoldUrl] [scaffoldProj  Generate a new project using pre-mad
+  ectDir]                                   e scaffold
+  taq opt-in                                Opt-in to sharing anonymous usage an
+                                            alytics
+  taq opt-out                               Opt-out of sharing anonymous usage a
+                                            nalytics
+  taq install <pluginName>                  Install a plugin
+  taq uninstall <pluginName>                Uninstall a plugin
+  taq add-contract <sourceFile>             Add a contract to the contract regis
+                                            try
+  taq rm-contract <contractName>            Remove a contract from the contract
+                                            registry
+  taq list-contracts                        List registered contracts
+  taq test [partition]                      Setup a directory as a partition to
+                                            run Jest tests       [aliases: jest]
+  taq clean                                 Clean all the Taqueria-related docke
+                                            r images
+  taq create <template>                     Create files from pre-existing templ
+                                            ates
 
 Options:
-      --version     Show version number                                [boolean]
-      --build       Display build information about the current version[boolean]
   -p, --projectDir  Path to your project directory               [default: "./"]
   -e, --env         Specify an environment configuration
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
 
@@ -31,17 +39,6 @@ Setup a directory as a partition to run Jest tests
 
 Positionals:
   partition  Name of the partition for these tests   [string] [default: "tests"]
-
-Options:
-      --version      Show version number                               [boolean]
-      --build        Display build information about the current version
-                                                                       [boolean]
-  -p, --projectDir   Path to your project directory              [default: "./"]
-  -e, --env          Specify an environment configuration
-  -y, --yes          Select "yes" to any prompt       [boolean] [default: false]
-      --help         Show help                                         [boolean]
-  -i, --init         Initializes the partition for Jest                [boolean]
-  -t, --testPattern  Run test files that match the provided pattern
 `;
 
 export const helpContentsContractTestTemplate = `taq create <template> <michelsonArtifact>
@@ -52,18 +49,7 @@ Positionals:
   template           Name of the template to use
                                   [string] [required] [choices: "contract-test"]
   michelsonArtifact  Name of the michelson contract (artifact) to generate tests
-                      for                                    [string] [required]
-
-Options:
-      --version     Show version number                                [boolean]
-      --build       Display build information about the current version[boolean]
-  -p, --projectDir  Path to your project directory               [default: "./"]
-  -e, --env         Specify an environment configuration
-  -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
-      --help        Show help                                          [boolean]
-      --partition   Partition to place generated test suite
-                                                     [string] [default: "tests"]
-`;
+                      for                                    [string] [required]`;
 
 export const incrementSpecContents = `
 import { TezosToolkit } from '@taquito/taquito';

@@ -1,11 +1,11 @@
-import { execCmd, getArch, getArtifactsDir, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { execCmd, getArch, getArtifactsDir, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import { CompileOpts as Opts, emitExternalError, getInputFilename, getLigoDockerImage } from './common';
 
 type TableRow = { contract: string; artifact: string };
 
-type ExprKind = 'storage' | 'default_storage' | 'parameter';
+export type ExprKind = 'storage' | 'default_storage' | 'parameter';
 
 const COMPILE_ERR_MSG: string = 'Not compiled';
 
@@ -212,7 +212,7 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 
 	const storageListFile = `${removeExt(sourceFile)}.storageList${extractExt(sourceFile)}`;
 	const storageListFilename = getInputFilename(parsedArgs, storageListFile);
-	const storageCompileResult = await access(storageListFilename)
+	const storageCompileResult = await (access(storageListFilename)
 		.then(() => compileExprs(parsedArgs, storageListFile, 'storage'))
 		.catch(() => tryLegacyStorageNamingConvention(parsedArgs, sourceFile))
 		.catch(() => {
@@ -220,11 +220,11 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 				`Note: storage file associated with "${sourceFile}" can't be found, so "${storageListFile}" has been created for you. Use this file to define all initial storage values for this contract\n`,
 			);
 			writeFile(storageListFilename, initContentForStorage(sourceFile), 'utf8');
-		});
+		}));
 
 	const parameterListFile = `${removeExt(sourceFile)}.parameterList${extractExt(sourceFile)}`;
 	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
-	const parameterCompileResult = await access(parameterListFilename)
+	const parameterCompileResult = await (access(parameterListFilename)
 		.then(() => compileExprs(parsedArgs, parameterListFile, 'parameter'))
 		.catch(() => tryLegacyParameterNamingConvention(parsedArgs, sourceFile))
 		.catch(() => {
@@ -232,7 +232,7 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 				`Note: parameter file associated with "${sourceFile}" can't be found, so "${parameterListFile}" has been created for you. Use this file to define all parameter values for this contract\n`,
 			);
 			writeFile(parameterListFilename, initContentForParameter(sourceFile), 'utf8');
-		});
+		}));
 
 	let compileResults: TableRow[] = [contractCompileResult];
 	if (storageCompileResult) compileResults = compileResults.concat(storageCompileResult);
@@ -283,7 +283,11 @@ const compile = (parsedArgs: Opts): Promise<void> => {
 			`${sourceFile} doesn't have a valid LIGO extension ('.ligo', '.religo', '.mligo' or '.jsligo')`,
 		);
 	}
-	return p.then(sendJsonRes).catch(err => sendAsyncErr(err, false));
+	return p.then(sendJsonRes).catch(err => sendErr(err, false));
 };
 
 export default compile;
+export const ___TEST___ = {
+	getContractNameForExpr,
+	getOutputExprFilename,
+};

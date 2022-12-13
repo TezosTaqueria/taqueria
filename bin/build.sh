@@ -7,6 +7,13 @@ if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
         echo "Please install deno before attempting to build."
         echo "Run: curl -fsSL https://deno.land/install.sh | sh"
     else
+        deno --version | grep 1.23 >/dev/null
+        errorCode=$?
+        if [ $errorCode -ne 0 ]; then
+            echo "Deno is installed, but not using v1.23.x."
+            exit $errorCode
+        fi
+
         if [  -z "$DENO_TARGET" ]; then
             TARGET_ARG=""
         else
