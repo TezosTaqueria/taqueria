@@ -153,7 +153,7 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 				.map(([k, v]) => [k, {
 					// Known fields
 					type: v.sandboxes.length ? `flextesa` : `simple`,
-					// Fields from the first sandbox or network (there should be only 1)
+					// Fields from the first sandbox or network (there should be only 1 sandbox or 1 network)
 					...[
 						...v.sandboxes.map(k => config.sandbox?.[k]),
 						...v.networks.map(k => config.network?.[k]),
@@ -172,7 +172,44 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 
 	// extract local only fields to environment specific files
 	// This should only include fields that the environment plugin will replace if missing
-	const environmentsV2 = {};
+	// This is providing a default implementation for a few known environments
+	const environmentsV2 = {} as ConfigFileSetV2['environments'];
+
+	for (const [envName, eMain] of Object.entries(configFileV2.environments ?? {})) {
+		// clone eMain and delete fields from either main config or local env config
+		const eLocal = environmentsV2[envName] = { ...eMain };
+
+		for (const k of Object.keys(eMain)) {
+			const key = k as keyof typeof eMain;
+
+			// Everything except label and protocol is local for sandbox
+			if (eMain.type === 'flextesa') {
+				if (
+					k === 'label'
+					|| k === 'protocol'
+				) {
+					delete eLocal[key];
+					continue;
+				}
+			}
+
+			// For simple networks, keep the rpcUrl also
+			if (eMain.type === 'simple') {
+				if (
+					k === 'label'
+					|| k === 'protocol'
+					|| k === 'rpcUrl'
+				) {
+					delete eLocal[key];
+					continue;
+				}
+			}
+
+			// Remove from main by default
+			delete eMain[key];
+		}
+		continue;
+	}
 
 	return removeUndefinedFields({ config: configFileV2, environments: environmentsV2 });
 };
