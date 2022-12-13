@@ -17,7 +17,7 @@ export default {
 	// clearMocks: true,
 
 	// Indicates whether the coverage information should be collected while executing the test
-	collectCoverage: false,
+	collectCoverage: true,
 
 	// An array of glob patterns indicating a set of files for which coverage information should be collected
 	collectCoverageFrom: [
@@ -28,12 +28,13 @@ export default {
 	coverageDirectory: 'coverage',
 
 	// An array of regexp pattern strings used to skip coverage collection
-	// coveragePathIgnorePatterns: [
-	//   "/node_modules/"
-	// ],
+	coveragePathIgnorePatterns: [
+		'/node_modules/',
+		'/tests/',
+	],
 
 	// Indicates which provider should be used to instrument code for coverage
-	// coverageProvider: "v8",
+	coverageProvider: 'v8',
 
 	// A list of reporter names that Jest uses when writing coverage reports
 	coverageReporters: [
@@ -126,6 +127,8 @@ export default {
 	roots: [
 		'<rootDir>/taqueria-sdk',
 		'<rootDir>/tests/unit/taqueria-sdk',
+		'<rootDir>/taqueria-plugin-ligo',
+		// '<rootDir>/tests/unit/ligo-plugin-tests',
 	],
 
 	// Allows you to use a custom runner instead of Jest's default test runner
@@ -155,6 +158,7 @@ export default {
 	// The glob patterns Jest uses to detect test files
 	testMatch: [
 		'**/unit/**/?(*.)+(spec).[tj]s?(x)',
+		'**/unit/**/?(*.)+(spec).mts?(x)',
 	],
 
 	// An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
