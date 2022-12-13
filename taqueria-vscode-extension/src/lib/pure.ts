@@ -4,8 +4,8 @@ import { exec, ExecException } from 'child_process';
 import { parse } from 'comment-json';
 import { readFile, stat } from 'fs/promises';
 import { join } from 'path';
-import { OutputFunction } from './helpers';
-import { OutputLevels } from './LogHelper';
+import { OutputFunction, VsCodeHelper } from './helpers';
+import { LogHelper, OutputLevels } from './LogHelper';
 import { TaqVsxError } from './TaqVsxError';
 
 /***********************************************************************/
@@ -163,8 +163,19 @@ export const execCmd = (
 		}
 	});
 
-export const checkTaqBinary = async (inputPath: PathToTaq, i18n: i18n, showOutput: OutputFunction) => {
-	const result = await execCmd(`${inputPath} testFromVsCode`, showOutput);
+export const checkTaqVersion = async (
+	inputPath: PathToTaq,
+	i18n: i18n,
+	showOutput: OutputFunction,
+	helper: VsCodeHelper,
+): Promise<string> => {
+	const result = await execCmd(`${inputPath} --version --fromVsCode`, showOutput);
+	if (result.executionError) {
+		helper.logAllNestedErrors(result.executionError);
+	}
+	if (result.standardError && result.standardError.length) {
+		showOutput(OutputLevels.error, result.standardError);
+	}
 	return result.standardOutput;
 };
 
