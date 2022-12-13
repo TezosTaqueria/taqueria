@@ -56,7 +56,6 @@ export const getBakingFlags = (parsedArgs: SanitizedArgs.t) => {
 		default:
 			return [
 				`--time-between-blocks ${bakingConfig.block_time}`,
-				'--number-of-b 1',
 			];
 	}
 };
@@ -67,7 +66,6 @@ export const startMininet = (parsedArgs: SanitizedArgs.t) => {
 		'--root /tmp/mini-box',
 		'--size 1',
 		'--set-history-mode N000:archive',
-		'--time-b 5',
 		...getBakingFlags(parsedArgs),
 		...getNoDaemonFlags(parsedArgs),
 		...getBootstrapFlags(parsedArgs),
