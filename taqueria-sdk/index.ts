@@ -690,7 +690,7 @@ const getPackageName = () => {
 };
 
 export const Plugin = {
-	create: async <Args extends Protocol.RequestArgs.t>(definer: pluginDefiner, unparsedArgs: string[]) => {
+	create: <Args extends Protocol.RequestArgs.t>(definer: pluginDefiner, unparsedArgs: string[]) => {
 		const packageName = getPackageName();
 		return parseArgs<Args>(unparsedArgs)
 			.then(getResponse(definer, packageName))

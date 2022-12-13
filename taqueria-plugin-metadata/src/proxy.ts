@@ -1,5 +1,7 @@
 import {
+	Config,
 	getContracts,
+	LoadedConfig,
 	PluginProxyResponse,
 	RequestArgs,
 	sendAsyncErr,
@@ -15,11 +17,10 @@ interface Opts extends RequestArgs.t {
 	readonly contractName?: string;
 	readonly task?: string;
 }
-type Config = Opts['config'];
 
 const createContractMetadata = async (
 	contractName: undefined | string,
-	config: Config,
+	config: Config.t,
 ): Promise<PluginProxyResponse> => {
 	const contracts = Object.keys(config.contracts ?? {}).map(x => path.basename(x, path.extname(x)));
 
@@ -168,9 +169,9 @@ type ProjectMetadata = {
 	homepage: string;
 };
 const createProjectMetadata = async (
-	config: Config,
+	loadedConfig: LoadedConfig.t,
 ): Promise<PluginProxyResponse> => {
-	const defaultValues = config.metadata;
+	const defaultValues = loadedConfig.metadata;
 
 	// Common fields from Tzip-16
 	const response = await prompts([
@@ -222,10 +223,10 @@ const createProjectMetadata = async (
 	};
 
 	const updatedConfig = {
-		...config,
+		...Config.create(loadedConfig), // config is actually LoadedConfig
 		metadata: projectMetadata,
 	};
-	await writeJsonFile(config.configFile)(updatedConfig);
+	await writeJsonFile(loadedConfig.configFile)(updatedConfig);
 
 	return {
 		render: 'table',
@@ -240,14 +241,12 @@ const execute = async (opts: Opts): Promise<PluginProxyResponse> => {
 		config,
 	} = opts;
 
-	// TAQ BUG: If both tasks start with 'generate' then 'project-metadata' is always selected
-	// WORKAROUND: If the 2nd command is changed to generate-project-metadata, it works as expected
-	// console.log('execute', { task, contractName, metadata: config.metadata });
-
 	switch (task) {
+		case 'generate-metadata':
 		case 'metadata':
 			return createContractMetadata(contractName, config as (typeof config & { metadata?: ProjectMetadata }));
 		case 'project-metadata':
+		case 'generate-project-metadata':
 			return createProjectMetadata(config as (typeof config & { metadata?: ProjectMetadata }));
 		default:
 			throw new Error(`${task} is not an understood task by the metadata plugin`);

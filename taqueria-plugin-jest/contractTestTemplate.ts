@@ -120,5 +120,6 @@ export default (args: RequestArgs.t) => {
 			.then(generateContractTypes)
 			.then(generateTestSuite)
 			.then((outFile: string) => sendAsyncRes(`Test suite generated: ${outFile}`))
+			.catch(sendAsyncErr)
 		: sendAsyncErr(`No michelson artifact provided`);
 };

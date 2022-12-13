@@ -95,12 +95,16 @@ const addToPluginList = (pluginName: NpmPluginName, loadedConfig: LoadedConfig.t
 		chain(writeJsonFile(loadedConfig.configFile)),
 	);
 
-export const installPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string): Future<TaqError.t, string> =>
+export const installPlugin = (
+	config: LoadedConfig.t,
+	projectDir: SanitizedAbsPath.t,
+	i18n: i18n,
+	plugin: string,
+): Future<TaqError.t, string> =>
 	pipe(
 		requireNPM(projectDir, i18n),
 		chain(_ => exec('npm install -D <%= it.plugin %>', { plugin }, false, projectDir)),
-		chain(_ => getConfig(projectDir, i18n, false)),
-		chain(config => {
+		chain(() => {
 			// The plugin name could look like this: @taqueria/plugin-ligo@1.2.3
 			// We need to trim @1.2.3 from the end
 			const pluginName = getPluginName(plugin);
@@ -114,12 +118,11 @@ export const installPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin
 		map(_ => i18n.__('pluginInstalled')),
 	);
 
-export const uninstallPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string) =>
+export const uninstallPlugin = (config: LoadedConfig.t, projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string) =>
 	pipe(
 		requireNPM(projectDir, i18n),
 		chain(() => exec('npm uninstall -D <%= it.plugin %>', { plugin }, false, projectDir)),
-		chain(() => getConfig(projectDir, i18n, false)),
-		chain((config: LoadedConfig.t) => {
+		chain(() => {
 			const pluginName = getPluginName(plugin);
 			const plugins = config.plugins?.filter(plugin => plugin.name != pluginName.toString());
 
