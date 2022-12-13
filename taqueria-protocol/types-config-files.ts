@@ -8,7 +8,7 @@ import type {
 
 type ConfigFileSetV2 = {
 	config: ConfigFileV2;
-	environments: ConfigEnvironmentFileV2;
+	environments: { [name: string]: ConfigEnvironmentFileV2 };
 };
 
 export const readJsonFileInterceptConfig = (readJsonFile: <T>(filePath: string) => Promise<T>) =>
@@ -23,13 +23,31 @@ export const readJsonFileInterceptConfig = (readJsonFile: <T>(filePath: string) 
 const readConfigFile = (readJsonFile: <T>(filePath: string) => Promise<T>) =>
 	async (configFilePath: string): Promise<Config> => {
 		// TODO: read the the new schema files and combine into the ConfigType
-		let configFileObj = await readJsonFile(configFilePath);
+		const configFileObj = await readJsonFile(configFilePath);
 
 		if ((configFileObj as ConfigFileV2).version !== `v2`) {
-			configFileObj = transformConfigFileV1ToConfigFileV2(configFileObj as ConfigFileV1);
+			// v1 - only file to load
+			const configFileSetV2 = transformConfigFileV1ToConfigFileSetV2(configFileObj as ConfigFileV1);
+			return transformConfigFileV2ToConfig(configFileSetV2);
 		}
 
-		return transformConfigFileV2ToConfig(configFileObj as ConfigFileV2);
+		// Load env files
+		const configFileV2 = configFileObj as ConfigFileV2;
+		const envFiles = await Promise.all(
+			Object.keys(configFileV2.environments ?? {}).map(async envName => {
+				return {
+					key: envName,
+					value: readJsonFile(
+						configFilePath.replace(`config.json`, `config.local.${envName}.json`),
+					) as ConfigEnvironmentFileV2,
+				};
+			}),
+		);
+
+		return transformConfigFileV2ToConfig({
+			config: configFileV2,
+			environments: Object.fromEntries(envFiles.map(x => [x.key, x.value])),
+		});
 	};
 
 export const writeJsonFileInterceptConfig = (writeJsonFile: (filePath: string) => (data: unknown) => Promise<string>) =>
@@ -44,9 +62,17 @@ export const writeJsonFileInterceptConfig = (writeJsonFile: (filePath: string) =
 const writeConfigFile = (writeJsonFile: (filePath: string) => (data: unknown) => Promise<string>) =>
 	(configFilePath: string) =>
 		async (config: Config) => {
-			// TODO: write the the new schema files and combine into the ConfigType
-			const configFileV2 = transformConfigToConfigFileV2(config);
-			return await writeJsonFile(configFilePath)(configFileV2);
+			const configFileSetV2 = transformConfigToConfigFileV2(config);
+			const configFileResult = await writeJsonFile(configFilePath)(configFileSetV2.config);
+
+			// write the env files
+			await Promise.all(
+				Object.entries(configFileSetV2.environments).map(async ([envName, value]) => {
+					await writeJsonFile(configFilePath.replace(`config.json`, `config.local.${envName}.json`))(value);
+				}),
+			);
+
+			return configFileResult;
 		};
 
 const removeUndefinedFields = <T>(x: T): T => {
@@ -59,7 +85,7 @@ const removeUndefinedFields = <T>(x: T): T => {
  * This function should be sealed while the transformConfigToConfigFileV2
  * will change interatively to become move like V2
  */
-const transformConfigFileV1ToConfigFileV2 = (configFileV1: ConfigFileV1): ConfigFileV2 => {
+const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV1): ConfigFileSetV2 => {
 	const config = configFileV1;
 	const configFileV2: ConfigFileV2 = {
 		version: `v2`,
@@ -99,11 +125,13 @@ const transformConfigFileV1ToConfigFileV2 = (configFileV1: ConfigFileV1): Config
 		plugins: config.plugins,
 	};
 
-	return removeUndefinedFields(configFileV2);
+	// It is fine to leave everything in the main config V2 file since it will be parsed either way
+	const environmentsV2 = {};
+	return removeUndefinedFields({ config: configFileV2, environments: environmentsV2 });
 };
 
 // Object to FileV2
-const transformConfigToConfigFileV2 = (config: Config): ConfigFileV2 => {
+const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 	const configFileV2: ConfigFileV2 = {
 		version: `v2`,
 		language: config.language,
@@ -142,15 +170,28 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileV2 => {
 		plugins: config.plugins,
 	};
 
-	return removeUndefinedFields(configFileV2);
+	// extract local only fields to environment specific files
+	// This should only include fields that the environment plugin will replace if missing
+	const environmentsV2 = {};
+
+	return removeUndefinedFields({ config: configFileV2, environments: environmentsV2 });
 };
 
 // FileV2 to Object
-const transformConfigFileV2ToConfig = (configFileV2: ConfigFileV2): Config => {
+const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config => {
+	const {
+		config: configFileV2,
+		environments: environmentFilesV2,
+	} = configFileSetV2;
+
 	const environments = Object.entries(configFileV2.environments ?? {})
 		.map(([k, v]) => ({
 			key: k,
-			value: v as typeof v & {
+			value: {
+				...v,
+				// merge in the fields from the envFile
+				...environmentFilesV2[k] ?? {},
+			} as typeof v & {
 				label?: string;
 				rpcUrl?: string;
 				protocol?: string;
