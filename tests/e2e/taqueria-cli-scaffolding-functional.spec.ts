@@ -6,7 +6,6 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 // This test suite does two time-consuming things:
 // - Scaffolds a project
 // - Starts and stops a sandbox
-jest.setTimeout(400000);
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	test('Verify that scaffold project gets sets up.', async () => {
 		const { execute, exists, cleanup } = await prepareEnvironment();
