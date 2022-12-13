@@ -6,63 +6,69 @@ import type {
 	Environment,
 } from '@taqueria/protocol/types';
 
-type ConfigFileSetV2 = {
+export type ConfigFileSetV2 = {
 	config: ConfigFileV2;
 	environments: { [name: string]: ConfigEnvironmentFileV2 };
 };
 
 export const readJsonFileInterceptConfig = (readJsonFile: <T>(filePath: string) => Promise<T>) =>
-	<T>(filePath: string): Promise<T> => {
+	async <T>(filePath: string): Promise<T> => {
 		if (filePath.endsWith(`.taq/config.json`)) {
-			return readConfigFile(readJsonFile)(filePath) as unknown as Promise<T>;
+			return transformConfigFileV2ToConfig(await readConfigFiles(readJsonFile)(filePath)) as unknown as Promise<T>;
 		}
 
 		return readJsonFile<T>(filePath);
 	};
 
-const readConfigFile = (readJsonFile: <T>(filePath: string) => Promise<T>) =>
-	async (configFilePath: string): Promise<Config> => {
+export const readConfigFiles = (readJsonFile: <T>(filePath: string) => Promise<T>) =>
+	async (configFilePath: string): Promise<ConfigFileSetV2> => {
 		// TODO: read the the new schema files and combine into the ConfigType
 		const configFileObj = await readJsonFile(configFilePath);
 
 		if ((configFileObj as ConfigFileV2).version !== `v2`) {
 			// v1 - only file to load
 			const configFileSetV2 = transformConfigFileV1ToConfigFileSetV2(configFileObj as ConfigFileV1);
-			return transformConfigFileV2ToConfig(configFileSetV2);
+			return configFileSetV2;
 		}
 
 		// Load env files
 		const configFileV2 = configFileObj as ConfigFileV2;
 		const envFiles = await Promise.all(
 			Object.keys(configFileV2.environments ?? {}).map(async envName => {
-				return {
-					key: envName,
-					value: readJsonFile(
-						configFilePath.replace(`config.json`, `config.local.${envName}.json`),
-					) as ConfigEnvironmentFileV2,
-				};
+				try {
+					return {
+						key: envName,
+						value: await readJsonFile(
+							configFilePath.replace(`config.json`, `config.local.${envName}.json`),
+						) as ConfigEnvironmentFileV2,
+					};
+				} catch {
+					// ignore if file could not be read (no env file)
+					return {};
+				}
 			}),
 		);
 
-		return transformConfigFileV2ToConfig({
+		return {
 			config: configFileV2,
-			environments: Object.fromEntries(envFiles.map(x => [x.key, x.value])),
-		});
+			environments: Object.fromEntries(envFiles.filter(x => x.value).map(x => [x.key, x.value])),
+		};
 	};
 
 export const writeJsonFileInterceptConfig = (writeJsonFile: (filePath: string) => (data: unknown) => Promise<string>) =>
 	(filePath: string): ((data: unknown) => Promise<string>) => {
 		if (filePath.endsWith(`.taq/config.json`)) {
-			return writeConfigFile(writeJsonFile)(filePath) as unknown as (data: unknown) => Promise<string>;
+			return ((config: Config) => {
+				return writeConfigFiles(writeJsonFile)(filePath)(transformConfigToConfigFileV2(config));
+			}) as (data: unknown) => Promise<string>;
 		}
 
 		return writeJsonFile(filePath);
 	};
 
-const writeConfigFile = (writeJsonFile: (filePath: string) => (data: unknown) => Promise<string>) =>
+export const writeConfigFiles = (writeJsonFile: (filePath: string) => (data: unknown) => Promise<string>) =>
 	(configFilePath: string) =>
-		async (config: Config) => {
-			const configFileSetV2 = transformConfigToConfigFileV2(config);
+		async (configFileSetV2: ConfigFileSetV2) => {
 			const configFileResult = await writeJsonFile(configFilePath)(configFileSetV2.config);
 
 			// write the env files
