@@ -126,4 +126,5 @@ export async function installDependencies(
 
 		await checkFolderExistsWithTimeout(`${projectPath}/node_modules/@taqueria/plugin-${packageName}/index.js`);
 	}
+	return;
 }

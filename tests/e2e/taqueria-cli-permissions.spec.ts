@@ -132,11 +132,5 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 
 	// Clean up process to remove taquified project folder
 	// Comment if need to debug
-	afterAll(async () => {
-		try {
-			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
-	});
+	afterAll(() => fsPromises.rm(taqueriaProjectPath, { recursive: true }));
 });

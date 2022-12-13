@@ -7,10 +7,10 @@ Plugin.create(() => ({
 	alias: 'metadata',
 	tasks: [
 		Task.create({
-			task: 'metadata',
+			task: 'generate-metadata',
 			command: 'generate-metadata [contractName]',
 			description: 'Create contract metadata.',
-			aliases: [],
+			aliases: ['metadata'],
 			handler: 'proxy',
 			positionals: [
 				PositionalArg.create({
@@ -22,10 +22,10 @@ Plugin.create(() => ({
 			encoding: 'none',
 		}),
 		Task.create({
-			task: 'project-metadata',
+			task: 'generate-project-metadata',
 			command: 'generate-project-metadata',
 			description: 'Create project metadata to be used as defaults for contracts.',
-			aliases: [],
+			aliases: ['project-metadata'],
 			handler: 'proxy',
 			encoding: 'none',
 		}),
