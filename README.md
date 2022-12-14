@@ -44,6 +44,9 @@ Builds are also available on the [releases](https://github.com/ecadlabs/taqueria
 
 ## Getting Started
 
+>**How to verify that taq is installed properly?**
+>You can run `which taq` to verify that the taq binary can be found (via your PATH env variable). You can also run `taq --version` to verify which version you are running. If you downloaded a precompiled binary from our website, then the version # should be displayed. If you built taq from sources, then the version should display `dev-[branchName]`, such as `dev-main`.
+
 Once installed, Taqueria is run from the command line using the `taq` command. The basic structure of a Taqueria command is:
 ```shell
 taq <taskName> [options]
