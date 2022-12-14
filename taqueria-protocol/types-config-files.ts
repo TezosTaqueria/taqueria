@@ -188,6 +188,10 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 		for (const k of Object.keys(eMain)) {
 			const key = k as keyof typeof eMain;
 
+			if (key === `type`) {
+				continue;
+			}
+
 			// Everything except label and protocol is local for sandbox
 			if (eMain.type === 'flextesa') {
 				if (

@@ -46,22 +46,13 @@
 		"development": {
 			"type": "flextesa",
 			"label": "Local Tezos Sandbox",
-			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A",
-			"rpcUrl": "http://localhost:21000",
-			"storage": {
-				"value": 42
-			}
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
 		},
 		"testing": {
 			"type": "simple",
 			"label": "ghostnet",
 			"rpcUrl": "https://ghostnet.ecadinfra.com",
-			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-			"aliases": {
-				"hello-tacos": {
-					"address": "KT1LMNSCTCprDtuzAJ5GiAHNdC1r5q8qiZYc"
-				}
-			}
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg"
 		}
 	},
 	"plugins": [
