@@ -49,6 +49,16 @@ Plugin.create(_i18n => ({
 			],
 			encoding: 'json',
 		}),
+
+		Task.create({
+			task: 'monitor',
+			command: 'monitor <sandboxName>',
+			aliases: [],
+			description: 'Monitor baked blocks for a particular sandbox',
+			options: [],
+			handler: 'proxy',
+			encoding: 'none',
+		}),
 	],
 	proxy: proxy,
 }), process.argv);

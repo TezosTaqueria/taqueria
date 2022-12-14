@@ -7,6 +7,7 @@ import {
 	sendAsyncRes,
 	sendErr,
 	sendJsonRes,
+	spawnCmd,
 	stringToSHA256,
 	writeJsonFile,
 } from '@taqueria/node-sdk';
@@ -333,6 +334,21 @@ const stopTzKtContainers = async (sandboxName: string, sandbox: SandboxConfig.t,
 	}
 };
 
+const monitor = (parsedArgs: Opts): Promise<void> => {
+	const sandbox = getSandbox(parsedArgs);
+	if (sandbox) {
+		return getContainerName(parsedArgs.sandboxName!, parsedArgs)
+			.then(container =>
+				spawnCmd([
+					`docker`,
+					['exec', container, 'octez-client', 'rpc', 'get', '/monitor/valid_blocks'],
+					{},
+				])
+			)
+			.then(() => {});
+	} else return sendAsyncErr('Please specify the name of a sandbox to monitor.');
+};
+
 export const proxy = (parsedArgs: Opts): Promise<void> => {
 	switch (parsedArgs.task) {
 		case 'list accounts':
@@ -341,6 +357,8 @@ export const proxy = (parsedArgs: Opts): Promise<void> => {
 			return startSandboxTask(parsedArgs);
 		case 'stop sandbox':
 			return stopSandboxTask(parsedArgs);
+		case 'monitor':
+			return monitor(parsedArgs);
 		default:
 			return sendAsyncErr(`${parsedArgs.task} is not an understood task by the Flextesa plugin`);
 	}
