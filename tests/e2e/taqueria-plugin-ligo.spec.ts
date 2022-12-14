@@ -81,7 +81,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		const { stdout: stdout2 } = await execute('taq', 'add-contract hello-tacos.mligo', './test-project');
-		expect(stdout2).toEqual(expect.arrayContaining(['│ Name              │ Source File       │ Last Known Hash │']));
+		expect(stdout2).toEqual(expect.arrayContaining(['│ No registered contracts found │']));
 
 		const { stderr } = await execute('taq', 'compile', './test-project');
 		expect(stderr).toEqual(expect.arrayContaining(['Not enough non-option arguments: got 0, need at least 1']));
@@ -134,7 +134,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 
 		const { stdout: stdout2 } = await execute('taq', 'add-contract invalid-contract.mligo', './test-project');
 		expect(stdout2).toEqual(
-			expect.arrayContaining(['│ invalid-contract.mligo │ invalid-contract.mligo │ 2c7affa2        │']),
+			expect.arrayContaining(['│ No registered contracts found │']),
 		);
 
 		const { stdout: stdout3, stderr: stderr2 } = await execute(
@@ -234,7 +234,6 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		expect(await ls('./test-project/contracts')).toContain('counter.mligo');
 
 		const bytes = await readFile(path.join('./test-project', 'contracts', 'counter.mligo'));
-		console.log(bytes);
 		const digest = createHash('sha256');
 		digest.update(bytes);
 		const hash = digest.digest('hex');
@@ -242,7 +241,6 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 
 		const configFile = await readFile(path.join('./test-project', '.taq', 'config.json'));
 		const json = JSON.parse(configFile);
-		console.log(json);
 		expect(json).toBeInstanceOf(Object);
 		expect(json).toHaveProperty('contracts');
 		expect(json.contracts).toEqual({
