@@ -116,7 +116,7 @@ export async function installDependencies(
 ) {
 	for (const packageName of packageNames) {
 		if (localPackages) {
-			const output = await exec(`taq install ../../../taqueria-plugin-${packageName}`, {
+			const output = await exec(`taq install @taqueria/plugin-${packageName}`, {
 				cwd: `./${projectPath}`,
 				encoding: 'utf8',
 			});
