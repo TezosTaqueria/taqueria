@@ -33,10 +33,11 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// });
 
 	test('Verify that the taquito plugin exposes the associated commands in the help menu', async () => {
-		const { execute, spawn, cleanup } = await prepareEnvironment();
+		const { execute, spawn, cleanup, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', '--help --projectDir=./test-project', './test-project');
+		expect(await ls('./test-project/.taq')).toContain('config.json');
+		const { stdout } = await execute('taq', '--help --projectDir=test-project', './test-project');
 		expect(stdout).toContain('taq [command]');
 		await cleanup();
 	});
@@ -46,39 +47,73 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'deploy --help --projectDir=./test-project', './test-project');
-		expect(stdout).toContain('Deploy a smart contract to a particular environment');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout2 } = await execute('taq', 'deploy --help --projectDir=test-project', './test-project');
+		expect(stdout2).toContain('Deploy a smart contract to a particular environment');
 		await cleanup();
 	});
 
-	// Skipping due to help output changing
+	// Skipping due to contextual help not working
 	test.skip('Verify that the taquito plugin deploy alias exposes the correct info in the help menu', async () => {
-		const taquitoHelpContents = await exec(`taq originate --help --projectDir=${taqueriaProjectPath}`);
-		expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginSpecific);
+		const { execute, spawn, cleanup } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout2 } = await execute('taq', 'originate --help --projectDir=test-project', './test-project');
+		expect(stdout2).toContain('Deploy a smart contract to a particular environment');
+		await cleanup();
 	});
 
-	// Skipping due to help output changing
+	// Skipping due to contextual help not working
 	test.skip('Verify that the taquito plugin transfer task expose the correct info in the help menu', async () => {
-		const taquitoHelpContents = await exec(`taq transfer --help --projectDir=${taqueriaProjectPath}`);
-		expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginTransferSpecific);
+		const { execute, spawn, cleanup } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout2 } = await execute('taq', 'transfer --help --projectDir=test-project', './test-project');
+		expect(stdout2).toContain('Transfer/call an implicit account or a smart contract');
+		await cleanup();
 	});
 
-	// Skipping due to help output changing
+	// Skipping due to contextual help not working
 	test.skip('Verify that the taquito plugin transfer alias exposes the correct info in the help menu', async () => {
-		const taquitoHelpContents = await exec(`taq call --help --projectDir=${taqueriaProjectPath}`);
-		expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginTransferSpecific);
+		const { execute, spawn, cleanup } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout2 } = await execute('taq', 'call --help --projectDir=test-project', './test-project');
+		expect(stdout2).toContain('Transfer/call an implicit account or a smart contract');
+		await cleanup();
 	});
 
-	// Skipping due to help output changing
-	test.skip('Verify that the taquito plugin fund task exposes the correct info in the help menu', async () => {
-		const taquitoHelpContents = await exec(`taq fund --help --projectDir=${taqueriaProjectPath}`);
-		expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginFundSpecific);
+	// Skipping due to contextual help not working
+	test('Verify that the taquito plugin fund task exposes the correct info in the help menu', async () => {
+		const { execute, spawn, cleanup } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout2 } = await execute('taq', 'fund --help', './test-project');
+		expect(stdout2).toContain('Transfer/call an implicit account or a smart contract');
+		await cleanup();
 	});
 
-	// Skipping due to help output changing
-	test.skip('Verify that the taquito plugin instantiate-account task exposes the correct info in the help menu', async () => {
-		const taquitoHelpContents = await exec(`taq instantiate-account --help --projectDir=${taqueriaProjectPath}`);
-		expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginInstantiateAccountSpecific);
+	// Skipping due to contextual help not working
+	test('Verify that the taquito plugin instantiate-account task exposes the correct info in the help menu', async () => {
+		// const taquitoHelpContents = await exec(`taq instantiate-account --help --projectDir=${taqueriaProjectPath}`);
+		// expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginInstantiateAccountSpecific);
+		const { execute, spawn, cleanup } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout2 } = await execute('taq', 'instantiate-account --help', './test-project');
+		expect(stdout2).toContain('Transfer/call an implicit account or a smart contract');
+		await cleanup();
 	});
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
