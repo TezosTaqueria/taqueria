@@ -1,15 +1,6 @@
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
-import { ExecException } from 'child_process';
-import { exec as exec1, execSync } from 'child_process';
-import fsPromises from 'fs/promises';
-import util from 'util';
-import * as contents from './data/help-contents/help-contents';
-import { generateTestProject } from './utils/utils';
-const exec = util.promisify(exec1);
 
 describe('E2E Testing for taqueria CLI,', () => {
-	const taqueriaProjectPath = 'auto-test-cli';
-
 	test('Verify that taq --help gives the help menu for a non-initialized project', async () => {
 		const { spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', '--help');
