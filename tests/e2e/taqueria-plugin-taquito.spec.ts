@@ -13,6 +13,7 @@ const exec = utils.promisify(exec1);
 
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 import { executionAsyncResource } from 'async_hooks';
+import path from 'path';
 
 describe('E2E Testing for taqueria taquito plugin', () => {
 	const taqueriaProjectPath = 'scrap/auto-test-taquito-plugin';
@@ -36,7 +37,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		const { execute, spawn, cleanup, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		expect(await ls('./test-project/.taq')).toContain('config.json');
 		const { stdout } = await execute('taq', '--help --projectDir=test-project', './test-project');
 		expect(stdout).toContain('taq [command]');
 		await cleanup();
@@ -44,12 +44,15 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	// Skipping due to contextual help not working
 	test.skip('Verify that the taquito plugin exposes the associated options for deploy in the help menu', async () => {
-		const { execute, spawn, cleanup } = await prepareEnvironment();
+		const { execute, spawn, cleanup, ls, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
-		const { stdout: stdout2 } = await execute('taq', 'deploy --help --projectDir=test-project', './test-project');
+		expect(await ls('./test-project/.taq')).toContain('config.json');
+		const config_contents = await readFile(path.join('./test-project', '.taq', 'config.json'));
+		expect(config_contents).toContain('@taqueria/plugin-taquito');
+		const { stdout: stdout2 } = await execute('taq', 'deploy --help', './test-project');
 		expect(stdout2).toContain('Deploy a smart contract to a particular environment');
 		await cleanup();
 	});
@@ -91,7 +94,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	});
 
 	// Skipping due to contextual help not working
-	test('Verify that the taquito plugin fund task exposes the correct info in the help menu', async () => {
+	test.skip('Verify that the taquito plugin fund task exposes the correct info in the help menu', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -103,9 +106,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	});
 
 	// Skipping due to contextual help not working
-	test('Verify that the taquito plugin instantiate-account task exposes the correct info in the help menu', async () => {
-		// const taquitoHelpContents = await exec(`taq instantiate-account --help --projectDir=${taqueriaProjectPath}`);
-		// expect(taquitoHelpContents.stdout).toBe(contents.helpContentsTaquitoPluginInstantiateAccountSpecific);
+	test.skip('Verify that the taquito plugin instantiate-account task exposes the correct info in the help menu', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -118,24 +119,43 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
-	test.skip('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
-		environment = 'testing';
+	test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
+		// environment = 'testing';
 
-		// 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
-		await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
-		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+		// // 1. Copy config.json and michelson contract from data folder to artifacts folder under taqueria project
+		// await exec(`cp e2e/data/config-taquito-test-environment.json ${taqueriaProjectPath}/.taq/config.json`);
+		// await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+
+		const env_file = await (await exec('cat e2e/data/config-taquito-test-environment.json')).stdout;
+		await writeFile('./test-project/contracts/.taq/config.json', env_file);
+
+		const tz_file = await (await exec('cat e2e/data/hello-tacos.tz')).stdout;
+		await writeFile('./test-project/artifacts/hello-tacos.tz', tz_file);
 
 		// 2. Run taq deploy on a selected test network described in "test" environment
 
-		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
-			cwd: `./${taqueriaProjectPath}`,
-		});
+		// const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
+		// 	cwd: `./${taqueriaProjectPath}`,
+		// });
+
+		const { stdout: stdout2 } = await execute(
+			'taq',
+			'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
+			'./test-project',
+		);
+		console.log(stdout2);
+		expect(stdout2).toContain('hello-tacos.tz');
 
 		// 3. Verify that contract has been originated on the network
-		expect(deployCommand.stdout).toContain('hello-tacos.tz');
-		expect(deployCommand.stdout).toContain(networkInfo.networkName);
+		// expect(deployCommand.stdout).toContain('hello-tacos.tz');
+		// expect(deployCommand.stdout).toContain(networkInfo.networkName);
 
-		const result = deployCommand.stdout.match(/(KT1)+\w{33}?/);
+		const result = stdout2[0].match(/(KT1)+\w{33}?/);
 		expect(result).not.toBe(null);
 		const contractHash = (result as RegExpMatchArray)[0];
 
@@ -147,6 +167,8 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			),
 		)
 			.toBe(contractHash);
+
+		await cleanup();
 	});
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
