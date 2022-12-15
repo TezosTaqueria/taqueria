@@ -12,7 +12,7 @@
 	},
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build": "npx tsc -noEmit && npx parcel build --no-cache 2>&1",
+		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup",
 		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
 		"compile": "node index.js --taqRun proxy --task compile --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
 		"debugPluginInfo": "node --inspect index.js --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\"}' --projectDir ../test-project --configDir ./.taq"
@@ -45,7 +45,23 @@
 		"ts-pattern": "^3.3.3"
 	},
 	"devDependencies": {
-		"parcel": "^2.8.0",
+		"tsup": "^6.1.3",
 		"typescript": "^4.7.2"
+	},
+	"tsup": {
+		"entry": [
+			"index.ts"
+		],
+		"sourcemap": true,
+		"target": "node16",
+		"outDir": "./",
+		"dts": true,
+		"clean": false,
+		"skipNodeModulesBundle": true,
+		"platform": "node",
+		"format": [
+			"esm",
+			"cjs"
+		]
 	}
 }
