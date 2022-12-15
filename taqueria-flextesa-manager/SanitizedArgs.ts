@@ -23,12 +23,7 @@ const internalSchema = z
 type Input = z.infer<typeof internalSchema>;
 
 const configInternalSchema = Config.internalSchema.omit({ sandbox: true }).extend({
-	sandbox: z.record(
-		z.union([
-			SandboxConfig.schemas.schema,
-			z.string().nonempty(),
-		]),
-	),
+	sandbox: z.record(SandboxConfig.schemas.schema),
 });
 
 export type ParsedConfig = z.infer<typeof configInternalSchema>;

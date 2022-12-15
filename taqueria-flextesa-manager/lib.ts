@@ -20,8 +20,9 @@ interface Failure {
 
 export const configureTezosClient = () => run(`octez-client --endpoint http://localhost:20000 config update`);
 
-export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
-	Object.entries(parsedArgs.config.accounts || {}).reduce(
+export const configureAccounts = (parsedArgs: SanitizedArgs.t) => {
+	console.log(parsedArgs.config);
+	return Object.entries(parsedArgs.config.accounts || {}).reduce(
 		async (lastConfig, [accountName, _initialBalance]) => {
 			if (accountName === 'default') return lastConfig;
 			const accountDetails = await addAccount(accountName);
@@ -37,6 +38,7 @@ export const configureAccounts = (parsedArgs: SanitizedArgs.t) =>
 	)
 		.then(writeConfigFile(parsedArgs.configAbsPath))
 		.then(config => ({ ...parsedArgs, config }) as SanitizedArgs.t);
+};
 
 export const getFlextesaAnnotations = (parsedArgs: SanitizedArgs.t) => {
 	const sandboxConfig = getSandboxConfig(parsedArgs);
@@ -55,6 +57,7 @@ export const getBakingFlags = (parsedArgs: SanitizedArgs.t) => {
 		case 'enabled':
 		default:
 			return [
+				`--number-of-b 1`,
 				`--time-between-blocks ${bakingConfig.block_time}`,
 			];
 	}
@@ -105,7 +108,7 @@ export const importAccounts = (opts: SanitizedArgs.t) => {
 };
 
 const writeConfigFile = (filename: string) =>
-	(config: SanitizedArgs.ParsedConfig) =>
+	(config: SanitizedArgs.ParsedConfig): Promise<SanitizedArgs.ParsedConfig> =>
 		writeJsonFile(filename)(config)
 			.then(() => config)
 			.catch(err => Promise.reject({ kind: 'E_WRITE_CONFIG', context: config, previous: err }));

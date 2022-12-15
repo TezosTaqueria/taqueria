@@ -89,12 +89,13 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 		);
 		await replaceRpcUrlInConfig(newPort, sandbox.rpcUrl.toString(), sandboxName, opts);
 	}
-	const ports = `-p ${newPort}:20000`;
+	const ports = opts.debug ? `-p ${newPort}:20000 -p 9229:9229 --expose 9229` : `-p ${newPort}:20000`;
 
 	const containerName = await getContainerName(sandboxName, opts);
 	const arch = await getArch();
 	const image = getDockerImage(getDefaultDockerImage(opts), ECAD_FLEXTESA_IMAGE_ENV_VAR);
 	const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir;
+	const nodeCmd = opts.debug ? `node --inspect-brk` : `node`;
 
 	return `docker run --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} node index.js --sandbox ${sandboxName}`;
 };
