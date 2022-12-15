@@ -160,17 +160,22 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
-		// TODO: query filter - only operations from config.json ???
-		const response = await fetch(`${tzktBaseUrl}/v1/accounts/${address}/operations`);
-		const data = await response.json();
-		return (data as any[]).map(item =>
-			new OperationTreeItem(
-				item.type,
-				item.hash,
-				item,
-				accountItem instanceof SandboxImplicitAccountTreeItem ? accountItem : accountItem.parent,
-			)
-		);
+		try {
+			// TODO: query filter - only operations from config.json ???
+			const response = await fetch(`${tzktBaseUrl}/v1/accounts/${address}/operations`);
+			const data = await response.json();
+			return (data as any[]).map(item =>
+				new OperationTreeItem(
+					item.type,
+					item.hash,
+					item,
+					accountItem instanceof SandboxImplicitAccountTreeItem ? accountItem : accountItem.parent,
+				)
+			);
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return [];
+		}
 	}
 
 	async updateSandboxInfo(): Promise<void> {
@@ -209,21 +214,26 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
-		// TODO: query filter - only entrypoints ... ???
-		const response = await fetch(
-			`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints?micheline=true&michelson=true`,
-		);
-		const data = await response.json();
-		this.helper.logHelper.showLog(OutputLevels.trace, JSON.stringify(data, null, 2));
-		return (data as any[]).map(item =>
-			new SmartContractEntrypointTreeItem(
-				item.name,
-				item.jsonParameters,
-				item.michelineParameters,
-				item.michelsonParameters,
-				element.parent,
-			)
-		);
+		try {
+			// TODO: query filter - only entrypoints ... ???
+			const response = await fetch(
+				`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints?micheline=true&michelson=true`,
+			);
+			const data = await response.json();
+			this.helper.logHelper.showLog(OutputLevels.trace, JSON.stringify(data, null, 2));
+			return (data as any[]).map(item =>
+				new SmartContractEntrypointTreeItem(
+					item.name,
+					item.jsonParameters,
+					item.michelineParameters,
+					item.michelsonParameters,
+					element.parent,
+				)
+			);
+		} catch (e: unknown) {
+			this.helper.logAllNestedErrors(e, true);
+			return [];
+		}
 	}
 
 	private async getSandboxChildren(element: SandboxTreeItem): Promise<SandboxChildrenTreeItem[]> {
@@ -292,19 +302,24 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
-		// TODO: query filter - only accounts from config.json
-		const response = await fetch(`${tzktBaseUrl}/v1/accounts?type.ne=contract`);
-		const data = await response.json();
-		const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
-		const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
-			? []
-			: Object.keys(sandbox.accounts)?.map(key => ({ key, value: sandbox.accounts?.[key] }));
-		return (data as any[]).map(item => {
-			const alias = aliases.find(a =>
-				!!a.value && (typeof a.value === 'string' ? a.value === item.address : a.value.publicKeyHash === item.address)
-			);
-			return new SandboxImplicitAccountTreeItem(item.address, alias?.key ?? undefined, element.parent);
-		});
+		try {
+			// TODO: query filter - only accounts from config.json
+			const response = await fetch(`${tzktBaseUrl}/v1/accounts?type.ne=contract`);
+			const data = await response.json();
+			const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
+			const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
+				? []
+				: Object.entries(sandbox.accounts).map(([key, value]) => ({ key, value }));
+			return (data as any[]).map(item => {
+				const alias = aliases.find(a =>
+					!!a.value && (typeof a.value === 'string' ? a.value === item.address : a.value.publicKeyHash === item.address)
+				);
+				return new SandboxImplicitAccountTreeItem(item.address, alias?.key ?? undefined, element.parent);
+			});
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return [];
+		}
 	}
 
 	private async getSandboxSmartContracts(element: SandboxChildrenTreeItem): Promise<SandboxSmartContractTreeItem[]> {
@@ -316,27 +331,32 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
-		// TODO: query filter - only contracts from config.json
-		const response = await fetch(`${tzktBaseUrl}/v1/contracts?limit=1000`);
-		const data = this.filterOutBuiltInContracts(await response.json() as any[]);
+		try {
+			// TODO: query filter - only contracts from config.json
+			const response = await fetch(`${tzktBaseUrl}/v1/contracts?limit=1000`);
+			const data = this.filterOutBuiltInContracts(await response.json() as any[]);
 
-		const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
-		const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
-			? []
-			: Object.keys(sandbox.accounts)?.map(key => ({ key, value: sandbox.accounts?.[key] }));
+			const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
+			const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
+				? []
+				: Object.keys(sandbox.accounts)?.map(key => ({ key, value: sandbox.accounts?.[key] }));
 
-		return data.map(item => {
-			const alias = aliases.find(a =>
-				!!a.value && (typeof a.value === 'string' ? a.value === item.address : a.value.publicKeyHash === item.address)
-			);
-			return new SandboxSmartContractTreeItem(
-				item.address,
-				alias?.key ?? undefined,
-				item.type,
-				containerName,
-				element.parent.sandboxName,
-			);
-		});
+			return data.map(item => {
+				const alias = aliases.find(a =>
+					!!a.value && (typeof a.value === 'string' ? a.value === item.address : a.value.publicKeyHash === item.address)
+				);
+				return new SandboxSmartContractTreeItem(
+					item.address,
+					alias?.key ?? undefined,
+					item.type,
+					containerName,
+					element.parent.sandboxName,
+				);
+			});
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return [];
+		}
 	}
 
 	static builtInContracts = [
