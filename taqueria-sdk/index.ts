@@ -215,7 +215,7 @@ const parseArgs = <T extends Protocol.RequestArgs.t>(unparsedArgs: string[]): Li
 	return Promise.reject('Invalid usage. If you were testing your plugin, did you remember to specify --taqRun?');
 };
 
-// A hack to protect all hex from being messed by yargs
+// A workaround to protect all hex from being messed by yargs
 const preprocessArgs = (args: string[]): string[] => {
 	return args.map(arg => /^0x[0-9a-fA-F]+$/.test(arg) ? '___' + arg + '___' : arg);
 };
@@ -246,7 +246,7 @@ const formatArgs = (args: Record<string, string>) => {
 	} as Record<string, unknown>;
 };
 
-// A hack to protect all hex from being messed by yargs
+// A workaround to protect all hex from being messed by yargs
 const postprocessArgs = (args: string[]): Record<string, string> => {
 	const postprocessedArgs = Object.entries(args).map((
 		[key, val],

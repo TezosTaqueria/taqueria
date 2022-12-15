@@ -24,7 +24,8 @@ export type ErrorType =
 	| 'E_NO_PROVISIONS'
 	| 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE'
 	| 'E_EXEC'
-	| 'E_OPT_IN_WARNING';
+	| 'E_OPT_IN_WARNING'
+	| 'E_INVALID_OPTION';
 
 export interface TaqError {
 	readonly kind: ErrorType;
