@@ -642,6 +642,7 @@ const initProject = (
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
 		chain(_ => taqInstall(parsedArgs)(projectDir)('core')),
 		chain(_ => preInstallPluginsOnInit(parsedArgs, projectDir)),
+		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/ecadlabs/taqueria/issues/528
 		chain(_ => createGitIgnoreFile(projectDir)),
 		map(_ => i18n.__('bootstrapMsg')),
 	);
