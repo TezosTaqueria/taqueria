@@ -45,6 +45,8 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"devDependencies": {
+		"@gmrchk/cli-testing-library": "^0.1.2",
+		"@taqueria/plugin-core": "file:taqueria-plugin-core",
 		"chokidar-cli": "^3.0.0",
 		"dprint": "^0.27.1",
 		"eta": "^1.12.3",

@@ -1,49 +1,24 @@
-import { exec as exec1 } from 'child_process';
-import fsPromises from 'fs/promises';
-import util from 'util';
-import { generateTestProject } from './utils/utils';
-const exec = util.promisify(exec1);
-
-const taqueriaProjectPath = './scrap/auto-test';
-const taqueriaProjectPathNPMSuccess = './scrap/auto-test-npm-success';
-const taqueriaProjectPathNPMFull = './scrap/auto-test-npm-full';
+import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 describe('E2E Testing for taqueria general functionality', () => {
-	test('Verify that taq init creates test folder', async () => {
-		try {
-			const projectInit = await generateTestProject(taqueriaProjectPath);
-			expect(projectInit.stdout.trim()).toEqual("Project taq'ified!");
-
-			const taquifiedDirContents = await fsPromises.readdir(taqueriaProjectPath);
-			expect(taquifiedDirContents).toContain('artifacts');
-			expect(taquifiedDirContents).toContain('contracts');
-
-			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+	test('Verify that taq init creates the correct directory structure', async () => {
+		const { spawn, cleanup, exists } = await prepareEnvironment();
+		const { waitForText, waitForFinish } = await spawn('taq', 'init temp');
+		await waitForText("Project taq'ified!");
+		await exists('./artifacts');
+		await exists('./contracts');
+		await waitForFinish();
+		await cleanup();
 	});
 
-	test.skip('Verify that to install a plugin all you need is a package.json file with {}', async () => {
-		try {
-			await exec(`taq init ${taqueriaProjectPathNPMSuccess}`);
-			await exec(`echo "{}" > ${taqueriaProjectPathNPMSuccess}/package.json`);
-			await exec(`taq install @taqueria/plugin-ligo`, { cwd: `./${taqueriaProjectPathNPMSuccess}` });
-
-			const ligoPackageContents = await exec(`cat ../taqueria-plugin-ligo/package.json`);
-			const ligoVersion = JSON.parse(ligoPackageContents.stdout).version;
-			const packageContents = await exec(`cd ${taqueriaProjectPathNPMSuccess} && cat package.json`);
-
-			const fileContentsBare = {
-				'devDependencies': {
-					'@taqueria/plugin-ligo': `^${ligoVersion}`,
-				},
-			};
-			expect(JSON.parse(packageContents.stdout)).toEqual(fileContentsBare);
-
-			await fsPromises.rm(`${taqueriaProjectPathNPMSuccess}`, { recursive: true });
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+	test('Verify that to install a plugin all you need is a package.json file with {}', async () => {
+		const { spawn, cleanup, execute, readFile, writeFile } = await prepareEnvironment();
+		const { waitForFinish } = await spawn('taq', 'init auto-test-npm-success');
+		await writeFile('./auto-test-npm-success/package.json', '{}');
+		const {} = await execute('taq', 'install @taqueria/plugin-ligo');
+		await waitForFinish();
+		const content = await readFile('./auto-test-npm-success/package.json');
+		expect(content).toContain('"name": "auto-test-npm-success"');
+		await cleanup();
 	});
 });
