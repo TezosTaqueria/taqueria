@@ -233,7 +233,7 @@ export const inject = (deps: PluginDeps) => {
 				// If env is missing, then set it to the default environment of the config
 				if (key === 'env' && !val) val = config.environment?.default ?? 'development';
 
-				// A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command. This same hack is used to prevent yargs from turning 0x00 into 0
+				// A workaround to get around yargs because it strips leading and trailing double quotes of strings passed by the command. This same workaround is used to prevent yargs from turning 0x00 into 0
 				// Refer to https://github.com/yargs/yargs-parser/issues/201
 				if (typeof val === 'string' && /^___(.|\n)*___$/.test(val)) val = val.slice(3, -3);
 
