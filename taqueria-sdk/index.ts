@@ -233,7 +233,8 @@ const formatArgs = (args: Record<string, string>) => {
 	const entries = Object.entries(args).map(
 		([key, value]) => {
 			if (key === 'config') return [key, JSON.parse(value)];
-			if (value === 'false' || value === 'true') return [key, Boolean(value)];
+			else if (value === 'false') return [key, false];
+			else if (value === 'true') return [key, true];
 			return [key, value];
 		},
 	);
