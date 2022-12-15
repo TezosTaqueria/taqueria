@@ -26,6 +26,10 @@ interface TzKTGetAccountByAddressData {
 	address?: string | null;
 	alias?: string | null;
 }
+interface TzKTGetContractByAddressData {
+	address?: string | null;
+	alias?: string | null;
+}
 
 export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	implements vscode.TreeDataProvider<SandboxTreeItemBase>, HasRefresh
@@ -340,28 +344,30 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
+		const environment = Object.values(this.observableConfig.currentConfig.config?.config.environment ?? []).find(
+			config =>
+				typeof config === 'string'
+					? false
+					: config.sandboxes.some(envSandbox => envSandbox === element.parent.sandboxName),
+		);
+		if (!environment || typeof environment === 'string') {
+			return [];
+		}
 		try {
-			// TODO: query filter - only contracts from config.json
-			const response = await fetch(`${tzktBaseUrl}/v1/contracts?limit=1000`);
-			const data = this.filterOutBuiltInContracts(await response.json() as any[]);
-
-			const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
-			const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
-				? []
-				: Object.keys(sandbox.accounts)?.map(key => ({ key, value: sandbox.accounts?.[key] }));
-
-			return data.map(item => {
-				const alias = aliases.find(a =>
-					!!a.value && (typeof a.value === 'string' ? a.value === item.address : a.value.publicKeyHash === item.address)
-				);
-				return new SandboxSmartContractTreeItem(
-					item.address,
-					alias?.key ?? undefined,
-					item.type,
-					containerName,
-					element.parent.sandboxName,
-				);
-			});
+			return await Promise.all(
+				Object.entries(environment.aliases ?? {})
+					.map(async ([contractAlias, contractConfig]) => {
+						const contractAddress = contractConfig.address;
+						const response = await fetch(`${tzktBaseUrl}/v1/contracts/${contractAddress}`);
+						const data = (await response.json()) as TzKTGetContractByAddressData;
+						return new SandboxSmartContractTreeItem(
+							data.address ?? contractAddress,
+							data.alias ?? contractAlias,
+							containerName,
+							element.parent.sandboxName,
+						);
+					}),
+			);
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
 			return [];
