@@ -52,9 +52,9 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 	});
 
 	// Skipping due to changes in the help output text
-	test.skip('Verify that the ligo plugin exposes the associated options in the help menu', async () => {
+	test('Verify that the ligo plugin exposes the associated options in the help menu', async () => {
 		try {
-			const ligoHelpContents = await exec(`taq compile --help --projectDir=${taqueriaProjectPath}`);
+			const ligoHelpContents = await exec(`taq compile --help --projectDir=scrap/auto-test-ligo-plugin`);
 			expect(ligoHelpContents.stdout).toBe(contents.helpContentsLigoPluginSpecific);
 		} catch (error) {
 			throw new Error(`error: ${error}`);
