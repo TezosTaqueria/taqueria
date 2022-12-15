@@ -156,7 +156,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const address = accountItem instanceof SandboxImplicitAccountTreeItem
 			? accountItem.address
 			: accountItem.parent.address;
-		const tzktBaseUrl = this.getTzKtBaseUrl(accountItem.parent.sandboxName);
+		const tzktBaseUrl = await this.getTzKtBaseUrl(accountItem.parent.sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
@@ -205,7 +205,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!containerName) {
 			return [];
 		}
-		const tzktBaseUrl = this.getTzKtBaseUrl(element.parent.sandboxName);
+		const tzktBaseUrl = await this.getTzKtBaseUrl(element.parent.sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
@@ -244,7 +244,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private async getAccountCount(element: SandboxTreeItem): Promise<number | undefined> {
-		const tzktBaseUrl = this.getTzKtBaseUrl(element.sandboxName);
+		const tzktBaseUrl = await this.getTzKtBaseUrl(element.sandboxName);
 		if (!tzktBaseUrl) {
 			return undefined;
 		}
@@ -260,7 +260,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private async getContractCount(element: SandboxTreeItem): Promise<number | undefined> {
-		const tzktBaseUrl = this.getTzKtBaseUrl(element.sandboxName);
+		const tzktBaseUrl = await this.getTzKtBaseUrl(element.sandboxName);
 		if (!tzktBaseUrl) {
 			return undefined;
 		}
@@ -288,13 +288,12 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	private async getSandboxImplicitAccounts(
 		element: SandboxChildrenTreeItem,
 	): Promise<SandboxImplicitAccountTreeItem[]> {
-		const tzktBaseUrl = this.getTzKtBaseUrl(element.parent.sandboxName);
+		const tzktBaseUrl = await this.getTzKtBaseUrl(element.parent.sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
 		// TODO: query filter - only accounts from config.json
 		const response = await fetch(`${tzktBaseUrl}/v1/accounts?type.ne=contract`);
-		tzktBaseUrl;
 		const data = await response.json();
 		const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
 		const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
@@ -313,7 +312,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!containerName) {
 			return [];
 		}
-		const tzktBaseUrl = this.getTzKtBaseUrl(element.parent.sandboxName);
+		const tzktBaseUrl = await this.getTzKtBaseUrl(element.parent.sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
