@@ -202,6 +202,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 								default: getFromEnv('TAQ_PROJECT_DIR', '.', env),
 							})
 							.option('workflow', {
+								alias: 'w',
 								describe: i18n.__('workflowDesc'),
 								requiresArg: true,
 								type: 'string',
