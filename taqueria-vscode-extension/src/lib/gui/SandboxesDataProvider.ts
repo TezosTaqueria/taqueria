@@ -1,4 +1,5 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
+import { SandboxAccountConfig } from '@taqueria/protocol/types';
 import fetch from 'node-fetch-commonjs';
 import path from 'path';
 import * as vscode from 'vscode';
@@ -20,6 +21,11 @@ import {
 	SmartContractEntrypointTreeItem,
 } from './SandboxTreeItemTypes';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
+
+interface TzKTGetAccountByAddressData {
+	address?: string | null;
+	alias?: string | null;
+}
 
 export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	implements vscode.TreeDataProvider<SandboxTreeItemBase>, HasRefresh
@@ -303,19 +309,22 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return [];
 		}
 		try {
-			// TODO: query filter - only accounts from config.json
-			const response = await fetch(`${tzktBaseUrl}/v1/accounts?type.ne=contract`);
-			const data = await response.json();
 			const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
-			const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
-				? []
-				: Object.entries(sandbox.accounts).map(([key, value]) => ({ key, value }));
-			return (data as any[]).map(item => {
-				const alias = aliases.find(a =>
-					!!a.value && (typeof a.value === 'string' ? a.value === item.address : a.value.publicKeyHash === item.address)
+			const sandboxAccounts = (
+				Object.entries(sandbox?.accounts || {})
+					.filter(([alias, config]) => typeof config !== 'string') as [string, SandboxAccountConfig][]
+			)
+				.map(([alias, config]) => ({ alias, address: config.publicKeyHash }));
+
+			return await Promise.all(sandboxAccounts.map(async account => {
+				const response = await fetch(`${tzktBaseUrl}/v1/accounts/${account.address}`);
+				const data = (await response.json()) as TzKTGetAccountByAddressData;
+				return new SandboxImplicitAccountTreeItem(
+					data.address ?? account.address,
+					data.alias ?? account.alias,
+					element.parent,
 				);
-				return new SandboxImplicitAccountTreeItem(item.address, alias?.key ?? undefined, element.parent);
-			});
+			}));
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
 			return [];
