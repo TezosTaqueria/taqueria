@@ -35,9 +35,9 @@
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
 		"@taqueria/protocol": "^0.25.16-rc",
-		"@taquito/signer": "^13.0.1",
-		"@taquito/taquito": "^13.0.1",
-		"@taquito/utils": "^13.0.1",
+		"@taquito/signer": "^15.0.0",
+		"@taquito/taquito": "^15.0.0",
+		"@taquito/utils": "^15.0.0",
 		"i18next": "^21.8.4",
 		"node-fetch": "^2.6.7",
 		"project-name-generator": "^2.1.9",
