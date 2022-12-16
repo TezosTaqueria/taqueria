@@ -6,6 +6,9 @@ on:
       prerelease:
         required: false
         type: string
+      deno-dir:
+        default: '~/.deno'
+        type: string
       deno-version:
         required: true
         type: string
@@ -29,6 +32,7 @@ concurrency:
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 env:
+  DENO_DIR: ${{ inputs.deno-dir }}
   GIT_WORKSPACE: taqueria-vscode-extension
 
 jobs:
@@ -45,12 +49,16 @@ jobs:
       vsixGcsUrl: ${{ steps.publicUrl.outputs.vsixGcsUrl }}
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
       
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
           cache: "npm"
-
 
       - name: Install Deno
         uses: denoland/setup-deno@v1

@@ -20,6 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  DENO_DIR: '~/.deno'
   DENO_VERSION: '1.23.1'
 
 jobs:
@@ -85,6 +86,11 @@ jobs:
       - name: Setup repo
         uses: actions/checkout@v3
 
+      - uses: actions/cache@v3
+        with:
+          path: ${{ DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
@@ -100,8 +106,6 @@ jobs:
       - name: Build the binary for ${{ matrix.os }}
         id: build-bin
         shell: bash
-        env:
-          DENO_DIR: "./deno"
         run: |
           BUILD=`git rev-parse --short "$GITHUB_SHA"`
           TAQ_VERSION="${TAQ_VERSION/\//-}"
@@ -203,6 +207,12 @@ jobs:
     if: ${{ github.event_name != 'release' && !(startsWith(github.ref, 'refs/tags/v')) }}
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
+
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -318,6 +328,7 @@ jobs:
   expose-env-vars:
     runs-on: ubuntu-latest
     outputs:
+      deno_dir: ${{ env.DENO_DIR }}
       deno_version: ${{ env.DENO_VERSION }}
     steps:
       - run: echo "Exposing env.DENO_VERSION for reusable workflow"
@@ -330,7 +341,8 @@ jobs:
     uses: ./.github/workflows/vscode-extension.yml
     with:
       prerelease: ${{ needs.workflow-setup.outputs.prerelease }}
-      deno-version: ${{ needs.vscode-extension.outputs.deno_version }}
+      deno-dir: ${{ needs.expose-env-vars.outputs.deno_dir }}
+      deno-version: ${{ needs.expose-env-vars.outputs.deno_version }}
     secrets:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
