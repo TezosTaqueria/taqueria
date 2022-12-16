@@ -3,6 +3,7 @@ import { SandboxAccountConfig } from '@taqueria/protocol/types';
 import fetch from 'node-fetch-commonjs';
 import path from 'path';
 import * as vscode from 'vscode';
+import { notNullish } from '../GeneralHelperFunctions';
 import { HasRefresh, mapAsync, VsCodeHelper } from '../helpers';
 import { OutputLevels } from '../LogHelper';
 import { getRunningContainerNames } from '../pure';
@@ -10,7 +11,7 @@ import * as Util from '../pure';
 import { CachedSandboxState, SandboxState } from './CachedSandboxState';
 import { getSandboxAccounts, getSandboxContracts } from './helpers/SandboxDataHelpers';
 import { ObservableConfig } from './ObservableConfig';
-import { TzKtHead } from './SandboxDataModels';
+import { TzKTAccountData, TzKTContractData, TzKtHead } from './SandboxDataModels';
 import {
 	OperationTreeItem,
 	SandboxChildrenTreeItem,
@@ -22,15 +23,6 @@ import {
 	SmartContractEntrypointTreeItem,
 } from './SandboxTreeItemTypes';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
-
-interface TzKTGetAccountByAddressData {
-	address?: string | null;
-	alias?: string | null;
-}
-interface TzKTGetContractByAddressData {
-	address?: string | null;
-	alias?: string | null;
-}
 
 export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	implements vscode.TreeDataProvider<SandboxTreeItemBase>, HasRefresh
@@ -273,7 +265,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			const sandboxAccounts = getSandboxAccounts(this.observableConfig.currentConfig, element.sandboxName);
 			const tzktAccounts = await Promise.all(sandboxAccounts.map(async account => {
 				const response = await fetch(`${tzktBaseUrl}/v1/accounts/${account.address}`);
-				const data = (await response.json()) as TzKTGetAccountByAddressData;
+				const data = (await response.json()) as TzKTAccountData;
 				return data;
 			}));
 			return tzktAccounts.length;
@@ -295,11 +287,15 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 					.map(async contract => {
 						const contractAddress = contract.config.address;
 						const response = await fetch(`${tzktBaseUrl}/v1/contracts/${contractAddress}`);
-						const data = (await response.json()) as TzKTGetContractByAddressData;
+						if (response.status !== 200) {
+							return;
+						}
+						const data = (await response.json()) as TzKTContractData;
 						return data;
 					}),
 			);
-			return tzktContracts.length;
+
+			return tzktContracts.filter(notNullish).length;
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
 			return undefined;
@@ -324,7 +320,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			const sandboxAccounts = getSandboxAccounts(this.observableConfig.currentConfig, element.parent.sandboxName);
 			return await Promise.all(sandboxAccounts.map(async account => {
 				const response = await fetch(`${tzktBaseUrl}/v1/accounts/${account.address}`);
-				const data = (await response.json()) as TzKTGetAccountByAddressData;
+				const data = (await response.json()) as TzKTAccountData;
 				return new SandboxImplicitAccountTreeItem(
 					data.address ?? account.address,
 					data.alias ?? account.alias,
@@ -348,19 +344,28 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 		try {
 			const sandboxContracts = getSandboxContracts(this.observableConfig.currentConfig, element.parent.sandboxName);
-			return await Promise.all(
+			const tzktContracts = await Promise.all(
 				sandboxContracts
 					.map(async contract => {
 						const contractAddress = contract.config.address;
 						const response = await fetch(`${tzktBaseUrl}/v1/contracts/${contractAddress}`);
-						const data = (await response.json()) as TzKTGetContractByAddressData;
-						return new SandboxSmartContractTreeItem(
-							data.address ?? contractAddress,
-							data.alias ?? contract.alias,
-							containerName,
-							element.parent.sandboxName,
-						);
+						if (response.status !== 200) {
+							return;
+						}
+						const data = (await response.json()) as TzKTContractData;
+						return {
+							address: data.address ?? contractAddress,
+							alias: data.alias ?? contract.alias,
+						};
 					}),
+			);
+			return tzktContracts.filter(notNullish).map(contract =>
+				new SandboxSmartContractTreeItem(
+					contract!.address,
+					contract!.alias,
+					containerName,
+					element.parent.sandboxName,
+				)
 			);
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
