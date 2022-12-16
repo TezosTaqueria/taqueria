@@ -217,7 +217,7 @@ Note: joe is already instantiated in the current environment, "testing"\n`);
 		const configContents = JSON.parse(
 			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
 		);
-		const configTezAmounts = Object.values(configContents.accounts).map((x: { balance: { amount: string } }) =>
+		const configTezAmounts = Object.values(configContents.accounts as { balance: { amount: string } }[]).map(x =>
 			x.balance.amount
 		);
 
