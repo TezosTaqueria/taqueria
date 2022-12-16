@@ -1,4 +1,5 @@
 {
+	"networkName": "ghostnet",
 	"aliases": {
 		"hello-tacos": {
 			"address": "KT1LMNSCTCprDtuzAJ5GiAHNdC1r5q8qiZYc"

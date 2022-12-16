@@ -38,7 +38,7 @@
 		"development": {
 			"networks": [],
 			"sandboxes": [
-				"development-sandbox"
+				"local-scaffold"
 			],
 			"storage": {
 				"value": 42
@@ -46,7 +46,7 @@
 		},
 		"testing": {
 			"networks": [
-				"testing-network"
+				"ghostnet"
 			],
 			"sandboxes": [],
 			"aliases": {
@@ -57,14 +57,14 @@
 		}
 	},
 	"network": {
-		"testing-network": {
+		"ghostnet": {
 			"label": "ghostnet",
 			"rpcUrl": "https://ghostnet.ecadinfra.com",
 			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg"
 		}
 	},
 	"sandbox": {
-		"development-sandbox": {
+		"local-scaffold": {
 			"label": "Local Tezos Sandbox",
 			"rpcUrl": "http://localhost:21000",
 			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"

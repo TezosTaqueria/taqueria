@@ -114,11 +114,6 @@ const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV1): Con
 				.map(([k, v]) => [k, {
 					// Known fields
 					type: v.sandboxes.length ? `flextesa` : `simple`,
-					// Fields from the first sandbox or network (there should be only 1)
-					...[
-						...v.sandboxes.map(k => config.sandbox?.[k]),
-						...v.networks.map(k => config.network?.[k]),
-					][0] as {},
 					// Unknown fields
 					...((() => {
 						const vClone = { ...v } as Partial<typeof v>;
@@ -126,6 +121,15 @@ const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV1): Con
 						delete vClone.sandboxes;
 						return vClone;
 					})()),
+					// Preserve sandbox or network name
+					networkName: v.networks[0],
+					sandboxName: v.sandboxes[0],
+					// Fields from the first sandbox or network (there should be only 1)
+					// These overwrite fields in environment
+					...[
+						...v.networks.map(k => config.network?.[k]),
+						...v.sandboxes.map(k => config.sandbox?.[k]),
+					][0] as {},
 				}]),
 		),
 		plugins: config.plugins,
@@ -159,11 +163,6 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 				.map(([k, v]) => [k, {
 					// Known fields
 					type: v.sandboxes.length ? `flextesa` : `simple`,
-					// Fields from the first sandbox or network (there should be only 1 sandbox or 1 network)
-					...[
-						...v.sandboxes.map(k => config.sandbox?.[k]),
-						...v.networks.map(k => config.network?.[k]),
-					][0] as {},
 					// Unknown fields
 					...((() => {
 						const vClone = { ...v } as Partial<typeof v>;
@@ -171,6 +170,15 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 						delete vClone.sandboxes;
 						return vClone;
 					})()),
+					// Preserve sandbox or network name
+					networkName: v.networks[0],
+					sandboxName: v.sandboxes[0],
+					// Fields from the first sandbox or network (there should be only 1)
+					// These overwrite fields in environment
+					...[
+						...v.networks.map(k => config.network?.[k]),
+						...v.sandboxes.map(k => config.sandbox?.[k]),
+					][0] as {},
 				}]),
 		),
 		plugins: config.plugins,
@@ -189,6 +197,7 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 			const key = k as keyof typeof eMain;
 
 			if (key === `type`) {
+				delete eLocal[key];
 				continue;
 			}
 
@@ -239,11 +248,42 @@ const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config
 				// merge in the fields from the envFile
 				...environmentFilesV2[k] ?? {},
 			} as typeof v & {
+				// custom named network or sandbox
+				networkName?: string;
+				sandboxName?: string;
+				// Known network/sandbox fields
 				label?: string;
-				rpcUrl?: string;
 				protocol?: string;
+				rpcUrl?: string;
+				// Known environment fields
+				storage?: unknown;
+				aliases?: unknown;
 			},
 		}));
+
+	const getUnknownFields = (x: typeof environments[number], structure: 'environment' | 'network' | 'sandbox') => {
+		if (structure === 'environment') {
+			// environment should only have known fields
+			return {};
+		}
+
+		// Let all the unknown fields be placed in the network or sandbox
+		const unknownFields = ((() => {
+			const vClone = { ...x.value } as Partial<typeof x.value>;
+			// Remove known fields that have a known structure
+			delete vClone.type;
+			delete vClone.networkName;
+			delete vClone.sandboxName;
+			delete vClone.label;
+			delete vClone.protocol;
+			delete vClone.rpcUrl;
+			delete vClone.storage;
+			delete vClone.aliases;
+			return vClone;
+		})());
+
+		return unknownFields;
+	};
 
 	const simpleEnvironments = environments.filter(x => x.value.type === `simple`);
 	const sandboxEnvironments = environments.filter(x => x.value.type === `flextesa`);
@@ -267,33 +307,35 @@ const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config
 		environment: {
 			default: configFileV2.environmentDefault ?? environments[0]?.key,
 			...Object.fromEntries(environments.map(x => [x.key, {
-				// Unknown fields
-				...((() => {
-					const vClone = { ...x.value } as Partial<typeof x.value>;
-					delete vClone.type;
-					delete vClone.label;
-					delete vClone.protocol;
-					delete vClone.rpcUrl;
-					return vClone;
-				})()),
-				// Known fields
+				// Network and sandbox
 				networks: x.value.type !== `simple` ? [] : [
-					`${x.key}-network`,
+					// use same name as enviroment by default
+					x.value.networkName ?? `${x.key}`,
 				],
 				sandboxes: x.value.type !== `flextesa` ? [] : [
-					`${x.key}-sandbox`,
+					// use same name as enviroment by default
+					x.value.sandboxName ?? `${x.key}`,
 				],
+				// Known environment fields
+				storage: x.value.storage,
+				aliases: x.value.aliases,
+				// Unknown fields might need to be in the environment
+				...getUnknownFields(x, 'environment'),
 			}])),
 		},
-		network: Object.fromEntries(simpleEnvironments.map(x => [`${x.key}-network`, {
+		network: Object.fromEntries(simpleEnvironments.map(x => [x.value.networkName ?? `${x.key}`, {
 			label: x.value.label ?? ``,
 			rpcUrl: x.value.rpcUrl ?? ``,
 			protocol: x.value.protocol ?? ``,
+			// Unknown fields might need to be in the network or sandbox
+			...getUnknownFields(x, 'network') as {},
 		}])),
-		sandbox: Object.fromEntries(sandboxEnvironments.map(x => [`${x.key}-sandbox`, {
+		sandbox: Object.fromEntries(sandboxEnvironments.map(x => [x.value.sandboxName ?? `${x.key}`, {
 			label: x.value.label ?? ``,
 			rpcUrl: x.value.rpcUrl ?? ``,
 			protocol: x.value.protocol ?? ``,
+			// Unknown fields might need to be in the network or sandbox
+			...getUnknownFields(x, 'sandbox') as {},
 		}])),
 	};
 

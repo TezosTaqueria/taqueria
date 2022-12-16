@@ -1,4 +1,5 @@
 {
+	"sandboxName": "local-scaffold",
 	"rpcUrl": "http://localhost:21000",
 	"storage": {
 		"value": 42
