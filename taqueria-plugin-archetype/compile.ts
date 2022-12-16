@@ -66,8 +66,9 @@ const compileContract = (opts: Opts) =>
 				});
 			});
 
-const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[]> =>
-	Promise.all(getContracts(/\.arl$/, opts.config))
+const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[]> => {
+	const contracts = getContracts(/\.arl$/, opts.config);
+	return Promise.all(contracts)
 		.then(entries => entries.map(compileContract(opts)))
 		.then(processes =>
 			processes.length > 0
@@ -75,6 +76,7 @@ const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[
 				: [{ contract: 'None found', artifact: 'N/A' }]
 		)
 		.then(promises => Promise.all(promises));
+};
 
 const compile = (parsedArgs: RequestArgs.t) => {
 	const unsafeOpts = parsedArgs as unknown as Opts;

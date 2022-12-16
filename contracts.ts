@@ -10,7 +10,7 @@ import { attemptP, chain, map, reject, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { has, isEmpty, omit, toPairs } from 'rambda';
 import { getConfig } from './taqueria-config.ts';
-import { joinPaths, readTextFile, writeJsonFile } from './taqueria-utils/taqueria-utils.ts';
+import { joinPaths, readTextFile, taqResolve, writeJsonFile } from './taqueria-utils/taqueria-utils.ts';
 
 type contractRow = {
 	'Name': string;
@@ -35,70 +35,56 @@ const newContract = (sourceFile: string, projectDir: SanitiziedAbsPath.t, contra
 		),
 	);
 
-export const addContract = (parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18n.t) =>
-	pipe(
-		getConfig(parsedArgs.projectDir, i18n),
-		chain(LoadedConfig.make),
-		chain(config =>
-			isContractRegistered(parsedArgs.contractName, config)
-				? reject(TaqError.create({
-					kind: 'E_CONTRACT_REGISTERED',
-					context: parsedArgs,
-					msg: `${parsedArgs.contractName} has already been registered`,
-				}))
-				: pipe(
-					newContract(parsedArgs.sourceFile, parsedArgs.projectDir, config.contractsDir ?? 'contracts'),
-					map(contract => {
-						const contracts = config.contracts || {};
-						return {
-							...config,
-							contracts: {
-								...contracts,
-								...Object.fromEntries([[parsedArgs.contractName, contract]]),
-							},
-						};
-					}),
-					chain(writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))),
-				)
-		),
-		chain(_ => listContracts(parsedArgs, i18n)),
-	);
+export const addContract = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.AddContractArgs, i18n: i18n.t) => {
+	return isContractRegistered(parsedArgs.contractName, config)
+		? reject(TaqError.create({
+			kind: 'E_CONTRACT_REGISTERED',
+			context: parsedArgs,
+			msg: `${parsedArgs.contractName} has already been registered`,
+		}))
+		: pipe(
+			newContract(parsedArgs.sourceFile, parsedArgs.projectDir, config.contractsDir ?? 'contracts'),
+			map(contract => {
+				const contracts = config.contracts || {};
+				return {
+					...config,
+					contracts: {
+						...contracts,
+						...Object.fromEntries([[parsedArgs.contractName, contract]]),
+					},
+				};
+			}),
+			chain(writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))),
+		);
+};
 
-export const removeContract = (parsedArgs: SanitizedArgs.RemoveContractArgs, i18n: i18n.t) =>
-	pipe(
-		getConfig(parsedArgs.projectDir, i18n),
-		chain(LoadedConfig.make),
-		chain(config => {
-			if (!isContractRegistered(parsedArgs.contractName, config)) {
-				return reject(TaqError.create({
-					kind: 'E_CONTRACT_NOT_REGISTERED',
-					context: parsedArgs,
-					msg: `${parsedArgs.contractName} is not a registered contract`,
-				}));
-			}
+export const removeContract = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.RemoveContractArgs, i18n: i18n.t) => {
+	if (!isContractRegistered(parsedArgs.contractName, config)) {
+		return reject(TaqError.create({
+			kind: 'E_CONTRACT_NOT_REGISTERED',
+			context: parsedArgs,
+			msg: `${parsedArgs.contractName} is not a registered contract`,
+		}));
+	}
 
-			const updatedConfig = {
-				...config,
-				contracts: omit([parsedArgs.contractName], config.contracts),
-			};
-			return writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))(updatedConfig);
-		}),
-		chain(_ => listContracts(parsedArgs, i18n)),
-	);
+	const updatedConfig = {
+		...config,
+		contracts: omit([parsedArgs.contractName], config.contracts),
+	};
+	return writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))(updatedConfig);
+};
 
-export const listContracts = (parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
+export const listContracts = (config: LoadedConfig.t, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 	pipe(
-		getConfig(parsedArgs.projectDir, i18n),
-		map(config =>
-			!hasContracts(config)
-				? [{ contract: i18n.__('noContractsRegistered') }]
-				: toPairs(config.contracts).reduce(
-					(retval: contractRow[], [key, val]) => [
-						...retval,
-						{ 'Name': key, 'Source file': val.sourceFile, 'Last Known Hash': val.hash.slice(0, 8) },
-					],
-					[],
-				)
-		),
-		map(rows => rows as Record<string, string>[]),
+		!hasContracts(config)
+			? [{ contract: i18n.__('noContractsRegistered') }]
+			: toPairs(config.contracts).reduce(
+				(retval: contractRow[], [key, val]) => [
+					...retval,
+					{ 'Name': key, 'Source file': val.sourceFile, 'Last Known Hash': val.hash.slice(0, 8) },
+				],
+				[],
+			),
+		rows => rows as Record<string, string>[],
+		taqResolve,
 	);

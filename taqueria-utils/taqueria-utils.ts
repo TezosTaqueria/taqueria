@@ -216,7 +216,7 @@ export const toPromise = <T>(f: Future<TaqError.t, T>) =>
 
 export const eager = toPromise;
 
-export const taqResolve = <T>(data: T): Future<TaqError.t, T> => resolve(data) as Future<TaqError.t, T>;
+export const taqResolve = <T>(data?: T): Future<TaqError.t, T> => resolve(data) as Future<TaqError.t, T>;
 
 // Exports a function to inject dependencies needed by this
 // utilities package

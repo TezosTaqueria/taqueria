@@ -77,6 +77,8 @@ There are two approaches to initializing a Taqueria project: initializing an emp
 3. Install the LIGO plugin: `taq install @taqueria/plugin-ligo`
 4. Continue steps 4-5 for each additional plugin you want to install
 
+##### Note: You may instead run `taq init test-project --workflow ligo` if you'd like to have the necessary plugins pre-installed for you on initialization
+
 #### Using a Taqueria Project Scaffold
 1. Run the command `taq scaffold`
 2. Change directories: `cd test-project`

@@ -95,12 +95,16 @@ const addToPluginList = (pluginName: NpmPluginName, loadedConfig: LoadedConfig.t
 		chain(writeJsonFile(loadedConfig.configFile)),
 	);
 
-export const installPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string): Future<TaqError.t, string> =>
+export const installPlugin = (
+	config: LoadedConfig.t,
+	projectDir: SanitizedAbsPath.t,
+	i18n: i18n,
+	plugin: string,
+): Future<TaqError.t, string> =>
 	pipe(
 		requireNPM(projectDir, i18n),
 		chain(_ => exec('npm install -D <%= it.plugin %>', { plugin }, false, projectDir)),
-		chain(_ => getConfig(projectDir, i18n, false)),
-		chain(config => {
+		chain(() => {
 			// The plugin name could look like this: @taqueria/plugin-ligo@1.2.3
 			// We need to trim @1.2.3 from the end
 			const pluginName = getPluginName(plugin);
@@ -110,16 +114,15 @@ export const installPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin
 			// what the real package name is
 			return addToPluginList(pluginName, config);
 		}),
-		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp hack for #528
+		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/ecadlabs/taqueria/issues/528
 		map(_ => i18n.__('pluginInstalled')),
 	);
 
-export const uninstallPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string) =>
+export const uninstallPlugin = (config: LoadedConfig.t, projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string) =>
 	pipe(
 		requireNPM(projectDir, i18n),
 		chain(() => exec('npm uninstall -D <%= it.plugin %>', { plugin }, false, projectDir)),
-		chain(() => getConfig(projectDir, i18n, false)),
-		chain((config: LoadedConfig.t) => {
+		chain(() => {
 			const pluginName = getPluginName(plugin);
 			const plugins = config.plugins?.filter(plugin => plugin.name != pluginName.toString());
 
@@ -131,6 +134,6 @@ export const uninstallPlugin = (projectDir: SanitizedAbsPath.t, i18n: i18n, plug
 				chain(writeJsonFile(config.configFile)),
 			);
 		}),
-		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp hack for #528
+		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/ecadlabs/taqueria/issues/528
 		map(() => i18n.__('pluginUninstalled')),
 	);
