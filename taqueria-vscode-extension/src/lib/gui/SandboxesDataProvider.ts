@@ -8,6 +8,7 @@ import { OutputLevels } from '../LogHelper';
 import { getRunningContainerNames } from '../pure';
 import * as Util from '../pure';
 import { CachedSandboxState, SandboxState } from './CachedSandboxState';
+import { getSandboxAccounts, getSandboxContracts } from './helpers/SandboxDataHelpers';
 import { ObservableConfig } from './ObservableConfig';
 import { TzKtHead } from './SandboxDataModels';
 import {
@@ -269,10 +270,13 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return undefined;
 		}
 		try {
-			// TODO: query filter - only accounts from config.json
-			const response = await fetch(`${tzktBaseUrl}/v1/accounts/count?type.ne=contract`);
-			const data = await response.json();
-			return data as number;
+			const sandboxAccounts = getSandboxAccounts(this.observableConfig.currentConfig, element.sandboxName);
+			const tzktAccounts = await Promise.all(sandboxAccounts.map(async account => {
+				const response = await fetch(`${tzktBaseUrl}/v1/accounts/${account.address}`);
+				const data = (await response.json()) as TzKTGetAccountByAddressData;
+				return data;
+			}));
+			return tzktAccounts.length;
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
 			return undefined;
@@ -285,13 +289,17 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return undefined;
 		}
 		try {
-			// TODO: query filter - only contracts from config.json
-			const response = await fetch(`${tzktBaseUrl}/v1/contracts/count`);
-			const data = await response.json();
-			// This assumes that the built-in contracts always exist on the chain. If not, the count will be off.
-			// The fix is to check existence of each of them
-			const ignoredContractCount = SandboxesDataProvider.builtInContracts.length;
-			return data as number - ignoredContractCount;
+			const sandboxContracts = getSandboxContracts(this.observableConfig.currentConfig, element.sandboxName);
+			const tzktContracts = await Promise.all(
+				sandboxContracts
+					.map(async contract => {
+						const contractAddress = contract.config.address;
+						const response = await fetch(`${tzktBaseUrl}/v1/contracts/${contractAddress}`);
+						const data = (await response.json()) as TzKTGetContractByAddressData;
+						return data;
+					}),
+			);
+			return tzktContracts.length;
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
 			return undefined;
@@ -313,13 +321,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return [];
 		}
 		try {
-			const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
-			const sandboxAccounts = (
-				Object.entries(sandbox?.accounts || {})
-					.filter(([alias, config]) => typeof config !== 'string') as [string, SandboxAccountConfig][]
-			)
-				.map(([alias, config]) => ({ alias, address: config.publicKeyHash }));
-
+			const sandboxAccounts = getSandboxAccounts(this.observableConfig.currentConfig, element.parent.sandboxName);
 			return await Promise.all(sandboxAccounts.map(async account => {
 				const response = await fetch(`${tzktBaseUrl}/v1/accounts/${account.address}`);
 				const data = (await response.json()) as TzKTGetAccountByAddressData;
@@ -344,25 +346,17 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return [];
 		}
-		const environment = Object.values(this.observableConfig.currentConfig.config?.config.environment ?? []).find(
-			config =>
-				typeof config === 'string'
-					? false
-					: config.sandboxes.some(envSandbox => envSandbox === element.parent.sandboxName),
-		);
-		if (!environment || typeof environment === 'string') {
-			return [];
-		}
 		try {
+			const sandboxContracts = getSandboxContracts(this.observableConfig.currentConfig, element.parent.sandboxName);
 			return await Promise.all(
-				Object.entries(environment.aliases ?? {})
-					.map(async ([contractAlias, contractConfig]) => {
-						const contractAddress = contractConfig.address;
+				sandboxContracts
+					.map(async contract => {
+						const contractAddress = contract.config.address;
 						const response = await fetch(`${tzktBaseUrl}/v1/contracts/${contractAddress}`);
 						const data = (await response.json()) as TzKTGetContractByAddressData;
 						return new SandboxSmartContractTreeItem(
 							data.address ?? contractAddress,
-							data.alias ?? contractAlias,
+							data.alias ?? contract.alias,
 							containerName,
 							element.parent.sandboxName,
 						);
