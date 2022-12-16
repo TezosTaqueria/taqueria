@@ -28,7 +28,7 @@
 	},
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.25.16-rc",
-		"@taqueria/plugin-contract-types": "^0.14.4",
+		"@taqueria/plugin-contract-types": "^0.25.16-rc",
 		"@taquito/signer": "^13.0.1",
 		"@taquito/taquito": "^13.0.1",
 		"@taquito/utils": "^13.0.1",
