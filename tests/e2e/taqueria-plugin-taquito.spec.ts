@@ -155,11 +155,10 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			cwd: `./${taqueriaProjectPath}`,
 		});
 
-		const configContents = JSON.parse(
-			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		const configEnvironmentContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.local.${environment}.json`, { encoding: 'utf-8' }),
 		);
-
-		const configPKH = configContents.network.fundnet.accounts.taqOperatorAccount.publicKeyHash;
+		const configPKH = configEnvironmentContents.accounts.taqOperatorAccount.publicKeyHash;
 
 		expect(result.stderr.replace(/tz3\S+/, 'tz3__address__')).toEqual(
 			await fsPromises.readFile('e2e/data/taquito-funding-instructions.txt', 'utf-8'),
@@ -218,7 +217,7 @@ Note: joe is already instantiated in the current environment, "testing"\n`);
 		const configContents = JSON.parse(
 			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
 		);
-		const configTezAmounts = Object.values(configContents.accounts);
+		const configTezAmounts = Object.values(configContents.accounts).map(x => x.balance.amount);
 
 		expect(accountResult.stdout).toBe(`Accounts instantiated: bob, alice, john, jane, joe.
 Please execute "taq fund" targeting the same environment to fund these accounts\n`);
@@ -251,7 +250,10 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		const configContents = JSON.parse(
 			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
 		);
-		const configAlicePKH = configContents.network.ghostnet.accounts.alice.publicKeyHash;
+		const configEnvironmentContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.local.${environment}.json`, { encoding: 'utf-8' }),
+		);
+		const configAlicePKH = configEnvironmentContents.accounts.alice.publicKeyHash;
 		const configAliceAmount = configContents.accounts.alice;
 
 		await exec(`taq transfer ${configAlicePKH} --mutez ${transferAmountMutez} --sender bob -e ${environment}`, {

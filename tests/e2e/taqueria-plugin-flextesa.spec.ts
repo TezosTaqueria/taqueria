@@ -242,10 +242,12 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		await sleep(2000);
 
 		// Get the port that the sandbox is running on
-		const configContents = JSON.parse(
-			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		const configEnvironmentContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.local.development-local.json`, {
+				encoding: 'utf-8',
+			}),
 		);
-		const port = configContents.sandbox.local.rpcUrl;
+		const port = configEnvironmentContents.rpcUrl;
 
 		// Connect to the sandbox using a different origin (CORS test)
 		const { stdout } = await exec(`curl -i -H "Origin: http://localhost:8080" ${port}/version`);
