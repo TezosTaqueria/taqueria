@@ -256,7 +256,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.local.${environment}.json`, { encoding: 'utf-8' }),
 		);
 		const configAlicePKH = configEnvironmentContents.accounts.alice.publicKeyHash;
-		const configAliceAmount = configContents.accounts.alice;
+		const configAliceAmount = configContents.accounts.alice.balance.amount;
 
 		await exec(`taq transfer ${configAlicePKH} --mutez ${transferAmountMutez} --sender bob -e ${environment}`, {
 			cwd: `./${taqueriaProjectPath}`,
@@ -285,7 +285,7 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		}
 	});
 
-	test('Verify that taqueria taquito plugin will show proper error when configuration is wrong -> invalid network name in the environment', async () => {
+	test.skip(/* This test is meaningless for new config schema */ 'Verify that taqueria taquito plugin will show proper error when configuration is wrong -> invalid network name in the environment', async () => {
 		// Environment test does not exist on default config.json
 		environment = 'testing';
 
