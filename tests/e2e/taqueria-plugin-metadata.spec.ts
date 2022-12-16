@@ -1,10 +1,9 @@
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
-import { exec } from 'child_process';
-// import { exec as execRaw, spawn } from 'child_process';
-// import fsPromises from 'fs/promises';
-// import util from 'util';
-// import { generateTestProject } from './utils/utils';
-// const exec = util.promisify(execRaw);
+import { exec as execRaw, spawn } from 'child_process';
+import fsPromises from 'fs/promises';
+import util from 'util';
+import { generateTestProject } from './utils/utils';
+const exec = util.promisify(execRaw);
 
 // const taqueriaProjectPath = 'scrap/auto-test-metadata-plugin';
 
@@ -57,77 +56,39 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 	// 	});
 	// };
 
-	test.skip('metadata plugin should create a contract metadata.json file', async () => {
-		// await runCliWithPrompts(`generate-metadata hello-tacos`, [
-		// 	['name', 'test-name'],
-		// 	['description', 'test-description'],
-		// 	['author', 'test-author'],
-		// 	['url', 'test-url'],
-		// 	['license', 'test-license'],
-		// ]);
-
-		// const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/hello-tacos.json`, {
-		// 	encoding: 'utf-8',
-		// });
-		// expect(metadataFileContents).toMatch(/name.*test-name/i);
-		// expect(metadataFileContents).toMatch(/description.*test-description/i);
-		// expect(metadataFileContents).toMatch(/authors(.|\n)*test-author/i);
-		// expect(metadataFileContents).toMatch(/homepage.*test-url/i);
-		// expect(metadataFileContents).toMatch(/license.*test-license/i);
-		const { execute, spawn, cleanup, ls, writeFile } = await prepareEnvironment();
+	test('metadata plugin should create a contract metadata.json file', async () => {
+		const { execute, spawn, cleanup, ls, readFile } = await prepareEnvironment();
 		const { waitForText: waitForText2 } = await spawn('taq', 'init test-project');
 		await waitForText2("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-metadata', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout2 } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		expect(stdout2).toContain('Plugin installed successfully');
 
-		// 	await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos.mligo`);
-		// 	await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
+		const {} = await execute('taq', 'create contract hello-tacos.mligo', './test-project');
+		const contracts_list = await ls('./test-project/contracts');
+		expect(contracts_list).toContain('hello-tacos.mligo');
 
-		await (await exec(`cat e2e/data/hello-tacos.mligo`)).stdout;
-		await writeFile('./test-project/contracts/hello-tacos.mligo', stdout[0]);
+		const { stdout: stdout5, stderr } = await execute('taq', 'generate-project-metadata, ./test-project');
+		console.log('stdout5', stdout5);
+		console.log('stderr', stderr);
+		const config_content = readFile('./test-project/.taq/config.json');
+		console.log(config_content);
+		// expect(stdout5).toContain('Metadata file generated successfully');
 
-		await (await exec(`cat e2e/data/hello-tacos.tz`)).stdout;
-		await writeFile('./test-project/artifacts/hello-tacos.mligo', stdout[0]);
-		// await exec(`taq add-contract hello-tacos.mligo`, { cwd: taqueriaProjectPath });
+		// expect(ls('./test-project/artifacts/')).toBe(`Array [ "hello-tacos.json" ]`);
 
-		const { stdout: stdout2, stderr, code } = await execute(
-			'taq',
-			'add-contract hello-tacos.mligo, ./test-project',
-		);
+		// const { waitForText, waitForFinish, writeText, pressKey, getExitCode } = await spawn(
+		// 	'taq',
+		// 	'name',
+		// );
 
-		console.log(stdout2);
-		console.log(stderr);
-		console.log(code);
+		// await waitForText('Enter your name:');
+		// await writeText('John');
+		// await pressKey('enter');
+		// await waitForFinish();
 
-		const { stdout: stdout3, stderr: stderr2, code: code2 } = await execute(
-			'taq',
-			'generate-metadata hello-tacos, ./test-project',
-		);
-
-		console.log(stdout3);
-		console.log(stderr2);
-		console.log(code2);
-
-		const file_list = await ls('./');
-		console.log(file_list);
-
-		expect(ls('./')).toBe(`
-			Array [
-			  "hello-tacos.json",
-			]
-		`);
-
-		const { waitForText, waitForFinish, writeText, pressKey, getExitCode } = await spawn(
-			'taq',
-			'name',
-		);
-
-		await waitForText('Enter your name:');
-		await writeText('John');
-		await pressKey('enter');
-		await waitForFinish();
-
-		expect(getExitCode()).toBe(0);
+		// expect(getExitCode()).toBe(0);
 
 		await cleanup();
 	});
