@@ -60,6 +60,13 @@ export const scaffoldRawSchema = rawSchema.extend({
 	scaffoldUrl: z.string().min(1).url().transform((val: unknown) => val as Url.t),
 });
 
+export const initRawSchema = rawSchema.extend({
+	workflow: z.string().refine(val => val === 'ligo' || val === 'smartpy' || val === 'archetype' || val === 'michelson')
+		.optional(),
+});
+
+export type rawInitSchemaInput = z.infer<typeof initRawSchema>;
+
 export const provisionRawSchema = rawSchema
 	.extend({
 		operation: z
