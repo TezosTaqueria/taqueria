@@ -57,23 +57,6 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 	// 	});
 	// };
 
-	test.only('Verify that taqueria ligo plugin can compile one contract using compile <sourceFile> command', async () => {
-		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
-		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
-		expect(stdout).toContain('Plugin installed successfully');
-
-		await (await exec(`cat e2e/data/hello-tacos.mligo`).stdout);
-		await writeFile('./test-project/contracts/hello-tacos.mligo', stdout[0]);
-
-		const {} = await execute('taq', 'compile hello-tacos.mligo', './test-project');
-		const artifacts_list = await ls('./test-project/artifacts');
-		expect(artifacts_list).toContain('hello-tacos.tz');
-
-		await cleanup();
-	});
-
 	test.skip('metadata plugin should create a contract metadata.json file', async () => {
 		// await runCliWithPrompts(`generate-metadata hello-tacos`, [
 		// 	['name', 'test-name'],
