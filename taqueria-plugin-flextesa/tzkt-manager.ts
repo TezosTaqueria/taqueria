@@ -1,14 +1,14 @@
 import { getArch, SandboxConfig } from '@taqueria/node-sdk';
 import { Config as RawConfig } from '@taqueria/protocol/types';
-import { getContainerName, getNewPortIfPortInUse, getUniqueSandboxName, Opts, updateConfig } from './proxy';
+import { getContainerName, getNewPortIfPortInUse, getUniqueSandboxName, updateConfig, ValidOpts } from './proxy';
 
-const getTzKtDockerImages = (opts: Opts) => ({
+const getTzKtDockerImages = (opts: ValidOpts) => ({
 	postgres: `postgres:14.5-alpine`,
 	sync: `ecadlabs/tzkt-sync:1.8.3-taqueria`,
 	api: `ecadlabs/tzkt-api:1.8.3-taqueria`,
 });
 
-export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: Opts) => {
+export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: ValidOpts) => {
 	const uniqueSandboxName = await getUniqueSandboxName(sandboxName, parsedArgs.projectDir);
 	return {
 		postgres: `taq-postgres-${uniqueSandboxName}`,
@@ -17,9 +17,9 @@ export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: Opt
 	};
 };
 
-const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: SandboxConfig, opts: Opts) => {
+const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: SandboxConfig, opts: ValidOpts) => {
 	const containerNames = await getTzKtContainerNames(sandboxName, opts);
-	const sandboxContainerName = await getContainerName(sandboxName, opts);
+	const sandboxContainerName = await getContainerName(opts);
 	const connectionStringEnv =
 		`ConnectionStrings__DefaultConnection="host=${containerNames.postgres};port=5432;database=sandbox_data;username=tzkt;password=${sandboxName};"`;
 	return {
@@ -29,7 +29,7 @@ const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: Sandbo
 	};
 };
 
-export const getTzKtStartCommands = async (sandboxName: string, sandbox: SandboxConfig, opts: Opts) => {
+export const getTzKtStartCommands = async (sandboxName: string, sandbox: SandboxConfig, opts: ValidOpts) => {
 	const pgPort = sandbox.tzkt?.postgresqlPort ?? 5432;
 	const newPGPort = await getNewPortIfPortInUse(pgPort);
 
