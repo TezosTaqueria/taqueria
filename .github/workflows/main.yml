@@ -95,6 +95,9 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: "${{ env.DENO_VERSION }}"
+      
+      # TODO: Remove after debug
+      - run: deno info
 
       # - name: Delete node-gyp cache
       #   id: delete-node-gyp-cache
