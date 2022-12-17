@@ -5,35 +5,46 @@ import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
-describe('E2E Testing for taqueria ligo plugin', () => {
-	test('Verify that the ligo plugin exposes the associated commands in the help menu', async () => {
+describe('E2E Testing for ligo plugin', () => {
+	test('ligo plugin help will show help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', '--help --projectDir=./test-project');
-		expect(stdout2).toEqual(expect.arrayContaining(['Commands:']));
+		const { stdout: stdout2 } = await execute('taq', '--help --projectDir=./test-project', './test-project');
+		expect(stdout2).toEqual(expect.arrayContaining(['taq [command]']));
 
 		await cleanup();
 	});
 
-	test('Verify that the ligo plugin exposes the associated options in the help menu', async () => {
-		const { execute, cleanup, spawn } = await prepareEnvironment();
+	// DEMONSTRATION OF https://github.com/ecadlabs/taqueria/issues/1635
+	test('bug - ligo plugin compile will only give contextual help in stderr', async () => {
+		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', 'compile --help --projectDir=./test-project');
-		expect(stdout2).toEqual(expect.arrayContaining(['Commands:']));
+		// provide --help parameter
+		const { stdout: stdout1 } = await execute('taq', 'compile --help', './test-project');
+
+		// displays default help, not contextual help
+		expect(stdout1).toContain('taq [command]');
+
+		// fail to provide enough parameters
+		const { stderr: stderr1 } = await execute('taq', 'compile', './test-project');
+
+		// invokes stderr to display contextual help
+		expect(stderr1).toContain('Compile a smart contract written in a LIGO syntax to Michelson code, along with');
+		expect(stderr1).toContain('Not enough non-option arguments: got 0, need at least 1');
 
 		await cleanup();
 	});
 
-	// contextual help broken waiting for refactor merge
-	test.skip('Verify that the ligo plugin aliases expose the correct info in the help menu', async () => {
+	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
+	test.skip('1635 - ligo plugin compile will show contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -42,22 +53,33 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 
 		const { stdout: stdout2 } = await execute('taq', 'compile --help --projectDir=./test-project', './test-project');
 		expect(stdout2).toEqual(
-			expect.arrayContaining(['Compile a smart contract written in a LIGO syntax to Michelson code']),
-		);
-
-		const { stdout: stdout3 } = await execute(
-			'taq',
-			'compile-ligo --help --projectDir=./test-project',
-			'./test-project',
-		);
-		expect(stdout3).toEqual(
-			expect.arrayContaining(['Compile a smart contract written in a LIGO syntax to Michelson code']),
+			expect.arrayContaining(['Compile a smart contract written in a LIGO syntax to Michelson code, along with']),
 		);
 
 		await cleanup();
 	});
 
-	test('Verify that taqueria ligo plugin outputs no contracts message if no contracts exist', async () => {
+	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
+	test.skip('1635 - ligo plugin compile-ligo will show contextual help', async () => {
+		const { execute, cleanup, spawn } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+
+		const { stdout: stdout2 } = await execute(
+			'taq',
+			'compile-ligo --help --projectDir=./test-project',
+			'./test-project',
+		);
+		expect(stdout2).toEqual(
+			expect.arrayContaining(['Compile a smart contract written in a LIGO syntax to Michelson code, along with']),
+		);
+
+		await cleanup();
+	});
+
+	test('ligo plugin compile will error if missing <contract> parameter', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -70,7 +92,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('Verify that the taqueria ligo plugin throws an error message if a contract name is not specified', async () => {
+	test('ligo plugin add-contract will error if named contract does not exist', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -83,13 +105,10 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		const { stdout: stdout2 } = await execute('taq', 'add-contract hello-tacos.mligo', './test-project');
 		expect(stdout2).toEqual(expect.arrayContaining(['│ No registered contracts found │']));
 
-		const { stderr } = await execute('taq', 'compile', './test-project');
-		expect(stderr).toEqual(expect.arrayContaining(['Not enough non-option arguments: got 0, need at least 1']));
-
 		await cleanup();
 	});
 
-	test('Verify that taqueria ligo plugin can compile one contract using compile <sourceFile> command', async () => {
+	test('ligo plugin compile will only compile one contract using compile <sourceFile> command', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -106,7 +125,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('Verify that taqueria ligo plugin will display proper message if user tries to compile contract that does not exist', async () => {
+	test('ligo plugin compile will error if the named contract does not exist', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -120,7 +139,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('Verify that taqueria ligo plugin emits error and yet displays table if contract is invalid', async () => {
+	test('ligo plugin add-contract will error if contract is invalid', async () => {
 		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -148,7 +167,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('Verify that taqueria ligo plugin can run ligo test using taq test <sourceFile> command', async () => {
+	test('ligo plugin test can run ligo test', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -168,7 +187,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('Verify that taqueria ligo plugin will output proper error message running taq test <sourceFile> command against invalid test file', async () => {
+	test('ligo plugin test will error if test file is invalid', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -187,7 +206,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('Verify that taqueria ligo plugin will output proper error message running taq test <sourceFile> command against non-existing file', async () => {
+	test('ligo plugin test will error if named file does not exist', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -200,7 +219,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('Verify that a different version of the LIGO image can be used', async () => {
+	test('ligo plugin compile can use a different version of the LIGO image', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -222,7 +241,7 @@ describe('E2E Testing for taqueria ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('Verify that the LIGO contract template is instantiated with the right content and registered', async () => {
+	test('LIGO contract template will be instantiated with the right content and registered', async () => {
 		const { execute, cleanup, spawn, readFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
