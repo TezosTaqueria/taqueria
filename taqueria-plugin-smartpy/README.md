@@ -17,6 +17,9 @@ To install the SmartPy plugin on a Taqueria project, navigate to the project fol
 taq install @taqueria/plugin-smartpy
 ```
 
+> ### :page_with_curl: Note
+> You can override the SmartPy version used by the plugin by creating the environment variable `TAQ_SMARTPY_VERSION` and setting it to your desired version. E.g. `v0.16.0`
+
 ## The `taq compile` Task
 
 Basic usage is:
