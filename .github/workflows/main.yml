@@ -88,7 +88,7 @@ jobs:
 
       - uses: actions/cache@v3
         with:
-          path: ${{ DENO_DIR }}
+          path: ${{ env.DENO_DIR }}
           key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
 
       - name: Setup Deno
@@ -210,7 +210,7 @@ jobs:
 
       - uses: actions/cache@v3
         with:
-          path: ${{ DENO_DIR }}
+          path: ${{ env.DENO_DIR }}
           key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
 
       - uses: actions/setup-node@v3
