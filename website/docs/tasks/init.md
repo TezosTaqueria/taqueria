@@ -8,6 +8,8 @@ Taq `init` is used to initialize a Taqueria project. It can be used to create a 
 
 Running `taq init` with no argumets will taq'ify the current directory, while `taq init [path]` will create a new taq'ified directory at the given path
 
+You may also supply the `-w/--workflow` flag if you'd like to have the necessary plugins pre-installed for you depending on what kind of developer you are: ligo, smartpy, archetype, or michelson. E.g. `taq init [path] --workflow [language]`
+
 The task will create the following directories:
 
 - `.taq` - Taqueria configuation files (`config.json`, `state.json`, `development-state.json`)

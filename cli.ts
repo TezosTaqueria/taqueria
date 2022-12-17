@@ -195,17 +195,24 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 					'init [projectDir]',
 					i18n.__('initDesc'),
 					(yargs: Arguments) => {
-						yargs.positional('projectDir', {
-							describe: i18n.__('initPathDesc'),
-							type: 'string',
-							default: getFromEnv('TAQ_PROJECT_DIR', '.', env),
-						});
+						yargs
+							.positional('projectDir', {
+								describe: i18n.__('initPathDesc'),
+								type: 'string',
+								default: getFromEnv('TAQ_PROJECT_DIR', '.', env),
+							})
+							.option('workflow', {
+								alias: 'w',
+								describe: i18n.__('workflowDesc'),
+								requiresArg: true,
+								type: 'string',
+							});
 					},
 				),
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				parsedArgs,
-				({ projectDir, maxConcurrency }) => initProject(projectDir, maxConcurrency, i18n),
+				parsedArgs => initProject(parsedArgs, parsedArgs.projectDir, parsedArgs.maxConcurrency, i18n),
 				map(log),
 			),
 	});
@@ -577,7 +584,56 @@ const createGitIgnoreFile = (projectDir: SanitizedAbsPath.t): Future<TaqError.Ta
 	return writeTextFile(`${projectDir}/.gitignore`)(toIgnore.join('\n'));
 };
 
+// Might consider using a dev flag but it's ok since the local installation part is for internal purposes only
+const taqInstall = (parsedArgs: SanitizedArgs.t) =>
+	(projectDir: SanitizedAbsPath.t) =>
+		(pluginName: string) =>
+			parsedArgs.debug
+				? exec(`taq install ../../taqueria/taqueria-plugin-${pluginName} 2>&1 > /dev/null`, {}, false, projectDir)
+				: exec(`taq install @taqueria/plugin-${pluginName} 2>&1 > /dev/null`, {}, false, projectDir);
+
+const preInstallPluginsOnInit = (parsedArgs: SanitizedArgs.t, projectDir: SanitizedAbsPath.t) => {
+	const parsedArgsOfInit = parsedArgs as unknown as SanitizedArgs.rawInitSchemaInput;
+	const taqInstallInProj = taqInstall(parsedArgs)(projectDir);
+	if (parsedArgsOfInit.workflow === undefined) return taqResolve();
+	switch (parsedArgsOfInit.workflow) {
+		case 'ligo':
+			return pipe(
+				taqInstallInProj('ligo'),
+				chain(_ => taqInstallInProj('flextesa')),
+				chain(_ => taqInstallInProj('taquito')),
+			);
+		case 'smartpy':
+			return pipe(
+				taqInstallInProj('smartpy'),
+				chain(_ => taqInstallInProj('flextesa')),
+				chain(_ => taqInstallInProj('taquito')),
+			);
+		case 'archetype':
+			return pipe(
+				taqInstallInProj('archetype'),
+				chain(_ => taqInstallInProj('flextesa')),
+				chain(_ => taqInstallInProj('taquito')),
+			);
+		case 'michelson':
+			return pipe(
+				taqInstallInProj('flextesa'),
+				chain(_ => taqInstallInProj('taquito')),
+			);
+		default: {
+			const err: TaqError.t = {
+				kind: 'E_INVALID_OPTION',
+				msg:
+					'Taqueria is only providing the following workflows for initializing a project: ligo|smartpy|archetype|michelson',
+				context: parsedArgs,
+			};
+			return reject(err);
+		}
+	}
+};
+
 const initProject = (
+	parsedArgs: SanitizedArgs.t,
 	projectDir: SanitizedAbsPath.t,
 	maxConcurrency: number,
 	i18n: i18n.t,
@@ -585,7 +641,9 @@ const initProject = (
 	pipe(
 		mkInitialDirectories(projectDir, maxConcurrency, i18n),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
-		chain(_ => exec('taq install @taqueria/plugin-core 2>&1 > /dev/null', {}, false, projectDir)),
+		chain(_ => taqInstall(parsedArgs)(projectDir)('core')),
+		chain(_ => preInstallPluginsOnInit(parsedArgs, projectDir)),
+		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/ecadlabs/taqueria/issues/528
 		chain(_ => createGitIgnoreFile(projectDir)),
 		map(_ => i18n.__('bootstrapMsg')),
 	);
@@ -1144,10 +1202,10 @@ const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 
 const preprocessArgs = (inputArgs: DenoArgs): DenoArgs => {
 	return inputArgs.map(arg => {
-		// A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command
+		// A workaround to get around yargs because it strips leading and trailing double quotes of strings passed by the command
 		// Refer to https://github.com/yargs/yargs-parser/issues/201
 		const protectedArg = /^"(.|\n)*"$/.test(arg) ? '___' + arg + '___' : arg;
-		// This same hack is used to prevent yargs from messing with hex values
+		// This same workaround is used to prevent yargs from messing with hex values
 		return /^0x[0-9a-fA-F]+$/.test(protectedArg) ? '___' + protectedArg + '___' : protectedArg;
 	});
 };
@@ -1248,6 +1306,7 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_EXEC' }, err => [19, false])
 				.with({ kind: 'E_OPT_IN_WARNING' }, err => [20, err.msg])
+				.with({ kind: 'E_INVALID_OPTION' }, err => [21, err.msg])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 

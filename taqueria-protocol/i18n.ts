@@ -25,6 +25,8 @@ export default async (): Promise<i18n> => {
 						'optInDesc': 'Opt-in to sharing anonymous usage analytics',
 						'optOutDesc': 'Opt-out of sharing anonymous usage analytics',
 						'initPathDesc': 'Path to your project directory',
+						'workflowDesc':
+							'Select a workflow to initialize your Taqueria project. Choices are (ligo|smartpy|archetype|michelson)',
 						'scaffoldDesc': 'Generate a new project using pre-made scaffold',
 						'scaffoldUrlDesc': 'Alias or Url for the scaffold project',
 						'scaffoldProjectDirDesc': 'Path where to create the new project. This must be a new directory.',
