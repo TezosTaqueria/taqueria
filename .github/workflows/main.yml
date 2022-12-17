@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DENO_DIR: '~/.deno'
+  DENO_DIR: '~/deno'
   DENO_VERSION: '1.23.1'
 
 jobs:
