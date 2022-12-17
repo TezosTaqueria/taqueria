@@ -19,30 +19,6 @@ describe('E2E Testing for ligo plugin', () => {
 		await cleanup();
 	});
 
-	// DEMONSTRATION OF https://github.com/ecadlabs/taqueria/issues/1635
-	test('bug - ligo plugin compile will only give contextual help in stderr', async () => {
-		const { execute, spawn, cleanup } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
-		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
-		expect(stdout).toContain('Plugin installed successfully');
-
-		// provide --help parameter
-		const { stdout: stdout1 } = await execute('taq', 'compile --help', './test-project');
-
-		// displays default help, not contextual help
-		expect(stdout1).toContain('taq [command]');
-
-		// fail to provide enough parameters
-		const { stderr: stderr1 } = await execute('taq', 'compile', './test-project');
-
-		// invokes stderr to display contextual help
-		expect(stderr1).toContain('Compile a smart contract written in a LIGO syntax to Michelson code, along with');
-		expect(stderr1).toContain('Not enough non-option arguments: got 0, need at least 1');
-
-		await cleanup();
-	});
-
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
 	test.skip('1635 - ligo plugin compile will show contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
