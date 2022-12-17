@@ -47,6 +47,8 @@ const getSmartpyVersion = (): string => {
 
 const getPathToSmartPyCliDir = (): string => `${process.env.HOME}/smartpy-cli-${getSmartpyVersion()}`;
 
+export const getSmartPyCli = (): string => `${getPathToSmartPyCliDir()}/SmartPy.sh`;
+
 const getSmartPyInstallerCmd = (): string => {
 	const installer = '~/SmartPyCliInstaller.sh';
 	const download = `curl -s ${smartpyVersionToInstallerMap[getSmartpyVersion()]} > ${installer};`;
@@ -54,8 +56,6 @@ const getSmartPyInstallerCmd = (): string => {
 	const clean = `rm ${installer};`;
 	return download + install + clean;
 };
-
-export const getSmartPyCli = (): string => `${getPathToSmartPyCliDir()}/SmartPy.sh`;
 
 export const addPyExtensionIfMissing = (sourceFile: string): string =>
 	/\.py$/.test(sourceFile) ? sourceFile : `${sourceFile}.py`;
