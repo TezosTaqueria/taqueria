@@ -52,7 +52,8 @@ jobs:
 
       - uses: actions/cache@v3
         with:
-          path: ~/${{ env.DENO_DIR }}
+          path: |
+            ~/${{ env.DENO_DIR }}
           key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
       
       - uses: actions/setup-node@v3
