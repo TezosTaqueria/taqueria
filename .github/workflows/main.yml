@@ -21,7 +21,7 @@ concurrency:
 
 env:
   DENO_DIR: "deno"
-  DENO_VERSION: '1.23.1'
+  # DENO_VERSION: '1.23.1'
 
 jobs:
   # When we use reusable we lose the ability to to filter out the workflow for changes to certain paths.
@@ -65,7 +65,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-       include:
+        deno_version:
+          - '1.23.1'
+          - '1.29.1'
+        include:
          - os: ubuntu-latest
            os_short: ubuntu
            deno_target: "x86_64-unknown-linux-gnu"
@@ -95,7 +98,7 @@ jobs:
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: "${{ env.DENO_VERSION }}"
+          deno-version: "${{ matrix.deno_version }}"
       
       # TODO: Remove after debug
       - run: deno info
@@ -189,6 +192,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, ecad-macmini]
+        deno_version:
+          - '1.23.1'
+          - '1.29.1'
         chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
         include:
         - os: ubuntu-latest
@@ -225,7 +231,7 @@ jobs:
 
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: "${{ env.DENO_VERSION }}"
+          deno-version: "${{ env.deno_version }}"
 
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
