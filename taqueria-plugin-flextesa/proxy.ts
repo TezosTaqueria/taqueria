@@ -1,7 +1,9 @@
 import {
 	execCmd,
 	getArch,
+	getDefaultSandboxAccount,
 	getDockerImage,
+	NonEmptyString,
 	noop,
 	readJsonFile,
 	sendAsyncErr,
@@ -175,12 +177,14 @@ const getBakingFlags = (sandbox: SandboxConfig.t) =>
 			else if (settings.baking === 'disabled') {
 				return [
 					'--no-baking',
+					`--time-b 1`,
 				];
 			}
 
 			// Auto
 			return [
 				'--no-baking',
+				`--time-b 1`,
 			];
 		});
 
@@ -195,6 +199,7 @@ const getMininetCommand = (sandboxName: string, sandbox: SandboxConfig.t, opts: 
 			'--set-history-mode N000:archive', // TODO: Add annotation for this setting
 			'--until-level 200_000_000', // TODO: Add annotation for this setting
 			`--protocol-kind ${PROTOCOL_NAME}`,
+			`--number-of-b 1`,
 			...accountFlags,
 			...bakingFlags,
 		])
@@ -222,7 +227,6 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 const startMininet = async (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) => {
 	const containerName = await getContainerName(opts);
 	const mininetCmd = await getMininetCommand(sandboxName, sandbox, opts);
-	sendErr(mininetCmd);
 	return execCmd(`docker exec -d ${containerName} ${mininetCmd}`);
 };
 
@@ -248,6 +252,7 @@ const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: Valid
 		})
 		.then(execCmd)
 		.then(() => importSandboxAccounts(opts))
+		.then(() => importBaker(opts))
 		.then(() => startMininet(sandboxName, sandbox, opts))
 		.then(() => configureTezosClient(sandboxName, opts))
 		.then(() => {
@@ -305,6 +310,13 @@ const configureTezosClient = (sandboxName: string, opts: ValidOpts): Promise<Std
 					return ({ stderr, stdout });
 				}),
 	);
+
+const importBaker = (opts: ValidOpts) =>
+	getContainerName(opts)
+		.then(container =>
+			`docker exec ${container} octez-client import secret key b0 unencrypted:edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx`
+		)
+		.then(execCmd);
 
 const startAll = (opts: ValidOpts): Promise<void> => {
 	if (opts.config.sandbox === undefined) return sendAsyncErr('No sandboxes configured to start');
@@ -442,6 +454,12 @@ const stopTzKtContainers = async (
 	}
 };
 
+const bake = (parsedArgs: ValidOpts) =>
+	getContainerName(parsedArgs)
+		.then(containerName => {
+			return spawnCmd(`docker exec ${containerName} octez-client bake for b0`).then(noop);
+		});
+
 const instantiateAccounts = (parsedArgs: ValidOpts) =>
 	getContainerName(parsedArgs)
 		.then(containerName =>
@@ -535,7 +553,7 @@ const validateRequest = async (unparsedArgs: Opts) => {
 		return false;
 	}
 
-	if (!unparsedArgs.task || !/list accounts|start sandbox|stop sandbox|monitor/.test(unparsedArgs.task)) {
+	if (!unparsedArgs.task || !/list accounts|start sandbox|stop sandbox|monitor|bake/.test(unparsedArgs.task)) {
 		await sendAsyncErr(`${unparsedArgs.task} is not an understood task by the Flextesa plugin`);
 		return false;
 	}
@@ -568,6 +586,8 @@ export const proxy = (unparsedArgs: Opts): Promise<void> =>
 					return stopSandboxTask(parsedArgs);
 				case 'monitor':
 					return monitor(parsedArgs);
+				case 'bake':
+					return bake(parsedArgs);
 				default:
 					return sendAsyncErr(`${parsedArgs.task} is not an understood task by the Flextesa plugin`);
 			}

@@ -60,6 +60,16 @@ Plugin.create(_i18n => ({
 			handler: 'proxy',
 			encoding: 'none',
 		}),
+
+		Task.create({
+			task: 'bake',
+			command: 'bake <sandboxName>',
+			aliases: [],
+			description: 'Manually bake a block. Use when the "baking" setting of a flextesa sandbox is set to "disabled".',
+			options: [],
+			handler: 'proxy',
+			encoding: 'none',
+		}),
 	],
 	proxy: proxy,
 }), process.argv);
