@@ -10,8 +10,9 @@ import { getRunningContainerNames } from '../pure';
 import * as Util from '../pure';
 import { CachedSandboxState, SandboxState } from './CachedSandboxState';
 import { getSandboxAccounts, getSandboxContracts } from './helpers/SandboxDataHelpers';
+import { getAccountFromTzkt, getSmartContractFromTzkt, TzKTAccountData, TzKTContractData } from './helpers/TzKTFetcher';
 import { ObservableConfig } from './ObservableConfig';
-import { TzKTAccountData, TzKTContractData, TzKtHead } from './SandboxDataModels';
+import { TzKtHead } from './SandboxDataModels';
 import {
 	OperationTreeItem,
 	SandboxChildrenTreeItem,
@@ -263,12 +264,10 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 		try {
 			const sandboxAccounts = getSandboxAccounts(this.observableConfig.currentConfig, element.sandboxName);
-			const tzktAccounts = await Promise.all(sandboxAccounts.map(async account => {
-				const response = await fetch(`${tzktBaseUrl}/v1/accounts/${account.address}`);
-				const data = (await response.json()) as TzKTAccountData;
-				return data;
-			}));
-			return tzktAccounts.length;
+			const tzktAccounts = await Promise.all(
+				sandboxAccounts.map(async account => getAccountFromTzkt(tzktBaseUrl, account)),
+			);
+			return tzktAccounts.filter(notNullish).length;
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
 			return undefined;
@@ -283,18 +282,8 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		try {
 			const sandboxContracts = getSandboxContracts(this.observableConfig.currentConfig, element.sandboxName);
 			const tzktContracts = await Promise.all(
-				sandboxContracts
-					.map(async contract => {
-						const contractAddress = contract.config.address;
-						const response = await fetch(`${tzktBaseUrl}/v1/contracts/${contractAddress}`);
-						if (response.status !== 200) {
-							return;
-						}
-						const data = (await response.json()) as TzKTContractData;
-						return data;
-					}),
+				sandboxContracts.map(async contract => getSmartContractFromTzkt(tzktBaseUrl, contract)),
 			);
-
 			return tzktContracts.filter(notNullish).length;
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
@@ -318,15 +307,21 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 		try {
 			const sandboxAccounts = getSandboxAccounts(this.observableConfig.currentConfig, element.parent.sandboxName);
-			return await Promise.all(sandboxAccounts.map(async account => {
-				const response = await fetch(`${tzktBaseUrl}/v1/accounts/${account.address}`);
-				const data = (await response.json()) as TzKTAccountData;
-				return new SandboxImplicitAccountTreeItem(
-					data.address ?? account.address,
-					data.alias ?? account.alias,
-					element.parent,
-				);
+			const tzktAccounts = await Promise.all(sandboxAccounts.map(async account => {
+				const data = await getAccountFromTzkt(tzktBaseUrl, account);
+				if (!data) return;
+				return {
+					address: data.address ?? account.address,
+					alias: data.alias ?? account.alias,
+				};
 			}));
+			return tzktAccounts.filter(notNullish).map(contract =>
+				new SandboxImplicitAccountTreeItem(
+					contract!.address,
+					contract!.alias,
+					element.parent,
+				)
+			);
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
 			return [];
@@ -347,14 +342,10 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			const tzktContracts = await Promise.all(
 				sandboxContracts
 					.map(async contract => {
-						const contractAddress = contract.config.address;
-						const response = await fetch(`${tzktBaseUrl}/v1/contracts/${contractAddress}`);
-						if (response.status !== 200) {
-							return;
-						}
-						const data = (await response.json()) as TzKTContractData;
+						const data = await getSmartContractFromTzkt(tzktBaseUrl, contract);
+						if (!data) return;
 						return {
-							address: data.address ?? contractAddress,
+							address: data.address ?? contract.config.address,
 							alias: data.alias ?? contract.alias,
 						};
 					}),
@@ -371,18 +362,6 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			this.helper.logAllNestedErrors(e, true);
 			return [];
 		}
-	}
-
-	static builtInContracts = [
-		'KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5',
-		'KT1AafHA1C1vk959wvHWBispY9Y2f3fxBUUo',
-		'KT1VqarPDicMFn1ejmQqqshUkUXTCTXwmkCN',
-	];
-
-	private filterOutBuiltInContracts(
-		data: { address: string; type: string; kind: string }[],
-	): { address: string; type: string; kind: string }[] {
-		return data.filter(item => SandboxesDataProvider.builtInContracts.indexOf(item.address) === -1);
 	}
 
 	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void> = new vscode

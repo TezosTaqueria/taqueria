@@ -23,16 +23,6 @@ export type TzKtHead = {
 	quoteGbp: number;
 };
 
-export type TzKTAccountData = {
-	address?: string | null;
-	alias?: string | null;
-};
-
-export type TzKTContractData = {
-	address?: string | null;
-	alias?: string | null;
-};
-
 export type SandboxModel = {
 	sandboxName: string;
 	flextesaContainerName: string;
