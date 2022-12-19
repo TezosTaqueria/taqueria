@@ -1,4 +1,4 @@
-import { Plugin, PositionalArg, Task } from '@taqueria/node-sdk';
+import { Option, Plugin, PositionalArg, Task } from '@taqueria/node-sdk';
 import proxy from './proxy';
 
 Plugin.create(_i18n => ({
@@ -59,6 +59,12 @@ Plugin.create(_i18n => ({
 			options: [],
 			handler: 'proxy',
 			encoding: 'none',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'sandboxName',
+					description: 'The name of the sandbox to stop',
+				}),
+			],
 		}),
 
 		Task.create({
@@ -66,9 +72,23 @@ Plugin.create(_i18n => ({
 			command: 'bake <sandboxName>',
 			aliases: [],
 			description: 'Manually bake a block. Use when the "baking" setting of a flextesa sandbox is set to "disabled".',
-			options: [],
+			options: [
+				Option.create({
+					flag: 'watch',
+					shortFlag: 'w',
+					description:
+						'Watch for operations as they are injected into the mempool and bake them as immediate as possible.',
+					boolean: true,
+				}),
+			],
 			handler: 'proxy',
 			encoding: 'none',
+			positionals: [
+				PositionalArg.create({
+					placeholder: 'sandboxName',
+					description: 'The name of the sandbox to stop',
+				}),
+			],
 		}),
 	],
 	proxy: proxy,

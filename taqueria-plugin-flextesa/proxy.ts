@@ -28,6 +28,7 @@ const { Url } = Protocol;
 export interface Opts extends RequestArgs.t {
 	sandboxName?: string;
 	task?: string;
+	watch?: boolean;
 }
 
 export interface ValidLoadedConfig extends LoadedConfig.t {
@@ -39,6 +40,7 @@ export interface ValidOpts extends RequestArgs.t {
 	sandboxName: string;
 	task: string;
 	config: ValidLoadedConfig;
+	watch?: boolean;
 }
 
 /*** @int ***/
@@ -200,6 +202,7 @@ const getMininetCommand = (sandboxName: string, sandbox: SandboxConfig.t, opts: 
 			'--until-level 200_000_000', // TODO: Add annotation for this setting
 			`--protocol-kind ${PROTOCOL_NAME}`,
 			`--number-of-b 1`,
+			'--size 1',
 			...accountFlags,
 			...bakingFlags,
 		])
@@ -456,7 +459,26 @@ const stopTzKtContainers = async (
 
 const bake = (parsedArgs: ValidOpts) =>
 	getContainerName(parsedArgs)
-		.then(containerName => {
+		.then(async containerName => {
+			if (parsedArgs.watch) {
+				console.log('Baking on demand as operations are injected.');
+				console.log('Press CTRL-C to stop and exit.');
+				console.log();
+				while (true) {
+					console.log('Waiting for operations to be injected...');
+					while (true) {
+						const { stdout } = await execCmd(
+							`docker exec ${containerName} octez-client rpc get /chains/main/mempool/pending_operations`,
+						);
+						const ops = JSON.parse(stdout);
+						if (Array.isArray(ops.applied) && ops.applied.length > 0) break;
+					}
+
+					await spawnCmd(`docker exec ${containerName} octez-client bake for b0`);
+					noop();
+				}
+			}
+
 			return spawnCmd(`docker exec ${containerName} octez-client bake for b0`).then(noop);
 		});
 
