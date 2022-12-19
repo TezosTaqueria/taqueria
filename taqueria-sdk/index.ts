@@ -41,8 +41,6 @@ import generateName from 'project-name-generator';
 const yargs = require('yargs');
 export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
 
-export type CmdArgEnv = [string, string[], { [key: string]: string }];
-
 export const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
 		mapRej((err: TaqError) => new E_TaqError(err))(f),
@@ -86,12 +84,9 @@ export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, Exe
 		});
 	});
 
-export const spawnCmd = (fullCmd: CmdArgEnv): Promise<number | null> =>
+export const spawnCmd = (cmd: string, envVars: Record<string, string> = {}): Promise<number | null> =>
 	new Promise((resolve, reject) => {
-		const cmd = fullCmd[0];
-		const args = fullCmd[1];
-		const envVars = fullCmd[2];
-		const child = spawn(cmd, args, { env: { ...process.env, ...envVars }, stdio: 'inherit' });
+		const child = spawn(cmd, { env: { ...process.env, ...envVars }, stdio: 'inherit', shell: true });
 		child.on('close', resolve);
 		child.on('error', reject);
 	});
