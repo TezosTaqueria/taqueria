@@ -336,6 +336,7 @@ jobs:
       prerelease: ${{ needs.workflow-setup.outputs.prerelease }}
       deno-version: ${{ needs.vscode-extension.outputs.deno_version }}
     secrets:
+      DENO_HTTP_PROXY: ${{ secrets.DENO_HTTP_PROXY }}
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
       VSCE_PAT: ${{ secrets.VSCE_PAT }} 
