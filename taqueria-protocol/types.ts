@@ -397,7 +397,6 @@ export type SandboxConfig = {
 	label: NonEmptyString;
 	rpcUrl: Url;
 	protocol: EconomicalProtocolHash;
-	attributes?: string | number | boolean;
 	plugin?: Verb;
 
 	// TODO: This causes a type conflict and is not supported
