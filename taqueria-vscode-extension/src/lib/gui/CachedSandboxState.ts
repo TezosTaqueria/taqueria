@@ -5,6 +5,8 @@ import * as rxjs from 'rxjs';
 import * as signalR from '../../../signalr';
 import { VsCodeHelper } from '../helpers';
 import { OutputLevels } from '../LogHelper';
+import { getSandboxAccounts } from './helpers/SandboxDataHelpers';
+import { TzKTAccountData } from './helpers/TzKTFetcher';
 import { ObservableConfig } from './ObservableConfig';
 import { SandboxModel, TzKtHead } from './SandboxDataModels';
 
@@ -88,6 +90,7 @@ export class CachedSandboxState {
 		});
 
 		this.connection.on('head', data => this.onHeadFromTzKt(data));
+		this.connection.on('accounts', payload => this.onAccountsFromTzKt(payload));
 	}
 
 	updateSandboxBaseUrl(): void {
@@ -110,7 +113,15 @@ export class CachedSandboxState {
 		}
 	}
 
+	private onAccountsFromTzKt(data: { type: number; data: TzKTAccountData }): void {
+		this.helper.logHelper.showLog(OutputLevels.debug, JSON.stringify(data));
+		if (data.type === 1) {
+			this.accountsFromTzKt.next(data.data);
+		}
+	}
+
 	headFromTzKt = new rxjs.BehaviorSubject<TzKtHead | undefined>(undefined);
+	accountsFromTzKt = new rxjs.BehaviorSubject<TzKTAccountData | undefined>(undefined);
 
 	async startConnection() {
 		if (!this.connection) {
@@ -119,6 +130,11 @@ export class CachedSandboxState {
 		try {
 			await this.connection.start();
 			await this.connection.invoke('SubscribeToHead');
+			// TODO: make sure to reconnect with new accounts if config.json changes
+			const sandboxAccounts = getSandboxAccounts(this.observableConfig.currentConfig, this.sandboxName);
+			await this.connection.invoke('SubscribeToAccounts', {
+				addresses: sandboxAccounts.map(account => account.address),
+			});
 			this.helper.logHelper.showLog(OutputLevels.debug, 'SignalR Connected');
 		} catch (err) {
 			this.helper.logHelper.showLog(OutputLevels.debug, 'Error while connecting SignalR');

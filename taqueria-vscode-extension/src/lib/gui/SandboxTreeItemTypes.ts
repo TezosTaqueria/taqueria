@@ -85,11 +85,12 @@ export class SandboxChildrenTreeItem extends SandboxTreeItemBase {
 export class SandboxImplicitAccountTreeItem extends SandboxTreeItemBase {
 	constructor(
 		public readonly address: string,
-		public readonly alias: string | undefined,
+		public readonly alias: string | undefined | null,
+		public readonly balance: number | undefined | null,
 		public readonly parent: SandboxTreeItem,
 	) {
 		super(alias ?? '', 'implicitAccount', vscode.TreeItemCollapsibleState.Collapsed);
-		this.description = address;
+		this.description = `(${balance ?? 0} ꜩ) ${address}`;
 	}
 }
 

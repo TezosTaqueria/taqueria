@@ -4,6 +4,7 @@ import { SandboxAccount, SandboxContract } from './SandboxDataHelpers';
 export type TzKTAccountData = {
 	address?: string | null;
 	alias?: string | null;
+	balance?: number | null; // int64
 };
 
 export type TzKTContractData = {

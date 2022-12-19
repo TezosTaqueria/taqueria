@@ -311,6 +311,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				const data = await getAccountFromTzkt(tzktBaseUrl, account);
 				if (!data) return;
 				return {
+					...data,
 					address: data.address ?? account.address,
 					alias: data.alias ?? account.alias,
 				};
@@ -319,6 +320,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				new SandboxImplicitAccountTreeItem(
 					contract!.address,
 					contract!.alias,
+					contract!.balance,
 					element.parent,
 				)
 			);
