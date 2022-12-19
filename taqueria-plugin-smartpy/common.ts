@@ -36,7 +36,9 @@ const getSmartpyVersion = (): string => {
 			return userDefinedSmartpyVersion;
 		} else {
 			sendWarn(
-				`Version ${userDefinedSmartpyVersion} is not supported by Taqueria yet. Will default to ${SMARTPY_DEFAULT_VERSION}`,
+				`Version ${userDefinedSmartpyVersion} is not supported by Taqueria yet. The supported versions are [${
+					Object.keys(smartpyVersionToInstallerMap)
+				}]. Will default to ${SMARTPY_DEFAULT_VERSION}`,
 			);
 			return SMARTPY_DEFAULT_VERSION;
 		}
