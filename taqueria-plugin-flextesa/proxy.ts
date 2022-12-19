@@ -55,12 +55,8 @@ type FlextesaBakingDisabled = {
 	baking: 'disabled';
 };
 
-type FlextesaBakingAuto = {
-	baking: 'auto';
-};
-
 // Assigned to SandboxConfig->annotations
-type FlextesaAnnotations = FlextesaBakingEnabled | FlextesaBakingDisabled | FlextesaBakingAuto;
+type FlextesaAnnotations = FlextesaBakingEnabled | FlextesaBakingDisabled;
 
 const ECAD_FLEXTESA_IMAGE_ENV_VAR = 'TAQ_ECAD_FLEXTESA_IMAGE';
 const PROTOCOL_IDENTIFIER = 'PtKathmankSp';
@@ -134,9 +130,9 @@ const getFlextesaAnnotations = (sandbox: SandboxConfig.t): Promise<FlextesaAnnot
 		...sandbox.annotations,
 	};
 
-	if (!['enabled', 'disabled', 'auto'].includes(settings.baking)) {
+	if (!['enabled', 'disabled'].includes(settings.baking)) {
 		return Promise.reject(
-			'The "baking" setting of a Flextesa Sandbox must to set to either "enabled", "disabled", or "auto".',
+			'The "baking" setting of a Flextesa Sandbox must to set to either "enabled" or "disabled".',
 		);
 	} else if (!Number.isInteger(settings.block_time)) {
 		return Promise.reject(
