@@ -19,6 +19,7 @@ Plugin.create(_i18n => ({
 					description: 'The name of the sandbox to start',
 				}),
 			],
+			encoding: 'none',
 		}),
 		Task.create({
 			task: 'stop sandbox',

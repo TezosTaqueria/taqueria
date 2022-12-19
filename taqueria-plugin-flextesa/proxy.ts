@@ -39,6 +39,25 @@ export interface ValidOpts extends RequestArgs.t {
 	config: ValidLoadedConfig;
 }
 
+/*** @int ***/
+type BlockTime = number;
+
+type FlextesaBakingEnabled = {
+	baking: 'enabled';
+	block_time?: BlockTime;
+};
+
+type FlextesaBakingDisabled = {
+	baking: 'disabled';
+};
+
+type FlextesaBakingAuto = {
+	baking: 'auto';
+};
+
+// Assigned to SandboxConfig->annotations
+type FlextesaAnnotations = FlextesaBakingEnabled | FlextesaBakingDisabled | FlextesaBakingAuto;
+
 const ECAD_FLEXTESA_IMAGE_ENV_VAR = 'TAQ_ECAD_FLEXTESA_IMAGE';
 const PROTOCOL_IDENTIFIER = 'PtKathmankSp';
 const PROTOCOL_NAME = 'Kathmandu';
@@ -95,6 +114,92 @@ export const updateConfig = async (opts: ValidOpts, update: (config: RawConfig) 
 	return config;
 };
 
+// TODO: We should adjust our plugins to have a types.ts file just like the taqueria-protocol, and
+// have our code generator generate type modules that use Zod schemas.
+//
+// We can then use those modules to parse things like annotations into plugin-specifc types
+// For now, I'll do things the old-fashioned way and just manually validate the annotations
+const getFlextesaAnnotations = (sandbox: SandboxConfig.t): Promise<FlextesaAnnotations> => {
+	const defaults = {
+		baking: 'enabled',
+		block_time: 5,
+	};
+
+	const settings = {
+		...defaults,
+		...sandbox.annotations,
+	};
+
+	if (!['enabled', 'disabled', 'auto'].includes(settings.baking)) {
+		return Promise.reject(
+			'The "baking" setting of a Flextesa Sandbox must to set to either "enabled", "disabled", or "auto".',
+		);
+	} else if (!Number.isInteger(settings.block_time)) {
+		return Promise.reject(
+			'The "block_time" setting of a Flextesa Sandbox must be an integer, and set to a value greater than 0.',
+		);
+	} else if (settings.block_time <= 0) {
+		return Promise.reject(
+			'The "block_time" setting of a Flextesa Sandbox must be set to a value greater than 0. If you are trying to disable baking, please set the "baking" setting to "disabled" instead.',
+		);
+	}
+
+	return Promise.resolve(settings as FlextesaAnnotations);
+};
+
+const getAccountFlags = (sandbox: SandboxConfig.t, config: ValidLoadedConfig) =>
+	Object.entries(sandbox.accounts ?? {}).reduce(
+		(retval, [accountName, accountDetails], _index, _) => {
+			if (accountName === 'default') return retval;
+			const desiredBalance = config.accounts[accountName];
+			const account = accountDetails as SandboxAccountConfig.t;
+			return [
+				...retval,
+				`--add-bootstrap-account "${accountName},${account.encryptedKey},${account.publicKeyHash},${account.secretKey}@${desiredBalance}"`,
+				`--no-daemons-for=${accountName}`,
+			];
+		},
+		[] as string[],
+	);
+
+const getBakingFlags = (sandbox: SandboxConfig.t) =>
+	getFlextesaAnnotations(sandbox)
+		.then(settings => {
+			// Enabled
+			if (settings.baking === 'enabled') {
+				return [
+					'--number-of-b 1',
+					`--time-b ${settings.block_time}`,
+				];
+			} // Disabled
+			else if (settings.baking === 'disabled') {
+				return [
+					'--no-baking',
+				];
+			}
+
+			// Auto
+			return [
+				'--no-baking',
+			];
+		});
+
+const getMininetCommand = (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) =>
+	Promise.all([
+		getAccountFlags(sandbox, opts.config),
+		getBakingFlags(sandbox),
+	])
+		.then(([accountFlags, bakingFlags]) => [
+			'flextesa mini-net',
+			'--root /tmp/mini-box',
+			'--set-history-mode N000:archive', // TODO: Add annotation for this setting
+			'--until-level 200_000_000', // TODO: Add annotation for this setting
+			`--protocol-kind ${PROTOCOL_NAME}`,
+			...accountFlags,
+			...bakingFlags,
+		])
+		.then(flags => flags.join(' '));
+
 const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) => {
 	const port = new URL(sandbox.rpcUrl).port;
 	const newPort = (await getNewPortIfPortInUse(parseInt(port))).toString();
@@ -104,15 +209,21 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 		);
 		await replaceRpcUrlInConfig(newPort, sandbox.rpcUrl.toString(), sandboxName, opts);
 	}
-	const ports = opts.debug ? `-p ${newPort}:20000 -p 9229:9229 --expose 9229` : `-p ${newPort}:20000`;
+	const ports = `-p ${newPort}:20000`;
 
 	const containerName = await getContainerName(opts);
 	const arch = await getArch();
 	const image = getDockerImage(getDefaultDockerImage(opts), ECAD_FLEXTESA_IMAGE_ENV_VAR);
 	const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir;
-	const script = `${PROTOCOL_NAME.toLowerCase()}box`;
 
-	return `docker run --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} ${script} start`;
+	return `docker run -i --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} /bin/sh`;
+};
+
+const startMininet = async (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) => {
+	const containerName = await getContainerName(opts);
+	const mininetCmd = await getMininetCommand(sandboxName, sandbox, opts);
+	sendErr(mininetCmd);
+	return execCmd(`docker exec -d ${containerName} ${mininetCmd}`);
 };
 
 const getConfigureCommand = async (opts: ValidOpts): Promise<string> => {
@@ -129,22 +240,18 @@ const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: Valid
 		return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`);
 	}
 
-	return getStartCommand(sandboxName, sandbox, opts)
-		.then(cmd => {
+	return Promise.resolve(opts)
+		.then(addSandboxAccounts)
+		.then(() => {
 			console.log('Booting sandbox...');
-			return execCmd(cmd);
+			return getStartCommand(sandboxName, sandbox, opts);
 		})
+		.then(execCmd)
+		.then(() => importSandboxAccounts(opts))
+		.then(() => startMininet(sandboxName, sandbox, opts))
+		.then(() => configureTezosClient(sandboxName, opts))
 		.then(() => {
-			console.log('Configuring sandbox...');
-			return configureTezosClient(sandboxName, opts);
-		})
-		.then(({ stderr }) => {
-			if (stderr.length) sendErr(stderr);
-			console.log('Adding accounts...');
-			return addSandboxAccounts(opts);
-		})
-		.then(() => {
-			sendAsyncRes(`Started ${sandboxName}.`);
+			console.log('Sandbox started');
 		});
 };
 
@@ -400,22 +507,13 @@ const importSandboxAccounts = (parsedArgs: ValidOpts) =>
 				)
 			);
 
-const addSandboxAccounts = (parsedArgs: ValidOpts) => {
-	maybeInstantiateAccounts(parsedArgs)
-		.then(importSandboxAccounts(parsedArgs));
-};
+const addSandboxAccounts = (parsedArgs: ValidOpts) => maybeInstantiateAccounts(parsedArgs);
 
 const monitor = (parsedArgs: ValidOpts): Promise<void> => {
 	const sandbox = getSandbox(parsedArgs);
 	if (sandbox) {
 		return getContainerName(parsedArgs)
-			.then(container =>
-				spawnCmd([
-					`docker`,
-					['exec', container, 'octez-client', 'rpc', 'get', '/monitor/valid_blocks'],
-					{},
-				])
-			)
+			.then(container => spawnCmd(`docker exec ${container} octez-client rpc get /monitor/valid_blocks`))
 			.then(() => {});
 	} else return sendAsyncErr('Please specify the name of a sandbox to monitor.');
 };
