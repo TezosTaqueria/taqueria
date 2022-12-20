@@ -11,7 +11,6 @@
 		"build-types": "npm run build-types -w taqueria-protocol",
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
-		"build:docker": "lerna run build-docker",
 		"build:packages": "lerna run build",
 		"deploy": "lerna version --no-push --no-git-tag-version --no-private",
 		"parse-readme-template": "ts-node ./parse-readme-template.ts",

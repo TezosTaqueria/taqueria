@@ -1,6 +1,7 @@
 import { getArch, SandboxConfig } from '@taqueria/node-sdk';
 import { Config as RawConfig } from '@taqueria/protocol/types';
-import { getContainerName, getNewPortIfPortInUse, getUniqueSandboxName, updateConfig, ValidOpts } from './proxy';
+import { getContainerName, getNewPortIfPortInUse, getUniqueSandboxName, updateConfig } from './proxy';
+import { ValidOpts } from './types';
 
 const getTzKtDockerImages = (opts: ValidOpts) => ({
 	postgres: `postgres:14.5-alpine`,

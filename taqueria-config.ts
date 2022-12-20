@@ -34,7 +34,6 @@ export const defaultConfig: Config.t = Config.create({
 	sandbox: {
 		local: {
 			label: 'Local Tezos Sandbox',
-			protocol: 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg',
 			rpcUrl: 'http://localhost:20000',
 		},
 	},
@@ -49,7 +48,6 @@ export const defaultConfig: Config.t = Config.create({
 		ghostnet: {
 			label: 'ghostnet',
 			rpcUrl: 'https://ghostnet.ecadinfra.com',
-			protocol: 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg',
 		},
 	},
 });

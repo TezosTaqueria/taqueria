@@ -14,9 +14,8 @@ import {
 	stringToSHA256,
 	writeJsonFile,
 } from '@taqueria/node-sdk';
-import { Config, RequestArgs } from '@taqueria/node-sdk';
+import { Config } from '@taqueria/node-sdk';
 import { LoadedConfig, Protocol, SandboxAccountConfig, SandboxConfig, StdIO } from '@taqueria/node-sdk/types';
-import { SanitizedArgs, TaqError } from '@taqueria/protocol/taqueria-protocol-types';
 import { Config as RawConfig } from '@taqueria/protocol/types';
 import retry from 'async-retry';
 import type { ExecException } from 'child_process';
@@ -25,44 +24,8 @@ import { getTzKtContainerNames, getTzKtStartCommands } from './tzkt-manager';
 
 const { Url } = Protocol;
 
-export interface Opts extends RequestArgs.t {
-	sandboxName?: string;
-	task?: string;
-	watch?: boolean;
-}
-
-export interface ValidLoadedConfig extends LoadedConfig.t {
-	sandbox: Record<string, SandboxConfig.t>;
-	accounts: Record<string, Protocol.Tz.t>;
-}
-
-export interface ValidOpts extends RequestArgs.t {
-	sandboxName: string;
-	task: string;
-	config: ValidLoadedConfig;
-	watch?: boolean;
-}
-
-/*** @int ***/
-type BlockTime = number;
-
-type FlextesaBakingEnabled = {
-	baking: 'enabled';
-	block_time?: BlockTime;
-};
-
-type FlextesaBakingDisabled = {
-	baking: 'disabled';
-};
-
-// Assigned to SandboxConfig->annotations
-type FlextesaAnnotations = FlextesaBakingEnabled | FlextesaBakingDisabled;
-
-const ECAD_FLEXTESA_IMAGE_ENV_VAR = 'TAQ_ECAD_FLEXTESA_IMAGE';
-const PROTOCOL_IDENTIFIER = 'PtKathmankSp';
-const PROTOCOL_NAME = 'Kathmandu';
-
-const getDefaultDockerImage = (opts: ValidOpts) => `oxheadalpha/flextesa:20221026`;
+import { getImage } from './docker';
+import type { FlextesaAnnotations, Opts, ValidLoadedConfig, ValidOpts } from './types';
 
 // ATTENTION: There is a duplicate of this function in taqueria-vscode-extension/src/lib/gui/SandboxesDataProvider.ts
 // Please make sure the two are kept in-sync
@@ -196,8 +159,8 @@ const getMininetCommand = (sandboxName: string, sandbox: SandboxConfig.t, opts: 
 			'--root /tmp/mini-box',
 			'--set-history-mode N000:archive', // TODO: Add annotation for this setting
 			'--until-level 200_000_000', // TODO: Add annotation for this setting
-			`--protocol-kind ${PROTOCOL_NAME}`,
 			`--number-of-b 1`,
+			`--protocol-hash=${sandbox.protocol ?? 'ProtoALphaALphaALphaALphaALphaALphaALphaALphaDdp3zK'}`,
 			'--size 1',
 			...accountFlags,
 			...bakingFlags,
@@ -217,7 +180,7 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 
 	const containerName = await getContainerName(opts);
 	const arch = await getArch();
-	const image = getDockerImage(getDefaultDockerImage(opts), ECAD_FLEXTESA_IMAGE_ENV_VAR);
+	const image = getImage(opts);
 	const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir;
 
 	return `docker run -i --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} /bin/sh`;
@@ -245,14 +208,19 @@ const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: Valid
 
 	return Promise.resolve(opts)
 		.then(addSandboxAccounts)
-		.then(() => {
+		.then(loadedConfig => {
 			console.log('Booting sandbox...');
-			return getStartCommand(sandboxName, sandbox, opts);
+			return getStartCommand(sandboxName, sandbox, opts).then(execCmd)
+				.then(() => {
+					console.log('Importing accounts...');
+					return importSandboxAccounts(opts)(loadedConfig);
+				});
 		})
-		.then(execCmd)
-		.then(() => importSandboxAccounts(opts))
 		.then(() => importBaker(opts))
-		.then(() => startMininet(sandboxName, sandbox, opts))
+		.then(() => {
+			console.log('Starting node...');
+			return startMininet(sandboxName, sandbox, opts);
+		})
 		.then(() => configureTezosClient(sandboxName, opts))
 		.then(() => {
 			console.log('Sandbox started');
@@ -453,7 +421,15 @@ const stopTzKtContainers = async (
 	}
 };
 
-const bake = (parsedArgs: ValidOpts) =>
+const listProtocolsTask = (parsedArgs: Opts) => {
+	const image = getImage(parsedArgs);
+	const cmd = `docker run --rm ${image} octez-client -M mockup list mockup protocols 2>/dev/null`;
+	return execCmd(cmd)
+		.then(({ stdout }) => stdout.trim().split('\n').map(hash => ({ 'protocols': hash })))
+		.then(sendJsonRes);
+};
+
+const bakeTask = (parsedArgs: ValidOpts) =>
 	getContainerName(parsedArgs)
 		.then(async containerName => {
 			if (parsedArgs.watch) {
@@ -536,7 +512,7 @@ const importSandboxAccounts = (parsedArgs: ValidOpts) =>
 								typeof account === 'string'
 									? noop()
 									: execCmd(
-										`docker exec ${containerName} octez-client --protocol ${PROTOCOL_IDENTIFIER} import secret key ${accountName} ${account.secretKey} --force | tee /tmp/import-key.log`,
+										`docker exec ${containerName} octez-client import secret key ${accountName} ${account.secretKey} --force | tee /tmp/import-key.log`,
 									).then(noop)
 							),
 					Promise.resolve(noop()),
@@ -545,17 +521,20 @@ const importSandboxAccounts = (parsedArgs: ValidOpts) =>
 
 const addSandboxAccounts = (parsedArgs: ValidOpts) => maybeInstantiateAccounts(parsedArgs);
 
-const monitor = (parsedArgs: ValidOpts): Promise<void> => {
-	const sandbox = getSandbox(parsedArgs);
-	if (sandbox) {
-		return getContainerName(parsedArgs)
-			.then(container => spawnCmd(`docker exec ${container} octez-client rpc get /monitor/valid_blocks`))
-			.then(() => {});
-	} else return sendAsyncErr('Please specify the name of a sandbox to monitor.');
-};
-
 const getDefaultSandboxName = (parsedArgs: Opts) => {
 	return Object.keys(parsedArgs.config.sandbox ?? {}).shift() ?? 'local';
+};
+
+const taskMap: Record<string, (opts: ValidOpts) => Promise<void>> = {
+	'list accounts': listAccountsTask,
+	'show protocols': listProtocolsTask,
+	'list protocols': listProtocolsTask,
+	'start sandbox': startSandboxTask,
+	'start flextesa': startSandboxTask,
+	'stop sandbox': stopSandboxTask,
+	'stop flextesa': stopSandboxTask,
+	'bake': bakeTask,
+	'b': bakeTask,
 };
 
 const validateRequest = async (unparsedArgs: Opts) => {
@@ -571,7 +550,7 @@ const validateRequest = async (unparsedArgs: Opts) => {
 		return false;
 	}
 
-	if (!unparsedArgs.task || !/list accounts|start sandbox|stop sandbox|monitor|bake/.test(unparsedArgs.task)) {
+	if (!unparsedArgs.task || !Object.keys(taskMap).includes(unparsedArgs.task)) {
 		await sendAsyncErr(`${unparsedArgs.task} is not an understood task by the Flextesa plugin`);
 		return false;
 	}
@@ -590,26 +569,16 @@ const validateRequest = async (unparsedArgs: Opts) => {
 	return true;
 };
 
-export const proxy = (unparsedArgs: Opts): Promise<void> =>
-	validateRequest(unparsedArgs).then(success => {
-		if (success) {
-			const parsedArgs = unparsedArgs as ValidOpts;
-
-			switch (parsedArgs.task) {
-				case 'list accounts':
-					return listAccountsTask(parsedArgs);
-				case 'start sandbox':
-					return startSandboxTask(parsedArgs);
-				case 'stop sandbox':
-					return stopSandboxTask(parsedArgs);
-				case 'monitor':
-					return monitor(parsedArgs);
-				case 'bake':
-					return bake(parsedArgs);
-				default:
-					return sendAsyncErr(`${parsedArgs.task} is not an understood task by the Flextesa plugin`);
+export const proxy = (unparsedArgs: Opts): Promise<void> => {
+	if (unparsedArgs.task && (unparsedArgs.task == 'list protocols' || unparsedArgs.task === 'show protocols')) {
+		return listProtocolsTask(unparsedArgs);
+	} else {
+		return validateRequest(unparsedArgs).then(success => {
+			if (success) {
+				const parsedArgs = unparsedArgs as ValidOpts;
+				return taskMap[parsedArgs.task](parsedArgs);
 			}
-		}
-	});
-
+		});
+	}
+};
 export default proxy;

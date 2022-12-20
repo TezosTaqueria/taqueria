@@ -376,7 +376,6 @@ export type MetadataConfig = {
 export type NetworkConfig = {
 	label: HumanReadableIdentifier;
 	rpcUrl: Url;
-	protocol: EconomicalProtocolHash;
 	accounts?: Record<string, NetworkAccountConfig>;
 	faucet?: Faucet;
 };
@@ -396,7 +395,7 @@ export type SandboxAccountConfig = {
 export type SandboxConfig = {
 	label: NonEmptyString;
 	rpcUrl: Url;
-	protocol: EconomicalProtocolHash;
+	protocol?: EconomicalProtocolHash;
 	plugin?: Verb;
 
 	// TODO: This causes a type conflict and is not supported

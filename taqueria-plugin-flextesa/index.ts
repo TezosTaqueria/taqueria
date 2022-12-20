@@ -50,27 +50,10 @@ Plugin.create(_i18n => ({
 			],
 			encoding: 'json',
 		}),
-
-		Task.create({
-			task: 'monitor',
-			command: 'monitor <sandboxName>',
-			aliases: [],
-			description: 'Monitor baked blocks for a particular sandbox',
-			options: [],
-			handler: 'proxy',
-			encoding: 'none',
-			positionals: [
-				PositionalArg.create({
-					placeholder: 'sandboxName',
-					description: 'The name of the sandbox to stop',
-				}),
-			],
-		}),
-
 		Task.create({
 			task: 'bake',
 			command: 'bake <sandboxName>',
-			aliases: [],
+			aliases: ['b'],
 			description: 'Manually bake a block. Use when the "baking" setting of a flextesa sandbox is set to "disabled".',
 			options: [
 				Option.create({
@@ -89,6 +72,15 @@ Plugin.create(_i18n => ({
 					description: 'The name of the sandbox to stop',
 				}),
 			],
+		}),
+		Task.create({
+			task: 'show protocols',
+			command: 'show protocols',
+			aliases: ['list protocols'],
+			description: 'List protocols understood by this version of Flextesa',
+			options: [],
+			handler: 'proxy',
+			encoding: 'json',
 		}),
 	],
 	proxy: proxy,
