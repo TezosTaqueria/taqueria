@@ -16,8 +16,6 @@ on:
         required: true
       VSCE_PAT:
         required: true
-      DENO_HTTP_PROXY:
-        required: true
     outputs:
       vsixGcsUrl:
         description: "The download URL for the VSIX artifact in GCS"
@@ -68,9 +66,6 @@ jobs:
       - run: npm ci
 
       - name: Build all
-        env:
-          HTTP_PROXY: ${{ secrets.DENO_HTTP_PROXY }}
-          HTTPS_PROXY: ${{ secrets.DENO_HTTP_PROXY }}
         run: |
           npm run build-types
           npm run build:packages

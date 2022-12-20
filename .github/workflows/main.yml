@@ -100,9 +100,6 @@ jobs:
       - name: Build the binary for ${{ matrix.os }}
         id: build-bin
         shell: bash
-        env:
-          HTTP_PROXY: ${{ secrets.DENO_HTTP_PROXY }}
-          HTTPS_PROXY: ${{ secrets.DENO_HTTP_PROXY }}
         run: |
           BUILD=`git rev-parse --short "$GITHUB_SHA"`
           TAQ_VERSION="${TAQ_VERSION/\//-}"
@@ -219,9 +216,6 @@ jobs:
       - run: npm ci
 
       - name: Build all
-        env:
-          HTTP_PROXY: ${{ secrets.DENO_HTTP_PROXY }}
-          HTTPS_PROXY: ${{ secrets.DENO_HTTP_PROXY }}
         run: |
           npm run build-types
           npm run build:packages 
@@ -336,7 +330,6 @@ jobs:
       prerelease: ${{ needs.workflow-setup.outputs.prerelease }}
       deno-version: ${{ needs.vscode-extension.outputs.deno_version }}
     secrets:
-      DENO_HTTP_PROXY: ${{ secrets.DENO_HTTP_PROXY }}
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
       VSCE_PAT: ${{ secrets.VSCE_PAT }} 
