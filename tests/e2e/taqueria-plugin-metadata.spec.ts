@@ -6,16 +6,16 @@ import path from 'path';
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
-	jest.setTimeout(90000);
+	jest.setTimeout(120000);
 
-	test('generate-project-metadata will add a metadata entry to the config.json', async () => {
+	test.only('generate-project-metadata will add a metadata entry to the config.json', async () => {
 		const { execute, spawn, cleanup, ls, writeFile, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-metadata', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const mligo_file = await (await exec(`cat src/test-data/hello-tacos.mligo`)).stdout;
+		const mligo_file = await (await exec(`cat e2e/data/hello-tacos.mligo`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 		const contracts_list = await ls('./test-project/contracts');
 		expect(contracts_list).toContain('hello-tacos.mligo');
@@ -75,7 +75,7 @@ describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-metadata', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const mligo_file = await (await exec(`cat src/test-data/hello-tacos.mligo`)).stdout;
+		const mligo_file = await (await exec(`cat e2e/data/hello-tacos.mligo`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 		const contracts_list = await ls('./test-project/contracts');
 		expect(contracts_list).toContain('hello-tacos.mligo');
@@ -93,7 +93,7 @@ describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout1 } = await execute('taq', 'install @taqueria/plugin-metadata', './test-project');
 		expect(stdout1).toContain('Plugin installed successfully');
 
-		const mligo_file = await (await exec(`cat src/test-data/hello-tacos.mligo`)).stdout;
+		const mligo_file = await (await exec(`cat e2e/data/hello-tacos.mligo`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 		const contracts_list = await ls('./test-project/contracts');
 		expect(contracts_list).toContain('hello-tacos.mligo');
