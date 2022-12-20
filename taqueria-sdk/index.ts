@@ -31,9 +31,10 @@ import { getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
 import { LikeAPromise, pluginDefiner, PluginSchema, StdIO } from './types';
 
-import { importKey } from '@taquito/signer';
+import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit } from '@taquito/taquito';
 import { b58cencode, Prefix, prefix } from '@taquito/utils';
+import * as Bip39 from 'bip39';
 import crypto from 'crypto';
 import generateName from 'project-name-generator';
 
@@ -583,12 +584,21 @@ export const getAccountPrivateKey = async (
 	if (!network.accounts) network.accounts = {};
 
 	if (!network.accounts[account]) {
-		const tezos = await createAddress(Protocol.NetworkConfig.create(network));
+		const mnemonic = Bip39.generateMnemonic();
+		const signer = InMemorySigner.fromMnemonic({ mnemonic });
+		const tezos = new TezosToolkit(network.rpcUrl as string);
+		tezos.setSignerProvider(signer);
+
 		const publicKey = Protocol.NonEmptyString.create(await tezos.signer.publicKey());
 		const publicKeyHash = Protocol.PublicKeyHash.create(await tezos.signer.publicKeyHash());
 		const privateKey = Protocol.NonEmptyString.create(await tezos.signer.secretKey() ?? '');
 		if (!privateKey) return sendAsyncErr('The private key must exist after creating it');
-		network.accounts[account] = Protocol.NetworkAccountConfig.create({ publicKey, publicKeyHash, privateKey });
+		network.accounts[account] = Protocol.NetworkAccountConfig.create({
+			publicKey,
+			publicKeyHash,
+			privateKey,
+			mnemonic,
+		});
 
 		try {
 			await writeJsonFile('./.taq/config.json')(parsedArgs.config);
