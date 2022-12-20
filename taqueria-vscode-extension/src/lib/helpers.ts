@@ -847,10 +847,11 @@ export class VsCodeHelper {
 			if (!shouldOutput(outputLevel, this.logHelper.logLevel)) {
 				return;
 			}
-			let text: string;
+			let text: string | undefined = undefined;
 			if (instanceOfHasToString(err)) {
 				text = err.toString();
-			} else {
+			}
+			if (text === undefined || text === '[object Object]') {
 				text = JSON.stringify(err, undefined, 4);
 			}
 			this.logHelper.logChannel.appendLine(text);
@@ -1267,8 +1268,8 @@ export class VsCodeHelper {
 
 	async updateCommandStates() {
 		await this.observableConfig.loadConfig();
-		const [isTaqReachable, nodeVersion] = await Promise.all([
-			this.isTaqCliReachable(),
+		const [taqVersion, nodeVersion] = await Promise.all([
+			this.getTaqVersion(),
 			Util.getNodeVersion(this.logHelper.showLog),
 		]);
 
@@ -1282,6 +1283,7 @@ export class VsCodeHelper {
 			isNodeVersionValid = !!semver.valid(nodeVersion);
 			nodeMeetsVersionRequirement = semver.gt(nodeVersion, minNodeVersion);
 		}
+		const isTaqReachable = taqVersion !== undefined && taqVersion.length > 0;
 		const systemCheckPassed = isTaqReachable && nodeFound && isNodeVersionValid && nodeMeetsVersionRequirement;
 
 		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taq-cli-reachable', isTaqReachable);
@@ -1304,7 +1306,7 @@ export class VsCodeHelper {
 		if (this.systemCheckTreeView) {
 			this.systemCheckTreeView.title = `${systemCheckPassed ? '✅' : '❌'} System Check`;
 			let message = '';
-			if (isTaqReachable) {
+			if (taqVersion) {
 				message += `✅ Taq CLI: Installed \n`;
 			} else {
 				message += `❌ Taq CLI: Installed (or not in PATH) \n`;
@@ -1690,13 +1692,13 @@ export class VsCodeHelper {
 		}
 	}
 
-	async isTaqCliReachable() {
+	async getTaqVersion(): Promise<string | undefined> {
 		try {
 			const pathToTaq = await this.getTaqBinPath();
-			const checkResult = await Util.checkTaqBinary(pathToTaq, this.i18, this.logHelper.showLog);
-			return checkResult.indexOf('OK') !== -1;
-		} catch {
-			return false;
+			return await Util.checkTaqVersion(pathToTaq, this.i18, this.logHelper.showLog, this);
+		} catch (e) {
+			this.logAllNestedErrors(e);
+			return undefined;
 		}
 	}
 
