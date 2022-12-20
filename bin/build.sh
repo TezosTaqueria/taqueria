@@ -19,7 +19,7 @@ if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
         else
             TARGET_ARG="--target $DENO_TARGET"
         fi
-        deno compile -o taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --setBuild "$BUILD" --setVersion "$TAQ_VERSION" --lock ./deno-lock.json $TARGET_ARG
+        deno compile -o taq --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts --setBuild "$BUILD" --setVersion "$TAQ_VERSION" $TARGET_ARG
     fi
 else
     echo "Usage: ./bin/build.sh"

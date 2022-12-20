@@ -22,7 +22,7 @@
 		"prepare": "husky install",
 		"format": "dprint fmt",
 		"format:check": "dprint check",
-		"update-lock": "deno cache --import-map ./import_map.json --lock ./deno-lock.json --lock-write index.ts"
+		"update-lock": "deno cache --import-map ./import_map.json index.ts"
 	},
 	"repository": {
 		"type": "git",
