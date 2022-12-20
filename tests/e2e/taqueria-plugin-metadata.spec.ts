@@ -55,7 +55,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		});
 	};
 
-	test('metadata plugin should create a contract metadata.json file', async () => {
+	test.skip('metadata plugin should create a contract metadata.json file', async () => {
 		await runCliWithPrompts(`generate-metadata hello-tacos`, [
 			['name', 'test-name'],
 			['description', 'test-description'],
@@ -74,7 +74,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		expect(metadataFileContents).toMatch(/license.*test-license/i);
 	});
 
-	test('metadata plugin should re-create a contract metadata.json using existing values', async () => {
+	test.skip('metadata plugin should re-create a contract metadata.json using existing values', async () => {
 		await runCliWithPrompts(`generate-metadata hello-tacos`, [
 			['name', 'test-name'],
 			['description', 'test-description'],
@@ -101,7 +101,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		expect(metadataFileContents).toMatch(/license.*test-license/i);
 	});
 
-	test('metadata plugin should ask for contract name if not provided', async () => {
+	test.skip('metadata plugin should ask for contract name if not provided', async () => {
 		await runCliWithPrompts(`generate-metadata`, [
 			['contract', 'hello-tacos'],
 			['name', 'test-name'],
@@ -121,7 +121,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		expect(metadataFileContents).toMatch(/license.*test-license/i);
 	});
 
-	test('metadata plugin should previous answers for defaults', async () => {
+	test.skip('metadata plugin should previous answers for defaults', async () => {
 		await runCliWithPrompts(`generate-metadata hello-tacos`, [
 			['name', 'test-name'],
 			['description', 'test-description'],
@@ -148,7 +148,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		expect(metadataFileContents).toMatch(/license.*test-license/i);
 	});
 
-	test('metadata plugin should use other contracts for defaults', async () => {
+	test.skip('metadata plugin should use other contracts for defaults', async () => {
 		await runCliWithPrompts(`generate-metadata hello-tacos`, [
 			['name', 'test-name'],
 			['description', 'test-description'],
@@ -175,7 +175,7 @@ describe('E2E Testing for the taqueria metadata plugin', () => {
 		expect(metadataFileContents).toMatch(/license.*test-license/i);
 	});
 
-	test('metadata plugin should use project metadata for defaults', async () => {
+	test.skip('metadata plugin should use project metadata for defaults', async () => {
 		await runCliWithPrompts(`generate-project-metadata`, [
 			['name', 'project-name'],
 			['description', 'project-description'],
