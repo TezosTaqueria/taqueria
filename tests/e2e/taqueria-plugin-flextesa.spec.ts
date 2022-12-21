@@ -32,13 +32,15 @@ const processes: ChildProcess[] = [];
 
 describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => {
 	beforeAll(async () => {
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true, force: true });
+		try {
+			await fsPromises.rm(taqueriaProjectPath, { recursive: true, force: true });
+		} catch {}
 		await generateTestProject(taqueriaProjectPath, ['flextesa']);
 		// TODO: This can removed after this is resolved:
 		// https://github.com/ecadlabs/taqueria/issues/528
 		try {
 			await exec(`taq -p ${taqueriaProjectPath}`);
-		} catch (_) {}
+		} catch {}
 	});
 
 	// TODO: may add it add later
@@ -54,8 +56,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		});
 
 		// 2. Verify that sandbox has been started and taqueria returns proper message into console
-		expect(sandboxStart.stdout).toContain(`Started ${sandboxName}.`);
-		expect(sandboxStart.stdout).toContain(`Done.`);
+		expect(sandboxStart.stdout).toContain(`${sandboxName} ready.`);
 
 		// 3. Verify that docker container has been started
 		const dockerContainerTest = await getContainerName(sandboxName);
@@ -131,8 +132,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		const sandboxStart = await exec(`taq start sandbox`, { cwd: `./${taqueriaProjectPath}` });
 
 		// 2. Verify that sandbox has been started and taqueria returns proper message into console
-		expect(sandboxStart.stdout).toContain(`Started ${sandboxName}.`);
-		expect(sandboxStart.stdout).toContain(`Done.`);
+		expect(sandboxStart.stdout).toContain(`${sandboxName} ready.`);
 
 		// 3. Verify that docker container has been started
 		const dockerContainerTest = await getContainerName(sandboxName);
@@ -161,7 +161,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		const sandboxStart = await exec(`taq start sandbox ${sandboxName}`, { cwd: `./${taqueriaProjectPath}` });
 
 		// 2. Verify that sandbox has been started and taqueria returns proper message into console
-		expect(sandboxStart.stdout).toContain(`Started ${sandboxName}.`);
+		expect(sandboxStart.stdout).toContain(`${sandboxName} ready.`);
 
 		// 3. Verify that docker container has been started
 		const dockerContainerTest = await getContainerName(sandboxName);
@@ -190,7 +190,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		});
 
 		// 2. Verify that sandbox has been started and taqueria returns proper message into console
-		expect(sandboxStart.stdout).toContain(`Started ${sandboxName}.`);
+		expect(sandboxStart.stdout).toContain(`${sandboxName} ready.`);
 
 		// 3. Verify that docker container has been started
 		const dockerContainerTest = await getContainerName(sandboxName);
