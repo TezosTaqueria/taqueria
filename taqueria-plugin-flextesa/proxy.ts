@@ -223,7 +223,7 @@ const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: Valid
 		})
 		.then(() => configureTezosClient(sandboxName, opts))
 		.then(() => {
-			console.log(`${sandbox} ready.`);
+			console.log(`The sandbox "${sandboxName}" is ready.`);
 		});
 };
 
@@ -326,6 +326,9 @@ const isSandboxRunning = (sandboxName: string, opts: ValidOpts) => {
 };
 
 type AccountBalance = { account: string; balance: string; address: string | undefined };
+
+// TODO - we should run all `octez-client` calls in a single `docker exec` call.
+// That will decrease response latency
 const getAccountBalances = (
 	sandboxName: string,
 	sandbox: SandboxConfig.t,
@@ -454,8 +457,11 @@ const bakeTask = (parsedArgs: ValidOpts) =>
 			return spawnCmd(`docker exec ${containerName} octez-client bake for b0`).then(noop);
 		});
 
-const instantiateAccounts = (parsedArgs: ValidOpts) =>
-	getContainerName(parsedArgs)
+// TODO - we should run all `flextesa key` calls in a single `docker run` call.
+// That will decrease response latency
+const instantiateAccounts = (parsedArgs: ValidOpts) => {
+	console.log('Generating account keys...');
+	return getContainerName(parsedArgs)
 		.then(containerName =>
 			Object.entries(parsedArgs.config.accounts).reduce(
 				(lastConfig, [accountName, _]) =>
@@ -488,6 +494,7 @@ const instantiateAccounts = (parsedArgs: ValidOpts) =>
 				...config,
 			}) as ValidLoadedConfig
 		);
+};
 
 const hasInstantiatedAccounts = (parsedArgs: ValidOpts) => {
 	const sandbox = getValidSandbox(parsedArgs.sandboxName, parsedArgs.config);
@@ -518,7 +525,8 @@ const importSandboxAccounts = (parsedArgs: ValidOpts) =>
 const addSandboxAccounts = (parsedArgs: ValidOpts) => maybeInstantiateAccounts(parsedArgs);
 
 const getDefaultSandboxName = (parsedArgs: Opts) => {
-	return Object.keys(parsedArgs.config.sandbox ?? {}).shift() ?? 'local';
+	const first = Object.keys(parsedArgs.config.sandbox ?? {}).filter(name => name != 'default').shift();
+	return first ?? 'local';
 };
 
 const taskMap: Record<string, (opts: ValidOpts) => Promise<void>> = {
@@ -535,45 +543,42 @@ const taskMap: Record<string, (opts: ValidOpts) => Promise<void>> = {
 
 const validateRequest = async (unparsedArgs: Opts) => {
 	// Validate that we have what we need
+	const origSandboxName = unparsedArgs.sandboxName;
 	const sandboxName = unparsedArgs.sandboxName ?? getDefaultSandboxName(unparsedArgs);
-	const sandbox = getSandbox(unparsedArgs);
+	const modifiedArgs = { ...unparsedArgs, sandboxName: sandboxName };
+	const sandbox = getSandbox(modifiedArgs);
 	if (!sandbox) {
-		await sendAsyncErr(
+		return sendAsyncErr(
 			unparsedArgs.sandboxName
-				? `There is no sandbox called ${unparsedArgs.sandboxName} in your .taq/config.json.`
-				: `No sandbox name was specified. We tried using ${unparsedArgs.sandboxName} but couldn't find a valid sandbox config for a sandbox with that name`,
+				? `There is no sandbox called ${origSandboxName} in your .taq/config.json.`
+				: `No sandbox name was specified. We tried using ${sandboxName} but couldn't find a valid sandbox config for a sandbox with that name`,
 		);
-		return false;
 	}
 
 	if (!unparsedArgs.task || !Object.keys(taskMap).includes(unparsedArgs.task)) {
-		await sendAsyncErr(`${unparsedArgs.task} is not an understood task by the Flextesa plugin`);
-		return false;
+		return await sendAsyncErr(`${unparsedArgs.task} is not an understood task by the Flextesa plugin`);
 	}
 
 	if (doesNotUseFlextesa(sandbox)) {
-		await sendAsyncErr(
+		return sendAsyncErr(
 			`Cannot ${unparsedArgs.task} for ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`,
 		);
-		return false;
 	}
 
-	if (!unparsedArgs.config.accounts) {
-		await sendAsyncErr(`This task required a list of declared accounts in your .taq/config.json.`);
+	if (!unparsedArgs.config.accounts || Object.keys(unparsedArgs.config.accounts).length === 0) {
+		return await sendAsyncErr(`This task required a list of declared accounts in your .taq/config.json.`);
 	}
 
-	return true;
+	return modifiedArgs;
 };
 
 export const proxy = (unparsedArgs: Opts): Promise<void> => {
 	if (unparsedArgs.task && (unparsedArgs.task == 'list protocols' || unparsedArgs.task === 'show protocols')) {
 		return listProtocolsTask(unparsedArgs);
 	} else {
-		return validateRequest(unparsedArgs).then(success => {
-			if (success) {
-				const parsedArgs = unparsedArgs as ValidOpts;
-				return taskMap[parsedArgs.task](parsedArgs);
-			}
+		return validateRequest(unparsedArgs).then(modifiedArgs => {
+			const parsedArgs = modifiedArgs as ValidOpts;
+			return taskMap[parsedArgs.task](parsedArgs);
 		});
 	}
 };

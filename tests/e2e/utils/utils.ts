@@ -56,6 +56,7 @@ export async function getContainerName(dockerName: string): Promise<string> {
 }
 
 export async function getContainerImage(dockerName: string): Promise<string> {
+	debugger;
 	const dockerContainerInfo =
 		(await exec(`docker ps -a --filter "name=taq-flextesa-${dockerName}" --no-trunc | tail -1`)).stdout.split('   ');
 
