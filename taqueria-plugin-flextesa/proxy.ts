@@ -223,7 +223,7 @@ const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: Valid
 		})
 		.then(() => configureTezosClient(sandboxName, opts))
 		.then(() => {
-			console.log('Sandbox started');
+			console.log(`${sandbox} ready.`);
 		});
 };
 
