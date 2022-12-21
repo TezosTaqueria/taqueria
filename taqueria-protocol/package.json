@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.25.16-rc",
+	"version": "0.25.19-rc",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -57,10 +57,10 @@
 		"@peculiar/webcrypto": "^1.4.0",
 		"batching-toposort": "^1.2.0",
 		"fluture": "^14.0.0",
+		"i18next": "^21.8.4",
 		"rambda": "^7.2.1",
 		"rambdax": "^8.1.0",
-		"zod": "^3.17.3",
-		"i18next": "^21.8.4"
+		"zod": "^3.17.3"
 	},
 	"tsup": {
 		"entry": [
