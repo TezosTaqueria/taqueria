@@ -147,6 +147,7 @@ describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 			'interfaces': [
 				'TZIP-016',
 			],
+
 		});
 
 		await cleanup();

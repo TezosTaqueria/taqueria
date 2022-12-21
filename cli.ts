@@ -36,10 +36,10 @@ import {
 import { titleCase } from 'https://deno.land/x/case@2.1.1/mod.ts';
 import { Table } from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts';
 import { identity, pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { has, last, uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
+import { has, last, uniq } from 'https://x.nest.land/ramda@0.27.2/mod.ts';
 import * as Analytics from './analytics.ts';
 import { addContract, listContracts, removeContract } from './contracts.ts';
 import * as NPM from './npm.ts';

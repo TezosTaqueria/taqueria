@@ -100,8 +100,6 @@ jobs:
       - name: Build the binary for ${{ matrix.os }}
         id: build-bin
         shell: bash
-        env:
-          DENO_DIR: "./deno"
         run: |
           BUILD=`git rev-parse --short "$GITHUB_SHA"`
           TAQ_VERSION="${TAQ_VERSION/\//-}"
