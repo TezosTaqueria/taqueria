@@ -136,6 +136,7 @@ const prepContractInfoForDisplay = async (
 };
 
 const originate = async (parsedArgs: Opts): Promise<void> => {
+	debugger;
 	const protocolArgs = RequestArgs.create(parsedArgs);
 	const env = getCurrentEnvironmentConfig(protocolArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);

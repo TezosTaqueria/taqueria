@@ -583,8 +583,8 @@ export const getAccountPrivateKey = async (
 ): Promise<string> => {
 	if (!network.accounts) network.accounts = {};
 
-	if (!network.accounts[account]) {
-		const mnemonic = Bip39.generateMnemonic();
+	if (!network.accounts[account] || !network.accounts[account].privateKey) {
+		const mnemonic = network?.accounts?.[account]?.mnemonic ?? Bip39.generateMnemonic();
 		const signer = InMemorySigner.fromMnemonic({ mnemonic });
 		const tezos = new TezosToolkit(network.rpcUrl as string);
 		tezos.setSignerProvider(signer);
@@ -615,7 +615,9 @@ export const getAccountPrivateKey = async (
 		}
 	}
 
-	return network.accounts[account].privateKey;
+	const privateKey = network.accounts[account].privateKey;
+	if (!privateKey) return sendAsyncErr('The private key must exist after creating it');
+	return privateKey;
 };
 
 export const getDockerImage = (defaultImageName: string, envVarName: string): string =>

@@ -382,9 +382,9 @@ export type NetworkConfig = {
 };
 
 export type NetworkAccountConfig = {
-	publicKey: NonEmptyString;
-	publicKeyHash: PublicKeyHash;
-	privateKey: NonEmptyString; /** TODO: Should this be secretKey: @see {SandboxAccountConfig} */
+	publicKey?: NonEmptyString;
+	publicKeyHash?: PublicKeyHash;
+	privateKey?: NonEmptyString; /** TODO: Should this be secretKey: @see {SandboxAccountConfig} */
 	mnemonic?: NonEmptyString;
 };
 
