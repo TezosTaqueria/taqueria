@@ -525,8 +525,11 @@ const importSandboxAccounts = (parsedArgs: ValidOpts) =>
 const addSandboxAccounts = (parsedArgs: ValidOpts) => maybeInstantiateAccounts(parsedArgs);
 
 const getDefaultSandboxName = (parsedArgs: Opts) => {
-	const first = Object.keys(parsedArgs.config.sandbox ?? {}).filter(name => name != 'default').shift();
-	return first ?? 'local';
+	const env = parsedArgs.config.environment[parsedArgs.env] as Protocol.Environment.t;
+	if (env.sandboxes && env.sandboxes.length > 0) {
+		return env.sandboxes[0];
+	}
+	return undefined;
 };
 
 const taskMap: Record<string, (opts: ValidOpts) => Promise<void>> = {
@@ -551,7 +554,7 @@ const validateRequest = async (unparsedArgs: Opts) => {
 		return sendAsyncErr(
 			unparsedArgs.sandboxName
 				? `There is no sandbox called ${origSandboxName} in your .taq/config.json.`
-				: `No sandbox name was specified. We tried using ${sandboxName} but couldn't find a valid sandbox config for a sandbox with that name`,
+				: `No sandbox name was specified. We couldn't find a valid sandbox config for the current environment.`,
 		);
 	}
 
