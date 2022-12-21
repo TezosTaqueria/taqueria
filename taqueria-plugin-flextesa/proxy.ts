@@ -131,7 +131,6 @@ const getBakingFlags = (sandbox: SandboxConfig.t) =>
 			// Enabled
 			if (settings.baking === 'enabled') {
 				return [
-					'--number-of-b 1',
 					`--time-b ${settings.block_time}`,
 				];
 			} // Disabled
@@ -189,12 +188,13 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 const startMininet = async (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) => {
 	const containerName = await getContainerName(opts);
 	const mininetCmd = await getMininetCommand(sandboxName, sandbox, opts);
-	return execCmd(`docker exec -d ${containerName} ${mininetCmd}`);
+	const cmd = `docker exec -d ${containerName} ${mininetCmd}`;
+	return execCmd(cmd);
 };
 
 const getConfigureCommand = async (opts: ValidOpts): Promise<string> => {
 	const containerName = await getContainerName(opts);
-	return `docker exec ${containerName} octez-client --endpoint http://localhost:20000 config update`;
+	return `docker exec -d ${containerName} octez-client --endpoint http://localhost:20000 config update`;
 };
 
 const doesUseFlextesa = (sandbox: SandboxConfig.t) => !sandbox.plugin || sandbox.plugin === 'flextesa';
@@ -281,7 +281,7 @@ const configureTezosClient = (sandboxName: string, opts: ValidOpts): Promise<Std
 const importBaker = (opts: ValidOpts) =>
 	getContainerName(opts)
 		.then(container =>
-			`docker exec ${container} octez-client import secret key b0 unencrypted:edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx`
+			`docker exec -d ${container} octez-client import secret key b0 unencrypted:edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx`
 		)
 		.then(execCmd);
 
@@ -461,7 +461,7 @@ const instantiateAccounts = (parsedArgs: ValidOpts) =>
 				(lastConfig, [accountName, _]) =>
 					// TODO: This could probably be more performant by generating the key pairs using TS rather than proxy to docker/flextesa
 					lastConfig
-						.then(_ => execCmd(`docker exec ${containerName} flextesa key ${accountName}`))
+						.then(_ => execCmd(`docker run --rm ${getImage(parsedArgs)} flextesa key ${accountName}`))
 						.then(result => result.stdout.trim().split(','))
 						.then(([_alias, encryptedKey, publicKeyHash, secretKey]) =>
 							SandboxAccountConfig.create({
@@ -502,22 +502,18 @@ const maybeInstantiateAccounts = (parsedArgs: ValidOpts) => {
 };
 
 const importSandboxAccounts = (parsedArgs: ValidOpts) =>
-	(updatedConfig: ValidLoadedConfig) =>
-		getContainerName(parsedArgs)
-			.then(containerName =>
-				Object.entries(getValidSandbox(parsedArgs.sandboxName, updatedConfig).accounts ?? {}).reduce(
-					(retval, [accountName, account]) =>
-						retval
-							.then(() =>
-								typeof account === 'string'
-									? noop()
-									: execCmd(
-										`docker exec ${containerName} octez-client import secret key ${accountName} ${account.secretKey} --force | tee /tmp/import-key.log`,
-									).then(noop)
-							),
-					Promise.resolve(noop()),
-				)
-			);
+	async (updatedConfig: ValidLoadedConfig) => {
+		const containerName = await getContainerName(parsedArgs);
+		const cmds = Object.entries(getValidSandbox(parsedArgs.sandboxName, updatedConfig).accounts ?? {}).reduce(
+			(retval, [accountName, account]) =>
+				typeof account === 'string'
+					? retval
+					: [...retval, `octez-client import secret key ${accountName} ${account.secretKey} --force`],
+			[] as string[],
+		);
+
+		await execCmd(`docker exec -d ${containerName} sh -c '${cmds.join(' && ')}'`);
+	};
 
 const addSandboxAccounts = (parsedArgs: ValidOpts) => maybeInstantiateAccounts(parsedArgs);
 
