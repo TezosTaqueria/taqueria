@@ -73,7 +73,7 @@ taq originate <contractName> --env testing
 Configuring a mainnet is quite similar to configuring a teztnet with one difference. Users must also create an account, with the mnemonic specified, within the network in order to interact with mainnet. See the example below:
 
 :::danger
-Improvements are on the way. However, we currently only support signing in memory and we require a mnemonic to be written in the config file, so do not commit this file or delete the mnemonic before doing so). This is not the safest way to interact with mainnet so proceed at your own risk
+Improvements are on the way. However, we currently only support signing in memory and we require a mnemonic to be written in the config file, so do not commit this file or delete the mnemonic before doing so). This is not the safest way to interact with mainnet so proceed with caution
 :::
 
 ```
@@ -81,7 +81,7 @@ Improvements are on the way. However, we currently only support signing in memor
     "label": "mainnet",
     "rpcUrl": "https://mainnet.api.tez.ie",
     "accounts": {
-        "user1": {
+        "tempUser": {
             "mnemonic": <12-24 words mnemonic generated via a wallet>
         }
     }
@@ -89,7 +89,16 @@ Improvements are on the way. However, we currently only support signing in memor
 ```
 
 :::note
-By default, Taqueria will create an environment called `production` that point to this network upon executing `taq init`
+By default, Taqueria will create an environment called `production` that point to this network upon executing `taq init`. For old projects, add the following to the `environment` field of the config file:
 :::
 
-To interact with mainnet using `user1`, users must include the `--env` and the `--sender` flags. E.g. `taq deploy counter --env production --sender user1`
+```
+"production": {
+    "networks": [
+        "mainnet"
+    ],
+    "sandboxes": []
+}
+```
+
+To interact with mainnet using `tempUser`, users must include the `--env` and the `--sender` flags. E.g. `taq deploy counter --env production --sender tempUser`
