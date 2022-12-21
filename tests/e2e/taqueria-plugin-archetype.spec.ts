@@ -18,7 +18,7 @@ describe('E2E Testing for taqueria archetype plugin', () => {
 		} catch (_) {}
 	});
 
-	test('Verify that the archetype plugin exposes the associated commands in the help menu', async () => {
+	test.skip('Verify that the archetype plugin exposes the associated commands in the help menu', async () => {
 		try {
 			const archetypeHelpContents = await exec(`taq --help --projectDir=${taqueriaProjectPath}`);
 			expect(archetypeHelpContents.stdout).toBe(contents.helpContentsArchetypePlugin);
@@ -27,7 +27,7 @@ describe('E2E Testing for taqueria archetype plugin', () => {
 		}
 	});
 
-	test('Verify that the archetype plugin aliases expose the correct info in the help menu', async () => {
+	test.skip('Verify that the archetype plugin aliases expose the correct info in the help menu', async () => {
 		try {
 			const archetypeAliasCHelpContents = await exec(`taq c --help --projectDir=${taqueriaProjectPath}`);
 			expect(archetypeAliasCHelpContents.stdout).toBe(contents.helpContentsArchetypePluginSpecific);

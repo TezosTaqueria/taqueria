@@ -4,7 +4,7 @@ The SmartPy plugin provides tasks to work with SmartPy smart contracts such as c
 
 ## Requirements
 
-- Taqueria v0.24.2 or later
+- Taqueria v0.26.0 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
 - Python 3 and pdoc
@@ -16,6 +16,9 @@ To install the SmartPy plugin on a Taqueria project, navigate to the project fol
 ```shell
 taq install @taqueria/plugin-smartpy
 ```
+
+> ### :page_with_curl: Note
+> To override the SmartPy version used by the plugin, create an environmental variable `TAQ_SMARTPY_VERSION` and set it appropriately, e.g. `v0.16.0`
 
 ## The `taq compile` Task
 

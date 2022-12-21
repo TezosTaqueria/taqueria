@@ -4,7 +4,7 @@ The LIGO plugin provides tasks to work with LIGO smart contracts such as compili
 
 ## Requirements
 
-- Taqueria v0.24.2 or later
+- Taqueria v0.26.0 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
 
