@@ -8,7 +8,7 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 describe('E2E Testing for ligo plugin', () => {
 	test('Ligo Plugin compile will create an artifact from three files (quickstart scenario)', async () => {
 		const { execute, spawn, cleanup, writeFile, readFile, ls } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
@@ -54,7 +54,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('ligo plugin help will show help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -68,7 +68,7 @@ describe('E2E Testing for ligo plugin', () => {
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
 	test.skip('1635 - ligo plugin compile will show contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -84,7 +84,7 @@ describe('E2E Testing for ligo plugin', () => {
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
 	test.skip('1635 - ligo plugin compile-ligo will show contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -103,7 +103,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('ligo plugin compile will error if missing <contract> parameter', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -116,7 +116,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('ligo plugin add-contract will error if named contract does not exist', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -132,7 +132,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('ligo plugin compile will only compile one contract using compile <sourceFile> command', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -151,7 +151,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('ligo plugin compile will error if the named contract does not exist', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -165,7 +165,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('ligo plugin add-contract will error if contract is invalid', async () => {
 		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -193,7 +193,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('ligo plugin test can run ligo test', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -213,7 +213,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('ligo plugin test will error if test file is invalid', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -232,7 +232,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('ligo plugin test will error if named file does not exist', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -245,7 +245,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('ligo plugin compile can use a different version of the LIGO image', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -267,7 +267,7 @@ describe('E2E Testing for ligo plugin', () => {
 
 	test('LIGO contract template will be instantiated with the right content and registered', async () => {
 		const { execute, cleanup, spawn, readFile, ls } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');

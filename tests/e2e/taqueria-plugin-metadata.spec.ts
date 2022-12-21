@@ -8,11 +8,11 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 	jest.setTimeout(120000);
 
-	// these tests are broken on dev-main as the metadata request does not realize there is an imported plugin for it
+	// these tests are broken as the metadata request does not realize there is an imported plugin available for it
 
 	test.skip('generate-project-metadata will add a metadata entry to the config.json', async () => {
 		const { execute, spawn, cleanup, ls, writeFile, readFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-metadata', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -72,7 +72,7 @@ describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 
 	test.skip('generate-metadata will error if no contract name provided', async () => {
 		const { execute, spawn, cleanup, ls, writeFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-metadata', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -147,7 +147,6 @@ describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 			'interfaces': [
 				'TZIP-016',
 			],
-
 		});
 
 		await cleanup();
