@@ -1,208 +1,152 @@
-import { exec as execRaw, spawn } from 'child_process';
-import fsPromises from 'fs/promises';
+import { exec as exec1 } from 'child_process';
 import util from 'util';
-import { generateTestProject } from './utils/utils';
-const exec = util.promisify(execRaw);
+const exec = util.promisify(exec1);
+import path from 'path';
 
-const taqueriaProjectPath = 'scrap/auto-test-metadata-plugin';
+import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
-describe('E2E Testing for the taqueria metadata plugin', () => {
-	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath, ['metadata']);
-		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts/hello-tacos.mligo`);
-		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/hello-tacos.tz`);
-		await exec(`taq add-contract hello-tacos.mligo`, { cwd: taqueriaProjectPath });
-	});
+describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
+	jest.setTimeout(150000);
 
-	beforeEach(async () => {
-		await exec(`rm -f *.json`, { cwd: `${taqueriaProjectPath}/artifacts` });
-	});
+	test.only('generate-project-metadata will add a metadata entry to the config.json', async () => {
+		const { execute, spawn, cleanup, ls, writeFile, readFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-metadata', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
 
-	const runCliWithPrompts = async (tagArgs: string, outputResponses: string[][]) => {
-		await new Promise<void>((resolve, reject) => {
-			const taqProcess = spawn(`taq`, tagArgs.split(' '), {
-				cwd: taqueriaProjectPath,
-			});
+		const mligo_file = await (await exec(`cat e2e/data/hello-tacos.mligo`)).stdout;
+		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
+		const contracts_list = await ls('./test-project/contracts');
+		expect(contracts_list).toContain('hello-tacos.mligo');
 
-			taqProcess.stdin.setDefaultEncoding('utf-8');
-			const writeInput = async (text: string) => {
-				taqProcess.stdin.cork();
-				taqProcess.stdin.write(`${text}\n`);
-				taqProcess.stdin.uncork();
-			};
+		const { waitForText: waitForText2, wait, writeText, pressKey, waitForFinish } = await spawn(
+			'taq',
+			'generate-project-metadata',
+			'./test-project',
+		);
 
-			taqProcess.on('close', data => {
-				resolve();
-			});
-			taqProcess.stderr.on('data', data => {
-			});
+		await wait(1000);
+		await waitForText2('Enter project name');
+		await writeText('test-project-name');
+		await pressKey('enter');
 
-			taqProcess.stdout.on('data', data => {
-				const dataText = `${data}`;
+		await waitForText2('Enter project description');
+		await writeText('test-project-description');
+		await pressKey('enter');
 
-				const dataTextLines = dataText.split('\n');
-				const dataTextLastLine = dataTextLines[dataTextLines.length - 1];
+		await waitForText2('Enter project authors (comma separated)');
+		await writeText('KentBeck, MartinFowler, ErichGamma');
+		await pressKey('enter');
 
-				// Find a match and write it
-				const response = outputResponses.find(x => dataTextLastLine.includes(x[0]));
+		await waitForText2('Enter project web url');
+		await writeText('http://taqueria.io');
+		await pressKey('enter');
 
-				if (response) {
-					writeInput(response[1]);
-					// Change the key so it won't match again
-					response[0] += '=USED';
-				}
-			});
+		await waitForText2('Enter project license');
+		await writeText('007');
+		await pressKey('enter');
+
+		await waitForFinish();
+
+		const metadata_file = await readFile(path.join('./test-project', '.taq', 'config.json'));
+		const json = JSON.parse(metadata_file);
+		expect(json).toBeInstanceOf(Object);
+		expect(json).toHaveProperty('metadata');
+		expect(json.metadata).toEqual({
+			'name': 'test-project-name',
+			'projectDescription': 'test-project-description',
+			'authors': [
+				'KentBeck',
+				'MartinFowler',
+				'ErichGamma',
+			],
+			'homepage': 'http://taqueria.io',
+			'license': '007',
 		});
-	};
 
-	test.skip('metadata plugin should create a contract metadata.json file', async () => {
-		await runCliWithPrompts(`generate-metadata hello-tacos`, [
-			['name', 'test-name'],
-			['description', 'test-description'],
-			['author', 'test-author'],
-			['url', 'test-url'],
-			['license', 'test-license'],
-		]);
-
-		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/hello-tacos.json`, {
-			encoding: 'utf-8',
-		});
-		expect(metadataFileContents).toMatch(/name.*test-name/i);
-		expect(metadataFileContents).toMatch(/description.*test-description/i);
-		expect(metadataFileContents).toMatch(/authors(.|\n)*test-author/i);
-		expect(metadataFileContents).toMatch(/homepage.*test-url/i);
-		expect(metadataFileContents).toMatch(/license.*test-license/i);
+		await cleanup();
 	});
 
-	test.skip('metadata plugin should re-create a contract metadata.json using existing values', async () => {
-		await runCliWithPrompts(`generate-metadata hello-tacos`, [
-			['name', 'test-name'],
-			['description', 'test-description'],
-			['author', 'test-author'],
-			['url', 'test-url'],
-			['license', 'test-license'],
-		]);
+	test('generate-metadata will error if no contract name provided', async () => {
+		const { execute, spawn, cleanup, ls, writeFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-metadata', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
 
-		await runCliWithPrompts(`generate-metadata hello-tacos`, [
-			['name', ''],
-			['description', ''],
-			['author', ''],
-			['url', ''],
-			['license', ''],
-		]);
+		const mligo_file = await (await exec(`cat e2e/data/hello-tacos.mligo`)).stdout;
+		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
+		const contracts_list = await ls('./test-project/contracts');
+		expect(contracts_list).toContain('hello-tacos.mligo');
 
-		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/hello-tacos.json`, {
-			encoding: 'utf-8',
-		});
-		expect(metadataFileContents).toMatch(/name.*test-name/i);
-		expect(metadataFileContents).toMatch(/description.*test-description/i);
-		expect(metadataFileContents).toMatch(/authors(.|\n)*test-author/i);
-		expect(metadataFileContents).toMatch(/homepage.*test-url/i);
-		expect(metadataFileContents).toMatch(/license.*test-license/i);
+		const { stderr: stderr2 } = await execute('taq', 'generate-metadata', './test-project');
+		expect(stderr2).toEqual(expect.arrayContaining(['contractName was not provided']));
+
+		await cleanup();
 	});
 
-	test.skip('metadata plugin should ask for contract name if not provided', async () => {
-		await runCliWithPrompts(`generate-metadata`, [
-			['contract', 'hello-tacos'],
-			['name', 'test-name'],
-			['description', 'test-description'],
-			['author', 'test-author'],
-			['url', 'test-url'],
-			['license', 'test-license'],
-		]);
+	test('generate-metadata will create a metadata json file in the artifacts directory', async () => {
+		const { execute, spawn, cleanup, ls, writeFile, readFile } = await prepareEnvironment();
+		const { stdout } = await execute('taq', 'init test-project');
+		expect(stdout).toContain("Project taq'ified!");
+		const { stdout: stdout1 } = await execute('taq', 'install @taqueria/plugin-metadata', './test-project');
+		expect(stdout1).toContain('Plugin installed successfully');
 
-		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/hello-tacos.json`, {
-			encoding: 'utf-8',
+		const mligo_file = await (await exec(`cat e2e/data/hello-tacos.mligo`)).stdout;
+		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
+		const contracts_list = await ls('./test-project/contracts');
+		expect(contracts_list).toContain('hello-tacos.mligo');
+
+		const { waitForText, wait, writeText, pressKey, waitForFinish } = await spawn(
+			'taq',
+			'generate-metadata hello-tacos.mligo',
+			'./test-project',
+		);
+
+		await wait(1000);
+		await waitForText('Enter contract name');
+		await writeText('hello-tacos.mligo');
+		await pressKey('enter');
+
+		await waitForText('Enter contract description');
+		await writeText('hello-tacos-description');
+		await pressKey('enter');
+
+		await waitForText('Enter contract authors (comma separated)');
+		await writeText('Jimi&nbspHendrix, Kurt&nbspCobain');
+		await pressKey('enter');
+
+		await waitForText('Enter contract web url');
+		await writeText('http://taqueria.io');
+		await pressKey('enter');
+
+		await waitForText('Enter contract license');
+		await writeText('007');
+		await pressKey('enter');
+
+		await waitForFinish();
+
+		expect(await ls('./test-project/artifacts')).toContain('hello-tacos.mligo.json');
+
+		const metadata_file = await readFile(path.join('./test-project', 'artifacts', 'hello-tacos.mligo.json'));
+		const json = JSON.parse(metadata_file);
+		expect(json).toBeInstanceOf(Object);
+		expect(json).toEqual({
+			'name': 'hello-tacos.mligo',
+			'version': 'v1.0.0',
+			'description': 'hello-tacos-description',
+			'authors': [
+				'Jimi&nbspHendrix',
+				'Kurt&nbspCobain',
+			],
+			'homepage': 'http://taqueria.io',
+			'license': '007',
+			'interfaces': [
+				'TZIP-016',
+			],
 		});
-		expect(metadataFileContents).toMatch(/name.*test-name/i);
-		expect(metadataFileContents).toMatch(/description.*test-description/i);
-		expect(metadataFileContents).toMatch(/authors(.|\n)*test-author/i);
-		expect(metadataFileContents).toMatch(/homepage.*test-url/i);
-		expect(metadataFileContents).toMatch(/license.*test-license/i);
-	});
 
-	test.skip('metadata plugin should previous answers for defaults', async () => {
-		await runCliWithPrompts(`generate-metadata hello-tacos`, [
-			['name', 'test-name'],
-			['description', 'test-description'],
-			['author', 'test-author'],
-			['url', 'test-url'],
-			['license', 'test-license'],
-		]);
-
-		await runCliWithPrompts(`generate-metadata hello-tacos`, [
-			['name', 'test2-name'],
-			['description', 'test2-description'],
-			['author', ''],
-			['url', ''],
-			['license', ''],
-		]);
-
-		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/hello-tacos.json`, {
-			encoding: 'utf-8',
-		});
-		expect(metadataFileContents).toMatch(/name.*test2-name/i);
-		expect(metadataFileContents).toMatch(/description.*test2-description/i);
-		expect(metadataFileContents).toMatch(/authors(.|\n)*test-author/i);
-		expect(metadataFileContents).toMatch(/homepage.*test-url/i);
-		expect(metadataFileContents).toMatch(/license.*test-license/i);
-	});
-
-	test.skip('metadata plugin should use other contracts for defaults', async () => {
-		await runCliWithPrompts(`generate-metadata hello-tacos`, [
-			['name', 'test-name'],
-			['description', 'test-description'],
-			['author', 'test-author'],
-			['url', 'test-url'],
-			['license', 'test-license'],
-		]);
-
-		await runCliWithPrompts(`generate-metadata fake-contract`, [
-			['name', 'fake-name'],
-			['description', 'fake-description'],
-			['author', ''],
-			['url', ''],
-			['license', ''],
-		]);
-
-		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/fake-contract.json`, {
-			encoding: 'utf-8',
-		});
-		expect(metadataFileContents).toMatch(/name.*fake-name/i);
-		expect(metadataFileContents).toMatch(/description.*fake-description/i);
-		expect(metadataFileContents).toMatch(/authors(.|\n)*test-author/i);
-		expect(metadataFileContents).toMatch(/homepage.*test-url/i);
-		expect(metadataFileContents).toMatch(/license.*test-license/i);
-	});
-
-	test.skip('metadata plugin should use project metadata for defaults', async () => {
-		await runCliWithPrompts(`generate-project-metadata`, [
-			['name', 'project-name'],
-			['description', 'project-description'],
-			['author', 'project-author'],
-			['url', 'project-url'],
-			['license', 'project-license'],
-		]);
-
-		await runCliWithPrompts(`generate-metadata fake-contract`, [
-			['name', 'fake-name'],
-			['description', 'fake-description'],
-			['author', ''],
-			['url', ''],
-			['license', ''],
-		]);
-
-		const metadataFileContents = await fsPromises.readFile(`${taqueriaProjectPath}/artifacts/fake-contract.json`, {
-			encoding: 'utf-8',
-		});
-		expect(metadataFileContents).toMatch(/name.*fake-name/i);
-		expect(metadataFileContents).toMatch(/description.*fake-description/i);
-		expect(metadataFileContents).toMatch(/authors(.|\n)*project-author/i);
-		expect(metadataFileContents).toMatch(/homepage.*project-url/i);
-		expect(metadataFileContents).toMatch(/license.*project-license/i);
-	});
-
-	afterAll(async () => {
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+		await cleanup();
 	});
 });
