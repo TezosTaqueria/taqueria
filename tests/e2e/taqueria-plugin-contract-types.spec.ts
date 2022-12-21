@@ -1,9 +1,6 @@
 import { exec as exec1 } from 'child_process';
-import fsPromises from 'fs/promises';
 import path from 'path';
 import util from 'util';
-import * as contents from './data/help-contents/contract-types-contents';
-import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
@@ -195,64 +192,98 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// describe('E2E Testing for taqueria contract types plugin: Generate Example Contracts', () => {
-	// 	beforeAll(async () => {
-	// 		await generateTestProject(taqueriaProjectPath, ['contract-types']);
-	// 		// TODO: This can removed after this is resolved:
-	// 		// https://github.com/ecadlabs/taqueria/issues/528
-	// 		try {
-	// 			await exec(`taq -p ${taqueriaProjectPath}`);
-	// 		} catch (_) {}
+	test('generate types can compile an Auction contract and generate types', async () => {
+		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-contract-types', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout1 } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		expect(stdout1).toContain('Plugin installed successfully');
 
-	// 		await exec(`cp -r ../taqueria-plugin-contract-types/example/contracts/* ${taqueriaProjectPath}/artifacts`);
-	// 		await exec(`cp -r ../taqueria-plugin-contract-types/example/types-file/ ${taqueriaProjectPath}/types-expected`);
+		const tz_file = await (await exec(`cat ../taqueria-plugin-contract-types/example/contracts/example-contract-1.tz`))
+			.stdout;
+		await writeFile('./test-project/artifacts/example-contract-1.tz', tz_file);
+		const expected_types_file =
+			await (await exec(`cat ../taqueria-plugin-contract-types/example/types-file/example-contract-1.types.ts`)).stdout;
 
-	// 		await exec(`taq generate types`, { cwd: `./${taqueriaProjectPath}` });
-	// 	});
+		const {} = await execute('taq', 'generate types', './test-project');
+		const generated_types_file = await readFile(path.join('./test-project', 'types', 'example-contract-1.types.ts'));
 
-	// 	const testContractTypeGeneration = async (
-	// 		contractFileName: string,
-	// 	) => {
-	// 		const expectedRaw = await fsPromises.readFile(
-	// 			`${taqueriaProjectPath}/types-expected/${contractFileName}.types.ts`,
-	// 			{ encoding: 'utf-8' },
-	// 		);
-	// 		const actualRaw = await fsPromises.readFile(`${taqueriaProjectPath}/types/${contractFileName}.types.ts`, {
-	// 			encoding: 'utf-8',
-	// 		});
+		expect(generated_types_file).toBe(expected_types_file);
 
-	// 		const expected = expectedRaw; // .replace(/\s+/g, ' ');
-	// 		const actual = actualRaw; // .replace(/\s+/g, ' ');
+		await cleanup();
+	});
 
-	// 		expect(expected).toEqual(actual);
-	// 	};
+	test('generate types can compile an FA2 contract and generate types', async () => {
+		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-contract-types', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout1 } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		expect(stdout1).toContain('Plugin installed successfully');
 
-	// 	it('Generate Types 01 - tz library', async () => {
-	// 		await testContractTypeGeneration('example-contract-1');
-	// 	});
-	// 	it('Generate Types 02 - tz library', async () => {
-	// 		await testContractTypeGeneration('example-contract-2');
-	// 	});
-	// 	it('Generate Types 04 - newer protocol', async () => {
-	// 		await testContractTypeGeneration('example-contract-4');
-	// 	});
-	// 	it('Generate Types 01A - subdir', async () => {
-	// 		await testContractTypeGeneration('subdir/example-contract-0');
-	// 	});
-	// 	it('Generate Types 01B - subsubdir', async () => {
-	// 		await testContractTypeGeneration('subdir/subsubdir/example-contract-0');
-	// 	});
-	// 	it('Generate lambda', async () => {
-	// 		await testContractTypeGeneration('example-lambda');
-	// 	});
+		const tz_file = await (await exec(`cat ../taqueria-plugin-contract-types/example/contracts/example-contract-2.tz`))
+			.stdout;
+		await writeFile('./test-project/artifacts/example-contract-2.tz', tz_file);
+		const expected_types_file =
+			await (await exec(`cat ../taqueria-plugin-contract-types/example/types-file/example-contract-2.types.ts`)).stdout;
 
-	// 	// Clean up process to remove taquified project folder
-	// 	// Comment if need to debug
-	// 	afterAll(async () => {
-	// 		try {
-	// 			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-	// 		} catch (error) {
-	// 			throw new Error(`error: ${error}`);
-	// 		}
-	// 	});
+		const {} = await execute('taq', 'generate types', './test-project');
+		const generated_types_file = await readFile(path.join('./test-project', 'types', 'example-contract-2.types.ts'));
+
+		expect(generated_types_file).toBe(expected_types_file);
+
+		await cleanup();
+	});
+
+	test('generate types can compile a contract from a sub-directory and generate types', async () => {
+		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-contract-types', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout1 } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		expect(stdout1).toContain('Plugin installed successfully');
+
+		const tz_file =
+			await (await exec(`cat ../taqueria-plugin-contract-types/example/contracts/subdir/example-contract-0.tz`)).stdout;
+		await writeFile('./test-project/artifacts/subdir/example-contract-0.tz', tz_file);
+		const expected_types_file =
+			await (await exec(`cat ../taqueria-plugin-contract-types/example/types-file/subdir/example-contract-0.types.ts`))
+				.stdout;
+
+		const {} = await execute('taq', 'generate types', './test-project');
+		const generated_types_file = await readFile(
+			path.join('./test-project', 'types', 'subdir/example-contract-0.types.ts'),
+		);
+
+		expect(generated_types_file).toBe(expected_types_file);
+
+		await cleanup();
+	});
+
+	test('generate types can compile a Lambda contract and generate types', async () => {
+		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-contract-types', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+		const { stdout: stdout1 } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		expect(stdout1).toContain('Plugin installed successfully');
+
+		const tz_file = await (await exec(`cat ../taqueria-plugin-contract-types/example/contracts/example-lambda.tz`))
+			.stdout;
+		await writeFile('./test-project/artifacts/example-lambda.tz', tz_file);
+		const expected_types_file =
+			await (await exec(`cat ../taqueria-plugin-contract-types/example/types-file/example-lambda.types.ts`)).stdout;
+
+		const {} = await execute('taq', 'generate types', './test-project');
+		const generated_types_file = await readFile(path.join('./test-project', 'types', 'example-lambda.types.ts'));
+
+		expect(generated_types_file).toBe(expected_types_file);
+
+		await cleanup();
+	});
 });
