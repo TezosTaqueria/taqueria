@@ -5,13 +5,14 @@ import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
-describe('E2E Testing for ligo plugin', () => {
-	test('Ligo Plugin compile will create an artifact from three files (quickstart scenario)', async () => {
+describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
+	test('compile will create an artifact from three files (quickstart scenario)', async () => {
 		const { execute, spawn, cleanup, writeFile, readFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout, stderr } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
+		console.log(stderr);
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const mligo_file = await (await exec(`cat e2e/data/counter.mligo`)).stdout;
@@ -56,7 +57,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stdout: stdout2 } = await execute('taq', '--help --projectDir=./test-project', './test-project');
@@ -70,7 +71,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stdout: stdout2 } = await execute('taq', 'compile --help --projectDir=./test-project', './test-project');
@@ -86,7 +87,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stdout: stdout2 } = await execute(
@@ -105,7 +106,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stderr } = await execute('taq', 'compile', './test-project');
@@ -118,7 +119,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const mligo_file = await (await exec(`cat e2e/data/hello-tacos.mligo`)).stdout;
@@ -134,7 +135,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 		const artifacts_list_before = await ls('./test-project/artifacts');
 		expect(artifacts_list_before).toEqual([]);
@@ -153,7 +154,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stdout: stdout2, stderr } = await execute('taq', 'compile does_not_exist.mligo', './test-project');
@@ -167,7 +168,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const mligo_file = await (await exec('cat e2e/data/invalid-contract.mligo')).stdout;
@@ -195,7 +196,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
@@ -215,7 +216,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
@@ -234,7 +235,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stderr } = await execute('taq', 'test hello-tacos-test.mligo', './test-project');
@@ -247,7 +248,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stdout: stdout2 } = await execute('taq', 'get-image --plugin ligo', './test-project');
@@ -269,7 +270,7 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn, readFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install @taqueria/plugin-ligo --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { code } = await execute('taq', 'create contract counter.mligo', './test-project');
