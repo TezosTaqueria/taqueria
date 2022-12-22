@@ -26,7 +26,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 
 		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-		await sleep(5000);
 	});
 
 	beforeEach(async () => {
@@ -35,7 +34,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
-	test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
+	test.only('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
 		environment = 'development';
 
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);

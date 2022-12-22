@@ -148,18 +148,46 @@ const getBakingFlags = (sandbox: SandboxConfig.t) =>
 			];
 		});
 
+// TODO work with Oxhead on this
+const getSupportedProtocolKinds = (opts: ValidOpts): Promise<string[]> => {
+	const image = getImage(opts);
+	return execCmd(`docker run --rm ${image} flextesa mini-net --protocol-kind=foobar`)
+		.catch(err => {
+			const { stderr } = err;
+			const protocols = stderr.match(/'[A-Z][a-z]+'/gm) ?? ['Alpha'];
+			return Promise.resolve(protocols.map((protocol: string) => protocol.replace(/'/gm, '')));
+		});
+};
+
+const getProtocolKind = (sandbox: SandboxConfig.t, opts: ValidOpts) =>
+	getSupportedProtocolKinds(opts)
+		.then(protocols =>
+			protocols.reduce(
+				(retval, protocolKind) => {
+					debugger;
+					if (retval) return retval;
+					const givenProtocolHash = (sandbox.protocol ?? 'alpha').toLowerCase();
+					const testProtocol = protocolKind.toLowerCase().slice(0, 4);
+					return givenProtocolHash.includes(testProtocol) ? protocolKind : undefined;
+				},
+				undefined as string | undefined,
+			)
+		)
+		.then(protocol => protocol ?? 'Alpha');
+
 const getMininetCommand = (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) =>
 	Promise.all([
 		getAccountFlags(sandbox, opts.config),
 		getBakingFlags(sandbox),
+		getProtocolKind(sandbox, opts),
 	])
-		.then(([accountFlags, bakingFlags]) => [
+		.then(([accountFlags, bakingFlags, protocolKind]) => [
 			'flextesa mini-net',
 			'--root /tmp/mini-box',
 			'--set-history-mode N000:archive', // TODO: Add annotation for this setting
 			'--until-level 200_000_000', // TODO: Add annotation for this setting
 			`--number-of-b 1`,
-			`--protocol-hash=${sandbox.protocol ?? 'ProtoALphaALphaALphaALphaALphaALphaALphaALphaDdp3zK'}`,
+			`--protocol-kind="${protocolKind}"`,
 			'--size 1',
 			...accountFlags,
 			...bakingFlags,
@@ -188,6 +216,7 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 const startMininet = async (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) => {
 	const containerName = await getContainerName(opts);
 	const mininetCmd = await getMininetCommand(sandboxName, sandbox, opts);
+	console.log(mininetCmd);
 	const cmd = `docker exec -d ${containerName} ${mininetCmd}`;
 	return execCmd(cmd);
 };
@@ -461,31 +490,29 @@ const bakeTask = (parsedArgs: ValidOpts) =>
 // That will decrease response latency
 const instantiateAccounts = (parsedArgs: ValidOpts) => {
 	console.log('Generating account keys...');
-	return getContainerName(parsedArgs)
-		.then(containerName =>
-			Object.entries(parsedArgs.config.accounts).reduce(
-				(lastConfig, [accountName, _]) =>
-					// TODO: This could probably be more performant by generating the key pairs using TS rather than proxy to docker/flextesa
-					lastConfig
-						.then(_ => execCmd(`docker run --rm ${getImage(parsedArgs)} flextesa key ${accountName}`))
-						.then(result => result.stdout.trim().split(','))
-						.then(([_alias, encryptedKey, publicKeyHash, secretKey]) =>
-							SandboxAccountConfig.create({
-								encryptedKey,
-								publicKeyHash,
-								secretKey,
-							})
-						)
-						.then(async accountConfig => {
-							const config = await lastConfig;
-							const accounts = config.sandbox[parsedArgs.sandboxName].accounts ?? {};
-							accounts[accountName] = accountConfig;
-							config.sandbox[parsedArgs.sandboxName].accounts = accounts;
-							return config;
-						}),
-				Promise.resolve(parsedArgs.config),
-			)
-		)
+	return Object.entries(parsedArgs.config.accounts).reduce(
+		(lastConfig, [accountName, _]) =>
+			// TODO: This could probably be more performant by generating the key pairs using TS rather than proxy to docker/flextesa
+			lastConfig
+				.then(_ => execCmd(`docker run --rm ${getImage(parsedArgs)} flextesa key ${accountName}`))
+				.then(result => result.stdout.trim().split(','))
+				.then(([_alias, encryptedKey, publicKeyHash, secretKey]) =>
+					SandboxAccountConfig.create({
+						encryptedKey,
+						publicKeyHash,
+						secretKey,
+					})
+				)
+				.then(async accountConfig => {
+					const config = await lastConfig;
+					const accounts = config.sandbox[parsedArgs.sandboxName].accounts
+						?? { 'default': NonEmptyString.create(accountName) };
+					accounts[accountName] = accountConfig;
+					config.sandbox[parsedArgs.sandboxName].accounts = accounts;
+					return config;
+				}),
+		Promise.resolve(parsedArgs.config),
+	)
 		.then(Config.create)
 		.then(config => writeJsonFile(parsedArgs.config.configFile)(config).then(_ => config))
 		.then(config =>
