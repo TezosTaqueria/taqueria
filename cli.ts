@@ -368,7 +368,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
-				chain(args => NPM.installPlugin(config, parsedArgs.projectDir, i18n, args.pluginName)),
+				chain(args => NPM.installPlugin(config, config.projectDir, i18n, args.pluginName)),
 				map(log),
 				chain(() => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
 				chain(_ => taqResolve<void>()),
@@ -397,7 +397,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofUninstallTaskArgs(parsedArgs),
-				chain(parsedArgs => NPM.uninstallPlugin(config, parsedArgs.projectDir, i18n, parsedArgs.pluginName)),
+				chain(parsedArgs => NPM.uninstallPlugin(config, config.projectDir, i18n, parsedArgs.pluginName)),
 				map(log),
 			),
 	});
@@ -415,8 +415,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 				),
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
-				parsedArgs,
-				listKnownTasks,
+				listKnownTasks(parsedArgs, config),
 				map(log),
 			),
 	});
@@ -534,9 +533,9 @@ const parseArgs = (cliArgs: string[]) =>
 			})),
 		);
 
-const listKnownTasks = (parsedArgs: SanitizedArgs.t) =>
+const listKnownTasks = (parsedArgs: SanitizedArgs.t, config: LoadedConfig.t) =>
 	pipe(
-		joinPaths(parsedArgs.projectDir, 'state.json'),
+		joinPaths(config.projectDir, 'state.json'),
 		stateAbsPath => readJsonFile<EphemeralState.t>(stateAbsPath), // TypeScript won't allow pointfree here
 		map(state =>
 			Object.entries(state.tasks).reduce(
@@ -1300,13 +1299,14 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_PARSE_UNKNOWN' }, err => [14, err.msg])
 				.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
 				.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
-				.with({ kind: 'E_CONTRACT_REGISTERED' }, err => [21, err.msg])
-				.with({ kind: 'E_CONTRACT_NOT_REGISTERED' }, err => [22, err.msg])
 				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_EXEC' }, err => [19, false])
-				.with({ kind: 'E_OPT_IN_WARNING' }, err => [20, err.msg])
-				.with({ kind: 'E_INVALID_OPTION' }, err => [21, err.msg])
+				.with({ kind: 'E_CONTRACT_REGISTERED' }, err => [20, err.msg])
+				.with({ kind: 'E_CONTRACT_NOT_REGISTERED' }, err => [21, err.msg])
+				.with({ kind: 'E_OPT_IN_WARNING' }, err => [22, err.msg])
+				.with({ kind: 'E_INVALID_OPTION' }, err => [23, err.msg])
+				.with({ kind: 'E_TAQ_PROJECT_NOT_FOUND' }, err => [24, err.msg])
 				.with({ message: __.string }, err => [128, err.message])
 				.exhaustive();
 

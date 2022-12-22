@@ -5,6 +5,7 @@ import * as PluginActionName from '@taqueria/protocol/PluginActionName';
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
+import { omit } from 'https://x.nest.land/ramda@0.27.2/mod.ts';
 import type { PluginDeps, PluginRequestArgs } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
@@ -136,7 +137,7 @@ export const inject = (deps: PluginDeps) => {
 		switch (plugin.type) {
 			case 'npm': {
 				const pluginPath = joinPaths(
-					parsedArgs.projectDir,
+					config.projectDir,
 					'node_modules',
 					plugin.name,
 					'index.js',
@@ -153,6 +154,7 @@ export const inject = (deps: PluginDeps) => {
 	const sendPluginActionRequest = <T>(plugin: InstalledPlugin.t) =>
 		(action: PluginActionName.t, encoding: PluginResponseEncoding.t) =>
 			(requestArgs: Record<string, unknown>): Future<TaqError.t, T | void> => {
+				debugger;
 				const cmd = [
 					...getPluginExe(plugin),
 					'--taqRun',
@@ -163,7 +165,7 @@ export const inject = (deps: PluginDeps) => {
 					"'" + JSON.stringify(config) + "'",
 					'--envVars',
 					"'" + JSON.stringify(env) + "'",
-					...toPluginArguments(requestArgs, config),
+					...toPluginArguments(requestArgs),
 				];
 
 				const shellCmd = ['sh', '-c', cmd.join(' ')];
@@ -217,11 +219,16 @@ export const inject = (deps: PluginDeps) => {
 	// This function returns a list of positional arguments
 	// which includes all dependencies and the individual request args
 	// toPluginArguments: Record<string, unknown> -> PluginRequestArgs
-	const toPluginArguments = (requestArgs: Record<string, unknown>, config: LoadedConfig.t): PluginRequestArgs => {
+	const toPluginArguments = (requestArgs: Record<string, unknown>): PluginRequestArgs => {
 		// For each argument passed in via the CLI, send it as an argument to the
 		// plugin call as well. Plugins can use this information for additional context
 		// about invocation
-		return Object.entries({ ...parsedArgs, ...requestArgs }).reduce(
+		// --
+		// We'll use the projectDir from the config rather than the one from the CLI, as
+		// as the actual projectDir could be found via traversal
+		const passableParsedArgs = omit(['p', 'project-dir', 'projectDir'], parsedArgs);
+		const passableRequestArgs = omit(Object.keys(passableParsedArgs), requestArgs);
+		return Object.entries({ ...passableParsedArgs, ...passableRequestArgs, projectDir: config.projectDir }).reduce(
 			(retval: (string | number | boolean)[], [key, val]) => {
 				const omit = [
 					'$0',
@@ -302,7 +309,7 @@ export const inject = (deps: PluginDeps) => {
 
 	// Returns the absolute path to the state.json file
 	// getStateAbsPath: () -> SanitizedAbsPath
-	const getStateAbspath = () => SanitizedAbsPath.make(`${parsedArgs.projectDir}/.taq/state.json`);
+	const getStateAbspath = () => SanitizedAbsPath.make(`${config.projectDir}/.taq/state.json`);
 
 	// Gets the State representation of the current config
 	// The state is retrieved from state.json if it exists,
