@@ -8,7 +8,7 @@ describe('E2E Testing for taqueria CLI,', () => {
 		await cleanup();
 	});
 
-	test('Verify that taq --help gives the help menu for an initialized project', async () => {
+	test.skip('Verify that taq --help gives the help menu for an initialized project', async () => {
 		const { spawn, execute, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");

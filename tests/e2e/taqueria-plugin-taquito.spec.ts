@@ -169,8 +169,8 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const {} = await execute('taq', 'uninstall @taqueria/plugin-core', './test-project');
-		const {} = await execute('taq', 'install @taqueria/plugin-core --debug', './test-project');
+		// const {} = await execute('taq', 'uninstall @taqueria/plugin-core', './test-project');
+		// const {} = await execute('taq', 'install @taqueria/plugin-core --debug', './test-project');
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
@@ -187,12 +187,12 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('taquito plugin can only once instantiate an account on a network once', async () => {
+	test.only('taquito plugin can only once instantiate an account on a network once', async () => {
 		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const {} = await execute('taq', 'uninstall @taqueria/plugin-core', './test-project');
-		const {} = await execute('taq', 'install @taqueria/plugin-core --debug', './test-project');
+		// const {} = await execute('taq', 'uninstall @taqueria/plugin-core', './test-project');
+		// const {} = await execute('taq', 'install @taqueria/plugin-core', './test-project');
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito --debug', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
