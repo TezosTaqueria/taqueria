@@ -56,7 +56,6 @@ export const defaultConfig: Config.t = Config.create({
 		mainnet: {
 			label: 'mainnet',
 			rpcUrl: 'https://mainnet.api.tez.ie',
-			protocol: 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg',
 		},
 	},
 });
