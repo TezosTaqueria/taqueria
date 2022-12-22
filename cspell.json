@@ -5,6 +5,7 @@
 		"**/node_modules/**/*.*"
 	],
 	"words": [
+		"aexec",
 		"abspath",
 		"Affordance",
 		"annots",

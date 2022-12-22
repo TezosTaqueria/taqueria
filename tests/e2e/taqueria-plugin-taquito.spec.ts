@@ -161,7 +161,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		const configPKH = configContents.network.fundnet.accounts.taqOperatorAccount.publicKeyHash;
 
-		expect(result.stderr.replace(/tz3\S+/, 'tz3__address__')).toEqual(
+		expect(result.stderr.replace(/tz\S+/, 'tz__address__')).toEqual(
 			await fsPromises.readFile('e2e/data/taquito-funding-instructions.txt', 'utf-8'),
 		);
 	});
@@ -206,7 +206,8 @@ Note: jane is already instantiated in the current environment, "testing"
 Note: joe is already instantiated in the current environment, "testing"\n`);
 	});
 
-	test('Verify that taqueria taquito plugin will fund instantiated accounts on a network', async () => {
+	// this test is flaky as it depends on an account being funded
+	test.skip('Verify that taqueria taquito plugin will fund instantiated accounts on a network', async () => {
 		environment = 'testing';
 
 		await exec(`cp e2e/data/config-taquito-test-environment-low-tez.json ${taqueriaProjectPath}/.taq/config.json`);
@@ -231,7 +232,8 @@ Please execute "taq fund" targeting the same environment to fund these accounts\
 		expect(amountFundedArray).toStrictEqual(configTezAmounts);
 	});
 
-	test('Verify that taqueria taquito plugin will can send from one instantiated account to another', async () => {
+	// this test is flaky as it depends on an account being funded
+	test.skip('Verify that taqueria taquito plugin will can send from one instantiated account to another', async () => {
 		environment = 'testing';
 		const transferAmountMutez = 1000000;
 

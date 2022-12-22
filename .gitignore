@@ -145,27 +145,12 @@ node_modules
 /taqueria-toolkit/index.js.map
 /taqueria-toolkit/*.d.ts
 
-# Jest plugin
-/taqueria-plugin-jest/*.js
-/taqueria-plugin-jest/*.cjs
-/taqueria-plugin-jest/*.map
-/taqueria-plugin-jest/*.mjs
-/taqueria-plugin-jest/index.d.ts
-
-# IPFS plugin
-/taqueria-plugin-ipfs-pinata/index.js.map
-/taqueria-plugin-ipfs-pinata/index.js
-
 # VS Code Extension
 /taqueria-vscode-extension/out
 *.vsix
 .vscode-test
 /taqueria-vscode-extension/state.json
 /taqueria-vscode-extension/config.json
-
-# Metadata plugin
-/taqueria-plugin-metadata/index.js.map
-/taqueria-plugin-metadata/index.js
 
 # Website
 website/docs/glossary.md

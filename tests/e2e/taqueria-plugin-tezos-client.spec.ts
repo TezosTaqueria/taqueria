@@ -87,7 +87,7 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 	});
 
 	test('Verify that a different version of the tezos client image can be used', async () => {
-		const imageName = 'oxheadalpha/flextesa:20221026';
+		const imageName = 'oxheadalpha/flextesa:20221123';
 
 		const result = await exec(`TAQ_TEZOS_CLIENT_IMAGE=${imageName} taq get-image --plugin tezos-client`, {
 			cwd: `./${taqueriaProjectPath}`,

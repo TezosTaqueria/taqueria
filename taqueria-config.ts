@@ -30,6 +30,10 @@ export const defaultConfig: Config.t = Config.create({
 			networks: ['ghostnet'],
 			sandboxes: [],
 		},
+		production: {
+			networks: ['mainnet'],
+			sandboxes: [],
+		},
 	},
 	sandbox: {
 		local: {
@@ -48,6 +52,11 @@ export const defaultConfig: Config.t = Config.create({
 		ghostnet: {
 			label: 'ghostnet',
 			rpcUrl: 'https://ghostnet.ecadinfra.com',
+		},
+		mainnet: {
+			label: 'mainnet',
+			rpcUrl: 'https://mainnet.api.tez.ie',
+			protocol: 'PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg',
 		},
 	},
 });
