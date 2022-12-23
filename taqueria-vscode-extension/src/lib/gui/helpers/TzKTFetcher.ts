@@ -26,7 +26,7 @@ export async function getSmartContractFromTzkt(
 	return data;
 }
 
-export async function getAccountFromTzkt(
+export async function findAccountInTzKT(
 	tzktBaseUrl: string,
 	account: SandboxAccount,
 ): Promise<TzKTAccountData | undefined> {
