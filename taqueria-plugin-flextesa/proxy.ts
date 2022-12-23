@@ -215,7 +215,6 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 const startMininet = async (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) => {
 	const containerName = await getContainerName(opts);
 	const mininetCmd = await getMininetCommand(sandboxName, sandbox, opts);
-	console.log(mininetCmd);
 	const cmd = `docker exec -d ${containerName} sh -c "flextesa_node_cors_origin='*' ${mininetCmd}"`;
 	return execCmd(cmd);
 };
