@@ -85,7 +85,7 @@ export const updateConfig = async (opts: ValidOpts, update: (config: RawConfig) 
 const getFlextesaAnnotations = (sandbox: SandboxConfig.t): Promise<FlextesaAnnotations> => {
 	const defaults = {
 		baking: 'enabled',
-		block_time: 5,
+		block_time: 2,
 	};
 
 	const settings = {
@@ -203,21 +203,21 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 		);
 		await replaceRpcUrlInConfig(newPort, sandbox.rpcUrl.toString(), sandboxName, opts);
 	}
-	const ports = `-p ${newPort}:20000`;
+	const ports = `-p ${newPort}:20000 --expose 20000`;
 
 	const containerName = await getContainerName(opts);
 	const arch = await getArch();
 	const image = getImage(opts);
 	const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir;
 
-	return `docker run -i --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -w /app ${image} /bin/sh`;
+	return `docker run -i --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project ${image} /bin/sh`;
 };
 
 const startMininet = async (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) => {
 	const containerName = await getContainerName(opts);
 	const mininetCmd = await getMininetCommand(sandboxName, sandbox, opts);
 	console.log(mininetCmd);
-	const cmd = `docker exec -d ${containerName} ${mininetCmd}`;
+	const cmd = `docker exec -d ${containerName} sh -c "flextesa_node_cors_origin='*' ${mininetCmd}"`;
 	return execCmd(cmd);
 };
 
