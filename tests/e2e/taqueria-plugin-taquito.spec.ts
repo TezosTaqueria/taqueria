@@ -29,7 +29,8 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install @taqueria/plugin-taquito', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', 'deploy --help', './test-project');
+		const { stdout: stdout2, stderr } = await execute('taq', 'deploy --help', './test-project');
+		if (stderr.length > 0) console.error(stderr);
 		expect(stdout2).toContain('Deploy a smart contract to a particular environment');
 
 		await cleanup();
@@ -105,7 +106,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test.only('taquito plugin can deploy one contract using deploy {contractName} when there are multiple contracts in the artifacts', async () => {
+	test('taquito plugin can deploy one contract using deploy {contractName} when there are multiple contracts in the artifacts', async () => {
 		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -133,7 +134,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 			'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
 			'./test-project',
 		);
-		console.log(stderr);
+		if (stderr.length > 0) console.error(stderr);
 		expect(stdout2).toEqual(expect.arrayContaining(
 			['│ Contract       │ Address                              │ Alias       │ Balance In Mutez │ Destination                    │'],
 		));
@@ -169,7 +170,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		await writeFile('./test-project/.taq/config.json', test_config_file);
 
 		const { stdout: stdout2, stderr } = await execute('taq', 'fund -e testing', './test-project');
-		console.log(stderr);
+		if (stderr.length > 0) console.error(stderr);
 
 		expect(stdout2).toContain(
 			'All instantiated accounts in the current environment, "testing", are funded up to or beyond the declared amount',
@@ -222,7 +223,8 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		expect(json).toBeInstanceOf(Object);
 		expect(json).toHaveProperty('accounts');
 
-		const { stdout: stdout3 } = await execute('taq', 'fund -e testing', './test-project');
+		const { stdout: stdout3, stderr } = await execute('taq', 'fund -e testing', './test-project');
+		if (stderr.length > 0) console.error(stderr);
 		expect(stdout3).toEqual(
 			expect.arrayContaining(['│ Account Alias │ Account Address                      │ Mutez Funded │']),
 		);
@@ -250,11 +252,12 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 			expect.arrayContaining(['│ Account Alias │ Account Address                      │ Mutez Funded │']),
 		);
 
-		const { stdout: stdout4 } = await execute(
+		const { stdout: stdout4, stderr } = await execute(
 			'taq',
 			'transfer tz3RobfdmYYQaiF5W343wdSiFhwWF2xUfjEy --mutez 100000 --sender bob -e testing',
 			'./test-project',
 		);
+		if (stderr.length > 0) console.error(stderr);
 		expect(stdout4).toEqual(
 			expect.arrayContaining([
 				'│ N/A            │ tz3RobfdmYYQaiF5W343wdSiFhwWF2xUfjEy │ Unit      │ default    │ 100000         │ https://ghostnet.ecadinfra.com │',
