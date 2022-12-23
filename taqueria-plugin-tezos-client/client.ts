@@ -1,10 +1,10 @@
-import { CmdArgEnv, getArch, sendAsyncErr, sendRes, spawnCmd } from '@taqueria/node-sdk';
+import { getArch, sendAsyncErr, sendRes, spawnCmd } from '@taqueria/node-sdk';
 import { ClientOpts as Opts, getClientDockerImage } from './common';
 
 const getArbitraryClientCmd = async (
 	parsedArgs: Opts,
 	userArgs: string,
-): Promise<CmdArgEnv> => {
+): Promise<[string, Record<string, string>]> => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const arch = await getArch();
@@ -27,12 +27,15 @@ const getArbitraryClientCmd = async (
 	);
 	const args = baseArgs.concat(processedUserArgs);
 	const envVars = {};
-	return [binary, args, envVars];
+	return [
+		[binary, ...args].join(' '),
+		envVars,
+	];
 };
 
 const runArbitraryClientCmd = (parsedArgs: Opts, cmd: string): Promise<string> =>
 	getArbitraryClientCmd(parsedArgs, cmd)
-		.then(spawnCmd)
+		.then(([cmd, envVars]) => spawnCmd(cmd, envVars))
 		.then(code =>
 			code !== null && code === 0
 				? `Command "${cmd}" ran successfully by octez-client`

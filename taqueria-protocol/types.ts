@@ -376,7 +376,6 @@ export type MetadataConfig = {
 export type NetworkConfig = {
 	label: HumanReadableIdentifier;
 	rpcUrl: Url;
-	protocol: EconomicalProtocolHash;
 	accounts?: Record<string, NetworkAccountConfig>;
 	faucet?: Faucet;
 };
@@ -397,8 +396,7 @@ export type SandboxAccountConfig = {
 export type SandboxConfig = {
 	label: NonEmptyString;
 	rpcUrl: Url;
-	protocol: EconomicalProtocolHash;
-	attributes?: string | number | boolean;
+	protocol?: EconomicalProtocolHash;
 	plugin?: Verb;
 
 	// TODO: This causes a type conflict and is not supported
@@ -408,6 +406,7 @@ export type SandboxConfig = {
 	accounts?: Record<string, SandboxAccountConfig | NonEmptyString>;
 
 	tzkt?: TzKtConfig;
+	annotations?: Record<string, unknown>;
 };
 
 export type ScaffoldConfig = {

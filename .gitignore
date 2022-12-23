@@ -128,31 +128,17 @@ node_modules
 /taqueria-sdk/*.mjs.map
 /taqueria-sdk/*.d.ts
 
-# Flextesa plugin
-/taqueria-plugin-flextesa/index.js
-/taqueria-plugin-flextesa/index.js.map
-/taqueria-plugin-flextesa/.parcel-cache
-/taqueria-flextesa-manager/*.map
-/taqueria-flextesa-manager/*.js
-/taqueria-flextesa-manager/*.d.ts
-/taqueria-flextesa-manager/*.mjs
-
-# Plugin build artifacts
-/taqueria-plugin-*/*.js
-/taqueria-plugin-*/*.map
-/taqueria-plugin-*/*.cjs
-/taqueria-plugin-*/*.mjs
-/taqueria-plugin-*/*.d.ts
-/taqueria-plugin-*/**/*.js
-/taqueria-plugin-*/**/*.map
-/taqueria-plugin-contract-types/**/*.cjs
-/taqueria-plugin-contract-types/**/*.d.ts
-
-# Taqueria State Package
-/taqueria-state/index.js
-/taqueria-state/index.js.map
-/taqueria-state/*.d.ts
-/taqueria-state/node/*.d.ts
+# Taqueria Build Artifacts
+/taqueria*/*.js
+/taqueria*/*.d.ts
+/taqueria*/*.mjs
+/taqueria*/*.map
+/taqueria*/*.cjs
+/taqueria*/**/*.js
+/taqueria*/**/*.map
+/taqueria*/**/*.d.ts
+/taqueria*/**/*.mjs
+/taqueria*/**/*.cjs
 
 # Toolkit
 /taqueria-toolkit/index.js

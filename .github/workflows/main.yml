@@ -213,15 +213,9 @@ jobs:
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
 
-      - run: npm ci
-
       - name: Build all
-        run: |
-          npm run build-types
-          npm run build:packages 
-          ./bin/build.sh
-          npm run build:docker
-
+        run: ./bin/build-all.sh
+        
       - name: Run unit tests
         run: npm run test:unit -w tests
 
