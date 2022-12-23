@@ -164,7 +164,6 @@ const getProtocolKind = (sandbox: SandboxConfig.t, opts: ValidOpts) =>
 		.then(protocols =>
 			protocols.reduce(
 				(retval, protocolKind) => {
-					debugger;
 					if (retval) return retval;
 					const givenProtocolHash = (sandbox.protocol ?? 'alpha').toLowerCase();
 					const testProtocol = protocolKind.toLowerCase().slice(0, 4);

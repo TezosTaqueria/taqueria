@@ -2,8 +2,22 @@ import { TezosToolkit } from '@taquito/taquito';
 import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import path from 'path';
-import util from 'util';
-const exec = util.promisify(exec1);
+
+export const exec = (cmd: string, opts: Record<string, unknown> = {}): Promise<{ stdout: string; stderr: string }> =>
+	new Promise((resolve: Function, reject: Function) => {
+		exec1(cmd, opts, (err, stdout, stderr) => {
+			if (err) {
+				typeof err === 'string'
+					? reject({ message: err, stderr, stdout })
+					: reject(Object.assign({ message: stderr, stderr, stdout }, err));
+			} else {
+				resolve({
+					stdout,
+					stderr,
+				});
+			}
+		});
+	});
 
 export const sleep = (ms: number) => new Promise((resolve, _reject) => setTimeout(resolve, ms));
 
@@ -56,7 +70,6 @@ export async function getContainerName(dockerName: string): Promise<string> {
 }
 
 export async function getContainerImage(dockerName: string): Promise<string> {
-	debugger;
 	const dockerContainerInfo =
 		(await exec(`docker ps -a --filter "name=taq-flextesa-${dockerName}" --no-trunc | tail -1`)).stdout.split('   ');
 
