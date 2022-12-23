@@ -1,7 +1,5 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
-import { SandboxAccountConfig } from '@taqueria/protocol/types';
 import fetch from 'node-fetch-commonjs';
-import path from 'path';
 import * as vscode from 'vscode';
 import { notNullish } from '../GeneralHelperFunctions';
 import { HasRefresh, mapAsync, VsCodeHelper } from '../helpers';
@@ -9,6 +7,7 @@ import { OutputLevels } from '../LogHelper';
 import { getRunningContainerNames } from '../pure';
 import * as Util from '../pure';
 import { CachedSandboxState, SandboxState } from './CachedSandboxState';
+import { CachedTzKTDataProvider } from './helpers/CachedTzKTDataProvider';
 import { getSandboxAccounts, getSandboxContracts } from './helpers/SandboxDataHelpers';
 import { getAccountFromTzkt, getSmartContractFromTzkt, TzKTAccountData, TzKTContractData } from './helpers/TzKTFetcher';
 import { ObservableConfig } from './ObservableConfig';
@@ -36,6 +35,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private sandboxStates: Record<string, CachedSandboxState> = {};
+	private tzktProviders: Record<string, CachedTzKTDataProvider> = {};
 
 	refreshLevelInterval: NodeJS.Timer | undefined;
 	private sandboxTreeItems: SandboxTreeItem[] | undefined;
@@ -89,7 +89,6 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!pathToDir || !config?.config?.sandbox) {
 			return [];
 		}
-		const environmentNames = this.getEnvironmentNames(config);
 
 		const sandboxNames = this.getSandboxNames(config);
 		const items = await mapAsync(
@@ -100,10 +99,17 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 					runningContainers,
 					pathToDir,
 				);
-				const cached = this.sandboxStates[sandboxName];
-				if (cached) {
-					await cached.setState(state);
+
+				const cachedState = this.sandboxStates[sandboxName];
+				if (cachedState) {
+					await cachedState.setState(state);
 				}
+
+				const cachedTzkt = this.tzktProviders[sandboxName];
+				if (cachedTzkt) {
+					await cachedTzkt.setSandboxState(state);
+				}
+
 				return new SandboxTreeItem(sandboxName, containerName, state);
 			},
 		);
@@ -122,24 +128,32 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!config?.config?.sandbox || !projectDir) {
 			return;
 		}
-		for (let name of this.getSandboxNames(config)) {
-			if (this.sandboxStates[name]) {
+		for (let sandboxName of this.getSandboxNames(config)) {
+			if (this.sandboxStates[sandboxName]) {
 				continue;
 			}
 			try {
-				const { state, containerName } = await this.getSandboxState(name, runningContainerNames, projectDir);
-				const cached = new CachedSandboxState(
+				const { state, containerName } = await this.getSandboxState(sandboxName, runningContainerNames, projectDir);
+				const cachedState = new CachedSandboxState(
+					// this.helper,
+					sandboxName,
+					await this.getContainerName(sandboxName, projectDir),
+					this.observableConfig,
+					state,
+				);
+				this.sandboxStates[sandboxName] = cachedState;
+
+				const cachedProvider = new CachedTzKTDataProvider(
 					this.helper,
-					name,
-					await this.getContainerName(name, projectDir),
+					sandboxName,
 					this.observableConfig,
 					state,
 				);
 				if (state === 'running') {
-					await cached.startConnection();
+					await cachedProvider.startConnection();
 				}
-				cached.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, name));
-				this.sandboxStates[name] = cached;
+				cachedProvider.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, sandboxName));
+				this.tzktProviders[sandboxName] = cachedProvider;
 			} catch (e: unknown) {
 				this.helper.logHelper.showLog(OutputLevels.debug, 'Error in signalR:');
 				this.helper.logAllNestedErrors(e);
@@ -415,6 +429,6 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private async getTzKtBaseUrl(sandboxName: string): Promise<string | undefined> {
-		return this.sandboxStates[sandboxName]?.getTzKtBaseUrl(sandboxName);
+		return this.tzktProviders[sandboxName]?.getTzKtBaseUrl(sandboxName);
 	}
 }
