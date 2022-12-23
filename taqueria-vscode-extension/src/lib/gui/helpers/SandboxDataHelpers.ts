@@ -13,7 +13,7 @@ export type SandboxAccount = {
 	address: string;
 };
 
-export function getSandboxContracts(currentConfig: ConfigInfo, sandboxName: string): SandboxContract[] {
+export function getContractsByTaqueriaConfig(currentConfig: ConfigInfo, sandboxName: string): SandboxContract[] {
 	const sandboxEnvironment = Object.values(currentConfig.config?.config.environment ?? []).find(
 		environment =>
 			typeof environment === 'string'
@@ -30,7 +30,7 @@ export function getSandboxContracts(currentConfig: ConfigInfo, sandboxName: stri
 	}));
 }
 
-export function getSandboxAccounts(currentConfig: ConfigInfo, sandboxName: string): SandboxAccount[] {
+export function getAccountsByTaqueriaConfig(currentConfig: ConfigInfo, sandboxName: string): SandboxAccount[] {
 	const sandbox = currentConfig.config?.config.sandbox?.[sandboxName];
 	if (!sandbox || !sandbox.accounts) {
 		return [];

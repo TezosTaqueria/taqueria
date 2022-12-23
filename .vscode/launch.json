@@ -12,7 +12,7 @@
 			"outFiles": ["${workspaceFolder}/taqueria-vscode-extension/out/**/*.js"],
 			"preLaunchTask": "build-and-watch-vscode",
 			"env": {
-				"LogLevel": "debug",
+				"LogLevel": "warn",
 				"InstallDevPlugins": "false"
 			}
 		},

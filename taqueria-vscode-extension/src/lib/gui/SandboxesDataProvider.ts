@@ -274,7 +274,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return undefined;
 		}
 		try {
-			const sandboxAccounts = await this.tzktProviders[element.sandboxName].getSandboxAccountsFromTzKT();
+			const sandboxAccounts = await this.tzktProviders[element.sandboxName].getAccounts();
 			return sandboxAccounts.length;
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
@@ -288,7 +288,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return undefined;
 		}
 		try {
-			const sandboxContracts = await this.tzktProviders[element.sandboxName].getSandboxContractsFromTzKT();
+			const sandboxContracts = await this.tzktProviders[element.sandboxName].getContracts();
 			return sandboxContracts.length;
 		} catch (e) {
 			this.helper.logAllNestedErrors(e, true);
@@ -311,7 +311,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return [];
 		}
 		try {
-			const sandboxAccounts = await this.tzktProviders[element.parent.sandboxName].getSandboxAccountsFromTzKT();
+			const sandboxAccounts = await this.tzktProviders[element.parent.sandboxName].getAccounts();
 			return sandboxAccounts.map(contract =>
 				new SandboxImplicitAccountTreeItem(
 					contract.address,
@@ -337,7 +337,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return [];
 		}
 		try {
-			const sandboxContracts = await this.tzktProviders[sandboxName].getSandboxContractsFromTzKT();
+			const sandboxContracts = await this.tzktProviders[sandboxName].getContracts();
 			return sandboxContracts.map(contract =>
 				new SandboxSmartContractTreeItem(
 					contract.address,

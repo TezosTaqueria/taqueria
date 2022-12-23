@@ -4,7 +4,7 @@ import { notNullish } from '../../GeneralHelperFunctions';
 import { VsCodeHelper } from '../../helpers';
 import { OutputLevels } from '../../LogHelper';
 import { SandboxState } from '../CachedSandboxState';
-import { getSandboxAccounts, getSandboxContracts } from '.././helpers/SandboxDataHelpers';
+import { getAccountsByTaqueriaConfig, getContractsByTaqueriaConfig } from '.././helpers/SandboxDataHelpers';
 import {
 	findAccountInTzKT,
 	getSmartContractFromTzkt,
@@ -119,7 +119,7 @@ export class CachedTzKTDataProvider {
 			await this.connection.start();
 			await this.connection.invoke('SubscribeToHead');
 			// TODO: make sure to reconnect with new accounts if config.json changes
-			const sandboxAccounts = getSandboxAccounts(this.observableConfig.currentConfig, this.sandboxName);
+			const sandboxAccounts = getAccountsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
 			await this.connection.invoke('SubscribeToAccounts', {
 				addresses: sandboxAccounts.map(account => account.address),
 			});
@@ -133,11 +133,11 @@ export class CachedTzKTDataProvider {
 		}
 	}
 
-	async getSandboxAccountsFromTzKT(): Promise<SandboxTzKTAccount[]> {
+	async getAccounts(): Promise<SandboxTzKTAccount[]> {
 		const tzktBaseUrl = this.findTzKtBaseUrl(this.sandboxName);
 		if (!tzktBaseUrl) return [];
 
-		const sandboxAccounts = getSandboxAccounts(this.observableConfig.currentConfig, this.sandboxName);
+		const sandboxAccounts = getAccountsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
 		const tzktAccounts = await Promise.all(
 			sandboxAccounts.map(async account => {
 				const data = await findAccountInTzKT(tzktBaseUrl, account);
@@ -153,11 +153,11 @@ export class CachedTzKTDataProvider {
 		return tzktAccounts.filter(notNullish) as SandboxTzKTAccount[];
 	}
 
-	async getSandboxContractsFromTzKT(): Promise<SandboxTzKTContract[]> {
+	async getContracts(): Promise<SandboxTzKTContract[]> {
 		const tzktBaseUrl = this.findTzKtBaseUrl(this.sandboxName);
 		if (!tzktBaseUrl) return [];
 
-		const sandboxContracts = getSandboxContracts(this.observableConfig.currentConfig, this.sandboxName);
+		const sandboxContracts = getContractsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
 		const tzktContracts = await Promise.all(
 			sandboxContracts
 				.map(async contract => {
