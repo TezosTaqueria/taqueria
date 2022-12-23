@@ -62,8 +62,11 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdo
 		// Escape quotes in the command, given that we're wrapping in quotes
 		const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
 		exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
-			if (err) reject({ ...err, stderr, stdout });
-			else {
+			if (err) {
+				typeof err === 'string'
+					? reject({ message: err, stderr, stdout })
+					: reject(Object.assign({ message: stderr, stderr, stdout }, err));
+			} else {
 				resolve({
 					stdout,
 					stderr,
