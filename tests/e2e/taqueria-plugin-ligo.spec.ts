@@ -5,8 +5,8 @@ import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
-describe('E2E Testing for ligo plugin', () => {
-	test('Ligo Plugin compile will create an artifact from three files (quickstart scenario)', async () => {
+describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
+	test('compile will create an artifact from three files (quickstart scenario)', async () => {
 		const { execute, spawn, cleanup, writeFile, readFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -69,11 +69,10 @@ describe('E2E Testing for ligo plugin', () => {
 	});
 
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('1635 - ligo plugin compile will show contextual help', async () => {
+	test.skip('compile will show contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-
 		const { stdout, stderr } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		if (stderr.length > 0) console.error(stderr); // useful for debugging
 		expect(stdout).toContain('Plugin installed successfully');
@@ -87,7 +86,7 @@ describe('E2E Testing for ligo plugin', () => {
 	});
 
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('1635 - ligo plugin compile-ligo will show contextual help', async () => {
+	test.skip('compile-ligo will show contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -108,7 +107,7 @@ describe('E2E Testing for ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('ligo plugin compile will error if missing <contract> parameter', async () => {
+	test('compile will error if missing <contract> parameter', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -123,7 +122,7 @@ describe('E2E Testing for ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('ligo plugin add-contract will error if named contract does not exist', async () => {
+	test('add-contract will error if named contract does not exist', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -141,7 +140,7 @@ describe('E2E Testing for ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('ligo plugin compile will only compile one contract using compile <sourceFile> command', async () => {
+	test('compile will only compile one contract using compile <sourceFile> command', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -163,7 +162,7 @@ describe('E2E Testing for ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('ligo plugin compile will error if the named contract does not exist', async () => {
+	test('compile will error if the named contract does not exist', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -183,7 +182,7 @@ describe('E2E Testing for ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('ligo plugin add-contract will error if contract is invalid', async () => {
+	test('add-contract will error if contract is invalid', async () => {
 		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -213,7 +212,7 @@ describe('E2E Testing for ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('ligo plugin test can run ligo test', async () => {
+	test('test will run ligo test', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -235,7 +234,7 @@ describe('E2E Testing for ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('ligo plugin test will error if test file is invalid', async () => {
+	test('test will error if test file is invalid', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -260,7 +259,7 @@ describe('E2E Testing for ligo plugin', () => {
 		await cleanup();
 	});
 
-	test('ligo plugin test will error if named file does not exist', async () => {
+	test('test will error if named file does not exist', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -276,7 +275,7 @@ describe('E2E Testing for ligo plugin', () => {
 	});
 
 	// TODO How do we set a environment variable, TAQ_LIGO_IMAGE=ligolang/ligo:0.54.1 ?
-	test.skip('ligo plugin compile can use a different version of the LIGO image', async () => {
+	test.skip('compile can use a different version of the LIGO image', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");

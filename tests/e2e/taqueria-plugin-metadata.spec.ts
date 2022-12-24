@@ -11,6 +11,7 @@ describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 	test('generate-project-metadata will add a metadata entry to the config.json', async () => {
 		const { execute, spawn, cleanup, ls, writeFile, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
+
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-metadata', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -70,6 +71,7 @@ describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 	test('generate-metadata will error if no contract name provided', async () => {
 		const { execute, spawn, cleanup, ls, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
+
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-metadata', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
