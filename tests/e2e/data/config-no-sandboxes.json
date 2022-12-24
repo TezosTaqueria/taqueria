@@ -1,0 +1,43 @@
+{
+	"language": "en",
+	"plugins": [
+		{
+			"type": "npm",
+			"name": "@taqueria/plugin-core"
+		},
+		{
+			"type": "npm",
+			"name": "@taqueria/plugin-flextesa"
+		}
+	],
+	"contractsDir": "contracts",
+	"artifactsDir": "artifacts",
+	"network": {
+		"ghostnet": {
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnet.ecadinfra.com"
+		}
+	},
+	"sandbox": {
+	},
+	"environment": {
+		"default": "development",
+		"development": {
+			"networks": [],
+			"sandboxes": []
+		},
+		"testing": {
+			"networks": [
+				"ghostnet"
+			],
+			"sandboxes": []
+		}
+	},
+	"accounts": {
+		"bob": "3_000_000_000",
+		"alice": "3_000_000_000",
+		"john": "3_000_000_000",
+		"jane": "3_000_000_000",
+		"joe": "3_000_000_000"
+	}
+}

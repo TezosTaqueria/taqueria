@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+skip_npm_ci="$SKIP_NPM_CI"
 
 if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
@@ -35,10 +36,12 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
 
     set -e # exiting on error
 
-    echo ""
-    echo '**********************************************'
-    echo "** Installing NPM dependencies"
-    npm ci
+    if [ -z "$skip_npm_ci" ]; then 
+        echo ""
+        echo '**********************************************'
+        echo "** Installing NPM dependencies"
+        npm ci
+    fi
 
     echo ""
     echo '**********************************************'
@@ -54,11 +57,6 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
     echo "** Building packages"
     npm run build:packages
-
-    echo ""
-    echo '**********************************************'
-    echo "** Building docker images"
-    npm run build:docker
 
     echo ""
     echo '**********************************************'
