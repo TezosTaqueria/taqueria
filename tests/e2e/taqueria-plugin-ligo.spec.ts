@@ -73,7 +73,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-
 		const { stdout, stderr } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		if (stderr.length > 0) console.error(stderr); // useful for debugging
 		expect(stdout).toContain('Plugin installed successfully');
