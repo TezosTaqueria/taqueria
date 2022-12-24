@@ -37,10 +37,10 @@ Compile a smart contract written in a LIGO syntax to Michelson code, along with
 its associated storage/parameter list files if they are found
 
 Options:
-      --version     Show version number                                [boolean]
-      --build       Display build information about the current version[boolean]
   -p, --projectDir  Path to your project directory               [default: "./"]
   -e, --env         Specify an environment configuration
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
       --json        Emit JSON-encoded Michelson                        [boolean]
