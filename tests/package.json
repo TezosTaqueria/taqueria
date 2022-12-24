@@ -7,7 +7,7 @@
 	"main": "index.js",
 	"scripts": {
 		"test:unit": "../bin/before-all-tests.sh && npm run test:unit:deno && npm run test:unit:jest",
-		"test:unit:deno": "../bin/before-all-tests.sh && TEST=true deno test unit/ --allow-all --unstable --import-map ../import_map.json",
+		"test:unit:deno": "../bin/before-all-tests.sh && TEST=true deno test unit/ --allow-all --unstable --import-map ../import_map.json --trace-ops",
 		"test:unit:jest": "../bin/before-all-tests.sh && TEST=true jest --config jest.config.unit.ts --no-cache",
 		"test:unit:jest:debug": "../bin/before-all-tests.sh && TEST=true jest --config jest.config.unit.ts --no-cache --detectOpenHandles --detectLeaks",
 		"test:unit:deno:debug": "../bin/before-all-tests.sh && TEST=true deno test unit/ --allow-all --unstable --import-map ../import_map.json",

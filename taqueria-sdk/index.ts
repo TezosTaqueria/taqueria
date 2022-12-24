@@ -31,17 +31,16 @@ import { getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
 import { LikeAPromise, pluginDefiner, PluginSchema, StdIO } from './types';
 
-import { importKey } from '@taquito/signer';
+import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit } from '@taquito/taquito';
 import { b58cencode, Prefix, prefix } from '@taquito/utils';
+import * as Bip39 from 'bip39';
 import crypto from 'crypto';
 import generateName from 'project-name-generator';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 const yargs = require('yargs');
 export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
-
-export type CmdArgEnv = [string, string[], { [key: string]: string }];
 
 export const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
@@ -58,13 +57,16 @@ export const readJsonFile = <T>(filename: string): Promise<T> =>
 		.then(JSON.parse)
 		.then(result => (result as T));
 
-export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
+export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdout: string; stderr: string }> =>
 	new Promise((resolve, reject) => {
 		// Escape quotes in the command, given that we're wrapping in quotes
 		const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
 		exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
-			if (err) reject(err);
-			else {
+			if (err) {
+				typeof err === 'string'
+					? reject({ message: err, stderr, stdout })
+					: reject(Object.assign({ message: stderr, stderr, stdout }, err));
+			} else {
 				resolve({
 					stdout,
 					stderr,
@@ -86,12 +88,9 @@ export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, Exe
 		});
 	});
 
-export const spawnCmd = (fullCmd: CmdArgEnv): Promise<number | null> =>
+export const spawnCmd = (cmd: string, envVars: Record<string, string> = {}): Promise<number | null> =>
 	new Promise((resolve, reject) => {
-		const cmd = fullCmd[0];
-		const args = fullCmd[1];
-		const envVars = fullCmd[2];
-		const child = spawn(cmd, args, { env: { ...process.env, ...envVars }, stdio: 'inherit' });
+		const child = spawn(cmd, { env: { ...process.env, ...envVars }, stdio: 'inherit', shell: true });
 		child.on('close', resolve);
 		child.on('error', reject);
 	});
@@ -582,13 +581,22 @@ export const getAccountPrivateKey = async (
 ): Promise<string> => {
 	if (!network.accounts) network.accounts = {};
 
-	if (!network.accounts[account]) {
-		const tezos = await createAddress(Protocol.NetworkConfig.create(network));
+	if (!network.accounts[account] || !network.accounts[account].privateKey) {
+		const mnemonic = network?.accounts?.[account]?.mnemonic ?? Bip39.generateMnemonic();
+		const signer = InMemorySigner.fromMnemonic({ mnemonic });
+		const tezos = new TezosToolkit(network.rpcUrl as string);
+		tezos.setSignerProvider(signer);
+
 		const publicKey = Protocol.NonEmptyString.create(await tezos.signer.publicKey());
 		const publicKeyHash = Protocol.PublicKeyHash.create(await tezos.signer.publicKeyHash());
 		const privateKey = Protocol.NonEmptyString.create(await tezos.signer.secretKey() ?? '');
 		if (!privateKey) return sendAsyncErr('The private key must exist after creating it');
-		network.accounts[account] = Protocol.NetworkAccountConfig.create({ publicKey, publicKeyHash, privateKey });
+		network.accounts[account] = Protocol.NetworkAccountConfig.create({
+			publicKey,
+			publicKeyHash,
+			privateKey,
+			mnemonic,
+		});
 
 		try {
 			await writeJsonFile('./.taq/config.json')(parsedArgs.config);
@@ -605,7 +613,9 @@ export const getAccountPrivateKey = async (
 		}
 	}
 
-	return network.accounts[account].privateKey;
+	const privateKey = network.accounts[account].privateKey;
+	if (!privateKey) return sendAsyncErr('The private key must exist after creating it');
+	return privateKey;
 };
 
 export const getDockerImage = (defaultImageName: string, envVarName: string): string =>

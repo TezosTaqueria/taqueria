@@ -161,7 +161,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		const configPKH = configContents.network.fundnet.accounts.taqOperatorAccount.publicKeyHash;
 
-		expect(result.stderr.replace(/tz3\S+/, 'tz3__address__')).toEqual(
+		expect(result.stderr.replace(/tz\S+/, 'tz__address__')).toEqual(
 			await fsPromises.readFile('e2e/data/taquito-funding-instructions.txt', 'utf-8'),
 		);
 	});
