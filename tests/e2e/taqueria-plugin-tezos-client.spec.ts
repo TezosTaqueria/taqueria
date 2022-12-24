@@ -107,34 +107,26 @@ describe('E2E Testing for taqueria typechecker and simulator tasks of the tezos-
 	});
 
 	test('Verify that taqueria typechecker task will display proper message if user tries to typecheck contract that does not exist', async () => {
-		try {
-			// 1. Run taq typecheck ${contractName} for contract that does not exist
-			const { stdout, stderr } = await exec(`taq typecheck test.tz`, { cwd: `./${taqueriaProjectPath}` });
+		// 1. Run taq typecheck ${contractName} for contract that does not exist
+		const { stdout, stderr } = await exec(`taq typecheck test.tz`, { cwd: `./${taqueriaProjectPath}` });
 
-			// 2. Verify that output includes a table and an error message
-			expect(stdout).toBe(contents.nonExistent);
-			expect(stderr).toContain('No such file or directory');
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		// 2. Verify that output includes a table and an error message
+		expect(stdout).toBe(contents.nonExistent);
+		expect(stderr).toContain('No such file or directory');
 	});
 
 	test('Verify that taqueria typechecker task emits error and yet displays table if contract is ill-typed', async () => {
-		try {
-			// 1. Copy contract from data folder to taqueria project folder
-			await exec(`cp e2e/data/hello-tacos-ill-typed.tz ${taqueriaProjectPath}/artifacts`);
+		// 1. Copy contract from data folder to taqueria project folder
+		await exec(`cp e2e/data/hello-tacos-ill-typed.tz ${taqueriaProjectPath}/artifacts`);
 
-			// 2. Run taq typecheck hello-tacos-ill-typed.tz
-			const { stdout, stderr } = await exec(`taq typecheck hello-tacos-ill-typed.tz`, {
-				cwd: `./${taqueriaProjectPath}`,
-			});
+		// 2. Run taq typecheck hello-tacos-ill-typed.tz
+		const { stdout, stderr } = await exec(`taq typecheck hello-tacos-ill-typed.tz`, {
+			cwd: `./${taqueriaProjectPath}`,
+		});
 
-			// 3. Verify that output includes a table and an error message
-			expect(stdout).toBe(contents.typeError);
-			expect(stderr).toContain('Type nat is not compatible with type string');
-		} catch (error) {
-			throw new Error(`error: ${error}`);
-		}
+		// 3. Verify that output includes a table and an error message
+		expect(stdout).toBe(contents.typeError);
+		expect(stderr).toContain('Type nat is not compatible with type string');
 	});
 
 	test('Verify that taqueria simulator task can simulate one contract using simulate [sourceFile] command', async () => {

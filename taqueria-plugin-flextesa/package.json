@@ -23,9 +23,7 @@
 	"types": "./index.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build-plugin": "npx tsc -noEmit -p ./tsconfig.json && npx tsup",
-		"build-dev": "npm run build-docker && npm run build-plugin",
-		"build": "npm run build-plugin",
+		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup",
 		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
 	},
 	"author": "ECAD Labs",
