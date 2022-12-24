@@ -5,8 +5,8 @@ import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
-describe('E2E Testing for ligo plugin', () => {
-	test('Ligo Plugin compile will create an artifact from three files (quickstart scenario)', async () => {
+describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
+	test('compile will create an artifact from three files (quickstart scenario)', async () => {
 		const { execute, spawn, cleanup, writeFile, readFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -73,7 +73,6 @@ describe('E2E Testing for ligo plugin', () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-
 		const { stdout, stderr } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		if (stderr.length > 0) console.error(stderr); // useful for debugging
 		expect(stdout).toContain('Plugin installed successfully');
