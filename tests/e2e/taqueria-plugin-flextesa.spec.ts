@@ -243,7 +243,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('Verify that taqueria flextesa plugin can return list of accounts from a sandbox', async () => {
+	test('list accounts will display the sandbox accounts', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
