@@ -1,3 +1,4 @@
+import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 import fsPromises from 'fs/promises';
 import utils from 'util';
 import {
@@ -16,56 +17,58 @@ let dockerName: string = 'localTF';
 const addressRegex = /tz1[A-Za-z0-9]{7,}/g;
 const amountRegex = /[0-9]{4,} ꜩ/g;
 
-describe('E2E Testing for taqueria taquito plugin', () => {
-	beforeAll(async () => {
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true, force: true });
-		await generateTestProject(taqueriaProjectPath, ['taquito', 'flextesa']);
-		await exec(
-			`cp e2e/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
+describe('Taquito and Flextesa Plugins E2E Testing for Taqueria CLI', () => {
+	test.only('deploy will create one contract using deploy command', async () => {
+		const { execute, spawn, cleanup, writeFile, readFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
+		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
+		const { stdout: stdout2 } = await execute('taq', 'install ../taqueria-plugin-taquito', './test-project');
+		expect(stdout2).toEqual(expect.arrayContaining(['Plugin installed successfully']));
+
+		const config_file = await (await exec(`cat e2e/data/config-taquito-flextesa-local-sandbox-test-environment.json`))
+			.stdout;
+		await writeFile('./test-project/.taq/config.json', config_file);
+		const storage_file = await (await exec(`cat e2e/data/anyContract.storage.tz`)).stdout;
+		await writeFile('./test-project/artifacts/anyContract.storage.tz', storage_file);
+		const tz_file = await (await exec(`cat e2e/data/hello-tacos.tz`)).stdout;
+		await writeFile('./test-project/artifacts/hello-tacos.tz', tz_file);
+
+		const { stdout: stdout3 } = await execute('taq', 'start sandbox localTF', './test-project');
+		expect(stdout3).toEqual(expect.arrayContaining(['Starting node...']));
+		sleep(4000);
+		const { stdout: stdout4, stderr } = await execute('taq', 'list accounts localTF', './test-project');
+		expect(stdout4).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
+		console.log(stdout4);
+		console.log(stderr);
+
+		const { stdout: stdout5, stderr: stderr1 } = await execute(
+			'taq',
+			'deploy hello-tacos.tz --storage anyContract.storage.tz -e development',
+			'./test-project',
 		);
+		console.log(stdout5);
+		console.log(stderr1);
 
-		const started = await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-	});
-
-	beforeEach(async () => {
-		await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
-	});
-
-	// TODO: Consider in future to use keygen service to update account balance programmatically
-	// https://github.com/ecadlabs/taqueria/issues/378
-	test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
-		await sleep(20000);
-		environment = 'development';
-
-		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
-
-		// 1. Run taq deploy on a selected test network described in "test" environment
-		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
-			cwd: `./${taqueriaProjectPath}`,
-		});
-		const deployResponse = deployCommand.stdout.trim().split(/\r?\n/)[3];
-
-		// 2. Verify that contract has been originated on the network
+		const deployResponse = stdout2[0].trim().split(/\r?\n/)[3];
 		expect(deployResponse).toContain('hello-tacos.tz');
 		const contractHash = deployResponse.split('│')[2].trim();
-
 		expect(contractHash).toMatch(contractRegex);
 
-		// 3. Verify that contract has been originated to the network and contains storage
-		const configContents = JSON.parse(
-			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
-		);
+		const configContents = JSON.parse(await readFile('./test-project/.taq/sinfig.json'));
 		const port = configContents.sandbox.localTF.rpcUrl;
-		const contractFromSandbox = await exec(
-			`curl ${port}/chains/main/blocks/head/context/contracts/${contractHash}`,
-		);
+
+		const contractFromSandbox = await exec(`curl ${port}/chains/main/blocks/head/context/contracts/${contractHash}`);
 		expect(contractFromSandbox.stdout).toContain('"balance":"0"');
 		expect(contractFromSandbox.stdout).toContain('"storage":{"int":"12"}');
+
+		await cleanup();
 	});
 
-	// TODO: Consider in future to use keygen service to update account balance programmatically
-	// https://github.com/ecadlabs/taqueria/issues/378
-	test('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
+	test('deploy will create one contract using deploy {contractName} command', async () => {
 		await sleep(20000);
 		environment = 'development';
 
@@ -206,22 +209,22 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(beforeAmount).toStrictEqual(afterAmount);
 	});
 
-	// Remove all files from artifacts folder without removing folder itself
-	afterEach(async () => {
-		const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
-		for (const file of files) {
-			await fsPromises.rm(`${taqueriaProjectPath}/artifacts/${file}`);
-		}
-	});
+	// // Remove all files from artifacts folder without removing folder itself
+	// afterEach(async () => {
+	// 	const files = await fsPromises.readdir(`${taqueriaProjectPath}/artifacts/`);
+	// 	for (const file of files) {
+	// 		await fsPromises.rm(`${taqueriaProjectPath}/artifacts/${file}`);
+	// 	}
+	// });
 
-	// Clean up process to remove taquified project folder
-	// Comment if need to debug
-	afterAll(async () => {
-		try {
-			await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-		} catch (e: unknown) {
-			console.log(e);
-		}
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-	});
+	// // Clean up process to remove taquified project folder
+	// // Comment if need to debug
+	// afterAll(async () => {
+	// 	try {
+	// 		await exec(`taq stop sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
+	// 	} catch (e: unknown) {
+	// 		console.log(e);
+	// 	}
+	// 	await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+	// });
 });
