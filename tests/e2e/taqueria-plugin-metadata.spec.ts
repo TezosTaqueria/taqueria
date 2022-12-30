@@ -4,14 +4,14 @@ const exec = util.promisify(exec1);
 import path from 'path';
 
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
-import { debug } from 'console';
 
 describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 	jest.setTimeout(90000);
 
 	test('generate-project-metadata will add a metadata entry to the config.json', async () => {
 		const { execute, spawn, cleanup, ls, writeFile, readFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		const { waitForText } = await spawn('taq', 'init test-project');
+
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-metadata', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -70,7 +70,8 @@ describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 
 	test('generate-metadata will error if no contract name provided', async () => {
 		const { execute, spawn, cleanup, ls, writeFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		const { waitForText } = await spawn('taq', 'init test-project');
+
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-metadata', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -98,7 +99,7 @@ describe('Metadata Plugin E2E Testing for the Taqueria CLI', () => {
 		const contracts_list = await ls('./test-project/contracts');
 		expect(contracts_list).toContain('hello-tacos.mligo');
 
-		const { debug, waitForText, wait, writeText, pressKey, waitForFinish } = await spawn(
+		const { waitForText, wait, writeText, pressKey, waitForFinish } = await spawn(
 			'taq',
 			'generate-metadata hello-tacos.mligo',
 			'./test-project',
