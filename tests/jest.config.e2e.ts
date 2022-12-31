@@ -194,13 +194,13 @@ export default {
 	// timers: "real",
 
 	// A map from regular expressions to paths to transformers
-	// transform: {"^.+\\.(ts|js)$":"<rootDir>/node_modules/ts-jest"},
+	transform: { '^.+\\.(ts|js)$': '<rootDir>/node_modules/ts-jest' },
 
 	// An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-	// transformIgnorePatterns: [
-	//   "/node_modules/",
-	//   "\\.pnp\\.[^\\/]+$"
-	// ],
+	transformIgnorePatterns: [
+		'/node_modules/',
+		'\\.pnp\\.[^\\/]+$',
+	],
 
 	// Changing default timeout from 5000 to 30000 for tests
 	testTimeout: 300000,
