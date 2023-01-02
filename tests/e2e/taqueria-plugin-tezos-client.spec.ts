@@ -2,13 +2,11 @@ import { exec as exec1 } from 'child_process';
 import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
-import * as contents from './data/help-contents/typechecker-simulator-contents';
 
 describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1671
 	test.skip('typecheck will check a contract in the artifacts folder', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -25,7 +23,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('typecheck will check one contract using typecheck [sourceFile] command', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -43,7 +40,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1671
 	test.skip('typechecker will check all contracts under artifacts folder', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -64,7 +60,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1671
 	test.skip('typecheck willcheck multiple (but not all) contracts using typecheck [sourceFile1] [sourceFile2] command', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -91,7 +86,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 	// hangs for a long time waiting for the image name
 	test.skip('different tezos client image can be used', async () => {
 		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -112,7 +106,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('typecheck will error if no contract', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -126,7 +119,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('typecheck will error and yet displays table if contract is ill-typed', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -143,7 +135,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('simulate will simulate one contract using simulate [sourceFile] command', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -169,7 +160,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('simulate will error if no contract', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -192,7 +182,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('simulate will pass errors from Michelson', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -217,7 +206,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('simulate will error with incorrect parameter', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -242,7 +230,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('simulate will error on supplying list instead of nat', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -269,7 +256,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('simulate will error when map supplied instead of nat', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -296,7 +282,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('Taqueria CLI will pass 0x00 to the simulator', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -322,7 +307,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('simulator will handle Left and Right (part of input and storage value) correctly', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -348,7 +332,6 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('simulate will accept --entrypoint flag', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		1;
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
