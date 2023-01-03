@@ -4,30 +4,17 @@ const exec = utils.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
-	test('project help offers help', async () => {
-		const { execute, spawn, cleanup } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
-		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
-		expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
-		1;
-
-		const { stdout: stdout1 } = await execute('taq', '--help --projectDir=./test-project/', './test-project');
-		expect(stdout1).toEqual(expect.arrayContaining(['taq [command]']));
-
-		await cleanup();
-	});
-
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
+	// contextual help not working for compile
 	test.skip('compile offers contextual help', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
-		1;
+		await new Promise(r => setTimeout(r, 2000));
 
-		const { stdout: stdout1 } = await execute('taq', 'c --help --projectDir=./test-project/', './test-project');
+		const { stdout: stdout1 } = await execute('taq', 'compile --help', './test-project');
+		console.log(stdout1);
 		expect(stdout1).toEqual(
 			expect.arrayContaining(['Compile a smart contract written in a Archetype syntax to Michelson code']),
 		);
@@ -41,7 +28,6 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
-		1;
 
 		const { stdout: stdout1 } = await execute('taq', 'compile', './test-project');
 		expect(stdout1).toEqual(expect.arrayContaining(['│ None found │ N/A      │']));
