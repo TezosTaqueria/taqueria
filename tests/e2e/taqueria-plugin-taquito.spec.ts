@@ -295,7 +295,6 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		expect(stdout2).toContain('Accounts instantiated: bob, alice, john, jane, joe.');
 
 		const { stdout: stdout3 } = await execute('taq', 'fund -e testing', './test-project');
-		console.log(stdout3);
 		expect(stdout3).toEqual(
 			expect.arrayContaining(['│ Account Alias │ Account Address                      │ Mutez Funded │']),
 		);
