@@ -4,31 +4,17 @@ import util from 'util';
 const exec = util.promisify(exec1);
 
 describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('project help will offer contextual help', async () => {
-		const { execute, cleanup, spawn } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
-		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
-		expect(stdout).toContain('Plugin installed successfully');
-
-		const { stdout: stdout1 } = await execute('taq', '--help --projectDir=./test-project/', './test-project');
-		expect(stdout1).toEqual(expect.arrayContaining(['taq compile <sourceFile>']));
-		expect(stdout1).toEqual(expect.arrayContaining(['taq compile <sourceFile>']));
-
-		await cleanup();
-	});
-
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
+	// contextual help not working for this plugin
 	test.skip('compile will offer contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
+		await new Promise(r => setTimeout(r, 2000));
 
-		const { stdout: stdout1 } = await execute('taq', 'compile --help --projectDir=./test-project/', './test-project');
-		expect(stdout1).toEqual(expect.arrayContaining(['taq compile <sourceFile>']));
+		const { stdout: stdout1 } = await execute('taq', 'compile --help', './test-project');
+		console.log(stdout1);
 		expect(stdout1).toEqual(expect.arrayContaining(['taq compile <sourceFile>']));
 
 		await cleanup();
