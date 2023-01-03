@@ -104,7 +104,11 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/.taq/config.json', config_file);
 
 		const { stderr, stdout: stdout2 } = await execute('taq', 'start sandbox', './test-project');
-		expect(stderr).toEqual(expect.arrayContaining(['network → ghostnet → protocol: Required']));
+		expect(stderr).toEqual(
+			expect.arrayContaining([
+				"No sandbox name was specified. We couldn't find a valid sandbox config for the current environment.",
+			]),
+		);
 		await cleanup();
 	});
 
