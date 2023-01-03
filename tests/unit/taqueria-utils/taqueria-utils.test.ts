@@ -81,7 +81,7 @@ Deno.test({
 	fn: async (t: any) => {
 		await t.step('run test for {mkdir} function', async () => {
 			const result = await toPromise(mkdir('./unit/taqueria-utils/data/test'));
-			exists(result).then((result: any) => assertEquals(result, true));
+			await exists(result).then((result: any) => assertEquals(result, true));
 		});
 		await t.step('clean up', () => {
 			try {

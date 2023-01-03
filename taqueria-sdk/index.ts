@@ -42,8 +42,6 @@ import generateName from 'project-name-generator';
 const yargs = require('yargs');
 export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
 
-export type CmdArgEnv = [string, string[], { [key: string]: string }];
-
 export const eager = <T>(f: Future<TaqError, T>) =>
 	promise(
 		mapRej((err: TaqError) => new E_TaqError(err))(f),
@@ -59,13 +57,16 @@ export const readJsonFile = <T>(filename: string): Promise<T> =>
 		.then(JSON.parse)
 		.then(result => (result as T));
 
-export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException> =>
+export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdout: string; stderr: string }> =>
 	new Promise((resolve, reject) => {
 		// Escape quotes in the command, given that we're wrapping in quotes
 		const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
 		exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
-			if (err) reject(err);
-			else {
+			if (err) {
+				typeof err === 'string'
+					? reject({ message: err, stderr, stdout })
+					: reject(Object.assign({ message: stderr, stderr, stdout }, err));
+			} else {
 				resolve({
 					stdout,
 					stderr,
@@ -87,12 +88,9 @@ export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, Exe
 		});
 	});
 
-export const spawnCmd = (fullCmd: CmdArgEnv): Promise<number | null> =>
+export const spawnCmd = (cmd: string, envVars: Record<string, string> = {}): Promise<number | null> =>
 	new Promise((resolve, reject) => {
-		const cmd = fullCmd[0];
-		const args = fullCmd[1];
-		const envVars = fullCmd[2];
-		const child = spawn(cmd, args, { env: { ...process.env, ...envVars }, stdio: 'inherit' });
+		const child = spawn(cmd, { env: { ...process.env, ...envVars }, stdio: 'inherit', shell: true });
 		child.on('close', resolve);
 		child.on('error', reject);
 	});

@@ -598,25 +598,29 @@ const preInstallPluginsOnInit = (parsedArgs: SanitizedArgs.t, projectDir: Saniti
 	switch (parsedArgsOfInit.workflow) {
 		case 'ligo':
 			return pipe(
-				taqInstallInProj('ligo'),
+				taqInstallInProj('core'),
+				chain(_ => taqInstallInProj('ligo')),
 				chain(_ => taqInstallInProj('flextesa')),
 				chain(_ => taqInstallInProj('taquito')),
 			);
 		case 'smartpy':
 			return pipe(
-				taqInstallInProj('smartpy'),
+				taqInstallInProj('core'),
+				chain(_ => taqInstallInProj('smartpy')),
 				chain(_ => taqInstallInProj('flextesa')),
 				chain(_ => taqInstallInProj('taquito')),
 			);
 		case 'archetype':
 			return pipe(
-				taqInstallInProj('archetype'),
+				taqInstallInProj('core'),
+				chain(_ => taqInstallInProj('archetype')),
 				chain(_ => taqInstallInProj('flextesa')),
 				chain(_ => taqInstallInProj('taquito')),
 			);
 		case 'michelson':
 			return pipe(
-				taqInstallInProj('flextesa'),
+				taqInstallInProj('core'),
+				chain(_ => taqInstallInProj('flextesa')),
 				chain(_ => taqInstallInProj('taquito')),
 			);
 		default: {
@@ -640,7 +644,6 @@ const initProject = (
 	pipe(
 		mkInitialDirectories(projectDir, maxConcurrency, i18n),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
-		chain(_ => taqInstall(parsedArgs)(projectDir)('core')),
 		chain(_ => preInstallPluginsOnInit(parsedArgs, projectDir)),
 		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/ecadlabs/taqueria/issues/528
 		chain(_ => createGitIgnoreFile(projectDir)),
