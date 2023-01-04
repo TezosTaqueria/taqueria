@@ -69,7 +69,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 	});
 
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('compile will show contextual help', async () => {
+	test('compile will show contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
