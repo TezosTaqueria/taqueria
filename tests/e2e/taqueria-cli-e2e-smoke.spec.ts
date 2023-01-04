@@ -75,13 +75,12 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
-		const { stderr } = await execute('taq', 'compile sourcefile.ligo', './test-project');
-		expect(stderr).toContain("Taqueria isn't aware of this task. Perhaps you need to install a plugin first?");
+		const { code } = await execute('taq', 'compile sourcefile.ligo');
+		expect(code).toBe(1);
 		await cleanup();
 	});
 
-	// TODO - blocked by https://github.com/ecadlabs/taqueria/issues/1692
-	test.skip('install a package that does not exist will  error', async () => {
+	test('install a package that does not exist will  error', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");

@@ -368,9 +368,9 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
-				chain(args => NPM.installPlugin(config, parsedArgs.projectDir, i18n, env, args)),
+				chain(args => NPM.installPlugin(config, parsedArgs.projectDir, i18n, args.pluginName)),
 				map(log),
-				chain(() => loadPlugins(cliConfig, config, env, parsedArgs, i18n)), // TODO - is this required?
+				chain(() => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
 				chain(_ => taqResolve<void>()),
 			),
 	});
@@ -397,7 +397,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofUninstallTaskArgs(parsedArgs),
-				chain(parsedArgs => NPM.uninstallPlugin(config, parsedArgs.projectDir, i18n, parsedArgs)),
+				chain(parsedArgs => NPM.uninstallPlugin(config, parsedArgs.projectDir, i18n, parsedArgs.pluginName)),
 				map(log),
 			),
 	});
