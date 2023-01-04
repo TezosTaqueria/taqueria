@@ -5,8 +5,8 @@ import { ValidOpts } from './types';
 
 const getTzKtDockerImages = (opts: ValidOpts) => ({
 	postgres: `postgres:14.5-alpine`,
-	sync: `ecadlabs/tzkt-sync:1.8.3-taqueria`,
-	api: `ecadlabs/tzkt-api:1.8.3-taqueria`,
+	sync: `tzktsynclocal`, // TODO: This will be replaced by our image or BakingBad, if they marge our PR, should fix before merging
+	api: `tzktapilocal`, // Same as above
 });
 
 export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: ValidOpts) => {
@@ -26,7 +26,8 @@ const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: Sandbo
 	return {
 		postgres: `--env POSTGRES_PASSWORD=${sandboxName} --env POSTGRES_USER=tzkt`,
 		sync: `--env ${connectionStringEnv} --env TezosNode__Endpoint="http://${sandboxContainerName}:20000/"`,
-		api: `--env ${connectionStringEnv} --env Kestrel__Endpoints__Http__Url="http://*:5000"`,
+		api:
+			`--env ${connectionStringEnv} --env Kestrel__Endpoints__Http__Url="http://*:5000" --env MaxAttemptsForMigrations=120`,
 	};
 };
 
