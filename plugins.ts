@@ -154,7 +154,6 @@ export const inject = (deps: PluginDeps) => {
 	const sendPluginActionRequest = <T>(plugin: InstalledPlugin.t) =>
 		(action: PluginActionName.t, encoding: PluginResponseEncoding.t) =>
 			(requestArgs: Record<string, unknown>): Future<TaqError.t, T | void> => {
-				debugger;
 				const cmd = [
 					...getPluginExe(plugin),
 					'--taqRun',
