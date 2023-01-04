@@ -63,7 +63,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stdout: stdout2 } = await execute('taq', '--help', './test-project');
-		expect(stdout2).toEqual(expect.arrayContaining(['taq [command]']));
+		expect(stdout2).toEqual(expect.arrayContaining(['taq <command>']));
 
 		await cleanup();
 	});
