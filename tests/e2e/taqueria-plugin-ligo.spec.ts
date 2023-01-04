@@ -62,14 +62,14 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		if (stderr.length > 0) console.error(stderr); // useful for debugging
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', '--help --projectDir=./test-project', './test-project');
-		expect(stdout2).toEqual(expect.arrayContaining(['taq [command]']));
+		const { stdout: stdout2 } = await execute('taq', '--help', './test-project');
+		expect(stdout2).toEqual(expect.arrayContaining(['taq <command>']));
 
 		await cleanup();
 	});
 
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('compile will show contextual help', async () => {
+	test('compile will show contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -77,7 +77,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		if (stderr.length > 0) console.error(stderr); // useful for debugging
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', 'compile --help --projectDir=./test-project', './test-project');
+		const { stdout: stdout2 } = await execute('taq', 'compile --help', './test-project');
 		expect(stdout2).toEqual(
 			expect.arrayContaining(['Compile a smart contract written in a LIGO syntax to Michelson code, along with']),
 		);
