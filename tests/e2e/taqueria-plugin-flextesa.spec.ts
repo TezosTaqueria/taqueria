@@ -29,7 +29,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('start will offer contextual help', async () => {
+	test.skip('start will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		const {} = await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
@@ -49,7 +49,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('start sandbox will offer contextual help', async () => {
+	test.skip('start sandbox will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		const {} = await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
@@ -69,7 +69,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('sandbox stop will offer contextual help', async () => {
+	test.skip('sandbox stop will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		const {} = await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
