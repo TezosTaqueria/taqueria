@@ -356,6 +356,7 @@ export const inject = (deps: PluginDeps) => {
 
 	return {
 		getState: getMemoizedState,
+		getStateAbspath,
 		sendPluginActionRequest,
 		__TEST__: {
 			toPluginArguments,
