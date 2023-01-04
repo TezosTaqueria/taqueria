@@ -29,26 +29,6 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('start sandbox will offer contextual help', async () => {
-		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
-		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
-		await new Promise(r => setTimeout(r, 750));
-
-		const { stdout: stdout2 } = await execute(
-			'taq',
-			'start sandbox --help',
-			'./test-project',
-		);
-		expect(stdout2).toEqual(expect.arrayContaining(['Starts a flextesa sandbox']));
-
-		await cleanup();
-	});
-
 	test('start will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		const {} = await execute('taq', 'init test-project');
@@ -62,6 +42,26 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: stdout2 } = await execute(
 			'taq',
 			'start --help',
+			'./test-project',
+		);
+		expect(stdout2).toEqual(expect.arrayContaining(['Starts a flextesa sandbox']));
+
+		await cleanup();
+	});
+
+	test('start sandbox will offer contextual help', async () => {
+		const { execute, cleanup, exists } = await prepareEnvironment();
+		const {} = await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
+		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
+		await new Promise(r => setTimeout(r, 750));
+
+		const { stdout: stdout2 } = await execute(
+			'taq',
+			'start sandbox --help',
 			'./test-project',
 		);
 		expect(stdout2).toEqual(expect.arrayContaining(['Starts a flextesa sandbox']));
