@@ -17,7 +17,7 @@ Some helpful things to know:
 
 ## Requirements
 
-- Taqueria v0.24.2 or later
+- Taqueria v0.26.0 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
 
@@ -43,6 +43,8 @@ The following commands are available from the CLI:
 - `taq start sandbox [sandboxName]`
 - `taq stop sandbox [sandboxName]`
 - `taq list accounts [sandboxName]`
+- `taq bake [sandboxName]`
+- `taq show protocols`
 
 > ### :page_with_curl: Note
 > The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer
@@ -62,7 +64,6 @@ This example shows the configuration for the default sandbox named `local`:
     "sandbox": {
         "local": {
             "label": "Local Tezos Sandbox",
-            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
             "rpcUrl": "http://localhost:20000"
         }
 ```
@@ -100,7 +101,6 @@ When this sandbox is started, the implicit accounts defined in the configuration
                 }
             },
             "label": "Local Tezos Sandbox",
-            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
             "rpcUrl": "http://localhost:20000"
         }
     },
@@ -140,8 +140,7 @@ An arbitrary string used to describe a particular configuration
 
 A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
 
-Current available protocols:
-- Kathmandu   `PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg` as of Oct 2022
+To see a list of what protocols are supported by the version of the Flextesa plugin you have installed please run `taq show protocols`.
 
 #### 'rpcUrl'
 
@@ -166,6 +165,49 @@ Once created, sandboxes can be added to environments by adding the `sandboxName`
         },
     },
 ```
+
+### Baking
+
+By default, the flextesa sandbox will start with a single baker and bake every 5 seconds, which is the default block time.
+
+The block time can be adjusted by editing your sandbox configuration:
+```json
+    "sandbox": {
+        "local": {
+            "label": "Local Tezos Sandbox",
+            "rpcUrl": "http://localhost:20000",
+            "annotations": {
+                "baking": "enabled",
+                "block_time": 1
+            }
+        }
+```
+
+> NOTE: The `block_time` setting is an integer and must be set to a minimum of 1, with 5 being the default.
+
+You may also disable baking:
+```json
+    "sandbox": {
+        "local": {
+            "label": "Local Tezos Sandbox",
+            "rpcUrl": "http://localhost:20000",
+            "annotations": {
+                "baking": "disabled"
+            }
+        }
+```
+
+When baking is disabled, operations will not automatically be injected into blocks, and blocks will not be injected into the blockchain.
+
+To bake any pending operations, run `taq bake`.
+
+#### Baking-on-demand
+
+Rather than manully run `taq bake` when there are pending operations, you can run `taq bake -w` which will watch for operations as they are injected into the mempool and bake them as soon as possible.
+
+## Plugin Architecture
+
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
 
 ### Flextesa Plugin Task Registry
 
@@ -194,6 +236,18 @@ Once created, sandboxes can be added to environments by adding the `sandboxName`
 |  command   | 'list accounts [sandboxName]'  | 
 |  aliases   | [ ]                            |  
 
-## Plugin Architecture
+#### The `show protocols` Task
 
-This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
+|  attribute |  value                         | 
+|------------|:------------------------------:|
+|  task      | 'show protocols'               | 
+|  command   | 'show protocols                | 
+|  aliases   | [ ]                            |
+
+#### The `bake` Task
+
+|  attribute |  value                         | 
+|------------|:------------------------------:|
+|  task      | 'bake'                         | 
+|  command   | 'bake [-w]                     | 
+|  aliases   | [ ]                            |

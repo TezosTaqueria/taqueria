@@ -36,10 +36,10 @@ import {
 import { titleCase } from 'https://deno.land/x/case@2.1.1/mod.ts';
 import { Table } from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts';
 import { identity, pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { has, last, uniq } from 'https://deno.land/x/ramda@v0.27.2/mod.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
+import { has, last, uniq } from 'https://x.nest.land/ramda@0.27.2/mod.ts';
 import * as Analytics from './analytics.ts';
 import { addContract, listContracts, removeContract } from './contracts.ts';
 import * as NPM from './npm.ts';
@@ -368,10 +368,9 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
-				chain(args => NPM.installPlugin(config, parsedArgs.projectDir, i18n, args.pluginName)),
-				map(log),
-				chain(() => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
-				chain(_ => taqResolve<void>()),
+				chain(args => NPM.installPlugin(config, parsedArgs.projectDir, i18n, env, args)),
+				chain(config => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
+				map(_ => log(i18n.__('pluginInstalled'))),
 			),
 	});
 
@@ -397,8 +396,9 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofUninstallTaskArgs(parsedArgs),
-				chain(parsedArgs => NPM.uninstallPlugin(config, parsedArgs.projectDir, i18n, parsedArgs.pluginName)),
-				map(log),
+				chain(parsedArgs => NPM.uninstallPlugin(config, parsedArgs.projectDir, i18n, env, parsedArgs)),
+				chain(config => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
+				map(_ => log(i18n.__('pluginUninstalled'))),
 			),
 	});
 
@@ -599,25 +599,29 @@ const preInstallPluginsOnInit = (parsedArgs: SanitizedArgs.t, projectDir: Saniti
 	switch (parsedArgsOfInit.workflow) {
 		case 'ligo':
 			return pipe(
-				taqInstallInProj('ligo'),
+				taqInstallInProj('core'),
+				chain(_ => taqInstallInProj('ligo')),
 				chain(_ => taqInstallInProj('flextesa')),
 				chain(_ => taqInstallInProj('taquito')),
 			);
 		case 'smartpy':
 			return pipe(
-				taqInstallInProj('smartpy'),
+				taqInstallInProj('core'),
+				chain(_ => taqInstallInProj('smartpy')),
 				chain(_ => taqInstallInProj('flextesa')),
 				chain(_ => taqInstallInProj('taquito')),
 			);
 		case 'archetype':
 			return pipe(
-				taqInstallInProj('archetype'),
+				taqInstallInProj('core'),
+				chain(_ => taqInstallInProj('archetype')),
 				chain(_ => taqInstallInProj('flextesa')),
 				chain(_ => taqInstallInProj('taquito')),
 			);
 		case 'michelson':
 			return pipe(
-				taqInstallInProj('flextesa'),
+				taqInstallInProj('core'),
+				chain(_ => taqInstallInProj('flextesa')),
 				chain(_ => taqInstallInProj('taquito')),
 			);
 		default: {
@@ -641,7 +645,6 @@ const initProject = (
 	pipe(
 		mkInitialDirectories(projectDir, maxConcurrency, i18n),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
-		chain(_ => taqInstall(parsedArgs)(projectDir)('core')),
 		chain(_ => preInstallPluginsOnInit(parsedArgs, projectDir)),
 		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/ecadlabs/taqueria/issues/528
 		chain(_ => createGitIgnoreFile(projectDir)),
@@ -1280,7 +1283,8 @@ export const displayError = (cli: CLIConfig) =>
 			cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
 		}
 
-		if (!inputArgs.help) {
+		// We should display errors when asking for help when debug mode is enabled
+		if (!inputArgs.help || inputArgs.debug) {
 			console.error(''); // empty line
 			const res = match(normalizeErr(err))
 				.with({ kind: 'E_FORK' }, err => [125, err.msg])

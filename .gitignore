@@ -128,82 +128,22 @@ node_modules
 /taqueria-sdk/*.mjs.map
 /taqueria-sdk/*.d.ts
 
-# Core plugin
-/taqueria-plugin-core/index.js
-/taqueria-plugin-core/index.js.map
-
-# LIGO Plugin
-/taqueria-plugin-ligo/index.js
-/taqueria-plugin-ligo/index.js.map
-
-# SmartPY
-/taqueria-plugin-smartpy/.parcel-cache
-/taqueria-plugin-smartpy/index.js
-/taqueria-plugin-smartpy/index.js.map
-
-# Taquito Plugin
-/taqueria-plugin-taquito/index.js
-/taqueria-plugin-taquito/index.js.map
-/taqueria-plugin-taquito/.parcel-cache
-
-# Mock plugin
-/taqueria-plugin-mock/index.js
-/taqueria-plugin-mock/index.js.map
-
-# Flextesa plugin
-/taqueria-plugin-flextesa/index.js
-/taqueria-plugin-flextesa/index.js.map
-/taqueria-plugin-flextesa/.parcel-cache
-/taqueria-flextesa-manager/*.map
-/taqueria-flextesa-manager/*.js
-/taqueria-flextesa-manager/*.d.ts
-/taqueria-flextesa-manager/*.mjs
-
-# Teztnets plugin
-/taqueria-plugin-teztnets/index.js
-/taqueria-plugin-teztnets/index.js.map
-/taqueria-plugin-teztnets/.parcel-cache
-
-# Contract Types Plugin
-/taqueria-plugin-contract-types/*.js
-/taqueria-plugin-contract-types/*.map
-/taqueria-plugin-contract-types/*.cjs
-/taqueria-plugin-contract-types/*.mjs
-/taqueria-plugin-contract-types/*.d.ts
-/taqueria-plugin-contract-types/**/*.js
-/taqueria-plugin-contract-types/**/*.map
-/taqueria-plugin-contract-types/**/*.cjs
-/taqueria-plugin-contract-types/**/*.d.ts
-
-# Archetype plugin
-/taqueria-plugin-archetype/index.js
-/taqueria-plugin-archetype/index.js.map
-
-# Tezos Client Plugin
-/taqueria-plugin-tezos-client/index.js
-/taqueria-plugin-tezos-client/index.js.map
-
-# Taqueria State Package
-/taqueria-state/index.js
-/taqueria-state/index.js.map
-/taqueria-state/*.d.ts
-/taqueria-state/node/*.d.ts
+# Taqueria Build Artifacts
+/taqueria*/*.js
+/taqueria*/*.d.ts
+/taqueria*/*.mjs
+/taqueria*/*.map
+/taqueria*/*.cjs
+/taqueria*/**/*.js
+/taqueria*/**/*.map
+/taqueria*/**/*.d.ts
+/taqueria*/**/*.mjs
+/taqueria*/**/*.cjs
 
 # Toolkit
 /taqueria-toolkit/index.js
 /taqueria-toolkit/index.js.map
 /taqueria-toolkit/*.d.ts
-
-# Jest plugin
-/taqueria-plugin-jest/*.js
-/taqueria-plugin-jest/*.cjs
-/taqueria-plugin-jest/*.map
-/taqueria-plugin-jest/*.mjs
-/taqueria-plugin-jest/index.d.ts
-
-# IPFS plugin
-/taqueria-plugin-ipfs-pinata/index.js.map
-/taqueria-plugin-ipfs-pinata/index.js
 
 # VS Code Extension
 /taqueria-vscode-extension/out
@@ -211,10 +151,6 @@ node_modules
 .vscode-test
 /taqueria-vscode-extension/state.json
 /taqueria-vscode-extension/config.json
-
-# Metadata plugin
-/taqueria-plugin-metadata/index.js.map
-/taqueria-plugin-metadata/index.js
 
 # Website
 website/docs/glossary.md

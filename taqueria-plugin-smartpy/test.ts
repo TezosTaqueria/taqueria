@@ -32,10 +32,9 @@ const testContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =
 		})
 		.catch(err => {
 			emitExternalError(err, sourceFile);
-			const outputDir = getCompilationTargetsDirname(parsedArgs, sourceFile);
 			return {
 				contract: sourceFile,
-				testResults: `Some tests failed :(\nInspect the log files inside the test subfolders of\n"${outputDir}"`,
+				testResults: 'Some tests failed :(',
 			};
 		});
 

@@ -1,14 +1,13 @@
-import { exec as exec1 } from 'child_process';
 import fsPromises from 'fs/promises';
 import utils from 'util';
 import {
 	checkContractBalanceOnNetwork,
+	exec,
 	generateTestProject,
 	getContainerName,
 	itemArrayInTable,
 	sleep,
 } from './utils/utils';
-const exec = utils.promisify(exec1);
 
 const taqueriaProjectPath = 'scrap/auto-test-taquito-flextesa-plugin';
 const contractRegex = new RegExp(/(KT1)+\w{33}?/);
@@ -25,8 +24,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			`cp e2e/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
 
-		await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-		await sleep(5000);
+		const started = await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
 	beforeEach(async () => {
@@ -36,6 +34,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
 	test('Verify that taqueria taquito plugin can deploy one contract using deploy command', async () => {
+		await sleep(20000);
 		environment = 'development';
 
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
@@ -67,6 +66,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
 	test('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
+		await sleep(20000);
 		environment = 'development';
 
 		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
