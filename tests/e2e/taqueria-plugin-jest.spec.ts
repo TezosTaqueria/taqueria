@@ -4,8 +4,7 @@ const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('test will offer contextual help', async () => {
+	test('test will offer contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -23,8 +22,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('jest will offer contextual help', async () => {
+	test('jest will offer contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -42,8 +40,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('create contract-test will offer contextual help', async () => {
+	test('create contract-test will offer contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
