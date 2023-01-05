@@ -7,6 +7,7 @@ const getTzKtDockerImages = (opts: ValidOpts) => ({
 	postgres: `postgres:14.5-alpine`,
 	sync: `ghcr.io/ecadlabs/tzkt-sync:v1.11.0-taqueria`,
 	api: `ghcr.io/ecadlabs/tzkt-api:v1.11.0-taqueria`,
+	metadata: 'dipdup/metadata:latest',
 });
 
 export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: ValidOpts) => {
@@ -15,6 +16,7 @@ export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: Val
 		postgres: `taq-postgres-${uniqueSandboxName}`,
 		sync: `taq-tzkt-sync-${uniqueSandboxName}`,
 		api: `taq-tzkt-api-${uniqueSandboxName}`,
+		metadata: `taq-metadata-${uniqueSandboxName}`,
 	};
 };
 
@@ -28,6 +30,7 @@ const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: Sandbo
 		sync: `--env ${connectionStringEnv} --env TezosNode__Endpoint="http://${sandboxContainerName}:20000/"`,
 		api:
 			`--env ${connectionStringEnv} --env Kestrel__Endpoints__Http__Url="http://*:5000" --env MaxAttemptsForMigrations=120`,
+		metadata: ``,
 	};
 };
 
@@ -89,5 +92,7 @@ export const getTzKtStartCommands = async (sandboxName: string, sandbox: Sandbox
 			`docker run --network sandbox_${sandboxName}_net --name ${containerNames.sync} --rm --detach --platform ${arch} ${environmentVariables.sync} ${images.sync}`,
 		api:
 			`docker run --network sandbox_${sandboxName}_net --name ${containerNames.api} --rm --detach --platform ${arch} -p ${newAPIPort}:5000 ${environmentVariables.api} ${images.api}`,
+		metadata:
+			`docker run --network sandbox_${sandboxName}_net --name ${containerNames.metadata} --rm --detach --platform ${arch} -v ${opts.projectDir}/dipdup:/work:Z ${environmentVariables.metadata} ${images.metadata} -c /work/dipdup.yml`,
 	};
 };
