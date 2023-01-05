@@ -128,7 +128,7 @@ const rmFromPluginList = (loadedConfig: LoadedConfig.t, parsedArgs: SanitizedArg
 			),
 	);
 
-const rebuildState = (env: EnvVars, i18n: i18n, parsedArgs: SanitizedArgs.InstallTaskArgs) =>
+const purgeEphemeralState = (env: EnvVars, i18n: i18n, parsedArgs: SanitizedArgs.InstallTaskArgs) =>
 	(config: LoadedConfig.t) => {
 		const pluginsLib = initPlugins({
 			config,
@@ -142,7 +142,7 @@ const rebuildState = (env: EnvVars, i18n: i18n, parsedArgs: SanitizedArgs.Instal
 		return pipe(
 			pluginsLib.getStateAbspath(),
 			chain(rm),
-			chain(pluginsLib.getState),
+			map(() => config),
 		);
 	};
 
@@ -152,7 +152,7 @@ export const installPlugin = (
 	i18n: i18n,
 	env: EnvVars,
 	parsedArgs: SanitizedArgs.InstallTaskArgs,
-): Future<TaqError.t, string> =>
+): Future<TaqError.t, LoadedConfig.t> =>
 	pipe(
 		requireNPM(projectDir, i18n),
 		chain(_ => exec('npm install -D <%= it.plugin %>', { plugin: parsedArgs.pluginName }, false, projectDir)),
@@ -168,20 +168,19 @@ export const installPlugin = (
 			// what the real package name is
 			return addToPluginList(pluginName, config);
 		}),
-		chain(rebuildState(env, i18n, parsedArgs)),
-		map(_ => i18n.__('pluginInstalled')),
+		chain(purgeEphemeralState(env, i18n, parsedArgs)),
 	);
 
 export const uninstallPlugin = (
 	config: LoadedConfig.t,
 	projectDir: SanitizedAbsPath.t,
 	i18n: i18n,
+	env: EnvVars,
 	parsedArgs: SanitizedArgs.UninstallTaskArgs,
 ) =>
 	pipe(
 		requireNPM(projectDir, i18n),
 		chain(() => exec('npm uninstall -D <%= it.plugin %>', { plugin: parsedArgs.pluginName }, false, projectDir)),
 		chain(() => rmFromPluginList(config, parsedArgs)),
-		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/ecadlabs/taqueria/issues/528
-		map(() => i18n.__('pluginUninstalled')),
+		chain(purgeEphemeralState(env, i18n, parsedArgs)),
 	);
