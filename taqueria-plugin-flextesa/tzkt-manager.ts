@@ -27,10 +27,11 @@ const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: Sandbo
 		`ConnectionStrings__DefaultConnection="host=${containerNames.postgres};port=5432;database=sandbox_data;username=tzkt;password=${sandboxName};"`;
 	return {
 		postgres: `--env POSTGRES_PASSWORD=${sandboxName} --env POSTGRES_USER=tzkt`,
-		sync: `--env ${connectionStringEnv} --env TezosNode__Endpoint="http://${sandboxContainerName}:20000/"`,
+		sync:
+			`--env ${connectionStringEnv} --env TezosNode__Endpoint="http://${sandboxContainerName}:20000/" --env Protocols__Fallback="PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"`,
 		api:
 			`--env ${connectionStringEnv} --env Kestrel__Endpoints__Http__Url="http://*:5000" --env MaxAttemptsForMigrations=120`,
-		metadata: ``,
+		metadata: `--env POSTGRES_HOST=${containerNames.postgres} --env TZKT_URL="http://${containerNames.api}:5000"`,
 	};
 };
 
@@ -93,6 +94,6 @@ export const getTzKtStartCommands = async (sandboxName: string, sandbox: Sandbox
 		api:
 			`docker run --network sandbox_${sandboxName}_net --name ${containerNames.api} --rm --detach --platform ${arch} -p ${newAPIPort}:5000 ${environmentVariables.api} ${images.api}`,
 		metadata:
-			`docker run --network sandbox_${sandboxName}_net --name ${containerNames.metadata} --rm --detach --platform ${arch} -v ${opts.projectDir}/dipdup:/work:Z ${environmentVariables.metadata} ${images.metadata} -c /work/dipdup.yml`,
+			`docker run --network sandbox_${sandboxName}_net --name ${containerNames.metadata} --rm --detach --platform ${arch} -v /home/alireza/work/scrap/EcadLabs/DipdupExplorations:/work:Z ${environmentVariables.metadata} ${images.metadata} -c /work/dipdup.yml`,
 	};
 };
