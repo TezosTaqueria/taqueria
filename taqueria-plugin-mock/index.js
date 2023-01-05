@@ -10,6 +10,18 @@ const tableResponse = JSON.stringify({
 	data: [{ ping: 'pong' }],
 });
 
+// If the CLI has requested an invalid-schema, then we modify
+// the schema to make it invalid
+const processArgs = (() => {
+	if (!process.argv.includes('--invalidSchema')) return process.argv;
+	const configIndex = process.argv.indexOf('--config') + 1;
+	const json = JSON.parse(process.argv[configIndex]);
+	json.accounts.secretKey = 'my secret key';
+	json.accounts.privateKey = 'my private key';
+	process.argv[configIndex] = JSON.stringify(json);
+	return process.argv;
+})();
+
 Plugin.create(i18n => ({
 	schema: '1.0',
 	version: '0.1',
@@ -191,4 +203,4 @@ echo 'Hi there, <%= greeting %>!' ><%= outputFile %>
 			}
 		}
 	},
-}), process.argv);
+}), processArgs);
