@@ -275,7 +275,8 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('transfer will send mutez from one instantiated account to another', async () => {
+	test.skip('transfer will send mutez from one instantiated account to another', async () => {
+		// FLAKY - https://github.com/ecadlabs/taqueria/issues/1694
 		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");

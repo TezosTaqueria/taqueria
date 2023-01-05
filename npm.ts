@@ -1,16 +1,19 @@
+import * as Config from '@taqueria/protocol/Config';
 import type { i18n } from '@taqueria/protocol/i18n';
 import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
 import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
+import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { chain, chainRej, FutureInstance as Future, map, mapRej } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { getConfig } from './taqueria-config.ts';
+import initPlugins from './plugins.ts';
+import { EnvVars } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
 
 // Get utils
-const { execText, readJsonFile, writeJsonFile } = utils.inject({
+const { execText, readJsonFile, writeJsonFile, rm } = utils.inject({
 	stdout: Deno.stdout,
 	stderr: Deno.stderr,
 });
@@ -87,53 +90,97 @@ const addToPluginList = (pluginName: NpmPluginName, loadedConfig: LoadedConfig.t
 				);
 		}),
 		chain(plugins =>
-			LoadedConfig.make({
+			Config.make({
 				...loadedConfig,
 				plugins,
 			})
 		),
-		chain(writeJsonFile(loadedConfig.configFile)),
+		chain(config =>
+			pipe(
+				writeJsonFile(loadedConfig.configFile)(config),
+				chain(_ =>
+					LoadedConfig.make({
+						...loadedConfig,
+						...config,
+					})
+				),
+			)
+		),
 	);
+
+const rmFromPluginList = (loadedConfig: LoadedConfig.t, parsedArgs: SanitizedArgs.UninstallTaskArgs) =>
+	pipe(
+		getPluginName(parsedArgs.pluginName),
+		pluginName => loadedConfig.plugins?.filter(plugin => plugin.name != pluginName.toString()),
+		plugins =>
+			pipe(
+				Config.make({
+					...loadedConfig,
+					plugins,
+				}),
+				chain(writeJsonFile(loadedConfig.configFile)),
+				chain(_ =>
+					LoadedConfig.make({
+						...loadedConfig,
+						plugins,
+					})
+				),
+			),
+	);
+
+const purgeEphemeralState = (env: EnvVars, i18n: i18n, parsedArgs: SanitizedArgs.InstallTaskArgs) =>
+	(config: LoadedConfig.t) => {
+		const pluginsLib = initPlugins({
+			config,
+			env,
+			i18n,
+			parsedArgs,
+			stderr: Deno.stderr,
+			stdout: Deno.stdout,
+		});
+
+		return pipe(
+			pluginsLib.getStateAbspath(),
+			chain(rm),
+			map(() => config),
+		);
+	};
 
 export const installPlugin = (
 	config: LoadedConfig.t,
 	projectDir: SanitizedAbsPath.t,
 	i18n: i18n,
-	plugin: string,
-): Future<TaqError.t, string> =>
+	env: EnvVars,
+	parsedArgs: SanitizedArgs.InstallTaskArgs,
+): Future<TaqError.t, LoadedConfig.t> =>
 	pipe(
 		requireNPM(projectDir, i18n),
-		chain(_ => exec('npm install -D <%= it.plugin %>', { plugin }, false, projectDir)),
-		chain(() => {
+		chain(_ => exec('npm install -D <%= it.plugin %>', { plugin: parsedArgs.pluginName }, false, projectDir)),
+		chain(_result => {
+			// TODO: we need to check whether the plugin installation was actually successful
+
 			// The plugin name could look like this: @taqueria/plugin-ligo@1.2.3
 			// We need to trim @1.2.3 from the end
-			const pluginName = getPluginName(plugin);
+			const pluginName = getPluginName(parsedArgs.pluginName);
 
 			// Note, pluginName could be something like @taqueria/plugin-ligo
 			// or ../taqueria-plugin-ligo. Thus, we still need to determine
 			// what the real package name is
 			return addToPluginList(pluginName, config);
 		}),
-		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/ecadlabs/taqueria/issues/528
-		map(_ => i18n.__('pluginInstalled')),
+		chain(purgeEphemeralState(env, i18n, parsedArgs)),
 	);
 
-export const uninstallPlugin = (config: LoadedConfig.t, projectDir: SanitizedAbsPath.t, i18n: i18n, plugin: string) =>
+export const uninstallPlugin = (
+	config: LoadedConfig.t,
+	projectDir: SanitizedAbsPath.t,
+	i18n: i18n,
+	env: EnvVars,
+	parsedArgs: SanitizedArgs.UninstallTaskArgs,
+) =>
 	pipe(
 		requireNPM(projectDir, i18n),
-		chain(() => exec('npm uninstall -D <%= it.plugin %>', { plugin }, false, projectDir)),
-		chain(() => {
-			const pluginName = getPluginName(plugin);
-			const plugins = config.plugins?.filter(plugin => plugin.name != pluginName.toString());
-
-			return pipe(
-				LoadedConfig.make({
-					...config,
-					plugins,
-				}),
-				chain(writeJsonFile(config.configFile)),
-			);
-		}),
-		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/ecadlabs/taqueria/issues/528
-		map(() => i18n.__('pluginUninstalled')),
+		chain(() => exec('npm uninstall -D <%= it.plugin %>', { plugin: parsedArgs.pluginName }, false, projectDir)),
+		chain(() => rmFromPluginList(config, parsedArgs)),
+		chain(purgeEphemeralState(env, i18n, parsedArgs)),
 	);
