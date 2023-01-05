@@ -368,10 +368,9 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
-				chain(args => NPM.installPlugin(config, parsedArgs.projectDir, i18n, args.pluginName)),
-				map(log),
-				chain(() => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
-				chain(_ => taqResolve<void>()),
+				chain(args => NPM.installPlugin(config, parsedArgs.projectDir, i18n, env, args)),
+				chain(config => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
+				map(_ => log(i18n.__('pluginInstalled'))),
 			),
 	});
 
@@ -397,8 +396,9 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofUninstallTaskArgs(parsedArgs),
-				chain(parsedArgs => NPM.uninstallPlugin(config, parsedArgs.projectDir, i18n, parsedArgs.pluginName)),
-				map(log),
+				chain(parsedArgs => NPM.uninstallPlugin(config, parsedArgs.projectDir, i18n, env, parsedArgs)),
+				chain(config => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
+				map(_ => log(i18n.__('pluginUninstalled'))),
 			),
 	});
 
@@ -1283,7 +1283,8 @@ export const displayError = (cli: CLIConfig) =>
 			cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
 		}
 
-		if (!inputArgs.help) {
+		// We should display errors when asking for help when debug mode is enabled
+		if (!inputArgs.help || inputArgs.debug) {
 			console.error(''); // empty line
 			const res = match(normalizeErr(err))
 				.with({ kind: 'E_FORK' }, err => [125, err.msg])
