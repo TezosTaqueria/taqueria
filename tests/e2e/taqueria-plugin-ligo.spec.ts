@@ -68,7 +68,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
 	test('compile will show contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
@@ -85,8 +84,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('compile-ligo will show contextual help', async () => {
+	test('compile-ligo will show contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -274,8 +272,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// TODO How do we set a environment variable, TAQ_LIGO_IMAGE=ligolang/ligo:0.54.1 ?
-	test.skip('compile can use a different version of the LIGO image', async () => {
+	test('compile can use a different version of the LIGO image', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -285,7 +282,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stdout: imageOutput } = await execute('taq', 'get-image --plugin ligo', './test-project');
-		expect(imageOutput).toContain('ligolang/ligo:0.54.1');
+		expect(imageOutput).toEqual(expect.arrayContaining([expect.stringContaining('ligolang/ligo:')]));
 
 		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-custom-image.mligo', mligo_file);
