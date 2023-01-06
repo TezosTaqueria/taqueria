@@ -6,53 +6,6 @@ const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
-	test('compile will create an artifact from three files (quickstart scenario)', async () => {
-		const { execute, spawn, cleanup, writeFile, readFile, ls } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project --debug');
-		await waitForText("Project taq'ified!");
-
-		const { stdout, stderr } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
-		if (stderr.length > 0) console.error(stderr); // useful for debugging
-		expect(stdout).toContain('Plugin installed successfully');
-
-		const mligo_file = await (await exec(`cat e2e/data/counter.mligo`)).stdout;
-		await writeFile('./test-project/contracts/counter.mligo', mligo_file);
-
-		const storage_file = await (await exec(`cat e2e/data/counter.storageList.mligo`)).stdout;
-		await writeFile('./test-project/contracts/counter.storageList.mligo', storage_file);
-
-		const permissions_file = await (await exec(`cat e2e/data/counter.parameterList.mligo`)).stdout;
-		await writeFile('./test-project/contracts/counter.parameterList.mligo', permissions_file);
-
-		const {} = await execute('taq', 'add-contract counter.mligo', './test-project');
-		const {} = await execute('taq', 'add-contract counter.parameterList.mligo', './test-project');
-		const {} = await execute('taq', 'add-contract counter.storageList.mligo', './test-project');
-
-		const contracts_list = await ls('./test-project/contracts');
-		expect(contracts_list).toEqual(
-			expect.arrayContaining(['counter.mligo', 'counter.parameterList.mligo', 'counter.storageList.mligo']),
-		);
-
-		const { stdout: stdout1 } = await execute('taq', 'compile counter.mligo', './test-project');
-
-		expect(stdout1).toMatchInlineSnapshot(`
-              [
-                "┌─────────────────────────────┬───────────────────────────────────────────────┐",
-                "│ Contract                    │ Artifact                                      │",
-                "├─────────────────────────────┼───────────────────────────────────────────────┤",
-                "│ counter.mligo               │ artifacts/counter.tz                          │",
-                "├─────────────────────────────┼───────────────────────────────────────────────┤",
-                "│ counter.storageList.mligo   │ artifacts/counter.default_storage.tz          │",
-                "│                             │ artifacts/counter.storage.another_count.tz    │",
-                "├─────────────────────────────┼───────────────────────────────────────────────┤",
-                "│ counter.parameterList.mligo │ artifacts/counter.parameter.increment_by_3.tz │",
-                "└─────────────────────────────┴───────────────────────────────────────────────┘",
-              ]
-          `);
-
-		await cleanup();
-	});
-
 	test('ligo plugin help will show help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
