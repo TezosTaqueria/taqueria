@@ -20,10 +20,10 @@ export function getContractsByTaqueriaConfig(currentConfig: ConfigInfo, sandboxN
 				? false
 				: environment.sandboxes.some(envSandbox => envSandbox === sandboxName),
 	);
-
 	if (!sandboxEnvironment || typeof sandboxEnvironment === 'string' || !sandboxEnvironment.aliases) {
 		return [];
 	}
+
 	return Object.entries(sandboxEnvironment.aliases).map(([alias, config]) => ({
 		alias,
 		config: { address: config.address },
@@ -35,10 +35,10 @@ export function getAccountsByTaqueriaConfig(currentConfig: ConfigInfo, sandboxNa
 	if (!sandbox || !sandbox.accounts) {
 		return [];
 	}
-	const sandboxAccounts = (
+
+	return (
 		Object.entries(sandbox.accounts)
 			.filter(([alias, config]) => typeof config !== 'string') as Array<[string, SandboxAccountConfig]>
 	)
 		.map(([alias, config]) => ({ alias, address: config.publicKeyHash }));
-	return sandboxAccounts;
 }

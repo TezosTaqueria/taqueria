@@ -7,8 +7,8 @@ import { getRunningContainerNames } from '../pure';
 import * as Util from '../pure';
 import { CachedSandboxState, SandboxState } from './CachedSandboxState';
 import { CachedTzKTDataProvider } from './helpers/CachedTzKTDataProvider';
+import { TzKTAccountData, TzKtHeadData } from './helpers/TzKTFetcher';
 import { ObservableConfig } from './ObservableConfig';
-import { TzKtHead } from './SandboxDataModels';
 import {
 	OperationTreeItem,
 	SandboxChildrenTreeItem,
@@ -150,6 +150,8 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 					await cachedProvider.startConnection();
 				}
 				cachedProvider.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, sandboxName));
+				cachedProvider.accountsFromTzKt.subscribe(data => this.onAccountFromTzKt(data, sandboxName));
+				cachedProvider.contractsFromTzKt.subscribe(data => this.onAccountFromTzKt(data, sandboxName));
 				this.tzktProviders[sandboxName] = cachedProvider;
 			} catch (e: unknown) {
 				this.helper.logHelper.showLog(OutputLevels.debug, 'Error in signalR:');
@@ -158,12 +160,22 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 	}
 
-	onHeadFromTzKt(data: TzKtHead | undefined, sandboxName: string): void {
+	onHeadFromTzKt(data: TzKtHeadData | undefined, sandboxName: string): void {
 		const treeItem = this.sandboxTreeItems?.find(item => item.sandboxName === sandboxName);
 		if (!treeItem) {
 			return;
 		}
 		treeItem.indexerLevel = data?.level;
+		this.refreshItem(treeItem);
+	}
+
+	onAccountFromTzKt(_data: TzKTAccountData | undefined, sandboxName: string): void {
+		// TODO: find a way to refresh only selected account tree item
+
+		const treeItem = this.sandboxTreeItems?.find(item => item.sandboxName === sandboxName);
+		if (!treeItem) {
+			return;
+		}
 		this.refreshItem(treeItem);
 	}
 
@@ -352,12 +364,8 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 	}
 
-	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void> = new vscode
-		.EventEmitter<
-		SandboxTreeItem | undefined | null | void
-	>();
-	readonly onDidChangeTreeData: vscode.Event<SandboxTreeItemBase | undefined | null | void> =
-		this._onDidChangeTreeData.event;
+	private _onDidChangeTreeData = new vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void>();
+	readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
 	async getSandboxState(
 		sandBoxName: string,

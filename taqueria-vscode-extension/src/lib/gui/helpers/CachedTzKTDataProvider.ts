@@ -5,33 +5,23 @@ import { VsCodeHelper } from '../../helpers';
 import { OutputLevels } from '../../LogHelper';
 import { SandboxState } from '../CachedSandboxState';
 import { getAccountsByTaqueriaConfig, getContractsByTaqueriaConfig } from '.././helpers/SandboxDataHelpers';
-import {
-	findAccountInTzKT,
-	findSmartContractFromTzkt,
-	TzKTAccountData,
-	TzKTContractData,
-} from '.././helpers/TzKTFetcher';
+import { findAccountInTzKT, findSmartContractFromTzkt, TzKTAccountData, TzKtHeadData } from '.././helpers/TzKTFetcher';
 import { ObservableConfig } from '.././ObservableConfig';
-import { TzKtHead } from '.././SandboxDataModels';
 
 export type SandboxTzKTAccount = TzKTAccountData & {
 	address: NonNullable<TzKTAccountData['address']>;
 	alias: NonNullable<TzKTAccountData['alias']>;
 };
 
-export type SandboxTzKTContract = TzKTContractData & {
-	address: NonNullable<TzKTContractData['address']>;
-	alias: NonNullable<TzKTContractData['alias']>;
-};
-
 export class CachedTzKTDataProvider {
 	private currentTzKtBaseAddress: string | undefined;
 	private currentSandboxState: SandboxState;
 	private tzktAccountsMap = new Map<string, TzKTAccountData>();
-	private tzktContractsMap = new Map<string, TzKTContractData>();
+	private tzktContractsMap = new Map<string, TzKTAccountData>();
 
-	readonly headFromTzKt = new rxjs.BehaviorSubject<TzKtHead | undefined>(undefined);
+	readonly headFromTzKt = new rxjs.BehaviorSubject<TzKtHeadData | undefined>(undefined);
 	readonly accountsFromTzKt = new rxjs.BehaviorSubject<TzKTAccountData | undefined>(undefined);
+	readonly contractsFromTzKt = new rxjs.BehaviorSubject<TzKTAccountData | undefined>(undefined);
 	connection: signalR.HubConnection | undefined;
 
 	constructor(
@@ -44,17 +34,41 @@ export class CachedTzKTDataProvider {
 		this.observableConfig.configObservable.subscribe(async _configInfo => await this.onConfigUpdate());
 	}
 
-	private onHeadFromTzKt(data: { type: number; data: TzKtHead }): void {
-		this.helper.logHelper.showLog(OutputLevels.debug, JSON.stringify(data));
+	private onHeadFromTzKt(data: { type: number; data: TzKtHeadData }): void {
+		this.helper.logHelper.showLog(OutputLevels.debug, 'onHeadFromTzKt ' + JSON.stringify(data));
 		if (data.type === 1) {
 			this.headFromTzKt.next(data.data);
 		}
 	}
 
-	private onAccountsFromTzKt(data: { type: number; data: TzKTAccountData }): void {
-		this.helper.logHelper.showLog(OutputLevels.debug, JSON.stringify(data));
+	private onAccountsFromTzKt(data: { type: number; data: TzKTAccountData[] }): void {
+		this.helper.logHelper.showLog(OutputLevels.debug, 'onAccountsFromTzKt ' + JSON.stringify(data));
 		if (data.type === 1) {
-			this.accountsFromTzKt.next(data.data);
+			for (const account of data.data) {
+				if (account.address) {
+					switch (account.type) {
+						case 'contract': {
+							this.tzktContractsMap.set(account.address, account);
+							this.contractsFromTzKt.next(account);
+							this.helper.logHelper.showLog(OutputLevels.debug, 'onAccountsFromTzKt > contract ' + account.address);
+							break;
+						}
+						case 'delegate': {
+							this.tzktAccountsMap.set(account.address, account);
+							this.accountsFromTzKt.next(account);
+							this.helper.logHelper.showLog(OutputLevels.debug, 'onAccountsFromTzKt > delegate ' + account.address);
+							break;
+						}
+						default: {
+							this.helper.logHelper.showLog(
+								OutputLevels.debug,
+								'onAccountsFromTzKt > unknown account.type ' + JSON.stringify(account),
+							);
+							break;
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -86,7 +100,7 @@ export class CachedTzKTDataProvider {
 			await this.startConnection();
 		});
 
-		this.connection.on('head', data => this.onHeadFromTzKt(data));
+		this.connection.on('head', payload => this.onHeadFromTzKt(payload));
 		this.connection.on('accounts', payload => this.onAccountsFromTzKt(payload));
 	}
 
@@ -121,9 +135,13 @@ export class CachedTzKTDataProvider {
 			await this.connection.start();
 			await this.connection.invoke('SubscribeToHead');
 
-			const sandboxAccounts = getAccountsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
+			const taqueriaAccounts = getAccountsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
+			const taqueriaContracts = getContractsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
 			await this.connection.invoke('SubscribeToAccounts', {
-				addresses: sandboxAccounts.map(account => account.address),
+				addresses: [
+					...taqueriaContracts.map(contract => contract.config.address),
+					...taqueriaAccounts.map(account => account.address),
+				],
 			});
 
 			this.helper.logHelper.showLog(OutputLevels.debug, 'SignalR Connected');
@@ -140,12 +158,13 @@ export class CachedTzKTDataProvider {
 		const tzktBaseUrl = this.findTzKtBaseUrl(this.sandboxName);
 		if (!tzktBaseUrl) return [];
 
-		const sandboxAccounts = getAccountsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
-		if (sandboxAccounts.length === 0) return [];
+		const taqueriaAccounts = getAccountsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
+		if (taqueriaAccounts.length === 0) return [];
 
 		const tzktAccounts = await Promise.all(
-			sandboxAccounts.map(async account => {
-				const data = this.tzktAccountsMap.get(account.address) ?? await findAccountInTzKT(tzktBaseUrl, account);
+			taqueriaAccounts.map(async account => {
+				const data = this.tzktAccountsMap.get(account.address)
+					?? await findAccountInTzKT(tzktBaseUrl, account);
 				if (!data) return;
 
 				const tzktAccount: SandboxTzKTAccount = {
@@ -161,21 +180,21 @@ export class CachedTzKTDataProvider {
 		return tzktAccounts.filter(notNullish) as SandboxTzKTAccount[];
 	}
 
-	async getContracts(): Promise<SandboxTzKTContract[]> {
+	async getContracts(): Promise<SandboxTzKTAccount[]> {
 		const tzktBaseUrl = this.findTzKtBaseUrl(this.sandboxName);
 		if (!tzktBaseUrl) return [];
 
-		const sandboxContracts = getContractsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
-		if (sandboxContracts.length === 0) return [];
+		const taqueriaContracts = getContractsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
+		if (taqueriaContracts.length === 0) return [];
 
 		const tzktContracts = await Promise.all(
-			sandboxContracts
+			taqueriaContracts
 				.map(async contract => {
 					const data = this.tzktContractsMap.get(contract.config.address)
 						?? await findSmartContractFromTzkt(tzktBaseUrl, contract);
 					if (!data) return;
 
-					const tzktContract: SandboxTzKTContract = {
+					const tzktContract: SandboxTzKTAccount = {
 						...data,
 						address: data.address ?? contract.config.address,
 						alias: data.alias ?? contract.alias,
@@ -185,6 +204,6 @@ export class CachedTzKTDataProvider {
 				}),
 		);
 
-		return tzktContracts.filter(notNullish) as SandboxTzKTContract[];
+		return tzktContracts.filter(notNullish) as SandboxTzKTAccount[];
 	}
 }
