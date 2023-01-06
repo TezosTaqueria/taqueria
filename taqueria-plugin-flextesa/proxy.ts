@@ -20,6 +20,7 @@ import { Config as RawConfig } from '@taqueria/protocol/types';
 import retry from 'async-retry';
 import type { ExecException } from 'child_process';
 import { getPortPromise } from 'portfinder';
+import { last } from 'rambda';
 import { getTzKtContainerNames, getTzKtStartCommands } from './tzkt-manager';
 
 const { Url } = Protocol;
@@ -148,16 +149,26 @@ const getBakingFlags = (sandbox: SandboxConfig.t) =>
 			];
 		});
 
-// TODO work with Oxhead on this
-const getSupportedProtocolKinds = (opts: ValidOpts): Promise<string[]> => {
-	const image = getImage(opts);
-	return execCmd(`docker run --rm ${image} flextesa mini-net --protocol-kind=foobar`)
-		.catch(err => {
-			const { stderr } = err;
-			const protocols = stderr.match(/'[A-Z][a-z]+'/gm) ?? ['Alpha'];
-			return Promise.resolve(protocols.map((protocol: string) => protocol.replace(/'/gm, '')));
-		});
-};
+// TODO work with Oxhead on this.
+// Uses memoization
+const getSupportedProtocolKinds = (() => {
+	let protocols: string[] = [];
+
+	const getAll = (opts: ValidOpts): Promise<string[] | [string]> => {
+		const image = getImage(opts);
+		return execCmd(`docker run --rm ${image} flextesa mini-net --protocol-kind=foobar`)
+			.catch(err => {
+				const { stderr } = err;
+				const protocols = stderr.match(/'[A-Z][a-z]+'/gm) ?? [];
+				return Promise.resolve(protocols.map((protocol: string) => protocol.replace(/'/gm, '')));
+			});
+	};
+
+	return async (opts: ValidOpts): Promise<string[] | [string]> => {
+		if (protocols.length == 0) protocols = await getAll(opts);
+		return protocols ?? ['Alpha']; // if no known protocols are found, return Alpha which is always a valid protocol
+	};
+})();
 
 const getProtocolKind = (sandbox: SandboxConfig.t, opts: ValidOpts) =>
 	getSupportedProtocolKinds(opts)
@@ -170,9 +181,8 @@ const getProtocolKind = (sandbox: SandboxConfig.t, opts: ValidOpts) =>
 					return givenProtocolHash.includes(testProtocol) ? protocolKind : undefined;
 				},
 				undefined as string | undefined,
-			)
-		)
-		.then(protocol => protocol ?? 'Alpha');
+			) ?? last(protocols)
+		);
 
 const getMininetCommand = (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) =>
 	Promise.all([
