@@ -1,12 +1,11 @@
-import { exec as exec1 } from 'child_process';
-import util from 'util';
-const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 // This test suite does two time-consuming things:
 // - Scaffolds a project
 // - Starts and stops a sandbox
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
+	jest.setTimeout(100000);
+
 	test('Verify that scaffold project gets sets up.', async () => {
 		const { execute, exists, cleanup } = await prepareEnvironment();
 		const { code } = await execute(
