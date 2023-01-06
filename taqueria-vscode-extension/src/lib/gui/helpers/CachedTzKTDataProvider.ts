@@ -27,6 +27,8 @@ export type SandboxTzKTContract = TzKTContractData & {
 export class CachedTzKTDataProvider {
 	private currentTzKtBaseAddress: string | undefined;
 	private currentSandboxState: SandboxState;
+	private tzktAccountsMap = new Map<string, TzKTAccountData>();
+	private tzktContractsMap = new Map<string, TzKTContractData>();
 
 	readonly headFromTzKt = new rxjs.BehaviorSubject<TzKtHead | undefined>(undefined);
 	readonly accountsFromTzKt = new rxjs.BehaviorSubject<TzKTAccountData | undefined>(undefined);
@@ -143,13 +145,16 @@ export class CachedTzKTDataProvider {
 
 		const tzktAccounts = await Promise.all(
 			sandboxAccounts.map(async account => {
-				const data = await findAccountInTzKT(tzktBaseUrl, account);
+				const data = this.tzktAccountsMap.get(account.address) ?? await findAccountInTzKT(tzktBaseUrl, account);
 				if (!data) return;
-				return {
+
+				const tzktAccount: SandboxTzKTAccount = {
 					...data,
 					address: data.address ?? account.address,
 					alias: data.alias ?? account.alias,
 				};
+				this.tzktAccountsMap.set(account.address, tzktAccount);
+				return tzktAccount;
 			}),
 		);
 
@@ -166,12 +171,17 @@ export class CachedTzKTDataProvider {
 		const tzktContracts = await Promise.all(
 			sandboxContracts
 				.map(async contract => {
-					const data = await findSmartContractFromTzkt(tzktBaseUrl, contract);
+					const data = this.tzktContractsMap.get(contract.config.address)
+						?? await findSmartContractFromTzkt(tzktBaseUrl, contract);
 					if (!data) return;
-					return {
+
+					const tzktContract: SandboxTzKTContract = {
+						...data,
 						address: data.address ?? contract.config.address,
 						alias: data.alias ?? contract.alias,
 					};
+					this.tzktAccountsMap.set(contract.config.address, tzktContract);
+					return tzktContract;
 				}),
 		);
 
