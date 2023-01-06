@@ -7,7 +7,7 @@ import { SandboxState } from '../CachedSandboxState';
 import { getAccountsByTaqueriaConfig, getContractsByTaqueriaConfig } from '.././helpers/SandboxDataHelpers';
 import {
 	findAccountInTzKT,
-	getSmartContractFromTzkt,
+	findSmartContractFromTzkt,
 	TzKTAccountData,
 	TzKTContractData,
 } from '.././helpers/TzKTFetcher';
@@ -39,7 +39,7 @@ export class CachedTzKTDataProvider {
 		initialSandboxState: SandboxState,
 	) {
 		this.currentSandboxState = initialSandboxState;
-		this.observableConfig.configObservable.subscribe(async _configInfo => await this.updateConfig());
+		this.observableConfig.configObservable.subscribe(async _configInfo => await this.onConfigUpdate());
 	}
 
 	private onHeadFromTzKt(data: { type: number; data: TzKtHead }): void {
@@ -56,7 +56,7 @@ export class CachedTzKTDataProvider {
 		}
 	}
 
-	private async updateConfig(): Promise<void> {
+	private async onConfigUpdate(): Promise<void> {
 		const tzKtBaseAddress = this.findTzKtBaseUrl(this.sandboxName);
 		if (this.currentTzKtBaseAddress === tzKtBaseAddress) {
 			return;
@@ -118,11 +118,12 @@ export class CachedTzKTDataProvider {
 		try {
 			await this.connection.start();
 			await this.connection.invoke('SubscribeToHead');
-			// TODO: make sure to reconnect with new accounts if config.json changes
+
 			const sandboxAccounts = getAccountsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
 			await this.connection.invoke('SubscribeToAccounts', {
 				addresses: sandboxAccounts.map(account => account.address),
 			});
+
 			this.helper.logHelper.showLog(OutputLevels.debug, 'SignalR Connected');
 		} catch (err) {
 			this.helper.logHelper.showLog(OutputLevels.debug, 'Error while connecting SignalR');
@@ -138,6 +139,8 @@ export class CachedTzKTDataProvider {
 		if (!tzktBaseUrl) return [];
 
 		const sandboxAccounts = getAccountsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
+		if (sandboxAccounts.length === 0) return [];
+
 		const tzktAccounts = await Promise.all(
 			sandboxAccounts.map(async account => {
 				const data = await findAccountInTzKT(tzktBaseUrl, account);
@@ -158,10 +161,12 @@ export class CachedTzKTDataProvider {
 		if (!tzktBaseUrl) return [];
 
 		const sandboxContracts = getContractsByTaqueriaConfig(this.observableConfig.currentConfig, this.sandboxName);
+		if (sandboxContracts.length === 0) return [];
+
 		const tzktContracts = await Promise.all(
 			sandboxContracts
 				.map(async contract => {
-					const data = await getSmartContractFromTzkt(tzktBaseUrl, contract);
+					const data = await findSmartContractFromTzkt(tzktBaseUrl, contract);
 					if (!data) return;
 					return {
 						address: data.address ?? contract.config.address,

@@ -12,7 +12,7 @@ export type TzKTContractData = {
 	alias?: string | null;
 };
 
-export async function getSmartContractFromTzkt(
+export async function findSmartContractFromTzkt(
 	tzktBaseUrl: string,
 	sandboxContract: SandboxContract,
 ): Promise<TzKTContractData | undefined> {
@@ -32,7 +32,7 @@ export async function findAccountInTzKT(
 ): Promise<TzKTAccountData | undefined> {
 	const response = await fetch(`${tzktBaseUrl}/v1/accounts/${account.address}`);
 	if (response.status !== 200) {
-		// contract could be not originated yet or a fresh sandbox spawned
+		// a fresh sandbox spawned
 		return;
 	}
 	const data = (await response.json()) as TzKTAccountData;
