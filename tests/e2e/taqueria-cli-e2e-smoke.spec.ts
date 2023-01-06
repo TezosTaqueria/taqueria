@@ -42,6 +42,7 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		await cleanup();
 	});
 
+	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
 	test.skip('--help will offer help for an initialized project', async () => {
 		const { spawn, execute, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
@@ -53,7 +54,27 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		await cleanup();
 	});
 
-	test('Verify that taq reports a version', async () => {
+	test('--plugin parameter is required', async () => {
+		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
+		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-jest', './test-project');
+		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
+
+		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
+		const tests_file = await (await exec('cat e2e/data/hello-tacos-tests.mligo')).stdout;
+		await writeFile('./test-project/contracts/hello-tacos-tests.mligo', tests_file);
+
+		const { stderr } = await execute('taq', 'test hello-tacos-tests.mligo', './test-project/');
+		expect(stderr).toContain('Missing required argument: plugin');
+
+		await cleanup();
+	});
+
+	test('--version will report a version', async () => {
 		const { execute, cleanup } = await prepareEnvironment();
 		const { code, stdout } = await execute('taq', '--version');
 		expect(code).toBe(0);
