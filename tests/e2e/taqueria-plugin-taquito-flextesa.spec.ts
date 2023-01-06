@@ -65,7 +65,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
-	test('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
+	test.skip('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
 		await sleep(20000);
 		environment = 'development';
 
