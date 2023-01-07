@@ -1,62 +1,79 @@
+import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 import { exec as exec1 } from 'child_process';
-import fsPromises from 'fs/promises';
-import path from 'path';
 import utils from 'util';
-import { generateTestProject, waitFor } from './utils/utils';
 const exec = utils.promisify(exec1);
 
-const taqueriaProjectPath = 'scrap/auto-test-persistent-state';
+describe('Persistent State E2E Tests for Taqueria CLI', () => {
+	test('taqueria will create a development-state file', async () => {
+		const { execute, cleanup, writeFile, exists, spawn } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
 
-describe('Test CLI Persistent State', () => {
-	beforeEach(() => fsPromises.rm(taqueriaProjectPath, { force: true, recursive: true }));
+		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
-	test('Ensure that the state file named using the default config.json and no env set using the CLI', async () => {
-		await generateTestProject(taqueriaProjectPath, ['ligo']);
-		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq compile hello-tacos.mligo`, { cwd: taqueriaProjectPath });
-		const result = await waitFor(
-			() => fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'development-state.json')),
-		);
+		const {} = await execute('taq', 'compile hello-tacos.mligo', './test-project');
+		await exists('./test-project/artifacts/hello-tacos.tz');
+		await exists('./test-project/.taq/development-state.json');
 
-		return expect(result).toBeTruthy();
+		await cleanup();
 	});
 
-	test('Ensure that state file is named after a valid environment when there is no default in the config', async () => {
-		await generateTestProject(taqueriaProjectPath, ['ligo']);
-		await exec(`cp e2e/data/config-without-default-environment.json ${taqueriaProjectPath}/.taq/config.json`);
-		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq compile hello-tacos.mligo`, { cwd: taqueriaProjectPath });
-		const result = await waitFor(
-			() => fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'development-state.json')),
-		);
+	test('taqueria will create a development-state file when there is no default environment in the config', async () => {
+		const { execute, cleanup, writeFile, exists, spawn } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
 
-		expect(result).toBeTruthy();
+		const config_file = await (await exec('cat e2e/data/config-without-default-environment.json')).stdout;
+		writeFile('./test-project/.taq/config.json', config_file);
+		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
+
+		const {} = await execute('taq', 'compile hello-tacos.mligo', './test-project');
+		await exists('./test-project/artifacts/hello-tacos.tz');
+		await exists('./test-project/.taq/development-state.json');
+
+		await cleanup();
 	});
 
-	test('Ensure that state file is named after testing environment when the default in the config is set to testing', async () => {
-		await generateTestProject(taqueriaProjectPath, ['ligo']);
-		await exec(`cp e2e/data/config-default-environment-testing.json ${taqueriaProjectPath}/.taq/config.json`);
-		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq compile hello-tacos.mligo`, { cwd: taqueriaProjectPath });
+	test('taqueria will create a testing-state file when the default in the config is set to testing', async () => {
+		const { execute, cleanup, writeFile, exists, spawn } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
 
-		const result = await waitFor(
-			() => fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'testing-state.json')),
-		);
+		const config_file = await (await exec('cat e2e/data/config-default-environment-testing.json')).stdout;
+		writeFile('./test-project/.taq/config.json', config_file);
+		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
-		expect(result).toBeTruthy();
+		const {} = await execute('taq', 'compile hello-tacos.mligo', './test-project');
+		await exists('./test-project/artifacts/hello-tacos.tz');
+		await exists('./test-project/.taq/development-state.json');
+		await exists('./test-project/.taq/testing-state.json');
+
+		await cleanup();
 	});
 
-	test('Ensure that state file is named after testing environment when the env is specified using the CLI', async () => {
-		await generateTestProject(taqueriaProjectPath, ['ligo']);
-		await exec(`cp e2e/data/hello-tacos.mligo ${taqueriaProjectPath}/contracts`);
-		await exec(`taq compile -e testing hello-tacos.mligo`, { cwd: taqueriaProjectPath });
+	test('taqueria will create a testing-state file when the test environment is specified using the CLI', async () => {
+		const { execute, cleanup, writeFile, exists, spawn } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		await waitForText("Project taq'ified!");
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
 
-		const result = await waitFor(
-			() => fsPromises.stat(path.join(taqueriaProjectPath, '.taq', 'testing-state.json')),
-		);
+		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
-		expect(result).toBeTruthy();
+		const {} = await execute('taq', 'compile -e testing hello-tacos.mligo', './test-project');
+		await exists('./test-project/artifacts/hello-tacos.tz');
+		await exists('./test-project/.taq/testing-state.json');
+
+		await cleanup();
 	});
-
-	afterAll(() => fsPromises.rm(taqueriaProjectPath, { force: true, recursive: true }));
 });

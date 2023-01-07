@@ -5,7 +5,7 @@ const jsonObject = {
 	'testkey': 'testvalue',
 };
 
-describe('Integration tests using taqueria-mock-plugin', () => {
+describe('Unit tests for Taqueria SDK', () => {
 	test('Verify that writeJsonFile can write json data to a file', async () => {
 		const filePath = '.\/unit\/taqueria-sdk\/data\/writeJsonFileTest.json';
 		const result = await writeJsonFile(filePath)(jsonObject);
