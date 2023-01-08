@@ -24,74 +24,31 @@ const expectedTableOutput = `┌────────────────
 └───────────────────┴───────────────────┴─────────────────┘
 `;
 
-describe('E2E for Registered Contracts', () => {
-	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath);
-		await sleep(1000);
+describe('Registered Contracts Plugin E2E tests for Taqueria CLI', () => {
+	// 	beforeAll(async () => {
+	// 	await generateTestProject(taqueriaProjectPath);
+	// 	await sleep(1000);
 
-		// TODO: This can removed after this is resolved:
-		// https://github.com/ecadlabs/taqueria/issues/528
-		try {
-			await exec(`taq -p ${taqueriaProjectPath}`);
-		} catch (_) {}
+	// 	// TODO: This can removed after this is resolved:
+	// 	// https://github.com/ecadlabs/taqueria/issues/528
+	// 	try {
+	// 		await exec(`taq -p ${taqueriaProjectPath}`);
+	// 	} catch (_) {}
 
-		const config = await readFile(configFile, { encoding: 'utf-8' });
-		configFileContents = JSON.stringify(config);
-	});
+	// 	const config = await readFile(configFile, { encoding: 'utf-8' });
+	// 	configFileContents = JSON.stringify(config);
+	// });
 
-	// Remove all files from contracts folder without removing folder itself
-	afterEach(async () => {
-		await writeFile(configFile, JSON.parse(configFileContents), { encoding: 'utf-8' });
-	});
+	// // Remove all files from contracts folder without removing folder itself
+	// afterEach(async () => {
+	// 	await writeFile(configFile, JSON.parse(configFileContents), { encoding: 'utf-8' });
+	// });
 
-	afterAll(async () => {
-		await rm(taqueriaProjectPath, { force: true, recursive: true });
-	});
+	// afterAll(async () => {
+	// 	await rm(taqueriaProjectPath, { force: true, recursive: true });
+	// });
 
-	// Skipping due to changes in help output
-	test.skip('Verify that the taqueria contract registration add command help is shown in the help menu', async () => {
-		const registerAdd = await exec(`taq add-contract --help`, { cwd: `${taqueriaProjectPath}` });
-		expect(registerAdd.stdout).toBe(contents.registerAddContract);
-	});
-
-	// Skipping due to changes in help output
-	test.skip('Verify that the taqueria contract registration remove command help is shown in the help menu', async () => {
-		const registerRemove = await exec(`taq rm-contract --help`, { cwd: `${taqueriaProjectPath}` });
-		expect(registerRemove.stdout).toBe(contents.registerRemoveContract);
-	});
-
-	// Skipping due to changes in help output
-	test.skip('Verify that the taqueria contract registration list command help is shown in the help menu', async () => {
-		const registerList = await exec(`taq list-contracts --help`, { cwd: `${taqueriaProjectPath}` });
-		expect(registerList.stdout).toBe(contents.registerListContracts);
-	});
-
-	test('Initial config has no registered contracts', async () => {
-		const config = await readFile(configFile, { encoding: 'utf-8' });
-		const json = JSON.parse(config);
-		expect(json).toBeInstanceOf(Object);
-		expect(json).not.toHaveProperty('contracts');
-	});
-
-	test('Assure that a non-existing contract cannot be registered', async () => {
-		const nonExistingContract = join(taqueriaProjectPath, 'contracts', 'nonexisting');
-		const result = exec('taq add-contract nonexisting', { cwd: taqueriaProjectPath });
-		expect(result).rejects.toHaveProperty('stderr');
-		try {
-			await result;
-		} catch (err) {
-			const { stderr } = err as { stderr: string };
-			expect(stderr).toContain('Could not read');
-			expect(stderr).toContain(nonExistingContract);
-		}
-
-		const config = await readFile(configFile, { encoding: 'utf-8' });
-		const json = JSON.parse(config);
-		expect(json).toBeInstanceOf(Object);
-		return expect(json).not.toHaveProperty('contracts');
-	});
-
-	test('Assure that an existing contract can be registered', async () => {
+	test('add-contract will register existing contract', async () => {
 		await copyFile(
 			'e2e/data/hello-tacos.mligo',
 			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
@@ -117,7 +74,50 @@ describe('E2E for Registered Contracts', () => {
 		});
 	});
 
-	test('Assure that the same contract cannot be registered twice', async () => {
+	// Skipping due to changes in help output
+	test.skip('add-contract will offer contextual help', async () => {
+		// const registerAdd = await exec(`taq add-contract --help`, { cwd: `${taqueriaProjectPath}` });
+		// expect(registerAdd.stdout).toBe(contents.registerAddContract);
+	});
+
+	// Skipping due to changes in help output
+	test.skip('rm-contract will offer contextual help', async () => {
+		// const registerRemove = await exec(`taq rm-contract --help`, { cwd: `${taqueriaProjectPath}` });
+		// expect(registerRemove.stdout).toBe(contents.registerRemoveContract);
+	});
+
+	// Skipping due to changes in help output
+	test.skip('list-contracts will offer contextual help', async () => {
+		// const registerList = await exec(`taq list-contracts --help`, { cwd: `${taqueriaProjectPath}` });
+		// expect(registerList.stdout).toBe(contents.registerListContracts);
+	});
+
+	test('Initial config will have no registered contracts', async () => {
+		const config = await readFile(configFile, { encoding: 'utf-8' });
+		const json = JSON.parse(config);
+		expect(json).toBeInstanceOf(Object);
+		expect(json).not.toHaveProperty('contracts');
+	});
+
+	test('add-contract will not register a contract that does not exist', async () => {
+		const nonExistingContract = join(taqueriaProjectPath, 'contracts', 'nonexisting');
+		const result = exec('taq add-contract nonexisting', { cwd: taqueriaProjectPath });
+		expect(result).rejects.toHaveProperty('stderr');
+		try {
+			await result;
+		} catch (err) {
+			const { stderr } = err as { stderr: string };
+			expect(stderr).toContain('Could not read');
+			expect(stderr).toContain(nonExistingContract);
+		}
+
+		const config = await readFile(configFile, { encoding: 'utf-8' });
+		const json = JSON.parse(config);
+		expect(json).toBeInstanceOf(Object);
+		return expect(json).not.toHaveProperty('contracts');
+	});
+
+	test('add-contract will not register the same contract twice', async () => {
 		await copyFile(
 			'e2e/data/hello-tacos.mligo',
 			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
@@ -151,7 +151,7 @@ describe('E2E for Registered Contracts', () => {
 		});
 	});
 
-	test('Ensure that a contract can be registered with a specific name using all aliases', async () => {
+	test('add-contract will register contract - test of all aliases', async () => {
 		await copyFile(
 			'e2e/data/hello-tacos.mligo',
 			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
@@ -194,7 +194,7 @@ describe('E2E for Registered Contracts', () => {
 		});
 	});
 
-	test('Assure that non-existent contract cannot be deregistered', async () => {
+	test('rm-contract will not deregister a contract that does not exist', async () => {
 		const contractName = 'hello-tacos.mligo';
 		const result = exec(`taq rm-contract ${contractName}`, { cwd: taqueriaProjectPath });
 		expect(result).rejects.toHaveProperty('stderr');
@@ -207,7 +207,7 @@ describe('E2E for Registered Contracts', () => {
 		}
 	});
 
-	test('Assure that a contract can be deregistered', async () => {
+	test('rm-contract will deregister a contract', async () => {
 		await copyFile(
 			'e2e/data/hello-tacos.mligo',
 			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
@@ -248,7 +248,7 @@ describe('E2E for Registered Contracts', () => {
 		expect(output).toEqual(noContractsTableOutput);
 	});
 
-	test('List registered contracts', async () => {
+	test('list-contracts will show registered contracts', async () => {
 		await copyFile(
 			'e2e/data/hello-tacos.mligo',
 			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
@@ -278,24 +278,24 @@ describe('E2E for Registered Contracts', () => {
 });
 
 describe('E2E for Registered Contracts via SDK', () => {
-	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath, ['mock']);
-		await sleep(1000);
+	// beforeAll(async () => {
+	// 	await generateTestProject(taqueriaProjectPath, ['mock']);
+	// 	await sleep(1000);
 
-		const config = await readFile(configFile, { encoding: 'utf-8' });
-		configFileContents = JSON.stringify(config);
-	});
+	// 	const config = await readFile(configFile, { encoding: 'utf-8' });
+	// 	configFileContents = JSON.stringify(config);
+	// });
 
-	// Remove all files from contracts folder without removing folder itself
-	afterEach(async () => {
-		await writeFile(configFile, JSON.parse(configFileContents), { encoding: 'utf-8' });
-	});
+	// // Remove all files from contracts folder without removing folder itself
+	// afterEach(async () => {
+	// 	await writeFile(configFile, JSON.parse(configFileContents), { encoding: 'utf-8' });
+	// });
 
-	afterAll(async () => {
-		await rm(taqueriaProjectPath, { force: true, recursive: true });
-	});
+	// afterAll(async () => {
+	// 	await rm(taqueriaProjectPath, { force: true, recursive: true });
+	// });
 
-	test('Assure that a non-existing contract cannot be registered', async () => {
+	test('testRegisterContract will not register a contract that does not exist', async () => {
 		const nonExistingContract = join(taqueriaProjectPath, 'contracts', 'nonexisting');
 
 		// testRegisterContract is a task from the mock plugin that calls registerContract from the SDK
@@ -310,7 +310,7 @@ describe('E2E for Registered Contracts via SDK', () => {
 		return expect(json).not.toHaveProperty('contracts');
 	});
 
-	test('Assure that an existing contract can be registered', async () => {
+	test('testRegisterContract will register a contract', async () => {
 		await copyFile(
 			'e2e/data/hello-tacos.mligo',
 			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
@@ -336,7 +336,7 @@ describe('E2E for Registered Contracts via SDK', () => {
 		});
 	});
 
-	test('Assure that the same contract cannot be registered twice', async () => {
+	test('testRegisterContract will not register the same contract twice', async () => {
 		await copyFile(
 			'e2e/data/hello-tacos.mligo',
 			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
