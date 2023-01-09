@@ -52,22 +52,20 @@ export class CachedTzKTDataProvider {
 		}
 	}
 
-	private onAccountsFromTzKt(data: { type: number; data: TzKTAccountData[] }): void {
+	private async onAccountsFromTzKt(data: { type: number; data: TzKTAccountData[] }): Promise<void> {
 		this.helper.logHelper.showLog(OutputLevels.debug, 'onAccountsFromTzKt ' + JSON.stringify(data));
 		if (data.type === 1) {
 			for (const account of data.data) {
 				if (account.address) {
 					switch (account.type) {
 						case 'contract': {
-							this.tzktContractsCache.set(account.address, account);
+							await this.updateContractCache(account);
 							this.contractsFromTzKt.next(account);
-							this.helper.logHelper.showLog(OutputLevels.debug, 'onAccountsFromTzKt > contract ' + account.address);
 							break;
 						}
 						case 'delegate': {
-							this.tzktAccountsCache.set(account.address, account);
+							await this.updateAccountCache(account);
 							this.accountsFromTzKt.next(account);
-							this.helper.logHelper.showLog(OutputLevels.debug, 'onAccountsFromTzKt > delegate ' + account.address);
 							break;
 						}
 						default: {
@@ -113,6 +111,38 @@ export class CachedTzKTDataProvider {
 
 		this.connection.on('head', payload => this.onHeadFromTzKt(payload));
 		this.connection.on('accounts', payload => this.onAccountsFromTzKt(payload));
+	}
+
+	private async updateContractCache(account: TzKTAccountData) {
+		if (account.address) {
+			this.tzktContractsCache.set(account.address, account);
+
+			const tzktBaseUrl = this.findTzKtBaseUrl(this.sandboxName);
+			if (tzktBaseUrl) {
+				const tzktEntrypoints = await findContractEntrypointsInTzKT(tzktBaseUrl, account.address);
+				if (tzktEntrypoints) {
+					this.tzktContractEntrypointsCache.set(account.address, tzktEntrypoints);
+				}
+				const tzktOperations = await findOperationsInTzKT(tzktBaseUrl, account.address);
+				if (tzktOperations) {
+					this.tzktOperationsCache.set(account.address, tzktOperations);
+				}
+			}
+		}
+	}
+
+	private async updateAccountCache(account: TzKTAccountData) {
+		if (account.address) {
+			this.tzktAccountsCache.set(account.address, account);
+
+			const tzktBaseUrl = this.findTzKtBaseUrl(this.sandboxName);
+			if (tzktBaseUrl) {
+				const tzktOperations = await findOperationsInTzKT(tzktBaseUrl, account.address);
+				if (tzktOperations) {
+					this.tzktOperationsCache.set(account.address, tzktOperations);
+				}
+			}
+		}
 	}
 
 	async setSandboxState(newState: SandboxState) {
@@ -211,7 +241,7 @@ export class CachedTzKTDataProvider {
 						address: data.address ?? contractAddress,
 						alias: data.alias ?? contract.alias,
 					};
-					this.tzktAccountsCache.set(contractAddress, tzktContract);
+					this.tzktContractsCache.set(contractAddress, tzktContract);
 					return tzktContract;
 				}),
 		);
