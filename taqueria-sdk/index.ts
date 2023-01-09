@@ -23,6 +23,7 @@ import * as SHA256 from '@taqueria/protocol/SHA256';
 import { E_TaqError, toFutureParseErr, toFutureParseUnknownErr } from '@taqueria/protocol/TaqError';
 import type { TaqError } from '@taqueria/protocol/TaqError';
 import * as NonStrict from '@taqueria/protocol/types';
+import { readJsonFileInterceptConfig, writeJsonFileInterceptConfig } from '@taqueria/protocol/types-config-files';
 import { exec, ExecException, spawn } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
@@ -47,15 +48,17 @@ export const eager = <T>(f: Future<TaqError, T>) =>
 		mapRej((err: TaqError) => new E_TaqError(err))(f),
 	);
 
-export const writeJsonFile = <T>(filename: string) =>
+const writeJsonFileInner = <T>(filename: string) =>
 	(data: T): Promise<string> =>
 		writeFile(filename, JSON.stringify(data, undefined, 4), { encoding: 'utf8' })
 			.then(_ => filename);
+export const writeJsonFile = writeJsonFileInterceptConfig(writeJsonFileInner);
 
-export const readJsonFile = <T>(filename: string): Promise<T> =>
+const readJsonFileInner = <T>(filename: string): Promise<T> =>
 	readFile(filename, { encoding: 'utf-8' })
 		.then(JSON.parse)
 		.then(result => (result as T));
+export const readJsonFile = readJsonFileInterceptConfig(readJsonFileInner);
 
 export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdout: string; stderr: string }> =>
 	new Promise((resolve, reject) => {
