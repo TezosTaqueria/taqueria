@@ -1,132 +1,179 @@
 import { exec as exec1 } from 'child_process';
-import fsPromises from 'fs/promises';
 import util from 'util';
-import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
-import * as contents from './data/help-contents/pinata-contents';
+import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
-const taqueriaProjectPath = 'scrap/auto-test-ipfs-pinata-plugin';
+const env_file =
+	'pinataJwtToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1M2FkZjkxZi0yY2Q0LTQ3ZGUtYThlOS00YmM0YjI5NDI4NzYiLCJlbWFpbCI6Im1pY2hhZWxrZXJuYWdoYW5AZWNhZGxhYnMuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJOWUMxIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImNiOGMzMzVkN2RhOThiZGQ2MTRmIiwic2NvcGVkS2V5U2VjcmV0IjoiZWIwYmUxYjRhYzNhZjE5ZGE3MjQ3MTAxNmFlZjFjNTllNjQzNTdlOTcwZmY1ZmYxZDBjNmU1ZTBkYmI1ODkzMCIsImlhdCI6MTY2OTEzMzI2MH0.U9JyTzEviH5y-GxSmD6YEkCVkcjsSX6d13a9fHE70LM';
 
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-// IF RUNNING LOCALLY MAKE SURE YOU ADD A .env FILE WITH YOUR PINATA JWT
-// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
+	test('publish will offer contextual help', async () => {
+		const { execute, cleanup, exists } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
-let JWT: string;
-async function configureForTests() {
-	if (process.env.pinataJwtToken) {
-		JWT = process.env.pinataJwtToken;
-		await exec(`unset pinataJwtToken`);
-		await exec(`echo "pinataJwtToken=${JWT}" > ${taqueriaProjectPath}/.env`);
-	}
-	if (process.env.UNLIMITED_PINATA_TOKEN) {
-		JWT = process.env.UNLIMITED_PINATA_TOKEN;
-		await exec(`echo "pinataJwtToken=${JWT}" > ${taqueriaProjectPath}/.env`);
-		await exec(`cat ${taqueriaProjectPath}/.env`);
-	} else {
-		// The .env file should be in the root directory of the taqueria project
-		// this just makes sure it gets into the test directory for use
-		await exec(`cp ../.env ${taqueriaProjectPath}/.env`);
-	}
-}
+		const { stdout: stdout2 } = await execute('taq', 'publish --help', './test-project');
+		expect(stdout2).toEqual(expect.arrayContaining(['Upload and pin files using your pinata account.']));
 
-describe('e2e testing for the IPFS Pinata plugin with no JWT', () => {
-	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath, ['ipfs-pinata']);
-		// TODO: This can removed after this is resolved:
-		// https://github.com/ecadlabs/taqueria/issues/528
-		try {
-			await exec(`taq -p ${taqueriaProjectPath}`);
-		} catch (_) {}
+		await cleanup();
 	});
 
-	// Skipping due to help output changing
-	test.skip('ipfs pinata plugin should show the correct help contents', async () => {
-		const publishRun = await exec(`taq --help`, { cwd: taqueriaProjectPath });
-		expect(publishRun.stdout).toBe(contents.helpContentsIPFSPinataPlugin);
+	test('pin will offer contextual help', async () => {
+		const { execute, cleanup, exists } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
+
+		const { stdout: stdout2 } = await execute('taq', 'pin --help', './test-project');
+		expect(stdout2).toEqual(expect.arrayContaining(['Pin a file already on ipfs with your pinata account.']));
+
+		await cleanup();
 	});
 
-	// Skipping due to help output changing
-	test.skip('ipfs pinata plugin should show the correct help contents for publish', async () => {
-		const publishRun = await exec(`taq publish --help`, { cwd: taqueriaProjectPath });
-		expect(publishRun.stdout).toBe(contents.helpContentsIPFSPinataPluginPublish);
+	test('publish will error if no env jwt token exists', async () => {
+		const { execute, cleanup, exists } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
+
+		const { stderr } = await execute('taq', 'publish ./ipfs/0001.txt', './test-project');
+		expect(stderr).toEqual(expect.arrayContaining(["The 'credentials.pinataJwtToken' was not found in config"]));
+
+		await cleanup();
 	});
 
-	// Skipping due to help output changing
-	test.skip('ipfs pinata plugin should show the correct help contents for pin', async () => {
-		const publishRun = await exec(`taq pin --help`, { cwd: taqueriaProjectPath });
-		expect(publishRun.stdout).toBe(contents.helpContentsIPFSPinataPluginPin);
+	test('pin will error if no env jwt token exists', async () => {
+		const { execute, cleanup, exists } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
+
+		const { stderr } = await execute('taq', 'pin QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5', './test-project');
+		expect(stderr).toEqual(expect.arrayContaining(["The 'credentials.pinataJwtToken' was not found in config"]));
+
+		await cleanup();
 	});
 
-	test('ipfs pinata plugin should warn for publish if no env jwt token exists', async () => {
-		const publishRun = await exec(`taq publish ./ipfs/0001.txt`, { cwd: taqueriaProjectPath });
-		expect(publishRun.stderr).toMatch(/jwt *token.*not *found/i);
+	test('publish will error if no file specified', async () => {
+		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+
+		await writeFile('./test-project/.env', env_file);
+
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
+
+		const { stderr } = await execute('taq', 'publish', './test-project');
+		expect(stderr).toEqual(expect.arrayContaining(['path was not provided']));
+
+		await cleanup();
 	});
 
-	// Skipping this test until issue https://github.com/ecadlabs/taqueria/issues/1188 is resolved
-	test.skip('ipfs pinata plugin should warn for pin if no env jwt token exists', async () => {
-		const publishRun = await exec(`taq pin QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5`, {
-			cwd: taqueriaProjectPath,
-		});
-		expect(publishRun.stderr).toMatch(/jwt *token.*not *found/i);
+	test('pin will error if no filehash specified', async () => {
+		// note the error is not what is expected, but it is what is returned
+		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+
+		await writeFile('./test-project/.env', env_file);
+
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
+
+		const { stderr } = await execute('taq', 'pin', './test-project');
+		expect(stderr).toEqual(expect.arrayContaining(['ipfs hash was not provided']));
+
+		await cleanup();
 	});
 
-	afterAll(async () => {
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
-	});
-});
+	test('publish a file will return the expected cid', async () => {
+		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
 
-describe('E2E Testing for the taqueria ipfs pinata plugin', () => {
-	beforeAll(async () => {
-		await generateTestProject(taqueriaProjectPath, ['ipfs-pinata']);
-		// TODO: This can removed after this is resolved:
-		// https://github.com/ecadlabs/taqueria/issues/528
+		await writeFile('./test-project/.env', env_file);
 
-		await configureForTests();
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
-		try {
-			await exec(`taq -p ${taqueriaProjectPath}`);
-		} catch (_) {}
+		const ipfs_file = await (await exec('cat e2e/data/ipfs/0001.txt')).stdout;
+		await writeFile('./test-project/ipfs/0001.txt', ipfs_file);
 
-		await exec(`cp -r e2e/data/ipfs ${taqueriaProjectPath}/ipfs`);
-	});
+		const { stdout: stdout1 } = await execute('taq', 'publish ipfs/0001.txt', './test-project');
+		expect(stdout1).toEqual(
+			expect.arrayContaining([
+				'│ ✔ │ {{base}}/test-project/ipfs/0001.txt │ QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5 │',
+			]),
+		);
 
-	test('ipfs pinata plugin should warn if no file specified for publish', async () => {
-		const publishRun = await exec(`taq publish`, { cwd: taqueriaProjectPath });
-		expect(publishRun.stderr).toBe('path was not provided\n');
+		await cleanup();
 	});
 
-	// Skipping this test until issue https://github.com/ecadlabs/taqueria/issues/1188 is resolved
-	test.skip('ipfs pinata plugin should warn if no filehash specified for pin', async () => {
-		const publishRun = await exec(`taq pin`, { cwd: taqueriaProjectPath });
-		expect(publishRun.stderr).toBe('ipfs hash was not provided\n');
+	test('publish a directory will return the expected cid for each file', async () => {
+		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+
+		await writeFile('./test-project/.env', env_file);
+
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
+
+		const ipfs_file_1 = await (await exec('cat e2e/data/ipfs/0001.txt')).stdout;
+		await writeFile('./test-project/ipfs/0001.txt', ipfs_file_1);
+		const ipfs_file_2 = await (await exec('cat e2e/data/ipfs/0002.txt')).stdout;
+		await writeFile('./test-project/ipfs/0002.txt', ipfs_file_2);
+		const ipfs_file_3 = await (await exec('cat e2e/data/ipfs/0003.txt')).stdout;
+		await writeFile('./test-project/ipfs/0003.txt', ipfs_file_3);
+
+		const { stdout: stdout1 } = await execute('taq', 'publish ipfs', './test-project');
+		expect(stdout1).toEqual(
+			expect.arrayContaining([
+				'│ ✔ │ {{base}}/test-project/ipfs/0003.txt │ Qmbg3rnnFw5d16HECdRPpoLRsvvoBvFgVAZa9owMbLLLe9 │',
+			]),
+		);
+		expect(stdout1).toEqual(
+			expect.arrayContaining([
+				'│ ✔ │ {{base}}/test-project/ipfs/0002.txt │ QmQeKydANxVEkysp8GGFS7fmw3Kd266RdAJx6w9n4o7Ev6 │',
+			]),
+		);
+		expect(stdout1).toEqual(
+			expect.arrayContaining([
+				'│ ✔ │ {{base}}/test-project/ipfs/0001.txt │ QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5 │',
+			]),
+		);
+
+		await cleanup();
 	});
 
-	test('publish a single file to ipfs and get back the expected cid', async () => {
-		const publishRun = await exec(`taq publish ./ipfs/0001.txt`, { cwd: taqueriaProjectPath });
-		expect(publishRun.stdout).toMatch(/0001\.txt.*QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5/i);
-	});
+	test('pin will accept an ipfs hash', async () => {
+		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
 
-	test('publish a directory to ipfs and get back the expected cid for each file', async () => {
-		const publishRun = await exec(`taq publish ./ipfs/`, { cwd: taqueriaProjectPath });
+		await writeFile('./test-project/.env', env_file);
 
-		for (let i = 1; i <= 12; i++) {
-			expect(publishRun.stdout).toContain(`${i}.txt`);
-		}
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
-		expect(publishRun.stdout).toMatch(/0001\.txt.*QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5/i);
-		expect(publishRun.stdout).toMatch(/0005\.txt.*QmQZF8kEyU6iuyc4xbnkTYNTtMEL4gjYgXhPjcXK14gnJ1/i);
-		expect(publishRun.stdout).toMatch(/0010\.txt.*QmW6GqMj6bXPXygCVCeVvcZN6w1w8ou4aVNKvarQrz8N4w/i);
-		expect(publishRun.stdout).toMatch(/0012\.txt.*QmZLSfobCPA8rQrm6dss28gyDwqXaw8GhQ8CXXQMSMnuNm/i);
-	});
+		const ipfs_file_1 = await (await exec('cat e2e/data/ipfs/0001.txt')).stdout;
+		await writeFile('./test-project/ipfs/0001.txt', ipfs_file_1);
 
-	test('pin using an ipfs hash', async () => {
-		const publishRun = await exec(`taq pin QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5`, {
-			cwd: taqueriaProjectPath,
-		});
-		expect(publishRun.stdout).toMatch(/QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5/i);
-	});
-
-	afterAll(async () => {
-		await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+		const { stdout: stdout1 } = await execute(
+			'taq',
+			'pin QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5',
+			'./test-project',
+		);
+		expect(stdout1).toEqual(
+			expect.arrayContaining([
+				'{"data":[{"ipfsHash":"QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5"}],"render":"table"}',
+			]),
+		);
 	});
 });
