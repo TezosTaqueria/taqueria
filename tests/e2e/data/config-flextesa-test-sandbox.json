@@ -13,12 +13,22 @@
 	"contractsDir": "contracts",
 	"artifactsDir": "artifacts",
 	"environment": {
-		"default": "development",
-		"development": {
+		"default": "development-local",
+		"development-local": {
 			"networks": [],
 			"sandboxes": [
-				"local",
-				"test",
+				"local"
+			]
+		},
+		"development-test": {
+			"networks": [],
+			"sandboxes": [
+				"test"
+			]
+		},
+		"development-override": {
+			"networks": [],
+			"sandboxes": [
 				"override"
 			]
 		}

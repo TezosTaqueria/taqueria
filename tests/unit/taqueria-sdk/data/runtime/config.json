@@ -1,0 +1,73 @@
+{
+	"language": "en",
+	"contractsDir": "contracts",
+	"artifactsDir": "artifacts",
+	"contracts": {
+		"./main.mligo": {
+			"sourceFile": "./main.mligo",
+			"hash": "1bbbe139820ef1e5223dee5e35b57480ed3b59e97170c9c252304f1d5c7b983e"
+		}
+	},
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-ligo",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-flextesa",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-taquito",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-jest",
+			"type": "npm"
+		}
+	],
+	"accounts": {
+		"bob": "3_000_000_000",
+		"alice": "3_000_000_000",
+		"john": "3_000_000_000",
+		"jane": "3_000_000_000",
+		"joe": "3_000_000_000"
+	},
+	"environment": {
+		"default": "testing",
+		"development": {
+			"networks": [],
+			"sandboxes": [
+				"local-scaffold"
+			],
+			"storage": {
+				"value": 42
+			}
+		},
+		"testing": {
+			"networks": [
+				"ghostnet"
+			],
+			"sandboxes": [],
+			"aliases": {
+				"hello-tacos": {
+					"address": "KT1LMNSCTCprDtuzAJ5GiAHNdC1r5q8qiZYc"
+				}
+			}
+		}
+	},
+	"network": {
+		"ghostnet": {
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
+			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg"
+		}
+	},
+	"sandbox": {
+		"local-scaffold": {
+			"label": "Local Tezos Sandbox",
+			"rpcUrl": "http://localhost:21000",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
+		}
+	}
+}
