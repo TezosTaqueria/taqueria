@@ -1,5 +1,6 @@
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
+import { readJsonFileInterceptConfig, writeJsonFileInterceptConfig } from '@taqueria/protocol/types-config-files';
 import * as Url from '@taqueria/protocol/Url';
 import {
 	alt,
@@ -167,11 +168,18 @@ export const readTextFile = (path: string): Future<TaqError.t, string> =>
 			);
 	});
 
-export const readJsonFile = <T>(path: string) =>
+const readJsonFileInner = <T>(path: string): Future<TaqError.TaqError, T> =>
 	pipe(
 		readTextFile(path),
 		chain(x => decodeJson<T>(x)),
 	);
+
+export const readJsonFile = <T>(path: string): Future<TaqError.TaqError, T> =>
+	attemptP(() => {
+		return readJsonFileInterceptConfig(async x => {
+			return await toPromise(readJsonFileInner(x));
+		})(path);
+	});
 
 export const appendTextFile = (path: string) =>
 	(data: string): Future<TaqError.t, string> =>
@@ -184,8 +192,8 @@ export const appendTextFile = (path: string) =>
 export const writeTextFile = (path: string) =>
 	(data: string): Future<TaqError.t, string> => attemptP(() => Deno.writeTextFile(path, data).then(() => path));
 
-export const writeJsonFile = <T>(path: string) =>
-	(data: T) =>
+const writeJsonFileInner = (path: string) =>
+	(data: unknown): Future<TaqError.t, string> =>
 		pipe(
 			JSON.stringify(data),
 			jsonStr =>
@@ -197,6 +205,15 @@ export const writeJsonFile = <T>(path: string) =>
 				),
 			writeTextFile(path),
 		);
+export const writeJsonFile = <T>(path: string) =>
+	(data: T): Future<TaqError.t, string> =>
+		attemptP(() => {
+			return writeJsonFileInterceptConfig(p =>
+				d => {
+					return toPromise(writeJsonFileInner(p)(d));
+				}
+			)(path)(data);
+		});
 
 export const isTaqError = (err: unknown): err is TaqError.t => {
 	return (err as TaqError.t).kind !== undefined;
@@ -207,7 +224,7 @@ export const joinPaths = _joinPaths;
 export const renderTemplate = (template: string, values: Record<string, unknown>): string =>
 	render(template, values) as string;
 
-export const toPromise = <T>(f: Future<TaqError.t, T>) =>
+export const toPromise = <T>(f: Future<TaqError.t, T>): Promise<T> =>
 	pipe(
 		f,
 		mapRej(taqErr => new TaqError.E_TaqError(taqErr)),
