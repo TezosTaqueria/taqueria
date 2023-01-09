@@ -22,7 +22,6 @@ export const readJsonFileInterceptConfig = (readJsonFile: <T>(filePath: string) 
 
 export const readConfigFiles = (readJsonFile: <T>(filePath: string) => Promise<T>) =>
 	async (configFilePath: string): Promise<ConfigFileSetV2> => {
-		// TODO: read the the new schema files and combine into the ConfigType
 		const configFileObj = await readJsonFile(configFilePath);
 
 		if ((configFileObj as ConfigFileV2).version !== `v2`) {
@@ -58,8 +57,11 @@ export const readConfigFiles = (readJsonFile: <T>(filePath: string) => Promise<T
 export const writeJsonFileInterceptConfig = (writeJsonFile: (filePath: string) => (data: unknown) => Promise<string>) =>
 	(filePath: string): ((data: unknown) => Promise<string>) => {
 		if (filePath.endsWith(`.taq/config.json`)) {
-			return ((config: Config) => {
-				return writeConfigFiles(writeJsonFile)(filePath)(transformConfigToConfigFileV2(config));
+			return (async (config: Config) => {
+				// DEBUG: write original file
+				// await writeJsonFile(filePath.replace(`config.json`, `config.original-${Date.now()}.json`))(config);
+
+				return await writeConfigFiles(writeJsonFile)(filePath)(transformConfigToConfigFileV2(config));
 			}) as (data: unknown) => Promise<string>;
 		}
 
@@ -323,20 +325,24 @@ const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config
 				...getUnknownFields(x, 'environment'),
 			}])),
 		},
-		network: Object.fromEntries(simpleEnvironments.map(x => [x.value.networkName ?? `${x.key}`, {
-			label: x.value.label ?? ``,
-			rpcUrl: x.value.rpcUrl ?? ``,
-			protocol: x.value.protocol ?? ``,
-			// Unknown fields might need to be in the network or sandbox
-			...getUnknownFields(x, 'network') as {},
-		}])),
-		sandbox: Object.fromEntries(sandboxEnvironments.map(x => [x.value.sandboxName ?? `${x.key}`, {
-			label: x.value.label ?? ``,
-			rpcUrl: x.value.rpcUrl ?? ``,
-			protocol: x.value.protocol ?? ``,
-			// Unknown fields might need to be in the network or sandbox
-			...getUnknownFields(x, 'sandbox') as {},
-		}])),
+		network: !simpleEnvironments.length
+			? undefined
+			: Object.fromEntries(simpleEnvironments.map(x => [x.value.networkName ?? `${x.key}`, {
+				label: x.value.label ?? ``,
+				rpcUrl: x.value.rpcUrl ?? ``,
+				protocol: x.value.protocol ?? ``,
+				// Unknown fields might need to be in the network or sandbox
+				...getUnknownFields(x, 'network') as {},
+			}])),
+		sandbox: !sandboxEnvironments.length
+			? undefined
+			: Object.fromEntries(sandboxEnvironments.map(x => [x.value.sandboxName ?? `${x.key}`, {
+				label: x.value.label ?? ``,
+				rpcUrl: x.value.rpcUrl ?? ``,
+				protocol: x.value.protocol ?? ``,
+				// Unknown fields might need to be in the network or sandbox
+				...getUnknownFields(x, 'sandbox') as {},
+			}])),
 	};
 
 	return removeUndefinedFields(config);

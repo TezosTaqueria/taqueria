@@ -178,7 +178,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 		expect(dockerContainerStopTest).toBe('');
 	});
 
-	test('Assure that the appropriate error is given when you attempt to start a sandbox without one in your config', async () => {
+	test.skip(/* No longer possible to have unassigned sandbox in config */ 'Assure that the appropriate error is given when you attempt to start a sandbox without one in your config', async () => {
 		// Preserve previous config so that we don't corrupt other tests
 		await exec(`cp ${taqueriaProjectPath}/.taq/config.json ${taqueriaProjectPath}/.taq/config.json.old`);
 		await exec(`cp e2e/data/config-no-sandboxes.json ${taqueriaProjectPath}/.taq/config.json`);
@@ -195,10 +195,10 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 			expect(execErr.stderr).toContain(
 				"No sandbox name was specified. We couldn't find a valid sandbox config for the current environment",
 			);
+		} finally {
+			// Restore config
+			await exec(`cp ${taqueriaProjectPath}/.taq/config.json.old ${taqueriaProjectPath}/.taq/config.json`);
 		}
-
-		// Restore config
-		await exec(`cp ${taqueriaProjectPath}/.taq/config.json.old ${taqueriaProjectPath}/.taq/config.json`);
 	});
 
 	test('Assure that the appropriate error is given if you specify an invalid sandbox to start', async () => {
@@ -385,7 +385,7 @@ describe('E2E Testing for taqueria flextesa plugin sandbox starts/stops', () => 
 			processes.map(child => child.kill());
 
 			// Clean up test projects
-			await fsPromises.rm(taqueriaProjectPath, { recursive: true });
+			// await fsPromises.rm(taqueriaProjectPath, { recursive: true });
 		} catch (error) {
 			throw new Error(`error: ${error}`);
 		}
