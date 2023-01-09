@@ -1,5 +1,102 @@
 # Change Log
 
+## Taqueria v0.24.2  
+
+| Details     |               |
+| ----------- | ------------- |
+|Release Date | Nov 17, 2022  |
+|Release Type | Minor         |
+|Release Page | [v0.24.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.24.2) |
+
+### Summary of Impactful Changes
+
+- Ligo storage and parameter files are now created by default (ignored during compilation if they remain empty)
+- The new naming convention for LIGO contract storage and parameter files is `<CONTRACT_NAME>.storageList.<EXTENSION>` and `<CONTRACT_NAME>.parameterList.<EXTENSION>` (`<CONTRACT_NAME>.storages.<EXTENSION>` and `<CONTRACT_NAME>.parameters.<EXTENSION>` will still be supported)
+- The version of Ligo used in the Ligo plugin has been downgraded to `v0.54.1` due to instability in `v0.55.0`
+- A mechanism to override the docker images used by plugins via environment variables has been added
+
+### New Features
+
+#### Override Docker Images Used by Plugins
+
+Taqueria now provides the means to override the docker images used by Taqueria plugins via setting environment variables in your shell or CI/CD 
+
+The available constants you can set to override are:
+
+- TAQ_FLEXTESA_IMAGE environment variable to override the default image for the flextesa plugin
+- TAQ_ARCHETYPE_IMAGE environment variable to override the default image for the archetype plugin
+- TAQ_LIGO_IMAGE environment variable to override the default image for the ligo plugin
+- TAQ_TEZOS_CLIENT_IMAGE environment variable to override the default image for the tezos client plugin
+
+### Bug Fixes
+
+- Tests now use compliant TS modules
+
+### Deprecations and Breaking Changes
+
+- The use of `<CONTRACT_NAME>.storages.<EXTENSION>` and `<CONTRACT_NAME>.parameters.<EXTENSION>` are now deprecated and will be removed in the future
+
+### Other Product Changes
+
+- A `quickstart.md` file is no longer created on `taq init`
+
+### Migrating from Legacy Versions
+
+To upgrade, you must download Taqueria v0.24.2 binary, replacing the legacy version
+
+This can be done by following these steps:
+
+1) Change into the installation directory
+
+```shell
+sudo cd /usr/local/bin
+```
+
+2) Remove the existing `taq` binary
+
+```shell
+sudo rm taq
+```
+
+3) Download the appropriate Taqueria v0.24.2 binary for your operating system
+
+```shell
+sudo curl -LO https://taqueria.io/get/macos/taq
+sudo curl -LO https://taqueria.io/get/linux/taq
+```
+
+:::warning
+The Flextesa plugin can hang or crash if old docker images exist on your machine. Install the new `@taqueria/plugin-core` plugin on the project, then run the following command to remove legacy images from your system
+
+```shell
+taq clean
+```
+:::
+
+You can update your existing projects to use Taqueria v0.24.2 plugins using the following command:
+
+```shell
+plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 1 taq uninstall && echo $plugins | xargs -n 1 taq install
+```
+
+### Pull Requests
+
+- 🚀 Release ➾ Taqueria v0.24.1 by @hu3man in [#1447](https://github.com/ecadlabs/taqueria/pull/1447)
+- Updating tests to become modules for TS requirement by @alexzbusko in [#1500](https://github.com/ecadlabs/taqueria/pull/1500)
+- 🛠️ Fix ➾ Update Taqueria.io Documentation by @hu3man in https://github.com/ecadlabs/taqueria/pull/1496
+- 🧽 Chore ➾ Bump loader-utils from 2.0.2 to 2.0.4 in /website by @dependabot in [#1497](https://github.com/ecadlabs/taqueria/pull/1497)
+- 👷 Refactor ➾ Updates to Docusaurus Docs by @hu3man in [#1506](https://github.com/ecadlabs/taqueria/pull/1506)
+- 🧽 Chore ➾ Update Docusaurus to `v2.2.0` by @hu3man in [#1505](https://github.com/ecadlabs/taqueria/pull/1505)
+- 🛠️ Fix ➾ Do Not Create the `quickstart.md` File on New Taqueria Projects by @jchenche in [#1491](https://github.com/ecadlabs/taqueria/pull/1491)
+- ✨ Feature ➾ Rename `<CONTRACT>.storages.mligo` to `<CONTRACT>.storageList.mligo` and similarly for the parameter part by @jchenche in [#1507](https://github.com/ecadlabs/taqueria/pull/1507)
+- ✨ Feature ➾ Allow docker images to be overwritten via environment variable (#1425) by @mweichert in [#1445](https://github.com/ecadlabs/taqueria/pull/1445)
+
+## New Contributors
+
+- @dependabot made their first contribution in [#1497](https://github.com/ecadlabs/taqueria/pull/1497)
+
+**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.24.1...v0.24.2
+
 ## Taqueria v0.24.1  
 
 | Details     |               |
@@ -1269,3 +1366,4 @@ Specifically:
     - SmartPy
     - Taquito
     - Flextesa
+

@@ -1,14 +1,14 @@
-import { noop, sendAsyncErr, sendAsyncRes } from '@taqueria/node-sdk';
-import { LoadedConfig, RequestArgs, SanitizedAbsPath, SanitizedPath } from '@taqueria/node-sdk/types';
+import { noop, RequestArgs, sendAsyncErr, sendAsyncRes } from '@taqueria/node-sdk';
+import { SanitizedAbsPath, SanitizedPath } from '@taqueria/node-sdk/types';
 import { mkdir, stat, writeFile } from 'fs/promises';
 import { defaults } from 'jest-config';
 import { join, relative } from 'path';
-import * as JestConfig from './config';
+import JestConfig from './config';
 
 export type DefaultConfig = typeof defaults;
 
 export interface CustomRequestArgs extends RequestArgs.t {
-	config: JestConfig.t;
+	config: JestConfig;
 	partition?: string;
 	init?: string;
 	testPattern?: string;
@@ -16,15 +16,15 @@ export interface CustomRequestArgs extends RequestArgs.t {
 
 export const toRequestArgs = (args: RequestArgs.t): CustomRequestArgs => {
 	const config = {
+		...args.config,
 		jest: {
 			testsRootDir: 'tests',
 		},
-		...args.config,
 	};
 
 	return {
 		...args,
-		config: JestConfig.create(config),
+		config,
 	};
 };
 
@@ -49,7 +49,7 @@ export const getRootConfigAbspath = (projectDir: SanitizedAbsPath.t) =>
 		join(projectDir, '.taq', 'jest.config.js'),
 	);
 
-export const getTestsRootDir = (config: JestConfig.t) => {
+export const getTestsRootDir = (config: JestConfig) => {
 	return config.jest.testsRootDir;
 };
 
@@ -69,14 +69,15 @@ export const getPartitionAbspath = (partitionDir: string) => SanitizedAbsPath.cr
 export const getPartitionConfigAbspath = (partitionDir: string) =>
 	SanitizedAbsPath.create(join(partitionDir, 'jest.config.js'));
 
-export const initPartition = (partitionDir: SanitizedAbsPath.t, projectDir: SanitizedAbsPath.t) =>
-	writeFile(
+export const initPartition = (partitionDir: SanitizedAbsPath.t, projectDir: SanitizedAbsPath.t) => {
+	return writeFile(
 		getPartitionConfigAbspath(partitionDir),
 		toPartitionCfg(
-			SanitizedPath.create(relative(partitionDir, partitionDir)),
+			SanitizedPath.create('./'),
 			SanitizedPath.create(relative(partitionDir, getRootConfigAbspath(projectDir))),
 		),
 	);
+};
 
 export const ensurePartitionExists = async (
 	partitionDir: SanitizedAbsPath.t,
@@ -103,13 +104,13 @@ export const ensureSelectedPartitionExists = (args: CustomRequestArgs, forceCrea
 	args.partition
 		? ensurePartitionExists(
 			SanitizedAbsPath.create(join(args.projectDir, args.partition)),
-			args.projectDir,
+			SanitizedPath.create(args.projectDir),
 			forceCreate,
 		)
 		: ensurePartitionExists(
 			SanitizedAbsPath.create(
 				join(args.projectDir, getTestsRootDir(args.config)),
 			),
-			args.projectDir,
+			SanitizedPath.create(args.projectDir),
 			forceCreate,
 		);

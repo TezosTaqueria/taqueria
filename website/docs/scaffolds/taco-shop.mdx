@@ -47,7 +47,7 @@ The project comes pre-configured with the following:
 
 ## Requirements
 
-- Taqueria v0.24.1 or later
+- Taqueria v0.26.0 or later
 - Docker v20.10.12 or later
 - Node.js v16.17.1 or later
 - Temple Wallet (can be found [here](https://templewallet.com/))
@@ -202,7 +202,7 @@ This will be fixed in the future when contract addresses will be passed via the 
 ### Insert the Contract Address
 
 There is a way to point the dApp to a hardcoded contract.
-To do so you need to insert the address of the contract into the `/app/src/App.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/src/App.tsx` file as shown here:
+To do so you need to insert the address of the contract into the `/app/src/App.tsx` file. Copy the address returned from the command above and paste it into the `contractAddress` variable in the `/app/src/App.tsx` file as shown here, replacing `getAliasAddress(config, "hello-tacos")` with the contract address:
 
 ```ts /app/src/App.tsx
 function App() {
@@ -212,7 +212,6 @@ function App() {
   const [rpcUrl] = useState("https://ghostnet.ecadinfra.com");
   const [contractAddress] = useState(
     "KT1KBBk3PXkKmGZn3K6FkktqyPRpEbzJoEPE"
-    getAliasAddress(config, "hello-tacos")
   );
   const [contractStorage, setContractStorage] = useState<Storage | undefined>(
     undefined

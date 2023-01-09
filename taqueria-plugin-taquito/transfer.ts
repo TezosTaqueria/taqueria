@@ -3,6 +3,7 @@ import {
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
 	getParameter,
+	RequestArgs,
 	sendAsyncErr,
 	sendJsonRes,
 } from '@taqueria/node-sdk';
@@ -40,10 +41,11 @@ const isContractAddress = (contract: string): boolean =>
 
 const getContractInfo = async (parsedArgs: Opts, env: Environment.t): Promise<ContractInfo> => {
 	const contract = parsedArgs.contract;
+	const protocolArgs = RequestArgs.create(parsedArgs);
 	return {
 		contractAlias: isContractAddress(contract) ? 'N/A' : contract,
 		contractAddress: isContractAddress(contract) ? contract : await getAddressOfAlias(env, contract),
-		parameter: parsedArgs.param ? await getParameter(parsedArgs, parsedArgs.param) : 'Unit',
+		parameter: parsedArgs.param ? await getParameter(protocolArgs, parsedArgs.param) : 'Unit',
 		entrypoint: parsedArgs.entrypoint ?? 'default',
 		mutezTransfer: parseInt(parsedArgs.mutez ?? '0'),
 	};
@@ -87,18 +89,19 @@ const prepContractInfoForDisplay = (tezos: TezosToolkit, contractInfo: ContractI
 	};
 };
 
-const transfer = async (parsedArgs: Opts): Promise<void> => {
-	const env = getCurrentEnvironmentConfig(parsedArgs);
-	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
+const transfer = async (opts: Opts): Promise<void> => {
+	const protocolArgs = RequestArgs.create(opts);
+	const env = getCurrentEnvironmentConfig(protocolArgs);
+	if (!env) return sendAsyncErr(`There is no environment called ${protocolArgs.env} in your config.json`);
 	try {
-		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
+		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(protocolArgs, env);
 		const tezos = await (envType === 'Network'
-			? configureToolKitForNetwork(parsedArgs, nodeConfig, parsedArgs.sender)
-			: configureToolKitForSandbox(nodeConfig, parsedArgs.sender));
+			? configureToolKitForNetwork(protocolArgs, nodeConfig, opts.sender)
+			: configureToolKitForSandbox(nodeConfig, opts.sender));
 
-		const contractInfo = await getContractInfo(parsedArgs, env);
+		const contractInfo = await getContractInfo(opts, env);
 
-		await performTransferOps(tezos, getCurrentEnvironment(parsedArgs), [contractInfo]);
+		await performTransferOps(tezos, getCurrentEnvironment(protocolArgs), [contractInfo]);
 
 		const contractInfoForDisplay = prepContractInfoForDisplay(tezos, contractInfo);
 		return sendJsonRes([contractInfoForDisplay]);

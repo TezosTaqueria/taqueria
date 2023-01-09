@@ -1,6 +1,7 @@
 import {
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
+	RequestArgs,
 	sendAsyncErr,
 	sendJsonRes,
 	sendWarn,
@@ -22,7 +23,7 @@ type TableRow = {
 };
 
 const getAccountsInfo = (
-	parsedArgs: Opts,
+	parsedArgs: RequestArgs.t,
 	tezos: TezosToolkit,
 	instantiatedAccounts: Record<string, any>,
 ): Promise<ContractInfo[]> =>
@@ -63,7 +64,7 @@ const prepAccountsInfoForDisplay = (accountsInfo: ContractInfo[]): TableRow[] =>
 		};
 	});
 
-const fund = async (parsedArgs: Opts): Promise<void> => {
+const fund = async (parsedArgs: RequestArgs.t): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	try {

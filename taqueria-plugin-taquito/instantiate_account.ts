@@ -1,13 +1,12 @@
-import { getCurrentEnvironmentConfig, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { getCurrentEnvironmentConfig, RequestArgs, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import {
 	generateAccountKeys,
 	getDeclaredAccounts,
 	getEnvTypeAndNodeConfig,
 	getNetworkInstantiatedAccounts,
-	InstantiateAccountOpts as Opts,
 } from './common';
 
-const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
+const instantiate_account = async (parsedArgs: RequestArgs.t): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	try {
@@ -42,8 +41,9 @@ const instantiate_account = async (parsedArgs: Opts): Promise<void> => {
 				`No accounts were instantiated because they were all instantiated in the target environment already`,
 			);
 		}
-	} catch {
-		return sendAsyncErr('No operations performed');
+	} catch (err) {
+		await sendAsyncErr('No operations performed');
+		if (parsedArgs.debug) await sendAsyncErr(String(err));
 	}
 };
 

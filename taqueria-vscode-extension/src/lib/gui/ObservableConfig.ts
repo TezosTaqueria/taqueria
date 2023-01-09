@@ -1,5 +1,6 @@
 import * as rxjs from 'rxjs';
-import { OutputLevels, VsCodeHelper } from '../helpers';
+import { VsCodeHelper } from '../helpers';
+import { OutputLevels } from '../LogHelper';
 import * as Util from '../pure';
 
 export type ConfigInfo = {
@@ -21,12 +22,15 @@ export class ObservableConfig {
 	private set currentConfig(value: ConfigInfo) {
 		this._currentConfig = value;
 		this.configObservable.next(value);
-		this.helper.showLog(OutputLevels.trace, `New config is loaded: ${JSON.stringify(this._currentConfig, null, 2)}`);
+		this.helper.logHelper.showLog(
+			OutputLevels.trace,
+			`New config is loaded: ${JSON.stringify(this._currentConfig, null, 2)}`,
+		);
 	}
 
 	private constructor(private helper: VsCodeHelper) {
 		if (!this.helper.taqFolderWatcher || !this.helper.configWatcher || !this.helper.stateWatcher) {
-			this.helper.showLog(OutputLevels.warn, "Helper's watchers are not yet created");
+			this.helper.logHelper.showLog(OutputLevels.warn, "Helper's watchers are not yet created");
 		}
 	}
 
@@ -37,11 +41,11 @@ export class ObservableConfig {
 	}
 
 	async loadConfig(): Promise<void> {
-		this.helper.showLog(OutputLevels.trace, `New Config Load started for path:`);
+		this.helper.logHelper.showLog(OutputLevels.trace, `New Config Load started for path:`);
 		const mainFolder = this.helper.getMainWorkspaceFolder();
-		this.helper.showLog(OutputLevels.trace, `${mainFolder}`);
+		this.helper.logHelper.showLog(OutputLevels.trace, `${mainFolder}`);
 		if (!mainFolder) {
-			this.helper.showLog(OutputLevels.warn, `Current working folder is empty.`);
+			this.helper.logHelper.showLog(OutputLevels.warn, `Current working folder is empty.`);
 			this.currentConfig = {
 				pathToDir: undefined,
 				config: undefined,

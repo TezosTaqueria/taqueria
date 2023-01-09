@@ -1,7 +1,9 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
 import fetch from 'node-fetch-commonjs';
+import path from 'path';
 import * as vscode from 'vscode';
-import { HasRefresh, mapAsync, OutputLevels, VsCodeHelper } from '../helpers';
+import { HasRefresh, mapAsync, VsCodeHelper } from '../helpers';
+import { OutputLevels } from '../LogHelper';
 import { getRunningContainerNames } from '../pure';
 import * as Util from '../pure';
 import { CachedSandboxState, SandboxState } from './CachedSandboxState';
@@ -135,7 +137,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				cached.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, name));
 				this.sandboxStates[name] = cached;
 			} catch (e: unknown) {
-				this.helper.showLog(OutputLevels.debug, 'Error in signalR:');
+				this.helper.logHelper.showLog(OutputLevels.debug, 'Error in signalR:');
 				this.helper.logAllNestedErrors(e);
 			}
 		}
@@ -191,7 +193,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				const sandboxHead = await sandBoxHeadResponse.json();
 				sandbox.sandboxLevel = (sandboxHead as any).header.level;
 			} catch (e: unknown) {
-				this.helper.showLog(OutputLevels.warn, `${e}`);
+				this.helper.logHelper.showLog(OutputLevels.warn, `${e}`);
 			}
 			this.refreshItem(sandbox);
 		}
@@ -212,7 +214,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints?micheline=true&michelson=true`,
 		);
 		const data = await response.json();
-		this.helper.showLog(OutputLevels.trace, JSON.stringify(data, null, 2));
+		this.helper.logHelper.showLog(OutputLevels.trace, JSON.stringify(data, null, 2));
 		return (data as any[]).map(item =>
 			new SmartContractEntrypointTreeItem(
 				item.name,
@@ -246,9 +248,14 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return undefined;
 		}
-		const response = await fetch(`${tzktBaseUrl}/v1/accounts/count?type.ne=contract`);
-		const data = await response.json();
-		return data as number;
+		try {
+			const response = await fetch(`${tzktBaseUrl}/v1/accounts/count?type.ne=contract`);
+			const data = await response.json();
+			return data as number;
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return undefined;
+		}
 	}
 
 	private async getContractCount(element: SandboxTreeItem): Promise<number | undefined> {
@@ -256,12 +263,17 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!tzktBaseUrl) {
 			return undefined;
 		}
-		const response = await fetch(`${tzktBaseUrl}/v1/contracts/count`);
-		const data = await response.json();
-		// This assumes that the built-in contracts always exist on the chain. If not, the count will be off.
-		// The fix is to check existence of each of them
-		const ignoredContractCount = SandboxesDataProvider.builtInContracts.length;
-		return data as number - ignoredContractCount;
+		try {
+			const response = await fetch(`${tzktBaseUrl}/v1/contracts/count`);
+			const data = await response.json();
+			// This assumes that the built-in contracts always exist on the chain. If not, the count will be off.
+			// The fix is to check existence of each of them
+			const ignoredContractCount = SandboxesDataProvider.builtInContracts.length;
+			return data as number - ignoredContractCount;
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return undefined;
+		}
 	}
 
 	private getSmartContractChildren(element: SandboxSmartContractTreeItem): SmartContractChildrenTreeItem[] {
@@ -364,7 +376,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	// taqueria-plugin-flextesa/proxy.ts. As suggested in https://github.com/ecadlabs/taqueria/issues/1030, we need to
 	// take care of this tech debt.
 	private async getUniqueSandboxName(sandboxName: string, projectDir: string) {
-		const hash = await toSHA256(projectDir);
+		const hash = await toSHA256(sandboxName + projectDir);
 		return `${sandboxName.substring(0, 10)}-${hash.substring(0, 5)}`;
 	}
 

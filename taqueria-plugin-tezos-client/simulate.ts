@@ -11,8 +11,8 @@ import {
 } from '@taqueria/node-sdk';
 import { basename, extname } from 'path';
 import {
-	DOCKER_IMAGE,
 	getCheckFileExistenceCommand,
+	getClientDockerImage,
 	getInputFilename,
 	GLOBAL_OPTIONS,
 	SimulateOpts as Opts,
@@ -54,11 +54,11 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 		);
 	}
 
-	const paramFilename = parsedArgs.param;
+	const paramFilename = parsedArgs.param!;
 	const param = (await getParameter(parsedArgs, paramFilename)).trim();
 
 	const arch = await getArch();
-	const flextesaImage = DOCKER_IMAGE;
+	const flextesaImage = getClientDockerImage();
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const entrypoint = parsedArgs.entrypoint ? `--entrypoint ${parsedArgs.entrypoint}` : '';
@@ -101,7 +101,7 @@ const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRo
 		});
 
 const simulate = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = addTzExtensionIfMissing(parsedArgs.sourceFile);
+	const sourceFile = addTzExtensionIfMissing(parsedArgs.sourceFile!);
 	return simulateContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
 		sendAsyncErr(err, false)
 	);

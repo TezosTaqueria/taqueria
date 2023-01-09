@@ -9,9 +9,6 @@ The Core plugin provides core utility tasks that assist the user in various ways
 
 ## Installation
 
-> ### :page_with_curl: Note
-> This plugin should be automatically installed upon executing the `taq init` or `taq scaffold` tasks
-
 To install the Core plugin on a Taqueria project, navigate to the project folder and run:
 ```shell
 taq install @taqueria/plugin-core

@@ -68,10 +68,15 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 					return taqResolve('');
 				}
 			}),
-			mapRej(() =>
-				option === OPT_IN
-					? 'The command "taq opt-in" is ignored as this might be the first time running Taqueria...'
-					: 'The command "taq opt-out" is ignored as this might be the first time running Taqueria...'
+			mapRej(previous =>
+				TaqError.create({
+					kind: 'E_OPT_IN_WARNING',
+					msg: option === OPT_IN
+						? 'The command "taq opt-in" is ignored as this might be the first time running Taqueria...'
+						: 'The command "taq opt-out" is ignored as this might be the first time running Taqueria...',
+					previous,
+					context: option,
+				})
 			),
 		);
 

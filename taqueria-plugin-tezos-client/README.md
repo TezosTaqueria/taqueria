@@ -4,7 +4,7 @@ The Tezos Client plugin provides tasks to analyze contracts including type check
 
 ## Requirements
 
-- Taqueria v0.24.1 or later
+- Taqueria v0.26.0 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
 
@@ -14,6 +14,9 @@ To install the Tezos Client plugin on a Taqueria project, navigate to the projec
 ```shell
 taq install @taqueria/plugin-tezos-client
 ```
+
+> ### :page_with_curl: Note
+> You can override the Tezos-Client version used by the plugin by creating the environment variable `TAQ_TEZOS_CLIENT_IMAGE` and setting it to your desired Tezos-Client Docker image
 
 ## The `taq typecheck` task
 

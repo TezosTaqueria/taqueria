@@ -4,7 +4,7 @@ The Archetype plugin provides a task to compile Archetype smart contracts (`.arl
 
 ## Requirements
 
-- Taqueria v0.24.1 or later
+- Taqueria v0.26.0 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
 
@@ -14,6 +14,9 @@ To install the Archetype plugin on a Taqueria project, navigate to the project f
 ```shell
 taq install @taqueria/plugin-archetype
 ```
+
+> ### :page_with_curl: Note
+> You can override the Archetype version used by the plugin by creating the environment variable `TAQ_ARCHETYPE_IMAGE` and setting it to your desired Ligo Docker image
 
 ## Configuration
 

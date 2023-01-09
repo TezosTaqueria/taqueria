@@ -6,6 +6,9 @@ on:
       prerelease:
         required: false
         type: string
+      deno-version:
+        required: true
+        type: string
     secrets:
       GCP_PROJECT:
         required: true
@@ -52,7 +55,7 @@ jobs:
       - name: Install Deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: "1.23.4"
+          deno-version: "${{ inputs.deno-version }}"
 
       - name: Attempt to rebuild
         run: npm rebuild | true
@@ -60,9 +63,11 @@ jobs:
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
 
+      - run: npm ci
+
       - name: Build all
         run: |
-          npx lerna bootstrap --force-local
+          npm run build-types
           npm run build:packages
       
       - name: Compile TS
@@ -115,6 +120,16 @@ jobs:
         with:
           node-version: lts/gallium
           cache: "npm"
+
+      - name: Add working dir to PATH
+        run: echo "$(pwd)" >> $GITHUB_PATH
+      
+      - run: npm ci
+
+      - name: Build all
+        run: |
+          npm run build-types
+          npm run build:packages
       
       - name: Compile TS
         run: npm run compile --workspace ${{ env.GIT_WORKSPACE }}

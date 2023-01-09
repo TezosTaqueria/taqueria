@@ -1,19 +1,23 @@
 # Taqueria LIGO Plugin
 
-The LIGO plugin provides a task to compile LIGO smart contracts to Michelson `.tz` files
+The LIGO plugin provides tasks to work with LIGO smart contracts such as compiling and testing
 
 ## Requirements
 
-- Taqueria v0.24.1 or later
+- Taqueria v0.26.0 or later
 - Node.js v16.17.1 or later
 - Docker v20.10.12 or later
 
 ## Installation
 
 To install the LIGO plugin on a Taqueria project, navigate to the project folder and run:
+
 ```shell
 taq install @taqueria/plugin-ligo
 ```
+
+> ### :page_with_curl: Note
+> You can override the Ligo version used by the plugin by creating the environment variable `TAQ_LIGO_IMAGE` and setting it to your desired Ligo Docker image
 
 ## The `taq compile` Task
 
@@ -49,7 +53,7 @@ Lastly, `taq compile hello.mligo` will compile `hello.mligo` and emit `hello.tz`
 
 ### Options
 
-None for now
+The `--json` flag will make the task emit JSON-encoded Michelson instead of pure Michelson `.tz`
 
 ## The `taq test` Task
 

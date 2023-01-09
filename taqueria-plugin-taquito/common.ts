@@ -3,34 +3,40 @@ import {
 	getDefaultSandboxAccount,
 	getNetworkConfig,
 	getSandboxConfig,
+	RequestArgs,
 	sendAsyncErr,
 	TAQ_OPERATOR_ACCOUNT,
 } from '@taqueria/node-sdk';
-import { Environment, NetworkConfig, RequestArgs, SandboxAccountConfig, SandboxConfig } from '@taqueria/node-sdk/types';
+import {
+	Environment,
+	NetworkConfig,
+	Protocol,
+	ProxyTaskArgs,
+	SandboxAccountConfig,
+	SandboxConfig,
+} from '@taqueria/node-sdk/types';
 import { importKey, InMemorySigner } from '@taquito/signer';
 import { TezosToolkit } from '@taquito/taquito';
 
-export interface OriginateOpts extends RequestArgs.ProxyRequestArgs {
+export type OriginateOpts = ProxyTaskArgs.t & {
 	contract: string;
 	storage: string;
 	alias?: string;
 	sender?: string;
 	mutez?: string;
-}
+};
 
-export interface TransferOpts extends RequestArgs.ProxyRequestArgs {
+export type TransferOpts = ProxyTaskArgs.t & {
 	contract: string;
 	mutez?: string;
 	param?: string;
 	entrypoint?: string;
 	sender?: string;
-}
+};
 
-export interface InstantiateAccountOpts extends RequestArgs.ProxyRequestArgs {
-}
+export type InstantiateAccountOpts = ProxyTaskArgs.t;
 
-export interface FundOpts extends RequestArgs.ProxyRequestArgs {
-}
+export type FundOpts = ProxyTaskArgs.t;
 
 // To be used for the main entrypoint of the plugin
 export type IntersectionOpts = OriginateOpts & TransferOpts & InstantiateAccountOpts & FundOpts;
@@ -39,7 +45,7 @@ export type IntersectionOpts = OriginateOpts & TransferOpts & InstantiateAccount
 type UnionOpts = OriginateOpts | TransferOpts | InstantiateAccountOpts | FundOpts;
 
 export const getEnvTypeAndNodeConfig = (
-	parsedArgs: UnionOpts,
+	parsedArgs: RequestArgs.t,
 	env: Environment.t,
 ): Promise<['Network', NetworkConfig.t] | ['Sandbox', SandboxConfig.t]> => {
 	const targetConstraintErrMsg = 'Each environment can only have one target, be it a network or a sandbox';
@@ -94,7 +100,7 @@ export const configureToolKitForSandbox = async (sandbox: SandboxConfig.t, sende
 };
 
 export const configureToolKitForNetwork = async (
-	parsedArgs: UnionOpts,
+	parsedArgs: RequestArgs.t,
 	network: NetworkConfig.t,
 	sender?: string,
 ): Promise<TezosToolkit> => {
@@ -118,8 +124,8 @@ export const configureToolKitForNetwork = async (
 	return tezos;
 };
 
-export const getDeclaredAccounts = (parsedArgs: UnionOpts): Record<string, number> =>
-	Object.entries(parsedArgs.config.accounts).reduce(
+export const getDeclaredAccounts = (parsedArgs: RequestArgs.t): Record<string, number> =>
+	Object.entries(parsedArgs.config.accounts ?? {}).reduce(
 		(acc, declaredAccount) => {
 			const alias: string = declaredAccount[0];
 			const mutez: string | number = declaredAccount[1];
@@ -166,7 +172,7 @@ export const getNetworkInstantiatedAccounts = (network: NetworkConfig.t): Record
 		: {};
 
 export const generateAccountKeys = async (
-	parsedArgs: UnionOpts,
+	parsedArgs: RequestArgs.t,
 	network: NetworkConfig.t,
 	account: string,
 ): Promise<void> => {

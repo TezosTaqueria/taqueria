@@ -9,7 +9,6 @@ Commands:
   taq add-contract <sourceFile>   Add a contract to the contract registry
   taq rm-contract <contractName>  Remove a contract from the contract registry
   taq list-contracts              List registered contracts
-  taq clean                       Clean all the Taqueria-related docker images
   taq ligo                        This task allows you to run arbitrary LIGO nat
                                   ive commands. Note that they might not benefit
                                    from the abstractions provided by Taqueria
@@ -18,6 +17,7 @@ Commands:
                                   ed storage/parameter list files if they are fo
                                   und                 [aliases: c, compile-ligo]
   taq test <sourceFile>           Test a smart contract written in LIGO
+  taq clean                       Clean all the Taqueria-related docker images
   taq create <template>           Create files from pre-existing templates
 
 Options:
@@ -37,12 +37,13 @@ Compile a smart contract written in a LIGO syntax to Michelson code, along with
 its associated storage/parameter list files if they are found
 
 Options:
-      --version     Show version number                                [boolean]
-      --build       Display build information about the current version[boolean]
   -p, --projectDir  Path to your project directory               [default: "./"]
   -e, --env         Specify an environment configuration
+      --version     Show version number                                [boolean]
+      --build       Display build information about the current version[boolean]
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
+      --json        Emit JSON-encoded Michelson                        [boolean]
 `;
 
 export const ligoNoContracts = `No contracts found to compile. Have you run "taq add-contract [sourceFile]" ?
@@ -61,6 +62,7 @@ Options:
   -e, --env         Specify an environment configuration
   -y, --yes         Select "yes" to any prompt        [boolean] [default: false]
       --help        Show help                                          [boolean]
+      --json        Emit JSON-encoded Michelson                        [boolean]
 
 Not enough non-option arguments: got 0, need at least 1
 `;

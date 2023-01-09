@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-flextesa",
-	"version": "0.24.1",
+	"version": "0.25.16-rc",
 	"description": "A plugin for Taqueria providing local sandbox capabilities built on Flextesa",
 	"keywords": [
 		"taqueria",
@@ -23,9 +23,7 @@
 	"types": "./index.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"build-plugin": "npx tsc -noEmit && npx parcel build --no-cache  2>&1",
-		"build-dev": "npm run build-docker && npm run build-plugin",
-		"build": "npm run build-plugin",
+		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup",
 		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
 	},
 	"author": "ECAD Labs",
@@ -36,15 +34,32 @@
 		"directory": "taqueria-plugin-flextesa"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.24.1",
-		"@taqueria/protocol": "^0.24.1",
+		"@taqueria/node-sdk": "^0.25.16-rc",
+		"@taqueria/protocol": "^0.25.16-rc",
 		"async-retry": "^1.3.3",
 		"fast-glob": "^3.2.11",
-		"portfinder": "^1.0.28"
+		"portfinder": "^1.0.28",
+		"rambda": "^7.4.0"
 	},
 	"devDependencies": {
 		"@types/async-retry": "^1.4.4",
-		"parcel": "2.6.1",
+		"tsup": "^6.1.3",
 		"typescript": "^4.7.2"
+	},
+	"tsup": {
+		"entry": [
+			"index.ts"
+		],
+		"sourcemap": true,
+		"target": "node16",
+		"outDir": "./",
+		"dts": true,
+		"clean": false,
+		"skipNodeModulesBundle": true,
+		"platform": "node",
+		"format": [
+			"esm",
+			"cjs"
+		]
 	}
 }

@@ -1,0 +1,338 @@
+{
+	"foldingStartMarker": "{",
+	"foldingStopMarker": "}",
+	"name": "JsLIGO",
+	"scopeName": "source.jsligo",
+	"fileTypes": ["jsligo"],
+	"patterns": [
+		{ "include": "#string" },
+		{ "include": "#block_comment" },
+		{ "include": "#line_comment" },
+		{ "include": "#uppercaseidentifier" },
+		{ "include": "#macro" },
+		{ "include": "#letbinding" },
+		{ "include": "#typedefinition" },
+		{ "include": "#controlkeywords" },
+		{ "include": "#numericliterals" },
+		{ "include": "#operators" },
+		{ "include": "#modulealias" },
+		{ "include": "#moduledeclaration" },
+		{ "include": "#typeannotation" },
+		{ "include": "#typeas" },
+		{ "include": "#objectorblock" }
+	],
+	"repository": {
+		"string": {
+			"name": "string.quoted.double.jsligo",
+			"begin": "\\\"",
+			"end": "\\\"",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": []
+		},
+		"block_comment": {
+			"name": "comment.block.jsligo",
+			"begin": "/\\*",
+			"end": "\\*\\/",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#block_comment" },
+				{ "include": "#attribute" }
+			]
+		},
+		"line_comment": {
+			"name": "comment.block.jsligo",
+			"begin": "\\/\\/",
+			"end": "$",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [{ "include": "#attribute" }]
+		},
+		"attribute": {
+			"name": "keyword.control.attribute.jsligo",
+			"match": "(@[a-zA-Z][a-zA-Z0-9_:.@%]*)",
+			"captures": {}
+		},
+		"macro": {
+			"name": "meta.preprocessor.jsligo",
+			"match": "^\\#[a-zA-Z]+",
+			"captures": {}
+		},
+		"letbinding": {
+			"match": "\\b(let|const)\\b\\s*\\s*\\b([a-zA-Z$_][a-zA-Z0-9$_]*)\\b",
+			"captures": {
+				"2": { "name": "entity.name.function.jsligo" },
+				"1": { "name": "keyword.other.jsligo" }
+			}
+		},
+		"controlkeywords": {
+			"name": "keyword.control.jsligo",
+			"match": "\\b(switch|case|default|if|else|for|of|while|return|break|export)\\b",
+			"captures": {}
+		},
+		"numericliterals": {
+			"name": "constant.numeric.jsligo",
+			"match": "(\\+|\\-)?[0-9]+(n|tz|tez|mutez|)\\b",
+			"captures": {}
+		},
+		"operators": {
+			"name": "keyword.operator.jsligo",
+			"match": "\\b(\\-|\\+|%|&&|\\|\\||==|!=|<=|>=|<|>|\\*|/|=|!|\\*=|/=|%=|\\+=|\\-=)\\b",
+			"captures": {}
+		},
+		"semicolon": { "match": "(;)", "captures": {} },
+		"comma": { "match": "(,)", "captures": {} },
+		"uppercaseidentifier": {
+			"match": "\\b([A-Z][a-zA-Z0-9_$]*)\\b",
+			"captures": { "1": { "name": "entity.name.type.jsligo" } }
+		},
+		"lowercaseidentifier": {
+			"match": "\\b([a-zA-Z$_][a-zA-Z0-9$_]*)\\b",
+			"captures": { "1": { "name": "variable.jsligo" } }
+		},
+		"moduleaccess ": {
+			"match": "\\b([A-Z][\\.a-zA-Z0-9_$]*)\\.\\s*\\b([a-zA-Z0-9_$]*)\\b",
+			"captures": {
+				"2": { "name": "variable.jsligo" },
+				"1": { "name": "entity.name.type.jsligo" }
+			}
+		},
+		"modulealias": {
+			"match": "\\b(import)\\b\\s*\\b([A-Z][a-zA-Z0-9_$]*)\\b",
+			"captures": {
+				"2": { "name": "entity.name.type.jsligo" },
+				"1": { "name": "keyword.control.jsligo" }
+			}
+		},
+		"moduledeclaration": {
+			"match": "\\b(namespace)\\b",
+			"captures": { "1": { "name": "keyword.other.jsligo" } }
+		},
+		"objectorblock": {
+			"begin": "({)",
+			"end": "(})",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#objectpropertyctor" },
+				{ "include": "#objectpropertyint" },
+				{ "include": "#objectpropertystring" },
+				{ "include": "#objectproperty" },
+				{ "include": "#comma" },
+				{ "include": "$self" }
+			]
+		},
+		"objectpropertyctor": {
+			"begin": "\\b([A-Z][a-zA-Z0-9_$]*)\\b\\s*(:)",
+			"end": "(?=,|})",
+			"beginCaptures": {
+				"2": { "name": "keyword.operator.jsligo" },
+				"1": { "name": "variable.other.enummember.jsligo" }
+			},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "$self" }
+			]
+		},
+		"objectpropertyint": {
+			"begin": "\\b([0-9]+)\\b\\s*(:)",
+			"end": "(?=,|})",
+			"beginCaptures": {
+				"2": { "name": "keyword.operator.jsligo" },
+				"1": { "name": "constant.numeric.jsligo" }
+			},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "$self" }
+			]
+		},
+		"objectpropertystring": {
+			"begin": "(\\\".*\\\")\\s*(:)",
+			"end": "(?=,|})",
+			"beginCaptures": {
+				"2": { "name": "keyword.operator.jsligo" },
+				"1": { "name": "string.quoted.double.jsligo" }
+			},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "$self" }
+			]
+		},
+		"objectproperty": {
+			"begin": "\\b([a-zA-Z$_][a-zA-Z0-9$_]*)\\b\\s*(:)",
+			"end": "(?=,|})",
+			"beginCaptures": { "2": { "name": "keyword.operator.jsligo" } },
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "$self" }
+			]
+		},
+		"typedefinition": {
+			"begin": "\\b(type)\\b",
+			"end": "(?=;|}|\\b(else|default|case)\\b)",
+			"beginCaptures": { "1": { "name": "keyword.other.jsligo" } },
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#uppercaseidentifier" },
+				{ "include": "#typeoperator" },
+				{ "include": "#typename" },
+				{ "include": "#typeparentheses" },
+				{ "include": "#typeint" },
+				{ "include": "#typevariant" },
+				{ "include": "#typeproduct" },
+				{ "include": "#string" }
+			]
+		},
+		"typeannotation": {
+			"begin": "(:)",
+			"end": "(?=\\)|=>|,|}|=)",
+			"beginCaptures": { "1": { "name": "keyword.operator.jsligo" } },
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#uppercaseidentifier" },
+				{ "include": "#typeoperator" },
+				{ "include": "#typename" },
+				{ "include": "#typeparentheses" },
+				{ "include": "#typeint" },
+				{ "include": "#typevariant" },
+				{ "include": "#typeproduct" },
+				{ "include": "#string" }
+			]
+		},
+		"typeannotationfield": {
+			"begin": "(:)",
+			"end": "(?=,|})",
+			"beginCaptures": { "1": { "name": "keyword.operator.jsligo" } },
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#uppercaseidentifier" },
+				{ "include": "#typeoperator" },
+				{ "include": "#typename" },
+				{ "include": "#typeparentheses" },
+				{ "include": "#typeint" },
+				{ "include": "#typevariant" },
+				{ "include": "#typeproduct" },
+				{ "include": "#string" }
+			]
+		},
+		"typeas": {
+			"begin": "\\b(as)\\b",
+			"end": "(?=;|\\)|%=|\\]|}|\\+=|\\*=|-=|=|/=|,|:|\\b(else|default|case|as)\\b)",
+			"beginCaptures": { "1": { "name": "keyword.other.jsligo" } },
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#uppercaseidentifier" },
+				{ "include": "#typeoperator" },
+				{ "include": "#typename" },
+				{ "include": "#typeparentheses" },
+				{ "include": "#typeint" },
+				{ "include": "#typevariant" },
+				{ "include": "#typeproduct" },
+				{ "include": "#string" }
+			]
+		},
+		"typeoperator": {
+			"name": "keyword.operator.jsligo",
+			"match": "(=>|\\.|\\|)",
+			"captures": {}
+		},
+		"typename": {
+			"name": "entity.name.type.jsligo",
+			"match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)\\b",
+			"captures": {}
+		},
+		"typegenericbinder": {
+			"begin": "(<)",
+			"end": "(>)",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#comma" },
+				{ "include": "#typename" }
+			]
+		},
+		"typefunparam": {
+			"match": "\\b([a-zA-Z$_][a-zA-Z0-9$_]*)\\b\\s*(?=:)",
+			"captures": {}
+		},
+		"typeparentheses": {
+			"begin": "(\\()",
+			"end": "(\\))",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#typefunparam" },
+				{ "include": "#typeannotation" },
+				{ "include": "#comma" },
+				{ "include": "#uppercaseidentifier" },
+				{ "include": "#typeoperator" },
+				{ "include": "#typename" },
+				{ "include": "#typeparentheses" },
+				{ "include": "#typeint" },
+				{ "include": "#typevariant" },
+				{ "include": "#typeproduct" },
+				{ "include": "#string" }
+			]
+		},
+		"typeint": {
+			"name": "constant.numeric.jsligo",
+			"match": "\\b([0-9]+)\\b",
+			"captures": {}
+		},
+		"typevariant": {
+			"begin": "(\\[)",
+			"end": "(\\])",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#comma" },
+				{ "include": "#uppercaseidentifier" },
+				{ "include": "#typeoperator" },
+				{ "include": "#typename" },
+				{ "include": "#typeparentheses" },
+				{ "include": "#typeint" },
+				{ "include": "#typevariant" },
+				{ "include": "#typeproduct" },
+				{ "include": "#string" }
+			]
+		},
+		"typeproduct": {
+			"begin": "({)",
+			"end": "(})",
+			"beginCaptures": {},
+			"endCaptures": {},
+			"patterns": [
+				{ "include": "#line_comment" },
+				{ "include": "#block_comment" },
+				{ "include": "#lowercaseidentifier" },
+				{ "include": "#typeannotationfield" },
+				{ "include": "#comma" }
+			]
+		}
+	}
+}

@@ -1,26 +1,27 @@
-import { getContracts, sendAsyncErr, sendJsonRes, sendRes, writeJsonFile } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import {
+	Config,
+	getContracts,
+	LoadedConfig,
+	PluginProxyResponse,
+	RequestArgs,
+	sendAsyncErr,
+	sendJsonRes,
+	sendRes,
+	writeJsonFile,
+} from '@taqueria/node-sdk';
 import fs from 'fs/promises';
 import path from 'path';
 import prompts from 'prompts';
 
-// TODO: What should this be, it was removed from the sdk
-type PluginResponse =
-	| void
-	| {
-		render: 'table';
-		data: unknown[];
-	};
-
-interface Opts extends RequestArgs.ProxyRequestArgs {
+interface Opts extends RequestArgs.t {
 	readonly contractName?: string;
+	readonly task?: string;
 }
-type Config = Opts['config'];
 
 const createContractMetadata = async (
 	contractName: undefined | string,
-	config: Config,
-): Promise<PluginResponse> => {
+	config: Config.t,
+): Promise<PluginProxyResponse> => {
 	const contracts = Object.keys(config.contracts ?? {}).map(x => path.basename(x, path.extname(x)));
 
 	if (!contractName) {
@@ -168,9 +169,9 @@ type ProjectMetadata = {
 	homepage: string;
 };
 const createProjectMetadata = async (
-	config: Config,
-): Promise<PluginResponse> => {
-	const defaultValues = config.metadata;
+	loadedConfig: LoadedConfig.t,
+): Promise<PluginProxyResponse> => {
+	const defaultValues = loadedConfig.metadata;
 
 	// Common fields from Tzip-16
 	const response = await prompts([
@@ -222,10 +223,10 @@ const createProjectMetadata = async (
 	};
 
 	const updatedConfig = {
-		...config,
+		...Config.create(loadedConfig), // config is actually LoadedConfig
 		metadata: projectMetadata,
 	};
-	await writeJsonFile(config.configFile)(updatedConfig);
+	await writeJsonFile(loadedConfig.configFile)(updatedConfig);
 
 	return {
 		render: 'table',
@@ -233,28 +234,26 @@ const createProjectMetadata = async (
 	};
 };
 
-const execute = async (opts: Opts): Promise<PluginResponse> => {
+const execute = async (opts: Opts): Promise<PluginProxyResponse> => {
 	const {
 		task,
 		contractName,
 		config,
 	} = opts;
 
-	// TAQ BUG: If both tasks start with 'generate' then 'project-metadata' is always selected
-	// WORKAROUND: If the 2nd command is changed to generate-project-metadata, it works as expected
-	// console.log('execute', { task, contractName, metadata: config.metadata });
-
 	switch (task) {
+		case 'generate-metadata':
 		case 'metadata':
 			return createContractMetadata(contractName, config as (typeof config & { metadata?: ProjectMetadata }));
 		case 'project-metadata':
+		case 'generate-project-metadata':
 			return createProjectMetadata(config as (typeof config & { metadata?: ProjectMetadata }));
 		default:
 			throw new Error(`${task} is not an understood task by the metadata plugin`);
 	}
 };
 
-export default async (args: RequestArgs.ProxyRequestArgs): Promise<PluginResponse> => {
+export default async (args: RequestArgs.t): Promise<PluginProxyResponse> => {
 	const opts = args as Opts;
 
 	try {

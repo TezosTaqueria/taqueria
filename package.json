@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/taqueria",
-	"version": "0.22.2",
+	"version": "0.25.16",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -8,10 +8,9 @@
 	},
 	"scripts": {
 		"test": "yarn",
-		"bootstrap": "lerna bootstrap --force-local",
+		"build-types": "npm run build-types -w taqueria-protocol",
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
-		"build:docker": "lerna run build-docker",
 		"build:packages": "lerna run build",
 		"deploy": "lerna version --no-push --no-git-tag-version --no-private",
 		"parse-readme-template": "ts-node ./parse-readme-template.ts",
@@ -45,6 +44,8 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"devDependencies": {
+		"@gmrchk/cli-testing-library": "^0.1.2",
+		"@taqueria/plugin-core": "file:taqueria-plugin-core",
 		"chokidar-cli": "^3.0.0",
 		"dprint": "^0.27.1",
 		"eta": "^1.12.3",
@@ -53,6 +54,7 @@
 		"lint-staged": "^12.4.1",
 		"ts-jest": "^28.0.7",
 		"ts-node": "^10.8.0",
+		"ts-to-zod": "^1.13.1",
 		"tsup": "^6.1.3",
 		"typescript": "^4.7.4",
 		"with-staged": "^1.0.2"

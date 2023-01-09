@@ -1,8 +1,9 @@
-import { LikeAPromise, RequestArgs, TaqError } from '@taqueria/node-sdk/types';
+import { RequestArgs } from '@taqueria/node-sdk';
+import { LikeAPromise, TaqError } from '@taqueria/node-sdk/types';
 import glob from 'fast-glob';
 import { join } from 'path';
 import { generateContractTypesProcessContractFiles } from './src/cli-process';
-interface Opts extends RequestArgs.ProxyRequestArgs {
+interface Opts extends RequestArgs.t {
 	// TODO: Document these
 	typescriptDir?: string;
 	typeAliasMode?: 'local' | 'file' | 'library' | 'simple';
@@ -10,13 +11,16 @@ interface Opts extends RequestArgs.ProxyRequestArgs {
 }
 
 const getContractAbspath = (contractFilename: string, parsedArgs: Opts) =>
-	join(parsedArgs.config.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`);
+	join(
+		parsedArgs.config.artifactsDir ?? 'artifacts',
+		/\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`,
+	);
 
 const generateContractTypes = (parsedArgs: Opts) =>
 	async (contractFilename: string): Promise<string> => {
 		const contractAbspath = getContractAbspath(contractFilename, parsedArgs);
 		await generateContractTypesProcessContractFiles({
-			inputTzContractDirectory: parsedArgs.config.artifactsDir,
+			inputTzContractDirectory: parsedArgs.config.artifactsDir ?? 'artifacts',
 			inputFiles: [contractAbspath],
 			outputTypescriptDirectory: parsedArgs.typescriptDir || 'types',
 			format: 'tz',

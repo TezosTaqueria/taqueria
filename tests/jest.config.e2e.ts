@@ -1,7 +1,25 @@
+import fs from 'fs';
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
  */
+
+function checkEnvFile(): boolean {
+	const fileName = `../.env`;
+	if (!fs.existsSync(fileName)) {
+		return false;
+	}
+	const contents = fs.readFileSync(fileName, 'utf8');
+	return contents.includes('pinataJwtToken=');
+}
+
+if (!process.env.pinataJwtToken && !process.env.UNLIMITED_PINATA_TOKEN && !checkEnvFile()) {
+	console.log('E2E tests need the environment variable pinataJwtToken to be set to a valid pinata jwt token.');
+	console.log(
+		'You can set that environment variable, or add a .env file in taqueria project root that sets the variable.',
+	);
+	throw new Error('E2E tests need the environment variable pinataJwtToken to be set to a valid pinata jwt token');
+}
 
 export default {
 	// All imported modules in your tests should be mocked automatically
@@ -61,11 +79,11 @@ export default {
 	// globalTeardown: undefined,
 
 	// A set of global variables that need to be available in all test environments
-	globals: {
-		'ts-jest': {
-			tsconfig: 'tsconfig.test.json',
-		},
-	},
+	// globals: {
+	// 	'ts-jest': {
+	// 		tsconfig: 'tsconfig.test.json',
+	// 	},
+	// },
 
 	// The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
 	// maxWorkers: "50%",
@@ -176,13 +194,13 @@ export default {
 	// timers: "real",
 
 	// A map from regular expressions to paths to transformers
-	// transform: {"^.+\\.(ts|js)$":"<rootDir>/node_modules/ts-jest"},
+	transform: { '^.+\\.(ts|js)$': '<rootDir>/node_modules/ts-jest' },
 
 	// An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-	// transformIgnorePatterns: [
-	//   "/node_modules/",
-	//   "\\.pnp\\.[^\\/]+$"
-	// ],
+	transformIgnorePatterns: [
+		'/node_modules/',
+		//   "\\.pnp\\.[^\\/]+$"
+	],
 
 	// Changing default timeout from 5000 to 30000 for tests
 	testTimeout: 300000,
@@ -190,8 +208,7 @@ export default {
 	// unmockedModulePathPatterns: undefined,
 
 	// Indicates whether each individual test should be reported during the run
-	// verbose: undefined,
-
+	verbose: true,
 	// An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
 	// watchPathIgnorePatterns: [],
 

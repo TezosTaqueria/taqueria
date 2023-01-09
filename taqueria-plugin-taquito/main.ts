@@ -1,22 +1,23 @@
-import { sendAsyncErr } from '@taqueria/node-sdk';
+import { RequestArgs, sendAsyncErr } from '@taqueria/node-sdk';
 import { IntersectionOpts as Opts } from './common';
 import fund from './fund';
 import instantiate_account from './instantiate_account';
 import originate from './originate';
 import transfer from './transfer';
 
-export const main = (parsedArgs: Opts): Promise<void> => {
-	switch (parsedArgs.task) {
+export const main = (parsedArgs: RequestArgs.t): Promise<void> => {
+	const unsafeArgs = parsedArgs as unknown as Opts;
+	switch (unsafeArgs.task) {
 		case 'deploy':
-			return originate(parsedArgs);
+			return originate(unsafeArgs);
 		case 'transfer':
-			return transfer(parsedArgs);
+			return transfer(unsafeArgs);
 		case 'instantiate-account':
 			return instantiate_account(parsedArgs);
 		case 'fund':
 			return fund(parsedArgs);
 		default:
-			return sendAsyncErr(`${parsedArgs.task} is not an understood task by the Taquito plugin`);
+			return sendAsyncErr(`${unsafeArgs} is not an understood task by the Taquito plugin`);
 	}
 };
 

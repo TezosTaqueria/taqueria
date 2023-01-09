@@ -1,5 +1,5 @@
-import { sendAsyncRes } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { sendAsyncRes, sendErr } from '@taqueria/node-sdk';
+import { RequestArgs } from '@taqueria/node-sdk';
 import { execa } from 'execa';
 import { CustomRequestArgs, ensureSelectedPartitionExists, toRequestArgs } from './common';
 
@@ -15,7 +15,7 @@ const execCmd = (cmd: string, args: string[]) => {
 
 	return child;
 };
-export default async (args: RequestArgs.t) => {
+export default (args: RequestArgs.t) => {
 	const parsedArgs = toRequestArgs(args);
 	return ensureSelectedPartitionExists(parsedArgs, parsedArgs.init ? true : false)
 		.then(configAbsPath => {

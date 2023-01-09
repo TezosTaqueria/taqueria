@@ -1,13 +1,14 @@
-import { sendAsyncErr } from '@taqueria/node-sdk';
+import { RequestArgs, sendAsyncErr } from '@taqueria/node-sdk';
 import clean from './clean';
 import { IntersectionOpts as Opts } from './common';
 
-export const core = (parsedArgs: Opts): Promise<void> => {
-	switch (parsedArgs.task) {
+export const core = (parsedArgs: RequestArgs.t): Promise<void> => {
+	const unsafeOpts = parsedArgs as unknown as Opts;
+	switch (unsafeOpts.task) {
 		case 'clean':
 			return clean(parsedArgs);
 		default:
-			return sendAsyncErr(`${parsedArgs.task} is not an understood task by the Core plugin`);
+			return sendAsyncErr(`${unsafeOpts.task} is not an understood task by the Core plugin`);
 	}
 };
 
