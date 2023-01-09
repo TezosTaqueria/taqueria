@@ -11,7 +11,7 @@ const tableOutput = `
 │ pong │
 └──────┘`;
 
-describe('Integration tests using taqueria-mock-plugin', () => {
+describe('Unit tests using taqueria-mock-plugin', () => {
 	beforeAll(async () => {
 		await generateTestProject(testProjectPath, ['mock']);
 	});

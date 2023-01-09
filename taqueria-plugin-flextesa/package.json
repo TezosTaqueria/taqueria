@@ -38,7 +38,8 @@
 		"@taqueria/protocol": "^0.25.16-rc",
 		"async-retry": "^1.3.3",
 		"fast-glob": "^3.2.11",
-		"portfinder": "^1.0.28"
+		"portfinder": "^1.0.28",
+		"rambda": "^7.4.0"
 	},
 	"devDependencies": {
 		"@types/async-retry": "^1.4.4",
