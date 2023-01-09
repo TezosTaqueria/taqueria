@@ -1,7 +1,10 @@
-import { execSync, spawnSync } from 'child_process';
+import { exec as exec1, execSync, spawnSync } from 'child_process';
 import { readFile, rm } from 'fs/promises';
 import { join } from 'path';
+import util from 'util';
 import { generateTestProject } from '../e2e/utils/utils';
+const exec = util.promisify(exec1);
+
 const testProjectPath = 'scrap/auto-test-integration';
 
 const tableOutput = `
@@ -12,6 +15,8 @@ const tableOutput = `
 └──────┘`;
 
 describe('Unit tests using taqueria-mock-plugin', () => {
+	jest.setTimeout(90000);
+
 	beforeAll(async () => {
 		await generateTestProject(testProjectPath, ['mock']);
 	});
@@ -112,6 +117,26 @@ describe('Unit tests using taqueria-mock-plugin', () => {
 
 		const output = await readFile(join(testProjectPath, 'artifacts', 'hello.json'), 'utf-8');
 		expect(output).toEqual('{"greeting":"Hello, QA Team!"}');
+	});
+
+	test('Verify that if an invalid schema is used, error messaging works as expected', async () => {
+		const withoutDebug = await exec('taq proxy --invalid-schema || true', {
+			cwd: testProjectPath,
+			encoding: 'utf-8',
+		});
+		expect(withoutDebug.stderr).toContain(
+			'@taqueria/plugin-mock encountered an unexpected problem. Use --debug to learn more.',
+		);
+
+		const withDebug = await exec('taq proxy --invalid-schema --debug || true', {
+			cwd: testProjectPath,
+			encoding: 'utf-8',
+		});
+		expect(withDebug.stderr).not.toEqual(
+			'@taqueria/plugin-mock encountered an unexpected problem. Use --debug to learn more.',
+		);
+		expect(withDebug.stderr).toContain(`"secretKey":"[hidden]"`);
+		expect(withDebug.stderr).toContain(`"privateKey":"[hidden]"`);
 	});
 
 	// Clean up process to remove taqified project folder

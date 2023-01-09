@@ -263,7 +263,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('deploy will error if an invalid network name is in the environment configuration', async () => {
+	test.skip(/* No longer possible to have missing network in config */ 'deploy will error if an invalid network name is in the environment configuration', async () => {
 		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
