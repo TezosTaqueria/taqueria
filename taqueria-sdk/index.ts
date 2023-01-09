@@ -703,13 +703,63 @@ const getPackageName = () => {
 	return generateName().dashed;
 };
 
+export const isTaqError = (err: unknown): err is TaqError => {
+	return (err as TaqError).kind !== undefined;
+};
+
+// Creates a writable stream that sanitizes the data being written to the stream
+// We then create a new console that uses this stream for stderr
+const sanitizedStderrWriter = () => {
+	const stream = require('stream');
+	const { Console } = require('console');
+	const writable = stream.Writable({
+		write(chunk: Buffer, _encoding: string, next: () => void) {
+			console.error(chunk.toString('utf8').replaceAll(/("[^"]+key\"):("[^"]+\")/gi, `$1:"[hidden]"`));
+			next();
+		},
+	});
+	return new Console(process.stdout, writable);
+};
+
+// Outputs the error using console.error (so that the error is formatted) but
+// uses a custom writable stream that sanitizes the data first
+const outputSanitizedErr = (err: unknown) => {
+	const console = sanitizedStderrWriter();
+	console.error(err);
+};
+
 export const Plugin = {
 	create: <Args extends Protocol.RequestArgs.t>(definer: pluginDefiner, unparsedArgs: string[]) => {
 		const packageName = getPackageName();
 		return parseArgs<Args>(unparsedArgs)
 			.then(getResponse(definer, packageName))
 			.catch((err: unknown) => {
-				if (err) console.error(err);
+				if (err) {
+					const debug = unparsedArgs.join(',').includes(['--debug', true].join(','));
+
+					// Handle Zod parsing errors
+					if (isTaqError(err) && err.kind === 'E_PARSE' && err.previous && err.previous instanceof ZodError) {
+						const msgs: string[] = err.previous.errors.reduce(
+							(retval, issue) => {
+								const path = issue.path.join(' → ');
+								const msg = `  ${path}: ${issue.message}`;
+								return [...retval, msg];
+							},
+							[`Taqueria tried to send data to ${packageName} that it couldn't parse or understand. This is most likely due to the version of the plugin being out-of-date and incompatible with the CLI or vice versa. More details:`],
+						);
+						console.error(msgs.join('\n') + '\n');
+					} // Handle simple string errors
+					else if (typeof err === 'string') console.error(err);
+					// Handle edge cases
+					else if (!debug) {
+						console.error(`${packageName} encountered an unexpected problem. Use --debug to learn more.`);
+					}
+
+					// Show the entire err if the debug flag is provided
+					if (debug) {
+						outputSanitizedErr(err);
+					}
+				}
 				process.exit(1);
 			});
 	},
