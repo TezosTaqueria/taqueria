@@ -52,10 +52,10 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(contractHash).toMatch(contractRegex);
 
 		// 3. Verify that contract has been originated to the network and contains storage
-		const configContents = JSON.parse(
-			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		const configEnvironmentContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.local.${environment}.json`, { encoding: 'utf-8' }),
 		);
-		const port = configContents.sandbox.localTF.rpcUrl;
+		const port = configEnvironmentContents.rpcUrl;
 		const contractFromSandbox = await exec(
 			`curl ${port}/chains/main/blocks/head/context/contracts/${contractHash}`,
 		);
@@ -84,10 +84,10 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(contractHash).toMatch(contractRegex);
 
 		// 3. Verify that contract has been originated to the network
-		const configContents = JSON.parse(
-			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		const configEnvironmentContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.local.${environment}.json`, { encoding: 'utf-8' }),
 		);
-		const port = configContents.sandbox.localTF.rpcUrl;
+		const port = configEnvironmentContents.rpcUrl;
 		const contractFromSandbox = await exec(
 			`curl ${port}/chains/main/blocks/head/context/contracts/${contractHash}`,
 		);
@@ -189,10 +189,10 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		// 5. Get the KT address from the output
 		const contractHash = deployResponse.split('│')[2].trim();
 
-		const configContents = JSON.parse(
-			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.json`, { encoding: 'utf-8' }),
+		const configEnvironmentContents = JSON.parse(
+			await fsPromises.readFile(`${taqueriaProjectPath}/.taq/config.local.${environment}.json`, { encoding: 'utf-8' }),
 		);
-		const localURL = configContents.sandbox.localTF.rpcUrl;
+		const localURL = configEnvironmentContents.rpcUrl;
 		const beforeAmount = await checkContractBalanceOnNetwork(contractHash, localURL);
 
 		// 6. Call taq call command to transfer 0 tez from account to the contract
