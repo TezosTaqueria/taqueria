@@ -3,12 +3,15 @@ import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
+const env_file =
+	'pinataJwtToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1M2FkZjkxZi0yY2Q0LTQ3ZGUtYThlOS00YmM0YjI5NDI4NzYiLCJlbWFpbCI6Im1pY2hhZWxrZXJuYWdoYW5AZWNhZGxhYnMuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJOWUMxIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImNiOGMzMzVkN2RhOThiZGQ2MTRmIiwic2NvcGVkS2V5U2VjcmV0IjoiZWIwYmUxYjRhYzNhZjE5ZGE3MjQ3MTAxNmFlZjFjNTllNjQzNTdlOTcwZmY1ZmYxZDBjNmU1ZTBkYmI1ODkzMCIsImlhdCI6MTY2OTEzMzI2MH0.U9JyTzEviH5y-GxSmD6YEkCVkcjsSX6d13a9fHE70LM';
+
 describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 	test('publish will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
 		const { stdout: stdout2 } = await execute('taq', 'publish --help', './test-project');
@@ -19,9 +22,9 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 
 	test('pin will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
 		const { stdout: stdout2 } = await execute('taq', 'pin --help', './test-project');
@@ -32,9 +35,9 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 
 	test('publish will error if no env jwt token exists', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
 		const { stderr } = await execute('taq', 'publish ./ipfs/0001.txt', './test-project');
@@ -45,9 +48,9 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 
 	test('pin will error if no env jwt token exists', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
 		const { stderr } = await execute('taq', 'pin QmZcEXgfE9K4zFVkTrqW5x4skvEqpNajZzvb7frrWnkQa5', './test-project');
@@ -58,14 +61,12 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 
 	test('publish will error if no file specified', async () => {
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 
-		const env_file =
-			'pinataJwtToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1M2FkZjkxZi0yY2Q0LTQ3ZGUtYThlOS00YmM0YjI5NDI4NzYiLCJlbWFpbCI6Im1pY2hhZWxrZXJuYWdoYW5AZWNhZGxhYnMuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJOWUMxIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImNiOGMzMzVkN2RhOThiZGQ2MTRmIiwic2NvcGVkS2V5U2VjcmV0IjoiZWIwYmUxYjRhYzNhZjE5ZGE3MjQ3MTAxNmFlZjFjNTllNjQzNTdlOTcwZmY1ZmYxZDBjNmU1ZTBkYmI1ODkzMCIsImlhdCI6MTY2OTEzMzI2MH0.U9JyTzEviH5y-GxSmD6YEkCVkcjsSX6d13a9fHE70LM';
 		await writeFile('./test-project/.env', env_file);
 
-		const {} = await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
 		const { stderr } = await execute('taq', 'publish', './test-project');
@@ -77,14 +78,12 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 	test('pin will error if no filehash specified', async () => {
 		// note the error is not what is expected, but it is what is returned
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 
-		const env_file =
-			'pinataJwtToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1M2FkZjkxZi0yY2Q0LTQ3ZGUtYThlOS00YmM0YjI5NDI4NzYiLCJlbWFpbCI6Im1pY2hhZWxrZXJuYWdoYW5AZWNhZGxhYnMuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJOWUMxIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImNiOGMzMzVkN2RhOThiZGQ2MTRmIiwic2NvcGVkS2V5U2VjcmV0IjoiZWIwYmUxYjRhYzNhZjE5ZGE3MjQ3MTAxNmFlZjFjNTllNjQzNTdlOTcwZmY1ZmYxZDBjNmU1ZTBkYmI1ODkzMCIsImlhdCI6MTY2OTEzMzI2MH0.U9JyTzEviH5y-GxSmD6YEkCVkcjsSX6d13a9fHE70LM';
 		await writeFile('./test-project/.env', env_file);
 
-		const {} = await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
 		const { stderr } = await execute('taq', 'pin', './test-project');
@@ -95,14 +94,12 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 
 	test('publish a file will return the expected cid', async () => {
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 
-		const env_file =
-			'pinataJwtToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1M2FkZjkxZi0yY2Q0LTQ3ZGUtYThlOS00YmM0YjI5NDI4NzYiLCJlbWFpbCI6Im1pY2hhZWxrZXJuYWdoYW5AZWNhZGxhYnMuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJOWUMxIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImNiOGMzMzVkN2RhOThiZGQ2MTRmIiwic2NvcGVkS2V5U2VjcmV0IjoiZWIwYmUxYjRhYzNhZjE5ZGE3MjQ3MTAxNmFlZjFjNTllNjQzNTdlOTcwZmY1ZmYxZDBjNmU1ZTBkYmI1ODkzMCIsImlhdCI6MTY2OTEzMzI2MH0.U9JyTzEviH5y-GxSmD6YEkCVkcjsSX6d13a9fHE70LM';
 		await writeFile('./test-project/.env', env_file);
 
-		const {} = await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
 		const ipfs_file = await (await exec('cat e2e/data/ipfs/0001.txt')).stdout;
@@ -120,14 +117,12 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 
 	test('publish a directory will return the expected cid for each file', async () => {
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 
-		const env_file =
-			'pinataJwtToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1M2FkZjkxZi0yY2Q0LTQ3ZGUtYThlOS00YmM0YjI5NDI4NzYiLCJlbWFpbCI6Im1pY2hhZWxrZXJuYWdoYW5AZWNhZGxhYnMuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJOWUMxIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImNiOGMzMzVkN2RhOThiZGQ2MTRmIiwic2NvcGVkS2V5U2VjcmV0IjoiZWIwYmUxYjRhYzNhZjE5ZGE3MjQ3MTAxNmFlZjFjNTllNjQzNTdlOTcwZmY1ZmYxZDBjNmU1ZTBkYmI1ODkzMCIsImlhdCI6MTY2OTEzMzI2MH0.U9JyTzEviH5y-GxSmD6YEkCVkcjsSX6d13a9fHE70LM';
 		await writeFile('./test-project/.env', env_file);
 
-		const {} = await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
 		const ipfs_file_1 = await (await exec('cat e2e/data/ipfs/0001.txt')).stdout;
@@ -159,14 +154,12 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 
 	test('pin will accept an ipfs hash', async () => {
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 
-		const env_file =
-			'pinataJwtToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiI1M2FkZjkxZi0yY2Q0LTQ3ZGUtYThlOS00YmM0YjI5NDI4NzYiLCJlbWFpbCI6Im1pY2hhZWxrZXJuYWdoYW5AZWNhZGxhYnMuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJOWUMxIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImNiOGMzMzVkN2RhOThiZGQ2MTRmIiwic2NvcGVkS2V5U2VjcmV0IjoiZWIwYmUxYjRhYzNhZjE5ZGE3MjQ3MTAxNmFlZjFjNTllNjQzNTdlOTcwZmY1ZmYxZDBjNmU1ZTBkYmI1ODkzMCIsImlhdCI6MTY2OTEzMzI2MH0.U9JyTzEviH5y-GxSmD6YEkCVkcjsSX6d13a9fHE70LM';
 		await writeFile('./test-project/.env', env_file);
 
-		const {} = await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
 		const ipfs_file_1 = await (await exec('cat e2e/data/ipfs/0001.txt')).stdout;
