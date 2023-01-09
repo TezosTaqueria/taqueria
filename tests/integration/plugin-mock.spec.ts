@@ -12,6 +12,8 @@ const tableOutput = `
 └──────┘`;
 
 describe('Unit tests using taqueria-mock-plugin', () => {
+	jest.setTimeout(90000);
+
 	beforeAll(async () => {
 		await generateTestProject(testProjectPath, ['mock']);
 	});
