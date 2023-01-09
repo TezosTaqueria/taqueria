@@ -45,7 +45,6 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		await waitForText("Project taq'ified!");
 
 		const { stdout } = await execute('taq', '--help', './test-project');
-		console.log(stdout);
 		expect(stdout).toContain('taq <command>');
 
 		await cleanup();
