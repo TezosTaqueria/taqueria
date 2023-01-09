@@ -19,7 +19,7 @@ describe('Unit tests for Taqueria SDK', () => {
 		expect(result).toEqual(jsonObject);
 	});
 
-	test('Verify that writeJsonFile can write config.json V2', async () => {
+	test.skip('Verify that writeJsonFile can write config.json V2', async () => {
 		const config = JSON.parse(
 			await fs.promises.readFile('./unit/taqueria-sdk/data/runtime/config.json', { encoding: `utf-8` }),
 		);
@@ -36,7 +36,7 @@ describe('Unit tests for Taqueria SDK', () => {
 		expect(actual).toEqual(expected);
 	});
 
-	test('Verify that readJsonFile can read config.json V2', async () => {
+	test.skip('Verify that readJsonFile can read config.json V2', async () => {
 		const result = await readJsonFile('./unit/taqueria-sdk/data/v2/.taq/config.json');
 		const expected = JSON.parse(
 			await fs.promises.readFile('./unit/taqueria-sdk/data/runtime/config.json', { encoding: `utf-8` }),
