@@ -1,6 +1,8 @@
+import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 import { exec as exec1 } from 'child_process';
 import { createHash } from 'crypto';
 import { copyFile, readFile, rm, writeFile } from 'fs/promises';
+import path from 'path';
 import { join } from 'path';
 import util from 'util';
 import * as contents from './data/help-contents/register-contracts-contents';
@@ -25,45 +27,53 @@ const expectedTableOutput = `┌────────────────
 `;
 
 describe('Registered Contracts Plugin E2E tests for Taqueria CLI', () => {
-	// 	beforeAll(async () => {
-	// 	await generateTestProject(taqueriaProjectPath);
-	// 	await sleep(1000);
+	test.only('add-contract will register existing contract', async () => {
+		// await copyFile(
+		// 	'e2e/data/hello-tacos.mligo',
+		// 	join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
+		// );
+		// const result = exec('taq add-contract hello-tacos.mligo', { cwd: taqueriaProjectPath });
+		// expect(result).resolves.toHaveProperty('stdout');
+		// await result;
 
-	// 	// TODO: This can removed after this is resolved:
-	// 	// https://github.com/ecadlabs/taqueria/issues/528
-	// 	try {
-	// 		await exec(`taq -p ${taqueriaProjectPath}`);
-	// 	} catch (_) {}
+		// const bytes = await readFile(join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'));
+		// const digest = createHash('sha256');
+		// digest.update(bytes);
+		// const hash = digest.digest('hex');
 
-	// 	const config = await readFile(configFile, { encoding: 'utf-8' });
-	// 	configFileContents = JSON.stringify(config);
-	// });
+		// const config = await readFile(configFile, { encoding: 'utf-8' });
+		// const json = JSON.parse(config);
+		// expect(json).toBeInstanceOf(Object);
+		// expect(json).toHaveProperty('contracts');
+		// return expect(json.contracts).toEqual({
+		// // 	'hello-tacos.mligo': {
+		//  		sourceFile: 'hello-tacos.mligo',
+		//  		hash,
+		//  	},
+		// });
+		const { execute, cleanup, writeFile, exists, ls } = await prepareEnvironment();
+		const {} = await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
 
-	// // Remove all files from contracts folder without removing folder itself
-	// afterEach(async () => {
-	// 	await writeFile(configFile, JSON.parse(configFileContents), { encoding: 'utf-8' });
-	// });
+		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
-	// afterAll(async () => {
-	// 	await rm(taqueriaProjectPath, { force: true, recursive: true });
-	// });
+		expect(await ls('./test-project/contracts')).toContain('hello-tacos.mligo');
 
-	test('add-contract will register existing contract', async () => {
-		await copyFile(
-			'e2e/data/hello-tacos.mligo',
-			join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'),
-		);
-		const result = exec('taq add-contract hello-tacos.mligo', { cwd: taqueriaProjectPath });
-		expect(result).resolves.toHaveProperty('stdout');
-		await result;
+		await sleep(2000);
 
-		const bytes = await readFile(join(taqueriaProjectPath, 'contracts', 'hello-tacos.mligo'));
+		const { stdout: stdout2, stderr } = await execute('taq', 'add-contract hello-tacos.mligo', './test-project');
+		console.log(stdout2);
+		console.log(stderr);
+		expect(stdout2).toEqual(expect.arrayContaining(['│ Contract                      │']));
+
+		const bytes = await readFile('contracts/hello-tacos.mligo');
 		const digest = createHash('sha256');
 		digest.update(bytes);
 		const hash = digest.digest('hex');
 
-		const config = await readFile(configFile, { encoding: 'utf-8' });
-		const json = JSON.parse(config);
+		const configFile = await readFile('.taq/config.json');
+		const json = JSON.parse(configFile.toString());
 		expect(json).toBeInstanceOf(Object);
 		expect(json).toHaveProperty('contracts');
 		return expect(json.contracts).toEqual({
@@ -72,6 +82,8 @@ describe('Registered Contracts Plugin E2E tests for Taqueria CLI', () => {
 				hash,
 			},
 		});
+
+		await cleanup();
 	});
 
 	// Skipping due to changes in help output

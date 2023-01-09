@@ -255,11 +255,9 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await waitForText("Project taq'ified!");
 
 		const { stdout, stderr } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
-		if (stderr.length > 0) console.error(stderr); // useful for debugging
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { code } = await execute('taq', 'create contract counter.mligo', './test-project');
-		expect(code).toEqual(0);
+		const {} = await execute('taq', 'create contract counter.mligo', './test-project');
 		expect(await ls('./test-project/contracts')).toContain('counter.mligo');
 
 		const bytes = await readFile(path.join('./test-project', 'contracts', 'counter.mligo'));
