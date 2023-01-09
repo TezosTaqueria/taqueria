@@ -236,6 +236,8 @@ export const inject = (deps: PluginDeps) => {
 					'scaffoldProjectDir',
 				];
 
+				if (key === 'help') val = false;
+
 				// If env is missing, then set it to the default environment of the config
 				if (key === 'env' && !val) val = config.environment?.default ?? 'development';
 
@@ -362,6 +364,7 @@ export const inject = (deps: PluginDeps) => {
 
 	return {
 		getState: getMemoizedState,
+		getStateAbspath,
 		sendPluginActionRequest,
 		__TEST__: {
 			toPluginArguments,

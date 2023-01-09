@@ -262,13 +262,6 @@ export type TzKtConfig = {
 
 // ---- Project Files ----
 
-export type Environment = {
-	networks: NonEmptyString[];
-	sandboxes: NonEmptyString[];
-	storage?: Record<string, NonEmptyString>;
-	aliases?: Record<string, Record<string, NonEmptyString>>;
-};
-
 export type EphemeralState = {
 	build: string;
 	configHash: string;
@@ -322,6 +315,13 @@ export type Provisions = Provisioner[];
 
 // ---- Project Files: Config ----
 
+export type Environment = {
+	networks: NonEmptyString[];
+	sandboxes: NonEmptyString[];
+	storage?: Record<string, NonEmptyString>;
+	aliases?: Record<string, Record<string, NonEmptyString>>;
+};
+
 /** @minLength 1 Default environment must reference the name of an existing environment.*/
 type EnvironmentName = NonEmptyString;
 
@@ -340,7 +340,41 @@ export type ConfigContractsDir = string;
  */
 export type ConfigArtifactsDir = string;
 
+export type ConfigAccount = {
+	balance: CurrencyAmountV2;
+};
+
+// Incrementally Convert from ConfigFileV1 to ConfigFileV2
+// 1. A wrapper will load/save the ConfigFileV2 and convert it to this Config runtime type (which is initially the same as ConfigFileV1)
+// 2. This type will be modified incrementally as the implementation uses the new type structure
+// - The new schema definitions will be used immediately in the file system
+// - Current implementation works the same
+// - This decouples the schema change from implementation changes and unblocks the development team
 export type Config = {
+	// same
+	language?: HumanLanguage;
+	metadata?: MetadataConfig;
+	artifactsDir?: ConfigArtifactsDir;
+	contractsDir?: ConfigContractsDir;
+	contracts?: Record<string, Contract>;
+	plugins?: InstalledPlugin[];
+
+	// to change
+	accounts?: Record<string, Tz>;
+	// accounts?: Record<string, ConfigAccount>;
+
+	// to change
+	environment: Record<string, Environment | EnvironmentName>;
+	// environments?: Record<string, ConfigFileEnvironmentV2>;
+
+	// to remove
+	network?: Record<string, NetworkConfig>;
+	// to remove
+	sandbox?: Record<string, SandboxConfig>;
+};
+
+// This is the original Config and is retained to support auto migration of files
+export type ConfigFileV1 = {
 	language?: HumanLanguage;
 	plugins?: InstalledPlugin[];
 	contractsDir?: ConfigContractsDir;
@@ -352,10 +386,87 @@ export type Config = {
 	// accounts?: {
 	// 	default: EnvironmentName;
 	// } & Record<string, Environment>;
-	environment: Record<string, Environment | EnvironmentName>;
+	environment?: Record<string, Environment | EnvironmentName>;
 	accounts?: Record<string, Tz>;
 	contracts?: Record<string, Contract>;
 	metadata?: MetadataConfig;
+};
+
+export type CurrencyAmountV2 = {
+	amount: string;
+	units: string;
+};
+
+/**
+ * Workaround: zod won`t support VersionV2 = `v2`
+ * @pattern ^v2$
+ */
+type VersionV2 = string;
+
+export type ConfigFileV2 = {
+	version: VersionV2;
+	language?: HumanLanguage;
+	metadata?: MetadataConfig;
+	artifactsDir?: ConfigArtifactsDir;
+	contractsDir?: ConfigContractsDir;
+
+	/** Declared accounts */
+	accounts?: Record<string, ConfigAccount>;
+
+	contracts?: Record<string, Contract>;
+
+	/** The default environment key */
+	environmentDefault?: EnvironmentName;
+
+	/** Environments
+	 *
+	 * An environment represents a unique context on a network with its own account instances and contracts.
+	 *
+	 * The environment implementation is provided by a plugin which enables network control, account management, and contract interaction.
+	 *
+	 * Example environment types:
+	 *
+	 * - a sandbox running locally (using flextesa and taquito plugin)
+	 * - teztnets.xyz (using taquito plugin)
+	 * - mainnet (using taquito plugin with a custom rpcUrl)
+	 *
+	 * The environment implementation also implements the account types that are supported by that environmentType:
+	 *
+	 * - flextesa
+	 *   - in-memory signer
+	 * - mainnet
+	 *   - beacon wallet
+	 *   - multi-sig
+	 *
+	 * Using the above as an example, the flextesa sandbox only needs an in-memory signer since it generates it's own accounts,
+	 * but mainnet might support something like a beacon wallet or a multi-sig account.
+	 */
+	environments?: Record<string, ConfigEnvironmentFileV2>;
+
+	plugins?: InstalledPlugin[];
+};
+
+export type ConfigEnvironmentFileV2 = {
+	/** environment types provided by plugins
+	 *
+	 * Examples: flextesa, teztnet, mainnet
+	 *
+	 * annotations provides plugin specific data like rpcUrl
+	 */
+	type?: string;
+
+	/** Account overrides for this environment */
+	accounts?: Record<string, {
+		type?: string;
+	}>;
+
+	/** Contract deployment data for this environment */
+	contracts?: Record<string, {
+		address?: string;
+	}>;
+	// Other fields may exist, but they are not type checked here
+	// It is expected that this will be cast to a more specific type
+	// by the plugin to access the additional fields
 };
 
 // TODO: sandbox breaks ts-to-zod

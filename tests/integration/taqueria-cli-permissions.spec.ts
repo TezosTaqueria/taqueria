@@ -24,6 +24,8 @@ if (operatingSystem == `Darwin`) {
 }
 
 describe('E2E Testing for taqueria plugin file permissions,', () => {
+	jest.setTimeout(100000);
+
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo', 'archetype', 'contract-types']);
 

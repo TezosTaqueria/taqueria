@@ -211,8 +211,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 				),
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
-				parsedArgs,
-				parsedArgs => initProject(parsedArgs, parsedArgs.projectDir, parsedArgs.maxConcurrency, i18n),
+				initProject(parsedArgs, parsedArgs.projectDir, parsedArgs.maxConcurrency, i18n),
 				map(log),
 			),
 	});
@@ -368,7 +367,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
-				chain(args => NPM.installPlugin(config, config.projectDir, i18n, args.pluginName)),
+				chain(args => NPM.installPlugin(config, config.projectDir, i18n, env, args)),
 				map(log),
 				chain(() => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
 				chain(_ => taqResolve<void>()),
@@ -397,7 +396,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofUninstallTaskArgs(parsedArgs),
-				chain(parsedArgs => NPM.uninstallPlugin(config, config.projectDir, i18n, parsedArgs.pluginName)),
+				chain(parsedArgs => NPM.uninstallPlugin(config, config.projectDir, i18n, env, parsedArgs)),
 				map(log),
 			),
 	});
@@ -1282,7 +1281,8 @@ export const displayError = (cli: CLIConfig) =>
 			cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
 		}
 
-		if (!inputArgs.help) {
+		// We should display errors when asking for help when debug mode is enabled
+		if (!inputArgs.help || inputArgs.debug) {
 			console.error(''); // empty line
 			const res = match(normalizeErr(err))
 				.with({ kind: 'E_FORK' }, err => [125, err.msg])
