@@ -179,24 +179,24 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		this.refreshItem(treeItem);
 	}
 
-	private async getAccountOperations(accountItem: SandboxImplicitAccountTreeItem | SmartContractChildrenTreeItem) {
-		const address = accountItem instanceof SandboxImplicitAccountTreeItem
-			? accountItem.address
-			: accountItem.parent.address;
-		const tzktBaseUrl = await this.getTzKtBaseUrl(accountItem.parent.sandboxName);
+	private async getAccountOperations(element: SandboxImplicitAccountTreeItem | SmartContractChildrenTreeItem) {
+		const isContract = element instanceof SmartContractChildrenTreeItem;
+		const address = isContract
+			? element.parent.address
+			: element.address;
+		const sandboxName = element.parent.sandboxName;
+		const tzktBaseUrl = await this.getTzKtBaseUrl(sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
 		try {
-			// TODO: query filter - only operations from config.json ???
-			const response = await fetch(`${tzktBaseUrl}/v1/accounts/${address}/operations`);
-			const data = await response.json();
-			return (data as any[]).map(item =>
+			const accountOperations = await this.tzktProviders[sandboxName].getAccountOperations(address);
+			return accountOperations.map(item =>
 				new OperationTreeItem(
 					item.type,
 					item.hash,
 					item,
-					accountItem instanceof SandboxImplicitAccountTreeItem ? accountItem : accountItem.parent,
+					isContract ? element.parent : element,
 				)
 			);
 		} catch (e) {
@@ -205,50 +205,23 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 	}
 
-	async updateSandboxInfo(): Promise<void> {
-		if (!this.sandboxTreeItems) {
-			return;
-		}
-		for (const sandbox of this.sandboxTreeItems) {
-			const cached = this.sandboxStates[sandbox.sandboxName];
-			if (cached.state !== 'running') {
-				continue;
-			}
-			try {
-				const sandboxBaseUrl = this.sandboxStates[sandbox.sandboxName]?.getSandboxBaseUrl(sandbox.sandboxName);
-				if (!sandboxBaseUrl) {
-					sandbox.sandboxLevel = undefined;
-					continue;
-				}
-				const sandBoxHeadResponse = await fetch(`${sandboxBaseUrl}/chains/main/blocks/head`);
-				const sandboxHead = await sandBoxHeadResponse.json();
-				sandbox.sandboxLevel = (sandboxHead as any).header.level;
-			} catch (e: unknown) {
-				this.helper.logHelper.showLog(OutputLevels.warn, `${e}`);
-			}
-			this.refreshItem(sandbox);
-		}
-	}
-
-	async getSmartContractEntrypoints(
+	private async getSmartContractEntrypoints(
 		element: SmartContractChildrenTreeItem,
 	): Promise<SmartContractEntrypointTreeItem[]> {
 		const containerName = element.parent.containerName;
 		if (!containerName) {
 			return [];
 		}
-		const tzktBaseUrl = await this.getTzKtBaseUrl(element.parent.sandboxName);
+		const sandboxName = element.parent.sandboxName;
+		const tzktBaseUrl = await this.getTzKtBaseUrl(sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
 		try {
-			// TODO: query filter - only entrypoints ... ???
-			const response = await fetch(
-				`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints?micheline=true&michelson=true`,
+			const sandboxContractEntrypoints = await this.tzktProviders[sandboxName].getContractEntrypoints(
+				element.parent.address,
 			);
-			const data = await response.json();
-			this.helper.logHelper.showLog(OutputLevels.trace, JSON.stringify(data, null, 2));
-			return (data as any[]).map(item =>
+			return sandboxContractEntrypoints.map(item =>
 				new SmartContractEntrypointTreeItem(
 					item.name,
 					item.jsonParameters,
@@ -268,19 +241,19 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!cached || cached.state !== 'running') {
 			return [];
 		}
-		const [accountCount, contractCount] = await Promise.all([
-			this.getAccountCount(element),
-			this.getContractCount(element),
+		const [accountsCount, contractsCount] = await Promise.all([
+			this.getAccountsCount(element),
+			this.getContractsCount(element),
 		]);
 		return [
-			new SandboxChildrenTreeItem('Implicit Accounts', accountCount, element),
-			new SandboxChildrenTreeItem('Smart Contracts', contractCount, element),
+			new SandboxChildrenTreeItem('Implicit Accounts', accountsCount, element),
+			new SandboxChildrenTreeItem('Smart Contracts', contractsCount, element),
 			// new SandboxChildrenTreeItem('Operations', undefined, element),
 			// new SandboxChildrenTreeItem('Non-Empty Blocks', undefined, element),
 		];
 	}
 
-	private async getAccountCount(element: SandboxTreeItem): Promise<number | undefined> {
+	private async getAccountsCount(element: SandboxTreeItem): Promise<number | undefined> {
 		const tzktBaseUrl = await this.getTzKtBaseUrl(element.sandboxName);
 		if (!tzktBaseUrl) {
 			return undefined;
@@ -294,7 +267,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 	}
 
-	private async getContractCount(element: SandboxTreeItem): Promise<number | undefined> {
+	private async getContractsCount(element: SandboxTreeItem): Promise<number | undefined> {
 		const tzktBaseUrl = await this.getTzKtBaseUrl(element.sandboxName);
 		if (!tzktBaseUrl) {
 			return undefined;
@@ -366,6 +339,31 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 
 	private _onDidChangeTreeData = new vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void>();
 	readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
+
+	async updateSandboxInfo(): Promise<void> {
+		if (!this.sandboxTreeItems) {
+			return;
+		}
+		for (const sandbox of this.sandboxTreeItems) {
+			const cached = this.sandboxStates[sandbox.sandboxName];
+			if (cached.state !== 'running') {
+				continue;
+			}
+			try {
+				const sandboxBaseUrl = this.sandboxStates[sandbox.sandboxName]?.getSandboxBaseUrl(sandbox.sandboxName);
+				if (!sandboxBaseUrl) {
+					sandbox.sandboxLevel = undefined;
+					continue;
+				}
+				const sandBoxHeadResponse = await fetch(`${sandboxBaseUrl}/chains/main/blocks/head`);
+				const sandboxHead = await sandBoxHeadResponse.json();
+				sandbox.sandboxLevel = (sandboxHead as any).header.level;
+			} catch (e: unknown) {
+				this.helper.logHelper.showLog(OutputLevels.warn, `${e}`);
+			}
+			this.refreshItem(sandbox);
+		}
+	}
 
 	async getSandboxState(
 		sandBoxName: string,

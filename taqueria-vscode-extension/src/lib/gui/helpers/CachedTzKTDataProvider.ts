@@ -5,7 +5,16 @@ import { VsCodeHelper } from '../../helpers';
 import { OutputLevels } from '../../LogHelper';
 import { SandboxState } from '../CachedSandboxState';
 import { getAccountsByTaqueriaConfig, getContractsByTaqueriaConfig } from '.././helpers/SandboxDataHelpers';
-import { findAccountInTzKT, findSmartContractFromTzkt, TzKTAccountData, TzKtHeadData } from '.././helpers/TzKTFetcher';
+import {
+	findAccountInTzKT,
+	findContractEntrypointsInTzKT,
+	findContractInTzkt,
+	findOperationsInTzKT,
+	TzKTAccountData,
+	TzKTContractEntrypointData,
+	TzKtHeadData,
+	TzKTOperationData as TzKTOperationData,
+} from '.././helpers/TzKTFetcher';
 import { ObservableConfig } from '.././ObservableConfig';
 
 export type SandboxTzKTAccount = TzKTAccountData & {
@@ -164,7 +173,7 @@ export class CachedTzKTDataProvider {
 		const tzktAccounts = await Promise.all(
 			taqueriaAccounts.map(async account => {
 				const data = this.tzktAccountsMap.get(account.address)
-					?? await findAccountInTzKT(tzktBaseUrl, account);
+					?? await findAccountInTzKT(tzktBaseUrl, account.address);
 				if (!data) return;
 
 				const tzktAccount: SandboxTzKTAccount = {
@@ -190,20 +199,49 @@ export class CachedTzKTDataProvider {
 		const tzktContracts = await Promise.all(
 			taqueriaContracts
 				.map(async contract => {
-					const data = this.tzktContractsMap.get(contract.config.address)
-						?? await findSmartContractFromTzkt(tzktBaseUrl, contract);
+					const contractAddress = contract.config.address;
+					const data = this.tzktContractsMap.get(contractAddress)
+						?? await findContractInTzkt(tzktBaseUrl, contractAddress);
 					if (!data) return;
 
 					const tzktContract: SandboxTzKTAccount = {
 						...data,
-						address: data.address ?? contract.config.address,
+						address: data.address ?? contractAddress,
 						alias: data.alias ?? contract.alias,
 					};
-					this.tzktAccountsMap.set(contract.config.address, tzktContract);
+					this.tzktAccountsMap.set(contractAddress, tzktContract);
 					return tzktContract;
 				}),
 		);
 
 		return tzktContracts.filter(notNullish) as SandboxTzKTAccount[];
+	}
+
+	async getContractEntrypoints(contractAddress: string): Promise<TzKTContractEntrypointData[]> {
+		const tzktBaseUrl = this.findTzKtBaseUrl(this.sandboxName);
+		if (!tzktBaseUrl) return [];
+
+		const contract = this.tzktContractsMap.get(contractAddress);
+		if (!contract) return [];
+
+		// TODO: use cache first
+		const tzktEntrypoints = await findContractEntrypointsInTzKT(tzktBaseUrl, contractAddress);
+		if (!tzktEntrypoints) return [];
+
+		return tzktEntrypoints;
+	}
+
+	async getAccountOperations(contractAddress: string): Promise<TzKTOperationData[]> {
+		const tzktBaseUrl = this.findTzKtBaseUrl(this.sandboxName);
+		if (!tzktBaseUrl) return [];
+
+		const contract = this.tzktContractsMap.get(contractAddress);
+		if (!contract) return [];
+
+		// TODO: use cache first
+		const tzktOperations = await findOperationsInTzKT(tzktBaseUrl, contractAddress);
+		if (!tzktOperations) return [];
+
+		return tzktOperations;
 	}
 }
