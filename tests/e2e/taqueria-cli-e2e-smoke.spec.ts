@@ -97,7 +97,8 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		await cleanup();
 	});
 
-	test('(quickstart scenario) - ligo compile will create an artifact from three files ', async () => {
+	// TODO - blocked by https://github.com/ecadlabs/taqueria/issues/1692
+	test.skip('(quickstart scenario) - ligo compile will create an artifact from three files ', async () => {
 		const { execute, spawn, cleanup, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");

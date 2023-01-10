@@ -15,7 +15,7 @@ import {
 	resolve,
 	swap,
 } from 'fluture';
-import { join as _joinPaths } from 'https://deno.land/std@0.115.1/path/mod.ts';
+import { dirname, join as _joinPaths } from 'https://deno.land/std@0.115.1/path/mod.ts';
 import { copy } from 'https://deno.land/std@0.128.0/streams/conversion.ts';
 import { render } from 'https://deno.land/x/eta@v1.12.3/mod.ts';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
@@ -221,6 +221,8 @@ export const isTaqError = (err: unknown): err is TaqError.t => {
 
 export const joinPaths = _joinPaths;
 
+export const dirOf = dirname;
+
 export const renderTemplate = (template: string, values: Record<string, unknown>): string =>
 	render(template, values) as string;
 
@@ -255,26 +257,33 @@ export const inject = (deps: UtilsDependencies) => {
 		};
 
 	const gitClone = (url: Url.t) =>
-		(destinationPath: SanitizedAbsPath.t): Future<TaqError.t, SanitizedAbsPath.t> =>
-			pipe(
-				execText('git clone <%= it.url %> <%= it.outputDir %>', { url: url.toString(), outputDir: destinationPath }),
-				mapRej<TaqError.t, TaqError.t>(previous => ({
-					kind: 'E_GIT_CLONE_FAILED',
-					msg: `Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed.`,
-					context: { url, destinationPath },
-					previous,
-				})),
-				chain(([status]) =>
-					status === 0
-						? resolve(destinationPath)
-						: reject<TaqError.t>({
-							kind: 'E_GIT_CLONE_FAILED',
-							msg: `Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed.`,
-							context: { url, destinationPath },
-						})
-				),
-				map(() => destinationPath),
-			);
+		(destinationPath: SanitizedAbsPath.t) =>
+			(branch: string): Future<TaqError.t, SanitizedAbsPath.t> =>
+				pipe(
+					execText('git clone <%= it.url %> <%= it.outputDir %> -b <%= it.branch %>', {
+						url: url.toString(),
+						outputDir: destinationPath,
+						branch: branch,
+					}),
+					mapRej<TaqError.t, TaqError.t>(previous => ({
+						kind: 'E_GIT_CLONE_FAILED',
+						msg:
+							`Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed. Also check the branch name if you've specified it via --branch.`,
+						context: { url, destinationPath },
+						previous,
+					})),
+					chain(([status]) =>
+						status === 0
+							? resolve(destinationPath)
+							: reject<TaqError.t>({
+								kind: 'E_GIT_CLONE_FAILED',
+								msg:
+									`Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed. Also check the branch name if you've specified it via --branch.`,
+								context: { url, destinationPath },
+							})
+					),
+					map(() => destinationPath),
+				);
 
 	const execText = (
 		cmdTemplate: string,
@@ -380,6 +389,7 @@ export const inject = (deps: UtilsDependencies) => {
 		isTaqError,
 		memoize: memoizeIt,
 		joinPaths,
+		dirOf,
 		renderTemplate,
 		execText,
 		toPromise,
