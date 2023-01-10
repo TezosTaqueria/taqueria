@@ -219,7 +219,7 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 			sendWarn(
 				`Note: storage file associated with "${sourceFile}" can't be found, so "${storageListFile}" has been created for you. Use this file to define all initial storage values for this contract\n`,
 			);
-			writeFile(storageListFilename, initContentForStorage(sourceFile), 'utf8');
+			writeFile(join(parsedArgs.config.projectDir, storageListFilename), initContentForStorage(sourceFile), 'utf8');
 		}));
 
 	const parameterListFile = `${removeExt(sourceFile)}.parameterList${extractExt(sourceFile)}`;
@@ -231,7 +231,7 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 			sendWarn(
 				`Note: parameter file associated with "${sourceFile}" can't be found, so "${parameterListFile}" has been created for you. Use this file to define all parameter values for this contract\n`,
 			);
-			writeFile(parameterListFilename, initContentForParameter(sourceFile), 'utf8');
+			writeFile(join(parsedArgs.config.projectDir, parameterListFilename), initContentForParameter(sourceFile), 'utf8');
 		}));
 
 	let compileResults: TableRow[] = [contractCompileResult];
