@@ -67,7 +67,7 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 				'│ Contract   │ Address                              │ Alias   │ Balance In Mutez │ Destination            │',
 			]),
 		);
-		if (stderr.length > 0) console.error(stderr);
+		if (stderr1.length > 0) console.error(stderr);
 		expect(stdout4).toEqual(expect.arrayContaining([expect.stringContaining('counter.tz')]));
 
 		const { stdout: stdout5 } = await execute(
