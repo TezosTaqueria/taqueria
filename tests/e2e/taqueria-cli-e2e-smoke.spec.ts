@@ -60,12 +60,14 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		await execute('taq', 'install ../taqueria-plugin-taquito', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-taquito/index.js');
 
-		const { stdout: stdout4 } = await execute('taq', 'originate counter.tz', './test-project');
+		const { stdout: stdout4, stderr: stderr1 } = await execute('taq', 'originate counter.tz', './test-project');
+
 		expect(stdout4).toEqual(
 			expect.arrayContaining([
 				'│ Contract   │ Address                              │ Alias   │ Balance In Mutez │ Destination            │',
 			]),
 		);
+		if (stderr.length > 0) console.error(stderr);
 		expect(stdout4).toEqual(expect.arrayContaining([expect.stringContaining('counter.tz')]));
 
 		const { stdout: stdout5 } = await execute(
