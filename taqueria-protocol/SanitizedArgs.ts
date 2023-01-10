@@ -58,6 +58,7 @@ export const rawSchema = z.object({
 export const scaffoldRawSchema = rawSchema.extend({
 	scaffoldProjectDir: z.string().min(1).transform((val: unknown) => val as SanitizedAbsPath.t),
 	scaffoldUrl: z.string().min(1).url().transform((val: unknown) => val as Url.t),
+	branch: z.string().min(1).optional(),
 });
 
 export const initRawSchema = rawSchema.extend({

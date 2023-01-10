@@ -236,6 +236,12 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 								type: 'string',
 								describe: i18n.__('scaffoldProjectDirDesc'),
 								default: './taqueria-taco-shop',
+							})
+							.option('branch', {
+								alias: 'b',
+								describe: 'Choose a branch to clone the scaffold with',
+								requiresArg: true,
+								type: 'string',
 							});
 					},
 				),
@@ -673,14 +679,14 @@ const runScaffoldPostInit = (scaffoldDir: SanitizedAbsPath.t): Future<TaqError.t
 };
 
 const scaffoldProject = (i18n: i18n.t) =>
-	({ scaffoldUrl, scaffoldProjectDir, maxConcurrency }: SanitizedArgs.ScaffoldTaskArgs) =>
+	({ scaffoldUrl, scaffoldProjectDir, branch }: SanitizedArgs.ScaffoldTaskArgs) =>
 		go(
 			function*() {
 				const abspath: SanitizedAbsPath.t = yield SanitizedAbsPath.make(scaffoldProjectDir);
 				const destDir: SanitizedAbsPath.t = yield doesPathNotExistOrIsEmptyDir(abspath);
 
 				log(`\n Scaffolding 🛠 \n into: ${destDir}\n from: ${scaffoldUrl} \n`);
-				yield gitClone(scaffoldUrl)(destDir);
+				yield gitClone(scaffoldUrl)(destDir)(branch ?? 'main');
 
 				log('\n Initializing Project...');
 
