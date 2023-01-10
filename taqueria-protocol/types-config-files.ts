@@ -277,7 +277,6 @@ const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config
 			delete vClone.networkName;
 			delete vClone.sandboxName;
 			delete vClone.label;
-			delete vClone.protocol;
 			delete vClone.rpcUrl;
 			delete vClone.storage;
 			delete vClone.aliases;
@@ -330,7 +329,6 @@ const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config
 			: Object.fromEntries(simpleEnvironments.map(x => [x.value.networkName ?? `${x.key}`, {
 				label: x.value.label ?? ``,
 				rpcUrl: x.value.rpcUrl ?? ``,
-				protocol: x.value.protocol ?? ``,
 				// Unknown fields might need to be in the network or sandbox
 				...getUnknownFields(x, 'network') as {},
 			}])),
@@ -339,7 +337,6 @@ const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config
 			: Object.fromEntries(sandboxEnvironments.map(x => [x.value.sandboxName ?? `${x.key}`, {
 				label: x.value.label ?? ``,
 				rpcUrl: x.value.rpcUrl ?? ``,
-				protocol: x.value.protocol ?? ``,
 				// Unknown fields might need to be in the network or sandbox
 				...getUnknownFields(x, 'sandbox') as {},
 			}])),
