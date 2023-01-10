@@ -93,7 +93,7 @@ If you prefer to build the Taqueria binary and plugins locally, follow the steps
 #### Requirements
 
 - [Deno](https://deno.land/) v1.23.4
-- [NodeJS](https://nodejs.org/en/) v16.16.0 or later
+- [NodeJS](https://nodejs.org/en/) v16.13.1
 - [Docker](https://www.docker.com/) v0.9 or later
 
 #### Run Build Script
@@ -104,9 +104,11 @@ npm run build-all
 
 ## Test
 
-## Usage:
+
 Since the taqueria project is currently making use of NPM workspaces all activity is generally going to take place in the root (taqueria) directory. Commands will not function normally if run from the tests directory and the following commands will be what you can use to install all dependencies and run the tests for taqueria:
+
 ### Installation
+
 - From the taqueria root directory (eg. `~/taqueria`) installing the dependencies for the project can be accomplished with the normal `npm install`. By default `npm install` will install everything, if you're making changes and want to check something out then the targeted NPM install will be handy
 - If you're going to be running the unit tests you need to make sure that deno is installed on your system. Installation instructions can be found [here](https://deno.land/manual@v1.18.2/getting_started/installation)
 - Installing specific plugins/tools needed for testing can be accomplished with the workspace modified NPM install: `npm install -w {workspace_name}` defined in the project top level package.json file (make sure to check this is the case before doing anything). For the tests directory the workspace has been defined as `tests` so the command will be `npm install -w tests`.

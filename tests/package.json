@@ -10,7 +10,7 @@
 		"test:unit:deno": "../bin/before-all-tests.sh && TEST=true deno test unit/ --allow-all --unstable --import-map ../import_map.json --trace-ops",
 		"test:unit:jest": "../bin/before-all-tests.sh && TEST=true jest --config jest.config.unit.ts --no-cache",
 		"test:unit:jest:debug": "../bin/before-all-tests.sh && TEST=true jest --config jest.config.unit.ts --no-cache --detectOpenHandles --detectLeaks",
-		"test:unit:deno:debug": "../bin/before-all-tests.sh && TEST=true deno test unit/ --allow-all --unstable --import-map ../import_map.json",
+		"test:unit:deno:debug": "../bin/before-all-tests.sh && TEST=true deno test --inspect-brk unit/ --allow-all --unstable --import-map ../import_map.json",
 		"test:unit:deno:with-coverage": "../bin/before-all-tests.sh && TEST=true deno test unit/ --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report && deno coverage coverage_report --lcov > coverage_profile.lcov",
 		"test:unit:selected": "../bin/before-all-tests.sh && TEST=true deno test unit/taqueria-utils/taqueria-utils.test.ts --allow-all --unstable --coverage=coverage_report && deno coverage coverage_report",
 		"test:integration": "../bin/before-all-tests.sh && TEST=true jest --config jest.config.integration.ts --no-cache",
