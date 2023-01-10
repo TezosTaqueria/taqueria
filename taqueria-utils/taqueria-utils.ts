@@ -15,7 +15,7 @@ import {
 	resolve,
 	swap,
 } from 'fluture';
-import { join as _joinPaths } from 'https://deno.land/std@0.115.1/path/mod.ts';
+import { dirname, join as _joinPaths } from 'https://deno.land/std@0.115.1/path/mod.ts';
 import { copy } from 'https://deno.land/std@0.128.0/streams/conversion.ts';
 import { render } from 'https://deno.land/x/eta@v1.12.3/mod.ts';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
@@ -221,6 +221,8 @@ export const isTaqError = (err: unknown): err is TaqError.t => {
 
 export const joinPaths = _joinPaths;
 
+export const dirOf = dirname;
+
 export const renderTemplate = (template: string, values: Record<string, unknown>): string =>
 	render(template, values) as string;
 
@@ -380,6 +382,7 @@ export const inject = (deps: UtilsDependencies) => {
 		isTaqError,
 		memoize: memoizeIt,
 		joinPaths,
+		dirOf,
 		renderTemplate,
 		execText,
 		toPromise,

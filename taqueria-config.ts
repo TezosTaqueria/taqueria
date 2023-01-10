@@ -6,9 +6,18 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as SHA256 from '@taqueria/protocol/SHA256';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Task from '@taqueria/protocol/Task';
-import { attemptP, both, chain, chainRej, FutureInstance as Future, map, mapRej, reject, resolve } from 'fluture';
+import { attemptP, both, chain, chainRej, FutureInstance as Future, go, map, mapRej, reject, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { eager, ensureDirExists, joinPaths, readJsonFile, writeJsonFile } from './taqueria-utils/taqueria-utils.ts';
+import {
+	dirOf,
+	doesPathExist,
+	doesPathNotExist,
+	eager,
+	ensureDirExists,
+	joinPaths,
+	readJsonFile,
+	writeJsonFile,
+} from './taqueria-utils/taqueria-utils.ts';
 
 export type AddTaskCallback = (
 	task: Task.t,
@@ -62,11 +71,32 @@ export const defaultConfig: Config.t = Config.create({
 
 export const getDefaultMaxConcurrency = () => 10;
 
-export const getConfigPath = (projectDir: SanitizedAbsPath.t, create = false): Future<TaqError.t, string> =>
+export const getProjectDir = (projectDir: SanitizedAbsPath.t): Future<TaqError.t, string> => {
+	const taqDir = joinPaths(projectDir, '.taq');
+	return pipe(
+		doesPathExist(taqDir),
+		chainRej(previous => {
+			if (projectDir === '/') {
+				return reject(TaqError.create({
+					kind: 'E_TAQ_PROJECT_NOT_FOUND',
+					msg: "This doesn't appear to be a taqueria project.",
+					context: projectDir,
+					previous,
+				}));
+			}
+			return pipe(
+				joinPaths(projectDir, '../'),
+				SanitizedAbsPath.make,
+				chain(getProjectDir),
+			);
+		}),
+	);
+};
+
+export const getConfigPath = (projectDir: SanitizedAbsPath.t, create = false) =>
 	pipe(
-		joinPaths(projectDir, '.taq'),
-		abspath => create ? ensureDirExists(abspath) : resolve(abspath),
-		map((abspath: string) => joinPaths(abspath, 'config.json')),
+		create ? ensureDirExists(joinPaths(projectDir, '.taq')) : getProjectDir(projectDir),
+		map(projectDir => joinPaths(projectDir, 'config.json')),
 	);
 
 export const getRawConfig = (projectDir: SanitizedAbsPath.t, create = false) =>
@@ -86,17 +116,20 @@ export const getRawConfig = (projectDir: SanitizedAbsPath.t, create = false) =>
 				}),
 			)
 		),
-		mapRej<TaqError.t, TaqError.t>(previous => ({
-			kind: 'E_INVALID_CONFIG',
-			msg: 'Your config.json file is invalid',
-			previous,
-		})),
+		mapRej<TaqError.t, TaqError.t>(previous =>
+			previous.kind === 'E_TAQ_PROJECT_NOT_FOUND'
+				? previous
+				: ({
+					kind: 'E_INVALID_CONFIG',
+					msg: 'Your config.json file is invalid',
+					previous,
+				})
+		),
 		chain(Config.of),
 	);
 
 export const toLoadedConfig = (
 	configPath: string,
-	projectDir: SanitizedAbsPath.t,
 	config: Config.t,
 ): Future<TaqError.t, LoadedConfig.t> =>
 	pipe(
@@ -106,7 +139,7 @@ export const toLoadedConfig = (
 				await eager(LoadedConfig.of({
 					...config,
 					configFile: await eager(SanitizedAbsPath.make(configPath)),
-					projectDir,
+					projectDir: await eager(SanitizedAbsPath.make(joinPaths(dirOf(configPath), '../'))),
 					hash,
 				}))
 			)
@@ -117,5 +150,5 @@ export const getConfig = (projectDir: SanitizedAbsPath.t, _i18n: i18n, create = 
 	pipe(
 		getRawConfig(projectDir, create),
 		both(getConfigPath(projectDir, create)),
-		chain(([configPath, config]) => toLoadedConfig(configPath, projectDir, config)),
+		chain(([configPath, config]) => toLoadedConfig(configPath, config)),
 	);
