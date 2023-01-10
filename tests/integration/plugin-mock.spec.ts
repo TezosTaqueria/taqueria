@@ -2,7 +2,7 @@ import { exec as exec1, execSync, spawnSync } from 'child_process';
 import { readFile, rm } from 'fs/promises';
 import { join } from 'path';
 import util from 'util';
-import { generateTestProject } from '../e2e/utils/utils';
+import { generateTestProject } from './utils/utils';
 const exec = util.promisify(exec1);
 
 const testProjectPath = 'scrap/auto-test-integration';
