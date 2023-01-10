@@ -7,6 +7,8 @@ import { OutputLevels } from '../LogHelper';
 import { getRunningContainerNames } from '../pure';
 import * as Util from '../pure';
 import { CachedSandboxState, SandboxState } from './CachedSandboxState';
+import { TokenInfo_Dipdup, TokenInfo_TzKt } from './DataModels';
+import { DbConnectionPools } from './DbConnectionPools';
 import { ObservableConfig } from './ObservableConfig';
 import { TzKtHead } from './SandboxDataModels';
 import {
@@ -18,6 +20,7 @@ import {
 	SandboxTreeItemBase,
 	SmartContractChildrenTreeItem,
 	SmartContractEntrypointTreeItem,
+	TokenTreeItem,
 } from './SandboxTreeItemTypes';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 
@@ -32,6 +35,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private sandboxStates: Record<string, CachedSandboxState> = {};
+	private pools = new DbConnectionPools();
 
 	refreshLevelInterval: NodeJS.Timer | undefined;
 	private sandboxTreeItems: SandboxTreeItem[] | undefined;
@@ -63,6 +67,8 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 					return await this.getSmartContractEntrypoints(element);
 				case 'Operations':
 					return await this.getAccountOperations(element);
+				case 'Tokens':
+					return await this.getTokens(element);
 				default:
 					return [];
 			}
@@ -280,6 +286,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		return [
 			new SmartContractChildrenTreeItem('Entrypoints', element),
 			new SmartContractChildrenTreeItem('Operations', element),
+			new SmartContractChildrenTreeItem('Tokens', element),
 		];
 	}
 
@@ -291,7 +298,6 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			return [];
 		}
 		const response = await fetch(`${tzktBaseUrl}/v1/accounts?type.ne=contract`);
-		tzktBaseUrl;
 		const data = await response.json();
 		const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
 		const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
@@ -394,5 +400,41 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			clearInterval(this.refreshLevelInterval);
 		}
 		this._onDidChangeTreeData.fire();
+	}
+
+	async getTokens(element: SmartContractChildrenTreeItem): Promise<TokenTreeItem[]> {
+		const data = await this.getTokensFromTzKt(element);
+		return data.map(item => new TokenTreeItem(item.tokenId, item.metadata?.name));
+	}
+
+	private async getTokensFromTzKt(element: SmartContractChildrenTreeItem): Promise<TokenInfo_TzKt[]> {
+		const tzktBaseUrl = this.sandboxStates[element.parent.sandboxName]?.getTzKtBaseUrl(element.parent.sandboxName);
+		if (!tzktBaseUrl) {
+			return [];
+		}
+		const contractAddress = element.parent.address;
+		const response = await fetch(`${tzktBaseUrl}/v1/tokens?contract.eq=${contractAddress}`);
+		const data = await response.json();
+		return data as TokenInfo_TzKt[];
+	}
+
+	private async getTokensFromDipdup(element: SmartContractChildrenTreeItem): Promise<TokenInfo_Dipdup[]> {
+		const connectionString = this.sandboxStates[element.parent.sandboxName]?.getDipupConnectionString(
+			element.parent.sandboxName,
+		);
+		if (!connectionString) {
+			return [];
+		}
+		const pool = this.pools.getPool(connectionString);
+		const contractAddress = element.parent.address;
+		const tokens = await pool.query(`select * from token_metadata where contract='${contractAddress}'`);
+		this.helper.logHelper.showOutput(JSON.stringify(tokens.rows));
+		return tokens.rows.map(row => ({
+			id: row.id,
+			token_id: row.token_id,
+			link: row.link,
+			metadata: JSON.parse(row.metadata),
+			image_processed: row.image_processed,
+		}));
 	}
 }

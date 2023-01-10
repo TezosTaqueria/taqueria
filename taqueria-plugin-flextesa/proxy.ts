@@ -298,7 +298,7 @@ const startInstance = async (sandboxName: string, sandbox: SandboxConfig.t, opts
 		{ name: 'postgresql', command: postgres },
 		{ name: 'TzKt.Sync', command: sync },
 		{ name: 'TzKt.Api', command: api },
-		{ name: 'metadata', command: metadata },
+		// { name: 'metadata', command: metadata },
 	];
 	for (const container of tzKtContainers) {
 		await startContainer(container);
