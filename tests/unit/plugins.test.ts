@@ -9,7 +9,7 @@ import * as Url from '@taqueria/protocol/Url';
 import { assert, assertEquals, assertRejects } from 'https://deno.land/std@0.127.0/testing/asserts.ts';
 import inject from '../../plugins.ts';
 import { defaultConfig, toLoadedConfig } from '../../taqueria-config.ts';
-import { toPromise } from '../../taqueria-utils/taqueria-utils.ts';
+import { joinPaths, toPromise } from '../../taqueria-utils/taqueria-utils.ts';
 import { MockWriter } from './helpers.ts';
 
 Deno.test('inject()', async t => {
@@ -31,10 +31,8 @@ Deno.test('inject()', async t => {
 		help: false,
 	});
 
-	const taqDir = await toPromise(SanitizedAbsPath.make(`${projectDir}/.taq`));
 	const config = await toPromise(toLoadedConfig(
-		'config.json',
-		taqDir,
+		joinPaths(projectDir, '.taq/config.json'),
 		defaultConfig,
 	));
 
@@ -61,17 +59,14 @@ Deno.test('inject()', async t => {
 		const taqDir = await toPromise(SanitizedAbsPath.make(`${projectDir}/.taq`));
 		const config = await toPromise(toLoadedConfig(
 			'config.json',
-			taqDir,
 			defaultConfig,
 		));
 
-		const result = toPluginArguments(requestArgs, config);
+		const result = toPluginArguments(requestArgs);
 
 		assertEquals(result, [
 			'_',
 			"'init'",
-			'--projectDir',
-			"'/tmp/test-project'",
 			'--maxConcurrency',
 			10,
 			'--debug',
@@ -100,6 +95,8 @@ Deno.test('inject()', async t => {
 			"'bar'",
 			'--bar',
 			"'foo'",
+			'--projectDir',
+			"'/tmp/test-project'",
 		]);
 	});
 
