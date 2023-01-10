@@ -10,7 +10,7 @@ describe('Registered Contracts Plugin E2E Tests for Taqueria CLI', () => {
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 
-		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		await execute('taq', 'add-contract hello-tacos.mligo', './test-project');
@@ -96,7 +96,7 @@ describe('Registered Contracts Plugin E2E Tests for Taqueria CLI', () => {
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 
-		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		await execute('taq', 'add-contract hello-tacos.mligo', './test-project');
@@ -112,7 +112,7 @@ describe('Registered Contracts Plugin E2E Tests for Taqueria CLI', () => {
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 
-		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		const { stderr } = await execute('taq', 'add-contract -n tacos1 hello-tacos.mligo', './test-project');
@@ -169,7 +169,7 @@ describe('Registered Contracts Plugin E2E Tests for Taqueria CLI', () => {
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 
-		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		const bytes = await readFile('./test-project/contracts/hello-tacos.mligo');
@@ -209,7 +209,7 @@ describe('Registered Contracts Plugin E2E Tests for Taqueria CLI', () => {
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 
-		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		const bytes = await readFile('./test-project/contracts/hello-tacos.mligo');
@@ -260,7 +260,7 @@ describe('Registered Contracts Plugin E2E Tests for Taqueria CLI', () => {
 			const { stdout } = await execute('taq', 'install ../taqueria-plugin-mock', './test-project');
 			expect(stdout).toContain('Plugin installed successfully');
 
-			const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+			const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 			await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 			const { stderr } = await execute('taq', 'testRegisterContract hello-tacos.mligo', './test-project');
@@ -274,7 +274,7 @@ describe('Registered Contracts Plugin E2E Tests for Taqueria CLI', () => {
 			await execute('taq', 'init test-project');
 			await exists('./test-project/.taq/config.json');
 
-			const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+			const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 			await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 			const { stdout } = await execute('taq', 'install ../taqueria-plugin-mock', './test-project');

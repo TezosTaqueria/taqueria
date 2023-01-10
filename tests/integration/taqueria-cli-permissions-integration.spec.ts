@@ -29,9 +29,9 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo', 'archetype', 'contract-types']);
 
-		await exec(`cp e2e/data/fa12.arl ${taqueriaProjectPath}/contracts`);
-		await exec(`cp e2e/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
-		await exec(`cp e2e/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
+		await exec(`cp integration/data/fa12.arl ${taqueriaProjectPath}/contracts`);
+		await exec(`cp integration/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
+		await exec(`cp integration/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
 
 		// Register the contracts
 		await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });

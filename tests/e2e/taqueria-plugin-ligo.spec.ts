@@ -77,7 +77,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const mligo_file = await (await exec(`cat e2e/data/hello-tacos.mligo`)).stdout;
+		const mligo_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.mligo`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		const { stdout: stdout2 } = await execute('taq', 'add-contract hello-tacos.mligo', './test-project');
@@ -97,7 +97,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const artifacts_list_before = await ls('./test-project/artifacts');
 		expect(artifacts_list_before).toEqual([]);
 
-		const mligo_file = await (await exec(`cat e2e/data/hello-tacos.mligo`)).stdout;
+		const mligo_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.mligo`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		const {} = await execute('taq', 'compile hello-tacos.mligo', './test-project');
@@ -134,7 +134,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const mligo_file = await (await exec('cat e2e/data/invalid-contract.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-data/invalid-contract.mligo')).stdout;
 		await writeFile('./test-project/contracts/invalid-contract.mligo', mligo_file);
 		const check_the_file = await readFile('./test-project/contracts/invalid-contract.mligo');
 		expect(check_the_file).toContain('type available_tacos = natu');
@@ -163,9 +163,9 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
-		const test_file = await (await exec('cat e2e/data/hello-tacos-tests.mligo')).stdout;
+		const test_file = await (await exec('cat e2e/data/ligo-data/hello-tacos-tests.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos-tests.mligo', test_file);
 
 		const { stdout: stdout2 } = await execute('taq', 'test hello-tacos-tests.mligo', './test-project');
@@ -184,9 +184,9 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
-		const invalid_test_file = await (await exec('cat e2e/data/hello-tacos-invalid-tests.mligo')).stdout;
+		const invalid_test_file = await (await exec('cat e2e/data/ligo-data/hello-tacos-invalid-tests.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos-invalid-tests.mligo', invalid_test_file);
 
 		const { stdout: testOutput, stderr: testErr } = await execute(
@@ -225,7 +225,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: imageOutput } = await execute('taq', 'get-image --plugin ligo', './test-project');
 		expect(imageOutput).toEqual(expect.arrayContaining([expect.stringContaining('ligolang/ligo:')]));
 
-		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-custom-image.mligo', mligo_file);
 
 		const { stdout: stdout3 } = await execute('taq', 'compile hello-custom-image.mligo', './test-project');

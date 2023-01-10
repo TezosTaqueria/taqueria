@@ -102,7 +102,7 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
-		const ipfs_file = await (await exec('cat e2e/data/ipfs/0001.txt')).stdout;
+		const ipfs_file = await (await exec('cat e2e/data/ipfs-data/0001.txt')).stdout;
 		await writeFile('./test-project/ipfs/0001.txt', ipfs_file);
 
 		const { stdout: stdout1 } = await execute('taq', 'publish ipfs/0001.txt', './test-project');
@@ -125,11 +125,11 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
-		const ipfs_file_1 = await (await exec('cat e2e/data/ipfs/0001.txt')).stdout;
+		const ipfs_file_1 = await (await exec('cat e2e/data/ipfs-data/0001.txt')).stdout;
 		await writeFile('./test-project/ipfs/0001.txt', ipfs_file_1);
-		const ipfs_file_2 = await (await exec('cat e2e/data/ipfs/0002.txt')).stdout;
+		const ipfs_file_2 = await (await exec('cat e2e/data/ipfs-data/0002.txt')).stdout;
 		await writeFile('./test-project/ipfs/0002.txt', ipfs_file_2);
-		const ipfs_file_3 = await (await exec('cat e2e/data/ipfs/0003.txt')).stdout;
+		const ipfs_file_3 = await (await exec('cat e2e/data/ipfs-data/0003.txt')).stdout;
 		await writeFile('./test-project/ipfs/0003.txt', ipfs_file_3);
 
 		const { stdout: stdout1 } = await execute('taq', 'publish ipfs', './test-project');
@@ -162,7 +162,7 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
-		const ipfs_file_1 = await (await exec('cat e2e/data/ipfs/0001.txt')).stdout;
+		const ipfs_file_1 = await (await exec('cat e2e/data/ipfs-data/0001.txt')).stdout;
 		await writeFile('./test-project/ipfs/0001.txt', ipfs_file_1);
 
 		const { stdout: stdout1 } = await execute(

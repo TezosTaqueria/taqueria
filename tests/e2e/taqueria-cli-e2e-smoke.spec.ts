@@ -59,9 +59,9 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-jest', './test-project');
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
-		const mligo_file = await (await exec('cat e2e/data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
-		const tests_file = await (await exec('cat e2e/data/hello-tacos-tests.mligo')).stdout;
+		const tests_file = await (await exec('cat e2e/data/ligo-data/hello-tacos-tests.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos-tests.mligo', tests_file);
 
 		const { stderr } = await execute('taq', 'test hello-tacos-tests.mligo', './test-project/');
@@ -102,16 +102,16 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
 
-		const { stdout, stderr } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const mligo_file = await (await exec(`cat e2e/data/counter.mligo`)).stdout;
+		const mligo_file = await (await exec(`cat e2e/data/ligo-data/counter.mligo`)).stdout;
 		await writeFile('./test-project/contracts/counter.mligo', mligo_file);
 
-		const storage_file = await (await exec(`cat e2e/data/counter.storageList.mligo`)).stdout;
+		const storage_file = await (await exec(`cat e2e/data/ligo-data/counter.storageList.mligo`)).stdout;
 		await writeFile('./test-project/contracts/counter.storageList.mligo', storage_file);
 
-		const permissions_file = await (await exec(`cat e2e/data/counter.parameterList.mligo`)).stdout;
+		const permissions_file = await (await exec(`cat e2e/data/ligo-data/counter.parameterList.mligo`)).stdout;
 		await writeFile('./test-project/contracts/counter.parameterList.mligo', permissions_file);
 
 		const {} = await execute('taq', 'add-contract counter.mligo', './test-project');
