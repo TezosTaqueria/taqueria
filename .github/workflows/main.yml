@@ -308,7 +308,6 @@ jobs:
           npm publish --workspaces --tag 'latest' --access public --registry $NPM_REGISTRY
   
   # Workaround for exposing env context to reusable workflows
-  # Test comment
   # TODO: Refactor once https://github.com/orgs/community/discussions/26671 is resolved
   expose-env-vars:
     runs-on: ubuntu-latest
