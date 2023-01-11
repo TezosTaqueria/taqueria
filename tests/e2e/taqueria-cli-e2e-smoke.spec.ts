@@ -59,11 +59,10 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 
 		await execute('taq', 'install ../taqueria-plugin-taquito', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-taquito/index.js');
-
-		const { stdout: stdout4, stderr: stderr1 } = await execute('taq', 'originate counter.tz', './test-project');
-
 		// hack for mac mini
 		await new Promise(r => setTimeout(r, 3000));
+
+		const { stdout: stdout4, stderr: stderr1 } = await execute('taq', 'originate counter.tz', './test-project');
 
 		expect(stdout4).toEqual(
 			expect.arrayContaining([
