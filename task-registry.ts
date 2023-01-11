@@ -1,8 +1,9 @@
 import { NonEmptyString, SanitizedArgs } from '@taqueria/protocol';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import { FutureInstance as Future, map } from 'fluture';
+import { chain, chainRej, coalesce, FutureInstance as Future, map, reject } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { equals } from 'rambda';
+import * as Analytics from './analytics.ts';
 import type { CLIConfig } from './taqueria-types.ts';
 import { inject } from './taqueria-utils/taqueria-utils.ts';
 
@@ -81,19 +82,39 @@ export function createRegistry() {
 		return tasks.map(t => t.taskName);
 	};
 
-	const handle = (parsedArgs: SanitizedArgs.t) =>
-		pipe(
+	const handle = (parsedArgs: SanitizedArgs.t) => {
+		const {
+			sendEvent,
+		} = Analytics.inject({
+			env: Deno.env,
+			machineInfo: Deno.build,
+			parsedArgs,
+		});
+
+		return pipe(
 			tasks.reduce(
 				([didRun, result], task) => {
-					const retval: [boolean, Future<TaqError.t, void>] = didRun || !task.isRunning(parsedArgs)
+					const retval: [boolean | string, Future<TaqError.t, void>] = didRun || !task.isRunning(parsedArgs)
 						? [didRun, result]
-						: [true, task.handler(parsedArgs)];
+						: [task.taskName, task.handler(parsedArgs)];
 					return retval;
 				},
-				[false, taqResolve(undefined as void)] as [boolean, Future<TaqError.t, void>],
+				[false, taqResolve(undefined as void)] as [boolean | string, Future<TaqError.t, void>],
 			),
-			([_, result]) => map(() => parsedArgs)(result),
+			([taskName, result]) =>
+				pipe(
+					result,
+					chain(() => sendEvent({ taskName })),
+					map(() => parsedArgs),
+					chainRej(err =>
+						pipe(
+							sendEvent({ taskName, errKind: err.kind, errMsg: err.msg }),
+							coalesce(() => reject(err))(() => reject(err)),
+						)
+					),
+				),
 		);
+	};
 
 	const isTaskRunning = (parsedArgs: SanitizedArgs.t) =>
 		parsedArgs.help ? false : tasks.reduce(

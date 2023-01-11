@@ -78,16 +78,6 @@ const {
 	stderr: Deno.stderr,
 });
 
-const {
-	optInAnalytics,
-	optOutAnalytics,
-	sendEvent,
-} = Analytics.inject({
-	env: Deno.env,
-	inputArgs: getCliArgs(),
-	build: Deno.build,
-});
-
 // Add alias
 const exec = execText;
 type PluginLib = ReturnType<typeof inject>;
@@ -261,12 +251,20 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 					() => {},
 				),
 
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
+		handler: (parsedArgs: SanitizedArgs.t) => {
+			const {
+				askToOptIn,
+			} = Analytics.inject({
+				env: Deno.env,
+				machineInfo: Deno.build,
 				parsedArgs,
-				optInAnalytics,
+			});
+
+			return pipe(
+				askToOptIn(),
 				map(log),
-			),
+			);
+		},
 	});
 
 	// Add "opt-out" task to opt-out of analytics tracking
@@ -281,12 +279,20 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 					() => {},
 				),
 
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
+		handler: (parsedArgs: SanitizedArgs.t) => {
+			const {
+				askToOptOut,
+			} = Analytics.inject({
+				env: Deno.env,
+				machineInfo: Deno.build,
 				parsedArgs,
-				optOutAnalytics,
+			});
+
+			return pipe(
+				askToOptOut(),
 				map(log),
-			),
+			);
+		},
 	});
 
 	// Add a task for vscode to learn more about the CLI
@@ -1230,19 +1236,6 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 						? globalTasks.handle(initArgs)
 						: postInitCLI(env, processedInputArgs, initArgs, i18n);
 				}),
-				chain(initArgs =>
-					sendEvent(
-						initArgs._.join(),
-						getVersion(inputArgs),
-						false,
-					)
-				),
-				chainRej(err =>
-					pipe(
-						sendEvent(inputArgs.join(), getVersion(inputArgs), true),
-						chain(_ => reject(err)),
-					)
-				),
 				forkCatch(displayError(cliConfig))(displayError(cliConfig))(identity),
 			),
 	);
