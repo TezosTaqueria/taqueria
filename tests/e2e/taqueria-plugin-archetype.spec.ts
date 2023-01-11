@@ -41,7 +41,7 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
-		const arl_file = await (await exec('cat e2e/data/fa12.arl')).stdout;
+		const arl_file = await (await exec('cat e2e/data/archetype-data/fa12.arl')).stdout;
 		writeFile('./test-project/contracts/fa12.arl', arl_file);
 
 		const { stdout } = await execute('taq', 'compile', './test-project');
@@ -59,7 +59,7 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
-		const arl_file = await (await exec('cat e2e/data/fa12.arl')).stdout;
+		const arl_file = await (await exec('cat e2e/data/archetype-data/fa12.arl')).stdout;
 		writeFile('./test-project/contracts/fa12.arl', arl_file);
 
 		const { stdout } = await execute('taq', 'compile fa12.arl', './test-project');
@@ -78,9 +78,9 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
-		const arl_file = await (await exec('cat e2e/data/fa12.arl')).stdout;
+		const arl_file = await (await exec('cat e2e/data/archetype-data/fa12.arl')).stdout;
 		writeFile('./test-project/contracts/fa12.arl', arl_file);
-		const animal_file = await (await exec('cat e2e/data/animal_tracking.arl')).stdout;
+		const animal_file = await (await exec('cat e2e/data/archetype-data/animal_tracking.arl')).stdout;
 		writeFile('./test-project/contracts/animal_tracking.arl', animal_file);
 
 		const { stdout } = await execute('taq', 'compile', './test-project');
@@ -142,7 +142,7 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
-		const arl_file = await (await exec('cat e2e/data/fa12.arl')).stdout;
+		const arl_file = await (await exec('cat e2e/data/archetype-data/fa12.arl')).stdout;
 		writeFile('./test-project/contracts/fa12.arl', arl_file);
 
 		const { stdout } = await execute(
