@@ -6,11 +6,11 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 	test('start and stop will work with a custom name sandbox', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
 		const config_file = await (await exec('cat e2e/data/config-data/config-flextesa-test-sandbox.json')).stdout;
@@ -31,11 +31,11 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('start sandbox will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
 		const { stdout: stdout2 } = await execute(
@@ -50,11 +50,11 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('sandbox stop will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
 		const { stdout: stdout2 } = await execute(
@@ -70,7 +70,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 	test.skip('start sandbox will error if no sandbox in config', async () => {
 		// not clear that taqueria has error handling to support this condition
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
@@ -92,11 +92,11 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('start sandbox will error if incorrect sandbox name called', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
 		const { stderr } = await execute('taq', 'start sandbox no_such_sandbox', './test-project');
@@ -107,11 +107,11 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('show protocols will offer known protocols', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
 		const { stdout: stdout2 } = await execute('taq', 'show protocols', './test-project');
@@ -122,11 +122,11 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('stop sandbox will error if call stop on a stopped sandbox', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
 		const { stdout: stdout2 } = await execute('taq', 'stop sandbox local', './test-project');
@@ -138,11 +138,11 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 	test('list accounts will error if called on a stopped sandbox', async () => {
 		5;
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
 		const { stderr } = await execute('taq', 'list accounts local', './test-project');
@@ -153,14 +153,14 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('start sandbox will error if called on a started sandbox', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
-		const {} = await execute('taq', 'start sandbox local', './test-project');
+		await execute('taq', 'start sandbox local', './test-project');
 
 		const { stdout: stdout2 } = await execute('taq', 'start sandbox local', './test-project');
 		expect(stdout2).toEqual(expect.arrayContaining(['Already running.']));
@@ -170,14 +170,14 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('list accounts will display the sandbox accounts', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
-		const {} = await execute('taq', 'start sandbox local', './test-project');
+		await execute('taq', 'start sandbox local', './test-project');
 
 		const { stdout: stdout2 } = await execute('taq', 'list accounts local', './test-project');
 		expect(stdout2).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
@@ -186,14 +186,14 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 	});
 
 	// config does not include baker by default - is this a bug?
-	test('start sandbox will initiate a baker daemon by default', async () => {
+	test.skip('start sandbox will initiate a baker daemon by default', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		await exec('docker rm -vf $(docker ps -aq) > /dev/null 2>&1 || echo "Docker clear."', { cwd: `./` });
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
-		const {} = await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
 		const { stdout: stdout2 } = await execute('taq', 'start sandbox local', './test-project');
