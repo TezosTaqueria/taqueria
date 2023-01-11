@@ -138,16 +138,16 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
-		const storage_file = await (await exec('cat e2e/data/anyContract.storage.tz')).stdout;
+		const storage_file = await (await exec('cat e2e/data/michelson-data/anyContract.storage.tz')).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', storage_file);
 
-		const config_file = await (await exec('cat e2e/data/config-taquito-test-environment.json')).stdout;
+		const config_file = await (await exec('cat e2e/data/config-data/config-taquito-test-environment.json')).stdout;
 		await writeFile('./test-project/.taq/config.json', config_file);
 
-		const hello_tz_file = await (await exec('cat e2e/data/hello-tacos.tz')).stdout;
+		const hello_tz_file = await (await exec('cat e2e/data/michelson-data/hello-tacos.tz')).stdout;
 		await writeFile('./test-project/artifacts/hello-tacos.tz', hello_tz_file);
 
-		const increment_tz_file = await (await exec('cat e2e/data/increment.tz')).stdout;
+		const increment_tz_file = await (await exec('cat e2e/data/michelson-data/increment.tz')).stdout;
 		await writeFile('./test-project/artifacts/increment.tz', increment_tz_file);
 
 		const { stdout: stdout2, stderr } = await execute(
@@ -178,7 +178,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
-		const test_config_file = await (await exec('cat e2e/data/config-taquito-test-environment.json')).stdout;
+		const test_config_file = await (await exec('cat e2e/data/config-data/config-taquito-test-environment.json')).stdout;
 		await writeFile('./test-project/.taq/config.json', test_config_file);
 
 		const { stdout: stdout3, stderr } = await execute('taq', 'fund -e testing', './test-project');
@@ -222,7 +222,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
-		const test_config_file = await (await exec('cat e2e/data/config-taquito-test-environment.json')).stdout;
+		const test_config_file = await (await exec('cat e2e/data/config-data/config-taquito-test-environment.json')).stdout;
 		await writeFile('./test-project/.taq/config.json', test_config_file);
 
 		const { stdout: stdout2 } = await execute('taq', 'instantiate-account -e testing', './test-project');
@@ -250,7 +250,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
-		const tz_file = await (await exec('cat e2e/data/hello-tacos.tz')).stdout;
+		const tz_file = await (await exec('cat e2e/data/michelson-data/hello-tacos.tz')).stdout;
 		await writeFile('./.taq/artifacts/hello-tacos.tz', tz_file);
 
 		const { stderr } = await execute(
@@ -277,10 +277,11 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
 		const test_config_file =
-			await (await exec('cat e2e/data/config-taquito-test-environment-invalid-config-networkname.json')).stdout;
+			await (await exec('cat e2e/data/config-data/config-taquito-test-environment-invalid-config-networkname.json'))
+				.stdout;
 		await writeFile('./test-project/.taq/config.json', test_config_file);
 
-		const tz_file = await (await exec('cat e2e/data/hello-tacos.tz')).stdout;
+		const tz_file = await (await exec('cat e2e/data/michelson-data/hello-tacos.tz')).stdout;
 		await writeFile('./test-project/.taq/artifacts/hello-tacos.tz', tz_file);
 
 		const { stderr } = await execute(
