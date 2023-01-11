@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { SandboxState } from './CachedSandboxState';
+import { TokenMetadata } from './DataModels';
 
 export class SandboxTreeItemBase extends vscode.TreeItem {
 	constructor(
@@ -146,7 +147,9 @@ export class TokenTreeItem extends SandboxTreeItemBase {
 	constructor(
 		public readonly tokenId: string,
 		public readonly name: string | undefined,
+		public readonly metadata: TokenMetadata | undefined,
 	) {
 		super(name || tokenId.toString(), 'token', vscode.TreeItemCollapsibleState.None);
+		this.contextValue = 'token';
 	}
 }

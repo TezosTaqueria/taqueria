@@ -25,6 +25,7 @@ import {
 	SandboxTreeItem,
 	SandboxTreeItemBase,
 	SmartContractEntrypointTreeItem,
+	TokenTreeItem,
 } from './gui/SandboxTreeItemTypes';
 import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProvider';
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
@@ -241,6 +242,7 @@ export class VsCodeHelper {
 		this.exposeRefreshSandBoxDataCommand();
 		this.exposeShowEntrypointParametersCommand();
 		this.exposeShowOperationDetailsCommand();
+		this.exposeShowTokenMetadataCommand();
 		this.exposeInvokeEntrypointCommand();
 
 		await this.registerDataProviders();
@@ -1726,6 +1728,13 @@ export class VsCodeHelper {
 		this.registerCommand('show_operation_details', async (item: OperationTreeItem) => {
 			const jsonParameters = item.operation;
 			this.logHelper.showOutput(JSON.stringify(jsonParameters, null, 2));
+		});
+	}
+
+	exposeShowTokenMetadataCommand() {
+		this.registerCommand('show_token_metadata', async (item: TokenTreeItem) => {
+			const metadata = item.metadata;
+			this.logHelper.showOutput(JSON.stringify(metadata, null, 2));
 		});
 	}
 

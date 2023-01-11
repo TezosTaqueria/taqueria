@@ -411,7 +411,9 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			tzKtItem,
 			dipDupItem: dataFromDipdup.find(dipDupItem => dipDupItem.token_id.toString() === tzKtItem.tokenId),
 		}));
-		return data.map(item => new TokenTreeItem(item.tzKtItem.tokenId, item.dipDupItem?.metadata?.name));
+		return data.map(item =>
+			new TokenTreeItem(item.tzKtItem.tokenId, item.dipDupItem?.metadata?.name, item.dipDupItem?.metadata ?? undefined)
+		);
 	}
 
 	private async getTokensFromTzKt(element: SmartContractChildrenTreeItem): Promise<TokenInfo_TzKt[]> {

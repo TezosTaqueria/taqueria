@@ -431,6 +431,13 @@
 				"title": "Invoke Entrypoint",
 				"shortTitle": "invoke",
 				"icon": "$(call-outgoing)"
+			},
+			{
+				"command": "taqueria.show_token_metadata",
+				"category": "Taqueria",
+				"title": "Show Token Metadata",
+				"shortTitle": "show token metadata",
+				"icon": "$(list-unordered)"
 			}
 		],
 		"menus": {
@@ -481,6 +488,10 @@
 				},
 				{
 					"command": "taqueria.originate",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.show_token_metadata",
 					"when": "false"
 				}
 			],
@@ -630,6 +641,11 @@
 				{
 					"command": "taqueria.show_operation_details",
 					"when": "view == taqueria-sandboxes && viewItem == operation",
+					"group": "inline"
+				},
+				{
+					"command": "taqueria.show_token_metadata",
+					"when": "view == taqueria-sandboxes && viewItem == token",
 					"group": "inline"
 				}
 			],
