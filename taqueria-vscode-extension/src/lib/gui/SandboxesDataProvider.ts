@@ -403,8 +403,15 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	async getTokens(element: SmartContractChildrenTreeItem): Promise<TokenTreeItem[]> {
-		const data = await this.getTokensFromTzKt(element);
-		return data.map(item => new TokenTreeItem(item.tokenId, item.metadata?.name));
+		const [dataFromTzKt, dataFromDipdup] = await Promise.all([
+			this.getTokensFromTzKt(element),
+			this.getTokensFromDipdup(element),
+		]);
+		const data = dataFromTzKt.map(tzKtItem => ({
+			tzKtItem,
+			dipDupItem: dataFromDipdup.find(dipDupItem => dipDupItem.token_id.toString() === tzKtItem.tokenId),
+		}));
+		return data.map(item => new TokenTreeItem(item.tzKtItem.tokenId, item.dipDupItem?.metadata?.name));
 	}
 
 	private async getTokensFromTzKt(element: SmartContractChildrenTreeItem): Promise<TokenInfo_TzKt[]> {
@@ -428,12 +435,11 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		const pool = this.pools.getPool(connectionString);
 		const contractAddress = element.parent.address;
 		const tokens = await pool.query(`select * from token_metadata where contract='${contractAddress}'`);
-		this.helper.logHelper.showOutput(JSON.stringify(tokens.rows));
 		return tokens.rows.map(row => ({
 			id: row.id,
 			token_id: row.token_id,
 			link: row.link,
-			metadata: JSON.parse(row.metadata),
+			metadata: row.metadata,
 			image_processed: row.image_processed,
 		}));
 	}

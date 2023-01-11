@@ -21,7 +21,7 @@ export type TokenInfo_Dipdup = {
 	id: bigint;
 	token_id: bigint;
 	link: string | undefined | null;
-	metadata: string | undefined | null;
+	metadata: TokenMetadata | undefined | null;
 	image_processed: boolean | undefined | null;
 };
 

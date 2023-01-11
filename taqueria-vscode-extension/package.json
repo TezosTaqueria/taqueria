@@ -750,7 +750,7 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile:base -- --minify",
-		"compile:base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+		"compile:base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --external:pg-native --format=cjs --platform=node",
 		"compile": "npx tsc -noEmit && npm run compile:base -- --sourcemap",
 		"compile:watch": "npm run compile:base -- --sourcemap --watch",
 		"compile:test": "tsc -p tsconfig.test.json",
