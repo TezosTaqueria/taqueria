@@ -62,6 +62,9 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 
 		const { stdout: stdout4, stderr: stderr1 } = await execute('taq', 'originate counter.tz', './test-project');
 
+		// hack for mac mini
+		await new Promise(r => setTimeout(r, 3000));
+
 		expect(stdout4).toEqual(
 			expect.arrayContaining([
 				'│ Contract   │ Address                              │ Alias   │ Balance In Mutez │ Destination            │',
