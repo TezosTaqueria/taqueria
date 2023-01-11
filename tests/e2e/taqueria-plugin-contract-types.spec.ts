@@ -13,7 +13,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', '--help --projectDir=./test-project');
+		const { stdout: stdout2 } = await execute('taq', '--help');
 		expect(stdout2).toEqual(expect.arrayContaining(['Commands:']));
 
 		await cleanup();
@@ -26,7 +26,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', 'generate types --help --projectDir=./test-project');
+		const { stdout: stdout2 } = await execute('taq', 'generate types --help');
 		expect(stdout2).toEqual(expect.arrayContaining(['Generate types for a contract to be used with taquito']));
 
 		await cleanup();
@@ -39,7 +39,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', 'gen --help --projectDir=./test-project');
+		const { stdout: stdout2 } = await execute('taq', 'gen --help');
 		expect(stdout2).toEqual(expect.arrayContaining(['Generate types for a contract to be used with taquito']));
 
 		await cleanup();
@@ -69,7 +69,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout1).toContain('Plugin installed successfully');
 
-		const jsligo_file = await (await exec(`cat e2e/data/increment.jsligo`)).stdout;
+		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
 		const {} = await execute('taq', 'compile increment.jsligo', './test-project');
@@ -102,7 +102,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout1).toContain('Plugin installed successfully');
 
-		const jsligo_file = await (await exec(`cat e2e/data/increment.jsligo`)).stdout;
+		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
 		const {} = await execute('taq', 'compile increment.jsligo', './test-project');
@@ -135,7 +135,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout1).toContain('Plugin installed successfully');
 
-		const jsligo_file = await (await exec(`cat e2e/data/increment.jsligo`)).stdout;
+		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
 		const {} = await execute('taq', 'compile increment.jsligo', './test-project');
@@ -168,7 +168,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout1).toContain('Plugin installed successfully');
 
-		const jsligo_file = await (await exec(`cat e2e/data/increment.jsligo`)).stdout;
+		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
 		const {} = await execute('taq', 'compile increment.jsligo', './test-project');

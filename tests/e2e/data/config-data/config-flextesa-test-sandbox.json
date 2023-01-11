@@ -1,0 +1,82 @@
+{
+	"language": "en",
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-core",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-flextesa",
+			"type": "npm"
+		}
+	],
+	"contractsDir": "contracts",
+	"artifactsDir": "artifacts",
+	"environment": {
+		"default": "development-local",
+		"development-local": {
+			"networks": [],
+			"sandboxes": [
+				"local"
+			]
+		},
+		"development-test": {
+			"networks": [],
+			"sandboxes": [
+				"test"
+			]
+		},
+		"development-override": {
+			"networks": [],
+			"sandboxes": [
+				"override"
+			]
+		}
+	},
+	"sandbox": {
+		"local": {
+			"label": "Local Tezos Sandbox",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
+			"rpcUrl": "http://localhost:20020",
+			"tzkt": {
+				"disableAutostartWithSandbox": false,
+				"postgresqlPort": 5432,
+				"apiPort": 5000
+			}
+		},
+		"test": {
+			"label": "Test Tezos Sandbox",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
+			"rpcUrl": "http://localhost:20010",
+			"tzkt": {
+				"disableAutostartWithSandbox": false,
+				"postgresqlPort": 5442,
+				"apiPort": 5010
+			}
+		},
+		"override": {
+			"label": "Test Tezos Sandbox",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
+			"rpcUrl": "http://localhost:20100",
+			"tzkt": {
+				"disableAutostartWithSandbox": false,
+				"postgresqlPort": 5532,
+				"apiPort": 5100
+			}
+		}
+	},
+	"network": {
+		"ghostnet": {
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"
+		}
+	},
+	"accounts": {
+		"bob": "3_000_000_000",
+		"alice": "3_000_000_000",
+		"john": "3_000_000_000",
+		"jane": "3_000_000_000",
+		"joe": "3_000_000_000"
+	}
+}

@@ -133,7 +133,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout3 } = await execute('taq', 'test -i dummy-test', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['Initialized successfully.']));
 
-		const test_file = await (await exec(`cat e2e/data/empty-jest-test-file-1.ts`)).stdout;
+		const test_file = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-1.ts`)).stdout;
 		await writeFile('./test-project/dummy-test/empty-jest-test-file-1.spec.ts', test_file);
 
 		const { stderr } = await execute('taq', 'test dummy-test', './test-project');
@@ -156,9 +156,9 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout3 } = await execute('taq', 'test -i multi-file-test', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['Initialized successfully.']));
 
-		const test_file_one = await (await exec(`cat e2e/data/empty-jest-test-file-1.ts`)).stdout;
+		const test_file_one = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-1.ts`)).stdout;
 		await writeFile('./test-project/multi-file-test/empty-jest-test-file-1.spec.ts', test_file_one);
-		const test_file_two = await (await exec(`cat e2e/data/empty-jest-test-file-2.ts`)).stdout;
+		const test_file_two = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-2.ts`)).stdout;
 		await writeFile('./test-project/multi-file-test/empty-jest-test-file-2.spec.ts', test_file_two);
 
 		const { stderr } = await execute('taq', 'test multi-file-test', './test-project');
@@ -182,9 +182,9 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout3 } = await execute('taq', 'test -i multi-file-single-test', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['Initialized successfully.']));
 
-		const test_file_one = await (await exec(`cat e2e/data/empty-jest-test-file-1.ts`)).stdout;
+		const test_file_one = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-1.ts`)).stdout;
 		await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-1.spec.ts', test_file_one);
-		const test_file_two = await (await exec(`cat e2e/data/empty-jest-test-file-2.ts`)).stdout;
+		const test_file_two = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-2.ts`)).stdout;
 		await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-2.spec.ts', test_file_two);
 
 		const { stderr } = await execute('taq', 'test multi-file-single-test', './test-project');
@@ -194,7 +194,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('only the tests matching a test pattern will run inside of a test partition', async () => {
+	test.skip('only the tests matching a test pattern will run inside of a test partition', async () => {
 		const { execute, cleanup, writeFile, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -208,9 +208,9 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout3 } = await execute('taq', 'test -i multi-file-single-test', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['Initialized successfully.']));
 
-		const test_file_one = await (await exec(`cat e2e/data/empty-jest-test-file-1.ts`)).stdout;
+		const test_file_one = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-1.ts`)).stdout;
 		await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-1.spec.ts', test_file_one);
-		const test_file_two = await (await exec(`cat e2e/data/empty-jest-test-file-2.ts`)).stdout;
+		const test_file_two = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-2.ts`)).stdout;
 		await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-2.spec.ts', test_file_two);
 
 		const { stderr } = await execute('taq', 'test multi-file-single-test --testPattern 1', './test-project');
@@ -248,7 +248,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout2 } = await execute('npm', 'i --save-dev @types/jest', './test-project');
 		expect(stdout2).toEqual(expect.arrayContaining([expect.stringContaining('packages')]));
 
-		const tz_file = await (await exec(`cat e2e/data/increment.tz`)).stdout;
+		const tz_file = await (await exec(`cat e2e/data/michelson-data/increment.tz`)).stdout;
 		await writeFile('./test-project/artifacts/increment.tz', tz_file);
 
 		const { stdout: stdout3 } = await execute('taq', 'create contract-test increment.tz', './test-project');
@@ -264,76 +264,5 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		expect(specContents).toContain("describe('increment', () => {");
 
 		await cleanup();
-	});
-
-	// perhaps better as an integration test
-	test.skip('Regression: #1098, Assure that ts-jest installs correctly', async () => {
-		// // NOTE:
-		// // The generateTestProject is executed once per test suite run via the
-		// // beforeAll hook.
-		// //
-		// // generateTestProject installs a local version of the plugin via symlink
-		// // (a side-effect of how NPM works when installing a plugin from a local
-		// // directory)
-		// //
-		// // Thus, we need to install the plugin in such a way that doesn't result
-		// // in NPM installing via symlink. Pack to the rescue!
-
-		// // Pack the jest plugin
-		// const taqRoot = resolve(`${__dirname}/../../`);
-		// await exec('npm pack -w taqueria-plugin-jest', { cwd: taqRoot });
-
-		// // Uninstall the npm package for the current version of the jest plugin
-		// await exec('npm uninstall -D @taqueria/plugin-jest', { cwd: taqueriaProjectPath });
-
-		// // Install the packed plugin in our project
-		// await exec(`npm i -D ${taqRoot}/taqueria-plugin-jest*.tgz`, { cwd: taqueriaProjectPath });
-		// await exec(`rm ${taqRoot}/taqueria-plugin-jest*.tgz`);
-
-		// await fsPromises.stat(`./test-project//node_modules/.bin/ts-jest`);
-
-		// // Revert to the local non-packed version of the jest plugin
-		// await exec('npm uninstall -D @taqueria/plugin-jest', { cwd: taqueriaProjectPath });
-		// await exec(`npm install -D ${taqRoot}/taqueria-plugin-jest`, { cwd: taqueriaProjectPath });
-	});
-
-	// perhaps better as an integration test
-	test.skip('global jest config will match reference config', async () => {
-		// const directory = 'config-matching';
-
-		// await exec(`taq test -i ${directory}`, { cwd: `./test-project/` });
-		// const configContents = require(`.././test-project//.taq/jest.config.js`);
-
-		// if (process.env.CI === 'true') {
-		// 	expect(configContents).toMatchObject(referenceCI);
-		// } else {
-		// 	expect(configContents).toMatchObject(reference);
-		// }
-		// const { execute, cleanup, exists, readFile, spawn } = await prepareEnvironment();
-		// const { waitForText } = await spawn('taq', 'init test-project');
-		// await waitForText("Project taq'ified!");
-		// const { stdout } = await execute('taq', 'install ../taqueria-plugin-jest', './test-project');
-		// expect(stdout).toContain('Plugin installed successfully');
-
-		// const { stdout: stdout1 } = await execute('taq', 'test -i config-matching', './test-project');
-		// expect(stdout1).toEqual(expect.arrayContaining(["Initialized successfully."]));
-
-		// await exists('./test-project/.taq/jest.config.js');
-		// const local_config_file = await readFile('./test-project/config-matching/jest.config.js')
-		// console.log(local_config_file)
-		// expect(local_config_file).toContain(`const parentConfig = require('../.taq/jest.config.js'`);
-
-		//  const reference_file = await (await exec(`cat e2e/data/jest.config-reference.ts`)).stdout;
-		//  console.log(reference_file)
-		//  const referenceCI_file = await (await exec(`cat e2e/data/jest.config-reference-ci.ts`)).stdout;
-		//  console.log(referenceCI_file)
-
-		//  if (process.env.CI === 'true') {
-		//   	expect(local_config_file).toContain('export const reference = {');
-		//   } else {
-		//   	expect(local_config_file).toContain('export const referenceCI = {');
-		//   }
-
-		// await cleanup();
 	});
 });

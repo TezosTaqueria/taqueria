@@ -33,7 +33,7 @@ export const getStateAbspath = (parsedArgs: SanitizedArgs.t, config: LoadedConfi
 		env => `${env}-state.json`,
 		stateFilename =>
 			joinPaths(
-				parsedArgs.projectDir,
+				config.projectDir,
 				'.taq',
 				stateFilename,
 			),

@@ -1,0 +1,65 @@
+{
+	"language": "en",
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-core",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-taquito",
+			"type": "npm"
+		}
+	],
+	"contractsDir": "contracts",
+	"artifactsDir": "artifacts",
+	"environment": {
+		"default": "development",
+		"development": {
+			"networks": [],
+			"sandboxes": [
+				"local"
+			]
+		},
+		"testing": {
+			"networks": ["ghostnet"],
+			"sandboxes": []
+		},
+		"funds": {
+			"networks": ["fundnet"],
+			"sandboxes": []
+		}
+	},
+	"sandbox": {
+		"local": {
+			"label": "Local Tezos Sandbox",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
+			"rpcUrl": "http://localhost:20070"
+		}
+	},
+	"network": {
+		"ghostnet": {
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
+			"accounts": {
+				"taqOperatorAccount": {
+					"publicKey": "p2pk666TYDPwRzgE2emHyTM4RSLbypvhHwhk6RwEtasA5arSBgf6bAq",
+					"publicKeyHash": "tz3P5zrUYGJnryVfZ5JFeLMMojdjQFGLUFiK",
+					"privateKey": "p2sk2sF7GEUMB11cmzpLBpXh7F1Asru5sNCneUjWDMqxpoCZA3DLNf"
+				}
+			}
+		},
+		"fundnet": {
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"
+		}
+	},
+	"accounts": {
+		"bob": "3000000",
+		"alice": "2000000",
+		"john": "4000000",
+		"jane": "5000000",
+		"joe": "1000000"
+	}
+}
