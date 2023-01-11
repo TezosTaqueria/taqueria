@@ -15,7 +15,7 @@ const getCurrentTimestamp = () => {
 const toRequestURI = () =>
 	`https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`;
 
-export const inject = ({ taqVersion, taqBuild, fields, getMachineId, operatingSystem, ...deps }: Deps) => {
+export const inject = ({ taqVersion, taqBuild, fields, getMachineId, operatingSystem, fetch, ...deps }: Deps) => {
 	const events: StoredEvent[] = [];
 
 	const toRequestBody = (client_id: string) =>

@@ -131,6 +131,7 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 					taqBuild: parsedArgs.setBuild,
 					taqVersion: parsedArgs.setVersion,
 					operatingSystem: machineInfo.os,
+					fetch,
 				});
 				return attemptP(() =>
 					analytics.trackEvent('taq_task_executed', toEventFields(fields))

@@ -27,4 +27,5 @@ export type Deps = {
 	taqBuild: string; // build of the taqueria CLI
 	fields?: EventParams; // other common fields to include in the event
 	getMachineId: () => Promise<string>; // function used to determine the machine id
+	fetch: (uri: string, opts: Record<string, unknown>) => Promise<{ json: () => Promise<Record<string, unknown>> }>;
 };
