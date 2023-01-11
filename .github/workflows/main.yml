@@ -38,7 +38,6 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         node-version: lts/gallium
-        cache: "npm"
 
     - name: check for VSCode changes
       uses: dorny/paths-filter@v2
@@ -151,7 +150,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
-          cache: "npm"
 
       # This step currently attempts to put all test files found in the e2e folder into 4 equal sized buckets. The output is a list of lists
       - id: set-test-chunks
@@ -204,7 +202,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
-          cache: "npm"
 
       - uses: denoland/setup-deno@v1
         with:
@@ -261,7 +258,6 @@ jobs:
         with: 
           scope: "${{ env.SCOPE }}"
           node-version: lts/gallium
-          cache: "npm"
 
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH

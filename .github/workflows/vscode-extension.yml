@@ -49,7 +49,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
-          cache: "npm"
 
 
       - name: Install Deno
@@ -119,7 +118,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
-          cache: "npm"
 
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
