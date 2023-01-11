@@ -11,5 +11,5 @@
 
 ### CICD
 - Tests E2E tests and Unit tets are run in CICD in every push. 
-- To run the integration tests in a CICD run, add the word "integration" to your merge commit command.nstall -w tests
+- To run the integration tests in a CICD run, add the word "integration" to your merge commit command.
 ```
