@@ -133,7 +133,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout3 } = await execute('taq', 'test -i dummy-test', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['Initialized successfully.']));
 
-		const test_file = await (await exec(`cat e2e/data/empty-jest-test-file-1.ts`)).stdout;
+		const test_file = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-1.ts`)).stdout;
 		await writeFile('./test-project/dummy-test/empty-jest-test-file-1.spec.ts', test_file);
 
 		const { stderr } = await execute('taq', 'test dummy-test', './test-project');
@@ -156,9 +156,9 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout3 } = await execute('taq', 'test -i multi-file-test', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['Initialized successfully.']));
 
-		const test_file_one = await (await exec(`cat e2e/data/empty-jest-test-file-1.ts`)).stdout;
+		const test_file_one = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-1.ts`)).stdout;
 		await writeFile('./test-project/multi-file-test/empty-jest-test-file-1.spec.ts', test_file_one);
-		const test_file_two = await (await exec(`cat e2e/data/empty-jest-test-file-2.ts`)).stdout;
+		const test_file_two = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-2.ts`)).stdout;
 		await writeFile('./test-project/multi-file-test/empty-jest-test-file-2.spec.ts', test_file_two);
 
 		const { stderr } = await execute('taq', 'test multi-file-test', './test-project');
@@ -182,9 +182,9 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout3 } = await execute('taq', 'test -i multi-file-single-test', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['Initialized successfully.']));
 
-		const test_file_one = await (await exec(`cat e2e/data/empty-jest-test-file-1.ts`)).stdout;
+		const test_file_one = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-1.ts`)).stdout;
 		await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-1.spec.ts', test_file_one);
-		const test_file_two = await (await exec(`cat e2e/data/empty-jest-test-file-2.ts`)).stdout;
+		const test_file_two = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-2.ts`)).stdout;
 		await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-2.spec.ts', test_file_two);
 
 		const { stderr } = await execute('taq', 'test multi-file-single-test', './test-project');
@@ -208,9 +208,9 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout3 } = await execute('taq', 'test -i multi-file-single-test', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['Initialized successfully.']));
 
-		const test_file_one = await (await exec(`cat e2e/data/empty-jest-test-file-1.ts`)).stdout;
+		const test_file_one = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-1.ts`)).stdout;
 		await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-1.spec.ts', test_file_one);
-		const test_file_two = await (await exec(`cat e2e/data/empty-jest-test-file-2.ts`)).stdout;
+		const test_file_two = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-2.ts`)).stdout;
 		await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-2.spec.ts', test_file_two);
 
 		const { stderr } = await execute('taq', 'test multi-file-single-test --testPattern 1', './test-project');
@@ -248,7 +248,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		const { stdout: stdout2 } = await execute('npm', 'i --save-dev @types/jest', './test-project');
 		expect(stdout2).toEqual(expect.arrayContaining([expect.stringContaining('packages')]));
 
-		const tz_file = await (await exec(`cat e2e/data/increment.tz`)).stdout;
+		const tz_file = await (await exec(`cat e2e/data/michelson-data/increment.tz`)).stdout;
 		await writeFile('./test-project/artifacts/increment.tz', tz_file);
 
 		const { stdout: stdout3 } = await execute('taq', 'create contract-test increment.tz', './test-project');

@@ -13,7 +13,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
-		const config_file = await (await exec('cat e2e/data/config-flextesa-test-sandbox.json')).stdout;
+		const config_file = await (await exec('cat e2e/data/config-data/config-flextesa-test-sandbox.json')).stdout;
 		await writeFile('./test-project/.taq/config.json', config_file);
 
 		const { stdout: stdout2 } = await execute('taq', 'start sandbox test', './test-project');
@@ -78,7 +78,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		expect(stdout1).toContain('Plugin installed successfully');
 		await new Promise(r => setTimeout(r, 1500));
 
-		const config_file = await (await exec('cat e2e/data/config-no-sandboxes.json')).stdout;
+		const config_file = await (await exec('cat e2e/data/config-data/config-no-sandboxes.json')).stdout;
 		await writeFile('./test-project/.taq/config.json', config_file);
 
 		const { stderr, stdout: stdout2 } = await execute('taq', 'start sandbox', './test-project');
