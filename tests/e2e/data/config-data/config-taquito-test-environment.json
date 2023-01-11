@@ -32,7 +32,7 @@
 	"sandbox": {
 		"local": {
 			"label": "Local Tezos Sandbox",
-			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
 			"rpcUrl": "http://localhost:20070"
 		}
 	},
@@ -40,7 +40,7 @@
 		"ghostnet": {
 			"label": "ghostnet",
 			"rpcUrl": "https://ghostnet.ecadinfra.com",
-			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
 			"accounts": {
 				"taqOperatorAccount": {
 					"publicKey": "p2pk666TYDPwRzgE2emHyTM4RSLbypvhHwhk6RwEtasA5arSBgf6bAq",
@@ -52,7 +52,7 @@
 		"fundnet": {
 			"label": "ghostnet",
 			"rpcUrl": "https://ghostnet.ecadinfra.com",
-			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg"
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"
 		}
 	},
 	"accounts": {
