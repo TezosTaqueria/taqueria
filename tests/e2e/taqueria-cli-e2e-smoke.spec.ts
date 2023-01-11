@@ -14,11 +14,11 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ligo/index.js');
 
-		const mligo_file = await (await exec(`cat e2e/data/counter.mligo`)).stdout;
+		const mligo_file = await (await exec(`cat e2e/data/ligo-data/counter.mligo`)).stdout;
 		await writeFile('./test-project/contracts/counter.mligo', mligo_file);
-		const storage_file = await (await exec(`cat e2e/data/counter.storageList.mligo`)).stdout;
+		const storage_file = await (await exec(`cat e2e/data/ligo-data/counter.storageList.mligo`)).stdout;
 		await writeFile('./test-project/contracts/counter.storageList.mligo', storage_file);
-		const permissions_file = await (await exec(`cat e2e/data/counter.parameterList.mligo`)).stdout;
+		const permissions_file = await (await exec(`cat e2e/data/ligo-data/counter.parameterList.mligo`)).stdout;
 		await writeFile('./test-project/contracts/counter.parameterList.mligo', permissions_file);
 
 		await execute('taq', 'add-contract counter.mligo', './test-project');
@@ -67,7 +67,7 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 				'│ Contract   │ Address                              │ Alias   │ Balance In Mutez │ Destination            │',
 			]),
 		);
-		if (stderr1.length > 0) console.error(stderr);
+		if (stderr1.length > 0) console.log(stderr);
 		expect(stdout4).toEqual(expect.arrayContaining([expect.stringContaining('counter.tz')]));
 
 		const { stdout: stdout5 } = await execute(
