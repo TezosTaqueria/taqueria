@@ -1,6 +1,7 @@
 import type { i18n } from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
+import * as Settings from '@taqueria/protocol/Settings';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 
 // TODO: There should be an ActionResponse type that we're extending here.
@@ -31,7 +32,18 @@ export interface CLICommand {
 
 export type DenoArgs = typeof Deno.args;
 
-export type DenoBuild = typeof Deno.build;
+export type MachineInfo = {
+	arch: string;
+	os: string;
+	target: string;
+	vendor: string;
+};
+
+export interface UsageAnalyticsDeps {
+	readonly parsedArgs: SanitizedArgs.t;
+	readonly env: EnvVars;
+	readonly machineInfo: MachineInfo;
+}
 
 export type EnvKey =
 	| 'TAQ_CONFIG_DIR'
@@ -66,12 +78,6 @@ export interface PreExtendDeps {
 // Common dependencies after we retrieved the config
 export interface PluginDeps extends PreExtendDeps {
 	readonly config: LoadedConfig.t;
-}
-
-export interface UsageAnalyticsDeps {
-	readonly inputArgs: DenoArgs;
-	readonly env: EnvVars;
-	readonly build: DenoBuild;
 }
 
 export { LoadedConfig };
