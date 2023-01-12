@@ -63,6 +63,7 @@
 	"workspaces": [
 		"./taqueria-protocol",
 		"./taqueria-sdk",
+		"./taqueria-analytics",
 		"./taqueria-state",
 		"./taqueria-toolkit",
 		"./taqueria-utils",
