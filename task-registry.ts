@@ -1,6 +1,6 @@
 import { NonEmptyString, SanitizedArgs } from '@taqueria/protocol';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import { chain, chainRej, coalesce, FutureInstance as Future, map, reject } from 'fluture';
+import { chain, chainRej, FutureInstance as Future, map, reject } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { equals } from 'rambda';
 import * as Analytics from './analytics.ts';
@@ -109,7 +109,8 @@ export function createRegistry() {
 					chainRej(err =>
 						pipe(
 							sendEvent({ taskName, errKind: err.kind, errMsg: err.msg }),
-							coalesce(() => reject(err))(() => reject(err)),
+							chainRej(() => reject(err)),
+							chain(() => reject(err)),
 						)
 					),
 				),
