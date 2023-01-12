@@ -19,7 +19,7 @@ export type SanitizedAbsPath = NonEmptyString;
 export type SanitizedPath = NonEmptyString;
 
 export type Settings = {
-	consent: 'opt_in' | 'opt_out';
+	consent: 'opt_in' | 'opt_out' | 'unspecified';
 };
 
 /**
