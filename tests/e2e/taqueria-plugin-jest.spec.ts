@@ -4,7 +4,7 @@ const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
-	test('test will offer contextual help', async () => {
+	test('test will offer contextual help - slowtest', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -40,7 +40,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('create contract-test will offer contextual help', async () => {
+	test('create contract-test will offer contextual help - slowtest', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -97,7 +97,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('local jest config will reference global config with local info added', async () => {
+	test('local jest config will reference global config with local info added - slowtest', async () => {
 		const { execute, cleanup, readFile, exists, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -168,7 +168,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('all tests matching a test pattern will run inside of a test partition', async () => {
+	test('all tests matching a test pattern will run inside of a test partition - slowtest', async () => {
 		const { execute, cleanup, writeFile, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
