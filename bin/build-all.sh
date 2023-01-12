@@ -46,7 +46,7 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
         npm version | grep "node: '16." >/dev/null
         errorCode=$?
         if [ $errorCode -ne 0 ]; then
-            echo "❌ NodeJS is installed, but not using v16.x.x. Please use NPM v16.x.x."
+            echo "❌ NodeJS is installed, but not using v16.x.x. Please use NodeJS v16.x.x."
             exit $errorCode
         else
             echo "✅ NodeJS is installed, and running v16."
