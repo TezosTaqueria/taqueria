@@ -194,7 +194,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test.skip('only the tests matching a test pattern will run inside of a test partition', async () => {
+	test('only the tests matching a test pattern will run inside of a test partition', async () => {
 		const { execute, cleanup, writeFile, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");

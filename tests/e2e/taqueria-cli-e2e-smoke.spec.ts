@@ -115,6 +115,17 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		await cleanup();
 	});
 
+	test('a BETA warning will be inluded in the help content', async () => {
+		const { spawn, execute, cleanup } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		await waitForText("Project taq'ified!");
+
+		const { stdout } = await execute('taq', '--help', './test-project');
+		expect(stdout).toContain('Please be advised that Taqueria is currently in BETA.');
+
+		await cleanup();
+	});
+
 	test('--help will offer the help menu for a non-initialized project', async () => {
 		const { spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', '--help');

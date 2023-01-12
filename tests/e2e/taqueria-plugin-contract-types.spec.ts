@@ -19,27 +19,40 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test.skip('1635 - generate types offers contextual help', async () => {
+	// see https://github.com/ecadlabs/taqueria/issues/1635
+	// this works in manual test of pre-release v0.25.23-rc
+	// perhaps the automated tests have problem with the space in the task name
+	test.skip('generate types offers contextual help', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', 'generate types --help');
+		const { stdout: stdout2, stderr } = await execute('taq', 'generate types --help');
+		console.log(stderr);
+		console.log(stdout2);
 		expect(stdout2).toEqual(expect.arrayContaining(['Generate types for a contract to be used with taquito']));
 
 		await cleanup();
 	});
 
-	test.skip('1635 - gen offers contextual help', async () => {
+	// see https://github.com/ecadlabs/taqueria/issues/1635
+	// this works in manual test of pre-release v0.25.23-rc
+	// perhaps the automated tests have problem with the space in the task name
+	test.skip('gen offers contextual help', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', 'gen --help');
+		await new Promise(r => setTimeout(r, 3000));
+
+		const { stdout: stdout2, stderr } = await execute('taq', 'gen --help');
+		console.log(stderr);
+		console.log(stdout2);
+
 		expect(stdout2).toEqual(expect.arrayContaining(['Generate types for a contract to be used with taquito']));
 
 		await cleanup();

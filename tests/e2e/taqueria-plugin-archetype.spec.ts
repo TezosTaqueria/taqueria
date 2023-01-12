@@ -34,6 +34,7 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 
 	// this isn't working. should it? should compile find all files in contracts dir?
 	// see https://github.com/ecadlabs/taqueria/issues/1678
+	// manually confirmed to fail in pre-release v0.25.23-rc
 	test.skip('compile will compile one contract under contracts folder without a parameter', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
 		const {} = await execute('taq', 'init test-project');
@@ -71,6 +72,7 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 	});
 
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1678
+	// manually confirmed to fail in pre-release v0.25.23-rc
 	test.skip('compile will compile multiple contracts in the contracts folder', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
 		const {} = await execute('taq', 'init test-project');
@@ -106,6 +108,7 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 	});
 
 	// hangs waiting to execute the image command
+	// works fine manually in pre-release v0.25.23-rc
 	test.skip('compile can use different versions of the Archetype image', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
 		const {} = await execute('taq', 'init test-project');

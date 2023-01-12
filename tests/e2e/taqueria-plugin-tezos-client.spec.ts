@@ -5,7 +5,8 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1671
-	test.skip('typecheck will check a contract in the artifacts folder', async () => {
+	// this fail has been confirmed manually in pre-release v0.25.23-rc
+	test.only('typecheck will check a contract in the artifacts folder', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -38,6 +39,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 	});
 
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1671
+	// this fail has been confirmed manually in pre-release v0.25.23-rc
 	test.skip('typechecker will check all contracts under artifacts folder', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
@@ -58,7 +60,8 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 	});
 
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1671
-	test.skip('typecheck willcheck multiple (but not all) contracts using typecheck [sourceFile1] [sourceFile2] command', async () => {
+	// this fail has been confirmed manually in pre-release v0.25.23-rc
+	test.skip('typecheck will check multiple (but not all) contracts using typecheck [sourceFile1] [sourceFile2] command', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -84,6 +87,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 	});
 
 	// hangs for a long time waiting for the image name
+	// this passes manually in pre-release v0.25.23-rc
 	test.skip('different tezos client image can be used', async () => {
 		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
