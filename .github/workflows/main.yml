@@ -323,7 +323,7 @@ jobs:
       GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
       GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }} 
       VSCE_PAT: ${{ secrets.VSCE_PAT }} 
-
+# Comment for test run 
   pr-comment:
     runs-on: ubuntu-latest
     # Without the 'always()' expression, the other conditions are not evaluated if a job is skipped or fails.
