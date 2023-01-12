@@ -21,22 +21,24 @@
 			]
 		},
 		"testing": {
-			"networks": ["ghostnet"],
+			"networks": [
+				"ghostnet"
+			],
 			"sandboxes": []
 		}
 	},
 	"sandbox": {
 		"local": {
 			"label": "Local Tezos Sandbox",
-			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-			"rpcUrl": "http://localhost:20050"
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
+			"rpcUrl": "http://localhost:20030"
 		}
 	},
 	"network": {
 		"ghostnet": {
 			"label": "ghostnet",
-			"rpcUrl": "https://ghostnet.ecadinfra.com",
-			"protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
+			"rpcUrl": "https://ghostnetbet.ecadinfrastructure.com",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
 			"accounts": {
 				"taqOperatorAccount": {
 					"publicKey": "p2pk666TYDPwRzgE2emHyTM4RSLbypvhHwhk6RwEtasA5arSBgf6bAq",

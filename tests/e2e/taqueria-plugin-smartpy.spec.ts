@@ -7,9 +7,9 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 	// contextual help not working for this plugin
 	test('compile will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
 
 		const { stdout } = await execute('taq', 'compile --help', './test-project');
@@ -20,12 +20,12 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('compile will compile one contract with compile <sourceFile> command', async () => {
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const { stdout: stdout1, stderr } = await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
 
-		const py_file = await (await exec(`cat e2e/data/hello-tacos.py`)).stdout;
+		const py_file = await (await exec(`cat e2e/data/smartpy-data/hello-tacos.py`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.py', py_file);
 
 		const { stdout } = await execute('taq', 'compile hello-tacos.py', './test-project');
@@ -40,9 +40,9 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('compile will error if no contract', async () => {
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
 
 		const { stdout } = await execute('taq', 'compile no_such_file.py', './test-project');
@@ -53,12 +53,12 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('test will run test on <sourceFile>', async () => {
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
 
-		const py_file = await (await exec(`cat e2e/data/hello-tacos.py`)).stdout;
+		const py_file = await (await exec(`cat e2e/data/smartpy-data/hello-tacos.py`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.py', py_file);
 
 		const { stdout } = await execute('taq', 'test hello-tacos.py', './test-project');
@@ -69,12 +69,12 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('test will show fails on test file with fails', async () => {
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
 
-		const py_file = await (await exec(`cat e2e/data/hello-tacos-failed-tests.py`)).stdout;
+		const py_file = await (await exec(`cat e2e/data/smartpy-data/hello-tacos-failed-tests.py`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos-failed-tests.py', py_file);
 
 		const { stdout } = await execute('taq', 'test hello-tacos-failed-tests.py', './test-project');
