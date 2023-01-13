@@ -82,7 +82,6 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/.taq/config.json', config_file);
 
 		const { stderr } = await execute('taq', 'start sandbox', './test-project');
-		console.log(stderr);
 		expect(stderr).toEqual(
 			expect.arrayContaining([
 				'Your .taq/config.json is invalid:',
