@@ -301,7 +301,6 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 				new SandboxImplicitAccountTreeItem(
 					contract.address,
 					contract.alias,
-					contract.balance,
 					element.parent,
 				)
 			);
