@@ -431,6 +431,13 @@
 				"title": "Invoke Entrypoint",
 				"shortTitle": "invoke",
 				"icon": "$(call-outgoing)"
+			},
+			{
+				"command": "taqueria.show_token_metadata",
+				"category": "Taqueria",
+				"title": "Show Token Metadata",
+				"shortTitle": "show token metadata",
+				"icon": "$(list-unordered)"
 			}
 		],
 		"menus": {
@@ -481,6 +488,10 @@
 				},
 				{
 					"command": "taqueria.originate",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.show_token_metadata",
 					"when": "false"
 				}
 			],
@@ -631,6 +642,11 @@
 					"command": "taqueria.show_operation_details",
 					"when": "view == taqueria-sandboxes && viewItem == operation",
 					"group": "inline"
+				},
+				{
+					"command": "taqueria.show_token_metadata",
+					"when": "view == taqueria-sandboxes && viewItem == token",
+					"group": "inline"
 				}
 			],
 			"view/title": [
@@ -750,7 +766,7 @@
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile:base -- --minify",
-		"compile:base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
+		"compile:base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --external:pg-native --format=cjs --platform=node",
 		"compile": "npx tsc -noEmit && npm run compile:base -- --sourcemap",
 		"compile:watch": "npm run compile:base -- --sourcemap --watch",
 		"compile:test": "tsc -p tsconfig.test.json",
@@ -764,6 +780,7 @@
 		"@types/glob": "^7.2.0",
 		"@types/mocha": "^5.2.6",
 		"@types/node": "^17.0.17",
+		"@types/pg": "^8.6.6",
 		"@types/promise-memoize": "^1.2.1",
 		"@types/semver": "^7.3.10",
 		"@types/vscode": "1.63.0",
@@ -775,6 +792,7 @@
 		"fs-extra": "^10.1.0",
 		"glob": "^7.2.0",
 		"mocha": "^9.2.1",
+		"pg-types": "^4.0.0",
 		"typescript": "4.7.2",
 		"vsce": "^2.6.4"
 	},
@@ -785,6 +803,7 @@
 		"comment-json": "^4.1.1",
 		"eventsource": "^2.0.2",
 		"node-fetch-commonjs": "^3.1.1",
+		"pg": "^8.8.0",
 		"promise-memoize": "^1.2.1",
 		"rambda": "^7.0.1",
 		"rxjs": "^7.5.6",

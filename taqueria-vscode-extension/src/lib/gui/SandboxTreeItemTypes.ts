@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { SandboxState } from './CachedSandboxState';
+import { TokenMetadata } from './DataModels';
 
 export class SandboxTreeItemBase extends vscode.TreeItem {
 	constructor(
@@ -11,6 +12,7 @@ export class SandboxTreeItemBase extends vscode.TreeItem {
 			| 'smartContract'
 			| 'smartContractChild'
 			| 'smartContractEntryPoint'
+			| 'token'
 			| 'operation',
 		collapsibleState: vscode.TreeItemCollapsibleState,
 	) {
@@ -108,7 +110,7 @@ export class SandboxSmartContractTreeItem extends SandboxTreeItemBase {
 
 export class SmartContractChildrenTreeItem extends SandboxTreeItemBase {
 	constructor(
-		public kind: 'Operations' | 'Entrypoints',
+		public kind: 'Operations' | 'Entrypoints' | 'Tokens',
 		public readonly parent: SandboxSmartContractTreeItem,
 	) {
 		super(kind, 'smartContractChild', vscode.TreeItemCollapsibleState.Collapsed);
@@ -138,5 +140,16 @@ export class OperationTreeItem extends SandboxTreeItemBase {
 		super(type, 'operation', vscode.TreeItemCollapsibleState.None);
 		this.description = hash;
 		this.contextValue = 'operation';
+	}
+}
+
+export class TokenTreeItem extends SandboxTreeItemBase {
+	constructor(
+		public readonly tokenId: string,
+		public readonly name: string | undefined,
+		public readonly metadata: TokenMetadata | undefined,
+	) {
+		super(name || tokenId.toString(), 'token', vscode.TreeItemCollapsibleState.None);
+		this.contextValue = 'token';
 	}
 }

@@ -293,11 +293,12 @@ const startInstance = async (sandboxName: string, sandbox: SandboxConfig.t, opts
 	if (sandbox.tzkt?.disableAutostartWithSandbox === true) {
 		return;
 	}
-	const { postgres, sync, api } = await getTzKtStartCommands(sandboxName, sandbox, opts);
+	const { postgres, sync, api, metadata } = await getTzKtStartCommands(sandboxName, sandbox, opts);
 	const tzKtContainers = [
 		{ name: 'postgresql', command: postgres },
 		{ name: 'TzKt.Sync', command: sync },
 		{ name: 'TzKt.Api', command: api },
+		// { name: 'metadata', command: metadata },
 	];
 	for (const container of tzKtContainers) {
 		await startContainer(container);
@@ -447,7 +448,7 @@ const stopTzKtContainers = async (
 	parsedArgs: ValidOpts,
 ): Promise<void> => {
 	const containerNames = await getTzKtContainerNames(sandboxName, parsedArgs);
-	const containersToStop = [containerNames.api, containerNames.sync, containerNames.postgres];
+	const containersToStop = [containerNames.api, containerNames.sync, containerNames.postgres, containerNames.metadata];
 	for (const container of containersToStop) {
 		try {
 			const result = await execCmd(`docker stop ${container}`);

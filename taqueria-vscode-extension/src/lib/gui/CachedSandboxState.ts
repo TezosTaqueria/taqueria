@@ -149,4 +149,13 @@ export class CachedSandboxState {
 		let port = sandbox.tzkt?.apiPort ?? 5000;
 		return `http://127.0.0.1:${port}`;
 	}
+
+	getDipupConnectionString(sandboxName: string): string | undefined {
+		const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[sandboxName];
+		if (!sandbox || typeof sandbox === 'string') {
+			return undefined;
+		}
+		let port = sandbox.tzkt?.postgresqlPort ?? 5432;
+		return `postgres://tzkt:${sandboxName}@127.0.0.1:${port}/sandbox_data`;
+	}
 }
