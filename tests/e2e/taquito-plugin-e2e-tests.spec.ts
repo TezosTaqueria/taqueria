@@ -45,8 +45,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('transfer will give contextual help', async () => {
+	test('transfer will give contextual help', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -60,13 +59,14 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
 		const { stdout: stdout2 } = await execute('taq', 'transfer --help', './test-project');
-		expect(stdout2).toContain('Transfer/call an implicit account or a smart contract');
+		expect(stdout2).toEqual(
+			expect.arrayContaining([expect.stringContaining('Transfer/call an implicit account or a smart contract')]),
+		);
 
 		await cleanup();
 	});
 
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('call will give contextual help', async () => {
+	test('call will give contextual help', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -80,13 +80,14 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
 		const { stdout: stdout2 } = await execute('taq', 'call --help', './test-project');
-		expect(stdout2).toContain('Transfer/call an implicit account or a smart contract');
+		expect(stdout2).toEqual(
+			expect.arrayContaining([expect.stringContaining('Transfer/call an implicit account or a smart contract')]),
+		);
 
 		await cleanup();
 	});
 
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
-	test.skip('fund will give contextual help', async () => {
+	test('fund will give contextual help', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -100,12 +101,14 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
 		const { stdout: stdout2 } = await execute('taq', 'fund --help', './test-project');
-		expect(stdout2).toContain('Transfer/call an implicit account or a smart contract');
+		expect(stdout2).toContain('Fund all the instantiated accounts up to the desired/declared amount in a target');
 
 		await cleanup();
 	});
 
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1635
+	// see https://github.com/ecadlabs/taqueria/issues/1635
+	// works manually
+	// might not be working in tests because of the hyphen in the task name
 	test.skip('instantiate-account will give contextual help', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
@@ -119,8 +122,12 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
+		await new Promise(r => setTimeout(r, 3000));
+
 		const { stdout: stdout2 } = await execute('taq', 'instantiate-account --help');
-		expect(stdout2).toContain('Transfer/call an implicit account or a smart contract');
+		expect(stdout2).toContain(
+			'Instantiate all accounts declared in the "accounts" field at the root level of the config file to a target environment',
+		);
 
 		await cleanup();
 	});
