@@ -16,7 +16,7 @@ const toRequestURI = () =>
 	`https://www.google-analytics.com/mp/collect?measurement_id=${MEASUREMENT_ID}&api_secret=${API_SECRET}`;
 
 export const inject = ({ taqVersion, taqBuild, fields, getMachineId, operatingSystem, fetch, ...deps }: Deps) => {
-	const events: StoredEvent[] = [];
+	let events: StoredEvent[] = [];
 
 	const toRequestBody = (client_id: string) =>
 		JSON.stringify({
@@ -39,11 +39,15 @@ export const inject = ({ taqVersion, taqBuild, fields, getMachineId, operatingSy
 			},
 		});
 
+	const empty = () => {
+		events = [];
+	};
+
 	const sendEvents = () =>
 		getMachineId()
 			.then(toRequestBody)
 			.then((body: string) => fetch(toRequestURI(), { method: 'POST', body }))
-			.then(noop)
+			.then(empty)
 			.catch(noop);
 
 	const isTrackingAllowed = () => deps.settings.consent === 'opt_in';

@@ -1,3 +1,4 @@
+import * as Analytics from '@taqueria/analytics';
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
 import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import { TaqError } from '@taqueria/protocol/TaqError';
@@ -6,6 +7,7 @@ import Table from 'cli-table3';
 import fs from 'fs';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
+import fetch from 'node-fetch-commonjs';
 import os from 'os';
 import path, { join } from 'path';
 import { uniq } from 'rambda';
@@ -33,10 +35,10 @@ import { createVscodeWebUiHtml } from './gui/web/WebUI';
 import { LogHelper, OutputLevels, shouldOutput } from './LogHelper';
 import * as Util from './pure';
 import { execCmd } from './pure';
+import * as Settings from './settings';
 import { getLanguageInfoForFileName, getSupportedSmartContractExtensions } from './SmartContractLanguageInfo';
 import { TaqVsxError } from './TaqVsxError';
 import { WatcherList } from './WatchersList';
-
 export const COMMAND_PREFIX = 'taqueria.';
 
 const minNodeVersion = '16.13.1';
@@ -118,6 +120,7 @@ export type TaskTitles = {
 };
 
 export class VsCodeHelper {
+	private analytics?: ReturnType<typeof Analytics.inject>;
 	private constructor(
 		private context: api.ExtensionContext,
 		private vscode: VsCodeApi,
@@ -263,10 +266,52 @@ export class VsCodeHelper {
 			}
 		});
 		await this.updateCommandStates();
+
+		// When there workspace changes, sent all tracked events
+		this.vscode.workspace.onDidChangeWorkspaceFolders(() => this.sendEvents());
+
+		this.vscode.window.onDidChangeWindowState(() => this.sendEvents());
+
+		// Track an event indicating the vscode extension has been loaded
+		await this.trackEvent('taq_vscode_loaded', {
+			ext_version: this.context.extension.packageJSON.version,
+			vscode_version: this.vscode.version,
+		});
+
+		await this.sendEvents();
 	}
 
 	get i18n() {
 		return this.i18;
+	}
+
+	async getAnalytics() {
+		if (!this.analytics) {
+			const taqVersion = (await this.getTaqVersion()) || 'unknown';
+			const taqBuild = (await this.getTaqBuild()) | 'unknown';
+
+			this.analytics = Analytics.inject({
+				taqVersion: taqVersion.trim(),
+				taqBuild: taqBuild,
+				isCICD: false,
+				isTesting: false,
+				operatingSystem: process.platform,
+				getMachineId: () => Promise.resolve('test'),
+				settings: await Settings.getSettings(),
+				fetch,
+			});
+		}
+		return this.analytics;
+	}
+
+	async trackEvent(eventName: string, eventFields: Analytics.EventParams) {
+		return (await this.getAnalytics()).trackEvent(eventName, eventFields);
+	}
+
+	async sendEvents() {
+		const analytics = await this.getAnalytics();
+		console.log(analytics.getEvents());
+		return analytics.sendTrackedEvents();
 	}
 
 	getFolders() {
@@ -1696,6 +1741,16 @@ export class VsCodeHelper {
 		try {
 			const pathToTaq = await this.getTaqBinPath();
 			return await Util.checkTaqVersion(pathToTaq, this.i18, this.logHelper.showLog, this);
+		} catch (e) {
+			this.logAllNestedErrors(e);
+			return undefined;
+		}
+	}
+
+	async getTaqBuild(): Promise<string | undefined> {
+		try {
+			const pathToTaq = await this.getTaqBinPath();
+			return await Util.checkTaqBuild(pathToTaq, this.i18, this.logHelper.showLog, this);
 		} catch (e) {
 			this.logAllNestedErrors(e);
 			return undefined;
