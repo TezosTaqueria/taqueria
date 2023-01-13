@@ -288,11 +288,11 @@ export class VsCodeHelper {
 	async getAnalytics() {
 		if (!this.analytics) {
 			const taqVersion = (await this.getTaqVersion()) || 'unknown';
-			const taqBuild = (await this.getTaqBuild()) | 'unknown';
+			const taqBuild = (await this.getTaqBuild()) || 'unknown';
 
 			this.analytics = Analytics.inject({
 				taqVersion: taqVersion.trim(),
-				taqBuild: taqBuild,
+				taqBuild: taqBuild.trim(),
 				isCICD: false,
 				isTesting: false,
 				operatingSystem: process.platform,
