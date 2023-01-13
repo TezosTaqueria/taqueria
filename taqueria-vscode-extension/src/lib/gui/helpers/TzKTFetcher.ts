@@ -73,7 +73,7 @@ export async function findAccountInTzKT(
 export async function findContractEntrypointsInTzKT(
 	tzktBaseUrl: string,
 	contractAddress: string,
-) {
+): Promise<TzKTContractEntrypointData[] | undefined> {
 	const response = await fetch(
 		`${tzktBaseUrl}/v1/contracts/${contractAddress}/entrypoints?micheline=true&michelson=true`,
 	);
@@ -87,7 +87,7 @@ export async function findContractEntrypointsInTzKT(
 export async function findOperationsInTzKT(
 	tzktBaseUrl: string,
 	address: string,
-) {
+): Promise<TzKTOperationData[] | undefined> {
 	const response = await fetch(`${tzktBaseUrl}/v1/accounts/${address}/operations`);
 	if (response.status !== 200) {
 		return;
