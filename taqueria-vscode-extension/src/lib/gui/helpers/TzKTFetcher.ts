@@ -86,9 +86,9 @@ export async function findContractEntrypointsInTzKT(
 
 export async function findOperationsInTzKT(
 	tzktBaseUrl: string,
-	address: string,
+	accountAddress: string,
 ): Promise<TzKTOperationData[] | undefined> {
-	const response = await fetch(`${tzktBaseUrl}/v1/accounts/${address}/operations`);
+	const response = await fetch(`${tzktBaseUrl}/v1/accounts/${accountAddress}/operations`);
 	if (response.status !== 200) {
 		return;
 	}

@@ -25,10 +25,10 @@ export type SandboxTzKTAccount = TzKTAccountData & {
 export class CachedTzKTDataProvider {
 	private currentTzKtBaseAddress: string | undefined;
 	private currentSandboxState: SandboxState;
-	private tzktAccountsCache = new Map<string, TzKTAccountData>();
-	private tzktContractsCache = new Map<string, TzKTAccountData>();
-	private tzktOperationsCache = new Map<string, TzKTOperationData[]>();
-	private tzktContractEntrypointsCache = new Map<string, TzKTContractEntrypointData[]>();
+	private tzktAccountsCache = new Map<string, TzKTAccountData | null>();
+	private tzktContractsCache = new Map<string, TzKTAccountData | null>();
+	private tzktOperationsCache = new Map<string, TzKTOperationData[] | null>();
+	private tzktContractEntrypointsCache = new Map<string, TzKTContractEntrypointData[] | null>();
 
 	readonly headFromTzKt = new rxjs.BehaviorSubject<TzKtHeadData | undefined>(undefined);
 	readonly accountsFromTzKt = new rxjs.BehaviorSubject<TzKTAccountData | undefined>(undefined);
@@ -111,6 +111,8 @@ export class CachedTzKTDataProvider {
 
 		this.connection.on('head', payload => this.onHeadFromTzKt(payload));
 		this.connection.on('accounts', payload => this.onAccountsFromTzKt(payload));
+
+		this.pruneNotFoundFromTzKTCaches();
 	}
 
 	private async updateContractCache(account: TzKTAccountData) {
@@ -143,6 +145,18 @@ export class CachedTzKTDataProvider {
 				}
 			}
 		}
+	}
+
+	private pruneNotFoundFromTzKTCaches() {
+		[this.tzktContractsCache, this.tzktOperationsCache, this.tzktContractEntrypointsCache, this.tzktAccountsCache]
+			.forEach(cache => {
+				cache
+					.forEach((value, key) => {
+						if (value === null) {
+							cache.delete(key);
+						}
+					});
+			});
 	}
 
 	async setSandboxState(newState: SandboxState) {
@@ -204,9 +218,15 @@ export class CachedTzKTDataProvider {
 
 		const tzktAccounts = await Promise.all(
 			taqueriaAccounts.map(async account => {
-				const data = this.tzktAccountsCache.get(account.address)
-					?? await findAccountInTzKT(tzktBaseUrl, account.address);
-				if (!data) return;
+				const cachedValue = this.tzktAccountsCache.get(account.address);
+				// quick return if we already know that the account doesn't exist
+				if (cachedValue === null) return null;
+
+				const data = cachedValue ?? await findAccountInTzKT(tzktBaseUrl, account.address);
+				if (!data) {
+					this.tzktAccountsCache.set(account.address, null);
+					return null;
+				}
 
 				const tzktAccount: SandboxTzKTAccount = {
 					...data,
@@ -232,9 +252,15 @@ export class CachedTzKTDataProvider {
 			taqueriaContracts
 				.map(async contract => {
 					const contractAddress = contract.config.address;
-					const data = this.tzktContractsCache.get(contractAddress)
-						?? await findContractInTzkt(tzktBaseUrl, contractAddress);
-					if (!data) return;
+					const cachedValue = this.tzktContractsCache.get(contractAddress);
+					// quick return if we already know that the contract doesn't exist
+					if (cachedValue === null) return null;
+
+					const data = cachedValue ?? await findContractInTzkt(tzktBaseUrl, contractAddress);
+					if (!data) {
+						this.tzktContractsCache.set(contractAddress, null);
+						return null;
+					}
 
 					const tzktContract: SandboxTzKTAccount = {
 						...data,
@@ -256,12 +282,18 @@ export class CachedTzKTDataProvider {
 		const contract = this.tzktContractsCache.get(contractAddress);
 		if (!contract) return [];
 
-		const tzktEntrypoints = this.tzktContractEntrypointsCache.get(contractAddress)
-			?? await findContractEntrypointsInTzKT(tzktBaseUrl, contractAddress);
-		if (!tzktEntrypoints) return [];
+		const cachedValue = this.tzktContractEntrypointsCache.get(contractAddress);
+		// quick return if we already know that entrypoints doesn't exist
+		if (cachedValue === null) return [];
 
-		this.tzktContractEntrypointsCache.set(contractAddress, tzktEntrypoints);
-		return tzktEntrypoints;
+		const data = cachedValue ?? await findContractEntrypointsInTzKT(tzktBaseUrl, contractAddress);
+		if (!data) {
+			this.tzktContractEntrypointsCache.set(contractAddress, null);
+			return [];
+		}
+
+		this.tzktContractEntrypointsCache.set(contractAddress, data);
+		return data;
 	}
 
 	async getAccountOperations(accountAddress: string): Promise<TzKTOperationData[]> {
@@ -272,9 +304,16 @@ export class CachedTzKTDataProvider {
 		const account = this.tzktAccountsCache.get(accountAddress);
 		if (!contract && !account) return [];
 
-		const tzktOperations = this.tzktOperationsCache.get(accountAddress)
+		const cachedValue = this.tzktOperationsCache.get(accountAddress);
+		// quick return if we already know that operations doesn't exist
+		if (cachedValue === null) return [];
+
+		const tzktOperations = cachedValue
 			?? await findOperationsInTzKT(tzktBaseUrl, accountAddress);
-		if (!tzktOperations) return [];
+		if (!tzktOperations) {
+			this.tzktOperationsCache.set(accountAddress, null);
+			return [];
+		}
 
 		this.tzktOperationsCache.set(accountAddress, tzktOperations);
 		return tzktOperations;
