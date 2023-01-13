@@ -25,7 +25,8 @@ const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: Sandbo
 		`ConnectionStrings__DefaultConnection="host=${containerNames.postgres};port=5432;database=sandbox_data;username=tzkt;password=${sandboxName};"`;
 	return {
 		postgres: `--env POSTGRES_PASSWORD=${sandboxName} --env POSTGRES_USER=tzkt`,
-		sync: `--env ${connectionStringEnv} --env TezosNode__Endpoint="http://${sandboxContainerName}:20000/"`,
+		sync:
+			`--env ${connectionStringEnv} --env TezosNode__Endpoint="http://${sandboxContainerName}:20000/" --env Protocols__Fallback="PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"`,
 		api:
 			`--env ${connectionStringEnv} --env Kestrel__Endpoints__Http__Url="http://*:5000" --env MaxAttemptsForMigrations=120`,
 	};
