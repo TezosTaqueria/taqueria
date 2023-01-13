@@ -766,7 +766,7 @@
 		"@types/node": "^17.0.17",
 		"@types/promise-memoize": "^1.2.1",
 		"@types/semver": "^7.3.10",
-		"@types/vscode": "1.73.0",
+		"@types/vscode": "1.68.1",
 		"@typescript-eslint/eslint-plugin": "^5.9.1",
 		"@typescript-eslint/parser": "^5.9.1",
 		"@vscode/test-electron": "^2.1.2",
