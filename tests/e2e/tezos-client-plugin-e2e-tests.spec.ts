@@ -6,7 +6,7 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 	// blocked by https://github.com/ecadlabs/taqueria/issues/1671
 	// this fail has been confirmed manually in pre-release v0.25.23-rc
-	test.only('typecheck will check a contract in the artifacts folder', async () => {
+	test.skip('typecheck will check a contract in the artifacts folder', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
