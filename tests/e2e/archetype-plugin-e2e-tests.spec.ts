@@ -6,28 +6,46 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 	test('compile offers contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
 		const { stdout } = await execute('taq', 'compile --help', './test-project');
 		expect(stdout).toEqual(
 			expect.arrayContaining(['Compile a smart contract written in a Archetype syntax to Michelson code']),
 		);
+		console.log(stdout);
 
 		await cleanup();
 	});
 
 	test('compile will error if no contract parameter passed and no contract exists', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
 		const { stdout } = await execute('taq', 'compile', './test-project');
 		expect(stdout).toEqual(expect.arrayContaining(['│ None found │ N/A      │']));
+
+		await cleanup();
+	});
+
+	test('archetype plugin will support cli options', async () => {
+		const { execute, cleanup, spawn } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		await waitForText("Project taq'ified!");
+
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+
+		const { stdout: stdout2 } = await execute('taq', '--version', './test-project');
+		expect(stdout2).not.toEqual([]);
+
+		const { stdout: stdout3 } = await execute('taq', '--build', './test-project');
+		expect(stdout3).not.toEqual([]);
 
 		await cleanup();
 	});
@@ -37,9 +55,9 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 	// manually confirmed to fail in pre-release v0.25.23-rc
 	test.skip('compile will compile one contract under contracts folder without a parameter', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
 		const arl_file = await (await exec('cat e2e/data/archetype-data/fa12.arl')).stdout;
@@ -55,9 +73,9 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('compile will compile one contract with [sourceFile] command', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
 		const arl_file = await (await exec('cat e2e/data/archetype-data/fa12.arl')).stdout;
@@ -75,9 +93,9 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 	// manually confirmed to fail in pre-release v0.25.23-rc
 	test.skip('compile will compile multiple contracts in the contracts folder', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
 		const arl_file = await (await exec('cat e2e/data/archetype-data/fa12.arl')).stdout;
@@ -96,9 +114,9 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('compile will error if named contract does not exist', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
 		const { stdout } = await execute('taq', 'compile no_such_file.arl', './test-project');
@@ -111,9 +129,9 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 	// works fine manually in pre-release v0.25.23-rc
 	test.skip('compile can use different versions of the Archetype image', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
 		const { stdout, stderr } = await execute(
@@ -140,9 +158,9 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('compile will require the plugin argument when other compile plugins are installed', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
-		const {} = await execute('taq', 'init test-project');
+		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		const {} = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
 		const arl_file = await (await exec('cat e2e/data/archetype-data/fa12.arl')).stdout;

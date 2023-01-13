@@ -14,7 +14,7 @@ describe('Persistent State E2E Tests for Taqueria CLI', () => {
 		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
-		const {} = await execute('taq', 'compile hello-tacos.mligo', './test-project');
+		await execute('taq', 'compile hello-tacos.mligo', './test-project');
 		await exists('./test-project/artifacts/hello-tacos.tz');
 		await exists('./test-project/.taq/development-state.json');
 
@@ -33,7 +33,7 @@ describe('Persistent State E2E Tests for Taqueria CLI', () => {
 		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
-		const {} = await execute('taq', 'compile hello-tacos.mligo', './test-project');
+		await execute('taq', 'compile hello-tacos.mligo', './test-project');
 		await exists('./test-project/artifacts/hello-tacos.tz');
 		await exists('./test-project/.taq/development-state.json');
 
@@ -52,7 +52,7 @@ describe('Persistent State E2E Tests for Taqueria CLI', () => {
 		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
-		const {} = await execute('taq', 'compile hello-tacos.mligo', './test-project');
+		await execute('taq', 'compile hello-tacos.mligo', './test-project');
 		await exists('./test-project/artifacts/hello-tacos.tz');
 		await exists('./test-project/.taq/development-state.json');
 		await exists('./test-project/.taq/testing-state.json');
@@ -70,7 +70,7 @@ describe('Persistent State E2E Tests for Taqueria CLI', () => {
 		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
 		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
-		const {} = await execute('taq', 'compile -e testing hello-tacos.mligo', './test-project');
+		await execute('taq', 'compile -e testing hello-tacos.mligo', './test-project');
 		await exists('./test-project/artifacts/hello-tacos.tz');
 		await exists('./test-project/.taq/testing-state.json');
 

@@ -55,6 +55,32 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
+	test('ligo plugin will support cli options', async () => {
+		const { execute, cleanup, writeFile, readFile, ls, spawn } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		await waitForText("Project taq'ified!");
+
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+
+		const { stdout: stdout2 } = await execute('taq', '--version', './test-project');
+		expect(stdout2).not.toEqual([]);
+
+		const { stdout: stdout3 } = await execute('taq', '--build', './test-project');
+		expect(stdout3).not.toEqual([]);
+
+		const mligo_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.mligo`)).stdout;
+		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
+
+		await execute('taq', 'compile hello-tacos.mligo --json', './test-project');
+		const artifacts_list = await ls('./test-project/artifacts');
+		expect(artifacts_list).toContain('hello-tacos.json');
+		const json_file = await readFile('./test-project/artifacts/hello-tacos.json');
+		expect(json_file).toContain('[ { "prim": "parameter", "args": [ { "prim": "nat" } ] },');
+
+		await cleanup();
+	});
+
 	test('compile will error if missing <contract> parameter', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
@@ -100,7 +126,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const mligo_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.mligo`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
-		const {} = await execute('taq', 'compile hello-tacos.mligo', './test-project');
+		await execute('taq', 'compile hello-tacos.mligo', './test-project');
 		const artifacts_list = await ls('./test-project/artifacts');
 		expect(artifacts_list).toContain('hello-tacos.tz');
 
@@ -245,7 +271,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const {} = await execute('taq', 'create contract counter.mligo', './test-project');
+		await execute('taq', 'create contract counter.mligo', './test-project');
 		expect(await ls('./test-project/contracts')).toContain('counter.mligo');
 
 		const bytes = await readFile(path.join('./test-project', 'contracts', 'counter.mligo'));
