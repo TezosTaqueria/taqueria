@@ -305,7 +305,10 @@ export class VsCodeHelper {
 	}
 
 	async trackEvent(eventName: string, eventFields: Analytics.EventParams) {
-		return (await this.getAnalytics()).trackEvent(eventName, eventFields);
+		return (await this.getAnalytics()).trackEvent(eventName, {
+			taq_ui: 'VSCode',
+			...eventFields,
+		});
 	}
 
 	async sendEvents() {

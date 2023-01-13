@@ -108,7 +108,7 @@ export function createRegistry() {
 					map(() => parsedArgs),
 					chainRej(err =>
 						pipe(
-							sendEvent({ taskName, errKind: err.kind, errMsg: err.msg }),
+							sendEvent({ taskName, taq_error: true, errKind: err.kind, errMsg: err.msg }),
 							chainRej(() => reject(err)),
 							chain(() => reject(err)),
 						)

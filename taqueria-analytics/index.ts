@@ -21,7 +21,10 @@ export const inject = ({ taqVersion, taqBuild, fields, getMachineId, operatingSy
 	const toRequestBody = (client_id: string) =>
 		JSON.stringify({
 			client_id,
-			events,
+			events: events.map(event => {
+				event.params['taq_client'] = client_id;
+				return event;
+			}),
 		});
 
 	const getEvents = () => [...events];
@@ -30,12 +33,13 @@ export const inject = ({ taqVersion, taqBuild, fields, getMachineId, operatingSy
 		events.push({
 			name,
 			params: {
-				...params,
-				...fields,
+				taq_error: false,
 				taq_timestamp: getCurrentTimestamp(),
 				taq_version: taqVersion,
 				taq_build: taqBuild,
 				taq_os: operatingSystem,
+				...fields,
+				...params,
 			},
 		});
 
