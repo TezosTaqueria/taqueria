@@ -17,7 +17,8 @@
 		"test:integration:debug": "../bin/before-all-tests.sh && TEST=true jest --config jest.config.integration.ts --no-cache --detectOpenHandles --detectLeaks",
 		"test:e2e": "../bin/before-all-tests.sh && TEST=true jest --config jest.config.e2e.ts --maxWorkers=1",
 		"test:e2e:smoke": "../bin/before-all-tests.sh && TEST=true jest taqueria-cli-e2e-smoke.spec.ts --config jest.config.e2e.ts --maxWorkers=1",
-		"test:e2e:debug": "../bin/before-all-tests.sh && TEST=true node --inspect-brk node_modules/.bin/jest --config jest.config.e2e.ts --maxWorkers=1 --detectOpenHandles --detectLeaks"
+		"test:e2e:debug": "../bin/before-all-tests.sh && TEST=true node --inspect-brk node_modules/.bin/jest --config jest.config.e2e.ts --maxWorkers=1 --detectOpenHandles --detectLeaks",
+		"test:e2e:fast": "../bin/before-all-tests.sh && TEST=true jest --config jest.config.e2e.ts --testNamePattern='^((?!slowtest).)*$' --maxWorkers=1"
 	},
 	"repository": {
 		"type": "git",
