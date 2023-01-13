@@ -5,7 +5,7 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 import { readFile } from 'fs';
 
 describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
-	test('start and stop will work with a custom name sandbox', async () => {
+	test('start and stop will work with a custom name sandbox - slowtest', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
@@ -157,7 +157,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('start sandbox will error if called on a started sandbox', async () => {
+	test('start sandbox will error if called on a started sandbox - slowtest', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
@@ -174,7 +174,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('list accounts will display the sandbox accounts', async () => {
+	test('list accounts will display the sandbox accounts - slowtest', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
