@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-mock",
-	"version": "0.25.16-rc",
+	"version": "0.25.26-rc",
 	"description": "A plugin used to test Taqueria",
 	"private": true,
 	"scripts": {
@@ -23,6 +23,6 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.25.16-rc"
+		"@taqueria/node-sdk": "^0.25.26-rc"
 	}
 }
