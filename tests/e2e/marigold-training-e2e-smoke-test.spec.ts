@@ -12,6 +12,8 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 		await exists('./test-project/node_modules/@taqueria/plugin-ligo/index.js');
 		await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-tezos-client/index.js');
+		await execute('taq', 'install ../taqueria-plugin-taquito', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-taquito/index.js');
 
 		const jligo_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/pokeGame.jsligo', jligo_file);
@@ -41,6 +43,17 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 			'./test-project',
 		);
 		expect(stdout2).toEqual(expect.arrayContaining(['│ pokeGame.tz │ storage                                      │']));
+
+		const { stdout: stdout3, stderr } = await execute(
+			'taq',
+			'deploy pokeGame.tz -e "testing"',
+			'./test-project',
+		);
+		console.log(stderr);
+		expect(stderr).toEqual(
+			expect.arrayContaining(['1. Go to https://teztnets.xyz and click "Faucet" of the target testnet']),
+		);
+		0;
 
 		await cleanup();
 	});
