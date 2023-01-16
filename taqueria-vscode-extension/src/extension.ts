@@ -11,4 +11,5 @@ export async function activate(context: vscode.ExtensionContext, input?: Injecte
 
 export function deactivate() {
 	helper.watchers.clearConfigWatchers();
+	helper.sendEvents();
 }

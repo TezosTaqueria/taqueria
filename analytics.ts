@@ -107,6 +107,7 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 				'quickstart',
 				'lock',
 				'$0',
+				'help',
 			],
 			Object.entries(parsedArgs).reduce(
 				(retval, [key, value]) => key.includes('-') || key.length === 1 ? retval : { ...retval, [key]: value },
@@ -132,6 +133,9 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 					taqVersion: parsedArgs.setVersion,
 					operatingSystem: machineInfo.os,
 					fetch,
+					fields: {
+						taq_ui: parsedArgs.fromVsCode ? 'VSCode' : 'CLI',
+					},
 				});
 				return attemptP(() =>
 					analytics.trackEvent('taq_task_executed', toEventFields(fields))

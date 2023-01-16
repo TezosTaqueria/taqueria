@@ -180,6 +180,22 @@ export const checkTaqVersion = async (
 	return result.standardOutput;
 };
 
+export const checkTaqBuild = async (
+	inputPath: PathToTaq,
+	i18n: i18n,
+	showOutput: OutputFunction,
+	helper: VsCodeHelper,
+): Promise<string> => {
+	const result = await execCmd(`${inputPath} --build --fromVsCode`, showOutput);
+	if (result.executionError) {
+		helper.logAllNestedErrors(result.executionError);
+	}
+	if (result.standardError && result.standardError.length) {
+		showOutput(OutputLevels.error, result.standardError);
+	}
+	return result.standardOutput;
+};
+
 export const getNodeVersion = async (showOutput: OutputFunction) => {
 	const result = await execCmd(`node --version`, showOutput);
 	const version = result.standardOutput;
