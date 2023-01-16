@@ -32,6 +32,25 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
+	test('archetype plugin will support cli options', async () => {
+		const { execute, cleanup, spawn } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		await waitForText("Project taq'ified!");
+
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+
+		const { stdout: stdout2, stderr } = await execute('taq', '--version', './test-project');
+		expect(stderr).toEqual([]);
+		expect(stdout2).not.toEqual([]);
+
+		const { stdout: stdout3, stderr: stderr2 } = await execute('taq', '--build', './test-project');
+		expect(stderr2).toEqual([]);
+		expect(stdout3).not.toEqual([]);
+
+		await cleanup();
+	});
+
 	// this isn't working. should it? should compile find all files in contracts dir?
 	// see https://github.com/ecadlabs/taqueria/issues/1678
 	// manually confirmed to fail in pre-release v0.25.23-rc
