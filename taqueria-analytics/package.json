@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/analytics",
-	"version": "0.25.26-rc",
+	"version": "0.26.27-rc",
 	"description": "A TypeScript SDK submitting events for Taqueria activity",
 	"main": "./index.js",
 	"source": "./index.ts",
