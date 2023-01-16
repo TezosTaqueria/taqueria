@@ -35,7 +35,7 @@
 			"distDir": "./out/test",
 			"context": "node",
 			"engines": {
-				"node": ">= 12"
+				"node": ">= 16"
 			},
 			"includeNodeModules": {
 				"vscode": false
