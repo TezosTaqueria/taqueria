@@ -15,7 +15,6 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 		expect(stdout).toEqual(
 			expect.arrayContaining(['Compile a smart contract written in a Archetype syntax to Michelson code']),
 		);
-		console.log(stdout);
 
 		await cleanup();
 	});
@@ -41,10 +40,12 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', '--version', './test-project');
+		const { stdout: stdout2, stderr } = await execute('taq', '--version', './test-project');
+		expect(stderr).toEqual([]);
 		expect(stdout2).not.toEqual([]);
 
-		const { stdout: stdout3 } = await execute('taq', '--build', './test-project');
+		const { stdout: stdout3, stderr: stderr2 } = await execute('taq', '--build', './test-project');
+		expect(stderr2).toEqual([]);
 		expect(stdout3).not.toEqual([]);
 
 		await cleanup();
