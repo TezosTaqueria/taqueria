@@ -106,7 +106,7 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		const { waitForFinish } = await spawn('taq', 'init test-project');
 		await writeFile('./test-project/package.json', '{}');
 
-		const {} = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		await waitForFinish();
 
 		const content = await readFile('./test-project/package.json');
