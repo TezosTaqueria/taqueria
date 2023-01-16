@@ -85,7 +85,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
-		const {} = await execute('taq', 'compile increment.jsligo', './test-project');
+		await execute('taq', 'compile increment.jsligo', './test-project');
 
 		const { stdout: stdout2 } = await execute('taq', 'generate types types', './test-project');
 		expect(stdout2).toContain(`generateTypes { typescriptDir: 'types' }`);
@@ -118,7 +118,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
-		const {} = await execute('taq', 'compile increment.jsligo', './test-project');
+		await execute('taq', 'compile increment.jsligo', './test-project');
 
 		const { stdout: stdout2 } = await execute('taq', 'gentypes types', './test-project');
 		expect(stdout2).toContain(`generateTypes { typescriptDir: 'types' }`);
@@ -151,7 +151,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
-		const {} = await execute('taq', 'compile increment.jsligo', './test-project');
+		await execute('taq', 'compile increment.jsligo', './test-project');
 
 		const { stdout: stdout2 } = await execute('taq', 'gen types', './test-project');
 		expect(stdout2).toContain(`generateTypes { typescriptDir: 'types' }`);
@@ -184,7 +184,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
-		const {} = await execute('taq', 'compile increment.jsligo', './test-project');
+		await execute('taq', 'compile increment.jsligo', './test-project');
 
 		const { stdout: stdout2 } = await execute('taq', 'generate types -t "file"', './test-project');
 		expect(stdout2).toContain(`generateTypes { typescriptDir: 'types' }`);
@@ -220,7 +220,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const expected_types_file =
 			await (await exec(`cat ../taqueria-plugin-contract-types/example/types-file/example-contract-1.types.ts`)).stdout;
 
-		const {} = await execute('taq', 'generate types', './test-project');
+		await execute('taq', 'generate types', './test-project');
 		const generated_types_file = await readFile(path.join('./test-project', 'types', 'example-contract-1.types.ts'));
 
 		expect(generated_types_file).toBe(expected_types_file);
@@ -243,7 +243,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const expected_types_file =
 			await (await exec(`cat ../taqueria-plugin-contract-types/example/types-file/example-contract-2.types.ts`)).stdout;
 
-		const {} = await execute('taq', 'generate types', './test-project');
+		await execute('taq', 'generate types', './test-project');
 		const generated_types_file = await readFile(path.join('./test-project', 'types', 'example-contract-2.types.ts'));
 
 		expect(generated_types_file).toBe(expected_types_file);
@@ -267,7 +267,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 			await (await exec(`cat ../taqueria-plugin-contract-types/example/types-file/subdir/example-contract-0.types.ts`))
 				.stdout;
 
-		const {} = await execute('taq', 'generate types', './test-project');
+		await execute('taq', 'generate types', './test-project');
 		const generated_types_file = await readFile(
 			path.join('./test-project', 'types', 'subdir/example-contract-0.types.ts'),
 		);
@@ -292,7 +292,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const expected_types_file =
 			await (await exec(`cat ../taqueria-plugin-contract-types/example/types-file/example-lambda.types.ts`)).stdout;
 
-		const {} = await execute('taq', 'generate types', './test-project');
+		await execute('taq', 'generate types', './test-project');
 		const generated_types_file = await readFile(path.join('./test-project', 'types', 'example-lambda.types.ts'));
 
 		expect(generated_types_file).toBe(expected_types_file);

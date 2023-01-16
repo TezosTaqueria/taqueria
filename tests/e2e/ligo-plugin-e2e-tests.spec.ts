@@ -100,7 +100,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const mligo_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.mligo`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
-		const {} = await execute('taq', 'compile hello-tacos.mligo', './test-project');
+		await execute('taq', 'compile hello-tacos.mligo', './test-project');
 		const artifacts_list = await ls('./test-project/artifacts');
 		expect(artifacts_list).toContain('hello-tacos.tz');
 
@@ -245,7 +245,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const {} = await execute('taq', 'create contract counter.mligo', './test-project');
+		await execute('taq', 'create contract counter.mligo', './test-project');
 		expect(await ls('./test-project/contracts')).toContain('counter.mligo');
 
 		const bytes = await readFile(path.join('./test-project', 'contracts', 'counter.mligo'));
