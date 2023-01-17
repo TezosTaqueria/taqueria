@@ -16,8 +16,6 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 		await writeFile('./test-project/.taq/config.json', test_config_file);
 
 		// install plugins
-		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
 		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ligo/index.js');
 		await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
@@ -77,8 +75,6 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 			await (await exec('cat e2e/data/config-data/config-taquito-test-environment-funded-pkh.json')).stdout;
 		await writeFile('./test-project/.taq/config.json', test_config_file);
 
-		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
 		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ligo/index.js');
 		await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
