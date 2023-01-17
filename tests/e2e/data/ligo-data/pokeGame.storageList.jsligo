@@ -1,0 +1,2 @@
+#include "pokeGame.jsligo"
+const default_storage = Set.empty as set<address>;
