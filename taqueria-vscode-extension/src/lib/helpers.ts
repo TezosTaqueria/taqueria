@@ -246,9 +246,6 @@ export class VsCodeHelper {
 		this.exposeShowOperationDetailsCommand();
 		this.exposeInvokeEntrypointCommand();
 
-		await this.registerDataProviders();
-		this.createTreeViews();
-
 		this.vscode.workspace.onDidChangeWorkspaceFolders(async e => {
 			for (const folder of e.added) {
 				try {
@@ -265,6 +262,10 @@ export class VsCodeHelper {
 				this.logAllNestedErrors(error);
 			}
 		});
+
+		await this.registerDataProviders();
+		this.createTreeViews();
+
 		await this.updateCommandStates();
 
 		// When there workspace changes, sent all tracked events
@@ -1500,7 +1501,7 @@ export class VsCodeHelper {
 			try {
 				const taqFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq'));
 				this._taqFolderWatcher = taqFolderWatcher;
-				const configWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+				const configWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config*.json'));
 				this._configWatcher = configWatcher;
 				const stateWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/state.json'));
 				this._stateWatcher = stateWatcher;
