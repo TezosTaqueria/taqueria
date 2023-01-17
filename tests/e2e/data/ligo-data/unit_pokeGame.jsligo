@@ -1,0 +1,70 @@
+type pokeMessage = {
+    receiver : address,
+    feedback : string
+};
+
+type storage = {
+    pokeTraces : map<address, pokeMessage>,
+    feedback : string
+};
+
+const default_storage = {
+    pokeTraces : Map.empty as map<address, pokeMessage>,
+    feedback : "kiss"
+};
+
+type parameter = |["Poke"];
+
+type return_ = [list<operation>, storage];
+
+const poke = (store : storage) : return_ => {
+    let feedbackMessage = {receiver : Tezos.get_self_address() ,feedback: ""};
+    return [  list([]) as list<operation>, {...store,
+        pokeTraces : Map.add(Tezos.get_source(), feedbackMessage, store.pokeTraces) }];
+};
+
+const main = ([action, store]: [parameter, storage]): return_ => {
+  return match(action, {
+    Poke: () => poke(store),
+  });
+};
+
+// reset state
+const _ = Test.reset_state ( 2 as nat, list([]) as list <tez> );
+const faucet = Test.nth_bootstrap_account(0);
+const sender1 : address = Test.nth_bootstrap_account(1);
+const _ = Test.log("Sender 1 has balance : ");
+const _ = Test.log(Test.get_balance(sender1));
+
+const _ = Test.set_baker(faucet);
+const _ = Test.set_source(faucet);
+
+//contract origination
+const [taddr, _, _] = Test.originate(main, {pokeTraces : Map.empty as map<address, pokeMessage> , feedback : "kiss"}, 0 as tez);
+const contr = Test.to_contract(taddr);
+const contrAddress = Tezos.address(contr);
+const _ = Test.log("contract deployed with values : ");
+const _ = Test.log(contr);
+
+//functions
+export const _testPoke = (s : address) : unit => {
+    Test.set_source(s);
+
+    let status = Test.transfer_to_contract(contr, Poke() as parameter, 0 as tez);
+    Test.log(status);
+
+    let store : storage = Test.get_storage(taddr);
+    Test.log(store);
+
+    //check poke is registered
+    match(Map.find_opt (s, store.pokeTraces), {
+        Some: (pokeMessage: pokeMessage) => { assert_with_error(pokeMessage.feedback == "","feedback "+pokeMessage.feedback+" is not equal to expected "+"(empty)"); assert_with_error(pokeMessage.receiver == contrAddress,"receiver is not equal");} ,
+        None: () => assert_with_error(false,"don't find traces")
+       });
+
+  };
+
+
+  //********** TESTS *************/
+
+  const testSender1Poke = _testPoke(sender1);
