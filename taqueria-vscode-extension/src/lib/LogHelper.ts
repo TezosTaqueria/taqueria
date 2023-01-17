@@ -49,6 +49,7 @@ export class LogHelper {
 		this._logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
 		this._outputChannel = vscode.window.createOutputChannel('Taqueria');
 		this._logChannel = vscode.window.createOutputChannel('Taqueria Logs');
+		this._logChannel.appendLine(`Log level: ${OutputLevels[this._logLevel]}`);
 	}
 
 	showOutput(data: string) {
