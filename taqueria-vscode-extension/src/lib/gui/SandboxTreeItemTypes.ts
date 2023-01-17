@@ -97,11 +97,10 @@ export class SandboxSmartContractTreeItem extends SandboxTreeItemBase {
 	constructor(
 		public readonly address: string,
 		public readonly alias: string | undefined,
-		public type: string,
 		public readonly containerName: string,
 		public readonly sandboxName: string,
 	) {
-		super(`${alias ? alias + ':' : ''}${type}`, 'smartContract', vscode.TreeItemCollapsibleState.Collapsed);
+		super(alias || '', 'smartContract', vscode.TreeItemCollapsibleState.Collapsed);
 		this.description = address;
 	}
 }

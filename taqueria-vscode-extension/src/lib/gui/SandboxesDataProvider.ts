@@ -1,14 +1,14 @@
 import { toSHA256 } from '@taqueria/protocol/SHA256';
 import fetch from 'node-fetch-commonjs';
-import path from 'path';
 import * as vscode from 'vscode';
 import { HasRefresh, mapAsync, VsCodeHelper } from '../helpers';
 import { OutputLevels } from '../LogHelper';
 import { getRunningContainerNames } from '../pure';
 import * as Util from '../pure';
 import { CachedSandboxState, SandboxState } from './CachedSandboxState';
+import { CachedTzKTDataProvider } from './helpers/CachedTzKTDataProvider';
+import { TzKTAccountData, TzKtHeadData } from './helpers/TzKTFetcher';
 import { ObservableConfig } from './ObservableConfig';
-import { TzKtHead } from './SandboxDataModels';
 import {
 	OperationTreeItem,
 	SandboxChildrenTreeItem,
@@ -32,6 +32,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	}
 
 	private sandboxStates: Record<string, CachedSandboxState> = {};
+	private tzktProviders: Record<string, CachedTzKTDataProvider> = {};
 
 	refreshLevelInterval: NodeJS.Timer | undefined;
 	private sandboxTreeItems: SandboxTreeItem[] | undefined;
@@ -85,7 +86,6 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!pathToDir || !config?.config?.sandbox) {
 			return [];
 		}
-		const environmentNames = this.getEnvironmentNames(config);
 
 		const sandboxNames = this.getSandboxNames(config);
 		const items = await mapAsync(
@@ -96,10 +96,17 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 					runningContainers,
 					pathToDir,
 				);
-				const cached = this.sandboxStates[sandboxName];
-				if (cached) {
-					await cached.setState(state);
+
+				const cachedState = this.sandboxStates[sandboxName];
+				if (cachedState) {
+					await cachedState.setState(state);
 				}
+
+				const cachedTzkt = this.tzktProviders[sandboxName];
+				if (cachedTzkt) {
+					await cachedTzkt.setSandboxState(state);
+				}
+
 				return new SandboxTreeItem(sandboxName, containerName, state);
 			},
 		);
@@ -118,24 +125,34 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		if (!config?.config?.sandbox || !projectDir) {
 			return;
 		}
-		for (let name of this.getSandboxNames(config)) {
-			if (this.sandboxStates[name]) {
+		for (let sandboxName of this.getSandboxNames(config)) {
+			if (this.sandboxStates[sandboxName]) {
 				continue;
 			}
 			try {
-				const { state, containerName } = await this.getSandboxState(name, runningContainerNames, projectDir);
-				const cached = new CachedSandboxState(
+				const { state, containerName } = await this.getSandboxState(sandboxName, runningContainerNames, projectDir);
+				const cachedState = new CachedSandboxState(
+					// this.helper,
+					sandboxName,
+					await this.getContainerName(sandboxName, projectDir),
+					this.observableConfig,
+					state,
+				);
+				this.sandboxStates[sandboxName] = cachedState;
+
+				const cachedProvider = new CachedTzKTDataProvider(
 					this.helper,
-					name,
-					await this.getContainerName(name, projectDir),
+					sandboxName,
 					this.observableConfig,
 					state,
 				);
 				if (state === 'running') {
-					await cached.startConnection();
+					await cachedProvider.startConnection();
 				}
-				cached.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, name));
-				this.sandboxStates[name] = cached;
+				cachedProvider.headFromTzKt.subscribe(data => this.onHeadFromTzKt(data, sandboxName));
+				cachedProvider.accountsFromTzKt.subscribe(data => this.onAccountFromTzKt(data, sandboxName));
+				cachedProvider.contractsFromTzKt.subscribe(data => this.onAccountFromTzKt(data, sandboxName));
+				this.tzktProviders[sandboxName] = cachedProvider;
 			} catch (e: unknown) {
 				this.helper.logHelper.showLog(OutputLevels.debug, 'Error in signalR:');
 				this.helper.logAllNestedErrors(e);
@@ -143,7 +160,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		}
 	}
 
-	onHeadFromTzKt(data: TzKtHead | undefined, sandboxName: string): void {
+	onHeadFromTzKt(data: TzKtHeadData | undefined, sandboxName: string): void {
 		const treeItem = this.sandboxTreeItems?.find(item => item.sandboxName === sandboxName);
 		if (!treeItem) {
 			return;
@@ -152,27 +169,175 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 		this.refreshItem(treeItem);
 	}
 
-	private async getAccountOperations(accountItem: SandboxImplicitAccountTreeItem | SmartContractChildrenTreeItem) {
-		const address = accountItem instanceof SandboxImplicitAccountTreeItem
-			? accountItem.address
-			: accountItem.parent.address;
-		const tzktBaseUrl = this.sandboxStates[accountItem.parent.sandboxName]?.getTzKtBaseUrl(
-			accountItem.parent.sandboxName,
-		);
+	onAccountFromTzKt(_data: TzKTAccountData | undefined, sandboxName: string): void {
+		// TODO: find a way to refresh only selected account tree item
+
+		const treeItem = this.sandboxTreeItems?.find(item => item.sandboxName === sandboxName);
+		if (!treeItem) {
+			return;
+		}
+		this.refreshItem(treeItem);
+	}
+
+	private async getAccountOperations(element: SandboxImplicitAccountTreeItem | SmartContractChildrenTreeItem) {
+		const isContract = element instanceof SmartContractChildrenTreeItem;
+		const address = isContract
+			? element.parent.address
+			: element.address;
+		const sandboxName = element.parent.sandboxName;
+		const tzktBaseUrl = await this.getTzKtBaseUrl(sandboxName);
 		if (!tzktBaseUrl) {
 			return [];
 		}
-		const response = await fetch(`${tzktBaseUrl}/v1/accounts/${address}/operations`);
-		const data = await response.json();
-		return (data as any[]).map(item =>
-			new OperationTreeItem(
-				item.type,
-				item.hash,
-				item,
-				accountItem instanceof SandboxImplicitAccountTreeItem ? accountItem : accountItem.parent,
-			)
-		);
+		try {
+			const accountOperations = await this.tzktProviders[sandboxName].getAccountOperations(address);
+			return accountOperations.map(item =>
+				new OperationTreeItem(
+					item.type,
+					item.hash,
+					item,
+					isContract ? element.parent : element,
+				)
+			);
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return [];
+		}
 	}
+
+	private async getSmartContractEntrypoints(
+		element: SmartContractChildrenTreeItem,
+	): Promise<SmartContractEntrypointTreeItem[]> {
+		const containerName = element.parent.containerName;
+		if (!containerName) {
+			return [];
+		}
+		const sandboxName = element.parent.sandboxName;
+		const tzktBaseUrl = await this.getTzKtBaseUrl(sandboxName);
+		if (!tzktBaseUrl) {
+			return [];
+		}
+		try {
+			const sandboxContractEntrypoints = await this.tzktProviders[sandboxName].getContractEntrypoints(
+				element.parent.address,
+			);
+			return sandboxContractEntrypoints.map(item =>
+				new SmartContractEntrypointTreeItem(
+					item.name,
+					item.jsonParameters,
+					item.michelineParameters,
+					item.michelsonParameters,
+					element.parent,
+				)
+			);
+		} catch (e: unknown) {
+			this.helper.logAllNestedErrors(e, true);
+			return [];
+		}
+	}
+
+	private async getSandboxChildren(element: SandboxTreeItem): Promise<SandboxChildrenTreeItem[]> {
+		const cached = this.sandboxStates[element.sandboxName];
+		if (!cached || cached.state !== 'running') {
+			return [];
+		}
+		const [accountsCount, contractsCount] = await Promise.all([
+			this.getAccountsCount(element),
+			this.getContractsCount(element),
+		]);
+		return [
+			new SandboxChildrenTreeItem('Implicit Accounts', accountsCount, element),
+			new SandboxChildrenTreeItem('Smart Contracts', contractsCount, element),
+			// new SandboxChildrenTreeItem('Operations', undefined, element),
+			// new SandboxChildrenTreeItem('Non-Empty Blocks', undefined, element),
+		];
+	}
+
+	private async getAccountsCount(element: SandboxTreeItem): Promise<number | undefined> {
+		const tzktBaseUrl = await this.getTzKtBaseUrl(element.sandboxName);
+		if (!tzktBaseUrl) {
+			return undefined;
+		}
+		try {
+			const sandboxAccounts = await this.tzktProviders[element.sandboxName].getAccounts();
+			return sandboxAccounts.length;
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return undefined;
+		}
+	}
+
+	private async getContractsCount(element: SandboxTreeItem): Promise<number | undefined> {
+		const tzktBaseUrl = await this.getTzKtBaseUrl(element.sandboxName);
+		if (!tzktBaseUrl) {
+			return undefined;
+		}
+		try {
+			const sandboxContracts = await this.tzktProviders[element.sandboxName].getContracts();
+			return sandboxContracts.length;
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return undefined;
+		}
+	}
+
+	private getSmartContractChildren(element: SandboxSmartContractTreeItem): SmartContractChildrenTreeItem[] {
+		return [
+			new SmartContractChildrenTreeItem('Entrypoints', element),
+			new SmartContractChildrenTreeItem('Operations', element),
+		];
+	}
+
+	private async getSandboxImplicitAccounts(
+		element: SandboxChildrenTreeItem,
+	): Promise<SandboxImplicitAccountTreeItem[]> {
+		const tzktBaseUrl = await this.getTzKtBaseUrl(element.parent.sandboxName);
+		if (!tzktBaseUrl) {
+			return [];
+		}
+		try {
+			const sandboxAccounts = await this.tzktProviders[element.parent.sandboxName].getAccounts();
+			return sandboxAccounts.map(contract =>
+				new SandboxImplicitAccountTreeItem(
+					contract.address,
+					contract.alias,
+					element.parent,
+				)
+			);
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return [];
+		}
+	}
+
+	private async getSandboxSmartContracts(element: SandboxChildrenTreeItem): Promise<SandboxSmartContractTreeItem[]> {
+		const containerName = element.parent.containerName;
+		if (!containerName) {
+			return [];
+		}
+		const sandboxName = element.parent.sandboxName;
+		const tzktBaseUrl = await this.getTzKtBaseUrl(sandboxName);
+		if (!tzktBaseUrl) {
+			return [];
+		}
+		try {
+			const sandboxContracts = await this.tzktProviders[sandboxName].getContracts();
+			return sandboxContracts.map(contract =>
+				new SandboxSmartContractTreeItem(
+					contract.address,
+					contract.alias,
+					containerName,
+					sandboxName,
+				)
+			);
+		} catch (e) {
+			this.helper.logAllNestedErrors(e, true);
+			return [];
+		}
+	}
+
+	private _onDidChangeTreeData = new vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void>();
+	readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
 	async updateSandboxInfo(): Promise<void> {
 		if (!this.sandboxTreeItems) {
@@ -198,162 +363,6 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			this.refreshItem(sandbox);
 		}
 	}
-
-	async getSmartContractEntrypoints(
-		element: SmartContractChildrenTreeItem,
-	): Promise<SmartContractEntrypointTreeItem[]> {
-		const containerName = element.parent.containerName;
-		if (!containerName) {
-			return [];
-		}
-		const tzktBaseUrl = this.sandboxStates[element.parent.sandboxName]?.getTzKtBaseUrl(element.parent.sandboxName);
-		if (!tzktBaseUrl) {
-			return [];
-		}
-		const response = await fetch(
-			`${tzktBaseUrl}/v1/contracts/${element.parent.address}/entrypoints?micheline=true&michelson=true`,
-		);
-		const data = await response.json();
-		this.helper.logHelper.showLog(OutputLevels.trace, JSON.stringify(data, null, 2));
-		return (data as any[]).map(item =>
-			new SmartContractEntrypointTreeItem(
-				item.name,
-				item.jsonParameters,
-				item.michelineParameters,
-				item.michelsonParameters,
-				element.parent,
-			)
-		);
-	}
-
-	private async getSandboxChildren(element: SandboxTreeItem): Promise<SandboxChildrenTreeItem[]> {
-		const cached = this.sandboxStates[element.sandboxName];
-		if (!cached || cached.state !== 'running') {
-			return [];
-		}
-		const [accountCount, contractCount] = await Promise.all([
-			this.getAccountCount(element),
-			this.getContractCount(element),
-		]);
-		return [
-			new SandboxChildrenTreeItem('Implicit Accounts', accountCount, element),
-			new SandboxChildrenTreeItem('Smart Contracts', contractCount, element),
-			// new SandboxChildrenTreeItem('Operations', undefined, element),
-			// new SandboxChildrenTreeItem('Non-Empty Blocks', undefined, element),
-		];
-	}
-
-	private async getAccountCount(element: SandboxTreeItem): Promise<number | undefined> {
-		const tzktBaseUrl = this.sandboxStates[element.sandboxName]?.getTzKtBaseUrl(element.sandboxName);
-		if (!tzktBaseUrl) {
-			return undefined;
-		}
-		try {
-			const response = await fetch(`${tzktBaseUrl}/v1/accounts/count?type.ne=contract`);
-			const data = await response.json();
-			return data as number;
-		} catch (e) {
-			this.helper.logAllNestedErrors(e, true);
-			return undefined;
-		}
-	}
-
-	private async getContractCount(element: SandboxTreeItem): Promise<number | undefined> {
-		const tzktBaseUrl = this.sandboxStates[element.sandboxName]?.getTzKtBaseUrl(element.sandboxName);
-		if (!tzktBaseUrl) {
-			return undefined;
-		}
-		try {
-			const response = await fetch(`${tzktBaseUrl}/v1/contracts/count`);
-			const data = await response.json();
-			// This assumes that the built-in contracts always exist on the chain. If not, the count will be off.
-			// The fix is to check existence of each of them
-			const ignoredContractCount = SandboxesDataProvider.builtInContracts.length;
-			return data as number - ignoredContractCount;
-		} catch (e) {
-			this.helper.logAllNestedErrors(e, true);
-			return undefined;
-		}
-	}
-
-	private getSmartContractChildren(element: SandboxSmartContractTreeItem): SmartContractChildrenTreeItem[] {
-		return [
-			new SmartContractChildrenTreeItem('Entrypoints', element),
-			new SmartContractChildrenTreeItem('Operations', element),
-		];
-	}
-
-	private async getSandboxImplicitAccounts(
-		element: SandboxChildrenTreeItem,
-	): Promise<SandboxImplicitAccountTreeItem[]> {
-		const tzktBaseUrl = this.sandboxStates[element.parent.sandboxName]?.getTzKtBaseUrl(element.parent.sandboxName);
-		if (!tzktBaseUrl) {
-			return [];
-		}
-		const response = await fetch(`${tzktBaseUrl}/v1/accounts?type.ne=contract`);
-		tzktBaseUrl;
-		const data = await response.json();
-		const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
-		const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
-			? []
-			: Object.keys(sandbox.accounts)?.map(key => ({ key, value: sandbox.accounts?.[key] }));
-		return (data as any[]).map(item => {
-			const alias = aliases.find(a =>
-				!!a.value && (typeof a.value === 'string' ? a.value === item.address : a.value.publicKeyHash === item.address)
-			);
-			return new SandboxImplicitAccountTreeItem(item.address, alias?.key ?? undefined, element.parent);
-		});
-	}
-
-	private async getSandboxSmartContracts(element: SandboxChildrenTreeItem): Promise<SandboxSmartContractTreeItem[]> {
-		const containerName = element.parent.containerName;
-		if (!containerName) {
-			return [];
-		}
-		const tzktBaseUrl = this.sandboxStates[element.parent.sandboxName]?.getTzKtBaseUrl(element.parent.sandboxName);
-		if (!tzktBaseUrl) {
-			return [];
-		}
-		const response = await fetch(`${tzktBaseUrl}/v1/contracts?limit=1000`);
-		const data = this.filterOutBuiltInContracts(await response.json() as any[]);
-
-		const sandbox = this.observableConfig.currentConfig.config?.config.sandbox?.[element.parent.sandboxName];
-		const aliases = (sandbox === undefined || typeof sandbox === 'string' || !sandbox.accounts)
-			? []
-			: Object.keys(sandbox.accounts)?.map(key => ({ key, value: sandbox.accounts?.[key] }));
-
-		return data.map(item => {
-			const alias = aliases.find(a =>
-				!!a.value && (typeof a.value === 'string' ? a.value === item.address : a.value.publicKeyHash === item.address)
-			);
-			return new SandboxSmartContractTreeItem(
-				item.address,
-				alias?.key ?? undefined,
-				item.type,
-				containerName,
-				element.parent.sandboxName,
-			);
-		});
-	}
-
-	static builtInContracts = [
-		'KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5',
-		'KT1AafHA1C1vk959wvHWBispY9Y2f3fxBUUo',
-		'KT1VqarPDicMFn1ejmQqqshUkUXTCTXwmkCN',
-	];
-
-	private filterOutBuiltInContracts(
-		data: { address: string; type: string; kind: string }[],
-	): { address: string; type: string; kind: string }[] {
-		return data.filter(item => SandboxesDataProvider.builtInContracts.indexOf(item.address) === -1);
-	}
-
-	private _onDidChangeTreeData: vscode.EventEmitter<SandboxTreeItemBase | undefined | null | void> = new vscode
-		.EventEmitter<
-		SandboxTreeItem | undefined | null | void
-	>();
-	readonly onDidChangeTreeData: vscode.Event<SandboxTreeItemBase | undefined | null | void> =
-		this._onDidChangeTreeData.event;
 
 	async getSandboxState(
 		sandBoxName: string,
@@ -394,5 +403,9 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 			clearInterval(this.refreshLevelInterval);
 		}
 		this._onDidChangeTreeData.fire();
+	}
+
+	private async getTzKtBaseUrl(sandboxName: string): Promise<string | undefined> {
+		return this.tzktProviders[sandboxName]?.findTzKtBaseUrl(sandboxName);
 	}
 }
