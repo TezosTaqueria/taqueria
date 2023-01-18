@@ -41,6 +41,21 @@ Plugin.create(i18n => ({
 			encoding: 'json',
 		}),
 		Task.create({
+			task: 'compile-all',
+			command: 'compile-all',
+			description:
+				'Compile all main smart contracts written in a LIGO syntax to Michelson code, along with their associated storage/parameter list files if they are found',
+			options: [
+				Option.create({
+					flag: 'json',
+					boolean: true,
+					description: 'Emit JSON-encoded Michelson',
+				}),
+			],
+			handler: 'proxy',
+			encoding: 'json',
+		}),
+		Task.create({
 			task: 'test',
 			command: 'test <sourceFile>',
 			description: 'Test a smart contract written in LIGO',

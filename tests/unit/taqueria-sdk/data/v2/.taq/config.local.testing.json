@@ -1,6 +1,6 @@
 {
 	"networkName": "ghostnet",
-	"aliases": {
+	"contracts": {
 		"hello-tacos": {
 			"address": "KT1LMNSCTCprDtuzAJ5GiAHNdC1r5q8qiZYc"
 		}
