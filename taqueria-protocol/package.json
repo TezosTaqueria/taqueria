@@ -37,19 +37,15 @@
 	"exports": {
 		".": "./index.js",
 		"./*": {
-			"import": "./*.mjs",
-			"default": "./*.js"
-		},
-		"./*.js": {
-			"import": "./*.mjs",
+			"import": "./*.js",
 			"default": "./*.js"
 		},
 		"./out/**/*": {
-			"import": "./*.mjs",
+			"import": "./*.js",
 			"default": "./*.js"
 		},
 		"./out/examples/*": {
-			"import": "./*.mjs",
+			"import": "./*.js",
 			"default": "./*.js"
 		}
 	},
