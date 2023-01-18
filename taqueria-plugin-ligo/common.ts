@@ -31,7 +31,10 @@ const LIGO_IMAGE_ENV_VAR = 'TAQ_LIGO_IMAGE';
 
 export const getLigoDockerImage = (): string => getDockerImage(LIGO_DEFAULT_IMAGE, LIGO_IMAGE_ENV_VAR);
 
-export const getInputFilename = (parsedArgs: UnionOpts, sourceFile: string): string =>
+export const getInputFilenameAbsPath = (parsedArgs: UnionOpts, sourceFile: string): string =>
+	join(parsedArgs.config.projectDir, parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
+
+export const getInputFilenameRelPath = (parsedArgs: UnionOpts, sourceFile: string): string =>
 	join(parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
 
 export const emitExternalError = (err: unknown, sourceFile: string): void => {

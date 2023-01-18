@@ -1,19 +1,20 @@
 import { sendErr, sendJsonRes } from '@taqueria/node-sdk';
 import glob from 'fast-glob';
 import { readFile } from 'fs/promises';
-import { CompileAllOpts as Opts, CompileOpts, getInputFilename } from './common';
+import { join } from 'path';
+import { CompileAllOpts as Opts, CompileOpts, getInputFilenameAbsPath } from './common';
 import { compileContractWithStorageAndParameter, TableRow } from './compile';
 
 const isMainContract = (parsedArgs: Opts, contactFilename: string): Promise<boolean> =>
-	readFile(getInputFilename(parsedArgs, contactFilename), 'utf8')
+	readFile(getInputFilenameAbsPath(parsedArgs, contactFilename), 'utf8')
 		.then(data => /(const|let|function)\s+main/.test(data));
 
 const compileAll = async (parsedArgs: Opts): Promise<void> => {
 	let p: Promise<TableRow[]>[] = [];
 
 	const contractFilenames = await glob(
-		['**/*.ligo', '**/*.mligo', '**/*.jsligo'],
-		{ cwd: parsedArgs.config.contractsDir, absolute: false },
+		['**/*.ligo', '**/*.religo', '**/*.mligo', '**/*.jsligo'],
+		{ cwd: join(parsedArgs.config.projectDir, parsedArgs.config.contractsDir ?? 'contracts'), absolute: false },
 	);
 
 	for (const filename of contractFilenames) {

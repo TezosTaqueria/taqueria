@@ -1,7 +1,13 @@
 import { execCmd, getArch, getArtifactsDir, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-import { CompileOpts as Opts, emitExternalError, getInputFilename, getLigoDockerImage } from './common';
+import {
+	CompileOpts as Opts,
+	emitExternalError,
+	getInputFilenameAbsPath,
+	getInputFilenameRelPath,
+	getLigoDockerImage,
+} from './common';
 
 export type TableRow = { contract: string; artifact: string };
 
@@ -67,7 +73,7 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 	if (!projectDir) throw `No project directory provided`;
 	const baseCmd =
 		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile contract`;
-	const inputFile = getInputFilename(parsedArgs, sourceFile);
+	const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputContractFilename(parsedArgs, sourceFile)}`;
 	const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
 	const cmd = `${baseCmd} ${inputFile} ${outputFile} ${flags}`;
@@ -80,7 +86,7 @@ const getCompileExprCmd = (parsedArgs: Opts, sourceFile: string, exprKind: ExprK
 	const compilerType = isStorageKind(exprKind) ? 'storage' : 'parameter';
 	const baseCmd =
 		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile ${compilerType}`;
-	const inputFile = getInputFilename(parsedArgs, sourceFile);
+	const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputExprFilename(parsedArgs, sourceFile, exprKind, exprName)}`;
 	const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
 	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile} ${flags}`;
@@ -127,7 +133,7 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 			});
 
 const getExprNames = (parsedArgs: Opts, sourceFile: string): Promise<string[]> =>
-	readFile(getInputFilename(parsedArgs, sourceFile), 'utf8')
+	readFile(getInputFilenameAbsPath(parsedArgs, sourceFile), 'utf8')
 		.then(data => data.match(/(?<=\n\s*(let|const)\s+)[a-zA-Z0-9_]+/g) ?? []);
 
 const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind): Promise<TableRow[]> =>
@@ -154,7 +160,7 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 // TODO: Just for backwards compatibility. Can be deleted in the future.
 const tryLegacyStorageNamingConvention = (parsedArgs: Opts, sourceFile: string) => {
 	const storageListFile = `${removeExt(sourceFile)}.storages${extractExt(sourceFile)}`;
-	const storageListFilename = getInputFilename(parsedArgs, storageListFile);
+	const storageListFilename = getInputFilenameAbsPath(parsedArgs, storageListFile);
 	return access(storageListFilename).then(() => {
 		sendWarn(
 			`Warning: The naming convention of "<CONTRACT>.storages.<EXTENSION>" is deprecated and renamed to "<CONTRACT>.storageList.<EXTENSION>". Please adjust your storage file names accordingly\n`,
@@ -166,7 +172,7 @@ const tryLegacyStorageNamingConvention = (parsedArgs: Opts, sourceFile: string) 
 // TODO: Just for backwards compatibility. Can be deleted in the future.
 const tryLegacyParameterNamingConvention = (parsedArgs: Opts, sourceFile: string) => {
 	const parameterListFile = `${removeExt(sourceFile)}.parameters${extractExt(sourceFile)}`;
-	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
+	const parameterListFilename = getInputFilenameAbsPath(parsedArgs, parameterListFile);
 	return access(parameterListFilename).then(() => {
 		sendWarn(
 			`Warning: The naming convention of "<CONTRACT>.parameters.<EXTENSION>" is deprecated and renamed to "<CONTRACT>.parameterList.<EXTENSION>". Please adjust your parameter file names accordingly\n`,
@@ -214,7 +220,7 @@ export const compileContractWithStorageAndParameter = async (
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
 
 	const storageListFile = `${removeExt(sourceFile)}.storageList${extractExt(sourceFile)}`;
-	const storageListFilename = getInputFilename(parsedArgs, storageListFile);
+	const storageListFilename = getInputFilenameAbsPath(parsedArgs, storageListFile);
 	const storageCompileResult = await (access(storageListFilename)
 		.then(() => compileExprs(parsedArgs, storageListFile, 'storage'))
 		.catch(() => tryLegacyStorageNamingConvention(parsedArgs, sourceFile))
@@ -222,11 +228,11 @@ export const compileContractWithStorageAndParameter = async (
 			sendWarn(
 				`Note: storage file associated with "${sourceFile}" can't be found, so "${storageListFile}" has been created for you. Use this file to define all initial storage values for this contract\n`,
 			);
-			writeFile(join(parsedArgs.config.projectDir, storageListFilename), initContentForStorage(sourceFile), 'utf8');
+			writeFile(storageListFilename, initContentForStorage(sourceFile), 'utf8');
 		}));
 
 	const parameterListFile = `${removeExt(sourceFile)}.parameterList${extractExt(sourceFile)}`;
-	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
+	const parameterListFilename = getInputFilenameAbsPath(parsedArgs, parameterListFile);
 	const parameterCompileResult = await (access(parameterListFilename)
 		.then(() => compileExprs(parsedArgs, parameterListFile, 'parameter'))
 		.catch(() => tryLegacyParameterNamingConvention(parsedArgs, sourceFile))
@@ -234,7 +240,7 @@ export const compileContractWithStorageAndParameter = async (
 			sendWarn(
 				`Note: parameter file associated with "${sourceFile}" can't be found, so "${parameterListFile}" has been created for you. Use this file to define all parameter values for this contract\n`,
 			);
-			writeFile(join(parsedArgs.config.projectDir, parameterListFilename), initContentForParameter(sourceFile), 'utf8');
+			writeFile(parameterListFilename, initContentForParameter(sourceFile), 'utf8');
 		}));
 
 	let compileResults: TableRow[] = [contractCompileResult];

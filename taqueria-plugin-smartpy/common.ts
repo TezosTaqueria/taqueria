@@ -77,10 +77,10 @@ const removeExt = (path: string): string => {
 };
 
 export const getInputFilename = (parsedArgs: UnionOpts, sourceFile: string): string =>
-	join(getContractsDir(parsedArgs), sourceFile);
+	join(parsedArgs.config.projectDir, getContractsDir(parsedArgs), sourceFile);
 
 export const getCompilationTargetsDirname = (parsedArgs: UnionOpts, sourceFile: string): string =>
-	join(getArtifactsDir(parsedArgs), SMARTPY_ARTIFACTS_DIR, removeExt(sourceFile));
+	join(parsedArgs.config.projectDir, getArtifactsDir(parsedArgs), SMARTPY_ARTIFACTS_DIR, removeExt(sourceFile));
 
 export const installSmartPyCliIfNotExist = () =>
 	access(getSmartPyCli())
