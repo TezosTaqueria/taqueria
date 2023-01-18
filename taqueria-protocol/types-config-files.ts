@@ -118,9 +118,11 @@ const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV1): Con
 					type: v.sandboxes.length ? `flextesa` : `simple`,
 					// Unknown fields
 					...((() => {
-						const vClone = { ...v } as Partial<typeof v>;
+						const vClone = { ...v } as Partial<typeof v> & ConfigEnvironmentFileV2['contracts'];
 						delete vClone.networks;
 						delete vClone.sandboxes;
+						delete vClone.aliases;
+						if (v.aliases) vClone.contracts = v.aliases;
 						return vClone;
 					})()),
 					// Preserve sandbox or network name
@@ -248,6 +250,7 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 
 // FileV2 to Object
 export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config => {
+	debugger;
 	const {
 		config: configFileV2,
 		environments: environmentFilesV2,
@@ -291,6 +294,7 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 			delete vClone.rpcUrl;
 			delete vClone.storage;
 			delete vClone.aliases;
+			delete vClone.contracts;
 			return vClone;
 		})());
 
