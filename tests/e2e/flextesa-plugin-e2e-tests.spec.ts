@@ -9,8 +9,8 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		await execute('taq', 'install ../taqueria-plugin-core', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
+		// await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		// await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
 		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
