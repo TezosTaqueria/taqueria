@@ -226,6 +226,17 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 				}
 			}
 
+			if (k == 'aliases') {
+				eLocal['contracts'] = Object.entries(eLocal[key] ?? {}).reduce(
+					(retval, [key, value]) => ({
+						...retval,
+						[key]: value,
+					}),
+					{},
+				);
+				delete eLocal[key];
+			}
+
 			// Remove from main by default
 			delete eMain[key];
 		}
@@ -236,7 +247,7 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 };
 
 // FileV2 to Object
-const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config => {
+export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config => {
 	const {
 		config: configFileV2,
 		environments: environmentFilesV2,
@@ -319,7 +330,7 @@ const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config
 				],
 				// Known environment fields
 				storage: x.value.storage,
-				aliases: x.value.aliases,
+				aliases: x.value.contracts,
 				// Unknown fields might need to be in the environment
 				...getUnknownFields(x, 'environment'),
 			}])),
