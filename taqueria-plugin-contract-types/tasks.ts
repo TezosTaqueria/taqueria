@@ -30,9 +30,17 @@ const generateContractTypes = (parsedArgs: Opts) =>
 		return `${contractFilename}: Types generated`;
 	};
 
+const isContractFile = (filename: string): boolean => {
+	return !filename.includes('.default_storage.')
+		&& !filename.includes('.storage.')
+		&& !filename.includes('.parameter.')
+		&& !filename.includes('.expression.');
+};
+
 const generateContractTypesAll = async (parsedArgs: Opts): Promise<string[]> => {
 	const files = await glob('**/*.tz', { cwd: parsedArgs.config.artifactsDir });
-	return await Promise.all(files.map(generateContractTypes(parsedArgs)));
+	const contractFiles = files.filter(isContractFile);
+	return await Promise.all(contractFiles.map(generateContractTypes(parsedArgs)));
 };
 
 export const generateTypes = (parsedArgs: Opts) => {
