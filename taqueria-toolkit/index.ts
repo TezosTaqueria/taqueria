@@ -61,7 +61,6 @@ const V1 = () => {
 	};
 
 	const getAliasAddress = (config: any, alias: string): string => {
-		debugger;
 		const currentEnv = getCurrentEnv(config);
 		if (currentEnv?.aliases?.[alias]?.address) return currentEnv.aliases[alias].address;
 		alert(`Address for alias, ${alias}, is missing. Please deploy a contract with such alias`);
@@ -81,7 +80,6 @@ export const isTaqError = (err: unknown): err is TaqError =>
 	typeof err === 'object' && (err as object).hasOwnProperty('isTaqError');
 
 export const loadFromEnv = (env: Record<string, string | undefined>, prefix = 'REACT_APP_') => {
-	debugger;
 	const getConfigEnvKey = () => `${prefix}TAQ_CONFIG`;
 
 	const getConfig = () => {
