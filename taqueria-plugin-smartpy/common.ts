@@ -8,13 +8,17 @@ export interface CompileOpts extends ProxyTaskArgs.t {
 	json: boolean;
 }
 
+export interface CompileAllOpts extends ProxyTaskArgs.t {
+	json: boolean;
+}
+
 export interface TestOpts extends ProxyTaskArgs.t {
 	sourceFile: string;
 }
 
-export type IntersectionOpts = CompileOpts & TestOpts;
+export type IntersectionOpts = CompileOpts & CompileAllOpts & TestOpts;
 
-type UnionOpts = CompileOpts | TestOpts;
+type UnionOpts = CompileOpts | CompileAllOpts | TestOpts;
 
 // Should point to the latest stable version, so it needs to be updated as part of our release process.
 const SMARTPY_DEFAULT_VERSION = 'v0.16.0';
