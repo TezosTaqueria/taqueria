@@ -51,6 +51,16 @@ Expression compilation targets in SmartPy produce only the expression Michelson 
 
 The `--json` flag will make the task emit JSON-encoded Michelson instead of pure Michelson `.tz`
 
+## The `taq compile-all` Task
+
+Basic usage is:
+
+```shell
+taq compile-all
+```
+
+It works just like the `compile` task but it compiles all contracts with at least one SmartPy compilation target.
+
 ## The `taq test` Task
 
 Basic usage is:

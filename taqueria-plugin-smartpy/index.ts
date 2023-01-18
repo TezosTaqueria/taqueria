@@ -23,6 +23,21 @@ Plugin.create(i18n => ({
 			],
 		}),
 		Task.create({
+			task: 'compile-all',
+			command: 'compile-all',
+			description:
+				'Compile all SmartPy smart contracts with at least one SmartPy compilation target to Michelson code, along with their associated storage values, per compilation targets, and some expressions per expression compilation targets',
+			handler: 'proxy',
+			encoding: 'json',
+			options: [
+				Option.create({
+					flag: 'json',
+					boolean: true,
+					description: 'Emit JSON-encoded Michelson',
+				}),
+			],
+		}),
+		Task.create({
 			task: 'test',
 			command: 'test <sourceFile>',
 			description: 'Test a smart contract written in SmartPy',

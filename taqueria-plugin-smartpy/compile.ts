@@ -11,7 +11,7 @@ import {
 	installSmartPyCliIfNotExist,
 } from './common';
 
-type TableRow = { contract: string; artifact: string };
+export type TableRow = { contract: string; artifact: string };
 
 const COMPILE_ERR_MSG: string = 'Not compiled';
 
@@ -187,12 +187,13 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 			};
 		});
 
-const compile = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = addPyExtensionIfMissing(parsedArgs.sourceFile);
-	return compileContract(parsedArgs, sourceFile)
+export const compileOneContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
+	compileContract(parsedArgs, sourceFile);
+
+const compile = (parsedArgs: Opts): Promise<void> =>
+	compileOneContract(parsedArgs, addPyExtensionIfMissing(parsedArgs.sourceFile))
 		.then(result => [result])
 		.then(sendJsonRes)
 		.catch(err => sendAsyncErr(err, false));
-};
 
 export default compile;
