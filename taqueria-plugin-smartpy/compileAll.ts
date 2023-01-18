@@ -2,7 +2,7 @@ import { sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
 import glob from 'fast-glob';
 import { readFile } from 'fs/promises';
 import { CompileAllOpts as Opts, CompileOpts, getInputFilename } from './common';
-import { compileOneContract, TableRow } from './compile';
+import { compileContract, TableRow } from './compile';
 
 const contractHasCompTarget = (parsedArgs: Opts, contactFilename: string): Promise<boolean> =>
 	readFile(getInputFilename(parsedArgs, contactFilename), 'utf8')
@@ -18,7 +18,7 @@ const compileAll = async (parsedArgs: Opts): Promise<void> => {
 
 	for (const filename of contractFilenames) {
 		if (await contractHasCompTarget(parsedArgs, filename)) {
-			p.push(compileOneContract(parsedArgs as CompileOpts, filename));
+			p.push(compileContract(parsedArgs as CompileOpts, filename));
 		}
 	}
 

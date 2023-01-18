@@ -165,7 +165,7 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 	return `${getSmartPyCli()} compile ${getInputFilename(parsedArgs, sourceFile)} ${outputDir} ${booleanFlags}`;
 };
 
-const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
+export const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
 	getArch()
 		.then(() => installSmartPyCliIfNotExist())
 		.then(() => getCompileContractCmd(parsedArgs, sourceFile))
@@ -187,11 +187,8 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 			};
 		});
 
-export const compileOneContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
-	compileContract(parsedArgs, sourceFile);
-
 const compile = (parsedArgs: Opts): Promise<void> =>
-	compileOneContract(parsedArgs, addPyExtensionIfMissing(parsedArgs.sourceFile))
+	compileContract(parsedArgs, addPyExtensionIfMissing(parsedArgs.sourceFile))
 		.then(result => [result])
 		.then(sendJsonRes)
 		.catch(err => sendAsyncErr(err, false));

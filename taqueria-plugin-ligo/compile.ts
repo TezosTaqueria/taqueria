@@ -206,7 +206,10 @@ const initContentForParameter = (sourceFile: string): string => {
 	return linkToContract + instruction + syntax;
 };
 
-const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
+export const compileContractWithStorageAndParameter = async (
+	parsedArgs: Opts,
+	sourceFile: string,
+): Promise<TableRow[]> => {
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile);
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
 
@@ -272,7 +275,8 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 		}];
 	};
 
-export const compileOneContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
+const compile = (parsedArgs: Opts): Promise<void> => {
+	const sourceFile = parsedArgs.sourceFile!;
 	let p: Promise<TableRow[]>;
 	if (isStorageListFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'storage');
 	else if (isParameterListFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'parameter');
@@ -282,12 +286,8 @@ export const compileOneContract = (parsedArgs: Opts, sourceFile: string): Promis
 			`${sourceFile} doesn't have a valid LIGO extension ('.ligo', '.religo', '.mligo' or '.jsligo')`,
 		);
 	}
-	return p;
+	return p.then(sendJsonRes).catch(err => sendErr(err, false));
 };
-
-const compile = (parsedArgs: Opts): Promise<void> =>
-	compileOneContract(parsedArgs, parsedArgs.sourceFile)
-		.then(sendJsonRes).catch(err => sendErr(err, false));
 
 export default compile;
 export const ___TEST___ = {
