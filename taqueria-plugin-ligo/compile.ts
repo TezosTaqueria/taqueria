@@ -3,7 +3,7 @@ import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import { CompileOpts as Opts, emitExternalError, getInputFilename, getLigoDockerImage } from './common';
 
-type TableRow = { contract: string; artifact: string };
+export type TableRow = { contract: string; artifact: string };
 
 export type ExprKind = 'storage' | 'default_storage' | 'parameter';
 
@@ -206,7 +206,10 @@ const initContentForParameter = (sourceFile: string): string => {
 	return linkToContract + instruction + syntax;
 };
 
-const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
+export const compileContractWithStorageAndParameter = async (
+	parsedArgs: Opts,
+	sourceFile: string,
+): Promise<TableRow[]> => {
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile);
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
 

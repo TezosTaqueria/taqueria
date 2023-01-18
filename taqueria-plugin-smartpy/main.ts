@@ -1,6 +1,7 @@
 import { RequestArgs, sendAsyncErr } from '@taqueria/node-sdk';
 import { IntersectionOpts as Opts } from './common';
 import compile from './compile';
+import compileAll from './compileAll';
 import test from './test';
 
 const main = (parsedArgs: RequestArgs.t): Promise<void> => {
@@ -8,6 +9,8 @@ const main = (parsedArgs: RequestArgs.t): Promise<void> => {
 	switch (unsafeArgs.task) {
 		case 'compile':
 			return compile(unsafeArgs);
+		case 'compile-all':
+			return compileAll(unsafeArgs);
 		case 'test':
 			return test(unsafeArgs);
 		default:
