@@ -3,7 +3,7 @@ import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import { CompileOpts as Opts, emitExternalError, getInputFilename, getLigoDockerImage } from './common';
 
-type TableRow = { contract: string; artifact: string };
+export type TableRow = { contract: string; artifact: string };
 
 export type ExprKind = 'storage' | 'default_storage' | 'parameter';
 
@@ -272,8 +272,7 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 		}];
 	};
 
-const compile = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = parsedArgs.sourceFile!;
+export const compileOneContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
 	let p: Promise<TableRow[]>;
 	if (isStorageListFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'storage');
 	else if (isParameterListFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'parameter');
@@ -283,8 +282,12 @@ const compile = (parsedArgs: Opts): Promise<void> => {
 			`${sourceFile} doesn't have a valid LIGO extension ('.ligo', '.religo', '.mligo' or '.jsligo')`,
 		);
 	}
-	return p.then(sendJsonRes).catch(err => sendErr(err, false));
+	return p;
 };
+
+const compile = (parsedArgs: Opts): Promise<void> =>
+	compileOneContract(parsedArgs, parsedArgs.sourceFile)
+		.then(sendJsonRes).catch(err => sendErr(err, false));
 
 export default compile;
 export const ___TEST___ = {

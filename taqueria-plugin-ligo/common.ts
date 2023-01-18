@@ -11,14 +11,18 @@ export interface CompileOpts extends ProxyTaskArgs.t {
 	json: boolean;
 }
 
+export interface CompileAllOpts extends ProxyTaskArgs.t {
+	json: boolean;
+}
+
 export interface TestOpts extends RequestArgs.t {
 	task?: string;
 	sourceFile?: string;
 }
 
-export type IntersectionOpts = LigoOpts & CompileOpts & TestOpts;
+export type IntersectionOpts = LigoOpts & CompileOpts & CompileAllOpts & TestOpts;
 
-type UnionOpts = LigoOpts | CompileOpts | TestOpts;
+type UnionOpts = LigoOpts | CompileOpts | CompileAllOpts | TestOpts;
 
 // Should point to the latest stable version, so it needs to be updated as part of our release process.
 const LIGO_DEFAULT_IMAGE = 'ligolang/ligo:0.57.0';

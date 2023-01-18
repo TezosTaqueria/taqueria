@@ -55,6 +55,16 @@ Lastly, `taq compile hello.mligo` will compile `hello.mligo` and emit `hello.tz`
 
 The `--json` flag will make the task emit JSON-encoded Michelson instead of pure Michelson `.tz`
 
+## The `taq compile-all` Task
+
+Basic usage is:
+
+```shell
+taq compile-all
+```
+
+It works just like the `compile` task but it compiles all main contracts, a.k.a contracts with a `main` function.
+
 ## The `taq test` Task
 
 Basic usage is:
