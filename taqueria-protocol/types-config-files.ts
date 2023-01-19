@@ -250,7 +250,6 @@ const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 
 // FileV2 to Object
 export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config => {
-	debugger;
 	const {
 		config: configFileV2,
 		environments: environmentFilesV2,
