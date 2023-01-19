@@ -126,7 +126,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_one);
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/integerParameter10.tz`)).stdout;
 		await writeFile('./test-project/artifacts/integerParameter10.tz', artifact_two);
-		const artifact_three = await (await exec(`cat e2e/data/michelson-data/anyContract.storage.tz`)).stdout;
+		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
 		const { stdout: stdout1, stderr } = await execute(
@@ -149,7 +149,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/integerParameter10.tz`)).stdout;
 		await writeFile('./test-project/artifacts/integerParameter10.tz', artifact_two);
-		const artifact_three = await (await exec(`cat e2e/data/michelson-data/anyContract.storage.tz`)).stdout;
+		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
 		const { stdout: stdout1 } = await execute(
@@ -173,7 +173,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_one);
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/integerParameter15.tz`)).stdout;
 		await writeFile('./test-project/artifacts/integerParameter15.tz', artifact_two);
-		const artifact_three = await (await exec(`cat e2e/data/michelson-data/anyContract.storage.tz`)).stdout;
+		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
 		const { stderr } = await execute(
@@ -197,7 +197,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_one);
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/stringParameter.tz`)).stdout;
 		await writeFile('./test-project/artifacts/stringParameter.tz', artifact_two);
-		const artifact_three = await (await exec(`cat e2e/data/michelson-data/anyContract.storage.tz`)).stdout;
+		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
 		const { stderr } = await execute(
@@ -221,7 +221,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_one);
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/listParameter.tz`)).stdout;
 		await writeFile('./test-project/artifacts/listParameter.tz', artifact_two);
-		const artifact_three = await (await exec(`cat e2e/data/michelson-data/anyContract.storage.tz`)).stdout;
+		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
 		const { stderr } = await execute(
@@ -247,7 +247,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_one);
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/mapParameter.tz`)).stdout;
 		await writeFile('./test-project/artifacts/mapParameter.tz', artifact_two);
-		const artifact_three = await (await exec(`cat e2e/data/michelson-data/anyContract.storage.tz`)).stdout;
+		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
 		const { stderr } = await execute(
@@ -298,7 +298,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/artifacts/increment.tz', artifact_one);
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/incrementBy3.tz`)).stdout;
 		await writeFile('./test-project/artifacts/incrementBy3.tz', artifact_two);
-		const artifact_three = await (await exec(`cat e2e/data/michelson-data/anyContract.storage.tz`)).stdout;
+		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
 		const { stdout: stdout1 } = await execute(
@@ -323,7 +323,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/artifacts/increment.tz', artifact_one);
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/integerParameter10.tz`)).stdout;
 		await writeFile('./test-project/artifacts/integerParameter10.tz', artifact_two);
-		const artifact_three = await (await exec(`cat e2e/data/michelson-data/anyContract.storage.tz`)).stdout;
+		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
 		const { stdout: stdout1, stderr } = await execute(
