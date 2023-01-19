@@ -29,8 +29,12 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/contracts/hello-tacos.py', py_file);
 
 		const { stdout } = await execute('taq', 'compile hello-tacos.py', './test-project');
-		expect(stdout).toEqual(expect.arrayContaining(['│ hello-tacos.py │ artifacts/hello-tacos.tz                 │']));
-		expect(stdout).toEqual(expect.arrayContaining(['│                │ artifacts/hello-tacos.default_storage.tz │']));
+		expect(stdout).toEqual(
+			expect.arrayContaining(['│ hello-tacos.py │ {{base}}/test-project/artifacts/hello-tacos.tz                 │']),
+		);
+		expect(stdout).toEqual(
+			expect.arrayContaining(['│                │ {{base}}/test-project/artifacts/hello-tacos.default_storage.tz │']),
+		);
 
 		await exists(`./test-project/artifacts/hello-tacos.tz`);
 		await exists(`./test-project/artifacts/hello-tacos.default_storage.tz`);
