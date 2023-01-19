@@ -1,15 +1,6 @@
 {
 	"language": "en",
-	"plugins": [
-		{
-			"type": "npm",
-			"name": "@taqueria/plugin-core"
-		},
-		{
-			"type": "npm",
-			"name": "@taqueria/plugin-flextesa"
-		}
-	],
+	"plugins": [],
 	"contractsDir": "contracts",
 	"artifactsDir": "artifacts",
 	"network": {
