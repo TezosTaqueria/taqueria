@@ -13,17 +13,16 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 		const { execute, spawn, cleanup, writeFile, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
-		expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
+		const test_config_file = await (await exec('cat e2e/data/config-taquito-test-environment-low-tez.json')).stdout;
+		await writeFile('./test-project/.taq/config.json', test_config_file);
+		// const { stdout } = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		// expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 		const { stdout: stdout1 } = await execute(
 			'taq',
 			'install ../taqueria-plugin-taquito',
 			'./test-project',
 		);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
-
-		const test_config_file = await (await exec('cat e2e/data/config-taquito-test-environment-low-tez.json')).stdout;
-		await writeFile('./test-project/.taq/config.json', test_config_file);
 
 		const { stdout: stdout2 } = await execute('taq', 'instantiate-account -e testing', './test-project');
 		expect(stdout2).toContain('Please execute "taq fund" targeting the same environment to fund these accounts');
@@ -33,7 +32,7 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 		expect(json).toBeInstanceOf(Object);
 		expect(json).toHaveProperty('accounts');
 
-		const { stdout: stdout3, stderr } = await execute('taq', 'fund -e testing', './test-project');
+		const { stdout: stdout3 } = await execute('taq', 'fund -e testing', './test-project');
 		expect(stdout3).toEqual(
 			expect.arrayContaining(['│ Account Alias │ Account Address                      │ Mutez Funded │']),
 		);
@@ -46,17 +45,16 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
-		expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
+		const test_config_file = await (await exec('cat e2e/data/config-taquito-test-environment-low-tez.json')).stdout;
+		await writeFile('./test-project/.taq/config.json', test_config_file);
+		// const { stdout } = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
+		// expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 		const { stdout: stdout1 } = await execute(
 			'taq',
 			'install ../taqueria-plugin-taquito',
 			'./test-project',
 		);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
-
-		const test_config_file = await (await exec('cat e2e/data/config-taquito-test-environment-low-tez.json')).stdout;
-		await writeFile('./test-project/.taq/config.json', test_config_file);
 
 		const { stdout: stdout2 } = await execute('taq', 'instantiate-account -e testing', './test-project');
 		expect(stdout2).toContain('Accounts instantiated: bob, alice, john, jane, joe.');
