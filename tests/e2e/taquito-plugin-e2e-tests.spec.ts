@@ -269,38 +269,4 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 
 		await cleanup();
 	});
-
-	test.skip(/* No longer possible to have missing network in config */ 'deploy will error if an invalid network name is in the environment configuration', async () => {
-		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
-		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
-		expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
-		const { stdout: stdout1 } = await execute(
-			'taq',
-			'install ../taqueria-plugin-taquito',
-			'./test-project',
-		);
-		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
-
-		const test_config_file =
-			await (await exec('cat e2e/data/config-data/config-taquito-test-environment-invalid-config-networkname.json'))
-				.stdout;
-		await writeFile('./test-project/.taq/config.json', test_config_file);
-
-		const tz_file = await (await exec('cat e2e/data/michelson-data/hello-tacos.tz')).stdout;
-		await writeFile('./test-project/.taq/artifacts/hello-tacos.tz', tz_file);
-
-		const { stderr } = await execute(
-			'taq',
-			'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
-			'./test-project',
-		);
-		expect(stderr).toContain(
-			"The current environment is configured to use a network called 'ghost'; however, no network of this name has been configured in .taq/config.json",
-		);
-		expect(stderr).toContain('No operations performed');
-
-		await cleanup();
-	});
 });
