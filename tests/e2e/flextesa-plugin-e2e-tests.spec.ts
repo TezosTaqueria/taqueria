@@ -2,7 +2,6 @@ import { exec as exec1 } from 'child_process';
 import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
-import { readFile } from 'fs';
 
 describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 	test('start and stop will work with a custom name sandbox - slowtest', async () => {

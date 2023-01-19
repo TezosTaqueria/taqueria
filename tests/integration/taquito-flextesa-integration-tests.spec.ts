@@ -17,18 +17,20 @@ const addressRegex = /tz1[A-Za-z0-9]{7,}/g;
 const amountRegex = /[0-9]{4,} ꜩ/g;
 
 describe('E2E Testing for taqueria taquito plugin', () => {
+	jest.setTimeout(120000);
+
 	beforeAll(async () => {
 		await fsPromises.rm(taqueriaProjectPath, { recursive: true, force: true });
 		await generateTestProject(taqueriaProjectPath, ['taquito', 'flextesa']);
 		await exec(
-			`cp e2e/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
+			`cp integration/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
 		);
 
 		const started = await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
 	});
 
 	beforeEach(async () => {
-		await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp integration/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
 	});
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
@@ -37,7 +39,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		await sleep(20000);
 		environment = 'development';
 
-		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp integration/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
 		// 1. Run taq deploy on a selected test network described in "test" environment
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
@@ -69,7 +71,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		await sleep(20000);
 		environment = 'development';
 
-		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp integration/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
 
 		// 1. Run taq deploy ${contractName} on a selected test network described in "test" environment
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
@@ -176,9 +178,9 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		environment = 'development';
 
 		// 2. Copy contract and parameters files in contract directory
-		await exec(`cp e2e/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
-		await exec(`cp e2e/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
-		await exec(`cp e2e/data/hello-tacos.parameter.decrement_by_1.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp integration/data/hello-tacos.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp integration/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
+		await exec(`cp integration/data/hello-tacos.parameter.decrement_by_1.tz ${taqueriaProjectPath}/artifacts/`);
 
 		// 4. Run taq deploy ${contractName} on a selected test network described in "test" environment
 		const deployCommand = await exec(`taq deploy hello-tacos.tz --storage anyContract.storage.tz -e ${environment}`, {
