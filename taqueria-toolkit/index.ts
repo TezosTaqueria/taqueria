@@ -91,7 +91,9 @@ export const getConfigAsV1 = (env: Record<string, string | undefined>, prefix = 
 	} catch (err) {
 		throw isTaqError(err)
 			? err
-			: new TaqError('todo'); // TODO
+			: new TaqError(
+				`Something went wrong trying to parse your configuration. Please report this to the Taqueria Developers: ${err}`,
+			);
 	}
 };
 
@@ -127,7 +129,9 @@ export function getConfigV2(
 	} catch (err) {
 		throw isTaqError(err)
 			? err
-			: new TaqError('todo'); // TODO
+			: new TaqError(
+				`Something went wrong trying to parse your configuration. Please report this to the Taqueria Developers: ${err}`,
+			);
 	}
 }
 
