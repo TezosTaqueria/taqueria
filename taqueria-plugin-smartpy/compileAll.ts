@@ -1,6 +1,7 @@
-import { sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
+import { getContractsDir, sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
 import glob from 'fast-glob';
 import { readFile } from 'fs/promises';
+import { join } from 'path';
 import { CompileAllOpts as Opts, CompileOpts, getInputFilename } from './common';
 import { compileContract, TableRow } from './compile';
 
@@ -13,7 +14,7 @@ const compileAll = async (parsedArgs: Opts): Promise<void> => {
 
 	const contractFilenames = await glob(
 		['**/*.py'],
-		{ cwd: parsedArgs.config.contractsDir, absolute: false },
+		{ cwd: join(parsedArgs.config.projectDir, getContractsDir(parsedArgs)), absolute: false },
 	);
 
 	for (const filename of contractFilenames) {

@@ -20,7 +20,7 @@ const isOutputFormatJSON = (parsedArgs: Opts): boolean => parsedArgs.json;
 const getOutputContractFilename = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
 	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
-	return join(getArtifactsDir(parsedArgs), `${outputFile}${ext}`);
+	return join(parsedArgs.config.projectDir, getArtifactsDir(parsedArgs), `${outputFile}${ext}`);
 };
 
 const getOutputStorageFilename = (
@@ -34,14 +34,14 @@ const getOutputStorageFilename = (
 	const storageName = isDefaultStorage
 		? `${outputFile}.default_storage${ext}`
 		: `${outputFile}.storage.${compilationTargetName}${ext}`;
-	return join(getArtifactsDir(parsedArgs), storageName);
+	return join(parsedArgs.config.projectDir, getArtifactsDir(parsedArgs), storageName);
 };
 
 const getOutputExprFilename = (parsedArgs: Opts, sourceFile: string, compilationTargetName: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
 	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
 	const exprName = `${outputFile}.expression.${compilationTargetName}${ext}`;
-	return join(getArtifactsDir(parsedArgs), exprName);
+	return join(parsedArgs.config.projectDir, getArtifactsDir(parsedArgs), exprName);
 };
 
 const getCompilationTargetNames = (
