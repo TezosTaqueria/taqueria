@@ -4,7 +4,7 @@ const ECAD_FLEXTESA_IMAGE = 'ghcr.io/ecadlabs/taqueria-flextesa';
 const FLEXTESA_IMAGE = 'oxheadalpha/flextesa';
 const LIGO_IMAGE = 'ligolang/ligo';
 const ARCHETYPE_IMAGE = 'completium/archetype';
-const ECAD_TZKT_IMAGE = 'alirezahaghshenas/tzkt';
+const ECAD_TZKT_IMAGE = 'ghcr.io/ecadlabs/tzkt';
 
 const getDockerImageIdsCmd = (): string => {
 	const images = [ECAD_FLEXTESA_IMAGE, FLEXTESA_IMAGE, LIGO_IMAGE, ARCHETYPE_IMAGE, ECAD_TZKT_IMAGE];
