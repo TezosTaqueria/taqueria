@@ -5,8 +5,8 @@ import { ValidOpts } from './types';
 
 const getTzKtDockerImages = (opts: ValidOpts) => ({
 	postgres: `postgres:14.5-alpine`,
-	sync: `bakingbad/tzkt-sync:1.11.1`,
-	api: `bakingbad/tzkt-api:1.11.1`,
+	sync: `ghcr.io/ecadlabs/tzkt-sync:v1.11.0-taqueria`,
+	api: `ghcr.io/ecadlabs/tzkt-api:v1.11.0-taqueria`,
 });
 
 export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: ValidOpts) => {
