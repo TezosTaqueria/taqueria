@@ -445,7 +445,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 					};
 					return updatedConfig;
 				}),
-				chain(writeJsonFile(joinPaths(parsedArgs.projectDir, '.taq', 'config.json'))),
+				chain(writeJsonFile(joinPaths(config.projectDir, '.taq', 'config.json'))),
 				map(() => log(`The default environment has been changed`)),
 			),
 	});
