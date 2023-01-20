@@ -2,6 +2,7 @@ import React from 'react';
 import { hasPrim, isObject } from '../Helpers';
 import { MichelineDataType } from '../MichelineDataType';
 import { BoolEditor } from './BoolEditor';
+import { ContractEditor } from './ContractEditor';
 import { ListEditor } from './ListEditor';
 import { MapEditor } from './MapEditor';
 import { getFriendlyDataType } from './MichelineEditor';
@@ -82,6 +83,8 @@ const getEditor = (
 			return <MapEditor value={value} dataType={dataType} onChange={onChange} />;
 		case 'or':
 			return <OrEditor value={value} dataType={dataType} onChange={onChange} />;
+		case 'contract':
+			return <ContractEditor value={value} dataType={dataType} onChange={onChange} />;
 		default:
 			return (
 				<span>

@@ -6,6 +6,7 @@ import {
 	isValueObject,
 	MichelineValidationResult,
 	ValidationFailure,
+	ValidationSuccess,
 	validState,
 } from '../Helpers';
 import { MichelineDataType, MichelineDataTypeWithArgs } from '../MichelineDataType';
@@ -70,6 +71,8 @@ export const validate = (
 			return isValidMap(dataType, value);
 		case 'or':
 			return isValieOr(dataType, value);
+		case 'contract':
+			return isValidContract(dataType, value);
 	}
 };
 
@@ -300,6 +303,11 @@ function isValieOr(dataType: MichelineDataTypeWithArgs, v: MichelineValue | unde
 	}
 	const index = value.prim === 'Left' ? 0 : 1;
 	return validate(dataType.args[index], value.args?.[0]);
+}
+
+function isValidContract(data: MichelineDataTypeWithArgs, v: MichelineValue | undefined): MichelineValidationResult {
+	// FIXME: add proper validation
+	return { state: 'Valid' };
 }
 
 // returns 1 if value2 is greater than value1, 0 if they are equal, and -1 if value2 is less than value1
