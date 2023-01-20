@@ -62,6 +62,7 @@ const {
 	joinPaths,
 	mkdir,
 	readJsonFile,
+	writeJsonFile,
 	writeTextFile,
 	appendTextFile,
 	doesPathNotExistOrIsEmptyDir,
@@ -411,6 +412,57 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 				chain(() => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
 				map(() => log(i18n.__('pluginUninstalled'))),
 			),
+	});
+
+	internalTasks.registerTask({
+		taskName: NonEmptyString.create('set-environment'),
+		aliases: [NonEmptyString.create('set-env')],
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'set-environment <defaultEnvironment>',
+					'Set the default environment of the project',
+					(yargs: Arguments) => {
+						yargs.positional('defaultEnvironment', {
+							describe: 'The default environment to be set',
+							type: 'string',
+							required: true,
+						});
+					},
+				)
+				.alias('set-environment', 'set-env'),
+
+		handler: (parsedArgs: SanitizedArgs.t) =>
+			pipe(
+				SanitizedArgs.ofSetEnvTaskArgs(parsedArgs),
+				map(parsedArgs => {
+					const updatedConfig = {
+						...config,
+						environment: {
+							...config.environment,
+							default: NonEmptyString.from(parsedArgs.defaultEnvironment),
+						},
+					};
+					return updatedConfig;
+				}),
+				chain(writeJsonFile(joinPaths(config.projectDir, '.taq', 'config.json'))),
+				map(() => log(`The default environment has been changed`)),
+			),
+	});
+
+	internalTasks.registerTask({
+		taskName: NonEmptyString.create('get-environment'),
+		aliases: [NonEmptyString.create('get-env')],
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig
+				.command(
+					'get-environment',
+					'Get the default environment of the project',
+				)
+				.alias('get-environment', 'get-env'),
+
+		handler: (_parsedArgs: SanitizedArgs.t) =>
+			taqResolve(log(`The default environment is ${config.environment.default}`)),
 	});
 
 	// Add a hidden task "list-known-tasks" task to show all known tasks
