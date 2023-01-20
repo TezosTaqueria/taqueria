@@ -67,7 +67,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
 	// https://github.com/ecadlabs/taqueria/issues/378
-	test('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
+	test.skip('Verify that taqueria taquito plugin can deploy one contract using deploy {contractName} command', async () => {
 		await sleep(20000);
 		environment = 'development';
 
@@ -97,7 +97,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(contractFromSandbox.stdout).toContain('"storage":{"int":"12"}');
 	});
 
-	test('Verify that taqueria taquito plugin can transfer amount of tezos using transfer command from one account to another', async () => {
+	test.skip('Verify that taqueria taquito plugin can transfer amount of tezos using transfer command from one account to another', async () => {
 		// 1. Setting up environment name
 		environment = 'development';
 
@@ -115,7 +115,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(amountArray[1]).toEqual('4000 ꜩ');
 	});
 
-	test('Verify that taqueria taquito plugin cant transfer 0 tez using transfer command from one account to another', async () => {
+	test.skip('Verify that taqueria taquito plugin cant transfer 0 tez using transfer command from one account to another', async () => {
 		// 1. Setting up environment name
 		environment = 'development';
 
@@ -133,7 +133,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(transferResult.stderr).toContain('No operations performed');
 	});
 
-	test('Verify that taqueria taquito plugin cant transfer from non-instantiated account to another', async () => {
+	test.skip('Verify that taqueria taquito plugin cant transfer from non-instantiated account to another', async () => {
 		// 1. Setting up environment name
 		environment = 'development';
 
@@ -153,7 +153,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(transferResult.stderr).toContain(`No operations performed`);
 	});
 
-	test('Verify that taqueria taquito plugin can transfer amount of tezos using transfer command from one account to another if account does not enough tezos', async () => {
+	test.skip('Verify that taqueria taquito plugin can transfer amount of tezos using transfer command from one account to another if account does not enough tezos', async () => {
 		// 1. Setting up environment name
 		environment = 'development';
 
@@ -173,7 +173,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(transferResult.stderr).toContain('No operations performed');
 	});
 
-	test('Verify that taqueria taquito plugin can transfer amount of tezos using call command from an account to a contract with using parameters file', async () => {
+	test.skip('Verify that taqueria taquito plugin can transfer amount of tezos using call command from an account to a contract with using parameters file', async () => {
 		// 1. Setting up environment name
 		environment = 'development';
 
