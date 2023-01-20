@@ -174,8 +174,8 @@ export const uninstallTaskArgs = createType<RawManagePluginInput, RawManagePlugi
 
 export const setEnvTaskArgs = createType<RawSetEnvInput, RawSetEnvInput>({
 	rawSchema: setEnvRawSchema,
-	parseErrMsg: 'The arguments provided are invalid for the uninstall task',
-	unknownErrMsg: 'Something went wrong parsing the arguments for the uninstall task',
+	parseErrMsg: 'The arguments provided are invalid for the set-environment task',
+	unknownErrMsg: 'Something went wrong parsing the arguments for the set-environment task',
 });
 
 export const createTaskArgs = createType<RawTemplateInput, RawTemplateInput>({
