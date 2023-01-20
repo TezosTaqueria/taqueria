@@ -2,142 +2,88 @@
 title: Account Configuration
 ---
 
-Taqueria provides an easy way to define and fund accounts at the project level
-
-:::note
-On Tezos, implicit accounts are accounts that do not have smart contract functionality and are prefixed with `tz1`
-:::
+Taqueria provides an easy way to define and fund accounts at the project level.
 
 The default Taqueria `config.json` provides 5 accounts as shown here:
 
 ```json
-{
-    "language": "en",
-    "plugins": [ ],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ]
-        },
-        "testing": {
-            "networks": [
-                "ghostnet"
-            ],
-            "sandboxes": []
-        }
-    },
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-            "rpcUrl": "http://localhost:20000"
-        }
-    },
-    "network": {
-        "ghostnet": {
-            "label": "ghostnet",
-            "rpcUrl": "https://ghostnet.ecadinfra.com"
-        }
-    },
     "accounts": {
-        "bob": "3_000_000_000",
-        "alice": "3_000_000_000",
-        "john": "3_000_000_000",
-        "jane": "3_000_000_000",
-        "joe": "3_000_000_000"
-    }
-}
+        "bob": {
+            "balance": {
+                "amount": "3_000_000_000",
+                "units": "mutez"
+            }
+        },
+        "alice": {
+            "balance": {
+                "amount": "3_000_000_000",
+                "units": "mutez"
+            }
+        },
+        "john": {
+            "balance": {
+                "amount": "3_000_000_000",
+                "units": "mutez"
+            }
+        },
+        "jane": {
+            "balance": {
+                "amount": "3_000_000_000",
+                "units": "mutez"
+            }
+        },
+        "joe": {
+            "balance": {
+                "amount": "3_000_000_000",
+                "units": "mutez"
+            }
+        }
+    },
 ```
 
-You may define as many accounts as you need. Taqueria imposes no limits on how many accounts you would like to reference in your project
+You may define as many accounts as you need. 
 
-These accounts will be created and funded automatically when a sandbox starts. After starting a sandbox, you will see the defined accounts appear in the configuration:
+It can be useful to name the accounts to represent different user roles for your contract. For example, an nft contract might have an `artist` and `collector` account which could be used in automated tests. 
+
+The account balance represents the target balance for those accounts. The enviroment plugins will provide a mechnism to instantiate and maintain the balance for those account.
+
+For example, with the flextesa plugin during the `start sandbox` task, it will automatically instantiate the named accounts and ensure they have the target balance.
+
+Since this is specific to the developer's sandbox, these accounts are in the `config.local...` file for the sandbox environemnt.
 
 ```json
-{
-    "language": "en",
-    "plugins": [
-    ],
-    "contractsDir": "contracts",
-    "testsDir": "tests",
-    "artifactsDir": "artifacts",
-    "environment": {
-        "default": "development",
-        "development": {
-            "networks": [],
-            "sandboxes": [
-                "local"
-            ]
-        },
-        "testing": {
-            "networks": [
-                "ghostnet"
-            ],
-            "sandboxes": []
-        }
-    },
-    "sandbox": {
-        "local": {
-            "accounts": {
-                "default": "bob",
-                "bob": {
-                    "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
-                    "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
-                    "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt",
-                    "alias": "bob"
-                },
-                "alice": {
-                    "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
-                    "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-                    "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq",
-                    "alias": "alice"
-                },
-                "john": {
-                    "encryptedKey": "edpktt6t2ENhxiQqun6bXPPWC6tFVvNPTDRh1gEPGX4BgDgbDnmGzP",
-                    "publicKeyHash": "tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6",
-                    "secretKey": "unencrypted:edsk3Un2KRUUoWZufi914HQem96ejVFnkyD8GXRPUSkgqy5etsYXEN",
-                    "alias": "john"
-                },
-                "jane": {
-                    "encryptedKey": "edpkvS6TDSWcqqj3EJi3NRrCMyN7oNw1B3Hp37R19tMThqM8YNhAuS",
-                    "publicKeyHash": "tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph",
-                    "secretKey": "unencrypted:edsk3UkdS1UBfTBkMAoFxmfdmUHmCdNhTzDJ1cSJuZhU1b6k6fZZoQ",
-                    "alias": "jane"
-                },
-                "joe": {
-                    "encryptedKey": "edpkuT1QYPYbLLQz9dXhQS33ncsixxeGHbNGmntPTR4VBbWmskHPrV",
-                    "publicKeyHash": "tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB",
-                    "secretKey": "unencrypted:edsk3Un2FU9Zeb4KEoATWdpAqcX5JArMUj2ew8S4SuzhPRDmGoqNx2",
-                    "alias": "joe"
-                }
-            },
-            "label": "Local Tezos Sandbox",
-            "protocol": "PtKathmankSpLLDALzWw7CGD2j2MtyveTwboEYokqUCP4a1LxMg",
-            "rpcUrl": "http://localhost:20000"
-        }
-    },
-    "network": {
-        "ghostnet": {
-            "label": "ghostnet",
-            "rpcUrl": "https://ghostnet.ecadinfra.com"
-        }
-    },
     "accounts": {
-        "bob": "3_000_000_000",
-        "alice": "3_000_000_000",
-        "john": "3_000_000_000",
-        "jane": "3_000_000_000",
-        "joe": "3_000_000_000"
+        "bob": {
+            "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+            "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+            "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+        },
+        "alice": {
+            "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+            "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+            "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+        },
+        "john": {
+            "encryptedKey": "edpktt6t2ENhxiQqun6bXPPWC6tFVvNPTDRh1gEPGX4BgDgbDnmGzP",
+            "publicKeyHash": "tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6",
+            "secretKey": "unencrypted:edsk3Un2KRUUoWZufi914HQem96ejVFnkyD8GXRPUSkgqy5etsYXEN"
+        },
+        "jane": {
+            "encryptedKey": "edpkvS6TDSWcqqj3EJi3NRrCMyN7oNw1B3Hp37R19tMThqM8YNhAuS",
+            "publicKeyHash": "tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph",
+            "secretKey": "unencrypted:edsk3UkdS1UBfTBkMAoFxmfdmUHmCdNhTzDJ1cSJuZhU1b6k6fZZoQ"
+        },
+        "joe": {
+            "encryptedKey": "edpkuT1QYPYbLLQz9dXhQS33ncsixxeGHbNGmntPTR4VBbWmskHPrV",
+            "publicKeyHash": "tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB",
+            "secretKey": "unencrypted:edsk3Un2FU9Zeb4KEoATWdpAqcX5JArMUj2ew8S4SuzhPRDmGoqNx2"
+        }
     }
-}
 ```
 
+For other enviroment types, the taquito plugin has the `instantiate` and `fund` tasks to manually maintain these accounts.
+
 :::note
-Future improvements will extend implicit account provisioning to testnets
+It is planned to improve the automation around this.
 :::
+
