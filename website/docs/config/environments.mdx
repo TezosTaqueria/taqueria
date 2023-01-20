@@ -40,19 +40,19 @@ Environments are declared in `.taq/config.json`
 
 The above example shows 3 environments: `development`, `testing`, and `production`. 
 
-Each environment has a type. The `development` enviroment is `flextesa` which uses the flextesa plugin for a local sandbox. The `testing` and `production` environments are both the `simple` type which use only the rpcUrl. 
+Each environment has a type. The `development` environment is `flextesa` which uses the flextesa plugin for a local sandbox. The `testing` and `production` environments are both the `simple` type which use only the rpcUrl. 
 
-Other enviroment types can be created with a plugin and it can define additional enviroment fields as needed.
+Other environment types can be created with a plugin and it can define additional environment fields as needed.
 
 ## The Default Environment
 
-In the above example, the default environemnt is `development`. For most taq commands the default enviroment will be used unless the `--env` flag is provided.
+In the above example, the default environment is `development`. For most taq commands the default environment will be used unless the `--env` flag is provided.
 
 ## Local Config
 
 Each environment also has a `config.local...` file. 
 
-Going back to the example `config.json` above, it has three enviroments. So, each would have their own `config.local...` file:
+Going back to the example `config.json` above, it has three environments. So, each would have their own `config.local...` file:
 
 - config.local.development.json
 - config.local.testing.json
@@ -60,7 +60,7 @@ Going back to the example `config.json` above, it has three enviroments. So, eac
 
 These local config files are intended to store custom settings that are specific to a single developer's context. 
 
-For example, when deploying a contract to a sandbox or a test enviroment, the `config.local...` file could contain the address of a contract deployed by a developer. Since each developer working on the same project would each have their own `config.local...` file for each environment, they will have an isolated context when working.
+For example, when deploying a contract to a sandbox or a test environment, the `config.local...` file could contain the address of a contract deployed by a developer. Since each developer working on the same project would each have their own `config.local...` file for each environment, they will have an isolated context when working.
 
 The `config.local...` files should be excluded from git commits, and are listed in the `.gitignore` by default.
 
