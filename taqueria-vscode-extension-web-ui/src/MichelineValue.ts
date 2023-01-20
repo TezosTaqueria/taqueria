@@ -52,6 +52,11 @@ export type MichelineBytesValue = {
 	bytes: string;
 };
 
+export type MichelineOrValue = {
+	prim: 'Left' | 'Right';
+	args: MichelineValue[];
+};
+
 export type MichelineMapValue = MichelineMapItem[];
 
 export type MichelineOtherValueObject = {
@@ -70,6 +75,7 @@ export type MichelineValueObject =
 	| MichelineStringValue
 	| MichelineOptionValue
 	| MichelinePairValue
-	| MichelineMapValue;
+	| MichelineMapValue
+	| MichelineOrValue;
 
 export type MichelineValue = MichelineValueObject | MichelineValue[];
