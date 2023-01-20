@@ -63,10 +63,12 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2 } = await execute('taq', '--version', './test-project');
+		const { stdout: stdout2, stderr } = await execute('taq', '--version', './test-project');
+		expect(stderr).toEqual([]);
 		expect(stdout2).not.toEqual([]);
 
-		const { stdout: stdout3 } = await execute('taq', '--build', './test-project');
+		const { stdout: stdout3, stderr: stderr2 } = await execute('taq', '--build', './test-project');
+		expect(stderr2).toEqual([]);
 		expect(stdout3).not.toEqual([]);
 
 		const mligo_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.mligo`)).stdout;

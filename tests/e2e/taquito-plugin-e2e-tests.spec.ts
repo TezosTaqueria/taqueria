@@ -133,7 +133,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
-		const storage_file = await (await exec('cat e2e/data/michelson-data/anyContract.storage.tz')).stdout;
+		const storage_file = await (await exec('cat integration/data/anyContract.storage.tz')).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', storage_file);
 
 		const hello_tz_file = await (await exec('cat e2e/data/michelson-data/hello-tacos.tz')).stdout;

@@ -5,12 +5,11 @@ import util from 'util';
 const exec = util.promisify(exec1);
 
 describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
-	test.only('(quickstart scenario) - ligo compile will create an artifact from three files - slowtest ', async () => {
+	test('(quickstart scenario) - ligo compile will create an artifact from three files - slowtest ', async () => {
 		const { execute, cleanup, writeFile, exists, ls } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		// await execute('taq', 'install ../taqueria-plugin-core', './test-project');
-		// await exists('./test-project/node_modules/@taqueria/plugin-core/index.js');
+
 		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ligo/index.js');
 
