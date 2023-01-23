@@ -33,11 +33,6 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		await exec(`cp integration/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
 		await exec(`cp integration/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
 
-		// Register the contracts
-		await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
-		await exec(`taq add-contract increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
-		await exec(`taq add-contract hello-tacos.py`, { cwd: `./${taqueriaProjectPath}` });
-
 		if (operatingSystem == `Linux`) {
 			userGroup = (await exec(`id -g -n ${username}`)).stdout.trim();
 		}
