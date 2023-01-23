@@ -299,7 +299,7 @@ function isValieOr(dataType: MichelineDataTypeWithArgs, v: MichelineValue | unde
 		};
 	}
 	const index = value.prim === 'Left' ? 0 : 1;
-	return validate(dataType.args[index], value.args?.[index]);
+	return validate(dataType.args[index], value.args?.[0]);
 }
 
 // returns 1 if value2 is greater than value1, 0 if they are equal, and -1 if value2 is less than value1
