@@ -82,7 +82,7 @@ export const toErrorWithProps = (message: string | Error, props: Record<string, 
 
 	// Note, retval looses its prototype using Object.assign. Same thing with using spread operator.
 	retval.__proto__ = Error.prototype;
-	return err;
+	return retval;
 };
 
 export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, ExecException> =>
