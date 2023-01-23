@@ -3,6 +3,12 @@
  * https://jestjs.io/docs/configuration
  */
 
+import fs from 'fs';
+/*
+ * For a detailed explanation regarding each configuration property and type check, visit:
+ * https://jestjs.io/docs/configuration
+ */
+
 export default {
 	// All imported modules in your tests should be mocked automatically
 	// automock: false,
@@ -60,11 +66,11 @@ export default {
 	// globalTeardown: undefined,
 
 	// A set of global variables that need to be available in all test environments
-	globals: {
-		'ts-jest': {
-			tsconfig: 'tsconfig.test.json',
-		},
-	},
+	// globals: {
+	// 	'ts-jest': {
+	// 		tsconfig: 'tsconfig.test.json',
+	// 	},
+	// },
 
 	// The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
 	// maxWorkers: "50%",
@@ -173,18 +179,14 @@ export default {
 
 	// Setting this value to "fake" allows the use of fake timers for functions such as "setTimeout"
 	// timers: "real",
+	// A map from regular expressions to paths to transformer
+	transform: { '^.+\\.(ts|js)$': '<rootDir>/node_modules/ts-jest' },
 
-	// A map from regular expressions to paths to transformers
-	// transform: {"^.+\\.(ts|js)$":"<rootDir>/node_modules/ts-jest"},
-
-	// Changing default timeout from 5000 to 30000 for tests
-	testTimeout: 60000,
 	// An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-	// transformIgnorePatterns: [
-	//   "/node_modules/",
-	//   "\\.pnp\\.[^\\/]+$"
-	// ],
-
+	transformIgnorePatterns: [
+		'/node_modules/',
+		//   "\\.pnp\\.[^\\/]+$"
+	],
 	// An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
 	// unmockedModulePathPatterns: undefined,
 

@@ -1,0 +1,76 @@
+{
+	"version": "v2",
+	"language": "en",
+	"artifactsDir": "artifacts",
+	"contractsDir": "contracts",
+	"accounts": {
+		"bob": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"alice": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"john": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"jane": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"joe": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		}
+	},
+	"contracts": {
+		"./main.mligo": {
+			"sourceFile": "./main.mligo",
+			"hash": "1bbbe139820ef1e5223dee5e35b57480ed3b59e97170c9c252304f1d5c7b983e"
+		}
+	},
+	"environmentDefault": "testing",
+	"environments": {
+		"development": {
+			"type": "flextesa",
+			"label": "Local Tezos Sandbox",
+			"protocol": "Psithaca2MLRFYargivpo7YvUr7wUDqyxrdhC5CQq78mRvimz6A"
+		},
+		"testing": {
+			"type": "simple",
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"
+		}
+	},
+	"plugins": [
+		{
+			"name": "@taqueria/plugin-ligo",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-flextesa",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-taquito",
+			"type": "npm"
+		},
+		{
+			"name": "@taqueria/plugin-jest",
+			"type": "npm"
+		}
+	]
+}

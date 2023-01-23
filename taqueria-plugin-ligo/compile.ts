@@ -1,11 +1,17 @@
-import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
+import { execCmd, getArch, getArtifactsDir, sendAsyncErr, sendErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
 import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
-import { CompileOpts as Opts, emitExternalError, getInputFilename, getLigoDockerImage } from './common';
+import {
+	CompileOpts as Opts,
+	emitExternalError,
+	getInputFilenameAbsPath,
+	getInputFilenameRelPath,
+	getLigoDockerImage,
+} from './common';
 
-type TableRow = { contract: string; artifact: string };
+export type TableRow = { contract: string; artifact: string };
 
-type ExprKind = 'storage' | 'default_storage' | 'parameter';
+export type ExprKind = 'storage' | 'default_storage' | 'parameter';
 
 const COMPILE_ERR_MSG: string = 'Not compiled';
 
@@ -32,9 +38,12 @@ const removeExt = (path: string): string => {
 	return path.replace(extRegex, '');
 };
 
-const getOutputFilename = (parsedArgs: Opts, sourceFile: string): string => {
+const isOutputFormatJSON = (parsedArgs: Opts): boolean => parsedArgs.json;
+
+const getOutputContractFilename = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputFile = basename(sourceFile, extname(sourceFile));
-	return join(parsedArgs.config.artifactsDir, `${outputFile}.tz`);
+	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
+	return join(getArtifactsDir(parsedArgs), `${outputFile}${ext}`);
 };
 
 // Get the contract name that the storage/parameter file is associated with
@@ -50,12 +59,13 @@ const getContractNameForExpr = (sourceFile: string, exprKind: ExprKind): string 
 };
 
 // If sourceFile is token.storageList.mligo, then it'll return token.storage.{storageName}.tz
-const getOutputExprFileName = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind, exprName: string): string => {
+const getOutputExprFilename = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind, exprName: string): string => {
 	const contractName = basename(getContractNameForExpr(sourceFile, exprKind), extname(sourceFile));
+	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
 	const outputFile = exprKind === 'default_storage'
-		? `${contractName}.default_storage.tz`
-		: `${contractName}.${exprKind}.${exprName}.tz`;
-	return join(parsedArgs.config.artifactsDir, `${outputFile}`);
+		? `${contractName}.default_storage${ext}`
+		: `${contractName}.${exprKind}.${exprName}${ext}`;
+	return join(getArtifactsDir(parsedArgs), `${outputFile}`);
 };
 
 const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
@@ -63,9 +73,10 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 	if (!projectDir) throw `No project directory provided`;
 	const baseCmd =
 		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile contract`;
-	const inputFile = getInputFilename(parsedArgs, sourceFile);
-	const outputFile = `-o ${getOutputFilename(parsedArgs, sourceFile)}`;
-	const cmd = `${baseCmd} ${inputFile} ${outputFile}`;
+	const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
+	const outputFile = `-o ${getOutputContractFilename(parsedArgs, sourceFile)}`;
+	const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
+	const cmd = `${baseCmd} ${inputFile} ${outputFile} ${flags}`;
 	return cmd;
 };
 
@@ -75,9 +86,10 @@ const getCompileExprCmd = (parsedArgs: Opts, sourceFile: string, exprKind: ExprK
 	const compilerType = isStorageKind(exprKind) ? 'storage' : 'parameter';
 	const baseCmd =
 		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile ${compilerType}`;
-	const inputFile = getInputFilename(parsedArgs, sourceFile);
-	const outputFile = `-o ${getOutputExprFileName(parsedArgs, sourceFile, exprKind, exprName)}`;
-	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile}`;
+	const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
+	const outputFile = `-o ${getOutputExprFilename(parsedArgs, sourceFile, exprKind, exprName)}`;
+	const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
+	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile} ${flags}`;
 	return cmd;
 };
 
@@ -89,7 +101,7 @@ const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow
 			if (stderr.length > 0) sendWarn(stderr);
 			return {
 				contract: sourceFile,
-				artifact: getOutputFilename(parsedArgs, sourceFile),
+				artifact: getOutputContractFilename(parsedArgs, sourceFile),
 			};
 		})
 		.catch(err => {
@@ -109,7 +121,7 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 				if (stderr.length > 0) sendWarn(stderr);
 				return {
 					contract: sourceFile,
-					artifact: getOutputExprFileName(parsedArgs, sourceFile, exprKind, exprName),
+					artifact: getOutputExprFilename(parsedArgs, sourceFile, exprKind, exprName),
 				};
 			})
 			.catch(err => {
@@ -120,11 +132,14 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 				};
 			});
 
+const getExprNames = (parsedArgs: Opts, sourceFile: string): Promise<string[]> =>
+	readFile(getInputFilenameAbsPath(parsedArgs, sourceFile), 'utf8')
+		.then(data => data.match(/(?<=\n\s*(let|const)\s+)[a-zA-Z0-9_]+/g) ?? []);
+
 const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind): Promise<TableRow[]> =>
-	readFile(getInputFilename(parsedArgs, sourceFile), 'utf8')
-		.then(data => data.match(/(?<=\n\s*(let|const)\s+)[a-zA-Z0-9_]+/g))
+	getExprNames(parsedArgs, sourceFile)
 		.then(exprNames => {
-			if (!exprNames) return [];
+			if (exprNames.length === 0) return [];
 			const firstExprName = exprNames.slice(0, 1)[0];
 			const restExprNames = exprNames.slice(1, exprNames.length);
 			const firstExprKind = isStorageKind(exprKind) ? 'default_storage' : 'parameter';
@@ -145,7 +160,7 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 // TODO: Just for backwards compatibility. Can be deleted in the future.
 const tryLegacyStorageNamingConvention = (parsedArgs: Opts, sourceFile: string) => {
 	const storageListFile = `${removeExt(sourceFile)}.storages${extractExt(sourceFile)}`;
-	const storageListFilename = getInputFilename(parsedArgs, storageListFile);
+	const storageListFilename = getInputFilenameAbsPath(parsedArgs, storageListFile);
 	return access(storageListFilename).then(() => {
 		sendWarn(
 			`Warning: The naming convention of "<CONTRACT>.storages.<EXTENSION>" is deprecated and renamed to "<CONTRACT>.storageList.<EXTENSION>". Please adjust your storage file names accordingly\n`,
@@ -157,7 +172,7 @@ const tryLegacyStorageNamingConvention = (parsedArgs: Opts, sourceFile: string) 
 // TODO: Just for backwards compatibility. Can be deleted in the future.
 const tryLegacyParameterNamingConvention = (parsedArgs: Opts, sourceFile: string) => {
 	const parameterListFile = `${removeExt(sourceFile)}.parameters${extractExt(sourceFile)}`;
-	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
+	const parameterListFilename = getInputFilenameAbsPath(parsedArgs, parameterListFile);
 	return access(parameterListFilename).then(() => {
 		sendWarn(
 			`Warning: The naming convention of "<CONTRACT>.parameters.<EXTENSION>" is deprecated and renamed to "<CONTRACT>.parameterList.<EXTENSION>". Please adjust your parameter file names accordingly\n`,
@@ -197,13 +212,16 @@ const initContentForParameter = (sourceFile: string): string => {
 	return linkToContract + instruction + syntax;
 };
 
-const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
+export const compileContractWithStorageAndParameter = async (
+	parsedArgs: Opts,
+	sourceFile: string,
+): Promise<TableRow[]> => {
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile);
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
 
 	const storageListFile = `${removeExt(sourceFile)}.storageList${extractExt(sourceFile)}`;
-	const storageListFilename = getInputFilename(parsedArgs, storageListFile);
-	const storageCompileResult = await access(storageListFilename)
+	const storageListFilename = getInputFilenameAbsPath(parsedArgs, storageListFile);
+	const storageCompileResult = await (access(storageListFilename)
 		.then(() => compileExprs(parsedArgs, storageListFile, 'storage'))
 		.catch(() => tryLegacyStorageNamingConvention(parsedArgs, sourceFile))
 		.catch(() => {
@@ -211,11 +229,11 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 				`Note: storage file associated with "${sourceFile}" can't be found, so "${storageListFile}" has been created for you. Use this file to define all initial storage values for this contract\n`,
 			);
 			writeFile(storageListFilename, initContentForStorage(sourceFile), 'utf8');
-		});
+		}));
 
 	const parameterListFile = `${removeExt(sourceFile)}.parameterList${extractExt(sourceFile)}`;
-	const parameterListFilename = getInputFilename(parsedArgs, parameterListFile);
-	const parameterCompileResult = await access(parameterListFilename)
+	const parameterListFilename = getInputFilenameAbsPath(parsedArgs, parameterListFile);
+	const parameterCompileResult = await (access(parameterListFilename)
 		.then(() => compileExprs(parsedArgs, parameterListFile, 'parameter'))
 		.catch(() => tryLegacyParameterNamingConvention(parsedArgs, sourceFile))
 		.catch(() => {
@@ -223,7 +241,7 @@ const compileContractWithStorageAndParameter = async (parsedArgs: Opts, sourceFi
 				`Note: parameter file associated with "${sourceFile}" can't be found, so "${parameterListFile}" has been created for you. Use this file to define all parameter values for this contract\n`,
 			);
 			writeFile(parameterListFilename, initContentForParameter(sourceFile), 'utf8');
-		});
+		}));
 
 	let compileResults: TableRow[] = [contractCompileResult];
 	if (storageCompileResult) compileResults = compileResults.concat(storageCompileResult);
@@ -264,7 +282,7 @@ const mergeArtifactsOutput = (sourceFile: string) =>
 	};
 
 const compile = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = parsedArgs.sourceFile;
+	const sourceFile = parsedArgs.sourceFile!;
 	let p: Promise<TableRow[]>;
 	if (isStorageListFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'storage');
 	else if (isParameterListFile(sourceFile)) p = compileExprs(parsedArgs, sourceFile, 'parameter');
@@ -274,7 +292,11 @@ const compile = (parsedArgs: Opts): Promise<void> => {
 			`${sourceFile} doesn't have a valid LIGO extension ('.ligo', '.religo', '.mligo' or '.jsligo')`,
 		);
 	}
-	return p.then(sendJsonRes).catch(err => sendAsyncErr(err, false));
+	return p.then(sendJsonRes).catch(err => sendErr(err, false));
 };
 
 export default compile;
+export const ___TEST___ = {
+	getContractNameForExpr,
+	getOutputExprFilename,
+};

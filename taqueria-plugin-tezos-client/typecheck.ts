@@ -2,6 +2,7 @@ import {
 	addTzExtensionIfMissing,
 	execCmd,
 	getArch,
+	RequestArgs,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,

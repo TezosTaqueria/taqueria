@@ -1,9 +1,11 @@
 // First-party dependencies
+import type { InstalledPlugin } from '@taqueria/protocol';
+import { EphemeralState, PluginInfo, SanitizedArgs } from '@taqueria/protocol';
+import * as PluginActionName from '@taqueria/protocol/PluginActionName';
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import type { InstalledPlugin, PluginActionName } from './taqueria-protocol/taqueria-protocol-types.ts';
-import { EphemeralState, PluginInfo, SanitizedArgs } from './taqueria-protocol/taqueria-protocol-types.ts';
+import { omit } from 'https://x.nest.land/ramda@0.27.2/mod.ts';
 import type { PluginDeps, PluginRequestArgs } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
@@ -135,7 +137,7 @@ export const inject = (deps: PluginDeps) => {
 		switch (plugin.type) {
 			case 'npm': {
 				const pluginPath = joinPaths(
-					parsedArgs.projectDir,
+					config.projectDir,
 					'node_modules',
 					plugin.name,
 					'index.js',
@@ -185,7 +187,8 @@ export const inject = (deps: PluginDeps) => {
 	// retrievePluginInfo: InstalledPlugin -> Future<TaqError, PluginInfo>
 	const retrievePluginInfo = (plugin: InstalledPlugin.t) =>
 		pipe(
-			sendPluginActionRequest(plugin)('pluginInfo', PluginResponseEncoding.create('json'))({}),
+			PluginActionName.make('pluginInfo'),
+			chain(action => sendPluginActionRequest(plugin)(action, PluginResponseEncoding.create('json'))({})),
 			chain(unvalidatedData =>
 				pipe(
 					PluginInfo.of(unvalidatedData),
@@ -219,19 +222,26 @@ export const inject = (deps: PluginDeps) => {
 		// For each argument passed in via the CLI, send it as an argument to the
 		// plugin call as well. Plugins can use this information for additional context
 		// about invocation
-		return Object.entries({ ...parsedArgs, ...requestArgs }).reduce(
+		// --
+		// We'll use the projectDir from the config rather than the one from the CLI, as
+		// as the actual projectDir could be found via traversal
+		const passableParsedArgs = omit(['p', 'project-dir', 'projectDir'], parsedArgs);
+		const passableRequestArgs = omit(Object.keys(passableParsedArgs), requestArgs);
+		return Object.entries({ ...passableParsedArgs, ...passableRequestArgs, projectDir: config.projectDir }).reduce(
 			(retval: (string | number | boolean)[], [key, val]) => {
 				const omit = [
 					'$0',
-					'version',
-					'build',
+					'quickstart',
 					'scaffoldUrl',
 					'scaffoldProjectDir',
-					'disableState',
-					'_',
 				];
 
-				// A hack to get around yargs because it strips leading and trailing double quotes of strings passed by the command. This same hack is used to prevent yargs from turning 0x00 into 0
+				if (key === 'help') val = false;
+
+				// If env is missing, then set it to the default environment of the config
+				if (key === 'env' && !val) val = config.environment?.default ?? 'development';
+
+				// A workaround to get around yargs because it strips leading and trailing double quotes of strings passed by the command. This same workaround is used to prevent yargs from turning 0x00 into 0
 				// Refer to https://github.com/yargs/yargs-parser/issues/201
 				if (typeof val === 'string' && /^___(.|\n)*___$/.test(val)) val = val.slice(3, -3);
 
@@ -239,6 +249,7 @@ export const inject = (deps: PluginDeps) => {
 				if (omit.includes(key) || key.indexOf('-') >= 0 || val === undefined) return retval;
 				// Pass numbers and bools as is
 				else if (typeof val === 'boolean' || typeof val === 'number') return [...retval, '--' + key, val];
+				else if (key === '_') return [...retval, key, `'${val}'`];
 				else return [...retval, '--' + key, `'${val}'`];
 			},
 			[],
@@ -258,17 +269,17 @@ export const inject = (deps: PluginDeps) => {
 						configHash: config.hash,
 						plugins: pluginInfo,
 						tasks: await eager(EphemeralState.mapTasksToPlugins(
-							await eager(LoadedConfig.toConfig(config)),
+							await eager(LoadedConfig.make(config)),
 							pluginInfo,
 							i18n,
 						)),
 						operations: await eager(EphemeralState.mapOperationsToPlugins(
-							await eager(LoadedConfig.toConfig(config)),
+							await eager(LoadedConfig.make(config)),
 							pluginInfo,
 							i18n,
 						)),
 						templates: await eager(EphemeralState.mapTemplatesToPlugins(
-							await eager(LoadedConfig.toConfig(config)),
+							await eager(LoadedConfig.make(config)),
 							pluginInfo,
 							i18n,
 						)),
@@ -299,7 +310,7 @@ export const inject = (deps: PluginDeps) => {
 
 	// Returns the absolute path to the state.json file
 	// getStateAbsPath: () -> SanitizedAbsPath
-	const getStateAbspath = () => SanitizedAbsPath.make(`${parsedArgs.projectDir}/.taq/state.json`);
+	const getStateAbspath = () => SanitizedAbsPath.make(`${config.projectDir}/.taq/state.json`);
 
 	// Gets the State representation of the current config
 	// The state is retrieved from state.json if it exists,
@@ -353,6 +364,7 @@ export const inject = (deps: PluginDeps) => {
 
 	return {
 		getState: getMemoizedState,
+		getStateAbspath,
 		sendPluginActionRequest,
 		__TEST__: {
 			toPluginArguments,

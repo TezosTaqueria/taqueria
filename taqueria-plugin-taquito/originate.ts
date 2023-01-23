@@ -1,8 +1,11 @@
 import {
 	addTzExtensionIfMissing,
+	getArtifactsDir,
 	getContractContent,
 	getCurrentEnvironment,
 	getCurrentEnvironmentConfig,
+	NonEmptyString,
+	RequestArgs,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
@@ -36,8 +39,8 @@ type TableRow = {
 	destination: string;
 };
 
-const getContractPath = (parsedArgs: Opts, contractFilename: string) =>
-	join(parsedArgs.config.artifactsDir, /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`);
+const getContractPath = (parsedArgs: RequestArgs.t, contractFilename: string) =>
+	join(getArtifactsDir(parsedArgs), /\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`);
 
 const getDefaultStorageFilename = (contractName: string): string => {
 	const baseFilename = basename(contractName, extname(contractName));
@@ -48,8 +51,9 @@ const getDefaultStorageFilename = (contractName: string): string => {
 
 const getContractInfo = async (parsedArgs: Opts): Promise<ContractInfo> => {
 	const contract = parsedArgs.contract;
+	const protocolArgs = RequestArgs.create(parsedArgs);
 	const contractWithTzExtension = addTzExtensionIfMissing(contract);
-	const contractCode = await getContractContent(parsedArgs, contractWithTzExtension);
+	const contractCode = await getContractContent(protocolArgs, contractWithTzExtension);
 	if (contractCode === undefined) {
 		return sendAsyncErr(
 			`Please generate ${contractWithTzExtension} with one of the compilers (LIGO, SmartPy, Archetype) or write it manually and put it under /${parsedArgs.config.artifactsDir}\n`,
@@ -57,7 +61,7 @@ const getContractInfo = async (parsedArgs: Opts): Promise<ContractInfo> => {
 	}
 
 	const storageFilename = parsedArgs.storage ?? getDefaultStorageFilename(contractWithTzExtension);
-	const contractInitStorage = await getContractContent(parsedArgs, storageFilename);
+	const contractInitStorage = await getContractContent(protocolArgs, storageFilename);
 	if (contractInitStorage === undefined) {
 		return sendAsyncErr(
 			`❌ No initial storage file was found for ${contractWithTzExtension}\nStorage must be specified in a file as a Michelson expression and will automatically be linked to this contract if specified with the name "${
@@ -104,6 +108,7 @@ const prepContractInfoForDisplay = async (
 	contractInfo: ContractInfo,
 	op: BatchWalletOperation,
 ): Promise<TableRow> => {
+	const protocolArgs = RequestArgs.create(parsedArgs);
 	const operationResults = await op.operationResults();
 	const originationResults = operationResults
 		.filter(result => result.kind === 'origination')
@@ -112,13 +117,18 @@ const prepContractInfoForDisplay = async (
 	// Length should be 1 since we are batching originate operations into one
 	const result = originationResults.length === 1 ? originationResults[0] : undefined;
 	const address = result?.metadata?.operation_result?.originated_contracts?.join(',');
-
 	const alias = parsedArgs.alias ?? basename(contractInfo.contract, extname(contractInfo.contract));
-	if (address) await updateAddressAlias(parsedArgs, alias, address);
+
+	const displayableAddress = address ?? 'Something went wrong during origination';
+
+	if (address) {
+		const validatedAddress = NonEmptyString.create(address);
+		await updateAddressAlias(protocolArgs, alias, validatedAddress);
+	}
 
 	return {
 		contract: contractInfo.contract,
-		address: address ?? 'Something went wrong during origination',
+		address: displayableAddress,
 		alias: address ? alias : 'N/A',
 		balanceInMutez: contractInfo.mutezTransfer.toString(),
 		destination: tezos.rpc.getRpcUrl(),
@@ -126,17 +136,18 @@ const prepContractInfoForDisplay = async (
 };
 
 const originate = async (parsedArgs: Opts): Promise<void> => {
-	const env = getCurrentEnvironmentConfig(parsedArgs);
+	const protocolArgs = RequestArgs.create(parsedArgs);
+	const env = getCurrentEnvironmentConfig(protocolArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	try {
-		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(parsedArgs, env);
+		const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(protocolArgs, env);
 		const tezos = await (envType === 'Network'
-			? configureToolKitForNetwork(parsedArgs, nodeConfig, parsedArgs.sender)
+			? configureToolKitForNetwork(protocolArgs, nodeConfig, parsedArgs.sender)
 			: configureToolKitForSandbox(nodeConfig, parsedArgs.sender));
 
 		const contractInfo = await getContractInfo(parsedArgs);
 
-		const op = await performOriginateOps(tezos, getCurrentEnvironment(parsedArgs), [contractInfo]);
+		const op = await performOriginateOps(tezos, getCurrentEnvironment(protocolArgs), [contractInfo]);
 
 		const contractInfoForDisplay = await prepContractInfoForDisplay(parsedArgs, tezos, contractInfo, op);
 		return sendJsonRes([contractInfoForDisplay]);

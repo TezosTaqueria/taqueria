@@ -1,4 +1,4 @@
-import { Option, Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
+import { Plugin, PositionalArg, Task, Template } from '@taqueria/node-sdk';
 import compile from './compile';
 import createContract from './createContract';
 

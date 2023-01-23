@@ -1,5 +1,5 @@
 import { Option, Plugin, Task } from '@taqueria/node-sdk';
-import compile from './compile';
+import main from './main';
 
 Plugin.create(i18n => ({
 	alias: 'smartpy',
@@ -8,13 +8,42 @@ Plugin.create(i18n => ({
 	tasks: [
 		Task.create({
 			task: 'compile',
-			command: 'compile [sourceFile]',
+			command: 'compile <sourceFile>',
 			aliases: ['c', 'compile-smartpy'],
-			description: 'Compile a smart contract written in a SmartPy syntax to Michelson code',
-			options: [],
+			description:
+				'Compile a smart contract written in a SmartPy syntax to Michelson code, along with its associated storage values, per compilation targets, and some expressions per expression compilation targets',
+			handler: 'proxy',
+			encoding: 'json',
+			options: [
+				Option.create({
+					flag: 'json',
+					boolean: true,
+					description: 'Emit JSON-encoded Michelson',
+				}),
+			],
+		}),
+		Task.create({
+			task: 'compile-all',
+			command: 'compile-all',
+			description:
+				'Compile all SmartPy smart contracts with at least one SmartPy compilation target to Michelson code, along with their associated storage values, per compilation targets, and some expressions per expression compilation targets',
+			handler: 'proxy',
+			encoding: 'json',
+			options: [
+				Option.create({
+					flag: 'json',
+					boolean: true,
+					description: 'Emit JSON-encoded Michelson',
+				}),
+			],
+		}),
+		Task.create({
+			task: 'test',
+			command: 'test <sourceFile>',
+			description: 'Test a smart contract written in SmartPy',
 			handler: 'proxy',
 			encoding: 'json',
 		}),
 	],
-	proxy: compile,
+	proxy: main,
 }), process.argv);

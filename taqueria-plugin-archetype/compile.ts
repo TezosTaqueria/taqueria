@@ -2,12 +2,13 @@ import {
 	execCmd,
 	getContracts,
 	getDockerImage,
+	ProxyTaskArgs,
+	RequestArgs,
 	sendAsyncErr,
 	sendAsyncRes,
 	sendErr,
 	sendJsonRes,
 } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
 import { basename, extname, join } from 'path';
 import { match } from 'ts-pattern';
 
@@ -18,20 +19,20 @@ const ARCHETYPE_IMAGE_ENV_VAR = 'TAQ_ARCHETYPE_IMAGE';
 
 export const getArchetypeDockerImage = (): string => getDockerImage(ARCHETYPE_DEFAULT_IMAGE, ARCHETYPE_IMAGE_ENV_VAR);
 
-interface Opts extends RequestArgs.ProxyRequestArgs {
+interface Opts extends ProxyTaskArgs.t {
 	sourceFile?: string;
 }
 
 const getInputFilename = (opts: Opts) =>
 	(sourceFile: string) => {
 		const inputFile = basename(sourceFile, extname(sourceFile));
-		return join(opts.config.contractsDir, `${inputFile}.arl`);
+		return join(opts.config.contractsDir ?? 'contracts', `${inputFile}.arl`);
 	};
 
 const getContractArtifactFilename = (opts: Opts) =>
 	(sourceFile: string) => {
 		const outFile = basename(sourceFile, extname(sourceFile));
-		return join(opts.config.artifactsDir, `${outFile}.tz`);
+		return join(opts.config.artifactsDir ?? 'contracts', `${outFile}.tz`);
 	};
 
 const getCompileCommand = (opts: Opts) =>
@@ -65,8 +66,9 @@ const compileContract = (opts: Opts) =>
 				});
 			});
 
-const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[]> =>
-	Promise.all(getContracts(/\.arl$/, opts.config))
+const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[]> => {
+	const contracts = getContracts(/\.arl$/, opts.config);
+	return Promise.all(contracts)
 		.then(entries => entries.map(compileContract(opts)))
 		.then(processes =>
 			processes.length > 0
@@ -74,15 +76,17 @@ const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[
 				: [{ contract: 'None found', artifact: 'N/A' }]
 		)
 		.then(promises => Promise.all(promises));
+};
 
-const compile = <T>(parsedArgs: Opts) =>
-	match(parsedArgs)
-		.when(opts => opts.task === 'get-image', () => sendAsyncRes(getArchetypeDockerImage()))
+const compile = (parsedArgs: RequestArgs.t) => {
+	const unsafeOpts = parsedArgs as unknown as Opts;
+	return match(unsafeOpts)
+		.when(unsafeOpts => unsafeOpts.task === 'get-image', () => sendAsyncRes(getArchetypeDockerImage()))
 		.otherwise(() => {
-			const p = parsedArgs.sourceFile
-				? compileContract(parsedArgs)(parsedArgs.sourceFile)
+			const p = unsafeOpts.sourceFile
+				? compileContract(unsafeOpts)(unsafeOpts.sourceFile)
 					.then(result => [result])
-				: compileAll(parsedArgs)
+				: compileAll(unsafeOpts)
 					.then(results => {
 						if (results.length === 0) sendErr('No contracts found to compile.');
 						return results;
@@ -92,5 +96,6 @@ const compile = <T>(parsedArgs: Opts) =>
 				.then(sendJsonRes)
 				.catch(err => sendAsyncErr(err, false));
 		});
+};
 
 export default compile;

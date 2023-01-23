@@ -3,7 +3,7 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
-	"version": "0.24.2",
+	"version": "0.25.16",
 	"private": true,
 	"engines": {
 		"vscode": "^1.68.1",
@@ -35,7 +35,7 @@
 			"distDir": "./out/test",
 			"context": "node",
 			"engines": {
-				"node": ">= 12"
+				"node": ">= 16"
 			},
 			"includeNodeModules": {
 				"vscode": false
@@ -239,8 +239,16 @@
 				"category": "Taqueria",
 				"title": "Compile Current File",
 				"shortTitle": "compile current file",
-				"enablement": "resourceExtname in @taqueria/supported-smart-contract-extensions",
+				"enablement": "resourceExtname in @taqueria/supported-smart-contract-extensions && editorFocus",
 				"icon": "$(combine)"
+			},
+			{
+				"command": "taqueria.generate_test_stub_current_file",
+				"category": "Taqueria",
+				"title": "Generate Test Stub For Current File",
+				"shortTitle": "generate test stub for current file",
+				"enablement": "@taqueria/plugin-jest && resourceExtname == .tz",
+				"icon": "$(beaker)"
 			},
 			{
 				"command": "taqueria.compile_pick_file",
@@ -249,6 +257,14 @@
 				"shortTitle": "compile pick file",
 				"enablement": "@taqueria/plugin-any-compiler",
 				"icon": "$(combine)"
+			},
+			{
+				"command": "taqueria.generate_test_stub_pick_file",
+				"category": "Taqueria",
+				"title": "Generate Test Stub (Pick File)",
+				"shortTitle": "generate test stub pick file",
+				"enablement": "@taqueria/plugin-jest && @taqueria/plugin-any-compiler",
+				"icon": "$(beaker)"
 			},
 			{
 				"command": "taqueria.compile_smartpy",
@@ -367,6 +383,14 @@
 				"icon": "$(run)"
 			},
 			{
+				"command": "taqueria.generate_test_stub",
+				"category": "Taqueria",
+				"title": "Generate Test Stub",
+				"shortTitle": "generate test stub",
+				"enablement": "@taqueria/plugin-jest",
+				"icon": "$(beaker)"
+			},
+			{
 				"command": "taqueria.add_contract",
 				"category": "Taqueria",
 				"title": " Add contract to registry",
@@ -441,6 +465,10 @@
 				},
 				{
 					"command": "taqueria.compile_archetype",
+					"when": "false"
+				},
+				{
+					"command": "taqueria.generate_test_stub",
 					"when": "false"
 				},
 				{
@@ -550,6 +578,11 @@
 					"group": "inline"
 				},
 				{
+					"command": "taqueria.generate_test_stub",
+					"when": "view == taqueria-artifacts",
+					"group": "inline"
+				},
+				{
 					"command": "taqueria.originate_pick_file",
 					"when": "view == taqueria-environments",
 					"group": "inline"
@@ -591,7 +624,7 @@
 				},
 				{
 					"command": "taqueria.refresh_sandbox_data",
-					"when": "view == taqueria-sandboxes",
+					"when": "false",
 					"group": "inline"
 				},
 				{
@@ -726,14 +759,14 @@
 		"test": "./bin/run-tests.sh"
 	},
 	"devDependencies": {
-		"@taquito/taquito": "^13.0.1",
+		"@taquito/taquito": "^15.0.0",
 		"@types/fs-extra": "^9.0.13",
 		"@types/glob": "^7.2.0",
 		"@types/mocha": "^5.2.6",
 		"@types/node": "^17.0.17",
 		"@types/promise-memoize": "^1.2.1",
 		"@types/semver": "^7.3.10",
-		"@types/vscode": "1.63.0",
+		"@types/vscode": "^1.68.1",
 		"@typescript-eslint/eslint-plugin": "^5.9.1",
 		"@typescript-eslint/parser": "^5.9.1",
 		"@vscode/test-electron": "^2.1.2",
@@ -747,7 +780,8 @@
 	},
 	"dependencies": {
 		"@microsoft/signalr": "^6.0.8",
-		"@taqueria/protocol": "^0.24.2",
+		"@taqueria/analytics": "^0.25.16-rc",
+		"@taqueria/protocol": "^0.25.16-rc",
 		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
 		"eventsource": "^2.0.2",

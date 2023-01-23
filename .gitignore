@@ -21,6 +21,8 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
+tests/coverage
+/tests/coverage_report
 
 # nyc test coverage
 .nyc_output
@@ -112,11 +114,8 @@ node_modules
 **/.parcel-cache/*
 /taqueria
 /taq
-tests/coverage
-/taqueria-protocol/*.mjs
-/taqueria-protocol/*.map
-/taqueria-protocol/*.d.ts
-/taqueria-protocol/*.js
+
+# SDK
 /taqueria-sdk/index.js
 /taqueria-sdk/index.js.map
 /taqueria-sdk/types.js
@@ -128,55 +127,23 @@ tests/coverage
 /taqueria-sdk/*.mjs
 /taqueria-sdk/*.mjs.map
 /taqueria-sdk/*.d.ts
-/taqueria-plugin-core/index.js
-/taqueria-plugin-core/index.js.map
-/taqueria-plugin-smartpy/index.js
-/taqueria-plugin-smartpy/index.js.map
-/taqueria-plugin-ligo/index.js
-/taqueria-plugin-ligo/index.js.map
-/tests/coverage_report
-/taqueria-plugin-smartpy/.parcel-cache
-/taqueria-plugin-taquito/index.js
-/taqueria-plugin-taquito/index.js.map
-/taqueria-plugin-mock/index.js
-/taqueria-plugin-mock/index.js.map
-/taqueria-plugin-taquito/.parcel-cache
-/taqueria-plugin-flextesa/index.js
-/taqueria-plugin-flextesa/index.js.map
-/taqueria-plugin-flextesa/.parcel-cache
-/taqueria-flextesa-manager/index.js
-/taqueria-plugin-teztnets/index.js
-/taqueria-plugin-teztnets/index.js.map
-/taqueria-plugin-teztnets/.parcel-cache
-/taqueria-plugin-contract-types/*.js
-/taqueria-plugin-contract-types/*.map
-/taqueria-plugin-contract-types/*.cjs
-/taqueria-plugin-contract-types/*.mjs
-/taqueria-plugin-contract-types/*.d.ts
-/taqueria-plugin-contract-types/**/*.js
-/taqueria-plugin-contract-types/**/*.map
-/taqueria-plugin-contract-types/**/*.cjs
-/taqueria-plugin-contract-types/**/*.d.ts
-/taqueria-plugin-archetype/index.js
-/taqueria-plugin-archetype/index.js.map
-/taqueria-plugin-tezos-client/index.js
-/taqueria-plugin-tezos-client/index.js.map
-/taqueria-state/index.js
-/taqueria-state/index.js.map
-/taqueria-state/*.d.ts
-/taqueria-state/node/*.d.ts
+
+# Taqueria Build Artifacts
+/taqueria*/*.js
+/taqueria*/*.d.ts
+/taqueria*/*.mjs
+/taqueria*/*.map
+/taqueria*/*.cjs
+/taqueria*/**/*.js
+/taqueria*/**/*.map
+/taqueria*/**/*.d.ts
+/taqueria*/**/*.mjs
+/taqueria*/**/*.cjs
+
+# Toolkit
 /taqueria-toolkit/index.js
 /taqueria-toolkit/index.js.map
 /taqueria-toolkit/*.d.ts
-/taqueria-plugin-jest/*.js
-/taqueria-plugin-jest/*.cjs
-/taqueria-plugin-jest/*.map
-/taqueria-plugin-jest/*.mjs
-/taqueria-plugin-jest/index.d.ts
-/taqueria-plugin-ipfs-pinata/index.js.map
-/taqueria-plugin-ipfs-pinata/index.js
-/taqueria-plugin-metadata/index.js.map
-/taqueria-plugin-metadata/index.js
 
 # VS Code Extension
 /taqueria-vscode-extension/out
@@ -184,11 +151,23 @@ tests/coverage
 .vscode-test
 /taqueria-vscode-extension/state.json
 /taqueria-vscode-extension/config.json
+
+# Website
 website/docs/glossary.md
 website/yarn.lock
-taqueria-plugin-metadata/index.js
-taqueria-plugin-metadata/index.js.map
+
+# Taqueria Protocol
+/taqueria-protocol/out
+/taqueria-protocol/*.mjs
+/taqueria-protocol/*.map
+/taqueria-protocol/*.d.ts
+/taqueria-protocol/*.js
+taqueria-protocol/**/*.js
+taqueria-protocol/**/*.map
+taqueria-protocol/**/*.d.ts
+taqueria-protocol/**/*.mjs
 
 # Temp taq projects created from e2e test execution
 tests/e2e/auto-test-*
 tests/scrap
+tests/unit/taqueria-sdk/temp

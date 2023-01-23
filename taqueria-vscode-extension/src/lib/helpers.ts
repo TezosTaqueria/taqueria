@@ -1,11 +1,13 @@
+import * as Analytics from '@taqueria/analytics';
 import loadI18n, { i18n } from '@taqueria/protocol/i18n';
+import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import { TaqError } from '@taqueria/protocol/TaqError';
-import { Config } from '@taqueria/protocol/taqueria-protocol-types';
 import { spawn } from 'child_process';
 import Table from 'cli-table3';
 import fs from 'fs';
 import { readFile } from 'fs/promises';
 import { stat } from 'fs/promises';
+import fetch from 'node-fetch-commonjs';
 import os from 'os';
 import path, { join } from 'path';
 import { uniq } from 'rambda';
@@ -30,11 +32,13 @@ import { ScaffoldsDataProvider, ScaffoldTreeItem } from './gui/ScaffoldsDataProv
 import { SystemCheckDataProvider, SystemCheckTreeItem } from './gui/SystemCheckDataProvider';
 import { TestDataProvider, TestTreeItem } from './gui/TestDataProvider';
 import { createVscodeWebUiHtml } from './gui/web/WebUI';
+import { LogHelper, OutputLevels, shouldOutput } from './LogHelper';
 import * as Util from './pure';
 import { execCmd } from './pure';
+import * as Settings from './settings';
 import { getLanguageInfoForFileName, getSupportedSmartContractExtensions } from './SmartContractLanguageInfo';
 import { TaqVsxError } from './TaqVsxError';
-
+import { WatcherList } from './WatchersList';
 export const COMMAND_PREFIX = 'taqueria.';
 
 const minNodeVersion = '16.13.1';
@@ -46,16 +50,6 @@ export enum Commands {
 	uninstall = 'uninstall',
 	optIn = 'optIn',
 	optOut = 'optOut',
-}
-
-export enum OutputLevels {
-	output,
-	fatal,
-	error,
-	warn,
-	info,
-	debug,
-	trace,
 }
 
 interface HasToString {
@@ -78,54 +72,16 @@ enum AnalyticsOptionState {
 	optedOut,
 }
 
-const outputLevelsOrder = [
-	OutputLevels.trace,
-	OutputLevels.debug,
-	OutputLevels.info,
-	OutputLevels.warn,
-	OutputLevels.error,
-	OutputLevels.fatal,
-	OutputLevels.output,
-];
-
-const shouldOutput = (currentLogLevel: OutputLevels, configuredLogLevel: OutputLevels) => {
-	const currentLogIndex = outputLevelsOrder.indexOf(currentLogLevel);
-	const configuredLogIndex = outputLevelsOrder.indexOf(configuredLogLevel);
-	return currentLogIndex >= configuredLogIndex;
-};
-
-export type Output = {
-	outputChannel: api.OutputChannel;
-	logLevel: OutputLevels;
-	logChannel: api.OutputChannel;
-};
-
-type VSCodeAPI = typeof api;
+export type VsCodeApi = typeof api;
 
 export interface InjectedDependencies {
-	vscode: VSCodeAPI;
+	vscode: VsCodeApi;
 }
 
 export const sanitizeDeps = (deps?: InjectedDependencies) =>
 	deps
 		? deps
 		: { vscode: api };
-
-export const showOutput = (output: Output) => {
-	return (data: string) => {
-		output.outputChannel.appendLine(data);
-		output.outputChannel.show();
-	};
-};
-
-export const showLog = (output: Output) => {
-	return (currentOutputLevel: OutputLevels, data: string) => {
-		if (!shouldOutput(currentOutputLevel, output.logLevel)) {
-			return;
-		}
-		output.logChannel.appendLine(data);
-	};
-};
 
 export interface HasFileName {
 	fileName: string;
@@ -164,33 +120,202 @@ export type TaskTitles = {
 };
 
 export class VsCodeHelper {
+	private analytics?: ReturnType<typeof Analytics.inject>;
 	private constructor(
 		private context: api.ExtensionContext,
-		private vscode: VSCodeAPI,
-		private output: Output,
+		private vscode: VsCodeApi,
+		public logHelper: LogHelper,
 		private i18: i18n,
+		public watchers: WatcherList,
 	) {}
 
 	static async construct(context: api.ExtensionContext, deps: InjectedDependencies) {
 		const vscode = deps.vscode;
-		const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
-		const logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
-		const outputChannel = vscode.window.createOutputChannel('Taqueria');
-		const logChannel = vscode.window.createOutputChannel('Taqueria Logs');
-		const output = {
-			outputChannel,
-			logChannel,
-			logLevel,
-		};
-		showLog(output)(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
+		const logHelper = new LogHelper(vscode);
+		logHelper.showLog(OutputLevels.info, 'the activate function was called for the Taqueria VsCode Extension.');
 
 		const i18n = await loadI18n();
+		const watchers = new WatcherList(logHelper);
 
-		return new VsCodeHelper(context, vscode, output, i18n);
+		return new VsCodeHelper(context, vscode, logHelper, i18n, watchers);
+	}
+
+	async setup(): Promise<void> {
+		this.listenToDockerEvents();
+
+		// Add built-in tasks for Taqueria
+		this.exposeInitTask();
+		this.exposeScaffoldTask();
+		await this.exposeInstallTask();
+		await this.exposeUninstallTask();
+		this.exposeTaqTaskAsCommand(
+			'opt_in',
+			'opt-in',
+			'output',
+			{
+				finishedTitle: `opted in to analytics`,
+				progressTitle: `opting in to analytics`,
+			},
+		);
+		this.exposeTaqTaskAsCommand(
+			'opt_out',
+			'opt-out',
+			'output',
+			{
+				finishedTitle: `opted out of analytics`,
+				progressTitle: `opting out of analytics`,
+			},
+		);
+		this.exposeRefreshCommand();
+		this.exposeInstallTaqCliCommand();
+		// await this.watchGlobalSettings();
+
+		this.exposeCompileCommand('compile_smartpy', 'getFromCommand', 'smartpy');
+		this.exposeCompileCommand('compile_ligo', 'getFromCommand', 'ligo');
+		this.exposeCompileCommand('compile_archetype', 'getFromCommand', 'archetype');
+		this.exposeCompileCommand('compile_pick_file', 'openDialog', undefined);
+		this.exposeCompileCommand('compile_current_file', 'currentFile', undefined);
+		this.exposeTaqTaskAsCommandWithFileArgument(
+			'add_contract',
+			'add-contract',
+			'output',
+			{
+				finishedTitle: `added contract to registry`,
+				progressTitle: `adding contract to registry`,
+			},
+		);
+		this.exposeTaqTaskAsCommandWithFileArgument(
+			'rm_contract',
+			'rm-contract',
+			'output',
+			{
+				finishedTitle: `removed contract from registry`,
+				progressTitle: `removing contract from registry`,
+			},
+		);
+
+		this.exposeTaqTaskAsCommand(
+			'generate_types',
+			'generate types',
+			'output',
+			{
+				finishedTitle: `generated types`,
+				progressTitle: `generating types`,
+			},
+		);
+		this.exposeTypecheckCommand();
+		this.exposeTestSetupCommand();
+		this.exposeRunTestCommand();
+
+		// Sandbox tasks
+		this.exposeSandboxTaskAsCommand(
+			'start_sandbox',
+			'start sandbox',
+			{
+				finishedTitle: `started sandbox`,
+				progressTitle: `starting sandbox`,
+			},
+		);
+		this.exposeSandboxTaskAsCommand(
+			'stop_sandbox',
+			'stop sandbox',
+			{
+				finishedTitle: `stopped sandbox`,
+				progressTitle: `stopping sandbox`,
+			},
+		);
+		this.exposeSandboxTaskAsCommand(
+			'list_accounts',
+			'list accounts',
+			{
+				finishedTitle: `listed sandbox accounts`,
+				progressTitle: `listing sandbox accounts`,
+			},
+		);
+
+		this.exposeOriginateTask('originate', 'getFromCommand');
+		this.exposeOriginateTask('originate_current_file', 'currentFile');
+		this.exposeOriginateTask('originate_pick_file', 'openDialog');
+
+		this.exposeGenerateTestStubTask('generate_test_stub', 'getFromCommand');
+		this.exposeGenerateTestStubTask('generate_test_stub_current_file', 'currentFile');
+		this.exposeGenerateTestStubTask('generate_test_stub_pick_file', 'openDialog');
+
+		this.exposeRefreshSandBoxDataCommand();
+		this.exposeShowEntrypointParametersCommand();
+		this.exposeShowOperationDetailsCommand();
+		this.exposeInvokeEntrypointCommand();
+
+		this.vscode.workspace.onDidChangeWorkspaceFolders(async e => {
+			for (const folder of e.added) {
+				try {
+					this.createWatcherIfNotExists(folder.uri.fsPath);
+				} catch (error: unknown) {
+					this.logAllNestedErrors(error);
+				}
+			}
+		});
+		this.vscode.workspace.workspaceFolders?.forEach(folder => {
+			try {
+				this.createWatcherIfNotExists(folder.uri.fsPath);
+			} catch (error: unknown) {
+				this.logAllNestedErrors(error);
+			}
+		});
+
+		await this.registerDataProviders();
+		this.createTreeViews();
+
+		await this.updateCommandStates();
+
+		// When there workspace changes, sent all tracked events
+		this.vscode.workspace.onDidChangeWorkspaceFolders(() => this.sendEvents());
+
+		this.vscode.window.onDidChangeWindowState(() => this.sendEvents());
+
+		// Track an event indicating the vscode extension has been loaded
+		await this.trackEvent('taq_vscode_loaded', {
+			ext_version: this.context.extension.packageJSON.version,
+			vscode_version: this.vscode.version,
+		});
+
+		await this.sendEvents();
 	}
 
 	get i18n() {
 		return this.i18;
+	}
+
+	async getAnalytics() {
+		if (!this.analytics) {
+			const taqVersion = (await this.getTaqVersion()) || 'unknown';
+			const taqBuild = (await this.getTaqBuild()) || 'unknown';
+
+			this.analytics = Analytics.inject({
+				taqVersion: taqVersion.trim(),
+				taqBuild: taqBuild.trim(),
+				isCICD: false,
+				isTesting: false,
+				operatingSystem: process.platform,
+				getMachineId: () => Promise.resolve('test'),
+				settings: await Settings.getSettings(),
+				fetch,
+			});
+		}
+		return this.analytics;
+	}
+
+	async trackEvent(eventName: string, eventFields: Analytics.EventParams) {
+		return (await this.getAnalytics()).trackEvent(eventName, {
+			taq_ui: 'VSCode',
+			...eventFields,
+		});
+	}
+
+	async sendEvents() {
+		const analytics = await this.getAnalytics();
+		console.log(analytics.getEvents());
+		return analytics.sendTrackedEvents();
 	}
 
 	getFolders() {
@@ -199,22 +324,6 @@ export class VsCodeHelper {
 			return [];
 		}
 		return workspaceFolders.map(x => x.uri);
-	}
-
-	getOutput() {
-		return showOutput(this.output);
-	}
-
-	getLog() {
-		return showLog(this.output);
-	}
-
-	showOutput(data: string) {
-		return showOutput(this.output)(data);
-	}
-
-	showLog(currentOutputLevel: OutputLevels, data: string) {
-		return showLog(this.output)(currentOutputLevel, data);
 	}
 
 	exposeInitTask() {
@@ -513,7 +622,7 @@ export class VsCodeHelper {
 			'@taqueria/plugin-smartpy',
 			'@taqueria/plugin-taquito',
 			'@taqueria/plugin-tezos-client',
-		];
+		].map(NonEmptyString.create);
 	}
 
 	private getCompilerPlugins() {
@@ -530,8 +639,8 @@ export class VsCodeHelper {
 			if (HOME_DIR) {
 				const availablePluginsFile = join(HOME_DIR, 'taqueria-plugins.json');
 				const contents = await readFile(availablePluginsFile, { encoding: 'utf-8' });
-				const decoded = JSON.parse(contents);
-				return decoded as string[];
+				const decoded = JSON.parse(contents) as string[];
+				return decoded.map(NonEmptyString.create);
 			}
 		} catch {
 			// Ignore
@@ -637,7 +746,7 @@ export class VsCodeHelper {
 					return;
 				}
 				await this.proxyToTaqAndShowOutput(
-					`originate -e ${environmentName} ${fileName ?? ''}`,
+					`originate -e ${environmentName} ${fileName}`,
 					{
 						finishedTitle: 'originated contracts',
 						progressTitle: 'originating contracts',
@@ -647,6 +756,63 @@ export class VsCodeHelper {
 				);
 			},
 		);
+	}
+
+	async exposeGenerateTestStubTask(
+		cmdId: string,
+		fileSelectionBehavior: 'getFromCommand' | 'currentFile' | 'openDialog',
+	) {
+		this.registerCommand(
+			cmdId,
+			async (arg?: HasFileName | EnvironmentTreeItem | api.Uri | undefined) => {
+				const { config, pathToDir } = this.observableConfig.currentConfig;
+				if (!config || !pathToDir) {
+					return;
+				}
+				const fileName = await this.getFileNameForOperationsOnContracts(
+					cmdId,
+					fileSelectionBehavior,
+					config,
+					'originate',
+					'artifacts',
+					arg instanceof EnvironmentTreeItem ? undefined : arg,
+				);
+				if (!fileName) {
+					return;
+				}
+				const testFolder = await this.getTestFolder();
+				if (!testFolder) {
+					return;
+				}
+				await this.proxyToTaqAndShowOutput(
+					`create contract-test ${fileName} --partition ${testFolder}`,
+					{
+						finishedTitle: 'originated contracts',
+						progressTitle: 'originating contracts',
+					},
+					pathToDir,
+					true,
+				);
+			},
+		);
+	}
+
+	async getTestFolder(): Promise<string | undefined> {
+		const testFolders = await this.testDataProvider?.findTestFolders();
+		if (!testFolders || testFolders.length === 0) {
+			this.logHelper.showOutput(
+				"Could not find a test partition. Maybe running the command 'Create Test Folder' Can fix this.",
+			);
+			return undefined;
+		}
+		if (testFolders.length === 1) {
+			return testFolders[0];
+		}
+		const testFolder = await this.vscode.window.showQuickPick(testFolders, {
+			canPickMany: false,
+			title: 'Please choose the test partition',
+		});
+		return testFolder;
 	}
 
 	async getEnvironment(config: Util.TaqifiedDir) {
@@ -671,7 +837,7 @@ export class VsCodeHelper {
 	async getTaqBinPath() {
 		let providedPath = this.vscode.workspace.getConfiguration('taqueria').get('path', '');
 		if (!providedPath || (providedPath as string).length === 0) {
-			providedPath = await Util.findTaqBinary(this.i18, this.getLog());
+			providedPath = await Util.findTaqBinary(this.i18, this.logHelper.showLog);
 		}
 		return providedPath as Util.PathToTaq;
 	}
@@ -727,23 +893,24 @@ export class VsCodeHelper {
 			return;
 		}
 		try {
-			if (!shouldOutput(outputLevel, this.output.logLevel)) {
+			if (!shouldOutput(outputLevel, this.logHelper.logLevel)) {
 				return;
 			}
-			let text: string;
+			let text: string | undefined = undefined;
 			if (instanceOfHasToString(err)) {
 				text = err.toString();
-			} else {
+			}
+			if (text === undefined || text === '[object Object]') {
 				text = JSON.stringify(err, undefined, 4);
 			}
-			this.output.logChannel.appendLine(text);
+			this.logHelper.logChannel.appendLine(text);
 			if (!suppressWindow) {
-				this.output.logChannel.show();
+				this.logHelper.logChannel.show();
 			}
 		} catch {
 			try {
-				this.output.logChannel.appendLine(`unknown error occurred while trying to log an error.`);
-				this.output.logChannel.appendLine(`error object: ${err}`);
+				this.logHelper.logChannel.appendLine(`unknown error occurred while trying to log an error.`);
+				this.logHelper.logChannel.appendLine(`error object: ${err}`);
 			} catch {
 				// at this point, we cannot do anything
 			}
@@ -841,14 +1008,14 @@ export class VsCodeHelper {
 				if (result.standardError) {
 					const fixedError = this.fixOutput(result.standardError, true);
 					if (logStandardErrorToOutput) {
-						this.showOutput(fixedError);
+						this.logHelper.showOutput(fixedError);
 					} else {
-						this.showLog(OutputLevels.warn, fixedError);
+						this.logHelper.showLog(OutputLevels.warn, fixedError);
 					}
 				}
 				if (result.standardOutput) {
 					const fixedOutput = this.fixOutput(result.standardOutput, true);
-					this.showOutput(fixedOutput);
+					this.logHelper.showOutput(fixedOutput);
 				}
 				if (result.executionError || result.standardError) {
 					this.vscode.window.showWarningMessage(
@@ -884,11 +1051,11 @@ export class VsCodeHelper {
 		if (projectDir) {
 			return await Util.execCmd(
 				`${pathToTaq} -p ${projectDir} --fromVsCode ${taskWithArgs}`,
-				this.getLog(),
+				this.logHelper.showLog,
 				{ projectDir: pathToDir },
 			);
 		} else {
-			return await Util.execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`, this.getLog());
+			return await Util.execCmd(`${pathToTaq} --fromVsCode ${taskWithArgs}`, this.logHelper.showLog);
 		}
 	}
 
@@ -921,7 +1088,7 @@ export class VsCodeHelper {
 			async (item?: HasFileName | api.Uri | undefined) => {
 				const { config, pathToDir } = this.observableConfig.currentConfig;
 				if (!config || !pathToDir) {
-					this.showLog(
+					this.logHelper.showLog(
 						OutputLevels.warn,
 						`Could not determine current project folder: ${JSON.stringify({ config, pathToDir }, null, 2)}`,
 					);
@@ -938,7 +1105,7 @@ export class VsCodeHelper {
 				if (!fileName) {
 					return;
 				}
-				this.showLog(OutputLevels.debug, `Running command ${cmdId} for ${fileName}`);
+				this.logHelper.showLog(OutputLevels.debug, `Running command ${cmdId} for ${fileName}`);
 				const taskWithArgs = `--plugin ${compilerPlugin ?? getLanguageInfoForFileName(fileName)?.compilerName} compile`;
 				await this.proxyToTaqAndShowOutput(
 					`${taskWithArgs} ${fileName}`,
@@ -972,14 +1139,14 @@ export class VsCodeHelper {
 			} else if (item instanceof api.Uri) {
 				const fileName = path.relative(expectedContractsOrArtifactsFolder, item.path);
 				if (!fileName) {
-					this.showLog(
+					this.logHelper.showLog(
 						OutputLevels.warn,
 						`Could not determine relative filename for ${item.path}, canceling ${cmdId} command.`,
 					);
 				}
 				return fileName;
 			} else if (fileSelectionBehavior === 'getFromCommand') {
-				this.showLog(
+				this.logHelper.showLog(
 					OutputLevels.warn,
 					`File to be ${commandTitle}d was not passed to command or could not determine relative filename for ${
 						JSON.stringify(item, null, 2)
@@ -989,9 +1156,18 @@ export class VsCodeHelper {
 			}
 		}
 		if (fileSelectionBehavior === 'currentFile') {
+			let viewColumn = this.vscode.window.activeTextEditor?.viewColumn;
+			if (!viewColumn) {
+				this.logHelper.showLog(
+					OutputLevels.warn,
+					`Focused window is not a text editor.`,
+				);
+				return;
+			}
+
 			let absoluteFilePath = this.vscode.window.activeTextEditor?.document.uri.path;
 			if (!absoluteFilePath) {
-				this.showLog(
+				this.logHelper.showLog(
 					OutputLevels.warn,
 					`No file is open in the text editor.`,
 				);
@@ -1015,7 +1191,7 @@ export class VsCodeHelper {
 				title: `Select a smart contract file to ${commandTitle}`,
 			});
 			if (!fileNames) {
-				this.showLog(
+				this.logHelper.showLog(
 					OutputLevels.debug,
 					`The user canceled out of ${commandTitle} process.`,
 				);
@@ -1023,7 +1199,7 @@ export class VsCodeHelper {
 			}
 			return path.relative(expectedContractsOrArtifactsFolder, fileNames[0].path);
 		}
-		this.showLog(
+		this.logHelper.showLog(
 			OutputLevels.warn,
 			`Unknown file mode for ${commandTitle} command.`,
 		);
@@ -1034,11 +1210,13 @@ export class VsCodeHelper {
 		let fileName = uri.path;
 		const mainFolder = this.getMainWorkspaceFolder();
 		if (!mainFolder) {
-			this.showLog(OutputLevels.warn, `No workspace is open, canceling command.`);
+			this.logHelper.showLog(OutputLevels.warn, `No workspace is open, canceling command.`);
 			return undefined;
 		}
 		const config = await Util.TaqifiedDir.create(mainFolder.fsPath as Util.PathToDir, this.i18);
-		const dir = folder === 'contracts' ? config.config.contractsDir : config.config.artifactsDir ?? folder;
+		const dir = folder === 'contracts'
+			? (config.config.contractsDir ?? 'contracts')
+			: config.config.artifactsDir ?? folder;
 		fileName = path.relative(path.join(mainFolder.path, dir), fileName);
 		return fileName;
 	}
@@ -1059,7 +1237,7 @@ export class VsCodeHelper {
 
 	exposeTestSetupCommand() {
 		this.registerCommand(
-			COMMAND_PREFIX + 'create_test_folder',
+			'create_test_folder',
 			async () => {
 				const mainFolder = this.getMainWorkspaceFolder();
 				if (!mainFolder) {
@@ -1071,13 +1249,14 @@ export class VsCodeHelper {
 					canSelectMany: false,
 					openLabel: 'Select',
 					title: 'Select a Folder to setup as test',
+					defaultUri: mainFolder,
 				});
 				if (!folders || folders.length !== 1) {
 					return;
 				}
 				const folder = folders[0].path.replace(mainFolder.fsPath + '/', '');
 				await this.proxyToTaqAndShowOutput(
-					`test --init ${folder}`,
+					`--plugin @taqueria/plugin-jest test --init ${folder}`,
 					{
 						finishedTitle: `Setup folder ${folder} as test`,
 						progressTitle: `Setting up folder ${folder} as test`,
@@ -1095,7 +1274,7 @@ export class VsCodeHelper {
 			async (item: TestTreeItem) => {
 				const folder = item.relativePath;
 				await this.proxyToTaqAndShowOutput(
-					`test ${folder}`,
+					`--plugin @taqueria/plugin-jest test ${folder}`,
 					{
 						finishedTitle: `Run tests from ${folder}`,
 						progressTitle: `Running tests from ${folder}`,
@@ -1138,9 +1317,9 @@ export class VsCodeHelper {
 
 	async updateCommandStates() {
 		await this.observableConfig.loadConfig();
-		const [isTaqReachable, nodeVersion] = await Promise.all([
-			this.isTaqCliReachable(),
-			Util.getNodeVersion(this.getLog()),
+		const [taqVersion, nodeVersion] = await Promise.all([
+			this.getTaqVersion(),
+			Util.getNodeVersion(this.logHelper.showLog),
 		]);
 
 		let nodeFound, isNodeVersionValid, nodeMeetsVersionRequirement: boolean;
@@ -1153,6 +1332,7 @@ export class VsCodeHelper {
 			isNodeVersionValid = !!semver.valid(nodeVersion);
 			nodeMeetsVersionRequirement = semver.gt(nodeVersion, minNodeVersion);
 		}
+		const isTaqReachable = taqVersion !== undefined && taqVersion.length > 0;
 		const systemCheckPassed = isTaqReachable && nodeFound && isNodeVersionValid && nodeMeetsVersionRequirement;
 
 		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taq-cli-reachable', isTaqReachable);
@@ -1175,7 +1355,7 @@ export class VsCodeHelper {
 		if (this.systemCheckTreeView) {
 			this.systemCheckTreeView.title = `${systemCheckPassed ? '✅' : '❌'} System Check`;
 			let message = '';
-			if (isTaqReachable) {
+			if (taqVersion) {
 				message += `✅ Taq CLI: Installed \n`;
 			} else {
 				message += `❌ Taq CLI: Installed (or not in PATH) \n`;
@@ -1195,7 +1375,7 @@ export class VsCodeHelper {
 
 		const mainFolder = this.getMainWorkspaceFolder();
 		if (mainFolder === undefined) {
-			this.showLog(OutputLevels.trace, 'No folder is open, enabling init and scaffold');
+			this.logHelper.showLog(OutputLevels.trace, 'No folder is open, enabling init and scaffold');
 			this.vscode.commands.executeCommand(
 				'setContext',
 				'@taqueria-state/enable-init-scaffold',
@@ -1205,15 +1385,15 @@ export class VsCodeHelper {
 		}
 		this.refreshDataProviders.forEach(dataProvider => dataProvider.refresh());
 
-		this.showLog(OutputLevels.trace, 'Project config changed, updating command states...');
+		this.logHelper.showLog(OutputLevels.trace, 'Project config changed, updating command states...');
 		let taqFolderFound: boolean;
 		try {
 			await Util.makeDir(join(mainFolder.path, '.taq'), this.i18);
-			this.showLog(OutputLevels.trace, 'Taq folder is found');
+			this.logHelper.showLog(OutputLevels.trace, 'Taq folder is found');
 			taqFolderFound = true;
 		} catch {
 			taqFolderFound = false;
-			this.showLog(OutputLevels.trace, 'Taq folder not found');
+			this.logHelper.showLog(OutputLevels.trace, 'Taq folder not found');
 		}
 		let enableAllCommands: boolean;
 		let config: Util.TaqifiedDir | null;
@@ -1224,12 +1404,12 @@ export class VsCodeHelper {
 			config = null;
 			enableAllCommands = taqFolderFound;
 			// We don't want to show messages to users when they are working with non-taqified folders (Except when output level is set to info or more verbose)
-			if (shouldOutput(OutputLevels.info, this.output.logLevel) || taqFolderFound) {
+			if (shouldOutput(OutputLevels.info, this.logHelper.logLevel) || taqFolderFound) {
 				this.vscode.commands.executeCommand('setContext', '@taqueria-state/enable-all-commands', true);
-				this.showLog(OutputLevels.error, 'Error: Could not update command states:');
+				this.logHelper.showLog(OutputLevels.error, 'Error: Could not update command states:');
 				this.logAllNestedErrors(e);
 				if (taqFolderFound) {
-					this.showLog(
+					this.logHelper.showLog(
 						OutputLevels.warn,
 						'The Taqueria config for this project could not be loaded. All Taqueria commands will be temporarily enabled.\nPlease check for errors in the .taq/config.json file\n',
 					);
@@ -1240,7 +1420,7 @@ export class VsCodeHelper {
 		const availablePluginsNotInstalled = config?.config?.plugins
 			? availablePlugins.filter(name => config?.config.plugins?.findIndex(p => p.name === name) === -1)
 			: availablePlugins;
-		this.showLog(
+		this.logHelper.showLog(
 			OutputLevels.trace,
 			`@taqueria-state/enable-init-scaffold: ${enableAllCommands || !config?.config}`,
 		);
@@ -1250,7 +1430,7 @@ export class VsCodeHelper {
 			enableAllCommands || !config?.config,
 		);
 
-		this.showLog(
+		this.logHelper.showLog(
 			OutputLevels.trace,
 			`@taqueria-state/enable-install-uninstall: ${enableAllCommands || !!config?.config}`,
 		);
@@ -1260,7 +1440,7 @@ export class VsCodeHelper {
 			enableAllCommands || !!config?.config,
 		);
 
-		this.showLog(OutputLevels.trace, `@taqueria-state/is-taqified: ${!!config?.config}`);
+		this.logHelper.showLog(OutputLevels.trace, `@taqueria-state/is-taqified: ${!!config?.config}`);
 		this.vscode.commands.executeCommand('setContext', '@taqueria-state/is-taqified', !!config?.config);
 
 		this.vscode.commands.executeCommand(
@@ -1274,10 +1454,10 @@ export class VsCodeHelper {
 			enableAllCommands ? 1 : availablePluginsNotInstalled.length,
 		);
 		const plugins = this.getWellKnownPlugins();
-		this.showLog(OutputLevels.trace, `Known plugins: ${JSON.stringify(plugins)}`);
+		this.logHelper.showLog(OutputLevels.trace, `Known plugins: ${JSON.stringify(plugins)}`);
 		for (const plugin of plugins) {
 			const found = config?.config?.plugins?.find(item => item.name === plugin) !== undefined;
-			this.showLog(OutputLevels.trace, `plugins ${plugin}: ${found}`);
+			this.logHelper.showLog(OutputLevels.trace, `plugins ${plugin}: ${found}`);
 			this.vscode.commands.executeCommand('setContext', plugin, enableAllCommands || found);
 		}
 		const installedCompilers = this.getCompilerPlugins().filter(compiler =>
@@ -1291,7 +1471,7 @@ export class VsCodeHelper {
 			'@taqueria/supported-smart-contract-extensions',
 			supportedFileExtensions,
 		);
-		this.showLog(OutputLevels.debug, `Supported extensions: ${JSON.stringify(supportedFileExtensions)}`);
+		this.logHelper.showLog(OutputLevels.debug, `Supported extensions: ${JSON.stringify(supportedFileExtensions)}`);
 	}
 
 	public static isPluginInstalled(config: Util.TaqifiedDir | null | undefined, pluginName: string) {
@@ -1314,17 +1494,14 @@ export class VsCodeHelper {
 		return this._stateWatcher;
 	}
 
-	createWatcherIfNotExists(
-		projectDir: string,
-		addConfigWatcherIfNotExists: (folder: string, factory: () => api.FileSystemWatcher[]) => void,
-	) {
-		this.showLog(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
-		addConfigWatcherIfNotExists(projectDir, () => {
-			this.showLog(OutputLevels.info, `Adding watchers for directory ${projectDir}.`);
+	createWatcherIfNotExists(projectDir: string) {
+		this.logHelper.showLog(OutputLevels.debug, `Directory ${projectDir} should be watched.`);
+		this.watchers.addConfigWatcherIfNotExists(projectDir, () => {
+			this.logHelper.showLog(OutputLevels.info, `Adding watchers for directory ${projectDir}.`);
 			try {
 				const taqFolderWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq'));
 				this._taqFolderWatcher = taqFolderWatcher;
-				const configWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config.json'));
+				const configWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/config*.json'));
 				this._configWatcher = configWatcher;
 				const stateWatcher = this.vscode.workspace.createFileSystemWatcher(join(projectDir, '.taq/state.json'));
 				this._stateWatcher = stateWatcher;
@@ -1564,13 +1741,23 @@ export class VsCodeHelper {
 		}
 	}
 
-	async isTaqCliReachable() {
+	async getTaqVersion(): Promise<string | undefined> {
 		try {
 			const pathToTaq = await this.getTaqBinPath();
-			const checkResult = await Util.checkTaqBinary(pathToTaq, this.i18, this.getLog());
-			return checkResult.indexOf('OK') !== -1;
-		} catch {
-			return false;
+			return await Util.checkTaqVersion(pathToTaq, this.i18, this.logHelper.showLog, this);
+		} catch (e) {
+			this.logAllNestedErrors(e);
+			return undefined;
+		}
+	}
+
+	async getTaqBuild(): Promise<string | undefined> {
+		try {
+			const pathToTaq = await this.getTaqBinPath();
+			return await Util.checkTaqBuild(pathToTaq, this.i18, this.logHelper.showLog, this);
+		} catch (e) {
+			this.logAllNestedErrors(e);
+			return undefined;
 		}
 	}
 
@@ -1588,23 +1775,35 @@ export class VsCodeHelper {
 
 	exposeShowEntrypointParametersCommand() {
 		this.registerCommand('show_entrypoint_parameters', async (item: SmartContractEntrypointTreeItem) => {
-			// this.showOutput(JSON.stringify(item.jsonParameters, null, 2));
-			this.showOutput(JSON.stringify(item.michelineParameters, null, 2));
-			// this.showOutput(JSON.stringify(item.michelsonParameters, null, 2));
+			// this.logHelper.showOutput(JSON.stringify(item.jsonParameters, null, 2));
+			this.logHelper.showOutput(JSON.stringify(item.michelineParameters, null, 2));
+			// this.logHelper.showOutput(JSON.stringify(item.michelsonParameters, null, 2));
 		});
 	}
 
 	exposeShowOperationDetailsCommand() {
 		this.registerCommand('show_operation_details', async (item: OperationTreeItem) => {
 			const jsonParameters = item.operation;
-			this.showOutput(JSON.stringify(jsonParameters, null, 2));
+			this.logHelper.showOutput(JSON.stringify(jsonParameters, null, 2));
 		});
 	}
 
 	exposeInvokeEntrypointCommand() {
 		this.registerCommand(
 			'invoke_entrypoint',
-			async (item: SmartContractEntrypointTreeItem) => {
+			async (treeViewItem?: SmartContractEntrypointTreeItem) => {
+				const item = {
+					michelineParameters: treeViewItem?.michelineParameters,
+					name: treeViewItem?.name,
+					parent: {
+						alias: treeViewItem?.parent?.alias,
+						address: treeViewItem?.parent?.address,
+					},
+				};
+				if (!item.michelineParameters || !(item.parent.address ?? item.parent.alias)) {
+					// The Item has been refreshed
+					return;
+				}
 				const michelineParameters = item.michelineParameters;
 				const panel = this.vscode.window.createWebviewPanel(
 					'entrypointParameter',
@@ -1635,7 +1834,7 @@ export class VsCodeHelper {
 								);
 								const config = this.observableConfig.currentConfig.config;
 								if (!config) {
-									this.showLog(
+									this.logHelper.showLog(
 										OutputLevels.error,
 										'Unexpected: Current config is empty',
 									);
@@ -1673,7 +1872,7 @@ export class VsCodeHelper {
 			case 'darwin':
 				return this.performDownloadingAndInstallTaqCLI('https://taqueria.io/get/macos/taq');
 			default:
-				this.showLog(OutputLevels.warn, `Taqueria CLI is not supported on ${process.platform}`);
+				this.logHelper.showLog(OutputLevels.warn, `Taqueria CLI is not supported on ${process.platform}`);
 				return false;
 		}
 	}
@@ -1682,22 +1881,22 @@ export class VsCodeHelper {
 		// 2. Download binary
 		const { executionError: curlError } = await execCmd(
 			`curl -s ${taqDownloadUrl} -o /tmp/taq -L`,
-			this.getLog(),
+			this.logHelper.showLog,
 		);
-		this.showLog(OutputLevels.debug, `Downloading Taqueria CLI...`);
+		this.logHelper.showLog(OutputLevels.debug, `Downloading Taqueria CLI...`);
 		if (curlError) {
-			this.showLog(OutputLevels.error, `Failed to download Taqueria CLI: ${curlError}`);
+			this.logHelper.showLog(OutputLevels.error, `Failed to download Taqueria CLI: ${curlError}`);
 			return false;
 		}
-		this.showLog(OutputLevels.info, `Taqueria CLI downloaded successfully`);
+		this.logHelper.showLog(OutputLevels.info, `Taqueria CLI downloaded successfully`);
 
 		// 3. Make Taqueria CLI executable
-		const { executionError: chmodError } = await execCmd(`chmod +x /tmp/taq`, this.getLog());
+		const { executionError: chmodError } = await execCmd(`chmod +x /tmp/taq`, this.logHelper.showLog);
 		if (chmodError) {
-			this.showLog(OutputLevels.error, `Failed to make Taqueria CLI executable: ${chmodError}`);
+			this.logHelper.showLog(OutputLevels.error, `Failed to make Taqueria CLI executable: ${chmodError}`);
 			return false;
 		}
-		this.showLog(OutputLevels.info, `Taqueria CLI made executable successfully`);
+		this.logHelper.showLog(OutputLevels.info, `Taqueria CLI made executable successfully`);
 
 		// 4. Ask for sudo password
 		const sudoPassword = await this.vscode.window.showInputBox({
@@ -1706,7 +1905,7 @@ export class VsCodeHelper {
 			prompt: 'Sudo password is required in order to install Taq CLI',
 		});
 		if (!sudoPassword) {
-			this.showLog(
+			this.logHelper.showLog(
 				OutputLevels.error,
 				`Sudo password is required in order to move Taq CLI binary to /usr/local/bin directory`,
 			);
@@ -1716,22 +1915,22 @@ export class VsCodeHelper {
 		// 5. Move to usr bin
 		const { executionError: moveError } = await execCmd(
 			`mv /tmp/taq /usr/local/bin`,
-			this.getLog(),
+			this.logHelper.showLog,
 			{ sudoPassword },
 		);
 		if (moveError) {
-			this.showLog(OutputLevels.error, `Failed to move Taqueria CLI to /usr/local/bin: ${moveError}`);
+			this.logHelper.showLog(OutputLevels.error, `Failed to move Taqueria CLI to /usr/local/bin: ${moveError}`);
 			return false;
 		}
-		this.showLog(OutputLevels.info, `Taqueria CLI moved to /usr/local/bin successfully`);
+		this.logHelper.showLog(OutputLevels.info, `Taqueria CLI moved to /usr/local/bin successfully`);
 
 		// 6. Check if taq is reachable
-		const { executionError: checkError } = await execCmd(`taq --version`, this.getLog());
+		const { executionError: checkError } = await execCmd(`taq --version`, this.logHelper.showLog);
 		if (checkError) {
-			this.showLog(OutputLevels.error, `Failed to check Taqueria CLI: ${checkError}`);
+			this.logHelper.showLog(OutputLevels.error, `Failed to check Taqueria CLI: ${checkError}`);
 			return false;
 		}
-		this.showLog(OutputLevels.info, `Taqueria CLI installed successfully`);
+		this.logHelper.showLog(OutputLevels.info, `Taqueria CLI installed successfully`);
 
 		// 7. Refresh side panel UI
 		await this.updateCommandStates();

@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-ipfs-pinata",
-	"version": "0.24.2",
+	"version": "0.25.16-rc",
 	"description": "A plugin for Taqueria providing ipfs publishing and pinning using the Pinata service",
 	"keywords": [
 		"taqueria",
@@ -22,7 +22,7 @@
 		}
 	},
 	"scripts": {
-		"build": "npx tsc -noEmit -p ./tsconfig.json && npx parcel build --no-cache 2>&1"
+		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
 	},
 	"author": "ECAD Labs",
 	"license": "Apache-2.0",
@@ -33,7 +33,7 @@
 		"directory": "taqueria-plugin-ipfs-pinata"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.24.2",
+		"@taqueria/node-sdk": "^0.25.16-rc",
 		"dotenv": "^16.0.0",
 		"form-data": "^4.0.0",
 		"ipfs-only-hash": "^4.0.0",
@@ -41,7 +41,23 @@
 	},
 	"devDependencies": {
 		"@types/node-fetch": "^2.6.1",
-		"parcel": "2.6.1",
+		"tsup": "^6.5.0",
 		"typescript": "4.7.2"
+	},
+	"tsup": {
+		"entry": [
+			"index.ts"
+		],
+		"sourcemap": true,
+		"target": "node16",
+		"outDir": "./",
+		"dts": true,
+		"clean": false,
+		"skipNodeModulesBundle": true,
+		"platform": "node",
+		"format": [
+			"esm",
+			"cjs"
+		]
 	}
 }

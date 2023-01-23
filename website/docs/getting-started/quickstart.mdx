@@ -48,6 +48,11 @@ Taqueria provides the command `init` which will create a new directory with the 
 ```shell
 taq init my-first-project
 ```
+Or run the following if you'd like to have the necessary plugins pre-installed for you on initialization (assuming you're a LIGO developer):
+```shell
+taq init my-first-project --workflow ligo
+```
+
 :::caution
 If a project has already been initialized, Taqueria will not re-initialize the project, but will still return a success message. This will be fixed in an upcoming release
 :::
@@ -112,11 +117,13 @@ let main (action, store : parameter * storage) : return =
 ```
 
 ```ligo title="counter.storageList.mligo"
+#include "counter.mligo"
 let initial_count: storage = 42
 let another_count: storage = 23 + 18 - 1
 ```
 
 ```ligo title="counter.parameterList.mligo"
+#include "counter.mligo"
 let increment_by_3: parameter = Increment 3
 ```
 

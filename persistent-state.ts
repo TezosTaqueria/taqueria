@@ -1,3 +1,4 @@
+import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
 import * as PersistentState from '@taqueria/protocol/PersistentState';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
@@ -20,32 +21,42 @@ const {
 	stderr: Deno.stderr,
 });
 
-const toTaskId = (task: Verb.t, plugin: string) => `${plugin}.${task}.${Timestamp.now()}`;
+const currentTime = () => Timestamp.create(Date.now());
 
-export const getStateAbspath = (parsedArgs: SanitizedArgs.t) =>
-	joinPaths(
-		parsedArgs.projectDir,
-		'.taq',
-		`${parsedArgs.env}-state.json`,
+const toTaskId = (task: Verb.t, plugin: string) => `${plugin}.${task}.${currentTime()}`;
+
+export const getStateAbspath = (parsedArgs: SanitizedArgs.t, config: LoadedConfig.t) =>
+	pipe(
+		parsedArgs.env
+			? parsedArgs.env
+			: (config.environment?.default ?? Object.keys(config.environment).find(env => env !== 'default')),
+		env => `${env}-state.json`,
+		stateFilename =>
+			joinPaths(
+				config.projectDir,
+				'.taq',
+				stateFilename,
+			),
 	);
 
-export const load = memoize((parsedArgs: SanitizedArgs.t) =>
-	pipe(
-		readJsonFile<PersistentState.t>(getStateAbspath(parsedArgs)),
-		chainRej(previous =>
-			previous.kind === 'E_READFILE'
-				? resolve({ operations: {}, tasks: {} })
-				: reject(previous)
-		),
-		chain(PersistentState.of),
-	)
-) as (parsedArgs: SanitizedArgs.t) => Future<TaqError.t, PersistentState.t>;
+export const load = (config: LoadedConfig.t) =>
+	memoize((parsedArgs: SanitizedArgs.t) =>
+		pipe(
+			readJsonFile<PersistentState.t>(getStateAbspath(parsedArgs, config)),
+			chainRej(previous =>
+				previous.kind === 'E_READFILE'
+					? resolve({ operations: {}, tasks: {} })
+					: reject(previous)
+			),
+			chain(PersistentState.of),
+		)
+	) as (parsedArgs: SanitizedArgs.t) => Future<TaqError.t, PersistentState.t>;
 
-export const save = (parsedArgs: SanitizedArgs.t) =>
+export const save = (parsedArgs: SanitizedArgs.t, config: LoadedConfig.t) =>
 	(updatedState: PersistentState.t) =>
 		pipe(
 			JSON.stringify(updatedState, undefined, 4),
-			writeTextFile(getStateAbspath(parsedArgs)),
+			writeTextFile(getStateAbspath(parsedArgs, config)),
 			map(_ => updatedState),
 		);
 
@@ -56,7 +67,7 @@ const newTaskEntry = (task: Verb.t, plugin: string, output: unknown) => {
 		plugin,
 		task,
 		output: typeof output === 'object' ? Object(output).data : null,
-		time: Timestamp.now(),
+		time: currentTime(),
 	};
 
 	return taskEntry;
@@ -80,10 +91,10 @@ const imposeTaskLimits = (tasks: Record<string, PersistentState.PersistedTask>) 
 		Object.fromEntries,
 	);
 
-export const addTask = (parsedArgs: SanitizedArgs.t, task: Verb.t, plugin: string) =>
+export const addTask = (parsedArgs: SanitizedArgs.t, config: LoadedConfig.t, task: Verb.t, plugin: string) =>
 	(output: { data: unknown } | unknown) =>
 		pipe(
-			load(parsedArgs),
+			load(config)(parsedArgs),
 			chain(state => {
 				if (!output) {
 					return reject(TaqError.create({
@@ -102,10 +113,10 @@ export const addTask = (parsedArgs: SanitizedArgs.t, task: Verb.t, plugin: strin
 
 				return PersistentState.make(updatedState);
 			}),
-			chain(save(parsedArgs)),
+			chain(save(parsedArgs, config)),
 			chainRej(previous =>
 				isTaqError(previous) && previous.kind === 'E_PROVISION'
-					? load(parsedArgs)
+					? load(config)(parsedArgs)
 					: reject(previous)
 			),
 			map(_ => output),

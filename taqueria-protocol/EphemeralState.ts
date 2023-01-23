@@ -1,16 +1,19 @@
+import {
+	Command,
+	Config,
+	InstalledPlugin,
+	NonEmptyString,
+	Option,
+	ParsedOperation,
+	ParsedTemplate,
+	PluginInfo,
+	PluginResponseEncoding,
+	Task,
+	Verb,
+} from '@taqueria/protocol';
 import createType from '@taqueria/protocol/Base';
-import * as Command from '@taqueria/protocol/Command';
-import * as Config from '@taqueria/protocol/Config';
 import type { i18n } from '@taqueria/protocol/i18n';
-import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
-import * as Option from '@taqueria/protocol/Option';
-import * as ParsedOperation from '@taqueria/protocol/ParsedOperation';
-import * as ParsedTemplate from '@taqueria/protocol/ParsedTemplate';
-import * as PluginInfo from '@taqueria/protocol/PluginInfo';
-import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import { E_TaqError, TaqError } from '@taqueria/protocol/TaqError';
-import * as Task from '@taqueria/protocol/Task';
-import * as Verb from '@taqueria/protocol/Verb';
 import { attemptP, FutureInstance as Future, mapRej, promise } from 'fluture';
 import { z } from 'zod';
 
@@ -139,9 +142,9 @@ const getOperationCounts = (pluginInfo: PluginInfo.t[]): Counts => {
 const toChoices = (plugins: PluginInfo.t[]) =>
 	plugins.reduce(
 		(retval, pluginInfo) => {
-			return [...retval, pluginInfo.name as string, pluginInfo.alias as string];
+			return [...retval, pluginInfo.name as NonEmptyString.t, pluginInfo.alias as NonEmptyString.t];
 		},
-		[] as string[],
+		[] as NonEmptyString.t[],
 	);
 
 const isComposite = (name: Verb.t, counts: Counts) => counts[name] && counts[name].length > 1;
@@ -165,12 +168,14 @@ export const mapTasksToPlugins = (config: Config.t, pluginInfo: PluginInfo.t[], 
 								const compositeTask = await eager(Task.make({
 									task,
 									command,
-									description: i18n.__('providedByMany'),
+									description: await eager(NonEmptyString.make(i18n.__('providedByMany'))),
 									hidden,
 									options: [
 										await eager(Option.make({
 											flag: await eager(Verb.make('plugin')),
-											description: 'Specify which plugin should be used to execute this task',
+											description: await eager(
+												NonEmptyString.make('Specify which plugin should be used to execute this task'),
+											),
 											choices: toChoices(taskCounts[task]),
 											required: true,
 										})),
@@ -207,11 +212,13 @@ export const mapOperationsToPlugins = (config: Config.t, pluginInfo: PluginInfo.
 								const compositeOp = await eager(ParsedOperation.make({
 									operation,
 									command,
-									description: i18n.__('providedByMany'),
+									description: await eager(NonEmptyString.make(i18n.__('providedByMany'))),
 									options: [
 										await eager(Option.make({
 											flag: await eager(Verb.make('plugin')),
-											description: 'Specify which plugin should be used to execute this operation',
+											description: await eager(
+												NonEmptyString.make('Specify which plugin should be used to execute this operation'),
+											),
 											choices: toChoices(opCounts[operation]),
 											required: true,
 										})),
@@ -244,14 +251,17 @@ export const mapTemplatesToPlugins = (config: Config.t, pluginInfo: PluginInfo.t
 						async (retval, { template, hidden }) => {
 							if (isComposite(template, tmplCounts)) {
 								const command = await eager(Command.make(template));
+								const description = await eager(NonEmptyString.of(i18n.__('providedByMany')));
 								const compositeTmpl = await eager(ParsedTemplate.make({
 									template,
 									command,
-									description: i18n.__('providedByMany'),
+									description,
 									options: [
 										await eager(Option.make({
 											flag: await eager(Verb.make('plugin')),
-											description: 'Specify which plugin should be used to execute this task',
+											description: await eager(
+												NonEmptyString.make('Specify which plugin should be used to execute this task'),
+											),
 											choices: toChoices(tmplCounts[template]),
 											required: true,
 										})),

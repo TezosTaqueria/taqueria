@@ -1,0 +1,41 @@
+{
+	"language": "en",
+	"plugins": [],
+	"contractsDir": "contracts",
+	"artifactsDir": "artifacts",
+	"network": {
+		"ghostnet": {
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"
+		}
+	},
+	"sandbox": {
+		"local": {
+			"label": "Local Tezos Sandbox",
+			"rpcUrl": "http://localhost:20000",
+			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"
+		}
+	},
+	"environment": {
+		"development": {
+			"networks": [],
+			"sandboxes": [
+				"local"
+			]
+		},
+		"testing": {
+			"networks": [
+				"ghostnet"
+			],
+			"sandboxes": []
+		}
+	},
+	"accounts": {
+		"bob": "3_000_000_000",
+		"alice": "3_000_000_000",
+		"john": "3_000_000_000",
+		"jane": "3_000_000_000",
+		"joe": "3_000_000_000"
+	}
+}

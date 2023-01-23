@@ -1,11 +1,10 @@
-import { execCmd, getCurrentEnvironmentConfig, sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { execCmd, getCurrentEnvironmentConfig, RequestArgs, sendAsyncErr, sendJsonRes } from '@taqueria/node-sdk';
 
 const ECAD_FLEXTESA_IMAGE = 'ghcr.io/ecadlabs/taqueria-flextesa';
 const FLEXTESA_IMAGE = 'oxheadalpha/flextesa';
 const LIGO_IMAGE = 'ligolang/ligo';
 const ARCHETYPE_IMAGE = 'completium/archetype';
-const ECAD_TZKT_IMAGE = 'alirezahaghshenas/tzkt';
+const ECAD_TZKT_IMAGE = 'ghcr.io/ecadlabs/tzkt';
 
 const getDockerImageIdsCmd = (): string => {
 	const images = [ECAD_FLEXTESA_IMAGE, FLEXTESA_IMAGE, LIGO_IMAGE, ARCHETYPE_IMAGE, ECAD_TZKT_IMAGE];
@@ -32,7 +31,7 @@ const removeImages = () =>
 			)
 		);
 
-const clean = (parsedArgs: RequestArgs.ProxyRequestArgs): Promise<void> => {
+const clean = (parsedArgs: RequestArgs.t): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	return Promise.resolve()

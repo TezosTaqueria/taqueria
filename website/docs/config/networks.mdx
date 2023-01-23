@@ -1,9 +1,9 @@
 ---
-title: Testnet Configuration
+title: Testnet and Mainnet Configuration
 ---
 
 :::note
-This document details the configuration and use of Tezos testnets. If you are looking for information on running or originating to a sandbox, please see the Flextesa documentation [here](docs/plugins/plugin-flextesa)
+This document details the configuration and use of Tezos testnets and mainnet. If you are looking for information on running or originating to a sandbox, please see the Flextesa documentation [here](docs/plugins/plugin-flextesa)
 :::
 
 ## Introduction
@@ -59,10 +59,6 @@ Then create a new environment (you may follow the format of the environment call
 
 Taqueria will support all protocols available on the [teztnets.xyz](https://teztnets.xyz/) site. If you notice an issue with a recent protocol update, please report it as a bug [here](https://github.com/ecadlabs/taqueria/issues/new?assignees=&labels=bug%2Ctriage&template=bug_report.yml&title=%5BBug%5D%3A+)
 
-:::note
-Currently Taqueria only supports testnets. Support for mainnet will be added in a future release
-:::
-
 ## Targeting a Network
 
 Taqueria uses [Environments](/docs/config/environments) to target a specific network or sandbox. An environment is a named collection of network configurations which can be passed to the CLI using the `--env` flag
@@ -71,3 +67,38 @@ To target the `ghostnet` network we configured above using the `testing` environ
 ```shell
 taq originate <contractName> --env testing
 ```
+
+## Deploying and Transferring with Mainnet
+
+Configuring a mainnet is quite similar to configuring a teztnet with one difference. Users must also create an account, with the mnemonic specified, within the network in order to interact with mainnet. See the example below:
+
+:::danger
+Improvements are on the way. However, we currently only support signing in memory and we require a mnemonic to be written in the config file, so do not commit this file or delete the mnemonic before doing so. This is not the safest way to interact with mainnet so proceed with caution
+:::
+
+```
+"mainnet": {
+    "label": "mainnet",
+    "rpcUrl": "https://mainnet.api.tez.ie",
+    "accounts": {
+        "tempUser": {
+            "mnemonic": <12-24 words mnemonic generated via a wallet>
+        }
+    }
+}
+```
+
+:::note
+By default, Taqueria will create an environment called `production` that point to this network upon executing `taq init`. For old projects, add the following to the `environment` field of the config file:
+:::
+
+```
+"production": {
+    "networks": [
+        "mainnet"
+    ],
+    "sandboxes": []
+}
+```
+
+To interact with mainnet using `tempUser`, users must include the `--env` and the `--sender` flags. E.g. `taq deploy counter --env production --sender tempUser`

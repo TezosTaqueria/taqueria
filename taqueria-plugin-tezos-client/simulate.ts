@@ -54,7 +54,7 @@ const getSimulateCmd = async (parsedArgs: Opts, sourceFile: string): Promise<str
 		);
 	}
 
-	const paramFilename = parsedArgs.param;
+	const paramFilename = parsedArgs.param!;
 	const param = (await getParameter(parsedArgs, paramFilename)).trim();
 
 	const arch = await getArch();
@@ -101,7 +101,7 @@ const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRo
 		});
 
 const simulate = (parsedArgs: Opts): Promise<void> => {
-	const sourceFile = addTzExtensionIfMissing(parsedArgs.sourceFile);
+	const sourceFile = addTzExtensionIfMissing(parsedArgs.sourceFile!);
 	return simulateContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
 		sendAsyncErr(err, false)
 	);

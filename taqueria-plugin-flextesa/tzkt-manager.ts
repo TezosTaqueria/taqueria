@@ -1,17 +1,15 @@
 import { getArch, SandboxConfig } from '@taqueria/node-sdk';
-import { Protocol } from '@taqueria/node-sdk/types';
-import { Config } from '@taqueria/protocol/taqueria-protocol-types';
-import { getContainerName, getNewPortIfPortInUse, getUniqueSandboxName, Opts, updateConfig } from './proxy';
+import { Config as RawConfig } from '@taqueria/protocol/types';
+import { getContainerName, getNewPortIfPortInUse, getUniqueSandboxName, updateConfig } from './proxy';
+import { ValidOpts } from './types';
 
-const { Url } = Protocol;
-
-const getTzKtDockerImages = (opts: Opts) => ({
+const getTzKtDockerImages = (opts: ValidOpts) => ({
 	postgres: `postgres:14.5-alpine`,
-	sync: `alirezahaghshenas/tzkt:sync-1.10.3`,
-	api: `alirezahaghshenas/tzkt:api-1.10.3`,
+	sync: `ghcr.io/ecadlabs/tzkt-sync:v1.11.0-taqueria`,
+	api: `ghcr.io/ecadlabs/tzkt-api:v1.11.0-taqueria`,
 });
 
-export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: Opts) => {
+export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: ValidOpts) => {
 	const uniqueSandboxName = await getUniqueSandboxName(sandboxName, parsedArgs.projectDir);
 	return {
 		postgres: `taq-postgres-${uniqueSandboxName}`,
@@ -20,20 +18,21 @@ export const getTzKtContainerNames = async (sandboxName: string, parsedArgs: Opt
 	};
 };
 
-const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts) => {
-	const sandboxPort = Url.toComponents(sandbox.rpcUrl).port;
+const getTzKtContainerEnvironments = async (sandboxName: string, sandbox: SandboxConfig, opts: ValidOpts) => {
 	const containerNames = await getTzKtContainerNames(sandboxName, opts);
-	const sandboxContainerName = await getContainerName(sandboxName, opts);
+	const sandboxContainerName = await getContainerName(opts);
 	const connectionStringEnv =
 		`ConnectionStrings__DefaultConnection="host=${containerNames.postgres};port=5432;database=sandbox_data;username=tzkt;password=${sandboxName};"`;
 	return {
 		postgres: `--env POSTGRES_PASSWORD=${sandboxName} --env POSTGRES_USER=tzkt`,
-		sync: `--env ${connectionStringEnv} --env TezosNode__Endpoint="http://${sandboxContainerName}:20000/"`,
-		api: `--env ${connectionStringEnv} --env Kestrel__Endpoints__Http__Url="http://*:5000"`,
+		sync:
+			`--env ${connectionStringEnv} --env TezosNode__Endpoint="http://${sandboxContainerName}:20000/" --env Protocols__Fallback="PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"`,
+		api:
+			`--env ${connectionStringEnv} --env Kestrel__Endpoints__Http__Url="http://*:5000" --env MaxAttemptsForMigrations=120`,
 	};
 };
 
-export const getTzKtStartCommands = async (sandboxName: string, sandbox: SandboxConfig.t, opts: Opts) => {
+export const getTzKtStartCommands = async (sandboxName: string, sandbox: SandboxConfig, opts: ValidOpts) => {
 	const pgPort = sandbox.tzkt?.postgresqlPort ?? 5432;
 	const newPGPort = await getNewPortIfPortInUse(pgPort);
 
@@ -51,7 +50,7 @@ export const getTzKtStartCommands = async (sandboxName: string, sandbox: Sandbox
 				`${apiPort} is already in use, ${newAPIPort} will be used for TzKt API in ${sandboxName} instead and .taq/config.json will be updated to reflect this.`,
 			);
 		}
-		await updateConfig(opts, (config: Config.t) => {
+		await updateConfig(opts, (config: RawConfig) => {
 			const sandbox = config.sandbox?.[sandboxName];
 			if (typeof sandbox === 'string' || sandbox === undefined) {
 				return undefined;
@@ -61,7 +60,7 @@ export const getTzKtStartCommands = async (sandboxName: string, sandbox: Sandbox
 				apiPort: 5000,
 				postgresqlPort: 5432,
 			};
-			const updatedConfig: Config.t = {
+			const updatedConfig: RawConfig = {
 				...config,
 				sandbox: {
 					...config.sandbox,

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e # exiting on error
+skip_npm_ci="$SKIP_NPM_CI"
 
 if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
@@ -9,12 +9,69 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo ""
     echo '**********************************************'
     echo "** Checking Dependencies"
-    docker ps
+    (
+        set -e
+        docker ps > /dev/null
+        echo "✅ Docker is installed, running, and the user has permission."
+    )
+    errorCode=$?
+    if [ $errorCode -ne 0 ]; then
+        echo "❌ Docker is not installed, not running, or the user needs permission."
+        exit $errorCode
+    fi
+    if [ -n `which deno || ""` ]; then
+        deno --version | grep 1.23 >/dev/null
+        errorCode=$?
+        if [ $errorCode -ne 0 ]; then
+            echo "❌ Deno is installed, but not using v1.23.x. Please use Deno v1.23.x."
+            exit $errorCode
+        else
+            echo "✅ Deno is installed, and running v1.23.x"
+        fi
+    else
+        echo "❌ Deno is not installed."
+        exit -2
+    fi
+
+    if [ -n `which npm || ""` ]; then
+        npm version | grep "npm: '8." >/dev/null
+        errorCode=$?
+        if [ $errorCode -ne 0 ]; then
+            echo "❌ NPM is installed, but not using v8.x.x. Please use NPM v8.x.x."
+            exit $errorCode
+        else
+            echo "✅ NPM is installed, and running v8.x.x."
+        fi
+
+        npm version | grep "node: '16." >/dev/null
+        errorCode=$?
+        if [ $errorCode -ne 0 ]; then
+            echo "❌ NodeJS is installed, but not using v16.x.x. Please use NodeJS v16.x.x."
+            exit $errorCode
+        else
+            echo "✅ NodeJS is installed, and running v16."
+        fi
+    else
+        echo "❌ NPM is not installed."
+        exit -2
+    fi
+
+
+    echo "** Dependency checks passed"
+
+    set -e # exiting on error
+
+    if [ -z "$skip_npm_ci" ]; then 
+        echo ""
+        echo '**********************************************'
+        echo "** Installing NPM dependencies"
+        npm ci
+    fi
 
     echo ""
     echo '**********************************************'
-    echo "** Installing NPM dependencies"
-    npm ci
+    echo "** Generating Types"
+    npm run build-types
 
     echo ""
     echo '**********************************************'
@@ -25,11 +82,6 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
     echo "** Building packages"
     npm run build:packages
-
-    echo ""
-    echo '**********************************************'
-    echo "** Building docker images"
-    npm run build:docker
 
     echo ""
     echo '**********************************************'

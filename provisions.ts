@@ -2,6 +2,7 @@ import * as Alias from '@taqueria/protocol/Alias';
 import * as EphemeralState from '@taqueria/protocol/EphemeralState';
 import * as InstalledPlugin from '@taqueria/protocol/InstalledPlugin';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
+import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as PersistentState from '@taqueria/protocol/PersistentState';
 import * as Provisioner from '@taqueria/protocol/Provisioner';
 import * as ProvisionerID from '@taqueria/protocol/ProvisionerID';
@@ -96,8 +97,8 @@ const getOperationParams = (state: EphemeralState.t) =>
  * @param parsedArgs
  * @returns {Alias.t}
  */
-const getPluginAlias = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t) => {
-	if (parsedArgs.plugin) return parsedArgs.plugin;
+const getPluginAlias = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state: EphemeralState.t): Alias.t => {
+	if (parsedArgs.plugin) return parsedArgs.plugin as Alias.t;
 	const operation = parsedArgs.operation;
 	const op = state.operations[operation] as InstalledPlugin.t;
 	const plugin = state.plugins.find(plugin => plugin.name == op.name);
@@ -114,7 +115,7 @@ export const newProvision = (parsedArgs: SanitizedArgs.ProvisionTaskArgs, state:
 		chain(id =>
 			Provisioner.make({
 				id,
-				operation,
+				operation: NonEmptyString.create(operation),
 				plugin,
 				...getOperationParams(state)(operation, plugin),
 				command: operation === 'custom' ? "echo 'Custom Provision'" : undefined,

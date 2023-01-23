@@ -1,10 +1,12 @@
 import * as Config from '@taqueria/protocol/Config';
 import { i18n } from '@taqueria/protocol/i18n';
+import { readJsonFileInterceptConfig } from '@taqueria/protocol/types-config-files';
 import { exec, ExecException } from 'child_process';
 import { parse } from 'comment-json';
 import { readFile, stat } from 'fs/promises';
 import { join } from 'path';
-import { OutputFunction, OutputLevels } from './helpers';
+import { OutputFunction, VsCodeHelper } from './helpers';
+import { LogHelper, OutputLevels } from './LogHelper';
 import { TaqVsxError } from './TaqVsxError';
 
 /***********************************************************************/
@@ -162,8 +164,35 @@ export const execCmd = (
 		}
 	});
 
-export const checkTaqBinary = async (inputPath: PathToTaq, i18n: i18n, showOutput: OutputFunction) => {
-	const result = await execCmd(`${inputPath} testFromVsCode`, showOutput);
+export const checkTaqVersion = async (
+	inputPath: PathToTaq,
+	i18n: i18n,
+	showOutput: OutputFunction,
+	helper: VsCodeHelper,
+): Promise<string> => {
+	const result = await execCmd(`${inputPath} --version --fromVsCode`, showOutput);
+	if (result.executionError) {
+		helper.logAllNestedErrors(result.executionError);
+	}
+	if (result.standardError && result.standardError.length) {
+		showOutput(OutputLevels.error, result.standardError);
+	}
+	return result.standardOutput;
+};
+
+export const checkTaqBuild = async (
+	inputPath: PathToTaq,
+	i18n: i18n,
+	showOutput: OutputFunction,
+	helper: VsCodeHelper,
+): Promise<string> => {
+	const result = await execCmd(`${inputPath} --build --fromVsCode`, showOutput);
+	if (result.executionError) {
+		helper.logAllNestedErrors(result.executionError);
+	}
+	if (result.standardError && result.standardError.length) {
+		showOutput(OutputLevels.error, result.standardError);
+	}
 	return result.standardOutput;
 };
 
@@ -176,8 +205,8 @@ export const getNodeVersion = async (showOutput: OutputFunction) => {
 	return version.substring(1).replace('\n', '');
 };
 
-export const readJsonFile = <T>(_i18n: i18n, make: (data: Record<string, unknown>) => T) =>
-	(pathToFile: PathToFile) =>
+const readJsonFileInner = (_i18n: i18n, make: (data: Record<string, unknown>) => unknown) =>
+	<T>(pathToFile: PathToFile) =>
 		readFile(pathToFile, { encoding: 'utf-8' })
 			.then(data => {
 				try {
@@ -196,6 +225,11 @@ export const readJsonFile = <T>(_i18n: i18n, make: (data: Record<string, unknown
 					});
 				}
 			});
+export const readJsonFile = <T>(_i18n: i18n, make: (data: Record<string, unknown>) => T) => {
+	return readJsonFileInterceptConfig(
+		(x: string) => readJsonFileInner(_i18n, make)(x as PathToFile),
+	) as (pathToFile: PathToFile) => Promise<T>;
+};
 
 export const isWindows = () => process.platform.includes('win') && !process.platform.includes('darwin');
 

@@ -1,7 +1,8 @@
+import { Url } from '@taqueria/protocol';
 import createType from '@taqueria/protocol/Base';
+import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
-import * as Url from '@taqueria/protocol/Url';
 import { z } from 'zod';
 
 export const rawSchema = z.object({
@@ -43,8 +44,9 @@ export const rawSchema = z.object({
 		val => Boolean(val),
 		z.boolean().optional(),
 	),
-	plugin: z.string().min(1).optional(),
+	plugin: NonEmptyString.schemas.schema.optional(),
 	env: z.string().optional(),
+	quickstart: z.string().min(1).optional(),
 	setBuild: z.preprocess(
 		val => String(val),
 		z.string().min(3),
@@ -56,7 +58,15 @@ export const rawSchema = z.object({
 export const scaffoldRawSchema = rawSchema.extend({
 	scaffoldProjectDir: z.string().min(1).transform((val: unknown) => val as SanitizedAbsPath.t),
 	scaffoldUrl: z.string().min(1).url().transform((val: unknown) => val as Url.t),
+	branch: z.string().min(1).optional(),
 });
+
+export const initRawSchema = rawSchema.extend({
+	workflow: z.string().refine(val => val === 'ligo' || val === 'smartpy' || val === 'archetype' || val === 'michelson')
+		.optional(),
+});
+
+export type rawInitSchemaInput = z.infer<typeof initRawSchema>;
 
 export const provisionRawSchema = rawSchema
 	.extend({
@@ -82,6 +92,10 @@ export const templateRawSchema = rawSchema.extend({
 
 export const managePluginRawSchema = rawSchema.omit({ pluginName: true }).extend({
 	pluginName: z.string().min(1),
+});
+
+export const setEnvRawSchema = rawSchema.extend({
+	defaultEnvironment: z.string().min(1),
 });
 
 export const versionRawSchema = rawSchema.extend({
@@ -112,6 +126,7 @@ type RawInput = z.infer<typeof rawSchema>;
 type RawScaffoldInput = z.infer<typeof scaffoldRawSchema>;
 type RawProvisionInput = z.infer<typeof provisionRawSchema>;
 type RawManagePluginInput = z.infer<typeof managePluginRawSchema>;
+type RawSetEnvInput = z.infer<typeof setEnvRawSchema>;
 type RawVersionInput = z.infer<typeof versionRawSchema>;
 type RawTemplateInput = z.infer<typeof templateRawSchema>;
 type RawAddContractsInput = z.infer<typeof addContractsRawSchema>;
@@ -157,6 +172,12 @@ export const uninstallTaskArgs = createType<RawManagePluginInput, RawManagePlugi
 	unknownErrMsg: 'Something went wrong parsing the arguments for the uninstall task',
 });
 
+export const setEnvTaskArgs = createType<RawSetEnvInput, RawSetEnvInput>({
+	rawSchema: setEnvRawSchema,
+	parseErrMsg: 'The arguments provided are invalid for the set-environment task',
+	unknownErrMsg: 'Something went wrong parsing the arguments for the set-environment task',
+});
+
 export const createTaskArgs = createType<RawTemplateInput, RawTemplateInput>({
 	rawSchema: templateRawSchema,
 	parseErrMsg: 'The arguments provided are invalid for the create task',
@@ -179,6 +200,7 @@ export type ScaffoldTaskArgs = z.infer<typeof scaffoldTaskArgs.schemas.schema>;
 export type ProvisionTaskArgs = z.infer<typeof provisionTaskArgs.schemas.schema>;
 export type InstallTaskArgs = z.infer<typeof installTaskArgs.schemas.schema>;
 export type UninstallTaskArgs = z.infer<typeof uninstallTaskArgs.schemas.schema>;
+export type SetEnvTaskArgs = z.infer<typeof setEnvTaskArgs.schemas.schema>;
 export type CreateTaskArgs = z.infer<typeof createTaskArgs.schemas.schema>;
 export type AddContractArgs = z.infer<typeof addContractArgs.schemas.schema>;
 export type RemoveContractArgs = z.infer<typeof removeContractsArgs.schemas.schema>;
@@ -198,6 +220,10 @@ export const ofInstallTaskArgs = installTaskArgs.factory.of;
 export const createUninstallTaskArgs = uninstallTaskArgs.factory.create;
 export const makeUninstallTaskArgs = uninstallTaskArgs.factory.make;
 export const ofUninstallTaskArgs = uninstallTaskArgs.factory.of;
+
+export const createSetEnvTaskArgs = setEnvTaskArgs.factory.create;
+export const makeSetEnvTaskArgs = setEnvTaskArgs.factory.make;
+export const ofSetEnvTaskArgs = setEnvTaskArgs.factory.of;
 
 export const createCreateTaskArgs = createTaskArgs.factory.create;
 export const makeCreateTaskArgs = createTaskArgs.factory.make;

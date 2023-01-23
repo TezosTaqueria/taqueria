@@ -1,28 +1,27 @@
-import { getArchSync, getDockerImage } from '@taqueria/node-sdk';
-import { RequestArgs } from '@taqueria/node-sdk/types';
+import { getArchSync, getDockerImage, ProxyTaskArgs, RequestArgs } from '@taqueria/node-sdk';
 import { join } from 'path';
 
 // Should point to the latest stable version, so it needs to be updated as part of our release process.
 const getFlextesaImage = (arch: 'linux/arm64/v8' | 'linux/amd64'): string =>
-	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:20221026' : 'oxheadalpha/flextesa:20221026';
+	arch === 'linux/arm64/v8' ? 'oxheadalpha/flextesa:20221123' : 'oxheadalpha/flextesa:20221123';
 
 const FLEXTESA_IMAGE_ENV_VAR = 'TAQ_FLEXTESA_IMAGE';
 
 export const getClientDockerImage = (): string =>
 	getDockerImage(getFlextesaImage(getArchSync()), FLEXTESA_IMAGE_ENV_VAR);
 
-export interface ClientOpts extends RequestArgs.ProxyRequestArgs {
+export interface ClientOpts extends ProxyTaskArgs.t {
 	command: string;
 }
 
-export interface TypeCheckOpts extends RequestArgs.ProxyRequestArgs {
+export interface TypeCheckOpts extends ProxyTaskArgs.t {
 	sourceFile: string;
 }
 
-export interface SimulateOpts extends RequestArgs.ProxyRequestArgs {
-	sourceFile: string;
+export interface SimulateOpts extends ProxyTaskArgs.t {
+	sourceFile?: string;
 	storage?: string;
-	param: string;
+	param?: string;
 	entrypoint?: string;
 }
 
@@ -38,7 +37,7 @@ export const trimTezosClientMenuIfPresent = (msg: string): string => {
 };
 
 export const getInputFilename = (opts: UnionOpts, sourceFile: string) =>
-	join('/project', opts.config.artifactsDir, sourceFile);
+	join('/project', opts.config.artifactsDir ?? 'artifacts', sourceFile);
 
 export const getCheckFileExistenceCommand = async (parsedArgs: UnionOpts, sourceFile: string): Promise<string> => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;

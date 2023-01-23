@@ -9,8 +9,6 @@
   Taqueria - A New Way to Build on Tezos
 </h1>
 
-> WARNING: This project has not officially been made public. Congratulations on finding it. Have a look around, but be aware, it's not yet ready for public consumption.! CLIs and APIs are unstable and likely to change.
-
 ## What is Taqueria?
 
 Taqueria is an extensible, open source plugin based framework for Tezos dApp development
@@ -43,6 +41,9 @@ Builds are also available on the [releases](https://github.com/ecadlabs/taqueria
 > Detailed instructions for installing and using Taqueria can be found [here](https://taqueria.io/docs/getting-started/installation)
 
 ## Getting Started
+
+>**How to verify that taq is installed properly?**
+>You can run `which taq` to verify that the taq binary can be found (via your PATH env variable). You can also run `taq --version` to verify which version you are running. If you downloaded a precompiled binary from our website, then the version # should be displayed. If you built taq from sources, then the version should display `dev-[branchName]`, such as `dev-main`.
 
 Once installed, Taqueria is run from the command line using the `taq` command. The basic structure of a Taqueria command is:
 ```shell
@@ -77,6 +78,8 @@ There are two approaches to initializing a Taqueria project: initializing an emp
 3. Install the LIGO plugin: `taq install @taqueria/plugin-ligo`
 4. Continue steps 4-5 for each additional plugin you want to install
 
+##### Note: You may instead run `taq init test-project --workflow ligo` if you'd like to have the necessary plugins pre-installed for you on initialization
+
 #### Using a Taqueria Project Scaffold
 1. Run the command `taq scaffold`
 2. Change directories: `cd test-project`
@@ -90,7 +93,7 @@ If you prefer to build the Taqueria binary and plugins locally, follow the steps
 #### Requirements
 
 - [Deno](https://deno.land/) v1.23.4
-- [NodeJS](https://nodejs.org/en/) v16.16.0 or later
+- [NodeJS](https://nodejs.org/en/) v16.13.1
 - [Docker](https://www.docker.com/) v0.9 or later
 
 #### Run Build Script
@@ -99,28 +102,14 @@ From the root of the Taqueria directory, run the build-all script:
 npm run build-all
 ```
 
-## Test
+## Taqueria Tests
+### Unit Tests
+Running the unit tests requires deno is installed on your system. Installation instructions can be found [here](https://deno.land/manual@v1.18.2/getting_started/installation)
 
-## Usage:
-Since the taqueria project is currently making use of NPM workspaces all activity is generally going to take place in the root (taqueria) directory. Commands will not function normally if run from the tests directory and the following commands will be what you can use to install all dependencies and run the tests for taqueria:
-### Installation
-- From the taqueria root directory (eg. `~/taqueria`) installing the dependencies for the project can be accomplished with the normal `npm install`. By default `npm install` will install everything, if you're making changes and want to check something out then the targeted NPM install will be handy
-- If you're going to be running the unit tests you need to make sure that deno is installed on your system. Installation instructions can be found [here](https://deno.land/manual@v1.18.2/getting_started/installation)
-- Installing specific plugins/tools needed for testing can be accomplished with the workspace modified NPM install: `npm install -w {workspace_name}` defined in the project top level package.json file (make sure to check this is the case before doing anything). For the tests directory the workspace has been defined as `tests` so the command will be `npm install -w tests`.
-- This will put all dependencies in the project level `node_modules/` folder so the test code will need to be searching for dependencies there. This is covered in the `tsconfig.test.json` file which points to the node modules folder a level up from the tests folder like so:
-```
-    "typeRoots": ["../node_modules/@types"],
-    "types": ["node", "jest", "ts-jest"]
-```
-
-- An example combining the above
-```
-$ npm install
-$ npm install -w taqueria-plugin-ligo
-$ npm install -w taqueria-plugin-mock
-$ npm install -w tests
-```
-
-### Running the Tests:
+### E2E and Integration tests
+If you are running from built sources, start with `npm run build-all`
 - The tests should be run from the taqueria root folder by calling the test run script with the workspace specified: `npm run test:{unit|integration|e2e} -w tests`
-    - If you're going to be running the unit tests then you will need deno installed on your system
+- the package.json file in the /tests directory lists various combinations of tests that can be invoked from the command line.
+
+
+
