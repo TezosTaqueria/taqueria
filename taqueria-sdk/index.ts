@@ -66,7 +66,7 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdo
 		const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
 		exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
 			if (err) {
-				reject(toErrorWithProps(err, { stderr, stdout }));
+				reject(toExecErr(err, { stderr, stdout }));
 			} else {
 				resolve({
 					stdout,
@@ -75,14 +75,16 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdo
 			}
 		});
 	});
-
-export const toErrorWithProps = (message: string | Error, props: Record<string, unknown>): Error => {
+type ExecErrProps = {
+	stderr: string;
+	stdout: string;
+};
+export const toExecErr = (message: string | Error, props: ExecErrProps): Error & ExecErrProps => {
 	const err = message instanceof Error ? message : new Error(message);
-	const retval = Object.assign(props, err);
-
-	// Note, retval looses its prototype using Object.assign. Same thing with using spread operator.
-	retval.__proto__ = Error.prototype;
-	return err;
+	const retval = err as unknown as Error & ExecErrProps;
+	retval.stderr = props.stderr;
+	retval.stdout = props.stdout;
+	return retval;
 };
 
 export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, ExecException> =>
