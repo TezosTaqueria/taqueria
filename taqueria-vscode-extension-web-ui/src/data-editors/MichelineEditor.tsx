@@ -65,6 +65,7 @@ export const getFriendlyDataType = (dataType: MichelineDataType): string => {
 		case 'list':
 		case 'set':
 		case 'option':
+		case 'contract':
 			friendlyDataType = `${dataType.prim} of ${getFriendlyDataType(dataType.args![0])}`;
 			break;
 		case 'unit':
@@ -103,8 +104,6 @@ export const getFriendlyDataType = (dataType: MichelineDataType): string => {
 			break;
 		case 'or':
 			friendlyDataType = `or (${dataType.args.map(type => getFriendlyDataType(type)).join(') (')} )`;
-		case 'contract':
-			friendlyDataType = `contract (${dataType.args.map(type => getFriendlyDataType(type)).join(') (')} )`;
 			break;
 		default:
 			return `Error: ${JSON.stringify(dataType)}`;

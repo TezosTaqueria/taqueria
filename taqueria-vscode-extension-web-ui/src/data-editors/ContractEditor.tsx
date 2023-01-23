@@ -1,6 +1,8 @@
 import React from 'react';
+import { hasArgs, hasPrim, isObject } from '../Helpers';
 import { MichelineDataTypeWithArgs } from '../MichelineDataType';
-import { ListEditor } from './ListEditor';
+import { MichelineContractValue, MichelineValue } from '../MichelineValue';
+import { DataEditorNode } from './DataEditorNode';
 
 export const ContractEditor = ({
 	dataType,
@@ -11,25 +13,35 @@ export const ContractEditor = ({
 	value: unknown;
 	onChange: (value: unknown) => void;
 }) => {
+	const contractValue = coerceAndCastValue(value);
+	const changeValue = (v: unknown) => {
+		const newValue = {
+			prim: 'Contract',
+			args: contractValue.args.slice(),
+		};
+		newValue.args[0] = v as MichelineValue;
+		onChange(newValue);
+	};
 	return (
-		<ListEditor
-			value={value}
-			dataType={unpackAndCastValue(dataType)}
-			onChange={onChange}
+		<DataEditorNode
+			hideDataType={true}
+			dataType={dataType.args[0]}
+			value={contractValue.args[0]}
+			onChange={newValue => {
+				changeValue(newValue);
+			}}
 		/>
 	);
-};
 
-function unpackAndCastValue(
-	dataType: MichelineDataTypeWithArgs,
-): MichelineDataTypeWithArgs {
-	const unpackedDataType = dataType.args[0];
-	if (!('args' in unpackedDataType)) {
-		// TODO: not throw error?
-		throw new Error(
-			'Invalid data type for contract editor'
-				+ JSON.stringify({ dataType }, null, 2),
-		);
+	function coerceAndCastValue(value: unknown): MichelineContractValue {
+		if (!isObject(value) || !hasPrim(value, 'Contract') || !hasArgs(value)) {
+			const newValue = {
+				prim: 'Contract' as const,
+				args: [],
+			};
+			onChange(newValue);
+			return newValue;
+		}
+		return value as MichelineContractValue;
 	}
-	return unpackedDataType;
-}
+};

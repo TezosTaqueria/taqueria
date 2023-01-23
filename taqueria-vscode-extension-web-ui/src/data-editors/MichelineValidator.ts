@@ -305,9 +305,11 @@ function isValieOr(dataType: MichelineDataTypeWithArgs, v: MichelineValue | unde
 	return validate(dataType.args[index], value.args?.[0]);
 }
 
-function isValidContract(data: MichelineDataTypeWithArgs, v: MichelineValue | undefined): MichelineValidationResult {
-	// FIXME: add proper validation
-	return { state: 'Valid' };
+function isValidContract(
+	data: MichelineDataTypeWithArgs,
+	value: MichelineValue | undefined,
+): MichelineValidationResult {
+	return validate(data.args[0], value);
 }
 
 // returns 1 if value2 is greater than value1, 0 if they are equal, and -1 if value2 is less than value1

@@ -43,6 +43,11 @@ export type MichelinePairValue = {
 	args: MichelineValue[];
 };
 
+export type MichelineContractValue = {
+	prim: 'Contract';
+	args: MichelineValue[];
+};
+
 export type MichelineMapItem = {
 	prim: 'Elt';
 	args: MichelineValue[];
@@ -76,6 +81,7 @@ export type MichelineValueObject =
 	| MichelineOptionValue
 	| MichelinePairValue
 	| MichelineMapValue
-	| MichelineOrValue;
+	| MichelineOrValue
+	| MichelineContractValue;
 
 export type MichelineValue = MichelineValueObject | MichelineValue[];
