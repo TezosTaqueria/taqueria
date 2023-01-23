@@ -1,202 +1,138 @@
 {
-	"scopeName": "source.michelson",
-	"name": "Michelson",
-	"patterns": [
-		{
-			"include": "#bytes"
-		},
-		{
-			"include": "#string"
-		},
-		{
-			"include": "#number"
-		},
-		{
-			"include": "#comment"
-		},
-		{
-			"include": "#multicomment"
-		},
-		{
-			"include": "#block"
-		},
-		{
-			"include": "#data"
-		},
-		{
-			"include": "#instruction"
-		},
-		{
-			"include": "#type"
-		},
-		{
-			"include": "#macros"
-		},
-		{
-			"include": "#annotations"
-		}
-	],
-	"repository": {
-		"string": {
-			"name": "string.quoted.michelson",
-			"begin": "\"",
-			"end": "\"",
-			"patterns": [
-				{
-					"name": "string.quoted.michelson",
-					"match": "\\\\."
-				}
-			]
-		},
-		"number": {
-			"patterns": [
-				{
-					"name": "string.michelson",
-					"match": "\\b-?[0-9]+\\b"
-				}
-			]
-		},
-		"bytes": {
-			"patterns": [
-				{
-					"name": "string.michelson",
-					"match": "\\b0x[0-9A-Ea-e]*\\b"
-				}
-			]
-		},
-		"comment": {
-			"name": "comment.language.michelson",
-			"begin": "#",
-			"end": "\n",
-			"patterns": [
-				{
-					"name": "constant.character.escape.michelson",
-					"match": "wordPattern"
-				}
-			]
-		},
-		"multicomment": {
-			"name": "comment.language.michelson",
-			"begin": "\\/\\*",
-			"end": "\\*\\/",
-			"patterns": [
-				{
-					"name": "constant.character.escape.michelson",
-					"match": "wordPattern"
-				}
-			]
-		},
-		"block": {
-			"patterns": [
-				{
-					"match": "\\b(parameter|storage|code?)\\b",
-					"name": "keyword.control.michelson"
-				}
-			]
-		},
-		"data": {
-			"patterns": [
-				{
-					"match": "\\b(Unit|True|False|Pair|Left|Right|Some|None|Elt)\\b",
-					"name": "variable.other.enummember.michelson"
-				}
-			]
-		},
-		"instruction": {
-			"patterns": [
-				{
-					"match": "\\b(APPLY|EXEC|FAILWITH|IF_CONS|IF_LEFT|IF_NONE|IF|ITER|LAMBDA|LOOP_LEFT|LOOP)\\b",
-					"name": "support.function.michelson"
-				},
-				{
-					"match": "\\b(DIG|DIP|DROP|DUG|DUP|PUSH|SWAP|CAST|RENAME|STEPS_TO_QUOTA)\\b",
-					"name": "support.function.michelson"
-				},
-				{
-					"match": "\\b(ABS|ADD|COMPARE|EDIV|NEQ|EQ|GE|GT|INT|ISNAT|LE|LSL|LSR|LT|MUL|NEG|SUB|AND|NOT|OR|XOR)\\b",
-					"name": "support.function.michelson"
-				},
-				{
-					"match": "\\b(BLAKE2B|CHECK_SIGNATURE|HASH_KEY|KECCAK|PAIRING_CHECK|SAPLING_EMPTY_STATE|SAPLING_VERIFY_UPDATE|SHA256|SHA3|SHA512)\\b",
-					"name": "support.function.michelson"
-				},
-				{
-					"match": "\\b(ADDRESS|AMOUNT|BALANCE|CHAIN_ID|CREATE_CONTRACT|CONTRACT|IMPLICIT_ACCOUNT|LEVEL|NOW|SELF_ADDRESS|SELF|SENDER|SET_DELEGATE|SOURCE|TOTAL_VOTING_POWER|VOTING_POWER|TRANSFER_TOKENS)\\b",
-					"name": "support.function.michelson"
-				},
-				{
-					"match": "\\b(GET_AND_UPDATE|GET|UPDATE|SOME|NONE|UNIT|UNPAIR|PAIR|CAR|CDR|LEFT|RIGHT|NIL|CONS|SIZE|EMPTY_SET|EMPTY_MAP|MAP|MEM|CONCAT|SLICE|UNPACK|PACK|JOIN_TICKETS|READ_TICKET|SPLIT_TICKET|TICKET)\\b",
-					"name": "support.function.michelson"
-				}
-			]
-		},
-		"type": {
-			"patterns": [
-				{
-					"match": "\\b(unit|int|nat|string|bytes|bool)\\b",
-					"name": "entity.name.type.michelson support.type.michelson"
-				},
-				{
-					"match": "\\b(option|list|set|contract|pair|or|lambda|big_map|map|ticket)\\b",
-					"name": "entity.name.type.michelson support.type.michelson"
-				},
-				{
-					"match": "\\b(key_hash|key|signature|operation|address|mutez|timestamp|chain_id|never)\\b",
-					"name": "entity.name.type.michelson support.type.michelson"
-				},
-				{
-					"match": "\\b(sapling_state|sapling_transaction|bls12_381_fr|bls12_381_g1|bls12_381_g2)\\b",
-					"name": "entity.name.type.michelson support.type.michelson"
-				}
-			]
-		},
-		"macros": {
-			"patterns": [
-				{
-					"match": "\\b(IF_SOME|IF_RIGHT|FAIL|ASSERT|ASSERT_NONE|ASSERT_SOME|ASSERT_LEFT|ASSERT_RIGHT|(SET|MAP)_C[AD]+R)\\b",
-					"name": "variable.function.michelson meta.preprocessor.numeric.michelson"
-				},
-				{
-					"match": "\\b(DII+P|C[AD]{2,}R|DUU+P|P[PAI]{3,}R|UNP[PAI]{3,}R)\\b",
-					"name": "variable.function.michelson meta.preprocessor.numeric.michelson"
-				},
-				{
-					"match": "\\bCMP(EQ|NEQ|LT|GT|LE|GE)\\b",
-					"name": "variable.function.michelson meta.preprocessor.numeric.michelson"
-				},
-				{
-					"match": "\\bIF(EQ|NEQ|LT|GT|LE|GE)\\b",
-					"name": "variable.function.michelson meta.preprocessor.numeric.michelson"
-				},
-				{
-					"match": "\\bIFCMP(EQ|NEQ|LT|GT|LE|GE)\\b",
-					"name": "variable.function.michelson meta.preprocessor.numeric.michelson"
-				},
-				{
-					"match": "\\bASSERT_(EQ|NEQ|LT|LE|GT|GE)\\b",
-					"name": "variable.function.michelson meta.preprocessor.numeric.michelson"
-				},
-				{
-					"match": "\\bASSERT_CMP(EQ|NEQ|LT|LE|GT|GE)\\b",
-					"name": "variable.function.michelson meta.preprocessor.numeric.michelson"
-				}
-			]
-		},
-		"annotations": {
-			"patterns": [
-				{
-					"match": "(?<=\\s)%[A-z_0-9%@]*",
-					"name": "entity.other.attribute-name.michelson"
-				},
-				{
-					"match": "(?<=\\s)@[A-z_0-9%]+\\b",
-					"name": "entity.other.attribute-name.michelson"
-				},
-				{
-					"match": "(?<=\\s):[A-z_0-9]+\\b",
-					"name": "entity.other.attribute-name.michelson"
-				}
-			]
-		}
-	}
+    "scopeName": "source.michelson",
+    "name": "Michelson",
+    "patterns": [
+        {
+            "include": "#bytes"
+        },
+        {
+            "include": "#string"
+        },
+        {
+            "include": "#number"
+        },
+        {
+            "include": "#comment"
+        },
+        {
+            "include": "#multicomment"
+        },
+        {
+            "include": "#block"
+        },
+        {
+            "include": "#data"
+        },
+        {
+            "include": "#instruction"
+        },
+        {
+            "include": "#type"
+        },
+        {
+            "include": "#macros"
+        },
+        {
+            "include": "#annotations"
+        }
+    ],
+    "repository": {
+        "string": {
+            "name": "string.quoted.michelson",
+            "begin": "\"",
+            "end": "\"",
+            "patterns": [
+                {
+                    "name": "string.quoted.michelson",
+                    "match": "\\\\."
+                }
+            ]
+        },
+        "number": {
+            "patterns": [
+                {
+                    "name": "constant.numeric.michelson",
+                    "match": "\\b(-?[0-9]+)\\b"
+                }
+            ]
+        },
+        "bytes": {
+            "patterns": [
+                {
+                    "name": "constant.numeric.michelson",
+                    "match": "\\b(0x[0-9A-Fa-f]+)\\b"
+                }
+            ]
+        },
+        "comment": {
+            "name": "comment.line.number-sign.michelson",
+            "begin": "#",
+            "end": "\n",
+            "patterns": [
+                {
+                    "name": "constant.character.escape.michelson",
+                    "match": "wordPattern"
+                }
+            ]
+        },
+        "multicomment": {
+            "name": "comment.block.michelson",
+            "begin": "\\/\\*",
+            "end": "\\*\\/",
+            "patterns": [
+                {
+                    "name": "constant.character.escape.michelson",
+                    "match": "wordPattern"
+                }
+            ]
+        },
+        "block": {
+            "patterns": [
+                {
+                    "match": "\\b(storage|parameter|code)\\b",
+                    "name": "keyword.control.michelson"
+                }
+            ]
+        },
+        "data": {
+            "patterns": [
+                {
+                    "match": "\\b(False|Pair|Elt|Some|None|Unit|True|Right|Left)\\b",
+                    "name": "variable.other.enummember.michelson"
+                }
+            ]
+        },
+        "instruction": {
+            "patterns": [
+                {
+                    "match": "\\b(ABS|IF|SOURCE|DUG|DIG|SAPLING_VERIFY_UPDATE|BLAKE2B|INT|RIGHT|SHA256|AND|VIEW|NIL|STEPS_TO_QUOTA|RENAME|CHECK_SIGNATURE|NEVER|MAP|ADD|IMPLICIT_ACCOUNT|SHA512|LSL|COMPARE|SUB_MUTEZ|SLICE|DROP|BALANCE|CONCAT|MUL|FAILWITH|MIN_BLOCK_TIME|DIP|MEM|XOR|UPDATE|EMPTY_MAP|SWAP|AMOUNT|KECCAK|CHAIN_ID|HASH_KEY|IF_LEFT|CREATE_ACCOUNT|LT|VOTING_POWER|UNPACK|TICKET|SELF|TRANSFER_TOKENS|LE|SOME|CREATE_CONTRACT|SAPLING_EMPTY_STATE|NONE|ADDRESS|GE|SIZE|SENDER|CAR|NOT|CDR|ITER|SHA3|PUSH|LEFT|ISNAT|PACK|IF_CONS|TOTAL_VOTING_POWER|SET_DELEGATE|EMPTY_SET|NEQ|LAMBDA|PAIRING_CHECK|LOOP|EMIT|LSR|EMPTY_BIG_MAP|SPLIT_TICKET|LEVEL|PAIR|READ_TICKET|UNPAIR|GT|NOW|IF_NONE|OR|GET_AND_UPDATE|UNIT|CONTRACT|CAST|JOIN_TICKETS|EDIV|EQ|LOOP_LEFT|OPEN_CHEST|EXEC|GET|NEG|SELF_ADDRESS|DUP|CONS|SUB|APPLY)\\b",
+                    "name": "support.function.michelson"
+                }
+            ]
+        },
+        "type": {
+            "patterns": [
+                {
+                    "match": "\\b(bls12_381_g1|key_hash|sapling_transaction_deprecated|map|sapling_transaction|view|signature|lambda|timestamp|big_map|chain_id|bool|chest|never|sapling_state|operation|option|ticket|key|int|unit|nat|pair|set|bytes|contract|or|mutez|bls12_381_g2|string|constant|address|list|bls12_381_fr|tx_rollup_l2_address|chest_key)\\b",
+                    "name": "entity.name.type.michelson support.type.michelson"
+                }
+            ]
+        },
+        "annotations": {
+            "patterns": [
+                {
+                    "match": "(?<=\\s)%[A-z_0-9%@]*",
+                    "name": "entity.other.attribute-name.michelson"
+                },
+                {
+                    "match": "(?<=\\s)@[A-z_0-9%]+\\b",
+                    "name": "entity.other.attribute-name.michelson"
+                },
+                {
+                    "match": "(?<=\\s):[A-z_0-9]+\\b",
+                    "name": "entity.other.attribute-name.michelson"
+                }
+            ]
+        }
+    }
 }
