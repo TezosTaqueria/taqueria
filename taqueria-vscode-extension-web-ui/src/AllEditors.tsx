@@ -514,9 +514,6 @@ export const AllEditors = () => {
 
 	const handleMessage: MichelineEditorMessageHandler = data => {
 		console.log(data);
-		// if (data.isValid === false) {
-		// 	console.trace();
-		// }
 	};
 	return (
 		<div className='allEditors'>
