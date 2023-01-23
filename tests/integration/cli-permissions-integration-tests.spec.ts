@@ -59,7 +59,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 	});
 
 	test('testing that archetype artifacts will have the correct permissions', async () => {
-		await exec(`taq compile --plugin archetype`, { cwd: `./${taqueriaProjectPath}` });
+		await exec(`taq compile fa12.arl --plugin archetype`, { cwd: `./${taqueriaProjectPath}` });
 		const fileUser = await exec(`${userStatCommand} ${taqueriaProjectPath}/artifacts/fa12.tz`);
 		const fileGroup = await exec(`${groupStatCommand} ${taqueriaProjectPath}/artifacts/fa12.tz`);
 
