@@ -14,9 +14,9 @@ import {
 	MichelineMapValue,
 	MichelineNumberValue,
 	MichelineOptionValue,
+	MichelineOrValue,
 	MichelinePairValue,
 	MichelineValue,
-	MichelineValueObject,
 } from '../MichelineValue';
 import { getFriendlyDataType } from './MichelineEditor';
 
@@ -68,6 +68,8 @@ export const validate = (
 		case 'map':
 		case 'big_map':
 			return isValidMap(dataType, value);
+		case 'or':
+			return isValieOr(dataType, value);
 	}
 };
 
@@ -281,6 +283,24 @@ const isValidBytes = (dataType: MichelineDataType, v?: MichelineValue | undefine
 	}
 	return validState;
 };
+
+function isValieOr(dataType: MichelineDataTypeWithArgs, v: MichelineValue | undefined): MichelineValidationResult {
+	if (!isValueObject(v, 'prim') || !hasArgs(v)) {
+		return {
+			state: 'ImmediateError' as const,
+			messages: [`Wrong value shape for ${dataType.prim}`],
+		};
+	}
+	const value = v as MichelineOrValue;
+	if (value.prim !== 'Left' && value.prim !== 'Right') {
+		return {
+			state: 'ImmediateError',
+			messages: [''],
+		};
+	}
+	const index = value.prim === 'Left' ? 0 : 1;
+	return validate(dataType.args[index], value.args?.[0]);
+}
 
 // returns 1 if value2 is greater than value1, 0 if they are equal, and -1 if value2 is less than value1
 export const compare = (dataType: MichelineDataType, value2: MichelineValue, value1: MichelineValue): number => {

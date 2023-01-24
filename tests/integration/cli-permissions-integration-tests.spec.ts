@@ -33,11 +33,6 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		await exec(`cp integration/data/increment.jsligo ${taqueriaProjectPath}/contracts`);
 		await exec(`cp integration/data/hello-tacos.py ${taqueriaProjectPath}/contracts`);
 
-		// Register the contracts
-		await exec(`taq add-contract fa12.arl`, { cwd: `./${taqueriaProjectPath}` });
-		await exec(`taq add-contract increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
-		await exec(`taq add-contract hello-tacos.py`, { cwd: `./${taqueriaProjectPath}` });
-
 		if (operatingSystem == `Linux`) {
 			userGroup = (await exec(`id -g -n ${username}`)).stdout.trim();
 		}
@@ -64,7 +59,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 	});
 
 	test('testing that archetype artifacts will have the correct permissions', async () => {
-		await exec(`taq compile --plugin archetype`, { cwd: `./${taqueriaProjectPath}` });
+		await exec(`taq compile fa12.arl --plugin archetype`, { cwd: `./${taqueriaProjectPath}` });
 		const fileUser = await exec(`${userStatCommand} ${taqueriaProjectPath}/artifacts/fa12.tz`);
 		const fileGroup = await exec(`${groupStatCommand} ${taqueriaProjectPath}/artifacts/fa12.tz`);
 

@@ -41,7 +41,6 @@ import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
 import { has, last, uniq } from 'https://x.nest.land/ramda@0.27.2/mod.ts';
 import * as Analytics from './analytics.ts';
-import { addContract, listContracts, removeContract } from './contracts.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
 import inject from './plugins.ts';
@@ -480,87 +479,6 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 			pipe(
 				listKnownTasks(parsedArgs, config),
 				map(log),
-			),
-	});
-
-	// Add "add-contract" task used to add/register a known contract
-	// TODO: Remove?
-	internalTasks.registerTask({
-		taskName: NonEmptyString.create('add-contract'),
-		aliases: [],
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.command(
-					'add-contract <sourceFile>',
-					i18n.__('addContractDesc'),
-					(yargs: Arguments) => {
-						yargs.positional('sourceFile', {
-							describe: i18n.__('addSourceFileDesc'),
-							type: 'string',
-							required: true,
-						});
-
-						yargs.option('contractName', {
-							alias: ['name', 'n'],
-							type: 'string',
-						});
-					},
-				),
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				SanitizedArgs.ofAddContractArgs(parsedArgs),
-				chain(args => addContract(config, args, i18n)),
-				chain(_ => listContracts(config, parsedArgs, i18n)),
-				map(renderTable),
-			),
-	});
-
-	// Add "rm-contract" task to remove (unregister) a known contract
-	internalTasks.registerTask({
-		taskName: NonEmptyString.create('rm-contract'),
-		aliases: [NonEmptyString.create('remove-contract')],
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.command(
-					'rm-contract <contractName>',
-					i18n.__('removeContractDesc'),
-					(yargs: Arguments) => {
-						yargs.positional('contractName', {
-							describe: i18n.__('removeContractNameDesc'),
-							type: 'string',
-							required: true,
-						});
-					},
-				)
-				.alias('remove-contract', 'rm-contract'),
-
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				SanitizedArgs.ofRemoveContractsArgs(parsedArgs),
-				chain(args => removeContract(config, args, i18n)),
-				chain(_ => listContracts(config, parsedArgs, i18n)),
-				map(renderTable),
-			),
-	});
-
-	// Add "list-contracts" task to show a list of all known (registered) contracts
-	internalTasks.registerTask({
-		taskName: NonEmptyString.create('list-contracts'),
-		aliases: [NonEmptyString.create('show-contracts')],
-		configure: (cliConfig: CLIConfig) =>
-			cliConfig
-				.command(
-					'list-contracts',
-					i18n.__('listContractsDesc'),
-					() => {},
-				)
-				.alias('show-contracts', 'list-contracts'),
-
-		handler: (parsedArgs: SanitizedArgs.t) =>
-			pipe(
-				SanitizedArgs.of(parsedArgs),
-				chain(args => listContracts(config, args, i18n)),
-				map(renderTable),
 			),
 	});
 
@@ -1356,8 +1274,6 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
 				.with({ kind: 'E_EXEC' }, err => [19, false])
-				.with({ kind: 'E_CONTRACT_REGISTERED' }, err => [20, err.msg])
-				.with({ kind: 'E_CONTRACT_NOT_REGISTERED' }, err => [21, err.msg])
 				.with({ kind: 'E_OPT_IN_WARNING' }, err => [22, err.msg])
 				.with({ kind: 'E_INVALID_OPTION' }, err => [23, err.msg])
 				.with({ kind: 'E_TAQ_PROJECT_NOT_FOUND' }, err => [24, err.msg])

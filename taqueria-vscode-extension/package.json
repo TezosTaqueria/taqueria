@@ -239,7 +239,7 @@
 				"category": "Taqueria",
 				"title": "Compile Current File",
 				"shortTitle": "compile current file",
-				"enablement": "resourceExtname in @taqueria/supported-smart-contract-extensions && editorFocus",
+				"enablement": "resourceExtname in @taqueria/supported-smart-contract-extensions",
 				"icon": "$(combine)"
 			},
 			{
@@ -391,20 +391,6 @@
 				"icon": "$(beaker)"
 			},
 			{
-				"command": "taqueria.add_contract",
-				"category": "Taqueria",
-				"title": " Add contract to registry",
-				"shortTitle": "add",
-				"icon": "$(add)"
-			},
-			{
-				"command": "taqueria.rm_contract",
-				"category": "Taqueria",
-				"title": " Remove contract from registry",
-				"shortTitle": "remove",
-				"icon": "$(remove)"
-			},
-			{
 				"command": "taqueria.show_entrypoint_parameters",
 				"category": "Taqueria",
 				"title": "Parameters",
@@ -435,14 +421,6 @@
 		],
 		"menus": {
 			"commandPalette": [
-				{
-					"command": "taqueria.add_contract",
-					"when": "false"
-				},
-				{
-					"command": "taqueria.rm_contract",
-					"when": "false"
-				},
 				{
 					"command": "taqueria.run_tests",
 					"when": "false"
@@ -590,16 +568,6 @@
 				{
 					"command": "taqueria.typecheck",
 					"when": "view == taqueria-sandboxes && viewItem =~ /sandbox:(?!stopped)/",
-					"group": "inline"
-				},
-				{
-					"command": "taqueria.add_contract",
-					"when": "view == taqueria-contracts && viewItem =~ /inRegistry:false/",
-					"group": "inline"
-				},
-				{
-					"command": "taqueria.rm_contract",
-					"when": "view == taqueria-contracts && viewItem =~ /inRegistry:true/",
 					"group": "inline"
 				},
 				{

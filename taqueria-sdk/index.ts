@@ -66,7 +66,7 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdo
 		const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
 		exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
 			if (err) {
-				reject(toErrorWithProps(err, { stderr, stdout }));
+				reject(toExecErr(err, { stderr, stdout }));
 			} else {
 				resolve({
 					stdout,
@@ -75,14 +75,16 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdo
 			}
 		});
 	});
-
-export const toErrorWithProps = (message: string | Error, props: Record<string, unknown>): Error => {
+type ExecErrProps = {
+	stderr: string;
+	stdout: string;
+};
+export const toExecErr = (message: string | Error, props: ExecErrProps): Error & ExecErrProps => {
 	const err = message instanceof Error ? message : new Error(message);
-	const retval = Object.assign(props, err);
-
-	// Note, retval looses its prototype using Object.assign. Same thing with using spread operator.
-	retval.__proto__ = Error.prototype;
-	return err;
+	const retval = err as unknown as Error & ExecErrProps;
+	retval.stderr = props.stderr;
+	retval.stdout = props.stdout;
+	return retval;
 };
 
 export const execCommandWithoutWrapping = (cmd: string): LikeAPromise<StdIO, ExecException> =>
@@ -654,43 +656,6 @@ export const getContracts = (regex: RegExp, config: Protocol.LoadedConfig.t) => 
 };
 
 const joinPaths = (...paths: string[]): string => paths.join('/');
-
-const newContract = async (sourceFile: string, parsedArgs: Protocol.RequestArgs.t) => {
-	const contractPath = joinPaths(parsedArgs.projectDir, getContractsDir(parsedArgs), sourceFile);
-	try {
-		const contents = await readFile(contractPath, { encoding: 'utf-8' });
-		const hash = await SHA256.toSHA256(contents);
-		return await eager(Protocol.Contract.of({
-			sourceFile,
-			hash,
-		}));
-	} catch (err) {
-		await Promise.reject(`Could not read ${contractPath}`);
-	}
-};
-
-const registerContract = async (parsedArgs: Protocol.RequestArgs.t, sourceFile: string): Promise<void> => {
-	try {
-		const config = await readJsonFile<Protocol.Config.t>(parsedArgs.config.configFile);
-		if (config.contracts && config.contracts[sourceFile]) {
-			await sendAsyncErr(`${sourceFile} has already been registered`);
-		} else {
-			const contract = await newContract(sourceFile, parsedArgs);
-			const contracts = config.contracts || {};
-			const updatedConfig = {
-				...config,
-				contracts: {
-					...contracts,
-					...Object.fromEntries([[sourceFile, contract]]),
-				},
-			};
-			await writeJsonFile(parsedArgs.config.configFile)(updatedConfig);
-		}
-	} catch (err) {
-		if (err) console.error('Error registering contract:', err);
-	}
-};
-
 export const stringToSHA256 = (s: string) => SHA256.toSHA256(s);
 
 const getPackageName = () => {
@@ -770,8 +735,4 @@ export const Plugin = {
 				process.exit(1);
 			});
 	},
-};
-
-export const experimental = {
-	registerContract,
 };
