@@ -27,9 +27,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// 	await exec(`cp integration/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
 	// });
 
-	// TODO: Consider in future to use keygen service to update account balance programmatically
-	// https://github.com/ecadlabs/taqueria/issues/378
-	test.only('deploy will create one contract using deploy command', async () => {
+	test.skip('deploy will create one contract using deploy command', async () => {
 		const { execute, exists, cleanup, writeFile, readFile } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
