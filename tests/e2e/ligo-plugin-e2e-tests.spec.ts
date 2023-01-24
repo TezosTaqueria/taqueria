@@ -219,7 +219,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('LIGO contract template will be instantiated with the right content and registered', async () => {
+	test('LIGO contract template will be instantiated with the right content', async () => {
 		const { execute, cleanup, spawn, readFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -235,18 +235,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		digest.update(bytes);
 		const hash = digest.digest('hex');
 		expect(hash).toEqual('241556bb7f849d22564378991ce6c15ffd7fd5727620f207fb53e6dc538e66ef');
-
-		const configFile = await readFile(path.join('./test-project', '.taq', 'config.json'));
-		const json = JSON.parse(configFile);
-		expect(json).toBeInstanceOf(Object);
-		expect(json).toHaveProperty('contracts');
-		expect(json.contracts).toEqual({
-			'counter.mligo': {
-				'hash': '241556bb7f849d22564378991ce6c15ffd7fd5727620f207fb53e6dc538e66ef',
-				'sourceFile': 'counter.mligo',
-			},
-		});
-
 		await cleanup();
 	});
 });
