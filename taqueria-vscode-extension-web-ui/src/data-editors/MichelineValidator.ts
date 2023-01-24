@@ -17,6 +17,7 @@ import {
 	MichelineOptionValue,
 	MichelineOrValue,
 	MichelinePairValue,
+	MichelineStringValue,
 	MichelineValue,
 } from '../MichelineValue';
 import { getFriendlyDataType } from './MichelineEditor';
@@ -47,7 +48,6 @@ export const validate = (
 			return isValidBytes(dataType, value);
 		case 'timestamp':
 		case 'mutez':
-		case 'address':
 		case 'key':
 		case 'key_hash':
 		case 'signature':
@@ -71,6 +71,7 @@ export const validate = (
 			return isValidMap(dataType, value);
 		case 'or':
 			return isValieOr(dataType, value);
+		case 'address':
 		case 'contract':
 			return isValidContract(dataType, value);
 	}
@@ -306,10 +307,29 @@ function isValieOr(dataType: MichelineDataTypeWithArgs, v: MichelineValue | unde
 }
 
 function isValidContract(
-	data: MichelineDataTypeWithArgs,
-	value: MichelineValue | undefined,
+	dataType: MichelineDataType,
+	v: MichelineValue | undefined,
 ): MichelineValidationResult {
-	return validate(data.args[0], value);
+	if (!isValueObject(v, 'string')) {
+		return {
+			state: 'ImmediateError' as const,
+			messages: [`Wrong value shape for ${dataType.prim}`],
+		};
+	}
+	const value = v as MichelineStringValue;
+	const address = value.string;
+	if (!address) {
+		return {
+			state: 'ImmediateError' as const,
+			messages: [`Address is empty`],
+		};
+	}
+	// Here we can have better validation like:
+	// - Checking the address format, but new protocols add new formats
+	// - Also we can check that the address exists on the target network, but then we need to
+	// 		have context about what network we are validating for
+	// - Also, we can check that the contract actually has an entrypoint with the correct datatype.
+	return validState;
 }
 
 // returns 1 if value2 is greater than value1, 0 if they are equal, and -1 if value2 is less than value1

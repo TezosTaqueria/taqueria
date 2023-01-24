@@ -1,8 +1,8 @@
 import React from 'react';
 import { hasPrim, isObject } from '../Helpers';
 import { MichelineDataType } from '../MichelineDataType';
+import { AddressEditor } from './AddressEditor';
 import { BoolEditor } from './BoolEditor';
-import { ContractEditor } from './ContractEditor';
 import { ListEditor } from './ListEditor';
 import { MapEditor } from './MapEditor';
 import { getFriendlyDataType } from './MichelineEditor';
@@ -54,7 +54,6 @@ const getEditor = (
 		case 'timestamp':
 		// TODO: investigate each Domain-Specific type and make sure it's working fine
 		case 'mutez':
-		case 'address':
 		case 'key':
 		case 'key_hash':
 		case 'signature':
@@ -83,8 +82,9 @@ const getEditor = (
 			return <MapEditor value={value} dataType={dataType} onChange={onChange} />;
 		case 'or':
 			return <OrEditor value={value} dataType={dataType} onChange={onChange} />;
+		case 'address':
 		case 'contract':
-			return <ContractEditor value={value} dataType={dataType} onChange={onChange} />;
+			return <AddressEditor value={value} dataType={dataType} onChange={onChange} />;
 		default:
 			return (
 				<span>

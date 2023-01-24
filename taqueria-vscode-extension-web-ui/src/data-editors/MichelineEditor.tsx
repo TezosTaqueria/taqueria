@@ -65,8 +65,10 @@ export const getFriendlyDataType = (dataType: MichelineDataType): string => {
 		case 'list':
 		case 'set':
 		case 'option':
-		case 'contract':
 			friendlyDataType = `${dataType.prim} of ${getFriendlyDataType(dataType.args![0])}`;
+			break;
+		case 'contract':
+			friendlyDataType = `Contract with entrypoint of type ${getFriendlyDataType(dataType.args![0])}`;
 			break;
 		case 'unit':
 			return 'unit';
