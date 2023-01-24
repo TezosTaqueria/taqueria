@@ -12,6 +12,7 @@ const PASSTHROUGH_TYPES = [
 	'ProxyTaskArgs',
 	'ProxyTemplateArgs',
 	'SanitizedArgs',
+	'ConfigEnvironmentFileV2',
 ];
 
 /**
