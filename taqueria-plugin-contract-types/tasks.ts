@@ -1,5 +1,4 @@
-import { RequestArgs } from '@taqueria/node-sdk';
-import { LikeAPromise, TaqError } from '@taqueria/node-sdk/types';
+import { isContractFile, RequestArgs } from '@taqueria/node-sdk';
 import glob from 'fast-glob';
 import { join } from 'path';
 import { generateContractTypesProcessContractFiles } from './src/cli-process';
@@ -29,13 +28,6 @@ const generateContractTypes = (parsedArgs: Opts) =>
 
 		return `${contractFilename}: Types generated`;
 	};
-
-const isContractFile = (filename: string): boolean => {
-	return !filename.includes('.default_storage.')
-		&& !filename.includes('.storage.')
-		&& !filename.includes('.parameter.')
-		&& !filename.includes('.expression.');
-};
 
 const generateContractTypesAll = async (parsedArgs: Opts): Promise<string[]> => {
 	const files = await glob('**/*.tz', { cwd: parsedArgs.config.artifactsDir });

@@ -736,3 +736,10 @@ export const Plugin = {
 			});
 	},
 };
+
+export const isContractFile = (filename: string): boolean => {
+	return !filename.includes('.default_storage.')
+		&& !filename.includes('.storage.')
+		&& !filename.includes('.parameter.')
+		&& !filename.includes('.expression.');
+};
