@@ -94,7 +94,7 @@ const removeUndefinedFields = <T>(x: T): T => {
  * This function should be sealed while the transformConfigToConfigFileV2
  * will change iteratively to become more like V2
  */
-const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV1): ConfigFileSetV2 => {
+export const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV1): ConfigFileSetV2 => {
 	const config = configFileV1;
 	const configFileV2: ConfigFileV2 = {
 		version: `v2`,

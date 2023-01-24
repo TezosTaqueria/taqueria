@@ -20,13 +20,12 @@ export function getContractsByTaqueriaConfig(currentConfig: ConfigInfo, sandboxN
 				? false
 				: environment.sandboxes.some(envSandbox => envSandbox === sandboxName),
 	);
-	if (!sandboxEnvironment || typeof sandboxEnvironment === 'string' || !sandboxEnvironment.aliases) {
-		return [];
-	}
-
-	return Object.entries(sandboxEnvironment.aliases).map(([alias, config]) => ({
+	const configContractsMap = sandboxEnvironment && typeof sandboxEnvironment !== 'string'
+		? sandboxEnvironment.aliases
+		: (currentConfig.config?.config.contracts) as unknown as Record<string, { address: string }> | undefined;
+	return Object.entries(configContractsMap ?? {}).map(([alias, contract]) => ({
 		alias,
-		config: { address: config.address },
+		config: { address: contract.address },
 	}));
 }
 

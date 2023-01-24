@@ -2,7 +2,7 @@
 title: Templates
 ---
 
-Taqueria plugins are able to define templates that can be used to generate project components such as contracts, tests, or operations. Templates are exposed via plugins and use the `create` task to create and register the templates output
+Taqueria plugins are able to define templates that can be used to generate project components such as contracts, tests, or operations. Templates are exposed via plugins and use the `create` task to create the templates output
 
 ## Available Templates
 

@@ -97,23 +97,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('add-contract will error if named contract does not exist', async () => {
-		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project --debug');
-		await waitForText("Project taq'ified!");
-
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
-		expect(stdout).toContain('Plugin installed successfully');
-
-		const mligo_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.mligo`)).stdout;
-		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
-
-		const { stdout: stdout2 } = await execute('taq', 'add-contract hello-tacos.mligo', './test-project');
-		expect(stdout2).toEqual(expect.arrayContaining(['│ No registered contracts found │']));
-
-		await cleanup();
-	});
-
 	test('compile will only compile one contract using compile <sourceFile> command', async () => {
 		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
@@ -150,35 +133,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		);
 		expect(compileOutput).toEqual(expect.arrayContaining(['│ does_not_exist.mligo │ Not compiled │']));
 		expect(compileErr.join()).toContain('contracts/does_not_exist.mligo: No such file or directory.');
-
-		await cleanup();
-	});
-
-	test('add-contract will error if contract is invalid', async () => {
-		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project --debug');
-		await waitForText("Project taq'ified!");
-
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
-		expect(stdout).toContain('Plugin installed successfully');
-
-		const mligo_file = await (await exec('cat e2e/data/ligo-data/invalid-contract.mligo')).stdout;
-		await writeFile('./test-project/contracts/invalid-contract.mligo', mligo_file);
-		const check_the_file = await readFile('./test-project/contracts/invalid-contract.mligo');
-		expect(check_the_file).toContain('type available_tacos = natu');
-
-		const { stdout: stdout2 } = await execute('taq', 'add-contract invalid-contract.mligo', './test-project');
-		expect(stdout2).toEqual(
-			expect.arrayContaining(['│ No registered contracts found │']),
-		);
-
-		const { stdout: stdout3, stderr: stderr2 } = await execute(
-			'taq',
-			'compile invalid-contract.mligo',
-			'./test-project',
-		);
-		expect(stdout3).toEqual(expect.arrayContaining(['│ invalid-contract.mligo │ Not compiled │']));
-		expect(stderr2.join()).toContain('File "contracts/invalid-contract.mligo", line 1, characters 23-27:');
 
 		await cleanup();
 	});
@@ -265,7 +219,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('LIGO contract template will be instantiated with the right content and registered', async () => {
+	test('LIGO contract template will be instantiated with the right content', async () => {
 		const { execute, cleanup, spawn, readFile, ls } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
 		await waitForText("Project taq'ified!");
@@ -281,18 +235,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		digest.update(bytes);
 		const hash = digest.digest('hex');
 		expect(hash).toEqual('241556bb7f849d22564378991ce6c15ffd7fd5727620f207fb53e6dc538e66ef');
-
-		const configFile = await readFile(path.join('./test-project', '.taq', 'config.json'));
-		const json = JSON.parse(configFile);
-		expect(json).toBeInstanceOf(Object);
-		expect(json).toHaveProperty('contracts');
-		expect(json.contracts).toEqual({
-			'counter.mligo': {
-				'hash': '241556bb7f849d22564378991ce6c15ffd7fd5727620f207fb53e6dc538e66ef',
-				'sourceFile': 'counter.mligo',
-			},
-		});
-
 		await cleanup();
 	});
 });

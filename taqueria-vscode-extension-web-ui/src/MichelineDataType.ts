@@ -4,7 +4,8 @@ export type TypesWithArgs =
 	| 'option'
 	| 'pair'
 	| 'map'
-	| 'big_map';
+	| 'big_map'
+	| 'or';
 
 export type TypesWithoutArgs =
 	| 'unit'

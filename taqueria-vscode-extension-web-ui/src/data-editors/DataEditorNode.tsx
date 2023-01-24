@@ -6,6 +6,7 @@ import { ListEditor } from './ListEditor';
 import { MapEditor } from './MapEditor';
 import { getFriendlyDataType } from './MichelineEditor';
 import { OptionEditor } from './OptionEditor';
+import { OrEditor } from './OrEditor';
 import { PairEditor } from './PairEditor';
 import { PrimitiveEditor } from './PrimitiveEditor';
 
@@ -79,6 +80,8 @@ const getEditor = (
 		case 'map':
 		case 'big_map':
 			return <MapEditor value={value} dataType={dataType} onChange={onChange} />;
+		case 'or':
+			return <OrEditor value={value} dataType={dataType} onChange={onChange} />;
 		default:
 			return (
 				<span>
