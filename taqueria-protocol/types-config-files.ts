@@ -296,8 +296,6 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 		environments: environmentFilesV2,
 	} = configFileSetV2;
 
-	debugger;
-
 	const environments = Object.entries(configFileV2.environments ?? {})
 		.map(([k, v]) => ({
 			key: k,
@@ -337,6 +335,7 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 			delete vClone.storage;
 			delete vClone.aliases;
 			delete vClone.contracts;
+			// delete vClone.accounts;
 			return vClone;
 		})());
 
@@ -397,16 +396,20 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 				// Unknown fields might need to be in the network or sandbox
 				...getUnknownFields(x, 'sandbox') as {},
 				...(() => {
-					if (configFileSetV2.environments[x.key]?.accounts) {
-						return configFileSetV2.environments[x.key].accountDefault
+					const environments = configFileV2.environments ?? {};
+					const environment = environments[x.value.sandboxName ?? x.key];
+					if (environment) {
+						return environment.accountDefault
 							? {
-								...configFileSetV2.environments[x.key].accounts,
-								accountDefault: configFileSetV2.environments[x.key].accountDefault,
+								accounts: {
+									...environment.accounts,
+									default: environment.accountDefault,
+								},
 							}
-							: configFileSetV2.environments[x.key].accounts;
+							: { accounts: environment.accounts };
 					}
 					return {};
-				})(),
+				}),
 			}])),
 	};
 
