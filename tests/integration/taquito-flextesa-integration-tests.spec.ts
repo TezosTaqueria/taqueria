@@ -56,14 +56,18 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		console.log(stderr);
 		console.log(stdout1);
 		expect(stdout1).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
+		expect(stdout1).not.toEqual(expect.arrayContaining([expect.stringContaining('Error')]));
 
-		// const { stdout: stdout5, stderr: stderr1 } = await execute(
-		// 	'taq',
-		// 	'deploy hello-tacos.tz --storage anyContract.storage.tz -e development',
-		// 	'./test-project',
-		// );
-		// console.log('stdout5', stdout5);
-		// console.log('stderr1', stderr1);
+		const { stdout: stdout5, stderr: stderr1 } = await execute(
+			'taq',
+			'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
+			'./test-project',
+		);
+		console.log('stdout5', stdout5);
+		console.log('stderr1', stderr1);
+
+		const content = await readFile('./test-project/.taq/config.json');
+		console.log(content);
 
 		// const deployResponse = stdout5[0].trim().split(/\r?\n/)[3];
 		// expect(deployResponse).toContain('hello-tacos.tz');
