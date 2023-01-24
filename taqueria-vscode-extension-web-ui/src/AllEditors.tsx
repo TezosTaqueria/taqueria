@@ -172,6 +172,166 @@ const typesForTestingEditor: {
 	},
 	{
 		type: {
+			'prim': 'pair',
+			'annots': [
+				'%balance_of',
+			],
+			'args': [
+				{
+					'prim': 'list',
+					'annots': [
+						'%requests',
+					],
+					'args': [
+						{
+							'prim': 'pair',
+							'args': [
+								{
+									'prim': 'address',
+									'annots': [
+										'%owner',
+									],
+								},
+								{
+									'prim': 'nat',
+									'annots': [
+										'%token_id',
+									],
+								},
+							],
+						},
+					],
+				},
+				{
+					'prim': 'contract',
+					'annots': [
+						'%callback',
+					],
+					'args': [
+						{
+							'prim': 'list',
+							'args': [
+								{
+									'prim': 'pair',
+									'args': [
+										{
+											'prim': 'pair',
+											'annots': [
+												'%request',
+											],
+											'args': [
+												{
+													'prim': 'address',
+													'annots': [
+														'%owner',
+													],
+												},
+												{
+													'prim': 'nat',
+													'annots': [
+														'%token_id',
+													],
+												},
+											],
+										},
+										{
+											'prim': 'nat',
+											'annots': [
+												'%balance',
+											],
+										},
+									],
+								},
+							],
+						},
+					],
+				},
+			],
+		},
+		value: {
+			'prim': 'Unit',
+		},
+	},
+	// {
+	// 	type: {
+	// 		'prim': 'list',
+	// 		'annots': [
+	// 			'%update_operators',
+	// 		],
+	// 		'args': [
+	// 			{
+	// 				'prim': 'or',
+	// 				'args': [
+	// 					{
+	// 						'prim': 'pair',
+	// 						'annots': [
+	// 							'%add_operator',
+	// 						],
+	// 						'args': [
+	// 							{
+	// 								'prim': 'address',
+	// 								'annots': [
+	// 									'%owner',
+	// 								],
+	// 							},
+	// 							{
+	// 								'prim': 'pair',
+	// 								'args': [
+	// 									{
+	// 										'prim': 'address',
+	// 										'annots': [
+	// 											'%operator',
+	// 										],
+	// 									},
+	// 									{
+	// 										'prim': 'nat',
+	// 										'annots': [
+	// 											'%token_id',
+	// 										],
+	// 									},
+	// 								],
+	// 							},
+	// 						],
+	// 					},
+	// 					{
+	// 						'prim': 'pair',
+	// 						'annots': [
+	// 							'%remove_operator',
+	// 						],
+	// 						'args': [
+	// 							{
+	// 								'prim': 'address',
+	// 								'annots': [
+	// 									'%owner',
+	// 								],
+	// 							},
+	// 							{
+	// 								'prim': 'pair',
+	// 								'args': [
+	// 									{
+	// 										'prim': 'address',
+	// 										'annots': [
+	// 											'%operator',
+	// 										],
+	// 									},
+	// 									{
+	// 										'prim': 'nat',
+	// 										'annots': [
+	// 											'%token_id',
+	// 										],
+	// 									},
+	// 								],
+	// 							},
+	// 						],
+	// 					},
+	// 				],
+	// 			},
+	// 		],
+	// 	},
+	// 	value: [],
+	// },
+	{
+		type: {
 			'prim': 'bool',
 			'annots': [
 				'%simpleBool',
