@@ -1,6 +1,6 @@
 import React from 'react';
 import { isObject } from '../Helpers';
-import { MichelineDataType, TypesWithoutArgs } from '../MichelineDataType';
+import { MichelineDataType } from '../MichelineDataType';
 import { MichelineValue, MichelineValueObject } from '../MichelineValue';
 import { validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
