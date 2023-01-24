@@ -33,7 +33,6 @@ export class ContractsDataProvider extends TaqueriaDataProviderBase
 				uri,
 				vscode.TreeItemCollapsibleState.None,
 				getLanguageInfoForFileName(uri.path)?.compilerName,
-				config?.config?.contracts?.[path.basename(uri.path)] !== undefined,
 				contractsFolder,
 				mainFolder,
 			)
@@ -59,7 +58,6 @@ export class ContractTreeItem extends vscode.TreeItem implements HasFileName {
 		public readonly contractUri: vscode.Uri,
 		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
 		language: SmartContractCompiler | undefined,
-		public isInRegistry: boolean,
 		readonly contractsFolder: string,
 		readonly mainFolder: vscode.Uri,
 	) {

@@ -1,4 +1,4 @@
-import { experimental, sendAsyncErr } from '@taqueria/node-sdk';
+import { sendAsyncErr } from '@taqueria/node-sdk';
 import { RequestArgs } from '@taqueria/node-sdk';
 import { writeFile } from 'fs/promises';
 import { jsligo_template, mligo_template, pascaligo_template, religo_template } from './ligo_templates';
@@ -7,10 +7,6 @@ interface Opts extends RequestArgs.t {
 	sourceFileName?: string;
 	syntax?: string;
 }
-
-const registerContract = (arg: Opts, contractName: string) => {
-	experimental.registerContract(arg, contractName);
-};
 
 const getLigoTemplate = async (contractName: string, syntax: string | undefined): Promise<string> => {
 	const matchResult = contractName.match(/\.[^.]+$/);
@@ -40,8 +36,7 @@ const createContract = (args: RequestArgs.t) => {
 	const syntax = unsafeOpts.syntax;
 	const contractsDir = `${args.config.projectDir}/${args.config.contractsDir}`;
 	return getLigoTemplate(contractName, syntax)
-		.then(ligo_template => writeFile(`${contractsDir}/${contractName}`, ligo_template))
-		.then(_ => registerContract(unsafeOpts, contractName));
+		.then(ligo_template => writeFile(`${contractsDir}/${contractName}`, ligo_template));
 };
 
 export default createContract;
