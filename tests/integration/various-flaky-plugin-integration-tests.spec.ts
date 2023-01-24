@@ -9,14 +9,16 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 	// FLAKY in cicd, example: https://github.com/ecadlabs/taqueria/actions/runs/3770115326/jobs/6409755728
 	//     Expected: ArrayContaining ["│ Account Alias │ Account Address                      │ Mutez Funded │"]
 	// 	   Received: []
-	test.skip('fund will fund instantiated accounts on a network', async () => {
+
+	jest.setTimeout(90000);
+
+	test('fund will fund instantiated accounts on a network', async () => {
 		const { execute, spawn, cleanup, writeFile, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const test_config_file = await (await exec('cat e2e/data/config-taquito-test-environment-low-tez.json')).stdout;
+		const test_config_file = await (await exec('cat integration/data/config-taquito-test-environment-low-tez.json'))
+			.stdout;
 		await writeFile('./test-project/.taq/config.json', test_config_file);
-		// const { stdout } = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
-		// expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 		const { stdout: stdout1 } = await execute(
 			'taq',
 			'install ../taqueria-plugin-taquito',
@@ -40,15 +42,15 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test.skip('transfer will send mutez from one instantiated account to another', async () => {
+	test('transfer will send mutez from one instantiated account to another', async () => {
 		// FLAKY - https://github.com/ecadlabs/taqueria/issues/1694
 		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const test_config_file = await (await exec('cat e2e/data/config-taquito-test-environment-low-tez.json')).stdout;
+		const test_config_file = await (await exec('cat integration/data/config-taquito-test-environment-low-tez.json'))
+			.stdout;
 		await writeFile('./test-project/.taq/config.json', test_config_file);
-		// const { stdout } = await execute('taq', 'install ../taqueria-plugin-core', './test-project');
-		// expect(stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
+
 		const { stdout: stdout1 } = await execute(
 			'taq',
 			'install ../taqueria-plugin-taquito',
@@ -87,7 +89,7 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const artifact_file = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
+		const artifact_file = await (await exec(`cat integration/data/hello-tacos.tz`)).stdout;
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_file);
 
 		const { stdout: stdout1, stderr } = await execute(
@@ -116,7 +118,7 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 		);
 		expect(stdout).toEqual(expect.arrayContaining(['│ completium/archetype:1.3.5 │']));
 
-		const arl_file = await (await exec('cat e2e/data/arch-1.3.5-example.arl')).stdout;
+		const arl_file = await (await exec('cat integration/data/arch-1.3.5-example.arl')).stdout;
 		writeFile('./test-project/contracts/arch-1.3.5-example.arl', arl_file);
 
 		const { stdout: stdout1 } = await execute(
