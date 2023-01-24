@@ -92,7 +92,7 @@ const removeUndefinedFields = <T>(x: T): T => {
  *
  * NOTE: Although this is nearly identical to transformConfigToConfigFileV2
  * This function should be sealed while the transformConfigToConfigFileV2
- * will change interatively to become move like V2
+ * will change iteratively to become more like V2
  */
 const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV1): ConfigFileSetV2 => {
 	const config = configFileV1;
@@ -147,7 +147,11 @@ const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV1): Con
 					// These overwrite fields in environment
 					...[
 						...v.networks.map(k => config.network?.[k]),
-						...v.sandboxes.map(k => config.sandbox?.[k]),
+						...v.sandboxes.map(k => {
+							const retval = { ...config.sandbox?.[k] };
+							delete retval['accounts'];
+							return retval;
+						}),
 					][0] as {},
 				}]),
 		),
@@ -291,6 +295,8 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 		config: configFileV2,
 		environments: environmentFilesV2,
 	} = configFileSetV2;
+
+	debugger;
 
 	const environments = Object.entries(configFileV2.environments ?? {})
 		.map(([k, v]) => ({
