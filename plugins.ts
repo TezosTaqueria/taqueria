@@ -142,7 +142,7 @@ export const inject = (deps: PluginDeps) => {
 					plugin.name,
 					'index.js',
 				);
-				return ['node', pluginPath];
+				return ['node', pluginPath, '--inspect'];
 			}
 			default:
 				return ['echo'];

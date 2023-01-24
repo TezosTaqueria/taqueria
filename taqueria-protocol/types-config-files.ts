@@ -164,7 +164,7 @@ export const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV
 };
 
 // Object to FileV2
-const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
+export const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
 	const environmentsV2Raw = Object.fromEntries(
 		Object.entries(config.environment)
 			.filter(([k]) => k !== `default`)
