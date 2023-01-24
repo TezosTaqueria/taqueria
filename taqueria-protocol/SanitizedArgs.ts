@@ -98,39 +98,12 @@ export const setEnvRawSchema = rawSchema.extend({
 	defaultEnvironment: z.string().min(1),
 });
 
-export const versionRawSchema = rawSchema.extend({
-	version: z.boolean().default(true),
-});
-
-export const addContractsRawSchema = z.preprocess(
-	val => {
-		const obj: {
-			contractName?: string;
-			sourceFile?: string;
-		} = typeof val === 'object' ? Object(val) : ({ contractName: '', sourceFile: '' });
-		return !obj.contractName && obj.sourceFile
-			? { ...obj, contractName: obj['sourceFile'] }
-			: obj;
-	},
-	rawSchema.extend({
-		sourceFile: z.string().min(1),
-		contractName: z.string().min(1),
-	}),
-);
-
-export const removeContractsRawSchema = rawSchema.extend({
-	contractName: z.string().min(1),
-});
-
 type RawInput = z.infer<typeof rawSchema>;
 type RawScaffoldInput = z.infer<typeof scaffoldRawSchema>;
 type RawProvisionInput = z.infer<typeof provisionRawSchema>;
 type RawManagePluginInput = z.infer<typeof managePluginRawSchema>;
 type RawSetEnvInput = z.infer<typeof setEnvRawSchema>;
-type RawVersionInput = z.infer<typeof versionRawSchema>;
 type RawTemplateInput = z.infer<typeof templateRawSchema>;
-type RawAddContractsInput = z.infer<typeof addContractsRawSchema>;
-type RawRemoveContractsInput = z.infer<typeof removeContractsRawSchema>;
 
 export const { schemas: generatedSchemas, factory } = createType<RawInput, RawInput>({
 	rawSchema,
@@ -184,26 +157,12 @@ export const createTaskArgs = createType<RawTemplateInput, RawTemplateInput>({
 	unknownErrMsg: 'Something went wrong parsing the arguments for the create task',
 });
 
-export const addContractArgs = createType<RawAddContractsInput, RawAddContractsInput>({
-	rawSchema: addContractsRawSchema,
-	parseErrMsg: 'Please specify the source file to register.',
-	unknownErrMsg: 'Something went wrong parsing the arguments for registering a contract.',
-});
-
-export const removeContractsArgs = createType<RawRemoveContractsInput, RawRemoveContractsInput>({
-	rawSchema: removeContractsRawSchema,
-	parseErrMsg: 'Please specify the contract name to unregister.',
-	unknownErrMsg: 'Something went wrong parsing the arguments to unregister a contract.',
-});
-
 export type ScaffoldTaskArgs = z.infer<typeof scaffoldTaskArgs.schemas.schema>;
 export type ProvisionTaskArgs = z.infer<typeof provisionTaskArgs.schemas.schema>;
 export type InstallTaskArgs = z.infer<typeof installTaskArgs.schemas.schema>;
 export type UninstallTaskArgs = z.infer<typeof uninstallTaskArgs.schemas.schema>;
 export type SetEnvTaskArgs = z.infer<typeof setEnvTaskArgs.schemas.schema>;
 export type CreateTaskArgs = z.infer<typeof createTaskArgs.schemas.schema>;
-export type AddContractArgs = z.infer<typeof addContractArgs.schemas.schema>;
-export type RemoveContractArgs = z.infer<typeof removeContractsArgs.schemas.schema>;
 
 export const createScaffoldTaskArgs = scaffoldTaskArgs.factory.from;
 export const makeScaffoldTaskArgs = scaffoldTaskArgs.factory.make;
@@ -228,10 +187,3 @@ export const ofSetEnvTaskArgs = setEnvTaskArgs.factory.of;
 export const createCreateTaskArgs = createTaskArgs.factory.create;
 export const makeCreateTaskArgs = createTaskArgs.factory.make;
 export const ofCreateTaskArgs = createTaskArgs.factory.of;
-export const createAddContractArgs = addContractArgs.factory.create;
-export const makeAddContractArgs = addContractArgs.factory.make;
-export const ofAddContractArgs = addContractArgs.factory.of;
-
-export const createRemoveContractsArgs = removeContractsArgs.factory.create;
-export const makeRemoveContractsArgs = removeContractsArgs.factory.make;
-export const ofRemoveContractsArgs = removeContractsArgs.factory.of;

@@ -80,8 +80,6 @@ describe('Extension Test Suite', async () => {
 			'taqueria.compile_archetype',
 			'taqueria.compile_pick_file',
 			'taqueria.compile_current_file',
-			'taqueria.add_contract',
-			'taqueria.rm_contract',
 			'taqueria.generate_types',
 			'taqueria.typecheck',
 			'taqueria.taqueria.create_test_folder',

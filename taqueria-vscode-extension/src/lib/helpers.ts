@@ -175,24 +175,6 @@ export class VsCodeHelper {
 		this.exposeCompileCommand('compile_archetype', 'getFromCommand', 'archetype');
 		this.exposeCompileCommand('compile_pick_file', 'openDialog', undefined);
 		this.exposeCompileCommand('compile_current_file', 'currentFile', undefined);
-		this.exposeTaqTaskAsCommandWithFileArgument(
-			'add_contract',
-			'add-contract',
-			'output',
-			{
-				finishedTitle: `added contract to registry`,
-				progressTitle: `adding contract to registry`,
-			},
-		);
-		this.exposeTaqTaskAsCommandWithFileArgument(
-			'rm_contract',
-			'rm-contract',
-			'output',
-			{
-				finishedTitle: `removed contract from registry`,
-				progressTitle: `removing contract from registry`,
-			},
-		);
 
 		this.exposeTaqTaskAsCommand(
 			'generate_types',
