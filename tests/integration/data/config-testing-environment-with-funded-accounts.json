@@ -1,0 +1,41 @@
+{
+	"networkName": "ghostnet",
+	"accounts": {
+		"bob": {
+			"publicKey": "edpkv1A37Dg1ra4AMktAnxSToqh8xHi5V2siXoyNdEZpuZZXnXAAxu",
+			"publicKeyHash": "tz1bMEtrTHzo8nQnmau7bFcc8MMssB57V3M9",
+			"privateKey": "edskRzmTEo8skzznGjBGwEUeC9Y6qz1xuk2rM9jSMRu6UretyoYrQbUhx2TsbF3VUdrfWdSnWoe7o3QWvzQ1QXjDg3Kb1LDj7E",
+			"mnemonic": "nephew pass water color split leg olive zone sustain mom coconut aim"
+		},
+		"alice": {
+			"publicKey": "edpkvLdm3geqf98sV4m4u4ZEveYtpNX68vqMLbCHNUPwyGBWkjfTYx",
+			"publicKeyHash": "tz1NBE25M4tsYAWJccpARBrXvFdH4h88Mhxv",
+			"privateKey": "edskRsgJ26t8t3uZQ1C3NF4nxiZv2GeiRBjJw8gcjpsc6GBMSqSM1kpWAmbnfyC6FgVaLWGBmYuDmSm7dsoNCXi176iWpx9imw",
+			"mnemonic": "absent frown blanket boost lemon business moon hidden tip pigeon reason impact"
+		},
+		"john": {
+			"publicKey": "edpkuKUgFMoFpghyv6a1YiDAEPtm4xbwe32Z8Gxuf3WRANMW2TvJkG",
+			"publicKeyHash": "tz1XDMT8HUF2vpqmTF4ggkQAHEZ1CFf7QE1x",
+			"privateKey": "edskRhfkt5HSwwoHLFcfSExYFMZvJ6smSxUgig2hNZb7rhFd1eqXr25GoD7JDSj6h9NR7tp6ZesBcW2k12A2HeGzs8pgQfssgT",
+			"mnemonic": "lecture unit maid source cluster lunch conduct rule metal claw long umbrella"
+		},
+		"jane": {
+			"publicKey": "edpkuA1wSn4npbiLcuoxsUBxPsrG96Wdx8AHGfChFC7NseuPVEuJSa",
+			"publicKeyHash": "tz1KsT3Rs6pHLB4QL3vpjoX573MxHub4nqoN",
+			"privateKey": "edskRoPBeVsUCUtj5fbb6wFLrB4omtqqAchycW4cYwp5DhEh2FbLYio7f3jBsJUKrcV8LUvWskohwyfYfgP1BtoGMjzhPJRj44",
+			"mnemonic": "dash wave weekend credit shoot frame connect fiber thing acid angry other"
+		},
+		"joe": {
+			"publicKey": "edpkv1DNZnATSP5dctnT3pbUStMVjGVgWYexwr8RCRwndP3GjMsfuz",
+			"publicKeyHash": "tz1g9VHSA8oMwkejPBxZX3Jua27HKnCdnAL1",
+			"privateKey": "edskRfqQc4NQYGbhPZsKcZXHe9uwgPGDEBemuiGRmVVopjEBAHEB6La5fUE3c71L1UHz7XtMffoEQh1WMhDM6Y9icEq5B16psV",
+			"mnemonic": "vanish autumn wish feed ankle drink learn bean start replace dwarf entire"
+		},
+		"taqOperatorAccount": {
+			"publicKey": "edpkuxAFFygov4QgzKEtzYxdS2RtrJDQNpqHkQvg7qWXRtVisBoxRu",
+			"publicKeyHash": "tz1eN7kNEYVnihuojQfviujKjF8BvNmNT3M9",
+			"privateKey": "edskS9pgh9MNG2Nsg1LJpcggJ19yDSumyiqo3A9dghpYNHgWdXTbNXGxQmypkRoqfP32TYNzb5LFBFuCzCg8jcFJA2dT3EKEKH",
+			"mnemonic": "fury fiction festival brass damage depend plastic tennis must account flight hungry"
+		}
+	}
+}

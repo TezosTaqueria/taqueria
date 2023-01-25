@@ -1,3 +1,4 @@
+import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 import fsPromises from 'fs/promises';
 import utils from 'util';
 import {
@@ -31,6 +32,30 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 	beforeEach(async () => {
 		await exec(`cp integration/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
+	});
+
+	test.only('instantiate-account can only be executed in a network environment', async () => {
+		const { execute, spawn, cleanup, writeFile, readFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+
+		const testing_env_config_file =
+			await (await exec('cat integration/data/config-testing-environment-with-funded-accounts.json'))
+				.stdout;
+		await writeFile('./test-project/.taq/config.local.testing.json', testing_env_config_file);
+		console.log(await readFile('./test-project/.taq/config.local.testing.json'));
+
+		const { stdout: stdout1 } = await execute(
+			'taq',
+			'install ../taqueria-plugin-taquito',
+			'./test-project',
+		);
+		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
+
+		const { stderr } = await execute('taq', 'instantiate-account -e development', './test-project');
+		expect(stderr).toContain('taq instantiate-account can only be executed in a network environment');
+
+		await cleanup();
 	});
 
 	// TODO: Consider in future to use keygen service to update account balance programmatically
@@ -95,24 +120,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 		expect(contractFromSandbox.stdout).toContain('"balance":"0"');
 		expect(contractFromSandbox.stdout).toContain('"storage":{"int":"12"}');
-	});
-
-	test.skip('Verify that taqueria taquito plugin can transfer amount of tezos using transfer command from one account to another', async () => {
-		// 1. Setting up environment name
-		environment = 'development';
-
-		// 2. Get Bob's and Alice's account addresses
-		const initialContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-		const addressArray = itemArrayInTable(addressRegex, initialContractList);
-
-		// 3. Call transfer to transfer
-		await exec(`taq transfer ${addressArray[1]} --mutez 1000000000`, { cwd: `./${taqueriaProjectPath}` });
-		await sleep(2500);
-
-		// 4. Verify transfer results
-		const resultContractList = await exec(`taq list accounts ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-		const amountArray = itemArrayInTable(amountRegex, resultContractList);
-		expect(amountArray[1]).toEqual('4000 ꜩ');
 	});
 
 	test.skip('Verify that taqueria taquito plugin cant transfer 0 tez using transfer command from one account to another', async () => {

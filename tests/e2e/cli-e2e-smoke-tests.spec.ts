@@ -27,6 +27,8 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 
 		const { stdout: stdout1 } = await execute('taq', 'compile counter.mligo', './test-project');
 
+		await new Promise(resolve => setTimeout(resolve, 5000));
+
 		expect(stdout1).toMatchInlineSnapshot(`
               [
                 "┌─────────────────────────────┬───────────────────────────────────────────────┐",
@@ -48,6 +50,8 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		const { stdout: stdout2, stderr } = await execute('taq', 'start sandbox local', './test-project');
 		expect(stdout2).toEqual(expect.arrayContaining(['Starting node...']));
 
+		await new Promise(resolve => setTimeout(resolve, 5000));
+
 		const { stdout: stdout3 } = await execute('taq', 'list accounts local', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
 		expect(stdout3).toEqual(expect.arrayContaining([expect.stringContaining('bob')]));
@@ -60,6 +64,8 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		// await new Promise(r => setTimeout(r, 3000));
 
 		const { stdout: stdout4, stderr: stderr1 } = await execute('taq', 'originate counter.tz', './test-project');
+
+		await new Promise(resolve => setTimeout(resolve, 5000));
 
 		expect(stdout4).toEqual(
 			expect.arrayContaining([
@@ -74,6 +80,9 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 			'transfer counter --param counter.parameter.increment_by_3.tz',
 			'./test-project',
 		);
+
+		await new Promise(resolve => setTimeout(resolve, 5000));
+
 		expect(stdout5).toEqual(
 			expect.arrayContaining([
 				'│ Contract Alias │ Contract Address                     │ Parameter        │ Entrypoint │ Mutez Transfer │ Destination            │',
