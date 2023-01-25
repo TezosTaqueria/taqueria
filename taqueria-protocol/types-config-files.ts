@@ -6,7 +6,6 @@ import type {
 	Environment,
 	NetworkConfig,
 	SandboxAccounts,
-	SandboxConfig,
 } from '@taqueria/protocol/types';
 
 export type ConfigFileSetV2 = {
@@ -64,7 +63,7 @@ export const writeJsonFileInterceptConfig = (writeJsonFile: (filePath: string) =
 				// DEBUG: write original file
 				// await writeJsonFile(filePath.replace(`config.json`, `config.original-${Date.now()}.json`))(config);
 
-				return await writeConfigFiles(writeJsonFile)(filePath)(transformConfigToConfigFileV2(config));
+				return await writeConfigFiles(writeJsonFile)(filePath)(transformConfigToConfigFileSetV2(config));
 			}) as (data: unknown) => Promise<string>;
 		}
 
@@ -114,32 +113,16 @@ export const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV
 		environmentDefault: config.environment?.default as string,
 		environments: Object.fromEntries(
 			Object.entries(config.environment ?? {})
-				.filter(([k, v]) => k !== `default`)
+				.filter(([k]) => k !== `default`)
 				.map(([k, v]) => [k, v] as [string, Environment])
 				.map(([k, v]) => [k, {
 					// Known fields
 					type: v.sandboxes.length ? `flextesa` : `simple`,
 					// Unknown fields
 					...((() => {
-						const vClone = { ...v } as Partial<typeof v> & ConfigEnvironmentFileV2;
+						const vClone = { ...v } as Partial<typeof v>;
 						delete vClone.networks;
 						delete vClone.sandboxes;
-						delete vClone.aliases;
-						if (v.aliases) vClone.contracts = v.aliases;
-
-						if (v.sandboxes?.[0]) {
-							const sandboxName = v.sandboxes[0];
-							if (config.sandbox?.[sandboxName].accounts) {
-								const accountsClone = { ...config.sandbox[sandboxName].accounts };
-								delete accountsClone['default'];
-								vClone.accounts = accountsClone as SandboxAccounts;
-
-								if (config.sandbox?.[sandboxName]?.accounts?.['default']) {
-									vClone.accountDefault = config.sandbox?.[sandboxName]?.accounts?.['default'] as string;
-								}
-							}
-						}
-
 						return vClone;
 					})()),
 					// Preserve sandbox or network name
@@ -149,12 +132,22 @@ export const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV
 					// These overwrite fields in environment
 					...[
 						...v.networks.map(k => config.network?.[k]),
-						...v.sandboxes.map(k => {
-							const retval = { ...config.sandbox?.[k] };
-							delete retval['accounts'];
-							return retval;
-						}),
-					][0] as {},
+						...v.sandboxes.map(k => config.sandbox?.[k]),
+					].map(x => ({
+						...x,
+						// Accounts and accountDefault
+						accountDefault: x?.accounts?.default as string,
+						accounts: !x?.accounts ? undefined : {
+							...x?.accounts,
+							default: undefined,
+						},
+					}))[0] as {},
+					// Other transforms
+					...{
+						// Rename aliases to contracts
+						aliases: undefined,
+						contracts: v.aliases,
+					},
 				}]),
 		),
 		plugins: config.plugins,
@@ -166,53 +159,7 @@ export const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV
 };
 
 // Object to FileV2
-export const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 => {
-	const environmentsV2Raw = Object.fromEntries(
-		Object.entries(config.environment)
-			.filter(([k]) => k !== `default`)
-			.map(([k, v]) => [k, v] as [string, Environment])
-			.map(([k, v]) => [k, {
-				// Known fields
-				type: v.sandboxes.length ? `flextesa` : `simple`,
-				// Unknown fields
-				...((() => {
-					const vClone = { ...v } as Partial<typeof v> & ConfigEnvironmentFileV2;
-					delete vClone.networks;
-					delete vClone.sandboxes;
-					delete vClone.aliases;
-					if (v.aliases) vClone.contracts = v.aliases;
-
-					if (v.sandboxes?.[0]) {
-						const sandboxName = v.sandboxes[0];
-						if (config.sandbox?.[sandboxName]?.accounts) {
-							const accountsClone = { ...config.sandbox[sandboxName].accounts };
-							delete accountsClone['default'];
-							vClone.accounts = accountsClone as SandboxAccounts;
-
-							if (config.sandbox[sandboxName].accounts?.['default']) {
-								vClone.accountDefault = config.sandbox[sandboxName].accounts?.['default'] as string;
-							}
-						}
-					}
-
-					return vClone;
-				})()),
-				// Preserve sandbox or network name
-				networkName: v.networks[0],
-				sandboxName: v.sandboxes[0],
-				// Fields from the first sandbox or network (there should be only 1)
-				// These overwrite fields in environment
-				...[
-					...v.networks.map(k => config.network?.[k]),
-					...v.sandboxes.map(k => {
-						const retval = { ...config.sandbox?.[k] };
-						delete retval['accounts'];
-						return retval;
-					}),
-				][0] as {},
-			}]),
-	);
-
+export const transformConfigToConfigFileSetV2 = (config: Config): ConfigFileSetV2 => {
 	const configFileV2: ConfigFileV2 = {
 		version: `v2`,
 		language: config.language,
@@ -227,7 +174,45 @@ export const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 =
 			),
 		contracts: config.contracts,
 		environmentDefault: config.environment.default as string,
-		environments: environmentsV2Raw,
+		environments: Object.fromEntries(
+			Object.entries(config.environment)
+				.filter(([k]) => k !== `default`)
+				.map(([k, v]) => [k, v] as [string, Environment])
+				.map(([k, v]) => [k, {
+					// Known fields
+					type: v.sandboxes.length ? `flextesa` : `simple`,
+					// Unknown fields
+					...((() => {
+						const vClone = { ...v } as Partial<typeof v>;
+						delete vClone.networks;
+						delete vClone.sandboxes;
+						return vClone;
+					})()),
+					// Preserve sandbox or network name
+					networkName: v.networks[0],
+					sandboxName: v.sandboxes[0],
+					// Fields from the first sandbox or network (there should be only 1)
+					// These overwrite fields in environment
+					...[
+						...v.networks.map(k => config.network?.[k]),
+						...v.sandboxes.map(k => config.sandbox?.[k]),
+					].map(x => ({
+						...x,
+						// Accounts and accountDefault
+						accountDefault: x?.accounts?.default as string,
+						accounts: !x?.accounts ? undefined : {
+							...x?.accounts,
+							default: undefined,
+						},
+					}))[0] as {},
+					// Other transforms
+					...{
+						// Rename aliases to contracts
+						aliases: undefined,
+						contracts: v.aliases,
+					},
+				}]),
+		),
 		plugins: config.plugins,
 	};
 
@@ -368,15 +353,16 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 			...Object.fromEntries(environments.map(x => [x.key, {
 				// Network and sandbox
 				networks: x.value.type !== `simple` ? [] : [
-					// use same name as enviroment by default
+					// use same name as environment by default
 					x.value.networkName ?? `${x.key}`,
 				],
 				sandboxes: x.value.type !== `flextesa` ? [] : [
-					// use same name as enviroment by default
+					// use same name as environment by default
 					x.value.sandboxName ?? `${x.key}`,
 				],
 				// Known environment fields
 				storage: x.value.storage,
+				// Rename contracts to aliases
 				aliases: x.value.contracts,
 				// Unknown fields might need to be in the environment
 				...getUnknownFields(x, 'environment'),
@@ -389,12 +375,11 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 				rpcUrl: x.value.rpcUrl ?? ``,
 				// Unknown fields might need to be in the network or sandbox
 				...getUnknownFields(x, 'network') as {},
-				...(() => {
-					return {
-						accounts: x.value.accounts,
-					};
-				})(),
-			}])) as Record<string, NetworkConfig>,
+				// Accounts w/out default
+				accounts: !x.value.accounts ? undefined : {
+					...x.value.accounts,
+				} as NetworkConfig[`accounts`],
+			}])),
 		sandbox: !sandboxEnvironments.length
 			? undefined
 			: Object.fromEntries(sandboxEnvironments.map(x => [x.value.sandboxName ?? `${x.key}`, {
@@ -402,26 +387,12 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 				rpcUrl: x.value.rpcUrl ?? ``,
 				// Unknown fields might need to be in the network or sandbox
 				...getUnknownFields(x, 'sandbox') as {},
-				...(() => {
-					const environment = x.value;
-					if (environment && environment.accounts) {
-						return environment.accountDefault
-							? {
-								accounts: {
-									...environment.accounts,
-									default: environment.accountDefault,
-								},
-							}
-							: {
-								accounts: {
-									...environment.accounts,
-									default: Object.keys(environment.accounts)[0],
-								},
-							};
-					}
-					return {};
-				})(),
-			}])) as Record<string, SandboxConfig>,
+				// Accounts with default
+				accounts: !x.value.accounts ? undefined : {
+					default: x.value.accountDefault as string,
+					...x.value.accounts,
+				},
+			}])),
 	};
 
 	return removeUndefinedFields(config);

@@ -109,7 +109,7 @@ export function getConfigV2(
 		// If version v1, return the config object
 		if (!rawConfig.version || rawConfig.version.toLowerCase() === 'v1') {
 			const configV1 = Config.from(rawConfig);
-			return transform.transformConfigToConfigFileV2(configV1);
+			return transform.transformConfigToConfigFileSetV2(configV1);
 		} else if (rawConfig.version.toLowerCase() === 'v2') {
 			const configV2 = ConfigFileV2.from(rawConfig);
 			const environments = Object.keys(configV2.environments ?? {}).reduce(
