@@ -117,9 +117,8 @@ const sidebars = {
       collapsed: true,
       collapsible: true,
       items: [
-        "config/networks",
+        "config/config-files",
         "config/implicit-accounts",
-        "config/sandbox-config",
         "config/environments"
       ],
     },
