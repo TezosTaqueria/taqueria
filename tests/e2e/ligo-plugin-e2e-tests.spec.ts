@@ -281,6 +281,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: stdout3 } = await execute('taq', 'list accounts local', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
 		expect(stdout3).toEqual(expect.arrayContaining([expect.stringContaining('bob')]));
+
 		await cleanup();
 	});
 
@@ -296,21 +297,16 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 		const parameters_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.parameters.mligo`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.parameters.mligo', parameters_file);
+
 		expect(await ls('./test-project/contracts')).toEqual(
 			expect.arrayContaining(['hello-tacos.mligo', 'hello-tacos.parameters.mligo']),
 		);
 
-		await execute('taq', 'compile hello-tacos.mligo', './test-project');
-		expect.arrayContaining(['│ hello-tacos.parameters.mligo │                          │']),
-			await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
+		const { stderr } = await execute('taq', 'compile counter.mligo', './test-project');
+		expect(stderr).toEqual(
+			expect.arrayContaining([expect.stringContaining('=== Error messages for counter.mligo ===')]),
+		);
 
-		const { stdout: stdout2 } = await execute('taq', 'start sandbox local', './test-project');
-		expect(stdout2).toEqual(expect.arrayContaining(['Starting node...']));
-
-		const { stdout: stdout3 } = await execute('taq', 'list accounts local', './test-project');
-		expect(stdout3).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
-		expect(stdout3).toEqual(expect.arrayContaining([expect.stringContaining('bob')]));
 		await cleanup();
 	});
 });
