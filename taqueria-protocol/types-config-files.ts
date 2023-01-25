@@ -137,7 +137,7 @@ export const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV
 						...x,
 						// Accounts and accountDefault
 						accountDefault: x?.accounts?.default as string,
-						accounts: {
+						accounts: !x?.accounts ? undefined : {
 							...x?.accounts,
 							default: undefined,
 						},
@@ -200,7 +200,7 @@ export const transformConfigToConfigFileSetV2 = (config: Config): ConfigFileSetV
 						...x,
 						// Accounts and accountDefault
 						accountDefault: x?.accounts?.default as string,
-						accounts: {
+						accounts: !x?.accounts ? undefined : {
 							...x?.accounts,
 							default: undefined,
 						},
@@ -376,7 +376,9 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 				// Unknown fields might need to be in the network or sandbox
 				...getUnknownFields(x, 'network') as {},
 				// Accounts w/out default
-				accounts: { ...x.value.accounts } as NetworkConfig[`accounts`],
+				accounts: !x.value.accounts ? undefined : {
+					...x.value.accounts,
+				} as NetworkConfig[`accounts`],
 			}])),
 		sandbox: !sandboxEnvironments.length
 			? undefined
