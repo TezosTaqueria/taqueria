@@ -446,6 +446,11 @@ export type ConfigFileV2 = {
 	plugins?: InstalledPlugin[];
 };
 
+/** Account overrides for this environment */
+export type SandboxAccounts = Record<string, {
+	type?: string;
+}>;
+
 export type ConfigEnvironmentFileV2 = {
 	/** environment types provided by plugins
 	 *
@@ -455,10 +460,11 @@ export type ConfigEnvironmentFileV2 = {
 	 */
 	type?: string;
 
-	/** Account overrides for this environment */
-	accounts?: Record<string, {
-		type?: string;
-	}>;
+	// Account overrides for the environment
+	accounts?: SandboxAccounts;
+
+	// Default account to use for this environment
+	accountDefault?: keyof SandboxAccounts;
 
 	/** Contract deployment data for this environment */
 	contracts?: Record<string, {
