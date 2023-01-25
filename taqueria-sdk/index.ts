@@ -556,9 +556,9 @@ export const updateAddressAlias = async (
 		env.aliases[alias].address = address;
 	}
 	try {
-		await writeJsonFile('./.taq/config.json')(parsedArgs.config);
+		await writeJsonFile(parsedArgs.config.configFile)(parsedArgs.config);
 	} catch (err) {
-		sendErr(`Could not write to ./.taq/config.json\n`);
+		sendErr(`Could not write to ${parsedArgs.config.configFile}\n`);
 	}
 };
 
