@@ -4,7 +4,8 @@ title: Environment Configuration
 
 ## Overview
 
-Taqueria Environments provide a powerful and flexible way to develop Tezos projects in multiple contexts. Environments can target one or more testnets or sandboxes.
+Taqueria Environments provide a powerful and flexible way to develop Tezos projects in multiple contexts. These environments can be used throughout the life cycle of a project from development to production.
+
 
 :::note
 To target an environment for a stateful task such as `taq originate`, add the `--env` flag with the name of the environment you would like to target. For example, to target an environment named `kathmandu_env` for an origination, you would use the following command:
@@ -13,38 +14,57 @@ taq originate --env kathmandu_env
 ```
 :::
 
-## The Default Environment
+## Example Environments
 
-Taqueria generates a default environment for each project named `development`. This environment has the following properties:
+Environments are declared in `.taq/config.json`
 
 ```json
-"environment": {
-    "default": "development",
-    "development": {
-        "networks": [],
-        "sandboxes": [
-            "local"
-        ]
+    "environmentDefault": "development",
+    "environments": {
+        "development": {
+            "type": "flextesa",
+            "label": "Local Tezos Sandbox"
+        },
+        "testing": {
+            "type": "simple",
+            "label": "ghostnet",
+            "rpcUrl": "https://ghostnet.ecadinfra.com"
+        },
+        "production": {
+            "type": "simple",
+            "label": "mainnet",
+            "rpcUrl": "https://mainnet.api.tez.ie"
+        }
     }
 ```
 
-## Adding a New Environment
+The above example shows 3 environments: `development`, `testing`, and `production`. 
 
-Environment configurations are added as key/value pairs to the main `environment` object using the format:
+Each environment has a type. The `development` environment is `flextesa` which uses the flextesa plugin for a local sandbox. The `testing` and `production` environments are both the `simple` type which use only the rpcUrl. 
 
-```json
-environmentName : { environmentConfig }
-```
+Other environment types can be created with a plugin and it can define additional environment fields as needed.
 
-Environment configurations have the following properties:
+## The Default Environment
 
-- `networks`: An array of network names that the environment should be targeted for
-- `sandboxes`: An array of sandbox names that the environment should be targeted for
+In the above example, the default environment is `development`. For most taq commands the default environment will be used unless the `--env` flag is provided.
 
-### The `networks` Property
+## Local Config
 
-The networks property holds a comma separated list of named networks. The networks referenced must be configured in the `network` property of `config.json`. You can add zero or more networks to an environment
+Each environment also has a `config.local...` file. 
 
-### The `sandboxes` Property
+Going back to the example `config.json` above, it has three environments. So, each would have their own `config.local...` file:
 
-The sandboxes property holds a comma separated list of named sandboxes. The sandboxes referenced must be configured in the `sandbox` property of `config.json`. You can add zero or more sandboxes to an environment
+- config.local.development.json
+- config.local.testing.json
+- config.local.production.json
+
+These local config files are intended to store custom settings that are specific to a single developer's context. 
+
+For example, when deploying a contract to a sandbox or a test environment, the `config.local...` file could contain the address of a contract deployed by a developer. Since each developer working on the same project would each have their own `config.local...` file for each environment, they will have an isolated context when working.
+
+The `config.local...` files should be excluded from git commits, and are listed in the `.gitignore` by default.
+
+On the other hand, the main `config.json` contains settings that belong to the project itself and should be shared by all developers working on that project since those settings are common.
+
+
+
