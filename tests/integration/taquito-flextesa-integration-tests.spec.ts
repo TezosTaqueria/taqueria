@@ -13,29 +13,10 @@ const amountRegex = /[0-9]{4,} ꜩ/g;
 describe('E2E Testing for taqueria taquito plugin', () => {
 	jest.setTimeout(90000);
 
-	// beforeAll(async () => {
-	// 	await fsPromises.rm(taqueriaProjectPath, { recursive: true, force: true });
-	// 	await generateTestProject(taqueriaProjectPath, ['taquito', 'flextesa']);
-	// 	await exec(
-	// 		`cp integration/data/config-taquito-flextesa-local-sandbox-test-environment.json ${taqueriaProjectPath}/.taq/config.json`,
-	// 	);
-
-	// 	const started = await exec(`taq start sandbox ${dockerName}`, { cwd: `./${taqueriaProjectPath}` });
-	// });
-
-	// beforeEach(async () => {
-	// 	await exec(`cp integration/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
-	// });
-
 	test('deploy will create one contract using deploy command', async () => {
 		const { execute, exists, cleanup, writeFile, readFile } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-
-		// const config_file =
-		// 	await (await exec(`cat integration/data/config-taquito-flextesa-local-sandbox-test-environment.json`))
-		// 		.stdout;
-		// await writeFile('./test-project/.taq/config.json', config_file);
 
 		await execute('taq', 'install ../taqueria-plugin-taquito', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-taquito/index.js');
@@ -49,6 +30,8 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		const { stdout } = await execute('taq', 'start sandbox local', './test-project');
 		expect(stdout).toEqual(expect.arrayContaining(['Starting node...']));
+
+		await new Promise(resolve => setTimeout(resolve, 15000));
 
 		const { stdout: stdout1, stderr } = await execute('taq', 'list accounts local', './test-project');
 		console.log(stderr);
@@ -69,7 +52,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		// const deployResponse = stdout5[0].trim().split(/\r?\n/)[3];
 		// expect(deployResponse).toContain('hello-tacos.tz');
-		// const contractHash = deployResponse.split('│')[2].trim();
+		// const contractHash = deployResponse.split('│')git status[2].trim();
 		// expect(contractHash).toMatch(contractRegex);
 
 		// const configContents = JSON.parse(await readFile('./test-project/.taq/sinfig.json'));
