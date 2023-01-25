@@ -33,9 +33,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		await new Promise(resolve => setTimeout(resolve, 15000));
 
-		const { stdout: stdout1, stderr } = await execute('taq', 'list accounts local', './test-project');
-		console.log(stderr);
-		console.log(stdout1);
+		const { stdout: stdout1 } = await execute('taq', 'list accounts local', './test-project');
 		expect(stdout1).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
 		expect(stdout1).not.toEqual(expect.arrayContaining([expect.stringContaining('Error')]));
 
@@ -44,11 +42,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			'deploy hello-tacos.tz --storage anyContract.storage.tz -e development',
 			'./test-project',
 		);
-		console.log('stdout5', stdout5);
-		console.log('stderr1', stderr1);
-
-		const content = await readFile('./test-project/.taq/config.json');
-		console.log(content);
 
 		// const deployResponse = stdout5[0].trim().split(/\r?\n/)[3];
 		// expect(deployResponse).toContain('hello-tacos.tz');
@@ -74,7 +67,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			await (await exec('cat integration/data/config-testing-environment-with-funded-accounts.json'))
 				.stdout;
 		await writeFile('./test-project/.taq/config.local.testing.json', testing_env_config_file);
-		console.log(await readFile('./test-project/.taq/config.local.testing.json'));
 
 		const { stdout: stdout1 } = await execute(
 			'taq',
@@ -83,8 +75,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
-		const { stdout: stdout2, stderr } = await execute('taq', 'instantiate-account -e testing', './test-project');
-		console.log(stderr);
+		const { stdout: stdout2 } = await execute('taq', 'instantiate-account -e testing', './test-project');
 		expect(stdout2).toContain(
 			'No accounts were instantiated because they were all instantiated in the target environment already',
 		);
@@ -101,7 +92,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			await (await exec('cat integration/data/config-testing-environment-with-funded-accounts.json'))
 				.stdout;
 		await writeFile('./test-project/.taq/config.local.testing.json', testing_env_config_file);
-		console.log(await readFile('./test-project/.taq/config.local.testing.json'));
 
 		const { stdout: stdout1 } = await execute(
 			'taq',
@@ -129,7 +119,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			await (await exec('cat integration/data/config-testing-environment-with-funded-accounts.json'))
 				.stdout;
 		await writeFile('./test-project/.taq/config.local.testing.json', testing_env_config_file);
-		console.log(await readFile('./test-project/.taq/config.local.testing.json'));
 
 		const { stdout: stdout1 } = await execute(
 			'taq',
@@ -154,14 +143,12 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			await (await exec('cat integration/data/config-testing-environment-with-funded-accounts.json'))
 				.stdout;
 		await writeFile('./test-project/.taq/config.local.testing.json', testing_env_config_file);
-		console.log(await readFile('./test-project/.taq/config.local.testing.json'));
 
 		const { stdout: stdout1, stderr: stderr10 } = await execute(
 			'taq',
 			'install ../taqueria-plugin-taquito',
 			'./test-project',
 		);
-		console.log(stderr10);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
 		const { stdout: stdout4, stderr } = await execute(
@@ -169,7 +156,6 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 			'transfer tz3RobfdmYYQaiF5W343wdSiFhwWF2xUfjEy --mutez 1 --sender bob -e testing',
 			'./test-project',
 		);
-		console.log(stderr);
 		expect(stdout4).toEqual(
 			expect.arrayContaining([
 				'│ N/A            │ tz3RobfdmYYQaiF5W343wdSiFhwWF2xUfjEy │ Unit      │ default    │ 1              │ https://ghostnet.ecadinfra.com │',
