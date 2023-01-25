@@ -34,7 +34,7 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/protocol": "*",
+		"@taqueria/protocol": "0.27.0-rc",
 		"node-machine-id-xz": "^1.0.2"
 	},
 	"devDependencies": {
