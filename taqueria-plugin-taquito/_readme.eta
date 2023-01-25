@@ -18,7 +18,7 @@ taq install @taqueria/plugin-taquito
 
 ## Configuration
 
-The target networks, sandboxes, and environments are configured in the Taqueria project's `config.json` file. For additional information on configuring network, documentation can be found [here](/docs/config/networks/)
+The target networks, sandboxes, and environments are configured in the Taqueria project's `config.json` file. For additional information on configuring network, documentation can be found [here](/docs/config/config-files/)
 
 <%~ it.noteOpenAdmonition %>
 Network environments have the notion of Taqueria Operator Account. This account is meant to be used internally and it is generated for you if it doesn't already exist. Instructions on how to fund the account is provided by the `taq` binary when the account is first generated

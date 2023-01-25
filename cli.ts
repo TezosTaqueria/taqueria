@@ -560,7 +560,7 @@ const mkInitialDirectories = (projectDir: SanitizedAbsPath.t, maxConcurrency: nu
 	);
 
 const createGitIgnoreFile = (projectDir: SanitizedAbsPath.t): Future<TaqError.TaqError, string> => {
-	const toIgnore = ['.DS_Store', 'artifacts', '.taq/*-state.json', 'node_modules/'];
+	const toIgnore = ['.DS_Store', 'artifacts', '.taq/*-state.json', '.taq/config.local.*.json', 'node_modules/'];
 	return writeTextFile(`${projectDir}/.gitignore`)(toIgnore.join('\n'));
 };
 

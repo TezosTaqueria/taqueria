@@ -9,7 +9,7 @@ Taq `stop sandbox` is used to stop a running sandbox
 The task will fail if the sandbox is not running, or if the sandbox was started from a different project
 
 :::note
-Sandbox configuration is done in `config.json` and additional documentation about adding new named sandboxes can be found in the [sandbox configuration documentation](/docs/config/sandbox-config)
+Sandbox configuration is done in `config.json` and additional documentation about adding new named sandboxes can be found in the [sandbox configuration documentation](/docs/config/config-files)
 :::
 
 ## Plugin Implementations
