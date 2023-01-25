@@ -5,6 +5,7 @@ import type {
 	ConfigFileV2,
 	Environment,
 	SandboxAccounts,
+	SandboxConfig,
 } from '@taqueria/protocol/types';
 
 export type ConfigFileSetV2 = {
@@ -335,7 +336,7 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 			delete vClone.storage;
 			delete vClone.aliases;
 			delete vClone.contracts;
-			// delete vClone.accounts;
+			delete vClone.accounts;
 			return vClone;
 		})());
 
@@ -396,9 +397,8 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 				// Unknown fields might need to be in the network or sandbox
 				...getUnknownFields(x, 'sandbox') as {},
 				...(() => {
-					const environments = configFileV2.environments ?? {};
-					const environment = environments[x.value.sandboxName ?? x.key];
-					if (environment) {
+					const environment = x.value;
+					if (environment && environment.accounts) {
 						return environment.accountDefault
 							? {
 								accounts: {
@@ -406,11 +406,16 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 									default: environment.accountDefault,
 								},
 							}
-							: { accounts: environment.accounts };
+							: {
+								accounts: {
+									...environment.accounts,
+									default: Object.keys(environment.accounts)[0],
+								},
+							};
 					}
 					return {};
-				}),
-			}])),
+				})(),
+			}])) as Record<string, SandboxConfig>,
 	};
 
 	return removeUndefinedFields(config);
