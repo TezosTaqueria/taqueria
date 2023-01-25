@@ -27,7 +27,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 	// 	await exec(`cp integration/data/anyContract.storage.tz ${taqueriaProjectPath}/artifacts/`);
 	// });
 
-	test.skip('deploy will create one contract using deploy command', async () => {
+	test('deploy will create one contract using deploy command', async () => {
 		const { execute, exists, cleanup, writeFile, readFile } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
@@ -58,7 +58,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 
 		const { stdout: stdout5, stderr: stderr1 } = await execute(
 			'taq',
-			'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
+			'deploy hello-tacos.tz --storage anyContract.storage.tz -e development',
 			'./test-project',
 		);
 		console.log('stdout5', stdout5);
