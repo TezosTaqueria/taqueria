@@ -18,6 +18,9 @@ export interface TypeCheckOpts extends ProxyTaskArgs.t {
 	sourceFile: string;
 }
 
+export interface TypeCheckAllOpts extends ProxyTaskArgs.t {
+}
+
 export interface SimulateOpts extends ProxyTaskArgs.t {
 	sourceFile?: string;
 	storage?: string;
@@ -25,9 +28,9 @@ export interface SimulateOpts extends ProxyTaskArgs.t {
 	entrypoint?: string;
 }
 
-export type IntersectionOpts = ClientOpts & TypeCheckOpts & SimulateOpts;
+export type IntersectionOpts = ClientOpts & TypeCheckOpts & TypeCheckAllOpts & SimulateOpts;
 
-type UnionOpts = ClientOpts | TypeCheckOpts | SimulateOpts;
+type UnionOpts = ClientOpts | TypeCheckOpts | TypeCheckAllOpts | SimulateOpts;
 
 const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://ghostnet.ecadinfra.com';
 export const GLOBAL_OPTIONS = `--endpoint ${ENDPOINT}`;

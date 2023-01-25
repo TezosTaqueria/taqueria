@@ -4,9 +4,7 @@ const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1671
-	// this fail has been confirmed manually in pre-release v0.25.23-rc
-	test.skip('typecheck will check a contract in the artifacts folder', async () => {
+	test('typecheck will check a contract in the artifacts folder', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -16,7 +14,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const artifact_file = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_file);
 
-		const { stdout: stdout1 } = await execute('taq', 'typecheck', './test-project');
+		const { stdout: stdout1 } = await execute('taq', 'typecheck-all', './test-project');
 		expect(stdout1).toEqual(expect.arrayContaining(['│ hello-tacos.tz │ Valid  │']));
 
 		await cleanup();
@@ -38,9 +36,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// blocked by https://github.com/ecadlabs/taqueria/issues/1671
-	// this fail has been confirmed manually in pre-release v0.25.23-rc
-	test.skip('typechecker will check all contracts under artifacts folder', async () => {
+	test('typechecker will check all contracts under artifacts folder', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -52,7 +48,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
 		await writeFile('./test-project/artifacts/hello-tacos-two.tz', artifact_two);
 
-		const { stdout: stdout1 } = await execute('taq', 'typecheck', './test-project');
+		const { stdout: stdout1 } = await execute('taq', 'typecheck-all', './test-project');
 		expect(stdout1).toEqual(expect.arrayContaining(['│ hello-tacos-one.tz │ Valid  │']));
 		expect(stdout1).toEqual(expect.arrayContaining(['│ hello-tacos-two.tz │ Valid  │']));
 

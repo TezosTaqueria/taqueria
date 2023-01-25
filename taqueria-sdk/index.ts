@@ -556,9 +556,9 @@ export const updateAddressAlias = async (
 		env.aliases[alias].address = address;
 	}
 	try {
-		await writeJsonFile('./.taq/config.json')(parsedArgs.config);
+		await writeJsonFile(parsedArgs.config.configFile)(parsedArgs.config);
 	} catch (err) {
-		sendErr(`Could not write to ./.taq/config.json\n`);
+		sendErr(`Could not write to ${parsedArgs.config.configFile}\n`);
 	}
 };
 
@@ -735,4 +735,11 @@ export const Plugin = {
 				process.exit(1);
 			});
 	},
+};
+
+export const isContractFile = (filename: string): boolean => {
+	return !filename.includes('.default_storage.')
+		&& !filename.includes('.storage.')
+		&& !filename.includes('.parameter.')
+		&& !filename.includes('.expression.');
 };
