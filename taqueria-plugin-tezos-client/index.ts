@@ -38,6 +38,13 @@ Plugin.create(i18n => ({
 			encoding: 'json',
 		}),
 		Task.create({
+			task: 'typecheck-all',
+			command: 'typecheck-all',
+			description: 'Typecheck all Michelson contracts in the artifacts directory',
+			handler: 'proxy',
+			encoding: 'json',
+		}),
+		Task.create({
 			task: 'simulate',
 			command: 'simulate <sourceFile>',
 			aliases: ['sim'],

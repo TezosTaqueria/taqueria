@@ -2,7 +2,6 @@ import {
 	addTzExtensionIfMissing,
 	execCmd,
 	getArch,
-	RequestArgs,
 	sendAsyncErr,
 	sendErr,
 	sendJsonRes,
@@ -17,7 +16,7 @@ import {
 	TypeCheckOpts as Opts,
 } from './common';
 
-type TableRow = { contract: string; result: string };
+export type TableRow = { contract: string; result: string };
 
 const getTypecheckCmd = async (parsedArgs: Opts, sourceFile: string): Promise<string> => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
@@ -30,7 +29,7 @@ const getTypecheckCmd = async (parsedArgs: Opts, sourceFile: string): Promise<st
 	return cmd;
 };
 
-const typecheckContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
+export const typecheckContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
 	getCheckFileExistenceCommand(parsedArgs, sourceFile)
 		.then(execCmd)
 		.then(() =>
