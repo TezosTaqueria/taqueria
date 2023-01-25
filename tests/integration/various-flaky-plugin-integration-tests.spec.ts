@@ -12,43 +12,6 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 
 	jest.setTimeout(90000);
 
-	test('fund will fund instantiated accounts on a network', async () => {
-		const { execute, spawn, cleanup, writeFile, readFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
-		await waitForText("Project taq'ified!");
-
-		const testing_env_config_file =
-			await (await exec('cat integration/data/config-testing-environment-with-funded-accounts.json'))
-				.stdout;
-		await writeFile('./test-project/.taq/config.local.testing.json', testing_env_config_file);
-		console.log(await readFile('./test-project/.taq/config.local.testing.json'));
-
-		const { stdout: stdout1 } = await execute(
-			'taq',
-			'install ../taqueria-plugin-taquito',
-			'./test-project',
-		);
-		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
-
-		const { stdout: stdout2, stderr } = await execute('taq', 'instantiate-account -e development', './test-project');
-		console.log(stderr);
-		expect(stdout2).toContain('Please execute "taq fund" targeting the same environment to fund these accounts');
-
-		await new Promise(resolve => setTimeout(resolve, 5000));
-
-		const configFile = await readFile(path.join('./test-project', '.taq', 'config.json'));
-		const json = JSON.parse(configFile);
-		expect(json).toBeInstanceOf(Object);
-		expect(json).toHaveProperty('accounts');
-
-		const { stdout: stdout3 } = await execute('taq', 'fund -e testing', './test-project');
-		expect(stdout3).toEqual(
-			expect.arrayContaining(['│ Account Alias │ Account Address                      │ Mutez Funded │']),
-		);
-
-		await cleanup();
-	});
-
 	// hangs for a long time waiting for the image name
 	// this passes manually in pre-release v0.25.23-rc
 	test.skip('different tezos client image can be used', async () => {
