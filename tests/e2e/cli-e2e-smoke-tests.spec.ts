@@ -48,6 +48,8 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		const { stdout: stdout2, stderr } = await execute('taq', 'start sandbox local', './test-project');
 		expect(stdout2).toEqual(expect.arrayContaining(['Starting node...']));
 
+		await new Promise(resolve => setTimeout(resolve, 15000));
+
 		const { stdout: stdout3 } = await execute('taq', 'list accounts local', './test-project');
 		expect(stdout3).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
 		expect(stdout3).toEqual(expect.arrayContaining([expect.stringContaining('bob')]));
