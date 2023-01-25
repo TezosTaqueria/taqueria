@@ -375,12 +375,9 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 				rpcUrl: x.value.rpcUrl ?? ``,
 				// Unknown fields might need to be in the network or sandbox
 				...getUnknownFields(x, 'network') as {},
-				...(() => {
-					return {
-						accounts: x.value.accounts,
-					};
-				})(),
-			}])) as Record<string, NetworkConfig>,
+				// Accounts w/out default
+				accounts: { ...x.value.accounts } as NetworkConfig[`accounts`],
+			}])),
 		sandbox: !sandboxEnvironments.length
 			? undefined
 			: Object.fromEntries(sandboxEnvironments.map(x => [x.value.sandboxName ?? `${x.key}`, {
