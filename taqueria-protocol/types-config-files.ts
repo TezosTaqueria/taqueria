@@ -5,7 +5,6 @@ import type {
 	ConfigFileV2,
 	Environment,
 	SandboxAccounts,
-	SandboxConfig,
 } from '@taqueria/protocol/types';
 
 export type ConfigFileSetV2 = {
