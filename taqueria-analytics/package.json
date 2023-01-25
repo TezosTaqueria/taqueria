@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/analytics",
-	"version": "0.27.3-rc",
+	"version": "0.27.4-rc",
 	"description": "A TypeScript SDK submitting events for Taqueria activity",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -34,7 +34,7 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/protocol": "^0.27.3-rc",
+		"@taqueria/protocol": "^0.27.4-rc",
 		"node-machine-id-xz": "^1.0.2"
 	},
 	"devDependencies": {
