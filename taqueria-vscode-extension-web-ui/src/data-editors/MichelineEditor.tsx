@@ -67,6 +67,9 @@ export const getFriendlyDataType = (dataType: MichelineDataType): string => {
 		case 'option':
 			friendlyDataType = `${dataType.prim} of ${getFriendlyDataType(dataType.args![0])}`;
 			break;
+		case 'contract':
+			friendlyDataType = `Contract with entrypoint of type ${getFriendlyDataType(dataType.args![0])}`;
+			break;
 		case 'unit':
 			return 'unit';
 		case 'string':
@@ -100,6 +103,9 @@ export const getFriendlyDataType = (dataType: MichelineDataType): string => {
 			friendlyDataType = `${dataType.prim} from ${getFriendlyDataType(dataType.args[0])} to ${
 				getFriendlyDataType(dataType.args[1])
 			}`;
+			break;
+		case 'or':
+			friendlyDataType = `or (${dataType.args.map(type => getFriendlyDataType(type)).join(') (')} )`;
 			break;
 		default:
 			return `Error: ${JSON.stringify(dataType)}`;
@@ -135,19 +141,40 @@ export const MichelineEditor = (
 		showDiagnostics: showDiagnostics ?? false,
 	});
 
+	console.log(currentState);
+
 	const handleChange = (v: MichelineValueContainer) => {
 		setState({
 			value: v,
 			showDiagnostics: currentState.showDiagnostics,
 		});
+		let error: unknown = undefined;
+		let micheline: string | undefined = undefined;
 		try {
+			micheline = getMicheline(v);
+		} catch (e: unknown) {
+			error = e;
+			console.log(`Could not convert value to Micheline:`);
+			console.log(v);
+			console.log(e);
+		}
+		let michelineJson: object | null | undefined = undefined;
+		try {
+			michelineJson = getJson(v);
+		} catch (e: unknown) {
+			error = e;
+			console.log(`Could not convert value to Micheline Json:`);
+			console.log(v);
+			console.log(e);
+		}
+		if (error === undefined) {
 			onMessage({
 				kind: 'change',
-				micheline: getMicheline(v),
-				michelineJson: getJson(v),
+				micheline: micheline,
+				michelineJson: michelineJson,
 				isValid: true,
 			});
-		} catch (error: unknown) {
+		} else {
 			onMessage({
 				kind: 'change',
 				isValid: false,
@@ -162,10 +189,11 @@ export const MichelineEditor = (
 	};
 
 	const toggleDiagnostics = () => {
-		setState({
+		const newState = {
 			...currentState,
 			showDiagnostics: !currentState.showDiagnostics,
-		});
+		};
+		setState(newState);
 	};
 
 	const handleClick = () => {
