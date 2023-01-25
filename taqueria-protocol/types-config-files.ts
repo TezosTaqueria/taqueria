@@ -142,7 +142,7 @@ export const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV
 						// Accounts and accountDefault
 						accountDefault: config.sandbox?.[v.sandboxes[0]]?.accounts?.default as string,
 						accounts: (() => {
-							if (config.sandbox?.[v.sandboxes[0]]?.accounts) return undefined;
+							if (!config.sandbox?.[v.sandboxes[0]]?.accounts) return undefined;
 							const accountsClone = { ...config.sandbox?.[v.sandboxes[0]]?.accounts };
 							delete accountsClone.default;
 							return accountsClone as SandboxAccounts;
@@ -205,7 +205,7 @@ export const transformConfigToConfigFileSetV2 = (config: Config): ConfigFileSetV
 						// Accounts and accountDefault
 						accountDefault: config.sandbox?.[v.sandboxes[0]]?.accounts?.default as string,
 						accounts: (() => {
-							if (config.sandbox?.[v.sandboxes[0]]?.accounts) return undefined;
+							if (!config.sandbox?.[v.sandboxes[0]]?.accounts) return undefined;
 							const accountsClone = { ...config.sandbox?.[v.sandboxes[0]]?.accounts };
 							delete accountsClone.default;
 							return accountsClone as SandboxAccounts;
