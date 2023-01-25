@@ -133,20 +133,20 @@ export const transformConfigFileV1ToConfigFileSetV2 = (configFileV1: ConfigFileV
 					...[
 						...v.networks.map(k => config.network?.[k]),
 						...v.sandboxes.map(k => config.sandbox?.[k]),
-					][0] as {},
+					].map(x => ({
+						...x,
+						// Accounts and accountDefault
+						accountDefault: x?.accounts?.default as string,
+						accounts: {
+							...x?.accounts,
+							default: undefined,
+						},
+					}))[0] as {},
 					// Other transforms
 					...{
 						// Rename aliases to contracts
 						aliases: undefined,
 						contracts: v.aliases,
-						// Accounts and accountDefault
-						accountDefault: config.sandbox?.[v.sandboxes[0]]?.accounts?.default as string,
-						accounts: (() => {
-							if (!config.sandbox?.[v.sandboxes[0]]?.accounts) return undefined;
-							const accountsClone = { ...config.sandbox?.[v.sandboxes[0]]?.accounts };
-							delete accountsClone.default;
-							return accountsClone as SandboxAccounts;
-						})(),
 					},
 				}]),
 		),
@@ -196,20 +196,20 @@ export const transformConfigToConfigFileSetV2 = (config: Config): ConfigFileSetV
 					...[
 						...v.networks.map(k => config.network?.[k]),
 						...v.sandboxes.map(k => config.sandbox?.[k]),
-					][0] as {},
+					].map(x => ({
+						...x,
+						// Accounts and accountDefault
+						accountDefault: x?.accounts?.default as string,
+						accounts: {
+							...x?.accounts,
+							default: undefined,
+						},
+					}))[0] as {},
 					// Other transforms
 					...{
 						// Rename aliases to contracts
 						aliases: undefined,
 						contracts: v.aliases,
-						// Accounts and accountDefault
-						accountDefault: config.sandbox?.[v.sandboxes[0]]?.accounts?.default as string,
-						accounts: (() => {
-							if (!config.sandbox?.[v.sandboxes[0]]?.accounts) return undefined;
-							const accountsClone = { ...config.sandbox?.[v.sandboxes[0]]?.accounts };
-							delete accountsClone.default;
-							return accountsClone as SandboxAccounts;
-						})(),
 					},
 				}]),
 		),
