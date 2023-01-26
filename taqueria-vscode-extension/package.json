@@ -3,7 +3,7 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
-	"version": "0.27.8",
+	"version": "0.27.9",
 	"private": true,
 	"engines": {
 		"vscode": "^1.68.1",
@@ -54,12 +54,7 @@
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
 	"keywords": [
-		"taqueria",
-		"tezos",
-		"Ligo",
-		"Michelson",
-		"SmartPy",
-		"Archetype"
+		"taqueria"
 	],
 	"activationEvents": [
 		"onCommand:taqueria.init",
