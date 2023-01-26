@@ -3,7 +3,7 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "ecadlabs",
-	"version": "0.27.12",
+	"version": "0.27.15",
 	"private": true,
 	"engines": {
 		"vscode": "^1.68.1",
@@ -53,9 +53,6 @@
 		"url": "https://github.com/ecadlabs/taqueria/issues"
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
-	"keywords": [
-		"taqueria"
-	],
 	"activationEvents": [
 		"onCommand:taqueria.init",
 		"onCommand:taqueria.scaffold",
@@ -733,7 +730,8 @@
 	},
 	"dependencies": {
 		"@microsoft/signalr": "^6.0.8",
-		"@taqueria/protocol": "^0.27.0-rc",
+		"@taqueria/analytics": "^0.27.15-rc",
+		"@taqueria/protocol": "^0.27.15-rc",
 		"cli-table3": "^0.6.2",
 		"comment-json": "^4.1.1",
 		"eventsource": "^2.0.2",
