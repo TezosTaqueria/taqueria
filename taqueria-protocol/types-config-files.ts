@@ -293,6 +293,7 @@ export const transformConfigToConfigFileV2 = (config: Config): ConfigFileSetV2 =
 
 // FileV2 to Object
 export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2): Config => {
+	debugger;
 	const {
 		config: configFileV2,
 		environments: environmentFilesV2,
@@ -389,11 +390,27 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 				rpcUrl: x.value.rpcUrl ?? ``,
 				// Unknown fields might need to be in the network or sandbox
 				...getUnknownFields(x, 'network') as {},
-				...(() => {
-					return {
-						accounts: x.value.accounts,
-					};
-				})(),
+				...['accounts', 'contracts'].reduce(
+					(retval, fieldName) => {
+						if (fieldName === 'accounts') {
+							return x.value.accounts
+								? {
+									...retval,
+									accounts: x.value.accounts,
+								}
+								: retval;
+						} else if (fieldName === 'contracts') {
+							return x.value.aliases
+								? {
+									...retval,
+									contracts: x.value.aliases,
+								}
+								: retval;
+						}
+						return retval;
+					},
+					{},
+				),
 			}])) as Record<string, NetworkConfig>,
 		sandbox: !sandboxEnvironments.length
 			? undefined
