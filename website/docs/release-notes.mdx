@@ -2,6 +2,238 @@
 title: Taqueria Releases
 ---
 
+## Taqueria v0.28.0
+| Details     |               |
+| ----------- | ------------- |
+|Release Date | Jan 26, 2023  |
+|Release Type | Significant         |
+|Release Page | [v0.28.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.28.0) |
+
+### Summary of Impactful Changes
+Taqueria v0.28.0 includes a significant change to the .taq/config.json schema:
+- The new schema version is version 2 and indicated in the .taq/config.json file:
+```json
+{
+    version: "v2",
+    ...
+}
+```
+- Developer-specific environment settings are stored in local configuration files and should _not_ be stored in SCM. These files look like .taq/config.local.[envName].json.
+
+Our codebase has made use of [Zod](https://github.com/colinhacks/zod) for parsing and sanitizing for a while, but in this release, we now generate Zod schemas based on TypeScript type definitions.
+This makes the codebase much more accessible to third-party contributors that might not be as familiar with Zod.
+
+### New Features
+
+#### Built-in Syntax Highlighting in VSCode Extension
+
+The Taqueria VSCode extension now includes syntax highlighting for LIGO & Michelson. No other extension installations necessary.
+
+#### Updated Workflow for SmartPy Developers
+
+(Ask Jimmy to write something here)
+
+#### Generating Test Stubs in VSCode Extension
+
+The Taqueria CLI has had the ability to create test stubs for your LIGO contracts using our `test-contract` template. This capability has now been exposed in the VSCode Extension as well.
+
+#### Workflows
+
+The Taqueria CLI introduces the concept of "workflows", which allows you to specify pre-named workflows when initializing a new project:
+```
+taq init -w ligo`
+```
+
+These workflows will install a bundle of plugins that is typical to the workflow for a specific type of developer. Taqueria CLI ships with the following workflows:
+- ligo
+- smartpy
+- archetype
+- michelson
+
+#### Override Docker Images
+
+Many of our plugins, such as our Flextesa, Ligo, and Archetype plugins, use docker images to provide their respective functionality. For instance, the v0.28.0 ligo plugin uses the `ligolang/ligo:0.57.0` image underthehood.
+We've added the ability to override these images using environment variables:
+- TAQ_FLEXTESA_IMAGE
+- TAQ_LIGO_IMAGE
+- TAQ_ARCHETYPE_IMAGE
+
+For instance, if you wanted to use LIGO v0.60 with our LIGO plugin when compiling, do the following:
+```
+export TAQ_LIGO_IMAGE="ligolang/ligo:0.60"
+taq compile hello-tacos.mligo # will use LIGO Compiler v0.60
+```
+
+#### Deploy to Mainnet
+
+(Ask Jimmy to fill this in)
+
+#### NEW Sandbox Baking Options
+
+Up to now, if you were using our Flextesa plugin to provide sandbox functionality, you would be confined to the default block times and a baker would be configured to bake blocks according to that block time.
+You can now customize the block time by adjusting `block_time` setting in your .taq/config.json, or the corresponding `config.local.[envName].json` file:
+```
+{
+     "environments": {
+        "development": {
+            "type": "flextesa",
+            "label": "Local Tezos Sandbox",
+            "block_time": 1
+        }
+        ...
+    },
+    ...
+}
+```
+
+In addition, you can disable baking entirely:
+```
+{
+     "environments": {
+        "development": {
+            "type": "flextesa",
+            "label": "Local Tezos Sandbox",
+            "baking": "disabled"
+        }
+        ...
+    },
+    ...
+}
+```
+
+With baking disabled, you will need to manually bake blocks by running `taq bake`. You can automatically bake blocks as new operations are injected by running the _bake_ task in _watch mode_: `taq bake -w`
+
+#### Added `compile-all` task
+
+Rather than compile each contract individually, you can compile all contracts of a particular type by running: `taq compile-all` for the respective plugin.
+
+
+#### Added `typecheck-all` task
+
+Like the feature above, you can now typecheck all compiled smart contracts by running `taq typecheck-all`.
+
+#### Ability to get/set the current environment via the CLI
+
+You can now use the `taq get-environment` task to get the current environment that will be targeted by tasks that you invoke. You can also set the environment using `taq set-environment [envName]`.
+
+### Pull Requests
+
+* 🚀 Release ➾ Taqueria v0.24.2 by @hu3man in https://github.com/ecadlabs/taqueria/pull/1504
+* Don't log scaffold.json contents when scaffolding by @mweichert in https://github.com/ecadlabs/taqueria/pull/1545
+* Fixes to build process by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1530
+* Correctly source environment variable in Linux runners by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1558
+* 🛠️ Fix ➾ Set TAQ_VERSION and BUILD in one script to unify CI and local build and test by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1560
+* ✨ Feature ➾ Provide LIGO syntax highlighting support in VSCode extension by @MichalLytek in https://github.com/ecadlabs/taqueria/pull/1514
+* 🧽 Chore ➾ Delete legacy lerna bootstrap commands by @danielelisi in https://github.com/ecadlabs/taqueria/pull/1567
+* ✨ Feature ➾ Improve SmartPy Workflow in relation to contract and storage compilations and added native SmartPy test by @jchenche in https://github.com/ecadlabs/taqueria/pull/1551
+* 🛠️ Fix ➾ Clean all docker containers before running any tests by @jchenche in https://github.com/ecadlabs/taqueria/pull/1571
+* Improve output when checking Dependencies, Remove dependency of tests step on build-binaries by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1557
+* Fixes #1363, Adds import-map to test:unit:deno:debug task by @mweichert in https://github.com/ecadlabs/taqueria/pull/1568
+* Fixed problem with undefined-state.json files getting generated by @mweichert in https://github.com/ecadlabs/taqueria/pull/1577
+* Refactor protocol by @mweichert in https://github.com/ecadlabs/taqueria/pull/1550
+* Add Generate Test Stub command to the VsCode Extension, Fix Existing Test Commands by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1582
+* Open Contracts and Artifacts when double-clicking a TreeViewItem in Taqueria sidebar by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1583
+* Fix: Change Container Name in VsCode Extension to Match Flextesa Plugin by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1584
+* ✨ Feature ➾ Add `.gitignore` file upon taq init by @jchenche in https://github.com/ecadlabs/taqueria/pull/1585
+* 🧽 Chore ➾ Stop building native Windows binary by @danielelisi in https://github.com/ecadlabs/taqueria/pull/1601
+* Fix: Have TzKt.Api do more retries for Database Schema before failing by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1612
+* 🧽 Chore ➾ Downgrade Deno version to v1.23.1 in GH Workflows by @danielelisi in https://github.com/ecadlabs/taqueria/pull/1610
+* Reduce vscode error messages while starting the Sandbox and when TreeViewItems are being refreshed by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1588
+* Mk 1578 ligo plugin unit tests by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1579
+* Check for deno version by @mweichert in https://github.com/ecadlabs/taqueria/pull/1589
+* Rewrite tests in taqueria-cli-init and taqueria-cli-other to use cli-test-library by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1587
+* Refactor tasks to not fork, and always run in-process of the main execution pipeline by @mweichert in https://github.com/ecadlabs/taqueria/pull/1613
+* 🧪 Pre-Release ➾ RELEASE BRANCH v0.25.0 by @hu3man in https://github.com/ecadlabs/taqueria/pull/1476
+* Skip problematic tests by @mweichert in https://github.com/ecadlabs/taqueria/pull/1626
+* ✨ Feature ➾ allow users to specify a workflow so that a Taqueria project will come with all the important plugins pre-installed by @jchenche in https://github.com/ecadlabs/taqueria/pull/1621
+* 🛠️ Fix ➾ Interpretation and parsing of boolean options given to a plugin by @mweichert in https://github.com/ecadlabs/taqueria/pull/1638
+* ✨ Feature ➾ added ability to override versions in SmartPy and fix error reporting issue during SmartPy compile and test by @jchenche in https://github.com/ecadlabs/taqueria/pull/1648
+* 🛠️ Fix ➾ Use default location for Deno dependency caching by @danielelisi in https://github.com/ecadlabs/taqueria/pull/1655
+* 🛠️ Fix ➾ Added instructions to help users verify that they have taq installed by @mweichert in https://github.com/ecadlabs/taqueria/pull/1632
+* 🛠️ Fix ➾ Import ramda library from x.nest.land registry by @danielelisi in https://github.com/ecadlabs/taqueria/pull/1656
+* Remove redundant warning by @egarson in https://github.com/ecadlabs/taqueria/pull/1657
+* 🛠️ Fix ➾ Remove parcel and lmdb (and indirectly clang) as dev dependencies by @mweichert in https://github.com/ecadlabs/taqueria/pull/1640
+* updated ligo plugin E2E tests by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1630
+* ✨ Feature ➾ added ability to deploy to mainnet and interact with contracts deployed there by @jchenche in https://github.com/ecadlabs/taqueria/pull/1658
+* 👷 Refactor ➾ Don't auto install CORE plugin upon `taq init` unless `--workflow` flag is specified by @jchenche in https://github.com/ecadlabs/taqueria/pull/1665
+* ✨ Feature ➾ 1162, Add baking options to flextesa plugin by @mweichert in https://github.com/ecadlabs/taqueria/pull/1645
+* Taquito Plugin E2E Tests - update by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1631
+* Ligo Plugin E2E Tests - improvements  by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1663
+* Metadata Plugin E2E Tests - rewrite by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1661
+* Contract Types Plugin E2E Tests - rewrite by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1660
+* mark the Taquito plugin  transfer tez test as flaky by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1695
+* 🛠️ Fix ➾ Recompute ephemeral state after installing/uninstalling a plugin by @mweichert in https://github.com/ecadlabs/taqueria/pull/1699
+* 🛠️ Fix ➾ Don't generate ephemeral state twice when installing/uninstalling plugins by @mweichert in https://github.com/ecadlabs/taqueria/pull/1702
+* Fix Failure in TzKt.Sync by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1698
+* 🛠️ Fix ➾ Use the hash of the latest protocol supported by the image as opposed to using Alpha by @mweichert in https://github.com/ecadlabs/taqueria/pull/1703
+* Tezos-client plugin - test rewrite by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1672
+* revised e2e test files for the  Archetype Plugin by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1679
+* Flextesa Plugin E2E Tests - rewrite by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1668
+* remove taqueria-plugin-multiple-test-plugins.spec.ts and moved its test to smoke tests by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1690
+* reorganized some tests files from e2e to integration by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1681
+* Mk 1676 revise e2e tests for smartpy plugin by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1693
+* revised the e2e tests for jest plugin by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1685
+* revised the persistent state e2e tests by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1683
+* cleanup and organization of some E2E tests by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1712
+* skip flaky jest plugin test by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1717
+* Config.json schema update by @ricklove in https://github.com/ecadlabs/taqueria/pull/1604
+* Mk 1710 revise e2e tests for taqueria registered contracts plugin by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1721
+* Mk 1709 revise e2e tests for ipfs plugin by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1720
+* 🛠️ Fix ➾Updated beta warning text by @mweichert in https://github.com/ecadlabs/taqueria/pull/1705
+* 🧽 Chore ➾ SDK was missing tsup as a dependency by @mweichert in https://github.com/ecadlabs/taqueria/pull/1707
+* 🛠️ Fix ➾ Added better error handling to the SDK by @mweichert in https://github.com/ecadlabs/taqueria/pull/1706
+* Mk 1719 move two jest plugin tests to integration by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1725
+* 🛠️ Fix ➾ Traverse directories to search for a taqueria project by @mweichert in https://github.com/ecadlabs/taqueria/pull/1662
+* 🛠️ Fix ➾ Update release-notes to remove 0.22.2 at start  by @hu3man in https://github.com/ecadlabs/taqueria/pull/1726
+* ✨ Feature ➾ Allow scaffold to target a git branch by @jchenche in https://github.com/ecadlabs/taqueria/pull/1732
+* deleted the permissions integration test file by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1734
+* reorganized test data files by type and deleted unused data files by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1729
+* replaced protocol in test data from k to Lima by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1728
+* remove deprecated files from e2e test directory by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1727
+* quickstart scenario in e2e smoke test by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1724
+* remove pinata preset requirement by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1739
+* fix mac mini problem with taquito plugin install timing by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1740
+* revise test readme and remove some unneeded ts.config by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1743
+* added workflow tests by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1745
+* revised the tests readmes by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1748
+* 🛠️ Fix ➾ Check Npm and Node Versions when building by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1731
+* 👷 Refactor ➾ Refactored google analytics code by separating functionality into a separate package by @mweichert in https://github.com/ecadlabs/taqueria/pull/1741
+* changed the names of tests by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1751
+* added a e2e fast mode by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1752
+* reconciled skipped tests with logged issues by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1755
+* Use official TzKt images by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1759
+* 🛠️ Fix ➾ Added analytics event tracking to vscode by @mweichert in https://github.com/ecadlabs/taqueria/pull/1757
+* extend coverage for  e2e tests for plugin cli options by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1762
+* 🚧 Dev ➾ Support for external TZkT Instances that are not managed by the Flextesa plugin to the VScE UI by @MichalLytek in https://github.com/ecadlabs/taqueria/pull/1637
+* add marigold training1 example to E2E tests by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1765
+* 🛠️ Fix ➾ During contract type generation, exclude all non-contract files such as storage files by @jchenche in https://github.com/ecadlabs/taqueria/pull/1773
+* ✨ Feature ➾ implement `taq compile-all` for the LIGO and SmartPy plugin by @jchenche in https://github.com/ecadlabs/taqueria/pull/1783
+* 👷 Refactor ➾ Adjusted @taqueria/toolkit to be compatible with V1 and V2 configs by @mweichert in https://github.com/ecadlabs/taqueria/pull/1784
+* 🛠️ Fix ➾ Fix Incorrect Version Number on Taqueria Homepage by @hu3man in https://github.com/ecadlabs/taqueria/pull/1789
+* Fix Monitoring for Changes in TVsCE by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1782
+* Mk 1763 add marigold training1 by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1780
+* Remove unwanted debugger statement by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1793
+* Mk 1790 unskip repaired compile all contracts tests by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1791
+* Rollback TzKt to Ecad images by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1795
+* 🛠️ Fix ➾ Make compile and compile-all work when users exec them in contracts dir by @jchenche in https://github.com/ecadlabs/taqueria/pull/1787
+* 🛠️ Fix ➾ execCmd should always reject with Error instance with stdout and stderr properties by @mweichert in https://github.com/ecadlabs/taqueria/pull/1799
+* ✨ Feature ➾ Implement ability to set the default environment in the config file as a command by @jchenche in https://github.com/ecadlabs/taqueria/pull/1801
+* 🛠️ Fix ➾ bug introduced in toErrorWithProps. Wrong return value. by @mweichert in https://github.com/ecadlabs/taqueria/pull/1805
+* Adjust getContractsByTaqueriaConfig to work with new config V2 by @MichalLytek in https://github.com/ecadlabs/taqueria/pull/1798
+* Remove contract registry from repo by @jchenche in https://github.com/ecadlabs/taqueria/pull/1807
+* 👷 Refactor ➾ Added V2 API for the toolkit by @mweichert in https://github.com/ecadlabs/taqueria/pull/1792
+* Implement Editor for NFT types: contract by @MichalLytek in https://github.com/ecadlabs/taqueria/pull/1803
+* Config Docs Update (and config.local gitignore) by @ricklove in https://github.com/ecadlabs/taqueria/pull/1797
+* 🛠️ Fix ➾ Issue #1802, sandbox accounts transformations by @mweichert in https://github.com/ecadlabs/taqueria/pull/1810
+* ✨ Feature ➾ Implement typecheck-all by @jchenche in https://github.com/ecadlabs/taqueria/pull/1812
+* 🛠️ Fix ➾ Closes #1824, transfer task not finding aliases by @mweichert in https://github.com/ecadlabs/taqueria/pull/1826
+
+## New Contributors
+* @egarson made their first contribution in https://github.com/ecadlabs/taqueria/pull/1657
+
+**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.24.2...v0.27.17-rc
+
+
 ## Taqueria v0.24.2  
 
 | Details     |               |
