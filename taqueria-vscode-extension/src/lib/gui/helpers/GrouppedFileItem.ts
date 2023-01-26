@@ -27,7 +27,7 @@ export class GrouppedFileItem {
 	private static contractChildrenSpecifiers = [/(?<name>.+)\.(?:parameter|storage)List(?<ext>\.(?:m|re|js)?ligo)/];
 	private static artifactChildrenSpecifiers = [
 		/(?<name>.+)\.default_storage(?<ext>\.tz)/,
-		/(?<name>.+)\.(?:storage|parameter|expression)\..*(?<ext>\.tz)/,
+		/(?<name>.+)\.(?:storage|parameter|expression)\..+(?<ext>\.tz)/,
 	];
 
 	static groupAndSortFiles = (
