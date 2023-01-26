@@ -66,5 +66,22 @@ The `config.local...` files should be excluded from git commits, and are listed 
 
 On the other hand, the main `config.json` contains settings that belong to the project itself and should be shared by all developers working on that project since those settings are common.
 
+## Deploying and Transferring with Mainnet
 
+:::danger
+Improvements are on the way. However, we currently only support signing in memory and we require a mnemonic to be written in the config file, so do not commit this file or delete the mnemonic before doing so. This is not the safest way to interact with mainnet so proceed with caution
+:::
 
+Add the `accounts` field to the `config.local.production.json` file. For example:
+```
+{
+    "networkName": "mainnet",
+    "accounts": {
+        "tempUser": {
+            "mnemonic": <12-24 words mnemonic generated via a wallet>
+        }
+    }
+}
+```
+
+To interact with mainnet using `tempUser`, users must include the `--env` and the `--sender` flags. E.g. `taq deploy counter --env production --sender tempUser`
