@@ -53,14 +53,6 @@
 		"url": "https://github.com/ecadlabs/taqueria/issues"
 	},
 	"homepage": "https://github.com/ecadlabs/taqueria#readme",
-	"keywords": [
-		"taqueria",
-		"tezos",
-		"Ligo",
-		"Michelson",
-		"SmartPy",
-		"Archetype"
-	],
 	"activationEvents": [
 		"onCommand:taqueria.init",
 		"onCommand:taqueria.scaffold",
