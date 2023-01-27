@@ -19,17 +19,14 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// see https://github.com/ecadlabs/taqueria/issues/1635
-	// this works in manual test of pre-release v0.25.23-rc
-	// perhaps the automated tests have problem with the space in the task name
-	test.skip('generate types offers contextual help', async () => {
+	test('generate types offers contextual help', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const { stdout: stdout2, stderr } = await execute('taq', 'generate types --help');
+		const { stdout: stdout2, stderr } = await execute('taq', 'generate types --help', './test-project');
 		console.log(stderr);
 		console.log(stdout2);
 		expect(stdout2).toEqual(expect.arrayContaining(['Generate types for a contract to be used with taquito']));
