@@ -529,14 +529,17 @@ export class VsCodeHelper {
 	}
 
 	async getPathForPluginSource(pluginName: string) {
-		if (pluginName && process.env.InstallDevPlugins === 'true') {
+		if (!pluginName || !process.env.PluginVersionToInstall) {
+			return pluginName;
+		}
+		if (process.env.PluginVersionToInstall === 'local') {
 			const pathToTaq = await this.getTaqBinPath();
 			const taqFolder = path.dirname(pathToTaq);
 			const pluginFolder = pluginName.replace('@', '').replace('/', '-');
 			const pluginPath = path.join(taqFolder, pluginFolder);
 			return pluginPath;
 		}
-		return pluginName;
+		return `${pluginName}@${process.env.PluginVersionToInstall}`;
 	}
 
 	async promptForPluginInstallation(
