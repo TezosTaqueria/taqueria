@@ -1,8 +1,8 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { HasFileName, HasRefresh, VsCodeHelper } from '../helpers';
-import * as Util from '../pure';
 import { getLanguageInfoForFileName, SmartContractCompiler } from '../SmartContractLanguageInfo';
+import { GrouppedFileItem } from './helpers/GrouppedFileItem';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 
 export class ContractsDataProvider extends TaqueriaDataProviderBase
@@ -17,8 +17,16 @@ export class ContractsDataProvider extends TaqueriaDataProviderBase
 	}
 
 	async getChildren(element?: ContractTreeItem): Promise<ContractTreeItem[]> {
+		const imagesFolder = await this.helper.getImagesPath();
 		if (element) {
-			return [];
+			return element.children.map(file =>
+				new ContractTreeItem(
+					file,
+					getLanguageInfoForFileName(file.uri.path)?.compilerName,
+					file.children,
+					imagesFolder,
+				)
+			);
 		}
 		const { config, mainFolder } = await this.getConfig();
 		if (!config || !mainFolder) {
@@ -26,15 +34,18 @@ export class ContractsDataProvider extends TaqueriaDataProviderBase
 		}
 		const contractsFolder = config?.config.contractsDir ?? 'contracts';
 		const contracts = await vscode.workspace.findFiles(`${contractsFolder}/*.*`, '**/node_modules/**');
-		contracts.sort();
+		const rootFiles = GrouppedFileItem.groupAndSortFiles(
+			path.join(mainFolder.path, contractsFolder),
+			contracts,
+			'contract',
+		);
 
-		const treeItems = contracts.map(uri =>
+		const treeItems = rootFiles.map(file =>
 			new ContractTreeItem(
-				uri,
-				vscode.TreeItemCollapsibleState.None,
-				getLanguageInfoForFileName(uri.path)?.compilerName,
-				contractsFolder,
-				mainFolder,
+				file,
+				getLanguageInfoForFileName(file.uri.path)?.compilerName,
+				file.children,
+				imagesFolder,
 			)
 		);
 		return treeItems;
@@ -55,22 +66,22 @@ export class ContractsDataProvider extends TaqueriaDataProviderBase
 export class ContractTreeItem extends vscode.TreeItem implements HasFileName {
 	fileName: string;
 	constructor(
-		public readonly contractUri: vscode.Uri,
-		public readonly collapsibleState: vscode.TreeItemCollapsibleState,
+		public readonly contract: GrouppedFileItem,
 		language: SmartContractCompiler | undefined,
-		readonly contractsFolder: string,
-		readonly mainFolder: vscode.Uri,
+		public readonly children: GrouppedFileItem[],
+		imagesFolder: string,
 	) {
-		const fileName = path.relative(path.join(mainFolder.path, contractsFolder), contractUri.path);
-		super(fileName, collapsibleState);
+		const fileName = contract.relativePath;
+		super(fileName, children.length ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
 		this.fileName = fileName;
 		this.tooltip = language ?? '';
-		this.iconPath = path.join(__filename, '..', '..', '..', '..', 'images', `${language}.svg`);
+		this.iconPath = path.join(imagesFolder, `${language}.svg`);
+		this.tooltip = this.iconPath;
 		this.contextValue = language;
 		this.command = {
 			command: 'vscode.open',
 			title: 'Open Contract for Editing',
-			arguments: [contractUri],
+			arguments: [contract.uri],
 			tooltip: 'Open Contract for Editing',
 		};
 	}

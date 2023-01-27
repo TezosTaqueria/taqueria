@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { HasFileName, HasRefresh, VsCodeHelper } from '../helpers';
-import * as Util from '../pure';
+import { GrouppedFileItem } from './helpers/GrouppedFileItem';
 import { TaqueriaDataProviderBase } from './TaqueriaDataProviderBase';
 
 export class ArtifactsDataProvider extends TaqueriaDataProviderBase
@@ -17,7 +17,7 @@ export class ArtifactsDataProvider extends TaqueriaDataProviderBase
 
 	async getChildren(element?: ArtifactTreeItem): Promise<ArtifactTreeItem[]> {
 		if (element) {
-			return [];
+			return element.children.map(file => new ArtifactTreeItem(file, file.children));
 		}
 		const { config, mainFolder } = await this.getConfig();
 		if (!config || !mainFolder) {
@@ -25,15 +25,13 @@ export class ArtifactsDataProvider extends TaqueriaDataProviderBase
 		}
 		const artifactsFolder = config.config.artifactsDir ?? 'artifacts';
 		const artifacts = await vscode.workspace.findFiles(`${artifactsFolder}/**/*.tz`, '**/node_modules/**');
-		artifacts.sort();
-		const treeItems = artifacts.map(uri =>
-			new ArtifactTreeItem(
-				uri,
-				vscode.TreeItemCollapsibleState.None,
-				artifactsFolder,
-				mainFolder,
-			)
+		const rootFiles = GrouppedFileItem.groupAndSortFiles(
+			path.join(mainFolder.path, artifactsFolder),
+			artifacts,
+			'artifact',
 		);
+
+		const treeItems = rootFiles.map(file => new ArtifactTreeItem(file, file.children));
 		return treeItems;
 	}
 
@@ -52,19 +50,17 @@ export class ArtifactsDataProvider extends TaqueriaDataProviderBase
 export class ArtifactTreeItem extends vscode.TreeItem implements HasFileName {
 	fileName: string;
 	constructor(
-		public readonly artifactUri: vscode.Uri,
-		readonly collapsibleState: vscode.TreeItemCollapsibleState,
-		readonly artifactsFolder: string,
-		readonly mainFolder: vscode.Uri,
+		public readonly artifact: GrouppedFileItem,
+		public readonly children: GrouppedFileItem[],
 	) {
-		const fileName = path.relative(path.join(mainFolder.path, artifactsFolder), artifactUri.path);
-		super(fileName, collapsibleState);
+		const fileName = artifact.relativePath;
+		super(fileName, children.length ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
 		this.fileName = fileName;
 		this.tooltip = `${this.fileName}`;
 		this.command = {
 			command: 'vscode.open',
 			title: 'Open Artifact for Editing',
-			arguments: [artifactUri],
+			arguments: [artifact.uri],
 			tooltip: 'Open Artifact for Editing',
 		};
 	}
