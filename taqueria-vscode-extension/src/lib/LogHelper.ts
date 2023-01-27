@@ -45,7 +45,7 @@ export class LogHelper {
 	}
 
 	constructor(vscode: VsCodeApi) {
-		const logLevelText = process.env.LogLevel ?? OutputLevels[OutputLevels.warn];
+		const logLevelText = process.env.TaqLogLevel ?? OutputLevels[OutputLevels.warn];
 		this._logLevel = OutputLevels[logLevelText as keyof typeof OutputLevels] ?? OutputLevels.warn;
 		this._outputChannel = vscode.window.createOutputChannel('Taqueria');
 		this._logChannel = vscode.window.createOutputChannel('Taqueria Logs');
