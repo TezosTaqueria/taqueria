@@ -85,9 +85,7 @@ function toCommandWithEnvVars(cmd: string, config: Record<string, string>) {
 				return `${key}=${btoa(value)} ${retval}`;
 			} catch (err) {
 				console.warn(`Could not set ${key}`);
-				if (err instanceof DOMException) {
-					console.warn('Check the contents of the associated file and ensure that it can be base64 encoded');
-				}
+				console.warn('Check the contents of the associated file and ensure that it can be Base64 encoded.');
 				return retval;
 			}
 		},
