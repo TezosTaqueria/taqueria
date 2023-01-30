@@ -268,6 +268,20 @@ export class VsCodeHelper {
 		return this.i18;
 	}
 
+	private _imagesPath: string | undefined = undefined;
+	async getImagesPath(): Promise<string> {
+		if (this._imagesPath) {
+			return this._imagesPath;
+		}
+		try {
+			await Util.makeDir(path.join(__filename, '..', '..', 'images'), this.i18);
+			this._imagesPath = path.join(__filename, '..', '..', 'images');
+		} catch {
+			this._imagesPath = path.join(__filename, '..', '..', '..', '..', 'images');
+		}
+		return this._imagesPath;
+	}
+
 	async getAnalytics() {
 		if (!this.analytics) {
 			const taqVersion = (await this.getTaqVersion()) || 'unknown';
@@ -529,14 +543,17 @@ export class VsCodeHelper {
 	}
 
 	async getPathForPluginSource(pluginName: string) {
-		if (pluginName && process.env.InstallDevPlugins === 'true') {
+		if (!pluginName || !process.env.PluginVersionToInstall) {
+			return pluginName;
+		}
+		if (process.env.PluginVersionToInstall === 'local') {
 			const pathToTaq = await this.getTaqBinPath();
 			const taqFolder = path.dirname(pathToTaq);
 			const pluginFolder = pluginName.replace('@', '').replace('/', '-');
 			const pluginPath = path.join(taqFolder, pluginFolder);
 			return pluginPath;
 		}
-		return pluginName;
+		return `${pluginName}@${process.env.PluginVersionToInstall}`;
 	}
 
 	async promptForPluginInstallation(

@@ -71,10 +71,9 @@ Configure Taqueria alternatively by using the following environment variables:
 - TAQ_ARCHETYPE_IMAGE
 
 For instance, to use LIGO v0.60 when compiling, do the following:
-
 ```shell
 export TAQ_LIGO_IMAGE="ligolang/ligo:0.60"
-taq compile 'hello-tacos.mligo'
+taq compile hello-tacos.mligo
 ```
 
 #### NEW Sandbox Baking Options
@@ -150,6 +149,8 @@ Taqueria has "state of the art" TypeScript code generation for Contract interact
 * Docker containers are now cleaned between test runs
 * Import-maps are now supported in deno unit tests
 * Test dependencies to build-binaries have been removed
+
+It should also be noted that the suite of [E2E tests](https://github.com/ecadlabs/e2e-taq-test), which will be of particular interest to contributors, have been substantially updated and expanded.
 
 ### VSCode Enhancements
 

@@ -80,7 +80,15 @@ async function getConfig(taqDir: string, prefix: string) {
 
 function toCommandWithEnvVars(cmd: string, config: Record<string, string>) {
 	return Object.entries(config).reduce(
-		(retval, [key, value]) => `${key}=${btoa(value)} ${retval}`,
+		(retval, [key, value]) => {
+			try {
+				return `${key}=${btoa(value)} ${retval}`;
+			} catch (err) {
+				console.warn(`Could not set ${key}`);
+				console.warn('Check the contents of the associated file and ensure that it can be Base64 encoded.');
+				return retval;
+			}
+		},
 		cmd,
 	);
 }
