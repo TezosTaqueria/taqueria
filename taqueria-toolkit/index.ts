@@ -38,9 +38,7 @@ function withEnv(env: Record<string, string | undefined>, prefix = DEFAULT_ENV_V
 		const key = getEnvironmentConfigKey(environmentName);
 		const data = env[key];
 		if (!data) {
-			throw new TaqError(
-				`Could not load environment config for an environment called ${environmentName}. Please ensure that the environment variable called ${key} is defined and set to the value of your config.json file using Base64 encoding.`,
-			);
+			return ConfigEnvironmentFileV2.from({});
 		}
 		try {
 			const decoded = atob(data);
