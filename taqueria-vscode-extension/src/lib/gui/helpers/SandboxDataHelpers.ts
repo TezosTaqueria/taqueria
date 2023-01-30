@@ -31,13 +31,15 @@ export function getContractsByTaqueriaConfig(currentConfig: ConfigInfo, sandboxN
 
 export function getAccountsByTaqueriaConfig(currentConfig: ConfigInfo, sandboxName: string): TaqueriaAccount[] {
 	const sandbox = currentConfig.config?.config.sandbox?.[sandboxName];
-	if (!sandbox || !sandbox.accounts) {
+	const configAccountsMap = sandbox?.accounts
+		?? ((currentConfig.config?.config.accounts) as unknown as Record<string, SandboxAccountConfig> | undefined);
+	if (!configAccountsMap) {
 		return [];
 	}
 
 	return (
-		Object.entries(sandbox.accounts)
+		Object.entries(configAccountsMap)
 			.filter(([alias, config]) => typeof config !== 'string') as Array<[string, SandboxAccountConfig]>
 	)
-		.map(([alias, config]) => ({ alias, address: config.publicKeyHash }));
+		.map(([alias, account]) => ({ alias, address: account.publicKeyHash }));
 }
