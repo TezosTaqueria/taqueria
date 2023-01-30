@@ -66,5 +66,8 @@
 			"skipNodeModulesBundle": true,
 			"platform": "node"
 		}
-	]
+	],
+	"exports": {
+		"./lib/*": "./lib/*"
+	}
 }
