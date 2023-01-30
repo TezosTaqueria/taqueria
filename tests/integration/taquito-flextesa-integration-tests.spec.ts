@@ -32,19 +32,19 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		expect(stdout1).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
 		expect(stdout1).not.toEqual(expect.arrayContaining([expect.stringContaining('Error')]));
 
-		const { stdout: stdout2 } = await execute(
+		const { stdout: stdout2, stderr } = await execute(
 			'taq',
 			'deploy hello-tacos.tz --storage anyContract.storage.tz -e development',
 			'./test-project',
 		);
 		expect(stdout2).toEqual(expect.arrayContaining([expect.stringContaining('http://localhost:20000')]));
-		expect(stdout[3].trim().split('│')[2].trim()).toMatch(contractRegex);
+		expect(stdout2[3].trim().split('│')[2]).toMatch(contractRegex);
 
 		const devconfigContents = JSON.parse(await readFile('./test-project/.taq/config.local.development.json'));
 		const port = devconfigContents.rpcUrl;
 
 		const contractFromSandbox = await exec(
-			`curl ${port}/chains/main/blocks/head/context/contracts/${stdout[3].trim().split('│')[2].trim()}`,
+			`curl ${port}/chains/main/blocks/head/context/contracts/${stdout2[3].trim().split('│')[2].trim()}`,
 		);
 		expect(contractFromSandbox.stdout).toContain('"balance":"0"');
 		expect(contractFromSandbox.stdout).toContain('"storage":{"int":"12"}');
@@ -159,7 +159,7 @@ describe('E2E Testing for taqueria taquito plugin', () => {
 		await cleanup();
 	});
 
-	test.only('Taquito plugin can transfer from one account to another', async () => {
+	test('Taquito plugin can transfer from one account to another', async () => {
 		const { execute, spawn, cleanup, writeFile, exists } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
