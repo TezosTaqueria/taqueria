@@ -8,7 +8,7 @@ The generated site is deployed to [http://taqueria.io](https://taqueria.io), but
 
 ### Requirements
 - Yarn v1.2 or later
-- Node.js v16 or later
+- v16.16 or later. (v17.x.x or later is not supported)
 
 ### Install dependencies and build the Site
 From the project root directory, run:

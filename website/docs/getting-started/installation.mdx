@@ -2,6 +2,8 @@
 title: Installation
 ---
 
+import NodeRequirement from "@site/src/components/Helpers/NodeRequirement"
+import TaqVersion from "@site/src/components/Helpers/TaqVersion"
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -16,7 +18,7 @@ Audience: Novice to intermediate developers with a basic understanding of Taquer
 Goal: To provide a simple, easy, and reliable installation process for developers to follow so there is minimal churn due to frustration or an inability to use the product due to installation or configuration issues
 
 Questions:
-- What do you need to understand about Taqueria to understand the installion process?
+- What do you need to understand about Taqueria to understand the installation process?
 - What options are there for installing Taqueria?
 - What are the exact steps a user will need to follow for each OS?
 - What are the most frequent friction points new users will have?
@@ -40,8 +42,8 @@ The Taqueria CLI is required to use the VS Code extension and as such, must be i
 
 ### Taqueria CLI
 
-- Node.js v16.17.1 or later
-- A compatable operating system:
+- <NodeRequirement/>
+- A compatible operating system:
   - MacOS
   - Linux
   - Windows (via [WSL 2](https://docs.microsoft.com/en-us/windows/wsl/))
@@ -131,7 +133,7 @@ You must be running Windows 10 version 2004 and higher, or Windows 11
 
 #### Install WSL 2
 
-1. Open a Power Shell or Windows Command Prompt as an adminstrator and run:
+1. Open a Power Shell or Windows Command Prompt as an administrator and run:
   
   ```shell
   wsl --install
@@ -183,19 +185,13 @@ sudo apt update
 sudo apt install curl git
 ```
 
-3. Download Node.js v16.x
+3. Download <NodeRequirement/>
 
 ```shell
 curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash -
 ```
 
-4. Install Node.js
-
-```shell
-sudo apt-get install -y nodejs
-```
-
-5. (Optional) Install the node development tools
+4. (Optional) Install the node development tools
 
 ```shell
 sudo apt-get install gcc g++ make
@@ -207,7 +203,7 @@ To confirm that Node v16.x has been installed properly, open a new WSL 2 termina
 node --version
 ```
 
-You should see `v16.17.1` or similar returned
+You should see `v16.x.x` or similar returned.
 
 #### Install the Taqueria Binary
 
@@ -241,10 +237,7 @@ taq --version
 ```
 
 You should see the version of Taqueria installed output:
-
-```shell
-v0.28.0
-```
+<TaqVersion code/>
 
 If you see this, you have successfully installed the Taqueria CLI!
 
