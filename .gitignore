@@ -171,3 +171,4 @@ taqueria-protocol/**/*.mjs
 tests/e2e/auto-test-*
 tests/scrap
 tests/unit/taqueria-sdk/temp
+.#*
