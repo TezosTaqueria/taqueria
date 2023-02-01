@@ -31,6 +31,16 @@ taq typecheck <contractName>
 ### Basic description
 This task typechecks a Michelson file in `artifacts` and reports a failure or success
 
+## The `taq typecheck-all` task
+
+Basic usage is:
+```shell
+taq typecheck-all
+```
+
+### Basic description
+Performs the same function as `taq typecheck`, but performs type-checking for all contracts in the `artifacts` directory.
+
 ## The `taq simulate` task
 
 Basic usage is:

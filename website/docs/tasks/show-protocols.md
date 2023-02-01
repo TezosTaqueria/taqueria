@@ -1,8 +1,8 @@
 ---
-title: bake
+title: show-protocols
 ---
 
-A task used to bake a block for a sandbox when baking is disabled.
+A task used to display the list of protocols supported by the sandbox.
 
 Refer to one of the following:
 - [The Flextesa plugin](/docs/plugins/plugin-flextesa)

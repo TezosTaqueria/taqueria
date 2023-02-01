@@ -24,17 +24,17 @@ The target networks, sandboxes, and environments are configured in the Taqueria 
 Network environments have the notion of Taqueria Operator Account. This account is meant to be used internally and it is generated for you if it doesn't already exist. Instructions on how to fund the account is provided by the `taq` binary when the account is first generated
 <%= it.closeAdmonition %>
 
-##  The `taq originate` task
+##  The `taq deploy` task
 
 Basic usage is:
 
 ```shell
-taq originate <contractName>
+taq deploy <contractName>
 ```
 
 ### Basic description
 
-The Taquito plugin exposes a `taq originate` (or `taq deploy`) task in Taqueria which will originate the specified Michelson contract to a Taqueria environment
+The Taquito plugin exposes a `taq deploy` (or `taq originate`) task in Taqueria which will originate the specified Michelson contract to a Taqueria environment
 
 This will originate a Michelson `.tz` file in the `artifacts` directory to the default development environment (the sandbox named `local`)
 

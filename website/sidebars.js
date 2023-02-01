@@ -86,8 +86,8 @@ const sidebars = {
         "tasks/opt-in",
         "tasks/opt-out",
         "tasks/scaffold",
-        // "tasks/set-environment",
-        // "tasks/get-environment"
+        "tasks/set-environment",
+        "tasks/get-environment",
 
         // Core plugin tasks
         "tasks/clean",
@@ -103,13 +103,18 @@ const sidebars = {
         "tasks/list-accounts",
         "tasks/start-sandbox",
         "tasks/stop-sandbox",
-        // "tasks/bake",
-        // "tasks/show-protocols",
+        "tasks/bake",
+        "tasks/show-protocols",
         
         // Taquito plugin tasks
         "tasks/deploy",
-        // "tasks/instantiate-account",
-        // "tasks/fund",
+        "tasks/instantiate-account",
+        "tasks/fund",
+        
+        // Taquito plugin tasks
+        "tasks/deploy",
+        "tasks/instantiate-account",
+        "tasks/fund",
 
         // Pinata plugin tasks
         "tasks/publish",
@@ -119,7 +124,7 @@ const sidebars = {
         "tasks/test",
 
         // Ligo plugin tasks:
-        // "tasks/ligo",
+        "tasks/ligo",
 
         // Metadata plugin tasks
         "tasks/generate-metadata",
@@ -130,7 +135,7 @@ const sidebars = {
         "tasks/simulate",
         "tasks/transfer",
         "tasks/typecheck",
-        // "tasks/typecheck-all",
+        "tasks/typecheck-all"
       ].sort(),
     },
     {
