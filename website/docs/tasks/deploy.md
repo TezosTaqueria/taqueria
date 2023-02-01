@@ -1,5 +1,5 @@
 ---
-title: originate
+title: deploy
 ---
 
 Refer to the following:
