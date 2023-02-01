@@ -65,7 +65,10 @@ clean_demo() {
     _ok 'Project(s) cleaned successfully'
 }
 
-clean_contracts() { rm -f artifacts/*; }
+clean_contracts() {
+    setopt localoptions rmstarsilent  # zsh
+    rm -f artifacts/*;
+}
 
 taq_init_taq_demo() {
     [[ -d $INIT_DEMO_DIR ]] && _err "Directory '$INIT_DEMO_DIR' exists" && return 1
@@ -120,6 +123,7 @@ install_ligo_plugin() { _install_plugin plugin-ligo ; }
 install_taquito_plugin() { _install_plugin plugin-taquito ; }
 install_flextesa_plugin() { _install_plugin plugin-flextesa ; }
 install_smartpy_plugin() { _install_plugin plugin-smartpy ; }
+install_contract_types_plugin() { _install_plugin plugin-contract-types ; }
 
 git_diff() {
     [[ ! -d '.git/' ]] && return 0 # No problem: Didn't set up git
@@ -167,6 +171,19 @@ copy_smartpy_to_contracts() {
     [[ ! -d 'contracts/' ]] && _err 'Directory `contracts/` not found' && return 1
     cp ../skel/hello-tacos.py contracts
    _ok 'Template SmartPy contract copied to `contracts/`'
+}
+
+change_environment() {
+    _command 'taq get-environment'
+    _command 'taq set-environment testing'
+
+}
+
+generate_types() { _command 'taq generate types'; }
+show_generated_type() {
+    # `pyg` is a function to color-code files on stdout, based on Pygmentize. Happy to share.
+    pager=$([[ `uname -n` =~ gauss ]] && echo 'pyg' || echo 'less')
+    $pager 'types/hello-tacos.types.ts'
 }
 
 goodbye() {
@@ -255,5 +272,5 @@ demo() {
     done
 }
 
-resource_demo() { source ./taq-demo.sh; }
+resource_demo() { source $SCRIPT_DIR/taq-demo.sh; }
 alias res=resource_demo
