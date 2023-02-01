@@ -79,25 +79,64 @@ const sidebars = {
       collapsed: true,
       collapsible: true,
       items: [
-        "tasks/compile",
-        "tasks/generate-types",
+        // Taqueria Built-in Tasks
         "tasks/init",
         "tasks/install",
-        "tasks/list-accounts",
+        "tasks/uninstall",
         "tasks/opt-in",
         "tasks/opt-out",
-        "tasks/originate",
-        "tasks/publish",
-        "tasks/generate-metadata",
         "tasks/scaffold",
-        "tasks/simulate",
+        "tasks/set-environment",
+        "tasks/get-environment",
+
+        // Core plugin tasks
+        "tasks/clean",
+
+        // Provided by ligo, smartpy, and archetype plugin:
+        "tasks/compile",
+        "tasks/compile-all",
+
+        // Contract Types plugin tasks
+        "tasks/generate-types",
+        
+        // Flextesa plugin tasks
+        "tasks/list-accounts",
         "tasks/start-sandbox",
         "tasks/stop-sandbox",
+        "tasks/bake",
+        "tasks/show-protocols",
+        
+        // Taquito plugin tasks
+        "tasks/deploy",
+        "tasks/instantiate-account",
+        "tasks/fund",
+        
+        // Taquito plugin tasks
+        "tasks/deploy",
+        "tasks/instantiate-account",
+        "tasks/fund",
+
+        // Pinata plugin tasks
+        "tasks/publish",
+        // "tasks/pin",
+
+        // Provided by ligo, smartpy, archetype, and jest plugin:
         "tasks/test",
+
+        // Ligo plugin tasks:
+        "tasks/ligo",
+
+        // Metadata plugin tasks
+        "tasks/generate-metadata",
+        // "tasks/generate-project-metadata",
+
+        // Tezos client plugin tasks:
+        // "tasks/client",
+        "tasks/simulate",
         "tasks/transfer",
         "tasks/typecheck",
-        "tasks/uninstall"
-      ],
+        "tasks/typecheck-all"
+      ].sort(),
     },
     {
       type: "category",

@@ -4,8 +4,9 @@
 const lightCodeTheme = require("prism-react-renderer/themes/github");
 const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const webpackPlugin = require("./webpack-plugin");
+const pkgInfo = require('../package.json')
 
-/** @type {import('@docusaurus/types').Config} */
+/** @type {import("@docusaurus/types").Config} */
 const config = {
   plugins: [
     "docusaurus-plugin-sass",
@@ -110,7 +111,7 @@ const config = {
           {
             type: "doc",
             docId: "release-notes",
-            label: "v0.24.2",
+            label: `v${pkgInfo.version}`,
             position: "right",
             className: "header-link"
           },

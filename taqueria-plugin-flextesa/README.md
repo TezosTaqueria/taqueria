@@ -18,7 +18,7 @@ Some helpful things to know:
 ## Requirements
 
 - Taqueria v0.26.0 or later
-- Node.js v16.17.1 or later
+- Node.js v16.16 or later. (v17.x.x or later is not supported)
 - Docker v20.10.12 or later
 
 ## Installation
@@ -30,7 +30,10 @@ To install the Flextesa plugin on a Taqueria project, navigate to the project fo
 taq install @taqueria/plugin-flextesa
 ```
 
-Once installed, you can confirm functionality by runing the command `taq start sandbox` which will start a sandbox with the default `local` configuration
+> ### :page_with_curl: Note
+> The first time you start a sandbox, it might take several minutes to start. This is expected behavior as it takes time to download the flextesa docker image to your computer
+
+Once installed, you can confirm functionality by running the command `taq start sandbox` which will start a sandbox with the default `local` configuration
 
 > ### :page_with_curl: Note
 > You can override the Flextesa version used by the plugin by creating the environment variable `TAQ_FLEXTESA_IMAGE` and setting it to your desired Flextesa Docker image
@@ -44,170 +47,237 @@ The following commands are available from the CLI:
 - `taq stop sandbox [sandboxName]`
 - `taq list accounts [sandboxName]`
 - `taq bake [sandboxName]`
-- `taq show protocols`
+- `taq show-protocols [sandboxName]`
 
 > ### :page_with_curl: Note
-> The first time you start a sandbox, it might take several minutes to start. This is expected behaviour as it takes time to download the flextesa docker image to your computer
+> In the tasks above, `[sandboxName]` can be substituted with `[environmentName]` if using Taqueria v0.28.0.
 
 ## Plugin Configuration
 
-Configuration is done in the project's `.taq/config.json` file. Here you can configure additonal sandboxes
+Configuration is done in the project's `.taq/config.json` file. Here you can configure additional sandboxes
 
 
-### The Default Sandbox Configuration
+### The Default Development Environment
 
-Named sandbox configurations are stored as key/value pairs in the `sandbox` property using the sandbox name as the key
+> ### :page_with_curl: Note
+> Note, as of Taqueria *v0.28.0*, the schema has been updated. The examples below will not work if using an earlier version of Taqueria.
 
-This example shows the configuration for the default sandbox named `local`:
+Taqueria has the concept of an environment which can be targeted when invoking a Taqueria task. An environment provides an execution context
+that facilitate the means for plugins to do the following:
+- Distinguishing when a testnet is being targeted versus a flextesa sandbox (or something some other environment type provided by another plugin)
+- Retrieve the addresses of contracts deployed to the environment
+- Separate account instances from one environment to another
+
+There are different types of environments, but as of v0.28.0, we support two environment types: a) simple; b) flextesa
+
+In this doc, we will focus on the _flextesa_ environment type.
+
+If an explicit environment isn't specified, then Taqueria will invoke tasks using the default environment, which is specified by the
+`environmentDefault` key in your `.taq/config.json` file.
+
+To use a different environment, you may specify `taq --env [environmentName]` flag when invoking a Taqueria task and that environment will be used
+as the execution context for that particular task invocation.
+
+When a Taqueria project is initialized using `taq init`, an environment is created for you called _development_, which is also configured
+as the default environment. This environment is of type _flextesa_ and configured as shown below:
 
 ```json
-    "sandbox": {
-        "local": {
-            "label": "Local Tezos Sandbox",
-            "rpcUrl": "http://localhost:20000"
-        }
-```
-
-When this sandbox is started, the implicit accounts defined in the configuration will be created on the sandbox and the `accounts` property will be populated with the account data as shown in this example:
-
-```json
-    "sandbox": {
-        "local": {
-            "accounts": {
-                "bob": {
-                    "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
-                    "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
-                    "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
-                },
-                "alice": {
-                    "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
-                    "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
-                    "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
-                },
-                "john": {
-                    "encryptedKey": "edpktt6t2ENhxiQqun6bXPPWC6tFVvNPTDRh1gEPGX4BgDgbDnmGzP",
-                    "publicKeyHash": "tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6",
-                    "secretKey": "unencrypted:edsk3Un2KRUUoWZufi914HQem96ejVFnkyD8GXRPUSkgqy5etsYXEN"
-                },
-                "jane": {
-                    "encryptedKey": "edpkvS6TDSWcqqj3EJi3NRrCMyN7oNw1B3Hp37R19tMThqM8YNhAuS",
-                    "publicKeyHash": "tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph",
-                    "secretKey": "unencrypted:edsk3UkdS1UBfTBkMAoFxmfdmUHmCdNhTzDJ1cSJuZhU1b6k6fZZoQ"
-                },
-                "joe": {
-                    "encryptedKey": "edpkuT1QYPYbLLQz9dXhQS33ncsixxeGHbNGmntPTR4VBbWmskHPrV",
-                    "publicKeyHash": "tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB",
-                    "secretKey": "unencrypted:edsk3Un2FU9Zeb4KEoATWdpAqcX5JArMUj2ew8S4SuzhPRDmGoqNx2"
-                }
-            },
-            "label": "Local Tezos Sandbox",
-            "rpcUrl": "http://localhost:20000"
-        }
+"environments": {
+        "development": {
+            "type": "flextesa",
+            "label": "Local Tezos Sandbox"
+        },
+        ...
     },
 ```
 
 ### Accounts
 
-Accounts are defined in the `accounts` property of `config.json` and are global to the project. Each sandbox configuration will instantiate the accounts defined in the `accounts` array on startup
+Accounts are defined in the `accounts` property of `config.json` and are global to the project. These accounts are referred to as _declared accounts_.
 
-Taqueria provides five default accounts in the default configuration:
+Taqueria provides five default declared accounts in the default configuration:
 
 ```json
+"accounts": {
+        "bob": {
+            "balance": {
+                "amount": "3_000_000_000",
+                "units": "mutez"
+            }
+        },
+        "alice": {
+            "balance": {
+                "amount": "3_000_000_000",
+                "units": "mutez"
+            }
+        },
+        "john": {
+            "balance": {
+                "amount": "3_000_000_000",
+                "units": "mutez"
+            }
+        },
+        "jane": {
+            "balance": {
+                "amount": "3_000_000_000",
+                "units": "mutez"
+            }
+        },
+        "joe": {
+            "balance": {
+                "amount": "3_000_000_000",
+                "units": "mutez"
+            }
+        }
+    },
+```
+
+When the sandbox for this environment is started, the declared accounts defined in the configuration will be _instantiated_. This means that they will be created
+on the sandbox and a `config.local.development.json` file will be created for you. This file is environment _and_ developer specific, and should not be checked
+into source control. It's contents will resemble the following:
+
+```json
+{
+    "accountsDefault": "bob",
     "accounts": {
-        "bob": "3_000_000_000",
-        "alice": "3_000_000_000",
-        "john": "3_000_000_000",
-        "jane": "3_000_000_000",
-        "joe": "3_000_000_000"
-    }
+        "bob": {
+            "encryptedKey": "edpkurPsQ8eUApnLUJ9ZPDvu98E8VNj4KtJa1aZr16Cr5ow5VHKnz4",
+            "publicKeyHash": "tz1aSkwEot3L2kmUvcoxzjMomb9mvBNuzFK6",
+            "secretKey": "unencrypted:edsk3RFfvaFaxbHx8BMtEW1rKQcPtDML3LXjNqMNLCzC3wLC1bWbAt"
+        },
+        "alice": {
+            "encryptedKey": "edpkvGfYw3LyB1UcCahKQk4rF2tvbMUk8GFiTuMjL75uGXrpvKXhjn",
+            "publicKeyHash": "tz1VSUr8wwNhLAzempoch5d6hLRiTh8Cjcjb",
+            "secretKey": "unencrypted:edsk3QoqBuvdamxouPhin7swCvkQNgq4jP5KZPbwWNnwdZpSpJiEbq"
+        },
+        "john": {
+            "encryptedKey": "edpktt6t2ENhxiQqun6bXPPWC6tFVvNPTDRh1gEPGX4BgDgbDnmGzP",
+            "publicKeyHash": "tz1Zwoh1QCVAvJ4sVTojMp9pLYp6Ji4NoZy6",
+            "secretKey": "unencrypted:edsk3Un2KRUUoWZufi914HQem96ejVFnkyD8GXRPUSkgqy5etsYXEN"
+        },
+        "jane": {
+            "encryptedKey": "edpkvS6TDSWcqqj3EJi3NRrCMyN7oNw1B3Hp37R19tMThqM8YNhAuS",
+            "publicKeyHash": "tz1aHUAC4oviwJuZF1EvVSvFz7cu9KMNYBph",
+            "secretKey": "unencrypted:edsk3UkdS1UBfTBkMAoFxmfdmUHmCdNhTzDJ1cSJuZhU1b6k6fZZoQ"
+        },
+        "joe": {
+            "encryptedKey": "edpkuT1QYPYbLLQz9dXhQS33ncsixxeGHbNGmntPTR4VBbWmskHPrV",
+            "publicKeyHash": "tz1MVGjgD1YtAPwohsSfk8i3ZiT1yEGM2YXB",
+            "secretKey": "unencrypted:edsk3Un2FU9Zeb4KEoATWdpAqcX5JArMUj2ew8S4SuzhPRDmGoqNx2"
+        }
+    },
+    "label": "Local Tezos Sandbox",
+    "rpcUrl": "http://localhost:20000"
+}
 ```
 
+### Adding/Editing a New Sandbox Configuration
 
-### Adding a New Sandbox Configuration
-
-Sandbox configurations are added as key/value pairs to the main `sandbox` object using the format:
+Sandbox configurations are added as key/value pairs to the main `environments` object using the format:
 
 ```json
-sandboxName : { sandboxConfigObject }
+environmentName : { sandboxConfigObject }
 ```
 
-Inside the `sandboxConfigObject`, there are three properties you can configure:
+Inside the `sandboxConfigObject`, there are the following properties you can configure:
+
+> ### :warning: CAUTION
+> Changes to a your flextesa environment will not take effect till you restart the sandbox.
+
+#### 'type'
+Indicates which type of environment is defined.
+
+> ### :page_with_curl: Note
+> Environment types are provided by plugins, except for the _simple_ type which is built-in to Taqueria, and used to specify a remote RPC node.
 
 #### 'label'
 An arbitrary string used to describe a particular configuration
 
 #### 'protocol'
 
-A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used for testing upcoming network changes
+A string value which accepts valid Tezos protocol hashes. This value will configure the sandbox to run a particular version of the Tezos network which can be used
+for testing upcoming network changes, or testing backwards-compatibility.
 
-To see a list of what protocols are supported by the version of the Flextesa plugin you have installed please run `taq show protocols`.
+To see a list of protocols supported by the flextesa plugin, please run: `taq show-protocols [environmentName]`.
 
 #### 'rpcUrl'
 
 A string which corresponds to the local URL you would like the sandbox to run on
 
+#### `accountsDefault`
+
+The name of the account to use by default when a task requires an account to perform its function.
+
+#### `annotations`
+
+Used to specify configuration options specific to the environment type, which can then be referenced and interpreted by the plugin which provided the associated
+environment type.
+
 > ### :page_with_curl: Note
 > In addition to the fields above, when a sandbox is first started, a list of accounts specific to the sandbox configuration will be generated and appended to the sandboxConfigObject. These accounts will respect the declared balances from the accounts field in the root of your config.json
 
-### Adding a Sandbox to a Taqueria Environment
-
-Once created, sandboxes can be added to environments by adding the `sandboxName` to the `sandboxes` list in the `environment` as shown here:
-```json
-    environment: {
-        default: 'development',
-        development: {
-            networks: [],
-            sandboxes: [
-                'local',
-                'myCustomSandbox'
-            ],
-            storage: {},
-        },
-    },
-```
-
 ### Baking
 
-By default, the flextesa sandbox will start with a single baker and bake every 5 seconds, which is the default block time.
+As of Taqueria v0.28.0, the ability to configure how baking works for a sandbox is available.
 
-The block time can be adjusted by editing your sandbox configuration:
+#### Changing the block time
+
+The default block time for a flextesa sandbox is _5_, but can be configured in your `.taq/config.json` file:
+
 ```json
-    "sandbox": {
-        "local": {
+{
+    "environments": {
+        "development": {
+            "type": "flextesa",
             "label": "Local Tezos Sandbox",
-            "rpcUrl": "http://localhost:20000",
             "annotations": {
-                "baking": "enabled",
                 "block_time": 1
             }
-        }
+        },
+        ...
+    },
+    ...
+}
 ```
 
-> NOTE: The `block_time` setting is an integer and must be set to a minimum of 1, with 5 being the default.
+The _block_time_ property can be set to any integer greater than 1.
 
-You may also disable baking:
+#### Disable Baking
+
+By default, a flextesa sandbox will launch a baker daemon which will bake blocks according to the provisioned block time. However, baking can be
+disabled to give developers more flexibility and control of the baking process. To disable baking, adjust your environment in your `.taq/config.json` file:
+
 ```json
-    "sandbox": {
-        "local": {
+{
+    "environments": {
+        "development": {
+            "type": "flextesa",
             "label": "Local Tezos Sandbox",
-            "rpcUrl": "http://localhost:20000",
             "annotations": {
+                "block_time": 1,
                 "baking": "disabled"
             }
-        }
+        },
+        ...
+    },
+    ...
+}
 ```
 
-When baking is disabled, operations will not automatically be injected into blocks, and blocks will not be injected into the blockchain.
+After restarting your sandbox, operations can be injected to the flextesa node, but those operations will reside in the mempool and not be baked until you
+manually run:
 
-To bake any pending operations, run `taq bake`.
+```
+taq bake [sandboxName]
+```
 
-#### Baking-on-demand
+##### Baking on Demand
 
-Rather than manully run `taq bake` when there are pending operations, you can run `taq bake -w` which will watch for operations as they are injected into the mempool and bake them as soon as possible.
+Rather than have to run `taq bake` manually each time wish to bake a block, you can do the following to bake immediately after an operation is injected:
 
-## Plugin Architecture
+1. Set the block time to _1_.
+2. Run bake task in watch mode: `taq bake -w [sandboxName]`
 
-This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK
 
 ### Flextesa Plugin Task Registry
 
@@ -234,20 +304,32 @@ This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node 
 |------------|:------------------------------:|
 |  task      | 'list accounts'                | 
 |  command   | 'list accounts [sandboxName]'  | 
-|  aliases   | [ ]                            |  
+|  aliases   | [ ]                            |
 
-#### The `show protocols` Task
+#### The `list accounts` Task
 
 |  attribute |  value                         | 
 |------------|:------------------------------:|
-|  task      | 'show protocols'               | 
-|  command   | 'show protocols                | 
+|  task      | 'list accounts'                | 
+|  command   | 'list accounts [sandboxName]'  | 
 |  aliases   | [ ]                            |
 
-#### The `bake` Task
+#### The `taq bake` Task
 
 |  attribute |  value                         | 
 |------------|:------------------------------:|
-|  task      | 'bake'                         | 
-|  command   | 'bake [-w]                     | 
-|  aliases   | [ ]                            |
+|  task      | 'bake'                | 
+|  command   | 'bake [sandboxName]'  | 
+|  aliases   | ['b']                          |
+
+#### The `show-protocols` Task
+
+|  attribute |  value                         | 
+|------------|:------------------------------:|
+|  task      | 'show-protocols'               | 
+|  command   | 'show-protocols [sandboxName]' | 
+|  aliases   | ['list protocols']             |
+
+## Plugin Architecture
+
+This is a plugin developed for Taqueria built on NodeJS using the Taqueria Node SDK and distributed via NPM
