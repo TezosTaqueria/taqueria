@@ -110,6 +110,11 @@ const sidebars = {
         "tasks/deploy",
         "tasks/instantiate-account",
         "tasks/fund",
+        
+        // Taquito plugin tasks
+        "tasks/deploy",
+        "tasks/instantiate-account",
+        "tasks/fund",
 
         // Pinata plugin tasks
         "tasks/publish",
@@ -130,7 +135,7 @@ const sidebars = {
         "tasks/simulate",
         "tasks/transfer",
         "tasks/typecheck",
-        "tasks/typecheck-all",
+        "tasks/typecheck-all"
       ].sort(),
     },
     {
