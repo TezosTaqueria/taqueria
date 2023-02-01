@@ -15,7 +15,7 @@ Benefits of using generated types:
 ## Requirements
 
 - Taqueria v0.26.0 or later
-- Node JS v16.17.1 or later
+- Node.js v16.16 or later. (v17.x.x or later is not supported)
 - Taquito v11.2 or later (optional)
 
 ## Installation
