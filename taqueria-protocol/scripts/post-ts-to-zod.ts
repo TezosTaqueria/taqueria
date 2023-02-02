@@ -13,6 +13,7 @@ const PASSTHROUGH_TYPES = [
 	'ProxyTemplateArgs',
 	'SanitizedArgs',
 	'ConfigEnvironmentFileV2',
+	'SandboxAccount',
 ];
 
 /**

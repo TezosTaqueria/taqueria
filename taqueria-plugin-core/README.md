@@ -5,7 +5,7 @@ The Core plugin provides core utility tasks that assist the user in various ways
 ## Requirements
 
 - Taqueria v0.22.2 or later
-- Node.js v16.17.1 or later
+- Node.js v16.16 or later. (v17.x.x or later is not supported)
 
 ## Installation
 

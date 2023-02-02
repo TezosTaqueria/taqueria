@@ -1,8 +1,9 @@
 {
 	"name": "@taqueria/toolkit",
-	"version": "0.28.0",
+	"version": "0.28.1",
 	"description": "A TypeScript library for NodeJS to work with Taqueria projects",
 	"source": "./index.ts",
+	"main": "./index.js",
 	"bin": {
 		"withTaq": "./bin/run.js"
 	},
@@ -36,14 +37,16 @@
 		"typescript": "^4.7.2"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.28.0",
+		"@taqueria/protocol": "^0.28.1",
 		"cross-spawn": "^7.0.3",
 		"yargs": "^17.6.2"
 	},
 	"tsup": [
 		{
 			"entry": [
-				"index.ts"
+				"index.ts",
+				"v1.ts",
+				"v2.ts"
 			],
 			"sourcemap": true,
 			"target": "es2018",
@@ -68,6 +71,10 @@
 		}
 	],
 	"exports": {
-		"./lib/*": "./lib/*"
+		"./lib/*": "./lib/*",
+		".*": "./*",
+		".": "./index.js",
+		"./v1": "./v1.js",
+		"./v2": "./v2.js"
 	}
 }

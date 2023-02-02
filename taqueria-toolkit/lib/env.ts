@@ -50,18 +50,24 @@ export async function getConfig(taqDir: string, prefix: string) {
 	}
 }
 
+export function encode(value: string) {
+	const buffer = Buffer.from(value, 'utf8');
+	return buffer.toString('base64');
+}
+
 export async function getEncodedConfig(taqDir: string, prefix: string) {
 	const config = await getConfig(taqDir, prefix);
 	return Object.fromEntries(
 		Object.entries(config).map(
-			([k, v]) => [k, btoa(v as string)],
+			([k, v]) => [k, encode(v as string)],
 		),
 	);
 }
 
 export async function getEnv(env: typeof process.env, taqDir: string, prefix: string = '') {
-	return Object.entries(getEncodedConfig(taqDir, prefix)).reduce(
-		(retval, [k, v]) => ({ ...retval, [k]: v }),
-		env,
-	);
+	const realTaqDir = await checkTaqProject(taqDir);
+	return {
+		...env,
+		...await getEncodedConfig(realTaqDir, prefix),
+	};
 }

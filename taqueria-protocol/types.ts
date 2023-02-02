@@ -447,9 +447,11 @@ export type ConfigFileV2 = {
 };
 
 /** Account overrides for this environment */
-export type SandboxAccounts = Record<string, {
+export type SandboxAccount = {
 	type?: string;
-}>;
+};
+
+export type SandboxAccounts = Record<string, SandboxAccount>;
 
 export type ConfigEnvironmentFileV2 = {
 	/** environment types provided by plugins
