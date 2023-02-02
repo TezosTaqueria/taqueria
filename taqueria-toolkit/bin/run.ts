@@ -1,29 +1,8 @@
 #!/usr/bin/env node
 import { spawn } from 'cross-spawn';
-import fs from 'fs/promises';
-import { readFile, stat } from 'fs/promises';
 import path from 'path';
 import yargs from 'yargs';
-
-class CustomErr extends Error {}
-
-class TaqNotFoundError extends CustomErr {
-	public isCustomErr = true;
-}
-
-function isCustomError(err: unknown): err is Error {
-	return typeof err === 'object' && (err as object).hasOwnProperty('isCustomErr');
-}
-
-async function checkTaqProject(dir: string) {
-	try {
-		const searchPath = path.join(dir, '.taq');
-		await stat(searchPath);
-		return searchPath;
-	} catch {
-		throw new TaqNotFoundError(`${dir} is not a valid Taqueria project.`);
-	}
-}
+import { checkTaqProject, getEncodedConfig, isCustomError } from '../lib/env';
 
 function withArguments(cliArgs: string[], fn: (projectDir: string, prefix: string, cmd: string) => Promise<void>) {
 	if (cliArgs[0].endsWith('node')) cliArgs.shift();
@@ -49,40 +28,11 @@ function withArguments(cliArgs: string[], fn: (projectDir: string, prefix: strin
 	} else console.log(`Usage: ${script} --projectDir <projectDir> [--prefix <prefix>] <command>`);
 }
 
-function getEnvName(filename: string, prefix = '') {
-	return `${prefix}TAQ_${filename}`
-		.replace('.json', '')
-		.replace(/\./mg, '_')
-		.replace(/\-/mg, '_')
-		.toUpperCase();
-}
-
-class TaqConfigError extends CustomErr {}
-async function getConfig(taqDir: string, prefix: string) {
-	try {
-		const files = await fs.readdir(taqDir);
-		return files.reduce(
-			async (retval, file) => {
-				if (!file.endsWith('.json')) return (await retval);
-				return {
-					...(await retval),
-					[getEnvName(file, prefix)]: await readFile(path.join(taqDir, file), 'utf-8'),
-				};
-			},
-			Promise.resolve({}),
-		);
-	} catch {
-		throw new TaqConfigError(
-			`There was a problem reading the config files in ${taqDir}. Please check file permissions are try again.`,
-		);
-	}
-}
-
 function toCommandWithEnvVars(cmd: string, config: Record<string, string>) {
 	return Object.entries(config).reduce(
 		(retval, [key, value]) => {
 			try {
-				return `${key}=${btoa(value)} ${retval}`;
+				return `${key}=${value} ${retval}`;
 			} catch (err) {
 				console.warn(`Could not set ${key}`);
 				console.warn('Check the contents of the associated file and ensure that it can be Base64 encoded.');
@@ -96,7 +46,7 @@ function toCommandWithEnvVars(cmd: string, config: Record<string, string>) {
 async function run(projectDir: string, prefix: string, cmd: string) {
 	try {
 		const taqDir = await checkTaqProject(projectDir);
-		const config = await getConfig(taqDir, prefix);
+		const config = await getEncodedConfig(taqDir, prefix);
 		const cmdWithEnvVars = toCommandWithEnvVars(cmd, config);
 
 		spawn(cmdWithEnvVars, {
