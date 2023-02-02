@@ -142,10 +142,12 @@ show_generated_type() {
 }
 
 _scaffold_toolkit_hack() {
-    npm install ../../taqueria-toolkit
-    cd app
-    npm install ../../../taqueria-toolkit
-    cd ..
+    cd ${SCRIPT_DIR}/${SCAF_DEMO_DIR} # ensure location
+    cd app  # now taq-scaf-demo/app
+    npm install ../../../../taqueria/taqueria-toolkit
+    cd src  # now taq-scaf-demo/app/src
+    npm install ../../../../../taqueria/taqueria-toolkit
+    cd ${SCRIPT_DIR}/${SCAF_DEMO_DIR}  # back to taq-scaf-demo/
 }
 
 _delete_state() { rm -f .taq/*state*; }
