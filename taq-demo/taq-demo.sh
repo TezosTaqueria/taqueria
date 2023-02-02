@@ -85,22 +85,18 @@ display_help() { echo 'taq --help'; }
 
 return_to_script_dir() { cd $SCRIPT_DIR; } # return to starting point
 
-_install_plugin() {
-    (($# != 1)) && _err 'Missing plugin argument' && return 1
-    echo "taq install @taqueria/${1}"
-}
+_install_plugin() { echo "taq install @taqueria/${1}" }
 
-install_core_plugin() { _install_plugin plugin-core ; }
-install_ligo_plugin() { _install_plugin plugin-ligo ; }
-install_taquito_plugin() { _install_plugin plugin-taquito ; }
-install_flextesa_plugin() { _install_plugin plugin-flextesa ; }
-install_smartpy_plugin() { _install_plugin plugin-smartpy ; }
-install_contract_types_plugin() { _install_plugin plugin-contract-types ; }
+_install_core_plugin() { taq install @taqueria/plugin-core ; }
+install_ligo_plugin() { echo taq install @taqueria/ plugin-ligo ; }
+install_taquito_plugin() { echo taq install @taqueria/plugin-taquito ; }
+install_flextesa_plugin() { echo taq install @taqueria/plugin-flextesa ; }
+install_smartpy_plugin() { echo taq install @taqueria/plugin-smartpy ; }
+install_contract_types_plugin() { echo taq install @taqueria/plugin-contract-types ; }
 
 copy_ligo_to_contracts() {
     [[ ! -d 'contracts/' ]] && _err 'No `contracts/` directory found' && return 1
-    cp ../skel/*.mligo contracts/
-   _ok 'Template CameLIGO contracts copied to `contracts/`'
+    echo 'cp ../skel/*.mligo contracts/'
 }
 
 # Ligo plugin
@@ -197,23 +193,21 @@ steps=(
     # Demo Init
     taq_init_taq_demo # n.b. this will cd into the created directory
     _cd_init_demo_dir
-
     list_contents
     display_environment
+    # display_help
+
+    _install_core_plugin # Do this silently, it's a detail
+
+    # Demo Ligo plugin
     display_help
+    copy_ligo_to_contracts
+    compile_single_contract
+    list_contents
+    compile_ligo_contracts
+    run_ligo_tests
 
-    # # Install plugin-core
-    # install_core_plugin
-    # # display_help
-
-    # # Demo Ligo plugin
-    # install_ligo_plugin
-    # # display_help
-    # copy_ligo_to_contracts
-    # compile_single_contract
-    # list_contents
-    # compile_ligo_contracts
-    # run_ligo_tests
+    goodbye # ***
 
     # # Demo SmartPy plugin
     # install_smartpy_plugin
@@ -255,15 +249,19 @@ steps=(
 
     goodbye)
 
+_reset_terminal_colors() { tput sgr0; } # "select graphic rendition 0"
+
 demo() {
     local help=' ↪ (o)k | (s)kip | (r)epeat | (p)revious | (q)uit | (c)ommand'
     local ctr=1
     while do
-        tput sgr0 # reset terminal color
+        _reset_terminal_colors
         unset action
         local step=${steps[ctr]}
+        # echo "Current step: $step"
         [[ $step =~ 'goodbye' ]] && goodbye && break # say goodbye automatically
         if _is_private_command $step; then
+            # echo "Evaluating private command $step"
             eval $step # private commands run silently
         else
             command=$(eval $step)  # get the command
