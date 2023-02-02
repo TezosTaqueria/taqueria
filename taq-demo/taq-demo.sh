@@ -3,16 +3,20 @@
 #
 # Run a Taqueria demo: `source taq-demo.sh && demo`
 #
-# See README for more details.
+# * "Private" commands are prefixed with "_" and are executed silently
+# * "Public" commands are written to stdout and await an action (such as (o)k)
+#
+# See the README for more details.
 #
 EXPECTED_TAQ_VERSION='v0.28.0'
 SCRIPT_DIR=${0:a:h} # full path to this script
 
-# Directories names to use to demo the `taq init` and `taq scaffold` tasks
+# Directories names to use to demo the `taq init` and `taq scaffold` tasks respectively
 # WARNING These get blown away arbitrarily: don't store anything therein
 INIT_DEMO_DIR='taq-init-demo'
 SCAF_DEMO_DIR='taq-scaf-demo'
 
+# tput color codes to differentiate easily input/commands from output/result
 COMMAND_COLOR=5
 OK_COLOR=2
 ERROR_COLOR=1
@@ -28,14 +32,12 @@ _ok() { # print success
 
 _warn() { # print warning
     [[ -o interactive ]] && tput setaf $WARN_COLOR
-    echo "$@"
-    newline
+    echo "$@" "\n"
 }
 
 _err() { # print error to stderr
     [[ -o interactive ]] && tput setaf $ERROR_COLOR
-    echo "$@" 1>&2
-    newline
+    echo "$@" 1>&2 "\n"
 }
 
 check_node_version() {
@@ -44,17 +46,9 @@ check_node_version() {
     [[ "v16" != "$major" ]] && _err 'Bad node version' && return 1 || return 0
 }
 
-setup_verify_demo() {
+_setup_verify_demo() {
     nvm use 16 > /dev/null
     check_node_version # belt and braces
-}
-
-# Echo the command, then execute it
-_command() {
-    tput setaf $COMMAND_COLOR
-    echo $1
-    tput setaf $OK_COLOR
-    eval $1
 }
 
 check_taq_version() {
@@ -65,47 +59,35 @@ check_taq_version() {
     _ok "Version check successful ($version)"
 }
 
-set_nvm() { _command 'nvm use 16' && newline; }
+set_nvm() { echo 'nvm use 16'; }
 
-_clean_demo() { rm -rf $INIT_DEMO_DIR && rm -rf $SCAF_DEMO_DIR; }
+_clean_demo() { cd $SCRIPT_DIR && rm -rf $INIT_DEMO_DIR && rm -rf $SCAF_DEMO_DIR; }
 
-clean_demo() {
-    [[ ${PWD:t} =~ $INIT_DEMO_DIR || ${PWD:t} =~ $SCAF_DEMO_DIR ]] && cd $SCRIPT_DIR
-    tput setaf $COMMAND_COLOR
-    _command "rm -rf $INIT_DEMO_DIR && rm -rf $SCAF_DEMO_DIR"
-    _ok 'Project(s) cleaned successfully'
-}
-
-clean_contracts() {
+_clean_contracts() {
+    [[ ! -d 'artifacts' ]] && _err 'Not in a Taqueria project' && return 1
     setopt localoptions rmstarsilent  # zsh
     rm -f artifacts/*;
 }
 
 taq_init_taq_demo() {
     [[ -d $INIT_DEMO_DIR ]] && _err "Directory '$INIT_DEMO_DIR' exists" && return 1
-    _command "taq init $INIT_DEMO_DIR"
-    newline
-    cd $INIT_DEMO_DIR
+    echo "taq init $INIT_DEMO_DIR"
 }
+
+_cd_init_demo_dir() { cd $INIT_DEMO_DIR; }
 
 # Caution: recursive; skip for scaffold
-list_contents() { ls --color=always -I 'node_modules' -I '.git' -lAR | less -F -R -X; }
+list_contents() { echo "ls --color=always -I 'node_modules' -I '.git' -lAR | less -F -R -X"; }
 
-display_environment() {
-    _command 'taq get-environment'
-    newline
-}
+display_environment() { echo 'taq get-environment'; }
 
-display_help() {
-    _command 'taq --help'
-}
+display_help() { echo 'taq --help'; }
 
 return_to_script_dir() { cd $SCRIPT_DIR; } # return to starting point
 
 _install_plugin() {
     (($# != 1)) && _err 'Missing plugin argument' && return 1
-    _command "taq install @taqueria/${1}"
-    newline
+    echo "taq install @taqueria/${1}"
 }
 
 install_core_plugin() { _install_plugin plugin-core ; }
@@ -121,54 +103,83 @@ copy_ligo_to_contracts() {
    _ok 'Template CameLIGO contracts copied to `contracts/`'
 }
 
-# Ligo plugins
-compile_single_contract() { _command 'taq compile hello-tacos.mligo'; }
-compile_ligo_contracts() { _command 'taq compile-all --plugin @taqueria/plugin-ligo'; }
-run_ligo_tests() { _command 'taq test hello-tacos.test.mligo --plugin @taqueria/plugin-ligo'; }
-
-compile_smartpy_contracts() { _command 'taq compile-all --plugin @taqueria/plugin-smartpy'; }
-run_smartpy_tests() { _command 'taq test hello-tacos.py --plugin @taqueria/plugin-smartpy'; }
+# Ligo plugin
+compile_single_contract() { echo 'taq compile hello-tacos.mligo'; }
+compile_ligo_contracts() { echo 'taq compile-all --plugin @taqueria/plugin-ligo'; }
+run_ligo_tests() { echo 'taq test hello-tacos.test.mligo --plugin @taqueria/plugin-ligo'; }
 
 # Flextesa plugin
-start_sandbox() { _command 'taq start sandbox' && sleep 1; }  # sleep fixes "list_accounts [too fast]"
-list_accounts() { _command 'taq list accounts local'; }
+_start_sandbox() {
+    taq stop sandbox $1 > /dev/null
+    echo "taq start sandbox $1"
+}
+# Sandbox names currently differ between {init,scaffold}'d projects....
+start_sandbox_local() { _start_sandbox local; }
+list_accounts_init() { echo 'taq list accounts local'; }
 
 # Taquito plugin
-originate_hello_tacos() { _command 'taq originate hello-tacos.tz --sender alice'; }
+originate_hello_tacos() { echo 'taq originate hello-tacos.tz'; }
 
-start_dapp() { _command 'npm run start:app'; }
+# SmartPy Plugin
+compile_smartpy_contracts() { echo 'taq compile-all --plugin @taqueria/plugin-smartpy'; }
+run_smartpy_tests() { echo 'taq test hello-tacos.py --plugin @taqueria/plugin-smartpy'; }
 
-# UNUSED
-contract_address() {
-    # Works at top-level (i.e. for print_storage) but only use one demo project at a time!
-    dev_json=$(find -type f -name config.local.development.json)
-    jq -r '.contracts."hello-tacos"."address"' $dev_json;
+# Scaffold functionality
+start_sandbox_development() { _start_sandbox development; }
+start_dapp() { echo 'npm run start:app' ; }
+list_accounts_scaf() { echo 'taq list accounts development'; }
+
+_contract_address() {
+    (( $# != 1 )) && _err 'Missing environment argument' && return 1
+    dev_json=$(find -type f -name config.local.${1}.json)
+    jq -r '.contracts."hello-tacos"."address"' $dev_json # assumes one is there!
 }
+# Not 'scripted': for interactive use, e.g. with (c)ommand action
+development_contract_address() { _contract_address development; }
+testing_contract_address() { _contract_address testing; }
 
 print_storage() {
     address=$(contract_address)
     # FIXME Assumption that we're on 20000
-    _command "curl http://localhost:20000/chains/main/blocks/head/context/contracts/${address}/storage"
-    newline
+    echo "curl http://localhost:20000/chains/main/blocks/head/context/contracts/${address}/storage"
 }
 
-copy_smartpy_to_contracts() {
+_copy_smartpy_to_contracts() {
     [[ ! -d 'contracts/' ]] && _err 'Directory `contracts/` not found' && return 1
-    cp ../skel/hello-tacos.py contracts
-   _ok 'Template SmartPy contract copied to `contracts/`'
+    [[ ! -f '../skel/hello-tacos.py' ]] && _err 'Missing ../skel/hello-tacos.py' && return 2
+    echo 'cp ../skel/hello-tacos.py contracts'
 }
 
-change_environment() {
-    _command 'taq get-environment'
-    _command 'taq set-environment testing'
+set_development_environment() { echo 'taq set-environment development'; }
 
-}
-
-generate_types() { _command 'taq generate types'; }
+generate_types() { echo 'taq generate types'; }
 show_generated_type() {
     # `pyg` is a function to color-code files on stdout, based on Pygmentize. Happy to share.
     pager=$([[ `uname -n` =~ gauss ]] && echo 'pyg' || echo 'less')
-    $pager 'types/hello-tacos.types.ts'
+    echo "$pager 'types/hello-tacos.types.ts'"
+}
+
+_scaffold_toolkit_hack() {
+    npm install ../../taqueria-toolkit
+    cd app
+    npm install ../../../taqueria-toolkit
+    cd ..
+}
+
+_delete_state() { rm -f .taq/*state*; }
+
+_prepare_scaffold_taco_shop() {
+    cd $SCAF_DEMO_DIR
+    _scaffold_toolkit_hack
+    taq set-environment development
+    _delete_state
+}
+
+scaffold_taco_shop() {
+    [[ ! -f taq-demo.sh ]] && _err 'Not in script root' && return 1
+    [[ -d $SCAF_DEMO_DIR ]] && _err 'Project exists' && return 2
+    local url='https://github.com/ecadlabs/taqueria-scaffold-taco-shop'
+    echo "taq scaffold -b prerelease $url $SCAF_DEMO_DIR"
 }
 
 goodbye() {
@@ -180,81 +191,95 @@ goodbye() {
 
 # Modify to taste
 steps=(
-    # Setup / verify
-    # check_taq_version
-    # set_nvm
+    _clean_demo
+    _setup_verify_demo
 
-    # taq init
+    # Demo Init
     taq_init_taq_demo # n.b. this will cd into the created directory
+    _cd_init_demo_dir
+
+    list_contents
+    display_environment
+    display_help
+
+    # # Install plugin-core
+    # install_core_plugin
+    # # display_help
+
+    # # Demo Ligo plugin
+    # install_ligo_plugin
+    # # display_help
+    # copy_ligo_to_contracts
+    # compile_single_contract
     # list_contents
-    # display_environment
-    # display_help
+    # compile_ligo_contracts
+    # run_ligo_tests
 
-    # Install plugin-core
-    install_core_plugin
-    # display_help
+    # # Demo SmartPy plugin
+    # install_smartpy_plugin
+    # clean_contracts
+    # copy_smartpy_to_contracts
+    # compile_smartpy_contracts
+    # run_smartpy_tests
+    # list_contents
 
-    # Demo Ligo plugin
-    install_ligo_plugin
-    # display_help
-    copy_ligo_to_contracts
-    compile_single_contract
-    list_contents
-    compile_ligo_contracts
-    run_ligo_tests
+    # # Demo flextesa plugin
+    # install_flextesa_plugin
+    # # display_help
+    # start_sandbox
+    # list_accounts
 
-    # Demo SmartPy plugin
-    install_smartpy_plugin
-    clean_contracts
-    copy_smartpy_to_contracts
-    compile_smartpy_contracts
-    run_smartpy_tests
-    list_contents
+    # # Demo Taquito plugin
+    # install_taquito_plugin
+    # originate_hello_tacos
+    # print_storage
 
-    # Demo flextesa plugin
-    install_flextesa_plugin
-    # display_help
-    start_sandbox
-    list_accounts
-
-    # Demo Taquito plugin
-    install_taquito_plugin
-    originate_hello_tacos
-    print_storage
-
-    # Demo Contract-Types plugin
+    # # Demo Contract-Types plugin
     # install_contract_types_plugin
     # generate_types
     # show_generated_type
 
     # Demo scaffolding
-    # _clean_demo
-    # scaffold_taco_shop  # n.b. this will cd into $SCAF_DEMO_DIR
-    # # compile_ligo_contracts
-    # # start_sandbox_development
-    # # originate_hello_tacos
-    # list_accounts_scaf
-    # start_dapp
+    _clean_demo
+    scaffold_taco_shop  # n.b. this will cd into $SCAF_DEMO_DIR
+    _prepare_scaffold_taco_shop
+    start_sandbox_development
+    compile_ligo_contracts
+    originate_hello_tacos
+
+    # # list_accounts_scaf
+    start_dapp
+
+    # # Demo VSCE
+    # open_vscode
 
     goodbye)
 
 demo() {
-    _clean_demo
+    local help=' ↪ (o)k | (s)kip | (r)epeat | (p)revious | (q)uit | (c)ommand'
     local ctr=1
     while do
-        unset choice # forget last choice
+        tput sgr0 # reset terminal color
+        unset action
         local step=${steps[ctr]}
-        [[ $step =~ 'goodbye' ]] && goodbye && return 0 # say goodbye automatically
-        vared -p "Next: '$step' ↪ (o)k | (s)kip | (r)epeat | (p)revious | (q)uit | (c)ommand → " -c choice
-        case $choice in
-            o|' ') eval ${steps[ctr]} ;;
-            s) _warn "Skipping $step" ;;
-            r) eval ${steps[ctr-1]} && continue ;;
-            p) (( ctr-- )) && continue ;;
-            q) goodbye && break ;;
-            c) echo -n "\n$ " && read command && eval $command && newline && continue;;
-            *) _err "Try again" && continue ;;
-        esac
+        [[ $step =~ 'goodbye' ]] && goodbye && break # say goodbye automatically
+        if _is_private_command $step; then
+            eval $step # private commands run silently
+        else
+            command=$(eval $step)  # get the command
+            tput setaf $COMMAND_COLOR
+            vared -p "$ $command " -c action
+            case $action in
+                o|$'\n') tput setaf $OK_COLOR && eval $command && newline ;;
+                s) _warn "Skipping $step" ;;
+                r) eval ${steps[ctr-1]} && continue ;;
+                p) (( ctr-- )) && continue ;;
+                q) goodbye && break ;;
+                c) echo -n "\n$ " && read command && eval $command && newline && continue;;
+                h) echo $help && continue ;;
+                *) _err "Try again" && continue ;;
+            esac
+        fi
         (( $? == 0)) && (( ctr++ )) # Advance iff last step was successful
     done
 }
