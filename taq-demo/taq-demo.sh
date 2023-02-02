@@ -40,12 +40,15 @@ check_taq_version() {
 
 set_nvm() { echo 'nvm use 16'; }
 
-_clean_demo() { cd $SCRIPT_DIR && rm -rf $INIT_DEMO_DIR && rm -rf $SCAF_DEMO_DIR; }
+_clean_demo() {
+    # [[ -d '.taq/' ]] && taq stop sandbox
+    cd $SCRIPT_DIR && rm -rf $INIT_DEMO_DIR && rm -rf $SCAF_DEMO_DIR;
+}
 
 _clean_contracts() {
     [[ ! -d 'artifacts' ]] && _err 'Not in a Taqueria project' && return 1
     setopt localoptions rmstarsilent  # zsh
-    rm -f artifacts/*;
+    rm -f artifacts/*(N); # NULL_GLOB option: do not fail if no matches
 }
 
 taq_init_taq_demo() {
@@ -66,12 +69,12 @@ return_to_script_dir() { cd $SCRIPT_DIR; } # return to starting point
 
 _install_plugin() { echo "taq install @taqueria/${1}" }
 
-_install_core_plugin() { taq install @taqueria/plugin-core ; }
-install_ligo_plugin() { echo taq install @taqueria/ plugin-ligo ; }
-install_taquito_plugin() { echo taq install @taqueria/plugin-taquito ; }
-install_flextesa_plugin() { echo taq install @taqueria/plugin-flextesa ; }
-install_smartpy_plugin() { echo taq install @taqueria/plugin-smartpy ; }
-install_contract_types_plugin() { echo taq install @taqueria/plugin-contract-types ; }
+_install_core_plugin() { taq install @taqueria/plugin-core >& /dev/null ; }
+install_ligo_plugin() { echo 'taq install @taqueria/plugin-ligo' ; }
+install_taquito_plugin() { echo 'taq install @taqueria/plugin-taquito' ; }
+install_flextesa_plugin() { echo 'taq install @taqueria/plugin-flextesa' ; }
+install_smartpy_plugin() { echo 'taq install @taqueria/plugin-smartpy' ; }
+install_contract_types_plugin() { echo 'taq install @taqueria/plugin-contract-types' ; }
 
 copy_ligo_to_contracts() {
     [[ ! -d 'contracts/' ]] && _err 'No `contracts/` directory found' && return 1
@@ -89,8 +92,12 @@ _start_sandbox() {
     echo "taq start sandbox $1"
 }
 # Sandbox names currently differ between {init,scaffold}'d projects....
-start_sandbox_local() { _start_sandbox local; }
-list_accounts_init() { echo 'taq list accounts local'; }
+start_sandbox_init() { _start_sandbox local; }
+start_sandbox_scaf() { _start_sandbox development; }
+
+# Sleep mitigates intermittent "Error" in balances after starting a sandbox
+list_accounts_init() { sleep 1; echo 'taq list accounts local'; }
+list_accounts_scaf() { sleep 1; echo 'taq list accounts development'; }
 
 # Taquito plugin
 originate_hello_tacos() { echo 'taq originate hello-tacos.tz'; }
@@ -119,7 +126,7 @@ print_storage() {
     echo "curl http://localhost:20000/chains/main/blocks/head/context/contracts/${address}/storage"
 }
 
-_copy_smartpy_to_contracts() {
+copy_smartpy_to_contracts() {
     [[ ! -d 'contracts/' ]] && _err 'Directory `contracts/` not found' && return 1
     [[ ! -f '../skel/hello-tacos.py' ]] && _err 'Missing ../skel/hello-tacos.py' && return 2
     echo 'cp ../skel/hello-tacos.py contracts'
@@ -153,14 +160,17 @@ _prepare_scaffold_taco_shop() {
 scaffold_taco_shop() {
     [[ ! -f taq-demo.sh ]] && _err 'Not in script root' && return 1
     [[ -d $SCAF_DEMO_DIR ]] && _err 'Project exists' && return 2
-    local url='https://github.com/ecadlabs/taqueria-scaffold-taco-shop'
+    local url='file:////home/edward/work/ecad/taqueria/taq-demo/skel/taq-scaf-cached4'
+    # local url='https://github.com/ecadlabs/taqueria-scaffold-taco-shop'
     echo "taq scaffold -b prerelease $url $SCAF_DEMO_DIR"
 }
 
+open_vscode() { code-insiders .; }
+
 goodbye() {
     _ok 'Cleaning up...'
-    # [[ -d '.taq/' ]] && taq stop sandbox local >& /dev/null
-    [[ -d '.taq/' ]] && return_to_script_dir
+    # [[ -d '.taq/' ]] && taq stop sandbox
+    [[ -d '.taq/' ]] && taq stop sandbox && return_to_script_dir
     _ok 'Done'
 }
 
