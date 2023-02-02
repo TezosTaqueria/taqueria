@@ -91,29 +91,8 @@ taq_init_taq_demo() {
 # Caution: recursive; skip for scaffold
 list_contents() { ls --color=always -I 'node_modules' -I '.git' -lAR | less -F -R -X; }
 
-init_git() {
-    [[ -d '.git' ]] && _err "Directory '.git' exists" && return 1
-    tput setaf $WHITE
-    git init
-    git add .
-    git commit -m 'Initial commit'
-    _ok "Git initialized successfully..."
-}
-
-commit_work() {
-    [[ ! -d '.git/' ]] && return 0 # No problem: Didn't set up git
-    git add .
-    git commit -m ${1:-'Next commit'}
-}
-
 display_environment() {
     _command 'taq get-environment'
-    newline
-}
-
-cat_gitignore() {
-    tput setaf $WHITE
-    cat .gitignore
     newline
 }
 
@@ -135,11 +114,6 @@ install_taquito_plugin() { _install_plugin plugin-taquito ; }
 install_flextesa_plugin() { _install_plugin plugin-flextesa ; }
 install_smartpy_plugin() { _install_plugin plugin-smartpy ; }
 install_contract_types_plugin() { _install_plugin plugin-contract-types ; }
-
-git_diff() {
-    [[ ! -d '.git/' ]] && return 0 # No problem: Didn't set up git
-    git diff
-}
 
 copy_ligo_to_contracts() {
     [[ ! -d 'contracts/' ]] && _err 'No `contracts/` directory found' && return 1
@@ -213,22 +187,16 @@ steps=(
     # taq init
     taq_init_taq_demo # n.b. this will cd into the created directory
     # list_contents
-    # cat_gitignore
-    # init_git # this will do an 'Initial commit'
     # display_environment
     # display_help
 
     # Install plugin-core
     install_core_plugin
     # display_help
-    # git_diff
-    # commit_work
 
     # Demo Ligo plugin
     install_ligo_plugin
     # display_help
-    # git_diff
-    # commit_work
     copy_ligo_to_contracts
     compile_single_contract
     list_contents
@@ -254,7 +222,18 @@ steps=(
     originate_hello_tacos
     print_storage
 
+    # Demo Contract-Types plugin
+    # install_contract_types_plugin
+    # generate_types
+    # show_generated_type
+
     # Demo scaffolding
+    # _clean_demo
+    # scaffold_taco_shop  # n.b. this will cd into $SCAF_DEMO_DIR
+    # # compile_ligo_contracts
+    # # start_sandbox_development
+    # # originate_hello_tacos
+    # list_accounts_scaf
     # start_dapp
 
     goodbye)
