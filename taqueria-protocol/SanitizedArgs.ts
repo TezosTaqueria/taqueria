@@ -106,7 +106,21 @@ type RawSetEnvInput = z.infer<typeof setEnvRawSchema>;
 type RawTemplateInput = z.infer<typeof templateRawSchema>;
 
 export const { schemas: generatedSchemas, factory } = createType<RawInput, RawInput>({
-	rawSchema,
+	rawSchema: z.preprocess(
+		unsanitizedArgs => {
+			if (typeof unsanitizedArgs === 'object') {
+				const unparsed: { y?: boolean; yes?: boolean } = { ...unsanitizedArgs };
+				if (unparsed.y) unparsed.yes = unparsed.y;
+				else if (unparsed.yes) unparsed.y = unparsed.yes;
+				return {
+					...unsanitizedArgs,
+					...unparsed,
+				};
+			}
+			return unsanitizedArgs;
+		},
+		rawSchema,
+	),
 	parseErrMsg: 'The arguments provided are invalid',
 	unknownErrMsg: 'Something went wrong parsing the command-line arguments',
 });
