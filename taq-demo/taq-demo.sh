@@ -38,6 +38,17 @@ _err() { # print error to stderr
     newline
 }
 
+check_node_version() {
+    IFS=\. read -r major minor patch < <(node --version)
+    # echo "Got major '$major' minor '$minor' patch '$patch' "
+    [[ "v16" != "$major" ]] && _err 'Bad node version' && return 1 || return 0
+}
+
+setup_verify_demo() {
+    nvm use 16 > /dev/null
+    check_node_version # belt and braces
+}
+
 # Echo the command, then execute it
 _command() {
     tput setaf $COMMAND_COLOR
@@ -242,9 +253,6 @@ steps=(
     install_taquito_plugin
     originate_hello_tacos
     print_storage
-    
-    # git_diff
-    # commit_work
 
     # Demo scaffolding
     # start_dapp
