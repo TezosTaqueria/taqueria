@@ -6,8 +6,9 @@
 # * "Private" commands are prefixed with "_" and are executed silently
 # * "Public" commands are written to stdout and await an action (such as (o)k)
 #
+# It works by specifying `steps` array and uses demo-izer.sh
 # See the README for more details.
-#
+
 EXPECTED_TAQ_VERSION='v0.28.0'
 SCRIPT_DIR=${0:a:h} # full path to this script
 
@@ -16,29 +17,7 @@ SCRIPT_DIR=${0:a:h} # full path to this script
 INIT_DEMO_DIR='taq-init-demo'
 SCAF_DEMO_DIR='taq-scaf-demo'
 
-# tput color codes to differentiate easily input/commands from output/result
-COMMAND_COLOR=5
-OK_COLOR=2
-ERROR_COLOR=1
-WARN_COLOR=6
-WHITE=7
-
-newline() { echo "\n"; }
-
-_ok() { # print success
-    [[ -o interactive ]] && tput setaf $OK_COLOR
-    echo "$@" "\n"
-}
-
-_warn() { # print warning
-    [[ -o interactive ]] && tput setaf $WARN_COLOR
-    echo "$@" "\n"
-}
-
-_err() { # print error to stderr
-    [[ -o interactive ]] && tput setaf $ERROR_COLOR
-    echo "$@" 1>&2 "\n"
-}
+source ./demo-izer.sh
 
 check_node_version() {
     IFS=\. read -r major minor patch < <(node --version)
@@ -190,97 +169,64 @@ steps=(
     _clean_demo
     _setup_verify_demo
 
-    # Demo Init
-    taq_init_taq_demo # n.b. this will cd into the created directory
-    _cd_init_demo_dir
-    list_contents
-    display_environment
+    # # Demo Init
+    # taq_init_taq_demo # n.b. this will cd into the created directory
+    # _cd_init_demo_dir
+    # list_contents
+    # display_environment
     # display_help
 
-    _install_core_plugin # Do this silently, it's a detail
+    # _install_core_plugin # Do this silently, it's a detail
 
-    # Demo Ligo plugin
-    display_help
-    copy_ligo_to_contracts
-    compile_single_contract
-    list_contents
-    compile_ligo_contracts
-    run_ligo_tests
-
-    goodbye # ***
-
-    # # Demo SmartPy plugin
-    # install_smartpy_plugin
-    # clean_contracts
-    # copy_smartpy_to_contracts
-    # compile_smartpy_contracts
-    # run_smartpy_tests
+    # # Demo Ligo plugin
+    # install_ligo_plugin
+    # display_help
+    # copy_ligo_to_contracts
+    # compile_single_contract
     # list_contents
+    # compile_ligo_contracts
+    # run_ligo_tests
 
     # # Demo flextesa plugin
     # install_flextesa_plugin
-    # # display_help
-    # start_sandbox
-    # list_accounts
+    # display_help
+    # start_sandbox_init
+    # list_accounts_init
 
     # # Demo Taquito plugin
     # install_taquito_plugin
     # originate_hello_tacos
-    # print_storage
+    # # print_storage
 
     # # Demo Contract-Types plugin
     # install_contract_types_plugin
     # generate_types
     # show_generated_type
 
-    # Demo scaffolding
+    # # Demo SmartPy plugin
+    # install_smartpy_plugin
+    # _clean_contracts
+    # copy_smartpy_to_contracts
+    # run_smartpy_tests
+
+    # # <--- `taq init` above, `taq scaffold` below --->
+
+    # Demo Scaffolding    
     _clean_demo
     scaffold_taco_shop  # n.b. this will cd into $SCAF_DEMO_DIR
     _prepare_scaffold_taco_shop
-    start_sandbox_development
+
+    # Demo VSCE first, because dismissing it returns here: unlike start_dapp
+    open_vscode
+
+    start_sandbox_scaf
+    list_accounts_scaf
     compile_ligo_contracts
     originate_hello_tacos
 
-    # # list_accounts_scaf
     start_dapp
 
-    # # Demo VSCE
-    # open_vscode
-
     goodbye)
-
-_reset_terminal_colors() { tput sgr0; } # "select graphic rendition 0"
-
-demo() {
-    local help=' ↪ (o)k | (s)kip | (r)epeat | (p)revious | (q)uit | (c)ommand'
-    local ctr=1
-    while do
-        _reset_terminal_colors
-        unset action
-        local step=${steps[ctr]}
-        # echo "Current step: $step"
-        [[ $step =~ 'goodbye' ]] && goodbye && break # say goodbye automatically
-        if _is_private_command $step; then
-            # echo "Evaluating private command $step"
-            eval $step # private commands run silently
-        else
-            command=$(eval $step)  # get the command
-            tput setaf $COMMAND_COLOR
-            vared -p "$ $command " -c action
-            case $action in
-                o|$'\n') tput setaf $OK_COLOR && eval $command && newline ;;
-                s) _warn "Skipping $step" ;;
-                r) eval ${steps[ctr-1]} && continue ;;
-                p) (( ctr-- )) && continue ;;
-                q) goodbye && break ;;
-                c) echo -n "\n$ " && read command && eval $command && newline && continue;;
-                h) echo $help && continue ;;
-                *) _err "Try again" && continue ;;
-            esac
-        fi
-        (( $? == 0)) && (( ctr++ )) # Advance iff last step was successful
-    done
-}
 
 resource_demo() { source $SCRIPT_DIR/taq-demo.sh; }
 alias res=resource_demo
