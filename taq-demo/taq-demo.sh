@@ -14,9 +14,10 @@ SCRIPT_DIR=${0:a:h} # full path to this script
 
 # Directories names to use to demo the `taq init` and `taq scaffold` tasks respectively
 # WARNING These get blown away arbitrarily: don't store anything therein
-INIT_DEMO_DIR='taq-init-demo'
-SCAF_DEMO_DIR='taq-scaf-demo'
+INIT_DEMO='taq-init-demo'
+SCAF_DEMO='taq-scaf-demo'
 
+export AUTO_DEMO_MODE='false'
 source ./demo-izer.sh
 
 check_node_version() {
@@ -42,7 +43,7 @@ set_nvm() { echo 'nvm use 16'; }
 
 _clean_demo() {
     # [[ -d '.taq/' ]] && taq stop sandbox
-    cd $SCRIPT_DIR && rm -rf $INIT_DEMO_DIR && rm -rf $SCAF_DEMO_DIR;
+    cd $SCRIPT_DIR && rm -rf $INIT_DEMO && rm -rf $SCAF_DEMO;
 }
 
 _clean_contracts() {
@@ -52,11 +53,11 @@ _clean_contracts() {
 }
 
 taq_init_taq_demo() {
-    [[ -d $INIT_DEMO_DIR ]] && _err "Directory '$INIT_DEMO_DIR' exists" && return 1
-    echo "taq init $INIT_DEMO_DIR"
+    [[ -d $INIT_DEMO ]] && _err "Directory '$INIT_DEMO' exists" && return 1
+    echo "taq init $INIT_DEMO"
 }
 
-_cd_init_demo_dir() { cd $INIT_DEMO_DIR; }
+_cd_init_demo_dir() { cd $INIT_DEMO; }
 
 # Caution: recursive; skip for scaffold
 list_contents() { echo "ls --color=always -I 'node_modules' -I '.git' -lAR | less -F -R -X"; }
@@ -93,7 +94,7 @@ _start_sandbox() {
 }
 # Sandbox names currently differ between {init,scaffold}'d projects....
 start_sandbox_init() { _start_sandbox local; }
-start_sandbox_scaf() { _start_sandbox development; }
+start_sandbox_scaf() { _start_sandbox ; } # Specifying 'development' will result in an error
 
 # Sleep mitigates intermittent "Error" in balances after starting a sandbox
 list_accounts_init() { sleep 1; echo 'taq list accounts local'; }
@@ -106,22 +107,20 @@ originate_hello_tacos() { echo 'taq originate hello-tacos.tz'; }
 compile_smartpy_contracts() { echo 'taq compile-all --plugin @taqueria/plugin-smartpy'; }
 run_smartpy_tests() { echo 'taq test hello-tacos.py --plugin @taqueria/plugin-smartpy'; }
 
-# Scaffold functionality
-
-start_dapp() { echo 'npm run start:app &' ; } # fork so script doesn't exit
+start_dapp() { echo 'npm run start:app &' ; }
 
 _contract_address() {
     (( $# != 1 )) && _err 'Missing environment argument' && return 1
     dev_json=$(find -type f -name config.local.${1}.json)
     jq -r '.contracts."hello-tacos"."address"' $dev_json # assumes one is there!
 }
-# Not 'scripted': for interactive use, e.g. with (c)ommand action
+# Not 'scripted'; for interactive use, e.g. with (c)ommand action
 development_contract_address() { _contract_address development; }
 testing_contract_address() { _contract_address testing; }
 
 print_storage() {
     address=$(contract_address)
-    # FIXME Assumption that we're on 20000
+    # FIXME Assumption that we're on 20000 - only on a 'clean' run
     echo "curl http://localhost:20000/chains/main/blocks/head/context/contracts/${address}/storage"
 }
 
@@ -141,44 +140,46 @@ show_generated_type() {
 }
 
 _scaffold_toolkit_hack() {
-    cd ${SCRIPT_DIR}/${SCAF_DEMO_DIR} # ensure location
+    cd ${SCRIPT_DIR}/${SCAF_DEMO} # ensure location
     cd app  # now taq-scaf-demo/app
     npm install ../../../../taqueria/taqueria-toolkit
     cd src  # now taq-scaf-demo/app/src
     npm install ../../../../../taqueria/taqueria-toolkit
-    cd ${SCRIPT_DIR}/${SCAF_DEMO_DIR}  # back to taq-scaf-demo/
+    cd ${SCRIPT_DIR}/${SCAF_DEMO}  # back to taq-scaf-demo/
 }
 
-_delete_state() { rm -f .taq/*state*; }
+_delete_state() {
+    [[ ! -d '.taq' ]] && _err 'Wrong directory: no .taq/ found' && return 1
+    setopt localoptions rmstarsilent  # zsh
+    rm -f .taq/*state*(N); # NULL_GLOB option: belt and braces
+}
 
 _prepare_scaffold_taco_shop() {
-    cd $SCAF_DEMO_DIR
     _scaffold_toolkit_hack
-    taq set-environment development
+    taq set-environment development  # *** Currently errors out ***
     _delete_state
 }
 
+_cd_scaff_demo_dir() { cd $SCAF_DEMO; }
+
 scaffold_taco_shop() {
     [[ ! -f taq-demo.sh ]] && _err 'Not in script root' && return 1
-    [[ -d $SCAF_DEMO_DIR ]] && _err 'Project exists' && return 2
-    local url='file:////home/edward/work/ecad/taqueria/taq-demo/skel/taq-scaf-cached'
-    # local url='https://github.com/ecadlabs/taqueria-scaffold-taco-shop'
-    echo "taq scaffold -b prerelease $url $SCAF_DEMO_DIR"
+    [[ -d $SCAF_DEMO ]] && _err 'Project exists' && return 2
+    echo "taq scaffold -b prerelease https://github.com/ecadlabs/taqueria-scaffold-taco-shop $SCAF_DEMO"
 }
 
 open_vscode() { code-insiders .; }
 
 goodbye() {
     _ok 'Cleaning up...'
-    # [[ -d '.taq/' ]] && taq stop sandbox
-    [[ -d '.taq/' ]] && taq stop sandbox && return_to_script_dir
+    # [[ -d '.taq/' ]] && taq stop sandbox && return_to_script_dir
     _ok 'Done'
 }
 
 # Modify to taste
 steps=(
-    _clean_demo
-    _setup_verify_demo
+    # _clean_demo
+    # _setup_verify_demo
 
     # # Demo Init
     # taq_init_taq_demo # n.b. this will cd into the created directory
@@ -220,11 +221,12 @@ steps=(
     # copy_smartpy_to_contracts
     # run_smartpy_tests
 
-    # # <--- `taq init` above, `taq scaffold` below --->
+    # <--- `taq init` above, `taq scaffold` below --->
 
     # Demo Scaffolding    
     _clean_demo
-    scaffold_taco_shop  # n.b. this will cd into $SCAF_DEMO_DIR
+    scaffold_taco_shop
+    _cd_scaff_demo_dir
     _prepare_scaffold_taco_shop
     start_sandbox_scaf
     list_accounts_scaf
@@ -232,10 +234,9 @@ steps=(
     originate_hello_tacos
 
     # Demo VSCE first, because dismissing it returns here: unlike start_dapp
-    open_vscode
-
+    # open_vscode
+ 
     start_dapp
-
     goodbye)
 
 resource_demo() { source $SCRIPT_DIR/taq-demo.sh; }
