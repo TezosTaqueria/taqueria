@@ -10,8 +10,8 @@ if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
         deno --version | grep 1.23 >/dev/null
         errorCode=$?
         if [ $errorCode -ne 0 ]; then
-            echo "Deno is installed, but not using v1.23.x."
-            exit $errorCode
+           echo "Deno is installed, but not using v1.23.x."
+           exit $errorCode
         fi
 
         if [  -z "$DENO_TARGET" ]; then

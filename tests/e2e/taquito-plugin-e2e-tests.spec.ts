@@ -98,10 +98,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// see https://github.com/ecadlabs/taqueria/issues/1635
-	// works manually
-	// might not be working in tests because of the hyphen in the task name
-	test.skip('instantiate-account will give contextual help', async () => {
+	test('instantiate-account will give contextual help', async () => {
 		const { execute, spawn, cleanup } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
@@ -112,9 +109,9 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		);
 		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
-		const { stdout: stdout2 } = await execute('taq', 'instantiate-account --help');
-		expect(stdout2).toContain(
-			'Instantiate all accounts declared in the "accounts" field at the root level of the config file to a target environment',
+		const { stdout: stdout2 } = await execute('taq', 'instantiate-account --help', './test-project');
+		expect(stdout2.join('')).toContain(
+			'Instantiate all accounts declared in the "accounts" field at the root level',
 		);
 
 		await cleanup();

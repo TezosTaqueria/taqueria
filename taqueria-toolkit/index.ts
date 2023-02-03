@@ -12,6 +12,11 @@ const DEFAULT_ENV_VAR_PREFIX = '';
 function withEnv(env: Record<string, string | undefined>, prefix = DEFAULT_ENV_VAR_PREFIX) {
 	const getConfigEnvKey = () => `${prefix}TAQ_CONFIG`;
 
+	const decode = (value: string) => {
+		const buffer = Buffer.from(value, 'base64');
+		return buffer.toString('utf8');
+	};
+
 	const getRawConfig = () => {
 		const key = getConfigEnvKey();
 		const data = env[key];
@@ -21,7 +26,7 @@ function withEnv(env: Record<string, string | undefined>, prefix = DEFAULT_ENV_V
 			);
 		}
 		try {
-			const decoded = atob(data);
+			const decoded = decode(data);
 			const rawConfig = JSON.parse(decoded);
 			return rawConfig;
 		} catch {
@@ -41,7 +46,7 @@ function withEnv(env: Record<string, string | undefined>, prefix = DEFAULT_ENV_V
 			return ConfigEnvironmentFileV2.from({});
 		}
 		try {
-			const decoded = atob(data);
+			const decoded = decode(data);
 			const rawConfig = JSON.parse(decoded);
 			return ConfigEnvironmentFileV2.from(rawConfig);
 		} catch {

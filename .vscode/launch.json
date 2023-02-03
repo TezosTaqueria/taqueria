@@ -12,8 +12,8 @@
 			"outFiles": ["${workspaceFolder}/taqueria-vscode-extension/out/**/*.js"],
 			"preLaunchTask": "build-and-watch-vscode",
 			"env": {
-				"LogLevel": "warn",
-				"InstallDevPlugins": "false"
+				"TaqLogLevel": "warn",
+				"PluginVersionToInstall": "local"
 			}
 		},
 		{
@@ -30,7 +30,7 @@
 			"outFiles": ["${workspaceFolder}/taqueria-vscode-extension/out/**/*.js"],
 			"preLaunchTask": "npm: pretest",
 			"env": {
-				"LogLevel": "debug"
+				"TaqLogLevel": "warn"
 			}
 		}
 	]

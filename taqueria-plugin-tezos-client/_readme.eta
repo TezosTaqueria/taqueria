@@ -7,7 +7,7 @@ The Tezos Client plugin provides tasks to analyze contracts including type check
 ## Requirements
 
 - Taqueria v0.26.0 or later
-- Node.js v16.17.1 or later
+- Node.js v16.16 or later. (v17.x.x or later is not supported)
 - Docker v20.10.12 or later
 
 ## Installation
@@ -30,6 +30,16 @@ taq typecheck <contractName>
 
 ### Basic description
 This task typechecks a Michelson file in `artifacts` and reports a failure or success
+
+## The `taq typecheck-all` task
+
+Basic usage is:
+```shell
+taq typecheck-all
+```
+
+### Basic description
+Performs the same function as `taq typecheck`, but performs type-checking for all contracts in the `artifacts` directory.
 
 ## The `taq simulate` task
 
