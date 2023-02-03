@@ -1,0 +1,26 @@
+header {
+  display: grid;
+  grid-template-columns: 30% 40% 30%;
+  align-items: center;
+  padding: 20px;
+  background-color: #28c2a0;
+}
+header .header__logo {
+  text-align: left;
+}
+header .header__logo img {
+  height: 50px;
+}
+header .header__title {
+  text-align: center;
+  color: white;
+}
+header .header__title h1 {
+  margin: 0px;
+  padding: 0px;
+}
+header .header__connection-status {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}

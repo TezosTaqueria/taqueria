@@ -1,0 +1,32 @@
+on: [push]
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  taco-shop-compile-and-originate:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Setup repo
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: install modules
+        run: |
+          npm update
+          npm ci
+
+      - name: Taqueria compile and originate
+        uses: ecadlabs/taqueria-github-action@v0.12.0
+        with:
+          plugins: '@taqueria/plugin-ligo, @taqueria/plugin-jest, @taqueria/plugin-taquito'
+          compile_contracts: hello-tacos.mligo
+          deploy_contracts: hello-tacos.tz
+          sandbox_name: local
+          test_plugin: jest

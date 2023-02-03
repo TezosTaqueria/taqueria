@@ -1,0 +1,15 @@
+button.wallet {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: light-grey;
+  font-size: 1rem;
+  border: solid 1px grey;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+button.wallet img {
+  width: 20px;
+  height: 20px;
+}

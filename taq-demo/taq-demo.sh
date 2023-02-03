@@ -107,9 +107,8 @@ compile_smartpy_contracts() { echo 'taq compile-all --plugin @taqueria/plugin-sm
 run_smartpy_tests() { echo 'taq test hello-tacos.py --plugin @taqueria/plugin-smartpy'; }
 
 # Scaffold functionality
-start_sandbox_development() { _start_sandbox development; }
-start_dapp() { echo 'npm run start:app' ; }
-list_accounts_scaf() { echo 'taq list accounts development'; }
+
+start_dapp() { echo 'npm run start:app &' ; } # fork so script doesn't exit
 
 _contract_address() {
     (( $# != 1 )) && _err 'Missing environment argument' && return 1
@@ -162,7 +161,7 @@ _prepare_scaffold_taco_shop() {
 scaffold_taco_shop() {
     [[ ! -f taq-demo.sh ]] && _err 'Not in script root' && return 1
     [[ -d $SCAF_DEMO_DIR ]] && _err 'Project exists' && return 2
-    local url='file:////home/edward/work/ecad/taqueria/taq-demo/skel/taq-scaf-cached4'
+    local url='file:////home/edward/work/ecad/taqueria/taq-demo/skel/taq-scaf-cached'
     # local url='https://github.com/ecadlabs/taqueria-scaffold-taco-shop'
     echo "taq scaffold -b prerelease $url $SCAF_DEMO_DIR"
 }
@@ -227,14 +226,13 @@ steps=(
     _clean_demo
     scaffold_taco_shop  # n.b. this will cd into $SCAF_DEMO_DIR
     _prepare_scaffold_taco_shop
-
-    # Demo VSCE first, because dismissing it returns here: unlike start_dapp
-    open_vscode
-
     start_sandbox_scaf
     list_accounts_scaf
     compile_ligo_contracts
     originate_hello_tacos
+
+    # Demo VSCE first, because dismissing it returns here: unlike start_dapp
+    open_vscode
 
     start_dapp
 

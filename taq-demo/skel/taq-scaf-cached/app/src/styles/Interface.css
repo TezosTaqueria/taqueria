@@ -1,0 +1,98 @@
+:root {
+  --anim-duration: 3.5s;
+}
+
+.interface {
+  position: relative;
+  width: 80%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.amount-of-tacos {
+  width: 80%;
+  font-size: 1.5rem;
+  text-align: center;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+.amount-of-tacos > div {
+  width: 100%;
+}
+.amount-of-tacos__storage {
+  font-size: 1.9rem;
+}
+
+input[type="number"] {
+  font-size: 1.5rem;
+  width: 100px;
+  padding: 10px;
+  border: solid 1px grey;
+  border-radius: 10px;
+}
+
+button.order {
+  background-color: #ff8f80;
+  font-size: 1rem;
+  border: solid 1px grey;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+button.order:disabled {
+  background-color: #ff8f8088;
+  color: grey;
+  border: solid 1px transparent;
+}
+
+.ordering-tacos {
+  width: 200px;
+  position: relative;
+}
+.ordering-tacos img {
+  position: absolute;
+}
+.ordering-tacos img:first-child {
+  animation: linear infinite;
+  animation-name: run;
+  animation-duration: var(--anim-duration);
+  -webkit-animation: linear infinite;
+  -webkit-animation-name: run;
+  -webkit-animation-duration: var(--anim-duration);
+}
+.ordering-tacos img:not(:first-child) {
+  animation: linear infinite;
+  animation-name: run;
+  animation-duration: var(--anim-duration);
+  animation-delay: 0.4s;
+  -webkit-animation: linear infinite;
+  -webkit-animation-name: run;
+  -webkit-animation-duration: var(--anim-duration);
+  -webkit-animation-delay: 0.4s;
+}
+@-webkit-keyframes run {
+  0% {
+    left: 0px;
+  }
+  50% {
+    left: calc(200px - 32px);
+  }
+  100% {
+    left: 0px;
+  }
+}
+@keyframes run {
+  0% {
+    left: 0px;
+  }
+  50% {
+    left: calc(200px - 32px);
+  }
+  100% {
+    left: 0px;
+  }
+}

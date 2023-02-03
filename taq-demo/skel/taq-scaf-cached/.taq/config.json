@@ -1,0 +1,88 @@
+{
+	"version": "v2",
+	"language": "en",
+	"artifactsDir": "artifacts",
+	"contractsDir": "contracts",
+	"accounts": {
+		"bob": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"alice": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"john": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"jane": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		},
+		"joe": {
+			"balance": {
+				"amount": "3_000_000_000",
+				"units": "mutez"
+			}
+		}
+	},
+	"environmentDefault": "testing",
+	"environments": {
+		"development": {
+			"type": "flextesa",
+			"label": "Local Tezos Sandbox",
+			"rpcUrl": "http://localhost:20000"
+		},
+		"testing": {
+			"type": "simple",
+			"label": "ghostnet",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
+			"contracts": {
+				"hello-tacos": {
+					"address": "KT1VABCpYdHwVt4KQyadfLpNsJtpqzCgFvqJ"
+				}
+			},
+			"networkName": "ghostnet",
+			"accounts": {
+				"taqOperatorAccount": {
+					"publicKey": "edpku75M92YKUfnXtgXAp15ToHATPWhqotdKLEcgjVDsWWor8ZMjge",
+					"publicKeyHash": "tz1RENwgnqPSpYcP7qCjUdEQYN4JdgdnAERt",
+					"privateKey": "edskRzxEMufesxjThqjXkRC5jtwQrJkyPhMt7sCc2MwPhftZLk9XjButF5nN8cVVtUdW4fFBDRsBJG2C6qm3AePieBt4SAxmpk",
+					"mnemonic": "cake noble burger super confirm wasp ahead doll barrel museum endless hello"
+				}
+			}
+		},
+		"production": {
+			"type": "simple",
+			"label": "mainnet",
+			"rpcUrl": "https://mainnet.api.tez.ie"
+		}
+	},
+	"plugins": [
+		{
+			"type": "npm",
+			"name": "@taqueria/plugin-ligo"
+		},
+		{
+			"type": "npm",
+			"name": "@taqueria/plugin-flextesa"
+		},
+		{
+			"type": "npm",
+			"name": "@taqueria/plugin-taquito"
+		},
+		{
+			"type": "npm",
+			"name": "@taqueria/plugin-jest"
+		}
+	]
+}

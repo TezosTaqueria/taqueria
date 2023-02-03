@@ -1,0 +1,24 @@
+footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  background-color: #313846;
+  padding: 30px 0px;
+}
+footer > div {
+  width: 40px;
+  height: 40px;
+  border: solid 2px white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+footer img {
+  width: 24px;
+  height: 24px;
+  margin: 3px 0px 0px 2px;
+}

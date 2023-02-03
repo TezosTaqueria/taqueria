@@ -1,0 +1,37 @@
+[
+	{ "prim": "parameter", "args": [{ "prim": "nat" }] },
+	{ "prim": "storage", "args": [{ "prim": "nat" }] },
+	{
+		"prim": "code",
+		"args": [
+			[
+				{ "prim": "UNPAIR" },
+				{ "prim": "SWAP" },
+				{ "prim": "DUP" },
+				{ "prim": "DUG", "args": [{ "int": "2" }] },
+				{ "prim": "SWAP" },
+				{ "prim": "DUP" },
+				{ "prim": "DUG", "args": [{ "int": "2" }] },
+				{ "prim": "COMPARE" },
+				{ "prim": "GT" },
+				{
+					"prim": "IF",
+					"args": [
+						[
+							{ "prim": "DROP", "args": [{ "int": "2" }] },
+							{ "prim": "PUSH", "args": [{ "prim": "string" }, { "string": "NOT_ENOUGH_TACOS" }] },
+							{ "prim": "FAILWITH" }
+						],
+						[
+							{ "prim": "SWAP" },
+							{ "prim": "SUB" },
+							{ "prim": "ABS" },
+							{ "prim": "NIL", "args": [{ "prim": "operation" }] },
+							{ "prim": "PAIR" }
+						]
+					]
+				}
+			]
+		]
+	}
+]
