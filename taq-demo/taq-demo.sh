@@ -27,6 +27,7 @@ check_node_version() {
 }
 
 _setup_verify_demo() {
+    _clean_demo
     nvm use 16 > /dev/null
     check_node_version # belt and braces
 }
@@ -42,7 +43,7 @@ check_taq_version() {
 set_nvm() { echo 'nvm use 16'; }
 
 _clean_demo() {
-    # [[ -d '.taq/' ]] && taq stop sandbox
+    [[ -d '.taq/' ]] && taq stop sandbox
     cd $SCRIPT_DIR && rm -rf $INIT_DEMO && rm -rf $SCAF_DEMO;
 }
 
@@ -155,9 +156,9 @@ _delete_state() {
 }
 
 _prepare_scaffold_taco_shop() {
-    _scaffold_toolkit_hack
-    taq set-environment development  # *** Currently errors out ***
+    # _scaffold_toolkit_hack
     _delete_state
+    taq set-environment development
 }
 
 _cd_scaff_demo_dir() { cd $SCAF_DEMO; }
@@ -178,48 +179,47 @@ goodbye() {
 
 # Modify to taste
 steps=(
-    # _clean_demo
-    # _setup_verify_demo
+    _setup_verify_demo
 
-    # # Demo Init
-    # taq_init_taq_demo # n.b. this will cd into the created directory
-    # _cd_init_demo_dir
-    # list_contents
-    # display_environment
-    # display_help
+    # Demo Init
+    taq_init_taq_demo # n.b. this will cd into the created directory
+    _cd_init_demo_dir
+    list_contents
+    display_environment
+    display_help
 
-    # _install_core_plugin # Do this silently, it's a detail
+    _install_core_plugin # Do this silently, it's a detail
 
-    # # Demo Ligo plugin
-    # install_ligo_plugin
-    # display_help
-    # copy_ligo_to_contracts
-    # compile_single_contract
-    # list_contents
-    # compile_ligo_contracts
-    # run_ligo_tests
+    # Demo Ligo plugin
+    install_ligo_plugin
+    display_help
+    copy_ligo_to_contracts
+    compile_single_contract
+    list_contents
+    compile_ligo_contracts
+    run_ligo_tests
 
-    # # Demo flextesa plugin
-    # install_flextesa_plugin
-    # display_help
-    # start_sandbox_init
-    # list_accounts_init
+    # Demo flextesa plugin
+    install_flextesa_plugin
+    display_help
+    start_sandbox_init
+    list_accounts_init
 
-    # # Demo Taquito plugin
-    # install_taquito_plugin
-    # originate_hello_tacos
-    # # print_storage
+    # Demo Taquito plugin
+    install_taquito_plugin
+    originate_hello_tacos
+    # print_storage
 
-    # # Demo Contract-Types plugin
-    # install_contract_types_plugin
-    # generate_types
-    # show_generated_type
+    # Demo Contract-Types plugin
+    install_contract_types_plugin
+    generate_types
+    show_generated_type
 
-    # # Demo SmartPy plugin
-    # install_smartpy_plugin
-    # _clean_contracts
-    # copy_smartpy_to_contracts
-    # run_smartpy_tests
+    # Demo SmartPy plugin
+    install_smartpy_plugin
+    _clean_contracts
+    copy_smartpy_to_contracts
+    run_smartpy_tests
 
     # <--- `taq init` above, `taq scaffold` below --->
 
