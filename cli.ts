@@ -380,7 +380,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 			pipe(
 				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
 				chain(args => NPM.installPlugin(config, config.projectDir, i18n, env, args)),
-				chain(() => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
+				chain(config => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
 				map(() => log(i18n.__('pluginInstalled'))),
 			),
 	});
@@ -408,7 +408,7 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 			pipe(
 				SanitizedArgs.ofUninstallTaskArgs(parsedArgs),
 				chain(parsedArgs => NPM.uninstallPlugin(config, config.projectDir, i18n, env, parsedArgs)),
-				chain(() => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
+				chain(config => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
 				map(() => log(i18n.__('pluginUninstalled'))),
 			),
 	});
