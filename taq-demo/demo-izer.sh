@@ -60,12 +60,11 @@ demo() {
                 echo -n "$ $command"
                 action='o'
             fi
-            echo "Action is $action"
             case $action in
                 o|$'\n') tput setaf $OK_COLOR && eval $command && newline ;;
                 s) _warn "Skipping $step" ;;
-                r) eval ${steps[ctr-1]} && continue ;;
-                p) (( ctr-- )) && continue ;;
+                r) eval ${steps[ctr-1]} && continue ;; # TODO Skip back to last *public* method
+                p) (( ctr-- )) && continue ;; # TODO Skip back to last *public* method
                 q) goodbye && break ;;
                 c) echo -n "\n$ " && read command && eval $command && newline && continue;;
                 h) echo $help && continue ;;
