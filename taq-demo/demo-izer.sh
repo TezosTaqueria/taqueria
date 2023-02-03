@@ -42,19 +42,25 @@ _is_private_command() { [[ ${1:0:1} == '_' ]]; }
 demo() {
     local help=' ↪ (o)k | (s)kip | (r)epeat | (p)revious | (q)uit | (c)ommand'
     local ctr=1
+    [[ $AUTO_DEMO_MODE == 'true' ]] && _ok 'Auto-demo mode set: on your marks...'
     while do
         _reset_terminal_colors
-        unset action
+        [[ $AUTO_DEMO_MODE == 'true' ]] && unset action
         local step=${steps[ctr]}
-        # echo "Current step: $step"
         [[ $step =~ 'goodbye' ]] && goodbye && break # say goodbye automatically
         if _is_private_command $step; then
-            # echo "Evaluating private command $step"
             eval $step # private commands run silently
         else
-            command=$(eval $step)  # get the command
+            command=$(eval $step)  # get the command echoed from `step`
             tput setaf $COMMAND_COLOR
-            vared -p "$ $command " -c action
+            if [[ $AUTO_DEMO_MODE != 'true' ]]; then
+                vared -p "$ $command " -c action  # print command and ask for $action
+            else
+                # Auto-demo mode: emulate $command and setup $action (o)k
+                echo -n "$ $command"
+                action='o'
+            fi
+            echo "Action is $action"
             case $action in
                 o|$'\n') tput setaf $OK_COLOR && eval $command && newline ;;
                 s) _warn "Skipping $step" ;;
