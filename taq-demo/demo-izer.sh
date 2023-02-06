@@ -59,6 +59,7 @@ demo() {
                 # Auto-demo mode: emulate $command and setup $action (o)k
                 echo -n "$ $command"
                 action='o'
+                newline
             fi
             case $action in
                 o|$'\n') tput setaf $OK_COLOR && eval $command && newline ;;

@@ -12,12 +12,12 @@
 EXPECTED_TAQ_VERSION='v0.28.0'
 SCRIPT_DIR=${0:a:h} # full path to this script
 
-# Directories names to use to demo the `taq init` and `taq scaffold` tasks respectively
-# WARNING These get blown away arbitrarily: don't store anything therein
+# These demo directories are for the `taq init` and `taq scaffold` tasks respectively
+# ** WARNING These get blown away on startup **
 INIT_DEMO='taq-init-demo'
 SCAF_DEMO='taq-scaf-demo'
 
-export AUTO_DEMO_MODE='false'
+export AUTO_DEMO_MODE='true'
 source ./demo-izer.sh
 
 check_node_version() {
@@ -43,7 +43,7 @@ check_taq_version() {
 set_nvm() { echo 'nvm use 16'; }
 
 _clean_demo() {
-    [[ -d '.taq/' ]] && taq stop sandbox
+    _stop_sandbox
     cd $SCRIPT_DIR && rm -rf $INIT_DEMO && rm -rf $SCAF_DEMO;
 }
 
@@ -72,25 +72,22 @@ return_to_script_dir() { cd $SCRIPT_DIR; } # return to starting point
 _install_plugin() { echo "taq install @taqueria/${1}" }
 
 _install_core_plugin() { taq install @taqueria/plugin-core >& /dev/null ; }
-install_ligo_plugin() { echo 'taq install @taqueria/plugin-ligo' ; }
-install_taquito_plugin() { echo 'taq install @taqueria/plugin-taquito' ; }
-install_flextesa_plugin() { echo 'taq install @taqueria/plugin-flextesa' ; }
-install_smartpy_plugin() { echo 'taq install @taqueria/plugin-smartpy' ; }
-install_contract_types_plugin() { echo 'taq install @taqueria/plugin-contract-types' ; }
 
+# Ligo plugin
+install_ligo_plugin() { echo 'taq install @taqueria/plugin-ligo' ; }
+compile_single_contract() { echo 'taq compile hello-tacos.mligo'; }
+compile_ligo_contracts() { echo 'taq compile-all --plugin @taqueria/plugin-ligo'; }
+run_ligo_tests() { echo 'taq test hello-tacos.test.mligo --plugin @taqueria/plugin-ligo'; }
 copy_ligo_to_contracts() {
     [[ ! -d 'contracts/' ]] && _err 'No `contracts/` directory found' && return 1
     echo 'cp ../skel/*.mligo contracts/'
 }
 
-# Ligo plugin
-compile_single_contract() { echo 'taq compile hello-tacos.mligo'; }
-compile_ligo_contracts() { echo 'taq compile-all --plugin @taqueria/plugin-ligo'; }
-run_ligo_tests() { echo 'taq test hello-tacos.test.mligo --plugin @taqueria/plugin-ligo'; }
-
 # Flextesa plugin
+install_flextesa_plugin() { echo 'taq install @taqueria/plugin-flextesa' ; }
+_stop_sandbox() { [[ -d '.taq/' ]] && taq stop sandbox >& /dev/null; }
 _start_sandbox() {
-    taq stop sandbox $1 > /dev/null
+    _stop_sandbox
     echo "taq start sandbox $1"
 }
 # Sandbox names currently differ between {init,scaffold}'d projects....
@@ -102,22 +99,31 @@ list_accounts_init() { sleep 1; echo 'taq list accounts local'; }
 list_accounts_scaf() { sleep 1; echo 'taq list accounts development'; }
 
 # Taquito plugin
+install_taquito_plugin() { echo 'taq install @taqueria/plugin-taquito' ; }
 originate_hello_tacos() { echo 'taq originate hello-tacos.tz'; }
 
 # SmartPy Plugin
+install_smartpy_plugin() { echo 'taq install @taqueria/plugin-smartpy' ; }
 compile_smartpy_contracts() { echo 'taq compile-all --plugin @taqueria/plugin-smartpy'; }
 run_smartpy_tests() { echo 'taq test hello-tacos.py --plugin @taqueria/plugin-smartpy'; }
 
-start_dapp() { echo 'npm run start:app &' ; }
+# Contract types plugin
+install_contract_types_plugin() { echo 'taq install @taqueria/plugin-contract-types' ; }
+generate_types() { echo 'taq generate types'; }
+show_generated_type() {
+    # `pyg` is a function to color-code files on stdout, based on Pygmentize. Happy to share.
+    pager=$([[ `uname -n` =~ gauss ]] && echo 'pyg' || echo 'less')
+    echo "$pager 'types/hello-tacos.types.ts'"
+}
 
 _contract_address() {
     (( $# != 1 )) && _err 'Missing environment argument' && return 1
     dev_json=$(find -type f -name config.local.${1}.json)
     jq -r '.contracts."hello-tacos"."address"' $dev_json # assumes one is there!
 }
-# Not 'scripted'; for interactive use, e.g. with (c)ommand action
-development_contract_address() { _contract_address development; }
-testing_contract_address() { _contract_address testing; }
+# These are not scripted directly; they are for interactive use, e.g. with (c)ommand action
+development_contract_address() { _contract_address development; }  # sandbox
+testing_contract_address() { _contract_address testing; }  # ghostnet
 
 print_storage() {
     address=$(contract_address)
@@ -132,13 +138,6 @@ copy_smartpy_to_contracts() {
 }
 
 set_development_environment() { echo 'taq set-environment development'; }
-
-generate_types() { echo 'taq generate types'; }
-show_generated_type() {
-    # `pyg` is a function to color-code files on stdout, based on Pygmentize. Happy to share.
-    pager=$([[ `uname -n` =~ gauss ]] && echo 'pyg' || echo 'less')
-    echo "$pager 'types/hello-tacos.types.ts'"
-}
 
 _scaffold_toolkit_hack() {
     cd ${SCRIPT_DIR}/${SCAF_DEMO} # ensure location
@@ -173,7 +172,8 @@ open_vscode() { code-insiders .; }
 
 goodbye() {
     _ok 'Cleaning up...'
-    # [[ -d '.taq/' ]] && taq stop sandbox && return_to_script_dir
+    _stop_sandbox
+    return_to_script_dir
     _ok 'Done'
 }
 
@@ -236,7 +236,6 @@ steps=(
     # Demo VSCE first, because dismissing it returns here: unlike start_dapp
     # open_vscode
  
-    start_dapp
     goodbye)
 
 resource_demo() { source $SCRIPT_DIR/taq-demo.sh; }
