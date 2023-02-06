@@ -4,6 +4,14 @@ This directory contains a script `taq-demo.sh` which showcases Taqueria function
 
 Principle: Everything created/modified during the demo is left intact. It is on *startup* that the working/demo directories are blown away. This way you have a record of what happened, but start fresh and idempotently each time.
 
+# AUTO_DEMO_MODE
+
+The `demo-izer.sh` script hooks a flag, `AUTO_DEMO_MODE`, which if set to `true` in a client script, causes the script to be executed without user input. This can be useful for memory-leak testing (in a long-lived loop), validating changes, or rudimentary performance testing.
+
+## Known Issue
+
+Note that in the case of `taq-demo.sh` the `taq list accounts` function will emit errors in `AUTO_DEMO_MODE`. This does not happen in "manual" mode. It may be because of a race condition, whereby the sandbox is ready to answer requests before the internal accounts have been completely initialized.
+
 ## The Demoizer
 
 `taq-demo.sh` is a client of the generic `demo-izer.sh` script, which may become its own repo. The `demo-izer.sh` script is the *driver*, while `taq-demo.sh` provides the *`steps`*.
@@ -31,10 +39,6 @@ You need to be careful about which actions you skip, as some actions will natura
 ### Private Method Idempotency
 
 Private methods should be idempotent, such that the `previous` and (future) `repeat` commands can be re-executed without problems. Be aware this might mandate that you check some given state first.
-
-# Auto-Mode
-
-The `demo-izer.sh` script hooks `AUTO_DEMO_MODE`, an exported variable which if set to `true` in a client script will cause all the `steps` to be executed sequentially automagically. This can be useful for stress testing, or validating changes, in an `e2e` fashion.
 
 # TODO
 
