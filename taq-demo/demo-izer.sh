@@ -40,7 +40,7 @@ _reset_terminal_colors() { tput sgr0; } # "select graphic rendition 0"
 _is_private_command() { [[ ${1:0:1} == '_' ]]; }
 
 demo() {
-    local help=' ↪ (o)k | (s)kip | (r)epeat | (p)revious | (q)uit | (c)ommand'
+    local help=' ↪ (o)k | (s)kip | (p)revious | (q)uit | (c)ommand'
     local ctr=1
     [[ $AUTO_DEMO_MODE == 'true' ]] && _ok 'Auto-demo mode set: on your marks...'
     while do
@@ -64,7 +64,7 @@ demo() {
             case $action in
                 o|$'\n') tput setaf $OK_COLOR && eval $command && newline ;;
                 s) _warn "Skipping $step" ;;
-                r) eval ${steps[ctr-1]} && continue ;; # TODO Skip back to last *public* method
+                # r) eval ${steps[ctr-1]} && continue ;; # TODO Skip back to last *public* method
                 p) (( ctr-- )) && continue ;; # TODO Skip back to last *public* method
                 q) goodbye && break ;;
                 c) echo -n "\n$ " && read command && eval $command && newline && continue;;
