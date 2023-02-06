@@ -2,7 +2,22 @@
 
 This directory contains a script `taq-demo.sh` which showcases Taqueria functionality in a sane, predictable, repeatable, and idempotent fashion. It takes care of many small details like copying files, and ensures that all pre-requisites are met, which might normally trip up an "ad hoc" demo. It endeavors to appear as a simple runner. The idea is to focus on core functionality, and for details like copying files and checking versions of stuff to fade into the background.
 
+## Demo Idempotence
+
 Principle: Everything created/modified during the demo is left intact. It is on *startup* that the working/demo directories are blown away. This way you have a record of what happened, but start fresh and idempotently each time.
+
+## Important
+
+* Wait for the prompt to return before hitting `<Enter>`; there is sometimes background work
+* Wait a moment after starting the sandbox and before listing accounts for best results
+
+## Why Demo Inside `taqueria`?
+
+You might be asked why the taq-demo exists in the `taqueria` hierarchy. The reasons are:
+
+1. This script can act as a poor-man's E2E test of taqueria functionality
+2. This script is contingent on changes to the `taqueria` code base, so should be colocated
+3. Monorepos are good for such integration; segregating this would foster a maintenance burden
 
 # AUTO_DEMO_MODE
 

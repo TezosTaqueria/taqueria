@@ -33,7 +33,11 @@ _err() { # print error to stderr
     echo "$@" 1>&2 "\n"
 }
 
-_pause() { read; } # Simply wait for a keystroke
+_pause() {
+    # Simply wait for a keystroke, unless in AUTO_DEMO_MODE
+    [[ $AUTO_DEMO_MODE == 'true' ]] && return 0
+    read
+} 
 
 _reset_terminal_colors() { tput sgr0; } # "select graphic rendition 0"
 

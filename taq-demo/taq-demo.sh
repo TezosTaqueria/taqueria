@@ -10,7 +10,7 @@
 # See the README for more details.
 
 EXPECTED_TAQ_VERSION='v0.28.0'
-SCRIPT_DIR=${0:a:h} # full path to this script
+SCRIPT_DIR=${0:a:h} # full path to this script; top-level for demo functionality
 
 # These demo directories are for the `taq init` and `taq scaffold` tasks respectively
 # ** WARNING These get blown away on startup **
@@ -18,7 +18,7 @@ INIT_DEMO='taq-init-demo'
 SCAF_DEMO='taq-scaf-demo'
 
 export AUTO_DEMO_MODE='false'
-source ./demo-izer.sh
+source $SCRIPT_DIR/demo-izer.sh
 
 check_node_version() {
     IFS=\. read -r major minor patch < <(node --version)
@@ -171,6 +171,14 @@ scaffold_taco_shop() {
 _open_vscode() { _ok 'Use (c)ommand and open manually Visual Studio Code with: `$ code .`'; }
 _start_dapp() { _ok 'Run the Dapp in a separate shell with: `$ npm run start:app`'; }
 
+# Overwrite current `config.json` with one set up for manual baking
+_change_config_to_manual_baking() { cp $SCRIPT_DIR/skel/config.annotated.json .taq/config.json; }
+
+_ask_user_to_bake_block_manually() {
+    _ok 'Now manually bake a block with `taq bake` in another shell'
+    _pause
+}
+
 goodbye() {
     _ok 'Cleaning up...'
     _stop_sandbox
@@ -224,7 +232,7 @@ steps=(
 
     # <--- `taq init` above, `taq scaffold` below --->
 
-    # Demo Scaffolding    
+    # Demo Scaffolding
     _clean_demo
     scaffold_taco_shop
     _cd_scaff_demo_dir
@@ -241,7 +249,7 @@ steps=(
     # Manually start VSCode and demo the extension....
     _open_vscode
     _pause
- 
+
     goodbye)
 
 resource_demo() { source $SCRIPT_DIR/taq-demo.sh; }
