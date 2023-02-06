@@ -17,7 +17,7 @@ SCRIPT_DIR=${0:a:h} # full path to this script
 INIT_DEMO='taq-init-demo'
 SCAF_DEMO='taq-scaf-demo'
 
-export AUTO_DEMO_MODE='true'
+export AUTO_DEMO_MODE='false'
 source ./demo-izer.sh
 
 check_node_version() {
@@ -168,7 +168,8 @@ scaffold_taco_shop() {
     echo "taq scaffold -b prerelease https://github.com/ecadlabs/taqueria-scaffold-taco-shop $SCAF_DEMO"
 }
 
-open_vscode() { code-insiders .; }
+_open_vscode() { _ok 'Use (c)ommand and open manually Visual Studio Code with: `$ code .`'; }
+_start_dapp() { _ok 'Run the Dapp in a separate shell with: `$ npm run start:app`'; }
 
 goodbye() {
     _ok 'Cleaning up...'
@@ -233,8 +234,13 @@ steps=(
     compile_ligo_contracts
     originate_hello_tacos
 
-    # Demo VSCE first, because dismissing it returns here: unlike start_dapp
-    # open_vscode
+    # Manually start the dapp and demo Beacon wallet -> sandbox coolness
+    _start_dapp
+    _pause
+
+    # Manually start VSCode and demo the extension....
+    _open_vscode
+    _pause
  
     goodbye)
 

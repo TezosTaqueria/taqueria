@@ -33,6 +33,8 @@ _err() { # print error to stderr
     echo "$@" 1>&2 "\n"
 }
 
+_pause() { read; } # Simply wait for a keystroke
+
 _reset_terminal_colors() { tput sgr0; } # "select graphic rendition 0"
 
 # Private commands are executed w/o reading 'action' from the user
@@ -75,6 +77,3 @@ demo() {
         (( $? == 0)) && (( ctr++ )) # Advance iff last step was successful
     done
 }
-
-resource_demo() { source $SCRIPT_DIR/taq-demo.sh; }
-alias res=resource_demo
