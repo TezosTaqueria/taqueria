@@ -115,9 +115,11 @@ const getVersion = (inputArgs: DenoArgs) => {
 		: 'not-provided';
 };
 
-const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
-	yargs(args)
+const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
+	const instance = yargs(args);
+	return instance
 		.scriptName('taq')
+		.wrap(Deno.consoleSize(Deno.stdout.rid).columns)
 		.option('setVersion', {
 			describe: i18n.__('setVersionDesc'),
 			demandOption: true,
@@ -173,6 +175,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) =>
 		})
 		.epilogue(i18n.__('betaWarning'))
 		.help(false);
+};
 
 const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	// Add "init" task used to initialize a new project
