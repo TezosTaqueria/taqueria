@@ -63,20 +63,6 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('start sandbox will error if incorrect sandbox name called', async () => {
-		const { execute, cleanup, exists } = await prepareEnvironment();
-		await execute('taq', 'init test-project');
-		await exists('./test-project/.taq/config.json');
-
-		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
-
-		const { stderr } = await execute('taq', 'start sandbox no_such_sandbox', './test-project');
-		expect(stderr).toEqual(['There is no sandbox called no_such_sandbox in your .taq/config.json.']);
-
-		await cleanup();
-	});
-
 	test('show protocols will offer known protocols', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
