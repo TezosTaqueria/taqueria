@@ -237,4 +237,76 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		expect(hash).toEqual('241556bb7f849d22564378991ce6c15ffd7fd5727620f207fb53e6dc538e66ef');
 		await cleanup();
 	});
+
+	test('ligo compile will compile counter contracts with renamed parameter file', async () => {
+		const { execute, cleanup, writeFile, exists, ls } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+
+		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ligo/index.js');
+
+		const mligo_file = await (await exec(`cat e2e/data/ligo-data/counter.mligo`)).stdout;
+		await writeFile('./test-project/contracts/counter.mligo', mligo_file);
+		const storage_file = await (await exec(`cat e2e/data/ligo-data/counter.storageList.mligo`)).stdout;
+		await writeFile('./test-project/contracts/counter.storageList.mligo', storage_file);
+		const parameter_file = await (await exec(`cat e2e/data/ligo-data/counter.parameterList.mligo`)).stdout;
+		await writeFile('./test-project/contracts/counter.parameters.mligo', parameter_file);
+		expect(await ls('./test-project/contracts')).toEqual(
+			expect.arrayContaining(['counter.mligo', 'counter.parameters.mligo', 'counter.storageList.mligo']),
+		);
+
+		const { stdout: stdout1 } = await execute('taq', 'compile counter.mligo', './test-project');
+		expect(stdout1).toMatchInlineSnapshot(`
+              [
+                "┌───────────────────────────┬───────────────────────────────────────────────┐",
+                "│ Contract                  │ Artifact                                      │",
+                "├───────────────────────────┼───────────────────────────────────────────────┤",
+                "│ counter.mligo             │ artifacts/counter.tz                          │",
+                "├───────────────────────────┼───────────────────────────────────────────────┤",
+                "│ counter.storageList.mligo │ artifacts/counter.default_storage.tz          │",
+                "│                           │ artifacts/counter.storage.another_count.tz    │",
+                "├───────────────────────────┼───────────────────────────────────────────────┤",
+                "│ counter.parameters.mligo  │ artifacts/counter.parameter.increment_by_3.tz │",
+                "└───────────────────────────┴───────────────────────────────────────────────┘",
+              ]
+          `);
+
+		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
+
+		const { stdout: stdout2 } = await execute('taq', 'start sandbox local', './test-project');
+		expect(stdout2).toEqual(expect.arrayContaining(['Starting node...']));
+
+		const { stdout: stdout3 } = await execute('taq', 'list accounts local', './test-project');
+		expect(stdout3).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
+		expect(stdout3).toEqual(expect.arrayContaining([expect.stringContaining('bob')]));
+
+		await cleanup();
+	});
+
+	test('ligo compile will error with missing storage file', async () => {
+		const { execute, cleanup, writeFile, exists, ls } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+
+		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-ligo/index.js');
+
+		const mligo_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.mligo`)).stdout;
+		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
+		const parameters_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.parameters.mligo`)).stdout;
+		await writeFile('./test-project/contracts/hello-tacos.parameters.mligo', parameters_file);
+
+		expect(await ls('./test-project/contracts')).toEqual(
+			expect.arrayContaining(['hello-tacos.mligo', 'hello-tacos.parameters.mligo']),
+		);
+
+		const { stderr } = await execute('taq', 'compile counter.mligo', './test-project');
+		expect(stderr).toEqual(
+			expect.arrayContaining([expect.stringContaining('=== Error messages for counter.mligo ===')]),
+		);
+
+		await cleanup();
+	});
 });

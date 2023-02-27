@@ -17,8 +17,8 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		await writeFile('./test-project/contracts/counter.mligo', mligo_file);
 		const storage_file = await (await exec(`cat e2e/data/ligo-data/counter.storageList.mligo`)).stdout;
 		await writeFile('./test-project/contracts/counter.storageList.mligo', storage_file);
-		const permissions_file = await (await exec(`cat e2e/data/ligo-data/counter.parameterList.mligo`)).stdout;
-		await writeFile('./test-project/contracts/counter.parameterList.mligo', permissions_file);
+		const parameter_file = await (await exec(`cat e2e/data/ligo-data/counter.parameterList.mligo`)).stdout;
+		await writeFile('./test-project/contracts/counter.parameterList.mligo', parameter_file);
 
 		const contracts_list = await ls('./test-project/contracts');
 		expect(contracts_list).toEqual(
