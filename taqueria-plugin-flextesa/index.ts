@@ -8,51 +8,33 @@ Plugin.create(_i18n => ({
 	tasks: [
 		Task.create({
 			task: 'start sandbox',
-			command: 'start sandbox [sandboxName]',
+			command: 'start sandbox',
 			aliases: ['start flextesa'],
 			description: 'Starts a flextesa sandbox',
 			options: [],
 			handler: 'proxy',
-			positionals: [
-				PositionalArg.create({
-					placeholder: 'sandboxName',
-					description: 'The name of the sandbox to start',
-				}),
-			],
 			encoding: 'none',
 		}),
 		Task.create({
 			task: 'stop sandbox',
-			command: 'stop sandbox [sandboxName]',
+			command: 'stop sandbox',
 			aliases: ['stop flextesa'],
 			description: 'Stops a flextesa sandbox',
 			options: [],
 			handler: 'proxy',
-			positionals: [
-				PositionalArg.create({
-					placeholder: 'sandboxName',
-					description: 'The name of the sandbox to stop',
-				}),
-			],
 		}),
 		Task.create({
 			task: 'list accounts',
-			command: 'list accounts <sandboxName>',
+			command: 'list accounts',
 			aliases: [],
 			description: 'List the balances of all sandbox accounts',
 			options: [],
 			handler: 'proxy',
-			positionals: [
-				PositionalArg.create({
-					placeholder: 'sandboxName',
-					description: 'The name of the sandbox to use',
-				}),
-			],
 			encoding: 'json',
 		}),
 		Task.create({
 			task: 'bake',
-			command: 'bake <sandboxName>',
+			command: 'bake',
 			aliases: ['b'],
 			description: 'Manually bake a block. Use when the "baking" setting of a flextesa sandbox is set to "disabled".',
 			options: [
@@ -66,12 +48,6 @@ Plugin.create(_i18n => ({
 			],
 			handler: 'proxy',
 			encoding: 'none',
-			positionals: [
-				PositionalArg.create({
-					placeholder: 'sandboxName',
-					description: 'The name of the sandbox to stop',
-				}),
-			],
 		}),
 		Task.create({
 			task: 'show protocols',
