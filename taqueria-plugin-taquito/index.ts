@@ -35,7 +35,7 @@ Plugin.create(_i18n => ({
 				Option.create({
 					flag: 'timeout',
 					shortFlag: 't',
-					defaultValue: 30,
+					defaultValue: 40,
 					description: 'Number of retry attempts (to avoid congestion and network failures)',
 					required: false,
 				}),
@@ -72,6 +72,13 @@ Plugin.create(_i18n => ({
 					description: 'Name of an instantiated account to use as the sender of the transfer operation',
 					required: false,
 				}),
+				Option.create({
+					flag: 'timeout',
+					shortFlag: 't',
+					defaultValue: 40,
+					description: 'Number of retry attempts (to avoid congestion and network failures)',
+					required: false,
+				}),
 			],
 			aliases: ['call'],
 			handler: 'proxy',
@@ -83,6 +90,15 @@ Plugin.create(_i18n => ({
 			description: 'Fund all the instantiated accounts up to the desired/declared amount in a target environment',
 			handler: 'proxy',
 			encoding: 'application/json',
+			options: [
+				Option.create({
+					flag: 'timeout',
+					shortFlag: 't',
+					defaultValue: 40,
+					description: 'Number of retry attempts (to avoid congestion and network failures)',
+					required: false,
+				}),
+			],
 		}),
 		Task.create({
 			task: 'instantiate-account',

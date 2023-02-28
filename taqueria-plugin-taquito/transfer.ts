@@ -14,6 +14,7 @@ import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-o
 import {
 	configureToolKitForNetwork,
 	configureToolKitForSandbox,
+	doWithin,
 	getEnvTypeAndNodeConfig,
 	handleOpsError,
 	TransferOpts as Opts,
@@ -67,12 +68,15 @@ export const performTransferOps = async (
 	tezos: TezosToolkit,
 	env: string,
 	contractsInfo: ContractInfo[],
+	maxTimeout: number,
 ): Promise<BatchWalletOperation> => {
 	const batch = createBatchForTransfer(tezos, contractsInfo);
 	try {
-		const op = await batch.send();
-		await op.confirmation();
-		return op;
+		return await doWithin<BatchWalletOperation>(maxTimeout, async () => {
+			const op = await batch.send();
+			await op.confirmation();
+			return op;
+		});
 	} catch (err) {
 		return handleOpsError(err, env);
 	}
@@ -101,7 +105,7 @@ const transfer = async (opts: Opts): Promise<void> => {
 
 		const contractInfo = await getContractInfo(opts, env);
 
-		await performTransferOps(tezos, getCurrentEnvironment(protocolArgs), [contractInfo]);
+		await performTransferOps(tezos, getCurrentEnvironment(protocolArgs), [contractInfo], opts.timeout);
 
 		const contractInfoForDisplay = prepContractInfoForDisplay(tezos, contractInfo);
 		return sendJsonRes([contractInfoForDisplay]);

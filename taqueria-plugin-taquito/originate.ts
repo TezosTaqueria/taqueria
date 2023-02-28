@@ -14,11 +14,11 @@ import {
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
-import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import {
 	configureToolKitForNetwork,
 	configureToolKitForSandbox,
+	doWithin,
 	getEnvTypeAndNodeConfig,
 	handleOpsError,
 	OriginateOpts as Opts,
@@ -87,43 +87,15 @@ const createBatchForOriginate = (tezos: TezosToolkit, contractsInfo: ContractInf
 			mutez: true,
 		}), tezos.wallet.batch());
 
-const doWithin = async <T>(seconds: number, fn: () => Promise<T>) => {
-	let captured: unknown = new Error(
-		'Operation timed out. Please try again and perhaps increase the timeout using the --timeout option.',
-	);
-	let timeout: ReturnType<typeof setTimeout>;
-
-	const maxTimeout = new Promise((resolve, reject) => {
-		timeout = setTimeout(() => {
-			reject(captured);
-		}, seconds * 1000);
-	}) as Promise<T>;
-
-	const process = async () => {
-		while (true) {
-			try {
-				const retval: T = await fn();
-				return retval;
-			} catch (err) {
-				captured = err;
-			}
-		}
-	};
-
-	return Promise.any<T>([process(), maxTimeout]).then(retval => {
-		clearTimeout(timeout);
-		return retval;
-	});
-};
-
 export const performOriginateOps = async (
 	tezos: TezosToolkit,
 	env: string,
 	contractsInfo: ContractInfo[],
+	maxTimeout: number,
 ): Promise<BatchWalletOperation> => {
 	const batch = createBatchForOriginate(tezos, contractsInfo);
 	try {
-		return await doWithin<BatchWalletOperation>(30, async () => {
+		return await doWithin<BatchWalletOperation>(maxTimeout, async () => {
 			const op = await batch.send();
 			await op.confirmation();
 			return op;
@@ -178,7 +150,12 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 
 		const contractInfo = await getContractInfo(parsedArgs);
 
-		const op = await performOriginateOps(tezos, getCurrentEnvironment(protocolArgs), [contractInfo]);
+		const op = await performOriginateOps(
+			tezos,
+			getCurrentEnvironment(protocolArgs),
+			[contractInfo],
+			parsedArgs.timeout,
+		);
 
 		const contractInfoForDisplay = await prepContractInfoForDisplay(parsedArgs, tezos, contractInfo, op);
 		return sendJsonRes([contractInfoForDisplay]);
