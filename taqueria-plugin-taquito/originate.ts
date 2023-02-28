@@ -87,6 +87,35 @@ const createBatchForOriginate = (tezos: TezosToolkit, contractsInfo: ContractInf
 			mutez: true,
 		}), tezos.wallet.batch());
 
+const doWithin = async <T>(seconds: number, fn: () => Promise<T>) => {
+	let captured: unknown = new Error(
+		'Operation timed out. Please try again and perhaps increase the timeout using the --timeout option.',
+	);
+	let timeout: ReturnType<typeof setTimeout>;
+
+	const maxTimeout = new Promise((resolve, reject) => {
+		timeout = setTimeout(() => {
+			reject(captured);
+		}, seconds * 1000);
+	}) as Promise<T>;
+
+	const process = async () => {
+		while (true) {
+			try {
+				const retval: T = await fn();
+				return retval;
+			} catch (err) {
+				captured = err;
+			}
+		}
+	};
+
+	return Promise.any<T>([process(), maxTimeout]).then(retval => {
+		clearTimeout(timeout);
+		return retval;
+	});
+};
+
 export const performOriginateOps = async (
 	tezos: TezosToolkit,
 	env: string,
@@ -94,9 +123,11 @@ export const performOriginateOps = async (
 ): Promise<BatchWalletOperation> => {
 	const batch = createBatchForOriginate(tezos, contractsInfo);
 	try {
-		const op = await batch.send();
-		await op.confirmation();
-		return op;
+		return await doWithin<BatchWalletOperation>(30, async () => {
+			const op = await batch.send();
+			await op.confirmation();
+			return op;
+		});
 	} catch (err) {
 		return handleOpsError(err, env);
 	}

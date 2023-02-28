@@ -32,6 +32,13 @@ Plugin.create(_i18n => ({
 					description: 'Amount of Mutez to transfer',
 					required: false,
 				}),
+				Option.create({
+					flag: 'timeout',
+					shortFlag: 't',
+					defaultValue: 30,
+					description: 'Number of retry attempts (to avoid congestion and network failures)',
+					required: false,
+				}),
 			],
 			aliases: ['originate'],
 			handler: 'proxy',
