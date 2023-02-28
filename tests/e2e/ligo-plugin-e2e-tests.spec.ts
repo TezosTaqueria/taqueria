@@ -309,4 +309,22 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 
 		await cleanup();
 	});
+
+	test('ligo can create template that the user owns the file', async () => {
+		const { execute, cleanup, exists } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		const result = await execute(
+			'taq',
+			"ligo --command 'init contract --template shifumi-jsligo shifumiTemplate'",
+			'./test-project',
+		);
+		console.log(result);
+		await exists('./test-project/shifumiTemplate');
+		const { stdout } = await execute('ls', '-l', './test-project');
+		const output = stdout.join('\n');
+		expect(output).toContain(process.env.USER);
+		expect(output).not.toContain('root');
+		await cleanup();
+	});
 });
