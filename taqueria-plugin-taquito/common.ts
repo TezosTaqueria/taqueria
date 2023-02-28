@@ -5,6 +5,7 @@ import {
 	getSandboxConfig,
 	RequestArgs,
 	sendAsyncErr,
+	sendErr,
 	TAQ_OPERATOR_ACCOUNT,
 } from '@taqueria/node-sdk';
 import {
@@ -24,6 +25,7 @@ export type OriginateOpts = ProxyTaskArgs.t & {
 	alias?: string;
 	sender?: string;
 	mutez?: string;
+	timeout: number;
 };
 
 export type TransferOpts = ProxyTaskArgs.t & {
@@ -32,11 +34,14 @@ export type TransferOpts = ProxyTaskArgs.t & {
 	param?: string;
 	entrypoint?: string;
 	sender?: string;
+	timeout: number;
+};
+
+export type FundOpts = ProxyTaskArgs.t & {
+	timeout: number;
 };
 
 export type InstantiateAccountOpts = ProxyTaskArgs.t;
-
-export type FundOpts = ProxyTaskArgs.t;
 
 // To be used for the main entrypoint of the plugin
 export type IntersectionOpts = OriginateOpts & TransferOpts & InstantiateAccountOpts & FundOpts;
@@ -196,5 +201,35 @@ export const handleOpsError = (err: unknown, env: string): Promise<never> => {
 			}
 		}
 	}
+
 	return sendAsyncErr(`Error while performing operation:\n${err} ${JSON.stringify(err, null, 2)}`);
+};
+
+export const doWithin = async <T>(seconds: number, fn: () => Promise<T>) => {
+	let captured: Error = new Error(
+		'Operation timed out. Please try again and perhaps increase the timeout using the --timeout option.',
+	);
+	let timeout: ReturnType<typeof setTimeout>;
+
+	const maxTimeout = new Promise((resolve, reject) => {
+		timeout = setTimeout(() => {
+			reject(captured);
+		}, seconds * 1000);
+	}) as Promise<T>;
+
+	const process = async () => {
+		while (true) {
+			try {
+				const retval: T = await fn();
+				return retval;
+			} catch (err) {
+				captured = err as Error;
+			}
+		}
+	};
+
+	return Promise.race<T>([process(), maxTimeout]).then(retval => {
+		clearTimeout(timeout);
+		return retval;
+	});
 };

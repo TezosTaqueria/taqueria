@@ -15,7 +15,7 @@ export const main = (parsedArgs: RequestArgs.t): Promise<void> => {
 		case 'instantiate-account':
 			return instantiate_account(parsedArgs);
 		case 'fund':
-			return fund(parsedArgs);
+			return fund(unsafeArgs);
 		default:
 			return sendAsyncErr(`${unsafeArgs} is not an understood task by the Taquito plugin`);
 	}

@@ -9,6 +9,7 @@ import {
 import { TezosToolkit } from '@taquito/taquito';
 import {
 	configureToolKitForNetwork,
+	FundOpts,
 	FundOpts as Opts,
 	getDeclaredAccounts,
 	getEnvTypeAndNodeConfig,
@@ -64,7 +65,7 @@ const prepAccountsInfoForDisplay = (accountsInfo: ContractInfo[]): TableRow[] =>
 		};
 	});
 
-const fund = async (parsedArgs: RequestArgs.t): Promise<void> => {
+const fund = async (parsedArgs: FundOpts): Promise<void> => {
 	const env = getCurrentEnvironmentConfig(parsedArgs);
 	if (!env) return sendAsyncErr(`There is no environment called ${parsedArgs.env} in your config.json`);
 	try {
@@ -81,7 +82,7 @@ const fund = async (parsedArgs: RequestArgs.t): Promise<void> => {
 			);
 		}
 
-		await performTransferOps(tezos, getCurrentEnvironment(parsedArgs), accountsInfo);
+		await performTransferOps(tezos, getCurrentEnvironment(parsedArgs), accountsInfo, parsedArgs.timeout);
 
 		const accountsInfoForDisplay = prepAccountsInfoForDisplay(accountsInfo);
 		return sendJsonRes(accountsInfoForDisplay);

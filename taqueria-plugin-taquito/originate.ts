@@ -14,11 +14,11 @@ import {
 import { OperationContentsAndResultOrigination } from '@taquito/rpc';
 import { TezosToolkit, WalletOperationBatch } from '@taquito/taquito';
 import { BatchWalletOperation } from '@taquito/taquito/dist/types/wallet/batch-operation';
-import { readFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import {
 	configureToolKitForNetwork,
 	configureToolKitForSandbox,
+	doWithin,
 	getEnvTypeAndNodeConfig,
 	handleOpsError,
 	OriginateOpts as Opts,
@@ -91,12 +91,15 @@ export const performOriginateOps = async (
 	tezos: TezosToolkit,
 	env: string,
 	contractsInfo: ContractInfo[],
+	maxTimeout: number,
 ): Promise<BatchWalletOperation> => {
 	const batch = createBatchForOriginate(tezos, contractsInfo);
 	try {
-		const op = await batch.send();
-		await op.confirmation();
-		return op;
+		return await doWithin<BatchWalletOperation>(maxTimeout, async () => {
+			const op = await batch.send();
+			await op.confirmation();
+			return op;
+		});
 	} catch (err) {
 		return handleOpsError(err, env);
 	}
@@ -147,7 +150,12 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 
 		const contractInfo = await getContractInfo(parsedArgs);
 
-		const op = await performOriginateOps(tezos, getCurrentEnvironment(protocolArgs), [contractInfo]);
+		const op = await performOriginateOps(
+			tezos,
+			getCurrentEnvironment(protocolArgs),
+			[contractInfo],
+			parsedArgs.timeout,
+		);
 
 		const contractInfoForDisplay = await prepContractInfoForDisplay(parsedArgs, tezos, contractInfo, op);
 		return sendJsonRes([contractInfoForDisplay]);

@@ -24,6 +24,14 @@ Plugin.create(_i18n => ({
 			handler: 'proxy',
 		}),
 		Task.create({
+			task: 'restart sandbox',
+			command: 'restart sandbox',
+			aliases: ['restart flextesa'],
+			description: 'Restarts a flextesa sandbox',
+			options: [],
+			handler: 'proxy',
+		}),
+		Task.create({
 			task: 'list accounts',
 			command: 'list accounts',
 			aliases: [],

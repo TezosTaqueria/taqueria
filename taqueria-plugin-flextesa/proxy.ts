@@ -441,6 +441,11 @@ const stopSandboxTask = async (parsedArgs: ValidOpts): Promise<void> => {
 	return sendAsyncErr(`No sandbox specified`);
 };
 
+const restartSandboxTask = async (parsedArgs: ValidOpts): Promise<void> => {
+	await stopSandboxTask(parsedArgs);
+	await startSandboxTask(parsedArgs);
+};
+
 const stopTzKtContainers = async (
 	sandboxName: string,
 	sandbox: SandboxConfig.t,
@@ -577,6 +582,8 @@ const taskMap: Record<string, (opts: ValidOpts) => Promise<void>> = {
 	'stop flextesa': stopSandboxTask,
 	'bake': bakeTask,
 	'b': bakeTask,
+	'restart sandbox': restartSandboxTask,
+	'restart flextesa': restartSandboxTask,
 };
 
 const validateRequest = async (unparsedArgs: Opts) => {
