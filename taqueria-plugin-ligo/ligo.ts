@@ -5,7 +5,17 @@ const getArbitraryLigoCmd = (parsedArgs: Opts, userArgs: string): [string, Recor
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const binary = 'docker';
-	const baseArgs = ['run', '--rm', '-v', `${projectDir}:/project`, '-w', '/project', getLigoDockerImage()];
+	const baseArgs = [
+		'run',
+		'--rm',
+		'-v',
+		`${projectDir}:/project`,
+		'-w',
+		'/project',
+		'-u',
+		`${process.env.UID}:${process.env.GID}`,
+		getLigoDockerImage(),
+	];
 	const processedUserArgs = userArgs.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg =>
 		arg
 	);
