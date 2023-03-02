@@ -2,6 +2,69 @@
 title: Taqueria Releases
 ---
 
+## Taqueria v0.28.3
+| Details     |               |
+| ----------- | ------------- |
+|Release Date | Mar 2, 2023  |
+|Release Type | Minor         |
+|Release Page | [v0.28.3](https://github.com/ecadlabs/taqueria/releases/tag/v0.28.3) |
+
+### Summary
+
+#### Taquito plugin
+- The `transfer` and `deploy` tasks will now retry if an error occured trying to forge or inject an operation. The tasks will be retried until the max timeout is reached (set to 40 seconds by default).
+- Add a `--timeout` option to both the `transfer` and `deploy` tasks to adjust the max timeout before giving up on forging and injecting an operation.
+
+#### Flextesa plugin
+- Tasks provided by the flextesa plugin no longer require a sandbox name, which is now inferred from the environment. For example, to start a sandbox you would execute `taq start sandbox` instead of `taq start sandbox local`
+- Adds a `taq restart sandbox` task to stop and then restart an already-running sandbox. Useful when you adjust baking options.
+
+#### LIGO plugin
+- The `taq ligo` command can be used to create files, such as when you execute `taq ligo -c 'init contract --template multisig-jsligo'`. This release fixes a bug where these files would be owned by root.
+- Added missing tests to assure that parameter and storage files are handled properly.
+
+
+### Pull Requests
+
+* 🛠️ Fix ➾ Don't require sandbox name for any task by @mweichert in https://github.com/ecadlabs/taqueria/pull/1844
+* 🛠️ Fix ➾ Ensure that files created by ligo/docker aren't owned by root by @mweichert in https://github.com/ecadlabs/taqueria/pull/1845
+* 🛠️ Fix ➾ Add restart sandbox task
+* 🛠️ Fix ➾ Ensure that all taquito tasks will retry until max timeout elapsed by @mweichert in https://github.com/ecadlabs/taqueria/pull/1847
+* 🧽 Chore ➾ add two tests for ligo compile file handling by @michaelkernaghan in https://github.com/ecadlabs/taqueria/pull/1817
+
+** Full Changelog: https://github.com/ecadlabs/taqueria/compare/v0.28.2...0.28.3
+
+## Taqueria v0.28.2
+| Details     |               |
+| ----------- | ------------- |
+|Release Date | Feb 16, 2023  |
+|Release Type | Minor         |
+|Release Page | [v0.28.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.28.2) |
+
+### Summary
+
+- CLI column width is dynamic. Help output will not be wrapped if your terminal width can accommodate longer lines of text.
+
+### Pull Requests
+
+This is the most *comprehensive* list of changes since the last release, and provides detailed, per-change information.
+
+* 🛠️ Fix ➾ Closes #1711, update tests to assert that contextual help is working by @mweichert in #1830
+* 🧽 Chore ➾ Ability to install plugins with specific version in TVsCE by @AlirezaHaghshenas in #1827
+* 🧽 Chore ➾ Group Contracts and Artifacts in TreeViews by @AlirezaHaghshenas in #1825
+* 🛠️ Fix ➾ Contextual help test by @michaelkernaghan in #1833
+* 🛠️ Fix ➾ Add better error handling to withTaq binary by @mweichert in #1831
+* 🛠️ Fix ➾ Doc changes by @mweichert in #1837
+* 🧽 Chore ➾ Update flextesa docs by @mweichert in #1839
+* 🛠️ Fix ➾ Added docs for all missing docs except 'generate-project-metadata' and 'pin' by @mweichert in #1840
+* 🛠️ Fix ➾  Closes #1775, ensures that protocol package can be consumed by nodejs, deno, and browsers by @mweichert in #1836
+* 🛠️ Fix ➾ #1750, uninstall plugin emits error by @mweichert in #1821
+* 🛠️ Fix ➾ Dynamically set the column wrapping of the yargs help menu by @mweichert in #1842
+* 🧪 Pre-Release ➾ v0.28.1 (and VSCode v0.29.0) by @mweichert in #1841
+
+** Full Changelog: https://github.com/ecadlabs/taqueria/compare/v0.28.0...v0.28.2
+
+
 ## Taqueria v0.28.2
 | Details     |               |
 | ----------- | ------------- |
