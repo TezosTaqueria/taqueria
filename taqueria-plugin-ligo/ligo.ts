@@ -4,6 +4,11 @@ import { getLigoDockerImage, LigoOpts as Opts } from './common';
 const getArbitraryLigoCmd = (parsedArgs: Opts, userArgs: string): [string, Record<string, string>] => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
+
+	// In all environments I've found that the UID environment variable is set. However, on
+	// Windows / WSLv2, GID isn't available.
+	const owner = process.env.GID ? `${process.env.UID}:${process.env.GID}` : process.env.UID;
+
 	const binary = 'docker';
 	const baseArgs = [
 		'run',
@@ -13,7 +18,7 @@ const getArbitraryLigoCmd = (parsedArgs: Opts, userArgs: string): [string, Recor
 		'-w',
 		'/project',
 		'-u',
-		`${process.env.UID}:${process.env.GID}`,
+		owner,
 		getLigoDockerImage(),
 	];
 	const processedUserArgs = userArgs.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg =>
