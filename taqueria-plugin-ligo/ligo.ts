@@ -1,13 +1,17 @@
-import { getArch, sendAsyncErr, sendRes, spawnCmd } from '@taqueria/node-sdk';
+import { execCmd, getArch, sendAsyncErr, sendRes, spawnCmd } from '@taqueria/node-sdk';
 import { getLigoDockerImage, LigoOpts as Opts } from './common';
 
-const getArbitraryLigoCmd = (parsedArgs: Opts, userArgs: string): [string, Record<string, string>] => {
+const getArbitraryLigoCmd = (
+	parsedArgs: Opts,
+	uid: string,
+	gid: string,
+	userArgs: string,
+): [string, Record<string, string>] => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 
-	// In all environments I've found that the UID environment variable is set. However, on
-	// Windows / WSLv2, GID isn't available.
-	const owner = process.env.GID ? `${process.env.UID}:${process.env.GID}` : process.env.UID;
+	const userMap = uid && gid ? `${uid}:${gid}` : uid;
+	const userMapArgs = uid ? ['-u', userMap] : [];
 
 	const binary = 'docker';
 	const baseArgs = [
@@ -17,8 +21,7 @@ const getArbitraryLigoCmd = (parsedArgs: Opts, userArgs: string): [string, Recor
 		`${projectDir}:/project`,
 		'-w',
 		'/project',
-		'-u',
-		owner,
+		...userMapArgs,
 		getLigoDockerImage(),
 	];
 	const processedUserArgs = userArgs.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg =>
@@ -34,7 +37,12 @@ const getArbitraryLigoCmd = (parsedArgs: Opts, userArgs: string): [string, Recor
 
 const runArbitraryLigoCmd = (parsedArgs: Opts, cmd: string): Promise<string> =>
 	getArch()
-		.then(() => getArbitraryLigoCmd(parsedArgs, cmd))
+		.then(async () => {
+			const uid = await execCmd('id -u');
+			const gid = await execCmd('id -g');
+			return [uid.stdout.trim(), gid.stdout.trim()];
+		})
+		.then(([uid, gid]) => getArbitraryLigoCmd(parsedArgs, uid, gid, cmd))
 		.then(([cmd, envVars]) => spawnCmd(cmd, envVars))
 		.then(code =>
 			code !== null && code === 0
