@@ -35,9 +35,9 @@
 	},
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.28.4",
-		"@taquito/michel-codec": "^15.0.0",
-		"@taquito/signer": "^15.0.0",
-		"@taquito/taquito": "^15.0.0",
+		"@taquito/michel-codec": "^16.0.1",
+		"@taquito/signer": "^16.0.1",
+		"@taquito/taquito": "^16.0.1",
 		"bignumber.js": "^9.0.2",
 		"fast-glob": "^3.2.11"
 	},
