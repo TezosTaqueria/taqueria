@@ -91,7 +91,7 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 		const unit_test_file = await (await exec(`cat e2e/data/ligo-data/unit_pokeGame.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/unit_pokeGame.jsligo', unit_test_file);
 
-		const { stdout } = await execute('taq', 'test unit_pokeGame.jsligo', './test-project');
+		const { stdout, stderr: _stderr } = await execute('taq', 'test unit_pokeGame.jsligo', './test-project');
 		expect(stdout).toEqual(expect.arrayContaining([expect.stringContaining('🎉 All tests passed 🎉')]));
 
 		await cleanup();

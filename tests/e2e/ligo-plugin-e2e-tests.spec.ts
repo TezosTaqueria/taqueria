@@ -150,8 +150,12 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const test_file = await (await exec('cat e2e/data/ligo-data/hello-tacos-tests.mligo')).stdout;
 		await writeFile('./test-project/contracts/hello-tacos-tests.mligo', test_file);
 
-		const { stdout: stdout2 } = await execute('taq', 'test hello-tacos-tests.mligo', './test-project');
-		expect(stdout2).toEqual(
+		const { stdout: testOutput, stderr: _testErrOutput } = await execute(
+			'taq',
+			'test hello-tacos-tests.mligo',
+			'./test-project',
+		);
+		expect(testOutput).toEqual(
 			expect.arrayContaining(['│                         │ 🎉 All tests passed 🎉                       │']),
 		);
 
