@@ -23,11 +23,11 @@ const poke = (store : storage) : return_ => {
         pokeTraces : Map.add(Tezos.get_source(), feedbackMessage, store.pokeTraces) }];
 };
 
-const main = ([action, store]: [parameter, storage]): return_ => {
-  return match(action, {
-    Poke: () => poke(store),
-  });
-};
+const main = (action: parameter, store: storage): return_ => {
+    return match(action, {
+      Poke: () => poke(store),
+    });
+}
 
 // reset state
 const _ = Test.reset_state ( 2 as nat, list([]) as list <tez> );
