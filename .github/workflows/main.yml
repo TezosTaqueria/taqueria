@@ -285,7 +285,7 @@ jobs:
           PR_VERSION="${PACKAGE_VERSION}-${BRANCH_NAME}.${SHORT_SHA}"
           echo "::set-output name=pr-version::$PR_VERSION"
           npx lerna version "${PR_VERSION}" --no-push --no-git-tag-version --yes
-          npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY
+          npm publish --workspaces --no-private --registry $PRIVATE_NPM_REGISTRY --strict-ssl=false
  
       - name: Publish for Alpha prerelease
         if: ${{ startsWith(needs.workflow-setup.outputs.prerelease, 'alpha') }}

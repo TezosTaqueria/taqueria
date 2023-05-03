@@ -28,6 +28,15 @@ const isParameterListFile = (sourceFile: string): boolean =>
 const isContractFile = (sourceFile: string): boolean =>
 	isLIGOFile(sourceFile) && !isStorageListFile(sourceFile) && !isParameterListFile(sourceFile);
 
+const getModuleName = async (parsedArgs: Opts, sourceFile: string): Promise<string | undefined> => {
+	const fileContent = await readFile(getInputFilenameAbsPath(parsedArgs, sourceFile), 'utf8');
+	if (fileContent.includes('@entry') && fileContent.includes('module')) {
+		const match = fileContent.match(/module ([^\s]+)/);
+		return match ? match[1] : undefined;
+	}
+	return undefined;
+};
+
 const extractExt = (path: string): string => {
 	const matchResult = path.match(/\.(ligo|religo|mligo|jsligo)$/);
 	return matchResult ? matchResult[0] : '';
@@ -68,7 +77,7 @@ const getOutputExprFilename = (parsedArgs: Opts, sourceFile: string, exprKind: E
 	return join(getArtifactsDir(parsedArgs), `${outputFile}`);
 };
 
-const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
+const getCompileContractCmd = async (parsedArgs: Opts, sourceFile: string): Promise<string> => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw `No project directory provided`;
 	const baseCmd =
@@ -76,7 +85,9 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 	const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
 	const outputFile = `-o ${getOutputContractFilename(parsedArgs, sourceFile)}`;
 	const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
-	const cmd = `${baseCmd} ${inputFile} ${outputFile} ${flags}`;
+	const moduleName = await getModuleName(parsedArgs, sourceFile);
+	const entryFlag = moduleName ? `-m ${moduleName}` : '';
+	const cmd = `${baseCmd} ${inputFile} ${outputFile} ${flags}${entryFlag}`;
 	return cmd;
 };
 
@@ -93,24 +104,24 @@ const getCompileExprCmd = (parsedArgs: Opts, sourceFile: string, exprKind: ExprK
 	return cmd;
 };
 
-const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
-	getArch()
-		.then(() => getCompileContractCmd(parsedArgs, sourceFile))
-		.then(execCmd)
-		.then(({ stderr }) => {
-			if (stderr.length > 0) sendWarn(stderr);
-			return {
-				contract: sourceFile,
-				artifact: getOutputContractFilename(parsedArgs, sourceFile),
-			};
-		})
-		.catch(err => {
-			emitExternalError(err, sourceFile);
-			return {
-				contract: sourceFile,
-				artifact: COMPILE_ERR_MSG,
-			};
-		});
+const compileContract = async (parsedArgs: Opts, sourceFile: string): Promise<TableRow> => {
+	try {
+		await getArch();
+		const cmd = await getCompileContractCmd(parsedArgs, sourceFile);
+		const { stderr } = await execCmd(cmd);
+		if (stderr.length > 0) sendWarn(stderr);
+		return {
+			contract: sourceFile,
+			artifact: getOutputContractFilename(parsedArgs, sourceFile),
+		};
+	} catch (err) {
+		emitExternalError(err, sourceFile);
+		return {
+			contract: sourceFile,
+			artifact: COMPILE_ERR_MSG,
+		};
+	}
+};
 
 const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =>
 	(exprName: string): Promise<TableRow> =>
@@ -119,9 +130,10 @@ const compileExpr = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind) =
 			.then(execCmd)
 			.then(({ stderr }) => {
 				if (stderr.length > 0) sendWarn(stderr);
+				const artifactName = getOutputExprFilename(parsedArgs, sourceFile, exprKind, exprName);
 				return {
 					contract: sourceFile,
-					artifact: getOutputExprFilename(parsedArgs, sourceFile, exprKind, exprName),
+					artifact: artifactName,
 				};
 			})
 			.catch(err => {
@@ -152,9 +164,15 @@ const compileExprs = (parsedArgs: Opts, sourceFile: string, exprKind: ExprKind):
 			emitExternalError(err, sourceFile);
 			return [{
 				contract: sourceFile,
-				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} values compiled`,
+				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} expressions compiled`,
 			}];
 		})
+		.then(results =>
+			results.length > 0 ? results : [{
+				contract: sourceFile,
+				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} expressions found`,
+			}]
+		)
 		.then(mergeArtifactsOutput(sourceFile));
 
 // TODO: Just for backwards compatibility. Can be deleted in the future.

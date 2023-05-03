@@ -55,6 +55,84 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
+	test('compile-all will find and compile all contracts', async () => {
+		const { execute, cleanup, spawn, writeFile, ls } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		await waitForText("Project taq'ified!");
+
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+
+		// Write a self-contained contract to the project
+		const selfContainedContract = await (await exec(`cat e2e/data/ligo-data/counter.mligo`)).stdout;
+		await writeFile('./test-project/contracts/counter.mligo', selfContainedContract);
+
+		// Write the parameter file for the contract
+		const parameterFile = await (await exec(`cat e2e/data/ligo-data/counter.parameterList.mligo`)).stdout;
+		await writeFile('./test-project/contracts/counter.parameterList.mligo', parameterFile);
+
+		// Write the storage file for the contract
+		const storageFile = await (await exec(`cat e2e/data/ligo-data/counter.storageList.mligo`)).stdout;
+		await writeFile('./test-project/contracts/counter.storageList.mligo', storageFile);
+
+		// Write a contract that imports the first contract
+		const importerContract = await (await exec(`cat e2e/data/ligo-data/importer.mligo`)).stdout;
+		await writeFile('./test-project/contracts/counter.jsligo', importerContract);
+
+		// Write a contract that is self-contained but uses @entry in the top-level
+		const entryContract = await (await exec(`cat e2e/data/ligo-data/entry.mligo`)).stdout;
+		await writeFile('./test-project/contracts/entry.mligo', entryContract);
+
+		// Write a contract that is composed of multiple files and uses @entry in the top-level
+		const multiFileContract = await (await exec(`cat e2e/data/ligo-data/counter-with-helpers.mligo`)).stdout;
+		await writeFile('./test-project/contracts/counter-with-helpers.mligo', multiFileContract);
+
+		// Write the math helpers module
+		const mathHelpers = await (await exec(`cat e2e/data/ligo-data/math-helpers.mligo`)).stdout;
+		await writeFile('./test-project/contracts/math-helpers.mligo', mathHelpers);
+
+		// Write an invalid contract
+		const invalidContract = await (await exec(`cat e2e/data/ligo-data/invalid-contract.mligo`)).stdout;
+		await writeFile('./test-project/contracts/invalid-contract.mligo', invalidContract);
+
+		// Compile the contracts using the `compile-all` task
+		const { stdout: compileStdout, stderr: compileStderr } = await execute('taq', 'compile-all', './test-project');
+
+		// Check that the output contains the expected files
+		expect(compileStdout.join('\n')).toContain(
+			`┌─────────────────────────────┬───────────────────────────────────────────────┐
+│ Contract                    │ Artifact                                      │
+├─────────────────────────────┼───────────────────────────────────────────────┤
+│ counter.mligo               │ artifacts/counter.tz                          │
+├─────────────────────────────┼───────────────────────────────────────────────┤
+│ counter.storageList.mligo   │ artifacts/counter.default_storage.tz          │
+│                             │ artifacts/counter.storage.another_count.tz    │
+├─────────────────────────────┼───────────────────────────────────────────────┤
+│ counter.parameterList.mligo │ artifacts/counter.parameter.increment_by_3.tz │
+├─────────────────────────────┼───────────────────────────────────────────────┤
+│ entry.mligo                 │ artifacts/entry.tz                            │
+├─────────────────────────────┼───────────────────────────────────────────────┤
+│ invalid-contract.mligo      │ Not compiled                                  │
+└─────────────────────────────┴───────────────────────────────────────────────┘`,
+		);
+
+		expect(compileStderr.join('\n')).toContain(
+			`=== Error messages for invalid-contract.mligo ===
+File "contracts/invalid-contract.mligo", line 1, characters 23-27:
+1 | type available_tacos = natu
+2 |
+Type "natu" not found.`,
+		);
+
+		expect(compileStderr.join('\n')).toContain(
+			`Note: storage file associated with "entry.mligo" can't be found, so "entry.storageList.mligo" has been created for you. Use this file to define all initial storage values for this contract`,
+		);
+
+		expect(compileStderr.join('\n')).toContain(
+			`Note: parameter file associated with "entry.mligo" can't be found, so "entry.parameterList.mligo" has been created for you. Use this file to define all parameter values for this contract`,
+		);
+	});
+
 	test('ligo plugin will support cli options', async () => {
 		const { execute, cleanup, writeFile, readFile, ls, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project --debug');
@@ -132,7 +210,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			'./test-project',
 		);
 		expect(compileOutput).toEqual(expect.arrayContaining(['│ does_not_exist.mligo │ Not compiled │']));
-		expect(compileErr.join()).toContain('contracts/does_not_exist.mligo: No such file or directory.');
+		expect(compileErr.join()).toContain('no such file or directory');
 
 		await cleanup();
 	});
@@ -323,7 +401,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			"ligo --command 'init contract --template shifumi-jsligo shifumiTemplate'",
 			'./test-project',
 		);
-		console.log(result);
 		await exists('./test-project/shifumiTemplate');
 		const { stdout } = await execute('ls', '-l', './test-project');
 		const output = stdout.join('\n');
