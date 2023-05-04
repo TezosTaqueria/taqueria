@@ -408,4 +408,14 @@ Type "natu" not found.`,
 		expect(output).not.toContain('root');
 		await cleanup();
 	});
+
+	// See https://github.com/ecadlabs/taqueria/issues/1870
+	test.only('ligo task with install command does not result in an error', async () => {
+		const { execute, cleanup, exists } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		const result = await execute('taq', 'ligo --command "install"', './test-project');
+		expect(result.stderr.join('').trim()).not.toContain('error');
+		await cleanup();
+	});
 });

@@ -1,4 +1,6 @@
 import { execCmd, getArch, sendAsyncErr, sendRes, spawnCmd } from '@taqueria/node-sdk';
+import { readJsonFile, writeJsonFile } from '@taqueria/node-sdk';
+import { join } from 'path';
 import { getLigoDockerImage, LigoOpts as Opts } from './common';
 
 const getArbitraryLigoCmd = (
@@ -35,8 +37,19 @@ const getArbitraryLigoCmd = (
 	];
 };
 
+const ensureEsyExists = async (parsedArgs: Opts): Promise<string> => {
+	const esyJsonPath = join(parsedArgs.projectDir, 'esy.json');
+
+	try {
+		return await readJsonFile(esyJsonPath);
+	} catch {
+		return await writeJsonFile(esyJsonPath)({});
+	}
+};
+
 const runArbitraryLigoCmd = (parsedArgs: Opts, cmd: string): Promise<string> =>
-	getArch()
+	ensureEsyExists(parsedArgs)
+		.then(getArch)
 		.then(async () => {
 			const uid = await execCmd('id -u');
 			const gid = await execCmd('id -g');
