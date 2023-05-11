@@ -96,7 +96,9 @@ const visitContractParameterEndpoint = (node: MMethod): TypedMethod[] => {
 	}
 
 	const nameRaw = node.annots?.[0];
-	const name = nameRaw?.startsWith('%') ? nameRaw.substr(1) : null;
+
+	// If the name is missing, then we assume its the main / default entrypoint
+	const name = nameRaw?.startsWith('%') ? nameRaw.substr(1) : 'default';
 
 	if (!name) {
 		console.warn(`Unknown method: ${node.prim as string}`, { node, args: node.args });

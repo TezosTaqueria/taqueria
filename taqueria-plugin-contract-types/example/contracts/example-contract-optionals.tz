@@ -1,0 +1,10 @@
+{ parameter (or (or (int %decrement) (pair %increment (option int) int)) (unit %reset)) ;
+  storage int ;
+  code { UNPAIR ;
+         IF_LEFT
+           { IF_LEFT
+               { SWAP ; SUB }
+               { CAR ; IF_NONE { PUSH int 1 ; ADD } { ADD } } }
+           { DROP 2 ; PUSH int 0 } ;
+         NIL operation ;
+         PAIR } }

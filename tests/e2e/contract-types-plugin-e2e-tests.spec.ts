@@ -298,4 +298,28 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 
 		await cleanup();
 	});
+
+	// See https://github.com/ecadlabs/taqueria/issues/1861
+	test('Assure that entrypoints with optional parameters generate valid TypeScript', async () => {
+		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+
+		const tz_file =
+			await (await exec(`cat ../taqueria-plugin-contract-types/example/contracts/example-contract-optionals.tz`))
+				.stdout;
+		await writeFile('./test-project/artifacts/example.tz', tz_file);
+
+		await execute('taq', 'generate types', './test-project');
+		const generated_types_file = path.join('./test-project', 'types', 'example.types.ts');
+
+		// Assure that the generated file is valid TypeScript
+		const { stdout: stdout1 } = await execute('npx', `tsx ${generated_types_file}`, './test-project');
+		expect(stdout1.join('').trim()).toBe('');
+
+		await cleanup();
+	});
 });
