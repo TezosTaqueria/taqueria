@@ -29,14 +29,12 @@ const SMARTPY_ARTIFACTS_DIR = '.smartpy';
 
 const smartpyVersionToInstallerMap: { [k: string]: string } = {
 	'v0.16.0': 'https://smartpy.io/releases/20221215-8f134ebb649f5a7b37c44fca8f336f970f523565/cli/install.sh',
-	'v0.15.0': 'https://smartpy.io/releases/20221026-28e8c18e46035c353804eb5fd725573c5d434e8a/cli/install.sh',
-	'v0.14.0': 'https://smartpy.io/releases/20220926-1c748c4572188f65a525792468e37da2182f18a2/cli/install.sh',
 };
 
 const getSmartpyVersion = (): string => {
 	const userDefinedSmartpyVersion = process.env[SMARTPY_VERSION_ENV_VAR];
 	if (userDefinedSmartpyVersion) {
-		if (smartpyVersionToInstallerMap[userDefinedSmartpyVersion]) {
+		if (/v0\.1[4-6]\./.test(userDefinedSmartpyVersion)) {
 			return userDefinedSmartpyVersion;
 		} else {
 			sendWarn(
@@ -56,11 +54,9 @@ const getPathToSmartPyCliDir = (): string => `${process.env.HOME}/smartpy-cli-${
 export const getSmartPyCli = (): string => `${getPathToSmartPyCliDir()}/SmartPy.sh`;
 
 const getSmartPyInstallerCmd = (): string => {
-	const installer = '~/SmartPyCliInstaller.sh';
-	const download = `curl -s ${smartpyVersionToInstallerMap[getSmartpyVersion()]} > ${installer};`;
+	const installer = join(__dirname, 'install.sh');
 	const install = `bash ${installer} --yes --prefix ${getPathToSmartPyCliDir()};`;
-	const clean = `rm ${installer};`;
-	return download + install + clean;
+	return install;
 };
 
 export const addPyExtensionIfMissing = (sourceFile: string): string =>
