@@ -229,8 +229,10 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
+		const { stdout, stderr } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
+
 		expect(stdout).toContain('Plugin installed successfully');
+
 		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout1).toContain('Plugin installed successfully');
 
