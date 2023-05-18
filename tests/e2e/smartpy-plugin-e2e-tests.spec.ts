@@ -27,7 +27,12 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		const py_file = await (await exec(`cat e2e/data/smartpy-data/hello-tacos.py`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.py', py_file);
 
-		const { stdout } = await execute('taq', 'compile hello-tacos.py', './test-project');
+		const { stdout, stderr } = await execute('taq', 'compile hello-tacos.py', './test-project');
+		console.log('------------------');
+		console.log('Compile stdout: ', stdout);
+		console.log('Compile stderr: ', stderr);
+		console.log('------------------');
+
 		expect(stdout).toEqual(
 			expect.arrayContaining(['│ hello-tacos.py │ {{base}}/test-project/artifacts/hello-tacos.tz                 │']),
 		);
