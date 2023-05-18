@@ -144,6 +144,12 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 			'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
 			'./test-project',
 		);
+
+		console.log('-----------------');
+		console.log('Deploy stdout: ', stdout2);
+		console.log('Deploy stderr: ', stderr);
+		console.log('-----------------');
+
 		expect(stdout2).toEqual(expect.arrayContaining(
 			['│ Contract       │ Address                              │ Alias       │ Balance In Mutez │ Destination                    │'],
 		));
