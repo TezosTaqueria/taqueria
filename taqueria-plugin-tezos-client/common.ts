@@ -31,7 +31,7 @@ export type IntersectionOpts = ClientOpts & TypeCheckOpts & TypeCheckAllOpts & S
 
 type UnionOpts = ClientOpts | TypeCheckOpts | TypeCheckAllOpts | SimulateOpts;
 
-const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://ghostnet.ecadinfra.com';
+const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://rpc.ghostnet.teztnets.xyz';
 export const GLOBAL_OPTIONS = `--endpoint ${ENDPOINT}`;
 
 export const trimTezosClientMenuIfPresent = (msg: string): string => {

@@ -145,14 +145,9 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 			'./test-project',
 		);
 
-		console.log('-----------------');
-		console.log('Deploy stdout: ', stdout2);
-		console.log('Deploy stderr: ', stderr);
-		console.log('-----------------');
-
-		expect(stdout2).toEqual(expect.arrayContaining(
-			['│ Contract       │ Address                              │ Alias       │ Balance In Mutez │ Destination                    │'],
-		));
+		const result = stdout2.join('\n');
+		expect(result).toMatch(/| Contract\s+| Address\s+| Alias\s+| Balance In Mutez\s+| Destination/);
+		expect(result).toMatch(/hello-tacos.tz\s+| KT[^\|]+| hello-tacos\s+| 0\s+| .+rpc\.ghostnet\.teztnets\.xyz/m);
 
 		await cleanup();
 	});
