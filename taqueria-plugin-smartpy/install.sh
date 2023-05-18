@@ -95,9 +95,9 @@ if [ "$native" != true ]; then
     rm -f "$prefix/smartpyc"
 fi
 
-# Copy prebuilt files stored in the plugin
-script_dir=$(dirname "$0")
-cp $script_dir/smartpy-v0.16.0/* "$prefix"
+# # Copy prebuilt files stored in the plugin
+# script_dir=$(dirname "$0")
+# cp $script_dir/smartpy-v0.16.0/* "$prefix"
 
 >&2 echo "Installing npm packages..."
 cd "$prefix"

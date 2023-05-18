@@ -56,7 +56,8 @@ export const getSmartPyCli = (): string => `${getPathToSmartPyCliDir()}/SmartPy.
 const getSmartPyInstallerCmd = (): string => {
 	const installer = join(__dirname, 'install.sh');
 	const install = `bash ${installer} --yes --prefix ${getPathToSmartPyCliDir()};`;
-	return install;
+	const copyPrebuilt = `cp ${join(__dirname, 'smartpy-v0.16.0')}/* ${getPathToSmartPyCliDir()}/;`;
+	return install + copyPrebuilt;
 };
 
 export const addPyExtensionIfMissing = (sourceFile: string): string =>
