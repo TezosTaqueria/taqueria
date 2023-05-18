@@ -144,9 +144,10 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 			'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
 			'./test-project',
 		);
-		expect(stdout2).toEqual(expect.arrayContaining(
-			['│ Contract       │ Address                              │ Alias       │ Balance In Mutez │ Destination                    │'],
-		));
+
+		const result = stdout2.join('\n');
+		expect(result).toMatch(/| Contract\s+| Address\s+| Alias\s+| Balance In Mutez\s+| Destination/);
+		expect(result).toMatch(/hello-tacos.tz\s+| KT[^\|]+| hello-tacos\s+| 0\s+| .+rpc\.ghostnet\.teztnets\.xyz/m);
 
 		await cleanup();
 	});
