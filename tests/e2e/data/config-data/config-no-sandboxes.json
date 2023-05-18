@@ -6,7 +6,7 @@
 	"network": {
 		"ghostnet": {
 			"label": "ghostnet",
-			"rpcUrl": "https://ghostnet.ecadinfra.com"
+			"rpcUrl": "https://rpc.ghostnet.teztnets.xyz/"
 		}
 	},
 	"sandbox": {

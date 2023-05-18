@@ -60,7 +60,7 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 			'deploy pokeGame.tz -e "testing"',
 			'./test-project',
 		);
-		expect(stdout4).toEqual(expect.arrayContaining([expect.stringContaining('https://ghostnet.ecadinfra.com')]));
+		expect(stdout4).toEqual(expect.arrayContaining([expect.stringContaining('https://rpc.ghostnet.teztnets.xyz/')]));
 
 		// tear down the project
 		await cleanup();
