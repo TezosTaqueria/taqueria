@@ -1,6 +1,6 @@
 import { execCmd, getArtifactsDir, getContractsDir, sendErr, sendWarn } from '@taqueria/node-sdk';
 import { ProxyTaskArgs } from '@taqueria/node-sdk/types';
-import { access } from 'fs/promises';
+import { access, copyFile, readdir } from 'fs/promises';
 import { join } from 'path';
 
 export interface CompileOpts extends ProxyTaskArgs.t {
@@ -57,9 +57,7 @@ const getSmartPyInstallerCmd = (projectDir: string): string => {
 	const trimmedProjectdir = projectDir.replace(/\/$/, '');
 	const installer = join(__dirname, 'install.sh');
 	const install = `bash ${installer} --yes --prefix ${getPathToSmartPyCliDir()} --project ${trimmedProjectdir};`;
-	const copyPrebuilt =
-		`cp ${trimmedProjectdir}/node_modules/@taqueria/plugin-smartpy/smartpy-v0.16.0/* ${getPathToSmartPyCliDir()}/;`;
-	return install + copyPrebuilt;
+	return install;
 };
 
 export const addPyExtensionIfMissing = (sourceFile: string): string =>
@@ -88,6 +86,14 @@ export const installSmartPyCliIfNotExist = (projectDir: string) =>
 			return execCmd(getSmartPyInstallerCmd(projectDir))
 				.then(({ stderr }) => {
 					if (stderr.length > 0) sendWarn(stderr);
+				})
+				.then(async () => {
+					// Copy prebuilt files
+					const prebuiltDir = join(__dirname, 'smartpy-v0.16.0');
+					const files = await readdir(prebuiltDir, { withFileTypes: true });
+					for (let file of files) {
+						file.isFile() && await copyFile(join(prebuiltDir, file.name), join(getPathToSmartPyCliDir(), file.name));
+					}
 				});
 		});
 
