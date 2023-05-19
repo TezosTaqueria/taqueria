@@ -57,7 +57,9 @@ const getSmartPyInstallerCmd = (projectDir: string): string => {
 	const trimmedProjectdir = projectDir.replace(/\/$/, '');
 	const installer = join(__dirname, 'install.sh');
 	const install = `bash ${installer} --yes --prefix ${getPathToSmartPyCliDir()} --project ${trimmedProjectdir};`;
-	return install;
+	const copyPrebuilt =
+		`cp ${trimmedProjectdir}/node_modules/@taqueria/plugin-smartpy/smartpy-v0.16.0/* ${getPathToSmartPyCliDir()}/;`;
+	return install + copyPrebuilt;
 };
 
 export const addPyExtensionIfMissing = (sourceFile: string): string =>
