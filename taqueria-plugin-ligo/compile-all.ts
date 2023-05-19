@@ -6,6 +6,7 @@ import { CompileAllOpts as Opts, CompileOpts, getInputFilenameAbsPath } from './
 import { compileContractWithStorageAndParameter, TableRow } from './compile';
 
 const isMainContract = async (parsedArgs: Opts, contractFilename: string): Promise<boolean> => {
+	if (/storageList\.\w{0,2}ligo$/.test(contractFilename)) return false;
 	const fileContent = await readFile(getInputFilenameAbsPath(parsedArgs, contractFilename), 'utf8');
 	const entryOrMainFunctionRegex = /@entry|((const|let|function)\s+main)/g;
 	return entryOrMainFunctionRegex.test(fileContent);
