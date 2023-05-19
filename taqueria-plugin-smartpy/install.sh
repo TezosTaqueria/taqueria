@@ -47,7 +47,7 @@ while [[ $# -gt 0 ]]; do
             yes=true
             shift
             ;;
-        -- projectDir)
+        --projectDir)
             projectDir="$2"
             shift 2
             ;;
