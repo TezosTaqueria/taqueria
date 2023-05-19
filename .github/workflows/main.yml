@@ -200,7 +200,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, ecad-macmini]
-        chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
+        chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['temp-adjust-chunks']) }}
         include:
         - os: ubuntu-latest
           url: ${{ needs.build-binaries.outputs.public-url-ubuntu }}
