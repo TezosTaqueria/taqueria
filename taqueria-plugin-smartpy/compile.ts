@@ -167,7 +167,7 @@ const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => 
 
 export const compileContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
 	getArch()
-		.then(() => installSmartPyCliIfNotExist())
+		.then(() => installSmartPyCliIfNotExist(parsedArgs.projectDir))
 		.then(() => getCompileContractCmd(parsedArgs, sourceFile))
 		.then(execCmd)
 		.then(({ stderr }) => {

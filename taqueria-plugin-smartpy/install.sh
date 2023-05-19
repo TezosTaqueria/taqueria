@@ -17,6 +17,9 @@ The options are as follows:
 --yes
         Answer 'y' to all questions during installation.
 
+--projectDir
+        The directory where the project is located.
+
 --help
 
 EOF
@@ -28,6 +31,7 @@ from=AUTO
 with_smartml=false
 native=false
 yes=false
+projectDir="."
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -42,6 +46,10 @@ while [[ $# -gt 0 ]]; do
         --yes)
             yes=true
             shift
+            ;;
+        -- projectDir)
+            projectDir="$2"
+            shift 2
             ;;
         --help)
             usage
@@ -96,8 +104,7 @@ if [ "$native" != true ]; then
 fi
 
 # # Copy prebuilt files stored in the plugin
-# script_dir=$(dirname "$0")
-# cp $script_dir/smartpy-v0.16.0/* "$prefix"
+cp projectDir/node_modules/\@taqueria/plugin-smartpy/smartpy-v0.16.0/* "$prefix"
 
 >&2 echo "Installing npm packages..."
 cd "$prefix"

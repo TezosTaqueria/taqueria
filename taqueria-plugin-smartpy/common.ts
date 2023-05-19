@@ -53,11 +53,11 @@ const getPathToSmartPyCliDir = (): string => `${process.env.HOME}/smartpy-cli-${
 
 export const getSmartPyCli = (): string => `${getPathToSmartPyCliDir()}/SmartPy.sh`;
 
-const getSmartPyInstallerCmd = (): string => {
+const getSmartPyInstallerCmd = (projectDir: string): string => {
+	const trimmedProjectdir = projectDir.replace(/\/$/, '');
 	const installer = join(__dirname, 'install.sh');
-	const install = `bash ${installer} --yes --prefix ${getPathToSmartPyCliDir()};`;
-	const copyPrebuilt = `cp ${join(__dirname, 'smartpy-v0.16.0')}/* ${getPathToSmartPyCliDir()}/;`;
-	return install + copyPrebuilt;
+	const install = `bash ${installer} --yes --prefix ${getPathToSmartPyCliDir()} --project ${trimmedProjectdir};`;
+	return install;
 };
 
 export const addPyExtensionIfMissing = (sourceFile: string): string =>
@@ -79,11 +79,11 @@ export const getInputFilename = (parsedArgs: UnionOpts, sourceFile: string): str
 export const getCompilationTargetsDirname = (parsedArgs: UnionOpts, sourceFile: string): string =>
 	join(parsedArgs.config.projectDir, getArtifactsDir(parsedArgs), SMARTPY_ARTIFACTS_DIR, removeExt(sourceFile));
 
-export const installSmartPyCliIfNotExist = () =>
+export const installSmartPyCliIfNotExist = (projectDir: string) =>
 	access(getSmartPyCli())
 		.catch(() => {
 			sendWarn('SmartPy CLI not found. Installing it now...');
-			return execCmd(getSmartPyInstallerCmd())
+			return execCmd(getSmartPyInstallerCmd(projectDir))
 				.then(({ stderr }) => {
 					if (stderr.length > 0) sendWarn(stderr);
 				});
