@@ -166,9 +166,16 @@ jobs:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
       # This step just creates a list of numbers representing the different buckets of tests
+      # - id: set-test-chunk-ids
+      #   name: Set Chunk IDs
+      #   run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -c 'to_entries | map(.key)')"
+      #   env:
+      #     CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+
+      # TEMP Step - just one chunk
       - id: set-test-chunk-ids
         name: Set Chunk IDs
-        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -c 'to_entries | map(.key)')"
+        run: echo "::set-output name=test-chunk-ids::[0]"
         env:
           CHUNKS: ${{ steps['temp-adjust-chunks'].outputs['test-chunks'] }}
 
