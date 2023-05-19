@@ -88,11 +88,21 @@ export const installSmartPyCliIfNotExist = (projectDir: string) =>
 					if (stderr.length > 0) sendWarn(stderr);
 				})
 				.then(async () => {
-					// Copy prebuilt files
-					const prebuiltDir = join(__dirname, 'smartpy-v0.16.0');
-					const files = await readdir(prebuiltDir, { withFileTypes: true });
-					for (let file of files) {
-						file.isFile() && await copyFile(join(prebuiltDir, file.name), join(getPathToSmartPyCliDir(), file.name));
+					try {
+						// Copy prebuilt files
+						sendWarn('Copying prebuilt files...');
+						const prebuiltDir = join(__dirname, 'smartpy-v0.16.0');
+						const files = await readdir(prebuiltDir, { withFileTypes: true });
+						for (let file of files) {
+							if (file.isFile()) {
+								await copyFile(join(prebuiltDir, file.name), join(getPathToSmartPyCliDir(), file.name));
+								sendWarn('Copied ${file.name}');
+							}
+						}
+					} catch (e) {
+						if (e instanceof Error) {
+							sendWarn(e.toString());
+						}
 					}
 				});
 		});
