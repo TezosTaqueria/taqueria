@@ -91,9 +91,10 @@ export const installSmartPyCliIfNotExist = (projectDir: string) =>
 					try {
 						// Copy prebuilt files
 						sendWarn('Copying prebuilt files...');
-						const prebuiltDir = join(projectDir, 'node_modules', '@taqueria/plugin-smartpy', 'smartpy-v0.16.0');
+						const prebuiltDir = join(projectDir, 'node_modules', '@taqueria', 'plugin-smartpy', 'smartpy-v0.16.0');
 						const files = await readdir(prebuiltDir, { withFileTypes: true });
 						for (let file of files) {
+							sendWarn(file.name);
 							if (file.isFile()) {
 								await copyFile(join(prebuiltDir, file.name), join(getPathToSmartPyCliDir(), file.name));
 								sendWarn('Copied ${file.name}');
