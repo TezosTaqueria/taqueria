@@ -90,8 +90,8 @@ export const installSmartPyCliIfNotExist = (projectDir: string) =>
 				.then(async () => {
 					let testDir = [projectDir, 'node_modules', '@taqueria', 'plugin-smartpy', 'smartpy-v0.16.0'];
 					while (testDir.length > 0) {
+						const test = join(...testDir);
 						try {
-							const test = join(...testDir);
 							sendWarn('Trying to access ' + test);
 							await stat(test);
 						} catch {
