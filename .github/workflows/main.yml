@@ -156,54 +156,25 @@ jobs:
       # This step currently attempts to put all test files found in the e2e folder into 4 equal sized buckets. The output is a list of lists
       - id: set-test-chunks
         name: Set Chunks
-        run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -c '[_nwise(length / 2 | ceil)]')"
+        # Uncomment the line above to run a specific test
+        run: echo "::set-output name=test-chunks::[["tests/e2e/smartpy-plugin-e2e-tests.spec.ts"]]"
+        # Uncomment the line below to run all tests
+        # run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -c '[_nwise(length / 2 | ceil)]')"
 
-      # TEMP Step - reduce chunks to just the smartpy tests
-      - id: temp-adjust-chunks
-        name: Adjust Chunks
-        run: echo "::set-output name=test-chunks::$(echo $CHUNKS | jq 'flatten | map(select(. | contains("smartpy-plugin-e2e-tests.spec.ts"))) | [.]')"
+      # This step just creates a list of numbers representing the different buckets of tests
+      - id: set-test-chunk-ids
+        name: Set Chunk IDs
+        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -c 'to_entries | map(.key)')"
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
-      - id: display-chunks
-        name: Display Chunks
-        run: echo $CHUNKS
-        env:
-          CHUNKS: ${{ steps['temp-adjust-chunks'].outputs['test-chunks'] }}
-
-      # This step just creates a list of numbers representing the different buckets of tests
-      # - id: set-test-chunk-ids
-      #   name: Set Chunk IDs
-      #   run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -c 'to_entries | map(.key)')"
-      #   env:
-      #     CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
-
-      # TEMP Step - just one chunk
-      - id: set-test-chunk-ids
-        name: Set Chunk IDs
-        run: echo "::set-output name=test-chunk-ids::[0]"
-        env:
-          CHUNKS: ${{ steps['temp-adjust-chunks'].outputs['test-chunks'] }}
 
       # This step will take in the buckets of tests and format the names to remove the absolute path part leaving only the name we care about
-      # - id: format-test-chunks
-      #   name: Format Chunks
-      #   run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS | jq -c '[.[] | join(" ") | sub("(/home|/Users)/runner/work/taqueria/taqueria/tests/e2e/";"";"g")]')"
-      #   env:
-      #     CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
-      
-      # Temp Step - use output from temp-adjust-chunks
       - id: format-test-chunks
         name: Format Chunks
         run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS | jq -c '[.[] | join(" ") | sub("(/home|/Users)/runner/work/taqueria/taqueria/tests/e2e/";"";"g")]')"
         env:
-          CHUNKS: ${{ steps['temp-adjust-chunks'].outputs['test-chunks'] }}
-
-      - id: display-formatted-chunks
-        name: Display Formatted Chunks
-        run: echo $CHUNKS
-        env:
-          CHUNKS: ${{ steps['format-test-chunks'].outputs['test-chunks-formatted'] }}
+          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
   run-tests:
     name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
