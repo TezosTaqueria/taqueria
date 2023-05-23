@@ -1,6 +1,6 @@
 import { execCmd, getArtifactsDir, getContractsDir, sendErr, sendWarn } from '@taqueria/node-sdk';
 import { ProxyTaskArgs } from '@taqueria/node-sdk/types';
-import { access, copyFile, readdir } from 'fs/promises';
+import { access, copyFile, readdir, stat } from 'fs/promises';
 import { join } from 'path';
 
 export interface CompileOpts extends ProxyTaskArgs.t {
@@ -93,8 +93,9 @@ export const installSmartPyCliIfNotExist = (projectDir: string) =>
 						try {
 							const test = join(...testDir);
 							sendWarn('Trying to access ' + test);
-							await readdir(test);
+							await stat(test);
 						} catch {
+							sendWarn('Could not access ' + test);
 							testDir.pop();
 						}
 					}

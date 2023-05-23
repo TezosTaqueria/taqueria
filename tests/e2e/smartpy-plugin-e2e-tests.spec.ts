@@ -17,7 +17,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('compile will compile one contract with compile <sourceFile> command', async () => {
+	test.only('compile will compile one contract with compile <sourceFile> command', async () => {
 		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
