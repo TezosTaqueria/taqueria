@@ -168,7 +168,6 @@ jobs:
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
-
       # This step will take in the buckets of tests and format the names to remove the absolute path part leaving only the name we care about
       - id: format-test-chunks
         name: Format Chunks
