@@ -88,6 +88,17 @@ export const installSmartPyCliIfNotExist = (projectDir: string) =>
 					if (stderr.length > 0) sendWarn(stderr);
 				})
 				.then(async () => {
+					let testDir = [projectDir, 'node_modules', '@taqueria', 'plugin-smartpy', 'smartpy-v0.16.0'];
+					while (testDir.length > 0) {
+						try {
+							const test = join(...testDir);
+							sendWarn('Trying to access ' + test);
+							await readdir(test);
+						} catch {
+							testDir.pop();
+						}
+					}
+
 					try {
 						// Copy prebuilt files
 						sendWarn('Copying prebuilt files...');
