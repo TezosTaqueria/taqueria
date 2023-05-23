@@ -39,7 +39,7 @@ import { identity, pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
 import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
-import { has, last, uniq } from 'https://x.nest.land/ramda@0.27.2/mod.ts';
+import { has, last, uniq } from 'rambda';
 import * as Analytics from './analytics.ts';
 import * as NPM from './npm.ts';
 import { addTask } from './persistent-state.ts';
