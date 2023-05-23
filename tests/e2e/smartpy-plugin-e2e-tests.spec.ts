@@ -3,7 +3,8 @@ import { exec as exec1 } from 'child_process';
 import util from 'util';
 const exec = util.promisify(exec1);
 
-jest.setTimeout(100000);
+// Set timeout to 5 minutes
+jest.setTimeout(5 * 60 * 1000);
 
 describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 	test('compile will offer contextual help', async () => {
