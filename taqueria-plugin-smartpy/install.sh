@@ -104,7 +104,10 @@ if [ "$native" != true ]; then
 fi
 
 # # Copy prebuilt files stored in the plugin
+echo "$projectDir/node_modules/\/@taqueria"
 ls $projectDir/node_modules/\/@taqueria
+echo "$projectDir/node_modules/\/@taqueria/plugin-smartpy"
+ls $projectDir/node_modules/\/@taqueria/plugin-smartpy
 #cp $projectDir/node_modules/\@taqueria/plugin-smartpy/smartpy-v0.16.0/* "$prefix"
 
 >&2 echo "Installing npm packages..."
