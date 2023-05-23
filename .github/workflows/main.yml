@@ -165,6 +165,12 @@ jobs:
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
+      - id: display-chunks
+        name: Display Chunks
+        run: echo $CHUNKS
+        env:
+          CHUNKS: ${{ steps['temp-adjust-chunks'].outputs['test-chunks'] }}
+
       # This step just creates a list of numbers representing the different buckets of tests
       # - id: set-test-chunk-ids
       #   name: Set Chunk IDs
@@ -192,6 +198,12 @@ jobs:
         run: echo "::set-output name=test-chunks-formatted::$(echo $CHUNKS | jq -c '[.[] | join(" ") | sub("(/home|/Users)/runner/work/taqueria/taqueria/tests/e2e/";"";"g")]')"
         env:
           CHUNKS: ${{ steps['temp-adjust-chunks'].outputs['test-chunks'] }}
+
+      - id: display-formatted-chunks
+        name: Display Formatted Chunks
+        run: echo $CHUNKS
+        env:
+          CHUNKS: ${{ steps['format-test-chunks'].outputs['test-chunks-formatted'] }}
 
   run-tests:
     name: OS ${{ matrix.os }} test chunk ${{ matrix.chunk-ids }}
