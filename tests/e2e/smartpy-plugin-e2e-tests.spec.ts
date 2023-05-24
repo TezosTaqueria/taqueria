@@ -1,6 +1,5 @@
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 import { exec as exec1 } from 'child_process';
-import { join } from 'path';
 import util from 'util';
 const exec = util.promisify(exec1);
 
@@ -18,8 +17,8 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test.only('compile will compile one contract with compile <sourceFile> command', async () => {
-		const { execute, cleanup, exists, writeFile, path } = await prepareEnvironment();
+	test('compile will compile one contract with compile <sourceFile> command', async () => {
+		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
 		await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
@@ -28,16 +27,13 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		const py_file = await (await exec(`cat e2e/data/smartpy-data/hello-tacos.py`)).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.py', py_file);
 
-		// the execute() function of the prepared environment fails to work here
-		const result = await exec(`taq compile hello-tacos.py`, {
-			cwd: join(path, 'test-project'),
-			shell: process.env['SHELL'],
-		});
-
-		console.log(result);
-
-		expect(result.stdout).toMatch(/hello-tacos\.py | test-project\/artifacts\/hello-tacos.tz/m);
-		expect(result.stdout).toMatch(/hello-tacos.default_storage.tz/m);
+		const { stdout } = await execute('taq', 'compile hello-tacos.py', './test-project');
+		expect(stdout).toEqual(
+			expect.arrayContaining(['│ hello-tacos.py │ {{base}}/test-project/artifacts/hello-tacos.tz                 │']),
+		);
+		expect(stdout).toEqual(
+			expect.arrayContaining(['│                │ {{base}}/test-project/artifacts/hello-tacos.default_storage.tz │']),
+		);
 
 		await exists(`./test-project/artifacts/hello-tacos.tz`);
 		await exists(`./test-project/artifacts/hello-tacos.default_storage.tz`);
