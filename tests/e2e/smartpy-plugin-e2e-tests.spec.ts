@@ -4,7 +4,6 @@ import util from 'util';
 const exec = util.promisify(exec1);
 
 describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
-	// contextual help not working for this plugin
 	test('compile will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');

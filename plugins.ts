@@ -5,7 +5,7 @@ import * as PluginActionName from '@taqueria/protocol/PluginActionName';
 import * as PluginResponseEncoding from '@taqueria/protocol/PluginResponseEncoding';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import { omit } from 'https://x.nest.land/ramda@0.27.2/mod.ts';
+import { omit } from 'rambda';
 import type { PluginDeps, PluginRequestArgs } from './taqueria-types.ts';
 import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
@@ -225,10 +225,10 @@ export const inject = (deps: PluginDeps) => {
 		// --
 		// We'll use the projectDir from the config rather than the one from the CLI, as
 		// as the actual projectDir could be found via traversal
-		const passableParsedArgs = omit(['p', 'project-dir', 'projectDir'], parsedArgs);
+		const passableParsedArgs = omit(['p', 'project-dir', 'projectDir'], parsedArgs) ?? {};
 		const passableRequestArgs = omit(Object.keys(passableParsedArgs), requestArgs);
 		return Object.entries({ ...passableParsedArgs, ...passableRequestArgs, projectDir: config.projectDir }).reduce(
-			(retval: (string | number | boolean)[], [key, val]) => {
+			(retval: (string | number | boolean)[], [key, val]: [string, unknown]) => {
 				const omit = [
 					'$0',
 					'quickstart',
