@@ -19,7 +19,7 @@ const getTestContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
 
 const testContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
 	getArch()
-		.then(() => installSmartPyCliIfNotExist())
+		.then(() => installSmartPyCliIfNotExist(parsedArgs.projectDir))
 		.then(() => getTestContractCmd(parsedArgs, sourceFile))
 		.then(execCmd)
 		.then(({ stdout, stderr }) => {
