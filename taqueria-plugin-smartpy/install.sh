@@ -98,17 +98,22 @@ mkdir -p "$prefix"
 >&2 echo "Downloading files..."
 git clone https://gitlab.com/SmartPy/SmartPy /tmp/smartpy
 # curl "$from"/smartpy-cli.tar.gz | tar xzf - -C "$prefix"
-cp -r /tmp/smartpy/smartpy-cli/* "$prefix" 2>/dev/null || true
+cp -Lr /tmp/smartpy/smartpy-cli/* "$prefix" 2>/dev/null || true
 if [ "$native" != true ]; then
     rm -f "$prefix/smartpyc"
 fi
 
 # # Copy prebuilt files stored in the plugin
-echo "$projectDir/node_modules/\/@taqueria"
-ls $projectDir/node_modules/\/@taqueria
-echo "$projectDir/node_modules/\/@taqueria/plugin-smartpy"
-ls $projectDir/node_modules/\/@taqueria/plugin-smartpy
-#cp $projectDir/node_modules/\@taqueria/plugin-smartpy/smartpy-v0.16.0/* "$prefix"
+>&2 echo "Copying prebuilt files..." 
+PREBUILD_DIR="$projectDir/node_modules/\@taqueria/plugin-smartpy/smartpy-v0.16.0"
+for file in `ls $PREBUILD_DIR/*`; do
+    dst="$prefix/`basename $file`"
+    >&2 echo $dst
+    if [ -L "$dst" ]; then
+        rm -f "$dst"
+    fi
+    cp "$file" $dst
+done
 
 >&2 echo "Installing npm packages..."
 cd "$prefix"
