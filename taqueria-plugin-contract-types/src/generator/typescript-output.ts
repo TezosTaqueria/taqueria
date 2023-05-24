@@ -247,20 +247,28 @@ ${tabs(indent)}}])`;
 	};
 
 	const argsToCode = (args: TypedVar[], indent: number, asObject: boolean): string => {
-		if (args.length === 1) {
-			if (args[0].type.kind === `unit`) return ``;
+		// Sort arguments so that optional args at the end
+		// See https://github.com/ecadlabs/taqueria/issues/1861
+		const sortedArgs = args.sort((a, b) => {
+			if (a.type.optional && !b.type.optional) return 1;
+			if (!a.type.optional && b.type.optional) return -1;
+			return 0;
+		});
+
+		if (sortedArgs.length === 1) {
+			if (sortedArgs[0].type.kind === `unit`) return ``;
 
 			if (options?.mode === 'defaultValue') {
-				return typeToCode(args[0].type, indent + 1);
+				return typeToCode(sortedArgs[0].type, indent + 1);
 			}
-			return `${args[0].name ?? `param`}: ${typeToCode(args[0].type, indent + 1)}`;
+			return `${sortedArgs[0].name ?? `param`}: ${typeToCode(sortedArgs[0].type, indent + 1)}`;
 		}
 
 		const result = `${
 			toIndentedItems(
 				indent,
 				{},
-				args.filter(x => x.name || x.type.kind !== `unit`).map((a, i) => {
+				sortedArgs.filter(x => x.name || x.type.kind !== `unit`).map((a, i) => {
 					if (!asObject && options?.mode === 'defaultValue') {
 						return typeToCode(a.type, indent + 1) + `,`;
 					}
