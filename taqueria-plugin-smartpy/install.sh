@@ -105,8 +105,6 @@ fi
 
 # # Copy prebuilt files stored in the plugin
 >&2 echo "Copying prebuilt files..." 
->&2 ls $projectDir/node_modules/
->&2 ls $projectDir/node_modules/@taqueria
 >&2 ls $projectDir/node_modules/@taqueria/plugin-smartpy
 PREBUILD_DIR="$projectDir/node_modules/@taqueria/plugin-smartpy/smartpy-v0.16.0"
 for file in `ls $PREBUILD_DIR/`; do
