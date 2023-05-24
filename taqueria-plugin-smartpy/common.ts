@@ -1,6 +1,6 @@
 import { execCmd, getArtifactsDir, getContractsDir, sendErr, sendWarn } from '@taqueria/node-sdk';
 import { ProxyTaskArgs } from '@taqueria/node-sdk/types';
-import { access } from 'fs/promises';
+import { access, copyFile, readdir, stat } from 'fs/promises';
 import { join } from 'path';
 
 export interface CompileOpts extends ProxyTaskArgs.t {
@@ -29,14 +29,12 @@ const SMARTPY_ARTIFACTS_DIR = '.smartpy';
 
 const smartpyVersionToInstallerMap: { [k: string]: string } = {
 	'v0.16.0': 'https://smartpy.io/releases/20221215-8f134ebb649f5a7b37c44fca8f336f970f523565/cli/install.sh',
-	'v0.15.0': 'https://smartpy.io/releases/20221026-28e8c18e46035c353804eb5fd725573c5d434e8a/cli/install.sh',
-	'v0.14.0': 'https://smartpy.io/releases/20220926-1c748c4572188f65a525792468e37da2182f18a2/cli/install.sh',
 };
 
 const getSmartpyVersion = (): string => {
 	const userDefinedSmartpyVersion = process.env[SMARTPY_VERSION_ENV_VAR];
 	if (userDefinedSmartpyVersion) {
-		if (smartpyVersionToInstallerMap[userDefinedSmartpyVersion]) {
+		if (/v0\.1[4-6]\./.test(userDefinedSmartpyVersion)) {
 			return userDefinedSmartpyVersion;
 		} else {
 			sendWarn(
@@ -55,12 +53,11 @@ const getPathToSmartPyCliDir = (): string => `${process.env.HOME}/smartpy-cli-${
 
 export const getSmartPyCli = (): string => `${getPathToSmartPyCliDir()}/SmartPy.sh`;
 
-const getSmartPyInstallerCmd = (): string => {
-	const installer = '~/SmartPyCliInstaller.sh';
-	const download = `curl -s ${smartpyVersionToInstallerMap[getSmartpyVersion()]} > ${installer};`;
-	const install = `bash ${installer} --yes --prefix ${getPathToSmartPyCliDir()};`;
-	const clean = `rm ${installer};`;
-	return download + install + clean;
+const getSmartPyInstallerCmd = (projectDir: string): string => {
+	const trimmedProjectdir = projectDir.replace(/\/$/, '');
+	const installer = join(__dirname, 'install.sh');
+	const install = `bash ${installer} --yes --prefix ${getPathToSmartPyCliDir()} --project ${trimmedProjectdir};`;
+	return install;
 };
 
 export const addPyExtensionIfMissing = (sourceFile: string): string =>
@@ -82,11 +79,11 @@ export const getInputFilename = (parsedArgs: UnionOpts, sourceFile: string): str
 export const getCompilationTargetsDirname = (parsedArgs: UnionOpts, sourceFile: string): string =>
 	join(parsedArgs.config.projectDir, getArtifactsDir(parsedArgs), SMARTPY_ARTIFACTS_DIR, removeExt(sourceFile));
 
-export const installSmartPyCliIfNotExist = () =>
+export const installSmartPyCliIfNotExist = (projectDir: string) =>
 	access(getSmartPyCli())
 		.catch(() => {
 			sendWarn('SmartPy CLI not found. Installing it now...');
-			return execCmd(getSmartPyInstallerCmd())
+			return execCmd(getSmartPyInstallerCmd(projectDir))
 				.then(({ stderr }) => {
 					if (stderr.length > 0) sendWarn(stderr);
 				});
