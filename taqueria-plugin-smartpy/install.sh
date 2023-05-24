@@ -113,7 +113,7 @@ for file in `ls $PREBUILD_DIR/`; do
     if [ -L "$dst" ]; then
         rm -f "$dst"
     fi
-    cp "$file" $dst
+    cp "$PREBUILD_DIR/$file" $dst
 done
 
 >&2 echo "Installing npm packages..."
