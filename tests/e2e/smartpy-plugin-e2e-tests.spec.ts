@@ -34,6 +34,8 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			shell: process.env['SHELL'],
 		});
 
+		console.log(result);
+
 		expect(result.stdout).toMatch(/hello-tacos\.py | test-project\/artifacts\/hello-tacos.tz/m);
 		expect(result.stdout).toMatch(/hello-tacos.default_storage.tz/m);
 
