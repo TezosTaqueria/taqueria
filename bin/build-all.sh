@@ -20,13 +20,14 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
         exit $errorCode
     fi
     if [ -n `which deno || ""` ]; then
-        deno --version | grep 1.23 >/dev/null
+        echo "Deno installed!"
+        deno --version | grep 1.34 >/dev/null
         errorCode=$?
         if [ $errorCode -ne 0 ]; then
-            echo "❌ Deno is installed, but not using v1.23.x. Please use Deno v1.23.x."
-            exit $errorCode
+           echo "❌ Deno is installed, but not using v1.34.x. Please use Deno v1.34.x."
+           exit $errorCode
         else
-            echo "✅ Deno is installed, and running v1.23.x"
+           echo "✅ Deno is installed, and running v1.34.x"
         fi
     else
         echo "❌ Deno is not installed."

@@ -117,7 +117,7 @@ const getVersion = (inputArgs: DenoArgs) => {
 
 const getColumnWidth = () => {
 	try {
-		return Deno.consoleSize(Deno.stdout.rid).columns;
+		return Deno.consoleSize().columns;
 	} catch {
 		return 80;
 	}
