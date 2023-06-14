@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DENO_VERSION: '1.23.1'
+  DENO_VERSION: '1.34.1'
 
 jobs:
   # When we use reusable we lose the ability to to filter out the workflow for changes to certain paths.
