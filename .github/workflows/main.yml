@@ -210,7 +210,7 @@ jobs:
 
       - name: Setup Docker (on macos)
         run: brew install docker
-        if: matrix.os == 'MacOS'
+        if: matrix.os == 'macOS'
 
       - name: Add working dir to PATH
         run: echo "$(pwd)" >> $GITHUB_PATH
