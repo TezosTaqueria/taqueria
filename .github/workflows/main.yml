@@ -85,6 +85,13 @@ jobs:
       - name: Setup repo
         uses: actions/checkout@v3
 
+      
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/gallium
+          cache: "npm"
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
@@ -181,7 +188,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, ecad-macmini]
+        os: [ubuntu-latest, macos-latest]
         chunk-ids: ${{ fromJson(needs.gather-info-for-e2e-tests.outputs['test-chunk-ids']) }}
     env:
       UNLIMITED_PINATA_TOKEN: ${{ secrets.PINATA_JWT_TOKEN }}
