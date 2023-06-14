@@ -208,6 +208,9 @@ jobs:
         with:
           deno-version: "${{ env.DENO_VERSION }}"
 
+      - name: Output OS
+        run: echo ${{env.RUNNER_OS }}
+
       - name: Setup Docker (on macos)
         run: brew install docker
         if: matrix.os == 'macOS'
