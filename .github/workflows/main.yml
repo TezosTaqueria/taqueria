@@ -209,7 +209,7 @@ jobs:
           deno-version: "${{ env.DENO_VERSION }}"
 
       - name: Output OS
-        run: echo $env:RUNNER_OS
+        run: echo "${{ runner.os }} ${{ matrix.os }}"
 
       - name: Setup Docker (on macos)
         run: brew install docker
