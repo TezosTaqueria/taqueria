@@ -25,7 +25,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ecadlabs/taqueria.git"
+		"url": "git+https://github.com/pinnacle-labs/taqueria.git"
 	},
 	"keywords": [
 		"taqueria",
@@ -34,15 +34,15 @@
 		"test",
 		"deploy",
 		"originate",
-		"ecad",
-		"ecadlabs"
+		"pinnaclelabs",
+		"pinnacle-labs"
 	],
-	"author": "ECAD Labs",
+	"author": "Pinnacle Labs",
 	"license": "Apache-2.0",
 	"bugs": {
-		"url": "https://github.com/ecadlabs/taqueria/issues"
+		"url": "https://github.com/pinnacle-labs/taqueria/issues"
 	},
-	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
 		"@gmrchk/cli-testing-library": "^0.1.2",
 		"chokidar-cli": "^3.0.0",

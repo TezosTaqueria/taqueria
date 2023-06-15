@@ -36,7 +36,7 @@ Builds for the latest release of Taqueria:
 | Linux   | https://taqueria.io/get/linux/taq       |
 | Windows | https://taqueria.io/get/windows/taq.exe |
 
-Builds are also available on the [releases](https://github.com/ecadlabs/taqueria/releases) page on Github
+Builds are also available on the [releases](https://github.com/pinnacle-labs/taqueria/releases) page on Github
 
 > Detailed instructions for installing and using Taqueria can be found [here](https://taqueria.io/docs/getting-started/installation)
 

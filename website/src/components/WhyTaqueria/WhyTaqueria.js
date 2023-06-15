@@ -35,7 +35,7 @@ const FeatureList = [
         description: (
           <>
 						<strong>From the creators of Taquito</strong><br></br>
-						Taqueria is built by ECAD Labs, the team behind the popular Taquito Typescript library. ECAD Labs has been working in the Tezos ecosystem since 2019 and brings extensive experience building and supporting developer tools.
+						Taqueria is built by Pinnacle Labs, previously developed by ECAD Labs - the team behind the popular Taquito Typescript library. Pinnacle Labs has been working in the Tezos ecosystem since 2021 and brings extensive experience building and supporting developer tools.
           </>
         ),
       },

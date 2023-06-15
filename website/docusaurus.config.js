@@ -21,7 +21,7 @@ const config = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "/img/favicon.ico",
-  organizationName: "ecadlabs", // Usually your GitHub org/user name
+  organizationName: "pinnacle-labs", // Usually your GitHub org/user name
   projectName: "taqueria", // Usually your repo name.
   trailingSlash: true,
 
@@ -35,13 +35,13 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           // Please change this to your repo.
 
-          editUrl: "https://github.com/ecadlabs/taqueria/edit/main/website/"
+          editUrl: "https://github.com/pinnacle-labs/taqueria/edit/main/website/"
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
           editUrl:
-            "https://github.com/ecadlabs/taqueria/edit/main/website/blog/"
+            "https://github.com/pinnacle-labs/taqueria/edit/main/website/blog/"
         },
         theme: {
           customCss: [
@@ -128,7 +128,7 @@ const config = {
             "aria-label": "Twitter"
           },
           {
-            href: "https://github.com/ecadlabs/taqueria",
+            href: "https://github.com/pinnacle-labs/taqueria",
             position: "right",
             className: "header-github-link",
             "aria-label": "GitHub repository"
@@ -142,11 +142,11 @@ const config = {
             items: [
               {
                 label: "Report Issues",
-                to: "https://github.com/ecadlabs/taqueria/issues/new/choose"
+                to: "https://github.com/pinnacle-labs/taqueria/issues/new/choose"
               },
               {
                 label: "Contribute",
-                to: "https://github.com/ecadlabs/taquito/blob/master/CONTRIBUTING.md"
+                to: "https://github.com/pinnacle-labs/taqueria/blob/master/CONTRIBUTING.md"
               }
             ]
           },
@@ -168,11 +168,11 @@ const config = {
               },
               {
                 label: "Code of Conduct",
-                to: "https://github.com/ecadlabs/taquito/blob/master/code-of-conduct.md"
+                to: "https://github.com/pinnacle-labs/contrib/blob/main/code-of-conduct.md"
               },
               {
                 label: "GitHub",
-                to: "https://github.com/ecadlabs/taqueria"
+                to: "https://github.com/pinnacle-labs/taqueria"
               }
             ]
           },
@@ -209,7 +209,7 @@ const config = {
                 html: `form`
               },
               {
-                label: `Copyright © 2021 ECAD Labs - This project is licensed under Apache License, Version 2.0`,
+                label: `Copyright © 2021-2023 Pinnacle Labs - This project is licensed under Apache License, Version 2.0`,
                 to: "/",
                 className: "copyright"
               }

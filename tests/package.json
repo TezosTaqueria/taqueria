@@ -22,7 +22,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ecadlabs/taqueria.git",
+		"url": "git+https://github.com/pinnacle-labs/taqueria.git",
 		"directory": "tests"
 	},
 	"keywords": [
@@ -35,9 +35,9 @@
 	"author": "Jev Bjorsell",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/ecadlabs/taqueria/issues"
+		"url": "https://github.com/pinnacle-labs/taqueria/issues"
 	},
-	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
 		"@taquito/signer": "^15.0.0",
 		"@taquito/taquito": "^15.0.0",

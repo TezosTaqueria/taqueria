@@ -8,8 +8,8 @@
 		"flextesa",
 		"sandbox",
 		"local",
-		"ecad",
-		"ecadlabs",
+		"pinnaclelabs",
+		"pinnacle-labs",
 		"tezos"
 	],
 	"targets": {
@@ -26,11 +26,11 @@
 		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup",
 		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
 	},
-	"author": "ECAD Labs",
+	"author": "Pinnacle Labs",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ecadlabs/taqueria.git",
+		"url": "https://github.com/pinnacle-labs/taqueria.git",
 		"directory": "taqueria-plugin-flextesa"
 	},
 	"dependencies": {

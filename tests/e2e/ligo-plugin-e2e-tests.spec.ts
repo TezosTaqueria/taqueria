@@ -409,7 +409,7 @@ Type "natu" not found.`,
 		await cleanup();
 	});
 
-	// See https://github.com/ecadlabs/taqueria/issues/1870
+	// See https://github.com/pinnacle-labs/taqueria/issues/1870
 	test('ligo task with install command does not result in an error', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');

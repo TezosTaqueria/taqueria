@@ -11,17 +11,17 @@
 		"taqueria",
 		"tezos",
 		"build",
-		"ecad",
-		"ecadlabs",
+		"pinnaclelabs",
+		"pinnacle-labs",
 		"smart contract",
 		"compile"
 	],
-	"author": "ECAD Labs",
+	"author": "Pinnacle Labs",
 	"license": "Apache-2.0",
 	"bugs": {
-		"url": "https://github.com/ecadlabs/taqueria/issues"
+		"url": "https://github.com/pinnacle-labs/taqueria/issues"
 	},
-	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.27.16-rc"
 	}

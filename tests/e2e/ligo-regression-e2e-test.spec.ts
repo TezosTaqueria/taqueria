@@ -5,8 +5,8 @@ import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
-// See https://github.com/ecadlabs/taqueria/issues/1859
-// See https://github.com/ecadlabs/taqueria/issues/1867
+// See https://github.com/pinnacle-labs/taqueria/issues/1859
+// See https://github.com/pinnacle-labs/taqueria/issues/1867
 test('regression against #1859, ligo compile-all will not create infinite storage files', async () => {
 	const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
 

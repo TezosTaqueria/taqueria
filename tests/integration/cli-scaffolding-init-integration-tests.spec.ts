@@ -9,7 +9,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	const scaffoldDirName = `taqueria-taco-shop`;
 
 	test('Verify that taq scaffold will create a baseline scaffold of the taco shop project', async () => {
-		// the URL for the default scaffold project is https://github.com/ecadlabs/taqueria-scaffold-taco-shop
+		// the URL for the default scaffold project is https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop
 		try {
 			await exec('mkdir -p ./scrap/scaffold01 && cd scrap/scaffold01 && taq scaffold');
 			const homeDirContents = await exec('ls scrap/scaffold01');
@@ -39,7 +39,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	test('Verify that taq scaffold can use the URL parameter to clone a different scaffold into the project', async () => {
 		try {
 			await exec(
-				'mkdir -p ./scrap/scaffold03 && cd scrap/scaffold03 && taq scaffold https://github.com/ecadlabs/taqueria-scaffold-nft.git',
+				'mkdir -p ./scrap/scaffold03 && cd scrap/scaffold03 && taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-nft.git',
 			);
 			const scaffoldDirContents = await exec(`ls scrap/scaffold03/${scaffoldDirName}`);
 
@@ -56,13 +56,13 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		}
 	});
 
-	// TODO: https://github.com/ecadlabs/taqueria/issues/737
+	// TODO: https://github.com/pinnacle-labs/taqueria/issues/737
 	test('Verify that taq scaffold returns an error with a bogus URL', async () => {
-		const scaffoldURL = 'https://github.com/ecadlabs/taqueria-scaffold-taco-shopzzz.git';
+		const scaffoldURL = 'https://github.com/pinnacle-labs/taqueria-scaffold-taco-shopzzz.git';
 		try {
 			if (process.env.CI === 'true') {
 				await exec(
-					`mkdir -p ./scrap/scaffold04 && cd scrap/scaffold04 && taq scaffold https://alexzbusko:${process.env.SCAFFOLDING_PAT}@github.com/ecadlabs/taqueria-scaffold-taco-shopzzz.git`,
+					`mkdir -p ./scrap/scaffold04 && cd scrap/scaffold04 && taq scaffold https://alexzbusko:${process.env.SCAFFOLDING_PAT}@github.com/pinnacle-labs/taqueria-scaffold-taco-shopzzz.git`,
 				);
 			}
 
@@ -83,7 +83,7 @@ describe('E2E Testing for taqueria scaffolding initialization in other directory
 	const alternateDirectory = 'scrap/alt-directory';
 	test('Verify that taq scaffold quickstart project can be installed in a specific directory', async () => {
 		try {
-			await exec(`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${alternateDirectory}`);
+			await exec(`taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop.git ${alternateDirectory}`);
 			const scaffoldDirContents = await exec(`ls ${alternateDirectory}`);
 
 			expect(scaffoldDirContents.stdout).toContain('README.md');
@@ -102,7 +102,7 @@ describe('E2E Testing for taqueria scaffolding initialization in other directory
 		try {
 			await fsPromises.mkdir(`${alternateDirectory}`);
 			await exec(
-				`taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git ${alternateDirectory}`,
+				`taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop.git ${alternateDirectory}`,
 			);
 		} catch (error) {
 			expect(JSON.stringify(error)).toContain('Path already exists');

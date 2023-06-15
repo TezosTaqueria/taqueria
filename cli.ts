@@ -231,7 +231,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 							.positional('scaffoldUrl', {
 								describe: i18n.__('scaffoldUrlDesc'),
 								type: 'string',
-								default: 'https://github.com/ecadlabs/taqueria-scaffold-taco-shop.git',
+								default: 'https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop.git',
 							})
 							.positional('scaffoldProjectDir', {
 								type: 'string',
@@ -637,7 +637,7 @@ const initProject = (
 		mkInitialDirectories(projectDir, maxConcurrency, i18n),
 		chain(_ => exec('npm init -y 2>&1 > /dev/null', {}, false, projectDir)),
 		chain(_ => preInstallPluginsOnInit(parsedArgs, projectDir)),
-		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/ecadlabs/taqueria/issues/528
+		map(_ => Deno.run({ cmd: ['sh', '-c', 'taq'], cwd: projectDir, stdout: 'piped', stderr: 'piped' })), // temp workaround for https://github.com/pinnacle-labs/taqueria/issues/528
 		chain(_ => createGitIgnoreFile(projectDir)),
 		map(_ => i18n.__('bootstrapMsg')),
 	);
@@ -1179,7 +1179,7 @@ const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 			//
 			// For some reason, the original parsedArgs is getting mutated by yargs in the second parseArgs() call.
 			// I'll be coming back to see what is going on here.
-			// https://github.com/ecadlabs/taqueria/issues/1614
+			// https://github.com/pinnacle-labs/taqueria/issues/1614
 			chain(inputArgs => SanitizedArgs.of({ ...inputArgs, _: parsedArgs._ })),
 			chain(parsedArgs => {
 				if (internalTasks.isTaskRunning(parsedArgs)) return internalTasks.handle(parsedArgs);

@@ -651,11 +651,11 @@ export class VsCodeHelper {
 		return [
 			{
 				name: 'NFT',
-				url: 'https://github.com/ecadlabs/taqueria-scaffold-nft',
+				url: 'https://github.com/pinnacle-labs/taqueria-scaffold-nft',
 			},
 			{
 				name: 'Taco Shop',
-				url: 'https://github.com/ecadlabs/taqueria-scaffold-taco-shop',
+				url: 'https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop',
 			},
 		];
 	}

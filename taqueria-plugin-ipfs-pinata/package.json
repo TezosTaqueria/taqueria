@@ -8,8 +8,8 @@
 		"jest",
 		"testing",
 		"tdd",
-		"ecad",
-		"ecadlabs",
+		"pinnaclelabs",
+		"pinnacle-labs",
 		"tezos"
 	],
 	"targets": {
@@ -24,12 +24,12 @@
 	"scripts": {
 		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
 	},
-	"author": "ECAD Labs",
+	"author": "Pinnacle Labs",
 	"license": "Apache-2.0",
 	"type": "module",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ecadlabs/taqueria.git",
+		"url": "https://github.com/pinnacle-labs/taqueria.git",
 		"directory": "taqueria-plugin-ipfs-pinata"
 	},
 	"dependencies": {

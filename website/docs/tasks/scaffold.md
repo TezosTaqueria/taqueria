@@ -37,8 +37,8 @@ taq scaffold [url] [path]
 
 | Argument     | Required | Description                                            | Example Usage                                                                   |
 | ------------ | -------- | ------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| `[url]`      | No       | URL of the scaffold repository                         | `taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop`          |
-| `[path]`     | No       | Path to the folder you would like to scaffold into     | `taq scaffold https://github.com/ecadlabs/taqueria-scaffold-taco-shop myNewDir` |
+| `[url]`      | No       | URL of the scaffold repository                         | `taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop`          |
+| `[path]`     | No       | Path to the folder you would like to scaffold into     | `taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop myNewDir` |
 
 ### Task Details
 
@@ -51,6 +51,6 @@ taq scaffold [url] [path]
 | Description                   | Command                               | Behaviour                                                                     |
 | ----------------------------- | ------------------------------------- | ----------------------------------------------------------------------------- |
 | Scaffold the default project  | `taq scaffold`                                                                          | Scaffolds the default (`taqueria-scaffold-taco-shop`) project |
-| Scaffold a specific project   | `taq scaffold https://github.com/ecadlabs/taqueria-scaffold-nft-project`                | Scaffolds the NFT project into a directory with the repo name |
-| Scaffold a specific project   | `taq scaffold https://github.com/ecadlabs/taqueria-scaffold-nft-project ./myNftProject` | Scaffolds the NFT project into the provided directory |
+| Scaffold a specific project   | `taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-nft-project`                | Scaffolds the NFT project into a directory with the repo name |
+| Scaffold a specific project   | `taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-nft-project ./myNftProject` | Scaffolds the NFT project into the provided directory |
 

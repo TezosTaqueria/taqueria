@@ -248,7 +248,7 @@ ${tabs(indent)}}])`;
 
 	const argsToCode = (args: TypedVar[], indent: number, asObject: boolean): string => {
 		// Sort arguments so that optional args at the end
-		// See https://github.com/ecadlabs/taqueria/issues/1861
+		// See https://github.com/pinnacle-labs/taqueria/issues/1861
 		const sortedArgs = args.sort((a, b) => {
 			if (a.type.optional && !b.type.optional) return 1;
 			if (!a.type.optional && b.type.optional) return -1;

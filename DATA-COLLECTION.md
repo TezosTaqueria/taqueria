@@ -15,4 +15,4 @@ With consent, Taqueria will collect anonymous usage statistics. Taqueria collect
 
 ## Privacy Policy
 
-Taqueria is committed to preserving user privacy and gathering usage analytics in compliance with the [ECAD Labs privacy policy](http://ecadlabs.com/privacy)
+Taqueria is committed to preserving user privacy and gathering usage analytics in compliance with the [Pinnacle Labs privacy policy](https://pinnaclelabs.limited/privacy)

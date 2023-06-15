@@ -29,8 +29,8 @@
 		"taqueria",
 		"tezos",
 		"build",
-		"ecad",
-		"ecadlabs",
+		"pinnaclelabs",
+		"pinnacle-labs",
 		"plugin",
 		"smartpy",
 		"smart contract",
@@ -39,17 +39,17 @@
 	"engines": {
 		"node": ">=14.5"
 	},
-	"author": "ECAD Labs",
+	"author": "Pinnacle Labs",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ecadlabs/taqueria.git",
+		"url": "https://github.com/pinnacle-labs/taqueria.git",
 		"directory": "taqueria-plugin-smartpy"
 	},
 	"bugs": {
-		"url": "https://github.com/ecadlabs/taqueria/issues"
+		"url": "https://github.com/pinnacle-labs/taqueria/issues"
 	},
-	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.28.6",
 		"fast-glob": "^3.2.11"

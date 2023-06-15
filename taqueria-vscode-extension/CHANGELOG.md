@@ -6,7 +6,7 @@
 | ----------- | ------------- |
 |Release Date | Nov 17, 2022  |
 |Release Type | Minor         |
-|Release Page | [v0.24.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.24.2) |
+|Release Page | [v0.24.2](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.24.2) |
 
 ### Summary of Impactful Changes
 
@@ -81,21 +81,21 @@ plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 
 
 ### Pull Requests
 
-- 🚀 Release ➾ Taqueria v0.24.1 by @hu3man in [#1447](https://github.com/ecadlabs/taqueria/pull/1447)
-- Updating tests to become modules for TS requirement by @alexzbusko in [#1500](https://github.com/ecadlabs/taqueria/pull/1500)
-- 🛠️ Fix ➾ Update Taqueria.io Documentation by @hu3man in https://github.com/ecadlabs/taqueria/pull/1496
-- 🧽 Chore ➾ Bump loader-utils from 2.0.2 to 2.0.4 in /website by @dependabot in [#1497](https://github.com/ecadlabs/taqueria/pull/1497)
-- 👷 Refactor ➾ Updates to Docusaurus Docs by @hu3man in [#1506](https://github.com/ecadlabs/taqueria/pull/1506)
-- 🧽 Chore ➾ Update Docusaurus to `v2.2.0` by @hu3man in [#1505](https://github.com/ecadlabs/taqueria/pull/1505)
-- 🛠️ Fix ➾ Do Not Create the `quickstart.md` File on New Taqueria Projects by @jchenche in [#1491](https://github.com/ecadlabs/taqueria/pull/1491)
-- ✨ Feature ➾ Rename `<CONTRACT>.storages.mligo` to `<CONTRACT>.storageList.mligo` and similarly for the parameter part by @jchenche in [#1507](https://github.com/ecadlabs/taqueria/pull/1507)
-- ✨ Feature ➾ Allow docker images to be overwritten via environment variable (#1425) by @mweichert in [#1445](https://github.com/ecadlabs/taqueria/pull/1445)
+- 🚀 Release ➾ Taqueria v0.24.1 by @hu3man in [#1447](https://github.com/pinnacle-labs/taqueria/pull/1447)
+- Updating tests to become modules for TS requirement by @alexzbusko in [#1500](https://github.com/pinnacle-labs/taqueria/pull/1500)
+- 🛠️ Fix ➾ Update Taqueria.io Documentation by @hu3man in https://github.com/pinnacle-labs/taqueria/pull/1496
+- 🧽 Chore ➾ Bump loader-utils from 2.0.2 to 2.0.4 in /website by @dependabot in [#1497](https://github.com/pinnacle-labs/taqueria/pull/1497)
+- 👷 Refactor ➾ Updates to Docusaurus Docs by @hu3man in [#1506](https://github.com/pinnacle-labs/taqueria/pull/1506)
+- 🧽 Chore ➾ Update Docusaurus to `v2.2.0` by @hu3man in [#1505](https://github.com/pinnacle-labs/taqueria/pull/1505)
+- 🛠️ Fix ➾ Do Not Create the `quickstart.md` File on New Taqueria Projects by @jchenche in [#1491](https://github.com/pinnacle-labs/taqueria/pull/1491)
+- ✨ Feature ➾ Rename `<CONTRACT>.storages.mligo` to `<CONTRACT>.storageList.mligo` and similarly for the parameter part by @jchenche in [#1507](https://github.com/pinnacle-labs/taqueria/pull/1507)
+- ✨ Feature ➾ Allow docker images to be overwritten via environment variable (#1425) by @mweichert in [#1445](https://github.com/pinnacle-labs/taqueria/pull/1445)
 
 ## New Contributors
 
-- @dependabot made their first contribution in [#1497](https://github.com/ecadlabs/taqueria/pull/1497)
+- @dependabot made their first contribution in [#1497](https://github.com/pinnacle-labs/taqueria/pull/1497)
 
-**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.24.1...v0.24.2
+**Full Changelog**: https://github.com/pinnacle-labs/taqueria/compare/v0.24.1...v0.24.2
 
 ## Taqueria v0.24.1  
 
@@ -103,7 +103,7 @@ plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 
 | ----------- | ------------- |
 |Release Date | Nov 15, 2022  |
 |Release Type | Minor         |
-|Release Page | [v0.24.1](https://github.com/ecadlabs/taqueria/releases/tag/v0.24.1) |
+|Release Page | [v0.24.1](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.24.1) |
 
 ### Summary of Impactful Changes
 
@@ -244,30 +244,30 @@ plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 
 
 ### Pull Requests
 
-- 👷 Refactor ➾ Improve Issue and PR Templates by @hu3man in [#1412](https://github.com/ecadlabs/taqueria/pull/1412)
-- 🛠️ Fix ➾ Update Current Version in Release Notes to v0.22.2 by @hu3man in [#1419](https://github.com/ecadlabs/taqueria/pull/1419)
-- 👷 Refactor ➾ (ci): Publish Packages for PR by @GImbrailo in [#1383](https://github.com/ecadlabs/taqueria/pull/1383)
-- 🛠️ Fix ➾ Typecheck Command in the VsCode Extension by @AlirezaHaghshenas in [#1422](https://github.com/ecadlabs/taqueria/pull/1422)
-- 👷 Refactor ➾ Update NFT Scaffold Website Docs by @alexzbusko in [#1362](https://github.com/ecadlabs/taqueria/pull/1362)
-- 🛠️ Fix ➾ Typos on Release Notes by @michaelkernaghan in [#1424](https://github.com/ecadlabs/taqueria/pull/1424)
-- 🛠️ Fix ➾ Add instructions for Updating `taq` Binary to Release Notes by @hu3man in [#1426](https://github.com/ecadlabs/taqueria/pull/1426)
-- ✨ Feature ➾ Implement a GUI for Micheline Data entry by @AlirezaHaghshenas in [#1247](https://github.com/ecadlabs/taqueria/pull/1247)
-- ✨ Feature ➾ Implement `taq instantiate-account` and `taq fund` to Generate and Fund Declared Accounts in a Target Environment by @jchenche in [#1427](https://github.com/ecadlabs/taqueria/pull/1427)
-- 🛠️ Fix ➾ Remove `default` from Zod Schema for `env` Field by @jchenche in [#1437](https://github.com/ecadlabs/taqueria/pull/1437)
-- 🧽 Chore ➾ Update Default Assignee on Bug Report Template to `alexzbusko` from `sinapsist` by @hu3man in [#1444](https://github.com/ecadlabs/taqueria/pull/1444)
-- 🛠️ Fix ➾ Use `octez-client` instead of `tezos-client` in new Flextesa image version in our plugins by @jchenche in [#1443](https://github.com/ecadlabs/taqueria/pull/1443)
-- 👷 Refactor ➾ (ci): Reintroduce a preid to Prereleases by @GImbrailo in [#1423](https://github.com/ecadlabs/taqueria/pull/1423)
-- Update tzkt to match flextesa by @AlirezaHaghshenas in [#1449](https://github.com/ecadlabs/taqueria/pull/1449)
-- ✨ Feature ➾ Add a new taq clean task and create a new core plugin to host it by @jchenche in [#1451](https://github.com/ecadlabs/taqueria/pull/1451)
-- 🧽 Chore ➾ Add the Work Description Field Back into the dev-task Issue Template by @hu3man in [#1463](https://github.com/ecadlabs/taqueria/pull/1463)
-- Added test network tests for transfer and funding by @alexzbusko in [#1450](https://github.com/ecadlabs/taqueria/pull/1450)
-- 🧽 Chore ➾ Contract Types: added tests for different aliased commands and type mode by @alexzbusko in [#1457](https://github.com/ecadlabs/taqueria/pull/1457)
-- 🛠️ Fix ➾ Implement Typescript Generation for Lambda by @AlirezaHaghshenas in [#1433](https://github.com/ecadlabs/taqueria/pull/1433)
-- ✨ Feature ➾ Implement arbitrary command passing from Taq CLI to underlying binary (LIGO and Octez-client) by @jchenche in [#1466](https://github.com/ecadlabs/taqueria/pull/1466)
-- Export Generated Storage type in Contract Types Plugin by @AlirezaHaghshenas in [#1483](https://github.com/ecadlabs/taqueria/pull/1483)
-- 🛠️ Fix ➾ Remove Dependency on play-sound-mp3 Package by @hu3man in [#1485](https://github.com/ecadlabs/taqueria/pull/1485)
-- 🛠️ Fix ➾ Typos in the Taqueria Documentation by @michaelkernaghan in [#1470](https://github.com/ecadlabs/taqueria/pull/1470)
-- 🧽 Chore ➾ (ci) pin node version to v16.16.x by @GImbrailo in [#1486](https://github.com/ecadlabs/taqueria/pull/1486)
+- 👷 Refactor ➾ Improve Issue and PR Templates by @hu3man in [#1412](https://github.com/pinnacle-labs/taqueria/pull/1412)
+- 🛠️ Fix ➾ Update Current Version in Release Notes to v0.22.2 by @hu3man in [#1419](https://github.com/pinnacle-labs/taqueria/pull/1419)
+- 👷 Refactor ➾ (ci): Publish Packages for PR by @GImbrailo in [#1383](https://github.com/pinnacle-labs/taqueria/pull/1383)
+- 🛠️ Fix ➾ Typecheck Command in the VsCode Extension by @AlirezaHaghshenas in [#1422](https://github.com/pinnacle-labs/taqueria/pull/1422)
+- 👷 Refactor ➾ Update NFT Scaffold Website Docs by @alexzbusko in [#1362](https://github.com/pinnacle-labs/taqueria/pull/1362)
+- 🛠️ Fix ➾ Typos on Release Notes by @michaelkernaghan in [#1424](https://github.com/pinnacle-labs/taqueria/pull/1424)
+- 🛠️ Fix ➾ Add instructions for Updating `taq` Binary to Release Notes by @hu3man in [#1426](https://github.com/pinnacle-labs/taqueria/pull/1426)
+- ✨ Feature ➾ Implement a GUI for Micheline Data entry by @AlirezaHaghshenas in [#1247](https://github.com/pinnacle-labs/taqueria/pull/1247)
+- ✨ Feature ➾ Implement `taq instantiate-account` and `taq fund` to Generate and Fund Declared Accounts in a Target Environment by @jchenche in [#1427](https://github.com/pinnacle-labs/taqueria/pull/1427)
+- 🛠️ Fix ➾ Remove `default` from Zod Schema for `env` Field by @jchenche in [#1437](https://github.com/pinnacle-labs/taqueria/pull/1437)
+- 🧽 Chore ➾ Update Default Assignee on Bug Report Template to `alexzbusko` from `sinapsist` by @hu3man in [#1444](https://github.com/pinnacle-labs/taqueria/pull/1444)
+- 🛠️ Fix ➾ Use `octez-client` instead of `tezos-client` in new Flextesa image version in our plugins by @jchenche in [#1443](https://github.com/pinnacle-labs/taqueria/pull/1443)
+- 👷 Refactor ➾ (ci): Reintroduce a preid to Prereleases by @GImbrailo in [#1423](https://github.com/pinnacle-labs/taqueria/pull/1423)
+- Update tzkt to match flextesa by @AlirezaHaghshenas in [#1449](https://github.com/pinnacle-labs/taqueria/pull/1449)
+- ✨ Feature ➾ Add a new taq clean task and create a new core plugin to host it by @jchenche in [#1451](https://github.com/pinnacle-labs/taqueria/pull/1451)
+- 🧽 Chore ➾ Add the Work Description Field Back into the dev-task Issue Template by @hu3man in [#1463](https://github.com/pinnacle-labs/taqueria/pull/1463)
+- Added test network tests for transfer and funding by @alexzbusko in [#1450](https://github.com/pinnacle-labs/taqueria/pull/1450)
+- 🧽 Chore ➾ Contract Types: added tests for different aliased commands and type mode by @alexzbusko in [#1457](https://github.com/pinnacle-labs/taqueria/pull/1457)
+- 🛠️ Fix ➾ Implement Typescript Generation for Lambda by @AlirezaHaghshenas in [#1433](https://github.com/pinnacle-labs/taqueria/pull/1433)
+- ✨ Feature ➾ Implement arbitrary command passing from Taq CLI to underlying binary (LIGO and Octez-client) by @jchenche in [#1466](https://github.com/pinnacle-labs/taqueria/pull/1466)
+- Export Generated Storage type in Contract Types Plugin by @AlirezaHaghshenas in [#1483](https://github.com/pinnacle-labs/taqueria/pull/1483)
+- 🛠️ Fix ➾ Remove Dependency on play-sound-mp3 Package by @hu3man in [#1485](https://github.com/pinnacle-labs/taqueria/pull/1485)
+- 🛠️ Fix ➾ Typos in the Taqueria Documentation by @michaelkernaghan in [#1470](https://github.com/pinnacle-labs/taqueria/pull/1470)
+- 🧽 Chore ➾ (ci) pin node version to v16.16.x by @GImbrailo in [#1486](https://github.com/pinnacle-labs/taqueria/pull/1486)
 
 ## Taqueria v0.22.2  
 
@@ -275,7 +275,7 @@ plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 
 | ----------- | ------------- |
 |Release Date | Oct 25, 2022  |
 |Release Type | Minor         |
-|Release Page | [v0.22.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.22.2) |
+|Release Page | [v0.22.2](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.22.2) |
 
 ### Summary of Impactful Changes
 
@@ -339,7 +339,7 @@ const current = await wallet.client.getActiveAccount()
 console.log(current)
 ```
 
-A demonstration dApp has been created to showcase how this works: [https://github.com/ecadlabs/taqueria-beacon-sandbox](https://github.com/ecadlabs/taqueria-beacon-sandbox)
+A demonstration dApp has been created to showcase how this works: [https://github.com/pinnacle-labs/taqueria-beacon-sandbox](https://github.com/pinnacle-labs/taqueria-beacon-sandbox)
 
 ### Other Product Changes
 
@@ -384,39 +384,39 @@ plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 
 
 ### Pull Requests
 
-- docs: Make plugin update instructions more prominent by @jevonearth in [#1300](https://github.com/ecadlabs/taqueria/pull/1300)
-- docs: sync web docs with README from taco-shop scaffold by @jevonearth in [#1302](https://github.com/ecadlabs/taqueria/pull/1302)
-- Docs: taco-shop minor edits and fix taq call example by @jevonearth in [#1303](https://github.com/ecadlabs/taqueria/pull/1303)
-- chore: unlist the quickstart scaffold as it is being retired by @jevonearth in [#1304](https://github.com/ecadlabs/taqueria/pull/1304)
-- refactor(ci): Workflows run for push to main by @GImbrailo in [#1298](https://github.com/ecadlabs/taqueria/pull/1298)
-- chore: remove docs husky hook by @GImbrailo in [#1308](https://github.com/ecadlabs/taqueria/pull/1308)
-- 🏗️ ➾ Add historical release notes to website by @hu3man in [#1313](https://github.com/ecadlabs/taqueria/pull/1313)
-- Improve templates by @hu3man in [#1324](https://github.com/ecadlabs/taqueria/pull/1324)
-- Update mechanism for funding accounts by @jchenche in [#1295](https://github.com/ecadlabs/taqueria/pull/1295)
-- updated test to now accept main as a taqueria build version by @alexzbusko in [#1334](https://github.com/ecadlabs/taqueria/pull/1334)
-- Improve templates by @hu3man in [#1336](https://github.com/ecadlabs/taqueria/pull/1336)
-- ✨ Feature ➾ Improve PR and Issue Templates by @hu3man in [#1337](https://github.com/ecadlabs/taqueria/pull/1337)
-- Vs code cli testing by @sinapsist in [#1309](https://github.com/ecadlabs/taqueria/pull/1309)
-- Install Taqueria from VS Code Extension by @MichalLytek in [#1261](https://github.com/ecadlabs/taqueria/pull/1261)
-- remove deprecated scaffolds by @AlirezaHaghshenas in [#1352](https://github.com/ecadlabs/taqueria/pull/1352)
-- 1209 docusaurus website changes by @alexzbusko in [#1312](https://github.com/ecadlabs/taqueria/pull/1312)
-- refactor(ci): publish workflows by @GImbrailo in [#1310](https://github.com/ecadlabs/taqueria/pull/1310)
-- fix(ci): added docker build before tests by @GImbrailo in [#1385](https://github.com/ecadlabs/taqueria/pull/1385)
-- 🛠️ Fix (#1375) ➾ Update Protocol Target for Typecheck and Simulate Tasks to Kathmandu by @jchenche in [#1384](https://github.com/ecadlabs/taqueria/pull/1384)
-- ✨ New feature => Add Ghostnet Configuration and `testing` Environment to Default `config.json`  by @hu3man in [#1364](https://github.com/ecadlabs/taqueria/pull/1364)
-- fix(ci): changed publish job to need build-and-cache-node-modules by @GImbrailo in [#1388](https://github.com/ecadlabs/taqueria/pull/1388)
-- Fixes #1046, ensures that flextesa works without CORS issues by @mweichert in [#1296](https://github.com/ecadlabs/taqueria/pull/1296)
-- Change ligo from next to stable version by @jchenche in [#1373](https://github.com/ecadlabs/taqueria/pull/1373)
-- 🏗️ Refactor ➾ Improve Issue & PR Templates and Automation by @hu3man in [#1395](https://github.com/ecadlabs/taqueria/pull/1395)
-- 🧹 Chore ➾ Update Docusaurus to v0.2.1 by @hu3man in [#1392](https://github.com/ecadlabs/taqueria/pull/1392)
-- fix taq installation detection by @AlirezaHaghshenas in [#1409](https://github.com/ecadlabs/taqueria/pull/1409)
-- 🚀 PR ➾ Release Taqueria v0.22.0 by @hu3man in [#1393](https://github.com/ecadlabs/taqueria/pull/1393)
-- 🚀 Release ➾ Taqueria v0.22.1 by @hu3man in [#1413](https://github.com/ecadlabs/taqueria/pull/1413)
-- chore: prevent vsix publishing on PR by @GImbrailo in [#1414](https://github.com/ecadlabs/taqueria/pull/1414)
-- 🚀 Release ➾ Taqueria v0.22.2 by @hu3man in [#1417](https://github.com/ecadlabs/taqueria/pull/1417)
+- docs: Make plugin update instructions more prominent by @jevonearth in [#1300](https://github.com/pinnacle-labs/taqueria/pull/1300)
+- docs: sync web docs with README from taco-shop scaffold by @jevonearth in [#1302](https://github.com/pinnacle-labs/taqueria/pull/1302)
+- Docs: taco-shop minor edits and fix taq call example by @jevonearth in [#1303](https://github.com/pinnacle-labs/taqueria/pull/1303)
+- chore: unlist the quickstart scaffold as it is being retired by @jevonearth in [#1304](https://github.com/pinnacle-labs/taqueria/pull/1304)
+- refactor(ci): Workflows run for push to main by @GImbrailo in [#1298](https://github.com/pinnacle-labs/taqueria/pull/1298)
+- chore: remove docs husky hook by @GImbrailo in [#1308](https://github.com/pinnacle-labs/taqueria/pull/1308)
+- 🏗️ ➾ Add historical release notes to website by @hu3man in [#1313](https://github.com/pinnacle-labs/taqueria/pull/1313)
+- Improve templates by @hu3man in [#1324](https://github.com/pinnacle-labs/taqueria/pull/1324)
+- Update mechanism for funding accounts by @jchenche in [#1295](https://github.com/pinnacle-labs/taqueria/pull/1295)
+- updated test to now accept main as a taqueria build version by @alexzbusko in [#1334](https://github.com/pinnacle-labs/taqueria/pull/1334)
+- Improve templates by @hu3man in [#1336](https://github.com/pinnacle-labs/taqueria/pull/1336)
+- ✨ Feature ➾ Improve PR and Issue Templates by @hu3man in [#1337](https://github.com/pinnacle-labs/taqueria/pull/1337)
+- Vs code cli testing by @sinapsist in [#1309](https://github.com/pinnacle-labs/taqueria/pull/1309)
+- Install Taqueria from VS Code Extension by @MichalLytek in [#1261](https://github.com/pinnacle-labs/taqueria/pull/1261)
+- remove deprecated scaffolds by @AlirezaHaghshenas in [#1352](https://github.com/pinnacle-labs/taqueria/pull/1352)
+- 1209 docusaurus website changes by @alexzbusko in [#1312](https://github.com/pinnacle-labs/taqueria/pull/1312)
+- refactor(ci): publish workflows by @GImbrailo in [#1310](https://github.com/pinnacle-labs/taqueria/pull/1310)
+- fix(ci): added docker build before tests by @GImbrailo in [#1385](https://github.com/pinnacle-labs/taqueria/pull/1385)
+- 🛠️ Fix (#1375) ➾ Update Protocol Target for Typecheck and Simulate Tasks to Kathmandu by @jchenche in [#1384](https://github.com/pinnacle-labs/taqueria/pull/1384)
+- ✨ New feature => Add Ghostnet Configuration and `testing` Environment to Default `config.json`  by @hu3man in [#1364](https://github.com/pinnacle-labs/taqueria/pull/1364)
+- fix(ci): changed publish job to need build-and-cache-node-modules by @GImbrailo in [#1388](https://github.com/pinnacle-labs/taqueria/pull/1388)
+- Fixes #1046, ensures that flextesa works without CORS issues by @mweichert in [#1296](https://github.com/pinnacle-labs/taqueria/pull/1296)
+- Change ligo from next to stable version by @jchenche in [#1373](https://github.com/pinnacle-labs/taqueria/pull/1373)
+- 🏗️ Refactor ➾ Improve Issue & PR Templates and Automation by @hu3man in [#1395](https://github.com/pinnacle-labs/taqueria/pull/1395)
+- 🧹 Chore ➾ Update Docusaurus to v0.2.1 by @hu3man in [#1392](https://github.com/pinnacle-labs/taqueria/pull/1392)
+- fix taq installation detection by @AlirezaHaghshenas in [#1409](https://github.com/pinnacle-labs/taqueria/pull/1409)
+- 🚀 PR ➾ Release Taqueria v0.22.0 by @hu3man in [#1393](https://github.com/pinnacle-labs/taqueria/pull/1393)
+- 🚀 Release ➾ Taqueria v0.22.1 by @hu3man in [#1413](https://github.com/pinnacle-labs/taqueria/pull/1413)
+- chore: prevent vsix publishing on PR by @GImbrailo in [#1414](https://github.com/pinnacle-labs/taqueria/pull/1414)
+- 🚀 Release ➾ Taqueria v0.22.2 by @hu3man in [#1417](https://github.com/pinnacle-labs/taqueria/pull/1417)
 
 
-**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.20.2...v0.22.2
+**Full Changelog**: https://github.com/pinnacle-labs/taqueria/compare/v0.20.2...v0.22.2
 
 ## Taqueria v0.20.2  
 
@@ -424,7 +424,7 @@ plugins=$(jq -r '.plugins[].name' .taq/config.json) && echo $plugins | xargs -n 
 | ----------- | ------------- |
 |Release Date | Sept 29, 2022 |
 |Release Type | Minor         |
-|Release Page | [v0.20.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.20.2) |
+|Release Page | [v0.20.2](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.20.2) |
 
 ### Summary of Impactful Changes
 
@@ -540,25 +540,25 @@ Note, this does require the `jq` cli tool to be installed ('brew install jq')
 
 ### Pull Requests
 
-- New Taquito plugin task called `transfer` to enable interaction with deployed contracts by @jchenche in [#1245](https://github.com/ecadlabs/taqueria/pull/1245)
-- Adding links to scaffold projects in the table by @sinapsist in [#1252](https://github.com/ecadlabs/taqueria/pull/1252)
-- add mock and metadata plugins by @AlirezaHaghshenas in [#1251](https://github.com/ecadlabs/taqueria/pull/1251)
-- updating quickstart section and a few other places by @alexzbusko in [#1250](https://github.com/ecadlabs/taqueria/pull/1250)
-- Add test task for ligo plugin by @jchenche in [#1255](https://github.com/ecadlabs/taqueria/pull/1255)
-- removed tutorial from sidebar and website. Also removed legacy hello-… by @alexzbusko in [#1256](https://github.com/ecadlabs/taqueria/pull/1256)
-- run tests in parallel by @AlirezaHaghshenas in [#1232](https://github.com/ecadlabs/taqueria/pull/1232)
-- 🏗️ PR ➾Update default sandbox protocol to Jakarta by @hu3man in [#1264](https://github.com/ecadlabs/taqueria/pull/1264)
-- Fix originate and compile commands in command pallet by @AlirezaHaghshenas in [#1258](https://github.com/ecadlabs/taqueria/pull/1258)
-- Use esbuild to bundle TVsCE instead of Parcel by @MichalLytek in [#1235](https://github.com/ecadlabs/taqueria/pull/1235)
-- updated test configs to use specific ports for tzkt instances by @alexzbusko in [#1266](https://github.com/ecadlabs/taqueria/pull/1266)
-- Fix build issues for taqueria-protocol on node v16.16.0+ by @mweichert in [#1243](https://github.com/ecadlabs/taqueria/pull/1243)
-- Transfer call e2e tests by @sinapsist in [#1263](https://github.com/ecadlabs/taqueria/pull/1263)
-- 🏗️ PR ➾ Update default protocol to K by @hu3man in [#1269](https://github.com/ecadlabs/taqueria/pull/1269)
-- 🏗️ PR ➾ Refactor Tezos-client (decoupled from the flextesa plugin) and updated typecheck and simulate by @jchenche in [#1272](https://github.com/ecadlabs/taqueria/pull/1272)
-- 1042 - Relax faucet validation and display error hints by @mweichert in [#1262](https://github.com/ecadlabs/taqueria/pull/1262)
-- 🏗️ PR ➾ Prerelease 0.19.0 and GH wf improvements by @hu3man in [#1271](https://github.com/ecadlabs/taqueria/pull/1271)
+- New Taquito plugin task called `transfer` to enable interaction with deployed contracts by @jchenche in [#1245](https://github.com/pinnacle-labs/taqueria/pull/1245)
+- Adding links to scaffold projects in the table by @sinapsist in [#1252](https://github.com/pinnacle-labs/taqueria/pull/1252)
+- add mock and metadata plugins by @AlirezaHaghshenas in [#1251](https://github.com/pinnacle-labs/taqueria/pull/1251)
+- updating quickstart section and a few other places by @alexzbusko in [#1250](https://github.com/pinnacle-labs/taqueria/pull/1250)
+- Add test task for ligo plugin by @jchenche in [#1255](https://github.com/pinnacle-labs/taqueria/pull/1255)
+- removed tutorial from sidebar and website. Also removed legacy hello-… by @alexzbusko in [#1256](https://github.com/pinnacle-labs/taqueria/pull/1256)
+- run tests in parallel by @AlirezaHaghshenas in [#1232](https://github.com/pinnacle-labs/taqueria/pull/1232)
+- 🏗️ PR ➾Update default sandbox protocol to Jakarta by @hu3man in [#1264](https://github.com/pinnacle-labs/taqueria/pull/1264)
+- Fix originate and compile commands in command pallet by @AlirezaHaghshenas in [#1258](https://github.com/pinnacle-labs/taqueria/pull/1258)
+- Use esbuild to bundle TVsCE instead of Parcel by @MichalLytek in [#1235](https://github.com/pinnacle-labs/taqueria/pull/1235)
+- updated test configs to use specific ports for tzkt instances by @alexzbusko in [#1266](https://github.com/pinnacle-labs/taqueria/pull/1266)
+- Fix build issues for taqueria-protocol on node v16.16.0+ by @mweichert in [#1243](https://github.com/pinnacle-labs/taqueria/pull/1243)
+- Transfer call e2e tests by @sinapsist in [#1263](https://github.com/pinnacle-labs/taqueria/pull/1263)
+- 🏗️ PR ➾ Update default protocol to K by @hu3man in [#1269](https://github.com/pinnacle-labs/taqueria/pull/1269)
+- 🏗️ PR ➾ Refactor Tezos-client (decoupled from the flextesa plugin) and updated typecheck and simulate by @jchenche in [#1272](https://github.com/pinnacle-labs/taqueria/pull/1272)
+- 1042 - Relax faucet validation and display error hints by @mweichert in [#1262](https://github.com/pinnacle-labs/taqueria/pull/1262)
+- 🏗️ PR ➾ Prerelease 0.19.0 and GH wf improvements by @hu3man in [#1271](https://github.com/pinnacle-labs/taqueria/pull/1271)
 
-**Full Changelog**: [https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.2](https://github.com/ecadlabs/taqueria/compare/v0.18.0...v0.20.2)
+**Full Changelog**: [https://github.com/pinnacle-labs/taqueria/compare/v0.18.0...v0.20.2](https://github.com/pinnacle-labs/taqueria/compare/v0.18.0...v0.20.2)
 
 ## Taqueria v0.18.0   
 
@@ -566,7 +566,7 @@ Note, this does require the `jq` cli tool to be installed ('brew install jq')
 | ----------- | ------------- |
 |Release Date | Sept 13, 2022 |
 |Release Type | Minor         |
-|Release Page | [v0.18.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.18.0) |
+|Release Page | [v0.18.0](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.18.0) |
 
 ### Summary of Impactful Changes
 
@@ -574,11 +574,11 @@ Bugfixes for build issues, test stub generation, and persistant state
 
 ### What's Changed
 
-- Build SDK using tsup by @mweichert in https://github.com/ecadlabs/taqueria/pull/1230
-- Fixed test stubs generated by Jest plugin by @mweichert in https://github.com/ecadlabs/taqueria/pull/1234
-- Fix persistent state by @ricklove in https://github.com/ecadlabs/taqueria/pull/1222
+- Build SDK using tsup by @mweichert in https://github.com/pinnacle-labs/taqueria/pull/1230
+- Fixed test stubs generated by Jest plugin by @mweichert in https://github.com/pinnacle-labs/taqueria/pull/1234
+- Fix persistent state by @ricklove in https://github.com/pinnacle-labs/taqueria/pull/1222
 
-**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.16.0...v0.18.0
+**Full Changelog**: https://github.com/pinnacle-labs/taqueria/compare/v0.16.0...v0.18.0
 
 ## Taqueria v0.16.0   
 
@@ -586,7 +586,7 @@ Bugfixes for build issues, test stub generation, and persistant state
 | ----------- | ------------- |
 |Release Date | Sept 08, 2022 |
 |Release Type | Minor         |
-|Release Page | [v0.16.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.16.0) |
+|Release Page | [v0.16.0](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.16.0) |
 
 ### Summary of Impactful Changes
 
@@ -595,14 +595,14 @@ Bugfixes for build issues, test stub generation, and persistant state
 
 ### What's Changed
 
-- Simple view of Sandbox state by @AlirezaHaghshenas in [1121]https://github.com/ecadlabs/taqueria/pull/1121
-- 1200 taq api for dapp jcc by @jchenche in [1224]https://githubcom/ecadlabs/taqueria/pull/1224
-- Fix failing tests after TVsCE feature merge by @AlirezaHaghshenas in [1227]https://github.com/ecadlabs/taqueria/pull/1227
-- Doc for ligo taquito and toolkit by @jchenche in [1228]https://github.com/ecadlabs/taqueria/pull/1228
-- Document fix after 0.14 release by @sinapsist in [1225]https://github.com/ecadlabs/taqueria/pull/1225
-- Update originate command to select contract file by @AlirezaHaghshenas in [1231]https://github.com/ecadlabs/taqueria/pull/1231
+- Simple view of Sandbox state by @AlirezaHaghshenas in [1121]https://github.com/pinnacle-labs/taqueria/pull/1121
+- 1200 taq api for dapp jcc by @jchenche in [1224]https://github.com/pinnacle-labs/taqueria/pull/1224
+- Fix failing tests after TVsCE feature merge by @AlirezaHaghshenas in [1227]https://github.com/pinnacle-labs/taqueria/pull/1227
+- Doc for ligo taquito and toolkit by @jchenche in [1228]https://github.com/pinnacle-labs/taqueria/pull/1228
+- Document fix after 0.14 release by @sinapsist in [1225]https://github.com/pinnacle-labs/taqueria/pull/1225
+- Update originate command to select contract file by @AlirezaHaghshenas in [1231]https://github.com/pinnacle-labs/taqueria/pull/1231
 
-**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.14.2...v0.16.0
+**Full Changelog**: https://github.com/pinnacle-labs/taqueria/compare/v0.14.2...v0.16.0
 
 ## Taqueria v0.14.4
 
@@ -610,7 +610,7 @@ Bugfixes for build issues, test stub generation, and persistant state
 | ----------- | ------------- |
 |Release Date | Sept 02, 2022 |
 |Release Type | Minor         |
-|Release Page | [v0.16.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.16.0) |
+|Release Page | [v0.16.0](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.16.0) |
 
 ### Summary of Impactful Changes
 
@@ -714,7 +714,7 @@ This action allows you to use Taqueria in your CI/CD pipeline so you can test, d
 
 The action can be found on the marketplace here
 
-For more information, [read the documentation](/docs/features/github-action) or see a live example in the [Taco Shop Scaffold](https://github.com/ecadlabs/taqueria-scaffold-taco-shop/blob/main/.github/workflows/main.yml) project
+For more information, [read the documentation](/docs/features/github-action) or see a live example in the [Taco Shop Scaffold](https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop/blob/main/.github/workflows/main.yml) project
 
 ### Migrating from Legacy Versions
 
@@ -734,30 +734,30 @@ Once all your contract
 
 #### Bugfixes
 
-- SDK's getContracts method not honoring regex pattern [#1011](https://github.com/ecadlabs/taqueria/issues/1011/)
-- Fix build pipeline: lock parcel to v2.6.1 [#1007](https://github.com/ecadlabs/taqueria/issues/1007/)
-- Fix scaffold verbosity by writing stdOut to `scaffold.log` file [#1001](https://github.com/ecadlabs/taqueria/issues/1001/)
-- Adjust jest plugin to return appropriate exit code [#995](https://github.com/ecadlabs/taqueria/issues/995/)
-- Updated tests to ensure sure npm package.json is available in all test projects [#899](https://github.com/ecadlabs/taqueria/issues/899/)
-- Enable all commands in the VSCE when config cannot be loaded [#955](https://github.com/ecadlabs/taqueria/issues/955/)
-- Fix `taq` runtime bug [#983](https://github.com/ecadlabs/taqueria/issues/983/)
-- Show error for all contracts that lack storage [#950](https://github.com/ecadlabs/taqueria/issues/950/)
+- SDK's getContracts method not honoring regex pattern [#1011](https://github.com/pinnacle-labs/taqueria/issues/1011/)
+- Fix build pipeline: lock parcel to v2.6.1 [#1007](https://github.com/pinnacle-labs/taqueria/issues/1007/)
+- Fix scaffold verbosity by writing stdOut to `scaffold.log` file [#1001](https://github.com/pinnacle-labs/taqueria/issues/1001/)
+- Adjust jest plugin to return appropriate exit code [#995](https://github.com/pinnacle-labs/taqueria/issues/995/)
+- Updated tests to ensure sure npm package.json is available in all test projects [#899](https://github.com/pinnacle-labs/taqueria/issues/899/)
+- Enable all commands in the VSCE when config cannot be loaded [#955](https://github.com/pinnacle-labs/taqueria/issues/955/)
+- Fix `taq` runtime bug [#983](https://github.com/pinnacle-labs/taqueria/issues/983/)
+- Show error for all contracts that lack storage [#950](https://github.com/pinnacle-labs/taqueria/issues/950/)
 
 
 #### Other Improvements
 
-- Compiler plugins refactored to use registered contracts [#981](https://github.com/ecadlabs/taqueria/issues/981/)
-- CI/CD now uses Deno package caching [#982](https://github.com/ecadlabs/taqueria/issues/982/)
-- Improvements to the `taq scaffold` task [#966](https://github.com/ecadlabs/taqueria/issues/966/) [#953](https://github.com/ecadlabs/taqueria/issues/953/)
-- Scaffolds now use a file `scaffold.json` to define a postInit script run during task execution [#993](https://github.com/ecadlabs/taqueria/issues/993/)
-- Added a contract template for Archetype [#984](https://github.com/ecadlabs/taqueria/issues/984/)
-- Refactor of automated tests: separate cli commands into separate files [#909](https://github.com/ecadlabs/taqueria/issues/909/)
-- Changed the partition's config file to use relative path #951 [#951](https://github.com/ecadlabs/taqueria/issues/951/)
-- Added tests for all Michelson data types [#919](https://github.com/ecadlabs/taqueria/issues/919/)
-- Update Taquito to v13 [#951](https://github.com/ecadlabs/taqueria/issues/951/)
-- The VLCE is now a `workspace` type project [#971](https://github.com/ecadlabs/taqueria/issues/971/)
-- Added the template construct [#946](https://github.com/ecadlabs/taqueria/issues/946/)
-- Added ability to register contracts [#908](https://github.com/ecadlabs/taqueria/issues/908/)
+- Compiler plugins refactored to use registered contracts [#981](https://github.com/pinnacle-labs/taqueria/issues/981/)
+- CI/CD now uses Deno package caching [#982](https://github.com/pinnacle-labs/taqueria/issues/982/)
+- Improvements to the `taq scaffold` task [#966](https://github.com/pinnacle-labs/taqueria/issues/966/) [#953](https://github.com/pinnacle-labs/taqueria/issues/953/)
+- Scaffolds now use a file `scaffold.json` to define a postInit script run during task execution [#993](https://github.com/pinnacle-labs/taqueria/issues/993/)
+- Added a contract template for Archetype [#984](https://github.com/pinnacle-labs/taqueria/issues/984/)
+- Refactor of automated tests: separate cli commands into separate files [#909](https://github.com/pinnacle-labs/taqueria/issues/909/)
+- Changed the partition's config file to use relative path #951 [#951](https://github.com/pinnacle-labs/taqueria/issues/951/)
+- Added tests for all Michelson data types [#919](https://github.com/pinnacle-labs/taqueria/issues/919/)
+- Update Taquito to v13 [#951](https://github.com/pinnacle-labs/taqueria/issues/951/)
+- The VLCE is now a `workspace` type project [#971](https://github.com/pinnacle-labs/taqueria/issues/971/)
+- Added the template construct [#946](https://github.com/pinnacle-labs/taqueria/issues/946/)
+- Added ability to register contracts [#908](https://github.com/pinnacle-labs/taqueria/issues/908/)
 
 ## Taqueria v0.12.0   
 
@@ -765,17 +765,17 @@ Once all your contract
 | ----------- | ------------- |
 |Release Date | Aug 03, 2022  |
 |Release Type | Minor         |
-|Release Page | [v0.12.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.12.0) |
+|Release Page | [v0.12.0](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.12.0) |
 
 ### What's Changed
 
-- Improvements to TVsCE 02 by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1034
-- docs: fix/update version on installation doc page by @jevonearth in https://github.com/ecadlabs/taqueria/pull/1054
-- Updates to workflows for build versions by @hu3man in https://github.com/ecadlabs/taqueria/pull/1073
-- implement a welcome UX by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1070
-- Taqueria v0.12.0 release by @hu3man in https://github.com/ecadlabs/taqueria/pull/1076
+- Improvements to TVsCE 02 by @AlirezaHaghshenas in https://github.com/pinnacle-labs/taqueria/pull/1034
+- docs: fix/update version on installation doc page by @jevonearth in https://github.com/pinnacle-labs/taqueria/pull/1054
+- Updates to workflows for build versions by @hu3man in https://github.com/pinnacle-labs/taqueria/pull/1073
+- implement a welcome UX by @AlirezaHaghshenas in https://github.com/pinnacle-labs/taqueria/pull/1070
+- Taqueria v0.12.0 release by @hu3man in https://github.com/pinnacle-labs/taqueria/pull/1076
 
-**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.10.0...v0.12.0
+**Full Changelog**: https://github.com/pinnacle-labs/taqueria/compare/v0.10.0...v0.12.0
 
 ## Taqueria v0.10.0   
 
@@ -783,32 +783,32 @@ Once all your contract
 | ----------- | ------------- |
 |Release Date | Jul 26, 2022  |
 |Release Type | Minor         |
-|Release Page | [v0.10.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.10.0) |
+|Release Page | [v0.10.0](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.10.0) |
 
 ### What's Changed
 
-- Use types from protocol in VsX by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/786
-- Documentation Updates by @hu3man in https://github.com/ecadlabs/taqueria/pull/975
-- Fixes #876, limits the number of task outputs which are persisted by @mweichert in https://github.com/ecadlabs/taqueria/pull/882
-- Testing by @ricklove in https://github.com/ecadlabs/taqueria/pull/1016
-- Doc refactor for 0.8.0 by @hu3man in https://github.com/ecadlabs/taqueria/pull/1027
-- Improvements to TVsCE 01 by @AlirezaHaghshenas in https://github.com/ecadlabs/taqueria/pull/1012
-- Unique port and name for sandboxes by @jchenche in https://github.com/ecadlabs/taqueria/pull/1028
-- Updates to website docs from review by @alexzbusko in https://github.com/ecadlabs/taqueria/pull/1015
-- Add logos and adjust hero text by @russellmorton in https://github.com/ecadlabs/taqueria/pull/1026
-- Update index Title by @russellmorton in https://github.com/ecadlabs/taqueria/pull/1041
-- chore: fix website documentation by @GImbrailo in https://github.com/ecadlabs/taqueria/pull/1040
-- Typescript testing generation by @ricklove in https://github.com/ecadlabs/taqueria/pull/818
-- Fixes #572, adds jest test stubs by @mweichert in https://github.com/ecadlabs/taqueria/pull/852
-- allowing latest 16 node version in pipeline by @alexzbusko in https://github.com/ecadlabs/taqueria/pull/918
-- Catch error right after parsing JSON and pass back correct JSON values from tezos-client to CLI by @jchenche in https://github.com/ecadlabs/taqueria/pull/1037
-- Adjusted pre-commit hook to only generate Deno lock file CLI source has changed by @mweichert in https://github.com/ecadlabs/taqueria/pull/1043
-- Disable publish step for contract-types plugin by @mweichert in https://github.com/ecadlabs/taqueria/pull/1044
-- Return JSON response from CLI by @MichalLytek in https://github.com/ecadlabs/taqueria/pull/1031
-- Alex quickstart readme investigation by @alexzbusko in https://github.com/ecadlabs/taqueria/pull/1038
-- chore: removed vscode workflow on windows by @GImbrailo in https://github.com/ecadlabs/taqueria/pull/1048
+- Use types from protocol in VsX by @AlirezaHaghshenas in https://github.com/pinnacle-labs/taqueria/pull/786
+- Documentation Updates by @hu3man in https://github.com/pinnacle-labs/taqueria/pull/975
+- Fixes #876, limits the number of task outputs which are persisted by @mweichert in https://github.com/pinnacle-labs/taqueria/pull/882
+- Testing by @ricklove in https://github.com/pinnacle-labs/taqueria/pull/1016
+- Doc refactor for 0.8.0 by @hu3man in https://github.com/pinnacle-labs/taqueria/pull/1027
+- Improvements to TVsCE 01 by @AlirezaHaghshenas in https://github.com/pinnacle-labs/taqueria/pull/1012
+- Unique port and name for sandboxes by @jchenche in https://github.com/pinnacle-labs/taqueria/pull/1028
+- Updates to website docs from review by @alexzbusko in https://github.com/pinnacle-labs/taqueria/pull/1015
+- Add logos and adjust hero text by @russellmorton in https://github.com/pinnacle-labs/taqueria/pull/1026
+- Update index Title by @russellmorton in https://github.com/pinnacle-labs/taqueria/pull/1041
+- chore: fix website documentation by @GImbrailo in https://github.com/pinnacle-labs/taqueria/pull/1040
+- Typescript testing generation by @ricklove in https://github.com/pinnacle-labs/taqueria/pull/818
+- Fixes #572, adds jest test stubs by @mweichert in https://github.com/pinnacle-labs/taqueria/pull/852
+- allowing latest 16 node version in pipeline by @alexzbusko in https://github.com/pinnacle-labs/taqueria/pull/918
+- Catch error right after parsing JSON and pass back correct JSON values from tezos-client to CLI by @jchenche in https://github.com/pinnacle-labs/taqueria/pull/1037
+- Adjusted pre-commit hook to only generate Deno lock file CLI source has changed by @mweichert in https://github.com/pinnacle-labs/taqueria/pull/1043
+- Disable publish step for contract-types plugin by @mweichert in https://github.com/pinnacle-labs/taqueria/pull/1044
+- Return JSON response from CLI by @MichalLytek in https://github.com/pinnacle-labs/taqueria/pull/1031
+- Alex quickstart readme investigation by @alexzbusko in https://github.com/pinnacle-labs/taqueria/pull/1038
+- chore: removed vscode workflow on windows by @GImbrailo in https://github.com/pinnacle-labs/taqueria/pull/1048
 
-**Full Changelog**: https://github.com/ecadlabs/taqueria/compare/v0.8.0...v0.10.0
+**Full Changelog**: https://github.com/pinnacle-labs/taqueria/compare/v0.8.0...v0.10.0
 
 
 ## Taqueria v0.8.0   
@@ -817,7 +817,7 @@ Once all your contract
 | ----------- | ------------- |
 |Release Date | July 15, 2022 |
 |Release Type | Minor         |
-|Release Page | [v0.8.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.8.0) |
+|Release Page | [v0.8.0](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.8.0) |
 
 ## Summary of Impactful Changes
 
@@ -941,30 +941,30 @@ Once all your contract
 
 ### Bugfixes
 
-- SDK's getContracts method not honoring regex pattern [#1011](https://github.com/ecadlabs/taqueria/issues/1011/)
-- Fix build pipeline: lock parcel to v2.6.1 [#1007](https://github.com/ecadlabs/taqueria/issues/1007/)
-- Fix scaffold verbosity by writing stdOut to `scaffold.log` file [#1001](https://github.com/ecadlabs/taqueria/issues/1001/)
-- Adjust jest plugin to return appropriate exit code [#995](https://github.com/ecadlabs/taqueria/issues/995/)
-- Updated tests to ensure sure npm package.json is available in all test projects [#899](https://github.com/ecadlabs/taqueria/issues/899/)
-- Enable all commands in the VSCE when config cannot be loaded [#955](https://github.com/ecadlabs/taqueria/issues/955/)
-- Fix `taq` runtime bug [#983](https://github.com/ecadlabs/taqueria/issues/983/)
-- Show error for all contracts that lack storage [#950](https://github.com/ecadlabs/taqueria/issues/950/)
+- SDK's getContracts method not honoring regex pattern [#1011](https://github.com/pinnacle-labs/taqueria/issues/1011/)
+- Fix build pipeline: lock parcel to v2.6.1 [#1007](https://github.com/pinnacle-labs/taqueria/issues/1007/)
+- Fix scaffold verbosity by writing stdOut to `scaffold.log` file [#1001](https://github.com/pinnacle-labs/taqueria/issues/1001/)
+- Adjust jest plugin to return appropriate exit code [#995](https://github.com/pinnacle-labs/taqueria/issues/995/)
+- Updated tests to ensure sure npm package.json is available in all test projects [#899](https://github.com/pinnacle-labs/taqueria/issues/899/)
+- Enable all commands in the VSCE when config cannot be loaded [#955](https://github.com/pinnacle-labs/taqueria/issues/955/)
+- Fix `taq` runtime bug [#983](https://github.com/pinnacle-labs/taqueria/issues/983/)
+- Show error for all contracts that lack storage [#950](https://github.com/pinnacle-labs/taqueria/issues/950/)
 
 
 ### Other Improvements
 
-- Compiler plugins refactored to use registered contracts [#981](https://github.com/ecadlabs/taqueria/issues/981/)
-- CI/CD now uses Deno package caching [#982](https://github.com/ecadlabs/taqueria/issues/982/)
-- Improvements to the `taq scaffold` task [#966](https://github.com/ecadlabs/taqueria/issues/966/) [#953](https://github.com/ecadlabs/taqueria/issues/953/)
-- Scaffolds now use a file `scaffold.json` to define a postInit script run during task execution [#993](https://github.com/ecadlabs/taqueria/issues/993/)
-- Added a contract template for Archetype [#984](https://github.com/ecadlabs/taqueria/issues/984/)
-- Refactor of automated tests: separate cli commands into separate files [#909](https://github.com/ecadlabs/taqueria/issues/909/)
-- Changed the partition's config file to use relative path #951 [#951](https://github.com/ecadlabs/taqueria/issues/951/)
-- Added tests for all Michelson data types [#919](https://github.com/ecadlabs/taqueria/issues/919/)
-- Update Taquito to v13 [#951](https://github.com/ecadlabs/taqueria/issues/951/)
-- The VLCE is now a `workspace` type project [#971](https://github.com/ecadlabs/taqueria/issues/971/)
-- Added the template construct [#946](https://github.com/ecadlabs/taqueria/issues/946/)
-- Added ability to register contracts [#908](https://github.com/ecadlabs/taqueria/issues/908/)
+- Compiler plugins refactored to use registered contracts [#981](https://github.com/pinnacle-labs/taqueria/issues/981/)
+- CI/CD now uses Deno package caching [#982](https://github.com/pinnacle-labs/taqueria/issues/982/)
+- Improvements to the `taq scaffold` task [#966](https://github.com/pinnacle-labs/taqueria/issues/966/) [#953](https://github.com/pinnacle-labs/taqueria/issues/953/)
+- Scaffolds now use a file `scaffold.json` to define a postInit script run during task execution [#993](https://github.com/pinnacle-labs/taqueria/issues/993/)
+- Added a contract template for Archetype [#984](https://github.com/pinnacle-labs/taqueria/issues/984/)
+- Refactor of automated tests: separate cli commands into separate files [#909](https://github.com/pinnacle-labs/taqueria/issues/909/)
+- Changed the partition's config file to use relative path #951 [#951](https://github.com/pinnacle-labs/taqueria/issues/951/)
+- Added tests for all Michelson data types [#919](https://github.com/pinnacle-labs/taqueria/issues/919/)
+- Update Taquito to v13 [#951](https://github.com/pinnacle-labs/taqueria/issues/951/)
+- The VLCE is now a `workspace` type project [#971](https://github.com/pinnacle-labs/taqueria/issues/971/)
+- Added the template construct [#946](https://github.com/pinnacle-labs/taqueria/issues/946/)
+- Added ability to register contracts [#908](https://github.com/pinnacle-labs/taqueria/issues/908/)
 
 # Taqueria v0.6.5   
 
@@ -972,7 +972,7 @@ Once all your contract
 | ----------- | ------------- |
 |Release Date | June 30, 2022 |
 |Release Type | Minor         |
-|Release Page | [v0.6.5](https://github.com/ecadlabs/taqueria/releases/tag/v0.6.5) |
+|Release Page | [v0.6.5](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.6.5) |
 
 ## Summary of Impactful Changes
 
@@ -998,7 +998,7 @@ Once all your contract
 | ----------- | ------------- |
 |Release Date | June 8, 2022  |
 |Release Type | Patch         |
-|Release Page | [v0.4.2](https://github.com/ecadlabs/taqueria/releases/tag/v0.4.2) |
+|Release Page | [v0.4.2](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.4.2) |
 
 ## Summary of Impactful Changes
 
@@ -1010,7 +1010,7 @@ Once all your contract
 | ----------- | ------------- |
 |Release Date | June 6, 2022  |
 |Release Type | Major         |
-|Release Page | [v0.4.0](https://github.com/ecadlabs/taqueria/releases/tag/v0.4.0) |
+|Release Page | [v0.4.0](https://github.com/pinnacle-labs/taqueria/releases/tag/v0.4.0) |
 
 ## Summary of Impactful Changes
 
@@ -1314,9 +1314,9 @@ Specifically:
 
 ### Bugfixes
 
-- @taqueria/plugin-flextesa: Deploying multiple contracts can fail [#512](https://github.com/ecadlabs/taqueria/issues/512)
-- @taqueria/plugin-flextesa: Contract contents in sandbox deployment don't match what is printed out in console message[#707](https://github.com/ecadlabs/taqueria/issues/707)
-- @taqueria/plugin-tezos-client: Tezos client plugin storage or input value of 0 is treated as empty [#702](https://github.com/ecadlabs/taqueria/issues/702)
+- @taqueria/plugin-flextesa: Deploying multiple contracts can fail [#512](https://github.com/pinnacle-labs/taqueria/issues/512)
+- @taqueria/plugin-flextesa: Contract contents in sandbox deployment don't match what is printed out in console message[#707](https://github.com/pinnacle-labs/taqueria/issues/707)
+- @taqueria/plugin-tezos-client: Tezos client plugin storage or input value of 0 is treated as empty [#702](https://github.com/pinnacle-labs/taqueria/issues/702)
 
 ### Other Improvements
 
@@ -1329,7 +1329,7 @@ Specifically:
 
 ## [Shipped]
 
-> For full detail on changes, fixes, and improvements made in each release, please refer to the [Taqueria Release Page](https://github.com/ecadlabs/taqueria/releases)
+> For full detail on changes, fixes, and improvements made in each release, please refer to the [Taqueria Release Page](https://github.com/pinnacle-labs/taqueria/releases)
 
 - April 2022:
   - Released the Archetype plugin
