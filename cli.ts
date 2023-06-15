@@ -38,7 +38,7 @@ import { Table } from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts';
 import { identity, pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
 import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
-import { __, match } from 'https://esm.sh/ts-pattern@3.3.5';
+import { match, P } from 'https://esm.sh/ts-pattern@5.0.1';
 import { has, last, uniq } from 'rambda';
 import * as Analytics from './analytics.ts';
 import * as NPM from './npm.ts';
@@ -1265,7 +1265,7 @@ export const displayError = (cli: CLIConfig) =>
 		if (!inputArgs.help || inputArgs.debug) {
 			console.error(''); // empty line
 			const res = match(normalizeErr(err))
-				.with({ kind: 'E_FORK' }, err => [125, err.msg])
+				.with({ kind: 'E_FORK' }, (err: TaqError.t) => [125, err.msg])
 				.with({ kind: 'E_INVALID_CONFIG' }, err => [1, err.msg])
 				.with({ kind: 'E_INVALID_JSON' }, err => [12, err])
 				.with({ kind: 'E_INVALID_PATH_ALREADY_EXISTS' }, err => [3, `${err.msg}: ${err.context}`])
@@ -1288,7 +1288,7 @@ export const displayError = (cli: CLIConfig) =>
 				.with({ kind: 'E_OPT_IN_WARNING' }, err => [22, err.msg])
 				.with({ kind: 'E_INVALID_OPTION' }, err => [23, err.msg])
 				.with({ kind: 'E_TAQ_PROJECT_NOT_FOUND' }, err => [24, err.msg])
-				.with({ message: __.string }, err => [128, err.message])
+				.with({ message: P.string }, (err: Error) => [128, err.message])
 				.exhaustive();
 
 			const [exitCode, msg] = res;
