@@ -3,7 +3,7 @@
 		"zod": "https://deno.land/x/zod@v3.14.4/mod.ts",
 		"util": "https://deno.land/std@0.85.0/node/util.ts",
 		"path": "https://deno.land/std@0.120.0/path/mod.ts",
-		"ts-pattern": "https://esm.sh/ts-pattern@3.3.5",
+		"ts-pattern": "https://cdn.skypack.dev/ts-pattern@5.0.1?dts",
 		"i18next": "https://deno.land/x/i18next@v21.6.14/index.js",
 		"fluture": "https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js",
 		"rambda": "https://cdn.skypack.dev/rambda@7.2.1",
