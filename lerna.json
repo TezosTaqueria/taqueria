@@ -1,6 +1,13 @@
 {
 	"$schema": "node_modules/lerna/schemas/lerna-schema.json",
-	"useWorkspaces": true,
 	"version": "0.28.6",
+	"packages": [
+		"taqueria-plugin*",
+		"taqueria-sdk",
+		"taqueria-toolkit",
+		"taqueria-analytics",
+		"taqueria-vscode*",
+		"tests"
+	],
 	"useNx": false
 }
