@@ -3,7 +3,7 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 const exec = util.promisify(exec1);
 
-const timeout = process.env.CI ? 40 : 30;
+const timeout = process.env.CI ? 50 : 30;
 
 jest.setTimeout(1000 * timeout);
 
