@@ -160,7 +160,7 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		await cleanup();
 	});
 
-	test.only('--version will report a version', async () => {
+	test('--version will report a version', async () => {
 		const { execute, cleanup } = await prepareEnvironment();
 		const { code, stdout } = await execute('taq', '--version');
 		expect(code).toBe(0);
