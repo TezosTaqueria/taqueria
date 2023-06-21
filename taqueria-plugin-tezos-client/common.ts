@@ -2,7 +2,7 @@ import { getArchSync, getDockerImage, ProxyTaskArgs, RequestArgs } from '@taquer
 import { join } from 'path';
 
 // Should point to the latest stable version, so it needs to be updated as part of our release process.
-const getFlextesaImage = (_arch: 'linux/arm64/v8' | 'linux/amd64'): string => 'oxheadalpha/flextesa:20230313';
+const getFlextesaImage = (_arch: 'linux/arm64/v8' | 'linux/amd64'): string => 'oxheadalpha/flextesa:20230607';
 
 const FLEXTESA_IMAGE_ENV_VAR = 'TAQ_FLEXTESA_IMAGE';
 
