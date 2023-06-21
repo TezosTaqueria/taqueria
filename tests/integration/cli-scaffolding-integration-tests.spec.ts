@@ -4,7 +4,9 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 // - Scaffolds a project
 // - Starts and stops a sandbox
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
-	jest.setTimeout(1000 * 30);
+	const timeout = process.env.CI ? 40 : 30;
+
+	jest.setTimeout(1000 * timeout);
 
 	test('Verify that scaffold project gets sets up.', async () => {
 		const { execute, exists, cleanup } = await prepareEnvironment();
