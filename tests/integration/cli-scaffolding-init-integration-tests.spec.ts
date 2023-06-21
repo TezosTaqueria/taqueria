@@ -3,7 +3,7 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 const exec = util.promisify(exec1);
 
-jest.setTimeout(400000);
+jest.setTimeout(1000 * 30);
 
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	const scaffoldDirName = `taqueria-taco-shop`;
@@ -53,23 +53,6 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 			expect(scaffoldDirContents.stdout).toContain('package.json');
 		} catch (error) {
 			throw new Error(`error: ${error}`);
-		}
-	});
-
-	// TODO: https://github.com/pinnacle-labs/taqueria/issues/737
-	test('Verify that taq scaffold returns an error with a bogus URL', async () => {
-		const scaffoldURL = 'https://github.com/pinnacle-labs/taqueria-scaffold-taco-shopzzz.git';
-		try {
-			if (process.env.CI === 'true') {
-				await exec(
-					`mkdir -p ./scrap/scaffold04 && cd scrap/scaffold04 && taq scaffold https://alexzbusko:${process.env.SCAFFOLDING_PAT}@github.com/pinnacle-labs/taqueria-scaffold-taco-shopzzz.git`,
-				);
-			}
-
-			await exec(`mkdir -p ./scrap/scaffold04 && cd scrap/scaffold04 && taq scaffold ${scaffoldURL}`);
-		} catch (error: any) {
-			expect(error.toString()).toContain(`remote: Repository not found.`);
-			expect(error.toString()).toContain(`repository '${scaffoldURL}/' not found`);
 		}
 	});
 

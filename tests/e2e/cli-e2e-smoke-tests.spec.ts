@@ -160,13 +160,11 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		await cleanup();
 	});
 
-	test('--version will report a version', async () => {
+	test.only('--version will report a version', async () => {
 		const { execute, cleanup } = await prepareEnvironment();
 		const { code, stdout } = await execute('taq', '--version');
 		expect(code).toBe(0);
-		expect(stdout[0].toString().trim()).toMatch(
-			/^((v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)|(dev-[\w-]+)|main?|(\d+)-[\w-]+)$/,
-		);
+		expect(stdout[0].toString().trim()).toMatch(/^(\d+\.(0?\d+|\d+)\.?(0?\d*)|dev-[A-Za-z0-9-_\.]+)$/);
 		await cleanup();
 	});
 

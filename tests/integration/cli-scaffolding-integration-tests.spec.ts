@@ -4,7 +4,7 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 // - Scaffolds a project
 // - Starts and stops a sandbox
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
-	jest.setTimeout(100000);
+	jest.setTimeout(1000 * 30);
 
 	test('Verify that scaffold project gets sets up.', async () => {
 		const { execute, exists, cleanup } = await prepareEnvironment();
@@ -26,6 +26,6 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		// expect(startResults.stdout).toContain('Started local-scaffold.');
 		// const stopResults = await exec(`taq stop sandbox local-scaffold`, { cwd: `scaffold-test` });
 		// expect(stopResults.stdout).toContain('Stopped local-scaffold.');
-		await cleanup();
+		return await cleanup();
 	});
 });
