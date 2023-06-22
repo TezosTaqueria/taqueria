@@ -4,14 +4,15 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 const timeout = process.env.CI ? 60 : 30;
 jest.setTimeout(1000 * timeout);
 
+// Use test.skip when RUNNER_OS is MacOS
+// https://docs.github.com/en/actions/reference/environment-variables#default-environment-variables
+const testFn = process.env.RUNNER_OS === 'macOS' ? test.skip : test;
+
 // This test suite does two time-consuming things:
 // - Scaffolds a project
 // - Starts and stops a sandbox
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
-	// Skip test if not on Linux in CI/CD
-	if (process.env.RUNNER_OS === 'macOS') return;
-
-	test('Verify that scaffold project gets sets up.', async () => {
+	testFn('Verify that scaffold project gets sets up.', async () => {
 		const { execute, exists, cleanup } = await prepareEnvironment();
 		const { code } = await execute(
 			'taq',
