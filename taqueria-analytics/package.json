@@ -34,7 +34,7 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/protocol": "^0.28.6",
+		"@taqueria/protocol": "^0.28.7",
 		"node-machine-id-xz": "^1.0.2"
 	},
 	"devDependencies": {
