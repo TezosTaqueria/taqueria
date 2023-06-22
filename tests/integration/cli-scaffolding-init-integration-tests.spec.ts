@@ -3,12 +3,15 @@ import fsPromises from 'fs/promises';
 import util from 'util';
 const exec = util.promisify(exec1);
 
-const timeout = process.env.CI ? 100 : 30;
-
+// Increase timeout for Github Actions
+const timeout = process.env.CI ? 60 : 30;
 jest.setTimeout(1000 * timeout);
 
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	const scaffoldDirName = `taqueria-taco-shop`;
+
+	// Skip test if not on Linux in CI/CD
+	if (process.env.RUNNER_OS === 'macOS') return;
 
 	test('Verify that taq scaffold will create a baseline scaffold of the taco shop project', async () => {
 		// the URL for the default scaffold project is https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop

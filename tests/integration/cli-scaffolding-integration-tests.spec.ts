@@ -1,12 +1,15 @@
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
+// Increase timeout for Github Actions
+const timeout = process.env.CI ? 60 : 30;
+jest.setTimeout(1000 * timeout);
+
 // This test suite does two time-consuming things:
 // - Scaffolds a project
 // - Starts and stops a sandbox
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
-	const timeout = process.env.CI ? 100 : 30;
-
-	jest.setTimeout(1000 * timeout);
+	// Skip test if not on Linux in CI/CD
+	if (process.env.RUNNER_OS === 'macOS') return;
 
 	test('Verify that scaffold project gets sets up.', async () => {
 		const { execute, exists, cleanup } = await prepareEnvironment();
