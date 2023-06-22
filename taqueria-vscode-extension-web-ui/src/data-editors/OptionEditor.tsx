@@ -1,9 +1,9 @@
+import { VSCodeCheckbox } from '@vscode/webview-ui-toolkit/react';
 import React from 'react';
 import { hasPrim, isObject } from '../Helpers';
 import { MichelineDataTypeWithArgs } from '../MichelineDataType';
 import { MichelineOptionValue } from '../MichelineValue';
 import { DataEditorNode } from './DataEditorNode';
-import { VSCodeCheckbox } from './VsCodeWebViewUIToolkitWrappers';
 
 export const OptionEditor = (
 	{ dataType, value, onChange }: {

@@ -1,10 +1,10 @@
+import { VSCodeTextField } from '@vscode/webview-ui-toolkit/react';
 import React from 'react';
 import { isObject } from '../Helpers';
 import { MichelineDataType } from '../MichelineDataType';
 import { MichelineValue, MichelineValueObject } from '../MichelineValue';
 import { validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
-import { VSCodeTextField } from './VsCodeWebViewUIToolkitWrappers';
 
 export const AddressEditor = (
 	{ dataType, value, onChange }: {
