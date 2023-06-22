@@ -7,6 +7,8 @@ const exec = util.promisify(exec1);
 const timeout = process.env.CI ? 60 : 30;
 jest.setTimeout(1000 * timeout);
 
+console.log(process.env);
+
 describe('E2E Testing for taqueria scaffolding initialization,', () => {
 	const scaffoldDirName = `taqueria-taco-shop`;
 
