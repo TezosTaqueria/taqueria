@@ -7,6 +7,7 @@
 		"taqueria-toolkit",
 		"taqueria-analytics",
 		"taqueria-vscode*",
+		"taqueria-protocol",
 		"tests"
 	],
 	"useNx": false
