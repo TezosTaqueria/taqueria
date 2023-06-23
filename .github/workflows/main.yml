@@ -164,9 +164,9 @@ jobs:
       - id: set-test-chunks
         name: Set Chunks
         # Uncomment the line above to run a specific test
-        #run: echo "::set-output name=test-chunks::[[\"tests/e2e/smartpy-plugin-e2e-tests.spec.ts\"]]"
+        run: echo "::set-output name=test-chunks::[[\"tests/e2e/ligo-plugin-e2e-tests.spec.ts\"]]"
         # Uncomment the line below to run all tests
-        run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -c '[_nwise(length / 2 | ceil)]')"
+        #run: echo "::set-output name=test-chunks::$(npx jest --listTests --json tests/e2e/ | jq -c '[_nwise(length / 2 | ceil)]')"
 
       # This step just creates a list of numbers representing the different buckets of tests
       - id: set-test-chunk-ids
