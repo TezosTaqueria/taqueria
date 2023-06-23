@@ -209,7 +209,7 @@ jobs:
           deno-version: "${{ env.DENO_VERSION }}"
 
       - name: Setup Docker (on macos)
-        run: brew install docker colima && colima start --mount-type virtiofs
+        run: brew install docker colima && colima start --mount-type sshfs
         if: runner.os == 'macOS'
 
       - name: Add working dir to PATH
