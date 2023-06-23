@@ -167,7 +167,8 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		// First pattern - vX.Y.Z
 		// Second pattern - dev-<branch-name>
 		// Third pattern: <PR-number>-merge
-		expect(stdout[0].toString().trim()).toMatch(/^(v?\d+\.(0?\d+|\d+)\.?(0?\d*)|dev-[A-Za-z0-9-_\.]+|\d+-merge)$/);
+		// Fourth pattern: main
+		expect(stdout[0].toString().trim()).toMatch(/^(v?\d+\.(0?\d+|\d+)\.?(0?\d*)|dev-[A-Za-z0-9-_\.]+|\d+-merge|main)$/);
 		await cleanup();
 	});
 
