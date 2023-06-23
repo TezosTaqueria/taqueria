@@ -98,6 +98,10 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		// Compile the contracts using the `compile-all` task
 		const { stdout: compileStdout, stderr: compileStderr } = await execute('taq', 'compile-all', './test-project');
 
+		console.log('----- ERROR OUTPUT -----');
+		console.log(compileStderr.join('\n'));
+		console.log('----- END ERROR OUTPUT -----');
+
 		// Check that the output contains the expected files
 		expect(compileStdout.join('\n')).toContain(
 			`┌─────────────────────────────┬───────────────────────────────────────────────┐
