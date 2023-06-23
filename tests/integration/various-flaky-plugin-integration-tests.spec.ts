@@ -6,7 +6,7 @@ import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 import path from 'path';
 
 describe('Plugin Integration testing for Taqueria CLI', () => {
-	// FLAKY in cicd, example: https://github.com/ecadlabs/taqueria/actions/runs/3770115326/jobs/6409755728
+	// FLAKY in cicd, example: https://github.com/pinnacle-labs/taqueria/actions/runs/3770115326/jobs/6409755728
 	//     Expected: ArrayContaining ["│ Account Alias │ Account Address                      │ Mutez Funded │"]
 	// 	   Received: []
 	test.skip('fund will fund instantiated accounts on a network', async () => {
@@ -41,7 +41,7 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 	});
 
 	test.skip('transfer will send mutez from one instantiated account to another', async () => {
-		// FLAKY - https://github.com/ecadlabs/taqueria/issues/1694
+		// FLAKY - https://github.com/pinnacle-labs/taqueria/issues/1694
 		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");

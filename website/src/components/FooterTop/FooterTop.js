@@ -2,11 +2,12 @@ import React from "react";
 import clsx from "clsx";
 import styles from "./FooterTop.module.css";
 
+// TODO: Adjust for Pinnacle Labs
 const FeatureList = [
 	{
 		title: "Built By",
 		Svg: require("../../../static/img/ECAD_logo.svg").default,
-		url: "https://ecadlabs.com/",
+		url: "https://pinnaclelabs.limited/",
 	},
 	,
 ];

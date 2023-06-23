@@ -1,6 +1,6 @@
 # Jest plugin for Taqueria
 
-Authors:    Michael Weichert <<michael.weichert@ecadlabs.com>>
+Authors:    Michael Weichert <<michael.weichert@pinnaclelabs.limited>>
 
 Date:       Apr 7, 2022
 

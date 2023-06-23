@@ -1,4 +1,5 @@
 import { emitMicheline, Parser } from '@taquito/michel-codec';
+import { VSCodeButton } from '@vscode/webview-ui-toolkit/react';
 import React, { useState } from 'react';
 import { WebviewApi } from 'vscode-webview';
 import { isObject } from '../Helpers';
@@ -9,7 +10,6 @@ import { DataEditorNode } from './DataEditorNode';
 import './MichelineEditor.css';
 import { validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
-import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 
 const parser = new Parser();
 
@@ -225,9 +225,13 @@ export const MichelineEditor = (
 		micheline = `${e}`;
 	}
 
+	const style = {
+		border: currentState.showDiagnostics ? 1 : 0,
+	};
+
 	return (
 		<div className={currentState.showDiagnostics ? 'editorDiv showDiag' : 'editorDiv'}>
-			<table border={currentState.showDiagnostics ? 1 : 0}>
+			<table style={style}>
 				<tbody>
 					<tr>
 						<td colSpan={3}>

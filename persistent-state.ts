@@ -6,6 +6,7 @@ import * as Timestamp from '@taqueria/protocol/Timestamp';
 import * as Verb from '@taqueria/protocol/Verb';
 import { chain, chainRej, FutureInstance as Future, map, reject, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
+import { TypeOf } from 'https://deno.land/x/zod@v3.14.4/types.ts';
 import { groupBy, takeLast } from 'rambda';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
 
@@ -85,6 +86,13 @@ const imposeTaskLimits = (tasks: Record<string, PersistentState.PersistedTask>) 
 					// TODO: Keeping the last 5 runs of a task may not be sufficient for the provising system
 					// i.e. every ipfs publish task output would be required no matter how many folders were published or how many times it was published
 					takeLast(5),
+					data =>
+						data as [string, {
+							output?: unknown;
+							task: Verb.Verb;
+							plugin: string;
+							time: Timestamp.Timestamp;
+						}][],
 				)
 			),
 		allItems => allItems.sort((a, b) => a[1].time - b[1].time),

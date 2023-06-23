@@ -44,7 +44,7 @@ export const inject = (deps: PluginDeps) => {
 					await stdout.write(encoder.encode(`${output}\n`));
 					await stdout.write(encoder.encode(`*** END of call to ${plugin.name} ***\n`));
 					// TODO: this logic will be refactored to achieve better SoC.
-					// Issue that captures this: https://github.com/ecadlabs/taqueria/issues/732
+					// Issue that captures this: https://github.com/pinnacle-labs/taqueria/issues/732
 					if (parsedArgs.debug) {
 						if (/^node /.test(output)) output = output.replace(/^node /, 'node --inspect-brk ');
 					}

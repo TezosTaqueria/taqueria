@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-taquito",
-	"version": "0.28.6",
+	"version": "0.28.7",
 	"description": "A taqueria plugin for originating smart contracts using Taquito",
 	"targets": {
 		"default": {
@@ -21,8 +21,8 @@
 		"tezos",
 		"originate",
 		"deploy",
-		"ecad",
-		"ecadlabs",
+		"pinnaclelabs",
+		"pinnacle-labs",
 		"plugin",
 		"taquito",
 		"smart contract"
@@ -30,27 +30,27 @@
 	"engines": {
 		"node": ">=16"
 	},
-	"author": "ECAD Labs",
+	"author": "Pinnacle Labs",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ecadlabs/taqueria.git",
+		"url": "https://github.com/pinnacle-labs/taqueria.git",
 		"directory": "taqueria-plugin-taquito"
 	},
 	"bugs": {
-		"url": "https://github.com/ecadlabs/taqueria/issues"
+		"url": "https://github.com/pinnacle-labs/taqueria/issues"
 	},
-	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.28.6",
-		"@taquito/michel-codec": "^16.0.1",
-		"@taquito/signer": "^16.0.1",
-		"@taquito/taquito": "^16.0.1",
-		"fast-glob": "^3.2.11"
+		"@taqueria/node-sdk": "^0.28.7",
+		"@taquito/michel-codec": "^16.2.0",
+		"@taquito/signer": "^16.2.0",
+		"@taquito/taquito": "^16.2.0",
+		"fast-glob": "^3.2.12"
 	},
 	"devDependencies": {
-		"tsup": "^6.5.0",
-		"typescript": "^4.7.2"
+		"tsup": "6.5.0",
+		"typescript": "^4.9.5"
 	},
 	"tsup": {
 		"entry": [

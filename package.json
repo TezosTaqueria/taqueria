@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/taqueria",
-	"version": "0.28.6",
+	"version": "0.28.7",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -25,7 +25,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/ecadlabs/taqueria.git"
+		"url": "git+https://github.com/pinnacle-labs/taqueria.git"
 	},
 	"keywords": [
 		"taqueria",
@@ -34,29 +34,29 @@
 		"test",
 		"deploy",
 		"originate",
-		"ecad",
-		"ecadlabs"
+		"pinnaclelabs",
+		"pinnacle-labs"
 	],
-	"author": "ECAD Labs",
+	"author": "Pinnacle Labs",
 	"license": "Apache-2.0",
 	"bugs": {
-		"url": "https://github.com/ecadlabs/taqueria/issues"
+		"url": "https://github.com/pinnacle-labs/taqueria/issues"
 	},
-	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
 		"@gmrchk/cli-testing-library": "^0.1.2",
 		"chokidar-cli": "^3.0.0",
 		"dprint": "^0.36.1",
 		"eta": "^2.2.0",
 		"husky": "^8.0.3",
-		"lerna": "^6.0.1",
+		"lerna": "^7.0.2",
 		"lint-staged": "^13.2.2",
 		"npm-check-updates": "^16.10.12",
 		"ts-jest": "^28.0.8",
 		"ts-node": "^10.9.1",
 		"ts-to-zod": "^1.13.1",
-		"tsup": "^6.7.0",
-		"typescript": "^4.7.4",
+		"tsup": "6.5.0",
+		"typescript": "^4.9.5",
 		"with-staged": "^1.0.2"
 	},
 	"workspaces": [
@@ -68,6 +68,7 @@
 		"./taqueria-utils",
 		"./taqueria-flextesa-manager",
 		"./taqueria-vscode-extension",
+		"./taqueria-vscode-extension-web-ui",
 		"./taqueria-plugin*",
 		"./tests"
 	],
@@ -81,6 +82,6 @@
 		"@docusaurus/plugin-google-analytics": "^2.1.0",
 		"@docusaurus/plugin-google-gtag": "^2.1.0",
 		"@docusaurus/plugin-sitemap": "^2.1.0",
-		"@docusaurus/preset-classic": "^2.1.0"
+		"@docusaurus/preset-classic": "^2.4.1"
 	}
 }

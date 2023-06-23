@@ -1,10 +1,10 @@
+import { VSCodeButton } from '@vscode/webview-ui-toolkit/react';
 import React from 'react';
 import { MichelineDataTypeWithArgs } from '../MichelineDataType';
 import { MichelineValue } from '../MichelineValue';
 import { DataEditorNode } from './DataEditorNode';
 import { compare, validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
-import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 
 export const ListEditor = (
 	{ dataType, value, onChange }: {

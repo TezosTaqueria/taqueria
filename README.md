@@ -36,7 +36,7 @@ Builds for the latest release of Taqueria:
 | Linux   | https://taqueria.io/get/linux/taq       |
 | Windows | https://taqueria.io/get/windows/taq.exe |
 
-Builds are also available on the [releases](https://github.com/ecadlabs/taqueria/releases) page on Github
+Builds are also available on the [releases](https://github.com/pinnacle-labs/taqueria/releases) page on Github
 
 > Detailed instructions for installing and using Taqueria can be found [here](https://taqueria.io/docs/getting-started/installation)
 
@@ -92,8 +92,8 @@ If you prefer to build the Taqueria binary and plugins locally, follow the steps
 
 #### Requirements
 
-- [Deno](https://deno.land/) v1.23.4
-- [NodeJS](https://nodejs.org/en/) v16.13.1
+- [Deno](https://deno.land/) v1.34.x
+- [NodeJS](https://nodejs.org/en/) v16.13 or later (but less than v17.x.x)
 - [Docker](https://www.docker.com/) v0.9 or later
 
 #### Run Build Script

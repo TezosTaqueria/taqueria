@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.28.6",
+	"version": "0.28.7",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -14,26 +14,26 @@
 		"build",
 		"test",
 		"deploy",
-		"ecad",
-		"ecadlabs",
+		"pinnaclelabs",
+		"pinnacle-labs",
 		"protocol"
 	],
-	"author": "ECAD Labs",
+	"author": "Pinnacle Labs",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ecadlabs/taqueria.git",
+		"url": "https://github.com/pinnacle-labs/taqueria.git",
 		"directory": "taqueria-protocol"
 	},
 	"bugs": {
-		"url": "https://github.com/ecadlabs/taqueria/issues"
+		"url": "https://github.com/pinnacle-labs/taqueria/issues"
 	},
-	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
-		"esbuild-plugin-text-replace": "^1.2.0",
+		"esbuild-plugin-text-replace": "^1.3.0",
 		"ts-to-zod": "^1.13.1",
-		"tsup": "^6.5.0",
-		"typescript": "^4.7.2"
+		"tsup": "6.5.0",
+		"typescript": "^4.9.5"
 	},
 	"exports": {
 		".": "./index.js",
@@ -51,12 +51,12 @@
 		}
 	},
 	"dependencies": {
-		"@peculiar/webcrypto": "^1.4.0",
+		"@peculiar/webcrypto": "^1.4.3",
 		"batching-toposort": "^1.2.0",
 		"fluture": "^14.0.0",
-		"i18next": "^21.8.4",
-		"rambda": "^7.2.1",
+		"i18next": "^21.10.0",
+		"rambda": "^7.5.0",
 		"rambdax": "^8.1.0",
-		"zod": "^3.17.3"
+		"zod": "^3.21.4"
 	}
 }

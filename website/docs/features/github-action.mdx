@@ -6,9 +6,9 @@ Taqueria has a GitHub action that helps simplify and standardize the use of GitH
 
 You can find the action on the GitHub Marketplace [here](https://github.com/marketplace/actions/taqueria-actions)
 
-The action GitHub repo for the project is located [here](https://github.com/ecadlabs/taqueria-github-action)
+The action GitHub repo for the project is located [here](https://github.com/pinnacle-labs/taqueria-github-action)
 
-You can see the action being used on the [Taco Shop Scaffold](https://github.com/ecadlabs/taqueria-scaffold-taco-shop/blob/main/.github/workflows/main.yml)
+You can see the action being used on the [Taco Shop Scaffold](https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop/blob/main/.github/workflows/main.yml)
 
 ## Inputs
 
@@ -59,7 +59,7 @@ You can also check out the quickstart guide for GitHub actions in the GitHub doc
 ### Single step action
 ```yaml
 - name: taqueria tasks
-    uses: ecadlabs/taqueria-github-action@v0.11.0
+    uses: pinnacle-labs/taqueria-github-action@v0.11.0
     with:
         plugins: '@taqueria/plugin-ligo, @taqueria/plugin-flextesa, @taqueria/plugin-taquito'
         contracts: 'counter.jsligo'
@@ -72,26 +72,26 @@ You can also check out the quickstart guide for GitHub actions in the GitHub doc
 ### Multiple step action
 ```yaml
 - name: compile contracts
-    uses: ecadlabs/taqueria-github-action@v0.11.0
+    uses: pinnacle-labs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         contracts: 'hello-tacos.mligo'
         compile_command: 'compile'
 
 - name: start local sandbox
-    uses: ecadlabs/taqueria-github-action@v0.11.0
+    uses: pinnacle-labs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         sandbox_name: 'local'
 
 - name: originate contracts
-    uses: ecadlabs/taqueria-github-action@v0.11.0
+    uses: pinnacle-labs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         originate: 'true'
 
 - name: originate contracts
-    uses: ecadlabs/taqueria-github-action@v0.11.0
+    uses: pinnacle-labs/taqueria-github-action@v0.11.0
     with:
         project_directory: 'example-projects/hello-tacos'
         tests: 'true'

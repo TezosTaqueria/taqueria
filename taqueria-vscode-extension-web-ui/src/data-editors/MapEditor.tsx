@@ -1,3 +1,4 @@
+import { VSCodeButton } from '@vscode/webview-ui-toolkit/react';
 import React from 'react';
 import { MichelineDataTypeWithArgs } from '../MichelineDataType';
 import { MichelineMapValue, MichelineValue } from '../MichelineValue';
@@ -5,7 +6,6 @@ import { DataEditorNode } from './DataEditorNode';
 import { getFriendlyDataType } from './MichelineEditor';
 import { compare, validate } from './MichelineValidator';
 import { ValidationResultDisplay } from './ValidationResultDisplay';
-import { VSCodeButton } from './VsCodeWebViewUIToolkitWrappers';
 
 export const MapEditor = (
 	{ dataType, value, onChange }: {

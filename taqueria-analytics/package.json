@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/analytics",
-	"version": "0.28.6",
+	"version": "0.28.7",
 	"description": "A TypeScript SDK submitting events for Taqueria activity",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -19,27 +19,27 @@
 		"build",
 		"test",
 		"deploy",
-		"ecad",
-		"ecadlabs"
+		"pinnacle-labs",
+		"pinnaclelabs"
 	],
-	"author": "ECAD Labs",
+	"author": "Pinancle Labs",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/ecadlabs/taqueria.git",
+		"url": "https://github.com/pinnacle-labs/taqueria.git",
 		"directory": "taqueria-sdk"
 	},
 	"bugs": {
-		"url": "https://github.com/ecadlabs/taqueria/issues"
+		"url": "https://github.com/pinnacle-labs/taqueria/issues"
 	},
-	"homepage": "https://github.com/ecadlabs/taqueria#readme",
+	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/protocol": "^0.28.6",
+		"@taqueria/protocol": "^0.28.7",
 		"node-machine-id-xz": "^1.0.2"
 	},
 	"devDependencies": {
-		"tsup": "^6.5.0",
-		"typescript": "^4.7.2"
+		"tsup": "6.5.0",
+		"typescript": "^4.9.5"
 	},
 	"tsup": {
 		"entry": [

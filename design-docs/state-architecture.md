@@ -1,6 +1,6 @@
 # Taqueria State Architecture
 
-Authors:    Michael Weichert <<michael.weichert@ecadlabs.com>>
+Authors:    Michael Weichert <<michael@pinnaclelabs.limited>>
 
 Date:       Apr 7, 2022
 

@@ -98,6 +98,15 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		// Compile the contracts using the `compile-all` task
 		const { stdout: compileStdout, stderr: compileStderr } = await execute('taq', 'compile-all', './test-project');
 
+		console.log('----- ERROR OUTPUT -----');
+		console.log(compileStderr.join('\n'));
+		console.log('----- END ERROR OUTPUT -----');
+
+		console.log('----- FILE OUTPUT ------');
+		const { stdout: fileOutput } = await execute('find', '.', './test-project/contracts');
+		console.log(fileOutput.join('\n'));
+		console.log('----- END FILE OUTPUT -----');
+
 		// Check that the output contains the expected files
 		expect(compileStdout.join('\n')).toContain(
 			`┌─────────────────────────────┬───────────────────────────────────────────────┐
@@ -409,13 +418,49 @@ Type "natu" not found.`,
 		await cleanup();
 	});
 
-	// See https://github.com/ecadlabs/taqueria/issues/1870
+	// See https://github.com/pinnacle-labs/taqueria/issues/1870
 	test('ligo task with install command does not result in an error', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		const result = await execute('taq', 'ligo --command "install"', './test-project');
 		expect(result.stderr.join('').trim()).not.toContain('error');
+		await cleanup();
+	});
+
+	// See https://github.com/pinnacle-labs/taqueria/issues/1859
+	// See https://github.com/pinnacle-labs/taqueria/issues/1867
+	test('regression against #1859, ligo compile-all will not create infinite storage files', async () => {
+		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
+
+		// set up the project
+		await execute('taq', 'init test-project');
+		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+
+		// copy jsligo files to contracts folder
+		const jligo_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.jsligo`)).stdout;
+		await writeFile('./test-project/contracts/pokeGame.jsligo', jligo_file);
+		const storage_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.storageList.jsligo`)).stdout;
+		await writeFile('./test-project/contracts/pokeGame.storageList.jsligo', storage_file);
+		const parameters_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.parameterList.jsligo`)).stdout;
+		await writeFile('./test-project/contracts/pokeGame.parameterList.jsligo', parameters_file);
+
+		// compile the contract using compile-all task
+		const { stdout } = await execute('taq', 'compile-all', './test-project');
+		expect(stdout).toMatchInlineSnapshot(`
+    [
+      "┌───────────────────────────────┬───────────────────────────────────────────────────┐",
+      "│ Contract                      │ Artifact                                          │",
+      "├───────────────────────────────┼───────────────────────────────────────────────────┤",
+      "│ pokeGame.jsligo               │ artifacts/pokeGame.tz                             │",
+      "├───────────────────────────────┼───────────────────────────────────────────────────┤",
+      "│ pokeGame.storageList.jsligo   │ artifacts/pokeGame.default_storage.tz             │",
+      "├───────────────────────────────┼───────────────────────────────────────────────────┤",
+      "│ pokeGame.parameterList.jsligo │ artifacts/pokeGame.parameter.default_parameter.tz │",
+      "└───────────────────────────────┴───────────────────────────────────────────────────┘",
+    ]
+`);
+		// Cleanup
 		await cleanup();
 	});
 });
