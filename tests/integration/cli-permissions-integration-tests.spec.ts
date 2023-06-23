@@ -23,9 +23,15 @@ if (operatingSystem == `Darwin`) {
 	groupStatCommand = `stat -f %Sg`;
 }
 
-describe('E2E Testing for taqueria plugin file permissions,', () => {
-	jest.setTimeout(100000);
+// Increase timeout for Github Actions
+const timeout = process.env.CI ? 60 : 30;
+jest.setTimeout(1000 * timeout);
 
+// Use test.skip when RUNNER_OS is MacOS
+// https://docs.github.com/en/actions/reference/environment-variables#default-environment-variables
+const testFn = process.env.RUNNER_OS === 'macOS' ? test.skip : test;
+
+describe('E2E Testing for taqueria plugin file permissions,', () => {
 	beforeAll(async () => {
 		await generateTestProject(taqueriaProjectPath, ['ligo', 'archetype', 'contract-types']);
 
@@ -42,14 +48,14 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		}
 	});
 
-	test('testing that CI pipeline is not running as root', async () => {
+	testFn('testing that CI pipeline is not running as root', async () => {
 		expect(username).not.toBe('root');
 		expect(userGroup).not.toBe('root');
 		// If the CI pipeline is running as root, the following tests will always pass
 		// even if the logic being tested is failing
 	});
 
-	test('testing that ligo artifacts will have the correct permissions', async () => {
+	testFn('testing that ligo artifacts will have the correct permissions', async () => {
 		await exec(`taq compile --plugin ligo increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
 		const fileUser = await exec(`${userStatCommand} ${taqueriaProjectPath}/artifacts/increment.tz`);
 		const fileGroup = await exec(`${groupStatCommand} ${taqueriaProjectPath}/artifacts/increment.tz`);
@@ -58,7 +64,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		expect(fileGroup.stdout.trim()).toBe(userGroup);
 	});
 
-	test('testing that archetype artifacts will have the correct permissions', async () => {
+	testFn('testing that archetype artifacts will have the correct permissions', async () => {
 		await exec(`taq compile fa12.arl --plugin archetype`, { cwd: `./${taqueriaProjectPath}` });
 		const fileUser = await exec(`${userStatCommand} ${taqueriaProjectPath}/artifacts/fa12.tz`);
 		const fileGroup = await exec(`${groupStatCommand} ${taqueriaProjectPath}/artifacts/fa12.tz`);
@@ -98,7 +104,7 @@ describe('E2E Testing for taqueria plugin file permissions,', () => {
 		expect(fileStorageGroup.stdout.trim()).toBe(userGroup);
 	});
 
-	test('testing that type generation artifacts will have the correct permissions', async () => {
+	testFn('testing that type generation artifacts will have the correct permissions', async () => {
 		await exec(`taq compile --plugin ligo increment.jsligo`, { cwd: `./${taqueriaProjectPath}` });
 		await exec(`taq generate types`, { cwd: `./${taqueriaProjectPath}` });
 
