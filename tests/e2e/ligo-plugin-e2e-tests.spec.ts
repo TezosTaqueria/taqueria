@@ -102,6 +102,11 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		console.log(compileStderr.join('\n'));
 		console.log('----- END ERROR OUTPUT -----');
 
+		console.log('----- FILE OUTPUT ------');
+		const { stdout: fileOutput } = await execute('find', '.', './test-project/contracts');
+		console.log(fileOutput.join('\n'));
+		console.log('----- END FILE OUTPUT -----');
+
 		// Check that the output contains the expected files
 		expect(compileStdout.join('\n')).toContain(
 			`┌─────────────────────────────┬───────────────────────────────────────────────┐
