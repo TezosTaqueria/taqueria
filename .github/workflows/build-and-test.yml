@@ -49,11 +49,14 @@ jobs:
           name: taq-${{ matrix.os }}
           path: taq
 
+      - name: Create archive of work
+        run: tar -czf /tmp/work.tar.gz .
+
       - name: Store work
         uses: actions/upload-artifact@v2
         with:
           name: work-${{ matrix.os }}
-          path: .
+          path: /tmp/work.tar.gz
           retention-days: 1
 
   list-e2e-tests:
@@ -99,11 +102,14 @@ jobs:
         with:
           node-version: lts/gallium
 
-      - name: Restore working directory
+      - name: Download work archive
         uses: actions/download-artifact@v2
         with:
           name: work-ubuntu-latest
           path: .
+      
+      - name: Restore work directory
+        run: tar -xzf work.tar.gz
           
       - name: Run tests
         env:
@@ -125,11 +131,14 @@ jobs:
         with:
           node-version: lts/gallium
 
-      - name: Restore working directory
+      - name: Download work archive
         uses: actions/download-artifact@v2
         with:
           name: work-ubuntu-latest
           path: .
+        
+      - name: Restore work directory
+        run: tar -xzf work.tar.gz
 
       - name: Run tests
         env:
@@ -151,11 +160,14 @@ jobs:
         with:
           node-version: lts/gallium
 
-      - name: Restore working directory
+      - name: Download work archive
         uses: actions/download-artifact@v2
         with:
           name: work-ubuntu-latest
           path: .
+      
+      - name: Restore work directory
+        run: tar -xzf work.tar.gz
 
       - name: Run tests
         env:
