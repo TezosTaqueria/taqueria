@@ -50,13 +50,13 @@ jobs:
           path: taq
 
       - name: Create archive of work
-        run: tar -czf ${{ runner.temp }}work.tar.gz .
+        run: tar -czf ${{ runner.temp }}/work.tar.gz .
 
       - name: Store work
         uses: actions/upload-artifact@v2
         with:
           name: work-${{ matrix.os }}
-          path: ${{ runner.temp }}work.tar.gz
+          path: ${{ runner.temp }}/work.tar.gz
           retention-days: 1
 
   list-e2e-tests:
