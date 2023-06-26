@@ -136,6 +136,8 @@ jobs:
     steps:
       - name: Get artifact download URLs
         id: get
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           OWNER=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
           REPO=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
