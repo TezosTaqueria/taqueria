@@ -102,7 +102,7 @@ jobs:
       - name: Run tests
         env:
           PATH: ${{ github.workspace }}/taq:$PATH
-        run: npm run test:unit -w tests
+        run: npm ci && npm run test:unit -w tests
 
   run-integration-tests:
     needs:
@@ -156,4 +156,4 @@ jobs:
       - name: Run tests
         env:
           PATH: ${{ github.workspace }}/taq:$PATH
-        run: npm run test:e2e -w tests ${{ matrix.spec }}
+        run: npm ci && npm run test:e2e -w tests ${{ matrix.spec }}
