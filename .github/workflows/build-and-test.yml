@@ -1,0 +1,26 @@
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+jobs:
+    build-binaries:
+        strategy:
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+        runs-on: ${{ matrix.os }}
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-node@v3
+              with:
+                node-version: lts/gallium
+                cache: "npm"
+
+            - uses: denoland/setup-deno@v1
+
+            - name: Build Binaries
+              run: |
+                npm run build:binary
