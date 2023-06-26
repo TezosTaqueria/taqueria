@@ -148,12 +148,25 @@ jobs:
           echo "REPO: $REPO"
           echo "RUN_ID: $RUN_ID"
 
-          STATUS_CODE=$(curl -H "Authorization: token $TOKEN" \
-            -o response.json \
-            -w "%{http_code}" \
-            "https://api.github.com/repos/$OWNER/$REPO/actions/runs/$RUN_ID/artifacts")
-          echo "Status code: $STATUS_CODE"
-          cat response.json
+          MAX_RETRIES=5
+          DELAY=5
+          retry_count=0
+          status_code=0
+
+          while [[ $retry_count -lt $MAX_RETRIES && $status_code -ne 200 ]]; do
+            STATUS_CODE=$(curl -H "Authorization: token $TOKEN" \
+              -o response.json \
+              -w "%{http_code}" \
+              "https://api.github.com/repos/$OWNER/$REPO/actions/runs/$RUN_ID/artifacts")
+            echo "Status code: $STATUS_CODE"
+            cat response.json
+
+            if [[ $STATUS_CODE -ne 200 ]]; then
+              let "retry_count+=1"
+              echo "Retry $retry_count/$MAX_RETRIES"
+              sleep $((DELAY * retry_count))
+            fi
+          done
 
           if [ $STATUS_CODE -eq 200 ]; then
             ARTIFACT_URLS=$(cat response.json | jq -r '.artifacts[]? | "<a href=\"\(.archive_download_url)\" download=\"taq\">\(.name)</a>"')
