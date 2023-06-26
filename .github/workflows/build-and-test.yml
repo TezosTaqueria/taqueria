@@ -1,43 +1,105 @@
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+  push:
+      branches:
+          - main
+  pull_request:
+      branches:
+          - main
 jobs:
-    build-binaries:
-        strategy:
-            matrix:
-                os: [ubuntu-latest, macos-latest]
-                node: [16]
-        runs-on: ${{ matrix.os }}
-        env:
-            DENO_DIR: ./.deno
-        steps:
-            - uses: actions/checkout@v2
+  # Builds the 'taq' binary on Linux and MacOS
+  build-binaries:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: [16]
+    runs-on: ${{ matrix.os }}
+    env:
+      DENO_DIR: ./.deno
+    steps:
+      - uses: actions/checkout@v2
 
-            - uses: actions/setup-node@v3
-              with:
-                node-version: lts/gallium
-                cache: "npm"
-               
-            - uses: denoland/setup-deno@v1
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/gallium
+          cache: "npm"
+          
+      - uses: denoland/setup-deno@v1
 
-            - name: Restore Deno Cache
-              uses: actions/cache/restore@v3
-              with:
-                path: ${{ env.DENO_DIR }}
-                key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
+      - name: Restore Deno Cache
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
 
-            - name: Build Binaries
-              run: |
-                npm ci
-                npm run build-types
-                npm run build:binary
-                
-            - name: Save Deno Cache
-              uses: actions/cache/save@v3
-              with:
-                path: ${{ env.DENO_DIR }}
-                key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
+      - name: Build Binaries
+        run: |
+          npm ci
+          npm run build-types
+          npm run build:binary
+          
+      - name: Save Deno Cache
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
+  
+  list-e2e-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: List .spec.ts files
+        id: list
+        run: echo "::set-output name=files::$(ls tests/e2e/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')"
+
+      - name: Set matrix for next job
+        id: set-matrix
+        run: echo "::set-output name=matrix::{\"spec\":${{ steps.list.outputs.files }}}"
+
+  list-integration-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: List .spec.ts files
+        id: list
+        run: echo "::set-output name=files::$(ls tests/integration/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')"
+
+      - name: Set matrix for next job
+        id: set-matrix
+        run: echo "::set-output name=matrix::{\"spec\":${{ steps.list.outputs.files }}}"
+
+  run-unit-tests:
+    needs: build-binaries
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run unit tests
+        run: npm run test:unit -w tests
+
+  run-integration-tests:
+    needs:
+      - list-integration-tests
+      - build-binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.list-integration-tests.outputs.matrix)}}
+    steps:
+      - name: Run E2E tests
+        run: npm run test:e2e -w tests ${{ matrix.spec }}        
+
+  run-e2e-tests:
+    needs:
+      - list-e2e-tests
+      - build-binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.list-e2e-tests.outputs.matrix)}}
+    steps:
+      - name: Run E2E tests
+        run: npm run test:e2e -w tests ${{ matrix.spec }}
