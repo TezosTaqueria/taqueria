@@ -48,7 +48,14 @@ jobs:
         with:
           name: taq-${{ matrix.os }}
           path: taq
-  
+
+      - name: Store work
+        uses: actions/upload-artifact@v2
+        with:
+          name: work-${{ matrix.os }}
+          path: work
+          retention-days: 1
+
   list-e2e-tests:
     runs-on: ubuntu-latest
     outputs:
@@ -91,18 +98,17 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
-          cache: "npm"
 
-      - name: Restore taq binary from artifacts
+      - name: Restore working directory
         uses: actions/download-artifact@v2
         with:
-          name: taq-ubuntu-latest
-          path: taq
+          name: work-ubuntu-latest
+          path: .
           
       - name: Run tests
         env:
           PATH: ${{ github.workspace }}/taq:$PATH
-        run: npm ci && npm run test:unit -w tests
+        run: npm run test:unit -w tests
 
   run-integration-tests:
     needs:
@@ -118,13 +124,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
-          cache: "npm"
 
-      - name: Restore taq binary from artifacts
+      - name: Restore working directory
         uses: actions/download-artifact@v2
         with:
-          name: taq-ubuntu-latest
-          path: taq
+          name: work-ubuntu-latest
+          path: .
 
       - name: Run tests
         env:
@@ -145,13 +150,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
-          cache: "npm"
 
-      - name: Restore taq binary from artifacts
+      - name: Restore working directory
         uses: actions/download-artifact@v2
         with:
-          name: taq-ubuntu-latest
-          path: taq
+          name: work-ubuntu-latest
+          path: .
 
       - name: Run tests
         env:
