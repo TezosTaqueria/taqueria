@@ -109,7 +109,7 @@ jobs:
           path: ${{ runner.temp }}/work.tar.gz
       
       - name: Restore work directory
-        run: tar -xzf work.tar.gz
+        run: tar -xzf ${{ runner.temp }}/work.tar.gz
           
       - name: Run tests
         env:
@@ -138,7 +138,7 @@ jobs:
           path: ${{ runner.temp }}/work.tar.gz
         
       - name: Restore work directory
-        run: tar -xzf work.tar.gz
+        run: tar -xzf ${{ runner.temp }}/work.tar.gz
 
       - name: Run tests
         env:
@@ -167,7 +167,7 @@ jobs:
           path: ${{ runner.temp }}/work.tar.gz
       
       - name: Restore work directory
-        run: tar -xzf work.tar.gz
+        run: tar -xzf ${{ runner.temp }}/work.tar.gz
 
       - name: Run tests
         env:
