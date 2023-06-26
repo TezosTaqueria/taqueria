@@ -10,7 +10,10 @@ jobs:
         strategy:
             matrix:
                 os: [ubuntu-latest, macos-latest]
+                node: [16]
         runs-on: ${{ matrix.os }}
+        env:
+            DENO_DIR: ./.deno
         steps:
             - uses: actions/checkout@v2
 
@@ -18,10 +21,23 @@ jobs:
               with:
                 node-version: lts/gallium
                 cache: "npm"
-
+               
             - uses: denoland/setup-deno@v1
+
+            - name: Restore Deno Cache
+              uses: actions/cache/restore@v3
+              with:
+                path: ${{ env.DENO_DIR }}
+                key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
 
             - name: Build Binaries
               run: |
+                npm ci
                 npm run build-types
                 npm run build:binary
+                
+            - name: Save Deno Cache
+              uses: actions/cache/save@3
+              with:
+                path: ${{ env.DENO_DIR }}
+                key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
