@@ -73,10 +73,6 @@ jobs:
            os_short: macos
            deno_target: "x86_64-apple-darwin"
            taqueria_bin: "taq"
-
-    outputs:
-      artifact_urls: ${{ steps.public-url.outputs.artifact_urls }}
-
     env:
       DENO_TARGET: ${{ matrix.deno_target }}
 
@@ -130,19 +126,39 @@ jobs:
           path: "taq.${{ matrix.deno_target }}"
           if-no-files-found: error
 
+  get-artifacts:
+    name: Get artifacts
+    needs:
+      - build-binaries
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_urls: ${{ steps.get.outputs.artifact_urls }}
+    steps:
       - name: Get artifact download URLs
-        id: public-url
+        id: get
         run: |
           OWNER=$(echo $GITHUB_REPOSITORY | cut -d'/' -f1)
           REPO=$(echo $GITHUB_REPOSITORY | cut -d'/' -f2)
           RUN_ID=$GITHUB_RUN_ID
           TOKEN=$GITHUB_TOKEN
 
-          RESPONSE=$(curl -H "Authorization: token $TOKEN" \
-            "https://api.github.com/repos/$OWNER/$REPO/actions/runs/$RUN_ID/artifacts")
+          echo "OWNER: $OWNER"
+          echo "REPO: $REPO"
+          echo "RUN_ID: $RUN_ID"
 
-          ARTIFACT_URLS=$(echo $RESPONSE | jq -r '.artifacts[] | "<a href=\"\(.archive_download_url)\" download=\"taq\">\(.name)</a>"')
-          echo "::set-output name=artifact_urls::$ARTIFACT_URLS"
+          STATUS_CODE=$(curl -H "Authorization: token $TOKEN" \
+            -o response.json \
+            -w "%{http_code}" \
+            "https://api.github.com/repos/$OWNER/$REPO/actions/runs/$RUN_ID/artifacts")
+          echo "Status code: $STATUS_CODE"
+          cat response.json
+
+          if [ $STATUS_CODE -eq 200 ]; then
+            ARTIFACT_URLS=$(cat response.json | jq -r '.artifacts[]? | "<a href=\"\(.archive_download_url)\" download=\"taq\">\(.name)</a>"')
+            echo "::set-output name=artifact_urls::$ARTIFACT_URLS"
+          else
+            echo "Failed to get artifacts"
+          fi
 
   gather-info-for-e2e-tests:
     runs-on: ubuntu-latest
@@ -343,6 +359,7 @@ jobs:
             !github.event.pull_request.head.repo.fork }}
     needs: 
       - build-binaries
+      - get-artifacts
       - publish-npm-packages
       - vscode-extension-workflow
     steps:
@@ -389,7 +406,7 @@ jobs:
                   <th scope="row">Taq Binaries</th>
                   <td>
                       <p>
-                          ${{ needs.build-binaries.outputs.public-url-artifact_urls }}
+                          ${{ needs.get-artifacts.outputs.artifact_urls }}
                       </p>
                   </td>
                 </tr>
