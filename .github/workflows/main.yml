@@ -126,8 +126,8 @@ jobs:
         id: upload-file
         uses: actions/upload-artifact@v2
         with:
-          name: taq
-          path: ${{ matrix.deno_target }}/taq
+          name: "taq ${{ matrix.deno_target }}"
+          path: "taq.${{ matrix.deno_target }}"
           if-no-files-found: error
 
       - name: Get artifact download URLs
@@ -141,7 +141,7 @@ jobs:
           RESPONSE=$(curl -H "Authorization: token $TOKEN" \
             "https://api.github.com/repos/$OWNER/$REPO/actions/runs/$RUN_ID/artifacts")
 
-          ARTIFACT_URLS=$(echo $RESPONSE | jq -r '.artifacts[] | "<a href=\"\(.archive_download_url)\">\(.name)</a>"')
+          ARTIFACT_URLS=$(echo $RESPONSE | jq -r '.artifacts[] | "<a href=\"\(.archive_download_url)\" download=\"taq\">\(.name)</a>"')
           echo "::set-output name=artifact_urls::$ARTIFACT_URLS"
 
   gather-info-for-e2e-tests:
