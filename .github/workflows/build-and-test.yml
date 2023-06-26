@@ -106,7 +106,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: work-ubuntu-latest
-          path: .
+          path: ${{ runner.temp }}/work.tar.gz
       
       - name: Restore work directory
         run: tar -xzf work.tar.gz
@@ -135,7 +135,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: work-ubuntu-latest
-          path: .
+          path: ${{ runner.temp }}/work.tar.gz
         
       - name: Restore work directory
         run: tar -xzf work.tar.gz
@@ -164,7 +164,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: work-ubuntu-latest
-          path: .
+          path: ${{ runner.temp }}/work.tar.gz
       
       - name: Restore work directory
         run: tar -xzf work.tar.gz
