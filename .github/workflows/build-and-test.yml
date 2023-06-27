@@ -117,145 +117,81 @@ jobs:
             path: work.tar.gz
             retention-days: 1
 
-  # Generates a matrix of all integration and e2e tests to run.
-  compute-tests-matrix:
+  list-e2e-tests:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.generate.outputs.matrix }}
-
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Generate matrix
-        id: generate
-        run: |
-          json=""
-          for testType in integration e2e; do
-            for file in $(find ./tests/$testType -name "*.spec.ts"); do
-              json=$(echo $json | jq ". + [\"$file;$testType\"]")
-            done
-          done
-          echo $json
-          echo "::set-output name=matrix::$json"
-          #echo "matrix=${json}" >> "$GITHUB_ENV"
-  
-  # Runs all integration and e2e tests in parallel on separate Linux runners.
-  run-tests:
+      - name: List .spec.ts files
+        id: list
+        run: echo "files=$(ls tests/e2e/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_ENV"
+
+      - name: Set matrix for next job
+        id: set-matrix
+        run: echo "matrix={\"spec\":${{ env.files }}" >> "$GITHUB_ENV"
+
+  list-integration-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: List .spec.ts files
+        id: list
+        run: echo "files=$(ls tests/integration/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_ENV"
+
+      - name: Set matrix for next job
+        id: set-matrix
+        run: echo "matrix={\"spec\":${{ env.files }}" >> "$GITHUB_ENV"
+
+  # Run all unit tests
+  run-unit-tests:
     needs:
-      - compute-tests-matrix
       - build-binaries
       - build-packages
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        test: ${{ needs.compute-tests-matrix.outputs.matrix }}
-
     steps:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
 
+      - uses: denoland/setup-deno@v1
+
       - name: Download work archive
         uses: actions/download-artifact@v2
         with:
           name: work-ubuntu-latest
-          path: ${{ runner.temp }}/work.tar.gz
-        
-      - name: Restore work directory
-        run: tar -xzf ${{ runner.temp }}/work.tar.gz
+          path: .
+
+      - name: Extract work archive
+        run: tar -xzpf work.tar.gz
 
       - name: Run tests
         env:
-          PATH: ${{ github.workspace }}/taq:$PATH
+          HUSKY_SKIP_INSTALL: 1
+          HUSKY: 0
+          npm_config_loglevel: silly
         run: |
-          TEST_FILE=$(echo ${{ matrix.pair }} | cut -d ';' -f 1)
-          TEST_TYPE=$(echo ${{ matrix.pair }} | cut -d ';' -f 2)
-          npm run test:$TEST_TYPE $TEST_FILE -w tests
+          CWD=$(pwd)
+          export PATH=$PATH:$CWD
+          export DENO_DIR=$CWD/.deno
+          npm run test:unit -w tests
 
-  # list-unit-tests:
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     matrix: ${{ steps.set-matrix.outputs.matrix }}
-  #   steps:
-  #     - name: Set matrix for next job
-  #       run: echo "matrix={\"spec\":[\"*\"]}" >> "$GITHUB_ENV"
-
-  # list-e2e-tests:
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     matrix: ${{ steps.set-matrix.outputs.matrix }}
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-
-  #     - name: List .spec.ts files
-  #       id: list
-  #       run: echo "files=$(ls tests/e2e/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_ENV"
-
-  #     - name: Set matrix for next job
-  #       id: set-matrix
-  #       run: echo "matrix={\"spec\":${{ env.files }}" >> "$GITHUB_ENV"
-
-  # list-integration-tests:
-  #   runs-on: ubuntu-latest
-  #   outputs:
-  #     matrix: ${{ steps.set-matrix.outputs.matrix }}
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-
-  #     - name: List .spec.ts files
-  #       id: list
-  #       run: echo "files=$(ls tests/integration/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_ENV"
-
-  #     - name: Set matrix for next job
-  #       id: set-matrix
-  #       run: echo "matrix={\"spec\":${{ env.files }}" >> "$GITHUB_ENV"
-
-  # run-unit-tests:
-  #   needs:
-  #     - build-binaries
-  #     - build-packages
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: lts/gallium
-
-  #     - uses: denoland/setup-deno@v1
-
-  #     - name: Download work archive
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: work-ubuntu-latest
-  #         path: .
-
-  #     - name: Extract work archive
-  #       run: tar -xzpf work.tar.gz
-
-  #     - name: Run tests
-  #       env:
-  #         HUSKY_SKIP_INSTALL: 1
-  #         HUSKY: 0
-  #         npm_config_loglevel: silly
-  #       run: |
-  #         CWD=$(pwd)
-  #         export PATH=$PATH:$CWD
-  #         export DENO_DIR=$CWD/.deno
-  #         npm run test:unit -w tests
-
-  # run-integration-tests:
-  #   needs:
-  #     - list-integration-tests
-  #     - build-binaries
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix: ${{fromJson(needs.list-integration-tests.outputs.matrix)}}
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
+  run-integration-tests:
+    needs:
+      - list-integration-tests
+      - build-binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.list-integration-tests.outputs.matrix)}}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - uses: actions/setup-node@v3
         with:
@@ -275,31 +211,31 @@ jobs:
           PATH: ${{ github.workspace }}/taq:$PATH
         run: npm ci && npm run test:e2e -w tests ${{ matrix.spec }}        
 
-  # run-e2e-tests:
-  #   needs:
-  #     - list-e2e-tests
-  #     - build-binaries
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     matrix: ${{fromJson(needs.list-e2e-tests.outputs.matrix)}}
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
+  run-e2e-tests:
+    needs:
+      - list-e2e-tests
+      - build-binaries
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.list-e2e-tests.outputs.matrix)}}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-  #     - uses: actions/setup-node@v3
-  #       with:
-  #         node-version: lts/gallium
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/gallium
 
-  #     - name: Download work archive
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: work-ubuntu-latest
-  #         path: ${{ runner.temp }}/work.tar.gz
+      - name: Download work archive
+        uses: actions/download-artifact@v2
+        with:
+          name: work-ubuntu-latest
+          path: ${{ runner.temp }}/work.tar.gz
       
-  #     - name: Restore work directory
-  #       run: tar -xzf ${{ runner.temp }}/work.tar.gz
+      - name: Restore work directory
+        run: tar -xzf ${{ runner.temp }}/work.tar.gz
 
-  #     - name: Run tests
-  #       env:
-  #         PATH: ${{ github.workspace }}/taq:$PATH
-  #       run: npm ci && npm run test:e2e -w tests ${{ matrix.spec }}
+      - name: Run tests
+        env:
+          PATH: ${{ github.workspace }}/taq:$PATH
+        run: npm ci && npm run test:e2e -w tests ${{ matrix.spec }}
