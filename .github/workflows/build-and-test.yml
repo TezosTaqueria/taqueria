@@ -121,11 +121,7 @@ jobs:
   compute-tests-matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.generate.outputs.matrix }}
-
-    strategy:
-      matrix:
-        testType: ["integration", "e2e"]
+      matrix: ${{ steps.generate.outputs.matrix }}ddddd
 
     steps:
       - name: Checkout
@@ -135,14 +131,12 @@ jobs:
         id: generate
         run: |
           json="[]"
-          for file in $(find ./tests/${{ matrix.testType }} -name "*.spec.ts"); do
-            pair=$(jq -n \
-                      --arg testType "${{ matrix.testType }}" \
-                      --arg test "$file" \
-                      '{testType: $testType, test: $test}')
-            json=$(echo $json | jq ". + [$pair]")
+          for testType in integration e2e; do
+            for file in $(find ./tests/$testType -name "*.spec.ts"); do
+              json=$(echo $json | jq ". + [\"$file:$testType\"]")
+            done
           done
-          echo "matrix=${json}" >> "$GITHUB_ENV"
+          echo "matrix=${json}" >> "$GITHUB_ENV
   
   # Runs all integration and e2e tests in parallel on separate Linux runners.
   run-tests:
@@ -173,8 +167,10 @@ jobs:
       - name: Run tests
         env:
           PATH: ${{ github.workspace }}/taq:$PATH
-        run: npm run test:${{ matrix.pair.testType }} ${{ matrix.pair.test }} -w tests
-          
+        run: |
+          TEST_FILE=$(echo ${{ matrix.pair }} | cut -d ':' -f 1)
+          TEST_TYPE=$(echo ${{ matrix.pair }} | cut -d ':' -f 2)
+          npm run test:$TEST_TYPE $TEST_FILE -w tests
 
   # list-unit-tests:
   #   runs-on: ubuntu-latest
