@@ -162,8 +162,12 @@ jobs:
 
       - name: Run tests
         env:
-          PATH: ${{ github.workspace }}/taq:$PATH
-        run: npm ci && npm run test:e2e -w tests ${{ matrix.spec }} 
+          HUSKY_SKIP_INSTALL: 1
+          HUSKY: 0
+        run: |
+          CWD=$(pwd)
+          export PATH=$PATH:$CWD
+          npm run test:e2e -w tests ${{ matrix.spec }}
 
   list-integration-tests:
     runs-on: ubuntu-latest
@@ -210,8 +214,12 @@ jobs:
 
       - name: Run tests
         env:
-          PATH: ${{ github.workspace }}/taq:$PATH
-        run: npm ci && npm run test:e2e -w tests ${{ matrix.spec }}
+          HUSKY_SKIP_INSTALL: 1
+          HUSKY: 0
+        run: |
+          CWD=$(pwd)
+          export PATH=$PATH:$CWD
+          npm run test:e2e -w tests ${{ matrix.spec }}
 
   # Run all unit tests
   run-unit-tests:
