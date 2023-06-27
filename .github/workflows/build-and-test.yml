@@ -119,6 +119,11 @@ jobs:
         with:
           name: work-ubuntu-latest
           path: work.tar.gz
+
+      - name: Debug
+        run: |
+          pwd
+          ls -la
           
       - name: Run tests
         env:
