@@ -131,7 +131,9 @@ jobs:
         run: tar -xzf work.tar.gz
 
       - name: Before tests
-        run: ls -l ../bin
+        env:
+          PATH: ${{ github.workspace }}/taq:$PATH
+        run: cd tests && ls -l ../bin
 
       - name: Run tests
         env:
