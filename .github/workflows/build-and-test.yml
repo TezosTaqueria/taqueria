@@ -51,6 +51,9 @@ jobs:
 
       - name: Create archive of work
         if: ${{ matrix.os == 'ubuntu-latest' }}
+        # We need to ignore the exit code of tar because it will exit with 1 if
+        # a file is being written to while tar is trying to read it. This is
+        # expected behavior and we don't want to fail the build because of it.
         run: |
           set +e
           tar --warning=no-file-changed -czpf work.tar.gz .
@@ -135,11 +138,13 @@ jobs:
         run: |
           pwd
           ls -la
+          echo $SHELL
+          echo $PATH
           
       - name: Run tests
         env:
           PATH: ${{ github.workspace }}/taq:$PATH
-        run: npm i && npm run test:unit -w tests
+        run: npm run test:unit -w tests
 
   # run-integration-tests:
   #   needs:
