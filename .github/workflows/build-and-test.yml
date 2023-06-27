@@ -115,9 +115,6 @@ jobs:
     needs: build-binaries
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
