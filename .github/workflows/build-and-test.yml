@@ -114,6 +114,8 @@ jobs:
   run-unit-tests:
     needs: build-binaries
     runs-on: ubuntu-latest
+    env:
+      DENO_DIR: ./.deno
     steps:
       - uses: actions/setup-node@v3
         with:
