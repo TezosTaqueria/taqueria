@@ -131,21 +131,17 @@ jobs:
         run: tar -xzf work.tar.gz
 
       - name: Before tests
-        env:
-          PATH: ${{ github.workspace }}/taq:$PATH
         run: cd tests && ls -l ../bin
 
       - name: Run tests
         env:
-          PATH: ${{ github.workspace }}/taq:$PATH
           HUSKY_SKIP_INSTALL: 1
           HUSKY: 0
           npm_config_loglevel: silly
-        run: cd tests && npm run test:unit
-        continue-on-error: true
-
-      - name: Debug
-        run: cat /home/runner/.npm/_logs/*-debug*.log
+        run: |
+          CWD=$(pwd)
+          export PATH=$PATH:$CWD`
+          npm run test:unit -w tests
 
   # run-integration-tests:
   #   needs:
