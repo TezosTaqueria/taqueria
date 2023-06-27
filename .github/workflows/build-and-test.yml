@@ -51,14 +51,14 @@ jobs:
 
       - name: Create archive of work
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        run: tar -czf ${{ runner.temp }}/work.tar.gz .
+        run: tar -czpf work.tar.gz .
 
       - name: Store work
         if: ${{ matrix.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v2
         with:
           name: work-${{ matrix.os }}
-          path: ${{ runner.temp }}/work.tar.gz
+          path: work.tar.gz
           retention-days: 1
 
   list-unit-tests:
@@ -118,7 +118,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: work-ubuntu-latest
-          path: work.tar.gz
+          path: .
+
+      - name: Extract work archive
+        run: tar -xzf work.tar.gz
+    
 
       - name: Debug
         run: |
