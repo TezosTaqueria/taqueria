@@ -140,7 +140,7 @@ jobs:
           npm_config_loglevel: silly
         run: |
           CWD=$(pwd)
-          export PATH=$PATH:$CWD`
+          export PATH=$PATH:$CWD
           npm run test:unit -w tests
 
   # run-integration-tests:
