@@ -121,7 +121,7 @@ jobs:
   compute-tests-matrix:
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.generate.outputs.matrix }}ddddd
+      matrix: ${{ steps.generate.outputs.matrix }}
 
     steps:
       - name: Checkout
@@ -130,10 +130,10 @@ jobs:
       - name: Generate matrix
         id: generate
         run: |
-          json="[]"
+          json=""
           for testType in integration e2e; do
             for file in $(find ./tests/$testType -name "*.spec.ts"); do
-              json=$(echo $json | jq ". + [\"$file:$testType\"]")
+              json=$(echo $json | jq ". + [\"$file;$testType\"]")
             done
           done
           echo $json
@@ -150,7 +150,7 @@ jobs:
 
     strategy:
       matrix:
-        pair: ${{ fromJson(needs.compute-tests-matrix.outputs.matrix) }}
+        test: ${{ needs.compute-tests-matrix.outputs.matrix }}
 
     steps:
       - uses: actions/setup-node@v3
@@ -170,8 +170,8 @@ jobs:
         env:
           PATH: ${{ github.workspace }}/taq:$PATH
         run: |
-          TEST_FILE=$(echo ${{ matrix.pair }} | cut -d ':' -f 1)
-          TEST_TYPE=$(echo ${{ matrix.pair }} | cut -d ':' -f 2)
+          TEST_FILE=$(echo ${{ matrix.pair }} | cut -d ';' -f 1)
+          TEST_TYPE=$(echo ${{ matrix.pair }} | cut -d ';' -f 2)
           npm run test:$TEST_TYPE $TEST_FILE -w tests
 
   # list-unit-tests:
