@@ -71,6 +71,52 @@ jobs:
           path: work.tar.gz
           retention-days: 1
 
+  build-packages:
+      needs: build-binaries
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v2
+
+        - uses: actions/setup-node@v3
+          with:
+            node-version: lts/gallium
+            cache: "npm"
+            
+        - uses: denoland/setup-deno@v1
+
+        - name: Download work archive
+          uses: actions/download-artifact@v2
+          with:
+            name: work-ubuntu-latest
+            path: .
+
+        - name: Extract work archive
+          run: tar -xzpf work.tar.gz
+
+        - name: Build packages
+          run: npm run build:packages
+
+        - name: Create archive of work
+          # We need to ignore the exit code of tar because it will exit with 1 if
+          # a file is being written to while tar is trying to read it. This is
+          # expected behavior and we don't want to fail the build because of it.
+          run: |
+            set +e
+            tar -czpf work.tar.gz .
+            exitcode=$?
+            if [ "$exitcode" != "1" ] && [ "$exitcode" != "0" ]; then
+              exit $exitcode
+            fi
+            set -e
+
+        - name: Store work
+          uses: actions/upload-artifact@v2
+          with:
+            name: work-ubuntu-latest
+            path: work.tar.gz
+            retention-days: 1
+
+
   list-unit-tests:
     runs-on: ubuntu-latest
     outputs:
@@ -112,7 +158,9 @@ jobs:
         run: echo "matrix={\"spec\":${{ env.files }}" >> "$GITHUB_ENV"
 
   run-unit-tests:
-    needs: build-binaries
+    needs:
+      - build-binaries
+      - build-packages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v3
@@ -129,46 +177,7 @@ jobs:
 
       - name: Extract work archive
         run: tar -xzpf work.tar.gz
-
-      - name: Generate tree
-        run: |
-          python - << END
-          import os
-  
-          def print_tree(directory, prefix=''):
-              # Ensure the directory exists
-              if not os.path.isdir(directory):
-                  return
-  
-              # List the contents of the directory
-              contents = os.listdir(directory)
-  
-              # Separate the contents into files and directories
-              files = [f for f in contents if os.path.isfile(os.path.join(directory, f))]
-              dirs = [d for d in contents if os.path.isdir(os.path.join(directory, d))]
-  
-              # Print the directories
-              for i, subdir in enumerate(dirs):
-                  if i == len(dirs) - 1 and len(files) == 0:
-                      print(f'{prefix}└── {subdir}/')
-                      if subdir != 'node_modules' or directory != '.':
-                          print_tree(os.path.join(directory, subdir), prefix + '    ')
-                  else:
-                      print(f'{prefix}├── {subdir}/')
-                      if subdir != 'node_modules' or directory != '.':
-                          print_tree(os.path.join(directory, subdir), prefix + '│   ')
-  
-              # Print the files
-              for i, filename in enumerate(files):
-                  if os.path.islink(os.path.join(directory, filename)):
-                      print(f'{prefix}├── {filename}@')
-                  else:
-                      print(f'{prefix}├── {filename}')
-  
-          # Call the function on the current directory
-          print_tree('.')
-          END
-  
+        
       - name: Run tests
         env:
           HUSKY_SKIP_INSTALL: 1
