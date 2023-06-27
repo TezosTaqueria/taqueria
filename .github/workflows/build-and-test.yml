@@ -137,7 +137,8 @@ jobs:
             done
           done
           echo $json
-          echo "matrix=${json}" >> "$GITHUB_ENV"
+          echo "::set-output name=matrix::$json"
+          #echo "matrix=${json}" >> "$GITHUB_ENV"
   
   # Runs all integration and e2e tests in parallel on separate Linux runners.
   run-tests:
