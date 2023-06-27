@@ -118,7 +118,7 @@ jobs:
       
       - name: List work directory
         run: |
-          FILES=`ls -lR*`
+          FILES=`ls -lR`
           echo "::set-output name=files::$FILES"
 
       - name: Restore work directory
