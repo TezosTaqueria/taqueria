@@ -131,7 +131,7 @@ jobs:
 
       - name: Set matrix for next job
         id: set-matrix
-        run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}" >> "$GITHUB_OUTPUT" && echo "matrix={\"spec\":${{ steps.list.outputs.files }}"
+        run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}}" >> "$GITHUB_OUTPUT"
 
   list-integration-tests:
     runs-on: ubuntu-latest
@@ -147,7 +147,7 @@ jobs:
 
       - name: Set matrix for next job
         id: set-matrix
-        run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}" >> "$GITHUB_OUTPUT"
+        run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}}" >> "$GITHUB_OUTPUT"
 
   # Run all unit tests
   run-unit-tests:
