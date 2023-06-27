@@ -142,11 +142,11 @@ jobs:
           echo $PATH
           which docker
           which env
-          
+
       - name: Run tests
         env:
           PATH: ${{ github.workspace }}/taq:$PATH
-        run: npm run test:unit -w tests
+        run: cd tests && npm run test:unit
 
   # run-integration-tests:
   #   needs:
