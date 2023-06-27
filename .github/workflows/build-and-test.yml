@@ -61,6 +61,14 @@ jobs:
           path: ${{ runner.temp }}/work.tar.gz
           retention-days: 1
 
+  list-unit-tests:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set matrix for next job
+        run: echo "::set-output name=matrix::{\"spec\":[\"*\"]}"
+
   list-e2e-tests:
     runs-on: ubuntu-latest
     outputs:
@@ -115,16 +123,6 @@ jobs:
         with:
           name: work-ubuntu-latest
           path: work.tar.gz
-      
-      - name: List work directory
-        run: |
-          FILES=`ls -lR`
-          echo "::set-output name=files::$FILES"
-
-      - name: Restore work directory
-        run: tar -xzf work.tar.gz
-
-      
           
       - name: Run tests
         env:
