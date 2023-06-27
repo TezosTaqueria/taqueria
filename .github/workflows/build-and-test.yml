@@ -132,20 +132,12 @@ jobs:
 
       - name: Extract work archive
         run: tar -xzf work.tar.gz
-    
-
-      - name: Debug
-        run: |
-          pwd
-          ls -la
-          echo $SHELL
-          echo $PATH
-          which docker
-          which env
 
       - name: Run tests
         env:
           PATH: ${{ github.workspace }}/taq:$PATH
+          HUSKY_SKIP_INSTALL: 1
+          HUSKY: 0
         run: cd tests && npm run test:unit
 
   # run-integration-tests:
