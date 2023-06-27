@@ -219,7 +219,7 @@ jobs:
         run: |
           CWD=$(pwd)
           export PATH=$PATH:$CWD
-          npm run test:e2e -w tests ${{ matrix.spec }}
+          npm run test:integration -w tests ${{ matrix.spec }}
 
   # Run all unit tests
   run-unit-tests:

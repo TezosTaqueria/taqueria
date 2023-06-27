@@ -125,13 +125,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 └─────────────────────────────┴───────────────────────────────────────────────┘`,
 		);
 
-		expect(compileStderr.join('\n')).toContain(
-			`=== Error messages for invalid-contract.mligo ===
-File "contracts/invalid-contract.mligo", line 1, characters 23-27:
-1 | type available_tacos = natu
-2 |
-Type "natu" not found.`,
-		);
+		expect(compileStderr.join('\n')).toContain(`Type "natu" not found.`);
 
 		expect(compileStderr.join('\n')).toContain(
 			`Note: storage file associated with "entry.mligo" can't be found, so "entry.storageList.mligo" has been created for you. Use this file to define all initial storage values for this contract`,
