@@ -140,6 +140,8 @@ jobs:
           ls -la
           echo $SHELL
           echo $PATH
+          which docker
+          which env
           
       - name: Run tests
         env:
