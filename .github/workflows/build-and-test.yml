@@ -50,9 +50,11 @@ jobs:
           path: taq
 
       - name: Create archive of work
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: tar -czf ${{ runner.temp }}/work.tar.gz .
 
       - name: Store work
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v2
         with:
           name: work-${{ matrix.os }}
@@ -108,13 +110,15 @@ jobs:
           name: work-ubuntu-latest
           path: ${{ runner.temp }}/work.tar.gz
       
-      - name: Restore work directory
-        run: tar -xzf ${{ runner.temp }}/work.tar.gz
-
       - name: List work directory
         run: |
           FILES=`ls -lRa ${{ runner.temp }}}`
           echo "::set-output name=files::$FILES"
+
+      - name: Restore work directory
+        run: tar -xzf ${{ runner.temp }}/work.tar.gz
+
+      
           
       - name: Run tests
         env:
