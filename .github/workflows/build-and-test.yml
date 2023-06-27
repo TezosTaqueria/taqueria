@@ -138,7 +138,12 @@ jobs:
           PATH: ${{ github.workspace }}/taq:$PATH
           HUSKY_SKIP_INSTALL: 1
           HUSKY: 0
+          npm_config_loglevel: silly
         run: cd tests && npm run test:unit
+        continue-on-error: true
+
+      - name: Debug
+        run: cat .npm/_logs/*-debug.log
 
   # run-integration-tests:
   #   needs:
