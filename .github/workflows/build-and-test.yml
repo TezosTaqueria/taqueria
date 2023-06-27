@@ -112,13 +112,7 @@ jobs:
         with:
           node-version: lts/gallium
 
-      - uses: denoland/setup-deno@v1          
-
-      - name: Create temp directory for work
-        run: |
-          if [ ! -d "${{ runner.temp }}" ]; then
-            mkdir -p ${{ runner.temp }}
-          fi
+      - uses: denoland/setup-deno@v1
 
       - name: Download work archive
         uses: actions/download-artifact@v2
@@ -129,7 +123,7 @@ jobs:
       - name: Run tests
         env:
           PATH: ${{ github.workspace }}/taq:$PATH
-        run: npm run test:unit -w tests
+        run: npm i && npm run test:unit -w tests
 
   # run-integration-tests:
   #   needs:
