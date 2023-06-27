@@ -56,7 +56,7 @@ jobs:
         # expected behavior and we don't want to fail the build because of it.
         run: |
           set +e
-          tar --warning=no-file-changed -czpf work.tar.gz .
+          tar -czpf work.tar.gz .
           exitcode=$?
           if [ "$exitcode" != "1" ] && [ "$exitcode" != "0" ]; then
             exit $exitcode
@@ -114,20 +114,12 @@ jobs:
   run-unit-tests:
     needs: build-binaries
     runs-on: ubuntu-latest
-    env:
-      DENO_DIR: ./.deno
     steps:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
 
       - uses: denoland/setup-deno@v1
-
-      - name: Restore Deno Cache
-        uses: actions/cache/restore@v3
-        with:
-          path: ${{ env.DENO_DIR }}
-          key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
 
       - name: Download work archive
         uses: actions/download-artifact@v2
@@ -136,8 +128,47 @@ jobs:
           path: .
 
       - name: Extract work archive
-        run: tar -xzf work.tar.gz
+        run: tar -xzpf work.tar.gz
 
+      - name: Generate tree
+        run: |
+          python - << END
+          import os
+  
+          def print_tree(directory, prefix=''):
+              # Ensure the directory exists
+              if not os.path.isdir(directory):
+                  return
+  
+              # List the contents of the directory
+              contents = os.listdir(directory)
+  
+              # Separate the contents into files and directories
+              files = [f for f in contents if os.path.isfile(os.path.join(directory, f))]
+              dirs = [d for d in contents if os.path.isdir(os.path.join(directory, d))]
+  
+              # Print the directories
+              for i, subdir in enumerate(dirs):
+                  if i == len(dirs) - 1 and len(files) == 0:
+                      print(f'{prefix}└── {subdir}/')
+                      if subdir != 'node_modules' or directory != '.':
+                          print_tree(os.path.join(directory, subdir), prefix + '    ')
+                  else:
+                      print(f'{prefix}├── {subdir}/')
+                      if subdir != 'node_modules' or directory != '.':
+                          print_tree(os.path.join(directory, subdir), prefix + '│   ')
+  
+              # Print the files
+              for i, filename in enumerate(files):
+                  if os.path.islink(os.path.join(directory, filename)):
+                      print(f'{prefix}├── {filename}@')
+                  else:
+                      print(f'{prefix}├── {filename}')
+  
+          # Call the function on the current directory
+          print_tree('.')
+          END
+  
       - name: Run tests
         env:
           HUSKY_SKIP_INSTALL: 1
@@ -146,6 +177,7 @@ jobs:
         run: |
           CWD=$(pwd)
           export PATH=$PATH:$CWD
+          export DENO_DIR=$CWD/.deno
           npm run test:unit -w tests
 
   # run-integration-tests:
