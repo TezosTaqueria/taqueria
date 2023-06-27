@@ -140,7 +140,7 @@ jobs:
         continue-on-error: true
 
       - name: Debug
-        run: cat /home/runner/.npm/_logs/*-debug.log
+        run: cat /home/runner/.npm/_logs/*-debug*.log
 
   # run-integration-tests:
   #   needs:
