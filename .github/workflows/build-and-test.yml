@@ -67,7 +67,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Set matrix for next job
-        run: echo "::set-output name=matrix::{\"spec\":[\"*\"]}"
+        run: echo "matrix={\"spec\":[\"*\"]}" >> "$GITHUB_ENV"
 
   list-e2e-tests:
     runs-on: ubuntu-latest
@@ -79,11 +79,11 @@ jobs:
 
       - name: List .spec.ts files
         id: list
-        run: echo "::set-output name=files::$(ls tests/e2e/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')"
+        run: echo "files=$(ls tests/e2e/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_ENV"
 
       - name: Set matrix for next job
         id: set-matrix
-        run: echo "::set-output name=matrix::{\"spec\":${{ steps.list.outputs.files }}}"
+        run: echo "matrix={\"spec\":${{ env.files }}" >> "$GITHUB_ENV"
 
   list-integration-tests:
     runs-on: ubuntu-latest
@@ -95,11 +95,11 @@ jobs:
 
       - name: List .spec.ts files
         id: list
-        run: echo "::set-output name=files::$(ls tests/integration/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')"
+        run: echo "files=$(ls tests/integration/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_ENV"
 
       - name: Set matrix for next job
         id: set-matrix
-        run: echo "::set-output name=matrix::{\"spec\":${{ steps.list.outputs.files }}}"
+        run: echo "matrix={\"spec\":${{ env.files }}" >> "$GITHUB_ENV"
 
   run-unit-tests:
     needs: build-binaries
@@ -111,6 +111,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
+
+      - uses: denoland/setup-deno@v1          
 
       - name: Create temp directory for work
         run: |
