@@ -127,11 +127,11 @@ jobs:
 
       - name: List .spec.ts files
         id: list
-        run: echo "files=$(ls tests/e2e/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_ENV"
+        run: echo "files=$(ls tests/e2e/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
 
       - name: Set matrix for next job
         id: set-matrix
-        run: echo "matrix={\"spec\":${{ env.files }}" >> "$GITHUB_ENV"
+        run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}" >> "$GITHUB_OUTPUT"
 
   list-integration-tests:
     runs-on: ubuntu-latest
@@ -143,11 +143,11 @@ jobs:
 
       - name: List .spec.ts files
         id: list
-        run: echo "files=$(ls tests/integration/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_ENV"
+        run: echo "files=$(ls tests/integration/*.spec.ts | jq -R -s -c 'split("\n")[:-1]')" >> "$GITHUB_OUTPUT"
 
       - name: Set matrix for next job
         id: set-matrix
-        run: echo "matrix={\"spec\":${{ env.files }}" >> "$GITHUB_ENV"
+        run: echo "matrix={\"spec\":${{ steps.list.outputs.files }}" >> "$GITHUB_OUTPUT"
 
   # Run all unit tests
   run-unit-tests:
