@@ -136,7 +136,7 @@ jobs:
               json=$(echo $json | jq ". + [\"$file:$testType\"]")
             done
           done
-          echo "matrix=${json}" >> "$GITHUB_ENV
+          echo "matrix=${json}" >> "$GITHUB_ENV"
   
   # Runs all integration and e2e tests in parallel on separate Linux runners.
   run-tests:
