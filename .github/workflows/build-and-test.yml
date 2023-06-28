@@ -97,6 +97,16 @@ jobs:
         - name: Build packages
           run: npm run build:packages
 
+        - name: Get VSIX
+          id: vsix
+          run: echo "artifact=$(ls taqueria-vscode-extension/*.vsix)" >> "$GITHUB_OUTPUT"
+
+        - name: Upload VSCode Extension
+          uses: actions/upload-artifact@v2
+          with:
+            name: taqueria.vsix
+            path: ${{ steps.vsix.outputs.artifact }}
+
         - name: Create archive of work
           # We need to ignore the exit code of tar because it will exit with 1 if
           # a file is being written to while tar is trying to read it. This is
