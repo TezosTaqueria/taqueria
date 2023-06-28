@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/taqueria",
-	"version": "0.28.7",
+	"version": "0.28.8",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -12,7 +12,7 @@
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
 		"build:packages": "lerna run build",
-		"deploy": "lerna version --no-push --no-git-tag-version --no-private",
+		"deploy": "lerna version --no-push --no-git-tag-version",
 		"parse-readme-template": "ts-node ./parse-readme-template.ts",
 		"build-website": "npm run parse-readme-template && cd website && npm ci --legacy-peer-deps && npm run build",
 		"serve-website": "cd website && npm run serve",
