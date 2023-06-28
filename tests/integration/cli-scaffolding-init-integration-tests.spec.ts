@@ -4,7 +4,7 @@ import util from 'util';
 const exec = util.promisify(exec1);
 
 // Increase timeout for Github Actions
-const timeout = process.env.CI ? 60 : 30;
+const timeout = process.env.CI ? 80 : 30;
 jest.setTimeout(1000 * timeout);
 
 // Use test.skip when RUNNER_OS is MacOS
