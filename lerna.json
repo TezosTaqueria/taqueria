@@ -8,6 +8,7 @@
 		"taqueria-analytics",
 		"taqueria-vscode*",
 		"taqueria-protocol",
+		"taqueria-vscode-extension",
 		"tests"
 	],
 	"useNx": false
