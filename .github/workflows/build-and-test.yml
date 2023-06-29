@@ -150,7 +150,8 @@ jobs:
       # Publish packages using lerna publish with commit as version
       - name: Publish packages
         run: |
-          VERSION=$(git rev-parse --short HEAD)
+          VERSION="${{ github.sha }}}"
+          echo $VERSION
           npx lerna version $VERSION --yes --force-publish --no-git-tag-version --exact
           npx lerna publish from-package --yes --no-git-tag-version --exact --registry https://npm.pkg.github.com/pinnacle-labs
 
