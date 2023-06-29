@@ -127,6 +127,35 @@ jobs:
             path: work.tar.gz
             retention-days: 1
 
+  # Publish NPM packages to Github Packages
+  publish-packages:
+    needs: build-packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/gallium
+          cache: "npm"
+          registry-url: https://npm.pkg.github.com/pinnacle-labs
+          
+      - uses: denoland/setup-deno@v1
+
+      - name: Download work archive
+        uses: actions/download-artifact@v2
+        with:
+          name: work-ubuntu-latest
+          path: .
+
+      - name: Extract work archive
+        run: tar -xzpf work.tar.gz
+
+      # Publish packages using lerna publish with commit as version
+      - name: Publish packages
+        run: |
+          VERSION=$(git rev-parse --short HEAD)
+          npx lerna version $VERSION --yes --force-publish --no-git-tag-version --exact
+          npx lerna publish from-package --yes --no-git-tag-version --exact --registry https://npm.pkg.github.com/pinnacle-labs
+
   list-e2e-tests:
     runs-on: ubuntu-latest
     outputs:
