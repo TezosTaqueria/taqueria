@@ -152,8 +152,9 @@ jobs:
         run: |
           npm version 
           GIT_VERSION="${{ github.sha }}}"
-          PKG_VERSION=$(npm version --json | jq -r '.["@taqueria/taqueria"]')
+          PKG_VERSION=`npm version --json | jq -r '.["@taqueria/taqueria"]')`
           VERSION="${PKG_VERSION}-${GIT_VERSION}"
+          echo $VERSION
           npx lerna version $VERSION --yes --force-publish --no-git-tag-version --exact
           npx lerna publish from-package --yes --no-git-tag-version --exact --registry https://npm.pkg.github.com/pinnacle-labs
 
