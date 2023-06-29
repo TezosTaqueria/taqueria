@@ -132,14 +132,6 @@ jobs:
     needs: build-packages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v3
-        with:
-          node-version: lts/gallium
-          cache: "npm"
-          registry-url: https://npm.pkg.github.com/pinnacle-labs
-          
-      - uses: denoland/setup-deno@v1
-
       - name: Download work archive
         uses: actions/download-artifact@v2
         with:
@@ -148,6 +140,12 @@ jobs:
 
       - name: Extract work archive
         run: tar -xzpf work.tar.gz
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/gallium
+          cache: "npm"
+          registry-url: https://npm.pkg.github.com/pinnacle-labs
 
       # Publish packages using lerna publish with commit as version
       - name: Publish packages
