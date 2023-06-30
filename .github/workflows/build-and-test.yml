@@ -156,6 +156,8 @@ jobs:
           echo $VERSION
           npx lerna version $VERSION --yes --force-publish --no-git-tag-version --no-commit-hooks --no-push --exact
           git add package.json taqueria*/package.json tests/package.json
+          git config --global user.email "you@example.com"
+          git config --global user.name "Michael Weichert"
           git commit -m "Temporary commit for publishing packages"
           rm -rf .deno
           rm work.tar.gz 
