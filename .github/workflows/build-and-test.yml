@@ -154,7 +154,7 @@ jobs:
           PKG_VERSION=`npm version --json | jq -r '.["@taqueria/taqueria"]'`
           VERSION="${PKG_VERSION}-${GIT_VERSION}"
           echo $VERSION
-          npx lerna version $VERSION --yes --force-publish --no-git-tag-version --exact
+          npx lerna version $VERSION --yes --force-publish --no-git-tag-version --no-commit-hooks --no-push --exact
           npx lerna publish from-package --yes --no-git-tag-version --exact --registry https://npm.pkg.github.com/pinnacle-labs
 
   list-e2e-tests:
