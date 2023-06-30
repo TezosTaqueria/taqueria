@@ -154,14 +154,12 @@ jobs:
           PKG_VERSION=`npm version --json | jq -r '.["@taqueria/taqueria"]'`
           VERSION="${PKG_VERSION}-${GIT_VERSION}"
           echo $VERSION
-          npx lerna version $VERSION --yes --force-publish --no-git-tag-version --no-commit-hooks --no-push --exact
-          git add package.json taqueria*/package.json tests/package.json
-          git config --global user.email "you@example.com"
-          git config --global user.name "Michael Weichert"
-          git commit -m "Temporary commit for publishing packages"
           rm -rf .deno
           rm work.tar.gz 
-          npx lerna publish from-package --yes --no-git-tag-version --exact --registry https://npm.pkg.github.com/pinnacle-labs
+          git config --global user.email "you@example.com"
+          git config --global user.name "Michael Weichert"
+          npx lerna version $VERSION --yes --force-publish --no-commit-hooks --no-push --exact
+          npx lerna publish from-package --yes --no-push --exact --registry https://npm.pkg.github.com/pinnacle-labs
 
   list-e2e-tests:
     runs-on: ubuntu-latest
