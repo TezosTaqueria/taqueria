@@ -158,7 +158,8 @@ jobs:
           rm work.tar.gz 
           git config --global user.email "you@example.com"
           git config --global user.name "Michael Weichert"
-          npx lerna version $VERSION --yes --force-publish --no-commit-hooks --no-push --exact
+          npx lerna version $VERSION --yes --force-publish --no-push --exact
+          echo "Updated versions"
           npx lerna publish from-package --yes --no-push --exact --registry https://npm.pkg.github.com/pinnacle-labs
 
   list-e2e-tests:
