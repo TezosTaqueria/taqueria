@@ -131,6 +131,8 @@ jobs:
   publish-packages:
     needs: build-packages
     runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.GH_PAT }}
     steps:
       - name: Download work archive
         uses: actions/download-artifact@v2
