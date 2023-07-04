@@ -149,6 +149,7 @@ jobs:
       # Publish packages
       - name: Publish to npm
         run: |
+          export HUSKY=0
           rm work.tar.gz
           git config --global user.email "mweichert@gmail.com"
           git config --global user.name "Michael Weichert"
