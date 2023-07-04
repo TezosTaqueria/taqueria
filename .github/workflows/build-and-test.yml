@@ -132,7 +132,7 @@ jobs:
     needs: build-packages
     runs-on: ubuntu-latest
     env:
-      NODE_AUTH_TOKEN: ${{ secrets.GH_PAT }}
+      NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Download work archive
         uses: actions/download-artifact@v2
@@ -153,14 +153,14 @@ jobs:
       - name: Publish packages
         run: |
           export HUSKY=0
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_PAT }}" > ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
           GIT_VERSION="${{ github.sha }}"
           PKG_VERSION=`npm version --json | jq -r '.["@taqueria/taqueria"]'`
           VERSION="${PKG_VERSION}-${GIT_VERSION}"
           echo $VERSION
           rm -rf .deno
           rm work.tar.gz 
-          git config --global user.email "you@example.com"
+          git config --global user.email "mweichert@gmail.com"
           git config --global user.name "Michael Weichert"
           git add .
           git commit -m "Pre version bump"
