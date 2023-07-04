@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/taqueria",
-	"version": "0.28.16",
+	"version": "0.28.17",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -42,6 +42,7 @@
 	"bugs": {
 		"url": "https://github.com/pinnacle-labs/taqueria/issues"
 	},
+	"private": true,
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
 		"@gmrchk/cli-testing-library": "^0.1.2",
