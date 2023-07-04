@@ -5,6 +5,7 @@
 	"main": "./index.js",
 	"source": "./index.ts",
 	"module": "./index.mjs",
+	"private": true,
 	"exports": {
 		".": "./index.js",
 		"./types": "./types.js"
