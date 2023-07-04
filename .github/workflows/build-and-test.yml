@@ -148,7 +148,10 @@ jobs:
            
       # Publish packages
       - name: Publish to npm
-        run: npx lerna publish from-package --no-push
+        run: |
+          rm work.tar.gz
+          git commit -am "chore: publish packages"
+          npx lerna publish from-package --no-push
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
