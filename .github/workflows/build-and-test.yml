@@ -154,7 +154,7 @@ jobs:
           git config --global user.email "mweichert@gmail.com"
           git config --global user.name "Michael Weichert"
           git commit -am "chore: publish packages"
-          npx lerna publish from-package --no-push --yes
+          npx lerna publish from-package --no-push --yes --ignore @taqueria/taqueria
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
