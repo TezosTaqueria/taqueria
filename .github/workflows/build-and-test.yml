@@ -150,6 +150,8 @@ jobs:
       - name: Publish to npm
         run: |
           rm work.tar.gz
+          git config --global user.email "mweichert@gmail.com"
+          git config --global user.name "Michael Weichert"
           git commit -am "chore: publish packages"
           npx lerna publish from-package --no-push
         env:
