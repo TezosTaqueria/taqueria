@@ -150,6 +150,7 @@ jobs:
       # Publish packages using lerna publish with commit as version
       - name: Publish packages
         run: |
+          export HUSKY=0
           GIT_VERSION="${{ github.sha }}"
           PKG_VERSION=`npm version --json | jq -r '.["@taqueria/taqueria"]'`
           VERSION="${PKG_VERSION}-${GIT_VERSION}"
