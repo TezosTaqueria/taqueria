@@ -109,6 +109,7 @@ dist
 .DS_Store
 node_modules
 /deno
+/.deno
 */**/.vscode
 .idea
 **/.parcel-cache/*
