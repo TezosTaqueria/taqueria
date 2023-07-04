@@ -151,6 +151,7 @@ jobs:
       - name: Publish packages
         run: |
           export HUSKY=0
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_PAT }}" > ~/.npmrc
           GIT_VERSION="${{ github.sha }}"
           PKG_VERSION=`npm version --json | jq -r '.["@taqueria/taqueria"]'`
           VERSION="${PKG_VERSION}-${GIT_VERSION}"
