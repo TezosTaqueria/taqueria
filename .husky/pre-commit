@@ -8,4 +8,4 @@ npx with-staged '*.ts' 'taqueria-utils' 'taqueria-protocol' 'import-map.json' --
 HUSKY=0 git add ./deno-lock.json
 
 # Bump version # for alpha release
-npx lerna version patch --no-git-tag-version --no-push --yes && git add packages/*/package*.json
+npx lerna version patch --no-git-tag-version --no-push --yes && git add */package*.json package*.json
