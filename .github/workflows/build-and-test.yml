@@ -127,9 +127,23 @@ jobs:
             path: work.tar.gz
             retention-days: 1
 
+  # Check the files to decide if publish-packages job should run
+  check_run_job:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check_files.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check for changed files
+        id: check_files
+        run: |
+          echo "::set-output name=should_run::$(git diff --name-only HEAD~1..HEAD | grep -E '^(taqueria|tests|.*\.ts)$' | wc -l)"
+        shell: bash
+
   # Publish NPM packages to Github Packages
   publish-packages:
-    needs: build-packages
+    needs: [build-packages, check_run_job]
+    if: needs.check_run_job.outputs.should_run > 0
     runs-on: ubuntu-latest
     steps:
       - name: Download work archive
@@ -161,6 +175,7 @@ jobs:
 
   # Add comment with published artifacts and packages
   update-comment:
+    if: github.event.pull_request || github.event.issue
     needs: publish-packages
     runs-on: ubuntu-latest
     steps: 
@@ -203,7 +218,6 @@ jobs:
             > Note: You can install the latest development version of a package with `taq install @taqueria/[packageName]@dev`.
   
           edit-mode: replace
-  
 
   list-e2e-tests:
     runs-on: ubuntu-latest
