@@ -175,3 +175,5 @@ tests/unit/taqueria-sdk/temp
 
 # Packaged vscode extensions
 /**/*.vsix
+
+/.npmrc
