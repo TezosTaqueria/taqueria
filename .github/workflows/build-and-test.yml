@@ -134,6 +134,8 @@ jobs:
       should_run: ${{ steps.check_files.outputs.should_run }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
       - name: Check for changed files
         id: check_files
         run: |
@@ -354,4 +356,4 @@ jobs:
           CWD=$(pwd)
           export PATH=$PATH:$CWD
           export DENO_DIR=$CWD/.deno
-          npm run test:unit -w tests     
+          npm run test:unit -w tests
