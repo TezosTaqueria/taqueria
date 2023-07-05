@@ -151,12 +151,13 @@ jobs:
         run: |
           export HUSKY=0
           rm work.tar.gz
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
           git config --global user.email "mweichert@gmail.com"
           git config --global user.name "Michael Weichert"
           git commit -am "chore: publish packages"
           npx lerna publish from-package --no-push --yes --dist-tag dev
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   list-e2e-tests:
     runs-on: ubuntu-latest
