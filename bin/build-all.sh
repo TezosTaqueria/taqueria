@@ -21,13 +21,15 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     fi
     if [ -n `which deno || ""` ]; then
         echo "Deno installed!"
-        deno --version | grep 1.34 >/dev/null
-        errorCode=$?
-        if [ $errorCode -ne 0 ]; then
-           echo "❌ Deno is installed, but not using v1.34.x. Please use Deno v1.34.x."
-           exit $errorCode
+        VERSION=$(deno --version | grep -oP 'deno \K([0-9]+\.[0-9]+)')
+        MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
+        MINOR_VERSION=$(echo $VERSION | cut -d. -f2)
+
+        if [ "$MAJOR_VERSION" -lt "1" ] || [ "$MAJOR_VERSION" -eq "1" -a "$MINOR_VERSION" -lt "34" ]; then
+            echo "❌ Deno is installed, but the version is less than v1.34. Please use Deno v1.34 or greater."
+            exit 1
         else
-           echo "✅ Deno is installed, and running v1.34.x"
+           echo "✅ Deno is installed, and running v1.34.x or greater"
         fi
     else
         echo "❌ Deno is not installed."

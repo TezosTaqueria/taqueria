@@ -7,11 +7,13 @@ if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
         echo "Please install deno before attempting to build."
         echo "Run: curl -fsSL https://deno.land/install.sh | sh"
     else
-        deno --version | grep 1.34 >/dev/null
-        errorCode=$?
-        if [ $errorCode -ne 0 ]; then
-           echo "❌ Deno is installed, but not using v1.34.x. Please use Deno v1.34.x."
-           exit $errorCode
+        VERSION=$(deno --version | grep -oP 'deno \K([0-9]+\.[0-9]+)')
+        MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
+        MINOR_VERSION=$(echo $VERSION | cut -d. -f2)
+
+        if [ "$MAJOR_VERSION" -lt "1" ] || [ "$MAJOR_VERSION" -eq "1" -a "$MINOR_VERSION" -lt "34" ]; then
+            echo "❌ Deno is installed, but the version is less than v1.34. Please use Deno v1.34 or greater."
+            exit 1
         fi
         if [  -z "$DENO_TARGET" ]; then
             TARGET_ARG=""
