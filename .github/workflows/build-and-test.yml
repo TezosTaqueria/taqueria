@@ -159,6 +159,52 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+  # Add comment with published artifacts and packages
+  update-comment:
+    needs: publish-packages
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Download work archive
+        uses: actions/download-artifact@v2
+        with:
+          name: work-ubuntu-latest
+          path: .
+  
+      - name: Extract work archive
+        run: tar -xzpf work.tar.gz
+  
+      - name: Get version
+        id: get_version
+        run: |
+          echo "::set-output name=VERSION::$(node -p "require('./package.json').version")"
+  
+      - name: List Lerna Packages
+        id: list_packages
+        run: |
+          echo "::set-output name=PACKAGES::"$(npx lerna ls --json --all | jq -r '.[] | select(.private == false) | "\(.name) \(.version)"' | tr '\n' ',' | sed 's/,$//')
+          
+      - name: Update or Create comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          issue-number: ${{ github.event.pull_request.number || github.event.issue.number }}
+          body: |
+            ## Published Binaries & Packages
+  
+            | Published | Version |
+            | :--- | :--- |
+            | Taq Binary (MacOS) | [${{ steps.get_version.outputs.VERSION }}](https://github.com/${{ github.repository }}/actions/artifacts) |
+            | Taq Binary (Windows) | [${{ steps.get_version.outputs.VERSION }}](https://github.com/${{ github.repository }}/actions/artifacts) |
+            | VSIX for VSCode Extension | [${{ steps.get_version.outputs.VERSION }}](https://github.com/${{ github.repository }}/actions/artifacts) |
+            ${{ steps.list_packages.outputs.PACKAGES }}
+            <!-- Add more rows for additional packages -->
+  
+            > Note: You can install the latest development version of a package with `taq install @taqueria/[packageName]@dev`.
+  
+          edit-mode: replace
+  
+
   list-e2e-tests:
     runs-on: ubuntu-latest
     outputs:
