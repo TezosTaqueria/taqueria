@@ -76,5 +76,6 @@
 		".": "./index.js",
 		"./v1": "./v1.js",
 		"./v2": "./v2.js"
-	}
+	},
+	"gitHead": "b67efe3a270b6d9b9cdff49033497371df75aac5"
 }
