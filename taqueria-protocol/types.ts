@@ -514,7 +514,7 @@ export type SandboxAccountConfig = {
 
 export type SandboxConfig = {
 	label: NonEmptyString;
-	rpcUrl: Url;
+	rpcUrl: Url; // should this be optional?
 	protocol?: EconomicalProtocolHash;
 	plugin?: Verb;
 
