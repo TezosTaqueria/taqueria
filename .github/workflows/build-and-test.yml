@@ -128,7 +128,7 @@ jobs:
             retention-days: 1
 
   # Check the files to decide if publish-packages job should run
-  check_run_job:
+  check_was_source_modified:
     runs-on: ubuntu-latest
     outputs:
       should_run: ${{ steps.check_files.outputs.should_run }}
@@ -142,10 +142,33 @@ jobs:
           echo "::set-output name=should_run::$(git diff --name-only HEAD~1..HEAD | grep -E '^(taqueria|tests|.*\.ts)$' | wc -l)"
         shell: bash
 
+  # Check whether this commit is related to a PR or if the commit message references an issue
+  check_is_pr_or_issue:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check_pr_or_issue.outputs.should_run }}
+      issue_number: ${{ steps.check_pr_or_issue.outputs.issue_number }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Check for PR or Issue
+        id: check_pr_or_issue
+        run: |
+          ISSUE_ID=$(git log --format=%B -n 1 ${{ github.sha }} | grep -Eo '#[0-9]+' | awk 'NR==1{ print $1 }' | tr -d '#')
+          echo "ISSUE_ID=$ISSUE_ID" >> $GITHUB_ENV
+          SHOULD_RUN=false
+          if [[ ! -z "${{ github.event.pull_request.number }}" || ! -z "$ISSUE_ID" ]]; then
+            SHOULD_RUN=true
+          fi
+          echo "::set-output name=should_run::$SHOULD_RUN"
+          echo "::set-output name=issue_number::$ISSUE_ID"
+  
+
   # Publish NPM packages to Github Packages
   publish-packages:
-    needs: [build-packages, check_run_job]
-    if: needs.check_run_job.outputs.should_run > 0
+    needs: [build-packages, check_was_source_modified]
+    if: needs.check_was_source_modified.outputs.should_run > 0
     runs-on: ubuntu-latest
     steps:
       - name: Download work archive
@@ -177,8 +200,8 @@ jobs:
 
   # Add comment with published artifacts and packages
   update-comment:
-    if: github.event.pull_request || github.event.issue
-    needs: publish-packages
+    needs: [publish-packages, check_was_source_modified, check_is_pr_or_issue]
+    if: needs.check_was_source_modified.outputs.should_run > 0 && needs.check_is_pr_or_issue.outputs.should_run
     runs-on: ubuntu-latest
     steps: 
       - name: Download work archive
@@ -205,7 +228,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
-          issue-number: ${{ github.event.pull_request.number || github.event.issue.number }}
+          issue-number: ${{ github.event.pull_request.number || needs.check_is_pr_or_issue.outputs.issue_number }}
           body: |
             ## Published Binaries & Packages
   
@@ -248,9 +271,6 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.list-e2e-tests.outputs.matrix)}}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
@@ -300,9 +320,6 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.list-integration-tests.outputs.matrix)}}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - uses: actions/setup-node@v3
         with:
           node-version: lts/gallium
