@@ -233,6 +233,10 @@ jobs:
           name: taqueria.vsix
           path: .
 
+      - name: Get VSIX
+        id: vsix
+        run: echo "artifact=$(ls taqueria.vsix/)" >> "$GITHUB_OUTPUT"
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -273,7 +277,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: taqueria.vsix/taqueria.vsix
+          asset_path: ${{ steps.vsix.outputs.artifact }}
           asset_name: taqueria.vsix
           asset_content_type: application/octet-stream
 
