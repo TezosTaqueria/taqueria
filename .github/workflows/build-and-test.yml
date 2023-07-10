@@ -221,7 +221,7 @@ jobs:
       - name: List Lerna Packages
         id: list_packages
         run: |
-          echo "::set-output name=PACKAGES::"$(npx lerna ls --json --all | jq -r '.[] | select(.private == false) | "\(.name) \(.version)"' | tr '\n' ',' | sed 's/,$//')
+          echo "::set-output name=PACKAGES::"$(npx lerna ls --json --all | jq -r '.[] | select(.private == false) | "\(.name)|\(.version)"' | tr ',' '\n' | awk 'BEGIN {print "| Package | Version |"; print "| :--- | :--- |";} {print}')  
           
       - name: Update or Create comment
         uses: peter-evans/create-or-update-comment@v1
