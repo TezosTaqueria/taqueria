@@ -167,7 +167,7 @@ jobs:
             IS_RELEASE=true
           fi
           echo "is_release=$IS_RELEASE" >> "$GITHUB_OUTPUT"
-          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
           
 
   # Publish NPM packages to Github Packages
