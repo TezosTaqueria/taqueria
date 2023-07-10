@@ -198,6 +198,15 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      # Our versioning scheme is detailed here: https://github.com/pinnacle-labs/contrib
+      # We use MAJOR.MINOR.RELEASE, where RELEASES is incremented for each release candidate. If its 0, then its a stable release.
+      # If the RELEASE version is 0, then we publish to the latest tag.
+      - name: Publish final release
+        run:
+          # Check if the release is a stable release
+          echo ${{github.ref }}
+          
+
   # Add comment with published artifacts and packages
   update-comment:
     needs: [publish-packages, check_was_source_modified, check_is_pr_or_issue]
