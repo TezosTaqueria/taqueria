@@ -1,4 +1,5 @@
-// TODO: Remove this.
+// TODO: Remove this
+// We should separate what the in-memory configuration model is from the file format
 import type {
 	Config,
 	ConfigEnvironmentFileV2,
