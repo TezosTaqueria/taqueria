@@ -1,5 +1,6 @@
 // TODO: Remove this
 // We should separate what the in-memory configuration model is from the file format
+// We should also have schema migrations
 import type {
 	Config,
 	ConfigEnvironmentFileV2,
