@@ -140,8 +140,7 @@ jobs:
       - name: Check for PR or Issue
         id: check_pr_or_issue
         run: |
-          ISSUE_ID=$(git log --format=%B -n 1 ${{ github.sha }} | grep -Eo '#[0-9]+' | awk 'NR==1{ print $1 }' | tr -d '#')
-          echo "ISSUE_ID=$ISSUE_ID" >> $GITHUB_ENV
+          ISSUE_ID="$(git log --format=%B -n 1 ${{ github.sha }} | grep -Eo '#[0-9]+' | awk 'NR==1{ print $1 }' | tr -d '#')"
           SHOULD_RUN=false
           if [[ ! -z "${{ github.event.pull_request.number }}" || ! -z "$ISSUE_ID" ]]; then
             SHOULD_RUN=true
