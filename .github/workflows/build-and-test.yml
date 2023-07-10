@@ -146,7 +146,7 @@ jobs:
             SHOULD_RUN=true
           fi
           echo "should_run=$SHOULD_RUN" >> "$GITHUB_OUTPUT"
-          echo "issue_number=$ISSUE_ID" >> "$GITHUB_OUTPUT
+          echo "issue_number=$ISSUE_ID" >> "$GITHUB_OUTPUT"
 
   # Check whether this is a release
   check_is_release:
