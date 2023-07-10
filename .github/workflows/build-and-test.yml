@@ -127,21 +127,6 @@ jobs:
             path: work.tar.gz
             retention-days: 1
 
-  # Check the files to decide if publish-packages job should run
-  check_was_source_modified:
-    runs-on: ubuntu-latest
-    outputs:
-      should_run: ${{ steps.check_files.outputs.should_run }}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
-      - name: Check for changed files
-        id: check_files
-        run: |
-          echo "::set-output name=should_run::$(git diff --name-only HEAD~1..HEAD | grep -E '^(taqueria|tests|.*\.ts)$' | wc -l)"
-        shell: bash
-
   # Check whether this commit is related to a PR or if the commit message references an issue
   check_is_pr_or_issue:
     runs-on: ubuntu-latest
@@ -161,14 +146,33 @@ jobs:
           if [[ ! -z "${{ github.event.pull_request.number }}" || ! -z "$ISSUE_ID" ]]; then
             SHOULD_RUN=true
           fi
-          echo "::set-output name=should_run::$SHOULD_RUN"
-          echo "::set-output name=issue_number::$ISSUE_ID"
-  
+          echo "should_run=$SHOULD_RUN" >> "$GITHUB_OUTPUT"
+          echo "issue_number=$ISSUE_ID" >> "$GITHUB_OUTPUT
+
+  # Check whether this is a release
+  check_is_release:
+    runs-on: ubuntu-latest
+    outputs:
+      is_release: ${{ steps.check_release.outputs.is_release }}
+      version: ${{ steps.check_release.outputs.version }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Check for Release
+        id: check_release
+        run: |
+          IS_RELEASE=false
+          if [[ $(node -p "require('./package.json').version" | awk -F. '{print $3}') == "0" ]]; then
+            IS_RELEASE=true
+          fi
+          echo "is_release=$IS_RELEASE" >> "$GITHUB_OUTPUT"
+          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT
+          
 
   # Publish NPM packages to Github Packages
   publish-packages:
-    needs: [build-packages, check_was_source_modified]
-    if: needs.check_was_source_modified.outputs.should_run > 0
+    needs: [build-packages, check_is_release]
     runs-on: ubuntu-latest
     steps:
       - name: Download work archive
@@ -194,23 +198,90 @@ jobs:
           git config --global user.email "mweichert@gmail.com"
           git config --global user.name "Michael Weichert"
           git commit -am "chore: publish packages"
-          npx lerna publish from-package --no-push --yes --dist-tag dev
+          
+          # Determine what tag to use. Our version numbers use the scheme MAJOR.MINOR.RELEASE. If RELEASE is 0, then we should use the "latest tag".
+          TAG=dev
+          if [[ "${{ needs.check_is_release.outputs.is_release }}" ]]; then
+            TAG=latest
+          fi
+
+          npx lerna publish from-package --no-push --yes --dist-tag $TAG
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Our versioning scheme is detailed here: https://github.com/pinnacle-labs/contrib
-      # We use MAJOR.MINOR.RELEASE, where RELEASES is incremented for each release candidate. If its 0, then its a stable release.
-      # If the RELEASE version is 0, then we publish to the latest tag.
-      - name: Publish final release
-        run:
-          # Check if the release is a stable release
-          echo ${{github.ref }}
           
+  # Publish binaries to Github Releases
+  publish-binaries:
+    needs: [build-binaries, check_is_release]
+    if: needs.check_is_release.outputs.is_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download taq binary for Linux
+        uses: actions/download-artifact@v2
+        with:
+          name: taq-ubuntu-latest
+          path: .
+
+      - name: Download taq binary for MacOS
+        uses: actions/download-artifact@v2
+        with:
+          name: taq-macos-latest
+          path: .
+      
+      - name: Download vscode extension
+        uses: actions/download-artifact@v2
+        with:
+          name: taqueria.vsix
+          path: .
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ needs.check_is_release.outputs.version }}
+          release_name: v${{ needs.check_is_release.outputs.version }}
+          draft: true
+          prerelease: false
+
+      - name: Upload Linux binary
+        id: upload-linux-binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: taq-ubuntu-latest/taq
+          asset_name: taq (Linux)
+          asset_content_type: application/octet-stream
+
+      - name: Upload MacOS binary
+        id: upload-macos-binary
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: taq-macos-latest/taq
+          asset_name: taq (MacOS)
+          asset_content_type: application/octet-stream
+
+      - name: Upload VSCode Extension
+        id: upload-vsix
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: taqueria.vsix/taqueria.vsix
+          asset_name: taqueria.vsix
+          asset_content_type: application/octet-stream
 
   # Add comment with published artifacts and packages
   update-comment:
-    needs: [publish-packages, check_was_source_modified, check_is_pr_or_issue]
-    if: needs.check_was_source_modified.outputs.should_run > 0 && needs.check_is_pr_or_issue.outputs.should_run
+    needs: [publish-packages, check_is_pr_or_issue]
+    if: needs.check_is_pr_or_issue.outputs.should_run
     runs-on: ubuntu-latest
     steps: 
       - name: Download work archive
@@ -225,12 +296,14 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          echo "::set-output name=VERSION::$(node -p "require('./package.json').version")"
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
   
       - name: List Lerna Packages
         id: list_packages
         run: |
-          echo "::set-output name=PACKAGES::"$(npx lerna ls --json --all | jq -r '.[] | select(.private == false) | "\(.name)|\(.version)"' | tr ',' '\n' | awk 'BEGIN {print "| Package | Version |"; print "| :--- | :--- |";} {print}')  
+          PACKAGES=$(npx lerna ls --json | jq -r '.[] | "| \(.name) | \(.version) |"')
+          echo "PACKAGES=$PACKAGES" >> "$GITHUB_OUTPUT"
           
       - name: Update or Create comment
         uses: peter-evans/create-or-update-comment@v1
