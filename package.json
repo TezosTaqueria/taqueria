@@ -12,7 +12,7 @@
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
 		"build:packages": "lerna run build",
-		"deploy": "lerna version --no-push --no-git-tag-version",
+		"deploy": "npx lerna version minor --yes",
 		"parse-readme-template": "ts-node ./parse-readme-template.ts",
 		"build-website": "npm run parse-readme-template && cd website && npm ci --legacy-peer-deps && npm run build",
 		"serve-website": "cd website && npm run serve",
