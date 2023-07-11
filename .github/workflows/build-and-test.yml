@@ -219,24 +219,24 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: taq-ubuntu-latest
-          path: .
+          path: taq-linux
 
       - name: Download taq binary for MacOS
         uses: actions/download-artifact@v2
         with:
           name: taq-macos-latest
-          path: .
+          path: taq-macos
       
       - name: Download vscode extension
         uses: actions/download-artifact@v2
         with:
           name: taqueria.vsix
-          path: .
+          path: vscode-extension
 
       - name: Debug
         run: |
           ls -l
-          find taq-ubuntu-latest
+          find .
 
       - name: Get VSIX
         id: vsix
