@@ -233,6 +233,11 @@ jobs:
           name: taqueria.vsix
           path: .
 
+      - name: Debug
+        run: |
+          ls -l
+          find taq-ubuntu-latest
+
       - name: Get VSIX
         id: vsix
         run: echo "artifact=$(ls taqueria.vsix/)" >> "$GITHUB_OUTPUT"
