@@ -329,8 +329,9 @@ jobs:
       - name: List Lerna Packages
         id: list_packages
         run: |
-          PACKAGES=$(npx lerna ls --json | jq -r '.[] | "| \(.name) | \(.version) |"')
-          echo "PACKAGES='$PACKAGES'" >> $GITHUB_ENV
+          echo "PACKAGES<<EOF" >> $GITHUB_OUTPUT
+          npx lerna ls --json | jq -r '.[] | "| \(.name) | \(.version) |"' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
           
       - name: Update or Create comment
         uses: peter-evans/create-or-update-comment@v1
