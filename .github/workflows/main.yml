@@ -329,15 +329,8 @@ jobs:
       - name: List Lerna Packages
         id: list_packages
         run: |
-          PACKAGES=$(npx lerna ls --json | jq -c '.[]' | while read -r package; do
-            name=$(echo "$package" | jq -r '.name')
-            version=$(echo "$package" | jq -r '.version')
-            echo "| $name | $version |"
-          done)
-          PACKAGES="${PACKAGES//'%'/'%25'}"
-          PACKAGES="${PACKAGES//$'\n'/'%0A'}"
-          PACKAGES="${PACKAGES//$'\r'/'%0D'}"
-          echo "PACKAGES=$PACKAGES" >> "$GITHUB_OUTPUT"
+          PACKAGES=$(npx lerna ls --json | jq -r '.[] | "| \(.name) | \(.version) |"')
+          echo "PACKAGES='$PACKAGES'" >> $GITHUB_ENV
           
       - name: Update or Create comment
         uses: peter-evans/create-or-update-comment@v1
