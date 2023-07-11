@@ -210,7 +210,7 @@ jobs:
 
           
   # Publish binaries to Github Releases
-  publish-binaries:
+  publish-release:
     needs: [build-binaries, build-packages, check_is_release]
     if: needs.check_is_release.outputs.is_release
     runs-on: ubuntu-latest
@@ -233,14 +233,9 @@ jobs:
           name: taqueria.vsix
           path: vscode-extension
 
-      - name: Debug
-        run: |
-          ls -l
-          find .
-
       - name: Get VSIX
         id: vsix
-        run: echo "artifact=$(ls taqueria.vsix/)" >> "$GITHUB_OUTPUT"
+        run: echo "artifact=$(ls vscode-extension/)" >> "$GITHUB_OUTPUT"
 
       - name: Create Release
         id: create_release
@@ -260,7 +255,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: taq-ubuntu-latest/taq
+          asset_path: taq-linux/taq
           asset_name: taq (Linux)
           asset_content_type: application/octet-stream
 
@@ -271,7 +266,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: taq-macos-latest/taq
+          asset_path: taq-macos/taq
           asset_name: taq (MacOS)
           asset_content_type: application/octet-stream
 
@@ -282,9 +277,33 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.vsix.outputs.artifact }}
+          asset_path: vscode-extension/${{ steps.vsix.outputs.artifact }}
           asset_name: taqueria.vsix
           asset_content_type: application/octet-stream
+
+  publish-vscode:
+    needs: [build-packages, check_is_release]
+    if: needs.check_is_release.outputs.is_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download vscode extension
+        uses: actions/download-artifact@v2
+        with:
+          name: taqueria.vsix
+          path: vscode-extension
+
+      - name: Get VSIX
+        id: vsix
+        run: echo "artifact=$(ls vscode-extension/)" >> "$GITHUB_OUTPUT"
+      
+      - name: Publish to Marketplace
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          pat: ${{ secrets.VSCODE_MARKETPLACE_PAT }}
+          extensionFile: vscode-extension/${{ steps.vsix.outputs.artifact }}
+          preRelease: false
+          registryUrl: https://marketplace.visualstudio.com
+
 
   # Add comment with published artifacts and packages
   update-comment:
