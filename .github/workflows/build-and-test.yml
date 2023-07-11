@@ -211,7 +211,7 @@ jobs:
           
   # Publish binaries to Github Releases
   publish-binaries:
-    needs: [build-binaries, check_is_release]
+    needs: [build-binaries, build-packages, check_is_release]
     if: needs.check_is_release.outputs.is_release
     runs-on: ubuntu-latest
     steps:
