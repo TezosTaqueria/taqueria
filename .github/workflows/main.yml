@@ -161,12 +161,15 @@ jobs:
       - name: Check for Release
         id: check_release
         run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Version: $VERSION"
           IS_RELEASE=false
-          if [[ $(node -p "require('./package.json').version" | awk -F. '{print $3}') == "0" ]]; then
+          if [[ $(echo $VERSION | awk -F. '{print $3}') == "0" ]]; then
             IS_RELEASE=true
+            echo "This is a final release"
           fi
           echo "is_release=$IS_RELEASE" >> "$GITHUB_OUTPUT"
-          echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           
 
   # Publish NPM packages to Github Packages
@@ -200,7 +203,9 @@ jobs:
           
           # Determine what tag to use. Our version numbers use the scheme MAJOR.MINOR.RELEASE. If RELEASE is 0, then we should use the "latest tag".
           TAG=dev
-          if [[ "${{ needs.check_is_release.outputs.is_release }}" ]]; then
+          echo "Publishing using dev tag"
+          if [[ ${{ needs.check_is_release.outputs.is_release }} ]]; then
+            echo "Publishing using latest tag"
             TAG=latest
           fi
 
