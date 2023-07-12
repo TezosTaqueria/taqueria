@@ -203,10 +203,11 @@ jobs:
           
           # Determine what tag to use. Our version numbers use the scheme MAJOR.MINOR.RELEASE. If RELEASE is 0, then we should use the "latest tag".
           TAG=dev
-          echo "Publishing using dev tag"
-          if [[ ${{ needs.check_is_release.outputs.is_release }} ]]; then
+          if [[ (${{ needs.check_is_release.outputs.is_release }}) ]]; then
             echo "Publishing using latest tag"
             TAG=latest
+          else
+            echo "Publishing using dev tag"
           fi
 
           npx lerna publish from-package --no-push --yes --dist-tag $TAG
