@@ -141,9 +141,9 @@ jobs:
         id: check_pr_or_issue
         run: |
           ISSUE_ID="$(git log --format=%B -n 1 ${{ github.sha }} | grep -Eo '#[0-9]+' | awk 'NR==1{ print $1 }' | tr -d '#')"
-          SHOULD_RUN=false
+          SHOULD_RUN="no"
           if [[ ! -z "${{ github.event.pull_request.number }}" || ! -z "$ISSUE_ID" ]]; then
-            SHOULD_RUN=true
+            SHOULD_RUN="yes"
           fi
           echo "should_run=$SHOULD_RUN" >> "$GITHUB_OUTPUT"
           echo "issue_number=$ISSUE_ID" >> "$GITHUB_OUTPUT"
@@ -163,9 +163,9 @@ jobs:
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "Version: $VERSION"
-          IS_RELEASE=false
+          IS_RELEASE="no"
           if [[ $(echo $VERSION | awk -F. '{print $3}') == "0" ]]; then
-            IS_RELEASE=true
+            IS_RELEASE="yes"
             echo "This is a final release"
           fi
           echo "is_release=$IS_RELEASE" >> "$GITHUB_OUTPUT"
@@ -203,7 +203,7 @@ jobs:
           
           # Determine what tag to use. Our version numbers use the scheme MAJOR.MINOR.RELEASE. If RELEASE is 0, then we should use the "latest tag".
           TAG=dev
-          if [[ (${{ needs.check_is_release.outputs.is_release }}) ]]; then
+          if [[ "${{ needs.check_is_release.outputs.is_release }}" == "yes" ]]; then
             echo "Publishing using latest tag"
             TAG=latest
           else
@@ -218,7 +218,7 @@ jobs:
   # Publish binaries to Github Releases
   publish-release:
     needs: [build-binaries, build-packages, check_is_release]
-    if: needs.check_is_release.outputs.is_release
+    if: needs.check_is_release.outputs.is_release == 'yes'
     runs-on: ubuntu-latest
     steps:
       - name: Download taq binary for Linux
@@ -289,7 +289,7 @@ jobs:
 
   publish-vscode:
     needs: [build-packages, check_is_release]
-    if: needs.check_is_release.outputs.is_release
+    if: needs.check_is_release.outputs.is_release == 'yes'
     runs-on: ubuntu-latest
     steps:
       - name: Download vscode extension
@@ -314,7 +314,7 @@ jobs:
   # Add comment with published artifacts and packages
   update-comment:
     needs: [publish-packages, check_is_pr_or_issue]
-    if: needs.check_is_pr_or_issue.outputs.should_run
+    if: needs.check_is_pr_or_issue.outputs.should_run == 'yes'
     runs-on: ubuntu-latest
     steps: 
       - name: Download work archive
