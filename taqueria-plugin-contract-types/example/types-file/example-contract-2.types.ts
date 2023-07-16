@@ -3,11 +3,11 @@ import { ContractAbstractionFromContractType, WalletContractAbstractionFromContr
 import { address, BigMap, bytes, contract, MMap, nat, unit } from './type-aliases';
 
 export type Storage = {
-    admin?: {
+    admin: {Some: {
         admin: address;
         paused: boolean;
-        pending_admin?: address;
-    };
+        pending_admin: {Some: address} | null;
+    }} | null;
     assets: {
         ledger: BigMap<{
             0: address;

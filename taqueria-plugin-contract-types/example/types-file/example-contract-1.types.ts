@@ -3,11 +3,11 @@ import { ContractAbstractionFromContractType, WalletContractAbstractionFromContr
 import { address, BigMap, int, mutez, nat, timestamp } from './type-aliases';
 
 export type Storage = {
-    pauseable_admin?: {
+    pauseable_admin: {Some: {
         admin: address;
         paused: boolean;
-        pending_admin?: address;
-    };
+        pending_admin: {Some: address} | null;
+    }} | null;
     current_id: nat;
     max_auction_time: nat;
     max_config_to_start_time: nat;

@@ -241,34 +241,28 @@ ${tabs(indent)}}])`;
 	};
 
 	const varToCode = (t: TypedVar, i: number, indent: number, numberVarNamePrefix = ''): string => {
-		return `${t.name ?? `${numberVarNamePrefix}${i}`}${
-			t.type.optional && options?.mode !== 'defaultValue' ? `?` : ``
-		}: ${typeToCode(t.type, indent)}`;
+		let typeName = typeToCode(t.type, indent);
+		if (t.type.optional) {
+			typeName = `{Some: ${typeName}} | null`;
+		}
+		return `${t.name ?? `${numberVarNamePrefix}${i}`}: ${typeName}`;
 	};
 
 	const argsToCode = (args: TypedVar[], indent: number, asObject: boolean): string => {
-		// Sort arguments so that optional args at the end
-		// See https://github.com/pinnacle-labs/taqueria/issues/1861
-		const sortedArgs = args.sort((a, b) => {
-			if (a.type.optional && !b.type.optional) return 1;
-			if (!a.type.optional && b.type.optional) return -1;
-			return 0;
-		});
-
-		if (sortedArgs.length === 1) {
-			if (sortedArgs[0].type.kind === `unit`) return ``;
+		if (args.length === 1) {
+			if (args[0].type.kind === `unit`) return ``;
 
 			if (options?.mode === 'defaultValue') {
-				return typeToCode(sortedArgs[0].type, indent + 1);
+				return typeToCode(args[0].type, indent + 1);
 			}
-			return `${sortedArgs[0].name ?? `param`}: ${typeToCode(sortedArgs[0].type, indent + 1)}`;
+			return `${args[0].name ?? `param`}: ${typeToCode(args[0].type, indent + 1)}`;
 		}
 
 		const result = `${
 			toIndentedItems(
 				indent,
 				{},
-				sortedArgs.filter(x => x.name || x.type.kind !== `unit`).map((a, i) => {
+				args.filter(x => x.name || x.type.kind !== `unit`).map((a, i) => {
 					if (!asObject && options?.mode === 'defaultValue') {
 						return typeToCode(a.type, indent + 1) + `,`;
 					}
