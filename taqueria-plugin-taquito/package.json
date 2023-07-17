@@ -43,9 +43,9 @@
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.36.9",
-		"@taquito/michel-codec": "^16.2.0",
-		"@taquito/signer": "^16.2.0",
-		"@taquito/taquito": "^16.2.0",
+		"@taquito/michel-codec": "^17.1.0",
+		"@taquito/signer": "^17.1.0",
+		"@taquito/taquito": "^17.1.0",
 		"fast-glob": "^3.2.12"
 	},
 	"devDependencies": {
