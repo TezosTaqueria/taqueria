@@ -1,7 +1,7 @@
 {
-	"name": "@taqueria/plugin-smartpy",
+	"name": "@taqueria/plugin-smartpy-legacy",
 	"version": "0.37.0",
-	"description": "A taqueria plugin for compiling SmartPy smart contracts",
+	"description": "A taqueria plugin for compiling SmartPy smart contracts using SmartPy v0.16 (legacy syntax).",
 	"targets": {
 		"default": {
 			"source": "./index.ts",
@@ -44,7 +44,7 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/pinnacle-labs/taqueria.git",
-		"directory": "taqueria-plugin-smartpy"
+		"directory": "taqueria-plugin-smartpy-legacy"
 	},
 	"bugs": {
 		"url": "https://github.com/pinnacle-labs/taqueria/issues"

@@ -1,6 +1,6 @@
 # Taqueria SmartPy Plugin
 
-The SmartPy plugin provides tasks to work with SmartPy smart contracts such as compiling and testing
+The SmartPy plugin provides tasks to work with SmartPy smart contracts written in the legacy syntax (up to SmartPy v0.16) such as compiling and testing.
 
 ## Requirements
 
@@ -14,7 +14,7 @@ The SmartPy plugin provides tasks to work with SmartPy smart contracts such as c
 To install the SmartPy plugin on a Taqueria project, navigate to the project folder and run:
 
 ```shell
-taq install @taqueria/plugin-smartpy
+taq install @taqueria/plugin-smartpy-legacy
 ```
 
 > ### :page_with_curl: Note
