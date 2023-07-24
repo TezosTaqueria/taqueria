@@ -159,7 +159,9 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const artifacts_list = await ls('./test-project/artifacts');
 		expect(artifacts_list).toContain('hello-tacos.json');
 		const json_file = await readFile('./test-project/artifacts/hello-tacos.json');
-		expect(json_file).toContain('[ { "prim": "parameter", "args": [ { "prim": "nat" } ] },');
+		expect(json_file).toContain(
+			'[{"prim":"parameter","args":[{"prim":"nat"}]},{"prim":"storage","args":[{"prim":"nat"}]},{"prim":"code","args":[[{"prim":"UNPAIR"},{"prim":"DUP","args":[{"int":"2"}]},{"prim":"DUP","args":[{"int":"2"}]},{"prim":"COMPARE"},{"prim":"GT"},{"prim":"IF","args":[[{"prim":"DROP","args":[{"int":"2"}]},{"prim":"PUSH","args":[{"prim":"string"},{"string":"NOT_ENOUGH_TACOS"}]},{"prim":"FAILWITH"}],[{"prim":"SWAP"},{"prim":"SUB"},{"prim":"ABS"},{"prim":"NIL","args":[{"prim":"operation"}]},{"prim":"PAIR"}]]}]]}]',
+		);
 
 		await cleanup();
 	});
