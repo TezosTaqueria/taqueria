@@ -113,7 +113,7 @@ const prepContractInfoForDisplay = async (
 ): Promise<TableRow> => {
 	const protocolArgs = RequestArgs.create(parsedArgs);
 	const operationResults = await op.operationResults();
-	const originationResults = operationResults
+	const originationResults = (operationResults ?? [])
 		.filter(result => result.kind === 'origination')
 		.map(result => result as OperationContentsAndResultOrigination);
 
