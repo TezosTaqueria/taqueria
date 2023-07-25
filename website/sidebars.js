@@ -190,7 +190,6 @@ const sidebars = {
       collapsible: true,
       items: [
         "roadmap",
-        "release-notes",
         "taqueria-dev/contributions",
         "taqueria-dev/making-plugins",
         "taqueria-dev/pr-npm-packages"

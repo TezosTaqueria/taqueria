@@ -12,7 +12,7 @@ const plugins: string[] = [
 	'taqueria-plugin-contract-types',
 	'taqueria-plugin-flextesa',
 	'taqueria-plugin-ligo',
-	'taqueria-plugin-smartpy',
+	'taqueria-plugin-smartpy-legacy',
 	'taqueria-plugin-taquito',
 	'taqueria-plugin-tezos-client',
 	`taqueria-plugin-ipfs-pinata`,

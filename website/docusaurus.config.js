@@ -5,6 +5,7 @@ const lightCodeTheme = require("prism-react-renderer/themes/github");
 const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const webpackPlugin = require("./webpack-plugin");
 const pkgInfo = require('../package.json')
+const TAQ_VERSION = process.env.TAQ_VERSION ?? pkgInfo.version
 
 /** @type {import("@docusaurus/types").Config} */
 const config = {
@@ -109,11 +110,11 @@ const config = {
             className: "header-link"
           },
           {
-            type: "doc",
-            docId: "release-notes",
-            label: `v${pkgInfo.version}`,
+            label: `v${TAQ_VERSION}`,
             position: "right",
-            className: "header-link"
+            className: "header-link",
+            href: "https://github.com/pinnacle-labs/taqueria/releases",
+            "aria-label": "Release Notes"
           },
           {
             href: "https://discord.gg/bujt7syVVT",
