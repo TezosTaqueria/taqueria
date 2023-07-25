@@ -46,7 +46,7 @@ export * as Verb from '@taqueria/protocol/Verb';
 export * as VersionNumber from '@taqueria/protocol/VersionNumber';
 
 // Non-generated exports MUST go here:
-// dprint-ignore
+/* dprint-ignore-start */
 export * as EphemeralState from '@taqueria/protocol/EphemeralState';
 export * as i18n from '@taqueria/protocol/i18n';
 export * as PersistentState from '@taqueria/protocol/PersistentState';
@@ -54,3 +54,4 @@ export * as PluginInfo from '@taqueria/protocol/PluginInfo';
 export * as PluginSchema from '@taqueria/protocol/PluginSchema';
 export * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 export * as SHA256 from '@taqueria/protocol/SHA256';
+/* dprint-ignore-end */
