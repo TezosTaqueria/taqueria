@@ -46,6 +46,7 @@ export * as Verb from '@taqueria/protocol/Verb';
 export * as VersionNumber from '@taqueria/protocol/VersionNumber';
 
 // Non-generated exports MUST go here:
+// dprint-ignore
 export * as EphemeralState from '@taqueria/protocol/EphemeralState';
 export * as i18n from '@taqueria/protocol/i18n';
 export * as PersistentState from '@taqueria/protocol/PersistentState';
