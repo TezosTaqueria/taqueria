@@ -4,7 +4,8 @@
 	"typescript": {
 		"quoteStyle": "preferSingle",
 		"singleBodyPosition": "sameLine",
-		"arrowFunction.useParentheses": "preferNone"
+		"arrowFunction.useParentheses": "preferNone",
+		"module.sortExportDeclarations": "maintain"
 	},
 	"json": {
 	},
