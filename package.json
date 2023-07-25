@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.37.6",
+	"version": "0.37.7",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -47,7 +47,7 @@
 	"devDependencies": {
 		"@gmrchk/cli-testing-library": "^0.1.2",
 		"chokidar-cli": "^3.0.0",
-		"dprint": "^0.36.1",
+		"dprint": "^0.39.1",
 		"eta": "^2.2.0",
 		"husky": "^8.0.3",
 		"lerna": "^7.0.2",
