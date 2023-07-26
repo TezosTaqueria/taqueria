@@ -1,7 +1,9 @@
 {
-	"name": "@taqueria/plugin-ligo",
+	"name": "@taqueria/plugin-smartpy",
 	"version": "0.37.11",
-	"description": "A taqueria plugin for compiling LIGO smart contracts",
+	"description": "A taqueria plugin used to test and compile smart contracts written in SmartPy.",
+	"main": "index.js",
+	"private": true,
 	"targets": {
 		"default": {
 			"source": "./index.ts",
@@ -13,9 +15,7 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup",
-		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
-		"compile": "npx ts-node index.ts --taqRun proxy --task compile --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\",\"artifactsDir\": \"artifacts\"}' --projectDir ../test-project --configDir ./.taq",
-		"debugPluginInfo": "npx ts-node --inspect index.ts --taqRun pluginInfo --i18n '{\"foo\":\"bar\"}' --config '{\"contractsDir\":\"contracts\",\"testsDir\": \"tests\"}' --projectDir ../test-project --configDir ./.taq"
+		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
 	},
 	"keywords": [
 		"taqueria",
@@ -24,17 +24,19 @@
 		"pinnaclelabs",
 		"pinnacle-labs",
 		"plugin",
-		"ligo",
-		"ligolang",
+		"smartpy",
 		"smart contract",
 		"compile"
 	],
+	"engines": {
+		"node": ">=16.0"
+	},
 	"author": "Pinnacle Labs",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/pinnacle-labs/taqueria.git",
-		"directory": "taqueria-plugin-ligo"
+		"directory": "taqueria-plugin-smartpy-legacy"
 	},
 	"bugs": {
 		"url": "https://github.com/pinnacle-labs/taqueria/issues"
@@ -63,6 +65,5 @@
 			"esm",
 			"cjs"
 		]
-	},
-	"gitHead": "ff58a2fc06ad233869ad6be574093c8b3b272e2e"
+	}
 }
