@@ -5,7 +5,7 @@ if [  -z "$GITHUB_REF_NAME" ]; then
     TAQ_VERSION="dev-${BRANCH//\//-}"
 else
 
-    TAQ_VERSION=$(cat package.json | jq '.["version"]')
+    TAQ_VERSION=$(cat package.json | jq -r '.["version"]')
 fi
 TIMESTAMP=`date +%s`
 BUILD="$COMMIT"

@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-smartpy",
-	"version": "0.37.10",
+	"version": "0.37.12",
 	"description": "A taqueria plugin used to test and compile smart contracts written in SmartPy.",
 	"main": "index.js",
 	"private": true,
@@ -36,14 +36,14 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/pinnacle-labs/taqueria.git",
-		"directory": "taqueria-plugin-smartpy-legacy"
+		"directory": "taqueria-plugin-smartpy"
 	},
 	"bugs": {
 		"url": "https://github.com/pinnacle-labs/taqueria/issues"
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.37.10",
+		"@taqueria/node-sdk": "^0.37.12",
 		"fast-glob": "^3.2.12"
 	},
 	"devDependencies": {

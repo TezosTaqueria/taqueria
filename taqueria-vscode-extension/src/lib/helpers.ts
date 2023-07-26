@@ -619,6 +619,7 @@ export class VsCodeHelper {
 			'@taqueria/plugin-ligo',
 			'@taqueria/plugin-metadata',
 			'@taqueria/plugin-smartpy',
+			'@taqueria/plugin-smartpy-legacy',
 			'@taqueria/plugin-taquito',
 			'@taqueria/plugin-tezos-client',
 		].map(NonEmptyString.create);
@@ -629,6 +630,7 @@ export class VsCodeHelper {
 			'@taqueria/plugin-archetype',
 			'@taqueria/plugin-ligo',
 			'@taqueria/plugin-smartpy',
+			'@taqueria/plugin-smartpy-legacy',
 		];
 	}
 
