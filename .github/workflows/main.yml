@@ -218,6 +218,10 @@ jobs:
   publish-website:
     needs: [build-binaries, check_is_release]
     runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      TAQ_VERSION: ${{ needs.check_is_release.outputs.version }}
     steps:
       - name: Download work archive
         uses: actions/download-artifact@v2
@@ -230,17 +234,17 @@ jobs:
 
       - name: Build Website
         run: |
-          TAQ_VERSION=${{ needs.check_is_release.outputs.version }} npm run build-website
+           npm run build-website
       
       - name: Publish Website (Preview)
         id: publish-website-preview
         if: needs.check_is_release.outputs.is_release == 'no'
-        run: cd website && CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }} npm run deploy-preview
+        run: cd website && npm run deploy-preview
 
       - name: Publish Website (Production)
         id: publish-website
         if: needs.check_is_release.outputs.is_release == 'yes'
-        run: cd website && CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }} npm run deploy
+        run: cd website && npm run deploy
           
   # Publish binaries to Github Releases
   publish-release:

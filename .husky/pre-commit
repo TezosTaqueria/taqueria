@@ -1,5 +1,5 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
+#. "$(dirname "$0")/_/husky.sh"
 
 # If there are any changed FILES, then run dprint for each file
 FILES=`git diff --cached --name-only | grep -E "json|ts|tsx|css"`
