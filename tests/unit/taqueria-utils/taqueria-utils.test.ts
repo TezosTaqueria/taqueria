@@ -167,8 +167,8 @@ Deno.test({
 });
 
 Deno.test('execText() can execute a command without buffering', async () => {
-	const stdOut = (stdout as MockWriter);
-	const stdErr = (stderr as MockWriter);
+	const stdOut = stdout as MockWriter;
+	const stdErr = stderr as MockWriter;
 	stdOut.clear();
 	stdErr.clear();
 
@@ -180,8 +180,8 @@ Deno.test('execText() can execute a command without buffering', async () => {
 });
 
 Deno.test('execText() handles errors correctly', async () => {
-	const stdOut = (stdout as MockWriter);
-	const stdErr = (stderr as MockWriter);
+	const stdOut = stdout as MockWriter;
+	const stdErr = stderr as MockWriter;
 	stdOut.clear();
 	stdErr.clear();
 
@@ -193,8 +193,8 @@ Deno.test('execText() handles errors correctly', async () => {
 });
 
 Deno.test('execText() can parse ESJ templates', async () => {
-	const stdOut = (stdout as MockWriter);
-	const stdErr = (stderr as MockWriter);
+	const stdOut = stdout as MockWriter;
+	const stdErr = stderr as MockWriter;
 	stdOut.clear();
 	stdErr.clear();
 
@@ -206,8 +206,8 @@ Deno.test('execText() can parse ESJ templates', async () => {
 });
 
 Deno.test('execText() can buffer stdout', async () => {
-	const stdOut = (stdout as MockWriter);
-	const stdErr = (stderr as MockWriter);
+	const stdOut = stdout as MockWriter;
+	const stdErr = stderr as MockWriter;
 	stdOut.clear();
 	stdErr.clear();
 
@@ -219,8 +219,8 @@ Deno.test('execText() can buffer stdout', async () => {
 });
 
 Deno.test('execText() can execute in a different working directory', async () => {
-	const stdOut = (stdout as MockWriter);
-	const stdErr = (stderr as MockWriter);
+	const stdOut = stdout as MockWriter;
+	const stdErr = stderr as MockWriter;
 	stdOut.clear();
 	stdErr.clear();
 
