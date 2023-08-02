@@ -1,7 +1,7 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx lint-staged --allow-empty
+git diff --cached --name-only | grep -E "json|ts|tsx|css" | xargs npx dprint fmt --config ./dprint.json
 
 # Update deno-lock file for CICD caching, only when CLI sourcecode changes
 npx with-staged '*.ts' 'taqueria-utils' 'taqueria-protocol' 'import-map.json' -- npm run update-lock

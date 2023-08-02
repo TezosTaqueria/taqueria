@@ -170,8 +170,8 @@ jobs:
           fi
           echo "is_release=$IS_RELEASE" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          
 
+          
   # Publish NPM packages to Github Packages
   publish-packages:
     needs: [build-packages, check_is_release]
@@ -286,6 +286,14 @@ jobs:
           asset_path: vscode-extension/${{ steps.vsix.outputs.artifact }}
           asset_name: taqueria.vsix
           asset_content_type: application/octet-stream
+
+      - name: Build Website
+        run: |
+          TAQ_VERSION=${{ needs.check_is_release.outputs.version }} npm run build-website
+      
+      - name: Publish website
+        id: publish-website
+        run: CLOUDFLARE_ACCOUNT_ID=${{ secrets.CLOUDFLARE_ACCOUNT_ID }} npm run deploy-website
 
   publish-vscode:
     needs: [build-packages, check_is_release]
