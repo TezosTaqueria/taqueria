@@ -7,7 +7,6 @@ if [ ! -z "$FILES" ]; then
   echo $FILES | xargs npx dprint fmt --config ./dprint.json
 fi
 
-
 # Update deno-lock file for CICD caching, only when CLI sourcecode changes
 npx with-staged '*.ts' 'taqueria-utils' 'taqueria-protocol' 'import-map.json' -- npm run update-lock
 HUSKY=0 git add ./deno-lock.json

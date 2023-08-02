@@ -216,7 +216,7 @@ jobs:
 
   # Publish website
   publish-website:
-    needs: [check_is_release]
+    needs: [build-binaries, check_is_release]
     runs-on: ubuntu-latest
     steps:
       - name: Download work archive
