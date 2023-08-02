@@ -1,15 +1,16 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
+HUSKY=0
 
 # If there are any changed FILES, then run dprint for each file
-# FILES=`HUSKY=0 git diff --cached --name-only | grep -E "json|ts|tsx|css"`
-# if [ ! -z "$FILES" ]; then
-#   echo $FILES | xargs npx dprint fmt --config ./dprint.json
-# fi
+FILES=`git diff --cached --name-only | grep -E "json|ts|tsx|css" || true`
+if [ ! -z "$FILES" ]; then
+  echo $FILES | xargs | npx dprint fmt --config ./dprint.json
+fi
 
 # Update deno-lock file for CICD caching, only when CLI sourcecode changes
 npx with-staged '*.ts' 'taqueria-utils' 'taqueria-protocol' 'import-map.json' -- npm run update-lock
-HUSKY=0 git add ./deno-lock.json
+git add ./deno-lock.json
 
 # Bump version # for alpha release
 npx lerna version patch --no-git-tag-version --no-push --yes --force-publish && git add */package*.json package*.json && git add lerna.json
