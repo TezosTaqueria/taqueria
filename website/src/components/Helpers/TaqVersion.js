@@ -1,10 +1,10 @@
 import React from 'react'
 import CodeBlock from '@theme/CodeBlock';
-
-const pkg = require('@site/../package.json')
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 export default ({code,v}={code:false, v:false}) => {
-    const version = process.env.TAQ_VERSION ?? pkg.version
+
+    const {siteConfig: {customFields: {TAQ_VERSION: version}}} = useDocusaurusContext();
     const str = v ? `v${version}` : version
     return code ? <CodeBlock>{str}</CodeBlock> : <span>{str}</span>
 }

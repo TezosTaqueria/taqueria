@@ -10,7 +10,7 @@
 	"json": {
 	},
 	"includes": [
-		"**/*.{ts,tsx,js,jsx,cjs,mjs,json}",
+		"**/*.{ts,tsx,jsx,cjs,mjs,json}",
 		".github/workflows/*",
 		"./website/src/pages/index.js"
 	],
@@ -23,7 +23,8 @@
 		"taqueria-vscode-extension/src/test/suite/data"
 	],
 	"plugins": [
-		"https://plugins.dprint.dev/typescript-0.68.2.wasm",
-		"https://plugins.dprint.dev/json-0.15.2.wasm"
+		"https://plugins.dprint.dev/typescript-0.85.1.wasm",
+		"https://plugins.dprint.dev/json-0.17.4.wasm",
+		"https://github.com/disrupted/dprint-plugin-css/releases/download/0.2.2/plugin.wasm"
 	]
 }

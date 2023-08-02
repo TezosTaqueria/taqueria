@@ -25,6 +25,9 @@ const config = {
   organizationName: "pinnacle-labs", // Usually your GitHub org/user name
   projectName: "taqueria", // Usually your repo name.
   trailingSlash: true,
+  customFields: {
+    TAQ_VERSION
+  },
 
   presets: [
     [
