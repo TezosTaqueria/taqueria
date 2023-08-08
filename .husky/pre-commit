@@ -9,7 +9,9 @@ if [ ! -z "$FILES" ]; then
     echo "Formatting ${file}"
     OUTPUT=$(npx dprint fmt --config ./dprint.json "$file" 2>&1)
     echo "$OUTPUT" | grep -q "No files found to format with the specified plugins." && continue
-    if [ -n "$OUTPUT" ]; then
+    # Exit with error code 1 if there was an error running npx dprint above
+    if [ $? = 0 ]; then
+    echo $?
       echo "Error: $OUTPUT"
       exit 1
     fi

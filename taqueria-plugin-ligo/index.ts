@@ -36,6 +36,12 @@ Plugin.create(i18n => ({
 					boolean: true,
 					description: 'Emit JSON-encoded Michelson',
 				}),
+				Option.create({
+					flag: 'module',
+					shortFlag: "m",
+					type: 'string',
+					description: 'The LIGO module to be compiled'
+				})
 			],
 			handler: 'proxy',
 			encoding: 'json',
