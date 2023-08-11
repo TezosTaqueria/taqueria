@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-ligo",
-	"version": "0.37.22",
+	"version": "0.37.23",
 	"description": "A taqueria plugin for compiling LIGO smart contracts",
 	"targets": {
 		"default": {
@@ -41,7 +41,7 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.37.22",
+		"@taqueria/node-sdk": "^0.37.23",
 		"fast-glob": "^3.2.12"
 	},
 	"devDependencies": {

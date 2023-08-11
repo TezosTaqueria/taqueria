@@ -1083,6 +1083,7 @@ const renderPluginJsonRes = (decoded: PluginJsonResponse.t, parsedArgs: Sanitize
 	}
 
 	if (typeof decoded === 'object') {
+		if (decoded.messages?.header) log(decoded.messages.header);
 		switch (decoded.render) {
 			case 'table':
 				renderTable(decoded.data ? decoded.data as Record<string, string>[] : []);
@@ -1091,6 +1092,7 @@ const renderPluginJsonRes = (decoded: PluginJsonResponse.t, parsedArgs: Sanitize
 				log(decoded.data as string);
 				break;
 		}
+		if (decoded.messages?.footer) log(decoded.messages.footer);
 	}
 };
 

@@ -184,15 +184,17 @@ export const sendAsyncJson = (msg: unknown, newline = true) => sendAsyncRes(JSON
 
 export const sendAsyncJsonErr = (msg: unknown, newline = true) => sendAsyncErr(JSON.stringify(msg), newline);
 
-export const sendJsonRes = <T>(data: T) =>
+export const sendJsonRes = <T>(data: T, messages?: {header?: string, footer?: string}) =>
 	typeof data === 'object'
 		? sendJson({
 			data,
 			render: 'table',
+			messages
 		})
 		: sendJson({
 			data,
 			render: 'string',
+			messages
 		});
 
 export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data));
