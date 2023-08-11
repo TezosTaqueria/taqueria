@@ -1,4 +1,13 @@
-import { execCmd, getArch, getArtifactsDir, sendAsyncErr, sendErr, sendJsonRes, sendRes, sendWarn } from '@taqueria/node-sdk';
+import {
+	execCmd,
+	getArch,
+	getArtifactsDir,
+	sendAsyncErr,
+	sendErr,
+	sendJsonRes,
+	sendRes,
+	sendWarn,
+} from '@taqueria/node-sdk';
 import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import {
@@ -20,17 +29,18 @@ export type ModuleInfo = {
 	sourceFile: string;
 	syntax: 'mligo' | 'jsligo' | 'religo' | 'ligo';
 	type: 'file-main' | 'file-entry' | 'module-main' | 'module-entry';
-}
+};
 
 const COMPILE_ERR_MSG: string = 'Not compiled';
 
 const isStorageKind = (exprKind: ExprKind): boolean => exprKind === 'storage' || exprKind === 'default_storage';
 
-export const isSupportedLigoSyntax = (sourceFile : string) => /\.(mligo|jsligo)$/.test(sourceFile);
+export const isSupportedLigoSyntax = (sourceFile: string) => /\.(mligo|jsligo)$/.test(sourceFile);
 
 export const isUnsupportedLigoSyntax = (sourceFile: string) => /\.(ligo|religo)$/.test(sourceFile);
 
-export const isLIGOFile = (sourceFile: string) => isSupportedLigoSyntax(sourceFile) || isUnsupportedLigoSyntax(sourceFile);
+export const isLIGOFile = (sourceFile: string) =>
+	isSupportedLigoSyntax(sourceFile) || isUnsupportedLigoSyntax(sourceFile);
 
 export const isStorageListFile = (sourceFile: string): boolean =>
 	/.+\.(storageList|storages)\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
@@ -58,17 +68,26 @@ export const listContractModules = async (parsedArgs: UnionOpts, sourceFile: str
 
 				if (decl === 'main') {
 					return [...acc, { moduleName: srcFile, sourceName: sourceFile, sourceFile, type: 'file-main', syntax }];
-				}
-				else if (decl === '$main') {
+				} else if (decl === '$main') {
 					return [...acc, { moduleName: srcFile, sourceName: sourceFile, sourceFile, type: 'file-entry', syntax }];
-				}
-				else if (decl.endsWith('.main')) {
+				} else if (decl.endsWith('.main')) {
 					const moduleName = decl.replace(/\.main$/, '');
-					return [...acc, { moduleName, sourceName: `${sourceFile}/${moduleName}`, sourceFile, type: 'module-main', syntax }];
-				}
-				else if (decl.endsWith('.$main')) {
+					return [...acc, {
+						moduleName,
+						sourceName: `${sourceFile}/${moduleName}`,
+						sourceFile,
+						type: 'module-main',
+						syntax,
+					}];
+				} else if (decl.endsWith('.$main')) {
 					const moduleName = decl.replace(/\.\$main$/, '');
-					return [...acc, { moduleName, sourceName: `${sourceFile}/${moduleName}`, sourceFile, type: 'module-entry', syntax }];
+					return [...acc, {
+						moduleName,
+						sourceName: `${sourceFile}/${moduleName}`,
+						sourceFile,
+						type: 'module-entry',
+						syntax,
+					}];
 				}
 				return acc;
 			},
@@ -102,7 +121,6 @@ const removeExt = (path: string): string => {
 };
 
 const isOutputFormatJSON = (parsedArgs: Opts): boolean => parsedArgs.json;
-
 
 const getOutputContractFilename = (parsedArgs: Opts, module: ModuleInfo): string => {
 	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
@@ -154,9 +172,9 @@ const getCompileExprCmd = (
 			case 'file-entry':
 				return '-m Contract';
 			default:
-				return `-m Contract.${module.moduleName}`
+				return `-m Contract.${module.moduleName}`;
 		}
-	})()
+	})();
 
 	const cmd = `${baseCmd} ${inputFile} ${exprName} ${outputFile} ${flags} ${moduleFlag}`;
 	return cmd;
@@ -168,7 +186,7 @@ const compileContract = async (parsedArgs: Opts, sourceFile: string, module: Mod
 		const cmd = await getCompileContractCmd(parsedArgs, sourceFile, module);
 		const { stderr } = await execCmd(cmd);
 		if (stderr.length > 0) sendWarn(stderr);
-		
+
 		return {
 			source: module.sourceName,
 			artifact: getOutputContractFilename(parsedArgs, module),
@@ -186,25 +204,24 @@ const compileExpr =
 	(parsedArgs: Opts, sourceFile: string, module: ModuleInfo, exprKind: ExprKind) =>
 	(exprName: string): Promise<TableRow> => {
 		return getArch()
-		.then(() => getCompileExprCmd(parsedArgs, sourceFile, module, exprKind, exprName))
-		.then(execCmd)
-		.then(({ stderr }) => {
-			if (stderr.length > 0) sendWarn(stderr);
-			const artifactName = getOutputExprFilename(parsedArgs, module, exprKind, exprName);
-			return {
-				source: module.sourceName,
-				artifact: artifactName,
-			};
-		})
-		.catch(err => {
-			emitExternalError(err, sourceFile);
-			return {
-				source: module.sourceName,
-				artifact: `${sourceFile} not compiled`,
-			};
-		});
-	}
-		
+			.then(() => getCompileExprCmd(parsedArgs, sourceFile, module, exprKind, exprName))
+			.then(execCmd)
+			.then(({ stderr }) => {
+				if (stderr.length > 0) sendWarn(stderr);
+				const artifactName = getOutputExprFilename(parsedArgs, module, exprKind, exprName);
+				return {
+					source: module.sourceName,
+					artifact: artifactName,
+				};
+			})
+			.catch(err => {
+				emitExternalError(err, sourceFile);
+				return {
+					source: module.sourceName,
+					artifact: `${sourceFile} not compiled`,
+				};
+			});
+	};
 
 const getExprNames = (parsedArgs: Opts, sourceFile: string): Promise<string[]> =>
 	readFile(getInputFilenameAbsPath(parsedArgs, sourceFile), 'utf8')
@@ -239,15 +256,15 @@ const compileExprs = (
 				source: module.sourceName,
 				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} expressions found`,
 			}]
-		)
+		);
 
 const initContentForStorage = (module: ModuleInfo): string => {
 	const linkToContract = `#import "${module.sourceFile}" "Contract"\n\n`;
 	const instruction =
 		'// Define your initial storage values as a list of LIGO variable definitions, the first of which will be considered the default value to be used for origination later on\n';
-	
+
 	const syntax = (() => {
-		const pair = [module.syntax, module.type].join('-')
+		const pair = [module.syntax, module.type].join('-');
 		switch (pair) {
 			case 'mligo-file-main':
 				return [
@@ -258,7 +275,7 @@ const initContentForStorage = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your storage from the contract',
 					'// E.g. let storage : Contract.storage = 10',
-				]
+				];
 				break;
 			case 'mligo-file-entry':
 				return [
@@ -269,7 +286,7 @@ const initContentForStorage = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your storage from the contract',
 					'// E.g. let storage : Contract.storage = 10',
-				]
+				];
 				break;
 			case 'mligo-module-main':
 				return [
@@ -280,7 +297,7 @@ const initContentForStorage = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your storage from the contract',
 					`// E.g. let storage : Contract.${module.moduleName}.storage = 10`,
-				]
+				];
 				break;
 			case 'mligo-module-entry':
 				return [
@@ -291,7 +308,7 @@ const initContentForStorage = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your storage from the contract',
 					`// E.g. let storage : Contract.${module.moduleName}.storage = 10`,
-				]
+				];
 				break;
 			case 'jsligo-file-main':
 				return [
@@ -303,7 +320,7 @@ const initContentForStorage = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your storage from the contract. This assumes that you have exported your `storage` type from the contract file.',
 					'// E.g. const storage : Contract.storage = 10',
-				]
+				];
 				break;
 			case 'jsligo-file-entry':
 				return [
@@ -314,7 +331,7 @@ const initContentForStorage = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your storage from the contract. This assumes that you have exported your `storage` type from the contract file.',
 					'// E.g. const storage : Contract.storage = 10',
-				]
+				];
 				break;
 			case 'jsligo-module-main':
 				return [
@@ -326,7 +343,7 @@ const initContentForStorage = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your storage from the contract. This assumes that you have exported your `storage` type from the contract file.',
 					`// E.g. const storage : Contract.${module.moduleName}.storage = 10`,
-				]
+				];
 				break;
 			case 'jsligo-module-entry':
 				return [
@@ -337,13 +354,13 @@ const initContentForStorage = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your storage from the contract. This assumes that you have exported your `storage` type from the contract file.',
 					`// E.g. const storage : Contract.${module.moduleName}.storage = 10`,
-				]
+				];
 				break;
 			default:
-				return []
+				return [];
 		}
 	})();
-	return linkToContract + instruction + syntax.join("\n");
+	return linkToContract + instruction + syntax.join('\n');
 };
 
 const initContentForParameter = (module: ModuleInfo): string => {
@@ -351,7 +368,7 @@ const initContentForParameter = (module: ModuleInfo): string => {
 	const instruction = '// Define your parameter values as a list of LIGO variable definitions\n';
 
 	const syntax = (() => {
-		const pair = [module.syntax, module.type].join('-')
+		const pair = [module.syntax, module.type].join('-');
 		switch (pair) {
 			case 'mligo-file-main':
 				return [
@@ -362,7 +379,7 @@ const initContentForParameter = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your parameter from the contract',
 					'// E.g. let default_parameter : Contract.parameter = 10',
-				]
+				];
 				break;
 			case 'mligo-file-entry':
 				return [
@@ -373,7 +390,7 @@ const initContentForParameter = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your parameter from the contract',
 					'// E.g. let default_parameter : parameter_of Contract = 10',
-				]
+				];
 				break;
 			case 'mligo-module-main':
 				return [
@@ -384,7 +401,7 @@ const initContentForParameter = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your parameter from the contract',
 					`// E.g. let default_parameter : Contract.${module.moduleName}.parameter = 10`,
-				]
+				];
 				break;
 			case 'mligo-module-entry':
 				return [
@@ -395,7 +412,7 @@ const initContentForParameter = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your parameter from the contract',
 					`// E.g. let default_parameter : parameter_of Contract.${module.moduleName} = 10`,
-				]
+				];
 				break;
 			case 'jsligo-file-main':
 				return [
@@ -407,7 +424,7 @@ const initContentForParameter = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your parameter from the contract',
 					'// E.g. const default_parameter : Contract.parameter = 10',
-				]
+				];
 				break;
 			case 'jsligo-file-entry':
 				return [
@@ -418,7 +435,7 @@ const initContentForParameter = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your parameter from the contract',
 					'// E.g. const default_parameter : parameter_of Contract = 10',
-				]
+				];
 				break;
 			case 'jsligo-module-main':
 				return [
@@ -430,7 +447,7 @@ const initContentForParameter = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your parameter from the contract',
 					`// E.g. const default_parameter : Contract.${module.moduleName}.parameter = 10`,
-				]
+				];
 				break;
 			case 'jsligo-module-entry':
 				return [
@@ -441,20 +458,20 @@ const initContentForParameter = (module: ModuleInfo): string => {
 					'',
 					'// For added type-safety, you can reference the type of your parameter from the contract',
 					`// E.g. const default_parameter : parameter_of Contract.${module.moduleName} = 10`,
-				]
+				];
 				break;
 			default:
-				return []
+				return [];
 		}
 	})();
 
-	return linkToContract + instruction + syntax.join("\n");
+	return linkToContract + instruction + syntax.join('\n');
 };
 
 export const compileContractWithStorageAndParameter = async (
 	parsedArgs: Opts,
 	sourceFile: string,
-	module: ModuleInfo	,
+	module: ModuleInfo,
 ): Promise<TableRow[]> => {
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile, module);
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
@@ -481,18 +498,18 @@ export const compileContractWithStorageAndParameter = async (
 			return writeFile(parameterListFilename, initContentForParameter(module), 'utf8');
 		});
 
-	const storageArtifacts = storageCompileResult ? storageCompileResult.map(res => res.artifact).join("\n") : "";
-	const parameterArtifacts = parameterCompileResult ? parameterCompileResult.map(res => res.artifact).join("\n") : "";
-	
+	const storageArtifacts = storageCompileResult ? storageCompileResult.map(res => res.artifact).join('\n') : '';
+	const parameterArtifacts = parameterCompileResult ? parameterCompileResult.map(res => res.artifact).join('\n') : '';
+
 	const combinedArtifact = [
 		contractCompileResult.artifact,
-		storageArtifacts, 
-		parameterArtifacts
-	].filter(Boolean).join("\n");
+		storageArtifacts,
+		parameterArtifacts,
+	].filter(Boolean).join('\n');
 
 	const combinedRow: TableRow = {
 		source: module.sourceName,
-		artifact: combinedArtifact
+		artifact: combinedArtifact,
 	};
 
 	return [combinedRow];
@@ -520,10 +537,9 @@ export const compile = async (parsedArgs: Opts): Promise<void> => {
 				{
 					source: sourceFile,
 					artifact: `No contract modules found in "${sourceFile}"`,
-				}
-			])
+				},
+			]);
 		}
-		
 
 		let allCompileResults: TableRow[] = [];
 		for (const module of modules) {
@@ -534,7 +550,7 @@ export const compile = async (parsedArgs: Opts): Promise<void> => {
 			allCompileResults = allCompileResults.concat(compileResults);
 		}
 
-		sendJsonRes(allCompileResults, {footer: `\nCompiled ${allCompileResults.length} contract(s) in "${sourceFile}"`})
+		sendJsonRes(allCompileResults, { footer: `\nCompiled ${allCompileResults.length} contract(s) in "${sourceFile}"` });
 	} catch (err) {
 		sendErr(`Error processing "${sourceFile}": ${err}`);
 	}

@@ -2,7 +2,13 @@ import { sendErr, sendJsonRes } from '@taqueria/node-sdk';
 import glob from 'fast-glob';
 import { join } from 'path';
 import { CompileAllOpts, CompileAllOpts as Opts, CompileOpts } from './common';
-import { compileContractWithStorageAndParameter, listContractModules, TableRow, isParameterListFile, isStorageListFile } from './compile';
+import {
+	compileContractWithStorageAndParameter,
+	isParameterListFile,
+	isStorageListFile,
+	listContractModules,
+	TableRow,
+} from './compile';
 
 const compileAll = async (parsedArgs: Opts): Promise<void> => {
 	let compilePromises: Promise<TableRow[]>[] = [];

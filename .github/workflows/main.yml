@@ -199,7 +199,7 @@ jobs:
           echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
           git config --global user.email "mweichert@gmail.com"
           git config --global user.name "Michael Weichert"
-          git commit -am "chore: publish packages"
+          git commit -am "chore: publish packages" --allow-empty
           
           # Determine what tag to use. Our version numbers use the scheme MAJOR.MINOR.RELEASE. If RELEASE is 0, then we should use the "latest tag".
           TAG=dev
