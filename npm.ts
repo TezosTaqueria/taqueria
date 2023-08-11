@@ -59,8 +59,8 @@ export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: Sanit
 		/^\//.test(pluginNameOrPath)
 			// If starts with a slash, we can assume that its a path
 			? SanitizedAbsPath.make(pluginNameOrPath)
-			: // Otherwise, we assume that its a relative path
-				SanitizedAbsPath.make(`${projectDir}/${pluginNameOrPath}`),
+			// Otherwise, we assume that its a relative path
+			: SanitizedAbsPath.make(`${projectDir}/${pluginNameOrPath}`),
 		chain(pluginPath => SanitizedAbsPath.make(`${pluginPath}/package.json`)),
 		chain(readJsonFile),
 		chainRej(() =>
@@ -76,8 +76,8 @@ export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: Sanit
 export const getPackageName = (projectDir: SanitizedAbsPath.t) => (pluginNameOrPath: string) =>
 	pipe(
 		getPluginPackageJson(pluginNameOrPath, projectDir),
-		map(manifest => manifest.name)
-	)
+		map(manifest => manifest.name),
+	);
 
 const addToPluginList = (pluginName: NpmPluginName, loadedConfig: LoadedConfig.t) =>
 	pipe(
@@ -132,8 +132,8 @@ const rmFromPluginList = (loadedConfig: LoadedConfig.t, parsedArgs: SanitizedArg
 			),
 	);
 
-const purgeEphemeralState = (env: EnvVars, i18n: i18n, parsedArgs: SanitizedArgs.InstallTaskArgs) =>
-	(config: LoadedConfig.t) => {
+const purgeEphemeralState =
+	(env: EnvVars, i18n: i18n, parsedArgs: SanitizedArgs.InstallTaskArgs) => (config: LoadedConfig.t) => {
 		const pluginsLib = initPlugins({
 			config,
 			env,
