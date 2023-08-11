@@ -390,9 +390,24 @@ const loadInternalTasks = (cliConfig: CLIConfig, config: LoadedConfig.t, env: En
 		handler: (parsedArgs: SanitizedArgs.t) =>
 			pipe(
 				SanitizedArgs.ofInstallTaskArgs(parsedArgs),
-				chain(args => NPM.installPlugin(config, config.projectDir, i18n, env, args)),
-				chain(config => loadPlugins(cliConfig, config, env, parsedArgs, i18n)),
-				map(() => log(i18n.__('pluginInstalled'))),
+				chain((args: SanitizedArgs.InstallTaskArgs) =>
+					pipe(
+						NPM.getPluginName(args.pluginName),
+						NPM.getPackageName(config.projectDir),
+						chain(pluginName =>
+							pipe(
+								NPM.installPlugin(config, config.projectDir, i18n, env, args),
+								chain(config =>
+									pipe(
+										loadPlugins(cliConfig, config, env, parsedArgs, i18n),
+										chain(cliConfig => runPostInstall(pluginName, cliConfig, config, env, args, i18n)),
+									)
+								),
+								map(() => log(i18n.__('pluginInstalled'))),
+							)
+						),
+					)
+				),
 			),
 	});
 
@@ -513,17 +528,16 @@ const postInitCLI = (env: EnvVars, args: DenoArgs, parsedArgs: SanitizedArgs.t, 
 		extendCLI(env, parsedArgs, i18n),
 	);
 
-const parseArgs = (cliArgs: string[]) =>
-	(cliConfig: CLIConfig): Future<TaqError.t, Record<string, unknown>> =>
-		pipe(
-			attemptP<Error, Record<string, unknown>>(() => cliConfig.parseAsync(cliArgs)),
-			mapRej<Error, TaqError.t>(previous => ({
-				kind: 'E_INVALID_ARGS',
-				msg: 'Invalid arguments were provided and could not be parsed',
-				context: cliConfig,
-				previous,
-			})),
-		);
+const parseArgs = (cliArgs: string[]) => (cliConfig: CLIConfig): Future<TaqError.t, Record<string, unknown>> =>
+	pipe(
+		attemptP<Error, Record<string, unknown>>(() => cliConfig.parseAsync(cliArgs)),
+		mapRej<Error, TaqError.t>(previous => ({
+			kind: 'E_INVALID_ARGS',
+			msg: 'Invalid arguments were provided and could not be parsed',
+			context: cliConfig,
+			previous,
+		})),
+	);
 
 const listKnownTasks = (parsedArgs: SanitizedArgs.t, config: LoadedConfig.t) =>
 	pipe(
@@ -576,12 +590,10 @@ const createGitIgnoreFile = (projectDir: SanitizedAbsPath.t): Future<TaqError.Ta
 };
 
 // Might consider using a dev flag but it's ok since the local installation part is for internal purposes only
-const taqInstall = (parsedArgs: SanitizedArgs.t) =>
-	(projectDir: SanitizedAbsPath.t) =>
-		(pluginName: string) =>
-			parsedArgs.debug
-				? exec(`taq install ../../taqueria/taqueria-plugin-${pluginName} 2>&1 > /dev/null`, {}, false, projectDir)
-				: exec(`taq install @taqueria/plugin-${pluginName} 2>&1 > /dev/null`, {}, false, projectDir);
+const taqInstall = (parsedArgs: SanitizedArgs.t) => (projectDir: SanitizedAbsPath.t) => (pluginName: string) =>
+	parsedArgs.debug
+		? exec(`taq install ../../taqueria/taqueria-plugin-${pluginName} 2>&1 > /dev/null`, {}, false, projectDir)
+		: exec(`taq install @taqueria/plugin-${pluginName} 2>&1 > /dev/null`, {}, false, projectDir);
 
 const preInstallPluginsOnInit = (parsedArgs: SanitizedArgs.t, projectDir: SanitizedAbsPath.t) => {
 	const parsedArgsOfInit = parsedArgs as unknown as SanitizedArgs.rawInitSchemaInput;
@@ -665,8 +677,8 @@ const runScaffoldPostInit = (scaffoldDir: SanitizedAbsPath.t): Future<TaqError.t
 	);
 };
 
-const scaffoldProject = (i18n: i18n.t) =>
-	({ scaffoldUrl, scaffoldProjectDir, branch }: SanitizedArgs.ScaffoldTaskArgs) =>
+const scaffoldProject =
+	(i18n: i18n.t) => ({ scaffoldUrl, scaffoldProjectDir, branch }: SanitizedArgs.ScaffoldTaskArgs) =>
 		go(
 			function*() {
 				const abspath: SanitizedAbsPath.t = yield SanitizedAbsPath.make(scaffoldProjectDir);
@@ -1169,26 +1181,55 @@ const loadPlugins = (
 	);
 };
 
-const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
-	(previousCLIConfig: CLIConfig) =>
-		pipe(
-			getConfig(parsedArgs.projectDir, i18n, false),
-			chain((config: LoadedConfig.t) => loadPlugins(previousCLIConfig, config, env, parsedArgs, i18n)),
-			map((cliConfig: CLIConfig) => cliConfig.help()),
-			chain(parseArgs(getCliArgs())),
-			// TODO: In the chain call below, we're copying the version of the '_' property from
-			// the original parsedArgs to the new parsedArgs as created from the parseArgs() function above.
-			//
-			// For some reason, the original parsedArgs is getting mutated by yargs in the second parseArgs() call.
-			// I'll be coming back to see what is going on here.
-			// https://github.com/pinnacle-labs/taqueria/issues/1614
-			chain(inputArgs => SanitizedArgs.of({ ...inputArgs, _: parsedArgs._ })),
-			chain(parsedArgs => {
-				if (internalTasks.isTaskRunning(parsedArgs)) return internalTasks.handle(parsedArgs);
-				else if (pluginTasks.isTaskRunning(parsedArgs)) return pluginTasks.handle(parsedArgs);
-				return showInvalidTask(previousCLIConfig)(parsedArgs);
-			}),
-		);
+const runPostInstall = (
+	pluginName: string,
+	previousCliConfig: CLIConfig,
+	config: LoadedConfig.t,
+	env: EnvVars,
+	parsedArgs: SanitizedArgs.InstallTaskArgs,
+	i18n: i18n.t,
+) => {
+	const pluginLib = inject({
+		parsedArgs,
+		i18n,
+		env,
+		config,
+		stderr: Deno.stderr,
+		stdout: Deno.stdout,
+	});
+
+	const plugin = config.plugins?.find(plugin => plugin.name === pluginName);
+
+	return plugin
+		? pipe(
+			pluginLib.sendPluginActionRequest(plugin)(
+				PluginActionName.create('runPostInstall'),
+				PluginResponseEncoding.create('none'),
+			)(parsedArgs),
+			map(_ => parsedArgs),
+		)
+		: taqResolve(parsedArgs);
+};
+
+const extendCLI = (env: EnvVars, parsedArgs: SanitizedArgs.t, i18n: i18n.t) => (previousCLIConfig: CLIConfig) =>
+	pipe(
+		getConfig(parsedArgs.projectDir, i18n, false),
+		chain((config: LoadedConfig.t) => loadPlugins(previousCLIConfig, config, env, parsedArgs, i18n)),
+		map((cliConfig: CLIConfig) => cliConfig.help()),
+		chain(parseArgs(getCliArgs())),
+		// TODO: In the chain call below, we're copying the version of the '_' property from
+		// the original parsedArgs to the new parsedArgs as created from the parseArgs() function above.
+		//
+		// For some reason, the original parsedArgs is getting mutated by yargs in the second parseArgs() call.
+		// I'll be coming back to see what is going on here.
+		// https://github.com/pinnacle-labs/taqueria/issues/1614
+		chain(inputArgs => SanitizedArgs.of({ ...inputArgs, _: parsedArgs._ })),
+		chain(parsedArgs => {
+			if (internalTasks.isTaskRunning(parsedArgs)) return internalTasks.handle(parsedArgs);
+			else if (pluginTasks.isTaskRunning(parsedArgs)) return pluginTasks.handle(parsedArgs);
+			return showInvalidTask(previousCLIConfig)(parsedArgs);
+		}),
+	);
 
 const executingBuiltInTask = (inputArgs: SanitizedArgs.t) =>
 	[...globalTasks.getTaskNames(), ...internalTasks.getTaskNames()].reduce(
@@ -1228,22 +1269,21 @@ export const run = (env: EnvVars, inputArgs: DenoArgs, i18n: i18n.t) => {
 	);
 };
 
-export const showInvalidTask = (cli: CLIConfig) =>
-	(parsedArgs: SanitizedArgs.t) => {
-		if (executingBuiltInTask(parsedArgs) || cli.handled) {
-			return taqResolve(parsedArgs);
-		} else if (parsedArgs._.length == 0) {
-			cli.showHelp();
-			return taqResolve(parsedArgs);
-		}
+export const showInvalidTask = (cli: CLIConfig) => (parsedArgs: SanitizedArgs.t) => {
+	if (executingBuiltInTask(parsedArgs) || cli.handled) {
+		return taqResolve(parsedArgs);
+	} else if (parsedArgs._.length == 0) {
+		cli.showHelp();
+		return taqResolve(parsedArgs);
+	}
 
-		const err: TaqError.t = {
-			kind: 'E_INVALID_TASK',
-			msg: `Taqueria isn't aware of this task. Perhaps you need to install a plugin first?`,
-			context: parsedArgs,
-		};
-		return reject(err);
+	const err: TaqError.t = {
+		kind: 'E_INVALID_TASK',
+		msg: `Taqueria isn't aware of this task. Perhaps you need to install a plugin first?`,
+		context: parsedArgs,
 	};
+	return reject(err);
+};
 
 export const normalizeErr = (err: TaqError.t | TaqError.E_TaqError | Error) => {
 	if (err instanceof TaqError.E_TaqError) {
@@ -1255,52 +1295,51 @@ export const normalizeErr = (err: TaqError.t | TaqError.E_TaqError | Error) => {
 	return err;
 };
 
-export const displayError = (cli: CLIConfig) =>
-	(err: Error | TaqError.t) => {
-		const inputArgs = (cli.parsed as unknown as { argv: Record<string, unknown> }).argv;
+export const displayError = (cli: CLIConfig) => (err: Error | TaqError.t) => {
+	const inputArgs = (cli.parsed as unknown as { argv: Record<string, unknown> }).argv;
 
-		if (!inputArgs.fromVsCode && (isTaqError(err) && err.kind !== 'E_EXEC')) {
-			cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
-		}
+	if (!inputArgs.fromVsCode && (isTaqError(err) && err.kind !== 'E_EXEC')) {
+		cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
+	}
 
-		// We should display errors when asking for help when debug mode is enabled
-		if (!inputArgs.help || inputArgs.debug) {
-			console.error(''); // empty line
-			const res = match(normalizeErr(err))
-				.with({ kind: 'E_FORK' }, (err: TaqError.t) => [125, err.msg])
-				.with({ kind: 'E_INVALID_CONFIG' }, err => [1, err.msg])
-				.with({ kind: 'E_INVALID_JSON' }, err => [12, err])
-				.with({ kind: 'E_INVALID_PATH_ALREADY_EXISTS' }, err => [3, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST' }, err => [4, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_INVALID_TASK' }, err => [5, err.msg])
-				.with({ kind: 'E_INVALID_PLUGIN_RESPONSE' }, err => [6, err.msg])
-				.with({ kind: 'E_MKDIR_FAILED' }, err => [7, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_NPM_INIT' }, err => [8, err.msg])
-				.with({ kind: 'E_READFILE' }, err => [9, err.msg])
-				.with({ kind: 'E_GIT_CLONE_FAILED' }, err => [10, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_INVALID_ARGS' }, err => [11, err.msg])
-				.with({ kind: 'E_PROVISION' }, err => [12, err.msg])
-				.with({ kind: 'E_PARSE' }, err => [13, err.msg])
-				.with({ kind: 'E_PARSE_UNKNOWN' }, err => [14, err.msg])
-				.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
-				.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
-				.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
-				.with({ kind: 'E_EXEC' }, err => [19, false])
-				.with({ kind: 'E_OPT_IN_WARNING' }, err => [22, err.msg])
-				.with({ kind: 'E_INVALID_OPTION' }, err => [23, err.msg])
-				.with({ kind: 'E_TAQ_PROJECT_NOT_FOUND' }, err => [24, err.msg])
-				.with({ message: P.string }, (err: Error) => [128, err.message])
-				.exhaustive();
+	// We should display errors when asking for help when debug mode is enabled
+	if (!inputArgs.help || inputArgs.debug) {
+		console.error(''); // empty line
+		const res = match(normalizeErr(err))
+			.with({ kind: 'E_FORK' }, (err: TaqError.t) => [125, err.msg])
+			.with({ kind: 'E_INVALID_CONFIG' }, err => [1, err.msg])
+			.with({ kind: 'E_INVALID_JSON' }, err => [12, err])
+			.with({ kind: 'E_INVALID_PATH_ALREADY_EXISTS' }, err => [3, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_INVALID_PATH_DOES_NOT_EXIST' }, err => [4, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_INVALID_TASK' }, err => [5, err.msg])
+			.with({ kind: 'E_INVALID_PLUGIN_RESPONSE' }, err => [6, err.msg])
+			.with({ kind: 'E_MKDIR_FAILED' }, err => [7, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_NPM_INIT' }, err => [8, err.msg])
+			.with({ kind: 'E_READFILE' }, err => [9, err.msg])
+			.with({ kind: 'E_GIT_CLONE_FAILED' }, err => [10, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_INVALID_ARGS' }, err => [11, err.msg])
+			.with({ kind: 'E_PROVISION' }, err => [12, err.msg])
+			.with({ kind: 'E_PARSE' }, err => [13, err.msg])
+			.with({ kind: 'E_PARSE_UNKNOWN' }, err => [14, err.msg])
+			.with({ kind: 'E_INVALID_ARCH' }, err => [15, err.msg])
+			.with({ kind: 'E_NO_PROVISIONS' }, err => [16, err.msg])
+			.with({ kind: 'E_INVALID_PATH_EXISTS_AND_NOT_AN_EMPTY_DIR' }, err => [17, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_INTERNAL_LOGICAL_VALIDATION_FAILURE' }, err => [18, `${err.msg}: ${err.context}`])
+			.with({ kind: 'E_EXEC' }, err => [19, false])
+			.with({ kind: 'E_OPT_IN_WARNING' }, err => [22, err.msg])
+			.with({ kind: 'E_INVALID_OPTION' }, err => [23, err.msg])
+			.with({ kind: 'E_TAQ_PROJECT_NOT_FOUND' }, err => [24, err.msg])
+			.with({ message: P.string }, (err: Error) => [128, err.message])
+			.exhaustive();
 
-			const [exitCode, msg] = res;
-			if (inputArgs.debug) {
-				logAllErrors(err);
-			} else if (msg) console.error(msg);
+		const [exitCode, msg] = res;
+		if (inputArgs.debug) {
+			logAllErrors(err);
+		} else if (msg) console.error(msg);
 
-			Deno.exit(exitCode as number);
-		}
-	};
+		Deno.exit(exitCode as number);
+	}
+};
 
 const logAllErrors = (err: Error | TaqError.E_TaqError | TaqError.t | unknown) => {
 	console.error(err);
