@@ -6,22 +6,20 @@ import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import { chain, chainRej, FutureInstance as Future, map, mapRej } from 'fluture';
+import { chain, chainRej, FutureInstance as Future, map, mapRej, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import initPlugins from './plugins.ts';
 import { EnvVars } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
 
 // Get utils
-const { execText, readJsonFile, writeJsonFile, rm } = utils.inject({
+const { execText, readJsonFile, writeJsonFile, rm, log } = utils.inject({
 	stdout: Deno.stdout,
 	stderr: Deno.stderr,
 });
 
 // Alias
 const exec = execText;
-
-// import {log, debug} from './taqueria-utils/taqueria-utils.ts'
 
 // This file contains logic for handling plugins distributed
 // and installable using NPM
@@ -74,6 +72,12 @@ export const getPluginPackageJson = (pluginNameOrPath: string, projectDir: Sanit
 		),
 		map(value => value as Manifest),
 	);
+
+export const getPackageName = (projectDir: SanitizedAbsPath.t) => (pluginNameOrPath: string) =>
+	pipe(
+		getPluginPackageJson(pluginNameOrPath, projectDir),
+		map(manifest => manifest.name)
+	)
 
 const addToPluginList = (pluginName: NpmPluginName, loadedConfig: LoadedConfig.t) =>
 	pipe(
