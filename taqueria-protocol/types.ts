@@ -109,6 +109,7 @@ type PluginSchemaBase = {
 	schema: VersionNumber;
 	alias: Alias;
 	tasks?: Task[];
+	postInstall?: string;
 };
 
 export type PluginInfo = PluginSchemaBase & {
@@ -157,6 +158,10 @@ export type PluginDependenciesResponse = {
 
 export type PluginJsonResponse = {
 	data?: unknown;
+	messages?: {
+		header?: string,
+		footer?: string
+	}
 
 	/** @default none */
 	render: 'none' | 'table' | 'string';
@@ -196,6 +201,7 @@ export type PluginActionName =
 	| 'pluginInfo'
 	| 'checkRuntimeDependencies'
 	| 'installRuntimeDependencies'
+	| 'runPostInstall'
 	| 'proxyTemplate';
 
 export type RequestArgs = Omit<SanitizedArgs, 'quickstart'> & {

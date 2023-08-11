@@ -11,6 +11,7 @@ export const rawSchema = z.object({
 	version: VersionNumber.rawSchema.describe('Plugin Version #'),
 	schema: VersionNumber.rawSchema.describe('Plugin Schema Version #'),
 	alias: Alias.rawSchema.describe('Plugin Alias'),
+	postInstall: z.string().optional(),
 	tasks: z.preprocess(
 		val => val ?? [],
 		z.array(
