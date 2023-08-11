@@ -8,7 +8,6 @@ type parameter =
 type return = operation list * storage
 
 // Two entrypoints
-
 let add (store, delta : storage * int) : storage = store + delta
 let sub (store, delta : storage * int) : storage = store - delta
 

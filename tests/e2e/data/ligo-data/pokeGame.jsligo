@@ -1,6 +1,6 @@
-type storage = set<address>;
+export type storage = set<address>;
 
-type parameter = |["Poke"];
+export type parameter = |["Poke"];
 
 type return_ = [list<operation>, storage];
 

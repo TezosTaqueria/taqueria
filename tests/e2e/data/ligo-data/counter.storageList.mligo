@@ -1,3 +1,5 @@
-#include "counter.mligo"
-let initial_count: storage = 42
-let another_count: storage = 23 + 18 - 1
+#include "counter-main.mligo"
+
+// Define your initial storage values as a list of LIGO variable definitions, the first of which will be considered the default value to be used for origination later on
+// E.g. let aStorageValue : aStorageType = 10
+let default_storage = 10

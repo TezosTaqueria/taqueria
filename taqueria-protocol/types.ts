@@ -9,7 +9,7 @@ export type SingleChar = NonEmptyString;
 /** @pattern ^[A-Za-z\-\ ]+ */
 export type Verb = NonEmptyString;
 
-export type Alias = (Verb | SingleChar);
+export type Alias = Verb | SingleChar;
 
 /** @pattern ^[A-Za-z]+[A-Za-z0-9-_ ]*$ */
 export type HumanReadableIdentifier = NonEmptyString;
@@ -159,9 +159,9 @@ export type PluginDependenciesResponse = {
 export type PluginJsonResponse = {
 	data?: unknown;
 	messages?: {
-		header?: string,
-		footer?: string
-	}
+		header?: string;
+		footer?: string;
+	};
 
 	/** @default none */
 	render: 'none' | 'table' | 'string';

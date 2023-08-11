@@ -48,10 +48,9 @@ export const eager = <T>(f: Future<TaqError, T>) =>
 		mapRej((err: TaqError) => new E_TaqError(err))(f),
 	);
 
-const writeJsonFileInner = <T>(filename: string) =>
-	(data: T): Promise<string> =>
-		writeFile(filename, JSON.stringify(data, undefined, 4), { encoding: 'utf8' })
-			.then(_ => filename);
+const writeJsonFileInner = <T>(filename: string) => (data: T): Promise<string> =>
+	writeFile(filename, JSON.stringify(data, undefined, 4), { encoding: 'utf8' })
+		.then(_ => filename);
 export const writeJsonFile = writeJsonFileInterceptConfig(writeJsonFileInner);
 
 const readJsonFileInner = <T>(filename: string): Promise<T> =>
@@ -116,11 +115,11 @@ export const getArchSync = (): 'linux/arm64/v8' | 'linux/amd64' => {
 		case 'x64':
 			return 'linux/amd64';
 		default:
-			const err: TaqError = ({
+			const err: TaqError = {
 				kind: 'E_INVALID_ARCH',
 				msg: `The ${process.arch} architecture is not supported at this time.`,
 				context: process.arch,
-			});
+			};
 			throw err;
 	}
 };
@@ -184,17 +183,17 @@ export const sendAsyncJson = (msg: unknown, newline = true) => sendAsyncRes(JSON
 
 export const sendAsyncJsonErr = (msg: unknown, newline = true) => sendAsyncErr(JSON.stringify(msg), newline);
 
-export const sendJsonRes = <T>(data: T, messages?: {header?: string, footer?: string}) =>
+export const sendJsonRes = <T>(data: T, messages?: { header?: string; footer?: string }) =>
 	typeof data === 'object'
 		? sendJson({
 			data,
 			render: 'table',
-			messages
+			messages,
 		})
 		: sendJson({
 			data,
 			render: 'string',
-			messages
+			messages,
 		});
 
 export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data));
@@ -327,8 +326,8 @@ const toProxableArgs = <T>(requestArgs: Protocol.RequestArgs.t, from: (input: un
 	return from(retval);
 };
 
-const getResponse = <T extends Protocol.RequestArgs.t>(definer: pluginDefiner, defaultPluginName: string) =>
-	async (requestArgs: T) => {
+const getResponse =
+	<T extends Protocol.RequestArgs.t>(definer: pluginDefiner, defaultPluginName: string) => async (requestArgs: T) => {
 		const { taqRun } = requestArgs;
 		const i18n = await load();
 		const schema = parseSchema(i18n, definer, defaultPluginName, requestArgs);
@@ -396,6 +395,17 @@ const getResponse = <T extends Protocol.RequestArgs.t>(definer: pluginDefiner, d
 						context: requestArgs,
 					});
 				}
+				case 'runPostInstall':
+					if (schema.postInstall) {
+						const result = await execCmd(schema.postInstall);
+						if (result.stderr) {
+							return sendAsyncErr('\n' + result.stderr);
+						}
+						return sendAsyncRes('\n' + result.stdout);
+					}
+					return Promise.resolve({});
+					break;
+
 				// case 'checkRuntimeDependencies':
 				// 	return sendAsyncJson(
 				// 		schema.checkRuntimeDependencies
@@ -462,34 +472,32 @@ export const getCurrentEnvironmentConfig = (parsedArgs: Protocol.RequestArgs.t) 
 /**
  * Gets the configuration for the project metadata
  */
-export const getMetadataConfig = (parsedArgs: Protocol.RequestArgs.t) =>
-	() => (parsedArgs.config.metadata ?? undefined) as Protocol.MetadataConfig.t | undefined;
+export const getMetadataConfig = (parsedArgs: Protocol.RequestArgs.t) => () =>
+	(parsedArgs.config.metadata ?? undefined) as Protocol.MetadataConfig.t | undefined;
 
 /**
  * Gets the configuration for the named network
  */
-export const getNetworkConfig = (parsedArgs: Protocol.RequestArgs.t) =>
-	(networkName: string) =>
-		(parsedArgs.config.network![networkName] ?? undefined) as Protocol.NetworkConfig.t | undefined;
+export const getNetworkConfig = (parsedArgs: Protocol.RequestArgs.t) => (networkName: string) =>
+	(parsedArgs.config.network![networkName] ?? undefined) as Protocol.NetworkConfig.t | undefined;
 
 /**
  * Gets the configuration for the named sandbox
  */
-export const getSandboxConfig = (parsedArgs: Protocol.RequestArgs.t) =>
-	(sandboxName: string): Protocol.SandboxConfig.t | undefined =>
+export const getSandboxConfig =
+	(parsedArgs: Protocol.RequestArgs.t) => (sandboxName: string): Protocol.SandboxConfig.t | undefined =>
 		(parsedArgs.config.sandbox![sandboxName] ?? undefined) as Protocol.SandboxConfig.t | undefined;
 
 /**
  * Gets the name of accounts for the given sandbox
  */
-export const getSandboxAccountNames = (parsedArgs: Protocol.RequestArgs.t) =>
-	(sandboxName: string) => {
-		const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
+export const getSandboxAccountNames = (parsedArgs: Protocol.RequestArgs.t) => (sandboxName: string) => {
+	const sandbox = getSandboxConfig(parsedArgs)(sandboxName);
 
-		return sandbox
-			? Object.keys(sandbox.accounts ?? []).filter(accountName => accountName !== 'default')
-			: [];
-	};
+	return sandbox
+		? Object.keys(sandbox.accounts ?? []).filter(accountName => accountName !== 'default')
+		: [];
+};
 
 /**
  * Gets the account config for the named account of the given sandbox

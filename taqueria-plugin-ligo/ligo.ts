@@ -29,7 +29,7 @@ const getArbitraryLigoCmd = (
 	const processedUserArgs = userArgs.split(' ').map(arg => arg.startsWith('\\-') ? arg.substring(1) : arg).filter(arg =>
 		arg
 	);
-	const args = baseArgs.concat(processedUserArgs);
+	const args = [...baseArgs, ...processedUserArgs, '--skip-analytics']
 	const envVars = { 'DOCKER_DEFAULT_PLATFORM': 'linux/amd64' };
 	return [
 		[binary, ...args].join(' '),
