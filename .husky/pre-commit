@@ -3,7 +3,7 @@
 HUSKY=0
 
 # If there are any changed FILES, then run dprint for each file
-FILES=`git diff --cached --name-only | grep -E "\.(json|ts|tsx|css)$" || true`
+FILES=`git diff --cached --name-only | grep -E "\.(ts|tsx|css)$" || true`
 if [ ! -z "$FILES" ]; then
   for file in $FILES; do
     echo "Formatting ${file}"
