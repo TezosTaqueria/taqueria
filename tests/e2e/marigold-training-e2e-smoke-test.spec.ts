@@ -33,19 +33,16 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 
 		// compile the contract
 		const { stdout } = await execute('taq', 'compile pokeGame.jsligo', './test-project');
-		expect(stdout).toMatchInlineSnapshot(`
-       [
-         "┌───────────────────────────────┬───────────────────────────────────────────────────┐",
-         "│ Contract                      │ Artifact                                          │",
-         "├───────────────────────────────┼───────────────────────────────────────────────────┤",
-         "│ pokeGame.jsligo               │ artifacts/pokeGame.tz                             │",
-         "├───────────────────────────────┼───────────────────────────────────────────────────┤",
-         "│ pokeGame.storageList.jsligo   │ artifacts/pokeGame.default_storage.tz             │",
-         "├───────────────────────────────┼───────────────────────────────────────────────────┤",
-         "│ pokeGame.parameterList.jsligo │ artifacts/pokeGame.parameter.default_parameter.tz │",
-         "└───────────────────────────────┴───────────────────────────────────────────────────┘",
-       ]
-   `);
+		expect(stdout).toEqual([
+			'┌─────────────────┬───────────────────────────────────────────────────┐',
+			'│ Source          │ Artifact                                          │',
+			'├─────────────────┼───────────────────────────────────────────────────┤',
+			'│ pokeGame.jsligo │ artifacts/pokeGame.tz                             │',
+			'│                 │ artifacts/pokeGame.default_storage.tz             │',
+			'│                 │ artifacts/pokeGame.parameter.default_parameter.tz │',
+			'└─────────────────┴───────────────────────────────────────────────────┘',
+			'Compiled 1 contract(s) in "pokeGame.jsligo"'
+    	]);
 
 		// simulate the contract
 		const { stdout: stdout2 } = await execute(
