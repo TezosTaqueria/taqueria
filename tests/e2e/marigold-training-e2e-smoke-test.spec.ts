@@ -41,8 +41,8 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 			'│                 │ artifacts/pokeGame.default_storage.tz             │',
 			'│                 │ artifacts/pokeGame.parameter.default_parameter.tz │',
 			'└─────────────────┴───────────────────────────────────────────────────┘',
-			'Compiled 1 contract(s) in "pokeGame.jsligo"'
-    	]);
+			'Compiled 1 contract(s) in "pokeGame.jsligo"',
+		]);
 
 		// simulate the contract
 		const { stdout: stdout2 } = await execute(
