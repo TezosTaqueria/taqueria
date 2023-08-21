@@ -135,6 +135,11 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			expect(artifacts_list).toHaveLength(expectedContracts.length);
 			expectedContracts.map(contract => expect(artifacts_list).toContain(contract));
 
+			// Expect the counter-main.tz file to have the correct file owner
+			const currentUser = (await exec('whoami')).stdout.trim();
+			const fileOwnerResult = execute('ls', '-l ./test-project/artifacts/counter-main.tz', './test-project');
+			expect((await fileOwnerResult).stdout.join('\n')).toContain(fileOwnerResult);
+
 			// Cleanup
 			await cleanup();
 		});

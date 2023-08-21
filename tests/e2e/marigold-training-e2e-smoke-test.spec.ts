@@ -33,6 +33,7 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 
 		// compile the contract
 		const compileResult = await execute('taq', 'compile pokeGame.jsligo', './test-project');
+		// console.log(compileResult)
 		expect(compileResult.stdout).toEqual([
 			'┌─────────────────┬───────────────────────────────────────────────────┐',
 			'│ Source          │ Artifact                                          │',
