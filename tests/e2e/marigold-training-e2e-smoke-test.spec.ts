@@ -32,8 +32,8 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 		await writeFile('./test-project/contracts/pokeGame.parameterList.jsligo', parameters_file);
 
 		// compile the contract
-		const { stdout } = await execute('taq', 'compile pokeGame.jsligo', './test-project');
-		expect(stdout).toEqual([
+		const compileResult = await execute('taq', 'compile pokeGame.jsligo', './test-project');
+		expect(compileResult.stdout).toEqual([
 			'┌─────────────────┬───────────────────────────────────────────────────┐',
 			'│ Source          │ Artifact                                          │',
 			'├─────────────────┼───────────────────────────────────────────────────┤',
@@ -89,7 +89,6 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 		await writeFile('./test-project/contracts/unit_pokeGame.jsligo', unit_test_file);
 
 		const { stdout, stderr: _stderr } = await execute('taq', 'test unit_pokeGame.jsligo', './test-project');
-		console.log(_stderr);
 		expect(stdout).toEqual(expect.arrayContaining([expect.stringContaining('🎉 All tests passed 🎉')]));
 
 		await cleanup();

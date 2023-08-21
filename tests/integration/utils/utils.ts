@@ -35,30 +35,10 @@ export const generateTestProject = async (
 	await exec(`mv ${targetDir} ./${projectPath}`, { encoding: 'utf8' });
 
 	await checkFolderExistsWithTimeout(path.join('./', projectPath, 'package.json'));
-	await fixCorePlugin(projectPath);
 
 	await installDependencies(projectPath, packageNames, localPackages);
 
 	return projectInit;
-};
-
-const fixCorePlugin = async (projectPath: string) => {
-	// TODO: We need to come back to this.
-	//
-	// The core plugin gets installed automatically when a taqueria project is initialized.
-	// However, the version of this plugin is pulled from npmjs.com, which might be using
-	// an older version of the SDK, and that older version of the SDK might be using a version
-	// of @taqueria/protocol package that is incompatible with the development version of the
-	// taq binary, which is the version that was meant to be used by the E2E tests.
-	//
-	// To fix this, we need to do the following:
-	//
-	// 1) Uninstall the core plugin pulled from npmjs.com
-	await exec('npm uninstall @taqueria/plugin-core', { cwd: projectPath });
-
-	// 2) Install the version fo the core plugin that is built locally
-	const localCorePath = path.resolve(path.join(__dirname, '../../../', 'taqueria-plugin-core'));
-	await exec(`npm install ${localCorePath}`, { cwd: projectPath });
 };
 
 export async function getContainerName(dockerName: string): Promise<string> {
