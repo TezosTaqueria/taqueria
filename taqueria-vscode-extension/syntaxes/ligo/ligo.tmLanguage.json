@@ -1,205 +1,217 @@
 {
-	"name": "ligo",
-	"scopeName": "source.ligo",
-	"fileTypes": ["ligo", "pligo"],
-	"patterns": [
-		{ "include": "#string" },
-		{ "include": "#block_comment" },
-		{ "include": "#line_comment" },
-		{ "include": "#uppercaseidentifier" },
-		{ "include": "#attribute" },
-		{ "include": "#macro" },
-		{ "include": "#controlkeywords" },
-		{ "include": "#moduledeclaration" },
-		{ "include": "#function" },
-		{ "include": "#operators" },
-		{ "include": "#typedefinition" },
-		{ "include": "#constorvar" },
-		{ "include": "#numericliterals" },
-		{ "include": "#typeannotation" }
-	],
-	"repository": {
-		"string": {
-			"name": "string.quoted.double.ligo",
-			"begin": "\\\"",
-			"end": "\\\"",
-			"beginCaptures": {},
-			"endCaptures": {},
-			"patterns": []
-		},
-		"block_comment": {
-			"name": "comment.block.ligo",
-			"begin": "\\(\\*",
-			"end": "\\*\\)",
-			"beginCaptures": {},
-			"endCaptures": {},
-			"patterns": [{ "include": "#block_comment" }]
-		},
-		"line_comment": {
-			"name": "comment.block.ligo",
-			"begin": "\\/\\/",
-			"end": "$",
-			"beginCaptures": {},
-			"endCaptures": {},
-			"patterns": []
-		},
-		"attribute": {
-			"name": "keyword.control.attribute.ligo",
-			"match": "\\[@.*\\]",
-			"captures": {}
-		},
-		"macro": {
-			"name": "meta.preprocessor.ligo",
-			"match": "^\\#[a-zA-Z]+",
-			"captures": {}
-		},
-		"controlkeywords": {
-			"name": "keyword.control.ligo",
-			"match": "\\b(case|with|if|then|else|assert|failwith|begin|end|in|is|from|skip|block|contains|to|step|of|while|for|remove)\\b",
-			"captures": {}
-		},
-		"moduledeclaration": {
-			"match": "\\b(module)\\b",
-			"captures": { "1": { "name": "keyword.other.ligo" } }
-		},
-		"function": {
-			"match": "\\b(function)\\b\\s*\\b([a-zA-Z$_][a-zA-Z0-9$_]*)",
-			"captures": {
-				"2": { "name": "entity.name.function.ligo" },
-				"1": { "name": "keyword.other.ligo" }
-			}
-		},
-		"numericliterals": {
-			"name": "constant.numeric.ligo",
-			"match": "(\\+|\\-)?[0-9]+(n|tz|tez|mutez|)\\b",
-			"captures": {}
-		},
-		"operators": {
-			"name": "keyword.operator.ligo",
-			"match": "\\b(\\-|\\+|mod|land|lor|lxor|lsl|lsr|&&|\\|\\||>|=/=|<=|=>|<|>)\\b",
-			"captures": {}
-		},
-		"semicolon": { "match": "(;)", "captures": {} },
-		"ofkeyword": {
-			"match": "\\b(of)\\b",
-			"captures": { "1": { "name": "keyword.other.ligo" } }
-		},
-		"iskeyword": {
-			"match": "\\b(is)\\b",
-			"captures": { "1": { "name": "keyword.other.ligo" } }
-		},
-		"uppercaseidentifier": {
-			"match": "\\b([A-Z][a-zA-Z0-9_$]*)\\b",
-			"captures": { "1": { "name": "entity.name.type.ligo" } }
-		},
-		"lowercaseidentifier": {
-			"match": "\\b([a-z$_][a-zA-Z0-9$_]*)\\b",
-			"captures": { "1": { "name": "variable.ligo" } }
-		},
-		"constorvar": {
-			"match": "\\b(const|var)\\b",
-			"captures": { "1": { "name": "keyword.other.ligo" } }
-		},
-		"typedefinition": {
-			"begin": "\\b(type)\\b",
-			"end": "(?=\\b(type|recursive|module|function|end|const)\\b|;|{|^#|\\[@)",
-			"beginCaptures": { "1": { "name": "keyword.other.ligo" } },
-			"endCaptures": {},
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#iskeyword" },
-				{ "include": "#uppercaseidentifier" },
-				{ "include": "#ofkeyword" },
-				{ "include": "#typeproduct" },
-				{ "include": "#typeoperator" },
-				{ "include": "#typename" },
-				{ "include": "#typeparentheses" },
-				{ "include": "#typeint" },
-				{ "include": "#string" }
-			]
-		},
-		"typeannotation": {
-			"begin": "(:)",
-			"end": "(?=;|\\)|\\]|\\bis\\b|=|:=)",
-			"beginCaptures": { "1": { "name": "keyword.operator.ligo" } },
-			"endCaptures": {},
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#uppercaseidentifier" },
-				{ "include": "#ofkeyword" },
-				{ "include": "#typeproduct" },
-				{ "include": "#typeoperator" },
-				{ "include": "#typename" },
-				{ "include": "#typeparentheses" },
-				{ "include": "#typeint" },
-				{ "include": "#string" }
-			]
-		},
-		"typeannotationfield": {
-			"begin": "(:)",
-			"end": "(?=;|\\])",
-			"beginCaptures": { "1": { "name": "keyword.operator.ligo" } },
-			"endCaptures": {},
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#uppercaseidentifier" },
-				{ "include": "#ofkeyword" },
-				{ "include": "#typeproduct" },
-				{ "include": "#typeoperator" },
-				{ "include": "#typename" },
-				{ "include": "#typeparentheses" },
-				{ "include": "#typeint" },
-				{ "include": "#string" }
-			]
-		},
-		"typeproduct": {
-			"begin": "\\b(record)\\b\\s*(\\[)",
-			"end": "(\\])",
-			"beginCaptures": { "1": { "name": "keyword.other.ligo" } },
-			"endCaptures": {},
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#lowercaseidentifier" },
-				{ "include": "#typeannotationfield" },
-				{ "include": "#semicolon" }
-			]
-		},
-		"typeoperator": {
-			"name": "keyword.operator.ligo",
-			"match": "(->|\\.|\\||\\*)",
-			"captures": {}
-		},
-		"typename": {
-			"name": "entity.name.type.ligo",
-			"match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
-			"captures": {}
-		},
-		"typeparentheses": {
-			"begin": "(\\()",
-			"end": "(\\))",
-			"beginCaptures": {},
-			"endCaptures": {},
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#uppercaseidentifier" },
-				{ "include": "#ofkeyword" },
-				{ "include": "#typeproduct" },
-				{ "include": "#typeoperator" },
-				{ "include": "#typename" },
-				{ "include": "#typeparentheses" },
-				{ "include": "#typeint" },
-				{ "include": "#string" }
-			]
-		},
-		"typeint": {
-			"name": "constant.numeric.ligo",
-			"match": "\\b([0-9]+)\\b",
-			"captures": {}
-		}
-	}
+  "name": "ligo",
+  "scopeName": "source.ligo",
+  "fileTypes": [ "ligo", "pligo" ],
+  "patterns": [
+    { "include": "#string0" },
+    { "include": "#block_comment" },
+    { "include": "#line_comment" },
+    { "include": "#typebinder" },
+    { "include": "#uppercaseidentifier" },
+    { "include": "#attribute" },
+    { "include": "#macro" },
+    { "include": "#controlkeywords" },
+    { "include": "#moduledeclaration" },
+    { "include": "#function" },
+    { "include": "#operators" },
+    { "include": "#typedefinition" },
+    { "include": "#constorvar" },
+    { "include": "#numericliterals" },
+    { "include": "#typeannotation" }
+  ],
+  "repository": {
+    "string0": {
+      "name": "string.quoted.double.ligo",
+      "begin": "\\\"",
+      "end": "\\\"",
+      "beginCaptures": {},
+      "endCaptures": {},
+      "patterns": []
+    },
+    "block_comment": {
+      "name": "comment.block.ligo",
+      "begin": "\\(\\*",
+      "end": "\\*\\)",
+      "beginCaptures": {},
+      "endCaptures": {},
+      "patterns": [ { "include": "#block_comment" } ]
+    },
+    "line_comment": {
+      "name": "comment.block.ligo",
+      "begin": "\\/\\/",
+      "end": "$",
+      "beginCaptures": {},
+      "endCaptures": {},
+      "patterns": []
+    },
+    "attribute": {
+      "name": "keyword.control.attribute.ligo",
+      "match": "\\[@.*\\]",
+      "captures": {}
+    },
+    "macro": {
+      "name": "meta.preprocessor.ligo",
+      "match": "^\\#[a-zA-Z]+",
+      "captures": {}
+    },
+    "controlkeywords": {
+      "name": "keyword.control.ligo",
+      "match": "\\b(case|with|if|then|else|assert|failwith|begin|end|in|is|from|skip|block|contains|to|step|of|while|for|remove)\\b",
+      "captures": {}
+    },
+    "moduledeclaration": {
+      "match": "\\b(module)\\b",
+      "captures": { "1": { "name": "keyword.other.ligo" } }
+    },
+    "function": {
+      "match": "\\b(function)\\b\\s*\\b([a-zA-Z$_][a-zA-Z0-9$_]*)\\b",
+      "captures": {
+        "2": { "name": "entity.name.function.ligo" },
+        "1": { "name": "keyword.other.ligo" }
+      }
+    },
+    "numericliterals": {
+      "name": "constant.numeric.ligo",
+      "match": "\\b(\\+|\\-)?[0-9]+(n|tz|tez|mutez|)\\b",
+      "captures": {}
+    },
+    "operators": {
+      "name": "keyword.operator.ligo",
+      "match": "\\b(\\-|\\+|mod|land|lor|lxor|lsl|lsr|&&|\\|\\||>|=/=|<=|=>|<|>)\\b",
+      "captures": {}
+    },
+    "semicolon": { "match": "(;)", "captures": {} },
+    "ofkeyword": {
+      "match": "\\b(of)\\b",
+      "captures": { "1": { "name": "keyword.other.ligo" } }
+    },
+    "iskeyword": {
+      "match": "\\b(is)\\b",
+      "captures": { "1": { "name": "keyword.other.ligo" } }
+    },
+    "uppercaseidentifier": {
+      "match": "\\b([A-Z][a-zA-Z0-9_$]*)\\b",
+      "captures": { "1": { "name": "entity.name.type.ligo" } }
+    },
+    "lowercaseidentifier": {
+      "match": "\\b([a-z$_][a-zA-Z0-9$_]*)\\b",
+      "captures": { "1": { "name": "variable.ligo" } }
+    },
+    "constorvar": {
+      "match": "\\b(const|var)\\b",
+      "captures": { "1": { "name": "keyword.other.ligo" } }
+    },
+    "typebinder": {
+      "begin": "(<)\\s*(?=([a-zA-Z0-9_,]+|\\s)+>)",
+      "end": "(>)",
+      "beginCaptures": {},
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#typename" }
+      ]
+    },
+    "typedefinition": {
+      "begin": "\\b(type)\\b",
+      "end": "(?=\\b(type|recursive|module|function|end|const)\\b|;|{|^#|\\[@)",
+      "beginCaptures": { "1": { "name": "keyword.other.ligo" } },
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#iskeyword" },
+        { "include": "#uppercaseidentifier" },
+        { "include": "#ofkeyword" },
+        { "include": "#typeproduct" },
+        { "include": "#typeoperator" },
+        { "include": "#typename" },
+        { "include": "#typeparentheses" },
+        { "include": "#typeint" },
+        { "include": "#string0" }
+      ]
+    },
+    "typeannotation": {
+      "begin": "(:)",
+      "end": "(?=;|\\)|\\]|\\bis\\b|=|:=)",
+      "beginCaptures": { "1": { "name": "keyword.operator.ligo" } },
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#uppercaseidentifier" },
+        { "include": "#ofkeyword" },
+        { "include": "#typeproduct" },
+        { "include": "#typeoperator" },
+        { "include": "#typename" },
+        { "include": "#typeparentheses" },
+        { "include": "#typeint" },
+        { "include": "#string0" }
+      ]
+    },
+    "typeannotationfield": {
+      "begin": "(:)",
+      "end": "(?=;|\\])",
+      "beginCaptures": { "1": { "name": "keyword.operator.ligo" } },
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#uppercaseidentifier" },
+        { "include": "#ofkeyword" },
+        { "include": "#typeproduct" },
+        { "include": "#typeoperator" },
+        { "include": "#typename" },
+        { "include": "#typeparentheses" },
+        { "include": "#typeint" },
+        { "include": "#string0" }
+      ]
+    },
+    "typeproduct": {
+      "begin": "\\b(record)\\b\\s*(\\[)",
+      "end": "(\\])",
+      "beginCaptures": { "1": { "name": "keyword.other.ligo" } },
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#lowercaseidentifier" },
+        { "include": "#typeannotationfield" },
+        { "include": "#semicolon" }
+      ]
+    },
+    "typeoperator": {
+      "name": "keyword.operator.ligo",
+      "match": "(->|\\.|\\||\\*)",
+      "captures": {}
+    },
+    "typename": {
+      "name": "entity.name.type.ligo",
+      "match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
+      "captures": {}
+    },
+    "typeparentheses": {
+      "begin": "(\\()",
+      "end": "(\\))",
+      "beginCaptures": {},
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#uppercaseidentifier" },
+        { "include": "#ofkeyword" },
+        { "include": "#typeproduct" },
+        { "include": "#typeoperator" },
+        { "include": "#typename" },
+        { "include": "#typeparentheses" },
+        { "include": "#typeint" },
+        { "include": "#string0" }
+      ]
+    },
+    "typeint": {
+      "name": "constant.numeric.ligo",
+      "match": "\\b([0-9]+)\\b",
+      "captures": {}
+    }
+  }
 }
