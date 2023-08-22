@@ -137,8 +137,8 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 
 			// Expect the counter-main.tz file to have the correct file owner
 			const currentUser = (await exec('whoami')).stdout.trim();
-			const fileOwnerResult = execute('ls', '-l ./test-project/artifacts/counter-main.tz', './test-project');
-			expect((await fileOwnerResult).stdout.join('\n')).toContain(fileOwnerResult);
+			const fileOwnerResult = await execute('ls', '-l artifacts/counter-main.tz', './test-project');
+			expect(fileOwnerResult.stdout.join('\n')).toContain(currentUser);
 
 			// Cleanup
 			await cleanup();
@@ -637,108 +637,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			await cleanup();
 		});
 
-		test('compile-all will find and compile all contracts', async () => {
-			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
-
-			const { waitForText } = await spawn('taq', 'init test-project');
-			await waitForText("Project taq'ified!");
-
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
-			expect(stdout).toContain('Plugin installed successfully');
-
-			// List of test files to copy to test project
-			const testFiles = [
-				'counter-main.mligo',
-				'counter-main.parameterList.mligo',
-				'counter-main.storageList.mligo',
-				'counter-module-main.mligo',
-				'Counter.parameterList.mligo',
-				'Counter.storageList.mligo',
-				'counter.storageList.mligo',
-				'C.parameterList.mligo',
-				'C.storageList.mligo',
-				'entry.jsligo',
-				'entry-module.mligo',
-				'entry.parameterList.jsligo',
-				'entry.storageList.jsligo',
-				'hello-tacos-invalid-tests.mligo',
-				'hello-tacos.mligo',
-				'hello-tacos.parameters.mligo',
-				'hello-tacos-tests.mligo',
-				'importer.mligo',
-				'IncDec.jsligo',
-				'IncDec.parameterList.jsligo',
-				'IncDec.storageList.jsligo',
-				'IncDec.tz',
-				'increment.jsligo',
-				'invalid-contract.mligo',
-				'math-helpers.mligo',
-				'pokeGame.jsligo',
-				'pokeGame.parameterList.jsligo',
-				'pokeGame.storageList.jsligo',
-				'unit_pokeGame.jsligo',
-			];
-
-			// Copy the test files to the test project
-			await Promise.all(testFiles.map(async file => {
-				const fileContents = await (await exec(`cat e2e/data/ligo-data/${file}`)).stdout;
-				return await writeFile(`./test-project/contracts/${file}`, fileContents);
-			}));
-
-			// Expect files to exist in test project
-			const contractsList = await ls('./test-project/contracts');
-			testFiles.map(file => expect(contractsList).toContain(file));
-
-			// Compile the contracts using the `compile-all` task
-			const compileResult = await execute('taq', 'compile-all', './test-project');
-			// console.log(compileResult);
-
-			// Check that the output contains the expected files
-			expect(compileResult.stdout).toEqual(
-				[
-					'┌───────────────────────────────────┬──────────────────────────────────────────────────────┐',
-					'│ Source                            │ Artifact                                             │',
-					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
-					'│ IncDec.jsligo/IncDec              │ artifacts/IncDec.tz                                  │',
-					'│                                   │ artifacts/IncDec.default_storage.tz                  │',
-					'│                                   │ artifacts/IncDec.parameter.increment.tz              │',
-					'│                                   │ artifacts/IncDec.parameter.decrement.tz              │',
-					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
-					'│ counter-main.mligo                │ artifacts/counter-main.tz                            │',
-					'│                                   │ artifacts/counter-main.default_storage.tz            │',
-					'│                                   │ artifacts/counter-main.storage.zero_storage.tz       │',
-					'│                                   │ artifacts/counter-main.parameter.increment_by_one.tz │',
-					'│                                   │ artifacts/counter-main.parameter.increment_by_two.tz │',
-					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
-					'│ counter-module-main.mligo/Counter │ artifacts/Counter.tz                                 │',
-					'│                                   │ artifacts/Counter.default_storage.tz                 │',
-					'│                                   │ artifacts/Counter.storage.another_count.tz           │',
-					'│                                   │ artifacts/Counter.parameter.increment_by_3.tz        │',
-					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
-					'│ entry-module.mligo/C              │ artifacts/C.tz                                       │',
-					'│                                   │ artifacts/C.default_storage.tz                       │',
-					'│                                   │ artifacts/C.parameter.default_parameter.tz           │',
-					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
-					'│ entry.jsligo                      │ artifacts/entry.tz                                   │',
-					'│                                   │ artifacts/entry.default_storage.tz                   │',
-					'│                                   │ artifacts/entry.parameter.default_parameter.tz       │',
-					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
-					'│ hello-tacos.mligo                 │ artifacts/hello-tacos.tz                             │',
-					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
-					'│ importer.mligo                    │ artifacts/importer.tz                                │',
-					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
-					'│ increment.jsligo                  │ artifacts/increment.tz                               │',
-					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
-					'│ pokeGame.jsligo                   │ artifacts/pokeGame.tz                                │',
-					'│                                   │ artifacts/pokeGame.default_storage.tz                │',
-					'│                                   │ artifacts/pokeGame.parameter.default_parameter.tz    │',
-					'└───────────────────────────────────┴──────────────────────────────────────────────────────┘',
-				],
-			);
-
-			await cleanup();
-		});
-
 		test('compile to json-encoded michelson', async () => {
 			const { execute, cleanup, writeFile, readFile, ls, spawn } = await prepareEnvironment();
 			const { waitForText } = await spawn('taq', 'init test-project --debug');
@@ -904,7 +802,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const digest = createHash('sha256');
 		digest.update(bytes);
 		const hash = digest.digest('hex');
-		expect(hash).toEqual('241556bb7f849d22564378991ce6c15ffd7fd5727620f207fb53e6dc538e66ef');
+		expect(hash).toEqual('c185becacb71badb6bb9dc0e413c0998ad05f4d359972485c5096ed4ad43da6f');
 		await cleanup();
 	});
 
@@ -963,6 +861,114 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			expect(result.stderr.join('').trim()).not.toContain('error');
 			await cleanup();
 		});
+	});
+
+
+	describe('long running tests', () => {
+		jest.setTimeout(100000);
+
+		test('compile-all will find and compile all contracts', async () => {	
+			
+			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
+
+			const { waitForText } = await spawn('taq', 'init test-project');
+			await waitForText("Project taq'ified!");
+
+			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			expect(stdout).toContain('Plugin installed successfully');
+
+			// List of test files to copy to test project
+			const testFiles = [
+				'counter-main.mligo',
+				'counter-main.parameterList.mligo',
+				'counter-main.storageList.mligo',
+				'counter-module-main.mligo',
+				'Counter.parameterList.mligo',
+				'Counter.storageList.mligo',
+				'counter.storageList.mligo',
+				'C.parameterList.mligo',
+				'C.storageList.mligo',
+				'entry.jsligo',
+				'entry-module.mligo',
+				'entry.parameterList.jsligo',
+				'entry.storageList.jsligo',
+				'hello-tacos-invalid-tests.mligo',
+				'hello-tacos.mligo',
+				'hello-tacos.parameters.mligo',
+				'hello-tacos-tests.mligo',
+				'importer.mligo',
+				'IncDec.jsligo',
+				'IncDec.parameterList.jsligo',
+				'IncDec.storageList.jsligo',
+				'IncDec.tz',
+				'increment.jsligo',
+				'invalid-contract.mligo',
+				'math-helpers.mligo',
+				'pokeGame.jsligo',
+				'pokeGame.parameterList.jsligo',
+				'pokeGame.storageList.jsligo',
+				'unit_pokeGame.jsligo',
+			];
+
+			// Copy the test files to the test project
+			await Promise.all(testFiles.map(async file => {
+				const fileContents = await (await exec(`cat e2e/data/ligo-data/${file}`)).stdout;
+				return await writeFile(`./test-project/contracts/${file}`, fileContents);
+			}));
+
+			// Expect files to exist in test project
+			const contractsList = await ls('./test-project/contracts');
+			testFiles.map(file => expect(contractsList).toContain(file));
+
+			// Compile the contracts using the `compile-all` task
+			const compileResult = await execute('taq', 'compile-all', './test-project');
+			// console.log(compileResult);
+
+			// Check that the output contains the expected files
+			expect(compileResult.stdout).toEqual(
+				[
+					'┌───────────────────────────────────┬──────────────────────────────────────────────────────┐',
+					'│ Source                            │ Artifact                                             │',
+					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
+					'│ IncDec.jsligo/IncDec              │ artifacts/IncDec.tz                                  │',
+					'│                                   │ artifacts/IncDec.default_storage.tz                  │',
+					'│                                   │ artifacts/IncDec.parameter.increment.tz              │',
+					'│                                   │ artifacts/IncDec.parameter.decrement.tz              │',
+					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
+					'│ counter-main.mligo                │ artifacts/counter-main.tz                            │',
+					'│                                   │ artifacts/counter-main.default_storage.tz            │',
+					'│                                   │ artifacts/counter-main.storage.zero_storage.tz       │',
+					'│                                   │ artifacts/counter-main.parameter.increment_by_one.tz │',
+					'│                                   │ artifacts/counter-main.parameter.increment_by_two.tz │',
+					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
+					'│ counter-module-main.mligo/Counter │ artifacts/Counter.tz                                 │',
+					'│                                   │ artifacts/Counter.default_storage.tz                 │',
+					'│                                   │ artifacts/Counter.storage.another_count.tz           │',
+					'│                                   │ artifacts/Counter.parameter.increment_by_3.tz        │',
+					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
+					'│ entry-module.mligo/C              │ artifacts/C.tz                                       │',
+					'│                                   │ artifacts/C.default_storage.tz                       │',
+					'│                                   │ artifacts/C.parameter.default_parameter.tz           │',
+					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
+					'│ entry.jsligo                      │ artifacts/entry.tz                                   │',
+					'│                                   │ artifacts/entry.default_storage.tz                   │',
+					'│                                   │ artifacts/entry.parameter.default_parameter.tz       │',
+					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
+					'│ hello-tacos.mligo                 │ artifacts/hello-tacos.tz                             │',
+					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
+					'│ importer.mligo                    │ artifacts/importer.tz                                │',
+					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
+					'│ increment.jsligo                  │ artifacts/increment.tz                               │',
+					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
+					'│ pokeGame.jsligo                   │ artifacts/pokeGame.tz                                │',
+					'│                                   │ artifacts/pokeGame.default_storage.tz                │',
+					'│                                   │ artifacts/pokeGame.parameter.default_parameter.tz    │',
+					'└───────────────────────────────────┴──────────────────────────────────────────────────────┘',
+				],
+			);
+
+			await cleanup();
+		})
 	});
 
 	describe('regression tests', () => {

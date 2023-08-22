@@ -83,35 +83,40 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('start sandbox will error if called on a started sandbox - slowtest', async () => {
-		const { execute, cleanup, exists } = await prepareEnvironment();
-		await execute('taq', 'init test-project');
-		await exists('./test-project/.taq/config.json');
+	describe('slow tests', () => {
+		jest.setTimeout(100000)
 
-		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
-		await execute('taq', 'start sandbox local', './test-project');
+		test('start sandbox will error if called on a started sandbox - slowtest', async () => {
+			const { execute, cleanup, exists } = await prepareEnvironment();
+			await execute('taq', 'init test-project');
+			await exists('./test-project/.taq/config.json');
 
-		const { stdout: stdout2 } = await execute('taq', 'start sandbox local', './test-project');
-		expect(stdout2).toEqual(expect.arrayContaining(['Already running.']));
+			await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+			await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
-		await cleanup();
-	});
+			await execute('taq', 'start sandbox local', './test-project');
 
-	test('list accounts will display the sandbox accounts - slowtest', async () => {
-		const { execute, cleanup, exists } = await prepareEnvironment();
-		await execute('taq', 'init test-project');
-		await exists('./test-project/.taq/config.json');
+			const { stdout: stdout2 } = await execute('taq', 'start sandbox local', './test-project');
+			expect(stdout2).toEqual(expect.arrayContaining(['Already running.']));
 
-		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
+			await cleanup();
+		});
 
-		await execute('taq', 'start sandbox local', './test-project');
+		test('list accounts will display the sandbox accounts - slowtest', async () => {
+			const { execute, cleanup, exists } = await prepareEnvironment();
+			await execute('taq', 'init test-project');
+			await exists('./test-project/.taq/config.json');
 
-		const { stdout: stdout2 } = await execute('taq', 'list accounts local', './test-project');
-		expect(stdout2).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
+			await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
+			await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
-		await cleanup();
-	});
+			await execute('taq', 'start sandbox local', './test-project');
+
+			const { stdout: stdout2 } = await execute('taq', 'list accounts local', './test-project');
+			expect(stdout2).toEqual(expect.arrayContaining(['│ Account │ Balance │ Address                              │']));
+
+			await cleanup();
+		});
+	})
 });

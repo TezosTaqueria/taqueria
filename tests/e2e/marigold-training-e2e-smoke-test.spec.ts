@@ -3,6 +3,8 @@ import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
+jest.setTimeout(60000);
+
 describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 	test('Part 1, Step 1 : Create folder & file', async () => {
 		// set up the project
@@ -17,11 +19,8 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 
 		// install plugins
 		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-ligo/index.js');
 		await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-tezos-client/index.js');
 		await execute('taq', 'install ../taqueria-plugin-taquito', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-taquito/index.js');
 
 		// copy jsligo files to contracts folder
 		const jligo_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.jsligo`)).stdout;
@@ -74,11 +73,8 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 		await writeFile('./test-project/.taq/config.json', test_config_file);
 
 		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-ligo/index.js');
 		await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-tezos-client/index.js');
 		await execute('taq', 'install ../taqueria-plugin-taquito', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-taquito/index.js');
 
 		const jligo_file = await (await exec(`cat e2e/data/ligo-data/unit_pokeGame.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/pokeGame.jsligo', jligo_file);

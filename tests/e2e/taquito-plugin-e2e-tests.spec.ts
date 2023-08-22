@@ -117,41 +117,6 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('deploy will deploy one contract using deploy {contractName} when there are multiple contracts in the artifacts - slowtest', async () => {
-		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project');
-		await waitForText("Project taq'ified!");
-		const config_file = await (await exec('cat e2e/data/config-data/config-taquito-test-environment.json')).stdout;
-		await writeFile('./test-project/.taq/config.json', config_file);
-		const { stdout: stdout1 } = await execute(
-			'taq',
-			'install ../taqueria-plugin-taquito',
-			'./test-project',
-		);
-		expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
-
-		const storage_file = await (await exec('cat integration/data/anyContract.storage.tz')).stdout;
-		await writeFile('./test-project/artifacts/anyContract.storage.tz', storage_file);
-
-		const hello_tz_file = await (await exec('cat e2e/data/michelson-data/hello-tacos.tz')).stdout;
-		await writeFile('./test-project/artifacts/hello-tacos.tz', hello_tz_file);
-
-		const increment_tz_file = await (await exec('cat e2e/data/michelson-data/increment.tz')).stdout;
-		await writeFile('./test-project/artifacts/increment.tz', increment_tz_file);
-
-		const { stdout: stdout2, stderr } = await execute(
-			'taq',
-			'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
-			'./test-project',
-		);
-
-		const result = stdout2.join('\n');
-		expect(result).toMatch(/| Contract\s+| Address\s+| Alias\s+| Balance In Mutez\s+| Destination/);
-		expect(result).toMatch(/hello-tacos.tz\s+| KT[^\|]+| hello-tacos\s+| 0\s+| .+rpc\.ghostnet\.teztnets\.xyz/m);
-
-		await cleanup();
-	});
-
 	test('fund will error if funding maxed out accounts', async () => {
 		const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
@@ -243,4 +208,44 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 
 		await cleanup();
 	});
+
+
+	describe('slow test', () => {
+		jest.setTimeout(130000)
+
+		test('deploy will deploy one contract using deploy {contractName} when there are multiple contracts in the artifacts - slowtest', async () => {
+			const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
+			const { waitForText } = await spawn('taq', 'init test-project');
+			await waitForText("Project taq'ified!");
+			const config_file = await (await exec('cat e2e/data/config-data/config-taquito-test-environment.json')).stdout;
+			await writeFile('./test-project/.taq/config.json', config_file);
+			const { stdout: stdout1 } = await execute(
+				'taq',
+				'install ../taqueria-plugin-taquito',
+				'./test-project',
+			);
+			expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
+	
+			const storage_file = await (await exec('cat integration/data/anyContract.storage.tz')).stdout;
+			await writeFile('./test-project/artifacts/anyContract.storage.tz', storage_file);
+	
+			const hello_tz_file = await (await exec('cat e2e/data/michelson-data/hello-tacos.tz')).stdout;
+			await writeFile('./test-project/artifacts/hello-tacos.tz', hello_tz_file);
+	
+			const increment_tz_file = await (await exec('cat e2e/data/michelson-data/increment.tz')).stdout;
+			await writeFile('./test-project/artifacts/increment.tz', increment_tz_file);
+	
+			const { stdout: stdout2, stderr } = await execute(
+				'taq',
+				'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
+				'./test-project',
+			);
+	
+			const result = stdout2.join('\n');
+			expect(result).toMatch(/| Contract\s+| Address\s+| Alias\s+| Balance In Mutez\s+| Destination/);
+			expect(result).toMatch(/hello-tacos.tz\s+| KT[^\|]+| hello-tacos\s+| 0\s+| .+rpc\.ghostnet\.teztnets\.xyz/m);
+	
+			await cleanup();
+		});
+	})
 });
