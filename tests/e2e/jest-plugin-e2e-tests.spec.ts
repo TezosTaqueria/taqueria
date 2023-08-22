@@ -4,7 +4,6 @@ const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
 describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
-
 	test('jest will offer contextual help', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
@@ -81,9 +80,7 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 	});
 
 	describe('slow tests', () => {
-
-		jest.setTimeout(100000)
-
+		jest.setTimeout(100000);
 
 		test('test will offer contextual help - slowtest', async () => {
 			const { execute, cleanup, spawn } = await prepareEnvironment();
@@ -96,10 +93,10 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 			expect(stdout1).toEqual(expect.arrayContaining([expect.stringContaining('packages')]));
 			const { stdout: stdout2 } = await execute('npm', 'i --save-dev @types/jest', './test-project');
 			expect(stdout2).toEqual(expect.arrayContaining([expect.stringContaining('packages')]));
-	
+
 			const { stdout: stdout3 } = await execute('taq', 'test --help', './test-project');
 			expect(stdout3).toEqual(expect.arrayContaining(['Setup a directory as a partition to run Jest tests']));
-	
+
 			await cleanup();
 		});
 
@@ -135,22 +132,22 @@ describe('Jest Plugin E2E Testing for the Taqueria CLI', () => {
 			expect(stdout1).toEqual(expect.arrayContaining([expect.stringContaining('packages')]));
 			const { stdout: stdout2 } = await execute('npm', 'i --save-dev @types/jest', './test-project');
 			expect(stdout2).toEqual(expect.arrayContaining([expect.stringContaining('packages')]));
-	
+
 			const { stdout: stdout3 } = await execute('taq', 'test -i multi-file-single-test', './test-project');
 			expect(stdout3).toEqual(expect.arrayContaining(['Initialized successfully.']));
-	
+
 			const test_file_one = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-1.ts`)).stdout;
 			await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-1.spec.ts', test_file_one);
 			const test_file_two = await (await exec(`cat e2e/data/jest-data/empty-jest-test-file-2.ts`)).stdout;
 			await writeFile('./test-project/multi-file-single-test/empty-jest-test-file-2.spec.ts', test_file_two);
-	
+
 			const { stderr } = await execute('taq', 'test multi-file-single-test', './test-project');
 			expect(stderr).toEqual(expect.arrayContaining(['PASS  multi-file-single-test/empty-jest-test-file-1.spec.ts']));
 			expect(stderr).toEqual(expect.arrayContaining(['PASS  multi-file-single-test/empty-jest-test-file-2.spec.ts']));
-	
+
 			await cleanup();
 		});
-	})
+	});
 
 	test('test can be run successfully with jest plugin', async () => {
 		const { execute, cleanup, writeFile, exists, spawn } = await prepareEnvironment();

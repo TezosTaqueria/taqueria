@@ -84,8 +84,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 	});
 
 	describe('slow tests', () => {
-		jest.setTimeout(100000)
-
+		jest.setTimeout(100000);
 
 		test('start sandbox will error if called on a started sandbox - slowtest', async () => {
 			const { execute, cleanup, exists } = await prepareEnvironment();
@@ -118,5 +117,5 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 
 			await cleanup();
 		});
-	})
+	});
 });

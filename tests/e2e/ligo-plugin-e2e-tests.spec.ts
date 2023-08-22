@@ -863,12 +863,10 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		});
 	});
 
-
 	describe('long running tests', () => {
 		jest.setTimeout(100000);
 
-		test('compile-all will find and compile all contracts', async () => {	
-			
+		test('compile-all will find and compile all contracts', async () => {
 			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
 
 			const { waitForText } = await spawn('taq', 'init test-project');
@@ -968,7 +966,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			);
 
 			await cleanup();
-		})
+		});
 	});
 
 	describe('regression tests', () => {

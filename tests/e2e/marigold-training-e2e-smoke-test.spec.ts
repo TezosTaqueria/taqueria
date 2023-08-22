@@ -3,10 +3,10 @@ import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
-jest.setTimeout(60000);
+jest.setTimeout(100000);
 
 describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
-	test('Part 1, Step 1 : Create folder & file', async () => {
+	test('Part 1, Step 1 : Create folder & file - slowTest', async () => {
 		// set up the project
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
