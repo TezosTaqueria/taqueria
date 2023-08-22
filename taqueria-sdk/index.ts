@@ -59,11 +59,10 @@ const readJsonFileInner = <T>(filename: string): Promise<T> =>
 		.then(result => (result as T));
 export const readJsonFile = readJsonFileInterceptConfig(readJsonFileInner);
 
-
 export type FilteredStdErr = {
-	skip: boolean,
-	output: string[]
-}
+	skip: boolean;
+	output: string[];
+};
 
 const filterDockerImageMessages = (stderr: string) => {
 	/**
@@ -101,44 +100,41 @@ const filterDockerImageMessages = (stderr: string) => {
 	Status: Downloaded newer image for ligolang/ligo:0.71.0
 
 	In that case, we need to remove the line that starts with "Unable to find image .* locally" and that lines that follow it till (but including) the line that starts with "Downloaded newer image"
-	 */	
+	 */
 	let skip = false;
-	const filteredStderr = stderr.split("\n")
+	const filteredStderr = stderr.split('\n')
 		.filter(line => {
-		if (line.startsWith("Unable to find image")) {
-			skip = true;
-		}
-		if (skip && line.startsWith("Downloaded newer image")) {
-			skip = false;
-			return false; // Also skip the line that starts with "Downloaded newer image"
-		}
-		return !skip;
+			if (line.startsWith('Unable to find image')) {
+				skip = true;
+			}
+			if (skip && line.startsWith('Downloaded newer image')) {
+				skip = false;
+				return false; // Also skip the line that starts with "Downloaded newer image"
+			}
+			return !skip;
 		})
-		.join("\n");
-	
+		.join('\n');
+
 	return filteredStderr;
 };
-  
 
 export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdout: string; stderr: string }> =>
-  new Promise((resolve, reject) => {
-	  // Escape quotes in the command, given that we're wrapping in quotes
-	  const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
-	  exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
-		  const filteredStderr = filterDockerImageMessages(stderr); // Filter the stderr
+	new Promise((resolve, reject) => {
+		// Escape quotes in the command, given that we're wrapping in quotes
+		const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
+		exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
+			const filteredStderr = filterDockerImageMessages(stderr); // Filter the stderr
 
-		  if (err) {
-			  reject(toExecErr(err, { stderr: filteredStderr, stdout })); // Use the filtered stderr
-		  } else {
-			  resolve({
-				  stdout,
-				  stderr: filteredStderr, // Use the filtered stderr
-			  });
-		  }
-	  });
-  });
-
-
+			if (err) {
+				reject(toExecErr(err, { stderr: filteredStderr, stdout })); // Use the filtered stderr
+			} else {
+				resolve({
+					stdout,
+					stderr: filteredStderr, // Use the filtered stderr
+				});
+			}
+		});
+	});
 
 type ExecErrProps = {
 	stderr: string;
