@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/tests",
-	"version": "0.37.37",
+	"version": "0.37.38",
 	"type": "module",
 	"private": true,
 	"description": "This is Taqueria testing project includes unit, integration and e2e tests",
@@ -32,7 +32,7 @@
 		"integration",
 		"unit"
 	],
-	"author": "Jev Bjorsell",
+	"author": "Pinnacle Labs",
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/pinnacle-labs/taqueria/issues"
