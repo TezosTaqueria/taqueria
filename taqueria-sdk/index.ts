@@ -59,25 +59,92 @@ const readJsonFileInner = <T>(filename: string): Promise<T> =>
 		.then(result => (result as T));
 export const readJsonFile = readJsonFileInterceptConfig(readJsonFileInner);
 
+
+export type FilteredStdErr = {
+	skip: boolean,
+	output: string[]
+}
+
+const filterDockerImageMessages = (stderr: string) => {
+	/**
+	stderr could look like the following:
+	Unable to find image 'ligolang/ligo:0.71.0' locally
+	0.71.0: Pulling from ligolang/ligo
+	31e352740f53: Pulling fs layer
+	4f4fb700ef54: Pulling fs layer
+	d66873d3e354: Pulling fs layer
+	01000b0059ad: Pulling fs layer
+	69adc53ad7bd: Pulling fs layer
+	574acbf36bfc: Pulling fs layer
+	01000b0059ad: Waiting
+	69adc53ad7bd: Waiting
+	574acbf36bfc: Waiting
+	d66873d3e354: Verifying Checksum
+	d66873d3e354: Download complete
+	4f4fb700ef54: Verifying Checksum
+	4f4fb700ef54: Download complete
+	31e352740f53: Verifying Checksum
+	31e352740f53: Download complete
+	69adc53ad7bd: Verifying Checksum
+	69adc53ad7bd: Download complete
+	31e352740f53: Pull complete
+	574acbf36bfc: Verifying Checksum
+	574acbf36bfc: Download complete
+	4f4fb700ef54: Pull complete
+	d66873d3e354: Pull complete
+	01000b0059ad: Verifying Checksum
+	01000b0059ad: Download complete
+	01000b0059ad: Pull complete
+	69adc53ad7bd: Pull complete
+	574acbf36bfc: Pull complete
+	Digest: sha256:f70a1fb1dafa8e74237d3412e84c85eabbf8a1d539eb9c557b70e971a3adf997
+	Status: Downloaded newer image for ligolang/ligo:0.71.0
+
+	In that case, we need to remove the line that starts with "Unable to find image .* locally" and that lines that follow it till (but including) the line that starts with "Downloaded newer image"
+	 */	
+	let skip = false;
+	const filteredStderr = stderr.split("\n")
+		.filter(line => {
+		if (line.startsWith("Unable to find image")) {
+			skip = true;
+		}
+		if (skip && line.startsWith("Downloaded newer image")) {
+			skip = false;
+			return false; // Also skip the line that starts with "Downloaded newer image"
+		}
+		return !skip;
+		})
+		.join("\n");
+	
+	return filteredStderr;
+};
+  
+
 export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdout: string; stderr: string }> =>
-	new Promise((resolve, reject) => {
-		// Escape quotes in the command, given that we're wrapping in quotes
-		const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
-		exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
-			if (err) {
-				reject(toExecErr(err, { stderr, stdout }));
-			} else {
-				resolve({
-					stdout,
-					stderr,
-				});
-			}
-		});
-	});
+  new Promise((resolve, reject) => {
+	  // Escape quotes in the command, given that we're wrapping in quotes
+	  const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
+	  exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
+		  const filteredStderr = filterDockerImageMessages(stderr); // Filter the stderr
+
+		  if (err) {
+			  reject(toExecErr(err, { stderr: filteredStderr, stdout })); // Use the filtered stderr
+		  } else {
+			  resolve({
+				  stdout,
+				  stderr: filteredStderr, // Use the filtered stderr
+			  });
+		  }
+	  });
+  });
+
+
+
 type ExecErrProps = {
 	stderr: string;
 	stdout: string;
 };
+
 export const toExecErr = (message: string | Error, props: ExecErrProps): Error & ExecErrProps => {
 	const err = message instanceof Error ? message : new Error(message);
 	const retval = err as unknown as Error & ExecErrProps;
