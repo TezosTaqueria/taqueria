@@ -40,7 +40,7 @@ import crypto from 'crypto';
 import generateName from 'project-name-generator';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
-import YArgs from 'yargs'
+import YArgs from 'yargs';
 const yargs: typeof YArgs = require('yargs');
 export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
 
