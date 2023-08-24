@@ -87,15 +87,41 @@ const createBatchForOriginate = (tezos: TezosToolkit, contractsInfo: ContractInf
 			mutez: true,
 		}), tezos.wallet.batch());
 
-export const performOriginateOps = async (
+// Provide a means to clear intervals that were created but not cleaned up in either
+// Taquito or RxJS. This is a hack to prevent the program from hanging after all promises have resolved.		
+function withIntervalHack(fn: CallableFunction) {
+	return async function (...args: unknown[]) {
+		const originalSetInterval = setInterval;
+		const intervals: NodeJS.Timeout[] = [];
+
+		// Override global setInterval
+		// @ts-ignore
+		global.setInterval = (callback, delay) => {
+			const id = originalSetInterval(callback, delay);
+			intervals.push(id);
+			return id;
+		};
+
+		try {
+			return await fn(...args);
+		} finally {
+			// Clear intervals and restore original setInterval
+			intervals.forEach((id) => clearInterval(id));
+			global.setInterval = originalSetInterval;
+		}
+	};
+}
+
+const performOriginateOps = withIntervalHack((
 	tezos: TezosToolkit,
 	env: string,
 	contractsInfo: ContractInfo[],
 	maxTimeout: number,
 ): Promise<BatchWalletOperation> => {
 	const batch = createBatchForOriginate(tezos, contractsInfo);
+
 	try {
-		return await doWithin<BatchWalletOperation>(maxTimeout, async () => {
+		return doWithin<BatchWalletOperation>(maxTimeout, async () => {
 			const op = await batch.send();
 			await op.confirmation();
 			return op;
@@ -103,7 +129,8 @@ export const performOriginateOps = async (
 	} catch (err) {
 		return handleOpsError(err, env);
 	}
-};
+});
+				
 
 const prepContractInfoForDisplay = async (
 	parsedArgs: Opts,
@@ -148,6 +175,7 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 			? configureToolKitForNetwork(protocolArgs, nodeConfig, parsedArgs.sender)
 			: configureToolKitForSandbox(nodeConfig, parsedArgs.sender));
 
+		
 		const contractInfo = await getContractInfo(parsedArgs);
 
 		const op = await performOriginateOps(

@@ -53,14 +53,13 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 		// );
 
 		// deploy the contract
-		// TODO: fix
-		// const { stdout: stdout4 } = await execute(
-		// 	'taq',
-		// 	'deploy pokeGame.tz -e "testing"',
-		// 	'./test-project',
-		// );
+		const deplotResult = await execute(
+			'taq',
+			'deploy pokeGame.tz -e "testing"',
+			'./test-project',
+		);
 
-		// expect(stdout4).toContain('https://rpc.ghostnet.teztnets.xyz/')
+		expect(deplotResult.stdout.join("\n")).toContain('https://rpc.ghostnet.teztnets.xyz/')
 
 		// tear down the project
 		await cleanup();

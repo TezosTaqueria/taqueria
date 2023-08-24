@@ -40,7 +40,8 @@ import crypto from 'crypto';
 import generateName from 'project-name-generator';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
-const yargs = require('yargs');
+import YArgs from 'yargs'
+const yargs: typeof YArgs = require('yargs');
 export const TAQ_OPERATOR_ACCOUNT = 'taqOperatorAccount';
 
 export const eager = <T>(f: Future<TaqError, T>) =>
@@ -323,7 +324,7 @@ const formatArgs = (args: Record<string, string>) => {
 };
 
 // A workaround to protect all hex from being messed by yargs
-const postprocessArgs = (args: string[]): Record<string, string> => {
+const postprocessArgs = (args: typeof YArgs.argv): Record<string, string> => {
 	const postprocessedArgs = Object.entries(args).map((
 		[key, val],
 	) => [
