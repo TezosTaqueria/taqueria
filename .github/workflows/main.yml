@@ -29,7 +29,7 @@ jobs:
         uses: actions/cache/restore@v3
         with:
           path: ${{ env.DENO_DIR }}
-          key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
       - name: Build Binaries
         run: |
@@ -41,7 +41,7 @@ jobs:
         uses: actions/cache/save@v3
         with:
           path: ${{ env.DENO_DIR }}
-          key: ${{ runner.os }}-deno-${{ hashFiles('deno-lock.json') }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
       - name: Store artifacts
         uses: actions/upload-artifact@v2

@@ -19,9 +19,9 @@ if [ ! -z "$FILES" ]; then
 fi
 
 
-# Update deno-lock file for CICD caching, only when CLI sourcecode changes
+# Update deno.lock file for CICD caching, only when CLI sourcecode changes
 npx with-staged '*.ts' 'taqueria-utils' 'taqueria-protocol' 'import-map.json' -- npm run update-lock
-git add ./deno-lock.json
+git add ./deno.lock
 
 # Bump version # for alpha release
 npx lerna version patch --no-git-tag-version --no-push --yes --force-publish && git add */package*.json package*.json && git add lerna.json
