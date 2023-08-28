@@ -6,7 +6,7 @@ import * as NonEmptyString from '@taqueria/protocol/NonEmptyString';
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
-import { chain, chainRej, FutureInstance as Future, map, mapRej, resolve, reject } from 'fluture';
+import { chain, chainRej, FutureInstance as Future, map, mapRej, reject, resolve } from 'fluture';
 import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import initPlugins from './plugins.ts';
 import { EnvVars } from './taqueria-types.ts';
@@ -78,9 +78,9 @@ export const getPackageName = (projectDir: SanitizedAbsPath.t) => (pluginNameOrP
 		getPluginPackageJson(pluginNameOrPath, projectDir),
 		chainRej(err => {
 			if (isTaqError(err) && err.kind === `E_READFILE`) {
-				return resolve({name: pluginNameOrPath})
+				return resolve({ name: pluginNameOrPath });
 			}
-			return reject(err)
+			return reject(err);
 		}),
 		map(manifest => manifest.name),
 	);
