@@ -2,7 +2,8 @@ import { GenerateApiError } from './common';
 import { TypedMethod, TypedStorage, TypedType, TypedVar } from './contract-parser';
 
 type SchemaObjectType = { [name: string]: SchemaType };
-type SchemaType = string | SchemaType[] | SchemaObjectType;
+type SchemaOptionalType = { optional: true, type: SchemaType };
+type SchemaType = string | SchemaType[] | SchemaObjectType |  SchemaOptionalType | null;
 type SchemaMethods = {
 	[name: string]: {
 		params: SchemaType;
@@ -28,17 +29,38 @@ export const toSchema = (methods: TypedMethod[], storage: TypedStorage): SchemaO
 	};
 
 	const getSchemaType = (t: TypedType): SchemaType => {
-		// console.log('getSchemaType', { t });
-
-		return (t.kind === `value` && t.value ? t.value : null)
-			?? (t.kind === `array` && t.array ? [getSchemaType(t.array.item)] : null)
-			?? (t.kind === `map` && t.map ? [`map`, getSchemaType(t.map.key), getSchemaType(t.map.value)] : null)
-			?? (t.kind === `object` && t.fields ? getSchemaObjectType(t.fields) : null)
-			?? (t.kind === `unit` ? `unit` : null)
-			?? (t.kind === `never` ? `never` : null)
-			?? (t.kind === 'lambda' ? ['lambda', getSchemaType(t.lambda.arg), getSchemaType(t.lambda.ret)] : null)
-			?? `${t.raw as unknown as string}`;
-	};
+		switch (t.kind) {
+		  case 'value':
+			if (t.value) {
+				return t.optional
+					? { optional: true, type: t.value }
+					: t.value;
+			}
+			return null;
+	  
+		  case 'array':
+			return t.array ? [getSchemaType(t.array.item)] : null;
+	  
+		  case 'map':
+			return t.map ? ['map', getSchemaType(t.map.key), getSchemaType(t.map.value)] : null;
+	  
+		  case 'object':
+			return t.fields ? getSchemaObjectType(t.fields) : null;
+	  
+		  case 'unit':
+			return 'unit';
+	  
+		  case 'never':
+			return 'never';
+	  
+		  case 'lambda':
+			return ['lambda', getSchemaType(t.lambda.arg), getSchemaType(t.lambda.ret)];
+	  
+		  default:
+			return `${t.raw as unknown as string}`;
+		}
+	  };
+	  
 
 	const schemaMethods = methods.reduce((out, x) => {
 		// console.log('schemaMethods', { x });

@@ -324,4 +324,25 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 
 		await cleanup();
 	});
+
+	// See https://github.com/pinnacle-labs/taqueria/issues/1895
+	test('Assure that storages types with nested optional types generate valid TypeScript', async () => {
+		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
+		const { waitForText } = await spawn('taq', 'init test-project');
+		await waitForText("Project taq'ified!");
+
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
+		expect(stdout).toContain('Plugin installed successfully');
+
+		const tz_file =
+			await (await exec(`cat ../taqueria-plugin-contract-types/example/contracts/example-contract-storage-with-optionals.tz`))
+				.stdout;
+		await writeFile('./test-project/artifacts/example.tz', tz_file);
+
+		await execute('taq', 'generate types', './test-project');
+		const generated_types_file = path.join('./test-project', 'types', 'example.types.ts');
+
+		const typesContents = await readFile(generated_types_file);
+		expect(typesContents).toContain('board: MMap<nat, {Some: address} | null>;')
+	});
 });
