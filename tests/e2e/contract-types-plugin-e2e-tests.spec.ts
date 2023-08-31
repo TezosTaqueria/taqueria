@@ -334,15 +334,16 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-contract-types', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const tz_file =
-			await (await exec(`cat ../taqueria-plugin-contract-types/example/contracts/example-contract-storage-with-optionals.tz`))
-				.stdout;
+		const tz_file = await (await exec(
+			`cat ../taqueria-plugin-contract-types/example/contracts/example-contract-storage-with-optionals.tz`,
+		))
+			.stdout;
 		await writeFile('./test-project/artifacts/example.tz', tz_file);
 
 		await execute('taq', 'generate types', './test-project');
 		const generated_types_file = path.join('./test-project', 'types', 'example.types.ts');
 
 		const typesContents = await readFile(generated_types_file);
-		expect(typesContents).toContain('board: MMap<nat, {Some: address} | null>;')
+		expect(typesContents).toContain('board: MMap<nat, {Some: address} | null>;');
 	});
 });

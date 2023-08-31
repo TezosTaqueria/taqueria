@@ -53,7 +53,7 @@ ${tabs(indent)}`;
 
 	const typeToCode = (t: TypedType, indent: number): string => {
 		if (t.optional) {
-			return `{Some: ${typeToCode({...t, optional: false}, indent)}} | null`;
+			return `{Some: ${typeToCode({ ...t, optional: false }, indent)}} | null`;
 		}
 
 		if (options?.mode === 'defaultValue') {
