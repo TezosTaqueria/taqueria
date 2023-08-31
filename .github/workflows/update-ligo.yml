@@ -6,7 +6,6 @@ on:
     - cron:  '0 8 * * *'
   push:
     branches:
-      - master
       - main
 
 jobs:
@@ -19,12 +18,8 @@ jobs:
       with:
         path: taqueria
 
-    - name: Checkout LIGO
-      uses: actions/checkout@v2
-      with:
-        repository: 'ligolang/ligo'
-        ref: 'master'
-        path: ligo
+    - name: Clone LIGO from GitLab
+      run: git clone https://gitlab.com/ligolang/ligo.git ligo
 
     - name: Copy grammar files
       run: cp ligo/tools/ligo-syntax-highlighting/textmate/* taqueria/taqueria-vscode-extension/syntaxes/ligo/
