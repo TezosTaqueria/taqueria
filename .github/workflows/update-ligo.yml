@@ -1,0 +1,41 @@
+name: Update LIGO Grammars
+
+on:
+  schedule:
+    # Runs every day at 3am EST (which is 8am UTC)
+    - cron:  '0 8 * * *'
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  update-grammar:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Taqueria
+      uses: actions/checkout@v2
+      with:
+        path: taqueria
+
+    - name: Checkout LIGO
+      uses: actions/checkout@v2
+      with:
+        repository: 'ligolang/ligo'
+        ref: 'master'
+        path: ligo
+
+    - name: Copy grammar files
+      run: cp ligo/tools/ligo-syntax-highlighting/textmate/* taqueria/taqueria-vscode-extension/syntaxes/ligo/
+
+    - name: Check git status and commit if needed
+      run: |
+        cd taqueria
+        if [[ $(git status -s) ]]; then
+          git add -A
+          git commit -m "Updated LIGO grammars to the latest version"
+          git push
+        else
+          echo "No changes to commit"
+        fi
