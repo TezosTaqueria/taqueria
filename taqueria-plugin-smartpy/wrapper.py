@@ -14,6 +14,12 @@ found_modules = []  # To hold the found SmartPy modules
 found_contracts = []  # To hold the instantiated contract instances
 output = {}
 
+# Parse sys.argv[1] into a dict pair from JSON string
+# sys.argv[1] is a JSON string that looks like this:
+# {"sourceFile": "minimal.py", projectDir: "/Users/foo/Projects/taqueria-project", "config": {"contractsDir": "contracts", "artifactsDir": "artifacts"}}
+# The JSON string is passed in from the Taqueria plugin as the second command line argument
+input = json.loads(sys.argv[2]) if len(sys.argv) > 2 else {}
+
 example_storage_code = """import smartpy as sp
 # storage expression variables must contain the word "storage"
 default_storage = {
@@ -25,7 +31,7 @@ def log(message):
         print(message)
 
 def append_to_output(contractName, storage_expr=None, failed=False):
-    source = f"{os.path.basename(get_input_contract_abspath())}/{contractName}"
+    source = f"{get_input_contract_relpath()}/{contractName}"
     
     if contractName not in output:
         output[contractName] = {
@@ -47,7 +53,13 @@ def get_input_contract_abspath():
     return os.path.abspath(sys.argv[1])
 
 def get_input_contract_dir():
-    return os.path.dirname(get_input_contract_abspath())
+    return os.path.join(input['projectDir'], input['config']['contractsDir'])
+
+def get_input_artifacts_dir():
+    return os.path.join(input['projectDir'], input['config']['artifactsDir'])
+
+def get_input_contract_relpath():
+    return get_input_contract_abspath().replace(get_input_contract_dir(), "").lstrip("/")
 
 def get_storage_list_abspath(contractName):
     return os.path.join(get_input_contract_dir(), f"{contractName}.storageList.py")
@@ -252,14 +264,13 @@ def get_compiled_storage_filename(dir, number):
     return None
 
 def move_files():
-    artifact_dir = sys.argv[2]
     for contract_name in found_contracts:
 
         # Skip moving files if compilation was unsuccessful
         if contract_name not in output or has_output_error(contract_name):
             continue
 
-        contract_dir = os.path.join(artifact_dir, contract_name)
+        contract_dir = os.path.join(get_input_artifacts_dir(), contract_name)
         os.makedirs(contract_dir, exist_ok=True)
         temp_dir = get_scenario_output_dir(contract_name)
 
@@ -277,16 +288,13 @@ def move_files():
         for index, storage_expr in enumerate(storage_exprs.keys()):
             shutil.move(get_compiled_storage_filename(temp_dir, index), os.path.join(contract_dir, f"{contract_name}.{storage_expr}.tz"))
 
-# TODO - remove this, its just for debugging
-# Detect if vscode debugger attached
-# sys.argv.append('tests/e2e/data/smartpy-data/minimal.py')
-# sys.argv.append('.')
+        # Remove the temp directory
+        shutil.rmtree(temp_dir)
 
 # Run the user's SmartPy script to kick things off
 if len(sys.argv) > 1:
-    user_script = sys.argv[1]
     monkey_patch_contract()
-    runpy.run_path(user_script, run_name='__main__')
+    runpy.run_path(sys.argv[1], run_name='__main__')
     move_files()
     print(json.dumps(list(output.values())))
 

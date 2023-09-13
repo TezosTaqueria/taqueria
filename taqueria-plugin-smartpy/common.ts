@@ -22,14 +22,7 @@ export interface TestOpts extends RequestArgs.t {
 
 export type IntersectionOpts = SmartPyOpts & CompileOpts & CompileAllOpts & TestOpts;
 
-type UnionOpts = SmartPyOpts | CompileOpts | CompileAllOpts | TestOpts;
-
-// Should point to the latest stable version, so it needs to be updated as part of our release process.
-const SMARTPY_DEFAULT_IMAGE = 'ligolang/ligo:0.69.0';
-
-const SMARTPY_IMAGE_ENV_VAR = 'TAQ_SMARTPY_IMAGE';
-
-export const getSmartPyDockerImage = (): string => getDockerImage(SMARTPY_DEFAULT_IMAGE, SMARTPY_IMAGE_ENV_VAR);
+export type UnionOpts = SmartPyOpts | CompileOpts | CompileAllOpts | TestOpts;
 
 export const getInputFilenameAbsPath = (parsedArgs: UnionOpts, sourceFile: string): string =>
 	join(parsedArgs.config.projectDir, parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
