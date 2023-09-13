@@ -172,6 +172,7 @@ taqueria-protocol/**/*.mjs
 tests/e2e/auto-test-*
 tests/scrap
 tests/unit/taqueria-sdk/temp
+tests/e2e/data/smartpy-data/__pycache__
 
 # Packaged vscode extensions
 /**/*.vsix

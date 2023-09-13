@@ -8,8 +8,8 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
-		await execute('taq', 'install ../taqueria-plugin-smartpy-legacy', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-smartpy-legacy/index.js');
+		await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
 
 		const { stdout } = await execute('taq', 'compile --help', './test-project');
 		expect(stdout).toEqual(expect.arrayContaining(['taq compile <sourceFile>']));
@@ -17,72 +17,118 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('compile will compile one contract with compile <sourceFile> command', async () => {
-		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		await execute('taq', 'init test-project');
-		await exists('./test-project/.taq/config.json');
-		await execute('taq', 'install ../taqueria-plugin-smartpy-legacy', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-smartpy-legacy/index.js');
+	describe('test wrapper.py', () => {
 
-		const py_file = await (await exec(`cat e2e/data/smartpy-legacy-data/hello-tacos.py`)).stdout;
-		await writeFile('./test-project/contracts/hello-tacos.py', py_file);
+		test('can compile a contract that requires no initial storage', async () => {
+			const { execute, cleanup, exists, path: testProjectDir } = await prepareEnvironment();
+			const { readFile, writeFile } = require('fs').promises;
+			const pipResult = await execute('pip', 'install https://preview.smartpy.io/0.19.0a0/tezos_smartpy-0.19.0a0-py3-none-any.whl')
+			expect(pipResult.stderr).toEqual([])
 
-		const { stdout } = await execute('taq', 'compile hello-tacos.py', './test-project');
-		expect(stdout).toEqual(
-			expect.arrayContaining(['│ hello-tacos.py │ {{base}}/test-project/artifacts/hello-tacos.tz                 │']),
-		);
-		expect(stdout).toEqual(
-			expect.arrayContaining(['│                │ {{base}}/test-project/artifacts/hello-tacos.default_storage.tz │']),
-		);
+			// Copy wrapper.py and some scripts to the test project
+			await readFile('../taqueria-plugin-smartpy/wrapper.py', 'utf8').then((data: string) => {
+				return writeFile(`${testProjectDir}/wrapper.py`, data, 'utf8');
+			});
 
-		await exists(`./test-project/artifacts/hello-tacos.tz`);
-		await exists(`./test-project/artifacts/hello-tacos.default_storage.tz`);
+			await readFile(`${__dirname}/data/smartpy-data/minimal.py`, 'utf8').then((data: string) => {
+				return writeFile(`${testProjectDir}/minimal.py`, data, 'utf8');
+			});
 
-		await cleanup();
-	});
+			const wrapperResult = await execute('python', 'wrapper.py minimal.py .');
+			
+			expect(wrapperResult.stderr).toEqual([]);
+			expect(wrapperResult.stdout).toEqual(['[{"source": "minimal.py/MyContract", "artifact": "MyContract.tz"}]']);
 
-	test('compile will error if no contract', async () => {
-		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		await execute('taq', 'init test-project');
-		await exists('./test-project/.taq/config.json');
-		await execute('taq', 'install ../taqueria-plugin-smartpy-legacy', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-smartpy-legacy/index.js');
+			// Verify that artifacts exist
+			expect(await exists('MyContract/MyContract.tz')).toBe(true);
 
-		const { stdout } = await execute('taq', 'compile no_such_file.py', './test-project');
-		expect(stdout).toEqual(expect.arrayContaining(['│ no_such_file.py │ Not compiled │']));
 
-		await cleanup();
-	});
+			await cleanup();
+		});
 
-	test('test will run test on <sourceFile>', async () => {
-		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		await execute('taq', 'init test-project');
-		await exists('./test-project/.taq/config.json');
-		await execute('taq', 'install ../taqueria-plugin-smartpy-legacy', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-smartpy-legacy/index.js');
+		test('can compile a contract that requires initial storage', async () => {
+			const { execute, cleanup, exists, path: testProjectDir } = await prepareEnvironment();
+			const { readFile, writeFile } = require('fs').promises;
+			const pipResult = await execute('pip', 'install https://preview.smartpy.io/0.19.0a0/tezos_smartpy-0.19.0a0-py3-none-any.whl')
+			expect(pipResult.stderr).toEqual([])
 
-		const py_file = await (await exec(`cat e2e/data/smartpy-legacy-data/hello-tacos.py`)).stdout;
-		await writeFile('./test-project/contracts/hello-tacos.py', py_file);
+			// Copy wrapper.py and some scripts to the test project
+			await readFile('../taqueria-plugin-smartpy/wrapper.py', 'utf8').then((data: string) => {
+				return writeFile(`${testProjectDir}/wrapper.py`, data, 'utf8');
+			});
 
-		const { stdout } = await execute('taq', 'test hello-tacos.py', './test-project');
-		expect(stdout).toEqual(expect.arrayContaining(['│ hello-tacos.py │ 🎉 All tests passed 🎉 │']));
+			await readFile(`${__dirname}/data/smartpy-data/chess.py`, 'utf8').then((data: string) => {
+				return writeFile(`${testProjectDir}/chess.py`, data, 'utf8');
+			});
 
-		await cleanup();
-	});
+			/*********** Test that missing storageList files produce a warning  ***********/
 
-	test('test will show fails on test file with fails', async () => {
-		const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
-		await execute('taq', 'init test-project');
-		await exists('./test-project/.taq/config.json');
-		await execute('taq', 'install ../taqueria-plugin-smartpy-legacy', './test-project');
-		await exists('./test-project/node_modules/@taqueria/plugin-smartpy-legacy/index.js');
+			const wrapperResult = await execute('python', 'wrapper.py chess.py .');
+			
+			// Expect compilation to fail due to missing a storageList file
+			expect(wrapperResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
+			expect(wrapperResult.stderr).toEqual([
+				"Warning: Contract Chess requires initial storage to be specified as an expression in the Chess.storageList.py file, which cannot be found. Here's an example:",
+				'import smartpy as sp',
+				'# storage expression variables must contain the word "storage"',
+				'default_storage = {',
+				'"count": sp.int(0)',
+				'}'
+			  ])
 
-		const py_file = await (await exec(`cat e2e/data/smartpy-legacy-data/hello-tacos-failed-tests.py`)).stdout;
-		await writeFile('./test-project/contracts/hello-tacos-failed-tests.py', py_file);
+			/*********** Test that empty storageList files produce a warning  ***********/
+			// Copy an empty storageList.py file to the test project
+			await readFile(`${__dirname}/data/smartpy-data/Chess.empty_storageList.py`, 'utf8').then((data: string) => {
+				return writeFile(`${testProjectDir}/Chess.storageList.py`, data, 'utf8');
+			});
 
-		const { stdout } = await execute('taq', 'test hello-tacos-failed-tests.py', './test-project');
-		expect(stdout).toEqual(expect.arrayContaining(['│ hello-tacos-failed-tests.py │ Some tests failed :( │']));
+			// Run the wrapper again
+			const emptyResult = await execute('python', 'wrapper.py chess.py .');
+			expect(emptyResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
+			expect(emptyResult.stderr).toEqual([
+				"Warning: Contract Chess requires initial storage to be specified as an expression in the Chess.storageList.py file. Here's an example:",
+				'import smartpy as sp',
+				'# storage expression variables must contain the word "storage"',
+				'default_storage = {',
+				'"count": sp.int(0)',
+				'}'
+			  ]);
+			
 
-		await cleanup();
+			/*********** Test that an invalid storageList results in no compilation  ***********/
+			// Copy an invalid storageList.py file to the test project
+			await readFile(`${__dirname}/data/smartpy-data/Chess.invalid_storageList.py`, 'utf8').then((data: string) => {
+				return writeFile(`${testProjectDir}/Chess.storageList.py`, data, 'utf8');
+			});
+
+			// Run the wrapper again
+			const invalidResult = await execute('python', 'wrapper.py chess.py .');
+			expect(invalidResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
+			expect(invalidResult.stderr).toEqual([
+				'Warning: Contract Chess failed to compile using the initial storage expression called default_storage.'
+			]);
+			
+			/*********** Test that a valid storageList files work as expected  ***********/
+
+			// Copy the storageList.py file to the test project
+			await readFile(`${__dirname}/data/smartpy-data/Chess.storageList.py`, 'utf8').then((data: string) => {
+				return writeFile(`${testProjectDir}/Chess.storageList.py`, data, 'utf8');
+			});
+			
+			// Run the wrapper again
+			const result = await execute('python', 'wrapper.py chess.py .');
+			expect(result.stderr).toEqual([]);
+			expect(result.stdout).toEqual([
+				'[{"source": "chess.py/Chess", "artifact": "Chess.tz\\nChess.default_storage.tz\\nChess.other_storage.tz"}]'
+			])
+
+			// Expect artifacts to exist
+			expect(await exists('Chess/Chess.tz')).toBe(true);
+			expect(await exists('Chess/Chess.default_storage.tz')).toBe(true);
+			expect(await exists('Chess/Chess.other_storage.tz')).toBe(true);
+
+			await cleanup();
+
+		});
 	});
 });
