@@ -32,6 +32,60 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 	});
 
 	describe('test compile wrapper.py', () => {
+		const filterDockerImageMessages = (stderr: string[]) => {
+			/**
+			stderr could look like the following:
+			Unable to find image 'ligolang/ligo:0.71.0' locally
+			0.71.0: Pulling from ligolang/ligo
+			31e352740f53: Pulling fs layer
+			4f4fb700ef54: Pulling fs layer
+			d66873d3e354: Pulling fs layer
+			01000b0059ad: Pulling fs layer
+			69adc53ad7bd: Pulling fs layer
+			574acbf36bfc: Pulling fs layer
+			01000b0059ad: Waiting
+			69adc53ad7bd: Waiting
+			574acbf36bfc: Waiting
+			d66873d3e354: Verifying Checksum
+			d66873d3e354: Download complete
+			4f4fb700ef54: Verifying Checksum
+			4f4fb700ef54: Download complete
+			31e352740f53: Verifying Checksum
+			31e352740f53: Download complete
+			69adc53ad7bd: Verifying Checksum
+			69adc53ad7bd: Download complete
+			31e352740f53: Pull complete
+			574acbf36bfc: Verifying Checksum
+			574acbf36bfc: Download complete
+			4f4fb700ef54: Pull complete
+			d66873d3e354: Pull complete
+			01000b0059ad: Verifying Checksum
+			01000b0059ad: Download complete
+			01000b0059ad: Pull complete
+			69adc53ad7bd: Pull complete
+			574acbf36bfc: Pull complete
+			Digest: sha256:f70a1fb1dafa8e74237d3412e84c85eabbf8a1d539eb9c557b70e971a3adf997
+			Status: Downloaded newer image for ligolang/ligo:0.71.0
+		
+			In that case, we need to remove the line that starts with "Unable to find image .* locally" and that lines that follow it till (but including) the line that starts with "Downloaded newer image"
+			 */
+			let skip = false;
+			const filteredStderr = stderr
+				.filter(line => {
+					if (line.startsWith('Unable to find image')) {
+						skip = true;
+					}
+					if (skip && line.startsWith('Downloaded newer image')) {
+						skip = false;
+						return false; // Also skip the line that starts with "Downloaded newer image"
+					}
+					return !skip;
+				})
+		
+			return filteredStderr;
+		};
+
+
 		test('can compile a contract that requires no initial storage', async () => {
 			const { execute, cleanup, exists, makeDir, path: testProjectDir } = await prepareEnvironment();
 			const { readFile, writeFile } = require('fs').promises;
@@ -64,7 +118,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			});
 
 			const wrapperResult = await execute('python', `wrapper.py ${testProjectDir}/contracts/minimal.py ${parsedArgs}`);
-			expect(wrapperResult.stderr).toEqual([]);
+			expect(filterDockerImageMessages(wrapperResult.stderr)).toEqual([]);
 			expect(wrapperResult.stdout).toEqual([
 				'[{"source": "minimal.py/MyContract", "artifact": "MyContract.tz\\nMyContract.json"}]',
 			]);
@@ -113,7 +167,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 			// Expect compilation to fail due to missing a storageList file
 			expect(wrapperResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
-			expect(wrapperResult.stderr).toEqual([
+			expect(filterDockerImageMessages(wrapperResult.stderr)).toEqual([
 				"Warning: Contract Chess requires initial storage to be specified as an expression in the Chess.storageList.py file, which cannot be found. Here's an example:",
 				'import smartpy as sp',
 				'# storage expression variables must contain the word "storage"',
@@ -131,7 +185,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			// Run the wrapper again
 			const emptyResult = await execute('python', `wrapper.py ${testProjectDir}/contracts/chess.py ${parsedArgs}`);
 			expect(emptyResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
-			expect(emptyResult.stderr).toEqual([
+			expect(filterDockerImageMessages(emptyResult.stderr)).toEqual([
 				"Warning: Contract Chess requires initial storage to be specified as an expression in the Chess.storageList.py file. Here's an example:",
 				'import smartpy as sp',
 				'# storage expression variables must contain the word "storage"',
@@ -149,7 +203,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			// Run the wrapper again
 			const invalidResult = await execute('python', `wrapper.py ${testProjectDir}/contracts/chess.py ${parsedArgs}`);
 			expect(invalidResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
-			expect(invalidResult.stderr).toEqual([
+			expect(filterDockerImageMessages(invalidResult.stderr)).toEqual([
 				'Warning: Contract Chess failed to compile using the initial storage expression called default_storage.',
 			]);
 
@@ -162,7 +216,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 			// Run the wrapper again
 			const result = await execute('python', `wrapper.py ${testProjectDir}/contracts/chess.py ${parsedArgs}`);
-			expect(result.stderr).toEqual([]);
+			expect(filterDockerImageMessages(result.stderr)).toEqual([]);
 			expect(result.stdout).toEqual([
 				'[{"source": "chess.py/Chess", "artifact": "Chess.tz\\nChess.json\\nChess.default_storage.tz\\nChess.other_storage.tz"}]',
 			]);
