@@ -66,7 +66,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			574acbf36bfc: Pull complete
 			Digest: sha256:f70a1fb1dafa8e74237d3412e84c85eabbf8a1d539eb9c557b70e971a3adf997
 			Status: Downloaded newer image for ligolang/ligo:0.71.0
-		
+
 			In that case, we need to remove the line that starts with "Unable to find image .* locally" and that lines that follow it till (but including) the line that starts with "Downloaded newer image"
 			 */
 			let skip = false;
@@ -80,11 +80,10 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 						return false; // Also skip the line that starts with "Downloaded newer image"
 					}
 					return !skip;
-				})
-		
+				});
+
 			return filteredStderr;
 		};
-
 
 		test('can compile a contract that requires no initial storage', async () => {
 			const { execute, cleanup, exists, makeDir, path: testProjectDir } = await prepareEnvironment();
