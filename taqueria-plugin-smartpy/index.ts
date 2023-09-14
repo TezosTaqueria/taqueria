@@ -32,4 +32,5 @@ Plugin.create(i18n => ({
 		}),
 	],
 	proxy: main,
+	postInstall: `node ${__dirname}/postinstall.js`
 }), process.argv);
