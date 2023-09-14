@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/node-sdk",
-	"version": "0.39.10",
+	"version": "0.39.11",
 	"description": "A TypeScript SDK for NodeJS used for Taqueria plugin development.",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -34,7 +34,7 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/protocol": "^0.39.10",
+		"@taqueria/protocol": "^0.39.11",
 		"@taquito/signer": "^15.0.0",
 		"@taquito/taquito": "^15.0.0",
 		"@taquito/utils": "^15.0.0",
