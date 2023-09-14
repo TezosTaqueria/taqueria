@@ -18,7 +18,20 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	describe('test wrapper.py', () => {
+	test('compile-all will offer contextual help', async () => {
+		const { execute, cleanup, exists } = await prepareEnvironment();
+		await execute('taq', 'init test-project');
+		await exists('./test-project/.taq/config.json');
+		await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
+		await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
+
+		const { stdout } = await execute('taq', 'compile-all --help', './test-project');
+		expect(stdout).toEqual(expect.arrayContaining(['taq compile-all']));
+
+		await cleanup();
+	});
+
+	describe('test compile wrapper.py', () => {
 		test('can compile a contract that requires no initial storage', async () => {
 			const { execute, cleanup, exists, makeDir, path: testProjectDir } = await prepareEnvironment();
 			const { readFile, writeFile } = require('fs').promises;
@@ -29,8 +42,8 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			expect(pipResult.stderr).toEqual([]);
 
 			// Mimic the structure of a Taqueria project
-			await makeDir('artifacts')
-			await makeDir('contracts')
+			await makeDir('artifacts');
+			await makeDir('contracts');
 
 			// Create JSON string of parsedArgs
 			const parsedArgs = JSON.stringify({
@@ -38,7 +51,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				config: {
 					contractsDir: 'contracts',
 					artifactsDir: 'artifacts',
-				}
+				},
 			});
 
 			// Copy wrapper.py and some scripts to the test project
@@ -52,10 +65,11 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 			const wrapperResult = await execute('python', `wrapper.py ${testProjectDir}/contracts/minimal.py ${parsedArgs}`);
 			expect(wrapperResult.stderr).toEqual([]);
-			expect(wrapperResult.stdout).toEqual(['[{"source": "minimal.py/MyContract", "artifact": "MyContract.tz"}]']);
+			expect(wrapperResult.stdout).toEqual(['[{"source": "minimal.py/MyContract", "artifact": "MyContract.tz\\nMyContract.json"}]']);
 
 			// Verify that artifacts exist
 			expect(await exists('artifacts/MyContract/MyContract.tz')).toBe(true);
+			expect(await exists('artifacts/MyContract/MyContract.json')).toBe(true);
 
 			await cleanup();
 		});
@@ -70,8 +84,8 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			expect(pipResult.stderr).toEqual([]);
 
 			// Mimic the structure of a Taqueria project
-			await makeDir('artifacts')
-			await makeDir('contracts')
+			await makeDir('artifacts');
+			await makeDir('contracts');
 
 			// Create JSON string of parsedArgs
 			const parsedArgs = JSON.stringify({
@@ -79,7 +93,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				config: {
 					contractsDir: 'contracts',
 					artifactsDir: 'artifacts',
-				}
+				},
 			});
 
 			// Copy wrapper.py and some scripts to the test project
@@ -148,7 +162,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			const result = await execute('python', `wrapper.py ${testProjectDir}/contracts/chess.py ${parsedArgs}`);
 			expect(result.stderr).toEqual([]);
 			expect(result.stdout).toEqual([
-				'[{"source": "chess.py/Chess", "artifact": "Chess.tz\\nChess.default_storage.tz\\nChess.other_storage.tz"}]',
+				'[{"source": "chess.py/Chess", "artifact": "Chess.tz\\nChess.json\\nChess.default_storage.tz\\nChess.other_storage.tz"}]',
 			]);
 
 			// Expect artifacts to exist
@@ -159,4 +173,136 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			await cleanup();
 		});
 	});
+
+	describe('test compile task', () => {
+		test('can compile a single contract', async () => {
+			const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
+			const { readFile } = require('fs').promises;
+		
+			// Initialize project
+			await execute('taq', 'init test-project');
+			await exists('./test-project/.taq/config.json');
+			await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
+			await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
+
+			// Copy contracts to the test project
+			await readFile(`${__dirname}/data/smartpy-data/minimal.py`, 'utf8').then((data: string) => {
+				return writeFile(`./test-project/contracts/minimal.py`, data);
+			});
+			await readFile(`${__dirname}/data/smartpy-data/chess.py`, 'utf8').then((data: string) => {
+				return writeFile(`./test-project/contracts/chess.py`, data);
+			});
+			await readFile(`${__dirname}/data/smartpy-data/Chess.storageList.py`, 'utf8').then((data: string) => {
+				return writeFile(`./test-project/contracts/Chess.storageList.py`, data);
+			});
+			
+			// Compile the minimal contract
+			const { stdout, stderr } = await execute('taq', 'compile minimal.py', './test-project');
+			expect(stderr).toEqual([]);
+			expect(stdout).toEqual([
+				'┌───────────────────────┬─────────────────┐',
+				'│ Source                │ Artifact        │',
+				'├───────────────────────┼─────────────────┤',
+				'│ minimal.py/MyContract │ MyContract.tz   │',
+				'│                       │ MyContract.json │',
+				'└───────────────────────┴─────────────────┘',
+				'Compiled 1 contract(s) in "minimal.py"'
+			]);
+
+			// Verify that artifacts exist
+			expect(await exists('artifacts/MyContract/MyContract.tz')).toBe(true);
+			expect(await exists('artifacts/MyContract/MyContract.json')).toBe(true);
+
+			// Clean up
+			await cleanup();
+		})
+
+		test('can compile all contracts', async () => {
+			const { execute, cleanup, exists, writeFile, ls } = await prepareEnvironment();
+			const { readFile } = require('fs').promises;
+
+			// Initialize project
+			await execute('taq', 'init test-project');
+			await exists('./test-project/.taq/config.json');
+			await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
+			await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
+
+			// Copy contracts to the test project
+			await Promise.all(['minimal.py', 'chess.py', 'Chess.storageList.py'].map(async (contract) => {
+				await readFile(`${__dirname}/data/smartpy-data/${contract}`, 'utf8').then((data: string) => {
+					return writeFile(`./test-project/contracts/${contract}`, data);
+				});
+			}));
+
+			// Compile all contracts
+			const { stdout, stderr } = await execute('taq', 'compile-all', './test-project');
+			expect(stderr).toEqual([]);
+			expect(stdout).toEqual([
+				'┌───────────────────────┬──────────────────────────┐',
+				'│ Source                │ Artifact                 │',
+				'├───────────────────────┼──────────────────────────┤',
+				'│ chess.py/Chess        │ Chess.tz                 │',
+				'│                       │ Chess.json               │',
+				'│                       │ Chess.default_storage.tz │',
+				'│                       │ Chess.other_storage.tz   │',
+				'├───────────────────────┼──────────────────────────┤',
+				'│ minimal.py/MyContract │ MyContract.tz            │',
+				'│                       │ MyContract.json          │',
+				'└───────────────────────┴──────────────────────────┘',
+				'Compiled 2 contract(s)."'
+			]);
+
+			// Verify that artifacts exist
+			expect(await exists('./test-project/artifacts/MyContract/MyContract.tz')).toBe(true);
+			expect(await exists('./test-project/artifacts/MyContract/MyContract.json')).toBe(true);
+			expect(await exists('./test-project/artifacts/Chess/Chess.tz')).toBe(true);
+			expect(await exists('./test-project/artifacts/Chess/Chess.json')).toBe(true);
+			expect(await exists('./test-project/artifacts/Chess/Chess.default_storage.tz')).toBe(true);
+			expect(await exists('./test-project/artifacts/Chess/Chess.other_storage.tz')).toBe(true);
+
+			// Clean up
+			await cleanup();
+		})
+	})
+
+	describe('test task', () => {
+		test('can test a contract', async () => {
+			const { execute, cleanup, exists, writeFile, ls } = await prepareEnvironment();
+			const { readFile } = require('fs').promises;
+
+			// Initialize project
+			await execute('taq', 'init test-project');
+			await exists('./test-project/.taq/config.json');
+			await execute('taq', 'install ../taqueria-plugin-smartpy', './test-project');
+			await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
+
+			// Copy contracts to the test project
+			await Promise.all(['minimal.py', 'chess.py', 'Chess.storageList.py'].map(async (contract) => {
+				await readFile(`${__dirname}/data/smartpy-data/${contract}`, 'utf8').then((data: string) => {
+					return writeFile(`./test-project/contracts/${contract}`, data);
+				});
+			}));
+
+			// Test the minimal contract
+			const { stdout, stderr } = await execute('taq', 'test minimal.py', './test-project');
+			expect(stderr).toEqual([]);
+			expect(stdout).toEqual(expect.arrayContaining([
+				'┌────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐',
+				'│ Test       │ Results                                                                                                                   │',
+				'├────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤',
+				'│ minimal.py │ === Minimal/log.txt ===                                                                                                   │',
+				'│            │ Comment...                                                                                                                │',
+				'│            │  h1: Minimal                                                                                                              │',
+				'│            │ Creating contract KT1TezoooozzSmartPyzzSTATiCzzzwwBFA1                                                                    │',
+				'│            │  -> Unit                                                                                                                  │',
+			  ]));
+			  
+
+			// Assure that the log file exists
+			expect(await exists('./test-project/artifacts/Minimal/log.txt')).toBe(true);
+
+			// Clean up
+			await cleanup();
+		})
+	})
 });

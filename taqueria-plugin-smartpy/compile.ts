@@ -8,32 +8,23 @@ import {
 	sendRes,
 	sendWarn,
 } from '@taqueria/node-sdk';
-import { access, readFile, writeFile } from 'fs/promises';
-import { basename, extname, join } from 'path';
 import os from 'os';
+import { join } from 'path';
 import {
 	CompileOpts as Opts,
 	emitExternalError,
 	getInputFilenameAbsPath,
 	getInputFilenameRelPath,
-	UnionOpts,
+	isSmartPyFile,
+	isParameterListFile,
+	isStorageListFile,
+	TableRow,
+	getCmdEnvVars
 } from './common';
-
-export type TableRow = { source: string; artifact: string };
 
 export type ExprKind = 'storage' | 'default_storage' | 'parameter';
 
-const COMPILE_ERR_MSG: string = 'Not compiled';
-
-export const isSmartPyFile = (sourceFile: string) =>
-	sourceFile.endsWith('.py')
-
-export const isStorageListFile = (sourceFile: string): boolean =>
-	/.+\.(storageList)\.py$/.test(sourceFile);
-
-export const isParameterListFile = (sourceFile: string): boolean =>
-	/.+\.(parameterList)\.py$/.test(sourceFile);
-
+export const COMPILE_ERR_MSG: string = 'Not compiled';
 
 const extractExt = (path: string): string => {
 	const matchResult = path.match(/\.py$/);
@@ -45,24 +36,17 @@ const removeExt = (path: string): string => {
 	return path.replace(extRegex, '');
 };
 
-const getCompileCmdEnvVars = (parsedArgs: Opts): string => {
-	const retval: Record<string, unknown> = {
-		'SMARTPY_OUTPUT_DIR': join(os.tmpdir(), `tempDir_${Date.now()}`)
-	}
-	if (parsedArgs.debug) retval['TAQ_DEBUG'] = 1;
-	return Object.entries(retval).reduce((acc, [key, val]) => acc.length > 0 ? `${acc} ${key}=${val} ` : acc, '');
-}
-
 const getCompileContractCmd = async (parsedArgs: Opts, sourceFile: string): Promise<string> => {
 	const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 	if (!projectDir) throw new Error(`No project directory provided`);
-	const artifactsDir = getArtifactsDir(parsedArgs);
-	const envVars = getCompileCmdEnvVars(parsedArgs);
-	const cmd = `${envVars}python ${__dirname}/wrapper.py ${getInputFilenameAbsPath(parsedArgs, sourceFile)} '${JSON.stringify(parsedArgs)}'`;
+	const envVars = getCmdEnvVars(parsedArgs);
+	const cmd = `${envVars}python ${__dirname}/wrapper.py ${getInputFilenameAbsPath(parsedArgs, sourceFile)} '${
+		JSON.stringify(parsedArgs)
+	}'`;
 	return cmd;
 };
 
-const compileContract = async (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
+export const compileContract = async (parsedArgs: Opts, sourceFile: string): Promise<TableRow[]> => {
 	try {
 		const cmd = await getCompileContractCmd(parsedArgs, sourceFile);
 		const { stderr, stdout } = await execCmd(cmd);
@@ -91,7 +75,11 @@ export const compile = async (parsedArgs: Opts): Promise<void> => {
 
 	try {
 		const data = await compileContract(parsedArgs, sourceFile);
-		sendJsonRes(data, { footer: `\nCompiled ${data.filter(result => result.artifact != 'Not Compiled').length} contract(s) in "${sourceFile}"` });
+		sendJsonRes(data, {
+			footer: `\nCompiled ${
+				data.filter(result => result.artifact != COMPILE_ERR_MSG).length
+			} contract(s) in "${sourceFile}"`,
+		});
 	} catch (err) {
 		sendErr(`Error processing "${sourceFile}": ${err}`);
 	}

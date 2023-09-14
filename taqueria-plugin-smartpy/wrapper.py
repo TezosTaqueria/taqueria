@@ -36,7 +36,7 @@ def append_to_output(contractName, storage_expr=None, failed=False):
     if contractName not in output:
         output[contractName] = {
             "source": source,
-            "artifact": f"{contractName}.tz"
+            "artifact": f"{contractName}.tz\n{contractName}.json"
         }
         
     if storage_expr is not None:
