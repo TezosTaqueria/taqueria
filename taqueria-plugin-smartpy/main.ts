@@ -1,4 +1,4 @@
-import { CompileOpts, SmartPyOpts, CompileAllOpts, TestOpts } from './common';
+import { CompileAllOpts, CompileOpts, SmartPyOpts, TestOpts } from './common';
 
 import { RequestArgs, sendAsyncErr } from '@taqueria/node-sdk';
 import compile from './compile';

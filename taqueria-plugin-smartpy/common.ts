@@ -1,8 +1,8 @@
 import { getDockerImage, sendErr } from '@taqueria/node-sdk';
 import { ProxyTaskArgs, RequestArgs } from '@taqueria/node-sdk/types';
-import { join } from 'path';
+import { mkdirSync, writeFileSync } from 'fs';
 import os from 'os';
-import {mkdirSync, writeFileSync} from 'fs'
+import { join } from 'path';
 
 export interface SmartPyOpts extends ProxyTaskArgs.t {
 	command: string;
@@ -46,15 +46,18 @@ export const isParameterListFile = (sourceFile: string): boolean => /.+\.(parame
 
 export const getSmartPyTempDir = (() => {
 	// Utilize once and done memoization
-	let computedValue: string|undefined = undefined
+	let computedValue: string | undefined = undefined;
 	return (parsedArgs: UnionOpts): string => {
 		if (computedValue === undefined) {
-			computedValue = join(parsedArgs.projectDir, parsedArgs.config.artifactsDir ?? 'artifacts', `.tempDir_${Date.now()}`)
+			computedValue = join(
+				parsedArgs.projectDir,
+				parsedArgs.config.artifactsDir ?? 'artifacts',
+				`.tempDir_${Date.now()}`,
+			);
 		}
-		return computedValue!
-	}
-})()
-
+		return computedValue!;
+	};
+})();
 
 export const getCmdEnvVars = (parsedArgs: UnionOpts): string => {
 	const retval: Record<string, unknown> = {
@@ -63,6 +66,6 @@ export const getCmdEnvVars = (parsedArgs: UnionOpts): string => {
 
 	if (parsedArgs.debug) retval['TAQ_DEBUG'] = 1;
 	return Object.entries(retval)
-    .map(([key, val]) => `${key}=${val}`)
-    .join(' ') + ' ';
+		.map(([key, val]) => `${key}=${val}`)
+		.join(' ') + ' ';
 };

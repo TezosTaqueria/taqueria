@@ -65,7 +65,9 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 			const wrapperResult = await execute('python', `wrapper.py ${testProjectDir}/contracts/minimal.py ${parsedArgs}`);
 			expect(wrapperResult.stderr).toEqual([]);
-			expect(wrapperResult.stdout).toEqual(['[{"source": "minimal.py/MyContract", "artifact": "MyContract.tz\\nMyContract.json"}]']);
+			expect(wrapperResult.stdout).toEqual([
+				'[{"source": "minimal.py/MyContract", "artifact": "MyContract.tz\\nMyContract.json"}]',
+			]);
 
 			// Verify that artifacts exist
 			expect(await exists('artifacts/MyContract/MyContract.tz')).toBe(true);
@@ -178,7 +180,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		test('can compile a single contract', async () => {
 			const { execute, cleanup, exists, writeFile } = await prepareEnvironment();
 			const { readFile } = require('fs').promises;
-		
+
 			// Initialize project
 			await execute('taq', 'init test-project');
 			await exists('./test-project/.taq/config.json');
@@ -195,7 +197,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			await readFile(`${__dirname}/data/smartpy-data/Chess.storageList.py`, 'utf8').then((data: string) => {
 				return writeFile(`./test-project/contracts/Chess.storageList.py`, data);
 			});
-			
+
 			// Compile the minimal contract
 			const { stdout, stderr } = await execute('taq', 'compile minimal.py', './test-project');
 			expect(stderr).toEqual([]);
@@ -206,7 +208,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				'│ minimal.py/MyContract │ MyContract.tz   │',
 				'│                       │ MyContract.json │',
 				'└───────────────────────┴─────────────────┘',
-				'Compiled 1 contract(s) in "minimal.py"'
+				'Compiled 1 contract(s) in "minimal.py"',
 			]);
 
 			// Verify that artifacts exist
@@ -215,7 +217,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 			// Clean up
 			await cleanup();
-		})
+		});
 
 		test('can compile all contracts', async () => {
 			const { execute, cleanup, exists, writeFile, ls } = await prepareEnvironment();
@@ -228,7 +230,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
 
 			// Copy contracts to the test project
-			await Promise.all(['minimal.py', 'chess.py', 'Chess.storageList.py'].map(async (contract) => {
+			await Promise.all(['minimal.py', 'chess.py', 'Chess.storageList.py'].map(async contract => {
 				await readFile(`${__dirname}/data/smartpy-data/${contract}`, 'utf8').then((data: string) => {
 					return writeFile(`./test-project/contracts/${contract}`, data);
 				});
@@ -249,7 +251,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				'│ minimal.py/MyContract │ MyContract.tz            │',
 				'│                       │ MyContract.json          │',
 				'└───────────────────────┴──────────────────────────┘',
-				'Compiled 2 contract(s)."'
+				'Compiled 2 contract(s)."',
 			]);
 
 			// Verify that artifacts exist
@@ -262,8 +264,8 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 			// Clean up
 			await cleanup();
-		})
-	})
+		});
+	});
 
 	describe('test task', () => {
 		test('can test a contract', async () => {
@@ -277,7 +279,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			await exists('./test-project/node_modules/@taqueria/plugin-smartpy/index.js');
 
 			// Copy contracts to the test project
-			await Promise.all(['minimal.py', 'chess.py', 'Chess.storageList.py'].map(async (contract) => {
+			await Promise.all(['minimal.py', 'chess.py', 'Chess.storageList.py'].map(async contract => {
 				await readFile(`${__dirname}/data/smartpy-data/${contract}`, 'utf8').then((data: string) => {
 					return writeFile(`./test-project/contracts/${contract}`, data);
 				});
@@ -295,14 +297,13 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				'│            │  h1: Minimal                                                                                                              │',
 				'│            │ Creating contract KT1TezoooozzSmartPyzzSTATiCzzzwwBFA1                                                                    │',
 				'│            │  -> Unit                                                                                                                  │',
-			  ]));
-			  
+			]));
 
 			// Assure that the log file exists
 			expect(await exists('./test-project/artifacts/Minimal/log.txt')).toBe(true);
 
 			// Clean up
 			await cleanup();
-		})
-	})
+		});
+	});
 });
