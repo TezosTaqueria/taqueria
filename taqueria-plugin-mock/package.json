@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-mock",
-	"version": "0.39.17",
+	"version": "0.39.18",
 	"description": "A plugin used to test Taqueria",
 	"private": true,
 	"scripts": {
@@ -23,6 +23,6 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.39.17"
+		"@taqueria/node-sdk": "^0.39.18"
 	}
 }

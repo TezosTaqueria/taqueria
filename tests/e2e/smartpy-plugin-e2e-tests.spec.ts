@@ -265,9 +265,8 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			]);
 
 			// Verify that artifacts exist
-			await new Promise(resolve => setTimeout(resolve, 2000));
-			expect(await exists('artifacts/MyContract/MyContract.tz')).toBe(true);
-			expect(await exists('artifacts/MyContract/MyContract.json')).toBe(true);
+			expect(await exists('./test-project/artifacts/MyContract/MyContract.tz')).toBe(true);
+			expect(await exists('./test-project/artifacts/MyContract/MyContract.json')).toBe(true);
 
 			// Clean up
 			await cleanup();
