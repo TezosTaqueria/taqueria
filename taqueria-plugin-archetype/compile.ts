@@ -23,48 +23,44 @@ interface Opts extends ProxyTaskArgs.t {
 	sourceFile?: string;
 }
 
-const getInputFilename = (opts: Opts) =>
-	(sourceFile: string) => {
-		const inputFile = basename(sourceFile, extname(sourceFile));
-		return join(opts.config.contractsDir ?? 'contracts', `${inputFile}.arl`);
-	};
+const getInputFilename = (opts: Opts) => (sourceFile: string) => {
+	const inputFile = basename(sourceFile, extname(sourceFile));
+	return join(opts.config.contractsDir ?? 'contracts', `${inputFile}.arl`);
+};
 
-const getContractArtifactFilename = (opts: Opts) =>
-	(sourceFile: string) => {
-		const outFile = basename(sourceFile, extname(sourceFile));
-		return join(opts.config.artifactsDir ?? 'contracts', `${outFile}.tz`);
-	};
+const getContractArtifactFilename = (opts: Opts) => (sourceFile: string) => {
+	const outFile = basename(sourceFile, extname(sourceFile));
+	return join(opts.config.artifactsDir ?? 'contracts', `${outFile}.tz`);
+};
 
-const getCompileCommand = (opts: Opts) =>
-	(sourceFile: string) => {
-		const { projectDir } = opts;
-		const inputFile = getInputFilename(opts)(sourceFile);
-		const baseCommand =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -u $(id -u):$(id -g) -w /project ${getArchetypeDockerImage()} ${inputFile}`;
-		const outFile = `-o ${getContractArtifactFilename(opts)(sourceFile)}`;
-		const cmd = `${baseCommand} ${outFile}`;
-		return cmd;
-	};
+const getCompileCommand = (opts: Opts) => (sourceFile: string) => {
+	const { projectDir } = opts;
+	const inputFile = getInputFilename(opts)(sourceFile);
+	const baseCommand =
+		`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -u $(id -u):$(id -g) -w /project ${getArchetypeDockerImage()} ${inputFile}`;
+	const outFile = `-o ${getContractArtifactFilename(opts)(sourceFile)}`;
+	const cmd = `${baseCommand} ${outFile}`;
+	return cmd;
+};
 
-const compileContract = (opts: Opts) =>
-	(sourceFile: string): Promise<{ contract: string; artifact: string }> =>
-		// const sourceAbspath = join(opts.contractsDir, sourceFile)
-		execCmd(getCompileCommand(opts)(sourceFile))
-			.then(({ stderr }) => { // How should we output warnings?
-				if (stderr.length > 0) sendErr(stderr);
-				return {
-					contract: sourceFile,
-					artifact: getContractArtifactFilename(opts)(sourceFile),
-				};
-			})
-			.catch(err => {
-				sendErr(' ');
-				sendErr(err.message.split('\n').slice(1).join('\n'));
-				return Promise.resolve({
-					contract: sourceFile,
-					artifact: 'Not compiled',
-				});
+const compileContract = (opts: Opts) => (sourceFile: string): Promise<{ contract: string; artifact: string }> =>
+	// const sourceAbspath = join(opts.contractsDir, sourceFile)
+	execCmd(getCompileCommand(opts)(sourceFile))
+		.then(({ stderr }) => { // How should we output warnings?
+			if (stderr.length > 0) sendErr(stderr);
+			return {
+				contract: sourceFile,
+				artifact: getContractArtifactFilename(opts)(sourceFile),
+			};
+		})
+		.catch(err => {
+			sendErr(' ');
+			sendErr(err.message.split('\n').slice(1).join('\n'));
+			return Promise.resolve({
+				contract: sourceFile,
+				artifact: 'Not compiled',
 			});
+		});
 
 const compileAll = (opts: Opts): Promise<{ contract: string; artifact: string }[]> => {
 	const contracts = getContracts(/\.arl$/, opts.config);
