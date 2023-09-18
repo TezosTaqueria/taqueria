@@ -42,11 +42,11 @@
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.39.19",
-		"fast-glob": "^3.2.12"
+		"fast-glob": "^3.3.1"
 	},
 	"devDependencies": {
-		"tsup": "6.5.0",
-		"typescript": "^4.9.5"
+		"tsup": "^7.2.0",
+		"typescript": "^5.2.2"
 	},
 	"tsup": {
 		"entry": [

@@ -13,7 +13,7 @@ import { basename, extname, join } from 'path';
 import { match } from 'ts-pattern';
 
 // Should point to the latest stable version, so it needs to be updated as part of our release process.
-const ARCHETYPE_DEFAULT_IMAGE = 'completium/archetype:1.2.12';
+const ARCHETYPE_DEFAULT_IMAGE = 'completium/archetype:1.4.3-rev3';
 
 const ARCHETYPE_IMAGE_ENV_VAR = 'TAQ_ARCHETYPE_IMAGE';
 

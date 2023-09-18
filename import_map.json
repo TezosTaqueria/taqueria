@@ -1,8 +1,12 @@
 {
 	"imports": {
+		"streams": "https://deno.land/std@0.115.1/streams/conversion.ts",
+		"eta": "https://deno.land/x/eta@v1.12.3/mod.ts",
 		"zod": "https://deno.land/x/zod@v3.14.4/mod.ts",
 		"util": "https://deno.land/std@0.85.0/node/util.ts",
 		"path": "https://deno.land/std@0.120.0/path/mod.ts",
+		"fun": "https://deno.land/x/fun@v1.0.0/fns.ts",
+		"jsonc": "https://deno.land/x/jsonc@1/main.ts",
 		"ts-pattern": "https://cdn.skypack.dev/ts-pattern@5.0.1?dts",
 		"i18next": "https://deno.land/x/i18next@v21.6.14/index.js",
 		"fluture": "https://cdn.jsdelivr.net/gh/fluture-js/Fluture@14.0.0/dist/module.js",

@@ -34,15 +34,18 @@
 	},
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.39.19",
+		"crypto": "^1.0.1",
 		"dotenv": "^16.3.1",
 		"form-data": "^4.0.0",
 		"ipfs-only-hash": "^4.0.0",
-		"node-fetch": "^2.6.11"
+		"multiformats": "^12.1.1",
+		"multihashes": "^4.0.3",
+		"node-fetch": "^3.3.2"
 	},
 	"devDependencies": {
-		"@types/node-fetch": "^2.6.4",
-		"tsup": "6.5.0",
-		"typescript": "4.7.2"
+		"@types/node-fetch": "^2.6.5",
+		"tsup": "^7.2.0",
+		"typescript": "^5.2.2"
 	},
 	"tsup": {
 		"entry": [

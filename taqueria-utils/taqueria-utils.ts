@@ -15,11 +15,11 @@ import {
 	resolve,
 	swap,
 } from 'fluture';
-import { dirname, join as _joinPaths } from 'https://deno.land/std@0.115.1/path/mod.ts';
-import { copy } from 'https://deno.land/std@0.128.0/streams/conversion.ts';
-import { render } from 'https://deno.land/x/eta@v1.12.3/mod.ts';
-import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import * as jsonc from 'https://deno.land/x/jsonc@1/main.ts';
+import { dirname, join as _joinPaths } from 'path';
+import { copy } from 'streams';
+import { render } from 'eta';
+import { pipe } from 'fun';
+import * as jsonc from 'jsonc';
 import { memoize as memoizeIt } from 'rambdax';
 import { UtilsDependencies } from './taqueria-utils-types.ts';
 

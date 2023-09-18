@@ -39,8 +39,8 @@
 		"node-machine-id-xz": "^1.0.2"
 	},
 	"devDependencies": {
-		"tsup": "6.5.0",
-		"typescript": "^4.9.5"
+		"tsup": "^7.2.0",
+		"typescript": "^5.2.2"
 	},
 	"tsup": {
 		"entry": [

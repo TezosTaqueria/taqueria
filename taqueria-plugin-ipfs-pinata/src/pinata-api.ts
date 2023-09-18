@@ -1,6 +1,7 @@
 import FormData from 'form-data';
 import fs from 'fs';
-import Hash from 'ipfs-only-hash';
+import {readFile} from 'fs/promises';
+import { getFileIPFSHash } from './ipfsHash';
 import fetch from 'node-fetch';
 
 export type PinataAuth = {
@@ -76,7 +77,8 @@ const checkIfFileIsPinned = async ({
 		filePath: string;
 	};
 }) => {
-	const ipfsHash = await Hash.of(fs.createReadStream(item.filePath));
+	const contents = await readFile(item.filePath);
+	const ipfsHash = await getFileIPFSHash(item.filePath)
 
 	const response = await fetch(`https://api.pinata.cloud/data/pinList?status=pinned&hashContains=${ipfsHash}`, {
 		headers: {
