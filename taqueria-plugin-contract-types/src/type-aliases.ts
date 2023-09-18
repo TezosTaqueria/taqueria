@@ -23,26 +23,26 @@ export type nat = BigNumber & { __type: 'nat' };
 export type mutez = BigNumber & { __type: 'mutez' };
 export type tez = BigNumber & { __type: 'tez' };
 
-type MapKey = Array<any> | object | string | boolean | number;
+export type MapKey = Array<any> | object | string | boolean | number;
 export type MMap<K extends MapKey, V> = Omit<MichelsonMap<K, V>, 'get'> & { get: (key: K) => V };
 export type BigMap<K extends MapKey, V> = Omit<MichelsonMap<K, V>, 'get'> & { get: (key: K) => Promise<V> };
 
 export type chest = string & { __type: 'chest' };
 export type chest_key = string & { __type: 'chest_key' };
 
-const createStringTypeTas = <T extends string>() => {
+export const createStringTypeTas = <T extends string>() => {
 	return (value: string): T => value as T;
 };
 
-const createBigNumberTypeTas = <T extends BigNumber>() => {
+export const createBigNumberTypeTas = <T extends BigNumber>() => {
 	return (value: number | BigNumber | string): T => new BigNumber(value) as T;
 };
 
-type asMapParamOf<K, V> = K extends string ? { [key: string]: V } | Array<{ key: K; value: V }>
+export type asMapParamOf<K, V> = K extends string ? { [key: string]: V } | Array<{ key: K; value: V }>
 	: K extends number ? { [key: number]: V } | Array<{ key: K; value: V }>
 	: Array<{ key: K; value: V }>;
 
-function asMap<K extends MapKey, V>(value: asMapParamOf<K, V>): MMap<K, V> {
+export function asMap<K extends MapKey, V>(value: asMapParamOf<K, V>): MMap<K, V> {
 	const m = new MichelsonMap<K, V>();
 	if (Array.isArray(value)) {
 		const vArray = value as Array<{ key: K; value: V }>;
@@ -53,16 +53,16 @@ function asMap<K extends MapKey, V>(value: asMapParamOf<K, V>): MMap<K, V> {
 	}
 	return m as MMap<K, V>;
 }
-const asBigMap = <K extends MapKey, V>(value: asMapParamOf<K, V>) => asMap(value) as unknown as BigMap<K, V>;
+export const asBigMap = <K extends MapKey, V>(value: asMapParamOf<K, V>) => asMap(value) as unknown as BigMap<K, V>;
 
-function add<T extends BigNumber>(a: T, b: T): T {
+export function add<T extends BigNumber>(a: T, b: T): T {
 	return a.plus(b) as T;
 }
-function subtract<T extends BigNumber>(a: T, b: T): T {
+export function subtract<T extends BigNumber>(a: T, b: T): T {
 	return a.minus(b) as T;
 }
 
-function createLambdaTypeTas(expr: Expr): MichelsonCode {
+export function createLambdaTypeTas(expr: Expr): MichelsonCode {
 	assertMichelsonInstruction(expr);
 	return expr as MichelsonCode;
 }
