@@ -9,12 +9,11 @@
     { "include": "#uppercaseidentifier" },
     { "include": "#attribute" },
     { "include": "#macro" },
-    { "include": "#letbinding" },
     { "include": "#lambda" },
     { "include": "#typedefinition" },
     { "include": "#controlkeywords" },
     { "include": "#moduledeclaration" },
-    { "include": "#structurekeywords" },
+    { "include": "#keywords" },
     { "include": "#numericliterals" },
     { "include": "#operators" },
     { "include": "#typeannotation" }
@@ -56,25 +55,17 @@
     },
     "controlkeywords": {
       "name": "keyword.control.mligo",
-      "match": "\\b(match|with|if|then|else|assert|failwith|begin)\\b",
+      "match": "\\b(match|with|if|then|else|assert|failwith|begin|for|upto|downto|do|while|done)\\b",
       "captures": {}
     },
-    "structurekeywords": {
+    "keywords": {
       "name": "keyword.other.mligo",
-      "match": "\\b(struct|end|in)\\b",
+      "match": "\\b(struct|end|let|in|mut|rec)\\b",
       "captures": {}
     },
     "moduledeclaration": {
       "match": "\\b(module)\\b",
       "captures": { "1": { "name": "keyword.other.mligo" } }
-    },
-    "letbinding": {
-      "match": "\\b(let)\\b\\s*(\\brec\\b|)\\s*\\b([a-zA-Z$_][a-zA-Z0-9$_]*)\\b",
-      "captures": {
-        "3": { "name": "entity.name.function.mligo" },
-        "2": { "name": "storage.modifier.mligo" },
-        "1": { "name": "keyword.other.mligo" }
-      }
     },
     "numericliterals": {
       "name": "constant.numeric.mligo",

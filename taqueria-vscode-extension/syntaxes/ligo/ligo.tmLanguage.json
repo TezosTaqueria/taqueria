@@ -64,7 +64,7 @@
       "captures": { "1": { "name": "keyword.other.ligo" } }
     },
     "function": {
-      "match": "\\b(function)\\b\\s*\\b([a-zA-Z$_][a-zA-Z0-9$_]*)\\b",
+      "match": "\\b(function)\\b\\s*\\b([a-z$_][a-zA-Z0-9$_]*)\\b",
       "captures": {
         "2": { "name": "entity.name.function.ligo" },
         "1": { "name": "keyword.other.ligo" }

@@ -125,11 +125,11 @@
       "captures": { "1": { "name": "entity.name.type.jsligo" } }
     },
     "lowercaseidentifier": {
-      "match": "\\b([a-zA-Z$_][a-zA-Z0-9$_]*)\\b",
+      "match": "\\b([a-z$_][a-zA-Z0-9$_]*)\\b",
       "captures": { "1": { "name": "variable.jsligo" } }
     },
     "moduleaccess": {
-      "match": "\\b([A-Z][\\.a-zA-Z0-9_$]*)\\.\\s*\\b([a-zA-Z0-9_$]*)\\b",
+      "match": "\\b([A-Z][a-zA-Z0-9_$]*)\\.\\s*\\b([a-zA-Z0-9_$]*)\\b",
       "captures": {
         "2": { "name": "variable.jsligo" },
         "1": { "name": "entity.name.type.jsligo" }
