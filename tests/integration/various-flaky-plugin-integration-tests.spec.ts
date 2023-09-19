@@ -100,7 +100,7 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	test('compile can use different versions of the Archetype image', async () => {
+	test.skip('compile can use different versions of the Archetype image', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');

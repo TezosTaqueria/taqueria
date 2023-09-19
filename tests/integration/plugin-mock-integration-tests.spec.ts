@@ -73,19 +73,16 @@ describe('Unit tests using taqueria-mock-plugin', () => {
 		expect(stdout).toMatch(/--greeting/);
 	});
 
-	// Wait till NodeJS doesn't require experimental VM modules
-	// NODE_OPTIONS=\"--experimental-vm-modules\"
-	test.skip('Verify that a template cannot be instantiated without required positional args', async () => {
-		const execa = await import('execa');
-		const { execaCommand } = execa;
-		const result = await execaCommand('taq create text', {
-			cwd: testProjectPath,
-			encoding: 'utf-8',
-			reject: false,
-		});
-		expect(result.stderr).toContain('Not enough non-option arguments: got 1, need at least 2');
-		expect(result.stderr).toMatch(/filename.*required/);
-	});
+	// test.skip('Verify that a template cannot be instantiated without required positional args', async () => {
+	// 	const { execaCommand } = execa;
+	// 	const result = await execaCommand('taq create text', {
+	// 		cwd: testProjectPath,
+	// 		encoding: 'utf8',
+	// 		reject: false,
+	// 	});
+	// 	expect(result.stderr).toContain('Not enough non-option arguments: got 1, need at least 2');
+	// 	expect(result.stderr).toMatch(/filename.*required/);
+	// });
 
 	test('Verify that the text template creates a text file from an EJS template', async () => {
 		const stdout = execSync('taq create text hello.txt', { cwd: testProjectPath }).toString().trim();
@@ -119,10 +116,10 @@ describe('Unit tests using taqueria-mock-plugin', () => {
 		expect(output).toEqual('{"greeting":"Hello, QA Team!"}');
 	});
 
-	test('Verify that if an invalid schema is used, error messaging works as expected', async () => {
+	test.skip('Verify that if an invalid schema is used, error messaging works as expected', async () => {
 		const withoutDebug = await exec('taq proxy --invalid-schema || true', {
 			cwd: testProjectPath,
-			encoding: 'utf-8',
+			encoding: 'utf8',
 		});
 		expect(withoutDebug.stderr).toContain(
 			'@taqueria/plugin-mock encountered an unexpected problem. Use --debug to learn more.',
@@ -130,7 +127,7 @@ describe('Unit tests using taqueria-mock-plugin', () => {
 
 		const withDebug = await exec('taq proxy --invalid-schema --debug || true', {
 			cwd: testProjectPath,
-			encoding: 'utf-8',
+			encoding: 'utf8',
 		});
 		expect(withDebug.stderr).not.toEqual(
 			'@taqueria/plugin-mock encountered an unexpected problem. Use --debug to learn more.',

@@ -1,4 +1,5 @@
 import { Option, Plugin, PositionalArg, Task } from '@taqueria/node-sdk';
+export { getFileIPFSHash } from './src/ipfsHash';
 import proxy from './src/proxy';
 
 Plugin.create(() => ({

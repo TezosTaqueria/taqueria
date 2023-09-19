@@ -28,7 +28,7 @@ import { exec, ExecException, spawn } from 'child_process';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { readFile, writeFile } from 'fs/promises';
 import { dirname, join, resolve as resolvePath } from 'path';
-import { getSync } from 'stacktrace-js';
+import { get, getSync } from 'stacktrace-js';
 import { ZodError } from 'zod';
 import { LikeAPromise, pluginDefiner, PluginSchema, StdIO } from './types';
 
@@ -501,8 +501,15 @@ const getNameFromPluginManifest = (packageJsonAbspath: string): string => {
 	try {
 		return `${require(packageJsonAbspath).name}`;
 	} catch (_) {
-		return generateName().dashed;
+		return getGeneratedPackageName(packageJsonAbspath);
 	}
+};
+
+const getGeneratedPackageName = (packageJsonAbsPath: string) => {
+	// Split the path into chunks. Pop off the chunk for the package.json file. Use the directory name as the plugin name.
+	const chunks = packageJsonAbsPath.split('/');
+	chunks.pop();
+	return chunks.pop() ?? 'unknown-plugin';
 };
 
 /**
@@ -745,7 +752,7 @@ const getPackageName = () => {
 		const pluginManifest = join(dirname(filename), 'package.json');
 		return getNameFromPluginManifest(pluginManifest);
 	}
-	return generateName().dashed;
+	return getGeneratedPackageName('');
 };
 
 export const isTaqError = (err: unknown): err is TaqError => {
