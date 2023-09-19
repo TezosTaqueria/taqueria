@@ -2,25 +2,7 @@
 . "$(dirname "$0")/_/husky.sh"
 HUSKY=0
 
-# If there are any changed FILES, then run dprint for each file
-FILES=`git diff --cached --name-only | grep -E "\.(ts|tsx|css)$" || true`
-if [ ! -z "$FILES" ]; then
-  for file in $FILES; do
-    echo "Formatting ${file}"
-    OUTPUT=$(npx dprint fmt --config ./dprint.json "$file" 2>&1)
-    echo "$OUTPUT" | grep -q "No files found to format with the specified plugins." && continue
-    # Exit with error code 1 if there was an error running npx dprint above
-    if [ $? = 0 ]; then
-    echo $?
-      echo "Error: $OUTPUT"
-      exit 1
-    fi
-  done
-fi
-
-
-# Update deno.lock file for CICD caching, only when CLI sourcecode changes
-npx with-staged '*.ts' 'taqueria-utils' 'taqueria-protocol' 'import-map.json' -- npm run update-lock
+npx lint-staged
 git add ./deno.lock
 
 # Bump version # for alpha release

@@ -3,7 +3,7 @@
 	"displayName": "Taqueria (by Pinnacle Labs)",
 	"description": "A better way to build on Tezos",
 	"publisher": "PinnacleLabs",
-	"version": "0.39.20",
+	"version": "0.39.21",
 	"private": true,
 	"engines": {
 		"vscode": "^1.82.0"
@@ -705,7 +705,6 @@
 		"compile:test": "tsc -p tsconfig.test.json",
 		"build": "npm run compile && npx vsce package",
 		"pretest": "npm run compile:test",
-		"lint": "eslint src --ext ts",
 		"test": "./bin/run-tests.sh"
 	},
 	"devDependencies": {
@@ -717,12 +716,9 @@
 		"@types/promise-memoize": "^1.2.1",
 		"@types/semver": "^7.5.0",
 		"@types/vscode": "^1.82.0",
-		"@typescript-eslint/eslint-plugin": "^5.60.0",
-		"@typescript-eslint/parser": "^5.60.0",
 		"@vscode/test-electron": "^2.3.3",
 		"@vscode/vsce": "^2.21.0",
 		"esbuild": "^0.14.54",
-		"eslint": "^8.43.0",
 		"fs-extra": "^10.1.0",
 		"glob": "^7.2.3",
 		"mocha": "^9.2.2",
@@ -730,8 +726,8 @@
 	},
 	"dependencies": {
 		"@microsoft/signalr": "^6.0.18",
-		"@taqueria/analytics": "^0.39.20",
-		"@taqueria/protocol": "^0.39.20",
+		"@taqueria/analytics": "^0.39.21",
+		"@taqueria/protocol": "^0.39.21",
 		"cli-table3": "^0.6.3",
 		"comment-json": "^4.2.3",
 		"eventsource": "^2.0.2",

@@ -101,14 +101,14 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 
 		const arl_file = await (await exec('cat e2e/data/archetype-data/fa12.arl')).stdout;
 		writeFile('./test-project/contracts/fa12.arl', arl_file);
-		const animal_file = await (await exec('cat e2e/data/archetype-data/animal_tracking.arl')).stdout;
-		writeFile('./test-project/contracts/animal_tracking.arl', animal_file);
+		const hello_file = await (await exec('cat e2e/data/archetype-data/hello.arl')).stdout;
+		writeFile('./test-project/contracts/hello.arl', hello_file);
 
 		const { stdout } = await execute('taq', 'compile', './test-project');
 		expect(stdout).toEqual(expect.arrayContaining(['│ fa12.arl │ artifacts/fa12.tz │']));
 
 		await exists(`./test-project/artifacts/fa12.tz`);
-		await exists(`./test-project/artifacts/animal_tracking.tz`);
+		await exists(`./test-project/artifacts/hello.tz`);
 
 		await cleanup();
 	});

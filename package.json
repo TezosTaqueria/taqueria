@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.39.20",
+	"version": "0.39.21",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -54,10 +54,20 @@
 		"lint-staged": "^13.2.2",
 		"npm-check-updates": "^16.10.12",
 		"ts-node": "^10.9.1",
-		"ts-to-zod": "^1.13.1",
 		"tsup": "^7.2.0",
 		"typescript": "^5.2.2",
 		"with-staged": "^1.0.2"
+	},
+	"lint-staged": {
+		"*.ts": [
+			"npx dprint fmt --config ./dprint.json",
+			"bash -c 'npm run update-lock'"
+		],
+		"*.tsx": [
+			"npx dprint fmt --config ./dprint.json",
+			"bash -c 'npm run update-lock'"
+		],
+		"*.json": "npx dprint fmt --config ./dprint.json"
 	},
 	"workspaces": [
 		"./taqueria-protocol",

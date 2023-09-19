@@ -37,7 +37,6 @@ import { TezosToolkit } from '@taquito/taquito';
 import { b58cencode, Prefix, prefix } from '@taquito/utils';
 import * as Bip39 from 'bip39';
 import crypto from 'crypto';
-import generateName from 'project-name-generator';
 
 // To use esbuild with yargs, we can't use ESM: https://github.com/yargs/yargs/issues/1929
 import YArgs from 'yargs';

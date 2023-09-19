@@ -100,9 +100,7 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// hangs waiting to execute the image command
-	// works fine manually in pre-release v0.25.23-rc
-	test.skip('compile can use different versions of the Archetype image', async () => {
+	test('compile can use different versions of the Archetype image', async () => {
 		const { execute, cleanup, writeFile, exists } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
 		await exists('./test-project/.taq/config.json');
@@ -110,23 +108,23 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 		await exists('./test-project/node_modules/@taqueria/plugin-archetype/index.js');
 
 		const { stdout, stderr } = await execute(
-			'TAQ_ARCHETYPE_IMAGE=completium/archetype:1.3.5 taq',
+			'TAQ_ARCHETYPE_IMAGE=completium/archetype:1.4.2 taq',
 			'get-image --plugin archetype',
 			'./test-project',
 		);
-		expect(stdout).toEqual(expect.arrayContaining(['│ completium/archetype:1.3.5 │']));
+		expect(stdout).toEqual(expect.arrayContaining(['│ completium/archetype:1.4.2 │']));
 
-		const arl_file = await (await exec('cat e2e/data/arch-1.3.5-example.arl')).stdout;
-		writeFile('./test-project/contracts/arch-1.3.5-example.arl', arl_file);
+		const arl_file = await (await exec('cat e2e/data/hello.arl')).stdout;
+		writeFile('./test-project/contracts/hello.arl', arl_file);
 
 		const { stdout: stdout1 } = await execute(
 			'taq',
-			'compile arch-1.3.5-example.arl',
+			'compile hello.arl',
 			'./test-project',
 		);
-		expect(stdout1).toEqual(expect.arrayContaining(['│ completium/archetype:1.3.5 │']));
+		expect(stdout1).toEqual(expect.arrayContaining(['│ completium/archetype:1.4.2 │']));
 
-		await exists(`./test-project/artifacts/arch-1.3.5-example.tz`);
+		await exists(`./test-project/artifacts/hello.tz`);
 
 		await cleanup();
 	});

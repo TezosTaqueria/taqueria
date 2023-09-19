@@ -3,12 +3,12 @@ import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
 
-describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
+describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 	test('typecheck will check a contract in the artifacts folder', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_file = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
@@ -24,7 +24,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_file = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
@@ -40,7 +40,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_one = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
@@ -61,7 +61,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_one = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
@@ -86,7 +86,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stdout: stdout1, stderr } = await execute('taq', 'typecheck no_such_contract.tz', './test-project');
@@ -99,7 +99,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_file = await (await exec(`cat e2e/data/michelson-data/hello-tacos-ill-typed.tz`)).stdout;
@@ -115,7 +115,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_one = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
@@ -140,7 +140,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/integerParameter10.tz`)).stdout;
@@ -162,7 +162,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_one = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
@@ -186,7 +186,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_one = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
@@ -210,7 +210,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_one = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
@@ -236,7 +236,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_one = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
@@ -262,7 +262,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_one = await (await exec(`cat e2e/data/michelson-data/byteSlice.tz`)).stdout;
@@ -287,7 +287,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_one = await (await exec(`cat e2e/data/michelson-data/increment.tz`)).stdout;
@@ -312,7 +312,7 @@ describe('Tezos-Client Plugin E2E Testing for Taqueria CLI', () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-tezos-client', './test-project');
+		const { stdout } = await execute('taq', 'install ../taqueria-plugin-octez-client', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const artifact_one = await (await exec(`cat e2e/data/michelson-data/increment.tz`)).stdout;
