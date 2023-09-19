@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.39.21",
+	"version": "0.39.22",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -50,13 +50,12 @@
 		"dprint": "^0.40.2",
 		"eta": "^2.2.0",
 		"husky": "^8.0.3",
-		"lerna": "^7.1.5",
+		"lerna": "^7.3.0",
 		"lint-staged": "^13.2.2",
 		"npm-check-updates": "^16.10.12",
 		"ts-node": "^10.9.1",
 		"tsup": "^7.2.0",
-		"typescript": "^5.2.2",
-		"with-staged": "^1.0.2"
+		"typescript": "^5.2.2"
 	},
 	"lint-staged": {
 		"*.ts": [
