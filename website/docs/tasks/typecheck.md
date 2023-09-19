@@ -3,4 +3,4 @@ title: typecheck
 ---
 
 Refer to the following:
-- [The Tezos Client plugin](/docs/plugins/plugin-tezos-client/#the-taq-typecheck-task)
+- [The Octez Client plugin](/docs/plugins/plugin-octez-client/#the-taq-typecheck-task)

@@ -14,7 +14,7 @@ const plugins: string[] = [
 	'taqueria-plugin-ligo',
 	'taqueria-plugin-smartpy-legacy',
 	'taqueria-plugin-taquito',
-	'taqueria-plugin-tezos-client',
+	'taqueria-plugin-octez-client',
 	`taqueria-plugin-ipfs-pinata`,
 	`taqueria-plugin-metadata`,
 ];

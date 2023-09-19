@@ -31,7 +31,7 @@ This task can be used to uninstall the following plugins:
 | [LIGO](/docs/plugins/plugin-ligo/)                     | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language                         |
 | [SmartPy](/docs/plugins/plugin-smartpy/)               | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy smart contract language                      |
 | [Taquito](/docs/plugins/plugin-taquito/)               | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate smart contracts           |
-| [Tezos Client](/docs/plugins/plugin-tezos-client/)     | `@taqueria/plugin-tezos-client`   | An abstraction of `tezos-client`, providing simulation and typechecking |
+| [Octez Client](/docs/plugins/plugin-octez-client/)     | `@taqueria/plugin-octez-client`   | An abstraction of `octez-client`, providing simulation and typechecking |
 
 ### Command
 

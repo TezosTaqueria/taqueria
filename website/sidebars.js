@@ -69,7 +69,7 @@ const sidebars = {
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
-        "plugins/plugin-tezos-client",
+        "plugins/plugin-octez-client",
       ],
     },
     {
@@ -130,7 +130,7 @@ const sidebars = {
         "tasks/generate-metadata",
         // "tasks/generate-project-metadata",
 
-        // Tezos client plugin tasks:
+        // Octez client plugin tasks:
         // "tasks/client",
         "tasks/simulate",
         "tasks/transfer",
