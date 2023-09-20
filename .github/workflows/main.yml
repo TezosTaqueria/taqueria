@@ -20,7 +20,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: lts/gallium
+          node-version: lts
           cache: "npm"
           
       - uses: denoland/setup-deno@v1
@@ -80,7 +80,7 @@ jobs:
 
         - uses: actions/setup-node@v3
           with:
-            node-version: lts/gallium
+            node-version: lts
             cache: "npm"
             
         - uses: denoland/setup-deno@v1
@@ -216,7 +216,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          node-version: lts/gallium
+          node-version: lts
           cache: "npm"
 
       - name: Debug matrix variables
@@ -461,7 +461,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v3
         with:
-          node-version: lts/gallium
+          node-version: lts
 
       - name: Download work archive
         uses: actions/download-artifact@v2
@@ -510,7 +510,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v3
         with:
-          node-version: lts/gallium
+          node-version: lts
 
       - name: Download work archive
         uses: actions/download-artifact@v2
@@ -539,7 +539,7 @@ jobs:
     steps:
       - uses: actions/setup-node@v3
         with:
-          node-version: lts/gallium
+          node-version: lts
 
       - uses: denoland/setup-deno@v1
 

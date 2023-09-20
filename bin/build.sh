@@ -11,8 +11,8 @@ if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
         MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
         MINOR_VERSION=$(echo $VERSION | cut -d. -f2)
 
-        if [ "$MAJOR_VERSION" -lt "1" ] || [ "$MAJOR_VERSION" -eq "1" -a "$MINOR_VERSION" -lt "34" ]; then
-            echo "❌ Deno is installed, but the version is less than v1.34. Please use Deno v1.34 or greater."
+        if [ "$MAJOR_VERSION" -lt "1" ] || [ "$MAJOR_VERSION" -eq "1" -a "$MINOR_VERSION" -lt "36" ]; then
+            echo "❌ Deno is installed, but the version is less than v1.34. Please use Deno v1.36 or greater."
             exit 1
         fi
         if [  -z "$DENO_TARGET" ]; then
@@ -20,7 +20,7 @@ if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
         else
             TARGET_ARG="--target $DENO_TARGET"
         fi
-        deno compile -o taq --unstable --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts $TARGET_ARG -- --setBuild "$BUILD" --setVersion "$TAQ_VERSION"  
+        deno compile -o taq --unstable --allow-run --allow-write --allow-read --allow-env --allow-net --import-map ./import_map.json --no-prompt index.ts $TARGET_ARG --setBuild "$BUILD" --setVersion "$TAQ_VERSION"  
     fi
 else
     echo "Usage: ./bin/build.sh"
