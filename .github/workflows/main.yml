@@ -241,9 +241,11 @@ jobs:
             fi
           fi
   
-          # Use either Lerna or NPM Workspaces to publish this package
-          # For example:
-          npx lerna publish --scope=${{ matrix.package.name }} from-package --no-push --yes --dist-tag $TAG
+          # Navigate to package directory
+          cd ${{ matrix.package.location }}
+    
+          # Publish using npm with the determined tag
+          npm publish --tag $TAG
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
