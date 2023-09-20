@@ -170,12 +170,40 @@ jobs:
           fi
           echo "is_release=$IS_RELEASE" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+  
+  # Gather package info for publishing
+  gather-package-info:
+    runs-on: ubuntu-latest
+    outputs:
+      taggedPackages: ${{ steps.gather-packages.outputs.taggedPackages }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
+    - name: Gather package info
+      id: gather-packages
+      run: |
+        PACKAGES=$(npx lerna list --json)
+        TAGGED_PACKAGES=[]
+        
+        for pkg in $(echo "${PACKAGES}" | jq -r '.[] | @base64'); do
+          pkg_name=$(echo "$pkg" | base64 --decode | jq -r '.name')
+          pkg_location=$(echo "$pkg" | base64 --decode | jq -r '.location')
+          pkg_tag=$(jq -r '.tag // "auto"' < "$pkg_location/package.json")
+          
+          TAGGED_PACKAGES+=("{\"name\":\"$pkg_name\",\"tag\":\"$pkg_tag\"}")
+        done
+
+        TAGGED_PACKAGES_JSON="[$(IFS=,; echo "${TAGGED_PACKAGES[*]}")]"
+        echo "taggedPackages=$TAGGED_PACKAGES_JSON" >> "$GITHUB_OUTPUT"
           
   # Publish NPM packages to Github Packages
   publish-packages:
-    needs: [build-packages, check_is_release]
+    needs: [build-packages, check_is_release, gather-package-info]
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: ${{fromJson(needs.gather-package-info.outputs.taggedPackages)}}
     steps:
       - name: Download work archive
         uses: actions/download-artifact@v2
@@ -201,16 +229,21 @@ jobs:
           git config --global user.name "Michael Weichert"
           git commit -am "chore: publish packages" --allow-empty
           
-          # Determine what tag to use. Our version numbers use the scheme MAJOR.MINOR.RELEASE. If RELEASE is 0, then we should use the "latest tag".
-          TAG=dev
-          if [[ "${{ needs.check_is_release.outputs.is_release }}" == "yes" ]]; then
-            echo "Publishing using latest tag"
-            TAG=latest
-          else
-            echo "Publishing using dev tag"
+          # Determine the appropriate NPM tag for publishing
+          # If the "tag" property from package.json is set to "auto",
+          # we rely on the "is_release" flag.
+          # Otherwise, we use the specified tag in package.json which should be set to "beta", "alpha", etc.
+          TAG=${{ matrix.package.tag }}
+          if [ "$TAG" == "auto" ]; then
+            TAG="dev"
+            if [[ "${{ needs.check_is_release.outputs.is_release }}" == "yes" ]]; then
+              TAG="latest"
+            fi
           fi
-
-          npx lerna publish from-package --no-push --yes --dist-tag $TAG
+  
+          # Use either Lerna or NPM Workspaces to publish this package
+          # For example:
+          npx lerna publish --scope=${{ matrix.package.name }} from-package --no-push --yes --dist-tag $TAG
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
