@@ -194,8 +194,8 @@ jobs:
           TAGGED_PACKAGES+=("{\"name\":\"$pkg_name\",\"tag\":\"$pkg_tag\",\"location\":\"$pkg_location\"}")
           TAGGED_PACKAGES_JSON="[$(IFS=,; echo "${TAGGED_PACKAGES[*]}")]"
         done
-        echo "taggedPackages=$TAGGED_PACKAGES_JSON" >> "$GITHUB_OUTPUT"
         echo $TAGGED_PACKAGES_JSON
+        echo "taggedPackages=$TAGGED_PACKAGES_JSON" >> "$GITHUB_OUTPUT"
           
   # Publish NPM packages to Github Packages
   publish-packages:
@@ -218,6 +218,12 @@ jobs:
         with:
           node-version: lts/gallium
           cache: "npm"
+
+      - name: Debug matrix variables
+        run: echo "PACKAGE_NAME=${{ matrix.package.name }}" && echo "PACKAGE_TAG=${{ matrix.package.tag }}" && echo "PACKAGE_LOCATION=${{ matrix.package.location }}"
+
+      - name: List env variables
+        run: env 
            
       # Publish packages
       - name: Publish to npm
