@@ -184,18 +184,18 @@ jobs:
       id: gather-packages
       run: |
         PACKAGES=$(npx lerna list --json)
-        TAGGED_PACKAGES=[]
+        TAGGED_PACKAGES=()
         
         for pkg in $(echo "${PACKAGES}" | jq -r '.[] | @base64'); do
           pkg_name=$(echo "$pkg" | base64 --decode | jq -r '.name')
           pkg_location=$(echo "$pkg" | base64 --decode | jq -r '.location')
           pkg_tag=$(jq -r '.tag // "auto"' < "$pkg_location/package.json")
           
-          TAGGED_PACKAGES+=("{\"name\":\"$pkg_name\",\"tag\":\"$pkg_tag\"}")
+          TAGGED_PACKAGES+=("{\"name\":\"$pkg_name\",\"tag\":\"$pkg_tag\",\"location\":\"$pkg_location\"}")
+          TAGGED_PACKAGES_JSON="[$(IFS=,; echo "${TAGGED_PACKAGES[*]}")]"
         done
-
-        TAGGED_PACKAGES_JSON="[$(IFS=,; echo "${TAGGED_PACKAGES[*]}")]"
         echo "taggedPackages=$TAGGED_PACKAGES_JSON" >> "$GITHUB_OUTPUT"
+        echo $TAGGED_PACKAGES_JSON
           
   # Publish NPM packages to Github Packages
   publish-packages:
