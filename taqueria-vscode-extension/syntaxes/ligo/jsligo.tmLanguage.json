@@ -19,7 +19,6 @@
     { "include": "#numericliterals" },
     { "include": "#operators" },
     { "include": "#modulealias" },
-    { "include": "#moduledeclaration" },
     { "include": "#typeannotation" },
     { "include": "#typeas" },
     { "include": "#objectorblock" },
@@ -78,12 +77,12 @@
       "captures": { "1": { "name": "keyword.other.jsligo" } }
     },
     "keywords": {
-      "match": "\\b(export|import|from|implements|contract_of|parameter_of|function|do)\\b",
+      "match": "\\b(export|import|from|implements|contract_of|parameter_of|function|do|namespace|interface|implements|false|true)\\b",
       "captures": { "1": { "name": "keyword.other.jsligo" } }
     },
     "controlkeywords": {
       "name": "keyword.control.jsligo",
-      "match": "\\b(switch|if|else|for|of|while|return|break|match)\\b",
+      "match": "\\b(switch|if|else|for|of|while|return|break|continue|match)\\b",
       "captures": {}
     },
     "numericliterals": {
@@ -141,10 +140,6 @@
         "2": { "name": "entity.name.type.jsligo" },
         "1": { "name": "keyword.control.jsligo" }
       }
-    },
-    "moduledeclaration": {
-      "match": "\\b(namespace|interface)\\b",
-      "captures": { "1": { "name": "keyword.other.jsligo" } }
     },
     "objectorblock": {
       "begin": "({)",

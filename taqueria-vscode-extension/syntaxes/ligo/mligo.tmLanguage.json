@@ -12,7 +12,6 @@
     { "include": "#lambda" },
     { "include": "#typedefinition" },
     { "include": "#controlkeywords" },
-    { "include": "#moduledeclaration" },
     { "include": "#keywords" },
     { "include": "#numericliterals" },
     { "include": "#operators" },
@@ -60,12 +59,8 @@
     },
     "keywords": {
       "name": "keyword.other.mligo",
-      "match": "\\b(struct|end|let|in|mut|rec)\\b",
+      "match": "\\b(struct|end|let|in|mut|rec|contract_of|parameter_of|module|sig|val|false|true)\\b",
       "captures": {}
-    },
-    "moduledeclaration": {
-      "match": "\\b(module)\\b",
-      "captures": { "1": { "name": "keyword.other.mligo" } }
     },
     "numericliterals": {
       "name": "constant.numeric.mligo",
@@ -74,7 +69,7 @@
     },
     "operators": {
       "name": "keyword.operator.mligo",
-      "match": "::|\\-|\\+|\\b(mod|land|lor|lxor|lsl|lsr)\\b|&&|\\|\\||>|<>|<=|=>|<|>|\\|>",
+      "match": "::|\\-|\\+|\\b(mod|land|lor|lxor|lsl|lsr)\\b|&&|\\|\\||>|<>|<=|=>|<|>|\\|>|->|:=|\\^|\\*|\\+=|-=|\\*=|/=|\\|=",
       "captures": {}
     },
     "semicolon": { "match": "(;)", "captures": {} },
@@ -103,7 +98,7 @@
     },
     "typedefinition": {
       "begin": "\\b(type)\\b",
-      "end": "(?=^#|\\[@|\\b(let|in|type|end|module)\\b|\\))",
+      "end": "(?=^#|\\[@|\\b(let|in|type|end|module|sig|val)\\b|\\))",
       "beginCaptures": { "1": { "name": "keyword.other.mligo" } },
       "endCaptures": {},
       "patterns": [
@@ -122,7 +117,7 @@
     },
     "typeannotation": {
       "begin": "(:)",
-      "end": "(?=\\)|=|;|})",
+      "end": "(?=\\)|=|;|}|^#|\\[@|\\b(let|in|type|end|module|sig|val|end)\\b)",
       "beginCaptures": { "1": { "name": "keyword.operator.mligo" } },
       "endCaptures": {},
       "patterns": [
