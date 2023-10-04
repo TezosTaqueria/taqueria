@@ -1,0 +1,4 @@
+#import "pokeGame.jsligo" "Contract"
+
+// const commented_parameter: Contract.parameter = Poke();
+const parameter: Contract.parameter = Poke();

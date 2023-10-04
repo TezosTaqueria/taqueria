@@ -1004,5 +1004,55 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			// Cleanup
 			await cleanup();
 		});
+
+		// https://github.com/pinnacle-labs/taqueria/issues/1907
+		test.only('regression against #1907, compile task will compile storage/parameter expressions for variables which were commented out', async () => {
+			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
+
+			console.log(projectDir);
+
+			// set up the project
+			const { waitForText } = await spawn('taq', 'init test-project');
+			await waitForText("Project taq'ified!");
+
+			// Install the plugin
+			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+
+			// copy jsligo files to contracts folder
+			const jligo_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.jsligo`)).stdout;
+			await writeFile('./test-project/contracts/pokeGame.jsligo', jligo_file);
+			const storage_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.storageList-with-comments.jsligo`))
+				.stdout;
+			await writeFile('./test-project/contracts/pokeGame.storageList.jsligo', storage_file);
+			const parameters_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.parameterList-with-comments.jsligo`))
+				.stdout;
+			await writeFile('./test-project/contracts/pokeGame.parameterList.jsligo', parameters_file);
+
+			// compile the contract using compile task
+			const results = await execute('taq', 'compile pokeGame.jsligo', './test-project');
+			expect(results.stdout).toEqual([
+				'┌─────────────────┬───────────────────────────────────────────┐',
+				'│ Source          │ Artifact                                  │',
+				'├─────────────────┼───────────────────────────────────────────┤',
+				'│ pokeGame.jsligo │ artifacts/pokeGame.tz                     │',
+				'│                 │ artifacts/pokeGame.default_storage.tz     │',
+				'│                 │ artifacts/pokeGame.parameter.parameter.tz │',
+				'└─────────────────┴───────────────────────────────────────────┘',
+				'Compiled 1 contract(s) in "pokeGame.jsligo"',
+			]);
+
+			// assure that no storage/parameter files were created
+			const artifacts_list = await ls('./test-project/artifacts');
+			expect(artifacts_list).toEqual(
+				[
+					'pokeGame.default_storage.tz',
+					'pokeGame.parameter.parameter.tz',
+					'pokeGame.tz',
+				],
+			);
+
+			// Cleanup
+			await cleanup();
+		});
 	});
 });

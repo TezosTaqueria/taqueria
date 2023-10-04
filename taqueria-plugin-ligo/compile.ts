@@ -8,8 +8,10 @@ import {
 	sendRes,
 	sendWarn,
 } from '@taqueria/node-sdk';
+import { createReadStream } from 'fs';
 import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
+import * as readline from 'readline';
 import {
 	CompileOpts as Opts,
 	emitExternalError,
@@ -223,9 +225,31 @@ const compileExpr =
 			});
 	};
 
-const getExprNames = (parsedArgs: Opts, sourceFile: string): Promise<string[]> =>
-	readFile(getInputFilenameAbsPath(parsedArgs, sourceFile), 'utf8')
-		.then(data => data.match(/(?<=\n\s*(let|const)\s+)[a-zA-Z0-9_]+/g) ?? []);
+const getExprNames = (parsedArgs: Opts, sourceFile: string): Promise<string[]> => {
+	return new Promise((resolve, reject) => {
+		const inputFilePath = getInputFilenameAbsPath(parsedArgs, sourceFile);
+		const readInterface = readline.createInterface({
+			input: createReadStream(inputFilePath),
+			output: process.stdout,
+		});
+
+		const variableNames: string[] = [];
+
+		readInterface.on('line', function(line) {
+			// Skip lines that start with a comment
+			if (!line.trim().startsWith('//')) {
+				const matches = line.match(/(?<=\s*(let|const)\s+)[a-zA-Z0-9_]+/g);
+				if (matches) {
+					variableNames.push(...matches);
+				}
+			}
+		});
+
+		readInterface.on('close', function() {
+			resolve(variableNames);
+		});
+	});
+};
 
 const compileExprs = (
 	parsedArgs: Opts,
