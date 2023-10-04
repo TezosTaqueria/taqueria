@@ -25,11 +25,13 @@ export type TableRow = { source: string; artifact: string };
 
 export type ExprKind = 'storage' | 'default_storage' | 'parameter';
 
+export type Syntax = 'mligo' | 'jsligo' | 'religo' | 'ligo';
+
 export type ModuleInfo = {
 	moduleName: string;
 	sourceName: string;
 	sourceFile: string;
-	syntax: 'mligo' | 'jsligo' | 'religo' | 'ligo';
+	syntax: Syntax;
 	type: 'file-main' | 'file-entry' | 'module-main' | 'module-entry';
 };
 
@@ -282,215 +284,60 @@ const compileExprs = (
 			}]
 		);
 
-const initContentForStorage = (module: ModuleInfo): string => {
-	const linkToContract = `#import "${module.sourceFile}" "Contract"\n\n`;
-	const instruction =
-		'// Define your initial storage values as a list of LIGO variable definitions, the first of which will be considered the default value to be used for origination later on\n';
+// Helper function to get the initial message based on the pair value
+const getInitialMessage = (pair: string, module: ModuleInfo) => {
+	const messages = {
+		'mligo-file-main':
+			`// When this file was created, the smart contract was defined with a main function that was not within a named module. As such, the examples below are written with that assumption in mind.`,
+		'mligo-file-entry':
+			`// When this file was created, the smart contract was defined with an entrypoint using \`@entry\` that was not within a named module. As such, the examples below are written with that assumption in mind.`,
+		'mligo-module-main':
+			`// When this file was created, the smart contract was defined with a main function that was within a named module. As such, the examples below are written with that assumption in mind.`,
+		'mligo-module-entry':
+			`// When this file was created, the smart contract was defined with an entrypoint using \`@entry\` that was within a named module. As such, the examples below are written with that assumption in mind.`,
+		'jsligo-file-main':
+			`// When this file was created, the smart contract was defined with a main function that was not within a namespace. As such, the examples below are written with that assumption in mind.\n`
+			+ `// NOTE: The "storage" type should be exported from the contract file (${module.sourceFile})`,
+		'jsligo-file-entry':
+			`// When this file was created, the smart contract was defined with an entrypoint using \`@entry\` that was not within a namespace. As such, the examples below are written with that assumption in mind.`,
+		'jsligo-module-main':
+			`// When this file was created, the smart contract was defined with a main function that was within a namespace. As such, the examples below are written with that assumption in mind.\n`
+			+ `// NOTE: The "storage" type should be exported from the contract file (${module.sourceFile})`,
+		'jsligo-module-entry':
+			`// When this file was created, the smart contract was defined with an entrypoint using \`@entry\` that was within a namespace. As such, the examples below are written with that assumption in mind.`,
+		// ... any other combinations
+	} as Record<string, string>;
 
-	const syntax = (() => {
-		const pair = [module.syntax, module.type].join('-');
-		switch (pair) {
-			case 'mligo-file-main':
-				return [
-					'// When this file was created, the smart contract was defined with a main function that was not within a named module. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your storage is a simple value, you can define it directly',
-					'// E.g. let storage = 10',
-					'',
-					'// For added type-safety, you can reference the type of your storage from the contract',
-					'// E.g. let storage : Contract.storage = 10',
-				];
-				break;
-			case 'mligo-file-entry':
-				return [
-					'// When this file was created, the smart contract was defined with an entrypoint using `@entry` that was not within a named module. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your storage is a simple value, you can define it directly',
-					'// E.g. let storage = 10',
-					'',
-					'// For added type-safety, you can reference the type of your storage from the contract',
-					'// E.g. let storage : Contract.storage = 10',
-				];
-				break;
-			case 'mligo-module-main':
-				return [
-					'// When this file was created, the smart contract was defined with a main function that was within a named module. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your storage is a simple value, you can define it directly',
-					'// E.g. let storage = 10',
-					'',
-					'// For added type-safety, you can reference the type of your storage from the contract',
-					`// E.g. let storage : Contract.${module.moduleName}.storage = 10`,
-				];
-				break;
-			case 'mligo-module-entry':
-				return [
-					'// When this file was created, the smart contract was defined with an entrypoint using `@entry` that was within a named module. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your storage is a simple value, you can define it directly',
-					'// E.g. let storage = 10',
-					'',
-					'// For added type-safety, you can reference the type of your storage from the contract',
-					`// E.g. let storage : Contract.${module.moduleName}.storage = 10`,
-				];
-				break;
-			case 'jsligo-file-main':
-				return [
-					'// When this file was created, the smart contract was defined with a main function that was not within a namespace. As such, the examples below are written with that assumption in mind.',
-					`// NOTE: The "storage" type should be exported from the contract file (${module.sourceFile})`,
-					'',
-					'// If your storage is a simple value, you can define it directly',
-					'// E.g. const storage = 10',
-					'',
-					'// For added type-safety, you can reference the type of your storage from the contract. This assumes that you have exported your `storage` type from the contract file.',
-					'// E.g. const storage : Contract.storage = 10',
-				];
-				break;
-			case 'jsligo-file-entry':
-				return [
-					'// When this file was created, the smart contract was defined with an entrypoint using `@entry` that was not within a namespace. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your storage is a simple value, you can define it directly',
-					'// E.g. const storage = 10',
-					'',
-					'// For added type-safety, you can reference the type of your storage from the contract. This assumes that you have exported your `storage` type from the contract file.',
-					'// E.g. const storage : Contract.storage = 10',
-				];
-				break;
-			case 'jsligo-module-main':
-				return [
-					'// When this file was created, the smart contract was defined with a main function that was within a namespace. As such, the examples below are written with that assumption in mind.',
-					`// NOTE: The "storage" type should be exported from the contract file (${module.sourceFile})`,
-					'',
-					'// If your storage is a simple value, you can define it directly',
-					'// E.g. const storage = 10',
-					'',
-					'// For added type-safety, you can reference the type of your storage from the contract. This assumes that you have exported your `storage` type from the contract file.',
-					`// E.g. const storage : Contract.${module.moduleName}.storage = 10`,
-				];
-				break;
-			case 'jsligo-module-entry':
-				return [
-					'// When this file was created, the smart contract was defined with an entrypoint using `@entry` that was within a namespace. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your storage is a simple value, you can define it directly',
-					'// E.g. const storage = 10',
-					'',
-					'// For added type-safety, you can reference the type of your storage from the contract. This assumes that you have exported your `storage` type from the contract file.',
-					`// E.g. const storage : Contract.${module.moduleName}.storage = 10`,
-				];
-				break;
-			default:
-				return [];
-		}
-	})();
-	return linkToContract + instruction + syntax.join('\n');
+	return messages[pair] || '// This file was created by Taqueria.';
 };
 
-const initContentForParameter = (module: ModuleInfo): string => {
-	const linkToContract = `#import "${module.sourceFile}" "Contract"\n\n`;
-	const instruction = '// Define your parameter values as a list of LIGO variable definitions\n';
+// Helper function to get a common message
+const getCommonMsg = (langType: Syntax, listType: ExprKind) => {
+	const varKeyword = langType === 'mligo' ? 'let' : 'const';
+	const commonMsgForStorage = `// IMPORTANT: We suggest always explicitly typing your storage values:\n`
+		+ `// E.g.: \`${varKeyword} storage: int = 10\` or \`${varKeyword} storage: Contract.storage = 10\``;
 
-	const syntax = (() => {
-		const pair = [module.syntax, module.type].join('-');
-		switch (pair) {
-			case 'mligo-file-main':
-				return [
-					'// When this file was created, the smart contract was defined with a main function that was not within a named module. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your parameter is a simple value, you can define it directly',
-					'// E.g. let default_parameter = 10',
-					'',
-					'// For added type-safety, you can reference the type of your parameter from the contract',
-					'// E.g. let default_parameter : Contract.parameter = 10',
-				];
-				break;
-			case 'mligo-file-entry':
-				return [
-					'// When this file was created, the smart contract was defined with an entrypoint using `@entry` that was not within a named module. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your parameter is a simple value, you can define it directly',
-					'// E.g. let default_parameter = 10',
-					'',
-					'// For added type-safety, you can reference the type of your parameter from the contract',
-					'// E.g. let default_parameter : parameter_of Contract = 10',
-				];
-				break;
-			case 'mligo-module-main':
-				return [
-					'// When this file was created, the smart contract was defined with a main function that was within a named module. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your parameter is a simple value, you can define it directly',
-					'// E.g. let default_parameter = 10',
-					'',
-					'// For added type-safety, you can reference the type of your parameter from the contract',
-					`// E.g. let default_parameter : Contract.${module.moduleName}.parameter = 10`,
-				];
-				break;
-			case 'mligo-module-entry':
-				return [
-					'// When this file was created, the smart contract was defined with an entrypoint using `@entry` that was within a named module. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your parameter is a simple value, you can define it directly',
-					'// E.g. let default_parameter = 10',
-					'',
-					'// For added type-safety, you can reference the type of your parameter from the contract',
-					`// E.g. let default_parameter : parameter_of Contract.${module.moduleName} = 10`,
-				];
-				break;
-			case 'jsligo-file-main':
-				return [
-					'// When this file was created, the smart contract was defined with a main function that was not within a namespace. As such, the examples below are written with that assumption in mind.',
-					`// NOTE: The "parameter" type should be exported from the contract file (${module.sourceFile})`,
-					'',
-					'// If your parameter is a simple value, you can define it directly',
-					'// E.g. const default_parameter = 10',
-					'',
-					'// For added type-safety, you can reference the type of your parameter from the contract',
-					'// E.g. const default_parameter : Contract.parameter = 10',
-				];
-				break;
-			case 'jsligo-file-entry':
-				return [
-					'// When this file was created, the smart contract was defined with an entrypoint using `@entry` that was not within a namespace. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your parameter is a simple value, you can define it directly',
-					'// E.g. const default_parameter = 10',
-					'',
-					'// For added type-safety, you can reference the type of your parameter from the contract',
-					'// E.g. const default_parameter : parameter_of Contract = 10',
-				];
-				break;
-			case 'jsligo-module-main':
-				return [
-					'// When this file was created, the smart contract was defined with a main function that was within a namespace. As such, the examples below are written with that assumption in mind.',
-					`// NOTE: The "parameter" type should be exported from the contract file (${module.sourceFile})`,
-					'',
-					'// If your parameter is a simple value, you can define it directly',
-					'// E.g. const default_parameter = 10',
-					'',
-					'// For added type-safety, you can reference the type of your parameter from the contract',
-					`// E.g. const default_parameter : Contract.${module.moduleName}.parameter = 10`,
-				];
-				break;
-			case 'jsligo-module-entry':
-				return [
-					'// When this file was created, the smart contract was defined with an entrypoint using `@entry` that was within a namespace. As such, the examples below are written with that assumption in mind.',
-					'',
-					'// If your parameter is a simple value, you can define it directly',
-					'// E.g. const default_parameter = 10',
-					'',
-					'// For added type-safety, you can reference the type of your parameter from the contract',
-					`// E.g. const default_parameter : parameter_of Contract.${module.moduleName} = 10`,
-				];
-				break;
-			default:
-				return [];
-		}
-	})();
+	const commonMsgForParameter = `// IMPORTANT: We suggest always explicitly typing your parameter values:\n`
+		+ `// E.g.: \`${varKeyword} parameter: int = 10\` or \`${varKeyword} parameter: Contract.parameter = 10\``;
 
-	return linkToContract + instruction + syntax.join('\n');
+	return listType === 'storage' ? commonMsgForStorage : commonMsgForParameter;
 };
+
+// Main function to get the content for storage or parameter
+const getContent = (moduleInfo: ModuleInfo, listType: ExprKind) => {
+	const linkToContract = `#import "${moduleInfo.sourceFile}" "Contract"`;
+	const pair = `${moduleInfo.syntax}-${moduleInfo.type}`;
+	const initialMsg = getInitialMessage(pair, moduleInfo);
+	const commonMsg = getCommonMsg(moduleInfo.syntax, listType);
+
+	return `${linkToContract}\n\n${initialMsg}\n\n${commonMsg}`;
+};
+
+// Usage for storage list
+const initContentForStorage = (moduleInfo: ModuleInfo) => getContent(moduleInfo, 'storage');
+
+// Usage for parameter list
+const initContentForParameter = (moduleInfo: ModuleInfo) => getContent(moduleInfo, 'parameter');
 
 export const compileContractWithStorageAndParameter = async (
 	parsedArgs: Opts,

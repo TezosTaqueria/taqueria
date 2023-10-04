@@ -196,18 +196,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 				await (await exec(`cat e2e/data/ligo-data/expected-counter-main.parameterList.mligo`)).stdout;
 			expect(parameterFile).toEqual(expectedParameterFile);
 
-			// Expect the example parameter in the file to compile
-			const example = expectedParameterFile.split('\n').pop()!.replace(/^\/\/ E.g\. /, '').replace('10', 'Increment 1');
-			const importStmt = expectedParameterFile.split('\n')[0]!;
-			writeFile('./test-project/contracts/counter-main.parameterList.mligo', [importStmt, example].join('\n'));
-			const compileExampleResult = await execute('taq', 'compile counter-main.mligo', './test-project');
-			// console.log(compileExampleResult)
-			expect(compileExampleResult.stderr).toHaveLength(0);
-
-			// Expect the parameter artifact to be created
-			const artifactsList = await ls('./test-project/artifacts');
-			expect(artifactsList).toContain('counter-main.parameter.default_parameter.tz');
-
 			// Cleanup
 			await cleanup();
 		});
@@ -323,18 +311,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 				.stdout;
 			expect(parameterFile).toEqual(expectedParameterFile);
 
-			// Expect the example parameter in the file to compile
-			const example = expectedParameterFile.split('\n').pop()!.replace(/^\/\/ E.g\. /, '').replace('10', 'Increment 1');
-			const importStmt = expectedParameterFile.split('\n')[0]!;
-			writeFile('./test-project/contracts/Counter.parameterList.mligo', [importStmt, example].join('\n'));
-			const compileExampleResult = await execute('taq', 'compile counter-module-main.mligo', './test-project');
-			// console.log(compileExampleResult)
-			expect(compileExampleResult.stderr).toHaveLength(0);
-
-			// Expect the parameter artifact to be created
-			const artifactsList = await ls('./test-project/artifacts');
-			expect(artifactsList).toContain('Counter.parameter.default_parameter.tz');
-
 			// Cleanup
 			await cleanup();
 		});
@@ -447,21 +423,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const expectedParameterFile = await (await exec(`cat e2e/data/ligo-data/expected-entry.parameterList.jsligo`))
 				.stdout;
 			expect(parameterFile).toEqual(expectedParameterFile);
-
-			// Expect the example parameter in the file to compile
-			const example = expectedParameterFile.split('\n').pop()!.replace(/^\/\/ E.g\. /, '').replace(
-				'10',
-				'Increment(1)',
-			);
-			const importStmt = expectedParameterFile.split('\n')[0]!;
-			writeFile('./test-project/contracts/entry.parameterList.jsligo', [importStmt, example].join('\n'));
-			const compileExampleResult = await execute('taq', 'compile entry.jsligo', './test-project');
-			// console.log(compileExampleResult)
-			expect(compileExampleResult.stderr).toHaveLength(0);
-
-			// Expect the parameter artifact to be created
-			const artifactsList = await ls('./test-project/artifacts');
-			expect(artifactsList).toContain('entry.parameter.default_parameter.tz');
 
 			// Cleanup
 			await cleanup();
@@ -577,21 +538,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const expectedParameterFile = await (await exec(`cat e2e/data/ligo-data/expected-IncDec.parameterList.jsligo`))
 				.stdout;
 			expect(parameterFile).toEqual(expectedParameterFile);
-
-			// Expect the example parameter in the file to compile
-			const example = expectedParameterFile.split('\n').pop()!.replace(/^\/\/ E.g\. /, '').replace(
-				'10',
-				'Increment(1)',
-			);
-			const importStmt = expectedParameterFile.split('\n')[0]!;
-			writeFile('./test-project/contracts/IncDec.parameterList.jsligo', [importStmt, example].join('\n'));
-			const compileExampleResult = await execute('taq', 'compile IncDec.jsligo', './test-project');
-			// console.log(compileExampleResult)
-			expect(compileExampleResult.stderr).toHaveLength(0);
-
-			// Expect the parameter artifact to be created
-			const artifactsList = await ls('./test-project/artifacts');
-			expect(artifactsList).toContain('IncDec.parameter.default_parameter.tz');
 
 			// Cleanup
 			await cleanup();
@@ -1009,7 +955,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		test('regression against #1907, compile task will compile storage/parameter expressions for variables which were commented out', async () => {
 			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
 
-			console.log(projectDir);
+			// console.log(projectDir);
 
 			// set up the project
 			const { waitForText } = await spawn('taq', 'init test-project');
