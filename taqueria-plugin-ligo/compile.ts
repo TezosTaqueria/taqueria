@@ -15,13 +15,14 @@ import * as readline from 'readline';
 import {
 	CompileOpts as Opts,
 	emitExternalError,
+	formatLigoError,
 	getInputFilenameAbsPath,
 	getInputFilenameRelPath,
 	getLigoDockerImage,
 	UnionOpts,
 } from './common';
 
-export type TableRow = { source: string; artifact: string };
+export type TableRow = { source: string; artifact: string; err?: unknown };
 
 export type ExprKind = 'storage' | 'default_storage' | 'parameter';
 
@@ -219,10 +220,10 @@ const compileExpr =
 				};
 			})
 			.catch(err => {
-				emitExternalError(err, sourceFile);
 				return {
 					source: module.sourceName,
-					artifact: `${sourceFile} not compiled`,
+					artifact: `${exprName} in ${sourceFile} not compiled`,
+					err,
 				};
 			});
 	};
@@ -253,36 +254,62 @@ const getExprNames = (parsedArgs: Opts, sourceFile: string): Promise<string[]> =
 	});
 };
 
-const compileExprs = (
+const compileExprs = async (
 	parsedArgs: Opts,
 	sourceFile: string,
 	module: ModuleInfo,
 	exprKind: ExprKind,
-): Promise<TableRow[]> =>
-	getExprNames(parsedArgs, sourceFile)
-		.then(exprNames => {
-			if (exprNames.length === 0) return [];
-			const firstExprName = exprNames.slice(0, 1)[0];
-			const restExprNames = exprNames.slice(1, exprNames.length);
-			const firstExprKind = isStorageKind(exprKind) ? 'default_storage' : 'parameter';
-			const restExprKind = isStorageKind(exprKind) ? 'storage' : 'parameter';
-			const firstExprResult = compileExpr(parsedArgs, sourceFile, module, firstExprKind)(firstExprName);
-			const restExprResults = restExprNames.map(compileExpr(parsedArgs, sourceFile, module, restExprKind));
-			return Promise.all([firstExprResult].concat(restExprResults));
-		})
-		.catch(err => {
-			emitExternalError(err, sourceFile);
-			return [{
-				source: module.sourceName,
-				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} expressions compiled`,
-			}];
-		})
-		.then(results =>
-			results.length > 0 ? results : [{
-				source: module.sourceName,
-				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} expressions found`,
-			}]
-		);
+): Promise<TableRow[]> => {
+	// Get expressions from file
+	let exprs = [];
+	try {
+		exprs = await getExprNames(parsedArgs, sourceFile);
+	} catch (err) {
+		emitExternalError(err, sourceFile);
+		return [{
+			source: module.sourceName,
+			artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} expressions compiled`,
+		}];
+	}
+
+	const results = await Promise.all(exprs.map(async (exprName, index) => {
+		const compileResult = await compileExpr(
+			parsedArgs,
+			sourceFile,
+			module,
+			exprKind === 'storage' && index === 0 ? 'default_storage' : exprKind,
+		)(exprName);
+		return compileResult;
+	}));
+
+	// Collect errors
+	const errors = results.reduce(
+		(acc, result) => {
+			if (result.err) {
+				// If its not an Error object, then just add it to the list
+				if (!(result.err instanceof Error)) return [...acc, result.err];
+
+				// Otherwise, get all ligo errors and ensure that the list is unique
+				const ligoErrs = (acc
+					.filter(err => err instanceof Error) as Error[])
+					.map(err => err.message);
+
+				const formattedError = formatLigoError(result.err);
+
+				return (ligoErrs.includes(formattedError.message)) ? acc : [...acc, formattedError];
+			}
+			return acc;
+		},
+		[] as unknown[],
+	);
+
+	// Collect table rows
+	const retval = results.map(({ source, artifact }) => ({ source, artifact }));
+
+	if (errors.length) emitExternalError(errors, sourceFile);
+
+	return retval;
+};
 
 // Helper function to get the initial message based on the pair value
 const getInitialMessage = (pair: string, module: ModuleInfo) => {
@@ -346,6 +373,7 @@ export const compileContractWithStorageAndParameter = async (
 ): Promise<TableRow[]> => {
 	const contractCompileResult = await compileContract(parsedArgs, sourceFile, module);
 	if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
+	debugger;
 
 	const storageListFile = `${module.moduleName}.storageList${extractExt(sourceFile)}`;
 	const storageListFilename = getInputFilenameAbsPath(parsedArgs, storageListFile);

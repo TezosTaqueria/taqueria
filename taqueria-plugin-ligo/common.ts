@@ -38,8 +38,29 @@ export const getInputFilenameAbsPath = (parsedArgs: UnionOpts, sourceFile: strin
 export const getInputFilenameRelPath = (parsedArgs: UnionOpts, sourceFile: string): string =>
 	join(parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
 
-export const emitExternalError = (err: unknown, sourceFile: string): void => {
+export const formatLigoError = (err: Error): Error => {
+	let result = err.message.replace(/Command failed.+?\n/, '');
+	if (
+		result.includes('An internal error ocurred. Please, contact the developers.')
+		&& result.includes('Module Contract not found with last Contract.')
+	) {
+		result =
+			`The contract must be imported with "Contract" as the namespace: #import "path/to/contract.ligo" "Contract"`;
+	}
+
+	err.message = result.replace(
+		'An internal error ocurred. Please, contact the developers.',
+		'The LIGO compiler experienced an internal error. Please contact the LIGO developers.',
+	);
+
+	return err;
+};
+
+export const emitExternalError = (errs: unknown[] | unknown, sourceFile: string): void => {
 	sendErr(`\n=== Error messages for ${sourceFile} ===`);
-	err instanceof Error ? sendErr(err.message.replace(/Command failed.+?\n/, '')) : sendErr(err as any);
-	sendErr(`\n===`);
+	const errors = Array.isArray(errs) ? errs : [errs];
+	errors.map(err => {
+		err instanceof Error ? sendErr(err.message) : sendErr(err as any);
+	});
+	sendErr(`===`);
 };
