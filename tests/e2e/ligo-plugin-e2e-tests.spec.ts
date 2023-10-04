@@ -1006,7 +1006,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		});
 
 		// https://github.com/pinnacle-labs/taqueria/issues/1907
-		test.only('regression against #1907, compile task will compile storage/parameter expressions for variables which were commented out', async () => {
+		test('regression against #1907, compile task will compile storage/parameter expressions for variables which were commented out', async () => {
 			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
 
 			console.log(projectDir);
