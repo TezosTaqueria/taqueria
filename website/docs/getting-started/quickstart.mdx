@@ -88,64 +88,59 @@ taq install @taqueria/plugin-ligo
 
 Copy the following 3 code snippets, with the names suggested at the top of each code snippets, to the `contracts` folder of your Taqueria project
 
-```ligo title="counter.mligo"
-type storage = int
+```ligo title="Counter.mligo"
+module Counter = struct
+  type storage = int
 
-type parameter =
-  Increment of int
-| Decrement of int
-| Reset
+  type ret = operation list * storage
 
-type return = operation list * storage
+  (* Three entrypoints *)
 
-// Two entrypoints
+  [@entry]
+  let increment (delta : int) (store : storage) : ret = [], store + delta
 
-let add (store, delta : storage * int) : storage = store + delta
-let sub (store, delta : storage * int) : storage = store - delta
+  [@entry]
+  let decrement (delta : int) (store : storage) : ret = [], store - delta
 
-(* Main access point that dispatches to the entrypoints according to
-   the smart contract parameter. *)
-
-let main (action, store : parameter * storage) : return =
- ([] : operation list),    // No operations
- (match action with
-   Increment (n) -> add (store, n)
- | Decrement (n) -> sub (store, n)
- | Reset         -> 0)
+  [@entry]
+  let reset (() : unit) (_ : storage) : ret = [], 0
+end
 ```
 
-```ligo title="counter.storageList.mligo"
-#include "counter.mligo"
-let initial_count: storage = 42
-let another_count: storage = 23 + 18 - 1
+```ligo title="Counter.storageList.mligo"
+#import "Counter.mligo" "Contract"
+
+// Define your initial storage values as a list of LIGO variable definitions, the first of which will be considered the default value to be used for origination later on
+let initial_count = 42
+let another_count: Contract.Counter.storage = 23 + 18 + 1
 ```
 
-```ligo title="counter.parameterList.mligo"
-#include "counter.mligo"
-let increment_by_3: parameter = Increment 3
+```ligo title="Counter.parameterList.mligo"
+#import "Counter.mligo" "Contract"
+let increment_by_3: Contract.Counter parameter_of = Increment 3
 ```
 
 You can now compile this contract, along with its storage and parameter values, by simply running the following command from the root of the project directory:
 ```shell
-taq compile counter.mligo
+taq compile Counter.mligo
 ```
 
 Taqueria will then output the following, and the artifacts created:
 ```shell
 ❯ taq compile counter.mligo                     
-┌────────────────────────────────┬───────────────────────────────────────────────┐
-│ Contract                       │ Artifact                                      │
-├────────────────────────────────┼───────────────────────────────────────────────┤
-│ counter.mligo                  │ artifacts/counter.tz                          │
-├────────────────────────────────┼───────────────────────────────────────────────┤
-│ counter.storageList.mligo      │ artifacts/counter.default_storage.tz          │
-│                                │ artifacts/counter.storage.another_count.tz    │
-├────────────────────────────────┼───────────────────────────────────────────────┤
-│ counter.parameterList.mligo    │ artifacts/counter.parameter.increment_by_3.tz │
-└────────────────────────────────┴───────────────────────────────────────────────┘
+┌───────────────────────┬───────────────────────────────────────────────┐
+│ Source                │ Artifact                                      │
+├───────────────────────┼───────────────────────────────────────────────┤
+│ Counter.mligo/Counter │ artifacts/Counter.tz                          │
+│                       │ artifacts/Counter.default_storage.tz          │
+│                       │ artifacts/Counter.storage.another_count.tz    │
+│                       │ artifacts/Counter.parameter.increment_by_3.tz │
+└───────────────────────┴───────────────────────────────────────────────┘
+
+Compiled 1 contract(s) in "Counter.mligo"
 ```
 
-If you open this file (`artifacts/counter.tz`), you can view the raw Michelson code which will later be originated to the sandbox:
+If you open this file (`artifacts/Counter.tz`), you can view the raw Michelson code which will later be originated to the sandbox:
 ```
 { parameter (or (or (int %decrement) (int %increment)) (unit %reset)) ;
   storage int ;
