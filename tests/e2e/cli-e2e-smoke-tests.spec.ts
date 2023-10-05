@@ -123,7 +123,6 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 			'install ../taqueria-plugin-ligo --logPluginRequests --debug',
 			'./test-project',
 		);
-		console.log(result);
 		expect(result.stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 		expect(result.stderr.join().trim()).toEqual('');
 

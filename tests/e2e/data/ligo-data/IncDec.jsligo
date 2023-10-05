@@ -1,0 +1,39 @@
+namespace IncDec {
+  export type storage = int;
+  type ret = [list<operation>, storage];
+  
+  // Three entrypoints
+
+  @entry
+  const increment = (delta: int, store: storage): ret =>
+    [list([]), store + delta];
+  @entry
+  const decrement = (delta: int, store: storage): ret =>
+    [list([]), store - delta];
+  @entry
+  const reset = (_: unit, _: storage): ret => [list([]), 0]
+};
+
+/* Tests for main access point */
+
+const test_initial_storage =
+  (
+    () => {
+      let initial_storage = 42;
+      let [taddr, _, _] =
+        Test.originate_module(contract_of (IncDec), initial_storage, 0 as tez);
+      return assert(Test.get_storage(taddr) == initial_storage)
+    }
+  )();
+
+const test_increment =
+  (
+    () => {
+      let initial_storage = 42;
+      let [taddr, _, _] =
+        Test.originate_module(contract_of (IncDec), initial_storage, 0 as tez);
+      let contr = Test.to_contract(taddr);
+      let _ = Test.transfer_to_contract_exn(contr, (Increment(1)), 1 as mutez);
+      return assert(Test.get_storage(taddr) == initial_storage + 1)
+    }
+  )();

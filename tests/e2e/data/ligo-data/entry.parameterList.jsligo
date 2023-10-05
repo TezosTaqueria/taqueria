@@ -1,0 +1,3 @@
+#import "entry.jsligo" "Contract"
+
+const default_parameter : parameter_of Contract = Increment(1)

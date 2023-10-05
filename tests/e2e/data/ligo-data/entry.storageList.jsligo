@@ -1,0 +1,3 @@
+#import "entry.jsligo" "Contract"
+
+const default_parameter : Contract.storage = 0
