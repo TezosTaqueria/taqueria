@@ -12,6 +12,7 @@ type ConfiguratorArgs = {
 	unparsedArgs: string[];
 	dockerImage: string;
 	dockerImageEnvVar: string;
+	templates?: Record<string, string>;
 };
 
 export const configurePlugin = (settings: ConfiguratorArgs) => {
@@ -110,7 +111,7 @@ export const configurePlugin = (settings: ConfiguratorArgs) => {
 						description: 'The syntax used in the contract',
 					}),
 				],
-				handler: createContract,
+				handler: createContract(settings.templates),
 			}),
 		],
 		proxy: main(settings.dockerImage, settings.dockerImageEnvVar),

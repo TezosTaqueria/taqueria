@@ -19,7 +19,7 @@ taq install @taqueria/plugin-ligo
 ```
 
 <%~ it.noteOpenAdmonition %>
-You can override the Ligo version used by the plugin by creating the environment variable `TAQ_LIGO_IMAGE` and setting it to your desired Ligo Docker image
+You can override the Ligo version used by the plugin by creating the environment variable `TAQ_LIGO_LEGACY_IMAGE` and setting it to your desired Ligo Docker image
 <%= it.closeAdmonition %>
 
 ## The `taq compile` Task
