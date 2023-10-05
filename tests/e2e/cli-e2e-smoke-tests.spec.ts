@@ -73,9 +73,9 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 			const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-jest', './test-project');
 			expect(stdout1).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
-			const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
+			const mligo_file = await (await exec('cat e2e/data/ligo-legacy-data/hello-tacos.mligo')).stdout;
 			await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
-			const tests_file = await (await exec('cat e2e/data/ligo-data/hello-tacos-tests.mligo')).stdout;
+			const tests_file = await (await exec('cat e2e/data/ligo-legacy-data/hello-tacos-tests.mligo')).stdout;
 			await writeFile('./test-project/contracts/hello-tacos-tests.mligo', tests_file);
 
 			const { stderr } = await execute('taq', 'test hello-tacos-tests.mligo', './test-project/');

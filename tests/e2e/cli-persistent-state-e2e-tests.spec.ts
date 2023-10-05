@@ -11,7 +11,7 @@ describe('Persistent State E2E Tests for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-legacy-data/hello-tacos.mligo')).stdout;
 		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		await execute('taq', 'compile hello-tacos.mligo', './test-project');
@@ -30,7 +30,7 @@ describe('Persistent State E2E Tests for Taqueria CLI', () => {
 
 		const config_file = await (await exec('cat e2e/data/config-data/config-without-default-environment.json')).stdout;
 		writeFile('./test-project/.taq/config.json', config_file);
-		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-legacy-data/hello-tacos.mligo')).stdout;
 		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		await execute('taq', 'compile hello-tacos.mligo', './test-project');
@@ -49,7 +49,7 @@ describe('Persistent State E2E Tests for Taqueria CLI', () => {
 
 		const config_file = await (await exec('cat e2e/data/config-data/config-default-environment-testing.json')).stdout;
 		writeFile('./test-project/.taq/config.json', config_file);
-		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-legacy-data/hello-tacos.mligo')).stdout;
 		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		await execute('taq', 'compile hello-tacos.mligo', './test-project');
@@ -67,7 +67,7 @@ describe('Persistent State E2E Tests for Taqueria CLI', () => {
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout).toContain('Plugin installed successfully');
 
-		const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
+		const mligo_file = await (await exec('cat e2e/data/ligo-legacy-data/hello-tacos.mligo')).stdout;
 		writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
 
 		await execute('taq', 'compile -e testing hello-tacos.mligo', './test-project');

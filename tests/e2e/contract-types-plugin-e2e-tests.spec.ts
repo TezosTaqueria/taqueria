@@ -74,7 +74,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout1).toContain('Plugin installed successfully');
 
-		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
+		const jsligo_file = await (await exec(`cat e2e/data/ligo-legacy-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
 		await execute('taq', 'compile increment.jsligo', './test-project');
@@ -108,7 +108,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout1).toContain('Plugin installed successfully');
 
-		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
+		const jsligo_file = await (await exec(`cat e2e/data/ligo-legacy-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
 		await execute('taq', 'compile increment.jsligo', './test-project');
@@ -142,7 +142,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout1).toContain('Plugin installed successfully');
 
-		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
+		const jsligo_file = await (await exec(`cat e2e/data/ligo-legacy-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
 		await execute('taq', 'compile increment.jsligo', './test-project');
@@ -176,7 +176,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		const { stdout: stdout1 } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		expect(stdout1).toContain('Plugin installed successfully');
 
-		const jsligo_file = await (await exec(`cat e2e/data/ligo-data/increment.jsligo`)).stdout;
+		const jsligo_file = await (await exec(`cat e2e/data/ligo-legacy-data/increment.jsligo`)).stdout;
 		await writeFile('./test-project/contracts/increment.jsligo', jsligo_file);
 
 		await execute('taq', 'compile increment.jsligo', './test-project');
