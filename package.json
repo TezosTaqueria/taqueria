@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.40.8",
+	"version": "0.40.9",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -78,6 +78,7 @@
 		"./taqueria-flextesa-manager",
 		"./taqueria-vscode-extension",
 		"./taqueria-vscode-extension-web-ui",
+		"./taqueria-lib*",
 		"./taqueria-plugin*",
 		"./tests"
 	]

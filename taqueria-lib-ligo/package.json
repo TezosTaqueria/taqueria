@@ -1,7 +1,7 @@
 {
-	"name": "@taqueria/plugin-ligo",
+	"name": "@taqueria/lib-ligo",
 	"version": "0.40.9",
-	"description": "A taqueria plugin for compiling LIGO smart contracts",
+	"description": "A taqueria library which provides common functionality for the LIGO and LIGO Legacy Plugins",
 	"targets": {
 		"default": {
 			"source": "./index.ts",
