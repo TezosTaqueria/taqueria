@@ -119,8 +119,12 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 		const result = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		console.log(result);
 		expect(result.stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 		expect(result.stderr.join().trim()).toEqual('');
+
+		const uninstallResult = await (execute('taq', 'uninstall @taqueria/plugin-ligo', './test-project'));
+		expect(uninstallResult.stdout).toEqual(expect.arrayContaining(['Plugin uninstalled successfully']));
 	});
 
 	describe('various regressions', () => {
