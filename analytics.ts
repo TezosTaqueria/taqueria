@@ -35,35 +35,18 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 
 	const didUserChooseYes = (input: string | null) => parsedArgs.yes || input === null || /^y(es)?$/i.test(input);
 
-	const promptForConsent = (option: Consent) =>
-		pipe(
-			doesPathExist(settingsFilePath),
-			chain(() => {
-				const input = parsedArgs.yes
-					? 'y'
-					: prompt(option === OPT_IN ? optInConfirmationPrompt : optOutConfirmationPrompt);
-				return !didUserChooseYes(input)
-					? taqResolve(option === OPT_IN ? OPT_OUT : OPT_IN)
-					: pipe(
-						readJsonFile<Settings.t>(settingsFilePath),
-						map((settingsContent: Settings.t) => {
-							settingsContent.consent = option;
-							return settingsContent;
-						}),
-						chain(writeJsonFile(settingsFilePath)),
-						map(() => option),
-					);
-			}),
-		);
-
-	const optInAnalytics = () => promptForConsent(OPT_IN);
-	const optOutAnalytics = () => promptForConsent(OPT_OUT);
-
 	const getSettings = () =>
 		pipe(
 			doesPathExist(settingsFolder),
 			chainRej(_ => mkdir(settingsFolder)),
 			chain(_ => doesPathExist(settingsFilePath)),
+			chainRej(_ =>
+				pipe(
+					Settings.of({ consent: 'unspecified' }),
+					chain(writeJsonFile(settingsFilePath)),
+					chain(() => doesPathExist(settingsFilePath)),
+				)
+			),
 			chain(readJsonFile),
 			chain(Settings.of),
 		);
@@ -71,19 +54,62 @@ export const inject = (deps: UsageAnalyticsDeps) => {
 	const getTrackingConsent = () =>
 		/*:Future<TaqError.t, Consent>*/ pipe(
 			getSettings(),
-			chain(settings => settings.consent !== 'unspecified' ? taqResolve(settings.consent) : promptForConsent(OPT_IN)),
+			chain(settings =>
+				settings.consent !== 'unspecified' ? taqResolve(settings.consent) : promptForConsent(OPT_IN, 'y')
+			),
+		);
+
+	const promptForConsent = (option: Consent, defaultAnswer: string, noActionOnNegative: boolean = false) => {
+		const promptText = option === OPT_IN ? optInConfirmationPrompt : optOutConfirmationPrompt;
+
+		const handlePrompt = (): Future<TaqError.t, string | null> => {
+			const input = parsedArgs.yes ? defaultAnswer : prompt(promptText);
+
+			if (input === null || /^y(es)?$/i.test(input)) {
+				return updateSettingsAndReturn(option);
+			} else if (/^n(o)?$/i.test(input)) {
+				return noActionOnNegative ? taqResolve(null) : updateSettingsAndReturn(option === OPT_IN ? OPT_OUT : OPT_IN);
+			} else {
+				console.log('Invalid response. Please enter "y" or "n".');
+				return handlePrompt();
+			}
+		};
+
+		return pipe(
+			getSettings(),
+			chain(() => handlePrompt()),
+		);
+	};
+
+	const updateSettingsAndReturn = (consent: Consent) =>
+		pipe(
+			readJsonFile<Settings.t>(settingsFilePath),
+			map((settingsContent: Settings.t) => {
+				settingsContent.consent = consent;
+				return settingsContent;
+			}),
+			chain(writeJsonFile(settingsFilePath)),
+			map(() => consent),
 		);
 
 	const askToOptIn = () =>
 		pipe(
-			optInAnalytics(),
-			map(() => 'You have successfully opted-in to sharing anonymous usage analytics.'),
+			promptForConsent(OPT_IN, 'y'),
+			map(consent =>
+				consent === OPT_IN
+					? 'You have successfully opted-in to sharing anonymous usage analytics.'
+					: 'You have opted-out from sharing anonymous usage analytics.'
+			),
 		);
 
 	const askToOptOut = () =>
 		pipe(
-			optOutAnalytics(),
-			map(() => 'You have successfully opted-out from sharing anonymous usage analytics.'),
+			promptForConsent(OPT_OUT, 'n', true), // Passing true for noActionOnNegative
+			map(consent =>
+				consent === OPT_OUT
+					? 'You have successfully opted-out from sharing anonymous usage analytics.'
+					: 'No changes were made.'
+			),
 		);
 
 	// No-operation

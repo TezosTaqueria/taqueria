@@ -122,4 +122,27 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 		expect(result.stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 		expect(result.stderr.join().trim()).toEqual('');
 	});
+
+	describe('various regressions', () => {
+		test('regression against #1911, opt-in to anonymous usage analytics works for first-time users', async () => {
+			const { execute, spawn, cleanup } = await prepareEnvironment();
+
+			// Setup project
+			const { waitForText } = await spawn('taq', 'init test-project');
+			await waitForText("Project taq'ified!");
+
+			// Remove the analytics file
+			await exec('rm $HOME/.taq-settings/taq-settings.json').catch(() => {});
+
+			// Run the command
+			const results = await execute('taq', 'opt-in --yes', './test-project');
+			expect(results.stderr).not.toContain('Path does not exist: {{homedir}}/.taq-settings/taq-settings.json');
+			expect(results.stdout).toEqual([
+				'You have successfully opted-in to sharing anonymous usage analytics.',
+			]);
+
+			// Cleanup
+			await cleanup();
+		});
+	});
 });
