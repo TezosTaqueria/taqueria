@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-contract-types",
-	"version": "0.40.17",
+	"version": "0.40.18",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",
@@ -34,7 +34,7 @@
 		"typescript": "^5.2.2"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.40.17",
+		"@taqueria/node-sdk": "^0.40.18",
 		"@taquito/michel-codec": "^17.3.1",
 		"@taquito/signer": "^17.3.1",
 		"@taquito/taquito": "^17.3.1",
