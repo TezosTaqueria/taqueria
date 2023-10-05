@@ -45,7 +45,7 @@ export const formatLigoError = (err: Error): Error => {
 		&& result.includes('Module Contract not found with last Contract.')
 	) {
 		result =
-			`The contract must be imported with "Contract" as the namespace: #import "path/to/contract.ligo" "Contract"`;
+			`By convention, Taqueria expects you to import your contract with Contract as the module name.\nFor instance, if you have a contract in a file called "increment.mligo", in your parameter/storage list file you must include #import "Increment.mligo" "Contract" for compilation to be successful.`;
 	}
 
 	err.message = result.replace(
