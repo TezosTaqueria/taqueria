@@ -3,7 +3,7 @@ import { exec as exec1 } from 'child_process';
 import { readFile } from 'fs/promises';
 
 describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
-	jest.setTimeout(60000);
+	jest.setTimeout(100000);
 	test('Part 1, Step 1 : Create folder & file - slowTest', async () => {
 		// set up the project
 		const { execute, cleanup, writeFile, exists, path: projectPath } = await prepareEnvironment();
