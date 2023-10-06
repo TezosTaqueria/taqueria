@@ -15,7 +15,7 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_file);
 
 		const typecheckResult = await execute('taq', 'typecheck-all', './test-project');
-		// console.log(typecheckResult)
+		console.log(typecheckResult);
 		expect(typecheckResult.stdout).toEqual(expect.arrayContaining(['│ hello-tacos.tz │ Valid  │']));
 
 		await cleanup();
