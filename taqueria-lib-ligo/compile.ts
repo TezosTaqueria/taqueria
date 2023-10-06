@@ -378,7 +378,6 @@ export const inject = (commonObj: Common) => {
 	): Promise<TableRow[]> => {
 		const contractCompileResult = await compileContract(parsedArgs, sourceFile, module);
 		if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
-		debugger;
 
 		const storageListFile = `${module.moduleName}.storageList${extractExt(sourceFile)}`;
 		const storageListFilename = getInputFilenameAbsPath(parsedArgs, storageListFile);
@@ -455,7 +454,8 @@ export const compile = async (commonObj: Common, parsedArgs: Opts): Promise<void
 			return sendJsonRes([
 				{
 					source: sourceFile,
-					artifact: `No contract modules found in "${sourceFile}"`,
+					artifact:
+						`No contract modules found in "${sourceFile}\nIf your contract is defined within a namespace, please ensure that it is exported from the contract file."`,
 				},
 			]);
 		}

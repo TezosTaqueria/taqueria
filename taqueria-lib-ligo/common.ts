@@ -41,10 +41,14 @@ export const formatLigoError = (err: Error): Error => {
 			`By convention, Taqueria expects you to import your contract with Contract as the module name.\nFor instance, if you have a contract in a file called "increment.mligo", in your parameter/storage list file you must include #import "Increment.mligo" "Contract" for compilation to be successful.`;
 	}
 
-	err.message = result.replace(
-		'An internal error ocurred. Please, contact the developers.',
-		'The LIGO compiler experienced an internal error. Please contact the LIGO developers.',
-	);
+	err.message = result
+		.replace(
+			'An internal error ocurred. Please, contact the developers.',
+			'The LIGO compiler experienced an internal error. Please contact the LIGO developers.',
+		).replace(
+			/Module ("Contract\.[^"]+") not found/,
+			'The module $1 was not found. If your contract is defined within a namespace, please ensure that it has been exported.',
+		);
 
 	return err;
 };
