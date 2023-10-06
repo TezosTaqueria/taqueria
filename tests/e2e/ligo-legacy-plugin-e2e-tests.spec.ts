@@ -648,7 +648,9 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			expect(compileOutput.join('\n')).toContain(
 				'│ does_not_exist.mligo │ No contract modules found in "does_not_exist.mligo"',
 			);
-			expect(compileErr.join()).toContain('does_not_exist.mligo: No such file or directory');
+			expect(compileErr).toContain(
+				'The file does_not_exist.mligo was not found. Please ensure that the file exists and that it is in the contracts directory.',
+			);
 
 			await cleanup();
 		});
