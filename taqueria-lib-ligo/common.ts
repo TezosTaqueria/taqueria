@@ -39,6 +39,14 @@ export const formatLigoError = (err: Error): Error => {
 	) {
 		result =
 			`By convention, Taqueria expects you to import your contract with Contract as the module name.\nFor instance, if you have a contract in a file called "increment.mligo", in your parameter/storage list file you must include #import "Increment.mligo" "Contract" for compilation to be successful.`;
+	} else {
+		const regex = /contracts\/(.+): No such file or directory/;
+		const match = regex.exec(result);
+		if (match) {
+			const filename = match[1];
+			result =
+				`The file ${filename} was not found. Please ensure that the file exists and that it is in the contracts directory.`;
+		}
 	}
 
 	err.message = result

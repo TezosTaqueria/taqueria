@@ -1,0 +1,3 @@
+#import "pokeGame.jsligo" "Contract"
+
+const default_storage = Set.empty as set<address>;

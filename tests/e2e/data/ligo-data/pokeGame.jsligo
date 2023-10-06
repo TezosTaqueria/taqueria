@@ -1,0 +1,8 @@
+export type storage = set<address>;
+
+type return_ = [list<operation>, storage];
+
+@entry
+const poke = (_: unit, store: storage): return_ => {
+  return [list([]) as list<operation>, Set.add(Tezos.get_source(), store)]
+};

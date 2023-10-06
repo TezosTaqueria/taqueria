@@ -12,5 +12,5 @@
     [list([]), store - delta];
 
   @entry
-  const reset = (_ : unit, _ : storage) : ret =>
+  const reset = (_ : unit, _s : storage) : ret =>
     [list([]), 0];

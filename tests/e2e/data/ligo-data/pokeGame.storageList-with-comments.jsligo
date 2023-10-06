@@ -1,0 +1,5 @@
+#import "pokeGame.jsligo" "Contract"
+
+// const commented_storage = Set.empty as set<address>;
+
+const default_storage = Set.empty as set<address>;

@@ -222,6 +222,7 @@ export const inject = (commonObj: Common) => {
 				[],
 			);
 		} catch (err) {
+			const formattedErr = err instanceof Error ? formatLigoError(err) : err;
 			emitExternalError(err, sourceFile);
 			return [];
 		}
@@ -455,7 +456,7 @@ export const compile = async (commonObj: Common, parsedArgs: Opts): Promise<void
 				{
 					source: sourceFile,
 					artifact:
-						`No contract modules found in "${sourceFile}\nIf your contract is defined within a namespace, please ensure that it is exported from the contract file."`,
+						`No contract modules found in "${sourceFile}".\nIf your contract is defined within a namespace, please ensure that it is exported from the contract file."`,
 				},
 			]);
 		}
