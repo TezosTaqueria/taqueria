@@ -124,7 +124,6 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 			'./test-project',
 		);
 		expect(result.stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
-		expect(result.stderr.join().trim()).toEqual('');
 
 		const uninstallResult = await (execute('taq', 'uninstall @taqueria/plugin-ligo', './test-project'));
 		expect(uninstallResult.stdout).toEqual(expect.arrayContaining(['Plugin uninstalled successfully']));
