@@ -72,8 +72,7 @@ const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRo
 	getCheckFileExistenceCommand(parsedArgs, sourceFile)
 		.then(execCmd)
 		.then(() =>
-			getSimulateCmd(parsedArgs, sourceFile)
-				.then(execCmd)
+			retrySimulateCmd(parsedArgs, sourceFile, 0)
 				.then(({ stdout, stderr }) => {
 					if (stderr.length > 0) sendWarn(`\n${stderr}`);
 					return {
@@ -99,6 +98,26 @@ const simulateContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRo
 				result: 'N/A',
 			};
 		});
+
+const retrySimulateCmd = (
+	parsedArgs: Opts,
+	sourceFile: string,
+	retryCount: number,
+): Promise<{ stdout: string; stderr: string }> => {
+	const max_retries = 3;
+	const relay_delay_ms = 1000;
+	return getSimulateCmd(parsedArgs, sourceFile)
+		.then(execCmd)
+		.catch(err => {
+			if (retryCount < max_retries && err.stderr.includes('503 Service Temporarily')) {
+				const delay = relay_delay_ms * Math.pow(2, retryCount);
+				return new Promise(resolve => setTimeout(resolve, delay))
+					.then(() => retrySimulateCmd(parsedArgs, sourceFile, retryCount + 1));
+			} else {
+				throw err;
+			}
+		});
+};
 
 const simulate = (parsedArgs: Opts): Promise<void> => {
 	const sourceFile = addTzExtensionIfMissing(parsedArgs.sourceFile!);
