@@ -14,8 +14,9 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		const artifact_file = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_file);
 
-		const { stdout: stdout1 } = await execute('taq', 'typecheck-all', './test-project');
-		expect(stdout1).toEqual(expect.arrayContaining(['│ hello-tacos.tz │ Valid  │']));
+		const typecheckResult = await execute('taq', 'typecheck-all', './test-project');
+		// console.log(typecheckResult)
+		expect(typecheckResult.stdout).toEqual(expect.arrayContaining(['│ hello-tacos.tz │ Valid  │']));
 
 		await cleanup();
 	});
@@ -30,8 +31,9 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		const artifact_file = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_file);
 
-		const { stdout: stdout1, stderr } = await execute('taq', 'typecheck hello-tacos.tz', './test-project');
-		expect(stdout1).toEqual(expect.arrayContaining(['│ hello-tacos.tz │ Valid  │']));
+		const typeCheckResult = await execute('taq', 'typecheck hello-tacos.tz', './test-project');
+		// console.log(typeCheckResult)
+		expect(typeCheckResult.stdout).toEqual(expect.arrayContaining(['│ hello-tacos.tz │ Valid  │']));
 
 		await cleanup();
 	});
@@ -48,9 +50,10 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		const artifact_two = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
 		await writeFile('./test-project/artifacts/hello-tacos-two.tz', artifact_two);
 
-		const { stdout: stdout1 } = await execute('taq', 'typecheck-all', './test-project');
-		expect(stdout1).toEqual(expect.arrayContaining(['│ hello-tacos-one.tz │ Valid  │']));
-		expect(stdout1).toEqual(expect.arrayContaining(['│ hello-tacos-two.tz │ Valid  │']));
+		const typeCheckResult = await execute('taq', 'typecheck-all', './test-project');
+		// console.log(typeCheckResult)
+		expect(typeCheckResult.stdout).toEqual(expect.arrayContaining(['│ hello-tacos-one.tz │ Valid  │']));
+		expect(typeCheckResult.stdout).toEqual(expect.arrayContaining(['│ hello-tacos-two.tz │ Valid  │']));
 
 		await cleanup();
 	});
@@ -297,13 +300,13 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
-		const { stdout: stdout1 } = await execute(
+		const simulateResult = await execute(
 			'taq',
 			'simulate increment.tz --param incrementBy3.tz --storage anyContract.storage.tz',
 			'./test-project',
 		);
-		expect(stdout1).toEqual(expect.arrayContaining(['│ increment.tz │ storage            │']));
-		expect(stdout1).toEqual(expect.arrayContaining(['│              │   15               │']));
+		expect(simulateResult.stdout).toEqual(expect.arrayContaining(['│ increment.tz │ storage            │']));
+		expect(simulateResult.stdout).toEqual(expect.arrayContaining(['│              │   15               │']));
 
 		await cleanup();
 	});
@@ -322,13 +325,14 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		const artifact_three = await (await exec(`cat integration/data/anyContract.storage.tz`)).stdout;
 		await writeFile('./test-project/artifacts/anyContract.storage.tz', artifact_three);
 
-		const { stdout: stdout1, stderr } = await execute(
+		const result = await execute(
 			'taq',
 			'simulate increment.tz --param integerParameter10.tz --storage anyContract.storage.tz --entrypoint increment',
 			'./test-project',
 		);
-		expect(stdout1).toEqual(expect.arrayContaining(['│ increment.tz │ storage            │']));
-		expect(stdout1).toEqual(expect.arrayContaining(['│              │   22               │']));
+		// console.log(result)
+		expect(result.stdout).toEqual(expect.arrayContaining(['│ increment.tz │ storage            │']));
+		expect(result.stdout).toEqual(expect.arrayContaining(['│              │   22               │']));
 
 		await cleanup();
 	});
