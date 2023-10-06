@@ -17,3 +17,20 @@ if (!fs.existsSync(filePath)) {
     // If not, create and write 'accepted' to it
     fs.writeFileSync(filePath, 'accepted');
 }
+
+// If we're provided JSON as input, parse it, and determine if the plugin name is `@taqueria/plugin-ligo-legacy`. If so, create an empty esy.json file if it doesn't exist.
+const schema = process.argv.find(arg => arg.startsWith('{'))
+if (schema) {
+    try {
+        const json = JSON.parse(schema);
+        if (json.name === '@taqueria/plugin-ligo-legacy') {
+            const esyJsonPath = path.join(process.cwd(), 'esy.json');
+            if (!fs.existsSync(esyJsonPath)) {
+                fs.writeFileSync(esyJsonPath, '{}');
+            }
+        }
+    }
+    catch {
+        // Do nothing
+    }   
+}

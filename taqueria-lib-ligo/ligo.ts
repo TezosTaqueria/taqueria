@@ -38,24 +38,12 @@ const getArbitraryLigoCmd = (
 	];
 };
 
-const ensureEsyExists = async (parsedArgs: Opts): Promise<string> => {
-	const esyJsonPath = join(parsedArgs.projectDir, 'esy.json');
-
-	try {
-		return await readJsonFile(esyJsonPath);
-	} catch {
-		return await writeJsonFile(esyJsonPath)({});
-	}
-};
-
 const runArbitraryLigoCmd = (commonObj: Common, parsedArgs: Opts, cmd: string): Promise<string> =>
-	ensureEsyExists(parsedArgs)
-		.then(getArch)
-		.then(async () => {
-			const uid = await execCmd('id -u');
-			const gid = await execCmd('id -g');
-			return [uid.stdout.trim(), gid.stdout.trim()];
-		})
+	(async () => {
+		const uid = await execCmd('id -u');
+		const gid = await execCmd('id -g');
+		return [uid.stdout.trim(), gid.stdout.trim()];
+	})()
 		.then(([uid, gid]) => getArbitraryLigoCmd(commonObj, parsedArgs, uid, gid, cmd))
 		.then(([cmd, envVars]) => spawnCmd(cmd, envVars))
 		.then(code =>

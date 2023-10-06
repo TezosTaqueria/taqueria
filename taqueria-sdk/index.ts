@@ -1,5 +1,6 @@
 export * from '@taqueria/protocol/types';
 import * as Protocol from '@taqueria/protocol';
+import { quote as shellEscape } from 'shell-quote';
 export {
 	Config,
 	EconomicalProtocolHash,
@@ -460,7 +461,13 @@ const getResponse =
 				}
 				case 'runPostInstall':
 					if (schema.postInstall) {
-						const result = await execCmd(schema.postInstall);
+						const schemaArg = shellEscape([JSON.stringify({
+							name: schema.name ?? 'unknown',
+							alias: schema.alias,
+							version: schema.version,
+							schema: schema.schema,
+						})]);
+						const result = await execCmd(`${schema.postInstall} ${schemaArg}`);
 						if (result.stderr) {
 							return sendAsyncErr('\n' + result.stderr);
 						}
