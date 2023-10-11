@@ -73,7 +73,7 @@ const getContractInfo = async (parsedArgs: Opts): Promise<ContractInfo> => {
 	return {
 		contract,
 		code: contractCode,
-		initStorage: contractInitStorage,
+		initStorage: contractInitStorage.trim(),
 		mutezTransfer: parseInt(parsedArgs.mutez ?? '0'),
 	};
 };
@@ -117,13 +117,14 @@ const performOriginateOps = withIntervalHack((
 	env: string,
 	contractsInfo: ContractInfo[],
 	maxTimeout: number,
+	isSandbox = false,
 ): Promise<BatchWalletOperation> => {
 	const batch = createBatchForOriginate(tezos, contractsInfo);
 
 	try {
 		return doWithin<BatchWalletOperation>(maxTimeout, async () => {
 			const op = await batch.send();
-			await op.confirmation();
+			await op.confirmation(isSandbox ? 1 : 3);
 			return op;
 		});
 	} catch (err) {
@@ -181,6 +182,7 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 			getCurrentEnvironment(protocolArgs),
 			[contractInfo],
 			parsedArgs.timeout,
+			envType !== 'Network',
 		);
 
 		const contractInfoForDisplay = await prepContractInfoForDisplay(parsedArgs, tezos, contractInfo, op);

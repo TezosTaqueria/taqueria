@@ -16,8 +16,9 @@ import {
 } from '@taqueria/node-sdk';
 import { Config } from '@taqueria/node-sdk';
 import { LoadedConfig, Protocol, SandboxAccountConfig, SandboxConfig, StdIO } from '@taqueria/node-sdk/types';
-import { Config as RawConfig } from '@taqueria/protocol/types';
+import { Config as RawConfig, ConfigAccount } from '@taqueria/protocol/types';
 import retry from 'async-retry';
+import { BigNumber } from 'bignumber.js';
 import type { ExecException } from 'child_process';
 import { getPortPromise } from 'portfinder';
 import { last } from 'rambda';
@@ -86,7 +87,7 @@ export const updateConfig = async (opts: ValidOpts, update: (config: RawConfig) 
 const getFlextesaAnnotations = (sandbox: SandboxConfig.t): Promise<FlextesaAnnotations> => {
 	const defaults = {
 		baking: 'enabled',
-		block_time: 2,
+		block_time: 1,
 	};
 
 	const settings = {
@@ -111,21 +112,6 @@ const getFlextesaAnnotations = (sandbox: SandboxConfig.t): Promise<FlextesaAnnot
 	return Promise.resolve(settings as FlextesaAnnotations);
 };
 
-const getAccountFlags = (sandbox: SandboxConfig.t, config: ValidLoadedConfig) =>
-	Object.entries(sandbox.accounts ?? {}).reduce(
-		(retval, [accountName, accountDetails], _index, _) => {
-			if (accountName === 'default') return retval;
-			const desiredBalance = config.accounts[accountName];
-			const account = accountDetails as SandboxAccountConfig.t;
-			return [
-				...retval,
-				`--add-bootstrap-account "${accountName},${account.encryptedKey},${account.publicKeyHash},${account.secretKey}@${desiredBalance}"`,
-				`--no-daemons-for=${accountName}`,
-			];
-		},
-		[] as string[],
-	);
-
 const getBakingFlags = (sandbox: SandboxConfig.t) =>
 	getFlextesaAnnotations(sandbox)
 		.then(settings => {
@@ -133,6 +119,7 @@ const getBakingFlags = (sandbox: SandboxConfig.t) =>
 			if (settings.baking === 'enabled') {
 				return [
 					`--time-b ${settings.block_time}`,
+					``,
 				];
 			} // Disabled
 			else if (settings.baking === 'disabled') {
@@ -184,13 +171,21 @@ const getProtocolKind = (sandbox: SandboxConfig.t, opts: ValidOpts) =>
 			) ?? last(protocols)
 		);
 
+const getBootstrapBalance = (opts: ValidOpts) =>
+	Object.values(opts.config.accounts || {})
+		.reduce(
+			(retval, amount) => retval.plus(new BigNumber(amount.replaceAll('_', ''))),
+			new BigNumber(0).multipliedBy(1000000),
+		)
+		.multipliedBy(1000); // give the baker lots to work with
+
 const getMininetCommand = (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) =>
 	Promise.all([
-		getAccountFlags(sandbox, opts.config),
+		// getAccountFlags(sandbox, opts.config),
 		getBakingFlags(sandbox),
 		getProtocolKind(sandbox, opts),
 	])
-		.then(([accountFlags, bakingFlags, protocolKind]) => [
+		.then(([bakingFlags, protocolKind]) => [
 			'flextesa mini-net',
 			'--root /tmp/mini-box',
 			'--set-history-mode N000:archive', // TODO: Add annotation for this setting
@@ -198,7 +193,8 @@ const getMininetCommand = (sandboxName: string, sandbox: SandboxConfig.t, opts: 
 			`--number-of-b 1`,
 			`--protocol-kind="${protocolKind}"`,
 			'--size 1',
-			...accountFlags,
+			`--balance-of-bootstrap-accounts=mutez:${getBootstrapBalance(opts)}`,
+			// ...accountFlags,
 			...bakingFlags,
 		])
 		.then(flags => flags.join(' '));
@@ -212,14 +208,15 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 		);
 		await replaceRpcUrlInConfig(newPort, sandbox.rpcUrl.toString(), sandboxName, opts);
 	}
-	const ports = `-p ${newPort}:20000 --expose 20000`;
+	const ports = `-p ${newPort}:30000 --expose 30000`;
 
 	const containerName = await getContainerName(opts);
 	const arch = await getArch();
 	const image = getImage(opts);
 	const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir;
+	const proxyAbsPath = `${__dirname}/proxy.py`;
 
-	return `docker run -i --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project ${image} /bin/sh`;
+	return `docker run -i --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -v ${proxyAbsPath}:/opt/proxy.py ${image} /bin/sh -c "apk add py3-pip && python3 /opt/proxy.py"`;
 };
 
 const startMininet = async (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) => {
@@ -237,6 +234,17 @@ const getConfigureCommand = async (opts: ValidOpts): Promise<string> => {
 const doesUseFlextesa = (sandbox: SandboxConfig.t) => !sandbox.plugin || sandbox.plugin === 'flextesa';
 
 const doesNotUseFlextesa = (sandbox: SandboxConfig.t) => !doesUseFlextesa(sandbox);
+
+const waitForBootstrap = (parsedArgs: ValidOpts): unknown => {
+	const sandbox = getValidSandbox(parsedArgs.sandboxName, parsedArgs.config);
+	const containerName = getContainerName(parsedArgs);
+	return getContainerName(parsedArgs)
+		.then(container => execCmd(`docker exec ${container} octez-client bootstrapped`))
+		.catch(({ stderr }) => {
+			if (stderr.includes('Failed to acquire the protocol version from the node')) return waitForBootstrap(parsedArgs);
+			throw stderr;
+		});
+};
 
 const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts): Promise<void> => {
 	if (doesNotUseFlextesa(sandbox)) {
@@ -260,8 +268,55 @@ const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: Valid
 		})
 		.then(() => configureTezosClient(sandboxName, opts))
 		.then(() => {
+			console.log('Waiting for bootstrapping to complete...');
+			return waitForBootstrap(opts);
+		})
+		.then(() => {
+			console.log('Funding declared accounts (please wait)...');
+			return new Promise(resolve => setTimeout(resolve, 10000)).then(() => fundDeclaredAccounts(opts));
+		})
+		.then(() => {
 			console.log(`The sandbox "${sandboxName}" is ready.`);
 		});
+};
+
+type Transfer = { destination: string; amount: string };
+
+const createTransferList = (sandbox: SandboxConfig.t, parsedArgs: ValidOpts) => {
+	const transferList = Object.keys(sandbox.accounts ?? {}).reduce(
+		(retval, accountName) => {
+			if (accountName === 'default') return retval;
+			const balance = new BigNumber(parsedArgs.config.accounts[accountName].replaceAll('_', '')).div(1000000);
+			return [...retval, { destination: accountName, amount: balance.toString() }];
+		},
+		[] as Transfer[],
+	);
+	return transferList;
+};
+
+const writeTransferList = (containerName: string, transferList: Transfer[]) => {
+	const fileAbsPath = '/tmp/transferList.json';
+	const cmd = `docker cp ${fileAbsPath} ${containerName}:${fileAbsPath}`;
+	return writeJsonFile(fileAbsPath)(transferList)
+		.then(() => execCmd(cmd))
+		.then(() => fileAbsPath);
+};
+
+const fundDeclaredAccounts = async (parsedArgs: ValidOpts) => {
+	const sandbox = getValidSandbox(parsedArgs.sandboxName, parsedArgs.config);
+	const transferList = createTransferList(sandbox, parsedArgs);
+
+	try {
+		const containerName = await getContainerName(parsedArgs);
+		const transferListAbsPath = await writeTransferList(containerName, transferList);
+		const cmd =
+			`docker exec ${containerName} octez-client multiple transfers from baker0 using ${transferListAbsPath} --burn-cap 1`;
+		const result = await execCmd(cmd);
+		return result;
+	} catch (e) {
+		if (parsedArgs.debug) console.warn(e);
+		return sendAsyncErr('Failed to fund declared accounts.');
+	}
 };
 
 const startContainer = async (container: { name: string; command: string }): Promise<void> => {
@@ -318,7 +373,7 @@ const configureTezosClient = (sandboxName: string, opts: ValidOpts): Promise<Std
 const importBaker = (opts: ValidOpts) =>
 	getContainerName(opts)
 		.then(container =>
-			`docker exec -d ${container} octez-client import secret key b0 unencrypted:edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx`
+			`docker exec -d ${container} octez-client import secret key baker0 unencrypted:edsk3RFgDiCt7tWB2oe96w1eRw72iYiiqZPLu9nnEY23MYRp2d8Kkx`
 		)
 		.then(execCmd);
 
@@ -345,7 +400,9 @@ const getSandbox = ({ sandboxName, config }: Opts) => {
 };
 
 const getValidSandbox = (sandboxName: string, config: ValidLoadedConfig) => {
-	return config.sandbox[sandboxName] as SandboxConfig.t;
+	const retval = config.sandbox[sandboxName] as SandboxConfig.t;
+	retval.rpcUrl = retval.rpcUrl && retval.rpcUrl.length > 0 ? retval.rpcUrl : Url.create('http://localhost:20000');
+	return retval;
 };
 
 const startSandboxTask = (parsedArgs: ValidOpts): Promise<void> => {
@@ -491,12 +548,12 @@ const bakeTask = (parsedArgs: ValidOpts) =>
 						if (Array.isArray(ops.applied) && ops.applied.length > 0) break;
 					}
 
-					await spawnCmd(`docker exec ${containerName} octez-client bake for b0`);
+					await spawnCmd(`docker exec ${containerName} octez-client bake for baker0`);
 					noop();
 				}
 			}
 
-			return spawnCmd(`docker exec ${containerName} octez-client bake for b0`).then(noop);
+			return spawnCmd(`docker exec ${containerName} octez-client bake for baker0`).then(noop);
 		});
 
 // TODO - we should run all `flextesa key` calls in a single `docker run` call.
@@ -548,19 +605,18 @@ const maybeInstantiateAccounts = (parsedArgs: ValidOpts) => {
 		: instantiateAccounts(parsedArgs);
 };
 
-const importSandboxAccounts = (parsedArgs: ValidOpts) =>
-	async (updatedConfig: ValidLoadedConfig) => {
-		const containerName = await getContainerName(parsedArgs);
-		const cmds = Object.entries(getValidSandbox(parsedArgs.sandboxName, updatedConfig).accounts ?? {}).reduce(
-			(retval, [accountName, account]) =>
-				typeof account === 'string'
-					? retval
-					: [...retval, `octez-client import secret key ${accountName} ${account.secretKey} --force`],
-			[] as string[],
-		);
+const importSandboxAccounts = (parsedArgs: ValidOpts) => async (updatedConfig: ValidLoadedConfig) => {
+	const containerName = await getContainerName(parsedArgs);
+	const cmds = Object.entries(getValidSandbox(parsedArgs.sandboxName, updatedConfig).accounts ?? {}).reduce(
+		(retval, [accountName, account]) =>
+			typeof account === 'string'
+				? retval
+				: [...retval, `octez-client import secret key ${accountName} ${account.secretKey} --force`],
+		[] as string[],
+	);
 
-		await execCmd(`docker exec -d ${containerName} sh -c '${cmds.join(' && ')}'`);
-	};
+	await execCmd(`docker exec -d ${containerName} sh -c '${cmds.join(' && ')}'`);
+};
 
 const addSandboxAccounts = (parsedArgs: ValidOpts) => maybeInstantiateAccounts(parsedArgs);
 
