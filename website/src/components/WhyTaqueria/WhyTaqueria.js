@@ -46,11 +46,6 @@ const FeatureList = [
 function Feature({ gif, title, features }) {
   return (
     <div>
-      <div className={styles.features}>
-        <div className={styles.left}>
-          <video autoPlay={true} muted src={gif} />
-        </div>
-        <div className={styles.right}>
           <h1>{title}</h1>
           <div className={styles.feature}>
             {features.map((feature, i) => (
@@ -60,8 +55,6 @@ function Feature({ gif, title, features }) {
               </div>
             ))}
           </div>
-        </div>
-      </div>
     </div>
   );
 }

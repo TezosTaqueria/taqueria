@@ -31,13 +31,6 @@ const FeatureList = [
 					"Installing the Taqueria is easy",
 				gif: require("../../../static/gif/taq_hero.mp4").default,
 			},
-			{
-				title: "Installing the Taqueria VS Code Extension",
-				icon: require("../../../static/img/briefcase.png").default,
-				description:
-					"Taqueria has a VS Code extension available in the marketplace",
-				gif: require("../../../static/gif/taq_hero.mp4").default,
-			},
 		],
 	},
 ];
@@ -103,38 +96,14 @@ function Feature({
         </div>
       </div>
       <div className={styles.carousel}>
-        <div className={styles.videoHeader}>
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-        <div className={styles.videoBlock}>
-          <div className={styles.videoBlockHidden}></div>
           {features.map((feature, index) => {
             return (
               isVisible === feature.title && (
-                <video key={index} autoPlay={true} muted src={feature.gif} />
+                <video key={index} autoPlay={true} loop muted src={feature.gif} />
               )
             );
           })}
         </div>
-        <div className={styles.dotMenu}>
-          {features.map((feature, index) => {
-            return (
-              <div
-                key={index}
-                className={
-                  isVisible === feature.title
-                    ? styles.dots
-                    : styles.inactivedots
-                }
-                id={feature.title}
-                onClick={(e) => checkTitle(e)}
-              ></div>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 }

@@ -139,7 +139,7 @@ function Feature({ title, description, features, button }) {
             } else {
               return (
                 isVisible === feature.title && (
-                  <video key={index} autoPlay={true} muted src={feature.gif} />
+                  <video style={{maxWidth: 640}} key={index} autoPlay={true} muted src={feature.gif} />
                 )
               );
             }
