@@ -115,9 +115,9 @@ const getVersion = (inputArgs: DenoArgs) => {
 		: 'not-provided';
 };
 
-const getColumnWidth = () => {
+const getColumnWidth = (env: EnvVars) => {
 	try {
-		return Deno.consoleSize().columns;
+		return env.get('TAQ_COlUMNS') ?? Deno.consoleSize().columns;
 	} catch {
 		return 80;
 	}
@@ -127,7 +127,7 @@ const commonCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 	const instance = yargs(args);
 	return instance
 		.scriptName('taq')
-		.wrap(getColumnWidth())
+		.wrap(getColumnWidth(env))
 		.option('setVersion', {
 			describe: i18n.__('setVersionDesc'),
 			demandOption: true,
