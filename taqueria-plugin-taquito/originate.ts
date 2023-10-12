@@ -35,8 +35,8 @@ type TableRow = {
 	contract: string;
 	address: string;
 	alias: string;
-	balanceInMutez: string;
-	destination: string;
+	balanceInMutez?: string;
+	destination?: string;
 };
 
 const getContractPath = (parsedArgs: RequestArgs.t, contractFilename: string) =>
@@ -160,8 +160,7 @@ const prepContractInfoForDisplay = async (
 		contract: contractInfo.contract,
 		address: displayableAddress,
 		alias: address ? alias : 'N/A',
-		balanceInMutez: contractInfo.mutezTransfer.toString(),
-		destination: tezos.rpc.getRpcUrl(),
+		// destination: tezos.rpc.getRpcUrl(),
 	};
 };
 

@@ -46,6 +46,7 @@ export interface UsageAnalyticsDeps {
 }
 
 export type EnvKey =
+	| 'TAQ_COLUMNS'
 	| 'TAQ_CONFIG_DIR'
 	| 'TAQ_MAX_CONCURRENCY'
 	| 'TAQ_PROJECT_DIR'
