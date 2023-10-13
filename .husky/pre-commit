@@ -7,3 +7,12 @@ git add ./deno.lock
 
 # Bump version # for alpha release
 npx lerna version patch --no-git-tag-version --no-push --yes --force-publish && git add */package*.json package*.json && git add lerna.json
+
+# Get the version number from lerna.json
+VERSION=$(cat lerna.json | grep version | cut -d '"' -f 4)
+
+# Check if the version ends with ".0"
+if [[ $VERSION == *".0" ]]; then
+  # Update the version number in the Homebrew formula (only if a stable release)
+  sed -i '' -e "s/\([0-9]\+\.[0-9]\+\.[0-9]+\)/${VERSION}/g" ./HomebrewFormula/taqueria.rb
+fi
