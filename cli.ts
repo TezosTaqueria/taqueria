@@ -117,7 +117,7 @@ const getVersion = (inputArgs: DenoArgs) => {
 
 const getColumnWidth = (env: EnvVars) => {
 	try {
-		return env.get('TAQ_COlUMNS') ?? Deno.consoleSize().columns;
+		return env.get('TAQ_COLUMNS') ?? Deno.consoleSize().columns;
 	} catch {
 		return 80;
 	}
