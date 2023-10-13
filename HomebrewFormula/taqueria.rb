@@ -8,12 +8,9 @@ class Taq < Formula
     depends_on "node"
     depends_on "deno"
   
-    def install
-      # Clone the repository
-      system "git", "clone", "https://github.com/pinnacle-labs/taqueria"
-      
+    def install      
       # Change to the repo directory
-      cd "taqueria" do
+      cd "taqueria-#{version}" do
         # Install npm dependencies
         system "npm", "install"
         
