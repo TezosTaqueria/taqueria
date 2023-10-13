@@ -3,7 +3,9 @@ class Taqueria < Formula
     homepage "https://taqueria.io"
     version "0.41.0"
     head "https://github.com/pinnacle-labs/taqueria.git", :branch => "main"
-    url "https://github.com/pinnacle-labs/taqueria/archive/refs/tags/v0.41.22.tar.gz"
+    #url "https://github.com/pinnacle-labs/taqueria/archive/refs/tags/v0.41.00.tar.gz"
+    url "https://github.com/{user}/{repo}/archive/03c85ca453f5010df75e0357e6d8e940be1aec85.tar.gz" # v0.41.23
+
     sha256 "9e95ce34ecf7cd984b2e373151136f9baccfa04fd1b7c710b7d858561164dcfc"
   
     depends_on "node"
