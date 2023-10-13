@@ -1,4 +1,4 @@
-class Taq < Formula
+class Taqueria < Formula
     desc "Extensible, open-source plugin-based framework and task runner for Tezos development with a CLI and a library of plugins."
     homepage "https://taqueria.io"
     version "0.41.0"

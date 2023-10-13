@@ -835,7 +835,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 				'counter-module-main.mligo',
 				'Counter.parameterList.mligo',
 				'Counter.storageList.mligo',
-				'counter.storageList.mligo',
 				'C.parameterList.mligo',
 				'C.storageList.mligo',
 				'entry.jsligo',
