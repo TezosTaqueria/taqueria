@@ -12,7 +12,7 @@ npx lerna version patch --no-git-tag-version --no-push --yes --force-publish && 
 VERSION=$(cat lerna.json | grep version | cut -d '"' -f 4)
 
 # Check if the version ends with ".0"
-if [ $VERSION == *".0" ]; then
+if [ "$VERSION" == *".0" ]; then
   # Update the version number in the Homebrew formula (only if a stable release)
   sed -i '' -e "s/\([0-9]\+\.[0-9]\+\.[0-9]+\)/${VERSION}/g" ./HomebrewFormula/taqueria.rb
 fi
