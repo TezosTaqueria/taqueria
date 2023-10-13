@@ -21,7 +21,7 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     fi
     if [ -n `which deno || ""` ]; then
         echo "Deno installed!"
-        VERSION=$(deno --version | grep -oP 'deno \K([0-9]+\.[0-9]+)')
+        VERSION=$(deno --version | awk '/deno/{print $2}' | awk -F. '{print $1"."$2}')
         MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
         MINOR_VERSION=$(echo $VERSION | cut -d. -f2)
 
@@ -35,30 +35,6 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
         echo "❌ Deno is not installed."
         exit -2
     fi
-
-    # if [ -n `which npm || ""` ]; then
-    #     npm version | grep "npm: '8." >/dev/null
-    #     errorCode=$?
-    #     if [ $errorCode -ne 0 ]; then
-    #         echo "❌ NPM is installed, but not using v8.x.x. Please use NPM v8.x.x."
-    #         exit $errorCode
-    #     else
-    #         echo "✅ NPM is installed, and running v8.x.x."
-    #     fi
-
-    #     npm version | grep "node: '16." >/dev/null
-    #     errorCode=$?
-    #     if [ $errorCode -ne 0 ]; then
-    #         echo "❌ NodeJS is installed, but not using v16.x.x. Please use NodeJS v16.x.x."
-    #         exit $errorCode
-    #     else
-    #         echo "✅ NodeJS is installed, and running v16."
-    #     fi
-    # else
-    #     echo "❌ NPM is not installed."
-    #     exit -2
-    # fi
-
 
     echo "** Dependency checks passed"
 
