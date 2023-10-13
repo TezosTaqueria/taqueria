@@ -16,7 +16,7 @@ class Taqueria < Formula
         ENV['TAQ_BUILD'] = '0.41.0'
 
         # Install npm dependencies
-        system "npm install >/dev/null 2>&1"
+        system "npm install >/install.log 2>&1"
         
         # Build types and binary
         system "npm", "run", "build-types"
