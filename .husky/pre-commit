@@ -14,5 +14,5 @@ VERSION=$(cat lerna.json | grep version | cut -d '"' -f 4)
 # Check if the version ends with ".0"
 if echo "$VERSION" | grep -q '\.[0-9]*0$'; then
   # Update the version number in the Homebrew formula (only if a stable release)
-  sed -i '' -e "s/\([0-9]\+\.[0-9]\+\.[0-9]+\)/${VERSION}/g" ./HomebrewFormula/taqueria.rb
+  sed -i '' -e "s/\([0-9]\+\.[0-9]\+\.[0-9]+\)/${VERSION}/mg" ./HomebrewFormula/taqueria.rb
 fi
