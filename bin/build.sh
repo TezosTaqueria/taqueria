@@ -7,7 +7,7 @@ if [ "$0" == "./bin/build.sh" -a -f index.ts ]; then
         echo "Please install deno before attempting to build."
         echo "Run: curl -fsSL https://deno.land/install.sh | sh"
     else
-        VERSION=$(deno --version | grep -oP 'deno \K([0-9]+\.[0-9]+)')
+        VERSION=$(deno --version | awk '/deno/{print $2}' | awk -F. '{print $1"."$2}')
         MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)
         MINOR_VERSION=$(echo $VERSION | cut -d. -f2)
 
