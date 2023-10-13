@@ -43,7 +43,7 @@ export const rawSchema = PluginInfo.rawSchema.extend({
 }).passthrough().describe('ParsedPluginInfo');
 
 type Input = z.infer<typeof internalSchema> & {
-	proxy: <T extends RequestArgs.t>(
+	proxy?: <T extends RequestArgs.t>(
 		args: T,
 	) => PluginProxyResponse | Promise<PluginProxyResponse> | Promise<void> | void;
 	checkRuntimeDependencies?: <T extends RequestArgs.t>(args: T) => PluginDependenciesResponse;
@@ -51,7 +51,7 @@ type Input = z.infer<typeof internalSchema> & {
 };
 
 export type RawPluginSchema = z.infer<typeof rawSchema> & {
-	proxy: <T extends RequestArgs.t>(
+	proxy?: <T extends RequestArgs.t>(
 		args: T,
 	) => PluginProxyResponse | Promise<PluginProxyResponse> | Promise<void> | void;
 	checkRuntimeDependencies?: <T extends RequestArgs.t>(args: T) => PluginDependenciesResponse;
