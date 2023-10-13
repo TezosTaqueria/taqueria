@@ -75,7 +75,6 @@
 		"./taqueria-state",
 		"./taqueria-toolkit",
 		"./taqueria-utils",
-		"./taqueria-flextesa-manager",
 		"./taqueria-vscode-extension",
 		"./taqueria-vscode-extension-web-ui",
 		"./taqueria-lib*",

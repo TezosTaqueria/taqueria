@@ -1,6 +1,82 @@
----
-title: Building a Taqueria Plugin
-sidebar_position: 2
----
+# Building a Taqueria Plugin
 
-### Coming Soon!
+Taqueria is a robust, open-source plugin-based framework aimed at simplifying Tezos development by centralizing configuration and granting access to top-tier Tezos development tools through executable tasks. These tasks are accessible via command-line or through the VS Code extension. While Taqueria comes with a basic set of tasks, its real power lies in its extensibility through plugins that introduce complex, domain-specific functionality. This document aims to guide you through the process of creating a Taqueria Plugin from scratch.
+
+## What is Taqueria?
+
+Taqueria is an extensible framework and task runner for Tezos development. It provides a centralized configuration and easy access to top Tezos development tools through tasks, either via command line or through the VS Code extension. The core of Taqueria comprises a Command-Line Interface (CLI), a library of plugins, a VS Code extension, and a GitHub action for CI/CD workflows. It aids developers with tasks such as compiling and originating smart contracts, generating types, and orchestrating deployments.
+
+## Core Functionality of a Taqueria Plugin
+
+Taqueria is designed to execute tasks via the CLI and VSCode Extension, but relies on plugins for task definitions. Plugins are additional functionalities that can be added to Taqueria on a per-project basis, each encapsulating a specific function like a smart contract compiler, sandbox, or test framework. Post installation, plugins provide tasks accessible through the Taqueria CLI. The available tasks will vary depending on the installed plugins for a particular project.
+
+For instance, the LIGO plugin furnishes the `compile` task which compiles a smart contract written in LIGO to Michelson. The syntax for the command is `taq compile [sourceFile].mligo`. Similarly, the Taquito plugin provides the `originate` task used to originate a Michelson contract with the command `taq originate [contract].tz`.
+
+## Prerequisites
+
+Before diving into plugin development, it's essential to have a good grasp of NodeJS and JavaScript. Having experience with TypeScript is beneficial as the SDK is developed in TypeScript.
+
+## Recommended Development Environment
+
+We recommend developing plugins using TypeScript and targeting Node v16 or v18. It's advisable to compile a bundle using a tool like `tsup`, which is utilized for bundling the JS for all the plugins we author.
+
+## Basic Architecture of a Taqueria Plugin
+
+Every plugin needs to call `Plugin.create` which accepts a defined schema for the plugin. A plugin is distributed as an NPM plugin and must have an `index.js` file as its entrypoint. Here's a snippet of what the structure might look like:
+
+```
+import { Plugin, Task, Option } from "@taqueria/node-sdk";
+
+Plugin.create(_ => ({
+    alias: "helloworld",
+    schema: "1.0",
+    version: "0.1",
+    tasks: [
+        Task.create({
+            task: "hello",
+            command: "hello",
+            aliases: [],
+            description: "Hello World!",
+            options: [
+                Option.create({
+                	flag: 'name',
+                	shortFlag: 'n',
+                	description: 'Your name',
+                	type: 'string',
+                	defaultValue: 'world!'
+                }),
+            ],
+            handler: "echo 'Hello <%= it.name %>'",
+            encoding: "none",
+        }),
+    ],
+}), process.argv)
+```
+
+## Steps to Build a Taqueria Plugin from Scratch
+
+1. Create a new directory: `mkdir my-plugin`
+2. Navigate to the directory and initialize as an NPM project: `cd my-plugin && npm init -y`
+3. Install the `@taqueria/node-sdk` package via NPM: `npm i -S @taqueria/node-sdk`
+4. Install TypeScript and tsup as dev dependencies: `npm i -D typescript tsup`
+5. Initialize your NPM project as a TypeScript project: `npx tsc --init`. Adjust the target to ES2021: `"target": "ES2021"`
+6. Update the `package.json` file with necessary configurations and a build script.
+7. Create an `index.ts` file with the necessary contents as per the Taqueria plugin architecture.
+
+## Common Challenges and Pitfalls
+
+Tasks responses have an encoding, which can be set to 'none' or 'json'. This informs the CLI how to interpret its response. If set to 'json', the CLI will parse the response as JSON and render the data in a well-formatted table. Otherwise, the CLI will not process the response and just pass the output of the plugin through.
+
+## Testing Framework
+
+We emphasize writing E2E tests. Refer to our LIGO plugin tests as an example [here](https://github.com/pinnacle-labs/taqueria/blob/main/tests/e2e/taquito-plugin-e2e-tests.spec.ts).
+
+## Naming Conventions
+
+Plugin names should be namespaced, but you can give your plugin an alias such as 'ligo'. Tasks, positional arguments, and options should use camelCase.
+
+## Deployment
+
+Once your plugin is ready, deploy it to NPM just like any other NPM package. It can then be installed in a Taqueria project using `taq install [my-npm-package]`.
+
+For a quicker start, consider using our example plugin in our monorepo called `@taqueria/plugin-helloworld` to avoid the boilerplate. Check it out [here](https://github.com/pinnacle-labs/taqueria/tree/main/taqueria-plugimn-helloworld).

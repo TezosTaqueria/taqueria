@@ -1,0 +1,41 @@
+{
+	"name": "@taqueria/plugin-helloworld",
+	"version": "0.41.5",
+	"description": "An example of a plugin for Taqueria",
+	"main": "index.js",
+	"scripts": {
+		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
+	},
+	"keywords": [
+		"taqueria",
+		"plugin",
+		"helloworld",
+		"tezos"
+	],
+	"author": "Pinnacle Labs <support@pinnaclelabs.limited>",
+	"license": "Apache-2.0",
+	"devDependencies": {
+		"tsup": "^7.2.0",
+		"typescript": "^5.2.2"
+	},
+	"dependencies": {
+		"@taqueria/node-sdk": "0.41.0"
+	},
+	"tsup": {
+		"entry": [
+			"index.ts"
+		],
+		"sourcemap": true,
+		"target": "node16",
+		"outDir": "./",
+		"dts": true,
+		"clean": false,
+		"skipNodeModulesBundle": true,
+		"platform": "node",
+		"format": [
+			"esm",
+			"cjs"
+		]
+	},
+	"types": "./index.d.ts"
+}
