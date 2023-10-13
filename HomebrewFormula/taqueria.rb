@@ -12,6 +12,8 @@ class Taqueria < Formula
     def install
         # Append the path to npm to the PATH environment variable
         ENV["PATH"] = "/usr/local/bin:#{ENV["PATH"]}"
+        ENV['TAQ_VERSION'] = '0.41.0'
+        ENV['TAQ_BUILD'] = '0.41.0'
 
         # Install npm dependencies
         system "npm install >/dev/null 2>&1"

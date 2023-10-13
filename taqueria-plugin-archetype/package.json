@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-archetype",
-	"version": "0.41.18",
+	"version": "0.41.19",
 	"description": "A taqueria plugin for compiling Archetype smart contracts",
 	"targets": {
 		"default": {
@@ -40,7 +40,7 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.41.18",
+		"@taqueria/node-sdk": "^0.41.19",
 		"fast-glob": "^3.3.1",
 		"ts-pattern": "^5.0.5"
 	},
