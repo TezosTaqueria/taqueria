@@ -13,6 +13,7 @@ import { access, readFile, writeFile } from 'fs/promises';
 import { basename, extname, join } from 'path';
 import * as readline from 'readline';
 import {
+	baseDriverCmd,
 	Common,
 	CompileOpts as Opts,
 	configure,
@@ -168,8 +169,7 @@ export const inject = (commonObj: Common) => {
 	const getListDeclarationsCmd = async (parsedArgs: UnionOpts, sourceFile: string): Promise<string> => {
 		const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 		if (!projectDir) throw new Error(`No project directory provided`);
-		const baseCmd =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} info list-declarations`;
+		const baseCmd = `${baseDriverCmd(projectDir, getLigoDockerImage())} info list-declarations`;
 		const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
 		const flags = '--display-format json';
 		const cmd = `${baseCmd} ${inputFile} ${flags}`;
@@ -231,8 +231,7 @@ export const inject = (commonObj: Common) => {
 	const getCompileContractCmd = async (parsedArgs: Opts, sourceFile: string, module: ModuleInfo): Promise<string> => {
 		const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 		if (!projectDir) throw new Error(`No project directory provided`);
-		const baseCmd =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile contract`;
+		const baseCmd = `${baseDriverCmd(projectDir, getLigoDockerImage())} compile contract`;
 		const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
 		const outputFile = `-o ${getOutputContractFilename(parsedArgs, module)}`;
 		const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
@@ -271,8 +270,7 @@ export const inject = (commonObj: Common) => {
 		const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 		if (!projectDir) throw new Error(`No project directory provided`);
 		const compilerType = isStorageKind(exprKind) ? 'storage' : 'parameter';
-		const baseCmd =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile ${compilerType}`;
+		const baseCmd = `${baseDriverCmd(projectDir, getLigoDockerImage())} compile ${compilerType}`;
 		const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
 		const outputFile = `-o ${getOutputExprFilename(parsedArgs, module, exprKind, exprName)}`;
 		const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
