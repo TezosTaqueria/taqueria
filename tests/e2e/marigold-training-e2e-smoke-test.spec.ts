@@ -61,7 +61,7 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 		);
 		// console.log(deployResult)
 
-		expect(deployResult.stdout.join('\n')).toContain('https://rpc.ghostnet.teztnets.xyz/');
+		expect(deployResult.stdout).toContain('KT');
 
 		// tear down the project
 		await cleanup();
