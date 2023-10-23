@@ -18,7 +18,7 @@ In more practical terms, Taqueria is a task runner that you can use from the com
 Taqueria includes:
 
 - A command line interface (CLI) you use in your terminal through a command named `taq`
-- A library of plugins that add tasks to Taqueria
+- A library of plugins that add tasks and other functionality to Taqueria
 - A VS Code Extension which provides the ability to run Taqueria tasks from the command palette
 
 ## Installing the Taqueria CLI
