@@ -1,209 +1,209 @@
 {
-	"name": "mligo",
-	"scopeName": "source.mligo",
-	"fileTypes": ["mligo"],
-	"patterns": [
-		{ "include": "#string0" },
-		{ "include": "#block_comment" },
-		{ "include": "#line_comment" },
-		{ "include": "#uppercaseidentifier" },
-		{ "include": "#attribute" },
-		{ "include": "#macro" },
-		{ "include": "#lambda" },
-		{ "include": "#typedefinition" },
-		{ "include": "#controlkeywords" },
-		{ "include": "#keywords" },
-		{ "include": "#numericliterals" },
-		{ "include": "#operators" },
-		{ "include": "#typeannotation" }
-	],
-	"repository": {
-		"string0": {
-			"name": "string.quoted.double.mligo",
-			"begin": "\\\"",
-			"end": "\\\"",
-			"beginCaptures": {},
-			"endCaptures": {},
-			"patterns": []
-		},
-		"block_comment": {
-			"name": "comment.block.mligo",
-			"begin": "\\(\\*",
-			"end": "\\*\\)",
-			"beginCaptures": {},
-			"endCaptures": {},
-			"patterns": [{ "include": "#block_comment" }]
-		},
-		"line_comment": {
-			"name": "comment.block.mligo",
-			"begin": "\\/\\/",
-			"end": "$",
-			"beginCaptures": {},
-			"endCaptures": {},
-			"patterns": []
-		},
-		"attribute": {
-			"name": "keyword.control.attribute.mligo",
-			"match": "\\[@.*\\]",
-			"captures": {}
-		},
-		"macro": {
-			"name": "meta.preprocessor.mligo",
-			"match": "^\\#[a-zA-Z]+",
-			"captures": {}
-		},
-		"controlkeywords": {
-			"name": "keyword.control.mligo",
-			"match": "\\b(match|with|if|then|else|assert|failwith|begin|for|upto|downto|do|while|done)\\b",
-			"captures": {}
-		},
-		"keywords": {
-			"name": "keyword.other.mligo",
-			"match": "\\b(struct|end|let|in|mut|rec|contract_of|parameter_of|module|sig|val|false|true)\\b",
-			"captures": {}
-		},
-		"numericliterals": {
-			"name": "constant.numeric.mligo",
-			"match": "\\b(\\+|\\-)?[0-9]+(n|tz|tez|mutez|)\\b",
-			"captures": {}
-		},
-		"operators": {
-			"name": "keyword.operator.mligo",
-			"match": "::|\\-|\\+|\\b(mod|land|lor|lxor|lsl|lsr)\\b|&&|\\|\\||>|<>|<=|=>|<|>|\\|>|->|:=|\\^|\\*|\\+=|-=|\\*=|/=|\\|=",
-			"captures": {}
-		},
-		"semicolon": { "match": "(;)", "captures": {} },
-		"ofkeyword": {
-			"match": "\\b(of)\\b",
-			"captures": { "1": { "name": "keyword.other.mligo" } }
-		},
-		"lambda": {
-			"begin": "\\b(fun)\\b",
-			"end": "(->)",
-			"beginCaptures": { "1": { "name": "keyword.other.mligo" } },
-			"endCaptures": { "1": { "name": "keyword.operator.mligo" } },
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#typeannotationlambda" }
-			]
-		},
-		"uppercaseidentifier": {
-			"match": "\\b([A-Z][a-zA-Z0-9_$]*)\\b",
-			"captures": { "1": { "name": "entity.name.type.mligo" } }
-		},
-		"lowercaseidentifier": {
-			"match": "\\b([a-z$_][a-zA-Z0-9$_]*)\\b",
-			"captures": { "1": { "name": "variable.mligo" } }
-		},
-		"typedefinition": {
-			"begin": "\\b(type)\\b",
-			"end": "(?=^#|\\[@|\\b(let|in|type|end|module|sig|val)\\b|\\))",
-			"beginCaptures": { "1": { "name": "keyword.other.mligo" } },
-			"endCaptures": {},
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#uppercaseidentifier" },
-				{ "include": "#ofkeyword" },
-				{ "include": "#typeoperator" },
-				{ "include": "#typename" },
-				{ "include": "#typevar" },
-				{ "include": "#typeparentheses" },
-				{ "include": "#typeint" },
-				{ "include": "#typeproduct" },
-				{ "include": "#string0" }
-			]
-		},
-		"typeannotation": {
-			"begin": "(:)",
-			"end": "(?=\\)|=|;|}|^#|\\[@|\\b(let|in|type|end|module|sig|val|end)\\b)",
-			"beginCaptures": { "1": { "name": "keyword.operator.mligo" } },
-			"endCaptures": {},
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#uppercaseidentifier" },
-				{ "include": "#ofkeyword" },
-				{ "include": "#typeoperator" },
-				{ "include": "#typename" },
-				{ "include": "#typevar" },
-				{ "include": "#typeparentheses" },
-				{ "include": "#typeint" },
-				{ "include": "#typeproduct" },
-				{ "include": "#string0" }
-			]
-		},
-		"typeannotationlambda": {
-			"begin": "(:)",
-			"end": "(?=\\)|=|;|}|->)",
-			"beginCaptures": { "1": { "name": "keyword.operator.mligo" } },
-			"endCaptures": {},
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#uppercaseidentifier" },
-				{ "include": "#ofkeyword" },
-				{ "include": "#typeoperator" },
-				{ "include": "#typename" },
-				{ "include": "#typevar" },
-				{ "include": "#typeparentheses" },
-				{ "include": "#typeint" },
-				{ "include": "#typeproduct" },
-				{ "include": "#string0" }
-			]
-		},
-		"typeoperator": {
-			"name": "keyword.operator.mligo",
-			"match": "(->|\\.|\\*|\\|)",
-			"captures": {}
-		},
-		"typename": {
-			"name": "entity.name.type.mligo",
-			"match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
-			"captures": {}
-		},
-		"typevar": {
-			"name": "variable.other.type.mligo",
-			"match": "'\\b([a-z_][a-zA-Z0-9_]*)\\b",
-			"captures": {}
-		},
-		"typeparentheses": {
-			"begin": "(\\()",
-			"end": "(\\))",
-			"beginCaptures": {},
-			"endCaptures": {},
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#uppercaseidentifier" },
-				{ "include": "#ofkeyword" },
-				{ "include": "#typeoperator" },
-				{ "include": "#typename" },
-				{ "include": "#typevar" },
-				{ "include": "#typeparentheses" },
-				{ "include": "#typeint" },
-				{ "include": "#typeproduct" },
-				{ "include": "#string0" }
-			]
-		},
-		"typeint": {
-			"name": "constant.numeric.mligo",
-			"match": "\\b([0-9]+)\\b",
-			"captures": {}
-		},
-		"typeproduct": {
-			"begin": "({)",
-			"end": "(})",
-			"beginCaptures": {},
-			"endCaptures": {},
-			"patterns": [
-				{ "include": "#line_comment" },
-				{ "include": "#block_comment" },
-				{ "include": "#uppercaseidentifier" },
-				{ "include": "#typeannotation" },
-				{ "include": "#semicolon" }
-			]
-		}
-	}
+  "name": "mligo",
+  "scopeName": "source.mligo",
+  "fileTypes": [ "mligo" ],
+  "patterns": [
+    { "include": "#string0" },
+    { "include": "#block_comment" },
+    { "include": "#line_comment" },
+    { "include": "#uppercaseidentifier" },
+    { "include": "#attribute" },
+    { "include": "#macro" },
+    { "include": "#lambda" },
+    { "include": "#typedefinition" },
+    { "include": "#controlkeywords" },
+    { "include": "#keywords" },
+    { "include": "#numericliterals" },
+    { "include": "#operators" },
+    { "include": "#typeannotation" }
+  ],
+  "repository": {
+    "string0": {
+      "name": "string.quoted.double.mligo",
+      "begin": "\\\"",
+      "end": "\\\"",
+      "beginCaptures": {},
+      "endCaptures": {},
+      "patterns": []
+    },
+    "block_comment": {
+      "name": "comment.block.mligo",
+      "begin": "\\(\\*",
+      "end": "\\*\\)",
+      "beginCaptures": {},
+      "endCaptures": {},
+      "patterns": [ { "include": "#block_comment" } ]
+    },
+    "line_comment": {
+      "name": "comment.block.mligo",
+      "begin": "\\/\\/",
+      "end": "$",
+      "beginCaptures": {},
+      "endCaptures": {},
+      "patterns": []
+    },
+    "attribute": {
+      "name": "keyword.control.attribute.mligo",
+      "match": "\\[@.*\\]",
+      "captures": {}
+    },
+    "macro": {
+      "name": "meta.preprocessor.mligo",
+      "match": "^\\#[a-zA-Z]+",
+      "captures": {}
+    },
+    "controlkeywords": {
+      "name": "keyword.control.mligo",
+      "match": "\\b(match|with|if|then|else|assert|failwith|begin|for|upto|downto|do|while|done)\\b",
+      "captures": {}
+    },
+    "keywords": {
+      "name": "keyword.other.mligo",
+      "match": "\\b(struct|end|let|in|mut|rec|contract_of|parameter_of|module|sig|val|false|true)\\b",
+      "captures": {}
+    },
+    "numericliterals": {
+      "name": "constant.numeric.mligo",
+      "match": "\\b(\\+|\\-)?[0-9]+(n|tz|tez|mutez|)\\b",
+      "captures": {}
+    },
+    "operators": {
+      "name": "keyword.operator.mligo",
+      "match": "::|\\-|\\+|\\b(mod|land|lor|lxor|lsl|lsr)\\b|&&|\\|\\||>|<>|<=|=>|<|>|\\|>|->|:=|\\^|\\*|\\+=|-=|\\*=|/=|\\|=",
+      "captures": {}
+    },
+    "semicolon": { "match": "(;)", "captures": {} },
+    "ofkeyword": {
+      "match": "\\b(of)\\b",
+      "captures": { "1": { "name": "keyword.other.mligo" } }
+    },
+    "lambda": {
+      "begin": "\\b(fun)\\b",
+      "end": "(->)",
+      "beginCaptures": { "1": { "name": "keyword.other.mligo" } },
+      "endCaptures": { "1": { "name": "keyword.operator.mligo" } },
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#typeannotationlambda" }
+      ]
+    },
+    "uppercaseidentifier": {
+      "match": "\\b([A-Z][a-zA-Z0-9_$]*)\\b",
+      "captures": { "1": { "name": "entity.name.type.mligo" } }
+    },
+    "lowercaseidentifier": {
+      "match": "\\b([a-z$_][a-zA-Z0-9$_]*)\\b",
+      "captures": { "1": { "name": "variable.mligo" } }
+    },
+    "typedefinition": {
+      "begin": "\\b(type)\\b",
+      "end": "(?=^#|\\[@|\\b(let|in|type|end|module|sig|val)\\b|\\))",
+      "beginCaptures": { "1": { "name": "keyword.other.mligo" } },
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#uppercaseidentifier" },
+        { "include": "#ofkeyword" },
+        { "include": "#typeoperator" },
+        { "include": "#typename" },
+        { "include": "#typevar" },
+        { "include": "#typeparentheses" },
+        { "include": "#typeint" },
+        { "include": "#typeproduct" },
+        { "include": "#string0" }
+      ]
+    },
+    "typeannotation": {
+      "begin": "(:)",
+      "end": "(?=\\)|=|;|}|^#|\\[@|\\b(let|in|type|end|module|sig|val|end)\\b)",
+      "beginCaptures": { "1": { "name": "keyword.operator.mligo" } },
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#uppercaseidentifier" },
+        { "include": "#ofkeyword" },
+        { "include": "#typeoperator" },
+        { "include": "#typename" },
+        { "include": "#typevar" },
+        { "include": "#typeparentheses" },
+        { "include": "#typeint" },
+        { "include": "#typeproduct" },
+        { "include": "#string0" }
+      ]
+    },
+    "typeannotationlambda": {
+      "begin": "(:)",
+      "end": "(?=\\)|=|;|}|->)",
+      "beginCaptures": { "1": { "name": "keyword.operator.mligo" } },
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#uppercaseidentifier" },
+        { "include": "#ofkeyword" },
+        { "include": "#typeoperator" },
+        { "include": "#typename" },
+        { "include": "#typevar" },
+        { "include": "#typeparentheses" },
+        { "include": "#typeint" },
+        { "include": "#typeproduct" },
+        { "include": "#string0" }
+      ]
+    },
+    "typeoperator": {
+      "name": "keyword.operator.mligo",
+      "match": "(->|\\.|\\*|\\|)",
+      "captures": {}
+    },
+    "typename": {
+      "name": "entity.name.type.mligo",
+      "match": "\\b([a-z_][a-zA-Z0-9_]*)\\b",
+      "captures": {}
+    },
+    "typevar": {
+      "name": "variable.other.type.mligo",
+      "match": "'\\b([a-z_][a-zA-Z0-9_]*)\\b",
+      "captures": {}
+    },
+    "typeparentheses": {
+      "begin": "(\\()",
+      "end": "(\\))",
+      "beginCaptures": {},
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#uppercaseidentifier" },
+        { "include": "#ofkeyword" },
+        { "include": "#typeoperator" },
+        { "include": "#typename" },
+        { "include": "#typevar" },
+        { "include": "#typeparentheses" },
+        { "include": "#typeint" },
+        { "include": "#typeproduct" },
+        { "include": "#string0" }
+      ]
+    },
+    "typeint": {
+      "name": "constant.numeric.mligo",
+      "match": "\\b([0-9]+)\\b",
+      "captures": {}
+    },
+    "typeproduct": {
+      "begin": "({)",
+      "end": "(})",
+      "beginCaptures": {},
+      "endCaptures": {},
+      "patterns": [
+        { "include": "#line_comment" },
+        { "include": "#block_comment" },
+        { "include": "#uppercaseidentifier" },
+        { "include": "#typeannotation" },
+        { "include": "#semicolon" }
+      ]
+    }
+  }
 }
