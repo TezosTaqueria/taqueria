@@ -53,13 +53,12 @@ export const load = (config: LoadedConfig.t) =>
 		)
 	) as (parsedArgs: SanitizedArgs.t) => Future<TaqError.t, PersistentState.t>;
 
-export const save = (parsedArgs: SanitizedArgs.t, config: LoadedConfig.t) =>
-	(updatedState: PersistentState.t) =>
-		pipe(
-			JSON.stringify(updatedState, undefined, 4),
-			writeTextFile(getStateAbspath(parsedArgs, config)),
-			map(_ => updatedState),
-		);
+export const save = (parsedArgs: SanitizedArgs.t, config: LoadedConfig.t) => (updatedState: PersistentState.t) =>
+	pipe(
+		JSON.stringify(updatedState, undefined, 4),
+		writeTextFile(getStateAbspath(parsedArgs, config)),
+		map(_ => updatedState),
+	);
 
 const newTaskEntry = (task: Verb.t, plugin: string, output: unknown) => {
 	const id = toTaskId(task, plugin);
@@ -99,7 +98,8 @@ const imposeTaskLimits = (tasks: Record<string, PersistentState.PersistedTask>) 
 		Object.fromEntries,
 	);
 
-export const addTask = (parsedArgs: SanitizedArgs.t, config: LoadedConfig.t, task: Verb.t, plugin: string) =>
+export const addTask =
+	(parsedArgs: SanitizedArgs.t, config: LoadedConfig.t, task: Verb.t, plugin: string) =>
 	(output: { data: unknown } | unknown) =>
 		pipe(
 			load(config)(parsedArgs),

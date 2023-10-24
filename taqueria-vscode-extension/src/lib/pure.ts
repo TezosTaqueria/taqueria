@@ -205,8 +205,8 @@ export const getNodeVersion = async (showOutput: OutputFunction) => {
 	return version.substring(1).replace('\n', '');
 };
 
-const readJsonFileInner = (_i18n: i18n, make: (data: Record<string, unknown>) => unknown) =>
-	<T>(pathToFile: PathToFile) =>
+const readJsonFileInner =
+	(_i18n: i18n, make: (data: Record<string, unknown>) => unknown) => <T>(pathToFile: PathToFile) =>
 		readFile(pathToFile, { encoding: 'utf-8' })
 			.then(data => {
 				try {
@@ -252,9 +252,8 @@ export const findTaqBinary = (i18n: i18n, showOutput: OutputFunction): LikeAProm
 		})
 		.catch(previous => Promise.reject({ code: 'E_TAQ_NOT_FOUND', msg: 'Could not find taq in your path.', previous }));
 
-export const log = <T>(heading: string) =>
-	(input: T): T => {
-		console.log('**' + heading + '**');
-		console.log(input);
-		return input;
-	};
+export const log = <T>(heading: string) => (input: T): T => {
+	console.log('**' + heading + '**');
+	console.log(input);
+	return input;
+};

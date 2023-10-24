@@ -133,31 +133,31 @@ const copyArtifactsForExprCompTargets = async (
 };
 
 const copyRelevantArtifactsForCompTargets = (parsedArgs: Opts, sourceFile: string) =>
-	async (
-		{ compTargetNames, exprCompTargetNames }: { compTargetNames: string[]; exprCompTargetNames: string[] },
-	): Promise<string> => {
-		if (compTargetNames.length === 0 && exprCompTargetNames.length === 0) return 'No compilation targets defined';
+async (
+	{ compTargetNames, exprCompTargetNames }: { compTargetNames: string[]; exprCompTargetNames: string[] },
+): Promise<string> => {
+	if (compTargetNames.length === 0 && exprCompTargetNames.length === 0) return 'No compilation targets defined';
 
-		const dstContractAndDefaultStoragePaths = await copyArtifactsForFirstCompTarget(
-			parsedArgs,
-			sourceFile,
-			compTargetNames,
-		);
+	const dstContractAndDefaultStoragePaths = await copyArtifactsForFirstCompTarget(
+		parsedArgs,
+		sourceFile,
+		compTargetNames,
+	);
 
-		const dstStoragePaths = await copyArtifactsForRestCompTargets(
-			parsedArgs,
-			sourceFile,
-			compTargetNames,
-		);
+	const dstStoragePaths = await copyArtifactsForRestCompTargets(
+		parsedArgs,
+		sourceFile,
+		compTargetNames,
+	);
 
-		const dstExpressionPaths = await copyArtifactsForExprCompTargets(
-			parsedArgs,
-			sourceFile,
-			exprCompTargetNames,
-		);
+	const dstExpressionPaths = await copyArtifactsForExprCompTargets(
+		parsedArgs,
+		sourceFile,
+		exprCompTargetNames,
+	);
 
-		return dstContractAndDefaultStoragePaths.concat(dstStoragePaths).concat(dstExpressionPaths).join('\n');
-	};
+	return dstContractAndDefaultStoragePaths.concat(dstStoragePaths).concat(dstExpressionPaths).join('\n');
+};
 
 const getCompileContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
 	const outputDir = getCompilationTargetsDirname(parsedArgs, sourceFile);

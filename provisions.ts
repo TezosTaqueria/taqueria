@@ -53,10 +53,9 @@ export const loadProvisions = (provisionsAbspath: SanitizedAbsPath.t) =>
 		}),
 	);
 
-const writeProvisions = (provisionsAbspath: SanitizedAbsPath.t) =>
-	(provisioners: Provisioner.t[] | Provisions.t) =>
-		writeJsonFile(provisionsAbspath)(provisioners)
-			.pipe(map(() => provisioners));
+const writeProvisions = (provisionsAbspath: SanitizedAbsPath.t) => (provisioners: Provisioner.t[] | Provisions.t) =>
+	writeJsonFile(provisionsAbspath)(provisioners)
+		.pipe(map(() => provisioners));
 
 const addProvision = (provisioner: Provisioner.t, provisionsAbspath: SanitizedAbsPath.t) =>
 	pipe(
@@ -67,30 +66,29 @@ const addProvision = (provisioner: Provisioner.t, provisionsAbspath: SanitizedAb
 		chain(writeProvisions(provisionsAbspath)),
 	);
 
-const getOperationParams = (state: EphemeralState.t) =>
-	(operationName: string, pluginName: string) => {
-		const op = state.plugins
-			.find(plugin => plugin.alias === pluginName)
-			?.operations
-			?.find(op => op.operation === operationName);
+const getOperationParams = (state: EphemeralState.t) => (operationName: string, pluginName: string) => {
+	const op = state.plugins
+		.find(plugin => plugin.alias === pluginName)
+		?.operations
+		?.find(op => op.operation === operationName);
 
-		if (op) {
-			const options = op.options ?? [];
-			const args = op.positionals ?? [];
-			const optionNames = options.reduce(
-				(retval, option) =>
-					option.shortFlag
-						? [...retval, option.shortFlag, option.flag]
-						: [...retval, option.flag],
-				[] as string[],
-			);
-			return args.reduce(
-				(retval, arg) => [...retval, arg.placeholder],
-				optionNames,
-			);
-		}
-		throw `Could not collect arguments for the operation, ${operationName}`;
-	};
+	if (op) {
+		const options = op.options ?? [];
+		const args = op.positionals ?? [];
+		const optionNames = options.reduce(
+			(retval, option) =>
+				option.shortFlag
+					? [...retval, option.shortFlag, option.flag]
+					: [...retval, option.flag],
+			[] as string[],
+		);
+		return args.reduce(
+			(retval, arg) => [...retval, arg.placeholder],
+			optionNames,
+		);
+	}
+	throw `Could not collect arguments for the operation, ${operationName}`;
+};
 
 /**
  * Gets the plugin associated with the request
@@ -187,8 +185,8 @@ export const toDAG = (data: Provisions.t) =>
 
 export const outputTab = (tabs: number) => new Array(tabs).fill('  ').join('');
 
-export const provisionerToMermaid = (parent: ProvisionerID.t | string, tabs: number) =>
-	(provisioner: Provisioner.t) => {
+export const provisionerToMermaid =
+	(parent: ProvisionerID.t | string, tabs: number) => (provisioner: Provisioner.t) => {
 		const state = provisioner.label
 			? `${outputTab(tabs)}${provisioner.id} : ${provisioner.label}`
 			: `${outputTab(tabs)}${provisioner.id}`;
@@ -202,7 +200,8 @@ const mermaidConfig = {
 	parent: 'Start',
 };
 
-const toMermaidSubgraph = (batchName: string, batchDescription: string) =>
+const toMermaidSubgraph =
+	(batchName: string, batchDescription: string) =>
 	({ content, tabs, parent }: typeof mermaidConfig, batch: Provisioner.t[]) => {
 		const ops = batch.map(provisionerToMermaid(parent, tabs + 1)).join('\n');
 

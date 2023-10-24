@@ -2,6 +2,7 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { readJsonFileInterceptConfig, writeJsonFileInterceptConfig } from '@taqueria/protocol/types-config-files';
 import * as Url from '@taqueria/protocol/Url';
+import { render } from 'eta';
 import {
 	alt,
 	attemptP,
@@ -15,12 +16,11 @@ import {
 	resolve,
 	swap,
 } from 'fluture';
-import { dirname, join as _joinPaths } from 'path';
-import { copy } from 'streams';
-import { render } from 'eta';
 import { pipe } from 'fun';
 import * as jsonc from 'jsonc';
+import { dirname, join as _joinPaths } from 'path';
 import { memoize as memoizeIt } from 'rambdax';
+import { copy } from 'streams';
 import { UtilsDependencies } from './taqueria-utils-types.ts';
 
 export const decodeJson = <T>(encoded: string): Future<TaqError.t, T> => {
@@ -181,39 +181,34 @@ export const readJsonFile = <T>(path: string): Future<TaqError.TaqError, T> =>
 		})(path);
 	});
 
-export const appendTextFile = (path: string) =>
-	(data: string): Future<TaqError.t, string> =>
-		attemptP(() =>
-			Deno.writeTextFile(path, data, {
-				append: true,
-			}).then(() => path)
-		);
+export const appendTextFile = (path: string) => (data: string): Future<TaqError.t, string> =>
+	attemptP(() =>
+		Deno.writeTextFile(path, data, {
+			append: true,
+		}).then(() => path)
+	);
 
-export const writeTextFile = (path: string) =>
-	(data: string): Future<TaqError.t, string> => attemptP(() => Deno.writeTextFile(path, data).then(() => path));
+export const writeTextFile = (path: string) => (data: string): Future<TaqError.t, string> =>
+	attemptP(() => Deno.writeTextFile(path, data).then(() => path));
 
-const writeJsonFileInner = (path: string) =>
-	(data: unknown): Future<TaqError.t, string> =>
-		pipe(
-			JSON.stringify(data),
-			jsonStr =>
-				pipe(
-					jsonc.format(jsonStr, undefined, {
-						insertSpaces: true,
-					}),
-					edits => jsonc.applyEdits(jsonStr, edits),
-				),
-			writeTextFile(path),
-		);
-export const writeJsonFile = <T>(path: string) =>
-	(data: T): Future<TaqError.t, string> =>
-		attemptP(() => {
-			return writeJsonFileInterceptConfig(p =>
-				d => {
-					return toPromise(writeJsonFileInner(p)(d));
-				}
-			)(path)(data);
-		});
+const writeJsonFileInner = (path: string) => (data: unknown): Future<TaqError.t, string> =>
+	pipe(
+		JSON.stringify(data),
+		jsonStr =>
+			pipe(
+				jsonc.format(jsonStr, undefined, {
+					insertSpaces: true,
+				}),
+				edits => jsonc.applyEdits(jsonStr, edits),
+			),
+		writeTextFile(path),
+	);
+export const writeJsonFile = <T>(path: string) => (data: T): Future<TaqError.t, string> =>
+	attemptP(() => {
+		return writeJsonFileInterceptConfig(p => d => {
+			return toPromise(writeJsonFileInner(p)(d));
+		})(path)(data);
+	});
 
 export const isTaqError = (err: unknown): err is TaqError.t => {
 	return (err as TaqError.t).kind !== undefined;
@@ -247,43 +242,41 @@ export const inject = (deps: UtilsDependencies) => {
 		stdout.write(encoder.encode(`${message}\n`));
 	};
 
-	const logInput = <T>(message: string) =>
-		(input: T): T => {
-			const encoder = new TextEncoder();
-			const data = typeof (input) === 'object' ? JSON.stringify(input, null, 4) : input;
-			stdout.write(encoder.encode(`${message}\n`));
-			stdout.write(encoder.encode(`${data}\n`));
-			return input as T;
-		};
+	const logInput = <T>(message: string) => (input: T): T => {
+		const encoder = new TextEncoder();
+		const data = typeof (input) === 'object' ? JSON.stringify(input, null, 4) : input;
+		stdout.write(encoder.encode(`${message}\n`));
+		stdout.write(encoder.encode(`${data}\n`));
+		return input as T;
+	};
 
-	const gitClone = (url: Url.t) =>
-		(destinationPath: SanitizedAbsPath.t) =>
-			(branch: string): Future<TaqError.t, SanitizedAbsPath.t> =>
-				pipe(
-					execText('git clone <%= it.url %> <%= it.outputDir %> -b <%= it.branch %>', {
-						url: url.toString(),
-						outputDir: destinationPath,
-						branch: branch,
-					}),
-					mapRej<TaqError.t, TaqError.t>(previous => ({
-						kind: 'E_GIT_CLONE_FAILED',
-						msg:
-							`Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed. Also check the branch name if you've specified it via --branch.`,
-						context: { url, destinationPath },
-						previous,
-					})),
-					chain(([status]) =>
-						status === 0
-							? resolve(destinationPath)
-							: reject<TaqError.t>({
-								kind: 'E_GIT_CLONE_FAILED',
-								msg:
-									`Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed. Also check the branch name if you've specified it via --branch.`,
-								context: { url, destinationPath },
-							})
-					),
-					map(() => destinationPath),
-				);
+	const gitClone =
+		(url: Url.t) => (destinationPath: SanitizedAbsPath.t) => (branch: string): Future<TaqError.t, SanitizedAbsPath.t> =>
+			pipe(
+				execText('git clone <%= it.url %> <%= it.outputDir %> -b <%= it.branch %>', {
+					url: url.toString(),
+					outputDir: destinationPath,
+					branch: branch,
+				}),
+				mapRej<TaqError.t, TaqError.t>(previous => ({
+					kind: 'E_GIT_CLONE_FAILED',
+					msg:
+						`Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed. Also check the branch name if you've specified it via --branch.`,
+					context: { url, destinationPath },
+					previous,
+				})),
+				chain(([status]) =>
+					status === 0
+						? resolve(destinationPath)
+						: reject<TaqError.t>({
+							kind: 'E_GIT_CLONE_FAILED',
+							msg:
+								`Could not clone ${url.toString()}. Please check the Git url and ensure that Git is installed. Also check the branch name if you've specified it via --branch.`,
+							context: { url, destinationPath },
+						})
+				),
+				map(() => destinationPath),
+			);
 
 	const execText = (
 		cmdTemplate: string,

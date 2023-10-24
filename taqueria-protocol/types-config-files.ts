@@ -17,8 +17,8 @@ export type ConfigFileSetV2 = {
 	environments: { [name: string]: ConfigEnvironmentFileV2 };
 };
 
-export const readJsonFileInterceptConfig = (readJsonFile: <T>(filePath: string) => Promise<T>) =>
-	async <T>(filePath: string): Promise<T> => {
+export const readJsonFileInterceptConfig =
+	(readJsonFile: <T>(filePath: string) => Promise<T>) => async <T>(filePath: string): Promise<T> => {
 		if (filePath.endsWith(`.taq/config.json`)) {
 			return transformConfigFileV2ToConfig(await readConfigFiles(readJsonFile)(filePath)) as unknown as Promise<T>;
 		}
@@ -26,8 +26,8 @@ export const readJsonFileInterceptConfig = (readJsonFile: <T>(filePath: string) 
 		return readJsonFile<T>(filePath);
 	};
 
-export const readConfigFiles = (readJsonFile: <T>(filePath: string) => Promise<T>) =>
-	async (configFilePath: string): Promise<ConfigFileSetV2> => {
+export const readConfigFiles =
+	(readJsonFile: <T>(filePath: string) => Promise<T>) => async (configFilePath: string): Promise<ConfigFileSetV2> => {
 		const configFileObj = await readJsonFile(configFilePath);
 
 		if ((configFileObj as ConfigFileV2).version !== `v2`) {
@@ -60,8 +60,9 @@ export const readConfigFiles = (readJsonFile: <T>(filePath: string) => Promise<T
 		};
 	};
 
-export const writeJsonFileInterceptConfig = (writeJsonFile: (filePath: string) => (data: unknown) => Promise<string>) =>
-	(filePath: string): ((data: unknown) => Promise<string>) => {
+export const writeJsonFileInterceptConfig =
+	(writeJsonFile: (filePath: string) => (data: unknown) => Promise<string>) =>
+	(filePath: string): (data: unknown) => Promise<string> => {
 		if (filePath.endsWith(`.taq/config.json`)) {
 			return (async (config: Config) => {
 				// DEBUG: write original file
@@ -74,20 +75,21 @@ export const writeJsonFileInterceptConfig = (writeJsonFile: (filePath: string) =
 		return writeJsonFile(filePath);
 	};
 
-export const writeConfigFiles = (writeJsonFile: (filePath: string) => (data: unknown) => Promise<string>) =>
+export const writeConfigFiles =
+	(writeJsonFile: (filePath: string) => (data: unknown) => Promise<string>) =>
 	(configFilePath: string) =>
-		async (configFileSetV2: ConfigFileSetV2) => {
-			const configFileResult = await writeJsonFile(configFilePath)(configFileSetV2.config);
+	async (configFileSetV2: ConfigFileSetV2) => {
+		const configFileResult = await writeJsonFile(configFilePath)(configFileSetV2.config);
 
-			// write the env files
-			await Promise.all(
-				Object.entries(configFileSetV2.environments).map(async ([envName, value]) => {
-					await writeJsonFile(configFilePath.replace(`config.json`, `config.local.${envName}.json`))(value);
-				}),
-			);
+		// write the env files
+		await Promise.all(
+			Object.entries(configFileSetV2.environments).map(async ([envName, value]) => {
+				await writeJsonFile(configFilePath.replace(`config.json`, `config.local.${envName}.json`))(value);
+			}),
+		);
 
-			return configFileResult;
-		};
+		return configFileResult;
+	};
 
 const removeUndefinedFields = <T>(x: T): T => {
 	return JSON.parse(JSON.stringify(x)) as T;
@@ -329,7 +331,7 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 		}
 
 		// Let all the unknown fields be placed in the network or sandbox
-		const unknownFields = ((() => {
+		const unknownFields = (() => {
 			const vClone = { ...x.value } as Partial<typeof x.value>;
 			// Remove known fields that have a known structure
 			delete vClone.type;
@@ -342,7 +344,7 @@ export const transformConfigFileV2ToConfig = (configFileSetV2: ConfigFileSetV2):
 			delete vClone.contracts;
 			delete vClone.accounts;
 			return vClone;
-		})());
+		})();
 
 		return unknownFields;
 	};

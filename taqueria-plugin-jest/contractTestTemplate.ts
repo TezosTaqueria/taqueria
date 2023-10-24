@@ -62,19 +62,18 @@ const generateTestSuite = (parsedArgs: Opts) => {
 		.then(() => jestSuiteAbspath);
 };
 
-const toJest = (contractName: string) =>
-	(generator: Generator) => {
-		const methodCalls = generator.methods.map(m => ({
-			name: m.name,
-			methodCall: generator.generateMethodCall({
-				methodName: m.name,
-				formatting: {
-					indent: 2,
-				},
-			}),
-			storageAccess: generator.generateStorageAccess({ storagePath: '' }),
-		}));
-		return `
+const toJest = (contractName: string) => (generator: Generator) => {
+	const methodCalls = generator.methods.map(m => ({
+		name: m.name,
+		methodCall: generator.generateMethodCall({
+			methodName: m.name,
+			formatting: {
+				indent: 2,
+			},
+		}),
+		storageAccess: generator.generateStorageAccess({ storagePath: '' }),
+	}));
+	return `
 import { TezosToolkit } from '@taquito/taquito';
 import { char2Bytes } from '@taquito/utils';
 import { tas } from './types/type-aliases';
@@ -97,7 +96,7 @@ describe('${contractName}', () => {
     });
 
 ${
-			methodCalls.map(x => `
+		methodCalls.map(x => `
     it('should call ${x.name}', async () => {
         ${x.storageAccess.getStorageValueFunctionCode}
         const storageValueBefore = await ${x.storageAccess.getStorageValueFunctionName}();
@@ -107,9 +106,9 @@ ${
         expect(storageValueAfter.toString()).toBe('');
     });
 `).join('')
-		}});
+	}});
 `;
-	};
+};
 
 export default (args: RequestArgs.t) => {
 	const parsedArgs = args as Opts;

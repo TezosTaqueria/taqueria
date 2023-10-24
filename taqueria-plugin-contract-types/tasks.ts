@@ -15,19 +15,18 @@ const getContractAbspath = (contractFilename: string, parsedArgs: Opts) =>
 		/\.tz$/.test(contractFilename) ? contractFilename : `${contractFilename}.tz`,
 	);
 
-const generateContractTypes = (parsedArgs: Opts) =>
-	async (contractFilename: string): Promise<string> => {
-		const contractAbspath = getContractAbspath(contractFilename, parsedArgs);
-		await generateContractTypesProcessContractFiles({
-			inputTzContractDirectory: parsedArgs.config.artifactsDir ?? 'artifacts',
-			inputFiles: [contractAbspath],
-			outputTypescriptDirectory: parsedArgs.typescriptDir || 'types',
-			format: 'tz',
-			typeAliasMode: parsedArgs.typeAliasMode ?? 'file',
-		});
+const generateContractTypes = (parsedArgs: Opts) => async (contractFilename: string): Promise<string> => {
+	const contractAbspath = getContractAbspath(contractFilename, parsedArgs);
+	await generateContractTypesProcessContractFiles({
+		inputTzContractDirectory: parsedArgs.config.artifactsDir ?? 'artifacts',
+		inputFiles: [contractAbspath],
+		outputTypescriptDirectory: parsedArgs.typescriptDir || 'types',
+		format: 'tz',
+		typeAliasMode: parsedArgs.typeAliasMode ?? 'file',
+	});
 
-		return `${contractFilename}: Types generated`;
-	};
+	return `${contractFilename}: Types generated`;
+};
 
 const generateContractTypesAll = async (parsedArgs: Opts): Promise<string[]> => {
 	const files = await glob('**/*.tz', { cwd: parsedArgs.config.artifactsDir });
