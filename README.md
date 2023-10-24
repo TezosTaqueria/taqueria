@@ -61,13 +61,14 @@ You can use `taq --help` to list the available tasks in a given context
 Taqueria plugins extend the functionality of Taqueria by adding additional tasks that can be run on a project. Currently available plugins are:
 | name         |  pluginName                       |  description                                                |
 |--------------|------------------------------     |-------------------------------------------------------------|
+| Archetype    | `@taqueria/plugin-archetype`      | A compiler for the Archetype smart contract language        |
 | Core         | `@taqueria/plugin-core`           | Contains core utility tasks provided by Taqueria            |
 | LIGO         | `@taqueria/plugin-ligo`           | A compiler for the LIGO smart contract language             |
 | SmartPy      | `@taqueria/plugin-smartpy`        | A compiler for the SmartPy contract language                |
 | Flextesa     | `@taqueria/plugin-flextesa`       | A sandbox test network running Tezos Flextesa               | 
 | Taquito      | `@taqueria/plugin-taquito`        | A front-end Tezos framework used to originate               |
 | TS Generator | `@taqueria/plugin-contract-types` | A type generator that produces TS types from Michelson code |
-| Tezos Client | `@taqueria/plugin-tezos-client`   | A Tezos client that can be used to interact with the network|
+| Octez Client | `@taqueria/plugin-octez-client`   | Official Tezos client used to interact with the network     |
 
 Taqueria manages plugins by providing installation/uninstallation via the `taq install <pluginName>` and `taq uninstall <pluginName>` tasks. Plugins are installed on a per-project basis during which the NPM package is downloaded and installed on the project, and configuration is added in the `./.taq/config.json` file
 
@@ -96,7 +97,7 @@ If you prefer to build the Taqueria binary and plugins locally, follow the steps
 #### Requirements
 
 - [Deno](https://deno.land/) v1.36 or later
-- [NodeJS](https://nodejs.org/en/) v16.13 or later
+- [NodeJS](https://nodejs.org/en/) v18.18 or later
 - [Docker](https://www.docker.com/) v0.9 or later
 
 #### Run Build Script

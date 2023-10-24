@@ -18,8 +18,8 @@ Run Taqueria commands right in the VS Code Command Palette or Taqueria Side Bar 
 
 ### Requirements
 
-- Taqueria v0.41.0 or later must be [installed](https://taqueria.io/docs/getting-started/installation/) and available in your system's `#PATH`
-- Node.js v16 or later
+- Taqueria v0.42.0 or later must be [installed](https://taqueria.io/docs/getting-started/installation/) and available in your system's `#PATH`
+- Node.js v18 or later
 - Docker v0.8 or later
 
 ### Running Taqueria Commands using command pallet

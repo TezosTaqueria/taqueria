@@ -1,11 +1,15 @@
 # Taqueria LIGO Plugin
 
+> ### :warning: PLEASE NOTE
+> This documentation is for our LIGO Plugin distributed as `@taqueria/plugin-ligo` NPM package with support for LIGO v1.0 and later.
+> If you're looking to use earlier versions of LIGO, please use our LIGO Legacy Plugin which is distributed as `@taqueria/plugin-ligo-legacy`. Documentation is available [here](https://taqueria.io/docs/plugins/plugin-ligo-legacy/).
+
 The LIGO plugin provides tasks to work with LIGO smart contracts such as compiling and testing
 
 ## Requirements
 
-- Taqueria v0.40.0 or later
-- Node.js v18 or later
+- Taqueria v0.42.0 or later
+- Node.js v18.18.0 or later
 - Docker v20.10.12 or later
 
 ## Installation

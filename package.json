@@ -13,8 +13,7 @@
 		"build:binary": "./bin/build.sh",
 		"build:packages": "lerna run build",
 		"deploy": "HUSKY=0 npx lerna version minor --yes && git push && git push --tags",
-		"parse-readme-template": "ts-node ./parse-readme-template.ts",
-		"build-website": "npm run parse-readme-template && cd website && npm ci --legacy-peer-deps && npm run build",
+		"build-website": "cd website && npm ci --legacy-peer-deps && npm run build",
 		"serve-website": "cd website && npm run serve",
 		"deploy-website": "cd website && npm run deploy",
 		"watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build\" --initial",
@@ -48,7 +47,6 @@
 	"devDependencies": {
 		"chokidar-cli": "^3.0.0",
 		"dprint": "^0.40.2",
-		"eta": "^2.2.0",
 		"husky": "^8.0.3",
 		"lerna": "^7.3.0",
 		"lint-staged": "^13.2.2",

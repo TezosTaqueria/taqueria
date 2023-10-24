@@ -1,15 +1,14 @@
-<% if (it.output == "github") { %>
-# Taqueria SmartPy Plugin
-<% } %>
+---
+title: '@taqueria/plugin-smartpy-legacy'
+---
 
 The SmartPy plugin provides tasks to work with SmartPy smart contracts written in the legacy syntax (up to SmartPy v0.16) such as compiling and testing.
 
 ## Requirements
 
-- Taqueria v0.26.0 or later
-- Node.js v16.16 or later. (v17.x.x or later is not supported)
+- Taqueria v0.42.0 or later
+- Node.js v18.18 or later.
 - Docker v20.10.12 or later
-- Python 3 and pdoc
 
 ## Installation
 
@@ -19,9 +18,9 @@ To install the SmartPy plugin on a Taqueria project, navigate to the project fol
 taq install @taqueria/plugin-smartpy-legacy
 ```
 
-<%~ it.noteOpenAdmonition %>
+:::note
 To override the SmartPy version used by the plugin, create an environmental variable `TAQ_SMARTPY_VERSION` and set it appropriately, e.g. `v0.16.0`
-<%= it.closeAdmonition %>
+:::
 
 ## The `taq compile` Task
 
@@ -31,9 +30,9 @@ Basic usage is:
 taq compile <contractName>
 ```
 
-<%~ it.cautionOpenAdmonition %>
+:::caution
 The `compile` task is implemented by more than one compiler plugin (SmartPy, Archetype, SmartPy). If more than one of these plugins are installed on a project, you need to use the `--plugin smartpy` flag to specify a particular compiler
-<%= it.closeAdmonition %>
+:::
 
 ### Basic description
 The SmartPy plugin exposes a `compile` task in Taqueria which can target one SmartPy contract in the `contracts` folder and compile it to a Michelson `.tz` file output to the `artifacts` folder

@@ -1,11 +1,13 @@
 # Archetype Plugin
 
-The Archetype plugin provides a task to compile Archetype smart contracts (`.arl`) to Michelson `.tz` files
+The Archetype plugin provides a task to compile Archetype smart contracts (`.arl`) to Michelson `.tz` files.
+
+For more information, please see our documentation for the [Archetype plugin](https://taqueria.io/docs/plugins/plugin-archetype/)
 
 ## Requirements
 
-- Taqueria v0.26.0 or later
-- Node.js v16.16 or later. (v17.x.x or later is not supported)
+- Taqueria v0.42.0 or later
+- Node.js v18.18.0 or later
 - Docker v20.10.12 or later
 
 ## Installation
