@@ -652,10 +652,6 @@ export class VsCodeHelper {
 	async getAvailableScaffolds() {
 		return [
 			{
-				name: 'NFT',
-				url: 'https://github.com/pinnacle-labs/taqueria-scaffold-nft',
-			},
-			{
 				name: 'Taco Shop',
 				url: 'https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop',
 			},

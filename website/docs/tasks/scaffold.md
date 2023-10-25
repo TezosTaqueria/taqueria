@@ -51,6 +51,4 @@ taq scaffold [url] [path]
 | Description                   | Command                               | Behaviour                                                                     |
 | ----------------------------- | ------------------------------------- | ----------------------------------------------------------------------------- |
 | Scaffold the default project  | `taq scaffold`                                                                          | Scaffolds the default (`taqueria-scaffold-taco-shop`) project |
-| Scaffold a specific project   | `taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-nft-project`                | Scaffolds the NFT project into a directory with the repo name |
-| Scaffold a specific project   | `taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-nft-project ./myNftProject` | Scaffolds the NFT project into the provided directory |
 
