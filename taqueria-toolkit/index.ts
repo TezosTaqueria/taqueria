@@ -9,6 +9,20 @@ import * as transform from '@taqueria/protocol/types-config-files';
 
 const DEFAULT_ENV_VAR_PREFIX = '';
 
+function withFixedEnv(env: Record<string, string | undefined>) {
+	return Object.entries(env).reduce(
+		(acc, [key, value]) => {
+			if (key.startsWith('VITE_')) {
+				const newKey = key.replace('VITE_', '');
+				acc[newKey] = value;
+			}
+			acc[key] = value;
+			return acc;
+		},
+		{} as Record<string, string | undefined>,
+	);
+}
+
 function withEnv(env: Record<string, string | undefined>, prefix = DEFAULT_ENV_VAR_PREFIX) {
 	const getConfigEnvKey = () => `${prefix}TAQ_CONFIG`;
 
@@ -65,7 +79,7 @@ function withEnv(env: Record<string, string | undefined>, prefix = DEFAULT_ENV_V
 }
 
 export const getConfigAsV1 = (env: Record<string, string | undefined>, prefix = DEFAULT_ENV_VAR_PREFIX): Config.t => {
-	const { getRawConfig, getEnvironmentConfig } = withEnv(env, prefix);
+	const { getRawConfig, getEnvironmentConfig } = withEnv(withFixedEnv(env), prefix);
 
 	const rawConfig = getRawConfig();
 
@@ -104,7 +118,7 @@ export function getConfigV2(
 	env: Record<string, string | undefined>,
 	prefix = DEFAULT_ENV_VAR_PREFIX,
 ): transform.ConfigFileSetV2 {
-	const { getRawConfig, getEnvironmentConfig } = withEnv(env, prefix);
+	const { getRawConfig, getEnvironmentConfig } = withEnv(withFixedEnv(env), prefix);
 
 	const rawConfig = getRawConfig();
 
