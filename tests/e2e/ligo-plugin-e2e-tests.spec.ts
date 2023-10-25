@@ -4,7 +4,6 @@ import path from 'path';
 import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
-import { compile } from 'eta';
 
 describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 	describe('tasks that rarely change', () => {
