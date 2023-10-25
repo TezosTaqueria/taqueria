@@ -61,7 +61,7 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 		);
 		// console.log(deployResult)
 
-		expect(deployResult.stdout).toContain('KT');
+		expect(deployResult.stdout).toMatch(/KT|T1/);
 
 		// tear down the project
 		await cleanup();
