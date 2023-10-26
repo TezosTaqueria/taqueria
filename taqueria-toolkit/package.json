@@ -1,12 +1,13 @@
 {
 	"name": "@taqueria/toolkit",
-	"version": "0.43.0",
+	"version": "0.43.1",
 	"description": "A TypeScript library for NodeJS to work with Taqueria projects",
 	"source": "./index.ts",
 	"main": "./index.js",
 	"bin": {
 		"withTaq": "./bin/run.js"
 	},
+	"type": "module",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "npx tsc -p ./tsconfig.json && npx tsup"
@@ -37,7 +38,7 @@
 		"typescript": "^5.2.2"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.43.0",
+		"@taqueria/protocol": "^0.43.1",
 		"cross-spawn": "^7.0.3",
 		"yargs": "^17.7.2"
 	},
@@ -49,30 +50,35 @@
 				"v2.ts"
 			],
 			"sourcemap": true,
-			"target": "es2018",
+			"target": [
+				"esnext"
+			],
 			"outDir": "./",
 			"dts": true,
 			"clean": false,
 			"shims": true,
 			"skipNodeModulesBundle": false,
-			"platform": "browser"
+			"platform": "browser",
+			"format": [
+				"esm"
+			]
 		},
 		{
 			"entry": [
 				"bin/run.ts"
 			],
 			"sourcemap": true,
-			"target": "node16",
+			"target": "esnext",
 			"outDir": "./bin/",
 			"dts": false,
 			"clean": false,
 			"skipNodeModulesBundle": true,
-			"platform": "node"
+			"platform": "node",
+			"format": "esm"
 		}
 	],
 	"exports": {
 		"./lib/*": "./lib/*",
-		".*": "./*",
 		".": "./index.js",
 		"./v1": "./v1.js",
 		"./v2": "./v2.js"

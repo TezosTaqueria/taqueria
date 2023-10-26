@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.43.0",
+	"version": "0.43.1",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -37,9 +37,269 @@
 	},
 	"exports": {
 		".": "./index.js",
-		"./*": {
-			"import": "./*.js",
-			"default": "./*.js"
+		"./Alias": {
+			"import": "./Alias.js",
+			"default": "./Alias.js"
+		},
+		"./Base": {
+			"import": "./Base.js",
+			"default": "./Base.js"
+		},
+		"./Command": {
+			"import": "./Command.js",
+			"default": "./Command.js"
+		},
+		"./ConfigArtifactsDir": {
+			"import": "./ConfigArtifactsDir.js",
+			"default": "./ConfigArtifactsDir.js"
+		},
+		"./ConfigContractsDir": {
+			"import": "./ConfigContractsDir.js",
+			"default": "./ConfigContractsDir.js"
+		},
+		"./ConfigEnvironmentFileV2": {
+			"import": "./ConfigEnvironmentFileV2.js",
+			"default": "./ConfigEnvironmentFileV2.js"
+		},
+		"./ConfigFileV2": {
+			"import": "./ConfigFileV2.js",
+			"default": "./ConfigFileV2.js"
+		},
+		"./Config": {
+			"import": "./Config.js",
+			"default": "./Config.js"
+		},
+		"./Contract": {
+			"import": "./Contract.js",
+			"default": "./Contract.js"
+		},
+		"./Crypto": {
+			"import": "./Crypto.js",
+			"default": "./Crypto.js"
+		},
+		"./EconomicalProtocolHash": {
+			"import": "./EconomicalProtocolHash.js",
+			"default": "./EconomicalProtocolHash.js"
+		},
+		"./Environment": {
+			"import": "./Environment.js",
+			"default": "./Environment.js"
+		},
+		"./EphemeralState": {
+			"import": "./EphemeralState.js",
+			"default": "./EphemeralState.js"
+		},
+		"./Faucet": {
+			"import": "./Faucet.js",
+			"default": "./Faucet.js"
+		},
+		"./helpers": {
+			"import": "./helpers.js",
+			"default": "./helpers.js"
+		},
+		"./HumanReadableIdentifier": {
+			"import": "./HumanReadableIdentifier.js",
+			"default": "./HumanReadableIdentifier.js"
+		},
+		"./i18n": {
+			"import": "./i18n.js",
+			"default": "./i18n.js"
+		},
+		"./index": {
+			"import": "./index.js",
+			"default": "./index.js"
+		},
+		"./InstalledPlugin": {
+			"import": "./InstalledPlugin.js",
+			"default": "./InstalledPlugin.js"
+		},
+		"./LoadedConfig": {
+			"import": "./LoadedConfig.js",
+			"default": "./LoadedConfig.js"
+		},
+		"./MetadataConfig": {
+			"import": "./MetadataConfig.js",
+			"default": "./MetadataConfig.js"
+		},
+		"./NetworkAccountConfig": {
+			"import": "./NetworkAccountConfig.js",
+			"default": "./NetworkAccountConfig.js"
+		},
+		"./NetworkConfig": {
+			"import": "./NetworkConfig.js",
+			"default": "./NetworkConfig.js"
+		},
+		"./NonEmptyString": {
+			"import": "./NonEmptyString.js",
+			"default": "./NonEmptyString.js"
+		},
+		"./Operation": {
+			"import": "./Operation.js",
+			"default": "./Operation.js"
+		},
+		"./Option": {
+			"import": "./Option.js",
+			"default": "./Option.js"
+		},
+		"./ParsedOperation": {
+			"import": "./ParsedOperation.js",
+			"default": "./ParsedOperation.js"
+		},
+		"./ParsedPluginInfo": {
+			"import": "./ParsedPluginInfo.js",
+			"default": "./ParsedPluginInfo.js"
+		},
+		"./ParsedTemplate": {
+			"import": "./ParsedTemplate.js",
+			"default": "./ParsedTemplate.js"
+		},
+		"./PersistentState": {
+			"import": "./PersistentState.js",
+			"default": "./PersistentState.js"
+		},
+		"./PluginActionName": {
+			"import": "./PluginActionName.js",
+			"default": "./PluginActionName.js"
+		},
+		"./PluginDependenciesResponse": {
+			"import": "./PluginDependenciesResponse.js",
+			"default": "./PluginDependenciesResponse.js"
+		},
+		"./PluginInfo": {
+			"import": "./PluginInfo.js",
+			"default": "./PluginInfo.js"
+		},
+		"./PluginJsonResponse": {
+			"import": "./PluginJsonResponse.js",
+			"default": "./PluginJsonResponse.js"
+		},
+		"./PluginProxyResponse": {
+			"import": "./PluginProxyResponse.js",
+			"default": "./PluginProxyResponse.js"
+		},
+		"./PluginResponseEncoding": {
+			"import": "./PluginResponseEncoding.js",
+			"default": "./PluginResponseEncoding.js"
+		},
+		"./PluginSchema": {
+			"import": "./PluginSchema.js",
+			"default": "./PluginSchema.js"
+		},
+		"./PositionalArg": {
+			"import": "./PositionalArg.js",
+			"default": "./PositionalArg.js"
+		},
+		"./ProvisionerID": {
+			"import": "./ProvisionerID.js",
+			"default": "./ProvisionerID.js"
+		},
+		"./Provisioner": {
+			"import": "./Provisioner.js",
+			"default": "./Provisioner.js"
+		},
+		"./Provisions": {
+			"import": "./Provisions.js",
+			"default": "./Provisions.js"
+		},
+		"./ProxyTaskArgs": {
+			"import": "./ProxyTaskArgs.js",
+			"default": "./ProxyTaskArgs.js"
+		},
+		"./ProxyTemplateArgs": {
+			"import": "./ProxyTemplateArgs.js",
+			"default": "./ProxyTemplateArgs.js"
+		},
+		"./PublicKeyHash": {
+			"import": "./PublicKeyHash.js",
+			"default": "./PublicKeyHash.js"
+		},
+		"./RequestArgs": {
+			"import": "./RequestArgs.js",
+			"default": "./RequestArgs.js"
+		},
+		"./SandboxAccountConfig": {
+			"import": "./SandboxAccountConfig.js",
+			"default": "./SandboxAccountConfig.js"
+		},
+		"./SandboxConfig": {
+			"import": "./SandboxConfig.js",
+			"default": "./SandboxConfig.js"
+		},
+		"./SanitizedAbsPath": {
+			"import": "./SanitizedAbsPath.js",
+			"default": "./SanitizedAbsPath.js"
+		},
+		"./SanitizedArgs": {
+			"import": "./SanitizedArgs.js",
+			"default": "./SanitizedArgs.js"
+		},
+		"./SanitizedPath": {
+			"import": "./SanitizedPath.js",
+			"default": "./SanitizedPath.js"
+		},
+		"./ScaffoldConfig": {
+			"import": "./ScaffoldConfig.js",
+			"default": "./ScaffoldConfig.js"
+		},
+		"./Settings": {
+			"import": "./Settings.js",
+			"default": "./Settings.js"
+		},
+		"./SHA256": {
+			"import": "./SHA256.js",
+			"default": "./SHA256.js"
+		},
+		"./SingleChar": {
+			"import": "./SingleChar.js",
+			"default": "./SingleChar.js"
+		},
+		"./TaqError": {
+			"import": "./TaqError.js",
+			"default": "./TaqError.js"
+		},
+		"./taqueria-protocol-types": {
+			"import": "./taqueria-protocol-types.js",
+			"default": "./taqueria-protocol-types.js"
+		},
+		"./Task": {
+			"import": "./Task.js",
+			"default": "./Task.js"
+		},
+		"./Template": {
+			"import": "./Template.js",
+			"default": "./Template.js"
+		},
+		"./Timestamp": {
+			"import": "./Timestamp.js",
+			"default": "./Timestamp.js"
+		},
+		"./types-config-files": {
+			"import": "./types-config-files.js",
+			"default": "./types-config-files.js"
+		},
+		"./types": {
+			"import": "./types.js",
+			"default": "./types.js"
+		},
+		"./Tz": {
+			"import": "./Tz.js",
+			"default": "./Tz.js"
+		},
+		"./tzkt-config": {
+			"import": "./tzkt-config.js",
+			"default": "./tzkt-config.js"
+		},
+		"./Url": {
+			"import": "./Url.js",
+			"default": "./Url.js"
+		},
+		"./Verb": {
+			"import": "./Verb.js",
+			"default": "./Verb.js"
+		},
+		"./VersionNumber": {
+			"import": "./VersionNumber.js",
+			"default": "./VersionNumber.js"
 		},
 		"./out/**/*": {
 			"import": "./*.js",
