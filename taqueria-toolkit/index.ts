@@ -43,7 +43,8 @@ function withEnv(env: Record<string, string | undefined>, prefix = DEFAULT_ENV_V
 			const decoded = decode(data);
 			const rawConfig = JSON.parse(decoded);
 			return rawConfig;
-		} catch {
+		} catch (err) {
+			console.debug(err);
 			throw new TaqError(
 				`Could not parse the config. Please ensure that the environment variable called ${key} is defined and set to the value of your config.json file using Base64 encoding.`,
 			);
