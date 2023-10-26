@@ -6,6 +6,7 @@ export { isTaqError, TaqError } from './TaqError';
 import * as V1 from './v1';
 export * as V2 from './v2';
 import * as transform from '@taqueria/protocol/types-config-files';
+import { Buffer } from 'buffer';
 
 const DEFAULT_ENV_VAR_PREFIX = '';
 
