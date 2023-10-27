@@ -1,6 +1,7 @@
 import { getDockerImage, sendErr } from '@taqueria/node-sdk';
 import { ProxyTaskArgs, RequestArgs } from '@taqueria/node-sdk/types';
-import { join } from 'path';
+import * as fs from 'fs';
+import { delimiter, join } from 'path';
 
 export interface LigoOpts extends ProxyTaskArgs.t {
 	command: string;
@@ -21,20 +22,35 @@ export interface TestOpts extends RequestArgs.t {
 	sourceFile?: string;
 }
 
-export type IntersectionOpts = LigoOpts & CompileOpts & CompileAllOpts & TestOpts;
+export type IntersectionOpts =
+	& LigoOpts
+	& CompileOpts
+	& CompileAllOpts
+	& TestOpts;
 
 export type UnionOpts = LigoOpts | CompileOpts | CompileAllOpts | TestOpts;
 
-export const getInputFilenameAbsPath = (parsedArgs: UnionOpts, sourceFile: string): string =>
-	join(parsedArgs.config.projectDir, parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
+export const getInputFilenameAbsPath = (
+	parsedArgs: UnionOpts,
+	sourceFile: string,
+): string =>
+	join(
+		parsedArgs.config.projectDir,
+		parsedArgs.config.contractsDir ?? 'contracts',
+		sourceFile,
+	);
 
-export const getInputFilenameRelPath = (parsedArgs: UnionOpts, sourceFile: string): string =>
-	join(parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
+export const getInputFilenameRelPath = (
+	parsedArgs: UnionOpts,
+	sourceFile: string,
+): string => join(parsedArgs.config.contractsDir ?? 'contracts', sourceFile);
 
 export const formatLigoError = (err: Error): Error => {
 	let result = err.message.replace(/Command failed.+?\n/, '');
 	if (
-		result.includes('An internal error ocurred. Please, contact the developers.')
+		result.includes(
+			'An internal error ocurred. Please, contact the developers.',
+		)
 		&& result.includes('Module Contract not found with last Contract.')
 	) {
 		result =
@@ -53,7 +69,8 @@ export const formatLigoError = (err: Error): Error => {
 		.replace(
 			'An internal error ocurred. Please, contact the developers.',
 			'The LIGO compiler experienced an internal error. Please contact the LIGO developers.',
-		).replace(
+		)
+		.replace(
 			/Module ("Contract\.[^"]+") not found/,
 			'The module $1 was not found. If your contract is defined within a namespace, please ensure that it has been exported.',
 		);
@@ -61,7 +78,10 @@ export const formatLigoError = (err: Error): Error => {
 	return err;
 };
 
-export const emitExternalError = (errs: unknown[] | unknown, sourceFile: string): void => {
+export const emitExternalError = (
+	errs: unknown[] | unknown,
+	sourceFile: string,
+): void => {
 	sendErr(`\n=== Error messages for ${sourceFile} ===`);
 	const errors = Array.isArray(errs) ? errs : [errs];
 	errors.map(err => {
@@ -77,3 +97,38 @@ export const configure = (dockerImage: string, dockerImageEnvVar: string) => ({
 });
 
 export type Common = ReturnType<typeof configure>;
+function exists(path: string): boolean {
+	try {
+		fs.accessSync(path, fs.constants.X_OK);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+function getLigoBinaryFromPath() {
+	const { PATH } = process.env;
+	if (!PATH) {
+		return null;
+	}
+	const paths = PATH.split(delimiter);
+	for (const candidatePath of paths) {
+		const possibleLigoPath = join(candidatePath, 'ligo');
+		if (exists(possibleLigoPath)) {
+			return possibleLigoPath;
+		}
+	}
+	return null;
+}
+
+export function baseDriverCmd(
+	projectDir: string,
+	ligoDockerImage: string,
+): string {
+	const ligoBinaryFromPath = getLigoBinaryFromPath();
+	if (ligoBinaryFromPath !== null) {
+		return ligoBinaryFromPath;
+	} else {
+		return `DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${ligoDockerImage}`;
+	}
+}
