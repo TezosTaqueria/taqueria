@@ -44,7 +44,7 @@
     },
     "attribute": {
       "name": "keyword.control.attribute.mligo",
-      "match": "\\[@.*\\]",
+      "match": "\\[@[^\\]]*\\]",
       "captures": {}
     },
     "macro": {
@@ -59,7 +59,7 @@
     },
     "keywords": {
       "name": "keyword.other.mligo",
-      "match": "\\b(struct|end|let|in|mut|rec|contract_of|parameter_of|module|sig|val|false|true)\\b",
+      "match": "\\b(struct|end|let|in|mut|rec|contract_of|parameter_of|module|sig|val|include|false|true)\\b",
       "captures": {}
     },
     "numericliterals": {
