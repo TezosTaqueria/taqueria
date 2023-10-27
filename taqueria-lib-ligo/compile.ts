@@ -338,7 +338,7 @@ export const inject = (commonObj: Common) => {
 				parsedArgs,
 				sourceFile,
 				module,
-				exprKind === 'storage' && index === 0 ? 'default_storage' : exprKind,
+				exprKind === 'storage' && exprName === 'default_storage' ? 'default_storage' : exprKind,
 			)(exprName);
 			return compileResult;
 		}));
