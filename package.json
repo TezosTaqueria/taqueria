@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.44.1",
+	"version": "0.44.2",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -46,7 +46,7 @@
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
 		"chokidar-cli": "^3.0.0",
-		"dprint": "^0.41.0",
+		"dprint": "^0.42.5",
 		"husky": "^8.0.3",
 		"lerna": "^7.3.0",
 		"lint-staged": "^15.0.2",
