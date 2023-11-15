@@ -6,6 +6,7 @@ configurePlugin({
 	alias: 'ligo',
 	dockerImage: 'ligolang/ligo:1.0.0',
 	dockerImageEnvVar: 'TAQ_LIGO_IMAGE',
+	canUseLIGOBinary: true,
 	unparsedArgs: process.argv,
 	templates,
 });
