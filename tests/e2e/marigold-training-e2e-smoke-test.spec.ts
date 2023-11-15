@@ -56,7 +56,7 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 		// deploy the contract
 		const deployResult = await execute(
 			'taq',
-			'deploy pokeGame.tz -e "testing -t 120"',
+			'deploy pokeGame.tz -e testing -t 120',
 			'./test-project',
 		);
 		console.log(deployResult);
