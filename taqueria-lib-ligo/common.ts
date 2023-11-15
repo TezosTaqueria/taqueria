@@ -90,10 +90,11 @@ export const emitExternalError = (
 	sendErr(`===`);
 };
 
-export const configure = (dockerImage: string, dockerImageEnvVar: string) => ({
+export const configure = (dockerImage: string, dockerImageEnvVar: string, canUseLIGOBinary: boolean) => ({
 	LIGO_DEFAULT_IMAGE: dockerImage,
 	LIGO_IMAGE_ENV_VAR: dockerImageEnvVar,
 	getLigoDockerImage: () => getDockerImage(dockerImage, dockerImageEnvVar),
+	baseDriverCmd: (projectDir: string) => baseDriverCmd(projectDir, dockerImage, canUseLIGOBinary),
 });
 
 export type Common = ReturnType<typeof configure>;
@@ -121,11 +122,12 @@ function getLigoBinaryFromPath() {
 	return null;
 }
 
-export function baseDriverCmd(
+function baseDriverCmd(
 	projectDir: string,
 	ligoDockerImage: string,
+	canUseLIGOBinary: boolean,
 ): string {
-	const ligoBinaryFromPath = getLigoBinaryFromPath();
+	const ligoBinaryFromPath = canUseLIGOBinary ? getLigoBinaryFromPath() : null;
 	if (ligoBinaryFromPath !== null) {
 		return ligoBinaryFromPath;
 	} else {

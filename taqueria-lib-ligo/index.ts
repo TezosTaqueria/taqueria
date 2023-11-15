@@ -12,6 +12,7 @@ type ConfiguratorArgs = {
 	unparsedArgs: string[];
 	dockerImage: string;
 	dockerImageEnvVar: string;
+	canUseLIGOBinary: boolean;
 	templates?: Record<string, string>;
 };
 
@@ -114,7 +115,7 @@ export const configurePlugin = (settings: ConfiguratorArgs) => {
 				handler: createContract(settings.templates),
 			}),
 		],
-		proxy: main(settings.dockerImage, settings.dockerImageEnvVar),
+		proxy: main(settings.dockerImage, settings.dockerImageEnvVar, settings.canUseLIGOBinary),
 		postInstall: `node ${__dirname}/postinstall.js`,
 	};
 

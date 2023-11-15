@@ -1,20 +1,15 @@
 import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
-import { baseDriverCmd, Common, emitExternalError, getInputFilenameRelPath, TestOpts as Opts } from './common';
+import { Common, emitExternalError, getInputFilenameRelPath, TestOpts as Opts } from './common';
 
 type TableRow = { contract: string; testResults: string };
 
 const inject = (commonObj: Common) => {
-	const { getLigoDockerImage } = commonObj;
+	const { baseDriverCmd } = commonObj;
 
 	const getTestContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
 		const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 		if (!projectDir) throw `No project directory provided`;
-		const baseCmd = `${
-			baseDriverCmd(
-				projectDir,
-				getLigoDockerImage(),
-			)
-		} run test`;
+		const baseCmd = `${baseDriverCmd(projectDir)} run test`;
 		const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
 		const cmd = `${baseCmd} ${inputFile}`;
 		return cmd;
