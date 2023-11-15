@@ -59,7 +59,7 @@ describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 			'deploy pokeGame.tz -e "testing"',
 			'./test-project',
 		);
-		// console.log(deployResult)
+		console.log(deployResult);
 
 		expect(deployResult.stdout.join('\n')).toMatch(/KT|T1/m);
 
