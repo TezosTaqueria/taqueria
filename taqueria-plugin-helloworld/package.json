@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-helloworld",
-	"version": "0.44.7",
+	"version": "0.44.8",
 	"description": "An example of a plugin for Taqueria",
 	"main": "index.js",
 	"scripts": {
