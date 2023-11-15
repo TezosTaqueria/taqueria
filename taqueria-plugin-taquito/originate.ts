@@ -186,7 +186,22 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 
 		const contractInfoForDisplay = await prepContractInfoForDisplay(parsedArgs, tezos, contractInfo, op);
 		return sendJsonRes([contractInfoForDisplay]);
-	} catch {
+	} catch (e) {
+		if (e instanceof Error && e.message.includes('503')) {
+			try {
+				const [envType, nodeConfig] = await getEnvTypeAndNodeConfig(protocolArgs, env);
+				if (envType === 'Network' && nodeConfig.rpcUrl.includes('ghostnet')) {
+					return sendAsyncErr(
+						`❌ Ghostnet is returning 503 errors, indicating that the server is under heavy load.\nPlease try again later.`,
+					);
+				}
+				return sendAsyncErr(
+					`❌ The node you are trying to connect to is not available\nPlease check if the node is running and the URL is correct in your config.json`,
+				);
+			} catch {
+				// Resort to the default error message
+			}
+		}
 		return sendAsyncErr('No operations performed');
 	}
 };
