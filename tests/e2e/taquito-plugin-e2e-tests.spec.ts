@@ -236,11 +236,11 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 
 			const deployResult = await execute(
 				'taq',
-				'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
+				'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing -t 120',
 				'./test-project',
 			);
 
-			// console.log(deployResult)
+			console.log(deployResult);
 			const { stdout: stdout2, stderr } = deployResult;
 			const result = stdout2.join('\n');
 			expect(result).toMatch(/| Contract\s+| Address\s+| Alias\s+| Balance In Mutez\s+| Destination/);
