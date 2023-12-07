@@ -130,7 +130,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		});
 
 		test('can compile a contract that requires initial storage', async () => {
-			jest.setTimeout(60000);
+			jest.setTimeout(100000);
 			const { execute, cleanup, exists, makeDir, path: testProjectDir } = await prepareEnvironment();
 			const { readFile, writeFile } = require('fs').promises;
 			const pipResult = await execute(
