@@ -88,12 +88,10 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 		test('can compile a contract that requires no initial storage', async () => {
 			const { execute, cleanup, exists, makeDir, path: testProjectDir } = await prepareEnvironment();
 			const { readFile, writeFile } = require('fs').promises;
-			const pipResult = await execute(
-				'bash',
-				'-c',
+			const pipResult = await exec(
 				'pip install https://preview.smartpy.io/0.19.0a0/tezos_smartpy-0.19.0a0-py3-none-any.whl',
 			);
-			expect(pipResult.stderr.filter(l => !l.includes('pip'))).toEqual([]);
+			expect(pipResult.stderr.trim().split('\n').filter(l => !l.includes('pip') && l.length > 0)).toEqual([]);
 
 			// Mimic the structure of a Taqueria project
 			await makeDir('artifacts');
@@ -136,12 +134,10 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			test('can compile a contract that requires initial storage', async () => {
 				const { execute, cleanup, exists, makeDir, path: testProjectDir } = await prepareEnvironment();
 				const { readFile, writeFile } = require('fs').promises;
-				const pipResult = await execute(
-					'bash',
-					'-c',
+				const pipResult = await exec(
 					'pip install https://preview.smartpy.io/0.19.0a0/tezos_smartpy-0.19.0a0-py3-none-any.whl',
 				);
-				expect(pipResult.stderr.filter(l => !l.includes('pip'))).toEqual([]);
+				expect(pipResult.stderr.trim().split('\n').filter(l => !l.includes('pip') && l.length > 0)).toEqual([]);
 
 				// Mimic the structure of a Taqueria project
 				await makeDir('artifacts');
