@@ -462,7 +462,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
       - name: Download work archive
         uses: actions/download-artifact@v2
         with:
