@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/toolkit",
-	"version": "0.45.17",
+	"version": "0.45.18",
 	"description": "A TypeScript library for NodeJS to work with Taqueria projects",
 	"source": "./index.ts",
 	"main": "./index.js",
@@ -31,14 +31,14 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
-		"@types/cross-spawn": "^6.0.3",
-		"@types/node": "^20.6.2",
-		"@types/yargs": "^17.0.24",
-		"tsup": "^7.2.0",
-		"typescript": "^5.2.2"
+		"@types/cross-spawn": "^6.0.6",
+		"@types/node": "^20.10.4",
+		"@types/yargs": "^17.0.32",
+		"tsup": "^8.0.1",
+		"typescript": "^5.3.3"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.45.17",
+		"@taqueria/protocol": "^0.45.18",
 		"buffer": "^6.0.3",
 		"cross-spawn": "^7.0.3",
 		"yargs": "^17.7.2"
