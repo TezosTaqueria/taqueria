@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-smartpy-legacy",
-	"version": "0.45.19",
+	"version": "0.45.20",
 	"description": "A taqueria plugin for compiling SmartPy smart contracts using SmartPy v0.16 (legacy syntax).",
 	"targets": {
 		"default": {
@@ -51,7 +51,7 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.45.19",
+		"@taqueria/node-sdk": "^0.45.20",
 		"fast-glob": "^3.3.2"
 	},
 	"devDependencies": {
