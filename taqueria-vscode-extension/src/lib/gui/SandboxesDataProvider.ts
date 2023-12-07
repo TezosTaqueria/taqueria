@@ -34,7 +34,7 @@ export class SandboxesDataProvider extends TaqueriaDataProviderBase
 	private sandboxStates: Record<string, CachedSandboxState> = {};
 	private tzktProviders: Record<string, CachedTzKTDataProvider> = {};
 
-	refreshLevelInterval: NodeJS.Timer | undefined;
+	refreshLevelInterval: NodeJS.Timeout | undefined;
 	private sandboxTreeItems: SandboxTreeItem[] | undefined;
 
 	getTreeItem(element: SandboxTreeItemBase): vscode.TreeItem {
