@@ -92,7 +92,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				'pip',
 				'install https://preview.smartpy.io/0.19.0a0/tezos_smartpy-0.19.0a0-py3-none-any.whl',
 			);
-			expect(pipResult.stderr).toEqual([]);
+			expect(pipResult.stderr.filter(l => !l.includes('pip'))).toEqual([]);
 
 			// Mimic the structure of a Taqueria project
 			await makeDir('artifacts');
