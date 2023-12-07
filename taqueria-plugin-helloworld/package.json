@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-helloworld",
-	"version": "0.45.7",
+	"version": "0.45.8",
 	"description": "An example of a plugin for Taqueria",
 	"main": "index.js",
 	"scripts": {
@@ -15,8 +15,8 @@
 	"author": "Pinnacle Labs <support@pinnaclelabs.limited>",
 	"license": "Apache-2.0",
 	"devDependencies": {
-		"tsup": "^7.2.0",
-		"typescript": "^5.2.2"
+		"tsup": "^8.0.1",
+		"typescript": "^5.3.3"
 	},
 	"dependencies": {
 		"@taqueria/node-sdk": "0.41.0"
