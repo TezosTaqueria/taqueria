@@ -134,7 +134,8 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			const { readFile, writeFile } = require('fs').promises;
 			const pipResult = await execute(
 				'pip',
-				'install https://preview.smartpy.io/0.19.0a0/tezos_smartpy-0.19.0a0-py3-none-any.whl',
+				'install',
+				'https://preview.smartpy.io/0.19.0a0/tezos_smartpy-0.19.0a0-py3-none-any.whl',
 			);
 			expect(pipResult.stderr).toEqual([]);
 
@@ -163,6 +164,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 			/*********** Test that missing storageList files produce a warning  ***********/
 
 			const wrapperResult = await execute('python', `wrapper.py ${testProjectDir}/contracts/chess.py ${parsedArgs}`);
+			console.log(wrapperResult);
 
 			// Expect compilation to fail due to missing a storageList file
 			expect(wrapperResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
