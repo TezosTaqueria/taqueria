@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.46.1",
+	"version": "0.46.2",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -21,7 +21,7 @@
 		"prepare": "husky install",
 		"format": "npx dprint fmt",
 		"format:check": "npx dprint check",
-		"update-lock": "deno cache --import-map ./import_map.json --lock-write index.ts"
+		"update-lock": "deno cache --lock-write index.ts"
 	},
 	"repository": {
 		"type": "git",
