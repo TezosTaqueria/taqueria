@@ -219,12 +219,15 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 
 	// Add "scaffold" task to scaffold full projects
 	globalTasks.registerTask({
-		taskName: NonEmptyString.create('scaffold'),
-		aliases: [],
+		taskName: NonEmptyString.create('new'),
+		aliases: [NonEmptyString.create('scaffold')],
 		configure: (cliConfig: CLIConfig) =>
 			cliConfig
 				.command(
-					'scaffold [scaffoldUrl] [scaffoldProjectDir]',
+					[
+						'new [scaffoldUrl] [scaffoldProjectDir]',
+						'scaffold [scaffoldUrl] [scaffoldProjectDir]',
+					],
 					i18n.__('scaffoldDesc'),
 					(yargs: Arguments) => {
 						yargs
@@ -523,7 +526,7 @@ const demandCommand = (cliConfig: CLIConfig) => cliConfig.demandCommand(1) as CL
 
 const postInitCLI = (env: EnvVars, args: DenoArgs, parsedArgs: SanitizedArgs.t, i18n: i18n.t) =>
 	pipe(
-		initCLI(env, args, i18n),
+		initCLI(env, args, i18n), // resetting yargs instance does not work so we create a new one
 		demandCommand,
 		extendCLI(env, parsedArgs, i18n),
 	);
@@ -1296,9 +1299,9 @@ export const normalizeErr = (err: TaqError.t | TaqError.E_TaqError | Error) => {
 };
 
 export const displayError = (cli: CLIConfig) => (err: Error | TaqError.t) => {
-	const inputArgs = (cli.parsed as unknown as { argv: Record<string, unknown> }).argv;
+	const inputArgs = (cli.parsed as unknown as { argv: Record<string, unknown> }).argv || {};
 
-	if (!inputArgs.fromVsCode && (isTaqError(err) && err.kind !== 'E_EXEC')) {
+	if (Object.entries(inputArgs).length && !inputArgs.fromVsCode && (isTaqError(err) && err.kind !== 'E_EXEC')) {
 		cli.getInternalMethods().getUsageInstance().showHelp(inputArgs.help ? 'log' : 'error');
 	}
 
@@ -1329,7 +1332,8 @@ export const displayError = (cli: CLIConfig) => (err: Error | TaqError.t) => {
 			.with({ kind: 'E_OPT_IN_WARNING' }, err => [22, err.msg])
 			.with({ kind: 'E_INVALID_OPTION' }, err => [23, err.msg])
 			.with({ kind: 'E_TAQ_PROJECT_NOT_FOUND' }, err => [24, err.msg])
-			.with({ message: P.string }, (err: Error) => [128, err.message])
+			// Internal error. Show full trace
+			.with({ message: P.string }, (err: Error) => [128, err])
 			.exhaustive();
 
 		const [exitCode, msg] = res;
