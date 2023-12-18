@@ -33,6 +33,7 @@ import {
 	reject,
 	resolve,
 } from 'fluture';
+import * as chalk from 'https://deno.land/std@0.209.0/fmt/colors.ts';
 import { titleCase } from 'https://deno.land/x/case@2.1.1/mod.ts';
 import { Table } from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts';
 import { identity, pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
@@ -215,6 +216,28 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 				initProject(parsedArgs, parsedArgs.projectDir, parsedArgs.maxConcurrency, i18n),
 				map(log),
 			),
+	});
+
+	// Add "start" task to run start-up script for a project
+	globalTasks.registerTask({
+		taskName: NonEmptyString.create('start'),
+		aliases: [],
+		configure: (cliConfig: CLIConfig) =>
+			cliConfig.command(
+				'start',
+				'Run the start routine for a scaffolded project',
+			),
+		handler: parsedArgs =>
+			pipe(
+				readJsonFile<{ scripts: { start?: string } }>(joinPaths(parsedArgs.projectDir, 'package.json')),
+				chain(contents =>
+					contents.scripts.start
+						? exec('npm run start', {})
+						: exec("echo 'No start script provided for this project.'", {})
+				),
+				map(() => {}),
+			),
+		isRunning: (parsedArgs => parsedArgs._.length === 1 && parsedArgs._.includes('start')),
 	});
 
 	// Add "scaffold" task to scaffold full projects
@@ -708,7 +731,15 @@ const scaffoldProject =
 
 				log("    ✓ Project Taq'ified \n");
 
-				return ('🌮 Project created successfully 🌮');
+				log('🌮 Project created successfully 🌮\n');
+
+				log(
+					`${
+						chalk.yellow('NEXT STEP')
+					}: - Run the following to change to the directory of your new project and start it:`,
+				);
+
+				return chalk.bold(`cd ${abspath} && taq start\n`);
 			},
 		);
 
