@@ -9,7 +9,6 @@ import { inject } from './taqueria-utils/taqueria-utils.ts';
 
 // Get utils
 const {
-	log,
 	taqResolve,
 } = inject({
 	stdout: Deno.stdout,
