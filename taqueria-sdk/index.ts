@@ -216,25 +216,22 @@ export const parseJSON = <T>(input: string): LikeAPromise<T, TaqError> =>
 
 export const sendRes = (msg: string, newline = true) => {
 	if (!msg || msg.length === 0) return;
-	return newline
-		? console.log(msg)
-		: process.stdout.write(msg) as unknown as void;
+	const output = newline ? msg + '\n' : msg;
+	return process.stdout.write(output) as unknown as void;
 };
 
 export const sendAsyncRes = (msg: string, newline = true): Promise<void> => Promise.resolve(sendRes(msg, newline));
 
 export const sendErr = (msg: string, newline = true) => {
 	if (!msg || msg.length === 0) return;
-	return newline
-		? console.error(msg)
-		: process.stderr.write(msg) as unknown as void;
+	const output = newline ? msg + '\n' : msg;
+	return process.stderr.write(output) as unknown as void;
 };
 
 export const sendWarn = (msg: string, newline = true) => {
 	if (!msg || msg.length === 0) return;
-	return newline
-		? console.warn(msg)
-		: process.stderr.write(msg) as unknown as void;
+	const output = newline ? msg + '\n' : msg;
+	return process.stderr.write(output) as unknown as void;
 };
 
 export const sendAsyncErr = (msg: string, newline = true) => Promise.reject(sendErr(msg, newline)); // should this be Promise.reject?
