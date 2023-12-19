@@ -6,4 +6,4 @@ PROJ_DIR="${BIN_DIR}/.."
 
 echo $TAQ_BUILD
 echo $TAQ_VERSION
-deno run --inspect-brk --unstable --allow-run --allow-write --allow-read --allow-env --allow-net --import-map "${PROJ_DIR}/import_map.json" "${PROJ_DIR}/index.ts" --setBuild "$TAQ_BUILD" --setVersion "$TAQ_VERSION" $@
+deno run --inspect-brk --unstable --allow-run --allow-write --allow-read --allow-env --allow-net "${PROJ_DIR}/index.ts" --setBuild "$TAQ_BUILD" --setVersion "$TAQ_VERSION" $@

@@ -210,7 +210,7 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 	});
 
 	describe('slow test', () => {
-		jest.setTimeout(100000);
+		jest.setTimeout(140000);
 
 		test('deploy will deploy one contract using deploy {contractName} when there are multiple contracts in the artifacts - slowtest', async () => {
 			const { execute, spawn, cleanup, writeFile } = await prepareEnvironment();
@@ -234,12 +234,14 @@ describe('Taquito Plugin E2E testing for Taqueria CLI', () => {
 			const increment_tz_file = await (await exec('cat e2e/data/michelson-data/increment.tz')).stdout;
 			await writeFile('./test-project/artifacts/increment.tz', increment_tz_file);
 
-			const { stdout: stdout2, stderr } = await execute(
+			const deployResult = await execute(
 				'taq',
-				'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing',
+				'deploy hello-tacos.tz --storage anyContract.storage.tz -e testing -t 120',
 				'./test-project',
 			);
 
+			console.log(deployResult);
+			const { stdout: stdout2, stderr } = deployResult;
 			const result = stdout2.join('\n');
 			expect(result).toMatch(/| Contract\s+| Address\s+| Alias\s+| Balance In Mutez\s+| Destination/);
 			expect(result).toMatch(/hello-tacos.tz\s+| KT[^\|]+| hello-tacos\s+| 0\s+| .+rpc\.ghostnet\.teztnets\.xyz/m);

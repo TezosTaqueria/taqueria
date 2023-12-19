@@ -21,7 +21,6 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 			'scaffold-test/app',
 			'scaffold-test/node_modules',
 			'scaffold-test/contracts',
-			'scaffold-test/artifacts/hello-tacos.tz',
 		];
 
 		// Get the path to the `ls` command

@@ -462,7 +462,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
       - name: Download work archive
         uses: actions/download-artifact@v2
         with:
@@ -476,6 +478,7 @@ jobs:
         env:
           HUSKY_SKIP_INSTALL: 1
           HUSKY: 0
+          TAQ_TEZOS_CLIENT_RPC: https://ghostnet.tezos.marigold.dev
         run: |
           CWD=$(pwd)
           export PATH=$PATH:$CWD

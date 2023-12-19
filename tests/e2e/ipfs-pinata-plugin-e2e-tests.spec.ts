@@ -14,8 +14,8 @@ describe('IPFS Pinata plugin E2E tests for Taqueria CLI', () => {
 		await execute('taq', 'install ../taqueria-plugin-ipfs-pinata', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ipfs-pinata/index.js');
 
-		const { stdout: stdout2 } = await execute('taq', 'publish --help', './test-project');
-		expect(stdout2).toEqual(expect.arrayContaining(['Upload and pin files using your pinata account.']));
+		const helpResult = await execute('taq', 'publish --help', './test-project');
+		expect(helpResult.stdout).toEqual(expect.arrayContaining(['Upload and pin files using your pinata account.']));
 
 		await cleanup();
 	});

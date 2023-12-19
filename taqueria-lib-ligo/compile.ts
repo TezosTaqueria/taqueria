@@ -15,7 +15,6 @@ import * as readline from 'readline';
 import {
 	Common,
 	CompileOpts as Opts,
-	configure,
 	emitExternalError,
 	formatLigoError,
 	getInputFilenameAbsPath,
@@ -52,7 +51,9 @@ export const isStorageListFile = (sourceFile: string): boolean =>
 	/.+\.(storageList|storages)\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
 
 export const isParameterListFile = (sourceFile: string): boolean =>
-	/.+\.(parameterList|parameters)\.(ligo|religo|mligo|jsligo)$/.test(sourceFile);
+	/.+\.(parameterList|parameters)\.(ligo|religo|mligo|jsligo)$/.test(
+		sourceFile,
+	);
 
 const extractExt = (path: string): string => {
 	const matchResult = path.match(/\.(ligo|religo|mligo|jsligo)$/);
@@ -66,12 +67,20 @@ const removeExt = (path: string): string => {
 
 const isOutputFormatJSON = (parsedArgs: Opts): boolean => parsedArgs.json;
 
-const getOutputContractFilename = (parsedArgs: Opts, module: ModuleInfo): string => {
+const getOutputContractFilename = (
+	parsedArgs: Opts,
+	module: ModuleInfo,
+): string => {
 	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
 	return join(getArtifactsDir(parsedArgs), `${module.moduleName}${ext}`);
 };
 
-const getOutputExprFilename = (parsedArgs: Opts, module: ModuleInfo, exprKind: ExprKind, exprName: string): string => {
+const getOutputExprFilename = (
+	parsedArgs: Opts,
+	module: ModuleInfo,
+	exprKind: ExprKind,
+	exprName: string,
+): string => {
 	const contractName = module.moduleName;
 	const ext = isOutputFormatJSON(parsedArgs) ? '.json' : '.tz';
 	const outputFile = exprKind === 'default_storage'
@@ -80,7 +89,10 @@ const getOutputExprFilename = (parsedArgs: Opts, module: ModuleInfo, exprKind: E
 	return join(getArtifactsDir(parsedArgs), `${outputFile}`);
 };
 
-const getExprNames = (parsedArgs: Opts, sourceFile: string): Promise<string[]> => {
+const getExprNames = (
+	parsedArgs: Opts,
+	sourceFile: string,
+): Promise<string[]> => {
 	return new Promise((resolve, reject) => {
 		const inputFilePath = getInputFilenameAbsPath(parsedArgs, sourceFile);
 		const readInterface = readline.createInterface({
@@ -165,18 +177,23 @@ const initContentForParameter = (moduleInfo: ModuleInfo) => getContent(moduleInf
 export const inject = (commonObj: Common) => {
 	const { getLigoDockerImage } = commonObj;
 
-	const getListDeclarationsCmd = async (parsedArgs: UnionOpts, sourceFile: string): Promise<string> => {
+	const getListDeclarationsCmd = async (
+		parsedArgs: UnionOpts,
+		sourceFile: string,
+	): Promise<string> => {
 		const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 		if (!projectDir) throw new Error(`No project directory provided`);
-		const baseCmd =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} info list-declarations`;
+		const baseCmd = `${commonObj.baseDriverCmd(projectDir)} info list-declarations`;
 		const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
 		const flags = '--display-format json';
 		const cmd = `${baseCmd} ${inputFile} ${flags}`;
 		return cmd;
 	};
 
-	const listContractModules = async (parsedArgs: UnionOpts, sourceFile: string): Promise<ModuleInfo[]> => {
+	const listContractModules = async (
+		parsedArgs: UnionOpts,
+		sourceFile: string,
+	): Promise<ModuleInfo[]> => {
 		try {
 			await getArch();
 			const cmd = await getListDeclarationsCmd(parsedArgs, sourceFile);
@@ -195,27 +212,51 @@ export const inject = (commonObj: Common) => {
 					const syntax = extractExt(sourceFile).replace('.', '');
 
 					if (decl === 'main') {
-						return [...acc, { moduleName: srcFile, sourceName: sourceFile, sourceFile, type: 'file-main', syntax }];
+						return [
+							...acc,
+							{
+								moduleName: srcFile,
+								sourceName: sourceFile,
+								sourceFile,
+								type: 'file-main',
+								syntax,
+							},
+						];
 					} else if (decl === '$main') {
-						return [...acc, { moduleName: srcFile, sourceName: sourceFile, sourceFile, type: 'file-entry', syntax }];
+						return [
+							...acc,
+							{
+								moduleName: srcFile,
+								sourceName: sourceFile,
+								sourceFile,
+								type: 'file-entry',
+								syntax,
+							},
+						];
 					} else if (decl.endsWith('.main')) {
 						const moduleName = decl.replace(/\.main$/, '');
-						return [...acc, {
-							moduleName,
-							sourceName: `${sourceFile}/${moduleName}`,
-							sourceFile,
-							type: 'module-main',
-							syntax,
-						}];
+						return [
+							...acc,
+							{
+								moduleName,
+								sourceName: `${sourceFile}/${moduleName}`,
+								sourceFile,
+								type: 'module-main',
+								syntax,
+							},
+						];
 					} else if (decl.endsWith('.$main')) {
 						const moduleName = decl.replace(/\.\$main$/, '');
-						return [...acc, {
-							moduleName,
-							sourceName: `${sourceFile}/${moduleName}`,
-							sourceFile,
-							type: 'module-entry',
-							syntax,
-						}];
+						return [
+							...acc,
+							{
+								moduleName,
+								sourceName: `${sourceFile}/${moduleName}`,
+								sourceFile,
+								type: 'module-entry',
+								syntax,
+							},
+						];
 					}
 					return acc;
 				},
@@ -228,20 +269,31 @@ export const inject = (commonObj: Common) => {
 		}
 	};
 
-	const getCompileContractCmd = async (parsedArgs: Opts, sourceFile: string, module: ModuleInfo): Promise<string> => {
+	const getCompileContractCmd = async (
+		parsedArgs: Opts,
+		sourceFile: string,
+		module: ModuleInfo,
+	): Promise<string> => {
 		const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 		if (!projectDir) throw new Error(`No project directory provided`);
-		const baseCmd =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile contract`;
+		const baseCmd = `${commonObj.baseDriverCmd(projectDir)} compile contract`;
 		const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
 		const outputFile = `-o ${getOutputContractFilename(parsedArgs, module)}`;
-		const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
-		const moduleFlag = module.type.startsWith('file-') ? '' : `-m ${module.moduleName}`;
+		const flags = isOutputFormatJSON(parsedArgs)
+			? ' --michelson-format json '
+			: '';
+		const moduleFlag = module.type.startsWith('file-')
+			? ''
+			: `-m ${module.moduleName}`;
 		const cmd = `${baseCmd} ${inputFile} ${outputFile} ${flags}${moduleFlag}`;
 		return cmd;
 	};
 
-	const compileContract = async (parsedArgs: Opts, sourceFile: string, module: ModuleInfo): Promise<TableRow> => {
+	const compileContract = async (
+		parsedArgs: Opts,
+		sourceFile: string,
+		module: ModuleInfo,
+	): Promise<TableRow> => {
 		try {
 			await getArch();
 			const cmd = await getCompileContractCmd(parsedArgs, sourceFile, module);
@@ -271,11 +323,19 @@ export const inject = (commonObj: Common) => {
 		const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 		if (!projectDir) throw new Error(`No project directory provided`);
 		const compilerType = isStorageKind(exprKind) ? 'storage' : 'parameter';
-		const baseCmd =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} compile ${compilerType}`;
+		const baseCmd = `${commonObj.baseDriverCmd(projectDir)} compile ${compilerType}`;
 		const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
-		const outputFile = `-o ${getOutputExprFilename(parsedArgs, module, exprKind, exprName)}`;
-		const flags = isOutputFormatJSON(parsedArgs) ? ' --michelson-format json ' : '';
+		const outputFile = `-o ${
+			getOutputExprFilename(
+				parsedArgs,
+				module,
+				exprKind,
+				exprName,
+			)
+		}`;
+		const flags = isOutputFormatJSON(parsedArgs)
+			? ' --michelson-format json '
+			: '';
 
 		// Parameter and Storage list files are expected to import the smart contract file as the "Contract" module.
 		const moduleFlag = (() => {
@@ -292,28 +352,37 @@ export const inject = (commonObj: Common) => {
 		return cmd;
 	};
 
-	const compileExpr =
-		(parsedArgs: Opts, sourceFile: string, module: ModuleInfo, exprKind: ExprKind) =>
-		(exprName: string): Promise<TableRow> => {
-			return getArch()
-				.then(() => getCompileExprCmd(parsedArgs, sourceFile, module, exprKind, exprName))
-				.then(execCmd)
-				.then(({ stderr }) => {
-					if (stderr.length > 0) sendWarn(stderr);
-					const artifactName = getOutputExprFilename(parsedArgs, module, exprKind, exprName);
-					return {
-						source: module.sourceName,
-						artifact: artifactName,
-					};
-				})
-				.catch(err => {
-					return {
-						source: module.sourceName,
-						artifact: `${exprName} in ${sourceFile} not compiled`,
-						err,
-					};
-				});
-		};
+	const compileExpr = (
+		parsedArgs: Opts,
+		sourceFile: string,
+		module: ModuleInfo,
+		exprKind: ExprKind,
+	) =>
+	(exprName: string): Promise<TableRow> => {
+		return getArch()
+			.then(() => getCompileExprCmd(parsedArgs, sourceFile, module, exprKind, exprName))
+			.then(execCmd)
+			.then(({ stderr }) => {
+				if (stderr.length > 0) sendWarn(stderr);
+				const artifactName = getOutputExprFilename(
+					parsedArgs,
+					module,
+					exprKind,
+					exprName,
+				);
+				return {
+					source: module.sourceName,
+					artifact: artifactName,
+				};
+			})
+			.catch(err => {
+				return {
+					source: module.sourceName,
+					artifact: `${exprName} in ${sourceFile} not compiled`,
+					err,
+				};
+			});
+	};
 
 	const compileExprs = async (
 		parsedArgs: Opts,
@@ -327,45 +396,51 @@ export const inject = (commonObj: Common) => {
 			exprs = await getExprNames(parsedArgs, sourceFile);
 		} catch (err) {
 			emitExternalError(err, sourceFile);
-			return [{
-				source: module.sourceName,
-				artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} expressions compiled`,
-			}];
+			return [
+				{
+					source: module.sourceName,
+					artifact: `No ${isStorageKind(exprKind) ? 'storage' : 'parameter'} expressions compiled`,
+				},
+			];
 		}
 
-		const results = await Promise.all(exprs.map(async (exprName, index) => {
-			const compileResult = await compileExpr(
-				parsedArgs,
-				sourceFile,
-				module,
-				exprKind === 'storage' && exprName === 'default_storage' ? 'default_storage' : exprKind,
-			)(exprName);
-			return compileResult;
-		}));
-
-		// Collect errors
-		const errors = results.reduce(
-			(acc, result) => {
-				if (result.err) {
-					// If its not an Error object, then just add it to the list
-					if (!(result.err instanceof Error)) return [...acc, result.err];
-
-					// Otherwise, get all ligo errors and ensure that the list is unique
-					const ligoErrs = (acc
-						.filter(err => err instanceof Error) as Error[])
-						.map(err => err.message);
-
-					const formattedError = formatLigoError(result.err);
-
-					return (ligoErrs.includes(formattedError.message)) ? acc : [...acc, formattedError];
-				}
-				return acc;
-			},
-			[] as unknown[],
+		const results = await Promise.all(
+			exprs.map(async (exprName, index) => {
+				const compileResult = await compileExpr(
+					parsedArgs,
+					sourceFile,
+					module,
+					exprKind === 'storage' && exprName === 'default_storage' ? 'default_storage' : exprKind,
+				)(exprName);
+				return compileResult;
+			}),
 		);
 
+		// Collect errors
+		const errors = results.reduce((acc, result) => {
+			if (result.err) {
+				// If its not an Error object, then just add it to the list
+				if (!(result.err instanceof Error)) return [...acc, result.err];
+
+				// Otherwise, get all ligo errors and ensure that the list is unique
+				const ligoErrs = (
+					acc.filter(err => err instanceof Error) as Error[]
+				).map(err => err.message);
+
+				const formattedError = formatLigoError(result.err);
+
+				return ligoErrs.includes(formattedError.message)
+					? acc
+					: [...acc, formattedError];
+			}
+			return acc;
+		}, [] as unknown[]);
+
 		// Collect table rows
-		const retval = results.map(({ source, artifact }) => ({ source, artifact }));
+		const retval = results.map(({ source, artifact }) => ({
+			source,
+			artifact,
+		}));
 
 		if (errors.length) emitExternalError(errors, sourceFile);
 
@@ -377,39 +452,71 @@ export const inject = (commonObj: Common) => {
 		sourceFile: string,
 		module: ModuleInfo,
 	): Promise<TableRow[]> => {
-		const contractCompileResult = await compileContract(parsedArgs, sourceFile, module);
+		const contractCompileResult = await compileContract(
+			parsedArgs,
+			sourceFile,
+			module,
+		);
 		if (contractCompileResult.artifact === COMPILE_ERR_MSG) return [contractCompileResult];
 
-		const storageListFile = `${module.moduleName}.storageList${extractExt(sourceFile)}`;
-		const storageListFilename = getInputFilenameAbsPath(parsedArgs, storageListFile);
+		const storageListFile = `${module.moduleName}.storageList${
+			extractExt(
+				sourceFile,
+			)
+		}`;
+		const storageListFilename = getInputFilenameAbsPath(
+			parsedArgs,
+			storageListFile,
+		);
 		const storageCompileResult = await access(storageListFilename)
 			.then(() => compileExprs(parsedArgs, storageListFile, module, 'storage'))
 			.catch(() => {
 				sendWarn(
 					`Note: storage file associated with "${module.moduleName}" can't be found, so "${storageListFile}" has been created for you. Use this file to define all initial storage values for this contract\n`,
 				);
-				return writeFile(storageListFilename, initContentForStorage(module), 'utf8');
+				return writeFile(
+					storageListFilename,
+					initContentForStorage(module),
+					'utf8',
+				);
 			});
 
-		const parameterListFile = `${module.moduleName}.parameterList${extractExt(sourceFile)}`;
-		const parameterListFilename = getInputFilenameAbsPath(parsedArgs, parameterListFile);
+		const parameterListFile = `${module.moduleName}.parameterList${
+			extractExt(
+				sourceFile,
+			)
+		}`;
+		const parameterListFilename = getInputFilenameAbsPath(
+			parsedArgs,
+			parameterListFile,
+		);
 		const parameterCompileResult = await access(parameterListFilename)
 			.then(() => compileExprs(parsedArgs, parameterListFile, module, 'parameter'))
 			.catch(() => {
 				sendWarn(
 					`Note: parameter file associated with "${module.moduleName}" can't be found, so "${parameterListFile}" has been created for you. Use this file to define all parameter values for this contract\n`,
 				);
-				return writeFile(parameterListFilename, initContentForParameter(module), 'utf8');
+				return writeFile(
+					parameterListFilename,
+					initContentForParameter(module),
+					'utf8',
+				);
 			});
 
-		const storageArtifacts = storageCompileResult ? storageCompileResult.map(res => res.artifact).join('\n') : '';
-		const parameterArtifacts = parameterCompileResult ? parameterCompileResult.map(res => res.artifact).join('\n') : '';
+		const storageArtifacts = storageCompileResult
+			? storageCompileResult.map(res => res.artifact).join('\n')
+			: '';
+		const parameterArtifacts = parameterCompileResult
+			? parameterCompileResult.map(res => res.artifact).join('\n')
+			: '';
 
 		const combinedArtifact = [
 			contractCompileResult.artifact,
 			storageArtifacts,
 			parameterArtifacts,
-		].filter(Boolean).join('\n');
+		]
+			.filter(Boolean)
+			.join('\n');
 
 		const combinedRow: TableRow = {
 			source: module.sourceName,
@@ -432,7 +539,10 @@ export const inject = (commonObj: Common) => {
 	};
 };
 
-export const compile = async (commonObj: Common, parsedArgs: Opts): Promise<void> => {
+export const compile = async (
+	commonObj: Common,
+	parsedArgs: Opts,
+): Promise<void> => {
 	const { listContractModules, compileContractWithStorageAndParameter } = inject(commonObj);
 
 	const sourceFile = parsedArgs.sourceFile;
@@ -441,11 +551,15 @@ export const compile = async (commonObj: Common, parsedArgs: Opts): Promise<void
 		return;
 	}
 	if (isStorageListFile(sourceFile) || isParameterListFile(sourceFile)) {
-		sendErr(`Storage and parameter list files are not meant to be compiled directly`);
+		sendErr(
+			`Storage and parameter list files are not meant to be compiled directly`,
+		);
 		return;
 	}
 	if (isUnsupportedLigoSyntax(sourceFile)) {
-		sendErr(`Unsupported LIGO syntax detected in ${sourceFile}. Note, we only support .jsligo and .mligo files.`);
+		sendErr(
+			`Unsupported LIGO syntax detected in ${sourceFile}. Note, we only support .jsligo and .mligo files.`,
+		);
 		return;
 	}
 
@@ -466,11 +580,17 @@ export const compile = async (commonObj: Common, parsedArgs: Opts): Promise<void
 			// If we're only to compile a particular module, then we'll skip any that don't match
 			if (parsedArgs.module && parsedArgs.module !== module.moduleName) continue;
 
-			const compileResults = await compileContractWithStorageAndParameter(parsedArgs, sourceFile, module);
+			const compileResults = await compileContractWithStorageAndParameter(
+				parsedArgs,
+				sourceFile,
+				module,
+			);
 			allCompileResults = allCompileResults.concat(compileResults);
 		}
 
-		sendJsonRes(allCompileResults, { footer: `\nCompiled ${allCompileResults.length} contract(s) in "${sourceFile}"` });
+		sendJsonRes(allCompileResults, {
+			footer: `\nCompiled ${allCompileResults.length} contract(s) in "${sourceFile}"`,
+		});
 	} catch (err) {
 		sendErr(`Error processing "${sourceFile}": ${err}`);
 	}

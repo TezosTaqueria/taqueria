@@ -4,18 +4,56 @@ import path from 'path';
 import util from 'util';
 const exec = util.promisify(exec1);
 import { prepareEnvironment } from '@gmrchk/cli-testing-library';
+import fs from 'fs';
+import os from 'os';
+import { join } from 'path';
 
 describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 	describe('tasks that rarely change', () => {
+		test('will use ligo binary from $PATH if available', async function() {
+			let testLigoDir = fs.realpathSync(os.tmpdir());
+			let testLigoPath = join(testLigoDir, 'ligo');
+			fs.writeFileSync(testLigoPath, '#!/bin/sh\necho Hello from test ligo');
+			fs.chmodSync(testLigoPath, '755');
+			let cwd = process.cwd();
+			const { execute, spawn, cleanup } = await prepareEnvironment();
+			process.env.PATH = `${testLigoDir}:${process.env.PATH}`;
+			const { waitForText } = await spawn('taq', 'init test-project');
+			await waitForText("Project taq'ified!");
+			const { stdout: stdout1, stderr: stderr1 } = await execute(
+				'taq',
+				`install ../taqueria-plugin-ligo`,
+				'./test-project',
+			);
+			expect(stdout1).toEqual(
+				expect.arrayContaining(['Plugin installed successfully']),
+			);
+			const { stdout: stdout2 } = await execute(
+				'env',
+				`PATH=${process.env.PATH} taq ligo --command help`,
+				'./test-project',
+			);
+			expect(stdout2).toEqual(expect.arrayContaining(['Hello from test ligo']));
+			await cleanup();
+		});
+
 		test('ligo plugin help will show help', async () => {
 			const { execute, cleanup, spawn } = await prepareEnvironment();
 			const { waitForText } = await spawn('taq', 'init test-project --debug');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
-			const { stdout: stdout2 } = await execute('taq', '--help', './test-project');
+			const { stdout: stdout2 } = await execute(
+				'taq',
+				'--help',
+				'./test-project',
+			);
 			expect(stdout2).toEqual(expect.arrayContaining(['taq <command>']));
 
 			await cleanup();
@@ -25,12 +63,22 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const { execute, cleanup, spawn } = await prepareEnvironment();
 			const { waitForText } = await spawn('taq', 'init test-project --debug');
 			await waitForText("Project taq'ified!");
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
-			const { stdout: stdout2 } = await execute('taq', 'compile --help', './test-project');
+			const { stdout: stdout2 } = await execute(
+				'taq',
+				'compile --help',
+				'./test-project',
+			);
 			expect(stdout2).toEqual(
-				expect.arrayContaining(['Compile a smart contract written in a LIGO syntax to Michelson code, along with']),
+				expect.arrayContaining([
+					'Compile a smart contract written in a LIGO syntax to Michelson code, along with',
+				]),
 			);
 
 			await cleanup();
@@ -41,11 +89,23 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const { waitForText } = await spawn('taq', 'init test-project --debug');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
-			const { stderr: compileErr } = await execute('taq', 'compile', './test-project');
-			expect(compileErr).toEqual(expect.arrayContaining(['Not enough non-option arguments: got 0, need at least 1']));
+			const { stderr: compileErr } = await execute(
+				'taq',
+				'compile',
+				'./test-project',
+			);
+			expect(compileErr).toEqual(
+				expect.arrayContaining([
+					'Not enough non-option arguments: got 0, need at least 1',
+				]),
+			);
 
 			await cleanup();
 		});
@@ -56,11 +116,17 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const { waitForText } = await spawn('taq', 'init test-project');
 			await waitForText("Project taq'ified!");
 
-			const { stdout, stderr } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout, stderr } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 			expect(stdout.join('\n')).toContain('LIGO collects anonymous usage data');
 
-			const postInstallRan = await exists('./test-project/.ligo/term_acceptance');
+			const postInstallRan = await exists(
+				'./test-project/.ligo/term_acceptance',
+			);
 			expect(postInstallRan).toEqual(true);
 		});
 
@@ -69,11 +135,21 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const { waitForText } = await spawn('taq', 'init test-project');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
-			const { stdout: imageOutput } = await execute('taq', 'get-image --plugin ligo', './test-project');
-			expect(imageOutput).toEqual(expect.arrayContaining([expect.stringContaining('ligolang/ligo:')]));
+			const { stdout: imageOutput } = await execute(
+				'taq',
+				'get-image --plugin ligo',
+				'./test-project',
+			);
+			expect(imageOutput).toEqual(
+				expect.arrayContaining([expect.stringContaining('ligolang/ligo:')]),
+			);
 
 			await cleanup();
 		});
@@ -81,7 +157,14 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 
 	describe('support for smart contracts which use @entry without a namespace/module', () => {
 		test('compile should compile a contract that uses @entry and is not within a namespace/module', async () => {
-			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
+			const {
+				execute,
+				cleanup,
+				spawn,
+				writeFile,
+				ls,
+				path: projectDir,
+			} = await prepareEnvironment();
 			// console.log(projectDir);
 
 			// Create the project
@@ -89,23 +172,43 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			await waitForText("Project taq'ified!");
 
 			// Install the plugin
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
 			// Write the contract to the test project
-			const contract = await (await exec(`cat e2e/data/ligo-data/entry.jsligo`)).stdout;
+			const contract = await (
+				await exec(`cat e2e/data/ligo-data/entry.jsligo`)
+			).stdout;
 			await writeFile('./test-project/contracts/entry.jsligo', contract);
 
 			// Write the parameter file for the contract
-			const parameterFile = await (await exec(`cat e2e/data/ligo-data/entry.parameterList.jsligo`)).stdout;
-			await writeFile('./test-project/contracts/entry.parameterList.jsligo', parameterFile);
+			const parameterFile = await (
+				await exec(`cat e2e/data/ligo-data/entry.parameterList.jsligo`)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/entry.parameterList.jsligo',
+				parameterFile,
+			);
 
 			// Write the storage file for the contract
-			const storageFile = await (await exec(`cat e2e/data/ligo-data/entry.storageList.jsligo`)).stdout;
-			await writeFile('./test-project/contracts/entry.storageList.jsligo', storageFile);
+			const storageFile = await (
+				await exec(`cat e2e/data/ligo-data/entry.storageList.jsligo`)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/entry.storageList.jsligo',
+				storageFile,
+			);
 
 			// Compile using the `compile` task
-			const compileResult = await execute('taq', 'compile entry.jsligo', './test-project');
+			const compileResult = await execute(
+				'taq',
+				'compile entry.jsligo',
+				'./test-project',
+			);
 			// console.log(compileResult);
 			expect(compileResult.stderr).toHaveLength(0);
 
@@ -136,7 +239,15 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		});
 
 		test('compile should create a missing parameterList file for a contract that uses @entry without a namespace/module', async () => {
-			const { execute, cleanup, spawn, writeFile, ls, readFile, path: projectDir } = await prepareEnvironment();
+			const {
+				execute,
+				cleanup,
+				spawn,
+				writeFile,
+				ls,
+				readFile,
+				path: projectDir,
+			} = await prepareEnvironment();
 			// console.log(projectDir);
 
 			// Create the project
@@ -144,19 +255,34 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			await waitForText("Project taq'ified!");
 
 			// Install the plugin
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
 			// Write the contract to the test project
-			const contract = await (await exec(`cat e2e/data/ligo-data/entry.jsligo`)).stdout;
+			const contract = await (
+				await exec(`cat e2e/data/ligo-data/entry.jsligo`)
+			).stdout;
 			await writeFile('./test-project/contracts/entry.jsligo', contract);
 
 			// Write the storage file for the contract
-			const storageFile = await (await exec(`cat e2e/data/ligo-data/entry.storageList.jsligo`)).stdout;
-			await writeFile('./test-project/contracts/entry.storageList.jsligo', storageFile);
+			const storageFile = await (
+				await exec(`cat e2e/data/ligo-data/entry.storageList.jsligo`)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/entry.storageList.jsligo',
+				storageFile,
+			);
 
 			// Compile using the `compile` task
-			const compileResult = await execute('taq', 'compile entry.jsligo', './test-project');
+			const compileResult = await execute(
+				'taq',
+				'compile entry.jsligo',
+				'./test-project',
+			);
 			// console.log(compileResult);
 
 			// Expect stderr to contain a warning about the missing parameter file
@@ -181,10 +307,13 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			expect(contractsList).toContain('entry.parameterList.jsligo');
 
 			// Expect the parameterList file to have the correct contents
-			const parameterFile = await readFile('./test-project/contracts/entry.parameterList.jsligo');
+			const parameterFile = await readFile(
+				'./test-project/contracts/entry.parameterList.jsligo',
+			);
 			// console.log(parameterFile)
-			const expectedParameterFile = await (await exec(`cat e2e/data/ligo-data/expected-entry.parameterList.jsligo`))
-				.stdout;
+			const expectedParameterFile = await (
+				await exec(`cat e2e/data/ligo-data/expected-entry.parameterList.jsligo`)
+			).stdout;
 			expect(parameterFile).toEqual(expectedParameterFile);
 
 			// Cleanup
@@ -194,7 +323,14 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 
 	describe('support for smart contracts which use @entry within a namespace/module', () => {
 		test('compile should compile a contract that uses @entry and is within a namespace/module', async () => {
-			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
+			const {
+				execute,
+				cleanup,
+				spawn,
+				writeFile,
+				ls,
+				path: projectDir,
+			} = await prepareEnvironment();
 			// console.log(projectDir);
 
 			// Create the project
@@ -202,23 +338,43 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			await waitForText("Project taq'ified!");
 
 			// Install the plugin
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
 			// Write the contract to the test project
-			const contract = await (await exec(`cat e2e/data/ligo-data/IncDec.jsligo`)).stdout;
+			const contract = await (
+				await exec(`cat e2e/data/ligo-data/IncDec.jsligo`)
+			).stdout;
 			await writeFile('./test-project/contracts/IncDec.jsligo', contract);
 
 			// Write the parameter file for the contract
-			const parameterFile = await (await exec(`cat e2e/data/ligo-data/IncDec.parameterList.jsligo`)).stdout;
-			await writeFile('./test-project/contracts/IncDec.parameterList.jsligo', parameterFile);
+			const parameterFile = await (
+				await exec(`cat e2e/data/ligo-data/IncDec.parameterList.jsligo`)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/IncDec.parameterList.jsligo',
+				parameterFile,
+			);
 
 			// Write the storage file for the contract
-			const storageFile = await (await exec(`cat e2e/data/ligo-data/IncDec.storageList.jsligo`)).stdout;
-			await writeFile('./test-project/contracts/IncDec.storageList.jsligo', storageFile);
+			const storageFile = await (
+				await exec(`cat e2e/data/ligo-data/IncDec.storageList.jsligo`)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/IncDec.storageList.jsligo',
+				storageFile,
+			);
 
 			// Compile using the `compile` task
-			const compileResult = await execute('taq', 'compile IncDec.jsligo', './test-project');
+			const compileResult = await execute(
+				'taq',
+				'compile IncDec.jsligo',
+				'./test-project',
+			);
 			// console.log(compileResult);
 			expect(compileResult.stderr).toHaveLength(0);
 
@@ -251,7 +407,15 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		});
 
 		test('compile should create a missing parameterList file for a contract that uses @entry within a namespace/module', async () => {
-			const { execute, cleanup, spawn, writeFile, ls, readFile, path: projectDir } = await prepareEnvironment();
+			const {
+				execute,
+				cleanup,
+				spawn,
+				writeFile,
+				ls,
+				readFile,
+				path: projectDir,
+			} = await prepareEnvironment();
 			// console.log(projectDir);
 
 			// Create the project
@@ -259,19 +423,34 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			await waitForText("Project taq'ified!");
 
 			// Install the plugin
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
 			// Write the contract to the test project
-			const contract = await (await exec(`cat e2e/data/ligo-data/IncDec.jsligo`)).stdout;
+			const contract = await (
+				await exec(`cat e2e/data/ligo-data/IncDec.jsligo`)
+			).stdout;
 			await writeFile('./test-project/contracts/IncDec.jsligo', contract);
 
 			// Write the storage file for the contract
-			const storageFile = await (await exec(`cat e2e/data/ligo-data/IncDec.storageList.jsligo`)).stdout;
-			await writeFile('./test-project/contracts/IncDec.storageList.jsligo', storageFile);
+			const storageFile = await (
+				await exec(`cat e2e/data/ligo-data/IncDec.storageList.jsligo`)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/IncDec.storageList.jsligo',
+				storageFile,
+			);
 
 			// Compile using the `compile` task
-			const compileResult = await execute('taq', 'compile IncDec.jsligo', './test-project');
+			const compileResult = await execute(
+				'taq',
+				'compile IncDec.jsligo',
+				'./test-project',
+			);
 			// console.log(compileResult);
 
 			// Expect stderr to contain a warning about the missing parameter file
@@ -296,8 +475,12 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			expect(contractsList).toContain('IncDec.parameterList.jsligo');
 
 			// Expect the parameterList file to have the correct contents
-			const parameterFile = await readFile('./test-project/contracts/IncDec.parameterList.jsligo');
-			const expectedParameterFile = await exec('cat e2e/data/ligo-data/expected-IncDec.parameterList.jsligo');
+			const parameterFile = await readFile(
+				'./test-project/contracts/IncDec.parameterList.jsligo',
+			);
+			const expectedParameterFile = await exec(
+				'cat e2e/data/ligo-data/expected-IncDec.parameterList.jsligo',
+			);
 			expect(parameterFile).toEqual(expectedParameterFile.stdout);
 
 			// Cleanup
@@ -307,21 +490,41 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 
 	describe('other compilation tasks', () => {
 		test('compile will compile only the specified module in the given source file when multiple modules exist', async () => {
-			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
+			const {
+				execute,
+				cleanup,
+				spawn,
+				writeFile,
+				ls,
+				path: projectDir,
+			} = await prepareEnvironment();
 			// console.log(projectDir);
 
 			const { waitForText } = await spawn('taq', 'init test-project');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
 			// Write the contract to the test project
-			const contract = await (await exec(`cat e2e/data/ligo-data/MultipleContracts.mligo`)).stdout;
-			await writeFile('./test-project/contracts/MultipleContracts.mligo', contract);
+			const contract = await (
+				await exec(`cat e2e/data/ligo-data/MultipleContracts.mligo`)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/MultipleContracts.mligo',
+				contract,
+			);
 
 			// Compile using the `compile` task
-			const compileResult = await execute('taq', 'compile MultipleContracts.mligo -m HelloWorld', './test-project');
+			const compileResult = await execute(
+				'taq',
+				'compile MultipleContracts.mligo -m HelloWorld',
+				'./test-project',
+			);
 			// console.log(compileResult);
 
 			// Expect the output to be correct
@@ -349,10 +552,16 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const { waitForText } = await spawn('taq', 'init test-project --debug');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
-			const jsligo_file = await (await exec(`cat e2e/data/ligo-data/IncDec.jsligo`)).stdout;
+			const jsligo_file = await (
+				await exec(`cat e2e/data/ligo-data/IncDec.jsligo`)
+			).stdout;
 			await writeFile('./test-project/contracts/IncDec.jsligo', jsligo_file);
 
 			await execute('taq', 'compile IncDec.jsligo --json', './test-project');
@@ -371,16 +580,24 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const { waitForText } = await spawn('taq', 'init test-project --debug');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
 			const artifacts_list_before = await ls('./test-project/artifacts');
 			expect(artifacts_list_before).toEqual([]);
 
-			const mligo_file = await (await exec(`cat e2e/data/ligo-data/IncDec.jsligo`)).stdout;
+			const mligo_file = await (
+				await exec(`cat e2e/data/ligo-data/IncDec.jsligo`)
+			).stdout;
 			await writeFile('./test-project/contracts/IncDec.jsligo', mligo_file);
 
-			const jsligo_file = await (await exec(`cat e2e/data/ligo-data/entry.jsligo`)).stdout;
+			const jsligo_file = await (
+				await exec(`cat e2e/data/ligo-data/entry.jsligo`)
+			).stdout;
 			await writeFile('./test-project/contracts/entry.jsligo', jsligo_file);
 
 			await execute('taq', 'compile IncDec.jsligo', './test-project');
@@ -395,7 +612,11 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const { waitForText } = await spawn('taq', 'init test-project --debug');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
 			const compileResult = await execute(
@@ -417,19 +638,36 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 
 	describe('ligo test framework', () => {
 		test('test will run ligo test', async () => {
-			const { execute, cleanup, spawn, writeFile, path: projectDir } = await prepareEnvironment();
+			const {
+				execute,
+				cleanup,
+				spawn,
+				writeFile,
+				path: projectDir,
+			} = await prepareEnvironment();
 			// console.log(projectDir)
 
 			const { waitForText } = await spawn('taq', 'init test-project');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
-			const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
+			const mligo_file = await (
+				await exec('cat e2e/data/ligo-data/hello-tacos.mligo')
+			).stdout;
 			await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
-			const test_file = await (await exec('cat e2e/data/ligo-data/hello-tacos-tests.mligo')).stdout;
-			await writeFile('./test-project/contracts/hello-tacos-tests.mligo', test_file);
+			const test_file = await (
+				await exec('cat e2e/data/ligo-data/hello-tacos-tests.mligo')
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/hello-tacos-tests.mligo',
+				test_file,
+			);
 
 			const testResult = await execute(
 				'taq',
@@ -461,14 +699,24 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const { waitForText } = await spawn('taq', 'init test-project --debug');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
-			const mligo_file = await (await exec('cat e2e/data/ligo-data/hello-tacos.mligo')).stdout;
+			const mligo_file = await (
+				await exec('cat e2e/data/ligo-data/hello-tacos.mligo')
+			).stdout;
 			await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
-			const invalid_test_file = await (await exec('cat e2e/data/ligo-data/hello-tacos-invalid-tests.mligo'))
-				.stdout;
-			await writeFile('./test-project/contracts/hello-tacos-invalid-tests.mligo', invalid_test_file);
+			const invalid_test_file = await (
+				await exec('cat e2e/data/ligo-data/hello-tacos-invalid-tests.mligo')
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/hello-tacos-invalid-tests.mligo',
+				invalid_test_file,
+			);
 
 			const { stdout: testOutput, stderr: testErr } = await execute(
 				'taq',
@@ -476,9 +724,13 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 				'./test-project',
 			);
 			expect(testOutput).toEqual(
-				expect.arrayContaining(['│ hello-tacos-invalid-tests.mligo │ Some tests failed :( │']),
+				expect.arrayContaining([
+					'│ hello-tacos-invalid-tests.mligo │ Some tests failed :( │',
+				]),
 			);
-			expect(testErr.join()).toContain('Error messages for hello-tacos-invalid-tests.mligo');
+			expect(testErr.join()).toContain(
+				'Error messages for hello-tacos-invalid-tests.mligo',
+			);
 
 			await cleanup();
 		});
@@ -488,11 +740,21 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const { waitForText } = await spawn('taq', 'init test-project --debug');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
-			const { stderr: testErr } = await execute('taq', 'test hello-tacos-test.mligo', './test-project');
-			expect(testErr.toString()).toContain('contracts/hello-tacos-test.mligo: No such file or directory.');
+			const { stderr: testErr } = await execute(
+				'taq',
+				'test hello-tacos-test.mligo',
+				'./test-project',
+			);
+			expect(testErr.toString()).toContain(
+				'contracts/hello-tacos-test.mligo: No such file or directory.',
+			);
 
 			await cleanup();
 		});
@@ -503,22 +765,37 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 
-		const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+		const { stdout } = await execute(
+			'taq',
+			'install ../taqueria-plugin-ligo',
+			'./test-project',
+		);
 		expect(stdout).toContain('Plugin installed successfully');
 
 		await execute('taq', 'create contract counter.mligo', './test-project');
 		expect(await ls('./test-project/contracts')).toContain('counter.mligo');
 
-		const bytes = await readFile(path.join('./test-project', 'contracts', 'counter.mligo'));
+		const bytes = await readFile(
+			path.join('./test-project', 'contracts', 'counter.mligo'),
+		);
 		const digest = createHash('sha256');
 		digest.update(bytes);
 		const hash = digest.digest('hex');
-		expect(hash).toEqual('e1ceba3bc28cb7a86f07eef36ea9baa835af4b58901b5b0d3e07730054400f55');
+		expect(hash).toEqual(
+			'e1ceba3bc28cb7a86f07eef36ea9baa835af4b58901b5b0d3e07730054400f55',
+		);
 		await cleanup();
 	});
 
 	test('ligo compile will error with missing storage file', async () => {
-		const { execute, cleanup, writeFile, exists, ls, path: projectDir } = await prepareEnvironment();
+		const {
+			execute,
+			cleanup,
+			writeFile,
+			exists,
+			ls,
+			path: projectDir,
+		} = await prepareEnvironment();
 		// console.log(projectDir)
 
 		await execute('taq', 'init test-project');
@@ -527,19 +804,35 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-ligo/index.js');
 
-		const mligo_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.mligo`)).stdout;
+		const mligo_file = await (
+			await exec(`cat e2e/data/ligo-data/hello-tacos.mligo`)
+		).stdout;
 		await writeFile('./test-project/contracts/hello-tacos.mligo', mligo_file);
-		const parameters_file = await (await exec(`cat e2e/data/ligo-data/hello-tacos.parameters.mligo`)).stdout;
-		await writeFile('./test-project/contracts/hello-tacos.parameters.mligo', parameters_file);
-
-		expect(await ls('./test-project/contracts')).toEqual(
-			expect.arrayContaining(['hello-tacos.mligo', 'hello-tacos.parameters.mligo']),
+		const parameters_file = await (
+			await exec(`cat e2e/data/ligo-data/hello-tacos.parameters.mligo`)
+		).stdout;
+		await writeFile(
+			'./test-project/contracts/hello-tacos.parameters.mligo',
+			parameters_file,
 		);
 
-		const { stderr, stdout } = await execute('taq', 'compile counter.mligo', './test-project');
+		expect(await ls('./test-project/contracts')).toEqual(
+			expect.arrayContaining([
+				'hello-tacos.mligo',
+				'hello-tacos.parameters.mligo',
+			]),
+		);
+
+		const { stderr, stdout } = await execute(
+			'taq',
+			'compile counter.mligo',
+			'./test-project',
+		);
 
 		expect(stderr).toEqual(
-			expect.arrayContaining([expect.stringContaining('=== Error messages for counter.mligo ===')]),
+			expect.arrayContaining([
+				expect.stringContaining('=== Error messages for counter.mligo ==='),
+			]),
 		);
 
 		await cleanup();
@@ -568,7 +861,11 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const { execute, cleanup, exists } = await prepareEnvironment();
 			await execute('taq', 'init test-project');
 			await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
-			const result = await execute('taq', 'ligo --command "install"', './test-project');
+			const result = await execute(
+				'taq',
+				'ligo --command "install"',
+				'./test-project',
+			);
 			expect(result.stderr.join('').trim()).not.toContain('error');
 			await cleanup();
 		});
@@ -578,66 +875,87 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		jest.setTimeout(100000);
 
 		test('compile-all will find and compile all contracts', async () => {
-			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
+			const {
+				execute,
+				cleanup,
+				spawn,
+				writeFile,
+				ls,
+				path: projectDir,
+			} = await prepareEnvironment();
 
 			const { waitForText } = await spawn('taq', 'init test-project');
 			await waitForText("Project taq'ified!");
 
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 			expect(stdout).toContain('Plugin installed successfully');
 
 			// List of test files to copy to test project
 			const testFiles = await exec('ls e2e/data/ligo-data').then(res =>
 				res.stdout
 					.split('\n')
-					.filter(file => file !== 'hello-tacos-invalid-tests.mligo' && file.length > 0)
+					.filter(
+						file => file !== 'hello-tacos-invalid-tests.mligo' && file.length > 0,
+					)
 			);
 
 			// Copy the test files to the test project
-			await Promise.all(testFiles.map(async file => {
-				const fileContents = (await exec(`cat e2e/data/ligo-data/${file}`)).stdout;
-				return await writeFile(`./test-project/contracts/${file}`, fileContents);
-			}));
+			await Promise.all(
+				testFiles.map(async file => {
+					const fileContents = (await exec(`cat e2e/data/ligo-data/${file}`))
+						.stdout;
+					return await writeFile(
+						`./test-project/contracts/${file}`,
+						fileContents,
+					);
+				}),
+			);
 
 			// Expect files to exist in test project
 			const contractsList = await ls('./test-project/contracts');
 			testFiles.map(file => expect(contractsList).toContain(file));
 
 			// Compile the contracts using the `compile-all` task
-			const compileResult = await execute('taq', 'compile-all', './test-project');
+			const compileResult = await execute(
+				'taq',
+				'compile-all',
+				'./test-project',
+			);
 			// console.log(compileResult);
 
 			// Check that the output contains the expected files
-			expect(compileResult.stdout).toEqual(
-				[
-					'┌────────────────────────────────────┬───────────────────────────────────────────────────┐',
-					'│ Source                             │ Artifact                                          │',
-					'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
-					'│ IncDec.jsligo/IncDec               │ artifacts/IncDec.tz                               │',
-					'│                                    │ artifacts/IncDec.default_storage.tz               │',
-					'│                                    │ artifacts/IncDec.parameter.increment.tz           │',
-					'│                                    │ artifacts/IncDec.parameter.decrement.tz           │',
-					'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
-					'│ MultipleContracts.mligo/HelloWorld │ artifacts/HelloWorld.tz                           │',
-					'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
-					'│ MultipleContracts.mligo/Increment  │ artifacts/Increment.tz                            │',
-					'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
-					'│ entry-module.mligo/C               │ artifacts/C.tz                                    │',
-					'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
-					'│ entry.jsligo                       │ artifacts/entry.tz                                │',
-					'│                                    │ artifacts/entry.default_storage.tz                │',
-					'│                                    │ artifacts/entry.parameter.default_parameter.tz    │',
-					'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
-					'│ hello-tacos.mligo                  │ artifacts/hello-tacos.tz                          │',
-					'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
-					'│ hello-tacos.mligo                  │ artifacts/hello-tacos.tz                          │',
-					'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
-					'│ pokeGame.jsligo                    │ artifacts/pokeGame.tz                             │',
-					'│                                    │ artifacts/pokeGame.default_storage.tz             │',
-					'│                                    │ artifacts/pokeGame.parameter.default_parameter.tz │',
-					'└────────────────────────────────────┴───────────────────────────────────────────────────┘',
-				],
-			);
+			expect(compileResult.stdout).toEqual([
+				'┌────────────────────────────────────┬───────────────────────────────────────────────────┐',
+				'│ Source                             │ Artifact                                          │',
+				'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
+				'│ IncDec.jsligo/IncDec               │ artifacts/IncDec.tz                               │',
+				'│                                    │ artifacts/IncDec.default_storage.tz               │',
+				'│                                    │ artifacts/IncDec.parameter.increment.tz           │',
+				'│                                    │ artifacts/IncDec.parameter.decrement.tz           │',
+				'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
+				'│ MultipleContracts.mligo/HelloWorld │ artifacts/HelloWorld.tz                           │',
+				'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
+				'│ MultipleContracts.mligo/Increment  │ artifacts/Increment.tz                            │',
+				'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
+				'│ entry-module.mligo/C               │ artifacts/C.tz                                    │',
+				'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
+				'│ entry.jsligo                       │ artifacts/entry.tz                                │',
+				'│                                    │ artifacts/entry.default_storage.tz                │',
+				'│                                    │ artifacts/entry.parameter.default_parameter.tz    │',
+				'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
+				'│ hello-tacos.mligo                  │ artifacts/hello-tacos.tz                          │',
+				'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
+				'│ hello-tacos.mligo                  │ artifacts/hello-tacos.tz                          │',
+				'├────────────────────────────────────┼───────────────────────────────────────────────────┤',
+				'│ pokeGame.jsligo                    │ artifacts/pokeGame.tz                             │',
+				'│                                    │ artifacts/pokeGame.default_storage.tz             │',
+				'│                                    │ artifacts/pokeGame.parameter.default_parameter.tz │',
+				'└────────────────────────────────────┴───────────────────────────────────────────────────┘',
+			]);
 
 			const expectedStdErr = [
 				'Note: storage file associated with "HelloWorld" can\'t be found, so "HelloWorld.storageList.mligo" has been created for you. Use this file to define all initial storage values for this contract',
@@ -663,7 +981,12 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 		// See https://github.com/pinnacle-labs/taqueria/issues/1859
 		// See https://github.com/pinnacle-labs/taqueria/issues/1867
 		test('regression against #1859, ligo compile-all will not create infinite storage files', async () => {
-			const { execute, cleanup, writeFile, path: projectDir } = await prepareEnvironment();
+			const {
+				execute,
+				cleanup,
+				writeFile,
+				path: projectDir,
+			} = await prepareEnvironment();
 
 			// console.log(projectDir)
 
@@ -672,12 +995,24 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
 
 			// copy jsligo files to contracts folder
-			const jligo_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.jsligo`)).stdout;
+			const jligo_file = await (
+				await exec(`cat e2e/data/ligo-data/pokeGame.jsligo`)
+			).stdout;
 			await writeFile('./test-project/contracts/pokeGame.jsligo', jligo_file);
-			const storage_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.storageList.jsligo`)).stdout;
-			await writeFile('./test-project/contracts/pokeGame.storageList.jsligo', storage_file);
-			const parameters_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.parameterList.jsligo`)).stdout;
-			await writeFile('./test-project/contracts/pokeGame.parameterList.jsligo', parameters_file);
+			const storage_file = await (
+				await exec(`cat e2e/data/ligo-data/pokeGame.storageList.jsligo`)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/pokeGame.storageList.jsligo',
+				storage_file,
+			);
+			const parameters_file = await (
+				await exec(`cat e2e/data/ligo-data/pokeGame.parameterList.jsligo`)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/pokeGame.parameterList.jsligo',
+				parameters_file,
+			);
 
 			// compile the contract using compile-all task
 			const { stdout } = await execute('taq', 'compile-all', './test-project');
@@ -697,7 +1032,14 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 
 		// https://github.com/pinnacle-labs/taqueria/issues/1907
 		test('regression against #1907, compile task will NOT compile storage/parameter expressions for variables which were commented out', async () => {
-			const { execute, cleanup, spawn, writeFile, ls, path: projectDir } = await prepareEnvironment();
+			const {
+				execute,
+				cleanup,
+				spawn,
+				writeFile,
+				ls,
+				path: projectDir,
+			} = await prepareEnvironment();
 
 			// console.log(projectDir);
 
@@ -706,20 +1048,42 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			await waitForText("Project taq'ified!");
 
 			// Install the plugin
-			const { stdout } = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
+			const { stdout } = await execute(
+				'taq',
+				'install ../taqueria-plugin-ligo',
+				'./test-project',
+			);
 
 			// copy jsligo files to contracts folder
-			const jligo_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.jsligo`)).stdout;
+			const jligo_file = await (
+				await exec(`cat e2e/data/ligo-data/pokeGame.jsligo`)
+			).stdout;
 			await writeFile('./test-project/contracts/pokeGame.jsligo', jligo_file);
-			const storage_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.storageList-with-comments.jsligo`))
-				.stdout;
-			await writeFile('./test-project/contracts/pokeGame.storageList.jsligo', storage_file);
-			const parameters_file = await (await exec(`cat e2e/data/ligo-data/pokeGame.parameterList-with-comments.jsligo`))
-				.stdout;
-			await writeFile('./test-project/contracts/pokeGame.parameterList.jsligo', parameters_file);
+			const storage_file = await (
+				await exec(
+					`cat e2e/data/ligo-data/pokeGame.storageList-with-comments.jsligo`,
+				)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/pokeGame.storageList.jsligo',
+				storage_file,
+			);
+			const parameters_file = await (
+				await exec(
+					`cat e2e/data/ligo-data/pokeGame.parameterList-with-comments.jsligo`,
+				)
+			).stdout;
+			await writeFile(
+				'./test-project/contracts/pokeGame.parameterList.jsligo',
+				parameters_file,
+			);
 
 			// compile the contract using compile task
-			const results = await execute('taq', 'compile pokeGame.jsligo', './test-project');
+			const results = await execute(
+				'taq',
+				'compile pokeGame.jsligo',
+				'./test-project',
+			);
 			expect(results.stdout).toEqual([
 				'┌─────────────────┬───────────────────────────────────────────┐',
 				'│ Source          │ Artifact                                  │',
@@ -733,13 +1097,11 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 
 			// assure that no storage/parameter files were created
 			const artifacts_list = await ls('./test-project/artifacts');
-			expect(artifacts_list).toEqual(
-				[
-					'pokeGame.default_storage.tz',
-					'pokeGame.parameter.parameter.tz',
-					'pokeGame.tz',
-				],
-			);
+			expect(artifacts_list).toEqual([
+				'pokeGame.default_storage.tz',
+				'pokeGame.parameter.parameter.tz',
+				'pokeGame.tz',
+			]);
 
 			// Cleanup
 			await cleanup();

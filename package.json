@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.43.3",
+	"version": "0.46.8",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -12,7 +12,7 @@
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
 		"build:packages": "lerna run build",
-		"deploy": "HUSKY=0 npx lerna version minor --yes && git push && git push --tags",
+		"deploy": "TAQUERIA_DEPLOY=1 npx lerna version minor --yes && git push && git push --tags",
 		"build-website": "cd website && npm ci --legacy-peer-deps && npm run build",
 		"serve-website": "cd website && npm run serve",
 		"deploy-website": "cd website && npm run deploy",
@@ -21,7 +21,7 @@
 		"prepare": "husky install",
 		"format": "npx dprint fmt",
 		"format:check": "npx dprint check",
-		"update-lock": "deno cache --import-map ./import_map.json --lock-write index.ts"
+		"update-lock": "deno cache --lock-write index.ts"
 	},
 	"repository": {
 		"type": "git",
@@ -46,7 +46,7 @@
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
 		"chokidar-cli": "^3.0.0",
-		"dprint": "^0.41.0",
+		"dprint": "^0.42.5",
 		"husky": "^8.0.3",
 		"lerna": "^7.3.0",
 		"lint-staged": "^15.0.2",

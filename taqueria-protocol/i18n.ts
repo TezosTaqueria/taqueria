@@ -27,7 +27,7 @@ export default async (): Promise<i18n> => {
 						'initPathDesc': 'Path to your project directory',
 						'workflowDesc':
 							'Select a workflow to initialize your Taqueria project. Choices are (ligo|smartpy|archetype|michelson)',
-						'scaffoldDesc': 'Generate a new project using pre-made scaffold',
+						'scaffoldDesc': `Generate a new project using pre-made scaffold. Recommended for creating a new project.`,
 						'scaffoldUrlDesc': 'Alias or Url for the scaffold project',
 						'scaffoldProjectDirDesc': 'Path where to create the new project. This must be a new directory.',
 						'scaffoldDoneMsg': 'The project was created using the scaffold.',

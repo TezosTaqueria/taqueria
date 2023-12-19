@@ -4,19 +4,21 @@ import { Common, emitExternalError, getInputFilenameRelPath, TestOpts as Opts } 
 type TableRow = { contract: string; testResults: string };
 
 const inject = (commonObj: Common) => {
-	const { getLigoDockerImage } = commonObj;
+	const { baseDriverCmd } = commonObj;
 
 	const getTestContractCmd = (parsedArgs: Opts, sourceFile: string): string => {
 		const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 		if (!projectDir) throw `No project directory provided`;
-		const baseCmd =
-			`DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${getLigoDockerImage()} run test`;
+		const baseCmd = `${baseDriverCmd(projectDir)} run test`;
 		const inputFile = getInputFilenameRelPath(parsedArgs, sourceFile);
 		const cmd = `${baseCmd} ${inputFile}`;
 		return cmd;
 	};
 
-	const testContract = (parsedArgs: Opts, sourceFile: string): Promise<TableRow> =>
+	const testContract = (
+		parsedArgs: Opts,
+		sourceFile: string,
+	): Promise<TableRow> =>
 		getArch()
 			.then(() => getTestContractCmd(parsedArgs, sourceFile))
 			.then(execCmd)
@@ -47,9 +49,10 @@ const test = (commonObj: Common, parsedArgs: Opts): Promise<void> => {
 
 	const sourceFile = parsedArgs.sourceFile;
 	if (!sourceFile) return sendAsyncErr(`No source file provided`);
-	return testContract(parsedArgs, sourceFile).then(result => [result]).then(sendJsonRes).catch(err =>
-		sendAsyncErr(err, false)
-	);
+	return testContract(parsedArgs, sourceFile)
+		.then(result => [result])
+		.then(sendJsonRes)
+		.catch(err => sendAsyncErr(err, false));
 };
 
 export default test;

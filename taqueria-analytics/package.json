@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/analytics",
-	"version": "0.43.3",
+	"version": "0.46.8",
 	"description": "A TypeScript SDK submitting events for Taqueria activity",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -35,12 +35,12 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/protocol": "^0.43.3",
+		"@taqueria/protocol": "^0.46.8",
 		"node-machine-id-xz": "^1.0.2"
 	},
 	"devDependencies": {
-		"tsup": "^7.2.0",
-		"typescript": "^5.2.2"
+		"tsup": "^8.0.1",
+		"typescript": "^5.3.3"
 	},
 	"tsup": {
 		"entry": [

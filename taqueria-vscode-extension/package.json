@@ -3,10 +3,10 @@
 	"displayName": "Taqueria (by Pinnacle Labs)",
 	"description": "A better way to build on Tezos",
 	"publisher": "PinnacleLabs",
-	"version": "0.43.3",
+	"version": "0.46.8",
 	"private": true,
 	"engines": {
-		"vscode": "^1.82.0"
+		"vscode": "^1.84.2"
 	},
 	"engineStrict": true,
 	"extensionKind": [
@@ -708,33 +708,33 @@
 		"test": "./bin/run-tests.sh"
 	},
 	"devDependencies": {
-		"@taquito/taquito": "^16.2.0",
-		"@types/fs-extra": "^9.0.13",
-		"@types/glob": "^7.2.0",
-		"@types/mocha": "^5.2.7",
-		"@types/node": "^17.0.17",
-		"@types/promise-memoize": "^1.2.1",
-		"@types/semver": "^7.5.0",
-		"@types/vscode": "^1.82.0",
-		"@vscode/test-electron": "^2.3.3",
-		"@vscode/vsce": "^2.21.0",
-		"esbuild": "^0.14.54",
-		"fs-extra": "^10.1.0",
-		"glob": "^7.2.3",
-		"mocha": "^9.2.2",
-		"typescript": "4.7.2"
+		"@taquito/taquito": "^17.5.0",
+		"@types/fs-extra": "^11.0.4",
+		"@types/glob": "^8.1.0",
+		"@types/mocha": "^10.0.6",
+		"@types/node": "^20.10.4",
+		"@types/promise-memoize": "^1.2.4",
+		"@types/semver": "^7.5.6",
+		"@types/vscode": "^1.84.2",
+		"@vscode/test-electron": "^2.3.8",
+		"@vscode/vsce": "^2.22.0",
+		"esbuild": "^0.19.8",
+		"fs-extra": "^11.2.0",
+		"glob": "^10.3.10",
+		"mocha": "^10.2.0",
+		"typescript": "^5.3.3"
 	},
 	"dependencies": {
 		"@microsoft/signalr": "^6.0.18",
-		"@taqueria/analytics": "^0.43.3",
-		"@taqueria/protocol": "^0.43.3",
+		"@taqueria/analytics": "^0.46.8",
+		"@taqueria/protocol": "^0.46.8",
 		"cli-table3": "^0.6.3",
 		"comment-json": "^4.2.3",
 		"eventsource": "^2.0.2",
-		"node-fetch-commonjs": "^3.3.1",
+		"node-fetch-commonjs": "^3.3.2",
 		"promise-memoize": "^1.2.1",
-		"rambda": "^7.5.0",
+		"rambda": "^8.6.0",
 		"rxjs": "^7.8.1",
-		"semver": "^7.5.2"
+		"semver": "^7.5.4"
 	}
 }
