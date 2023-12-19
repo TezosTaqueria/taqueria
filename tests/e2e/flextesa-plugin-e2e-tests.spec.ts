@@ -77,7 +77,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 		await execute('taq', 'install ../taqueria-plugin-flextesa', './test-project');
 		await exists('./test-project/node_modules/@taqueria/plugin-flextesa/index.js');
 
-		const { stderr } = await execute('taq', 'list accounts local', './test-project');
+		const { stderr } = await execute('taq', 'list accounts local --debug', './test-project');
 		expect(stderr).toEqual(['The local sandbox is not running.']);
 
 		await cleanup();
