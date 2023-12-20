@@ -807,7 +807,7 @@ export const Plugin = {
 					} // Handle simple string errors
 					else if (typeof err === 'string') console.error(err);
 					// Handle edge cases
-					else if (!debug) {
+					else if (!debug && typeof (err) !== 'boolean') {
 						console.error(`${packageName} encountered an unexpected problem. Use --debug to learn more.`);
 					}
 
