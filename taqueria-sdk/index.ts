@@ -231,7 +231,7 @@ export const sendErr = (msg: string, newline = true) => {
 export const sendWarn = (msg: string, newline = true) => {
 	if (!msg || msg.length === 0) return;
 	const output = newline ? msg + '\n' : msg;
-	return process.stdout.write(output) as unknown as void;
+	return process.stderr.write(output) as unknown as void;
 };
 
 export const sendAsyncErr = (msg: string, newline = true) => Promise.reject(sendErr(msg, newline)); // should this be Promise.reject?
