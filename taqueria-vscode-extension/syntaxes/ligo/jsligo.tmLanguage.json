@@ -77,7 +77,7 @@
       "captures": { "1": { "name": "keyword.other.jsligo" } }
     },
     "keywords": {
-      "match": "\\b(export|import|from|implements|contract_of|parameter_of|function|do|namespace|interface|implements|false|true)\\b",
+      "match": "\\b(export|import|from|contract_of|parameter_of|function|do|namespace|interface|implements|extends|false|true)\\b",
       "captures": { "1": { "name": "keyword.other.jsligo" } }
     },
     "controlkeywords": {

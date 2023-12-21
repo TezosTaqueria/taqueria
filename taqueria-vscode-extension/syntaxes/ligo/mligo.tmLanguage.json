@@ -98,7 +98,7 @@
     },
     "typedefinition": {
       "begin": "\\b(type)\\b",
-      "end": "(?=^#|\\[@|\\b(let|in|type|end|module|sig|val)\\b|\\))",
+      "end": "(?=^#|\\[@|\\b(let|in|type|end|module|sig|val|include)\\b|\\))",
       "beginCaptures": { "1": { "name": "keyword.other.mligo" } },
       "endCaptures": {},
       "patterns": [
@@ -117,7 +117,7 @@
     },
     "typeannotation": {
       "begin": "(:)",
-      "end": "(?=\\)|=|;|}|^#|\\[@|\\b(let|in|type|end|module|sig|val|end)\\b)",
+      "end": "(?=\\)|=|;|}|^#|\\[@|\\b(let|in|type|end|module|sig|val|end|include)\\b)",
       "beginCaptures": { "1": { "name": "keyword.operator.mligo" } },
       "endCaptures": {},
       "patterns": [
