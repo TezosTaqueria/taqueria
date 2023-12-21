@@ -237,7 +237,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 				'│ Source                            │ Artifact                                      │',
 				'├───────────────────────────────────┼───────────────────────────────────────────────┤',
 				'│ counter-module-main.mligo/Counter │ artifacts/Counter.tz                          │',
-				'│                                   │ artifacts/Counter.default_storage.tz          │',
+				'│                                   │ artifacts/Counter.storage.initial_count.tz    │',
 				'│                                   │ artifacts/Counter.storage.another_count.tz    │',
 				'│                                   │ artifacts/Counter.parameter.increment_by_3.tz │',
 				'└───────────────────────────────────┴───────────────────────────────────────────────┘',
@@ -248,7 +248,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 			const artifacts_list = await ls('./test-project/artifacts');
 			const expectedContracts = [
 				'Counter.tz',
-				'Counter.default_storage.tz',
+				'Counter.storage.initial_count.tz',
 				'Counter.storage.another_count.tz',
 				'Counter.parameter.increment_by_3.tz',
 			];
@@ -295,7 +295,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 				'│ Source                            │ Artifact                                   │',
 				'├───────────────────────────────────┼────────────────────────────────────────────┤',
 				'│ counter-module-main.mligo/Counter │ artifacts/Counter.tz                       │',
-				'│                                   │ artifacts/Counter.default_storage.tz       │',
+				'│                                   │ artifacts/Counter.storage.initial_count.tz │',
 				'│                                   │ artifacts/Counter.storage.another_count.tz │',
 				'└───────────────────────────────────┴────────────────────────────────────────────┘',
 				'Compiled 1 contract(s) in "counter-module-main.mligo"',
@@ -891,7 +891,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 					'│                                   │ artifacts/counter-main.parameter.increment_by_two.tz │',
 					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',
 					'│ counter-module-main.mligo/Counter │ artifacts/Counter.tz                                 │',
-					'│                                   │ artifacts/Counter.default_storage.tz                 │',
+					'│                                   │ artifacts/Counter.storage.initial_count.tz           │',
 					'│                                   │ artifacts/Counter.storage.another_count.tz           │',
 					'│                                   │ artifacts/Counter.parameter.increment_by_3.tz        │',
 					'├───────────────────────────────────┼──────────────────────────────────────────────────────┤',

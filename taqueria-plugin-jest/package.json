@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-jest",
-	"version": "0.46.16",
+	"version": "0.46.17",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",
@@ -27,8 +27,8 @@
 		"directory": "taqueria-plugin-jest"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.46.16",
-		"@taqueria/plugin-contract-types": "^0.46.16",
+		"@taqueria/node-sdk": "^0.46.17",
+		"@taqueria/plugin-contract-types": "^0.46.17",
 		"@taquito/signer": "^17.5.0",
 		"@taquito/taquito": "^17.5.0",
 		"@taquito/utils": "^17.5.0",
