@@ -78,5 +78,12 @@
 		"./taqueria-lib*",
 		"./taqueria-plugin*",
 		"./tests"
-	]
+	],
+	"optionalDependencies": {
+		"@dprint/linux-x64-glibc": "^0.45.0",
+		"@nx/nx-linux-x64-gnu": "^17.2.8",
+		"@rollup/rollup-linux-x64-gnu": "^4.9.3",
+		"@nx/nx-darwin-arm64": "^17.2.6",
+		"@rollup/rollup-darwin-arm64": "^4.9.1"
+	}
 }
