@@ -1,20 +1,20 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-HUSKY=0
+# . "$(dirname "$0")/_/husky.sh"
+# HUSKY=0
 
-# IS A DEPLOYMENT?
-if [[ -n "$TAQUERIA_DEPLOY" ]]; then
-  # Get the version number from lerna.json
-  VERSION=$(cat lerna.json | grep version | cut -d '"' -f 4)
+# # IS A DEPLOYMENT?
+# if [[ -n "$TAQUERIA_DEPLOY" ]]; then
+#   # Get the version number from lerna.json
+#   VERSION=$(cat lerna.json | grep version | cut -d '"' -f 4)
 
-  # Update the version number in the Homebrew formula (only if a stable release)
-  sed -i -e "s/\([0-9]\+\.[0-9]\+\.[0-9]+\)/${VERSION}/mg" ./HomebrewFormula/taqueria.rb
+#   # Update the version number in the Homebrew formula (only if a stable release)
+#   sed -i -e "s/\([0-9]\+\.[0-9]\+\.[0-9]+\)/${VERSION}/mg" ./HomebrewFormula/taqueria.rb
 
-# NOT A DEPLOYMENT
-else
-  npx lint-staged
-  git add ./deno.lock
+# # NOT A DEPLOYMENT
+# else
+#   npx lint-staged
+#   git add ./deno.lock
 
-  # Bump version # for alpha release
-  npx lerna version patch --no-git-tag-version --no-push --yes --force-publish && git add */package*.json package*.json && git add lerna.json
-fi
+#   # Bump version # for alpha release
+#   npx lerna version patch --no-git-tag-version --no-push --yes --force-publish && git add */package*.json package*.json && git add lerna.json
+# fi
