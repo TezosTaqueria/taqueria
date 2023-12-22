@@ -3,7 +3,10 @@ import * as fse from 'fs-extra';
 import * as path from 'path';
 
 const homedir = require('os').homedir();
-const testProjectDestination = path.resolve(homedir, 'TVsCE_e2e/vscode-taq-test-project/');
+const testProjectDestination = path.resolve(
+	homedir,
+	'TVsCE_e2e/vscode-taq-test-project/',
+);
 const vsCodeUserData = path.resolve(homedir, '.vscode-test/user-data'); // fixes long path warning
 
 async function main() {
@@ -14,14 +17,26 @@ async function main() {
 
 		// The path to the extension test script
 		// Passed to --extensionTestsPath
-		const extensionTestsPath = path.resolve(__dirname, '../../out/test/suite/index');
+		const extensionTestsPath = path.resolve(
+			__dirname,
+			'../../out/test/suite/index',
+		);
 
-		const launchArgs = [`${testProjectDestination}/`, '--disable-extension=true', `--user-data-dir=${vsCodeUserData}`];
+		const launchArgs = [
+			`${testProjectDestination}/`,
+			'--disable-extension=true',
+			`--user-data-dir=${vsCodeUserData}`,
+		];
+		process.env['PATH'] = extensionDevelopmentPath + ':' + process.env['PATH'];
 
 		// Download VS Code, unzip it and run the integration test
-		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs });
+		await runTests({
+			extensionDevelopmentPath,
+			extensionTestsPath,
+			launchArgs,
+		});
 	} catch (err) {
-		console.error('Failed to run tests');
+		console.error('Failed to run tests', err);
 
 		if (fse.existsSync(vsCodeUserData)) {
 			fse.rmdirSync(vsCodeUserData, { recursive: true });

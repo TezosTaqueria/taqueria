@@ -1,4 +1,4 @@
-// DO NOT EDIT - THIS FILE IS GENERATED
+// DO NOT EDIT - THIS FILE IS GENERATED 
 
 export type MichelineEditorMessageInput = {
 	kind: 'change' | 'action';
@@ -29,6 +29,7 @@ export type InteropMessageInterface =
 		view: 'AllEditors';
 		input: {};
 	};
+
 
 export const createVscodeWebUiHtml = ({
 	webview,

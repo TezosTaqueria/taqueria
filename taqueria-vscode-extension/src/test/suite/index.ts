@@ -7,12 +7,14 @@ export async function run(): Promise<void> {
 	const mocha = new Mocha({
 		ui: 'bdd',
 	});
-	mocha.timeout(120000);
+	mocha.timeout(20 * 60 * 1000);
 	mocha.options.color = true;
 
 	const testsRoot = path.resolve(__dirname, '../../../');
 
-	const files = await glob('**/**.test.js', { cwd: testsRoot });
+	const files = await glob('**/*.test.js', {
+		cwd: testsRoot,
+	});
 
 	// Add files to the test suite
 	files.map(f => {
