@@ -4,7 +4,7 @@ import * as path from 'path';
 
 const homedir = require('os').homedir();
 const testProjectDestination = path.resolve(homedir, 'TVsCE_e2e/vscode-taq-test-project/');
-const vsCodeUserData = path.resolve(__dirname, '../../.vscode-test/user-data');
+const vsCodeUserData = path.resolve(homedir, '.vscode-test/user-data'); // fixes long path warning
 
 async function main() {
 	try {
@@ -16,7 +16,7 @@ async function main() {
 		// Passed to --extensionTestsPath
 		const extensionTestsPath = path.resolve(__dirname, '../../out/test/suite/index');
 
-		const launchArgs = [`${testProjectDestination}/`, '--disable-extension=true'];
+		const launchArgs = [`${testProjectDestination}/`, '--disable-extension=true', `--user-data-dir=${vsCodeUserData}`];
 
 		// Download VS Code, unzip it and run the integration test
 		await runTests({ extensionDevelopmentPath, extensionTestsPath, launchArgs });
