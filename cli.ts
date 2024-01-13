@@ -59,6 +59,7 @@ const getCliArgs = () => {
 // Get utils
 const {
 	execText,
+	execWithoutShell,
 	joinPaths,
 	mkdir,
 	readJsonFile,
@@ -232,8 +233,8 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 				readJsonFile<{ scripts: { start?: string } }>(joinPaths(parsedArgs.projectDir, 'package.json')),
 				chain(contents =>
 					contents.scripts.start
-						? exec('npm run start', {})
-						: exec("echo 'No start script provided for this project.'", {})
+						? execWithoutShell('npm', ['run', 'start'], { cwd: parsedArgs.projectDir })
+						: execWithoutShell('echo', ['No start script provided for this project.'])
 				),
 				map(() => {}),
 			),
@@ -257,12 +258,12 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 							.positional('scaffoldUrl', {
 								describe: i18n.__('scaffoldUrlDesc'),
 								type: 'string',
-								default: 'https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop.git',
+								default: 'https://github.com/pinnacle-labs/taqueria-getting-started-ligo-scaffold',
 							})
 							.positional('scaffoldProjectDir', {
 								type: 'string',
 								describe: i18n.__('scaffoldProjectDirDesc'),
-								default: './taqueria-taco-shop',
+								default: './my-taqueria-project',
 							})
 							.option('branch', {
 								alias: 'b',

@@ -278,6 +278,19 @@ export const inject = (deps: UtilsDependencies) => {
 				map(() => destinationPath),
 			);
 
+	const execWithoutShell = (command: string, commandArgs?: string[], opts?: Record<string, string>) =>
+		attemptP<TaqError.t, [number, string, string]>(async () => {
+			const child = Deno.run({
+				cmd: [command, ...commandArgs!],
+				...opts,
+				stdout: 'inherit',
+			});
+
+			const status = await child.status();
+
+			return Promise.resolve([status.code, '', '']);
+		});
+
 	const execText = (
 		cmdTemplate: string,
 		inputArgs: Record<string, unknown>,
@@ -391,5 +404,6 @@ export const inject = (deps: UtilsDependencies) => {
 		eager,
 		taqResolve,
 		appendTextFile,
+		execWithoutShell,
 	};
 };
