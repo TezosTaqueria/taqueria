@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.46.17",
+	"version": "0.46.18",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -81,9 +81,9 @@
 	],
 	"optionalDependencies": {
 		"@dprint/linux-x64-glibc": "^0.45.0",
-		"@nx/nx-linux-x64-gnu": "^17.2.8",
-		"@rollup/rollup-linux-x64-gnu": "^4.9.3",
 		"@nx/nx-darwin-arm64": "^17.2.6",
-		"@rollup/rollup-darwin-arm64": "^4.9.1"
+		"@nx/nx-linux-x64-gnu": "^17.2.8",
+		"@rollup/rollup-darwin-arm64": "^4.9.1",
+		"@rollup/rollup-linux-x64-gnu": "^4.9.3"
 	}
 }

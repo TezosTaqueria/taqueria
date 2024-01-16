@@ -244,13 +244,6 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 			const { readFile, writeFile } = require('fs').promises;
 			await execute('taq', 'init test-project');
 			await exists('./test-project/.taq/config.json');
-			const configJsonPath = path.join(
-				tmpPath,
-				'./test-project/.taq/config.json',
-			);
-			const configJson = require(configJsonPath);
-			configJson.environments!.development!.protocol = 'Nairobi';
-			fs.writeFileSync(configJsonPath, JSON.stringify(configJson, null, 2));
 
 			await execute(
 				'taq',

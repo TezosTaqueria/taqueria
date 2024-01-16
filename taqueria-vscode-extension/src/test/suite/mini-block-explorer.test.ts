@@ -139,13 +139,6 @@ describe('Extension Test Suite', async () => {
 		});
 
 		Taq.init({ projectPath: testProjectDestination });
-		const configJsonPath = path.join(
-			testProjectDestination,
-			'.taq/config.json',
-		);
-		const configJson = require(configJsonPath);
-		configJson.environments!.development!.protocol = 'Nairobi';
-		fse.writeFileSync(configJsonPath, JSON.stringify(configJson, null, 2));
 
 		// TODO do this in extension.test.js. Doesn't hit the network and faster
 		Taq.install({ projectPath: testProjectDestination, pluginName: 'taqueria-plugin-ligo' });
