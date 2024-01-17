@@ -159,17 +159,21 @@ const getSupportedProtocolKinds = (() => {
 
 const getProtocolKind = (sandbox: SandboxConfig.t, opts: ValidOpts) =>
 	getSupportedProtocolKinds(opts)
-		.then(protocols =>
-			protocols.reduce(
+		.then(protocols => {
+			const validProtocols = protocols.filter(p => p != 'Alpha' && p != 'Oxford'); // Oxford is filtered only because it's not supported in a image. Alpha is not a valid protocol as it doesn't work with the indexers
+			if (!sandbox.protocol || sandbox.protocol.includes('lpha')) {
+				return last(validProtocols);
+			}
+			return validProtocols.reduce(
 				(retval, protocolKind) => {
 					if (retval) return retval;
-					const givenProtocolHash = (sandbox.protocol ?? 'alpha').toLowerCase();
+					const givenProtocolHash = (sandbox.protocol!).toLowerCase();
 					const testProtocol = protocolKind.toLowerCase().slice(0, 4);
 					return givenProtocolHash.includes(testProtocol) ? protocolKind : undefined;
 				},
 				undefined as string | undefined,
-			) ?? last(protocols)
-		);
+			) ?? last(validProtocols);
+		});
 
 const getBootstrapBalance = (opts: ValidOpts) =>
 	Object.values(opts.config.accounts || {})
