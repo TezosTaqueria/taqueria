@@ -54,7 +54,7 @@ The Taqueria CLI is required to use the VS Code extension and as such, must be i
 
 ### Overview
 
-The Taqueria CLI is an executable binary named `taq`, installed globally in your shell's `$PATH`
+The Taqueria CLI is an executable binary named `taq`.
 
 Installing the Taqueria CLI involves the following steps:
 
@@ -62,9 +62,12 @@ Installing the Taqueria CLI involves the following steps:
 2. Make the Taqueria binary `taq` executable
 3. Add `taq` to your shell's `$PATH`
 
-Once these steps are complete, you will be able to run Taqueria from your terminal using the `taq` command
+To install, we recommend our one-line installer:
+```shell
+/bin/bash -c "$(wget -O - https://taqueria.io/install-taq.sh 2>/dev/null || curl -fsSL https://taqueria.io/install-taq.sh)"
+```
 
-### OS Specific Instructions
+### Alternative OS Specific Instructions
 
 <Tabs groupId="operating-systems">
 <TabItem value="mac" label="MacOS">
