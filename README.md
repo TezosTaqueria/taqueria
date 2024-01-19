@@ -25,23 +25,10 @@ Taqueria includes:
 
 The Taqueria CLI is an executable binary named `taq` installed globally in your shell's `$PATH`
 
-### MacOS
-
-To install on MacOS, we recommend using [Homebrew](https://brew.sh):
-```sh
-brew tap pinancle-labs/taqueria https://github.com/pinnacle-labs/taqueria
-brew install taqueria
+Run the following in your terminal:
 ```
-
-### Linux
-
-1. Download the Taqueria binary: `wget https://taqueria.io/get/linux/taq`
-2. Make the Taqueria binary `taq` executable
-3. Add `taq` to your shell's `$PATH`
-
-Builds are also available on the [releases](https://github.com/pinnacle-labs/taqueria/releases) page on Github
-
-> Detailed instructions for installing and using Taqueria can be found [here](https://taqueria.io/docs/getting-started/installation)
+/bin/bash -c "$(wget -O - https://taqueria.io/install-taq.sh 2>/dev/null || curl -fsSL https://taqueria.io/install-taq.sh)"
+```
 
 ## Getting Started
 
