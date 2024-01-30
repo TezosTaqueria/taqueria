@@ -24,6 +24,8 @@ jobs:
           cache: "npm"
           
       - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
 
       - name: Restore Deno Cache
         uses: actions/cache/restore@v3
@@ -84,6 +86,8 @@ jobs:
             cache: "npm"
             
         - uses: denoland/setup-deno@v1
+          with:
+            deno-version: v1.x
 
         - name: Download work archive
           uses: actions/download-artifact@v2
@@ -545,6 +549,8 @@ jobs:
           node-version: 18
 
       - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
 
       - name: Download work archive
         uses: actions/download-artifact@v2
