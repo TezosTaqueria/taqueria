@@ -38,7 +38,7 @@ export const OptionEditor = (
 					<td>
 						<VSCodeCheckbox
 							checked={optionValue.prim !== 'None'}
-							onClick={(e: Event) => setOption((e.target as HTMLInputElement).checked)}
+							onClick={e => setOption((e.target as HTMLInputElement).checked)}
 						/>{' '}
 						<h4 style={{ display: 'inline', verticalAlign: 'super' }}>{optionValue.prim}</h4>
 					</td>
