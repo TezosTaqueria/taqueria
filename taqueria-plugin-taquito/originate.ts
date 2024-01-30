@@ -142,7 +142,7 @@ const prepContractInfoForDisplay = async (
 	const operationResults = await op.operationResults();
 	const originationResults = (operationResults ?? [])
 		.filter(result => result.kind === 'origination')
-		.map(result => result as OperationContentsAndResultOrigination);
+		.map(result => result as unknown as OperationContentsAndResultOrigination);
 
 	// Length should be 1 since we are batching originate operations into one
 	const result = originationResults.length === 1 ? originationResults[0] : undefined;

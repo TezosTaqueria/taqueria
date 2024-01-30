@@ -27,7 +27,7 @@ export const PrimitiveEditor = (
 			<VSCodeTextField
 				type='text'
 				value={(primitiveValue as Record<string, string>)[fieldName]}
-				onInput={e => changeValue((e.target as HTMLInputElement).value)}
+				onInput={(e: Event) => changeValue((e.target as HTMLInputElement).value)}
 			/>
 			<ValidationResultDisplay validationResult={validationResult} hideSublevelErrors={false} />
 		</div>
