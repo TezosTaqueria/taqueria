@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.48.8",
+	"version": "0.48.9",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -30,6 +30,10 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
+		"@bevry/jsonfile": "^1.3.0",
+		"@types/node": "^20.11.10",
+		"@types/project-name-generator": "^2.1.3",
+		"@types/shell-quote": "^1.7.5",
 		"esbuild-plugin-text-replace": "^1.3.0",
 		"ts-to-zod": "^3.6.1",
 		"tsup": "^8.0.1",
@@ -312,11 +316,20 @@
 	},
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.4.5",
+		"@taquito/signer": "^19.0.0",
+		"@taquito/taquito": "^19.0.0",
+		"@taquito/utils": "^19.0.0",
 		"batching-toposort": "^1.2.0",
 		"fluture": "^14.0.0",
 		"i18next": "^23.8.1",
+		"node-fetch": "^3.3.2",
 		"rambda": "^9.0.1",
 		"rambdax": "^10.1.0",
+		"shell-quote": "^1.8.1",
+		"stacktrace-js": "^2.0.2",
+		"ts-pattern": "^5.0.6",
+		"why-is-node-running": "^2.2.2",
+		"yargs": "^17.7.2",
 		"zod": "^3.22.4"
 	},
 	"gitHead": "ff58a2fc06ad233869ad6be574093c8b3b272e2e"
