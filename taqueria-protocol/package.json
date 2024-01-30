@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.48.7",
+	"version": "0.48.8",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -31,7 +31,7 @@
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
 		"esbuild-plugin-text-replace": "^1.3.0",
-		"ts-to-zod": "^3.4.1",
+		"ts-to-zod": "^3.6.1",
 		"tsup": "^8.0.1",
 		"typescript": "^5.3.3"
 	},
@@ -311,11 +311,11 @@
 		}
 	},
 	"dependencies": {
-		"@peculiar/webcrypto": "^1.4.3",
+		"@peculiar/webcrypto": "^1.4.5",
 		"batching-toposort": "^1.2.0",
 		"fluture": "^14.0.0",
-		"i18next": "^23.7.8",
-		"rambda": "^8.6.0",
+		"i18next": "^23.8.1",
+		"rambda": "^9.0.1",
 		"rambdax": "^10.1.0",
 		"zod": "^3.22.4"
 	},
