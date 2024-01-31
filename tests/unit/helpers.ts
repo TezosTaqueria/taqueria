@@ -1,24 +1,21 @@
-import { StringWriter } from 'deno-stdlib-writers';
-
 // Provides a Writable implementation to be used
 // as stdout/stderr in tests
-export class MockWriter implements Deno.Writer {
-	writer: StringWriter;
+export class MockWriter {
+	private encoder = new TextEncoder();
+	private decoder = new TextDecoder();
+	private chunks: Uint8Array[] = [];
 
-	constructor() {
-		this.writer = new StringWriter();
+	write(p: Uint8Array): Promise<number> {
+		this.chunks.push(p);
+		return Promise.resolve(p.length);
 	}
 
 	clear() {
-		this.writer = new StringWriter();
-	}
-
-	write(p: Uint8Array): Promise<number> {
-		return this.writer.write(p);
+		this.chunks = [];
 	}
 
 	toString() {
-		const str = this.writer.toString();
+		const str = this.chunks.map(chunk => this.decoder.decode(chunk, { stream: true })).join('');
 		this.clear();
 		return str;
 	}
