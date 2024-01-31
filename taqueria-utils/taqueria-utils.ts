@@ -2,7 +2,7 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { readJsonFileInterceptConfig, writeJsonFileInterceptConfig } from '@taqueria/protocol/types-config-files';
 import * as Url from '@taqueria/protocol/Url';
-import { copy } from 'deno-stdlib-streams';
+import { copy } from 'deno-stdlib-io-copy';
 import { Eta } from 'eta';
 import {
 	alt,
@@ -219,8 +219,8 @@ export const joinPaths = _joinPaths;
 export const dirOf = dirname;
 
 export const renderTemplate = (template: string, values: Record<string, unknown>): string => {
-	const eta = new Eta();
-	return eta.render(template, values);
+	const eta = new Eta({ views: './templates' });
+	return eta.renderString(template, values);
 };
 
 export const toPromise = <T>(f: Future<TaqError.t, T>): Promise<T> =>

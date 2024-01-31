@@ -16,7 +16,7 @@
 		"cliffy": "https://deno.land/x/cliffy@v0.20.1/table/mod.ts",
 		"deno-yargs-types": "https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts",
 		"deno-yargs": "https://deno.land/x/yargs@v17.4.0-deno/deno.ts",
-		"deno-stdlib-streams": "https://deno.land/std@0.213.0/streams/mod.ts",
+		"deno-stdlib-io-copy": "https://deno.land/std@0.213.0/io/copy.ts",
 		"deno-asserts": "https://deno.land/std@0.213.0/assert/mod.ts",
 		"deno-stdlib-fs": "https://deno.land/std@0.213.0/fs/mod.ts",
 		"retronid": "https://cdn.skypack.dev/retronid",
