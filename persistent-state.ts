@@ -5,8 +5,7 @@ import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Timestamp from '@taqueria/protocol/Timestamp';
 import * as Verb from '@taqueria/protocol/Verb';
 import { chain, chainRej, FutureInstance as Future, map, reject, resolve } from 'fluture';
-import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import { TypeOf } from 'https://deno.land/x/zod@v3.14.4/types.ts';
+import { pipe } from 'fun';
 import { groupBy, takeLast } from 'rambda';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
 

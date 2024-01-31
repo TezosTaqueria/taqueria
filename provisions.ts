@@ -11,10 +11,10 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { attemptP, chain, chainRej, Future, map, mapRej, reject, resolve } from 'fluture';
+import { pipe } from 'fun';
 import batchingToposort from 'https://cdn.skypack.dev/batching-toposort';
-import generate from 'https://cdn.skypack.dev/retronid';
-import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
 import { times } from 'rambda';
+import generate from 'retronid';
 import { inject } from './taqueria-utils/taqueria-utils.ts';
 
 const { doesPathExist, writeJsonFile, joinPaths, eager, isTaqError, readJsonFile, renderTemplate, execText } = inject({

@@ -1,14 +1,8 @@
 import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
+import { assert, assertEquals, assertInstanceOf, assertRejects, unreachable } from 'deno-asserts';
+import { exists } from 'deno-stdlib-fs';
 import { fork } from 'fluture';
-import { exists } from 'https://deno.land/std@0.132.0/fs/mod.ts';
-import {
-	assert,
-	assertEquals,
-	assertInstanceOf,
-	assertRejects,
-	unreachable,
-} from 'https://deno.land/std@0.141.0/testing/asserts.ts';
 import { inject } from '../../../taqueria-utils/taqueria-utils.ts';
 import { MockWriter } from '../helpers.ts';
 const {

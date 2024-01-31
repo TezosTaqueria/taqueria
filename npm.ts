@@ -7,7 +7,7 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { chain, chainRej, FutureInstance as Future, map, mapRej, reject, resolve } from 'fluture';
-import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
+import { pipe } from 'fun';
 import initPlugins from './plugins.ts';
 import { EnvVars } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';

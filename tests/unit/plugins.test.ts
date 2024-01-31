@@ -6,7 +6,7 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Url from '@taqueria/protocol/Url';
-import { assert, assertEquals, assertRejects } from 'https://deno.land/std@0.127.0/testing/asserts.ts';
+import { assert, assertEquals, assertRejects } from 'deno-asserts';
 import inject from '../../plugins.ts';
 import { defaultConfig, toLoadedConfig } from '../../taqueria-config.ts';
 import { joinPaths, toPromise } from '../../taqueria-utils/taqueria-utils.ts';

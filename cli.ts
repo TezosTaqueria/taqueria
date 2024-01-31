@@ -16,6 +16,11 @@ import {
 } from '@taqueria/protocol';
 import * as PluginActionName from '@taqueria/protocol/PluginActionName';
 import * as TaqError from '@taqueria/protocol/TaqError';
+import { titleCase } from 'case';
+import { Table } from 'cliffy';
+import * as chalk from 'colors';
+import yargs from 'deno-yargs';
+import type { Arguments } from 'deno-yargs-types';
 import {
 	attemptP,
 	bichain,
@@ -33,12 +38,7 @@ import {
 	reject,
 	resolve,
 } from 'fluture';
-import * as chalk from 'https://deno.land/std@0.209.0/fmt/colors.ts';
-import { titleCase } from 'https://deno.land/x/case@2.1.1/mod.ts';
-import { Table } from 'https://deno.land/x/cliffy@v0.20.1/table/mod.ts';
-import { identity, pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
-import type { Arguments } from 'https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts';
-import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
+import { identity, pipe } from 'fun';
 import { has, last, uniq } from 'rambda';
 import { match, P } from 'ts-pattern';
 import * as Analytics from './analytics.ts';

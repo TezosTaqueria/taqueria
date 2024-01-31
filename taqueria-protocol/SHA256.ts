@@ -2,7 +2,6 @@ import createType from '@taqueria/protocol/Base';
 import { E_TaqError, TaqError } from '@taqueria/protocol/TaqError';
 import { FutureInstance as Future, mapRej, promise } from 'fluture';
 import { has } from 'rambda';
-import { TextEncoder } from 'util';
 import { z } from 'zod';
 
 const eager = <T>(f: Future<TaqError, T>) =>

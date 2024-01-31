@@ -2,7 +2,8 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { readJsonFileInterceptConfig, writeJsonFileInterceptConfig } from '@taqueria/protocol/types-config-files';
 import * as Url from '@taqueria/protocol/Url';
-import { render } from 'eta';
+import { copy } from 'deno-stdlib-streams';
+import { Eta } from 'eta';
 import {
 	alt,
 	attemptP,
@@ -20,7 +21,6 @@ import { pipe } from 'fun';
 import * as jsonc from 'jsonc';
 import { dirname, join as _joinPaths } from 'path';
 import { memoize as memoizeIt } from 'rambdax';
-import { copy } from 'streams';
 import { UtilsDependencies } from './taqueria-utils-types.ts';
 
 export const decodeJson = <T>(encoded: string): Future<TaqError.t, T> => {
@@ -218,8 +218,10 @@ export const joinPaths = _joinPaths;
 
 export const dirOf = dirname;
 
-export const renderTemplate = (template: string, values: Record<string, unknown>): string =>
-	render(template, values) as string;
+export const renderTemplate = (template: string, values: Record<string, unknown>): string => {
+	const eta = new Eta();
+	return eta.render(template, values);
+};
 
 export const toPromise = <T>(f: Future<TaqError.t, T>): Promise<T> =>
 	pipe(

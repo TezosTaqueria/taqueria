@@ -1,7 +1,7 @@
 import { NonEmptyString, SanitizedArgs } from '@taqueria/protocol';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import { chain, chainRej, FutureInstance as Future, map, reject } from 'fluture';
-import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
+import { pipe } from 'fun';
 import { equals } from 'rambda';
 import * as Analytics from './analytics.ts';
 import type { CLIConfig } from './taqueria-types.ts';

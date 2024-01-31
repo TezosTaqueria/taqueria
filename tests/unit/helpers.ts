@@ -1,4 +1,4 @@
-import { StringWriter } from 'https://deno.land/std@0.128.0/io/writers.ts';
+import { StringWriter } from 'deno-stdlib-writers';
 
 // Provides a Writable implementation to be used
 // as stdout/stderr in tests

@@ -11,9 +11,9 @@ import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
 
 // Third-party dependencies
+import { copy } from 'deno-stdlib-streams';
 import { attemptP, chain, chainRej, FutureInstance as Future, map, mapRej, parallel, reject, resolve } from 'fluture';
-import { copy } from 'https://deno.land/std@0.128.0/streams/conversion.ts';
-import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
+import { pipe } from 'fun';
 import clipboard from 'https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts';
 
 // Get utils

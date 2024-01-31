@@ -7,7 +7,7 @@ import * as SHA256 from '@taqueria/protocol/SHA256';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Task from '@taqueria/protocol/Task';
 import { attemptP, both, chain, chainRej, FutureInstance as Future, go, map, mapRej, reject, resolve } from 'fluture';
-import { pipe } from 'https://deno.land/x/fun@v1.0.0/fns.ts';
+import { pipe } from 'fun';
 import {
 	dirOf,
 	doesPathExist,

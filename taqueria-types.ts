@@ -2,7 +2,7 @@ import type { i18n } from '@taqueria/protocol/i18n';
 import * as LoadedConfig from '@taqueria/protocol/LoadedConfig';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as Settings from '@taqueria/protocol/Settings';
-import yargs from 'https://deno.land/x/yargs@v17.4.0-deno/deno.ts';
+import yargs from 'deno-yargs';
 
 // TODO: There should be an ActionResponse type that we're extending here.
 // This probably exists already in the taqueria-sdk and should be moved to the
