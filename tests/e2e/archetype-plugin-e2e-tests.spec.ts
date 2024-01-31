@@ -34,7 +34,7 @@ describe('Archetype Plugin E2E Testing for Taqueria CLI', () => {
 
 	test('archetype plugin will support cli options', async () => {
 		const { execute, cleanup, spawn } = await prepareEnvironment();
-		const { waitForText } = await spawn('taq', 'init test-project --debug');
+		const { waitForText } = await spawn('taq', 'init test-project');
 		await waitForText("Project taq'ified!");
 
 		const { stdout } = await execute('taq', 'install ../taqueria-plugin-archetype', './test-project');
