@@ -17,7 +17,7 @@
 		"deno-yargs-types": "https://deno.land/x/yargs@v17.4.0-deno/deno-types.ts",
 		"deno-yargs": "https://deno.land/x/yargs@v17.4.0-deno/deno.ts",
 		"deno-stdlib-streams": "https://deno.land/std@0.213.0/streams/mod.ts",
-		"deno-asserts": "https://deno.land/std@0.213.0/testing/asserts.ts",
+		"deno-asserts": "https://deno.land/std@0.213.0/assert/mod.ts",
 		"deno-stdlib-fs": "https://deno.land/std@0.213.0/fs/mod.ts",
 		"retronid": "https://cdn.skypack.dev/retronid",
 		"@taqueria/analytics": "./taqueria-analytics/index.ts",

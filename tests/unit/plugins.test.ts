@@ -137,7 +137,7 @@ Deno.test('inject()', async t => {
 
 	await t.step('execPluginText() throws an error when given an invalid command', () => {
 		const { execPluginText } = pluginLib.__TEST__;
-		assertRejects<TaqError.E_TaqError>(() => toPromise(execPluginText(['foobar'])));
+		assertRejects(() => toPromise(execPluginText(['foobar'])));
 		assertEquals(deps.stderr.toString(), '');
 		assertEquals(deps.stdout.toString(), '');
 	});
@@ -168,7 +168,7 @@ Deno.test('inject()', async t => {
 
 	await t.step('execPluginPassThru() throws an error when given an invalid command', () => {
 		const { execPluginPassthru } = pluginLib.__TEST__;
-		assertRejects<TaqError.E_TaqError>(() => toPromise(execPluginPassthru(['foobar'])));
+		assertRejects(() => toPromise(execPluginPassthru(['foobar'])));
 		assertEquals(deps.stderr.toString(), '');
 		assertEquals(deps.stdout.toString(), '');
 	});
