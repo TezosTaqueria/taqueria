@@ -7,6 +7,6 @@ export interface EnvVars {
 }
 
 export interface UtilsDependencies {
-	stdout: Deno.Writer;
-	stderr: Deno.Writer;
+	stdout: typeof Deno.stdout;
+	stderr: typeof Deno.stderr;
 }

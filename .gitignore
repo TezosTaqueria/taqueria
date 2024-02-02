@@ -180,3 +180,4 @@ tests/e2e/data/smartpy-data/__pycache__
 /**/*.vsix
 
 /.npmrc
+.aider*

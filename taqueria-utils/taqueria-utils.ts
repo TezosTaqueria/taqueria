@@ -334,43 +334,51 @@ export const inject = (deps: UtilsDependencies) => {
 					previous,
 				} as TaqError.t;
 			}
+			let subprocess: Deno.ChildProcess;
 			try {
-				const process = Deno.run({
-					cmd: ['sh', '-c', `${command}`],
-					cwd,
-					stdout: 'piped',
-					stderr: 'piped',
-				});
+				debugger;
+				let output = '', errOutput = '', code = 0;
+				const cmd = new Deno.Command('sh', { cwd: cwd, stdout: 'piped', 'stderr': 'piped', args: ['-c', command] });
+				subprocess = cmd.spawn();
 
-				// Output for the subprocess' stderr should be copied to the parent stderr
-				const errOutput = await (async () => {
-					if (bufferOutput) {
-						const output = await process.stderrOutput();
-						const decoder = new TextDecoder();
-						return decoder.decode(output);
-					} else {
-						await copy(process.stderr, stderr);
-						process.stderr.close();
-					}
-				})();
+				if (bufferOutput) {
+					const result = await subprocess.output();
+					const textDecoder = new TextDecoder();
 
-				// Get output. Buffer if desired
-				const output = await (async () => {
-					if (bufferOutput) {
-						const output = await process.output();
-						const decoder = new TextDecoder();
-						return decoder.decode(output);
-					} else {
-						await copy(process.stdout, stdout);
-						process.stdout.close();
+					output = textDecoder.decode(result.stdout);
+					errOutput = textDecoder.decode(result.stderr);
+				} else {
+					const stdoutReader = subprocess.stdout.getReader();
+					try {
+						while (true) {
+							const { done, value } = await stdoutReader.read();
+							if (done) break;
+							await stdout.write(value);
+						}
+					} finally {
+						stdoutReader.releaseLock();
 					}
-				})();
+
+					// Manually read from the subprocess stderr and write to Deno.stderr
+					const stderrReader = subprocess.stderr.getReader();
+					try {
+						while (true) {
+							const { done, value } = await stderrReader.read();
+							if (done) break;
+							await stderr.write(value);
+						}
+					} finally {
+						stderrReader.releaseLock();
+					}
+				}
 
 				// Wait for subprocess to exit
-				const status = await process.status();
-				Deno.close(process.rid);
-				return [status.code, output ?? '', errOutput ?? ''];
+				const status = await subprocess.status;
+				code = status.code;
+
+				return [code, output ?? '', errOutput ?? ''];
 			} catch (previous) {
+				debugger;
 				throw {
 					kind: 'E_FORK',
 					msg: `There was a problem trying to run: ${command}`,

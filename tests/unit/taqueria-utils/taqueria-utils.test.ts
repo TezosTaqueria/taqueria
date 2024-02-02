@@ -165,7 +165,6 @@ Deno.test('execText() can execute a command without buffering', async () => {
 	const stdErr = stderr as MockWriter;
 	stdOut.clear();
 	stdErr.clear();
-
 	const retval = await toPromise(execText('echo foobar', {}));
 	assert(Array.isArray(retval));
 	assertEquals(retval[0], 0);
