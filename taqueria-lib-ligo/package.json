@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/lib-ligo",
-	"version": "0.48.20",
+	"version": "0.48.21",
 	"description": "A taqueria library which provides common functionality for the LIGO and LIGO Legacy Plugins",
 	"targets": {
 		"default": {
@@ -41,7 +41,7 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.48.20",
+		"@taqueria/node-sdk": "^0.48.21",
 		"fast-glob": "^3.3.2"
 	},
 	"devDependencies": {

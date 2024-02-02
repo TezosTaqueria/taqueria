@@ -293,10 +293,23 @@ export const inject = (deps: UtilsDependencies) => {
 			return Promise.resolve([status.code, '', '']);
 		});
 
+	const decodeText = (result: Deno.CommandOutput): Promise<[string, string]> => {
+		const textDecoder = new TextDecoder();
+		return Promise.resolve([textDecoder.decode(result.stdout), textDecoder.decode(result.stderr)]);
+	};
+
 	const execText = (
 		cmdTemplate: string,
 		inputArgs: Record<string, unknown>,
 		bufferOutput = false,
+		cwd?: SanitizedAbsPath.t,
+	): Future<TaqError.t, [number, string, string]> =>
+		execCmd(cmdTemplate, inputArgs, bufferOutput ? decodeText : undefined, cwd);
+
+	const execCmd = (
+		cmdTemplate: string,
+		inputArgs: Record<string, unknown>,
+		bufferOutput?: (result: Deno.CommandOutput) => Promise<[string, string]>,
 		cwd?: SanitizedAbsPath.t,
 	): Future<TaqError.t, [number, string, string]> =>
 		attemptP(async () => {
@@ -336,17 +349,13 @@ export const inject = (deps: UtilsDependencies) => {
 			}
 			let subprocess: Deno.ChildProcess;
 			try {
-				debugger;
 				let output = '', errOutput = '', code = 0;
 				const cmd = new Deno.Command('sh', { cwd: cwd, stdout: 'piped', 'stderr': 'piped', args: ['-c', command] });
 				subprocess = cmd.spawn();
 
 				if (bufferOutput) {
 					const result = await subprocess.output();
-					const textDecoder = new TextDecoder();
-
-					output = textDecoder.decode(result.stdout);
-					errOutput = textDecoder.decode(result.stderr);
+					[output, errOutput] = await bufferOutput(result);
 				} else {
 					const stdoutReader = subprocess.stdout.getReader();
 					try {
@@ -408,6 +417,7 @@ export const inject = (deps: UtilsDependencies) => {
 		dirOf,
 		renderTemplate,
 		execText,
+		execCmd,
 		toPromise,
 		stdout,
 		stderr,
