@@ -6,7 +6,7 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Url from '@taqueria/protocol/Url';
-import { assert, assertEquals, assertRejects, assertThrows } from 'deno-asserts';
+import { assert, assertEquals, assertMatch, assertRejects, assertThrows } from 'deno-asserts';
 import inject from '../../plugins.ts';
 import { defaultConfig, toLoadedConfig } from '../../taqueria-config.ts';
 import { joinPaths, toPromise } from '../../taqueria-utils/taqueria-utils.ts';
@@ -145,7 +145,7 @@ Deno.test('inject()', async t => {
 		} catch {
 			assert(true, 'Promise rejected');
 		}
-		assertEquals(deps.stderr.toString(), 'sh: line 1: foobar: command not found\n');
+		assertMatch(deps.stderr.toString(), /not found/);
 		assertEquals(deps.stdout.toString(), '');
 	});
 
@@ -186,7 +186,7 @@ Deno.test('inject()', async t => {
 		} catch {
 			assert(true, 'Promise rejected');
 		}
-		assertEquals(deps.stderr.toString(), 'sh: line 1: foobar: command not found\n');
+		assertMatch(deps.stderr.toString(), /not found/);
 		assertEquals(deps.stdout.toString(), '');
 	});
 

@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/lerna/schemas/lerna-schema.json",
-  "version": "0.48.22",
+  "version": "0.48.23",
   "packages": [
     "taqueria-protocol",
     "taqueria-lib*",
