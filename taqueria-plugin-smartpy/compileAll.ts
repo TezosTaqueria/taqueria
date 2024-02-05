@@ -27,7 +27,6 @@ export const compileAll = async (parsedArgs: CompileAllOpts): Promise<void> => {
 
 		const data = await allFiles.reduce(
 			async (acc, contractAbsPath) => {
-				debugger;
 				const contractRelPath = contractAbsPath.replace(contractsAbsPath, '').replace(/^\//, '');
 				if (
 					isSmartPyFile(contractAbsPath)

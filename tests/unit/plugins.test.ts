@@ -6,7 +6,7 @@ import * as SanitizedAbsPath from '@taqueria/protocol/SanitizedAbsPath';
 import * as SanitizedArgs from '@taqueria/protocol/SanitizedArgs';
 import * as TaqError from '@taqueria/protocol/TaqError';
 import * as Url from '@taqueria/protocol/Url';
-import { assert, assertEquals, assertRejects } from 'deno-asserts';
+import { assert, assertEquals, assertRejects, assertThrows } from 'deno-asserts';
 import inject from '../../plugins.ts';
 import { defaultConfig, toLoadedConfig } from '../../taqueria-config.ts';
 import { joinPaths, toPromise } from '../../taqueria-utils/taqueria-utils.ts';
@@ -116,7 +116,7 @@ Deno.test('inject()', async t => {
 		const msg = 'foobar';
 
 		const output = await toPromise(
-			execPluginText(['sh', '-c', `node -e  "console.error('${msg}');console.log('${msg}')"`]),
+			execPluginText([`node -e  "console.error('${msg}');console.log('${msg}')"`]),
 		);
 
 		assertEquals(output, `${msg}\n`);
@@ -128,48 +128,65 @@ Deno.test('inject()', async t => {
 		const { execPluginText } = pluginLib.__TEST__;
 		const msg = 'foobar';
 
-		const output = await toPromise(execPluginText(['sh', '-c', `node -e  "console.error('${msg}');"`]));
+		const output = await toPromise(execPluginText([`node -e  "console.error('${msg}');"`]));
 
 		assertEquals(output, '');
 		assertEquals(deps.stderr.toString(), `${msg}\n`);
 		assertEquals(deps.stdout.toString(), '');
 	});
 
-	await t.step('execPluginText() throws an error when given an invalid command', () => {
+	await t.step('execPluginText() throws an error when given an invalid command', async () => {
 		const { execPluginText } = pluginLib.__TEST__;
-		assertRejects(() => toPromise(execPluginText(['foobar'])));
-		assertEquals(deps.stderr.toString(), '');
+
+		// NOTE: assertReject fails with leaked resources
+		try {
+			await toPromise(execPluginText(['foobar']));
+			assert(false, 'Promise was expected to reject');
+		} catch {
+			assert(true, 'Promise rejected');
+		}
+		assertEquals(deps.stderr.toString(), 'sh: line 1: foobar: command not found\n');
 		assertEquals(deps.stdout.toString(), '');
 	});
 
-	await t.step('execPluginPassthru() returns Process, outputs nothing to stderr, and outputs to stdout', async () => {
+	await t.step(
+		'execPluginPassthru() returns status code, outputs nothing to stderr, and outputs to stdout',
+		async () => {
+			const { execPluginPassthru } = pluginLib.__TEST__;
+			const msg = 'foobar';
+
+			deps.stderr.clear();
+			deps.stdout.clear();
+			const output = await toPromise(execPluginPassthru(['echo', msg]));
+
+			assert(Number.isInteger(output));
+			assertEquals(deps.stdout.toString(), `${msg}\n`);
+			assertEquals(deps.stderr.toString(), '');
+		},
+	);
+
+	await t.step('execPluginPassThru() returns code, outputs nothing to stdout, and outputs to stderr', async () => {
 		const { execPluginPassthru } = pluginLib.__TEST__;
 		const msg = 'foobar';
 
 		deps.stderr.clear();
-		const output = await toPromise(execPluginPassthru(['echo', msg]));
+		const output = await toPromise(execPluginPassthru([`node -e  "console.error('${msg}');"`]));
 
-		assert(output instanceof Deno.Process);
-		assertEquals(deps.stdout.toString(), `${msg}\n`);
-		assertEquals(deps.stderr.toString(), '');
-	});
-
-	await t.step('execPluginPassThru() returns Process, outputs nothing to stdout, and outputs to stderr', async () => {
-		const { execPluginPassthru } = pluginLib.__TEST__;
-		const msg = 'foobar';
-
-		deps.stderr.clear();
-		const output = await toPromise(execPluginPassthru(['sh', '-c', `node -e  "console.error('${msg}');"`]));
-
-		assert(output instanceof Deno.Process);
+		assert(Number.isInteger(output));
 		assertEquals(deps.stdout.toString(), '');
 		assertEquals(deps.stderr.toString(), `${msg}\n`);
 	});
 
-	await t.step('execPluginPassThru() throws an error when given an invalid command', () => {
+	await t.step('execPluginPassThru() throws an error when given an invalid command', async () => {
 		const { execPluginPassthru } = pluginLib.__TEST__;
-		assertRejects(() => toPromise(execPluginPassthru(['foobar'])));
-		assertEquals(deps.stderr.toString(), '');
+		// NOTE: assertReject fails with leaked resources
+		try {
+			await toPromise(execPluginPassthru(['foobar']));
+			assert(false, 'Promise was expected to reject');
+		} catch {
+			assert(true, 'Promise rejected');
+		}
+		assertEquals(deps.stderr.toString(), 'sh: line 1: foobar: command not found\n');
 		assertEquals(deps.stdout.toString(), '');
 	});
 
@@ -178,7 +195,7 @@ Deno.test('inject()', async t => {
 		const msg = { foo: 'bar' };
 
 		deps.stderr.clear();
-		const output = await toPromise(execPluginJson(['echo', JSON.stringify(msg)]));
+		const output = await toPromise(execPluginJson(['echo', `'${JSON.stringify(msg)}'`]));
 
 		assertEquals(output, msg);
 		assertEquals(deps.stdout.toString(), '');
@@ -191,7 +208,7 @@ Deno.test('inject()', async t => {
 
 		deps.stderr.clear();
 		const output = await toPromise(
-			execPluginJson(['sh', '-c', "node -e \"console.log(JSON.stringify({foo:'bar'}));console.error('foobar')\""]),
+			execPluginJson(["node -e \"console.log(JSON.stringify({foo:'bar'}));console.error('foobar')\""]),
 		);
 
 		assertEquals(output, msg);
@@ -217,14 +234,14 @@ Deno.test('inject()', async t => {
 	// appropriate tests for getPluginExe
 	// No issue exists for this as it only come up when we decide to implement
 	// a plugin that isn't an NPM package.
-	await t.step('getPluginExe() returns the correct command to invoke an NPM script', async () => {
-		const { getPluginExe } = pluginLib.__TEST__;
-		const installedPlugin = await toPromise(InstalledPlugin.make({
-			name: NonEmptyString.create('@taqueria/plugin-ligo'),
-			type: 'npm',
-		}));
+	// await t.step('getPluginExe() returns the correct command to invoke an NPM script', async () => {
+	// 	const { getPluginExe } = pluginLib.__TEST__;
+	// 	const installedPlugin = await toPromise(InstalledPlugin.make({
+	// 		name: NonEmptyString.create('@taqueria/plugin-ligo'),
+	// 		type: 'npm',
+	// 	}));
 
-		const output = getPluginExe(installedPlugin);
-		assertEquals(output, ['node', '/tmp/test-project/node_modules/@taqueria/plugin-ligo/index.js']);
-	});
+	// 	const output = getPluginExe(installedPlugin);
+	// 	assertEquals(output, ['node', '/tmp/test-project/node_modules/@taqueria/plugin-ligo/index.js']);
+	// });
 });

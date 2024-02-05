@@ -11,16 +11,20 @@ import { LoadedConfig } from './taqueria-types.ts';
 import * as utils from './taqueria-utils/taqueria-utils.ts';
 
 // Third-party dependencies
-import { copy } from 'deno-stdlib-io-copy';
-import { attemptP, chain, chainRej, FutureInstance as Future, map, mapRej, parallel, reject, resolve } from 'fluture';
+import {
+	attemptP,
+	chain,
+	chainRej,
+	coalesce,
+	FutureInstance as Future,
+	map,
+	mapRej,
+	parallel,
+	reject,
+	resolve,
+} from 'fluture';
 import { pipe } from 'fun';
 import clipboard from 'https://raw.githubusercontent.com/mweichert/clipboard/master/mod.ts';
-
-// Get utils
-const { joinPaths, readJsonFile, writeTextFile, decodeJson, eager } = utils.inject({
-	stdout: Deno.stdout,
-	stderr: Deno.stderr,
-});
 
 // No-operation
 // noop: () -> void
@@ -30,6 +34,12 @@ const noop = (): void => {};
 export const inject = (deps: PluginDeps) => {
 	// Extract injected dependencies for easy reference
 	const { i18n, env, config, parsedArgs, stdout, stderr } = deps;
+
+	// Get utils
+	const { joinPaths, readJsonFile, writeTextFile, decodeJson, eager, execCmd, execText } = utils.inject({
+		stdout,
+		stderr,
+	});
 
 	// Logs a request to a plugin to stdout if logPluginRequests has been
 	// set to true for parsedArgs
@@ -62,62 +72,26 @@ export const inject = (deps: PluginDeps) => {
 
 	// Invokes a command which will
 	const execPluginText = (cmd: string[]): Future<TaqError.t, string> =>
-		attemptP(
-			async () => {
-				let status = undefined;
-				try {
-					const process = Deno.run({ cmd, stdout: 'piped', stderr: 'piped' });
-					status = await process.status();
-					const output = await process.output();
-					await copy(process.stderr, stderr);
-					const decoder = new TextDecoder();
-					process.stderr.close();
-					await process.status();
-					process.close();
-					const retval = await decoder.decode(output);
-					return retval;
-				} catch (previous) {
-					throw {
-						kind: 'E_EXEC',
-						msg: 'Could not execute command',
-						context: status !== undefined
-							? `Exit code: ${status}, Command: ${cmd}`
-							: cmd,
-						previous,
-					};
-				}
-			},
+		pipe(
+			execText(cmd.join(' '), {}, true),
+			chain(([status, output, errOutput]) => {
+				stderr.writeSync(new TextEncoder().encode(errOutput));
+				if (status !== 0) return reject(TaqError.create({ kind: 'E_EXEC', msg: errOutput }));
+				return resolve(output);
+			}),
 		);
 
 	// Invokes a command which will print to stdout and stderr
-	// execPluginPassthru: string[] -> Future<TaqError, Deno.Process>
-	const execPluginPassthru = (cmd: string[]): Future<TaqError.t, Deno.Process> =>
-		attemptP(
-			async () => {
-				try {
-					const process = Deno.run({ cmd, stdout: 'piped', stderr: 'piped' });
-					await Promise.all([copy(process.stderr, stderr), copy(process.stdout, stdout)]);
-					process.stderr.close();
-					process.stdout.close();
-					const status = await process.status();
-					if (!status.success) {
-						throw TaqError.create({
-							kind: 'E_EXEC',
-							msg: `The plugin returned a status code of ${status.code}`,
-							context: cmd,
-						});
-					}
-					process.close();
-					return process;
-				} catch (previous) {
-					throw {
-						kind: 'E_EXEC',
-						msg: 'There was a problem executing the task.',
-						context: cmd,
-						previous,
-					};
+	const execPluginPassthru = (cmd: string[]): Future<TaqError.t, number> =>
+		pipe(
+			execCmd(cmd.join(' '), {}, undefined),
+			map(([status]) => status),
+			chain(status => {
+				if (status !== 0) {
+					return reject(TaqError.create({ kind: 'E_EXEC', msg: `${cmd} returned a non-zero status: ${status}` }));
 				}
-			},
+				return resolve(status);
+			}),
 		);
 
 	// Invokes a command which is expected to return JSON on stdout
@@ -167,7 +141,7 @@ export const inject = (deps: PluginDeps) => {
 				...toPluginArguments(requestArgs),
 			];
 
-			const shellCmd = ['sh', '-c', cmd.join(' ')];
+			const shellCmd = [cmd.join(' ')];
 
 			return pipe(
 				// TODO: Clear side-effect here. Can we handle this better?

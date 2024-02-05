@@ -9,6 +9,8 @@ import {
 	attemptP,
 	chain,
 	chainRej,
+	coalesce,
+	fork,
 	FutureInstance as Future,
 	map,
 	mapRej,
@@ -295,7 +297,17 @@ export const inject = (deps: UtilsDependencies) => {
 
 	const decodeText = (result: Deno.CommandOutput): Promise<[string, string]> => {
 		const textDecoder = new TextDecoder();
-		return Promise.resolve([textDecoder.decode(result.stdout), textDecoder.decode(result.stderr)]);
+		let output = '', errOutput = '';
+		try {
+			output = textDecoder.decode(result.stdout);
+		} catch {
+		}
+
+		try {
+			errOutput = textDecoder.decode(result.stderr);
+		} catch {
+		}
+		return Promise.resolve([output, errOutput]);
 	};
 
 	const execText = (
@@ -361,8 +373,8 @@ export const inject = (deps: UtilsDependencies) => {
 					try {
 						while (true) {
 							const { done, value } = await stdoutReader.read();
+							if (value) await stdout.write(value);
 							if (done) break;
-							await stdout.write(value);
 						}
 					} finally {
 						stdoutReader.releaseLock();
@@ -373,8 +385,8 @@ export const inject = (deps: UtilsDependencies) => {
 					try {
 						while (true) {
 							const { done, value } = await stderrReader.read();
+							if (value) await stderr.write(value);
 							if (done) break;
-							await stderr.write(value);
 						}
 					} finally {
 						stderrReader.releaseLock();
@@ -384,10 +396,8 @@ export const inject = (deps: UtilsDependencies) => {
 				// Wait for subprocess to exit
 				const status = await subprocess.status;
 				code = status.code;
-
 				return [code, output ?? '', errOutput ?? ''];
 			} catch (previous) {
-				debugger;
 				throw {
 					kind: 'E_FORK',
 					msg: `There was a problem trying to run: ${command}`,

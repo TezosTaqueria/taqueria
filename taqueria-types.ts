@@ -72,8 +72,8 @@ export interface PreExtendDeps {
 	readonly parsedArgs: SanitizedArgs.t;
 	readonly env: EnvVars;
 	readonly i18n: i18n;
-	readonly stdout: Deno.Writer;
-	readonly stderr: Deno.Writer;
+	readonly stdout: typeof Deno.stdout;
+	readonly stderr: typeof Deno.stderr;
 }
 
 // Common dependencies after we retrieved the config
