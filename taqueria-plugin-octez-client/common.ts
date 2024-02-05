@@ -2,12 +2,13 @@ import { getArchSync, getDockerImage, ProxyTaskArgs, RequestArgs } from '@taquer
 import { join } from 'path';
 
 // Should point to the latest stable version, so it needs to be updated as part of our release process.
-const getFlextesaImage = (_arch: 'linux/arm64/v8' | 'linux/amd64'): string => 'oxheadalpha/flextesa:20230915';
+const getFlextesaImage = (_arch: 'linux/arm64/v8' | 'linux/amd64'): string =>
+	'tezos/tezos:master_9a1982bb_20240205174255';
 
-const FLEXTESA_IMAGE_ENV_VAR = 'TAQ_FLEXTESA_IMAGE';
+const OCTEZ_CLIENT_IMAGE_ENV_VAR = 'TAQ_OCTEZ_CLIENT_IMAGE';
 
 export const getClientDockerImage = (): string =>
-	getDockerImage(getFlextesaImage(getArchSync()), FLEXTESA_IMAGE_ENV_VAR);
+	getDockerImage(getFlextesaImage(getArchSync()), OCTEZ_CLIENT_IMAGE_ENV_VAR);
 
 export interface ClientOpts extends ProxyTaskArgs.t {
 	command: string;
@@ -31,7 +32,7 @@ export type IntersectionOpts = ClientOpts & TypeCheckOpts & TypeCheckAllOpts & S
 
 type UnionOpts = ClientOpts | TypeCheckOpts | TypeCheckAllOpts | SimulateOpts;
 
-const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://rpc.ghostnet.teztnets.xyz';
+const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://ghostnet.tezos.marigold.dev';
 export const GLOBAL_OPTIONS = `--endpoint ${ENDPOINT}`;
 
 export const trimTezosClientMenuIfPresent = (msg: string): string => {

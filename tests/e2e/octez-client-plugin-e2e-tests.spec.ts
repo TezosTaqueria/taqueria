@@ -93,7 +93,7 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		expect(stdout).toContain('Plugin installed successfully');
 
 		const { stdout: stdout1, stderr } = await execute('taq', 'typecheck no_such_contract.tz', './test-project');
-		expect(stdout1).toEqual(expect.arrayContaining(['│ no_such_contract.tz │ N/A    │']));
+		expect(stdout1.join()).toContain('Invalid');
 
 		await cleanup();
 	});
@@ -156,7 +156,7 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 			'simulate no_such_contract.tz --param integerParameter10.tz --storage anyContract.storage.tz',
 			'./test-project',
 		);
-		expect(stdout1).toEqual(expect.arrayContaining(['│ no_such_contract.tz │ N/A    │']));
+		expect(stdout1.join()).toContain('Invalid');
 
 		await cleanup();
 	});
