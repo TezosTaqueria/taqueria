@@ -3,7 +3,7 @@
 	"displayName": "Taqueria (by Pinnacle Labs)",
 	"description": "A better way to build on Tezos",
 	"publisher": "PinnacleLabs",
-	"version": "0.48.23",
+	"version": "0.48.24",
 	"private": true,
 	"engines": {
 		"vscode": "^1.84.2"
@@ -726,8 +726,8 @@
 	},
 	"dependencies": {
 		"@microsoft/signalr": "^8.0.0",
-		"@taqueria/analytics": "^0.48.23",
-		"@taqueria/protocol": "^0.48.23",
+		"@taqueria/analytics": "^0.48.24",
+		"@taqueria/protocol": "^0.48.24",
 		"cli-table3": "^0.6.3",
 		"comment-json": "^4.2.3",
 		"eventsource": "^2.0.2",

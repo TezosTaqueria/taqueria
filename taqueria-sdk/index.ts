@@ -257,7 +257,7 @@ export const sendJsonRes = <T>(data: T, messages?: { header?: string; footer?: s
 			messages,
 		});
 
-export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data));
+export const sendAsyncJsonRes = <T>(data: T) => Promise.resolve(sendJsonRes(data)).then(() => {});
 
 export const noop = () => {};
 
