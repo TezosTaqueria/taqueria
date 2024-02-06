@@ -1,7 +1,7 @@
 {
 	"name": "taqueria-vscode-extension-web-ui",
 	"private": true,
-	"version": "0.48.29",
+	"version": "0.48.30",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
