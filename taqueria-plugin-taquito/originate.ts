@@ -112,7 +112,7 @@ function withIntervalHack(fn: CallableFunction) {
 	};
 }
 
-const performOriginateOps = withIntervalHack((
+const performOriginateOps = withIntervalHack(async (
 	tezos: TezosToolkit,
 	env: string,
 	contractsInfo: ContractInfo[],
@@ -122,7 +122,7 @@ const performOriginateOps = withIntervalHack((
 	const batch = createBatchForOriginate(tezos, contractsInfo);
 
 	try {
-		return doWithin<BatchWalletOperation>(maxTimeout, async () => {
+		return await doWithin<BatchWalletOperation>(maxTimeout, async () => {
 			const op = await batch.send();
 			await op.confirmation(isSandbox ? 1 : 3);
 			return op;
