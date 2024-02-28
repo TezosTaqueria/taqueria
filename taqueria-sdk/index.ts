@@ -58,7 +58,10 @@ const readJsonFileInner = <T>(filename: string): Promise<T> =>
 	readFile(filename, { encoding: 'utf-8' })
 		.then(JSON.parse)
 		.then(result => (result as T));
+
 export const readJsonFile = readJsonFileInterceptConfig(readJsonFileInner);
+
+export const readJsonFileWithoutTransform = readJsonFileInner;
 
 export type FilteredStdErr = {
 	skip: boolean;
