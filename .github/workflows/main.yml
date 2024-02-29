@@ -18,10 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
+          # cache: "npm"
           
       - uses: denoland/setup-deno@v1
         with:
@@ -83,7 +83,7 @@ jobs:
       steps:
         - uses: actions/checkout@v2
 
-        - uses: actions/setup-node@v3
+        - uses: actions/setup-node@v4
           with:
             node-version: 20
             cache: "npm"
@@ -221,7 +221,7 @@ jobs:
       - name: Extract work archive
         run: tar -xzpf work.tar.gz
 
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "npm"
@@ -466,7 +466,7 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.list-e2e-tests.outputs.matrix)}}
     steps:
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
       - uses: actions/setup-python@v2
@@ -518,7 +518,7 @@ jobs:
     strategy:
       matrix: ${{fromJson(needs.list-integration-tests.outputs.matrix)}}
     steps:
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
@@ -547,7 +547,7 @@ jobs:
       - build-packages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
