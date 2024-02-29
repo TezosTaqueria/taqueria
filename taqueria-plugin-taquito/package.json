@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-taquito",
-	"version": "0.49.6",
+	"version": "0.49.7",
 	"description": "A taqueria plugin for originating smart contracts using Taquito",
 	"targets": {
 		"default": {
@@ -42,7 +42,7 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.49.6",
+		"@taqueria/node-sdk": "^0.49.7",
 		"@taquito/michel-codec": "^19.0.0",
 		"@taquito/signer": "^19.0.0",
 		"@taquito/taquito": "^19.0.0",
