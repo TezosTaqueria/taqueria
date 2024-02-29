@@ -33,11 +33,14 @@ jobs:
           path: ${{ env.DENO_DIR }}
           key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
-      - name: Build Binaries
-        run: |
-          npm ci
-          npm run build-types
-          npm run build:binary
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build types
+        run: npm run build-types
+
+      - name: Build binary
+        run: npm run build:binary
           
       - name: Save Deno Cache
         uses: actions/cache/save@v3
