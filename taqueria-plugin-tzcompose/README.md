@@ -1,6 +1,6 @@
-# Hello World Plugin for Taqueria
+# Tzcompose Plugin for Taqueria
 
-The Hello World plugin provides a basic example of a Taqueria plugin. This plugin is intended to be used as a template for creating new plugins.
+This plugin provides integration with tzcompose, a tool by Blockwatch that provides an automation framework for complex transaction sequences on Tezos.
 
 It is written in TypeScript and compiled to a JavaScript bundle for NodeJS using [tsup](https://github.com/egoist/tsup) and uses the `@taqueria/node-sdk` - as are all plugins that the Pinnacle Labs team develops for Taqueria.
 
@@ -11,30 +11,24 @@ It is written in TypeScript and compiled to a JavaScript bundle for NodeJS using
 
 ## Building
 
-To build the Hello World plugin, run the following command from the root of this repository:
+To build the Tzcompose plugin, run the following command from the root of this repository:
 
 ```shell
-npm run build -w taqueria-plugin-helloworld
+npm run build -w taqueria-plugin-tzcompose
 ```
 
 ## Installation
 
-To install the Hello World plugin on a Taqueria project, navigate to the project folder and run:
+To install the Tzcompose plugin on a Taqueria project, navigate to the project folder and run:
 
 ```shell
 cd [taqueria-project]
 taq init # if the project isn't already initialized
-taq install /path/to/taqueria-repo/taqueria-plugin-helloworld
+taq install @taqueria/plugin-tzcompose
 ```
 
 ## Usage:
 
-The Hello World plugin provides a single command to Taqueria: `taq hello`.
+The Tzcompose plugin provides a single command to Taqueria: `taq run [pipeline.yaml]`.
 
-## Plugin Development
-
-We suggest cloning our hello-world plugin and using as a boilerplate.
-
-See the following documentation from our Taqueria website, [taqueria.io](https://taqueria.io):
-- [Building a Taqueria Plugin](https://taqueria.io/docs/taqueria-dev/making-plugins/)
-- [Taqueria Architecture](https://taqueria.io/docs/taqueria-internals/architecture/)
+For more information of how to create a YAML file for your pipelines, please see the Tzcompose [[documentation]](https://github.com/blockwatch-cc/tzgo/blob/master/cmd/tzcompose/README.md).
