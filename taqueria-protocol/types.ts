@@ -51,7 +51,7 @@ export type Option = {
 	flag: Verb;
 	description: NonEmptyString;
 	defaultValue?: string | number | boolean;
-	type?: 'string' | 'number' | 'boolean';
+	type?: 'string' | 'number' | 'boolean' | 'count';
 	required?: boolean;
 	boolean?: boolean;
 	choices?: NonEmptyString[];

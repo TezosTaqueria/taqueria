@@ -212,22 +212,57 @@ const getStartCommand = async (sandboxName: string, sandbox: SandboxConfig.t, op
 		);
 		await replaceRpcUrlInConfig(newPort, sandbox.rpcUrl.toString(), sandboxName, opts);
 	}
-	const ports = `-p ${newPort}:30000 --expose 30000`;
+	const ports = `-p ${newPort}:20000 --expose 20000`;
 
 	const containerName = await getContainerName(opts);
+	const mininetCmd = await getMininetCommand(sandboxName, sandbox, opts);
 	const arch = await getArch();
 	const image = getImage(opts);
 	const projectDir = process.env.PROJECT_DIR ?? opts.config.projectDir;
 	const proxyAbsPath = `${__dirname}/proxy.py`;
 
-	return `docker run -i --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project -v ${proxyAbsPath}:/opt/proxy.py ${image} /bin/sh -c "apk add py3-pip && python3 /opt/proxy.py"`;
+	return `docker run -i --network sandbox_${sandboxName}_net --name ${containerName} --rm --detach --platform ${arch} ${ports} -v ${projectDir}:/project ${image} /bin/sh -c "flextesa_node_cors_origin=* ${mininetCmd}"`;
 };
 
-const startMininet = async (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) => {
-	const containerName = await getContainerName(opts);
-	const mininetCmd = await getMininetCommand(sandboxName, sandbox, opts);
-	const cmd = `docker exec -d ${containerName} sh -c "flextesa_node_cors_origin='*' ${mininetCmd}"`;
-	return execCmd(cmd);
+// const startMininet = async (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts) => {
+// 	const containerName = await getContainerName(opts);
+// 	const mininetCmd = await getMininetCommand(sandboxName, sandbox, opts);
+// 	const cmd = `docker exec -d ${containerName} sh -c "flextesa_node_cors_origin='*' ${mininetCmd}"`;
+// 	return execCmd(cmd);
+// };
+
+const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts): Promise<void> => {
+	if (doesNotUseFlextesa(sandbox)) {
+		return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`);
+	}
+
+	return Promise.resolve(opts)
+		.then(addSandboxAccounts)
+		.then(loadedConfig => {
+			console.log('Booting sandbox...');
+			return getStartCommand(sandboxName, sandbox, opts).then(execCmd)
+				.then(() => {
+					console.log('Importing accounts...');
+					return importSandboxAccounts(opts)(loadedConfig);
+				});
+		})
+		.then(() => importBaker(opts))
+		// .then(() => {
+		// 	console.log('Starting node...');
+		// 	return startMininet(sandboxName, sandbox, opts);
+		// })
+		.then(() => configureTezosClient(sandboxName, opts))
+		.then(() => {
+			console.log('Waiting for bootstrapping to complete...');
+			return waitForBootstrap(opts);
+		})
+		.then(() => {
+			console.log('Funding declared accounts (please wait)...');
+			return new Promise(resolve => setTimeout(resolve, 10000)).then(() => fundDeclaredAccounts(opts));
+		})
+		.then(() => {
+			console.log(`The sandbox "${sandboxName}" is ready.`);
+		});
 };
 
 const getConfigureCommand = async (opts: ValidOpts): Promise<string> => {
@@ -247,40 +282,6 @@ const waitForBootstrap = (parsedArgs: ValidOpts): unknown => {
 		.catch(({ stderr }) => {
 			if (stderr.includes('Failed to acquire the protocol version from the node')) return waitForBootstrap(parsedArgs);
 			throw stderr;
-		});
-};
-
-const startSandbox = (sandboxName: string, sandbox: SandboxConfig.t, opts: ValidOpts): Promise<void> => {
-	if (doesNotUseFlextesa(sandbox)) {
-		return sendAsyncErr(`Cannot start ${sandbox.label} as its configured to use the ${sandbox.plugin} plugin.`);
-	}
-
-	return Promise.resolve(opts)
-		.then(addSandboxAccounts)
-		.then(loadedConfig => {
-			console.log('Booting sandbox...');
-			return getStartCommand(sandboxName, sandbox, opts).then(execCmd)
-				.then(() => {
-					console.log('Importing accounts...');
-					return importSandboxAccounts(opts)(loadedConfig);
-				});
-		})
-		.then(() => importBaker(opts))
-		.then(() => {
-			console.log('Starting node...');
-			return startMininet(sandboxName, sandbox, opts);
-		})
-		.then(() => configureTezosClient(sandboxName, opts))
-		.then(() => {
-			console.log('Waiting for bootstrapping to complete...');
-			return waitForBootstrap(opts);
-		})
-		.then(() => {
-			console.log('Funding declared accounts (please wait)...');
-			return new Promise(resolve => setTimeout(resolve, 10000)).then(() => fundDeclaredAccounts(opts));
-		})
-		.then(() => {
-			console.log(`The sandbox "${sandboxName}" is ready.`);
 		});
 };
 
