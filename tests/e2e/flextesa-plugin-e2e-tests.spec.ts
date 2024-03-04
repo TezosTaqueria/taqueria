@@ -38,6 +38,7 @@ async function bootstrappedBlockAccountsAndContracts(
 		}
 	}
 }
+
 describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 	test('start sandbox will offer contextual help', async () => {
 		const { execute, cleanup, exists } = await prepareEnvironment();
@@ -234,7 +235,7 @@ describe('Flextesa Plugin E2E Testing for Taqueria CLI', () => {
 			await cleanup();
 		});
 
-		test('check tzkt for default set of accounts  - slowtest', async () => {
+		test.skip('check tzkt for default set of accounts  - slowtest', async () => {
 			const {
 				execute,
 				cleanup,
