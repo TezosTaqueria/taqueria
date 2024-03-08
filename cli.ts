@@ -241,6 +241,12 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 		isRunning: (parsedArgs => parsedArgs._.length === 1 && parsedArgs._.includes('start')),
 	});
 
+	const scaffoldMap = {
+		'getting-started-ligo': 'https://github.com/pinnacle-labs/taqueria-getting-started-ligo-scaffold',
+		'getting-started-tzcompose': 'https://github.com/pinnacle-labs/taqueria-getting-started-tzcompose-scaffold',
+		'taco-shop': 'https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop',
+	};
+
 	// Add "scaffold" task to scaffold full projects
 	globalTasks.registerTask({
 		taskName: NonEmptyString.create('new'),
@@ -256,9 +262,11 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 					(yargs: Arguments) => {
 						yargs
 							.positional('scaffoldUrl', {
-								describe: i18n.__('scaffoldUrlDesc'),
+								describe: i18n.__('scaffoldUrlDesc')
+									+ `. You may use the following aliases: ${Object.keys(scaffoldMap).join(', ')}`,
 								type: 'string',
-								default: 'https://github.com/pinnacle-labs/taqueria-getting-started-ligo-scaffold',
+								default: 'getting-started-ligo',
+								coerce: (url: string) => scaffoldMap[url as keyof typeof scaffoldMap] ?? url,
 							})
 							.positional('scaffoldProjectDir', {
 								type: 'string',

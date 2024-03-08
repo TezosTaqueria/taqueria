@@ -37,6 +37,16 @@ const sidebars = {
       collapsible: true,
       items: [
         "scaffolds/scaffold-basics",
+        {
+          "type": "link",
+          "label": "Getting Started with LIGO",
+          "href": "https://github.com/pinnacle-labs/taqueria-getting-started-ligo-scaffold"
+        },
+        {
+          "type": "link",
+          "label": "Getting Started with TzCompose",
+          "href": "https://github.com/pinnacle-labs/taqueria-getting-started-tzcompose-scaffold"
+        },
         "scaffolds/taco-shop",
       ],
     },
@@ -68,6 +78,7 @@ const sidebars = {
         "plugins/plugin-ligo",
         "plugins/plugin-smartpy",
         "plugins/plugin-taquito",
+        "plugins/plugin-tzcompose",
         "plugins/plugin-octez-client",
       ],
     },
@@ -134,7 +145,10 @@ const sidebars = {
         "tasks/simulate",
         "tasks/transfer",
         "tasks/typecheck",
-        "tasks/typecheck-all"
+        "tasks/typecheck-all",
+
+        // TzCompose plugin tasks:
+        "tasks/run"
       ].sort(),
     },
     {

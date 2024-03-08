@@ -1,0 +1,51 @@
+---
+title: '@taqueria/plugin-tzcompose'
+---
+
+:::caution
+This plugin is still in early development. Please submit issues and feature requests [here](https://github.com/pinnacle-labs/taqueria).
+:::
+
+The Tzcompose plugin integrates Tzcompose, a powerful automation framework developed by Blockwatch for executing complex transaction sequences on Tezos, into the Taqueria development environment.
+
+## Requirements
+
+- Taqueria v0.42.0 or later
+- Node.js v18.18.0 or later
+- Docker v20.10.12 or later
+
+## Installation
+
+To install the Tzcompose plugin in a Taqueria project, navigate to the project folder and run:
+
+```shell
+cd [taqueria-project]
+taq init # if the project isn't already initialized
+taq install @taqueria/plugin-tzcompose
+```
+
+Alternatively, you can use the `Getting Started with Taqueria and TzCompose` scaffold to quickly set up a project with Tzcompose integrated. Visit [https://github.com/pinnacle-labs/taqueria-getting-started-tzcompose-scaffold](https://github.com/pinnacle-labs/taqueria-getting-started-tzcompose-scaffold) to learn more.
+
+## The `taq tzcompose` Task
+
+Basic usage is:
+
+```shell
+taq tzcompose [pipeline.yaml]
+```
+
+### Basic description
+
+The `tzcompose` task runs the specified Tzcompose pipeline YAML file within your Taqueria project. This plugin invokes Tzcompose via Docker, providing a self-contained environment for executing complex transaction sequences on Tezos.
+
+#### Integration with Taqueria
+
+We've built a custom dockerized version of Tzcompose that integrates seamlessly with Taqueria. All named account instances configured in your Taqueria project are preconfigured and available to use in Tzcompose as variables. For example, if you're running a flextesa sandbox and have an account configured called "bob", `$bob` will be available as a variable name to use in your Tzcompose pipelines.
+
+For detailed information on creating YAML files to define your Tzcompose pipelines, please refer to the [Tzcompose documentation](https://github.com/blockwatch-cc/tzgo/blob/master/cmd/tzcompose/README.md).
+
+## Plugin Architecture
+
+This plugin is developed for Taqueria, built on Node.js using the Taqueria Node SDK, and distributed via NPM.
+
+The plugin is written in TypeScript and compiled to a JavaScript bundle for Node.js using [tsup](https://github.com/egoist/tsup). It leverages the `@taqueria/node-sdk`, following the same development practices as other plugins created by the Pinnacle Labs team for Taqueria.

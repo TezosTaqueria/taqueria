@@ -116,7 +116,7 @@ const config = {
             "aria-label": "Release Notes"
           },
           {
-            href: "https://discord.gg/bujt7syVVT",
+            href: "https://discord.gg/tezos",
             position: "right",
             className: "header-discord-link",
             "aria-label": "Discord"
@@ -160,7 +160,7 @@ const config = {
               },
               {
                 label: "Discord",
-                to: "https://discord.gg/bujt7syVVT"
+                to: "https://discord.gg/tezos"
               },
               {
                 label: "Twitter",

@@ -434,3 +434,8 @@ a.pagination-nav__link {
 .pagination-nav__label {
 	color: #454545;
 }
+
+/* Hide icon for external links in sidebar menu */
+a[href*="scaffold"] svg {
+	display: none;
+}

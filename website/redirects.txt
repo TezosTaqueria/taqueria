@@ -1,3 +1,7 @@
 /get/macos/taq https://github.com/pinnacle-labs/taqueria/releases/latest/download/taq-macos 307
 /get/linux/taq https://github.com/pinnacle-labs/taqueria/releases/latest/download/taq-linux 307
 /get/windows/taq.exe https://github.com/pinnacle-labs/taqueria/releases/latest/download/taq-windows.exe 307
+/scaffolds/getting-started-ligo https://github.com/pinnacle-labs/taqueria-getting-started-ligo-scaffold 307
+/scaffolds/getting-started-tzcompose https://github.com/pinnacle-labs/taqueria-getting-started-tzcompose-scaffold 307
+/scaffolds/taco-shop https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop 307
+/scaffolds/quickstart https://github.com/pinnacle-labs/taqueria-getting-started-ligo-scaffold 307
