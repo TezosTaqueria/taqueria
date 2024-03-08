@@ -291,6 +291,13 @@ ${tabs(indent)}}])`;
 	};
 };
 
+const capitalize = (str: string) => {
+	return str
+		.split('_')
+		.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+		.join('');
+};
+
 export const toTypescriptCode = (
 	storage: TypedStorage,
 	methods: TypedMethod[],
@@ -306,6 +313,15 @@ export const toTypescriptCode = (
 		typeToCode,
 		argsToCode,
 	} = createTypescriptCodeGenerator();
+
+	const methodsToParamsCode = (indent: number) => {
+		const methodParamsCode = methods.map(x => {
+			const paramsCode = `export type ${capitalize(x.name)}Params = ${argsToCode(x.args, indent + 1, true)}`;
+			return paramsCode;
+		});
+
+		return methodParamsCode;
+	};
 
 	const methodsToCode = (indent: number) => {
 		const methodFields = methods.map(x => {
@@ -332,6 +348,7 @@ export const toTypescriptCode = (
 	};
 
 	const methodsCode = methodsToCode(0);
+	const methodsParamsCode = methodsToParamsCode(0);
 	const methodsObjectCode = methodsObjectToCode(0);
 	const storageCode = storageToCode(0);
 
@@ -384,6 +401,8 @@ ${typeAliasesDefinitions}
 ${storageCode}
 
 ${methodsCode}
+
+${methodsParamsCode}
 
 ${methodsObjectCode}
 
