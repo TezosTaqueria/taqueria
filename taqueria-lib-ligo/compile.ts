@@ -146,13 +146,14 @@ const getInitialMessage = (pair: string, module: ModuleInfo) => {
 };
 
 // Helper function to get a common message
-const getCommonMsg = (langType: Syntax, listType: ExprKind) => {
+const getCommonMsg = (langType: Syntax, listType: ExprKind, moduleInfo: ModuleInfo) => {
 	const varKeyword = langType === 'mligo' ? 'let' : 'const';
+	const namespaceSelector = moduleInfo.type.startsWith('module') ? '[Namespace].' : '';
 	const commonMsgForStorage = `// IMPORTANT: We suggest always explicitly typing your storage values:\n`
-		+ `// E.g.: \`${varKeyword} storage: int = 10\` or \`${varKeyword} storage: Contract.storage = 10\``;
+		+ `// E.g.: \`${varKeyword} storage: int = 10\` or \`${varKeyword} storage: Contract.${namespaceSelector}storage = 10\``;
 
 	const commonMsgForParameter = `// IMPORTANT: We suggest always explicitly typing your parameter values:\n`
-		+ `// E.g.: \`${varKeyword} parameter: int = 10\` or \`${varKeyword} parameter: Contract.parameter = 10\``;
+		+ `// E.g.: \`${varKeyword} parameter: int = 10\` or \`${varKeyword} parameter: Contract.${namespaceSelector}parameter = 10\``;
 
 	return listType === 'storage' ? commonMsgForStorage : commonMsgForParameter;
 };
@@ -162,7 +163,7 @@ const getContent = (moduleInfo: ModuleInfo, listType: ExprKind) => {
 	const linkToContract = `#import "${moduleInfo.sourceFile}" "Contract"`;
 	const pair = `${moduleInfo.syntax}-${moduleInfo.type}`;
 	const initialMsg = getInitialMessage(pair, moduleInfo);
-	const commonMsg = getCommonMsg(moduleInfo.syntax, listType);
+	const commonMsg = getCommonMsg(moduleInfo.syntax, listType, moduleInfo);
 
 	return `${linkToContract}\n\n${initialMsg}\n\n${commonMsg}`;
 };
