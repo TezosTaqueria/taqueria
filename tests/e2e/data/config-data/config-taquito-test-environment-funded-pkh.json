@@ -30,7 +30,7 @@
 	"network": {
 		"ghostnet": {
 			"label": "ghostnet",
-			"rpcUrl": "https://rpc.ghostnet.teztnets.xyz/",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
 			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
 			"accounts": {
 				"taqOperatorAccount": {
@@ -42,7 +42,7 @@
 		},
 		"fundnet": {
 			"label": "fundnet",
-			"rpcUrl": "https://rpc.ghostnet.teztnets.xyz/",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
 			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW",
 			"accounts": {
 				"taqOperatorAccount": {

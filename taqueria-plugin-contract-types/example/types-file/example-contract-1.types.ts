@@ -1,6 +1,6 @@
 
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
-import { address, BigMap, int, mutez, nat, timestamp } from './type-aliases';
+import { address, BigMap, int, mutez, nat, timestamp, unit } from './type-aliases';
 
 export type Storage = {
     pauseable_admin: {Some: {
@@ -56,6 +56,14 @@ type Methods = {
     ) => Promise<void>;
     resolve: (param: nat) => Promise<void>;
 };
+
+export type ConfirmAdminParams = unit
+export type PauseParams = boolean
+export type SetAdminParams = address
+export type BidParams = nat
+export type CancelParams = nat
+export type ConfigureParams = mutez
+export type ResolveParams = nat
 
 type MethodsObject = {
     confirm_admin: () => Promise<void>;

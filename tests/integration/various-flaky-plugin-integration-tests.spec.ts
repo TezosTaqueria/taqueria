@@ -71,7 +71,7 @@ describe('Plugin Integration testing for Taqueria CLI', () => {
 		);
 		expect(stdout4).toEqual(
 			expect.arrayContaining([
-				'│ N/A            │ tz3RobfdmYYQaiF5W343wdSiFhwWF2xUfjEy │ Unit      │ default    │ 100000         │ https://rpc.ghostnet.teztnets.xyz/ │',
+				'│ N/A            │ tz3RobfdmYYQaiF5W343wdSiFhwWF2xUfjEy │ Unit      │ default    │ 100000         │ https://ghostnet.ecadinfra.com │',
 			]),
 		);
 

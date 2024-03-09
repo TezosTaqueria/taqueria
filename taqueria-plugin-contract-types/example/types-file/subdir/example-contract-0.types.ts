@@ -1,6 +1,6 @@
 
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from '../type-utils';
-import { int } from '../type-aliases';
+import { int, unit } from '../type-aliases';
 
 export type Storage = int;
 
@@ -9,6 +9,10 @@ type Methods = {
     increment: (param: int) => Promise<void>;
     reset: () => Promise<void>;
 };
+
+export type DecrementParams = int
+export type IncrementParams = int
+export type ResetParams = unit
 
 type MethodsObject = {
     decrement: (param: int) => Promise<void>;

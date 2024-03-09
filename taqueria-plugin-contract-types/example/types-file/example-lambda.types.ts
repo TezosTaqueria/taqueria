@@ -1,6 +1,6 @@
 
 import { ContractAbstractionFromContractType, WalletContractAbstractionFromContractType } from './type-utils';
-import { Instruction, int } from './type-aliases';
+import { Instruction, int, unit } from './type-aliases';
 
 export type Storage = {
     currentValue: int;
@@ -11,6 +11,9 @@ type Methods = {
     callModifyValue: () => Promise<void>;
     updateModifyValueFunction: (param: Instruction[]) => Promise<void>;
 };
+
+export type CallModifyValueParams = unit
+export type UpdateModifyValueFunctionParams = Instruction[]
 
 type MethodsObject = {
     callModifyValue: () => Promise<void>;

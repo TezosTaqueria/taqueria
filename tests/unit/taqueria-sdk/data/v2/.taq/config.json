@@ -51,7 +51,7 @@
 		"testing": {
 			"type": "simple",
 			"label": "ghostnet",
-			"rpcUrl": "https://rpc.ghostnet.teztnets.xyz/",
+			"rpcUrl": "https://ghostnet.ecadinfra.com",
 			"protocol": "PtLimaPtLMwfNinJi9rCfDPWea8dFgTZ1MeJ9f1m2SRic6ayiwW"
 		}
 	},

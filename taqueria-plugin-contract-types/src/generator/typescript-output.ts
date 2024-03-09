@@ -316,11 +316,12 @@ export const toTypescriptCode = (
 
 	const methodsToParamsCode = (indent: number) => {
 		const methodParamsCode = methods.map(x => {
-			const paramsCode = `export type ${capitalize(x.name)}Params = ${argsToCode(x.args, indent + 1, true)}`;
-			return paramsCode;
+			return x.args.length > 0
+				? `export type ${capitalize(x.name)}Params = ${typeToCode(x.args[0].type, indent + 1)}`
+				: '';
 		});
 
-		return methodParamsCode;
+		return methodParamsCode.join('\n');
 	};
 
 	const methodsToCode = (indent: number) => {

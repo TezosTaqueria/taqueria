@@ -72,6 +72,35 @@ type Methods = {
         }>) => Promise<void>;
 };
 
+export type ConfirmAdminParams = unit
+export type PauseParams = boolean
+export type SetAdminParams = address
+export type BalanceOfParams = Array<{
+        owner: address;
+        token_id: nat;
+    }>
+export type TransferParams = Array<{
+        from_: address;
+        txs: Array<{
+            to_: address;
+            token_id: nat;
+            amount: nat;
+        }>;
+    }>
+export type AddOperatorParams = address
+export type RemoveOperatorParams = address
+export type BurnTokensParams = Array<{
+        owner: address;
+        token_id: nat;
+        amount: nat;
+    }>
+export type CreateTokenParams = nat
+export type MintTokensParams = Array<{
+        owner: address;
+        token_id: nat;
+        amount: nat;
+    }>
+
 type MethodsObject = {
     confirm_admin: () => Promise<void>;
     pause: (param: boolean) => Promise<void>;
