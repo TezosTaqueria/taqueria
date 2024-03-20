@@ -62,4 +62,5 @@ Plugin.create<CustomRequestArgs>(requestArgs => ({
 		}),
 	],
 	proxy,
+	postInstall: "bash -c 'npm install --save-dev ts-jest @types/jest'",
 }), process.argv);

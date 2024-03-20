@@ -75,18 +75,19 @@ const toJest = (contractName: string) => (generator: Generator) => {
 	}));
 	return `
 import { TezosToolkit } from '@taquito/taquito';
-import { char2Bytes } from '@taquito/utils';
+import { stringToBytes } from '@taquito/utils';
 import { tas } from './types/type-aliases';
-import { InMemorySigner, importKey } from '@taquito/signer';
+import { InMemorySigner } from '@taquito/signer';
 import { ${normalizeContractName(contractName)}ContractType as ContractType } from './types/${contractName}.types';
 import { ${normalizeContractName(contractName)}Code as ContractCode } from './types/${contractName}.code';
 
 jest.setTimeout(20000)
 
 describe('${contractName}', () => {
-	const config = require('../.taq/config.json')
-    const Tezos = new TezosToolkit(config.sandbox.local.rpcUrl);
-	const key = config.sandbox.local.accounts.bob.secretKey.replace('unencrypted:', '')
+	const currentEnv = process.env.TAQUERIA_ENV || 'development';
+	const envConfig = require('../.taq/config.local.' + currentEnv + '.json')
+    const Tezos = new TezosToolkit(envConfig.rpcUrl);
+	const key = envConfig.accounts.bob.secretKey.replace('unencrypted:', '')
 	Tezos.setProvider({
 		signer: new InMemorySigner(key),
 	  });
