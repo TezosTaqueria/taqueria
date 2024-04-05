@@ -6,6 +6,7 @@ import inspect
 import smartpy
 import os
 import shutil
+import traceback
 
 first_run = True  # Flag to ensure `__taq_compile__` only runs once
 found_modules = []  # To hold the found SmartPy modules
@@ -26,7 +27,8 @@ default_storage = {
 
 def log(message):
     if os.environ.get('TAQUERIA_DEBUG', False):
-        print(message)
+        with open('/tmp/smartpy.log', 'a') as file:
+            file.write(message + '\n')
 
 def append_to_output(contractName, storage_expr=None, failed=False):
     source = f"{get_input_contract_relpath()}/{contractName}"
@@ -212,17 +214,21 @@ def __taq_compile__():
                             log(f"Found storage expression {storage_expr}")
                             storage_value = storage_exprs[storage_expr]
 
+                            log(f"Value: {storage_value}")
+
                             # Try instantiating with initial storage
                             try:
-                                contract_instance = contract_class_func(**storage_value)
+                                contract_instance = contract_class_func(storage_value)
                                 if not contractName in found_contracts:
                                     found_contracts.append(contractName)
                                 sc += contract_instance
 
                                 # Add output
                                 append_to_output(contractName, storage_expr)
-                            except:
+                            except Exception as ex:
                                 print(f"""Warning: Contract {contractName} failed to compile using the initial storage expression called {storage_expr}.""", file=sys.stderr)
+                                # print(ex)
+                                # traceback.print_exc()
                                 append_to_output(contractName, None, True)
                     else:
                         # Write to stderr a warning that this Contract requires initial storage to be specified as an expression in the [contractName].storageList.py file
