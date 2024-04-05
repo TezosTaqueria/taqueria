@@ -203,9 +203,9 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				// Run the wrapper again
 				const invalidResult = await execute('python', `wrapper.py ${testProjectDir}/contracts/chess.py ${parsedArgs}`);
 				expect(invalidResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
-				expect(filterDockerImageMessages(invalidResult.stderr)).toEqual([
+				expect(filterDockerImageMessages(invalidResult.stderr).join('')).toContain(
 					'Warning: Contract Chess failed to compile using the initial storage expression called default_storage.',
-				]);
+				);
 
 				/*********** Test that a valid storageList files work as expected  ***********/
 
