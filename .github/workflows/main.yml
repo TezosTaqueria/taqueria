@@ -225,12 +225,6 @@ jobs:
         with:
           node-version: 20
           cache: "npm"
-
-      - name: Debug matrix variables
-        run: echo "PACKAGE_NAME=${{ matrix.package.name }}" && echo "PACKAGE_TAG=${{ matrix.package.tag }}" && echo "PACKAGE_LOCATION=${{ matrix.package.location }}"
-
-      - name: List env variables
-        run: env 
            
       # Publish packages
       - name: Publish to npm
