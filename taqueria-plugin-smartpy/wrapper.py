@@ -218,7 +218,7 @@ def __taq_compile__():
 
                             # Try instantiating with initial storage
                             try:
-                                contract_instance = contract_class_func(storage_value)
+                                contract_instance = contract_class_func(**storage_value)
                                 if not contractName in found_contracts:
                                     found_contracts.append(contractName)
                                 sc += contract_instance
@@ -227,8 +227,7 @@ def __taq_compile__():
                                 append_to_output(contractName, storage_expr)
                             except Exception as ex:
                                 print(f"""Warning: Contract {contractName} failed to compile using the initial storage expression called {storage_expr}.""", file=sys.stderr)
-                                # print(ex)
-                                # traceback.print_exc()
+                                traceback.print_exc()
                                 append_to_output(contractName, None, True)
                     else:
                         # Write to stderr a warning that this Contract requires initial storage to be specified as an expression in the [contractName].storageList.py file

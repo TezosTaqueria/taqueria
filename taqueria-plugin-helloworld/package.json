@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-helloworld",
-	"version": "0.50.6",
+	"version": "0.50.7",
 	"description": "An example of a plugin for Taqueria",
 	"main": "index.js",
 	"scripts": {
@@ -19,7 +19,7 @@
 		"typescript": "^5.3.3"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.50.6"
+		"@taqueria/node-sdk": "^0.50.7"
 	},
 	"tsup": {
 		"entry": [
