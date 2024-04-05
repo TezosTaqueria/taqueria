@@ -135,7 +135,7 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				const { execute, cleanup, exists, makeDir, path: testProjectDir } = await prepareEnvironment();
 				const { readFile, writeFile } = require('fs').promises;
 				const pipResult = await exec(
-					'pip install https://preview.smartpy.io/0.19.0a0/tezos_smartpy-0.19.0a0-py3-none-any.whl',
+					'pip install pip install https://smartpy.io/static/tezos_smartpy-0.19.1-py3-none-any.whl',
 				);
 				expect(pipResult.stderr.trim().split('\n').filter(l => !l.includes('pip') && l.length > 0)).toEqual([]);
 
@@ -164,7 +164,6 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 				/*********** Test that missing storageList files produce a warning  ***********/
 
 				const wrapperResult = await execute('python', `wrapper.py ${testProjectDir}/contracts/chess.py ${parsedArgs}`);
-				console.log(wrapperResult);
 
 				// Expect compilation to fail due to missing a storageList file
 				expect(wrapperResult.stdout).toEqual(['[{"source": "chess.py/Chess", "artifact": "Not Compiled"}]']);
@@ -343,16 +342,17 @@ describe('SmartPy Plugin E2E Testing for Taqueria CLI', () => {
 
 			// Test the minimal contract
 			const { stdout, stderr } = await execute('taq', 'test minimal.py', './test-project');
+
 			expect(stderr).toEqual([]);
 			expect(stdout).toEqual(expect.arrayContaining([
-				'┌────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐',
-				'│ Test       │ Results                                                                                                                   │',
-				'├────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤',
-				'│ minimal.py │ === Minimal/log.txt ===                                                                                                   │',
-				'│            │ Comment...                                                                                                                │',
-				'│            │  h1: Minimal                                                                                                              │',
-				'│            │ Creating contract KT1TezoooozzSmartPyzzSTATiCzzzwwBFA1                                                                    │',
-				'│            │  -> Unit                                                                                                                  │',
+				'┌────────────┬──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐',
+				'│ Test       │ Results                                                                                                                                      │',
+				'├────────────┼──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤',
+				'│ minimal.py │ === Minimal/log.txt ===                                                                                                                      │',
+				'│            │ Comment...                                                                                                                                   │',
+				'│            │  h1: Minimal                                                                                                                                 │',
+				'│            │ Creating contract KT1TezoooozzSmartPyzzSTATiCzzzwwBFA1                                                                                       │',
+				'│            │  -> Unit                                                                                                                                     │',
 			]));
 
 			// Assure that the log file exists

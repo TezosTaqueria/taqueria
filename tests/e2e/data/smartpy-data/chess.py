@@ -135,9 +135,9 @@ def main():
                 ),
                 t_board_state,
             )
-            self.data.draw_offer = sp.set()
+            self.data.draw_offer = set()
             self.data.metadata = sp.big_map()
-            self.data.players = sp.set(player1, player2)
+            self.data.players = {player1, player2}
             self.data.players_map = {-1: player2, 1: player1}
             self.data.status = sp.variant.play()
 
@@ -609,7 +609,7 @@ def main():
                     (
                         new_board_state,
                         nextPlayer,
-                        sp.set(fullMove1, fullMove2, new_board_state.fullMove),
+                        {fullMove1, fullMove2, new_board_state.fullMove},
                     )
                 )
                 is_draw = True
@@ -931,7 +931,7 @@ def main():
                 (
                     self.data.board_state,
                     self.data.board_state.nextPlayer * -1,
-                    sp.set(fullMove1, fullMove2, previousFullMove),
+                    {fullMove1, fullMove2, previousFullMove},
                 )
             )
             self.data.status = sp.variant.finished("draw")
@@ -1017,7 +1017,7 @@ def main():
             self.data.board_state = new_board_state
             if is_draw:
                 self.data.status = sp.variant.finished("draw")
-            self.data.draw_offer = sp.set()
+            self.data.draw_offer = set()
 
         @sp.entrypoint
         def claim_checkmate(self):

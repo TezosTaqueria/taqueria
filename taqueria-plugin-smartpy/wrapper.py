@@ -1,5 +1,3 @@
-# Updating the Taqueria SmartPy Wrapper script to include handling a JSON object passed in as the second command line argument.
-
 import json
 import runpy
 import sys
