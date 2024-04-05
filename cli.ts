@@ -243,6 +243,7 @@ const initCLI = (env: EnvVars, args: DenoArgs, i18n: i18n.t) => {
 
 	const scaffoldMap = {
 		'getting-started-ligo': 'https://github.com/pinnacle-labs/taqueria-getting-started-ligo-scaffold',
+		'getting-started-smartpy': 'https://github.com/pinnacle-labs/taqueria-getting-started-smartpy-scaffold',
 		'getting-started-tzcompose': 'https://github.com/pinnacle-labs/taqueria-getting-started-tzcompose-scaffold',
 		'taco-shop': 'https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop',
 	};
