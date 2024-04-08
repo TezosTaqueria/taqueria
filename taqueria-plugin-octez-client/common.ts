@@ -3,7 +3,7 @@ import { join } from 'path';
 
 // Should point to the latest stable version, so it needs to be updated as part of our release process.
 const getFlextesaImage = (_arch: 'linux/arm64/v8' | 'linux/amd64'): string =>
-	'tezos/tezos:master_9a1982bb_20240205174255';
+	'tezos/tezos:octez-v20.0-beta2_c8e95f06_20240402182131';
 
 const OCTEZ_CLIENT_IMAGE_ENV_VAR = 'TAQ_OCTEZ_CLIENT_IMAGE';
 
