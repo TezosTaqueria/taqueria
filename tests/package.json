@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/tests",
-	"version": "0.50.10",
+	"version": "0.50.11",
 	"type": "module",
 	"private": true,
 	"description": "This is Taqueria testing project includes unit, integration and e2e tests",
@@ -41,7 +41,7 @@
 	"devDependencies": {
 		"@gmrchk/cli-testing-library": "^0.1.2",
 		"@taquito/signer": "^19.1.0",
-		"@taquito/taquito": "^19.1.0",
+		"@taquito/taquito": "^19.2.0",
 		"@types/jest": "^29.5.3",
 		"@types/node": "^17.0.45",
 		"chokidar": "^3.5.3",

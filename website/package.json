@@ -24,7 +24,7 @@
     "@mdx-js/react": "^1.6.22",
     "@svgr/webpack": "^5.5.0",
     "@taquito/beacon-wallet": "^15.0.0",
-    "@taquito/taquito": "^15.0.0",
+    "@taquito/taquito": "^19.2.0",
     "@typeform/embed": "^1.35.1",
     "clsx": "^1.1.1",
     "docusaurus-plugin-image-zoom": "^0.1.1",
