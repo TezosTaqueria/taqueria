@@ -675,8 +675,6 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 				'./test-project',
 			);
 
-			// console.log(testResult)
-
 			expect(testResult.stdout).toEqual([
 				'┌─────────────────────────┬──────────────────────────────────────────────┐',
 				'│ Contract                │ Test Results                                 │',
