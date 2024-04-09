@@ -4,7 +4,7 @@
 # The installer has the following behaviour:
 # 1) If run by root, will install system-wide. If not run by root, the installer will prompt the user for permission to use sudo to install system-wide.
 # 2) If the installer is installing system-wide, it will determine whether /usr/local/bin is in $PATH and if so, install the binary there. Otherwise, it will use /usr/bin.
-# 3) If the user chooses a user-specific install, then the installer will use $HOME/.taqueria/bin, and configure the $PATH in the the current shell.
+# 3) If the user chooses a user-specific install, then the installer will use $HOME/.taqueria/bin, and configure the $PATH in the current shell.
 # 4) The installer will use curl or wget, depending which is available.
 
 # Function to check if command exists
