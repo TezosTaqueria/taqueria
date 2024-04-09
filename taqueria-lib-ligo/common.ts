@@ -134,3 +134,14 @@ function baseDriverCmd(
 		return `DOCKER_DEFAULT_PLATFORM=linux/amd64 docker run --rm -v \"${projectDir}\":/project -w /project -u $(id -u):$(id -g) ${ligoDockerImage}`;
 	}
 }
+
+export const formatStdErr = (stderr: string) => {
+	// Temporary fix for issue: https://gitlab.com/ligolang/ligo/-/issues/2176
+	if (stderr.length > 0 && stderr.includes('create directory //.ligo')) {
+		return stderr
+			.replace(/create directory \/\/\.ligo: Permission denied/, '')
+			.replace(/create temporary file \/\/\.ligo\/.*.tmp: No such file or directory/, '')
+			.trim();
+	}
+	return stderr;
+};

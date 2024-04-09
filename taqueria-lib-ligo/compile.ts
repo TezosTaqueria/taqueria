@@ -17,6 +17,7 @@ import {
 	CompileOpts as Opts,
 	emitExternalError,
 	formatLigoError,
+	formatStdErr,
 	getInputFilenameAbsPath,
 	getInputFilenameRelPath,
 	UnionOpts,
@@ -198,7 +199,8 @@ export const inject = (commonObj: Common) => {
 		try {
 			await getArch();
 			const cmd = await getListDeclarationsCmd(parsedArgs, sourceFile);
-			const { stderr, stdout } = await execCmd(cmd);
+			const { stderr: unformattedStderr, stdout } = await execCmd(cmd);
+			const stderr = formatStdErr(unformattedStderr);
 			if (stderr.length > 0) return Promise.reject(stderr);
 
 			return JSON.parse(stdout).declarations.reduce(
@@ -298,7 +300,8 @@ export const inject = (commonObj: Common) => {
 		try {
 			await getArch();
 			const cmd = await getCompileContractCmd(parsedArgs, sourceFile, module);
-			const { stderr } = await execCmd(cmd);
+			const { stderr: unformattedStderr } = await execCmd(cmd);
+			const stderr = formatStdErr(unformattedStderr);
 			if (stderr.length > 0) sendWarn(stderr);
 
 			return {
@@ -363,7 +366,8 @@ export const inject = (commonObj: Common) => {
 		return getArch()
 			.then(() => getCompileExprCmd(parsedArgs, sourceFile, module, exprKind, exprName))
 			.then(execCmd)
-			.then(({ stderr }) => {
+			.then(({ stderr: unformattedStderr }) => {
+				const stderr = formatStdErr(unformattedStderr);
 				if (stderr.length > 0) sendWarn(stderr);
 				const artifactName = getOutputExprFilename(
 					parsedArgs,
