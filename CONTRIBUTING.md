@@ -1,6 +1,6 @@
 # Contributions
 
-Thank you for your interested in contributing to Taqueria!
+Thank you for your interest in contributing to Taqueria!
 
 Please use the [GitHub issue tracker](https://github.com/pinnacle-labs/taqueria/issues) to report bugs or request features.
 
