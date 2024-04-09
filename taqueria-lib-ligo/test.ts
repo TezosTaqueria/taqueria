@@ -1,5 +1,5 @@
 import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
-import { Common, emitExternalError, getInputFilenameRelPath, TestOpts as Opts } from './common';
+import { Common, emitExternalError, getInputFilenameRelPath, TestOpts as Opts, formatStdErr } from './common';
 
 type TableRow = { contract: string; testResults: string };
 
@@ -22,7 +22,8 @@ const inject = (commonObj: Common) => {
 		getArch()
 			.then(() => getTestContractCmd(parsedArgs, sourceFile))
 			.then(execCmd)
-			.then(({ stdout, stderr }) => {
+			.then(({ stdout, stderr: unformattedStdErr }) => {
+				const stderr = formatStdErr(unformattedStdErr)
 				if (stderr.length > 0) sendWarn(stderr);
 				const result = '🎉 All tests passed 🎉';
 				return {
