@@ -1,7 +1,18 @@
 {
-	"name": "@taqueria/plugin-taquito",
+	"name": "@taqueria/plugin-tezbox",
 	"version": "0.51.1",
-	"description": "A taqueria plugin for originating smart contracts using Taquito",
+	"description": "A plugin for Taqueria providing local sandbox capabilities built on TezBox",
+	"private": true,
+	"keywords": [
+		"taqueria",
+		"plugin",
+		"tezbox",
+		"sandbox",
+		"local",
+		"pinnaclelabs",
+		"pinnacle-labs",
+		"tezos"
+	],
 	"targets": {
 		"default": {
 			"source": "./index.ts",
@@ -10,46 +21,30 @@
 			"isLibrary": true
 		}
 	},
+	"types": "./index.ts",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
 		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup",
-		"debugPluginInfo": "node --inspect-brk index.js --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
-	},
-	"keywords": [
-		"taqueria",
-		"tezos",
-		"originate",
-		"deploy",
-		"pinnaclelabs",
-		"pinnacle-labs",
-		"plugin",
-		"taquito",
-		"smart contract"
-	],
-	"engines": {
-		"node": ">=16"
+		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}"
 	},
 	"author": "Pinnacle Labs",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/pinnacle-labs/taqueria.git",
-		"directory": "taqueria-plugin-taquito"
+		"directory": "taqueria-plugin-tezbox"
 	},
-	"bugs": {
-		"url": "https://github.com/pinnacle-labs/taqueria/issues"
-	},
-	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
 		"@taqueria/node-sdk": "^0.51.1",
-		"@taquito/michel-codec": "^19.2.0",
-		"@taquito/signer": "^19.2.0",
-		"@taquito/taquito": "^19.2.0",
+		"@taqueria/protocol": "^0.51.1",
+		"async-retry": "^1.3.3",
+		"bignumber.js": "^9.1.2",
 		"fast-glob": "^3.3.2",
-		"wtfnode": "^0.9.1"
+		"portfinder": "^1.0.32",
+		"rambda": "^9.1.0"
 	},
 	"devDependencies": {
+		"@types/async-retry": "^1.4.8",
 		"tsup": "^8.0.1",
 		"typescript": "^5.3.3"
 	},
