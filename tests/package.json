@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/tests",
-	"version": "0.52.1",
+	"version": "0.52.2",
 	"type": "module",
 	"private": true,
 	"description": "This is Taqueria testing project includes unit, integration and e2e tests",
@@ -40,8 +40,8 @@
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"devDependencies": {
 		"@gmrchk/cli-testing-library": "^0.1.2",
-		"@taquito/signer": "^19.1.0",
-		"@taquito/taquito": "^19.2.0",
+		"@taquito/signer": "^20.0.0-beta.0",
+		"@taquito/taquito": "^20.0.0-beta.0",
 		"@types/jest": "^29.5.3",
 		"@types/node": "^17.0.45",
 		"chokidar": "^3.5.3",
