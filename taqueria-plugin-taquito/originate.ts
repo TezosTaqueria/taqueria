@@ -78,9 +78,18 @@ const getContractInfo = async (parsedArgs: Opts): Promise<ContractInfo> => {
 	};
 };
 
-const createBatchForOriginate = (tezos: TezosToolkit, contractsInfo: ContractInfo[]): WalletOperationBatch =>
+const createBatchForOriginate = (
+	tezos: TezosToolkit,
+	contractsInfo: ContractInfo[],
+	gasLimit?: number,
+	storageLimit?: number,
+	fee?: number,
+): WalletOperationBatch =>
 	contractsInfo.reduce((acc, contractInfo) =>
 		acc.withOrigination({
+			gasLimit,
+			storageLimit,
+			fee,
 			code: contractInfo.code,
 			init: contractInfo.initStorage,
 			balance: contractInfo.mutezTransfer.toString(),
@@ -118,8 +127,11 @@ const performOriginateOps = withIntervalHack(async (
 	contractsInfo: ContractInfo[],
 	maxTimeout: number,
 	isSandbox = false,
+	gasLimit?: number,
+	storageLimit?: number,
+	fee?: number,
 ): Promise<BatchWalletOperation> => {
-	const batch = createBatchForOriginate(tezos, contractsInfo);
+	const batch = createBatchForOriginate(tezos, contractsInfo, gasLimit, storageLimit, fee);
 
 	try {
 		return await doWithin<BatchWalletOperation>(maxTimeout, async () => {
@@ -182,6 +194,9 @@ const originate = async (parsedArgs: Opts): Promise<void> => {
 			[contractInfo],
 			parsedArgs.timeout,
 			envType !== 'Network',
+			parsedArgs.gasLimit,
+			parsedArgs.storageLimit,
+			parsedArgs.fee,
 		);
 
 		const contractInfoForDisplay = await prepContractInfoForDisplay(parsedArgs, tezos, contractInfo, op);

@@ -26,6 +26,9 @@ export type OriginateOpts = ProxyTaskArgs.t & {
 	sender?: string;
 	mutez?: string;
 	timeout: number;
+	gasLimit?: number;
+	storageLimit?: number;
+	fee?: number;
 };
 
 export type TransferOpts = ProxyTaskArgs.t & {
@@ -35,6 +38,9 @@ export type TransferOpts = ProxyTaskArgs.t & {
 	entrypoint?: string;
 	sender?: string;
 	timeout: number;
+	gasLimit?: number;
+	storageLimit?: number;
+	fee?: number;
 };
 
 export type FundOpts = ProxyTaskArgs.t & {

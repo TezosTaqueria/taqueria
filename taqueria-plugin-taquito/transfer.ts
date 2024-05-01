@@ -52,9 +52,18 @@ const getContractInfo = async (parsedArgs: Opts, env: Environment.t): Promise<Co
 	};
 };
 
-const createBatchForTransfer = (tezos: TezosToolkit, contractsInfo: ContractInfo[]): WalletOperationBatch =>
+const createBatchForTransfer = (
+	tezos: TezosToolkit,
+	contractsInfo: ContractInfo[],
+	gasLimit?: number,
+	storageLimit?: number,
+	fee?: number,
+): WalletOperationBatch =>
 	contractsInfo.reduce((acc, contractInfo) =>
 		acc.withTransfer({
+			fee,
+			gasLimit,
+			storageLimit,
 			to: contractInfo.contractAddress,
 			amount: contractInfo.mutezTransfer,
 			parameter: {
@@ -69,8 +78,11 @@ export const performTransferOps = async (
 	env: string,
 	contractsInfo: ContractInfo[],
 	maxTimeout: number,
+	gasLimit?: number,
+	storageLimit?: number,
+	fee?: number,
 ): Promise<BatchWalletOperation> => {
-	const batch = createBatchForTransfer(tezos, contractsInfo);
+	const batch = createBatchForTransfer(tezos, contractsInfo, gasLimit, storageLimit, fee);
 	try {
 		return await doWithin<BatchWalletOperation>(maxTimeout, async () => {
 			const op = await batch.send();
@@ -105,7 +117,15 @@ const transfer = async (opts: Opts): Promise<void> => {
 
 		const contractInfo = await getContractInfo(opts, env);
 
-		await performTransferOps(tezos, getCurrentEnvironment(protocolArgs), [contractInfo], opts.timeout);
+		await performTransferOps(
+			tezos,
+			getCurrentEnvironment(protocolArgs),
+			[contractInfo],
+			opts.timeout,
+			opts.gasLimit,
+			opts.storageLimit,
+			opts.fee,
+		);
 
 		const contractInfoForDisplay = prepContractInfoForDisplay(tezos, contractInfo);
 		return sendJsonRes([contractInfoForDisplay]);
