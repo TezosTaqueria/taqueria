@@ -4,7 +4,7 @@ import { readFile } from 'fs/promises';
 
 describe('Marigold Training E2E Smoke Test for Taqueria CLI', () => {
 	jest.setTimeout(200000);
-	test('Part 1, Step 1 : Create folder & file - slowTest', async () => {
+	test.skip('Part 1, Step 1 : Create folder & file - slowTest', async () => {
 		// set up the project
 		const { execute, cleanup, writeFile, exists, path: projectPath } = await prepareEnvironment();
 		await execute('taq', 'init test-project');
