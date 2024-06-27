@@ -24,7 +24,7 @@ const inject = (commonObj: Common) => {
 			.then(execCmd)
 			.then(({ stdout: unformattedStdout, stderr: unformattedStdErr }) => {
 				// Workaround for https://gitlab.com/ligolang/ligo/-/issues/2189
-				const stdout = unformattedStdout.replace(/method not allowed/i, '');
+				const stdout = unformattedStdout.replace(/method not allowed\n/gi, '');
 
 				const stderr = formatStdErr(unformattedStdErr);
 				if (stderr.length > 0) sendWarn(stderr);
