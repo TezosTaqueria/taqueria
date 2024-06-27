@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.53.12",
+	"version": "0.53.13",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -316,9 +316,9 @@
 	},
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.4.5",
-		"@taquito/signer": "^20.0.0-beta.0",
-		"@taquito/taquito": "^20.0.0-beta.0",
-		"@taquito/utils": "^20.0.0-beta.0",
+		"@taquito/signer": "^20.0.1",
+		"@taquito/taquito": "^20.0.1",
+		"@taquito/utils": "^20.0.1",
 		"batching-toposort": "^1.2.0",
 		"fluture": "^14.0.0",
 		"i18next": "^23.8.1",
