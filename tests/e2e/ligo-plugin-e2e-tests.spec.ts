@@ -915,6 +915,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 
 			// Expect files to exist in test project
 			const contractsList = await ls('./test-project/contracts');
+			console.log(contractsList);
 			testFiles.map(file => expect(contractsList).toContain(file));
 
 			// Compile the contracts using the `compile-all` task
