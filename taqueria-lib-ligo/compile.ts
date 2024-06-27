@@ -199,8 +199,12 @@ export const inject = (commonObj: Common) => {
 		try {
 			await getArch();
 			const cmd = await getListDeclarationsCmd(parsedArgs, sourceFile);
-			const { stderr: unformattedStderr, stdout } = await execCmd(cmd);
+			const { stderr: unformattedStderr, stdout: unformattedStdout } = await execCmd(cmd);
+			const stdout = unformattedStdout.replace(/method not allowed/i, '');
+
+			// Workaround for https://gitlab.com/ligolang/ligo/-/issues/2189
 			const stderr = formatStdErr(unformattedStderr);
+
 			if (stderr.length > 0) return Promise.reject(stderr);
 
 			return JSON.parse(stdout).declarations.reduce(
@@ -572,6 +576,8 @@ export const compile = async (
 	try {
 		const modules = await listContractModules(parsedArgs, sourceFile);
 		if (modules.length === 0) {
+			https:
+			// gitlab.com/ligolang/ligo/-/issues/2189
 			return sendJsonRes([
 				{
 					source: sourceFile,
