@@ -923,7 +923,7 @@ describe('Ligo Plugin E2E Testing for Taqueria CLI', () => {
 				'compile-all',
 				'./test-project',
 			);
-			// console.log(compileResult);
+			console.log(compileResult);
 
 			// Check that the output contains the expected files
 			expect(compileResult.stdout).toEqual([
