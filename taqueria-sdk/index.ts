@@ -127,7 +127,7 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdo
 		// Escape quotes in the command, given that we're wrapping in quotes
 		const escapedCmd = cmd.replaceAll(/"/gm, '\\"');
 		exec(`sh -c "${escapedCmd}"`, (err, stdout, stderr) => {
-			const filteredStderr = filterDockerImageMessages(stderr); // Filter the stderr
+			const filteredStderr = filterShellCmdStderr(stderr); // Filter the stderr
 
 			if (err) {
 				reject(toExecErr(err, { stderr: filteredStderr, stdout })); // Use the filtered stderr
@@ -139,6 +139,19 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdo
 			}
 		});
 	});
+
+const filterNPMWarnings = (stderr: string) => {
+	return stderr.split('\n')
+		.filter(line => !line.includes('npm WARN'))
+		.join('\n');
+};
+
+const filterShellCmdStderr = (stderr: string) => {
+	let retval = filterDockerImageMessages(stderr);
+	retval = filterNPMWarnings(retval);
+
+	return retval;
+};
 
 type ExecErrProps = {
 	stderr: string;
