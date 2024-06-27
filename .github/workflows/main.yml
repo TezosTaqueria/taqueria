@@ -49,7 +49,7 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: taq-${{ matrix.os }}
           path: taq
@@ -70,7 +70,7 @@ jobs:
 
       - name: Store work
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: work-${{ matrix.os }}
           path: work.tar.gz
@@ -93,7 +93,7 @@ jobs:
             deno-version: v1.x
 
         - name: Download work archive
-          uses: actions/download-artifact@v4
+          uses: actions/download-artifact@v3
           with:
             name: work-ubuntu-latest
             path: .
@@ -109,7 +109,7 @@ jobs:
           run: echo "artifact=$(ls taqueria-vscode-extension/*.vsix)" >> "$GITHUB_OUTPUT"
 
         - name: Upload VSCode Extension
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v3
           with:
             name: taqueria.vsix
             path: ${{ steps.vsix.outputs.artifact }}
@@ -128,7 +128,7 @@ jobs:
             set -e
 
         - name: Store work
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v3
           with:
             name: work-ubuntu-latest
             path: work.tar.gz
@@ -213,7 +213,7 @@ jobs:
         package: ${{fromJson(needs.gather-package-info.outputs.taggedPackages)}}
     steps:
       - name: Download work archive
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: work-ubuntu-latest
           path: .
@@ -266,7 +266,7 @@ jobs:
       TAQ_VERSION: ${{ needs.check_is_release.outputs.version }}
     steps:
       - name: Download work archive
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: work-ubuntu-latest
           path: .
@@ -295,19 +295,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download taq binary for Linux
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: taq-ubuntu-latest
           path: taq-linux
 
       - name: Download taq binary for MacOS
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: taq-macos-latest
           path: taq-macos
       
       - name: Download vscode extension
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: taqueria.vsix
           path: vscode-extension
@@ -366,7 +366,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download vscode extension
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: taqueria.vsix
           path: vscode-extension
@@ -391,7 +391,7 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - name: Download work archive
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: work-ubuntu-latest
           path: .
@@ -467,7 +467,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Download work archive
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: work-ubuntu-latest
           path: .
@@ -517,7 +517,7 @@ jobs:
           node-version: 20
 
       - name: Download work archive
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: work-ubuntu-latest
           path: .
@@ -550,7 +550,7 @@ jobs:
           deno-version: v1.x
 
       - name: Download work archive
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: work-ubuntu-latest
           path: .
