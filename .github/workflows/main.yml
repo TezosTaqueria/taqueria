@@ -16,7 +16,7 @@ jobs:
     env:
       DENO_DIR: ./.deno
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
@@ -28,7 +28,7 @@ jobs:
           deno-version: v1.x
 
       - name: Restore Deno Cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: ${{ env.DENO_DIR }}
           key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
@@ -43,13 +43,13 @@ jobs:
         run: npm run build:binary
           
       - name: Save Deno Cache
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         with:
           path: ${{ env.DENO_DIR }}
           key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: taq-${{ matrix.os }}
           path: taq
@@ -70,7 +70,7 @@ jobs:
 
       - name: Store work
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: work-${{ matrix.os }}
           path: work.tar.gz
@@ -81,7 +81,7 @@ jobs:
       needs: build-binaries
       runs-on: ubuntu-latest
       steps:
-        - uses: actions/checkout@v2
+        - uses: actions/checkout@v4
 
         - uses: actions/setup-node@v4
           with:
@@ -109,7 +109,7 @@ jobs:
           run: echo "artifact=$(ls taqueria-vscode-extension/*.vsix)" >> "$GITHUB_OUTPUT"
 
         - name: Upload VSCode Extension
-          uses: actions/upload-artifact@v2
+          uses: actions/upload-artifact@v4
           with:
             name: taqueria.vsix
             path: ${{ steps.vsix.outputs.artifact }}
@@ -128,7 +128,7 @@ jobs:
             set -e
 
         - name: Store work
-          uses: actions/upload-artifact@v2
+          uses: actions/upload-artifact@v4
           with:
             name: work-ubuntu-latest
             path: work.tar.gz
@@ -141,7 +141,7 @@ jobs:
       should_run: ${{ steps.check_pr_or_issue.outputs.should_run }}
       issue_number: ${{ steps.check_pr_or_issue.outputs.issue_number }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: Check for PR or Issue
@@ -162,7 +162,7 @@ jobs:
       is_release: ${{ steps.check_release.outputs.is_release }}
       version: ${{ steps.check_release.outputs.version }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 1
       - name: Check for Release
@@ -185,7 +185,7 @@ jobs:
       taggedPackages: ${{ steps.gather-packages.outputs.taggedPackages }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Gather package info
       id: gather-packages
@@ -439,7 +439,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: List .spec.ts files
         id: list
@@ -491,7 +491,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: List .spec.ts files
         id: list
