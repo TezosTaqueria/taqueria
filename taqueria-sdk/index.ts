@@ -140,11 +140,11 @@ export const execCmd = (cmd: string): LikeAPromise<StdIO, ExecException & { stdo
 		});
 	});
 
-const filterNPMWarnings = (stderr: string) => {
-	return stderr.split('\n')
-		.filter(line => !line.includes('npm WARN'))
+const filterNPMWarnings = (stderr: string): string =>
+	stderr
+		.split('\n')
+		.filter(line => !/npm\s+warn/i.test(line))
 		.join('\n');
-};
 
 const filterShellCmdStderr = (stderr: string) => {
 	let retval = filterDockerImageMessages(stderr);

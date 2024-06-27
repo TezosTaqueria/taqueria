@@ -330,10 +330,10 @@
     "packageJson": {
       "dependencies": [
         "npm:@helia/unixfs@^3.0.1",
-        "npm:@taqueria/lib-ligo@^0.53.9",
-        "npm:@taqueria/node-sdk@^0.53.9",
-        "npm:@taqueria/plugin-contract-types@^0.53.9",
-        "npm:@taqueria/protocol@^0.53.9",
+        "npm:@taqueria/lib-ligo@^0.53.10",
+        "npm:@taqueria/node-sdk@^0.53.10",
+        "npm:@taqueria/plugin-contract-types@^0.53.10",
+        "npm:@taqueria/protocol@^0.53.10",
         "npm:@taquito/michel-codec@^19.2.0",
         "npm:@taquito/signer@^19.2.0",
         "npm:@taquito/taquito@^19.2.0",

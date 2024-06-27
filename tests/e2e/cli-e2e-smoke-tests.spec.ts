@@ -69,10 +69,10 @@ describe('Smoke Test E2E Testing for Taqueria CLI,', () => {
 			const { waitForText } = await spawn('taq', 'init test-project');
 			await waitForText("Project taq'ified!");
 			const ligoInstall = await execute('taq', 'install ../taqueria-plugin-ligo', './test-project');
-			console.log(ligoInstall);
+			// console.log(ligoInstall);
 			expect(ligoInstall.stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 			const jestInstall = await execute('taq', 'install ../taqueria-plugin-jest', './test-project');
-			console.log(jestInstall);
+			// console.log(jestInstall);
 			expect(jestInstall.stdout).toEqual(expect.arrayContaining(['Plugin installed successfully']));
 
 			const mligo_file = await (await exec('cat e2e/data/ligo-legacy-data/hello-tacos.mligo')).stdout;
