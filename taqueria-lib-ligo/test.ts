@@ -1,5 +1,5 @@
 import { execCmd, getArch, sendAsyncErr, sendJsonRes, sendWarn } from '@taqueria/node-sdk';
-import { Common, emitExternalError, getInputFilenameRelPath, TestOpts as Opts, formatStdErr } from './common';
+import { Common, emitExternalError, formatStdErr, getInputFilenameRelPath, TestOpts as Opts } from './common';
 
 type TableRow = { contract: string; testResults: string };
 
@@ -22,8 +22,11 @@ const inject = (commonObj: Common) => {
 		getArch()
 			.then(() => getTestContractCmd(parsedArgs, sourceFile))
 			.then(execCmd)
-			.then(({ stdout, stderr: unformattedStdErr }) => {
-				const stderr = formatStdErr(unformattedStdErr)
+			.then(({ stdout: unformattedStdout, stderr: unformattedStdErr }) => {
+				// Workaround for https://gitlab.com/ligolang/ligo/-/issues/2189
+				const stdout = unformattedStdout.replace(/method not allowed/i, '');
+
+				const stderr = formatStdErr(unformattedStdErr);
 				if (stderr.length > 0) sendWarn(stderr);
 				const result = '🎉 All tests passed 🎉';
 				return {

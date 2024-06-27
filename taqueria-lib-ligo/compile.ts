@@ -200,9 +200,9 @@ export const inject = (commonObj: Common) => {
 			await getArch();
 			const cmd = await getListDeclarationsCmd(parsedArgs, sourceFile);
 			const { stderr: unformattedStderr, stdout: unformattedStdout } = await execCmd(cmd);
-			const stdout = unformattedStdout.replace(/method not allowed/i, '');
 
 			// Workaround for https://gitlab.com/ligolang/ligo/-/issues/2189
+			const stdout = unformattedStdout.replace(/method not allowed/i, '');
 			const stderr = formatStdErr(unformattedStderr);
 
 			if (stderr.length > 0) return Promise.reject(stderr);
