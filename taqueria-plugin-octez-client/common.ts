@@ -2,7 +2,7 @@ import { getArchSync, getDockerImage, ProxyTaskArgs, RequestArgs } from '@taquer
 import { join } from 'path';
 
 // Should point to the latest stable version, so it needs to be updated as part of our release process.
-const getFlextesaImage = (_arch: 'linux/arm64/v8' | 'linux/amd64'): string => 'tezos/tezos:octez-v20.0-rc1';
+const getFlextesaImage = (_arch: 'linux/arm64/v8' | 'linux/amd64'): string => 'tezos/tezos:octez-v20.1';
 
 const OCTEZ_CLIENT_IMAGE_ENV_VAR = 'TAQ_OCTEZ_CLIENT_IMAGE';
 
