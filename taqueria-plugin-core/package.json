@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-core",
-	"version": "0.53.19",
+	"version": "0.54.0",
 	"description": "A taqueria plugin for core tasks",
 	"targets": {
 		"default": {
@@ -43,7 +43,7 @@
 		"typescript": "^5.3.3"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.53.19"
+		"@taqueria/node-sdk": "^0.54.0"
 	},
 	"tsup": {
 		"entry": [
