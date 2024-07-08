@@ -51,11 +51,11 @@ export const defaultConfig: Config.t = Config.create({
 		},
 	},
 	accounts: {
-		bob: '3_000_000_000',
-		alice: '3_000_000_000',
-		john: '3_000_000_000',
-		jane: '3_000_000_000',
-		joe: '3_000_000_000',
+		bob: '30_000_000',
+		alice: '30_000_000',
+		john: '30_000_000',
+		jane: '30_000_000',
+		joe: '30_000_000',
 	},
 	network: {
 		ghostnet: {

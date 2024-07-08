@@ -328,7 +328,6 @@ export const inject = (commonObj: Common) => {
 		exprKind: ExprKind,
 		exprName: string,
 	): string => {
-		debugger;
 		const projectDir = process.env.PROJECT_DIR ?? parsedArgs.projectDir;
 		if (!projectDir) throw new Error(`No project directory provided`);
 		const compilerType = isStorageKind(exprKind) ? 'storage' : 'parameter';

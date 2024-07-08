@@ -49,7 +49,7 @@ const getAccountsInfo = (
 					contractAddress: aliasInfo.publicKeyHash,
 					parameter: 'Unit',
 					entrypoint: 'default',
-					mutezTransfer: parseInt(amountToFillInMutez.toString()),
+					mutezTransfer: parseInt(amountToFillInMutez.toString().replaceAll('_', '')),
 				};
 			}),
 	)

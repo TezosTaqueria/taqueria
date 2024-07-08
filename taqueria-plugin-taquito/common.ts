@@ -142,7 +142,7 @@ export const getDeclaredAccounts = (parsedArgs: RequestArgs.t): Record<string, n
 			const mutez: string | number = declaredAccount[1];
 			return {
 				...acc,
-				[alias]: typeof mutez === 'string' ? parseFloat(mutez) : mutez,
+				[alias]: typeof mutez === 'string' ? parseFloat(mutez.replaceAll('_', '')) : mutez,
 			};
 		},
 		{} as Record<string, number>,
