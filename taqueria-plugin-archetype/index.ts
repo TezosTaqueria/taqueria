@@ -17,6 +17,15 @@ Plugin.create(i18n => ({
 			encoding: 'json',
 		}),
 		Task.create({
+			task: 'decompile',
+			command: 'decompile [sourceFile]',
+			aliases: ['d', 'decompile-archetype'],
+			description: 'Decompile a Michelson smart contract to Archetype source code',
+			options: [],
+			handler: 'proxy',
+			encoding: 'json',
+		}),
+		Task.create({
 			task: 'get-image',
 			command: 'get-image',
 			description: 'Gets the name of the image to be used',
