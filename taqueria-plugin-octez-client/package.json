@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-octez-client",
-	"version": "0.55.1",
+	"version": "0.56.0",
 	"description": "A taqueria plugin for utilizing octez-client",
 	"targets": {
 		"default": {
@@ -41,7 +41,7 @@
 	},
 	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.55.1",
+		"@taqueria/node-sdk": "^0.56.0",
 		"fast-glob": "^3.3.2"
 	},
 	"devDependencies": {
