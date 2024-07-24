@@ -15,5 +15,5 @@ const getAliasAddress: (config: any, alias: string) => string;
 ```
 
 :::tip
-https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop is a scaffold that shows an example of how to use this library. It uses `getAliasAddress` to facilitate hot reloading.
+https://github.com/tezostaqueria/taqueria-scaffold-taco-shop is a scaffold that shows an example of how to use this library. It uses `getAliasAddress` to facilitate hot reloading.
 :::

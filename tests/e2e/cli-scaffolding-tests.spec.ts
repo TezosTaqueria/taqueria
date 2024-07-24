@@ -13,7 +13,7 @@ describe('E2E Testing for taqueria scaffolding initialization,', () => {
 		// Scaffold the project
 		const { code } = await execute(
 			'taq',
-			'scaffold https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop.git scaffold-test',
+			'scaffold https://github.com/tezostaqueria/taqueria-scaffold-taco-shop.git scaffold-test',
 		);
 		expect(code).toBe(0);
 		const expectedContents: string[] = [

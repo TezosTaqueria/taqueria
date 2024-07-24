@@ -1,9 +1,9 @@
 {
 	"name": "taqueria",
-	"displayName": "Taqueria (by Pinnacle Labs)",
+	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
-	"publisher": "PinnacleLabs",
-	"version": "0.56.0",
+	"publisher": "Taqueria",
+	"version": "0.56.1",
 	"private": true,
 	"engines": {
 		"vscode": "^1.84.2"
@@ -41,17 +41,17 @@
 			}
 		}
 	},
-	"author": "Pinnacle Labs Limited",
+	"author": "Taqueria",
 	"license": "Apache-2.0",
 	"icon": "images/taqueria-icon.png",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/pinnacle-labs/taqueria.git"
+		"url": "https://github.com/tezostaqueria/taqueria.git"
 	},
 	"bugs": {
-		"url": "https://github.com/pinnacle-labs/taqueria/issues"
+		"url": "https://github.com/tezostaqueria/taqueria/issues"
 	},
-	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
+	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
 	"activationEvents": [
 		"onCommand:taqueria.init",
 		"onCommand:taqueria.scaffold",
@@ -726,8 +726,8 @@
 	},
 	"dependencies": {
 		"@microsoft/signalr": "^8.0.0",
-		"@taqueria/analytics": "^0.56.0",
-		"@taqueria/protocol": "^0.56.0",
+		"@taqueria/analytics": "^0.56.1",
+		"@taqueria/protocol": "^0.56.1",
 		"cli-table3": "^0.6.3",
 		"comment-json": "^4.2.3",
 		"eventsource": "^2.0.2",

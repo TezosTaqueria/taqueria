@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/analytics",
-	"version": "0.56.0",
+	"version": "0.56.1",
 	"description": "A TypeScript SDK submitting events for Taqueria activity",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -23,19 +23,19 @@
 		"pinnacle-labs",
 		"pinnaclelabs"
 	],
-	"author": "Pinancle Labs",
+	"author": "Taqueria",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/pinnacle-labs/taqueria.git",
+		"url": "https://github.com/tezostaqueria/taqueria.git",
 		"directory": "taqueria-sdk"
 	},
 	"bugs": {
-		"url": "https://github.com/pinnacle-labs/taqueria/issues"
+		"url": "https://github.com/tezostaqueria/taqueria/issues"
 	},
-	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
+	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
 	"dependencies": {
-		"@taqueria/protocol": "^0.56.0",
+		"@taqueria/protocol": "^0.56.1",
 		"node-machine-id-xz": "^1.0.2"
 	},
 	"devDependencies": {

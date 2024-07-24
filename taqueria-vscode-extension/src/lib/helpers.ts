@@ -653,7 +653,7 @@ export class VsCodeHelper {
 		return [
 			{
 				name: 'Taco Shop',
-				url: 'https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop',
+				url: 'https://github.com/tezostaqueria/taqueria-scaffold-taco-shop',
 			},
 		];
 	}

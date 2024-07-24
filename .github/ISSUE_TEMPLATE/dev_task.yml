@@ -16,7 +16,7 @@ body:
     id: epic_link
     attributes:
       label: 🔗 Epic|Feature Link
-      placeholder: "ex. https://github.com/pinnacle-labs/taqueria/issues/123"
+      placeholder: "ex. https://github.com/tezostaqueria/taqueria/issues/123"
     validations:
       required: false
   - type: checkboxes
@@ -61,7 +61,7 @@ body:
     id: terms
     attributes:
       label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/pinnacle-labs/taqueria/blob/1d6476f92fce0f2f36cd268549aa15e6cbe770d3/code-of-conduct.md)
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/tezostaqueria/taqueria/blob/1d6476f92fce0f2f36cd268549aa15e6cbe770d3/code-of-conduct.md)
       options:
         - label: I agree to follow this project's Code of Conduct
           required: true

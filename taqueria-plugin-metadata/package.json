@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-metadata",
-	"version": "0.56.0",
+	"version": "0.56.1",
 	"description": "A plugin for Taqueria providing metadata creation and validation.",
 	"keywords": [
 		"taqueria",
@@ -22,17 +22,17 @@
 	"scripts": {
 		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
 	},
-	"author": "Pinnacle Labs",
+	"author": "Taqueria",
 	"license": "Apache-2.0",
 	"type": "module",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/pinnacle-labs/taqueria.git",
+		"url": "https://github.com/tezostaqueria/taqueria.git",
 		"directory": "taqueria-plugin-metadata"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.56.0",
-		"@taqueria/protocol": "^0.56.0",
+		"@taqueria/node-sdk": "^0.56.1",
+		"@taqueria/protocol": "^0.56.1",
 		"prompts": "^2.4.2"
 	},
 	"devDependencies": {

@@ -307,7 +307,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// See https://github.com/pinnacle-labs/taqueria/issues/1861
+	// See https://github.com/tezostaqueria/taqueria/issues/1861
 	test('Assure that entrypoints with optional parameters generate valid TypeScript', async () => {
 		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');
@@ -331,7 +331,7 @@ describe('Contract Types Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// See https://github.com/pinnacle-labs/taqueria/issues/1895
+	// See https://github.com/tezostaqueria/taqueria/issues/1895
 	test('Assure that storages types with nested optional types generate valid TypeScript', async () => {
 		const { execute, cleanup, spawn, writeFile, readFile } = await prepareEnvironment();
 		const { waitForText } = await spawn('taq', 'init test-project');

@@ -37,8 +37,8 @@ taq scaffold [url] [path]
 
 | Argument     | Required | Description                                            | Example Usage                                                                   |
 | ------------ | -------- | ------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| `[url]`      | No       | URL of the scaffold repository                         | `taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop`          |
-| `[path]`     | No       | Path to the folder you would like to scaffold into     | `taq scaffold https://github.com/pinnacle-labs/taqueria-scaffold-taco-shop myNewDir` |
+| `[url]`      | No       | URL of the scaffold repository                         | `taq scaffold https://github.com/tezostaqueria/taqueria-scaffold-taco-shop`          |
+| `[path]`     | No       | Path to the folder you would like to scaffold into     | `taq scaffold https://github.com/tezostaqueria/taqueria-scaffold-taco-shop myNewDir` |
 
 ### Task Details
 

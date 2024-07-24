@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/lib-ligo",
-	"version": "0.56.0",
+	"version": "0.56.1",
 	"description": "A taqueria library which provides common functionality for the LIGO and LIGO Legacy Plugins",
 	"targets": {
 		"default": {
@@ -29,19 +29,19 @@
 		"smart contract",
 		"compile"
 	],
-	"author": "Pinnacle Labs",
+	"author": "Taqueria",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/pinnacle-labs/taqueria.git",
+		"url": "git+https://github.com/tezostaqueria/taqueria.git",
 		"directory": "taqueria-plugin-ligo"
 	},
 	"bugs": {
-		"url": "https://github.com/pinnacle-labs/taqueria/issues"
+		"url": "https://github.com/tezostaqueria/taqueria/issues"
 	},
-	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
+	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.56.0",
+		"@taqueria/node-sdk": "^0.56.1",
 		"fast-glob": "^3.3.2"
 	},
 	"devDependencies": {

@@ -2,7 +2,7 @@
 
 The Hello World plugin provides a basic example of a Taqueria plugin. This plugin is intended to be used as a template for creating new plugins.
 
-It is written in TypeScript and compiled to a JavaScript bundle for NodeJS using [tsup](https://github.com/egoist/tsup) and uses the `@taqueria/node-sdk` - as are all plugins that the Pinnacle Labs team develops for Taqueria.
+It is written in TypeScript and compiled to a JavaScript bundle for NodeJS using [tsup](https://github.com/egoist/tsup) and uses the `@taqueria/node-sdk` - as are all plugins that the our team develops for Taqueria.
 
 ## Requirements
 

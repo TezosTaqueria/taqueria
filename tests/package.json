@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/tests",
-	"version": "0.56.0",
+	"version": "0.56.1",
 	"type": "module",
 	"private": true,
 	"description": "This is Taqueria testing project includes unit, integration and e2e tests",
@@ -22,7 +22,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/pinnacle-labs/taqueria.git",
+		"url": "git+https://github.com/tezostaqueria/taqueria.git",
 		"directory": "tests"
 	},
 	"keywords": [
@@ -32,12 +32,12 @@
 		"integration",
 		"unit"
 	],
-	"author": "Pinnacle Labs",
+	"author": "Taqueria",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/pinnacle-labs/taqueria/issues"
+		"url": "https://github.com/tezostaqueria/taqueria/issues"
 	},
-	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
+	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
 	"devDependencies": {
 		"@gmrchk/cli-testing-library": "^0.1.2",
 		"@taquito/signer": "^20.0.0-beta.0",

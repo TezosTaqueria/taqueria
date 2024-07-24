@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-tzcompose",
-	"version": "0.56.0",
+	"version": "0.56.1",
 	"description": "A TzCompose plugin for Taqueria using the GoTz SDK",
 	"main": "index.js",
 	"scripts": {
@@ -14,14 +14,14 @@
 		"deploy",
 		"gotz"
 	],
-	"author": "Pinnacle Labs <support@pinnaclelabs.limited>",
+	"author": "Taqueria",
 	"license": "Apache-2.0",
 	"devDependencies": {
 		"tsup": "^8.0.1",
 		"typescript": "^5.3.3"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.56.0"
+		"@taqueria/node-sdk": "^0.56.1"
 	},
 	"tsup": {
 		"entry": [

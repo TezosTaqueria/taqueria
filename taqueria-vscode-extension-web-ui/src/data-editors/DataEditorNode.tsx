@@ -89,7 +89,7 @@ const getEditor = (
 			return (
 				<span>
 					The editor for {JSON.stringify(dataType)}{' '}
-					is not implemented yet, please contract the taqueria team at github.com/pinnacle-labs/taqueria to report this
+					is not implemented yet, please contract the taqueria team at github.com/tezostaqueria/taqueria to report this
 					issue.
 				</span>
 			);

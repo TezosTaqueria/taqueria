@@ -58,7 +58,7 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		await cleanup();
 	});
 
-	// blocked by https://github.com/pinnacle-labs/taqueria/issues/1671
+	// blocked by https://github.com/tezostaqueria/taqueria/issues/1671
 	// this fail has been confirmed manually in pre-release v0.25.23-rc
 	test.skip('typecheck will check multiple (but not all) contracts using typecheck [sourceFile1] [sourceFile2] command', async () => {
 		const { execute, cleanup, spawn, writeFile } = await prepareEnvironment();

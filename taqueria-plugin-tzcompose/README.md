@@ -2,7 +2,7 @@
 
 This plugin integrates [Tzcompose](https://github.com/blockwatch-cc/tzgo/blob/master/cmd/tzcompose/README.md), a powerful automation framework developed by Blockwatch for executing complex transaction sequences on Tezos, into the Taqueria development environment.
 
-The plugin is written in TypeScript and compiled to a JavaScript bundle for Node.js using [tsup](https://github.com/egoist/tsup). It leverages the `@taqueria/node-sdk`, following the same development practices as other plugins created by the Pinnacle Labs team for Taqueria.
+The plugin is written in TypeScript and compiled to a JavaScript bundle for Node.js using [tsup](https://github.com/egoist/tsup). It leverages the `@taqueria/node-sdk`, following the same development practices as other plugins created by our team for Taqueria.
 
 ## Requirements
 

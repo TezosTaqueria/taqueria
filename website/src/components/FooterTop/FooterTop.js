@@ -2,12 +2,12 @@ import React from "react";
 import clsx from "clsx";
 import styles from "./FooterTop.module.css";
 
-// TODO: Adjust for Pinnacle Labs
+// TODO: Adjust for Taqueria
 const FeatureList = [
 	{
 		title: "Built By",
 		Svg: require("../../../static/img/ECAD_logo.svg").default,
-		url: "https://pinnaclelabs.limited/",
+		url: "https://taqueria.io/",
 	},
 	,
 ];

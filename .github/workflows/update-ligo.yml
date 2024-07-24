@@ -28,7 +28,7 @@ jobs:
       run: |
         cd taqueria
         if [[ $(git status -s) ]]; then
-          git config user.email "michael@pinnaclelabs.limited"
+          git config user.email "mike.weichert@trili.tech"
           git config user.name "Michael Weichert"
           git add -A
           git commit -m "Updated LIGO grammars to the latest version"

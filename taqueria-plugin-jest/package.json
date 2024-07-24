@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-jest",
-	"version": "0.56.0",
+	"version": "0.56.1",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",
@@ -19,16 +19,16 @@
 	"scripts": {
 		"build": "npx tsc -noEmit -p ./tsconfig.json && npx tsup"
 	},
-	"author": "Pinnacle Labs",
+	"author": "Taqueria",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/pinnacle-labs/taqueria.git",
+		"url": "https://github.com/tezostaqueria/taqueria.git",
 		"directory": "taqueria-plugin-jest"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.56.0",
-		"@taqueria/plugin-contract-types": "^0.56.0",
+		"@taqueria/node-sdk": "^0.56.1",
+		"@taqueria/plugin-contract-types": "^0.56.1",
 		"@taquito/signer": "^20.0.1",
 		"@taquito/taquito": "^20.0.1",
 		"@taquito/utils": "^20.0.1",

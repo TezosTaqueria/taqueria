@@ -8,7 +8,7 @@ import {
 import { InMemorySigner } from '@taquito/signer';
 import { join } from 'path';
 
-const getDockerImage = () => 'ghcr.io/pinnacle-labs/tzgo/tzcompose:latest';
+const getDockerImage = () => 'ghcr.io/tezostaqueria/tzgo/tzcompose:latest';
 
 export interface RunArgs extends RequestArgs.t {
 	task: 'run';

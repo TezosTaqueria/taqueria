@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/toolkit",
-	"version": "0.56.0",
+	"version": "0.56.1",
 	"description": "A TypeScript library for NodeJS to work with Taqueria projects",
 	"source": "./index.ts",
 	"main": "./index.js",
@@ -19,17 +19,17 @@
 		"pinnaclelabs",
 		"ecadlabs"
 	],
-	"author": "Pinnacle Labs",
+	"author": "Taqueria",
 	"license": "Apache-2.0",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/pinnacle-labs/taqueria.git",
+		"url": "https://github.com/tezostaqueria/taqueria.git",
 		"directory": "taqueria-toolkit"
 	},
 	"bugs": {
-		"url": "https://github.com/pinnacle-labs/taqueria/issues"
+		"url": "https://github.com/tezostaqueria/taqueria/issues"
 	},
-	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
+	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
 	"devDependencies": {
 		"@types/cross-spawn": "^6.0.6",
 		"@types/node": "^20.10.4",
@@ -38,7 +38,7 @@
 		"typescript": "^5.3.3"
 	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.56.0",
+		"@taqueria/protocol": "^0.56.1",
 		"buffer": "^6.0.3",
 		"cross-spawn": "^7.0.3",
 		"yargs": "^17.7.2"

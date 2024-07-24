@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.56.0",
+	"version": "0.56.1",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -25,7 +25,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/pinnacle-labs/taqueria.git"
+		"url": "git+https://github.com/tezostaqueria/taqueria.git"
 	},
 	"keywords": [
 		"taqueria",
@@ -35,15 +35,16 @@
 		"deploy",
 		"originate",
 		"pinnaclelabs",
-		"pinnacle-labs"
+		"pinnacle-labs",
+		"trilitech"
 	],
-	"author": "Pinnacle Labs",
+	"author": "Taqueria",
 	"license": "Apache-2.0",
 	"bugs": {
-		"url": "https://github.com/pinnacle-labs/taqueria/issues"
+		"url": "https://github.com/tezostaqueria/taqueria/issues"
 	},
 	"private": true,
-	"homepage": "https://github.com/pinnacle-labs/taqueria#readme",
+	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
 	"devDependencies": {
 		"chokidar-cli": "^3.0.0",
 		"dprint": "^0.45.0",
@@ -81,10 +82,10 @@
 	],
 	"dependencies": {
 		"@helia/unixfs": "^3.0.1",
-		"@taqueria/lib-ligo": "^0.56.0",
-		"@taqueria/node-sdk": "^0.56.0",
-		"@taqueria/plugin-contract-types": "^0.56.0",
-		"@taqueria/protocol": "^0.56.0",
+		"@taqueria/lib-ligo": "^0.56.1",
+		"@taqueria/node-sdk": "^0.56.1",
+		"@taqueria/plugin-contract-types": "^0.56.1",
+		"@taqueria/protocol": "^0.56.1",
 		"@taquito/michel-codec": "^19.2.0",
 		"@taquito/signer": "^19.2.0",
 		"@taquito/taquito": "^19.2.0",

@@ -1,1 +1,1 @@
-Please see [here](https://github.com/pinnacle-labs/contrib/blob/main/code-of-conduct.md).
+Please see [here](https://github.com/tezostaqueria/contrib/blob/main/code-of-conduct.md).

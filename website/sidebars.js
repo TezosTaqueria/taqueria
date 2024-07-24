@@ -40,12 +40,12 @@ const sidebars = {
         {
           "type": "link",
           "label": "Getting Started with LIGO",
-          "href": "https://github.com/pinnacle-labs/taqueria-getting-started-ligo-scaffold"
+          "href": "https://github.com/tezostaqueria/taqueria-getting-started-ligo-scaffold"
         },
         {
           "type": "link",
           "label": "Getting Started with TzCompose",
-          "href": "https://github.com/pinnacle-labs/taqueria-getting-started-tzcompose-scaffold"
+          "href": "https://github.com/tezostaqueria/taqueria-getting-started-tzcompose-scaffold"
         },
         "scaffolds/taco-shop",
       ],

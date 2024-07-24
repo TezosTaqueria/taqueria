@@ -56,7 +56,7 @@ install_taq() {
             output_error "Homebrew not found. Please install Homebrew first."
             exit 1
         fi
-        brew tap pinnacle-labs/taqueria https://github.com/pinnacle-labs/taqueria
+        brew tap TezosTaqueria/taqueria https://github.com/TezosTaqueria/taqueria
         brew install taqueria
         exit 0
     fi
