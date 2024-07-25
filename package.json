@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.56.5",
+	"version": "0.56.6",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -72,7 +72,6 @@
 		"./taqueria-sdk",
 		"./taqueria-analytics",
 		"./taqueria-toolkit",
-		"./taqueria-utils",
 		"./taqueria-vscode-extension",
 		"./taqueria-vscode-extension-web-ui",
 		"./taqueria-lib*",
@@ -81,10 +80,10 @@
 	],
 	"dependencies": {
 		"@helia/unixfs": "^3.0.1",
-		"@taqueria/lib-ligo": "^0.56.5",
-		"@taqueria/node-sdk": "^0.56.5",
-		"@taqueria/plugin-contract-types": "^0.56.5",
-		"@taqueria/protocol": "^0.56.5",
+		"@taqueria/lib-ligo": "^0.56.6",
+		"@taqueria/node-sdk": "^0.56.6",
+		"@taqueria/plugin-contract-types": "^0.56.6",
+		"@taqueria/protocol": "^0.56.6",
 		"@taquito/michel-codec": "^19.2.0",
 		"@taquito/signer": "^19.2.0",
 		"@taquito/taquito": "^19.2.0",
