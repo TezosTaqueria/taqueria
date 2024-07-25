@@ -26,7 +26,6 @@ const getTypecheckCmd = async (parsedArgs: Opts, sourceFile: string): Promise<st
 	const baseCmd = `docker run --rm -v \"${projectDir}\":/project -w /project --platform ${arch} ${flextesaImage}`;
 	const inputFile = getInputFilename(parsedArgs, sourceFile);
 	const cmd = `${baseCmd} octez-client ${GLOBAL_OPTIONS} typecheck script ${inputFile}`;
-	console.error(cmd);
 	return cmd;
 };
 
