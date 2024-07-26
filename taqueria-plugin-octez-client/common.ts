@@ -31,6 +31,8 @@ export type IntersectionOpts = ClientOpts & TypeCheckOpts & TypeCheckAllOpts & S
 
 type UnionOpts = ClientOpts | TypeCheckOpts | TypeCheckAllOpts | SimulateOpts;
 
+// Temporary change till a discussion is had with ECAD Labs
+// about https://github.com/TezosTaqueria/taqueria/actions/runs/10102868947/job/27961869044
 const ENDPOINT = process.env['TAQ_TEZOS_CLIENT_RPC'] ?? 'https://ghostnet.smartpy.io';
 export const GLOBAL_OPTIONS = `--endpoint ${ENDPOINT}`;
 
