@@ -480,7 +480,6 @@ jobs:
         env:
           HUSKY_SKIP_INSTALL: 1
           HUSKY: 0
-          TAQ_TEZOS_CLIENT_RPC: https://ghostnet.ecadinfra.com
         run: |
           CWD=$(pwd)
           export PATH=$PATH:$CWD
