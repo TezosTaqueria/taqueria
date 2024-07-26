@@ -74,6 +74,7 @@ jobs:
         with:
           name: work-${{ matrix.os }}
           path: work.tar.gz
+          overwrite: true
           retention-days: 1
 
   # Builds all NPM packages. Then update the archive of the work we've done and store it as an artifact to use in later jobs.
