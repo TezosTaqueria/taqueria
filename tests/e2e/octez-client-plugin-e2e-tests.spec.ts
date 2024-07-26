@@ -14,6 +14,8 @@ describe('octez-client Plugin E2E Testing for Taqueria CLI', () => {
 		const artifact_file = await (await exec(`cat e2e/data/michelson-data/hello-tacos.tz`)).stdout;
 		await writeFile('./test-project/artifacts/hello-tacos.tz', artifact_file);
 
+		console.log(await execute('head', '-50 node_modules/@taqueria/plugin-octez-client/index.js', '/test-project'));
+
 		const typecheckResult = await execute('taq', 'typecheck-all', './test-project');
 		console.log(typecheckResult);
 		expect(typecheckResult.stdout).toEqual(expect.arrayContaining(['│ hello-tacos.tz │ Valid  │']));
