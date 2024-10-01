@@ -1,24 +1,15 @@
-import { unixfs } from '@helia/unixfs';
+import { createHash } from 'crypto';
 import { readFile } from 'fs/promises';
-import { createHelia } from 'helia';
 
 export async function getFileIPFSHash(filePath: string): Promise<string> {
-	// create a Helia node
-	const helia = await createHelia();
+	// Read the file contents
+	const fileContent = await readFile(filePath);
 
-	// create a filesystem on top of Helia, in this case it's UnixFS
-	const fs = unixfs(helia);
+	// Create a SHA-256 hash of the file contents
+	const hash = createHash('sha256').update(fileContent).digest('hex');
 
-	// Create a text encoder and encode the contents of the file
-	// into a Uint8Array.
-	const cid = fs.addFile({
-		path: filePath,
-		content: await readFile(filePath),
-	});
-
-	await helia.stop();
-
-	return cid.toString();
+	// Return the hash as a string
+	return hash;
 }
 
 export default getFileIPFSHash;

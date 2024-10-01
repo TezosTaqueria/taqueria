@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-contract-types",
-	"version": "0.56.15",
+	"version": "0.56.17",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",
@@ -30,14 +30,14 @@
 		"ts-jest": "^29.1.2",
 		"ts-node": "^10.9.2",
 		"tsconfig-paths": "^4.2.0",
-		"tsup": "^8.0.1",
-		"typescript": "^5.3.3"
+		"tsup": "^8.3.0",
+		"typescript": "^5.6.2"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.56.15",
-		"@taquito/michel-codec": "^20.0.1",
-		"@taquito/signer": "^20.0.1",
-		"@taquito/taquito": "^20.0.1",
+		"@taqueria/node-sdk": "^0.56.17",
+		"@taquito/michel-codec": "^21.0.0-beta.0",
+		"@taquito/signer": "^21.0.0-beta.0",
+		"@taquito/taquito": "^21.0.0-beta.0",
 		"bignumber.js": "^9.1.2",
 		"fast-glob": "^3.3.2"
 	},

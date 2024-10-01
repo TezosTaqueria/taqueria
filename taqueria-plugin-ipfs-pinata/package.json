@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-ipfs-pinata",
-	"version": "0.56.15",
+	"version": "0.56.17",
 	"description": "A plugin for Taqueria providing ipfs publishing and pinning using the Pinata service",
 	"keywords": [
 		"taqueria",
@@ -33,29 +33,21 @@
 		"directory": "taqueria-plugin-ipfs-pinata"
 	},
 	"dependencies": {
-		"@helia/unixfs": "^3.0.0",
-		"@taqueria/node-sdk": "^0.56.15",
-		"dotenv": "^16.4.1",
+		"@taqueria/node-sdk": "^0.56.17",
+		"dotenv": "^16.4.5",
 		"form-data": "^4.0.0",
-		"helia": "^4.0.0",
 		"node-fetch": "^3.3.2"
 	},
 	"devDependencies": {
 		"@types/node-fetch": "^2.6.11",
-		"tsup": "^8.0.1",
-		"typescript": "^5.3.3"
+		"tsup": "^8.3.0",
+		"typescript": "^5.6.2"
 	},
 	"exports": {
 		".": {
-			"import": "./index.js",
-			"require": "./index.cjs",
-			"node": "./index.cjs",
 			"default": "./index.js"
 		},
 		"./src/ipfsHash": {
-			"import": "./src/ipfsHash.js",
-			"require": "./src/ipfsHash.cjs",
-			"node": "./src/ipfsHash.cjs",
 			"default": "./src/ipfsHash.js"
 		}
 	},

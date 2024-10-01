@@ -13,6 +13,7 @@
 		/* Language and Environment */
 		"target": "ES2021", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
 		"lib": [
+			"ES2015.Promise",
 			"ES2021.String"
 		], /* Specify a set of bundled library declaration files that describe the target runtime environment. */
 		// "experimentalDecorators": true,                   /* Enable experimental support for TC39 stage 2 draft decorators. */

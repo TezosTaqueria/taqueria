@@ -1,7 +1,7 @@
 {
 	"name": "taqueria-vscode-extension-web-ui",
 	"private": true,
-	"version": "0.56.15",
+	"version": "0.56.17",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
@@ -10,9 +10,15 @@
 		"package": "node ./scripts/package-for-extension.js",
 		"preview": "vite preview"
 	},
+	"resolutions": {
+		"node-fetch": "3.3.2"
+	},
+	"overrides": {
+		"node-fetch": "3.3.2"
+	},
 	"dependencies": {
-		"@taquito/michel-codec": "^20.0.1",
-		"@taquito/michelson-encoder": "^20.0.1",
+		"@taquito/michel-codec": "^21.0.0-beta.0",
+		"@taquito/michelson-encoder": "^21.0.0-beta.0",
 		"@vscode/webview-ui-toolkit": "^1.4.0",
 		"react": "^17.0.2",
 		"react-dom": "^17.0.2"

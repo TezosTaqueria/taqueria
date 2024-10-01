@@ -2,7 +2,6 @@ import { RequestArgs } from '@taqueria/node-sdk';
 import { LoadedConfig, Protocol, SandboxConfig } from '@taqueria/node-sdk/types';
 
 export interface Opts extends RequestArgs.t {
-	sandboxName?: string;
 	task?: string;
 	watch?: boolean;
 }

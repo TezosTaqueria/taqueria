@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.56.15",
+	"version": "0.56.17",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -35,9 +35,15 @@
 		"@types/project-name-generator": "^2.1.3",
 		"@types/shell-quote": "^1.7.5",
 		"esbuild-plugin-text-replace": "^1.3.0",
-		"ts-to-zod": "^3.6.1",
-		"tsup": "^8.0.1",
-		"typescript": "^5.3.3"
+		"ts-to-zod": "^3.13.0",
+		"tsup": "^8.3.0",
+		"typescript": "^5.6.2"
+	},
+	"resolutions": {
+		"node-fetch": "3.3.2"
+	},
+	"overrides": {
+		"node-fetch": "3.3.2"
 	},
 	"exports": {
 		".": "./index.js",
@@ -316,21 +322,21 @@
 	},
 	"dependencies": {
 		"@peculiar/webcrypto": "^1.4.5",
-		"@taquito/signer": "^20.0.1",
-		"@taquito/taquito": "^20.0.1",
-		"@taquito/utils": "^20.0.1",
+		"@taquito/signer": "^21.0.0-beta.0",
+		"@taquito/taquito": "^21.0.0-beta.0",
+		"@taquito/utils": "^21.0.0-beta.0",
 		"batching-toposort": "^1.2.0",
 		"fluture": "^14.0.0",
-		"i18next": "^23.8.1",
+		"i18next": "^23.15.1",
 		"node-fetch": "^3.3.2",
-		"rambda": "^9.1.0",
-		"rambdax": "^11.0.0",
+		"rambda": "^9.3.0",
+		"rambdax": "^11.2.0",
 		"shell-quote": "^1.8.1",
 		"stacktrace-js": "^2.0.2",
-		"ts-pattern": "^5.0.6",
+		"ts-pattern": "^5.4.0",
 		"why-is-node-running": "^2.2.2",
 		"yargs": "^17.7.2",
-		"zod": "^3.22.4"
+		"zod": "^3.23.8"
 	},
 	"gitHead": "ff58a2fc06ad233869ad6be574093c8b3b272e2e"
 }
