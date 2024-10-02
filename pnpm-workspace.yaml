@@ -1,0 +1,10 @@
+packages:
+  - 'taqueria-protocol'
+  - 'taqueria-lib*'
+  - 'taqueria-plugin*'
+  - 'taqueria-sdk'
+  - 'taqueria-toolkit'
+  - 'taqueria-analytics'
+  - 'taqueria-vscode*'
+  - 'tests'
+  - '.'

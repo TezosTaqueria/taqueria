@@ -3,7 +3,7 @@
 	"displayName": "Taqueria",
 	"description": "A better way to build on Tezos",
 	"publisher": "Taqueria",
-	"version": "0.56.17",
+	"version": "0.56.18",
 	"private": true,
 	"engines": {
 		"vscode": "^1.84.2"
@@ -698,13 +698,13 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile:base -- --minify",
+		"vscode:prepublish": "pnpm run compile:base --minify",
 		"compile:base": "esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node",
-		"compile": "npx tsc -noEmit && npm run compile:base -- --sourcemap",
-		"compile:watch": "npm run compile:base -- --sourcemap --watch",
+		"compile": "npx tsc -noEmit && pnpm run compile:base --sourcemap",
+		"compile:watch": "pnpm run compile:base --sourcemap --watch",
 		"compile:test": "tsc -p tsconfig.test.json",
-		"build": "npm run compile && npx vsce package --no-dependencies",
-		"pretest": "npm run compile:test",
+		"build": "pnpm run compile && npx vsce package --no-dependencies",
+		"pretest": "pnpm run compile:test",
 		"test": "./bin/run-tests.sh"
 	},
 	"devDependencies": {
@@ -725,8 +725,8 @@
 	},
 	"dependencies": {
 		"@microsoft/signalr": "^8.0.0",
-		"@taqueria/analytics": "^0.56.17",
-		"@taqueria/protocol": "^0.56.17",
+		"@taqueria/analytics": "workspace:*",
+		"@taqueria/protocol": "workspace:*",
 		"cli-table3": "^0.6.3",
 		"comment-json": "^4.2.3",
 		"eventsource": "^2.0.2",

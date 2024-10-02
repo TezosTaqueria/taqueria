@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-contract-types",
-	"version": "0.56.17",
+	"version": "0.56.18",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",
@@ -9,16 +9,16 @@
 	"scripts": {
 		"pluginInfo": "npx ts-node index.ts --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
 		"build": "npx tsc -noEmit && npx tsup",
-		"build-ci": "npm run build",
+		"build-ci": "pnpm run build",
 		"debugPluginInfo": "node --inspect-brk index.js --taqRun pluginInfo --i18n {\"foo:\"\"bar\"}",
-		"examples": "npm run build && npm run example && npm run example-json && npm run example-simple && npm run example-file && npm run example-local",
+		"examples": "pnpm run build && pnpm run example && pnpm run example-json && pnpm run example-simple && pnpm run example-file && pnpm run example-local",
 		"example": "node run.js --g ./example/contracts ./example/types",
 		"example-json": "node run.js --json --g ./example/contracts ./example/types",
 		"example-simple": "node run.js --types simple --g ./example/contracts ./example/types-simple",
 		"example-file": "node run.js --types file --g ./example/contracts ./example/types-file",
 		"example-local": "node run.js --types local --g ./example/contracts ./example/types-local",
 		"example-jest-test-generation": "npx ts-node ./src/generator/testing-code-generator-jest-demo.ts",
-		"test": "npm run examples && npx jest"
+		"test": "pnpm run examples && npx jest"
 	},
 	"keywords": [],
 	"author": "",
@@ -34,7 +34,7 @@
 		"typescript": "^5.6.2"
 	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.56.17",
+		"@taqueria/node-sdk": "workspace:*",
 		"@taquito/michel-codec": "^21.0.0-beta.0",
 		"@taquito/signer": "^21.0.0-beta.0",
 		"@taquito/taquito": "^21.0.0-beta.0",

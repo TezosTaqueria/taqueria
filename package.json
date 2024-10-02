@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.56.17",
+	"version": "0.56.18",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"test": "yarn",
-		"build-types": "npm run build-types -w taqueria-protocol",
+		"build-types": "pnpm --filter taqueria-protocol run build-types",
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
 		"build:packages": "lerna run build",
@@ -17,12 +17,11 @@
 		"serve-website": "cd website && npm run serve",
 		"deploy-website": "cd website && npm run deploy",
 		"watch": "npx chokidar \"*.ts\" \"taqueria-utils/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run build\" --initial",
-		"build-and-watch-vscode": "npx chokidar \"*.ts\" \"taqueria-vscode-extension/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"npm run compile -w taqueria-vscode-extension\" --initial",
+		"build-and-watch-vscode": "npx chokidar \"*.ts\" \"taqueria-vscode-extension/**/*.ts\" \"taqueria-protocol/**/*.ts\" -c \"pnpm run compile --filter taqueria-vscode-extension\" --initial",
 		"prepare": "npx husky",
 		"format": "npx dprint fmt",
 		"format:check": "npx dprint check",
-		"update-lock": "deno cache --lock-write index.ts",
-		"postinstall": "patch-package"
+		"update-lock": "deno cache --lock-write index.ts"
 	},
 	"repository": {
 		"type": "git",
@@ -57,6 +56,14 @@
 		"tsup": "^8.0.2",
 		"typescript": "^5.3.3"
 	},
+	"pnpm": {
+		"overrides": {
+			"glob": "^11.0.0",
+			"rimraf": "^5.0.5",
+			"whatwg-url": "^14.0.0",
+			"@taqueria/node-sdk>node-fetch": "^3.3.2"
+		}
+	},
 	"lint-staged": {
 		"*.ts": [
 			"npx dprint fmt --config ./dprint.json",
@@ -67,16 +74,5 @@
 			"bash -c 'npm run update-lock'"
 		],
 		"*.json": "npx dprint fmt --config ./dprint.json"
-	},
-	"workspaces": [
-		"./taqueria-protocol",
-		"./taqueria-sdk",
-		"./taqueria-analytics",
-		"./taqueria-toolkit",
-		"./taqueria-vscode-extension",
-		"./taqueria-vscode-extension-web-ui",
-		"./taqueria-lib*",
-		"./taqueria-plugin*",
-		"./tests"
-	]
+	}
 }

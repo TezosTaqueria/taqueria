@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/node-sdk",
-	"version": "0.56.17",
+	"version": "0.56.18",
 	"description": "A TypeScript SDK for NodeJS used for Taqueria plugin development.",
 	"main": "./index.js",
 	"source": "./index.ts",
@@ -33,14 +33,8 @@
 		"url": "https://github.com/tezostaqueria/taqueria/issues"
 	},
 	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
-	"resolutions": {
-		"node-fetch": "3.3.2"
-	},
-	"overrides": {
-		"node-fetch": "3.3.2"
-	},
 	"dependencies": {
-		"@taqueria/protocol": "^0.56.17",
+		"@taqueria/protocol": "workspace:*",
 		"@taquito/signer": "^21.0.0-beta.0",
 		"@taquito/taquito": "^21.0.0-beta.0",
 		"@taquito/utils": "^21.0.0-beta.0",

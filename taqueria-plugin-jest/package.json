@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-jest",
-	"version": "0.56.17",
+	"version": "0.56.18",
 	"main": "index.cjs",
 	"module": "index.js",
 	"source": "index.ts",
@@ -26,15 +26,9 @@
 		"url": "https://github.com/tezostaqueria/taqueria.git",
 		"directory": "taqueria-plugin-jest"
 	},
-	"resolutions": {
-		"node-fetch": "3.3.2"
-	},
-	"overrides": {
-		"node-fetch": "3.3.2"
-	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.56.17",
-		"@taqueria/plugin-contract-types": "^0.56.17",
+		"@taqueria/node-sdk": "workspace:*",
+		"@taqueria/plugin-contract-types": "workspace:*",
 		"@taquito/signer": "^21.0.0-beta.0",
 		"@taquito/taquito": "^21.0.0-beta.0",
 		"@taquito/utils": "^21.0.0-beta.0",

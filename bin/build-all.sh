@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-skip_npm_ci="$SKIP_NPM_CI"
+skip_pnpm_install="${SKIP_PNPM_INSTALL:-$SKIP_NPM_CI}"
 
 if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
     echo '**********************************************'
@@ -40,27 +40,27 @@ if [ "$0" == "./bin/build-all.sh" ] && [ -f index.ts ]; then
 
     set -e # exiting on error
 
-    if [ -z "$skip_npm_ci" ]; then 
+    if [ -z "$skip_pnpm_install" ]; then 
         echo ""
         echo '**********************************************'
-        echo "** Installing NPM dependencies"
-        npm ci
+        echo "** Installing dependencies"
+        pnpm install --frozen-lockfile
     fi
 
     echo ""
     echo '**********************************************'
     echo "** Generating Types"
-    npm run build-types
+    pnpm run build-types
 
     echo ""
     echo '**********************************************'
     echo "** Building taqueria"
-    npm run build:binary
+    pnpm run build:binary
 
     echo ""
     echo '**********************************************'
     echo "** Building packages"
-    npm run build:packages
+    pnpm run build:packages
 
     echo ""
     echo '**********************************************'

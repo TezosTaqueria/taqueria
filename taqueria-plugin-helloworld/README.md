@@ -14,7 +14,7 @@ It is written in TypeScript and compiled to a JavaScript bundle for NodeJS using
 To build the Hello World plugin, run the following command from the root of this repository:
 
 ```shell
-npm run build -w taqueria-plugin-helloworld
+pnpm run build --filter taqueria-plugin-helloworld
 ```
 
 ## Installation

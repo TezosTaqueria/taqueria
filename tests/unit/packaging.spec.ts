@@ -4,9 +4,9 @@ import { join, resolve } from 'path';
 const cwd = resolve(join(__dirname, '/../../'));
 const encoding = 'utf-8' as const;
 const opts = { cwd, encoding };
-const result = JSON.parse(execSync('npm version -w taqueria-sdk --json', opts));
+const result = JSON.parse(execSync('npm version --filter taqueria-sdk --json', opts));
 const sdkVersion = result['@taqueria/node-sdk'];
-const pResult = JSON.parse(execSync('npm version -w taqueria-protocol --json', opts));
+const pResult = JSON.parse(execSync('npm version --filter taqueria-protocol --json', opts));
 const protoVersion = pResult['@taqueria/protocol'];
 
 describe('Assure that SDK and Protocol are packaged correctly', () => {

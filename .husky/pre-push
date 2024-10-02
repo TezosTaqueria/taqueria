@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-npm run test:unit -w tests
+pnpm run test:unit --filter @taqueria/tests

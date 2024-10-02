@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/protocol",
-	"version": "0.56.17",
+	"version": "0.56.18",
 	"description": "A TypeScript package which contains types that are to be shared between @taqueria/node-sdk and @taqueria/taqueria.",
 	"main": "index.js",
 	"scripts": {
@@ -38,12 +38,6 @@
 		"ts-to-zod": "^3.13.0",
 		"tsup": "^8.3.0",
 		"typescript": "^5.6.2"
-	},
-	"resolutions": {
-		"node-fetch": "3.3.2"
-	},
-	"overrides": {
-		"node-fetch": "3.3.2"
 	},
 	"exports": {
 		".": "./index.js",

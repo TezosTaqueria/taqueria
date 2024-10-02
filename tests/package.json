@@ -1,12 +1,12 @@
 {
 	"name": "@taqueria/tests",
-	"version": "0.56.17",
+	"version": "0.56.18",
 	"type": "module",
 	"private": true,
 	"description": "This is Taqueria testing project includes unit, integration and e2e tests",
 	"main": "index.js",
 	"scripts": {
-		"test:unit": "../bin/before-all-tests.sh && npm run test:unit:deno && npm run test:unit:jest",
+		"test:unit": "../bin/before-all-tests.sh && pnpm run test:unit:deno && pnpm run test:unit:jest",
 		"test:unit:deno": "../bin/before-all-tests.sh && TEST=true deno test unit/ --allow-all --unstable --trace-ops",
 		"test:unit:jest": "../bin/before-all-tests.sh && TEST=true jest --config jest.config.unit.ts --no-cache",
 		"test:unit:jest:debug": "../bin/before-all-tests.sh && TEST=true jest --config jest.config.unit.ts --no-cache --detectOpenHandles --detectLeaks",
@@ -40,8 +40,8 @@
 	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
 	"devDependencies": {
 		"@gmrchk/cli-testing-library": "^0.1.2",
-		"@taquito/signer": "^20.0.0-beta.0",
-		"@taquito/taquito": "^20.0.0-beta.0",
+		"@taquito/signer": "^21.0.0-beta.0",
+		"@taquito/taquito": "^21.0.0-beta.0",
 		"@types/jest": "^29.5.3",
 		"@types/node": "^17.0.45",
 		"chokidar": "^3.5.3",

@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-taquito",
-	"version": "0.56.17",
+	"version": "0.56.18",
 	"description": "A taqueria plugin for originating smart contracts using Taquito",
 	"targets": {
 		"default": {
@@ -41,14 +41,8 @@
 		"url": "https://github.com/tezostaqueria/taqueria/issues"
 	},
 	"homepage": "https://github.com/tezostaqueria/taqueria#readme",
-	"resolutions": {
-		"node-fetch": "3.3.2"
-	},
-	"overrides": {
-		"node-fetch": "3.3.2"
-	},
 	"dependencies": {
-		"@taqueria/node-sdk": "^0.56.17",
+		"@taqueria/node-sdk": "workspace:*",
 		"@taquito/michel-codec": "^21.0.0-beta.0",
 		"@taquito/signer": "^21.0.0-beta.0",
 		"@taquito/taquito": "^21.0.0-beta.0",

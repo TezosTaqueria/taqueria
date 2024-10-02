@@ -14,7 +14,7 @@ The plugin is written in TypeScript and compiled to a JavaScript bundle for Node
 To build the Tzcompose plugin, run the following command from the root of the plugin repository:
 
 ```shell
-npm run build -w taqueria-plugin-tzcompose
+pnpm run build --filter taqueria-plugin-tzcompose
 ```
 
 ## Installation

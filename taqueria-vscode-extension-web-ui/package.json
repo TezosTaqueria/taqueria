@@ -1,20 +1,14 @@
 {
 	"name": "taqueria-vscode-extension-web-ui",
 	"private": true,
-	"version": "0.56.17",
+	"version": "0.56.18",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc && vite build",
-		"postbuild": "npm run package",
+		"postbuild": "pnpm run package",
 		"package": "node ./scripts/package-for-extension.js",
 		"preview": "vite preview"
-	},
-	"resolutions": {
-		"node-fetch": "3.3.2"
-	},
-	"overrides": {
-		"node-fetch": "3.3.2"
 	},
 	"dependencies": {
 		"@taquito/michel-codec": "^21.0.0-beta.0",
