@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-ligo",
-	"version": "0.56.20",
+	"version": "0.56.22",
 	"description": "A taqueria plugin for compiling LIGO smart contracts",
 	"targets": {
 		"default": {

@@ -280,7 +280,7 @@ async function prepareTezBoxAccounts(
 	declaredAccounts: Record<string, Mutez>,
 ): Promise<Record<string, TezboxAccount>> {
 	// Add funder account to instantiatedAccounts
-	instantiatedAccounts['funder'] = await createFunderAccount();
+	// instantiatedAccounts['funder'] = await createFunderAccount();
 
 	const tezboxAccounts: Record<string, TezboxAccount> = {};
 
@@ -310,6 +310,11 @@ async function writeAccountsHjson(
 ): Promise<void> {
 	// TODO: Remove for debugging
 	await Promise.resolve();
+
+	// // Rearrange accounts record so that funder is first
+	// const funderAccount = tezboxAccounts['funder'];
+	// delete tezboxAccounts['funder'];
+	// tezboxAccounts = { funder: funderAccount, ...tezboxAccounts };
 
 	// Convert the accounts object to HJSON format
 	const hjsonContent = hjson.stringify(tezboxAccounts, {
@@ -356,6 +361,61 @@ async function prepareAccountsHjson(taskArgs: Opts, tezBoxConfigDir: string): Pr
 	} catch (error) {
 		const errorMessage = getErrorMessage(error);
 		throw new Error(`Failed to prepare accounts: ${errorMessage}`);
+	}
+}
+
+/**
+ * Prepares bakers.hjson for TezBox.
+ */
+async function prepareBakersHjson(taskArgs: Opts, tezBoxConfigDir: string): Promise<void> {
+	try {
+		// Get declared accounts
+		const declaredAccounts = getDeclaredAccounts(taskArgs);
+
+		// Calculate total balance
+		const totalBalance = Object.values(declaredAccounts).reduce(
+			(sum, balance) => BigNumber.sum(sum, balance),
+			new BigNumber(0),
+		).toString();
+
+		// Prepare bakers object
+		const bakers = {
+			baker1: {
+				pkh: 'tz1faswCTDciRzE4oJ9jn2Vm2dvjeyA9fUzU',
+				pk: 'edpkuTXkJDGcFd5nh6VvMz8phXxU3Bi7h6hqgywNFi1vZTfQNnS1RV',
+				sk: 'unencrypted:edsk4ArLQgBTLWG5FJmnGnT689VKoqhXwmDPBuGx3z4cvwU9MmrPZZ',
+				balance: totalBalance,
+			},
+			baker2: {
+				pkh: 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN',
+				pk: 'edpktzNbDAUjUk697W7gYg2CRuBQjyPxbEg8dLccYYwKSKvkPvjtV9',
+				sk: 'unencrypted:edsk39qAm1fiMjgmPkw1EgQYkMzkJezLNewd7PLNHTkr6w9XA2zdfo',
+				balance: totalBalance,
+			},
+			baker3: {
+				pkh: 'tz1b7tUupMgCNw2cCLpKTkSD1NZzB5TkP2sv',
+				pk: 'edpkuFrRoDSEbJYgxRtLx2ps82UdaYc1WwfS9sE11yhauZt5DgCHbU',
+				sk: 'unencrypted:edsk2uqQB9AY4FvioK2YMdfmyMrer5R8mGFyuaLLFfSRo8EoyNdht3',
+				balance: totalBalance,
+			},
+		};
+
+		// Convert the bakers object to HJSON format
+		const hjsonContent = hjson.stringify(bakers, {
+			quotes: 'min',
+			bracesSameLine: true,
+			separator: false,
+		});
+
+		// Remove quotes around sk values and ensure proper indentation
+		const fixedHjsonContent = hjsonContent.replaceAll('"', '');
+
+		// Write the bakers.hjson file
+		const bakersHjsonPath = path.join(tezBoxConfigDir, 'bakers.hjson');
+		await fs.promises.writeFile(bakersHjsonPath, fixedHjsonContent, 'utf8');
+	} catch (error) {
+		const errorMessage = getErrorMessage(error);
+		throw new Error(`Failed to prepare bakers: ${errorMessage}`);
 	}
 }
 
@@ -704,6 +764,9 @@ async function prepareTezBoxOverrides(taskArgs: Opts): Promise<void> {
 
 		// Prepare tasks
 		const tasks: Promise<void>[] = [];
+
+		// Prepare bakers.hjson
+		tasks.push(prepareBakersHjson(taskArgs, tezBoxConfigDir));
 
 		// Prepare accounts.hjson
 		if (taskArgs.config.accounts) {
