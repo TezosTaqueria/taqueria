@@ -361,6 +361,7 @@
         "npm:eta@^3.1.1",
         "npm:execa@^8.0.1",
         "npm:fix-esm@^1.0.1",
+        "npm:jest-cli@^29.7.0",
         "npm:jest@^29.7.0",
         "npm:ts-jest@^29.1.1",
         "npm:ts-node@^10.9.1",

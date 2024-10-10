@@ -333,8 +333,9 @@
         "npm:dprint@^0.45.0",
         "npm:husky@^9.0.11",
         "npm:lerna@^8.1.8",
-        "npm:lint-staged@^15.2.2",
+        "npm:lint-staged@^15.2.10",
         "npm:patch-package@^8.0.0",
+        "npm:pnpm@^9.12.1",
         "npm:ts-node@^10.9.2",
         "npm:tsup@^8.0.2",
         "npm:typescript@^5.3.3"

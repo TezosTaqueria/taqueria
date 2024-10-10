@@ -3,8 +3,6 @@
  * https://jestjs.io/docs/configuration
  */
 
-import tsconfig from './tsconfig';
-
 export default {
 	// All imported modules in your tests should be mocked automatically
 	// automock: false,
@@ -189,7 +187,11 @@ export default {
 	// 	'\.ts$' : ['ts-jest', tsconfig],
 	// 	'\.c?js$' : ['ts-jest', tsconfig],
 	// }
-
+	transform: {
+		'\.tsx?$': ['ts-jest', {
+			tsconfig: './tsconfig.json',
+		}],
+	},
 	// An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
 	// transformIgnorePatterns: [
 	//   "/node_modules/",
