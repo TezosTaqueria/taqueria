@@ -50,7 +50,7 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: taq-ubuntu-latest
           path: taq
@@ -66,7 +66,7 @@ jobs:
           set -e
 
       - name: Store work
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: work-stage1-ubuntu-latest
           path: work.tar.gz
@@ -115,7 +115,7 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: taq-macos-latest
           path: taq
@@ -156,7 +156,7 @@ jobs:
         run: echo "artifact=$(ls taqueria-vscode-extension/*.vsix)" >> "$GITHUB_OUTPUT"
 
       - name: Upload VSCode Extension
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: taqueria.vsix
           path: ${{ steps.vsix.outputs.artifact }}
@@ -172,7 +172,7 @@ jobs:
           set -e
 
       - name: Store work
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: work-stage2-ubuntu-latest
           path: work.tar.gz
