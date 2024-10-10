@@ -24,7 +24,7 @@ jobs:
         with:
           version: 9
 
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v2
         with:
           deno-version: v1.x
 
@@ -39,6 +39,9 @@ jobs:
 
       - name: Build types
         run: pnpm run build-types
+
+      - name: Build @taqueria/protocol
+        run: pnpm --filter @taqueria/protocol run build
 
       - name: Build binary
         run: pnpm run build:binary
@@ -90,7 +93,7 @@ jobs:
           with:
             version: 9
 
-        - uses: denoland/setup-deno@v1
+        - uses: denoland/setup-deno@v2
           with:
             deno-version: v1.x
 
