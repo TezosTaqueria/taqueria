@@ -103,10 +103,10 @@
 	"references": [
 		{
 			"path": "../taqueria-sdk"
-		},
-		{
-			"path": "../taqueria-protocol"
 		}
+		// {
+		// 	"path": "../taqueria-protocol"
+		// }
 	],
 	"include": ["./*.ts"]
 }

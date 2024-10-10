@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        node: [16]
+        node: [22]
     runs-on: ${{ matrix.os }}
     env:
       DENO_DIR: ./.deno
@@ -53,7 +53,7 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: taq-${{ matrix.os }}
           path: taq
@@ -71,11 +71,10 @@ jobs:
 
       - name: Store work
         if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: work-${{ matrix.os }}
+          name: work-stage1-${{ matrix.os }}
           path: work.tar.gz
-          overwrite: true
           retention-days: 1
 
   # Builds all NPM packages. Then update the archive of the work we've done and store it as an artifact to use in later jobs.
@@ -100,7 +99,7 @@ jobs:
         - name: Download work archive
           uses: actions/download-artifact@v3
           with:
-            name: work-ubuntu-latest
+            name: work-stage1-ubuntu-latest
             path: .
 
         - name: Extract work archive
@@ -114,7 +113,7 @@ jobs:
           run: echo "artifact=$(ls taqueria-vscode-extension/*.vsix)" >> "$GITHUB_OUTPUT"
 
         - name: Upload VSCode Extension
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: taqueria.vsix
             path: ${{ steps.vsix.outputs.artifact }}
@@ -130,8 +129,8 @@ jobs:
             set -e
 
         - name: Store work
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
-            name: work-ubuntu-latest
+            name: work-stage2-ubuntu-latest
             path: work.tar.gz
             retention-days: 1
