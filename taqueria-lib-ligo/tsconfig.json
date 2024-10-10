@@ -107,5 +107,6 @@
 		{
 			"path": "../taqueria-protocol"
 		}
-	]
+	],
+	"include": ["./*.ts"]
 }
