@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-taquito",
-	"version": "0.56.27",
+	"version": "0.56.28",
 	"description": "A taqueria plugin for originating smart contracts using Taquito",
 	"targets": {
 		"default": {

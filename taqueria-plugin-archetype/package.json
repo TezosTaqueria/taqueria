@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/plugin-archetype",
-	"version": "0.56.27",
+	"version": "0.56.28",
 	"description": "A taqueria plugin for compiling Archetype smart contracts",
 	"targets": {
 		"default": {
