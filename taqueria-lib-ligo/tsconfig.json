@@ -108,5 +108,16 @@
 		// 	"path": "../taqueria-protocol"
 		// }
 	],
-	"include": ["./*.ts"]
+	"include": ["./*.ts"],
+	"files": [
+		"./index.ts",
+		"./common.ts",
+		"./compile-all.ts",
+		"./compile.ts",
+		"./createContract.ts",
+		"./ligo_templates.ts",
+		"./ligo.ts",
+		"./main.ts",
+		"./test.ts"
+	]
 }
