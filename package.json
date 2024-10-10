@@ -1,6 +1,6 @@
 {
 	"name": "@taqueria/root",
-	"version": "0.56.33",
+	"version": "0.56.34",
 	"description": "An easy to use opinionated tool for building, testing, and deploying Tezos software",
 	"main": "index.ts",
 	"directories": {
@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"test": "yarn",
-		"build-types": "pnpm --filter taqueria-protocol run build-types",
+		"build-types": "pnpm --filter @taqueria/protocol run build-types",
 		"build-all": "./bin/build-all.sh",
 		"build:binary": "./bin/build.sh",
 		"build:packages": "lerna run build",
