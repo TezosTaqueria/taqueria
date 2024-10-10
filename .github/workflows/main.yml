@@ -5,14 +5,11 @@ on:
   pull_request:
       branches:
           - main
+
 jobs:
-  # Builds the 'taq' binary on Linux and MacOS. Then create an archive of the work we've done and store it as an artifact to use in later jobs.
-  build-binaries:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        node: [22]
-    runs-on: ${{ matrix.os }}
+  # Build binaries on Ubuntu
+  build-binaries-linux:
+    runs-on: ubuntu-latest
     env:
       DENO_DIR: ./.deno
     steps:
@@ -53,13 +50,12 @@ jobs:
           key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: taq-${{ matrix.os }}
+          name: taq-ubuntu-latest
           path: taq
 
       - name: Create archive of work
-        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           set +e
           tar -czpf work.tar.gz .
@@ -70,67 +66,114 @@ jobs:
           set -e
 
       - name: Store work
-        if: ${{ matrix.os == 'ubuntu-latest' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
-          name: work-stage1-${{ matrix.os }}
+          name: work-stage1-ubuntu-latest
           path: work.tar.gz
           retention-days: 1
 
-  # Builds all NPM packages. Then update the archive of the work we've done and store it as an artifact to use in later jobs.
+  # Build binaries on macOS
+  build-binaries-macos:
+    runs-on: macos-latest
+    env:
+      DENO_DIR: ./.deno
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v1.x
+
+      - name: Restore Deno Cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
+
+      - name: Install dependencies
+        run: rm -rf node_modules && pnpm install
+
+      - name: Build types
+        run: pnpm run build-types
+
+      - name: Build @taqueria/protocol
+        run: pnpm --filter @taqueria/protocol run build
+
+      - name: Build binary
+        run: pnpm run build:binary
+          
+      - name: Save Deno Cache
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ runner.os }}-deno-${{ hashFiles('deno.lock') }}
+
+      - name: Store artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: taq-macos-latest
+          path: taq
+
+  # Build packages
   build-packages:
-      needs: build-binaries
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
+    needs: build-binaries-linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-        - uses: actions/setup-node@v4
-          with:
-            node-version: 22
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-        - uses: pnpm/action-setup@v4
-          with:
-            version: 9
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
-        - uses: denoland/setup-deno@v2
-          with:
-            deno-version: v1.x
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v1.x
 
-        - name: Download work archive
-          uses: actions/download-artifact@v3
-          with:
-            name: work-stage1-ubuntu-latest
-            path: .
+      - name: Download work archive
+        uses: actions/download-artifact@v4
+        with:
+          name: work-stage1-ubuntu-latest
+          path: .
 
-        - name: Extract work archive
-          run: tar -xzpf work.tar.gz
+      - name: Extract work archive
+        run: tar -xzpf work.tar.gz
 
-        - name: Build packages
-          run: pnpm run build:packages
+      - name: Build packages
+        run: pnpm run build:packages
 
-        - name: Get VSIX
-          id: vsix
-          run: echo "artifact=$(ls taqueria-vscode-extension/*.vsix)" >> "$GITHUB_OUTPUT"
+      - name: Get VSIX
+        id: vsix
+        run: echo "artifact=$(ls taqueria-vscode-extension/*.vsix)" >> "$GITHUB_OUTPUT"
 
-        - name: Upload VSCode Extension
-          uses: actions/upload-artifact@v4
-          with:
-            name: taqueria.vsix
-            path: ${{ steps.vsix.outputs.artifact }}
+      - name: Upload VSCode Extension
+        uses: actions/upload-artifact@v3
+        with:
+          name: taqueria.vsix
+          path: ${{ steps.vsix.outputs.artifact }}
 
-        - name: Create archive of work
-          run: |
-            set +e
-            tar -czpf work.tar.gz .
-            exitcode=$?
-            if [ "$exitcode" != "1" ] && [ "$exitcode" != "0" ]; then
-              exit $exitcode
-            fi
-            set -e
+      - name: Create archive of work
+        run: |
+          set +e
+          tar -czpf work.tar.gz .
+          exitcode=$?
+          if [ "$exitcode" != "1" ] && [ "$exitcode" != "0" ]; then
+            exit $exitcode
+          fi
+          set -e
 
-        - name: Store work
-          uses: actions/upload-artifact@v4
-          with:
-            name: work-stage2-ubuntu-latest
-            path: work.tar.gz
-            retention-days: 1
+      - name: Store work
+        uses: actions/upload-artifact@v3
+        with:
+          name: work-stage2-ubuntu-latest
+          path: work.tar.gz
+          retention-days: 1
